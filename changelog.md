@@ -15,6 +15,7 @@
 - `TASK-166` se expandió después del cierre inicial:
   - `income/[id]`, `expenses/[id]`, `income/[id]/payment`, `clients`, `reconciliation/**` y los sync helpers principales ya respetan el mismo guard fail-closed
   - `clients` dejó de ser solo fail-closed: `create/update/sync` ya corre Postgres-first y conserva fallback BigQuery explícito solo mientras el flag legacy siga activo
+- `Finance Clients` dejó de depender de BigQuery también en lectura principal: `GET /api/finance/clients` y `GET /api/finance/clients/[id]` ahora nacen desde PostgreSQL (`greenhouse_core`, `greenhouse_finance`, `greenhouse_crm`, `v_client_active_modules`) y solo usan BigQuery como fallback transicional.
 - `TASK-166` arrancó el cutover real del write fallback legacy de Finance:
   - nuevo helper `src/lib/finance/bigquery-write-flag.ts`
   - `POST /api/finance/income` y `POST /api/finance/expenses` ya respetan `FINANCE_BIGQUERY_WRITE_ENABLED`

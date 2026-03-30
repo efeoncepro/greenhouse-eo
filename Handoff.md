@@ -93,8 +93,42 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 
 ### Residual explícito
 - El remanente de `Finance Clients` ya no es write path:
-  - list/detail y algunos enrichments siguen BigQuery-first
-  - ese follow-on pertenece a `TASK-050`, no bloquea el cierre operativo de `TASK-166`
+  - solo queda fallback transicional de compatibilidad cuando el carril Postgres no está disponible
+  - `TASK-050` ya no queda abierta por request path principal
+
+## Sesión 2026-03-30 — cierre del read path de Finance Clients
+
+### Objetivo
+- Cortar `GET /api/finance/clients` y `GET /api/finance/clients/[id]` al grafo Postgres-first para dejar `Finance Clients` realmente alineado con `TASK-050`.
+
+### Delta de ejecución
+- `GET /api/finance/clients` ya intenta resolver primero desde:
+  - `greenhouse_core.clients`
+  - `greenhouse_finance.client_profiles`
+  - `greenhouse_crm.companies`
+  - `greenhouse_core.v_client_active_modules`
+  - `greenhouse_finance.income`
+- `GET /api/finance/clients/[id]` ya intenta resolver primero desde:
+  - `greenhouse_core.clients`
+  - `greenhouse_finance.client_profiles`
+  - `greenhouse_crm.companies`
+  - `greenhouse_crm.deals`
+  - `greenhouse_core.v_client_active_modules`
+  - `greenhouse_finance.income`
+- BigQuery queda solo como fallback explícito cuando el read-path Postgres no está disponible.
+- Apoyo de subagentes utilizado:
+  - explorer para mapear el drift real del read path
+  - worker para sugerir cobertura de tests del cutover
+
+### Validación ejecutada
+- `pnpm exec eslint src/app/api/finance/clients/route.ts 'src/app/api/finance/clients/[id]/route.ts' src/app/api/finance/clients/sync/route.ts src/lib/finance/postgres-store-slice2.ts src/app/api/finance/bigquery-write-cutover.test.ts`
+- `pnpm exec vitest run src/app/api/finance/bigquery-write-cutover.test.ts src/lib/finance/bigquery-write-flag.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
+### Residual explícito
+- `Finance Clients` conserva fallback BigQuery transicional por compatibilidad.
+- El request path principal ya no depende de BigQuery; el remanente dejó de ser blocker arquitectónico.
 
 ## Sesión 2026-03-30 — arranque de TASK-166 Finance BigQuery write cutover
 

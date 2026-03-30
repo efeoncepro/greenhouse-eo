@@ -32,7 +32,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Ajuste relevante:
   - `suppliers` ya es Postgres-first para writes y dejó de depender de BigQuery como path principal
   - `clients` ya es Postgres-first para `create/update/sync` vía `greenhouse_finance.client_profiles`
-  - el remanente de `Finance Clients` ya no es de writes, sino de reads/hydration BigQuery-first
+  - `GET /api/finance/clients` y `GET /api/finance/clients/[id]` también ya nacen desde PostgreSQL (`greenhouse_core`, `greenhouse_finance`, `greenhouse_crm`, `v_client_active_modules`)
+  - BigQuery queda en `Finance Clients` solo como fallback explícito de compatibilidad, no como request path principal
 
 ## Delta 2026-03-30 UI/UX skill stack local reforzada
 - Greenhouse ya no debe depender solo de skills globales de UI para frontend portal.

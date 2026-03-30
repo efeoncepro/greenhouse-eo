@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import {
   getHubspotCompaniesExpressions,
   getHubspotDealsExpressions,
@@ -29,7 +30,7 @@ import {
 
 export const dynamic = 'force-dynamic'
 
-interface ClientProfileRow {
+type ClientProfileRow = Record<string, unknown> & {
   client_id: string | null
   greenhouse_client_name: string | null
   client_profile_id: string
@@ -57,7 +58,7 @@ interface ClientProfileRow {
   updated_at: unknown
 }
 
-interface InvoiceRow {
+type InvoiceRow = Record<string, unknown> & {
   income_id: string
   invoice_number: string | null
   invoice_date: unknown
@@ -68,7 +69,7 @@ interface InvoiceRow {
   amount_paid: unknown
 }
 
-interface DealRow {
+type DealRow = Record<string, unknown> & {
   deal_id: string | null
   deal_name: string | null
   deal_stage: string | null
@@ -97,6 +98,317 @@ const parseServiceModules = (value: string | null) =>
     .map(item => item.trim())
     .filter(Boolean)
 
+const shouldFallbackFromFinanceClientDetailReads = (error: unknown) => {
+  if (shouldFallbackFromFinancePostgres(error)) {
+    return true
+  }
+
+  if (!(error instanceof Error)) {
+    return false
+  }
+
+  const message = error.message.toLowerCase()
+
+  return (
+    message.includes('relation') && message.includes('does not exist')
+  ) || message.includes('greenhouse_crm') || message.includes('v_client_active_modules')
+}
+
+const readFinanceClientDetailFromPostgres = async (id: string) => {
+  const rows = await runGreenhousePostgresQuery<ClientProfileRow>(
+    `
+      WITH latest_profiles AS (
+        SELECT DISTINCT ON (cp.client_profile_id)
+          cp.client_profile_id,
+          cp.client_id,
+          cp.hubspot_company_id,
+          cp.tax_id,
+          cp.tax_id_type,
+          cp.legal_name,
+          cp.billing_address,
+          cp.billing_country,
+          cp.payment_terms_days,
+          cp.payment_currency,
+          cp.requires_po,
+          cp.requires_hes,
+          cp.current_po_number,
+          cp.current_hes_number,
+          cp.finance_contacts,
+          cp.special_conditions,
+          cp.created_by_user_id,
+          cp.created_at,
+          cp.updated_at
+        FROM greenhouse_finance.client_profiles cp
+        ORDER BY cp.client_profile_id, cp.updated_at DESC, cp.created_at DESC
+      ),
+      crm_company_by_client AS (
+        SELECT DISTINCT ON (client_id)
+          client_id,
+          hubspot_company_id,
+          company_name,
+          legal_name,
+          country_code,
+          website_url
+        FROM greenhouse_crm.companies
+        WHERE client_id IS NOT NULL
+          AND is_deleted = FALSE
+        ORDER BY client_id, updated_at DESC, synced_at DESC
+      ),
+      crm_company_by_hubspot AS (
+        SELECT DISTINCT ON (hubspot_company_id)
+          hubspot_company_id,
+          company_name,
+          legal_name,
+          country_code,
+          website_url
+        FROM greenhouse_crm.companies
+        WHERE hubspot_company_id IS NOT NULL
+          AND is_deleted = FALSE
+        ORDER BY hubspot_company_id, updated_at DESC, synced_at DESC
+      ),
+      module_summary_by_client AS (
+        SELECT
+          vam.client_id,
+          MIN(sm.business_line) FILTER (WHERE sm.business_line IS NOT NULL) AS business_line,
+          STRING_AGG(DISTINCT vam.module_code, ';' ORDER BY vam.module_code) AS service_modules_raw
+        FROM greenhouse_core.v_client_active_modules vam
+        JOIN greenhouse_core.service_modules sm ON sm.module_id = vam.module_id
+        GROUP BY vam.client_id
+      )
+      SELECT
+        c.client_id,
+        c.client_name AS greenhouse_client_name,
+        COALESCE(cp.client_profile_id, c.client_id, c.hubspot_company_id) AS client_profile_id,
+        COALESCE(cp.hubspot_company_id, c.hubspot_company_id, cch.hubspot_company_id) AS hubspot_company_id,
+        COALESCE(cc.company_name, cch.company_name) AS company_name,
+        NULLIF(REGEXP_REPLACE(COALESCE(cc.website_url, cch.website_url, ''), '^https?://(www\\.)?', ''), '') AS company_domain,
+        COALESCE(cc.country_code, cch.country_code) AS company_country,
+        ms.business_line,
+        ms.service_modules_raw,
+        COALESCE(cp.tax_id, NULL) AS tax_id,
+        COALESCE(cp.tax_id_type, NULL) AS tax_id_type,
+        COALESCE(cp.legal_name, cc.legal_name, cch.legal_name, cc.company_name, cch.company_name, c.client_name) AS legal_name,
+        cp.billing_address,
+        COALESCE(cp.billing_country, 'CL') AS billing_country,
+        COALESCE(cp.payment_terms_days, 30) AS payment_terms_days,
+        COALESCE(cp.payment_currency, 'CLP') AS payment_currency,
+        COALESCE(cp.requires_po, FALSE) AS requires_po,
+        COALESCE(cp.requires_hes, FALSE) AS requires_hes,
+        cp.current_po_number,
+        cp.current_hes_number,
+        cp.finance_contacts,
+        cp.special_conditions,
+        cp.created_by_user_id AS created_by,
+        cp.created_at,
+        cp.updated_at
+      FROM greenhouse_core.clients c
+      LEFT JOIN latest_profiles cp ON cp.client_id = c.client_id
+      LEFT JOIN crm_company_by_client cc ON cc.client_id = c.client_id
+      LEFT JOIN crm_company_by_hubspot cch ON cch.hubspot_company_id = COALESCE(cp.hubspot_company_id, c.hubspot_company_id)
+      LEFT JOIN module_summary_by_client ms ON ms.client_id = c.client_id
+      WHERE c.active = TRUE
+        AND (
+          c.client_id = $1
+          OR c.hubspot_company_id = $1
+          OR cp.client_profile_id = $1
+          OR cp.hubspot_company_id = $1
+        )
+      LIMIT 1
+    `,
+    [id]
+  )
+
+  let row = rows[0]
+
+  if (!row) {
+    const fallbackRows = await runGreenhousePostgresQuery<ClientProfileRow>(
+      `
+        WITH crm_company_by_hubspot AS (
+          SELECT DISTINCT ON (hubspot_company_id)
+            hubspot_company_id,
+            company_name,
+            legal_name,
+            country_code,
+            website_url
+          FROM greenhouse_crm.companies
+          WHERE hubspot_company_id IS NOT NULL
+            AND is_deleted = FALSE
+          ORDER BY hubspot_company_id, updated_at DESC, synced_at DESC
+        ),
+        module_summary_by_client AS (
+          SELECT
+            vam.client_id,
+            MIN(sm.business_line) FILTER (WHERE sm.business_line IS NOT NULL) AS business_line,
+            STRING_AGG(DISTINCT vam.module_code, ';' ORDER BY vam.module_code) AS service_modules_raw
+          FROM greenhouse_core.v_client_active_modules vam
+          JOIN greenhouse_core.service_modules sm ON sm.module_id = vam.module_id
+          GROUP BY vam.client_id
+        )
+        SELECT
+          cp.client_id,
+          c.client_name AS greenhouse_client_name,
+          cp.client_profile_id,
+          cp.hubspot_company_id,
+          cch.company_name,
+          NULLIF(REGEXP_REPLACE(COALESCE(cch.website_url, ''), '^https?://(www\\.)?', ''), '') AS company_domain,
+          cch.country_code AS company_country,
+          ms.business_line,
+          ms.service_modules_raw,
+          cp.tax_id,
+          cp.tax_id_type,
+          COALESCE(cp.legal_name, cch.legal_name, cch.company_name) AS legal_name,
+          cp.billing_address,
+          COALESCE(cp.billing_country, 'CL') AS billing_country,
+          COALESCE(cp.payment_terms_days, 30) AS payment_terms_days,
+          COALESCE(cp.payment_currency, 'CLP') AS payment_currency,
+          COALESCE(cp.requires_po, FALSE) AS requires_po,
+          COALESCE(cp.requires_hes, FALSE) AS requires_hes,
+          cp.current_po_number,
+          cp.current_hes_number,
+          cp.finance_contacts,
+          cp.special_conditions,
+          cp.created_by_user_id AS created_by,
+          cp.created_at,
+          cp.updated_at
+        FROM greenhouse_finance.client_profiles cp
+        LEFT JOIN greenhouse_core.clients c ON c.client_id = cp.client_id
+        LEFT JOIN crm_company_by_hubspot cch ON cch.hubspot_company_id = cp.hubspot_company_id
+        LEFT JOIN module_summary_by_client ms ON ms.client_id = cp.client_id
+        WHERE cp.client_profile_id = $1 OR cp.hubspot_company_id = $1
+        LIMIT 1
+      `,
+      [id]
+    )
+
+    row = fallbackRows[0]
+  }
+
+  if (!row) {
+    return null
+  }
+
+  const financeContacts = parseFinanceContacts(row.finance_contacts)
+  const hubspotCompanyId = row.hubspot_company_id ? normalizeString(row.hubspot_company_id) : null
+  const clientProfileId = normalizeString(row.client_profile_id)
+  const clientId = row.client_id ? normalizeString(row.client_id) : null
+
+  const invoices = await runGreenhousePostgresQuery<InvoiceRow>(
+    `
+      SELECT income_id, invoice_number, invoice_date, due_date, total_amount, currency, payment_status, amount_paid
+      FROM greenhouse_finance.income
+      WHERE client_id = $1 OR client_profile_id = $2 OR hubspot_company_id = $3
+      ORDER BY invoice_date DESC
+      LIMIT 50
+    `,
+    [clientId, clientProfileId, hubspotCompanyId]
+  )
+
+  const summaryRows = await runGreenhousePostgresQuery<{
+    total_receivable: unknown
+    active_invoices_count: unknown
+    overdue_invoices_count: unknown
+  }>(
+    `
+      SELECT
+        COALESCE(
+          SUM(
+            COALESCE(total_amount_clp, 0) * CASE
+              WHEN COALESCE(total_amount, 0) = 0 THEN 0
+              ELSE GREATEST(COALESCE(total_amount, 0) - COALESCE(amount_paid, 0), 0) / NULLIF(COALESCE(total_amount, 0), 0)
+            END
+          ),
+          0
+        ) AS total_receivable,
+        COUNT(*) FILTER (WHERE payment_status IN ('pending', 'overdue', 'partial')) AS active_invoices_count,
+        COUNT(*) FILTER (WHERE payment_status = 'overdue') AS overdue_invoices_count
+      FROM greenhouse_finance.income
+      WHERE client_id = $1 OR client_profile_id = $2 OR hubspot_company_id = $3
+    `,
+    [clientId, clientProfileId, hubspotCompanyId]
+  )
+
+  const deals = hubspotCompanyId
+    ? await runGreenhousePostgresQuery<DealRow>(
+      `
+        SELECT
+          hubspot_deal_id AS deal_id,
+          deal_name,
+          stage_name AS deal_stage,
+          pipeline_id AS pipeline,
+          amount,
+          close_date
+        FROM greenhouse_crm.deals
+        WHERE hubspot_company_id = $1
+          AND is_deleted = FALSE
+        ORDER BY close_date DESC NULLS LAST, hubspot_deal_id DESC
+        LIMIT 25
+      `,
+      [hubspotCompanyId]
+    )
+    : []
+
+  const summary = summaryRows[0]
+
+  return {
+    company: {
+      clientId,
+      greenhouseClientName: row.greenhouse_client_name ? normalizeString(row.greenhouse_client_name) : null,
+      hubspotCompanyId,
+      companyName: row.company_name ? normalizeString(row.company_name) : null,
+      companyDomain: row.company_domain ? normalizeString(row.company_domain) : null,
+      companyCountry: row.company_country ? normalizeString(row.company_country) : null,
+      businessLine: row.business_line ? normalizeString(row.business_line) : null,
+      serviceModules: parseServiceModules(row.service_modules_raw)
+    },
+    financialProfile: {
+      clientId,
+      clientProfileId,
+      hubspotCompanyId,
+      companyName: row.company_name ? normalizeString(row.company_name) : null,
+      taxId: row.tax_id ? normalizeString(row.tax_id) : null,
+      taxIdType: row.tax_id_type ? normalizeString(row.tax_id_type) : 'RUT',
+      legalName: row.legal_name ? normalizeString(row.legal_name) : null,
+      billingAddress: row.billing_address ? normalizeString(row.billing_address) : null,
+      billingCountry: row.billing_country ? normalizeString(row.billing_country) : 'CL',
+      paymentTermsDays: toNumber(row.payment_terms_days),
+      paymentCurrency: normalizeString(row.payment_currency),
+      requiresPo: normalizeBoolean(row.requires_po),
+      requiresHes: normalizeBoolean(row.requires_hes),
+      currentPoNumber: row.current_po_number ? normalizeString(row.current_po_number) : null,
+      currentHesNumber: row.current_hes_number ? normalizeString(row.current_hes_number) : null,
+      financeContacts,
+      specialConditions: row.special_conditions ? normalizeString(row.special_conditions) : null,
+      createdBy: row.created_by ? normalizeString(row.created_by) : null,
+      createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
+      updatedAt: toTimestampString(row.updated_at as string | { value?: string } | null)
+    },
+    summary: {
+      totalReceivable: toNumber(summary?.total_receivable),
+      activeInvoicesCount: toNumber(summary?.active_invoices_count),
+      overdueInvoicesCount: toNumber(summary?.overdue_invoices_count)
+    },
+    invoices: invoices.map(inv => ({
+      incomeId: normalizeString(inv.income_id),
+      invoiceNumber: inv.invoice_number ? normalizeString(inv.invoice_number) : null,
+      invoiceDate: toDateString(inv.invoice_date as string | { value?: string } | null),
+      dueDate: toDateString(inv.due_date as string | { value?: string } | null),
+      totalAmount: toNumber(inv.total_amount),
+      currency: normalizeString(inv.currency),
+      paymentStatus: normalizeString(inv.payment_status),
+      amountPaid: toNumber(inv.amount_paid),
+      amountPending: toNumber(inv.total_amount) - toNumber(inv.amount_paid)
+    })),
+    deals: deals.map(deal => ({
+      dealId: deal.deal_id ? normalizeString(deal.deal_id) : null,
+      dealName: deal.deal_name ? normalizeString(deal.deal_name) : null,
+      dealStage: deal.deal_stage ? normalizeString(deal.deal_stage) : null,
+      pipeline: deal.pipeline ? normalizeString(deal.pipeline) : null,
+      amount: toNumber(deal.amount),
+      closeDate: toDateString(deal.close_date as string | { value?: string } | null)
+    }))
+  }
+}
+
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { tenant, errorResponse } = await requireFinanceTenantContext()
 
@@ -107,6 +419,23 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   await ensureFinanceInfrastructure()
 
   const { id } = await params
+
+  try {
+    const response = await readFinanceClientDetailFromPostgres(id)
+
+    if (!response) {
+      return NextResponse.json({ error: 'Client profile not found' }, { status: 404 })
+    }
+
+    return NextResponse.json(response)
+  } catch (error) {
+    if (!shouldFallbackFromFinanceClientDetailReads(error)) {
+      throw error
+    }
+
+    console.warn('[finance/clients/[id]] Postgres-first read path unavailable, falling back to BigQuery.', error)
+  }
+
   const projectId = getFinanceProjectId()
   const companyColumns = await getHubspotTableColumns('companies')
   const dealColumns = await getHubspotTableColumns('deals')

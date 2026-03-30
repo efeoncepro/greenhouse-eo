@@ -38,7 +38,7 @@ Brechas derivadas de revisar:
 
 | Gap                                                                    | Evidencia en repo                                                                                                                                                                                            | Riesgo operativo                                                                                                             | Cierre propuesto                                              |
 | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| Finance client runtime sigue anclado a BigQuery legacy                 | `src/app/api/finance/clients/route.ts`, `src/app/api/finance/clients/[id]/route.ts` y `src/lib/finance/canonical.ts` siguen leyendo `projectId.greenhouse.clients`, `fin_client_profiles` y conformed tables | identidad de cliente duplicada o inconsistente frente a `greenhouse_core.clients`, `organization_id` y snapshots ejecutivos  | `TASK-050 - Finance Client Canonical Runtime Cutover`         |
+| Finance client runtime sigue anclado a BigQuery legacy                 | **Resuelto en runtime principal.** `src/app/api/finance/clients/route.ts` y `src/app/api/finance/clients/[id]/route.ts` ya operan Postgres-first con fallback explícito; `src/lib/finance/canonical.ts` conserva fallback BigQuery transicional por compatibilidad | residual localizado solo en fallback/compatibilidad, no en request path principal                                             | Cerrado por `TASK-050` + refuerzo de `TASK-166`               |
 | Finance <-> Payroll bridge sigue híbrido y parcialmente roto           | `src/app/api/finance/analytics/trends/route.ts` consulta `greenhouse_hr.payroll_entries`; `expenses/payroll-candidates` y `resolveFinanceMemberContext()` siguen leyendo payroll/team legacy en BigQuery     | trends de payroll pueden fallar o quedar vacíos; linking de expenses a payroll no converge sobre el source of truth canónico | `TASK-051 - Finance Payroll Bridge Postgres Alignment`        |
 | Person 360 finance no está alineado con permisos reales de Finance     | `canAccessPeopleModule()` no permite roles `finance`; `getPersonAccess()` solo habilita tab financiera a `admin`, `ops` y `hr_payroll`                                                                       | Finance no puede consumir la ficha financiera por persona aunque la proyección `person_finance_360` ya existe                | `TASK-052 - Person 360 Finance Access Alignment`              |
 | Attendance/leave payroll summary sigue sobrecontando permisos cruzados | `src/lib/payroll/fetch-attendance-for-period.ts` suma `requested_days` completos con solo condición de traslape de fechas                                                                                    | descuentos de nómina pueden inflarse cuando un permiso cruza más de un período                                               | ya owned por `TASK-005` y `TASK-001`; no crear lane duplicada |
@@ -52,10 +52,11 @@ Brechas derivadas de revisar:
   - `PUT /api/finance/clients/[id]`
   - `POST /api/finance/clients/sync`
   ya operan Postgres-first sobre `greenhouse_finance.client_profiles`.
-- El residual vigente del gap es read-path:
-  - list/detail siguen consultando BigQuery legacy e hydrations híbridas
-  - `resolveFinanceClientContext()` mantiene fallback BigQuery explícito
-- La tabla de brechas se mantiene abierta porque el request path completo todavía no está cortado al grafo canónico.
+- El read path también quedó cortado:
+  - `GET /api/finance/clients`
+  - `GET /api/finance/clients/[id]`
+  ya nacen desde PostgreSQL y solo caen a BigQuery cuando el carril Postgres no está disponible.
+- El residual vigente ya no es el request path principal sino el fallback transicional de compatibilidad.
 
 ### Evidencia
 

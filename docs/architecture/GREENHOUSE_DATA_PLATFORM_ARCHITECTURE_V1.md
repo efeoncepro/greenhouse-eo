@@ -229,6 +229,7 @@ Operational status after `TASK-166`:
   - reconciliation create/update/match/unmatch/exclude/statements/auto-match
 - `suppliers` no longer uses BigQuery as its primary write path; it is Postgres-first with transitional fallback only when the flag remains enabled
 - `clients` no longer uses BigQuery as its primary write path for mutations; `greenhouse_finance.client_profiles` is now the write baseline and BigQuery remains only as transitional fallback when the flag remains enabled
+- `Finance Clients` list/detail no longer use BigQuery as the primary request path either; PostgreSQL (`greenhouse_core`, `greenhouse_finance`, `greenhouse_crm`, `v_client_active_modules`) is the baseline and BigQuery remains only as explicit read fallback
 Cutover sequence: automated fail-closed validation with flag `false` → staging rollout with flag `false` on covered routes → production rollout with flag `false` → remove BQ write code route by route.
 
 #### AI Tooling operational workflows
