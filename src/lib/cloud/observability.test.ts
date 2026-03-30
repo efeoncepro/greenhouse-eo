@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-const { getSecretSource } = vi.hoisted(() => ({
+const { getSecretSource, resolveSecret } = vi.hoisted(() => ({
   getSecretSource: vi.fn(async ({ envVarName, env }: { envVarName: string, env: Record<string, string | undefined> }) => {
     const secretRef = env[`${envVarName}_SECRET_REF`]?.trim()
     const envValue = env[envVarName]?.trim()
@@ -11,11 +11,16 @@ const { getSecretSource } = vi.hoisted(() => ({
       secretRef: secretRef || null,
       source: secretRef ? 'secret_manager' : envValue ? 'env' : 'unconfigured'
     }
-  })
+  }),
+  resolveSecret: vi.fn(async ({ envVarName, env }: { envVarName: string, env: Record<string, string | undefined> }) => ({
+    value: env[envVarName]?.trim() || null,
+    source: env[envVarName]?.trim() ? 'env' : 'unconfigured'
+  }))
 }))
 
 vi.mock('@/lib/secrets/secret-manager', () => ({
-  getSecretSource
+  getSecretSource,
+  resolveSecret
 }))
 
 import { getCloudObservabilityPosture, getCloudSentryIncidents } from '@/lib/cloud/observability'
@@ -61,6 +66,7 @@ describe('getCloudObservabilityPosture', () => {
     })
 
     expect(posture.summary).toContain('Sentry runtime + source maps listos')
+    expect(posture.summary).toContain('reader de incidentes Sentry configurado')
     expect(posture.sentry.sourceMapsReady).toBe(true)
   })
 
@@ -166,5 +172,25 @@ describe('getCloudSentryIncidents', () => {
     expect(snapshot.enabled).toBe(true)
     expect(snapshot.available).toBe(false)
     expect(snapshot.incidents).toEqual([])
+  })
+
+  it('returns an actionable warning when the token lacks issues permission', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => ({
+      ok: false,
+      status: 403,
+      text: async () => '{"detail":"You do not have permission to perform this action."}'
+    })))
+
+    const snapshot = await getCloudSentryIncidents({
+      SENTRY_INCIDENTS_AUTH_TOKEN: 'reader-token',
+      SENTRY_ORG: 'efeonce-group-spa',
+      SENTRY_PROJECT: 'javascript-nextjs'
+    })
+
+    expect(snapshot.status).toBe('warning')
+    expect(snapshot.available).toBe(false)
+    expect(snapshot.summary).toContain('no tiene permisos para leer incidentes')
+    expect(snapshot.error).toContain('HTTP 403')
+    expect(snapshot.error).toContain('event:read')
   })
 })

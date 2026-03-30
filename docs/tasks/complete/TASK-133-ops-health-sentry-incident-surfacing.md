@@ -1,5 +1,15 @@
 # TASK-133 — Ops Health: Sentry Incident Surfacing
 
+## Delta 2026-03-30
+
+- Se endureció el reader de incidentes para separar credencial de lectura (`SENTRY_INCIDENTS_AUTH_TOKEN`) del token de build/source maps (`SENTRY_AUTH_TOKEN`).
+- `src/lib/cloud/observability.ts` ahora devuelve un warning accionable cuando Sentry responde `401/403`, en vez de un fallo genérico.
+- El contrato ambiental recomendado para `Ops Health` pasa a ser:
+  - `SENTRY_INCIDENTS_AUTH_TOKEN` o `SENTRY_INCIDENTS_AUTH_TOKEN_SECRET_REF`
+  - `SENTRY_ORG`
+  - `SENTRY_PROJECT`
+- `SENTRY_AUTH_TOKEN` se mantiene como fallback transicional y como token build-time para source maps.
+
 ## Delta 2026-03-29
 
 - Cerrada con integración fail-soft de incidentes Sentry en `src/lib/cloud/observability.ts`.

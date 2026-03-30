@@ -3,6 +3,19 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-30 Sentry incident reader hardening
+- `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.
+- Nuevo contrato soportado:
+  - `SENTRY_INCIDENTS_AUTH_TOKEN`
+  - `SENTRY_INCIDENTS_AUTH_TOKEN_SECRET_REF`
+- `src/lib/cloud/observability.ts` intenta leer incidentes con `SENTRY_INCIDENTS_AUTH_TOKEN` primero y solo cae a `SENTRY_AUTH_TOKEN` como compatibilidad transicional.
+- Si Sentry responde `401/403`, la UI mantiene degradación fail-soft pero con mensaje accionable:
+  - el token no tiene permisos para leer incidentes
+  - el reader requiere un token con scope `event:read`
+- Decisión operativa:
+  - `SENTRY_AUTH_TOKEN` sigue siendo el token principal de build/source maps
+  - `SENTRY_INCIDENTS_AUTH_TOKEN` pasa a ser el canal recomendado para `Ops Health`
+
 ## Delta 2026-03-29 notifications identity model
 - El sistema de notificaciones ya no debe leerse como `client_user-first`.
 - Contrato canónico vigente:

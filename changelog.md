@@ -5,6 +5,12 @@
 - Registrar solo cambios con impacto real en comportamiento, estructura, flujo de trabajo o despliegue.
 - Usar entradas cortas, fechadas y accionables.
 
+## 2026-03-30
+
+### Sentry incident reader hardened for Ops Health
+- `src/lib/cloud/observability.ts` ya soporta un token dedicado `SENTRY_INCIDENTS_AUTH_TOKEN` / `_SECRET_REF` para leer incidentes, sin asumir que `SENTRY_AUTH_TOKEN` también tiene permisos de issues.
+- Cuando Sentry responde `401/403`, `Ops Health` mantiene el fallback fail-soft pero ahora muestra un mensaje accionable de permisos en lugar de un warning genérico.
+
 ## 2026-03-29
 
 ### Notifications moved to a person-first recipient model

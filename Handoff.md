@@ -4,6 +4,30 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — hardening Sentry incident reader
+
+### Completado
+- Se aisló el incidente visible en `staging` desde `/admin/ops-health`: el bloque `Incidentes Sentry` degradaba con `HTTP 403 {"detail":"You do not have permission to perform this action."}`.
+- La causa raíz es de permisos/token, no de UI:
+  - el runtime estaba usando `SENTRY_AUTH_TOKEN` para leer issues de Sentry
+  - ese token puede servir para build/source maps y aun así no tener permisos de lectura de incidentes
+- `src/lib/cloud/observability.ts` ahora:
+  - resuelve `SENTRY_INCIDENTS_AUTH_TOKEN` / `SENTRY_INCIDENTS_AUTH_TOKEN_SECRET_REF` como credencial preferida
+  - mantiene fallback a `SENTRY_AUTH_TOKEN` solo como compatibilidad transicional
+  - cuando Sentry responde `401/403`, proyecta un warning accionable en vez de un fallo genérico
+
+### Archivos tocados
+- `src/lib/cloud/observability.ts`
+- `src/lib/cloud/observability.test.ts`
+- `.env.example`
+- `project_context.md`
+- `docs/tasks/complete/TASK-133-ops-health-sentry-incident-surfacing.md`
+- `changelog.md`
+
+### Pendiente inmediato
+- Correr validación local (`vitest`, `eslint`, `tsc`, `build`).
+- Sembrar en `staging` un `SENTRY_INCIDENTS_AUTH_TOKEN` con permisos reales de lectura de incidentes si se quiere recuperar el bloque con data real.
+
 ## Sesión 2026-03-29 — Notifications endurecida a person-first
 
 ### Completado

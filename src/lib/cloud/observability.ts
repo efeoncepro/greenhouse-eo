@@ -6,7 +6,7 @@ import type {
   CloudSentryIncidentLevel,
   CloudSentryIncidentsSnapshot
 } from '@/lib/cloud/contracts'
-import { getSecretSource } from '@/lib/secrets/secret-manager'
+import { getSecretSource, resolveSecret } from '@/lib/secrets/secret-manager'
 
 const hasValue = (value: string | undefined) => Boolean(value?.trim())
 
@@ -144,7 +144,7 @@ const fetchWithTimeout = async (input: string, init: RequestInit, timeoutMs: num
 }
 
 export const getCloudObservabilityPosture = async (env: ObservabilityEnv = process.env): Promise<CloudObservabilityPosture> => {
-  const [sentryDsnSource, slackWebhookSource] = await Promise.all([
+  const [sentryDsnSource, slackWebhookSource, sentryIncidentsAuthTokenSource] = await Promise.all([
     getSecretSource({
       envVarName: 'SENTRY_DSN',
       env: env as NodeJS.ProcessEnv
@@ -152,12 +152,20 @@ export const getCloudObservabilityPosture = async (env: ObservabilityEnv = proce
     getSecretSource({
       envVarName: 'SLACK_ALERTS_WEBHOOK_URL',
       env: env as NodeJS.ProcessEnv
+    }),
+    getSecretSource({
+      envVarName: 'SENTRY_INCIDENTS_AUTH_TOKEN',
+      env: env as NodeJS.ProcessEnv
     })
   ])
 
   const sentryDsnConfigured = sentryDsnSource.source !== 'unconfigured' || hasValue(env.NEXT_PUBLIC_SENTRY_DSN)
   const sentryClientDsnConfigured = hasValue(env.NEXT_PUBLIC_SENTRY_DSN)
   const sentryAuthTokenConfigured = hasValue(env.SENTRY_AUTH_TOKEN)
+
+  const sentryIncidentsReaderConfigured =
+    sentryIncidentsAuthTokenSource.source !== 'unconfigured' || sentryAuthTokenConfigured
+
   const sentryOrgConfigured = hasValue(env.SENTRY_ORG)
   const sentryProjectConfigured = hasValue(env.SENTRY_PROJECT)
   const sentrySourceMapsReady = sentryAuthTokenConfigured && sentryOrgConfigured && sentryProjectConfigured
@@ -170,6 +178,9 @@ export const getCloudObservabilityPosture = async (env: ObservabilityEnv = proce
         : sentryClientDsnConfigured
           ? 'Sentry runtime configurado con source maps pendientes'
           : 'Sentry server configurado; falta DSN público o source maps'
+      : null,
+    sentryIncidentsReaderConfigured && sentryOrgConfigured && sentryProjectConfigured
+      ? 'reader de incidentes Sentry configurado'
       : null,
     slackAlertsWebhookConfigured ? 'Slack alerts configuradas' : null
   ].filter(Boolean)
@@ -193,7 +204,12 @@ export const getCloudObservabilityPosture = async (env: ObservabilityEnv = proce
 }
 
 export const getCloudSentryIncidents = async (env: ObservabilityEnv = process.env): Promise<CloudSentryIncidentsSnapshot> => {
-  const sentryAuthToken = env.SENTRY_AUTH_TOKEN?.trim()
+  const incidentsTokenResolution = await resolveSecret({
+    envVarName: 'SENTRY_INCIDENTS_AUTH_TOKEN',
+    env: env as NodeJS.ProcessEnv
+  })
+
+  const sentryAuthToken = incidentsTokenResolution.value?.trim() || env.SENTRY_AUTH_TOKEN?.trim()
   const sentryOrg = env.SENTRY_ORG?.trim()
   const sentryProject = env.SENTRY_PROJECT?.trim()
 
@@ -231,12 +247,18 @@ export const getCloudSentryIncidents = async (env: ObservabilityEnv = process.en
     if (!response.ok) {
       const errorBody = await response.text()
 
+      const permissionError = response.status === 401 || response.status === 403
+
       return buildIncidentsSnapshot({
         status: 'warning',
         enabled: true,
         available: false,
-        summary: 'No fue posible consultar incidentes Sentry',
-        error: `HTTP ${response.status}${errorBody ? ` · ${errorBody.slice(0, 200)}` : ''}`
+        summary: permissionError
+          ? 'El token Sentry no tiene permisos para leer incidentes'
+          : 'No fue posible consultar incidentes Sentry',
+        error: permissionError
+          ? `HTTP ${response.status} · el reader necesita un token con scope event:read para ${sentryOrg}/${sentryProject}${errorBody ? ` · ${errorBody.slice(0, 200)}` : ''}`
+          : `HTTP ${response.status}${errorBody ? ` · ${errorBody.slice(0, 200)}` : ''}`
       })
     }
 
