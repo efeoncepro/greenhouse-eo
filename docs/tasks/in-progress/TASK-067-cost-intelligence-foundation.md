@@ -10,15 +10,39 @@
 - No existen `accounting.*` event types — esta task los agrega.
 - No existe `cost_intelligence` domain en projections — esta task lo registra.
 
+## Delta 2026-03-30 — Bootstrap foundation aplicado
+
+- Ya quedó aplicado el setup idempotente `pnpm setup:postgres:cost-intelligence` sobre Cloud SQL.
+- Nuevo schema operativo:
+  - `greenhouse_cost_intelligence`
+- Nuevas tablas base:
+  - `greenhouse_cost_intelligence.period_closure_config`
+  - `greenhouse_cost_intelligence.period_closures`
+  - `greenhouse_serving.period_closure_status`
+  - `greenhouse_serving.operational_pl_snapshots`
+- Nuevo script/wrapper:
+  - `scripts/setup-postgres-cost-intelligence.sql`
+  - `scripts/setup-postgres-cost-intelligence.ts`
+- `scripts/pg-doctor.ts` ya reconoce `greenhouse_cost_intelligence`.
+- `event-catalog.ts` ya soporta aggregate types y eventos `accounting.*`.
+- `projection-registry.ts` ya reconoce `cost_intelligence` como domain soportado.
+- Nueva route disponible:
+  - `/api/cron/outbox-react-cost-intelligence`
+- `GET /api/internal/projections` ya expone `supportedDomains`, incluyendo `cost_intelligence`.
+
+Pendiente para cerrar la task:
+- decidir si se agenda cron dedicada en `vercel.json` o si el catch-all `outbox-react` sigue siendo suficiente para esta fase
+- cerrar smoke explícito del endpoint con request autenticado de cron
+
 ## Status
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `in-progress` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Medio` |
-| Status real | `Diseño` |
+| Status real | `Implementación` |
 | Rank | — |
 | Domain | Cost Intelligence |
 

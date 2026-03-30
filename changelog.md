@@ -2,6 +2,7 @@
 
 ## 2026-03-30
 
+- `TASK-067` dejó aplicada la fundación técnica de Cost Intelligence: schema `greenhouse_cost_intelligence`, tablas base de cierre de período y P&L operativo, script `setup:postgres:cost-intelligence`, eventos `accounting.*`, domain `cost_intelligence` soportado por el projection registry y route `/api/cron/outbox-react-cost-intelligence`.
 - Se endureció documentalmente `TASK-141` para que la futura institucionalización `person-first` preserve los carriles reactivos: notificaciones, outbox, webhook dispatch, projections de finance, ICO y person intelligence.
 - La arquitectura ya deja explícito que `identity_profile` es la raíz humana, pero `member_id` y `user_id` siguen siendo claves operativas que no deben romperse en recipients, inbox/preferencias, overrides, serving por colaborador ni envelopes reactivos.
 - `TASK-136` quedó formalmente cerrada y movida a `docs/tasks/complete/`, ya que la gobernanza por vistas alcanzó el baseline operativo comprometido del portal actual.

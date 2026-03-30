@@ -62,6 +62,24 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - no mutar silenciosamente payloads, recipient keys ni identifiers operativos (`identity_profile_id`, `member_id`, `user_id`)
   - resolver el grafo humano completo sin degradar consumers que hoy dependen de `member` o `user`
 
+## Delta 2026-03-30 Cost Intelligence foundation bootstrap
+- Greenhouse ya reconoce `cost_intelligence` como domain soportado del projection registry.
+- Base técnica nueva:
+  - schema `greenhouse_cost_intelligence`
+  - `period_closure_config`
+  - `period_closures`
+  - serving tables `greenhouse_serving.period_closure_status` y `greenhouse_serving.operational_pl_snapshots`
+- Event catalog ya reserva el prefijo `accounting.*` para:
+  - `accounting.period_closed`
+  - `accounting.period_reopened`
+  - `accounting.pl_snapshot.materialized`
+  - `accounting.margin_alert.triggered`
+- Route nueva:
+  - `/api/cron/outbox-react-cost-intelligence`
+- Decisión operativa actual:
+  - el dominio ya puede procesarse de forma dedicada
+  - el scheduling fino puede seguir temporalmente apoyado en el catch-all `outbox-react` mientras no existan projections registradas
+
 ## Delta 2026-03-30 Sentry incident reader hardening
 - `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.
 - Nuevo contrato soportado:

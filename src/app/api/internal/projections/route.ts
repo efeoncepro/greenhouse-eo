@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { getRegisteredProjections } from '@/lib/sync/projection-registry'
+import { getRegisteredProjections, getSupportedProjectionDomains } from '@/lib/sync/projection-registry'
 import { ensureProjectionsRegistered } from '@/lib/sync/projections'
 import { getQueueStats } from '@/lib/sync/refresh-queue'
 
@@ -79,6 +79,7 @@ export async function GET() {
 
     return NextResponse.json({
       projections: projectionStatus,
+      supportedDomains: getSupportedProjectionDomains(),
       queue,
       totalRegistered: projections.length,
       globalDeadLetters,

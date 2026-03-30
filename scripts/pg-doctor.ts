@@ -67,6 +67,7 @@ const main = async () => {
           'greenhouse_hr',
           'greenhouse_payroll',
           'greenhouse_finance',
+          'greenhouse_cost_intelligence',
           'greenhouse_ai',
           'greenhouse_crm',
           'greenhouse_delivery'

@@ -34,6 +34,7 @@
     "setup:postgres:ai-tooling": "tsx scripts/setup-postgres-ai-tooling.ts",
     "setup:postgres:campaigns": "tsx scripts/setup-postgres-campaigns.ts",
     "setup:postgres:canonical-360": "tsx scripts/setup-postgres-canonical-360.ts",
+    "setup:postgres:cost-intelligence": "tsx scripts/setup-postgres-cost-intelligence.ts",
     "setup:postgres:finance": "tsx scripts/setup-postgres-finance.ts",
     "setup:postgres:hr-leave": "tsx scripts/setup-postgres-hr-leave.ts",
     "setup:postgres:organization-operational": "tsx scripts/setup-postgres-organization-operational-serving.ts",

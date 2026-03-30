@@ -60,7 +60,12 @@ export const AGGREGATE_TYPES = {
   financeExchangeRate: 'finance_exchange_rate',
   financeOverhead: 'finance_overhead',
   financeLicenseCost: 'finance_license_cost',
-  financeToolingCost: 'finance_tooling_cost'
+  financeToolingCost: 'finance_tooling_cost',
+
+  // Cost Intelligence
+  periodClosure: 'period_closure',
+  operationalPl: 'operational_pl',
+  marginAlert: 'margin_alert'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -142,7 +147,13 @@ export const EVENT_TYPES = {
   financeExchangeRateUpserted: 'finance.exchange_rate.upserted',
   financeOverheadUpdated: 'finance.overhead.updated',
   financeLicenseCostUpdated: 'finance.license_cost.updated',
-  financeToolingCostUpdated: 'finance.tooling_cost.updated'
+  financeToolingCostUpdated: 'finance.tooling_cost.updated',
+
+  // Cost Intelligence
+  accountingPeriodClosed: 'accounting.period_closed',
+  accountingPeriodReopened: 'accounting.period_reopened',
+  accountingPlSnapshotMaterialized: 'accounting.pl_snapshot.materialized',
+  accountingMarginAlertTriggered: 'accounting.margin_alert.triggered'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]

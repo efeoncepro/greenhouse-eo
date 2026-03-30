@@ -4,6 +4,45 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — TASK-067 Cost Intelligence Foundation iniciada
+
+### Objetivo
+- bootstrap técnico de Cost Intelligence:
+  - schema `greenhouse_cost_intelligence`
+  - serving tables base
+  - eventos `accounting.*`
+  - domain `cost_intelligence` en projections
+  - cron route dedicada
+
+### Contexto operativo
+- Esta lane se ejecuta después de revisar:
+  - `docs/architecture/GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
+  - `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`
+- Hay un cambio ajeno ya abierto y no mezclado en:
+  - `src/app/api/finance/dashboard/summary/route.ts`
+
+### Pendiente inmediato
+- crear setup SQL/TS idempotente
+- extender `event-catalog`
+- registrar domain `cost_intelligence`
+- crear `/api/cron/outbox-react-cost-intelligence`
+
+### Delta de ejecución
+- El bootstrap ya quedó implementado y validado:
+  - `pnpm setup:postgres:cost-intelligence`
+  - `pnpm pg:doctor --profile=runtime`
+  - `pnpm pg:doctor --profile=migrator`
+  - `pnpm exec eslint ...`
+  - `pnpm build`
+- Resultado:
+  - schema `greenhouse_cost_intelligence` visible para runtime y migrator
+  - route `outbox-react-cost-intelligence` compila y entra al build
+  - `supportedDomains` ya incluye `cost_intelligence`
+- Pendiente real de esta task:
+  - decidir si se agenda cron dedicada en `vercel.json` ya en 067 o si se mantiene solo la route hasta que 068/069 registren projections
+  - smoke del endpoint con request autenticado
+
 ## Sesión 2026-03-30 — hardening documental para `TASK-141` sin romper reactive lanes
 
 ### Completado
