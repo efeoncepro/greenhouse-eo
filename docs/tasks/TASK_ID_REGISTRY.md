@@ -177,5 +177,8 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-132` | `complete` | Admin Center: Notification System Landing | `docs/tasks/complete/TASK-132-admin-notification-center-landing.md` |
 | `TASK-133` | `complete` | Ops Health: Sentry Incident Surfacing | `docs/tasks/complete/TASK-133-ops-health-sentry-incident-surfacing.md` |
 | `TASK-134` | `to-do` | Notification Identity Model Hardening | `docs/tasks/to-do/TASK-134-notification-identity-model-hardening.md` |
+| `TASK-135` | `to-do` | Ops Health Sentry Reactive Refresh | `docs/tasks/to-do/TASK-135-ops-health-sentry-reactive-refresh.md` |
 
-`TASK-135`
+| `TASK-136` | `to-do` | Admin Center: View Access Governance | `docs/tasks/to-do/TASK-136-admin-view-access-governance.md` |
+
+`TASK-137`
