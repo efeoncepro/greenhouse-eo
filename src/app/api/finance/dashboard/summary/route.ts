@@ -30,6 +30,7 @@ interface PgExpenseRow extends Record<string, unknown> {
   payment_date: string | Date | null
   total_amount_clp: string | number
   payment_status: string
+  expense_type: string | null
 }
 
 // ── BigQuery types ─────────────────────────────────────────────────
@@ -49,6 +50,7 @@ interface BqExpenseDashboardRow {
   payment_date: unknown
   total_amount_clp: unknown
   payment_status: string
+  expense_type: unknown
 }
 
 // ── Route ──────────────────────────────────────────────────────────
@@ -94,7 +96,7 @@ async function handlePostgresFirst(monthKeys: string[]) {
        WHERE ip.payment_date IS NOT NULL AND ip.amount > 0`
     ),
     runGreenhousePostgresQuery<PgExpenseRow>(
-      `SELECT document_date, payment_date, total_amount_clp, payment_status
+      `SELECT document_date, payment_date, total_amount_clp, payment_status, expense_type
        FROM greenhouse_finance.expenses`
     )
   ])
@@ -158,7 +160,7 @@ async function handleBigQueryFallback(monthKeys: string[]) {
       FROM \`${projectId}.greenhouse.fin_income\`
     `),
     runFinanceQuery<BqExpenseDashboardRow>(`
-      SELECT document_date, payment_date, total_amount_clp, payment_status
+      SELECT document_date, payment_date, total_amount_clp, payment_status, expense_type
       FROM \`${projectId}.greenhouse.fin_expenses\`
     `)
   ])
@@ -221,7 +223,7 @@ function buildResponse(
   incomeRows: Array<{ total_amount: unknown; total_amount_clp: unknown; amount_paid: unknown; payment_status: string }>,
   incomeAccrualSeries: ReturnType<typeof aggregateMonthlyEntries>,
   incomeCashSeries: ReturnType<typeof aggregateMonthlyEntries>,
-  expenseRows: Array<{ total_amount_clp: unknown; payment_status: string }>,
+  expenseRows: Array<{ total_amount_clp: unknown; payment_status: string; expense_type?: unknown }>,
   expenseAccrualSeries: ReturnType<typeof aggregateMonthlyEntries>,
   expenseCashSeries: ReturnType<typeof aggregateMonthlyEntries>
 ) {
@@ -273,9 +275,9 @@ function buildResponse(
   // Payroll-to-revenue ratio (payroll expenses / total revenue)
   const payrollExpenses = roundCurrency(
     expenseRows.reduce((sum, row) => {
-      const r = row as Record<string, unknown>
+      const expType = typeof row.expense_type === 'string' ? row.expense_type : ''
 
-      return r.expense_type === 'payroll' ? sum + toNumber(r.total_amount_clp) : sum
+      return (expType === 'payroll' || expType === 'social_security') ? sum + toNumber(row.total_amount_clp) : sum
     }, 0)
   )
   const payrollToRevenueRatio = monthlyRevenue > 0
