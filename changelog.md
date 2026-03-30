@@ -7,6 +7,11 @@
 
 ## 2026-03-29
 
+### TASK-129 staging hardening completed with Secret Manager-only
+- `staging` dejó de depender de `WEBHOOK_NOTIFICATIONS_SECRET` crudo; el fallback legacy fue retirado de Vercel.
+- Después del redeploy del entorno `Staging`, el consumer `notification-dispatch` siguió validando firmas y enviando notificaciones usando `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF`.
+- `src/lib/secrets/secret-manager.ts` ahora sanitiza secuencias literales `\n` y `\r` en `*_SECRET_REF`, endureciendo el contrato frente a drift de export/import de env vars.
+
 ### TASK-129 webhook notifications consumer started
 - Se inició `TASK-129` como un consumer institucional nuevo sobre el bus outbound, sin reemplazar el carril reactivo legacy.
 - El repo ahora soporta:
@@ -19,7 +24,16 @@
 - El consumer de notificaciones ahora exige firma cuando existe secreto resuelto y ya no queda `fail-open` ante deliveries sin `x-greenhouse-signature`.
 - La deduplicación cubre también dispatches `email-only` usando metadata persistida en `notification_log`, no solo filas visibles en `notifications`.
 - Vercel ya tiene `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF=webhook-notifications-secret` en `staging` y `production`.
-- El remanente operativo queda concentrado en GCP Secret Manager y en la validación E2E de `staging`.
+- Los seed routes de webhooks ahora persisten aliases estables del request en vez de `VERCEL_URL` efímero, y los bypass secrets se sanitizan removiendo también `\n`/`\r` literales.
+- `wh-sub-notifications` quedó corregida en `staging` para apuntar al alias `dev-greenhouse.efeoncepro.com` sin `%5Cn` contaminando el target.
+- Validación E2E cerrada en `staging`:
+  - `assignment.created` visible en campanita para un usuario real
+  - `payroll_period.exported` creó 4 notificaciones `payroll_ready` para recipients del período `2026-03`
+- Durante la validación se detectó y corrigió un gap de identidad en `staging`: `client_users` internos activos sin `member_id`, lo que impedía resolver recipients.
+
+### TASK-133 created for Sentry surfacing in Ops Health
+- Se creó `TASK-133` para traer incidentes abiertos/relevantes de Sentry a `Operations Health`.
+- El trigger real de esta task fue un error de producción detectado en Sentry fuera del tablero de health actual.
 
 ### TASK-131 closed with runtime-vs-tooling secret posture separation
 - `src/lib/cloud/secrets.ts` ahora clasifica secretos tracked entre `runtime` y `tooling`.

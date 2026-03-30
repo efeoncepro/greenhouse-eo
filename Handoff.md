@@ -4,6 +4,50 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — Rollout de production intentado para TASK-129, bloqueado por drift de branch
+
+### Completado
+- `production` ya tiene `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF=webhook-notifications-secret`.
+- Se confirmó que `production` no conserva `WEBHOOK_NOTIFICATIONS_SECRET` crudo; el fallback legacy ya no está presente en Vercel para este carril.
+- Se ejecutó redeploy seguro de la build productiva existente:
+  - source deployment previo: `https://greenhouse-pcty6593d-efeonce-7670142f.vercel.app`
+  - nuevo deployment: `https://greenhouse-j35lx1ock-efeonce-7670142f.vercel.app`
+  - target: `production`
+
+### Bloqueo real
+- El smoke firmado contra `production` no llegó al consumer `notification-dispatch`; devolvió HTML del portal en vez de JSON del route handler.
+- La causa observada en el build productivo es branch drift:
+  - el deployment de `main` (`commit: fbe21a3`) no incluye `/api/internal/webhooks/notification-dispatch` en el artefacto compilado
+  - sí incluye `/api/internal/webhooks/canary`, pero no el consumer de `TASK-129`
+- Conclusión operativa:
+  - `production` ya está lista a nivel de secretos
+  - el rollout funcional de `TASK-129` en `production` queda bloqueado hasta que el código del consumer llegue a `main`
+
+### Pendiente inmediato
+- Promover a `main` el slice real de `TASK-129` antes de repetir validación productiva.
+- Una vez `main` incluya la route, repetir:
+  - redeploy/redeploy seguro de `production`
+  - smoke firmado
+  - verificación de persistencia en `greenhouse_notifications.notifications`
+
+## Sesión 2026-03-29 — TASK-129 hardening final en staging con Secret Manager-only
+
+### Completado
+- `staging` ya no conserva `WEBHOOK_NOTIFICATIONS_SECRET` crudo en Vercel.
+- Se forzó redeploy del entorno `Staging` después del retiro del env legacy.
+- Validación real posterior al redeploy:
+  - `POST /api/internal/webhooks/notification-dispatch` respondió `200`
+  - `assignment.created` volvió a crear notificación visible para `user-efeonce-admin-julio-reyes`
+  - la resolución efectiva quedó servida por `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF -> webhook-notifications-secret`
+- Hardening adicional en repo:
+  - `src/lib/secrets/secret-manager.ts` ahora sanitiza también secuencias literales `\\n` / `\\r` en `*_SECRET_REF`
+  - esto evita depender de formatos tolerados al importar/pullar env vars desde Vercel
+
+### Pendiente inmediato
+- El mismo retiro del env legacy puede replicarse en cualquier otro ambiente que todavía conserve fallback crudo.
+- Siguiente lane sugerida sin blocker técnico de `TASK-129`:
+  - `TASK-133` para surfacing de incidentes Sentry en `Ops Health`
+
 ## Sesión 2026-03-29 — TASK-129 iniciada sobre webhook bus con convivencia explícita
 
 ### Completado
@@ -35,21 +79,33 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - `staging` y `production` ya tienen cargada en Vercel la ref:
   - `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF=webhook-notifications-secret`
 - `staging` conserva además `WEBHOOK_NOTIFICATIONS_SECRET` como fallback transicional, lo que deja la migración fail-soft mientras se confirma GCP.
+- El secret `webhook-notifications-secret` ya fue creado/verificado en GCP Secret Manager y el consumer smoke firmado responde `200` en `staging`.
+- El subscriber `wh-sub-notifications` quedó corregido en DB para usar el alias estable:
+  - `https://dev-greenhouse.efeoncepro.com/api/internal/webhooks/notification-dispatch?...`
+- Se alineó el dataset de `staging` para recipients internos:
+  - `greenhouse_core.client_users.member_id` quedó enlazado por match exacto de nombre para usuarios internos activos
+- Se corrigió también el drift operativo de los seed routes:
+  - ahora prefieren el host real del request sobre `VERCEL_URL`
+  - sanitizan `\n`/`\r` literales en bypass secrets para no persistir `%5Cn` en `target_url`
+- Se creó `TASK-133` para surfacing de incidentes Sentry en `Ops Health`.
 - Validación local ejecutada:
   - `pnpm exec vitest run src/lib/webhooks/consumers/notification-mapping.test.ts src/lib/webhooks/consumers/notification-recipients.test.ts src/lib/webhooks/consumers/notification-dispatch.test.ts src/app/api/internal/webhooks/notification-dispatch/route.test.ts src/lib/webhooks/notification-target.test.ts src/lib/notifications/notification-service.test.ts`
   - `pnpm exec eslint src/views/greenhouse/admin/AdminNotificationsView.tsx src/lib/notifications/schema.ts src/lib/notifications/notification-service.ts src/lib/webhooks/consumers/notification-dispatch.ts src/app/api/internal/webhooks/notification-dispatch/route.ts src/app/api/internal/webhooks/notification-dispatch/route.test.ts`
   - `pnpm exec tsc --noEmit --pretty false`
   - `pnpm build`
+  - `pnpm exec vitest run src/lib/webhooks/notification-target.test.ts src/lib/webhooks/canary-target.test.ts src/lib/webhooks/target-url.test.ts src/app/api/internal/webhooks/notification-dispatch/route.test.ts`
+  - `pnpm exec eslint src/lib/webhooks/target-url.ts src/lib/webhooks/target-url.test.ts src/lib/webhooks/notification-target.ts src/lib/webhooks/canary-target.ts src/app/api/admin/ops/webhooks/seed-notifications/route.ts src/app/api/admin/ops/webhooks/seed-canary/route.ts`
+  - `pnpm pg:doctor --profile=runtime` usando `.env.staging.pull`
+  - smoke firmado contra `https://dev-greenhouse.efeoncepro.com/api/internal/webhooks/notification-dispatch`
+  - evidencia funcional:
+    - `assignment.created` visible en campanita para `user-efeonce-admin-julio-reyes`
+    - `payroll_period.exported` creó 4 notificaciones `payroll_ready` para recipients resolubles del período `2026-03`
 
 ### Pendiente inmediato
-- Crear o verificar en GCP Secret Manager el secreto `webhook-notifications-secret`.
-- Bloqueo encontrado:
-  - `gcloud secrets describe webhook-notifications-secret --project=efeonce-group` falló por reautenticación no interactiva (`gcloud auth login` requerido).
-- Después de resolver GCP:
-  - redeploy de `staging`
-  - activar `wh-sub-notifications`
-  - smoke real con `assignment.created` y `payroll_period.exported`
-  - recién entonces evaluar retirar el env crudo `WEBHOOK_NOTIFICATIONS_SECRET` de `staging`
+- `TASK-129` ya queda lista para cierre documental.
+- Siguiente follow-on razonable:
+  - retirar el fallback crudo `WEBHOOK_NOTIFICATIONS_SECRET` de `staging` cuando se confirme que Secret Manager queda como única fuente
+  - decidir si el enlace `client_users.member_id` interno observado en `staging` debe formalizarse como backfill/lane de identidad separada
 
 ## Sesión 2026-03-29 — TASK-131 cerrada: health separa runtime vs tooling posture
 

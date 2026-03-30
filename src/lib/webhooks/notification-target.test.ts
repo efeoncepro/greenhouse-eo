@@ -44,4 +44,17 @@ describe('buildNotificationDispatchTargetUrl', () => {
       'https://dev-greenhouse.efeoncepro.com/api/internal/webhooks/notification-dispatch?x-vercel-protection-bypass=generic-bypass'
     )
   })
+
+  it('strips escaped newlines from the bypass secret before building the target', () => {
+    expect(
+      buildNotificationDispatchTargetUrl({
+        baseUrl: 'https://dev-greenhouse.efeoncepro.com',
+        env: makeEnv({
+          WEBHOOK_NOTIFICATIONS_VERCEL_PROTECTION_BYPASS_SECRET: 'notifications-only-bypass\\n'
+        })
+      })
+    ).toBe(
+      'https://dev-greenhouse.efeoncepro.com/api/internal/webhooks/notification-dispatch?x-vercel-protection-bypass=notifications-only-bypass'
+    )
+  })
 })

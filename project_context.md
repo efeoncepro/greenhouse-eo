@@ -3,6 +3,14 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-29 TASK-129 hardening final en staging
+- `staging` ya opera `webhook notifications` sin `WEBHOOK_NOTIFICATIONS_SECRET` crudo en Vercel.
+- Postura vigente del carril:
+  - firma HMAC resuelta por `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF`
+  - secreto canónico servido desde GCP Secret Manager
+  - alias estable `dev-greenhouse.efeoncepro.com` como target del subscriber
+- `src/lib/secrets/secret-manager.ts` ahora sanitiza secuencias literales `\\n` / `\\r` en variables `*_SECRET_REF`, endureciendo el contrato frente a drift de export/import de env vars.
+
 ## Delta 2026-03-29 TASK-129 iniciada
 - Greenhouse inicia un segundo carril institucional de notificaciones:
   - `reactive notifications` sigue como control plane legacy para eventos internos existentes
@@ -23,9 +31,15 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `staging` y `production` ya tienen `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF=webhook-notifications-secret`.
 - Postura operativa vigente:
   - `staging` mantiene además `WEBHOOK_NOTIFICATIONS_SECRET` como fallback transicional
-  - `production` queda preparada para consumir Secret Manager en cuanto exista/sea verificable el secreto canónico
-- Bloqueo externo actual:
-  - la creación/verificación de `webhook-notifications-secret` en GCP no pudo completarse desde este turno porque `gcloud` exigió reautenticación no interactiva
+  - `production` ya queda preparada para consumir Secret Manager con el secreto canónico verificado
+- El seed de subscriptions de webhooks ya no debe persistir `VERCEL_URL` efímero:
+  - `seed-canary` y `seed-notifications` prefieren el alias real del request (`x-forwarded-host`) cuando existe
+- Los target builders de webhooks sanitizan también secuencias literales `\n`/`\r`, no solo whitespace, para evitar query params contaminados en `greenhouse_sync.webhook_subscriptions`.
+- Validación real ya ejecutada en `staging`:
+  - `assignment.created` visible en campanita para un usuario real
+  - `payroll_period.exported` crea notificaciones `payroll_ready` para recipients resolubles del período
+- Gap de datos detectado durante la validación:
+  - había `client_users` activos sin `member_id`; en `staging` se enlazaron los internos con match exacto de nombre para permitir la resolución de recipients del carril webhook notifications.
 
 ## Delta 2026-03-29 TASK-131 cerrada
 - El health cloud ya separa correctamente secretos runtime-críticos de secretos de tooling.

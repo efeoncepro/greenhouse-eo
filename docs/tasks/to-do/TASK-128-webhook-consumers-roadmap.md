@@ -1,5 +1,12 @@
 # TASK-128 — Webhook Consumers Roadmap: Slack, Invalidation, Nubox Push & In-App Notifications
 
+## Delta 2026-03-29
+- El Slice 4 (`In-App Notifications via webhook bus`) ya quedó implementado y validado en `staging` por `TASK-129`.
+- Evidencia real:
+  - `assignment.created` visible en campanita
+  - `payroll_period.exported` crea notificaciones `payroll_ready` para recipients resolubles del período
+- Este roadmap ya no debe tratar el consumer `notification-dispatch` como gap abierto; queda como baseline implementada y operativa.
+
 ## Status
 
 | Campo | Valor |

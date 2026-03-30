@@ -1,9 +1,12 @@
 const CANARY_PATH = '/api/internal/webhooks/canary'
 
+import { resolveWebhookProtectionBypassSecret } from './target-url'
+
 const getCanaryProtectionBypassSecret = (env: NodeJS.ProcessEnv) =>
-  env.WEBHOOK_CANARY_VERCEL_PROTECTION_BYPASS_SECRET?.trim() ||
-  env.VERCEL_AUTOMATION_BYPASS_SECRET?.trim() ||
-  ''
+  resolveWebhookProtectionBypassSecret({
+    dedicatedSecret: env.WEBHOOK_CANARY_VERCEL_PROTECTION_BYPASS_SECRET,
+    fallbackSecret: env.VERCEL_AUTOMATION_BYPASS_SECRET
+  })
 
 export const buildCanaryTargetUrl = ({
   baseUrl,
@@ -21,4 +24,3 @@ export const buildCanaryTargetUrl = ({
 
   return url.toString()
 }
-

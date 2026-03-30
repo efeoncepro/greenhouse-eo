@@ -4,6 +4,7 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import { NOTIFICATION_EVENT_TYPES } from '@/lib/webhooks/consumers/notification-mapping'
 import { buildNotificationDispatchTargetUrl } from '@/lib/webhooks/notification-target'
+import { resolveWebhookBaseUrl } from '@/lib/webhooks/target-url'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,7 +18,7 @@ export async function POST(request: Request) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const baseUrl = getBaseUrl(request)
+  const baseUrl = resolveWebhookBaseUrl({ request })
   const targetUrl = buildNotificationDispatchTargetUrl({ baseUrl })
 
   const eventFiltersJson = JSON.stringify(
@@ -54,14 +55,4 @@ export async function POST(request: Request) {
     action: isNew ? 'created' : 'reactivated',
     note: 'La siguiente pasada de webhook-dispatch empezará a entregar eventos compatibles al consumer de notificaciones.'
   })
-}
-
-function getBaseUrl(request: Request): string {
-  const vercelUrl = process.env.VERCEL_URL
-
-  if (vercelUrl) return `https://${vercelUrl}`
-
-  const url = new URL(request.url)
-
-  return url.origin
 }

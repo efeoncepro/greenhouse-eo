@@ -70,6 +70,30 @@ describe('resolveSecret', () => {
     expect(resolution.value).toBe('env-fallback-token')
   })
 
+  it('sanitizes literal newline escapes in secret refs before resolving Secret Manager', async () => {
+    vi.stubEnv('GCP_PROJECT', 'efeonce-group')
+    vi.stubEnv('WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF', 'webhook-notifications-secret\\n')
+    accessSecretVersion.mockResolvedValue([
+      {
+        payload: {
+          data: Buffer.from('secret-from-manager')
+        }
+      }
+    ])
+
+    const { resolveSecret } = await import('@/lib/secrets/secret-manager')
+
+    const resolution = await resolveSecret({
+      envVarName: 'WEBHOOK_NOTIFICATIONS_SECRET'
+    })
+
+    expect(resolution.source).toBe('secret_manager')
+    expect(resolution.secretRef).toBe('projects/efeonce-group/secrets/webhook-notifications-secret/versions/latest')
+    expect(accessSecretVersion).toHaveBeenCalledWith({
+      name: 'projects/efeonce-group/secrets/webhook-notifications-secret/versions/latest'
+    })
+  })
+
   it('reports unconfigured when neither Secret Manager nor env vars are available', async () => {
     const { resolveSecret } = await import('@/lib/secrets/secret-manager')
 
