@@ -193,6 +193,28 @@ These domains are operational and write-heavy:
 - account balances and mutable account metadata
 - expense/income states that change due to reconciliation or approvals
 
+##### Finance BigQuery → Postgres Cutover Plan (Delta 2026-03-30)
+
+Finance module migrated to Postgres-first with BigQuery fallback (Slice 1 + 2). Current state:
+
+| Component | Primary Store | BigQuery Status | Cutover Plan |
+|-----------|--------------|----------------|--------------|
+| Accounts CRUD | Postgres | Fallback | Remove fallback after 30d stable |
+| Suppliers CRUD | Postgres | Fallback | Remove fallback after 30d stable |
+| Income CRUD | Postgres | Fallback (Slice 2) | Remove fallback after 30d stable |
+| Expenses CRUD | Postgres | Fallback (Slice 2) | Remove fallback after 30d stable |
+| Income Payments | Postgres only | No BQ table | Done |
+| Exchange Rates | Postgres | Fallback | Remove fallback after 30d stable |
+| Economic Indicators | Postgres | Fallback | Remove fallback after 30d stable |
+| Reconciliation | `postgres-reconciliation.ts` | `reconciliation.ts` (@deprecated) | Remove BQ version after 30d |
+| Dashboard Summary | Postgres | Full BQ fallback path | Remove `handleBigQueryFallback()` |
+| Bulk Expense Import | BigQuery only | Primary! | Add Postgres version |
+| DTE Coverage | Verify | May use BQ | Migrate if needed |
+| Agency economics | BigQuery | Primary for BQ CTEs | Depends on TASK-069 materialized P&L |
+
+Flag: `FINANCE_BIGQUERY_WRITE_ENABLED` controls BQ writes (default: true).
+Cutover sequence: flag → false in staging 30d → false in production → remove BQ write code.
+
 #### AI Tooling operational workflows
 - wallets
 - credit ledger

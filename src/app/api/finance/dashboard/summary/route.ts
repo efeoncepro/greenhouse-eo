@@ -264,6 +264,24 @@ function buildResponse(
 
   const payableCount = expenseRows.filter(row => row.payment_status === 'pending').length
 
+  // Working capital metrics
+  const monthlyRevenue = incomeAccrualMetrics.totalAmountClp
+  const monthlyExpenses = expenseAccrualMetrics.totalAmountClp
+  const dso = monthlyRevenue > 0 ? Math.round((receivables / monthlyRevenue) * 30) : null
+  const dpo = monthlyExpenses > 0 ? Math.round((payables / monthlyExpenses) * 30) : null
+
+  // Payroll-to-revenue ratio (payroll expenses / total revenue)
+  const payrollExpenses = roundCurrency(
+    expenseRows.reduce((sum, row) => {
+      const r = row as Record<string, unknown>
+
+      return r.expense_type === 'payroll' ? sum + toNumber(r.total_amount_clp) : sum
+    }, 0)
+  )
+  const payrollToRevenueRatio = monthlyRevenue > 0
+    ? Math.round((payrollExpenses / monthlyRevenue) * 1000) / 10
+    : null
+
   return NextResponse.json({
     incomeMonth: incomeCashMetrics.totalAmountClp,
     incomePrev: incomeCashMetrics.previousTotalAmountClp,
@@ -276,6 +294,9 @@ function buildResponse(
     receivableInvoices,
     payables,
     payableCount,
+    dso,
+    dpo,
+    payrollToRevenueRatio,
     cash: {
       incomeMonth: incomeCashMetrics.totalAmountClp,
       incomePrev: incomeCashMetrics.previousTotalAmountClp,

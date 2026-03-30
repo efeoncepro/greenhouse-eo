@@ -183,7 +183,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 | `TASK-137` | `complete` | UI Foundation Activation: RHF, FullCalendar, DatePicker, DnD | `docs/tasks/complete/TASK-137-ui-foundation-activation.md` |
 
-| `TASK-138` | `to-do` | Finance Intelligence: Audit Gaps, Notifications & Synergies | `docs/tasks/to-do/TASK-138-finance-intelligence-audit-gaps.md` |
+| `TASK-138` | `in-progress` | Finance Intelligence: Audit Gaps, Notifications & Synergies | `docs/tasks/in-progress/TASK-138-finance-intelligence-audit-gaps.md` |
 | `TASK-139` | `complete` | Finance Module Hardening: Corrections & Data Quality | `docs/tasks/complete/TASK-139-finance-module-hardening.md` |
 
 `TASK-140`

@@ -144,3 +144,27 @@ export const getHrAdminRecipients = async (): Promise<RecipientResolutionResult>
     unresolvedRecipients: 0
   }
 }
+
+export const getFinanceAdminRecipients = async (): Promise<RecipientResolutionResult> => {
+  const rows = await runGreenhousePostgresQuery<RecipientRow>(
+    `SELECT DISTINCT
+       identity_profile_id,
+       member_id,
+       user_id,
+       email,
+       full_name
+     FROM greenhouse_serving.session_360
+     WHERE active = TRUE
+       AND status = 'active'
+       AND (
+         role_codes @> ARRAY['finance_manager']::text[]
+         OR role_codes @> ARRAY['efeonce_admin']::text[]
+       )
+     ORDER BY full_name ASC NULLS LAST, email ASC NULLS LAST`
+  )
+
+  return {
+    recipients: rows.map(normalizeRecipient).filter((value): value is NotificationRecipient => value !== null),
+    unresolvedRecipients: 0
+  }
+}

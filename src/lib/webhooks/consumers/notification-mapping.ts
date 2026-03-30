@@ -1,7 +1,7 @@
 import 'server-only'
 
 import type { WebhookEnvelope } from '@/lib/webhooks/types'
-import { getHrAdminRecipients, getMemberRecipient, getPayrollPeriodRecipients, getUserRecipient, type RecipientResolutionResult } from './notification-recipients'
+import { getFinanceAdminRecipients, getHrAdminRecipients, getMemberRecipient, getPayrollPeriodRecipients, getUserRecipient, type RecipientResolutionResult } from './notification-recipients'
 
 export interface NotificationDispatchMetadata {
   eventId: string
@@ -128,6 +128,114 @@ export const NOTIFICATION_MAPPINGS: NotificationMapping[] = [
     resolveRecipients: getHrAdminRecipients,
     metadata: baseMetadata
   },
+  // ── Finance alerts ──
+
+  {
+    eventType: 'finance.income_payment.recorded',
+    category: 'finance_alert',
+    title: envelope => {
+      const amount = typeof envelope.data.amount === 'number'
+        ? `$${envelope.data.amount.toLocaleString('es-CL')}`
+        : 'un pago'
+
+      return `Pago registrado: ${amount}`
+    },
+    body: envelope => {
+      const incomeId = typeof envelope.data.incomeId === 'string' ? envelope.data.incomeId : null
+
+      return incomeId ? `Factura: ${incomeId}` : 'Pago registrado en el sistema.'
+    },
+    actionUrl: envelope => {
+      const incomeId = typeof envelope.data.incomeId === 'string' ? envelope.data.incomeId : null
+
+      return incomeId ? `/finance/income/${incomeId}` : '/finance/income'
+    },
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+  {
+    eventType: 'finance.expense.created',
+    category: 'finance_alert',
+    title: envelope => {
+      const description = typeof envelope.data.description === 'string' && envelope.data.description.trim()
+        ? envelope.data.description
+        : 'Nuevo gasto'
+
+      return description.length > 50 ? `${description.slice(0, 47)}...` : description
+    },
+    body: envelope => {
+      const amount = typeof envelope.data.totalAmountClp === 'number'
+        ? `$${envelope.data.totalAmountClp.toLocaleString('es-CL')} CLP`
+        : null
+
+      return amount ? `Monto: ${amount}` : 'Gasto registrado en el sistema.'
+    },
+    actionUrl: envelope => {
+      const expenseId = typeof envelope.data.expenseId === 'string' ? envelope.data.expenseId : null
+
+      return expenseId ? `/finance/expenses/${expenseId}` : '/finance/expenses'
+    },
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+  {
+    eventType: 'finance.dte.discrepancy_found',
+    category: 'finance_alert',
+    title: envelope => {
+      const orgName = typeof envelope.data.organizationName === 'string' && envelope.data.organizationName.trim()
+        ? envelope.data.organizationName
+        : 'una organización'
+
+      return `Discrepancia DTE detectada en ${orgName}`
+    },
+    body: () => 'Se encontró una diferencia entre el monto registrado y el DTE tributario.',
+    actionUrl: () => '/finance/reconciliation',
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+  {
+    eventType: 'finance.income.created',
+    category: 'finance_alert',
+    title: envelope => {
+      const clientName = typeof envelope.data.clientName === 'string' && envelope.data.clientName.trim()
+        ? envelope.data.clientName
+        : null
+
+      return clientName ? `Nuevo ingreso para ${clientName}` : 'Nuevo ingreso registrado'
+    },
+    body: envelope => {
+      const amount = typeof envelope.data.totalAmountClp === 'number'
+        ? `$${envelope.data.totalAmountClp.toLocaleString('es-CL')} CLP`
+        : null
+
+      return amount ? `Monto: ${amount}` : null
+    },
+    actionUrl: envelope => {
+      const incomeId = typeof envelope.data.incomeId === 'string' ? envelope.data.incomeId : null
+
+      return incomeId ? `/finance/income/${incomeId}` : '/finance/income'
+    },
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+  {
+    eventType: 'finance.exchange_rate.upserted',
+    category: 'finance_alert',
+    title: () => 'Tipo de cambio actualizado',
+    body: envelope => {
+      const rate = typeof envelope.data.rate === 'number' ? envelope.data.rate : null
+      const from = typeof envelope.data.fromCurrency === 'string' ? envelope.data.fromCurrency : 'USD'
+      const to = typeof envelope.data.toCurrency === 'string' ? envelope.data.toCurrency : 'CLP'
+
+      return rate ? `${from}/${to}: $${rate.toLocaleString('es-CL')}` : `${from}/${to} actualizado.`
+    },
+    actionUrl: () => '/finance',
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+
+  // ── Identity ──
+
   {
     eventType: 'identity.email_verification.completed',
     category: 'system_event',
