@@ -740,13 +740,21 @@ const FinanceDashboardView = () => {
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 4, md: 4 }}>
-          <HorizontalWithSubtitle
-            title='Ratio nómina / ingresos'
-            stats={workingCapital.payrollToRevenueRatio !== null ? `${workingCapital.payrollToRevenueRatio}%` : 'Sin datos'}
-            subtitle='Costo de nómina como porcentaje del ingreso mensual'
-            avatarIcon='tabler-percentage'
-            avatarColor={workingCapital.payrollToRevenueRatio !== null && workingCapital.payrollToRevenueRatio > 70 ? 'error' : workingCapital.payrollToRevenueRatio !== null && workingCapital.payrollToRevenueRatio > 50 ? 'warning' : 'success'}
-          />
+          {(() => {
+            const ratio = pnl && pnl.revenue.netRevenue > 0
+              ? Math.round((pnl.payroll.totalGross / pnl.revenue.netRevenue) * 100)
+              : workingCapital.payrollToRevenueRatio
+
+            return (
+              <HorizontalWithSubtitle
+                title='Ratio nómina / ingresos'
+                stats={ratio !== null ? `${ratio}%` : 'Sin datos'}
+                subtitle='Costo bruto de nómina como porcentaje del ingreso neto'
+                avatarIcon='tabler-percentage'
+                avatarColor={ratio !== null && ratio > 70 ? 'error' : ratio !== null && ratio > 50 ? 'warning' : 'success'}
+              />
+            )
+          })()}
         </Grid>
       </Grid>
 
