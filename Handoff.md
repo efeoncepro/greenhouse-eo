@@ -4,6 +4,24 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — documentación arquitectónica del modelo de views
+
+### Completado
+- El modelo de gobernanza por vistas ya quedó documentado en arquitectura, no solo en tasks/handoff:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
+  - `project_context.md`
+- Quedó explícito que:
+  - `routeGroups` siguen como boundary broad
+  - `authorizedViews` + `view_code` son la capa fina
+  - `/admin/views` es la superficie oficial para operar matrix, overrides, expiración, auditoría y preview
+
+### Validación ejecutada
+- Validación documental/manual del delta en arquitectura
+
+### Pendiente inmediato
+- Si en el siguiente corte nacen más superficies gobernables, ya no deberían documentarse solo en la task; deben actualizar también la arquitectura canónica.
+
 ## Sesión 2026-03-30 — TASK-136 cierra más rutas terciarias y completa la operabilidad de `/admin/views`
 
 ### Completado

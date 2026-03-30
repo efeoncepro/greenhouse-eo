@@ -15,6 +15,32 @@ vive en:
 - `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md`
 - `docs/changelog/CLIENT_CHANGELOG.md`
 
+## Delta 2026-03-30 — View access governance model
+
+Greenhouse ya no debe leerse solo como `role -> route_groups`.
+
+Estado canónico vigente:
+- `routeGroups` siguen existiendo como capa broad/fallback
+- la gobernanza fina de superficies visibles ya vive en `view_code`
+- la sesión ya carga `authorizedViews` resueltos desde PostgreSQL cuando la capa persistida existe
+- `Admin Center > Vistas y acceso` es la superficie operativa para:
+  - matrix por rol
+  - overrides por usuario
+  - expiración
+  - auditoría
+  - preview efectivo
+
+Modelo persistido en `greenhouse_core`:
+- `view_registry`
+- `role_view_assignments`
+- `user_view_overrides`
+- `view_access_log`
+
+Regla arquitectónica:
+- nuevas superficies visibles del portal deberían nacer con `view_code` explícito cuando sea razonable gobernarlas
+- `routeGroups` no deben seguir creciendo como mecanismo principal de autorización fina
+- cuando falte modelado explícito, el fallback puede existir, pero debe tratarse como estado transicional
+
 ## Purpose
 
 This document is the master architecture reference for Greenhouse EO.
@@ -111,13 +137,46 @@ Greenhouse must not become:
 
 NextAuth.js with three providers: Azure AD, Google OAuth, and Credentials.
 
-Auth guards are enforced at the layout level using route group wrappers — there is no `middleware.ts`. Route groups define the access boundary: `client`, `admin`, `internal`, `finance`, `hr`, `people`, `agency`.
+Auth guards are enforced at the layout level using route group wrappers plus `view_code` checks — there is no `middleware.ts`.
+
+Current access model:
+- broad boundary:
+  - `client`, `admin`, `internal`, `finance`, `hr`, `people`, `agency`, `my`, `ai_tooling`
+- fine-grained boundary:
+  - `authorizedViews` on session
+  - `hasAuthorizedViewCode()` / `hasAnyAuthorizedViewCode()` in route pages/layouts
+
+Route groups still define the high-level access boundary, but they are no longer the intended long-term source of truth for every visible surface.
 
 Roles are composable (not hierarchical). `efeonce_admin` serves as the universal override role.
 
-The `TenantContext` carries: `userId`, `clientId`, `roleCodes`, `routeGroups`, `spaceId`, `organizationId`.
+The `TenantContext` carries:
+- `userId`
+- `clientId`
+- `roleCodes`
+- `routeGroups`
+- `authorizedViews`
+- `spaceId`
+- `organizationId`
 
-Tables live in `greenhouse_core`: `client_users`, `roles`, `user_role_assignments`, `identity_profiles`.
+Tables live in `greenhouse_core`:
+- `client_users`
+- `roles`
+- `user_role_assignments`
+- `identity_profiles`
+- `view_registry`
+- `role_view_assignments`
+- `user_view_overrides`
+- `view_access_log`
+
+Operational rule:
+- role baseline still seeds default visibility
+- persisted role assignments can override that baseline by `view_code`
+- user overrides apply after role baseline
+- expired overrides should degrade automatically and register audit history
+
+Primary admin surface:
+- `/admin/views`
 
 ### Executive Dashboard
 

@@ -10,6 +10,19 @@
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
 
+## Delta 2026-03-30 — View Governance UI ya es parte de la plataforma
+
+`/admin/views` ya no debe leerse como experimento aislado.
+
+La plataforma UI ahora asume un patrón explícito de gobernanza de vistas:
+- catálogo de superficies gobernables por `view_code`
+- matrix por rol como superficie de administración
+- preview por usuario con lectura efectiva
+- enforcement page-level/layout-level por `view_code`
+- auditoría y overrides como parte del mismo módulo
+
+Esto convierte `Admin Center > Vistas y acceso` en un componente de plataforma, no en una pantalla ad hoc.
+
 ## Stack Principal
 
 | Capa | Tecnología | Versión | Rol |
@@ -104,6 +117,79 @@ Vuexy envuelve componentes MUI con estilizado consistente:
 | Ops action button | `AdminOpsActionButton` | Cloud & Integrations, Ops Health, Notifications |
 | Health chip | `Chip variant='tonal'` con color semáforo | Ops Health, Cloud posture |
 | Delivery health bar | `LinearProgress` + `Chip` de estado | Notifications, Webhooks |
+| View access matrix | `AdminViewAccessGovernanceView` | `/admin/views` |
+| Effective access preview | `AdminViewAccessGovernanceView` | `/admin/views` |
+
+## View Governance Architecture
+
+### Objetivo
+
+Separar:
+- navegación broad por `routeGroups`
+- autorización fina de superficies por `view_code`
+
+La UI debe ayudar a responder tres preguntas:
+1. qué ve un rol hoy
+2. qué override tiene un usuario
+3. qué terminará viendo realmente esa sesión
+
+### Modelo UI canónico
+
+`/admin/views` debe conservar estas capas:
+- **hero + KPIs**
+  - registrar cobertura
+  - exponer drift entre persistido y fallback
+- **matrix por rol**
+  - editar `granted/revoked`
+  - mostrar origen `persisted` vs `hardcoded_fallback`
+- **preview por usuario**
+  - baseline visible por rol
+  - grants extra por override
+  - revokes efectivos
+  - auditoría reciente
+- **roadmap / follow-on**
+  - dejar explícito qué parte del modelo sigue transicional
+
+### Tokens semánticos
+
+Convención operativa para la UI:
+- `success`
+  - concesión activa
+  - grant extra
+- `warning`
+  - cambio pendiente
+  - override activo
+- `error`
+  - revoke efectivo
+  - fallback que aún debe modelarse mejor
+- `info`
+  - baseline persistido o lectura neutra
+
+### Reglas de UX para matrix y preview
+
+1. La matrix no debe presentarse como pared indiferenciada de checks.
+2. Debe existir foco explícito para:
+   - cambios pendientes
+   - fallback heredado
+   - impacto efectivo por usuario
+3. El preview debe distinguir siempre:
+   - baseline por rol
+   - override grant
+   - override revoke
+4. La auditoría visible debe convivir con la edición; no debe quedar escondida fuera del flujo.
+5. Si una vista sigue dependiendo de fallback hardcoded, la UI debe hacerlo visible.
+
+### Regla de implementación
+
+Cuando nazca una nueva superficie gobernable:
+- agregar `view_code` en `src/lib/admin/view-access-catalog.ts`
+- alinear menú si corresponde
+- agregar guard page-level o layout-level
+- reflejarla automáticamente en `/admin/views`
+
+No abrir nuevas pantallas visibles relevantes sin decidir al menos una de estas dos posturas:
+- `tiene view_code propio`
+- `queda explícitamente fuera del modelo porque es una ruta base transversal`
 
 ## State Management
 

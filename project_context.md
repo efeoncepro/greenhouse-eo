@@ -18,6 +18,23 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `greenhouse-ui-orchestrator` sigue resolviendo patron y target
   - `greenhouse-vuexy-ui-expert` y `greenhouse-portal-ui-implementer` ya deben endurecer copy, state design y accessibility con la baseline moderna
 
+## Delta 2026-03-30 view governance ya forma parte de la arquitectura base
+- El portal ya no debe interpretarse como acceso fino gobernado solo por `routeGroups`.
+- Estado vigente:
+  - broad access por `routeGroups`
+  - fine-grained access por `authorizedViews` + `view_code`
+- Persistencia canónica en `greenhouse_core`:
+  - `view_registry`
+  - `role_view_assignments`
+  - `user_view_overrides`
+  - `view_access_log`
+- Superficie operativa:
+  - `/admin/views`
+- Regla para trabajo futuro:
+  - nuevas superficies visibles del portal deberían evaluarse explícitamente como:
+    - gobernables por `view_code`, o
+    - rutas base transversales fuera del modelo
+
 ## Delta 2026-03-30 Sentry incident reader hardening
 - `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.
 - Nuevo contrato soportado:
