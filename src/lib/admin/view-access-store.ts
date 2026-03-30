@@ -29,6 +29,16 @@ type ViewRegistryRow = {
   active: boolean
 }
 
+type ViewAccessLogRow = {
+  action: 'grant_role' | 'revoke_role' | 'grant_user' | 'revoke_user' | 'expire_user'
+  target_role: string | null
+  target_user: string | null
+  view_code: string
+  performed_by: string
+  reason: string | null
+  created_at: string
+}
+
 export type ViewAccessSource = 'persisted' | 'hardcoded_fallback'
 
 export type PersistedRoleViewAssignmentInput = {
@@ -217,6 +227,37 @@ const getPersistedUserOverrides = async () => {
           expires_at
         FROM greenhouse_core.user_view_overrides
         WHERE expires_at IS NULL OR expires_at > now()
+      `
+    )
+
+    return rows
+  } catch (error) {
+    if (missingRelation(error)) {
+      throw new ViewAccessStoreError(
+        'View access tables are not provisioned. Run: pnpm setup:postgres:view-access',
+        'SCHEMA_NOT_READY'
+      )
+    }
+
+    throw error
+  }
+}
+
+const getRecentViewAccessLog = async () => {
+  try {
+    const rows = await runGreenhousePostgresQuery<ViewAccessLogRow>(
+      `
+        SELECT
+          action,
+          target_role,
+          target_user,
+          view_code,
+          performed_by,
+          reason,
+          created_at
+        FROM greenhouse_core.view_access_log
+        ORDER BY created_at DESC
+        LIMIT 40
       `
     )
 
@@ -467,10 +508,11 @@ export const getAdminPersistedViewAccessGovernance = async () => {
 
   await syncViewRegistryCatalog()
 
-  const [persistedRows, persistedRegistryRows, persistedUserOverrides] = await Promise.all([
+  const [persistedRows, persistedRegistryRows, persistedUserOverrides, auditLogRows] = await Promise.all([
     getPersistedAssignments(),
     getPersistedViewRegistry(),
-    getPersistedUserOverrides()
+    getPersistedUserOverrides(),
+    getRecentViewAccessLog()
   ])
 
   const registryRows = persistedRegistryRows.length > 0
@@ -559,6 +601,15 @@ export const getAdminPersistedViewAccessGovernance = async () => {
       overrideType: override.override_type,
       reason: override.reason,
       expiresAt: override.expires_at
+    })),
+    auditLog: auditLogRows.map(entry => ({
+      action: entry.action,
+      targetRole: entry.target_role,
+      targetUser: entry.target_user,
+      viewCode: entry.view_code,
+      performedBy: entry.performed_by,
+      reason: entry.reason,
+      createdAt: entry.created_at
     })),
     persistence: {
       rolesWithPersistedAssignments: roles.filter(role => {

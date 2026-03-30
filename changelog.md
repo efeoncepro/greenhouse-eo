@@ -9,6 +9,7 @@
 - `TASK-136` extendió ese mismo modelo a `Agency`, `HR` y `My`, con nuevos `view_code` explícitos y guards/sidebar alineados a esas superficies visibles.
 - `TASK-136` alineó además el portal cliente y access points secundarios con nuevos `view_code` (`cliente.equipo`, `cliente.analytics`, `cliente.revisiones`, `cliente.actualizaciones`, `gestion.capacidad`) y el menú cliente ya filtra también por `authorizedViews`.
 - `TASK-136` activó además overrides por usuario iniciales en `/admin/views`, con persistencia en `user_view_overrides`, resolución runtime sobre `authorizedViews` y una primera UI de `inherit/grant/revoke` en el tab `Preview`.
+- `TASK-136` ya suma expiración opcional por batch de overrides y auditoría visible en `Preview`, dejando el módulo bastante más operable para admins.
 - `TASK-136` avanzó de baseline visual a persistencia inicial real en `Admin Center > Vistas y acceso`.
 - Nuevo contrato backend:
   - `POST /api/admin/views/assignments`

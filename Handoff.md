@@ -371,10 +371,29 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 
 ### Pendiente inmediato
 - Este slice inicial ya hace el trabajo útil, pero aún faltan:
-  - expiración opcional por override
   - reasons por vista más finas
-  - auditoría visible en la UI
   - evento/notificación al usuario afectado cuando cambie su acceso
+
+## Sesión 2026-03-30 — TASK-136 suma expiración opcional y auditoría visible
+
+### Completado
+- `src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx` ahora soporta:
+  - expiración opcional por batch de overrides del usuario seleccionado
+  - feed de auditoría reciente por usuario en el tab `Preview`
+- `src/lib/admin/get-admin-view-access-governance.ts` y `src/lib/admin/view-access-store.ts` ahora exponen `auditLog` desde `greenhouse_core.view_access_log`.
+- Para sostener el repo verde durante el cierre se corrigió un drift de tipos en:
+  - `src/app/api/finance/income/reconcile-payments/route.ts`
+  - el handler usaba `newAmountPaid`, pero el contrato actual del ledger expone `amountPaid`
+
+### Validación ejecutada
+- `pnpm exec eslint src/lib/admin/get-admin-view-access-governance.ts src/lib/admin/view-access-store.ts src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx src/app/api/finance/income/reconcile-payments/route.ts`
+- `pnpm build`
+
+### Pendiente inmediato
+- El remanente más valioso de `TASK-136` ya es:
+  - reasons por vista más finas
+  - expiración individual por override, no solo por batch
+  - notificación/evento al usuario afectado
 
 ## Sesión 2026-03-30 — hardening Sentry incident reader
 

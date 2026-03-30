@@ -185,10 +185,20 @@
   - guardar overrides permanentes con razón obligatoria
   - ver el preview efectivo ya mezclando baseline y override
 - Este slice no cubre todavía:
-  - expiración temporal por override
   - edición inline de razones por vista
-  - auditoría visible en la UI
   - notificación automática al usuario afectado
+
+## Delta 2026-03-30 — expiración opcional y auditoría visible
+
+- El tab `Preview` de `/admin/views` ahora también soporta:
+  - expiración opcional por batch de overrides del usuario seleccionado
+  - auditoría visible de eventos recientes asociados al usuario
+- `AdminGovernanceOverview` ya expone `auditLog`, alimentado desde `greenhouse_core.view_access_log`.
+- El store mantiene la semántica:
+  - `grant/revoke` por usuario
+  - expiración opcional persistida en `user_view_overrides`
+  - lectura efectiva de sesión desde `authorizedViews`
+- Durante este cierre también se corrigió un drift incidental en `src/app/api/finance/income/reconcile-payments/route.ts` para mantener `tsc/build` sanos.
 
 ## Summary
 

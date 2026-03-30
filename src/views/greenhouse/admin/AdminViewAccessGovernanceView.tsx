@@ -54,6 +54,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
   const [saving, setSaving] = useState(false)
   const [editableUserOverrides, setEditableUserOverrides] = useState(data.userOverrides)
   const [overrideReason, setOverrideReason] = useState('')
+  const [overrideExpiresAt, setOverrideExpiresAt] = useState('')
   const [overrideError, setOverrideError] = useState<string | null>(null)
   const [overrideSuccess, setOverrideSuccess] = useState<string | null>(null)
   const [savingOverrides, setSavingOverrides] = useState(false)
@@ -110,8 +111,10 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
 
   useEffect(() => {
     const firstReason = data.userOverrides.find(override => override.userId === previewUserId && override.reason)?.reason ?? ''
+    const firstExpiresAt = data.userOverrides.find(override => override.userId === previewUserId && override.expiresAt)?.expiresAt ?? ''
 
     setOverrideReason(firstReason)
+    setOverrideExpiresAt(firstExpiresAt ? String(firstExpiresAt).slice(0, 16) : '')
     setOverrideError(null)
     setOverrideSuccess(null)
   }, [data.userOverrides, previewUserId])
@@ -157,6 +160,11 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
         }))
         .filter(section => section.views.length > 0),
     [data.sections, previewViews]
+  )
+
+  const previewUserAuditLog = useMemo(
+    () => data.auditLog.filter(entry => entry.targetUser === previewUserId).slice(0, 10),
+    [data.auditLog, previewUserId]
   )
 
   const toggleRoleAccess = (viewCode: string, roleCode: string) => {
@@ -206,7 +214,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
             viewCode,
             overrideType: 'grant',
             reason: overrideReason || null,
-            expiresAt: null
+            expiresAt: overrideExpiresAt || null
           }
         ]
       }
@@ -219,7 +227,8 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
             ? {
                 ...override,
                 overrideType: 'revoke',
-                reason: overrideReason || override.reason || null
+                reason: overrideReason || override.reason || null,
+                expiresAt: overrideExpiresAt || override.expiresAt || null
               }
             : override
         )
@@ -279,7 +288,8 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
       .filter(override => override.userId === previewUser.userId)
       .map(override => ({
         ...override,
-        reason: (overrideReason || override.reason || '').trim() || null
+        reason: (overrideReason || override.reason || '').trim() || null,
+        expiresAt: overrideExpiresAt || override.expiresAt || null
       }))
 
     if (overridesForUser.length > 0 && !overrideReason.trim()) {
@@ -640,7 +650,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                                 <Box>
                                   <Typography variant='h6'>Overrides por usuario</Typography>
                                   <Typography variant='body2' color='text.secondary'>
-                                    Cambia una vista entre `inherit`, `grant` y `revoke`. Este corte guarda overrides permanentes sin expiración.
+                                    Cambia una vista entre `inherit`, `grant` y `revoke`. Puedes guardar este batch con expiración opcional y razón operativa.
                                   </Typography>
                                 </Box>
                                 <Stack direction='row' spacing={1}>
@@ -665,6 +675,17 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                                 value={overrideReason}
                                 onChange={event => setOverrideReason(event.target.value)}
                                 helperText='Obligatoria si el usuario tiene al menos un override activo.'
+                              />
+
+                              <TextField
+                                size='small'
+                                fullWidth
+                                type='datetime-local'
+                                label='Expira el'
+                                value={overrideExpiresAt}
+                                onChange={event => setOverrideExpiresAt(event.target.value)}
+                                InputLabelProps={{ shrink: true }}
+                                helperText='Opcional. Se aplica al batch de overrides que guardes para este usuario.'
                               />
 
                               {overrideError ? <Alert severity='error'>{overrideError}</Alert> : null}
@@ -708,6 +729,12 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                                             label={mode === 'inherit' ? 'Inherit' : mode === 'grant' ? 'Grant' : 'Revoke'}
                                           />
                                         </Stack>
+                                        {mode !== 'inherit' ? (
+                                          <Stack direction='row' spacing={1} flexWrap='wrap'>
+                                            {overrideReason ? <Chip size='small' variant='outlined' label={overrideReason} /> : null}
+                                            {overrideExpiresAt ? <Chip size='small' color='warning' variant='tonal' label={`Expira ${overrideExpiresAt.replace('T', ' ')}`} /> : null}
+                                          </Stack>
+                                        ) : null}
                                       </Stack>
                                     </Box>
                                   )
@@ -718,6 +745,56 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                         </Card>
 
                         <Divider />
+
+                        <Card variant='outlined'>
+                          <CardContent>
+                            <Stack spacing={2}>
+                              <Typography variant='h6'>Auditoría reciente</Typography>
+                              <Typography variant='body2' color='text.secondary'>
+                                Últimos eventos visibles de access governance para este usuario.
+                              </Typography>
+                              {previewUserAuditLog.length === 0 ? (
+                                <Alert severity='info' variant='outlined'>
+                                  Aún no hay actividad reciente registrada para este usuario.
+                                </Alert>
+                              ) : (
+                                <Stack spacing={1.25}>
+                                  {previewUserAuditLog.map((entry, index) => (
+                                    <Box
+                                      key={`${entry.createdAt}-${entry.viewCode}-${index}`}
+                                      sx={{
+                                        border: theme => `1px solid ${theme.palette.divider}`,
+                                        borderRadius: 1,
+                                        p: 1.5
+                                      }}
+                                    >
+                                      <Stack spacing={0.75}>
+                                        <Stack direction='row' spacing={1} flexWrap='wrap'>
+                                          <Chip
+                                            size='small'
+                                            color={entry.action.includes('grant') ? 'success' : entry.action.includes('revoke') ? 'error' : 'warning'}
+                                            variant='tonal'
+                                            label={entry.action}
+                                          />
+                                          <Chip size='small' variant='outlined' label={entry.viewCode} />
+                                          <Chip size='small' variant='outlined' label={String(entry.createdAt).replace('T', ' ').slice(0, 16)} />
+                                        </Stack>
+                                        <Typography variant='body2' color='text.secondary'>
+                                          Actor: {entry.performedBy}
+                                        </Typography>
+                                        {entry.reason ? (
+                                          <Typography variant='body2' color='text.secondary'>
+                                            Razón: {entry.reason}
+                                          </Typography>
+                                        ) : null}
+                                      </Stack>
+                                    </Box>
+                                  ))}
+                                </Stack>
+                              )}
+                            </Stack>
+                          </CardContent>
+                        </Card>
 
                         <Box
                           sx={{
@@ -839,7 +916,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                       <Chip size='small' color='warning' variant='tonal' label='Siguiente slice' />
                       <Typography variant='h6'>Overrides por usuario</Typography>
                       <Typography color='text.secondary'>
-                        Grant o revoke ya quedó activo en este slice inicial. El remanente es expiración, edición más fina y mejor auditoría contextual.
+                        Grant o revoke ya quedó activo y ahora también hay expiración opcional por batch + auditoría visible. El remanente es edición más fina por vista y vencimiento automático más rico.
                       </Typography>
                     </Stack>
                   </CardContent>
