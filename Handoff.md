@@ -4,6 +4,42 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — hardening documental para `TASK-141` sin romper reactive lanes
+
+### Completado
+- Se revisaron explícitamente los carriles sensibles antes de profundizar el cutover `person-first`:
+  - `src/lib/sync/publish-event.ts`
+  - `src/lib/webhooks/dispatcher.ts`
+  - `src/lib/webhooks/consumers/notification-recipients.ts`
+  - `src/lib/notifications/person-recipient-resolver.ts`
+  - `src/lib/notifications/notification-service.ts`
+  - `src/lib/sync/projections/notifications.ts`
+  - `src/lib/sync/projections/client-economics.ts`
+  - `src/lib/sync/projections/ico-member-metrics.ts`
+  - `src/lib/sync/projections/person-intelligence.ts`
+- Se dejó explícito en arquitectura y en `TASK-141` que:
+  - persona canónica no reemplaza a ciegas `member_id` ni `user_id`
+  - notificaciones siguen necesitando `userId` para inbox/preferencias cuando aplique
+  - ICO, finance y serving por colaborador siguen necesitando `member_id` como clave operativa
+  - cualquier cutover futuro debe ser gradual, observable y con compatibilidad transicional
+
+### Archivos tocados
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+- `docs/tasks/to-do/TASK-141-canonical-person-identity-consumption.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Validación ejecutada
+- revisión documental/manual del contrato
+- lectura explícita de outbox, webhook dispatcher, recipient resolution y projections sensibles
+
+### Pendiente inmediato
+- si se implementa `TASK-141`, el primer slice debería crear o endurecer el resolver shared sin cambiar todavía recipient keys ni payloads reactivos
+- consumers de notifications, finance e ICO deben verificarse con evidencia antes de cualquier cutover más agresivo
+
 ## Sesión 2026-03-30 — documentación arquitectónica del modelo de views
 
 ### Completado

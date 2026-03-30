@@ -41,6 +41,38 @@ Regla arquitectónica:
 - `routeGroups` no deben seguir creciendo como mecanismo principal de autorización fina
 - cuando falte modelado explícito, el fallback puede existir, pero debe tratarse como estado transicional
 
+## Delta 2026-03-30 — Person-first identity with reactive compatibility
+
+Greenhouse debe institucionalizar el consumo `person-first` sin romper los carriles reactivos ya operativos.
+
+Regla canónica:
+- cuando una surface, recipient resolver o preview represente a un humano, la raíz conceptual es la persona canónica (`identity_profile`)
+- `member` sigue siendo la faceta operativa fuerte para HR, payroll, capacity, ICO y People
+- `client_user` sigue siendo el principal de acceso para sesión, inbox, preferencias, auditoría de login y overrides user-scoped
+
+Guardrails obligatorios para la migración:
+- no cambiar de forma silenciosa la semántica de `event_id`, `aggregate_id`, `member_id`, `identity_profile_id` o `user_id` en outbox, projections o webhook envelopes
+- no reemplazar recipients `userId`-scoped en notificaciones cuando la operación sigue dependiendo de inbox o preferencias por usuario
+- consumers reactivos de `finance`, `people`, `ICO` y `notifications` deben seguir pudiendo resolver:
+  - persona canónica
+  - faceta operativa (`member`)
+  - principal portal (`client_user`)
+- toda adopción `person-first` debe ser gradual, observable y con fallback explícito, no por cutover implícito
+
+Piezas especialmente sensibles para esta regla:
+- `src/lib/notifications/person-recipient-resolver.ts`
+- `src/lib/notifications/notification-service.ts`
+- `src/lib/webhooks/consumers/notification-recipients.ts`
+- `src/lib/sync/projections/notifications.ts`
+- `src/lib/sync/projections/client-economics.ts`
+- `src/lib/sync/projections/ico-member-metrics.ts`
+- `src/lib/sync/projections/person-intelligence.ts`
+- `src/lib/webhooks/dispatcher.ts`
+
+Consecuencia arquitectónica:
+- `TASK-141` no debe ejecutarse como “swap `client_user` por persona en todas partes”
+- debe implementarse como un contrato shared que expone la identidad humana canónica sin degradar los consumers que todavía necesitan `userId` o `memberId` como claves operativas
+
 ## Purpose
 
 This document is the master architecture reference for Greenhouse EO.

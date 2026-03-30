@@ -21,6 +21,19 @@ Use together with:
 
 This is the target access architecture. The PostgreSQL canonical backbone is already provisioned (`greenhouse_core` schema in `greenhouse-pg-dev`). The tables defined in this document extend that backbone with a mature RBAC model that replaces the early `role: 'client' | 'admin'` field on `greenhouse.clients`.
 
+## Delta 2026-03-30 — Principal-first auth, person-first human resolution
+
+Este documento sigue siendo `principal-first` para auth y access runtime.
+
+Eso no contradice el contrato `person-first` del modelo 360:
+- sesión, login, preferencias, inbox y overrides continúan anclados en `client_users.user_id`
+- surfaces que representen humanos no deberían tratar `client_user` como raíz humana si existe resolución canónica por persona
+
+Regla operativa:
+- access runtime puede seguir resolviendo desde `user_id`
+- consumers de preview, recipients y admin read surfaces deben enriquecer la sesión con `identity_profile_id` y `member_id` cuando corresponda
+- migraciones futuras no deben romper compatibilidad con tablas o logs que hoy son `userId`-scoped por diseño
+
 ## Core Design Decisions
 
 ### Decision 1: Single app, three audiences

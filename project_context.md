@@ -46,6 +46,22 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - menú de `Módulos` visible solo si la sesión conserva `cliente.modulos`
   - `/capabilities/[moduleId]` exige tanto ese `view_code` como la validación específica del módulo
 
+## Delta 2026-03-30 person-first identity debe preservar carriles reactivos
+- La institucionalización de identidad `person-first` no puede ejecutarse como reemplazo ciego de `client_user`.
+- Contrato operativo vigente:
+  - `identity_profile` = raíz humana canónica
+  - `member` = faceta operativa para payroll, HR, ICO, capacity, People y serving por colaborador
+  - `client_user` = principal de acceso para sesión, inbox, preferencias, overrides y auditoría user-scoped
+- Carriles sensibles revisados:
+  - outbox / webhook dispatch
+  - notification recipients
+  - projections de notifications
+  - projections de finance / client economics
+  - projections de ICO / person intelligence
+- Regla para follow-ons como `TASK-141`:
+  - no mutar silenciosamente payloads, recipient keys ni identifiers operativos (`identity_profile_id`, `member_id`, `user_id`)
+  - resolver el grafo humano completo sin degradar consumers que hoy dependen de `member` o `user`
+
 ## Delta 2026-03-30 Sentry incident reader hardening
 - `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.
 - Nuevo contrato soportado:

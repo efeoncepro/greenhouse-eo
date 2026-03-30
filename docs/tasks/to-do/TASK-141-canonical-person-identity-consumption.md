@@ -263,6 +263,36 @@ La estrategia debe explicitar:
   - admin governance
   - health o audit surfaces futuras
 
+### Slice 6 - Reactive, webhook and projection compatibility
+
+- inventariar explícitamente qué carriles no pueden romperse durante el cutover
+- formalizar qué identificadores siguen siendo operativos por dominio
+- exigir rollout con verificación sobre notificaciones, projections, outbox y webhook dispatch
+
+Componentes revisados que deben preservarse:
+
+- outbox y dispatch:
+  - `src/lib/sync/publish-event.ts`
+  - `src/lib/webhooks/dispatcher.ts`
+- projection registry y consumers:
+  - `src/lib/sync/projection-registry.ts`
+  - `src/lib/sync/projections/notifications.ts`
+  - `src/lib/sync/projections/client-economics.ts`
+  - `src/lib/sync/projections/ico-member-metrics.ts`
+  - `src/lib/sync/projections/person-intelligence.ts`
+- recipient resolution:
+  - `src/lib/notifications/person-recipient-resolver.ts`
+  - `src/lib/notifications/notification-service.ts`
+  - `src/lib/webhooks/consumers/notification-recipients.ts`
+
+Reglas no negociables para este slice:
+
+- no mutar silenciosamente payloads de outbox ya consumidos por projections o webhook subscriptions
+- no sustituir `member_id` por `identity_profile_id` en consumers que materializan serving por miembro
+- no sustituir `user_id` por `identity_profile_id` en consumers que dependen de inbox, preferencias, overrides o auditoría user-scoped
+- sí enriquecer resolvers para que cada consumer pueda ver el grafo completo persona/member/user sin perder las claves operativas actuales
+- cualquier cambio de envelope, payload o recipient key debe salir con migration note, compatibilidad transicional y observabilidad explícita
+
 ## Out of Scope
 
 - reimplementar en esta misma task todos los consumers afectados
@@ -282,6 +312,8 @@ La estrategia debe explicitar:
 - [ ] existe una estrategia de rollout gradual con degradaciones explícitas y observables
 - [ ] quedan definidos anti-patterns que no deben volver a aparecer
 - [ ] `TASK-140` y `TASK-134` quedan claramente posicionadas como follow-ons o carriles dependientes de esta política
+- [ ] el contrato deja explícito que notifications, outbox, projections, webhooks, ICO y finance no deben degradarse durante la migración
+- [ ] quedan definidos los identificadores operativos que deben preservarse por cada carril sensible (`identity_profile_id`, `member_id`, `user_id`)
 
 ## Verification
 
@@ -296,6 +328,19 @@ La estrategia debe explicitar:
   - consumers notifications
   - consumers audit/access
   - evolución futura de IdP y provisioning
+- revisión explícita de los carriles sensibles:
+  - `src/lib/notifications/person-recipient-resolver.ts`
+  - `src/lib/notifications/notification-service.ts`
+  - `src/lib/webhooks/consumers/notification-recipients.ts`
+  - `src/lib/sync/projections/notifications.ts`
+  - `src/lib/sync/projections/client-economics.ts`
+  - `src/lib/sync/projections/ico-member-metrics.ts`
+  - `src/lib/sync/projections/person-intelligence.ts`
+  - `src/lib/webhooks/dispatcher.ts`
+- confirmar que la task no plantea un cutover que rompa:
+  - inbox/preferencias user-scoped
+  - projections member-scoped
+  - payloads actuales del outbox
 
 ## Anti-Patterns To Ban
 
