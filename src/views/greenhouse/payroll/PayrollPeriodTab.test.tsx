@@ -32,6 +32,39 @@ describe('PayrollPeriodTab readiness', () => {
         json: async () => ({
           periodId: '2026-03',
           ready: false,
+          calculation: {
+            ready: false,
+            blockingIssues: [
+              {
+                code: 'missing_uf_value',
+                severity: 'blocking',
+                message: 'Falta el valor UF y este período lo requiere para calcular descuentos Isapre.'
+              }
+            ],
+            warnings: [
+              {
+                code: 'missing_compensation',
+                severity: 'warning',
+                message: '1 colaborador(es) activos quedarían fuera por no tener compensación vigente.'
+              }
+            ],
+            deadline: {
+              lastBusinessDay: '2026-03-31',
+              isDue: false,
+              isOverdue: true,
+              calculatedOnTime: null
+            }
+          },
+          approval: {
+            ready: false,
+            blockingIssues: [
+              {
+                code: 'missing_uf_value',
+                severity: 'blocking',
+                message: 'Falta el valor UF y este período lo requiere para calcular descuentos Isapre.'
+              }
+            ]
+          },
           includedMemberIds: ['member-1'],
           missingCompensationMemberIds: ['member-2'],
           missingKpiMemberIds: [],
@@ -84,6 +117,8 @@ describe('PayrollPeriodTab readiness', () => {
     await findByText('Falta el valor UF y este período lo requiere para calcular descuentos Isapre.')
 
     expect(getByText('1 colaborador(es) activos quedarían fuera por no tener compensación vigente.')).toBeInTheDocument()
+    expect(getByText(/Deadline de cálculo:/)).toBeInTheDocument()
+    expect(getByText(/Bloqueada o fuera de fecha/)).toBeInTheDocument()
     expect(queryByText('La asistencia aún se resume desde attendance_daily + leave_requests.')).not.toBeInTheDocument()
     expect(queryByText('La integración futura objetivo para asistencia es Microsoft Teams.')).not.toBeInTheDocument()
     expect(getByRole('button', { name: 'Calcular' })).toBeDisabled()

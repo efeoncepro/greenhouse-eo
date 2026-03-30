@@ -1,12 +1,43 @@
 # TASK-117 - Payroll Last Business Day Auto-Calculation
 
+## Delta 2026-03-29 — validación real de notificaciones y corrección de identidad
+
+- `TASK-117` quedó revalidada con dispatch real de `payroll_ops`, no solo por tests y build.
+- La resolución de recipients operativos ahora nace desde la identidad canónica de persona:
+  - `identity_profile` como raíz
+  - `member` como faceta fuerte de Payroll
+  - `client_user` solo para `in_app`
+- Evidencia real confirmada:
+  - `user-efeonce-admin-julio-reyes`
+  - `user-efeonce-internal-humberly-henriquez`
+  - categoría `payroll_ops`
+  - título `Nómina marzo de 2026 calculada`
+- El gap sistémico descubierto en Notifications se deriva a `TASK-134`.
+
+## Delta 2026-03-29
+
+- Cerrada con semántica operativa materializada en runtime:
+  - helper canónico `getLastBusinessDayOfMonth()` + `isLastBusinessDayOfMonth()`
+  - `calculation readiness` separado de `approval readiness`
+  - helper `getPayrollCalculationDeadlineStatus()`
+  - cron idempotente `GET /api/cron/payroll-auto-calculate`
+  - job `runPayrollAutoCalculation()` con auto-creación del período mensual
+  - consumer reactivo `payroll_period.calculated` con categoría `payroll_ops`
+- `PayrollPeriodTab` ahora expone deadline, estado operativo y cumplimiento del cálculo.
+- La task original quedó parcialmente desfasada frente al branch: el job/cron y parte del carril de notificaciones ya existían y se consolidaron/documentaron en este cierre.
+- Validación ejecutada:
+  - `pnpm exec vitest run src/lib/calendar/operational-calendar.test.ts src/lib/payroll/current-payroll-period.test.ts src/lib/payroll/payroll-readiness.test.ts src/lib/payroll/auto-calculate-payroll.test.ts src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx`
+  - `pnpm exec eslint src/lib/calendar/operational-calendar.ts src/lib/calendar/operational-calendar.test.ts src/lib/payroll/current-payroll-period.ts src/lib/payroll/current-payroll-period.test.ts src/lib/payroll/payroll-readiness.ts src/lib/payroll/payroll-readiness.test.ts src/lib/payroll/auto-calculate-payroll.ts src/lib/payroll/auto-calculate-payroll.test.ts src/app/api/cron/payroll-auto-calculate/route.ts src/app/api/hr/payroll/periods/[periodId]/approve/route.ts src/config/notification-categories.ts src/lib/sync/projections/notifications.ts src/types/payroll.ts src/views/greenhouse/payroll/PayrollPeriodTab.tsx src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm build`
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
-- Status real: `Diseño`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `hr`
 
@@ -105,15 +136,14 @@ Reglas obligatorias:
 - lifecycle oficial `draft -> calculated -> approved -> exported`
 - mutaciones canónicas Postgres-first para `calculated`, `approved` y `exported`
 - readiness canónico para aprobación en `src/lib/payroll/payroll-readiness.ts`
+- helper explícito `getLastBusinessDayOfMonth()` / `isLastBusinessDayOfMonth()`
+- helper `getPayrollCalculationDeadlineStatus()` para deadline/cumplimiento
+- cron `GET /api/cron/payroll-auto-calculate` + orquestador `runPayrollAutoCalculation()`
+- consumer reactivo `payroll_period.calculated` con categoría `payroll_ops`
 
 ### Gap actual
 
-- no existe helper explícito de `último día hábil del mes`
-- no existe `calculation readiness` separado del readiness de aprobación
-- no existe job idempotente para cálculo automático mensual
-- no existe surface operativa clara para deadline, cumplimiento o bloqueo del cálculo
-- no está decidido si el período mensual debe crearse automáticamente cuando falta
-- no existe consumer de notificaciones para `payroll_period.calculated` hacia stakeholders internos de Payroll
+- baseline cerrado y validado con recipients reales; el follow-on ya no es de Payroll sino del modelo transversal de identidad en Notifications (`TASK-134`)
 
 ## Scope
 
@@ -170,15 +200,15 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] existe una policy documentada que define que el período del mes debe quedar en `calculated` el último día hábil del mes operativo
-- [ ] la utilidad de calendario expone helper explícito de `último día hábil del mes`
-- [ ] `calculation readiness` queda separado conceptualmente del readiness de aprobación
-- [ ] existe diseño implementable de job/crón idempotente para auto-cálculo mensual
-- [ ] está definido si el período mensual se crea automáticamente cuando falta
-- [ ] `/hr/payroll` tiene contrato claro para mostrar deadline/cumplimiento/bloqueo del cálculo
-- [ ] existe diseño implementable para notificar a Julio Reyes y Humberly Henríquez cuando el período quede `calculated`, reutilizando `NotificationService` y la capa centralizada de email
-- [ ] el diseño deja explícito que la resolución de recipients de Payroll Ops nace preparada para migrar a rol/suscripción sin rehacer el flujo
-- [ ] la arquitectura de Payroll queda alineada a esta semántica sin romper `approved` ni `exported`
+- [x] existe una policy documentada que define que el período del mes debe quedar en `calculated` el último día hábil del mes operativo
+- [x] la utilidad de calendario expone helper explícito de `último día hábil del mes`
+- [x] `calculation readiness` queda separado conceptualmente del readiness de aprobación
+- [x] existe diseño implementable de job/crón idempotente para auto-cálculo mensual
+- [x] está definido si el período mensual se crea automáticamente cuando falta
+- [x] `/hr/payroll` tiene contrato claro para mostrar deadline/cumplimiento/bloqueo del cálculo
+- [x] existe diseño implementable para notificar a Julio Reyes y Humberly Henríquez cuando el período quede `calculated`, reutilizando `NotificationService` y la capa centralizada de email
+- [x] el diseño deja explícito que la resolución de recipients de Payroll Ops nace preparada para migrar a rol/suscripción sin rehacer el flujo
+- [x] la arquitectura de Payroll queda alineada a esta semántica sin romper `approved` ni `exported`
 
 ## Open Questions
 

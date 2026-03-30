@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { NotificationService } from '@/lib/notifications/notification-service'
+import { buildNotificationRecipientKey, NotificationService } from '@/lib/notifications/notification-service'
 import { ensureNotificationSchema } from '@/lib/notifications/schema'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import type { WebhookEnvelope } from '@/lib/webhooks/types'
@@ -35,6 +35,14 @@ const filterDedupedRecipients = async ({
     return { recipients, deduped: 0 }
   }
 
+  const recipientKeys = recipients
+    .map(recipient => buildNotificationRecipientKey(recipient))
+    .filter((value): value is string => Boolean(value))
+
+  if (recipientKeys.length === 0) {
+    return { recipients: [], deduped: recipients.length }
+  }
+
   const rows = await runGreenhousePostgresQuery<ExistingNotificationRow>(
     `SELECT DISTINCT user_id
      FROM (
@@ -55,11 +63,16 @@ const filterDedupedRecipients = async ({
          AND metadata->>'eventId' = $3
          AND metadata->>'source' = 'webhook_notifications'
      ) existing`,
-    [recipients.map(recipient => recipient.userId), category, eventId]
+    [recipientKeys, category, eventId]
   )
 
   const existingUserIds = new Set(rows.map(row => String(row.user_id ?? '')).filter(Boolean))
-  const filtered = recipients.filter(recipient => !existingUserIds.has(recipient.userId))
+
+  const filtered = recipients.filter(recipient => {
+    const recipientKey = buildNotificationRecipientKey(recipient)
+
+    return recipientKey ? !existingUserIds.has(recipientKey) : false
+  })
 
   return {
     recipients: filtered,

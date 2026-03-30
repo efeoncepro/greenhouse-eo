@@ -131,7 +131,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-104` | `complete` | Payroll Export Email Redesign | `docs/tasks/complete/TASK-104-payroll-export-email-redesign.md` |
 | `TASK-105` | `complete` | Lint Debt Stabilization | `docs/tasks/complete/TASK-105-lint-debt-stabilization.md` |
 | `TASK-106` | `complete` | Email Delivery Admin UI | `docs/tasks/complete/TASK-106-email-delivery-admin-ui.md` |
-| `TASK-107` | `to-do` | Auth Email Verification Request Flow | `docs/tasks/to-do/TASK-107-auth-email-verification-request-flow.md` |
+| `TASK-107` | `complete` | Auth Email Verification Request Flow | `docs/tasks/complete/TASK-107-auth-email-verification-request-flow.md` |
 | `TASK-108` | `complete` | Admin Center Governance Shell | `docs/tasks/complete/TASK-108-admin-center-governance-shell.md` |
 | `TASK-109` | `to-do` | Projected Payroll Runtime Hardening and Observability | `docs/tasks/to-do/TASK-109-projected-payroll-runtime-hardening-observability.md` |
 | `TASK-110` | `in-progress` | Nexa: assistant-ui Feature Adoption | `docs/tasks/in-progress/TASK-110-nexa-assistant-ui-features.md` |
@@ -141,7 +141,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-114` | `complete` | Nexa Backend: Persistence, Feedback & Dynamic Suggestions | `docs/tasks/complete/TASK-114-nexa-backend-persistence-suggestions.md` |
 | `TASK-115` | `to-do` | Nexa UI: Edit, Suggestions, Feedback, Floating & Thread History | `docs/tasks/to-do/TASK-115-nexa-ui-completion.md` |
 | `TASK-116` | `to-do` | Sidebar Navigation Audit & Remediation | `docs/tasks/to-do/TASK-116-sidebar-navigation-audit-remediation.md` |
-| `TASK-117` | `to-do` | Payroll Last Business Day Auto-Calculation | `docs/tasks/to-do/TASK-117-payroll-last-business-day-auto-calculation.md` |
+| `TASK-117` | `complete` | Payroll Last Business Day Auto-Calculation | `docs/tasks/complete/TASK-117-payroll-last-business-day-auto-calculation.md` |
 | `TASK-118` | `to-do` | ICO AI Core: Embedded Intelligence Layer | `docs/tasks/to-do/TASK-118-ico-ai-core-embedded-intelligence.md` |
 | `TASK-119` | `complete` | Home Landing Rollout and Navigation Cutover | `docs/tasks/complete/TASK-119-home-landing-rollout-navigation-cutover.md` |
 | `TASK-120` | `complete` | Admin Center Governance Follow-on Cutover | `docs/tasks/complete/TASK-120-admin-center-governance-follow-on-cutover.md` |
@@ -168,13 +168,14 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 | `TASK-128` | `to-do` | Webhook Consumers Roadmap: Slack, Cache, Nubox, In-App | `docs/tasks/to-do/TASK-128-webhook-consumers-roadmap.md` |
 
-| `TASK-129` | `in-progress` | In-App Notifications via Webhook Bus | `docs/tasks/in-progress/TASK-129-in-app-notifications-via-webhook-bus.md` |
+| `TASK-129` | `complete` | In-App Notifications via Webhook Bus | `docs/tasks/complete/TASK-129-in-app-notifications-via-webhook-bus.md` |
 
 | `TASK-130` | `to-do` | Login Auth Flow UX: Loading States & Transitions | `docs/tasks/to-do/TASK-130-login-auth-flow-ux-feedback.md` |
 
 | `TASK-131` | `complete` | Cloud Health Runtime vs Tooling Posture Separation | `docs/tasks/complete/TASK-131-cloud-health-runtime-tooling-posture-separation.md` |
 
-| `TASK-132` | `to-do` | Admin Center: Notification System Landing | `docs/tasks/to-do/TASK-132-admin-notification-center-landing.md` |
-| `TASK-133` | `to-do` | Ops Health: Sentry Incident Surfacing | `docs/tasks/to-do/TASK-133-ops-health-sentry-incident-surfacing.md` |
+| `TASK-132` | `complete` | Admin Center: Notification System Landing | `docs/tasks/complete/TASK-132-admin-notification-center-landing.md` |
+| `TASK-133` | `complete` | Ops Health: Sentry Incident Surfacing | `docs/tasks/complete/TASK-133-ops-health-sentry-incident-surfacing.md` |
+| `TASK-134` | `to-do` | Notification Identity Model Hardening | `docs/tasks/to-do/TASK-134-notification-identity-model-hardening.md` |
 
-`TASK-134`
+`TASK-135`

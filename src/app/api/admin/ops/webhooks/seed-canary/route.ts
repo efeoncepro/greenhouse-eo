@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import { buildCanaryTargetUrl } from '@/lib/webhooks/canary-target'
+import { resolveWebhookBaseUrl } from '@/lib/webhooks/target-url'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,8 +27,7 @@ export async function POST(request: Request) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  // Resolve the base URL from the request or Vercel env
-  const baseUrl = getBaseUrl(request)
+  const baseUrl = resolveWebhookBaseUrl({ request })
 
   const targetUrl = buildCanaryTargetUrl({ baseUrl })
 
@@ -61,16 +61,4 @@ export async function POST(request: Request) {
     action: isNew ? 'created' : 'reactivated',
     note: 'The webhook-dispatch cron (*/2 min) will start delivering matched events on next cycle.'
   })
-}
-
-function getBaseUrl(request: Request): string {
-  // Use VERCEL_URL if available (includes protocol-less domain)
-  const vercelUrl = process.env.VERCEL_URL
-
-  if (vercelUrl) return `https://${vercelUrl}`
-
-  // Fallback to request origin
-  const url = new URL(request.url)
-
-  return url.origin
 }

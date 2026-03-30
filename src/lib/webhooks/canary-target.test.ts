@@ -44,4 +44,15 @@ describe('buildCanaryTargetUrl', () => {
       'https://dev-greenhouse.efeoncepro.com/api/internal/webhooks/canary?x-vercel-protection-bypass=generic-bypass'
     )
   })
+
+  it('strips escaped newlines from the bypass secret before building the target', () => {
+    expect(
+      buildCanaryTargetUrl({
+        baseUrl: 'https://dev-greenhouse.efeoncepro.com',
+        env: makeEnv({
+          WEBHOOK_CANARY_VERCEL_PROTECTION_BYPASS_SECRET: 'canary-only-bypass\\n'
+        })
+      })
+    ).toBe('https://dev-greenhouse.efeoncepro.com/api/internal/webhooks/canary?x-vercel-protection-bypass=canary-only-bypass')
+  })
 })

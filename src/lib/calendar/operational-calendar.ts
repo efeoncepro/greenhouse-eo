@@ -304,6 +304,53 @@ export const countBusinessDays = (
   return count
 }
 
+export const getOperationalDateKey = (
+  referenceDate: DateLike,
+  options?: OperationalCalendarContextInput | null
+) => {
+  const context = resolveOperationalCalendarContext(options ?? null, null, null)
+
+  return getCalendarDate(referenceDate, context.timezone).key
+}
+
+export const getLastBusinessDayOfMonth = (
+  year: number,
+  month: number,
+  options?: OperationalCalendarContextInput | null
+) => {
+  if (!Number.isInteger(year) || year < 1900 || year > 9999) {
+    throw new RangeError(`Invalid year: ${year}`)
+  }
+
+  if (!Number.isInteger(month) || month < 1 || month > 12) {
+    throw new RangeError(`Invalid month: ${month}`)
+  }
+
+  const context = resolveOperationalCalendarContext(options ?? null, null, null)
+
+  let candidate = buildCalendarDateParts(
+    year,
+    month,
+    new Date(Date.UTC(year, month, 0)).getUTCDate()
+  )
+
+  while (!isBusinessCalendarDate(candidate, context)) {
+    candidate = addCalendarDays(candidate, -1)
+  }
+
+  return candidate.key
+}
+
+export const isLastBusinessDayOfMonth = (
+  referenceDate: DateLike,
+  options?: OperationalCalendarContextInput | null
+) => {
+  const context = resolveOperationalCalendarContext(options ?? null, null, null)
+  const localDate = getCalendarDate(referenceDate, context.timezone)
+
+  return localDate.key === getLastBusinessDayOfMonth(localDate.year, localDate.month, context)
+}
+
 export const isWithinPayrollCloseWindow = (
   referenceDate: DateLike,
   closeWindowBusinessDays = DEFAULT_OPERATIONAL_CLOSE_WINDOW_BUSINESS_DAYS,

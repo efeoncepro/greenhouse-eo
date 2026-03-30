@@ -1,5 +1,15 @@
 # TASK-129 — In-App Notifications via Webhook Bus
 
+## Delta 2026-03-29 — recipient resolution canónica
+- El consumer webhook ya quedó alineado al resolver compartido `person-first`.
+- Contrato vigente del carril:
+  - `identity_profile` como raíz humana
+  - `member` para eventos colaborador/payroll
+  - `client_user` como inbox portal
+  - fallback `email-only` cuando no exista principal portal activo
+- El dedupe del consumer ya opera sobre la recipient key efectiva (`userId`, `person:*`, `member:*` o `external:*`), no solo sobre `userId`.
+- `payroll_period.exported` corrige además el label mensual con timezone `America/Santiago`, evitando deriva de mes en bordes UTC.
+
 ## Delta 2026-03-29
 - La implementación arranca con convivencia explícita entre carriles:
   - `reactive notifications` conserva `service.created`, `identity.reconciliation.approved`, `finance.dte.discrepancy_found`, `identity.profile.linked`
@@ -18,17 +28,28 @@
   - `production`: `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF=webhook-notifications-secret`
 - Estado transicional explícito:
   - `staging` conserva además `WEBHOOK_NOTIFICATIONS_SECRET`
-  - la creación/verificación de `webhook-notifications-secret` en GCP quedó bloqueada por reautenticación de `gcloud`
+  - `webhook-notifications-secret` ya fue creado/verificado en GCP Secret Manager
+- Los seed routes de webhooks ahora prefieren el alias estable del request sobre `VERCEL_URL` efímero.
+- Los target builders limpian también secuencias literales `\n`/`\r` en bypass secrets, evitando subscriptions con `%5Cn`.
+- La subscription real `wh-sub-notifications` quedó corregida en `staging` para usar `https://dev-greenhouse.efeoncepro.com/...`.
+- Smoke firmado en `staging` contra `dev-greenhouse.efeoncepro.com` responde `200` con `mapped=true`.
+
+## Delta 2026-03-29 — E2E validada en staging
+- Se alineó `greenhouse_core.client_users.member_id` para usuarios internos activos con match exacto de nombre contra `members`, destrabando la resolución de recipients.
+- Evidencia real:
+  - `assignment.created` visible en campanita para `user-efeonce-admin-julio-reyes`
+  - `payroll_period.exported` con `periodId=2026-03` resolvió 4 recipients y creó 4 notificaciones `payroll_ready`
+- La lane queda cerrada para el alcance definido en esta task; el follow-on natural es endurecer la higiene de identity linkage y retirar el fallback crudo del secreto en `staging`.
 
 ## Status
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `in-progress` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Medio` |
-| Status real | `Implementación` |
+| Status real | `Cerrada` |
 | Rank | — |
 | Domain | UX / Infrastructure / Notifications |
 | Sequence | Post TASK-125 (Webhook Activation), parte de TASK-128 (Webhook Consumers Roadmap) |

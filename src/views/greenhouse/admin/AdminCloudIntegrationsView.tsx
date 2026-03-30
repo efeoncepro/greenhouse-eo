@@ -101,6 +101,16 @@ const governanceLabel = (status: SecretGovernanceStatus): string => {
   return 'Sin verificar'
 }
 
+const sentryStatusColor = (
+  status: OperationsOverview['cloud']['observability']['incidents']['status']
+): 'success' | 'warning' | 'error' | 'secondary' => {
+  if (status === 'ok') return 'success'
+  if (status === 'warning') return 'warning'
+  if (status === 'unconfigured') return 'secondary'
+
+  return 'error'
+}
+
 const syncSubsystems = (subsystems: OperationsSubsystem[]) =>
   subsystems.filter(subsystem => ['Notion Sync', 'Services Sync', 'ICO Sync'].includes(subsystem.name))
 
@@ -296,6 +306,31 @@ const AdminCloudIntegrationsView = ({ data }: Props) => {
                     maximumBytesBilled: {data.cloud.bigquery.maximumBytesBilled.toLocaleString('en-US')} bytes
                   </Typography>
                 </Stack>
+              </Stack>
+            </CardContent>
+          </Card>
+
+          <Card variant='outlined'>
+            <CardContent>
+              <Stack spacing={1.5}>
+                <Stack direction='row' justifyContent='space-between' alignItems='center' gap={2}>
+                  <Typography variant='h6'>Sentry incidents</Typography>
+                  <Chip
+                    size='small'
+                    variant='tonal'
+                    color={sentryStatusColor(data.cloud.observability.incidents.status)}
+                    label={data.cloud.observability.incidents.status}
+                  />
+                </Stack>
+                <Typography variant='body2' color='text.secondary'>
+                  {data.cloud.observability.incidents.summary}
+                </Typography>
+                <Typography variant='body2' color='text.secondary'>
+                  {data.cloud.observability.posture.summary}
+                </Typography>
+                <Button component={Link} href='/admin/ops-health' variant='outlined' size='small'>
+                  Ver incidentes en Ops Health
+                </Button>
               </Stack>
             </CardContent>
           </Card>

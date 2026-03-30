@@ -34,7 +34,7 @@ The goal is narrower and more practical:
 
 As of 2026-03-29:
 
-### Implemented (TASK-006 + TASK-125)
+### Implemented (TASK-006 + TASK-125 + TASK-129)
 
 | Component | Status | Location |
 |-----------|--------|----------|
@@ -47,6 +47,7 @@ As of 2026-03-29:
 | Retry policy | Complete | 5 attempts: immediate, +1m, +5m, +15m, +60m → dead-letter |
 | Teams attendance migration | Complete | Migrated to generic inbound gateway |
 | Canary subscription | Deployable | `POST /api/admin/ops/webhooks/seed-canary` + `POST /api/internal/webhooks/canary` |
+| Notification consumer | Active | `POST /api/internal/webhooks/notification-dispatch` + `POST /api/admin/ops/webhooks/seed-notifications` |
 | Admin Center visibility | Active | Endpoint/subscription/delivery counters, dead-letter tracking, dispatch button |
 
 ### First Consumer: Canary Subscription (TASK-125)
@@ -70,6 +71,47 @@ outbox_events (published) → webhook-dispatch cron (*/2 min) → matches subscr
 - Dispatcher baseline:
   - prioriza eventos `published` más recientes (`published_at DESC NULLS LAST, occurred_at DESC`)
   - evita hambrear subscriptions nuevas cuando existe historial de eventos ya publicados dentro de la ventana de 24h
+
+### Second Consumer: In-App Notifications via Webhook Bus (TASK-129)
+
+El segundo consumer outbound ya quedó operativo y validado sobre el mismo bus:
+
+```
+outbox_events (published) → webhook-dispatch cron (*/2 min) → matches wh-sub-notifications
+  → creates delivery → HTTP POST to /api/internal/webhooks/notification-dispatch
+  → validates HMAC signature → resolves recipients → dispatches UX notification
+  → delivery marked succeeded
+```
+
+- Subscription ID baseline: `wh-sub-notifications`
+- Secret contract:
+  - `WEBHOOK_NOTIFICATIONS_SECRET`
+  - `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF`
+- Optional protection bypass:
+  - `WEBHOOK_NOTIFICATIONS_VERCEL_PROTECTION_BYPASS_SECRET`
+- Activation:
+  - Admin Center button `Activar notificaciones via webhook`
+  - o `POST /api/admin/ops/webhooks/seed-notifications`
+- Event mapping baseline validado:
+  - `assignment.created`
+  - `assignment.updated`
+  - `assignment.removed`
+  - `compensation_version.created`
+  - `member.created`
+  - `payroll_period.exported`
+- Recipient resolution baseline:
+  - `person-first` via `identity_profile` / `member`
+  - `client_user` cuando existe principal portal activo
+  - fallback `email-only` cuando la persona existe pero no tiene inbox portal
+  - recipients del período exportado en nómina
+  - respeto de preferencias in-app/email a través de `notification-service`
+- Guardrails ya implementados:
+  - firma HMAC obligatoria cuando existe secreto resuelto
+  - dedupe cubriendo `notifications` y también `notification_log` para casos `email-only`
+  - target URL sembrado sobre alias estable del request, no `VERCEL_URL` efímero
+- Evidencia operativa confirmada:
+  - `staging`: `assignment.created` visible en campanita y `payroll_period.exported` con 4 notificaciones `payroll_ready`
+  - `production`: delivery firmada real `assignment.created` con notificación persistida para `user-efeonce-admin-julio-reyes`
 
 ### Not Yet Active
 
@@ -430,7 +472,7 @@ But it creates a reusable Greenhouse-side surface so future integrations do not 
 - Manual dispatch button available
 - Canary activation button available
 
-### Phase 5 - Real consumers — `to-do` (TASK-128)
+### Phase 5 - Real consumers — `in progress` (TASK-128, TASK-129)
 
 Cinco slices ordenados por impacto vs esfuerzo:
 
@@ -450,7 +492,7 @@ Cinco slices ordenados por impacto vs esfuerzo:
 - `finance.income.created` / `finance.expense.created` → push a API de Nubox
 - Cron `nubox-sync` se mantiene como safety net de reconciliación
 
-#### 5d. Notificaciones in-app via webhook bus (~2h) — mayor impacto en UX
+#### 5d. Notificaciones in-app via webhook bus (~2h) — `complete` (TASK-129)
 - Consumer que recibe eventos del bus y llama a `dispatchNotification()` de `notification-service.ts`
 - La campanita del navbar muestra actividad real alimentada por el bus de eventos
 - Preferencias in-app/email del usuario se respetan automáticamente (TASK-023)

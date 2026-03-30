@@ -290,12 +290,30 @@ export type PayrollReadinessIssueCode =
   | 'missing_uf_value'
   | 'missing_utm_value'
   | 'missing_tax_table_version'
+  | 'period_not_calculated'
 
 export interface PayrollReadinessIssue {
   code: PayrollReadinessIssueCode
   severity: 'blocking' | 'warning'
   message: string
   memberIds?: string[]
+}
+
+export interface PayrollCalculationReadiness {
+  ready: boolean
+  blockingIssues: PayrollReadinessIssue[]
+  warnings: PayrollReadinessIssue[]
+  deadline: {
+    lastBusinessDay: string
+    isDue: boolean
+    isOverdue: boolean
+    calculatedOnTime: boolean | null
+  }
+}
+
+export interface PayrollApprovalReadiness {
+  ready: boolean
+  blockingIssues: PayrollReadinessIssue[]
 }
 
 export interface PayrollPeriodReadiness {
@@ -309,6 +327,8 @@ export interface PayrollPeriodReadiness {
   attendanceDiagnostics: PayrollAttendanceDiagnostics
   warnings: PayrollReadinessIssue[]
   blockingIssues: PayrollReadinessIssue[]
+  calculation: PayrollCalculationReadiness
+  approval: PayrollApprovalReadiness
 }
 
 export interface ProjectedPayrollPromotionRecord {

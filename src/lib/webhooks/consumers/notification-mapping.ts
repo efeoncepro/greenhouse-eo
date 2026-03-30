@@ -1,7 +1,7 @@
 import 'server-only'
 
 import type { WebhookEnvelope } from '@/lib/webhooks/types'
-import { getHrAdminRecipients, getMemberRecipient, getPayrollPeriodRecipients, type RecipientResolutionResult } from './notification-recipients'
+import { getHrAdminRecipients, getMemberRecipient, getPayrollPeriodRecipients, getUserRecipient, type RecipientResolutionResult } from './notification-recipients'
 
 export interface NotificationDispatchMetadata {
   eventId: string
@@ -33,7 +33,7 @@ const toPeriodLabel = (envelope: WebhookEnvelope) => {
     month: 'long',
     year: 'numeric',
     timeZone: 'America/Santiago'
-  }).format(new Date(Date.UTC(year, month - 1, 1)))
+  }).format(new Date(Date.UTC(year, month - 1, 1, 12)))
 }
 
 const getMemberId = (envelope: WebhookEnvelope) =>
@@ -126,6 +126,21 @@ export const NOTIFICATION_MAPPINGS: NotificationMapping[] = [
       return memberId ? `/people/${memberId}` : '/people'
     },
     resolveRecipients: getHrAdminRecipients,
+    metadata: baseMetadata
+  },
+  {
+    eventType: 'identity.email_verification.completed',
+    category: 'system_event',
+    title: () => 'Tu correo fue verificado exitosamente',
+    body: () => 'Tu identidad quedó confirmada en Greenhouse.',
+    actionUrl: () => '/my/profile',
+    resolveRecipients: async envelope => {
+      const userId = typeof envelope.data.userId === 'string' && envelope.data.userId.trim()
+        ? envelope.data.userId
+        : null
+
+      return userId ? getUserRecipient(userId) : { recipients: [], unresolvedRecipients: 1 }
+    },
     metadata: baseMetadata
   },
   {

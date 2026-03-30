@@ -1,9 +1,12 @@
 const NOTIFICATION_DISPATCH_PATH = '/api/internal/webhooks/notification-dispatch'
 
+import { resolveWebhookProtectionBypassSecret } from './target-url'
+
 const getNotificationProtectionBypassSecret = (env: NodeJS.ProcessEnv) =>
-  env.WEBHOOK_NOTIFICATIONS_VERCEL_PROTECTION_BYPASS_SECRET?.trim() ||
-  env.VERCEL_AUTOMATION_BYPASS_SECRET?.trim() ||
-  ''
+  resolveWebhookProtectionBypassSecret({
+    dedicatedSecret: env.WEBHOOK_NOTIFICATIONS_VERCEL_PROTECTION_BYPASS_SECRET,
+    fallbackSecret: env.VERCEL_AUTOMATION_BYPASS_SECRET
+  })
 
 export const buildNotificationDispatchTargetUrl = ({
   baseUrl,

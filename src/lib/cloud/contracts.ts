@@ -99,3 +99,33 @@ export interface CloudObservabilityPosture {
     enabled: boolean
   }
 }
+
+export type CloudSentryIncidentLevel = 'error' | 'warning' | 'info' | 'fatal' | 'unknown'
+export type CloudSentryIncidentsStatus = 'ok' | 'warning' | 'unconfigured'
+
+export interface CloudSentryIncident {
+  id: string
+  shortId: string | null
+  title: string
+  location: string
+  level: CloudSentryIncidentLevel
+  priority: string | null
+  status: string
+  count: number
+  userCount: number
+  firstSeen: string | null
+  lastSeen: string | null
+  release: string | null
+  environment: string | null
+  permalink: string | null
+}
+
+export interface CloudSentryIncidentsSnapshot {
+  status: CloudSentryIncidentsStatus
+  enabled: boolean
+  available: boolean
+  summary: string
+  incidents: CloudSentryIncident[]
+  fetchedAt: string
+  error: string | null
+}

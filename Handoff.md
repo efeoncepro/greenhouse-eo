@@ -4,6 +4,196 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — hardening Sentry incident reader
+
+### Completado
+- Se aisló el incidente visible en `staging` desde `/admin/ops-health`: el bloque `Incidentes Sentry` degradaba con `HTTP 403 {"detail":"You do not have permission to perform this action."}`.
+- La causa raíz es de permisos/token, no de UI:
+  - el runtime estaba usando `SENTRY_AUTH_TOKEN` para leer issues de Sentry
+  - ese token puede servir para build/source maps y aun así no tener permisos de lectura de incidentes
+- `src/lib/cloud/observability.ts` ahora:
+  - resuelve `SENTRY_INCIDENTS_AUTH_TOKEN` / `SENTRY_INCIDENTS_AUTH_TOKEN_SECRET_REF` como credencial preferida
+  - mantiene fallback a `SENTRY_AUTH_TOKEN` solo como compatibilidad transicional
+  - cuando Sentry responde `401/403`, proyecta un warning accionable en vez de un fallo genérico
+
+### Archivos tocados
+- `src/lib/cloud/observability.ts`
+- `src/lib/cloud/observability.test.ts`
+- `.env.example`
+- `project_context.md`
+- `docs/tasks/complete/TASK-133-ops-health-sentry-incident-surfacing.md`
+- `changelog.md`
+
+### Pendiente inmediato
+- Correr validación local (`vitest`, `eslint`, `tsc`, `build`).
+- Sembrar en `staging` un `SENTRY_INCIDENTS_AUTH_TOKEN` con permisos reales de lectura de incidentes si se quiere recuperar el bloque con data real.
+
+## Sesión 2026-03-29 — Notifications endurecida a person-first
+
+### Completado
+- Se confirmó y corrigió el drift de identidad del sistema de notificaciones:
+  - antes coexistían rutas `member-first`, `client_user-first` y `userId-first`
+  - ahora el resolver compartido nace desde `identity_profile` / `member`
+- Nuevo helper canónico:
+  - `src/lib/notifications/person-recipient-resolver.ts`
+- `NotificationService.dispatch()` ahora resuelve recipients a través de ese helper antes de elegir canales.
+- `notification-recipients.ts` (webhook bus) ya quedó alineado al mismo contrato.
+- `notification-dispatch.ts` ya dedupea por recipient key efectiva, no solo `userId`.
+- `TASK-117` quedó revalidada con notificaciones reales para Julio y Humberly.
+- Se creó `TASK-134` para el follow-on transversal de governance del modelo Notifications.
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/notifications/person-recipient-resolver.test.ts src/lib/notifications/notification-service.test.ts src/lib/webhooks/consumers/notification-recipients.test.ts src/lib/webhooks/consumers/notification-dispatch.test.ts src/lib/webhooks/consumers/notification-mapping.test.ts src/lib/sync/projections/notifications.test.ts`
+- `pnpm exec eslint ...` sobre notifications + webhook consumers + reactive projection
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Pendiente inmediato
+- El inbox y las preferencias siguen `userId`-scoped por diseño; no reabrir eso sin un corte de schema/policy explícito.
+- Si se sigue esta línea, el siguiente slice natural es `TASK-134`.
+
+## Sesión 2026-03-29 — TASK-117 cerrada con auto-cálculo mensual de payroll
+
+### Completado
+- `TASK-117` pasó a `complete`.
+- Payroll ya formaliza el hito mensual de cálculo con:
+  - `getLastBusinessDayOfMonth()` / `isLastBusinessDayOfMonth()`
+  - `getPayrollCalculationDeadlineStatus()`
+  - `calculation readiness` separado de `approval readiness`
+  - `runPayrollAutoCalculation()` + `GET /api/cron/payroll-auto-calculate`
+  - auto-creación del período mensual cuando falta
+  - consumer reactivo `payroll_period.calculated` con categoría `payroll_ops`
+- `PayrollPeriodTab` ahora muestra deadline, estado operativo y cumplimiento del cálculo.
+- `approve/route` consume la rama `approval` del readiness en vez del readiness legacy mezclado.
+- Validación local ejecutada:
+  - `pnpm exec vitest run src/lib/calendar/operational-calendar.test.ts src/lib/payroll/current-payroll-period.test.ts src/lib/payroll/payroll-readiness.test.ts src/lib/payroll/auto-calculate-payroll.test.ts src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx`
+  - `pnpm exec eslint ...` sobre calendario, payroll, cron y UI
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm build`
+
+### Pendiente inmediato
+- No queda blocker abierto dentro del alcance de `TASK-117`; los follow-ons que resten son de policy/UX futura o de adopción operativa en ambientes.
+
+## Sesión 2026-03-29 — TASK-133 cerrada con surfacing fail-soft de incidentes Sentry
+
+### Completado
+- `TASK-133` pasó a `complete`.
+- `src/lib/cloud/observability.ts` ahora separa:
+  - `getCloudObservabilityPosture()`
+  - `getCloudSentryIncidents()`
+- `getOperationsOverview()` ya proyecta:
+  - `cloud.observability.posture`
+  - `cloud.observability.incidents`
+- `GET /api/internal/health` ya expone también `sentryIncidents`.
+- UI conectada:
+  - `AdminOpsHealthView` muestra incidentes Sentry con status, summary, release, environment, ocurrencia y deep-link
+  - `AdminCloudIntegrationsView` resume el estado de incidentes y deriva a `Ops Health`
+- Validación local ejecutada:
+  - `pnpm exec vitest run src/lib/cloud/observability.test.ts src/lib/webhooks/target-url.test.ts`
+  - `pnpm exec eslint ...` sobre cloud/ops/admin views
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm build`
+
+### Pendiente inmediato
+- No queda blocker de repo para el surfacing; la validación runtime adicional en ambiente queda como smoke operativo, no como gap de implementación.
+
+## Sesión 2026-03-29 — TASK-133 iniciada con surfacing fail-soft de incidentes Sentry
+
+### Completado
+- `TASK-133` pasó a `in-progress`.
+- `src/lib/cloud/observability.ts` ahora separa:
+  - `getCloudObservabilityPosture()`
+  - `getCloudSentryIncidents()`
+- Nuevo contrato canónico en `src/lib/cloud/contracts.ts`:
+  - `CloudSentryIncident`
+  - `CloudSentryIncidentsSnapshot`
+- `getOperationsOverview()` ya proyecta:
+  - `cloud.observability.posture`
+  - `cloud.observability.incidents`
+- `GET /api/internal/health` ya expone también `sentryIncidents` sin mezclar incidentes con el health runtime base.
+- UI conectada:
+  - `AdminOpsHealthView` muestra incidentes Sentry con status, summary, release, environment, ocurrencia y deep-link
+  - `AdminCloudIntegrationsView` resume el estado de incidentes y deriva a `Ops Health`
+- Validación local ejecutada:
+  - `pnpm exec vitest run src/lib/cloud/observability.test.ts src/lib/webhooks/target-url.test.ts`
+  - `pnpm exec eslint src/lib/cloud/contracts.ts src/lib/cloud/observability.ts src/lib/cloud/observability.test.ts src/lib/operations/get-operations-overview.ts src/app/api/internal/health/route.ts src/views/greenhouse/admin/AdminOpsHealthView.tsx src/views/greenhouse/admin/AdminCloudIntegrationsView.tsx src/lib/webhooks/target-url.test.ts`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm build`
+- Drift incidental corregido:
+  - `src/lib/webhooks/target-url.test.ts` ahora pasa `NODE_ENV: 'test'` para respetar el contrato tipado actual de `ProcessEnv`
+
+### Pendiente inmediato
+- Superado por el cierre posterior de `TASK-133` en esta misma fecha.
+
+## Sesión 2026-03-29 — TASK-129 promovida a production y validada end-to-end
+
+### Completado
+- `develop` fue promovida a `main` vía PR `#22`:
+  - merge commit `95a03a7266c60b07e0eeb93977137b5ffaff0cff`
+- `production` absorbió el deployment:
+  - `https://greenhouse-efjxg8r0x-efeonce-7670142f.vercel.app`
+  - alias productivo activo: `https://greenhouse.efeoncepro.com`
+- Validación real en `production`:
+  - `POST /api/internal/webhooks/notification-dispatch` respondió `200`
+  - payload result:
+    - `mapped=true`
+    - `recipientsResolved=1`
+    - `sent=1`
+  - `greenhouse_notifications.notifications` persistió la fila:
+    - `eventId=evt-prod-final-1774830739019`
+    - `user_id=user-efeonce-admin-julio-reyes`
+    - `category=assignment_change`
+    - `status=unread`
+- Conclusión:
+  - `TASK-129` ya no queda solo validada en `staging`; el carril webhook notifications quedó operativo también en `production`
+
+### Pendiente inmediato
+- El draft PR `#21` (`release/task-129-prod-promo`) ya quedó redundante después de promover `develop -> main`; puede cerrarse por higiene cuando convenga.
+- El check `Preview` del PR individual falló por drift de env/build (`NEXTAUTH_SECRET` durante page-data collection), pero no bloqueó el rollout real porque la promoción completa de `develop` a `main` sí quedó validada en `production`.
+
+## Sesión 2026-03-29 — Rollout de production intentado para TASK-129, bloqueado por drift de branch
+
+### Completado
+- `production` ya tiene `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF=webhook-notifications-secret`.
+- Se confirmó que `production` no conserva `WEBHOOK_NOTIFICATIONS_SECRET` crudo; el fallback legacy ya no está presente en Vercel para este carril.
+- Se ejecutó redeploy seguro de la build productiva existente:
+  - source deployment previo: `https://greenhouse-pcty6593d-efeonce-7670142f.vercel.app`
+  - nuevo deployment: `https://greenhouse-j35lx1ock-efeonce-7670142f.vercel.app`
+  - target: `production`
+
+### Bloqueo real
+- El smoke firmado contra `production` no llegó al consumer `notification-dispatch`; devolvió HTML del portal en vez de JSON del route handler.
+- La causa observada en el build productivo es branch drift:
+  - el deployment de `main` (`commit: fbe21a3`) no incluye `/api/internal/webhooks/notification-dispatch` en el artefacto compilado
+  - sí incluye `/api/internal/webhooks/canary`, pero no el consumer de `TASK-129`
+- Conclusión operativa:
+  - `production` ya está lista a nivel de secretos
+  - el rollout funcional de `TASK-129` en `production` queda bloqueado hasta que el código del consumer llegue a `main`
+
+### Pendiente inmediato
+- Promover a `main` el slice real de `TASK-129` antes de repetir validación productiva.
+- Una vez `main` incluya la route, repetir:
+  - redeploy/redeploy seguro de `production`
+  - smoke firmado
+  - verificación de persistencia en `greenhouse_notifications.notifications`
+
+## Sesión 2026-03-29 — TASK-129 hardening final en staging con Secret Manager-only
+
+### Completado
+- `staging` ya no conserva `WEBHOOK_NOTIFICATIONS_SECRET` crudo en Vercel.
+- Se forzó redeploy del entorno `Staging` después del retiro del env legacy.
+- Validación real posterior al redeploy:
+  - `POST /api/internal/webhooks/notification-dispatch` respondió `200`
+  - `assignment.created` volvió a crear notificación visible para `user-efeonce-admin-julio-reyes`
+  - la resolución efectiva quedó servida por `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF -> webhook-notifications-secret`
+- Hardening adicional en repo:
+  - `src/lib/secrets/secret-manager.ts` ahora sanitiza también secuencias literales `\\n` / `\\r` en `*_SECRET_REF`
+  - esto evita depender de formatos tolerados al importar/pullar env vars desde Vercel
+
+### Pendiente inmediato
+- El mismo retiro del env legacy puede replicarse en cualquier otro ambiente que todavía conserve fallback crudo.
+- Siguiente lane sugerida sin blocker técnico de `TASK-129`:
+  - `TASK-133` para surfacing de incidentes Sentry en `Ops Health`
+
 ## Sesión 2026-03-29 — TASK-129 iniciada sobre webhook bus con convivencia explícita
 
 ### Completado
@@ -35,21 +225,33 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - `staging` y `production` ya tienen cargada en Vercel la ref:
   - `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF=webhook-notifications-secret`
 - `staging` conserva además `WEBHOOK_NOTIFICATIONS_SECRET` como fallback transicional, lo que deja la migración fail-soft mientras se confirma GCP.
+- El secret `webhook-notifications-secret` ya fue creado/verificado en GCP Secret Manager y el consumer smoke firmado responde `200` en `staging`.
+- El subscriber `wh-sub-notifications` quedó corregido en DB para usar el alias estable:
+  - `https://dev-greenhouse.efeoncepro.com/api/internal/webhooks/notification-dispatch?...`
+- Se alineó el dataset de `staging` para recipients internos:
+  - `greenhouse_core.client_users.member_id` quedó enlazado por match exacto de nombre para usuarios internos activos
+- Se corrigió también el drift operativo de los seed routes:
+  - ahora prefieren el host real del request sobre `VERCEL_URL`
+  - sanitizan `\n`/`\r` literales en bypass secrets para no persistir `%5Cn` en `target_url`
+- Se creó `TASK-133` para surfacing de incidentes Sentry en `Ops Health`.
 - Validación local ejecutada:
   - `pnpm exec vitest run src/lib/webhooks/consumers/notification-mapping.test.ts src/lib/webhooks/consumers/notification-recipients.test.ts src/lib/webhooks/consumers/notification-dispatch.test.ts src/app/api/internal/webhooks/notification-dispatch/route.test.ts src/lib/webhooks/notification-target.test.ts src/lib/notifications/notification-service.test.ts`
   - `pnpm exec eslint src/views/greenhouse/admin/AdminNotificationsView.tsx src/lib/notifications/schema.ts src/lib/notifications/notification-service.ts src/lib/webhooks/consumers/notification-dispatch.ts src/app/api/internal/webhooks/notification-dispatch/route.ts src/app/api/internal/webhooks/notification-dispatch/route.test.ts`
   - `pnpm exec tsc --noEmit --pretty false`
   - `pnpm build`
+  - `pnpm exec vitest run src/lib/webhooks/notification-target.test.ts src/lib/webhooks/canary-target.test.ts src/lib/webhooks/target-url.test.ts src/app/api/internal/webhooks/notification-dispatch/route.test.ts`
+  - `pnpm exec eslint src/lib/webhooks/target-url.ts src/lib/webhooks/target-url.test.ts src/lib/webhooks/notification-target.ts src/lib/webhooks/canary-target.ts src/app/api/admin/ops/webhooks/seed-notifications/route.ts src/app/api/admin/ops/webhooks/seed-canary/route.ts`
+  - `pnpm pg:doctor --profile=runtime` usando `.env.staging.pull`
+  - smoke firmado contra `https://dev-greenhouse.efeoncepro.com/api/internal/webhooks/notification-dispatch`
+  - evidencia funcional:
+    - `assignment.created` visible en campanita para `user-efeonce-admin-julio-reyes`
+    - `payroll_period.exported` creó 4 notificaciones `payroll_ready` para recipients resolubles del período `2026-03`
 
 ### Pendiente inmediato
-- Crear o verificar en GCP Secret Manager el secreto `webhook-notifications-secret`.
-- Bloqueo encontrado:
-  - `gcloud secrets describe webhook-notifications-secret --project=efeonce-group` falló por reautenticación no interactiva (`gcloud auth login` requerido).
-- Después de resolver GCP:
-  - redeploy de `staging`
-  - activar `wh-sub-notifications`
-  - smoke real con `assignment.created` y `payroll_period.exported`
-  - recién entonces evaluar retirar el env crudo `WEBHOOK_NOTIFICATIONS_SECRET` de `staging`
+- `TASK-129` ya queda lista para cierre documental.
+- Siguiente follow-on razonable:
+  - retirar el fallback crudo `WEBHOOK_NOTIFICATIONS_SECRET` de `staging` cuando se confirme que Secret Manager queda como única fuente
+  - decidir si el enlace `client_users.member_id` interno observado en `staging` debe formalizarse como backfill/lane de identidad separada
 
 ## Sesión 2026-03-29 — TASK-131 cerrada: health separa runtime vs tooling posture
 

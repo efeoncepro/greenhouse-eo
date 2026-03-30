@@ -1,5 +1,6 @@
-import type { PayrollPeriod, PayrollPeriodReadiness, PayrollReadinessIssue } from '@/types/payroll'
+import type { PayrollApprovalReadiness, PayrollCalculationReadiness, PayrollPeriod, PayrollPeriodReadiness, PayrollReadinessIssue } from '@/types/payroll'
 
+import { getLastBusinessDayOfMonth, getOperationalDateKey } from '@/lib/calendar/operational-calendar'
 import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
 import { fetchAttendanceForPayrollPeriod } from '@/lib/payroll/fetch-attendance-for-period'
 import { fetchKpisForPeriod } from '@/lib/payroll/fetch-kpis-for-period'
@@ -31,7 +32,8 @@ export const buildPayrollPeriodReadiness = ({
   missingKpiMemberIds,
   missingAttendanceMemberIds,
   attendanceDiagnostics,
-  missingUtmValue = false
+  missingUtmValue = false,
+  referenceDate = new Date()
 }: {
   period: PayrollPeriod
   compensationRows: ApplicableCompensation[]
@@ -39,6 +41,7 @@ export const buildPayrollPeriodReadiness = ({
   missingAttendanceMemberIds: string[]
   attendanceDiagnostics: PayrollPeriodReadiness['attendanceDiagnostics']
   missingUtmValue?: boolean
+  referenceDate?: Date | string
 }): PayrollPeriodReadiness => {
   const includedCompensations = compensationRows.filter(row => row.hasCompensationVersion)
   const includedMemberIds = includedCompensations.map(row => row.memberId)
@@ -112,9 +115,33 @@ export const buildPayrollPeriodReadiness = ({
     })
   }
 
+  const lastBusinessDay = getLastBusinessDayOfMonth(period.year, period.month)
+  const referenceDateKey = getOperationalDateKey(referenceDate)
+
+  const calculatedOnTime = period.calculatedAt
+    ? getOperationalDateKey(period.calculatedAt) <= lastBusinessDay
+    : null
+
+  const calculation: PayrollCalculationReadiness = {
+    ready: blockingIssues.length === 0,
+    blockingIssues,
+    warnings,
+    deadline: {
+      lastBusinessDay,
+      isDue: referenceDateKey === lastBusinessDay,
+      isOverdue: referenceDateKey > lastBusinessDay && period.status === 'draft',
+      calculatedOnTime
+    }
+  }
+
+  const approval: PayrollApprovalReadiness = {
+    ready: blockingIssues.length === 0,
+    blockingIssues
+  }
+
   return {
     periodId: period.periodId,
-    ready: blockingIssues.length === 0,
+    ready: calculation.ready,
     includedMemberIds,
     missingCompensationMemberIds,
     missingKpiMemberIds,
@@ -122,7 +149,9 @@ export const buildPayrollPeriodReadiness = ({
     requiresUfValue,
     attendanceDiagnostics,
     warnings,
-    blockingIssues
+    blockingIssues,
+    calculation,
+    approval
   }
 }
 

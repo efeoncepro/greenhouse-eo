@@ -5,7 +5,42 @@
 - Registrar solo cambios con impacto real en comportamiento, estructura, flujo de trabajo o despliegue.
 - Usar entradas cortas, fechadas y accionables.
 
+## 2026-03-30
+
+### Sentry incident reader hardened for Ops Health
+- `src/lib/cloud/observability.ts` ya soporta un token dedicado `SENTRY_INCIDENTS_AUTH_TOKEN` / `_SECRET_REF` para leer incidentes, sin asumir que `SENTRY_AUTH_TOKEN` también tiene permisos de issues.
+- Cuando Sentry responde `401/403`, `Ops Health` mantiene el fallback fail-soft pero ahora muestra un mensaje accionable de permisos en lugar de un warning genérico.
+
 ## 2026-03-29
+
+### Notifications moved to a person-first recipient model
+- `NotificationService` y los helpers compartidos ya resuelven destinatarios desde identidad canónica de persona, no desde `client_user` como raíz.
+- El nuevo resolver soporta `identityProfileId`, `memberId`, `userId` y fallback `email-only`, manteniendo compatibilidad con inbox/preferences portal.
+- `TASK-117` quedó revalidada con notificaciones reales sobre este patrón, y la deuda transversal restante se formalizó en `TASK-134`.
+
+### TASK-117 payroll auto-calculation baseline closed
+- Payroll ya formaliza el cálculo del período oficial el último día hábil del mes operativo, sin alterar el lifecycle `draft -> calculated -> approved -> exported`.
+- La utilidad de calendario ahora expone `getLastBusinessDayOfMonth()` / `isLastBusinessDayOfMonth()`, y Payroll separa `calculation readiness` de `approval readiness`.
+- El repo ya incluye `runPayrollAutoCalculation()`, `GET /api/cron/payroll-auto-calculate`, auto-creación del período faltante y notificación reactiva `payroll_ops` al emitirse `payroll_period.calculated`.
+
+### TASK-133 Sentry incidents surfaced into Ops Health
+- `Ops Health` y `Cloud & Integrations` ya consumen un snapshot canónico fail-soft de incidentes Sentry abiertos/relevantes.
+- `src/lib/cloud/observability.ts` ahora separa postura de observability vs incidentes activos, y `GET /api/internal/health` expone también `sentryIncidents`.
+- La UI muestra contexto operativo por release, environment y última ocurrencia sin cambiar la semántica del health runtime base.
+
+### TASK-129 promoted to production
+- `develop` fue promovida a `main` y `production` ya absorbió el carril `notification-dispatch`.
+- `POST /api/internal/webhooks/notification-dispatch` quedó validado también en `production` con delivery firmada real y notificación persistida en `greenhouse_notifications.notifications`.
+- Evidencia productiva confirmada:
+  - `eventId=evt-prod-final-1774830739019`
+  - `user_id=user-efeonce-admin-julio-reyes`
+  - `category=assignment_change`
+  - `status=unread`
+
+### TASK-129 staging hardening completed with Secret Manager-only
+- `staging` dejó de depender de `WEBHOOK_NOTIFICATIONS_SECRET` crudo; el fallback legacy fue retirado de Vercel.
+- Después del redeploy del entorno `Staging`, el consumer `notification-dispatch` siguió validando firmas y enviando notificaciones usando `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF`.
+- `src/lib/secrets/secret-manager.ts` ahora sanitiza secuencias literales `\n` y `\r` en `*_SECRET_REF`, endureciendo el contrato frente a drift de export/import de env vars.
 
 ### TASK-129 webhook notifications consumer started
 - Se inició `TASK-129` como un consumer institucional nuevo sobre el bus outbound, sin reemplazar el carril reactivo legacy.
@@ -19,7 +54,16 @@
 - El consumer de notificaciones ahora exige firma cuando existe secreto resuelto y ya no queda `fail-open` ante deliveries sin `x-greenhouse-signature`.
 - La deduplicación cubre también dispatches `email-only` usando metadata persistida en `notification_log`, no solo filas visibles en `notifications`.
 - Vercel ya tiene `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF=webhook-notifications-secret` en `staging` y `production`.
-- El remanente operativo queda concentrado en GCP Secret Manager y en la validación E2E de `staging`.
+- Los seed routes de webhooks ahora persisten aliases estables del request en vez de `VERCEL_URL` efímero, y los bypass secrets se sanitizan removiendo también `\n`/`\r` literales.
+- `wh-sub-notifications` quedó corregida en `staging` para apuntar al alias `dev-greenhouse.efeoncepro.com` sin `%5Cn` contaminando el target.
+- Validación E2E cerrada en `staging`:
+  - `assignment.created` visible en campanita para un usuario real
+  - `payroll_period.exported` creó 4 notificaciones `payroll_ready` para recipients del período `2026-03`
+- Durante la validación se detectó y corrigió un gap de identidad en `staging`: `client_users` internos activos sin `member_id`, lo que impedía resolver recipients.
+
+### TASK-133 created for Sentry surfacing in Ops Health
+- Se creó `TASK-133` para traer incidentes abiertos/relevantes de Sentry a `Operations Health`.
+- El trigger real de esta task fue un error de producción detectado en Sentry fuera del tablero de health actual.
 
 ### TASK-131 closed with runtime-vs-tooling secret posture separation
 - `src/lib/cloud/secrets.ts` ahora clasifica secretos tracked entre `runtime` y `tooling`.

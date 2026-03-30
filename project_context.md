@@ -3,6 +3,74 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-30 Sentry incident reader hardening
+- `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.
+- Nuevo contrato soportado:
+  - `SENTRY_INCIDENTS_AUTH_TOKEN`
+  - `SENTRY_INCIDENTS_AUTH_TOKEN_SECRET_REF`
+- `src/lib/cloud/observability.ts` intenta leer incidentes con `SENTRY_INCIDENTS_AUTH_TOKEN` primero y solo cae a `SENTRY_AUTH_TOKEN` como compatibilidad transicional.
+- Si Sentry responde `401/403`, la UI mantiene degradación fail-soft pero con mensaje accionable:
+  - el token no tiene permisos para leer incidentes
+  - el reader requiere un token con scope `event:read`
+- Decisión operativa:
+  - `SENTRY_AUTH_TOKEN` sigue siendo el token principal de build/source maps
+  - `SENTRY_INCIDENTS_AUTH_TOKEN` pasa a ser el canal recomendado para `Ops Health`
+
+## Delta 2026-03-29 notifications identity model
+- El sistema de notificaciones ya no debe leerse como `client_user-first`.
+- Contrato canónico vigente:
+  - `identity_profile` = raíz de persona
+  - `member` = faceta operativa fuerte para HR/Payroll/Assignments
+  - `client_user` = acceso portal, inbox y preferencias
+- `src/lib/notifications/person-recipient-resolver.ts` centraliza la resolución compartida para:
+  - `identityProfileId`
+  - `memberId`
+  - `userId`
+  - fallback `email-only`
+- `TASK-117` y `TASK-129` ya consumen este patrón; el follow-on transversal queda formalizado en `TASK-134`.
+
+## Delta 2026-03-29 TASK-117 auto-cálculo mensual de payroll
+- Payroll ya formaliza el hito mensual para dejar el período oficial en `calculated` el último día hábil del mes operativo.
+- Contratos nuevos o endurecidos:
+  - `getLastBusinessDayOfMonth()` / `isLastBusinessDayOfMonth()`
+  - `getPayrollCalculationDeadlineStatus()`
+  - `runPayrollAutoCalculation()`
+  - `GET /api/cron/payroll-auto-calculate`
+- `PayrollPeriodReadiness` ahora separa `calculation` y `approval`.
+- `payroll_period.calculated` ya puede notificar a stakeholders operativos por el dominio reactivo `notifications` bajo la categoría `payroll_ops`.
+
+## Delta 2026-03-29 TASK-133 observability incidents en Ops Health
+- El dominio Cloud ya separa dos capas de observability:
+  - `posture/configuración` en `getCloudObservabilityPosture()`
+  - `incidentes Sentry abiertos/relevantes` en `getCloudSentryIncidents()`
+- `getOperationsOverview()` ahora proyecta:
+  - `cloud.observability.posture`
+  - `cloud.observability.incidents`
+- `GET /api/internal/health` expone también `sentryIncidents` como snapshot fail-soft machine-readable.
+- `Ops Health` y `Cloud & Integrations` ya pueden mostrar errores runtime detectados por Sentry sin degradar el `overallStatus` base del health interno.
+- Decisión arquitectónica explícita:
+  - incidentes Sentry no reescriben la semántica del control plane health
+  - siguen siendo señal operativa adicional, no fuente del semáforo runtime/posture
+
+## Delta 2026-03-29 TASK-129 validada en production
+- `main` ya incluye el consumer institucional de notificaciones via webhook bus.
+- `production` quedó validada con delivery firmada real sobre:
+  - `POST /api/internal/webhooks/notification-dispatch`
+- Evidencia operativa confirmada:
+  - `eventId=evt-prod-final-1774830739019`
+  - notificación `assignment_change` persistida para `user-efeonce-admin-julio-reyes`
+- Estado vigente del carril:
+  - `staging` y `production` consumen el secreto de firmas vía Secret Manager
+  - `production` ya no está bloqueada por ausencia del route en `main`
+
+## Delta 2026-03-29 TASK-129 hardening final en staging
+- `staging` ya opera `webhook notifications` sin `WEBHOOK_NOTIFICATIONS_SECRET` crudo en Vercel.
+- Postura vigente del carril:
+  - firma HMAC resuelta por `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF`
+  - secreto canónico servido desde GCP Secret Manager
+  - alias estable `dev-greenhouse.efeoncepro.com` como target del subscriber
+- `src/lib/secrets/secret-manager.ts` ahora sanitiza secuencias literales `\\n` / `\\r` en variables `*_SECRET_REF`, endureciendo el contrato frente a drift de export/import de env vars.
+
 ## Delta 2026-03-29 TASK-129 iniciada
 - Greenhouse inicia un segundo carril institucional de notificaciones:
   - `reactive notifications` sigue como control plane legacy para eventos internos existentes
@@ -23,9 +91,15 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `staging` y `production` ya tienen `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF=webhook-notifications-secret`.
 - Postura operativa vigente:
   - `staging` mantiene además `WEBHOOK_NOTIFICATIONS_SECRET` como fallback transicional
-  - `production` queda preparada para consumir Secret Manager en cuanto exista/sea verificable el secreto canónico
-- Bloqueo externo actual:
-  - la creación/verificación de `webhook-notifications-secret` en GCP no pudo completarse desde este turno porque `gcloud` exigió reautenticación no interactiva
+  - `production` ya queda preparada para consumir Secret Manager con el secreto canónico verificado
+- El seed de subscriptions de webhooks ya no debe persistir `VERCEL_URL` efímero:
+  - `seed-canary` y `seed-notifications` prefieren el alias real del request (`x-forwarded-host`) cuando existe
+- Los target builders de webhooks sanitizan también secuencias literales `\n`/`\r`, no solo whitespace, para evitar query params contaminados en `greenhouse_sync.webhook_subscriptions`.
+- Validación real ya ejecutada en `staging`:
+  - `assignment.created` visible en campanita para un usuario real
+  - `payroll_period.exported` crea notificaciones `payroll_ready` para recipients resolubles del período
+- Gap de datos detectado durante la validación:
+  - había `client_users` activos sin `member_id`; en `staging` se enlazaron los internos con match exacto de nombre para permitir la resolución de recipients del carril webhook notifications.
 
 ## Delta 2026-03-29 TASK-131 cerrada
 - El health cloud ya separa correctamente secretos runtime-críticos de secretos de tooling.

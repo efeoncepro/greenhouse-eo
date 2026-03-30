@@ -58,6 +58,16 @@ const normalizeSecretValue = (value: string | undefined) => {
   return trimmed ? trimmed : null
 }
 
+const normalizeSecretRefValue = (value: string | undefined) => {
+  if (!value) {
+    return null
+  }
+
+  const sanitized = value.replace(/\\r/g, '').replace(/\\n/g, '').trim()
+
+  return sanitized ? sanitized : null
+}
+
 const normalizeSecretRef = (ref: string, env: NodeJS.ProcessEnv) => {
   const trimmed = ref.trim()
 
@@ -88,7 +98,7 @@ const getCacheKey = ({
   env: NodeJS.ProcessEnv
 }) => {
   const envValue = normalizeSecretValue(env[envVarName])
-  const secretRefValue = normalizeSecretValue(env[secretRefEnvVarName])
+  const secretRefValue = normalizeSecretRefValue(env[secretRefEnvVarName])
 
   return `${envVarName}|${secretRefEnvVarName}|${envValue ? 'env' : 'no-env'}|${secretRefValue || 'no-secret-ref'}`
 }
@@ -153,7 +163,7 @@ export const resolveSecret = async ({
   }
 
   const envValue = normalizeSecretValue(env[envVarName])
-  const secretRef = normalizeSecretValue(env[resolvedSecretRefEnvVarName])
+  const secretRef = normalizeSecretRefValue(env[resolvedSecretRefEnvVarName])
   let normalizedSecretRef: string | null = null
 
   if (secretRef) {

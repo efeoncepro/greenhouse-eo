@@ -1,13 +1,13 @@
 import 'server-only'
 
+import { getBlockedQueries, getBigQueryProjectId } from '@/lib/bigquery'
 import { getBigQueryMaximumBytesBilled } from '@/lib/cloud/bigquery'
-import { getBlockedQueries } from '@/lib/bigquery'
 import type { CloudHealthSnapshot } from '@/lib/cloud/contracts'
 import { getCronSecretState } from '@/lib/cloud/cron'
 import { getCloudGcpAuthPosture } from '@/lib/cloud/gcp-auth'
 import { buildCloudHealthSnapshot, getCloudPlatformHealthSnapshot } from '@/lib/cloud/health'
+import { getCloudObservabilityPosture, getCloudSentryIncidents } from '@/lib/cloud/observability'
 import { getCloudPostgresPosture } from '@/lib/cloud/postgres'
-import { getBigQueryProjectId } from '@/lib/bigquery'
 import { getGreenhousePostgresConfig, isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 export interface OperationsKpis {
@@ -113,6 +113,10 @@ export interface CloudPlatformOverview {
     maximumBytesBilled: number
     summary: string
     blockedQueries: BlockedQueryEntry[]
+  }
+  observability: {
+    posture: Awaited<ReturnType<typeof getCloudObservabilityPosture>>
+    incidents: Awaited<ReturnType<typeof getCloudSentryIncidents>>
   }
 }
 
@@ -470,12 +474,39 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
     secretRefs = []
   }
 
-  const cloudHealth = await getCloudPlatformHealthSnapshot().catch<CloudHealthSnapshot>(() =>
-    buildCloudHealthSnapshot({
-      runtimeChecks: [],
-      timestamp: new Date().toISOString()
-    })
-  )
+  const [cloudHealth, observabilityPosture, sentryIncidents] = await Promise.all([
+    getCloudPlatformHealthSnapshot().catch<CloudHealthSnapshot>(() =>
+      buildCloudHealthSnapshot({
+        runtimeChecks: [],
+        timestamp: new Date().toISOString()
+      })
+    ),
+    getCloudObservabilityPosture().catch(() => ({
+      summary: 'Observabilidad externa no configurada',
+      sentry: {
+        dsnConfigured: false,
+        clientDsnConfigured: false,
+        authTokenConfigured: false,
+        orgConfigured: false,
+        projectConfigured: false,
+        enabled: false,
+        sourceMapsReady: false
+      },
+      slack: {
+        alertsWebhookConfigured: false,
+        enabled: false
+      }
+    })),
+    getCloudSentryIncidents().catch(() => ({
+      status: 'warning' as const,
+      enabled: true,
+      available: false,
+      summary: 'Sentry no respondió; se mantiene fallback operativo',
+      incidents: [],
+      fetchedAt: new Date().toISOString(),
+      error: 'incident reader failed unexpectedly'
+    }))
+  ])
 
   const cronState = getCronSecretState()
   const postgresConfig = getGreenhousePostgresConfig()
@@ -608,6 +639,10 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
         maximumBytesBilled,
         summary: bigQueryHealth?.summary ?? (bigQueryProjectId ? 'Proyecto configurado sin respuesta de health' : 'Proyecto no configurado'),
         blockedQueries: [...getBlockedQueries()]
+      },
+      observability: {
+        posture: observabilityPosture,
+        incidents: sentryIncidents
       }
     }
   }

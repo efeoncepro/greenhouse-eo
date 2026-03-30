@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 
 import { consumeToken, validateToken } from '@/lib/auth-tokens'
+import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 export async function POST(request: Request) {
@@ -26,6 +28,17 @@ export async function POST(request: Request) {
     )
 
     await consumeToken(record.token_hash)
+
+    // Emit outbox event
+    await publishOutboxEvent({
+      aggregateType: AGGREGATE_TYPES.emailVerification,
+      aggregateId: record.user_id ?? record.email,
+      eventType: EVENT_TYPES.emailVerificationCompleted,
+      payload: {
+        userId: record.user_id,
+        email: record.email
+      }
+    }).catch(err => console.error('[verify-email] Outbox event failed:', err))
 
     return NextResponse.json({ success: true, message: 'Email verificado.' })
   } catch (err) {
