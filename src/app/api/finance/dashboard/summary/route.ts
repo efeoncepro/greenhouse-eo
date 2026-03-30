@@ -272,33 +272,38 @@ async function buildResponse(
   const dso = monthlyRevenue > 0 ? Math.round((receivables / monthlyRevenue) * 30) : null
   const dpo = monthlyExpenses > 0 ? Math.round((payables / monthlyExpenses) * 30) : null
 
-  // Payroll-to-revenue ratio: read labor costs from payroll module (not finance expenses)
+  // Payroll-to-revenue ratio: sum gross_total from latest period with status >= calculated
   let payrollCostClp = 0
+  let payrollPeriodLabel: string | null = null
 
   try {
-    const now = new Date()
-    const year = now.getFullYear()
-    const month = now.getMonth() + 1
-    const periodKey = `${year}-${String(month).padStart(2, '0')}`
-
-    const payrollRows = await runGreenhousePostgresQuery<{ total_clp: string | number } & Record<string, unknown>>(
-      `SELECT COALESCE(SUM(e.chile_employer_total_cost), 0) AS total_clp
+    // Use gross_total as the primary cost field — it's the total haberes (bruto)
+    // chile_employer_total_cost includes employer contributions but may be NULL
+    const payrollRows = await runGreenhousePostgresQuery<{
+      total_clp: string | number
+      entry_count: string | number
+      p_year: number
+      p_month: number
+    } & Record<string, unknown>>(
+      `SELECT
+         COALESCE(SUM(e.gross_total), 0) AS total_clp,
+         COUNT(*)::text AS entry_count,
+         p.year AS p_year,
+         p.month AS p_month
        FROM greenhouse_payroll.payroll_entries e
        INNER JOIN greenhouse_payroll.payroll_periods p ON p.period_id = e.period_id
-       WHERE p.year = $1 AND p.month = $2`,
-      [year, month]
+       WHERE p.status IN ('calculated', 'approved', 'exported')
+       GROUP BY p.year, p.month
+       ORDER BY p.year DESC, p.month DESC
+       LIMIT 1`
     )
 
-    payrollCostClp = roundCurrency(toNumber(payrollRows[0]?.total_clp))
+    if (payrollRows[0]) {
+      payrollCostClp = roundCurrency(toNumber(payrollRows[0].total_clp))
+      payrollPeriodLabel = `${payrollRows[0].p_year}-${String(payrollRows[0].p_month).padStart(2, '0')}`
+    }
   } catch {
-    // Payroll tables may not exist — fallback to expense-based calculation
-    payrollCostClp = roundCurrency(
-      expenseRows.reduce((sum, row) => {
-        const expType = typeof row.expense_type === 'string' ? row.expense_type : ''
-
-        return (expType === 'payroll' || expType === 'social_security') ? sum + toNumber(row.total_amount_clp) : sum
-      }, 0)
-    )
+    // Payroll tables may not exist
   }
 
   const payrollToRevenueRatio = monthlyRevenue > 0
@@ -320,6 +325,11 @@ async function buildResponse(
     dso,
     dpo,
     payrollToRevenueRatio,
+    payrollContext: {
+      costClp: payrollCostClp,
+      periodLabel: payrollPeriodLabel,
+      revenueClp: monthlyRevenue
+    },
     cash: {
       incomeMonth: incomeCashMetrics.totalAmountClp,
       incomePrev: incomeCashMetrics.previousTotalAmountClp,
