@@ -85,8 +85,8 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-067` | `complete` | Cost Intelligence Foundation | `docs/tasks/complete/TASK-067-cost-intelligence-foundation.md` |
 | `TASK-068` | `complete` | Period Closure Status Projection | `docs/tasks/complete/TASK-068-period-closure-status-projection.md` |
 | `TASK-069` | `complete` | Operational P&L Projection | `docs/tasks/complete/TASK-069-operational-pl-projection.md` |
-| `TASK-070` | `in-progress` | Cost Intelligence Finance UI | `docs/tasks/in-progress/TASK-070-cost-intelligence-finance-ui.md` |
-| `TASK-071` | `in-progress` | Cost Intelligence Cross-Module Consumers | `docs/tasks/in-progress/TASK-071-cost-intelligence-cross-module-consumers.md` |
+| `TASK-070` | `complete` | Cost Intelligence Finance UI | `docs/tasks/complete/TASK-070-cost-intelligence-finance-ui.md` |
+| `TASK-071` | `complete` | Cost Intelligence Cross-Module Consumers | `docs/tasks/complete/TASK-071-cost-intelligence-cross-module-consumers.md` |
 | `TASK-072` | `to-do` | Compensation Versioning UX Clarity | `docs/tasks/to-do/TASK-072-compensation-versioning-ux-clarity.md` |
 | `TASK-073` | `complete` | People Canonical Capacity Cutover | `docs/tasks/complete/TASK-073-people-canonical-capacity-cutover.md` |
 | `TASK-074` | `complete` | Projected Payroll to Official Promotion Flow | `docs/tasks/complete/TASK-074-projected-payroll-to-official-promotion-flow.md` |
