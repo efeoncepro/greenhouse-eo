@@ -82,6 +82,19 @@ CREATE TABLE IF NOT EXISTS greenhouse_serving.operational_pl_snapshots (
   UNIQUE (scope_type, scope_id, period_year, period_month, snapshot_revision)
 );
 
+GRANT USAGE ON SCHEMA greenhouse_cost_intelligence TO greenhouse_runtime;
+GRANT USAGE, CREATE ON SCHEMA greenhouse_cost_intelligence TO greenhouse_migrator;
+
+GRANT SELECT, INSERT, UPDATE ON greenhouse_cost_intelligence.period_closure_config TO greenhouse_runtime;
+GRANT SELECT, INSERT, UPDATE ON greenhouse_cost_intelligence.period_closures TO greenhouse_runtime;
+GRANT SELECT, INSERT, UPDATE ON greenhouse_serving.period_closure_status TO greenhouse_runtime;
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_serving.operational_pl_snapshots TO greenhouse_runtime;
+
+GRANT ALL PRIVILEGES ON TABLE greenhouse_cost_intelligence.period_closure_config TO greenhouse_migrator;
+GRANT ALL PRIVILEGES ON TABLE greenhouse_cost_intelligence.period_closures TO greenhouse_migrator;
+GRANT ALL PRIVILEGES ON TABLE greenhouse_serving.period_closure_status TO greenhouse_migrator;
+GRANT ALL PRIVILEGES ON TABLE greenhouse_serving.operational_pl_snapshots TO greenhouse_migrator;
+
 INSERT INTO greenhouse_cost_intelligence.period_closure_config (
   config_id,
   updated_by

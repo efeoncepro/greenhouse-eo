@@ -1,5 +1,12 @@
 # TASK-139 — Finance Module Hardening: Corrections, Cutover & Data Quality
 
+## Delta 2026-03-30
+
+- El hardening de Finance ya debe considerar una regla canónica adicional:
+  - assignments internos de `Efeonce` son válidos para operación interna
+  - pero no deben contaminar la atribución comercial de costo laboral ni el serving de Cost Intelligence
+- `client_labor_cost_allocation` y `auto-allocation-rules.ts` ya quedaron alineados con esa semántica.
+
 ## Delta 2026-03-30 — Slices 1-7 implementados
 
 - Slice 1: `reconciliation.ts` y `income-payments.ts` marcados como `@deprecated` con nota de cutover

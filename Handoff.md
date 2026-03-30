@@ -4,6 +4,33 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — Hardening canónico de atribución comercial para Cost Intelligence
+
+### Objetivo
+- Corregir la divergencia entre la FTE visible en `Agency > Team` / Person 360 y la atribución comercial usada por Finance / Cost Intelligence.
+- Dejar la regla documentada para que no vuelva a bifurcarse por consumer.
+
+### Delta de ejecución
+- Se creó una regla shared en:
+  - `src/lib/team-capacity/internal-assignments.ts`
+- Esa regla ya se reutiliza en:
+  - `src/app/api/team/capacity-breakdown/route.ts`
+  - `src/lib/sync/projections/member-capacity-economics.ts`
+  - `src/lib/finance/auto-allocation-rules.ts`
+  - `scripts/setup-postgres-finance-intelligence-p2.sql`
+  - `src/lib/cost-intelligence/compute-operational-pl.ts`
+- Semántica consolidada:
+  - `space-efeonce`, `efeonce_internal` y `client_internal` siguen siendo válidos para carga operativa interna
+  - no participan como cliente comercial en labor attribution, auto-allocation ni snapshots de `operational_pl`
+- También se endureció el serving runtime:
+  - `greenhouse_runtime` requiere `DELETE` acotado sobre `greenhouse_serving.operational_pl_snapshots`
+  - el materializador lo usa solo para purgar scopes obsoletos de la misma revisión antes del upsert
+
+### Pendiente inmediato
+- Reaplicar `setup-postgres-cost-intelligence.sql`
+- Re-materializar `operational_pl` y verificar que filas stale de `Efeonce` desaparezcan del período afectado
+- Cerrar con validación + documentación final + commit/push
+
 ## Sesión 2026-03-30 — TASK-071 slice 1-3 consumers distribuidos
 
 ### Objetivo

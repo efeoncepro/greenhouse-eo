@@ -206,6 +206,24 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El fix quedó aplicado en `FinancePeriodClosureDashboardView` con parseo seguro para display.
 - Con ese ajuste, el carril `TASK-070` queda todavía más cerca de cierre funcional real; el remanente ya es principalmente visual/UX, no de datos ni semántica operativa.
 
+## Delta 2026-03-30 Cost Intelligence ya excluye assignments internos de la atribución comercial
+- Se consolidó una regla canónica shared para assignments internos:
+  - `space-efeonce`
+  - `efeonce_internal`
+  - `client_internal`
+- Esa regla ya se reutiliza en:
+  - `Agency > Team`
+  - `member_capacity_economics`
+  - `auto-allocation-rules`
+  - `client_labor_cost_allocation`
+  - `computeOperationalPl()`
+- Decisión operativa:
+  - la carga interna sigue siendo válida para operación/capacity
+  - no debe competir como cliente comercial en labor cost ni en snapshots de Cost Intelligence
+- Ajuste técnico asociado:
+  - `greenhouse_runtime` necesita `DELETE` acotado sobre `greenhouse_serving.operational_pl_snapshots`
+  - se usa solo para purgar snapshots obsoletos de la misma revisión antes del upsert vigente
+
 ## Delta 2026-03-30 Sentry incident reader hardening
 - `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.
 - Nuevo contrato soportado:

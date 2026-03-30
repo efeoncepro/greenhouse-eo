@@ -28,6 +28,22 @@ Regla arquitectónica:
 - Cost Intelligence actúa como layer de materialización y distribución operativa sobre esa base.
 - Nuevos consumers que necesiten margen, closure status o snapshots operativos deberían preferir `operational_pl_snapshots` y `period_closure_status` antes de recomputar on-read.
 
+## Delta 2026-03-30 — Atribución comercial debe excluir assignments internos
+
+Se formaliza una regla que ya existía implícitamente en `Agency > Team` y `member_capacity_economics` y ahora también aplica a Finance / Cost Intelligence:
+
+- assignments internos como `space-efeonce`, `efeonce_internal` y `client_internal` pueden seguir existiendo para operación interna
+- esos assignments no deben competir como cliente comercial en:
+  - atribución de costo laboral
+  - auto-allocation comercial
+  - snapshots de `operational_pl`
+- consecuencia práctica:
+  - un colaborador puede tener carga interna operativa y al mismo tiempo `1.0 FTE` comercial hacia un cliente sin que Finance le parta la nómina 50/50 contra `Efeonce`
+
+Regla de implementación:
+- la truth comercial compartida debe salir de una regla canónica reusable, no de filtros distintos por consumer
+- Cost Intelligence puede purgar snapshots obsoletos de una revisión para evitar que scopes internos antiguos sigan visibles después del recompute
+
 ## Overview
 
 Finance es el módulo más grande del portal: 49 API routes, 13 páginas, 28 archivos de librería. Gestiona facturación, gastos, reconciliación bancaria, indicadores económicos, integración DTE/Nubox, y la capa de inteligencia financiera (economics, allocations, P&L).

@@ -1,5 +1,10 @@
 # TASK-138 — Finance Intelligence: Audit Gaps, Notifications & Cross-Module Synergies
 
+## Delta 2026-03-30
+
+- `auto-allocation-rules.ts` quedó endurecido para excluir assignments internos (`space-efeonce`, `efeonce_internal`, `client_internal`) del reparto comercial.
+- Esto alinea Finance Intelligence con la semántica ya visible en `Agency > Team` y evita que clientes billables pierdan costo laboral por competir contra `Efeonce` interno.
+
 ## Delta 2026-03-30 — 6 slices implementados
 
 - Slice 1: 5 finance notification mappings + `finance_alert` category + `getFinanceAdminRecipients()` helper

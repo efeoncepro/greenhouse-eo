@@ -2,6 +2,7 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { roundCurrency, toNumber } from '@/lib/finance/shared'
+import { isInternalCommercialClientId } from '@/lib/team-capacity/internal-assignments'
 
 /**
  * Auto-allocation rules for expenses.
@@ -44,16 +45,18 @@ const allocatePayrollByFte = async (
     [memberId]
   )
 
-  if (assignments.length === 0) return null
+  const commercialAssignments = assignments.filter(a => !isInternalCommercialClientId(String(a.client_id || '')))
 
-  const totalFte = assignments.reduce((sum, a) => sum + toNumber(a.fte_allocation), 0)
+  if (commercialAssignments.length === 0) return null
+
+  const totalFte = commercialAssignments.reduce((sum, a) => sum + toNumber(a.fte_allocation), 0)
 
   if (totalFte <= 0) return null
 
   return {
     expenseId,
     ruleApplied: 'payroll_by_fte',
-    allocations: assignments.map(a => {
+    allocations: commercialAssignments.map(a => {
       const fteWeight = toNumber(a.fte_allocation) / totalFte
       const allocatedAmount = roundCurrency(totalAmountClp * fteWeight)
 

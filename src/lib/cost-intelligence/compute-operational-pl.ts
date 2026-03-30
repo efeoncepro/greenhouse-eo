@@ -4,6 +4,10 @@ import { getMonthDateRange } from '@/lib/finance/periods'
 import { computeClientLaborCosts } from '@/lib/finance/payroll-cost-allocation'
 import { roundCurrency, toNumber, toTimestampString } from '@/lib/finance/shared'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import {
+  INTERNAL_COMMERCIAL_CLIENT_IDS,
+  INTERNAL_COMMERCIAL_CLIENT_NAMES
+} from '@/lib/team-capacity/internal-assignments'
 
 import type { OperationalPlFilters, OperationalPlScopeType, OperationalPlSnapshot, PlComputationResult } from './pl-types'
 import { assertValidPeriodParts, toBoolean } from './shared'
@@ -286,9 +290,11 @@ export const computeOperationalPl = async (
           WHERE i.invoice_date >= $1::date
             AND i.invoice_date <= $2::date
             AND COALESCE(i.client_id, i.client_profile_id) IS NOT NULL
+            AND COALESCE(NULLIF(LOWER(TRIM(COALESCE(i.client_id, i.client_profile_id))), ''), '__missing__') <> ALL($3::text[])
+            AND COALESCE(NULLIF(LOWER(TRIM(i.client_name)), ''), '__missing__') <> ALL($4::text[])
           GROUP BY COALESCE(i.client_id, i.client_profile_id)
         `,
-        [periodStart, periodEnd]
+        [periodStart, periodEnd, INTERNAL_COMMERCIAL_CLIENT_IDS, INTERNAL_COMMERCIAL_CLIENT_NAMES]
       ),
       runGreenhousePostgresQuery<ExpenseRow>(
         `
@@ -302,9 +308,11 @@ export const computeOperationalPl = async (
             AND e.payroll_entry_id IS NULL
             AND COALESCE(e.document_date, e.payment_date) >= $1::date
             AND COALESCE(e.document_date, e.payment_date) <= $2::date
+            AND COALESCE(NULLIF(LOWER(TRIM(e.allocated_client_id)), ''), '__missing__') <> ALL($3::text[])
+            AND COALESCE(NULLIF(LOWER(TRIM(c.client_name)), ''), '__missing__') <> ALL($4::text[])
           GROUP BY e.allocated_client_id
         `,
-        [periodStart, periodEnd]
+        [periodStart, periodEnd, INTERNAL_COMMERCIAL_CLIENT_IDS, INTERNAL_COMMERCIAL_CLIENT_NAMES]
       ),
       runGreenhousePostgresQuery<ExpenseRow>(
         `
@@ -317,9 +325,11 @@ export const computeOperationalPl = async (
           WHERE ca.period_year = $1
             AND ca.period_month = $2
             AND e.payroll_entry_id IS NULL
+            AND COALESCE(NULLIF(LOWER(TRIM(ca.client_id)), ''), '__missing__') <> ALL($3::text[])
+            AND COALESCE(NULLIF(LOWER(TRIM(ca.client_name)), ''), '__missing__') <> ALL($4::text[])
           GROUP BY ca.client_id
         `,
-        [year, month]
+        [year, month, INTERNAL_COMMERCIAL_CLIENT_IDS, INTERNAL_COMMERCIAL_CLIENT_NAMES]
       ),
       runGreenhousePostgresQuery<OverheadRow>(
         `
@@ -335,6 +345,8 @@ export const computeOperationalPl = async (
               AND a.start_date <= $2::date
               AND (a.end_date IS NULL OR a.end_date >= $1::date)
               AND COALESCE(a.fte_allocation, 0) > 0
+              AND COALESCE(NULLIF(LOWER(TRIM(a.client_id)), ''), '__missing__') <> ALL($5::text[])
+              AND COALESCE(NULLIF(LOWER(TRIM(c.client_name)), ''), '__missing__') <> ALL($6::text[])
             GROUP BY a.member_id, a.client_id, a.fte_allocation
           ),
           member_totals AS (
@@ -361,7 +373,7 @@ export const computeOperationalPl = async (
            AND mce.period_month = $4
           GROUP BY aa.client_id
         `,
-        [periodStart, periodEnd, year, month]
+        [periodStart, periodEnd, year, month, INTERNAL_COMMERCIAL_CLIENT_IDS, INTERNAL_COMMERCIAL_CLIENT_NAMES]
       ).catch(() => []),
       runGreenhousePostgresQuery<ScopeBridgeRow>(
         `
@@ -584,6 +596,26 @@ export const upsertOperationalPlSnapshots = async (snapshots: OperationalPlSnaps
   return snapshots
 }
 
+const purgeOperationalPlRevision = async ({
+  year,
+  month,
+  snapshotRevision
+}: {
+  year: number
+  month: number
+  snapshotRevision: number
+}) => {
+  await runGreenhousePostgresQuery(
+    `
+      DELETE FROM greenhouse_serving.operational_pl_snapshots
+      WHERE period_year = $1
+        AND period_month = $2
+        AND snapshot_revision = $3
+    `,
+    [year, month, snapshotRevision]
+  )
+}
+
 export const materializeOperationalPl = async (
   year: number,
   month: number,
@@ -591,6 +623,11 @@ export const materializeOperationalPl = async (
 ) => {
   const result = await computeOperationalPl(year, month, reason)
 
+  await purgeOperationalPlRevision({
+    year,
+    month,
+    snapshotRevision: result.snapshotRevision
+  })
   await upsertOperationalPlSnapshots(result.snapshots)
 
   return result

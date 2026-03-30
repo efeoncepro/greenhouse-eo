@@ -26,11 +26,14 @@ type LaborCostRow = {
 /**
  * Computes FTE-weighted payroll cost allocation per client for a given period.
  *
- * Uses approved/exported payroll entries and active client_team_assignments
- * to proportionally distribute each member's gross payroll across their
- * assigned clients by fte_allocation weight.
+ * Uses approved/exported payroll entries and active commercial
+ * client_team_assignments to proportionally distribute each member's gross
+ * payroll across their assigned clients by fte_allocation weight.
  *
- * Members with no active assignments are excluded (their cost is unallocated overhead).
+ * Internal operational workspaces like `space-efeonce` are excluded from this
+ * bridge so they do not compete as commercial clients in Finance / Cost
+ * Intelligence. Members with no active commercial assignments are excluded
+ * (their cost is unallocated overhead).
  */
 export const computeClientLaborCosts = async (
   year: number,

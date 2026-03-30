@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { requireAgencyTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { readMemberCapacityEconomicsBatch } from '@/lib/member-capacity-economics/store'
+import { isInternalCommercialAssignment } from '@/lib/team-capacity/internal-assignments'
 import {
   getCapacityHealth,
   type CapacityBreakdown
@@ -33,14 +34,11 @@ interface AssignmentRow extends Record<string, unknown> {
   start_date: string | null
 }
 
-const INTERNAL_CLIENT_IDS = new Set(['efeonce_internal', 'client_internal', 'space-efeonce'])
-const INTERNAL_CLIENT_NAMES = new Set(['efeonce internal', 'efeonce'])
-
 const isInternalAssignment = (row: AssignmentRow) => {
-  const clientId = String(row.client_id || '').trim().toLowerCase()
-  const clientName = String(row.client_name || '').trim().toLowerCase()
-
-  return INTERNAL_CLIENT_IDS.has(clientId) || INTERNAL_CLIENT_NAMES.has(clientName)
+  return isInternalCommercialAssignment({
+    clientId: row.client_id,
+    clientName: row.client_name
+  })
 }
 
 const withTimeout = async <T>(promise: Promise<T>, label: string, timeoutMs = QUERY_TIMEOUT_MS): Promise<T> => {

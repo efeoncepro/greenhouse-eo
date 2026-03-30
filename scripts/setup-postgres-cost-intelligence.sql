@@ -122,7 +122,10 @@ ON CONFLICT (config_id) DO NOTHING;
 GRANT SELECT, INSERT, UPDATE ON greenhouse_cost_intelligence.period_closure_config TO greenhouse_runtime;
 GRANT SELECT, INSERT, UPDATE ON greenhouse_cost_intelligence.period_closures TO greenhouse_runtime;
 GRANT SELECT, INSERT, UPDATE ON greenhouse_serving.period_closure_status TO greenhouse_runtime;
-GRANT SELECT, INSERT, UPDATE ON greenhouse_serving.operational_pl_snapshots TO greenhouse_runtime;
+-- Runtime can mutate serving snapshots for Cost Intelligence materialization.
+-- DELETE is intentionally allowed here so each recompute can purge stale scopes
+-- from the same period/revision before upserting the current commercial truth.
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_serving.operational_pl_snapshots TO greenhouse_runtime;
 
 GRANT ALL PRIVILEGES ON TABLE greenhouse_cost_intelligence.period_closure_config TO greenhouse_migrator;
 GRANT ALL PRIVILEGES ON TABLE greenhouse_cost_intelligence.period_closures TO greenhouse_migrator;

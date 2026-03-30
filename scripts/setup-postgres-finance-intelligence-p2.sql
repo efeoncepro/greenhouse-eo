@@ -9,7 +9,11 @@
 -- per-client labor cost attribution for any given period.
 --
 -- For each approved payroll entry, distributes gross_total proportionally
--- across the member's active client assignments by fte_allocation.
+-- across the member's active commercial client assignments by fte_allocation.
+--
+-- Internal operational workspaces like `space-efeonce` remain valid for Agency
+-- and capacity views, but they must not compete as commercial clients inside
+-- Finance / Cost Intelligence labor attribution.
 
 DROP VIEW IF EXISTS greenhouse_serving.client_labor_cost_allocation;
 
@@ -44,6 +48,10 @@ assignment_overlap AS (
     AND COALESCE(a.start_date, DATE '1900-01-01') <= pw.period_end
     AND COALESCE(a.end_date, DATE '9999-12-31') >= pw.period_start
     AND (a.active = TRUE OR a.end_date IS NOT NULL)
+  LEFT JOIN greenhouse_core.clients c
+    ON c.client_id = a.client_id
+  WHERE COALESCE(NULLIF(LOWER(TRIM(a.client_id)), ''), '__missing__') NOT IN ('efeonce_internal', 'client_internal', 'space-efeonce')
+    AND COALESCE(NULLIF(LOWER(TRIM(c.client_name)), ''), '__missing__') NOT IN ('efeonce internal', 'efeonce')
 ),
 member_period_total AS (
   SELECT

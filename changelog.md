@@ -2,6 +2,11 @@
 
 ## 2026-03-30
 
+- Se corrigió una desviación semántica importante entre Team Capacity y Cost Intelligence:
+  - assignments internos de `Efeonce` (`space-efeonce`, `efeonce_internal`, `client_internal`) ya no compiten como clientes comerciales en la atribución de costo laboral
+  - la regla ahora es shared entre `Agency > Team`, `member_capacity_economics`, `auto-allocation-rules`, `client_labor_cost_allocation` y `computeOperationalPl()`
+  - Cost Intelligence puede además purgar snapshots obsoletos por período/revisión antes de upsert, evitando que queden filas stale de clientes internos después de un recompute
+
 - La validación visual real de `TASK-070` encontró y corrigió un bug de display en `/finance/intelligence`:
   - `lastBusinessDayOfTargetMonth` ya venía correctamente calculado desde el calendario operativo
   - la UI lo mostraba corrido por parsear `YYYY-MM-DD` con `new Date(...)`

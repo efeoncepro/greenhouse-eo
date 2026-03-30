@@ -17,6 +17,23 @@
   - cierre semántico de fallbacks
   - cierre formal de `TASK-070` y `TASK-071`
 
+## Delta 2026-03-30 — La atribución comercial excluye assignments internos
+- Se formaliza una regla canónica compartida con Team Capacity y Finance:
+  - `space-efeonce`
+  - `efeonce_internal`
+  - `client_internal`
+  no participan como cliente comercial en labor attribution, auto-allocation ni `operational_pl`.
+- Motivación:
+  - esos assignments sí representan carga operativa interna válida
+  - pero no deben partir la nómina comercial contra clientes billables cuando el objetivo es management accounting
+- Impacto directo:
+  - `client_labor_cost_allocation` ya no reparte salario hacia `Efeonce` cuando también existe un assignment comercial activo
+  - `computeOperationalPl()` ya filtra esos scopes en revenue, direct expenses, labor y overhead
+  - la materialización puede purgar snapshots obsoletos por período/revisión para no dejar filas stale de clientes internos
+- Excepción de access model:
+  - `greenhouse_runtime` mantiene un permiso acotado de `DELETE` sobre `greenhouse_serving.operational_pl_snapshots`
+  - se usa solo para purgar scopes viejos dentro de la misma revisión antes del upsert del snapshot vigente
+
 ## Delta 2026-03-30 — Baseline del módulo ya implementada
 - El módulo de Cost Intelligence ya no está solo en diseño.
 - Estado implementado en repo:
