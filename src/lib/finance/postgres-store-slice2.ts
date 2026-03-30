@@ -600,6 +600,7 @@ export const listFinanceIncomeFromPostgres = async ({
   serviceLine,
   fromDate,
   toDate,
+  incomeType,
   page = 1,
   pageSize = 50
 }: {
@@ -610,6 +611,7 @@ export const listFinanceIncomeFromPostgres = async ({
   serviceLine?: string | null
   fromDate?: string | null
   toDate?: string | null
+  incomeType?: string | null
   page?: number
   pageSize?: number
 } = {}) => {
@@ -638,6 +640,7 @@ export const listFinanceIncomeFromPostgres = async ({
   if (serviceLine) push('service_line = $?', serviceLine)
   if (fromDate) push('invoice_date >= $?::date', fromDate)
   if (toDate) push('invoice_date <= $?::date', toDate)
+  if (incomeType) push('income_type = $?', incomeType)
 
   const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
 
