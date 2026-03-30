@@ -2,6 +2,10 @@
 
 ## 2026-03-30 (session 2)
 
+- Finance read identity drift hardening:
+  - `GET /api/finance/income` y `GET /api/finance/expenses` ahora resuelven filtros de cliente por contexto canónico antes de consultar Postgres/BQ
+  - `income` ya no depende de la equivalencia ad hoc `clientProfileId -> hubspot_company_id` en SQL
+  - se mantiene compatibilidad transicional para callers legacy que seguían usando `clientProfileId` como alias de HubSpot en lecturas de income
 - `TASK-165` (Nubox Full Data Enrichment) cerrada: 16 nuevas columnas en income, 16 en expenses, tabla `income_line_items`, mappers conformed enriquecidos con todos los campos Nubox, sync migrado de DELETE-all a upsert selectivo, cron `nubox-balance-sync` cada 4h, 2 nuevos event types (SII claim + balance divergence), 2 nuevos data quality checks, filtro de annulled en PnL, PDF/XML links + SII chips en UI.
 - `TASK-164` (Purchase Orders & HES) implementada: tablas `purchase_orders` y `service_entry_sheets`, CRUD completo con reconciliación de saldo y lifecycle (draft→submitted→approved/rejected), 9 API routes, 7 event types nuevos, 4 notification mappings, `PurchaseOrdersListView` con progress bars de consumo, `HesListView` con status chips.
 - `ISSUE-002` (Nubox sync data integrity) cerrada: Fix 1 (annulled handling), Fix 2 (identity resolution GROUP BY), Fix 3 (upsert selectivo en conformed).

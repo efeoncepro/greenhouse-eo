@@ -1,5 +1,11 @@
 # project_context.md
 
+## Delta 2026-03-30 Finance read identity drift hardening
+- `GET /api/finance/income` y `GET /api/finance/expenses` ahora resuelven filtros de cliente contra el contexto canónico antes de consultar Postgres o BigQuery fallback.
+- `income` deja de depender internamente de la equivalencia ad hoc `clientProfileId -> hubspot_company_id`; el filtro usa anclas canónicas resueltas.
+- Se preserva compatibilidad transicional para `GET /api/finance/income`: si un caller legacy sigue mandando `clientProfileId` usando en realidad un `hubspotCompanyId`, el handler reintenta esa lectura como alias legacy en vez de romperla.
+- `expenses` ahora acepta `clientProfileId` y `hubspotCompanyId` como filtros de lectura, resolviéndolos a `clientId` canónico sin cambiar el modelo operativo de `expenses`.
+
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 

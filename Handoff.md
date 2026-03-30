@@ -4,6 +4,23 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — hardening del drift de lectura en income y expenses
+
+### Objetivo
+- Reducir el drift residual de identidad financiera en lectura sin romper compatibilidad histórica de `income`.
+
+### Delta de ejecución
+- `GET /api/finance/income` ahora resuelve `clientId` / `clientProfileId` / `hubspotCompanyId` contra el contexto canónico antes de consultar Postgres o BigQuery fallback.
+- `src/lib/finance/postgres-store-slice2.ts` ya no mezcla `clientProfileId` con `hubspot_company_id` en una sola comparación ad hoc; el filtro usa anclas canónicas separadas.
+- Se dejó un shim transicional explícito para no romper callers legacy de `income`: si `clientProfileId` se usaba como alias de `hubspotCompanyId`, el handler reintenta esa lectura solo para esa compatibilidad histórica.
+- `GET /api/finance/expenses` ahora acepta filtros por `clientProfileId` y `hubspotCompanyId`, resolviéndolos a `clientId` canónico sin cambiar el modelo operativo del expense runtime.
+- Cobertura reforzada en `src/app/api/finance/identity-drift-payloads.test.ts`.
+
+### Validación ejecutada
+- `pnpm exec vitest run src/app/api/finance/identity-drift-payloads.test.ts src/lib/finance/canonical.test.ts src/app/api/finance/bigquery-write-cutover.test.ts src/app/api/finance/clients/read-cutover.test.ts src/lib/finance/bigquery-write-flag.test.ts`
+- `pnpm exec eslint src/app/api/finance/income/route.ts src/app/api/finance/income/[id]/route.ts src/app/api/finance/expenses/route.ts src/app/api/finance/expenses/[id]/route.ts src/app/api/finance/identity-drift-payloads.test.ts src/lib/finance/postgres-store-slice2.ts src/lib/finance/canonical.ts src/lib/finance/canonical.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+
 ## Sesión 2026-03-30 — cierre formal de TASK-166 Finance BigQuery write cutover
 
 ### Objetivo

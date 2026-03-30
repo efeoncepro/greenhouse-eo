@@ -716,6 +716,7 @@ export const listFinanceIncomeFromPostgres = async ({
   status,
   clientId,
   clientProfileId,
+  hubspotCompanyId,
   organizationId,
   serviceLine,
   fromDate,
@@ -727,6 +728,7 @@ export const listFinanceIncomeFromPostgres = async ({
   status?: string | null
   clientId?: string | null
   clientProfileId?: string | null
+  hubspotCompanyId?: string | null
   organizationId?: string | null
   serviceLine?: string | null
   fromDate?: string | null
@@ -748,12 +750,29 @@ export const listFinanceIncomeFromPostgres = async ({
   }
 
   if (status) push('payment_status = $?', status)
-  if (clientId) push('client_id = $?', clientId)
 
-  if (clientProfileId) {
-    idx++
-    conditions.push(`(client_profile_id = $${idx} OR hubspot_company_id = $${idx})`)
-    values.push(clientProfileId)
+  if (clientId || clientProfileId || hubspotCompanyId) {
+    const clientConditions: string[] = []
+
+    if (clientId) {
+      idx++
+      clientConditions.push(`client_id = $${idx}`)
+      values.push(clientId)
+    }
+
+    if (clientProfileId) {
+      idx++
+      clientConditions.push(`client_profile_id = $${idx}`)
+      values.push(clientProfileId)
+    }
+
+    if (hubspotCompanyId) {
+      idx++
+      clientConditions.push(`hubspot_company_id = $${idx}`)
+      values.push(hubspotCompanyId)
+    }
+
+    conditions.push(`(${clientConditions.join(' OR ')})`)
   }
 
   if (organizationId) push('organization_id = $?', organizationId)

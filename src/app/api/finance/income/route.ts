@@ -105,6 +105,7 @@ export async function GET(request: Request) {
   const status = searchParams.get('status')
   const clientId = searchParams.get('clientId')
   const clientProfileId = searchParams.get('clientProfileId')
+  const hubspotCompanyId = searchParams.get('hubspotCompanyId')
   const organizationId = searchParams.get('organizationId')
   const serviceLine = searchParams.get('serviceLine')
   const fromDate = searchParams.get('fromDate')
@@ -113,10 +114,41 @@ export async function GET(request: Request) {
   const page = Math.max(1, toNumber(searchParams.get('page') || '1'))
   const pageSize = Math.min(200, Math.max(1, toNumber(searchParams.get('pageSize') || '50')))
 
+  let resolvedClient = null
+
+  if (clientId || clientProfileId || hubspotCompanyId) {
+    try {
+      resolvedClient = await resolveFinanceClientContext({ clientId, clientProfileId, hubspotCompanyId })
+    } catch (error) {
+      const canRetryLegacyHubspotAlias = (
+        error instanceof FinanceValidationError
+        && !clientId
+        && !hubspotCompanyId
+        && Boolean(clientProfileId)
+      )
+
+      if (!canRetryLegacyHubspotAlias) {
+        throw error
+      }
+
+      resolvedClient = await resolveFinanceClientContext({ hubspotCompanyId: clientProfileId })
+    }
+  }
+
   // ── Postgres-first path ──
   try {
     const result = await listFinanceIncomeFromPostgres({
-      status, clientId, clientProfileId, organizationId, serviceLine, fromDate, toDate, incomeType, page, pageSize
+      status,
+      clientId: resolvedClient?.clientId ?? clientId,
+      clientProfileId: resolvedClient?.clientProfileId ?? clientProfileId,
+      hubspotCompanyId: resolvedClient?.hubspotCompanyId ?? hubspotCompanyId,
+      organizationId,
+      serviceLine,
+      fromDate,
+      toDate,
+      incomeType,
+      page,
+      pageSize
     })
 
     return NextResponse.json(result)
@@ -138,14 +170,25 @@ export async function GET(request: Request) {
     params.status = status
   }
 
-  if (clientId) {
-    filters += ' AND client_id = @clientId'
-    params.clientId = clientId
-  }
+  if (resolvedClient?.clientId || resolvedClient?.clientProfileId || resolvedClient?.hubspotCompanyId || clientId || clientProfileId || hubspotCompanyId) {
+    const clientFilters: string[] = []
 
-  if (clientProfileId) {
-    filters += ' AND (client_profile_id = @clientProfileId OR hubspot_company_id = @clientProfileId)'
-    params.clientProfileId = clientProfileId
+    if (resolvedClient?.clientId ?? clientId) {
+      clientFilters.push('client_id = @clientId')
+      params.clientId = resolvedClient?.clientId ?? clientId
+    }
+
+    if (resolvedClient?.clientProfileId ?? clientProfileId) {
+      clientFilters.push('client_profile_id = @clientProfileId')
+      params.clientProfileId = resolvedClient?.clientProfileId ?? clientProfileId
+    }
+
+    if (resolvedClient?.hubspotCompanyId ?? hubspotCompanyId) {
+      clientFilters.push('hubspot_company_id = @hubspotCompanyId')
+      params.hubspotCompanyId = resolvedClient?.hubspotCompanyId ?? hubspotCompanyId
+    }
+
+    filters += ` AND (${clientFilters.join(' OR ')})`
   }
 
   if (serviceLine) {

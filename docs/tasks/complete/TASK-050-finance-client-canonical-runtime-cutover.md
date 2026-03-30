@@ -1,5 +1,11 @@
 # TASK-050 - Finance Client Canonical Runtime Cutover
 
+## Delta 2026-03-30 — filtros canónicos sin romper alias legacy
+
+- `GET /api/finance/income` y `GET /api/finance/expenses` ya resuelven filtros de cliente desde el contexto canónico antes de leer Postgres o BigQuery fallback.
+- `income` deja de basarse en la comparación SQL ambigua `client_profile_id = ? OR hubspot_company_id = ?` para el filtro `clientProfileId`; ahora usa anclas canónicas resueltas.
+- Se mantiene una compatibilidad transicional explícita para lecturas legacy de `income` donde `clientProfileId` todavía se usaba como alias de `hubspotCompanyId`.
+
 ## Delta 2026-03-30
 
 - El write path de `Finance Clients` ya no queda completamente anclado a BigQuery:
