@@ -161,8 +161,14 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         { label: <NavLabel label={GH_AGENCY_NAV.organizations.label} subtitle={GH_AGENCY_NAV.organizations.subtitle} show={showSub} />, href: '/agency/organizations', icon: 'tabler-building-community' }
       ].filter(item => {
         if (item.href === '/agency') return canSeeView('gestion.agencia', true)
+        if (item.href === '/agency/spaces') return canSeeView('gestion.spaces', true)
+        if (item.href === '/agency/economics') return canSeeView('gestion.economia', true)
+        if (item.href === '/agency/team') return canSeeView('gestion.equipo', true)
+        if (item.href === '/agency/delivery') return canSeeView('gestion.delivery', true)
+        if (item.href === '/agency/campaigns') return canSeeView('gestion.campanas', true)
         if (item.href === '/agency/organizations') return canSeeView('gestion.organizaciones', true)
         if (item.href === '/agency/services') return canSeeView('gestion.servicios', true)
+        if (item.href === '/agency/operations') return canSeeView('gestion.operaciones', true)
 
         return true
       })
@@ -201,7 +207,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         }
       ].filter(item => {
         if (item.href === '/hr/payroll') return canSeeView('equipo.nomina', true)
+        if (item.href === '/hr/departments') return canSeeView('equipo.departamentos', true)
         if (item.href === '/hr/leave') return canSeeView('equipo.permisos', true)
+        if (item.href === '/hr/attendance') return canSeeView('equipo.asistencia', true)
 
         return true
       })
@@ -253,7 +261,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         if (item.href === '/finance') return canSeeView('finanzas.resumen', true)
         if (item.href === '/finance/income') return canSeeView('finanzas.ingresos', true)
         if (item.href === '/finance/expenses') return canSeeView('finanzas.egresos', true)
+        if (item.href === '/finance/suppliers') return canSeeView('finanzas.proveedores', true)
         if (item.href === '/finance/reconciliation') return canSeeView('finanzas.conciliacion', true)
+        if (item.href === '/finance/intelligence') return canSeeView('finanzas.inteligencia', true)
 
         return true
       })
@@ -295,6 +305,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         if (item.href === '/admin/users') return canSeeView('administracion.usuarios', true)
         if (item.href === '/admin/roles') return canSeeView('administracion.roles', true)
         if (item.href === '/admin/views') return canSeeView('administracion.vistas', true)
+        if (item.href === '/admin/operational-calendar') return canSeeView('administracion.calendario_operativo', true)
+        if (item.href === '/admin/team') return canSeeView('administracion.equipo', true)
+        if (item.href === '/admin/email-delivery') return canSeeView('administracion.email_delivery', true)
+        if (item.href === '/admin/notifications') return canSeeView('administracion.notifications', true)
+        if (item.href === '/admin/cloud-integrations') return canSeeView('administracion.cloud_integrations', true)
         if (item.href === '/admin/ops-health') return canSeeView('administracion.ops_health', true)
         if (item.href === '/admin/ai-tools') return canSeeView('ia.herramientas', true)
 
@@ -316,21 +331,35 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
 
     menuData.push(
       { isSection: true, label: 'MI FICHA' } as VerticalMenuDataType,
-      { label: <NavLabel label='Mis Asignaciones' subtitle='Clientes y capacidad' show={showSub} />, href: '/my/assignments', icon: 'tabler-users' },
-      { label: <NavLabel label='Mi Desempeño' subtitle='Métricas ICO' show={showSub} />, href: '/my/performance', icon: 'tabler-chart-bar' },
-      { label: <NavLabel label='Mi Delivery' subtitle='Tareas y proyectos' show={showSub} />, href: '/my/delivery', icon: 'tabler-list-check' },
-      { label: <NavLabel label='Mi Perfil' subtitle='Datos personales' show={showSub} />, href: '/my/profile', icon: 'tabler-user-circle' },
-      { label: <NavLabel label='Mi Nómina' subtitle='Liquidaciones' show={showSub} />, href: '/my/payroll', icon: 'tabler-receipt' },
-      { label: <NavLabel label='Mis Permisos' subtitle='Vacaciones y días' show={showSub} />, href: '/my/leave', icon: 'tabler-calendar-event' },
-      { label: <NavLabel label='Mi Organización' subtitle='Directorio y colegas' show={showSub} />, href: '/my/organization', icon: 'tabler-building' }
+      ...[
+        { label: <NavLabel label='Mis Asignaciones' subtitle='Clientes y capacidad' show={showSub} />, href: '/my/assignments', icon: 'tabler-users' },
+        { label: <NavLabel label='Mi Desempeño' subtitle='Métricas ICO' show={showSub} />, href: '/my/performance', icon: 'tabler-chart-bar' },
+        { label: <NavLabel label='Mi Delivery' subtitle='Tareas y proyectos' show={showSub} />, href: '/my/delivery', icon: 'tabler-list-check' },
+        { label: <NavLabel label='Mi Perfil' subtitle='Datos personales' show={showSub} />, href: '/my/profile', icon: 'tabler-user-circle' },
+        { label: <NavLabel label='Mi Nómina' subtitle='Liquidaciones' show={showSub} />, href: '/my/payroll', icon: 'tabler-receipt' },
+        { label: <NavLabel label='Mis Permisos' subtitle='Vacaciones y días' show={showSub} />, href: '/my/leave', icon: 'tabler-calendar-event' },
+        { label: <NavLabel label='Mi Organización' subtitle='Directorio y colegas' show={showSub} />, href: '/my/organization', icon: 'tabler-building' }
+      ].filter(item => {
+          if (item.href === '/my/assignments') return canSeeView('mi_ficha.mis_asignaciones', true)
+          if (item.href === '/my/performance') return canSeeView('mi_ficha.mi_desempeno', true)
+          if (item.href === '/my/delivery') return canSeeView('mi_ficha.mi_delivery', true)
+          if (item.href === '/my/profile') return canSeeView('mi_ficha.mi_perfil', true)
+          if (item.href === '/my/payroll') return canSeeView('mi_ficha.mi_nomina', true)
+          if (item.href === '/my/leave') return canSeeView('mi_ficha.mis_permisos', true)
+          if (item.href === '/my/organization') return canSeeView('mi_ficha.mi_organizacion', true)
+
+          return true
+        })
     )
   }
 
   // Add "Mi Organización" for client users too (if they have organizationId)
   if (!isInternalUser && !isMyUser && session?.user?.organizationId) {
-    menuData.push(
-      { label: <NavLabel label='Mi Organización' subtitle='Directorio de colegas' show={showSub} />, href: '/my/organization', icon: 'tabler-building' }
-    )
+    if (canSeeView('mi_ficha.mi_organizacion', true)) {
+      menuData.push(
+        { label: <NavLabel label='Mi Organización' subtitle='Directorio de colegas' show={showSub} />, href: '/my/organization', icon: 'tabler-building' }
+      )
+    }
   }
 
   return (

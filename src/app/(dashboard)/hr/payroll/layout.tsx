@@ -2,10 +2,10 @@ import type { ReactNode } from 'react'
 
 import { redirect } from 'next/navigation'
 
-import { canAccessPeopleModule, hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
+import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 
-const PeopleLayout = async ({ children }: { children: ReactNode }) => {
+export default async function HrPayrollLayout({ children }: { children: ReactNode }) {
   const tenant = await getTenantContext()
 
   if (!tenant) {
@@ -14,15 +14,13 @@ const PeopleLayout = async ({ children }: { children: ReactNode }) => {
 
   const hasAccess = hasAuthorizedViewCode({
     tenant,
-    viewCode: 'equipo.personas',
-    fallback: canAccessPeopleModule(tenant)
+    viewCode: 'equipo.nomina',
+    fallback: tenant.routeGroups.includes('hr') || tenant.roleCodes.includes('efeonce_admin')
   })
 
   if (!hasAccess) {
     redirect(tenant.portalHomePath || '/dashboard')
   }
 
-  return <>{children}</>
+  return children
 }
-
-export default PeopleLayout

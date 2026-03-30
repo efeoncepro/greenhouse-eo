@@ -42,6 +42,107 @@
   - auditoría expandida en UI: pendiente
   - guards page-level por vista específica: pendiente
 
+## Delta 2026-03-30 — enforcement page-level por `view_code`
+
+- Se cerró el siguiente corte de enforcement real usando `authorizedViews` en runtime con fallback controlado a `routeGroups` cuando un usuario todavía no tiene catálogo persistido.
+- Nuevo helper canónico:
+  - `src/lib/tenant/authorization.ts` → `hasAuthorizedViewCode()`
+- Superficies ya protegidas por `view_code` o nested layout específico:
+  - `cliente.pulse` → `/dashboard`
+  - `cliente.configuracion` → `/settings`
+  - `cliente.proyectos` → `/proyectos/**`
+  - `cliente.ciclos` → `/sprints/**`
+  - `gestion.agencia` → `/agency`
+  - `gestion.organizaciones` → `/agency/organizations/**`
+  - `gestion.servicios` → `/agency/services/**`
+  - `equipo.personas` → `/people/**`
+  - `equipo.nomina` → `/hr/payroll/**`
+  - `finanzas.resumen` → `/finance`
+  - `finanzas.ingresos` → `/finance/income/**`
+  - `finanzas.egresos` → `/finance/expenses/**`
+  - `finanzas.conciliacion` → `/finance/reconciliation/**`
+  - `administracion.admin_center` → `/admin`
+  - `administracion.roles` → `/admin/roles`
+  - `administracion.vistas` → `/admin/views`
+  - `administracion.ops_health` → `/admin/ops-health`
+  - `administracion.spaces` → `/admin/tenants/**`
+  - `administracion.usuarios` → `/admin/users/**`
+  - `ia.herramientas` → `/admin/ai-tools`
+  - `mi_ficha.mi_perfil` → `/my/profile`
+  - `mi_ficha.mi_nomina` → `/my/payroll`
+- Estado real del corte:
+  - persistencia por rol: activa
+  - `authorizedViews` en sesión: activa
+  - menú inicial filtrado: activo
+  - enforcement page-level en las vistas catalogadas principales: activo
+  - overrides por usuario: pendiente
+  - enforcement exhaustivo de todos los subpaths no catalogados: pendiente
+
+## Delta 2026-03-30 — expansión del enforcement a layouts y páginas adyacentes
+
+- Se endurecieron layouts amplios para que ya no dependan solo de `routeGroups` cuando existe catálogo persistido:
+  - `AdminLayout` ahora exige alguna vista válida de administración o `ia.herramientas`
+  - `FinanceLayout` ahora exige alguna vista válida de finanzas
+  - `HrLayout` ahora exige `equipo.nomina` o `equipo.permisos`
+  - nuevo `MyLayout` ahora exige alguna vista válida de `mi_ficha`
+- También se cubrieron páginas adyacentes no catalogadas todavía con el `view_code` más cercano:
+  - `equipo.permisos` → `/hr/leave`
+  - `administracion.usuarios` → `/admin/team`
+  - `administracion.admin_center` → `/admin/operational-calendar`
+  - `administracion.ops_health` → `/admin/cloud-integrations`, `/admin/email-delivery`, `/admin/notifications`
+  - `finanzas.resumen` → `/finance/intelligence`, `/finance/cost-allocations`
+- Estado real actualizado:
+  - enforcement sobre layouts principales `admin`, `finance`, `hr`, `my`: activo
+  - enforcement sobre páginas adyacentes principales ya visibles en navegación: activo
+  - remanente real: subpaths todavía no catalogados con ownership ambiguo dentro de módulos grandes
+
+## Delta 2026-03-30 — expansión del modelo `view_registry` en Admin + Finance
+
+- El cuello de botella empezó a moverse de guards a modelado, así que se amplió `VIEW_REGISTRY` con superficies explícitas nuevas:
+  - `finanzas.clientes`
+  - `finanzas.proveedores`
+  - `finanzas.inteligencia`
+  - `finanzas.asignaciones_costos`
+  - `administracion.cloud_integrations`
+  - `administracion.email_delivery`
+  - `administracion.notifications`
+  - `administracion.calendario_operativo`
+  - `administracion.equipo`
+- Se alinearon guards y menú con esos `view_code` nuevos en vez de seguir colgándolos de vistas vecinas.
+- Cambio importante de rollout:
+  - si un rol ya tiene assignments persistidos y nace un `view_code` nuevo, el resolver ya no lo deja apagado por defecto
+  - ahora usa fallback hardcoded por vista faltante hasta que esa combinación se persista explícitamente
+- Resultado:
+  - el catálogo ya modela mejor ownership real en `Admin + Finance`
+  - el cutover a permisos por vista deja de penalizar rutas nuevas solo por existir después del primer save
+
+## Delta 2026-03-30 — expansión del modelo `view_registry` en Agency + HR + My
+
+- Se agregaron `view_code` explícitos para superficies visibles de Agency:
+  - `gestion.spaces`
+  - `gestion.economia`
+  - `gestion.equipo`
+  - `gestion.delivery`
+  - `gestion.campanas`
+  - `gestion.operaciones`
+- Se agregaron `view_code` explícitos para HR:
+  - `equipo.departamentos`
+  - `equipo.asistencia`
+- Se agregaron `view_code` explícitos para `Mi Ficha`:
+  - `mi_ficha.mi_inicio`
+  - `mi_ficha.mis_asignaciones`
+  - `mi_ficha.mi_desempeno`
+  - `mi_ficha.mi_delivery`
+  - `mi_ficha.mis_permisos`
+  - `mi_ficha.mi_organizacion`
+- Se alinearon:
+  - `AgencyLayout` a un set explícito de vistas `gestion.*`
+  - páginas de `Agency`, `HR` y `My` a sus `view_code` exactos
+  - sidebar para que filtre también estos accesos nuevos en Gestión, HR y Mi Ficha
+- Resultado:
+  - la inferencia restante bajó bastante en superficies visibles del portal
+  - el remanente ya se concentra más en rutas secundarias/no visibles del árbol grande
+
 ## Summary
 
 Crear un módulo de gobernanza de vistas en Admin Center que permita a admins visualizar, asignar y revocar acceso a módulos/secciones del portal por perfil de rol, con override por usuario individual cuando sea necesario. Reemplaza el mapping hardcoded `role → route_groups` en `deriveRouteGroups()` por una tabla configurable desde la UI, sin perder el failsafe de la resolución actual.

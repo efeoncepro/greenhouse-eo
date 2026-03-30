@@ -168,6 +168,159 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - Los guards broad por layout ya heredan `routeGroups` derivados, pero aún no existe enforcement page-level exhaustivo por `view_code` en todas las rutas del portal.
 - El warning OpenSSL/JWT durante `build` sigue apareciendo en static generation de `/admin/views`; el artefacto termina bien y cae a fallback hardcoded durante esa fase.
 
+## Sesión 2026-03-30 — TASK-136 cierra el primer enforcement page-level por view_code
+
+### Completado
+- Se agregó `hasAuthorizedViewCode()` en `src/lib/tenant/authorization.ts` para resolver autorización por vista usando:
+  - `tenant.authorizedViews`
+  - fallback explícito a `routeGroups` cuando el catálogo persistido aún no gobierna ese usuario
+- Ya hay enforcement page-level o nested layout específico para superficies catalogadas clave:
+  - `/dashboard`, `/settings`
+  - `/proyectos/**`, `/sprints/**`
+  - `/agency`, `/agency/organizations/**`, `/agency/services/**`
+  - `/people/**`, `/hr/payroll/**`
+  - `/finance`, `/finance/income/**`, `/finance/expenses/**`, `/finance/reconciliation/**`
+  - `/admin`, `/admin/roles`, `/admin/views`, `/admin/ops-health`, `/admin/ai-tools`, `/admin/tenants/**`, `/admin/users/**`
+  - `/my/profile`, `/my/payroll`
+
+### Archivos tocados
+- `src/lib/tenant/authorization.ts`
+- `src/app/(dashboard)/dashboard/page.tsx`
+- `src/app/(dashboard)/settings/page.tsx`
+- `src/app/(dashboard)/proyectos/layout.tsx`
+- `src/app/(dashboard)/sprints/layout.tsx`
+- `src/app/(dashboard)/agency/page.tsx`
+- `src/app/(dashboard)/agency/organizations/layout.tsx`
+- `src/app/(dashboard)/agency/services/layout.tsx`
+- `src/app/(dashboard)/people/layout.tsx`
+- `src/app/(dashboard)/hr/payroll/layout.tsx`
+- `src/app/(dashboard)/finance/page.tsx`
+- `src/app/(dashboard)/finance/income/layout.tsx`
+- `src/app/(dashboard)/finance/expenses/layout.tsx`
+- `src/app/(dashboard)/finance/reconciliation/layout.tsx`
+- `src/app/(dashboard)/admin/page.tsx`
+- `src/app/(dashboard)/admin/roles/page.tsx`
+- `src/app/(dashboard)/admin/views/page.tsx`
+- `src/app/(dashboard)/admin/ops-health/page.tsx`
+- `src/app/(dashboard)/admin/ai-tools/page.tsx`
+- `src/app/(dashboard)/admin/tenants/layout.tsx`
+- `src/app/(dashboard)/admin/users/layout.tsx`
+- `src/app/(dashboard)/my/profile/page.tsx`
+- `src/app/(dashboard)/my/payroll/page.tsx`
+- `docs/tasks/in-progress/TASK-136-admin-view-access-governance.md`
+- `changelog.md`
+
+### Validación ejecutada
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec eslint src/lib/tenant/authorization.ts src/app/'(dashboard)'/agency/page.tsx src/app/'(dashboard)'/agency/organizations/layout.tsx src/app/'(dashboard)'/agency/services/layout.tsx src/app/'(dashboard)'/dashboard/page.tsx src/app/'(dashboard)'/finance/page.tsx src/app/'(dashboard)'/finance/income/layout.tsx src/app/'(dashboard)'/finance/expenses/layout.tsx src/app/'(dashboard)'/finance/reconciliation/layout.tsx src/app/'(dashboard)'/hr/payroll/layout.tsx src/app/'(dashboard)'/people/layout.tsx src/app/'(dashboard)'/admin/page.tsx src/app/'(dashboard)'/admin/roles/page.tsx src/app/'(dashboard)'/admin/views/page.tsx src/app/'(dashboard)'/admin/ops-health/page.tsx src/app/'(dashboard)'/admin/ai-tools/page.tsx src/app/'(dashboard)'/admin/tenants/layout.tsx src/app/'(dashboard)'/admin/users/layout.tsx src/app/'(dashboard)'/my/profile/page.tsx src/app/'(dashboard)'/my/payroll/page.tsx src/app/'(dashboard)'/settings/page.tsx src/app/'(dashboard)'/proyectos/layout.tsx src/app/'(dashboard)'/sprints/layout.tsx`
+- `pnpm build`
+
+### Pendiente inmediato
+- Extender el mismo enforcement a rutas todavía no catalogadas en `view_registry` para reducir los últimos escapes por subpath.
+- Decidir si algunos módulos amplios deben endurecerse con layouts más altos en el árbol una vez que el catálogo de vistas cubra todos los descendants.
+
+## Sesión 2026-03-30 — TASK-136 amplía enforcement sobre layouts amplios y páginas vecinas
+
+### Completado
+- `src/lib/tenant/authorization.ts` ahora también expone `hasAnyAuthorizedViewCode()`.
+- Los layouts amplios ya respetan catálogo persistido cuando existe:
+  - `src/app/(dashboard)/admin/layout.tsx`
+  - `src/app/(dashboard)/finance/layout.tsx`
+  - `src/app/(dashboard)/hr/layout.tsx`
+  - `src/app/(dashboard)/my/layout.tsx` nuevo
+- Páginas vecinas no catalogadas todavía quedaron amarradas al `view_code` más cercano:
+  - `src/app/(dashboard)/hr/leave/page.tsx` → `equipo.permisos`
+  - `src/app/(dashboard)/admin/team/page.tsx` → `administracion.usuarios`
+  - `src/app/(dashboard)/admin/operational-calendar/page.tsx` → `administracion.admin_center`
+  - `src/app/(dashboard)/admin/cloud-integrations/page.tsx` → `administracion.ops_health`
+  - `src/app/(dashboard)/admin/email-delivery/page.tsx` → `administracion.ops_health`
+  - `src/app/(dashboard)/admin/notifications/page.tsx` → `administracion.ops_health`
+  - `src/app/(dashboard)/finance/intelligence/page.tsx` → `finanzas.resumen`
+  - `src/app/(dashboard)/finance/cost-allocations/page.tsx` → `finanzas.resumen`
+
+### Validación ejecutada
+- `pnpm exec eslint src/lib/tenant/authorization.ts src/app/'(dashboard)'/admin/layout.tsx src/app/'(dashboard)'/finance/layout.tsx src/app/'(dashboard)'/hr/layout.tsx src/app/'(dashboard)'/my/layout.tsx src/app/'(dashboard)'/hr/leave/page.tsx src/app/'(dashboard)'/admin/team/page.tsx src/app/'(dashboard)'/admin/operational-calendar/page.tsx src/app/'(dashboard)'/admin/email-delivery/page.tsx src/app/'(dashboard)'/admin/notifications/page.tsx src/app/'(dashboard)'/admin/cloud-integrations/page.tsx src/app/'(dashboard)'/finance/intelligence/page.tsx src/app/'(dashboard)'/finance/cost-allocations/page.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- El enforcement ya cubre mejor navegación y descendencia visible, pero el catálogo `view_registry` sigue sin modelar cada superficie secundaria del portal.
+- El siguiente paso saludable es expandir `view_registry` antes de seguir repartiendo ownership de subpaths ambiguos por inferencia.
+
+## Sesión 2026-03-30 — TASK-136 empieza el cierre del cuello de modelo en Admin + Finance
+
+### Completado
+- `src/lib/admin/view-access-catalog.ts` sumó nuevos `view_code` explícitos:
+  - `finanzas.clientes`
+  - `finanzas.proveedores`
+  - `finanzas.inteligencia`
+  - `finanzas.asignaciones_costos`
+  - `administracion.cloud_integrations`
+  - `administracion.email_delivery`
+  - `administracion.notifications`
+  - `administracion.calendario_operativo`
+  - `administracion.equipo`
+- Se alinearon guards directos con esos códigos nuevos en:
+  - `src/app/(dashboard)/admin/team/page.tsx`
+  - `src/app/(dashboard)/admin/operational-calendar/page.tsx`
+  - `src/app/(dashboard)/admin/email-delivery/page.tsx`
+  - `src/app/(dashboard)/admin/notifications/page.tsx`
+  - `src/app/(dashboard)/admin/cloud-integrations/page.tsx`
+  - `src/app/(dashboard)/finance/intelligence/page.tsx`
+  - `src/app/(dashboard)/finance/cost-allocations/page.tsx`
+  - `src/app/(dashboard)/finance/clients/layout.tsx`
+  - `src/app/(dashboard)/finance/suppliers/layout.tsx`
+- `src/components/layout/vertical/VerticalMenu.tsx` ya filtra también esos accesos nuevos en sidebar.
+- Hardening clave del resolver:
+  - `src/lib/admin/view-access-store.ts` ya no apaga por defecto un `view_code` nuevo cuando un rol tiene assignments persistidos parciales
+  - si falta la combinación `role_code + view_code`, se usa fallback por vista hasta que se persista explícitamente
+
+### Validación ejecutada
+- `pnpm exec eslint src/lib/admin/view-access-catalog.ts src/lib/admin/view-access-store.ts src/components/layout/vertical/VerticalMenu.tsx src/app/'(dashboard)'/finance/clients/layout.tsx src/app/'(dashboard)'/finance/suppliers/layout.tsx src/app/'(dashboard)'/admin/team/page.tsx src/app/'(dashboard)'/admin/operational-calendar/page.tsx src/app/'(dashboard)'/admin/email-delivery/page.tsx src/app/'(dashboard)'/admin/notifications/page.tsx src/app/'(dashboard)'/admin/cloud-integrations/page.tsx src/app/'(dashboard)'/finance/intelligence/page.tsx src/app/'(dashboard)'/finance/cost-allocations/page.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- Repetir la misma expansión de modelo en `Agency`, `HR`, `My` y otras superficies secundarias para quitar más inferencias del catálogo.
+- Luego de eso, recién tiene sentido abrir con fuerza los overrides por usuario y la auditoría fina desde `/admin/views`.
+
+## Sesión 2026-03-30 — TASK-136 extiende el catálogo a Agency, HR y My
+
+### Completado
+- `src/lib/admin/view-access-catalog.ts` sumó nuevos `view_code` explícitos en:
+  - Agency: `gestion.spaces`, `gestion.economia`, `gestion.equipo`, `gestion.delivery`, `gestion.campanas`, `gestion.operaciones`
+  - HR: `equipo.departamentos`, `equipo.asistencia`
+  - My: `mi_ficha.mi_inicio`, `mi_ficha.mis_asignaciones`, `mi_ficha.mi_desempeno`, `mi_ficha.mi_delivery`, `mi_ficha.mis_permisos`, `mi_ficha.mi_organizacion`
+- Se alinearon guards concretos en:
+  - `src/app/(dashboard)/agency/layout.tsx`
+  - `src/app/(dashboard)/agency/spaces/page.tsx`
+  - `src/app/(dashboard)/agency/economics/page.tsx`
+  - `src/app/(dashboard)/agency/team/page.tsx`
+  - `src/app/(dashboard)/agency/delivery/page.tsx`
+  - `src/app/(dashboard)/agency/campaigns/page.tsx`
+  - `src/app/(dashboard)/agency/operations/page.tsx`
+  - `src/app/(dashboard)/hr/departments/page.tsx`
+  - `src/app/(dashboard)/hr/attendance/page.tsx`
+  - `src/app/(dashboard)/my/layout.tsx`
+  - `src/app/(dashboard)/my/page.tsx`
+  - `src/app/(dashboard)/my/assignments/page.tsx`
+  - `src/app/(dashboard)/my/delivery/page.tsx`
+  - `src/app/(dashboard)/my/performance/page.tsx`
+  - `src/app/(dashboard)/my/leave/page.tsx`
+  - `src/app/(dashboard)/my/organization/page.tsx`
+- `src/components/layout/vertical/VerticalMenu.tsx` ya filtra también `Agency`, `HR` y `Mi Ficha` con esos `view_code` nuevos.
+
+### Validación ejecutada
+- `pnpm exec eslint src/lib/admin/view-access-catalog.ts src/app/'(dashboard)'/agency/layout.tsx src/app/'(dashboard)'/agency/spaces/page.tsx src/app/'(dashboard)'/agency/economics/page.tsx src/app/'(dashboard)'/agency/team/page.tsx src/app/'(dashboard)'/agency/delivery/page.tsx src/app/'(dashboard)'/agency/campaigns/page.tsx src/app/'(dashboard)'/agency/operations/page.tsx src/app/'(dashboard)'/hr/departments/page.tsx src/app/'(dashboard)'/hr/attendance/page.tsx src/app/'(dashboard)'/my/layout.tsx src/app/'(dashboard)'/my/page.tsx src/app/'(dashboard)'/my/assignments/page.tsx src/app/'(dashboard)'/my/delivery/page.tsx src/app/'(dashboard)'/my/performance/page.tsx src/app/'(dashboard)'/my/leave/page.tsx src/app/'(dashboard)'/my/organization/page.tsx src/components/layout/vertical/VerticalMenu.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- El mayor remanente ya queda en rutas secundarias que no están directamente en menú o que representan tabs/flows internos más finos.
+- El siguiente paso útil puede ser:
+  - expandir catálogo a superficies secundarias restantes, o
+  - empezar overrides por usuario y auditoría visible apoyados en el catálogo ya bastante más completo.
+
 ## Sesión 2026-03-30 — hardening Sentry incident reader
 
 ### Completado

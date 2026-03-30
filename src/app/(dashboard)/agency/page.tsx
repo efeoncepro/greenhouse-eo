@@ -1,6 +1,9 @@
 import { Suspense } from 'react'
 
+import { redirect } from 'next/navigation'
+
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
+import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 import {
   getAgencyPulseKpis,
   getAgencySpacesHealth,
@@ -34,6 +37,20 @@ const deriveKpisFromSpaces = (spaces: AgencySpaceHealth[]): AgencyPulseKpis => {
 export default async function AgencyPage() {
   const tenant = await getTenantContext()
 
+  if (!tenant) {
+    redirect('/login')
+  }
+
+  const hasAccess = hasAuthorizedViewCode({
+    tenant,
+    viewCode: 'gestion.agencia',
+    fallback: tenant.routeGroups.includes('internal') || tenant.routeGroups.includes('admin')
+  })
+
+  if (!hasAccess) {
+    redirect(tenant.portalHomePath || '/dashboard')
+  }
+
   const [kpisResult, spaces, statusMix, weeklyActivity] = await Promise.all([
     getAgencyPulseKpis().catch(err => { console.error('[Agency] KPI query error:', err);
 
@@ -58,7 +75,7 @@ return [] })
         pulseSpaces={spaces}
         pulseStatusMix={statusMix}
         pulseWeeklyActivity={weeklyActivity}
-        tenantName={tenant?.clientName ?? 'Efeonce'}
+        tenantName={tenant.clientName ?? 'Efeonce'}
       />
     </Suspense>
   )

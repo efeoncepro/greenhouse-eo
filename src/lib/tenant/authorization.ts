@@ -6,6 +6,38 @@ import { getTenantContext, type TenantContext } from '@/lib/tenant/get-tenant-co
 
 export type TenantRouteGroup = 'client' | 'internal' | 'admin' | 'agency' | 'hr' | 'finance' | 'employee' | 'my' | 'people' | 'ai_tooling'
 
+export const hasAuthorizedViewCode = ({
+  tenant,
+  viewCode,
+  fallback
+}: {
+  tenant: TenantContext
+  viewCode: string
+  fallback: boolean
+}) => {
+  if (tenant.authorizedViews.length === 0) {
+    return fallback
+  }
+
+  return tenant.authorizedViews.includes(viewCode)
+}
+
+export const hasAnyAuthorizedViewCode = ({
+  tenant,
+  viewCodes,
+  fallback
+}: {
+  tenant: TenantContext
+  viewCodes: string[]
+  fallback: boolean
+}) => {
+  if (tenant.authorizedViews.length === 0) {
+    return fallback
+  }
+
+  return viewCodes.some(viewCode => tenant.authorizedViews.includes(viewCode))
+}
+
 export const isClientTenant = (tenant: TenantContext) => tenant.tenantType === 'client' && Boolean(tenant.clientId)
 
 export const hasRoleCode = (tenant: TenantContext, roleCode: string) => tenant.roleCodes.includes(roleCode)

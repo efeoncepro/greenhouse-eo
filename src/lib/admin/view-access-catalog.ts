@@ -56,6 +56,54 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'internal'
   },
   {
+    viewCode: 'gestion.spaces',
+    section: 'gestion',
+    label: 'Spaces',
+    description: 'Spaces activos, postura operativa y salud cross-space.',
+    routePath: '/agency/spaces',
+    routeGroup: 'internal'
+  },
+  {
+    viewCode: 'gestion.economia',
+    section: 'gestion',
+    label: 'Economía',
+    description: 'Rentabilidad, P&L y lectura económica institucional.',
+    routePath: '/agency/economics',
+    routeGroup: 'internal'
+  },
+  {
+    viewCode: 'gestion.equipo',
+    section: 'gestion',
+    label: 'Equipo de agencia',
+    description: 'Capacidad, dedicación y staffing del equipo Efeonce.',
+    routePath: '/agency/team',
+    routeGroup: 'internal'
+  },
+  {
+    viewCode: 'gestion.delivery',
+    section: 'gestion',
+    label: 'Delivery',
+    description: 'Seguimiento operativo de producción, ICO y entrega.',
+    routePath: '/agency/delivery',
+    routeGroup: 'internal'
+  },
+  {
+    viewCode: 'gestion.campanas',
+    section: 'gestion',
+    label: 'Campañas',
+    description: 'Vista cross-space de campañas e iniciativas activas.',
+    routePath: '/agency/campaigns',
+    routeGroup: 'internal'
+  },
+  {
+    viewCode: 'gestion.operaciones',
+    section: 'gestion',
+    label: 'Operaciones',
+    description: 'Observabilidad operativa, colas y postura del platform interno.',
+    routePath: '/agency/operations',
+    routeGroup: 'internal'
+  },
+  {
     viewCode: 'equipo.personas',
     section: 'equipo',
     label: 'Personas',
@@ -77,6 +125,22 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     label: 'Permisos',
     description: 'Leave balances, solicitudes y saldos.',
     routePath: '/hr/leave',
+    routeGroup: 'hr'
+  },
+  {
+    viewCode: 'equipo.departamentos',
+    section: 'equipo',
+    label: 'Departamentos',
+    description: 'Estructura organizacional y taxonomía interna del equipo.',
+    routePath: '/hr/departments',
+    routeGroup: 'hr'
+  },
+  {
+    viewCode: 'equipo.asistencia',
+    section: 'equipo',
+    label: 'Asistencia',
+    description: 'Registros de asistencia y señales operativas del equipo.',
+    routePath: '/hr/attendance',
     routeGroup: 'hr'
   },
   {
@@ -109,6 +173,38 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     label: 'Conciliación',
     description: 'Conciliación bancaria y matching operativo.',
     routePath: '/finance/reconciliation',
+    routeGroup: 'finance'
+  },
+  {
+    viewCode: 'finanzas.clientes',
+    section: 'finanzas',
+    label: 'Clientes',
+    description: 'Maestro de clientes, coberturas y contexto comercial financiero.',
+    routePath: '/finance/clients',
+    routeGroup: 'finance'
+  },
+  {
+    viewCode: 'finanzas.proveedores',
+    section: 'finanzas',
+    label: 'Proveedores',
+    description: 'Directorio de suppliers y contrapartes de gasto.',
+    routePath: '/finance/suppliers',
+    routeGroup: 'finance'
+  },
+  {
+    viewCode: 'finanzas.inteligencia',
+    section: 'finanzas',
+    label: 'Inteligencia financiera',
+    description: 'Economics, tendencias y lectura ejecutiva del negocio.',
+    routePath: '/finance/intelligence',
+    routeGroup: 'finance'
+  },
+  {
+    viewCode: 'finanzas.asignaciones_costos',
+    section: 'finanzas',
+    label: 'Asignaciones de costos',
+    description: 'Reparto de costos y lógica de imputación financiera.',
+    routePath: '/finance/cost-allocations',
     routeGroup: 'finance'
   },
   {
@@ -168,6 +264,46 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'admin'
   },
   {
+    viewCode: 'administracion.cloud_integrations',
+    section: 'administracion',
+    label: 'Cloud & Integrations',
+    description: 'Estado operativo de cloud, observability e integraciones críticas.',
+    routePath: '/admin/cloud-integrations',
+    routeGroup: 'admin'
+  },
+  {
+    viewCode: 'administracion.email_delivery',
+    section: 'administracion',
+    label: 'Email delivery',
+    description: 'Entregabilidad, retries y salud del carril de correo.',
+    routePath: '/admin/email-delivery',
+    routeGroup: 'admin'
+  },
+  {
+    viewCode: 'administracion.notifications',
+    section: 'administracion',
+    label: 'Notificaciones',
+    description: 'Postura y overview del sistema de notificaciones del portal.',
+    routePath: '/admin/notifications',
+    routeGroup: 'admin'
+  },
+  {
+    viewCode: 'administracion.calendario_operativo',
+    section: 'administracion',
+    label: 'Calendario operativo',
+    description: 'Calendario institucional y ritmo operativo de payroll.',
+    routePath: '/admin/operational-calendar',
+    routeGroup: 'admin'
+  },
+  {
+    viewCode: 'administracion.equipo',
+    section: 'administracion',
+    label: 'Equipo admin',
+    description: 'Vista operativa del equipo interno desde Admin Center.',
+    routePath: '/admin/team',
+    routeGroup: 'admin'
+  },
+  {
     viewCode: 'mi_ficha.mi_perfil',
     section: 'mi_ficha',
     label: 'Mi Perfil',
@@ -181,6 +317,54 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     label: 'Mi Nómina',
     description: 'Liquidaciones y compensación personal.',
     routePath: '/my/payroll',
+    routeGroup: 'my'
+  },
+  {
+    viewCode: 'mi_ficha.mi_inicio',
+    section: 'mi_ficha',
+    label: 'Mi Greenhouse',
+    description: 'Resumen personal de trabajo, foco y actividad.',
+    routePath: '/my',
+    routeGroup: 'my'
+  },
+  {
+    viewCode: 'mi_ficha.mis_asignaciones',
+    section: 'mi_ficha',
+    label: 'Mis asignaciones',
+    description: 'Clientes, FTE y capacidad asignada a la persona.',
+    routePath: '/my/assignments',
+    routeGroup: 'my'
+  },
+  {
+    viewCode: 'mi_ficha.mi_desempeno',
+    section: 'mi_ficha',
+    label: 'Mi desempeño',
+    description: 'Métricas personales, ICO y lectura de rendimiento.',
+    routePath: '/my/performance',
+    routeGroup: 'my'
+  },
+  {
+    viewCode: 'mi_ficha.mi_delivery',
+    section: 'mi_ficha',
+    label: 'Mi delivery',
+    description: 'Tareas, proyectos y foco operativo personal.',
+    routePath: '/my/delivery',
+    routeGroup: 'my'
+  },
+  {
+    viewCode: 'mi_ficha.mis_permisos',
+    section: 'mi_ficha',
+    label: 'Mis permisos',
+    description: 'Saldos, solicitudes y visibilidad de permisos personales.',
+    routePath: '/my/leave',
+    routeGroup: 'my'
+  },
+  {
+    viewCode: 'mi_ficha.mi_organizacion',
+    section: 'mi_ficha',
+    label: 'Mi organización',
+    description: 'Directorio, colegas y contexto organizacional cercano.',
+    routePath: '/my/organization',
     routeGroup: 'my'
   },
   {

@@ -138,6 +138,33 @@ const deriveRouteGroupsForSingleRole = (roleCode: string, tenantType: 'client' |
   return Array.from(routeGroups)
 }
 
+const resolvePersistedOrFallbackRoleAccess = ({
+  roleAssignments,
+  role,
+  view
+}: {
+  roleAssignments: Map<string, boolean> | undefined
+  role: {
+    roleCode: string
+    isAdmin: boolean
+    isInternal: boolean
+    routeGroups: string[]
+  }
+  view: GovernanceViewRegistryEntry
+}) => {
+  if (roleAssignments?.has(view.viewCode)) {
+    return {
+      granted: Boolean(roleAssignments.get(view.viewCode)),
+      source: 'persisted' as ViewAccessSource
+    }
+  }
+
+  return {
+    granted: roleCanAccessViewFallback(role, view),
+    source: 'hardcoded_fallback' as ViewAccessSource
+  }
+}
+
 const getPersistedAssignments = async () => {
   try {
     const rows = await runGreenhousePostgresQuery<RoleAssignmentRow>(
@@ -370,22 +397,27 @@ export const getAdminPersistedViewAccessGovernance = async () => {
     roleAccess: Object.fromEntries(
       roles.map(role => {
         const roleAssignments = persistedByRole.get(role.roleCode)
-        const hasPersistedRoleAssignments = Boolean(roleAssignments && roleAssignments.size > 0)
 
-        return [
-          role.roleCode,
-          hasPersistedRoleAssignments
-            ? Boolean(roleAssignments?.get(view.viewCode))
-            : roleCanAccessViewFallback(role, view)
-        ]
+        const resolvedAccess = resolvePersistedOrFallbackRoleAccess({
+          roleAssignments,
+          role,
+          view
+        })
+
+        return [role.roleCode, resolvedAccess.granted]
       })
     ),
     roleAccessSource: Object.fromEntries(
       roles.map(role => {
         const roleAssignments = persistedByRole.get(role.roleCode)
-        const hasPersistedRoleAssignments = Boolean(roleAssignments && roleAssignments.size > 0)
 
-        return [role.roleCode, hasPersistedRoleAssignments ? 'persisted' : 'hardcoded_fallback']
+        const resolvedAccess = resolvePersistedOrFallbackRoleAccess({
+          roleAssignments,
+          role,
+          view
+        })
+
+        return [role.roleCode, resolvedAccess.source]
       })
     ) as Record<string, ViewAccessSource>
   }))
@@ -451,21 +483,18 @@ export const resolveAuthorizedViewsForUser = async ({
       .filter(view =>
         roleCodes.some(roleCode => {
           const roleAssignments = persistedByRole.get(roleCode)
-          const hasPersistedRoleAssignments = Boolean(roleAssignments && roleAssignments.size > 0)
+          const derivedRouteGroups = deriveRouteGroupsForSingleRole(roleCode, tenantType)
 
-          if (hasPersistedRoleAssignments) {
-            return Boolean(roleAssignments?.get(view.viewCode))
-          }
-
-          return roleCanAccessViewFallback(
-            {
+          return resolvePersistedOrFallbackRoleAccess({
+            roleAssignments,
+            role: {
               roleCode,
               isAdmin: roleCode === 'efeonce_admin',
-              isInternal: deriveRouteGroupsForSingleRole(roleCode, tenantType).includes('internal'),
-              routeGroups: deriveRouteGroupsForSingleRole(roleCode, tenantType)
+              isInternal: derivedRouteGroups.includes('internal'),
+              routeGroups: derivedRouteGroups
             },
             view
-          )
+          }).granted
         })
       )
       .map(view => view.viewCode)

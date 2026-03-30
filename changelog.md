@@ -2,6 +2,11 @@
 
 ## 2026-03-30
 
+- `TASK-136` cerró el primer enforcement page-level por `view_code` usando `authorizedViews` en runtime con fallback controlado a `routeGroups`.
+- Rutas clave del portal ya bloquean acceso a nivel de página o nested layout para `dashboard`, `settings`, `proyectos`, `sprints`, Agency, People, Payroll, Finance, Admin Center, AI tools y `Mi Ficha`.
+- `TASK-136` amplió además el enforcement a layouts amplios de `Admin`, `Finance`, `HR` y `My`, y cubrió páginas vecinas como `hr/leave`, `admin/cloud-integrations`, `admin/email-delivery`, `admin/notifications`, `admin/operational-calendar`, `admin/team`, `finance/intelligence` y `finance/cost-allocations`.
+- `TASK-136` empezó además a cerrar el gap de modelo: `view_registry` ya incluye nuevas superficies explícitas en `Admin + Finance`, y el resolver ahora hace fallback por vista faltante cuando existen assignments persistidos parciales para un rol.
+- `TASK-136` extendió ese mismo modelo a `Agency`, `HR` y `My`, con nuevos `view_code` explícitos y guards/sidebar alineados a esas superficies visibles.
 - `TASK-136` avanzó de baseline visual a persistencia inicial real en `Admin Center > Vistas y acceso`.
 - Nuevo contrato backend:
   - `POST /api/admin/views/assignments`
