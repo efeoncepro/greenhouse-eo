@@ -6,6 +6,38 @@
 
 ---
 
+## Delta 2026-03-30 — Commercial cost attribution ya es contrato operativo de plataforma
+
+Finance ya no debe tratar la atribución comercial como una recomposición local entre bridges de payroll, assignments y overhead.
+
+Estado canónico vigente:
+- existe una capa materializada específica:
+  - `greenhouse_serving.commercial_cost_attribution`
+- esta capa consolida por período y `member_id`:
+  - costo base laboral
+  - labor comercial atribuida
+  - carga interna excluida
+  - overhead comercial atribuible
+- la capa expone además explainability por cliente/período y health semántico mínimo
+
+Regla arquitectónica:
+- `client_labor_cost_allocation` sigue existiendo, pero queda como bridge/input interno
+- readers nuevos de Finance no deben volver a depender de `client_labor_cost_allocation` directamente
+- el contrato compartido para costo comercial pasa a ser:
+  - reader shared de `commercial_cost_attribution`
+  - o serving derivado que ya lo consuma (`operational_pl_snapshots`)
+
+Matriz de consumo:
+- Finance base / `client_economics`
+  - debe consumir `commercial_cost_attribution`
+- Cost Intelligence / `operational_pl`
+  - debe consumir `commercial_cost_attribution`
+- Agency / economics por espacio
+  - debe seguir sobre `operational_pl_snapshots`
+- People / person finance
+  - debe seguir sobre `member_capacity_economics`
+  - usando `commercial_cost_attribution` solo para explain cuando aplique
+
 ## Delta 2026-03-30 — Cost Intelligence ya opera como layer de management accounting
 
 Finance sigue siendo el owner del motor financiero central, pero ya no es la única surface que expone semántica de rentabilidad.
@@ -66,6 +98,7 @@ Finance es el módulo más grande del portal: 49 API routes, 13 páginas, 28 arc
 | `reconciliation_periods` | Postgres | `fin_reconciliation_periods` (fallback) | Migrado |
 | `bank_statement_rows` | Postgres | `fin_bank_statement_rows` (fallback) | Migrado |
 | `dte_emission_queue` | Postgres only | No | TASK-139 |
+| `commercial_cost_attribution` | Serving Postgres (`greenhouse_serving`) | No | Canónico materializado |
 
 ### BigQuery Cutover Plan
 
@@ -293,6 +326,7 @@ Finance genera 5 tipos de notificación via webhook bus:
 | Labor cost in P&L | Payroll → Finance | PnL endpoint lee `payroll_entries` directamente |
 | Expense linking | Finance → Payroll | `expenses.payroll_entry_id` + `member_id` |
 | Cost allocation | Payroll → Finance | `client_labor_cost_allocation` serving view |
+| Commercial cost attribution | Payroll/Capacity/Finance → Finance/Cost Intelligence | `commercial_cost_attribution` serving table |
 | Period status | Payroll → Finance | PnL solo incluye `approved`/`exported` |
 
 ### Finance ↔ People

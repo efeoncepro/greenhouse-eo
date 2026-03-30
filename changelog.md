@@ -9,6 +9,10 @@
 
 ## 2026-03-30
 
+- Se consolidó en arquitectura canónica el estado actual de `TASK-162`:
+  - `commercial_cost_attribution` quedó documentada como truth layer materializada
+  - Finance, Cost Intelligence y el modelo maestro ya explicitan la matriz de cutover por consumer
+  - `client_labor_cost_allocation` queda reafirmado como bridge/input histórico, no como contrato directo para lanes nuevas
 - `TASK-134` quedó formalmente cerrada:
   - Notifications institucionaliza `person-first` para recipient resolution
   - webhook consumers y projections ya comparten el mismo shape de recipient

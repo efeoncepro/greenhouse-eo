@@ -1,5 +1,36 @@
 # Greenhouse Architecture V1
 
+## Delta 2026-03-30 — TASK-162 ya dejó capa canónica materializada + estrategia de cutover
+
+La decisión de `commercial cost attribution` ya no debe leerse solo como framing.
+
+Estado arquitectónico vigente:
+- la truth layer ya existe como capa explícita y materializada:
+  - `greenhouse_serving.commercial_cost_attribution`
+- la capa ya tiene:
+  - reader shared
+  - materializer propio
+  - projection reactiva dedicada
+  - health semántico
+  - explain surface mínima
+- `operational_pl` ya consume esta capa en vez de recomponer labor + overhead desde bridges divergentes
+
+Política de consumo vigente:
+- `commercial_cost_attribution`
+  - truth layer canónica de costo comercial
+- `operational_pl_snapshots`
+  - serving derivado para rentabilidad por scope
+- `member_capacity_economics`
+  - serving derivado para costo/capacidad por miembro
+- `client_labor_cost_allocation`
+  - bridge histórico e input interno
+  - ya no debe tratarse como contrato directo para consumers nuevos
+
+Consecuencia arquitectónica:
+- el cutover no significa que todo el portal lea la tabla nueva directamente
+- Agency, Home, Nexa y surfaces resumidas deben seguir privilegiando serving derivado
+- Finance base, Cost Intelligence y explain surfaces sí deben apoyarse en la capa canónica/shared
+
 ## Delta 2026-03-30 — TASK-141 ya tiene primer slice runtime conservador
 
 Greenhouse ya no tiene solo un contrato documental para la migración `person-first`.

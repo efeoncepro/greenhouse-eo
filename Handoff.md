@@ -4,6 +4,24 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — consolidación arquitectónica de TASK-162
+
+### Objetivo
+- Dejar la estrategia de cutover de `commercial cost attribution` consolidada en arquitectura canónica, no solo en la task operativa.
+
+### Delta de ejecución
+- Se actualizaron las fuentes canónicas:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+- Quedó explícito que:
+  - `greenhouse_serving.commercial_cost_attribution` es la truth layer canónica
+  - `operational_pl_snapshots` y `member_capacity_economics` siguen siendo serving derivado por consumer
+  - `client_labor_cost_allocation` queda como bridge/input histórico y no como contrato consumidor nuevo
+
+### Validación ejecutada
+- `git diff --check`
+
 ## Sesión 2026-03-30 (session 2) — TASK-165 + TASK-164 + ISSUE-002
 
 ### Objetivo
