@@ -50,6 +50,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
   const [roleFilter, setRoleFilter] = useState<RoleFilter>('efeonce_internal')
   const [sectionFilter, setSectionFilter] = useState<string>('all')
   const [permissionsFocus, setPermissionsFocus] = useState<PermissionsFocus>('all')
+  const [bulkRoleCode, setBulkRoleCode] = useState<string>(data.roles[0]?.roleCode ?? '')
   const [previewUserId, setPreviewUserId] = useState<string>(data.users[0]?.userId ?? '')
   const [previewFocus, setPreviewFocus] = useState<PreviewFocus>('impact')
   const [editableViews, setEditableViews] = useState(data.views)
@@ -132,6 +133,18 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
 
     return data.roles.filter(role => role.tenantType === roleFilter)
   }, [data.roles, roleFilter])
+
+  useEffect(() => {
+    if (filteredRoles.length === 0) {
+      setBulkRoleCode('')
+
+      return
+    }
+
+    if (!filteredRoles.some(role => role.roleCode === bulkRoleCode)) {
+      setBulkRoleCode(filteredRoles[0]?.roleCode ?? '')
+    }
+  }, [bulkRoleCode, filteredRoles])
 
   const filteredViews = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
@@ -299,6 +312,49 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
             }
           : view
       )
+    )
+  }
+
+  const updateRoleAccessForViews = (roleCode: string, nextGrantedByViewCode: Map<string, boolean>) => {
+    setSaveError(null)
+    setSaveSuccess(null)
+    setEditableViews(current =>
+      current.map(view => {
+        if (!nextGrantedByViewCode.has(view.viewCode)) return view
+
+        return {
+          ...view,
+          roleAccess: {
+            ...view.roleAccess,
+            [roleCode]: Boolean(nextGrantedByViewCode.get(view.viewCode))
+          },
+          roleAccessSource: view.roleAccessSource
+            ? {
+                ...view.roleAccessSource,
+                [roleCode]: 'persisted'
+              }
+            : view.roleAccessSource
+        }
+      })
+    )
+  }
+
+  const applyBulkRoleAction = (mode: 'grant' | 'revoke' | 'reset') => {
+    if (!bulkRoleCode || filteredViews.length === 0) return
+
+    if (mode === 'reset') {
+      const originalAssignments = new Map(
+        filteredViews.map(view => [view.viewCode, Boolean(originalViewsByCode.get(view.viewCode)?.roleAccess[bulkRoleCode])])
+      )
+
+      updateRoleAccessForViews(bulkRoleCode, originalAssignments)
+
+      return
+    }
+
+    updateRoleAccessForViews(
+      bulkRoleCode,
+      new Map(filteredViews.map(view => [view.viewCode, mode === 'grant']))
     )
   }
 
@@ -568,6 +624,68 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                     </Button>
                   </Stack>
                 </Stack>
+
+                <Card variant='outlined'>
+                  <CardContent>
+                    <Stack spacing={2}>
+                      <Stack direction={{ xs: 'column', lg: 'row' }} spacing={2} justifyContent='space-between' alignItems={{ lg: 'center' }}>
+                        <Box>
+                          <Typography variant='h6'>Acciones masivas por rol</Typography>
+                          <Typography variant='body2' color='text.secondary'>
+                            Aplica grant, revoke o reset sobre las vistas filtradas para no editar una por una cuando el cambio es de lote.
+                          </Typography>
+                        </Box>
+                        <Chip
+                          size='small'
+                          variant='outlined'
+                          label={`${filteredViews.length} vista(s) en el foco actual`}
+                        />
+                      </Stack>
+                      <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems={{ md: 'center' }}>
+                        <TextField
+                          select
+                          size='small'
+                          label='Rol objetivo'
+                          value={bulkRoleCode}
+                          onChange={event => setBulkRoleCode(event.target.value)}
+                          sx={{ minWidth: 260 }}
+                          disabled={filteredRoles.length === 0}
+                        >
+                          {filteredRoles.map(role => (
+                            <MenuItem key={role.roleCode} value={role.roleCode}>
+                              {role.roleName} · {role.roleCode}
+                            </MenuItem>
+                          ))}
+                        </TextField>
+                        <Stack direction='row' spacing={1} flexWrap='wrap'>
+                          <Button
+                            variant='contained'
+                            color='success'
+                            onClick={() => applyBulkRoleAction('grant')}
+                            disabled={!bulkRoleCode || filteredViews.length === 0 || saving}
+                          >
+                            Conceder filtradas
+                          </Button>
+                          <Button
+                            variant='outlined'
+                            color='error'
+                            onClick={() => applyBulkRoleAction('revoke')}
+                            disabled={!bulkRoleCode || filteredViews.length === 0 || saving}
+                          >
+                            Revocar filtradas
+                          </Button>
+                          <Button
+                            variant='outlined'
+                            onClick={() => applyBulkRoleAction('reset')}
+                            disabled={!bulkRoleCode || filteredViews.length === 0 || saving}
+                          >
+                            Restablecer filtradas
+                          </Button>
+                        </Stack>
+                      </Stack>
+                    </Stack>
+                  </CardContent>
+                </Card>
 
                 <Box
                   sx={{

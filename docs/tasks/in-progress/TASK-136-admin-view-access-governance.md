@@ -238,6 +238,22 @@
 - Decisión vigente:
   - no
   - `/home` queda fuera del catálogo gobernable por ahora
+
+## Delta 2026-03-30 — `cliente.modulos` + acciones masivas en la matrix
+
+- Se agregó una nueva superficie client-facing gobernable:
+  - `cliente.modulos` → `/capabilities/**`
+- El portal cliente ya no debe exponer capability modules solo por `routeGroups`:
+  - el menú filtra la sección `Módulos` con `authorizedViews`
+  - el layout dinámico de `/capabilities/[moduleId]` exige `cliente.modulos` además de validar acceso al módulo específico
+- `/admin/views` ganó una mejora operativa pendiente:
+  - acciones masivas por rol sobre el set actualmente filtrado
+  - `conceder filtradas`
+  - `revocar filtradas`
+  - `restablecer filtradas`
+- Resultado:
+  - menos acceso transversal implícito en portal cliente
+  - mejor throughput de edición cuando el ajuste afecta un bloque entero de vistas
 - Rationale:
   - es el landing base de internos vía `portalHomePath`
   - funciona como ruta transversal segura de entrada, no como módulo privilege-gated independiente

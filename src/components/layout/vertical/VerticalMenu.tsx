@@ -143,15 +143,17 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
 
   // ── Módulos (client capability modules) ─────────────────────────────
   if (!isInternalUser && capabilityModules.length > 0) {
-    menuData.push({
-      isSection: true,
-      label: 'Módulos',
-      children: capabilityModules.map(module => ({
-        label: module.label,
-        href: module.route,
-        icon: module.icon
-      }))
-    })
+    if (canSeeView('cliente.modulos', true)) {
+      menuData.push({
+        isSection: true,
+        label: 'Módulos',
+        children: capabilityModules.map(module => ({
+          label: module.label,
+          href: module.route,
+          icon: module.icon
+        }))
+      })
+    }
   }
 
   // ── Gestión (agency) ────────────────────────────────────────────────

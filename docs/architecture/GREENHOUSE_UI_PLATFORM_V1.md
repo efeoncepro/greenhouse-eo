@@ -23,6 +23,19 @@ La plataforma UI ahora asume un patrón explícito de gobernanza de vistas:
 
 Esto convierte `Admin Center > Vistas y acceso` en un componente de plataforma, no en una pantalla ad hoc.
 
+## Delta 2026-03-30 — capability modules cliente entran al modelo gobernable
+
+La sección `Módulos` del portal cliente ya no debe tratarse como navegación libre derivada solo desde `routeGroups`.
+
+Estado vigente:
+- `cliente.modulos` es el access point gobernable del carril `/capabilities/**`
+- el menú solo debe exponer capability modules cuando la sesión conserve esa vista
+- el acceso al layout dinámico debe pasar dos checks:
+  - `view_code` broad del carril (`cliente.modulos`)
+  - autorización específica del módulo (`verifyCapabilityModuleAccess`)
+
+Esto deja explícito que los capability modules son parte del modelo de gobierno del portal y no un apéndice fuera de `/admin/views`.
+
 ## Stack Principal
 
 | Capa | Tecnología | Versión | Rol |

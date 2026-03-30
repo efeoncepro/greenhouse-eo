@@ -38,6 +38,14 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `/home` queda fuera del modelo de `view_code`
   - sigue siendo landing base de internos vía `portalHomePath`
 
+## Delta 2026-03-30 capability modules cliente ya forman parte del gobierno de vistas
+- Los capability modules client-facing ya no deben leerse como navegación implícita derivada solo desde `routeGroups`.
+- Nuevo access point gobernable:
+  - `cliente.modulos`
+- Regla operativa vigente:
+  - menú de `Módulos` visible solo si la sesión conserva `cliente.modulos`
+  - `/capabilities/[moduleId]` exige tanto ese `view_code` como la validación específica del módulo
+
 ## Delta 2026-03-30 Sentry incident reader hardening
 - `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.
 - Nuevo contrato soportado:

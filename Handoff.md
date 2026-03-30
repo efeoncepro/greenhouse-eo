@@ -37,6 +37,43 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 ### Razón corta
 - Gobernar `/home` como vista revocable hoy metería riesgo innecesario en el punto de entrada base de internos.
 
+## Sesión 2026-03-30 — TASK-136 cierra capability modules cliente y mejora bulk ops en la matrix
+
+### Completado
+- Se agregó `cliente.modulos` al catálogo gobernable para cubrir `/capabilities/**`.
+- El menú cliente ya no expone `Módulos` solo por `routeGroups`; ahora exige `authorizedViews` vía `cliente.modulos`.
+- El layout dinámico `src/app/(dashboard)/capabilities/[moduleId]/layout.tsx` ahora aplica:
+  - guard broad por `view_code` (`cliente.modulos`)
+  - guard fino por módulo (`verifyCapabilityModuleAccess`)
+- `/admin/views` ganó acciones masivas por rol sobre el set filtrado actual:
+  - conceder filtradas
+  - revocar filtradas
+  - restablecer filtradas
+
+### Archivos tocados
+- `src/lib/admin/view-access-catalog.ts`
+- `src/components/layout/vertical/VerticalMenu.tsx`
+- `src/app/(dashboard)/capabilities/[moduleId]/layout.tsx`
+- `src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx`
+- `docs/tasks/in-progress/TASK-136-admin-view-access-governance.md`
+- `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
+- `project_context.md`
+- `changelog.md`
+
+### Validación ejecutada
+- `pnpm exec eslint src/lib/admin/view-access-catalog.ts src/app/'(dashboard)'/capabilities/[moduleId]/layout.tsx src/components/layout/vertical/VerticalMenu.tsx src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx`
+- `pnpm build`
+
+### Limitación observada
+- `pnpm exec tsc --noEmit --pretty false` falló por drift ajeno en una ruta nueva ya presente en el árbol:
+  - `src/app/api/people/[memberId]/finance-impact/route.ts`
+- El build completo sí pasó, incluyendo `/capabilities/[moduleId]` y `/admin/views`.
+
+### Pendiente inmediato
+- El remanente fino de `TASK-136` ya se parece más a cleanup/cobertura residual que a un gap estructural:
+  - decidir si más access points transversales merecen `view_code` propio
+  - cerrar rutas profundas que aún hereden por layouts amplios
+
 ## Sesión 2026-03-30 — TASK-136 cierra más rutas terciarias y completa la operabilidad de `/admin/views`
 
 ### Completado

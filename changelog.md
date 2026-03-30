@@ -2,6 +2,8 @@
 
 ## 2026-03-30
 
+- `TASK-136` agrega `cliente.modulos` al catálogo de views gobernables y endurece `/capabilities/[moduleId]` para requerir tanto el access point broad del carril como el permiso específico del módulo.
+- `/admin/views` suma acciones masivas por rol sobre el set filtrado actual, permitiendo conceder, revocar o restablecer bloques completos de vistas sin editar celda por celda.
 - Se documentó además la excepción arquitectónica de `/home`: sigue fuera del modelo de `view_code` y se mantiene como landing transversal interna vía `portalHomePath`.
 - La arquitectura canónica ya documenta el modelo de gobernanza de vistas: `routeGroups` como capa broad y `view_code` / `authorizedViews` como capa fina, con `/admin/views` como superficie operativa oficial.
 - `TASK-136` amplió el catálogo de vistas client-facing con `cliente.campanas` y `cliente.notificaciones`, y esas superficies ya quedaron protegidas por layout en `/campanas/**`, `/campaigns/**` y `/notifications/**`.

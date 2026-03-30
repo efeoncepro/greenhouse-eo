@@ -448,6 +448,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'client'
   },
   {
+    viewCode: 'cliente.modulos',
+    section: 'cliente',
+    label: 'Módulos',
+    description: 'Acceso a capability modules visibles para la cuenta cliente.',
+    routePath: '/capabilities',
+    routeGroup: 'client'
+  },
+  {
     viewCode: 'cliente.notificaciones',
     section: 'cliente',
     label: 'Notificaciones',
