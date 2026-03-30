@@ -28,6 +28,9 @@
 - BigQuery queda solo como fallback explícito cuando el carril Postgres no está disponible o no está listo.
 - El request path principal de `Finance Clients` ya no nace desde `greenhouse.clients`, `greenhouse.fin_client_profiles` ni `greenhouse_conformed.crm_*`.
 - Con esto, el drift histórico de esta task queda resuelto: el runtime principal sí quedó cortado al grafo canónico actual.
+- Hardening adicional:
+  - `resolveFinanceClientContext()` ya no ejecuta fallback BigQuery ciego ante cualquier excepción de PostgreSQL
+  - solo conserva fallback para errores clasificados como permitidos por `shouldFallbackFromFinancePostgres()`
 
 ## Status
 

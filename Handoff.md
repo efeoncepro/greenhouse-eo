@@ -130,6 +130,25 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - `Finance Clients` conserva fallback BigQuery transicional por compatibilidad.
 - El request path principal ya no depende de BigQuery; el remanente dejó de ser blocker arquitectónico.
 
+## Sesión 2026-03-30 — hardening del resolver canónico Finance Clients
+
+### Objetivo
+- Evitar que `resolveFinanceClientContext()` tape errores arbitrarios del carril canónico detrás de fallback BigQuery.
+
+### Delta de ejecución
+- `src/lib/finance/canonical.ts` ahora consulta `shouldFallbackFromFinancePostgres()` antes de caer a BigQuery.
+- Nuevo test canónico:
+  - `src/lib/finance/canonical.test.ts`
+- Comportamiento fijado:
+  - Postgres-first cuando el carril está sano
+  - fallback BigQuery solo para errores permitidos de readiness/conectividad
+  - errores no permitidos ya no se esconden detrás de compatibilidad legacy
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/finance/canonical.test.ts src/app/api/finance/bigquery-write-cutover.test.ts src/app/api/finance/clients/read-cutover.test.ts src/lib/finance/bigquery-write-flag.test.ts`
+- `pnpm exec eslint src/lib/finance/canonical.ts src/lib/finance/canonical.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+
 ## Sesión 2026-03-30 — arranque de TASK-166 Finance BigQuery write cutover
 
 ### Objetivo

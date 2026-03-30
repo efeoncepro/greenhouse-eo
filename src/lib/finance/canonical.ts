@@ -7,6 +7,7 @@ import {
   runFinanceQuery
 } from '@/lib/finance/shared'
 import { resolveOrganizationForClient } from '@/lib/account-360/organization-identity'
+import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
 
 type ClientRow = {
   client_id: string
@@ -172,8 +173,11 @@ export const resolveFinanceClientContext = async ({
        )`,
       [normalizedClientProfileId, normalizedClientId, normalizedHubspotCompanyId]
     )
-  } catch {
-    // Fallback to BigQuery if Postgres not available
+  } catch (error) {
+    if (!shouldFallbackFromFinancePostgres(error)) {
+      throw error
+    }
+
     console.warn('[canonical] resolveFinanceClientContext: Postgres unavailable, falling back to BigQuery')
 
     const projectId = getFinanceProjectId()
