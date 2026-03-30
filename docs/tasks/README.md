@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-142`
+- siguiente ID disponible: `TASK-163`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -73,6 +73,7 @@ Primer bloque operativo asignado:
 - `TASK-134` nace como follow-on institucional para consolidar Notifications sobre identidad canónica `person-first`, sin reabrir el cierre funcional de `TASK-117` ni `TASK-129`.
 - `TASK-140` nace como follow-on de `TASK-136` para alinear `/admin/views` con el modelo persona-first del producto, sin reabrir la gobernanza por `view_code` ya cerrada.
 - `TASK-141` nace como contrato institucional más amplio para formalizar el consumo canónico de identidad humana en Greenhouse; `TASK-140` y `TASK-134` se leen como consumers/follow-ons concretos de esa política.
+- `TASK-162` nace como contrato institucional para consolidar la atribución comercial de costos entre Payroll, Team Capacity, Finance y Cost Intelligence antes de seguir expandiendo Agency Economics y Service P&L.
 - Criterio vigente: cerrar costo y guardrails de BigQuery como último remanente del bloque cloud baseline.
 
 ### Prioridad vigente — bloque `TASK-025` a `TASK-031`
@@ -178,6 +179,7 @@ Primer bloque operativo asignado:
 | 55 | `TASK-131` | [TASK-131-cloud-health-runtime-tooling-posture-separation.md](complete/TASK-131-cloud-health-runtime-tooling-posture-separation.md) | P1 | Alto | Medio | **Cerrada** | Health Cloud ya separa secretos runtime vs tooling: `migrator/admin` siguen visibles en `postgresAccessProfiles`, pero ya no degradan `overallStatus` del portal sano |
 | 56 | `TASK-140` | [TASK-140-admin-views-person-first-preview.md](to-do/TASK-140-admin-views-person-first-preview.md) | P1 | Alto | Medio | Diseño | Cortar el preview de `/admin/views` a un modelo persona-first, tomando el contrato canónico definido en `TASK-141` y manteniendo compatibilidad con overrides user-scoped |
 | 57 | `TASK-141` | [TASK-141-canonical-person-identity-consumption.md](to-do/TASK-141-canonical-person-identity-consumption.md) | P1 | Muy alto | Medio | Diseño | Formalizar el contrato enterprise del objeto persona en Greenhouse: persona como raíz humana, resolver canónico reusable, degradaciones explícitas, rollout gradual y follow-ons claros para `/admin/views` y notifications |
+| 58 | `TASK-162` | [TASK-162-canonical-commercial-cost-attribution.md](to-do/TASK-162-canonical-commercial-cost-attribution.md) | P0 | Muy alto | Alto | Diseño | Consolidar la truth layer de atribución comercial de costos entre Payroll, Team Capacity, Finance y Cost Intelligence, incluyendo outbox/reactive, cloud runtime, helpers, serving y consumers downstream |
 | 38 | ~~CODEX_TASK_Greenhouse_Email_Catalog_v1.md~~ | — | — | — | **Movida a spec** | Reclasificada como documento de referencia → `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md` |
 | 30 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | P3 | Medio | Medio | Parcial | Consolidación UX transversal de shells, vistas y navegación |
 | 31 | ~~CODEX_TASK_Typography_Hierarchy_Fix.md~~ | — | — | — | **Cerrada** | Jerarquía core absorbida en mergedTheme.ts; custom variants `monoId`, `monoAmount`, `kpiValue` para adopción gradual |

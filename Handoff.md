@@ -31,6 +31,21 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - Re-materializar `operational_pl` y verificar que filas stale de `Efeonce` desaparezcan del período afectado
 - Cerrar con validación + documentación final + commit/push
 
+## Sesión 2026-03-30 — Documentación de la capa canónica de commercial cost attribution
+
+### Objetivo
+- Dejar explícito en docs que la consolidación pendiente ya no debe pensarse como “más lógica dentro de Cost Intelligence”, sino como una capa canónica nueva de plataforma ya decidida.
+
+### Delta de ejecución
+- Se documentó que la capa de `commercial cost attribution` debe ubicarse entre:
+  - Payroll / Team Capacity / Finance base
+  - y Finance / Cost Intelligence / Agency / People / Home / Nexa
+- `TASK-162` queda como la lane institucional para esa capa.
+
+### Pendiente inmediato
+- Mover `TASK-162` a `in-progress` cuando empecemos implementación real.
+- Usarla como prerequisito semántico antes de profundizar más `Agency Economics`, `Service P&L` y scorecards financieros.
+
 ## Sesión 2026-03-30 — TASK-071 slice 1-3 consumers distribuidos
 
 ### Objetivo

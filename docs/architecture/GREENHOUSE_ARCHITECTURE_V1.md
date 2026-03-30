@@ -21,6 +21,44 @@ Regla arquitectónica:
 - Cost Intelligence es el layer operativo de management accounting y closure awareness.
 - Los consumers que necesiten margen, costo total, closure status o snapshot de período deberían preferir serving materializado antes de recomputar on-read.
 
+## Delta 2026-03-30 — Commercial cost attribution queda definido como capa canónica separada
+
+Greenhouse ya no debe resolver la atribución comercial de costos solo como una suma implícita de Payroll + Team Capacity + Finance bridges dentro de cada consumer.
+
+Decisión arquitectónica:
+- existe una capa canónica nueva de `commercial cost attribution`
+- esta capa se ubica entre:
+  - Payroll
+  - Team Capacity
+  - Finance base
+  y:
+  - Cost Intelligence
+  - Finance consumers
+  - Agency / Organization 360 / People / Home / Nexa
+
+Responsabilidad de la nueva capa:
+- resolver la verdad única de costo comercial atribuible por período
+- separar explícitamente:
+  - labor cost comercial
+  - carga interna / internal assignments
+  - overhead interno
+  - costo no billable o no atribuible
+- publicar una semántica reusable para serving, projections y consumers
+
+Regla de consumo:
+- Finance y Cost Intelligence deben consumir esta capa, no reinventar localmente la atribución
+- los demás módulos deben consumirla directa o indirectamente a través de serving materializado
+
+Módulos que deberían alimentarse desde esta capa:
+- Finance
+- Cost Intelligence
+- Agency
+- Organization 360
+- People
+- Home
+- Nexa
+- futuros `Service P&L`, `Campaign ↔ Service`, forecasting y scorecards financieros
+
 ## Delta 2026-03-29 — Release channels model reference
 
 Greenhouse maneja release channels principalmente por modulo o feature visible, con una capa opcional de canal global de plataforma.

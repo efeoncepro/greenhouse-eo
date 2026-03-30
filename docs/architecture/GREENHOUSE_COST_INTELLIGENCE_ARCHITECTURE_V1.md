@@ -34,6 +34,34 @@
   - `greenhouse_runtime` mantiene un permiso acotado de `DELETE` sobre `greenhouse_serving.operational_pl_snapshots`
   - se usa solo para purgar scopes viejos dentro de la misma revisión antes del upsert del snapshot vigente
 
+## Delta 2026-03-30 — Cost Intelligence consume una capa canónica previa
+
+Cost Intelligence no debería seguir siendo el lugar donde se “termina de inventar” la atribución comercial de costos.
+
+Decisión arquitectónica:
+- la atribución comercial debe consolidarse en una capa canónica previa
+- esa capa debe alimentar a Cost Intelligence con una verdad ya resuelta para:
+  - labor cost comercial
+  - costo interno excluido
+  - overhead atribuible
+  - metadata de fuente, razón y materialización
+
+Implicancia:
+- Cost Intelligence sigue siendo owner de:
+  - cierre de período
+  - `operational_pl`
+  - snapshots y closure awareness
+- pero deja de cargar con toda la semántica de attribution por su cuenta
+
+Consumers que se benefician de esta separación:
+- `/finance/intelligence`
+- Agency economics
+- Organization 360
+- People 360
+- Home
+- Nexa
+- futuros `service_economics` y bridges de campaign/scope
+
 ## Delta 2026-03-30 — Baseline del módulo ya implementada
 - El módulo de Cost Intelligence ya no está solo en diseño.
 - Estado implementado en repo:

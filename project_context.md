@@ -224,6 +224,25 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `greenhouse_runtime` necesita `DELETE` acotado sobre `greenhouse_serving.operational_pl_snapshots`
   - se usa solo para purgar snapshots obsoletos de la misma revisión antes del upsert vigente
 
+## Delta 2026-03-30 Commercial cost attribution queda definida como capa canónica
+- Greenhouse ya no debe leer la atribución comercial de costos como lógica repartida entre Payroll, Team Capacity, Finance y Cost Intelligence.
+- Decisión acordada:
+  - existe una capa canónica explícita de `commercial cost attribution`
+  - Payroll, Team Capacity y Finance siguen calculando sus piezas de dominio
+  - la verdad consolidada de costo comercial sale de una sola capa shared
+  - esa capa alimenta primero a:
+    - Finance
+    - Cost Intelligence
+  - y desde ahí a consumers derivados:
+    - Agency
+    - Organization 360
+    - People
+    - Home
+    - Nexa
+    - futuros Service P&L / Campaign bridges
+- Task canónica abierta:
+  - `TASK-162`
+
 ## Delta 2026-03-30 Sentry incident reader hardening
 - `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.
 - Nuevo contrato soportado:

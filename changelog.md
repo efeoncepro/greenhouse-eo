@@ -2,6 +2,13 @@
 
 ## 2026-03-30
 
+- Se documentó formalmente la decisión de una capa canónica de `commercial cost attribution`:
+  - no reemplaza a Finance ni a Cost Intelligence
+  - consolida una sola verdad de costo comercial por encima de Payroll, Team Capacity y Finance base
+  - alimenta primero a Finance y Cost Intelligence
+  - y desde ahí a Agency, Organization 360, People, Home, Nexa y futuros consumers financieros
+  - `TASK-162` queda abierta como lane institucional para implementarla
+
 - Se corrigió una desviación semántica importante entre Team Capacity y Cost Intelligence:
   - assignments internos de `Efeonce` (`space-efeonce`, `efeonce_internal`, `client_internal`) ya no compiten como clientes comerciales en la atribución de costo laboral
   - la regla ahora es shared entre `Agency > Team`, `member_capacity_economics`, `auto-allocation-rules`, `client_labor_cost_allocation` y `computeOperationalPl()`
