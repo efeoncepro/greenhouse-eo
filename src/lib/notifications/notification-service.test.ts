@@ -32,6 +32,7 @@ describe('NotificationService', () => {
     mockRunGreenhousePostgresQuery.mockImplementation(async (sql: unknown) => {
       if (typeof sql !== 'string') return []
       if (sql.includes('FROM greenhouse_notifications.notification_preferences')) return []
+
       if (sql.includes('INSERT INTO greenhouse_notifications.notifications')) {
         return [{ notification_id: 'notif-1' }]
       }
