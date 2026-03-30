@@ -30,6 +30,8 @@ type Props = {
 type RoleFilter = 'all' | 'efeonce_internal' | 'client'
 type ActiveTab = 'permissions' | 'preview' | 'roadmap'
 type OverrideMode = 'inherit' | 'grant' | 'revoke'
+type PermissionsFocus = 'all' | 'changed' | 'fallback'
+type PreviewFocus = 'all' | 'visible' | 'overrides' | 'impact'
 
 const SECTION_ACCENT: Record<string, 'primary' | 'info' | 'success' | 'warning' | 'secondary'> = {
   gestion: 'info',
@@ -47,7 +49,9 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
   const [query, setQuery] = useState('')
   const [roleFilter, setRoleFilter] = useState<RoleFilter>('efeonce_internal')
   const [sectionFilter, setSectionFilter] = useState<string>('all')
+  const [permissionsFocus, setPermissionsFocus] = useState<PermissionsFocus>('all')
   const [previewUserId, setPreviewUserId] = useState<string>(data.users[0]?.userId ?? '')
+  const [previewFocus, setPreviewFocus] = useState<PreviewFocus>('impact')
   const [editableViews, setEditableViews] = useState(data.views)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [saveSuccess, setSaveSuccess] = useState<string | null>(null)
@@ -71,6 +75,58 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
     return JSON.stringify(editableViews.map(view => view.roleAccess)) !== JSON.stringify(data.views.map(view => view.roleAccess))
   }, [data.views, editableViews])
 
+  const originalViewsByCode = useMemo(
+    () => new Map(data.views.map(view => [view.viewCode, view])),
+    [data.views]
+  )
+
+  const changedViewCodes = useMemo(
+    () =>
+      new Set(
+        editableViews
+          .filter(view =>
+            data.roles.some(
+              role => Boolean(view.roleAccess[role.roleCode]) !== Boolean(originalViewsByCode.get(view.viewCode)?.roleAccess[role.roleCode])
+            )
+          )
+          .map(view => view.viewCode)
+      ),
+    [data.roles, editableViews, originalViewsByCode]
+  )
+
+  const changedCellCount = useMemo(
+    () =>
+      editableViews.reduce(
+        (count, view) =>
+          count +
+          data.roles.filter(
+            role => Boolean(view.roleAccess[role.roleCode]) !== Boolean(originalViewsByCode.get(view.viewCode)?.roleAccess[role.roleCode])
+          ).length,
+        0
+      ),
+    [data.roles, editableViews, originalViewsByCode]
+  )
+
+  const fallbackViewCodes = useMemo(
+    () =>
+      new Set(
+        editableViews
+          .filter(view => Object.values(view.roleAccessSource ?? {}).includes('hardcoded_fallback'))
+          .map(view => view.viewCode)
+      ),
+    [editableViews]
+  )
+
+  const fallbackCellCount = useMemo(
+    () =>
+      editableViews.reduce(
+        (count, view) =>
+          count + Object.values(view.roleAccessSource ?? {}).filter(source => source === 'hardcoded_fallback').length,
+        0
+      ),
+    [editableViews]
+  )
+
   const filteredRoles = useMemo(() => {
     if (roleFilter === 'all') return data.roles
 
@@ -82,11 +138,13 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
 
     return editableViews.filter(view => {
       if (sectionFilter !== 'all' && view.section !== sectionFilter) return false
+      if (permissionsFocus === 'changed' && !changedViewCodes.has(view.viewCode)) return false
+      if (permissionsFocus === 'fallback' && !fallbackViewCodes.has(view.viewCode)) return false
       if (!normalizedQuery) return true
 
       return [view.label, view.description, view.routePath, view.viewCode].some(value => value.toLowerCase().includes(normalizedQuery))
     })
-  }, [editableViews, query, sectionFilter])
+  }, [changedViewCodes, editableViews, fallbackViewCodes, permissionsFocus, query, sectionFilter])
 
   const visibleSections = useMemo(
     () =>
@@ -150,6 +208,59 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
 
     return Array.from(current.values())
   }, [editableViews, previewUser, selectedUserOverrides])
+
+  const previewBaselineViews = useMemo(() => {
+    if (!previewUser) return []
+
+    return editableViews.filter(view => {
+      const roleGranted = previewUser.roleCodes.some(roleCode => Boolean(view.roleAccess[roleCode]))
+
+      if (roleGranted) return true
+      if (previewUser.routeGroups.includes(view.routeGroup)) return true
+      if (previewUser.routeGroups.includes('admin')) return ['admin', 'finance', 'hr', 'people', 'ai_tooling', 'internal'].includes(view.routeGroup)
+      if (view.routeGroup === 'people') return previewUser.roleCodes.includes('efeonce_operations') || previewUser.roleCodes.includes('hr_payroll')
+      if (view.routeGroup === 'internal') return previewUser.routeGroups.includes('internal')
+
+      return false
+    })
+  }, [editableViews, previewUser])
+
+  const previewGrantedByOverride = useMemo(() => {
+    const baselineCodes = new Set(previewBaselineViews.map(view => view.viewCode))
+
+    return previewViews.filter(view => !baselineCodes.has(view.viewCode))
+  }, [previewBaselineViews, previewViews])
+
+  const previewRevokedByOverride = useMemo(() => {
+    const visibleCodes = new Set(previewViews.map(view => view.viewCode))
+
+    return previewBaselineViews.filter(view => !visibleCodes.has(view.viewCode))
+  }, [previewBaselineViews, previewViews])
+
+  const previewOverrideCandidateViews = useMemo(() => {
+    if (!previewUser) return []
+
+    if (previewFocus === 'visible') {
+      return previewViews
+    }
+
+    if (previewFocus === 'overrides') {
+      const overrideCodes = new Set(selectedUserOverrides.map(override => override.viewCode))
+
+      return editableViews.filter(view => overrideCodes.has(view.viewCode))
+    }
+
+    if (previewFocus === 'impact') {
+      const impactCodes = new Set([
+        ...previewGrantedByOverride.map(view => view.viewCode),
+        ...previewRevokedByOverride.map(view => view.viewCode)
+      ])
+
+      return editableViews.filter(view => impactCodes.has(view.viewCode))
+    }
+
+    return editableViews
+  }, [editableViews, previewFocus, previewGrantedByOverride, previewRevokedByOverride, previewUser, previewViews, selectedUserOverrides])
 
   const previewSections = useMemo(
     () =>
@@ -336,21 +447,21 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
           <Box>
             <Stack direction='row' spacing={1.5} alignItems='center' sx={{ mb: 1.5 }}>
               <Chip size='small' color='primary' variant='tonal' label='TASK-136' />
-              <Chip size='small' variant='outlined' label='Baseline actual + UX slice' />
+              <Chip size='small' variant='outlined' label='Persistencia + enforcement activos' />
             </Stack>
             <Typography variant='h4' sx={{ mb: 1 }}>
               Vistas y acceso
             </Typography>
             <Typography color='text.secondary' sx={{ maxWidth: 920 }}>
-              Admin Center necesita una capa legible para gobernar qué secciones del portal ve cada perfil. Esta primera
-              superficie usa el baseline real actual de roles y route groups para exponer la matriz, probar la lectura del
-              módulo y preparar el salto a permisos configurables por vista.
+              Esta superficie ya gobierna vistas por rol, overrides por usuario, expiración operativa y lectura efectiva
+              de sesión. El objetivo de este panel ahora es ayudar a decidir cambios con menos ambigüedad: qué está
+              persistido, qué sigue en fallback y qué impacto tendría un ajuste antes de guardarlo.
             </Typography>
           </Box>
           <Alert severity={data.persistence?.rolesWithPersistedAssignments ? 'success' : 'info'} variant='outlined' sx={{ maxWidth: 460 }}>
             {data.persistence?.rolesWithPersistedAssignments
-              ? `Persistencia activa para ${data.persistence.rolesWithPersistedAssignments} rol(es). Overrides y cutover de sesión siguen pendientes.`
-              : 'Esta pantalla ya puede guardar assignments por rol. Overrides, auditoría expandida y cutover de sesión siguen pendientes.'}
+              ? `Persistencia activa para ${data.persistence.rolesWithPersistedAssignments} rol(es). La prioridad ahora es completar catálogo fino y reducir fallback.`
+              : 'La pantalla ya puede guardar assignments por rol, pero todavía conviene revisar qué vistas siguen dependiendo del baseline heredado.'}
           </Alert>
         </Stack>
       </Stack>
@@ -412,6 +523,18 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                     <TextField
                       select
                       size='small'
+                      label='Enfoque'
+                      value={permissionsFocus}
+                      onChange={event => setPermissionsFocus(event.target.value as PermissionsFocus)}
+                      sx={{ minWidth: 220 }}
+                    >
+                      <MenuItem value='all'>Todas las vistas</MenuItem>
+                      <MenuItem value='changed'>Solo vistas con cambios</MenuItem>
+                      <MenuItem value='fallback'>Solo vistas con fallback</MenuItem>
+                    </TextField>
+                    <TextField
+                      select
+                      size='small'
                       label='Roles visibles'
                       value={roleFilter}
                       onChange={event => setRoleFilter(event.target.value as RoleFilter)}
@@ -445,6 +568,18 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                     </Button>
                   </Stack>
                 </Stack>
+
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gap: 2,
+                    gridTemplateColumns: { xs: '1fr', md: 'repeat(3, minmax(0, 1fr))' }
+                  }}
+                >
+                  <ExecutiveMiniStatCard title='Cambios pendientes' value={String(changedCellCount)} detail='Celdas distintas al estado persistido actual' icon='tabler-pencil-check' tone='warning' />
+                  <ExecutiveMiniStatCard title='Vistas afectadas' value={String(changedViewCodes.size)} detail='Filas con al menos un rol cambiado' icon='tabler-table-options' tone='info' />
+                  <ExecutiveMiniStatCard title='Fallback heredado' value={String(fallbackCellCount)} detail='Celdas aún soportadas por baseline hardcoded' icon='tabler-layers-subtract' tone='error' />
+                </Box>
 
                 {visibleSections.map(section => (
                   <Card key={section.key} variant='outlined'>
@@ -604,10 +739,24 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                 </Stack>
 
                 {previewUser ? (
-                  <Card variant='outlined'>
-                    <CardContent>
-                      <Stack spacing={3}>
-                        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} justifyContent='space-between'>
+                  <Stack spacing={3}>
+                    <Box
+                      sx={{
+                        display: 'grid',
+                        gap: 2,
+                        gridTemplateColumns: { xs: '1fr', md: 'repeat(4, minmax(0, 1fr))' }
+                      }}
+                    >
+                      <ExecutiveMiniStatCard title='Baseline visible' value={String(previewBaselineViews.length)} detail='Vistas heredadas por rol antes del override' icon='tabler-layers-linked' tone='info' />
+                      <ExecutiveMiniStatCard title='Overrides activos' value={String(selectedUserOverrides.length)} detail='Grant o revoke configurados para este usuario' icon='tabler-adjustments-horizontal' tone='warning' />
+                      <ExecutiveMiniStatCard title='Grant extra' value={String(previewGrantedByOverride.length)} detail='Vistas añadidas sobre la baseline del rol' icon='tabler-circle-plus' tone='success' />
+                      <ExecutiveMiniStatCard title='Revoke efectivo' value={String(previewRevokedByOverride.length)} detail='Vistas ocultas respecto de la baseline del rol' icon='tabler-circle-minus' tone='error' />
+                    </Box>
+
+                    <Card variant='outlined'>
+                      <CardContent>
+                        <Stack spacing={3}>
+                          <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} justifyContent='space-between'>
                           <Stack direction='row' spacing={2} alignItems='center'>
                             <Avatar>{previewUser.fullName.slice(0, 1).toUpperCase()}</Avatar>
                             <Box>
@@ -643,14 +792,14 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                           </Stack>
                         </Stack>
 
-                        <Card variant='outlined'>
-                          <CardContent>
-                            <Stack spacing={2}>
+                          <Card variant='outlined'>
+                            <CardContent>
+                              <Stack spacing={2}>
                               <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} justifyContent='space-between' alignItems={{ md: 'center' }}>
                                 <Box>
                                   <Typography variant='h6'>Overrides por usuario</Typography>
                                   <Typography variant='body2' color='text.secondary'>
-                                    Cambia una vista entre `inherit`, `grant` y `revoke`. Puedes guardar este batch con expiración opcional y razón operativa.
+                                    Cambia una vista entre `inherit`, `grant` y `revoke`. Puedes concentrarte en visibles, overrides o impacto efectivo antes de guardar el batch.
                                   </Typography>
                                 </Box>
                                 <Stack direction='row' spacing={1}>
@@ -688,6 +837,20 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                                 helperText='Opcional. Se aplica al batch de overrides que guardes para este usuario.'
                               />
 
+                              <TextField
+                                select
+                                size='small'
+                                label='Qué revisar en el panel'
+                                value={previewFocus}
+                                onChange={event => setPreviewFocus(event.target.value as PreviewFocus)}
+                                sx={{ maxWidth: 320 }}
+                              >
+                                <MenuItem value='impact'>Solo impacto efectivo</MenuItem>
+                                <MenuItem value='overrides'>Solo vistas con override</MenuItem>
+                                <MenuItem value='visible'>Solo vistas visibles</MenuItem>
+                                <MenuItem value='all'>Todas las vistas</MenuItem>
+                              </TextField>
+
                               {overrideError ? <Alert severity='error'>{overrideError}</Alert> : null}
                               {overrideSuccess ? <Alert severity='success'>{overrideSuccess}</Alert> : null}
 
@@ -698,7 +861,11 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                                   gridTemplateColumns: { xs: '1fr', xl: 'repeat(2, minmax(0, 1fr))' }
                                 }}
                               >
-                                {editableViews.map(view => {
+                                {previewOverrideCandidateViews.length === 0 ? (
+                                  <Alert severity='info' variant='outlined'>
+                                    No hay vistas para este enfoque. Cambia el filtro para revisar baseline completa, overrides activos o impacto efectivo.
+                                  </Alert>
+                                ) : previewOverrideCandidateViews.map(view => {
                                   const mode = getUserOverrideMode(view.viewCode)
 
                                   return (
@@ -740,15 +907,15 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                                   )
                                 })}
                               </Box>
-                            </Stack>
-                          </CardContent>
-                        </Card>
+                              </Stack>
+                            </CardContent>
+                          </Card>
 
-                        <Divider />
+                          <Divider />
 
-                        <Card variant='outlined'>
-                          <CardContent>
-                            <Stack spacing={2}>
+                          <Card variant='outlined'>
+                            <CardContent>
+                              <Stack spacing={2}>
                               <Typography variant='h6'>Auditoría reciente</Typography>
                               <Typography variant='body2' color='text.secondary'>
                                 Últimos eventos visibles de access governance para este usuario.
@@ -792,20 +959,20 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                                   ))}
                                 </Stack>
                               )}
-                            </Stack>
-                          </CardContent>
-                        </Card>
+                              </Stack>
+                            </CardContent>
+                          </Card>
 
-                        <Box
-                          sx={{
-                            display: 'grid',
-                            gap: 3,
-                            gridTemplateColumns: { xs: '1fr', xl: '340px minmax(0, 1fr)' }
-                          }}
-                        >
-                          <Card variant='outlined'>
-                            <CardContent>
-                              <Stack spacing={2}>
+                          <Box
+                            sx={{
+                              display: 'grid',
+                              gap: 3,
+                              gridTemplateColumns: { xs: '1fr', xl: '340px minmax(0, 1fr)' }
+                            }}
+                          >
+                            <Card variant='outlined'>
+                              <CardContent>
+                                <Stack spacing={2}>
                                 <Typography variant='h6'>Sidebar simulada</Typography>
                                 <Typography variant='body2' color='text.secondary'>
                                   Lectura resumida de lo que vería este usuario en navegación.
@@ -830,17 +997,27 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                                     ))}
                                   </Stack>
                                 ))}
-                              </Stack>
-                            </CardContent>
-                          </Card>
+                                </Stack>
+                              </CardContent>
+                            </Card>
 
-                          <Card variant='outlined'>
-                            <CardContent>
-                              <Stack spacing={2}>
+                            <Card variant='outlined'>
+                              <CardContent>
+                                <Stack spacing={2}>
                                 <Typography variant='h6'>Detalle de vistas visibles</Typography>
                                 <Typography variant='body2' color='text.secondary'>
                                   Aquí ya se ve la lectura efectiva entre baseline por rol y overrides por usuario.
                                 </Typography>
+                                {previewGrantedByOverride.length > 0 ? (
+                                  <Alert severity='success' variant='outlined'>
+                                    {previewGrantedByOverride.length} vista(s) quedan visibles solo por override grant.
+                                  </Alert>
+                                ) : null}
+                                {previewRevokedByOverride.length > 0 ? (
+                                  <Alert severity='warning' variant='outlined'>
+                                    {previewRevokedByOverride.length} vista(s) salen del menú efectivo por override revoke.
+                                  </Alert>
+                                ) : null}
                                 {previewSections.map(section => (
                                   <Stack key={section.key} spacing={1.25}>
                                     <Stack direction='row' spacing={1} alignItems='center'>
@@ -867,37 +1044,49 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                                           </Typography>
                                           <Stack direction='row' spacing={1} flexWrap='wrap'>
                                             <Chip size='small' variant='outlined' label={view.routePath} />
-                                            <Chip
-                                              size='small'
-                                              color={
-                                                getUserOverrideMode(view.viewCode) === 'grant'
-                                                  ? 'success'
-                                                  : getUserOverrideMode(view.viewCode) === 'revoke'
-                                                    ? 'error'
-                                                    : 'info'
-                                              }
-                                              variant='tonal'
-                                              label={
-                                                getUserOverrideMode(view.viewCode) === 'grant'
-                                                  ? 'Override grant'
-                                                  : getUserOverrideMode(view.viewCode) === 'revoke'
-                                                    ? 'Override revoke'
-                                                    : 'Baseline por rol'
-                                              }
-                                            />
+                                            <Chip size='small' color={previewGrantedByOverride.some(candidate => candidate.viewCode === view.viewCode) ? 'success' : 'info'} variant='tonal' label={previewGrantedByOverride.some(candidate => candidate.viewCode === view.viewCode) ? 'Grant extra' : 'Baseline por rol'} />
                                           </Stack>
                                         </Stack>
                                       </Box>
                                     ))}
                                   </Stack>
                                 ))}
-                              </Stack>
-                            </CardContent>
-                          </Card>
-                        </Box>
-                      </Stack>
-                    </CardContent>
-                  </Card>
+                                {previewRevokedByOverride.length > 0 ? (
+                                  <Stack spacing={1.25}>
+                                    <Typography variant='h6'>Vistas ocultas por revoke</Typography>
+                                    {previewRevokedByOverride.map(view => (
+                                      <Box
+                                        key={`revoked-${view.viewCode}`}
+                                        sx={{
+                                          border: theme => `1px solid ${theme.palette.divider}`,
+                                          borderRadius: 1,
+                                          p: 1.5
+                                        }}
+                                      >
+                                        <Stack spacing={0.75}>
+                                          <Typography color='text.primary' className='font-medium'>
+                                            {view.label}
+                                          </Typography>
+                                          <Typography variant='body2' color='text.secondary'>
+                                            {view.description}
+                                          </Typography>
+                                          <Stack direction='row' spacing={1} flexWrap='wrap'>
+                                            <Chip size='small' variant='outlined' label={view.routePath} />
+                                            <Chip size='small' color='error' variant='tonal' label='Oculta por override revoke' />
+                                          </Stack>
+                                        </Stack>
+                                      </Box>
+                                    ))}
+                                  </Stack>
+                                ) : null}
+                                </Stack>
+                              </CardContent>
+                            </Card>
+                          </Box>
+                        </Stack>
+                      </CardContent>
+                    </Card>
+                  </Stack>
                 ) : null}
               </Stack>
             ) : null}
@@ -914,9 +1103,9 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                   <CardContent>
                     <Stack spacing={2}>
                       <Chip size='small' color='warning' variant='tonal' label='Siguiente slice' />
-                      <Typography variant='h6'>Overrides por usuario</Typography>
+                      <Typography variant='h6'>Rutas terciarias</Typography>
                       <Typography color='text.secondary'>
-                        Grant o revoke ya quedó activo y ahora también hay expiración opcional por batch + auditoría visible. El remanente es edición más fina por vista y vencimiento automático más rico.
+                        El remanente fino ahora vive en superficies menos visibles del árbol: detalles, subpaths y access points secundarios que todavía conviene modelar con `view_code` propio.
                       </Typography>
                     </Stack>
                   </CardContent>
@@ -925,9 +1114,9 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                   <CardContent>
                     <Stack spacing={2}>
                       <Chip size='small' color='warning' variant='tonal' label='Siguiente slice' />
-                      <Typography variant='h6'>Persistencia configurable</Typography>
+                      <Typography variant='h6'>Operación del panel</Typography>
                       <Typography color='text.secondary'>
-                        Reemplazar el mapping hardcoded por `view_registry`, `role_view_assignments` y resolución híbrida con fallback seguro.
+                        La matrix ya guarda, pero todavía puede crecer con bulk actions, edición por sección y una lectura más explícita de drift entre fallback y catálogo persistido.
                       </Typography>
                     </Stack>
                   </CardContent>
@@ -936,9 +1125,9 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                   <CardContent>
                     <Stack spacing={2}>
                       <Chip size='small' color='warning' variant='tonal' label='Siguiente slice' />
-                      <Typography variant='h6'>Auditoría y notificación</Typography>
+                      <Typography variant='h6'>Auditoría y cleanup</Typography>
                       <Typography color='text.secondary'>
-                        Historial de cambios, outbox `identity.view_access.changed` y aviso al usuario afectado cuando cambie su acceso.
+                        Ya existe notificación reactiva y expiración operativa. El siguiente refinamiento natural es mostrar mejor el histórico completo y los eventos automáticos dentro de la misma UI.
                       </Typography>
                     </Stack>
                   </CardContent>

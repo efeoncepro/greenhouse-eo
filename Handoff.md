@@ -4,6 +4,45 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — TASK-136 cierra más rutas terciarias y completa la operabilidad de `/admin/views`
+
+### Completado
+- Se ampliaron superficies gobernables client-facing en `view_registry`:
+  - `cliente.campanas`
+  - `cliente.notificaciones`
+- Nuevos guards por layout activos en:
+  - `src/app/(dashboard)/campaigns/layout.tsx`
+  - `src/app/(dashboard)/campanas/layout.tsx`
+  - `src/app/(dashboard)/notifications/layout.tsx`
+- `/admin/views` ya no se comporta solo como matrix editable básica:
+  - resumen de cambios pendientes vs estado persistido
+  - foco sobre vistas que siguen en fallback hardcoded
+  - preview con baseline visible, overrides activos, grants extra y revokes efectivos
+  - filtro del panel de overrides por `impact / overrides / visibles / todas`
+  - lectura más clara de vistas ocultas por revoke
+
+### Archivos tocados
+- `src/lib/admin/view-access-catalog.ts`
+- `src/app/(dashboard)/campaigns/layout.tsx`
+- `src/app/(dashboard)/campanas/layout.tsx`
+- `src/app/(dashboard)/notifications/layout.tsx`
+- `src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx`
+- `docs/tasks/in-progress/TASK-136-admin-view-access-governance.md`
+- `docs/tasks/README.md`
+- `changelog.md`
+
+### Validación ejecutada
+- `pnpm exec eslint src/lib/admin/view-access-catalog.ts src/app/'(dashboard)'/campaigns/layout.tsx src/app/'(dashboard)'/campanas/layout.tsx src/app/'(dashboard)'/notifications/layout.tsx src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- `home` y algunos access points transversales siguen sin `view_code` propio porque todavía conviene decidir si deben ser superficies gobernables o rutas base siempre disponibles para sesión autenticada.
+- Quedan cambios ajenos en el árbol fuera de este carril:
+  - `src/lib/operations/get-operations-overview.ts`
+  - `src/views/greenhouse/admin/AdminOpsHealthView.tsx`
+  - `src/lib/finance/dte-emission-queue.test.ts`
+
 ## Sesión 2026-03-30 — TASK-136 agrega notificación reactiva al usuario afectado
 
 ### Completado

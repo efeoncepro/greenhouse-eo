@@ -217,6 +217,21 @@
   - solo se notifica cuando cambia el acceso efectivo
   - cambios de razón sin cambio de vistas no generan notificación adicional
 
+## Delta 2026-03-30 — catálogo fino en campañas/notificaciones + matrix UI más operable
+
+- Se agregaron nuevas superficies explícitas del portal cliente:
+  - `cliente.campanas` → `/campanas/**`
+  - `cliente.notificaciones` → `/notifications/**`
+- También se endureció `/campaigns/**` usando `gestion.campanas` como ownership explícito del carril interno de campañas.
+- `/admin/views` subió de nivel operativo:
+  - ahora muestra cambios pendientes vs persistido
+  - permite enfocar la matrix en vistas con cambio o vistas aún soportadas por fallback
+  - el preview separa baseline visible, grants extra, revokes efectivos y overrides activos
+  - el panel de overrides ya puede enfocarse en `impact`, `overrides`, `visibles` o `todas`
+- Resultado del corte:
+  - menos rutas terciarias abiertas por omisión
+  - mejor capacidad de revisar impacto real antes de guardar cambios de acceso
+
 ## Summary
 
 Crear un módulo de gobernanza de vistas en Admin Center que permita a admins visualizar, asignar y revocar acceso a módulos/secciones del portal por perfil de rol, con override por usuario individual cuando sea necesario. Reemplaza el mapping hardcoded `role → route_groups` en `deriveRouteGroups()` por una tabla configurable desde la UI, sin perder el failsafe de la resolución actual.

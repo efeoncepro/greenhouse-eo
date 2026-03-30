@@ -438,5 +438,21 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     description: 'Novedades, cambios y comunicación continua del ecosistema.',
     routePath: '/updates',
     routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.campanas',
+    section: 'cliente',
+    label: 'Campañas',
+    description: 'Lectura client-facing de campañas, iniciativas y contexto asociado.',
+    routePath: '/campanas',
+    routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.notificaciones',
+    section: 'cliente',
+    label: 'Notificaciones',
+    description: 'Inbox y preferencias de avisos visibles para la sesión.',
+    routePath: '/notifications',
+    routeGroup: 'client'
   }
 ]
