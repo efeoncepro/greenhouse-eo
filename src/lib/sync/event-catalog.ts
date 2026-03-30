@@ -44,6 +44,7 @@ export const AGGREGATE_TYPES = {
   // Identity
   identityReconciliation: 'identity_reconciliation',
   identityProfile: 'identity_profile',
+  viewAccess: 'view_access',
 
   // Services
   service: 'service',
@@ -134,6 +135,9 @@ export const EVENT_TYPES = {
   emailVerificationRequested: 'identity.email_verification.requested',
   emailVerificationCompleted: 'identity.email_verification.completed',
 
+  // View Access
+  viewAccessOverrideChanged: 'access.view_override_changed',
+
   // Capacity Economics
   financeExchangeRateUpserted: 'finance.exchange_rate.upserted',
   financeOverheadUpdated: 'finance.overhead.updated',
@@ -176,6 +180,7 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.reconciliationApproved,
   EVENT_TYPES.dteDiscrepancyFound,
   EVENT_TYPES.profileLinked,
+  EVENT_TYPES.viewAccessOverrideChanged,
 
   // Person Intelligence triggers
   EVENT_TYPES.compensationUpdated,

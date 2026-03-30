@@ -47,6 +47,46 @@ export async function POST(request: Request) {
       throw new FinanceValidationError('Bulk expense creation supports up to 100 items per request.')
     }
 
+    // Pre-validation pass: validate all rows before creating any
+    const validationErrors: Array<{ index: number; field: string; message: string }> = []
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i]
+
+      if (!item.description || !normalizeString(item.description)) {
+        validationErrors.push({ index: i, field: 'description', message: 'Descripción requerida' })
+      }
+
+      if (!item.currency) {
+        validationErrors.push({ index: i, field: 'currency', message: 'Moneda requerida' })
+      } else if (!['CLP', 'USD'].includes(String(item.currency).toUpperCase())) {
+        validationErrors.push({ index: i, field: 'currency', message: `Moneda no válida: ${item.currency}` })
+      }
+
+      if (toNumber(item.subtotal) <= 0) {
+        validationErrors.push({ index: i, field: 'subtotal', message: 'Subtotal debe ser mayor a 0' })
+      }
+
+      const dateFields = ['paymentDate', 'documentDate', 'dueDate'] as const
+
+      for (const field of dateFields) {
+        const value = normalizeString(item[field])
+
+        if (value && !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+          validationErrors.push({ index: i, field, message: `Formato de fecha inválido: ${value}. Usa YYYY-MM-DD` })
+        }
+      }
+    }
+
+    if (validationErrors.length > 0) {
+      return NextResponse.json({
+        error: `${validationErrors.length} error(es) de validación en ${new Set(validationErrors.map(e => e.index)).size} fila(s)`,
+        validationErrors,
+        imported: 0,
+        skipped: items.length
+      }, { status: 400 })
+    }
+
     const projectId = getFinanceProjectId()
     const createdIds: string[] = []
 

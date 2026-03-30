@@ -297,6 +297,8 @@ export const getLatestExchangeRate = async ({
   return synced && synced.rate > 0 ? synced.rate : null
 }
 
+const EXCHANGE_RATE_STALE_DAYS = 7
+
 export const resolveExchangeRateToClp = async ({
   currency,
   requestedRate
@@ -321,6 +323,35 @@ export const resolveExchangeRateToClp = async ({
   }
 
   return roundCurrency(latestRate)
+}
+
+/**
+ * Check if the latest stored exchange rate is stale (older than EXCHANGE_RATE_STALE_DAYS).
+ * Returns null if no rate exists, or a staleness report.
+ */
+export const checkExchangeRateStaleness = async (
+  fromCurrency: FinanceCurrency = 'USD',
+  toCurrency: FinanceCurrency = 'CLP'
+): Promise<{ isStale: boolean; rateDateIso: string | null; ageDays: number; thresholdDays: number } | null> => {
+  try {
+    const { getLatestFinanceExchangeRateFromPostgres } = await import('@/lib/finance/postgres-store')
+
+    const latest = await getLatestFinanceExchangeRateFromPostgres({ fromCurrency, toCurrency })
+
+    if (!latest) return null
+
+    const rateDate = new Date(latest.rateDate)
+    const ageDays = Math.floor((Date.now() - rateDate.getTime()) / 86_400_000)
+
+    return {
+      isStale: ageDays > EXCHANGE_RATE_STALE_DAYS,
+      rateDateIso: latest.rateDate,
+      ageDays,
+      thresholdDays: EXCHANGE_RATE_STALE_DAYS
+    }
+  } catch {
+    return null
+  }
 }
 
 export const buildMonthlySequenceId = async ({

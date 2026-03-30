@@ -1,5 +1,13 @@
 import 'server-only'
 
+/**
+ * @deprecated TASK-139 — BigQuery reconciliation store.
+ * Use postgres-reconciliation.ts as the primary store.
+ * This file is retained as fallback during migration and will be removed
+ * when Postgres reconciliation runs stable for 30 days in production.
+ * See: docs/tasks/to-do/TASK-139-finance-module-hardening.md
+ */
+
 import { getLatestIncomePaymentContext, listUnreconciledIncomePayments, parseIncomePaymentsReceived, summarizeIncomeReconciliation } from '@/lib/finance/income-payments'
 import {
   FinanceValidationError,

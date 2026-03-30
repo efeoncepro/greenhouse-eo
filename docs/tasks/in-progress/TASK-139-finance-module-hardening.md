@@ -1,14 +1,25 @@
 # TASK-139 — Finance Module Hardening: Corrections, Cutover & Data Quality
 
+## Delta 2026-03-30 — Slices 1-7 implementados
+
+- Slice 1: `reconciliation.ts` y `income-payments.ts` marcados como `@deprecated` con nota de cutover
+- Slice 2: `POST /api/finance/income/reconcile-payments` — batch reconcilia income.amount_paid vs SUM(income_payments)
+- Slice 3: `checkExchangeRateStaleness()` en `shared.ts` — detecta rates >7 días
+- Slice 4: `dte-emission-queue.ts` — tabla + enqueue/claim/mark functions + cron `/api/cron/dte-emission-retry`
+- Slice 5: Bulk expense import ahora pre-valida todas las rows (descripción, moneda, subtotal >0, formato de fecha) y retorna reporte de errores sin crear nada si hay fallos
+- Slice 6: `FINANCE_BIGQUERY_WRITE_ENABLED` flag documentado en `.env.example`
+- Slice 7: `GET /api/finance/data-quality` — 6 checks (payment integrity, FX freshness, orphan expenses, income without client, DTE pending, overdue receivables) con overall status
+- Pendiente: DTE emission cron necesita integración real con Nubox API (actualmente stub), y el flag de BigQuery write necesita wiring en las rutas de write
+
 ## Status
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `in-progress` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Medio` |
-| Status real | `Diseño` |
+| Status real | `Implementación` |
 | Rank | — |
 | Domain | Finance / Data Quality / Cloud |
 | Sequence | Independiente de TASK-067→071, puede ejecutarse en paralelo |

@@ -1,5 +1,12 @@
 import 'server-only'
 
+/**
+ * @deprecated TASK-139 — BigQuery JSON payment parsing helpers.
+ * Postgres uses `greenhouse_finance.income_payments` table (not JSON).
+ * These helpers are retained for BigQuery fallback paths in reconciliation.ts.
+ * Will be removed when reconciliation.ts is fully cutover to Postgres.
+ */
+
 import { normalizeString, roundCurrency, toDateString, toNumber, toTimestampString } from '@/lib/finance/shared'
 
 export type IncomePaymentRecord = {
