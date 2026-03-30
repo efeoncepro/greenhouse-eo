@@ -6,6 +6,7 @@ import {
   getHubspotTableColumns
 } from '@/lib/finance/hubspot'
 import { resolveFinanceClientContext } from '@/lib/finance/canonical'
+import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
@@ -452,6 +453,16 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  if (!isFinanceBigQueryWriteEnabled()) {
+    return NextResponse.json(
+      {
+        error: 'Finance BigQuery fallback write is disabled for client profiles.',
+        code: 'FINANCE_BQ_WRITE_DISABLED'
+      },
+      { status: 503 }
+    )
   }
 
   await ensureFinanceInfrastructure()

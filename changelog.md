@@ -12,6 +12,9 @@
 - `TASK-166` cerró el lifecycle real de `FINANCE_BIGQUERY_WRITE_ENABLED`:
   - `income`, `expenses`, `expenses/bulk`, `accounts`, `exchange-rates` y `suppliers` ya pueden fallar cerrado con `FINANCE_BQ_WRITE_DISABLED` cuando PostgreSQL falla y el flag está apagado
   - `suppliers` pasó a write path Postgres-first; BigQuery queda solo como fallback transicional
+- `TASK-166` se expandió después del cierre inicial:
+  - `income/[id]`, `expenses/[id]`, `income/[id]/payment`, `clients`, `reconciliation/**` y los sync helpers principales ya respetan el mismo guard fail-closed
+  - `clients` queda explícitamente fail-closed mientras siga sin write path canónico en Postgres
 - `TASK-166` arrancó el cutover real del write fallback legacy de Finance:
   - nuevo helper `src/lib/finance/bigquery-write-flag.ts`
   - `POST /api/finance/income` y `POST /api/finance/expenses` ya respetan `FINANCE_BIGQUERY_WRITE_ENABLED`

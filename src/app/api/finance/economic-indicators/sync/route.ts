@@ -26,6 +26,15 @@ const parseIndicatorCodes = (value: string | null): EconomicIndicatorCode[] => {
     .filter((item): item is EconomicIndicatorCode => ECONOMIC_INDICATOR_CODES.includes(item as EconomicIndicatorCode))
 }
 
+const buildFinanceValidationErrorResponse = (error: FinanceValidationError) =>
+  NextResponse.json(
+    {
+      error: error.message,
+      ...(error.code ? { code: error.code } : {})
+    },
+    { status: error.statusCode }
+  )
+
 export async function GET(request: Request) {
   try {
     const { authorized, errorResponse } = requireCronAuth(request)
@@ -65,7 +74,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ synced: true, results })
   } catch (error) {
     if (error instanceof FinanceValidationError) {
-      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+      return buildFinanceValidationErrorResponse(error)
     }
 
     throw error
@@ -118,7 +127,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ synced: true, results })
   } catch (error) {
     if (error instanceof FinanceValidationError) {
-      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+      return buildFinanceValidationErrorResponse(error)
     }
 
     throw error

@@ -6,6 +6,10 @@ const mockUpsertFinanceExchangeRateInPostgres = vi.fn()
 const mockSeedFinanceSupplierInPostgres = vi.fn()
 const mockGetFinanceSupplierFromPostgres = vi.fn()
 const mockCreateFinanceExpenseInPostgres = vi.fn()
+const mockUpdateFinanceIncomeInPostgres = vi.fn()
+const mockUpdateFinanceExpenseInPostgres = vi.fn()
+const mockCreateFinanceIncomePaymentInPostgres = vi.fn()
+const mockCreateReconciliationPeriodInPostgres = vi.fn()
 const mockShouldFallbackFromFinancePostgres = vi.fn()
 
 vi.mock('@/lib/tenant/authorization', () => ({
@@ -22,7 +26,16 @@ vi.mock('@/lib/finance/postgres-store', () => ({
 
 vi.mock('@/lib/finance/postgres-store-slice2', () => ({
   createFinanceExpenseInPostgres: (...args: unknown[]) => mockCreateFinanceExpenseInPostgres(...args),
+  updateFinanceIncomeInPostgres: (...args: unknown[]) => mockUpdateFinanceIncomeInPostgres(...args),
+  updateFinanceExpenseInPostgres: (...args: unknown[]) => mockUpdateFinanceExpenseInPostgres(...args),
+  createFinanceIncomePaymentInPostgres: (...args: unknown[]) => mockCreateFinanceIncomePaymentInPostgres(...args),
+  getFinanceIncomeFromPostgres: vi.fn(),
+  getFinanceExpenseFromPostgres: vi.fn(),
   listFinanceExpensesFromPostgres: vi.fn().mockResolvedValue({ items: [] })
+}))
+
+vi.mock('@/lib/finance/postgres-reconciliation', () => ({
+  createReconciliationPeriodInPostgres: (...args: unknown[]) => mockCreateReconciliationPeriodInPostgres(...args)
 }))
 
 vi.mock('@/lib/providers/canonical', () => ({
@@ -44,6 +57,12 @@ import { POST as postExchangeRate } from '@/app/api/finance/exchange-rates/route
 import { POST as postSupplier } from '@/app/api/finance/suppliers/route'
 import { PUT as putSupplier } from '@/app/api/finance/suppliers/[id]/route'
 import { POST as postBulkExpenses } from '@/app/api/finance/expenses/bulk/route'
+import { PUT as putIncome } from '@/app/api/finance/income/[id]/route'
+import { PUT as putExpense } from '@/app/api/finance/expenses/[id]/route'
+import { POST as postIncomePayment } from '@/app/api/finance/income/[id]/payment/route'
+import { POST as postReconciliation } from '@/app/api/finance/reconciliation/route'
+import { POST as postClient } from '@/app/api/finance/clients/route'
+import { PUT as putClient } from '@/app/api/finance/clients/[id]/route'
 
 describe('Finance BigQuery write cutover guards', () => {
   beforeEach(() => {
@@ -193,5 +212,105 @@ describe('Finance BigQuery write cutover guards', () => {
     await expect(response.json()).resolves.toMatchObject({
       code: 'FINANCE_BQ_WRITE_DISABLED'
     })
+  })
+
+  it('fails closed for income updates when Postgres fails and fallback is disabled', async () => {
+    mockUpdateFinanceIncomeInPostgres.mockRejectedValue(new Error('pg down'))
+
+    const response = await putIncome(
+      new Request('http://localhost/api/finance/income/inc-1', {
+        method: 'PUT',
+        body: JSON.stringify({
+          clientName: 'Cliente Test'
+        })
+      }),
+      { params: Promise.resolve({ id: 'inc-1' }) }
+    )
+
+    expect(response.status).toBe(503)
+    await expect(response.json()).resolves.toMatchObject({ code: 'FINANCE_BQ_WRITE_DISABLED' })
+  })
+
+  it('fails closed for expense updates when Postgres fails and fallback is disabled', async () => {
+    mockUpdateFinanceExpenseInPostgres.mockRejectedValue(new Error('pg down'))
+
+    const response = await putExpense(
+      new Request('http://localhost/api/finance/expenses/exp-1', {
+        method: 'PUT',
+        body: JSON.stringify({
+          description: 'Nuevo texto'
+        })
+      }),
+      { params: Promise.resolve({ id: 'exp-1' }) }
+    )
+
+    expect(response.status).toBe(503)
+    await expect(response.json()).resolves.toMatchObject({ code: 'FINANCE_BQ_WRITE_DISABLED' })
+  })
+
+  it('fails closed for income payments when Postgres fails and fallback is disabled', async () => {
+    mockCreateFinanceIncomePaymentInPostgres.mockRejectedValue(new Error('pg down'))
+
+    const response = await postIncomePayment(
+      new Request('http://localhost/api/finance/income/inc-1/payment', {
+        method: 'POST',
+        body: JSON.stringify({
+          amount: 500,
+          paymentDate: '2026-03-30'
+        })
+      }),
+      { params: Promise.resolve({ id: 'inc-1' }) }
+    )
+
+    expect(response.status).toBe(503)
+    await expect(response.json()).resolves.toMatchObject({ code: 'FINANCE_BQ_WRITE_DISABLED' })
+  })
+
+  it('fails closed for reconciliation period creation when Postgres fails and fallback is disabled', async () => {
+    mockCreateReconciliationPeriodInPostgres.mockRejectedValue(new Error('pg down'))
+
+    const response = await postReconciliation(
+      new Request('http://localhost/api/finance/reconciliation', {
+        method: 'POST',
+        body: JSON.stringify({
+          accountId: 'acc-1',
+          year: 2026,
+          month: 3,
+          openingBalance: 0
+        })
+      })
+    )
+
+    expect(response.status).toBe(503)
+    await expect(response.json()).resolves.toMatchObject({ code: 'FINANCE_BQ_WRITE_DISABLED' })
+  })
+
+  it('fails closed for client creation when legacy write fallback is disabled', async () => {
+    const response = await postClient(
+      new Request('http://localhost/api/finance/clients', {
+        method: 'POST',
+        body: JSON.stringify({
+          clientName: 'Cliente Test'
+        })
+      })
+    )
+
+    expect(response.status).toBe(503)
+    await expect(response.json()).resolves.toMatchObject({ code: 'FINANCE_BQ_WRITE_DISABLED' })
+  })
+
+  it('fails closed for client updates when legacy write fallback is disabled', async () => {
+    const response = await putClient(
+      new Request('http://localhost/api/finance/clients/client-1', {
+        method: 'PUT',
+        body: JSON.stringify({
+          legalName: 'Cliente Renombrado'
+        })
+      }),
+      { params: Promise.resolve({ id: 'client-1' }) }
+    )
+
+    expect(response.status).toBe(503)
+    await expect(response.json()).resolves.toMatchObject({ code: 'FINANCE_BQ_WRITE_DISABLED' })
   })
 })

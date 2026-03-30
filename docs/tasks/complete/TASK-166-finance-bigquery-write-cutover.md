@@ -63,7 +63,7 @@ Reglas obligatorias:
 - `src/lib/finance/bigquery-write-flag.ts`
 - `src/app/api/finance/**`
 - `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
-- `docs/tasks/in-progress/TASK-166-finance-bigquery-write-cutover.md`
+- `docs/tasks/complete/TASK-166-finance-bigquery-write-cutover.md`
 
 ## Current Repo State
 
@@ -104,29 +104,63 @@ Reglas obligatorias:
   - cuando Postgres falla y `FINANCE_BIGQUERY_WRITE_ENABLED=false`, las rutas write cubiertas responden `503` con `FINANCE_BQ_WRITE_DISABLED`
   - BigQuery queda solo como fallback transicional cuando el flag sigue activo
 
+## Delta 2026-03-30 — slice 3 + expansión final del guard
+
+- Nuevas rutas cubiertas por el guard operativo:
+  - `PUT /api/finance/income/[id]`
+  - `PUT /api/finance/expenses/[id]`
+  - `POST /api/finance/income/[id]/payment`
+  - `POST /api/finance/reconciliation`
+  - `PUT /api/finance/reconciliation/[id]`
+  - `POST /api/finance/reconciliation/[id]/match`
+  - `POST /api/finance/reconciliation/[id]/unmatch`
+  - `POST /api/finance/reconciliation/[id]/exclude`
+  - `POST /api/finance/reconciliation/[id]/statements`
+  - `POST /api/finance/reconciliation/[id]/auto-match`
+  - `POST /api/finance/clients`
+  - `PUT /api/finance/clients/[id]`
+- Low-risk helpers ya alineados al mismo comportamiento:
+  - `src/lib/finance/economic-indicators.ts`
+  - `src/lib/finance/exchange-rates.ts`
+  - sus rutas `sync` ahora propagan `code: FINANCE_BQ_WRITE_DISABLED` cuando el helper falla cerrado
+- Regla operativa resultante:
+  - Finance ya no conserva write fallback legacy abierto en carriles core, master-data, reconciliation ni sync helpers principales
+  - `clients` queda fail-closed por diseño porque esas rutas siguen siendo BigQuery-first y todavía no existe write Postgres canónico reusable en el repo
+
 ## Delta 2026-03-30 — inventario clasificado del remanente
 
 ### Write paths ya cubiertos por TASK-166
 
 - `POST /api/finance/income`
 - `POST /api/finance/expenses`
+- `PUT /api/finance/income/[id]`
+- `PUT /api/finance/expenses/[id]`
+- `POST /api/finance/income/[id]/payment`
 - `POST /api/finance/expenses/bulk`
 - `POST /api/finance/accounts`
 - `PUT /api/finance/accounts/[id]`
 - `POST /api/finance/exchange-rates`
 - `POST /api/finance/suppliers`
 - `PUT /api/finance/suppliers/[id]`
+- `POST /api/finance/clients`
+- `PUT /api/finance/clients/[id]`
+- `POST /api/finance/reconciliation`
+- `PUT /api/finance/reconciliation/[id]`
+- `POST /api/finance/reconciliation/[id]/match`
+- `POST /api/finance/reconciliation/[id]/unmatch`
+- `POST /api/finance/reconciliation/[id]/exclude`
+- `POST /api/finance/reconciliation/[id]/statements`
+- `POST /api/finance/reconciliation/[id]/auto-match`
+- `economic-indicators` sync/upsert
+- `exchange-rates` sync/upsert
 
 ### Write paths residuales clasificados, no bloqueadores del cierre
 
-- siguen con fallback BigQuery porque pertenecen a carriles más especializados o follow-ons ya existentes:
-  - `PUT /api/finance/income/[id]`
-  - `PUT /api/finance/expenses/[id]`
-  - `POST /api/finance/income/[id]/payment`
-  - rutas `reconciliation/**`
-  - `economic-indicators` sync/upsert
+- residuales principales:
+  - `POST /api/finance/clients/sync`
+  - algunas rutas de lectura o sync siguen leyendo BigQuery por compatibilidad, pero ya no abren writes mutantes cuando el flag está apagado
 - criterio de cierre:
-  - `TASK-166` cierra el lifecycle real del flag y el cutover del bloque core/master-data
+  - `TASK-166` cierra el lifecycle real del flag y el cutover operativo del write fallback residual más sensible
   - el remanente se trata como deuda localizada por dominio, no como bloqueo del flag operativo
 
 ## Scope
@@ -164,11 +198,12 @@ Reglas obligatorias:
 - [x] Existe inventario explícito de rutas write que aún conservan fallback BigQuery
 - [x] Al menos un segundo bloque de rutas write queda cortado o clasificado
 - [x] La estrategia de rollout por entorno queda documentada
+- [x] El bloque `core detail/payment`, `clients`, `reconciliation` y sync helpers principales ya respeta el guard operativo
 
 ## Verification
 
 - `pnpm exec vitest run src/lib/finance/bigquery-write-flag.test.ts`
 - `pnpm exec vitest run src/lib/finance/bigquery-write-flag.test.ts src/app/api/finance/bigquery-write-cutover.test.ts`
-- `pnpm exec eslint src/lib/finance/bigquery-write-flag.ts src/lib/finance/bigquery-write-flag.test.ts src/app/api/finance/bigquery-write-cutover.test.ts src/app/api/finance/accounts/route.ts src/app/api/finance/accounts/[id]/route.ts src/app/api/finance/exchange-rates/route.ts src/app/api/finance/suppliers/route.ts src/app/api/finance/suppliers/[id]/route.ts src/app/api/finance/expenses/bulk/route.ts src/app/api/finance/income/route.ts src/app/api/finance/expenses/route.ts`
+- `pnpm exec eslint src/lib/finance/bigquery-write-flag.ts src/lib/finance/bigquery-write-flag.test.ts src/app/api/finance/bigquery-write-cutover.test.ts src/app/api/finance/accounts/route.ts src/app/api/finance/accounts/[id]/route.ts src/app/api/finance/clients/route.ts src/app/api/finance/clients/[id]/route.ts src/app/api/finance/exchange-rates/route.ts src/app/api/finance/exchange-rates/sync/route.ts src/app/api/finance/suppliers/route.ts src/app/api/finance/suppliers/[id]/route.ts src/app/api/finance/expenses/bulk/route.ts src/app/api/finance/expenses/[id]/route.ts src/app/api/finance/income/[id]/route.ts src/app/api/finance/income/[id]/payment/route.ts src/app/api/finance/reconciliation/route.ts src/app/api/finance/reconciliation/[id]/route.ts src/app/api/finance/reconciliation/[id]/match/route.ts src/app/api/finance/reconciliation/[id]/unmatch/route.ts src/app/api/finance/reconciliation/[id]/exclude/route.ts src/app/api/finance/reconciliation/[id]/statements/route.ts src/app/api/finance/reconciliation/[id]/auto-match/route.ts src/app/api/finance/economic-indicators/sync/route.ts src/lib/finance/economic-indicators.ts src/lib/finance/exchange-rates.ts`
 - `pnpm exec tsc --noEmit --pretty false`
 - validación automatizada fail-closed con `FINANCE_BIGQUERY_WRITE_ENABLED=false` vía route handlers

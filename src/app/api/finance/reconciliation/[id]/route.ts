@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
+import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
 import {
   getReconciliationPeriodDetailFromPostgres,
   updateReconciliationPeriodInPostgres,
@@ -253,6 +254,16 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     } catch (error) {
       if (!shouldFallbackFromFinancePostgres(error)) {
         throw error
+      }
+
+      if (!isFinanceBigQueryWriteEnabled()) {
+        return NextResponse.json(
+          {
+            error: 'Finance BigQuery fallback write is disabled. Postgres write path failed.',
+            code: 'FINANCE_BQ_WRITE_DISABLED'
+          },
+          { status: 503 }
+        )
       }
     }
 

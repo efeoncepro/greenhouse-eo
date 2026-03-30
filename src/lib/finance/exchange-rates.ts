@@ -1,4 +1,5 @@
 import {
+  FinanceValidationError,
   getFinanceProjectId,
   invertExchangeRate,
   normalizeString,
@@ -14,6 +15,7 @@ import {
   shouldFallbackFromFinancePostgres,
   upsertFinanceExchangeRateInPostgres
 } from '@/lib/finance/postgres-store'
+import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
 
 const MINDICADOR_BASE_URL = 'https://mindicador.cl/api'
 const OPEN_EXCHANGE_RATE_BASE_URL = 'https://open.er-api.com/v6'
@@ -32,6 +34,14 @@ type PersistedExchangeRate = {
   rateDate: string
   source: string
 }
+
+const createFinanceBigQueryWriteDisabledError = () =>
+  new FinanceValidationError(
+    'Finance BigQuery fallback write is disabled. Postgres write path failed.',
+    503,
+    undefined,
+    'FINANCE_BQ_WRITE_DISABLED'
+  )
 
 export const buildHistoricalMindicadorLookupDates = (requestedDate: string, lookbackDays = 7) => {
   const baseDate = new Date(`${requestedDate}T00:00:00Z`)
@@ -298,6 +308,10 @@ export const upsertExchangeRates = async (rates: PersistedExchangeRate[]) => {
       if (!shouldFallbackFromFinancePostgres(error)) {
         throw error
       }
+    }
+
+    if (!isFinanceBigQueryWriteEnabled()) {
+      throw createFinanceBigQueryWriteDisabledError()
     }
 
     const projectId = getFinanceProjectId()

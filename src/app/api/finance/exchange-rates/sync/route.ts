@@ -35,6 +35,15 @@ const syncAndRespond = async (rateDate?: string | null) => {
   return NextResponse.json(result)
 }
 
+const buildFinanceValidationErrorResponse = (error: FinanceValidationError) =>
+  NextResponse.json(
+    {
+      error: error.message,
+      ...(error.code ? { code: error.code } : {})
+    },
+    { status: error.statusCode }
+  )
+
 export async function GET(request: Request) {
   try {
     const { authorized, errorResponse } = requireCronAuth(request)
@@ -48,7 +57,7 @@ export async function GET(request: Request) {
     return await syncAndRespond(rateDate ? assertDateString(rateDate, 'rateDate') : null)
   } catch (error) {
     if (error instanceof FinanceValidationError) {
-      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+      return buildFinanceValidationErrorResponse(error)
     }
 
     throw error
@@ -72,7 +81,7 @@ export async function POST(request: Request) {
     return await syncAndRespond(rateDate)
   } catch (error) {
     if (error instanceof FinanceValidationError) {
-      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+      return buildFinanceValidationErrorResponse(error)
     }
 
     throw error

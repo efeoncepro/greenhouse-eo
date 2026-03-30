@@ -106,6 +106,10 @@ Ver `GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md` sección "Finance BigQuery →
 
 Flag de control: `FINANCE_BIGQUERY_WRITE_ENABLED` (default: true).
 
+Estado operativo post `TASK-166`:
+- `income`, `expenses`, `accounts`, `suppliers`, `exchange_rates`, `reconciliation` y los sync helpers principales ya respetan el guard fail-closed cuando PostgreSQL falla y el flag está apagado.
+- `clients` también falla cerrado con el mismo código (`FINANCE_BQ_WRITE_DISABLED`), pero sigue siendo BigQuery-first hasta que exista write path canónico en Postgres.
+
 ## P&L Endpoint — Motor Financiero Central
 
 ### `GET /api/finance/dashboard/pnl`

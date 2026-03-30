@@ -1,4 +1,5 @@
 import {
+  FinanceValidationError,
   getFinanceProjectId,
   normalizeString,
   roundDecimal,
@@ -15,6 +16,7 @@ import {
   type FinanceEconomicIndicatorRecord,
   upsertFinanceEconomicIndicatorInPostgres
 } from '@/lib/finance/postgres-store'
+import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
 import { buildUsdClpRatePairs, upsertExchangeRates } from '@/lib/finance/exchange-rates'
 
 const MINDICADOR_BASE_URL = 'https://mindicador.cl/api'
@@ -50,6 +52,14 @@ type EconomicIndicatorSnapshot = {
   unit: string
   frequency: EconomicIndicatorFrequency
 }
+
+const createFinanceBigQueryWriteDisabledError = () =>
+  new FinanceValidationError(
+    'Finance BigQuery fallback write is disabled. Postgres write path failed.',
+    503,
+    undefined,
+    'FINANCE_BQ_WRITE_DISABLED'
+  )
 
 const DEFINITIONS: Record<EconomicIndicatorCode, EconomicIndicatorDefinition> = {
   USD_CLP: { code: 'USD_CLP', path: 'dolar', unit: 'Pesos', frequency: 'daily', provider: 'mindicador' },
@@ -271,6 +281,10 @@ const upsertStoredEconomicIndicator = async (item: EconomicIndicatorSnapshot) =>
     if (!shouldFallbackFromFinancePostgres(error)) {
       throw error
     }
+  }
+
+  if (!isFinanceBigQueryWriteEnabled()) {
+    throw createFinanceBigQueryWriteDisabledError()
   }
 
   await upsertEconomicIndicatorsInBigQuery([item])

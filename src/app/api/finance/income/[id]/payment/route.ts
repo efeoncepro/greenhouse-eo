@@ -17,6 +17,7 @@ import {
 import { createFinanceIncomePaymentInPostgres } from '@/lib/finance/postgres-store-slice2'
 import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
 
 export const dynamic = 'force-dynamic'
 
@@ -35,8 +36,6 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-
-  await ensureFinanceInfrastructure()
 
   try {
     const { id: incomeId } = await params
@@ -68,6 +67,16 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     } catch (pgError) {
       if (!shouldFallbackFromFinancePostgres(pgError)) {
         throw pgError
+      }
+
+      if (!isFinanceBigQueryWriteEnabled()) {
+        return NextResponse.json(
+          {
+            error: 'Finance BigQuery fallback write is disabled. Postgres write path failed.',
+            code: 'FINANCE_BQ_WRITE_DISABLED'
+          },
+          { status: 503 }
+        )
       }
     }
 

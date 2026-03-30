@@ -8,17 +8,30 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Carriles cubiertos:
   - `POST /api/finance/income`
   - `POST /api/finance/expenses`
+  - `PUT /api/finance/income/[id]`
+  - `PUT /api/finance/expenses/[id]`
+  - `POST /api/finance/income/[id]/payment`
   - `POST /api/finance/expenses/bulk`
   - `POST /api/finance/accounts`
   - `PUT /api/finance/accounts/[id]`
   - `POST /api/finance/exchange-rates`
   - `POST /api/finance/suppliers`
   - `PUT /api/finance/suppliers/[id]`
+  - `POST /api/finance/clients`
+  - `PUT /api/finance/clients/[id]`
+  - `POST /api/finance/reconciliation`
+  - `PUT /api/finance/reconciliation/[id]`
+  - `POST /api/finance/reconciliation/[id]/match`
+  - `POST /api/finance/reconciliation/[id]/unmatch`
+  - `POST /api/finance/reconciliation/[id]/exclude`
+  - `POST /api/finance/reconciliation/[id]/statements`
+  - `POST /api/finance/reconciliation/[id]/auto-match`
 - Regla vigente:
   - si PostgreSQL falla y `FINANCE_BIGQUERY_WRITE_ENABLED=false`, estas rutas responden `503` con `FINANCE_BQ_WRITE_DISABLED`
   - BigQuery queda como fallback transicional solo cuando el flag permanece activo
 - Ajuste relevante:
   - `suppliers` ya es Postgres-first para writes y dejó de depender de BigQuery como path principal
+  - `clients` queda fail-closed con el mismo guard, pero todavía sin write path Postgres canónico
 
 ## Delta 2026-03-30 UI/UX skill stack local reforzada
 - Greenhouse ya no debe depender solo de skills globales de UI para frontend portal.

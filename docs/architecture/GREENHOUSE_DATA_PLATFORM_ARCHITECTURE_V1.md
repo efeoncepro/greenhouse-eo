@@ -217,11 +217,16 @@ Operational status after `TASK-166`:
 - covered core/master-data routes now fail closed with `503 FINANCE_BQ_WRITE_DISABLED` when Postgres fails and the flag is `false`
 - covered routes:
   - income create
+  - income update
+  - income payment create
   - expense create
+  - expense update
   - bulk expense create
   - accounts create/update
   - exchange-rates upsert
   - suppliers create/update
+  - clients create/update (fail-closed over BigQuery-first runtime)
+  - reconciliation create/update/match/unmatch/exclude/statements/auto-match
 - `suppliers` no longer uses BigQuery as its primary write path; it is Postgres-first with transitional fallback only when the flag remains enabled
 Cutover sequence: automated fail-closed validation with flag `false` → staging rollout with flag `false` on covered routes → production rollout with flag `false` → remove BQ write code route by route.
 

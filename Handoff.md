@@ -36,12 +36,34 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 
 ### Residual explícito
 - Siguen clasificados fuera de `TASK-166`:
+  - `POST /api/finance/clients/sync`
+  - reads legacy que aún consultan BigQuery por compatibilidad
+- El criterio vigente es tratarlos como lanes o follow-ons localizados, no como bloqueo del flag operativo core.
+
+## Sesión 2026-03-30 — expansión final del guard sobre core + reconciliation + clients
+
+### Objetivo
+- Extender el guard operativo más allá del bloque master-data inicial para que el remanente sensible de Finance tampoco pueda reabrir writes legacy con el flag apagado.
+
+### Delta de ejecución
+- El guard se extendió a:
   - `income/[id]`
   - `expenses/[id]`
   - `income/[id]/payment`
-  - `reconciliation/**`
-  - `economic-indicators`
-- El criterio vigente es tratarlos como lanes o follow-ons localizados, no como bloqueo del flag operativo core.
+  - `clients` create/update
+  - `reconciliation` create/update/match/unmatch/exclude/statements/auto-match
+- `economic-indicators.ts` y `exchange-rates.ts` ahora lanzan `FINANCE_BQ_WRITE_DISABLED` antes del write BigQuery fallback cuando PostgreSQL falla y el flag está apagado.
+- Las rutas `sync` ya propagan ese `code` en la respuesta.
+- Apoyo de subagentes utilizado:
+  - un worker cerró `clients`
+  - otro worker endureció `exchange-rates`/sync helpers
+  - un explorer auditó el bloque `core + reconciliation` para reducir riesgo antes del cambio
+
+### Validación ejecutada
+- `pnpm exec vitest run src/app/api/finance/bigquery-write-cutover.test.ts src/lib/finance/bigquery-write-flag.test.ts`
+- `pnpm exec eslint ...` del bloque expandido
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
 
 ## Sesión 2026-03-30 — arranque de TASK-166 Finance BigQuery write cutover
 
@@ -50,7 +72,7 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 
 ### Delta de ejecución
 - Nueva task activa:
-  - `docs/tasks/in-progress/TASK-166-finance-bigquery-write-cutover.md`
+  - `docs/tasks/complete/TASK-166-finance-bigquery-write-cutover.md`
 - Helper nuevo:
   - `src/lib/finance/bigquery-write-flag.ts`
 - Primer slice runtime:
