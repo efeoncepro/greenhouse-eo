@@ -86,7 +86,8 @@ async function handlePostgresFirst(monthKeys: string[]) {
   const [incomeRows, paymentRows, expenseRows] = await Promise.all([
     runGreenhousePostgresQuery<PgIncomeRow>(
       `SELECT invoice_date, total_amount, total_amount_clp, amount_paid, payment_status
-       FROM greenhouse_finance.income`
+       FROM greenhouse_finance.income
+       WHERE COALESCE(income_type, 'service_fee') != 'quote'`
     ),
     runGreenhousePostgresQuery<PgPaymentRow>(
       `SELECT ip.payment_date,

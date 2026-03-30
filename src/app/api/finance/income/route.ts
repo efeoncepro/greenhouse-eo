@@ -108,13 +108,14 @@ export async function GET(request: Request) {
   const serviceLine = searchParams.get('serviceLine')
   const fromDate = searchParams.get('fromDate')
   const toDate = searchParams.get('toDate')
+  const incomeType = searchParams.get('incomeType')
   const page = Math.max(1, toNumber(searchParams.get('page') || '1'))
   const pageSize = Math.min(200, Math.max(1, toNumber(searchParams.get('pageSize') || '50')))
 
   // ── Postgres-first path ──
   try {
     const result = await listFinanceIncomeFromPostgres({
-      status, clientId, clientProfileId, organizationId, serviceLine, fromDate, toDate, page, pageSize
+      status, clientId, clientProfileId, organizationId, serviceLine, fromDate, toDate, incomeType, page, pageSize
     })
 
     return NextResponse.json(result)

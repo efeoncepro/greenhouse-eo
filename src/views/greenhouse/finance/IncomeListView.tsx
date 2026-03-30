@@ -66,6 +66,7 @@ interface Income {
   amountPaid: number
   amountPending: number
   serviceLine: string | null
+  incomeType: string | null
   description: string | null
 
   // Nubox DTE fields
@@ -75,6 +76,16 @@ interface Income {
   dteTypeCode: string | null
   dteFolio: string | null
 }
+
+// Document type helpers
+const DOC_TYPE_CONFIG: Record<string, { label: string; color: 'primary' | 'error' | 'warning' }> = {
+  service_fee: { label: 'Factura', color: 'primary' },
+  credit_note: { label: 'N. crédito', color: 'error' },
+  debit_note: { label: 'N. débito', color: 'warning' }
+}
+
+const getDocTypeConfig = (incomeType: string | null) =>
+  DOC_TYPE_CONFIG[incomeType ?? 'service_fee'] ?? DOC_TYPE_CONFIG.service_fee
 
 // ---------------------------------------------------------------------------
 // Status config
@@ -147,6 +158,7 @@ const IncomeListView = () => {
   const [items, setItems] = useState<Income[]>([])
   const [total, setTotal] = useState(0)
   const [statusFilter, setStatusFilter] = useState('')
+  const [docTypeFilter, setDocTypeFilter] = useState('')
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [batchDialogOpen, setBatchDialogOpen] = useState(false)
@@ -161,6 +173,7 @@ const IncomeListView = () => {
       const params = new URLSearchParams()
 
       if (statusFilter) params.set('status', statusFilter)
+      if (docTypeFilter) params.set('incomeType', docTypeFilter)
 
       const res = await fetch(`/api/finance/income?${params.toString()}`)
 
@@ -173,7 +186,7 @@ const IncomeListView = () => {
     } finally {
       setLoading(false)
     }
-  }, [statusFilter])
+  }, [statusFilter, docTypeFilter])
 
   useEffect(() => {
     fetchIncome()
@@ -300,7 +313,21 @@ const IncomeListView = () => {
         </Box>
       )
     }),
-    incomeColumnHelper.accessor('clientName', { header: 'Cliente' }),
+    incomeColumnHelper.accessor('clientName', {
+      header: 'Cliente',
+      cell: ({ row }) => {
+        const docType = getDocTypeConfig(row.original.incomeType)
+
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant='body2'>{row.original.clientName}</Typography>
+            {row.original.incomeType && row.original.incomeType !== 'service_fee' && (
+              <CustomChip round='true' size='small' variant='tonal' color={docType.color} label={docType.label} sx={{ height: 20, fontSize: '0.65rem' }} />
+            )}
+          </Box>
+        )
+      }
+    }),
     incomeColumnHelper.accessor('invoiceDate', {
       header: 'Fecha',
       cell: ({ getValue }) => <Typography variant='body2'>{formatDate(getValue())}</Typography>
@@ -311,7 +338,15 @@ const IncomeListView = () => {
     }),
     incomeColumnHelper.accessor('totalAmount', {
       header: 'Monto',
-      cell: ({ row }) => <Typography variant='body2' fontWeight={600}>{formatAmount(row.original.totalAmount, row.original.currency)}</Typography>,
+      cell: ({ row }) => (
+        <Typography
+          variant='body2'
+          fontWeight={600}
+          color={row.original.totalAmount < 0 ? 'error.main' : undefined}
+        >
+          {formatAmount(row.original.totalAmount, row.original.currency)}
+        </Typography>
+      ),
       meta: { align: 'right' }
     }),
     incomeColumnHelper.accessor('paymentStatus', {
@@ -479,6 +514,19 @@ const IncomeListView = () => {
             {STATUS_OPTIONS.map(opt => (
               <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
             ))}
+          </CustomTextField>
+          <CustomTextField
+            select
+            size='small'
+            label='Tipo'
+            value={docTypeFilter}
+            onChange={e => setDocTypeFilter(e.target.value)}
+            sx={{ minWidth: 160 }}
+          >
+            <MenuItem value=''>Todos los tipos</MenuItem>
+            <MenuItem value='service_fee'>Facturas</MenuItem>
+            <MenuItem value='credit_note'>Notas de crédito</MenuItem>
+            <MenuItem value='debit_note'>Notas de débito</MenuItem>
           </CustomTextField>
         </CardContent>
         <Divider />
