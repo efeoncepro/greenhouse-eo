@@ -16,8 +16,9 @@
 - Home ya dejó los placeholders financieros:
   - `getHomeSnapshot()` ahora puede resolver `financeStatus` para roles internos/finance.
   - `HomeView` usa ese snapshot para construir `OperationStatus` con cierre del período y margen operativo reciente.
-- Nexa quedó pendiente en este corte:
-  - el consumer conversacional todavía no incorpora el resumen de Cost Intelligence en `lightContext`.
+- Nexa ya conserva el mismo resumen financiero del Home snapshot:
+  - `src/app/api/home/nexa/route.ts` ya incorpora `financeStatus` en `lightContext`.
+  - `src/lib/nexa/nexa-service.ts` ya recibe esa señal en el system prompt para responder mejor sobre cierre, margen y estado financiero.
 - Validación del slice:
   - `pnpm exec tsc --noEmit --pretty false` OK
   - `pnpm exec eslint ...` del slice OK

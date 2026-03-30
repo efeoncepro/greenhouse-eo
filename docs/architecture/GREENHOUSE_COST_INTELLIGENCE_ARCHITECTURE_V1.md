@@ -7,6 +7,7 @@
   - Organization 360 `Rentabilidad` vía `organization-economics.ts`
   - People 360 vía `latestCostSnapshot` en `PersonFinanceTab`
   - Home vía `financeStatus` en `getHomeSnapshot()`
+  - Nexa vía `financeStatus` resumido en `lightContext`
 - Patrón aplicado:
   - serving-first sobre `greenhouse_serving.operational_pl_snapshots`
   - `period_closure_status` para closure awareness

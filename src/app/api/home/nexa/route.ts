@@ -5,6 +5,7 @@ import { getServerSession } from 'next-auth'
 import { resolveNexaModel } from '@/config/nexa-models'
 import { authOptions } from '@/lib/auth'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
+import { canSeeFinanceStatus, getHomeFinanceStatus } from '@/lib/home/get-home-snapshot'
 import type { NexaRuntimeContext } from '@/lib/nexa/nexa-contract'
 import { NexaService } from '@/lib/nexa/nexa-service'
 import { persistNexaConversation } from '@/lib/nexa/store'
@@ -46,11 +47,19 @@ export async function POST(req: Request) {
       serviceModules: user.serviceModules || []
     })
 
+    const financeStatus = canSeeFinanceStatus({
+      roleCodes: user.roleCodes || [],
+      routeGroups: user.routeGroups || []
+    })
+      ? await getHomeFinanceStatus()
+      : null
+
     const lightContext = {
       user: { firstName, lastName: null, role: user.role || 'user' },
       greeting: { title: '', subtitle: '' },
       modules: modules.map(m => ({ id: m.id, title: m.label, subtitle: m.description || '', icon: m.icon, route: m.route, color: 'primary' as const })),
       tasks: [],
+      financeStatus,
       nexaIntro: '',
       computedAt: new Date().toISOString()
     }

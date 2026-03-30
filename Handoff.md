@@ -34,7 +34,7 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 
 ### Pendiente inmediato
 - Validación visual real del slice en Agency / Organization 360 / People / Home.
-- Decidir si `TASK-071` cierra con Home solamente o si Nexa debe entrar antes del cierre formal.
+- Nexa ya recibe el mismo `financeStatus` resumido en `lightContext`; el remanente ya no es funcional sino de validación/cierre formal.
 
 ## Sesión 2026-03-30 — TASK-069 cerrada + arquitectura del módulo endurecida
 

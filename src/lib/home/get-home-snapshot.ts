@@ -6,7 +6,7 @@ import { HOME_GREETINGS, HOME_SUBTITLE } from '@/config/home-greetings'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import type { HomeSnapshot, ModuleCard, PendingTask } from '@/types/home'
 
-interface HomeSnapshotInput {
+export interface HomeSnapshotInput {
   userId: string
   firstName: string
   lastName: string | null
@@ -20,11 +20,11 @@ interface HomeSnapshotInput {
 
 const MONTH_SHORT = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
 
-const canSeeFinanceStatus = (input: HomeSnapshotInput) =>
+export const canSeeFinanceStatus = (input: Pick<HomeSnapshotInput, 'roleCodes' | 'routeGroups'>) =>
   (input.routeGroups || []).includes('finance') ||
   (input.roleCodes || []).some(code => code === 'finance_manager' || code === 'efeonce_admin' || code === 'efeonce_operations')
 
-const getHomeFinanceStatus = async () => {
+export const getHomeFinanceStatus = async () => {
   const [currentPeriod, latestMargin] = await Promise.all([
     runGreenhousePostgresQuery<{
       period_year: number | string

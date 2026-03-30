@@ -10,7 +10,8 @@
   - Home ya reemplaza placeholders por un resumen financiero real del período para roles internos/finance
 - `TASK-071` sigue abierta:
   - falta validación visual real
-  - Nexa todavía no consume este resumen en `lightContext`
+  - el resumen ya también entra a Nexa `lightContext`; el remanente es de validación y cierre formal
+- Nexa ahora recibe el mismo `financeStatus` resumido del Home snapshot y lo incorpora al prompt de contexto para responder mejor sobre cierre de período y margen operativo.
 - Validación técnica del slice:
   - `pnpm exec tsc --noEmit --pretty false`
   - `pnpm exec eslint ...` del slice

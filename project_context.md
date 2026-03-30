@@ -184,7 +184,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Remanente explícito de la lane:
   - endurecer fallback semantics
   - validación visual real
-  - incorporar el mismo resumen a Nexa `lightContext`
+  - el resumen ya también entra a Nexa `lightContext`
+  - sigue pendiente solo validación visual/cierre limpio de la lane
 
 ## Delta 2026-03-30 Sentry incident reader hardening
 - `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.
