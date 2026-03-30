@@ -80,6 +80,10 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
         dte_type_code = $4,
         dte_folio = $5,
         organization_id = COALESCE(organization_id, $6),
+        balance_nubox = $7,
+        is_annulled = $8,
+        nubox_pdf_url = $9,
+        nubox_xml_url = $10,
         nubox_last_synced_at = NOW(),
         updated_at = NOW()
       WHERE nubox_document_id = $1`,
@@ -89,7 +93,11 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
         sale.emission_status_name,
         sale.dte_type_code,
         sale.folio,
-        sale.organization_id || null
+        sale.organization_id || null,
+        sale.balance ?? null,
+        isAnnulled,
+        sale.pdf_url,
+        sale.xml_url
       ]
     )
 
@@ -123,6 +131,12 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
         payment_status, amount_paid, income_type, is_annulled, service_line,
         nubox_document_id, nubox_sii_track_id, nubox_emission_status,
         dte_type_code, dte_folio, nubox_emitted_at, nubox_last_synced_at,
+        dte_type_abbreviation, dte_type_name,
+        exempt_amount, other_taxes_amount, withholding_amount,
+        balance_nubox, payment_form, payment_form_name,
+        origin, period_year, period_month,
+        nubox_pdf_url, nubox_xml_url, nubox_details_url, nubox_references_url,
+        client_main_activity,
         created_by_user_id, created_at, updated_at
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7,
@@ -131,6 +145,12 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
         $11, 0, $12, $19, NULL,
         $13, $14, $15,
         $16, $17, $18, NOW(),
+        $20, $21,
+        $22, $23, $24,
+        $25, $26, $27,
+        $28, $29, $30,
+        $31, $32, $33, $34,
+        $35,
         NULL, NOW(), NOW()
       )
       ON CONFLICT (income_id) DO UPDATE SET
@@ -142,6 +162,9 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
         nubox_emitted_at = COALESCE(EXCLUDED.nubox_emitted_at, greenhouse_finance.income.nubox_emitted_at),
         organization_id = COALESCE(greenhouse_finance.income.organization_id, EXCLUDED.organization_id),
         is_annulled = EXCLUDED.is_annulled,
+        balance_nubox = EXCLUDED.balance_nubox,
+        nubox_pdf_url = COALESCE(EXCLUDED.nubox_pdf_url, greenhouse_finance.income.nubox_pdf_url),
+        nubox_xml_url = COALESCE(EXCLUDED.nubox_xml_url, greenhouse_finance.income.nubox_xml_url),
         nubox_last_synced_at = NOW(),
         updated_at = NOW()`,
       [
@@ -163,7 +186,23 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
         sale.dte_type_code,
         sale.folio,
         sale.emission_date,
-        isAnnulled
+        isAnnulled,
+        sale.dte_type_abbreviation,
+        sale.dte_type_name,
+        sale.exempt_amount != null ? Number(sale.exempt_amount) * signMultiplier : null,
+        sale.other_taxes_amount != null ? Number(sale.other_taxes_amount) * signMultiplier : null,
+        sale.withholding_amount != null ? Number(sale.withholding_amount) * signMultiplier : null,
+        sale.balance ?? null,
+        sale.payment_form_code === '1' ? 'contado' : sale.payment_form_code === '2' ? 'credito' : null,
+        sale.payment_form_name,
+        sale.origin_name,
+        sale.period_year,
+        sale.period_month,
+        sale.pdf_url,
+        sale.xml_url,
+        sale.details_url,
+        sale.references_url,
+        sale.client_main_activity
       ]
     )
 
@@ -247,10 +286,21 @@ const upsertExpenseFromPurchase = async (
     await runGreenhousePostgresQuery(
       `UPDATE greenhouse_finance.expenses SET
         nubox_document_status = $2,
+        is_annulled = $3,
+        sii_document_status = $4,
+        balance_nubox = $5,
+        nubox_pdf_url = $6,
         nubox_last_synced_at = NOW(),
         updated_at = NOW()
       WHERE nubox_purchase_id = $1`,
-      [Number(purchase.nubox_purchase_id), purchase.document_status_name]
+      [
+        Number(purchase.nubox_purchase_id),
+        purchase.document_status_name,
+        purchase.is_annulled ?? false,
+        purchase.document_status_name,
+        purchase.balance ?? null,
+        purchase.pdf_url
+      ]
     )
 
     await publishOutboxEvent(
@@ -277,6 +327,8 @@ const upsertExpenseFromPurchase = async (
   // Create new expense record
   const expenseId = `EXP-NB-${purchase.nubox_purchase_id}`
 
+  const isExpenseAnnulled = purchase.is_annulled === true
+
   await withGreenhousePostgresTransaction(async client => {
     await client.query(
       `INSERT INTO greenhouse_finance.expenses (
@@ -287,6 +339,11 @@ const upsertExpenseFromPurchase = async (
         supplier_id, supplier_name,
         nubox_purchase_id, nubox_document_status, nubox_supplier_rut,
         nubox_supplier_name, nubox_origin, nubox_last_synced_at,
+        is_annulled, sii_document_status, receipt_date, purchase_type,
+        balance_nubox, vat_unrecoverable_amount, vat_fixed_assets_amount, vat_common_use_amount,
+        nubox_pdf_url, dte_type_code, dte_folio,
+        exempt_amount, other_taxes_amount, withholding_amount,
+        period_year, period_month,
         created_by_user_id, created_at, updated_at
       ) VALUES (
         $1, 'supplier', $2,
@@ -296,6 +353,11 @@ const upsertExpenseFromPurchase = async (
         $10, $11,
         $12, $13, $14,
         $15, $16, NOW(),
+        $17, $18, $19::date, $20,
+        $21, $22, $23, $24,
+        $25, $26, $27,
+        $28, $29, $30,
+        $31, $32,
         NULL, NOW(), NOW()
       )
       ON CONFLICT (expense_id) DO NOTHING`,
@@ -305,7 +367,7 @@ const upsertExpenseFromPurchase = async (
         Number(purchase.net_amount ?? 0),
         Number(purchase.tax_vat_amount ?? 0),
         Number(purchase.total_amount ?? 0),
-        Number(purchase.balance ?? -1) === 0 ? 'paid' : 'pending',
+        isExpenseAnnulled ? 'written_off' : (Number(purchase.balance ?? -1) === 0 ? 'paid' : 'pending'),
         purchase.folio,
         purchase.emission_date,
         purchase.due_date,
@@ -315,7 +377,23 @@ const upsertExpenseFromPurchase = async (
         purchase.document_status_name,
         purchase.supplier_rut,
         purchase.supplier_trade_name,
-        purchase.origin_name
+        purchase.origin_name,
+        isExpenseAnnulled,
+        purchase.document_status_name,
+        purchase.receipt_date,
+        purchase.purchase_type_name,
+        purchase.balance ?? null,
+        purchase.vat_unrecoverable_amount ?? null,
+        purchase.vat_fixed_assets_amount ?? null,
+        purchase.vat_common_use_amount ?? null,
+        purchase.pdf_url,
+        purchase.dte_type_code,
+        purchase.folio,
+        purchase.exempt_amount ?? null,
+        purchase.total_other_taxes_amount ?? null,
+        purchase.total_withholding_amount ?? null,
+        purchase.period_year,
+        purchase.period_month
       ]
     )
 
@@ -334,6 +412,25 @@ const upsertExpenseFromPurchase = async (
         })
       ]
     )
+
+    // Emit SII claim alert if document is "Reclamado"
+    if (purchase.document_status_name === 'Reclamado') {
+      await client.query(
+        `INSERT INTO greenhouse_sync.outbox_events (
+          event_id, aggregate_type, aggregate_id, event_type, payload_json, status, occurred_at
+        ) VALUES ($1, 'finance.expense', $2, 'finance.sii_claim.detected', $3::jsonb, 'pending', NOW())`,
+        [
+          `evt-${randomUUID()}`,
+          expenseId,
+          JSON.stringify({
+            expenseId,
+            supplierName: purchase.supplier_trade_name,
+            dteFolio: purchase.folio,
+            siiStatus: purchase.document_status_name
+          })
+        ]
+      )
+    }
   })
 
   return { action: 'created', autoProvisioned }

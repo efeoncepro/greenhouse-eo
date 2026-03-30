@@ -94,6 +94,14 @@ type PostgresIncomeRow = {
   dte_folio: string | null
   nubox_emitted_at: string | Date | null
   nubox_last_synced_at: string | Date | null
+
+  // Enrichment fields (TASK-165)
+  is_annulled: boolean
+  nubox_pdf_url: string | null
+  nubox_xml_url: string | null
+  referenced_income_id: string | null
+  payment_form: string | null
+  balance_nubox: unknown
 }
 
 type PostgresExpenseRow = {
@@ -154,6 +162,12 @@ type PostgresExpenseRow = {
   nubox_supplier_name: string | null
   nubox_origin: string | null
   nubox_last_synced_at: string | Date | null
+
+  // Enrichment fields (TASK-165)
+  is_annulled: boolean
+  sii_document_status: string | null
+  nubox_pdf_url: string | null
+  balance_nubox: unknown
 }
 
 type PostgresIncomePaymentRow = {
@@ -223,6 +237,14 @@ export type FinanceIncomeRecord = {
   dteFolio: string | null
   nuboxEmittedAt: string | null
   nuboxLastSyncedAt: string | null
+
+  // Enrichment fields (TASK-165)
+  isAnnulled: boolean
+  nuboxPdfUrl: string | null
+  nuboxXmlUrl: string | null
+  referencedIncomeId: string | null
+  paymentForm: string | null
+  balanceNubox: number | null
 }
 
 export type CostCategory = 'direct_labor' | 'indirect_labor' | 'operational' | 'infrastructure' | 'tax_social'
@@ -287,6 +309,12 @@ export type FinanceExpenseRecord = {
   nuboxSupplierName: string | null
   nuboxOrigin: string | null
   nuboxLastSyncedAt: string | null
+
+  // Enrichment fields (TASK-165)
+  isAnnulled: boolean
+  siiDocumentStatus: string | null
+  nuboxPdfUrl: string | null
+  balanceNubox: number | null
 }
 
 export type CostAllocationRecord = {
@@ -404,7 +432,13 @@ const mapIncome = (row: PostgresIncomeRow): FinanceIncomeRecord => {
     dteTypeCode: str(row.dte_type_code),
     dteFolio: str(row.dte_folio),
     nuboxEmittedAt: toTimestampString(row.nubox_emitted_at as string | { value?: string } | null),
-    nuboxLastSyncedAt: toTimestampString(row.nubox_last_synced_at as string | { value?: string } | null)
+    nuboxLastSyncedAt: toTimestampString(row.nubox_last_synced_at as string | { value?: string } | null),
+    isAnnulled: normalizeBoolean(row.is_annulled),
+    nuboxPdfUrl: str(row.nubox_pdf_url),
+    nuboxXmlUrl: str(row.nubox_xml_url),
+    referencedIncomeId: str(row.referenced_income_id),
+    paymentForm: str(row.payment_form),
+    balanceNubox: toNullableNumber(row.balance_nubox)
   }
 }
 
@@ -463,7 +497,11 @@ const mapExpense =(row: PostgresExpenseRow): FinanceExpenseRecord => ({
   nuboxSupplierRut: str(row.nubox_supplier_rut),
   nuboxSupplierName: str(row.nubox_supplier_name),
   nuboxOrigin: str(row.nubox_origin),
-  nuboxLastSyncedAt: toTimestampString(row.nubox_last_synced_at as string | { value?: string } | null)
+  nuboxLastSyncedAt: toTimestampString(row.nubox_last_synced_at as string | { value?: string } | null),
+  isAnnulled: normalizeBoolean(row.is_annulled),
+  siiDocumentStatus: str(row.sii_document_status),
+  nuboxPdfUrl: str(row.nubox_pdf_url),
+  balanceNubox: toNullableNumber(row.balance_nubox)
 })
 
 const mapIncomePayment =(row: PostgresIncomePaymentRow): FinanceIncomePaymentRecord => ({

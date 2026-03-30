@@ -44,7 +44,10 @@ export const GH_FINANCE_NAV = {
   expenses: { label: 'Egresos', subtitle: 'Pagos y obligaciones' },
   suppliers: { label: 'Proveedores', subtitle: 'Directorio de proveedores' },
   reconciliation: { label: 'Conciliación', subtitle: 'Conciliación bancaria' },
-  intelligence: { label: 'Economía', subtitle: 'Cierre de período y P&L operativo' }
+  intelligence: { label: 'Economía', subtitle: 'Cierre de período y P&L operativo' },
+  quotes: { label: 'Cotizaciones', subtitle: 'Cotizaciones emitidas y su seguimiento' },
+  purchaseOrders: { label: 'Órdenes de compra', subtitle: 'OC de clientes, saldos y consumo' },
+  hes: { label: 'HES', subtitle: 'Hojas de entrada de servicio' }
 } as const
 
 export const GH_HR_NAV = {

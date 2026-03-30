@@ -147,7 +147,54 @@ export async function GET() {
     checks.push({ name: 'dte_pending_emission', status: 'ok', detail: 'Cola DTE no provisionada aún' })
   }
 
-  // 6. Overdue receivables
+  // 6. Nubox balance divergence
+  try {
+    const divergent = await runGreenhousePostgresQuery<{ count: string } & Record<string, unknown>>(
+      `SELECT COUNT(*)::text AS count
+       FROM greenhouse_finance.income
+       WHERE balance_nubox IS NOT NULL
+         AND balance_nubox = 0
+         AND payment_status IN ('pending', 'partial', 'overdue')
+         AND COALESCE(is_annulled, FALSE) = FALSE`
+    )
+
+    const count = Number(divergent[0]?.count ?? 0)
+
+    checks.push({
+      name: 'nubox_balance_divergence',
+      status: count === 0 ? 'ok' : 'warning',
+      detail: count === 0
+        ? 'Sin divergencias de balance Nubox vs Greenhouse'
+        : `${count} factura(s) cobrada(s) en Nubox pero pendiente(s) en Greenhouse`,
+      value: count
+    })
+  } catch {
+    checks.push({ name: 'nubox_balance_divergence', status: 'ok', detail: 'Check no disponible' })
+  }
+
+  // 7. Annulled expenses not excluded
+  try {
+    const annulled = await runGreenhousePostgresQuery<{ count: string } & Record<string, unknown>>(
+      `SELECT COUNT(*)::text AS count
+       FROM greenhouse_finance.expenses
+       WHERE is_annulled = TRUE AND payment_status NOT IN ('written_off', 'cancelled')`
+    )
+
+    const count = Number(annulled[0]?.count ?? 0)
+
+    checks.push({
+      name: 'annulled_expenses_status',
+      status: count === 0 ? 'ok' : 'warning',
+      detail: count === 0
+        ? 'Todos los gastos anulados tienen status correcto'
+        : `${count} gasto(s) anulado(s) sin status written_off/cancelled`,
+      value: count
+    })
+  } catch {
+    checks.push({ name: 'annulled_expenses_status', status: 'ok', detail: 'Check no disponible' })
+  }
+
+  // 8. Overdue receivables
   try {
     const overdue = await runGreenhousePostgresQuery<{ count: string; total_clp: string } & Record<string, unknown>>(
       `SELECT COUNT(*)::text AS count, COALESCE(SUM(total_amount_clp - COALESCE(amount_paid, 0)), 0)::text AS total_clp

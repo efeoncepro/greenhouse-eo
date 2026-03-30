@@ -41,6 +41,10 @@ const toTimestamp = (value: string | null | undefined): string | null => {
 const nowIso = () => new Date().toISOString()
 const todayDate = () => nowIso().slice(0, 10)
 
+/** Extract a link URL from the Nubox links array by rel name */
+const getLink = (links: Array<{ rel: string; href: string }> | undefined, rel: string): string | null =>
+  links?.find(l => l.rel === rel)?.href || null
+
 // ─── Raw Snapshot Mappers ───────────────────────────────────────────────────
 
 export const mapSaleToRawRow = (sale: NuboxSale, syncRunId: string): NuboxRawSnapshotRow => {
@@ -143,6 +147,8 @@ export const mapSaleToConformed = (
     exempt_amount: sale.totalExemptAmount ?? null,
     tax_vat_amount: sale.totalTaxVatAmount ?? null,
     total_amount: sale.totalAmount ?? null,
+    other_taxes_amount: sale.totalOtherTaxesAmount ?? null,
+    withholding_amount: sale.totalWithholdingAmount ?? null,
     balance: sale.balance ?? null,
     emission_date: toDateOnly(sale.emissionDate),
     due_date: toDateOnly(sale.dueDate) || null,
@@ -157,6 +163,11 @@ export const mapSaleToConformed = (
     origin_name: sale.origin?.name || null,
     client_rut: clientRut,
     client_trade_name: sale.client?.tradeName || null,
+    client_main_activity: sale.client?.mainActivity || null,
+    pdf_url: getLink(sale.links, 'pdf'),
+    xml_url: getLink(sale.links, 'xml'),
+    details_url: getLink(sale.links, 'details'),
+    references_url: getLink(sale.links, 'references'),
     organization_id: orgMatch?.organization_id || null,
     client_id: orgMatch?.client_id || null,
     income_id: incomeId,
@@ -197,9 +208,15 @@ export const mapPurchaseToConformed = (
     document_status_name: purchase.documentStatus?.name || null,
     purchase_type_code: purchase.purchaseType?.legalCode || null,
     purchase_type_name: purchase.purchaseType?.name || null,
+    is_annulled: purchase.dataCl?.annulled ?? false,
+    receipt_date: toDateOnly(purchase.dataCl?.receiptAt) || null,
+    vat_unrecoverable_amount: purchase.dataCl?.vatUnrecoverableAmount ?? null,
+    vat_fixed_assets_amount: purchase.dataCl?.vatFixedAssetsAmount ?? null,
+    vat_common_use_amount: purchase.dataCl?.vatCommonUseAmount ?? null,
     origin_name: purchase.origin?.name || null,
     supplier_rut: supplierRut,
     supplier_trade_name: purchase.supplier?.tradeName || null,
+    pdf_url: getLink(purchase.links, 'pdf'),
     supplier_id: supplierId,
     organization_id: orgEntry?.organization_id || null,
     expense_id: expenseId,

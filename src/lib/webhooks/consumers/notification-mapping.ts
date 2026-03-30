@@ -256,6 +256,131 @@ export const NOTIFICATION_MAPPINGS: NotificationMapping[] = [
     metadata: baseMetadata
   },
 
+  // ── Purchase Orders & HES ──
+
+  {
+    eventType: 'finance.purchase_order.expiring',
+    category: 'finance_alert',
+    title: envelope => {
+      const poNumber = typeof envelope.data.poNumber === 'string' ? envelope.data.poNumber : 'OC'
+
+      return `OC ${poNumber} próxima a vencer`
+    },
+    body: envelope => {
+      const clientName = typeof envelope.data.clientName === 'string' ? envelope.data.clientName : 'cliente'
+      const daysLeft = typeof envelope.data.daysLeft === 'number' ? envelope.data.daysLeft : null
+
+      return daysLeft != null
+        ? `OC de ${clientName} vence en ${daysLeft} días. Solicite renovación.`
+        : `OC de ${clientName} está próxima a vencer.`
+    },
+    actionUrl: envelope => {
+      const poId = typeof envelope.data.poId === 'string' ? envelope.data.poId : null
+
+      return poId ? `/finance/purchase-orders/${poId}` : '/finance/purchase-orders'
+    },
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+  {
+    eventType: 'finance.purchase_order.consumed',
+    category: 'finance_alert',
+    title: envelope => {
+      const poNumber = typeof envelope.data.poNumber === 'string' ? envelope.data.poNumber : 'OC'
+
+      return `OC ${poNumber} consumida — saldo $0`
+    },
+    body: envelope => {
+      const clientName = typeof envelope.data.clientName === 'string' ? envelope.data.clientName : ''
+
+      return clientName ? `Toda la OC de ${clientName} fue facturada.` : 'OC totalmente facturada.'
+    },
+    actionUrl: () => '/finance/purchase-orders',
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+  {
+    eventType: 'finance.hes.approved',
+    category: 'finance_alert',
+    title: envelope => {
+      const hesNumber = typeof envelope.data.hesNumber === 'string' ? envelope.data.hesNumber : 'HES'
+
+      return `HES ${hesNumber} aprobada — lista para facturar`
+    },
+    body: envelope => {
+      const approvedBy = typeof envelope.data.approvedBy === 'string' ? envelope.data.approvedBy : ''
+
+      return approvedBy ? `Aprobada por ${approvedBy}.` : 'HES aprobada por el cliente.'
+    },
+    actionUrl: () => '/finance/hes',
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+  {
+    eventType: 'finance.hes.rejected',
+    category: 'finance_alert',
+    title: envelope => {
+      const hesNumber = typeof envelope.data.hesNumber === 'string' ? envelope.data.hesNumber : 'HES'
+
+      return `HES ${hesNumber} rechazada`
+    },
+    body: envelope => {
+      const reason = typeof envelope.data.reason === 'string' ? envelope.data.reason : ''
+
+      return reason ? `Motivo: ${reason}` : 'HES rechazada por el cliente. Requiere acción.'
+    },
+    actionUrl: () => '/finance/hes',
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+
+  // ── Data Quality / SII Alerts ──
+
+  {
+    eventType: 'finance.sii_claim.detected',
+    category: 'finance_alert',
+    title: envelope => {
+      const supplierName = typeof envelope.data.supplierName === 'string' && envelope.data.supplierName.trim()
+        ? envelope.data.supplierName
+        : 'un proveedor'
+
+      return `DTE Reclamado: ${supplierName}`
+    },
+    body: envelope => {
+      const folio = typeof envelope.data.dteFolio === 'string' ? envelope.data.dteFolio : null
+
+      return folio
+        ? `El documento ${folio} fue reclamado ante el SII. Requiere revisión.`
+        : 'Un documento fue reclamado ante el SII. Requiere revisión.'
+    },
+    actionUrl: envelope => {
+      const expenseId = typeof envelope.data.expenseId === 'string' ? envelope.data.expenseId : null
+
+      return expenseId ? `/finance/expenses/${expenseId}` : '/finance/expenses'
+    },
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+  {
+    eventType: 'finance.balance_divergence.detected',
+    category: 'finance_alert',
+    title: envelope => {
+      const folio = typeof envelope.data.dteFolio === 'string' && envelope.data.dteFolio.trim()
+        ? envelope.data.dteFolio
+        : null
+
+      return folio ? `Divergencia de cobro: Factura #${folio}` : 'Divergencia de cobro detectada'
+    },
+    body: () => 'Nubox marca como cobrada pero Greenhouse tiene pago pendiente.',
+    actionUrl: envelope => {
+      const incomeId = typeof envelope.data.incomeId === 'string' ? envelope.data.incomeId : null
+
+      return incomeId ? `/finance/income/${incomeId}` : '/finance/income'
+    },
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+
   // ── Identity ──
 
   {

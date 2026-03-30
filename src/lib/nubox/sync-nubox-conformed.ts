@@ -220,8 +220,14 @@ const writeConformedSales = async (projectId: string, rows: NuboxConformedSale[]
 
   const bq = getBigQueryClient()
 
+  // Delete only IDs we're about to re-insert (safe upsert pattern)
+  const ids = rows.map(r => r.nubox_sale_id)
+  const placeholders = ids.map((_, i) => `@id_${i}`).join(', ')
+  const params = Object.fromEntries(ids.map((id, i) => [`id_${i}`, id]))
+
   await bq.query({
-    query: `DELETE FROM \`${projectId}.greenhouse_conformed.nubox_sales\` WHERE TRUE`
+    query: `DELETE FROM \`${projectId}.greenhouse_conformed.nubox_sales\` WHERE nubox_sale_id IN (${placeholders})`,
+    params
   })
 
   await bq.dataset('greenhouse_conformed').table('nubox_sales').insert(rows)
@@ -232,8 +238,13 @@ const writeConformedPurchases = async (projectId: string, rows: NuboxConformedPu
 
   const bq = getBigQueryClient()
 
+  const ids = rows.map(r => r.nubox_purchase_id)
+  const placeholders = ids.map((_, i) => `@id_${i}`).join(', ')
+  const params = Object.fromEntries(ids.map((id, i) => [`id_${i}`, id]))
+
   await bq.query({
-    query: `DELETE FROM \`${projectId}.greenhouse_conformed.nubox_purchases\` WHERE TRUE`
+    query: `DELETE FROM \`${projectId}.greenhouse_conformed.nubox_purchases\` WHERE nubox_purchase_id IN (${placeholders})`,
+    params
   })
 
   await bq.dataset('greenhouse_conformed').table('nubox_purchases').insert(rows)
@@ -244,8 +255,13 @@ const writeConformedBankMovements = async (projectId: string, rows: NuboxConform
 
   const bq = getBigQueryClient()
 
+  const ids = rows.map(r => r.nubox_movement_id)
+  const placeholders = ids.map((_, i) => `@id_${i}`).join(', ')
+  const params = Object.fromEntries(ids.map((id, i) => [`id_${i}`, id]))
+
   await bq.query({
-    query: `DELETE FROM \`${projectId}.greenhouse_conformed.nubox_bank_movements\` WHERE TRUE`
+    query: `DELETE FROM \`${projectId}.greenhouse_conformed.nubox_bank_movements\` WHERE nubox_movement_id IN (${placeholders})`,
+    params
   })
 
   await bq.dataset('greenhouse_conformed').table('nubox_bank_movements').insert(rows)

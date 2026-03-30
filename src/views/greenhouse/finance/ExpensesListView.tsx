@@ -58,6 +58,9 @@ interface Expense {
   supplierName: string | null
   serviceLine: string | null
   isRecurring: boolean
+  isAnnulled: boolean
+  siiDocumentStatus: string | null
+  nuboxPdfUrl: string | null
 
   // Nubox fields
   nuboxPurchaseId: string | null
@@ -99,6 +102,12 @@ const TYPE_OPTIONS = [
   { value: 'tax', label: 'Impuesto' },
   { value: 'miscellaneous', label: 'Varios' }
 ]
+
+const SII_STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'error' | 'warning' | 'secondary' }> = {
+  Aceptado: { label: 'Aceptado', color: 'success' },
+  Reclamado: { label: 'Reclamado', color: 'error' },
+  Pendiente: { label: 'Pendiente', color: 'warning' }
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -143,7 +152,14 @@ const expColumns: ColumnDef<Expense, any>[] = [
     header: 'Descripción',
     cell: ({ row }) => (
       <Box>
-        <Typography variant='body2' fontWeight={600} sx={{ maxWidth: 240, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <Typography
+          variant='body2'
+          fontWeight={600}
+          sx={{
+            maxWidth: 240, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            ...(row.original.isAnnulled ? { textDecoration: 'line-through', color: 'text.disabled' } : {})
+          }}
+        >
           {row.original.description}
         </Typography>
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 0.25 }}>
@@ -152,7 +168,21 @@ const expColumns: ColumnDef<Expense, any>[] = [
               Doc: {row.original.documentNumber}
             </Typography>
           )}
-          {row.original.nuboxPurchaseId && <CustomChip round='true' size='small' color='info' variant='outlined' label='Nubox' />}
+          {row.original.isAnnulled && <CustomChip round='true' size='small' variant='tonal' color='secondary' label='Anulada' sx={{ height: 20, fontSize: '0.65rem' }} />}
+          {row.original.nuboxPurchaseId && <CustomChip round='true' size='small' color='info' variant='outlined' label='Nubox' sx={{ height: 20, fontSize: '0.65rem' }} />}
+          {row.original.nuboxPdfUrl && (
+            <Box
+              component='a'
+              href={row.original.nuboxPdfUrl}
+              target='_blank'
+              rel='noopener noreferrer'
+              onClick={e => e.stopPropagation()}
+              sx={{ display: 'inline-flex', color: 'error.main', '&:hover': { color: 'error.dark' } }}
+              aria-label='Ver DTE en PDF'
+            >
+              <i className='tabler-file-type-pdf' style={{ fontSize: 16 }} />
+            </Box>
+          )}
         </Box>
       </Box>
     )
@@ -181,7 +211,19 @@ const expColumns: ColumnDef<Expense, any>[] = [
 
       return <CustomChip round='true' size='small' color={conf.color} label={conf.label} />
     }
-  })
+  }),
+  {
+    id: 'sii',
+    header: 'SII',
+    cell: ({ row }: { row: { original: Expense } }) => {
+      if (!row.original.siiDocumentStatus) return null
+
+      const conf = SII_STATUS_CONFIG[row.original.siiDocumentStatus] ?? { label: row.original.siiDocumentStatus, color: 'secondary' as const }
+
+      return <CustomChip round='true' size='small' variant='tonal' color={conf.color} label={conf.label} />
+    },
+    enableSorting: false
+  }
 ]
 
 const ExpensesListView = () => {

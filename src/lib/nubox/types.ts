@@ -257,6 +257,8 @@ export type NuboxConformedSale = {
   exempt_amount: number | null
   tax_vat_amount: number | null
   total_amount: number | null
+  other_taxes_amount: number | null
+  withholding_amount: number | null
   balance: number | null
   emission_date: string | null
   due_date: string | null
@@ -271,6 +273,12 @@ export type NuboxConformedSale = {
   origin_name: string | null
   client_rut: string | null
   client_trade_name: string | null
+  client_main_activity: string | null
+  // Links
+  pdf_url: string | null
+  xml_url: string | null
+  details_url: string | null
+  references_url: string | null
 
   // Identity resolution (populated during conformed sync)
   organization_id: string | null
@@ -302,9 +310,16 @@ export type NuboxConformedPurchase = {
   document_status_name: string | null
   purchase_type_code: string | null
   purchase_type_name: string | null
+  is_annulled: boolean
+  receipt_date: string | null
+  vat_unrecoverable_amount: number | null
+  vat_fixed_assets_amount: number | null
+  vat_common_use_amount: number | null
   origin_name: string | null
   supplier_rut: string | null
   supplier_trade_name: string | null
+  // Links
+  pdf_url: string | null
 
   // Identity resolution
   supplier_id: string | null

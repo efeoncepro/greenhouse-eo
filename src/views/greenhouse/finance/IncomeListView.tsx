@@ -76,6 +76,11 @@ interface Income {
   nuboxEmittedAt: string | null
   dteTypeCode: string | null
   dteFolio: string | null
+  nuboxPdfUrl: string | null
+  nuboxXmlUrl: string | null
+  referencedIncomeId: string | null
+  paymentForm: string | null
+  balanceNubox: number | null
 }
 
 const DOC_TYPE_CHIP: Record<string, { label: string; color: 'primary' | 'error' | 'warning' | 'secondary' }> = {
@@ -301,7 +306,35 @@ const IncomeListView = () => {
       header: 'Factura',
       cell: ({ row }) => (
         <Box>
-          <Typography variant='body2' fontWeight={600}>{row.original.invoiceNumber || row.original.incomeId}</Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Typography variant='body2' fontWeight={600}>{row.original.invoiceNumber || row.original.incomeId}</Typography>
+            {row.original.nuboxPdfUrl && (
+              <Box
+                component='a'
+                href={row.original.nuboxPdfUrl}
+                target='_blank'
+                rel='noopener noreferrer'
+                onClick={e => e.stopPropagation()}
+                sx={{ display: 'inline-flex', color: 'error.main', '&:hover': { color: 'error.dark' } }}
+                aria-label='Ver DTE en PDF'
+              >
+                <i className='tabler-file-type-pdf' style={{ fontSize: 16 }} />
+              </Box>
+            )}
+            {row.original.nuboxXmlUrl && (
+              <Box
+                component='a'
+                href={row.original.nuboxXmlUrl}
+                target='_blank'
+                rel='noopener noreferrer'
+                onClick={e => e.stopPropagation()}
+                sx={{ display: 'inline-flex', color: 'info.main', '&:hover': { color: 'info.dark' } }}
+                aria-label='Ver XML del DTE'
+              >
+                <i className='tabler-code' style={{ fontSize: 14 }} />
+              </Box>
+            )}
+          </Box>
           {row.original.description && (
             <Typography variant='caption' color='text.secondary' sx={{ display: 'block', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {row.original.description}

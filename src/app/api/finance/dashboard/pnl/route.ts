@@ -69,6 +69,7 @@ export async function GET(request: Request) {
        FROM greenhouse_finance.expenses
        WHERE COALESCE(document_date, payment_date) >= $1::date
          AND COALESCE(document_date, payment_date) <= $2::date
+         AND COALESCE(is_annulled, FALSE) = FALSE
        GROUP BY cost_category`,
       [periodStart, periodEnd]
     ),
@@ -97,7 +98,8 @@ export async function GET(request: Request) {
        FROM greenhouse_finance.expenses
        WHERE payroll_entry_id IS NOT NULL
          AND COALESCE(document_date, payment_date) >= $1::date
-         AND COALESCE(document_date, payment_date) <= $2::date`,
+         AND COALESCE(document_date, payment_date) <= $2::date
+         AND COALESCE(is_annulled, FALSE) = FALSE`,
       [periodStart, periodEnd]
     ),
 
