@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
@@ -32,6 +33,7 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import { fuzzyFilter } from '@/components/tableUtils'
 import tableStyles from '@core/styles/table.module.css'
+import CreateHesDrawer from '@views/greenhouse/finance/drawers/CreateHesDrawer'
 
 // ── Types ──
 
@@ -145,6 +147,7 @@ const HesListView = () => {
   const [statusFilter, setStatusFilter] = useState('')
   const [sorting, setSorting] = useState<SortingState>([{ id: 'hesNumber', desc: true }])
   const [globalFilter, setGlobalFilter] = useState('')
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -201,9 +204,14 @@ const HesListView = () => {
 
   return (
     <Stack spacing={6}>
-      <Box>
-        <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>Hojas de entrada de servicio</Typography>
-        <Typography variant='body2' color='text.secondary'>HES — certificación de recepción de servicio</Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
+        <Box>
+          <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>Hojas de entrada de servicio</Typography>
+          <Typography variant='body2' color='text.secondary'>HES — certificación de recepción de servicio</Typography>
+        </Box>
+        <Button variant='contained' color='warning' startIcon={<i className='tabler-plus' />} onClick={() => setDrawerOpen(true)}>
+          Registrar HES
+        </Button>
       </Box>
 
       <Grid container spacing={6}>
@@ -270,6 +278,8 @@ const HesListView = () => {
         )}
         <TablePaginationComponent table={table as ReturnType<typeof useReactTable>} />
       </Card>
+
+      <CreateHesDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} onSuccess={() => { setDrawerOpen(false); fetchData() }} />
     </Stack>
   )
 }

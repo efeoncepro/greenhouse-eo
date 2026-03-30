@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
@@ -33,6 +34,7 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import { fuzzyFilter } from '@/components/tableUtils'
 import tableStyles from '@core/styles/table.module.css'
+import CreatePurchaseOrderDrawer from '@views/greenhouse/finance/drawers/CreatePurchaseOrderDrawer'
 
 // ── Types ──
 
@@ -168,6 +170,7 @@ const PurchaseOrdersListView = () => {
   const [statusFilter, setStatusFilter] = useState('')
   const [sorting, setSorting] = useState<SortingState>([{ id: 'issueDate', desc: true }])
   const [globalFilter, setGlobalFilter] = useState('')
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -225,9 +228,14 @@ const PurchaseOrdersListView = () => {
 
   return (
     <Stack spacing={6}>
-      <Box>
-        <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>Órdenes de compra</Typography>
-        <Typography variant='body2' color='text.secondary'>OC de clientes, saldos y consumo</Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
+        <Box>
+          <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>Órdenes de compra</Typography>
+          <Typography variant='body2' color='text.secondary'>OC de clientes, saldos y consumo</Typography>
+        </Box>
+        <Button variant='contained' color='primary' startIcon={<i className='tabler-plus' />} onClick={() => setDrawerOpen(true)}>
+          Registrar OC
+        </Button>
       </Box>
 
       <Grid container spacing={6}>
@@ -294,6 +302,8 @@ const PurchaseOrdersListView = () => {
         )}
         <TablePaginationComponent table={table as ReturnType<typeof useReactTable>} />
       </Card>
+
+      <CreatePurchaseOrderDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} onSuccess={() => { setDrawerOpen(false); fetchData() }} />
     </Stack>
   )
 }
