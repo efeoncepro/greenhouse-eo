@@ -1,5 +1,16 @@
 # TASK-162 — Canonical Commercial Cost Attribution
 
+## Delta 2026-03-30
+
+- Esta task queda explícitamente secuenciada después de `TASK-141`.
+- El contrato de identidad ya endurecido fija un boundary que `TASK-162` no puede reabrir:
+  - `identity_profile` enriquece trazabilidad humana cross-source
+  - `member_id` sigue siendo la llave operativa fuerte para costo, payroll, capacity, ICO y serving
+  - `client_user` no participa como raíz humana ni como llave de atribución comercial
+- La consecuencia para esta lane:
+  - la capa canónica de commercial cost attribution debe construirse encima del contrato person-first
+  - pero no debe mover la raíz operativa del costo fuera de `member_id`
+
 ## Status
 
 | Campo | Valor |

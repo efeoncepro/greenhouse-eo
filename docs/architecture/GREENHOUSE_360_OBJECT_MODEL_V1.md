@@ -18,6 +18,7 @@ Use this document together with:
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_ID_STRATEGY_V1.md`
 - `docs/architecture/GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+- `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
 - `docs/architecture/GREENHOUSE_SERVICE_MODULES_V1.md`
 - `docs/architecture/FINANCE_CANONICAL_360_V1.md`
 - `project_context.md`

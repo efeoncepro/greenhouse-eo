@@ -1,5 +1,22 @@
 # TASK-134 - Notification Identity Model Hardening
 
+## Delta 2026-03-30
+
+- El contrato transversal de identidad ya quedó explicitado en:
+  - `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
+- Confirmación desde el codebase:
+  - `src/lib/notifications/person-recipient-resolver.ts` ya sigue en gran parte el patrón correcto
+  - `src/lib/notifications/notification-service.ts` debe seguir conservando `userId` como llave para inbox/preferencias y dedupe efectiva
+  - el hardening pendiente de notifications ya no es “volver person-first todo”, sino cerrar institucionalmente el boundary:
+    - persona para resolver humanos
+    - `member` cuando aplique faceta operativa
+    - `userId` para stores y auditoría user-scoped
+- Esta task no debe romper:
+  - recipient keys efectivas
+  - `notification_preferences`
+  - `notifications`
+  - `notification_log`
+
 ## Status
 
 - Lifecycle: `to-do`

@@ -4,6 +4,53 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — TASK-141 contrato canónico persona/member/client_user
+
+### Objetivo
+- Priorizar `TASK-141` antes de `TASK-162`.
+- Determinar si la task estaba lista para implementación o si primero necesitaba endurecimiento arquitectónico.
+
+### Delta de ejecución
+- `TASK-141` pasó de `to-do` a `in-progress`.
+- Conclusión del contraste arquitectura + codebase:
+  - la dirección de la task era correcta
+  - todavía no estaba suficientemente endurecida para un cutover amplio
+  - faltaba formalizar mejor el contrato sobre:
+    - `person_360` vs `session_360`
+    - recipient keys
+    - projections member-scoped
+    - overrides y auditoría user-scoped
+    - relación explícita con `TASK-162`
+- Nueva fuente canónica creada:
+  - `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
+- Evidencia real usada para endurecer el contrato:
+  - `src/lib/notifications/person-recipient-resolver.ts`
+  - `src/lib/notifications/notification-service.ts`
+  - `src/lib/webhooks/consumers/notification-recipients.ts`
+  - `src/lib/sync/projections/notifications.ts`
+  - `src/lib/admin/get-admin-access-overview.ts`
+  - `src/lib/admin/get-admin-view-access-governance.ts`
+  - `scripts/setup-postgres-person-360-v2.sql`
+- Postura cerrada para continuidad:
+  - `identity_profile` es la raíz humana canónica
+  - `member_id` no se toca como llave operativa para payroll/capacity/ICO/costos
+  - `user_id` no se toca como llave operativa para inbox/preferencias/overrides/auditoría
+  - `/admin/views` y notifications quedan explícitamente como follow-ons del contrato, no como redefiniciones del mismo
+
+### Validación ejecutada
+- revisión documental y contraste manual de arquitectura + task + codebase
+- búsqueda dirigida de consumers sensibles con `rg`
+
+### Limitación de validación
+- No hubo slice de runtime o UI en esta sesión inicial de `TASK-141`; el trabajo fue contract-first para evitar un cutover incorrecto.
+- La spec externa pedida por `AGENTS.md` no apareció en la ruta `../Greenhouse_Portal_Spec_v1.md` ni por búsqueda simple en `/Users/jreye/Documents`.
+
+### Pendiente inmediato
+- Implementar el siguiente slice shared del contrato si se quiere empezar adopción real:
+  - resolver reusable sobre `person_360`
+  - cutover de `/admin/views` (`TASK-140`)
+  - hardening final de notifications (`TASK-134`)
+
 ## Sesión 2026-03-30 — Hardening canónico de atribución comercial para Cost Intelligence
 
 ### Objetivo

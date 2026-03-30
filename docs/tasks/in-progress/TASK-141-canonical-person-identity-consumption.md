@@ -1,12 +1,35 @@
 # TASK-141 - Canonical Person Identity Consumption
 
+## Delta 2026-03-30
+
+- La task ya no debe leerse como lista abierta de ideas.
+- Después del contraste contra arquitectura y codebase real, la decisión operativa quedó endurecida así:
+  - `identity_profile` = raíz humana canónica
+  - `member` = llave operativa obligatoria para payroll, capacity, ICO, serving por colaborador y costos
+  - `client_user` = principal portal para sesión, inbox, preferencias, overrides y auditoría user-scoped
+- Fuente canónica nueva del contrato:
+  - `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
+- Evidencia real que condiciona el rollout:
+  - notifications ya tiene un resolver híbrido razonablemente correcto en `src/lib/notifications/person-recipient-resolver.ts`
+  - `NotificationService` sigue dependiendo correctamente de `userId` para inbox/preferencias y recipient key efectiva
+  - `/admin/views` sigue siendo conceptualmente `client_user-first` desde `src/lib/admin/get-admin-access-overview.ts` y `src/lib/admin/get-admin-view-access-governance.ts`
+  - `person_360` ya expone el grafo humano completo vía `scripts/setup-postgres-person-360-v2.sql`
+  - `session_360` sigue siendo la base útil para access/runtime y recipients por rol
+- Conclusión del contraste:
+  - la task estaba bien orientada
+  - no estaba todavía lo suficientemente endurecida para iniciar un cutover amplio sin antes fijar guardrails explícitos sobre outbox, projections, serving y recipient keys
+- Relación con follow-ons:
+  - `TASK-140` debe consumir este contrato para `/admin/views`
+  - `TASK-134` debe cerrarlo en Notifications
+  - `TASK-162` debe construirse encima sin reinterpretar costo/comercial attribution desde `identity_profile`
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
-- Status real: `Diseño`
+- Status real: `Slice 1 - contrato endurecido`
 - Rank: `56`
 - Domain: `identity / platform / access`
 
@@ -185,6 +208,16 @@ Reglas obligatorias:
 - `client_user` como principal de acceso y sesión
 - notifications ya tiene parte del carril `person-first`
 - `/admin/views` ya tiene la necesidad visible de esta corrección
+- `greenhouse_serving.person_360` ya resuelve en una sola vista:
+  - `identity_profile_id`
+  - `member_id`
+  - `user_id`
+  - facetas y estados base del grafo humano
+- `greenhouse_serving.session_360` ya es un serving útil para:
+  - roles
+  - route groups
+  - acceso efectivo
+  - recipients por rol user-scoped
 
 ### Gap actual
 
@@ -194,6 +227,10 @@ Reglas obligatorias:
 - los límites de lo que seguirá siendo `userId`-scoped no están suficientemente formalizados
 - no existe todavía un resolver canónico único con shape reusable para consumers
 - no hay métricas institucionales para saber cuántos casos siguen degradados o parcialmente enlazados
+- la task no explicitaba suficientemente el boundary entre:
+  - `person_360` como resolver humano cross-facet
+  - `session_360` como carril access-first
+  - consumers member-scoped que no deben degradarse
 
 ## Scope
 
@@ -363,6 +400,15 @@ Reglas no negociables para este slice:
   - notifications
   - `/admin/views`
   - people/admin surfaces relacionadas
+
+## Slice 1 Outcome
+
+- esta sesión cierra el framing contractual y deja la task lista para adopción gradual
+- no ejecuta todavía un cutover de consumers porque eso habría sido prematuro
+- el siguiente slice sano ya no es debatir la jerarquía, sino:
+  - shared resolver/person DTO reusable
+  - adopción en `TASK-140`
+  - cierre institucional en `TASK-134`
 
 ## Follow-ups
 

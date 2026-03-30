@@ -1,5 +1,21 @@
 # TASK-140 - Admin Views Person-First Preview Cutover
 
+## Delta 2026-03-30
+
+- El contrato transversal ya dejó de estar implícito.
+- Fuente canónica a consumir:
+  - `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
+- Decisión endurecida para este follow-on:
+  - el preview debe pasar a ser `person-first` en su raíz conceptual
+  - pero debe preservar `userId` como llave de overrides, `authorizedViews`, auditoría y compatibilidad runtime
+- Estado del drift confirmado en repo:
+  - `src/lib/admin/get-admin-access-overview.ts` y `src/lib/admin/get-admin-view-access-governance.ts` siguen naciendo desde `client_users`
+  - `person_360` y `session_360` ya ofrecen una base más correcta para separar persona vs acceso portal
+- Esta task no debe reinterpretar:
+  - recipient keys
+  - stores user-scoped
+  - llaves operativas ajenas a access preview
+
 ## Status
 
 - Lifecycle: `to-do`

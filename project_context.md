@@ -3,6 +3,20 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-30 canonical person identity consumption ya tiene fuente operativa dedicada
+- Greenhouse ya no debe depender solo de notas dispersas para aplicar el contrato `person-first`.
+- Fuente canónica nueva:
+  - `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
+- Contrato operativo consolidado:
+  - `identity_profile` = raíz humana canónica
+  - `member` = llave operativa obligatoria para payroll, capacity, ICO, serving por colaborador y costos
+  - `client_user` = principal portal para sesión, inbox, preferencias, overrides y auditoría user-scoped
+- Serving base recomendado:
+  - `greenhouse_serving.person_360` para resolución humana cross-facet
+  - `greenhouse_serving.session_360` para acceso efectivo y consumers access-first
+- Regla nueva para follow-ons:
+  - cualquier cutover `person-first` debe preservar recipient keys, payloads de outbox y consumers `member_id`/`user_id`-scoped existentes
+
 ## Delta 2026-03-30 UI/UX skill stack local reforzada
 - Greenhouse ya no debe depender solo de skills globales de UI para frontend portal.
 - Nuevo baseline canónico:

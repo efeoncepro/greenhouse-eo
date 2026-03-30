@@ -147,6 +147,7 @@ Use together with:
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_ID_STRATEGY_V1.md`
 - `docs/architecture/GREENHOUSE_INTERNAL_IDENTITY_V1.md`
+- `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
 - `docs/architecture/GREENHOUSE_SERVICE_MODULES_V1.md`
 - `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_TEAM_CAPACITY_ARCHITECTURE_V1.md`

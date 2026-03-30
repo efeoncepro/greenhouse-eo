@@ -2,6 +2,18 @@
 
 ## 2026-03-30
 
+- `TASK-141` quedó formalmente encaminada como prioridad arquitectónica antes de `TASK-162`.
+- Se creó una fuente canónica dedicada para el consumo del objeto persona:
+  - `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
+- El contrato quedó endurecido con reglas explícitas para:
+  - `identity_profile` como raíz humana canónica
+  - `member` como llave operativa obligatoria para payroll, capacity, ICO, serving por colaborador y costos
+  - `client_user` como principal portal para sesión, inbox, preferencias, overrides y auditoría user-scoped
+- También quedó explicitado que:
+  - `person_360` es la base recomendada para resolución humana cross-facet
+  - `session_360` complementa acceso efectivo y consumers access-first
+  - no deben romperse recipient keys, payloads de outbox ni consumers `member_id`/`user_id`-scoped durante los follow-ons `TASK-140`, `TASK-134` y `TASK-162`
+
 - Se documentó formalmente la decisión de una capa canónica de `commercial cost attribution`:
   - no reemplaza a Finance ni a Cost Intelligence
   - consolida una sola verdad de costo comercial por encima de Payroll, Team Capacity y Finance base
