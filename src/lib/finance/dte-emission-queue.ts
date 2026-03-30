@@ -10,6 +10,7 @@ export interface DteEmissionQueueItem {
   queueId: string
   incomeId: string
   requestedBy: string
+  dteTypeCode: string
   status: DteEmissionStatus
   attemptCount: number
   maxAttempts: number
@@ -31,6 +32,7 @@ export const ensureDteEmissionQueueSchema = async () => {
       queue_id         TEXT PRIMARY KEY,
       income_id        TEXT NOT NULL,
       requested_by     TEXT NOT NULL,
+      dte_type_code    TEXT NOT NULL DEFAULT '33',
       status           TEXT NOT NULL DEFAULT 'pending'
                        CHECK (status IN ('pending', 'emitting', 'emitted', 'failed', 'retry_scheduled', 'dead_letter')),
       attempt_count    INT NOT NULL DEFAULT 0,
@@ -41,6 +43,11 @@ export const ensureDteEmissionQueueSchema = async () => {
       updated_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
       CONSTRAINT dte_queue_income_unique UNIQUE (income_id, status)
     )
+  `)
+
+  await runGreenhousePostgresQuery(`
+    ALTER TABLE greenhouse_finance.dte_emission_queue
+    ADD COLUMN IF NOT EXISTS dte_type_code TEXT NOT NULL DEFAULT '33'
   `)
 
   await runGreenhousePostgresQuery(`
@@ -55,19 +62,7 @@ export const ensureDteEmissionQueueSchema = async () => {
 // ── Enqueue ──
 
 export const enqueueDteEmission = async (incomeId: string, requestedBy: string): Promise<string> => {
-  await ensureDteEmissionQueueSchema()
-
-  const queueId = `dte-q-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-
-  await runGreenhousePostgresQuery(
-    `INSERT INTO greenhouse_finance.dte_emission_queue
-       (queue_id, income_id, requested_by, status, attempt_count, max_attempts, created_at, updated_at)
-     VALUES ($1, $2, $3, 'pending', 0, 3, now(), now())
-     ON CONFLICT (income_id, status) DO NOTHING`,
-    [queueId, incomeId, requestedBy]
-  )
-
-  return queueId
+  return enqueueDteEmissionWithType(incomeId, requestedBy, '33')
 }
 
 // ── Claim pending items ──
@@ -89,6 +84,7 @@ export const claimPendingDteEmissions = async (batchSize = 5): Promise<DteEmissi
        FOR UPDATE SKIP LOCKED
      )
      RETURNING queue_id AS "queueId", income_id AS "incomeId", requested_by AS "requestedBy",
+       dte_type_code AS "dteTypeCode",
        status, attempt_count AS "attemptCount", max_attempts AS "maxAttempts",
        last_error AS "lastError", next_retry_at::text AS "nextRetryAt",
        created_at::text AS "createdAt", updated_at::text AS "updatedAt"`,
@@ -99,6 +95,7 @@ export const claimPendingDteEmissions = async (batchSize = 5): Promise<DteEmissi
     queueId: String(r.queueId),
     incomeId: String(r.incomeId),
     requestedBy: String(r.requestedBy),
+    dteTypeCode: String(r.dteTypeCode || '33'),
     status: String(r.status) as DteEmissionStatus,
     attemptCount: Number(r.attemptCount),
     maxAttempts: Number(r.maxAttempts),
@@ -107,6 +104,26 @@ export const claimPendingDteEmissions = async (batchSize = 5): Promise<DteEmissi
     createdAt: String(r.createdAt),
     updatedAt: String(r.updatedAt)
   }))
+}
+
+export const enqueueDteEmissionWithType = async (
+  incomeId: string,
+  requestedBy: string,
+  dteTypeCode: string
+): Promise<string> => {
+  await ensureDteEmissionQueueSchema()
+
+  const queueId = `dte-q-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+
+  await runGreenhousePostgresQuery(
+    `INSERT INTO greenhouse_finance.dte_emission_queue
+       (queue_id, income_id, requested_by, dte_type_code, status, attempt_count, max_attempts, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, 'pending', 0, 3, now(), now())
+     ON CONFLICT (income_id, status) DO NOTHING`,
+    [queueId, incomeId, requestedBy, dteTypeCode]
+  )
+
+  return queueId
 }
 
 // ── Mark results ──

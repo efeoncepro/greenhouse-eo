@@ -6,11 +6,18 @@ vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
 }))
 
-import { enqueueDteEmission, getDteEmissionQueueStats, markDteEmitted, markDteEmissionFailed } from './dte-emission-queue'
+import {
+  enqueueDteEmission,
+  enqueueDteEmissionWithType,
+  getDteEmissionQueueStats,
+  markDteEmitted,
+  markDteEmissionFailed
+} from './dte-emission-queue'
 
 describe('dte-emission-queue', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+
     // Schema check passes
     mockRunGreenhousePostgresQuery.mockResolvedValue([])
   })
@@ -21,7 +28,17 @@ describe('dte-emission-queue', () => {
     expect(queueId).toMatch(/^dte-q-/)
     expect(mockRunGreenhousePostgresQuery).toHaveBeenCalledWith(
       expect.stringContaining('INSERT INTO greenhouse_finance.dte_emission_queue'),
-      expect.arrayContaining(['INC-2026-001', 'admin@efeoncepro.com'])
+      expect.arrayContaining(['INC-2026-001', 'admin@efeoncepro.com', '33'])
+    )
+  })
+
+  it('enqueues a DTE emission with explicit type code when provided', async () => {
+    const queueId = await enqueueDteEmissionWithType('INC-2026-002', 'admin@efeoncepro.com', '61')
+
+    expect(queueId).toMatch(/^dte-q-/)
+    expect(mockRunGreenhousePostgresQuery).toHaveBeenCalledWith(
+      expect.stringContaining('INSERT INTO greenhouse_finance.dte_emission_queue'),
+      expect.arrayContaining(['INC-2026-002', 'admin@efeoncepro.com', '61'])
     )
   })
 

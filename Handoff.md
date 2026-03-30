@@ -4,6 +4,28 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — reconciliación final de TASK-138 + TASK-139
+
+### Objetivo
+- Contrastar ambas tasks ya cerradas contra el repo real y resolver el remanente técnico auténtico sin reabrir lanes artificialmente.
+
+### Delta de ejecución
+- `TASK-138`:
+  - se confirmó que el repo actual ya absorbió la adopción UI/runtime que el doc seguía marcando como “pendiente”
+  - el drift quedó saneado en la task markdown
+- `TASK-139`:
+  - `src/lib/finance/dte-emission-queue.ts` ahora preserva `dte_type_code`
+  - `src/app/api/cron/dte-emission-retry/route.ts` ya llama `emitDte()` real, no stub
+  - `src/app/api/finance/income/[id]/emit-dte/route.ts` y `src/app/api/finance/income/batch-emit-dte/route.ts` encolan fallos retryable
+  - nuevo test:
+    - `src/app/api/cron/dte-emission-retry/route.test.ts`
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/finance/dte-emission-queue.test.ts src/app/api/cron/dte-emission-retry/route.test.ts`
+- `pnpm exec eslint src/lib/finance/dte-emission-queue.ts src/lib/finance/dte-emission-queue.test.ts src/app/api/cron/dte-emission-retry/route.ts src/app/api/cron/dte-emission-retry/route.test.ts 'src/app/api/finance/income/[id]/emit-dte/route.ts' 'src/app/api/finance/income/batch-emit-dte/route.ts'`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
 ## Sesión 2026-03-30 — cierre formal de TASK-162
 
 ### Objetivo

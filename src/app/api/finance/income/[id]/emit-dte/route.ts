@@ -2,8 +2,22 @@ import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { emitDte } from '@/lib/nubox/emission'
+import { enqueueDteEmissionWithType } from '@/lib/finance/dte-emission-queue'
 
 export const dynamic = 'force-dynamic'
+
+const isRetryableDteError = (error: string | null | undefined) => {
+  const normalized = (error || '').toLowerCase()
+
+  if (!normalized) return true
+
+  return ![
+    'income not found',
+    'dte already emitted',
+    'no client_id on income',
+    'organization not found or missing rut'
+  ].some(marker => normalized.includes(marker))
+}
 
 export async function POST(
   request: Request,
@@ -29,6 +43,10 @@ export async function POST(
     const result = await emitDte({ incomeId, dteTypeCode })
 
     if (!result.success) {
+      if (isRetryableDteError(result.error)) {
+        await enqueueDteEmissionWithType(incomeId, 'finance_emit_route', dteTypeCode).catch(() => {})
+      }
+
       return NextResponse.json(result, { status: 422 })
     }
 

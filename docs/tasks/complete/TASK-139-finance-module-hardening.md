@@ -16,7 +16,19 @@
 - Slice 5: Bulk expense import ahora pre-valida todas las rows (descripción, moneda, subtotal >0, formato de fecha) y retorna reporte de errores sin crear nada si hay fallos
 - Slice 6: `FINANCE_BIGQUERY_WRITE_ENABLED` flag documentado en `.env.example`
 - Slice 7: `GET /api/finance/data-quality` — 6 checks (payment integrity, FX freshness, orphan expenses, income without client, DTE pending, overdue receivables) con overall status
-- Pendiente: DTE emission cron necesita integración real con Nubox API (actualmente stub), y el flag de BigQuery write necesita wiring en las rutas de write
+
+## Delta 2026-03-30 — DTE retry ya dejó de ser stub
+
+- El remanente más sensible de la task quedó endurecido:
+  - `greenhouse_finance.dte_emission_queue` ahora preserva `dte_type_code`
+  - `/api/cron/dte-emission-retry` ya reintenta con `emitDte()` real
+  - las rutas:
+    - `/api/finance/income/[id]/emit-dte`
+    - `/api/finance/income/batch-emit-dte`
+    ya encolan fallos retryable para reintento posterior
+- Estado actualizado:
+  - el retry mechanism ya no es solo queue plumbing
+  - el remanente real de la task queda acotado al lifecycle del flag `FINANCE_BIGQUERY_WRITE_ENABLED`, no al carril DTE
 
 ## Status
 

@@ -13,7 +13,16 @@
 - Slice 4: `agency-finance-metrics.ts` — `getSpaceFinanceMetrics()` returns per-client revenue, expenses, margin, trend
 - Slice 5: BigQuery cutover plan documented in `GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md` with 12-component status table
 - Slice 6: `auto-allocation-rules.ts` — declarative rules: payroll by FTE, infrastructure by revenue weight
-- Pendiente para UI adoption: Finance dashboard view needs to consume DSO/DPO/ratio from API, Agency view needs to call `getSpaceFinanceMetrics()`, People tab needs to call finance-impact endpoint
+
+## Delta 2026-03-30 — adopción UI/runtime ya absorbida por el repo actual
+
+- El drift documental de esta task quedó resuelto:
+  - `FinanceDashboardView.tsx` ya consume `dso`, `dpo` y `payrollToRevenueRatio`
+  - `PersonHrProfileTab.tsx` ya consume `/api/people/[memberId]/finance-impact`
+  - `getSpaceFinanceMetrics()` ya tiene endpoint dedicado en `/api/agency/finance-metrics`
+- Lectura correcta:
+  - los slices declarados en `TASK-138` no quedaron “API-ready pero sin adopción”
+  - la adopción visible ya ocurrió y la task sigue correctamente en `complete`
 
 ## Status
 

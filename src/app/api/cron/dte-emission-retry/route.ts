@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
 import { alertCronFailure } from '@/lib/alerts/slack-notify'
 import { claimPendingDteEmissions, markDteEmitted, markDteEmissionFailed } from '@/lib/finance/dte-emission-queue'
+import { emitDte } from '@/lib/nubox/emission'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
@@ -14,9 +15,7 @@ export const maxDuration = 30
  * Retries: 3 attempts with backoff (immediate, 1h, 4h, 24h).
  * Dead-letter after max attempts.
  *
- * Note: actual DTE emission via Nubox API is a stub here — the real emission
- * logic lives in the income emit-dte route. This cron retries failed emissions
- * by re-calling the emission function.
+ * Retries failed emissions by re-calling the canonical Nubox emission logic.
  */
 export async function GET(request: Request) {
   const { authorized, errorResponse } = requireCronAuth(request)
@@ -37,10 +36,19 @@ export async function GET(request: Request) {
 
     for (const item of items) {
       try {
-        // Stub: in a real implementation, this would call the Nubox DTE emission API
-        // For now, we mark as emitted to validate the queue mechanism works
-        // TODO: integrate with actual DTE emission logic from /api/finance/income/[id]/emit-dte
-        console.log(`[dte-emission-retry] Processing ${item.incomeId} (attempt ${item.attemptCount})`)
+        console.log(`[dte-emission-retry] Processing ${item.incomeId} (${item.dteTypeCode}) attempt ${item.attemptCount}`)
+        const result = await emitDte({ incomeId: item.incomeId, dteTypeCode: item.dteTypeCode || '33' })
+
+        if (!result.success) {
+          await markDteEmissionFailed(
+            item.queueId,
+            result.error || 'Unknown DTE emission error',
+            item.attemptCount,
+            item.maxAttempts
+          )
+          failed++
+          continue
+        }
 
         await markDteEmitted(item.queueId)
         emitted++

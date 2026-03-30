@@ -9,6 +9,14 @@
 
 ## 2026-03-30
 
+- `TASK-138` quedó reconciliada con el estado real del repo:
+  - `FinanceDashboardView` ya consume `dso`, `dpo` y `payrollToRevenueRatio`
+  - `PersonHrProfileTab` ya consume `finance-impact`
+  - Agency ya expone `getSpaceFinanceMetrics()` por endpoint dedicado
+- `TASK-139` cerró el remanente técnico más importante:
+  - la cola `dte_emission_queue` ya preserva `dte_type_code`
+  - `/api/cron/dte-emission-retry` ya reintenta vía `emitDte()` real
+  - las rutas de emisión ahora encolan fallos retryable para recuperación posterior
 - `TASK-162` quedó formalmente cerrada:
   - `commercial_cost_attribution` ya es truth layer materializada con projection reactiva, health y explain
   - `Person Finance` dejó de leer `client_labor_cost_allocation` y ahora explica costo desde la capa canónica

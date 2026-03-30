@@ -395,7 +395,17 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el reader requiere un token con scope `event:read`
 - Decisión operativa:
   - `SENTRY_AUTH_TOKEN` sigue siendo el token principal de build/source maps
-  - `SENTRY_INCIDENTS_AUTH_TOKEN` pasa a ser el canal recomendado para `Ops Health`
+- `SENTRY_INCIDENTS_AUTH_TOKEN` pasa a ser el canal recomendado para `Ops Health`
+
+## Delta 2026-03-30 Finance hardening ya conecta retry DTE con emisión real
+- El carril de `TASK-139` ya no deja la cola DTE como stub operativo.
+- Estado vigente:
+  - `greenhouse_finance.dte_emission_queue` preserva `dte_type_code`
+  - `/api/cron/dte-emission-retry` reintenta con `emitDte()` real
+  - las rutas de emisión encolan fallos retryable para recuperación posterior
+- Lectura operativa:
+  - el retry DTE ya es un mecanismo real de resiliencia
+  - `FINANCE_BIGQUERY_WRITE_ENABLED` sigue siendo un follow-on de lifecycle/cutover, no un bloqueo funcional del hardening base
 
 ## Delta 2026-03-29 notifications identity model
 - El sistema de notificaciones ya no debe leerse como `client_user-first`.
