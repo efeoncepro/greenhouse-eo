@@ -95,6 +95,10 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - gasto por `COALESCE(document_date, payment_date)`
   - FX por `greenhouse_finance.exchange_rates.rate_date`
   - payroll gating por `greenhouse_payroll.payroll_periods.status`
+- Ajuste de continuidad aplicado:
+  - el período ya se resuelve además contra el calendario operativo compartido de Greenhouse
+  - `checkPeriodReadiness()` expone timezone/jurisdicción, ventana operativa y último día hábil del mes objetivo
+  - `listRecentClosurePeriods()` garantiza incluir el mes operativo actual aunque todavía no existan señales materializadas en Finance/Payroll
 - Estado actual:
   - slice implementado y validado por tests + `tsc` + `build`
   - todavía falta el smoke reactivo end-to-end del domain `cost_intelligence` antes de declarar la task cerrada

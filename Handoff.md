@@ -4,6 +4,39 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — TASK-068 alineada al calendario operativo
+
+### Objetivo
+- Evitar que `period closure` nazca como lógica de mes calendario puro y alinearlo al calendario operativo ya existente en Payroll.
+
+### Contexto operativo
+- La implementación inicial de `TASK-068` ya estaba en `develop` y validada.
+- Se revisaron explícitamente:
+  - `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+  - `src/lib/calendar/operational-calendar.ts`
+  - `src/lib/calendar/nager-date-holidays.ts`
+  - `src/lib/payroll/auto-calculate-payroll.ts`
+  - `src/lib/payroll/current-payroll-period.ts`
+- Hallazgo clave:
+  - Cost Intelligence ya estaba documentado como consumidor potencial del calendario operativo; convenía alinearlo ahora y no más tarde.
+
+### Delta de ejecución
+- `src/lib/cost-intelligence/check-period-readiness.ts` ahora:
+  - resuelve contexto operativo con `resolveOperationalCalendarContext()`
+  - hidrata feriados vía `loadNagerDateHolidayDateSet()`
+  - calcula `currentOperationalMonthKey`, `inCurrentCloseWindow` y `lastBusinessDayOfTargetMonth`
+  - expone ese bloque en `operationalCalendar`
+- `listRecentClosurePeriods()` ahora asegura presencia del mes operativo actual aunque aún no existan señales materializadas del período.
+- `src/lib/cost-intelligence/check-period-readiness.test.ts` ganó cobertura para el bloque `operationalCalendar`.
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/cost-intelligence/check-period-readiness.test.ts src/lib/sync/projections/period-closure-status.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- Sigue pendiente el smoke reactivo end-to-end del domain `cost_intelligence` para cerrar `TASK-068`.
+
 ## Sesión 2026-03-30 — TASK-068 Period Closure Status iniciada
 
 ### Objetivo

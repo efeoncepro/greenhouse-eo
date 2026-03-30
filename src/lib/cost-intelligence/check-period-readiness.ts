@@ -1,5 +1,14 @@
 import 'server-only'
 
+import {
+  DEFAULT_OPERATIONAL_CALENDAR_COUNTRY_CODE,
+  DEFAULT_OPERATIONAL_CALENDAR_TIMEZONE,
+  getLastBusinessDayOfMonth,
+  getOperationalPayrollMonth,
+  resolveOperationalCalendarContext,
+  type OperationalCalendarContextInput
+} from '@/lib/calendar/operational-calendar'
+import { loadNagerDateHolidayDateSet } from '@/lib/calendar/nager-date-holidays'
 import { buildPeriodId, getPeriodRangeFromId } from '@/lib/payroll/shared'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
@@ -56,6 +65,14 @@ export type PeriodClosureReadiness = {
   periodId: string
   year: number
   month: number
+  operationalCalendar: {
+    timezone: string
+    countryCode: string
+    closeWindowBusinessDays: number
+    currentOperationalMonthKey: string
+    inCurrentCloseWindow: boolean
+    lastBusinessDayOfTargetMonth: string
+  }
   closureStatus: PeriodClosureLifecycle
   payrollStatus: PayrollClosureStatus
   incomeStatus: FinanceClosureStatus
@@ -96,6 +113,8 @@ const DEFAULT_CONFIG: PeriodClosureConfig = {
   marginAlertThresholdPct: 15
 }
 
+const operationalCalendarCache = new Map<string, Promise<OperationalCalendarContextInput>>()
+
 const runRows = async <T extends Record<string, unknown>>(query: string, values: unknown[] = [], client?: QueryableClient) => {
   if (client) {
     const result = await client.query<T>(query, values)
@@ -104,6 +123,41 @@ const runRows = async <T extends Record<string, unknown>>(query: string, values:
   }
 
   return runGreenhousePostgresQuery<T>(query, values)
+}
+
+const loadOperationalCalendarOptions = async (year: number): Promise<OperationalCalendarContextInput> => {
+  const cacheKey = `${year}`
+
+  if (!operationalCalendarCache.has(cacheKey)) {
+    operationalCalendarCache.set(
+      cacheKey,
+      (async () => {
+        const baseContext = resolveOperationalCalendarContext()
+
+        try {
+          const holidayDates = await loadNagerDateHolidayDateSet(year, baseContext.countryCode)
+
+          return {
+            timezone: baseContext.timezone,
+            countryCode: baseContext.countryCode,
+            holidayCalendarCode: baseContext.holidayCalendarCode,
+            holidayDates,
+            closeWindowBusinessDays: baseContext.closeWindowBusinessDays
+          }
+        } catch {
+          return {
+            timezone: baseContext.timezone || DEFAULT_OPERATIONAL_CALENDAR_TIMEZONE,
+            countryCode: baseContext.countryCode || DEFAULT_OPERATIONAL_CALENDAR_COUNTRY_CODE,
+            holidayCalendarCode: baseContext.holidayCalendarCode,
+            holidayDates: baseContext.holidayDates,
+            closeWindowBusinessDays: baseContext.closeWindowBusinessDays
+          }
+        }
+      })()
+    )
+  }
+
+  return operationalCalendarCache.get(cacheKey)!
 }
 
 const resolveFinanceStatus = ({ count, required }: { count: number; required: boolean }): FinanceClosureStatus => {
@@ -201,6 +255,9 @@ export const checkPeriodReadiness = async ({
 
   const periodId = buildPeriodId(year, month)
   const range = getPeriodRangeFromId(periodId)
+  const calendarOptions = await loadOperationalCalendarOptions(year)
+  const operationalMonth = getOperationalPayrollMonth(new Date(), calendarOptions)
+  const lastBusinessDayOfTargetMonth = getLastBusinessDayOfMonth(year, month, calendarOptions)
 
   const [config, existingRows, payrollRows, incomeRows, expenseRows, fxRows] = await Promise.all([
     getPeriodClosureConfig({ year, month, client }),
@@ -312,6 +369,14 @@ export const checkPeriodReadiness = async ({
     periodId,
     year,
     month,
+    operationalCalendar: {
+      timezone: calendarOptions.timezone ?? DEFAULT_OPERATIONAL_CALENDAR_TIMEZONE,
+      countryCode: calendarOptions.countryCode ?? DEFAULT_OPERATIONAL_CALENDAR_COUNTRY_CODE,
+      closeWindowBusinessDays: calendarOptions.closeWindowBusinessDays ?? 5,
+      currentOperationalMonthKey: operationalMonth.operationalMonthKey,
+      inCurrentCloseWindow: operationalMonth.inCloseWindow,
+      lastBusinessDayOfTargetMonth
+    },
     closureStatus,
     payrollStatus,
     incomeStatus,
@@ -489,6 +554,9 @@ export const materializePeriodClosureStatus = async ({
 }
 
 export const listRecentClosurePeriods = async (limit = 12) => {
+  const currentCalendarOptions = await loadOperationalCalendarOptions(new Date().getFullYear())
+  const currentOperationalMonth = getOperationalPayrollMonth(new Date(), currentCalendarOptions)
+
   const rows = await runGreenhousePostgresQuery<{ period_year: number | string; period_month: number | string }>(
     `
       SELECT DISTINCT period_year, period_month
@@ -522,10 +590,23 @@ export const listRecentClosurePeriods = async (limit = 12) => {
     [limit]
   )
 
-  return rows.map(row => ({
+  const periods = rows.map(row => ({
     year: Number(row.period_year),
     month: Number(row.period_month)
   }))
+
+  const operationalExists = periods.some(
+    period => period.year === currentOperationalMonth.operationalYear && period.month === currentOperationalMonth.operationalMonth
+  )
+
+  if (!operationalExists) {
+    periods.unshift({
+      year: currentOperationalMonth.operationalYear,
+      month: currentOperationalMonth.operationalMonth
+    })
+  }
+
+  return periods.slice(0, limit)
 }
 
 export const getPeriodClosureStatus = async ({ year, month }: { year: number; month: number }) =>

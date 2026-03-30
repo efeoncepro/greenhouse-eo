@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const mockRunGreenhousePostgresQuery = vi.fn()
 const mockWithGreenhousePostgresTransaction = vi.fn()
 const mockPublishOutboxEvent = vi.fn()
+const mockLoadNagerDateHolidayDateSet = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args),
@@ -11,6 +12,10 @@ vi.mock('@/lib/postgres/client', () => ({
 
 vi.mock('@/lib/sync/publish-event', () => ({
   publishOutboxEvent: (...args: unknown[]) => mockPublishOutboxEvent(...args)
+}))
+
+vi.mock('@/lib/calendar/nager-date-holidays', () => ({
+  loadNagerDateHolidayDateSet: (...args: unknown[]) => mockLoadNagerDateHolidayDateSet(...args)
 }))
 
 const { checkPeriodReadiness } = await import('./check-period-readiness')
@@ -104,6 +109,7 @@ describe('checkPeriodReadiness', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockPublishOutboxEvent.mockResolvedValue('outbox-event-1')
+    mockLoadNagerDateHolidayDateSet.mockResolvedValue(new Set<string>())
   })
 
   it('returns ready when payroll, income, expenses and fx are present', async () => {
@@ -115,6 +121,8 @@ describe('checkPeriodReadiness', () => {
     expect(result.closureStatus).toBe('ready')
     expect(result.readinessPct).toBe(100)
     expect(result.isReady).toBe(true)
+    expect(result.operationalCalendar.timezone).toBe('America/Santiago')
+    expect(result.operationalCalendar.countryCode).toBe('CL')
     expect(result.payrollStatus).toBe('exported')
     expect(result.incomeStatus).toBe('complete')
     expect(result.expenseStatus).toBe('complete')
@@ -154,6 +162,7 @@ describe('period closure mutations', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockPublishOutboxEvent.mockResolvedValue('outbox-event-1')
+    mockLoadNagerDateHolidayDateSet.mockResolvedValue(new Set<string>())
   })
 
   it('closes a ready period and publishes accounting.period_closed', async () => {

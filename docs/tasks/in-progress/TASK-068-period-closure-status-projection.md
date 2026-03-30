@@ -1,5 +1,23 @@
 # TASK-068 — Period Closure Status Projection
 
+## Delta 2026-03-30 — Period closure alineado al calendario operativo
+
+- `checkPeriodReadiness()` ya no asume solo mes calendario crudo.
+- El checker ahora resuelve el período contra el calendario operativo compartido de Greenhouse:
+  - timezone canónica `America/Santiago`
+  - jurisdicción `CL`
+  - `closeWindowBusinessDays` desde `src/lib/calendar/operational-calendar.ts`
+  - feriados vía `Nager.Date` con fallback fail-soft a la configuración base
+- El payload de readiness ahora expone `operationalCalendar` con:
+  - `currentOperationalMonthKey`
+  - `inCurrentCloseWindow`
+  - `lastBusinessDayOfTargetMonth`
+- `listRecentClosurePeriods()` ahora garantiza incluir el mes operativo actual aunque todavía no existan señales de payroll/finance materializadas para ese período.
+- Validación adicional ejecutada:
+  - `pnpm exec vitest run src/lib/cost-intelligence/check-period-readiness.test.ts src/lib/sync/projections/period-closure-status.test.ts`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm build`
+
 ## Delta 2026-03-30 — Slice operativo inicial implementado
 
 - Ya quedó implementado el primer slice real de `TASK-068`:
