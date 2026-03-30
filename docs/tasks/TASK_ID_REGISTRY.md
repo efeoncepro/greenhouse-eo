@@ -86,7 +86,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-068` | `complete` | Period Closure Status Projection | `docs/tasks/complete/TASK-068-period-closure-status-projection.md` |
 | `TASK-069` | `complete` | Operational P&L Projection | `docs/tasks/complete/TASK-069-operational-pl-projection.md` |
 | `TASK-070` | `in-progress` | Cost Intelligence Finance UI | `docs/tasks/in-progress/TASK-070-cost-intelligence-finance-ui.md` |
-| `TASK-071` | `to-do` | Cost Intelligence Cross-Module Consumers | `docs/tasks/to-do/TASK-071-cost-intelligence-cross-module-consumers.md` |
+| `TASK-071` | `in-progress` | Cost Intelligence Cross-Module Consumers | `docs/tasks/in-progress/TASK-071-cost-intelligence-cross-module-consumers.md` |
 | `TASK-072` | `to-do` | Compensation Versioning UX Clarity | `docs/tasks/to-do/TASK-072-compensation-versioning-ux-clarity.md` |
 | `TASK-073` | `complete` | People Canonical Capacity Cutover | `docs/tasks/complete/TASK-073-people-canonical-capacity-cutover.md` |
 | `TASK-074` | `complete` | Projected Payroll to Official Promotion Flow | `docs/tasks/complete/TASK-074-projected-payroll-to-official-promotion-flow.md` |
@@ -187,5 +187,25 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-139` | `complete` | Finance Module Hardening: Corrections & Data Quality | `docs/tasks/complete/TASK-139-finance-module-hardening.md` |
 | `TASK-140` | `to-do` | Admin Views Person-First Preview Cutover | `docs/tasks/to-do/TASK-140-admin-views-person-first-preview.md` |
 | `TASK-141` | `to-do` | Canonical Person Identity Consumption | `docs/tasks/to-do/TASK-141-canonical-person-identity-consumption.md` |
+| `TASK-142` | `to-do` | Agency Space 360 View | `docs/tasks/to-do/TASK-142-agency-space-360-view.md` |
+| `TASK-143` | `to-do` | Agency Economics API & View | `docs/tasks/to-do/TASK-143-agency-economics-api.md` |
+| `TASK-144` | `to-do` | Agency Team Dedicated API | `docs/tasks/to-do/TASK-144-agency-team-api-dedup.md` |
+| `TASK-145` | `to-do` | Agency Campaigns API Rescope | `docs/tasks/to-do/TASK-145-agency-campaigns-rescope.md` |
+| `TASK-146` | `to-do` | Service-Level P&L (Economics per Service) | `docs/tasks/to-do/TASK-146-service-pnl.md` |
+| `TASK-147` | `to-do` | Campaign ↔ Service Bridge | `docs/tasks/to-do/TASK-147-campaign-service-bridge.md` |
+| `TASK-148` | `to-do` | Agency Outbox Event Emission | `docs/tasks/to-do/TASK-148-agency-outbox-events.md` |
+| `TASK-149` | `to-do` | Team Capacity Engine — Alerts & Constraints | `docs/tasks/to-do/TASK-149-capacity-engine-alerts.md` |
+| `TASK-150` | `to-do` | Space Health Score — Composite Indicator | `docs/tasks/to-do/TASK-150-space-health-score.md` |
+| `TASK-151` | `to-do` | Space Risk Score & Churn Prediction | `docs/tasks/to-do/TASK-151-space-risk-score.md` |
+| `TASK-152` | `to-do` | Anomaly Detection Engine — Rule-Based | `docs/tasks/to-do/TASK-152-anomaly-detection-engine.md` |
+| `TASK-153` | `to-do` | Capacity Forecast — FTE Projection by Role | `docs/tasks/to-do/TASK-153-capacity-forecast.md` |
+| `TASK-154` | `to-do` | Revenue Pipeline Intelligence (HubSpot → Forecast) | `docs/tasks/to-do/TASK-154-revenue-pipeline-intelligence.md` |
+| `TASK-155` | `to-do` | Scope Intelligence — Automatic Scope Creep Detection | `docs/tasks/to-do/TASK-155-scope-intelligence.md` |
+| `TASK-156` | `to-do` | SLA/SLO Contractual per Service | `docs/tasks/to-do/TASK-156-sla-slo-per-service.md` |
+| `TASK-157` | `to-do` | Skills Matrix + Intelligent Staffing Engine | `docs/tasks/to-do/TASK-157-skills-matrix-staffing.md` |
+| `TASK-158` | `to-do` | Client Lifecycle Intelligence & Churn Prediction | `docs/tasks/to-do/TASK-158-client-lifecycle-churn.md` |
+| `TASK-159` | `to-do` | Nexa Agency Tools — Query, Recommend, Act | `docs/tasks/to-do/TASK-159-nexa-agency-tools.md` |
+| `TASK-160` | `to-do` | Agency Enterprise Hardening — Contracts, Observability, Migration | `docs/tasks/to-do/TASK-160-agency-enterprise-hardening.md` |
+| `TASK-161` | `to-do` | Agency Permissions, Data Retention & Operational Onboarding | `docs/tasks/to-do/TASK-161-agency-permissions-retention-onboarding.md` |
 
-`TASK-142`
+`TASK-162`
