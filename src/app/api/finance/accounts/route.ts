@@ -21,6 +21,7 @@ import {
   createFinanceAccountInPostgres,
   shouldFallbackFromFinancePostgres
 } from '@/lib/finance/postgres-store'
+import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
 
 export const dynamic = 'force-dynamic'
 
@@ -289,6 +290,16 @@ export async function POST(request: Request) {
     } catch (error) {
       if (!shouldFallbackFromFinancePostgres(error)) {
         throw error
+      }
+
+      if (!isFinanceBigQueryWriteEnabled()) {
+        return NextResponse.json(
+          {
+            error: 'Finance BigQuery fallback write is disabled. Postgres write path failed.',
+            code: 'FINANCE_BQ_WRITE_DISABLED'
+          },
+          { status: 503 }
+        )
       }
 
       await ensureFinanceInfrastructure()

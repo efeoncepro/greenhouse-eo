@@ -4,6 +4,45 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — cierre formal de TASK-166 Finance BigQuery write cutover
+
+### Objetivo
+- Cerrar el lifecycle real de `FINANCE_BIGQUERY_WRITE_ENABLED` como guard operativo de Finance y dejar el remanente clasificado explícitamente.
+
+### Delta de ejecución
+- Guard operativo extendido a:
+  - `POST /api/finance/accounts`
+  - `PUT /api/finance/accounts/[id]`
+  - `POST /api/finance/exchange-rates`
+  - `POST /api/finance/suppliers`
+  - `PUT /api/finance/suppliers/[id]`
+  - `POST /api/finance/expenses/bulk`
+- `suppliers` ya no escribe primariamente a BigQuery:
+  - `POST` y `PUT` usan `seedFinanceSupplierInPostgres()`
+- Test nuevo:
+  - `src/app/api/finance/bigquery-write-cutover.test.ts`
+- Lifecycle cerrado:
+  - `docs/tasks/complete/TASK-166-finance-bigquery-write-cutover.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+- Delta cruzado:
+  - `docs/tasks/complete/TASK-139-finance-module-hardening.md` ahora explicita que el remanente del flag quedó absorbido y cerrado por `TASK-166`
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/finance/bigquery-write-flag.test.ts src/app/api/finance/bigquery-write-cutover.test.ts`
+- `pnpm exec eslint src/lib/finance/bigquery-write-flag.ts src/lib/finance/bigquery-write-flag.test.ts src/app/api/finance/bigquery-write-cutover.test.ts src/app/api/finance/accounts/route.ts src/app/api/finance/accounts/[id]/route.ts src/app/api/finance/exchange-rates/route.ts src/app/api/finance/suppliers/route.ts src/app/api/finance/suppliers/[id]/route.ts src/app/api/finance/expenses/bulk/route.ts src/app/api/finance/income/route.ts src/app/api/finance/expenses/route.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
+### Residual explícito
+- Siguen clasificados fuera de `TASK-166`:
+  - `income/[id]`
+  - `expenses/[id]`
+  - `income/[id]/payment`
+  - `reconciliation/**`
+  - `economic-indicators`
+- El criterio vigente es tratarlos como lanes o follow-ons localizados, no como bloqueo del flag operativo core.
+
 ## Sesión 2026-03-30 — arranque de TASK-166 Finance BigQuery write cutover
 
 ### Objetivo

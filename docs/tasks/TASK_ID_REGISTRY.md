@@ -214,4 +214,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-164` | `complete` | Purchase Orders (OC) & Service Entry Sheets (HES) Module | `docs/tasks/complete/TASK-164-purchase-orders-module.md` |
 
 | `TASK-165` | `complete` | Nubox Full Data Enrichment: All Fields, Line Items, Sync Hardening | `docs/tasks/complete/TASK-165-nubox-full-data-enrichment.md` |
-| `TASK-166` | `in-progress` | Finance BigQuery Write Cutover | `docs/tasks/in-progress/TASK-166-finance-bigquery-write-cutover.md` |
+| `TASK-166` | `complete` | Finance BigQuery Write Cutover | `docs/tasks/complete/TASK-166-finance-bigquery-write-cutover.md` |

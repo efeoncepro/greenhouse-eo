@@ -19,8 +19,13 @@ import {
   type SupplierCategory,
   type PaymentMethod
 } from '@/lib/finance/shared'
-import { getFinanceSupplierFromPostgres, shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
+import {
+  getFinanceSupplierFromPostgres,
+  seedFinanceSupplierInPostgres,
+  shouldFallbackFromFinancePostgres
+} from '@/lib/finance/postgres-store'
 import { listFinanceExpensesFromPostgres } from '@/lib/finance/postgres-store-slice2'
+import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
 
 export const dynamic = 'force-dynamic'
 
@@ -182,129 +187,200 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
-
   try {
     const { id: supplierId } = await params
     const body = await request.json()
-    const projectId = getFinanceProjectId()
 
-    const existing = await runFinanceQuery<{ supplier_id: string }>(`
-      SELECT supplier_id
-      FROM \`${projectId}.greenhouse.fin_suppliers\`
-      WHERE supplier_id = @supplierId
-    `, { supplierId })
+    try {
+      const existing = await getFinanceSupplierFromPostgres(supplierId)
 
-    if (existing.length === 0) {
-      return NextResponse.json({ error: 'Supplier not found' }, { status: 404 })
-    }
-
-    const updates: string[] = []
-    const updateParams: Record<string, unknown> = { supplierId }
-
-    const stringFields: [string, string][] = [
-      ['legalName', 'legal_name'], ['tradeName', 'trade_name'], ['taxId', 'tax_id'],
-      ['taxIdType', 'tax_id_type'], ['country', 'country'], ['serviceType', 'service_type'],
-      ['primaryContactName', 'primary_contact_name'], ['primaryContactEmail', 'primary_contact_email'],
-      ['primaryContactPhone', 'primary_contact_phone'], ['website', 'website'],
-      ['bankName', 'bank_name'], ['bankAccountNumber', 'bank_account_number'],
-      ['bankAccountType', 'bank_account_type'], ['bankRouting', 'bank_routing'],
-      ['notes', 'notes']
-    ]
-
-    for (const [bodyKey, dbCol] of stringFields) {
-      if (body[bodyKey] !== undefined) {
-        if (bodyKey === 'legalName') {
-          updateParams[bodyKey] = assertNonEmptyString(body[bodyKey], bodyKey)
-        } else {
-          updateParams[bodyKey] = body[bodyKey] ? normalizeString(body[bodyKey]) : null
-        }
-
-        updates.push(`${dbCol} = @${bodyKey}`)
+      if (!existing) {
+        return NextResponse.json({ error: 'Supplier not found' }, { status: 404 })
       }
-    }
 
-    if (body.category !== undefined) {
-      updates.push('category = @category')
-      updateParams.category = SUPPLIER_CATEGORIES.includes(body.category)
-        ? (body.category as SupplierCategory)
-        : 'other'
-    }
+      const updatedSupplier = await seedFinanceSupplierInPostgres({
+        supplierId,
+        providerId: body.providerId !== undefined ? (body.providerId ? normalizeString(body.providerId) : null) : existing.providerId,
+        organizationId: existing.organizationId,
+        legalName: body.legalName !== undefined ? assertNonEmptyString(body.legalName, 'legalName') : existing.legalName,
+        tradeName: body.tradeName !== undefined ? (body.tradeName ? normalizeString(body.tradeName) : null) : existing.tradeName,
+        taxId: body.taxId !== undefined ? (body.taxId ? normalizeString(body.taxId) : null) : existing.taxId,
+        taxIdType: body.taxIdType !== undefined ? (body.taxIdType ? normalizeString(body.taxIdType) : null) : existing.taxIdType,
+        country: body.country !== undefined ? (normalizeString(body.country) || 'CL') : existing.country,
+        category: body.category !== undefined
+          ? (SUPPLIER_CATEGORIES.includes(body.category) ? body.category as SupplierCategory : 'other')
+          : existing.category,
+        serviceType: body.serviceType !== undefined ? (body.serviceType ? normalizeString(body.serviceType) : null) : existing.serviceType,
+        isInternational: body.isInternational !== undefined ? Boolean(body.isInternational) : existing.isInternational,
+        primaryContactName: body.primaryContactName !== undefined ? (body.primaryContactName ? normalizeString(body.primaryContactName) : null) : existing.primaryContactName,
+        primaryContactEmail: body.primaryContactEmail !== undefined ? (body.primaryContactEmail ? normalizeString(body.primaryContactEmail) : null) : existing.primaryContactEmail,
+        primaryContactPhone: body.primaryContactPhone !== undefined ? (body.primaryContactPhone ? normalizeString(body.primaryContactPhone) : null) : existing.primaryContactPhone,
+        website: body.website !== undefined ? (body.website ? normalizeString(body.website) : null) : existing.website,
+        bankName: body.bankName !== undefined ? (body.bankName ? normalizeString(body.bankName) : null) : existing.bankName,
+        bankAccountNumber: body.bankAccountNumber !== undefined ? (body.bankAccountNumber ? normalizeString(body.bankAccountNumber) : null) : existing.bankAccountNumber,
+        bankAccountType: body.bankAccountType !== undefined ? (body.bankAccountType ? normalizeString(body.bankAccountType) : null) : existing.bankAccountType,
+        bankRouting: body.bankRouting !== undefined ? (body.bankRouting ? normalizeString(body.bankRouting) : null) : existing.bankRouting,
+        paymentCurrency: body.paymentCurrency !== undefined ? assertValidCurrency(body.paymentCurrency) : existing.paymentCurrency,
+        defaultPaymentTerms: body.defaultPaymentTerms !== undefined ? (toNumber(body.defaultPaymentTerms) || 30) : existing.defaultPaymentTerms,
+        defaultPaymentMethod: body.defaultPaymentMethod !== undefined
+          ? (PAYMENT_METHODS.includes(body.defaultPaymentMethod) ? body.defaultPaymentMethod as PaymentMethod : 'transfer')
+          : existing.defaultPaymentMethod,
+        requiresPo: body.requiresPo !== undefined ? Boolean(body.requiresPo) : existing.requiresPo,
+        isActive: body.isActive !== undefined ? Boolean(body.isActive) : existing.isActive,
+        notes: body.notes !== undefined ? (body.notes ? normalizeString(body.notes) : null) : existing.notes,
+        createdBy: existing.createdBy
+      })
 
-    if (body.paymentCurrency !== undefined) {
-      updates.push('payment_currency = @paymentCurrency')
-      updateParams.paymentCurrency = assertValidCurrency(body.paymentCurrency)
-    }
 
-    if (body.defaultPaymentTerms !== undefined) {
-      updates.push('default_payment_terms = @defaultPaymentTerms')
-      updateParams.defaultPaymentTerms = toNumber(body.defaultPaymentTerms) || 30
-    }
-
-    if (body.defaultPaymentMethod !== undefined) {
-      updates.push('default_payment_method = @defaultPaymentMethod')
-      updateParams.defaultPaymentMethod = PAYMENT_METHODS.includes(body.defaultPaymentMethod)
-        ? (body.defaultPaymentMethod as PaymentMethod)
-        : 'transfer'
-    }
-
-    if (body.isInternational !== undefined) {
-      updates.push('is_international = @isInternational')
-      updateParams.isInternational = Boolean(body.isInternational)
-    }
-
-    if (body.requiresPo !== undefined) {
-      updates.push('requires_po = @requiresPo')
-      updateParams.requiresPo = Boolean(body.requiresPo)
-    }
-
-    if (body.isActive !== undefined) {
-      updates.push('is_active = @isActive')
-      updateParams.isActive = Boolean(body.isActive)
-    }
-
-    if (body.providerId !== undefined) {
-      const providerId = body.providerId ? normalizeString(body.providerId) : null
-
-      updates.push('provider_id = @providerId')
-      updateParams.providerId = providerId
-    }
-
-    if (updates.length === 0) {
-      return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
-    }
-
-    updates.push('updated_at = CURRENT_TIMESTAMP()')
-
-    await runFinanceQuery(`
-      UPDATE \`${projectId}.greenhouse.fin_suppliers\`
-      SET ${updates.join(', ')}
-      WHERE supplier_id = @supplierId
-    `, updateParams)
-
-    const [updatedSupplier] = await runFinanceQuery<SupplierDetailRow>(`
-      SELECT *
-      FROM \`${projectId}.greenhouse.fin_suppliers\`
-      WHERE supplier_id = @supplierId
-      LIMIT 1
-    `, { supplierId })
-
-    if (updatedSupplier) {
       await syncProviderFromFinanceSupplier({
         supplierId,
-        providerId: updatedSupplier.provider_id ? normalizeString(updatedSupplier.provider_id) : null,
-        legalName: normalizeString(updatedSupplier.legal_name),
-        tradeName: updatedSupplier.trade_name ? normalizeString(updatedSupplier.trade_name) : null,
-        website: updatedSupplier.website ? normalizeString(updatedSupplier.website) : null,
-        isActive: normalizeBoolean(updatedSupplier.is_active)
+        providerId: updatedSupplier.providerId,
+        legalName: updatedSupplier.legalName,
+        tradeName: updatedSupplier.tradeName,
+        website: updatedSupplier.website,
+        isActive: updatedSupplier.isActive
+      })
+
+      return NextResponse.json({
+        supplierId,
+        providerId: updatedSupplier.providerId,
+        updated: true
+      })
+    } catch (error) {
+      if (!shouldFallbackFromFinancePostgres(error)) {
+        throw error
+      }
+
+      if (!isFinanceBigQueryWriteEnabled()) {
+        return NextResponse.json(
+          {
+            error: 'Finance BigQuery fallback write is disabled. Postgres write path failed.',
+            code: 'FINANCE_BQ_WRITE_DISABLED'
+          },
+          { status: 503 }
+        )
+      }
+
+      await ensureFinanceInfrastructure()
+      const projectId = getFinanceProjectId()
+
+      const existing = await runFinanceQuery<{ supplier_id: string }>(`
+        SELECT supplier_id
+        FROM \`${projectId}.greenhouse.fin_suppliers\`
+        WHERE supplier_id = @supplierId
+      `, { supplierId })
+
+      if (existing.length === 0) {
+        return NextResponse.json({ error: 'Supplier not found' }, { status: 404 })
+      }
+
+      const updates: string[] = []
+      const updateParams: Record<string, unknown> = { supplierId }
+
+      const stringFields: [string, string][] = [
+        ['legalName', 'legal_name'], ['tradeName', 'trade_name'], ['taxId', 'tax_id'],
+        ['taxIdType', 'tax_id_type'], ['country', 'country'], ['serviceType', 'service_type'],
+        ['primaryContactName', 'primary_contact_name'], ['primaryContactEmail', 'primary_contact_email'],
+        ['primaryContactPhone', 'primary_contact_phone'], ['website', 'website'],
+        ['bankName', 'bank_name'], ['bankAccountNumber', 'bank_account_number'],
+        ['bankAccountType', 'bank_account_type'], ['bankRouting', 'bank_routing'],
+        ['notes', 'notes']
+      ]
+
+      for (const [bodyKey, dbCol] of stringFields) {
+        if (body[bodyKey] !== undefined) {
+          if (bodyKey === 'legalName') {
+            updateParams[bodyKey] = assertNonEmptyString(body[bodyKey], bodyKey)
+          } else {
+            updateParams[bodyKey] = body[bodyKey] ? normalizeString(body[bodyKey]) : null
+          }
+
+          updates.push(`${dbCol} = @${bodyKey}`)
+        }
+      }
+
+      if (body.category !== undefined) {
+        updates.push('category = @category')
+        updateParams.category = SUPPLIER_CATEGORIES.includes(body.category)
+          ? (body.category as SupplierCategory)
+          : 'other'
+      }
+
+      if (body.paymentCurrency !== undefined) {
+        updates.push('payment_currency = @paymentCurrency')
+        updateParams.paymentCurrency = assertValidCurrency(body.paymentCurrency)
+      }
+
+      if (body.defaultPaymentTerms !== undefined) {
+        updates.push('default_payment_terms = @defaultPaymentTerms')
+        updateParams.defaultPaymentTerms = toNumber(body.defaultPaymentTerms) || 30
+      }
+
+      if (body.defaultPaymentMethod !== undefined) {
+        updates.push('default_payment_method = @defaultPaymentMethod')
+        updateParams.defaultPaymentMethod = PAYMENT_METHODS.includes(body.defaultPaymentMethod)
+          ? (body.defaultPaymentMethod as PaymentMethod)
+          : 'transfer'
+      }
+
+      if (body.isInternational !== undefined) {
+        updates.push('is_international = @isInternational')
+        updateParams.isInternational = Boolean(body.isInternational)
+      }
+
+      if (body.requiresPo !== undefined) {
+        updates.push('requires_po = @requiresPo')
+        updateParams.requiresPo = Boolean(body.requiresPo)
+      }
+
+      if (body.isActive !== undefined) {
+        updates.push('is_active = @isActive')
+        updateParams.isActive = Boolean(body.isActive)
+      }
+
+      if (body.providerId !== undefined) {
+        const providerId = body.providerId ? normalizeString(body.providerId) : null
+
+        updates.push('provider_id = @providerId')
+        updateParams.providerId = providerId
+      }
+
+      if (updates.length === 0) {
+        return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
+      }
+
+      updates.push('updated_at = CURRENT_TIMESTAMP()')
+
+      await runFinanceQuery(`
+        UPDATE \`${projectId}.greenhouse.fin_suppliers\`
+        SET ${updates.join(', ')}
+        WHERE supplier_id = @supplierId
+      `, updateParams)
+
+      const [updatedSupplier] = await runFinanceQuery<SupplierDetailRow>(`
+        SELECT *
+        FROM \`${projectId}.greenhouse.fin_suppliers\`
+        WHERE supplier_id = @supplierId
+        LIMIT 1
+      `, { supplierId })
+
+      if (updatedSupplier) {
+        await syncProviderFromFinanceSupplier({
+          supplierId,
+          providerId: updatedSupplier.provider_id ? normalizeString(updatedSupplier.provider_id) : null,
+          legalName: normalizeString(updatedSupplier.legal_name),
+          tradeName: updatedSupplier.trade_name ? normalizeString(updatedSupplier.trade_name) : null,
+          website: updatedSupplier.website ? normalizeString(updatedSupplier.website) : null,
+          isActive: normalizeBoolean(updatedSupplier.is_active)
+        })
+      }
+
+      return NextResponse.json({
+        supplierId,
+        providerId: updatedSupplier?.provider_id ? normalizeString(updatedSupplier.provider_id) : null,
+        updated: true
       })
     }
-
-    return NextResponse.json({
-      supplierId,
-      providerId: updatedSupplier?.provider_id ? normalizeString(updatedSupplier.provider_id) : null,
-      updated: true
-    })
   } catch (error) {
     if (error instanceof FinanceValidationError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode })

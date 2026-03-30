@@ -30,6 +30,15 @@
   - el retry mechanism ya no es solo queue plumbing
   - el remanente real de la task queda acotado al lifecycle del flag `FINANCE_BIGQUERY_WRITE_ENABLED`, no al carril DTE
 
+## Delta 2026-03-30 — remanente del flag absorbido y cerrado por TASK-166
+
+- El follow-on operativo del flag ya quedó resuelto en:
+  - `docs/tasks/complete/TASK-166-finance-bigquery-write-cutover.md`
+- Estado resultante:
+  - `FINANCE_BIGQUERY_WRITE_ENABLED` ya es guard runtime real, no solo documentación
+  - `suppliers` dejó de depender de BigQuery como write path principal
+  - el remanente legacy queda clasificado por rutas especializadas, no como deuda abierta de `TASK-139`
+
 ## Status
 
 | Campo | Valor |

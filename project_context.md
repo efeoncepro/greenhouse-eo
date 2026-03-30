@@ -3,6 +3,23 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-30 TASK-166 cerró el lifecycle real del flag de BigQuery writes en Finance
+- `FINANCE_BIGQUERY_WRITE_ENABLED` ya no es solo documentación; ahora es un guard operativo real.
+- Carriles cubiertos:
+  - `POST /api/finance/income`
+  - `POST /api/finance/expenses`
+  - `POST /api/finance/expenses/bulk`
+  - `POST /api/finance/accounts`
+  - `PUT /api/finance/accounts/[id]`
+  - `POST /api/finance/exchange-rates`
+  - `POST /api/finance/suppliers`
+  - `PUT /api/finance/suppliers/[id]`
+- Regla vigente:
+  - si PostgreSQL falla y `FINANCE_BIGQUERY_WRITE_ENABLED=false`, estas rutas responden `503` con `FINANCE_BQ_WRITE_DISABLED`
+  - BigQuery queda como fallback transicional solo cuando el flag permanece activo
+- Ajuste relevante:
+  - `suppliers` ya es Postgres-first para writes y dejó de depender de BigQuery como path principal
+
 ## Delta 2026-03-30 UI/UX skill stack local reforzada
 - Greenhouse ya no debe depender solo de skills globales de UI para frontend portal.
 - Nuevo baseline canónico:

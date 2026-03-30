@@ -4,11 +4,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `in-progress` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Medio` |
-| Status real | `Implementación inicial` |
+| Status real | `Cerrada` |
 | Rank | — |
 | Domain | Finance / Data Platform / Runtime |
 | Sequence | Follow-on directo post `TASK-139` |
@@ -89,6 +89,46 @@ Reglas obligatorias:
   - si el write Postgres falla y `FINANCE_BIGQUERY_WRITE_ENABLED=false`, la ruta responde `503` con `FINANCE_BQ_WRITE_DISABLED`
   - si el flag sigue activo, se conserva el fallback legacy actual
 
+## Delta 2026-03-30 — slice 2 + cierre operativo
+
+- Nuevas rutas cubiertas por el guard operativo:
+  - `POST /api/finance/accounts`
+  - `PUT /api/finance/accounts/[id]`
+  - `POST /api/finance/exchange-rates`
+  - `POST /api/finance/suppliers`
+  - `PUT /api/finance/suppliers/[id]`
+  - `POST /api/finance/expenses/bulk`
+- `suppliers` dejó de depender de BigQuery como write path principal:
+  - `POST` y `PUT` ahora son Postgres-first vía `seedFinanceSupplierInPostgres()`
+- Regla operativa cerrada:
+  - cuando Postgres falla y `FINANCE_BIGQUERY_WRITE_ENABLED=false`, las rutas write cubiertas responden `503` con `FINANCE_BQ_WRITE_DISABLED`
+  - BigQuery queda solo como fallback transicional cuando el flag sigue activo
+
+## Delta 2026-03-30 — inventario clasificado del remanente
+
+### Write paths ya cubiertos por TASK-166
+
+- `POST /api/finance/income`
+- `POST /api/finance/expenses`
+- `POST /api/finance/expenses/bulk`
+- `POST /api/finance/accounts`
+- `PUT /api/finance/accounts/[id]`
+- `POST /api/finance/exchange-rates`
+- `POST /api/finance/suppliers`
+- `PUT /api/finance/suppliers/[id]`
+
+### Write paths residuales clasificados, no bloqueadores del cierre
+
+- siguen con fallback BigQuery porque pertenecen a carriles más especializados o follow-ons ya existentes:
+  - `PUT /api/finance/income/[id]`
+  - `PUT /api/finance/expenses/[id]`
+  - `POST /api/finance/income/[id]/payment`
+  - rutas `reconciliation/**`
+  - `economic-indicators` sync/upsert
+- criterio de cierre:
+  - `TASK-166` cierra el lifecycle real del flag y el cutover del bloque core/master-data
+  - el remanente se trata como deuda localizada por dominio, no como bloqueo del flag operativo
+
 ## Scope
 
 ### Slice 1 — Fail-closed inicial en writes core
@@ -121,13 +161,14 @@ Reglas obligatorias:
 - [x] Existe helper shared para resolver el estado efectivo de `FINANCE_BIGQUERY_WRITE_ENABLED`
 - [x] `POST /api/finance/income` respeta el flag cuando Postgres falla
 - [x] `POST /api/finance/expenses` respeta el flag cuando Postgres falla
-- [ ] Existe inventario explícito de rutas write que aún conservan fallback BigQuery
-- [ ] Al menos un segundo bloque de rutas write queda cortado o clasificado
-- [ ] La estrategia de rollout por entorno queda documentada
+- [x] Existe inventario explícito de rutas write que aún conservan fallback BigQuery
+- [x] Al menos un segundo bloque de rutas write queda cortado o clasificado
+- [x] La estrategia de rollout por entorno queda documentada
 
 ## Verification
 
 - `pnpm exec vitest run src/lib/finance/bigquery-write-flag.test.ts`
-- `pnpm exec eslint src/lib/finance/bigquery-write-flag.ts src/lib/finance/bigquery-write-flag.test.ts src/app/api/finance/income/route.ts src/app/api/finance/expenses/route.ts`
+- `pnpm exec vitest run src/lib/finance/bigquery-write-flag.test.ts src/app/api/finance/bigquery-write-cutover.test.ts`
+- `pnpm exec eslint src/lib/finance/bigquery-write-flag.ts src/lib/finance/bigquery-write-flag.test.ts src/app/api/finance/bigquery-write-cutover.test.ts src/app/api/finance/accounts/route.ts src/app/api/finance/accounts/[id]/route.ts src/app/api/finance/exchange-rates/route.ts src/app/api/finance/suppliers/route.ts src/app/api/finance/suppliers/[id]/route.ts src/app/api/finance/expenses/bulk/route.ts src/app/api/finance/income/route.ts src/app/api/finance/expenses/route.ts`
 - `pnpm exec tsc --noEmit --pretty false`
-- validación manual en staging con `FINANCE_BIGQUERY_WRITE_ENABLED=false`
+- validación automatizada fail-closed con `FINANCE_BIGQUERY_WRITE_ENABLED=false` vía route handlers

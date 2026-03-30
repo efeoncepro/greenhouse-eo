@@ -213,7 +213,17 @@ Finance module migrated to Postgres-first with BigQuery fallback (Slice 1 + 2). 
 | Agency economics | BigQuery | Primary for BQ CTEs | Depends on TASK-069 materialized P&L |
 
 Flag: `FINANCE_BIGQUERY_WRITE_ENABLED` controls BQ writes (default: true).
-Cutover sequence: flag → false in staging 30d → false in production → remove BQ write code.
+Operational status after `TASK-166`:
+- covered core/master-data routes now fail closed with `503 FINANCE_BQ_WRITE_DISABLED` when Postgres fails and the flag is `false`
+- covered routes:
+  - income create
+  - expense create
+  - bulk expense create
+  - accounts create/update
+  - exchange-rates upsert
+  - suppliers create/update
+- `suppliers` no longer uses BigQuery as its primary write path; it is Postgres-first with transitional fallback only when the flag remains enabled
+Cutover sequence: automated fail-closed validation with flag `false` → staging rollout with flag `false` on covered routes → production rollout with flag `false` → remove BQ write code route by route.
 
 #### AI Tooling operational workflows
 - wallets
