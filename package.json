@@ -42,6 +42,7 @@
     "setup:postgres:person-360-contextual": "tsx scripts/setup-postgres-person-360-contextual.ts",
     "setup:postgres:source-sync": "tsx scripts/setup-postgres-source-sync.ts",
     "setup:postgres:transactional-email": "tsx scripts/setup-postgres-transactional-email.ts",
+    "setup:postgres:view-access": "tsx scripts/setup-postgres-view-access.ts",
     "email:dev": "email dev --dir src/emails --port 3001",
     "postinstall": "npm run build:icons",
     "clean": "node scripts/clean-paths.mjs .next-local .next",

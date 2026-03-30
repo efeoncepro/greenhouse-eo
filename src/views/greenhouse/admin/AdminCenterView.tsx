@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import Link from 'next/link'
 import { usePathname, useRouter as useNavRouter, useSearchParams } from 'next/navigation'
@@ -16,7 +16,7 @@ import Typography from '@mui/material/Typography'
 
 import SectionErrorBoundary from '@components/greenhouse/SectionErrorBoundary'
 
-import { ExecutiveCardShell, ExecutiveMiniStatCard } from '@/components/greenhouse'
+import { ExecutiveCardShell, ExecutiveMiniStatCard, GreenhouseDragList } from '@/components/greenhouse'
 import { GH_INTERNAL_MESSAGES, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import type { AdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
 import type { AdminTenantsOverview } from '@/lib/admin/get-admin-tenants-overview'
@@ -43,6 +43,7 @@ type Props = {
 }
 
 type DomainCard = {
+  id: string
   title: string
   subtitle: string
   icon: string
@@ -109,6 +110,7 @@ const exportToCsv = (rows: DerivedControlTowerTenant[]) => {
 
 const buildDomainCards = ({ access, tenants, operations }: Pick<Props, 'access' | 'tenants' | 'operations'>): DomainCard[] => [
   {
+    id: 'identity-access',
     title: 'Identity & Access',
     subtitle: 'Usuarios, roles, equipo interno y scopes visibles del portal.',
     icon: 'tabler-shield-lock',
@@ -124,6 +126,23 @@ const buildDomainCards = ({ access, tenants, operations }: Pick<Props, 'access' 
     ]
   },
   {
+    id: 'view-access',
+    title: 'Vistas y acceso',
+    subtitle: 'Lectura efectiva del portal por rol y preparación para overrides por usuario.',
+    icon: 'tabler-layout-grid',
+    avatarColor: 'primary',
+    status: { label: 'Baseline actual', color: 'info' },
+    href: '/admin/views',
+    primaryAction: 'Abrir vistas y acceso',
+    routes: ['/admin/views'],
+    points: [
+      `${access.roles.length} roles visibles en la matrix actual`,
+      'Preview de navegación por usuario sobre el baseline vigente',
+      'Slice preparado para asignación configurable y auditoría'
+    ]
+  },
+  {
+    id: 'delivery',
     title: 'Delivery',
     subtitle: 'Historial de envios, suscripciones y trazabilidad de delivery operacional.',
     icon: 'tabler-mail-bolt',
@@ -139,6 +158,7 @@ const buildDomainCards = ({ access, tenants, operations }: Pick<Props, 'access' 
     ]
   },
   {
+    id: 'notifications',
     title: 'Notificaciones',
     subtitle: 'Gobierno del sistema de notificaciones in-app y email.',
     icon: 'tabler-bell',
@@ -154,6 +174,7 @@ const buildDomainCards = ({ access, tenants, operations }: Pick<Props, 'access' 
     ]
   },
   {
+    id: 'ai-governance',
     title: 'AI Governance',
     subtitle: 'Catalogo, licencias, wallets y control administrativo de AI Tools.',
     icon: 'tabler-robot',
@@ -169,6 +190,7 @@ const buildDomainCards = ({ access, tenants, operations }: Pick<Props, 'access' 
     ]
   },
   {
+    id: 'cloud-integrations',
     title: 'Cloud & Integrations',
     subtitle: GH_INTERNAL_NAV.adminCloudIntegrations.subtitle,
     icon: 'tabler-plug-connected',
@@ -187,6 +209,7 @@ const buildDomainCards = ({ access, tenants, operations }: Pick<Props, 'access' 
     ]
   },
   {
+    id: 'ops-health',
     title: 'Ops Health',
     subtitle: GH_INTERNAL_NAV.adminOpsHealth.subtitle,
     icon: 'tabler-activity-heartbeat',
@@ -207,6 +230,7 @@ const buildDomainCards = ({ access, tenants, operations }: Pick<Props, 'access' 
     ]
   },
   {
+    id: 'spaces',
     title: 'Spaces',
     subtitle: 'Provisioning context, enablement y postura de acceso por tenant.',
     icon: 'tabler-grid-4x4',
@@ -224,6 +248,7 @@ const buildDomainCards = ({ access, tenants, operations }: Pick<Props, 'access' 
 ]
 
 const validFilters: StatusFilter[] = ['all', 'active', 'onboarding', 'attention', 'inactive']
+const ADMIN_CENTER_CARD_ORDER_KEY = 'greenhouse:admin-center:domain-card-order'
 
 const AdminCenterView = ({ access, tenants, controlTower, operations }: Props) => {
   const searchParams = useSearchParams()
@@ -303,6 +328,58 @@ const AdminCenterView = ({ access, tenants, controlTower, operations }: Props) =
           : 'error'
 
   const cards = buildDomainCards({ access, tenants, operations })
+  const [domainCardOrder, setDomainCardOrder] = useState<string[]>([])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const rawValue = window.localStorage.getItem(ADMIN_CENTER_CARD_ORDER_KEY)
+
+    if (!rawValue) {
+      setDomainCardOrder(cards.map(card => card.id))
+
+      return
+    }
+
+    try {
+      const parsed = JSON.parse(rawValue)
+
+      if (!Array.isArray(parsed)) {
+        setDomainCardOrder(cards.map(card => card.id))
+
+        return
+      }
+
+      setDomainCardOrder(parsed.filter((value): value is string => typeof value === 'string'))
+    } catch {
+      setDomainCardOrder(cards.map(card => card.id))
+    }
+  }, [cards])
+
+  const orderedCards = useMemo(() => {
+    const positionMap = new Map(domainCardOrder.map((id, index) => [id, index]))
+
+    return [...cards].sort((left, right) => {
+      const leftPosition = positionMap.get(left.id) ?? Number.MAX_SAFE_INTEGER
+      const rightPosition = positionMap.get(right.id) ?? Number.MAX_SAFE_INTEGER
+
+      if (leftPosition === rightPosition) {
+        return left.title.localeCompare(right.title)
+      }
+
+      return leftPosition - rightPosition
+    })
+  }, [cards, domainCardOrder])
+
+  const handleDomainCardsChange = useCallback((nextCards: DomainCard[]) => {
+    const nextOrder = nextCards.map(card => card.id)
+
+    setDomainCardOrder(nextOrder)
+
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(ADMIN_CENTER_CARD_ORDER_KEY, JSON.stringify(nextOrder))
+    }
+  }, [])
 
   return (
     <Stack spacing={6}>
@@ -500,16 +577,12 @@ const AdminCenterView = ({ access, tenants, controlTower, operations }: Props) =
       {/* ── Mapa de dominios ── */}
       <ExecutiveCardShell
         title='Mapa de dominios'
-        subtitle='Cada dominio indexa una family operacional distinta. Las rutas especialistas siguen vivas.'
+        subtitle='Cada dominio indexa una family operacional distinta. Puedes reordenar las cards para priorizar tu lectura local.'
       >
-        <Box
-          sx={{
-            display: 'grid',
-            gap: 3,
-            gridTemplateColumns: { xs: '1fr', xl: 'repeat(2, minmax(0, 1fr))' }
-          }}
-        >
-          {cards.map(card => (
+        <GreenhouseDragList
+          items={orderedCards}
+          onChange={handleDomainCardsChange}
+          renderItem={card => (
             <Card key={card.title} variant='outlined' sx={{ height: '100%' }}>
               <CardContent sx={{ p: 4 }}>
                 <Stack spacing={3} sx={{ height: '100%' }}>
@@ -520,6 +593,12 @@ const AdminCenterView = ({ access, tenants, controlTower, operations }: Props) =
                           <i className={card.icon} />
                         </Avatar>
                         <Typography variant='h5'>{card.title}</Typography>
+                        <Chip
+                          size='small'
+                          variant='outlined'
+                          label='Reordenar'
+                          icon={<i className='tabler-grip-vertical' />}
+                        />
                       </Stack>
                       <Typography color='text.secondary'>{card.subtitle}</Typography>
                     </Stack>
@@ -548,8 +627,8 @@ const AdminCenterView = ({ access, tenants, controlTower, operations }: Props) =
                 </Stack>
               </CardContent>
             </Card>
-          ))}
-        </Box>
+          )}
+        />
       </ExecutiveCardShell>
     </Stack>
   )

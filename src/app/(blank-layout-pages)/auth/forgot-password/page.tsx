@@ -13,25 +13,39 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import Alert from '@mui/material/Alert'
 import CircularProgress from '@mui/material/CircularProgress'
+import { useForm } from 'react-hook-form'
 
 import Logo from '@components/layout/shared/Logo'
+import CustomTextField from '@core/components/mui/TextField'
+
+import { email as emailRule, required } from '@/lib/forms/greenhouse-form-patterns'
+
+type ForgotPasswordFormValues = {
+  email: string
+}
 
 export default function ForgotPasswordPage() {
-  const [email, setEmail] = useState('')
-  const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting }
+  } = useForm<ForgotPasswordFormValues>({
+    defaultValues: {
+      email: ''
+    }
+  })
+
+  const onSubmit = handleSubmit(async values => {
     setError(null)
 
     try {
       const res = await fetch('/api/account/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email: values.email })
       })
 
       const data = await res.json()
@@ -43,10 +57,8 @@ export default function ForgotPasswordPage() {
       }
     } catch {
       setError('Error de conexión. Intenta de nuevo.')
-    } finally {
-      setLoading(false)
     }
-  }
+  })
 
   return (
     <div className='flex min-bs-[100dvh] items-center justify-center bg-[var(--mui-palette-background-default)] p-6'>
@@ -77,24 +89,29 @@ export default function ForgotPasswordPage() {
 
                 {error && <Alert severity='error' sx={{ width: '100%' }}>{error}</Alert>}
 
-                <Box component='form' onSubmit={handleSubmit} sx={{ width: '100%' }}>
+                <Box component='form' onSubmit={onSubmit} sx={{ width: '100%' }}>
                   <Stack spacing={3}>
-                    <TextField
+                    <CustomTextField
                       fullWidth
                       label='Email'
                       type='email'
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
+                      error={Boolean(errors.email)}
+                      helperText={errors.email?.message}
                       autoFocus
+                      {...register('email', {
+                        validate: {
+                          required: required('Email'),
+                          email: emailRule
+                        }
+                      })}
                     />
                     <Button
                       fullWidth
                       variant='contained'
                       type='submit'
-                      disabled={loading || !email}
+                      disabled={isSubmitting}
                     >
-                      {loading ? <CircularProgress size={24} color='inherit' /> : 'Enviar enlace de recuperación'}
+                      {isSubmitting ? <CircularProgress size={24} color='inherit' /> : 'Enviar enlace de recuperación'}
                     </Button>
                   </Stack>
                 </Box>

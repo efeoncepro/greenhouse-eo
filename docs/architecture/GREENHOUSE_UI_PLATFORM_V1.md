@@ -154,6 +154,18 @@ const onSubmit = handleSubmit(async (data) => { /* ... */ })
 // isDirty tracking automático, no re-render por keystroke
 ```
 
+### Activación real inicial
+
+- `src/views/Login.tsx`
+  - migrado a `react-hook-form` como referencia canónica para credenciales
+- `src/app/(blank-layout-pages)/auth/forgot-password/page.tsx`
+  - migrado a `react-hook-form` como segundo ejemplo liviano de auth form
+- Helper canónico inicial:
+  - `src/lib/forms/greenhouse-form-patterns.ts`
+- Regla práctica vigente:
+  - wrappers MUI/Vuexy + helpers reutilizables primero
+  - no introducir schemas pesados mientras no exista una necesidad real de Zod/Yup
+
 ### Reglas de adopción
 
 1. **Nuevos forms** → siempre `react-hook-form`
@@ -190,6 +202,17 @@ FullCalendar está instalado con 6 paquetes:
 4. Locale `es` para labels en español
 5. No mezclar con MUI DatePicker para selección de fechas (FullCalendar es para visualización)
 
+### Activación real inicial
+
+- Wrapper canónico:
+  - `src/components/greenhouse/GreenhouseCalendar.tsx`
+- Primera vista real:
+  - `src/app/(dashboard)/admin/operational-calendar/page.tsx`
+  - `src/views/greenhouse/admin/AdminOperationalCalendarView.tsx`
+- Fuente de datos inicial:
+  - `src/lib/calendar/get-admin-operational-calendar-overview.ts`
+  - reutiliza `operational-calendar.ts` + `nager-date-holidays.ts`
+
 ## Date Handling
 
 ### Librerías disponibles
@@ -205,6 +228,15 @@ FullCalendar está instalado con 6 paquetes:
 - Base: `America/Santiago` vía IANA del runtime
 - Feriados: `Nager.Date` + overrides en Greenhouse
 - Helper canónico: `src/lib/calendar/operational-calendar.ts`
+
+### Date picker canónico inicial
+
+- Wrapper:
+  - `src/components/greenhouse/GreenhouseDatePicker.tsx`
+- Primer uso real:
+  - selector mensual en `AdminOperationalCalendarView`
+- Criterio:
+  - usar este wrapper para inputs de fecha del portal antes de introducir inputs manuales
 
 ## Rich Text (disponible, sin activar)
 
@@ -225,6 +257,17 @@ No activar hasta que un caso de uso lo requiera explícitamente.
 - Reorder de KPIs en dashboards
 
 Activar cuando un caso de uso lo requiera.
+
+### Activación real inicial
+
+- Wrapper canónico:
+  - `src/components/greenhouse/GreenhouseDragList.tsx`
+- Primer uso real:
+  - reorder local de domain cards en `src/views/greenhouse/admin/AdminCenterView.tsx`
+- Persistencia inicial:
+  - `localStorage`
+- Evolución esperada:
+  - mover a preferencias de usuario cuando exista contrato shared de layout personalization
 
 ## File Upload (disponible, sin activar)
 

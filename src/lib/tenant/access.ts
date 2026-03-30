@@ -8,6 +8,7 @@ import {
   isInternalEfeonceEmail,
   isLikelyEfeonceProfileMatch
 } from '@/lib/tenant/internal-email-aliases'
+import { resolveAuthorizedViewsForUser } from '@/lib/admin/view-access-store'
 import { updateTenantLastLogin as updateClientTenantLastLogin } from '@/lib/tenant/clients'
 import { dispatchWelcomeNotification } from '@/lib/notifications/welcome'
 import {
@@ -88,6 +89,7 @@ export interface TenantAccessRecord {
   roleCodes: string[]
   primaryRoleCode: string
   routeGroups: string[]
+  authorizedViews: string[]
   projectScopes: string[]
   campaignScopes: string[]
   businessLines: string[]
@@ -249,6 +251,7 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
     roleCodes,
     primaryRoleCode,
     routeGroups,
+    authorizedViews: [],
     projectScopes,
     campaignScopes,
     businessLines,
@@ -272,6 +275,29 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
     // Collaborator identity
     memberId: row.member_id ?? null,
     identityProfileId: row.identity_profile_id ?? null
+  }
+}
+
+const resolveTenantRuntimeAccess = async (record: TenantAccessRecord): Promise<TenantAccessRecord> => {
+  try {
+    const resolvedAccess = await resolveAuthorizedViewsForUser({
+      roleCodes: record.roleCodes,
+      tenantType: record.tenantType,
+      fallbackRouteGroups: record.routeGroups
+    })
+
+    return {
+      ...record,
+      routeGroups: resolvedAccess.routeGroups,
+      authorizedViews: resolvedAccess.authorizedViews
+    }
+  } catch (error) {
+    console.warn('Unable to resolve persisted authorized views. Falling back to route-group baseline.', error)
+
+    return {
+      ...record,
+      authorizedViews: []
+    }
   }
 }
 
@@ -373,7 +399,7 @@ const getIdentityAccessRecord = async ({
 
   const accessRow = (rows[0] as TenantAccessRow | undefined) || null
 
-  return accessRow ? normalizeTenantAccessRow(accessRow) : null
+  return accessRow ? resolveTenantRuntimeAccess(normalizeTenantAccessRow(accessRow)) : null
 }
 
 const getIdentityAccessRecordByEmail = async (email: string) =>
@@ -394,7 +420,7 @@ export const getTenantAccessRecordByEmail = async (email: string) => {
     const pgRow = await getSessionFromPostgresByEmail(email)
 
     if (pgRow) {
-      const record = normalizeTenantAccessRow(pgRow as TenantAccessRow)
+      const record = await resolveTenantRuntimeAccess(normalizeTenantAccessRow(pgRow as TenantAccessRow))
 
       // If PG has the password hash, use it directly.
       // Otherwise fall through to BigQuery where hashes are authoritative
@@ -412,7 +438,7 @@ export const getTenantAccessRecordByMicrosoftOid = async (oid: string) => {
   try {
     const pgRow = await getSessionFromPostgresByMicrosoftOid(oid)
 
-    if (pgRow) return normalizeTenantAccessRow(pgRow as TenantAccessRow)
+    if (pgRow) return resolveTenantRuntimeAccess(normalizeTenantAccessRow(pgRow as TenantAccessRow))
   } catch (error) {
     if (!shouldFallbackFromIdentityPostgres(error)) throw error
   }
@@ -427,7 +453,7 @@ export const getTenantAccessRecordByGoogleSub = async (sub: string) => {
   try {
     const pgRow = await getSessionFromPostgresByGoogleSub(sub)
 
-    if (pgRow) return normalizeTenantAccessRow(pgRow as TenantAccessRow)
+    if (pgRow) return resolveTenantRuntimeAccess(normalizeTenantAccessRow(pgRow as TenantAccessRow))
   } catch (error) {
     if (!shouldFallbackFromIdentityPostgres(error)) throw error
   }
@@ -521,7 +547,7 @@ export const getTenantAccessRecordByInternalMicrosoftAlias = async ({
   try {
     const pgRow = await getSessionFromPostgresByUserId(matches[0].user_id)
 
-    if (pgRow) return normalizeTenantAccessRow(pgRow as TenantAccessRow)
+    if (pgRow) return resolveTenantRuntimeAccess(normalizeTenantAccessRow(pgRow as TenantAccessRow))
   } catch (error) {
     if (!shouldFallbackFromIdentityPostgres(error)) throw error
   }

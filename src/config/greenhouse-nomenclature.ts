@@ -16,6 +16,8 @@ export const GH_INTERNAL_NAV = {
   adminTeam: { label: 'Equipo', subtitle: 'Colaboradores, activación y asignaciones' },
   adminUsers: { label: 'Usuarios', subtitle: 'Acceso, roles y scopes visibles' },
   adminRoles: { label: 'Roles y permisos', subtitle: 'Gobernanza operativa del portal' },
+  adminViews: { label: 'Vistas y acceso', subtitle: 'Gobernanza por vista y lectura efectiva del portal' },
+  adminOperationalCalendar: { label: 'Calendario operativo', subtitle: 'Feriados, cierre y hitos del mes operativo' },
   adminAiTools: { label: 'Herramientas IA', subtitle: 'Catálogo, licencias y créditos IA' },
   adminCorreos: { label: 'Correos', subtitle: 'Historial de envíos y suscripciones' },
   adminCloudIntegrations: { label: 'Cloud & Integrations', subtitle: 'Syncs, webhooks, auth y runtime operativo' },

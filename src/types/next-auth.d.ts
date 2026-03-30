@@ -10,6 +10,7 @@ declare module 'next-auth' {
     roleCodes: string[]
     primaryRoleCode: string
     routeGroups: string[]
+    authorizedViews: string[]
     projectScopes: string[]
     campaignScopes: string[]
     businessLines: string[]
@@ -45,6 +46,7 @@ declare module 'next-auth' {
       roleCodes: string[]
       primaryRoleCode: string
       routeGroups: string[]
+      authorizedViews: string[]
       projectScopes: string[]
       campaignScopes: string[]
       businessLines: string[]
@@ -83,6 +85,7 @@ declare module 'next-auth/jwt' {
     roleCodes?: string[]
     primaryRoleCode?: string
     routeGroups?: string[]
+    authorizedViews?: string[]
     projectScopes?: string[]
     campaignScopes?: string[]
     businessLines?: string[]

@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-136`
+- siguiente ID disponible: `TASK-138`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -48,6 +48,8 @@ Primer bloque operativo asignado:
 | `TASK-110` | [TASK-110-nexa-assistant-ui-features.md](in-progress/TASK-110-nexa-assistant-ui-features.md) | P1 | Alto | Medio | Implementación | Lane A activa: contrato de tools, ejecución backend y grounding operativo para Nexa en `/home`; la continuación natural de UI quedó más claramente separada en `TASK-115` |
 | `TASK-115` | [TASK-115-nexa-ui-completion.md](in-progress/TASK-115-nexa-ui-completion.md) | P1 | Alto | Medio | Implementación | Edit inline, suggestions, feedback, floating portal-wide, thread history, NexaPanel cleanup |
 | `TASK-121` | [TASK-121-admin-center-hardening.md](in-progress/TASK-121-admin-center-hardening.md) | P1 | Alto | Bajo | Implementación | Sorting, skeleton, health real, deep-link filtros y alertas consolidadas para Admin Center |
+| `TASK-136` | [TASK-136-admin-view-access-governance.md](in-progress/TASK-136-admin-view-access-governance.md) | P1 | Muy alto | Alto | Parcial | Primer slice en repo: `/admin/views` como baseline UI de matriz, preview por usuario e integración inicial en Admin Center mientras el backend configurable sigue pendiente |
+| `TASK-137` | [TASK-137-ui-foundation-activation.md](in-progress/TASK-137-ui-foundation-activation.md) | P1 | Alto | Medio | Parcial | Foundation UI ya activada con RHF en auth, `GreenhouseCalendar`, `GreenhouseDatePicker`, `GreenhouseDragList` y primer calendario operativo en `/admin/operational-calendar` |
 
 ## To Do
 

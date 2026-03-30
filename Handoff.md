@@ -4,6 +4,170 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — baseline moderna de UI/UX y skills locales
+
+### Completado
+- Se auditó la capa local de skills UI de Greenhouse y se confirmó drift operativo:
+  - el repo dependía demasiado de skills globales y de una lectura vieja de Vuexy
+  - `greenhouse-ui-orchestrator` referenciaba heurísticas no alineadas con el estado actual
+- Se agregó `docs/ui/GREENHOUSE_MODERN_UI_UX_BASELINE_V1.md` como referencia canónica para:
+  - first-fold hierarchy
+  - densidad y ritmo visual
+  - estados empty/partial/warning/error
+  - UX writing
+  - accessibility baseline
+- Se reforzaron las skills locales:
+  - `.codex/skills/greenhouse-agent/SKILL.md`
+  - `.codex/skills/greenhouse-vuexy-ui-expert/SKILL.md`
+  - `.codex/skills/greenhouse-portal-ui-implementer/SKILL.md`
+  - `.codex/skills/greenhouse-ui-orchestrator/SKILL.md`
+- Nueva skill creada:
+  - `.codex/skills/greenhouse-ux-content-accessibility/SKILL.md`
+
+### Fuentes externas sintetizadas
+- Android Developers / Material guidance para layouts adaptativos y list-detail
+- GOV.UK Design System
+- US Web Design System
+- Atlassian content design
+- W3C WAI / WCAG quick reference
+
+### Pendiente inmediato
+- No hay validación de build necesaria por ser un cambio documental/skills, pero conviene probar en los siguientes trabajos UI que la selección automática de skills ya priorice la baseline local.
+
+## Sesión 2026-03-30 — TASK-136 iniciada con slice UI de gobernanza de vistas
+
+### Completado
+- `TASK-136` pasó a `in-progress`.
+- Se abrió el primer corte real del módulo en `/admin/views` para probar la nueva baseline UI/UX en una superficie compleja de admin governance.
+- El slice actual implementa:
+  - hero y KPIs de contexto
+  - matriz de acceso por vista × rol
+  - filtros por sección y tipo de rol
+  - preview por usuario de la navegación efectiva
+  - cards de siguiente slice para overrides, persistencia configurable y auditoría
+- Integración inicial aplicada en:
+  - `Admin Center` landing
+  - sidebar admin
+- Decisión deliberada del slice:
+  - la pantalla usa el baseline real actual (`roles` + `routeGroups`) sin fingir todavía `view_registry` persistido
+  - esto deja honesto el estado parcial de la lane y permite validar UX antes del cambio fuerte de backend
+
+### Archivos tocados
+- `src/lib/admin/get-admin-view-access-governance.ts`
+- `src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx`
+- `src/app/(dashboard)/admin/views/page.tsx`
+- `src/views/greenhouse/admin/AdminCenterView.tsx`
+- `src/components/layout/vertical/VerticalMenu.tsx`
+- `src/config/greenhouse-nomenclature.ts`
+- `docs/tasks/in-progress/TASK-136-admin-view-access-governance.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+
+### Pendiente inmediato
+- Validar `lint` del slice nuevo.
+- Evaluar si el helper actual debe endurecer la simulación de acceso de admin para empatar exactamente todos los casos especiales del menú vigente.
+- Siguiente salto funcional de la task:
+  - persistencia `view_registry` / `role_view_assignments`
+  - overrides por usuario
+  - auditoría y save real
+
+## Sesión 2026-03-30 — TASK-137 iniciada con activación real de la foundation UI
+
+### Completado
+- `TASK-137` pasó a `in-progress`.
+- Se activó un slice inicial real de la capa UI transversal:
+  - `react-hook-form` en `Login`
+  - `react-hook-form` en `Forgot Password`
+  - `GreenhouseDatePicker`
+  - `GreenhouseCalendar`
+  - `GreenhouseDragList`
+- Primera vista de calendario en repo:
+  - `/admin/operational-calendar`
+- Primer uso real de drag-and-drop:
+  - reorder local de domain cards en `Admin Center`
+- Arquitectura UI actualizada para reflejar activación real en:
+  - `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
+
+### Archivos tocados
+- `src/lib/forms/greenhouse-form-patterns.ts`
+- `src/views/Login.tsx`
+- `src/app/(blank-layout-pages)/auth/forgot-password/page.tsx`
+- `src/components/greenhouse/GreenhouseDatePicker.tsx`
+- `src/components/greenhouse/GreenhouseCalendar.tsx`
+- `src/components/greenhouse/GreenhouseDragList.tsx`
+- `src/components/greenhouse/index.ts`
+- `src/lib/calendar/get-admin-operational-calendar-overview.ts`
+- `src/views/greenhouse/admin/AdminOperationalCalendarView.tsx`
+- `src/app/(dashboard)/admin/operational-calendar/page.tsx`
+- `src/views/greenhouse/admin/AdminCenterView.tsx`
+- `src/components/layout/vertical/VerticalMenu.tsx`
+- `src/config/greenhouse-nomenclature.ts`
+- `docs/tasks/in-progress/TASK-137-ui-foundation-activation.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
+
+### Pendiente inmediato
+- Correr validación local del slice (`eslint`, `tsc`, `build`, `test`).
+- Confirmar si el wrapper de date picker necesita endurecer integración explícita con `Controller` para forms complejos futuros.
+
+## Sesión 2026-03-30 — TASK-136 avanza a persistencia inicial por rol
+
+### Completado
+- `/admin/views` ya soporta save real de la matriz role × view.
+- Nuevo slice persistido implementado:
+  - store Postgres para catálogo de vistas y assignments
+  - API admin `POST /api/admin/views/assignments`
+  - matrix editable en UI con guardar/restablecer
+  - fallback seguro al baseline hardcoded cuando la capa persistida no está lista
+- Infra aplicada en dev con:
+  - `pnpm setup:postgres:view-access`
+
+### Archivos tocados
+- `src/lib/admin/view-access-catalog.ts`
+- `src/lib/admin/view-access-store.ts`
+- `src/lib/admin/get-admin-view-access-governance.ts`
+- `src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx`
+- `src/app/api/admin/views/assignments/route.ts`
+- `scripts/setup-postgres-view-access.sql`
+- `scripts/setup-postgres-view-access.ts`
+- `package.json`
+- `docs/tasks/in-progress/TASK-136-admin-view-access-governance.md`
+
+### Validación ejecutada
+- `pnpm pg:doctor`
+- `pnpm setup:postgres:view-access`
+- `pnpm exec eslint src/lib/admin/view-access-catalog.ts src/lib/admin/view-access-store.ts src/lib/admin/get-admin-view-access-governance.ts src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx src/app/api/admin/views/assignments/route.ts scripts/setup-postgres-view-access.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- Conectar esta persistencia al runtime de sesión (`TenantContext`, `NextAuth`, guards y menú) para que las vistas guardadas gobiernen acceso real y no solo la matrix administrativa.
+- Activar overrides por usuario y auditoría visible en la misma pantalla.
+
+## Sesión 2026-03-30 — TASK-136 integra authorizedViews en sesión y navegación
+
+### Completado
+- `TenantAccessRecord` ahora resuelve `authorizedViews` desde la capa persistida de view access cuando existe.
+- `NextAuth` y `TenantContext` ya propagan:
+  - `authorizedViews`
+  - `routeGroups` derivados de las vistas autorizadas
+- `VerticalMenu` ya usa `authorizedViews` para filtrar items clave de:
+  - Gestión
+  - Finanzas
+  - HR
+  - Administración
+  - AI tooling
+
+### Validación ejecutada
+- `pnpm exec eslint src/lib/admin/view-access-store.ts src/lib/tenant/access.ts src/lib/auth.ts src/lib/tenant/get-tenant-context.ts src/types/next-auth.d.ts src/components/layout/vertical/VerticalMenu.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- Los guards broad por layout ya heredan `routeGroups` derivados, pero aún no existe enforcement page-level exhaustivo por `view_code` en todas las rutas del portal.
+- El warning OpenSSL/JWT durante `build` sigue apareciendo en static generation de `/admin/views`; el artefacto termina bien y cae a fallback hardcoded durante esa fase.
+
 ## Sesión 2026-03-30 — hardening Sentry incident reader
 
 ### Completado

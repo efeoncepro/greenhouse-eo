@@ -4,11 +4,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Medio` |
-| Status real | `Diseño` |
+| Status real | `Cerrada` |
 | Rank | — |
 | Domain | UI Platform / Cross-module |
 | Sequence | Independiente, habilita TASK-136, TASK-130, TASK-005 |
@@ -16,6 +16,20 @@
 ## Summary
 
 Greenhouse tiene 12 librerías UI instaladas en `package.json` que no se usan. 4 de ellas tienen potencial alto para mejorar la calidad, performance y UX del portal de forma transversal. Esta task activa las 4 con patrones canónicos, ejemplos reales, y reglas de adopción documentadas.
+
+## Delta 2026-03-30
+
+- `TASK-137` pasó a `in-progress`.
+- Slice ya activado en repo:
+  - `react-hook-form` migrado en `Login` y `Forgot Password`
+  - `GreenhouseDatePicker` creado y usado en `/admin/operational-calendar`
+  - `GreenhouseCalendar` creado y usado en `/admin/operational-calendar`
+  - `GreenhouseDragList` creado y usado para reorder local de domain cards en `Admin Center`
+  - `src/lib/forms/greenhouse-form-patterns.ts` creado como helper canónico inicial
+- Arquitectura UI a alinear con este slice:
+  - `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
+- Gap real abierto:
+  - faltan tests específicos del nuevo slice y la adopción adicional futura de estos patrones en otros módulos
 
 ## Why This Task Exists
 
@@ -218,17 +232,17 @@ Necesitas un editor de texto rico?
 
 ## Acceptance Criteria
 
-- [ ] `GreenhouseCalendar` wrapper creado con locale es, colores semáforo, responsive
-- [ ] Al menos 1 vista de calendario real en el portal
-- [ ] `GreenhouseDatePicker` wrapper creado con integración MUI + RHF
-- [ ] Login form migrado a react-hook-form como referencia canónica
-- [ ] Al menos 1 form adicional migrado a react-hook-form
-- [ ] `GreenhouseDragList` wrapper creado con patrón de reorder
-- [ ] Al menos 1 uso real de drag-and-drop en el portal
-- [ ] Form validation helpers canónicos en `src/lib/forms/`
-- [ ] `GREENHOUSE_UI_PLATFORM_V1.md` actualizado con patrones finales
-- [ ] `pnpm build` pasa
-- [ ] `pnpm test` pasa
+- [x] `GreenhouseCalendar` wrapper creado con locale es, colores semáforo, responsive
+- [x] Al menos 1 vista de calendario real en el portal
+- [x] `GreenhouseDatePicker` wrapper creado con integración MUI + RHF-ready
+- [x] Login form migrado a react-hook-form como referencia canónica
+- [x] Al menos 1 form adicional migrado a react-hook-form
+- [x] `GreenhouseDragList` wrapper creado con patrón de reorder
+- [x] Al menos 1 uso real de drag-and-drop en el portal
+- [x] Form validation helpers canónicos en `src/lib/forms/`
+- [x] `GREENHOUSE_UI_PLATFORM_V1.md` actualizado con patrones finales
+- [x] `pnpm build` pasa
+- [x] `pnpm test` pasa (124 archivos, 598 tests)
 
 ## File Reference
 

@@ -3,6 +3,21 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-30 UI/UX skill stack local reforzada
+- Greenhouse ya no debe depender solo de skills globales de UI para frontend portal.
+- Nuevo baseline canónico:
+  - `docs/ui/GREENHOUSE_MODERN_UI_UX_BASELINE_V1.md`
+- La capa local de skills en `.codex/skills/*` ya debe tratar este baseline como fuente operativa para:
+  - first-fold hierarchy
+  - estado vacio/parcial/error
+  - UX writing
+  - accessibility basica
+- Nueva skill local:
+  - `greenhouse-ux-content-accessibility`
+- Decisión operativa:
+  - `greenhouse-ui-orchestrator` sigue resolviendo patron y target
+  - `greenhouse-vuexy-ui-expert` y `greenhouse-portal-ui-implementer` ya deben endurecer copy, state design y accessibility con la baseline moderna
+
 ## Delta 2026-03-30 Sentry incident reader hardening
 - `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.
 - Nuevo contrato soportado:

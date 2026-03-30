@@ -55,6 +55,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
 
   const { isBreakpointReached, transitionDuration, isCollapsed, isHovered } = verticalNavOptions
   const { data: session } = useSession()
+  const authorizedViews = session?.user?.authorizedViews ?? []
   const isInternalUser = session?.user?.routeGroups?.includes('internal') ?? false
   const isAdminUser = session?.user?.routeGroups?.includes('admin') ?? false
   const isHrUser = session?.user?.routeGroups?.includes('hr') ?? false
@@ -77,6 +78,14 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     businessLines: session?.user?.businessLines || [],
     serviceModules: session?.user?.serviceModules || []
   })
+
+  const canSeeView = (viewCode: string, fallback: boolean) => {
+    if (authorizedViews.length === 0) {
+      return fallback
+    }
+
+    return authorizedViews.includes(viewCode)
+  }
 
   const showSub = !(isCollapsed && !isHovered)
   const ScrollWrapper = isBreakpointReached ? 'div' : PerfectScrollbar
@@ -150,7 +159,13 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         { label: <NavLabel label={GH_AGENCY_NAV.services.label} subtitle={GH_AGENCY_NAV.services.subtitle} show={showSub} />, href: '/agency/services', icon: 'tabler-packages' },
         { label: <NavLabel label='Operaciones' subtitle='Salud del platform' show={showSub} />, href: '/agency/operations', icon: 'tabler-activity' },
         { label: <NavLabel label={GH_AGENCY_NAV.organizations.label} subtitle={GH_AGENCY_NAV.organizations.subtitle} show={showSub} />, href: '/agency/organizations', icon: 'tabler-building-community' }
-      ]
+      ].filter(item => {
+        if (item.href === '/agency') return canSeeView('gestion.agencia', true)
+        if (item.href === '/agency/organizations') return canSeeView('gestion.organizaciones', true)
+        if (item.href === '/agency/services') return canSeeView('gestion.servicios', true)
+
+        return true
+      })
     })
   }
 
@@ -184,7 +199,12 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           href: '/hr/attendance',
           icon: 'tabler-clock-check'
         }
-      ]
+      ].filter(item => {
+        if (item.href === '/hr/payroll') return canSeeView('equipo.nomina', true)
+        if (item.href === '/hr/leave') return canSeeView('equipo.permisos', true)
+
+        return true
+      })
     : []
 
   if (canSeePeople && hasHrAccess) {
@@ -229,17 +249,26 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         { label: <NavLabel label={GH_FINANCE_NAV.suppliers.label} subtitle={GH_FINANCE_NAV.suppliers.subtitle} show={showSub} />, href: '/finance/suppliers' },
         { label: <NavLabel label={GH_FINANCE_NAV.reconciliation.label} subtitle={GH_FINANCE_NAV.reconciliation.subtitle} show={showSub} />, href: '/finance/reconciliation' },
         { label: <NavLabel label={GH_FINANCE_NAV.intelligence.label} subtitle={GH_FINANCE_NAV.intelligence.subtitle} show={showSub} />, href: '/finance/intelligence' }
-      ]
+      ].filter(item => {
+        if (item.href === '/finance') return canSeeView('finanzas.resumen', true)
+        if (item.href === '/finance/income') return canSeeView('finanzas.ingresos', true)
+        if (item.href === '/finance/expenses') return canSeeView('finanzas.egresos', true)
+        if (item.href === '/finance/reconciliation') return canSeeView('finanzas.conciliacion', true)
+
+        return true
+      })
     })
   }
 
   // ── Herramientas IA (standalone for non-admin ai_tooling users) ─────
   if (isAiToolingUser && !isAdminUser) {
-    menuData.push({
+    if (canSeeView('ia.herramientas', true)) {
+      menuData.push({
       label: <NavLabel label={GH_INTERNAL_NAV.adminAiTools.label} subtitle={GH_INTERNAL_NAV.adminAiTools.subtitle} show={showSub} />,
       href: '/admin/ai-tools',
       icon: 'tabler-robot'
-    })
+      })
+    }
   }
 
   // ── Administración (submenu — 5 children) ───────────────────────────
@@ -252,13 +281,25 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         { label: <NavLabel label={GH_INTERNAL_NAV.adminTenants.label} subtitle={GH_INTERNAL_NAV.adminTenants.subtitle} show={showSub} />, href: '/admin/tenants' },
         { label: <NavLabel label={GH_INTERNAL_NAV.adminUsers.label} subtitle={GH_INTERNAL_NAV.adminUsers.subtitle} show={showSub} />, href: '/admin/users' },
         { label: <NavLabel label={GH_INTERNAL_NAV.adminRoles.label} subtitle={GH_INTERNAL_NAV.adminRoles.subtitle} show={showSub} />, href: '/admin/roles' },
+        { label: <NavLabel label={GH_INTERNAL_NAV.adminViews.label} subtitle={GH_INTERNAL_NAV.adminViews.subtitle} show={showSub} />, href: '/admin/views' },
+        { label: <NavLabel label={GH_INTERNAL_NAV.adminOperationalCalendar.label} subtitle={GH_INTERNAL_NAV.adminOperationalCalendar.subtitle} show={showSub} />, href: '/admin/operational-calendar' },
         { label: <NavLabel label={GH_INTERNAL_NAV.adminTeam.label} subtitle={GH_INTERNAL_NAV.adminTeam.subtitle} show={showSub} />, href: '/admin/team' },
         { label: <NavLabel label={GH_INTERNAL_NAV.adminCorreos.label} subtitle={GH_INTERNAL_NAV.adminCorreos.subtitle} show={showSub} />, href: '/admin/email-delivery' },
         { label: <NavLabel label={GH_INTERNAL_NAV.adminNotifications.label} subtitle={GH_INTERNAL_NAV.adminNotifications.subtitle} show={showSub} />, href: '/admin/notifications' },
         { label: <NavLabel label={GH_INTERNAL_NAV.adminAiTools.label} subtitle={GH_INTERNAL_NAV.adminAiTools.subtitle} show={showSub} />, href: '/admin/ai-tools' },
         { label: <NavLabel label={GH_INTERNAL_NAV.adminCloudIntegrations.label} subtitle={GH_INTERNAL_NAV.adminCloudIntegrations.subtitle} show={showSub} />, href: '/admin/cloud-integrations' },
         { label: <NavLabel label={GH_INTERNAL_NAV.adminOpsHealth.label} subtitle={GH_INTERNAL_NAV.adminOpsHealth.subtitle} show={showSub} />, href: '/admin/ops-health' }
-      ]
+      ].filter(item => {
+        if (item.href === '/admin') return canSeeView('administracion.admin_center', true)
+        if (item.href === '/admin/tenants') return canSeeView('administracion.spaces', true)
+        if (item.href === '/admin/users') return canSeeView('administracion.usuarios', true)
+        if (item.href === '/admin/roles') return canSeeView('administracion.roles', true)
+        if (item.href === '/admin/views') return canSeeView('administracion.vistas', true)
+        if (item.href === '/admin/ops-health') return canSeeView('administracion.ops_health', true)
+        if (item.href === '/admin/ai-tools') return canSeeView('ia.herramientas', true)
+
+        return true
+      })
     })
   }
 

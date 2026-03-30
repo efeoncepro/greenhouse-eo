@@ -4,14 +4,43 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `in-progress` |
 | Priority | `P1` |
 | Impact | `Muy alto` |
 | Effort | `Alto` |
-| Status real | `Diseño` |
+| Status real | `Parcial` |
 | Rank | — |
 | Domain | Admin Center / Identity & Access / UX |
 | Sequence | Independiente, evoluciona la gobernanza de acceso existente |
+
+## Delta 2026-03-30
+
+- Se inició el primer slice UI del módulo con `/admin/views`.
+- El corte actual no persiste permisos todavía; expone:
+  - baseline visual de vistas gobernables
+  - matrix de acceso derivada del modelo actual de roles + route groups
+  - preview por usuario de la navegación efectiva
+  - integración inicial en `Admin Center` y sidebar
+- El objetivo del slice es validar jerarquía, lectura operativa y UX del módulo antes del salto a `view_registry`, `role_view_assignments` y overrides persistidos.
+
+## Delta 2026-03-30 — persistencia inicial por rol
+
+- `/admin/views` ya no es solo lectura:
+  - guarda matriz role × view vía `POST /api/admin/views/assignments`
+  - persiste catálogo y assignments iniciales en PostgreSQL `greenhouse_core`
+- Infra nueva provisionada:
+  - `greenhouse_core.view_registry`
+  - `greenhouse_core.role_view_assignments`
+  - `greenhouse_core.user_view_overrides`
+  - `greenhouse_core.view_access_log`
+- Estado real del corte:
+  - persistencia por rol: activa
+  - fallback seguro al baseline hardcoded: activo
+  - `authorizedViews` en sesión: activo
+  - navegación filtrada por `authorizedViews`: activa de forma inicial
+  - overrides por usuario: pendiente
+  - auditoría expandida en UI: pendiente
+  - guards page-level por vista específica: pendiente
 
 ## Summary
 

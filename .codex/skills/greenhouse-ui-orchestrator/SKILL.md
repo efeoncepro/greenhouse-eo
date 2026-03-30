@@ -21,10 +21,11 @@ Read only what the task needs, in this order:
 - `<repo>/docs/ui/GREENHOUSE_UI_ORCHESTRATION_V1.md`
 - `<repo>/docs/ui/GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md`
 - `<repo>/docs/ui/GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`
+- `<repo>/docs/ui/GREENHOUSE_MODERN_UI_UX_BASELINE_V1.md`
 
-If the task is visual or needs extra Vuexy heuristics:
-- use the existing `greenhouse-vuexy-portal` skill
-- read its `references/ui-ux-vuexy.md`
+If the task is visual or needs extra heuristics:
+- use `greenhouse-vuexy-ui-expert`
+- use `greenhouse-ux-content-accessibility` when the weakness is copy, states, or accessibility rather than pattern choice
 
 ## Input contract
 
@@ -53,11 +54,16 @@ Normalize it into:
 3. Inspect local shared components before opening `full-version`.
 4. Choose one primary pattern family from `docs/ui/GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md`.
 5. Inspect at most 1 to 3 `full-version` references for that family.
-6. Decide whether the implementation belongs in:
+6. Apply the modern baseline before finalizing the recommendation:
+   - first-fold hierarchy
+   - state coverage
+   - microcopy quality
+   - accessibility basics
+7. Decide whether the implementation belongs in:
    - `src/components/greenhouse/*`
    - `src/views/greenhouse/<module>/*`
    - `src/views/greenhouse/admin/**`
-7. Return an implementation-ready recommendation.
+8. Return an implementation-ready recommendation.
 
 ## Hard rules
 

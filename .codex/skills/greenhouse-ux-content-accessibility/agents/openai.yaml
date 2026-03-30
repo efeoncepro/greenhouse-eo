@@ -1,0 +1,7 @@
+interface:
+  display_name: "Greenhouse UX Content & Accessibility"
+  short_description: "Tighten UX writing, states, and accessibility."
+  default_prompt: "Use $greenhouse-ux-content-accessibility to review or improve this Greenhouse screen's copy, states, and accessibility."
+
+policy:
+  allow_implicit_invocation: true

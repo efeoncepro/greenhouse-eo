@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import type { ChangeEvent, FormEvent } from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -15,6 +14,7 @@ import Button from '@mui/material/Button'
 import Stack from '@mui/material/Stack'
 
 import { signIn } from 'next-auth/react'
+import { useForm } from 'react-hook-form'
 
 import type { SystemMode } from '@core/types'
 
@@ -22,8 +22,14 @@ import Link from '@components/Link'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { GH_COLORS, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { email as emailRule, required } from '@/lib/forms/greenhouse-form-patterns'
 import GreenhouseBrandPanel from '@/views/login/GreenhouseBrandPanel'
 import { BRAND_PANEL_BREAKPOINT } from '@/views/login/login-constants'
+
+type LoginFormValues = {
+  email: string
+  password: string
+}
 
 const LoginV2 = ({
   hasMicrosoftAuth,
@@ -34,37 +40,41 @@ const LoginV2 = ({
   hasGoogleAuth: boolean
 }) => {
   const [isPasswordShown, setIsPasswordShown] = useState(false)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const router = useRouter()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting }
+  } = useForm<LoginFormValues>({
+    defaultValues: {
+      email: '',
+      password: ''
+    }
+  })
 
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setIsSubmitting(true)
+  const onSubmit = handleSubmit(async values => {
     setError('')
 
     const result = await signIn('credentials', {
-      email,
-      password,
+      email: values.email,
+      password: values.password,
       redirect: false,
       callbackUrl: '/auth/landing'
     })
 
     if (result?.error) {
       setError(GH_MESSAGES.login_error_credentials)
-      setIsSubmitting(false)
 
       return
     }
 
     router.replace('/auth/landing')
     router.refresh()
-  }
+  })
 
   const handleMicrosoftSignIn = async () => {
     setError('')
@@ -218,16 +228,22 @@ const LoginV2 = ({
             <Divider sx={{ my: 1, '&::before, &::after': { borderColor: 'divider' } }}>o</Divider>
 
             {/* Credentials form */}
-            <form noValidate autoComplete='off' onSubmit={handleSubmit}>
+            <form noValidate autoComplete='off' onSubmit={onSubmit}>
               <Stack spacing={2.5}>
                 <CustomTextField
                   autoFocus
                   fullWidth
                   label={GH_MESSAGES.login_email_placeholder}
                   placeholder={GH_MESSAGES.login_email_placeholder}
-                  value={email}
-                  onChange={(event: ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
+                  error={Boolean(errors.email)}
+                  helperText={errors.email?.message}
                   sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                  {...register('email', {
+                    validate: {
+                      required: required('Email'),
+                      email: emailRule
+                    }
+                  })}
                 />
                 <CustomTextField
                   fullWidth
@@ -235,9 +251,14 @@ const LoginV2 = ({
                   placeholder={GH_MESSAGES.login_password_placeholder}
                   id='outlined-adornment-password'
                   type={isPasswordShown ? 'text' : 'password'}
-                  value={password}
-                  onChange={(event: ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
+                  error={Boolean(errors.password)}
+                  helperText={errors.password?.message}
                   sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
+                  {...register('password', {
+                    validate: {
+                      required: required('Password')
+                    }
+                  })}
                   slotProps={{
                     input: {
                       endAdornment: (

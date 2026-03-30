@@ -1,11 +1,29 @@
 # changelog.md
 
+## 2026-03-30
+
+- `TASK-136` avanzó de baseline visual a persistencia inicial real en `Admin Center > Vistas y acceso`.
+- Nuevo contrato backend:
+  - `POST /api/admin/views/assignments`
+- Nueva base PostgreSQL en `greenhouse_core`:
+  - `view_registry`
+  - `role_view_assignments`
+  - `user_view_overrides`
+  - `view_access_log`
+- `/admin/views` ahora permite editar y guardar la matriz role × view con fallback seguro al baseline hardcoded mientras el cutover completo de sesión sigue pendiente.
+- La sesión ahora propaga `authorizedViews` y el sidebar ya filtra navegación principal con esa capa cuando existe configuración persistida.
+
 ## Regla
 
 - Registrar solo cambios con impacto real en comportamiento, estructura, flujo de trabajo o despliegue.
 - Usar entradas cortas, fechadas y accionables.
 
 ## 2026-03-30
+
+### UI/UX skill stack modernized for Greenhouse
+- Se agregó `docs/ui/GREENHOUSE_MODERN_UI_UX_BASELINE_V1.md` como baseline moderna para jerarquía visual, UX writing, estados y accessibility.
+- Las skills locales de Greenhouse UI ahora leen explícitamente esta baseline y dejan de depender solo de heurísticas heredadas de Vuexy.
+- Se creó la skill `greenhouse-ux-content-accessibility` para revisar y mejorar copy, empty states, errores, formularios y accesibilidad con criterio de producto.
 
 ### Sentry incident reader hardened for Ops Health
 - `src/lib/cloud/observability.ts` ya soporta un token dedicado `SENTRY_INCIDENTS_AUTH_TOKEN` / `_SECRET_REF` para leer incidentes, sin asumir que `SENTRY_AUTH_TOKEN` también tiene permisos de issues.
