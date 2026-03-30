@@ -14,6 +14,35 @@
 
 Hacer que la sección `Incidentes Sentry` en `Ops Health` deje de ser una foto estática del momento de carga y pase a comportarse como una superficie operativa viva: refresco automático, refresco manual y fallback `stale` con último snapshot bueno cuando Sentry falle.
 
+## Observability Posture
+
+### Semáforo actual
+
+- `Runtime health`: `Verde`
+  - `GET /api/internal/health` ya expone señal institucional útil y separa mejor runtime vs tooling.
+- `Errores runtime`: `Verde`
+  - Sentry ya está instrumentado, con source maps y lectura interna de incidentes en portal.
+- `Ops Health UI`: `Amarillo`
+  - la señal ya existe, pero todavía depende demasiado del refresco manual y no conserva bien un último estado bueno.
+- `Alerting`: `Amarillo`
+  - Slack alerts ya forman parte de la postura, pero falta cerrar mejor el puente entre incidente detectado y acción visible dentro del portal.
+- `Freshness / recencia`: `Amarillo`
+  - hay timestamp de consulta, pero todavía no hay política institucional visible de `fresh` vs `stale`.
+- `Runbooks / acción`: `Rojo`
+  - la UI muestra incidentes, pero todavía no ofrece una guía corta y accionable para responder desde `Ops Health`.
+
+### Qué cierra esta task
+
+- mueve `Ops Health UI` de `Amarillo` a `Verde`
+- mueve `Freshness / recencia` de `Amarillo` a `Verde`
+- mejora parcialmente `Runbooks / acción` de `Rojo` a `Amarillo` al menos con semántica clara de degradación y refresh manual
+
+### Qué seguiría después
+
+- enriquecer `Ops Health` con sugerencia de follow-up o runbook corto por incidente
+- profundizar alertas por dominio y no solo por observabilidad transversal
+- extender la lógica `fresh/stale` a otras señales operativas del dominio Cloud
+
 ## Why This Task Exists
 
 `TASK-133` cerró el surfacing de incidentes Sentry dentro del portal, pero la experiencia actual sigue siendo demasiado estática para una vista operativa que suele quedarse abierta en pantalla:
@@ -30,6 +59,7 @@ Para que `Ops Health` sirva realmente como consola de monitoreo ligera, la secci
 - mantener un snapshot server-side canónico con caché corta y recencia visible
 - conservar el último estado bueno cuando Sentry falle, marcándolo como `stale`
 - ofrecer un affordance explícito de `Refrescar ahora` para uso manual
+- cerrar explícitamente el gap de observabilidad operativa que hoy mantiene `Ops Health UI` y `Freshness / recencia` en estado `Amarillo`
 
 ## Architecture Alignment
 
