@@ -490,7 +490,363 @@ Risk Level:
 
 ---
 
-## 7. Reglas de implementación
+## 7. Enterprise Hardening — 5 capas de robustez
+
+Lo que diferencia un sistema enterprise de uno que "funciona por ahora" es que cada crecimiento lo fortalece en vez de romperlo. Estas son las 5 capas que garantizan eso.
+
+### 7.1 Contratos canónicos por objeto (no código suelto)
+
+Hoy cada vista llama queries BigQuery directas con CTEs de 100+ líneas. Si cambia cómo se calcula OTD, hay que tocar 5 archivos. Enterprise significa contratos estables.
+
+**Un store canónico por objeto:**
+
+```
+src/lib/agency/
+  ├── space-store.ts          ← SpaceStore: getSpace360(), listSpacesWithHealth()
+  ├── service-economics.ts    ← ServiceEconomics: getServicePnL(), listServicesBySpace()
+  ├── team-capacity-store.ts  ← TeamCapacityStore: getCapacity(), getUtilization(), forecast()
+  ├── campaign-store.ts       ← CampaignStore: listBySpace(), getBudgetStatus()
+  └── agency-intelligence.ts  ← AgencyIntelligence: getHealthScore(), getRiskScore(), getAnomalies()
+```
+
+**Interfaces estables entre store y consumer:**
+
+```typescript
+// El contrato es un type — si el store cambia internamente
+// (migra de BigQuery a Postgres, cambia un CTE), los consumers no se enteran
+
+interface Space360 {
+  identity: SpaceIdentity
+  health: SpaceHealthScore
+  risk: SpaceRiskScore
+  team: SpaceTeamSummary
+  services: SpaceServiceSummary
+  delivery: SpaceDeliverySummary
+  finance: SpaceFinanceSummary
+  anomalies: SpaceAnomaly[]
+  recommendations: SpaceRecommendation[]
+}
+
+// Los consumers (vistas, API routes, Nexa) solo importan el type
+// Nunca hacen queries directas ni conocen la fuente de datos
+```
+
+**Serving views materializadas:**
+
+En vez de computar on-demand con CTEs complejas, materializar en `greenhouse_serving` y leer flat:
+
+| Serving View | Fuente | Refresh | Consumer |
+|-------------|--------|---------|----------|
+| `space_health_scores` | ICO + Finance + Capacity + Engagement | Reactive (outbox events) | Space cards, Pulse KPIs |
+| `space_risk_scores` | OTD trend + margin trend + aging + feedback | Reactive | Space 360 Overview, alerts |
+| `service_economics` | Finance income + expenses + allocation by service | Reactive | Economics drill-down |
+| `team_capacity_forecast` | Assignments + pipeline + utilization | Scheduled (daily) | Capacity Engine alerts |
+| `agency_anomalies` | Rule engine over materialized signals | Scheduled (hourly) | Space 360, Pulse, notifications |
+
+Patrón existente que se reutiliza: ICO `metric_snapshots_monthly` y `client_economics` ya funcionan así.
+
+### 7.2 Observabilidad de negocio (no solo infra)
+
+Hoy observamos la infra (Sentry, health endpoint, Ops Health). Pero no observamos el negocio:
+
+**Cada componente de inteligencia tiene su propio health check:**
+
+```typescript
+// Materialización health — integrado en GET /api/cron/materialization-health
+const AGENCY_INTELLIGENCE_CHECKS = [
+  {
+    name: 'space_health_scores',
+    table: 'greenhouse_serving.space_health_scores',
+    maxAgeHours: 6,      // debe refrescarse con cada evento
+    severity: 'degraded'  // si se atrasa, la capa funciona con datos stale
+  },
+  {
+    name: 'agency_anomalies',
+    table: 'greenhouse_serving.agency_anomalies',
+    maxAgeHours: 2,       // anomaly detection corre cada hora
+    severity: 'warning'   // si no corre, se pierden alertas
+  },
+  {
+    name: 'team_capacity_forecast',
+    table: 'greenhouse_serving.team_capacity_forecast',
+    maxAgeHours: 24,      // se materializa diariamente
+    severity: 'info'      // forecast stale es aceptable por horas
+  }
+]
+```
+
+**Dashboard de salud de inteligencia en Ops Health:**
+
+```
+Agency Intelligence    [ok|degraded|stale]
+  Health scores: fresh (hace 12 min)
+  Anomalies: fresh (hace 45 min) — 2 activas
+  Forecast: fresh (hace 6h) — próxima: 3:00 AM
+  Recommendations: 3 pendientes de review
+```
+
+**Alertas cuando la inteligencia falla:**
+
+Si la anomaly detection no corre en 2h, `alertCronFailure()` notifica. Si el health score de un Space no se actualiza en 6h, se marca como stale en la UI.
+
+### 7.3 Idempotencia y recovery en todo
+
+El patrón existe con `projection-recovery` cron. La inteligencia necesita lo mismo.
+
+**Principio:** toda operación de inteligencia es retry-safe.
+
+```
+Anomaly Detection:
+  1. Lee signals materializados → detecta anomalías
+  2. Persiste en agency_anomalies con dedupe por (space_id, signal, period)
+  3. Si la notificación falla → queda en outbox → webhook retry la entrega
+  4. Si el cron muere → projection-recovery lo recoge
+
+Health Score:
+  1. Lee delivery + finance + capacity + engagement → computa score
+  2. Upsert en space_health_scores (idempotente por space_id + period)
+  3. Si una fuente está null → score parcial con flag "incomplete"
+  4. Próximo refresh completa el score cuando la fuente esté disponible
+
+Recommendations:
+  1. Generadas desde anomalías + forecasts → persistidas con status
+  2. Status lifecycle: generated → notified → acknowledged → acted → resolved
+  3. Si una recomendación no se actúa en 7 días → re-notifica con escalamiento
+  4. Resolved automáticamente si la anomalía subyacente se resuelve
+```
+
+**Tabla de recovery:**
+
+```sql
+CREATE TABLE greenhouse_serving.agency_intelligence_queue (
+  queue_id TEXT PRIMARY KEY,
+  computation_type TEXT NOT NULL,  -- 'health_score', 'risk_score', 'anomaly', 'forecast'
+  scope_type TEXT NOT NULL,        -- 'space', 'service', 'member', 'global'
+  scope_id TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending',
+  triggered_by TEXT,               -- event_id que lo disparó
+  retry_count INT DEFAULT 0,
+  max_retries INT DEFAULT 3,
+  error_message TEXT,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+### 7.4 Extensibilidad declarativa (crecer = agregar, no reescribir)
+
+Agregar capacidad nueva al sistema debe ser **agregar una entrada a un registro**, no escribir un módulo nuevo.
+
+**Anomaly rules — registro declarativo:**
+
+```typescript
+interface AnomalyRule {
+  id: string
+  signal: string              // qué métrica observar
+  condition: 'drop' | 'rise' | 'threshold' | 'streak'
+  threshold: number           // magnitud del cambio o valor umbral
+  windowPeriods: number       // cuántos períodos evaluar
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  category: string            // notification category
+  titleTemplate: string       // "OTD cayó {delta}pts en {space}"
+  suggestionTemplate: string  // "Revisar stuck assets y capacity de {role}"
+  recipientStrategy: string   // 'space_account' | 'operations_lead' | 'finance_admin'
+}
+
+const ANOMALY_RULES: AnomalyRule[] = [
+  {
+    id: 'otd_drop',
+    signal: 'otd_pct',
+    condition: 'drop',
+    threshold: 15,
+    windowPeriods: 2,
+    severity: 'high',
+    category: 'ico_alert',
+    titleTemplate: '{space}: OTD cayó {delta}pts ({from}% → {to}%)',
+    suggestionTemplate: 'Revisar stuck assets y capacity de {bottleneck_role}',
+    recipientStrategy: 'space_account'
+  },
+  {
+    id: 'margin_erosion',
+    signal: 'margin_pct',
+    condition: 'drop',
+    threshold: 10,
+    windowPeriods: 2,
+    severity: 'medium',
+    category: 'finance_alert',
+    titleTemplate: '{space}: margen cayó a {to}%',
+    suggestionTemplate: 'Revisar scope creep o renegociar tarifa',
+    recipientStrategy: 'finance_admin'
+  },
+  // Agregar nueva regla = 1 objeto aquí. Zero código nuevo.
+]
+```
+
+**Health score weights — registro configurable:**
+
+```typescript
+interface HealthScoreDimension {
+  id: string
+  weight: number              // 0-1, suma = 1.0
+  signalSource: string        // serving view o función
+  normalize: (raw: number) => number  // 0-100 normalizado
+  label: string
+}
+
+const HEALTH_DIMENSIONS: HealthScoreDimension[] = [
+  { id: 'delivery', weight: 0.40, signalSource: 'ico_metrics', normalize: normalizeOtdRpa, label: 'Delivery' },
+  { id: 'finance',  weight: 0.30, signalSource: 'finance_metrics', normalize: normalizeMargin, label: 'Finanzas' },
+  { id: 'engagement', weight: 0.15, signalSource: 'engagement_signals', normalize: normalizeEngagement, label: 'Engagement' },
+  { id: 'capacity', weight: 0.15, signalSource: 'capacity_metrics', normalize: normalizeUtilization, label: 'Capacidad' },
+  // Agregar nueva dimensión = 1 objeto. El score se recalcula automáticamente.
+]
+```
+
+**Recommendation templates — catálogo extensible:**
+
+```typescript
+interface RecommendationTemplate {
+  id: string
+  triggerAnomalies: string[]   // qué anomalías disparan esta recomendación
+  type: 'reassign' | 'reprice' | 'hire' | 'escalate' | 'reduce_scope'
+  titleTemplate: string
+  bodyTemplate: string
+  actionUrl: string            // deep link a la acción sugerida
+  priority: 'low' | 'medium' | 'high'
+  autoExpireDays: number       // se resuelve sola si la anomalía desaparece
+}
+
+const RECOMMENDATION_TEMPLATES: RecommendationTemplate[] = [
+  {
+    id: 'reassign_from_idle',
+    triggerAnomalies: ['otd_drop', 'capacity_overload'],
+    type: 'reassign',
+    titleTemplate: 'Reasignar {fteAmount} FTE de {role} de {sourceSpace} a {targetSpace}',
+    bodyTemplate: '{sourceSpace} tiene OTD {sourceOtd}% (holgado). {targetSpace} está al {targetOtd}% (stressed).',
+    actionUrl: '/agency/spaces/{targetSpaceId}?tab=team',
+    priority: 'high',
+    autoExpireDays: 14
+  },
+  // Cada recomendación nueva = 1 template. La engine ya sabe ejecutarla.
+]
+```
+
+### 7.5 Testing de reglas de negocio (el corazón del sistema)
+
+Los tests actuales validan infra ("RPA viene de ICO, no de Notion"). Enterprise necesita tests que validen **decisiones de negocio**:
+
+**Tests de anomaly detection:**
+
+```typescript
+describe('anomaly detection', () => {
+  it('triggers otd_drop when OTD falls >15pts in 2 consecutive periods', () => {
+    const signals = [
+      { period: '2026-01', otd_pct: 92 },
+      { period: '2026-02', otd_pct: 85 },
+      { period: '2026-03', otd_pct: 74 }  // drop: 92 → 74 = 18pts in 2 periods
+    ]
+    const anomalies = detectAnomalies(signals, ANOMALY_RULES)
+    expect(anomalies).toContainEqual(expect.objectContaining({
+      ruleId: 'otd_drop', severity: 'high', delta: 18
+    }))
+  })
+
+  it('does NOT trigger otd_drop for single-period dip', () => {
+    const signals = [
+      { period: '2026-01', otd_pct: 92 },
+      { period: '2026-02', otd_pct: 75 },
+      { period: '2026-03', otd_pct: 90 }  // recovered — not a trend
+    ]
+    const anomalies = detectAnomalies(signals, ANOMALY_RULES)
+    expect(anomalies.filter(a => a.ruleId === 'otd_drop')).toHaveLength(0)
+  })
+})
+```
+
+**Tests de health score:**
+
+```typescript
+describe('health score', () => {
+  it('returns 0 when all signals are null (no data)', () => {
+    const score = computeHealthScore({ delivery: null, finance: null, engagement: null, capacity: null })
+    expect(score.value).toBe(0)
+    expect(score.completeness).toBe('no_data')
+  })
+
+  it('weighs delivery at 40% of total score', () => {
+    const fullDelivery = computeHealthScore({
+      delivery: { otd: 100, rpa: 1.0 },  // perfect delivery
+      finance: null, engagement: null, capacity: null
+    })
+    expect(fullDelivery.value).toBe(40)  // 100% delivery × 0.4 weight
+    expect(fullDelivery.completeness).toBe('partial')
+  })
+
+  it('returns optimal for score >= 80', () => {
+    const score = computeHealthScore({
+      delivery: { otd: 95, rpa: 1.2 },
+      finance: { margin: 25 },
+      engagement: { feedbackRate: 90, loginRecency: 2 },
+      capacity: { utilizationBalance: 85 }
+    })
+    expect(score.value).toBeGreaterThanOrEqual(80)
+    expect(score.zone).toBe('optimal')
+  })
+})
+```
+
+**Tests de recommendations:**
+
+```typescript
+describe('recommendation engine', () => {
+  it('suggests reassignment when one space is stressed and another is idle', () => {
+    const context = {
+      spaces: [
+        { id: 'A', otd: 95, capacityUtilization: 60 },  // idle
+        { id: 'B', otd: 72, capacityUtilization: 110 }   // stressed
+      ],
+      anomalies: [{ ruleId: 'otd_drop', spaceId: 'B' }]
+    }
+    const recs = generateRecommendations(context, RECOMMENDATION_TEMPLATES)
+    expect(recs).toContainEqual(expect.objectContaining({
+      type: 'reassign', sourceSpaceId: 'A', targetSpaceId: 'B'
+    }))
+  })
+
+  it('suggests hiring when pipeline requires FTE that does not exist', () => {
+    const context = {
+      capacityForecast: { design: { available: 0.2, required: 1.7 } },
+      anomalies: [{ ruleId: 'capacity_overload', role: 'design' }]
+    }
+    const recs = generateRecommendations(context, RECOMMENDATION_TEMPLATES)
+    expect(recs).toContainEqual(expect.objectContaining({
+      type: 'hire', role: 'design'
+    }))
+  })
+
+  it('auto-resolves recommendation when underlying anomaly disappears', () => {
+    const rec = { id: 'rec-1', triggerAnomalyId: 'anomaly-1', status: 'notified' }
+    const activeAnomalies = [] // anomaly resolved
+    const updated = reconcileRecommendations([rec], activeAnomalies)
+    expect(updated[0].status).toBe('auto_resolved')
+  })
+})
+```
+
+**Test coverage requirements:**
+
+| Componente | Tests mínimos | Tipo |
+|------------|--------------|------|
+| Anomaly rules | 1 positive + 1 negative per rule | Unit (pure function) |
+| Health score | Null handling, partial data, edge weights | Unit |
+| Risk score | Each factor individually + composite | Unit |
+| Recommendations | Trigger condition + auto-resolve + escalation | Unit |
+| Capacity forecast | Empty pipeline, full pipeline, mixed | Unit |
+| Store contracts | Each store function returns correct type | Integration |
+
+---
+
+## 8. Reglas de implementación
 
 1. **Space es el objeto central** — toda feature nueva debe conectar con Space 360
 2. **No duplicar cálculos** — reusar P&L engine (`GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`), ICO materializations, capacity economics
@@ -498,10 +854,14 @@ Risk Level:
 4. **Datos antes que UI** — APIs y materializations primero, vistas después
 5. **Outbox-first** — toda mutación emite evento, toda señal puede generar notificación
 6. **Gradual, no Big Bang** — cada fase entrega valor independiente
+7. **Contratos tipados** — stores exponen interfaces, consumers nunca hacen queries directas
+8. **Materializar antes que computar** — serving views > CTEs on-demand
+9. **Registros declarativos** — reglas, weights, templates son data, no código
+10. **Tests de negocio obligatorios** — cada regla de anomaly/health/recommendation tiene test positivo + negativo
 
 ---
 
-## 8. Dependencias cross-module
+## 9. Dependencias cross-module
 
 ```
 ICO Engine ──metrics──→ Agency Intelligence (anomaly + health score)
@@ -514,7 +874,7 @@ Nexa ──tools──→ Natural language access to Agency Intelligence
 
 ---
 
-## 9. Anti-patterns a evitar
+## 10. Anti-patterns a evitar
 
 - No construir un "Agency BigQuery" — migrar a Postgres para operacional, BigQuery solo para analytics/histórico
 - No reimplementar P&L — consumir el motor Finance existente
