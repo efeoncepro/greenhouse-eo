@@ -67,6 +67,7 @@ interface Income {
   amountPending: number
   serviceLine: string | null
   incomeType: string | null
+  isAnnulled: boolean
   description: string | null
 
   // Nubox DTE fields
@@ -77,9 +78,10 @@ interface Income {
   dteFolio: string | null
 }
 
-const DOC_TYPE_CHIP: Record<string, { label: string; color: 'primary' | 'error' | 'warning' }> = {
+const DOC_TYPE_CHIP: Record<string, { label: string; color: 'primary' | 'error' | 'warning' | 'secondary' }> = {
   credit_note: { label: 'N. crédito', color: 'error' },
-  debit_note: { label: 'N. débito', color: 'warning' }
+  debit_note: { label: 'N. débito', color: 'warning' },
+  annulled: { label: 'Anulada', color: 'secondary' }
 }
 
 // ---------------------------------------------------------------------------
@@ -311,11 +313,12 @@ const IncomeListView = () => {
     incomeColumnHelper.accessor('clientName', {
       header: 'Cliente',
       cell: ({ row }) => {
-        const chip = DOC_TYPE_CHIP[row.original.incomeType ?? '']
+        const chipKey = row.original.isAnnulled ? 'annulled' : (row.original.incomeType ?? '')
+        const chip = DOC_TYPE_CHIP[chipKey]
 
         return (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant='body2'>{row.original.clientName}</Typography>
+            <Typography variant='body2' sx={row.original.isAnnulled ? { textDecoration: 'line-through', color: 'text.disabled' } : undefined}>{row.original.clientName}</Typography>
             {chip && <CustomChip round='true' size='small' variant='tonal' color={chip.color} label={chip.label} sx={{ height: 20, fontSize: '0.65rem' }} />}
           </Box>
         )

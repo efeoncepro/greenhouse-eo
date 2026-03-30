@@ -43,7 +43,8 @@ export async function GET(request: Request) {
        FROM greenhouse_finance.income
        WHERE invoice_date >= $1::date AND invoice_date <= $2::date
          AND COALESCE(income_type, 'service_fee') NOT IN ('quote')
-         AND COALESCE(dte_type_code, '') NOT IN ('52', 'COT')`,
+         AND COALESCE(dte_type_code, '') NOT IN ('52', 'COT')
+         AND COALESCE(is_annulled, FALSE) = FALSE`,
       [periodStart, periodEnd]
     ),
 

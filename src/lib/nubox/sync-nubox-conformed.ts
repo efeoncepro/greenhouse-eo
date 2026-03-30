@@ -35,15 +35,19 @@ export type SyncNuboxConformedResult = {
 // ─── Identity Resolution ────────────────────────────────────────────────────
 
 const buildOrgByRutMap = async () => {
+  // Use GROUP BY + MAX to pick the first non-null client_id
+  // when an organization has multiple active spaces
   const rows = await runGreenhousePostgresQuery<{
     organization_id: string
     tax_id: string
     client_id: string | null
   }>(`
-    SELECT o.organization_id, o.tax_id, s.client_id
+    SELECT o.organization_id, o.tax_id,
+           MAX(s.client_id) FILTER (WHERE s.client_id IS NOT NULL) AS client_id
     FROM greenhouse_core.organizations o
     LEFT JOIN greenhouse_core.spaces s ON s.organization_id = o.organization_id AND s.active = TRUE
     WHERE o.tax_id IS NOT NULL AND o.tax_id <> ''
+    GROUP BY o.organization_id, o.tax_id
   `)
 
   const map = new Map<string, { organization_id: string; client_id: string | null }>()

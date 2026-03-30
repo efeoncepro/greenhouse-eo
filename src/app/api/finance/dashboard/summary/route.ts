@@ -88,7 +88,8 @@ async function handlePostgresFirst(monthKeys: string[]) {
       `SELECT invoice_date, total_amount, total_amount_clp, amount_paid, payment_status
        FROM greenhouse_finance.income
        WHERE COALESCE(income_type, 'service_fee') NOT IN ('quote')
-         AND COALESCE(dte_type_code, '') NOT IN ('52', 'COT')`
+         AND COALESCE(dte_type_code, '') NOT IN ('52', 'COT')
+         AND COALESCE(is_annulled, FALSE) = FALSE`
     ),
     runGreenhousePostgresQuery<PgPaymentRow>(
       `SELECT ip.payment_date,

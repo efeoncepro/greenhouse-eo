@@ -44,5 +44,9 @@ CREATE INDEX IF NOT EXISTS idx_quotes_nubox ON greenhouse_finance.quotes (nubox_
 ALTER TABLE greenhouse_finance.income
   ADD COLUMN IF NOT EXISTS referenced_income_id TEXT;
 
+-- Add is_annulled flag to income for annulled documents
+ALTER TABLE greenhouse_finance.income
+  ADD COLUMN IF NOT EXISTS is_annulled BOOLEAN DEFAULT FALSE;
+
 -- Grants
 GRANT SELECT, INSERT, UPDATE ON greenhouse_finance.quotes TO runtime;

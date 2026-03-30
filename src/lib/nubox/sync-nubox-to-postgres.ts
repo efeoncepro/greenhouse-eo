@@ -60,6 +60,9 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
   // Skip if nubox_sale_id is not a valid number
   if (!sale.nubox_sale_id || isNaN(Number(sale.nubox_sale_id))) return 'skipped'
 
+  // Annulled documents are stored but excluded from revenue calculations
+  const isAnnulled = sale.is_annulled === true
+
   // Check if income already exists for this nubox document
   const existing = await runGreenhousePostgresQuery<{ income_id: string }>(
     `SELECT income_id FROM greenhouse_finance.income
@@ -117,7 +120,7 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
         income_id, client_id, organization_id, client_name, invoice_number, invoice_date, due_date,
         currency, subtotal, tax_rate, tax_amount, total_amount,
         exchange_rate_to_clp, total_amount_clp,
-        payment_status, amount_paid, income_type, service_line,
+        payment_status, amount_paid, income_type, is_annulled, service_line,
         nubox_document_id, nubox_sii_track_id, nubox_emission_status,
         dte_type_code, dte_folio, nubox_emitted_at, nubox_last_synced_at,
         created_by_user_id, created_at, updated_at
@@ -125,7 +128,7 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
         $1, $2, $3, $4, $5, $6, $7,
         'CLP', $8, 0.19, $9, $10,
         1, $10,
-        $11, 0, $12, NULL,
+        $11, 0, $12, $19, NULL,
         $13, $14, $15,
         $16, $17, $18, NOW(),
         NULL, NOW(), NOW()
@@ -138,6 +141,7 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
         dte_folio = COALESCE(EXCLUDED.dte_folio, greenhouse_finance.income.dte_folio),
         nubox_emitted_at = COALESCE(EXCLUDED.nubox_emitted_at, greenhouse_finance.income.nubox_emitted_at),
         organization_id = COALESCE(greenhouse_finance.income.organization_id, EXCLUDED.organization_id),
+        is_annulled = EXCLUDED.is_annulled,
         nubox_last_synced_at = NOW(),
         updated_at = NOW()`,
       [
@@ -151,14 +155,15 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
         Number(sale.net_amount ?? 0) * signMultiplier,
         Number(sale.tax_vat_amount ?? 0) * signMultiplier,
         Number(sale.total_amount ?? 0) * signMultiplier,
-        isCreditNote ? 'paid' : 'pending', // Credit notes are settled on creation
+        isCreditNote ? 'paid' : (isAnnulled ? 'written_off' : 'pending'),
         mapDteTypeToIncomeType(sale.dte_type_code),
         Number(sale.nubox_sale_id),
         sale.sii_track_id ? Number(sale.sii_track_id) : null,
         sale.emission_status_name,
         sale.dte_type_code,
         sale.folio,
-        sale.emission_date
+        sale.emission_date,
+        isAnnulled
       ]
     )
 
