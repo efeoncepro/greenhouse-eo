@@ -1,7 +1,10 @@
 import 'server-only'
 
+import {
+  materializeCommercialCostAttributionForPeriod,
+  readCommercialCostAttributionByClientForPeriod
+} from '@/lib/commercial-cost-attribution/member-period-attribution'
 import { getMonthDateRange } from '@/lib/finance/periods'
-import { computeClientLaborCosts } from '@/lib/finance/payroll-cost-allocation'
 import { roundCurrency, toNumber, toTimestampString } from '@/lib/finance/shared'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import {
@@ -46,13 +49,6 @@ type ExpenseRow = {
   client_id: string
   client_name: string | null
   total_direct_expense_clp: number | string
-}
-
-type OverheadRow = {
-  client_id: string
-  client_name: string | null
-  total_overhead_clp: number | string
-  allocated_fte: number | string
 }
 
 type ScopeBridgeRow = {
@@ -276,7 +272,7 @@ export const computeOperationalPl = async (
 
   const { periodStart, periodEnd } = getMonthDateRange(year, month)
 
-  const [{ periodClosed, snapshotRevision }, revenueRows, directExpenseRows, allocationRows, overheadRows, scopeBridgeRows] =
+  const [{ periodClosed, snapshotRevision }, revenueRows, directExpenseRows, allocationRows, scopeBridgeRows, commercialCostRows] =
     await Promise.all([
       getPeriodClosureMetadata(year, month),
       runGreenhousePostgresQuery<RevenueRow>(
@@ -331,50 +327,6 @@ export const computeOperationalPl = async (
         `,
         [year, month, INTERNAL_COMMERCIAL_CLIENT_IDS, INTERNAL_COMMERCIAL_CLIENT_NAMES]
       ),
-      runGreenhousePostgresQuery<OverheadRow>(
-        `
-          WITH active_assignments AS (
-            SELECT
-              a.member_id,
-              a.client_id,
-              MAX(c.client_name) AS client_name,
-              COALESCE(a.fte_allocation, 0) AS fte_allocation
-            FROM greenhouse_core.client_team_assignments a
-            LEFT JOIN greenhouse_core.clients c ON c.client_id = a.client_id
-            WHERE a.active = TRUE
-              AND a.start_date <= $2::date
-              AND (a.end_date IS NULL OR a.end_date >= $1::date)
-              AND COALESCE(a.fte_allocation, 0) > 0
-              AND COALESCE(NULLIF(LOWER(TRIM(a.client_id)), ''), '__missing__') <> ALL($5::text[])
-              AND COALESCE(NULLIF(LOWER(TRIM(c.client_name)), ''), '__missing__') <> ALL($6::text[])
-            GROUP BY a.member_id, a.client_id, a.fte_allocation
-          ),
-          member_totals AS (
-            SELECT member_id, COALESCE(SUM(fte_allocation), 0) AS total_fte
-            FROM active_assignments
-            GROUP BY member_id
-          )
-          SELECT
-            aa.client_id,
-            MAX(aa.client_name) AS client_name,
-            COALESCE(
-              SUM(
-                (COALESCE(mce.direct_overhead_target, 0) + COALESCE(mce.shared_overhead_target, 0))
-                * aa.fte_allocation / NULLIF(mt.total_fte, 0)
-              ),
-              0
-            ) AS total_overhead_clp,
-            COALESCE(SUM(aa.fte_allocation), 0) AS allocated_fte
-          FROM active_assignments aa
-          INNER JOIN member_totals mt ON mt.member_id = aa.member_id
-          INNER JOIN greenhouse_serving.member_capacity_economics mce
-            ON mce.member_id = aa.member_id
-           AND mce.period_year = $3
-           AND mce.period_month = $4
-          GROUP BY aa.client_id
-        `,
-        [periodStart, periodEnd, year, month, INTERNAL_COMMERCIAL_CLIENT_IDS, INTERNAL_COMMERCIAL_CLIENT_NAMES]
-      ).catch(() => []),
       runGreenhousePostgresQuery<ScopeBridgeRow>(
         `
           SELECT
@@ -390,10 +342,9 @@ export const computeOperationalPl = async (
           WHERE s.active = TRUE
           GROUP BY s.client_id, s.space_id, s.organization_id
         `
-      ).catch(() => [])
+      ).catch(() => []),
+      readCommercialCostAttributionByClientForPeriod(year, month).catch(() => [])
     ])
-
-  const laborCosts = await computeClientLaborCosts(year, month).catch(() => [])
 
   const scopeBridgeByClient = new Map<string, ScopeBridgeRow>(scopeBridgeRows.map(row => [row.client_id, row]))
   const clientMap = new Map<string, ClientAccumulator>()
@@ -439,21 +390,12 @@ export const computeOperationalPl = async (
     client.directExpenseClp += toNumber(row.total_direct_expense_clp)
   }
 
-  for (const row of laborCosts) {
+  for (const row of commercialCostRows) {
     const client = ensureClient(row.clientId, row.clientName)
 
-    client.laborCostClp += row.allocatedLaborClp
+    client.laborCostClp += row.laborCostClp
+    client.overheadClp += row.overheadCostClp
     client.headcountFte += row.headcountFte
-  }
-
-  for (const row of overheadRows) {
-    const client = ensureClient(row.client_id, row.client_name)
-
-    client.overheadClp += toNumber(row.total_overhead_clp)
-
-    if (client.headcountFte <= 0) {
-      client.headcountFte = toNumber(row.allocated_fte)
-    }
   }
 
   const clientSnapshots = Array.from(clientMap.values())
@@ -621,6 +563,8 @@ export const materializeOperationalPl = async (
   month: number,
   reason: string | null = null
 ) => {
+  await materializeCommercialCostAttributionForPeriod(year, month, reason).catch(() => [])
+
   const result = await computeOperationalPl(year, month, reason)
 
   await purgeOperationalPlRevision({

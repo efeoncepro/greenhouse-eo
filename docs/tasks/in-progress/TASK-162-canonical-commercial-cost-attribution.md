@@ -4,11 +4,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `in-progress` |
 | Priority | P0 |
 | Impact | Muy alto |
 | Effort | Alto |
-| Status real | `Diseño` |
+| Status real | `Implementación inicial` |
 | Rank | — |
 | Domain | Finance / Cost Intelligence / Team Capacity / Payroll / Platform |
 | Sequence | Follow-on canónico post `TASK-055`, `TASK-057`, `TASK-067`→`TASK-071`, `TASK-138` y `TASK-139` |
@@ -32,6 +32,64 @@ La capa no reemplaza a Finance ni a Cost Intelligence:
 - Implicación para `TASK-162`:
   - puede enriquecer identidad humana vía `identity_profile`
   - pero no debe degradar `member_id` como llave operativa de payroll, capacity, finance serving, ICO ni attribution
+
+## Delta 2026-03-30 — contrato endurecido tras contraste real con el repo
+
+- El contraste con código y serving real mostró drift semántico explícito:
+  - `computeOperationalPl()` mezcla `client_labor_cost_allocation` para labor cost y `member_capacity_economics` para overhead
+  - `client_economics` y `organization-economics` todavía consumen parte del bridge histórico
+  - Finance mantiene heurísticas propias en `auto-allocation-rules.ts`
+- Decisión operativa de esta lane:
+  - primero se institucionaliza una semántica shared reutilizable
+  - luego se endurece la truth layer materializada
+  - después se hace cutover progresivo de Finance / Cost Intelligence / consumers
+- Fuente canónica nueva para el contrato:
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`
+- Slice 1 implementado:
+  - helper shared `src/lib/commercial-cost-attribution/assignment-classification.ts`
+  - adopción inicial en Team Capacity / Finance para clasificar assignments internos vs comerciales con una sola regla versionada
+
+## Delta 2026-03-30 — slice 2: capa intermedia consumida por Cost Intelligence
+
+- Se implementó una capa intermedia read-model, sin materialización SQL nueva todavía:
+  - `src/lib/commercial-cost-attribution/member-period-attribution.ts`
+- La capa ya combina, por `member_id + período`:
+  - `member_capacity_economics`
+  - `client_labor_cost_allocation`
+- Shape que ya expone:
+  - costo base laboral
+  - costo laboral comercial atribuible
+  - costo interno operativo no atribuido
+  - overhead directo y compartido
+  - loaded cost comercial por allocation
+- Primer consumer cortado a esa capa:
+  - `src/lib/cost-intelligence/compute-operational-pl.ts`
+- Decisión de este slice:
+  - empezar el cutover por Cost Intelligence, no por Finance dashboard
+  - mantener `client_labor_cost_allocation` como bridge histórico de entrada, no como contrato final
+
+## Delta 2026-03-30 — slice 3: Finance y Organization 360 se alinean al mismo reader
+
+- Consumers adicionales cortados a la capa intermedia:
+  - `src/lib/finance/postgres-store-intelligence.ts`
+  - `src/lib/account-360/organization-economics.ts`
+- Efecto:
+  - `client_economics` y Organization 360 ya no leen `client_labor_cost_allocation` directamente
+  - el bridge legacy queda más claramente como input interno de la truth layer, no como contrato expuesto a múltiples consumers
+
+## Delta 2026-03-30 — slice 4: materialización inicial de la truth layer
+
+- Se agregó store canónico inicial:
+  - `src/lib/commercial-cost-attribution/store.ts`
+  - tabla `greenhouse_serving.commercial_cost_attribution`
+- La capa intermedia ahora:
+  - lee primero desde serving materializado
+  - hace fallback a recompute cuando el período todavía no está materializado
+- `materializeOperationalPl()` ya dispara antes:
+  - `materializeCommercialCostAttributionForPeriod(year, month, reason)`
+- Resultado:
+  - la truth layer dejó de ser solo composición on-read
+  - todavía falta el wiring reactivo dedicado del dominio para cerrar la lane por completo
 
 ## Why This Task Exists
 
@@ -375,8 +433,9 @@ Reglas obligatorias:
 ## Acceptance Criteria
 
 - [ ] Existe un contrato canónico documentado para `commercial cost attribution`
+- [x] Existe un contrato canónico documentado para `commercial cost attribution`
 - [ ] El contrato define versión y estrategia de evolución
-- [ ] Finance, Team Capacity y Cost Intelligence reutilizan la misma clasificación de assignments
+- [x] Finance, Team Capacity y Cost Intelligence reutilizan la misma clasificación de assignments
 - [ ] `client_labor_cost_allocation` o su sucesor expone atribución comercial sin mezclar carga interna
 - [ ] Los eventos reactivos relevantes y su orden lógico quedan explícitamente documentados
 - [ ] Existe health técnico y health semántico para esta capa

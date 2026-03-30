@@ -1,14 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockRunGreenhousePostgresQuery = vi.fn()
-const mockComputeClientLaborCosts = vi.fn()
+const mockReadCommercialCostAttributionByClientForPeriod = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
 }))
 
-vi.mock('@/lib/finance/payroll-cost-allocation', () => ({
-  computeClientLaborCosts: (...args: unknown[]) => mockComputeClientLaborCosts(...args)
+vi.mock('@/lib/commercial-cost-attribution/member-period-attribution', () => ({
+  readCommercialCostAttributionByClientForPeriod: (...args: unknown[]) =>
+    mockReadCommercialCostAttributionByClientForPeriod(...args)
 }))
 
 import { computeOperationalPl } from '@/lib/cost-intelligence/compute-operational-pl'
@@ -31,9 +32,6 @@ describe('computeOperationalPl', () => {
         { client_id: 'client-1', client_name: 'Acme', total_direct_expense_clp: 25 }
       ])
       .mockResolvedValueOnce([
-        { client_id: 'client-1', client_name: 'Acme', total_overhead_clp: 75, allocated_fte: 1 }
-      ])
-      .mockResolvedValueOnce([
         {
           client_id: 'client-1',
           client_name: 'Acme',
@@ -44,11 +42,13 @@ describe('computeOperationalPl', () => {
         }
       ])
 
-    mockComputeClientLaborCosts.mockResolvedValue([
+    mockReadCommercialCostAttributionByClientForPeriod.mockResolvedValue([
       {
         clientId: 'client-1',
         clientName: 'Acme',
-        allocatedLaborClp: 300,
+        laborCostClp: 300,
+        overheadCostClp: 75,
+        loadedCostClp: 375,
         headcountFte: 1,
         memberCount: 1
       }
@@ -91,13 +91,14 @@ describe('computeOperationalPl', () => {
       ])
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([])
 
-    mockComputeClientLaborCosts.mockResolvedValue([
+    mockReadCommercialCostAttributionByClientForPeriod.mockResolvedValue([
       {
         clientId: 'client-2',
         clientName: 'No Revenue Co',
-        allocatedLaborClp: 60,
+        laborCostClp: 60,
+        overheadCostClp: 0,
+        loadedCostClp: 60,
         headcountFte: 0.5,
         memberCount: 1
       }

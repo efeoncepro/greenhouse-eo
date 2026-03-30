@@ -54,4 +54,19 @@ describe('resolveAutoAllocation', () => {
 
     expect(result).toBeNull()
   })
+
+  it('excludes non-positive fte assignments through the shared classifier', async () => {
+    mockRunGreenhousePostgresQuery.mockResolvedValue([
+      { client_id: 'client-sky', fte_allocation: '0.000' }
+    ])
+
+    const result = await resolveAutoAllocation({
+      expenseId: 'expense-3',
+      expenseType: 'payroll',
+      memberId: 'member-3',
+      totalAmountClp: 100000
+    })
+
+    expect(result).toBeNull()
+  })
 })

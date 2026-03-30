@@ -36,7 +36,7 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - `docs/tasks/in-progress/TASK-141-canonical-person-identity-consumption.md`
   - `docs/tasks/to-do/TASK-140-admin-views-person-first-preview.md`
   - `docs/tasks/to-do/TASK-134-notification-identity-model-hardening.md`
-  - `docs/tasks/to-do/TASK-162-canonical-commercial-cost-attribution.md`
+  - `docs/tasks/in-progress/TASK-162-canonical-commercial-cost-attribution.md`
   - `docs/tasks/README.md`
   - `project_context.md`
   - `changelog.md`
@@ -217,6 +217,71 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - Si reaparece el mismo error después del deploy, revisar ya a nivel infra/Cloud SQL Connector rotation y runtime logs productivos.
 
 ## Sesión 2026-03-30 — Hardening canónico de atribución comercial para Cost Intelligence
+
+### Objetivo
+- Contrastar `TASK-162` contra la arquitectura y el código real para decidir si la lane ya estaba lista o si necesitaba endurecerse antes del cutover.
+
+### Delta de ejecución
+- El contraste confirmó drift semántico real:
+  - `computeOperationalPl()` mezcla `client_labor_cost_allocation` para labor y `member_capacity_economics` para overhead
+  - `client_economics` y `organization-economics` todavía dependen del bridge histórico
+  - `auto-allocation-rules.ts` mantenía heurísticas locales de clasificación
+- Se endureció la fuente canónica del dominio:
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`
+- `TASK-162` se movió a `in-progress` con slice 1 explícito:
+  - `docs/tasks/in-progress/TASK-162-canonical-commercial-cost-attribution.md`
+- Primer módulo shared implementado:
+  - `src/lib/commercial-cost-attribution/assignment-classification.ts`
+  - `src/lib/commercial-cost-attribution/assignment-classification.test.ts`
+- Slice 2 ya implementado:
+  - `src/lib/commercial-cost-attribution/member-period-attribution.ts`
+  - `src/lib/commercial-cost-attribution/member-period-attribution.test.ts`
+  - combina `member_capacity_economics` + `client_labor_cost_allocation` por `member_id + período`
+  - expone costo base, labor comercial, internal load y overhead comercialmente atribuible
+- Primer consumer ya cortado a la capa intermedia:
+  - `src/lib/cost-intelligence/compute-operational-pl.ts`
+  - `src/lib/cost-intelligence/compute-operational-pl.test.ts`
+- Consumers adicionales ya alineados:
+  - `src/lib/finance/postgres-store-intelligence.ts`
+  - `src/lib/account-360/organization-economics.ts`
+  - ambos dejaron de depender directamente de `computeClientLaborCosts()`
+- Slice 4 ya implementado:
+  - `src/lib/commercial-cost-attribution/store.ts`
+  - `src/lib/commercial-cost-attribution/store.test.ts`
+  - tabla `greenhouse_serving.commercial_cost_attribution`
+  - `member-period-attribution.ts` ahora hace read serving-first con fallback
+  - `materializeOperationalPl()` rematerializa primero `commercial_cost_attribution`
+- Adopción inicial sin big bang:
+  - `src/lib/team-capacity/internal-assignments.ts` ahora reexporta la regla shared
+  - `src/lib/finance/auto-allocation-rules.ts` ya filtra assignments con el classifier shared
+- Guardrail aplicado:
+  - no se tocó todavía `client_labor_cost_allocation`
+  - no se tocó serving de `operational_pl`
+  - no se mezcló con los cambios paralelos abiertos en Finance/Nubox
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/team-capacity/internal-assignments.test.ts src/lib/finance/auto-allocation-rules.test.ts`
+- `pnpm exec eslint src/lib/commercial-cost-attribution/assignment-classification.ts src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/team-capacity/internal-assignments.ts src/lib/team-capacity/internal-assignments.test.ts src/lib/finance/auto-allocation-rules.ts src/lib/finance/auto-allocation-rules.test.ts`
+- `pnpm exec vitest run src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/team-capacity/internal-assignments.test.ts src/lib/finance/auto-allocation-rules.test.ts src/lib/cost-intelligence/compute-operational-pl.test.ts`
+- `pnpm exec vitest run src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/commercial-cost-attribution/store.test.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/team-capacity/internal-assignments.test.ts src/lib/finance/auto-allocation-rules.test.ts src/lib/cost-intelligence/compute-operational-pl.test.ts`
+- `pnpm exec eslint src/lib/commercial-cost-attribution/assignment-classification.ts src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/commercial-cost-attribution/member-period-attribution.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/team-capacity/internal-assignments.ts src/lib/team-capacity/internal-assignments.test.ts src/lib/finance/auto-allocation-rules.ts src/lib/finance/auto-allocation-rules.test.ts src/lib/cost-intelligence/compute-operational-pl.ts src/lib/cost-intelligence/compute-operational-pl.test.ts`
+- `pnpm exec eslint src/lib/commercial-cost-attribution/assignment-classification.ts src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/commercial-cost-attribution/member-period-attribution.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/team-capacity/internal-assignments.ts src/lib/team-capacity/internal-assignments.test.ts src/lib/finance/auto-allocation-rules.ts src/lib/finance/auto-allocation-rules.test.ts src/lib/cost-intelligence/compute-operational-pl.ts src/lib/cost-intelligence/compute-operational-pl.test.ts src/lib/finance/postgres-store-intelligence.ts src/lib/account-360/organization-economics.ts`
+- `pnpm exec eslint src/lib/commercial-cost-attribution/assignment-classification.ts src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/commercial-cost-attribution/store.ts src/lib/commercial-cost-attribution/store.test.ts src/lib/commercial-cost-attribution/member-period-attribution.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/team-capacity/internal-assignments.ts src/lib/team-capacity/internal-assignments.test.ts src/lib/finance/auto-allocation-rules.ts src/lib/finance/auto-allocation-rules.test.ts src/lib/cost-intelligence/compute-operational-pl.ts src/lib/cost-intelligence/compute-operational-pl.test.ts src/lib/finance/postgres-store-intelligence.ts src/lib/account-360/organization-economics.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
+### Limitación de validación
+- `pnpm exec tsc --noEmit --pretty false` falla por cambios paralelos ajenos:
+  - `src/app/(dashboard)/finance/hes/page.tsx`
+  - `src/app/(dashboard)/finance/purchase-orders/page.tsx`
+  - faltan views `HesListView` y `PurchaseOrdersListView`
+- La lane `TASK-162` no introdujo ese fallo.
+
+### Pendiente inmediato
+- Siguiente slice de `TASK-162`:
+  - wiring reactivo dedicado para `commercial_cost_attribution`
+  - health semántico / explainability / audit surface
+  - luego cierre formal del bridge legacy como contrato interno en vez de consumer API
 
 ### Objetivo
 - Corregir la divergencia entre la FTE visible en `Agency > Team` / Person 360 y la atribución comercial usada por Finance / Cost Intelligence.

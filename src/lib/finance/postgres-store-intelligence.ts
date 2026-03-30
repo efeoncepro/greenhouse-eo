@@ -20,7 +20,7 @@ import {
   type ClientEconomicsRecord,
   type AllocationMethod
 } from '@/lib/finance/postgres-store-slice2'
-import { computeClientLaborCosts } from '@/lib/finance/payroll-cost-allocation'
+import { readCommercialCostAttributionByClientForPeriod } from '@/lib/commercial-cost-attribution/member-period-attribution'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 // ─── Row types ──────────────────────────────────────────────────────
@@ -415,16 +415,16 @@ export const computeClientEconomicsSnapshots = async (
     [periodStart, periodEnd]
   )
 
-  let laborCosts: Awaited<ReturnType<typeof computeClientLaborCosts>> = []
+  let commercialCostRows: Awaited<ReturnType<typeof readCommercialCostAttributionByClientForPeriod>> = []
 
   try {
-    laborCosts = await computeClientLaborCosts(year, month)
+    commercialCostRows = await readCommercialCostAttributionByClientForPeriod(year, month)
   } catch {
-    laborCosts = []
+    commercialCostRows = []
   }
 
   const fteMap = new Map<string, { fte: number; laborClp: number }>(
-    laborCosts.map(lc => [lc.clientId, { fte: lc.headcountFte, laborClp: lc.allocatedLaborClp }])
+    commercialCostRows.map(row => [row.clientId, { fte: row.headcountFte, laborClp: row.laborCostClp }])
   )
 
   const clientMap = new Map<string, {
@@ -463,16 +463,16 @@ export const computeClientEconomicsSnapshots = async (
     }
   }
 
-  for (const lc of laborCosts) {
-    const existing = clientMap.get(lc.clientId) || {
-      clientName: lc.clientName,
+  for (const row of commercialCostRows) {
+    const existing = clientMap.get(row.clientId) || {
+      clientName: row.clientName,
       revenue: 0,
       directCosts: 0,
       indirectCosts: 0
     }
 
-    existing.directCosts += lc.allocatedLaborClp
-    clientMap.set(lc.clientId, existing)
+    existing.directCosts += row.laborCostClp
+    clientMap.set(row.clientId, existing)
   }
 
   // LTV/CAC: fetch acquisition costs per client (all-time)

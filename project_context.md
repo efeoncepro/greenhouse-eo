@@ -330,7 +330,25 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 ## Delta 2026-03-30 Commercial cost attribution queda definida como capa canónica
 - Greenhouse ya no debe leer la atribución comercial de costos como lógica repartida entre Payroll, Team Capacity, Finance y Cost Intelligence.
 - Decisión acordada:
-  - existe una capa canónica explícita de `commercial cost attribution`
+- existe una capa canónica explícita de `commercial cost attribution`
+- la fuente canónica del contrato vive en `docs/architecture/GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`
+- primer slice shared ya implementado:
+  - `src/lib/commercial-cost-attribution/assignment-classification.ts`
+  - clasifica assignments en:
+    - `commercial_billable`
+    - `commercial_non_billable`
+    - `internal_operational`
+    - `excluded_invalid`
+- estado actual del dominio:
+  - `client_labor_cost_allocation` sigue siendo el bridge laboral histórico
+  - `member_capacity_economics` sigue siendo la fuente reusable de labor cost cargado + overhead por miembro
+  - `src/lib/commercial-cost-attribution/member-period-attribution.ts` ya actúa como capa intermedia canónica on-read por `member_id + período`
+  - `src/lib/cost-intelligence/compute-operational-pl.ts` ya consume esa capa intermedia en vez de mezclar directamente labor bridge + overhead query local
+  - `src/lib/finance/postgres-store-intelligence.ts` y `src/lib/account-360/organization-economics.ts` también ya consumen esa capa intermedia
+  - `src/lib/commercial-cost-attribution/store.ts` ya materializa la truth layer inicial en `greenhouse_serving.commercial_cost_attribution`
+  - `member-period-attribution.ts` hace serving-first con fallback a recompute
+  - `materializeOperationalPl()` ya rematerializa primero esta capa y luego el P&L operativo
+  - el siguiente remanente es wiring reactivo dedicado y health/observability semántica de la capa
   - Payroll, Team Capacity y Finance siguen calculando sus piezas de dominio
   - la verdad consolidada de costo comercial sale de una sola capa shared
   - esa capa alimenta primero a:

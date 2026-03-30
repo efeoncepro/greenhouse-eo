@@ -2,7 +2,7 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { roundCurrency, toNumber } from '@/lib/finance/shared'
-import { isInternalCommercialClientId } from '@/lib/team-capacity/internal-assignments'
+import { classifyAssignmentForCostAttribution } from '@/lib/commercial-cost-attribution/assignment-classification'
 
 /**
  * Auto-allocation rules for expenses.
@@ -45,7 +45,12 @@ const allocatePayrollByFte = async (
     [memberId]
   )
 
-  const commercialAssignments = assignments.filter(a => !isInternalCommercialClientId(String(a.client_id || '')))
+  const commercialAssignments = assignments.filter(a =>
+    classifyAssignmentForCostAttribution({
+      clientId: String(a.client_id || ''),
+      fteAllocation: a.fte_allocation
+    }).shouldParticipateInCommercialAttribution
+  )
 
   if (commercialAssignments.length === 0) return null
 

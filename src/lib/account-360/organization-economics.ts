@@ -1,8 +1,8 @@
 import 'server-only'
 
+import { readCommercialCostAttributionByClientForPeriod } from '@/lib/commercial-cost-attribution/member-period-attribution'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
-import { computeClientLaborCosts } from '@/lib/finance/payroll-cost-allocation'
 import { roundCurrency } from '@/lib/finance/shared'
 import { getOrganizationDetail } from './organization-store'
 
@@ -89,7 +89,7 @@ interface OperationalPlServingRow extends Record<string, unknown> {
 
 /**
  * Get unified economics for an organization for a single period.
- * Correlates client_economics (revenue, costs) with client_labor_cost_allocation (real payroll cost).
+ * Correlates finance snapshots with canonical commercial cost attribution.
  */
 export const getOrganizationEconomics = async (
   orgId: string,
@@ -110,14 +110,12 @@ export const getOrganizationEconomics = async (
   // 1. Get finance snapshots for org's clients
   const financeRows = await queryOrgFinanceRows(orgId, year, month)
 
-  // 2. Get real labor costs from payroll allocation
-  const laborCosts = await computeClientLaborCosts(year, month)
+  // 2. Get canonical client commercial cost summary for the period
+  const commercialCostRows = await readCommercialCostAttributionByClientForPeriod(year, month)
 
-  // Build labor cost lookup by client_id
-  const laborByClient = new Map(laborCosts.map(lc => [lc.clientId, lc]))
-
-  // Collect client IDs from the org's finance data
-  const orgClientIds = new Set(financeRows.map(r => String(r.client_id)))
+  const laborByClient = new Map(
+    commercialCostRows.map(row => [row.clientId, row])
+  )
 
   // 3. Aggregate
   let totalRevenue = 0
@@ -131,7 +129,7 @@ export const getOrganizationEconomics = async (
     const direct = toNum(row.direct_costs_clp)
     const indirect = toNum(row.indirect_costs_clp)
     const labor = laborByClient.get(String(row.client_id))
-    const laborCost = labor?.allocatedLaborClp ?? 0
+    const laborCost = labor?.laborCostClp ?? 0
     const nonLaborDirect = Math.max(0, direct - laborCost)
 
     totalRevenue += rev
@@ -139,13 +137,6 @@ export const getOrganizationEconomics = async (
     totalIndirectCosts += indirect
     totalLaborCost += laborCost
     totalFte += labor?.headcountFte ?? toNum(row.headcount_fte)
-  }
-
-  // Also include labor costs for clients in this org that may not have revenue
-  for (const lc of laborCosts) {
-    if (!orgClientIds.has(lc.clientId)) continue
-
-    // Already counted above
   }
 
   const adjustedMargin = roundCurrency(totalRevenue - totalLaborCost - totalDirectCosts - totalIndirectCosts)
@@ -241,15 +232,15 @@ export const getOrganizationProfitabilityBreakdown = async (
   }
 
   const financeRows = await queryOrgFinanceRows(orgId, year, month)
-  const laborCosts = await computeClientLaborCosts(year, month)
-  const laborByClient = new Map(laborCosts.map(lc => [lc.clientId, lc]))
+  const commercialCostRows = await readCommercialCostAttributionByClientForPeriod(year, month)
+  const laborByClient = new Map(commercialCostRows.map(row => [row.clientId, row]))
 
   return financeRows.map(row => {
     const rev = toNum(row.total_revenue_clp)
     const direct = toNum(row.direct_costs_clp)
     const indirect = toNum(row.indirect_costs_clp)
     const labor = laborByClient.get(String(row.client_id))
-    const laborCost = labor?.allocatedLaborClp ?? 0
+    const laborCost = labor?.laborCostClp ?? 0
     const nonLaborDirect = Math.max(0, direct - laborCost)
     const marginClp = roundCurrency(rev - laborCost - nonLaborDirect - indirect)
 

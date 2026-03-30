@@ -46,6 +46,7 @@ Primer bloque operativo asignado:
 | `TASK-115` | [TASK-115-nexa-ui-completion.md](in-progress/TASK-115-nexa-ui-completion.md) | P1 | Alto | Medio | Implementación | Edit inline, suggestions, feedback, floating portal-wide, thread history, NexaPanel cleanup |
 | `TASK-121` | [TASK-121-admin-center-hardening.md](in-progress/TASK-121-admin-center-hardening.md) | P1 | Alto | Bajo | Implementación | Sorting, skeleton, health real, deep-link filtros y alertas consolidadas para Admin Center |
 | `TASK-137` | [TASK-137-ui-foundation-activation.md](in-progress/TASK-137-ui-foundation-activation.md) | P1 | Alto | Medio | Parcial | Foundation UI ya activada con RHF en auth, `GreenhouseCalendar`, `GreenhouseDatePicker`, `GreenhouseDragList` y primer calendario operativo en `/admin/operational-calendar` |
+| `TASK-162` | [TASK-162-canonical-commercial-cost-attribution.md](in-progress/TASK-162-canonical-commercial-cost-attribution.md) | P0 | Muy alto | Alto | Implementación inicial | Contrato canónico endurecido + helper shared inicial de clasificación para atribución comercial; siguiente slice: truth layer materializada y cutover progresivo de consumers |
 
 ## To Do
 
@@ -176,7 +177,6 @@ Primer bloque operativo asignado:
 | 52 | `TASK-127` | [TASK-127-cloud-architecture-posture-consolidation.md](to-do/TASK-127-cloud-architecture-posture-consolidation.md) | P2 | Alto | Medio | Diseño | Consolidar la arquitectura Cloud post-baseline con scorecard semáforo por dominio, cleanup de drift documental y plan corto de next hardening wave |
 | 54 | `TASK-135` | [TASK-135-ops-health-sentry-reactive-refresh.md](to-do/TASK-135-ops-health-sentry-reactive-refresh.md) | P2 | Alto | Medio | Diseño | Hacer que `Incidentes Sentry` en `Ops Health` sea una superficie reactiva: auto-refresh, `Refrescar ahora` y fallback `stale` con último snapshot bueno |
 | 55 | `TASK-131` | [TASK-131-cloud-health-runtime-tooling-posture-separation.md](complete/TASK-131-cloud-health-runtime-tooling-posture-separation.md) | P1 | Alto | Medio | **Cerrada** | Health Cloud ya separa secretos runtime vs tooling: `migrator/admin` siguen visibles en `postgresAccessProfiles`, pero ya no degradan `overallStatus` del portal sano |
-| 58 | `TASK-162` | [TASK-162-canonical-commercial-cost-attribution.md](to-do/TASK-162-canonical-commercial-cost-attribution.md) | P0 | Muy alto | Alto | Diseño | Consolidar la truth layer de atribución comercial de costos entre Payroll, Team Capacity, Finance y Cost Intelligence, incluyendo outbox/reactive, cloud runtime, helpers, serving y consumers downstream |
 | 38 | ~~CODEX_TASK_Greenhouse_Email_Catalog_v1.md~~ | — | — | — | **Movida a spec** | Reclasificada como documento de referencia → `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md` |
 | 30 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | P3 | Medio | Medio | Parcial | Consolidación UX transversal de shells, vistas y navegación |
 | 31 | ~~CODEX_TASK_Typography_Hierarchy_Fix.md~~ | — | — | — | **Cerrada** | Jerarquía core absorbida en mergedTheme.ts; custom variants `monoId`, `monoAmount`, `kpiValue` para adopción gradual |

@@ -207,7 +207,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-159` | `to-do` | Nexa Agency Tools — Query, Recommend, Act | `docs/tasks/to-do/TASK-159-nexa-agency-tools.md` |
 | `TASK-160` | `to-do` | Agency Enterprise Hardening — Contracts, Observability, Migration | `docs/tasks/to-do/TASK-160-agency-enterprise-hardening.md` |
 | `TASK-161` | `to-do` | Agency Permissions, Data Retention & Operational Onboarding | `docs/tasks/to-do/TASK-161-agency-permissions-retention-onboarding.md` |
-| `TASK-162` | `to-do` | Canonical Commercial Cost Attribution | `docs/tasks/to-do/TASK-162-canonical-commercial-cost-attribution.md` |
+| `TASK-162` | `in-progress` | Canonical Commercial Cost Attribution | `docs/tasks/in-progress/TASK-162-canonical-commercial-cost-attribution.md` |
 
 | `TASK-163` | `complete` | Finance Document Type Separation: Quotes, Credit/Debit Notes | `docs/tasks/complete/TASK-163-finance-document-type-separation.md` |
 
