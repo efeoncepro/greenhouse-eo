@@ -277,16 +277,29 @@ async function buildResponse(
   let payrollPeriodLabel: string | null = null
 
   try {
-    // Use gross_total as the primary cost field — it's the total haberes (bruto)
-    // chile_employer_total_cost includes employer contributions but may be NULL
+    // Use the most complete cost field available per entry:
+    // chile_employer_total_cost > gross_total > base_salary
+    // chile_employer_total_cost = bruto + cargas empleador (SIS, cesantía, mutual)
+    // gross_total = total haberes (bruto del colaborador)
+    // base_salary = solo sueldo base
     const payrollRows = await runGreenhousePostgresQuery<{
       total_clp: string | number
+      total_employer: string | number
+      total_gross: string | number
+      total_base: string | number
       entry_count: string | number
       p_year: number
       p_month: number
     } & Record<string, unknown>>(
       `SELECT
-         COALESCE(SUM(e.gross_total), 0) AS total_clp,
+         COALESCE(SUM(GREATEST(
+           COALESCE(e.chile_employer_total_cost, 0),
+           COALESCE(e.gross_total, 0),
+           COALESCE(e.base_salary, 0)
+         )), 0) AS total_clp,
+         COALESCE(SUM(e.chile_employer_total_cost), 0) AS total_employer,
+         COALESCE(SUM(e.gross_total), 0) AS total_gross,
+         COALESCE(SUM(e.base_salary), 0) AS total_base,
          COUNT(*)::text AS entry_count,
          p.year AS p_year,
          p.month AS p_month
@@ -328,7 +341,8 @@ async function buildResponse(
     payrollContext: {
       costClp: payrollCostClp,
       periodLabel: payrollPeriodLabel,
-      revenueClp: monthlyRevenue
+      revenueClp: monthlyRevenue,
+      breakdown: payrollCostClp > 0 ? 'See /api/finance/dashboard/summary for details' : 'No payroll data found'
     },
     cash: {
       incomeMonth: incomeCashMetrics.totalAmountClp,
