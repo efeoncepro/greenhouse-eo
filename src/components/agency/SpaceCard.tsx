@@ -63,6 +63,12 @@ const getOtdSemaphore = (v: number | null) => {
   return { color: 'error' as const, muiColor: GH_COLORS.semaphore.red.source, pct: v }
 }
 
+const getFinanceSnapshotLabel = (financeMetrics: SpaceFinanceMetrics) => {
+  if (!financeMetrics.periodYear || !financeMetrics.periodMonth) return null
+
+  return `${String(financeMetrics.periodMonth).padStart(2, '0')}/${financeMetrics.periodYear}`
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -73,6 +79,7 @@ const SpaceCard = ({ space, financeMetrics }: Props) => {
   const rpa = getRpaSemaphore(space.rpaAvg)
   const otd = getOtdSemaphore(space.otdPct)
   const healthZone = getSpaceHealth(space)
+  const financePeriodLabel = financeMetrics ? getFinanceSnapshotLabel(financeMetrics) : null
 
   return (
     <Card
@@ -210,7 +217,9 @@ const SpaceCard = ({ space, financeMetrics }: Props) => {
                 size='small'
                 color='primary'
                 variant='tonal'
-                label={`$${Math.round(financeMetrics.revenueCurrentMonth / 1000).toLocaleString('es-CL')}K`}
+                label={financePeriodLabel
+                  ? `$${Math.round(financeMetrics.revenueCurrentMonth / 1000).toLocaleString('es-CL')}K · ${financePeriodLabel}`
+                  : `$${Math.round(financeMetrics.revenueCurrentMonth / 1000).toLocaleString('es-CL')}K`}
                 sx={{ height: 18, fontSize: '0.6rem' }}
               />
               {financeMetrics.marginPct !== null && (
@@ -219,7 +228,7 @@ const SpaceCard = ({ space, financeMetrics }: Props) => {
                   size='small'
                   color={financeMetrics.marginPct >= 20 ? 'success' : financeMetrics.marginPct >= 5 ? 'warning' : 'error'}
                   variant='tonal'
-                  label={`${financeMetrics.marginPct}%`}
+                  label={`${financeMetrics.marginPct}%${financeMetrics.periodClosed ? ' · Cerrado' : ''}`}
                   sx={{ height: 18, fontSize: '0.6rem' }}
                 />
               )}

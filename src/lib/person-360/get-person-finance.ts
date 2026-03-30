@@ -80,6 +80,18 @@ type CostAttributionRow = {
   period_month: string | number
 }
 
+type LatestCostSnapshotRow = {
+  period_year: string | number
+  period_month: string | number
+  closure_status: string | null
+  period_closed: boolean | null
+  snapshot_status: string | null
+  loaded_cost_target: string | number | null
+  total_labor_cost_target: string | number | null
+  direct_overhead_target: string | number | null
+  shared_overhead_target: string | number | null
+}
+
 // ── Helpers ──
 
 const toNum = (v: unknown): number => {
@@ -156,7 +168,7 @@ const buildFinanceOverview = async (
   displayNameHint: string | null
 ): Promise<PersonFinanceOverview> => {
   // Run summary + detail queries in parallel
-  const [summaryRows, payrollRows, expenseRows, identityRows, assignmentRows, costAttributionRows] = await Promise.all([
+  const [summaryRows, payrollRows, expenseRows, identityRows, assignmentRows, costAttributionRows, latestCostSnapshotRows] = await Promise.all([
     runGreenhousePostgresQuery<FinanceSummaryRow>(
       `SELECT * FROM greenhouse_serving.person_finance_360
        WHERE member_id = $1
@@ -247,10 +259,31 @@ const buildFinanceOverview = async (
       ORDER BY clca.period_year DESC, clca.period_month DESC, clca.allocated_labor_clp DESC
       LIMIT 20`,
       [memberId]
-    ).catch(() => [] as CostAttributionRow[])
+    ).catch(() => [] as CostAttributionRow[]),
+    runGreenhousePostgresQuery<LatestCostSnapshotRow>(
+      `SELECT
+         mce.period_year,
+         mce.period_month,
+         pcs.closure_status,
+         COALESCE(pcs.closure_status = 'closed', FALSE) AS period_closed,
+         mce.snapshot_status,
+         mce.loaded_cost_target,
+         mce.total_labor_cost_target,
+         mce.direct_overhead_target,
+         mce.shared_overhead_target
+       FROM greenhouse_serving.member_capacity_economics mce
+       LEFT JOIN greenhouse_serving.period_closure_status pcs
+         ON pcs.period_year = mce.period_year
+        AND pcs.period_month = mce.period_month
+       WHERE mce.member_id = $1
+       ORDER BY mce.period_year DESC, mce.period_month DESC
+       LIMIT 1`,
+      [memberId]
+    ).catch(() => [] as LatestCostSnapshotRow[])
   ])
 
   const summary = summaryRows[0]
+  const latestCostSnapshot = latestCostSnapshotRows[0]
 
   return {
     member: {
@@ -320,6 +353,19 @@ const buildFinanceOverview = async (
       attributedCostClp: toNum(r.allocated_labor_clp),
       periodYear: toNum(r.period_year),
       periodMonth: toNum(r.period_month)
-    }))
+    })),
+    latestCostSnapshot: latestCostSnapshot
+      ? {
+          periodYear: toNum(latestCostSnapshot.period_year),
+          periodMonth: toNum(latestCostSnapshot.period_month),
+          closureStatus: str(latestCostSnapshot.closure_status),
+          periodClosed: latestCostSnapshot.period_closed === true,
+          snapshotStatus: str(latestCostSnapshot.snapshot_status),
+          loadedCostTarget: toNum(latestCostSnapshot.loaded_cost_target),
+          laborCostTarget: toNum(latestCostSnapshot.total_labor_cost_target),
+          directOverheadTarget: toNum(latestCostSnapshot.direct_overhead_target),
+          sharedOverheadTarget: toNum(latestCostSnapshot.shared_overhead_target)
+        }
+      : null
   }
 }

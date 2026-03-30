@@ -1,5 +1,21 @@
 # GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md
 
+## Delta 2026-03-30 — Consumers distribuidos ya iniciaron cutover
+- `TASK-071` ya no está solo en diseño.
+- Consumers que ya leen serving materializado:
+  - Agency `SpaceCard` vía `agency-finance-metrics.ts`
+  - Organization 360 `Rentabilidad` vía `organization-economics.ts`
+  - People 360 vía `latestCostSnapshot` en `PersonFinanceTab`
+  - Home vía `financeStatus` en `getHomeSnapshot()`
+- Patrón aplicado:
+  - serving-first sobre `greenhouse_serving.operational_pl_snapshots`
+  - `period_closure_status` para closure awareness
+  - fallback honesto a compute legacy solo donde todavía conviene resiliencia (`organization-economics.ts`)
+- Remanente de la ola:
+  - validación visual
+  - cierre semántico de fallbacks
+  - incorporación de contexto resumido en Nexa
+
 ## Delta 2026-03-30 — Baseline del módulo ya implementada
 - El módulo de Cost Intelligence ya no está solo en diseño.
 - Estado implementado en repo:

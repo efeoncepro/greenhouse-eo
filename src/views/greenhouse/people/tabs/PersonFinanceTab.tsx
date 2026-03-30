@@ -36,6 +36,22 @@ const MONTH_SHORT = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago',
 const formatCLP = (amount: number): string =>
   new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
 
+const closureColor = (status: string | null, periodClosed: boolean): 'success' | 'warning' | 'info' | 'secondary' => {
+  if (status === 'closed' || periodClosed) return 'success'
+  if (status === 'ready') return 'info'
+  if (status === 'reopened') return 'warning'
+
+  return 'secondary'
+}
+
+const closureLabel = (status: string | null, periodClosed: boolean) => {
+  if (status === 'closed' || periodClosed) return 'Cerrado'
+  if (status === 'ready') return 'Listo para cierre'
+  if (status === 'reopened') return 'Reabierto'
+
+  return 'Provisional'
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -87,7 +103,7 @@ const PersonFinanceTab = ({ memberId }: Props) => {
     )
   }
 
-  const { summary, costAttribution, payrollHistory } = data
+  const { summary, costAttribution, payrollHistory, latestCostSnapshot } = data
 
   // Derive total attributed cost from most recent period
   const latestPeriodKey = costAttribution && costAttribution.length > 0
@@ -122,8 +138,8 @@ const PersonFinanceTab = ({ memberId }: Props) => {
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
         <HorizontalWithSubtitle
           title='Costo laboral total'
-          stats={totalAttributedCost > 0 ? formatCLP(totalAttributedCost) : '—'}
-          subtitle='del período más reciente'
+          stats={latestCostSnapshot?.loadedCostTarget ? formatCLP(latestCostSnapshot.loadedCostTarget) : totalAttributedCost > 0 ? formatCLP(totalAttributedCost) : '—'}
+          subtitle={latestCostSnapshot ? `${MONTH_SHORT[latestCostSnapshot.periodMonth]} ${latestCostSnapshot.periodYear}` : 'del período más reciente'}
           avatarIcon='tabler-wallet'
           avatarColor='primary'
         />
@@ -148,6 +164,72 @@ const PersonFinanceTab = ({ memberId }: Props) => {
       </Grid>
 
       {/* ROW 1 — Cost attribution table */}
+      <Grid size={{ xs: 12 }}>
+        {latestCostSnapshot && (
+          <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+            <CardHeader
+              title='Costo total del período'
+              subheader={`${MONTH_SHORT[latestCostSnapshot.periodMonth]} ${latestCostSnapshot.periodYear}`}
+              avatar={
+                <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
+                  <i className='tabler-currency-dollar' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} />
+                </Avatar>
+              }
+              action={
+                <CustomChip
+                  round='true'
+                  size='small'
+                  variant='tonal'
+                  color={closureColor(latestCostSnapshot.closureStatus, latestCostSnapshot.periodClosed)}
+                  label={closureLabel(latestCostSnapshot.closureStatus, latestCostSnapshot.periodClosed)}
+                />
+              }
+            />
+            <Divider />
+            <CardContent>
+              <Grid container spacing={4}>
+                <Grid size={{ xs: 12, sm: 3 }}>
+                  <HorizontalWithSubtitle
+                    title='Loaded cost'
+                    stats={formatCLP(latestCostSnapshot.loadedCostTarget)}
+                    subtitle='snapshot canónico'
+                    avatarIcon='tabler-coins'
+                    avatarColor='primary'
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 3 }}>
+                  <HorizontalWithSubtitle
+                    title='Costo laboral'
+                    stats={formatCLP(latestCostSnapshot.laborCostTarget)}
+                    subtitle='payroll + compensación'
+                    avatarIcon='tabler-receipt-2'
+                    avatarColor='success'
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 3 }}>
+                  <HorizontalWithSubtitle
+                    title='Overhead directo'
+                    stats={formatCLP(latestCostSnapshot.directOverheadTarget)}
+                    subtitle='tools y costos asignados'
+                    avatarIcon='tabler-tool'
+                    avatarColor='warning'
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 3 }}>
+                  <HorizontalWithSubtitle
+                    title='Overhead compartido'
+                    stats={formatCLP(latestCostSnapshot.sharedOverheadTarget)}
+                    subtitle='pool distribuido'
+                    avatarIcon='tabler-building-bank'
+                    avatarColor='info'
+                  />
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        )}
+      </Grid>
+
       <Grid size={{ xs: 12 }}>
         <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
           <CardHeader

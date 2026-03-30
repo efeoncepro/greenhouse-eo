@@ -4,6 +4,38 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — TASK-071 slice 1-3 consumers distribuidos
+
+### Objetivo
+- Ejecutar el primer corte real de `TASK-071` contrastando primero arquitectura, consumers y serving ya implementado del módulo Cost Intelligence.
+
+### Delta de ejecución
+- Agency:
+  - `src/lib/agency/agency-finance-metrics.ts` ya no calcula este consumer desde `greenhouse_finance.income` / `expenses`; ahora lee `greenhouse_serving.operational_pl_snapshots`.
+  - `src/components/agency/SpaceCard.tsx` ya puede mostrar período del snapshot y si el margen corresponde a cierre efectivo.
+- Organization 360:
+  - `src/lib/account-360/organization-economics.ts` ya es serving-first para `organization` y breakdown `client`, con fallback al compute legacy si falta snapshot.
+  - `src/views/greenhouse/organizations/tabs/OrganizationEconomicsTab.tsx` ya muestra chips de cierre por período y badge del período actual.
+- People 360:
+  - `src/lib/person-360/get-person-finance.ts` ahora publica `latestCostSnapshot`.
+  - `src/views/greenhouse/people/tabs/PersonFinanceTab.tsx` suma card `Costo total del período` con desglose y badge de cierre.
+  - `src/app/api/people/[memberId]/finance-impact/route.ts` y `src/views/greenhouse/people/tabs/PersonHrProfileTab.tsx` ya muestran período + closure awareness.
+- Home:
+  - `src/lib/home/get-home-snapshot.ts` ahora resuelve `financeStatus` para roles internos/finance.
+  - `src/views/greenhouse/home/HomeView.tsx` reemplaza placeholders por estado real de cierre/margen.
+
+### Validación ejecutada
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec eslint src/lib/agency/agency-finance-metrics.ts src/lib/account-360/organization-economics.ts src/views/greenhouse/organizations/tabs/OrganizationEconomicsTab.tsx src/types/people.ts src/lib/person-360/get-person-finance.ts 'src/app/api/people/[memberId]/finance-impact/route.ts' src/views/greenhouse/people/tabs/PersonFinanceTab.tsx src/views/greenhouse/people/tabs/PersonHrProfileTab.tsx src/types/home.ts src/lib/home/get-home-snapshot.ts src/app/api/home/snapshot/route.ts src/views/greenhouse/home/HomeView.tsx`
+
+### Limitación de validación
+- `pnpm build` quedó inestable en esta sesión por locks/artifacts de `.next` (`Unable to acquire lock` y luego `ENOENT` sobre `_buildManifest.js.tmp`), incluso después de limpiar `.next`.
+- No apareció error de tipos del slice después de `tsc`; el ruido observado fue del runtime/build workspace de Next en esta máquina.
+
+### Pendiente inmediato
+- Validación visual real del slice en Agency / Organization 360 / People / Home.
+- Decidir si `TASK-071` cierra con Home solamente o si Nexa debe entrar antes del cierre formal.
+
 ## Sesión 2026-03-30 — TASK-069 cerrada + arquitectura del módulo endurecida
 
 ### Objetivo

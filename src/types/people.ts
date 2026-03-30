@@ -214,6 +214,17 @@ export interface PersonFinanceOverview {
     periodYear: number
     periodMonth: number
   }>
+  latestCostSnapshot?: {
+    periodYear: number
+    periodMonth: number
+    closureStatus: string | null
+    periodClosed: boolean
+    snapshotStatus: string | null
+    loadedCostTarget: number
+    laborCostTarget: number
+    directOverheadTarget: number
+    sharedOverheadTarget: number
+  } | null
 }
 
 export interface PersonIdentityContext {

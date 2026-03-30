@@ -1,5 +1,39 @@
 # TASK-071 — Cost Intelligence Cross-Module Consumer Enrichment
 
+## Delta 2026-03-30 — Slice 1-3 ya implementado
+
+- Agency ya dejó de calcular economics desde `income`/`expenses` crudos para este consumer:
+  - `src/lib/agency/agency-finance-metrics.ts` ahora lee `greenhouse_serving.operational_pl_snapshots` (`scope_type='client'`) para el período más reciente y el anterior.
+  - `SpaceCard` ya expone también el período del snapshot y si el margen mostrado corresponde a un período cerrado.
+- Organization 360 ya pasó a serving-first:
+  - `src/lib/account-360/organization-economics.ts` ahora prioriza `operational_pl_snapshots` + `period_closure_status` para `organization` y `client`.
+  - se conserva fallback al compute on-read previo si el snapshot materializado todavía no existe.
+  - `OrganizationEconomicsTab` ya muestra estado de cierre para el período actual y chips por período en la tendencia.
+- People 360 ya ganó closure awareness sin abrir surface nueva:
+  - `src/lib/person-360/get-person-finance.ts` ahora expone `latestCostSnapshot`.
+  - `PersonFinanceTab` ya muestra card `Costo total del período` con loaded cost, labor, overhead directo y overhead compartido, más badge de cierre.
+  - `finance-impact` / `FinanceImpactCard` también muestran período y estado de cierre.
+- Home ya dejó los placeholders financieros:
+  - `getHomeSnapshot()` ahora puede resolver `financeStatus` para roles internos/finance.
+  - `HomeView` usa ese snapshot para construir `OperationStatus` con cierre del período y margen operativo reciente.
+- Nexa quedó pendiente en este corte:
+  - el consumer conversacional todavía no incorpora el resumen de Cost Intelligence en `lightContext`.
+- Validación del slice:
+  - `pnpm exec tsc --noEmit --pretty false` OK
+  - `pnpm exec eslint ...` del slice OK
+  - `pnpm build` quedó inestable por runtime artifacts/locks de `.next` durante esta sesión; no apareció error de tipos del slice después de `tsc`
+
+## Delta 2026-03-30 — Ejecución iniciada
+
+- La task entra en `in-progress`.
+- Orden de implementación elegido:
+  - Slice 1: Agency + Organization 360
+  - Slice 2: People 360
+  - Slice 3: Home/Nexa
+- Razón:
+  - Agency y Organization 360 ya tienen consumers claros que leen economics hoy
+  - ambos permiten validar rápido el cutover a serving materializado sin abrir superficies nuevas
+
 ## Delta 2026-03-30 — TASK-070 ya fijó la surface primaria
 
 - `/finance/intelligence` ya quedó repivotada a `FinancePeriodClosureDashboardView`.
@@ -52,11 +86,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `in-progress` |
 | Priority | `P2` |
 | Impact | `Alto` |
 | Effort | `Medio` |
-| Status real | `Lista para ejecución` |
+| Status real | `Implementación` |
 | Rank | — |
 | Domain | Cost Intelligence |
 
@@ -161,11 +195,11 @@ Que los 4 consumers principales lean de serving views pre-materializadas en vez 
 
 ## Acceptance Criteria
 
-- [ ] Agency space cards muestran margin % badge cuando hay P&L disponible
-- [ ] Organization 360 Rentabilidad lee P&L materializado en vez de computar on-demand
-- [ ] Organization 360 muestra badge de closure status por período
-- [ ] People Finance tab muestra "Costo Total del Período" con desglose y closure badge
-- [ ] Home/dashboard muestra widget de status financiero con período actual + trend
+- [x] Agency space cards muestran margin % badge cuando hay P&L disponible
+- [x] Organization 360 Rentabilidad lee P&L materializado en vez de computar on-demand
+- [x] Organization 360 muestra badge de closure status por período
+- [x] People Finance tab muestra "Costo Total del Período" con desglose y closure badge
+- [x] Home/dashboard muestra widget de status financiero con período actual + trend
 - [ ] Fallbacks funcionan cuando no hay P&L materializado
 - [ ] `pnpm build` pasa
 - [ ] Validación visual en preview

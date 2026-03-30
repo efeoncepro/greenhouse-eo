@@ -173,6 +173,19 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Siguiente ola explícita:
   - `TASK-071` como consumers distribuidos en Agency, Org 360, People 360 y Home/Nexa
 
+## Delta 2026-03-30 TASK-071 ya tiene primer cutover de consumers distribuidos
+- Cost Intelligence ya no vive solo en `/finance/intelligence`; el serving materializado empezó a alimentar consumers existentes del portal.
+- Estado real del cutover:
+  - Agency lee `operational_pl_snapshots` para el resumen financiero de `SpaceCard`
+  - Organization 360 (`Rentabilidad`) ya es serving-first con fallback al compute legacy
+  - People 360 ya expone `latestCostSnapshot` con closure awareness en `PersonFinanceTab`
+  - `FinanceImpactCard` de People HR Profile ya muestra período y estado de cierre
+  - Home ya puede resolver un `financeStatus` resumido para roles internos/finance y usarlo en `OperationStatus`
+- Remanente explícito de la lane:
+  - endurecer fallback semantics
+  - validación visual real
+  - incorporar el mismo resumen a Nexa `lightContext`
+
 ## Delta 2026-03-30 Sentry incident reader hardening
 - `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.
 - Nuevo contrato soportado:

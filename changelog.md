@@ -2,6 +2,20 @@
 
 ## 2026-03-30
 
+- `TASK-071` ya tiene su primer cutover real de consumers distribuidos:
+  - Agency ahora resuelve `SpaceCard` desde `greenhouse_serving.operational_pl_snapshots` en vez de recomputar con `income` / `expenses`
+  - Organization 360 (`Rentabilidad`) ya es serving-first con fallback al compute legacy
+  - People 360 ahora expone `latestCostSnapshot` y muestra closure awareness en `PersonFinanceTab`
+  - `FinanceImpactCard` también muestra período + estado de cierre
+  - Home ya reemplaza placeholders por un resumen financiero real del período para roles internos/finance
+- `TASK-071` sigue abierta:
+  - falta validación visual real
+  - Nexa todavía no consume este resumen en `lightContext`
+- Validación técnica del slice:
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm exec eslint ...` del slice
+- `pnpm build` quedó inestable por artifacts/locks de `.next` en esta sesión de trabajo; no se observó error de tipado posterior a `tsc`.
+
 - `TASK-069` quedó formalmente cerrada:
   - `operational_pl` ya se considera baseline implementada del módulo de Cost Intelligence
   - snapshots materializados por `client`, `space` y `organization`

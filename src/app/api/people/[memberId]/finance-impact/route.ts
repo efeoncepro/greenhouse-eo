@@ -8,13 +8,17 @@ export const dynamic = 'force-dynamic'
 
 interface CapacityRow extends Record<string, unknown> {
   member_id: string
-  period_key: string
+  period_year: string | number
+  period_month: string | number
+  closure_status: string | null
+  period_closed: boolean | null
   base_salary_clp: string | number
   total_bonus_clp: string | number
   total_allowance_clp: string | number
   loaded_cost_target: string | number
-  direct_overhead_clp: string | number
-  shared_overhead_clp: string | number
+  total_labor_cost_target: string | number | null
+  direct_overhead_target: string | number
+  shared_overhead_target: string | number
   total_fte: string | number
 }
 
@@ -52,19 +56,38 @@ export async function GET(
     totalBonusClp: number
     totalAllowanceClp: number
     loadedCostTarget: number
+    laborCostTarget: number
     directOverheadClp: number
     sharedOverheadClp: number
     totalFte: number
-    periodKey: string
+    periodYear: number
+    periodMonth: number
+    closureStatus: string | null
+    periodClosed: boolean
   } | null = null
 
   try {
     const rows = await runGreenhousePostgresQuery<CapacityRow>(
-      `SELECT member_id, period_key, base_salary_clp, total_bonus_clp, total_allowance_clp,
-              loaded_cost_target, direct_overhead_clp, shared_overhead_clp, total_fte
-       FROM greenhouse_serving.member_capacity_economics
-       WHERE member_id = $1
-       ORDER BY period_key DESC
+      `SELECT
+         mce.member_id,
+         mce.period_year,
+         mce.period_month,
+         pcs.closure_status,
+         COALESCE(pcs.closure_status = 'closed', FALSE) AS period_closed,
+         mce.base_salary_clp,
+         mce.total_bonus_clp,
+         mce.total_allowance_clp,
+         mce.loaded_cost_target,
+         mce.total_labor_cost_target,
+         mce.direct_overhead_target,
+         mce.shared_overhead_target,
+         mce.total_fte
+       FROM greenhouse_serving.member_capacity_economics mce
+       LEFT JOIN greenhouse_serving.period_closure_status pcs
+         ON pcs.period_year = mce.period_year
+        AND pcs.period_month = mce.period_month
+       WHERE mce.member_id = $1
+       ORDER BY mce.period_year DESC, mce.period_month DESC
        LIMIT 1`,
       [memberId]
     )
@@ -77,10 +100,14 @@ export async function GET(
         totalBonusClp: roundCurrency(toNumber(r.total_bonus_clp)),
         totalAllowanceClp: roundCurrency(toNumber(r.total_allowance_clp)),
         loadedCostTarget: roundCurrency(toNumber(r.loaded_cost_target)),
-        directOverheadClp: roundCurrency(toNumber(r.direct_overhead_clp)),
-        sharedOverheadClp: roundCurrency(toNumber(r.shared_overhead_clp)),
+        laborCostTarget: roundCurrency(toNumber(r.total_labor_cost_target)),
+        directOverheadClp: roundCurrency(toNumber(r.direct_overhead_target)),
+        sharedOverheadClp: roundCurrency(toNumber(r.shared_overhead_target)),
         totalFte: toNumber(r.total_fte),
-        periodKey: String(r.period_key)
+        periodYear: toNumber(r.period_year),
+        periodMonth: toNumber(r.period_month),
+        closureStatus: r.closure_status ? String(r.closure_status) : null,
+        periodClosed: r.period_closed === true
       }
     }
   } catch {
@@ -97,24 +124,33 @@ export async function GET(
 
   try {
     const now = new Date()
-    const year = now.getFullYear()
-    const month = now.getMonth() + 1
+    const year = costData?.periodYear ?? now.getFullYear()
+    const month = costData?.periodMonth ?? (now.getMonth() + 1)
 
     const rows = await runGreenhousePostgresQuery<AssignmentRevenueRow>(
-      `SELECT
+      `WITH latest_client_snapshots AS (
+         SELECT
+           ops.scope_id AS client_id,
+           ops.revenue_clp,
+           ROW_NUMBER() OVER (
+             PARTITION BY ops.scope_id, ops.period_year, ops.period_month
+             ORDER BY ops.snapshot_revision DESC, ops.materialized_at DESC NULLS LAST
+           ) AS revision_rank
+         FROM greenhouse_serving.operational_pl_snapshots ops
+         WHERE ops.scope_type = 'client'
+           AND ops.period_year = $2
+           AND ops.period_month = $3
+       )
+       SELECT
          a.client_id,
          c.client_name,
          a.fte_allocation AS fte_weight,
-         COALESCE(
-           (SELECT SUM(i.total_amount_clp)
-            FROM greenhouse_finance.income i
-            WHERE i.client_id = a.client_id
-              AND EXTRACT(YEAR FROM i.invoice_date) = $2
-              AND EXTRACT(MONTH FROM i.invoice_date) = $3
-           ), 0
-         ) * COALESCE(a.fte_allocation, 0) AS revenue_clp
+         COALESCE(s.revenue_clp, 0) * COALESCE(a.fte_allocation, 0) AS revenue_clp
        FROM greenhouse_core.client_team_assignments a
        LEFT JOIN greenhouse_core.clients c ON c.client_id = a.client_id
+       LEFT JOIN latest_client_snapshots s
+         ON s.client_id = a.client_id
+        AND s.revision_rank = 1
        WHERE a.member_id = $1
          AND a.active = TRUE
        ORDER BY revenue_clp DESC`,
@@ -133,6 +169,7 @@ export async function GET(
 
   const totalRevenueAttributed = roundCurrency(assignmentRevenue.reduce((sum, a) => sum + a.revenueClp, 0))
   const totalCost = costData?.loadedCostTarget ?? 0
+
   const costRevenueRatio = totalRevenueAttributed > 0
     ? Math.round((totalCost / totalRevenueAttributed) * 1000) / 10
     : null

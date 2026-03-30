@@ -552,7 +552,17 @@ const PersonHrProfileTab = ({ memberId, hrContext = null, defaultOperationalMetr
 
 function FinanceImpactCard({ memberId }: { memberId: string }) {
   const [data, setData] = useState<{
-    cost: { loadedCostTarget: number; baseSalaryClp: number; directOverheadClp: number; sharedOverheadClp: number } | null
+    cost: {
+      loadedCostTarget: number
+      laborCostTarget: number
+      baseSalaryClp: number
+      directOverheadClp: number
+      sharedOverheadClp: number
+      periodYear: number
+      periodMonth: number
+      closureStatus: string | null
+      periodClosed: boolean
+    } | null
     assignments: { count: number; totalRevenueAttributed: number; items: Array<{ clientName: string | null; fteWeight: number; revenueClp: number }> }
     costRevenueRatio: number | null
     costRevenueStatus: string
@@ -574,6 +584,18 @@ function FinanceImpactCard({ memberId }: { memberId: string }) {
 
   const formatCLP = (v: number) => `$${Math.round(v).toLocaleString('es-CL')}`
 
+  const periodLabel = data.cost ? `${String(data.cost.periodMonth).padStart(2, '0')}/${data.cost.periodYear}` : null
+
+  const closureColor = data.cost?.closureStatus === 'closed' || data.cost?.periodClosed ? 'success'
+    : data.cost?.closureStatus === 'ready' ? 'info'
+      : data.cost?.closureStatus === 'reopened' ? 'warning'
+        : 'secondary'
+
+  const closureLabel = data.cost?.closureStatus === 'closed' || data.cost?.periodClosed ? 'Cerrado'
+    : data.cost?.closureStatus === 'ready' ? 'Listo para cierre'
+      : data.cost?.closureStatus === 'reopened' ? 'Reabierto'
+        : 'Provisional'
+
   const statusColor = data.costRevenueStatus === 'optimal' ? 'success'
     : data.costRevenueStatus === 'attention' ? 'warning' : 'error'
 
@@ -585,20 +607,30 @@ function FinanceImpactCard({ memberId }: { memberId: string }) {
       <Card elevation={0} sx={(t: Theme) => ({ border: `1px solid ${t.palette.divider}` })}>
         <CardHeader
           title='Impacto financiero'
+          subheader={periodLabel ? `Período ${periodLabel}` : undefined}
           avatar={
             <Avatar variant='rounded' sx={{ bgcolor: 'success.lightOpacity' }}>
               <i className='tabler-chart-bar' style={{ fontSize: 22, color: 'var(--mui-palette-success-main)' }} />
             </Avatar>
           }
           action={
-            data.costRevenueRatio !== null ? (
+            <Stack spacing={1} alignItems='flex-end'>
               <CustomChip
                 round='true'
                 size='small'
-                color={statusColor}
-                label={`${data.costRevenueRatio}% costo/ingreso · ${statusLabel}`}
+                variant='tonal'
+                color={closureColor}
+                label={closureLabel}
               />
-            ) : null
+              {data.costRevenueRatio !== null ? (
+                <CustomChip
+                  round='true'
+                  size='small'
+                  color={statusColor}
+                  label={`${data.costRevenueRatio}% costo/ingreso · ${statusLabel}`}
+                />
+              ) : null}
+            </Stack>
           }
         />
         <Divider />
@@ -610,6 +642,10 @@ function FinanceImpactCard({ memberId }: { memberId: string }) {
                 <Stack direction='row' justifyContent='space-between'>
                   <Typography variant='body2'>Salario base</Typography>
                   <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(data.cost.baseSalaryClp)}</Typography>
+                </Stack>
+                <Stack direction='row' justifyContent='space-between'>
+                  <Typography variant='body2'>Costo laboral</Typography>
+                  <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(data.cost.laborCostTarget)}</Typography>
                 </Stack>
                 <Stack direction='row' justifyContent='space-between'>
                   <Typography variant='body2'>Overhead directo</Typography>

@@ -35,6 +35,9 @@ interface EconomicsCurrent {
   organizationId: string
   periodYear: number
   periodMonth: number
+  closureStatus: string | null
+  periodClosed: boolean
+  snapshotRevision: number | null
   totalRevenueClp: number
   totalLaborCostClp: number
   totalDirectCostsClp: number
@@ -50,6 +53,9 @@ interface EconomicsCurrent {
 interface ClientBreakdown {
   clientId: string
   clientName: string
+  closureStatus: string | null
+  periodClosed: boolean
+  snapshotRevision: number | null
   revenueClp: number
   laborCostClp: number
   directCostsClp: number
@@ -69,6 +75,9 @@ interface IcoSummary {
 interface TrendPoint {
   periodYear: number
   periodMonth: number
+  closureStatus: string | null
+  periodClosed: boolean
+  snapshotRevision: number | null
   totalRevenueClp: number
   totalLaborCostClp: number
   adjustedMarginClp: number
@@ -99,6 +108,22 @@ const marginColor = (value: number | null): 'success' | 'warning' | 'error' | 's
   if (value >= 15) return 'warning'
 
   return 'error'
+}
+
+const closureColor = (status: string | null, periodClosed: boolean): 'success' | 'warning' | 'info' | 'secondary' => {
+  if (status === 'closed' || periodClosed) return 'success'
+  if (status === 'ready') return 'info'
+  if (status === 'reopened') return 'warning'
+
+  return 'secondary'
+}
+
+const closureLabel = (status: string | null, periodClosed: boolean) => {
+  if (status === 'closed' || periodClosed) return 'Cerrado'
+  if (status === 'ready') return 'Listo para cierre'
+  if (status === 'reopened') return 'Reabierto'
+
+  return 'Provisional'
 }
 
 // ── Component ──
@@ -144,7 +169,9 @@ const OrganizationEconomicsTab = ({ detail }: Props) => {
     label: `${MONTH_SHORT[t.periodMonth]} ${String(t.periodYear).slice(2)}`,
     ingreso: Math.round(t.totalRevenueClp / 1_000_000),
     costo: Math.round(t.totalLaborCostClp / 1_000_000),
-    margen: Math.round(t.adjustedMarginClp / 1_000_000)
+    margen: Math.round(t.adjustedMarginClp / 1_000_000),
+    closureStatus: t.closureStatus,
+    periodClosed: t.periodClosed
   })) ?? []
 
   return (
@@ -264,9 +291,9 @@ const OrganizationEconomicsTab = ({ detail }: Props) => {
           {trendChartData.length > 1 && (
             <Grid size={{ xs: 12 }}>
               <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-                <CardHeader
-                  title='Tendencia econ&oacute;mica'
-                  subheader='&Uacute;ltimos 6 meses (millones CLP)'
+              <CardHeader
+                title='Tendencia econ&oacute;mica'
+                subheader='&Uacute;ltimos 6 meses (millones CLP)'
                   avatar={
                     <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
                       <i className='tabler-chart-line' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} />
@@ -275,6 +302,18 @@ const OrganizationEconomicsTab = ({ detail }: Props) => {
                 />
                 <Divider />
                 <CardContent>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mb: 4 }}>
+                    {data?.trend?.map(point => (
+                      <CustomChip
+                        key={`${point.periodYear}-${point.periodMonth}`}
+                        round='true'
+                        size='small'
+                        variant='tonal'
+                        color={closureColor(point.closureStatus, point.periodClosed)}
+                        label={`${MONTH_SHORT[point.periodMonth]} ${String(point.periodYear).slice(2)} · ${closureLabel(point.closureStatus, point.periodClosed)}`}
+                      />
+                    ))}
+                  </Box>
                   <AppRecharts>
                     <ResponsiveContainer width='100%' height={300}>
                       <LineChart data={trendChartData}>
@@ -323,6 +362,15 @@ const OrganizationEconomicsTab = ({ detail }: Props) => {
                   <Avatar variant='rounded' sx={{ bgcolor: 'warning.lightOpacity' }}>
                     <i className='tabler-report-analytics' style={{ fontSize: 22, color: 'var(--mui-palette-warning-main)' }} />
                   </Avatar>
+                }
+                action={
+                  <CustomChip
+                    round='true'
+                    size='small'
+                    variant='tonal'
+                    color={closureColor(current.closureStatus, current.periodClosed)}
+                    label={closureLabel(current.closureStatus, current.periodClosed)}
+                  />
                 }
               />
               <Divider />
