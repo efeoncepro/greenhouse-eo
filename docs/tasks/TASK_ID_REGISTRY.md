@@ -209,7 +209,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-161` | `to-do` | Agency Permissions, Data Retention & Operational Onboarding | `docs/tasks/to-do/TASK-161-agency-permissions-retention-onboarding.md` |
 | `TASK-162` | `to-do` | Canonical Commercial Cost Attribution | `docs/tasks/to-do/TASK-162-canonical-commercial-cost-attribution.md` |
 
-| `TASK-163` | `to-do` | Finance Document Type Separation: Quotes, Credit/Debit Notes | `docs/tasks/to-do/TASK-163-finance-document-type-separation.md` |
+| `TASK-163` | `complete` | Finance Document Type Separation: Quotes, Credit/Debit Notes | `docs/tasks/complete/TASK-163-finance-document-type-separation.md` |
 
 | `TASK-164` | `to-do` | Purchase Orders (OC) & Service Entry Sheets (HES) Module | `docs/tasks/to-do/TASK-164-purchase-orders-module.md` |
 

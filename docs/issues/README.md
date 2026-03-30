@@ -49,11 +49,13 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-002`
+`ISSUE-003`
 
 ## Open
 
-(ninguno activo)
+| ID | Título | Ambiente | Detectado | Estado |
+|----|--------|----------|-----------|--------|
+| `ISSUE-002` | [Nubox sync conformed: data integrity (period mixing, identity loss)](open/ISSUE-002-nubox-sync-conformed-data-integrity.md) | staging + production | 2026-03-30 | open |
 
 ## Resolved
 
