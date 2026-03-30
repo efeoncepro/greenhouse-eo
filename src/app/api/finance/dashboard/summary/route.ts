@@ -282,12 +282,10 @@ async function buildResponse(
     const periodKey = `${year}-${String(month).padStart(2, '0')}`
 
     const payrollRows = await runGreenhousePostgresQuery<{ total_clp: string | number } & Record<string, unknown>>(
-      `SELECT COALESCE(SUM(total_cost_clp), 0) AS total_clp
-       FROM greenhouse_payroll.payroll_entries
-       WHERE period_id IN (
-         SELECT period_id FROM greenhouse_payroll.payroll_periods
-         WHERE year = $1 AND month = $2
-       )`,
+      `SELECT COALESCE(SUM(e.chile_employer_total_cost), 0) AS total_clp
+       FROM greenhouse_payroll.payroll_entries e
+       INNER JOIN greenhouse_payroll.payroll_periods p ON p.period_id = e.period_id
+       WHERE p.year = $1 AND p.month = $2`,
       [year, month]
     )
 
