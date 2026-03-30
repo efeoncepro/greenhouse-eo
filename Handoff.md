@@ -251,6 +251,12 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - tabla `greenhouse_serving.commercial_cost_attribution`
   - `member-period-attribution.ts` ahora hace read serving-first con fallback
   - `materializeOperationalPl()` rematerializa primero `commercial_cost_attribution`
+- Slice 5 ya implementado:
+  - `src/lib/sync/projections/commercial-cost-attribution.ts`
+  - `src/lib/sync/projections/commercial-cost-attribution.test.ts`
+  - `src/lib/sync/projections/index.ts`
+  - `src/lib/sync/event-catalog.ts`
+  - la capa ya tiene refresh reactivo dedicado y evento `accounting.commercial_cost_attribution.materialized`
 - Adopción inicial sin big bang:
   - `src/lib/team-capacity/internal-assignments.ts` ahora reexporta la regla shared
   - `src/lib/finance/auto-allocation-rules.ts` ya filtra assignments con el classifier shared
@@ -264,9 +270,11 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - `pnpm exec eslint src/lib/commercial-cost-attribution/assignment-classification.ts src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/team-capacity/internal-assignments.ts src/lib/team-capacity/internal-assignments.test.ts src/lib/finance/auto-allocation-rules.ts src/lib/finance/auto-allocation-rules.test.ts`
 - `pnpm exec vitest run src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/team-capacity/internal-assignments.test.ts src/lib/finance/auto-allocation-rules.test.ts src/lib/cost-intelligence/compute-operational-pl.test.ts`
 - `pnpm exec vitest run src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/commercial-cost-attribution/store.test.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/team-capacity/internal-assignments.test.ts src/lib/finance/auto-allocation-rules.test.ts src/lib/cost-intelligence/compute-operational-pl.test.ts`
+- `pnpm exec vitest run src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/commercial-cost-attribution/store.test.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/sync/projections/commercial-cost-attribution.test.ts src/lib/sync/projections/operational-pl.test.ts src/lib/sync/projections/client-economics.test.ts src/lib/sync/event-catalog.test.ts`
 - `pnpm exec eslint src/lib/commercial-cost-attribution/assignment-classification.ts src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/commercial-cost-attribution/member-period-attribution.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/team-capacity/internal-assignments.ts src/lib/team-capacity/internal-assignments.test.ts src/lib/finance/auto-allocation-rules.ts src/lib/finance/auto-allocation-rules.test.ts src/lib/cost-intelligence/compute-operational-pl.ts src/lib/cost-intelligence/compute-operational-pl.test.ts`
 - `pnpm exec eslint src/lib/commercial-cost-attribution/assignment-classification.ts src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/commercial-cost-attribution/member-period-attribution.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/team-capacity/internal-assignments.ts src/lib/team-capacity/internal-assignments.test.ts src/lib/finance/auto-allocation-rules.ts src/lib/finance/auto-allocation-rules.test.ts src/lib/cost-intelligence/compute-operational-pl.ts src/lib/cost-intelligence/compute-operational-pl.test.ts src/lib/finance/postgres-store-intelligence.ts src/lib/account-360/organization-economics.ts`
 - `pnpm exec eslint src/lib/commercial-cost-attribution/assignment-classification.ts src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/commercial-cost-attribution/store.ts src/lib/commercial-cost-attribution/store.test.ts src/lib/commercial-cost-attribution/member-period-attribution.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/team-capacity/internal-assignments.ts src/lib/team-capacity/internal-assignments.test.ts src/lib/finance/auto-allocation-rules.ts src/lib/finance/auto-allocation-rules.test.ts src/lib/cost-intelligence/compute-operational-pl.ts src/lib/cost-intelligence/compute-operational-pl.test.ts src/lib/finance/postgres-store-intelligence.ts src/lib/account-360/organization-economics.ts`
+- `pnpm exec eslint src/lib/commercial-cost-attribution/assignment-classification.ts src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/commercial-cost-attribution/store.ts src/lib/commercial-cost-attribution/store.test.ts src/lib/commercial-cost-attribution/member-period-attribution.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/sync/projections/commercial-cost-attribution.ts src/lib/sync/projections/commercial-cost-attribution.test.ts src/lib/sync/projections/index.ts src/lib/sync/event-catalog.ts src/lib/cost-intelligence/compute-operational-pl.ts src/lib/cost-intelligence/compute-operational-pl.test.ts src/lib/finance/postgres-store-intelligence.ts src/lib/account-360/organization-economics.ts`
 - `pnpm exec tsc --noEmit --pretty false`
 - `git diff --check`
 
@@ -279,8 +287,8 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 
 ### Pendiente inmediato
 - Siguiente slice de `TASK-162`:
-  - wiring reactivo dedicado para `commercial_cost_attribution`
   - health semántico / explainability / audit surface
+  - revisar si hace falta projection domain propio o si `cost_intelligence` basta como partición operativa
   - luego cierre formal del bridge legacy como contrato interno en vez de consumer API
 
 ### Objetivo

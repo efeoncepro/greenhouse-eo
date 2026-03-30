@@ -91,6 +91,20 @@ La capa no reemplaza a Finance ni a Cost Intelligence:
   - la truth layer dejó de ser solo composición on-read
   - todavía falta el wiring reactivo dedicado del dominio para cerrar la lane por completo
 
+## Delta 2026-03-30 — slice 5: wiring reactivo dedicado del dominio
+
+- Se agregó una projection propia:
+  - `src/lib/sync/projections/commercial-cost-attribution.ts`
+- La projection:
+  - reacciona a eventos de Finance, Payroll, assignments, compensation y overhead
+  - materializa `commercial_cost_attribution` por período
+  - publica el evento:
+    - `accounting.commercial_cost_attribution.materialized`
+- Registro y catálogo actualizados:
+  - `src/lib/sync/projections/index.ts`
+  - `src/lib/sync/event-catalog.ts`
+- Con esto la capa ya no depende solo del flujo de `operational_pl` para refrescarse.
+
 ## Why This Task Exists
 
 Hoy Greenhouse ya tiene piezas importantes:
