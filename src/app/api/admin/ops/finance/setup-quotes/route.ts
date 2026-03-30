@@ -2,22 +2,25 @@ import { NextResponse } from 'next/server'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
+import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
 
 /**
- * GET /api/admin/ops/finance/setup-quotes
+ * POST /api/admin/ops/finance/setup-quotes
  *
  * One-time migration endpoint for TASK-163.
- * Uses cron auth (CRON_SECRET bearer) so it can be called via vercel curl.
+ * Accepts admin session (browser) OR cron auth (bearer token).
  * Idempotent — safe to run multiple times.
  */
-export async function GET(request: Request) {
-  const { authorized, errorResponse } = requireCronAuth(request)
+export async function POST(request: Request) {
+  // Try session auth first (browser), then cron auth (CLI)
+  const { tenant } = await requireAdminTenantContext()
+  const { authorized: cronAuthorized } = requireCronAuth(request)
 
-  if (!authorized) {
-    return errorResponse
+  if (!tenant && !cronAuthorized) {
+    return NextResponse.json({ error: 'Unauthorized — requires admin session or CRON_SECRET' }, { status: 401 })
   }
 
   const results: string[] = []
