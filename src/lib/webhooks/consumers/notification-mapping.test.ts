@@ -27,6 +27,7 @@ describe('notification mappings', () => {
       'assignment.removed',
       'compensation_version.created',
       'member.created',
+      'identity.email_verification.completed',
       'payroll_period.exported'
     ])
   })

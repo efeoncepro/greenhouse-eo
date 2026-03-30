@@ -52,6 +52,9 @@ export const AGGREGATE_TYPES = {
   compensation: 'compensation',
   icoMaterialization: 'ico_materialization',
 
+  // Email Verification
+  emailVerification: 'email_verification',
+
   // Capacity Economics
   financeExchangeRate: 'finance_exchange_rate',
   financeOverhead: 'finance_overhead',
@@ -126,6 +129,10 @@ export const EVENT_TYPES = {
   projectedPayrollPeriodRefreshed: 'payroll.projected_period.refreshed',
   projectedPayrollPromotedToOfficialDraft: 'payroll.projected_promoted_to_official_draft',
   payrollPeriodRecalculatedFromProjection: 'payroll_period.recalculated_from_projection',
+
+  // Email Verification
+  emailVerificationRequested: 'identity.email_verification.requested',
+  emailVerificationCompleted: 'identity.email_verification.completed',
 
   // Capacity Economics
   financeExchangeRateUpserted: 'finance.exchange_rate.upserted',
