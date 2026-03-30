@@ -44,8 +44,8 @@ const FinanceIntelligenceView = ({ canManageClosure, canReopen }: Props) => {
             <FinancePeriodClosureDashboardView canManageClosure={canManageClosure} canReopen={canReopen} />
           </TabPanel>
 
-          <TabPanel value='economics' sx={{ p: 0 }}>
-            <ClientEconomicsView />
+          <TabPanel value='economics' sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
+            <ClientEconomicsView embedded />
           </TabPanel>
         </TabContext>
       </Card>

@@ -18,6 +18,11 @@ import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 import Skeleton from '@mui/material/Skeleton'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
 import {
   createColumnHelper, flexRender, getCoreRowModel, getPaginationRowModel, useReactTable
 } from '@tanstack/react-table'
@@ -30,7 +35,6 @@ import { useTheme } from '@mui/material/styles'
 
 import type { ApexOptions } from 'apexcharts'
 
-import tableStyles from '@core/styles/table.module.css'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
@@ -298,7 +302,7 @@ const buildTrendAreaOptions = (theme: Theme, categories: string[]): ApexOptions 
 // Component
 // ---------------------------------------------------------------------------
 
-const ClientEconomicsView = () => {
+const ClientEconomicsView = ({ embedded = false }: { embedded?: boolean }) => {
   const theme = useTheme()
 
   const now = new Date()
@@ -543,21 +547,16 @@ const ClientEconomicsView = () => {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
-          <Box>
-            <Typography variant='h5' sx={{ fontWeight: 600, mb: 0.5 }}>Inteligencia financiera</Typography>
-            <Typography variant='body2' color='text.secondary'>Rentabilidad y economía por Space</Typography>
-          </Box>
-        </Box>
-        <Grid container spacing={6}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <Skeleton variant='rounded' height={56} />
+        <Grid container spacing={4}>
           {[0, 1, 2, 3].map(i => (
             <Grid size={{ xs: 12, sm: 6, md: 3 }} key={i}>
-              <Skeleton variant='rounded' height={120} />
+              <Skeleton variant='rounded' height={100} />
             </Grid>
           ))}
         </Grid>
-        <Skeleton variant='rounded' height={400} />
+        <Skeleton variant='rounded' height={350} />
       </Box>
     )
   }
@@ -567,51 +566,64 @@ const ClientEconomicsView = () => {
   // ---------------------------------------------------------------------------
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      {/* ROW 0 — Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      {/* Header — only when standalone, hidden when embedded in tabs */}
+      {!embedded && (
         <Box>
-          <Typography variant='h5' sx={{ fontWeight: 600, mb: 0.5 }}>Inteligencia financiera</Typography>
-          <Typography variant='body2' color='text.secondary'>Rentabilidad y economía por Space</Typography>
+          <Typography variant='h5' sx={{ fontWeight: 600, mb: 0.5 }}>Rentabilidad por cliente</Typography>
+          <Typography variant='body2' color='text.secondary'>Economía y márgenes por Space</Typography>
         </Box>
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-end' }}>
-          <CustomTextField
-            select
-            size='small'
-            label='Año'
-            value={year}
-            onChange={e => setYear(Number(e.target.value))}
-            sx={{ minWidth: 100 }}
-          >
-            {YEARS.map(y => (
-              <MenuItem key={y} value={y}>{y}</MenuItem>
-            ))}
-          </CustomTextField>
-          <CustomTextField
-            select
-            size='small'
-            label='Mes'
-            value={month}
-            onChange={e => setMonth(Number(e.target.value))}
-            sx={{ minWidth: 100 }}
-          >
-            {MONTH_SHORT.slice(1).map((label, i) => (
-              <MenuItem key={i + 1} value={i + 1}>{label}</MenuItem>
-            ))}
-          </CustomTextField>
-          <Button
-            variant='contained'
-            color='primary'
-            size='large'
-            startIcon={computing ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-calculator' />}
-            onClick={handleCompute}
-            disabled={computing}
-            sx={{ height: 40 }}
-          >
-            {computing ? 'Calculando…' : 'Calcular'}
-          </Button>
-        </Box>
-      </Box>
+      )}
+
+      {/* Toolbar — period selector + compute action */}
+      <Card variant='outlined'>
+        <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <CustomTextField
+                select
+                size='small'
+                label='Año'
+                value={year}
+                onChange={e => setYear(Number(e.target.value))}
+                sx={{ minWidth: 90 }}
+              >
+                {YEARS.map(y => (
+                  <MenuItem key={y} value={y}>{y}</MenuItem>
+                ))}
+              </CustomTextField>
+              <CustomTextField
+                select
+                size='small'
+                label='Mes'
+                value={month}
+                onChange={e => setMonth(Number(e.target.value))}
+                sx={{ minWidth: 90 }}
+              >
+                {MONTH_SHORT.slice(1).map((label, i) => (
+                  <MenuItem key={i + 1} value={i + 1}>{label}</MenuItem>
+                ))}
+              </CustomTextField>
+              <CustomChip
+                round='true'
+                size='small'
+                variant='tonal'
+                color={snapshots.length > 0 ? 'success' : 'secondary'}
+                label={snapshots.length > 0 ? `${snapshots.length} Spaces` : 'Sin datos'}
+              />
+            </Box>
+            <Button
+              variant='contained'
+              color='primary'
+              startIcon={computing ? <CircularProgress size={16} color='inherit' /> : <i className='tabler-calculator' />}
+              onClick={handleCompute}
+              disabled={computing}
+            >
+              {computing ? 'Calculando…' : 'Calcular rentabilidad'}
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
 
       {/* Error alert */}
       {error && (
@@ -620,13 +632,13 @@ const ClientEconomicsView = () => {
         </Alert>
       )}
 
-      {/* ROW 1 — KPI cards */}
-      <Grid container spacing={6}>
+      {/* KPI cards */}
+      <Grid container spacing={4}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <HorizontalWithSubtitle
-            title='Spaces analizados'
+            title='Spaces'
             stats={String(snapshots.length)}
-            subtitle={totalFte > 0 ? `${totalFte.toFixed(1)} FTE asignados` : 'del período seleccionado'}
+            subtitle={totalFte > 0 ? `${totalFte.toFixed(1)} FTE` : `${MONTH_SHORT[month]} ${year}`}
             avatarIcon='tabler-building-store'
             avatarColor='info'
           />
@@ -635,33 +647,27 @@ const ClientEconomicsView = () => {
           <HorizontalWithSubtitle
             title='Ingreso total'
             stats={formatCLP(totalRevenue)}
-            subtitle='facturación acumulada'
+            subtitle={`${MONTH_SHORT[month]} ${year}`}
             avatarIcon='tabler-cash'
             avatarColor='primary'
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <HorizontalWithSubtitle
-            title='Margen bruto prom.'
+            title='Margen bruto'
             stats={snapshots.length > 0 && hasAnyCompleteCostCoverage ? `${avgGrossPct.toFixed(1)}%` : '—'}
-            subtitle={snapshots.length > 0 ? (hasAnyCompleteCostCoverage ? '' : 'costos incompletos') : 'sin datos'}
+            subtitle={hasAnyCompleteCostCoverage ? grossSemaphore.label : 'sin cobertura'}
             avatarIcon='tabler-chart-arrows-vertical'
-            avatarColor={snapshots.length > 0 && hasAnyCompleteCostCoverage ? grossSemaphore.color : 'secondary'}
-            statusLabel={snapshots.length > 0 && hasAnyCompleteCostCoverage ? grossSemaphore.label : undefined}
-            statusColor={snapshots.length > 0 && hasAnyCompleteCostCoverage ? grossSemaphore.color : undefined}
-            statusIcon={snapshots.length > 0 && hasAnyCompleteCostCoverage ? grossSemaphore.icon : undefined}
+            avatarColor={hasAnyCompleteCostCoverage ? grossSemaphore.color : 'secondary'}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <HorizontalWithSubtitle
-            title='Margen neto prom.'
+            title='Margen neto'
             stats={snapshots.length > 0 && hasAnyCompleteCostCoverage ? `${avgNetPct.toFixed(1)}%` : '—'}
-            subtitle={snapshots.length > 0 ? (hasAnyCompleteCostCoverage ? '' : 'costos incompletos') : 'sin datos'}
+            subtitle={hasAnyCompleteCostCoverage ? netSemaphore.label : 'sin cobertura'}
             avatarIcon='tabler-trending-up'
-            avatarColor={snapshots.length > 0 && hasAnyCompleteCostCoverage ? netSemaphore.color : 'secondary'}
-            statusLabel={snapshots.length > 0 && hasAnyCompleteCostCoverage ? netSemaphore.label : undefined}
-            statusColor={snapshots.length > 0 && hasAnyCompleteCostCoverage ? netSemaphore.color : undefined}
-            statusIcon={snapshots.length > 0 && hasAnyCompleteCostCoverage ? netSemaphore.icon : undefined}
+            avatarColor={hasAnyCompleteCostCoverage ? netSemaphore.color : 'secondary'}
           />
         </Grid>
       </Grid>
@@ -812,33 +818,39 @@ const ClientEconomicsView = () => {
           </Box>
         ) : (
           <>
-          <div className='overflow-x-auto'>
-            <table className={tableStyles.table}>
-              <thead>
-                {ceTable.getHeaderGroups().map(hg => (
-                  <tr key={hg.id}>
-                    {hg.headers.map(header => (
-                      <th key={header.id} style={{ textAlign: (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              <tbody>
-                {ceTable.getRowModel().rows.map(row => (
-                  <tr key={row.id}>
-                    {row.getVisibleCells().map(cell => (
-                      <td key={cell.id} style={{ textAlign: (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <TablePaginationComponent table={ceTable as ReturnType<typeof useReactTable>} />
+            <Box sx={{ overflowX: 'auto' }}>
+              <Table size='small'>
+                <TableHead>
+                  {ceTable.getHeaderGroups().map(hg => (
+                    <TableRow key={hg.id}>
+                      {hg.headers.map(header => (
+                        <TableCell
+                          key={header.id}
+                          align={(header.column.columnDef.meta as { align?: 'left' | 'right' | 'center' } | undefined)?.align ?? 'left'}
+                        >
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableHead>
+                <TableBody>
+                  {ceTable.getRowModel().rows.map(row => (
+                    <TableRow key={row.id} hover>
+                      {row.getVisibleCells().map(cell => (
+                        <TableCell
+                          key={cell.id}
+                          align={(cell.column.columnDef.meta as { align?: 'left' | 'right' | 'center' } | undefined)?.align ?? 'left'}
+                        >
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Box>
+            <TablePaginationComponent table={ceTable as ReturnType<typeof useReactTable>} />
           </>
         )}
       </Card>
