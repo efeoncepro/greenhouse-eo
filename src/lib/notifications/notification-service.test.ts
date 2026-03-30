@@ -4,6 +4,7 @@ vi.mock('server-only', () => ({}))
 
 const mockRunGreenhousePostgresQuery = vi.fn()
 const mockSendEmail = vi.fn()
+const mockResolveNotificationRecipients = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
@@ -13,33 +14,30 @@ vi.mock('@/lib/email/delivery', () => ({
   sendEmail: (...args: unknown[]) => mockSendEmail(...args)
 }))
 
+vi.mock('./person-recipient-resolver', () => ({
+  resolveNotificationRecipients: (...args: unknown[]) => mockResolveNotificationRecipients(...args)
+}))
+
 const { NotificationService } = await import('./notification-service')
 
 describe('NotificationService', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockResolveNotificationRecipients.mockImplementation(async (recipients: unknown[]) => recipients)
     mockSendEmail.mockResolvedValue({
       deliveryId: 'delivery-1',
       resendId: 'resend-1',
       status: 'sent'
     })
-    mockRunGreenhousePostgresQuery
-      .mockResolvedValueOnce([
-        {
-          profile_id: 'profile-1',
-          member_id: 'member-1',
-          display_name: 'User One',
-          primary_email: 'user@example.com',
-          canonical_email: 'user@example.com',
-          profile_full_name: 'User One Canonical',
-          user_id: 'user-1',
-          client_user_email: 'user@example.com',
-          client_user_full_name: 'User One'
-        }
-      ])
-      .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([{ notification_id: 'notif-1' }])
-      .mockResolvedValue([])
+    mockRunGreenhousePostgresQuery.mockImplementation(async (sql: unknown) => {
+      if (typeof sql !== 'string') return []
+      if (sql.includes('FROM greenhouse_notifications.notification_preferences')) return []
+      if (sql.includes('INSERT INTO greenhouse_notifications.notifications')) {
+        return [{ notification_id: 'notif-1' }]
+      }
+
+      return []
+    })
   })
 
   it('routes email notifications through the centralized delivery layer', async () => {
