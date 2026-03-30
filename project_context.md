@@ -139,6 +139,22 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el carril base `outbox -> operational_pl` ya no está pendiente
   - lo siguiente con más valor es consumers downstream y hardening semántico
 
+## Delta 2026-03-30 Finance Intelligence ya usa Cost Intelligence como surface principal
+- `/finance/intelligence` ya no usa `ClientEconomicsView` como portada principal del módulo.
+- Nueva surface activa:
+  - `FinancePeriodClosureDashboardView`
+- Capacidades visibles ya integradas en la UI:
+  - hero y KPIs de cierre operativo
+  - tabla de últimos 12 períodos con semáforos por pata
+  - P&L inline expandible por cliente
+  - cierre manual y reapertura con control por rol
+- Regla operativa:
+  - `finance_manager` y `efeonce_admin` pueden cerrar períodos listos
+  - solo `efeonce_admin` puede reabrir períodos cerrados
+- Estado:
+  - implementación técnica ya validada con `eslint`, `tsc` y `build`
+  - validación visual todavía pendiente antes de declarar `TASK-070` cerrada
+
 ## Delta 2026-03-30 Sentry incident reader hardening
 - `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.
 - Nuevo contrato soportado:

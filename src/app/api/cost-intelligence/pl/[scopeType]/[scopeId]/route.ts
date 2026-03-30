@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { getOperationalPlTrend } from '@/lib/cost-intelligence/compute-operational-pl'
 import type { OperationalPlScopeType } from '@/lib/cost-intelligence/pl-types'
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireCostIntelligenceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,7 +13,7 @@ export async function GET(
   request: Request,
   context: { params: Promise<{ scopeType: string; scopeId: string }> }
 ) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCostIntelligenceTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

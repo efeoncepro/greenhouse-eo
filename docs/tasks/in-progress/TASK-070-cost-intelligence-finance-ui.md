@@ -1,5 +1,46 @@
 # TASK-070 — Cost Intelligence Finance UI: Period Closure Dashboard
 
+## Delta 2026-03-30 — Ejecución iniciada
+
+- La task entra en `in-progress` después de contrastar el brief con:
+  - `GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - las APIs reales de `period closure` y `operational_pl`
+- Orden operativo confirmado:
+  - `TASK-070` va antes de `TASK-071` como surface primaria de validación sobre Cost Intelligence
+  - `TASK-071` queda como consumers downstream sobre el serving ya probado en Finance
+- La implementación deja de apoyarse en `ClientEconomicsView` como surface principal de `/finance/intelligence` y pasa a una vista dedicada de cierre de período y P&L operativo.
+
+## Delta 2026-03-30 — Slice principal implementado
+
+- `/finance/intelligence` ya dejó de renderizar `ClientEconomicsView` como surface principal.
+- Nueva vista implementada:
+  - `src/views/greenhouse/finance/FinancePeriodClosureDashboardView.tsx`
+- La surface nueva ya cubre:
+  - hero y KPIs de salud del cierre
+  - tabla de últimos 12 períodos
+  - semáforos por nómina, ingresos, gastos y FX
+  - P&L inline expandible por cliente
+  - diálogo de cierre con summary agregado
+  - diálogo de reapertura con razón obligatoria
+  - gating de acciones por rol:
+    - cierre: `finance_manager` y `efeonce_admin`
+    - reapertura: `efeonce_admin`
+  - alineación de APIs de Cost Intelligence con arquitectura:
+    - lecturas: `finance`, `hr_payroll`, `efeonce_admin`
+    - cierre: `finance_manager`, `efeonce_admin`
+    - reapertura: `efeonce_admin`
+- Validación técnica ya pasada:
+  - `pnpm exec vitest run src/views/greenhouse/finance/FinancePeriodClosureDashboardView.test.tsx`
+  - `pnpm exec eslint 'src/lib/tenant/authorization.ts' 'src/app/(dashboard)/finance/intelligence/page.tsx' 'src/app/api/cost-intelligence/periods/route.ts' 'src/app/api/cost-intelligence/periods/[year]/[month]/route.ts' 'src/app/api/cost-intelligence/periods/[year]/[month]/close/route.ts' 'src/app/api/cost-intelligence/periods/[year]/[month]/reopen/route.ts' 'src/app/api/cost-intelligence/pl/route.ts' 'src/app/api/cost-intelligence/pl/[scopeType]/[scopeId]/route.ts' 'src/config/greenhouse-nomenclature.ts' 'src/views/greenhouse/finance/FinancePeriodClosureDashboardView.tsx' 'src/views/greenhouse/finance/FinancePeriodClosureDashboardView.test.tsx'`
+  - `pnpm exec tsc --noEmit --pretty false`
+- Limitación de validación:
+  - `pnpm build` compila pero el proceso `next build` está dejando lock/colgándose en `.next` dentro de este workspace; no se toma todavía como validación limpia del slice.
+- La task se mantiene `in-progress` hasta tener:
+  - validación visual real del flujo
+  - confirmación de qué hacer con `ClientEconomicsView` como surface legacy
+  - build limpio sin el lock/hang del workspace
+
 ## Delta 2026-03-30 — TASK-068 cerrada
 
 - `TASK-068` ya quedó cerrada y deja listo el carril de cierre de período:
@@ -32,11 +73,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `in-progress` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Medio` |
-| Status real | `Diseño` |
+| Status real | `Implementación avanzada` |
 | Rank | — |
 | Domain | Cost Intelligence |
 
@@ -67,22 +108,21 @@ Surface operativa dentro de "Economía" para gestión de cierre de período y vi
 
 - **Depende de:**
   - TASK-068 (period closure APIs) — **cerrada**
-  - TASK-069 (P&L APIs) — **blocker**
+  - TASK-069 (P&L APIs) — **cerrada para este slice base**
   - Finance module existente (tab structure, layout)
 - **Impacta a:**
   - Economía section — agrega surface de cierre de período
   - TASK-071 — establece patrones visuales reutilizables para otros consumers
 - **Archivos owned:**
-  - `src/views/greenhouse/economia/PeriodClosureDashboard.tsx`
-  - `src/views/greenhouse/economia/PeriodClosureRow.tsx`
-  - `src/views/greenhouse/economia/PeriodPlSummary.tsx`
-  - `src/app/(dashboard)/economia/cierre/page.tsx`
+  - `src/views/greenhouse/finance/FinancePeriodClosureDashboardView.tsx`
+  - `src/app/(dashboard)/finance/intelligence/page.tsx`
 
 ## Current Repo State
 
 - Sidebar ya tiene sección "Economía — P&L y rentabilidad" como item de navegación
-- No existe surface de cierre de período
-- El portal usa patrones Vuexy: `Card`, `CardHeader`, `CardContent`, tablas con `@tanstack/react-table`, chips de status
+- `/finance/intelligence` ya consume Cost Intelligence como dashboard principal de cierre de período
+- `ClientEconomicsView.tsx` sigue existiendo como surface legacy, pero ya no es la portada de `Inteligencia financiera`
+- El portal usa patrones Greenhouse + Vuexy: `ExecutiveCardShell`, chips de status, tablas expandibles y estados vacíos compartidos
 
 ## Scope
 
@@ -132,20 +172,22 @@ Surface operativa dentro de "Economía" para gestión de cierre de período y vi
 
 ## Acceptance Criteria
 
-- [ ] Surface de cierre de período visible en Economía para `finance_manager` y `efeonce_admin`
-- [ ] Tabla muestra últimos 12 meses con semáforos correctos por pata
-- [ ] P&L inline expandible muestra breakdown por client
-- [ ] Botón "Cerrar" funciona cuando readiness = 100%
-- [ ] Botón "Reabrir" solo visible para `efeonce_admin`, requiere razón
-- [ ] Badge `provisional` visible en períodos no cerrados
-- [ ] Chips de color en margin % con thresholds correctos
-- [ ] `pnpm build` pasa
+- [x] Surface de cierre de período visible en Economía para `finance_manager` y `efeonce_admin`
+- [x] Tabla muestra últimos 12 meses con semáforos correctos por pata
+- [x] P&L inline expandible muestra breakdown por client
+- [x] Botón "Cerrar" funciona cuando readiness = 100%
+- [x] Botón "Reabrir" solo visible para `efeonce_admin`, requiere razón
+- [x] Badge `provisional` visible en períodos no cerrados
+- [x] Chips de color en margin % con thresholds correctos
+- [ ] `pnpm build` pasa limpio sin lock/hang
 - [ ] Validación visual en preview
 
 ## Verification
 
-- `pnpm build`
-- `pnpm lint`
+- `pnpm exec eslint 'src/app/(dashboard)/finance/intelligence/page.tsx' 'src/views/greenhouse/finance/FinancePeriodClosureDashboardView.tsx'`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec vitest run src/views/greenhouse/finance/FinancePeriodClosureDashboardView.test.tsx`
+- `pnpm build` compila pero queda pendiente como validación limpia por lock/hang residual de `.next`
 - Validación visual local/preview:
   - Tabla de períodos con semáforos
   - Expandir un mes → P&L inline

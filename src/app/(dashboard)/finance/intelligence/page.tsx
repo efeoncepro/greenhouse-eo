@@ -3,14 +3,14 @@ import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 
 
-import ClientEconomicsView from '@views/greenhouse/finance/ClientEconomicsView'
-import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
+import FinancePeriodClosureDashboardView from '@views/greenhouse/finance/FinancePeriodClosureDashboardView'
+import { canCloseCostIntelligencePeriod, canReopenCostIntelligencePeriod, hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Inteligencia financiera — Greenhouse'
+  title: 'Economía operativa — Greenhouse'
 }
 
 const IntelligencePage = async () => {
@@ -30,7 +30,12 @@ const IntelligencePage = async () => {
     redirect(tenant.portalHomePath || '/dashboard')
   }
 
-  return <ClientEconomicsView />
+  return (
+    <FinancePeriodClosureDashboardView
+      canManageClosure={canCloseCostIntelligencePeriod(tenant)}
+      canReopen={canReopenCostIntelligencePeriod(tenant)}
+    />
+  )
 }
 
 export default IntelligencePage

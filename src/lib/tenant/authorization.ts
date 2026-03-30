@@ -46,6 +46,15 @@ export const hasRouteGroup = (tenant: TenantContext, routeGroup: TenantRouteGrou
 
 export const canAccessProject = (tenant: TenantContext, projectId: string) => tenant.projectIds.includes(projectId)
 
+export const canReadCostIntelligence = (tenant: TenantContext) =>
+  hasRouteGroup(tenant, 'finance') || hasRoleCode(tenant, 'efeonce_admin')
+
+export const canCloseCostIntelligencePeriod = (tenant: TenantContext) =>
+  hasRoleCode(tenant, 'finance_manager') || hasRoleCode(tenant, 'efeonce_admin')
+
+export const canReopenCostIntelligencePeriod = (tenant: TenantContext) =>
+  hasRoleCode(tenant, 'efeonce_admin')
+
 export const canAccessPeopleModule = (tenant: TenantContext) =>
   hasRouteGroup(tenant, 'people') ||
   (hasRouteGroup(tenant, 'internal') &&
@@ -240,6 +249,29 @@ export const requireFinanceTenantContext = async () => {
   }
 
   if (!hasRouteGroup(tenant, 'finance') && !hasRoleCode(tenant, 'efeonce_admin')) {
+    return {
+      tenant: null,
+      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+  }
+
+  return {
+    tenant,
+    errorResponse: null
+  }
+}
+
+export const requireCostIntelligenceTenantContext = async () => {
+  const { tenant, unauthorizedResponse } = await requireTenantContext()
+
+  if (!tenant) {
+    return {
+      tenant: null,
+      errorResponse: unauthorizedResponse
+    }
+  }
+
+  if (!canReadCostIntelligence(tenant)) {
     return {
       tenant: null,
       errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })

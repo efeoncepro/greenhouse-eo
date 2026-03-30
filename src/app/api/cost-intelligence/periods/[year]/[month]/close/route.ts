@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { closePeriod } from '@/lib/cost-intelligence/close-period'
 import { CostIntelligenceValidationError } from '@/lib/cost-intelligence/shared'
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { canCloseCostIntelligencePeriod, requireCostIntelligenceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,10 +10,14 @@ export async function POST(
   _: Request,
   { params }: { params: Promise<{ year: string; month: string }> }
 ) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCostIntelligenceTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  if (!canCloseCostIntelligencePeriod(tenant)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   try {

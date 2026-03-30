@@ -4,6 +4,42 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — TASK-070 surface principal de Finance Intelligence implementada
+
+### Objetivo
+- Ejecutar `TASK-070` después de contrastarla con:
+  - `docs/architecture/GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - APIs reales de `period closure` y `operational_pl`
+- Confirmar el orden operativo:
+  - `TASK-070` antes de `TASK-071`
+
+### Delta de ejecución
+- `TASK-070` pasó a `in-progress`.
+- `/finance/intelligence` ya dejó de renderizar `ClientEconomicsView` como portada y ahora usa:
+  - `src/views/greenhouse/finance/FinancePeriodClosureDashboardView.tsx`
+- La nueva surface ya incluye:
+  - hero de cierre operativo
+  - KPIs agregados de readiness
+  - tabla de 12 períodos con semáforos por pata
+  - expandible inline de P&L por cliente
+  - diálogo de cierre con summary agregado
+  - reapertura con razón obligatoria
+- Gating aplicado en UI:
+  - cierre para `finance_manager` y `efeonce_admin`
+  - reapertura solo para `efeonce_admin`
+
+### Validación ejecutada
+- `pnpm exec eslint 'src/app/(dashboard)/finance/intelligence/page.tsx' 'src/views/greenhouse/finance/FinancePeriodClosureDashboardView.tsx'`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- Validación visual real del flujo en local/preview antes de cerrar `TASK-070`.
+- Decidir si `ClientEconomicsView`:
+  - se reubica a otra route/surface de analytics, o
+  - queda como legacy candidate para retiro en un follow-on.
+
 ## Sesión 2026-03-30 — TASK-069 slice 1 materializado
 
 ### Objetivo

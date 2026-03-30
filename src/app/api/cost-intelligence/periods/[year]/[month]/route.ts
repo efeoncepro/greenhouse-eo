@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { checkPeriodReadiness } from '@/lib/cost-intelligence/check-period-readiness'
 import { CostIntelligenceValidationError } from '@/lib/cost-intelligence/shared'
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireCostIntelligenceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,7 +10,7 @@ export async function GET(
   _: Request,
   { params }: { params: Promise<{ year: string; month: string }> }
 ) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCostIntelligenceTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

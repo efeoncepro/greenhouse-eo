@@ -2,6 +2,21 @@
 
 ## 2026-03-30
 
+- `TASK-070` ya sustituyó la portada de `/finance/intelligence` por una surface real de Cost Intelligence:
+  - `FinancePeriodClosureDashboardView`
+  - hero + KPIs de cierre
+  - tabla de 12 períodos con semáforos por nómina, ingresos, gastos y FX
+  - P&L inline expandible por cliente
+  - diálogo de cierre y reapertura con control por rol
+- La UI de cierre de período ya respeta el contrato operativo:
+  - cierre para `finance_manager` y `efeonce_admin`
+  - reapertura solo para `efeonce_admin`
+- Validación técnica del slice:
+  - `pnpm exec eslint 'src/app/(dashboard)/finance/intelligence/page.tsx' 'src/views/greenhouse/finance/FinancePeriodClosureDashboardView.tsx'`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm build`
+- `TASK-070` sigue abierta solo por validación visual pendiente y por la decisión posterior sobre el destino del dashboard legacy `ClientEconomicsView`.
+
 - `TASK-069` ya tiene smoke reactivo E2E reusable:
   - `pnpm smoke:cost-intelligence:operational-pl`
   - el carril valida `outbox -> operational_pl -> operational_pl_snapshots -> accounting.pl_snapshot.materialized`

@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import { listOperationalPlSnapshots } from '@/lib/cost-intelligence/compute-operational-pl'
 import type { OperationalPlScopeType } from '@/lib/cost-intelligence/pl-types'
 import { CostIntelligenceValidationError, toBoolean, toInteger, toNullableString } from '@/lib/cost-intelligence/shared'
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireCostIntelligenceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,7 +11,7 @@ const isScopeType = (value: string | null): value is OperationalPlScopeType =>
   value === 'client' || value === 'space' || value === 'organization'
 
 export async function GET(request: Request) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireCostIntelligenceTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
