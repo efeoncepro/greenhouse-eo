@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-138`
+- siguiente ID disponible: `TASK-142`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -74,6 +74,8 @@ Primer bloque operativo asignado:
 - `TASK-126` nace como follow-on explícito de `TASK-099` para endurecer `CSP` más allá de `Report-Only`, pero no bloquea el cierre del baseline cloud.
 - `TASK-127` nace como follow-on institucional para consolidar la lectura arquitectónica Cloud post-baseline, sin reabrir lanes ya cerradas.
 - `TASK-134` nace como follow-on institucional para consolidar Notifications sobre identidad canónica `person-first`, sin reabrir el cierre funcional de `TASK-117` ni `TASK-129`.
+- `TASK-140` nace como follow-on de `TASK-136` para alinear `/admin/views` con el modelo persona-first del producto, sin reabrir la gobernanza por `view_code` ya cerrada.
+- `TASK-141` nace como contrato institucional más amplio para formalizar el consumo canónico de identidad humana en Greenhouse; `TASK-140` y `TASK-134` se leen como consumers/follow-ons concretos de esa política.
 - Criterio vigente: cerrar costo y guardrails de BigQuery como último remanente del bloque cloud baseline.
 
 ### Prioridad vigente — bloque `TASK-025` a `TASK-031`
@@ -177,6 +179,8 @@ Primer bloque operativo asignado:
 | 53 | `TASK-134` | [TASK-134-notification-identity-model-hardening.md](to-do/TASK-134-notification-identity-model-hardening.md) | P1 | Alto | Medio | Descubierta | Consolidar Notifications sobre identidad canónica `person-first`: `identity_profile` raíz, `member` faceta operativa y `client_user` como acceso portal |
 | 54 | `TASK-135` | [TASK-135-ops-health-sentry-reactive-refresh.md](to-do/TASK-135-ops-health-sentry-reactive-refresh.md) | P2 | Alto | Medio | Diseño | Hacer que `Incidentes Sentry` en `Ops Health` sea una superficie reactiva: auto-refresh, `Refrescar ahora` y fallback `stale` con último snapshot bueno |
 | 55 | `TASK-131` | [TASK-131-cloud-health-runtime-tooling-posture-separation.md](complete/TASK-131-cloud-health-runtime-tooling-posture-separation.md) | P1 | Alto | Medio | **Cerrada** | Health Cloud ya separa secretos runtime vs tooling: `migrator/admin` siguen visibles en `postgresAccessProfiles`, pero ya no degradan `overallStatus` del portal sano |
+| 56 | `TASK-140` | [TASK-140-admin-views-person-first-preview.md](to-do/TASK-140-admin-views-person-first-preview.md) | P1 | Alto | Medio | Diseño | Cortar el preview de `/admin/views` a un modelo persona-first, tomando el contrato canónico definido en `TASK-141` y manteniendo compatibilidad con overrides user-scoped |
+| 57 | `TASK-141` | [TASK-141-canonical-person-identity-consumption.md](to-do/TASK-141-canonical-person-identity-consumption.md) | P1 | Muy alto | Medio | Diseño | Formalizar el contrato canónico del objeto persona en Greenhouse: persona como raíz humana, `member` como faceta operativa y `client_user` como principal portal; deja follow-ons explícitos para `/admin/views` y notifications |
 | 38 | ~~CODEX_TASK_Greenhouse_Email_Catalog_v1.md~~ | — | — | — | **Movida a spec** | Reclasificada como documento de referencia → `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md` |
 | 30 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | P3 | Medio | Medio | Parcial | Consolidación UX transversal de shells, vistas y navegación |
 | 31 | ~~CODEX_TASK_Typography_Hierarchy_Fix.md~~ | — | — | — | **Cerrada** | Jerarquía core absorbida en mergedTheme.ts; custom variants `monoId`, `monoAmount`, `kpiValue` para adopción gradual |
