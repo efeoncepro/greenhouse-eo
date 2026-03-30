@@ -19,8 +19,32 @@ import {
   toNullableNumber,
   toTimestampString
 } from '@/lib/finance/shared'
+import { resolveAutoAllocation, type AutoAllocationInput } from '@/lib/finance/auto-allocation-rules'
+import { runGreenhousePostgresQuery as pgQuery } from '@/lib/postgres/client'
 
 type QueryableClient = Pick<PoolClient, 'query'>
+
+// ─── Auto-allocation helper (fire-and-forget after expense creation) ──────
+
+const tryAutoAllocateExpense = async (input: AutoAllocationInput) => {
+  const result = await resolveAutoAllocation(input)
+
+  if (!result || result.allocations.length === 0) return
+
+  for (const allocation of result.allocations) {
+    const allocationId = `alloc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+
+    await pgQuery(
+      `INSERT INTO greenhouse_finance.cost_allocations
+         (allocation_id, expense_id, client_id, allocation_percent, allocated_amount_clp, allocation_method, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, now())
+       ON CONFLICT DO NOTHING`,
+      [allocationId, input.expenseId, allocation.clientId, allocation.allocationPercent, allocation.allocatedAmountClp, allocation.method]
+    )
+  }
+
+  console.log(`[auto-allocation] ${result.ruleApplied}: ${result.allocations.length} allocations for expense ${input.expenseId}`)
+}
 
 // ─── Row types ──────────────────────────────────────────────────────
 
@@ -1431,6 +1455,16 @@ export const createFinanceExpenseInPostgres = async ({
       eventType: 'finance.expense.created',
       payload: created
     })
+
+    // Fire-and-forget auto-allocation for payroll/infrastructure expenses
+    tryAutoAllocateExpense({
+      expenseId,
+      expenseType,
+      memberId: memberId ?? null,
+      clientId: clientId ?? null,
+      costCategory: costCategory ?? null,
+      totalAmountClp
+    }).catch(err => console.error('[auto-allocation] Failed:', err))
 
     return created
   })
