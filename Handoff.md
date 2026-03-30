@@ -4,6 +4,49 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — TASK-068 Period Closure Status iniciada
+
+### Objetivo
+- Implementar el primer slice operativo de Cost Intelligence después de `TASK-067`:
+  - checker de readiness mensual
+  - projection `period_closure_status`
+  - base de APIs close/reopen para ceremonia de cierre
+
+### Contexto operativo
+- `TASK-068` ya fue movida a `in-progress`.
+- Esta lane se ejecuta apoyándose en:
+  - `docs/architecture/GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`
+- Restricción arquitectónica explícita:
+  - el readiness y el cierre deben conversar con el lifecycle canónico de Payroll/Finance
+  - no inventar semánticas paralelas para el período financiero
+
+### Pendiente inmediato
+- mapear columnas canónicas de `payroll_periods`, `income`, `expenses`, `exchange_rates`
+- implementar helper `check-period-readiness`
+- registrar projection reactiva y su scope `finance_period`
+
+### Delta de ejecución
+- El slice principal ya quedó materializado:
+  - `src/lib/cost-intelligence/check-period-readiness.ts`
+  - `src/lib/cost-intelligence/close-period.ts`
+  - `src/lib/cost-intelligence/reopen-period.ts`
+  - `src/lib/sync/projections/period-closure-status.ts`
+  - rutas `GET/POST` bajo `/api/cost-intelligence/periods/**`
+- Decisiones semánticas implementadas:
+  - income mensual se lee por `invoice_date`
+  - expenses mensuales se leen por `COALESCE(document_date, payment_date)`
+  - FX mensual se considera por `rate_date`
+  - payroll gating usa `payroll_periods.status`, con `exported` como condición default de readiness
+- Validación pasada:
+  - tests del carril `cost-intelligence`
+  - `tsc --noEmit`
+  - `pnpm build`
+- Remanente inmediato:
+  - smoke reactivo E2E del projection domain
+  - evaluar si Finance amerita una semántica `partial` más rica para income/expenses antes de cerrar `TASK-068`
+
 ## Sesión 2026-03-30 — TASK-067 Cost Intelligence Foundation iniciada
 
 ### Objetivo

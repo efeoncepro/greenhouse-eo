@@ -84,6 +84,21 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `TASK-068` y `TASK-069` deben mantenerse consistentes con `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
   - Cost Intelligence no debe redefinir un P&L paralelo; debe materializar y agregar la semántica financiera canónica ya definida en Finance
 
+## Delta 2026-03-30 TASK-068 period closure status ya tiene primer slice real
+- Cost Intelligence ya no tiene solo foundation; ahora existe un carril operativo inicial para cierre de período:
+  - `checkPeriodReadiness()`
+  - `closePeriod()` / `reopenPeriod()`
+  - projection `period_closure_status`
+  - APIs bajo `/api/cost-intelligence/periods/**`
+- Decisión semántica actual para readiness mensual:
+  - ingreso por `greenhouse_finance.income.invoice_date`
+  - gasto por `COALESCE(document_date, payment_date)`
+  - FX por `greenhouse_finance.exchange_rates.rate_date`
+  - payroll gating por `greenhouse_payroll.payroll_periods.status`
+- Estado actual:
+  - slice implementado y validado por tests + `tsc` + `build`
+  - todavía falta el smoke reactivo end-to-end del domain `cost_intelligence` antes de declarar la task cerrada
+
 ## Delta 2026-03-30 Sentry incident reader hardening
 - `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.
 - Nuevo contrato soportado:

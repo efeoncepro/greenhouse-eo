@@ -1,5 +1,34 @@
 # TASK-068 — Period Closure Status Projection
 
+## Delta 2026-03-30 — Slice operativo inicial implementado
+
+- Ya quedó implementado el primer slice real de `TASK-068`:
+  - helper canónico `src/lib/cost-intelligence/check-period-readiness.ts`
+  - mutation helpers `src/lib/cost-intelligence/close-period.ts` y `src/lib/cost-intelligence/reopen-period.ts`
+  - projection reactiva `src/lib/sync/projections/period-closure-status.ts`
+  - APIs:
+    - `GET /api/cost-intelligence/periods`
+    - `GET /api/cost-intelligence/periods/[year]/[month]`
+    - `POST /api/cost-intelligence/periods/[year]/[month]/close`
+    - `POST /api/cost-intelligence/periods/[year]/[month]/reopen`
+- Semántica adoptada y ya amarrada al carril Finance canónico:
+  - income por `invoice_date`
+  - expenses por `COALESCE(document_date, payment_date)`
+  - FX por `rate_date`
+  - payroll readiness por `greenhouse_payroll.payroll_periods.status`
+- La materialización preserva estados manuales `closed` / `reopened` y proyecta el serving `greenhouse_serving.period_closure_status`.
+- Cobertura nueva:
+  - `src/lib/cost-intelligence/check-period-readiness.test.ts`
+  - `src/lib/cost-intelligence/close-period.test.ts`
+  - `src/lib/sync/projections/period-closure-status.test.ts`
+- Validación ejecutada:
+  - `pnpm exec vitest run src/lib/cost-intelligence/check-period-readiness.test.ts src/lib/cost-intelligence/close-period.test.ts src/lib/sync/projections/period-closure-status.test.ts`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm build`
+- Remanente real del task:
+  - smoke reactivo end-to-end con outbox/cron del domain `cost_intelligence`
+  - decidir si `income_status` / `expense_status` requieren un estado `partial` más rico cuando se conecten señales adicionales de Finance
+
 ## Delta 2026-03-30 — TASK-067 cerrada + continuidad canónica
 
 - `TASK-067` ya quedó cerrada:
@@ -27,11 +56,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `in-progress` |
 | Priority | `P1` |
 | Impact | `Muy alto` |
 | Effort | `Medio` |
-| Status real | `Diseño` |
+| Status real | `Implementación` |
 | Rank | — |
 | Domain | Cost Intelligence |
 
