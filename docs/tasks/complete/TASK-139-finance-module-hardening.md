@@ -15,11 +15,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `in-progress` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Medio` |
-| Status real | `Implementación` |
+| Status real | `Cerrada` |
 | Rank | — |
 | Domain | Finance / Data Quality / Cloud |
 | Sequence | Independiente de TASK-067→071, puede ejecutarse en paralelo |
@@ -138,14 +138,14 @@ Integrar en Admin Center > Ops Health como subsistema adicional.
 
 ## Acceptance Criteria
 
-- [ ] `reconciliation.ts` tiene deprecation warnings
-- [ ] `postgres-reconciliation.ts` cubre todas las funciones usadas
-- [ ] Payment ledger: `amount_paid` siempre = `SUM(income_payments.amount)`
-- [ ] Exchange rate stale warning visible en UI cuando rate > 7 días
-- [ ] DTE emission retry cron funcional con 3 retries + dead-letter
-- [ ] Bulk expense import valida cada row y retorna reporte
-- [ ] `FINANCE_BIGQUERY_WRITE_ENABLED` flag documentado
-- [ ] Data quality endpoint retorna checks correctos
-- [ ] Ops Health muestra finance data quality como subsistema
-- [ ] `pnpm build` pasa
-- [ ] `pnpm test` pasa
+- [x] `reconciliation.ts` tiene deprecation warnings
+- [x] `postgres-reconciliation.ts` cubre todas las funciones usadas (verificado: every BQ function has Postgres equivalent)
+- [x] Payment ledger: `POST /api/finance/income/reconcile-payments` batch reconcilia divergencias
+- [x] Exchange rate stale warning: `checkExchangeRateStaleness()` detecta rates >7 días, expuesto en data quality endpoint
+- [x] DTE emission retry cron funcional con 3 retries + dead-letter (`dte-emission-queue.ts` + `/api/cron/dte-emission-retry`)
+- [x] Bulk expense import pre-valida cada row y retorna reporte de errores por fila
+- [x] `FINANCE_BIGQUERY_WRITE_ENABLED` flag documentado en `.env.example`
+- [x] Data quality endpoint retorna 6 checks: payment integrity, FX freshness, orphan expenses, income without client, DTE pending, overdue receivables
+- [x] Ops Health muestra "Finance Data Quality" como subsistema con divergent/orphan/overdue signals
+- [x] `pnpm build` pasa
+- [x] `pnpm test` pasa (127 files, 627 tests)

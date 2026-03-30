@@ -177,6 +177,51 @@ const deriveHealth = (
   return 'healthy'
 }
 
+const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubsystem> => {
+  try {
+    const hasFinanceTables = await tableExists('greenhouse_finance', 'income')
+
+    if (!hasFinanceTables) {
+      return { name: 'Finance Data Quality', status: 'not_configured', processed: 0, failed: 0, lastRun: null }
+    }
+
+    const [divergentPayments, orphanExpenses, overdueCount] = await Promise.all([
+      safeCount(
+        `SELECT COUNT(*) AS cnt
+         FROM greenhouse_finance.income i
+         LEFT JOIN (SELECT income_id, SUM(amount)::numeric AS total FROM greenhouse_finance.income_payments GROUP BY income_id) p
+           ON p.income_id = i.income_id
+         WHERE ABS(COALESCE(i.amount_paid, 0) - COALESCE(p.total, 0)) > 0.01`
+      ),
+      safeCount(
+        `SELECT COUNT(*) AS cnt FROM greenhouse_finance.expenses
+         WHERE (client_id IS NULL OR client_id = '') AND expense_type NOT IN ('tax', 'social_security')`
+      ),
+      safeCount(
+        `SELECT COUNT(*) AS cnt FROM greenhouse_finance.income
+         WHERE payment_status IN ('pending', 'partial', 'overdue') AND due_date < CURRENT_DATE`
+      )
+    ])
+
+    const totalIssues = divergentPayments + orphanExpenses
+    const status: OperationsHealthStatus =
+      divergentPayments > 0 ? 'degraded'
+        : orphanExpenses > 5 ? 'degraded'
+          : overdueCount > 10 ? 'degraded'
+            : 'healthy'
+
+    return {
+      name: 'Finance Data Quality',
+      status,
+      processed: overdueCount,
+      failed: totalIssues,
+      lastRun: new Date().toISOString()
+    }
+  } catch {
+    return { name: 'Finance Data Quality', status: 'idle', processed: 0, failed: 0, lastRun: null }
+  }
+}
+
 export const getOperationsOverview = async (): Promise<OperationsOverview> => {
   const [hasOutbox, hasProjections, hasReactiveLog, hasNotifications, hasServices, hasIcoMetrics, hasWebhookEndpoints, hasWebhookInbox, hasWebhookDeliveries, hasWebhookSubscriptions] =
     await Promise.all([
@@ -347,7 +392,8 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       processed: icoMetricsCount,
       failed: 0,
       lastRun: icoLastSync
-    }
+    },
+    await buildFinanceDataQualitySubsystem()
   ]
 
   interface EventRow extends Record<string, unknown> {
