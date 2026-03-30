@@ -111,9 +111,13 @@ const AgencyEconomicsView = () => {
     setLoading(true)
 
     try {
+      const now = new Date()
+      const year = now.getFullYear()
+      const month = now.getMonth() + 1
+
       const [pnlRes, clientsRes, trendsRes] = await Promise.allSettled([
         fetch('/api/finance/dashboard/pnl'),
-        fetch('/api/finance/intelligence/client-economics'),
+        fetch(`/api/finance/intelligence/operational-pl?year=${year}&month=${month}&scope=client`),
         fetch('/api/finance/analytics/trends?type=expenses&months=6')
       ])
 
@@ -121,8 +125,15 @@ const AgencyEconomicsView = () => {
 
       if (clientsRes.status === 'fulfilled' && clientsRes.value.ok) {
         const d = await clientsRes.value.json()
+        const snapshots = d.snapshots ?? []
 
-        setClients(d.items ?? [])
+        setClients(snapshots.map((s: Record<string, unknown>) => ({
+          clientId: String(s.scopeId ?? ''),
+          clientName: String(s.scopeName ?? ''),
+          totalRevenueClp: Number(s.revenueClp ?? 0),
+          grossMarginPercent: s.grossMarginPct != null ? Number(s.grossMarginPct) : null,
+          headcountFte: s.headcountFte != null ? Number(s.headcountFte) : null
+        })))
       }
 
       if (trendsRes.status === 'fulfilled' && trendsRes.value.ok) {
