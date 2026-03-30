@@ -4,6 +4,42 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 (session 2) — TASK-165 + TASK-164 + ISSUE-002
+
+### Objetivo
+- Implementar completamente TASK-165 (Nubox Full Data Enrichment) y TASK-164 (Purchase Orders & HES).
+- Cerrar ISSUE-002 (Nubox sync data integrity).
+
+### Delta de ejecución
+- **TASK-165** cerrada — 33 archivos, 2,746 líneas:
+  - Schema: 16 columnas nuevas en income + 16 en expenses + tabla `income_line_items`
+  - Sync: mappers conformed capturan TODOS los campos Nubox, sync migrado de DELETE-all a upsert selectivo
+  - Cron: `/api/cron/nubox-balance-sync` cada 4h con detección de divergencias
+  - Events: `finance.sii_claim.detected`, `finance.balance_divergence.detected`
+  - Cross-module: PnL filtra annulled expenses, 2 data quality checks nuevos
+  - UI: PDF/XML links en income, SII chips + annulled badge en expenses
+- **TASK-164** implementada — 19 archivos nuevos:
+  - `purchase_orders`: CRUD + reconciliación de saldo + auto-expire
+  - `service_entry_sheets`: lifecycle draft→submitted→approved/rejected
+  - 9 API routes, 7 event types, 4 notification mappings
+  - `PurchaseOrdersListView` con progress bars, `HesListView` con status chips
+- **ISSUE-002** cerrada — los 3 fixes aplicados
+
+### DDL ejecutados
+- `scripts/setup-nubox-enrichment.sql` — ejecutado en Cloud SQL (greenhouse_app)
+- `scripts/setup-postgres-purchase-orders.sql` — ejecutado en Cloud SQL (greenhouse_app)
+- GRANTs corregidos a `greenhouse_runtime` (el DDL original decía `runtime`)
+
+### Pendiente inmediato
+- Re-ejecutar Nubox sync para poblar los campos enriquecidos con los nuevos datos
+- Verificar visualmente en staging que las nuevas columnas aparecen en las vistas
+
+### Validación ejecutada
+- `npx tsc --noEmit` — sin errores
+- `pnpm test` — 138/139 test files passed (1 pre-existing failure)
+- `pnpm build` — exitoso
+- Committed y pushed a `develop`
+
 ## Sesión 2026-03-30 — TASK-141 contrato canónico + bridge inicial en /admin/views
 
 ### Objetivo

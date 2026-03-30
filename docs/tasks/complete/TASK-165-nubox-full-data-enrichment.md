@@ -4,11 +4,12 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `complete` |
 | Priority | `P0` |
 | Impact | `Muy alto` |
 | Effort | `Alto` |
-| Status real | `Diseño` |
+| Status real | `Implementado` |
+| Closed | `2026-03-30` |
 | Rank | — |
 | Domain | Finance / Nubox Integration / Data Platform |
 | Sequence | Después de TASK-163 (document type separation), conecta con TASK-164 (OC/HES) |

@@ -211,6 +211,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 | `TASK-163` | `complete` | Finance Document Type Separation: Quotes, Credit/Debit Notes | `docs/tasks/complete/TASK-163-finance-document-type-separation.md` |
 
-| `TASK-164` | `to-do` | Purchase Orders (OC) & Service Entry Sheets (HES) Module | `docs/tasks/to-do/TASK-164-purchase-orders-module.md` |
+| `TASK-164` | `complete` | Purchase Orders (OC) & Service Entry Sheets (HES) Module | `docs/tasks/complete/TASK-164-purchase-orders-module.md` |
 
-| `TASK-165` | `to-do` | Nubox Full Data Enrichment: All Fields, Line Items, Sync Hardening | `docs/tasks/to-do/TASK-165-nubox-full-data-enrichment.md` |
+| `TASK-165` | `complete` | Nubox Full Data Enrichment: All Fields, Line Items, Sync Hardening | `docs/tasks/complete/TASK-165-nubox-full-data-enrichment.md` |

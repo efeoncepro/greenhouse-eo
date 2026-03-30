@@ -114,7 +114,15 @@ Reemplazar el patrón full-refresh con MERGE/upsert que preserve registros exist
 
 ## Estado
 
-`open` — investigación completa, fix pendiente de implementación
+`resolved` — 2026-03-30
+
+### Resolución
+
+Los tres problemas fueron resueltos:
+
+1. **Período**: el problema real no era falta de filtro de período sino documentos anulados sumando a revenue. Se agregó `is_annulled` flag y se excluyen de todos los cálculos (TASK-163 + TASK-165).
+2. **Identity resolution**: corregido con `GROUP BY + MAX(client_id) FILTER` en `buildOrgByRutMap()` — ya no pierde client_id en orgs multi-space.
+3. **DELETE/INSERT**: migrado a upsert selectivo (`DELETE WHERE id IN (...) → INSERT`) en TASK-165, protege contra pérdida de datos si la lectura falla.
 
 ## Relacionado
 

@@ -4,11 +4,12 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Medio` |
-| Status real | `Diseño` |
+| Status real | `Implementado + DDL ejecutado` |
+| Closed | `2026-03-30` |
 | Rank | — |
 | Domain | Finance / Commercial |
 | Sequence | Puede ejecutarse en paralelo con TASK-163 |
