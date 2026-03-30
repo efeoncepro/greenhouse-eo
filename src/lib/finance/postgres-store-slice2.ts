@@ -712,7 +712,9 @@ export const listFinanceIncomeFromPostgres = async ({
         notes, created_by_user_id,
         created_at, updated_at,
         nubox_document_id, nubox_sii_track_id, nubox_emission_status,
-        dte_type_code, dte_folio, nubox_emitted_at, nubox_last_synced_at
+        dte_type_code, dte_folio, nubox_emitted_at, nubox_last_synced_at,
+        is_annulled, income_type, nubox_pdf_url, nubox_xml_url, referenced_income_id,
+        payment_form, balance_nubox
       FROM greenhouse_finance.income
       ${whereClause}
       ORDER BY invoice_date DESC
@@ -742,7 +744,9 @@ export const getFinanceIncomeFromPostgres = async (incomeId: string) => {
         notes, created_by_user_id,
         created_at, updated_at,
         nubox_document_id, nubox_sii_track_id, nubox_emission_status,
-        dte_type_code, dte_folio, nubox_emitted_at, nubox_last_synced_at
+        dte_type_code, dte_folio, nubox_emitted_at, nubox_last_synced_at,
+        is_annulled, income_type, nubox_pdf_url, nubox_xml_url, referenced_income_id,
+        payment_form, balance_nubox
       FROM greenhouse_finance.income
       WHERE income_id = $1
       LIMIT 1
@@ -1289,7 +1293,8 @@ export const listFinanceExpensesFromPostgres = async ({
         notes, created_by_user_id,
         created_at, updated_at,
         nubox_purchase_id, nubox_document_status, nubox_supplier_rut,
-        nubox_supplier_name, nubox_origin, nubox_last_synced_at
+        nubox_supplier_name, nubox_origin, nubox_last_synced_at,
+        is_annulled, sii_document_status, nubox_pdf_url, balance_nubox
       FROM greenhouse_finance.expenses
       ${whereClause}
       ORDER BY COALESCE(document_date, payment_date, created_at::date) DESC
@@ -1324,7 +1329,8 @@ export const getFinanceExpenseFromPostgres = async (expenseId: string) => {
         notes, created_by_user_id,
         created_at, updated_at,
         nubox_purchase_id, nubox_document_status, nubox_supplier_rut,
-        nubox_supplier_name, nubox_origin, nubox_last_synced_at
+        nubox_supplier_name, nubox_origin, nubox_last_synced_at,
+        is_annulled, sii_document_status, nubox_pdf_url, balance_nubox
       FROM greenhouse_finance.expenses
       WHERE expense_id = $1
       LIMIT 1

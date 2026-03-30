@@ -265,9 +265,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
       children: [
         { label: <NavLabel label={GH_FINANCE_NAV.dashboard.label} subtitle={GH_FINANCE_NAV.dashboard.subtitle} show={showSub} />, href: '/finance' },
         { label: <NavLabel label={GH_FINANCE_NAV.income.label} subtitle={GH_FINANCE_NAV.income.subtitle} show={showSub} />, href: '/finance/income' },
-        { label: <NavLabel label='Cotizaciones' subtitle='Cotizaciones sincronizadas' show={showSub} />, href: '/finance/quotes' },
+        { label: <NavLabel label={GH_FINANCE_NAV.quotes.label} subtitle={GH_FINANCE_NAV.quotes.subtitle} show={showSub} />, href: '/finance/quotes' },
         { label: <NavLabel label={GH_FINANCE_NAV.expenses.label} subtitle={GH_FINANCE_NAV.expenses.subtitle} show={showSub} />, href: '/finance/expenses' },
         { label: <NavLabel label={GH_FINANCE_NAV.suppliers.label} subtitle={GH_FINANCE_NAV.suppliers.subtitle} show={showSub} />, href: '/finance/suppliers' },
+        { label: <NavLabel label={GH_FINANCE_NAV.purchaseOrders.label} subtitle={GH_FINANCE_NAV.purchaseOrders.subtitle} show={showSub} />, href: '/finance/purchase-orders' },
+        { label: <NavLabel label={GH_FINANCE_NAV.hes.label} subtitle={GH_FINANCE_NAV.hes.subtitle} show={showSub} />, href: '/finance/hes' },
         { label: <NavLabel label={GH_FINANCE_NAV.reconciliation.label} subtitle={GH_FINANCE_NAV.reconciliation.subtitle} show={showSub} />, href: '/finance/reconciliation' },
         { label: <NavLabel label={GH_FINANCE_NAV.intelligence.label} subtitle={GH_FINANCE_NAV.intelligence.subtitle} show={showSub} />, href: '/finance/intelligence' }
       ].filter(item => {
