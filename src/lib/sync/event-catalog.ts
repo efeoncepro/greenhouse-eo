@@ -56,6 +56,9 @@ export const AGGREGATE_TYPES = {
   // Email Verification
   emailVerification: 'email_verification',
 
+  // Quotes
+  quote: 'quote',
+
   // Capacity Economics
   financeExchangeRate: 'finance_exchange_rate',
   financeOverhead: 'finance_overhead',
@@ -139,6 +142,11 @@ export const EVENT_TYPES = {
   // Email Verification
   emailVerificationRequested: 'identity.email_verification.requested',
   emailVerificationCompleted: 'identity.email_verification.completed',
+
+  // Quotes & Credit Notes
+  quoteCreated: 'finance.quote.created',
+  quoteConverted: 'finance.quote.converted',
+  creditNoteCreated: 'finance.credit_note.created',
 
   // View Access
   viewAccessOverrideChanged: 'access.view_override_changed',

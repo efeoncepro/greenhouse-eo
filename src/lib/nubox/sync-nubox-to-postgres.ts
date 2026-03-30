@@ -13,6 +13,8 @@ export type SyncNuboxToPostgresResult = {
   syncRunId: string
   incomesCreated: number
   incomesUpdated: number
+  quotesCreated: number
+  quotesUpdated: number
   expensesCreated: number
   expensesUpdated: number
   suppliersAutoProvisioned: number
@@ -105,6 +107,10 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
   // Create new income record
   const incomeId = `INC-NB-${sale.nubox_sale_id}`
 
+  // Credit notes (DTE 61) are stored with negative amounts
+  const isCreditNote = sale.dte_type_code === '61'
+  const signMultiplier = isCreditNote ? -1 : 1
+
   await withGreenhousePostgresTransaction(async client => {
     await client.query(
       `INSERT INTO greenhouse_finance.income (
@@ -142,10 +148,10 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
         sale.folio,
         sale.emission_date,
         sale.due_date,
-        Number(sale.net_amount ?? 0),
-        Number(sale.tax_vat_amount ?? 0),
-        Number(sale.total_amount ?? 0),
-        'pending', // Always 'pending' for new invoices — payment_status is derived from income_payments ledger
+        Number(sale.net_amount ?? 0) * signMultiplier,
+        Number(sale.tax_vat_amount ?? 0) * signMultiplier,
+        Number(sale.total_amount ?? 0) * signMultiplier,
+        isCreditNote ? 'paid' : 'pending', // Credit notes are settled on creation
         mapDteTypeToIncomeType(sale.dte_type_code),
         Number(sale.nubox_sale_id),
         sale.sii_track_id ? Number(sale.sii_track_id) : null,
@@ -462,6 +468,80 @@ const reconcileIncomeFromBankMovement = async (
   return true
 }
 
+// ─── Quote Upsert (DTE 52 → quotes table) ────────────────────────────────
+
+const upsertQuoteFromSale = async (sale: NuboxConformedSale): Promise<'created' | 'updated' | 'skipped'> => {
+  if (!sale.nubox_sale_id || isNaN(Number(sale.nubox_sale_id))) return 'skipped'
+
+  const existing = await runGreenhousePostgresQuery<{ quote_id: string }>(
+    `SELECT quote_id FROM greenhouse_finance.quotes WHERE nubox_document_id = $1 LIMIT 1`,
+    [String(sale.nubox_sale_id)]
+  )
+
+  if (existing.length > 0) {
+    await runGreenhousePostgresQuery(
+      `UPDATE greenhouse_finance.quotes SET
+        nubox_sii_track_id = $2,
+        nubox_emission_status = $3,
+        nubox_last_synced_at = NOW(),
+        updated_at = NOW()
+      WHERE nubox_document_id = $1`,
+      [String(sale.nubox_sale_id), sale.sii_track_id, sale.emission_status_name]
+    )
+
+    return 'updated'
+  }
+
+  if (!sale.client_id) return 'skipped'
+
+  const quoteId = `QUO-NB-${sale.nubox_sale_id}`
+
+  await runGreenhousePostgresQuery(
+    `INSERT INTO greenhouse_finance.quotes (
+      quote_id, client_id, organization_id, client_name,
+      quote_number, quote_date, due_date,
+      currency, subtotal, tax_rate, tax_amount, total_amount,
+      exchange_rate_to_clp, total_amount_clp,
+      status, nubox_document_id, nubox_sii_track_id, nubox_emission_status,
+      dte_type_code, dte_folio, nubox_emitted_at, nubox_last_synced_at,
+      created_at, updated_at
+    ) VALUES (
+      $1, $2, $3, $4,
+      $5, $6, $7,
+      'CLP', $8, 0.19, $9, $10,
+      1, $10,
+      'sent', $11, $12, $13,
+      '52', $14, $15, NOW(),
+      NOW(), NOW()
+    )
+    ON CONFLICT (quote_id) DO UPDATE SET
+      nubox_last_synced_at = NOW(), updated_at = NOW()`,
+    [
+      quoteId,
+      sale.client_id,
+      sale.organization_id || null,
+      sale.client_trade_name || 'Unknown',
+      sale.folio,
+      sale.emission_date,
+      sale.due_date,
+      Number(sale.net_amount ?? 0),
+      Number(sale.tax_vat_amount ?? 0),
+      Number(sale.total_amount ?? 0),
+      String(sale.nubox_sale_id),
+      sale.sii_track_id,
+      sale.emission_status_name,
+      sale.folio,
+      sale.emission_date
+    ]
+  )
+
+  await publishOutboxEvent('finance.quote', quoteId, 'finance.quote.created', {
+    quote_id: quoteId, source: 'nubox_sync', nubox_sale_id: sale.nubox_sale_id, total_amount: sale.total_amount
+  })
+
+  return 'created'
+}
+
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 const mapDteTypeToIncomeType = (dteCode: string | null): string => {
@@ -538,17 +618,28 @@ export const syncNuboxToPostgres = async (): Promise<SyncNuboxToPostgresResult> 
       readConformedPurchases(projectId)
     ])
 
-    // 2. Project sales to income
+    // 2. Project sales to income (or quotes for DTE 52)
     let incomesCreated = 0
     let incomesUpdated = 0
+    let quotesCreated = 0
+    let quotesUpdated = 0
     let orphanedRecords = 0
 
     for (const sale of conformedSales) {
-      const result = await upsertIncomeFromSale(sale)
+      if (sale.dte_type_code === '52') {
+        // Cotizaciones go to quotes table, not income
+        const result = await upsertQuoteFromSale(sale)
 
-      if (result === 'created') incomesCreated++
-      else if (result === 'updated') incomesUpdated++
-      else if (result === 'skipped') orphanedRecords++
+        if (result === 'created') quotesCreated++
+        else if (result === 'updated') quotesUpdated++
+        else if (result === 'skipped') orphanedRecords++
+      } else {
+        const result = await upsertIncomeFromSale(sale)
+
+        if (result === 'created') incomesCreated++
+        else if (result === 'updated') incomesUpdated++
+        else if (result === 'skipped') orphanedRecords++
+      }
     }
 
     // 3. Project purchases to expenses
@@ -602,6 +693,8 @@ export const syncNuboxToPostgres = async (): Promise<SyncNuboxToPostgresResult> 
       syncRunId,
       incomesCreated,
       incomesUpdated,
+      quotesCreated,
+      quotesUpdated,
       expensesCreated,
       expensesUpdated,
       suppliersAutoProvisioned,

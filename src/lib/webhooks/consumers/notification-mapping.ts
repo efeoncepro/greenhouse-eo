@@ -234,6 +234,28 @@ export const NOTIFICATION_MAPPINGS: NotificationMapping[] = [
     metadata: baseMetadata
   },
 
+  {
+    eventType: 'finance.credit_note.created',
+    category: 'finance_alert',
+    title: envelope => {
+      const clientName = typeof envelope.data.clientName === 'string' && envelope.data.clientName.trim()
+        ? envelope.data.clientName
+        : null
+
+      return clientName ? `Nota de crédito registrada para ${clientName}` : 'Nota de crédito registrada'
+    },
+    body: envelope => {
+      const amount = typeof envelope.data.totalAmountClp === 'number'
+        ? `$${Math.abs(envelope.data.totalAmountClp).toLocaleString('es-CL')} CLP`
+        : null
+
+      return amount ? `Monto: ${amount} (resta del ingreso)` : 'Resta del ingreso del período.'
+    },
+    actionUrl: () => '/finance/income',
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+
   // ── Identity ──
 
   {

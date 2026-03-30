@@ -32,6 +32,7 @@ describe('notification mappings', () => {
       'finance.dte.discrepancy_found',
       'finance.income.created',
       'finance.exchange_rate.upserted',
+      'finance.credit_note.created',
       'identity.email_verification.completed',
       'payroll_period.exported'
     ])
