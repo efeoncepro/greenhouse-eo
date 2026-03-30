@@ -370,6 +370,20 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Task canónica abierta:
   - `TASK-162`
 
+## Delta 2026-03-30 TASK-162 queda cerrada como baseline canónica de atribución comercial
+- La lane `commercial cost attribution` ya no queda abierta como framing o implementación parcial.
+- Estado resultante:
+  - `greenhouse_serving.commercial_cost_attribution` queda institucionalizada como truth layer materializada
+  - `operational_pl_snapshots` sigue como serving derivado para margen/rentabilidad por scope
+  - `member_capacity_economics` sigue como serving derivado para costo/capacidad por miembro
+  - `client_labor_cost_allocation` queda acotado a bridge/input interno del materializer y provenance histórica
+- Corte final aplicado:
+  - `src/lib/person-360/get-person-finance.ts` ya no lee el bridge legacy
+  - `src/lib/finance/payroll-cost-allocation.ts` ya resume la capa canónica/shared
+- Regla para follow-ons:
+  - lanes como `TASK-143`, `TASK-146`, `TASK-147` y `TASK-160` no deben reintroducir lecturas directas del bridge legacy
+  - si necesitan explain comercial deben apoyarse en `commercial_cost_attribution`
+
 ## Delta 2026-03-30 Sentry incident reader hardening
 - `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.
 - Nuevo contrato soportado:

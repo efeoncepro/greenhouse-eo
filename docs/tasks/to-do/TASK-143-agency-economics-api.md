@@ -8,6 +8,13 @@
   - no debe leer `client_labor_cost_allocation` directamente
   - si hace falta explain de costo comercial, debe delegarlo a la surface/API de `commercial_cost_attribution`, no recomputarlo localmente
 
+## Delta 2026-03-30 — baseline ya cerrada
+
+- `TASK-162` ya quedó cerrada como baseline institucional.
+- Esta lane ya no debe reinterpretar la atribución comercial:
+  - rentabilidad resumida por `space` debe seguir sobre `operational_pl_snapshots`
+  - explain puntual de costo comercial debe salir de `commercial_cost_attribution`
+
 ## Status
 
 | Campo | Valor |

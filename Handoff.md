@@ -4,6 +4,34 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — cierre formal de TASK-162
+
+### Objetivo
+- Ejecutar el último cut técnico sobre consumers residuales del bridge legacy y cerrar `TASK-162` como baseline institucional.
+
+### Delta de ejecución
+- Residual runtime cortado:
+  - `src/lib/person-360/get-person-finance.ts`
+  - `Person Finance` ya usa `greenhouse_serving.commercial_cost_attribution` para explain por miembro/período
+- Residual técnico secundario cortado:
+  - `src/lib/finance/payroll-cost-allocation.ts`
+  - ahora resume `readCommercialCostAttributionByClientForPeriod()`
+- Test nuevo:
+  - `src/lib/person-360/get-person-finance.test.ts`
+- Lifecycle cerrado:
+  - `docs/tasks/complete/TASK-162-canonical-commercial-cost-attribution.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+- Documentación viva alineada:
+  - `project_context.md`
+  - `changelog.md`
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/finance/payroll-cost-allocation.test.ts src/lib/person-360/get-person-finance.test.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/commercial-cost-attribution/insights.test.ts src/lib/commercial-cost-attribution/store.test.ts src/lib/sync/projections/commercial-cost-attribution.test.ts src/lib/cost-intelligence/compute-operational-pl.test.ts`
+- `pnpm exec eslint src/lib/finance/payroll-cost-allocation.ts src/lib/finance/payroll-cost-allocation.test.ts src/lib/person-360/get-person-finance.ts src/lib/person-360/get-person-finance.test.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
 ## Sesión 2026-03-30 — consolidación arquitectónica de TASK-162
 
 ### Objetivo

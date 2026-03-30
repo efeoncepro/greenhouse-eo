@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { readCommercialCostAttributionByClientForPeriod } from '@/lib/commercial-cost-attribution/member-period-attribution'
 import { roundCurrency, toNumber } from '@/lib/finance/shared'
 
 // ── Types ──
@@ -11,14 +11,6 @@ export interface ClientLaborCost {
   allocatedLaborClp: number
   headcountFte: number
   memberCount: number
-}
-
-type LaborCostRow = {
-  client_id: string
-  client_name: string
-  allocated_labor_clp: string | number
-  headcount_fte: string | number
-  headcount_members: string | number
 }
 
 // ── Engine ──
@@ -39,26 +31,13 @@ export const computeClientLaborCosts = async (
   year: number,
   month: number
 ): Promise<ClientLaborCost[]> => {
-  const rows = await runGreenhousePostgresQuery<LaborCostRow>(
-    `SELECT
-       client_id,
-       client_name,
-       SUM(allocated_labor_clp) AS allocated_labor_clp,
-       SUM(fte_contribution) AS headcount_fte,
-       COUNT(DISTINCT member_id) AS headcount_members
-     FROM greenhouse_serving.client_labor_cost_allocation
-     WHERE period_year = $1 AND period_month = $2
-       AND allocated_labor_clp IS NOT NULL
-     GROUP BY client_id, client_name
-     ORDER BY SUM(allocated_labor_clp) DESC`,
-    [year, month]
-  )
+  const rows = await readCommercialCostAttributionByClientForPeriod(year, month)
 
   return rows.map(row => ({
-    clientId: row.client_id,
-    clientName: row.client_name,
-    allocatedLaborClp: roundCurrency(toNumber(row.allocated_labor_clp)),
-    headcountFte: Math.round(toNumber(row.headcount_fte) * 100) / 100,
-    memberCount: toNumber(row.headcount_members)
+    clientId: row.clientId,
+    clientName: row.clientName,
+    allocatedLaborClp: roundCurrency(toNumber(row.laborCostClp)),
+    headcountFte: Math.round(toNumber(row.headcountFte) * 100) / 100,
+    memberCount: toNumber(row.memberCount)
   }))
 }

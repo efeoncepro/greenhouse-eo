@@ -4,11 +4,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `in-progress` |
+| Lifecycle | `complete` |
 | Priority | P0 |
 | Impact | Muy alto |
 | Effort | Alto |
-| Status real | `Implementación inicial` |
+| Status real | `Cerrada` |
 | Rank | — |
 | Domain | Finance / Cost Intelligence / Team Capacity / Payroll / Platform |
 | Sequence | Follow-on canónico post `TASK-055`, `TASK-057`, `TASK-067`→`TASK-071`, `TASK-138` y `TASK-139` |
@@ -140,6 +140,18 @@ La capa no reemplaza a Finance ni a Cost Intelligence:
   - Nexa
 - Fuente canónica del cutover:
   - `docs/architecture/GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`
+
+## Delta 2026-03-30 — slice 7: corte final de residual consumers
+
+- Se cortó el residual runtime de `Person Finance`:
+  - `src/lib/person-360/get-person-finance.ts`
+  - ahora lee `greenhouse_serving.commercial_cost_attribution` para explain por miembro/período
+- Se cortó el residual técnico secundario:
+  - `src/lib/finance/payroll-cost-allocation.ts`
+  - ahora resume `readCommercialCostAttributionByClientForPeriod()`
+- Resultado:
+  - fuera del materializer/shared layer, ya no quedan consumers runtime directos leyendo `greenhouse_serving.client_labor_cost_allocation`
+  - el bridge legacy queda acotado a input interno/provenance, no a surfaces activas de producto
 
 ## Why This Task Exists
 
@@ -482,7 +494,6 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Existe un contrato canónico documentado para `commercial cost attribution`
 - [x] Existe un contrato canónico documentado para `commercial cost attribution`
 - [x] El contrato define versión y estrategia de evolución
 - [x] Finance, Team Capacity y Cost Intelligence reutilizan la misma clasificación de assignments
@@ -491,9 +502,9 @@ Reglas obligatorias:
 - [x] Existe health técnico y health semántico para esta capa
 - [x] Los consumers prioritarios de Finance + Agency + People tienen estrategia de cutover definida
 - [x] Hay tests con fixtures de negocio reales que cubren casos tipo `Sky`
-- [ ] Existe una explain/audit surface para troubleshooting de attribution
 - [x] Existe una explain/audit surface para troubleshooting de attribution
 - [x] Arquitectura y task docs quedan actualizadas sin contradicción entre módulos
+- [x] El residual runtime directo de `client_labor_cost_allocation` quedó cortado fuera del materializer/shared layer
 
 ## Verification
 
@@ -506,10 +517,8 @@ Reglas obligatorias:
 
 ## Open Questions
 
-- ¿La capa canónica debe persistirse como nueva serving table o basta con endurecer `client_labor_cost_allocation`?
-- ¿Qué porcentaje de overhead debe seguir mostrándose como costo del cliente vs bucket corporativo?
-- ¿Cómo se representa explícitamente costo no billable pero comercialmente asignado?
-- ¿Hace falta un evento nuevo del bus para materialización de esta capa o el P&L ya basta como boundary?
+- No quedan preguntas bloqueantes para cerrar esta lane.
+- Los remanentes pasan a follow-ons de consumer/UX, no a deuda estructural del contrato canónico.
 
 ## Follow-ups
 

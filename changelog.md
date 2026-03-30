@@ -9,6 +9,11 @@
 
 ## 2026-03-30
 
+- `TASK-162` quedó formalmente cerrada:
+  - `commercial_cost_attribution` ya es truth layer materializada con projection reactiva, health y explain
+  - `Person Finance` dejó de leer `client_labor_cost_allocation` y ahora explica costo desde la capa canónica
+  - `computeClientLaborCosts()` dejó de resumir el bridge legacy directo y ahora reutiliza el reader shared
+  - el bridge `client_labor_cost_allocation` queda acotado al materializer/provenance interna, no a consumers runtime nuevos
 - Se consolidó en arquitectura canónica el estado actual de `TASK-162`:
   - `commercial_cost_attribution` quedó documentada como truth layer materializada
   - Finance, Cost Intelligence y el modelo maestro ya explicitan la matriz de cutover por consumer

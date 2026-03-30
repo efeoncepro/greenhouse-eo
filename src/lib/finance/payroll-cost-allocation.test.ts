@@ -1,9 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const mockRunGreenhousePostgresQuery = vi.fn()
+const mockReadCommercialCostAttributionByClientForPeriod = vi.fn()
 
-vi.mock('@/lib/postgres/client', () => ({
-  runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
+vi.mock('@/lib/commercial-cost-attribution/member-period-attribution', () => ({
+  readCommercialCostAttributionByClientForPeriod: (...args: unknown[]) =>
+    mockReadCommercialCostAttributionByClientForPeriod(...args)
 }))
 
 import { computeClientLaborCosts } from '@/lib/finance/payroll-cost-allocation'
@@ -13,24 +14,22 @@ describe('computeClientLaborCosts', () => {
     vi.clearAllMocks()
   })
 
-  it('queries the serving view for the requested payroll period', async () => {
-    mockRunGreenhousePostgresQuery.mockResolvedValue([
+  it('reads client labor cost from the canonical commercial attribution layer for the requested period', async () => {
+    mockReadCommercialCostAttributionByClientForPeriod.mockResolvedValue([
       {
-        client_id: 'client-1',
-        client_name: 'Sky Airline',
-        allocated_labor_clp: '2500000.49',
-        headcount_fte: '1.500',
-        headcount_members: '2'
+        clientId: 'client-1',
+        clientName: 'Sky Airline',
+        laborCostClp: 2500000.49,
+        overheadCostClp: 250000,
+        loadedCostClp: 2750000.49,
+        headcountFte: 1.5,
+        memberCount: 2
       }
     ])
 
     const result = await computeClientLaborCosts(2026, 3)
 
-    expect(mockRunGreenhousePostgresQuery).toHaveBeenCalledWith(
-      expect.stringContaining('FROM greenhouse_serving.client_labor_cost_allocation'),
-      [2026, 3]
-    )
-    expect(mockRunGreenhousePostgresQuery.mock.calls[0][0]).toContain('allocated_labor_clp IS NOT NULL')
+    expect(mockReadCommercialCostAttributionByClientForPeriod).toHaveBeenCalledWith(2026, 3)
     expect(result).toEqual([
       {
         clientId: 'client-1',
@@ -43,22 +42,15 @@ describe('computeClientLaborCosts', () => {
   })
 
   it('uses period_year and period_month params, never CURRENT_DATE', async () => {
-    mockRunGreenhousePostgresQuery.mockResolvedValue([])
+    mockReadCommercialCostAttributionByClientForPeriod.mockResolvedValue([])
 
     await computeClientLaborCosts(2026, 2)
 
-    const query = mockRunGreenhousePostgresQuery.mock.calls[0][0] as string
-    const params = mockRunGreenhousePostgresQuery.mock.calls[0][1] as unknown[]
-
-    expect(query).not.toContain('CURRENT_DATE')
-    expect(query).not.toContain('NOW()')
-    expect(query).toContain('period_year')
-    expect(query).toContain('period_month')
-    expect(params).toEqual([2026, 2])
+    expect(mockReadCommercialCostAttributionByClientForPeriod).toHaveBeenCalledWith(2026, 2)
   })
 
   it('returns empty array when no labor allocations exist', async () => {
-    mockRunGreenhousePostgresQuery.mockResolvedValue([])
+    mockReadCommercialCostAttributionByClientForPeriod.mockResolvedValue([])
 
     const result = await computeClientLaborCosts(2025, 12)
 
@@ -66,9 +58,9 @@ describe('computeClientLaborCosts', () => {
   })
 
   it('handles multiple clients in the same period', async () => {
-    mockRunGreenhousePostgresQuery.mockResolvedValue([
-      { client_id: 'c-1', client_name: 'Sky', allocated_labor_clp: '1000000', headcount_fte: '1', headcount_members: '1' },
-      { client_id: 'c-2', client_name: 'Aldea', allocated_labor_clp: '500000', headcount_fte: '0.5', headcount_members: '1' }
+    mockReadCommercialCostAttributionByClientForPeriod.mockResolvedValue([
+      { clientId: 'c-1', clientName: 'Sky', laborCostClp: 1000000, overheadCostClp: 0, loadedCostClp: 1000000, headcountFte: 1, memberCount: 1 },
+      { clientId: 'c-2', clientName: 'Aldea', laborCostClp: 500000, overheadCostClp: 0, loadedCostClp: 500000, headcountFte: 0.5, memberCount: 1 }
     ])
 
     const result = await computeClientLaborCosts(2026, 3)

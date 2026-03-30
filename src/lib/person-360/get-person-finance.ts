@@ -245,18 +245,18 @@ const buildFinanceOverview = async (
     ).catch(() => [] as AssignmentRow[]),
     runGreenhousePostgresQuery<CostAttributionRow>(
       `SELECT
-        clca.client_id,
-        clca.client_name,
+        cca.client_id,
+        cca.client_name,
         o.organization_name,
-        clca.fte_contribution AS fte_allocation,
-        clca.allocated_labor_clp,
-        clca.period_year,
-        clca.period_month
-      FROM greenhouse_serving.client_labor_cost_allocation clca
-      LEFT JOIN greenhouse_core.spaces sp ON sp.client_id = clca.client_id AND sp.active = TRUE
+        cca.fte_contribution AS fte_allocation,
+        cca.commercial_labor_cost_target AS allocated_labor_clp,
+        cca.period_year,
+        cca.period_month
+      FROM greenhouse_serving.commercial_cost_attribution cca
+      LEFT JOIN greenhouse_core.spaces sp ON sp.client_id = cca.client_id AND sp.active = TRUE
       LEFT JOIN greenhouse_core.organizations o ON o.organization_id = sp.organization_id
-      WHERE clca.member_id = $1
-      ORDER BY clca.period_year DESC, clca.period_month DESC, clca.allocated_labor_clp DESC
+      WHERE cca.member_id = $1
+      ORDER BY cca.period_year DESC, cca.period_month DESC, cca.commercial_labor_cost_target DESC
       LIMIT 20`,
       [memberId]
     ).catch(() => [] as CostAttributionRow[]),
