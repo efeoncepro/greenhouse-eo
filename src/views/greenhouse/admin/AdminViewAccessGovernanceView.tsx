@@ -531,7 +531,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
       >
         <ExecutiveMiniStatCard title='Vistas registradas' value={String(data.totals.registeredViews)} detail='Mapa inicial de superficies gobernables' icon='tabler-layout-grid' tone='info' />
         <ExecutiveMiniStatCard title='Roles configurados' value={String(data.totals.configuredRoles)} detail='Perfiles visibles en la matrix actual' icon='tabler-shield-lock' tone='info' />
-        <ExecutiveMiniStatCard title='Usuarios para preview' value={String(data.totals.previewableUsers)} detail='Base actual para simular navegación' icon='tabler-user-search' tone='success' />
+        <ExecutiveMiniStatCard title='Principales para preview' value={String(data.totals.previewableUsers)} detail='Base user-scoped con bridge a persona canónica' icon='tabler-user-search' tone='success' />
         <ExecutiveMiniStatCard title='Secciones cubiertas' value={String(data.totals.sections)} detail='Gestión, equipo, finanzas y administración' icon='tabler-layout-kanban' tone='warning' />
       </Box>
 
@@ -840,7 +840,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                       select
                       fullWidth
                       size='small'
-                      label='Seleccionar usuario'
+                      label='Seleccionar principal portal'
                       value={previewUserId}
                       onChange={event => setPreviewUserId(event.target.value)}
                     >
@@ -852,7 +852,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                     </TextField>
                   </Box>
                   <Alert severity='info' variant='outlined'>
-                    El preview ya mezcla baseline por rol con overrides por usuario. Aquí medimos la lectura efectiva que terminaría viendo esa sesión.
+                    El preview sigue siendo `userId`-scoped para session y overrides. Aquí mostramos además el bridge a persona canónica para no leer `client_user` como raíz humana.
                   </Alert>
                 </Stack>
 
@@ -884,7 +884,25 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                           </Stack>
                           <Stack direction='row' spacing={1} flexWrap='wrap'>
                             <Chip size='small' color='info' variant='tonal' label={previewUser.tenantType} />
+                            <Chip
+                              size='small'
+                              color={previewUser.portalAccessState === 'active' ? 'success' : previewUser.portalAccessState === 'inactive' ? 'default' : 'warning'}
+                              variant='tonal'
+                              label={`portal:${previewUser.portalAccessState}`}
+                            />
+                            <Chip size='small' variant='outlined' label={`bridge:${previewUser.resolutionSource}`} />
                             <Chip size='small' variant='outlined' label={`${previewViews.length} vistas visibles`} />
+                          </Stack>
+                        </Stack>
+
+                        <Stack spacing={1}>
+                          <Typography variant='body2' color='text.secondary'>
+                            Contrato canónico
+                          </Typography>
+                          <Stack direction='row' spacing={1} flexWrap='wrap'>
+                            <Chip size='small' variant='outlined' label={`user:${previewUser.userId}`} />
+                            {previewUser.identityProfileId ? <Chip size='small' color='secondary' variant='tonal' label={`person:${previewUser.identityProfileId}`} /> : null}
+                            {previewUser.memberId ? <Chip size='small' color='warning' variant='tonal' label={`member:${previewUser.memberId}`} /> : null}
                           </Stack>
                         </Stack>
 

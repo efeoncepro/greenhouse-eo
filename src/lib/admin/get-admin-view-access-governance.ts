@@ -3,6 +3,11 @@ import 'server-only'
 import { getAdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
 import { getAdminPersistedViewAccessGovernance } from '@/lib/admin/view-access-store'
 import { GOVERNANCE_SECTIONS, VIEW_REGISTRY, type GovernanceSection, type GovernanceViewRegistryEntry } from '@/lib/admin/view-access-catalog'
+import {
+  getCanonicalPersonsByUserIds,
+  type CanonicalPersonPortalAccessState,
+  type CanonicalPersonResolutionSource
+} from '@/lib/identity/canonical-person'
 
 export type AdminGovernanceRole = {
   roleCode: string
@@ -21,6 +26,10 @@ export type AdminGovernanceUserPreview = {
   tenantType: 'client' | 'efeonce_internal'
   roleCodes: string[]
   routeGroups: string[]
+  identityProfileId: string | null
+  memberId: string | null
+  portalAccessState: CanonicalPersonPortalAccessState
+  resolutionSource: CanonicalPersonResolutionSource
 }
 
 export type AdminGovernanceUserOverride = {
@@ -67,6 +76,34 @@ export type AdminGovernanceOverview = {
     rolesWithPersistedAssignments: number
     usesPersistedRegistry: boolean
   }
+}
+
+export const enrichGovernancePreviewUsers = async (users: Array<{
+  userId: string
+  fullName: string
+  email: string
+  tenantType: 'client' | 'efeonce_internal'
+  roleCodes: string[]
+  routeGroups: string[]
+}>): Promise<AdminGovernanceUserPreview[]> => {
+  const canonicalByUserId = await getCanonicalPersonsByUserIds(users.map(user => user.userId))
+
+  return users.map(user => {
+    const canonical = canonicalByUserId.get(user.userId)
+
+    return {
+      userId: user.userId,
+      fullName: canonical?.displayName ?? user.fullName,
+      email: canonical?.canonicalEmail ?? user.email,
+      tenantType: canonical?.tenantType ?? user.tenantType,
+      roleCodes: user.roleCodes,
+      routeGroups: user.routeGroups,
+      identityProfileId: canonical?.identityProfileId ?? null,
+      memberId: canonical?.memberId ?? null,
+      portalAccessState: canonical?.portalAccessState ?? 'degraded_link',
+      resolutionSource: canonical?.resolutionSource ?? 'fallback'
+    }
+  })
 }
 
 const roleCanAccessView = (role: AdminGovernanceRole, view: GovernanceViewRegistryEntry) => {
@@ -128,14 +165,16 @@ export const getAdminViewAccessGovernance = async (): Promise<AdminGovernanceOve
     assignedUsers: role.assignedUsers
   }))
 
-  const users: AdminGovernanceUserPreview[] = access.users.map(user => ({
-    userId: user.userId,
-    fullName: user.fullName,
-    email: user.email,
-    tenantType: user.tenantType,
-    roleCodes: user.roleCodes,
-    routeGroups: user.routeGroups
-  }))
+  const users = await enrichGovernancePreviewUsers(
+    access.users.map(user => ({
+      userId: user.userId,
+      fullName: user.fullName,
+      email: user.email,
+      tenantType: user.tenantType,
+      roleCodes: user.roleCodes,
+      routeGroups: user.routeGroups
+    }))
+  )
 
   const views: AdminGovernanceMatrixEntry[] = VIEW_REGISTRY.map(view => ({
     ...view,
