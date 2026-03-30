@@ -18,6 +18,7 @@ Esta task ya no define la política institucional completa. Toma esa política y
 
 ## Delta 2026-03-30
 
+- `TASK-141` quedó cerrada como baseline institucional.
 - `TASK-141` ya dejó fuente canónica explícita en:
   - `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
 - Ya existe primer slice shared reusable en:

@@ -15,6 +15,7 @@ Consolidar Greenhouse Notifications sobre un modelo `person-first`, usando `iden
 
 ## Delta 2026-03-30
 
+- `TASK-141` quedó cerrada como baseline institucional.
 - `TASK-141` ya dejó contrato institucional y primer resolver shared en:
   - `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
   - `src/lib/identity/canonical-person.ts`

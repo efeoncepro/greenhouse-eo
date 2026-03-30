@@ -2,6 +2,10 @@
 
 ## 2026-03-30
 
+- `TASK-141` quedó formalmente cerrada como lane institucional:
+  - el contrato canónico persona/member/client_user ya no queda abierto como diseño
+  - la implementación mínima reusable quedó activa con `src/lib/identity/canonical-person.ts`
+  - el remanente operativo se distribuye explícitamente a `TASK-140`, `TASK-134` y `TASK-162`
 - `TASK-141` avanzó de contrato endurecido a primer slice runtime conservador:
   - nueva fuente canónica `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
   - nuevo resolver shared `src/lib/identity/canonical-person.ts`

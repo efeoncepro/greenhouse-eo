@@ -54,6 +54,36 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - `TASK-162`:
   - ya puede apoyarse en este contrato sin reabrir persona/member/user, preservando `member_id` como llave operativa de costo
 
+## Sesión 2026-03-30 — cierre formal de `TASK-141` en `develop`
+
+### Objetivo
+- Cerrar la lane institucional sin mover de rama y sin mezclar el trabajo paralelo de Finance ya abierto en `develop`.
+
+### Delta de ejecución
+- `TASK-141` se reclasificó de `in-progress` a `complete`.
+- El archivo canónico quedó en:
+  - `docs/tasks/complete/TASK-141-canonical-person-identity-consumption.md`
+- Se actualizaron:
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `project_context.md`
+  - `changelog.md`
+- Criterio de cierre explicitado:
+  - la lane queda cerrada por contrato institucional + resolver shared + primera adopción real
+  - la adopción restante se delega formalmente a `TASK-140`, `TASK-134` y `TASK-162`
+
+### Validación ejecutada
+- `git diff --check`
+
+### Riesgo / coordinación
+- `develop` mantiene además cambios paralelos sin commitear en Finance:
+  - `src/app/api/finance/dashboard/pnl/route.ts`
+  - `src/app/api/finance/dashboard/summary/route.ts`
+  - `src/app/api/finance/income/route.ts`
+  - `src/lib/finance/postgres-store-slice2.ts`
+  - `src/views/greenhouse/finance/IncomeListView.tsx`
+- No se deben mezclar en este cierre de `TASK-141`; stage/commit selectivo solamente.
+
 ## Sesión 2026-03-30 — Hardening canónico de atribución comercial para Cost Intelligence
 
 ### Objetivo

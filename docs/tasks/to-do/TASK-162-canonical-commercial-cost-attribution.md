@@ -25,6 +25,7 @@ La capa no reemplaza a Finance ni a Cost Intelligence:
 
 ## Delta 2026-03-30
 
+- `TASK-141` quedó cerrada como baseline institucional.
 - `TASK-141` ya quedó formalmente antes de esta lane con:
   - contrato canónico explícito persona/member/user
   - primer resolver shared conservador

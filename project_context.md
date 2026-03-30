@@ -111,6 +111,17 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - notifications sigue privilegiando `userId` como recipient key efectiva cuando existe principal portal
   - el carril no cambia todavía `/admin/views`, outbox payloads ni projections member-scoped
 
+## Delta 2026-03-30 TASK-141 quedó cerrada como baseline institucional
+- La lane `canonical person identity consumption` ya no queda abierta como framing.
+- Estado resultante:
+  - `identity_profile` queda institucionalizado como raíz humana canónica
+  - `member` sigue siendo la llave operativa fuerte para payroll, capacity, finance serving, ICO y costos
+  - `client_user` sigue siendo principal de acceso para sesión, inbox, preferencias, overrides y auditoría
+- Los siguientes cortes ya no deben reabrir este contrato:
+  - `TASK-140` consume el bridge para completar `/admin/views` person-first
+  - `TASK-134` endurece notifications sobre el resolver shared
+  - `TASK-162` construye costo comercial canónico encima de esta separación explícita
+
 ## Delta 2026-03-30 Cost Intelligence foundation bootstrap
 - Greenhouse ya reconoce `cost_intelligence` como domain soportado del projection registry.
 - Base técnica nueva:

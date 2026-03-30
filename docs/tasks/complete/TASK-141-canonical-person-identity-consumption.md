@@ -2,11 +2,11 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
-- Status real: `Parcial`
+- Status real: `Cerrada`
 - Rank: `56`
 - Domain: `identity / platform / access`
 
@@ -29,6 +29,9 @@ Esta task no existe para cambiar una sola pantalla. Existe para dejar explícito
 - Guardrail explícito del slice:
   - no se tocaron recipient keys efectivas, inbox/preferences `userId`-scoped, payloads de outbox ni projections member-scoped
   - `/admin/views` sigue `userId`-scoped para overrides y auditoría, pero ya expone bridge persona/member/user
+- Cierre formal de la task:
+  - el contrato canónico quedó institucionalizado y ya no depende de interpretación ad hoc por consumer
+  - los remanentes de adopción pasan explícitamente a `TASK-140`, `TASK-134` y `TASK-162`
 
 ## Why This Task Exists
 
@@ -323,16 +326,16 @@ Reglas no negociables para este slice:
 
 ## Acceptance Criteria
 
-- [ ] existe una definición institucional clara del objeto persona canónico en Greenhouse
-- [ ] queda explícita la diferencia entre persona, `member` y `client_user`
-- [ ] hay reglas concretas de cuándo cada consumer debe usar cada entidad
-- [ ] existe un shape canónico de resolución reusable para consumers
-- [ ] quedan identificados los consumers con drift actual
-- [ ] existe una estrategia de rollout gradual con degradaciones explícitas y observables
-- [ ] quedan definidos anti-patterns que no deben volver a aparecer
-- [ ] `TASK-140` y `TASK-134` quedan claramente posicionadas como follow-ons o carriles dependientes de esta política
-- [ ] el contrato deja explícito que notifications, outbox, projections, webhooks, ICO y finance no deben degradarse durante la migración
-- [ ] quedan definidos los identificadores operativos que deben preservarse por cada carril sensible (`identity_profile_id`, `member_id`, `user_id`)
+- [x] existe una definición institucional clara del objeto persona canónico en Greenhouse
+- [x] queda explícita la diferencia entre persona, `member` y `client_user`
+- [x] hay reglas concretas de cuándo cada consumer debe usar cada entidad
+- [x] existe un shape canónico de resolución reusable para consumers
+- [x] quedan identificados los consumers con drift actual
+- [x] existe una estrategia de rollout gradual con degradaciones explícitas y observables
+- [x] quedan definidos anti-patterns que no deben volver a aparecer
+- [x] `TASK-140` y `TASK-134` quedan claramente posicionadas como follow-ons o carriles dependientes de esta política
+- [x] el contrato deja explícito que notifications, outbox, projections, webhooks, ICO y finance no deben degradarse durante la migración
+- [x] quedan definidos los identificadores operativos que deben preservarse por cada carril sensible (`identity_profile_id`, `member_id`, `user_id`)
 
 ## Verification
 
@@ -374,6 +377,16 @@ Reglas no negociables para este slice:
 - esta task debería cerrarse antes de declarar estable cualquier nueva wave de consumers person-centric
 - `TASK-134` y `TASK-140` deberían leerse como primeras adopciones visibles
 - si en implementación aparece necesidad de backfill o repair operativo, eso debería salir como lane derivada y no meterse implícitamente en esta misma task
+
+## Closure Note
+
+`TASK-141` se considera cerrada porque ya dejó la policy institucional, el resolver shared y la primera adopción real sin romper claves operativas ni carriles reactivos sensibles.
+
+El remanente ya no pertenece a esta lane:
+
+- `TASK-140`: cutover funcional completo de `/admin/views` a persona previewable real
+- `TASK-134`: hardening transversal de Notifications e inbox/preferencias sobre el contrato shared
+- `TASK-162`: capa canónica de costo comercial apoyada en la separación explícita entre persona, `member` y `client_user`
 
 ## Open Questions
 

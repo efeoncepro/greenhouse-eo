@@ -46,7 +46,6 @@ Primer bloque operativo asignado:
 | `TASK-115` | [TASK-115-nexa-ui-completion.md](in-progress/TASK-115-nexa-ui-completion.md) | P1 | Alto | Medio | Implementación | Edit inline, suggestions, feedback, floating portal-wide, thread history, NexaPanel cleanup |
 | `TASK-121` | [TASK-121-admin-center-hardening.md](in-progress/TASK-121-admin-center-hardening.md) | P1 | Alto | Bajo | Implementación | Sorting, skeleton, health real, deep-link filtros y alertas consolidadas para Admin Center |
 | `TASK-137` | [TASK-137-ui-foundation-activation.md](in-progress/TASK-137-ui-foundation-activation.md) | P1 | Alto | Medio | Parcial | Foundation UI ya activada con RHF en auth, `GreenhouseCalendar`, `GreenhouseDatePicker`, `GreenhouseDragList` y primer calendario operativo en `/admin/operational-calendar` |
-| `TASK-141` | [TASK-141-canonical-person-identity-consumption.md](in-progress/TASK-141-canonical-person-identity-consumption.md) | P1 | Muy alto | Medio | Slice 1 - contrato + resolver | Contrato canónico persona/member/client_user ya explicitado y con primer resolver shared adoptado en `/admin/views`, preservando `user_id` para preview/overrides y `member_id` para carriles operativos |
 
 ## To Do
 
@@ -224,6 +223,7 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 ## Complete
 
 | [TASK-067-cost-intelligence-foundation.md](complete/TASK-067-cost-intelligence-foundation.md) | Foundation técnica de Cost Intelligence cerrada: schema `greenhouse_cost_intelligence`, serving tables base, eventos `accounting.*`, domain `cost_intelligence`, cron route dedicada validada y continuidad amarrada al P&L canónico de Finance. |
+| [TASK-141-canonical-person-identity-consumption.md](complete/TASK-141-canonical-person-identity-consumption.md) | Contrato canónico de persona cerrado como baseline institucional: `identity_profile` raíz humana, `member` faceta operativa, `client_user` principal portal; resolver shared activo y primer bridge en notifications y `/admin/views` sin romper `user_id` ni `member_id`. |
 | [TASK-068-period-closure-status-projection.md](complete/TASK-068-period-closure-status-projection.md) | `period_closure_status` cerrada: readiness por período, close/reopen, APIs, alineación con calendario operativo y smoke reactivo E2E validado para el domain `cost_intelligence`. |
 | [TASK-069-operational-pl-projection.md](complete/TASK-069-operational-pl-projection.md) | `operational_pl` cerrada para su baseline: snapshots materializados por `client/space/organization`, APIs de lectura, smoke reactivo E2E, health/alerts básicas y contrato estable ya consumido por Finance Intelligence. |
 | [TASK-136-admin-view-access-governance.md](complete/TASK-136-admin-view-access-governance.md) | Gobernanza de vistas cerrada: catálogo `view_code`, persistencia role/user, expiración, auditoría, notificación reactiva, `authorizedViews` en sesión, enforcement por layout/página y `/admin/views` como superficie operable de administración. |
