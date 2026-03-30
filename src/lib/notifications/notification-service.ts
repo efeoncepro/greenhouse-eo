@@ -69,7 +69,16 @@ export class NotificationService {
 
       if (channels.length === 0) {
         result.skipped.push({ userId: recipient.userId, reason: 'all_channels_disabled' })
-        await this.logDispatch(null, recipient.userId, input.category, 'in_app', 'skipped', 'all_channels_disabled')
+        await this.logDispatch(
+          null,
+          recipient.userId,
+          input.category,
+          'in_app',
+          'skipped',
+          'all_channels_disabled',
+          undefined,
+          input.metadata
+        )
         continue
       }
 
@@ -81,12 +90,30 @@ export class NotificationService {
           const notificationId = await this.createInAppNotification(input, recipient.userId, categoryConfig.icon)
 
           sentChannels.push('in_app')
-          await this.logDispatch(notificationId, recipient.userId, input.category, 'in_app', 'sent')
+          await this.logDispatch(
+            notificationId,
+            recipient.userId,
+            input.category,
+            'in_app',
+            'sent',
+            undefined,
+            undefined,
+            input.metadata
+          )
         } catch (error) {
           const msg = error instanceof Error ? error.message : 'Unknown error'
 
           result.failed.push({ userId: recipient.userId, channel: 'in_app', error: msg })
-          await this.logDispatch(null, recipient.userId, input.category, 'in_app', 'failed', undefined, msg)
+          await this.logDispatch(
+            null,
+            recipient.userId,
+            input.category,
+            'in_app',
+            'failed',
+            undefined,
+            msg,
+            input.metadata
+          )
         }
       }
 
@@ -97,22 +124,68 @@ export class NotificationService {
 
           if (emailResult.status === 'sent') {
             sentChannels.push('email')
-            await this.logDispatch(null, recipient.userId, input.category, 'email', 'sent')
+            await this.logDispatch(
+              null,
+              recipient.userId,
+              input.category,
+              'email',
+              'sent',
+              undefined,
+              undefined,
+              input.metadata
+            )
           } else if (emailResult.status === 'skipped') {
             result.skipped.push({ userId: recipient.userId, reason: emailResult.error || 'email_delivery_skipped' })
-            await this.logDispatch(null, recipient.userId, input.category, 'email', 'skipped', emailResult.error || 'email_delivery_skipped')
+            await this.logDispatch(
+              null,
+              recipient.userId,
+              input.category,
+              'email',
+              'skipped',
+              emailResult.error || 'email_delivery_skipped',
+              undefined,
+              input.metadata
+            )
           } else {
             result.failed.push({ userId: recipient.userId, channel: 'email', error: emailResult.error || 'Email delivery failed' })
-            await this.logDispatch(null, recipient.userId, input.category, 'email', 'failed', undefined, emailResult.error || 'Email delivery failed')
+            await this.logDispatch(
+              null,
+              recipient.userId,
+              input.category,
+              'email',
+              'failed',
+              undefined,
+              emailResult.error || 'Email delivery failed',
+              input.metadata
+            )
           }
         } catch (error) {
           const msg = error instanceof Error ? error.message : 'Unknown error'
 
           result.failed.push({ userId: recipient.userId, channel: 'email', error: msg })
-          await this.logDispatch(null, recipient.userId, input.category, 'email', 'failed', undefined, msg)
+          await this.logDispatch(
+            null,
+            recipient.userId,
+            input.category,
+            'email',
+            'failed',
+            undefined,
+            msg,
+            input.metadata
+          )
         }
       } else if (channels.includes('email') && !recipient.email) {
         result.skipped.push({ userId: recipient.userId, reason: 'email_not_provided' })
+        await this.logDispatch(
+          null,
+          recipient.userId,
+          input.category,
+          'email',
+          'skipped',
+          'email_not_provided',
+          undefined,
+          input.metadata
+        )
       }
 
       if (sentChannels.length > 0) {
@@ -217,14 +290,24 @@ export class NotificationService {
     channel: NotificationChannel,
     status: 'sent' | 'skipped' | 'failed',
     skipReason?: string,
-    errorMessage?: string
+    errorMessage?: string,
+    metadata?: Record<string, unknown>
   ): Promise<void> {
     try {
       await runGreenhousePostgresQuery(
         `INSERT INTO greenhouse_notifications.notification_log
-           (notification_id, user_id, category, channel, status, skip_reason, error_message, created_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())`,
-        [notificationId, userId, category, channel, status, skipReason || null, errorMessage || null]
+           (notification_id, user_id, category, channel, status, skip_reason, metadata, error_message, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())`,
+        [
+          notificationId,
+          userId,
+          category,
+          channel,
+          status,
+          skipReason || null,
+          JSON.stringify(metadata || {}),
+          errorMessage || null
+        ]
       )
     } catch {
       // Log dispatch failure is non-blocking

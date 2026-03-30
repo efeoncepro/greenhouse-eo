@@ -52,9 +52,16 @@ const DDL_STATEMENTS = [
     channel           TEXT NOT NULL CHECK (channel IN ('in_app', 'email')),
     status            TEXT NOT NULL CHECK (status IN ('sent', 'skipped', 'failed')),
     skip_reason       TEXT,
+    metadata          JSONB DEFAULT '{}',
     error_message     TEXT,
     created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
-  )`
+  )`,
+
+  `ALTER TABLE greenhouse_notifications.notification_log
+   ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}'`,
+
+  `CREATE INDEX IF NOT EXISTS idx_notification_log_user_category_event
+   ON greenhouse_notifications.notification_log (user_id, category, created_at DESC)`
 ]
 
 export const ensureNotificationSchema = async (): Promise<void> => {

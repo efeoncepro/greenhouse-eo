@@ -7,6 +7,20 @@
 
 ## 2026-03-29
 
+### TASK-129 webhook notifications consumer started
+- Se inició `TASK-129` como un consumer institucional nuevo sobre el bus outbound, sin reemplazar el carril reactivo legacy.
+- El repo ahora soporta:
+  - `POST /api/internal/webhooks/notification-dispatch`
+  - `POST /api/admin/ops/webhooks/seed-notifications`
+  - contrato de secretos `WEBHOOK_NOTIFICATIONS_SECRET` + `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF`
+- El target del subscriber de notificaciones soporta bypass opcional de `Deployment Protection`, alineado al patrón ya validado por el canary.
+
+### TASK-129 hardening + Vercel secret-ref rollout
+- El consumer de notificaciones ahora exige firma cuando existe secreto resuelto y ya no queda `fail-open` ante deliveries sin `x-greenhouse-signature`.
+- La deduplicación cubre también dispatches `email-only` usando metadata persistida en `notification_log`, no solo filas visibles en `notifications`.
+- Vercel ya tiene `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF=webhook-notifications-secret` en `staging` y `production`.
+- El remanente operativo queda concentrado en GCP Secret Manager y en la validación E2E de `staging`.
+
 ### TASK-131 closed with runtime-vs-tooling secret posture separation
 - `src/lib/cloud/secrets.ts` ahora clasifica secretos tracked entre `runtime` y `tooling`.
 - `src/lib/cloud/health.ts` evalúa `postureChecks.secrets` solo con secretos runtime-críticos y conserva el detalle de tooling por separado.
