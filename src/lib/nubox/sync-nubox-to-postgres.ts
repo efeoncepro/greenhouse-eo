@@ -7,6 +7,20 @@ import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@
 import { ensureOrganizationForSupplier } from '@/lib/account-360/organization-identity'
 import type { NuboxConformedSale, NuboxConformedPurchase, NuboxConformedBankMovement } from '@/lib/nubox/types'
 
+/** Safely parse a numeric value that may come as string, quoted string, or number from BigQuery */
+const safeNum = (v: unknown): number | null => {
+  if (v == null) return null
+  if (typeof v === 'number') return v
+
+  const s = String(v).replace(/^"|"$/g, '').trim()
+
+  if (s === '' || s === 'null') return null
+
+  const n = Number(s)
+
+  return Number.isFinite(n) ? n : null
+}
+
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export type SyncNuboxToPostgresResult = {
@@ -94,7 +108,7 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
         sale.dte_type_code,
         sale.folio,
         sale.organization_id || null,
-        sale.balance ?? null,
+        safeNum(sale.balance),
         isAnnulled,
         sale.pdf_url,
         sale.xml_url
@@ -175,9 +189,9 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
         sale.folio,
         sale.emission_date,
         sale.due_date,
-        Number(sale.net_amount ?? 0) * signMultiplier,
-        Number(sale.tax_vat_amount ?? 0) * signMultiplier,
-        Number(sale.total_amount ?? 0) * signMultiplier,
+        (safeNum(sale.net_amount) ?? 0) * signMultiplier,
+        (safeNum(sale.tax_vat_amount) ?? 0) * signMultiplier,
+        (safeNum(sale.total_amount) ?? 0) * signMultiplier,
         isCreditNote ? 'paid' : (isAnnulled ? 'written_off' : 'pending'),
         mapDteTypeToIncomeType(sale.dte_type_code),
         Number(sale.nubox_sale_id),
@@ -189,10 +203,10 @@ const upsertIncomeFromSale = async (sale: NuboxConformedSale): Promise<'created'
         isAnnulled,
         sale.dte_type_abbreviation,
         sale.dte_type_name,
-        sale.exempt_amount != null ? Number(sale.exempt_amount) * signMultiplier : null,
-        sale.other_taxes_amount != null ? Number(sale.other_taxes_amount) * signMultiplier : null,
-        sale.withholding_amount != null ? Number(sale.withholding_amount) * signMultiplier : null,
-        sale.balance ?? null,
+        safeNum(sale.exempt_amount) != null ? (safeNum(sale.exempt_amount) ?? 0) * signMultiplier : null,
+        safeNum(sale.other_taxes_amount) != null ? (safeNum(sale.other_taxes_amount) ?? 0) * signMultiplier : null,
+        safeNum(sale.withholding_amount) != null ? (safeNum(sale.withholding_amount) ?? 0) * signMultiplier : null,
+        safeNum(sale.balance),
         sale.payment_form_code === '1' ? 'contado' : sale.payment_form_code === '2' ? 'credito' : null,
         sale.payment_form_name,
         sale.origin_name,
@@ -298,7 +312,7 @@ const upsertExpenseFromPurchase = async (
         purchase.document_status_name,
         purchase.is_annulled ?? false,
         purchase.document_status_name,
-        purchase.balance ?? null,
+        safeNum(purchase.balance),
         purchase.pdf_url
       ]
     )
@@ -364,10 +378,10 @@ const upsertExpenseFromPurchase = async (
       [
         expenseId,
         `${purchase.dte_type_name || 'Factura'} — ${purchase.supplier_trade_name || 'Unknown'}`,
-        Number(purchase.net_amount ?? 0),
-        Number(purchase.tax_vat_amount ?? 0),
-        Number(purchase.total_amount ?? 0),
-        isExpenseAnnulled ? 'written_off' : (Number(purchase.balance ?? -1) === 0 ? 'paid' : 'pending'),
+        safeNum(purchase.net_amount) ?? 0,
+        safeNum(purchase.tax_vat_amount) ?? 0,
+        safeNum(purchase.total_amount) ?? 0,
+        isExpenseAnnulled ? 'written_off' : ((safeNum(purchase.balance) ?? -1) === 0 ? 'paid' : 'pending'),
         purchase.folio,
         purchase.emission_date,
         purchase.due_date,
@@ -382,16 +396,16 @@ const upsertExpenseFromPurchase = async (
         purchase.document_status_name,
         purchase.receipt_date,
         purchase.purchase_type_name,
-        purchase.balance ?? null,
-        purchase.vat_unrecoverable_amount ?? null,
-        purchase.vat_fixed_assets_amount ?? null,
-        purchase.vat_common_use_amount ?? null,
+        safeNum(purchase.balance),
+        safeNum(purchase.vat_unrecoverable_amount),
+        safeNum(purchase.vat_fixed_assets_amount),
+        safeNum(purchase.vat_common_use_amount),
         purchase.pdf_url,
         purchase.dte_type_code,
         purchase.folio,
-        purchase.exempt_amount ?? null,
-        purchase.total_other_taxes_amount ?? null,
-        purchase.total_withholding_amount ?? null,
+        safeNum(purchase.exempt_amount),
+        safeNum(purchase.total_other_taxes_amount),
+        safeNum(purchase.total_withholding_amount),
         purchase.period_year,
         purchase.period_month
       ]
