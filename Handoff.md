@@ -4,6 +4,44 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — TASK-068 smoke reactivo E2E validado
+
+### Objetivo
+- Cerrar el remanente real de `TASK-068` verificando el circuito reactivo del domain `cost_intelligence` con evidencia de runtime, no solo tests unitarios.
+
+### Contexto operativo
+- Antes de implementarlo se recontrastó `TASK-068` contra:
+  - `docs/architecture/GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+  - projection registry, outbox consumer y reactive consumer del codebase
+- Hallazgo clave:
+  - la tarea sí estaba alineada con arquitectura y modelo de datos
+  - el único gap real restante era demostrar la cadena `outbox -> reactive -> serving`
+
+### Delta de ejecución
+- Se agregó el smoke script:
+  - `scripts/smoke-cost-intelligence-period-closure.ts`
+  - comando: `pnpm smoke:cost-intelligence:period-closure`
+- El smoke inserta un evento sintético `finance.expense.updated`, lo publica de forma aislada y procesa solo `cost_intelligence` con `batchSize: 1`.
+- Evidencia obtenida:
+  - `periodId=2026-03`
+  - `eventsProcessed=1`
+  - `eventsFailed=0`
+  - `projectionsTriggered=1`
+  - row materializada en `greenhouse_serving.period_closure_status`
+  - row reactiva registrada en `greenhouse_sync.outbox_reactive_log`
+
+### Validación ejecutada
+- `pnpm smoke:cost-intelligence:period-closure`
+- `pnpm exec vitest run src/lib/cost-intelligence/check-period-readiness.test.ts src/lib/sync/projections/period-closure-status.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- El remanente de `TASK-068` ya no es de wiring técnico.
+- Solo queda decidir si vale la pena endurecer `income_status` / `expense_status` a un `partial` más rico cuando Finance exponga señales de completitud más finas.
+
 ## Sesión 2026-03-30 — TASK-068 alineada al calendario operativo
 
 ### Objetivo

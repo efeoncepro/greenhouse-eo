@@ -101,7 +101,8 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `listRecentClosurePeriods()` garantiza incluir el mes operativo actual aunque todavía no existan señales materializadas en Finance/Payroll
 - Estado actual:
   - slice implementado y validado por tests + `tsc` + `build`
-  - todavía falta el smoke reactivo end-to-end del domain `cost_intelligence` antes de declarar la task cerrada
+  - smoke reactivo end-to-end ya validado con `pnpm smoke:cost-intelligence:period-closure`
+  - el remanente real ya no es de wiring/runtime sino de posible enriquecimiento semántico (`partial`) si Finance endurece sus señales de completitud
 
 ## Delta 2026-03-30 Sentry incident reader hardening
 - `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.

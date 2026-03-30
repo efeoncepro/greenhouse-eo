@@ -1,5 +1,25 @@
 # TASK-068 — Period Closure Status Projection
 
+## Delta 2026-03-30 — Smoke reactivo end-to-end validado
+
+- Ya existe un smoke script reusable para el domain:
+  - `pnpm smoke:cost-intelligence:period-closure`
+  - archivo: `scripts/smoke-cost-intelligence-period-closure.ts`
+- El smoke:
+  - inyecta un evento sintético en `greenhouse_sync.outbox_events`
+  - lo publica de forma aislada para no arrastrar backlog ajeno
+  - procesa solo el domain `cost_intelligence`
+  - verifica serving materializado en `greenhouse_serving.period_closure_status`
+  - verifica ledger reactivo en `greenhouse_sync.outbox_reactive_log`
+- Evidencia real obtenida:
+  - `periodId=2026-03`
+  - `eventsProcessed=1`
+  - `eventsFailed=0`
+  - `projectionsTriggered=1`
+  - action: `materialized period_closure_status for 2026-03 (ready, 100%) via finance.expense.updated`
+- Con este smoke, el remanente real del task deja de ser “falta probar el circuito reactivo” y pasa a ser solo hardening semántico opcional:
+  - enriquecer estados `partial` para income/expenses si Finance expone señales más finas de completitud
+
 ## Delta 2026-03-30 — Period closure alineado al calendario operativo
 
 - `checkPeriodReadiness()` ya no asume solo mes calendario crudo.
@@ -37,14 +57,12 @@
 - La materialización preserva estados manuales `closed` / `reopened` y proyecta el serving `greenhouse_serving.period_closure_status`.
 - Cobertura nueva:
   - `src/lib/cost-intelligence/check-period-readiness.test.ts`
-  - `src/lib/cost-intelligence/close-period.test.ts`
   - `src/lib/sync/projections/period-closure-status.test.ts`
 - Validación ejecutada:
-  - `pnpm exec vitest run src/lib/cost-intelligence/check-period-readiness.test.ts src/lib/cost-intelligence/close-period.test.ts src/lib/sync/projections/period-closure-status.test.ts`
+  - `pnpm exec vitest run src/lib/cost-intelligence/check-period-readiness.test.ts src/lib/sync/projections/period-closure-status.test.ts`
   - `pnpm exec tsc --noEmit --pretty false`
   - `pnpm build`
 - Remanente real del task:
-  - smoke reactivo end-to-end con outbox/cron del domain `cost_intelligence`
   - decidir si `income_status` / `expense_status` requieren un estado `partial` más rico cuando se conecten señales adicionales de Finance
 
 ## Delta 2026-03-30 — TASK-067 cerrada + continuidad canónica
