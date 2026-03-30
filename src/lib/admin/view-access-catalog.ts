@@ -104,6 +104,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'internal'
   },
   {
+    viewCode: 'gestion.capacidad',
+    section: 'gestion',
+    label: 'Capacidad',
+    description: 'Carga operativa global y disponibilidad del equipo.',
+    routePath: '/agency/capacity',
+    routeGroup: 'internal'
+  },
+  {
     viewCode: 'equipo.personas',
     section: 'equipo',
     label: 'Personas',
@@ -397,6 +405,38 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     label: 'Configuración',
     description: 'Perfil y preferencias del portal cliente.',
     routePath: '/settings',
+    routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.equipo',
+    section: 'cliente',
+    label: 'Equipo',
+    description: 'Equipo asignado, perfiles y visibilidad del roster del cliente.',
+    routePath: '/equipo',
+    routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.analytics',
+    section: 'cliente',
+    label: 'Analytics',
+    description: 'Lectura analítica de delivery, actividad y rendimiento del servicio.',
+    routePath: '/analytics',
+    routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.revisiones',
+    section: 'cliente',
+    label: 'Revisiones',
+    description: 'Queue de revisiones y seguimiento de feedback en curso.',
+    routePath: '/reviews',
+    routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.actualizaciones',
+    section: 'cliente',
+    label: 'Novedades',
+    description: 'Novedades, cambios y comunicación continua del ecosistema.',
+    routePath: '/updates',
     routeGroup: 'client'
   }
 ]

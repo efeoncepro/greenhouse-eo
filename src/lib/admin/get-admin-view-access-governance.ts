@@ -23,6 +23,14 @@ export type AdminGovernanceUserPreview = {
   routeGroups: string[]
 }
 
+export type AdminGovernanceUserOverride = {
+  userId: string
+  viewCode: string
+  overrideType: 'grant' | 'revoke'
+  reason: string | null
+  expiresAt: string | null
+}
+
 export type AdminGovernanceMatrixEntry = GovernanceViewRegistryEntry & {
   roleAccess: Record<string, boolean>
   roleAccessSource?: Record<string, 'persisted' | 'hardcoded_fallback'>
@@ -38,6 +46,7 @@ export type AdminGovernanceOverview = {
   roles: AdminGovernanceRole[]
   users: AdminGovernanceUserPreview[]
   views: AdminGovernanceMatrixEntry[]
+  userOverrides: AdminGovernanceUserOverride[]
   sections: Array<{
     key: GovernanceSection
     label: string
@@ -132,6 +141,7 @@ export const getAdminViewAccessGovernance = async (): Promise<AdminGovernanceOve
     roles,
     users,
     views,
+    userOverrides: [],
     sections: GOVERNANCE_SECTIONS
   }
 }

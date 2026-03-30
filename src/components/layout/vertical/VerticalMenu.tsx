@@ -103,6 +103,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     })
   } else {
     menuData.push(
+      ...[
       {
         label: <NavLabel label={GH_CLIENT_NAV.dashboard.label} subtitle={GH_CLIENT_NAV.dashboard.subtitle} show={showSub} />,
         href: dashboardHref,
@@ -128,6 +129,15 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         href: '/updates',
         icon: 'tabler-bell'
       }
+      ].filter(item => {
+        if (item.href === dashboardHref) return canSeeView('cliente.pulse', true)
+        if (item.href === '/proyectos') return canSeeView('cliente.proyectos', true)
+        if (item.href === '/sprints') return canSeeView('cliente.ciclos', true)
+        if (item.href === '/settings') return canSeeView('cliente.configuracion', true)
+        if (item.href === '/updates') return canSeeView('cliente.actualizaciones', true)
+
+        return true
+      })
     )
   }
 

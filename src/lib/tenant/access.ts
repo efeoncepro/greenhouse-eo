@@ -281,6 +281,7 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
 const resolveTenantRuntimeAccess = async (record: TenantAccessRecord): Promise<TenantAccessRecord> => {
   try {
     const resolvedAccess = await resolveAuthorizedViewsForUser({
+      userId: record.userId,
       roleCodes: record.roleCodes,
       tenantType: record.tenantType,
       fallbackRouteGroups: record.routeGroups

@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 
 import GreenhouseUpdates from '@views/greenhouse/GreenhouseUpdates'
 
+import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 
 export default async function Page() {
@@ -11,7 +12,13 @@ export default async function Page() {
     redirect('/login')
   }
 
-  if (!tenant.routeGroups.includes('client')) {
+  const hasAccess = hasAuthorizedViewCode({
+    tenant,
+    viewCode: 'cliente.actualizaciones',
+    fallback: tenant.routeGroups.includes('client')
+  })
+
+  if (!hasAccess) {
     redirect(tenant.portalHomePath || '/auth/landing')
   }
 

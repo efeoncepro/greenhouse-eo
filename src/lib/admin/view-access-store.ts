@@ -10,6 +10,14 @@ type RoleAssignmentRow = {
   granted: boolean
 }
 
+type UserOverrideRow = {
+  user_id: string
+  view_code: string
+  override_type: 'grant' | 'revoke'
+  reason: string | null
+  expires_at: string | null
+}
+
 type ViewRegistryRow = {
   view_code: string
   section: string
@@ -27,6 +35,13 @@ export type PersistedRoleViewAssignmentInput = {
   roleCode: string
   viewCode: string
   granted: boolean
+}
+
+export type PersistedUserViewOverrideInput = {
+  viewCode: string
+  overrideType: 'grant' | 'revoke'
+  reason: string | null
+  expiresAt: string | null
 }
 
 export type ResolvedUserViewAccess = {
@@ -174,6 +189,34 @@ const getPersistedAssignments = async () => {
           view_code,
           granted
         FROM greenhouse_core.role_view_assignments
+      `
+    )
+
+    return rows
+  } catch (error) {
+    if (missingRelation(error)) {
+      throw new ViewAccessStoreError(
+        'View access tables are not provisioned. Run: pnpm setup:postgres:view-access',
+        'SCHEMA_NOT_READY'
+      )
+    }
+
+    throw error
+  }
+}
+
+const getPersistedUserOverrides = async () => {
+  try {
+    const rows = await runGreenhousePostgresQuery<UserOverrideRow>(
+      `
+        SELECT
+          user_id,
+          view_code,
+          override_type,
+          reason,
+          expires_at
+        FROM greenhouse_core.user_view_overrides
+        WHERE expires_at IS NULL OR expires_at > now()
       `
     )
 
@@ -346,12 +389,89 @@ export const saveRoleViewAssignments = async ({
   }
 }
 
+export const saveUserViewOverrides = async ({
+  userId,
+  overrides,
+  actorUserId
+}: {
+  userId: string
+  overrides: PersistedUserViewOverrideInput[]
+  actorUserId: string
+}) => {
+  const dedupedOverrides = Array.from(
+    new Map(overrides.map(override => [override.viewCode, override])).values()
+  )
+
+  try {
+    await syncViewRegistryCatalog(actorUserId)
+
+    await withGreenhousePostgresTransaction(async client => {
+      await client.query(
+        `
+          DELETE FROM greenhouse_core.user_view_overrides
+          WHERE user_id = $1
+        `,
+        [userId]
+      )
+
+      for (const override of dedupedOverrides) {
+        await client.query(
+          `
+            INSERT INTO greenhouse_core.user_view_overrides (
+              user_id,
+              view_code,
+              override_type,
+              reason,
+              expires_at,
+              granted_by,
+              updated_at
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, now())
+          `,
+          [userId, override.viewCode, override.overrideType, override.reason, override.expiresAt, actorUserId]
+        )
+
+        await client.query(
+          `
+            INSERT INTO greenhouse_core.view_access_log (
+              action,
+              target_user,
+              view_code,
+              performed_by,
+              reason
+            )
+            VALUES ($1, $2, $3, $4, $5)
+          `,
+          [override.overrideType === 'grant' ? 'grant_user' : 'revoke_user', userId, override.viewCode, actorUserId, override.reason || 'Admin Center user override save']
+        )
+      }
+    })
+  } catch (error) {
+    if (missingRelation(error)) {
+      throw new ViewAccessStoreError(
+        'View access tables are not provisioned. Run: pnpm setup:postgres:view-access',
+        'SCHEMA_NOT_READY'
+      )
+    }
+
+    throw error
+  }
+
+  return {
+    savedOverrides: dedupedOverrides.length
+  }
+}
+
 export const getAdminPersistedViewAccessGovernance = async () => {
   const access = await getAdminAccessOverview()
 
   await syncViewRegistryCatalog()
 
-  const [persistedRows, persistedRegistryRows] = await Promise.all([getPersistedAssignments(), getPersistedViewRegistry()])
+  const [persistedRows, persistedRegistryRows, persistedUserOverrides] = await Promise.all([
+    getPersistedAssignments(),
+    getPersistedViewRegistry(),
+    getPersistedUserOverrides()
+  ])
 
   const registryRows = persistedRegistryRows.length > 0
     ? persistedRegistryRows.map<GovernanceViewRegistryEntry>(row => ({
@@ -433,6 +553,13 @@ export const getAdminPersistedViewAccessGovernance = async () => {
     users,
     views,
     sections: [...GOVERNANCE_SECTIONS],
+    userOverrides: persistedUserOverrides.map(override => ({
+      userId: override.user_id,
+      viewCode: override.view_code,
+      overrideType: override.override_type,
+      reason: override.reason,
+      expiresAt: override.expires_at
+    })),
     persistence: {
       rolesWithPersistedAssignments: roles.filter(role => {
         const assignments = persistedByRole.get(role.roleCode)
@@ -445,18 +572,21 @@ export const getAdminPersistedViewAccessGovernance = async () => {
 }
 
 export const resolveAuthorizedViewsForUser = async ({
+  userId,
   roleCodes,
   tenantType,
   fallbackRouteGroups
 }: {
+  userId?: string | null
   roleCodes: string[]
   tenantType: 'client' | 'efeonce_internal'
   fallbackRouteGroups: string[]
 }): Promise<ResolvedUserViewAccess> => {
   try {
-    const [persistedRows, persistedRegistryRows] = await Promise.all([
+    const [persistedRows, persistedRegistryRows, persistedUserOverrides] = await Promise.all([
       getPersistedAssignments(),
-      getPersistedViewRegistry().catch(() => [])
+      getPersistedViewRegistry().catch(() => []),
+      getPersistedUserOverrides().catch(() => [])
     ])
 
     const registryRows = persistedRegistryRows.length > 0
@@ -479,7 +609,7 @@ export const resolveAuthorizedViewsForUser = async ({
       persistedByRole.set(row.role_code, current)
     }
 
-    const authorizedViews = registryRows
+    const baseAuthorizedViews = registryRows
       .filter(view =>
         roleCodes.some(roleCode => {
           const roleAssignments = persistedByRole.get(roleCode)
@@ -498,6 +628,22 @@ export const resolveAuthorizedViewsForUser = async ({
         })
       )
       .map(view => view.viewCode)
+
+    const overridesForUser = userId
+      ? persistedUserOverrides.filter(override => override.user_id === userId)
+      : []
+
+    const authorizedViews = Array.from(
+      overridesForUser.reduce((current, override) => {
+        if (override.override_type === 'grant') {
+          current.add(override.view_code)
+        } else {
+          current.delete(override.view_code)
+        }
+
+        return current
+      }, new Set(baseAuthorizedViews))
+    )
 
     const routeGroups = Array.from(
       new Set(

@@ -143,6 +143,53 @@
   - la inferencia restante bajó bastante en superficies visibles del portal
   - el remanente ya se concentra más en rutas secundarias/no visibles del árbol grande
 
+## Delta 2026-03-30 — cierre adicional en portal cliente y access points secundarios
+
+- Se agregaron `view_code` explícitos para:
+  - `gestion.capacidad`
+  - `cliente.equipo`
+  - `cliente.analytics`
+  - `cliente.revisiones`
+  - `cliente.actualizaciones`
+- Se alinearon guards para:
+  - `/agency/capacity`
+  - `/hr`
+  - `/equipo`
+  - `/analytics`
+  - `/reviews`
+  - `/updates`
+- El menú primario cliente ya no depende solo de `routeGroups`; ahora filtra también por:
+  - `cliente.pulse`
+  - `cliente.proyectos`
+  - `cliente.ciclos`
+  - `cliente.configuracion`
+  - `cliente.actualizaciones`
+- Resultado:
+  - el portal cliente ya participa de forma más consistente en el modelo `authorizedViews`
+  - el remanente baja sobre todo a rutas terciarias, tabs internas y flujos no principales
+
+## Delta 2026-03-30 — overrides por usuario iniciales
+
+- Se activó el primer slice real de overrides por usuario:
+  - nueva API `POST /api/admin/views/overrides`
+  - persistencia en `greenhouse_core.user_view_overrides`
+  - resolución runtime aplicada sobre `authorizedViews`
+  - UI inicial dentro del tab `Preview` de `/admin/views`
+- El runtime ya resuelve acceso final así:
+  1. baseline por rol
+  2. fallback por vista faltante si el catálogo crece después de un save previo
+  3. overrides de usuario `grant/revoke`
+- La UI actual permite:
+  - seleccionar usuario
+  - alternar una vista entre `inherit`, `grant` y `revoke`
+  - guardar overrides permanentes con razón obligatoria
+  - ver el preview efectivo ya mezclando baseline y override
+- Este slice no cubre todavía:
+  - expiración temporal por override
+  - edición inline de razones por vista
+  - auditoría visible en la UI
+  - notificación automática al usuario afectado
+
 ## Summary
 
 Crear un módulo de gobernanza de vistas en Admin Center que permita a admins visualizar, asignar y revocar acceso a módulos/secciones del portal por perfil de rol, con override por usuario individual cuando sea necesario. Reemplaza el mapping hardcoded `role → route_groups` en `deriveRouteGroups()` por una tabla configurable desde la UI, sin perder el failsafe de la resolución actual.

@@ -321,6 +321,61 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - expandir catálogo a superficies secundarias restantes, o
   - empezar overrides por usuario y auditoría visible apoyados en el catálogo ya bastante más completo.
 
+## Sesión 2026-03-30 — TASK-136 alinea portal cliente y access points secundarios
+
+### Completado
+- `src/lib/admin/view-access-catalog.ts` sumó:
+  - `gestion.capacidad`
+  - `cliente.equipo`
+  - `cliente.analytics`
+  - `cliente.revisiones`
+  - `cliente.actualizaciones`
+- Se alinearon guards en:
+  - `src/app/(dashboard)/agency/capacity/page.tsx`
+  - `src/app/(dashboard)/hr/page.tsx`
+  - `src/app/(dashboard)/equipo/page.tsx`
+  - `src/app/(dashboard)/analytics/page.tsx`
+  - `src/app/(dashboard)/reviews/page.tsx`
+  - `src/app/(dashboard)/updates/page.tsx`
+- `src/components/layout/vertical/VerticalMenu.tsx` ahora filtra también la navegación primaria cliente con `authorizedViews`.
+
+### Validación ejecutada
+- `pnpm exec eslint src/lib/admin/view-access-catalog.ts src/app/'(dashboard)'/agency/capacity/page.tsx src/app/'(dashboard)'/hr/page.tsx src/app/'(dashboard)'/equipo/page.tsx src/app/'(dashboard)'/analytics/page.tsx src/app/'(dashboard)'/reviews/page.tsx src/app/'(dashboard)'/updates/page.tsx src/components/layout/vertical/VerticalMenu.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- El remanente más claro ahora está en superficies terciarias, redirects/tabs internas y algunas páginas genéricas no modeladas como vistas gobernables.
+- Ya empieza a tener sentido abrir el siguiente gran bloque: overrides por usuario y auditoría visible, o bien hacer una última pasada de catálogo fino en rutas profundas.
+
+## Sesión 2026-03-30 — TASK-136 activa overrides por usuario
+
+### Completado
+- Nuevo endpoint:
+  - `src/app/api/admin/views/overrides/route.ts`
+- `src/lib/admin/view-access-store.ts` ahora:
+  - lee overrides activos desde `greenhouse_core.user_view_overrides`
+  - guarda overrides por usuario
+  - aplica `grant/revoke` al resolver final de `authorizedViews`
+- `src/lib/tenant/access.ts` ya pasa `userId` al resolver para que la sesión reciba la lectura efectiva final.
+- `src/lib/admin/get-admin-view-access-governance.ts` y `src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx` ya exponen y usan `userOverrides`.
+- El tab `Preview` de `/admin/views` ahora permite:
+  - alternar cada vista entre `inherit`, `grant` y `revoke`
+  - guardar overrides permanentes con razón
+  - ver el resultado efectivo en la sidebar simulada y el detalle de vistas
+
+### Validación ejecutada
+- `pnpm exec eslint src/lib/admin/get-admin-view-access-governance.ts src/lib/admin/view-access-store.ts src/lib/tenant/access.ts src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx src/app/api/admin/views/overrides/route.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- Este slice inicial ya hace el trabajo útil, pero aún faltan:
+  - expiración opcional por override
+  - reasons por vista más finas
+  - auditoría visible en la UI
+  - evento/notificación al usuario afectado cuando cambie su acceso
+
 ## Sesión 2026-03-30 — hardening Sentry incident reader
 
 ### Completado

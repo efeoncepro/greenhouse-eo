@@ -1,6 +1,26 @@
-import HrCoreDashboard from '@views/greenhouse/hr-core/HrCoreDashboard'
+import { redirect } from 'next/navigation'
 
-const HrPage = () => {
+import HrCoreDashboard from '@views/greenhouse/hr-core/HrCoreDashboard'
+import { hasAnyAuthorizedViewCode } from '@/lib/tenant/authorization'
+import { getTenantContext } from '@/lib/tenant/get-tenant-context'
+
+const HrPage = async () => {
+  const tenant = await getTenantContext()
+
+  if (!tenant) {
+    redirect('/login')
+  }
+
+  const hasAccess = hasAnyAuthorizedViewCode({
+    tenant,
+    viewCodes: ['equipo.nomina', 'equipo.permisos', 'equipo.departamentos', 'equipo.asistencia'],
+    fallback: tenant.routeGroups.includes('hr') || tenant.roleCodes.includes('efeonce_admin')
+  })
+
+  if (!hasAccess) {
+    redirect(tenant.portalHomePath || '/dashboard')
+  }
+
   return <HrCoreDashboard />
 }
 

@@ -29,6 +29,7 @@ type Props = {
 
 type RoleFilter = 'all' | 'efeonce_internal' | 'client'
 type ActiveTab = 'permissions' | 'preview' | 'roadmap'
+type OverrideMode = 'inherit' | 'grant' | 'revoke'
 
 const SECTION_ACCENT: Record<string, 'primary' | 'info' | 'success' | 'warning' | 'secondary'> = {
   gestion: 'info',
@@ -51,10 +52,19 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
   const [saveError, setSaveError] = useState<string | null>(null)
   const [saveSuccess, setSaveSuccess] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const [editableUserOverrides, setEditableUserOverrides] = useState(data.userOverrides)
+  const [overrideReason, setOverrideReason] = useState('')
+  const [overrideError, setOverrideError] = useState<string | null>(null)
+  const [overrideSuccess, setOverrideSuccess] = useState<string | null>(null)
+  const [savingOverrides, setSavingOverrides] = useState(false)
 
   useEffect(() => {
     setEditableViews(data.views)
   }, [data.views])
+
+  useEffect(() => {
+    setEditableUserOverrides(data.userOverrides)
+  }, [data.userOverrides])
 
   const isDirty = useMemo(() => {
     return JSON.stringify(editableViews.map(view => view.roleAccess)) !== JSON.stringify(data.views.map(view => view.roleAccess))
@@ -93,10 +103,26 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
     [data.users, previewUserId]
   )
 
+  const selectedUserOverrides = useMemo(
+    () => editableUserOverrides.filter(override => override.userId === previewUserId),
+    [editableUserOverrides, previewUserId]
+  )
+
+  useEffect(() => {
+    const firstReason = data.userOverrides.find(override => override.userId === previewUserId && override.reason)?.reason ?? ''
+
+    setOverrideReason(firstReason)
+    setOverrideError(null)
+    setOverrideSuccess(null)
+  }, [data.userOverrides, previewUserId])
+
   const previewViews = useMemo(() => {
     if (!previewUser) return []
 
-    return editableViews.filter(view => {
+    const baseVisibleViews = editableViews.filter(view => {
+      const roleGranted = previewUser.roleCodes.some(roleCode => Boolean(view.roleAccess[roleCode]))
+
+      if (roleGranted) return true
       if (previewUser.routeGroups.includes(view.routeGroup)) return true
       if (previewUser.routeGroups.includes('admin')) return ['admin', 'finance', 'hr', 'people', 'ai_tooling', 'internal'].includes(view.routeGroup)
       if (view.routeGroup === 'people') return previewUser.roleCodes.includes('efeonce_operations') || previewUser.roleCodes.includes('hr_payroll')
@@ -104,7 +130,23 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
 
       return false
     })
-  }, [editableViews, previewUser])
+
+    const current = new Map(baseVisibleViews.map(view => [view.viewCode, view]))
+
+    for (const override of selectedUserOverrides) {
+      const view = editableViews.find(candidate => candidate.viewCode === override.viewCode)
+
+      if (!view) continue
+
+      if (override.overrideType === 'grant') {
+        current.set(view.viewCode, view)
+      } else {
+        current.delete(view.viewCode)
+      }
+    }
+
+    return Array.from(current.values())
+  }, [editableViews, previewUser, selectedUserOverrides])
 
   const previewSections = useMemo(
     () =>
@@ -139,6 +181,52 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
           : view
       )
     )
+  }
+
+  const getUserOverrideMode = (viewCode: string): OverrideMode => {
+    const override = selectedUserOverrides.find(candidate => candidate.viewCode === viewCode)
+
+    if (!override) return 'inherit'
+
+    return override.overrideType
+  }
+
+  const toggleUserOverride = (viewCode: string) => {
+    setOverrideError(null)
+    setOverrideSuccess(null)
+
+    setEditableUserOverrides(current => {
+      const index = current.findIndex(override => override.userId === previewUserId && override.viewCode === viewCode)
+
+      if (index === -1) {
+        return [
+          ...current,
+          {
+            userId: previewUserId,
+            viewCode,
+            overrideType: 'grant',
+            reason: overrideReason || null,
+            expiresAt: null
+          }
+        ]
+      }
+
+      const existing = current[index]
+
+      if (existing.overrideType === 'grant') {
+        return current.map((override, overrideIndex) =>
+          overrideIndex === index
+            ? {
+                ...override,
+                overrideType: 'revoke',
+                reason: overrideReason || override.reason || null
+              }
+            : override
+        )
+      }
+
+      return current.filter((_, overrideIndex) => overrideIndex !== index)
+    })
   }
 
   const handleReset = () => {
@@ -181,6 +269,53 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
       setSaveError(error instanceof Error ? error.message : 'No se pudieron guardar los permisos.')
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleSaveOverrides = async () => {
+    if (!previewUser) return
+
+    const overridesForUser = editableUserOverrides
+      .filter(override => override.userId === previewUser.userId)
+      .map(override => ({
+        ...override,
+        reason: (overrideReason || override.reason || '').trim() || null
+      }))
+
+    if (overridesForUser.length > 0 && !overrideReason.trim()) {
+      setOverrideError('Escribe una razón breve para guardar overrides por usuario.')
+
+      return
+    }
+
+    setSavingOverrides(true)
+    setOverrideError(null)
+    setOverrideSuccess(null)
+
+    try {
+      const response = await fetch('/api/admin/views/overrides', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: previewUser.userId,
+          overrides: overridesForUser
+        })
+      })
+
+      const payload = (await response.json().catch(() => null)) as { error?: string } | null
+
+      if (!response.ok) {
+        throw new Error(payload?.error || 'No se pudieron guardar los overrides por usuario.')
+      }
+
+      setOverrideSuccess('Los overrides del usuario quedaron guardados.')
+      router.refresh()
+    } catch (error) {
+      setOverrideError(error instanceof Error ? error.message : 'No se pudieron guardar los overrides por usuario.')
+    } finally {
+      setSavingOverrides(false)
     }
   }
 
@@ -454,7 +589,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                     </TextField>
                   </Box>
                   <Alert severity='info' variant='outlined'>
-                    El preview usa la resolución actual del portal. Aquí medimos qué vería hoy ese usuario, antes de introducir overrides y asignación por vista.
+                    El preview ya mezcla baseline por rol con overrides por usuario. Aquí medimos la lectura efectiva que terminaría viendo esa sesión.
                   </Alert>
                 </Stack>
 
@@ -497,6 +632,90 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                             ))}
                           </Stack>
                         </Stack>
+
+                        <Card variant='outlined'>
+                          <CardContent>
+                            <Stack spacing={2}>
+                              <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} justifyContent='space-between' alignItems={{ md: 'center' }}>
+                                <Box>
+                                  <Typography variant='h6'>Overrides por usuario</Typography>
+                                  <Typography variant='body2' color='text.secondary'>
+                                    Cambia una vista entre `inherit`, `grant` y `revoke`. Este corte guarda overrides permanentes sin expiración.
+                                  </Typography>
+                                </Box>
+                                <Stack direction='row' spacing={1}>
+                                  <Button variant='outlined' disabled={savingOverrides} onClick={() => {
+                                    setEditableUserOverrides(current => current.filter(override => override.userId !== previewUser.userId))
+                                    setOverrideError(null)
+                                    setOverrideSuccess(null)
+                                  }}>
+                                    Limpiar usuario
+                                  </Button>
+                                  <Button variant='contained' disabled={savingOverrides} onClick={handleSaveOverrides}>
+                                    {savingOverrides ? 'Guardando...' : 'Guardar overrides'}
+                                  </Button>
+                                </Stack>
+                              </Stack>
+
+                              <TextField
+                                size='small'
+                                fullWidth
+                                label='Razón del override'
+                                placeholder='Ej: acceso temporal para revisión financiera del cierre mensual'
+                                value={overrideReason}
+                                onChange={event => setOverrideReason(event.target.value)}
+                                helperText='Obligatoria si el usuario tiene al menos un override activo.'
+                              />
+
+                              {overrideError ? <Alert severity='error'>{overrideError}</Alert> : null}
+                              {overrideSuccess ? <Alert severity='success'>{overrideSuccess}</Alert> : null}
+
+                              <Box
+                                sx={{
+                                  display: 'grid',
+                                  gap: 1.25,
+                                  gridTemplateColumns: { xs: '1fr', xl: 'repeat(2, minmax(0, 1fr))' }
+                                }}
+                              >
+                                {editableViews.map(view => {
+                                  const mode = getUserOverrideMode(view.viewCode)
+
+                                  return (
+                                    <Box
+                                      key={`${previewUser.userId}-${view.viewCode}`}
+                                      sx={{
+                                        border: theme => `1px solid ${theme.palette.divider}`,
+                                        borderRadius: 1,
+                                        p: 1.5
+                                      }}
+                                    >
+                                      <Stack spacing={1}>
+                                        <Stack direction='row' spacing={1} justifyContent='space-between' alignItems='center'>
+                                          <Box>
+                                            <Typography variant='body2' color='text.primary' className='font-medium'>
+                                              {view.label}
+                                            </Typography>
+                                            <Typography variant='caption' color='text.secondary'>
+                                              {view.routePath}
+                                            </Typography>
+                                          </Box>
+                                          <Chip
+                                            size='small'
+                                            clickable
+                                            onClick={() => toggleUserOverride(view.viewCode)}
+                                            color={mode === 'grant' ? 'success' : mode === 'revoke' ? 'error' : 'default'}
+                                            variant={mode === 'inherit' ? 'outlined' : 'tonal'}
+                                            label={mode === 'inherit' ? 'Inherit' : mode === 'grant' ? 'Grant' : 'Revoke'}
+                                          />
+                                        </Stack>
+                                      </Stack>
+                                    </Box>
+                                  )
+                                })}
+                              </Box>
+                            </Stack>
+                          </CardContent>
+                        </Card>
 
                         <Divider />
 
@@ -543,7 +762,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                               <Stack spacing={2}>
                                 <Typography variant='h6'>Detalle de vistas visibles</Typography>
                                 <Typography variant='body2' color='text.secondary'>
-                                  Baseline real actual. Cuando llegue la capa configurable, aquí aparecerá además la fuente de acceso: rol, override grant o revoke temporal.
+                                  Aquí ya se ve la lectura efectiva entre baseline por rol y overrides por usuario.
                                 </Typography>
                                 {previewSections.map(section => (
                                   <Stack key={section.key} spacing={1.25}>
@@ -571,7 +790,24 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                                           </Typography>
                                           <Stack direction='row' spacing={1} flexWrap='wrap'>
                                             <Chip size='small' variant='outlined' label={view.routePath} />
-                                            <Chip size='small' color='success' variant='tonal' label='Baseline actual' />
+                                            <Chip
+                                              size='small'
+                                              color={
+                                                getUserOverrideMode(view.viewCode) === 'grant'
+                                                  ? 'success'
+                                                  : getUserOverrideMode(view.viewCode) === 'revoke'
+                                                    ? 'error'
+                                                    : 'info'
+                                              }
+                                              variant='tonal'
+                                              label={
+                                                getUserOverrideMode(view.viewCode) === 'grant'
+                                                  ? 'Override grant'
+                                                  : getUserOverrideMode(view.viewCode) === 'revoke'
+                                                    ? 'Override revoke'
+                                                    : 'Baseline por rol'
+                                              }
+                                            />
                                           </Stack>
                                         </Stack>
                                       </Box>
@@ -603,7 +839,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                       <Chip size='small' color='warning' variant='tonal' label='Siguiente slice' />
                       <Typography variant='h6'>Overrides por usuario</Typography>
                       <Typography color='text.secondary'>
-                        Grant o revoke temporal con razón obligatoria, expiración opcional y visibilidad inmediata para el operador.
+                        Grant o revoke ya quedó activo en este slice inicial. El remanente es expiración, edición más fina y mejor auditoría contextual.
                       </Typography>
                     </Stack>
                   </CardContent>
