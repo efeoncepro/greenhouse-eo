@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 
 
-import FinancePeriodClosureDashboardView from '@views/greenhouse/finance/FinancePeriodClosureDashboardView'
+import FinanceIntelligenceView from '@views/greenhouse/finance/FinanceIntelligenceView'
 import { canCloseCostIntelligencePeriod, canReopenCostIntelligencePeriod, hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 
@@ -31,7 +31,7 @@ const IntelligencePage = async () => {
   }
 
   return (
-    <FinancePeriodClosureDashboardView
+    <FinanceIntelligenceView
       canManageClosure={canCloseCostIntelligencePeriod(tenant)}
       canReopen={canReopenCostIntelligencePeriod(tenant)}
     />
