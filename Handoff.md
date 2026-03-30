@@ -4,6 +4,40 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — TASK-068 cerrada
+
+### Completado
+- `TASK-068` pasó de `in-progress` a `complete`.
+- Criterio de cierre validado:
+  - checker de readiness operativo
+  - close/reopen operativos
+  - projection `period_closure_status` registrada
+  - alineación con calendario operativo aplicada
+  - smoke reactivo E2E validado
+- Chequeo de impacto cruzado ejecutado:
+  - `TASK-069` ya no queda bloqueada por remanentes de `TASK-068`
+  - `TASK-070` y `TASK-071` pasan a depender solo de `TASK-069`
+
+### Archivos tocados
+- `docs/tasks/complete/TASK-068-period-closure-status-projection.md`
+- `docs/tasks/README.md`
+- `docs/tasks/to-do/TASK-069-operational-pl-projection.md`
+- `docs/tasks/to-do/TASK-070-cost-intelligence-finance-ui.md`
+- `docs/tasks/to-do/TASK-071-cost-intelligence-cross-module-consumers.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Validación ejecutada
+- `pnpm smoke:cost-intelligence:period-closure`
+- `pnpm exec vitest run src/lib/cost-intelligence/check-period-readiness.test.ts src/lib/sync/projections/period-closure-status.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec eslint scripts/smoke-cost-intelligence-period-closure.ts src/lib/cost-intelligence/check-period-readiness.ts src/lib/cost-intelligence/check-period-readiness.test.ts`
+- `pnpm build`
+
+### Pendiente inmediato
+- La continuación natural del carril ya es `TASK-069`.
+
 ## Sesión 2026-03-30 — TASK-068 smoke reactivo E2E validado
 
 ### Objetivo

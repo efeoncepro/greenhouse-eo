@@ -4,11 +4,13 @@ import process from 'node:process'
 import { loadGreenhouseToolEnv, applyGreenhousePostgresProfile } from './lib/load-greenhouse-tool-env'
 
 const require = createRequire(import.meta.url)
+
 const moduleWithCache = require('module') as {
   _cache: Record<string, { id: string; exports: Record<string, never>; loaded?: boolean }>
 }
 
 moduleWithCache._cache[require.resolve('server-only')] = { id: 'server-only', exports: {}, loaded: true }
+
 
 loadGreenhouseToolEnv()
 applyGreenhousePostgresProfile('runtime')

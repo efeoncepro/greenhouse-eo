@@ -1,5 +1,15 @@
 # TASK-071 — Cost Intelligence Cross-Module Consumer Enrichment
 
+## Delta 2026-03-30 — TASK-068 cerrada
+
+- `TASK-068` ya quedó cerrada:
+  - closure status materializado
+  - close/reopen operativo
+  - calendario operativo ya integrado
+  - smoke reactivo E2E validado
+- Esta task deja de estar bloqueada por el carril de cierre de período.
+- El blocker estructural real restante pasa a ser `TASK-069` (P&L materializado por scope).
+
 ## Delta 2026-03-30 — Foundation lista para continuidad
 
 - `TASK-067` ya quedó cerrada y deja listo el carril base:
@@ -8,11 +18,11 @@
   - domain `cost_intelligence`
   - eventos `accounting.*`
   - cron route dedicada con smoke `200`
-- Esta task sigue correctamente bloqueada por `TASK-068 + TASK-069`, no por infraestructura base.
+- Esta task sigue correctamente bloqueada por `TASK-069`, no por infraestructura base.
 
 ## Delta 2026-03-30 — Auditoría Finance + dependencias clarificadas
 
-- **Bloqueada por TASK-068 + TASK-069** (consume materialized P&L + closure status).
+- **Bloqueada por TASK-069** (closure status de TASK-068 ya disponible).
 - Puede ejecutarse **en paralelo con TASK-070** (ambas consumen las mismas APIs).
 - Reemplaza on-demand compute de `organization-economics.ts` con reads del P&L materializado.
 - TASK-138 Slice 3 (People finance bridge) y Slice 4 (Agency synergy) cubren parte del scope de esta task — coordinar para no duplicar.
@@ -52,7 +62,7 @@ Que los 4 consumers principales lean de serving views pre-materializadas en vez 
 
 - **Depende de:**
   - TASK-069 (operational P&L snapshots) — **blocker**
-  - TASK-068 (period closure status) — **blocker**
+  - TASK-068 (period closure status) — **cerrada**
   - Agency module existente
   - Organization 360 existente (tab Rentabilidad)
   - People 360 existente (Person Finance tab)

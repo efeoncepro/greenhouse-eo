@@ -1,5 +1,15 @@
 # TASK-069 — Operational P&L Projection
 
+## Delta 2026-03-30 — TASK-068 cerrada
+
+- `TASK-068` ya quedó cerrada:
+  - `period_closure_status` materializada
+  - close/reopen operativos
+  - alineación al calendario operativo aplicada
+  - smoke reactivo E2E validado para el domain `cost_intelligence`
+- Esta task ya no depende de ningún remanente técnico de cierre de período.
+- Desde ahora, el único blocker estructural real para `TASK-069` es su propia implementación.
+
 ## Delta 2026-03-30 — TASK-067 cerrada + amarre al motor Finance
 
 - `TASK-067` ya quedó cerrada:
@@ -21,7 +31,7 @@
 ## Delta 2026-03-30 — Auditoría Finance + dependencias clarificadas
 
 - **TASK-067 ya cerrada** (schema + domain + events disponibles).
-- Puede ejecutarse **en paralelo con TASK-068** (ambas dependen solo de 067).
+- Ya no depende de ejecución paralela con `TASK-068`; esa lane quedó cerrada.
 - TASK-070 (UI) y TASK-071 (cross-module) necesitan ESTA task completada.
 - `computeClientEconomicsSnapshots()` ya existe en `postgres-store-intelligence.ts` — esta task la evoluciona a un P&L materializado con scopes (client → space → organization).
 - `client_labor_cost_allocation` ya existe como serving view — esta task lo consume para labor costs.
@@ -73,7 +83,7 @@ Materializar `greenhouse_serving.operational_pl_snapshots` con P&L por scope/per
 
 - **Depende de:**
   - TASK-067 (schema + domain) — **cerrada**
-  - TASK-068 (period closure status) — para `period_closed` flag
+  - TASK-068 (period closure status) — **cerrada**, ya disponible para `period_closed` flag
   - `greenhouse_serving.client_economics_snapshots` o fuentes directas si no disponible
   - `greenhouse_payroll.payroll_entries` + `greenhouse_core.client_team_assignments`
   - `greenhouse_finance.income`, `greenhouse_finance.expenses`

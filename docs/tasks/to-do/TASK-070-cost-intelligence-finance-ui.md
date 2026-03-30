@@ -1,5 +1,15 @@
 # TASK-070 — Cost Intelligence Finance UI: Period Closure Dashboard
 
+## Delta 2026-03-30 — TASK-068 cerrada
+
+- `TASK-068` ya quedó cerrada y deja listo el carril de cierre de período:
+  - status por período
+  - semántica de readiness
+  - close/reopen
+  - smoke reactivo validado
+- Esta task deja de estar bloqueada por `TASK-068`.
+- El blocker real restante pasa a ser solo `TASK-069` (P&L materializado).
+
 ## Delta 2026-03-30 — Foundation lista para continuidad
 
 - `TASK-067` ya quedó cerrada y deja listo el carril base:
@@ -8,11 +18,11 @@
   - domain `cost_intelligence`
   - eventos `accounting.*`
   - cron route dedicada con smoke `200`
-- Esta task sigue correctamente bloqueada por `TASK-068 + TASK-069`, no por infraestructura base.
+- Esta task sigue correctamente bloqueada por `TASK-069`, no por infraestructura base.
 
 ## Delta 2026-03-30 — Auditoría Finance + dependencias clarificadas
 
-- **Bloqueada por TASK-068 + TASK-069** (necesita ambas APIs).
+- **Bloqueada por TASK-069** (el carril `period closure` de TASK-068 ya quedó listo).
 - Puede ejecutarse **en paralelo con TASK-071** (ambas consumen las mismas APIs).
 - Los patterns de UI ya están establecidos: `ExecutiveCardShell`, `Chip` semáforo, `Table` expandible — esta task los reutiliza.
 - `FinanceDashboardView.tsx` (48KB) y `ClientEconomicsView.tsx` (31KB) ya existen como referencia de patterns.
@@ -56,7 +66,7 @@ Surface operativa dentro de "Economía" para gestión de cierre de período y vi
 ## Dependencies & Impact
 
 - **Depende de:**
-  - TASK-068 (period closure APIs) — **blocker**
+  - TASK-068 (period closure APIs) — **cerrada**
   - TASK-069 (P&L APIs) — **blocker**
   - Finance module existente (tab structure, layout)
 - **Impacta a:**

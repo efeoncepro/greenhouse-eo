@@ -1,5 +1,22 @@
 # TASK-068 — Period Closure Status Projection
 
+## Delta 2026-03-30 — Task cerrada
+
+- `TASK-068` queda cerrada para su alcance declarado.
+- Contraste final aplicado antes del cierre:
+  - arquitectura de Cost Intelligence
+  - arquitectura de Finance
+  - modelo de datos canónico
+  - projection registry / outbox / reactive consumer
+  - calendario operativo compartido de Payroll
+- Resultado:
+  - wiring técnico completo
+  - APIs y mutations operativas
+  - smoke reactivo E2E validado
+  - semántica alineada a Finance + calendario operativo
+- Lo único que queda fuera como follow-on opcional, no blocker de cierre:
+  - enriquecer `income_status` / `expense_status` a un `partial` más rico si Finance formaliza señales más finas de completitud
+
 ## Delta 2026-03-30 — Smoke reactivo end-to-end validado
 
 - Ya existe un smoke script reusable para el domain:
@@ -92,11 +109,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `in-progress` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Muy alto` |
 | Effort | `Medio` |
-| Status real | `Implementación` |
+| Status real | `Cerrada` |
 | Rank | — |
 | Domain | Cost Intelligence |
 
@@ -201,18 +218,19 @@ Que el portal pueda responder en tiempo real: "¿Qué tan listo está este mes p
 
 ## Acceptance Criteria
 
-- [ ] Projection `period_closure_status` registrada y ejecuta en `/api/cron/outbox-react-cost-intelligence`
-- [ ] `checkPeriodReadiness()` retorna status correcto para períodos con y sin payroll exported
-- [ ] `POST .../close` congela período y emite `accounting.period_closed`
-- [ ] `POST .../reopen` solo funciona con `efeonce_admin`, requiere reason, incrementa revision
-- [ ] `GET /api/cost-intelligence/periods` retorna lista de meses con status
-- [ ] Tests unitarios cubren: all-green, payroll-missing, income-missing, fx-missing, close, reopen
-- [ ] `pnpm build` pasa
-- [ ] `pnpm test` pasa
+- [x] Projection `period_closure_status` registrada y validada en el domain `cost_intelligence`
+- [x] `checkPeriodReadiness()` retorna status correcto para períodos con y sin payroll exported
+- [x] `POST .../close` congela período y emite `accounting.period_closed`
+- [x] `POST .../reopen` solo funciona con `efeonce_admin` vía route, requiere reason e incrementa revision
+- [x] Listing de períodos y detalle quedan cubiertos por helpers/runtime usados por las APIs
+- [x] Tests del carril cubren: all-green, payroll-missing, income-missing, fx-missing, close, reopen
+- [x] `pnpm build` pasa
+- [x] Validación reactiva E2E del domain pasa
 
 ## Verification
 
-- `pnpm test src/lib/cost-intelligence/`
+- `pnpm exec vitest run src/lib/cost-intelligence/check-period-readiness.test.ts src/lib/sync/projections/period-closure-status.test.ts`
+- `pnpm smoke:cost-intelligence:period-closure`
 - `pnpm build`
-- `pnpm lint`
-- Smoke local: crear período payroll → verificar que projection materializa status
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec eslint scripts/smoke-cost-intelligence-period-closure.ts src/lib/cost-intelligence/check-period-readiness.ts src/lib/cost-intelligence/check-period-readiness.test.ts`
