@@ -23,10 +23,7 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - `src/app/api/finance/dashboard/summary/route.ts`
 
 ### Pendiente inmediato
-- crear setup SQL/TS idempotente
-- extender `event-catalog`
-- registrar domain `cost_intelligence`
-- crear `/api/cron/outbox-react-cost-intelligence`
+- ninguno dentro del alcance de `TASK-067`; la continuation natural es `TASK-068` / `TASK-069`
 
 ### Delta de ejecución
 - El bootstrap ya quedó implementado y validado:
@@ -39,9 +36,17 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - schema `greenhouse_cost_intelligence` visible para runtime y migrator
   - route `outbox-react-cost-intelligence` compila y entra al build
   - `supportedDomains` ya incluye `cost_intelligence`
-- Pendiente real de esta task:
-  - el smoke local con `CRON_SECRET` efímero ya autentica, pero cae en `502` por el carril local OpenSSL/JWT del runtime
-  - decidir si se agenda cron dedicada en `vercel.json` ya en 067 o si se mantiene solo la route hasta que 068/069 registren projections
+- El remanente del smoke local ya quedó resuelto:
+  - raíz del problema: `GOOGLE_APPLICATION_CREDENTIALS_JSON` podía traer `private_key` PEM colapsada en una sola línea
+  - fix aplicado en `src/lib/google-credentials.ts` reconstruyendo los saltos de línea del PEM antes de instanciar `google-auth-library`
+  - cobertura agregada en `src/lib/google-credentials.test.ts`
+  - smoke local autenticado de `/api/cron/outbox-react-cost-intelligence` ya responde `200`
+- Decisión operativa vigente:
+  - `TASK-067` queda cerrada para su alcance
+  - la cron dedicada en `vercel.json` puede seguir diferida mientras `068/069` aún no registran projections reales; ya no por bloqueo OpenSSL/JWT
+- Alineación nueva obligatoria para el siguiente slice:
+  - `TASK-068` y `TASK-069` deben respetar también `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `TASK-069` no redefine el P&L; materializa y distribuye por scope la semántica financiera canónica ya documentada por Finance
 
 ## Sesión 2026-03-30 — hardening documental para `TASK-141` sin romper reactive lanes
 

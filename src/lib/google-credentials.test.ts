@@ -22,6 +22,15 @@ describe('google credentials helpers', () => {
     expect(credentials?.private_key).toBe('-----BEGIN PRIVATE KEY-----\nabc\n-----END PRIVATE KEY-----\n')
   })
 
+  it('reconstructs pem line breaks when the private key body was collapsed', () => {
+    const credentials = getGoogleCredentials({
+      GOOGLE_APPLICATION_CREDENTIALS_JSON:
+        '{"project_id":"efeonce-group","client_email":"runtime@example.com","private_key":"-----BEGIN PRIVATE KEY-----abc-----END PRIVATE KEY-----"}'
+    } as unknown as NodeJS.ProcessEnv)
+
+    expect(credentials?.private_key).toBe('-----BEGIN PRIVATE KEY-----\nabc\n-----END PRIVATE KEY-----\n')
+  })
+
   it('parses service account credentials from base64 env json', () => {
     const payload = Buffer.from(
       '{"project_id":"efeonce-group","client_email":"runtime@example.com","private_key":"-----BEGIN PRIVATE KEY-----\\\\nabc\\\\n-----END PRIVATE KEY-----"}',

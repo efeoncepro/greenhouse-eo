@@ -1,8 +1,21 @@
 # TASK-068 — Period Closure Status Projection
 
+## Delta 2026-03-30 — TASK-067 cerrada + continuidad canónica
+
+- `TASK-067` ya quedó cerrada:
+  - schema `greenhouse_cost_intelligence`
+  - serving tables base
+  - domain `cost_intelligence`
+  - eventos `accounting.*`
+  - cron route dedicada con smoke `200`
+- Esta task ya no está bloqueada por foundation técnica.
+- Regla de continuidad:
+  - además de `GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md`, esta task debe respetar `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - el readiness y la ceremonia de cierre deben conversar con el lifecycle financiero/payroll canónico, no inventar estados paralelos
+
 ## Delta 2026-03-30 — Auditoría Finance + dependencias clarificadas
 
-- **Bloqueada por TASK-067** (schema + domain + events).
+- **TASK-067 ya cerrada** (schema + domain + events disponibles).
 - Puede ejecutarse **en paralelo con TASK-069** (ambas dependen solo de 067).
 - TASK-070 (UI) necesita ESTA task + TASK-069 completadas antes de empezar.
 - El concepto de "período cerrado" no existe en el codebase actual — esta task lo introduce.
@@ -43,7 +56,7 @@ Que el portal pueda responder en tiempo real: "¿Qué tan listo está este mes p
 ## Dependencies & Impact
 
 - **Depende de:**
-  - TASK-067 (schema + domain + event catalog) — **blocker**
+  - TASK-067 (schema + domain + event catalog) — **cerrada**
   - `greenhouse_payroll.payroll_periods` (status del período)
   - `greenhouse_finance.income` (existencia de ingresos)
   - `greenhouse_finance.expenses` (existencia de gastos)

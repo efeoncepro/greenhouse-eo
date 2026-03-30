@@ -78,8 +78,11 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `/api/cron/outbox-react-cost-intelligence`
 - Decisión operativa actual:
   - el dominio ya puede procesarse de forma dedicada
-  - el scheduling fino puede seguir temporalmente apoyado en el catch-all `outbox-react` mientras no existan projections registradas
-  - la cron dedicada en `vercel.json` se difiere hasta que el smoke local del path dedicado deje de topar el warning OpenSSL/JWT del runtime server-side
+  - el smoke local autenticado del path dedicado ya responde `200`
+  - el scheduling fino puede seguir temporalmente apoyado en el catch-all `outbox-react` mientras no existan projections registradas; ya no por un bloqueo técnico del runtime, sino por secuenciación de rollout
+- Regla nueva de continuidad:
+  - `TASK-068` y `TASK-069` deben mantenerse consistentes con `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - Cost Intelligence no debe redefinir un P&L paralelo; debe materializar y agregar la semántica financiera canónica ya definida en Finance
 
 ## Delta 2026-03-30 Sentry incident reader hardening
 - `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.

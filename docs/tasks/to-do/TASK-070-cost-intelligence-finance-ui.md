@@ -1,5 +1,15 @@
 # TASK-070 — Cost Intelligence Finance UI: Period Closure Dashboard
 
+## Delta 2026-03-30 — Foundation lista para continuidad
+
+- `TASK-067` ya quedó cerrada y deja listo el carril base:
+  - schema `greenhouse_cost_intelligence`
+  - serving tables base
+  - domain `cost_intelligence`
+  - eventos `accounting.*`
+  - cron route dedicada con smoke `200`
+- Esta task sigue correctamente bloqueada por `TASK-068 + TASK-069`, no por infraestructura base.
+
 ## Delta 2026-03-30 — Auditoría Finance + dependencias clarificadas
 
 - **Bloqueada por TASK-068 + TASK-069** (necesita ambas APIs).

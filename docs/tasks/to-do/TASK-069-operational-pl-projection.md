@@ -1,8 +1,26 @@
 # TASK-069 — Operational P&L Projection
 
+## Delta 2026-03-30 — TASK-067 cerrada + amarre al motor Finance
+
+- `TASK-067` ya quedó cerrada:
+  - schema `greenhouse_cost_intelligence`
+  - serving tables base
+  - domain `cost_intelligence`
+  - eventos `accounting.*`
+  - cron route dedicada con smoke `200`
+- Esta task ya no está bloqueada por foundation técnica.
+- Alineación obligatoria desde ahora:
+  - `TASK-069` no debe construir un P&L alternativo o semánticamente distinto al de Finance
+  - debe materializar, agregar por scope y volver reactiva la lógica financiera canónica definida en `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - invariantes mínimas:
+    - revenue neto con `partnerShare`
+    - payroll multi-moneda con FX canónico
+    - anti-doble-conteo vía `expenses.payroll_entry_id`
+    - reuse preferente de `resolveExchangeRateToClp()`, `client_labor_cost_allocation`, `member_capacity_economics` y `total-company-cost.ts`
+
 ## Delta 2026-03-30 — Auditoría Finance + dependencias clarificadas
 
-- **Bloqueada por TASK-067** (schema + domain + events).
+- **TASK-067 ya cerrada** (schema + domain + events disponibles).
 - Puede ejecutarse **en paralelo con TASK-068** (ambas dependen solo de 067).
 - TASK-070 (UI) y TASK-071 (cross-module) necesitan ESTA task completada.
 - `computeClientEconomicsSnapshots()` ya existe en `postgres-store-intelligence.ts` — esta task la evoluciona a un P&L materializado con scopes (client → space → organization).
@@ -45,13 +63,16 @@ Materializar `greenhouse_serving.operational_pl_snapshots` con P&L por scope/per
 ## Architecture Alignment
 
 - Fuente canónica: `docs/architecture/GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md` § 4.2, § 6.2
+- Fuente complementaria obligatoria: `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
 - Relación con `client_economics`: este projection es un **consumer enriquecido** de `client_economics`, no un reemplazo. Lee los snapshots existentes y los consolida/agrega.
 - Si `client_economics` (TASK-055) completa su pipeline, `operational_pl` lo consume directamente. Si no, computa desde las mismas fuentes.
+- Regla de implementación:
+  - este projection materializa y distribuye por scope la semántica financiera canónica; no redefine revenue/cost/margin por fuera del contrato ya documentado por Finance
 
 ## Dependencies & Impact
 
 - **Depende de:**
-  - TASK-067 (schema + domain) — **blocker**
+  - TASK-067 (schema + domain) — **cerrada**
   - TASK-068 (period closure status) — para `period_closed` flag
   - `greenhouse_serving.client_economics_snapshots` o fuentes directas si no disponible
   - `greenhouse_payroll.payroll_entries` + `greenhouse_core.client_team_assignments`

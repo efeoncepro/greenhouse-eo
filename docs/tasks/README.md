@@ -38,7 +38,6 @@ Primer bloque operativo asignado:
 | `TASK-083` | [TASK-083-compensation-drawer-enterprise-ux-redesign.md](complete/TASK-083-compensation-drawer-enterprise-ux-redesign.md) | P1 | Alto | Medio | Cerrada | Preview con secciones semánticas, salary base como chip, accordion MUI, font mono, micro-copy conciso. |
 | `TASK-084` | [TASK-084-compensation-drawer-manual-mode-ux-polish.md](complete/TASK-084-compensation-drawer-manual-mode-ux-polish.md) | P2 | Medio | Bajo | Cerrada | Secciones con borders, accordion previsional en todos los modos, overline labels. |
 | `TASK-085` | [TASK-085-compensation-chile-liquido-first-flow.md](complete/TASK-085-compensation-chile-liquido-first-flow.md) | P1 | Alto | Bajo | Cerrada | Chile siempre en modo reverse (sin switch). Líquido deseado es el campo principal. |
-| `TASK-067` | [TASK-067-cost-intelligence-foundation.md](in-progress/TASK-067-cost-intelligence-foundation.md) | P1 | Alto | Medio | Implementación | Bootstrap schema `greenhouse_cost_intelligence`, event catalog `accounting.*`, projection domain `cost_intelligence` |
 | `TASK-068` | [TASK-068-period-closure-status-projection.md](to-do/TASK-068-period-closure-status-projection.md) | P1 | Muy alto | Medio | Diseño | Projection `period_closure_status`: auto-detect readiness, serving view, APIs close/reopen |
 | `TASK-069` | [TASK-069-operational-pl-projection.md](to-do/TASK-069-operational-pl-projection.md) | P1 | Muy alto | Alto | Diseño | Projection `operational_pl`: P&L por scope (client/space/org), closure awareness, margin alerts |
 | `TASK-070` | [TASK-070-cost-intelligence-finance-ui.md](to-do/TASK-070-cost-intelligence-finance-ui.md) | P1 | Alto | Medio | Diseño | Economía UI: surface "Cierre de Período" con semáforos, P&L inline, close/reopen |
@@ -93,7 +92,7 @@ Primer bloque operativo asignado:
 ### Prioridad vigente — backlog `to-do` por impacto vs esfuerzo
 
 - **Top ROI ahora:** `TASK-100` → `TASK-101` → `TASK-072` → `TASK-098` → `TASK-026` → `TASK-109` → `TASK-030`.
-- **Siguiente ola:** `TASK-027` → `TASK-028` → `TASK-116` → `TASK-067` → `TASK-068` → `TASK-070` → `TASK-011`.
+- **Siguiente ola:** `TASK-027` → `TASK-028` → `TASK-116` → `TASK-068` → `TASK-069` → `TASK-070` → `TASK-011`.
 - **Estratégicas pero caras:** `TASK-008` → `TASK-005` → `TASK-069` → `TASK-118` → `TASK-018` → `TASK-019`.
 - **Later / oportunistas:** `TASK-029` → `TASK-031` → `TASK-015` → `TASK-016` → `TASK-020` → `TASK-115` → `TASK-107` → `TASK-103` → `TASK-021` → `TASK-032` → `TASK-053` → `TASK-054` → `TASK-055` → `TASK-058` → `TASK-059` → `TASK-071`.
 - **No gastar tokens ahora:** `TASK-025`, `TASK-033` a `TASK-038`, `TASK-039`, `TASK-041`.
@@ -224,6 +223,7 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 
 ## Complete
 
+| [TASK-067-cost-intelligence-foundation.md](complete/TASK-067-cost-intelligence-foundation.md) | Foundation técnica de Cost Intelligence cerrada: schema `greenhouse_cost_intelligence`, serving tables base, eventos `accounting.*`, domain `cost_intelligence`, cron route dedicada validada y continuidad amarrada al P&L canónico de Finance. |
 | [TASK-136-admin-view-access-governance.md](complete/TASK-136-admin-view-access-governance.md) | Gobernanza de vistas cerrada: catálogo `view_code`, persistencia role/user, expiración, auditoría, notificación reactiva, `authorizedViews` en sesión, enforcement por layout/página y `/admin/views` como superficie operable de administración. |
 | [TASK-133-ops-health-sentry-incident-surfacing.md](complete/TASK-133-ops-health-sentry-incident-surfacing.md) | Incidentes Sentry abiertos/relevantes visibles en `Ops Health` y `Cloud & Integrations` con snapshot fail-soft separado de la postura base de observability. |
 | [TASK-117-payroll-last-business-day-auto-calculation.md](complete/TASK-117-payroll-last-business-day-auto-calculation.md) | Policy operativa de último día hábil cerrada y revalidada con recipients reales: helper temporal canónico, readiness de cálculo separado, cron idempotente con auto-creación del período y `payroll_ops` ya resuelta sobre identidad persona-first. |
