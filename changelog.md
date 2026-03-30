@@ -7,6 +7,16 @@
 
 ## 2026-03-29
 
+### TASK-117 payroll auto-calculation baseline closed
+- Payroll ya formaliza el cálculo del período oficial el último día hábil del mes operativo, sin alterar el lifecycle `draft -> calculated -> approved -> exported`.
+- La utilidad de calendario ahora expone `getLastBusinessDayOfMonth()` / `isLastBusinessDayOfMonth()`, y Payroll separa `calculation readiness` de `approval readiness`.
+- El repo ya incluye `runPayrollAutoCalculation()`, `GET /api/cron/payroll-auto-calculate`, auto-creación del período faltante y notificación reactiva `payroll_ops` al emitirse `payroll_period.calculated`.
+
+### TASK-133 Sentry incidents surfaced into Ops Health
+- `Ops Health` y `Cloud & Integrations` ya consumen un snapshot canónico fail-soft de incidentes Sentry abiertos/relevantes.
+- `src/lib/cloud/observability.ts` ahora separa postura de observability vs incidentes activos, y `GET /api/internal/health` expone también `sentryIncidents`.
+- La UI muestra contexto operativo por release, environment y última ocurrencia sin cambiar la semántica del health runtime base.
+
 ### TASK-129 promoted to production
 - `develop` fue promovida a `main` y `production` ya absorbió el carril `notification-dispatch`.
 - `POST /api/internal/webhooks/notification-dispatch` quedó validado también en `production` con delivery firmada real y notificación persistida en `greenhouse_notifications.notifications`.

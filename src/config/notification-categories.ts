@@ -108,6 +108,16 @@ export const NOTIFICATION_CATEGORIES: Record<string, NotificationCategoryConfig>
     priority: 'normal'
   },
 
+  payroll_ops: {
+    code: 'payroll_ops',
+    label: 'Operación de nómina',
+    description: 'Hitos operativos de cálculo y revisión del período oficial',
+    icon: 'tabler-calculator',
+    audience: 'internal',
+    defaultChannels: ['in_app', 'email'],
+    priority: 'high'
+  },
+
   system_event: {
     code: 'system_event',
     label: 'Eventos del sistema',

@@ -70,6 +70,24 @@ const chipColor = (status: AdminHealth): 'success' | 'warning' | 'error' | 'seco
   return 'warning'
 }
 
+const sentryStatusColor = (
+  status: OperationsOverview['cloud']['observability']['incidents']['status']
+): 'success' | 'warning' | 'error' | 'secondary' => {
+  if (status === 'ok') return 'success'
+  if (status === 'warning') return 'warning'
+  if (status === 'unconfigured') return 'secondary'
+
+  return 'error'
+}
+
+const sentryLevelColor = (level: string): 'success' | 'warning' | 'error' | 'secondary' => {
+  if (level === 'fatal' || level === 'error') return 'error'
+  if (level === 'warning') return 'warning'
+  if (level === 'info' || level === 'debug') return 'secondary'
+
+  return 'warning'
+}
+
 const healthSubsystems = (subsystems: OperationsSubsystem[]) =>
   subsystems.filter(subsystem => ['Outbox', 'Proyecciones', 'Notificaciones'].includes(subsystem.name))
 
@@ -127,6 +145,7 @@ const AdminOpsHealthView = ({ data }: Props) => {
   const uniqueRecentEventTypes = Array.from(new Set(data.recentEvents.map(event => event.eventType))).slice(0, 8)
   const auditEvents = buildAuditEvents(data)
   const cloudAlerts = data.cloud.posture.controls.filter(control => control.status !== 'ok')
+  const sentryIncidents = data.cloud.observability.incidents
 
   return (
     <Stack spacing={6}>
@@ -314,6 +333,107 @@ const AdminOpsHealthView = ({ data }: Props) => {
             </CardContent>
           </Card>
         </Box>
+      </ExecutiveCardShell>
+
+      <ExecutiveCardShell
+        title='Incidentes Sentry'
+        subtitle='Errores abiertos o recientes ya detectados por observabilidad externa para no depender solo del ledger interno.'
+      >
+        <Stack spacing={3}>
+          <Card variant='outlined'>
+            <CardContent>
+              <Box
+                sx={{
+                  display: 'grid',
+                  gap: 2,
+                  gridTemplateColumns: { xs: '1fr', md: 'repeat(3, minmax(0, 1fr))' }
+                }}
+              >
+                <Stack spacing={0.75}>
+                  <Typography variant='overline' color='text.secondary'>
+                    Estado
+                  </Typography>
+                  <Stack direction='row' spacing={1.5} alignItems='center'>
+                    <Chip size='small' variant='tonal' color={sentryStatusColor(sentryIncidents.status)} label={sentryIncidents.status} />
+                    <Typography variant='body2' color='text.secondary'>
+                      {sentryIncidents.summary}
+                    </Typography>
+                  </Stack>
+                </Stack>
+                <Stack spacing={0.75}>
+                  <Typography variant='overline' color='text.secondary'>
+                    Observability posture
+                  </Typography>
+                  <Typography variant='body2' color='text.secondary'>
+                    {data.cloud.observability.posture.summary}
+                  </Typography>
+                </Stack>
+                <Stack spacing={0.75}>
+                  <Typography variant='overline' color='text.secondary'>
+                    Última consulta
+                  </Typography>
+                  <Typography variant='body2' color='text.secondary'>
+                    {formatDateTime(sentryIncidents.fetchedAt)}
+                  </Typography>
+                </Stack>
+              </Box>
+            </CardContent>
+          </Card>
+
+          {sentryIncidents.incidents.length === 0 ? (
+            <Card variant='outlined'>
+              <CardContent>
+                <Typography variant='body2' color='text.secondary'>
+                  {sentryIncidents.status === 'unconfigured'
+                    ? 'Falta token o metadata base de Sentry para leer incidentes desde Ops Health.'
+                    : !sentryIncidents.available
+                      ? `Sentry no respondió en esta consulta. ${sentryIncidents.error ?? 'El portal sigue operativo y puedes reintentar más tarde.'}`
+                      : 'No hay incidentes Sentry abiertos en este momento.'}
+                </Typography>
+              </CardContent>
+            </Card>
+          ) : (
+            <Box
+              sx={{
+                display: 'grid',
+                gap: 2,
+                gridTemplateColumns: { xs: '1fr', xl: 'repeat(2, minmax(0, 1fr))' }
+              }}
+            >
+              {sentryIncidents.incidents.map(incident => (
+                <Card key={incident.id} variant='outlined'>
+                  <CardContent>
+                    <Stack spacing={1.25}>
+                      <Stack direction='row' justifyContent='space-between' alignItems='flex-start' gap={2}>
+                        <Stack spacing={0.5} sx={{ minWidth: 0 }}>
+                          <Typography variant='h6'>{incident.title}</Typography>
+                          <Typography variant='body2' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
+                            {incident.location}
+                          </Typography>
+                        </Stack>
+                        <Stack direction='row' spacing={1} flexWrap='wrap' justifyContent='flex-end'>
+                          <Chip size='small' variant='tonal' color={sentryLevelColor(incident.level)} label={incident.level} />
+                          <Chip size='small' variant='outlined' label={incident.environment || 'sin env'} />
+                        </Stack>
+                      </Stack>
+                      <Typography variant='body2' color='text.secondary'>
+                        {incident.shortId || 'Sentry'} · {incident.release || 'sin release'} · {incident.count} eventos · {incident.userCount} usuarios
+                      </Typography>
+                      <Typography variant='caption' color='text.secondary'>
+                        First seen: {formatDateTime(incident.firstSeen)} · Last seen: {formatDateTime(incident.lastSeen)}
+                      </Typography>
+                      {incident.permalink ? (
+                        <Button component='a' href={incident.permalink} target='_blank' rel='noreferrer' variant='outlined' size='small'>
+                          Abrir issue en Sentry
+                        </Button>
+                      ) : null}
+                    </Stack>
+                  </CardContent>
+                </Card>
+              ))}
+            </Box>
+          )}
+        </Stack>
       </ExecutiveCardShell>
 
       {/* Señales reactivas + Focos */}

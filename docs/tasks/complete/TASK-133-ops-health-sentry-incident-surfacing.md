@@ -1,14 +1,25 @@
 # TASK-133 — Ops Health: Sentry Incident Surfacing
 
+## Delta 2026-03-29
+
+- Cerrada con integración fail-soft de incidentes Sentry en `src/lib/cloud/observability.ts`.
+- `getOperationsOverview()` y `GET /api/internal/health` ahora exponen un snapshot canónico separado de la postura base de observability.
+- `Ops Health` y `Cloud & Integrations` muestran incidentes abiertos/relevantes con `title`, `location`, `release`, `environment`, `lastSeen` y deep-link.
+- Validación ejecutada:
+  - `pnpm exec vitest run src/lib/cloud/observability.test.ts src/lib/webhooks/target-url.test.ts`
+  - `pnpm exec eslint src/lib/cloud/contracts.ts src/lib/cloud/observability.ts src/lib/cloud/observability.test.ts src/lib/operations/get-operations-overview.ts src/app/api/internal/health/route.ts src/views/greenhouse/admin/AdminCloudIntegrationsView.tsx src/views/greenhouse/admin/AdminOpsHealthView.tsx src/lib/webhooks/target-url.test.ts`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm build`
+
 ## Status
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Medio` |
-| Status real | `Diseño` |
+| Status real | `Cerrada` |
 | Rank | — |
 | Domain | Cloud / Ops Health / Observability |
 | Sequence | Follow-on de TASK-098 (Observability MVP) y TASK-122 (Cloud Governance Layer) |
@@ -75,7 +86,7 @@ Reglas obligatorias:
 - `src/views/greenhouse/admin/AdminCloudIntegrationsView.tsx`
 - `src/views/greenhouse/admin/AdminOpsHealthView.tsx`
 - `src/app/api/internal/health/route.ts`
-- `docs/tasks/to-do/TASK-133-ops-health-sentry-incident-surfacing.md`
+- `docs/tasks/complete/TASK-133-ops-health-sentry-incident-surfacing.md`
 
 ## Current Repo State
 
@@ -127,13 +138,13 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Existe helper server-side para leer incidentes abiertos/relevantes desde Sentry.
-- [ ] `getOperationsOverview()` incorpora un bloque canónico de incidentes Sentry.
-- [ ] `Ops Health` muestra al menos endpoint/transacción, release, environment y última ocurrencia.
-- [ ] La integración degrada sin romper cuando falta token o Sentry no responde.
-- [ ] `pnpm lint` pasa.
-- [ ] `pnpm test` pasa.
-- [ ] `pnpm build` pasa.
+- [x] Existe helper server-side para leer incidentes abiertos/relevantes desde Sentry.
+- [x] `getOperationsOverview()` incorpora un bloque canónico de incidentes Sentry.
+- [x] `Ops Health` muestra al menos endpoint/transacción, release, environment y última ocurrencia.
+- [x] La integración degrada sin romper cuando falta token o Sentry no responde.
+- [x] `pnpm lint` pasa.
+- [x] `pnpm test` pasa.
+- [x] `pnpm build` pasa.
 
 ## Verification
 

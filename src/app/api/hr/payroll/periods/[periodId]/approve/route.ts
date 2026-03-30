@@ -61,9 +61,9 @@ export async function POST(_: Request, { params }: { params: Promise<{ periodId:
 
     const readiness = await getPayrollPeriodReadiness(periodId)
 
-    if (!readiness.ready) {
+    if (!readiness.approval.ready) {
       throw new PayrollValidationError('Payroll period is not ready for approval.', 409, {
-        blockingIssues: readiness.blockingIssues
+        blockingIssues: readiness.approval.blockingIssues
       })
     }
 

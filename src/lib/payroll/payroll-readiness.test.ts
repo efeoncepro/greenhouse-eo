@@ -82,10 +82,13 @@ describe('buildPayrollPeriodReadiness', () => {
     })
 
     expect(readiness.ready).toBe(true)
+    expect(readiness.calculation.ready).toBe(true)
+    expect(readiness.approval.ready).toBe(true)
     expect(readiness.includedMemberIds).toEqual(['member-1'])
     expect(readiness.blockingIssues).toHaveLength(0)
     expect(readiness.warnings).toHaveLength(0)
     expect(readiness.attendanceDiagnostics.blocking).toBe(false)
+    expect(readiness.calculation.deadline.lastBusinessDay).toBe('2026-03-31')
   })
 
   it('adds warnings for missing compensation, KPI, and attendance signals', () => {
@@ -107,6 +110,7 @@ describe('buildPayrollPeriodReadiness', () => {
     })
 
     expect(readiness.ready).toBe(true)
+    expect(readiness.calculation.ready).toBe(true)
     expect(readiness.missingCompensationMemberIds).toEqual(['member-2'])
     expect(readiness.missingKpiMemberIds).toEqual(['member-1'])
     expect(readiness.missingAttendanceMemberIds).toEqual(['member-1'])
@@ -134,6 +138,7 @@ describe('buildPayrollPeriodReadiness', () => {
     })
 
     expect(readiness.ready).toBe(false)
+    expect(readiness.calculation.ready).toBe(false)
     expect(readiness.blockingIssues.map(issue => issue.code)).toEqual(['no_compensated_members'])
   })
 
@@ -161,6 +166,7 @@ describe('buildPayrollPeriodReadiness', () => {
     })
 
     expect(readiness.ready).toBe(false)
+    expect(readiness.calculation.ready).toBe(false)
     expect(readiness.requiresUfValue).toBe(true)
     expect(readiness.blockingIssues.map(issue => issue.code)).toEqual(['missing_uf_value'])
   })
@@ -188,6 +194,7 @@ describe('buildPayrollPeriodReadiness', () => {
     })
 
     expect(readiness.ready).toBe(false)
+    expect(readiness.calculation.ready).toBe(false)
     expect(readiness.blockingIssues.map(issue => issue.code)).toEqual(['missing_tax_table_version'])
   })
 
@@ -212,6 +219,23 @@ describe('buildPayrollPeriodReadiness', () => {
     })
 
     expect(readiness.ready).toBe(false)
+    expect(readiness.calculation.ready).toBe(false)
     expect(readiness.blockingIssues.map(issue => issue.code)).toEqual(['missing_utm_value'])
+  })
+
+  it('marks draft periods as overdue once the calculation deadline passed', () => {
+    const readiness = buildPayrollPeriodReadiness({
+      period,
+      compensationRows: [compensatedMember],
+      missingKpiMemberIds: [],
+      missingAttendanceMemberIds: [],
+      attendanceDiagnostics,
+      referenceDate: '2026-04-02'
+    })
+
+    expect(readiness.calculation.deadline.lastBusinessDay).toBe('2026-03-31')
+    expect(readiness.calculation.deadline.isDue).toBe(false)
+    expect(readiness.calculation.deadline.isOverdue).toBe(true)
+    expect(readiness.calculation.deadline.calculatedOnTime).toBeNull()
   })
 })

@@ -8,6 +8,16 @@ Este documento es la fuente canónica del módulo. No reemplaza:
 - `GREENHOUSE_360_OBJECT_MODEL_V1.md` como modelo 360 transversal
 - `GREENHOUSE_POSTGRES_CANONICAL_360_V1.md` como placement del modelo en PostgreSQL
 
+## Delta 2026-03-29 — TASK-117 cerrada: cálculo el último día hábil
+
+- Payroll ya formaliza que el período oficial del mes debe quedar en `calculated` el último día hábil del mes operativo.
+- La semántica temporal vive en `src/lib/calendar/operational-calendar.ts` con:
+  - `getLastBusinessDayOfMonth()`
+  - `isLastBusinessDayOfMonth()`
+- El runtime ya separa `calculation readiness` de `approval readiness`.
+- El job idempotente `runPayrollAutoCalculation()` y la route `GET /api/cron/payroll-auto-calculate` reutilizan el path oficial de cálculo y auto-crean el período si falta.
+- El hito `payroll_period.calculated` ya notifica a stakeholders operativos por el dominio reactivo `notifications` con categoría `payroll_ops`.
+
 ## Delta 2026-03-28 — Próximo backlog operativo: cálculo el último día hábil
 
 - El siguiente backlog recomendado de Payroll queda documentado en `TASK-117`.
@@ -128,12 +138,14 @@ Regla operativa canónica para Efeonce:
 
 Esta regla define la semántica de negocio del dashboard, no solo su copy.
 
-Backlog recomendado del módulo:
+Baseline operativo vigente del módulo:
 
-- Como siguiente iteración, Payroll debería formalizar una policy explícita para dejar el período oficial del mes en `calculated` el último día hábil del mes operativo.
-- Esa iteración debería apoyarse en la utility temporal compartida, separar `calculation readiness` de `approval readiness`, y resolver un job idempotente de cálculo mensual.
-- El hito de `calculated` debería poder notificar a stakeholders operativos vía el dominio reactivo `notifications`, sin convertir `approved` ni `exported` en eventos automáticos.
-- Esta línea de trabajo vive operativamente en `TASK-117-payroll-last-business-day-auto-calculation.md`.
+- Payroll formaliza una policy explícita para dejar el período oficial del mes en `calculated` el último día hábil del mes operativo.
+- La utility temporal compartida resuelve `getLastBusinessDayOfMonth()` / `isLastBusinessDayOfMonth()` y la deadline semántica de cálculo.
+- `calculation readiness` y `approval readiness` quedan separadas sin alterar el lifecycle transaccional base.
+- El job idempotente mensual reutiliza el path oficial de cálculo, puede auto-crear el período y publica el evento canónico `payroll_period.calculated`.
+- El hito `calculated` notifica a stakeholders operativos vía el dominio reactivo `notifications`, sin convertir `approved` ni `exported` en eventos automáticos.
+- Esta línea de trabajo quedó cerrada operativamente en `TASK-117-payroll-last-business-day-auto-calculation.md`.
 
 ## 2.7. Timezone-aware operational calendar
 
@@ -227,6 +239,7 @@ Non-fit modules:
 - `GET /api/hr/payroll/periods/[periodId]/export`
 - `GET /api/hr/payroll/projected`
 - `POST /api/hr/payroll/projected/promote`
+- `GET /api/cron/payroll-auto-calculate`
 - `PATCH /api/hr/payroll/entries/[entryId]`
 - `GET /api/hr/payroll/entries/[entryId]/receipt`
 - `GET /api/hr/payroll/members/[memberId]/history`

@@ -3,17 +3,18 @@ import { NextResponse } from 'next/server'
 import { getBigQueryMaximumBytesBilled } from '@/lib/cloud/bigquery'
 import { getCloudGcpAuthPosture } from '@/lib/cloud/gcp-auth'
 import { buildCloudHealthSnapshot, getCloudPlatformHealthSnapshot, getCloudPostureChecks } from '@/lib/cloud/health'
-import { getCloudObservabilityPosture } from '@/lib/cloud/observability'
+import { getCloudObservabilityPosture, getCloudSentryIncidents } from '@/lib/cloud/observability'
 import { getCloudPostgresAccessProfilesPosture, getCloudPostgresPosture } from '@/lib/cloud/postgres'
 import { getCloudSecretsPosture } from '@/lib/cloud/secrets'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
-  const [runtimeHealth, secrets, observability] = await Promise.all([
+  const [runtimeHealth, secrets, observability, sentryIncidents] = await Promise.all([
     getCloudPlatformHealthSnapshot(),
     getCloudSecretsPosture(),
-    getCloudObservabilityPosture()
+    getCloudObservabilityPosture(),
+    getCloudSentryIncidents()
   ])
 
   const auth = getCloudGcpAuthPosture()
@@ -42,6 +43,7 @@ export async function GET() {
       version: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? 'local',
       auth,
       observability,
+      sentryIncidents,
       postgres,
       postgresAccessProfiles,
       secrets,

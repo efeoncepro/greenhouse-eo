@@ -4,6 +4,79 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-117 cerrada con auto-cálculo mensual de payroll
+
+### Completado
+- `TASK-117` pasó a `complete`.
+- Payroll ya formaliza el hito mensual de cálculo con:
+  - `getLastBusinessDayOfMonth()` / `isLastBusinessDayOfMonth()`
+  - `getPayrollCalculationDeadlineStatus()`
+  - `calculation readiness` separado de `approval readiness`
+  - `runPayrollAutoCalculation()` + `GET /api/cron/payroll-auto-calculate`
+  - auto-creación del período mensual cuando falta
+  - consumer reactivo `payroll_period.calculated` con categoría `payroll_ops`
+- `PayrollPeriodTab` ahora muestra deadline, estado operativo y cumplimiento del cálculo.
+- `approve/route` consume la rama `approval` del readiness en vez del readiness legacy mezclado.
+- Validación local ejecutada:
+  - `pnpm exec vitest run src/lib/calendar/operational-calendar.test.ts src/lib/payroll/current-payroll-period.test.ts src/lib/payroll/payroll-readiness.test.ts src/lib/payroll/auto-calculate-payroll.test.ts src/views/greenhouse/payroll/PayrollPeriodTab.test.tsx`
+  - `pnpm exec eslint ...` sobre calendario, payroll, cron y UI
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm build`
+
+### Pendiente inmediato
+- No queda blocker abierto dentro del alcance de `TASK-117`; los follow-ons que resten son de policy/UX futura o de adopción operativa en ambientes.
+
+## Sesión 2026-03-29 — TASK-133 cerrada con surfacing fail-soft de incidentes Sentry
+
+### Completado
+- `TASK-133` pasó a `complete`.
+- `src/lib/cloud/observability.ts` ahora separa:
+  - `getCloudObservabilityPosture()`
+  - `getCloudSentryIncidents()`
+- `getOperationsOverview()` ya proyecta:
+  - `cloud.observability.posture`
+  - `cloud.observability.incidents`
+- `GET /api/internal/health` ya expone también `sentryIncidents`.
+- UI conectada:
+  - `AdminOpsHealthView` muestra incidentes Sentry con status, summary, release, environment, ocurrencia y deep-link
+  - `AdminCloudIntegrationsView` resume el estado de incidentes y deriva a `Ops Health`
+- Validación local ejecutada:
+  - `pnpm exec vitest run src/lib/cloud/observability.test.ts src/lib/webhooks/target-url.test.ts`
+  - `pnpm exec eslint ...` sobre cloud/ops/admin views
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm build`
+
+### Pendiente inmediato
+- No queda blocker de repo para el surfacing; la validación runtime adicional en ambiente queda como smoke operativo, no como gap de implementación.
+
+## Sesión 2026-03-29 — TASK-133 iniciada con surfacing fail-soft de incidentes Sentry
+
+### Completado
+- `TASK-133` pasó a `in-progress`.
+- `src/lib/cloud/observability.ts` ahora separa:
+  - `getCloudObservabilityPosture()`
+  - `getCloudSentryIncidents()`
+- Nuevo contrato canónico en `src/lib/cloud/contracts.ts`:
+  - `CloudSentryIncident`
+  - `CloudSentryIncidentsSnapshot`
+- `getOperationsOverview()` ya proyecta:
+  - `cloud.observability.posture`
+  - `cloud.observability.incidents`
+- `GET /api/internal/health` ya expone también `sentryIncidents` sin mezclar incidentes con el health runtime base.
+- UI conectada:
+  - `AdminOpsHealthView` muestra incidentes Sentry con status, summary, release, environment, ocurrencia y deep-link
+  - `AdminCloudIntegrationsView` resume el estado de incidentes y deriva a `Ops Health`
+- Validación local ejecutada:
+  - `pnpm exec vitest run src/lib/cloud/observability.test.ts src/lib/webhooks/target-url.test.ts`
+  - `pnpm exec eslint src/lib/cloud/contracts.ts src/lib/cloud/observability.ts src/lib/cloud/observability.test.ts src/lib/operations/get-operations-overview.ts src/app/api/internal/health/route.ts src/views/greenhouse/admin/AdminOpsHealthView.tsx src/views/greenhouse/admin/AdminCloudIntegrationsView.tsx src/lib/webhooks/target-url.test.ts`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm build`
+- Drift incidental corregido:
+  - `src/lib/webhooks/target-url.test.ts` ahora pasa `NODE_ENV: 'test'` para respetar el contrato tipado actual de `ProcessEnv`
+
+### Pendiente inmediato
+- Superado por el cierre posterior de `TASK-133` en esta misma fecha.
+
 ## Sesión 2026-03-29 — TASK-129 promovida a production y validada end-to-end
 
 ### Completado

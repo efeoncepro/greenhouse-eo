@@ -360,6 +360,20 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
   const netSummary = buildPayrollCurrencySummary(entries, entry => entry.netTotal)
   const deductionsSummary = buildPayrollCurrencySummary(entries, entry => entry.chileTotalDeductions ?? 0)
 
+  const calculationDeadline = readiness?.calculation.deadline ?? null
+
+  const calculationOperationalLabel = calculationDeadline
+    ? calculationDeadline.calculatedOnTime === true
+      ? 'Calculada en fecha'
+      : calculationDeadline.calculatedOnTime === false
+        ? 'Calculada fuera de fecha'
+        : calculationDeadline.isOverdue
+          ? 'Bloqueada o fuera de fecha'
+          : calculationDeadline.isDue
+            ? 'Pendiente hoy'
+            : 'Pendiente'
+    : 'Sin evaluación'
+
   return (
     <>
       {isHistoricalSelection && (
@@ -462,7 +476,7 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
                     size='small'
                     startIcon={<i className='tabler-calculator' />}
                     onClick={handleCalculate}
-                    disabled={isPending || readinessLoading || readiness?.ready === false}
+                    disabled={isPending || readinessLoading || readiness?.calculation.ready === false}
                   >
                     Calcular
                   </Button>
@@ -645,6 +659,23 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
 
           {readiness && (
             <Stack spacing={2} sx={{ mb: 3 }}>
+              <Alert severity={calculationDeadline?.isOverdue ? 'error' : calculationDeadline?.isDue ? 'warning' : 'info'}>
+                Deadline de cálculo:
+                {' '}
+                {calculationDeadline?.lastBusinessDay ?? 'Sin definir'}
+                {' · '}
+                Estado operativo:
+                {' '}
+                {calculationOperationalLabel}
+                {' · '}
+                Readiness cálculo:
+                {' '}
+                {readiness.calculation.ready ? 'lista para calcular' : 'con blockers'}
+                {' · '}
+                Readiness aprobación:
+                {' '}
+                {readiness.approval.ready ? 'lista para aprobar' : 'con blockers'}
+              </Alert>
               {readiness.blockingIssues.map(issue => (
                 <Alert key={issue.code} severity='error'>
                   {issue.message}

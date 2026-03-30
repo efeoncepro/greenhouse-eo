@@ -3,7 +3,10 @@ import { describe, expect, it } from 'vitest'
 import {
   countBusinessDays,
   DEFAULT_OPERATIONAL_CALENDAR_TIMEZONE,
+  getLastBusinessDayOfMonth,
+  getOperationalDateKey,
   getOperationalPayrollMonth,
+  isLastBusinessDayOfMonth,
   isWithinPayrollCloseWindow,
   resolveOperationalCalendarContext
 } from './operational-calendar'
@@ -82,5 +85,31 @@ describe('operational-calendar', () => {
     expect(resolution.inCloseWindow).toBe(true)
     expect(resolution.businessDaysElapsed).toBe(5)
   })
-})
 
+  it('resolves the last business day of a month skipping weekends and local holidays', () => {
+    const lastBusinessDay = getLastBusinessDayOfMonth(2026, 5, {
+      timezone: DEFAULT_OPERATIONAL_CALENDAR_TIMEZONE,
+      holidayDates: ['2026-05-29']
+    })
+
+    expect(lastBusinessDay).toBe('2026-05-28')
+  })
+
+  it('detects when a date is the last business day of the month', () => {
+    expect(isLastBusinessDayOfMonth('2026-03-31', {
+      timezone: DEFAULT_OPERATIONAL_CALENDAR_TIMEZONE
+    })).toBe(true)
+
+    expect(isLastBusinessDayOfMonth('2026-03-30', {
+      timezone: DEFAULT_OPERATIONAL_CALENDAR_TIMEZONE
+    })).toBe(false)
+  })
+
+  it('returns a timezone-aware date key for operational comparisons', () => {
+    const dateKey = getOperationalDateKey(new Date('2026-04-01T02:30:00.000Z'), {
+      timezone: DEFAULT_OPERATIONAL_CALENDAR_TIMEZONE
+    })
+
+    expect(dateKey).toBe('2026-03-31')
+  })
+})

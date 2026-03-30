@@ -88,7 +88,7 @@ Primer bloque operativo asignado:
 
 ### Prioridad vigente — backlog `to-do` por impacto vs esfuerzo
 
-- **Top ROI ahora:** `TASK-100` → `TASK-101` → `TASK-072` → `TASK-098` → `TASK-026` → `TASK-109` → `TASK-117` → `TASK-030`.
+- **Top ROI ahora:** `TASK-100` → `TASK-101` → `TASK-072` → `TASK-098` → `TASK-026` → `TASK-109` → `TASK-030`.
 - **Siguiente ola:** `TASK-027` → `TASK-028` → `TASK-116` → `TASK-067` → `TASK-068` → `TASK-070` → `TASK-011`.
 - **Estratégicas pero caras:** `TASK-008` → `TASK-005` → `TASK-069` → `TASK-118` → `TASK-018` → `TASK-019`.
 - **Later / oportunistas:** `TASK-029` → `TASK-031` → `TASK-015` → `TASK-016` → `TASK-020` → `TASK-115` → `TASK-107` → `TASK-103` → `TASK-021` → `TASK-032` → `TASK-053` → `TASK-054` → `TASK-055` → `TASK-058` → `TASK-059` → `TASK-071`.
@@ -164,7 +164,6 @@ Primer bloque operativo asignado:
 | 41 | `TASK-114` | [TASK-114-nexa-backend-persistence-suggestions.md](complete/TASK-114-nexa-backend-persistence-suggestions.md) | P1 | Alto | Medio | **Cerrada** | **[Codex]** Backend Nexa implementado: feedback PG, thread history, persistence de conversación, `threadId` y dynamic suggestions |
 | 42 | `TASK-115` | [TASK-115-nexa-ui-completion.md](to-do/TASK-115-nexa-ui-completion.md) | P1 | Alto | Medio | Diseño actualizado | **[Claude]** UI Nexa: edit inline, follow-up suggestions, feedback thumbs, floating modal, thread sidebar; backend de `TASK-114` ya disponible |
 | 43 | `TASK-116` | [TASK-116-sidebar-navigation-audit-remediation.md](to-do/TASK-116-sidebar-navigation-audit-remediation.md) | P2 | Alto | Bajo-Medio | Auditoría completada | **[Claude]** Sidebar: fix Spanglish, desambiguar duplicados, Gestión/Mi Ficha a submenu, agregar /home, documentar reglas |
-| 44 | `TASK-117` | [TASK-117-payroll-last-business-day-auto-calculation.md](to-do/TASK-117-payroll-last-business-day-auto-calculation.md) | P1 | Alto | Medio | Diseño | Payroll official debe quedar en `calculated` el último día hábil del mes operativo, con helper temporal canónico, readiness de cálculo y job idempotente |
 | 45 | `TASK-118` | [TASK-118-ico-ai-core-embedded-intelligence.md](to-do/TASK-118-ico-ai-core-embedded-intelligence.md) | P1 | Muy alto | Alto | Diseño completado | **[Codex+Claude]** IA embebida en ICO: anomaly detection, predictions, root cause, capacity forecast, recommendations. Advisory-only, internal, TypeScript in-process |
 | 46 | `TASK-119` | [TASK-119-home-landing-rollout-navigation-cutover.md](complete/TASK-119-home-landing-rollout-navigation-cutover.md) | P1 | Alto | Medio | **Cerrada** | Rollout final de `/home` completado: `portalHomePath` institucional a `/home`, sesiones legadas normalizadas y verificación manual confirmada |
 | 47 | `TASK-120` | [TASK-120-admin-center-governance-follow-on-cutover.md](complete/TASK-120-admin-center-governance-follow-on-cutover.md) | P2 | Medio | Bajo | **Absorbida** | Follow-on absorbido por la unificación efectiva de `Admin Center + Control Tower` |
@@ -174,7 +173,6 @@ Primer bloque operativo asignado:
 | 51 | `TASK-126` | [TASK-126-csp-enforcement-hardening.md](to-do/TASK-126-csp-enforcement-hardening.md) | P2 | Medio | Medio | Diseño | Follow-on de security headers para pasar de `CSP-Report-Only` a una política más estricta sin romper auth, MUI, observability ni uploads |
 | 52 | `TASK-127` | [TASK-127-cloud-architecture-posture-consolidation.md](to-do/TASK-127-cloud-architecture-posture-consolidation.md) | P2 | Alto | Medio | Diseño | Consolidar la arquitectura Cloud post-baseline con scorecard semáforo por dominio, cleanup de drift documental y plan corto de next hardening wave |
 | 53 | `TASK-131` | [TASK-131-cloud-health-runtime-tooling-posture-separation.md](complete/TASK-131-cloud-health-runtime-tooling-posture-separation.md) | P1 | Alto | Medio | **Cerrada** | Health Cloud ya separa secretos runtime vs tooling: `migrator/admin` siguen visibles en `postgresAccessProfiles`, pero ya no degradan `overallStatus` del portal sano |
-| 54 | `TASK-133` | [TASK-133-ops-health-sentry-incident-surfacing.md](to-do/TASK-133-ops-health-sentry-incident-surfacing.md) | P1 | Alto | Medio | Diseño | Exponer incidentes abiertos/relevantes de Sentry dentro de `Ops Health`, con payload canónico fail-soft y contexto operativo por release/transacción |
 | 38 | ~~CODEX_TASK_Greenhouse_Email_Catalog_v1.md~~ | — | — | — | **Movida a spec** | Reclasificada como documento de referencia → `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md` |
 | 30 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | P3 | Medio | Medio | Parcial | Consolidación UX transversal de shells, vistas y navegación |
 | 31 | ~~CODEX_TASK_Typography_Hierarchy_Fix.md~~ | — | — | — | **Cerrada** | Jerarquía core absorbida en mergedTheme.ts; custom variants `monoId`, `monoAmount`, `kpiValue` para adopción gradual |
@@ -218,6 +216,8 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 
 ## Complete
 
+| [TASK-133-ops-health-sentry-incident-surfacing.md](complete/TASK-133-ops-health-sentry-incident-surfacing.md) | Incidentes Sentry abiertos/relevantes visibles en `Ops Health` y `Cloud & Integrations` con snapshot fail-soft separado de la postura base de observability. |
+| [TASK-117-payroll-last-business-day-auto-calculation.md](complete/TASK-117-payroll-last-business-day-auto-calculation.md) | Policy operativa de último día hábil cerrada: helper temporal canónico, readiness de cálculo separado, cron idempotente con auto-creación del período y notificación reactiva `payroll_ops` al quedar `calculated`. |
 | [TASK-124-gcp-secret-manager-critical-secrets-migration.md](complete/TASK-124-gcp-secret-manager-critical-secrets-migration.md) | Secret Manager crítico cerrado: helper canónico, postura en `/api/internal/health`, migración de Nubox/Postgres/Auth-SSO y validación real en `staging` + `production` con secretos sirviéndose desde Secret Manager. |
 | [TASK-096-gcp-secret-management-security-hardening.md](complete/TASK-096-gcp-secret-management-security-hardening.md) | Hardening cloud cerrado para su alcance útil: WIF/OIDC validado en `preview` + `staging` + `production`, Cloud SQL externo endurecido y Fase 3 absorbida posteriormente por `TASK-124`. |
 | [TASK-099-security-headers-middleware.md](complete/TASK-099-security-headers-middleware.md) | Baseline de security headers cerrada: `src/proxy.ts`, matcher conservador, `HSTS` en `production` y `Content-Security-Policy-Report-Only` como capa segura de observación. |

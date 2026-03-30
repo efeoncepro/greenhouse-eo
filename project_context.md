@@ -3,6 +3,29 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-29 TASK-117 auto-cálculo mensual de payroll
+- Payroll ya formaliza el hito mensual para dejar el período oficial en `calculated` el último día hábil del mes operativo.
+- Contratos nuevos o endurecidos:
+  - `getLastBusinessDayOfMonth()` / `isLastBusinessDayOfMonth()`
+  - `getPayrollCalculationDeadlineStatus()`
+  - `runPayrollAutoCalculation()`
+  - `GET /api/cron/payroll-auto-calculate`
+- `PayrollPeriodReadiness` ahora separa `calculation` y `approval`.
+- `payroll_period.calculated` ya puede notificar a stakeholders operativos por el dominio reactivo `notifications` bajo la categoría `payroll_ops`.
+
+## Delta 2026-03-29 TASK-133 observability incidents en Ops Health
+- El dominio Cloud ya separa dos capas de observability:
+  - `posture/configuración` en `getCloudObservabilityPosture()`
+  - `incidentes Sentry abiertos/relevantes` en `getCloudSentryIncidents()`
+- `getOperationsOverview()` ahora proyecta:
+  - `cloud.observability.posture`
+  - `cloud.observability.incidents`
+- `GET /api/internal/health` expone también `sentryIncidents` como snapshot fail-soft machine-readable.
+- `Ops Health` y `Cloud & Integrations` ya pueden mostrar errores runtime detectados por Sentry sin degradar el `overallStatus` base del health interno.
+- Decisión arquitectónica explícita:
+  - incidentes Sentry no reescriben la semántica del control plane health
+  - siguen siendo señal operativa adicional, no fuente del semáforo runtime/posture
+
 ## Delta 2026-03-29 TASK-129 validada en production
 - `main` ya incluye el consumer institucional de notificaciones via webhook bus.
 - `production` quedó validada con delivery firmada real sobre:
