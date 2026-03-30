@@ -51,7 +51,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
   const [sectionFilter, setSectionFilter] = useState<string>('all')
   const [permissionsFocus, setPermissionsFocus] = useState<PermissionsFocus>('all')
   const [bulkRoleCode, setBulkRoleCode] = useState<string>(data.roles[0]?.roleCode ?? '')
-  const [previewUserId, setPreviewUserId] = useState<string>(data.users[0]?.userId ?? '')
+  const [previewSelectionKey, setPreviewSelectionKey] = useState<string>(data.users[0]?.previewKey ?? '')
   const [previewFocus, setPreviewFocus] = useState<PreviewFocus>('impact')
   const [editableViews, setEditableViews] = useState(data.views)
   const [saveError, setSaveError] = useState<string | null>(null)
@@ -171,24 +171,24 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
   )
 
   const previewUser = useMemo(
-    () => data.users.find(user => user.userId === previewUserId) ?? data.users[0] ?? null,
-    [data.users, previewUserId]
+    () => data.users.find(user => user.previewKey === previewSelectionKey) ?? data.users[0] ?? null,
+    [data.users, previewSelectionKey]
   )
 
   const selectedUserOverrides = useMemo(
-    () => editableUserOverrides.filter(override => override.userId === previewUserId),
-    [editableUserOverrides, previewUserId]
+    () => editableUserOverrides.filter(override => override.userId === previewUser?.userId),
+    [editableUserOverrides, previewUser?.userId]
   )
 
   useEffect(() => {
-    const firstReason = data.userOverrides.find(override => override.userId === previewUserId && override.reason)?.reason ?? ''
-    const firstExpiresAt = data.userOverrides.find(override => override.userId === previewUserId && override.expiresAt)?.expiresAt ?? ''
+    const firstReason = data.userOverrides.find(override => override.userId === previewUser?.userId && override.reason)?.reason ?? ''
+    const firstExpiresAt = data.userOverrides.find(override => override.userId === previewUser?.userId && override.expiresAt)?.expiresAt ?? ''
 
     setOverrideReason(firstReason)
     setOverrideExpiresAt(firstExpiresAt ? String(firstExpiresAt).slice(0, 16) : '')
     setOverrideError(null)
     setOverrideSuccess(null)
-  }, [data.userOverrides, previewUserId])
+  }, [data.userOverrides, previewUser?.userId])
 
   const previewViews = useMemo(() => {
     if (!previewUser) return []
@@ -287,8 +287,8 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
   )
 
   const previewUserAuditLog = useMemo(
-    () => data.auditLog.filter(entry => entry.targetUser === previewUserId).slice(0, 10),
-    [data.auditLog, previewUserId]
+    () => data.auditLog.filter(entry => entry.targetUser === previewUser?.userId).slice(0, 10),
+    [data.auditLog, previewUser?.userId]
   )
 
   const toggleRoleAccess = (viewCode: string, roleCode: string) => {
@@ -367,6 +367,14 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
   }
 
   const toggleUserOverride = (viewCode: string) => {
+    if (!previewUser?.userId) {
+      setOverrideError('Esta persona no tiene un principal portal compatible para guardar overrides todavía.')
+
+      return
+    }
+
+    const previewUserId = previewUser.userId
+
     setOverrideError(null)
     setOverrideSuccess(null)
 
@@ -449,7 +457,11 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
   }
 
   const handleSaveOverrides = async () => {
-    if (!previewUser) return
+    if (!previewUser?.userId) {
+      setOverrideError('Esta persona no tiene un principal portal compatible para guardar overrides todavía.')
+
+      return
+    }
 
     const overridesForUser = editableUserOverrides
       .filter(override => override.userId === previewUser.userId)
@@ -840,19 +852,19 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                       select
                       fullWidth
                       size='small'
-                      label='Seleccionar principal portal'
-                      value={previewUserId}
-                      onChange={event => setPreviewUserId(event.target.value)}
+                      label='Seleccionar persona previewable'
+                      value={previewSelectionKey}
+                      onChange={event => setPreviewSelectionKey(event.target.value)}
                     >
                       {data.users.map(user => (
-                        <MenuItem key={user.userId} value={user.userId}>
-                          {user.fullName} · {user.email}
+                        <MenuItem key={user.previewKey} value={user.previewKey}>
+                          {user.fullName} · {user.email} · {user.previewMode === 'person' ? 'persona' : 'principal'}
                         </MenuItem>
                       ))}
                     </TextField>
                   </Box>
                   <Alert severity='info' variant='outlined'>
-                    El preview sigue siendo `userId`-scoped para session y overrides. Aquí mostramos además el bridge a persona canónica para no leer `client_user` como raíz humana.
+                    El universo del selector ya es persona-first cuando existe `identityProfileId`. Los overrides y la auditoría siguen siendo `userId`-scoped sobre el principal portal compatible.
                   </Alert>
                 </Stack>
 
@@ -866,9 +878,9 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                       }}
                     >
                       <ExecutiveMiniStatCard title='Baseline visible' value={String(previewBaselineViews.length)} detail='Vistas heredadas por rol antes del override' icon='tabler-layers-linked' tone='info' />
-                      <ExecutiveMiniStatCard title='Overrides activos' value={String(selectedUserOverrides.length)} detail='Grant o revoke configurados para este usuario' icon='tabler-adjustments-horizontal' tone='warning' />
+                      <ExecutiveMiniStatCard title='Overrides activos' value={String(selectedUserOverrides.length)} detail={previewUser.userId ? 'Grant o revoke sobre el principal portal seleccionado' : 'Sin principal portal compatible para persistir overrides'} icon='tabler-adjustments-horizontal' tone='warning' />
                       <ExecutiveMiniStatCard title='Grant extra' value={String(previewGrantedByOverride.length)} detail='Vistas añadidas sobre la baseline del rol' icon='tabler-circle-plus' tone='success' />
-                      <ExecutiveMiniStatCard title='Revoke efectivo' value={String(previewRevokedByOverride.length)} detail='Vistas ocultas respecto de la baseline del rol' icon='tabler-circle-minus' tone='error' />
+                      <ExecutiveMiniStatCard title='Principal portal' value={String(previewUser.portalPrincipalCount)} detail={previewUser.portalPrincipalCount > 1 ? 'La persona consolida más de un principal portal' : 'La persona consolida un principal portal'} icon='tabler-user-shield' tone='error' />
                     </Box>
 
                     <Card variant='outlined'>
@@ -880,10 +892,19 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                             <Box>
                               <Typography variant='h6'>{previewUser.fullName}</Typography>
                               <Typography color='text.secondary'>{previewUser.email}</Typography>
+                              <Typography variant='body2' color='text.secondary'>
+                                {previewUser.previewMode === 'person' ? 'Persona previewable' : 'Principal portal sin bridge persona completo'}
+                              </Typography>
                             </Box>
                           </Stack>
                           <Stack direction='row' spacing={1} flexWrap='wrap'>
                             <Chip size='small' color='info' variant='tonal' label={previewUser.tenantType} />
+                            <Chip
+                              size='small'
+                              color={previewUser.previewMode === 'person' ? 'secondary' : 'default'}
+                              variant='tonal'
+                              label={previewUser.previewMode === 'person' ? 'persona canónica' : 'principal portal'}
+                            />
                             <Chip
                               size='small'
                               color={previewUser.portalAccessState === 'active' ? 'success' : previewUser.portalAccessState === 'inactive' ? 'default' : 'warning'}
@@ -900,10 +921,15 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                             Contrato canónico
                           </Typography>
                           <Stack direction='row' spacing={1} flexWrap='wrap'>
-                            <Chip size='small' variant='outlined' label={`user:${previewUser.userId}`} />
+                            {previewUser.userId ? <Chip size='small' variant='outlined' label={`user:${previewUser.userId}`} /> : null}
                             {previewUser.identityProfileId ? <Chip size='small' color='secondary' variant='tonal' label={`person:${previewUser.identityProfileId}`} /> : null}
                             {previewUser.memberId ? <Chip size='small' color='warning' variant='tonal' label={`member:${previewUser.memberId}`} /> : null}
                           </Stack>
+                          {previewUser.linkedUserIds.length > 1 ? (
+                            <Typography variant='caption' color='text.secondary'>
+                              Principales portal enlazados: {previewUser.linkedUserIds.join(', ')}
+                            </Typography>
+                          ) : null}
                         </Stack>
 
                         <Stack spacing={1}>
@@ -933,24 +959,32 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                               <Stack spacing={2}>
                               <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} justifyContent='space-between' alignItems={{ md: 'center' }}>
                                 <Box>
-                                  <Typography variant='h6'>Overrides por usuario</Typography>
+                                  <Typography variant='h6'>Overrides del principal portal</Typography>
                                   <Typography variant='body2' color='text.secondary'>
-                                    Cambia una vista entre `inherit`, `grant` y `revoke`. Puedes concentrarte en visibles, overrides o impacto efectivo antes de guardar el batch.
+                                    Cambia una vista entre `inherit`, `grant` y `revoke`. La persona es la raíz del preview, pero la persistencia sigue usando el principal portal compatible para no romper auditoría ni `authorizedViews`.
                                   </Typography>
                                 </Box>
                                 <Stack direction='row' spacing={1}>
-                                  <Button variant='outlined' disabled={savingOverrides} onClick={() => {
+                                  <Button variant='outlined' disabled={savingOverrides || !previewUser.userId} onClick={() => {
+                                    if (!previewUser.userId) return
+
                                     setEditableUserOverrides(current => current.filter(override => override.userId !== previewUser.userId))
                                     setOverrideError(null)
                                     setOverrideSuccess(null)
                                   }}>
-                                    Limpiar usuario
+                                    Limpiar principal
                                   </Button>
-                                  <Button variant='contained' disabled={savingOverrides} onClick={handleSaveOverrides}>
+                                  <Button variant='contained' disabled={savingOverrides || !previewUser.userId} onClick={handleSaveOverrides}>
                                     {savingOverrides ? 'Guardando...' : 'Guardar overrides'}
                                   </Button>
                                 </Stack>
                               </Stack>
+
+                              {!previewUser.userId ? (
+                                <Alert severity='warning' variant='outlined'>
+                                  Esta persona todavía no tiene un principal portal persistible. Puedes revisar el acceso efectivo, pero no guardar overrides hasta que exista `userId` compatible.
+                                </Alert>
+                              ) : null}
 
                               <TextField
                                 size='small'
@@ -1006,7 +1040,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
 
                                   return (
                                     <Box
-                                      key={`${previewUser.userId}-${view.viewCode}`}
+                                      key={`${previewUser.previewKey}-${view.viewCode}`}
                                       sx={{
                                         border: theme => `1px solid ${theme.palette.divider}`,
                                         borderRadius: 1,

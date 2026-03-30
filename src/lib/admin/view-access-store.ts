@@ -1,9 +1,9 @@
 import 'server-only'
 
+import { enrichGovernancePreviewUsers } from '@/lib/admin/admin-preview-persons'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { GOVERNANCE_SECTIONS, VIEW_REGISTRY, type GovernanceViewRegistryEntry } from '@/lib/admin/view-access-catalog'
 import { getAdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
-import { getCanonicalPersonsByUserIds } from '@/lib/identity/canonical-person'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 
@@ -875,24 +875,7 @@ export const getAdminPersistedViewAccessGovernance = async () => {
     routeGroups: user.routeGroups
   }))
 
-  const canonicalByUserId = await getCanonicalPersonsByUserIds(userBaselines.map(user => user.userId))
-
-  const users = userBaselines.map(user => {
-    const canonical = canonicalByUserId.get(user.userId)
-
-    return {
-      userId: user.userId,
-      fullName: canonical?.displayName ?? user.fullName,
-      email: canonical?.canonicalEmail ?? user.email,
-      tenantType: canonical?.tenantType ?? user.tenantType,
-      roleCodes: user.roleCodes,
-      routeGroups: user.routeGroups,
-      identityProfileId: canonical?.identityProfileId ?? null,
-      memberId: canonical?.memberId ?? null,
-      portalAccessState: canonical?.portalAccessState ?? 'degraded_link',
-      resolutionSource: canonical?.resolutionSource ?? 'fallback'
-    }
-  })
+  const users = await enrichGovernancePreviewUsers(userBaselines)
 
   const views = registryRows.map(view => ({
     ...view,

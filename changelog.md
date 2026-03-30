@@ -2,6 +2,11 @@
 
 ## 2026-03-30
 
+- `TASK-140` salió de diseño y ya tiene `Slice 1` implementado en `/admin/views`:
+  - nuevo helper shared `src/lib/admin/admin-preview-persons.ts`
+  - el selector de preview ahora agrupa por persona canónica cuando existe `identityProfileId`
+  - el consumer sigue preservando `userId` como llave operativa para overrides, auditoría y `authorizedViews`
+  - la UI distingue mejor entre persona, faceta operativa y principal portal compatible
 - `TASK-141` quedó formalmente cerrada como lane institucional:
   - el contrato canónico persona/member/client_user ya no queda abierto como diseño
   - la implementación mínima reusable quedó activa con `src/lib/identity/canonical-person.ts`

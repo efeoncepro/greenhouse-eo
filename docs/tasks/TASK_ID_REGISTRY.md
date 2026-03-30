@@ -185,7 +185,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 | `TASK-138` | `complete` | Finance Intelligence: Audit Gaps, Notifications & Synergies | `docs/tasks/complete/TASK-138-finance-intelligence-audit-gaps.md` |
 | `TASK-139` | `complete` | Finance Module Hardening: Corrections & Data Quality | `docs/tasks/complete/TASK-139-finance-module-hardening.md` |
-| `TASK-140` | `to-do` | Admin Views Person-First Preview Cutover | `docs/tasks/to-do/TASK-140-admin-views-person-first-preview.md` |
+| `TASK-140` | `in-progress` | Admin Views Person-First Preview Cutover | `docs/tasks/in-progress/TASK-140-admin-views-person-first-preview.md` |
 | `TASK-141` | `complete` | Canonical Person Identity Consumption | `docs/tasks/complete/TASK-141-canonical-person-identity-consumption.md` |
 | `TASK-142` | `to-do` | Agency Space 360 View | `docs/tasks/to-do/TASK-142-agency-space-360-view.md` |
 | `TASK-143` | `to-do` | Agency Economics API & View | `docs/tasks/to-do/TASK-143-agency-economics-api.md` |

@@ -2,11 +2,11 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
-- Status real: `Diseño`
+- Status real: `Slice 1 implementado`
 - Rank: `56`
 - Domain: `admin / identity / access / ui`
 
@@ -26,6 +26,12 @@ Esta task ya no define la política institucional completa. Toma esa política y
 - Implicación nueva para este follow-on:
   - `/admin/views` ya no necesita inventar su propio bridge persona/member/user
   - debe adoptar el resolver shared y mantener `userId` solo como llave de compatibilidad para overrides, audit y `authorizedViews`
+- Slice 1 implementado en runtime:
+  - nuevo helper shared `src/lib/admin/admin-preview-persons.ts`
+  - `/admin/views` ahora agrupa el universo previewable por `identityProfileId` cuando existe y cae a `user:<userId>` solo como fallback
+  - la UI ya selecciona “persona previewable” y explicita cuándo el principal portal sigue siendo la llave operativa de compatibilidad
+- Guardrail explícito del slice:
+  - no se tocaron `user_view_overrides`, `view_access_log`, `authorizedViews` ni la resolución runtime de sesión
 
 ## Why This Task Exists
 
@@ -113,12 +119,12 @@ Reglas obligatorias:
 
 ### Gap actual
 
-- el selector de preview sigue naciendo desde `client_users`
+- el overview fuente todavía nace desde `client_users`, aunque el consumer ya lo reagrupa en clave persona previewable
 - no está explicitado qué universo debe entrar al preview:
   - toda persona activa
   - toda persona con acceso portal
   - toda persona con membership relevante
-- el copy y el modelo de la UI siguen hablando de “usuario” cuando el producto ya piensa en “persona”
+- queda remanente de copy y definición operativa para casos sin principal portal persistible
 
 ## Scope
 
@@ -171,11 +177,11 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] existe una definición explícita y documentada de “persona previewable” para `/admin/views`
-- [ ] `/admin/views` deja de depender conceptualmente de `client_users` como identidad raíz del preview
-- [ ] el preview resuelve acceso efectivo sin perder compatibilidad con overrides user-scoped
-- [ ] la UI distingue correctamente persona vs acceso portal cuando haga falta
-- [ ] el copy de la superficie deja de inducir una lectura `client_user-first`
+- [x] existe una definición explícita y documentada de “persona previewable” para `/admin/views`
+- [x] `/admin/views` deja de depender conceptualmente de `client_users` como identidad raíz del preview
+- [x] el preview resuelve acceso efectivo sin perder compatibilidad con overrides user-scoped
+- [x] la UI distingue correctamente persona vs acceso portal cuando haga falta
+- [x] el copy de la superficie deja de inducir una lectura `client_user-first`
 
 ## Verification
 
@@ -186,6 +192,17 @@ Reglas obligatorias:
   - una persona interna con acceso
   - una persona cliente con acceso
   - un caso borde donde la persona exista pero el principal portal esté incompleto o degradado
+
+## Current Slice Outcome
+
+- definición operativa del slice:
+  - “persona previewable” = persona canónica cuando existe `identityProfileId` y tiene al menos un principal portal resoluble para el consumer actual
+  - fallback = principal portal sin bridge persona completo, visible con honestidad como caso degradado
+- compatibilidad preservada:
+  - selección y preview ya son persona-first
+  - overrides, auditoría y runtime session siguen `userId`-scoped
+- remanente explícito:
+  - evaluar si un siguiente slice debe abrir el universo a personas sin principal portal persistible o si ese carril debe quedar solo como estado informativo
 
 ## Open Questions
 

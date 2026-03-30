@@ -1,13 +1,9 @@
 import 'server-only'
 
 import { getAdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
+import { enrichGovernancePreviewUsers, type AdminGovernanceUserPreview } from '@/lib/admin/admin-preview-persons'
 import { getAdminPersistedViewAccessGovernance } from '@/lib/admin/view-access-store'
 import { GOVERNANCE_SECTIONS, VIEW_REGISTRY, type GovernanceSection, type GovernanceViewRegistryEntry } from '@/lib/admin/view-access-catalog'
-import {
-  getCanonicalPersonsByUserIds,
-  type CanonicalPersonPortalAccessState,
-  type CanonicalPersonResolutionSource
-} from '@/lib/identity/canonical-person'
 
 export type AdminGovernanceRole = {
   roleCode: string
@@ -17,19 +13,6 @@ export type AdminGovernanceRole = {
   isInternal: boolean
   routeGroups: string[]
   assignedUsers: number
-}
-
-export type AdminGovernanceUserPreview = {
-  userId: string
-  fullName: string
-  email: string
-  tenantType: 'client' | 'efeonce_internal'
-  roleCodes: string[]
-  routeGroups: string[]
-  identityProfileId: string | null
-  memberId: string | null
-  portalAccessState: CanonicalPersonPortalAccessState
-  resolutionSource: CanonicalPersonResolutionSource
 }
 
 export type AdminGovernanceUserOverride = {
@@ -76,34 +59,6 @@ export type AdminGovernanceOverview = {
     rolesWithPersistedAssignments: number
     usesPersistedRegistry: boolean
   }
-}
-
-export const enrichGovernancePreviewUsers = async (users: Array<{
-  userId: string
-  fullName: string
-  email: string
-  tenantType: 'client' | 'efeonce_internal'
-  roleCodes: string[]
-  routeGroups: string[]
-}>): Promise<AdminGovernanceUserPreview[]> => {
-  const canonicalByUserId = await getCanonicalPersonsByUserIds(users.map(user => user.userId))
-
-  return users.map(user => {
-    const canonical = canonicalByUserId.get(user.userId)
-
-    return {
-      userId: user.userId,
-      fullName: canonical?.displayName ?? user.fullName,
-      email: canonical?.canonicalEmail ?? user.email,
-      tenantType: canonical?.tenantType ?? user.tenantType,
-      roleCodes: user.roleCodes,
-      routeGroups: user.routeGroups,
-      identityProfileId: canonical?.identityProfileId ?? null,
-      memberId: canonical?.memberId ?? null,
-      portalAccessState: canonical?.portalAccessState ?? 'degraded_link',
-      resolutionSource: canonical?.resolutionSource ?? 'fallback'
-    }
-  })
 }
 
 const roleCanAccessView = (role: AdminGovernanceRole, view: GovernanceViewRegistryEntry) => {
@@ -199,9 +154,9 @@ export const getAdminViewAccessGovernance = async (): Promise<AdminGovernanceOve
 
 export const getVisibleViewsForPreviewUser = (
   overview: AdminGovernanceOverview,
-  userId: string
+  previewKey: string
 ) => {
-  const user = overview.users.find(candidate => candidate.userId === userId) ?? overview.users[0]
+  const user = overview.users.find(candidate => candidate.previewKey === previewKey) ?? overview.users[0]
 
   if (!user) {
     return {

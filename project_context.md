@@ -122,6 +122,15 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `TASK-134` endurece notifications sobre el resolver shared
   - `TASK-162` construye costo comercial canónico encima de esta separación explícita
 
+## Delta 2026-03-30 `/admin/views` ya consume persona previewable
+- `Admin Center > Vistas y acceso` ya no selecciona conceptualmente solo un `client_user`.
+- Slice vigente:
+  - el universo previewable se agrupa por persona canónica cuando existe `identityProfileId`
+  - el fallback sigue siendo un principal portal aislado cuando el bridge humano está degradado
+- Invariante preservada:
+  - `userId` sigue siendo la llave operativa para overrides, auditoría de vistas y `authorizedViews`
+  - el cut es persona-first para lectura y preview, no un reemplazo big bang del principal portal
+
 ## Delta 2026-03-30 Cost Intelligence foundation bootstrap
 - Greenhouse ya reconoce `cost_intelligence` como domain soportado del projection registry.
 - Base técnica nueva:

@@ -84,6 +84,34 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - `src/views/greenhouse/finance/IncomeListView.tsx`
 - No se deben mezclar en este cierre de `TASK-141`; stage/commit selectivo solamente.
 
+## Sesión 2026-03-30 — `TASK-140` slice 1 persona-first en `/admin/views`
+
+### Objetivo
+- Empezar implementación real de `TASK-140` sin reabrir `TASK-141` y sin romper overrides, auditoría ni `authorizedViews`.
+
+### Delta de ejecución
+- Nueva pieza shared:
+  - `src/lib/admin/admin-preview-persons.ts`
+  - `src/lib/admin/admin-preview-persons.test.ts`
+- `getAdminViewAccessGovernance()` y `view-access-store` ya construyen el universo previewable agrupando por:
+  - `identityProfileId` cuando existe
+  - fallback `user:<userId>` cuando todavía no hay bridge persona completo
+- `/admin/views` ya cambió el selector y el framing del preview:
+  - ahora habla de `persona previewable`
+  - muestra si el caso es `persona canónica` o `principal portal`
+  - conserva el principal portal compatible para guardar overrides
+- Guardrail preservado:
+  - `user_view_overrides`, `view_access_log`, `authorizedViews` y la resolución runtime siguen `userId`-scoped
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/admin/admin-preview-persons.test.ts`
+- `pnpm exec eslint src/lib/admin/admin-preview-persons.ts src/lib/admin/admin-preview-persons.test.ts src/lib/admin/get-admin-view-access-governance.ts src/lib/admin/view-access-store.ts src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Pendiente inmediato
+- Validación manual visual en `/admin/views` para confirmar copy, chips y casos borde.
+- Decidir si un siguiente slice debe abrir el universo a personas sin principal portal persistible o si ese caso queda fuera del preview editable.
+
 ## Sesión 2026-03-30 — Hardening canónico de atribución comercial para Cost Intelligence
 
 ### Objetivo
