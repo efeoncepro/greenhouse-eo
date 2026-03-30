@@ -62,6 +62,55 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - no mutar silenciosamente payloads, recipient keys ni identifiers operativos (`identity_profile_id`, `member_id`, `user_id`)
   - resolver el grafo humano completo sin degradar consumers que hoy dependen de `member` o `user`
 
+## Delta 2026-03-30 canonical person resolver ya tiene primer slice reusable
+- `TASK-141` dejó de ser solo framing documental.
+- Baseline técnica nueva:
+  - `src/lib/identity/canonical-person.ts`
+- El resolver shared ya puede publicar el grafo humano mínimo por:
+  - `userId`
+  - `memberId`
+  - `identityProfileId`
+- Shape institucional aplicada:
+  - `identityProfileId`
+  - `memberId`
+  - `userId`
+  - `eoId`
+  - `displayName`
+  - `canonicalEmail`
+  - `portalAccessState`
+  - `resolutionSource`
+- Guardrail vigente:
+  - esto no reemplaza stores `userId`-scoped ni serving `memberId`-scoped
+  - expone el bridge canónico sin hacer cutover big bang
+
+## Delta 2026-03-30 /admin/views ya expone bridge persona sin romper overrides
+- `Admin Center > Vistas y acceso` sigue siendo compatible con:
+  - `user_view_overrides`
+  - `view_access_log`
+  - `authorizedViews`
+- Cambio aplicado:
+  - el preview ya enriquece cada principal portal con:
+    - `identityProfileId`
+    - `memberId`
+    - `portalAccessState`
+    - `resolutionSource`
+- Lectura operativa:
+  - `/admin/views` todavía no es una surface persona-first cerrada
+  - pero ya no depende ciegamente de leer `client_user` como si fuera la raíz humana
+  - `TASK-140` queda como follow-on para el universo previewable y la UX completa de persona
+
+## Delta 2026-03-30 TASK-141 ya tiene resolver shared conservador
+- Greenhouse ya no depende solo de contrato documental para la lane `person-first`.
+- Slice runtime nuevo:
+  - `src/lib/identity/canonical-person.ts`
+- Adopción inicial cerrada:
+  - `src/lib/notifications/person-recipient-resolver.ts`
+  - `src/lib/webhooks/consumers/notification-recipients.ts`
+- Regla operativa de este slice:
+  - el resolver shared expone simultáneamente `identityProfileId`, `memberId`, `userId`, `portalAccessState` y `resolutionSource`
+  - notifications sigue privilegiando `userId` como recipient key efectiva cuando existe principal portal
+  - el carril no cambia todavía `/admin/views`, outbox payloads ni projections member-scoped
+
 ## Delta 2026-03-30 Cost Intelligence foundation bootstrap
 - Greenhouse ya reconoce `cost_intelligence` como domain soportado del projection registry.
 - Base técnica nueva:

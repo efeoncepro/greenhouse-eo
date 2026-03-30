@@ -23,6 +23,15 @@ La capa no reemplaza a Finance ni a Cost Intelligence:
 - `Cost Intelligence` la consume como base para snapshots y P&L operativo
 - otros módulos la consumen directa o indirectamente a través de serving materializado
 
+## Delta 2026-03-30
+
+- `TASK-141` ya quedó formalmente antes de esta lane con:
+  - contrato canónico explícito persona/member/user
+  - primer resolver shared conservador
+- Implicación para `TASK-162`:
+  - puede enriquecer identidad humana vía `identity_profile`
+  - pero no debe degradar `member_id` como llave operativa de payroll, capacity, finance serving, ICO ni attribution
+
 ## Why This Task Exists
 
 Hoy Greenhouse ya tiene piezas importantes:

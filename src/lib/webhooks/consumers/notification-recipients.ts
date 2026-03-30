@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { getMemberNotificationRecipients, type PersonNotificationRecipient } from '@/lib/notifications/person-recipient-resolver'
+import { getCanonicalPersonByUserId } from '@/lib/identity/canonical-person'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 export interface NotificationRecipient {
@@ -98,22 +99,17 @@ export const getPayrollPeriodRecipients = async (periodId: string): Promise<Reci
 }
 
 export const getUserRecipient = async (userId: string): Promise<RecipientResolutionResult> => {
-  const rows = await runGreenhousePostgresQuery<RecipientRow>(
-    `SELECT
-       ip.identity_profile_id,
-       tm.member_id,
-       cu.user_id,
-       cu.email,
-       cu.full_name
-     FROM greenhouse_core.client_users cu
-     LEFT JOIN greenhouse_core.identity_profiles ip ON ip.user_id = cu.user_id
-     LEFT JOIN greenhouse_core.team_members tm ON tm.identity_profile_id = ip.identity_profile_id
-     WHERE cu.user_id = $1
-     LIMIT 1`,
-    [userId]
-  )
+  const person = await getCanonicalPersonByUserId(userId)
 
-  const recipient = rows[0] ? normalizeRecipient(rows[0]) : null
+  const recipient = person
+    ? normalizeRecipient({
+        identity_profile_id: person.identityProfileId,
+        member_id: person.memberId,
+        user_id: person.userId,
+        email: person.portalEmail ?? person.canonicalEmail ?? person.memberEmail,
+        full_name: person.portalDisplayName ?? person.displayName
+      })
+    : null
 
   return {
     recipients: recipient ? [recipient] : [],

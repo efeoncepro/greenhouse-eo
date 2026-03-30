@@ -4,6 +4,56 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — TASK-141 contrato canónico + bridge inicial en /admin/views
+
+### Objetivo
+- Convertir `TASK-141` desde contrato endurecido a primer slice real de implementación, sin romper carriles reactivos ni llaves operativas.
+
+### Delta de ejecución
+- Nueva fuente canónica del contrato:
+  - `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
+- Nuevo baseline shared:
+  - `src/lib/identity/canonical-person.ts`
+  - `src/lib/identity/canonical-person.test.ts`
+- Contrato runtime que ya expone el resolver:
+  - `identityProfileId`
+  - `memberId`
+  - `userId`
+  - `canonicalEmail`
+  - `portalAccessState`
+  - `resolutionSource`
+- Primer consumer adoptado:
+  - `src/lib/admin/get-admin-view-access-governance.ts`
+  - `src/lib/admin/view-access-store.ts`
+  - `src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx`
+- Postura aplicada en el cut:
+  - `/admin/views` ahora muestra `identityProfileId`, `memberId`, `portalAccessState` y `resolutionSource`
+  - overrides y auditoría siguen `userId`-scoped
+  - no se tocaron payloads de outbox, webhook envelopes ni serving member-scoped
+- Documentación viva actualizada:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
+  - `docs/tasks/in-progress/TASK-141-canonical-person-identity-consumption.md`
+  - `docs/tasks/to-do/TASK-140-admin-views-person-first-preview.md`
+  - `docs/tasks/to-do/TASK-134-notification-identity-model-hardening.md`
+  - `docs/tasks/to-do/TASK-162-canonical-commercial-cost-attribution.md`
+  - `docs/tasks/README.md`
+  - `project_context.md`
+  - `changelog.md`
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/identity/canonical-person.test.ts`
+- `pnpm exec eslint src/lib/identity/canonical-person.ts src/lib/identity/canonical-person.test.ts src/lib/admin/get-admin-view-access-governance.ts src/lib/admin/view-access-store.ts src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Pendiente inmediato
+- `TASK-140`:
+  - mover el universo base del preview desde principal portal a persona previewable real
+- `TASK-134`:
+  - terminar de alinear notifications y callers legacy sobre el contrato shared
+- `TASK-162`:
+  - ya puede apoyarse en este contrato sin reabrir persona/member/user, preservando `member_id` como llave operativa de costo
+
 ## Sesión 2026-03-30 — Hardening canónico de atribución comercial para Cost Intelligence
 
 ### Objetivo

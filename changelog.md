@@ -2,6 +2,16 @@
 
 ## 2026-03-30
 
+- `TASK-141` avanzó de contrato endurecido a primer slice runtime conservador:
+  - nueva fuente canónica `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
+  - nuevo resolver shared `src/lib/identity/canonical-person.ts`
+  - contrato runtime explícito para `identityProfileId`, `memberId`, `userId`, `portalAccessState` y `resolutionSource`
+  - primera adopción visible en `/admin/views` sin romper overrides `userId`-scoped ni auditoría de acceso
+- La arquitectura de identidad quedó más precisa para los follow-ons:
+  - `TASK-140` ya no necesita inventar el bridge persona/member/user, sino mover el preview a persona previewable real
+  - `TASK-134` ya puede consumir el contrato shared en vez de rediscutir persona/member/user
+  - `TASK-162` queda reafirmada como lane posterior a `TASK-141`, preservando `member_id` como llave operativa de costo, payroll, capacity e ICO
+
 - Se documentó formalmente la decisión de una capa canónica de `commercial cost attribution`:
   - no reemplaza a Finance ni a Cost Intelligence
   - consolida una sola verdad de costo comercial por encima de Payroll, Team Capacity y Finance base
