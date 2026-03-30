@@ -211,4 +211,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 | `TASK-163` | `to-do` | Finance Document Type Separation: Quotes, Credit/Debit Notes | `docs/tasks/to-do/TASK-163-finance-document-type-separation.md` |
 
-`TASK-164`
+| `TASK-164` | `to-do` | Purchase Orders (OC) & Service Entry Sheets (HES) Module | `docs/tasks/to-do/TASK-164-purchase-orders-module.md` |
+
+`TASK-165`
