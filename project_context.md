@@ -3,6 +3,17 @@
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
+## Delta 2026-03-29 TASK-129 validada en production
+- `main` ya incluye el consumer institucional de notificaciones via webhook bus.
+- `production` quedó validada con delivery firmada real sobre:
+  - `POST /api/internal/webhooks/notification-dispatch`
+- Evidencia operativa confirmada:
+  - `eventId=evt-prod-final-1774830739019`
+  - notificación `assignment_change` persistida para `user-efeonce-admin-julio-reyes`
+- Estado vigente del carril:
+  - `staging` y `production` consumen el secreto de firmas vía Secret Manager
+  - `production` ya no está bloqueada por ausencia del route en `main`
+
 ## Delta 2026-03-29 TASK-129 hardening final en staging
 - `staging` ya opera `webhook notifications` sin `WEBHOOK_NOTIFICATIONS_SECRET` crudo en Vercel.
 - Postura vigente del carril:

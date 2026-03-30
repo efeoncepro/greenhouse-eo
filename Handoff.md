@@ -4,6 +4,32 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-29 — TASK-129 promovida a production y validada end-to-end
+
+### Completado
+- `develop` fue promovida a `main` vía PR `#22`:
+  - merge commit `95a03a7266c60b07e0eeb93977137b5ffaff0cff`
+- `production` absorbió el deployment:
+  - `https://greenhouse-efjxg8r0x-efeonce-7670142f.vercel.app`
+  - alias productivo activo: `https://greenhouse.efeoncepro.com`
+- Validación real en `production`:
+  - `POST /api/internal/webhooks/notification-dispatch` respondió `200`
+  - payload result:
+    - `mapped=true`
+    - `recipientsResolved=1`
+    - `sent=1`
+  - `greenhouse_notifications.notifications` persistió la fila:
+    - `eventId=evt-prod-final-1774830739019`
+    - `user_id=user-efeonce-admin-julio-reyes`
+    - `category=assignment_change`
+    - `status=unread`
+- Conclusión:
+  - `TASK-129` ya no queda solo validada en `staging`; el carril webhook notifications quedó operativo también en `production`
+
+### Pendiente inmediato
+- El draft PR `#21` (`release/task-129-prod-promo`) ya quedó redundante después de promover `develop -> main`; puede cerrarse por higiene cuando convenga.
+- El check `Preview` del PR individual falló por drift de env/build (`NEXTAUTH_SECRET` durante page-data collection), pero no bloqueó el rollout real porque la promoción completa de `develop` a `main` sí quedó validada en `production`.
+
 ## Sesión 2026-03-29 — Rollout de production intentado para TASK-129, bloqueado por drift de branch
 
 ### Completado

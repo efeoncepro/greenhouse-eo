@@ -7,6 +7,15 @@
 
 ## 2026-03-29
 
+### TASK-129 promoted to production
+- `develop` fue promovida a `main` y `production` ya absorbió el carril `notification-dispatch`.
+- `POST /api/internal/webhooks/notification-dispatch` quedó validado también en `production` con delivery firmada real y notificación persistida en `greenhouse_notifications.notifications`.
+- Evidencia productiva confirmada:
+  - `eventId=evt-prod-final-1774830739019`
+  - `user_id=user-efeonce-admin-julio-reyes`
+  - `category=assignment_change`
+  - `status=unread`
+
 ### TASK-129 staging hardening completed with Secret Manager-only
 - `staging` dejó de depender de `WEBHOOK_NOTIFICATIONS_SECRET` crudo; el fallback legacy fue retirado de Vercel.
 - Después del redeploy del entorno `Staging`, el consumer `notification-dispatch` siguió validando firmas y enviando notificaciones usando `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF`.
