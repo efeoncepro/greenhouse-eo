@@ -187,6 +187,17 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el resumen ya también entra a Nexa `lightContext`
   - sigue pendiente solo validación visual/cierre limpio de la lane
 
+## Delta 2026-03-30 Cost Intelligence documentado end-to-end
+- La documentación viva del repo ya refleja Cost Intelligence como módulo operativo transversal, no como lane aislada.
+- Capas ya explicitadas en arquitectura:
+  - foundation técnica (`TASK-067`)
+  - period closure (`TASK-068`)
+  - operational P&L (`TASK-069`)
+  - finance UI principal (`TASK-070`)
+  - consumers distribuidos (`TASK-071`)
+- Finance conserva ownership del motor financiero central.
+- Cost Intelligence queda formalizado como layer de management accounting, closure awareness y serving distribuido hacia Agency, Organization 360, People 360, Home y Nexa.
+
 ## Delta 2026-03-30 Sentry incident reader hardening
 - `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.
 - Nuevo contrato soportado:

@@ -1,5 +1,18 @@
 # TASK-070 — Cost Intelligence Finance UI: Period Closure Dashboard
 
+## Delta 2026-03-30 — Módulo ya documentado end-to-end
+
+- La arquitectura ya refleja al módulo de Cost Intelligence como sistema operativo completo:
+  - foundation (`TASK-067`)
+  - period closure (`TASK-068`)
+  - operational P&L (`TASK-069`)
+  - consumers distribuidos iniciados (`TASK-071`)
+- Esta task ya no debe leerse como una UI aislada “bloqueada por el backend”.
+- Su remanente real es:
+  - validación visual
+  - confirmación de qué hacer con `ClientEconomicsView` como fallback o surface legacy
+  - build limpio del workspace, sin el lock inestable de `.next`
+
 ## Delta 2026-03-30 — Ejecución iniciada
 
 - La task entra en `in-progress` después de contrastar el brief con:
@@ -49,7 +62,7 @@
   - close/reopen
   - smoke reactivo validado
 - Esta task deja de estar bloqueada por `TASK-068`.
-- El blocker real restante pasa a ser solo `TASK-069` (P&L materializado).
+- El blocker real restante pasó a ser `TASK-069` durante el arranque del slice, pero ese bloqueo ya quedó resuelto.
 
 ## Delta 2026-03-30 — Foundation lista para continuidad
 
@@ -59,11 +72,11 @@
   - domain `cost_intelligence`
   - eventos `accounting.*`
   - cron route dedicada con smoke `200`
-- Esta task sigue correctamente bloqueada por `TASK-069`, no por infraestructura base.
+- Esta task ya no está bloqueada por infraestructura base; ese punto quedó resuelto al cerrar `TASK-069`.
 
 ## Delta 2026-03-30 — Auditoría Finance + dependencias clarificadas
 
-- **Bloqueada por TASK-069** (el carril `period closure` de TASK-068 ya quedó listo).
+- **Ya no bloqueada por TASK-069**; el carril base de P&L quedó cerrado para este slice.
 - Puede ejecutarse **en paralelo con TASK-071** (ambas consumen las mismas APIs).
 - Los patterns de UI ya están establecidos: `ExecutiveCardShell`, `Chip` semáforo, `Table` expandible — esta task los reutiliza.
 - `FinanceDashboardView.tsx` (48KB) y `ClientEconomicsView.tsx` (31KB) ya existen como referencia de patterns.

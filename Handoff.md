@@ -36,6 +36,40 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - Validación visual real del slice en Agency / Organization 360 / People / Home.
 - Nexa ya recibe el mismo `financeStatus` resumido en `lightContext`; el remanente ya no es funcional sino de validación/cierre formal.
 
+## Sesión 2026-03-30 — Consolidación documental de Cost Intelligence
+
+### Objetivo
+- Dejar el módulo documentado a todo nivel antes del siguiente corte funcional.
+
+### Delta de ejecución
+- Arquitectura master actualizada:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- Arquitectura especializada actualizada:
+  - `docs/architecture/GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+- Índice de docs actualizado:
+  - `docs/README.md`
+- Pipeline de tasks reconciliado:
+  - `docs/tasks/README.md`
+  - `docs/tasks/in-progress/TASK-070-cost-intelligence-finance-ui.md`
+- Contexto vivo actualizado:
+  - `project_context.md`
+
+### Estado real tras la consolidación
+- Cost Intelligence ya debe leerse como módulo operativo distribuido.
+- Finance sigue siendo owner del motor financiero central.
+- Cost Intelligence ya sirve:
+  - `/finance/intelligence`
+  - Agency
+  - Organization 360
+  - People 360
+  - Home
+  - Nexa
+
+### Pendiente inmediato
+- Validación visual final de `TASK-070` y `TASK-071`.
+- Cierre formal de fallbacks legacy donde todavía existen por resiliencia.
+
 ## Sesión 2026-03-30 — TASK-069 cerrada + arquitectura del módulo endurecida
 
 ### Objetivo

@@ -1,5 +1,26 @@
 # Greenhouse Architecture V1
 
+## Delta 2026-03-30 — Cost Intelligence ya es módulo operativo distribuido
+
+Greenhouse ya no debe leer Cost Intelligence como una lane experimental de Finance.
+
+Estado canónico vigente:
+- `TASK-067` dejó la fundación técnica del dominio `cost_intelligence`.
+- `TASK-068` cerró `period_closure_status` como serving canónico de readiness y cierre.
+- `TASK-069` cerró `operational_pl_snapshots` como serving canónico de P&L operativo.
+- `TASK-070` ya convirtió `/finance/intelligence` en la surface principal del módulo.
+- `TASK-071` ya inició el cutover de consumers distribuidos:
+  - Agency
+  - Organization 360
+  - People 360
+  - Home
+  - Nexa
+
+Regla arquitectónica:
+- Finance sigue siendo owner del motor financiero central.
+- Cost Intelligence es el layer operativo de management accounting y closure awareness.
+- Los consumers que necesiten margen, costo total, closure status o snapshot de período deberían preferir serving materializado antes de recomputar on-read.
+
 ## Delta 2026-03-29 — Release channels model reference
 
 Greenhouse maneja release channels principalmente por modulo o feature visible, con una capa opcional de canal global de plataforma.

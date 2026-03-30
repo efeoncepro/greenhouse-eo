@@ -2,6 +2,15 @@
 
 ## 2026-03-30
 
+- Se consolidó la documentación viva de Cost Intelligence a nivel arquitectura, índice de docs, pipeline de tasks y contexto operativo.
+- El módulo ya queda descrito como sistema operativo distribuido:
+  - foundation (`TASK-067`)
+  - period closure (`TASK-068`)
+  - operational P&L (`TASK-069`)
+  - Finance UI (`TASK-070`)
+  - consumers en Agency, Organization 360, People 360, Home y Nexa (`TASK-071`)
+- Finance queda reafirmado como owner del motor financiero central; Cost Intelligence queda formalizado como layer de management accounting y serving distribuido.
+
 - `TASK-071` ya tiene su primer cutover real de consumers distribuidos:
   - Agency ahora resuelve `SpaceCard` desde `greenhouse_serving.operational_pl_snapshots` en vez de recomputar con `income` / `expenses`
   - Organization 360 (`Rentabilidad`) ya es serving-first con fallback al compute legacy

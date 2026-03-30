@@ -6,6 +6,28 @@
 
 ---
 
+## Delta 2026-03-30 — Cost Intelligence ya opera como layer de management accounting
+
+Finance sigue siendo el owner del motor financiero central, pero ya no es la única surface que expone semántica de rentabilidad.
+
+Estado canónico vigente:
+- `GET /api/finance/dashboard/pnl` sigue siendo la referencia central del cálculo financiero mensual.
+- Cost Intelligence ya materializa esa semántica en serving propio, sin redefinir un P&L paralelo:
+  - `greenhouse_serving.period_closure_status`
+  - `greenhouse_serving.operational_pl_snapshots`
+- `/finance/intelligence` ya es la surface principal de cierre operativo y lectura de P&L del módulo.
+- Los consumers downstream ya empezaron a leer ese serving:
+  - Agency
+  - Organization 360
+  - People 360
+  - Home
+  - Nexa
+
+Regla arquitectónica:
+- Finance mantiene ownership de ingresos, gastos, reconciliación, FX y semántica del P&L central.
+- Cost Intelligence actúa como layer de materialización y distribución operativa sobre esa base.
+- Nuevos consumers que necesiten margen, closure status o snapshots operativos deberían preferir `operational_pl_snapshots` y `period_closure_status` antes de recomputar on-read.
+
 ## Overview
 
 Finance es el módulo más grande del portal: 49 API routes, 13 páginas, 28 archivos de librería. Gestiona facturación, gastos, reconciliación bancaria, indicadores económicos, integración DTE/Nubox, y la capa de inteligencia financiera (economics, allocations, P&L).

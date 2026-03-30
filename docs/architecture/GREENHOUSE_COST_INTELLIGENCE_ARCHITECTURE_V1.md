@@ -15,7 +15,7 @@
 - Remanente de la ola:
   - validación visual
   - cierre semántico de fallbacks
-  - incorporación de contexto resumido en Nexa
+  - cierre formal de `TASK-070` y `TASK-071`
 
 ## Delta 2026-03-30 — Baseline del módulo ya implementada
 - El módulo de Cost Intelligence ya no está solo en diseño.
@@ -40,6 +40,12 @@
     - `/api/cron/outbox-react-cost-intelligence`
   - UI principal:
     - `/finance/intelligence`
+  - consumers distribuidos iniciales:
+    - Agency
+    - Organization 360
+    - People 360
+    - Home
+    - Nexa
 - Decisión operativa vigente:
   - el engine base del módulo ya se considera estable
   - lo siguiente ya no es “fundación”, sino consumers distribuidos y profundización funcional
