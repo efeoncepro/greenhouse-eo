@@ -541,6 +541,110 @@ const PersonHrProfileTab = ({ memberId, hrContext = null, defaultOperationalMetr
           </Card>
         </Grid>
       )}
+
+      {/* Finance Impact */}
+      <FinanceImpactCard memberId={memberId} />
+    </Grid>
+  )
+}
+
+// ── Finance Impact Card (self-contained, fetches own data) ──
+
+function FinanceImpactCard({ memberId }: { memberId: string }) {
+  const [data, setData] = useState<{
+    cost: { loadedCostTarget: number; baseSalaryClp: number; directOverheadClp: number; sharedOverheadClp: number } | null
+    assignments: { count: number; totalRevenueAttributed: number; items: Array<{ clientName: string | null; fteWeight: number; revenueClp: number }> }
+    costRevenueRatio: number | null
+    costRevenueStatus: string
+  } | null>(null)
+
+  const fetched = useRef(false)
+
+  useEffect(() => {
+    if (fetched.current) return
+    fetched.current = true
+
+    fetch(`/api/people/${memberId}/finance-impact`, { cache: 'no-store' })
+      .then(res => res.ok ? res.json() : null)
+      .then(json => json && setData(json))
+      .catch(() => {})
+  }, [memberId])
+
+  if (!data || !data.cost) return null
+
+  const formatCLP = (v: number) => `$${Math.round(v).toLocaleString('es-CL')}`
+
+  const statusColor = data.costRevenueStatus === 'optimal' ? 'success'
+    : data.costRevenueStatus === 'attention' ? 'warning' : 'error'
+
+  const statusLabel = data.costRevenueStatus === 'optimal' ? 'Óptimo'
+    : data.costRevenueStatus === 'attention' ? 'Atención' : 'Crítico'
+
+  return (
+    <Grid size={{ xs: 12 }}>
+      <Card elevation={0} sx={(t: Theme) => ({ border: `1px solid ${t.palette.divider}` })}>
+        <CardHeader
+          title='Impacto financiero'
+          avatar={
+            <Avatar variant='rounded' sx={{ bgcolor: 'success.lightOpacity' }}>
+              <i className='tabler-chart-bar' style={{ fontSize: 22, color: 'var(--mui-palette-success-main)' }} />
+            </Avatar>
+          }
+          action={
+            data.costRevenueRatio !== null ? (
+              <CustomChip
+                round='true'
+                size='small'
+                color={statusColor}
+                label={`${data.costRevenueRatio}% costo/ingreso · ${statusLabel}`}
+              />
+            ) : null
+          }
+        />
+        <Divider />
+        <CardContent>
+          <Grid container spacing={4}>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Stack spacing={1.5}>
+                <Typography variant='overline' color='text.secondary'>Costo mensual</Typography>
+                <Stack direction='row' justifyContent='space-between'>
+                  <Typography variant='body2'>Salario base</Typography>
+                  <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(data.cost.baseSalaryClp)}</Typography>
+                </Stack>
+                <Stack direction='row' justifyContent='space-between'>
+                  <Typography variant='body2'>Overhead directo</Typography>
+                  <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(data.cost.directOverheadClp)}</Typography>
+                </Stack>
+                <Stack direction='row' justifyContent='space-between'>
+                  <Typography variant='body2'>Overhead compartido</Typography>
+                  <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(data.cost.sharedOverheadClp)}</Typography>
+                </Stack>
+                <Divider />
+                <Stack direction='row' justifyContent='space-between'>
+                  <Typography variant='body2' sx={{ fontWeight: 600 }}>Costo total loaded</Typography>
+                  <Typography variant='body2' sx={{ fontWeight: 600, fontFamily: 'monospace' }}>{formatCLP(data.cost.loadedCostTarget)}</Typography>
+                </Stack>
+              </Stack>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Stack spacing={1.5}>
+                <Typography variant='overline' color='text.secondary'>Revenue atribuido ({data.assignments.count} clientes)</Typography>
+                {data.assignments.items.slice(0, 5).map((a, i) => (
+                  <Stack key={i} direction='row' justifyContent='space-between'>
+                    <Typography variant='body2'>{a.clientName ?? 'Sin nombre'} ({Math.round(a.fteWeight * 100)}%)</Typography>
+                    <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(a.revenueClp)}</Typography>
+                  </Stack>
+                ))}
+                <Divider />
+                <Stack direction='row' justifyContent='space-between'>
+                  <Typography variant='body2' sx={{ fontWeight: 600 }}>Total atribuido</Typography>
+                  <Typography variant='body2' sx={{ fontWeight: 600, fontFamily: 'monospace' }}>{formatCLP(data.assignments.totalRevenueAttributed)}</Typography>
+                </Stack>
+              </Stack>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
     </Grid>
   )
 }

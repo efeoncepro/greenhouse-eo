@@ -14,11 +14,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `in-progress` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Muy alto` |
 | Effort | `Alto` |
-| Status real | `Implementación` |
+| Status real | `Cerrada` |
 | Rank | — |
 | Domain | Finance / Intelligence / Cross-module |
 | Sequence | Complementa TASK-067→071, puede ejecutarse en paralelo con ellas |

@@ -17,10 +17,12 @@ import CustomIconButton from '@core/components/mui/IconButton'
 
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type { AgencySpaceHealth } from '@/lib/agency/agency-queries'
+import type { SpaceFinanceMetrics } from '@/lib/agency/agency-finance-metrics'
 import { getSpaceHealth, HEALTH_ZONE_LABEL, HEALTH_ZONE_COLOR } from './space-health'
 
 type Props = {
   space: AgencySpaceHealth
+  financeMetrics?: SpaceFinanceMetrics | null
 }
 
 // ---------------------------------------------------------------------------
@@ -65,7 +67,7 @@ const getOtdSemaphore = (v: number | null) => {
 // Component
 // ---------------------------------------------------------------------------
 
-const SpaceCard = ({ space }: Props) => {
+const SpaceCard = ({ space, financeMetrics }: Props) => {
   const router = useRouter()
   const color = getServiceColor(space.businessLines)
   const rpa = getRpaSemaphore(space.rpaAvg)
@@ -193,13 +195,37 @@ const SpaceCard = ({ space }: Props) => {
 
       {/* ── Metadata line ─────────────────────────────────────── */}
       <Box sx={{ px: 2.5, py: 1.5 }}>
-        <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
-          {[
-            `${space.projectCount} proyecto${space.projectCount !== 1 ? 's' : ''}`,
-            `${space.assignedMembers} persona${space.assignedMembers !== 1 ? 's' : ''}`,
-            `${space.allocatedFte.toFixed(1)} FTE`
-          ].join(' · ')}
-        </Typography>
+        <Stack direction='row' justifyContent='space-between' alignItems='center' flexWrap='wrap' useFlexGap spacing={1}>
+          <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+            {[
+              `${space.projectCount} proyecto${space.projectCount !== 1 ? 's' : ''}`,
+              `${space.assignedMembers} persona${space.assignedMembers !== 1 ? 's' : ''}`,
+              `${space.allocatedFte.toFixed(1)} FTE`
+            ].join(' · ')}
+          </Typography>
+          {financeMetrics && financeMetrics.revenueCurrentMonth > 0 && (
+            <Stack direction='row' spacing={0.5}>
+              <CustomChip
+                round='true'
+                size='small'
+                color='primary'
+                variant='tonal'
+                label={`$${Math.round(financeMetrics.revenueCurrentMonth / 1000).toLocaleString('es-CL')}K`}
+                sx={{ height: 18, fontSize: '0.6rem' }}
+              />
+              {financeMetrics.marginPct !== null && (
+                <CustomChip
+                  round='true'
+                  size='small'
+                  color={financeMetrics.marginPct >= 20 ? 'success' : financeMetrics.marginPct >= 5 ? 'warning' : 'error'}
+                  variant='tonal'
+                  label={`${financeMetrics.marginPct}%`}
+                  sx={{ height: 18, fontSize: '0.6rem' }}
+                />
+              )}
+            </Stack>
+          )}
+        </Stack>
       </Box>
     </Card>
   )

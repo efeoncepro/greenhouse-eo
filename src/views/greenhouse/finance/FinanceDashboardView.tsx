@@ -371,6 +371,7 @@ const FinanceDashboardView = () => {
   const [nuboxSync, setNuboxSync] = useState<NuboxSyncStatus | null>(null)
   const [cashflow, setCashflow] = useState<CashflowData | null>(null)
   const [syncing, setSyncing] = useState(false)
+  const [workingCapital, setWorkingCapital] = useState<{ dso: number | null; dpo: number | null; payrollToRevenueRatio: number | null }>({ dso: null, dpo: null, payrollToRevenueRatio: null })
 
   const fetchData = useCallback(async () => {
     let cancelled = false
@@ -380,7 +381,7 @@ const FinanceDashboardView = () => {
     const errors: string[] = []
 
     try {
-      const [accountsRes, indicatorsRes, incomeSummaryRes, expenseSummaryRes, incomeListRes, expenseListRes, pnlRes, nuboxSyncRes, cashflowRes] = await Promise.all([
+      const [accountsRes, indicatorsRes, incomeSummaryRes, expenseSummaryRes, incomeListRes, expenseListRes, pnlRes, nuboxSyncRes, cashflowRes, dashSummaryRes] = await Promise.all([
         fetch('/api/finance/accounts', { cache: 'no-store' }),
         fetch('/api/finance/economic-indicators/latest', { cache: 'no-store' }),
         fetch('/api/finance/income/summary', { cache: 'no-store' }),
@@ -389,7 +390,8 @@ const FinanceDashboardView = () => {
         fetch('/api/finance/expenses?pageSize=12', { cache: 'no-store' }),
         fetch('/api/finance/dashboard/pnl', { cache: 'no-store' }),
         fetch('/api/finance/nubox/sync-status', { cache: 'no-store' }),
-        fetch('/api/finance/dashboard/cashflow', { cache: 'no-store' })
+        fetch('/api/finance/dashboard/cashflow', { cache: 'no-store' }),
+        fetch('/api/finance/dashboard/summary', { cache: 'no-store' })
       ])
 
       if (cancelled) return
@@ -485,6 +487,16 @@ const FinanceDashboardView = () => {
 
       if (cashflowRes.ok) {
         setCashflow(await cashflowRes.json())
+      }
+
+      if (dashSummaryRes.ok) {
+        const summaryData = await dashSummaryRes.json()
+
+        setWorkingCapital({
+          dso: typeof summaryData.dso === 'number' ? summaryData.dso : null,
+          dpo: typeof summaryData.dpo === 'number' ? summaryData.dpo : null,
+          payrollToRevenueRatio: typeof summaryData.payrollToRevenueRatio === 'number' ? summaryData.payrollToRevenueRatio : null
+        })
       }
     } catch (e) {
       errors.push(`Conexión: ${e instanceof Error ? e.message : 'Error desconocido'}`)
@@ -703,6 +715,37 @@ const FinanceDashboardView = () => {
               : 'Sin registros'}
             avatarIcon='tabler-scale'
             avatarColor='warning'
+          />
+        </Grid>
+      </Grid>
+
+      {/* Working Capital Metrics */}
+      <Grid container spacing={6}>
+        <Grid size={{ xs: 12, sm: 4, md: 4 }}>
+          <HorizontalWithSubtitle
+            title='DSO'
+            stats={workingCapital.dso !== null ? `${workingCapital.dso} días` : 'Sin datos'}
+            subtitle='Days Sales Outstanding — días promedio de cobro'
+            avatarIcon='tabler-clock-dollar'
+            avatarColor={workingCapital.dso !== null && workingCapital.dso > 60 ? 'error' : workingCapital.dso !== null && workingCapital.dso > 30 ? 'warning' : 'success'}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 4, md: 4 }}>
+          <HorizontalWithSubtitle
+            title='DPO'
+            stats={workingCapital.dpo !== null ? `${workingCapital.dpo} días` : 'Sin datos'}
+            subtitle='Days Payable Outstanding — días promedio de pago'
+            avatarIcon='tabler-clock-pause'
+            avatarColor={workingCapital.dpo !== null && workingCapital.dpo > 90 ? 'error' : workingCapital.dpo !== null && workingCapital.dpo > 45 ? 'warning' : 'info'}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 4, md: 4 }}>
+          <HorizontalWithSubtitle
+            title='Ratio nómina / ingresos'
+            stats={workingCapital.payrollToRevenueRatio !== null ? `${workingCapital.payrollToRevenueRatio}%` : 'Sin datos'}
+            subtitle='Costo de nómina como porcentaje del ingreso mensual'
+            avatarIcon='tabler-percentage'
+            avatarColor={workingCapital.payrollToRevenueRatio !== null && workingCapital.payrollToRevenueRatio > 70 ? 'error' : workingCapital.payrollToRevenueRatio !== null && workingCapital.payrollToRevenueRatio > 50 ? 'warning' : 'success'}
           />
         </Grid>
       </Grid>
