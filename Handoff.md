@@ -4,6 +4,32 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — TASK-069 cerrada + arquitectura del módulo endurecida
+
+### Objetivo
+- Cerrar formalmente `TASK-069`.
+- Dejar el módulo de Cost Intelligence documentado de forma más completa en arquitectura.
+
+### Delta de ejecución
+- `TASK-069` pasó de `in-progress` a `complete`.
+- Motivo:
+  - `operational_pl` ya materializa snapshots por `client`, `space` y `organization`
+  - APIs de lectura ya están expuestas
+  - smoke reactivo E2E ya quedó validado
+  - la UI principal de Finance ya consume este serving como contrato estable
+- Arquitectura endurecida en:
+  - `docs/architecture/GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md`
+- Lo documentado ahora incluye:
+  - estado implementado por lanes `067-070`
+  - serving canónico
+  - invariantes operativos
+  - authorization vigente
+  - consumers pendientes (`TASK-071`)
+
+### Pendiente inmediato
+- `TASK-070` sigue abierta solo por validación visual final y decisión sobre `ClientEconomicsView`.
+- El siguiente carril funcional natural ya es `TASK-071`.
+
 ## Sesión 2026-03-30 — TASK-070 surface principal de Finance Intelligence implementada
 
 ### Objetivo

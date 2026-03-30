@@ -2,6 +2,17 @@
 
 ## 2026-03-30
 
+- `TASK-069` quedó formalmente cerrada:
+  - `operational_pl` ya se considera baseline implementada del módulo de Cost Intelligence
+  - snapshots materializados por `client`, `space` y `organization`
+  - APIs estables de lectura
+  - smoke reactivo E2E ya validado
+- La arquitectura de Cost Intelligence quedó endurecida para reflejar el estado real del módulo:
+  - foundation `067`, cierre `068`, P&L `069` y UI principal `070`
+  - serving canónico
+  - invariantes de revenue/costo/closure
+  - authorization actual
+  - consumers pendientes vía `TASK-071`
 - `TASK-070` ya sustituyó la portada de `/finance/intelligence` por una surface real de Cost Intelligence:
   - `FinancePeriodClosureDashboardView`
   - hero + KPIs de cierre

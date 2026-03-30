@@ -1,5 +1,32 @@
 # GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md
 
+## Delta 2026-03-30 — Baseline del módulo ya implementada
+- El módulo de Cost Intelligence ya no está solo en diseño.
+- Estado implementado en repo:
+  - foundation técnica cerrada (`TASK-067`)
+  - `period_closure_status` cerrada (`TASK-068`)
+  - `operational_pl` cerrada para su baseline (`TASK-069`)
+  - Finance Intelligence ya consume el módulo como surface principal (`TASK-070`)
+- Elementos ya operativos:
+  - schema `greenhouse_cost_intelligence`
+  - serving views:
+    - `greenhouse_serving.period_closure_status`
+    - `greenhouse_serving.operational_pl_snapshots`
+  - APIs:
+    - `GET /api/cost-intelligence/periods`
+    - `GET /api/cost-intelligence/periods/[year]/[month]`
+    - `POST /api/cost-intelligence/periods/[year]/[month]/close`
+    - `POST /api/cost-intelligence/periods/[year]/[month]/reopen`
+    - `GET /api/cost-intelligence/pl`
+    - `GET /api/cost-intelligence/pl/[scopeType]/[scopeId]`
+  - cron reactivo:
+    - `/api/cron/outbox-react-cost-intelligence`
+  - UI principal:
+    - `/finance/intelligence`
+- Decisión operativa vigente:
+  - el engine base del módulo ya se considera estable
+  - lo siguiente ya no es “fundación”, sino consumers distribuidos y profundización funcional
+
 ## Delta 2026-03-28
 - `member_capacity_economics.total_labor_cost_target` ahora puede absorber el costo empleador real calculado por Payroll Chile desde `payroll_entries`, reutilizando la proyección canónica de Team Capacity como base loaded cost en vez de crear un store paralelo.
 - El boundary de Cost Intelligence sigue igual: consume `member_capacity_economics` y no recalcula payroll ni employer costs por su cuenta.
@@ -406,3 +433,67 @@ El layer trabaja con data `provisional` y lo marca así. Consumers pueden leer P
 | Budget/presupuesto no existe | No hay variance analysis | Fase 3 |
 | Bank reconciliation no es condición de cierre | Cierre posible sin reconciliación completa | Fase 3 |
 | Cost centers solo a nivel client + member | No hay visión por department ni BU | Fase 3 |
+
+## 14. Estado implementado y contrato operativo actual
+
+### 14.1 Qué ya está cerrado
+
+| Lane | Estado | Resultado |
+|------|--------|-----------|
+| `TASK-067` | Cerrada | Foundation técnica, schema, eventos `accounting.*`, domain `cost_intelligence`, cron dedicada |
+| `TASK-068` | Cerrada | `period_closure_status`, readiness mensual, close/reopen, calendario operativo, smoke reactivo |
+| `TASK-069` | Cerrada | `operational_pl_snapshots`, APIs P&L, smoke reactivo, health/alerts básicas |
+| `TASK-070` | En implementación avanzada | UI principal de Finance ya sobre Cost Intelligence |
+
+### 14.2 Serving canónico del módulo
+
+| Serving | Owner | Uso actual |
+|---------|-------|-----------|
+| `greenhouse_serving.period_closure_status` | Cost Intelligence | Cierre mensual, readiness, status visible en UI y downstream |
+| `greenhouse_serving.operational_pl_snapshots` | Cost Intelligence | P&L por `client`, `space`, `organization`; reads API y consumers futuros |
+
+### 14.3 Invariantes operativos vigentes
+
+- Cost Intelligence no redefine el P&L financiero canónico; lo materializa y lo distribuye por scope.
+- Revenue operativo sigue siendo net revenue:
+  - `total_amount_clp - partner_share`
+- Costo laboral no se recalcula aquí:
+  - se consume desde `client_labor_cost_allocation`
+- Overhead no se recalcula aquí:
+  - se consume desde `member_capacity_economics`
+- Anti-doble-conteo:
+  - `direct_expense` excluye `expenses.payroll_entry_id`
+- Closure awareness:
+  - `period_closed` y `snapshot_revision` derivan de `period_closure_status`
+
+### 14.4 Authorization vigente
+
+| Acción | Regla actual |
+|--------|--------------|
+| Leer Cost Intelligence | `finance` route group o `efeonce_admin` |
+| Cerrar período | `finance_manager` o `efeonce_admin` |
+| Reabrir período | solo `efeonce_admin` |
+
+### 14.5 Superficie principal implementada
+
+- Ruta activa:
+  - `/finance/intelligence`
+- Surface actual:
+  - dashboard de cierre de período
+  - tabla de 12 meses con semáforos por pata
+  - P&L inline expandible por cliente
+  - acciones `close/reopen`
+- Decisión de producto:
+  - esta ya es la portada principal del módulo
+  - `ClientEconomicsView` queda como surface legacy mientras se decide reubicación o retiro
+
+### 14.6 Consumers todavía pendientes
+
+Los siguientes consumidores no bloquean el módulo base y se tratan como siguiente ola:
+
+- Agency: badge de margen por space
+- Organization 360: rentabilidad leyendo snapshots materializados
+- People 360: costo fully-loaded con closure awareness
+- Home/Nexa: widget financiero resumido
+
+Eso vive en `TASK-071`.

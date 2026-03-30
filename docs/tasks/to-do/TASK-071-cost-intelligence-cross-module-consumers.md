@@ -1,5 +1,25 @@
 # TASK-071 — Cost Intelligence Cross-Module Consumer Enrichment
 
+## Delta 2026-03-30 — TASK-070 ya fijó la surface primaria
+
+- `/finance/intelligence` ya quedó repivotada a `FinancePeriodClosureDashboardView`.
+- `TASK-070` deja establecidos los patterns base reutilizables para este carril:
+  - hero ejecutivo
+  - chips semáforo por pata
+  - tabla expandible con inline P&L
+  - gating explícito por rol para `close/reopen`
+- `TASK-071` ya no necesita definir la lectura primaria de Cost Intelligence; debe concentrarse en consumers distribuidos que lean el mismo serving.
+
+## Delta 2026-03-30 — TASK-069 cerrada
+
+- `operational_pl` ya quedó cerrada para su baseline:
+  - snapshots materializados por `client`, `space` y `organization`
+  - APIs de lectura estables
+  - smoke reactivo E2E validado
+  - health y alertas básicas ya conectadas
+- Esta task deja de estar bloqueada por el carril P&L.
+- El siguiente paso natural ya es ejecutar consumers distribuidos, no seguir endureciendo el engine base.
+
 ## Delta 2026-03-30 — TASK-068 cerrada
 
 - `TASK-068` ya quedó cerrada:
@@ -8,7 +28,7 @@
   - calendario operativo ya integrado
   - smoke reactivo E2E validado
 - Esta task deja de estar bloqueada por el carril de cierre de período.
-- El blocker estructural real restante pasa a ser `TASK-069` (P&L materializado por scope).
+- El blocker estructural real restante ya no es `TASK-068`; el trabajo pasa directo a consumers distribuidos.
 
 ## Delta 2026-03-30 — Foundation lista para continuidad
 
@@ -18,12 +38,12 @@
   - domain `cost_intelligence`
   - eventos `accounting.*`
   - cron route dedicada con smoke `200`
-- Esta task sigue correctamente bloqueada por `TASK-069`, no por infraestructura base.
+- Esta task ya no queda bloqueada por foundation técnica ni por el engine P&L base.
 
 ## Delta 2026-03-30 — Auditoría Finance + dependencias clarificadas
 
-- **Bloqueada por TASK-069** (closure status de TASK-068 ya disponible).
-- Puede ejecutarse **en paralelo con TASK-070** (ambas consumen las mismas APIs).
+- **Desbloqueada** por cierre de `TASK-069` y `TASK-070`.
+- Debe tomar `TASK-070` como patrón visual primario y `TASK-069` como serving canónico.
 - Reemplaza on-demand compute de `organization-economics.ts` con reads del P&L materializado.
 - TASK-138 Slice 3 (People finance bridge) y Slice 4 (Agency synergy) cubren parte del scope de esta task — coordinar para no duplicar.
 - El Home/Nexa widget (Slice 4 de esta task) depende de TASK-009 (Home, ya `complete`).
@@ -36,7 +56,7 @@
 | Priority | `P2` |
 | Impact | `Alto` |
 | Effort | `Medio` |
-| Status real | `Diseño` |
+| Status real | `Lista para ejecución` |
 | Rank | — |
 | Domain | Cost Intelligence |
 
@@ -61,7 +81,7 @@ Que los 4 consumers principales lean de serving views pre-materializadas en vez 
 ## Dependencies & Impact
 
 - **Depende de:**
-  - TASK-069 (operational P&L snapshots) — **blocker**
+- TASK-069 (operational P&L snapshots) — **cerrada**
   - TASK-068 (period closure status) — **cerrada**
   - Agency module existente
   - Organization 360 existente (tab Rentabilidad)

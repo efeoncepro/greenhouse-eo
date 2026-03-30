@@ -155,6 +155,24 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - implementación técnica ya validada con `eslint`, `tsc` y `build`
   - validación visual todavía pendiente antes de declarar `TASK-070` cerrada
 
+## Delta 2026-03-30 Cost Intelligence ya tiene baseline cerrada como módulo
+- Cost Intelligence ya no debe leerse como una lane experimental separada, sino como módulo operativo con baseline implementada.
+- Estado consolidado:
+  - `TASK-067` cerrada: foundation técnica
+  - `TASK-068` cerrada: cierre de período
+  - `TASK-069` cerrada: P&L operativo materializado
+  - `TASK-070` en implementación avanzada: UI principal de Finance ya sobre el módulo
+- Contrato canónico vigente:
+  - serving base:
+    - `greenhouse_serving.period_closure_status`
+    - `greenhouse_serving.operational_pl_snapshots`
+  - auth:
+    - lectura para `finance` y `efeonce_admin`
+    - cierre para `finance_manager` y `efeonce_admin`
+    - reapertura solo para `efeonce_admin`
+- Siguiente ola explícita:
+  - `TASK-071` como consumers distribuidos en Agency, Org 360, People 360 y Home/Nexa
+
 ## Delta 2026-03-30 Sentry incident reader hardening
 - `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.
 - Nuevo contrato soportado:

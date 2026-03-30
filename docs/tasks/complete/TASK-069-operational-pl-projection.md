@@ -1,5 +1,19 @@
 # TASK-069 — Operational P&L Projection
 
+## Delta 2026-03-30 — Task cerrada
+
+- `TASK-069` pasa a `complete`.
+- Motivo de cierre:
+  - `operational_pl` ya materializa snapshots por `client`, `space` y `organization`
+  - APIs de lectura ya están expuestas
+  - smoke reactivo E2E ya quedó validado
+  - health y alertas básicas ya están integradas
+  - la UI principal de Finance (`TASK-070`) ya consume este serving como contrato estable
+- Lo que queda pendiente ya no es parte de esta task:
+  - consumers downstream distribuidos (`TASK-071`)
+  - validaciones visuales y refinamientos de surfaces consumidoras
+  - profundización semántica futura del módulo (budget, cost centers, projected P&L)
+
 ## Delta 2026-03-30 — Slice 1 operativo implementado
 
 - `TASK-069` ya no está en diseño puro.
