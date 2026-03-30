@@ -1399,3 +1399,443 @@ Cómo saber que el sistema funciona:
 | Revenue forecast accuracy | No existe | ±15% vs actual | Pipeline vs actual revenue |
 | Client churn predicted vs actual | No existe | >70% predicted | Churn score vs actual churn |
 | Nexa queries sobre Agency | Low | 5x increase | Nexa tool usage analytics |
+
+---
+
+## 14. Degradation Strategy — Qué pasa cuando algo falla
+
+Cada componente del Operator Layer depende de fuentes externas. Cuando una fuente falla, el sistema debe **degradar gracefully**, no romperse ni mostrar datos engañosos.
+
+### Principio
+
+> **Parcial visible > completo invisible.** Mejor mostrar un health score al 60% de completitud que no mostrar nada. Pero siempre indicar qué falta.
+
+### Degradation matrix
+
+| Componente | Fuente | Si falla | UX | Backend |
+|------------|--------|----------|-----|---------|
+| Health Score | ICO materialized | Score parcial sin dimension delivery | Badge "Parcial — sin datos ICO" | `completeness: 'partial'`, `missing: ['delivery']` |
+| Health Score | Finance P&L | Score parcial sin dimension finance | Badge "Parcial — sin datos financieros" | Mismo patrón |
+| Health Score | Capacity | Score parcial sin dimension capacity | Badge "Parcial" | Mismo patrón |
+| Risk Score | Receivables aging | Risk sin componente financiero | Score recalculado con weights redistribuidos | `excludedFactors: ['receivables']` |
+| Revenue Forecast | HubSpot sync | Pipeline stale | Chip "Pipeline: hace 3 días" con color warning | `pipeline.staleDays > 0` |
+| Anomaly Detection | ICO stale >2h | No detecta anomalías de delivery | Ops Health muestra "Anomaly detection: stale" | Cron health check alerta |
+| Space 360 | Postgres down | Fallback a último snapshot | Banner "Datos de hace X minutos" | Cache de último response exitoso |
+| SLA Compliance | ICO o Finance | Compliance parcial | "2 de 5 SLAs verificables" | `verifiableSlas: 2, totalSlas: 5` |
+| Scope Intelligence | Service scope null | No puede computar scope creep | Chip "Sin scope definido" | `scopeStatus: 'no_contract'` |
+| Skills Match | Skills matrix vacía | Staffing sin skill matching | "Asignación por FTE (sin skills)" | Fallback a capacity-only |
+
+### Freshness indicators en UI
+
+Cada sección que depende de datos materializados muestra su freshness:
+
+```typescript
+interface DataFreshness {
+  source: string           // 'ico_metrics', 'finance_pnl', 'capacity_economics'
+  lastMaterializedAt: string | null
+  ageMinutes: number
+  status: 'fresh' | 'acceptable' | 'stale' | 'unavailable'
+  thresholdMinutes: number // cuándo pasa de acceptable a stale
+}
+
+// Thresholds por fuente:
+// ICO metrics: fresh <60min, acceptable <360min, stale >360min
+// Finance P&L: fresh <120min, acceptable <720min, stale >720min
+// Capacity: fresh <1440min (24h), acceptable <2880min, stale >2880min
+// Pipeline: fresh <1440min, acceptable <4320min (3d), stale >4320min
+```
+
+### Cache strategy
+
+```
+Cada serving view tiene un cache layer:
+  1. Postgres serving view (source of truth, refreshed by projections)
+  2. API response cache (in-memory, 5 min TTL)
+  3. Client-side SWR (stale-while-revalidate, show last known while fetching)
+
+Si Postgres falla:
+  → API sirve from in-memory cache (si <30 min old)
+  → Si cache expired → 503 con retry-after header
+  → Client SWR muestra último conocido con banner "Reconectando..."
+```
+
+---
+
+## 15. Permission Model dentro de Agency
+
+No todos los internos deben ver todo. La inteligencia financiera y de riesgo requiere control granular.
+
+### Roles dentro del Operator Layer
+
+| Rol | Qué ve | Qué NO ve | Qué puede hacer |
+|-----|--------|-----------|------------------|
+| **Operations Lead** | Todo | — | Ejecutar recomendaciones, reasignar, escalar |
+| **Account Lead** | Su Space(s): delivery, team, SLA, engagement | Margin %, cost breakdown, otros Spaces, churn score | Solicitar reasignación, responder feedback |
+| **Team Lead** | Capacity de su rol, performance de su equipo | Finance, churn, pricing, otros roles | Ver utilización, solicitar recursos |
+| **Designer/Developer** | Su propia utilización, sus assignments | Cost, margin, otros members, scores | Ver sus KPIs propios en Mi Ficha |
+| **Finance Manager** | Economics, margin, P&L, receivables | Capacity por skill, client engagement | Configurar SLA financieros |
+| **Admin** | Todo + governance | — | Configurar weights, thresholds, permissions |
+
+### Implementación
+
+```typescript
+// Cada dato del Space 360 tiene un visibility level
+interface Space360Field {
+  field: string
+  visibleTo: ('operations_lead' | 'account_lead' | 'team_lead' | 'finance' | 'admin')[]
+}
+
+const SPACE_360_VISIBILITY: Space360Field[] = [
+  { field: 'health_score',           visibleTo: ['operations_lead', 'admin'] },
+  { field: 'health_score_zone',      visibleTo: ['operations_lead', 'account_lead', 'admin'] }, // zone sí, number no
+  { field: 'risk_score',             visibleTo: ['operations_lead', 'admin'] },
+  { field: 'churn_prediction',       visibleTo: ['operations_lead', 'admin'] },
+  { field: 'margin_pct',             visibleTo: ['operations_lead', 'finance', 'admin'] },
+  { field: 'revenue',                visibleTo: ['operations_lead', 'account_lead', 'finance', 'admin'] },
+  { field: 'cost_breakdown',         visibleTo: ['operations_lead', 'finance', 'admin'] },
+  { field: 'otd_pct',                visibleTo: ['operations_lead', 'account_lead', 'team_lead', 'admin'] },
+  { field: 'rpa_avg',                visibleTo: ['operations_lead', 'account_lead', 'team_lead', 'admin'] },
+  { field: 'team_utilization',       visibleTo: ['operations_lead', 'team_lead', 'admin'] },
+  { field: 'member_loaded_cost',     visibleTo: ['operations_lead', 'finance', 'admin'] },
+  { field: 'scope_creep_score',      visibleTo: ['operations_lead', 'account_lead', 'admin'] },
+  { field: 'sla_compliance',         visibleTo: ['operations_lead', 'account_lead', 'finance', 'admin'] },
+  { field: 'expansion_signals',      visibleTo: ['operations_lead', 'account_lead', 'admin'] },
+  { field: 'anomalies',              visibleTo: ['operations_lead', 'admin'] },
+  { field: 'recommendations',        visibleTo: ['operations_lead', 'admin'] },
+]
+```
+
+### Relación con TASK-136 (View Access Governance)
+
+El permission model de Agency **no reemplaza** la gobernanza de vistas (TASK-136). Se complementan:
+
+- TASK-136 controla **qué páginas** ve cada rol (sidebar visibility)
+- Este permission model controla **qué datos dentro de una página** ve cada rol (field-level visibility)
+
+```
+TASK-136: "Account Lead puede ver /agency/spaces/[id]" → acceso a la página
+Permission Model: "Account Lead en esa página ve OTD pero no ve margin" → acceso al dato
+```
+
+---
+
+## 16. Data Retention Policy
+
+### Principio
+
+> **Los datos operativos tienen ciclo de vida. Los históricos se archivan, no se eliminan.**
+
+### Retention por tipo de dato
+
+| Dato | Hot (Postgres serving) | Warm (Postgres archive) | Cold (BigQuery) | Eliminado |
+|------|----------------------|------------------------|----------------|-----------|
+| Health scores | Último score + 6 meses trend | 6-24 meses | >24 meses | Nunca |
+| Risk scores | Último + 6 meses | 6-24 meses | >24 meses | Nunca |
+| Anomalies (open) | Indefinido mientras open | — | — | — |
+| Anomalies (resolved) | 3 meses | 3-12 meses | >12 meses | Nunca |
+| Recommendations (acted) | 3 meses | 3-12 meses | >12 meses | Nunca |
+| Recommendations (expired) | 30 días | 1-6 meses | >6 meses | >24 meses |
+| Capacity forecast | Último + 3 meses | 3-12 meses | >12 meses | >24 meses |
+| Revenue pipeline | Último + 6 meses | 6-24 meses | >24 meses | Nunca |
+| SLA compliance | Último + 12 meses | 12-36 meses | >36 meses | Nunca |
+| Retrospectives | Indefinido | — | — | Nunca |
+| Scope creep snapshots | Último + 6 meses | 6-24 meses | >24 meses | Nunca |
+| Asset profitability | 12 meses | 12-36 meses | >36 meses | Nunca |
+
+### Archiving mechanism
+
+```sql
+-- Cron mensual: mueve datos hot → warm
+-- Implementar como script SQL programado
+-- Pattern: INSERT INTO archive_table SELECT ... WHERE created_at < threshold; DELETE FROM hot_table WHERE ...;
+
+-- Cron trimestral: mueve datos warm → BigQuery cold
+-- Implementar como Cloud Function o cron que exporta a BigQuery dataset
+```
+
+### Protecciones
+
+- Nunca eliminar datos que tengan `status = 'open'` o referencia activa
+- Archiving es **append-only** al destino — nunca sobreescribe
+- Cada tabla con retention tiene campo `archived_at` para tracking
+- Dry-run mode: primero cuenta cuántos records se archivarían, requiere confirmación
+
+---
+
+## 17. Migration Path — De lo actual al Operator Layer
+
+### Principio
+
+> **Coexistencia → migración gradual → cutover → cleanup.** Nunca Big Bang.
+
+### Fase de coexistencia
+
+Cada componente nuevo coexiste con el viejo hasta que se valida:
+
+| Componente actual | Componente nuevo | Coexistencia | Cutover trigger |
+|-------------------|-----------------|-------------|----------------|
+| `agency-queries.ts` (BigQuery CTEs) | `SpaceStore` (Postgres serving views) | Nuevo lee de serving, viejo sigue como fallback | Serving views fresh >30 días sin errores |
+| Space redirect → Admin | Space 360 page | Space 360 como nueva ruta, redirect se mantiene en `/admin/tenants/[id]` | Space 360 tiene todos los tabs funcionales |
+| Economics placeholder | Economics API + view | Nuevo reemplaza placeholder directamente | API retorna datos reales |
+| Inline capacity queries | `TeamCapacityStore` | Store encapsula queries existentes, misma data | Store validado con tests |
+| `/api/campaigns` (global) | `/api/agency/campaigns` | Proxy: nuevo delega al viejo | Viejo eliminado después de 30 días |
+
+### Migration checklist por componente
+
+```
+Para cada migración:
+  □ Nuevo componente implementado con tests
+  □ Nuevo componente deployado en staging
+  □ Datos comparados: nuevo vs viejo producen mismos resultados
+  □ Nuevo componente deployado en production como primario
+  □ Viejo componente marcado @deprecated
+  □ 30 días sin incidentes
+  □ Viejo componente eliminado
+  □ Documentación actualizada
+```
+
+### BigQuery → Postgres migration específica para Agency
+
+Las queries de `agency-queries.ts` son las más complejas del portal (CTEs de 100+ líneas con joins a 6 tablas). No se migran de golpe:
+
+```
+Paso 1: Materializar los resultados de las CTEs en serving views
+  └── greenhouse_serving.space_operational_summary
+  └── greenhouse_serving.team_capacity_summary
+
+Paso 2: Crear stores que lean de serving views
+  └── SpaceStore.listWithHealth() → SELECT * FROM space_operational_summary
+  └── TeamCapacityStore.getCapacity() → SELECT * FROM team_capacity_summary
+
+Paso 3: API routes usan stores en vez de BigQuery queries
+  └── /api/agency/spaces → SpaceStore.listWithHealth()
+
+Paso 4: Reactive projections mantienen serving views fresh
+  └── assignment.created → refresh space_operational_summary
+  └── ico.materialization.completed → refresh space_operational_summary
+
+Paso 5: BigQuery queries en agency-queries.ts marcadas @deprecated
+
+Paso 6: 30 días sin fallback → eliminar BigQuery queries
+```
+
+### Backward compatibility guarantees
+
+- **API responses no cambian shape** — mismos campos, mismos tipos, nuevos campos son aditivos
+- **Sidebar no cambia** — mismos items, mismas rutas, nuevas rutas son aditivas
+- **Permissions no se restringen** — si hoy ves algo, lo seguirás viendo. Nuevas restricciones se aplican solo a datos nuevos (health score, risk score, etc.)
+- **Fallback siempre disponible** — si serving view está vacía, cae a BigQuery query original
+
+---
+
+## 18. Governance, Multi-Currency, Onboarding & Integration Testing
+
+### 18.1 Governance del Operator Layer
+
+**Quién controla qué:**
+
+| Decisión | Quién decide | Dónde se configura | Cómo cambia |
+|----------|-------------|-------------------|-------------|
+| Health score weights | Product Owner + Operations Lead | `HEALTH_DIMENSIONS[]` en código | PR con justificación + test actualizado |
+| Anomaly thresholds | Operations Lead | `ANOMALY_RULES[]` en código (v1), Admin UI (v2) | PR (v1), Admin Center panel (v2) |
+| SLA defaults por tipo de servicio | Account Lead + Finance | `service_sla` table via Admin UI | CRUD endpoint |
+| Recommendation approval | Operations Lead | In-app (recommendation lifecycle) | Click en "Aprobar" / "Rechazar" |
+| Client transparency fields | Product Owner | `CLIENT_VISIBLE_FIELDS[]` en código | PR con review de Account Lead |
+| Nexa execution permissions | Admin | Nexa tool config | `requiresConfirmation: true/false` per tool |
+| Data retention thresholds | Platform Engineer | Cron config + retention policy doc | Infra PR |
+
+**Principio de governance:**
+
+> v1: todo configurable en código con registros declarativos + tests.
+> v2: governance UI en Admin Center para thresholds y SLAs.
+> v3: self-service para Account Leads en SLAs de su Space.
+
+### 18.2 Multi-Currency
+
+**Regla canónica:**
+
+> Todas las comparaciones, scores y rankings se computan en **CLP**. La UI muestra moneda original + CLP cuando difieren.
+
+**Puntos de conversión:**
+
+| Dato | Moneda original | Conversión | Momento |
+|------|----------------|------------|---------|
+| Service cost | USD o CLP | `resolveExchangeRateToClp()` | Al materializar service_economics |
+| Payroll (USD entries) | USD | Último FX rate × monto | En PnL computation (ya implementado) |
+| Revenue pipeline | USD (HubSpot) | FX rate al materializar | Al sync pipeline |
+| Asset profitability | Mixto | Normalizar a CLP en serving view | Al materializar |
+| SLA monetary thresholds | CLP | — | Definidos en CLP |
+| Health/Risk scores | CLP-normalized inputs | — | Inputs ya en CLP |
+
+**Helper canónico:** `resolveExchangeRateToClp()` de `src/lib/finance/shared.ts` — ya existe, se reutiliza en todo el layer.
+
+**Staleness protection:** `checkExchangeRateStaleness()` — si FX rate >7 días, serving views se marcan como `fxStale: true` y la UI muestra warning.
+
+### 18.3 Onboarding del sistema
+
+**Tres niveles de onboarding:**
+
+**Nivel 1 — Glossary operativo (siempre visible):**
+
+```typescript
+const AGENCY_GLOSSARY: Record<string, { term: string; definition: string; example: string }> = {
+  health_score: {
+    term: 'Health Score',
+    definition: 'Indicador compuesto 0-100 del estado de un Space. Combina delivery (40%), finanzas (30%), engagement (15%) y capacidad (15%).',
+    example: 'Un Space con OTD 95%, margen 25%, login frecuente y equipo balanceado tiene score ~85 (Óptimo).'
+  },
+  rpa: {
+    term: 'RPA (Revisiones por Aprobación)',
+    definition: 'Promedio de revisiones necesarias antes de aprobar un entregable. Menor es mejor.',
+    example: 'RPA 1.2 = la mayoría se aprueba con mínimas correcciones. RPA 3.0 = demasiadas iteraciones.'
+  },
+  scope_creep: {
+    term: 'Scope Creep',
+    definition: 'Cuando se entrega más de lo contratado sin ajuste de precio. Score 0-100.',
+    example: 'Scope creep 65: se entregaron 2.5x más assets que los contratados.'
+  },
+  // ... 20+ terms
+}
+```
+
+Accesible vía tooltip (`?` icon) al lado de cada métrica en la UI.
+
+**Nivel 2 — Playbooks por anomalía (en documentación):**
+
+```markdown
+## Playbook: OTD Degradation
+
+### Señal
+OTD cayó >15 puntos en 2 períodos consecutivos.
+
+### Diagnóstico (en orden)
+1. ¿Hay stuck assets? → Revisar en Space 360 > Delivery
+2. ¿Hay bottleneck de capacidad? → Revisar en Space 360 > Team
+3. ¿Cambió el scope? → Revisar Scope Intelligence
+4. ¿Cambió el equipo? → Revisar assignment history
+
+### Acciones
+- Si stuck assets > 5: escalar a Team Lead del rol bottleneck
+- Si capacity > 100%: reasignar FTE desde Space con holgura
+- Si scope creep > 40: escalar a Account Lead para renegociar
+- Si equipo cambió: evaluar onboarding del nuevo member
+
+### Escalamiento
+- Si no se resuelve en 1 semana: Operations Lead interviene
+- Si no se resuelve en 2 semanas: notificar a management
+```
+
+Ubicación: `docs/operations/playbooks/` (nuevo directorio).
+
+**Nivel 3 — Interactive onboarding (futuro):**
+
+Primera vez que un usuario abre Agency → tour guiado:
+1. "Esta es tu vista Pulse — los KPIs globales de la agencia"
+2. "Cada Space tiene un Health Score — verde es óptimo"
+3. "Las anomalías aparecen aquí cuando algo necesita atención"
+4. "Puedes pedirle a Nexa que te explique cualquier métrica"
+
+Implementar con tooltip tour library (sin agregar dependencias — usar MUI Popover secuencial).
+
+### 18.4 Integration Testing Strategy
+
+Unit tests validan reglas individuales. Integration tests validan **flujos completos** que cruzan múltiples módulos.
+
+**Test scenarios end-to-end:**
+
+```typescript
+describe('Agency Intelligence E2E', () => {
+
+  // Scenario 1: OTD degrades → anomaly → notification → recommendation
+  it('detects OTD degradation and generates actionable recommendation', async () => {
+    // Setup: Space with healthy OTD
+    await seedSpaceWithMetrics('space-A', { otd: [92, 90] }) // 2 healthy periods
+
+    // Act: ICO materializes with degraded OTD
+    await materializeIcoMetrics('space-A', { otd: 74 }) // drops 16pts
+
+    // Assert: anomaly detection runs
+    const anomalies = await runAnomalyDetection()
+    expect(anomalies).toContainEqual(expect.objectContaining({
+      spaceId: 'space-A', ruleId: 'otd_drop', severity: 'high'
+    }))
+
+    // Assert: notification dispatched
+    const notifications = await getNotificationsForSpace('space-A')
+    expect(notifications).toContainEqual(expect.objectContaining({
+      category: 'ico_alert', title: expect.stringContaining('OTD cayó')
+    }))
+
+    // Assert: recommendation generated
+    const recs = await getRecommendationsForSpace('space-A')
+    expect(recs.length).toBeGreaterThan(0)
+    expect(recs[0].type).toBe('reassign')
+  })
+
+  // Scenario 2: Anomaly resolves → recommendation auto-resolved
+  it('auto-resolves recommendation when anomaly disappears', async () => {
+    // Setup: existing anomaly + recommendation
+    await seedAnomaly('space-A', 'otd_drop')
+    await seedRecommendation('space-A', { triggerAnomaly: 'otd_drop', status: 'notified' })
+
+    // Act: OTD recovers
+    await materializeIcoMetrics('space-A', { otd: 91 })
+    await runAnomalyDetection()
+
+    // Assert: anomaly marked resolved
+    const anomalies = await getAnomaliesForSpace('space-A')
+    expect(anomalies.filter(a => a.status === 'active')).toHaveLength(0)
+
+    // Assert: recommendation auto-resolved
+    const recs = await getRecommendationsForSpace('space-A')
+    expect(recs[0].status).toBe('auto_resolved')
+  })
+
+  // Scenario 3: Revenue pipeline → capacity gap → hiring recommendation
+  it('detects capacity gap from pipeline and recommends hiring', async () => {
+    // Setup: pipeline requires Design FTE
+    await seedPipelineDeal({ requiredFte: { design: 1.5 }, startDate: '2026-05-01' })
+
+    // Setup: current Design capacity almost full
+    await seedCapacity({ design: { total: 2.0, allocated: 1.8, available: 0.2 } })
+
+    // Act: capacity forecast runs
+    await runCapacityForecast()
+
+    // Assert: gap detected
+    const forecast = await getCapacityForecast('design', '2026-05')
+    expect(forecast.gapFte).toBeCloseTo(1.3) // needs 1.5, has 0.2
+
+    // Assert: hiring recommendation generated
+    const recs = await getRecommendationsByType('hire')
+    expect(recs).toContainEqual(expect.objectContaining({
+      role: 'design', requiredFte: 1.3
+    }))
+  })
+})
+```
+
+**Testing infrastructure:**
+
+| Layer | Tool | Scope |
+|-------|------|-------|
+| Unit tests | Vitest | Pure functions (score computation, rule matching, normalization) |
+| Store tests | Vitest + PG mock | Store functions return correct types from mock data |
+| API tests | Vitest + fetch mock | Routes handle auth, params, errors correctly |
+| Integration tests | Vitest + test database | Multi-module flows with real Postgres (test schema) |
+| E2E scenarios | Vitest + seed helpers | Full lifecycle flows (seed → act → assert across modules) |
+
+**Test database strategy:**
+
+```
+Option A (recommended for v1): Mock PostgresQuery at module boundary
+  - Fast, no external dependencies
+  - Each test controls exactly what the DB "returns"
+  - Limitation: doesn't catch SQL bugs
+
+Option B (recommended for v2): Dedicated test database
+  - Real Postgres instance (Docker or Cloud SQL clone)
+  - Seed → test → teardown per suite
+  - Catches SQL bugs, schema mismatches
+  - Slower, requires infra setup
+```
