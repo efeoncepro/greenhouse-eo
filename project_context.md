@@ -131,6 +131,16 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `userId` sigue siendo la llave operativa para overrides, auditoría de vistas y `authorizedViews`
   - el cut es persona-first para lectura y preview, no un reemplazo big bang del principal portal
 
+## Delta 2026-03-30 runtime Postgres más resiliente a fallos TLS transitorios
+- `src/lib/postgres/client.ts` ya no deja cacheado indefinidamente un pool fallido.
+- Cambios operativos:
+  - si `buildPool()` falla, el singleton se limpia para permitir recovery en el siguiente intento
+  - si `pg` emite errores de conexión/TLS, el pool y el connector se resetean
+  - queries y transacciones reintentan una vez para errores retryable como `ssl alert bad certificate`
+- Lectura práctica:
+  - esto no reemplaza el diagnóstico de infraestructura si Cloud SQL o el connector siguen fallando
+  - sí evita que un handshake roto quede pegado en un runtime caliente y multiplique alertas innecesarias
+
 ## Delta 2026-03-30 Cost Intelligence foundation bootstrap
 - Greenhouse ya reconoce `cost_intelligence` como domain soportado del projection registry.
 - Base técnica nueva:

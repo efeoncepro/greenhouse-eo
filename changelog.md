@@ -2,6 +2,11 @@
 
 ## 2026-03-30
 
+- Se endureció `src/lib/postgres/client.ts` ante incidentes TLS/SSL transitorios:
+  - normaliza `GREENHOUSE_POSTGRES_SSL` y numerics con `trim()`
+  - evita cachear un `Pool` fallido de forma indefinida
+  - resetea pool/connector cuando `pg` emite errores de conexión
+  - reintenta una vez queries y transacciones ante fallos retryable como `ssl alert bad certificate`
 - `TASK-140` salió de diseño y ya tiene `Slice 1` implementado en `/admin/views`:
   - nuevo helper shared `src/lib/admin/admin-preview-persons.ts`
   - el selector de preview ahora agrupa por persona canónica cuando existe `identityProfileId`

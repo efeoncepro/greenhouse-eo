@@ -116,6 +116,36 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - alertas explícitas para `active`, `inactive`, `missing_principal` y `degraded_link`
   - roadmap tab ya refleja los remanentes reales de `TASK-140`
 
+## Sesión 2026-03-30 — hardening urgente de Postgres por incidentes TLS en cron
+
+### Objetivo
+- Cortar la cascada de fallos repetidos en `outbox-publish` y `webhook-dispatch` ante errores TLS/SSL transitorios de PostgreSQL en `production`.
+
+### Diagnóstico
+- Slack mostró errores repetidos `SSL routines:ssl3_read_bytes:sslv3 alert bad certificate`.
+- Verificación operativa local:
+  - `production` sí tiene `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`
+  - Cloud SQL sigue con `sslMode=ENCRYPTED_ONLY`
+  - el runtime usa Cloud SQL Connector por diseño; no hay evidencia de que el issue venga de falta de env del connector
+- Riesgo detectado en código:
+  - `src/lib/postgres/client.ts` cacheaba `__greenhousePostgresPoolPromise` incluso si la creación del pool fallaba una vez
+  - un fallo TLS/handshake podía quedar pegado en el runtime caliente y repetir alertas hasta el próximo cold start
+
+### Delta de ejecución
+- `src/lib/postgres/client.ts` ahora:
+  - normaliza envs boolean/number con `trim()`
+  - resetea el pool global si `buildPool()` falla
+  - cierra pool/connector ante errores emitidos por `pg`
+  - reintenta una vez queries y transacciones cuando detecta fallos retryable de conexión/TLS
+
+### Validación ejecutada
+- `pnpm exec eslint src/lib/postgres/client.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Pendiente inmediato
+- Desplegar este hardening para observar si desaparece el spam de cron failures en `production`.
+- Si reaparece el mismo error después del deploy, revisar ya a nivel infra/Cloud SQL Connector rotation y runtime logs productivos.
+
 ## Sesión 2026-03-30 — Hardening canónico de atribución comercial para Cost Intelligence
 
 ### Objetivo
