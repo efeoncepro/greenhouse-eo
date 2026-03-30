@@ -74,6 +74,29 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - decidir si más access points transversales merecen `view_code` propio
   - cerrar rutas profundas que aún hereden por layouts amplios
 
+## Sesión 2026-03-30 — TASK-136 cerrada
+
+### Completado
+- `TASK-136` pasó de `in-progress` a `complete`.
+- Se validó el criterio de cierre:
+  - catálogo gobernable por `view_code` activo
+  - persistencia role/user activa
+  - expiración, auditoría y notificación reactiva activas
+  - `authorizedViews` integrado a sesión, menú y guards
+  - `/admin/views` ya funciona como superficie operativa real
+- Chequeo de impacto cruzado ejecutado:
+  - no se detectaron otras tasks activas o `to-do` que requieran delta inmediato por este cierre
+  - el remanente futuro debe abrirse como follow-on, no reabrir artificialmente `TASK-136`
+
+### Archivos tocados
+- `docs/tasks/complete/TASK-136-admin-view-access-governance.md`
+- `docs/tasks/README.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Validación ejecutada
+- Validación documental/manual del cierre y del índice de tasks
+
 ## Sesión 2026-03-30 — TASK-136 cierra más rutas terciarias y completa la operabilidad de `/admin/views`
 
 ### Completado

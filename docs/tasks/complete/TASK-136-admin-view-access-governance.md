@@ -4,14 +4,28 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `in-progress` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Muy alto` |
 | Effort | `Alto` |
-| Status real | `Parcial` |
+| Status real | `Cerrada` |
 | Rank | — |
 | Domain | Admin Center / Identity & Access / UX |
 | Sequence | Independiente, evoluciona la gobernanza de acceso existente |
+
+## Delta 2026-03-30 — cierre de task
+
+- `TASK-136` queda cerrada para el alcance comprometido del portal actual.
+- Resultado consolidado:
+  - catálogo gobernable por `view_code` operativo
+  - persistencia por rol y overrides por usuario activas
+  - expiración, auditoría y notificación reactiva funcionando
+  - `authorizedViews` integrado a sesión y navegación
+  - enforcement page-level/layout-level activo en las superficies principales y access points transversales relevantes
+  - `/admin/views` operable como superficie real de gobierno, no solo como mock o lectura
+- Decisión de cierre:
+  - los remanentes finos ya no bloquean el modelo ni la operación
+  - cualquier expansión futura de rutas profundas o nuevos access points debe nacer como follow-on, no mantener esta task abierta artificialmente
 
 ## Delta 2026-03-30
 

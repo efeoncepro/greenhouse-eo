@@ -48,7 +48,6 @@ Primer bloque operativo asignado:
 | `TASK-110` | [TASK-110-nexa-assistant-ui-features.md](in-progress/TASK-110-nexa-assistant-ui-features.md) | P1 | Alto | Medio | Implementación | Lane A activa: contrato de tools, ejecución backend y grounding operativo para Nexa en `/home`; la continuación natural de UI quedó más claramente separada en `TASK-115` |
 | `TASK-115` | [TASK-115-nexa-ui-completion.md](in-progress/TASK-115-nexa-ui-completion.md) | P1 | Alto | Medio | Implementación | Edit inline, suggestions, feedback, floating portal-wide, thread history, NexaPanel cleanup |
 | `TASK-121` | [TASK-121-admin-center-hardening.md](in-progress/TASK-121-admin-center-hardening.md) | P1 | Alto | Bajo | Implementación | Sorting, skeleton, health real, deep-link filtros y alertas consolidadas para Admin Center |
-| `TASK-136` | [TASK-136-admin-view-access-governance.md](in-progress/TASK-136-admin-view-access-governance.md) | P1 | Muy alto | Alto | Parcial | Gobernanza de vistas ya activa con persistencia por rol, overrides por usuario, expiración operativa, auditoría visible, enforcement por `view_code`, notificación reactiva y una UI de matrix/preview bastante más operable |
 | `TASK-137` | [TASK-137-ui-foundation-activation.md](in-progress/TASK-137-ui-foundation-activation.md) | P1 | Alto | Medio | Parcial | Foundation UI ya activada con RHF en auth, `GreenhouseCalendar`, `GreenhouseDatePicker`, `GreenhouseDragList` y primer calendario operativo en `/admin/operational-calendar` |
 
 ## To Do
@@ -221,6 +220,7 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 
 ## Complete
 
+| [TASK-136-admin-view-access-governance.md](complete/TASK-136-admin-view-access-governance.md) | Gobernanza de vistas cerrada: catálogo `view_code`, persistencia role/user, expiración, auditoría, notificación reactiva, `authorizedViews` en sesión, enforcement por layout/página y `/admin/views` como superficie operable de administración. |
 | [TASK-133-ops-health-sentry-incident-surfacing.md](complete/TASK-133-ops-health-sentry-incident-surfacing.md) | Incidentes Sentry abiertos/relevantes visibles en `Ops Health` y `Cloud & Integrations` con snapshot fail-soft separado de la postura base de observability. |
 | [TASK-117-payroll-last-business-day-auto-calculation.md](complete/TASK-117-payroll-last-business-day-auto-calculation.md) | Policy operativa de último día hábil cerrada y revalidada con recipients reales: helper temporal canónico, readiness de cálculo separado, cron idempotente con auto-creación del período y `payroll_ops` ya resuelta sobre identidad persona-first. |
 | [TASK-124-gcp-secret-manager-critical-secrets-migration.md](complete/TASK-124-gcp-secret-manager-critical-secrets-migration.md) | Secret Manager crítico cerrado: helper canónico, postura en `/api/internal/health`, migración de Nubox/Postgres/Auth-SSO y validación real en `staging` + `production` con secretos sirviéndose desde Secret Manager. |
