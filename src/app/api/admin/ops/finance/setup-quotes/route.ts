@@ -1,26 +1,23 @@
 import { NextResponse } from 'next/server'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { requireAdminTenantContext } from '@/lib/tenant/authorization'
+import { requireCronAuth } from '@/lib/cron/require-cron-auth'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
 
 /**
- * POST /api/admin/ops/finance/setup-quotes
+ * GET /api/admin/ops/finance/setup-quotes
  *
- * One-time migration endpoint for TASK-163:
- * 1. Creates greenhouse_finance.quotes table
- * 2. Migrates DTE 52 from income → quotes
- * 3. Fixes DTE 61 credit note signs (negative amounts)
- *
+ * One-time migration endpoint for TASK-163.
+ * Uses cron auth (CRON_SECRET bearer) so it can be called via vercel curl.
  * Idempotent — safe to run multiple times.
  */
-export async function POST() {
-  const { tenant, errorResponse } = await requireAdminTenantContext()
+export async function GET(request: Request) {
+  const { authorized, errorResponse } = requireCronAuth(request)
 
-  if (!tenant) {
-    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!authorized) {
+    return errorResponse
   }
 
   const results: string[] = []
