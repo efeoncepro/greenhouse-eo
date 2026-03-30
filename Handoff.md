@@ -116,6 +116,27 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - alertas explícitas para `active`, `inactive`, `missing_principal` y `degraded_link`
   - roadmap tab ya refleja los remanentes reales de `TASK-140`
 
+## Sesión 2026-03-30 — cierre formal de `TASK-140`
+
+### Objetivo
+- Cerrar el consumer `/admin/views` como adopción real de la policy persona-first sin reabrir `TASK-141` ni romper el runtime user-scoped existente.
+
+### Delta de ejecución
+- `TASK-140` se movió de `in-progress` a `complete`.
+- El archivo canónico quedó en:
+  - `docs/tasks/complete/TASK-140-admin-views-person-first-preview.md`
+- Se actualizaron:
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `changelog.md`
+- Criterio de cierre explicitado:
+  - el selector y preview ya son persona-first cuando existe `identityProfileId`
+  - `userId` quedó preservado como llave operativa de compatibilidad para overrides, auditoría y `authorizedViews`
+  - el remanente pasa a policy/validación continua, no a gap estructural del consumer
+
+### Validación ejecutada
+- `git diff --check`
+
 ## Sesión 2026-03-30 — hardening urgente de Postgres por incidentes TLS en cron
 
 ### Objetivo

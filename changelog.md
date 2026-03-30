@@ -2,6 +2,10 @@
 
 ## 2026-03-30
 
+- `TASK-140` quedó formalmente cerrada:
+  - `/admin/views` ya se interpreta y se opera como consumer persona-first
+  - el selector/preview usa persona canónica cuando existe `identityProfileId`
+  - `userId` se preserva solo como llave operativa para overrides, auditoría y `authorizedViews`
 - Se endureció `src/lib/postgres/client.ts` ante incidentes TLS/SSL transitorios:
   - normaliza `GREENHOUSE_POSTGRES_SSL` y numerics con `trim()`
   - evita cachear un `Pool` fallido de forma indefinida

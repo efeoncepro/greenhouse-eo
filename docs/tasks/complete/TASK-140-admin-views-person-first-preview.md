@@ -2,11 +2,11 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
-- Status real: `Slice 1 implementado`
+- Status real: `Cerrada`
 - Rank: `56`
 - Domain: `admin / identity / access / ui`
 
@@ -32,6 +32,10 @@ Esta task ya no define la política institucional completa. Toma esa política y
   - la UI ya selecciona “persona previewable” y explicita cuándo el principal portal sigue siendo la llave operativa de compatibilidad
 - Guardrail explícito del slice:
   - no se tocaron `user_view_overrides`, `view_access_log`, `authorizedViews` ni la resolución runtime de sesión
+- Cierre formal de la task:
+  - `/admin/views` ya consume identidad persona-first para selección y preview
+  - `userId` quedó preservado solo como llave operativa de compatibilidad
+  - el remanente posterior se interpreta como follow-on de policy o validación, no como gap funcional central del consumer
 
 ## Why This Task Exists
 
@@ -203,6 +207,20 @@ Reglas obligatorias:
   - overrides, auditoría y runtime session siguen `userId`-scoped
 - remanente explícito:
   - evaluar si un siguiente slice debe abrir el universo a personas sin principal portal persistible o si ese carril debe quedar solo como estado informativo
+
+## Closure Note
+
+`TASK-140` se considera cerrada porque el consumer principal de `/admin/views` ya dejó de ser `client_user-first` en su lectura funcional:
+
+- el universo visible ahora se agrupa por persona canónica cuando existe `identityProfileId`
+- la UI distingue persona, faceta operativa y principal portal compatible
+- overrides, auditoría y `authorizedViews` siguen usando `userId` sin romper compatibilidad
+
+El remanente que queda no bloquea este cierre:
+
+- validación visual operativa continua del panel
+- futura decisión de policy para personas sin principal portal persistible
+- cualquier evolución adicional de overrides beyond `userId` como lane derivada, no dentro de esta task
 
 ## Open Questions
 
