@@ -34,9 +34,9 @@ import tableStyles from '@core/styles/table.module.css'
 
 interface PnlData {
   revenue?: { netRevenue?: number }
-  costs?: { totalCosts?: number }
+  costs?: { totalExpenses?: number }
   margins?: { grossMargin?: number; grossMarginPercent?: number; ebitda?: number; ebitdaPercent?: number }
-  payroll?: { headcount?: number; grossTotal?: number }
+  payroll?: { headcount?: number; totalGross?: number }
 }
 
 interface ClientEcon {
@@ -60,12 +60,12 @@ const MONTHS = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep
 const fmtClp = (n: number) =>
   new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(n)
 
-const pct = (v: number | null | undefined) => v != null ? `${Math.round(v * 100)}%` : '—'
+const pct = (v: number | null | undefined) => v != null ? `${Math.round(v)}%` : '—'
 
 const marginColor = (v: number | null | undefined): 'success' | 'warning' | 'error' => {
   if (v == null) return 'secondary' as 'error'
-  if (v >= 0.3) return 'success'
-  if (v >= 0.15) return 'warning'
+  if (v >= 30) return 'success'
+  if (v >= 15) return 'warning'
 
   return 'error'
 }
@@ -151,7 +151,7 @@ const AgencyEconomicsView = () => {
   if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress /></Box>
 
   const revenue = pnl?.revenue?.netRevenue ?? 0
-  const costs = pnl?.costs?.totalCosts ?? 0
+  const costs = pnl?.costs?.totalExpenses ?? 0
   const grossMargin = pnl?.margins?.grossMargin ?? 0
   const ebitda = pnl?.margins?.ebitda ?? 0
   const ebitdaPct = pnl?.margins?.ebitdaPercent

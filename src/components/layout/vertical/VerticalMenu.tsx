@@ -271,7 +271,8 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         { label: <NavLabel label={GH_FINANCE_NAV.purchaseOrders.label} subtitle={GH_FINANCE_NAV.purchaseOrders.subtitle} show={showSub} />, href: '/finance/purchase-orders' },
         { label: <NavLabel label={GH_FINANCE_NAV.hes.label} subtitle={GH_FINANCE_NAV.hes.subtitle} show={showSub} />, href: '/finance/hes' },
         { label: <NavLabel label={GH_FINANCE_NAV.reconciliation.label} subtitle={GH_FINANCE_NAV.reconciliation.subtitle} show={showSub} />, href: '/finance/reconciliation' },
-        { label: <NavLabel label={GH_FINANCE_NAV.intelligence.label} subtitle={GH_FINANCE_NAV.intelligence.subtitle} show={showSub} />, href: '/finance/intelligence' }
+        { label: <NavLabel label={GH_FINANCE_NAV.intelligence.label} subtitle={GH_FINANCE_NAV.intelligence.subtitle} show={showSub} />, href: '/finance/intelligence' },
+        { label: <NavLabel label='P&L y clientes' subtitle='Rentabilidad y top clientes' show={showSub} />, href: '/finance/economics' }
       ].filter(item => {
         if (item.href === '/finance') return canSeeView('finanzas.resumen', true)
         if (item.href === '/finance/income') return canSeeView('finanzas.ingresos', true)
