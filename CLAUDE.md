@@ -51,6 +51,7 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - `project_context.md` — arquitectura, stack, decisiones, restricciones (documento vivo con deltas)
 - `Handoff.md` — trabajo en curso, riesgos, próximos pasos
 - `docs/tasks/README.md` — pipeline de tareas `TASK-###` y legacy `CODEX_TASK_*`
+- `docs/issues/README.md` — pipeline de incidentes operativos `ISSUE-###`
 - `docs/architecture/` — specs de arquitectura canónicas (30+ documentos)
 - `docs/operations/` — modelos operativos (documentación, GitHub Project, data model, repo ecosystem)
 
@@ -66,6 +67,29 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - `GREENHOUSE_IDENTITY_ACCESS_V2.md` — identidad y acceso (12/12 implementado)
 - `GREENHOUSE_EVENT_CATALOG_V1.md` — catálogo de eventos outbox
 - `GREENHOUSE_INTERNAL_IDENTITY_V1.md` — separación auth principal vs canonical identity
+- `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` — módulo Finance: P&L engine, dual-store, outbox, allocations
+- `GREENHOUSE_UI_PLATFORM_V1.md` — stack UI, librerías disponibles, patrones de componentes
+- `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md` — infraestructura de webhooks inbound/outbound
+- `GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md` — playbook de proyecciones reactivas + recovery
+
+## Issue Lifecycle Protocol
+
+Los issues documentan incidentes operativos detectados en runtime. Viven en `docs/issues/{open,resolved}/`.
+
+### Al detectar un incidente
+1. Crear `docs/issues/open/ISSUE-###-descripcion-breve.md` con la plantilla de `docs/issues/README.md`
+2. Registrar en `docs/issues/README.md` tabla Open
+3. Documentar: ambiente, síntoma, causa raíz, impacto, solución propuesta
+
+### Al resolver un incidente
+1. Mover archivo de `open/` a `resolved/`
+2. Actualizar `docs/issues/README.md` — mover de Open a Resolved
+3. Agregar fecha de resolución y verificación realizada
+
+### Diferencia con Tasks
+- **Tasks** (`TASK-###`) son trabajo planificado (features, hardening, refactors)
+- **Issues** (`ISSUE-###`) son problemas encontrados en runtime (errores, fallos, degradación)
+- Un issue puede generar una task si la solución requiere trabajo significativo
 
 ## Task Lifecycle Protocol
 
