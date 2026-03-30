@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-163`
+- siguiente ID disponible: `TASK-167`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -46,6 +46,7 @@ Primer bloque operativo asignado:
 | `TASK-115` | [TASK-115-nexa-ui-completion.md](in-progress/TASK-115-nexa-ui-completion.md) | P1 | Alto | Medio | Implementación | Edit inline, suggestions, feedback, floating portal-wide, thread history, NexaPanel cleanup |
 | `TASK-121` | [TASK-121-admin-center-hardening.md](in-progress/TASK-121-admin-center-hardening.md) | P1 | Alto | Bajo | Implementación | Sorting, skeleton, health real, deep-link filtros y alertas consolidadas para Admin Center |
 | `TASK-137` | [TASK-137-ui-foundation-activation.md](in-progress/TASK-137-ui-foundation-activation.md) | P1 | Alto | Medio | Parcial | Foundation UI ya activada con RHF en auth, `GreenhouseCalendar`, `GreenhouseDatePicker`, `GreenhouseDragList` y primer calendario operativo en `/admin/operational-calendar` |
+| `TASK-166` | [TASK-166-finance-bigquery-write-cutover.md](in-progress/TASK-166-finance-bigquery-write-cutover.md) | P1 | Alto | Medio | Implementación inicial | Primer wiring real de `FINANCE_BIGQUERY_WRITE_ENABLED`; `income` y `expenses` ya pueden fallar cerrado en vez de caer a BigQuery si el flag está apagado |
 
 ## To Do
 

@@ -407,6 +407,18 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el retry DTE ya es un mecanismo real de resiliencia
   - `FINANCE_BIGQUERY_WRITE_ENABLED` sigue siendo un follow-on de lifecycle/cutover, no un bloqueo funcional del hardening base
 
+## Delta 2026-03-30 arranca el cutover real de writes legacy de Finance
+- El flag `FINANCE_BIGQUERY_WRITE_ENABLED` ya no queda solo documentado.
+- Slice inicial activo:
+  - `src/lib/finance/bigquery-write-flag.ts`
+  - `POST /api/finance/income`
+  - `POST /api/finance/expenses`
+- Regla vigente:
+  - si PostgreSQL falla y el flag está en `false`, esas rutas fallan cerrado con `FINANCE_BQ_WRITE_DISABLED`
+  - si el flag está en `true`, el fallback BigQuery actual sigue disponible como compatibilidad transicional
+- Lane nueva:
+  - `TASK-166`
+
 ## Delta 2026-03-29 notifications identity model
 - El sistema de notificaciones ya no debe leerse como `client_user-first`.
 - Contrato canónico vigente:

@@ -4,6 +4,29 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — arranque de TASK-166 Finance BigQuery write cutover
+
+### Objetivo
+- Empezar el cutover real del write fallback legacy de Finance sin big bang, usando `FINANCE_BIGQUERY_WRITE_ENABLED` como guard operativo verdadero.
+
+### Delta de ejecución
+- Nueva task activa:
+  - `docs/tasks/in-progress/TASK-166-finance-bigquery-write-cutover.md`
+- Helper nuevo:
+  - `src/lib/finance/bigquery-write-flag.ts`
+- Primer slice runtime:
+  - `POST /api/finance/income`
+  - `POST /api/finance/expenses`
+  - si PostgreSQL falla y el flag está apagado, responden `503` con `FINANCE_BQ_WRITE_DISABLED`
+
+### Pendiente inmediato
+- expandir el inventario/wiring a writes secundarios:
+  - `expenses/bulk`
+  - `accounts`
+  - `suppliers`
+  - `exchange-rates`
+- validar manualmente en staging con `FINANCE_BIGQUERY_WRITE_ENABLED=false`
+
 ## Sesión 2026-03-30 — reconciliación final de TASK-138 + TASK-139
 
 ### Objetivo

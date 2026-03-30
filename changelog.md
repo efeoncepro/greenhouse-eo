@@ -9,6 +9,10 @@
 
 ## 2026-03-30
 
+- `TASK-166` arrancó el cutover real del write fallback legacy de Finance:
+  - nuevo helper `src/lib/finance/bigquery-write-flag.ts`
+  - `POST /api/finance/income` y `POST /api/finance/expenses` ya respetan `FINANCE_BIGQUERY_WRITE_ENABLED`
+  - con el flag apagado y fallo Postgres, esas rutas ahora fallan cerrado en vez de mutar `fin_*` por compatibilidad implícita
 - `TASK-138` quedó reconciliada con el estado real del repo:
   - `FinanceDashboardView` ya consume `dso`, `dpo` y `payrollToRevenueRatio`
   - `PersonHrProfileTab` ya consume `finance-impact`
