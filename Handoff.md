@@ -51,6 +51,44 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - consumers downstream (`TASK-071`)
   - decidir si el cron dedicado `outbox-react-cost-intelligence` ya merece scheduling propio o si seguimos temporalmente con catch-all
 
+## Sesión 2026-03-30 — TASK-069 smoke reactivo E2E validado
+
+### Objetivo
+- Cerrar el remanente técnico más claro de `TASK-069`: demostrar que `operational_pl` ya procesa el carril reactivo real, no solo tests y build.
+
+### Delta de ejecución
+- Nuevo smoke script:
+  - `scripts/smoke-cost-intelligence-operational-pl.ts`
+  - comando: `pnpm smoke:cost-intelligence:operational-pl`
+- El smoke:
+  - detecta un período real con actividad
+  - inserta un evento sintético `finance.income.updated`
+  - lo publica de forma aislada
+  - procesa solo `cost_intelligence`
+  - valida reactive log + snapshots materializados + eventos salientes `accounting.pl_snapshot.materialized`
+
+### Evidencia obtenida
+- `periodId=2026-03`
+- `eventsProcessed=5`
+- `eventsFailed=0`
+- `projectionsTriggered=6`
+- `snapshotCount=3`
+- `publishedEventsCount=10`
+- handler validado:
+  - `operational_pl:finance.income.updated`
+
+### Validación ejecutada
+- `pnpm smoke:cost-intelligence:operational-pl`
+- `pnpm exec eslint scripts/smoke-cost-intelligence-operational-pl.ts package.json`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- El remanente principal de `TASK-069` ya no es de wiring base.
+- Siguiente corte lógico:
+  - consumers downstream (`TASK-071`)
+  - decidir si el cron dedicado de `cost_intelligence` ya merece scheduling propio
+
 ## Sesión 2026-03-30 — TASK-068 cerrada
 
 ### Completado

@@ -22,6 +22,29 @@
   - ya existe serving materializado de P&L por `client`, `space` y `organization`
   - todavía queda abierto para endurecer consumers downstream y semántica fina de alertas si hace falta
 
+## Delta 2026-03-30 — Smoke reactivo E2E validado
+
+- `operational_pl` ya no solo compila y pasa unit tests; el carril reactivo quedó validado con evidencia real.
+- Nuevo smoke reusable:
+  - `pnpm smoke:cost-intelligence:operational-pl`
+  - script: `scripts/smoke-cost-intelligence-operational-pl.ts`
+- El smoke:
+  - detecta un período real con actividad
+  - publica un evento sintético `finance.income.updated`
+  - procesa el domain `cost_intelligence`
+  - verifica:
+    - `greenhouse_sync.outbox_reactive_log` para `operational_pl`
+    - filas en `greenhouse_serving.operational_pl_snapshots`
+    - eventos `accounting.pl_snapshot.materialized`
+- Evidencia obtenida:
+  - `periodId=2026-03`
+  - `eventsProcessed=5`
+  - `eventsFailed=0`
+  - `projectionsTriggered=6`
+  - `snapshotCount=3`
+  - `publishedEventsCount=10`
+- Con esto, el remanente de `TASK-069` ya no es el wiring reactivo base.
+
 ## Delta 2026-03-30 — TASK-068 cerrada
 
 - `TASK-068` ya quedó cerrada:
@@ -207,6 +230,7 @@ Materializar `greenhouse_serving.operational_pl_snapshots` con P&L por scope/per
 ## Verification
 
 - `pnpm test src/lib/cost-intelligence/`
+- `pnpm smoke:cost-intelligence:operational-pl`
 - `pnpm build`
 - `pnpm lint`
 - Smoke local: trigger events → verificar snapshot materializado con valores correctos

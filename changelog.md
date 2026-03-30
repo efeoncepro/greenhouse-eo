@@ -2,6 +2,15 @@
 
 ## 2026-03-30
 
+- `TASK-069` ya tiene smoke reactivo E2E reusable:
+  - `pnpm smoke:cost-intelligence:operational-pl`
+  - el carril valida `outbox -> operational_pl -> operational_pl_snapshots -> accounting.pl_snapshot.materialized`
+- Evidencia real del smoke:
+  - `periodId=2026-03`
+  - `eventsProcessed=5`
+  - `eventsFailed=0`
+  - `projectionsTriggered=6`
+  - `snapshotCount=3`
 - `TASK-069` deja de estar en diseño puro:
   - nuevo engine `computeOperationalPl()` para materializar `greenhouse_serving.operational_pl_snapshots`
   - scopes soportados: `client`, `space`, `organization`

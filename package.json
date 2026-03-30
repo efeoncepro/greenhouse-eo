@@ -26,6 +26,7 @@
     "pg:doctor": "tsx scripts/pg-doctor.ts",
     "sync:outbox": "tsx scripts/run-outbox-consumer.ts",
     "smoke:cost-intelligence:period-closure": "tsx scripts/smoke-cost-intelligence-period-closure.ts",
+    "smoke:cost-intelligence:operational-pl": "tsx scripts/smoke-cost-intelligence-operational-pl.ts",
     "sync:source-runtime-projections": "tsx scripts/sync-source-runtime-projections.ts",
     "setup:bigquery:outbox": "tsx scripts/setup-bigquery-outbox.ts",
     "setup:bigquery:outbox-marts": "tsx scripts/setup-bigquery-outbox-marts.ts",

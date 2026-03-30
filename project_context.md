@@ -126,6 +126,19 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - task abierta todavía
   - el remanente principal ahora son consumers downstream (`TASK-071`) y hardening semántico, no wiring base
 
+## Delta 2026-03-30 TASK-069 smoke reactivo E2E validado
+- `operational_pl` ya quedó validada también en runtime reactivo real.
+- Nuevo smoke reusable:
+  - `pnpm smoke:cost-intelligence:operational-pl`
+- Evidencia real del carril:
+  - evento sintético `finance.income.updated`
+  - handler `operational_pl:finance.income.updated` sin error en `outbox_reactive_log`
+  - snapshots materializados en `greenhouse_serving.operational_pl_snapshots`
+  - eventos `accounting.pl_snapshot.materialized` publicados
+- Estado actual:
+  - el carril base `outbox -> operational_pl` ya no está pendiente
+  - lo siguiente con más valor es consumers downstream y hardening semántico
+
 ## Delta 2026-03-30 Sentry incident reader hardening
 - `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.
 - Nuevo contrato soportado:
