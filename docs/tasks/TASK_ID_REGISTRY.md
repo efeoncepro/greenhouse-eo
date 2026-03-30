@@ -181,4 +181,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 | `TASK-136` | `to-do` | Admin Center: View Access Governance | `docs/tasks/to-do/TASK-136-admin-view-access-governance.md` |
 
-`TASK-137`
+| `TASK-137` | `to-do` | UI Foundation Activation: RHF, FullCalendar, DatePicker, DnD | `docs/tasks/to-do/TASK-137-ui-foundation-activation.md` |
+
+`TASK-138`
