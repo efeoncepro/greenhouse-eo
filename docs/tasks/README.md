@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-169`
+- siguiente ID disponible: `TASK-170`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -41,10 +41,10 @@ Primer bloque operativo asignado:
 | `TASK-070` | [TASK-070-cost-intelligence-finance-ui.md](in-progress/TASK-070-cost-intelligence-finance-ui.md) | P1 | Alto | Medio | Implementación avanzada | Economía UI ya reemplaza `/finance/intelligence` con dashboard de cierre de período + P&L inline; falta validación visual final y decidir el destino del dashboard legacy |
 | `TASK-071` | [TASK-071-cost-intelligence-cross-module-consumers.md](in-progress/TASK-071-cost-intelligence-cross-module-consumers.md) | P2 | Alto | Medio | Implementación | Agency, Organization 360, People, Home y Nexa ya tienen primer cutover a Cost Intelligence; resta validación visual y cierre formal de fallbacks |
 | `TASK-073` | [TASK-073-people-canonical-capacity-cutover.md](to-do/TASK-073-people-canonical-capacity-cutover.md) | P1 | Alto | Medio | Diseño | Cutover de `People` para dejar de derivar FTE/capacidad desde assignments y raw metrics, y pasar a serving canónico (`member_capacity_economics`, `person_intelligence`) |
+| `TASK-169` | [TASK-169-staff-aug-placement-bridge-hris-runtime-consolidation.md](complete/TASK-169-staff-aug-placement-bridge-hris-runtime-consolidation.md) | P1 | Alto | Medio | Cerrada | Bridge real entre `People`, `Assignments` y `Staff Aug`; create-placement liviano, preselección por assignment y señales de placement visibles en `Person 360` |
 | `TASK-093` | [TASK-093-personnel-expense-data-consistency.md](complete/TASK-093-personnel-expense-data-consistency.md) | P1 | Alto | Medio | Cerrada | Consistencia de datos en Gasto de Personal: promedios per-currency, labels semánticos, donut sin mix, headcount breakdown |
 | `TASK-110` | [TASK-110-nexa-assistant-ui-features.md](in-progress/TASK-110-nexa-assistant-ui-features.md) | P1 | Alto | Medio | Implementación | Lane A activa: contrato de tools, ejecución backend y grounding operativo para Nexa en `/home`; la continuación natural de UI quedó más claramente separada en `TASK-115` |
 | `TASK-115` | [TASK-115-nexa-ui-completion.md](in-progress/TASK-115-nexa-ui-completion.md) | P1 | Alto | Medio | Implementación | Edit inline, suggestions, feedback, floating portal-wide, thread history, NexaPanel cleanup |
-| `TASK-121` | [TASK-121-admin-center-hardening.md](in-progress/TASK-121-admin-center-hardening.md) | P1 | Alto | Bajo | Implementación | Sorting, skeleton, health real, deep-link filtros y alertas consolidadas para Admin Center |
 | `TASK-137` | [TASK-137-ui-foundation-activation.md](in-progress/TASK-137-ui-foundation-activation.md) | P1 | Alto | Medio | Parcial | Foundation UI ya activada con RHF en auth, `GreenhouseCalendar`, `GreenhouseDatePicker`, `GreenhouseDragList` y primer calendario operativo en `/admin/operational-calendar` |
 
 ## To Do
@@ -84,9 +84,17 @@ Primer bloque operativo asignado:
 ### Prioridad vigente — Staff Aug `TASK-038` y `TASK-041`
 
 - Lectura recomendada a 2026-03-28:
-  - `TASK-038`: tratarla como brief histórico de producto; el baseline runtime ya quedó cerrado por `TASK-019`.
-  - `TASK-041`: necesaria solo al momento de conectar Staff Aug con HRIS canónico y contract model consolidado; no compite como lane autónoma antes de `TASK-026`.
+- `TASK-038`: tratarla como brief histórico de producto; el baseline runtime ya quedó cerrado por `TASK-019`.
+- `TASK-041`: necesaria solo al momento de conectar Staff Aug con HRIS canónico y contract model consolidado; no compite como lane autónoma antes de `TASK-026`.
 - Criterio: el baseline moderno de Staff Aug ya existe; lo pendiente es integración HRIS adicional y follow-ons de consumers.
+
+### Prioridad vigente — Staff Aug bridge `TASK-169`
+
+- `TASK-169` ya cerró el bridge mínimo para `People -> assignment context -> placement`.
+- Criterio:
+  - no reabrir `TASK-019`
+  - no ejecutar literalmente `TASK-038` ni `TASK-041`
+  - mantener `assignment` como pivote real y `membership` como contexto organizacional para follow-ons futuros
 
 ### Prioridad vigente — backlog `to-do` por impacto vs esfuerzo
 
@@ -219,6 +227,7 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 
 ## Complete
 
+| [TASK-121-admin-center-hardening.md](complete/TASK-121-admin-center-hardening.md) | Hardening de `/admin` cerrado: sorting manual en la tabla de spaces, deep-link compartible por filtros, skeleton route-level, domain cards con health real y bloque consolidado de alertas; el cierre además corrigió un loop de re-render en `AdminCenterView` y dejó tests UI dedicados para el slice. |
 | [TASK-059-tool-provider-canonical-object.md](complete/TASK-059-tool-provider-canonical-object.md) | Provider canónico cross-module ya reconciliado al runtime real: se descarta `tool_providers`, se institucionaliza `greenhouse_core.providers` como ancla única y queda materializado `provider_tooling` con snapshot reactivo mensual, bridge supplier/provider explícito y consumer real en analytics de herramientas. |
 | [TASK-142-agency-space-360-view.md](complete/TASK-142-agency-space-360-view.md) | Agency `Space 360` ya reemplaza el redirect legacy de `/agency/spaces/[id]`: compone identidad `clientId -> space_id`, Finance, ICO, Team Capacity, Services, Staff Aug y outbox activity en una vista única con API dedicada, tabs reales, partial-state honesto y governance por `view_code`. |
 | [TASK-067-cost-intelligence-foundation.md](complete/TASK-067-cost-intelligence-foundation.md) | Foundation técnica de Cost Intelligence cerrada: schema `greenhouse_cost_intelligence`, serving tables base, eventos `accounting.*`, domain `cost_intelligence`, cron route dedicada validada y continuidad amarrada al P&L canónico de Finance. |

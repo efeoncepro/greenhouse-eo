@@ -18,24 +18,34 @@ type AssignmentOption = {
   assignmentId: string
   memberLabel: string
   clientLabel: string
+  organizationLabel: string | null
   label: string
   assignmentType: string
-  placementId: string | null
-  placementStatus: string | null
+  compensation: {
+    payRegime: string | null
+    contractType: string | null
+    costRateAmount: number | null
+    costRateCurrency: string | null
+  }
 }
 
-type TeamCapacityResponse = {
-  members: Array<{
+type PlacementOptionsResponse = {
+  items: Array<{
+    assignmentId: string
+    assignmentType: string
+    clientId: string
+    clientName: string | null
     memberId: string
-    displayName: string
-    assignments: Array<{
-      assignmentId: string
-      clientName: string | null
-      clientId: string | null
-      assignmentType?: string
-      placementId?: string | null
-      placementStatus?: string | null
-    }>
+    memberName: string | null
+    organizationId: string | null
+    organizationName: string | null
+    label: string
+    compensation: {
+      payRegime: string | null
+      contractType: string | null
+      costRateAmount: number | null
+      costRateCurrency: string | null
+    }
   }>
 }
 
@@ -51,9 +61,10 @@ interface Props {
   open: boolean
   onClose: () => void
   onCreated: (placementId: string) => void
+  initialAssignmentId?: string | null
 }
 
-const CreatePlacementDialog = ({ open, onClose, onCreated }: Props) => {
+const CreatePlacementDialog = ({ open, onClose, onCreated, initialAssignmentId }: Props) => {
   const [loading, setLoading] = useState(false)
   const [metaLoading, setMetaLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -73,23 +84,26 @@ const CreatePlacementDialog = ({ open, onClose, onCreated }: Props) => {
       setError(null)
 
       try {
-        const res = await fetch('/api/team/capacity-breakdown', { cache: 'no-store' })
-        const json = (await res.json()) as TeamCapacityResponse
+        const res = await fetch('/api/agency/staff-augmentation/placement-options', { cache: 'no-store' })
+        const json = (await res.json()) as PlacementOptionsResponse
 
-        const flattened = json.members.flatMap(member =>
-          (member.assignments || []).map(assignment => ({
-            assignmentId: assignment.assignmentId,
-            memberLabel: member.displayName,
-            clientLabel: assignment.clientName || assignment.clientId || 'Cliente',
-            label: `${member.displayName} · ${assignment.clientName || assignment.clientId || 'Cliente'}`,
-            assignmentType: assignment.assignmentType || 'internal',
-            placementId: assignment.placementId || null,
-            placementStatus: assignment.placementStatus || null
-          }))
-        ).filter(option => !option.placementId)
+        const nextOptions = (json.items || []).map(option => ({
+          assignmentId: option.assignmentId,
+          memberLabel: option.memberName || option.memberId,
+          clientLabel: option.clientName || option.clientId || 'Cliente',
+          organizationLabel: option.organizationName || null,
+          label: option.label,
+          assignmentType: option.assignmentType || 'internal',
+          compensation: option.compensation
+        }))
 
-        setOptions(flattened)
-        setAssignmentId(flattened[0]?.assignmentId || '')
+        setOptions(nextOptions)
+
+        const preferredAssignmentId = initialAssignmentId && nextOptions.some(option => option.assignmentId === initialAssignmentId)
+          ? initialAssignmentId
+          : nextOptions[0]?.assignmentId || ''
+
+        setAssignmentId(preferredAssignmentId)
       } catch {
         setError('No pudimos cargar assignments activos para crear el placement.')
       } finally {
@@ -98,7 +112,7 @@ const CreatePlacementDialog = ({ open, onClose, onCreated }: Props) => {
     }
 
     load()
-  }, [open])
+  }, [initialAssignmentId, open])
 
   const selectedAssignment = useMemo(
     () => options.find(option => option.assignmentId === assignmentId) || null,
@@ -181,6 +195,21 @@ const CreatePlacementDialog = ({ open, onClose, onCreated }: Props) => {
               ))}
             </CustomTextField>
           </Grid>
+          {selectedAssignment ? (
+            <Grid size={{ xs: 12 }}>
+              <Alert severity='info' icon={<i className='tabler-briefcase' />}>
+                {selectedAssignment.organizationLabel ? `${selectedAssignment.organizationLabel} · ` : ''}
+                {selectedAssignment.compensation.contractType || 'Sin contract type'} · {selectedAssignment.compensation.payRegime || 'Sin pay regime'}
+                {selectedAssignment.compensation.costRateAmount != null
+                  ? ` · costo base ${new Intl.NumberFormat('es-CL', {
+                    style: 'currency',
+                    currency: selectedAssignment.compensation.costRateCurrency || 'USD',
+                    maximumFractionDigits: 0
+                  }).format(selectedAssignment.compensation.costRateAmount)}`
+                  : ' · sin costo base vigente en Payroll'}
+              </Alert>
+            </Grid>
+          ) : null}
           <Grid size={{ xs: 12, md: 6 }}>
             <CustomTextField
               select

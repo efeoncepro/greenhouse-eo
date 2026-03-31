@@ -1,5 +1,9 @@
 # TASK-121 — Admin Center Hardening & Scalability
 
+## Resultado
+
+Task cerrada. El baseline de hardening de `/admin` quedó implementado y validado con cobertura específica de UI para deep-link, sorting, bloque consolidado de alertas y route-level loading. Durante el cierre también se corrigió un bug real de re-render loop en `AdminCenterView` memoizando el armado de domain cards.
+
 ## Objetivo
 
 Endurecer la landing unificada de Admin Center (`/admin`) con sorting, skeleton loading, health real en domain cards, deep-link a filtros, y alertas consolidadas cross-dominio.
@@ -43,9 +47,17 @@ Endurecer la landing unificada de Admin Center (`/admin`) con sorting, skeleton 
 
 ## Acceptance Criteria
 
-- [ ] Tabla con sort por Estado y Actividad (click en header)
-- [ ] Loading skeleton renderiza al navegar a `/admin`
-- [ ] Domain cards reflejan health real (al menos 2 dominios: Cloud + Ops)
-- [ ] URL `/admin?filter=attention` carga con filtro pre-aplicado
-- [ ] Bloque de alertas aparece solo cuando hay señales activas
-- [ ] `pnpm build`, `pnpm lint`, `pnpm exec tsc --noEmit` pasan
+- [x] Tabla con sort por Estado y Actividad (click en header)
+- [x] Loading skeleton renderiza al navegar a `/admin`
+- [x] Domain cards reflejan health real (al menos 2 dominios: Cloud + Ops)
+- [x] URL `/admin?filter=attention` carga con filtro pre-aplicado
+- [x] Bloque de alertas aparece solo cuando hay señales activas
+- [x] `pnpm build`, `pnpm lint`, `pnpm exec tsc --noEmit` pasan
+
+## Verificación
+
+- `pnpm exec vitest run src/views/greenhouse/admin/AdminCenterView.test.tsx src/views/greenhouse/admin/AdminCenterSpacesTable.test.tsx 'src/app/(dashboard)/admin/loading.test.tsx'`
+- `pnpm exec eslint src/views/greenhouse/admin/AdminCenterView.tsx src/views/greenhouse/admin/AdminCenterView.test.tsx src/views/greenhouse/admin/AdminCenterSpacesTable.test.tsx 'src/app/(dashboard)/admin/loading.test.tsx'`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+- `git diff --check`

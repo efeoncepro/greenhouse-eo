@@ -1,5 +1,20 @@
 # changelog.md
 
+## 2026-03-31
+
+- Staff Aug bridge endurecido sin cambiar el modelo canónico:
+  - `Create placement` ya no depende de `/api/team/capacity-breakdown`
+  - nueva route liviana `GET /api/agency/staff-augmentation/placement-options`
+  - el modal ahora muestra contexto de Payroll (`contractType`, `payRegime`, costo base) y acepta preselección por `assignmentId`
+- `People 360` ya ve señales reales de Staff Aug por assignment:
+  - `assignmentType`
+  - `placementId`
+  - `placementStatus`
+  - desde `Organizaciones` ahora puede abrir placement existente o saltar a crear uno cuando el assignment ya existe
+- Nueva lane documental activa:
+  - `TASK-169` consolida el bridge `People -> assignment context -> placement`
+  - `TASK-038` y `TASK-041` quedan absorbidas como framing histórico/addendum ya reconciliado con el runtime real
+
 ## 2026-03-30 (session 12)
 
 - `TASK-142` quedó cerrada como `Agency Space 360` operativa:
@@ -595,6 +610,7 @@
 - Domain cards de Cloud & Integrations y Ops Health muestran health real desde `getOperationsOverview`.
 - Deep-link a filtros: `/admin?filter=attention&q=empresa`.
 - Bloque "Requiere atencion" consolidado cross-dominio — solo visible cuando hay senales activas.
+- Cierre final con tests UI dedicados para deep-link, sorting y loading; además se corrigió un loop de re-render en `AdminCenterView` memoizando el armado de domain cards.
 
 ### Admin Center absorbe Control Tower (v2)
 - `/admin` es ahora la landing unificada de governance: Hero → 4 ExecutiveMiniStatCards → tabla limpia "Torre de control" (5 cols MUI, sin scroll horizontal) → mapa de dominios (outlined cards ricos).

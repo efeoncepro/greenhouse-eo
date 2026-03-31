@@ -3,6 +3,7 @@ import 'server-only'
 import { randomUUID } from 'node:crypto'
 
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
+import { isInternalCommercialAssignment } from '@/lib/team-capacity/internal-assignments'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 
@@ -74,6 +75,26 @@ type CompensationSnapshotRow = {
   contract_type: string | null
   currency: string | null
   base_salary: string | number | null
+}
+
+type PlacementOptionRow = {
+  assignment_id: string
+  client_id: string | null
+  client_name: string | null
+  member_id: string
+  member_name: string | null
+  space_id: string | null
+  space_name: string | null
+  organization_id: string | null
+  organization_name: string | null
+  assignment_type: string | null
+  placement_id: string | null
+  placement_status: string | null
+  compensation_version_id: string | null
+  pay_regime: string | null
+  contract_type: string | null
+  cost_rate_amount: string | number | null
+  cost_rate_currency: string | null
 }
 
 type EventRow = {
@@ -212,6 +233,106 @@ const loadCompensationSnapshot = async (memberId: string, date: string) => {
   ).catch(() => [])
 
   return rows[0] ?? null
+}
+
+export type StaffAugPlacementOption = {
+  assignmentId: string
+  clientId: string | null
+  clientName: string | null
+  memberId: string
+  memberName: string | null
+  spaceId: string | null
+  spaceName: string | null
+  organizationId: string | null
+  organizationName: string | null
+  assignmentType: string
+  placementId: string | null
+  placementStatus: string | null
+  compensationVersionId: string | null
+  payRegime: string | null
+  contractType: string | null
+  label: string
+  compensation: {
+    payRegime: string | null
+    contractType: string | null
+    costRateAmount: number | null
+    costRateCurrency: string | null
+  }
+}
+
+const normalizePlacementOption = (row: PlacementOptionRow): StaffAugPlacementOption => ({
+  assignmentId: row.assignment_id,
+  clientId: row.client_id,
+  clientName: row.client_name,
+  memberId: row.member_id,
+  memberName: row.member_name,
+  spaceId: row.space_id,
+  spaceName: row.space_name,
+  organizationId: row.organization_id,
+  organizationName: row.organization_name,
+  assignmentType: String(row.assignment_type || 'internal'),
+  placementId: row.placement_id,
+  placementStatus: row.placement_status,
+  compensationVersionId: row.compensation_version_id,
+  payRegime: row.pay_regime,
+  contractType: row.contract_type,
+  label: `${row.member_name || row.member_id} · ${row.client_name || row.client_id || 'Cliente'}`,
+  compensation: {
+    payRegime: row.pay_regime,
+    contractType: row.contract_type,
+    costRateAmount: toNullableNumber(row.cost_rate_amount),
+    costRateCurrency: row.cost_rate_currency
+  }
+})
+
+export const listStaffAugPlacementOptions = async () => {
+  const rows = await runGreenhousePostgresQuery<PlacementOptionRow>(
+    `
+      SELECT
+        a.assignment_id,
+        a.client_id,
+        c.client_name,
+        a.member_id,
+        m.display_name AS member_name,
+        s.space_id,
+        s.space_name,
+        s.organization_id,
+        o.organization_name,
+        a.assignment_type,
+        placement.placement_id,
+        placement.status AS placement_status,
+        comp.version_id AS compensation_version_id,
+        comp.pay_regime,
+        comp.contract_type,
+        comp.base_salary AS cost_rate_amount,
+        comp.currency AS cost_rate_currency
+      FROM greenhouse_core.client_team_assignments a
+      INNER JOIN greenhouse_core.members m ON m.member_id = a.member_id
+      LEFT JOIN greenhouse_core.clients c ON c.client_id = a.client_id
+      LEFT JOIN greenhouse_delivery.staff_aug_placements placement ON placement.assignment_id = a.assignment_id
+      LEFT JOIN greenhouse_core.spaces s ON s.client_id = a.client_id AND s.active = TRUE
+      LEFT JOIN greenhouse_core.organizations o ON o.organization_id = s.organization_id
+      LEFT JOIN LATERAL (
+        SELECT version_id, pay_regime, contract_type, currency, base_salary
+        FROM greenhouse_payroll.compensation_versions
+        WHERE member_id = a.member_id
+          AND effective_from <= CURRENT_DATE
+          AND (effective_to IS NULL OR effective_to >= CURRENT_DATE)
+        ORDER BY effective_from DESC
+        LIMIT 1
+      ) comp ON TRUE
+      WHERE a.active = TRUE
+        AND (a.end_date IS NULL OR a.end_date >= CURRENT_DATE)
+        AND m.active = TRUE
+        AND COALESCE(m.assignable, TRUE) = TRUE
+      ORDER BY m.display_name ASC, c.client_name ASC NULLS LAST, a.assignment_id ASC
+    `
+  ).catch(() => [])
+
+  return rows
+    .filter(row => !row.placement_id)
+    .filter(row => !isInternalCommercialAssignment({ clientId: row.client_id, clientName: row.client_name }))
+    .map(normalizePlacementOption)
 }
 
 const normalizePlacement = (row: PlacementRow) => ({

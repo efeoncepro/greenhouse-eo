@@ -1,5 +1,20 @@
 # project_context.md
 
+## Delta 2026-03-31 TASK-169 Staff Aug bridge People -> Assignment -> Placement
+- El bridge real de `Staff Augmentation` ya no debe interpretarse como `ghost slot -> placement`.
+- Estado vigente:
+  - `Vincular a organización` en `People` crea `person_memberships`
+  - la proyección `assignment_membership_sync` asegura `assignment -> membership`
+  - el placement sigue naciendo solo desde `client_team_assignments`
+- Ajustes nuevos:
+  - `Create placement` ahora usa `GET /api/agency/staff-augmentation/placement-options` en vez de `/api/team/capacity-breakdown`
+  - `People 360` ya expone señales de assignment Staff Aug (`assignmentType`, `placementId`, `placementStatus`) para abrir o crear placement desde el pivot correcto
+- Regla vigente:
+  - `membership` da contexto organizacional
+  - `assignment` da contexto operativo
+  - `placement` da contexto comercial-operativo y económico
+  - no promover `person_membership` a identidad canónica del placement
+
 ## Delta 2026-03-30 TASK-142 agency space 360 runtime
 - `Agency Space 360` ya existe como surface operativa y no debe leerse como redirect pendiente.
 - Surface visible vigente:

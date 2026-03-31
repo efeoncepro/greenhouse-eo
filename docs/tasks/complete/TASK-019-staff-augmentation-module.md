@@ -1,5 +1,13 @@
 # TASK-019 — Staff Augmentation Module
 
+## Delta 2026-03-31
+- El baseline de `TASK-019` se mantiene cerrado; el puente explícito `People membership -> assignment context -> placement` sale a [TASK-169-staff-aug-placement-bridge-hris-runtime-consolidation.md](/Users/jreye/Documents/greenhouse-eo/docs/tasks/in-progress/TASK-169-staff-aug-placement-bridge-hris-runtime-consolidation.md).
+- Ajuste operativo confirmado:
+  - `ghost slot` / `Vincular a organización` crea `person_memberships`
+  - el assignment sigue siendo el pivote real para Staff Aug
+  - el placement nunca nace directamente desde membership
+- `Create placement` dejó de depender de `/api/team/capacity-breakdown`; ahora usa la route liviana `GET /api/agency/staff-augmentation/placement-options`.
+
 ## Status
 
 Closed on 2026-03-30.

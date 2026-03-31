@@ -11,6 +11,7 @@ import StaffAugmentationListView from './StaffAugmentationListView'
 
 const fetchMock = vi.fn()
 const pushMock = vi.fn()
+const replaceMock = vi.fn()
 
 vi.mock('next/link', () => ({
   default: ({ children, href, ...props }: { children: ReactNode; href: string }) => (
@@ -21,13 +22,15 @@ vi.mock('next/link', () => ({
 }))
 
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: pushMock })
+  useRouter: () => ({ push: pushMock, replace: replaceMock }),
+  useSearchParams: () => new URLSearchParams('')
 }))
 
 describe('StaffAugmentationListView', () => {
   beforeEach(() => {
     fetchMock.mockReset()
     pushMock.mockReset()
+    replaceMock.mockReset()
     vi.stubGlobal('fetch', fetchMock)
   })
 

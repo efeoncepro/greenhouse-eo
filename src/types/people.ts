@@ -66,6 +66,9 @@ export interface PersonDetailAssignment {
   startDate: string | null
   endDate: string | null
   active: boolean
+  assignmentType: string
+  placementId: string | null
+  placementStatus: string | null
 }
 
 export interface PersonOperationalProjectBreakdown {

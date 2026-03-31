@@ -84,6 +84,9 @@ type AssignmentRow = {
   start_date: { value?: string } | string | null
   end_date: { value?: string } | string | null
   active: boolean | null
+  assignment_type: string | null
+  placement_id: string | null
+  placement_status: string | null
 }
 
 type IdentitySourceRow = {
@@ -113,7 +116,10 @@ const normalizeAssignments = (rows: AssignmentRow[]): PersonDetailAssignment[] =
     roleTitleOverride: row.role_title_override || null,
     startDate: toDateString(row.start_date),
     endDate: toDateString(row.end_date),
-    active: Boolean(row.active)
+    active: Boolean(row.active),
+    assignmentType: row.assignment_type || 'internal',
+    placementId: row.placement_id || null,
+    placementStatus: row.placement_status || null
   }))
 
 const buildAssignmentsSummary = (rows: AssignmentRow[]) => {
@@ -444,9 +450,13 @@ const getAssignmentsByMemberFromPostgres = async (memberId: string): Promise<Ass
       a.role_title_override,
       a.start_date::text AS start_date,
       a.end_date::text AS end_date,
-      a.active
+      a.active,
+      a.assignment_type,
+      p.placement_id,
+      p.status AS placement_status
     FROM greenhouse_core.client_team_assignments a
     LEFT JOIN greenhouse_core.clients c ON c.client_id = a.client_id
+    LEFT JOIN greenhouse_delivery.staff_aug_placements p ON p.assignment_id = a.assignment_id
     WHERE a.member_id = $1
     ORDER BY a.active DESC, a.start_date DESC, c.client_name
   `, [memberId])

@@ -1,5 +1,15 @@
 # CODEX TASK — Staff Augmentation Module: Addendum HRIS Integration
 
+## Delta 2026-03-31
+- Esta addendum queda absorbida operativamente por [TASK-169-staff-aug-placement-bridge-hris-runtime-consolidation.md](/Users/jreye/Documents/greenhouse-eo/docs/tasks/in-progress/TASK-169-staff-aug-placement-bridge-hris-runtime-consolidation.md) para todo lo relativo al bridge `People/HRIS -> assignment -> placement`.
+- Supuestos viejos confirmados como no vigentes:
+  - `CreatePlacementDrawer` como helper actual
+  - `placement_onboarding_checklists` como tabla runtime
+  - `greenhouse_core.members.*` como fuente ya consolidada de todos los campos HRIS necesarios para placement creation
+- Regla vigente:
+  - placement creation usa runtime real `client_team_assignments` + `compensation_versions` + contexto `provider`
+  - la consolidación canónica de campos HRIS en `members.*` sigue dependiendo de `TASK-026`
+
 ## Delta 2026-03-30
 - `TASK-019` ya quedó cerrada como baseline runtime de Staff Augmentation sobre `Postgres-first`; esta addendum ya no depende de un módulo inexistente, sino de un baseline operativo real.
 - La surface vigente del módulo es `Agency > Staff Augmentation`:

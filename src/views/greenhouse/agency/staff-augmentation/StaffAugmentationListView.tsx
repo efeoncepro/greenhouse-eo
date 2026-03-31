@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
@@ -152,6 +152,7 @@ const columns: ColumnDef<PlacementListItem, any>[] = [
 
 const StaffAugmentationListView = () => {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [data, setData] = useState<PlacementListResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(0)
@@ -162,6 +163,31 @@ const StaffAugmentationListView = () => {
   const [businessUnit, setBusinessUnit] = useState('')
   const [sorting, setSorting] = useState<SortingState>([{ id: 'publicId', desc: false }])
   const [createOpen, setCreateOpen] = useState(false)
+  const createParam = searchParams.get('create')
+  const initialAssignmentId = searchParams.get('assignmentId')
+
+  useEffect(() => {
+    if (createParam === '1') {
+      setCreateOpen(true)
+    }
+  }, [createParam])
+
+  const handleCloseCreate = useCallback(() => {
+    setCreateOpen(false)
+
+    if (createParam !== '1' && !initialAssignmentId) {
+      return
+    }
+
+    const params = new URLSearchParams(searchParams.toString())
+
+    params.delete('create')
+    params.delete('assignmentId')
+
+    const query = params.toString()
+
+    router.replace(`/agency/staff-augmentation${query ? `?${query}` : ''}`, { scroll: false })
+  }, [createParam, initialAssignmentId, router, searchParams])
 
   useEffect(() => {
     const timer = setTimeout(() => setSearchDebounced(search), 350)
@@ -312,9 +338,10 @@ const StaffAugmentationListView = () => {
 
       <CreatePlacementDialog
         open={createOpen}
-        onClose={() => setCreateOpen(false)}
+        onClose={handleCloseCreate}
+        initialAssignmentId={initialAssignmentId}
         onCreated={placementId => {
-          setCreateOpen(false)
+          handleCloseCreate()
           void loadData()
           router.push(`/agency/staff-augmentation/${placementId}`)
         }}

@@ -327,7 +327,11 @@ const AdminCenterView = ({ access, tenants, controlTower, operations }: Props) =
         : summary.avgOnTimePct >= 70 ? 'warning'
           : 'error'
 
-  const cards = buildDomainCards({ access, tenants, operations })
+  const cards = useMemo(
+    () => buildDomainCards({ access, tenants, operations }),
+    [access, tenants, operations]
+  )
+
   const [domainCardOrder, setDomainCardOrder] = useState<string[]>([])
 
   useEffect(() => {

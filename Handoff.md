@@ -4,6 +4,45 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-31 — TASK-169 Staff Aug bridge + create placement hardening
+
+### Objetivo
+- Corregir el cuelgue real de `Crear placement` y consolidar el bridge vigente entre `People`, `Assignments` y `Staff Augmentation`.
+
+### Delta de ejecución
+- `CreatePlacementDialog` ya no usa `/api/team/capacity-breakdown`.
+- Nueva route liviana:
+  - `src/app/api/agency/staff-augmentation/placement-options/route.ts`
+  - reusa `listStaffAugPlacementOptions()` desde `src/lib/staff-augmentation/store.ts`
+- El modal ahora:
+  - carga assignments elegibles livianos
+  - muestra contexto `organization + contract type + pay regime + costo base`
+  - acepta `initialAssignmentId` para deep-link desde `People`
+- `StaffAugmentationListView` ya entiende `?create=1&assignmentId=...` para abrir el modal con preselección.
+- `People 360` ahora expone el bridge real:
+  - `src/lib/people/get-person-detail.ts` agrega `assignmentType`, `placementId`, `placementStatus`
+  - `src/types/people.ts` refleja esas señales
+  - `src/views/greenhouse/people/tabs/PersonMembershipsTab.tsx` ahora muestra:
+    - chip `Staff Aug` / `Interno`
+    - CTA `Crear placement` si existe assignment elegible
+    - CTA `Abrir placement` si ya existe
+- Consolidación documental iniciada:
+  - nueva `docs/tasks/in-progress/TASK-169-staff-aug-placement-bridge-hris-runtime-consolidation.md`
+  - deltas en `TASK-019`, `TASK-038`, `TASK-041`
+  - `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md` y `project_context.md` alineados al bridge real
+
+### Validación ejecutada
+- `pnpm exec vitest run src/app/api/agency/staff-augmentation/placement-options/route.test.ts src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.test.tsx src/app/api/agency/staff-augmentation/placements/route.test.ts src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.test.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Cierre
+- `TASK-169` queda cerrada como baseline mínimo del bridge `People -> assignment -> placement`.
+- Validación adicional completada después de este delta:
+  - `pnpm exec vitest run src/app/api/agency/staff-augmentation/placement-options/route.test.ts src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.test.tsx src/views/greenhouse/people/tabs/PersonMembershipsTab.test.tsx src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.test.tsx src/app/api/agency/staff-augmentation/placements/route.test.ts`
+  - `pnpm exec eslint src/lib/staff-augmentation/store.ts src/app/api/agency/staff-augmentation/placement-options/route.ts src/app/api/agency/staff-augmentation/placement-options/route.test.ts src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.tsx src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.test.tsx src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.tsx src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.test.tsx src/lib/people/get-person-detail.ts src/types/people.ts src/views/greenhouse/people/tabs/PersonMembershipsTab.tsx src/views/greenhouse/people/tabs/PersonMembershipsTab.test.tsx`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `git diff --check`
+
 ## Sesión 2026-03-30 — cierre de TASK-142 Agency Space 360
 
 ### Objetivo
@@ -2843,6 +2882,13 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - **Slice 3**: Health real en domain cards — Cloud & Integrations y Ops Health consumen `getOperationsOverview`
 - **Slice 4**: Deep-link con `searchParams` — `/admin?filter=attention&q=empresa` funciona
 - **Slice 5**: Bloque "Requiere atencion" con alertas consolidadas cross-dominio
+- **Cierre final 2026-03-31**: tests UI dedicados en `AdminCenterView.test.tsx`, `AdminCenterSpacesTable.test.tsx` y `src/app/(dashboard)/admin/loading.test.tsx`; además se corrigió un re-render loop en `AdminCenterView` memoizando `buildDomainCards`
+- **Validación de cierre**:
+  - `pnpm exec vitest run src/views/greenhouse/admin/AdminCenterView.test.tsx src/views/greenhouse/admin/AdminCenterSpacesTable.test.tsx 'src/app/(dashboard)/admin/loading.test.tsx'`
+  - `pnpm exec eslint src/views/greenhouse/admin/AdminCenterView.tsx src/views/greenhouse/admin/AdminCenterView.test.tsx src/views/greenhouse/admin/AdminCenterSpacesTable.test.tsx 'src/app/(dashboard)/admin/loading.test.tsx'`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm build`
+  - `git diff --check`
 
 ### Pendiente inmediato
 - `TASK-115` pasa a ser la siguiente lane natural de Nexa UI porque ya tiene backend real para feedback, suggestions y thread history

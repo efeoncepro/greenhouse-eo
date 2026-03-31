@@ -1,5 +1,17 @@
 # CODEX TASK — Staff Augmentation Module: Gestión de Placements y Capa Comercial para Greenhouse
 
+## Delta 2026-03-31
+- Este brief queda absorbido como framing histórico por [TASK-169-staff-aug-placement-bridge-hris-runtime-consolidation.md](/Users/jreye/Documents/greenhouse-eo/docs/tasks/in-progress/TASK-169-staff-aug-placement-bridge-hris-runtime-consolidation.md).
+- No volver a ejecutar literalmente desde aquí:
+  - `/internal/staff-augmentation`
+  - `greenhouse_core.staff_aug_*`
+  - `CreatePlacementDrawer`
+  - `BigQuery` como write path operativo del módulo
+- El bridge vigente ya no es `ghost slot -> placement`; el runtime real es:
+  - `membership` como contexto organizacional
+  - `assignment` como ancla operativa
+  - `placement` como capa comercial-operativa Staff Aug
+
 ## Delta 2026-03-30
 - `TASK-019` ya cerró el baseline runtime de Staff Augmentation. Este brief queda explícitamente como framing histórico/producto y no debe ejecutarse literalmente.
 - Drift principal confirmado contra runtime:

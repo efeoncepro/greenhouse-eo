@@ -6,6 +6,7 @@ import Link from 'next/link'
 
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
@@ -20,6 +21,7 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
+import Stack from '@mui/material/Stack'
 
 import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
@@ -213,11 +215,46 @@ const PersonMembershipsTab = ({ memberId, assignments, isAdmin, reloadKey, onAdd
                         </TableCell>
                         <TableCell>
                           {assignment ? (
-                            assignment.active ? (
-                              <Chip size='small' label='Activo' color='success' variant='tonal' />
-                            ) : (
-                              <Chip size='small' label={assignment.endDate ? `Cerrado ${assignment.endDate}` : 'Inactivo'} color='default' variant='tonal' />
-                            )
+                            <Stack spacing={1} alignItems='flex-start'>
+                              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                {assignment.active ? (
+                                  <Chip size='small' label='Activo' color='success' variant='tonal' />
+                                ) : (
+                                  <Chip size='small' label={assignment.endDate ? `Cerrado ${assignment.endDate}` : 'Inactivo'} color='default' variant='tonal' />
+                                )}
+                                <Chip
+                                  size='small'
+                                  label={assignment.assignmentType === 'staff_augmentation' ? 'Staff Aug' : 'Interno'}
+                                  color={assignment.assignmentType === 'staff_augmentation' ? 'info' : 'default'}
+                                  variant='tonal'
+                                />
+                              </Box>
+                              {assignment.placementId ? (
+                                <Button
+                                  component={Link}
+                                  href={`/agency/staff-augmentation/${assignment.placementId}`}
+                                  size='small'
+                                  variant='text'
+                                  sx={{ minHeight: 0, p: 0 }}
+                                >
+                                  Abrir placement
+                                </Button>
+                              ) : assignment.active ? (
+                                <Button
+                                  component={Link}
+                                  href={`/agency/staff-augmentation?create=1&assignmentId=${assignment.assignmentId}`}
+                                  size='small'
+                                  variant='text'
+                                  sx={{ minHeight: 0, p: 0 }}
+                                >
+                                  Crear placement
+                                </Button>
+                              ) : null}
+                            </Stack>
+                          ) : m.clientId ? (
+                            <Typography variant='body2' color='text.secondary'>
+                              Crea el assignment desde editar membresía.
+                            </Typography>
                           ) : (
                             <Typography variant='body2' color='text.secondary'>—</Typography>
                           )}
