@@ -32,7 +32,7 @@ vi.mock('@/lib/people/shared', () => ({
   getPeopleTableColumns: vi.fn(async () => new Set(['reports_to']))
 }))
 
-import { updateMemberHrProfile } from '@/lib/hr-core/service'
+import { isHrLeavePostgresFallbackError, updateMemberHrProfile } from '@/lib/hr-core/service'
 
 describe('updateMemberHrProfile', () => {
   beforeEach(() => {
@@ -68,5 +68,25 @@ describe('updateMemberHrProfile', () => {
       memberId: 'member-1',
       hireDate: '2024-12-15'
     })
+  })
+})
+
+describe('isHrLeavePostgresFallbackError', () => {
+  it('treats missing postgres columns as recoverable schema drift', () => {
+    expect(
+      isHrLeavePostgresFallbackError({
+        code: '42703',
+        message: 'column r.attachment_asset_id does not exist'
+      })
+    ).toBe(true)
+  })
+
+  it('treats missing relations as recoverable schema drift', () => {
+    expect(
+      isHrLeavePostgresFallbackError({
+        code: '42P01',
+        message: 'relation greenhouse_core.assets does not exist'
+      })
+    ).toBe(true)
   })
 })

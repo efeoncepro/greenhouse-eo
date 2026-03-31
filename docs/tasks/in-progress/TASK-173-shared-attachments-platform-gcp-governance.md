@@ -53,6 +53,24 @@
   - `purchase orders` ya no depende solo de `attachment_url` libre
   - `payroll receipts` y `payroll export packages` ya pueden persistir `asset_id`/`pdf_asset_id`/`csv_asset_id` sin romper compatibilidad con `storage_path`
 
+## Delta 2026-03-31 — hotfix remoto de `leave` y estado real en GCP
+
+- El despliegue `develop/staging` quedó temporalmente roto en `HR > Permisos` porque el código ya leía `greenhouse_hr.leave_requests.attachment_asset_id`, pero `shared-assets-platform-v1` seguía sin aplicarse en Cloud SQL.
+- Hotfix remoto aplicado con perfil `migrator` usando ADC/GCP:
+  - `greenhouse_core.assets`
+  - `greenhouse_core.asset_access_log`
+  - `greenhouse_hr.leave_requests.attachment_asset_id`
+  - FK `greenhouse_leave_requests_attachment_asset_fk`
+  - índice `leave_requests_attachment_asset_idx`
+  - grants runtime/app/migrator sobre las tablas shared nuevas
+- Resultado operativo:
+  - `leave` vuelve a quedar compatible con el deploy actual
+  - el upload/download privado shared ya tiene foundation suficiente para `leave`
+- Estado aún pendiente para cerrar la task completa:
+  - `greenhouse_finance.purchase_orders` sigue owned por `postgres`
+  - `greenhouse_payroll.payroll_receipts` sigue owned por `postgres`
+  - por eso el bootstrap full `pnpm setup:postgres:shared-assets` todavía no puede cerrar `purchase orders` ni `payroll receipts` sin acceso al secreto/owner `postgres`
+
 ## Summary
 
 Crear la foundation compartida de adjuntos y archivos de Greenhouse para que `leave`, `purchase orders`, `payroll receipts`, `payroll export packages`, `Document Vault`, `Expense Reports`, proveedores, herramientas y otros módulos compatibles dejen de resolver uploads de forma ad hoc.

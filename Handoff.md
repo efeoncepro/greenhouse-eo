@@ -3799,3 +3799,34 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - `pnpm exec eslint src/config/nexa-models.ts src/config/nexa-models.test.ts src/lib/ai/google-genai.ts src/lib/nexa/nexa-contract.ts src/lib/nexa/nexa-service.ts src/app/api/home/nexa/route.ts src/views/greenhouse/home/HomeView.tsx src/views/greenhouse/home/components/NexaHero.tsx src/views/greenhouse/home/components/NexaThread.tsx src/views/greenhouse/home/components/NexaModelSelector.tsx`
   - `pnpm exec vitest run src/config/nexa-models.test.ts src/lib/nexa/nexa-service.test.ts`
 - No se tocó `.env.staging-check`.
+
+### Sesión 2026-03-31 — incidente `HR > Permisos` + TASK-173
+
+- Incidente observado en `dev-greenhouse.efeoncepro.com/hr/leave`: banner `Unable to load leave requests.` y tabla vacía en staging.
+- Causa raíz confirmada en Cloud SQL:
+  - el deploy `c96cf284` ya lee `greenhouse_hr.leave_requests.attachment_asset_id`
+  - `shared-assets-platform-v1` todavía no estaba aplicado
+  - en runtime faltaban `greenhouse_core.assets`, `greenhouse_core.asset_access_log` y la columna `greenhouse_hr.leave_requests.attachment_asset_id`
+- Mitigación remota aplicada por GCP/ADC con perfil `migrator`:
+  - creación de `greenhouse_core.assets`
+  - creación de `greenhouse_core.asset_access_log`
+  - `ALTER TABLE greenhouse_hr.leave_requests ADD COLUMN attachment_asset_id`
+  - FK `greenhouse_leave_requests_attachment_asset_fk`
+  - índice `leave_requests_attachment_asset_idx`
+  - grants a `greenhouse_app`, `greenhouse_runtime` y `greenhouse_migrator`
+- Verificación remota:
+  - `attachment_asset_id` ya existe en `greenhouse_hr.leave_requests`
+  - `greenhouse_core.assets` y `greenhouse_core.asset_access_log` ya existen
+  - query directa sobre `greenhouse_hr.leave_requests` volvió a devolver filas
+- Hardening en repo:
+  - `src/lib/hr-core/service.ts` ahora trata `undefined_column` / `relation does not exist` (`42703` / `42P01`) como fallback recuperable a BigQuery para evitar que `leave requests` tire la UI completa por schema drift
+  - test nuevo en `src/lib/hr-core/service.test.ts`
+- Validación local:
+  - `pnpm vitest run src/lib/hr-core/service.test.ts`
+  - `pnpm eslint src/lib/hr-core/service.ts src/lib/hr-core/service.test.ts`
+  - `pnpm lint`
+  - `pnpm build`
+- Estado real de `TASK-173` tras esta mitigación:
+  - `leave` quedó restaurado en staging
+  - el bootstrap full sigue incompleto porque `greenhouse_finance.purchase_orders` y `greenhouse_payroll.payroll_receipts` continúan owned por `postgres`
+  - falta resolver acceso/owner `postgres` para cerrar completamente la task en GCP

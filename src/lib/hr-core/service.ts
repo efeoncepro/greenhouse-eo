@@ -201,7 +201,7 @@ const getProjectId = () => getHrCoreProjectId()
 
 const getCurrentYear = () => new Date().getUTCFullYear()
 
-const isHrLeavePostgresFallbackError = (error: unknown) => {
+export const isHrLeavePostgresFallbackError = (error: unknown) => {
   if (error instanceof HrCoreValidationError) {
     return error.code === 'HR_CORE_POSTGRES_NOT_CONFIGURED' || error.code === 'HR_CORE_POSTGRES_SCHEMA_NOT_READY'
   }
@@ -212,17 +212,23 @@ const isHrLeavePostgresFallbackError = (error: unknown) => {
 
   const maybeError = error as { code?: unknown; status?: unknown; message?: unknown }
   const message = typeof maybeError.message === 'string' ? maybeError.message : ''
+  const normalizedMessage = message.toLowerCase()
+  const rawCode = typeof maybeError.code === 'string' ? maybeError.code.trim().toUpperCase() : null
   const code = typeof maybeError.code === 'number' ? maybeError.code : Number(maybeError.code)
   const status = typeof maybeError.status === 'number' ? maybeError.status : Number(maybeError.status)
 
   return (
     code === 403 ||
+    code === 42703 ||
     status === 403 ||
-    message.includes('boss::NOT_AUTHORIZED') ||
-    message.includes('cloudsql.instances.get') ||
-    message.includes('Cloud SQL') ||
-    message.includes('ECONNREFUSED') ||
-    message.includes('connect ETIMEDOUT')
+    rawCode === '42P01' ||
+    normalizedMessage.includes('boss::not_authorized') ||
+    normalizedMessage.includes('cloudsql.instances.get') ||
+    normalizedMessage.includes('cloud sql') ||
+    normalizedMessage.includes('econnrefused') ||
+    normalizedMessage.includes('connect etimedout') ||
+    (normalizedMessage.includes('column') && normalizedMessage.includes('does not exist')) ||
+    (normalizedMessage.includes('relation') && normalizedMessage.includes('does not exist'))
   )
 }
 
