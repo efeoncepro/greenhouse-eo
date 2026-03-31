@@ -189,9 +189,9 @@ const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubsystem> 
       safeCount(
         `SELECT COUNT(*) AS cnt
          FROM greenhouse_finance.income i
-         LEFT JOIN (SELECT income_id, SUM(amount)::numeric AS total FROM greenhouse_finance.income_payments GROUP BY income_id) p
+         INNER JOIN (SELECT income_id, SUM(amount)::numeric AS total FROM greenhouse_finance.income_payments GROUP BY income_id) p
            ON p.income_id = i.income_id
-         WHERE ABS(COALESCE(i.amount_paid, 0) - COALESCE(p.total, 0)) > 0.01`
+         WHERE ABS(COALESCE(i.amount_paid, 0) - p.total) > 0.01`
       ),
       safeCount(
         `SELECT COUNT(*) AS cnt FROM greenhouse_finance.expenses
@@ -204,11 +204,11 @@ const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubsystem> 
     ])
 
     const totalIssues = divergentPayments + orphanExpenses
+
     const status: OperationsHealthStatus =
       divergentPayments > 0 ? 'degraded'
         : orphanExpenses > 5 ? 'degraded'
-          : overdueCount > 10 ? 'degraded'
-            : 'healthy'
+          : 'healthy'
 
     return {
       name: 'Finance Data Quality',

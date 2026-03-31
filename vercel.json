@@ -17,6 +17,10 @@
       "schedule": "15 6 * * *"
     },
     {
+      "path": "/api/cron/ico-member-sync",
+      "schedule": "30 6 * * *"
+    },
+    {
       "path": "/api/cron/nubox-sync",
       "schedule": "30 7 * * *"
     },
