@@ -1,5 +1,12 @@
 # project_context.md
 
+## Delta 2026-03-30 Finance staging verification + TASK-164 docs reconciled
+- `staging` ya carga correctamente al menos dos surfaces críticas del carril Finance actual:
+  - `/finance/income/[id]`
+  - `/finance/clients`
+- En la verificación manual asistida solo aparecieron errores de `vercel.live`/CSP embed, no fallos funcionales del runtime Greenhouse.
+- `TASK-164` quedó alineada documentalmente a su estado real implementado; Purchase Orders y HES ya no deben interpretarse como diseño pendiente.
+
 ## Delta 2026-03-30 Finance/Nubox docs reconciled to runtime
 - `docs/architecture/FINANCE_DUAL_STORE_CUTOVER_V1.md` ya no debe leerse como snapshot operativo actual; quedó explícitamente reclasificado como historial de migración.
 - `TASK-163` y `TASK-165` quedaron alineadas al estado real ya absorbido por runtime para evitar que futuros agentes reabran lanes que ya cerraron en código.

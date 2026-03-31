@@ -1,5 +1,15 @@
 # changelog.md
 
+## 2026-03-30 (session 4)
+
+- Verificación rápida de `staging` completada:
+  - `/finance/income/[id]` carga como `Ingreso — Greenhouse`
+  - `/finance/clients` carga como `Clientes — Greenhouse`
+  - los errores vistos en consola quedaron limitados a `vercel.live`/CSP embed, sin evidencia de fallo funcional del runtime
+- `TASK-164` quedó reconciliada documentalmente con el estado real del repo:
+  - Purchase Orders y HES ya no se leen como spec pendiente
+  - el documento ahora deja claro que el módulo ya fue absorbido por runtime y UI
+
 ## 2026-03-30 (session 3)
 
 - Se reconciliaron documentos rezagados de Finance/Nubox para que la documentación no siga describiendo un estado anterior al runtime real:

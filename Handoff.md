@@ -4,6 +4,24 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — verificación staging Finance + reconciliación TASK-164
+
+### Objetivo
+- Confirmar que los flujos visibles de Finance ya cargan en `staging` y dejar `TASK-164` alineada al estado real del repo.
+
+### Delta de ejecución
+- Verificación manual asistida con browser en `staging`:
+  - `https://dev-greenhouse.efeoncepro.com/finance/income/INC-NB-26639047` carga como `Ingreso — Greenhouse`
+  - `https://dev-greenhouse.efeoncepro.com/finance/clients` carga como `Clientes — Greenhouse`
+  - los únicos errores observados en consola son de `vercel.live` embed/CSP y no del runtime funcional del módulo
+- `docs/tasks/complete/TASK-164-purchase-orders-module.md` quedó reconciliada con su estado real:
+  - ya no debe leerse como plan pendiente
+  - los slices/checklists pasan a ser contexto histórico del diseño original
+
+### Validación ejecutada
+- Browser verification en `staging`
+- `git diff --check`
+
 ## Sesión 2026-03-30 — reconciliación documental final Finance/Nubox
 
 ### Objetivo

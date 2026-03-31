@@ -1,5 +1,15 @@
 # TASK-164 — Purchase Orders (OC) & Service Entry Sheets (HES) Module
 
+## Delta 2026-03-30
+
+- Esta task ya no debe leerse como plan de implementación pendiente.
+- Estado real ya absorbido por runtime:
+  - `purchase_orders` y `service_entry_sheets` existen como objetos financieros independientes
+  - el módulo ya cuenta con CRUD, lifecycle operativo y surfaces UI dedicadas en Finance
+  - `PurchaseOrdersListView` y `HesListView` ya quedaron visibles en el portal
+  - los hooks de events/notifications y el wiring con Finance ya fueron implementados en el cierre efectivo de la lane
+- Los checklists y slices que siguen más abajo quedan como contexto histórico de diseño, no como backlog abierto.
+
 ## Status
 
 | Campo | Valor |
@@ -17,6 +27,10 @@
 ## Summary
 
 Crear el módulo de Órdenes de Compra (OC/PO) y Hojas de Entrada de Servicio (HES) como objetos financieros independientes. Hoy `po_number` y `hes_number` son campos de texto libre en cada factura — no hay tracking de la OC ni de la HES como entidades con lifecycle, saldo disponible ni vencimiento. Clientes corporativos chilenos (especialmente los que usan SAP u otros ERP) requieren OC + HES aprobada antes de procesar el pago; sin este módulo, no hay visibilidad del pipeline de facturación.
+
+Estado histórico:
+- este summary describe el gap original que originó la task
+- no describe el estado actual del portal después del cierre efectivo del módulo
 
 ## Why This Task Exists
 
@@ -71,6 +85,12 @@ Problemas:
   - Space 360 (TASK-142) — tab Services/Finance muestra OCs
   - Client lifecycle (TASK-158) — OC vigente es señal de relación activa
   - Agency Intelligence — OC por vencer es señal de acción
+
+## Resultado real de cierre
+
+- Finance ya trata `purchase_orders` y `service_entry_sheets` como entidades operativas propias, no como texto libre incrustado en income.
+- El portal ya expone las superficies de OC/HES y su lifecycle principal.
+- La deuda restante, si aparece, debe abrirse como follow-on localizado de UX, automatización o integración adicional, no como reapertura completa de `TASK-164`.
 
 ## Scope
 
