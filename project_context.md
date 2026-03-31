@@ -2,6 +2,11 @@
 
 ## Delta 2026-03-31 Shared attachments and GCP bucket topology
 
+- Hotfix operativo:
+  - los drafts de `leave` ya no dependen solamente de que la sesión exponga `tenant.memberId`
+  - `/api/hr/core/meta` ahora entrega `currentMemberId` resuelto para superficies HR/My que necesiten ownership documental
+  - `/api/assets/private` hace fallback server-side para `leave_request_draft` usando la resolución actual de colaborador antes de rechazar el upload
+  - `LeaveRequestDialog` ahora propaga `ownerMemberId` tanto al upload como al `POST` final de la solicitud
 - Nueva decisión arquitectónica activa:
   - la capability shared de adjuntos/archivos del portal vive en `TASK-173`
   - `leave`, `Document Vault` y `Expense Reports` pasan a leerse como consumers de esa foundation

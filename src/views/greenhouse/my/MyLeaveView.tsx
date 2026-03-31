@@ -330,6 +330,7 @@ const MyLeaveView = () => {
         open={createOpen}
         saving={createSaving}
         leaveTypes={leaveTypes}
+        ownerMemberId={data?.memberId ?? null}
         onClose={() => setCreateOpen(false)}
         onSubmit={handleCreate}
       />
