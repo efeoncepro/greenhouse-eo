@@ -3,7 +3,12 @@ export const GH_CLIENT_NAV = {
   projects: { label: 'Proyectos', subtitle: 'Proyectos activos' },
   sprints: { label: 'Ciclos', subtitle: 'Sprints de produccion' },
   settings: { label: 'Mi Greenhouse', subtitle: 'Perfil y preferencias' },
-  updates: { label: 'Novedades', subtitle: 'Novedades del ecosistema' }
+  updates: { label: 'Novedades', subtitle: 'Novedades del ecosistema' },
+  team: { label: 'Mi Equipo', subtitle: 'Equipo asignado a tu operación' },
+  reviews: { label: 'Revisiones', subtitle: 'Queue de feedback en curso' },
+  analytics: { label: 'Analytics', subtitle: 'Rendimiento y métricas del servicio' },
+  campaigns: { label: 'Campañas', subtitle: 'Iniciativas y campañas activas' },
+  notifications: { label: 'Notificaciones', subtitle: 'Avisos y preferencias' }
 } as const
 
 // Internal/admin surfaces are operational runtime, not part of the client portal
@@ -35,7 +40,13 @@ export const GH_AGENCY_NAV = {
   spaces: { label: 'Spaces', subtitle: 'Lista de clientes activos' },
   capacity: { label: 'Capacidad', subtitle: 'Carga operativa global del equipo' },
   organizations: { label: 'Organizaciones', subtitle: 'Cuentas, relaciones y estructura' },
-  services: { label: 'Servicios', subtitle: 'Servicios contratados por Space' }
+  services: { label: 'Servicios', subtitle: 'Servicios contratados por Space' },
+  economics: { label: 'Economía', subtitle: 'P&L y rentabilidad' },
+  team: { label: 'Equipo', subtitle: 'Capacidad y dedicación' },
+  delivery: { label: 'Delivery', subtitle: 'ICO, sprints y producción' },
+  campaigns: { label: 'Campañas', subtitle: 'Iniciativas cross-space' },
+  operations: { label: 'Operaciones', subtitle: 'Salud del platform' },
+  structure: { label: 'Estructura', subtitle: 'Organizaciones, servicios y operaciones' }
 } as const
 
 export const GH_FINANCE_NAV = {
@@ -47,11 +58,17 @@ export const GH_FINANCE_NAV = {
   intelligence: { label: 'Economía', subtitle: 'Cierre de período y P&L operativo' },
   quotes: { label: 'Cotizaciones', subtitle: 'Cotizaciones emitidas y su seguimiento' },
   purchaseOrders: { label: 'Órdenes de compra', subtitle: 'OC de clientes, saldos y consumo' },
-  hes: { label: 'HES', subtitle: 'Hojas de entrada de servicio' }
+  hes: { label: 'HES', subtitle: 'Hojas de entrada de servicio' },
+  clients: { label: 'Clientes', subtitle: 'Maestro de clientes y coberturas' },
+  costAllocations: { label: 'Asignaciones', subtitle: 'Reparto e imputación de costos' },
+  flow: { label: 'Flujo', subtitle: 'Ingresos, egresos y cuentas' },
+  documents: { label: 'Documentos', subtitle: 'Cotizaciones, OC, HES y conciliación' },
+  analytics: { label: 'Inteligencia', subtitle: 'Economía y asignaciones de costos' }
 } as const
 
 export const GH_HR_NAV = {
   payroll: { label: 'Nómina', subtitle: 'Compensaciones y nómina mensual' },
+  payrollProjected: { label: 'Nómina Proyectada', subtitle: 'Simulación y previsión' },
   departments: { label: 'Departamentos', subtitle: 'Estructura organizacional' },
   leave: { label: 'Permisos', subtitle: 'Solicitudes y saldos de permisos' },
   attendance: { label: 'Asistencia', subtitle: 'Registros de asistencia del equipo' }
@@ -65,6 +82,7 @@ export const GH_MY_NAV = {
   profile: { label: 'Mi Perfil', subtitle: 'Identidad y datos personales' },
   payroll: { label: 'Mi Nómina', subtitle: 'Liquidaciones y compensación' },
   leave: { label: 'Mis Permisos', subtitle: 'Saldos y solicitudes' },
+  organization: { label: 'Mi Organización', subtitle: 'Directorio y colegas' },
   settings: { label: 'Configuración', subtitle: 'Notificaciones y preferencias' }
 } as const
 

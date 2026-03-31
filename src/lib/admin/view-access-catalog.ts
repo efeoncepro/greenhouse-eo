@@ -216,6 +216,78 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'finance'
   },
   {
+    viewCode: 'finanzas.cotizaciones',
+    section: 'finanzas',
+    label: 'Cotizaciones',
+    description: 'Cotizaciones emitidas y seguimiento.',
+    routePath: '/finance/quotes',
+    routeGroup: 'finance'
+  },
+  {
+    viewCode: 'finanzas.ordenes_compra',
+    section: 'finanzas',
+    label: 'Órdenes de compra',
+    description: 'OC de clientes, saldos y consumo.',
+    routePath: '/finance/purchase-orders',
+    routeGroup: 'finance'
+  },
+  {
+    viewCode: 'finanzas.hes',
+    section: 'finanzas',
+    label: 'HES',
+    description: 'Hojas de entrada de servicio.',
+    routePath: '/finance/hes',
+    routeGroup: 'finance'
+  },
+  {
+    viewCode: 'equipo.nomina_proyectada',
+    section: 'equipo',
+    label: 'Nómina proyectada',
+    description: 'Simulación y previsión de compensaciones.',
+    routePath: '/hr/payroll/projected',
+    routeGroup: 'hr'
+  },
+  {
+    viewCode: 'cliente.equipo',
+    section: 'cliente',
+    label: 'Mi Equipo',
+    description: 'Equipo asignado a la operación del cliente.',
+    routePath: '/equipo',
+    routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.revisiones',
+    section: 'cliente',
+    label: 'Revisiones',
+    description: 'Queue de feedback y revisiones en curso.',
+    routePath: '/reviews',
+    routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.analytics',
+    section: 'cliente',
+    label: 'Analytics',
+    description: 'Rendimiento y métricas del servicio.',
+    routePath: '/analytics',
+    routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.campanas',
+    section: 'cliente',
+    label: 'Campañas',
+    description: 'Iniciativas y campañas activas del cliente.',
+    routePath: '/campanas',
+    routeGroup: 'client'
+  },
+  {
+    viewCode: 'cliente.notificaciones',
+    section: 'cliente',
+    label: 'Notificaciones',
+    description: 'Avisos y preferencias de notificación.',
+    routePath: '/notifications',
+    routeGroup: 'client'
+  },
+  {
     viewCode: 'ia.herramientas',
     section: 'ia',
     label: 'Herramientas IA',
