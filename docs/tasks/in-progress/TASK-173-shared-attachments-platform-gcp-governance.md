@@ -52,6 +52,20 @@
 - La lane sigue `in-progress` solo por un punto restante:
   - smoke manual autenticado de upload/download en `staging` sobre `leave` y `purchase orders`
 
+## Delta 2026-03-31 — runtime bucket alignment in Vercel
+
+- Se confirmó un gap de infraestructura restante:
+  - el runtime shared ya deriva `${GCP_PROJECT}-greenhouse-private-assets-{env}`
+  - pero `staging` y `production` no tenían `GREENHOUSE_PRIVATE_ASSETS_BUCKET` configurado y los buckets privados dedicados todavía no existen/provisionan como baseline real
+- Mitigación operativa aplicada:
+  - `GREENHOUSE_PRIVATE_ASSETS_BUCKET=efeonce-group-greenhouse-media` en `staging`
+  - `GREENHOUSE_PRIVATE_ASSETS_BUCKET=efeonce-group-greenhouse-media` en `production`
+- Resultado:
+  - el carril shared vuelve a apoyarse en el bucket operativo real mientras se completa la infraestructura dedicada
+- La task sigue `in-progress` porque aún falta:
+  - provisionar buckets privados por entorno como destino real de largo plazo
+  - ejecutar smoke autenticado final de upload/download con sesión real
+
 ## Delta 2026-03-31 — implementación en repo y limitación operativa real
 
 - La foundation shared ya quedó implementada en el repo:

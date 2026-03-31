@@ -55,6 +55,20 @@ Regla operativa:
 - no declarar la lane cerrada en infraestructura hasta correr el setup con `migrator`
 - no promover consumers que dependan de esas columnas/FKs en entornos compartidos sin ese bootstrap aplicado
 
+## Delta 2026-03-31 — Runtime bucket pinning while dedicated private buckets remain pending
+
+- `GREENHOUSE_PRIVATE_ASSETS_BUCKET` quedó configurado explícitamente en Vercel para:
+  - `staging`
+  - `production`
+- Valor operativo actual:
+  - `efeonce-group-greenhouse-media`
+- Motivo:
+  - el runtime ya soporta buckets privados dedicados por entorno
+  - pero la infraestructura real de `greenhouse-private-assets-{env}` todavía no está provisionada como baseline compartida
+- Regla:
+  - mientras esos buckets no existan realmente en GCP, no dejar el runtime derivando nombres por convención
+  - usar env explícita apuntando al bucket operativo vigente
+
 ## Delta 2026-03-29 — Secret Manager rollout validated in staging + production
 
 - `origin/develop` ya quedó en `497cb19` con los tres slices de `TASK-124`.

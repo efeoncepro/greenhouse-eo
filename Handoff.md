@@ -4,6 +4,36 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-31 — assets privados: env runtime explícito en Vercel
+
+### Objetivo
+
+- Resolver el error `Unable to upload private asset.` observado al subir respaldos de `leave` en `staging`.
+
+### Causa raíz confirmada
+
+- El runtime de assets privados estaba derivando por defecto `${GCP_PROJECT}-greenhouse-private-assets-{env}`.
+- En Vercel no existía `GREENHOUSE_PRIVATE_ASSETS_BUCKET` configurado para `staging` ni `production`.
+- La infraestructura real de buckets privados dedicados por entorno todavía no está provisionada/cableada como baseline operativa; el bucket funcional vigente sigue siendo `efeonce-group-greenhouse-media`.
+
+### Delta de ejecución
+
+- Se configuró en Vercel:
+  - `GREENHOUSE_PRIVATE_ASSETS_BUCKET=efeonce-group-greenhouse-media` para `staging`
+  - `GREENHOUSE_PRIVATE_ASSETS_BUCKET=efeonce-group-greenhouse-media` para `production`
+- Se redeployó:
+  - `staging` → `https://greenhouse-9j9xmnozt-efeonce-7670142f.vercel.app`
+  - `production` → `https://greenhouse-bvvyyoufq-efeonce-7670142f.vercel.app`
+- Alias activos confirmados:
+  - `https://dev-greenhouse.efeoncepro.com` → `greenhouse-9j9xmnozt-efeonce-7670142f.vercel.app`
+  - `https://greenhouse.efeoncepro.com` → `greenhouse-bvvyyoufq-efeonce-7670142f.vercel.app`
+
+### Regla operativa
+
+- `GREENHOUSE_PRIVATE_ASSETS_BUCKET` es configuración de entorno, no secreto; no debe vivir en Secret Manager.
+- La task de infraestructura sigue pendiente de provisionar buckets dedicados `greenhouse-private-assets-{env}`.
+- Mientras eso no exista, el runtime debe apuntar explícitamente al bucket operativo real y no derivar nombres nuevos por convención.
+
 ## Sesión 2026-03-31 — Hotfix upload leave drafts ownerMemberId
 
 ### Objetivo
