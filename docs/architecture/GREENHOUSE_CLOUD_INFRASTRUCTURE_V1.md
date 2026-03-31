@@ -61,24 +61,30 @@ Regla operativa:
 
 ## Delta 2026-03-31 — Runtime bucket pinning while dedicated buckets remain pending
 
-- `GREENHOUSE_PRIVATE_ASSETS_BUCKET` quedó configurado explícitamente en Vercel para:
-  - `development`
-  - `staging`
-  - `production`
-  - `preview (develop)`
-- `GREENHOUSE_PUBLIC_MEDIA_BUCKET` quedó configurado explícitamente en Vercel para:
-  - `development`
-  - `staging`
-  - `production`
-  - `preview (develop)`
-- Valor operativo actual:
-  - `efeonce-group-greenhouse-media`
-- Motivo:
-  - el runtime ya soporta buckets públicos/privados dedicados por entorno
-  - pero la infraestructura real de `greenhouse-public-media-{env}` y `greenhouse-private-assets-{env}` todavía no está provisionada como baseline compartida
+- La topología dedicada ya quedó provisionada realmente en GCP:
+  - `efeonce-group-greenhouse-public-media-dev`
+  - `efeonce-group-greenhouse-public-media-staging`
+  - `efeonce-group-greenhouse-public-media-prod`
+  - `efeonce-group-greenhouse-private-assets-dev`
+  - `efeonce-group-greenhouse-private-assets-staging`
+  - `efeonce-group-greenhouse-private-assets-prod`
+- Configuración aplicada:
+  - `US-CENTRAL1`
+  - `STANDARD`
+  - `uniform bucket-level access=true`
+  - buckets privados con `publicAccessPrevention=enforced`
+  - buckets públicos con lectura anónima controlada (`roles/storage.objectViewer` para `allUsers`)
+  - `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` con `roles/storage.objectAdmin` bucket-level
+- Vercel ya quedó alineado así:
+  - `development` -> `public-media-dev` / `private-assets-dev`
+  - `staging` -> `public-media-staging` / `private-assets-staging`
+  - `production` -> `public-media-prod` / `private-assets-prod`
+  - `preview (develop)` -> `public-media-staging` / `private-assets-staging`
+- Compatibilidad transicional:
+  - `GREENHOUSE_MEDIA_BUCKET` también quedó fijado a los buckets públicos dedicados
+  - `src/lib/storage/greenhouse-media.ts` ahora prioriza `GREENHOUSE_PUBLIC_MEDIA_BUCKET` y solo cae a `GREENHOUSE_MEDIA_BUCKET` como fallback legacy
 - Regla:
-  - mientras esos buckets no existan realmente en GCP, no dejar el runtime derivando nombres por convención
-  - usar env explícita apuntando al bucket operativo vigente
+  - no volver a apuntar nuevas capacidades documentales privadas al bucket legacy `${GCP_PROJECT}-greenhouse-media`
   - en este proyecto `Preview` no debe asumirse como entorno shared puro: la presencia de env vars branch-scoped obliga a fijar como mínimo `preview (develop)` si queremos un baseline consistente
 
 ## Delta 2026-03-29 — Secret Manager rollout validated in staging + production

@@ -2,11 +2,24 @@
 
 ## 2026-03-31
 
+- Se provisionó la topología definitiva de buckets GCP para assets compartidos:
+  - `efeonce-group-greenhouse-public-media-dev`
+  - `efeonce-group-greenhouse-public-media-staging`
+  - `efeonce-group-greenhouse-public-media-prod`
+  - `efeonce-group-greenhouse-private-assets-dev`
+  - `efeonce-group-greenhouse-private-assets-staging`
+  - `efeonce-group-greenhouse-private-assets-prod`
+  - todos en `US-CENTRAL1`, `STANDARD`, con `uniform bucket-level access`
+  - los buckets privados quedaron con `publicAccessPrevention=enforced`
+  - `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` recibió `roles/storage.objectAdmin` bucket-level
+  - los buckets públicos quedaron legibles anónimamente vía `roles/storage.objectViewer` para `allUsers`
 - Se alineó el runtime de storage en Vercel para evitar drift entre código y cloud real:
-  - `GREENHOUSE_PRIVATE_ASSETS_BUCKET=efeonce-group-greenhouse-media` quedó explícito en `development`, `staging`, `production` y `preview (develop)`
-  - `GREENHOUSE_PUBLIC_MEDIA_BUCKET=efeonce-group-greenhouse-media` quedó explícito en `development`, `staging`, `production` y `preview (develop)`
-  - esto evita que el runtime derive buckets `greenhouse-public-media-*` y `greenhouse-private-assets-*` que todavía no existen/provisionan como baseline real
-  - ambos nombres de bucket quedan documentados como configuración de entorno, no secretos
+  - `development` ahora apunta a `public-media-dev` / `private-assets-dev`
+  - `staging` ahora apunta a `public-media-staging` / `private-assets-staging`
+  - `production` ahora apunta a `public-media-prod` / `private-assets-prod`
+  - `preview (develop)` ahora apunta a `public-media-staging` / `private-assets-staging`
+  - además se fijó `GREENHOUSE_MEDIA_BUCKET` a los buckets públicos dedicados como carril legacy de compatibilidad
+  - `src/lib/storage/greenhouse-media.ts` ya prioriza `GREENHOUSE_PUBLIC_MEDIA_BUCKET` sobre `GREENHOUSE_MEDIA_BUCKET`
 - `TASK-173` ya cerró el pendiente remoto en Cloud SQL:
   - `pnpm setup:postgres:shared-assets` quedó aplicado realmente en `greenhouse-pg-dev / greenhouse_app`
   - se validó `shared-assets-platform-v1` en `greenhouse_sync.schema_migrations`

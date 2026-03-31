@@ -59,7 +59,9 @@ const getAccessToken = async () => {
 }
 
 export const getGreenhouseMediaBucket = () =>
-  process.env.GREENHOUSE_MEDIA_BUCKET?.trim() || `${getBigQueryProjectId()}-greenhouse-media`
+  process.env.GREENHOUSE_PUBLIC_MEDIA_BUCKET?.trim() ||
+  process.env.GREENHOUSE_MEDIA_BUCKET?.trim() ||
+  `${getBigQueryProjectId()}-greenhouse-media`
 
 export const isSupportedImageType = (contentType: string) =>
   IMAGE_CONTENT_TYPES.includes(contentType as (typeof IMAGE_CONTENT_TYPES)[number])

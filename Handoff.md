@@ -4,31 +4,48 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
-## Sesión 2026-03-31 — assets shared: env runtime explícito en Vercel
+## Sesión 2026-03-31 — shared assets: buckets dedicados GCP + cutover de runtime
 
 ### Objetivo
 
-- Resolver el error `Unable to upload private asset.` observado al subir respaldos de `leave` en `staging` y dejar `public/private media` explícitos en los entornos operativos de Vercel.
+- Resolver el error `Unable to upload private asset.` observado al subir respaldos de `leave`, provisionar de verdad la topología `public/private` en GCP y dejar el runtime cortado a esos buckets por entorno.
 
 ### Causa raíz confirmada
 
 - El runtime de assets privados estaba derivando por defecto `${GCP_PROJECT}-greenhouse-private-assets-{env}`.
-- En Vercel no existía `GREENHOUSE_PRIVATE_ASSETS_BUCKET` configurado para `staging` ni `production`.
-- La infraestructura real de buckets públicos/privados dedicados por entorno todavía no está provisionada/cableada como baseline operativa; el bucket funcional vigente sigue siendo `efeonce-group-greenhouse-media`.
+- En Vercel no existían `GREENHOUSE_PRIVATE_ASSETS_BUCKET` / `GREENHOUSE_PUBLIC_MEDIA_BUCKET` alineados a una infraestructura real.
+- El bucket operativo vigente seguía siendo `efeonce-group-greenhouse-media`, pero la topología dedicada todavía no estaba provisionada.
 
 ### Delta de ejecución
 
 - Se configuró en Vercel:
-  - `GREENHOUSE_PRIVATE_ASSETS_BUCKET=efeonce-group-greenhouse-media` para:
-    - `development`
-    - `staging`
-    - `production`
-    - `preview (develop)`
-  - `GREENHOUSE_PUBLIC_MEDIA_BUCKET=efeonce-group-greenhouse-media` para:
-    - `development`
-    - `staging`
-    - `production`
-    - `preview (develop)`
+  - `development`:
+    - `GREENHOUSE_PRIVATE_ASSETS_BUCKET=efeonce-group-greenhouse-private-assets-dev`
+    - `GREENHOUSE_PUBLIC_MEDIA_BUCKET=efeonce-group-greenhouse-public-media-dev`
+    - `GREENHOUSE_MEDIA_BUCKET=efeonce-group-greenhouse-public-media-dev`
+  - `staging`:
+    - `GREENHOUSE_PRIVATE_ASSETS_BUCKET=efeonce-group-greenhouse-private-assets-staging`
+    - `GREENHOUSE_PUBLIC_MEDIA_BUCKET=efeonce-group-greenhouse-public-media-staging`
+    - `GREENHOUSE_MEDIA_BUCKET=efeonce-group-greenhouse-public-media-staging`
+  - `production`:
+    - `GREENHOUSE_PRIVATE_ASSETS_BUCKET=efeonce-group-greenhouse-private-assets-prod`
+    - `GREENHOUSE_PUBLIC_MEDIA_BUCKET=efeonce-group-greenhouse-public-media-prod`
+    - `GREENHOUSE_MEDIA_BUCKET=efeonce-group-greenhouse-public-media-prod`
+  - `preview (develop)`:
+    - `GREENHOUSE_PRIVATE_ASSETS_BUCKET=efeonce-group-greenhouse-private-assets-staging`
+    - `GREENHOUSE_PUBLIC_MEDIA_BUCKET=efeonce-group-greenhouse-public-media-staging`
+    - `GREENHOUSE_MEDIA_BUCKET=efeonce-group-greenhouse-public-media-staging`
+- Se provisionó en GCP con `julio.reyes@efeonce.org`:
+  - buckets `public-media-{dev,staging,prod}` y `private-assets-{dev,staging,prod}`
+  - `US-CENTRAL1`, `STANDARD`, `uniform bucket-level access=true`
+  - `private` con `publicAccessPrevention=enforced`
+  - `public` con `roles/storage.objectViewer` para `allUsers`
+  - `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` con `roles/storage.objectAdmin` en los seis buckets
+- Validación de infraestructura ejecutada:
+  - upload autenticado a bucket público y privado: OK
+  - lectura anónima desde bucket público: `200`
+  - lectura anónima desde bucket privado: `401`
+  - borrado autenticado de probes: OK
 - Se redeployó y el estado final quedó en:
   - `staging` → `https://greenhouse-12ehg5shd-efeonce-7670142f.vercel.app`
   - `production` → `https://greenhouse-cosgfclp0-efeonce-7670142f.vercel.app`
@@ -43,11 +60,9 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 
 - `GREENHOUSE_PRIVATE_ASSETS_BUCKET` es configuración de entorno, no secreto; no debe vivir en Secret Manager.
 - `GREENHOUSE_PUBLIC_MEDIA_BUCKET` sigue la misma regla: configuración, no secreto.
+- `GREENHOUSE_MEDIA_BUCKET` queda como compatibilidad legacy para surfaces públicas que aún usan `src/lib/storage/greenhouse-media.ts`; el helper ya prioriza `GREENHOUSE_PUBLIC_MEDIA_BUCKET`.
 - En este proyecto no conviene asumir un `Preview` totalmente shared; Vercel ya tiene múltiples env vars branch-scoped y el baseline mínimo debe fijarse explícitamente al menos en `preview (develop)`.
-- La task de infraestructura sigue pendiente de provisionar buckets dedicados:
-  - `greenhouse-public-media-{env}`
-  - `greenhouse-private-assets-{env}`
-- Mientras eso no exista, el runtime debe apuntar explícitamente al bucket operativo real y no derivar nombres nuevos por convención.
+- La infraestructura de buckets dedicados ya quedó provisionada; el pendiente residual de `TASK-173` pasa a ser solo smoke autenticado final de upload/download sobre el portal ya cortado.
 
 ## Sesión 2026-03-31 — Hotfix upload leave drafts ownerMemberId
 
