@@ -4,6 +4,32 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-31 — TASK-180 creada para cutover de Departments a PostgreSQL
+
+### Objetivo
+
+- Abrir una task formal para resolver el drift entre `HR > Departments` en BigQuery y el resto del dominio HR/People que ya converge a PostgreSQL.
+
+### Delta de ejecución
+
+- Se creó `docs/tasks/to-do/TASK-180-hr-departments-postgres-runtime-cutover.md`.
+- La task deja explícito:
+  - que `greenhouse_core.departments` debe ser source of truth operativo
+  - que `/api/hr/core/departments` debe cortar a PostgreSQL
+  - que el legacy `greenhouse.departments` en BigQuery debe reclasificarse como downstream, histórico o deprecado
+  - que el cutover requiere verificación de completitud/backfill y no solo cambio de queries
+- Se actualizaron:
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+
+### Nota de coordinación
+
+- El árbol ya tenía cambios locales no commiteados en:
+  - `src/lib/hr-core/shared.ts`
+  - `src/lib/hr-core/service.ts`
+  - `src/lib/hr-core/service.test.ts`
+- Esos cambios corresponden al hotfix puntual del create de departamentos sobre BigQuery y no fueron mezclados con la task nueva.
+
 ## Sesión 2026-03-31 — research abierto para Hiring Desk reactivo
 
 ### Objetivo
