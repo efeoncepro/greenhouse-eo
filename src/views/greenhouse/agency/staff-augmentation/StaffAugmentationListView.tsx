@@ -336,16 +336,18 @@ const StaffAugmentationListView = () => {
         </Card>
       </Grid>
 
-      <CreatePlacementDialog
-        open={createOpen}
-        onClose={handleCloseCreate}
-        initialAssignmentId={initialAssignmentId}
-        onCreated={placementId => {
-          handleCloseCreate()
-          void loadData()
-          router.push(`/agency/staff-augmentation/${placementId}`)
-        }}
-      />
+      {createOpen ? (
+        <CreatePlacementDialog
+          open
+          onClose={handleCloseCreate}
+          initialAssignmentId={initialAssignmentId}
+          onCreated={placementId => {
+            handleCloseCreate()
+            void loadData()
+            router.push(`/agency/staff-augmentation/${placementId}`)
+          }}
+        />
+      ) : null}
     </Grid>
   )
 }

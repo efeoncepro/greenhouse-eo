@@ -17,7 +17,11 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - Objetivo técnico:
   - sacar del carril crítico la combinación `MUI Dialog + Autocomplete + Popper`
   - mantener el contrato funcional del flujo sin volver al `select` masivo
+- Ajuste adicional posterior:
+  - `StaffAugmentationListView` ahora hace lazy-mount real del modal solo cuando `createOpen=true`
+  - `CreatePlacementDialog` desactiva `auto/enforce/restore focus` del `Dialog` para reducir riesgo de freeze al abrir en Chrome
 - Archivos tocados:
+  - `src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.tsx`
   - `src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.tsx`
   - `src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.test.tsx`
 

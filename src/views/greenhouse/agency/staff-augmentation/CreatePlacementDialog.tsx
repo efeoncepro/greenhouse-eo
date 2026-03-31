@@ -207,7 +207,16 @@ const CreatePlacementDialog = ({ open, onClose, onCreated, initialAssignmentId }
   }
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth='sm'>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
+      maxWidth='sm'
+      disableAutoFocus
+      disableEnforceFocus
+      disableRestoreFocus
+      keepMounted={false}
+    >
       <DialogTitle>Crear placement</DialogTitle>
       <DialogContent>
         <Typography variant='body2' color='text.secondary' sx={{ mb: 4 }}>

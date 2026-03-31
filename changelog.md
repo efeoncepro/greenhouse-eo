@@ -3483,6 +3483,7 @@
 # 2026-03-31
 
 - Staff Aug `Crear placement` recibió una segunda mitigación conservadora: el modal ya no depende de `MUI Autocomplete` dentro del `Dialog`; ahora usa búsqueda incremental con input controlado y lista inline de resultados elegibles para reducir el riesgo de freeze al abrir.
+- Staff Aug `Crear placement` ahora además monta el modal solo al abrirlo y desactiva el focus management más agresivo de `MUI Dialog`, para reducir el riesgo de cuelgue del navegador en el click inicial.
 
 # 2026-03-28
 
