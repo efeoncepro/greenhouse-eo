@@ -47,6 +47,7 @@ import type {
   CreateLeaveRequestInput,
   HrApprovalAction,
   HrLeaveCalendarResponse,
+  HrCoreMetadata,
   HrLeaveRequest,
   HrLeaveRequestsResponse,
   HrLeaveBalancesResponse,
@@ -85,6 +86,7 @@ const HrLeaveView = () => {
   const [balData, setBalData] = useState<HrLeaveBalancesResponse | null>(null)
   const [calData, setCalData] = useState<HrLeaveCalendarResponse | null>(null)
   const [leaveTypes, setLeaveTypes] = useState<HrLeaveType[]>([])
+  const [currentMemberId, setCurrentMemberId] = useState<string | null>(null)
 
   // Filters
   const [filterStatus, setFilterStatus] = useState<HrLeaveRequestStatus | ''>('')
@@ -140,9 +142,10 @@ const HrLeaveView = () => {
       }
 
       if (metaRes.ok) {
-        const meta = await metaRes.json()
+        const meta = (await metaRes.json()) as HrCoreMetadata
 
         setLeaveTypes(meta.leaveTypes ?? [])
+        setCurrentMemberId(meta.currentMemberId ?? null)
       } else {
         const payload = await metaRes.json().catch(() => null)
 
@@ -561,6 +564,7 @@ const HrLeaveView = () => {
         open={createOpen}
         saving={createSaving}
         leaveTypes={leaveTypes}
+        ownerMemberId={currentMemberId}
         onClose={() => setCreateOpen(false)}
         onSubmit={handleCreate}
       />

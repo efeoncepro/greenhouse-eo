@@ -1,5 +1,18 @@
 # GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md
 
+## Delta 2026-03-31 — Leave draft uploads resuelven ownerMemberId de forma robusta
+
+`leave` ya no debe depender exclusivamente de `tenant.memberId` en sesión para ownership documental de borradores.
+
+Estado vigente:
+- `/api/hr/core/meta` devuelve `currentMemberId` resuelto server-side para surfaces HR/My
+- `LeaveRequestDialog` propaga ese `ownerMemberId` al uploader y al payload final de creación
+- `/api/assets/private` hace fallback server-side para `leave_request_draft` antes de rechazar un upload por falta de ownership
+
+Regla:
+- los adjuntos draft de `leave` deben quedar amarrados al colaborador efectivo de la solicitud
+- el ownership documental no debe quedar implícito en la sesión si el backend ya puede resolver al colaborador actual por identidad/email
+- la UI debe enviar el `memberId` efectivo cuando ya lo conoce para mantener alineados draft upload y create request
 ## Delta 2026-03-31 — Payroll artifacts convergen a shared assets
 
 `TASK-173` deja explícito que los artefactos documentales de Payroll no deben seguir como carriles aislados.

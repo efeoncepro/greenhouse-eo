@@ -583,6 +583,16 @@ const resolveTenantMember = async (tenant: TenantContext) => {
   return row
 }
 
+export const resolveCurrentHrMemberId = async (tenant: TenantContext) => {
+  if (tenant.memberId) {
+    return tenant.memberId
+  }
+
+  const member = await resolveTenantMember(tenant)
+
+  return member.member_id
+}
+
 const assertMemberVisibleToTenant = async (tenant: TenantContext, memberId: string) => {
   if (isHrAdminTenant(tenant)) {
     return

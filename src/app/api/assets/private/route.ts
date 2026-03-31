@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import type { GreenhouseAssetContext, PrivateAssetUploadResponse } from '@/types/assets'
+import { resolveCurrentHrMemberId } from '@/lib/hr-core/service'
 import { createPrivatePendingAsset } from '@/lib/storage/greenhouse-assets'
 import { hasRoleCode, hasRouteGroup, requireTenantContext } from '@/lib/tenant/authorization'
 import { ROLE_CODES } from '@/config/role-codes'
@@ -60,9 +61,14 @@ export async function POST(request: Request) {
     const ownerClientId = ownerClientIdRaw || tenant.clientId || null
     const ownerSpaceId = ownerSpaceIdRaw || tenant.spaceId || null
 
+    const fallbackOwnerMemberId =
+      contextTypeValue === 'leave_request_draft' && !ownerMemberIdRaw && !tenant.memberId
+        ? await resolveCurrentHrMemberId(tenant).catch(() => null)
+        : null
+
     const ownerMemberId =
       contextTypeValue === 'leave_request_draft'
-        ? ownerMemberIdRaw || tenant.memberId || null
+        ? ownerMemberIdRaw || tenant.memberId || fallbackOwnerMemberId || null
         : ownerMemberIdRaw || null
 
     if (contextTypeValue === 'purchase_order_draft' && !ownerClientId) {

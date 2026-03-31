@@ -177,6 +177,7 @@ export interface HrAttendanceRecord {
 }
 
 export interface HrCoreMetadata {
+  currentMemberId?: string | null
   departments: HrDepartment[]
   leaveTypes: HrLeaveType[]
   jobLevels: HrJobLevel[]

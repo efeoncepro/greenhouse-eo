@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { getHrCoreMetadata } from '@/lib/hr-core/service'
+import { getHrCoreMetadata, resolveCurrentHrMemberId } from '@/lib/hr-core/service'
 import { requireHrCoreReadTenantContext, toHrCoreErrorResponse } from '@/lib/hr-core/shared'
 
 export const dynamic = 'force-dynamic'
@@ -14,8 +14,12 @@ export async function GET() {
 
   try {
     const payload = await getHrCoreMetadata()
+    const currentMemberId = await resolveCurrentHrMemberId(tenant).catch(() => tenant.memberId ?? null)
 
-    return NextResponse.json(payload)
+    return NextResponse.json({
+      ...payload,
+      currentMemberId
+    })
   } catch (error) {
     return toHrCoreErrorResponse(error, 'Unable to load HR Core metadata.')
   }

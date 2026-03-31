@@ -22,6 +22,7 @@ type LeaveRequestDialogProps = {
   open: boolean
   saving: boolean
   leaveTypes: HrLeaveType[]
+  ownerMemberId?: string | null
   title?: string
   onClose: () => void
   onSubmit: (input: CreateLeaveRequestInput) => Promise<void> | void
@@ -31,6 +32,7 @@ const LeaveRequestDialog = ({
   open,
   saving,
   leaveTypes,
+  ownerMemberId = null,
   title = 'Solicitar permiso',
   onClose,
   onSubmit
@@ -72,6 +74,7 @@ const LeaveRequestDialog = ({
 
   const handleSubmit = async () => {
     await onSubmit({
+      memberId: ownerMemberId || undefined,
       leaveTypeCode,
       startDate,
       endDate,
@@ -168,6 +171,7 @@ const LeaveRequestDialog = ({
             replaceCta='Reemplazar archivo'
             value={attachmentAsset}
             onChange={setAttachmentAsset}
+            ownerMemberId={ownerMemberId}
             metadataLabel={selectedLeaveType?.leaveTypeName || 'leave-request'}
             disabled={saving}
           />

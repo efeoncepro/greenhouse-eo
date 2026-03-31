@@ -4,6 +4,41 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-31 — Hotfix upload leave drafts ownerMemberId
+
+### Objetivo
+
+- Corregir el error visible en producción `ownerMemberId is required for leave drafts.` al subir respaldos desde `greenhouse.efeoncepro.com/hr/leave`.
+
+### Causa raíz
+
+- `LeaveRequestDialog` usaba `GreenhouseFileUploader` con `contextType='leave_request_draft'`, pero no le propagaba `ownerMemberId`.
+- En `/hr/leave`, la sesión puede no traer `tenant.memberId` directo, aunque backend sí pueda resolver al colaborador actual por `userId` / `identity_profile_id` / email.
+- Resultado: el upload draft fallaba antes del submit final.
+
+### Delta de ejecución
+
+- `src/app/api/hr/core/meta/route.ts` ahora devuelve `currentMemberId` resuelto server-side.
+- `src/lib/hr-core/service.ts` expone `resolveCurrentHrMemberId()` para reusar la resolución del colaborador actual.
+- `src/views/greenhouse/hr-core/HrLeaveView.tsx` pasa `currentMemberId` al diálogo de permisos.
+- `src/views/greenhouse/my/MyLeaveView.tsx` pasa `data.memberId` al mismo diálogo.
+- `src/components/greenhouse/LeaveRequestDialog.tsx` ahora:
+  - pasa `ownerMemberId` al uploader
+  - incluye `memberId` en el payload final de `CreateLeaveRequestInput`
+- `src/app/api/assets/private/route.ts` hace fallback adicional via `resolveCurrentHrMemberId()` para `leave_request_draft` cuando la sesión no expone `tenant.memberId`.
+
+### Validación ejecutada
+
+- `pnpm exec vitest run src/components/greenhouse/LeaveRequestDialog.test.tsx src/app/api/hr/core/meta/route.test.ts src/app/api/assets/private/route.test.ts`
+- `pnpm exec eslint src/components/greenhouse/LeaveRequestDialog.tsx src/views/greenhouse/hr-core/HrLeaveView.tsx src/views/greenhouse/my/MyLeaveView.tsx src/app/api/hr/core/meta/route.ts src/app/api/assets/private/route.ts src/lib/hr-core/service.ts src/types/hr-core.ts src/components/greenhouse/LeaveRequestDialog.test.tsx src/app/api/hr/core/meta/route.test.ts src/app/api/assets/private/route.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm lint`
+
+### Limitación real
+
+- `pnpm build` volvió a quedarse detenido después de `Compiled successfully` en `Running TypeScript`, igual que el antecedente previo ya documentado en este repo.
+- Para este hotfix la mitigación fue validar con `tsc --noEmit`, `lint` y tests focalizados antes de push/deploy.
+
 ## Sesión 2026-03-31 — TASK-173 bootstrap remoto Cloud SQL + ownership drift
 
 ### Objetivo

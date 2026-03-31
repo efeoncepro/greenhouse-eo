@@ -3747,3 +3747,10 @@
 - `TASK-162` agregó la materialización inicial `greenhouse_serving.commercial_cost_attribution`; la capa de attribution ya es serving-first con fallback a recompute y `materializeOperationalPl()` la rematerializa antes del snapshot de P&L.
 - `TASK-162` sumó wiring reactivo dedicado: nueva projection `commercial_cost_attribution`, registro en el projection registry y evento `accounting.commercial_cost_attribution.materialized` para desacoplar la capa del refresh exclusivo de `operational_pl`.
 - `TASK-162` agregó health semántico y explain surface mínima para commercial cost attribution, con APIs dedicadas y chequeo de freshness en `/api/cron/materialization-health`.
+# 2026-03-31
+
+- Hotfix en `leave` para uploads de respaldo:
+  - `LeaveRequestDialog` ahora propaga el `memberId` efectivo al draft upload y a la creación de la solicitud
+  - `/api/hr/core/meta` devuelve `currentMemberId` resuelto para superficies HR/My
+  - `/api/assets/private` hace fallback server-side para `leave_request_draft` cuando la sesión no expone `tenant.memberId`
+  - Esto corrige el error visible `ownerMemberId is required for leave drafts.` en `greenhouse.efeoncepro.com/hr/leave`
