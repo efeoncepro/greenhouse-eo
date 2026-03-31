@@ -36,6 +36,65 @@ Estado vigente:
 
 Esto deja explícito que los capability modules son parte del modelo de gobierno del portal y no un apéndice fuera de `/admin/views`.
 
+## Delta 2026-03-31 — Person Detail View: Enterprise Redesign Pattern (TASK-168)
+
+La vista de detalle de persona (`/people/:slug`) fue rediseñada como referencia canónica de un patrón enterprise aplicable a cualquier entity detail view del portal.
+
+### Patrón: Horizontal Profile Header + Consolidated Tabs
+
+Reemplaza el patrón anterior de sidebar izquierdo + contenido derecho con:
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│  PROFILE HEADER (full-width Card)                                │
+│  Avatar(80px) + Name + Role + Email + Integration Chips          │
+│  3x CardStatsSquare (FTE, Hrs, Spaces) + Status Chip + ⚙ Admin  │
+├──────────────────────────────────────────────────────────────────┤
+│  [Tab1] [Tab2] [Tab3] [Tab4] [Tab5]  ← máx 5-6 tabs, sin scroll │
+├──────────────────────────────────────────────────────────────────┤
+│  Tab content (full-width, Accordion sections)                    │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+### Decisiones de diseño validadas (research enterprise UX 2026)
+
+| Decisión | Justificación |
+|----------|---------------|
+| Header horizontal > sidebar | Top-rail layout maximiza content area ([Pencil & Paper](https://www.pencilandpaper.io/articles/ux-pattern-analysis-data-dashboards)) |
+| Tabs consolidados (9→5) | Máx 5-6 tabs evitan overflow; agrupar por dominio lógico |
+| Progressive disclosure (Accordion) | "Carefully sequencing when users encounter features" ([FuseLab 2026](https://fuselabcreative.com/enterprise-ux-design-guide-2026-best-practices/)) |
+| Campos vacíos omitidos | Reducir ruido: no renderizar "—" dashes en DOM |
+| Admin actions en OptionMenu | Quick actions accesibles desde cualquier tab, sin clutterear la UI |
+| Integration status con chips | Texto + icon + color (no solo ✓/✗) para WCAG 2.2 AA |
+| Legacy URL redirects | Backward-compatible: `?tab=compensation` → `?tab=economy` |
+
+### Componentes del patrón
+
+| Componente | Archivo | Rol |
+|-----------|---------|-----|
+| `PersonProfileHeader` | `views/greenhouse/people/PersonProfileHeader.tsx` | Header horizontal con avatar, KPIs, admin OptionMenu |
+| `PersonProfileTab` | `views/greenhouse/people/tabs/PersonProfileTab.tsx` | 3 Accordion sections: datos laborales, identidad, actividad |
+| `PersonEconomyTab` | `views/greenhouse/people/tabs/PersonEconomyTab.tsx` | Compensación card + nómina accordion + costos accordion |
+| `CardStatsSquare` | `components/card-statistics/CardStatsSquare.tsx` | KPI pill compacto en headers |
+
+### Cuándo aplicar este patrón
+
+Usar para **cualquier entity detail view** que tenga:
+- Identidad (avatar, nombre, estado)
+- 4+ secciones de contenido
+- Acciones admin contextuales
+- Múltiples dominios de datos (HR, Finance, Delivery, etc.)
+
+Candidatos: Organization Detail, Space Detail, Client Detail, Provider Detail.
+
+### Reglas de Accordion en detail views
+
+- `defaultExpanded` solo para la primera sección (la más usada)
+- Secciones sin datos no se renderizan (no empty states dentro de accordions)
+- Cada accordion header: `Avatar variant='rounded' skin='light'` + `Typography h6` + subtitle
+- Divider entre summary y details
+- `disableGutters elevation={0}` en el Accordion interno, Card wrapper con border
+
 ## Stack Principal
 
 | Capa | Tecnología | Versión | Rol |
@@ -121,6 +180,8 @@ Vuexy envuelve componentes MUI con estilizado consistente:
 | Accent border | `borderLeft: '4px solid'` + palette color |
 | KPI row (4 cols) | `Box` con `gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(4, 1fr)' }` |
 | Content 8/4 split | `Grid` con `xs={12} md={8}` + `xs={12} md={4}` |
+| Entity detail view | `Stack spacing={6}` → ProfileHeader → Tabs → TabContent (full-width) |
+| Accordion section | `Card border` → `Accordion disableGutters` → `AccordionSummary` (Avatar+h6) → `Divider` → `AccordionDetails` |
 
 ### Admin Center Patterns
 
