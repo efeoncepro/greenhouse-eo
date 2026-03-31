@@ -4,6 +4,53 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-31 — shared assets hardening para attach de leave
+
+### Objetivo
+
+- Corregir el error visible `Unable to attach the supporting document.` después de un upload exitoso en `HR > Permisos`.
+
+### Causa raíz confirmada
+
+- El upload del draft normalizaba `ownerClientId` / `ownerSpaceId` vacíos a `null`.
+- El attach final del asset al `leave_request` reutilizaba el contexto tenant crudo.
+- Para usuarios internos como `julio.reyes`, `tenant.clientId` puede venir como cadena vacía `''`; eso no fallaba en el upload, pero sí rompía la FK de `greenhouse_core.assets.owner_client_id` al promover el asset draft a owner definitivo.
+- El síntoma visible era:
+  - upload OK
+  - asset quedaba en `status='pending'` con `owner_aggregate_type='leave_request_draft'`
+  - el submit final caía con `Unable to attach the supporting document.`
+
+### Delta de ejecución
+
+- Se agregó `src/lib/storage/greenhouse-assets-shared.ts` para normalizar ownership scope compartido.
+- `src/lib/storage/greenhouse-assets.ts` ahora normaliza `ownerClientId`, `ownerSpaceId` y `ownerMemberId` en:
+  - `createPrivatePendingAsset()`
+  - `attachAssetToAggregate()`
+  - `upsertSystemGeneratedAsset()`
+- Resultado:
+  - cualquier `''` o whitespace en owner scope ya se trata como `null` antes de tocar FKs
+  - el hardening beneficia no solo `leave`, también `purchase orders` y futuros consumers del registry shared
+
+### Validación ejecutada
+
+- `pnpm exec vitest run src/lib/storage/greenhouse-assets-shared.test.ts src/app/api/assets/private/route.test.ts src/components/greenhouse/LeaveRequestDialog.test.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec eslint src/lib/storage/greenhouse-assets.ts src/lib/storage/greenhouse-assets-shared.ts src/lib/storage/greenhouse-assets-shared.test.ts`
+
+### Evidencia técnica
+
+- Se consultó `staging` con env real y se confirmó un asset huérfano reciente:
+  - `status='pending'`
+  - `owner_aggregate_type='leave_request_draft'`
+  - `owner_client_id=NULL`
+  - `owner_member_id='julio-reyes'`
+- Se reprodujo el attach técnico sobre ese asset y se descartó problema en:
+  - bucket GCP
+  - tabla `greenhouse_core.assets`
+  - `asset_access_log`
+  - `greenhouse_sync.outbox_events`
+- La falla estaba en la diferencia de normalización entre draft upload y attach final.
+
 ## Sesión 2026-03-31 — shared assets: buckets dedicados GCP + cutover de runtime
 
 ### Objetivo

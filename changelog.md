@@ -2,6 +2,14 @@
 
 ## 2026-03-31
 
+- Se endureció la foundation shared de adjuntos para evitar fallos al adjuntar respaldos de `leave` después de un upload exitoso:
+  - `ownerClientId`, `ownerSpaceId` y `ownerMemberId` ahora se normalizan en la capa shared antes de tocar FKs
+  - esto corrige el caso de usuarios internos cuyo `tenant.clientId` llega como cadena vacía `''`
+  - el hardening aplica a:
+    - `createPrivatePendingAsset`
+    - `attachAssetToAggregate`
+    - `upsertSystemGeneratedAsset`
+  - se agregó test unitario de regresión para ownership scope vacío
 - Se provisionó la topología definitiva de buckets GCP para assets compartidos:
   - `efeonce-group-greenhouse-public-media-dev`
   - `efeonce-group-greenhouse-public-media-staging`
