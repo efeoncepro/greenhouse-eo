@@ -12,6 +12,34 @@
 - `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` siguen documentados como perfiles de tooling, no como dependencias del runtime del portal.
 - La postura operativa mantiene su visibilidad, pero el `overallStatus` del health ya no debe degradarse solo por esos perfiles ausentes.
 
+## Delta 2026-03-31 — Shared attachments storage topology approved
+
+- `TASK-173` fija la decisión arquitectónica para adjuntos/archivos del portal.
+- Greenhouse no debe seguir creciendo sobre un único bucket genérico para todos los casos de uso.
+- Topología aprobada de aquí en adelante:
+  - `public media` por entorno
+  - `private assets` por entorno
+- Convención base recomendada:
+  - `${GCP_PROJECT}-greenhouse-public-media-dev`
+  - `${GCP_PROJECT}-greenhouse-public-media-staging`
+  - `${GCP_PROJECT}-greenhouse-public-media-prod`
+  - `${GCP_PROJECT}-greenhouse-private-assets-dev`
+  - `${GCP_PROJECT}-greenhouse-private-assets-staging`
+  - `${GCP_PROJECT}-greenhouse-private-assets-prod`
+- Regla operativa:
+  - `public media` sirve logos, avatars y assets visuales de baja sensibilidad
+  - `private assets` sirve adjuntos operativos, documentos HR, receipts, payroll PDFs y respaldos
+  - la separación por módulo debe vivir primero en prefixes y metadata, no en proliferación de buckets
+- Prefixes base aprobados para `private assets`:
+  - `leave/`
+  - `hr-documents/`
+  - `expense-reports/`
+  - `payroll-receipts/`
+  - `payroll-exports/`
+  - `providers/`
+  - `tooling/`
+- El bucket actual `${GCP_PROJECT}-greenhouse-media` pasa a leerse como baseline legacy/transicional; no debe seguir siendo el destino por defecto para nuevas capacidades documentales privadas.
+
 ## Delta 2026-03-29 — Secret Manager rollout validated in staging + production
 
 - `origin/develop` ya quedó en `497cb19` con los tres slices de `TASK-124`.

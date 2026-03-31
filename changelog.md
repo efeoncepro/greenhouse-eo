@@ -2,6 +2,12 @@
 
 ## 2026-03-31
 
+- Se formalizó la decisión arquitectónica para adjuntos/archivos compartidos del portal:
+  - nueva lane `TASK-173` para foundation shared de assets/attachments
+  - `leave`, `Document Vault` y `Expense Reports` quedan alineadas como consumers de esa capability
+  - topología aprobada en GCP: `public media` por entorno + `private assets` por entorno
+  - `public media` queda reservado para logos/avatars/assets no sensibles
+  - todo adjunto documental u operativo cae en `private assets` y se sirve bajo control de acceso Greenhouse
 - `People > HR profile` ahora permite editar `Fecha de ingreso` desde la propia card de información laboral:
   - usa el endpoint existente `PATCH /api/hr/core/members/[memberId]/profile`
   - el valor se refleja de inmediato en la UI sin esperar otro refresh de contexto

@@ -1,5 +1,21 @@
 # project_context.md
 
+## Delta 2026-03-31 Shared attachments and GCP bucket topology
+- Nueva decisión arquitectónica activa:
+  - la capability shared de adjuntos/archivos del portal vive en `TASK-173`
+  - `leave`, `Document Vault` y `Expense Reports` pasan a leerse como consumers de esa foundation
+- Topología aprobada:
+  - `public media` por entorno para logos/avatars/assets no sensibles
+  - `private assets` por entorno para documentos y adjuntos operativos
+- Regla vigente:
+  - el bucket legacy `${GCP_PROJECT}-greenhouse-media` no debe seguir creciendo como default de nuevas capacidades privadas
+  - la separación fina debe vivir en prefixes, metadata, authorization y retention, no en un bucket por módulo
+- Modelo de acceso aprobado:
+  - `public media` puede servirse directo y cachearse agresivamente
+  - `private assets` entra por control de acceso Greenhouse y no debe persistirse como signed URL estable en el dominio
+- Baseline UI aprobado:
+  - el uploader shared debe construirse sobre `react-dropzone` + `src/libs/styles/AppReactDropzone.ts`
+
 ## Delta 2026-03-31 HR profile hire-date editing
 - `People > HR profile` ya expone edición visible de `hireDate` en la card `Información laboral`.
 - La UI usa `PATCH /api/hr/core/members/[memberId]/profile` y refleja el valor guardado en la misma tab sin depender de un refresh posterior del contexto HR agregado.

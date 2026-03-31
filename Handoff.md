@@ -27,6 +27,12 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - Índice de tasks y registry actualizados:
   - `docs/tasks/README.md`
   - `docs/tasks/TASK_ID_REGISTRY.md`
+- Decisión arquitectónica posterior explicitada:
+  - `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` y `GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md` ya fijan bucket topology y access model
+  - baseline aprobado:
+    - `public media` por entorno
+    - `private assets` por entorno
+  - `private assets` debe bajar siempre por control de acceso Greenhouse; signed URLs solo como mecanismo efímero, no como contrato persistido
 
 ### Validación ejecutada
 

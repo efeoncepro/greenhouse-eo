@@ -18,6 +18,30 @@
   - `secrets.toolingSummary`
   - `postgresAccessProfiles`
 
+## Delta 2026-03-31 — Attachments posture approved
+
+- `TASK-173` fija la postura de seguridad para assets y adjuntos del portal.
+- Regla canónica de visibilidad:
+  - `public media`: solo logos, avatars y assets visuales no sensibles
+  - `private assets`: todo documento o adjunto de negocio, HR, payroll, finance, providers o tooling
+- Los assets privados no deben exponerse por bucket público ni por URLs permanentes.
+- Modelo de descarga aprobado para privados:
+  - el caller entra por una route autenticada de Greenhouse
+  - la autorización se evalúa en el portal
+  - la entrega puede resolverse por streaming server-side o por signed URL de vida corta
+- Regla de persistencia:
+  - PostgreSQL guarda metadata y associations del asset
+  - no guardar signed URLs persistentes como source of truth del dominio
+- Regla de upload:
+  - el browser no recibe credenciales GCP crudas
+  - cualquier flujo directo a GCS debe estar mediado por autorización server-side y expiración corta
+- Regla de compatibilidad con CSP:
+  - `public media` puede whitelistarse como origen de assets visuales
+  - `private assets` no debe depender de acceso directo desde el browser como baseline
+- Requisito operativo adicional:
+  - uploads y downloads privados deben dejar trazabilidad mínima de actor, aggregate y timestamp
+  - assets subidos y no asociados deben poder limpiarse por lifecycle/housekeeping
+
 ## Delta 2026-03-29 — Secret Manager validated in shared staging
 
 - `TASK-124` ya salió del estado solo-repo y quedó validada en el entorno compartido `staging`.

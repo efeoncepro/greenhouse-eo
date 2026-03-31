@@ -40,6 +40,45 @@ Sin una foundation común el riesgo es alto:
 - Estandarizar la experiencia de upload sobre el patrón Vuexy existente.
 - Cortar `leave` y futuros módulos a adjuntos gestionados por Greenhouse en vez de `attachmentUrl` arbitrario.
 
+## Architectural Decision Locked
+
+- Storage topology aprobada:
+  - `public media` por entorno
+  - `private assets` por entorno
+- Convención recomendada:
+  - `${GCP_PROJECT}-greenhouse-public-media-dev`
+  - `${GCP_PROJECT}-greenhouse-public-media-staging`
+  - `${GCP_PROJECT}-greenhouse-public-media-prod`
+  - `${GCP_PROJECT}-greenhouse-private-assets-dev`
+  - `${GCP_PROJECT}-greenhouse-private-assets-staging`
+  - `${GCP_PROJECT}-greenhouse-private-assets-prod`
+- `public media` se usa para:
+  - logos
+  - avatars
+  - assets visuales de baja sensibilidad
+- `private assets` se usa para:
+  - adjuntos de `leave`
+  - `Document Vault`
+  - `Expense Reports`
+  - payroll receipts
+  - payroll export packages
+  - respaldos documentales de providers/tooling/finance cuando apliquen
+- Download model aprobado:
+  - privados entran siempre por control de acceso Greenhouse
+  - el servidor puede responder por proxy/stream o emitir signed URL corta
+  - no persistir signed URLs como source of truth del dominio
+- Contract model aprobado:
+  - registry canónico en PostgreSQL
+  - bytes en GCS
+  - associations por aggregate
+- Baseline UI aprobada:
+  - `react-dropzone` + `AppReactDropzone`
+  - componente shared `GreenhouseFileUploader`
+- Primeros consumers aprobados:
+  - `leave`
+  - `TASK-027`
+  - `TASK-028`
+
 ## Architecture Alignment
 
 Revisar y respetar:
@@ -133,6 +172,8 @@ Reglas obligatorias:
   - `ownerAggregateType`
   - `ownerAggregateId`
   - `status` (`pending`, `attached`, `orphaned`, `deleted`)
+  - `downloadCount`
+  - `lastDownloadedAt`
 - Definir el patrón transaccional:
   - `request upload`
   - `upload bytes`
@@ -141,9 +182,9 @@ Reglas obligatorias:
 
 ### Slice 2 - Bucket topology y gobernanza GCP
 
-- Formalizar la recomendación base:
-  - `greenhouse-public-media` para assets públicos o casi públicos como logos/avatars
-  - `greenhouse-private-assets` para documentos privados, receipts, respaldos y adjuntos operativos
+- Implementar la topología ya aprobada:
+  - `${GCP_PROJECT}-greenhouse-public-media-{env}`
+  - `${GCP_PROJECT}-greenhouse-private-assets-{env}`
 - Evitar un bucket por módulo como baseline.
 - Gobernar por prefixes y políticas:
   - `leave/`
@@ -175,11 +216,15 @@ Reglas obligatorias:
 - Upload sin exponer credenciales GCP al browser.
 - Download siempre mediado por autorización Greenhouse para assets privados.
 - Compatibilidad con WIF/connector baseline actual.
+- signed URLs privadas solo como mecanismo efímero de entrega, no como dato persistido del agregado.
 - Trazabilidad mínima:
   - quién subió
   - cuándo
   - a qué aggregate quedó asociado
   - qué actor lo descargó o lo pidió
+- Housekeeping mínimo:
+  - limpieza de assets `pending/orphaned`
+  - lifecycle por retention class
 
 ### Slice 5 - Primeros consumers
 
@@ -187,6 +232,23 @@ Reglas obligatorias:
 - `TASK-027 Document Vault`: consumir esta foundation en vez de definir bucket/helper propios.
 - `TASK-028 Expense Reports`: receipts sobre el mismo contrato shared.
 - dejar a proveedores, tooling y purchase orders con contrato listo aunque su rollout quede como follow-on.
+
+### Slice 6 - Baseline v1 de tipos y límites
+
+- Tipos de archivo v1 aprobados:
+  - `application/pdf`
+  - `image/jpeg`
+  - `image/png`
+  - `image/webp`
+- Límites iniciales recomendados:
+  - `leave`: hasta 3 archivos, 10 MB por archivo
+  - `Document Vault`: 1 archivo por documento lógico, 15 MB
+  - `Expense Reports`: múltiples comprobantes, 10 MB por archivo
+- No incluir en v1:
+  - video
+  - audio
+  - archivos comprimidos
+  - Office docs salvo requerimiento explícito de negocio posterior
 
 ## Out of Scope
 
@@ -201,6 +263,8 @@ Reglas obligatorias:
 - [ ] Existe una decisión arquitectónica explícita para topología de buckets GCP y gobierno por visibilidad/retención.
 - [ ] Existe un contrato compartido de `assets/attachments` con registry canónico y associations por aggregate.
 - [ ] Existe un uploader reusable de Greenhouse basado en el patrón Vuexy actual.
+- [ ] La decisión deja explícito qué cae en `public media` y qué cae en `private assets`.
+- [ ] La decisión deja explícito que descargas privadas pasan por control de acceso Greenhouse.
 - [ ] `leave` deja de depender de `attachmentUrl` manual y consume adjuntos gestionados.
 - [ ] `TASK-027` y `TASK-028` quedan actualizadas para consumir la foundation shared en vez de redefinir storage base.
 - [ ] El path de downloads privados queda autenticado y no depende de exponer URLs permanentes del bucket.
