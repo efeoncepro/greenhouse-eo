@@ -217,3 +217,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-166` | `complete` | Finance BigQuery Write Cutover | `docs/tasks/complete/TASK-166-finance-bigquery-write-cutover.md` |
 
 | `TASK-167` | `to-do` | Operational P&L: Organization Scope Materialization | `docs/tasks/to-do/TASK-167-operational-pl-organization-scope.md` |
+| `TASK-168` | `to-do` | Person Detail View: Enterprise Redesign | `docs/tasks/to-do/TASK-168-person-detail-enterprise-redesign.md` |
