@@ -10,6 +10,7 @@ import { renderWithTheme } from '@/test/render'
 import StaffAugmentationListView from './StaffAugmentationListView'
 
 const fetchMock = vi.fn()
+const pushMock = vi.fn()
 
 vi.mock('next/link', () => ({
   default: ({ children, href, ...props }: { children: ReactNode; href: string }) => (
@@ -19,9 +20,16 @@ vi.mock('next/link', () => ({
   )
 }))
 
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: pushMock
+  })
+}))
+
 describe('StaffAugmentationListView', () => {
   beforeEach(() => {
     fetchMock.mockReset()
+    pushMock.mockReset()
     vi.stubGlobal('fetch', fetchMock)
   })
 
@@ -70,7 +78,7 @@ describe('StaffAugmentationListView', () => {
     expect(screen.getByText('Reach')).toBeInTheDocument()
   })
 
-  it('routes placement creation to a dedicated page instead of mounting the flow inside the list', async () => {
+  it('keeps the CTA wired to the route-driven create drawer', async () => {
     fetchMock.mockResolvedValue({
       ok: true,
       json: async () => ({
@@ -88,5 +96,26 @@ describe('StaffAugmentationListView', () => {
     })
 
     expect(screen.getByRole('link', { name: 'Crear placement' })).toHaveAttribute('href', '/agency/staff-augmentation/create')
+  })
+
+  it('renders the create flow as a drawer when the route requests it', async () => {
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        items: [],
+        total: 0,
+        page: 1,
+        pageSize: 25
+      })
+    })
+
+    renderWithTheme(<StaffAugmentationListView initialCreateOpen />)
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+    })
+
+    expect(screen.getByRole('heading', { name: 'Crear placement' })).toBeInTheDocument()
+    expect(screen.getByText(/Alta comercial-operativa sobre un assignment existente/i)).toBeInTheDocument()
   })
 })

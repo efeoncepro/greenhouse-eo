@@ -2,6 +2,11 @@
 
 ## 2026-03-31
 
+- Staff Aug `Crear placement` vuelve a experiencia tipo drawer:
+  - `/agency/staff-augmentation/create` ya no muestra una página-card separada
+  - ahora reutiliza el listado con un drawer route-driven abierto sobre la misma vista
+  - se mantiene soporte para deep-link con `assignmentId` y para la ruta legacy `?create=1`
+  - el shell de apertura pasa de `Dialog` a `Drawer`
 - Se reparó en GCP el baseline faltante de PostgreSQL para Staff Aug en el entorno de `develop`:
   - `GET /api/agency/staff-augmentation/placements` estaba cayendo con `500` porque no existían las tablas `staff_aug_*` en `greenhouse-pg-dev / greenhouse_app`
   - se aplicó el setup canónico `pnpm setup:postgres:staff-augmentation` vía Cloud SQL Connector con perfil `migrator`

@@ -4,6 +4,25 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-31 — Staff Aug create flow vuelve a drawer seguro
+
+### Objetivo
+- Recuperar la UX de `drawer` para `Crear placement` sin volver al carril de página-card ni reintroducir el freeze ya investigado.
+
+### Delta de ejecución
+- `Agency > Staff Augmentation` vuelve a abrir el alta en `drawer`.
+- La ruta `/agency/staff-augmentation/create` ya no renderiza una página separada:
+  - ahora renderiza el listado con el drawer abierto
+  - el cierre vuelve al listado base
+- La ruta legacy `?create=1&assignmentId=...` sigue soportada en `/agency/staff-augmentation`.
+- Se eliminó el wrapper `CreatePlacementPageView` porque dejó de ser necesario al volver a un flujo route-driven sobre el listado.
+- El shell de apertura ya no usa `Dialog`; ahora usa `Drawer` con mount perezoso y apertura controlada por ruta.
+
+### Validación ejecutada
+- `pnpm exec vitest run src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.test.tsx src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.test.tsx src/views/greenhouse/people/tabs/PersonMembershipsTab.test.tsx --reporter=verbose`
+- `pnpm exec eslint 'src/app/(dashboard)/agency/staff-augmentation/page.tsx' 'src/app/(dashboard)/agency/staff-augmentation/create/page.tsx' src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.tsx src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.tsx src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.test.tsx src/views/greenhouse/people/tabs/PersonMembershipsTab.tsx src/views/greenhouse/people/tabs/PersonMembershipsTab.test.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+
 ## Sesión 2026-03-31 — Staff Aug Postgres baseline reparado en GCP para develop
 
 ### Objetivo

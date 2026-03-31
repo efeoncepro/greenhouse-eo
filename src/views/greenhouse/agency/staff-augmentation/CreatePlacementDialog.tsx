@@ -10,10 +10,7 @@ import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
 import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
-import Dialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import DialogTitle from '@mui/material/DialogTitle'
+import Drawer from '@mui/material/Drawer'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 import Paper from '@mui/material/Paper'
@@ -409,22 +406,40 @@ const CreatePlacementDialog = ({ open, onClose, onCreated, initialAssignmentId, 
   }
 
   return (
-    <Dialog
+    <Drawer
       open={open}
       onClose={onClose}
-      fullWidth
-      maxWidth='sm'
-      disableAutoFocus
-      disableEnforceFocus
-      disableRestoreFocus
-      keepMounted={false}
+      anchor='right'
+      ModalProps={{
+        keepMounted: false,
+        disableAutoFocus: true,
+        disableEnforceFocus: true,
+        disableRestoreFocus: true
+      }}
+      PaperProps={{
+        sx: {
+          width: { xs: '100%', sm: 560 },
+          maxWidth: '100vw'
+        }
+      }}
     >
-      <DialogTitle>Crear placement</DialogTitle>
-      <DialogContent>
+      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <Box sx={{ px: 6, py: 5 }}>
+          <Typography variant='h5'>Crear placement</Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
+            Alta comercial-operativa sobre un assignment existente.
+          </Typography>
+        </Box>
+        <Divider />
+        <Box sx={{ flex: 1, overflowY: 'auto', px: 6, py: 5 }}>
         {formContent}
-      </DialogContent>
-      <DialogActions>{actions}</DialogActions>
-    </Dialog>
+        </Box>
+        <Divider />
+        <Box sx={{ px: 6, py: 4, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+          {actions}
+        </Box>
+      </Box>
+    </Drawer>
   )
 }
 

@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 
 import type { Metadata } from 'next'
 
-import CreatePlacementPageView from '@/views/greenhouse/agency/staff-augmentation/CreatePlacementPageView'
+import StaffAugmentationListView from '@/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 
@@ -34,7 +34,7 @@ const StaffAugmentationCreatePage = async ({ searchParams }: Props) => {
 
   const resolvedSearchParams = searchParams ? await searchParams : undefined
 
-  return <CreatePlacementPageView initialAssignmentId={resolvedSearchParams?.assignmentId} />
+  return <StaffAugmentationListView initialCreateOpen initialAssignmentId={resolvedSearchParams?.assignmentId} />
 }
 
 export default StaffAugmentationCreatePage

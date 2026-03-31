@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
@@ -26,6 +27,8 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
 import tableStyles from '@core/styles/table.module.css'
+
+import CreatePlacementDialog from './CreatePlacementDialog'
 
 type PlacementListItem = {
   placementId: string
@@ -51,6 +54,11 @@ type PlacementListResponse = {
   }
   page: number
   pageSize: number
+}
+
+type Props = {
+  initialCreateOpen?: boolean
+  initialAssignmentId?: string | null
 }
 
 const STATUS_COLOR: Record<string, 'secondary' | 'info' | 'success' | 'warning' | 'primary' | 'error'> = {
@@ -147,7 +155,8 @@ const columns: ColumnDef<PlacementListItem, any>[] = [
   })
 ]
 
-const StaffAugmentationListView = () => {
+const StaffAugmentationListView = ({ initialCreateOpen = false, initialAssignmentId = null }: Props) => {
+  const router = useRouter()
   const [data, setData] = useState<PlacementListResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(0)
@@ -304,6 +313,14 @@ const StaffAugmentationListView = () => {
           </CardContent>
         </Card>
       </Grid>
+      {initialCreateOpen ? (
+        <CreatePlacementDialog
+          open
+          initialAssignmentId={initialAssignmentId}
+          onClose={() => router.push('/agency/staff-augmentation')}
+          onCreated={placementId => router.push(`/agency/staff-augmentation/${placementId}`)}
+        />
+      ) : null}
     </Grid>
   )
 }

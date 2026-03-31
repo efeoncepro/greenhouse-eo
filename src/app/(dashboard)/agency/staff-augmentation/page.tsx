@@ -35,17 +35,12 @@ const StaffAugmentationPage = async ({ searchParams }: Props) => {
 
   const resolvedSearchParams = searchParams ? await searchParams : undefined
 
-  if (resolvedSearchParams?.create === '1') {
-    const params = new URLSearchParams()
-
-    if (resolvedSearchParams.assignmentId) {
-      params.set('assignmentId', resolvedSearchParams.assignmentId)
-    }
-
-    redirect(`/agency/staff-augmentation/create${params.toString() ? `?${params.toString()}` : ''}`)
-  }
-
-  return <StaffAugmentationListView />
+  return (
+    <StaffAugmentationListView
+      initialCreateOpen={resolvedSearchParams?.create === '1'}
+      initialAssignmentId={resolvedSearchParams?.assignmentId}
+    />
+  )
 }
 
 export default StaffAugmentationPage

@@ -47,14 +47,14 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 - No aplica como capacidad nueva.
 
 ### Mejoras
-- `Crear placement` en `Agency > Staff Augmentation` ahora abre una página dedicada de creación, en vez de montarse dentro del listado.
+- `Crear placement` en `Agency > Staff Augmentation` vuelve a abrirse como drawer sobre el listado, manteniendo soporte de deep-link para abrir el flujo con `assignmentId`.
 
 ### Correcciones
-- Se reduce el riesgo de cuelgue del navegador al iniciar el flujo de alta de placement sobre assignments existentes.
+- Se mantiene el carril seguro de apertura después del repair de Postgres y se evita depender de una página-card separada para iniciar el alta.
 
 ### Notas
 - El flujo conserva búsqueda incremental, lectura contextual del assignment y creación del placement sobre el modelo canónico vigente.
-- Los deep-links desde `People` siguen disponibles vía `assignmentId`.
+- La experiencia vuelve a ser lateral y contextual dentro de `Agency > Staff Augmentation`.
 
 ## 2026.03-beta.1
 **Canal:** Beta
