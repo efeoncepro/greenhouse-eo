@@ -6,8 +6,6 @@
 --          parent_module_code links service modules to their parent BL.
 -- ────────────────────────────────────────────────────────────────────────
 
-BEGIN;
-
 -- 1. Add columns
 ALTER TABLE greenhouse_core.service_modules
   ADD COLUMN IF NOT EXISTS module_kind TEXT,
@@ -55,5 +53,3 @@ SET
   applied_by = EXCLUDED.applied_by,
   notes = EXCLUDED.notes,
   applied_at = CURRENT_TIMESTAMP;
-
-COMMIT;

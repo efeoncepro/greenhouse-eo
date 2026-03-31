@@ -6,7 +6,13 @@
 -- Depends on: add-service-modules-kind-v1 (module_kind must exist)
 -- ────────────────────────────────────────────────────────────────────────
 
-BEGIN;
+-- 0. Ensure all 5 canonical business lines exist in service_modules
+--    (prod DB was bootstrapped from BigQuery and may be missing some)
+INSERT INTO greenhouse_core.service_modules (module_id, module_code, module_name, business_line, module_kind, parent_module_code, status, active)
+VALUES
+  ('module-business-line-efeonce-digital', 'efeonce_digital', 'Efeonce Digital', 'efeonce_digital', 'business_line', NULL, 'active', TRUE),
+  ('module-business-line-reach', 'reach', 'Reach', 'reach', 'business_line', NULL, 'active', TRUE)
+ON CONFLICT (module_code) DO NOTHING;
 
 -- 1. Create table
 CREATE TABLE IF NOT EXISTS greenhouse_core.business_line_metadata (
@@ -159,5 +165,3 @@ SET
   applied_by = EXCLUDED.applied_by,
   notes = EXCLUDED.notes,
   applied_at = CURRENT_TIMESTAMP;
-
-COMMIT;
