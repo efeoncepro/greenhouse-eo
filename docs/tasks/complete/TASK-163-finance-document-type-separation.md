@@ -1,14 +1,25 @@
 # TASK-163 — Finance Document Type Separation: Cotizaciones, Notas de Crédito/Débito
 
+## Delta 2026-03-30
+
+- Esta task quedó absorbida por el runtime actual y no debe leerse como diseño pendiente.
+- Estado real ya implementado:
+  - `income_type` y `dte_type_code` ya gobiernan listados y filtros de ingresos
+  - las cotizaciones ya no inflan los dashboards principales de revenue/P&L
+  - `TASK-138` y `TASK-139` quedaron cerradas sobre esta semántica corregida
+  - la emisión/retry DTE ya preserva `dte_type_code`
+- El detalle fino de UI/reporting puede seguir evolucionando, pero la separación documental básica de tipos DTE ya no está abierta como gap estructural.
+
 ## Status
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `complete` |
 | Priority | `P0` |
 | Impact | `Muy alto` |
 | Effort | `Alto` |
-| Status real | `Diseño` |
+| Status real | `Implementado y absorbido` |
+| Closed | `2026-03-30` |
 | Rank | — |
 | Domain | Finance / Data Integrity / Nubox |
 | Sequence | Independiente, afecta toda la capa financiera |
@@ -18,6 +29,10 @@
 Todos los documentos de Nubox (facturas, cotizaciones, notas de crédito, notas de débito) se almacenan como registros positivos en `greenhouse_finance.income`. Esto causa que los ingresos reportados sean **incorrectos**: cotizaciones inflan el ingreso (no son ventas), notas de crédito suman en vez de restar, y el P&L del portal no refleja la realidad contable.
 
 Los campos `dte_type_code` e `income_type` ya se capturan correctamente en cada registro — el problema es que **nadie los usa** en queries, cálculos ni UI.
+
+Estado histórico:
+- este resumen describe el problema original que dio origen a la task
+- ya no describe el estado runtime actual del portal
 
 ## Why This Task Exists
 
@@ -115,6 +130,12 @@ Desventaja: cada query de SUM necesita el CASE WHEN.
   - TASK-138 (Finance Intelligence) — DSO/DPO/ratio correctos
   - TASK-143 (Agency Economics) — P&L por Space correcto
   - Todas las surfaces que muestran revenue
+
+## Resultado real de cierre
+
+- `income` ya distingue semánticamente tipos documentales relevantes para Finance runtime.
+- Los dashboards y listados principales ya no dependen de una lectura ciega de todos los DTE como ingreso homogéneo.
+- La deuda restante ya no es “separación de tipos documentales”, sino follow-ons específicos de UX, reporting o sincronización adicional cuando aparezcan nuevos casos tributarios.
 
 ## Scope
 

@@ -1,5 +1,13 @@
 # changelog.md
 
+## 2026-03-30 (session 3)
+
+- Se reconciliaron documentos rezagados de Finance/Nubox para que la documentación no siga describiendo un estado anterior al runtime real:
+  - `FINANCE_DUAL_STORE_CUTOVER_V1.md` quedó explícitamente marcado como historial de migración y no como estado operativo vigente
+  - `TASK-163` quedó alineada al estado implementado de separación documental DTE
+  - `TASK-165` quedó alineada al enrichment Nubox ya absorbido por runtime y UI/detail
+- Con esto, la lectura canónica del estado actual de Finance vuelve a concentrarse en `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `TASK-166` y `TASK-050`.
+
 ## 2026-03-30 (session 2)
 
 - Finance DTE download hardening:

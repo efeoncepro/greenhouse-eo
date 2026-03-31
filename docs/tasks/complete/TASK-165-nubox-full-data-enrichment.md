@@ -1,5 +1,17 @@
 # TASK-165 — Nubox Full Data Enrichment: All Fields, Line Items, References, Balances & Sync Hardening
 
+## Delta 2026-03-30
+
+- Esta task ya no está en modo plan; el baseline quedó implementado y endurecido en runtime.
+- Estado real a la fecha:
+  - el sync enriquecido ya materializa campos ricos de Nubox en Postgres
+  - la UI/detail de income ya consume artefactos enriquecidos como `nuboxPdfUrl` y `nuboxXmlUrl`
+  - el incidente de descarga `401` quedó mitigado priorizando URLs directas cuando ya existen en el record
+  - los remanentes futuros deben tratarse como follow-ons localizados, no como reapertura de esta task
+- Referencias vivas:
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/tasks/complete/TASK-139-finance-module-hardening.md`
+
 ## Status
 
 | Campo | Valor |
@@ -17,6 +29,10 @@
 ## Summary
 
 Nubox envía datos ricos en cada documento (detalle de líneas, referencias entre documentos, balance de cobro, estado SII, URLs a PDF/XML, forma de pago, montos exentos, retenciones, tipo de compra) pero Greenhouse solo aprovecha un subset. Esta task trae TODO lo que Nubox ofrece, lo integra en las tablas correctas de Postgres, habilita reconciliación cruzada, alertas tributarias, y migra el sync conformed de DELETE/INSERT a upsert incremental.
+
+Estado histórico:
+- este summary describe el gap original que originó la task
+- no debe interpretarse como deuda abierta del runtime actual
 
 ## Why This Task Exists
 
@@ -97,6 +113,12 @@ Nubox provee un link `rel: "references"` que conecta notas de crédito con su fa
   - TASK-139 (Data Quality) — nuevo check de balance divergence
   - Finance Dashboard — cash flow con payment_form
   - Todos los consumers de income/expenses
+
+## Resultado real de cierre
+
+- Nubox enrichment quedó institucionalizado como baseline del carril Finance/Nubox.
+- El runtime actual ya reutiliza metadata tributaria y enlaces ricos materializados por sync.
+- El fetch/download de PDF/XML ya quedó endurecido para preferir links directos cuando existen, manteniendo fallback al proxy solo como compatibilidad.
 
 ## Scope
 

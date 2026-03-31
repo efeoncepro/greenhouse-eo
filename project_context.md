@@ -1,5 +1,13 @@
 # project_context.md
 
+## Delta 2026-03-30 Finance/Nubox docs reconciled to runtime
+- `docs/architecture/FINANCE_DUAL_STORE_CUTOVER_V1.md` ya no debe leerse como snapshot operativo actual; quedó explícitamente reclasificado como historial de migración.
+- `TASK-163` y `TASK-165` quedaron alineadas al estado real ya absorbido por runtime para evitar que futuros agentes reabran lanes que ya cerraron en código.
+- La lectura canónica del estado actual de Finance sigue concentrada en:
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/tasks/complete/TASK-166-finance-bigquery-write-cutover.md`
+  - `docs/tasks/complete/TASK-050-finance-client-canonical-runtime-cutover.md`
+
 ## Delta 2026-03-30 Nubox DTE download hardening
 - `IncomeDetailView` ahora reutiliza `nuboxPdfUrl` y `nuboxXmlUrl` directos cuando el sync ya los materializó, en vez de forzar siempre el proxy server-side de descarga.
 - `src/lib/nubox/client.ts` normaliza `NUBOX_API_BASE_URL` y `NUBOX_X_API_KEY` con `trim()` y envía `Accept` explícito para descargas `pdf/xml`.

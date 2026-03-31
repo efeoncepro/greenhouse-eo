@@ -4,6 +4,23 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — reconciliación documental final Finance/Nubox
+
+### Objetivo
+- Cerrar el drift documental que quedaba después de los últimos cutovers de Finance Clients, BigQuery fail-closed y Nubox enrichment.
+
+### Delta de ejecución
+- `docs/architecture/FINANCE_DUAL_STORE_CUTOVER_V1.md` quedó degradado explícitamente a historial de migración; ya no debe leerse como estado operativo vigente.
+- `docs/tasks/complete/TASK-163-finance-document-type-separation.md` quedó alineada a estado `complete`, dejando claro que el problema original fue absorbido por el runtime actual.
+- `docs/tasks/complete/TASK-165-nubox-full-data-enrichment.md` quedó alineada a estado implementado real y al hardening reciente de PDF/XML en Income detail.
+- La fuente viva para el estado actual de Finance queda reafirmada en:
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/tasks/complete/TASK-166-finance-bigquery-write-cutover.md`
+  - `docs/tasks/complete/TASK-050-finance-client-canonical-runtime-cutover.md`
+
+### Validación ejecutada
+- `git diff --check`
+
 ## Sesión 2026-03-30 — fix de descarga PDF/XML Nubox en Finance income detail
 
 ### Objetivo
