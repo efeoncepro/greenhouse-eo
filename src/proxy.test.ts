@@ -30,6 +30,26 @@ describe('proxy', () => {
     vi.unstubAllEnvs()
   })
 
+  it('allows vercel live frames outside production', () => {
+    vi.stubEnv('VERCEL_ENV', 'preview')
+
+    const response = proxy(new NextRequest('https://example.com/dashboard'))
+
+    expect(response.headers.get('Content-Security-Policy-Report-Only')).toContain('https://vercel.live')
+
+    vi.unstubAllEnvs()
+  })
+
+  it('keeps vercel live out of production csp', () => {
+    vi.stubEnv('VERCEL_ENV', 'production')
+
+    const response = proxy(new NextRequest('https://example.com/dashboard'))
+
+    expect(response.headers.get('Content-Security-Policy-Report-Only')).not.toContain('https://vercel.live')
+
+    vi.unstubAllEnvs()
+  })
+
   it('responds cleanly to page OPTIONS requests', () => {
     const request = new NextRequest('https://example.com/dashboard', {
       method: 'OPTIONS'

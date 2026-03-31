@@ -29,6 +29,13 @@
   - el cambio apunta a eliminar `400` espurios vistos durante prefetch de `/dashboard`
   - `/api/**` conserva su comportamiento normal y no queda short-circuiteado por este fix
 
+## 2026-03-30 (session 7)
+
+- Ajuste final de CSP report-only para entornos no productivos:
+  - `preview/staging` permiten `https://vercel.live` en `frame-src`
+  - `production` se mantiene más estricta y no incorpora esa fuente
+- Con esto, el ruido de consola asociado a Vercel Live deja de contaminar la verificación manual de `staging`.
+
 ## 2026-03-30 (session 3)
 
 - Se reconciliaron documentos rezagados de Finance/Nubox para que la documentación no siga describiendo un estado anterior al runtime real:

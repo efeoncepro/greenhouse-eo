@@ -27,6 +27,13 @@
 - Cobertura:
   - `src/proxy.test.ts` ahora valida tanto el caso page-route como el guard explícito sobre API routes.
 
+## Delta 2026-03-30 CSP report-only ajustada para Vercel Live fuera de production
+- `src/proxy.ts` ahora arma `frame-src` de la CSP report-only según entorno.
+- Regla vigente:
+  - `production` no incorpora `https://vercel.live`
+  - `preview/staging` sí lo incorporan para evitar ruido de consola del toolbar/bridge de Vercel Live
+- Esto no cambia la política efectiva de negocio del portal; solo limpia señal observacional en entornos no productivos.
+
 ## Delta 2026-03-30 Finance/Nubox docs reconciled to runtime
 - `docs/architecture/FINANCE_DUAL_STORE_CUTOVER_V1.md` ya no debe leerse como snapshot operativo actual; quedó explícitamente reclasificado como historial de migración.
 - `TASK-163` y `TASK-165` quedaron alineadas al estado real ya absorbido por runtime para evitar que futuros agentes reabran lanes que ya cerraron en código.

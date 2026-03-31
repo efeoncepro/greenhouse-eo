@@ -60,6 +60,26 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - `pnpm exec tsc --noEmit --pretty false`
 - `git diff --check`
 
+## Sesión 2026-03-30 — cierre del ruido `vercel.live` en CSP report-only
+
+### Objetivo
+- Cerrar el ruido residual de consola en `staging/preview` sin relajar la postura de `production`.
+
+### Delta de ejecución
+- `src/proxy.ts` ahora construye la CSP report-only según entorno:
+  - `production` conserva `frame-src` limitado a las fuentes originales
+  - `preview/staging` permiten además `https://vercel.live` en `frame-src`
+- El cambio es deliberadamente acotado al canal report-only y no modifica la política efectiva de runtime de `production`.
+- Tests reforzados en `src/proxy.test.ts`:
+  - `vercel.live` presente fuera de `production`
+  - `vercel.live` ausente en `production`
+
+### Validación ejecutada
+- `pnpm exec vitest run src/proxy.test.ts`
+- `pnpm exec eslint src/proxy.ts src/proxy.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
 ## Sesión 2026-03-30 — reconciliación documental final Finance/Nubox
 
 ### Objetivo
