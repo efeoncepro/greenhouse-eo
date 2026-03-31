@@ -38,9 +38,9 @@ describe('GET /api/team/capacity-breakdown', () => {
 
       // Query 2: active assignments
       .mockResolvedValueOnce([
-        { assignment_id: 'a-internal', member_id: 'member-1', client_id: 'client_internal', client_name: 'Efeonce Internal', role_title_override: null, fte_allocation: '1.000', contracted_hours_month: 160, start_date: '2026-01-01' },
-        { assignment_id: 'a-sky', member_id: 'member-1', client_id: 'client-sky', client_name: 'Sky Airline', role_title_override: null, fte_allocation: '1.000', contracted_hours_month: 160, start_date: '2026-01-01' },
-        { assignment_id: 'a-sky-2', member_id: 'member-2', client_id: 'client-sky', client_name: 'Sky Airline', role_title_override: null, fte_allocation: '0.300', contracted_hours_month: 48, start_date: '2026-02-01' }
+        { assignment_id: 'a-internal', member_id: 'member-1', client_id: 'client_internal', client_name: 'Efeonce Internal', role_title_override: null, fte_allocation: '1.000', contracted_hours_month: 160, start_date: '2026-01-01', assignment_type: 'internal', placement_id: null, placement_status: null },
+        { assignment_id: 'a-sky', member_id: 'member-1', client_id: 'client-sky', client_name: 'Sky Airline', role_title_override: null, fte_allocation: '1.000', contracted_hours_month: 160, start_date: '2026-01-01', assignment_type: 'staff_augmentation', placement_id: 'placement-1', placement_status: 'active' },
+        { assignment_id: 'a-sky-2', member_id: 'member-2', client_id: 'client-sky', client_name: 'Sky Airline', role_title_override: null, fte_allocation: '0.300', contracted_hours_month: 48, start_date: '2026-02-01', assignment_type: 'internal', placement_id: null, placement_status: null }
       ])
 
     mockReadMemberCapacityEconomicsBatch.mockResolvedValue(
@@ -79,6 +79,11 @@ describe('GET /api/team/capacity-breakdown', () => {
       usageKind: 'percent'
     })
     expect(body.members[0].assignments).toHaveLength(1) // only Sky, not internal
+    expect(body.members[0].assignments[0]).toMatchObject({
+      assignmentType: 'staff_augmentation',
+      placementId: 'placement-1',
+      placementStatus: 'active'
+    })
 
     // Luis: has external assignment but no snapshot — uses fallback
     expect(body.members[1]).toMatchObject({
@@ -102,7 +107,7 @@ describe('GET /api/team/capacity-breakdown', () => {
         { member_id: 'member-1', display_name: 'Daniela Ferreira', role_title: 'Designer', role_category: 'design' }
       ])
       .mockResolvedValueOnce([
-        { assignment_id: 'a-1', member_id: 'member-1', client_id: 'client-sky', client_name: 'Sky Airline', role_title_override: null, fte_allocation: '1.000', contracted_hours_month: 160, start_date: null }
+        { assignment_id: 'a-1', member_id: 'member-1', client_id: 'client-sky', client_name: 'Sky Airline', role_title_override: null, fte_allocation: '1.000', contracted_hours_month: 160, start_date: null, assignment_type: 'internal', placement_id: null, placement_status: null }
       ])
 
     mockReadMemberCapacityEconomicsBatch.mockResolvedValue(

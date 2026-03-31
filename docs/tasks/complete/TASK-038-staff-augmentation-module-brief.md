@@ -1,5 +1,28 @@
 # CODEX TASK — Staff Augmentation Module: Gestión de Placements y Capa Comercial para Greenhouse
 
+## Delta 2026-03-31
+- Este brief queda absorbido como framing histórico por [TASK-169-staff-aug-placement-bridge-hris-runtime-consolidation.md](/Users/jreye/Documents/greenhouse-eo/docs/tasks/in-progress/TASK-169-staff-aug-placement-bridge-hris-runtime-consolidation.md).
+- No volver a ejecutar literalmente desde aquí:
+  - `/internal/staff-augmentation`
+  - `greenhouse_core.staff_aug_*`
+  - `CreatePlacementDrawer`
+  - `BigQuery` como write path operativo del módulo
+- El bridge vigente ya no es `ghost slot -> placement`; el runtime real es:
+  - `membership` como contexto organizacional
+  - `assignment` como ancla operativa
+  - `placement` como capa comercial-operativa Staff Aug
+
+## Delta 2026-03-30
+- `TASK-019` ya cerró el baseline runtime de Staff Augmentation. Este brief queda explícitamente como framing histórico/producto y no debe ejecutarse literalmente.
+- Drift principal confirmado contra runtime:
+  - schema real en `greenhouse_delivery.staff_aug_*` y `greenhouse_serving.staff_aug_placement_snapshots`
+  - surface real en `/agency/staff-augmentation/*`
+  - navegación y governance reales sobre `gestion.staff_augmentation`
+  - checklist real en `staff_aug_onboarding_items`
+- Cualquier follow-on debe montarse sobre:
+  - [TASK-019-staff-augmentation-module.md](/Users/jreye/Documents/greenhouse-eo/docs/tasks/complete/TASK-019-staff-augmentation-module.md)
+  - `TASK-041` para integración HRIS adicional
+
 ## Delta 2026-03-27
 - **Nuevo prerequisito:** TASK-060 (Team Assignment Admin) construye la gestión centralizada de assignments en Agency > Team. Staff Aug extiende esa base con `assignment_type = 'staff_augmentation'`, billing rates, SLA, compliance y onboarding — no necesita construir el CRUD de assignments desde cero.
 - TASK-056 y TASK-057 cerraron la cadena de loaded cost (labor + shared + direct overhead). Staff Aug hereda esa economía para calcular márgenes reales por placement.

@@ -1,6 +1,44 @@
 # CODEX TASK -- Business Units Canonical v2: metadata canonica sobre business_line y separacion comercial vs operativa
 
+## Delta 2026-03-31
+
+Fase 1 implementada:
+- Migration `add-service-modules-kind.sql`: module_kind + parent_module_code en PG service_modules
+- Migration `create-business-line-metadata.sql`: tabla + seed con colores de GH_COLORS.service
+- Type `BusinessLineMetadata` + `BusinessLineMetadataSummary` en `src/types/business-line.ts`
+- Helper `loadBusinessLineMetadata()` + cache server-side en `src/lib/business-line/metadata.ts`
+- API `GET/PUT /api/admin/business-lines[/moduleCode]`
+- `TenantContext.businessLineMetadata` enrichment via cached query
+- `BusinessLineMetadataCard` component + barrel export
+- Admin page `/admin/business-lines` con edit dialog
+- `brand-assets.ts` — added crm_solutions
+- `getCapabilityPaletteFromMetadata()` — metadata-driven palette resolver
+
+Fase 2 implementada:
+- BQ DDL `bigquery/greenhouse_dim_business_lines_v1.sql`
+- ETL script `scripts/etl-business-lines-to-bigquery.ts` (PG → BQ full replace)
+- `greenhouse_conformed.dim_business_lines` live con 5 BLs
+- Finance `/api/finance/dashboard/by-service-line` enriched con label, colorHex, loopPhase desde metadata
+- Missing BLs (efeonce_digital, reach) insertadas en PG service_modules de producción
+
+Fase 3 implementada:
+- Propiedad `Business Unit` (Select) creada en Notion Proyectos via API
+  Opciones: Globe, Efeonce Digital, Reach, Wave, CRM Solutions
+- `sync-notion-conformed.ts` extendido: lee `business_unit` de `notion_ops.proyectos`,
+  normaliza label→module_code, escribe `operating_business_unit` a `delivery_projects`
+- BQ `greenhouse_conformed.delivery_projects` — columna `operating_business_unit` agregada
+- DDL en `setup-bigquery-source-sync.sql` actualizado
+
+Fase 4 implementada:
+- `ICO_DIMENSIONS` allowlist: agregado `business_unit` → `operating_business_unit`
+- `v_tasks_enriched` view: JOIN a `delivery_projects` para exponer `operating_business_unit`
+- BQ tabla `ico_engine.metrics_by_business_unit` (DDL + infra provisioning)
+- `materializeBusinessUnitMetrics()` en `materialize.ts` (Step 10)
+- API live compute via `/api/ico-engine/context?dimension=business_unit&value=wave`
+
 ## Estado
+
+**Complete** — Fases 1-4 implementadas 2026-03-31.
 
 Baseline canonica de implementacion al 2026-03-19.
 

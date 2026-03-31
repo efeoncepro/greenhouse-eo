@@ -105,9 +105,14 @@ const buildTasksEnrichedView = (projectId: string) => `
       WHEN dt.completed_at IS NOT NULL AND dt.due_date IS NOT NULL
         AND DATE(dt.completed_at) > dt.due_date THEN 'late'
       ELSE 'unknown'
-    END AS delivery_signal
+    END AS delivery_signal,
+
+    -- Operating business unit (from project, not from commercial context)
+    dp.operating_business_unit
 
   FROM \`${projectId}.${CONFORMED_DATASET}.delivery_tasks\` dt
+  LEFT JOIN \`${projectId}.${CONFORMED_DATASET}.delivery_projects\` dp
+    ON dp.project_source_id = dt.project_source_id AND dp.is_deleted = FALSE
   LEFT JOIN \`${projectId}.${ICO_DATASET}.status_phase_config\` spc
     ON spc.space_id = dt.space_id AND spc.task_status = dt.task_status
   WHERE dt.is_deleted = FALSE
@@ -342,6 +347,34 @@ const buildMetricsByOrganizationTable = (projectId: string) => `
 `
 
 /**
+ * Business-unit-level metrics. Keyed by operating_business_unit (from delivery_projects).
+ * Semantic: who executes the project, not who sold it. See TASK-016.
+ */
+const buildMetricsByBusinessUnitTable = (projectId: string) => `
+  CREATE TABLE IF NOT EXISTS \`${projectId}.${ICO_DATASET}.metrics_by_business_unit\` (
+    business_unit STRING NOT NULL,
+    period_year INT64 NOT NULL,
+    period_month INT64 NOT NULL,
+    rpa_avg FLOAT64,
+    rpa_median FLOAT64,
+    otd_pct FLOAT64,
+    ftr_pct FLOAT64,
+    cycle_time_avg_days FLOAT64,
+    cycle_time_p50_days FLOAT64,
+    cycle_time_variance FLOAT64,
+    throughput_count INT64,
+    pipeline_velocity FLOAT64,
+    stuck_asset_count INT64,
+    stuck_asset_pct FLOAT64,
+    total_tasks INT64,
+    completed_tasks INT64,
+    active_tasks INT64,
+    materialized_at TIMESTAMP
+  )
+  CLUSTER BY business_unit
+`
+
+/**
  * Configurable mapping of task_status → CSC phase per space.
  * Used by v_tasks_enriched via LEFT JOIN — unmapped statuses fall back to the
  * hardcoded CASE (Efeonce defaults).
@@ -433,7 +466,8 @@ export const ensureIcoEngineInfrastructure = async () => {
           WHERE table_name IN (
             'metric_snapshots_monthly', 'ai_metric_scores',
             'stuck_assets_detail', 'rpa_trend', 'metrics_by_project',
-            'metrics_by_member', 'metrics_by_sprint', 'metrics_by_organization', 'status_phase_config'
+            'metrics_by_member', 'metrics_by_sprint', 'metrics_by_organization',
+            'metrics_by_business_unit', 'status_phase_config'
           )
         `
       })
@@ -451,6 +485,7 @@ export const ensureIcoEngineInfrastructure = async () => {
         ['metrics_by_member', buildMetricsByMemberTable(projectId)],
         ['metrics_by_sprint', buildMetricsBySprintTable(projectId)],
         ['metrics_by_organization', buildMetricsByOrganizationTable(projectId)],
+        ['metrics_by_business_unit', buildMetricsByBusinessUnitTable(projectId)],
         ['status_phase_config', buildStatusPhaseConfigTable(projectId)]
       ]
 

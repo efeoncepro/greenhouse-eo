@@ -8,6 +8,8 @@ export type PayrollExportPackageDeliveryStatus = 'pending' | 'sent' | 'failed'
 export interface PayrollExportPackageRecord {
   periodId: string
   storageBucket: string | null
+  pdfAssetId: string | null
+  csvAssetId: string | null
   pdfStoragePath: string | null
   csvStoragePath: string | null
   pdfFileSizeBytes: number | null
@@ -29,6 +31,8 @@ export interface PayrollExportPackageRecord {
 type PayrollExportPackageRow = {
   period_id: string
   storage_bucket: string | null
+  pdf_asset_id: string | null
+  csv_asset_id: string | null
   pdf_storage_path: string | null
   csv_storage_path: string | null
   pdf_file_size_bytes: number | string | null
@@ -57,6 +61,8 @@ const normalizeDeliveryStatus = (value: string | null): PayrollExportPackageDeli
 const mapPackage = (row: PayrollExportPackageRow): PayrollExportPackageRecord => ({
   periodId: row.period_id,
   storageBucket: normalizeNullableString(row.storage_bucket),
+  pdfAssetId: normalizeNullableString(row.pdf_asset_id),
+  csvAssetId: normalizeNullableString(row.csv_asset_id),
   pdfStoragePath: normalizeNullableString(row.pdf_storage_path),
   csvStoragePath: normalizeNullableString(row.csv_storage_path),
   pdfFileSizeBytes: row.pdf_file_size_bytes == null ? null : toNumber(row.pdf_file_size_bytes),
@@ -91,6 +97,8 @@ const ensureSchema = async () => {
       CREATE TABLE IF NOT EXISTS greenhouse_payroll.payroll_export_packages (
         period_id TEXT PRIMARY KEY REFERENCES greenhouse_payroll.payroll_periods(period_id) ON DELETE CASCADE,
         storage_bucket TEXT,
+        pdf_asset_id TEXT,
+        csv_asset_id TEXT,
         pdf_storage_path TEXT,
         csv_storage_path TEXT,
         pdf_file_size_bytes INTEGER,
@@ -154,6 +162,8 @@ export const getPayrollExportPackageByPeriodId = async (periodId: string): Promi
 export const upsertPayrollExportPackageArtifacts = async (input: {
   periodId: string
   storageBucket: string
+  pdfAssetId?: string | null
+  csvAssetId?: string | null
   pdfStoragePath: string
   csvStoragePath: string
   pdfFileSizeBytes: number
@@ -170,6 +180,8 @@ export const upsertPayrollExportPackageArtifacts = async (input: {
       INSERT INTO greenhouse_payroll.payroll_export_packages (
         period_id,
         storage_bucket,
+        pdf_asset_id,
+        csv_asset_id,
         pdf_storage_path,
         csv_storage_path,
         pdf_file_size_bytes,
@@ -183,12 +195,14 @@ export const upsertPayrollExportPackageArtifacts = async (input: {
         created_at,
         updated_at
       ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8,
-        $9, $10, 'pending', 0,
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
+        $11, $12, 'pending', 0,
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
       )
       ON CONFLICT (period_id) DO UPDATE SET
         storage_bucket = EXCLUDED.storage_bucket,
+        pdf_asset_id = COALESCE(EXCLUDED.pdf_asset_id, greenhouse_payroll.payroll_export_packages.pdf_asset_id),
+        csv_asset_id = COALESCE(EXCLUDED.csv_asset_id, greenhouse_payroll.payroll_export_packages.csv_asset_id),
         pdf_storage_path = EXCLUDED.pdf_storage_path,
         csv_storage_path = EXCLUDED.csv_storage_path,
         pdf_file_size_bytes = EXCLUDED.pdf_file_size_bytes,
@@ -203,6 +217,8 @@ export const upsertPayrollExportPackageArtifacts = async (input: {
     [
       input.periodId,
       input.storageBucket,
+      input.pdfAssetId ?? null,
+      input.csvAssetId ?? null,
       input.pdfStoragePath,
       input.csvStoragePath,
       input.pdfFileSizeBytes,

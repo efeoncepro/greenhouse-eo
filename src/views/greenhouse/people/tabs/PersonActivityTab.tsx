@@ -4,21 +4,25 @@ import { useEffect, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 
+import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
+import Card from '@mui/material/Card'
+import CardHeader from '@mui/material/CardHeader'
 import CircularProgress from '@mui/material/CircularProgress'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
-import Typography from '@mui/material/Typography'
+import Stack from '@mui/material/Stack'
 import { useTheme } from '@mui/material/styles'
 import type { ApexOptions } from 'apexcharts'
 
+import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import SectionErrorBoundary from '@/components/greenhouse/SectionErrorBoundary'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import ExecutiveCardShell from '@/components/greenhouse/ExecutiveCardShell'
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
-import { THRESHOLD_ZONE_COLOR, type ThresholdZone , CSC_PHASE_LABELS, type CscPhase } from '@/lib/ico-engine/metric-registry'
+import { THRESHOLD_ZONE_COLOR, type ThresholdZone, CSC_PHASE_LABELS, type CscPhase } from '@/lib/ico-engine/metric-registry'
 import type { IcoMetricSnapshot, MetricValue, CscDistributionEntry } from '@/lib/ico-engine/read-metrics'
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
@@ -128,6 +132,7 @@ const PersonActivityTab = ({ memberId }: Props) => {
     : []
 
   const cscTotal = cscEntries.reduce((sum, e) => sum + e.count, 0)
+  const hasCsc = cscEntries.length > 0
 
   const donutOptions: ApexOptions = {
     chart: { type: 'donut', toolbar: { show: false }, background: 'transparent' },
@@ -237,6 +242,7 @@ const PersonActivityTab = ({ memberId }: Props) => {
 
   const velocity = hasData ? getMetricValue(data, 'pipeline_velocity') : null
   const velocityPct = velocity !== null ? Math.min(100, Math.round(velocity * 100)) : 0
+  const hasVelocity = velocity !== null
 
   const velocityOptions: ApexOptions = {
     chart: { type: 'radialBar', toolbar: { show: false }, background: 'transparent' },
@@ -261,40 +267,87 @@ const PersonActivityTab = ({ memberId }: Props) => {
     tooltip: { enabled: false }
   }
 
+  const velocityInlineOptions: ApexOptions = {
+    chart: { type: 'radialBar', toolbar: { show: false }, background: 'transparent', sparkline: { enabled: true } },
+    theme: { mode },
+    plotOptions: {
+      radialBar: {
+        startAngle: -135,
+        endAngle: 135,
+        hollow: { size: '55%' },
+        track: {
+          background: mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+          strokeWidth: '100%'
+        },
+        dataLabels: {
+          name: { show: false },
+          value: { fontSize: '16px', fontWeight: 700, offsetY: 4 }
+        }
+      }
+    },
+    colors: [GH_COLORS.semaphore.yellow.source],
+    labels: ['Velocidad'],
+    tooltip: { enabled: false }
+  }
+
+  // ── Decide chart layout ────────────────────────────────────────────
+  // If both CSC + velocity exist: radar (md=7) + CSC (md=5), velocity inline in summary
+  // If only CSC: radar (md=7) + CSC (md=5)
+  // If only velocity: radar (md=7) + velocity (md=5)
+  // If neither: radar only (md=12)
+
+  const showCscChart = hasCsc
+  const showVelocityStandalone = hasVelocity && !hasCsc
+  const showVelocityInline = hasVelocity && hasCsc
+  const hasSecondaryChart = showCscChart || showVelocityStandalone
+
   // ── Render ──────────────────────────────────────────────────────────
 
   return (
     <Grid container spacing={6}>
-      {/* Period selectors */}
+      {/* Period header */}
       <Grid size={{ xs: 12 }}>
-        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-          <CustomTextField
-            select
-            size='small'
-            value={month}
-            onChange={e => setMonth(Number(e.target.value))}
-            sx={{ minWidth: 120 }}
-          >
-            {MONTH_SHORT.slice(1).map((label, i) => (
-              <MenuItem key={i + 1} value={i + 1}>
-                {label}
-              </MenuItem>
-            ))}
-          </CustomTextField>
-          <CustomTextField
-            select
-            size='small'
-            value={year}
-            onChange={e => setYear(Number(e.target.value))}
-            sx={{ minWidth: 100 }}
-          >
-            {years.map(y => (
-              <MenuItem key={y} value={y}>
-                {y}
-              </MenuItem>
-            ))}
-          </CustomTextField>
-        </Box>
+        <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+          <CardHeader
+            title='Actividad del período'
+            subheader='Métricas ICO de rendimiento y producción'
+            avatar={
+              <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
+                <i className='tabler-chart-dots' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} />
+              </Avatar>
+            }
+            action={
+              <Stack direction='row' spacing={2} alignItems='center'>
+                <CustomTextField
+                  select
+                  size='small'
+                  value={month}
+                  onChange={e => setMonth(Number(e.target.value))}
+                  sx={{ minWidth: 100 }}
+                >
+                  {MONTH_SHORT.slice(1).map((label, i) => (
+                    <MenuItem key={i + 1} value={i + 1}>
+                      {label}
+                    </MenuItem>
+                  ))}
+                </CustomTextField>
+                <CustomTextField
+                  select
+                  size='small'
+                  value={year}
+                  onChange={e => setYear(Number(e.target.value))}
+                  sx={{ minWidth: 90 }}
+                >
+                  {years.map(y => (
+                    <MenuItem key={y} value={y}>
+                      {y}
+                    </MenuItem>
+                  ))}
+                </CustomTextField>
+              </Stack>
+            }
+          />
+        </Card>
       </Grid>
 
       {loading ? (
@@ -313,75 +366,81 @@ const PersonActivityTab = ({ memberId }: Props) => {
         </Grid>
       ) : (
         <>
-          {/* KPI Row */}
-          <Grid size={{ xs: 12 }}>
-            <SectionErrorBoundary sectionName='person-activity-kpis' description='No pudimos calcular los KPIs de actividad.'>
-              <Box sx={{ display: 'flex', gap: 3, overflowX: 'auto', pb: 1 }}>
-                {KPI_CONFIG.map(kpi => {
-                  const metric = getMetric(data, kpi.id)
-                  const value = metric?.value ?? null
-                  const zoneColor = getZoneColor(metric?.zone ?? null)
+          {/* KPI Grid — 3 per row on desktop, 2 on mobile */}
+          <SectionErrorBoundary sectionName='person-activity-kpis' description='No pudimos calcular los KPIs de actividad.'>
+            {KPI_CONFIG.map(kpi => {
+              const metric = getMetric(data, kpi.id)
+              const value = metric?.value ?? null
+              const zoneColor = getZoneColor(metric?.zone ?? null)
 
-                  return (
-                    <Box key={kpi.id} sx={{ minWidth: 160, flex: '1 1 0' }}>
-                      <HorizontalWithSubtitle
-                        title={kpi.label}
-                        stats={kpi.format(value)}
-                        avatarIcon={kpi.icon}
-                        avatarColor={zoneColor}
-                        subtitle={`${MONTH_SHORT[month]} ${year}`}
+              return (
+                <Grid size={{ xs: 6, sm: 4, md: 4 }} key={kpi.id}>
+                  <HorizontalWithSubtitle
+                    title={kpi.label}
+                    stats={kpi.format(value)}
+                    avatarIcon={kpi.icon}
+                    avatarColor={zoneColor}
+                    subtitle={`${MONTH_SHORT[month]} ${year}`}
+                  />
+                </Grid>
+              )
+            })}
+          </SectionErrorBoundary>
+
+          {/* Task summary chips + inline velocity */}
+          <Grid size={{ xs: 12 }}>
+            <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}`, px: 4, py: 3 }}>
+              <Stack direction='row' alignItems='center' justifyContent='space-between' flexWrap='wrap' gap={2}>
+                <Stack direction='row' spacing={2} flexWrap='wrap'>
+                  <CustomChip
+                    round='true'
+                    size='small'
+                    variant='tonal'
+                    color='secondary'
+                    icon={<i className='tabler-subtask' />}
+                    label={`${data.context.totalTasks} tareas`}
+                  />
+                  <CustomChip
+                    round='true'
+                    size='small'
+                    variant='tonal'
+                    color='success'
+                    icon={<i className='tabler-check' />}
+                    label={`${data.context.completedTasks} completadas`}
+                  />
+                  <CustomChip
+                    round='true'
+                    size='small'
+                    variant='tonal'
+                    color='info'
+                    icon={<i className='tabler-progress' />}
+                    label={`${data.context.activeTasks} activas`}
+                  />
+                </Stack>
+
+                {showVelocityInline && (
+                  <Stack direction='row' alignItems='center' spacing={1}>
+                    <Box sx={{ width: 64, height: 64 }}>
+                      <AppReactApexCharts
+                        type='radialBar'
+                        height={64}
+                        width={64}
+                        series={[velocityPct]}
+                        options={velocityInlineOptions}
                       />
                     </Box>
-                  )
-                })}
-              </Box>
-            </SectionErrorBoundary>
-          </Grid>
-
-          {/* Context summary */}
-          <Grid size={{ xs: 12 }}>
-            <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
-              <Typography variant='body2' color='text.secondary'>
-                Total tareas: <strong>{data.context.totalTasks}</strong>
-              </Typography>
-              <Typography variant='body2' color='text.secondary'>
-                Completadas: <strong>{data.context.completedTasks}</strong>
-              </Typography>
-              <Typography variant='body2' color='text.secondary'>
-                Activas: <strong>{data.context.activeTasks}</strong>
-              </Typography>
-              <Typography variant='body2' color='text.secondary'>
-                Fuente: <strong>{data.source === 'materialized' ? 'Cache' : 'Tiempo real'}</strong>
-              </Typography>
-            </Box>
-          </Grid>
-
-          {/* CSC Donut + Health Radar + Velocity Gauge */}
-          <Grid size={{ xs: 12, md: 5 }}>
-            <SectionErrorBoundary sectionName='person-activity-csc' description='No pudimos cargar la distribución CSC.'>
-              <ExecutiveCardShell title='Distribución CSC' subtitle='Activos asignados por fase'>
-                {cscEntries.length === 0 ? (
-                  <EmptyState
-                    icon='tabler-chart-pie'
-                    title='Sin datos de distribución'
-                    description='Se necesitan activos activos asignados para calcular la distribución CSC.'
-                  />
-                ) : (
-                  <figure role='img' aria-label={`Distribución CSC: ${cscTotal} activos`} style={{ margin: 0 }}>
-                    <AppReactApexCharts
-                      type='donut'
-                      height={380}
-                      width='100%'
-                      series={cscEntries.map(e => e.count)}
-                      options={donutOptions}
-                    />
-                  </figure>
+                    <Box>
+                      <Box sx={{ fontSize: '0.7rem', color: 'text.secondary', lineHeight: 1.2 }}>Pipeline</Box>
+                      <Box sx={{ fontSize: '0.85rem', fontWeight: 600 }}>{velocityPct}%</Box>
+                    </Box>
+                  </Stack>
                 )}
-              </ExecutiveCardShell>
-            </SectionErrorBoundary>
+              </Stack>
+            </Card>
           </Grid>
 
-          <Grid size={{ xs: 12, md: 4 }}>
+          {/* Charts: Radar (primary) + CSC or Velocity (secondary) */}
+          <Grid size={{ xs: 12, md: hasSecondaryChart ? 7 : 12 }}>
             <SectionErrorBoundary
               sectionName='person-activity-radar'
               description='No pudimos cargar el radar de salud.'
@@ -390,7 +449,7 @@ const PersonActivityTab = ({ memberId }: Props) => {
                 <figure role='img' aria-label='Radar de salud operativa personal' style={{ margin: 0 }}>
                   <AppReactApexCharts
                     type='radar'
-                    height={340}
+                    height={380}
                     width='100%'
                     series={[{ name: 'Métricas', data: radarMetrics.map(m => m.value) }]}
                     options={radarOptions}
@@ -400,15 +459,31 @@ const PersonActivityTab = ({ memberId }: Props) => {
             </SectionErrorBoundary>
           </Grid>
 
-          <Grid size={{ xs: 12, md: 3 }}>
-            <SectionErrorBoundary
-              sectionName='person-activity-velocity'
-              description='No pudimos cargar la velocidad del pipeline.'
-            >
-              <ExecutiveCardShell title='Velocidad pipeline' subtitle='Completados / activos'>
-                {velocity === null ? (
-                  <EmptyState icon='tabler-bolt' title='Sin datos' description='Se necesitan activos completados.' />
-                ) : (
+          {showCscChart && (
+            <Grid size={{ xs: 12, md: 5 }}>
+              <SectionErrorBoundary sectionName='person-activity-csc' description='No pudimos cargar la distribución CSC.'>
+                <ExecutiveCardShell title='Distribución CSC' subtitle='Activos asignados por fase'>
+                  <figure role='img' aria-label={`Distribución CSC: ${cscTotal} activos`} style={{ margin: 0 }}>
+                    <AppReactApexCharts
+                      type='donut'
+                      height={380}
+                      width='100%'
+                      series={cscEntries.map(e => e.count)}
+                      options={donutOptions}
+                    />
+                  </figure>
+                </ExecutiveCardShell>
+              </SectionErrorBoundary>
+            </Grid>
+          )}
+
+          {showVelocityStandalone && (
+            <Grid size={{ xs: 12, md: 5 }}>
+              <SectionErrorBoundary
+                sectionName='person-activity-velocity'
+                description='No pudimos cargar la velocidad del pipeline.'
+              >
+                <ExecutiveCardShell title='Velocidad pipeline' subtitle='Completados / activos'>
                   <figure
                     role='img'
                     aria-label={`Velocidad del pipeline: ${velocityPct}%`}
@@ -416,16 +491,16 @@ const PersonActivityTab = ({ memberId }: Props) => {
                   >
                     <AppReactApexCharts
                       type='radialBar'
-                      height={280}
+                      height={320}
                       width='100%'
                       series={[velocityPct]}
                       options={velocityOptions}
                     />
                   </figure>
-                )}
-              </ExecutiveCardShell>
-            </SectionErrorBoundary>
-          </Grid>
+                </ExecutiveCardShell>
+              </SectionErrorBoundary>
+            </Grid>
+          )}
         </>
       )}
     </Grid>

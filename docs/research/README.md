@@ -26,3 +26,4 @@ RESEARCH-###-short-description.md
 | ID | Brief | Status | Resulting tasks |
 |----|-------|--------|-----------------|
 | RESEARCH-001 | [Embedded AI Strategy](RESEARCH-001-embedded-ai-strategy.md) | Active | TASK-118 (ICO AI Core) |
+| RESEARCH-002 | [Staff Augmentation Enterprise Module](RESEARCH-002-staff-augmentation-enterprise-module.md) | Active | TBD |

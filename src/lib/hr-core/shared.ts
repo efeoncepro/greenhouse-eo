@@ -2,6 +2,7 @@ import 'server-only'
 
 import { NextResponse } from 'next/server'
 
+import { ROLE_CODES } from '@/config/role-codes'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { hasRoleCode, requireTenantContext } from '@/lib/tenant/authorization'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
@@ -191,7 +192,7 @@ export const maskSensitiveValue = (value: string | null, visibleDigits = 4) => {
   return `${'*'.repeat(Math.max(4, trimmed.length - visibleDigits))}${trimmed.slice(-visibleDigits)}`
 }
 
-export const isHrAdminTenant = (tenant: TenantContext) => tenant.routeGroups.includes('hr') || hasRoleCode(tenant, 'efeonce_admin')
+export const isHrAdminTenant = (tenant: TenantContext) => tenant.routeGroups.includes('hr') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
 
 export const requireHrCoreReadTenantContext = async () => {
   const { tenant, unauthorizedResponse } = await requireTenantContext()
@@ -203,7 +204,7 @@ export const requireHrCoreReadTenantContext = async () => {
     }
   }
 
-  if (!tenant.routeGroups.includes('employee') && !tenant.routeGroups.includes('hr') && !hasRoleCode(tenant, 'efeonce_admin')) {
+  if (!tenant.routeGroups.includes('employee') && !tenant.routeGroups.includes('hr') && !hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)) {
     return {
       tenant: null,
       errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })

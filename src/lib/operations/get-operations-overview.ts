@@ -168,8 +168,8 @@ const deriveHealth = (
   if (lastRun) {
     const hoursAgo = (Date.now() - new Date(lastRun).getTime()) / 3_600_000
 
-    if (failed > 0 && hoursAgo > 48) return 'down'
-    if (failed > 0 || hoursAgo > 24) return 'degraded'
+    if (failed > 0 && hoursAgo > 72) return 'down'
+    if (failed > 0 || hoursAgo > 36) return 'degraded'
   } else if (failed > 0) {
     return 'down'
   }
@@ -189,13 +189,13 @@ const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubsystem> 
       safeCount(
         `SELECT COUNT(*) AS cnt
          FROM greenhouse_finance.income i
-         LEFT JOIN (SELECT income_id, SUM(amount)::numeric AS total FROM greenhouse_finance.income_payments GROUP BY income_id) p
+         INNER JOIN (SELECT income_id, SUM(amount)::numeric AS total FROM greenhouse_finance.income_payments GROUP BY income_id) p
            ON p.income_id = i.income_id
-         WHERE ABS(COALESCE(i.amount_paid, 0) - COALESCE(p.total, 0)) > 0.01`
+         WHERE ABS(COALESCE(i.amount_paid, 0) - p.total) > 0.01`
       ),
       safeCount(
         `SELECT COUNT(*) AS cnt FROM greenhouse_finance.expenses
-         WHERE (client_id IS NULL OR client_id = '') AND expense_type NOT IN ('tax', 'social_security')`
+         WHERE (client_id IS NULL OR client_id = '') AND expense_type = 'supplier'`
       ),
       safeCount(
         `SELECT COUNT(*) AS cnt FROM greenhouse_finance.income
@@ -204,11 +204,11 @@ const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubsystem> 
     ])
 
     const totalIssues = divergentPayments + orphanExpenses
+
     const status: OperationsHealthStatus =
-      divergentPayments > 0 ? 'degraded'
-        : orphanExpenses > 5 ? 'degraded'
-          : overdueCount > 10 ? 'degraded'
-            : 'healthy'
+      divergentPayments > 3 ? 'degraded'
+        : orphanExpenses > 10 ? 'degraded'
+          : 'healthy'
 
     return {
       name: 'Finance Data Quality',
@@ -277,7 +277,7 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
     ).then(rows => rows[0]?.last_run ?? null).catch(() => null),
 
     safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.projection_refresh_queue WHERE status = 'completed'`),
-    safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.projection_refresh_queue WHERE status = 'failed'`),
+    safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.projection_refresh_queue WHERE status = 'failed' AND updated_at > NOW() - INTERVAL '48 hours'`),
     runGreenhousePostgresQuery<Record<string, unknown> & { last_run: string | null }>(
       `SELECT MAX(updated_at)::text AS last_run FROM greenhouse_sync.projection_refresh_queue WHERE status = 'completed'`
     ).then(rows => rows[0]?.last_run ?? null).catch(() => null),

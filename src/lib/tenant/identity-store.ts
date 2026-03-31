@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { ROLE_CODES } from '@/config/role-codes'
 import {
   isGreenhousePostgresConfigured,
   runGreenhousePostgresQuery
@@ -174,11 +175,11 @@ type Session360Row = Record<string, unknown> & {
 const sessionRowToAccessRow = async (row: Session360Row) => {
   const roleCodes = Array.isArray(row.role_codes) ? row.role_codes : []
 
-  const projectScopes = roleCodes.includes('client_specialist')
+  const projectScopes = roleCodes.includes(ROLE_CODES.CLIENT_SPECIALIST)
     ? await loadProjectScopes(row.user_id)
     : []
 
-  const campaignScopes = roleCodes.includes('client_specialist')
+  const campaignScopes = roleCodes.includes(ROLE_CODES.CLIENT_SPECIALIST)
     ? await loadCampaignScopes(row.user_id)
     : []
 

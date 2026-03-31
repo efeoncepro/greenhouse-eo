@@ -1,3 +1,5 @@
+import { ROLE_CODES } from '@/config/role-codes'
+
 type ResolvePortalHomePathInput = {
   portalHomePath?: string | null
   tenantType?: 'client' | 'efeonce_internal' | string | null
@@ -14,13 +16,13 @@ export const resolvePortalHomePath = ({
   const roleCodes = Array.isArray(rawRoleCodes) ? rawRoleCodes.filter(Boolean) : []
   const normalizedPortalHomePath = portalHomePath?.trim() || ''
   const isInternalTenant = tenantType === 'efeonce_internal'
-  const isHrUser = hasRole(roleCodes, 'hr_payroll') || hasRole(roleCodes, 'hr_manager')
-  const isFinanceUser = hasRole(roleCodes, 'finance_analyst') || hasRole(roleCodes, 'finance_admin')
+  const isHrUser = hasRole(roleCodes, ROLE_CODES.HR_PAYROLL) || hasRole(roleCodes, ROLE_CODES.HR_MANAGER)
+  const isFinanceUser = hasRole(roleCodes, ROLE_CODES.FINANCE_ANALYST) || hasRole(roleCodes, ROLE_CODES.FINANCE_ADMIN)
 
   const isPureCollaborator =
-    hasRole(roleCodes, 'collaborator') &&
-    !hasRole(roleCodes, 'efeonce_admin') &&
-    !hasRole(roleCodes, 'efeonce_operations')
+    hasRole(roleCodes, ROLE_CODES.COLLABORATOR) &&
+    !hasRole(roleCodes, ROLE_CODES.EFEONCE_ADMIN) &&
+    !hasRole(roleCodes, ROLE_CODES.EFEONCE_OPERATIONS)
 
   if (isHrUser) {
     return '/hr/payroll'

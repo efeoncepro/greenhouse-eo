@@ -128,6 +128,7 @@ export const NOTIFICATION_MAPPINGS: NotificationMapping[] = [
     resolveRecipients: getHrAdminRecipients,
     metadata: baseMetadata
   },
+
   // ── Finance alerts ──
 
   {

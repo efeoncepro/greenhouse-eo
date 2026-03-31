@@ -21,6 +21,7 @@ export default async function AgencyLayout({ children }: { children: ReactNode }
       'gestion.equipo',
       'gestion.delivery',
       'gestion.campanas',
+      'gestion.staff_augmentation',
       'gestion.servicios',
       'gestion.operaciones',
       'gestion.organizaciones'

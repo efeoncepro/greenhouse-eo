@@ -43,6 +43,7 @@ const LoginV2 = ({
   const [error, setError] = useState('')
 
   const router = useRouter()
+
   const {
     register,
     handleSubmit,

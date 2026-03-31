@@ -2,6 +2,7 @@ import 'server-only'
 
 import { NextResponse } from 'next/server'
 
+import { ROLE_CODES } from '@/config/role-codes'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { hasRoleCode, isClientTenant, requireTenantContext } from '@/lib/tenant/authorization'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
@@ -244,11 +245,11 @@ export const getPeriodDateRange = (period: string) => {
 }
 
 export const getViewerKind = (tenant: TenantContext) => {
-  if (hasRoleCode(tenant, 'efeonce_admin')) {
+  if (hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)) {
     return 'admin' as const
   }
 
-  if (hasRoleCode(tenant, 'efeonce_operations')) {
+  if (hasRoleCode(tenant, ROLE_CODES.EFEONCE_OPERATIONS)) {
     return 'operator' as const
   }
 
@@ -294,7 +295,7 @@ export const requireAiOperatorTenantContext = async () => {
     }
   }
 
-  if (!hasRoleCode(tenant, 'efeonce_operations') && !hasRoleCode(tenant, 'efeonce_admin')) {
+  if (!hasRoleCode(tenant, ROLE_CODES.EFEONCE_OPERATIONS) && !hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)) {
     return {
       tenant: null,
       errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })

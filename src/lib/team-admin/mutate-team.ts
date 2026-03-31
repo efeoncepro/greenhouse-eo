@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto'
 
 import { NextResponse } from 'next/server'
 
+import { ROLE_CODES } from '@/config/role-codes'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
@@ -1683,7 +1684,7 @@ export const getAdminTeamMetadata = async (): Promise<TeamAdminMetadata> => ({
   canManageTeam: true,
   memberCrud: true,
   assignmentCrud: true,
-  requiredRole: 'efeonce_admin',
+  requiredRole: ROLE_CODES.EFEONCE_ADMIN,
   roleCategories,
   contactChannels: ['teams', 'slack', 'email'],
   activeClients: await getActiveClients()

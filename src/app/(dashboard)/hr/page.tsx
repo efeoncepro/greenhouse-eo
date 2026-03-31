@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import HrCoreDashboard from '@views/greenhouse/hr-core/HrCoreDashboard'
 import { hasAnyAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
+import { ROLE_CODES } from '@/config/role-codes'
 
 const HrPage = async () => {
   const tenant = await getTenantContext()
@@ -14,7 +15,7 @@ const HrPage = async () => {
   const hasAccess = hasAnyAuthorizedViewCode({
     tenant,
     viewCodes: ['equipo.nomina', 'equipo.permisos', 'equipo.departamentos', 'equipo.asistencia'],
-    fallback: tenant.routeGroups.includes('hr') || tenant.roleCodes.includes('efeonce_admin')
+    fallback: tenant.routeGroups.includes('hr') || tenant.roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)
   })
 
   if (!hasAccess) {

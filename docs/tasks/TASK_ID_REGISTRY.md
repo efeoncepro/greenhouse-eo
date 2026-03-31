@@ -33,7 +33,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-016` | `to-do`          | `CODEX_TASK_Business_Units_Canonical_v2`                           | `docs/tasks/to-do/TASK-016-business-units-canonical.md`                 |
 | `TASK-017` | `to-do`          | `CODEX_TASK_Campaign_360_v2`                                       | `docs/tasks/to-do/TASK-017-campaign-360.md`                             |
 | `TASK-018` | `to-do`          | `CODEX_TASK_SCIM_User_Provisioning_v2`                             | `docs/tasks/to-do/TASK-018-scim-user-provisioning.md`                   |
-| `TASK-019` | `to-do`          | `CODEX_TASK_Staff_Augmentation_Module_v2`                          | `docs/tasks/to-do/TASK-019-staff-augmentation-module.md`                |
+| `TASK-019` | `complete`       | `CODEX_TASK_Staff_Augmentation_Module_v2`                          | `docs/tasks/complete/TASK-019-staff-augmentation-module.md`             |
 | `TASK-020` | `to-do`          | `CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline_v2`                | `docs/tasks/to-do/TASK-020-frameio-bigquery-analytics-pipeline.md`      |
 | `TASK-021` | `to-do`          | `CODEX_TASK_Typography_Variant_Adoption_v1`                        | `docs/tasks/to-do/TASK-021-typography-variant-adoption.md`              |
 | `TASK-022` | `to-do`          | `CODEX_TASK_Services_Runtime_Closure_v1`                           | `docs/tasks/to-do/TASK-022-services-runtime-closure.md`                 |
@@ -52,11 +52,11 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-035` | `to-do`          | `CODEX_TASK_FrameIO_BigQuery_Analytics_Pipeline` (brief historico) | `docs/tasks/to-do/TASK-035-frameio-analytics-brief.md`                  |
 | `TASK-036` | `to-do`          | `CODEX_TASK_Greenhouse_Home_Nexa` (brief historico)                | `docs/tasks/to-do/TASK-036-greenhouse-home-nexa-brief.md`               |
 | `TASK-037` | `to-do`          | `CODEX_TASK_SCIM_User_Provisioning` (brief historico)              | `docs/tasks/to-do/TASK-037-scim-user-provisioning-brief.md`             |
-| `TASK-038` | `to-do`          | `CODEX_TASK_Staff_Augmentation_Module` (brief historico)           | `docs/tasks/to-do/TASK-038-staff-augmentation-module-brief.md`          |
+| `TASK-038` | `complete`       | `CODEX_TASK_Staff_Augmentation_Module` (brief historico absorbido) | `docs/tasks/complete/TASK-038-staff-augmentation-module-brief.md`       |
 | `TASK-039` | `to-do`          | `Greenhouse_Data_Node_Architecture_v1` (supporting spec)           | `docs/tasks/to-do/TASK-039-data-node-architecture-v1.md`                |
 | `TASK-040` | `to-do`          | `Greenhouse_Data_Node_Architecture_v2` (supporting spec)           | `docs/tasks/to-do/TASK-040-data-node-architecture-v2.md`                |
 
-| `TASK-041` | `to-do` | `CODEX_TASK_Staff_Augmentation_HRIS_Addendum` | `docs/tasks/to-do/TASK-041-staff-augmentation-hris-addendum.md` |
+| `TASK-041` | `complete` | `CODEX_TASK_Staff_Augmentation_HRIS_Addendum` (absorbida) | `docs/tasks/complete/TASK-041-staff-augmentation-hris-addendum.md` |
 | `TASK-042` | `to-do` | Person Operational Serving Cutover | `docs/tasks/to-do/TASK-042-person-operational-serving-cutover.md` |
 | `TASK-043` | `to-do` | Person 360 Runtime Consolidation | `docs/tasks/to-do/TASK-043-person-360-runtime-consolidation.md` |
 | `TASK-044` | `to-do` | Organization Executive Snapshot | `docs/tasks/to-do/TASK-044-organization-executive-snapshot.md` |
@@ -75,7 +75,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-057` | `complete` | Direct Overhead Tool Cost Attribution | `docs/tasks/complete/TASK-057-direct-overhead-tool-cost-attribution.md` |
 | `TASK-058` | `complete` | Economic Indicators Runtime Layer | `docs/tasks/complete/TASK-058-economic-indicators-runtime-layer.md` |
 
-| `TASK-059` | `to-do` | Tool Provider Canonical Object | `docs/tasks/to-do/TASK-059-tool-provider-canonical-object.md` |
+| `TASK-059` | `complete` | Tool Provider Canonical Object | `docs/tasks/complete/TASK-059-tool-provider-canonical-object.md` |
 | `TASK-060` | `complete` | Team Assignment Admin (Agency > Team CRUD) | `docs/tasks/complete/TASK-060-team-assignment-admin.md` |
 | `TASK-061` | `complete` | Payroll Go-Live Readiness Audit | `docs/tasks/complete/TASK-061-payroll-go-live-readiness-audit.md` |
 | `TASK-062` | `complete` | Payroll Recurring Fixed Bonus Support | `docs/tasks/complete/TASK-062-payroll-recurring-fixed-bonus-support.md` |
@@ -145,7 +145,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-118` | `to-do` | ICO AI Core: Embedded Intelligence Layer | `docs/tasks/to-do/TASK-118-ico-ai-core-embedded-intelligence.md` |
 | `TASK-119` | `complete` | Home Landing Rollout and Navigation Cutover | `docs/tasks/complete/TASK-119-home-landing-rollout-navigation-cutover.md` |
 | `TASK-120` | `complete` | Admin Center Governance Follow-on Cutover | `docs/tasks/complete/TASK-120-admin-center-governance-follow-on-cutover.md` |
-| `TASK-121` | `in-progress` | Admin Center Hardening & Scalability | `docs/tasks/in-progress/TASK-121-admin-center-hardening.md` |
+| `TASK-121` | `complete` | Admin Center Hardening & Scalability | `docs/tasks/complete/TASK-121-admin-center-hardening.md` |
 | `TASK-122` | `complete` | Cloud Governance Layer Institutionalization | `docs/tasks/complete/TASK-122-cloud-governance-layer-institutionalization.md` |
 
 ## Regla de asignacion desde aqui
@@ -187,7 +187,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-139` | `complete` | Finance Module Hardening: Corrections & Data Quality | `docs/tasks/complete/TASK-139-finance-module-hardening.md` |
 | `TASK-140` | `complete` | Admin Views Person-First Preview Cutover | `docs/tasks/complete/TASK-140-admin-views-person-first-preview.md` |
 | `TASK-141` | `complete` | Canonical Person Identity Consumption | `docs/tasks/complete/TASK-141-canonical-person-identity-consumption.md` |
-| `TASK-142` | `to-do` | Agency Space 360 View | `docs/tasks/to-do/TASK-142-agency-space-360-view.md` |
+| `TASK-142` | `complete` | Agency Space 360 View | `docs/tasks/complete/TASK-142-agency-space-360-view.md` |
 | `TASK-143` | `to-do` | Agency Economics API & View | `docs/tasks/to-do/TASK-143-agency-economics-api.md` |
 | `TASK-144` | `to-do` | Agency Team Dedicated API | `docs/tasks/to-do/TASK-144-agency-team-api-dedup.md` |
 | `TASK-145` | `to-do` | Agency Campaigns API Rescope | `docs/tasks/to-do/TASK-145-agency-campaigns-rescope.md` |
@@ -217,3 +217,9 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-166` | `complete` | Finance BigQuery Write Cutover | `docs/tasks/complete/TASK-166-finance-bigquery-write-cutover.md` |
 
 | `TASK-167` | `to-do` | Operational P&L: Organization Scope Materialization | `docs/tasks/to-do/TASK-167-operational-pl-organization-scope.md` |
+| `TASK-168` | `complete` | Person Detail View: Enterprise Redesign | `docs/tasks/complete/TASK-168-person-detail-enterprise-redesign.md` |
+| `TASK-169` | `complete` | Staff Aug Placement Bridge & HRIS Runtime Consolidation | `docs/tasks/complete/TASK-169-staff-aug-placement-bridge-hris-runtime-consolidation.md` |
+| `TASK-170` | `complete` | Leave Request & Approval Flow | `docs/tasks/complete/TASK-170-leave-request-approval-flow.md` |
+| `TASK-171` | `complete` | Access Model Hardening: Route Group Unification, Type Safety & Fallback Strategy | `docs/tasks/complete/TASK-171-access-model-hardening.md` |
+| `TASK-172` | `to-do` | Platform Hardening: CI Pipeline, Structured Logging, Test Coverage & Security Headers | `docs/tasks/to-do/TASK-172-platform-hardening-ci-observability-security.md` |
+| `TASK-173` | `in-progress` | Shared Attachments Platform and GCP Bucket Governance | `docs/tasks/in-progress/TASK-173-shared-attachments-platform-gcp-governance.md` |

@@ -5,6 +5,7 @@ import { toAiToolingErrorResponse } from '@/lib/ai-tools/shared'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 30
 
 export async function GET() {
   const { tenant, errorResponse } = await requireAdminTenantContext()

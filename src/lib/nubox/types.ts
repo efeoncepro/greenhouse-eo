@@ -274,6 +274,7 @@ export type NuboxConformedSale = {
   client_rut: string | null
   client_trade_name: string | null
   client_main_activity: string | null
+
   // Links
   pdf_url: string | null
   xml_url: string | null
@@ -318,6 +319,7 @@ export type NuboxConformedPurchase = {
   origin_name: string | null
   supplier_rut: string | null
   supplier_trade_name: string | null
+
   // Links
   pdf_url: string | null
 

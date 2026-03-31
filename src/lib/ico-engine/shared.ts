@@ -78,11 +78,12 @@ export const toTimestampString = (value: { value?: string } | string | null): st
  * Column names come from v_tasks_enriched — the allowlist prevents SQL injection.
  */
 export const ICO_DIMENSIONS = {
-  space:   { column: 'space_id' },
-  project: { column: 'project_source_id' },
-  member:  { column: 'assignee_member_id' },
-  client:  { column: 'client_id' },
-  sprint:  { column: 'sprint_source_id' }
+  space:         { column: 'space_id' },
+  project:       { column: 'project_source_id' },
+  member:        { column: 'assignee_member_id' },
+  client:        { column: 'client_id' },
+  sprint:        { column: 'sprint_source_id' },
+  business_unit: { column: 'operating_business_unit' }
 } as const
 
 export type IcoDimensionKey = keyof typeof ICO_DIMENSIONS

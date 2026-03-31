@@ -82,10 +82,25 @@ export interface HrLeaveBalance {
   leaveTypeName: string
   year: number
   allowanceDays: number
+  progressiveExtraDays?: number
   carriedOverDays: number
+  adjustmentDays?: number
+  accumulatedPeriods?: number
   usedDays: number
   reservedDays: number
   availableDays: number
+}
+
+export interface HrLeavePayrollImpactPeriod {
+  periodId: string
+  year: number
+  month: number
+  status: 'draft' | 'calculated' | 'approved' | 'exported'
+}
+
+export interface HrLeavePayrollImpactSummary {
+  mode: 'none' | 'recalculate_recommended' | 'deferred_adjustment_required'
+  impactedPeriods: HrLeavePayrollImpactPeriod[]
 }
 
 export interface HrLeaveRequest {
@@ -100,6 +115,7 @@ export interface HrLeaveRequest {
   requestedDays: number
   status: HrLeaveRequestStatus
   reason: string | null
+  attachmentAssetId?: string | null
   attachmentUrl: string | null
   supervisorMemberId: string | null
   supervisorName: string | null
@@ -108,6 +124,39 @@ export interface HrLeaveRequest {
   decidedBy: string | null
   notes: string | null
   createdAt: string | null
+  holidaySource?: 'nager' | 'empty-fallback' | 'none'
+  payrollImpact?: HrLeavePayrollImpactSummary | null
+}
+
+export interface HrLeavePolicy {
+  policyId: string
+  leaveTypeCode: string
+  policyName: string
+  annualDays: number
+  minAdvanceDays: number
+  minContinuousDays: number | null
+  maxCarryOverDays: number
+  progressiveEnabled: boolean
+  requiresApproval: boolean
+  allowNegativeBalance: boolean
+  active: boolean
+}
+
+export interface HrLeaveCalendarEvent {
+  id: string
+  title: string
+  start: string
+  end?: string
+  allDay?: boolean
+  color?: string
+  extendedProps?: Record<string, unknown>
+}
+
+export interface HrLeaveCalendarResponse {
+  from: string
+  to: string
+  holidaySource: 'nager' | 'empty-fallback' | 'none'
+  events: HrLeaveCalendarEvent[]
 }
 
 export interface HrAttendanceRecord {
@@ -148,6 +197,7 @@ export interface HrDepartmentsResponse {
 
 export interface HrLeaveBalancesResponse {
   balances: HrLeaveBalance[]
+  policies?: HrLeavePolicy[]
   summary: {
     memberCount: number
     totalAvailableDays: number
@@ -227,8 +277,9 @@ export interface CreateLeaveRequestInput {
   leaveTypeCode: string
   startDate: string
   endDate: string
-  requestedDays: number
+  requestedDays?: number | null
   reason?: string | null
+  attachmentAssetId?: string | null
   attachmentUrl?: string | null
   notes?: string | null
 }

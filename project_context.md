@@ -1,6 +1,137 @@
 # project_context.md
 
+## Delta 2026-03-31 Shared attachments and GCP bucket topology
+
+- Nueva decisión arquitectónica activa:
+  - la capability shared de adjuntos/archivos del portal vive en `TASK-173`
+  - `leave`, `Document Vault` y `Expense Reports` pasan a leerse como consumers de esa foundation
+- Topología aprobada:
+  - `public media` por entorno para logos/avatars/assets no sensibles
+  - `private assets` por entorno para documentos y adjuntos operativos
+- Regla vigente:
+  - el bucket legacy `${GCP_PROJECT}-greenhouse-media` no debe seguir creciendo como default de nuevas capacidades privadas
+  - la separación fina debe vivir en prefixes, metadata, authorization y retention, no en un bucket por módulo
+- Modelo de acceso aprobado:
+  - `public media` puede servirse directo y cachearse agresivamente
+  - `private assets` entra por control de acceso Greenhouse y no debe persistirse como signed URL estable en el dominio
+- Baseline UI aprobado:
+  - el uploader shared debe construirse sobre `react-dropzone` + `src/libs/styles/AppReactDropzone.ts`
+- Estado operativo actualizado:
+  - el repo ya incluye `src/lib/storage/greenhouse-assets.ts`, routes `/api/assets/private*`, `GreenhouseFileUploader` y el setup `pnpm setup:postgres:shared-assets`
+  - `leave`, `purchase orders`, `payroll receipts` y `payroll export packages` ya convergen en código al contrato shared
+  - el bootstrap remoto en GCP/Cloud SQL ya quedó aplicado sobre `greenhouse-pg-dev / greenhouse_app`
+  - el drift de ownership en `purchase_orders`, `payroll_receipts` y `payroll_export_packages` quedó corregido hacia `greenhouse_migrator`
+  - `greenhouse_migrator_user` ya puede reejecutar `pnpm setup:postgres:shared-assets` sin depender de `postgres`
+  - el único pendiente operativo de `TASK-173` es smoke manual autenticado de upload/download en `staging`
+
+## Delta 2026-03-31 HR profile hire-date editing
+
+- `People > HR profile` ya expone edición visible de `hireDate` en la card `Información laboral`.
+- La UI usa `PATCH /api/hr/core/members/[memberId]/profile` y refleja el valor guardado en la misma tab sin depender de un refresh posterior del contexto HR agregado.
+- Esto cierra la brecha operativa detectada después de endurecer `leave`: el sistema ya podía usar `hire_date` para antigüedad/progresivos, pero RRHH no tenía una surface clara para mantener ese dato.
+- Decisión explícita de runtime:
+  - `hireDate` sigue escribiéndose en `greenhouse.team_members.hire_date` sobre BigQuery
+  - `greenhouse_core.members.hire_date` no reemplaza todavía ese write path
+  - mientras `HR profile` no tenga cutover formal a PostgreSQL, este dato debe mantenerse BigQuery-first en edición y Postgres como consumo/proyección
+- Arquitectura leave documentada con reglas runtime explícitas:
+  - cálculo de días hábiles
+  - overlap
+  - attachment
+  - min/max de anticipación y continuidad
+  - balance, carry-over y progresivos
+  - matrix seed de policies por tipo
+  - aclaración de que saldo disponible no anula validaciones de policy
+
+## Delta 2026-03-31 TASK-169 Staff Aug bridge People -> Assignment -> Placement
+
+- El bridge real de `Staff Augmentation` ya no debe interpretarse como `ghost slot -> placement`.
+- Estado vigente:
+  - `Vincular a organización` en `People` crea `person_memberships`
+  - la proyección `assignment_membership_sync` asegura `assignment -> membership`
+  - el placement sigue naciendo solo desde `client_team_assignments`
+- Ajustes nuevos:
+  - `Create placement` ahora usa `GET /api/agency/staff-augmentation/placement-options` en vez de `/api/team/capacity-breakdown`
+  - `People 360` ya expone señales de assignment Staff Aug (`assignmentType`, `placementId`, `placementStatus`) para abrir o crear placement desde el pivot correcto
+- Regla vigente:
+  - `membership` da contexto organizacional
+  - `assignment` da contexto operativo
+  - `placement` da contexto comercial-operativo y económico
+  - no promover `person_membership` a identidad canónica del placement
+
+## Delta 2026-03-30 TASK-142 agency space 360 runtime
+
+- `Agency Space 360` ya existe como surface operativa y no debe leerse como redirect pendiente.
+- Surface visible vigente:
+  - `/agency/spaces/[id]`
+  - `GET /api/agency/spaces/[id]`
+- Contrato runtime nuevo:
+  - `src/lib/agency/space-360.ts`
+  - resuelve `clientId` como key operativa actual y enriquece con `space_id` + organización cuando existe vínculo canónico
+- Fuentes activas de la 360:
+  - `greenhouse_core.spaces`
+  - `greenhouse_serving.operational_pl_snapshots`
+  - `agency-finance-metrics`
+  - `greenhouse_core.client_team_assignments`
+  - `member_capacity_economics`
+  - `services`
+  - `greenhouse_delivery.staff_aug_placements`
+  - `greenhouse_sync.outbox_events`
+  - ICO latest snapshot + project metrics + stuck assets
+- Regla vigente:
+  - `Health` y `Risk` visibles en la 360 siguen siendo heurísticas transicionales
+  - scores materializados y eventos Agency propios quedan como follow-ons (`TASK-150`, `TASK-151`, `TASK-148`)
+
+## Delta 2026-03-30 TASK-019 staff augmentation baseline closure
+
+- `Staff Augmentation` ya existe como módulo runtime de `Agency`, no como brief futuro.
+- Ancla canónica:
+  - `greenhouse_core.client_team_assignments`
+  - `assignment_type = 'staff_augmentation'`
+- Tablas vigentes:
+  - `greenhouse_delivery.staff_aug_placements`
+  - `greenhouse_delivery.staff_aug_onboarding_items`
+  - `greenhouse_delivery.staff_aug_events`
+  - `greenhouse_serving.staff_aug_placement_snapshots`
+- Wiring reactivo vigente:
+  - eventos `staff_aug.*`
+  - proyección `staff_augmentation_placements`
+  - refresh entrante desde assignments, finance, providers, tooling y payroll
+- Surface visible vigente:
+  - `/agency/staff-augmentation`
+  - `/agency/staff-augmentation/[placementId]`
+  - `Agency > Team` ya expone signal de placement en assignments
+- Regla vigente:
+  - Staff Aug se monta sobre assignments existentes
+  - providers, finance suppliers y AI tooling actúan como consumidores y referencias del placement, no como identidades paralelas
+
+## Delta 2026-03-30 TASK-059 provider canonical object reactivo
+
+- `Provider` ya no debe leerse como ancla parcial o solo documental.
+- Estado vigente:
+  - identidad canónica: `greenhouse_core.providers`
+  - serving base: `greenhouse_serving.provider_360`
+  - bridge Finance: `greenhouse_serving.provider_finance_360`
+  - snapshot operativo mensual nuevo: `greenhouse_serving.provider_tooling_snapshots`
+  - latest-state nuevo: `greenhouse_serving.provider_tooling_360`
+- Wiring reactivo nuevo:
+  - `provider.upserted`
+  - `finance.supplier.created`
+  - `finance.supplier.updated`
+  - proyección `provider_tooling` en domain `finance`
+  - evento saliente `provider.tooling_snapshot.materialized`
+- Consumer ya alineado:
+  - `/api/finance/analytics/trends?type=tools` ahora consume el snapshot provider-centric en vez de agrupar por `supplier_name` o `description`
+- Surface visible ya alineada:
+  - `Finance > Suppliers` expone cobertura `Provider 360` en el listado
+  - `Finance > Suppliers > [id]` expone tab `Provider 360`
+  - `Admin > AI Tooling` ahora acepta drilldown por `providerId` y `tab` vía query string para catálogo/licencias/wallets desde Finanzas
+- Regla vigente:
+  - no crear `tool_providers` ni mover licencias/ledger al core
+  - `greenhouse_ai.*` sigue siendo el runtime transaccional de tooling
+  - `greenhouse_finance.suppliers` sigue siendo extensión payable del provider
+
 ## Delta 2026-03-30 Finance staging verification + TASK-164 docs reconciled
+
 - `staging` ya carga correctamente al menos dos surfaces críticas del carril Finance actual:
   - `/finance/income/[id]`
   - `/finance/clients`
@@ -8,6 +139,7 @@
 - `TASK-164` quedó alineada documentalmente a su estado real implementado; Purchase Orders y HES ya no deben interpretarse como diseño pendiente.
 
 ## Delta 2026-03-30 Finance staging smoke for PO/HES/Intelligence
+
 - `staging` ya carga también las surfaces:
   - `/finance/purchase-orders`
   - `/finance/hes`
@@ -20,6 +152,7 @@
 - El resto del ruido de consola observado sigue siendo el embed/CSP report-only de `vercel.live`.
 
 ## Delta 2026-03-30 proxy hardening para OPTIONS de page routes
+
 - `src/proxy.ts` ahora responde `204` a requests `OPTIONS` sobre rutas de página del portal.
 - Objetivo:
   - evitar `400` espurios durante prefetch/navegación de surfaces que siguen referenciando `/dashboard`
@@ -28,6 +161,7 @@
   - `src/proxy.test.ts` ahora valida tanto el caso page-route como el guard explícito sobre API routes.
 
 ## Delta 2026-03-30 CSP report-only ajustada para Vercel Live fuera de production
+
 - `src/proxy.ts` ahora arma `frame-src` de la CSP report-only según entorno.
 - Regla vigente:
   - `production` no incorpora `https://vercel.live`
@@ -35,6 +169,7 @@
 - Esto no cambia la política efectiva de negocio del portal; solo limpia señal observacional en entornos no productivos.
 
 ## Delta 2026-03-30 Finance/Nubox docs reconciled to runtime
+
 - `docs/architecture/FINANCE_DUAL_STORE_CUTOVER_V1.md` ya no debe leerse como snapshot operativo actual; quedó explícitamente reclasificado como historial de migración.
 - `TASK-163` y `TASK-165` quedaron alineadas al estado real ya absorbido por runtime para evitar que futuros agentes reabran lanes que ya cerraron en código.
 - La lectura canónica del estado actual de Finance sigue concentrada en:
@@ -43,30 +178,36 @@
   - `docs/tasks/complete/TASK-050-finance-client-canonical-runtime-cutover.md`
 
 ## Delta 2026-03-30 Nubox DTE download hardening
+
 - `IncomeDetailView` ahora reutiliza `nuboxPdfUrl` y `nuboxXmlUrl` directos cuando el sync ya los materializó, en vez de forzar siempre el proxy server-side de descarga.
 - `src/lib/nubox/client.ts` normaliza `NUBOX_API_BASE_URL` y `NUBOX_X_API_KEY` con `trim()` y envía `Accept` explícito para descargas `pdf/xml`.
 - Esto reduce fallos `401` en staging cuando el detalle intentaba descargar PDF/XML por el carril proxy aun teniendo URLs directas ya disponibles.
 
 ## Delta 2026-03-30 Finance read identity drift hardening
+
 - `GET /api/finance/income` y `GET /api/finance/expenses` ahora resuelven filtros de cliente contra el contexto canónico antes de consultar Postgres o BigQuery fallback.
 - `income` deja de depender internamente de la equivalencia ad hoc `clientProfileId -> hubspot_company_id`; el filtro usa anclas canónicas resueltas.
 - Se preserva compatibilidad transicional para `GET /api/finance/income`: si un caller legacy sigue mandando `clientProfileId` usando en realidad un `hubspotCompanyId`, el handler reintenta esa lectura como alias legacy en vez de romperla.
 - `expenses` ahora acepta `clientProfileId` y `hubspotCompanyId` como filtros de lectura, resolviéndolos a `clientId` canónico sin cambiar el modelo operativo de `expenses`.
 
 ## Delta 2026-03-30 Finance aggregates ya no usan client_profile_id como client_id
+
 - `computeClientEconomicsSnapshots()` y `computeOperationalPl()` ya no agrupan revenue con `COALESCE(client_id, client_profile_id)`.
 - El runtime ahora traduce ingresos legacy `profile-only` vía `greenhouse_finance.client_profiles` para resolver `client_id` canónico antes de agregar métricas financieras.
 - Impacto: `client_economics` y `operational_pl` dejan de tratar `client_profile_id` como si fuera la llave de cliente comercial, pero siguen incorporando ingresos históricos cuando el profile mapea a un `client_id` real.
 
 ## Delta 2026-03-30 Finance clients and campaigns canonized on client_id
+
 - `GET /api/finance/clients` y `GET /api/finance/clients/[id]` ya calculan receivables e invoices por `client_id` canónico, traduciendo incomes legacy vía `greenhouse_finance.client_profiles` cuando aplica.
 - El fallback BigQuery de `Finance Clients` quedó alineado al mismo criterio, sin volver a tratar `client_profile_id` como llave comercial primaria.
 - `getCampaignFinancials()` ya no usa `COALESCE(client_id, client_profile_id)` para revenue; ahora reancla ingresos al `client_id` canónico antes de calcular margen.
 
 ## Resumen
+
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 
 ## Delta 2026-03-30 TASK-166 cerró el lifecycle real del flag de BigQuery writes en Finance
+
 - `FINANCE_BIGQUERY_WRITE_ENABLED` ya no es solo documentación; ahora es un guard operativo real.
 - Carriles cubiertos:
   - `POST /api/finance/income`
@@ -102,6 +243,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el fallback solo se activa para errores clasificados como permitidos por `shouldFallbackFromFinancePostgres()`
 
 ## Delta 2026-03-30 UI/UX skill stack local reforzada
+
 - Greenhouse ya no debe depender solo de skills globales de UI para frontend portal.
 - Nuevo baseline canónico:
   - `docs/ui/GREENHOUSE_MODERN_UI_UX_BASELINE_V1.md`
@@ -117,6 +259,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `greenhouse-vuexy-ui-expert` y `greenhouse-portal-ui-implementer` ya deben endurecer copy, state design y accessibility con la baseline moderna
 
 ## Delta 2026-03-30 view governance ya forma parte de la arquitectura base
+
 - El portal ya no debe interpretarse como acceso fino gobernado solo por `routeGroups`.
 - Estado vigente:
   - broad access por `routeGroups`
@@ -137,6 +280,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - sigue siendo landing base de internos vía `portalHomePath`
 
 ## Delta 2026-03-30 capability modules cliente ya forman parte del gobierno de vistas
+
 - Los capability modules client-facing ya no deben leerse como navegación implícita derivada solo desde `routeGroups`.
 - Nuevo access point gobernable:
   - `cliente.modulos`
@@ -145,6 +289,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `/capabilities/[moduleId]` exige tanto ese `view_code` como la validación específica del módulo
 
 ## Delta 2026-03-30 person-first identity debe preservar carriles reactivos
+
 - La institucionalización de identidad `person-first` no puede ejecutarse como reemplazo ciego de `client_user`.
 - Contrato operativo vigente:
   - `identity_profile` = raíz humana canónica
@@ -161,6 +306,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - resolver el grafo humano completo sin degradar consumers que hoy dependen de `member` o `user`
 
 ## Delta 2026-03-30 canonical person resolver ya tiene primer slice reusable
+
 - `TASK-141` dejó de ser solo framing documental.
 - Baseline técnica nueva:
   - `src/lib/identity/canonical-person.ts`
@@ -182,6 +328,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - expone el bridge canónico sin hacer cutover big bang
 
 ## Delta 2026-03-30 /admin/views ya expone bridge persona sin romper overrides
+
 - `Admin Center > Vistas y acceso` sigue siendo compatible con:
   - `user_view_overrides`
   - `view_access_log`
@@ -198,6 +345,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `TASK-140` queda como follow-on para el universo previewable y la UX completa de persona
 
 ## Delta 2026-03-30 TASK-141 ya tiene resolver shared conservador
+
 - Greenhouse ya no depende solo de contrato documental para la lane `person-first`.
 - Slice runtime nuevo:
   - `src/lib/identity/canonical-person.ts`
@@ -210,6 +358,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el carril no cambia todavía `/admin/views`, outbox payloads ni projections member-scoped
 
 ## Delta 2026-03-30 TASK-134 ya comparte recipients role-based sobre el contrato persona-first
+
 - Notifications ya no mantiene dos lecturas distintas de recipients role-based entre projections y webhook consumers.
 - Nuevo baseline shared:
   - `src/lib/notifications/person-recipient-resolver.ts`
@@ -223,6 +372,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el cut elimina drift de mapping, no cambia recipient keys ni semántica de delivery
 
 ## Delta 2026-03-30 TASK-134 quedó cerrada como contrato transversal de Notifications
+
 - Greenhouse Notifications ya no tiene deuda estructural abierta entre identidad humana y delivery portal.
 - Contrato vigente:
   - resolución humana `person-first`
@@ -234,6 +384,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - no reintroducir mappings `client_user-first` ni reinterpretar `notification_log.user_id` como FK estricta a portal user
 
 ## Delta 2026-03-30 TASK-141 quedó cerrada como baseline institucional
+
 - La lane `canonical person identity consumption` ya no queda abierta como framing.
 - Estado resultante:
   - `identity_profile` queda institucionalizado como raíz humana canónica
@@ -245,6 +396,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `TASK-162` construye costo comercial canónico encima de esta separación explícita
 
 ## Delta 2026-03-30 `/admin/views` ya consume persona previewable
+
 - `Admin Center > Vistas y acceso` ya no selecciona conceptualmente solo un `client_user`.
 - Slice vigente:
   - el universo previewable se agrupa por persona canónica cuando existe `identityProfileId`
@@ -254,6 +406,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el cut es persona-first para lectura y preview, no un reemplazo big bang del principal portal
 
 ## Delta 2026-03-30 runtime Postgres más resiliente a fallos TLS transitorios
+
 - `src/lib/postgres/client.ts` ya no deja cacheado indefinidamente un pool fallido.
 - Cambios operativos:
   - si `buildPool()` falla, el singleton se limpia para permitir recovery en el siguiente intento
@@ -264,6 +417,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - sí evita que un handshake roto quede pegado en un runtime caliente y multiplique alertas innecesarias
 
 ## Delta 2026-03-30 Cost Intelligence foundation bootstrap
+
 - Greenhouse ya reconoce `cost_intelligence` como domain soportado del projection registry.
 - Base técnica nueva:
   - schema `greenhouse_cost_intelligence`
@@ -286,6 +440,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - Cost Intelligence no debe redefinir un P&L paralelo; debe materializar y agregar la semántica financiera canónica ya definida en Finance
 
 ## Delta 2026-03-30 TASK-068 period closure status ya tiene primer slice real
+
 - Cost Intelligence ya no tiene solo foundation; ahora existe un carril operativo inicial para cierre de período:
   - `checkPeriodReadiness()`
   - `closePeriod()` / `reopenPeriod()`
@@ -306,6 +461,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el remanente real ya no es de wiring/runtime; cualquier mejora futura cae como follow-on semántico, no como blocker del carril
 
 ## Delta 2026-03-30 TASK-069 operational_pl ya tiene primer slice materializado
+
 - Cost Intelligence ya no depende solo de `client_economics` on-read para economics agregada.
 - Nuevo carril implementado:
   - `computeOperationalPl()` materializa snapshots en `greenhouse_serving.operational_pl_snapshots`
@@ -328,6 +484,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el remanente principal ahora son consumers downstream (`TASK-071`) y hardening semántico, no wiring base
 
 ## Delta 2026-03-30 TASK-069 smoke reactivo E2E validado
+
 - `operational_pl` ya quedó validada también en runtime reactivo real.
 - Nuevo smoke reusable:
   - `pnpm smoke:cost-intelligence:operational-pl`
@@ -341,6 +498,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - lo siguiente con más valor es consumers downstream y hardening semántico
 
 ## Delta 2026-03-30 Finance Intelligence ya usa Cost Intelligence como surface principal
+
 - `/finance/intelligence` ya no usa `ClientEconomicsView` como portada principal del módulo.
 - Nueva surface activa:
   - `FinancePeriodClosureDashboardView`
@@ -357,6 +515,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - validación visual todavía pendiente antes de declarar `TASK-070` cerrada
 
 ## Delta 2026-03-30 Cost Intelligence ya tiene baseline cerrada como módulo
+
 - Cost Intelligence ya no debe leerse como una lane experimental separada, sino como módulo operativo con baseline implementada.
 - Estado consolidado:
   - `TASK-067` cerrada: foundation técnica
@@ -375,6 +534,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `TASK-071` como consumers distribuidos en Agency, Org 360, People 360 y Home/Nexa
 
 ## Delta 2026-03-30 TASK-071 ya tiene primer cutover de consumers distribuidos
+
 - Cost Intelligence ya no vive solo en `/finance/intelligence`; el serving materializado empezó a alimentar consumers existentes del portal.
 - Estado real del cutover:
   - Agency lee `operational_pl_snapshots` para el resumen financiero de `SpaceCard`
@@ -389,6 +549,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - sigue pendiente solo validación visual/cierre limpio de la lane
 
 ## Delta 2026-03-30 Cost Intelligence documentado end-to-end
+
 - La documentación viva del repo ya refleja Cost Intelligence como módulo operativo transversal, no como lane aislada.
 - Capas ya explicitadas en arquitectura:
   - foundation técnica (`TASK-067`)
@@ -400,6 +561,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Cost Intelligence queda formalizado como layer de management accounting, closure awareness y serving distribuido hacia Agency, Organization 360, People 360, Home y Nexa.
 
 ## Delta 2026-03-30 Cost Intelligence visual validation found a display-only date bug
+
 - La validación visual real de `/finance/intelligence` confirmó que `lastBusinessDayOfTargetMonth` sí viene del calendario operativo compartido.
 - El bug detectado fue de render y timezone:
   - la UI parseaba fechas `YYYY-MM-DD` con `new Date(...)`
@@ -408,6 +570,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Con ese ajuste, el carril `TASK-070` queda todavía más cerca de cierre funcional real; el remanente ya es principalmente visual/UX, no de datos ni semántica operativa.
 
 ## Delta 2026-03-30 Cost Intelligence ya excluye assignments internos de la atribución comercial
+
 - Se consolidó una regla canónica shared para assignments internos:
   - `space-efeonce`
   - `efeonce_internal`
@@ -426,6 +589,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - se usa solo para purgar snapshots obsoletos de la misma revisión antes del upsert vigente
 
 ## Delta 2026-03-30 Commercial cost attribution queda definida como capa canónica
+
 - Greenhouse ya no debe leer la atribución comercial de costos como lógica repartida entre Payroll, Team Capacity, Finance y Cost Intelligence.
 - Decisión acordada:
 - existe una capa canónica explícita de `commercial cost attribution`
@@ -469,6 +633,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `TASK-162`
 
 ## Delta 2026-03-30 TASK-162 queda cerrada como baseline canónica de atribución comercial
+
 - La lane `commercial cost attribution` ya no queda abierta como framing o implementación parcial.
 - Estado resultante:
   - `greenhouse_serving.commercial_cost_attribution` queda institucionalizada como truth layer materializada
@@ -483,6 +648,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - si necesitan explain comercial deben apoyarse en `commercial_cost_attribution`
 
 ## Delta 2026-03-30 Sentry incident reader hardening
+
 - `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.
 - Nuevo contrato soportado:
   - `SENTRY_INCIDENTS_AUTH_TOKEN`
@@ -496,6 +662,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `SENTRY_INCIDENTS_AUTH_TOKEN` pasa a ser el canal recomendado para `Ops Health`
 
 ## Delta 2026-03-30 Finance hardening ya conecta retry DTE con emisión real
+
 - El carril de `TASK-139` ya no deja la cola DTE como stub operativo.
 - Estado vigente:
   - `greenhouse_finance.dte_emission_queue` preserva `dte_type_code`
@@ -506,6 +673,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `FINANCE_BIGQUERY_WRITE_ENABLED` sigue siendo un follow-on de lifecycle/cutover, no un bloqueo funcional del hardening base
 
 ## Delta 2026-03-30 arranca el cutover real de writes legacy de Finance
+
 - El flag `FINANCE_BIGQUERY_WRITE_ENABLED` ya no queda solo documentado.
 - Slice inicial activo:
   - `src/lib/finance/bigquery-write-flag.ts`
@@ -518,6 +686,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `TASK-166`
 
 ## Delta 2026-03-29 notifications identity model
+
 - El sistema de notificaciones ya no debe leerse como `client_user-first`.
 - Contrato canónico vigente:
   - `identity_profile` = raíz de persona
@@ -531,6 +700,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `TASK-117` y `TASK-129` ya consumen este patrón; el follow-on transversal queda formalizado en `TASK-134`.
 
 ## Delta 2026-03-29 TASK-117 auto-cálculo mensual de payroll
+
 - Payroll ya formaliza el hito mensual para dejar el período oficial en `calculated` el último día hábil del mes operativo.
 - Contratos nuevos o endurecidos:
   - `getLastBusinessDayOfMonth()` / `isLastBusinessDayOfMonth()`
@@ -541,6 +711,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `payroll_period.calculated` ya puede notificar a stakeholders operativos por el dominio reactivo `notifications` bajo la categoría `payroll_ops`.
 
 ## Delta 2026-03-29 TASK-133 observability incidents en Ops Health
+
 - El dominio Cloud ya separa dos capas de observability:
   - `posture/configuración` en `getCloudObservabilityPosture()`
   - `incidentes Sentry abiertos/relevantes` en `getCloudSentryIncidents()`
@@ -554,6 +725,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - siguen siendo señal operativa adicional, no fuente del semáforo runtime/posture
 
 ## Delta 2026-03-29 TASK-129 validada en production
+
 - `main` ya incluye el consumer institucional de notificaciones via webhook bus.
 - `production` quedó validada con delivery firmada real sobre:
   - `POST /api/internal/webhooks/notification-dispatch`
@@ -565,6 +737,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `production` ya no está bloqueada por ausencia del route en `main`
 
 ## Delta 2026-03-29 TASK-129 hardening final en staging
+
 - `staging` ya opera `webhook notifications` sin `WEBHOOK_NOTIFICATIONS_SECRET` crudo en Vercel.
 - Postura vigente del carril:
   - firma HMAC resuelta por `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF`
@@ -573,6 +746,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `src/lib/secrets/secret-manager.ts` ahora sanitiza secuencias literales `\\n` / `\\r` en variables `*_SECRET_REF`, endureciendo el contrato frente a drift de export/import de env vars.
 
 ## Delta 2026-03-29 TASK-129 iniciada
+
 - Greenhouse inicia un segundo carril institucional de notificaciones:
   - `reactive notifications` sigue como control plane legacy para eventos internos existentes
   - `webhook notifications` nace como consumer UX-facing del bus outbound
@@ -589,6 +763,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el self-loop del subscriber de notificaciones soporta bypass opcional de `Deployment Protection`, igual que el canary
 
 ## Delta 2026-03-29 TASK-129 env rollout preparado en Vercel
+
 - `staging` y `production` ya tienen `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF=webhook-notifications-secret`.
 - Postura operativa vigente:
   - `staging` mantiene además `WEBHOOK_NOTIFICATIONS_SECRET` como fallback transicional
@@ -603,6 +778,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - había `client_users` activos sin `member_id`; en `staging` se enlazaron los internos con match exacto de nombre para permitir la resolución de recipients del carril webhook notifications.
 
 ## Delta 2026-03-29 TASK-131 cerrada
+
 - El health cloud ya separa correctamente secretos runtime-críticos de secretos de tooling.
 - `src/lib/cloud/secrets.ts` ahora clasifica los secretos tracked entre:
   - `runtime`
@@ -617,6 +793,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - esos perfiles siguen siendo tooling/operación, no dependencias de serving
 
 ## Delta 2026-03-29 TASK-125 cerrada
+
 - `TASK-125` quedó cerrada con validación E2E real en `staging`.
 - Baseline operativo vigente:
   - `POST /api/admin/ops/webhooks/seed-canary` registra una subscription interna self-loop
@@ -632,6 +809,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `src/lib/webhooks/dispatcher.ts` ahora prioriza eventos `published` más recientes dentro de la ventana de 24h, para evitar starvation de subscriptions recién activadas
 
 ## Delta 2026-03-29 TASK-102 cerrada
+
 - `TASK-102` quedó cerrada con verificación externa completa.
 - Evidencia final incorporada:
   - `PITR=true`
@@ -644,6 +822,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El clone de restore se verificó por SQL y luego se eliminó; no quedaron instancias temporales vivas.
 
 ## Delta 2026-03-29 TASK-102 casi cerrada
+
 - `TASK-102` ya no está bloqueada por postura de Cloud SQL ni por rollout runtime.
 - Validaciones externas ya confirmadas:
   - `PITR=true`
@@ -656,6 +835,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Ese remanente ya quedó resuelto con un restore test limpio y documentado.
 
 ## Delta 2026-03-29 TASK-099 cerrada
+
 - `TASK-099` ya quedó cerrada para el alcance baseline de hardening seguro.
 - `src/proxy.ts` ahora materializa:
   - headers estáticos cross-cutting
@@ -666,6 +846,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - cualquier tightening posterior de `CSP` se considera mejora futura, no blocker del track cloud
 
 ## Delta 2026-03-29 TASK-099 re-scoped to the validated baseline
+
 - `TASK-099` sigue `in-progress`, pero ya no debe interpretarse como si el repo tuviera `Content-Security-Policy`.
 - Estado real consolidado:
   - `src/proxy.ts` ya aplica headers estáticos cross-cutting
@@ -680,6 +861,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - no introducir `CSP` sin rollout controlado tipo `Report-Only` o equivalente
 
 ## Delta 2026-03-29 Observability MVP cerrada
+
 - `TASK-098` quedó cerrada tras validación en `staging` y `production`.
 - `production` ya valida:
   - `observability.sentry.enabled=true`
@@ -693,6 +875,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - rotar el webhook de Slack expuesto en una captura previa
 
 ## Delta 2026-03-29 Observability MVP operativa en staging
+
 - `TASK-098` ya quedó validada end-to-end en `staging`.
 - Señales confirmadas:
   - `GET /api/internal/health` devuelve `observability.summary=Sentry runtime + source maps listos · Slack alerts configuradas`
@@ -704,6 +887,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El remanente real de `TASK-098` ya no está en repo ni en `staging`, sino en replicar el rollout a `production/main`.
 
 ## Delta 2026-03-29 Slack alerts Secret Manager-ready
+
 - `TASK-098` extendió el patrón de `TASK-124` a `SLACK_ALERTS_WEBHOOK_URL`.
 - Nuevo contrato soportado:
   - `SLACK_ALERTS_WEBHOOK_URL`
@@ -715,6 +899,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `SENTRY_DSN` se mantiene como config runtime/env
 
 ## Delta 2026-03-29 Sentry minimal runtime baseline
+
 - `TASK-098` ya no está solo en posture interna: el repo ahora incluye el wiring mínimo de `@sentry/nextjs` para App Router.
 - Archivos canónicos del slice:
   - `next.config.ts`
@@ -732,6 +917,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El rollout externo pendiente ya quedó concentrado en `production/main`.
 
 ## Delta 2026-03-29 Observability posture baseline
+
 - `TASK-098` quedó iniciada con un slice mínimo y reversible de contrato.
 - `GET /api/internal/health` ahora proyecta también `observability`, con postura de:
   - `SENTRY_DSN`
@@ -754,6 +940,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El adapter `src/lib/alerts/slack-notify.ts` y los hooks base de cron ya existen; el remanente de Slack es cargar `SLACK_ALERTS_WEBHOOK_URL` y validar envíos reales.
 
 ## Delta 2026-03-29 Security headers proxy baseline
+
 - `TASK-099` quedó iniciada con un `proxy.ts` mínimo de headers estáticos.
 - La primera versión de `src/proxy.ts`:
   - no implementa auth
@@ -762,6 +949,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Objetivo del slice: sumar protección cross-cutting barata y reversible sin romper MUI, OAuth ni assets estáticos.
 
 ## Delta 2026-03-29 Secret Manager validado en staging + production
+
 - `develop` absorbió `TASK-124` en `497cb19` y `main` absorbió el slice mínimo en `7238a90`.
 - `staging` ya ejecuta `497cb19` y `/api/internal/health` confirmó resolución real por Secret Manager para:
   - `GREENHOUSE_POSTGRES_PASSWORD`
@@ -779,6 +967,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el fallback legacy a env var sigue existiendo por compatibilidad durante la transición
 
 ## Delta 2026-03-29 Secret Manager helper baseline
+
 - `TASK-124` ya inició implementación real con un helper canónico en `src/lib/secrets/secret-manager.ts`.
 - Nuevo contrato base para secretos críticos:
   - env var legacy: `<ENV_VAR>`
@@ -795,13 +984,14 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `NEXTAUTH_SECRET`
   - `AZURE_AD_CLIENT_SECRET`
   - `GOOGLE_CLIENT_SECRET`
-  resuelven vía `src/lib/auth-secrets.ts`
+    resuelven vía `src/lib/auth-secrets.ts`
 - Validación operativa local ya ejecutada:
   - `pnpm pg:doctor --profile=runtime`
 - Estado pendiente explícito:
   - falta validación real en `staging` y `production` con secretos servidos desde Secret Manager
 
 ## Delta 2026-03-29 WIF preview validation + non-prod environment drift
+
 - El preview redeployado de `feature/codex-task-096-wif-baseline` quedó validado en Vercel con health real:
   - `version=7638f85`
   - `auth.mode=wif`
@@ -821,6 +1011,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - no endurecer Cloud SQL externo ni retirar la SA key hasta que `develop` absorba este baseline y `staging` quede validado con WIF final
 
 ## Delta 2026-03-29 Home landing cutover baseline
+
 - `TASK-119` quedó cerrada sobre la policy de landing del portal.
 - Nuevo contrato base:
   - usuarios internos/admin sin override explícito aterrizan por defecto en `/home`
@@ -830,6 +1021,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El runtime también normaliza sesiones legadas: si `NextAuth` o un registro viejo trae `'/internal/dashboard'` como home interno, el resolver canónico lo reescribe a `'/home'` antes de hidratar `session.user.portalHomePath`.
 
 ## Delta 2026-03-29 Nexa backend persistence and thread runtime
+
 - `TASK-114` quedó cerrada con persistencia operativa para Nexa en PostgreSQL bajo `greenhouse_ai`.
 - El runtime ahora materializa:
   - `nexa_threads`
@@ -840,6 +1032,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Se agregaron endpoints dedicados para feedback e historial de threads que destraban la UI pendiente de `TASK-115`.
 
 ## Delta 2026-03-29 Release channels y changelog client-facing
+
 - Greenhouse formalizo un operating model de release channels en `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md`.
 - Regla vigente:
   - el release se comunica principalmente por modulo o feature visible, no solo por plataforma completa
@@ -852,6 +1045,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `Preview`, `Staging` y `Production` siguen siendo los ambientes tecnicos; los canales de release se apoyan en ellos pero no los reemplazan.
 
 ## Delta 2026-03-29 Cloud governance operating model
+
 - `Cloud` quedó institucionalizado como dominio interno de platform governance, no como módulo client-facing nuevo.
 - La base canónica vive en `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`.
 - El dominio ahora queda explícitamente separado en:
@@ -867,10 +1061,11 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `Admin Center`
   - `/admin/cloud-integrations`
   - `/admin/ops-health`
-  consumen el bloque `cloud` como snapshot institucional del dominio.
+    consumen el bloque `cloud` como snapshot institucional del dominio.
 - `TASK-100` a `TASK-103` ya se interpretan como slices del dominio Cloud y no como hardening aislado.
 
 ## Delta 2026-03-29 Cloud SQL resilience baseline in progress
+
 - `TASK-102` ya aplicó la baseline principal de resiliencia sobre `greenhouse-pg-dev`.
 - Estado real verificado:
   - `pointInTimeRecoveryEnabled=true`
@@ -882,6 +1077,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Ese remanente ya quedó resuelto después en la misma fecha con un restore test limpio y documentado sobre `greenhouse-pg-restore-test-20260329d`.
 
 ## Delta 2026-03-29 Cloud layer robustness expansion
+
 - La capa `src/lib/cloud/*` ahora incorpora posture helpers reutilizables para el siguiente bloque `TASK-096` a `TASK-103`.
 - Nuevas piezas institucionales:
   - `src/lib/cloud/gcp-auth.ts` para postura de autenticación GCP (`wif | service_account_key | mixed | unconfigured`)
@@ -892,6 +1088,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Los crons críticos del control plane (`outbox-publish`, `webhook-dispatch`, `sync-conformed`, `ico-materialize`, `nubox-sync`) ya tienen hook base de alerting Slack en caso de fallo.
 
 ## Delta 2026-03-29 TASK-096 cerrada
+
 - `TASK-096` ya quedó cerrada para su alcance útil.
 - Estado consolidado:
   - WIF/OIDC validado en `preview`, `staging` y `production`
@@ -899,6 +1096,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - Fase 3 de Secret Manager absorbida y cerrada por `TASK-124`
 
 ## Delta 2026-03-29 GCP credentials baseline WIF-aware in progress
+
 - `TASK-096` quedó iniciada en el repo con baseline real en código; esta sesión trabajó sobre el estado actual de `develop`.
 - El repo ahora resuelve autenticación GCP con un contrato explícito en `src/lib/google-credentials.ts`:
   - `wif` si existen `GCP_WORKLOAD_IDENTITY_PROVIDER` y `GCP_SERVICE_ACCOUNT_EMAIL`, y el runtime puede obtener un token OIDC de Vercel
@@ -931,54 +1129,64 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - staging/production siguen en postura transicional hasta que Vercel + GCP WIF queden validados en preview/staging reales y se limpie un drift detectado en variables Vercel que hoy agregan sufijos literales `\n`
 
 ## Delta 2026-03-28 Admin Center governance shell
+
 - `/admin` dejó de ser un redirect ciego y ahora funciona como landing real de `Admin Center`.
 - La navegación administrativa ya separa explícitamente `Admin Center`, `Cloud & Integrations` y `Ops Health` como surfaces de gobernanza dentro del shell admin.
 - La señal operacional para esas vistas se resuelve desde una capa compartida `src/lib/operations/get-operations-overview.ts`, reutilizada también por `GET /api/agency/operations`.
 - `Admin Center` indexa la observabilidad operativa y la separa del uso diario del producto; no reemplaza `Agency > Operations`, sino que la contextualiza como vista extendida.
 
 ## Delta 2026-03-28 Centralized email delivery layer completed
+
 - `TASK-095` quedó cerrada con `sendEmail()` como capa canónica sobre Resend, registro unificado en `greenhouse_notifications.email_deliveries` y resolver por suscripción en `greenhouse_notifications.email_subscriptions`.
 - Auth, NotificationService y Payroll ya consumen esa capa; los envíos directos ad hoc y el plain text de notificaciones quedaron reemplazados por templates centralizados.
 - El contrato operativo ahora distingue `sent`, `failed` y `skipped`, con la documentación de arquitectura y el índice de tasks ya alineados al runtime implementado.
 - El retry cron `email-delivery-retry` quedó conectado a `delivery_payload` para reprocesar `failed` deliveries con hasta 3 intentos en 1 hora.
 
 ## Delta 2026-03-28 Payroll export package auto-bootstrap
+
 - La capa de exportación de Payroll ahora materializa su propia tabla `greenhouse_payroll.payroll_export_packages` si el entorno de preview aún no la tiene aplicada.
 - El objetivo es evitar que `Reenviar correo` y la descarga de artefactos queden bloqueados por un schema ausente en deployments viejos o incompletos.
 - La migración canónica sigue siendo `scripts/migrations/add-payroll-export-packages.sql`; el runtime bootstrap solo actúa como red de seguridad operacional.
 
 ## Delta 2026-03-28 Payroll email delivery staging alias lesson
+
 - `dev-greenhouse.efeoncepro.com` apunta al deployment `staging` de Vercel, no al `Preview (develop)`, así que la validación del correo de Payroll debe hacerse contra el entorno que realmente sirve ese alias.
 - Para que `Reenviar correo` funcione en ese dominio, `RESEND_API_KEY` y `EMAIL_FROM` deben existir en `staging`; tenerlos solo en `Preview (develop)` no alcanza.
 - El endpoint de reenvío no debe presentar `deliveryId: null` como éxito visible; a nivel de capa de delivery, ese caso debe distinguirse como `skipped` o `failed`.
 - Como hardening futuro, la gestión de secretos transaccionales podría vivir en Google Secret Manager con service account de sincronización, pero la app desplegada seguirá consumiendo variables del entorno de Vercel.
 
 ## Delta 2026-03-28 Payroll export actions UX hardening
+
 - `PayrollPeriodTab` ahora envuelve las acciones exportadas para que el CTA `Reenviar correo` no quede fuera de vista cuando el header tiene demasiados botones.
 - La descarga de PDF del período cambió de `window.open` a una descarga explícita por `fetch -> blob -> anchor`, con lo que el browser debe iniciar un archivo real y no una navegación dependiente del pop-up handling.
 - El contrato de negocio sigue igual: `Reenviar correo` y los artefactos descargables solo se exponen para períodos `exported`.
 
 ## Delta 2026-03-28 Payroll export package persistence completed
+
 - `TASK-097` quedó cerrada: Payroll ahora persiste PDF/CSV de exportación en GCS, sirve descargas desde storage con fallback y permite reenvío del correo desde un período ya exportado.
 - La implementación añade `greenhouse_payroll.payroll_export_packages`, la ruta `POST /api/hr/payroll/periods/[periodId]/resend-export-ready` y botones/CTAs en `PayrollPeriodTab` para reenvío.
 - El contrato de negocio no cambia: `payroll_period.exported` sigue siendo el cierre canónico; el paquete documental es derivado y reutilizable.
 
 ## Delta 2026-03-28 Payroll export package persistence in progress
+
 - `TASK-097` quedó en progreso para persistir el paquete documental de exportación Payroll en GCS y permitir reenvío del correo sin volver a cerrar el período.
 - La implementación añade una tabla `greenhouse_payroll.payroll_export_packages`, rutas de descarga basadas en storage y `POST /api/hr/payroll/periods/[periodId]/resend-export-ready`.
 - El cierre canónico sigue siendo `payroll_period.exported`; el paquete documental es un artefacto derivado y reutilizable.
 
 ## Delta 2026-03-28 Payroll export artifact persistence lane added
+
 - Se documentó `TASK-097` como follow-up de Payroll para persistir PDF/CSV de cierre en GCS y habilitar reenvío del correo sin volver a cerrar el período.
 - La lane se apoya en el contrato ya existente de `payroll_period.exported`, en el delivery de Resend y en la experiencia de recibos almacenados en bucket.
 - El alcance explícito separa cierre canónico, reenvío de correo y descargas posteriores; el cierre sigue siendo `exported`, no el click de archivo.
 
 ## Delta 2026-03-28 Centralized email delivery lane added
+
 - Se documentó `TASK-095` como lane paralela para centralizar el delivery de emails sobre Resend.
 - La idea es que Payroll, Finance, Delivery, Permissions y Auth consuman una capa única de envío en vez de helpers ad hoc.
 - La nueva task se apoya conceptualmente en la infraestructura de notificaciones existente, pero no cambia todavía el runtime de delivery.
 
 ## Delta 2026-03-28 Payroll close/export split completed
+
 - Payroll separó el cierre canónico del período de la descarga del CSV.
 - `POST /api/hr/payroll/periods/[periodId]/close` marca el período como `exported` y publica `payroll_period.exported`.
 - `GET /api/hr/payroll/periods/[periodId]/csv` y el route legacy `export` quedaron como descarga de artefacto, sin mutar estado.
@@ -987,11 +1195,13 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - La arquitectura y el catálogo de emails quedaron alineados con ese contrato.
 
 ## Delta 2026-03-28 Payroll export notification immediate flush
+
 - El cierre de Payroll ahora intenta además un flush inmediato del dominio `notifications` después de exportar el período, para no depender exclusivamente del cron en entornos interactivos o staging.
 - El flush inmediato sigue siendo best-effort: `outbox-publish` y `outbox-react` continúan como safety net operativo y la idempotencia se conserva por `outbox_reactive_log`.
 - La mutación canónica sigue siendo `payroll_period.exported`; el cambio solo acelera la entrega del correo y de los recibos downstream cuando el entorno permite procesarlos en caliente.
 
 ## Delta 2026-03-28 Payroll operational calendar utility implemented
+
 - La utilidad canónica de calendario operativo quedó implementada en `src/lib/calendar/operational-calendar.ts`.
 - La hidratación pública de feriados quedó separada en `src/lib/calendar/nager-date-holidays.ts`.
 - El contrato operativo sigue siendo timezone-aware, con base `America/Santiago`, feriados nacionales desde `Nager.Date` y overrides persistidos en Greenhouse.
@@ -1001,6 +1211,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Posibles futuros consumidores: `ICO`, `Finance`, `Campaigns` y `Cost Intelligence`, pero solo si esos dominios formalizan ciclos de cierre mensuales o ventanas operativas reales.
 
 ## Delta 2026-03-28 Payroll operational calendar timezone + jurisdiction
+
 - El calendario operativo de Payroll quedó definido como una política timezone-aware con base en `America/Santiago`.
 - La semántica de cierre debe separar:
   - `timezone` operativo de la casa matriz
@@ -1012,11 +1223,13 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - la utilidad temporal debe seguir siendo pura y no publicar outbox events por sí misma
 
 ## Delta 2026-03-28 Payroll holiday source decision
+
 - La timezone canónica del calendario operativo se resuelve con la base IANA del runtime, no con una API externa.
 - La fuente pública de mercado recomendada para feriados nacionales es `Nager.Date`.
 - Greenhouse puede persistir overrides corporativos o jurisdiccionales encima de esa fuente cuando la política local lo requiera.
 
 ## Delta 2026-03-28 Payroll operational calendar / current-period semantics split
+
 - La semántica operativa de Payroll quedó partida en dos lanes explícitas para evitar mezclar calendario y UI:
   - `TASK-091` para una utilidad canónica de calendario operativo
   - `TASK-092` para la lectura de período actual, historial y cards KPI en `/hr/payroll`
@@ -1025,15 +1238,18 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el helper temporal no debe seguir creciendo dentro de la vista de Payroll si el contrato se reutiliza en otros dominios
 
 ## Delta 2026-03-28 Payroll current-period semantics implementation started
+
 - `TASK-092` empezó a mover la lectura del período actual hacia el mes operativo vigente resuelto por la utility compartida.
 - `PayrollHistoryTab` dejó de contar `approved` como si fuera cierre final y ahora distingue `aprobado en cierre` de `cerrado/exportado`.
 - La selección temporal de `current-payroll-period` ahora busca el período del mes operativo vigente, no solo el último periodo no exportado.
 
 ## Delta 2026-03-28 Payroll current-period semantics completed
+
 - `TASK-092` quedó cerrada con la semántica operativa de período actual y la distinción visual de historial entre cierres reales y aprobaciones aún en cierre.
 - El dashboard de Payroll mantiene KPI y copy atados al período activo, mientras el historial muestra los períodos aprobados en cierre como estado intermedio y los exportados como cierre final.
 
 ## Delta 2026-03-28 Payroll UX semantics and feedback hardening
+
 - `TASK-089` cerró el endurecimiento de UX de Payroll sin alterar el dominio de cálculo:
   - el dashboard separa período activo e histórico seleccionado
   - las vistas críticas muestran error y retry visibles
@@ -1045,6 +1261,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - las descargas de recibos deben comunicar fallo y nombre humano del documento, no solo disparar una navegación o log interno
 
 ## Delta 2026-03-28 Operating Entity Identity — React context + API endpoint
+
 - La identidad de la entidad operadora (razón social, RUT, dirección legal) ya no se resuelve ad hoc por cada consumer.
 - Nuevo baseline:
   - `OperatingEntityProvider` + `useOperatingEntity()` hook en `src/context/OperatingEntityContext.tsx`
@@ -1057,6 +1274,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - multi-tenant ready: si la operación se fragmenta por tenant, el layout resuelve el operating entity del scope de la sesión
 
 ## Delta 2026-03-28 Payroll reactive hardening complete
+
 - `TASK-088` cerró la lane reactiva de Payroll sin cambiar la semántica funcional del módulo:
   - la cola persistente `greenhouse_sync.projection_refresh_queue` ya vuelve de forma observable a `completed` o `failed`
   - `reactive-consumer` completa best-effort después del ledger reactivo y no convierte un fallo de completion en fallo del refresh exitoso
@@ -1066,6 +1284,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `payroll_period.exported` sigue siendo el cierre canónico de nómina, independientemente del runtime Postgres-first o BigQuery fallback
 
 ## Delta 2026-03-28 Payroll hardening backlog documented
+
 - La auditoría de Payroll dejó tres lanes explícitas para seguir endureciendo el módulo sin mezclar objetivos:
   - `TASK-087`: invariantes del lifecycle oficial y gate de readiness
   - `TASK-088`: cola reactiva, export parity y contrato de projected payroll / receipts
@@ -1078,6 +1297,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - la nómina oficial y la proyectada siguen siendo objetos distintos; la proyección alimenta, pero no reemplaza, el lifecycle oficial
 
 ## Delta 2026-03-28 Payroll lifecycle invariants hardened
+
 - `TASK-087` ya quedó cerrada para mover la semántica del lifecycle oficial desde los routes hacia el dominio.
 - Nuevo contrato operativo:
   - `approved` solo se acepta desde `calculated`
@@ -1087,6 +1307,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `approved` sigue siendo checkpoint editable, no cierre final; el cierre real sigue siendo `exported`
 
 ## Delta 2026-03-28 Compensation Chile líquido-first + reverse engine completo
+
 - `TASK-079` a `TASK-085` cerradas en una sesión:
   - Motor reverse `computeGrossFromNet()` con binary search, piso IMM, convergencia ±$1 CLP
   - Regla de negocio: líquido deseado = neto con descuentos legales (7% salud, no Isapre)
@@ -1104,6 +1325,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el líquido a pagar varía mes a mes por ausencias, bonos, excedente Isapre, etc.
 
 ## Delta 2026-03-28 Reverse payroll engine (Slices 1-2 validados)
+
 - `TASK-079` Slices 1-2 validados en staging contra liquidación real de Valentina Hoyos (Feb 2026).
 - Motor `computeGrossFromNet()` en `src/lib/payroll/reverse-payroll.ts`: binary search sobre forward engine real, ±$1 CLP, 10 golden tests.
 - Reglas de negocio Chile validadas:
@@ -1116,11 +1338,13 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - No se introdujeron nuevos eventos ni cambios de schema (aún); el campo `desired_net_clp` requiere migration.
 
 ## Delta 2026-03-28 Reactive receipts projection log + queue fix
+
 - El ledger reactivo ahora es projection-aware: `greenhouse_sync.outbox_reactive_log` quedó keyeado por `(event_id, handler)` para que un handler no bloquee al resto de proyecciones del mismo evento.
 - La cola persistente `greenhouse_sync.projection_refresh_queue` recuperó su `UNIQUE (projection_name, entity_type, entity_id)` para que `enqueueRefresh()` deduzca intents sin caer en `ON CONFLICT` inválido.
 - Esto destraba la materialización de `payroll_receipts_delivery` después de `payroll_period.exported`, que era el último bloqueo estructural del smoke de `TASK-077`.
 
 ## Delta 2026-03-28 Payroll receipts smoke complete
+
 - `TASK-077` quedó cerrada en staging con smoke end-to-end real:
   - `outbox-publish` publicó el evento nuevo de `payroll_period.exported`
   - `outbox-react` materializó `payroll_receipts_delivery`
@@ -1129,6 +1353,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El flujo de recibos queda ahora validado no solo por código y docs, sino también por ejecución real sobre marzo 2026.
 
 ## Delta 2026-03-28 Payroll receipts registry + reactive delivery
+
 - `Payroll` ya persistió un registry canónico de recibos en `greenhouse_payroll.payroll_receipts`.
 - La generación batch de recibos al exportar período se ejecuta por `payroll_period.exported` a través de proyecciones reactivas, no por cron separado.
 - La descarga de recibos por HR prioriza el PDF almacenado en GCS y cae a render on-demand solo como fallback.
@@ -1136,27 +1361,32 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Quedan pendientes el pulido del layout de recibos y el smoke end-to-end con correo + descarga en staging.
 
 ## Delta 2026-03-28 Projected payroll snapshot grants
+
 - `greenhouse_serving.projected_payroll_snapshots` es una materialización serving escribible por el runtime de Payroll projected, con grants explícitos para `greenhouse_app`, `greenhouse_runtime` y `greenhouse_migrator`.
 - La promoción `Projected -> Official` usa ese snapshot como cache auditable, no como source of truth transaccional.
 - El permiso denegado en staging se resolvió añadiendo el grant a la migration/bootstrap de Payroll, sin mover la tabla fuera de `greenhouse_serving`.
 
 ## Delta 2026-03-28 Payroll AFP split
+
 - `Payroll Chile` ahora versiona y snapshottea `AFP` con split explícito de `cotización` y `comisión`, manteniendo también el total agregado para compatibilidad histórica.
 - Las superficies de exportación y recibos deben mostrar ambos componentes cuando existan, pero el cálculo legal sigue consumiendo el total AFP para no alterar la paridad del período.
 - La migration operativa quedó disponible en `scripts/migrations/add-chile-afp-breakdown.sql`.
 
 ## Delta 2026-03-28 Employer legal identity
+
 - La razón social canónica de la organización operativa propietaria de Greenhouse es `Efeonce Group SpA`.
 - El RUT canónico es `77.357.182-1`.
 - La dirección legal canónica es `Dr. Manuel Barros Borgoño 71 of 05, Providencia, Chile`.
 - Estos datos deben reutilizarse en liquidaciones, recibos, exportes legales, Finance y surfaces comerciales como identidad de la organización/empleador, no como dato de persona ni como identidad de cliente.
 
 ## Delta 2026-03-28 Chile employer cost base
+
 - `Payroll Chile` ya calcula un breakdown de costos empleador (`SIS`, cesantía empleador y mutual estimado) y lo persiste junto a las entries.
 - `member_capacity_economics.total_labor_cost_target` absorbe ese breakdown para que Cost Intelligence pueda ver el costo laboral cargado real sin inventar otra proyección.
 - Esta base reutiliza la misma propagación reactiva de `compensation_version.created/updated` y `payroll_entry.upserted`.
 
 ## Delta 2026-03-28 Payroll Chile smoke validation
+
 - Se validó contra la liquidación real de febrero 2026 de Valentina Hoyos que el núcleo legal de `Payroll Chile` ya calza con el PDF cuando existen los insumos correctos:
   - `IMM = 539000`
   - compensación Chile vigente con gratificación legal mensual
@@ -1172,6 +1402,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el helper/ruta de creación de compensación sigue requiriendo revisión separada, pero no invalida el cálculo core cuando la data está cargada
 
 ## Delta 2026-03-28 Chile payroll non-imponible allowances
+
 - `Payroll Chile` ahora modela `colación` y `movilización` como haberes canónicos versionados en la compensación y en `payroll_entries`.
 - El motor forward los incorpora al devengado y al neto, manteniendo su carácter no imponible.
 - El cambio se expone por las superficies existentes de `compensation_version.created/updated` y `payroll_entry.upserted`; no se agregó un nuevo evento.
@@ -1179,6 +1410,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - los consumidores de recibos, PDF, Excel, breakdown y projected payroll deben mostrar esos haberes cuando existan y tratarlos como parte del contrato de nómina Chile, no como un bono manual ad hoc
 
 ## Delta 2026-03-27 Payroll variable bonus policy recalibration
+
 - `Payroll` ya no depende de una policy simple para bonos variables (`OTD >= threshold`, `RpA` lineal hasta un único umbral).
 - Baseline nuevo materializado:
   - `OTD` con full payout desde `89%` y piso `70%`
@@ -1196,6 +1428,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `TASK-025` (`FTR`) deja de ser el siguiente paso obligatorio; pasa a ser una alternativa estratégica futura
 
 ## Delta 2026-03-27 Economic indicators runtime baseline
+
 - Finance ya no queda limitado semánticamente a `exchange_rates` para datos macroeconómicos chilenos.
 - Baseline nuevo materializado:
   - helper server-side común para `USD_CLP`, `UF`, `UTM`, `IPC`
@@ -1210,6 +1443,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `Payroll` ya no debe pedir `UF` manualmente por defecto al crear/editar períodos; debe autohidratarla desde indicadores usando el mes imputable
 
 ## Delta 2026-03-27 Payroll variable bonus policy recalibrated
+
 - `Payroll` mantiene a `ICO` como fuente canónica de `OTD` y `RpA`, pero su policy de payout ya no es solo un threshold lineal simple.
 - Regla operativa nueva:
   - `OTD` paga `100%` desde `89%`, con piso de prorrateo en `70%`
@@ -1227,6 +1461,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - cualquier fallback analítico debe tolerar esquemas viejos y rellenar defaults para no romper ambientes parcialmente migrados
 
 ## Delta 2026-03-26 Team capacity architecture canonized
+
 - La arquitectura de capacidad/economía de equipo ya no vive solo en una task o en el código.
 - La fuente canónica quedó fijada en:
   - `docs/architecture/GREENHOUSE_TEAM_CAPACITY_ARCHITECTURE_V1.md`
@@ -1237,6 +1472,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - no crear una segunda capa paralela de capacidad por miembro/período si el problema es solo un nuevo consumer o un nuevo campo del mismo dominio
 
 ## Delta 2026-03-26 TASK-056 reactive capacity economics slice
+
 - Se materializó la nueva proyección reactiva `member_capacity_economics` en `greenhouse_serving.member_capacity_economics`.
 - El snapshot quedó centrado en `member_id + period_year + period_month` y materializa:
   - capacidad contractual
@@ -1260,6 +1496,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `pnpm exec tsc --noEmit --pretty false`
 
 ## Delta 2026-03-24 Task system normalization
+
 - El sistema de tasks deja de nacer bajo el prefijo `CODEX_TASK_*` como convencion nueva.
 - Regla operativa derivada:
   - toda task nueva debe usar un ID estable `TASK-###`
@@ -1271,6 +1508,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - los `CODEX_TASK_*` existentes siguen vigentes como legacy hasta su migracion y no deben renumerarse de forma masiva sin una lane dedicada
 
 ## Delta 2026-03-24 GitHub Project materialized
+
 - El Project operativo recomendado ya no es hipotetico: quedó creado en GitHub bajo `efeoncepro`.
 - Estado real:
   - Project: `Greenhouse Delivery`
@@ -1282,6 +1520,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el `Status` built-in de GitHub queda como estado coarse (`Todo`, `In Progress`, `Done`)
 
 ## Delta 2026-03-22 Webhook architecture canonized
+
 - La infraestructura de webhooks de Greenhouse ya no queda como idea difusa entre una ruta aislada de Teams, el outbox y la API de integraciones.
 - La fuente canonica para webhook architecture quedo fijada en:
   - `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
@@ -1293,6 +1532,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `docs/tasks/to-do/CODEX_TASK_Webhook_Infrastructure_MVP_v1.md`
 
 ## Delta 2026-03-22 Repo ecosystem canonized
+
 - Ya no queda implícito qué repos externos son hermanos operativos de `greenhouse-eo`.
 - La fuente canónica para ownership multi-repo y selección de upstream quedó fijada en:
   - `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`
@@ -1306,6 +1546,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - si un cambio toca una integración o pipeline cuyo runtime vive fuera del portal, el agente debe revisar primero ese repo hermano antes de asumir que el fix o la evolución pertenece a `greenhouse-eo`
 
 ## Delta 2026-03-21 Payroll architecture canonized
+
 - `Payroll` ya no depende solo de contexto distribuido entre tasks y código: su contrato completo de módulo quedó consolidado en `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`.
 - Ese documento fija como canon:
   - compensación versionada por vigencia, no mensual
@@ -1317,6 +1558,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - cambios futuros de semantics o ownership de `Payroll` deben actualizar primero `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, y solo dejar deltas breves en `project_context.md`, `Handoff.md` y `changelog.md`
 
 ## Delta 2026-03-21 Payroll period lifecycle — approved is editable, exported is final
+
 - Se ajustó la semántica operativa de estados de `Payroll` para alinearla con el flujo real de pago:
   - el período imputable sigue siendo el mes calendario (`2026-02`, `2026-03`, etc.)
   - la nómina puede aprobarse dentro del flujo de revisión y seguir ajustándose antes de su pago/exportación
@@ -1333,6 +1575,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - solo los períodos `exported` quedan completamente congelados para recalcular, editar entries o bloquear cambios de compensación reutilizada
 
 ## Delta 2026-03-21 Payroll period correction — imputed month/year can be fixed before export
+
 - Se detectó un caso operativo real: una nómina puede haberse creado como `2026-03` solo para prueba aunque en realidad corresponda al mes imputable `2026-02`.
 - Regla operativa derivada:
   - `year` y `month` del período son la identidad del mes imputable, no del mes de pago
@@ -1343,6 +1586,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - no se permite “renombrar” un período exportado ni moverlo encima de un `periodId` ya existente
 
 ## Delta 2026-03-21 Payroll KPI source cutover — ICO becomes the monthly source of truth
+
 - Se confirmó una brecha entre la intención funcional de `Payroll` y su runtime real:
   - los montos de compensación (`salario base`, `bono conectividad`, `bono máximo On-Time`, `bono máximo RpA`) ya vivían correctamente versionados en `compensation_versions`
   - pero el cálculo mensual de `On-Time` y `RpA` todavía dependía de `notion_ops.tareas`
@@ -1356,6 +1600,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - períodos históricos con `kpi_data_source = notion_ops` se siguen leyendo por compatibilidad, pero los nuevos cálculos deben registrar `kpi_data_source = ico`
 
 ## Delta 2026-03-21 MUI live-region sizing pitfall — width/height numeric shorthand is unsafe for visually hidden nodes
+
 - Se confirmó un bug real de layout en `People`: un `aria-live` oculto dentro de `PersonTabs` usaba `sx={{ width: 1, height: 1 }}`.
 - Regla operativa derivada:
   - en MUI `sx`, para propiedades de tamaño (`width`, `height`, etc.), el valor numérico `1` significa `100%`, no `1px`
@@ -1366,6 +1611,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - se corrigió `PersonTabs` y se saneó el duplicado equivalente en `OrganizationTabs`
 
 ## Delta 2026-03-20 HR Payroll — contraste arquitectónico confirma cierre completo
+
 - Se contrastaron las 2 tasks de Payroll contra la arquitectura 360 real:
   - `CODEX_TASK_HR_Payroll_Postgres_Runtime_Migration_v1` — schema `greenhouse_payroll` materializado, 25+ funciones en postgres-store, 11/11 rutas Postgres-first
   - `CODEX_TASK_HR_Payroll_Module_v3` — 4 gaps UX cerrados (alta compensación, edición período, KPI manual, ficha colaborador)
@@ -1376,6 +1622,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Ambas tasks cerradas y movidas a `docs/tasks/complete/`
 
 ## Delta 2026-03-20 BigQuery cron hardening — schema drift + streaming buffer
+
 - Se confirmó que el readiness hacia producción no estaba bloqueado por `build`, sino por dos fallos de cron en BigQuery:
   - `GET /api/cron/ico-materialize` fallaba cuando `ico_engine.metrics_by_project` existía pero sin columnas nuevas como `pipeline_velocity`
   - `GET /api/cron/sync-conformed` fallaba por `streaming buffer` al ejecutar `DELETE` sobre `greenhouse_conformed.delivery_*` después de escribir con `insertAll`
@@ -1387,6 +1634,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `src/lib/sync/sync-notion-conformed.ts` ahora reemplaza `delivery_projects`, `delivery_tasks` y `delivery_sprints` con load jobs `WRITE_TRUNCATE`
 
 ## Delta 2026-03-20 Sidebar navigation — reestructuración arquitectónica
+
 - Se eliminó todo label en inglés del sidebar: `Updates`, `Control Tower`, `HR`, `Admin`, `AI Tooling` pasan a español.
 - Se definió una regla explícita de cuándo usar cada patrón de menú:
   - **Flat MenuItem**: navegación primaria siempre visible (click directo)
@@ -1402,6 +1650,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - Los hijos de SubMenu deben usar `NavLabel` con subtítulo, igual que los items de nivel superior
 
 ## Delta 2026-03-20 Nubox DTE staging runtime aligned + DTE labeling clarified
+
 - `staging` / `dev-greenhouse.efeoncepro.com` no tenía cargadas las env vars Nubox aunque `Development`, `Preview` y `Production` sí.
 - Se alineó `staging` con:
   - `NUBOX_API_BASE_URL`
@@ -1416,6 +1665,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `Finance > Ingresos > detalle` debe separar visualmente `Tipo de documento`, `Código SII` y `Folio DTE` para evitar interpretar `33` como número de factura
 
 ## Delta 2026-03-19 Nubox DTE integration — API discovery, org mapping, supplier seeding, income import
+
 - Se descubrió y validó la New API de Nubox (Integraciones/Pyme) con credenciales productivas:
   - Base URL: `https://api.pyme.nubox.com/nbxpymapi-environment-pyme/v1`
   - Auth: `Authorization: Bearer <token>` + `x-api-key: <key>`
@@ -1442,6 +1692,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - Nubox New API es la única API activa; la Old API (`api.nubox.com`) NO se usa
 
 ## Delta 2026-03-15 Person 360 audit and serving baseline materialized
+
 - Se materializó `greenhouse_serving.person_360` en Cloud SQL como primer serving unificado de persona sobre:
   - `greenhouse_core.identity_profiles`
   - `greenhouse_core.members`
@@ -1467,6 +1718,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `People` y `Users` ya tienen un backbone real al cual migrar, pero todavía no lo consumen
 
 ## Delta 2026-03-15 Person 360 formalized as canonical profile strategy
+
 - Se fijó explícitamente que Greenhouse no debe seguir tratando `People`, `Users`, `CRM Contact` y `Member` como identidades distintas.
 - Decisión de arquitectura:
   - `identity_profile` es el ancla canónica de persona
@@ -1482,6 +1734,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Esto no reemplaza `Identity & Access V2`; lo complementa como capa de modelo y serving sobre persona.
 
 ## Delta 2026-03-15 AI Tooling runtime migrated to PostgreSQL
+
 - `AI Tooling` ya no depende primariamente del bootstrap runtime de BigQuery para `catalog`, `licenses`, `wallets` y `metadata`.
 - Se materializó `greenhouse_ai` en Cloud SQL con:
   - `tool_catalog`
@@ -1513,6 +1766,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - no volver a depender de `ensureAiToolingInfrastructure()` como camino principal de request path
 
 ## Delta 2026-03-15 Performance indicators and source RpA semaphore identified and wired for runtime
+
 - Se confirmó contra `notion_ops.tareas` que la fuente ya trae indicadores operativos explícitos, no solo señales derivadas:
   - `🟢 On-Time`
   - `🟡 Late Drop`
@@ -1551,11 +1805,12 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el consumer de `Project Detail` no depende de esperar ese apply porque lee estos campos directo desde `notion_ops.tareas`
 
 ## Delta 2026-03-15 Finance clients consumers migrated to canonical-first, live-compatible reads
+
 - `Finance > Clients` ya no depende solo de `hubspot_crm.*` live para listar y detallar clientes.
 - Las rutas:
   - `GET /api/finance/clients`
   - `GET /api/finance/clients/[id]`
-  ahora usan patrón `canonical first + live fallback`.
+    ahora usan patrón `canonical first + live fallback`.
 - Fuente primaria nueva:
   - `greenhouse_conformed.crm_companies`
   - `greenhouse_conformed.crm_deals`
@@ -1568,22 +1823,24 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el patrón correcto de transición es `canonical first, live fallback`, no `raw only` ni `projection only`
 
 ## Delta 2026-03-15 Admin project scope consumers now prefer delivery projections
+
 - `Admin > tenant detail` y `Admin > user detail` ya no dependen solo de `notion_ops.proyectos` para resolver nombres de proyecto en scopes.
 - Los consumers:
   - `src/lib/admin/get-admin-tenant-detail.ts`
   - `src/lib/admin/get-admin-user-detail.ts`
-  ahora priorizan `greenhouse_conformed.delivery_projects.project_name`.
+    ahora priorizan `greenhouse_conformed.delivery_projects.project_name`.
 - `notion_ops.proyectos` queda temporalmente solo como fallback y para `page_url`, porque ese campo todavía no vive en `delivery_projects`.
 - Regla derivada:
   - cuando la proyección canónica ya resuelve el nombre operativo, usarla primero
   - mantener source fallback solo para campos que aún no se materializan en el projection
 
 ## Delta 2026-03-15 Projects consumers now prefer delivery metadata first
+
 - `Projects` ya no depende solo de `notion_ops.proyectos` y `notion_ops.sprints` para metadata base.
 - Los consumers:
   - `src/lib/projects/get-projects-overview.ts`
   - `src/lib/projects/get-project-detail.ts`
-  ahora priorizan:
+    ahora priorizan:
   - `greenhouse_conformed.delivery_projects`
   - `greenhouse_conformed.delivery_sprints`
 - Alcance de este corte:
@@ -1598,6 +1855,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - dejar el cálculo fino en legacy hasta que esos campos también estén proyectados de forma canónica
 
 ## Delta 2026-03-15 HubSpot contacts + owners projected into canonical sync model
+
 - `Source Sync Runtime Projections` ya materializa contactos CRM en:
   - `greenhouse_conformed.crm_contacts`
   - `greenhouse_crm.contacts`
@@ -1640,6 +1898,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - la cobertura actual de `owner -> user` depende de cuántos colaboradores internos ya tengan principal en `client_users`; hoy solo `Julio` quedó resuelto en esa capa
 
 ## Delta 2026-03-15 Space model added to canonical 360 and delivery projections
+
 - `greenhouse_core.spaces` y `greenhouse_core.space_source_bindings` ya existen en Cloud SQL como nuevo boundary operativo del 360.
 - Regla arquitectónica ya documentada y aplicada:
   - `client` = boundary comercial
@@ -1677,6 +1936,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - cuando un objeto legacy no puede transferirse, el script continúa con `NOTICE` en vez de bloquear toda la evolución del backbone
 
 ## Delta 2026-03-15 Data model master and source-sync runtime seed
+
 - Se agregó la fuente de verdad del modelo de datos actual en:
   - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
 - Se agregó la guía operativa para evolucionar ese documento en:
@@ -1707,6 +1967,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - binding tenant-level futuro del workspace de delivery en Notion
 
 ## Delta 2026-03-15 PostgreSQL access model and tooling
+
 - Se formalizó la capa de acceso escalable a Cloud SQL en:
   - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
 - `AGENTS.md` ya documenta explícitamente cómo acceder y operar PostgreSQL para evitar que otros agentes vuelvan a usar el perfil incorrecto.
@@ -1736,6 +1997,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - se dejó la fundación para que los siguientes cortes de dominio no dependan de grants manuales repetidos
 
 ## Delta 2026-03-15 Finance PostgreSQL first slice
+
 - Se materializó el primer slice operacional de `Finance` sobre PostgreSQL en `greenhouse-pg-dev / greenhouse_app`.
 - Nuevo schema operativo:
   - `greenhouse_finance`
@@ -1772,6 +2034,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - dashboards y reporting financiero pesado siguen en BigQuery por ahora
 
 ## Delta 2026-03-15 Source sync foundation materialized
+
 - Se ejecutó el primer slice técnico del blueprint de sync externo sobre PostgreSQL y BigQuery.
 - Scripts nuevos agregados:
   - `pnpm setup:postgres:source-sync`
@@ -1816,6 +2079,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el siguiente paso ya no es “crear estructura”, sino construir jobs de ingestión/backfill que llenen `raw`, materialicen `conformed` y proyecten `greenhouse_crm` / `greenhouse_delivery`
 
 ## Delta 2026-03-15 External source sync blueprint
+
 - Se agregó `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` para formalizar cómo Greenhouse debe desacoplar cálculos y runtime de `Notion` y `HubSpot`.
 - Dirección operativa definida:
   - `Notion` y `HubSpot` quedan como `source systems`
@@ -1839,6 +2103,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el raw externo se respalda en BigQuery y el subset operativo se sirve desde PostgreSQL
 
 ## Delta 2026-03-15 HR leave preview rollout hardening
+
 - El cutover de `HR > Permisos` a PostgreSQL en `Preview` quedó endurecido con fallback operativo a BigQuery para evitar que la vista completa falle si Cloud SQL no está disponible.
 - El slice de `leave` ahora puede caer controladamente al path legacy para:
   - metadata
@@ -1853,6 +2118,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - BigQuery queda como red de seguridad temporal mientras se estabiliza el rollout por ambiente
 
 ## Delta 2026-03-15 HR leave runtime cutover to PostgreSQL
+
 - `HR > Permisos` se convirtió en el primer dominio operativo del portal que ya usa PostgreSQL en runtime sobre la instancia `greenhouse-pg-dev`.
 - Se agregó el dominio `greenhouse_hr` en Cloud SQL con:
   - `leave_types`
@@ -1883,7 +2149,37 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - sólo `HR > Permisos` quedó cortado a PostgreSQL
   - `departamentos`, `member profile` y `attendance` siguen en BigQuery, pero ya sin bootstraps mutantes en navegación normal
 
+## Delta 2026-03-31 HR leave policy, calendar and payroll impact hardening
+
+- `HR > Permisos` ya no depende de `requestedDays` enviado por el caller:
+  - los días hábiles se derivan desde `src/lib/hr-core/leave-domain.ts`
+  - esa capa se apoya en el calendario operativo canónico y en `Nager.Date` para feriados Chile
+- El dominio `greenhouse_hr` suma `leave_policies` como capa explícita de policy para leave.
+- `/api/hr/core/leave/calendar` queda disponible como source canónica del calendario de ausencias del equipo.
+- `/api/my/leave` deja de ser solo balances y ahora devuelve también `requests` + `calendar`.
+- El setup real del dominio quedó aplicado en `greenhouse-pg-dev / greenhouse_app`:
+  - `pnpm setup:postgres:hr-leave`
+  - `pnpm setup:postgres:person-360-contextual`
+  - validación runtime posterior: `leave_policies=10`, `leave_types=10`, `leave_balances=4`
+- El outbox de leave ahora emite:
+  - `leave_request.created`
+  - `leave_request.escalated_to_hr`
+  - `leave_request.approved`
+  - `leave_request.rejected`
+  - `leave_request.cancelled`
+  - `leave_request.payroll_impact_detected`
+- Regla arquitectónica vigente:
+  - leave no calcula costos ni provider/tooling directo
+  - el carril canónico es `leave -> payroll -> cost projections`
+- Cuando un permiso aprobado impacta un período de nómina no exportado:
+  - se recalcula payroll oficial desde la proyección reactiva `leave_payroll_recalculation`
+  - luego siguen reaccionando los consumers habituales de payroll/cost attribution
+- Cuando el período ya está `exported`, el sistema no recalculea automáticamente:
+  - emite alerta operativa para payroll/finance
+  - el ajuste queda como downstream manual/diferido por política
+
 ## Delta 2026-03-15 Data platform architecture and Cloud SQL foundation
+
 - Se agregó la arquitectura de datos objetivo en:
   - `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`
   - `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
@@ -1947,6 +2243,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `GREENHOUSE_BIGQUERY_LOCATION`
 
 ## Delta 2026-03-15 Finance exchange-rate sync persistence
+
 - `Finance` ahora tiene hidratación automática server-side de `USD/CLP` para evitar que ingresos/egresos en USD dependan de carga manual previa.
 - Proveedores activos para tipo de cambio:
   - primario: `mindicador.cl`
@@ -1974,6 +2271,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - frontend no debe intentar resolver tipo de cambio desde cliente ni depender de input manual cuando el backend ya puede hidratar la tasa del día
 
 ## Delta 2026-03-14 Portal surface consolidation task
+
 - Se documentó una task `to-do` específica para consolidación UX y arquitectura de surfaces del portal:
   - `docs/tasks/to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md`
 - La task no propone cambios de código inmediatos.
@@ -1986,6 +2284,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - no seguir abriendo rutas nuevas por módulo sin revisar antes esta consolidación de surfaces
 
 ## Delta 2026-03-14 People + Team capacity backend complements
+
 - `People v3` y `Team Identity & Capacity v2` ya no dependen solo de contratos mínimos heredados.
 - Complementos backend activos:
   - `GET /api/people/meta`
@@ -1997,6 +2296,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - frontend de `People` debe usar `meta`, `capacity` y `financeSummary` como contratos canónicos de lectura 360
 
 ## Delta 2026-03-14 Team Identity & People task reclassification
+
 - `Team Identity & Capacity` y `People Unified View v2` fueron contrastadas explícitamente contra:
   - `GREENHOUSE_ARCHITECTURE_V1.md`
   - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
@@ -2016,6 +2316,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `docs/tasks/to-do/CODEX_TASK_Team_Identity_Capacity_System_v2.md` pasa a ser la task vigente para formalización de capacity
 
 ## Delta 2026-03-14 Creative Hub task reclassification
+
 - `Creative Hub` fue contrastado explícitamente contra:
   - `GREENHOUSE_ARCHITECTURE_V1.md`
   - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
@@ -2035,6 +2336,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `docs/tasks/to-do/CODEX_TASK_Creative_Hub_Module_v2.md` pasa a ser la task vigente para cierre runtime
 
 ## Delta 2026-03-14 Creative Hub backend runtime closure
+
 - `Creative Hub v2` ya no depende solo del snapshot genérico de `Capabilities`; ahora tiene backend propio de enriquecimiento creativo para cerrar los gaps detectados.
 - Complementos backend agregados:
   - `resolveCapabilityModules()` ahora exige match de `business line` y `service module` cuando ambos requisitos existen
@@ -2056,6 +2358,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - no crea objeto canónico paralelo de capability, asset o proyecto
 
 ## Delta 2026-03-14 HR core backend foundation
+
 - `HR Core Module` fue contrastado explícitamente contra:
   - `GREENHOUSE_ARCHITECTURE_V1.md`
   - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
@@ -2100,6 +2403,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `HR_CORE_TEAMS_WEBHOOK_SECRET` para proteger la ingesta externa de asistencia
 
 ## Delta 2026-03-14 AI tooling backend foundation
+
 - `AI Tooling & Credit System` fue contrastada explícitamente contra:
   - `GREENHOUSE_ARCHITECTURE_V1.md`
   - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
@@ -2142,6 +2446,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - frontend de AI Tooling no debe inventar catálogo, providers, enums ni balance derivado si el backend ya entrega esos contratos
 
 ## Delta 2026-03-14 Admin team backend complements
+
 - `Admin Team Module v2` fue contrastado explícitamente contra:
   - `GREENHOUSE_ARCHITECTURE_V1.md`
   - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
@@ -2162,6 +2467,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - cuando el colaborador ya tiene `identity_profile_id`, el backend ahora sincroniza best-effort `azureOid`, `notionUserId` y `hubspotOwnerId` hacia `greenhouse.identity_profile_source_links`
 
 ## Delta 2026-03-14 HR payroll v3 backend complements
+
 - `HR Payroll v3` ya fue contrastado explícitamente contra:
   - `GREENHOUSE_ARCHITECTURE_V1.md`
   - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
@@ -2181,6 +2487,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - frontend de `HR Payroll` debe consumir estos contratos como source of truth y no recomputar discovery de colaboradores o KPIs agregados si el backend ya los expone
 
 ## Delta 2026-03-14 Finance backend runtime closure
+
 - `Finance` ya no debe tratarse solo como dashboard + CRUD parcial; ahora también expone una capa backend de soporte operativo para que frontend cierre conciliación y egresos especializados sin inventar contratos.
 - Superficie backend agregada o endurecida:
   - `GET /api/finance/reconciliation/[id]/candidates`
@@ -2196,6 +2503,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `auto-match`, `match`, `unmatch` y `exclude` ya no pueden dejar desacoplado el estado entre la fila bancaria y la transacción financiera reconciliada
 
 ## Delta 2026-03-14 Task board reorganization
+
 - `docs/tasks/` ya no debe leerse como una carpeta plana de briefs.
 - Regla operativa nueva:
   - las `CODEX_TASK_*` se ordenan en paneles `in-progress`, `to-do` y `complete`
@@ -2208,6 +2516,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - mover una task entre paneles requiere contraste con repo real + `project_context.md` + `Handoff.md` + `changelog.md`, no solo intuición
 
 ## Delta 2026-03-14 Provider canonical object alignment
+
 - La arquitectura 360 ya no debe tratar `provider`, `vendor` o `supplier` como conceptos intercambiables.
 - Regla operativa nueva:
   - `Provider` pasa a reconocerse como objeto canónico objetivo para vendors/plataformas reutilizables entre AI Tooling, Finance, Identity y Admin
@@ -2219,6 +2528,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - futuras relaciones de licencias, wallets, costos y mapeos de identidad deben resolver contra `provider_id` cuando aplique
 
 ## Delta 2026-03-14 Greenhouse 360 object model
+
 - El repo ahora formaliza una regla de arquitectura transversal: Greenhouse debe evolucionar como plataforma de `objetos canónicos enriquecidos`, no como módulos con identidades paralelas por silo.
 - Documento canónico nuevo:
   - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
@@ -2233,6 +2543,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `Cotización`, `Proyecto` y `Sprint` quedan definidos como objetos canónicos objetivo aunque todavía necesiten mayor formalización de identidad en runtime
 
 ## Delta 2026-03-14 Finance canonical backend phase
+
 - El módulo `Finance` mantiene sus tablas `fin_*` como capa transaccional propia, pero ya no debe modelarse como silo aislado:
   - `greenhouse.clients.client_id` queda como llave canónica de cliente
   - `greenhouse.team_members.member_id` queda como llave canónica de colaborador
@@ -2249,6 +2560,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - las vistas 360 deben salir de read-models enriquecidos, no de convertir `fin_*` en source of truth para roster o tenants
 
 ## Delta 2026-03-14 Admin team backend foundation
+
 - El repo ya tiene la primera capa backend de escritura para `Admin Team Module v2` sobre rama de trabajo dedicada:
   - `src/lib/team-admin/mutate-team.ts`
   - `/api/admin/team/meta`
@@ -2270,6 +2582,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `GET /api/admin/team/members` se mantiene como capability handshake compatible con la task para habilitar CTAs admin sin depender de `404/405`
 
 ## Delta 2026-03-14 People unified frontend
+
 - Frontend completo de `People Unified View v2` implementado sobre los contratos backend:
   - `/people` → `PeopleList.tsx` (stats + filtros + tabla TanStack)
   - `/people/[memberId]` → `PersonView.tsx` (2 columnas: sidebar + tabs)
@@ -2287,6 +2600,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - La carpeta `views/greenhouse/people/drawers/` queda reservada para Admin Team Module (CRUD)
 
 ## Delta 2026-03-14 People unified backend foundation
+
 - El repo ya tiene una primera capa backend read-only para `People Unified View`:
   - `GET /api/people`
   - `GET /api/people/[memberId]`
@@ -2324,6 +2638,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el sidebar de persona debe usar `summary` del payload, no recomputar FTE u horas desde la tabla
 
 ## Delta 2026-03-14 HR payroll backend foundation
+
 - El repo ya tiene una primera capa backend operativa de `HR Payroll` bajo el route group propio `hr`:
   - `src/app/(dashboard)/hr/layout.tsx`
   - `src/app/api/hr/payroll/**`
@@ -2347,6 +2662,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el DDL versionado de payroll se endureció para no depender de `DEFAULT` literales en BigQuery, porque el runtime de la app ya setea esos valores explícitamente
 
 ## Delta 2026-03-14 GitHub collaboration hygiene
+
 - El repo ahora incorpora una capa explicita de buenas practicas GitHub bajo `.github/`:
   - `workflows/ci.yml`
   - `PULL_REQUEST_TEMPLATE.md`
@@ -2366,6 +2682,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Se removio la contradiccion de `.gitignore` respecto de `full-version/`; aunque siga siendo referencia local, hoy existe versionado en este workspace y no debe tratarse como artefacto ignorado.
 
 ## Delta 2026-03-14 Document structure reorganization
+
 - La raiz documental del repo ya no debe usarse para mezclar specs, tasks y guias especializadas.
 - Regla operativa vigente:
   - en raiz solo quedan `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, `project_context.md`, `Handoff.md`, `Handoff.archive.md` y `changelog.md`
@@ -2384,6 +2701,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `docs/tasks/complete/`
 
 ## Delta 2026-03-14 Agency data hydration correction
+
 - La capa `agency` ya no debe asumir que toda la senal operativa vive solo en `notion_project_ids` ni filtrar `greenhouse.clients` por `tenant_type`.
   - `src/lib/agency/agency-queries.ts` ahora toma `clients.active = TRUE` como base canonica de spaces.
   - El inventario de proyectos agency se arma desde la union de:
@@ -2395,6 +2713,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - la lista de capacidad debe reutilizar `TeamAvatar` y no un avatar ad-hoc, para heredar `avatarUrl` real y fallback cromatico consistente con el roster.
 
 ## Delta 2026-03-13 Agency operator layer
+
 - El repo ahora tiene una primera capa agency para lectura ejecutiva interna a nivel transversal:
   - `/agency`
   - `/agency/spaces`
@@ -2416,6 +2735,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - si se necesita una lectura agency por space mas profunda, debera implementarse como modulo posterior y no asumirse ya resuelto por esta iteracion
 
 ## Delta 2026-03-13 Pulse team view correction
+
 - `Pulse` ya no debe tratar la seccion de equipo como una lectura primaria de capacidad operativa.
   - La surface del dashboard cliente ahora consume roster asignado (`getTeamMembers`) como fuente principal para `Tu equipo asignado`.
   - La columna derecha queda limitada a resumen contractual visible: FTE, horas, linea de servicio y modalidad.
@@ -2425,6 +2745,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El `view-as` admin del dashboard ahora tambien hidrata esta seccion server-side con roster del tenant para evitar errores por fetch cliente fuera del contexto `client`.
 
 ## Delta 2026-03-13 Canonical team identity hardening
+
 - La capa de equipo/capacidad ya no debe tratar `azure_oid`, `notion_user_id` o `hubspot_owner_id` como la identidad canonica.
   - `greenhouse.team_members.identity_profile_id` pasa a ser el enlace canonico de persona para el roster Efeonce.
   - Los providers externos se resuelven y enriquecen desde `greenhouse.identity_profile_source_links`.
@@ -2442,6 +2763,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `Equipo en este proyecto` y `Velocity por persona` ahora usan `ExecutiveCardShell`, resumenes KPI y cards por persona con mejor jerarquia visual
 
 ## Delta 2026-03-13 Team profile taxonomy
+
 - `greenhouse.team_members` ya no modela solo roster operativo; ahora tambien soporta perfil profesional y atributos de identidad laboral:
   - nombre estructurado: `first_name`, `last_name`, `preferred_name`, `legal_name`
   - taxonomia interna: `org_role_id`, `profession_id`, `seniority_level`, `employment_type`
@@ -2466,6 +2788,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el modelo ya existe y la UI lo expresa como `en configuracion`
 
 ## Delta 2026-03-13 Team identity and capacity runtime
+
 - Se implemento una primera capa real del task `docs/tasks/complete/CODEX_TASK_Team_Identity_Capacity_System.md` dentro de este repo:
   - `GET /api/team/members`
   - `GET /api/team/capacity`
@@ -2506,6 +2829,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - los textos visibles que faltaban en las 4 vistas se movieron a `GH_TEAM` / `GH_MESSAGES`
 
 ## Delta 2026-03-13 Preview auth hardening
+
 - `src/lib/bigquery.ts` ahora acepta un fallback opcional `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64` para evitar fallos de serializacion de secretos en Preview de Vercel.
 - Si una Preview de branch necesita login funcional y el JSON crudo falla por quoting/escaping, la opcion preferida pasa a ser cargar `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64` junto con `GCP_PROJECT`, `NEXTAUTH_SECRET` y `NEXTAUTH_URL`.
 - El repo ahora versiona una skill local para operaciones Vercel:
@@ -2518,6 +2842,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - para pruebas humanas de Google SSO, preferir el dominio autorizado `pre-greenhouse.efeoncepro.com` sobre aliases estables de branch si esos aliases no fueron agregados en GCP como redirect URI
 
 ## Delta 2026-03-13 Branding lock and nav hydration
+
 - El shell autenticado ahora debe inyectar la sesion inicial al `SessionProvider` para evitar flicker entre menu cliente e interno/admin durante la hidratacion.
 - La capa de nomenclatura ya no debe mezclar portal cliente con internal/admin:
   - `GH_CLIENT_NAV` queda reservado para la navegacion cliente normada por `docs/architecture/Greenhouse_Nomenclatura_Portal_v3.md`
@@ -2526,6 +2851,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `src/@core/utils/brandSettings.ts` y `getSettingsFromCookie()` son ahora el boundary de saneamiento para cookies de settings antes de SSR o hidratacion cliente.
 
 ## Delta 2026-03-13 Greenhouse nomenclature portal
+
 - Ya existe `src/config/greenhouse-nomenclature.ts` como fuente unica de nomenclatura visible para la capa cliente:
   - `GH_CLIENT_NAV`
   - `GH_LABELS`
@@ -2548,12 +2874,14 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Regla operativa ratificada para theming: Greenhouse no debe reescribir el theme de Vuexy desde cero; cualquier ajuste global de tema debe pasar por `src/components/theme/mergedTheme.ts`, `@core/theme/*` o la configuracion oficial de Vuexy.
 
 ## Delta 2026-03-13 Branding SVG rollout
+
 - `public/branding/SVG` pasa a ser la carpeta canonica para isotipos y wordmarks SVG de `Efeonce`, `Globe`, `Reach` y `Wave`.
 - `src/components/greenhouse/brand-assets.ts` centraliza el mapping reusable de esos assets para shell, business lines y futuras cards que necesiten logos propios.
 - `src/components/layout/shared/Logo.tsx` y `src/app/layout.tsx` ya no deben depender del PNG `avatar.png` como marca primaria; el shell y el favicon salen desde esa capa SVG.
 - `src/components/greenhouse/BrandWordmark.tsx` y `src/components/greenhouse/BusinessLineBadge.tsx` son ahora los componentes canonicos para renderizar `Efeonce`, `Globe`, `Reach` y `Wave` en contextos `inline`, footer, hero, tabla o chip sin hardcodes de imagen dispersos.
 
 ## Delta 2026-03-13 Tenant and user media persistence
+
 - El runtime ya soporta subir y persistir logos/fotos reales para identidades visibles del portal en lugar de depender solo de iniciales o fallbacks.
 - Capa server-side nueva:
   - `src/lib/storage/greenhouse-media.ts` para upload/download autenticado contra GCS
@@ -2572,6 +2900,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - La sesion NextAuth ya propaga `avatarUrl`, permitiendo que el dropdown autenticado refleje la foto guardada del usuario.
 
 ## Delta 2026-03-13 Promote and deploy closeout
+
 - La iniciativa de alineacion de nomenclatura + branding + media persistente ya quedo promovida a:
   - `develop`
   - `main`
@@ -2584,6 +2913,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - si Preview falla por duplicados `* (1).ts(x)`, `tsconfig.json` ya los excluye para que el deploy no quede atascado por copias accidentales del workspace
 
 ## Delta 2026-03-13 Capabilities runtime foundation
+
 - La spec `docs/architecture/Greenhouse_Capabilities_Architecture_v1.md` ya tiene una primera ejecucion real sobre el runtime actual del repo, sin volver al modelo legacy de resolver capabilities directo desde `greenhouse.clients`.
 - El runtime nuevo toma `businessLines` y `serviceModules` desde la sesion tenant-aware actual, que ya deriva de `greenhouse.client_service_modules` + `greenhouse.service_modules`.
 - Se agregaron:
@@ -2628,6 +2958,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `chart-bar`
 
 ## Delta 2026-03-12 Internal Control Tower Redesign
+
 - `/internal/dashboard` dejo de ser un hero estatico con lista plana de tenants y ahora funciona como `Control Tower` operativo para el equipo interno Efeonce.
 - La landing interna ahora usa:
   - header compacto con subtitulo dinamico y acciones
@@ -2645,6 +2976,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El rediseño sigue sin introducir mutaciones nuevas: `Crear space`, `Editar` y `Desactivar` quedan como affordances parciales hasta que exista workflow real.
 
 ## Delta 2026-03-12 Internal Identity Foundation
+
 - Se agrego `docs/architecture/GREENHOUSE_INTERNAL_IDENTITY_V1.md` como contrato canonico para separar `auth principal` de `canonical identity` en usuarios internos Efeonce.
 - La fundacion nueva usa:
   - `EO-USR-*` para el principal de acceso actual
@@ -2660,6 +2992,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `8` perfiles `EO-ID-*` creados en BigQuery
 
 ## Delta 2026-03-13 Google SSO foundation
+
 - El login ahora soporta tres flujos paralelos sobre `greenhouse.client_users`:
   - `credentials`
   - Microsoft Entra ID (`azure-ad` en NextAuth)
@@ -2678,6 +3011,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `allowed_email_domains` puede explicar un rechazo o servir de pista de provisioning, pero no auto-crea principals durante login
 
 ## Delta 2026-03-12 Microsoft SSO foundation
+
 - El login ahora soporta dos flujos en paralelo sobre `greenhouse.client_users`:
   - `credentials`
   - Microsoft Entra ID (`azure-ad` en NextAuth)
@@ -2691,6 +3025,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - La ruta publica adicional `/auth/access-denied` cubre el rechazo de usuarios Microsoft sin principal explicito autorizado en Greenhouse.
 
 ## Documento Maestro de Arquitectura
+
 - Documento maestro actual: `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - Resumen rapido de fases y tareas: `docs/roadmap/PHASE_TASK_MATRIX.md`
 - Este documento debe leerse antes de cambiar arquitectura, auth, rutas, roles, multi-tenant, dashboard, team/capacity, campaign intelligence o admin.
@@ -2711,11 +3046,13 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Plan UX actual para la siguiente iteracion del dashboard: `docs/ui/GREENHOUSE_DASHBOARD_UX_GAPS_V1.md`
 
 ## Especificacion Fuente
+
 - Documento fuente actual: `../Greenhouse_Portal_Spec_v1.md`
 - Ese markdown define el target funcional del portal y debe usarse como referencia primaria de producto.
 - Si existe conflicto entre el estado actual del starter kit y la especificacion, prevalece la especificacion como norte de implementacion salvo decision documentada.
 
 ## Alcance del Repositorio
+
 - Este repositorio contiene solo `starter-kit`.
 - La carpeta `full-version` existe fuera de este repo como referencia de contexto, referencia visual y referencia funcional.
 - `full-version` debe servir para entender hacia donde debe evolucionar `starter-kit`.
@@ -2747,6 +3084,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El repo tambien versiona una copia del skill operativo en `.codex/skills/greenhouse-ui-orchestrator/` para que el flujo no dependa solo del perfil local del agente.
 
 ## Stack Actual
+
 - Next.js 16.1.1
 - React 19.2.3
 - TypeScript 5.9.3
@@ -2765,6 +3103,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `.gitattributes` fija archivos de texto en `LF` para estabilizar el trabajo en Windows
 
 ## Target Definido por la Especificacion
+
 - Portal de clientes multi-tenant para Efeonce Greenhouse
 - BigQuery como fuente principal de datos consumida server-side
 - NextAuth.js para autenticacion
@@ -2773,6 +3112,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Dataset propio del portal: `efeonce-group.greenhouse`
 
 ## Posicion de Producto Actual
+
 - Greenhouse debe ser un portal ejecutivo y operativo, no un segundo Notion.
 - Notion sigue siendo el system of work.
 - Greenhouse debe exponer visibilidad de entrega, velocidad, capacidad, riesgo y contexto por tenant.
@@ -2781,6 +3121,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - El centro actual del producto ya es `/dashboard`; las siguientes capas objetivo son `/equipo` y `/campanas`.
 
 ## Comandos Utiles
+
 - `npx pnpm install --frozen-lockfile`
 - `npx pnpm dev`
 - `npx pnpm build`
@@ -2788,6 +3129,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `npx pnpm clean`
 
 ## Librerias visuales activas
+
 - `apexcharts` y `react-apexcharts`: base actual para charts ejecutivos; wrappers locales en `src/libs/ApexCharts.tsx` y `src/libs/styles/AppReactApexCharts.tsx`.
 - `recharts`: segunda via de charting disponible para cards compactas y visualizaciones de comparacion.
 - `keen-slider`: sliders, carousels y hero cards con narrativa visual.
@@ -2804,6 +3146,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `recharts` y `keen-slider` ya estan disponibles en `starter-kit`; usarlos solo cuando una superficie lo justifique y manteniendo `apexcharts` como base actual del dashboard.
 
 ## Regla documental compacta
+
 - La estrategia de documentacion liviana del repo queda en `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`.
 - La regla es: detalle completo en una fuente canonica; deltas breves en `README.md`, `project_context.md`, `Handoff.md` y `changelog.md`.
 - `Handoff.md` debe mantener solo el estado activo del turno o del frente abierto.
@@ -2811,6 +3154,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Si un build local falla por rutas de otra rama, revisar el cache historico en `.next-local/**` antes de asumir un bug del cambio actual.
 
 ## Estructura Base
+
 - `src/app/layout.tsx`: layout raiz
 - `src/app/(dashboard)/layout.tsx`: layout principal autenticado o de dashboard
 - `src/app/(dashboard)/dashboard/page.tsx`: dashboard principal actual
@@ -2835,6 +3179,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `src/views/greenhouse/dashboard/orchestrator.ts`: orquestador de bloques ejecutivos reutilizables para el dashboard
 
 ## Estado de Rutas
+
 - Existe `/dashboard`
 - Existe `/capabilities/[moduleId]`
 - Existe `/proyectos`
@@ -2856,6 +3201,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `/home` y `/about` quedaron como rutas de compatibilidad que redirigen a la nueva experiencia
 
 ## Rutas Objetivo del Producto
+
 - `/dashboard`: dashboard principal con KPIs ICO
 - `/entrega`: contexto operativo agregado
 - `/proyectos`: lista de proyectos del cliente
@@ -2869,6 +3215,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `/admin/**`: gobernanza de tenants, usuarios, roles, scopes y feature flags
 
 ## Brecha Actual vs Objetivo
+
 - El shell principal ya fue adaptado a Greenhouse con rutas reales y branding base.
 - `next-auth` ya esta integrado, usa session JWT, protege el dashboard y autentica solo contra `greenhouse.client_users`.
 - El JWT actual de Greenhouse ya carga `roleCodes`, `routeGroups`, `projectScopes` y `campaignScopes`; eso reemplaza el valor de negocio que podria aportar un ACL generico del template.
@@ -2921,6 +3268,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - el switch de tema del shell Greenhouse ya esta operativo en navbar con soporte real para `light`, `dark` y `system`, incluyendo reaccion al cambio del tema del sistema mientras la sesion sigue abierta
 
 ## Deploy
+
 - Hosting principal: Vercel
 - Repositorio remoto: `https://github.com/efeoncepro/greenhouse-eo.git`
 - Configuracion importante en Vercel:
@@ -2930,6 +3278,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Se detecto un problema inicial de `404 NOT_FOUND` por tener `Framework Preset` en `Other`. Ya fue resuelto.
 
 ## Estrategia de Ramas y Ambientes
+
 - `main`:
   - rama productiva
   - su deploy en Vercel corresponde a `Production`
@@ -2946,6 +3295,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - deben volver tanto a `main` como a `develop`
 
 ## Logica de Trabajo Recomendada
+
 1. Crear rama desde `develop` para trabajo normal o desde `main` para hotfix.
 2. Implementar cambio pequeno y verificable.
 3. Validar localmente con `npx pnpm build`, `npx pnpm lint` o prueba manual suficiente.
@@ -2956,12 +3306,14 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 8. Confirmar deploy a `Production` en Vercel.
 
 ## Regla de Entornos
+
 - `Development`: uso local de cada agente
 - `Preview`: validacion remota de ramas de trabajo
 - `Staging`: entorno persistente controlado asociado a `develop`
 - `Production`: estado estable accesible para usuarios finales
 
 ## Regla de Variables en Vercel
+
 - Toda variable debe definirse conscientemente por ambiente.
 - No asumir que una variable de `Preview` o `Staging` existe en `Production`, ni al reves.
 - Si una feature necesita variable nueva, primero debe existir en `Preview` y `Staging` antes de promocionarse a `main`.
@@ -2970,6 +3322,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Si `Preview` rechaza un login que en BigQuery esta activo y con hash correcto, revisar primero alias del dominio y el parseo de `GOOGLE_APPLICATION_CREDENTIALS_JSON` antes de asumir fallo de credenciales.
 
 ## Variables de Entorno
+
 - `.env.example` define:
   - `NEXT_PUBLIC_APP_URL`
   - `BASEPATH`
@@ -2988,6 +3341,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Riesgo operativo: si `BASEPATH` se configura en Vercel sin necesitarlo, la app deja de vivir en `/`
 
 ## Variables de Entorno Objetivo
+
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON`
 - `GCP_PROJECT`
 - `NEXTAUTH_SECRET`
@@ -3006,6 +3360,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `tsconfig.json` excluye `**/* (1).ts` y `**/* (1).tsx` para evitar que duplicados locales del workspace rompan `tsc` y los builds de Preview en Vercel.
 
 ## Multi-Tenant Actual
+
 - Dataset creado: `efeonce-group.greenhouse`
 - Tabla creada: `greenhouse.clients`
 - Tenant bootstrap cargado: `greenhouse-demo-client`
@@ -3019,6 +3374,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - DDL de bootstrap de scopes por mapeo conocido: `bigquery/greenhouse_project_scope_bootstrap_v1.sql`
 
 ## Decisiones Actuales
+
 - Mantener cambios iniciales pequenos y reversibles.
 - Usar `full-version` como fuente de contexto y referencia para construir la version Greenhouse dentro de `starter-kit`.
 - Usar `../Greenhouse_Portal_Spec_v1.md` como especificacion funcional principal.
@@ -3037,6 +3393,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - La capa `GH_INTERNAL_MESSAGES` ya gobierna tambien partes grandes de `admin/tenants/[id]`, `view-as/dashboard`, governance de capabilities y tablas operativas del detalle de space.
 
 ## Deuda Tecnica Visible
+
 - El proyecto ya tiene shell Greenhouse, pero aun no refleja la identidad funcional final.
 - La autenticacion runtime ya no depende de `greenhouse.clients`; esas columnas quedaron como metadata legacy de compatibilidad.
 - El demo y el admin interno ya usan `password_hash` reales; los contactos cliente importados desde HubSpot permanecen `invited` hasta onboarding.
@@ -3055,6 +3412,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Existe un bloqueo de tipos ajeno al plan actual por el archivo duplicado `src/config/capability-registry (1).ts`, que hoy impide usar `tsc` como verificacion integral limpia.
 
 ## Supuestos Operativos
+
 - El repo puede estar siendo editado por varios agentes y personas en paralelo.
 - `Handoff.md` es la fuente de continuidad entre turnos.
 - `AGENTS.md` define las reglas del repositorio y prevalece como guia operativa local.

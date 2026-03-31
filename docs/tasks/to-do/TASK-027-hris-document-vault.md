@@ -1,5 +1,22 @@
 # CODEX TASK — HRIS Fase 1A: Document Vault (Bóveda de Documentos)
 
+## Delta 2026-03-31
+
+- La foundation compartida de uploader, registry de assets y gobernanza de buckets GCP se separa a `TASK-173`.
+- Esta task mantiene ownership del dominio `HR documents`, elegibilidad, vistas y eventos `hr.document.*`, pero ya no debe redefinir por sí sola el patrón base de upload/storage del portal.
+- El bucket/path/URL strategy final debe consumirse desde la capability shared que cierre `TASK-173`.
+- `TASK-173` ya dejó implementados en repo:
+  - registry shared `greenhouse_core.assets`
+  - uploader reusable `GreenhouseFileUploader`
+  - routes autenticadas `/api/assets/private` y `/api/assets/private/[assetId]`
+- Esta task ya no debe crear:
+  - bucket propio `greenhouse-documents`
+  - helper `gcs-signed-urls.ts` aislado
+  - signed URLs persistidas como contrato principal del dominio
+- Lectura correcta actual:
+  - `Document Vault` debe modelar documentos HR como aggregates del dominio
+  - pero los bytes y metadata base deben vivir sobre la foundation shared de assets
+
 ## Delta 2026-03-27 — Alineación arquitectónica
 
 - **TASK-026 es soft dependency**: el Document Vault puede avanzar sin contract type consolidation, pero las reglas de elegibilidad por `contract_type` no funcionarán hasta que TASK-026 agregue el campo canónico en `greenhouse_core.members`.
@@ -16,10 +33,11 @@ Implementar el **módulo de bóveda de documentos** del HRIS en Greenhouse. Perm
 **El problema hoy:** No hay dónde almacenar ni gestionar documentos de colaboradores. Los contratos viven en Google Drive sin estructura. Los certificados vencen sin aviso. HR no tiene visibilidad centralizada de qué documentos tiene cada persona ni cuáles faltan.
 
 **La solución:** Un módulo con dos superficies:
+
 1. **`/my/documents`** — Vista self-service donde el colaborador ve sus documentos, sube nuevos (licencia médica, certificados) y ve el estado de verificación
 2. **`/hr/documents`** — Vista admin donde HR ve documentos de todo el equipo, verifica documentos, detecta vencimientos próximos y documentos faltantes
 
-**Storage:** Archivos en Google Cloud Storage (bucket `greenhouse-documents` en proyecto `efeonce-group`). PostgreSQL almacena solo metadatos y URL.
+**Storage:** Archivos privados en GCS bajo la foundation shared de `TASK-173` (`private assets` por entorno). PostgreSQL almacena metadata del dominio HR y referencia al asset canónico.
 
 ---
 
@@ -33,26 +51,26 @@ Implementar el **módulo de bóveda de documentos** del HRIS en Greenhouse. Perm
 
 ### Documentos normativos
 
-| Documento | Qué aporta |
-|-----------|------------|
-| `Greenhouse_HRIS_Architecture_v1.md` | Schema DDL §4.1, navegación §6, elegibilidad §5 |
-| `GREENHOUSE_IDENTITY_ACCESS_V2.md` | Route groups `my` y `hr`, roles |
-| `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` | GCP project, regions |
-| `Greenhouse_Nomenclatura_Portal_v3.md` | Colores, labels, microcopy |
-| `CODEX_TASK_HR_Core_Module.md` | Patrón de vistas HR, ficha del colaborador |
+| Documento                               | Qué aporta                                      |
+| --------------------------------------- | ----------------------------------------------- |
+| `Greenhouse_HRIS_Architecture_v1.md`    | Schema DDL §4.1, navegación §6, elegibilidad §5 |
+| `GREENHOUSE_IDENTITY_ACCESS_V2.md`      | Route groups `my` y `hr`, roles                 |
+| `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` | GCP project, regions                            |
+| `Greenhouse_Nomenclatura_Portal_v3.md`  | Colores, labels, microcopy                      |
+| `CODEX_TASK_HR_Core_Module.md`          | Patrón de vistas HR, ficha del colaborador      |
 
 ---
 
 ## Dependencias
 
-| Dependencia | Estado | Impacto si no está |
-|---|---|---|
-| Fase 0.5 (contract types) | Prerequisito | Elegibilidad por contract_type no funciona sin este campo |
-| `greenhouse_hr` schema en PostgreSQL | Existe | Tabla `member_documents` va aquí |
-| GCS bucket `greenhouse-documents` | **Crear** | Blocker para upload |
-| Route group `my` implementado | Existe | Self-service views |
-| Route group `hr` implementado | Existe | Admin views |
-| People 360 `/people/[memberId]` | Existe | Tab "Documentos" se agrega aquí |
+| Dependencia                          | Estado       | Impacto si no está                                        |
+| ------------------------------------ | ------------ | --------------------------------------------------------- |
+| Fase 0.5 (contract types)            | Prerequisito | Elegibilidad por contract_type no funciona sin este campo |
+| `greenhouse_hr` schema en PostgreSQL | Existe       | Tabla `member_documents` va aquí                          |
+| Foundation shared `TASK-173`         | En progreso  | Blocker para upload/download canónico                     |
+| Route group `my` implementado        | Existe       | Self-service views                                        |
+| Route group `hr` implementado        | Existe       | Admin views                                               |
+| People 360 `/people/[memberId]`      | Existe       | Tab "Documentos" se agrega aquí                           |
 
 ---
 
@@ -77,6 +95,7 @@ Según `Greenhouse_HRIS_Architecture_v1.md` §4.1 — tabla `greenhouse_hr.membe
 ### A3. Signed URL API
 
 Para upload y download, usar **signed URLs** de GCS (no exponer el bucket directamente):
+
 - Upload: `POST /api/hr/documents/upload-url` genera signed URL de escritura (expira en 15 min)
 - Download: `GET /api/hr/documents/[documentId]/download` genera signed URL de lectura (expira en 1 hora)
 
@@ -97,6 +116,7 @@ Genera signed URL para upload directo a GCS desde el browser.
 Registra el documento en PostgreSQL después de que el upload a GCS se completó.
 
 **Request:**
+
 ```typescript
 {
   member_id: string
@@ -110,6 +130,7 @@ Registra el documento en PostgreSQL después de que el upload a GCS se completó
   is_confidential: boolean
 }
 ```
+
 **Auth:** `collaborator` (solo para sí mismo, tipos limitados) o `hr_manager` / `efeonce_admin` (cualquier tipo)
 
 Tipos que un colaborador puede subir por sí mismo: `licencia_medica`, `certificado`, `titulo`, `otro`.
@@ -213,9 +234,7 @@ export type DocumentType =
   | 'titulo'
   | 'otro'
 
-export const COLLABORATOR_UPLOADABLE_TYPES: DocumentType[] = [
-  'licencia_medica', 'certificado', 'titulo', 'otro'
-]
+export const COLLABORATOR_UPLOADABLE_TYPES: DocumentType[] = ['licencia_medica', 'certificado', 'titulo', 'otro']
 
 export const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
   contrato: 'Contrato',
@@ -225,7 +244,7 @@ export const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
   certificado: 'Certificado',
   cedula_identidad: 'Cédula de identidad',
   titulo: 'Título profesional',
-  otro: 'Otro',
+  otro: 'Otro'
 }
 
 export interface MemberDocument {
@@ -239,13 +258,13 @@ export interface MemberDocument {
   mime_type: string | null
   description: string | null
   expires_at: string | null
-  is_expired: boolean            // Computed: expires_at < today
+  is_expired: boolean // Computed: expires_at < today
   is_confidential: boolean
   uploaded_by: string
   uploaded_by_name?: string
   verified_by: string | null
   verified_at: string | null
-  is_verified: boolean           // Computed: verified_by IS NOT NULL
+  is_verified: boolean // Computed: verified_by IS NOT NULL
   created_at: string
 }
 ```
@@ -303,12 +322,14 @@ src/
 ## PARTE F: Orden de ejecución
 
 ### Fase 1: Infraestructura
-1. Crear GCS bucket `greenhouse-documents`
+
+1. Consumir foundation shared de `TASK-173` para upload/download privado
 2. Crear tabla `greenhouse_hr.member_documents`
 3. Crear TypeScript types
-4. Crear `gcs-signed-urls.ts` utility
+4. Reutilizar el helper shared de assets en vez de `gcs-signed-urls.ts` propio
 
 ### Fase 2: APIs
+
 5. `POST /api/hr/documents/upload-url`
 6. `POST /api/hr/documents` (register)
 7. `GET /api/hr/documents` (list with filters)
@@ -319,6 +340,7 @@ src/
 12. `GET /api/hr/documents/expiring`
 
 ### Fase 3: UI
+
 13. `MyDocumentsView.tsx` + `DocumentTable.tsx` + `DocumentUploadDrawer.tsx`
 14. `TeamDocumentsView.tsx` + `DocumentExpiryAlerts.tsx`
 15. `PersonDocumentsTab.tsx` (People 360 tab)
@@ -327,7 +349,7 @@ src/
 
 ## Criterios de aceptación
 
-- [ ] GCS bucket `greenhouse-documents` creado con lifecycle policy
+- [ ] `Document Vault` consume la foundation shared de `TASK-173` para upload/download autenticado
 - [ ] Tabla `greenhouse_hr.member_documents` creada en PostgreSQL
 - [ ] Upload funciona: signed URL → GCS → registro en PG
 - [ ] Download funciona: signed URL de lectura con expiración
@@ -348,10 +370,10 @@ src/
 
 ## Notas para el agente
 
-- **Signed URLs son obligatorias.** Nunca expongas el bucket directamente ni pases archivos por la API de Next.js. El browser sube directo a GCS via signed URL.
+- **No crear helper de storage paralelo.** El dominio debe montar su UX sobre la foundation shared de `TASK-173`; si se usan signed URLs, deben ser efímeras y mediadas por el access model central.
 - **`is_confidential` controla visibilidad**, no acceso. Un documento confidencial no aparece en la vista self-service del colaborador — solo HR/admin lo ve.
 - **Branch naming:** `feature/hris-document-vault`.
 
 ---
 
-*Efeonce Greenhouse™ · Efeonce Group · Marzo 2026*
+_Efeonce Greenhouse™ · Efeonce Group · Marzo 2026_

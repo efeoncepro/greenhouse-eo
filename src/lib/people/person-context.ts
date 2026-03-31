@@ -1,3 +1,4 @@
+import { ROLE_CODES } from '@/config/role-codes'
 import type { PersonAccessContext, PersonIdentityContext } from '@/types/people'
 import type { Person360 } from '@/types/person-360'
 
@@ -9,38 +10,38 @@ const deriveRouteGroupsFromRoleCodes = (roleCodes: string[], tenantType: string)
       routeGroups.add('internal')
     }
 
-    if (roleCode === 'hr_payroll') {
+    if (roleCode === ROLE_CODES.HR_PAYROLL) {
       routeGroups.add('internal')
       routeGroups.add('hr')
     }
 
-    if (roleCode === 'employee') {
+    if (roleCode === ROLE_CODES.EMPLOYEE) {
       routeGroups.add('internal')
       routeGroups.add('employee')
     }
 
-    if (roleCode === 'finance_manager' || roleCode === 'finance_analyst' || roleCode === 'finance_admin') {
+    if (roleCode === ROLE_CODES.FINANCE_MANAGER || roleCode === ROLE_CODES.FINANCE_ANALYST || roleCode === ROLE_CODES.FINANCE_ADMIN) {
       routeGroups.add('internal')
       routeGroups.add('finance')
     }
 
-    if (roleCode === 'efeonce_admin') {
+    if (roleCode === ROLE_CODES.EFEONCE_ADMIN) {
       routeGroups.add('admin')
     }
 
-    if (roleCode === 'collaborator') {
+    if (roleCode === ROLE_CODES.COLLABORATOR) {
       routeGroups.add('my')
     }
 
-    if (roleCode === 'hr_manager') {
+    if (roleCode === ROLE_CODES.HR_MANAGER) {
       routeGroups.add('hr')
     }
 
-    if (roleCode === 'people_viewer') {
+    if (roleCode === ROLE_CODES.PEOPLE_VIEWER) {
       routeGroups.add('people')
     }
 
-    if (roleCode === 'ai_tooling_admin') {
+    if (roleCode === ROLE_CODES.AI_TOOLING_ADMIN) {
       routeGroups.add('ai_tooling')
     }
 

@@ -19,6 +19,7 @@ import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
 
 import { GenerateVerticalMenu } from '@/components/GenerateMenu'
 import { GH_AGENCY_NAV, GH_CLIENT_NAV, GH_FINANCE_NAV, GH_HR_NAV, GH_INTERNAL_NAV, GH_MY_NAV, GH_PEOPLE_NAV } from '@/config/greenhouse-nomenclature'
+import { ROLE_CODES } from '@/config/role-codes'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
 
 type RenderExpandIconProps = {
@@ -68,9 +69,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
 
   const canSeePeople =
     isPeopleRouteGroup ||
-    roleCodes.includes('efeonce_admin') ||
-    roleCodes.includes('efeonce_operations') ||
-    roleCodes.includes('hr_payroll')
+    roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN) ||
+    roleCodes.includes(ROLE_CODES.EFEONCE_OPERATIONS) ||
+    roleCodes.includes(ROLE_CODES.HR_PAYROLL)
 
   const dashboardHref = session?.user?.portalHomePath || '/dashboard'
 
@@ -116,8 +117,10 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           { label: nl(GH_AGENCY_NAV.spaces), href: '/agency/spaces', icon: 'tabler-grid-4x4' },
           { label: nl(GH_AGENCY_NAV.economics), href: '/agency/economics', icon: 'tabler-chart-line' },
           { label: nl(GH_AGENCY_NAV.team), href: '/agency/team', icon: 'tabler-users-group' },
+          { label: nl(GH_AGENCY_NAV.staffAugmentation), href: '/agency/staff-augmentation', icon: 'tabler-briefcase-2' },
           { label: nl(GH_AGENCY_NAV.delivery), href: '/agency/delivery', icon: 'tabler-cpu' },
           { label: nl(GH_AGENCY_NAV.campaigns), href: '/agency/campaigns', icon: 'tabler-speakerphone' },
+
           // Collapsible submenu inside section
           {
             label: nl(GH_AGENCY_NAV.structure),
@@ -139,6 +142,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           if (item.href === '/agency/spaces') return canSeeView('gestion.spaces', true)
           if (item.href === '/agency/economics') return canSeeView('gestion.economia', true)
           if (item.href === '/agency/team') return canSeeView('gestion.equipo', true)
+          if (item.href === '/agency/staff-augmentation') return canSeeView('gestion.staff_augmentation', true)
           if (item.href === '/agency/delivery') return canSeeView('gestion.delivery', true)
           if (item.href === '/agency/campaigns') return canSeeView('gestion.campanas', true)
 
@@ -217,6 +221,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               return true
             })
           },
+
           // Documentos submenu
           {
             label: nl(GH_FINANCE_NAV.documents),
@@ -235,6 +240,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               return true
             })
           },
+
           // Inteligencia submenu
           {
             label: nl(GH_FINANCE_NAV.analytics),
@@ -280,7 +286,8 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               { label: nl(GH_INTERNAL_NAV.adminUsers), href: '/admin/users' },
               { label: nl(GH_INTERNAL_NAV.adminRoles), href: '/admin/roles' },
               { label: nl(GH_INTERNAL_NAV.adminViews), href: '/admin/views' },
-              { label: nl(GH_INTERNAL_NAV.adminTeam), href: '/admin/team' }
+              { label: nl(GH_INTERNAL_NAV.adminTeam), href: '/admin/team' },
+              { label: nl(GH_INTERNAL_NAV.adminBusinessLines), href: '/admin/business-lines' }
             ].filter(item => {
               if (item.href === '/admin') return canSeeView('administracion.admin_center', true)
               if (item.href === '/admin/tenants') return canSeeView('administracion.spaces', true)
@@ -288,10 +295,12 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               if (item.href === '/admin/roles') return canSeeView('administracion.roles', true)
               if (item.href === '/admin/views') return canSeeView('administracion.vistas', true)
               if (item.href === '/admin/team') return canSeeView('administracion.equipo', true)
+              if (item.href === '/admin/business-lines') return canSeeView('administracion.admin_center', true)
 
               return true
             })
           },
+
           // Platform submenu
           {
             label: <NavLabel label='Platform' subtitle='Infraestructura y observabilidad' show={showSub} />,

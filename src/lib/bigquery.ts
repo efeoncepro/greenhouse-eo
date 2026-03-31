@@ -23,6 +23,7 @@ export const getBigQueryClient = () => {
   const client = new BigQuery(getGoogleAuthOptions())
 
   const originalQueryFn = client.query;
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (client as any).query = async (optionsOrQuery: any, ...rest: any[]) => {
     if (typeof optionsOrQuery === 'object' && !('maximumBytesBilled' in optionsOrQuery)) {
@@ -39,6 +40,7 @@ export const getBigQueryClient = () => {
         const querySnippet = typeof optionsOrQuery === 'object'
           ? String(optionsOrQuery.query ?? '').slice(0, 200)
           : String(optionsOrQuery).slice(0, 200)
+
         const limit = optionsOrQuery?.maximumBytesBilled ?? String(getBigQueryMaximumBytesBilled())
 
         console.error(`[bigquery-guard] Query blocked by maximumBytesBilled (${limit}): ${querySnippet}`)

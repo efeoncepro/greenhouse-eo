@@ -1,3 +1,9 @@
+## Delta 2026-03-30
+- `TASK-142` ya cerró el source base para `get_space_360`:
+  - store `src/lib/agency/space-360.ts`
+  - route `GET /api/agency/spaces/[id]`
+- Esta task ya no debe asumir que `Space 360` es un placeholder; puede envolver el contrato existente y extenderlo con tools Nexa.
+
 # TASK-159 — Nexa Agency Tools: Query, Recommend, Act
 
 ## Status

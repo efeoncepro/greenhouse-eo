@@ -1453,7 +1453,7 @@ export const pgCreateAiTool = async (input: CreateAiToolInput) => {
       aggregateType: 'ai_tool',
       aggregateId: toolId,
       eventType: 'ai_tool.created',
-      payload: { toolId }
+      payload: { toolId, providerId: input.providerId }
     })
   })
 
@@ -1537,7 +1537,7 @@ export const pgUpdateAiTool = async (toolId: string, input: UpdateAiToolInput) =
       aggregateType: 'ai_tool',
       aggregateId: toolId,
       eventType: 'ai_tool.updated',
-      payload: { toolId }
+      payload: { toolId, providerId: input.providerId ?? existing.providerId }
     })
 
     if (publishesFinanceLicenseCost) {
@@ -1554,6 +1554,7 @@ export const pgUpdateAiTool = async (toolId: string, input: UpdateAiToolInput) =
             licenseId: license.license_id,
             memberId: license.member_id,
             toolId: license.tool_id,
+            providerId: input.providerId ?? existing.providerId,
             activatedAt: toIsoDate(license.activated_at),
             expiresAt: toIsoDate(license.expires_at),
             ...period
@@ -1657,7 +1658,7 @@ export const pgCreateLicense = async (input: CreateLicenseInput, actorUserId: st
       aggregateType: 'ai_license',
       aggregateId: licenseId,
       eventType: existing ? 'ai_license.reactivated' : 'ai_license.created',
-      payload: { licenseId, memberId: input.memberId, toolId: input.toolId }
+      payload: { licenseId, memberId: input.memberId, toolId: input.toolId, providerId: tool.providerId }
     })
 
     await publishAiToolingOutboxEvent({
@@ -1669,6 +1670,7 @@ export const pgCreateLicense = async (input: CreateLicenseInput, actorUserId: st
         licenseId,
         memberId: input.memberId,
         toolId: input.toolId,
+        providerId: tool.providerId,
         activatedAt: getCurrentDateString(),
         expiresAt,
         ...getCurrentSantiagoPeriod()
@@ -1730,7 +1732,7 @@ export const pgUpdateLicense = async (licenseId: string, input: UpdateLicenseInp
       aggregateType: 'ai_license',
       aggregateId: licenseId,
       eventType: 'ai_license.updated',
-      payload: { licenseId }
+      payload: { licenseId, toolId: existing.toolId, memberId: existing.memberId, providerId: existing.tool?.providerId ?? null }
     })
 
     await publishAiToolingOutboxEvent({
@@ -1742,6 +1744,7 @@ export const pgUpdateLicense = async (licenseId: string, input: UpdateLicenseInp
         licenseId,
         memberId: existing.memberId,
         toolId: existing.toolId,
+        providerId: existing.tool?.providerId ?? null,
         activatedAt: existing.activatedAt,
         expiresAt: input.expiresAt ?? existing.expiresAt,
         ...getCurrentSantiagoPeriod()
@@ -1909,7 +1912,7 @@ export const pgCreateWallet = async ({
       aggregateType: 'ai_wallet',
       aggregateId: walletId,
       eventType: 'ai_wallet.created',
-      payload: { walletId, toolId: tool.toolId, clientId }
+      payload: { walletId, toolId: tool.toolId, providerId: tool.providerId, clientId }
     })
   })
 
@@ -1969,7 +1972,7 @@ export const pgUpdateWallet = async (walletId: string, input: UpdateWalletInput)
       aggregateType: 'ai_wallet',
       aggregateId: walletId,
       eventType: 'ai_wallet.updated',
-      payload: { walletId }
+      payload: { walletId, toolId: existing.toolId, providerId: existing.providerId, clientId: existing.clientId }
     })
   })
 
@@ -2181,7 +2184,7 @@ export const pgConsumeAiCredits = async ({
       aggregateType: 'ai_wallet',
       aggregateId: wallet.walletId,
       eventType: 'ai_wallet.credits_consumed',
-      payload: { walletId: wallet.walletId, requestId, creditAmount, clientId }
+      payload: { walletId: wallet.walletId, toolId: wallet.toolId, providerId: wallet.providerId, requestId, creditAmount, clientId }
     })
 
     await publishAiToolingOutboxEvent({
@@ -2193,6 +2196,7 @@ export const pgConsumeAiCredits = async ({
         memberId: normalizeString(input.consumedByMemberId),
         walletId: wallet.walletId,
         toolId: wallet.toolId,
+        providerId: wallet.providerId,
         requestId,
         creditAmount,
         ...getCurrentSantiagoPeriod()

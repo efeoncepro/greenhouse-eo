@@ -184,6 +184,45 @@ CREATE TABLE IF NOT EXISTS greenhouse_core.providers (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS greenhouse_serving.provider_tooling_snapshots (
+  snapshot_id TEXT PRIMARY KEY,
+  provider_id TEXT NOT NULL,
+  provider_name TEXT NOT NULL,
+  provider_type TEXT,
+  supplier_id TEXT,
+  supplier_category TEXT,
+  payment_currency TEXT,
+  period_year INTEGER NOT NULL,
+  period_month INTEGER NOT NULL,
+  period_id TEXT NOT NULL,
+  tool_count INTEGER NOT NULL DEFAULT 0,
+  active_tool_count INTEGER NOT NULL DEFAULT 0,
+  active_license_count INTEGER NOT NULL DEFAULT 0,
+  active_member_count INTEGER NOT NULL DEFAULT 0,
+  wallet_count INTEGER NOT NULL DEFAULT 0,
+  active_wallet_count INTEGER NOT NULL DEFAULT 0,
+  subscription_cost_total_clp NUMERIC(14,2) NOT NULL DEFAULT 0,
+  usage_cost_total_clp NUMERIC(14,2) NOT NULL DEFAULT 0,
+  finance_expense_count INTEGER NOT NULL DEFAULT 0,
+  finance_expense_total_clp NUMERIC(14,2) NOT NULL DEFAULT 0,
+  payroll_member_count INTEGER NOT NULL DEFAULT 0,
+  licensed_member_payroll_cost_clp NUMERIC(14,2) NOT NULL DEFAULT 0,
+  total_provider_cost_clp NUMERIC(14,2) NOT NULL DEFAULT 0,
+  latest_expense_date DATE,
+  latest_license_change_at TIMESTAMPTZ,
+  snapshot_status TEXT NOT NULL DEFAULT 'complete',
+  refresh_reason TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT provider_tooling_snapshots_period_unique UNIQUE (provider_id, period_year, period_month)
+);
+
+CREATE INDEX IF NOT EXISTS provider_tooling_snapshots_period_idx
+  ON greenhouse_serving.provider_tooling_snapshots (period_year DESC, period_month DESC, provider_id);
+
+CREATE INDEX IF NOT EXISTS provider_tooling_snapshots_provider_idx
+  ON greenhouse_serving.provider_tooling_snapshots (provider_id, updated_at DESC);
+
 CREATE TABLE IF NOT EXISTS greenhouse_core.service_modules (
   module_id TEXT PRIMARY KEY,
   module_code TEXT NOT NULL UNIQUE,
@@ -527,6 +566,57 @@ GROUP BY
   p.created_at,
   p.updated_at;
 
+DROP VIEW IF EXISTS greenhouse_serving.provider_tooling_360;
+CREATE OR REPLACE VIEW greenhouse_serving.provider_tooling_360 AS
+SELECT
+  p.provider_id,
+  p.public_id,
+  p.provider_name,
+  p.legal_name,
+  p.provider_type,
+  p.website_url,
+  p.primary_email,
+  p.primary_contact_name,
+  p.country_code,
+  p.status,
+  p.active,
+  p.notes,
+  latest_snapshot.snapshot_id,
+  latest_snapshot.period_year,
+  latest_snapshot.period_month,
+  latest_snapshot.period_id,
+  latest_snapshot.supplier_id,
+  latest_snapshot.supplier_category,
+  latest_snapshot.payment_currency,
+  latest_snapshot.tool_count,
+  latest_snapshot.active_tool_count,
+  latest_snapshot.active_license_count,
+  latest_snapshot.active_member_count,
+  latest_snapshot.wallet_count,
+  latest_snapshot.active_wallet_count,
+  latest_snapshot.subscription_cost_total_clp,
+  latest_snapshot.usage_cost_total_clp,
+  latest_snapshot.finance_expense_count,
+  latest_snapshot.finance_expense_total_clp,
+  latest_snapshot.payroll_member_count,
+  latest_snapshot.licensed_member_payroll_cost_clp,
+  latest_snapshot.total_provider_cost_clp,
+  latest_snapshot.latest_expense_date,
+  latest_snapshot.latest_license_change_at,
+  latest_snapshot.snapshot_status,
+  latest_snapshot.refresh_reason,
+  latest_snapshot.updated_at AS latest_snapshot_updated_at,
+  p.created_at,
+  p.updated_at
+FROM greenhouse_core.providers AS p
+LEFT JOIN LATERAL (
+  SELECT *
+  FROM greenhouse_serving.provider_tooling_snapshots AS pts
+  WHERE pts.provider_id = p.provider_id
+  ORDER BY pts.period_year DESC, pts.period_month DESC, pts.updated_at DESC
+  LIMIT 1
+) AS latest_snapshot ON TRUE;
+
 DROP VIEW IF EXISTS greenhouse_serving.user_360;
 CREATE OR REPLACE VIEW greenhouse_serving.user_360 AS
 SELECT
@@ -627,6 +717,9 @@ GRANT SELECT ON TABLES TO greenhouse_migrator;
 
 ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_sync
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_migrator;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_serving.provider_tooling_snapshots TO greenhouse_runtime;
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_serving.provider_tooling_snapshots TO greenhouse_migrator;
 
 -- ════════════════════════════════════════════════════════════
 -- Additive migration: add member profile columns if table already exists

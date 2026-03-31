@@ -83,6 +83,8 @@ const missingRelation = (error: unknown) => {
   )
 }
 
+import { ROLE_CODES } from '@/config/role-codes'
+
 const roleCanAccessViewFallback = (
   role: {
     roleCode: string
@@ -101,7 +103,7 @@ const roleCanAccessViewFallback = (
   }
 
   if (view.routeGroup === 'people') {
-    return role.roleCode === 'efeonce_operations' || role.roleCode === 'hr_payroll'
+    return role.roleCode === ROLE_CODES.EFEONCE_OPERATIONS || role.roleCode === ROLE_CODES.HR_PAYROLL
   }
 
   if (view.routeGroup === 'internal') {
@@ -111,62 +113,7 @@ const roleCanAccessViewFallback = (
   return false
 }
 
-const deriveRouteGroupsForSingleRole = (roleCode: string, tenantType: 'client' | 'efeonce_internal') => {
-  const routeGroups = new Set<string>()
-
-  if (roleCode.startsWith('efeonce_')) {
-    routeGroups.add('internal')
-  }
-
-  if (roleCode === 'hr_payroll') {
-    routeGroups.add('internal')
-    routeGroups.add('hr')
-  }
-
-  if (roleCode === 'employee') {
-    routeGroups.add('internal')
-    routeGroups.add('employee')
-  }
-
-  if (roleCode === 'finance_manager') {
-    routeGroups.add('internal')
-    routeGroups.add('finance')
-  }
-
-  if (roleCode === 'efeonce_admin') {
-    routeGroups.add('admin')
-  }
-
-  if (roleCode === 'collaborator') {
-    routeGroups.add('my')
-  }
-
-  if (roleCode === 'hr_manager') {
-    routeGroups.add('hr')
-  }
-
-  if (roleCode === 'finance_analyst' || roleCode === 'finance_admin') {
-    routeGroups.add('finance')
-  }
-
-  if (roleCode === 'people_viewer') {
-    routeGroups.add('people')
-  }
-
-  if (roleCode === 'ai_tooling_admin') {
-    routeGroups.add('ai_tooling')
-  }
-
-  if (roleCode.startsWith('client_')) {
-    routeGroups.add('client')
-  }
-
-  if (routeGroups.size === 0) {
-    routeGroups.add(tenantType === 'efeonce_internal' ? 'internal' : 'client')
-  }
-
-  return Array.from(routeGroups)
-}
+import { deriveRouteGroupsForSingleRole } from '@/lib/tenant/role-route-mapping'
 
 const toRegistryRows = (persistedRegistryRows: ViewRegistryRow[]) =>
   persistedRegistryRows.length > 0
@@ -211,7 +158,7 @@ const resolveAuthorizedViewsForTargetUser = ({
           roleAssignments: persistedByRole.get(roleCode),
           role: {
             roleCode,
-            isAdmin: roleCode === 'efeonce_admin',
+            isAdmin: roleCode === ROLE_CODES.EFEONCE_ADMIN,
             isInternal: user.routeGroups.includes('internal'),
             routeGroups: deriveRouteGroupsForSingleRole(roleCode, user.tenantType)
           },
@@ -945,6 +892,18 @@ export const getAdminPersistedViewAccessGovernance = async () => {
   }
 }
 
+/**
+ * Resolve which views a user is authorized to see.
+ *
+ * Resolution strategy (additive per-view):
+ *   1. For each view in the registry, check each of the user's roles
+ *   2. If the role has a PERSISTED assignment for that view → use it (granted/revoked)
+ *   3. If NOT persisted → fall back to hardcoded roleCanAccessViewFallback()
+ *   4. Apply user-level overrides last (grant adds, revoke removes)
+ *
+ * This means a role with 1 persisted view does NOT lose fallback access to other views.
+ * To revoke a view from a role, persist an explicit `granted = false` row.
+ */
 export const resolveAuthorizedViewsForUser = async ({
   userId,
   roleCodes,
@@ -976,7 +935,7 @@ export const resolveAuthorizedViewsForUser = async ({
             roleAssignments,
             role: {
               roleCode,
-              isAdmin: roleCode === 'efeonce_admin',
+              isAdmin: roleCode === ROLE_CODES.EFEONCE_ADMIN,
               isInternal: derivedRouteGroups.includes('internal'),
               routeGroups: derivedRouteGroups
             },

@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { ROLE_CODES } from '@/config/role-codes'
 import type { PeopleMetaPayload } from '@/types/people'
 
 import { peopleRoleCodes } from '@/lib/people/shared'
@@ -9,9 +10,9 @@ export const getPeopleMeta = (roleCodes: string[]): PeopleMetaPayload => {
   const access = getPersonAccess(roleCodes)
 
   return {
-    canManageTeam: roleCodes.includes('efeonce_admin'),
+    canManageTeam: roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN),
     visibleTabs: access.visibleTabs,
-    supportedTabs: ['memberships', 'activity', 'intelligence', 'compensation', 'payroll', 'finance', 'hr-profile', 'ai-tools', 'identity'],
+    supportedTabs: ['profile', 'activity', 'memberships', 'economy', 'ai-tools'],
     availableEnrichments: {
       activity: true,
       compensation: true,

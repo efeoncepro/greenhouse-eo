@@ -181,6 +181,19 @@ let financePostgresReadyAt = 0
 
 const FINANCE_POSTGRES_READY_TTL_MS = 60_000
 
+const getCurrentSantiagoPeriod = () => {
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date())
+  const match = today.match(/^(\d{4})-(\d{2})-\d{2}$/)
+
+  if (!match) {
+    const now = new Date()
+
+    return { periodYear: now.getFullYear(), periodMonth: now.getMonth() + 1 }
+  }
+
+  return { periodYear: Number(match[1]), periodMonth: Number(match[2]) }
+}
+
 const mapAccount = (row: PostgresFinanceAccountRow): FinanceAccountRecord => ({
   accountId: normalizeString(row.account_id),
   accountName: normalizeString(row.account_name),
@@ -1096,6 +1109,14 @@ export const seedFinanceSupplierInPostgres = async ({
   await assertFinancePostgresReady()
 
   return withGreenhousePostgresTransaction(async client => {
+    const existingSupplierRows = await queryRows<{ supplier_id: string }>(
+      'SELECT supplier_id FROM greenhouse_finance.suppliers WHERE supplier_id = $1 LIMIT 1',
+      [supplierId],
+      client
+    )
+
+    const supplierAlreadyExisted = existingSupplierRows.length > 0
+
     const provider = await upsertProviderFromFinanceSupplierInPostgres(
       {
         supplierId,
@@ -1236,6 +1257,26 @@ export const seedFinanceSupplierInPostgres = async ({
       client
     )
 
-    return mapSupplier(rows[0])
+    const record = mapSupplier(rows[0])
+    const period = getCurrentSantiagoPeriod()
+
+    await publishFinanceOutboxEvent({
+      client,
+      aggregateType: 'supplier',
+      aggregateId: record.supplierId,
+      eventType: supplierAlreadyExisted ? 'finance.supplier.updated' : 'finance.supplier.created',
+      payload: {
+        supplierId: record.supplierId,
+        providerId: record.providerId,
+        legalName: record.legalName,
+        tradeName: record.tradeName,
+        category: record.category,
+        paymentCurrency: record.paymentCurrency,
+        isActive: record.isActive,
+        ...period
+      }
+    })
+
+    return record
   })
 }

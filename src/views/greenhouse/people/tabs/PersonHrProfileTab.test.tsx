@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { cleanup, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { IcoMetricSnapshot } from '@/lib/ico-engine/read-metrics'
@@ -136,5 +137,77 @@ describe('PersonHrProfileTab', () => {
     expect(viewModel.operational.throughput).toBe(18)
     expect(viewModel.operational.otdPercent).toBe(92)
     expect(viewModel.operational.rpa).toBe(1.45)
+  })
+
+  it('allows HR to update hire date from the employment card', async () => {
+    const user = userEvent.setup()
+
+    fetchMock.mockImplementation(async (input: string | URL | Request, init?: RequestInit) => {
+      const url = String(input)
+
+      if (url.includes('/api/hr/core/members/member-1/profile') && (!init || !init.method || init.method === 'GET')) {
+        return {
+          ok: true,
+          json: async () => ({
+            memberId: 'member-1',
+            hireDate: null,
+            phone: '+56 9 5555 5555'
+          })
+        }
+      }
+
+      if (url.includes('/api/hr/core/members/member-1/profile') && init?.method === 'PATCH') {
+        return {
+          ok: true,
+          json: async () => ({
+            memberId: 'member-1',
+            hireDate: '2026-04-01'
+          })
+        }
+      }
+
+      if (url.includes('/api/people/member-1/intelligence')) {
+        return { ok: false, json: async () => ({}) }
+      }
+
+      if (url.includes('/api/people/member-1/ico')) {
+        return { ok: false, json: async () => ({}) }
+      }
+
+      if (url.includes('/api/people/member-1/finance-impact')) {
+        return { ok: false, json: async () => ({}) }
+      }
+
+      return { ok: false, json: async () => ({}) }
+    })
+
+    renderWithTheme(
+      <PersonHrProfileTab
+        memberId='member-1'
+        hrContext={{ ...hrContext, hireDate: null }}
+        defaultOperationalMetrics={fallbackOperationalMetrics}
+      />
+    )
+
+    await user.click(await screen.findByRole('button', { name: /editar ingreso/i }))
+
+    const input = screen.getByLabelText('Fecha de ingreso')
+
+    await user.clear(input)
+    await user.type(input, '2026-04-01')
+    await user.click(screen.getByRole('button', { name: /^guardar$/i }))
+
+    await waitFor(() => {
+      expect(screen.getByText('01/04/2026')).toBeInTheDocument()
+    })
+
+    expect(screen.getByText('+56 9 5555 5555')).toBeInTheDocument()
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/hr/core/members/member-1/profile',
+      expect.objectContaining({
+        method: 'PATCH'
+      })
+    )
   })
 })

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { ROLE_CODES } from '@/config/role-codes'
 import { requireTenantContext } from '@/lib/tenant/authorization'
 import { listAllCampaigns, listCampaigns, createCampaign } from '@/lib/campaigns/campaign-store'
 
@@ -52,7 +53,7 @@ export async function POST(request: Request) {
   }
 
   // Only internal users can create campaigns
-  if (!tenant.routeGroups.includes('internal') && !tenant.roleCodes.includes('efeonce_admin')) {
+  if (!tenant.routeGroups.includes('internal') && !tenant.roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 

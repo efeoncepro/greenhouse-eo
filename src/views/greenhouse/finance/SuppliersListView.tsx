@@ -38,6 +38,7 @@ import CreateSupplierDrawer from '@views/greenhouse/finance/drawers/CreateSuppli
 
 interface Supplier {
   supplierId: string
+  providerId: string | null
   legalName: string
   tradeName: string | null
   category: string
@@ -91,8 +92,24 @@ const supColumns: ColumnDef<Supplier, any>[] = [
     header: 'Proveedor',
     cell: ({ row }) => (
       <Box>
-        <Typography variant='body2' fontWeight={600}>{row.original.tradeName || row.original.legalName}</Typography>
-        {row.original.tradeName && <Typography variant='caption' color='text.secondary'>{row.original.legalName}</Typography>}
+        <Typography variant='body2' fontWeight={600}>
+          {row.original.tradeName || row.original.legalName}
+        </Typography>
+        {row.original.tradeName && (
+          <Typography variant='caption' color='text.secondary'>
+            {row.original.legalName}
+          </Typography>
+        )}
+        <Box sx={{ mt: 1 }}>
+          <CustomChip
+            round='true'
+            size='small'
+            variant='tonal'
+            color={row.original.providerId ? 'success' : 'secondary'}
+            icon={<i className={row.original.providerId ? 'tabler-link' : 'tabler-link-off'} />}
+            label={row.original.providerId ? 'Provider 360' : 'Sin vínculo canónico'}
+          />
+        </Box>
       </Box>
     )
   }),
@@ -182,6 +199,7 @@ const SuppliersListView = () => {
   // Derived KPIs
   const activeCount = suppliers.filter(s => s.isActive).length
   const internationalCount = suppliers.filter(s => s.isInternational).length
+  const linkedProviderCount = suppliers.filter(s => Boolean(s.providerId)).length
 
   const categoryCounts = suppliers.reduce<Record<string, number>>((acc, s) => {
     acc[s.category] = (acc[s.category] || 0) + 1
@@ -203,7 +221,7 @@ const SuppliersListView = () => {
             Proveedores
           </Typography>
           <Typography variant='body2' color='text.secondary'>
-            Directorio y gestión de proveedores
+            Directorio y gestión de proveedores con lectura canónica de Provider 360
           </Typography>
         </Box>
         <Grid container spacing={6}>
@@ -231,7 +249,7 @@ const SuppliersListView = () => {
             Proveedores
           </Typography>
           <Typography variant='body2' color='text.secondary'>
-            Directorio y gestión de proveedores
+            Directorio y gestión de proveedores con lectura canónica de Provider 360
           </Typography>
         </Box>
         <Button
@@ -275,11 +293,13 @@ const SuppliersListView = () => {
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <HorizontalWithSubtitle
-            title='Categoría principal'
-            stats={topCategory ? CATEGORY_LABELS[topCategory[0]]?.label || topCategory[0] : '—'}
-            subtitle={topCategory ? `${topCategory[1]} proveedores` : 'Sin datos'}
-            avatarIcon='tabler-tag'
-            avatarColor='warning'
+            title='Provider 360'
+            stats={`${linkedProviderCount}/${total}`}
+            subtitle={total > 0 ? `${Math.round((linkedProviderCount / total) * 100)}% con vínculo canónico` : 'Sin proveedores'}
+            avatarIcon='tabler-link'
+            avatarColor='success'
+            trend={linkedProviderCount > 0 ? 'positive' : 'neutral'}
+            trendNumber={topCategory ? `${topCategory[1]} en ${CATEGORY_LABELS[topCategory[0]]?.label || topCategory[0]}` : 'Sin datos'}
           />
         </Grid>
       </Grid>

@@ -40,7 +40,11 @@ export async function PUT(
     contactName: body.contactName,
     contactEmail: body.contactEmail,
     notes: body.notes,
-    attachmentUrl: body.attachmentUrl
+    attachmentAssetId: body.attachmentAssetId,
+    attachmentUrl: body.attachmentUrl,
+    createdBy: tenant.userId,
+    clientId: body.clientId,
+    spaceId: body.spaceId
   })
 
   if (!result) return NextResponse.json({ error: 'Not found' }, { status: 404 })

@@ -17,16 +17,12 @@ import { visuallyHiddenSx } from '@/components/greenhouse/accessibility'
 import type { PersonDetail, PersonDetailAssignment } from '@/types/people'
 import type { MembershipRowData } from './drawers/EditPersonMembershipDrawer'
 import type { PersonTab } from './helpers'
-import { TAB_CONFIG } from './helpers'
+import { TAB_CONFIG, LEGACY_TAB_REDIRECT } from './helpers'
+import PersonProfileTab from './tabs/PersonProfileTab'
 import PersonActivityTab from './tabs/PersonActivityTab'
-import PersonCompensationTab from './tabs/PersonCompensationTab'
-import PersonPayrollTab from './tabs/PersonPayrollTab'
-import PersonFinanceTab from './tabs/PersonFinanceTab'
 import PersonMembershipsTab from './tabs/PersonMembershipsTab'
-import PersonHrProfileTab from './tabs/PersonHrProfileTab'
+import PersonEconomyTab from './tabs/PersonEconomyTab'
 import PersonAiToolsTab from './tabs/PersonAiToolsTab'
-import PersonIdentityTab from './tabs/PersonIdentityTab'
-import PersonIntelligenceTab from './tabs/PersonIntelligenceTab'
 
 type Props = {
   detail: PersonDetail
@@ -45,9 +41,14 @@ const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onE
   const visibleTabs = TAB_CONFIG.filter(tab => detail.access.visibleTabs.includes(tab.value))
   const visibleValues = visibleTabs.map(t => t.value)
 
-  // Read initial tab from URL, fallback to first visible
-  const urlTab = searchParams.get('tab') as PersonTab | null
-  const initialTab = urlTab && visibleValues.includes(urlTab) ? urlTab : visibleTabs[0]?.value ?? 'memberships'
+  // Read initial tab from URL, handle legacy redirects
+  const urlTab = searchParams.get('tab')
+
+  const resolvedTab = (urlTab && urlTab in LEGACY_TAB_REDIRECT)
+    ? LEGACY_TAB_REDIRECT[urlTab]
+    : urlTab as PersonTab | null
+
+  const initialTab = resolvedTab && visibleValues.includes(resolvedTab) ? resolvedTab : visibleTabs[0]?.value ?? 'profile'
 
   const [activeTab, setActiveTab] = useState<PersonTab>(initialTab)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -62,9 +63,20 @@ const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onE
     document.title = `${memberName} \u2014 ${tabLabel} | Personas | Greenhouse`
   }, [activeTab, memberName])
 
-  // Focus panel on redirect arrival (e.g., from /hr/payroll/member/[id]?tab=payroll)
+  // Redirect legacy tab URLs to new consolidated tabs
   useEffect(() => {
-    if (isInitialMount.current && urlTab && visibleValues.includes(urlTab)) {
+    if (urlTab && urlTab in LEGACY_TAB_REDIRECT) {
+      const params = new URLSearchParams(searchParams.toString())
+
+      params.set('tab', LEGACY_TAB_REDIRECT[urlTab])
+      router.replace(`${pathname}?${params}`, { scroll: false })
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Focus panel on redirect arrival
+  useEffect(() => {
+    if (isInitialMount.current && urlTab && visibleValues.includes(resolvedTab as PersonTab)) {
       setTimeout(() => panelRef.current?.focus(), 100)
     }
 
@@ -77,7 +89,6 @@ const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onE
 
     setActiveTab(newTab)
 
-    // URL sync with router.replace (no history entry)
     const params = new URLSearchParams(searchParams.toString())
 
     if (newTab === visibleTabs[0]?.value) {
@@ -118,12 +129,19 @@ const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onE
         </Grid>
         <Grid size={{ xs: 12 }}>
           <div ref={panelRef} tabIndex={-1} style={{ outline: 'none' }}>
-            {/* Screen reader announcement for async tab loading */}
-            <Box
-              aria-live='polite'
-              aria-atomic='true'
-              sx={visuallyHiddenSx}
-            />
+            <Box aria-live='polite' aria-atomic='true' sx={visuallyHiddenSx} />
+
+            <TabPanel value='profile' className='p-0'>
+              {activeTab === 'profile' && (
+                <PersonProfileTab detail={detail} />
+              )}
+            </TabPanel>
+
+            <TabPanel value='activity' className='p-0'>
+              {activeTab === 'activity' && (
+                <PersonActivityTab memberId={detail.member.memberId} />
+              )}
+            </TabPanel>
 
             <TabPanel value='memberships' className='p-0'>
               {activeTab === 'memberships' && (
@@ -138,62 +156,15 @@ const PersonTabs = ({ detail, isAdmin, membershipReloadKey, onNewMembership, onE
               )}
             </TabPanel>
 
-            <TabPanel value='activity' className='p-0'>
-              {activeTab === 'activity' && (
-                <PersonActivityTab memberId={detail.member.memberId} />
-              )}
-            </TabPanel>
-
-            <TabPanel value='compensation' className='p-0'>
-              {activeTab === 'compensation' && (
-                <PersonCompensationTab compensation={detail.currentCompensation} onEdit={onEditCompensation} />
-              )}
-            </TabPanel>
-
-            <TabPanel value='payroll' className='p-0'>
-              {activeTab === 'payroll' && (
-                <PersonPayrollTab entries={detail.recentPayroll} memberId={detail.member.memberId} />
-              )}
-            </TabPanel>
-
-            <TabPanel value='finance' className='p-0'>
-              {activeTab === 'finance' && (
-                <PersonFinanceTab memberId={detail.member.memberId} />
-              )}
-            </TabPanel>
-
-            <TabPanel value='hr-profile' className='p-0'>
-              {activeTab === 'hr-profile' && (
-                <PersonHrProfileTab
-                  memberId={detail.member.memberId}
-                  hrContext={detail.hrContext ?? null}
-                  defaultOperationalMetrics={detail.operationalMetrics ?? null}
-                />
-              )}
-            </TabPanel>
-
-            <TabPanel value='intelligence' className='p-0'>
-              {activeTab === 'intelligence' && (
-                <PersonIntelligenceTab memberId={detail.member.memberId} />
+            <TabPanel value='economy' className='p-0'>
+              {activeTab === 'economy' && (
+                <PersonEconomyTab detail={detail} onEditCompensation={onEditCompensation} />
               )}
             </TabPanel>
 
             <TabPanel value='ai-tools' className='p-0'>
               {activeTab === 'ai-tools' && (
                 <PersonAiToolsTab memberId={detail.member.memberId} />
-              )}
-            </TabPanel>
-
-            <TabPanel value='identity' className='p-0'>
-              {activeTab === 'identity' && (
-                <PersonIdentityTab
-                  identityContext={detail.identityContext ?? null}
-                  accessContext={detail.accessContext ?? null}
-                  eoId={detail.member.eoId ?? null}
-                  hrContext={detail.hrContext ?? null}
-                  deliveryContext={detail.deliveryContext ?? null}
-                  memberId={detail.member.memberId}
-                />
               )}
             </TabPanel>
           </div>

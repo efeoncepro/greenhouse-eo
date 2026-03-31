@@ -3,6 +3,7 @@ import AzureADProvider from 'next-auth/providers/azure-ad'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
 
+import { ROLE_CODES } from '@/config/role-codes'
 import {
   getAzureAdClientSecret,
   getGoogleClientSecret,
@@ -528,8 +529,8 @@ export const authOptions: NextAuthOptions = {
           typeof token.primaryRoleCode === 'string'
             ? token.primaryRoleCode
             : session.user.tenantType === 'efeonce_internal'
-              ? 'efeonce_account'
-              : 'client_executive'
+              ? ROLE_CODES.EFEONCE_ACCOUNT
+              : ROLE_CODES.CLIENT_EXECUTIVE
         session.user.routeGroups = Array.isArray(token.routeGroups) ? token.routeGroups.filter(Boolean) : []
         session.user.authorizedViews = Array.isArray(token.authorizedViews) ? token.authorizedViews.filter(Boolean) : []
         session.user.projectScopes = Array.isArray(token.projectScopes) ? token.projectScopes.filter(Boolean) : []
@@ -538,7 +539,7 @@ export const authOptions: NextAuthOptions = {
         session.user.serviceModules = Array.isArray(token.serviceModules) ? token.serviceModules.filter(Boolean) : []
         session.user.projectIds = Array.isArray(token.projectIds) ? token.projectIds.filter(Boolean) : []
         session.user.role =
-          typeof token.role === 'string' ? token.role : session.user.primaryRoleCode || 'client_executive'
+          typeof token.role === 'string' ? token.role : session.user.primaryRoleCode || ROLE_CODES.CLIENT_EXECUTIVE
         session.user.featureFlags = Array.isArray(token.featureFlags) ? token.featureFlags.filter(Boolean) : []
         session.user.timezone = typeof token.timezone === 'string' ? token.timezone : 'UTC'
         session.user.portalHomePath = resolvePortalHomePath({

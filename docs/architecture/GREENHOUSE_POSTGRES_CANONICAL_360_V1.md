@@ -87,6 +87,7 @@ Domain workflows extend the canonical core from dedicated schemas instead of pus
 #### `greenhouse_hr`
 
 - `leave_types`
+- `leave_policies`
 - `leave_balances`
 - `leave_requests`
 - `leave_request_actions`
@@ -248,7 +249,17 @@ Examples:
 
 The first runtime cutover already follows this pattern:
 - `HR > Permisos` resolves user and collaborator identity from `greenhouse_core.client_users` and `greenhouse_core.members`
-- `HR > Permisos` stores leave types, balances, requests, and review actions in `greenhouse_hr`
+- `HR > Permisos` stores leave types, policies, balances, requests, and review actions in `greenhouse_hr`
+- `HR > Permisos` materializes leave-centric serving reads in:
+  - `greenhouse_serving.member_leave_360`
+  - `greenhouse_serving.person_hr_360`
+
+Important boundary:
+- `HR > Permisos` already consumes canonical member identity from Postgres
+- `HR profile` editing is not fully cut over to PostgreSQL yet
+- fields such as `hire_date` still have their operational write path in BigQuery legacy tables:
+  - `greenhouse.team_members.hire_date`
+- therefore `greenhouse_core.members` must still be treated here as canonical identity plus downstream consumption anchor, not as the operational source of every mutable HR profile field
 
 That is the actual platform synergy we want.
 
@@ -381,10 +392,17 @@ The bootstrap created:
 #### HR Leave (`greenhouse_hr`)
 - `GET /api/hr/core/meta`
 - `GET /api/hr/core/leave/balances`
+- `GET /api/hr/core/leave/calendar`
 - `GET /api/hr/core/leave/requests`
 - `GET /api/hr/core/leave/requests/[requestId]`
 - `POST /api/hr/core/leave/requests`
 - `POST /api/hr/core/leave/requests/[requestId]/review`
+- `GET /api/my/leave`
+
+Contrato operativo vigente:
+- los días solicitados ya no se toman como input confiable del cliente; se derivan desde calendario operativo + feriados
+- `greenhouse_hr.leave_policies` define saldo, carry-over, progressive extra days y reglas de validación
+- el runtime self-service y HR consume el mismo contrato canónico de leave
 
 #### Payroll (`greenhouse_payroll`)
 - `GET/POST /api/hr/payroll/compensation`

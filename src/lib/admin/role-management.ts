@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { isRoleCode } from '@/config/role-codes'
 import {
   runGreenhousePostgresQuery,
   withGreenhousePostgresTransaction
@@ -82,6 +83,32 @@ export const getAvailableRoles = async (): Promise<RoleCatalogEntry[]> => {
   return rows.map(normalizeRoleCatalog)
 }
 
+/**
+ * Check for drift between ROLE_CODES (TypeScript) and greenhouse_core.roles (Postgres).
+ * Returns roles present in DB but missing from code, and vice versa.
+ * Use in ops health checks or pg:doctor to detect configuration drift.
+ */
+export const checkRoleCodeDrift = async (): Promise<{
+  healthy: boolean
+  inDbNotInCode: string[]
+  inCodeNotInDb: string[]
+}> => {
+  const dbRoles = await getAvailableRoles()
+  const dbCodes = new Set(dbRoles.map(r => r.roleCode))
+
+  const { ROLE_CODES } = await import('@/config/role-codes')
+  const codeCodes = new Set(Object.values(ROLE_CODES))
+
+  const inDbNotInCode = [...dbCodes].filter(code => !codeCodes.has(code as typeof ROLE_CODES[keyof typeof ROLE_CODES]))
+  const inCodeNotInDb = [...codeCodes].filter(code => !dbCodes.has(code))
+
+  return {
+    healthy: inDbNotInCode.length === 0 && inCodeNotInDb.length === 0,
+    inDbNotInCode,
+    inCodeNotInDb
+  }
+}
+
 export const getUserRoleAssignments = async (userId: string): Promise<UserRoleAssignment[]> => {
   const rows = await runGreenhousePostgresQuery<AssignmentRow>(
     `SELECT ura.assignment_id, ura.role_code, r.role_name, r.role_family,
@@ -111,6 +138,14 @@ export const updateUserRoles = async (params: {
   assignedByUserId: string
 }): Promise<UserRoleAssignment[]> => {
   const { userId, roleCodes } = params
+
+  // Warn if any role code is not in the typed ROLE_CODES constant.
+  // This catches drift between the DB role catalog and the TypeScript constants.
+  const unknownRoles = roleCodes.filter(code => !isRoleCode(code))
+
+  if (unknownRoles.length > 0) {
+    console.warn(`[role-management] Assigning unknown role codes not in ROLE_CODES: ${unknownRoles.join(', ')}. Route group derivation may not work for these roles.`)
+  }
 
   return withGreenhousePostgresTransaction(async client => {
     // 1. Deactivate roles no longer in the list

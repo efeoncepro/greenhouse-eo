@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { buildBusinessLineMap } from '@/lib/business-line/metadata'
 import { toIncomePaymentCashEntries } from '@/lib/finance/income-payments'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import { getFinanceProjectId, roundCurrency, runFinanceQuery, toNumber } from '@/lib/finance/shared'
@@ -146,20 +147,36 @@ export async function GET() {
     else bucket.laborCosts.operational = roundCurrency(bucket.laborCosts.operational + amount)
   }
 
+  // Enrich with business line metadata (label, color, loop phase)
+  let blMap: Map<string, { label: string; colorHex: string; loopPhase: string | null }> | null = null
+
+  try {
+    blMap = await buildBusinessLineMap()
+  } catch {
+    // Non-blocking: if metadata table doesn't exist yet, proceed without enrichment
+  }
+
   const serviceLines = Array.from(totalsByServiceLine.entries())
-    .map(([serviceLine, totals]) => ({
-      serviceLine,
-      income: totals.cashIncome,
-      expenses: totals.cashExpenses,
-      net: totals.cashIncome - totals.cashExpenses,
-      cashIncome: totals.cashIncome,
-      cashExpenses: totals.cashExpenses,
-      cashNet: totals.cashIncome - totals.cashExpenses,
-      accrualIncome: totals.accrualIncome,
-      accrualExpenses: totals.accrualExpenses,
-      accrualNet: totals.accrualIncome - totals.accrualExpenses,
-      laborCosts: totals.laborCosts
-    }))
+    .map(([serviceLine, totals]) => {
+      const meta = blMap?.get(serviceLine)
+
+      return {
+        serviceLine,
+        label: meta?.label || serviceLine,
+        colorHex: meta?.colorHex || null,
+        loopPhase: meta?.loopPhase || null,
+        income: totals.cashIncome,
+        expenses: totals.cashExpenses,
+        net: totals.cashIncome - totals.cashExpenses,
+        cashIncome: totals.cashIncome,
+        cashExpenses: totals.cashExpenses,
+        cashNet: totals.cashIncome - totals.cashExpenses,
+        accrualIncome: totals.accrualIncome,
+        accrualExpenses: totals.accrualExpenses,
+        accrualNet: totals.accrualIncome - totals.accrualExpenses,
+        laborCosts: totals.laborCosts
+      }
+    })
     .sort((left, right) => right.cashIncome - left.cashIncome)
 
   return NextResponse.json({ serviceLines })

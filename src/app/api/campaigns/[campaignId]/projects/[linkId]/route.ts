@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { ROLE_CODES } from '@/config/role-codes'
 import { requireTenantContext } from '@/lib/tenant/authorization'
 import { removeProjectFromCampaign } from '@/lib/campaigns/campaign-store'
 
@@ -15,7 +16,7 @@ export async function DELETE(
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  if (!tenant.routeGroups.includes('internal') && !tenant.roleCodes.includes('efeonce_admin')) {
+  if (!tenant.routeGroups.includes('internal') && !tenant.roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 

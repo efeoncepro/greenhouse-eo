@@ -8,6 +8,8 @@ export const AGGREGATE_TYPES = {
   supplier: 'supplier',
   exchangeRate: 'exchange_rate',
   economicIndicator: 'economic_indicator',
+  provider: 'provider',
+  providerToolingSnapshot: 'provider_tooling_snapshot',
 
   // Nubox
   nuboxEmission: 'nubox_emission',
@@ -28,6 +30,8 @@ export const AGGREGATE_TYPES = {
   payrollPrevisionalSnapshot: 'payroll_previsional_snapshot',
 
   // AI Tools
+  aiTool: 'ai_tool',
+  aiLicense: 'ai_license',
   aiCredits: 'ai_credits',
   aiWallet: 'ai_wallet',
 
@@ -45,6 +49,7 @@ export const AGGREGATE_TYPES = {
   identityReconciliation: 'identity_reconciliation',
   identityProfile: 'identity_profile',
   viewAccess: 'view_access',
+  asset: 'asset',
 
   // Services
   service: 'service',
@@ -73,7 +78,10 @@ export const AGGREGATE_TYPES = {
   periodClosure: 'period_closure',
   commercialCostAttribution: 'commercial_cost_attribution',
   operationalPl: 'operational_pl',
-  marginAlert: 'margin_alert'
+  marginAlert: 'margin_alert',
+  staffAugPlacement: 'staff_aug_placement',
+  staffAugOnboardingItem: 'staff_aug_onboarding_item',
+  staffAugPlacementSnapshot: 'staff_aug_placement_snapshot'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -112,11 +120,25 @@ export const EVENT_TYPES = {
   financeIncomeUpdated: 'finance.income.updated',
   financeExpenseCreated: 'finance.expense.created',
   financeExpenseUpdated: 'finance.expense.updated',
+  financeSupplierCreated: 'finance.supplier.created',
+  financeSupplierUpdated: 'finance.supplier.updated',
   financeIncomePaymentCreated: 'finance.income_payment.created',
   financeIncomePaymentRecorded: 'finance.income_payment.recorded',
   financeCostAllocationCreated: 'finance.cost_allocation.created',
   financeCostAllocationDeleted: 'finance.cost_allocation.deleted',
   financeEconomicIndicatorUpserted: 'finance.economic_indicator.upserted',
+  providerUpserted: 'provider.upserted',
+  providerToolingSnapshotMaterialized: 'provider.tooling_snapshot.materialized',
+
+  // AI Tooling structural events
+  aiToolCreated: 'ai_tool.created',
+  aiToolUpdated: 'ai_tool.updated',
+  aiLicenseCreated: 'ai_license.created',
+  aiLicenseReactivated: 'ai_license.reactivated',
+  aiLicenseUpdated: 'ai_license.updated',
+  aiWalletCreated: 'ai_wallet.created',
+  aiWalletUpdated: 'ai_wallet.updated',
+  aiWalletCreditsConsumed: 'ai_wallet.credits_consumed',
 
   // Payroll
   payrollPeriodCreated: 'payroll_period.created',
@@ -125,6 +147,12 @@ export const EVENT_TYPES = {
   payrollPeriodApproved: 'payroll_period.approved',
   payrollPeriodExported: 'payroll_period.exported',
   payrollEntryUpserted: 'payroll_entry.upserted',
+  leaveRequestCreated: 'leave_request.created',
+  leaveRequestEscalatedToHr: 'leave_request.escalated_to_hr',
+  leaveRequestApproved: 'leave_request.approved',
+  leaveRequestRejected: 'leave_request.rejected',
+  leaveRequestCancelled: 'leave_request.cancelled',
+  leaveRequestPayrollImpactDetected: 'leave_request.payroll_impact_detected',
   compensationVersionCreated: 'compensation_version.created',
   compensationVersionUpdated: 'compensation_version.updated',
   payrollPrevisionalSnapshotUpserted: 'payroll.previsional_snapshot.upserted',
@@ -169,6 +197,12 @@ export const EVENT_TYPES = {
   // View Access
   viewAccessOverrideChanged: 'access.view_override_changed',
 
+  // Shared Assets
+  assetUploaded: 'asset.uploaded',
+  assetAttached: 'asset.attached',
+  assetDeleted: 'asset.deleted',
+  assetDownloaded: 'asset.downloaded',
+
   // Capacity Economics
   financeExchangeRateUpserted: 'finance.exchange_rate.upserted',
   financeOverheadUpdated: 'finance.overhead.updated',
@@ -180,7 +214,12 @@ export const EVENT_TYPES = {
   accountingPeriodReopened: 'accounting.period_reopened',
   accountingCommercialCostAttributionMaterialized: 'accounting.commercial_cost_attribution.materialized',
   accountingPlSnapshotMaterialized: 'accounting.pl_snapshot.materialized',
-  accountingMarginAlertTriggered: 'accounting.margin_alert.triggered'
+  accountingMarginAlertTriggered: 'accounting.margin_alert.triggered',
+  staffAugPlacementCreated: 'staff_aug.placement.created',
+  staffAugPlacementUpdated: 'staff_aug.placement.updated',
+  staffAugPlacementStatusChanged: 'staff_aug.placement.status_changed',
+  staffAugOnboardingItemUpdated: 'staff_aug.onboarding_item.updated',
+  staffAugPlacementSnapshotMaterialized: 'staff_aug.placement_snapshot.materialized'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
@@ -199,17 +238,32 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.financeIncomeUpdated,
   EVENT_TYPES.financeExpenseCreated,
   EVENT_TYPES.financeExpenseUpdated,
+  EVENT_TYPES.financeSupplierCreated,
+  EVENT_TYPES.financeSupplierUpdated,
   EVENT_TYPES.financeIncomePaymentCreated,
   EVENT_TYPES.financeIncomePaymentRecorded,
   EVENT_TYPES.financeCostAllocationCreated,
   EVENT_TYPES.financeCostAllocationDeleted,
   EVENT_TYPES.financeEconomicIndicatorUpserted,
+  EVENT_TYPES.financeSupplierCreated,
+  EVENT_TYPES.financeSupplierUpdated,
+  EVENT_TYPES.providerUpserted,
+  EVENT_TYPES.staffAugPlacementCreated,
+  EVENT_TYPES.staffAugPlacementUpdated,
+  EVENT_TYPES.staffAugPlacementStatusChanged,
+  EVENT_TYPES.staffAugOnboardingItemUpdated,
   EVENT_TYPES.payrollPeriodCreated,
   EVENT_TYPES.payrollPeriodUpdated,
   EVENT_TYPES.payrollPeriodCalculated,
   EVENT_TYPES.payrollPeriodApproved,
   EVENT_TYPES.payrollPeriodExported,
   EVENT_TYPES.payrollEntryUpserted,
+  EVENT_TYPES.leaveRequestCreated,
+  EVENT_TYPES.leaveRequestEscalatedToHr,
+  EVENT_TYPES.leaveRequestApproved,
+  EVENT_TYPES.leaveRequestRejected,
+  EVENT_TYPES.leaveRequestCancelled,
+  EVENT_TYPES.leaveRequestPayrollImpactDetected,
   EVENT_TYPES.payrollPrevisionalSnapshotUpserted,
   EVENT_TYPES.compensationVersionUpdated,
 
@@ -231,6 +285,15 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.financeOverheadUpdated,
   EVENT_TYPES.financeLicenseCostUpdated,
   EVENT_TYPES.financeToolingCostUpdated,
+  EVENT_TYPES.providerUpserted,
+  EVENT_TYPES.aiToolCreated,
+  EVENT_TYPES.aiToolUpdated,
+  EVENT_TYPES.aiLicenseCreated,
+  EVENT_TYPES.aiLicenseReactivated,
+  EVENT_TYPES.aiLicenseUpdated,
+  EVENT_TYPES.aiWalletCreated,
+  EVENT_TYPES.aiWalletUpdated,
+  EVENT_TYPES.aiWalletCreditsConsumed,
   EVENT_TYPES.accountingMarginAlertTriggered,
 
   // Data quality / SII alerts

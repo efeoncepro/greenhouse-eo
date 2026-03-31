@@ -60,6 +60,11 @@ Indice maestro de la documentacion no operativa del repo.
 - [GREENHOUSE_DELIVERY_CLIENT_RUNTIME_GAPS_V1.md](roadmap/GREENHOUSE_DELIVERY_CLIENT_RUNTIME_GAPS_V1.md)
 - [GREENHOUSE_HR_FINANCE_RUNTIME_GAPS_V1.md](roadmap/GREENHOUSE_HR_FINANCE_RUNTIME_GAPS_V1.md)
 
+### Research
+
+- [Research Briefs](research/README.md)
+- [RESEARCH-002-staff-augmentation-enterprise-module.md](research/RESEARCH-002-staff-augmentation-enterprise-module.md)
+
 ### Operations
 
 - [DOCUMENTATION_OPERATING_MODEL_V1.md](operations/DOCUMENTATION_OPERATING_MODEL_V1.md)

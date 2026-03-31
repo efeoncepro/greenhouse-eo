@@ -1,3 +1,7 @@
+## Delta 2026-03-30
+- `TASK-142` ya cerró el shell real de `Space 360` y el tab `Services` existe con contrato operativo sobre `getAgencySpace360()`.
+- Esta task ya no debe asumir que necesita crear primero la vista `Services`; el trabajo pendiente es agregar revenue/cost/margin por servicio encima del tab ya materializado.
+
 # TASK-146 — Service-Level P&L (Economics per Service)
 
 ## Status

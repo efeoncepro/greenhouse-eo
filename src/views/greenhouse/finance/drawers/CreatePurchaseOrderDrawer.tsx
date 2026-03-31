@@ -16,6 +16,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import CustomTextField from '@core/components/mui/TextField'
+import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/greenhouse/GreenhouseFileUploader'
 
 // ── Types ──
 
@@ -60,7 +61,7 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
   const [description, setDescription] = useState('')
   const [contactName, setContactName] = useState('')
   const [contactEmail, setContactEmail] = useState('')
-  const [attachmentUrl, setAttachmentUrl] = useState('')
+  const [attachmentAsset, setAttachmentAsset] = useState<UploadedFileValue | null>(null)
   const [notes, setNotes] = useState('')
 
   // State
@@ -144,7 +145,7 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
     setDescription('')
     setContactName('')
     setContactEmail('')
-    setAttachmentUrl('')
+    setAttachmentAsset(null)
     setNotes('')
     setActivePOs(null)
     setError(null)
@@ -189,7 +190,7 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
           ...(description.trim() && { description: description.trim() }),
           ...(contactName.trim() && { contactName: contactName.trim() }),
           ...(contactEmail.trim() && { contactEmail: contactEmail.trim() }),
-          ...(attachmentUrl.trim() && { attachmentUrl: attachmentUrl.trim() }),
+          ...(attachmentAsset?.assetId && { attachmentAssetId: attachmentAsset.assetId }),
           ...(notes.trim() && { notes: notes.trim() })
         })
       })
@@ -339,10 +340,19 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
         <Divider />
         <Typography variant='subtitle2' color='text.secondary'>Adjunto y notas</Typography>
 
-        <CustomTextField
-          fullWidth size='small' label='URL del documento (PDF)'
-          placeholder='https://...'
-          value={attachmentUrl} onChange={e => setAttachmentUrl(e.target.value)}
+        <GreenhouseFileUploader
+          contextType='purchase_order_draft'
+          title='Documento de respaldo'
+          helperText='Sube la orden de compra o su respaldo en PDF o imagen. Quedará gobernado por el registry shared de assets.'
+          emptyTitle='Arrastra la OC aquí'
+          emptyDescription='Acepta PDF, JPG, PNG y WEBP hasta 10 MB.'
+          browseCta='Seleccionar documento'
+          replaceCta='Reemplazar documento'
+          value={attachmentAsset}
+          onChange={setAttachmentAsset}
+          ownerClientId={selectedClientId || undefined}
+          metadataLabel={poNumber.trim() || 'purchase-order'}
+          disabled={saving || !selectedClientId}
         />
         <CustomTextField
           fullWidth size='small' label='Notas' multiline rows={2}

@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { ROLE_CODES } from '@/config/role-codes'
 import { NotificationService } from '@/lib/notifications/notification-service'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
 import { HOME_GREETINGS, HOME_SUBTITLE } from '@/config/home-greetings'
@@ -22,7 +23,7 @@ const MONTH_SHORT = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago',
 
 export const canSeeFinanceStatus = (input: Pick<HomeSnapshotInput, 'roleCodes' | 'routeGroups'>) =>
   (input.routeGroups || []).includes('finance') ||
-  (input.roleCodes || []).some(code => code === 'finance_manager' || code === 'efeonce_admin' || code === 'efeonce_operations')
+  (input.roleCodes || []).some(code => code === ROLE_CODES.FINANCE_MANAGER || code === ROLE_CODES.EFEONCE_ADMIN || code === ROLE_CODES.EFEONCE_OPERATIONS)
 
 export const getHomeFinanceStatus = async () => {
   const [currentPeriod, latestMargin] = await Promise.all([

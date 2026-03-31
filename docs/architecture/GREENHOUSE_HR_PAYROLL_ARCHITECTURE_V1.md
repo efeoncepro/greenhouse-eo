@@ -1,5 +1,18 @@
 # GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md
 
+## Delta 2026-03-31 — Payroll artifacts convergen a shared assets
+
+`TASK-173` deja explícito que los artefactos documentales de Payroll no deben seguir como carriles aislados.
+
+Estado vigente en repo:
+- `payroll_receipts` ya puede persistir `asset_id`
+- `payroll_export_packages` ya puede persistir `pdf_asset_id` y `csv_asset_id`
+- la generación de recibos y export packages ya puede registrar metadata shared sobre el bucket privado canónico
+
+Regla:
+- Payroll sigue siendo owner del agregado `receipt` / `export package`
+- pero el archivo físico y su delivery privado convergen sobre la foundation shared de assets
+
 ## Objetivo
 Definir el contrato arquitectónico del módulo `Payroll` de Greenhouse: qué ownership tiene, sobre qué anclas canónicas opera, cómo se calcula una nómina mensual, qué estados atraviesa, qué integra con otros módulos y qué superficies son las oficiales.
 
@@ -205,6 +218,194 @@ Non-fit modules:
 
 - módulos sin concepto de cierre mensual ni ventana de aprobación no deberían depender de esta policy por defecto
 - si un módulo solo necesita una fecha de calendario civil simple, no debe cargar la complejidad de la policy operativa
+
+## 2.8. Leave, vacations and payroll impact contract
+
+`Leave` y `Payroll` comparten el mismo calendario operativo canónico, pero no el mismo ownership transaccional.
+
+Regla arquitectónica:
+
+- `leave` vive en `greenhouse_hr`
+- `payroll` vive en `greenhouse_payroll`
+- el puente entre ambos no es una tabla compartida mutable, sino:
+  - calendario operativo común
+  - lectura de licencias aprobadas por período
+  - eventos de outbox semánticos cuando una licencia cambia
+
+Source of truth de permisos:
+
+- `greenhouse_hr.leave_types`
+- `greenhouse_hr.leave_policies`
+- `greenhouse_hr.leave_balances`
+- `greenhouse_hr.leave_requests`
+- `greenhouse_hr.leave_request_actions`
+- serving views:
+  - `greenhouse_serving.member_leave_360`
+  - `greenhouse_serving.person_hr_360`
+
+Regla para vacaciones:
+
+- la persona solicita vacaciones por rango de fechas, no por “cantidad manual” de días
+- el sistema deriva los días hábiles desde `src/lib/calendar/operational-calendar.ts`
+- la capa de feriados usa `src/lib/calendar/nager-date-holidays.ts` con `Nager.Date` + overrides locales persistidos
+- no se cuentan fines de semana ni feriados
+- la timezone canónica sigue siendo `America/Santiago`
+- el saldo se valida contra `leave_policies` y `leave_balances`, incluyendo carry-over, progressive extra days y ajustes
+
+Regla de producto para self-service y HR:
+
+- `/my/leave` es la superficie personal de saldo, historial y calendario
+- `/hr/leave` es la superficie operativa de revisión, saldos y calendario del equipo
+- ambas surfaces deben consumir el mismo runtime canónico de leave, no helpers paralelos ni cálculos locales en la UI
+
+Regla de captura de `hire_date`:
+
+- `hire_date` sí afecta el dominio de vacaciones por antigüedad/progresivos
+- mientras `HR profile` no tenga cutover formal a PostgreSQL, la edición operativa de `hire_date` permanece en el carril HR legacy:
+  - write path: `PATCH /api/hr/core/members/[memberId]/profile`
+  - persistencia actual: `greenhouse.team_members.hire_date` en BigQuery
+- `greenhouse_core.members.hire_date` puede existir como proyección o snapshot canónico de consumo, pero no debe reemplazar el write path operativo antes del cutover explícito del módulo
+- no mover esta edición a `Postgres-first` por simetría con `leave` o `payroll`; aquí prevalece el ownership operativo actual de `HR profile`
+
+Contrato de eventos:
+
+- `leave_request.created`
+- `leave_request.escalated_to_hr`
+- `leave_request.approved`
+- `leave_request.rejected`
+- `leave_request.cancelled`
+- `leave_request.payroll_impact_detected`
+
+Regla de impacto en nómina:
+
+- cuando una licencia aprobada, rechazada o cancelada toca un período existente de nómina, el sistema debe detectarlo
+- si el período aún no está exportado, la proyección reactiva `leave_payroll_recalculation` puede recalcular la nómina oficial
+- si el período ya está exportado, no se debe mutar automáticamente; el sistema solo alerta a Payroll/Finance para ajuste controlado
+- costos, finanzas, providers y tooling no consumen `leave_request.*` directo como source of truth económico
+- el carril canónico es `leave -> payroll -> projections downstream`
+
+### 2.8.1. Leave runtime rules currently enforced
+
+Estas son las reglas observables del runtime real al `2026-03-31`.
+
+Resolución de policy:
+
+- el sistema primero resuelve `leave_type`
+- luego selecciona la `leave_policy` aplicable según:
+  - `employment_type`
+  - `pay_regime`
+- si no existe match exacto, usa una policy default derivada del `leave_type`
+
+Cálculo de días:
+
+- el usuario selecciona `startDate` y `endDate`
+- si `endDate < startDate`, la solicitud falla
+- los días no se toman del cliente como source of truth; se recalculan server-side
+- solo cuentan días hábiles:
+  - excluye fines de semana
+  - excluye feriados nacionales
+  - timezone canónica: `America/Santiago`
+- si el rango no contiene días hábiles pagables, la solicitud falla
+
+Validaciones al crear una solicitud:
+
+- no puede existir overlap con otra solicitud activa del mismo colaborador
+- si el tipo requiere attachment, debe venir `attachmentUrl`
+- si la policy define `minAdvanceDays`, se exige esa anticipación en días calendario contra la fecha operativa de hoy
+- si la policy define `minContinuousDays`, la solicitud debe cubrir al menos esa cantidad de días hábiles
+- si la policy define `maxConsecutiveDays`, la solicitud no puede exceder ese tope
+- si la licencia trackea balance y la policy no permite saldo negativo, cada año afectado debe tener saldo suficiente
+
+Semántica de balance:
+
+- el seed anual se arma por `member_id + leave_type_code + year`
+- `availableDays` se calcula como:
+  - `allowance_days`
+  - `+ progressive_extra_days`
+  - `+ carried_over_days`
+  - `+ adjustment_days`
+  - `- used_days`
+  - `- reserved_days`
+- al crear una solicitud pendiente, el sistema reserva días
+- al aprobarla en HR, libera reserva y mueve esos días a usados
+- al rechazar o cancelar, revierte la reserva
+
+Carry-over y progresivos:
+
+- `carry-over` se limita por `maxCarryOverDays`
+- `progressive_extra_days` solo se calcula cuando la policy lo habilita
+- hoy el cálculo progresivo usa:
+  - `hire_date`
+  - `prior_work_years`
+  - `progressive_base_years`
+  - `progressive_interval_years`
+  - `progressive_max_extra_days`
+- para vacaciones Chile, esa lógica se aplica sobre `pay_regime = 'chile'`
+
+Flujo de aprobación:
+
+- si existe supervisor, una solicitud nueva entra como `pending_supervisor`
+- si no existe supervisor, entra directo como `pending_hr`
+- supervisor no-HR:
+  - puede aprobar hacia `pending_hr`
+  - puede rechazar
+- HR:
+  - puede aprobar
+  - puede rechazar
+- el solicitante puede cancelar solo solicitudes todavía pendientes
+- solicitudes ya cerradas no pueden volver a revisarse como si siguieran pendientes
+
+Reglas base seed observables por tipo:
+
+- `vacation`
+  - policy Chile dependientes:
+    - `annual_days = 15`
+    - `max_carry_over_days = 5`
+    - `min_advance_days = 7`
+    - `max_consecutive_days = 15`
+    - `min_continuous_days = 5`
+    - `max_accumulation_periods = 2`
+    - `progressive_enabled = true`
+    - `applicable_employment_types = ['full_time']`
+    - `applicable_pay_regimes = ['chile']`
+    - `allow_negative_balance = false`
+  - policy default portal:
+    - `annual_days = 15`
+    - `min_advance_days = 7`
+    - `max_consecutive_days = 15`
+    - `min_continuous_days = 5`
+    - `allow_negative_balance = false`
+- `floating_holiday`
+  - `annual_days = 1`
+  - `min_advance_days = 2`
+  - `max_consecutive_days = 1`
+  - `min_continuous_days = 1`
+- `bereavement`
+  - `annual_days = 3`
+  - `min_advance_days = 0`
+  - `max_consecutive_days = 3`
+  - `min_continuous_days = 1`
+- `civic_duty`
+  - `annual_days = 2`
+  - `min_advance_days = 0`
+  - `max_consecutive_days = 2`
+  - `min_continuous_days = 1`
+- `study`
+  - `min_advance_days = 3`
+  - `allow_negative_balance = true`
+- `personal`
+  - `min_advance_days = 1`
+  - `allow_negative_balance = true`
+- `medical`
+  - `min_advance_days = 0`
+  - `allow_negative_balance = true`
+  - hoy el seed no exige attachment por defecto; si negocio quiere licencia médica con respaldo obligatorio, eso debe expresarse en `leave_types`/`leave_policies`
+
+Implicación funcional importante:
+
+- tener saldo disponible no implica aprobación automática
+- una solicitud puede fallar por policy aunque el saldo exista
+- ejemplo vigente: vacaciones con saldo disponible igual fallan si se intentan pedir con menos de `7` días de anticipación
 
 ## 3. Superficies oficiales
 
@@ -545,6 +746,19 @@ Snapshot guardado por entry:
 Regla:
 - la asistencia afecta salario base y conectividad cuando corresponde
 - el entry guarda el resultado ajustado, no solo el valor fuente
+
+Semántica adicional de licencias:
+
+- `days_on_leave` representa días de licencia aprobada dentro del período
+- `days_on_unpaid_leave` representa la porción sin goce de sueldo o equivalente no pagado
+- `vacaciones` y otras licencias pagadas pueden reducir presencia efectiva sin necesariamente reducir base imponible del mismo modo que una ausencia no pagada
+- la clasificación de impacto debe salir del dominio `leave` y de la policy asociada al tipo de permiso, no de heurísticas en el cálculo de nómina
+
+Regla de recalculo:
+
+- si cambia una licencia que ya intersecta un período creado/calculado/aprobado, la señal nace en `leave_request.payroll_impact_detected`
+- Payroll decide si recalcula automáticamente o deja solo alerta operativa según el estado del período
+- `exported` sigue siendo lock final y no debe recibir recálculo automático desde `leave`
 
 ## 14. Edición manual y recálculo de entries
 

@@ -1,5 +1,11 @@
 # CODEX TASK — HR Payroll Attendance/Leave Work Entries Hardening (v1)
 
+## Delta 2026-03-31
+
+- `leave` ya no debe tratarse como input crudo basado en `requested_days` entregado por el caller.
+- El dominio de permisos ahora deriva días hábiles desde calendario operativo + feriados Chile y emite `leave_request.payroll_impact_detected` por período.
+- Esta task sigue abierta porque la capa canónica `work_entries` sigue faltando, pero debe leer ese baseline como existente y no como gap por resolver dentro de leave.
+
 ## Delta 2026-03-28 — Auditoría de implementación
 
 ### Estado real: la capa canónica `work_entries` NO existe

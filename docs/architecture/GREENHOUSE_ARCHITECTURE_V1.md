@@ -1,5 +1,27 @@
 # Greenhouse Architecture V1
 
+## Delta 2026-03-31 — Shared attachments platform ya tiene foundation runtime en repo
+
+`TASK-173` ya no debe leerse solo como decisión documental.
+
+Estado vigente en el repo:
+- existe una capability shared de assets/attachments para el portal
+- su capa base vive en:
+  - `src/lib/storage/greenhouse-assets.ts`
+  - `src/app/api/assets/private/route.ts`
+  - `src/app/api/assets/private/[assetId]/route.ts`
+  - `src/components/greenhouse/GreenhouseFileUploader.tsx`
+- el contrato converge múltiples dominios reales:
+  - `leave`
+  - `purchase orders`
+  - `payroll receipts`
+  - `payroll export packages`
+
+Regla arquitectónica nueva:
+- nuevos módulos compatibles no deben crear storage helpers, buckets lógicos o uploaders paralelos si pueden consumir esta capability shared
+- las associations documentales se resuelven por aggregate del dominio, no creando identidades documentales duplicadas
+- la metadata y autorización del asset son cross-module; la semántica del documento sigue siendo ownership del dominio consumidor
+
 ## Delta 2026-03-30 — TASK-162 ya dejó capa canónica materializada + estrategia de cutover
 
 La decisión de `commercial cost attribution` ya no debe leerse solo como framing.

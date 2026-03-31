@@ -1,9 +1,10 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { SyntheticEvent } from 'react'
 
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
@@ -36,6 +37,7 @@ import AiConsumptionTab from './tabs/AiConsumptionTab'
 type AdminTab = 'catalog' | 'licenses' | 'wallets' | 'consumption'
 
 const AiToolingDashboard = () => {
+  const searchParams = useSearchParams()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [tab, setTab] = useState<AdminTab>('catalog')
@@ -44,17 +46,38 @@ const AiToolingDashboard = () => {
   const [walletsData, setWalletsData] = useState<AiCreditWalletsResponse | null>(null)
   const [meta, setMeta] = useState<AiToolingAdminMetadata | null>(null)
 
+  const requestedTab = searchParams.get('tab')
+  const requestedProviderId = searchParams.get('providerId')?.trim() || ''
+
+  useEffect(() => {
+    if (
+      requestedTab === 'catalog' ||
+      requestedTab === 'licenses' ||
+      requestedTab === 'wallets' ||
+      requestedTab === 'consumption'
+    ) {
+      setTab(requestedTab)
+    }
+  }, [requestedTab])
+
   const fetchData = useCallback(async () => {
     setLoading(true)
     setError(null)
 
     try {
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 25_000)
+
+      const opts = { signal: controller.signal }
+
       const [catRes, licRes, walRes, metaRes] = await Promise.all([
-        fetch('/api/admin/ai-tools/catalog'),
-        fetch('/api/admin/ai-tools/licenses'),
-        fetch('/api/admin/ai-tools/wallets'),
-        fetch('/api/admin/ai-tools/meta')
+        fetch('/api/admin/ai-tools/catalog', opts),
+        fetch('/api/admin/ai-tools/licenses', opts),
+        fetch('/api/admin/ai-tools/wallets', opts),
+        fetch('/api/admin/ai-tools/meta', opts)
       ])
+
+      clearTimeout(timeout)
 
       const errors: string[] = []
 
@@ -94,7 +117,11 @@ const AiToolingDashboard = () => {
         setError(errors.join(' · '))
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Error de conexión al cargar datos')
+      const message = err instanceof DOMException && err.name === 'AbortError'
+        ? 'La carga de datos excedió el tiempo límite. Intenta de nuevo.'
+        : err instanceof Error ? err.message : 'Error de conexión al cargar datos'
+
+      setError(message)
     } finally {
       setLoading(false)
     }
@@ -105,6 +132,91 @@ const AiToolingDashboard = () => {
   const handleTabChange = (_: SyntheticEvent, value: string) => {
     setTab(value as AdminTab)
   }
+
+  const providerContext = useMemo(() => {
+    if (!requestedProviderId) {
+      return null
+    }
+
+    const providers = [...(catalogData?.providers ?? []), ...(meta?.providers ?? [])]
+
+    return providers.find(provider => provider.providerId === requestedProviderId) ?? null
+  }, [catalogData, meta, requestedProviderId])
+
+  const filteredCatalogData = useMemo<AiToolsCatalogResponse | null>(() => {
+    if (!catalogData) {
+      return null
+    }
+
+    if (!requestedProviderId) {
+      return catalogData
+    }
+
+    const tools = catalogData.tools.filter(tool => tool.providerId === requestedProviderId)
+    const providers = catalogData.providers.filter(provider => provider.providerId === requestedProviderId)
+
+    return {
+      tools,
+      providers,
+      summary: {
+        total: tools.length,
+        active: tools.filter(tool => tool.isActive).length,
+        categories: tools.reduce<Record<string, number>>((accumulator, tool) => {
+          accumulator[tool.toolCategory] = (accumulator[tool.toolCategory] || 0) + 1
+
+          return accumulator
+        }, {})
+      }
+    }
+  }, [catalogData, requestedProviderId])
+
+  const filteredLicensesData = useMemo<AiToolLicensesResponse | null>(() => {
+    if (!licensesData) {
+      return null
+    }
+
+    if (!requestedProviderId) {
+      return licensesData
+    }
+
+    const licenses = licensesData.licenses.filter(license => license.tool?.providerId === requestedProviderId)
+
+    return {
+      licenses,
+      summary: {
+        total: licenses.length,
+        active: licenses.filter(license => license.licenseStatus === 'active').length,
+        members: new Set(licenses.map(license => license.memberId)).size
+      }
+    }
+  }, [licensesData, requestedProviderId])
+
+  const filteredWalletsData = useMemo<AiCreditWalletsResponse | null>(() => {
+    if (!walletsData) {
+      return null
+    }
+
+    if (!requestedProviderId) {
+      return walletsData
+    }
+
+    const wallets = walletsData.wallets.filter(wallet => wallet.providerId === requestedProviderId)
+
+    return {
+      wallets,
+      summary: {
+        totalWallets: wallets.length,
+        activeWallets: wallets.filter(wallet => wallet.walletStatus === 'active').length,
+        depletedWallets: wallets.filter(wallet => wallet.walletStatus === 'depleted').length,
+        totalCreditsAvailable: wallets.reduce((sum, wallet) => sum + wallet.availableBalance, 0)
+      }
+    }
+  }, [walletsData, requestedProviderId])
+
+  const catSummary = filteredCatalogData?.summary ?? { total: 0, active: 0, categories: {} }
+  const licSummary = filteredLicensesData?.summary ?? { total: 0, active: 0, members: 0 }
+  const walSummary = filteredWalletsData?.summary ?? { totalWallets: 0, activeWallets: 0, depletedWallets: 0, totalCreditsAvailable: 0 }
+  const categoryCount = Object.keys(catSummary.categories).length
 
   if (loading) {
     return (
@@ -128,11 +240,6 @@ const AiToolingDashboard = () => {
       </Stack>
     )
   }
-
-  const catSummary = catalogData?.summary ?? { total: 0, active: 0, categories: {} }
-  const licSummary = licensesData?.summary ?? { total: 0, active: 0, members: 0 }
-  const walSummary = walletsData?.summary ?? { totalWallets: 0, activeWallets: 0, depletedWallets: 0, totalCreditsAvailable: 0 }
-  const categoryCount = Object.keys(catSummary.categories).length
 
   return (
     <Stack spacing={6}>
@@ -162,6 +269,25 @@ const AiToolingDashboard = () => {
         <Alert severity='error' variant='outlined' onClose={() => setError(null)}>
           <Typography variant='body2' fontWeight={500} sx={{ mb: 0.5 }}>No se pudieron cargar algunos datos</Typography>
           <Typography variant='caption' color='text.secondary'>{error}</Typography>
+        </Alert>
+      )}
+
+      {requestedProviderId && (
+        <Alert
+          severity={providerContext ? 'info' : 'warning'}
+          variant='outlined'
+          action={
+            <IconButton component={Link} href='/admin/ai-tools' color='inherit' size='small'>
+              <i className='tabler-x' />
+            </IconButton>
+          }
+        >
+          <Typography variant='body2' fontWeight={600}>
+            {providerContext ? `Filtro activo: ${providerContext.providerName}` : `Filtro activo: ${requestedProviderId}`}
+          </Typography>
+          <Typography variant='body2'>
+            La vista está acotada al provider canónico seleccionado desde Finanzas. Catálogo, licencias y wallets reflejan solo ese proveedor.
+          </Typography>
         </Alert>
       )}
 
@@ -241,24 +367,24 @@ const AiToolingDashboard = () => {
 
         <TabPanel value='catalog' sx={{ p: 0 }}>
           <AiCatalogTab
-            tools={catalogData?.tools ?? []}
-            providers={catalogData?.providers ?? []}
+            tools={filteredCatalogData?.tools ?? []}
+            providers={filteredCatalogData?.providers ?? []}
             meta={meta}
             onRefresh={fetchData}
           />
         </TabPanel>
         <TabPanel value='licenses' sx={{ p: 0 }}>
           <AiLicensesTab
-            licenses={licensesData?.licenses ?? []}
-            tools={catalogData?.tools ?? []}
+            licenses={filteredLicensesData?.licenses ?? []}
+            tools={filteredCatalogData?.tools ?? []}
             meta={meta}
             onRefresh={fetchData}
           />
         </TabPanel>
         <TabPanel value='wallets' sx={{ p: 0 }}>
           <AiWalletsTab
-            wallets={walletsData?.wallets ?? []}
-            tools={catalogData?.tools ?? []}
+            wallets={filteredWalletsData?.wallets ?? []}
+            tools={filteredCatalogData?.tools ?? []}
             meta={meta}
             onRefresh={fetchData}
           />

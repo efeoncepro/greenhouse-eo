@@ -1,6 +1,7 @@
 import type { PoolClient } from 'pg'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 const normalizeString = (value: unknown) => {
   if (typeof value !== 'string') {
@@ -35,6 +36,19 @@ type FinanceSupplierProviderInput = {
 }
 
 type QueryableClient = Pick<PoolClient, 'query'>
+
+const getCurrentSantiagoPeriod = () => {
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date())
+  const match = today.match(/^(\d{4})-(\d{2})-\d{2}$/)
+
+  if (!match) {
+    const now = new Date()
+
+    return { periodYear: now.getFullYear(), periodMonth: now.getMonth() + 1 }
+  }
+
+  return { periodYear: Number(match[1]), periodMonth: Number(match[2]) }
+}
 
 const queryRows = async <T extends Record<string, unknown>>(text: string, values: unknown[], client?: QueryableClient) => {
   if (client) {
@@ -88,6 +102,17 @@ export const upsertProviderFromFinanceSupplierInPostgres = async (
 
   const providerPublicId = `provider_${providerId}`
 
+  const existing = await queryRows<{ provider_id: string }>(
+    `
+      SELECT provider_id
+      FROM greenhouse_core.providers
+      WHERE provider_id = $1
+      LIMIT 1
+    `,
+    [providerId],
+    client
+  )
+
   await queryRows(
     `
       INSERT INTO greenhouse_core.providers (
@@ -133,6 +158,29 @@ export const upsertProviderFromFinanceSupplierInPostgres = async (
       normalizeNullableString(input.website),
       input.isActive ?? true
     ],
+    client
+  )
+
+  const period = getCurrentSantiagoPeriod()
+
+  await publishOutboxEvent(
+    {
+      aggregateType: 'provider',
+      aggregateId: providerId,
+      eventType: 'provider.upserted',
+      payload: {
+        providerId,
+        providerName,
+        legalName: normalizeNullableString(input.legalName),
+        providerType: 'financial_vendor',
+        supplierId: normalizeString(input.supplierId),
+        source: 'finance_supplier',
+        websiteUrl: normalizeNullableString(input.website),
+        active: input.isActive ?? true,
+        changeKind: existing.length > 0 ? 'updated' : 'created',
+        ...period
+      }
+    },
     client
   )
 

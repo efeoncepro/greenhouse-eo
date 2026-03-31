@@ -46,4 +46,16 @@ describe('event catalog', () => {
     expect(EVENT_TYPES.payrollPeriodExported).toBe('payroll_period.exported')
     expect(REACTIVE_EVENT_TYPES).toContain('payroll_period.exported')
   })
+
+  it('includes staff augmentation placement lifecycle events in the reactive catalog', () => {
+    expect(EVENT_TYPES.staffAugPlacementCreated).toBe('staff_aug.placement.created')
+    expect(EVENT_TYPES.staffAugPlacementSnapshotMaterialized).toBe('staff_aug.placement_snapshot.materialized')
+    expect(REACTIVE_EVENT_TYPES).toContain('staff_aug.placement.created')
+    expect(REACTIVE_EVENT_TYPES).toContain('staff_aug.placement.updated')
+  })
+
+  it('includes leave payroll impact events in both event catalog and reactive triggers', () => {
+    expect(EVENT_TYPES.leaveRequestPayrollImpactDetected).toBe('leave_request.payroll_impact_detected')
+    expect(REACTIVE_EVENT_TYPES).toContain('leave_request.payroll_impact_detected')
+  })
 })

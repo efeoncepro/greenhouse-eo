@@ -57,8 +57,12 @@ Mutacion en store
 
 | Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
 |---|---|---|---|---|
-| `leave_request` | `leave.request.*` | `hr-core/postgres-leave-store.ts` | `{ requestId, memberId }` | — |
-| `leave_balance` | `leave.balance.*` | `hr-core/postgres-leave-store.ts` | `{ memberId }` | — |
+| `leave_request` | `leave_request.created`, `leave_request.escalated_to_hr`, `leave_request.approved`, `leave_request.rejected`, `leave_request.cancelled` | `hr-core/postgres-leave-store.ts` | `{ requestId, memberId, leaveTypeCode, startDate, endDate, status }` | `notifications` |
+| `leave_request` | `leave_request.payroll_impact_detected` | `hr-core/postgres-leave-store.ts` | `{ requestId, memberId, affectedPeriods, payrollImpact }` | `notifications`, `projected_payroll`, `leave_payroll_recalculation` |
+
+Notas:
+- `leave_request.payroll_impact_detected` es una señal operativa; no reemplaza `payroll_entry.upserted` como source of truth económico downstream.
+- `Finance`, `Cost Intelligence`, `Providers` y `AI Tooling` deben seguir reaccionando al carril `payroll -> projections`, no a `leave_request.*` directo salvo alertas.
 
 ### Payroll
 

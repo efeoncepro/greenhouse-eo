@@ -3,7 +3,10 @@ import type { PersonHrContext } from '@/lib/person-360/get-person-hr'
 import type { CompensationVersion, PayrollEntry } from '@/types/payroll'
 import type { TeamMemberProfile } from '@/types/team'
 
-export type PersonTab = 'activity' | 'compensation' | 'payroll' | 'finance' | 'memberships' | 'hr-profile' | 'ai-tools' | 'identity' | 'intelligence'
+export type PersonTab = 'profile' | 'activity' | 'memberships' | 'economy' | 'ai-tools'
+
+/** @deprecated Legacy tab values — kept for URL redirect compatibility */
+export type LegacyPersonTab = 'compensation' | 'payroll' | 'finance' | 'hr-profile' | 'identity' | 'intelligence'
 
 export interface PersonListItem {
   memberId: string
@@ -63,6 +66,9 @@ export interface PersonDetailAssignment {
   startDate: string | null
   endDate: string | null
   active: boolean
+  assignmentType: string
+  placementId: string | null
+  placementStatus: string | null
 }
 
 export interface PersonOperationalProjectBreakdown {

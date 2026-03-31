@@ -12,7 +12,6 @@ import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CircularProgress from '@mui/material/CircularProgress'
-import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -22,6 +21,7 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomIconButton from '@core/components/mui/IconButton'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
+import { ROLE_CODES } from '@/config/role-codes'
 import type { OrganizationDetailData } from './types'
 import OrganizationTabs from './OrganizationTabs'
 import EditOrganizationDrawer from './drawers/EditOrganizationDrawer'
@@ -59,7 +59,7 @@ type Props = {
 
 const OrganizationView = ({ organizationId }: Props) => {
   const { data: session } = useSession()
-  const isAdmin = session?.user?.roleCodes?.includes('efeonce_admin') ?? false
+  const isAdmin = session?.user?.roleCodes?.includes(ROLE_CODES.EFEONCE_ADMIN) ?? false
 
   const [detail, setDetail] = useState<OrganizationDetailData | null>(null)
   const [loading, setLoading] = useState(true)

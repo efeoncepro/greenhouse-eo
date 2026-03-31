@@ -75,17 +75,19 @@ export const assertSupportedImageFile = ({ contentType, size }: { contentType: s
 }
 
 export const uploadGreenhouseStorageObject = async ({
+  bucketName,
   objectName,
   contentType,
   bytes,
   cacheControl
 }: {
+  bucketName?: string
   objectName: string
   contentType: string
   bytes: ArrayBuffer | Uint8Array | Buffer
   cacheControl?: string
 }) => {
-  const bucket = getGreenhouseMediaBucket()
+  const bucket = bucketName?.trim() || getGreenhouseMediaBucket()
   const token = await getAccessToken()
   const uploadUrl = `https://storage.googleapis.com/upload/storage/v1/b/${encodeURIComponent(bucket)}/o?uploadType=media&name=${encodeURIComponent(objectName)}`
 
@@ -106,6 +108,61 @@ export const uploadGreenhouseStorageObject = async ({
   }
 
   return `gs://${bucket}/${objectName}`
+}
+
+export const downloadGreenhouseStorageObject = async ({
+  bucketName,
+  objectName
+}: {
+  bucketName: string
+  objectName: string
+}) => {
+  const token = await getAccessToken()
+  const downloadUrl = `https://storage.googleapis.com/storage/v1/b/${encodeURIComponent(bucketName)}/o/${encodeURIComponent(objectName)}?alt=media`
+
+  const response = await fetch(downloadUrl, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    cache: 'no-store'
+  })
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => '')
+
+    throw new Error(`download_failed:${response.status}:${errorText}`)
+  }
+
+  return {
+    arrayBuffer: await response.arrayBuffer(),
+    contentType: response.headers.get('content-type') || 'application/octet-stream',
+    cacheControl: response.headers.get('cache-control') || 'private, max-age=0, must-revalidate'
+  }
+}
+
+export const deleteGreenhouseStorageObject = async ({
+  bucketName,
+  objectName
+}: {
+  bucketName: string
+  objectName: string
+}) => {
+  const token = await getAccessToken()
+  const deleteUrl = `https://storage.googleapis.com/storage/v1/b/${encodeURIComponent(bucketName)}/o/${encodeURIComponent(objectName)}`
+
+  const response = await fetch(deleteUrl, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    cache: 'no-store'
+  })
+
+  if (!response.ok && response.status !== 404) {
+    const errorText = await response.text().catch(() => '')
+
+    throw new Error(`delete_failed:${response.status}:${errorText}`)
+  }
 }
 
 export const uploadGreenhouseMediaAsset = async ({
@@ -154,27 +211,10 @@ export const downloadGreenhouseMediaAsset = async (assetPath: string) => {
     throw new Error('invalid_asset_path')
   }
 
-  const token = await getAccessToken()
-  const downloadUrl = `https://storage.googleapis.com/storage/v1/b/${encodeURIComponent(parsed.bucket)}/o/${encodeURIComponent(parsed.objectName)}?alt=media`
-
-  const response = await fetch(downloadUrl, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    },
-    cache: 'no-store'
+  return downloadGreenhouseStorageObject({
+    bucketName: parsed.bucket,
+    objectName: parsed.objectName
   })
-
-  if (!response.ok) {
-    const errorText = await response.text().catch(() => '')
-
-    throw new Error(`download_failed:${response.status}:${errorText}`)
-  }
-
-  return {
-    arrayBuffer: await response.arrayBuffer(),
-    contentType: response.headers.get('content-type') || 'application/octet-stream',
-    cacheControl: response.headers.get('cache-control') || 'private, max-age=0, must-revalidate'
-  }
 }
 
 export const greenhouseMediaMaxBytes = MAX_MEDIA_BYTES
