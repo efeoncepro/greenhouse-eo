@@ -27,6 +27,7 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 
 ### Limitación real
 - El endpoint de edición sigue escribiendo por el carril HR legacy/profile y no corta todavía directo a `greenhouse_core.members` en Postgres.
+- Una reejecución posterior de `next build` quedó colgada en `Running TypeScript` sin error explícito; como mitigación, el estado final volvió a pasar `vitest`, `eslint` y `tsc --noEmit`.
 
 ## Sesión 2026-03-31 — TASK-016 Business Units Canonical v2 Fase 1
 
