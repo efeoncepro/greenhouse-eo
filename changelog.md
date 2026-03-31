@@ -2,6 +2,11 @@
 
 ## 2026-03-31
 
+- `HR > Departments` ya no falla al crear departamentos raíz por parámetros `null` en el write path legacy de BigQuery:
+  - `runHrCoreQuery()` ahora acepta `types` explícitos para queries tipadas
+  - create/update de departamentos declaran `STRING` en campos opcionales como `description`, `parentDepartmentId` y `headMemberId`
+  - se agregó regresión para el caso de creación de departamento sin padre
+  - esto es un hotfix transicional; el cutover estructural del módulo quedó abierto en `TASK-180`
 - `TASK-173` quedó cerrada formalmente:
   - movida a `docs/tasks/complete/`
   - índice de tasks reconciliado

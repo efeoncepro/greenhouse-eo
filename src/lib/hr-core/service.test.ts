@@ -32,7 +32,7 @@ vi.mock('@/lib/people/shared', () => ({
   getPeopleTableColumns: vi.fn(async () => new Set(['reports_to']))
 }))
 
-import { isHrLeavePostgresFallbackError, updateMemberHrProfile } from '@/lib/hr-core/service'
+import { createDepartment, isHrLeavePostgresFallbackError, updateMemberHrProfile } from '@/lib/hr-core/service'
 
 describe('updateMemberHrProfile', () => {
   beforeEach(() => {
@@ -67,6 +67,60 @@ describe('updateMemberHrProfile', () => {
     expect(runHrCoreQueryMock.mock.calls[1]?.[1]).toEqual({
       memberId: 'member-1',
       hireDate: '2024-12-15'
+    })
+  })
+})
+
+describe('createDepartment', () => {
+  beforeEach(() => {
+    runHrCoreQueryMock.mockReset()
+    assertHrCoreInfrastructureReadyMock.mockClear()
+  })
+
+  it('passes explicit STRING types for nullable department fields', async () => {
+    runHrCoreQueryMock
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([
+        {
+          department_id: 'creative-team',
+          name: 'Creative Team',
+          description: 'Equipo creativo',
+          parent_department_id: null,
+          head_member_id: 'member-1',
+          head_member_name: 'Daniela Ferreira',
+          business_unit: 'globe',
+          active: true,
+          sort_order: 1
+        }
+      ])
+
+    await createDepartment({
+      name: 'Creative Team',
+      description: 'Equipo creativo',
+      parentDepartmentId: null,
+      headMemberId: 'member-1',
+      businessUnit: 'globe',
+      active: true,
+      sortOrder: 1
+    })
+
+    expect(runHrCoreQueryMock).toHaveBeenCalledTimes(3)
+    expect(runHrCoreQueryMock.mock.calls[1]?.[0]).toContain('INSERT INTO `test-project.greenhouse.departments`')
+    expect(runHrCoreQueryMock.mock.calls[1]?.[1]).toEqual({
+      departmentId: 'creative-team',
+      name: 'Creative Team',
+      description: 'Equipo creativo',
+      parentDepartmentId: null,
+      headMemberId: 'member-1',
+      businessUnit: 'globe',
+      active: true,
+      sortOrder: 1
+    })
+    expect(runHrCoreQueryMock.mock.calls[1]?.[2]).toEqual({
+      description: 'STRING',
+      parentDepartmentId: 'STRING',
+      headMemberId: 'STRING'
     })
   })
 })

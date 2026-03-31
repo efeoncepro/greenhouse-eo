@@ -2,6 +2,8 @@ import 'server-only'
 
 import { NextResponse } from 'next/server'
 
+import type { Query } from '@google-cloud/bigquery'
+
 import { ROLE_CODES } from '@/config/role-codes'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { hasRoleCode, requireTenantContext } from '@/lib/tenant/authorization'
@@ -48,8 +50,18 @@ export const HR_ATTENDANCE_STATUSES = ['present', 'late', 'absent', 'excused', '
 
 export const getHrCoreProjectId = () => getBigQueryProjectId()
 
-export const runHrCoreQuery = async <T>(query: string, params: Record<string, unknown> = {}) => {
-  const [rows] = await getBigQueryClient().query({ query, params })
+export const runHrCoreQuery = async <T>(
+  query: string,
+  params: Record<string, unknown> = {},
+  types?: Query['types']
+) => {
+  const queryOptions: Query = {
+    query,
+    params,
+    ...(types ? { types } : {})
+  }
+
+  const [rows] = await getBigQueryClient().query(queryOptions)
 
   return rows as T[]
 }

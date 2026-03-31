@@ -815,6 +815,12 @@ export const createDepartment = async (input: CreateDepartmentInput) => {
   const projectId = getProjectId()
   const departmentId = slugify(normalizeString(input.departmentId || input.name))
 
+  const nullableStringTypes = {
+    description: 'STRING',
+    parentDepartmentId: 'STRING',
+    headMemberId: 'STRING'
+  } as const
+
   if (!departmentId) {
     throw new HrCoreValidationError('departmentId is required.')
   }
@@ -869,7 +875,8 @@ export const createDepartment = async (input: CreateDepartmentInput) => {
       businessUnit: normalizeString(input.businessUnit),
       active: input.active ?? true,
       sortOrder: input.sortOrder ?? 0
-    }
+    },
+    nullableStringTypes
   )
 
   return getDepartmentById(departmentId)
@@ -886,17 +893,23 @@ export const updateDepartment = async (departmentId: string, input: UpdateDepart
 
   const updates: string[] = []
   const params: Record<string, unknown> = { departmentId }
+  const types: Record<string, string> = {}
 
   const setField = (column: string, paramKey: string, value: unknown) => {
     updates.push(`${column} = @${paramKey}`)
     params[paramKey] = value
   }
 
+  const setNullableStringField = (column: string, paramKey: string, value: unknown) => {
+    setField(column, paramKey, normalizeNullableString(value))
+    types[paramKey] = 'STRING'
+  }
+
   if (input.name !== undefined) setField('name', 'name', normalizeString(input.name))
-  if (input.description !== undefined) setField('description', 'description', normalizeNullableString(input.description))
+  if (input.description !== undefined) setNullableStringField('description', 'description', input.description)
   if (input.parentDepartmentId !== undefined)
-    setField('parent_department_id', 'parentDepartmentId', normalizeNullableString(input.parentDepartmentId))
-  if (input.headMemberId !== undefined) setField('head_member_id', 'headMemberId', normalizeNullableString(input.headMemberId))
+    setNullableStringField('parent_department_id', 'parentDepartmentId', input.parentDepartmentId)
+  if (input.headMemberId !== undefined) setNullableStringField('head_member_id', 'headMemberId', input.headMemberId)
   if (input.businessUnit !== undefined) setField('business_unit', 'businessUnit', normalizeString(input.businessUnit))
   if (input.active !== undefined) setField('active', 'active', Boolean(input.active))
   if (input.sortOrder !== undefined) setField('sort_order', 'sortOrder', input.sortOrder)
@@ -913,7 +926,8 @@ export const updateDepartment = async (departmentId: string, input: UpdateDepart
       SET ${updates.join(', ')}
       WHERE department_id = @departmentId
     `,
-    params
+    params,
+    Object.keys(types).length > 0 ? types : undefined
   )
 
   return getDepartmentById(departmentId)

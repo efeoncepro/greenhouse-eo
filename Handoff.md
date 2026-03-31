@@ -4,6 +4,39 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-31 — hotfix HR Departments create path en BigQuery
+
+### Objetivo
+
+- Corregir el fallo visible `Unable to create department.` en `/hr/departments` mientras se prepara el cutover formal del módulo a PostgreSQL.
+
+### Causa raíz confirmada
+
+- El write path actual de `departments` sigue corriendo sobre BigQuery en `src/lib/hr-core/service.ts`.
+- Al crear un departamento raíz, el formulario envía campos opcionales `STRING` en `null`, especialmente `parentDepartmentId`.
+- `runHrCoreQuery()` no pasaba `types` explícitos al cliente de BigQuery, así que el query podía fallar al inferir parámetros nulos.
+- La route terminaba devolviendo el genérico `Unable to create department.` aunque el problema real fuera tipado de parámetros.
+
+### Delta de ejecución
+
+- `src/lib/hr-core/shared.ts` ahora permite pasar `types` opcionales a `runHrCoreQuery()`.
+- `src/lib/hr-core/service.ts` ahora declara tipos `STRING` explícitos en create/update de departamentos para:
+  - `description`
+  - `parentDepartmentId`
+  - `headMemberId`
+- `src/lib/hr-core/service.test.ts` suma regresión para create de departamento raíz con `parentDepartmentId = null`.
+
+### Validación ejecutada
+
+- `pnpm exec vitest run src/lib/hr-core/service.test.ts`
+- `pnpm exec eslint src/lib/hr-core/shared.ts src/lib/hr-core/service.ts src/lib/hr-core/service.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Nota de coordinación
+
+- Este hotfix no resuelve la contradicción arquitectónica de fondo.
+- El correctivo real quedó abierto como `TASK-180`, que mueve `HR > Departments` a `greenhouse_core.departments` en PostgreSQL.
+
 ## Sesión 2026-03-31 — TASK-180 creada para cutover de Departments a PostgreSQL
 
 ### Objetivo
