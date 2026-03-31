@@ -2,6 +2,17 @@
 
 ## 2026-03-31
 
+- `Finance > Egresos` ya materializa correctamente las nóminas exportadas atrasadas de febrero/marzo:
+  - se corrigió starvation en el consumer reactivo para que el dominio `finance` pueda saltarse eventos `published` ya terminales para todos sus handlers
+  - se corrigió el `INSERT` canónico de `createFinanceExpenseInPostgres()` que podía fallar por desalineación entre columnas y `VALUES`
+  - se agregó `scripts/backfill-payroll-expenses-reactive.ts` y se ejecutó backfill real en `greenhouse-pg-dev`
+  - resultado materializado:
+    - `2026-02` → `2` expenses `payroll`
+    - `2026-03` → `4` expenses `payroll` + `1` `social_security`
+  - gaps operativos detectados en el mismo carril:
+    - `greenhouse_serving.provider_tooling_snapshots` y `provider_tooling_360` no existen aún en `staging`
+    - `commercial_cost_attribution` existe pero sigue con `permission denied` para el reactor de Finance
+    - Vercel sigue scheduleando solo `/api/cron/outbox-react`, no las domain routes documentadas
 - `TASK-182` y `TASK-183` quedaron documentadas en conjunto con su contrato final de Finance Expenses:
   - el drawer ahora usa la taxonomía visible `Operacional / Tooling / Impuesto / Otro`
   - el ledger quedó endurecido con `space_id`, `source_type`, `payment_provider` y `payment_rail`

@@ -4,6 +4,49 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-31 — Finance reactive backlog starvation + payroll expenses backfill
+
+### Objetivo
+
+- Explicar por qué `Finance > Egresos` no mostraba las nóminas ya exportadas de febrero/marzo y dejar corregido tanto el runtime como el dato operativo faltante.
+
+### Hallazgos confirmados
+
+- `greenhouse_payroll.payroll_periods` tenía `2026-02` y `2026-03` en estado `exported`.
+- Ambos períodos ya habían emitido `payroll_period.exported` en `greenhouse_sync.outbox_events`.
+- `greenhouse_finance.expenses` no tenía filas para esos `payroll_period_id`.
+- `finance_expense_reactive_intake` no había dejado rastro en:
+  - `greenhouse_sync.outbox_reactive_log`
+  - `greenhouse_sync.projection_refresh_queue`
+- La causa operativa no era UI: el cron reactivo de `finance` quedaba starved por eventos `published` más antiguos ya terminales para sus handlers.
+
+### Delta de ejecución
+
+- Se endureció `src/lib/sync/reactive-consumer.ts` para escanear el outbox por chunks y omitir eventos que ya estén terminales para todos los handlers del dominio.
+- Se corrigió la dedupe reactiva para tratar `dead-letter` como estado terminal y no reencolarlo indefinidamente.
+- Se agregó regresión en `src/lib/sync/reactive-consumer.test.ts` para cubrir el caso de starvation por eventos terminales viejos.
+- Se corrigió `src/lib/finance/postgres-store-slice2.ts`: el `INSERT` de `createFinanceExpenseInPostgres()` tenía desalineado el bloque `VALUES`, por lo que el path canónico de creación podía fallar con `INSERT has more target columns than expressions`.
+- Se agregó `scripts/backfill-payroll-expenses-reactive.ts` para rematerializar períodos `exported` faltantes con el mismo path canónico del reactor.
+- Se ejecutó backfill real en Cloud SQL `greenhouse-pg-dev / greenhouse_app` para:
+  - `2026-02` → `2` expenses `payroll`
+  - `2026-03` → `4` expenses `payroll` + `1` `social_security`
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/sync/reactive-consumer.test.ts` ✅
+- `pnpm exec eslint src/lib/sync/reactive-consumer.ts src/lib/sync/reactive-consumer.test.ts scripts/backfill-payroll-expenses-reactive.ts src/lib/finance/postgres-store-slice2.ts` ✅
+- Verificación live en DB:
+  - marzo quedó visible en orden de grilla como filas `6` a `10`
+  - febrero quedó visible como filas `19` y `20`
+
+### Gaps abiertos detectados en el mismo carril
+
+- `greenhouse_serving.provider_tooling_snapshots` no existe en `staging`, aunque el runtime y la documentación ya lo consumen.
+- `greenhouse_serving.provider_tooling_360` tampoco existe materializado en `staging`.
+- `greenhouse_serving.commercial_cost_attribution` sí existe, pero el reactor de Finance viene chocando con `permission denied`.
+- En `vercel.json` sigue scheduleado solo el catch-all `/api/cron/outbox-react`; las domain routes (`outbox-react-finance`, `people`, `org`, `notify`) existen en código/documentación pero no están agendadas hoy en Vercel.
+- El auto-allocation de estos expenses emitió `numeric field overflow`; no bloqueó la creación del ledger, pero el subflujo quedó pendiente de hardening.
+
 ## Sesión 2026-03-31 — TASK-182 + TASK-183 en descubrimiento/auditoría conjunta
 
 ### Objetivo

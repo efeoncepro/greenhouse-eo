@@ -1,5 +1,25 @@
 # Greenhouse Reactive Projections Playbook v1
 
+## Delta 2026-03-31
+
+- En código ya existen routes particionadas por dominio:
+  - `/api/cron/outbox-react-org`
+  - `/api/cron/outbox-react-people`
+  - `/api/cron/outbox-react-finance`
+  - `/api/cron/outbox-react-notify`
+- Estado observado en Vercel `staging` al `31 de marzo de 2026`:
+  - solo estaba scheduleado el catch-all `/api/cron/outbox-react`
+  - las domain routes existían, pero no estaban agendadas en `vercel.json`
+- Se detectó además un caso real de starvation en el consumer reactivo:
+  - eventos `published` ya terminales para todos los handlers del dominio podían seguir ocupando el batch
+  - consecuencia: eventos más nuevos, como `payroll_period.exported`, podían quedar sin procesarse aunque ya existieran en outbox
+- Hardening aplicado:
+  - el consumer ahora escanea el outbox por chunks y filtra solo eventos con al menos un handler accionable
+  - `dead-letter` se trata como estado terminal para dedupe del handler
+- Incidente que motivó este delta:
+  - `Finance > Egresos` no materializaba automáticamente nóminas ya exportadas de `2026-02` y `2026-03`
+  - se corrigió el consumer y se ejecutó backfill canónico del ledger para esos períodos
+
 ## Overview
 
 Este playbook documenta cómo registrar, operar y monitorear proyecciones reactivas en Greenhouse. El sistema permite que cualquier módulo declare qué eventos de dominio invalidan sus snapshots serving, y el consumer reactivo se encarga del refresh en tiempo real.
