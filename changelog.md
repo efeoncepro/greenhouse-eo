@@ -2,6 +2,12 @@
 
 ## 2026-03-31
 
+- `Finance > Suppliers` ya no deja huérfano el estado `Sin vínculo canónico`:
+  - el detalle del supplier ahora permite `Crear vínculo canónico`
+  - el tab `Provider 360` también ofrece ese CTA en el empty state
+  - se agregó soporte server-side para `autoLinkProvider` en `PUT /api/finance/suppliers/[id]`
+  - se agregó backfill batch `POST /api/finance/suppliers/backfill-provider-links`
+  - el listado ahora muestra cuántos proveedores siguen sin vínculo canónico y permite correr `Backfill Provider 360` desde UI
 - `HR > Departments` ya no falla al crear departamentos raíz por parámetros `null` en el write path legacy de BigQuery:
   - `runHrCoreQuery()` ahora acepta `types` explícitos para queries tipadas
   - create/update de departamentos declaran `STRING` en campos opcionales como `description`, `parentDepartmentId` y `headMemberId`

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { syncProviderFromFinanceSupplier } from '@/lib/providers/canonical'
+import { resolveCanonicalProviderId } from '@/lib/providers/postgres'
 import { getLatestProviderToolingSnapshot } from '@/lib/providers/provider-tooling-snapshots'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
@@ -211,9 +212,22 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         return NextResponse.json({ error: 'Supplier not found' }, { status: 404 })
       }
 
+      const autoLinkedProviderId = body.autoLinkProvider
+        ? resolveCanonicalProviderId({
+            supplierId,
+            providerId: body.providerId !== undefined ? (body.providerId ? normalizeString(body.providerId) : null) : existing.providerId,
+            legalName: body.legalName !== undefined ? assertNonEmptyString(body.legalName, 'legalName') : existing.legalName,
+            tradeName: body.tradeName !== undefined ? (body.tradeName ? normalizeString(body.tradeName) : null) : existing.tradeName,
+            website: body.website !== undefined ? (body.website ? normalizeString(body.website) : null) : existing.website,
+            isActive: body.isActive !== undefined ? Boolean(body.isActive) : existing.isActive
+          })
+        : null
+
       const updatedSupplier = await seedFinanceSupplierInPostgres({
         supplierId,
-        providerId: body.providerId !== undefined ? (body.providerId ? normalizeString(body.providerId) : null) : existing.providerId,
+        providerId:
+          autoLinkedProviderId ||
+          (body.providerId !== undefined ? (body.providerId ? normalizeString(body.providerId) : null) : existing.providerId),
         organizationId: existing.organizationId,
         legalName: body.legalName !== undefined ? assertNonEmptyString(body.legalName, 'legalName') : existing.legalName,
         tradeName: body.tradeName !== undefined ? (body.tradeName ? normalizeString(body.tradeName) : null) : existing.tradeName,
@@ -351,11 +365,43 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         updateParams.isActive = Boolean(body.isActive)
       }
 
-      if (body.providerId !== undefined) {
+      if (body.providerId !== undefined && !body.autoLinkProvider) {
         const providerId = body.providerId ? normalizeString(body.providerId) : null
 
         updates.push('provider_id = @providerId')
         updateParams.providerId = providerId
+      }
+
+      if (body.autoLinkProvider) {
+        const [currentRow] = await runFinanceQuery<SupplierDetailRow>(`
+          SELECT *
+          FROM \`${projectId}.greenhouse.fin_suppliers\`
+          WHERE supplier_id = @supplierId
+          LIMIT 1
+        `, { supplierId })
+
+        if (!currentRow) {
+          return NextResponse.json({ error: 'Supplier not found' }, { status: 404 })
+        }
+
+        const providerId = resolveCanonicalProviderId({
+          supplierId,
+          providerId: body.providerId !== undefined ? (body.providerId ? normalizeString(body.providerId) : null) : normalizeString(currentRow.provider_id || ''),
+          legalName:
+            body.legalName !== undefined
+              ? assertNonEmptyString(body.legalName, 'legalName')
+              : normalizeString(currentRow.legal_name),
+          tradeName:
+            body.tradeName !== undefined
+              ? (body.tradeName ? normalizeString(body.tradeName) : null)
+              : (currentRow.trade_name ? normalizeString(currentRow.trade_name) : null),
+          website:
+            body.website !== undefined ? (body.website ? normalizeString(body.website) : null) : (currentRow.website ? normalizeString(currentRow.website) : null),
+          isActive: body.isActive !== undefined ? Boolean(body.isActive) : normalizeBoolean(currentRow.is_active)
+        })
+
+        updates.push('provider_id = @providerId')
+        updateParams.providerId = providerId || null
       }
 
       if (updates.length === 0) {

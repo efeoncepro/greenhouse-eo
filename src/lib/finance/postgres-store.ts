@@ -1280,3 +1280,92 @@ export const seedFinanceSupplierInPostgres = async ({
     return record
   })
 }
+
+export const backfillFinanceSupplierProviderLinksInPostgres = async ({ limit = 250 }: { limit?: number } = {}) => {
+  await assertFinancePostgresReady()
+
+  return withGreenhousePostgresTransaction(async client => {
+    const unresolvedRows = await queryRows<PostgresFinanceSupplierRow>(
+      `
+        SELECT
+          supplier_id,
+          provider_id,
+          organization_id,
+          legal_name,
+          trade_name,
+          tax_id,
+          tax_id_type,
+          country_code,
+          category,
+          service_type,
+          is_international,
+          primary_contact_name,
+          primary_contact_email,
+          primary_contact_phone,
+          website_url,
+          bank_name,
+          bank_account_number,
+          bank_account_type,
+          bank_routing,
+          payment_currency,
+          default_payment_terms,
+          default_payment_method,
+          requires_po,
+          is_active,
+          notes,
+          created_by_user_id,
+          created_at,
+          updated_at
+        FROM greenhouse_finance.suppliers
+        WHERE COALESCE(provider_id, '') = ''
+        ORDER BY COALESCE(trade_name, legal_name) ASC
+        LIMIT $1
+      `,
+      [limit],
+      client
+    )
+
+    const linkedSuppliers: Array<{ supplierId: string; providerId: string; providerName: string }> = []
+
+    for (const row of unresolvedRows) {
+      const linkedProvider = await upsertProviderFromFinanceSupplierInPostgres(
+        {
+          supplierId: normalizeString(row.supplier_id),
+          providerId: null,
+          legalName: normalizeString(row.legal_name),
+          tradeName: row.trade_name ? normalizeString(row.trade_name) : null,
+          website: row.website_url ? normalizeString(row.website_url) : null,
+          isActive: Boolean(row.is_active)
+        },
+        client
+      )
+
+      if (!linkedProvider?.providerId) {
+        continue
+      }
+
+      await queryRows(
+        `
+          UPDATE greenhouse_finance.suppliers
+          SET provider_id = $2,
+              updated_at = CURRENT_TIMESTAMP
+          WHERE supplier_id = $1
+        `,
+        [normalizeString(row.supplier_id), linkedProvider.providerId],
+        client
+      )
+
+      linkedSuppliers.push({
+        supplierId: normalizeString(row.supplier_id),
+        providerId: linkedProvider.providerId,
+        providerName: linkedProvider.providerName
+      })
+    }
+
+    return {
+      scanned: unresolvedRows.length,
+      linked: linkedSuppliers.length,
+      items: linkedSuppliers
+    }
+  })
+}

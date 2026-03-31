@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 import Link from 'next/link'
 
 import Alert from '@mui/material/Alert'
@@ -47,6 +49,8 @@ type Props = {
   supplierName: string
   providerId: string | null
   providerTooling: SupplierProviderToolingSnapshot | null
+  onLinkProvider?: () => Promise<void>
+  linkingProvider?: boolean
 }
 
 const formatClp = (value: number) =>
@@ -88,14 +92,41 @@ const titleCase = (value: string | null) => {
   return value.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase())
 }
 
-const SupplierProviderToolingTab = ({ supplierId, supplierName, providerId, providerTooling }: Props) => {
+const SupplierProviderToolingTab = ({ supplierId, supplierName, providerId, providerTooling, onLinkProvider, linkingProvider = false }: Props) => {
+  const [linkError, setLinkError] = useState<string | null>(null)
+
+  const handleLinkProvider = async () => {
+    if (!onLinkProvider) {
+      return
+    }
+
+    try {
+      setLinkError(null)
+      await onLinkProvider()
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'No pudimos crear el vínculo canónico.'
+
+      setLinkError(message)
+    }
+  }
+
   if (!providerId) {
     return (
-      <EmptyState
-        icon='tabler-link-off'
-        title='Sin vínculo canónico de provider'
-        description='Este supplier existe en Finanzas, pero todavía no está enlazado al objeto provider canónico. Sin ese vínculo no podemos consolidar tooling, costos proyectados ni exposición de payroll.'
-      />
+      <Stack spacing={3}>
+        {linkError ? <Alert severity='error'>{linkError}</Alert> : null}
+        <EmptyState
+          icon='tabler-link-off'
+          title='Sin vínculo canónico de provider'
+          description='Este supplier existe en Finanzas, pero todavía no está enlazado al objeto provider canónico. Sin ese vínculo no podemos consolidar tooling, costos proyectados ni exposición de payroll.'
+          action={
+            onLinkProvider ? (
+              <Button variant='contained' size='small' onClick={handleLinkProvider} disabled={linkingProvider}>
+                {linkingProvider ? 'Vinculando...' : 'Crear vínculo canónico'}
+              </Button>
+            ) : undefined
+          }
+        />
+      </Stack>
     )
   }
 

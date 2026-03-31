@@ -4,6 +4,9 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
+import { toast } from 'react-toastify'
+
+import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -156,6 +159,8 @@ const SuppliersListView = () => {
   const [categoryFilter, setCategoryFilter] = useState('')
   const [internationalFilter, setInternationalFilter] = useState('')
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [backfillingProviders, setBackfillingProviders] = useState(false)
+  const [backfillError, setBackfillError] = useState<string | null>(null)
 
   const fetchSuppliers = useCallback(async () => {
     setLoading(true)
@@ -183,6 +188,34 @@ const SuppliersListView = () => {
     fetchSuppliers()
   }, [fetchSuppliers])
 
+  const handleBackfillProviders = useCallback(async () => {
+    setBackfillingProviders(true)
+    setBackfillError(null)
+
+    try {
+      const response = await fetch('/api/finance/suppliers/backfill-provider-links', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ limit: 500 })
+      })
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+
+        throw new Error(data.error || 'No pudimos ejecutar el backfill de Provider 360.')
+      }
+
+      const result = await response.json()
+
+      await fetchSuppliers()
+      toast.success(`Backfill ejecutado: ${result.linked ?? 0} vínculos canónicos creados`)
+    } catch (error) {
+      setBackfillError(error instanceof Error ? error.message : 'No pudimos ejecutar el backfill de Provider 360.')
+    } finally {
+      setBackfillingProviders(false)
+    }
+  }, [fetchSuppliers])
+
   const supTable = useReactTable({
     data: suppliers,
     columns: supColumns,
@@ -200,6 +233,7 @@ const SuppliersListView = () => {
   const activeCount = suppliers.filter(s => s.isActive).length
   const internationalCount = suppliers.filter(s => s.isInternational).length
   const linkedProviderCount = suppliers.filter(s => Boolean(s.providerId)).length
+  const unresolvedProviderCount = total - linkedProviderCount
 
   const categoryCounts = suppliers.reduce<Record<string, number>>((acc, s) => {
     acc[s.category] = (acc[s.category] || 0) + 1
@@ -262,6 +296,12 @@ const SuppliersListView = () => {
         </Button>
       </Box>
 
+      {backfillError ? (
+        <Alert severity='error' onClose={() => setBackfillError(null)}>
+          {backfillError}
+        </Alert>
+      ) : null}
+
       {/* KPIs */}
       <Grid container spacing={6}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -308,6 +348,18 @@ const SuppliersListView = () => {
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
         <CardHeader
           title='Directorio de proveedores'
+          subheader={
+            unresolvedProviderCount > 0
+              ? `${unresolvedProviderCount} proveedor${unresolvedProviderCount === 1 ? '' : 'es'} todavía sin vínculo canónico`
+              : 'Todos los suppliers listados ya tienen vínculo canónico'
+          }
+          action={
+            unresolvedProviderCount > 0 ? (
+              <Button variant='outlined' size='small' onClick={handleBackfillProviders} disabled={backfillingProviders}>
+                {backfillingProviders ? 'Backfill en curso...' : 'Backfill Provider 360'}
+              </Button>
+            ) : null
+          }
           avatar={
             <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
               <i className='tabler-building-store' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} />

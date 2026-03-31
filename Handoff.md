@@ -4,6 +4,41 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-31 — Suppliers / Provider 360: vínculo manual + backfill batch
+
+### Objetivo
+
+- Resolver el gap operativo de `Finance > Suppliers` donde el badge `Sin vínculo canónico` no tenía salida desde UI.
+
+### Causa raíz confirmada
+
+- El backend de suppliers sí soportaba `providerId` y derivación canónica.
+- El listado y el detalle solo mostraban el estado del vínculo, pero no ofrecían ninguna acción para crearlo o repararlo.
+- Los suppliers históricos sin `provider_id` podían quedar huérfanos aunque el modelo `Provider 360` ya existiera.
+
+### Delta de ejecución
+
+- `src/views/greenhouse/finance/SupplierDetailView.tsx` ahora expone `Crear vínculo canónico` cuando falta `providerId`.
+- `src/views/greenhouse/finance/SupplierProviderToolingTab.tsx` ahora ofrece el mismo CTA dentro del empty state del tab `Provider 360`.
+- `src/app/api/finance/suppliers/[id]/route.ts` ahora acepta `autoLinkProvider: true` para derivar y persistir el `providerId` server-side.
+- `src/lib/finance/postgres-store.ts` suma `backfillFinanceSupplierProviderLinksInPostgres()` para batch linking Postgres-first.
+- Nueva route batch:
+  - `POST /api/finance/suppliers/backfill-provider-links`
+- `src/views/greenhouse/finance/SuppliersListView.tsx` ahora muestra:
+  - cuántos proveedores siguen sin vínculo canónico
+  - botón `Backfill Provider 360` para reparar en lote los suppliers pendientes
+
+### Validación ejecutada
+
+- `pnpm exec vitest run 'src/app/api/finance/suppliers/[id]/route.test.ts' 'src/app/api/finance/suppliers/backfill-provider-links/route.test.ts' src/views/greenhouse/finance/SupplierProviderToolingTab.test.tsx`
+- `pnpm exec eslint 'src/app/api/finance/suppliers/[id]/route.ts' 'src/app/api/finance/suppliers/[id]/route.test.ts' src/app/api/finance/suppliers/backfill-provider-links/route.ts src/app/api/finance/suppliers/backfill-provider-links/route.test.ts src/lib/finance/postgres-store.ts src/views/greenhouse/finance/SupplierDetailView.tsx src/views/greenhouse/finance/SupplierProviderToolingTab.tsx src/views/greenhouse/finance/SupplierProviderToolingTab.test.tsx src/views/greenhouse/finance/SuppliersListView.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Nota de coordinación
+
+- No se hizo smoke manual en `dev-greenhouse`.
+- El backfill batch opera sobre PostgreSQL (`greenhouse_finance.suppliers`) y reusa el carril canónico actual de `providers/postgres.ts`.
+
 ## Sesión 2026-03-31 — hotfix HR Departments create path en BigQuery
 
 ### Objetivo

@@ -1,10 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 
+import { toast } from 'react-toastify'
+
+import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -173,17 +176,18 @@ const SupplierDetailView = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState('info')
+  const [isLinkingProvider, setIsLinkingProvider] = useState(false)
+  const [linkProviderError, setLinkProviderError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const controller = new AbortController()
-
-    const loadSupplier = async () => {
+  const loadSupplier = useCallback(
+    async (signal?: AbortSignal) => {
       try {
         setIsLoading(true)
+        setError(null)
 
         const response = await fetch(`/api/finance/suppliers/${supplierId}`, {
           cache: 'no-store',
-          signal: controller.signal
+          signal
         })
 
         if (!response.ok) {
@@ -200,12 +204,45 @@ const SupplierDetailView = () => {
       } finally {
         setIsLoading(false)
       }
-    }
+    },
+    [supplierId]
+  )
 
-    loadSupplier()
+  useEffect(() => {
+    const controller = new AbortController()
+
+    loadSupplier(controller.signal)
 
     return () => controller.abort()
-  }, [supplierId])
+  }, [loadSupplier])
+
+  const handleLinkProvider = useCallback(async () => {
+    setIsLinkingProvider(true)
+    setLinkProviderError(null)
+
+    try {
+      const response = await fetch(`/api/finance/suppliers/${supplierId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ autoLinkProvider: true })
+      })
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+
+        throw new Error(data.error || 'No pudimos crear el vínculo canónico.')
+      }
+
+      await loadSupplier()
+      setActiveTab('provider')
+      toast.success('Provider 360 vinculado')
+    } catch (err: unknown) {
+      setLinkProviderError((err as Error).message ?? 'No pudimos crear el vínculo canónico.')
+      throw err
+    } finally {
+      setIsLinkingProvider(false)
+    }
+  }, [loadSupplier, supplierId])
 
   // -------------------------------------------------------------------------
   // Loading state
@@ -269,6 +306,11 @@ const SupplierDetailView = () => {
               variant='tonal'
               color={supplier.isActive ? 'success' : 'error'}
             />
+            {!supplier.providerId ? (
+              <Button variant='outlined' size='small' onClick={handleLinkProvider} disabled={isLinkingProvider}>
+                {isLinkingProvider ? 'Vinculando...' : 'Crear vínculo canónico'}
+              </Button>
+            ) : null}
           </Stack>
           {supplier.tradeName && (
             <Typography variant='body2' color='text.secondary'>
@@ -277,6 +319,12 @@ const SupplierDetailView = () => {
           )}
         </Box>
       </Stack>
+
+      {linkProviderError ? (
+        <Alert severity='error' sx={{ mb: 3 }}>
+          {linkProviderError}
+        </Alert>
+      ) : null}
 
       {/* Tabs */}
       <TabContext value={activeTab}>
@@ -516,16 +564,18 @@ const SupplierDetailView = () => {
           </Card>
         </TabPanel>
 
-        <TabPanel value='provider' sx={{ p: 0 }}>
-          <SupplierProviderToolingTab
-            supplierId={supplier.supplierId}
-            supplierName={supplier.tradeName || supplier.legalName}
-            providerId={supplier.providerId}
-            providerTooling={supplier.providerTooling}
-          />
-        </TabPanel>
-      </TabContext>
-    </Box>
+          <TabPanel value='provider' sx={{ p: 0 }}>
+            <SupplierProviderToolingTab
+              supplierId={supplier.supplierId}
+              supplierName={supplier.tradeName || supplier.legalName}
+              providerId={supplier.providerId}
+              providerTooling={supplier.providerTooling}
+              onLinkProvider={handleLinkProvider}
+              linkingProvider={isLinkingProvider}
+            />
+          </TabPanel>
+        </TabContext>
+      </Box>
   )
 }
 
