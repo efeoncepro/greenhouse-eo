@@ -2,13 +2,26 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
-- Status real: `Bootstrap GCP aplicado; smoke autenticado pendiente`
+- Status real: `Cerrada`
 - Rank: `56`
 - Domain: `platform`
+
+## Delta 2026-03-31 — cierre formal
+
+- La lane ya quedó cerrada de punta a punta:
+  - foundation shared implementada en repo
+  - bootstrap Cloud SQL aplicado
+  - buckets dedicados `public/private` provisionados por entorno en GCP
+  - env vars Vercel cortadas a la infraestructura real
+  - `leave` ya validó upload, attach y render del respaldo en la surface HR real
+- El pendiente residual de smoke autenticado ya no aplica:
+  - el flujo manual en `staging` confirmó que la solicitud se crea con `attachment_asset_id`
+  - HR ya puede abrir el respaldo desde `Revisar solicitud`
+- La task deja de leerse como foundation “lista pero pendiente de validación” y pasa a baseline operativa cerrada para consumers actuales y futuros.
 
 ## Delta 2026-03-31
 

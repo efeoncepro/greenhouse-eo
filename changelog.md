@@ -2,6 +2,10 @@
 
 ## 2026-03-31
 
+- `TASK-173` quedó cerrada formalmente:
+  - movida a `docs/tasks/complete/`
+  - índice de tasks reconciliado
+  - el pendiente residual de smoke autenticado ya no aplica después de validar `leave` end-to-end en la surface HR real
 - `HR > Permisos` ahora muestra el respaldo adjunto dentro del modal `Revisar solicitud`:
   - el backend ya guardaba `attachment_asset_id`, pero la UI no lo exponía
   - se agregó CTA `Abrir respaldo` directo en la revisión HR

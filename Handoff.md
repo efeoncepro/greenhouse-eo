@@ -4,6 +4,18 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-31 — TASK-173 cierre formal
+
+### Estado final
+
+- `TASK-173` ya pasó a `complete`.
+- La foundation shared de adjuntos queda cerrada como baseline operativa, ya no como lane abierta con smoke pendiente.
+- Cierre sustentado por:
+  - registry shared + Cloud SQL bootstrap
+  - buckets dedicados GCP por entorno
+  - env vars Vercel alineadas
+  - flujo manual real de `leave` validado hasta `Revisar solicitud` con respaldo visible
+
 ## Sesión 2026-03-31 — HR leave review modal muestra respaldo adjunto
 
 ### Objetivo
