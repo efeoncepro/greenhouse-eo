@@ -10,11 +10,7 @@ const SECURITY_HEADERS = {
 } as const
 
 function buildContentSecurityPolicyReportOnly() {
-  const frameSources = ["'self'", 'https://login.microsoftonline.com', 'https://accounts.google.com']
-
-  if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== 'production') {
-    frameSources.push('https://vercel.live')
-  }
+  const frameSources = ["'self'", 'https://login.microsoftonline.com', 'https://accounts.google.com', 'https://vercel.live']
 
   return [
     "default-src 'self'",
