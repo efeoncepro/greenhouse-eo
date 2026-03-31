@@ -219,3 +219,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-167` | `to-do` | Operational P&L: Organization Scope Materialization | `docs/tasks/to-do/TASK-167-operational-pl-organization-scope.md` |
 | `TASK-168` | `complete` | Person Detail View: Enterprise Redesign | `docs/tasks/complete/TASK-168-person-detail-enterprise-redesign.md` |
 | `TASK-169` | `complete` | Staff Aug Placement Bridge & HRIS Runtime Consolidation | `docs/tasks/complete/TASK-169-staff-aug-placement-bridge-hris-runtime-consolidation.md` |
+| `TASK-170` | `to-do` | Leave Request & Approval Flow | `docs/tasks/to-do/TASK-170-leave-request-approval-flow.md` |
