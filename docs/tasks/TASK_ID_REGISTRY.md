@@ -220,5 +220,5 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-168` | `complete` | Person Detail View: Enterprise Redesign | `docs/tasks/complete/TASK-168-person-detail-enterprise-redesign.md` |
 | `TASK-169` | `complete` | Staff Aug Placement Bridge & HRIS Runtime Consolidation | `docs/tasks/complete/TASK-169-staff-aug-placement-bridge-hris-runtime-consolidation.md` |
 | `TASK-170` | `to-do` | Leave Request & Approval Flow | `docs/tasks/to-do/TASK-170-leave-request-approval-flow.md` |
-| `TASK-171` | `to-do` | Access Model Hardening: Route Group Unification, Type Safety & Fallback Strategy | `docs/tasks/to-do/TASK-171-access-model-hardening.md` |
+| `TASK-171` | `complete` | Access Model Hardening: Route Group Unification, Type Safety & Fallback Strategy | `docs/tasks/complete/TASK-171-access-model-hardening.md` |
 | `TASK-172` | `to-do` | Platform Hardening: CI Pipeline, Structured Logging, Test Coverage & Security Headers | `docs/tasks/to-do/TASK-172-platform-hardening-ci-observability-security.md` |

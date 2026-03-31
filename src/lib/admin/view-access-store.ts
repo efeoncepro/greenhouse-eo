@@ -83,6 +83,8 @@ const missingRelation = (error: unknown) => {
   )
 }
 
+import { ROLE_CODES } from '@/config/role-codes'
+
 const roleCanAccessViewFallback = (
   role: {
     roleCode: string
@@ -101,7 +103,7 @@ const roleCanAccessViewFallback = (
   }
 
   if (view.routeGroup === 'people') {
-    return role.roleCode === 'efeonce_operations' || role.roleCode === 'hr_payroll'
+    return role.roleCode === ROLE_CODES.EFEONCE_OPERATIONS || role.roleCode === ROLE_CODES.HR_PAYROLL
   }
 
   if (view.routeGroup === 'internal') {
@@ -156,7 +158,7 @@ const resolveAuthorizedViewsForTargetUser = ({
           roleAssignments: persistedByRole.get(roleCode),
           role: {
             roleCode,
-            isAdmin: roleCode === 'efeonce_admin',
+            isAdmin: roleCode === ROLE_CODES.EFEONCE_ADMIN,
             isInternal: user.routeGroups.includes('internal'),
             routeGroups: deriveRouteGroupsForSingleRole(roleCode, user.tenantType)
           },
@@ -890,6 +892,18 @@ export const getAdminPersistedViewAccessGovernance = async () => {
   }
 }
 
+/**
+ * Resolve which views a user is authorized to see.
+ *
+ * Resolution strategy (additive per-view):
+ *   1. For each view in the registry, check each of the user's roles
+ *   2. If the role has a PERSISTED assignment for that view → use it (granted/revoked)
+ *   3. If NOT persisted → fall back to hardcoded roleCanAccessViewFallback()
+ *   4. Apply user-level overrides last (grant adds, revoke removes)
+ *
+ * This means a role with 1 persisted view does NOT lose fallback access to other views.
+ * To revoke a view from a role, persist an explicit `granted = false` row.
+ */
 export const resolveAuthorizedViewsForUser = async ({
   userId,
   roleCodes,
@@ -921,7 +935,7 @@ export const resolveAuthorizedViewsForUser = async ({
             roleAssignments,
             role: {
               roleCode,
-              isAdmin: roleCode === 'efeonce_admin',
+              isAdmin: roleCode === ROLE_CODES.EFEONCE_ADMIN,
               isInternal: derivedRouteGroups.includes('internal'),
               routeGroups: derivedRouteGroups
             },
