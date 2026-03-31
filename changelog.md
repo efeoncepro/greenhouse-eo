@@ -2,6 +2,11 @@
 
 ## 2026-03-31
 
+- Staff Aug `Crear placement` deja de usar un patrón propenso a congelar la UI:
+  - el modal ya no carga/renderiza todas las asignaciones elegibles como `select`
+  - ahora usa búsqueda incremental remota con límite
+  - `GET /api/agency/staff-augmentation/placement-options` acepta `search`, `assignmentId` y `limit`
+  - el query base en Postgres ya filtra y pagina el universo elegible antes de responder
 - Staff Aug bridge endurecido sin cambiar el modelo canónico:
   - `Create placement` ya no depende de `/api/team/capacity-breakdown`
   - nueva route liviana `GET /api/agency/staff-augmentation/placement-options`

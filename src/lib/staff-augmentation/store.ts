@@ -285,7 +285,45 @@ const normalizePlacementOption = (row: PlacementOptionRow): StaffAugPlacementOpt
   }
 })
 
-export const listStaffAugPlacementOptions = async () => {
+type ListStaffAugPlacementOptionsInput = {
+  search?: string
+  assignmentId?: string | null
+  limit?: number
+}
+
+export const listStaffAugPlacementOptions = async ({
+  search,
+  assignmentId,
+  limit = 20
+}: ListStaffAugPlacementOptionsInput = {}) => {
+  const trimmedSearch = search?.trim() || ''
+  const trimmedAssignmentId = assignmentId?.trim() || ''
+  const params: unknown[] = []
+
+  const filters = [
+    'a.active = TRUE',
+    '(a.end_date IS NULL OR a.end_date >= CURRENT_DATE)',
+    'm.active = TRUE',
+    'COALESCE(m.assignable, TRUE) = TRUE',
+    'placement.placement_id IS NULL'
+  ]
+
+  if (trimmedAssignmentId) {
+    params.push(trimmedAssignmentId)
+    filters.push(`a.assignment_id = $${params.length}`)
+  } else if (trimmedSearch) {
+    params.push(`%${trimmedSearch}%`)
+    filters.push(`(
+      m.display_name ILIKE $${params.length}
+      OR c.client_name ILIKE $${params.length}
+      OR o.organization_name ILIKE $${params.length}
+      OR a.assignment_id ILIKE $${params.length}
+    )`)
+  }
+
+  params.push(Math.min(Math.max(limit, 1), 50))
+  const limitParam = `$${params.length}`
+
   const rows = await runGreenhousePostgresQuery<PlacementOptionRow>(
     `
       SELECT
@@ -322,15 +360,14 @@ export const listStaffAugPlacementOptions = async () => {
         LIMIT 1
       ) comp ON TRUE
       WHERE a.active = TRUE
-        AND (a.end_date IS NULL OR a.end_date >= CURRENT_DATE)
-        AND m.active = TRUE
-        AND COALESCE(m.assignable, TRUE) = TRUE
+        AND ${filters.join('\n        AND ')}
       ORDER BY m.display_name ASC, c.client_name ASC NULLS LAST, a.assignment_id ASC
-    `
+      LIMIT ${limitParam}
+    `,
+    params
   ).catch(() => [])
 
   return rows
-    .filter(row => !row.placement_id)
     .filter(row => !isInternalCommercialAssignment({ clientId: row.client_id, clientName: row.client_name }))
     .map(normalizePlacementOption)
 }

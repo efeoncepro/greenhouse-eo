@@ -11,17 +11,11 @@ export async function GET(request: Request) {
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { searchParams } = new URL(request.url)
-  const search = searchParams.get('search')?.trim().toLowerCase() || ''
-  const baseItems = await listStaffAugPlacementOptions()
-
-  const items = search
-    ? baseItems.filter(item =>
-      [item.memberName || '', item.clientName || '', item.organizationName || '']
-        .join(' ')
-        .toLowerCase()
-        .includes(search)
-    )
-    : baseItems
+  const search = searchParams.get('search')?.trim() || ''
+  const assignmentId = searchParams.get('assignmentId')?.trim() || null
+  const rawLimit = Number(searchParams.get('limit') || '20')
+  const limit = Number.isFinite(rawLimit) ? rawLimit : 20
+  const items = await listStaffAugPlacementOptions({ search, assignmentId, limit })
 
   return NextResponse.json({
     items: items.map(item => ({

@@ -55,6 +55,11 @@ describe('Agency Staff Aug placement options route', () => {
 
     expect(response.status).toBe(200)
     expect(mockListStaffAugPlacementOptions).toHaveBeenCalledTimes(1)
+    expect(mockListStaffAugPlacementOptions).toHaveBeenCalledWith({
+      search: 'sky',
+      assignmentId: null,
+      limit: 20
+    })
     expect(body).toMatchObject({
       total: 1,
       items: [
@@ -68,6 +73,19 @@ describe('Agency Staff Aug placement options route', () => {
           })
         })
       ]
+    })
+  })
+
+  it('supports fetching a single assignment by id for People deep-links', async () => {
+    mockListStaffAugPlacementOptions.mockResolvedValue([])
+
+    const response = await GET(new Request('http://localhost/api/agency/staff-augmentation/placement-options?assignmentId=assignment-2&limit=1'))
+
+    expect(response.status).toBe(200)
+    expect(mockListStaffAugPlacementOptions).toHaveBeenCalledWith({
+      search: '',
+      assignmentId: 'assignment-2',
+      limit: 1
     })
   })
 })

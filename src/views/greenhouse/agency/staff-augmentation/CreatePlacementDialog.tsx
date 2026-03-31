@@ -1,9 +1,11 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import Alert from '@mui/material/Alert'
+import Autocomplete from '@mui/material/Autocomplete'
 import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
@@ -70,54 +72,94 @@ const CreatePlacementDialog = ({ open, onClose, onCreated, initialAssignmentId }
   const [error, setError] = useState<string | null>(null)
   const [options, setOptions] = useState<AssignmentOption[]>([])
   const [assignmentId, setAssignmentId] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
   const [businessUnit, setBusinessUnit] = useState('reach')
   const [status, setStatus] = useState('pipeline')
   const [billingRateAmount, setBillingRateAmount] = useState('')
   const [billingRateCurrency, setBillingRateCurrency] = useState('USD')
   const [placementNotes, setPlacementNotes] = useState('')
-
-  useEffect(() => {
-    if (!open) return
-
-    const load = async () => {
-      setMetaLoading(true)
-      setError(null)
-
-      try {
-        const res = await fetch('/api/agency/staff-augmentation/placement-options', { cache: 'no-store' })
-        const json = (await res.json()) as PlacementOptionsResponse
-
-        const nextOptions = (json.items || []).map(option => ({
-          assignmentId: option.assignmentId,
-          memberLabel: option.memberName || option.memberId,
-          clientLabel: option.clientName || option.clientId || 'Cliente',
-          organizationLabel: option.organizationName || null,
-          label: option.label,
-          assignmentType: option.assignmentType || 'internal',
-          compensation: option.compensation
-        }))
-
-        setOptions(nextOptions)
-
-        const preferredAssignmentId = initialAssignmentId && nextOptions.some(option => option.assignmentId === initialAssignmentId)
-          ? initialAssignmentId
-          : nextOptions[0]?.assignmentId || ''
-
-        setAssignmentId(preferredAssignmentId)
-      } catch {
-        setError('No pudimos cargar assignments activos para crear el placement.')
-      } finally {
-        setMetaLoading(false)
-      }
-    }
-
-    load()
-  }, [initialAssignmentId, open])
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const selectedAssignment = useMemo(
     () => options.find(option => option.assignmentId === assignmentId) || null,
     [assignmentId, options]
   )
+
+  const loadOptions = useCallback(async (params?: { search?: string; assignmentId?: string | null }) => {
+    setMetaLoading(true)
+    setError(null)
+
+    try {
+      const query = new URLSearchParams({ limit: '20' })
+
+      if (params?.search?.trim()) query.set('search', params.search.trim())
+      if (params?.assignmentId?.trim()) query.set('assignmentId', params.assignmentId.trim())
+
+      const res = await fetch(`/api/agency/staff-augmentation/placement-options?${query.toString()}`, { cache: 'no-store' })
+      const json = (await res.json()) as PlacementOptionsResponse
+
+      const nextOptions = (json.items || []).map(option => ({
+        assignmentId: option.assignmentId,
+        memberLabel: option.memberName || option.memberId,
+        clientLabel: option.clientName || option.clientId || 'Cliente',
+        organizationLabel: option.organizationName || null,
+        label: option.label,
+        assignmentType: option.assignmentType || 'internal',
+        compensation: option.compensation
+      }))
+
+      setOptions(nextOptions)
+
+      if (params?.assignmentId) {
+        const exactMatch = nextOptions.find(option => option.assignmentId === params.assignmentId) || null
+
+        if (exactMatch) {
+          setAssignmentId(exactMatch.assignmentId)
+          setSearchQuery(exactMatch.label)
+        }
+      }
+    } catch {
+      setError('No pudimos cargar assignments activos para crear el placement.')
+    } finally {
+      setMetaLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!open) return
+
+    setError(null)
+    setOptions([])
+    setAssignmentId('')
+    setSearchQuery('')
+
+    if (initialAssignmentId) {
+      void loadOptions({ assignmentId: initialAssignmentId })
+    }
+  }, [initialAssignmentId, loadOptions, open])
+
+  useEffect(() => {
+    if (!open) return
+
+    const trimmedQuery = searchQuery.trim()
+    const selectedLabel = selectedAssignment?.label || ''
+
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+
+    if (trimmedQuery.length < 2 || trimmedQuery === selectedLabel) {
+      if (!trimmedQuery) setOptions(current => (assignmentId ? current : []))
+
+      return
+    }
+
+    debounceRef.current = setTimeout(() => {
+      void loadOptions({ search: trimmedQuery })
+    }, 350)
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
+  }, [assignmentId, loadOptions, open, searchQuery, selectedAssignment])
 
   const handleSubmit = async () => {
     if (!assignmentId) {
@@ -175,25 +217,64 @@ const CreatePlacementDialog = ({ open, onClose, onCreated, initialAssignmentId }
 
         <Grid container spacing={4}>
           <Grid size={{ xs: 12 }}>
-            <CustomTextField
-              select
-              fullWidth
-              label='Assignment base'
-              value={assignmentId}
-              onChange={event => setAssignmentId(event.target.value)}
-              disabled={metaLoading || loading}
-              helperText={
-                selectedAssignment
-                  ? `${selectedAssignment.memberLabel} · ${selectedAssignment.clientLabel}`
-                  : 'Selecciona una asignación activa sin placement previo.'
+            <Autocomplete
+              options={options}
+              value={selectedAssignment}
+              inputValue={searchQuery}
+              onInputChange={(_event, value, reason) => {
+                setSearchQuery(value)
+
+                if (reason === 'clear') {
+                  setAssignmentId('')
+                  setOptions([])
+                }
+              }}
+              onChange={(_event, option) => {
+                setAssignmentId(option?.assignmentId || '')
+                setSearchQuery(option?.label || '')
+              }}
+              loading={metaLoading}
+              disabled={loading}
+              noOptionsText={
+                searchQuery.trim().length < 2
+                  ? 'Escribe al menos 2 caracteres para buscar assignments elegibles.'
+                  : 'No encontramos assignments elegibles con ese criterio.'
               }
-            >
-              {options.map(option => (
-                <MenuItem key={option.assignmentId} value={option.assignmentId}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </CustomTextField>
+              getOptionLabel={option => option.label}
+              isOptionEqualToValue={(option, value) => option.assignmentId === value.assignmentId}
+              renderOption={(props, option) => (
+                <li {...props} key={option.assignmentId}>
+                  <div>
+                    <Typography variant='body2' fontWeight={600}>{option.memberLabel}</Typography>
+                    <Typography variant='caption' color='text.secondary'>
+                      {option.clientLabel}{option.organizationLabel ? ` · ${option.organizationLabel}` : ''}
+                    </Typography>
+                  </div>
+                </li>
+              )}
+              renderInput={params => (
+                <CustomTextField
+                  {...params}
+                  fullWidth
+                  label='Buscar assignment'
+                  placeholder='Miembro, cliente, organización o ID'
+                  helperText={
+                    selectedAssignment
+                      ? `${selectedAssignment.memberLabel} · ${selectedAssignment.clientLabel}`
+                      : 'Busca una asignación activa sin placement previo. No cargamos toda la lista para evitar cuelgues.'
+                  }
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {metaLoading ? <CircularProgress size={18} color='inherit' /> : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    )
+                  }}
+                />
+              )}
+            />
           </Grid>
           {selectedAssignment ? (
             <Grid size={{ xs: 12 }}>

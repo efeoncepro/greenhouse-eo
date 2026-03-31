@@ -4,6 +4,71 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-31 — Staff Aug create placement freeze hardening
+
+### Objetivo
+- Corregir el cuelgue visible al hacer click en `Crear placement` dentro de `/agency/staff-augmentation`.
+
+### Delta de ejecución
+- Se confirmó y corrigió el patrón de riesgo principal del modal:
+  - antes cargaba y renderizaba todas las opciones elegibles en un `select`
+  - ahora usa búsqueda incremental y acotada para assignments elegibles
+- Cambios principales:
+  - `src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.tsx`
+    - reemplaza `select` masivo por `Autocomplete`
+    - no carga opciones al abrir salvo deep-link por `assignmentId`
+    - busca remoto al escribir
+  - `src/app/api/agency/staff-augmentation/placement-options/route.ts`
+    - ahora acepta `search`, `assignmentId` y `limit`
+  - `src/lib/staff-augmentation/store.ts`
+    - mueve filtro y `LIMIT` al query Postgres para no traer todo el universo al modal
+- Resultado esperado:
+  - abrir `Crear placement` ya no debería congelar la página por render masivo de opciones
+
+### Validación ejecutada
+- `pnpm exec vitest run src/app/api/agency/staff-augmentation/placement-options/route.test.ts src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.test.tsx`
+- `pnpm exec eslint src/lib/staff-augmentation/store.ts src/app/api/agency/staff-augmentation/placement-options/route.ts src/app/api/agency/staff-augmentation/placement-options/route.test.ts src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.tsx src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.test.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- Faltante:
+  - no hubo smoke browser autenticado en `dev-greenhouse` desde este turno; el fix quedó validado por contrato, tests y tipado
+
+## Sesión 2026-03-31 — RESEARCH-002 Staff Aug enterprise module grounded in codebase
+
+### Objetivo
+- Seguir iterando el brief enterprise de `Staff Augmentation`, pero aterrizado contra el runtime actual del repo y no solo como diseño aspiracional.
+
+### Delta de ejecución
+- `docs/research/RESEARCH-002-staff-augmentation-enterprise-module.md` ahora distingue con más fuerza:
+  - baseline runtime ya confirmado
+  - gaps reales vs target enterprise
+- El brief ya deja explícito, con referencia a código y arquitectura vigente, que hoy ya existen:
+  - `assignment` como pivote operativo
+  - `placement` como entidad transaccional real
+  - bridge `People -> assignment -> placement`
+  - contexto `Space` / `organization` ya persistido en placements
+  - snapshots económicos Staff Aug
+  - reactividad con Payroll, Finance, Providers y Tooling
+- También quedó explicitado qué falta todavía para una task enterprise nueva:
+  - `Placement 360` completo
+  - profitability desk
+  - renewal/risk desk
+  - talent coverage
+  - governance placement-first con provider/tooling
+
+### Validación ejecutada
+- Relectura de arquitectura:
+  - `docs/architecture/Greenhouse_HRIS_Architecture_v1.md`
+  - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+- Contraste manual contra runtime:
+  - `src/lib/staff-augmentation/store.ts`
+  - `src/lib/staff-augmentation/snapshots.ts`
+  - `src/lib/sync/projections/staff-augmentation.ts`
+  - `src/lib/agency/space-360.ts`
+  - `src/lib/people/get-person-detail.ts`
+  - `src/lib/person-360/get-person-finance.ts`
+  - `src/lib/providers/provider-tooling-snapshots.ts`
+
 ## Sesión 2026-03-31 — TASK-169 Staff Aug bridge + create placement hardening
 
 ### Objetivo
