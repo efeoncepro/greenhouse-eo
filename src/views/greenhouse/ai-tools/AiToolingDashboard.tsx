@@ -65,12 +65,19 @@ const AiToolingDashboard = () => {
     setError(null)
 
     try {
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 25_000)
+
+      const opts = { signal: controller.signal }
+
       const [catRes, licRes, walRes, metaRes] = await Promise.all([
-        fetch('/api/admin/ai-tools/catalog'),
-        fetch('/api/admin/ai-tools/licenses'),
-        fetch('/api/admin/ai-tools/wallets'),
-        fetch('/api/admin/ai-tools/meta')
+        fetch('/api/admin/ai-tools/catalog', opts),
+        fetch('/api/admin/ai-tools/licenses', opts),
+        fetch('/api/admin/ai-tools/wallets', opts),
+        fetch('/api/admin/ai-tools/meta', opts)
       ])
+
+      clearTimeout(timeout)
 
       const errors: string[] = []
 
@@ -110,7 +117,11 @@ const AiToolingDashboard = () => {
         setError(errors.join(' · '))
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Error de conexión al cargar datos')
+      const message = err instanceof DOMException && err.name === 'AbortError'
+        ? 'La carga de datos excedió el tiempo límite. Intenta de nuevo.'
+        : err instanceof Error ? err.message : 'Error de conexión al cargar datos'
+
+      setError(message)
     } finally {
       setLoading(false)
     }

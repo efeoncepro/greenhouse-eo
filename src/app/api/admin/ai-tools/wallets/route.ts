@@ -6,6 +6,7 @@ import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import type { CreateWalletInput } from '@/types/ai-tools'
 
 export const dynamic = 'force-dynamic'
+export const maxDuration = 30
 
 export async function GET(request: Request) {
   const { tenant, errorResponse } = await requireAdminTenantContext()
