@@ -4,6 +4,35 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-31 — Staff Aug create placement moved to dedicated route after real freeze reproduction
+
+### Objetivo
+- Resolver el cuelgue real de `Crear placement` después de reproducirlo con sesión autenticada real en `dev-greenhouse`.
+
+### Delta de ejecución
+- Se confirmó que el freeze ocurría al hacer click real sobre `Crear placement` en la vista de listado.
+- Replanteamiento aplicado:
+  - `Agency > Staff Augmentation` ya no monta el create flow dentro del listado
+  - el botón ahora navega a `/agency/staff-augmentation/create`
+  - `?create=1&assignmentId=...` redirige server-side a la nueva ruta dedicada
+  - el bridge desde `People` también apunta a la ruta dedicada con `assignmentId`
+- Objetivo técnico:
+  - sacar el formulario del árbol del listado, que era el carril donde el browser quedaba colgado al abrir
+  - mantener intacto el contrato funcional de creación y el deep-link desde `People`
+- Archivos tocados:
+  - `src/app/(dashboard)/agency/staff-augmentation/page.tsx`
+  - `src/app/(dashboard)/agency/staff-augmentation/create/page.tsx`
+  - `src/views/greenhouse/agency/staff-augmentation/CreatePlacementPageView.tsx`
+  - `src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.tsx`
+  - `src/views/greenhouse/people/tabs/PersonMembershipsTab.tsx`
+  - tests asociados
+
+### Validación ejecutada
+- Reproducción real previa del freeze con sesión autenticada y click real sobre `Crear placement`
+- `pnpm exec vitest run src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.test.tsx src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.test.tsx src/views/greenhouse/people/tabs/PersonMembershipsTab.test.tsx --reporter=verbose`
+- `pnpm exec eslint 'src/app/(dashboard)/agency/staff-augmentation/page.tsx' 'src/app/(dashboard)/agency/staff-augmentation/create/page.tsx' src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.tsx src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.test.tsx src/views/greenhouse/agency/staff-augmentation/CreatePlacementPageView.tsx src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.tsx src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.test.tsx src/views/greenhouse/people/tabs/PersonMembershipsTab.tsx src/views/greenhouse/people/tabs/PersonMembershipsTab.test.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+
 ## Sesión 2026-03-31 — Staff Aug create placement freeze replanteado inline
 
 ### Objetivo

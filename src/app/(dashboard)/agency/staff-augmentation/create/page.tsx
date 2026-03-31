@@ -2,21 +2,20 @@ import { redirect } from 'next/navigation'
 
 import type { Metadata } from 'next'
 
-import StaffAugmentationListView from '@/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView'
+import CreatePlacementPageView from '@/views/greenhouse/agency/staff-augmentation/CreatePlacementPageView'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 
-export const metadata: Metadata = { title: 'Staff Augmentation | Agencia | Greenhouse' }
+export const metadata: Metadata = { title: 'Crear Placement | Staff Augmentation | Greenhouse' }
 export const dynamic = 'force-dynamic'
 
 type Props = {
   searchParams?: Promise<{
-    create?: string
     assignmentId?: string
   }>
 }
 
-const StaffAugmentationPage = async ({ searchParams }: Props) => {
+const StaffAugmentationCreatePage = async ({ searchParams }: Props) => {
   const tenant = await getTenantContext()
 
   if (!tenant) {
@@ -35,17 +34,7 @@ const StaffAugmentationPage = async ({ searchParams }: Props) => {
 
   const resolvedSearchParams = searchParams ? await searchParams : undefined
 
-  if (resolvedSearchParams?.create === '1') {
-    const params = new URLSearchParams()
-
-    if (resolvedSearchParams.assignmentId) {
-      params.set('assignmentId', resolvedSearchParams.assignmentId)
-    }
-
-    redirect(`/agency/staff-augmentation/create${params.toString() ? `?${params.toString()}` : ''}`)
-  }
-
-  return <StaffAugmentationListView />
+  return <CreatePlacementPageView initialAssignmentId={resolvedSearchParams?.assignmentId} />
 }
 
-export default StaffAugmentationPage
+export default StaffAugmentationCreatePage

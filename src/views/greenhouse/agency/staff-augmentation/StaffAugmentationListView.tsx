@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
 
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
@@ -25,8 +24,6 @@ import classnames from 'classnames'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
-
-import CreatePlacementDialog from './CreatePlacementDialog'
 
 import tableStyles from '@core/styles/table.module.css'
 
@@ -151,8 +148,6 @@ const columns: ColumnDef<PlacementListItem, any>[] = [
 ]
 
 const StaffAugmentationListView = () => {
-  const router = useRouter()
-  const searchParams = useSearchParams()
   const [data, setData] = useState<PlacementListResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(0)
@@ -162,32 +157,6 @@ const StaffAugmentationListView = () => {
   const [status, setStatus] = useState('')
   const [businessUnit, setBusinessUnit] = useState('')
   const [sorting, setSorting] = useState<SortingState>([{ id: 'publicId', desc: false }])
-  const [createOpen, setCreateOpen] = useState(false)
-  const createParam = searchParams.get('create')
-  const initialAssignmentId = searchParams.get('assignmentId')
-
-  useEffect(() => {
-    if (createParam === '1') {
-      setCreateOpen(true)
-    }
-  }, [createParam])
-
-  const handleCloseCreate = useCallback(() => {
-    setCreateOpen(false)
-
-    if (createParam !== '1' && !initialAssignmentId) {
-      return
-    }
-
-    const params = new URLSearchParams(searchParams.toString())
-
-    params.delete('create')
-    params.delete('assignmentId')
-
-    const query = params.toString()
-
-    router.replace(`/agency/staff-augmentation${query ? `?${query}` : ''}`, { scroll: false })
-  }, [createParam, initialAssignmentId, router, searchParams])
 
   useEffect(() => {
     const timer = setTimeout(() => setSearchDebounced(search), 350)
@@ -254,28 +223,12 @@ const StaffAugmentationListView = () => {
       </Grid>
 
       <Grid size={{ xs: 12 }}>
-        {createOpen ? (
-          <Box sx={{ mb: 6 }}>
-            <CreatePlacementDialog
-              open
-              inline
-              onClose={handleCloseCreate}
-              initialAssignmentId={initialAssignmentId}
-              onCreated={placementId => {
-                handleCloseCreate()
-                void loadData()
-                router.push(`/agency/staff-augmentation/${placementId}`)
-              }}
-            />
-          </Box>
-        ) : null}
-
         <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
           <CardHeader
             avatar={<Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}><i className='tabler-users-plus' /></Avatar>}
             title='Staff Augmentation'
             subheader='Placements comerciales sobre assignments canónicos, con lectura Finance, Payroll y tooling.'
-            action={<Button variant='contained' onClick={() => setCreateOpen(true)}>Crear placement</Button>}
+            action={<Button component={Link} href='/agency/staff-augmentation/create' variant='contained'>Crear placement</Button>}
           />
           <Divider />
           <CardContent>

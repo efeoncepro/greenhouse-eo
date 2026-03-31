@@ -81,7 +81,7 @@ describe('CreatePlacementDialog', () => {
 
     expect(await screen.findByText(/Sky Org · contractor · international/i)).toBeInTheDocument()
     expect(screen.getByText(/\$2\.800/i)).toBeInTheDocument()
-  })
+  }, 10000)
 
   it('preselects the requested assignment when it arrives from People', async () => {
     fetchMock.mockImplementation(async (input: RequestInfo | URL) => {

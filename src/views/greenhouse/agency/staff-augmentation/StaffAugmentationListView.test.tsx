@@ -3,7 +3,6 @@
 import type { ReactNode } from 'react'
 
 import { cleanup, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithTheme } from '@/test/render'
@@ -11,8 +10,6 @@ import { renderWithTheme } from '@/test/render'
 import StaffAugmentationListView from './StaffAugmentationListView'
 
 const fetchMock = vi.fn()
-const pushMock = vi.fn()
-const replaceMock = vi.fn()
 
 vi.mock('next/link', () => ({
   default: ({ children, href, ...props }: { children: ReactNode; href: string }) => (
@@ -22,16 +19,9 @@ vi.mock('next/link', () => ({
   )
 }))
 
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: pushMock, replace: replaceMock }),
-  useSearchParams: () => new URLSearchParams('')
-}))
-
 describe('StaffAugmentationListView', () => {
   beforeEach(() => {
     fetchMock.mockReset()
-    pushMock.mockReset()
-    replaceMock.mockReset()
     vi.stubGlobal('fetch', fetchMock)
   })
 
@@ -80,9 +70,7 @@ describe('StaffAugmentationListView', () => {
     expect(screen.getByText('Reach')).toBeInTheDocument()
   })
 
-  it('opens the placement creation flow inline instead of mounting a blocking dialog', async () => {
-    const user = userEvent.setup()
-
+  it('routes placement creation to a dedicated page instead of mounting the flow inside the list', async () => {
     fetchMock.mockResolvedValue({
       ok: true,
       json: async () => ({
@@ -99,10 +87,6 @@ describe('StaffAugmentationListView', () => {
       expect(fetchMock).toHaveBeenCalledTimes(1)
     })
 
-    await user.click(screen.getByRole('button', { name: 'Crear placement' }))
-
-    expect(await screen.findByText('Alta comercial-operativa sobre un assignment existente.')).toBeInTheDocument()
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
-    expect(screen.getByRole('textbox', { name: 'Buscar assignment' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Crear placement' })).toHaveAttribute('href', '/agency/staff-augmentation/create')
   })
 })

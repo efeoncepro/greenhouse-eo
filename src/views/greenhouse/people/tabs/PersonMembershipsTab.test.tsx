@@ -98,6 +98,6 @@ describe('PersonMembershipsTab', () => {
 
     expect(screen.getAllByText('Staff Aug')[0]).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Abrir placement' })).toHaveAttribute('href', '/agency/staff-augmentation/placement-1')
-    expect(screen.getByRole('link', { name: 'Crear placement' })).toHaveAttribute('href', '/agency/staff-augmentation?create=1&assignmentId=assignment-2')
+    expect(screen.getByRole('link', { name: 'Crear placement' })).toHaveAttribute('href', '/agency/staff-augmentation/create?assignmentId=assignment-2')
   })
 })

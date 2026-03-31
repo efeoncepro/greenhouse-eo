@@ -2,6 +2,11 @@
 
 ## 2026-03-31
 
+- Staff Aug `Crear placement` ya no se monta dentro del listado:
+  - `Agency > Staff Augmentation` ahora navega a `/agency/staff-augmentation/create`
+  - el bridge desde `People` también usa la ruta dedicada con `assignmentId`
+  - `?create=1` se redirige server-side a esa nueva página
+  - el cambio se tomó después de reproducir el freeze real autenticado al hacer click en `Crear placement` sobre el listado
 - Staff Aug `Crear placement` se replanteó otra vez para salir del carril que seguía congelando Chrome:
   - el formulario ya no se abre en `Dialog`
   - `Agency > Staff Augmentation` ahora lo renderiza inline dentro de la misma vista

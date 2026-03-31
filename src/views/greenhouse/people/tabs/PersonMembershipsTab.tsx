@@ -242,7 +242,7 @@ const PersonMembershipsTab = ({ memberId, assignments, isAdmin, reloadKey, onAdd
                               ) : assignment.active ? (
                                 <Button
                                   component={Link}
-                                  href={`/agency/staff-augmentation?create=1&assignmentId=${assignment.assignmentId}`}
+                                  href={`/agency/staff-augmentation/create?assignmentId=${assignment.assignmentId}`}
                                   size='small'
                                   variant='text'
                                   sx={{ minHeight: 0, p: 0 }}
