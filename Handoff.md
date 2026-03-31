@@ -34,6 +34,10 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 ### Limitación real
 - El endpoint de edición sigue escribiendo por el carril HR legacy/profile y no corta todavía directo a `greenhouse_core.members` en Postgres.
 - Una reejecución posterior de `next build` quedó colgada en `Running TypeScript` sin error explícito; como mitigación, el estado final volvió a pasar `vitest`, `eslint` y `tsc --noEmit`.
+- Fix posterior 2026-03-31:
+  - guardar solo `hireDate` estaba disparando también un `MERGE` innecesario contra `greenhouse.member_profiles`
+  - eso exponía al runtime a `500` y además era riesgoso porque podía tocar campos suplementarios no editados
+  - `updateMemberHrProfile()` ahora solo muta `member_profiles` cuando realmente vienen campos de ese subperfil
 
 ## Sesión 2026-03-31 — TASK-016 Business Units Canonical v2 Fase 1
 

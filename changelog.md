@@ -8,6 +8,7 @@
   - esto cierra la brecha operativa que dejaba a `leave`/vacaciones con `hire_date` técnicamente soportado pero no mantenible desde pantalla
   - queda documentado además que este campo sigue siendo `BigQuery-first` para edición (`greenhouse.team_members.hire_date`) mientras `HR profile` no haga cutover formal a PostgreSQL
   - la acción visible quedó finalmente en la surface real `People > [colaborador] > Perfil > Datos laborales`; ya no depende de un componente no montado
+  - se corrigió además el write path para que cambiar solo `hireDate` no ejecute un `MERGE` innecesario sobre `greenhouse.member_profiles`, eliminando el `500` observado al guardar
 - `TASK-170` se reconcilió contra el runtime real de HR Leave:
   - la task deja de asumir un módulo “nuevo” y se alinea al baseline existente en PostgreSQL, serving views, APIs y UI
   - `leave` ya calcula días hábiles desde el calendario operativo canónico + feriados Chile

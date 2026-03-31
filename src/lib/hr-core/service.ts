@@ -985,10 +985,27 @@ export const updateMemberHrProfile = async ({
 
   const teamMemberUpdates: string[] = []
   const teamMemberParams: Record<string, unknown> = { memberId }
+  const profileUpdates: string[] = []
+  const profileSelects: string[] = []
+  const profileInsertColumns: string[] = []
+  const profileInsertValues: string[] = []
+
+  const profileParams: Record<string, unknown> = {
+    memberId,
+    updatedBy: actorUserId
+  }
 
   const setTeamField = (column: string, paramKey: string, value: unknown) => {
     teamMemberUpdates.push(`${column} = @${paramKey}`)
     teamMemberParams[paramKey] = value
+  }
+
+  const setProfileField = (column: string, paramKey: string, value: unknown) => {
+    profileSelects.push(`@${paramKey} AS ${column}`)
+    profileUpdates.push(`${column} = source.${column}`)
+    profileInsertColumns.push(column)
+    profileInsertValues.push(`source.${column}`)
+    profileParams[paramKey] = value
   }
 
   if (input.departmentId !== undefined) setTeamField('department_id', 'departmentId', normalizeNullableString(input.departmentId))
@@ -1006,6 +1023,50 @@ export const updateMemberHrProfile = async ({
     )
   if (input.dailyRequired !== undefined) setTeamField('daily_required', 'dailyRequired', Boolean(input.dailyRequired))
   if (input.phone !== undefined) setTeamField('phone', 'phone', normalizeNullableString(input.phone))
+  if (input.identityDocumentType !== undefined) setProfileField('identity_document_type', 'identityDocumentType', normalizeNullableString(input.identityDocumentType))
+  if (input.identityDocumentNumber !== undefined)
+    setProfileField('identity_document_number', 'identityDocumentNumber', normalizeNullableString(input.identityDocumentNumber))
+  if (input.emergencyContactName !== undefined)
+    setProfileField('emergency_contact_name', 'emergencyContactName', normalizeNullableString(input.emergencyContactName))
+  if (input.emergencyContactPhone !== undefined)
+    setProfileField('emergency_contact_phone', 'emergencyContactPhone', normalizeNullableString(input.emergencyContactPhone))
+  if (input.healthSystem !== undefined)
+    setProfileField('health_system', 'healthSystem', input.healthSystem ? assertEnum(input.healthSystem, HR_HEALTH_SYSTEMS, 'healthSystem') : null)
+  if (input.isapreName !== undefined) setProfileField('isapre_name', 'isapreName', normalizeNullableString(input.isapreName))
+  if (input.bankName !== undefined) setProfileField('bank_name', 'bankName', normalizeNullableString(input.bankName))
+  if (input.bankAccountType !== undefined)
+    setProfileField('bank_account_type', 'bankAccountType', input.bankAccountType ? assertEnum(input.bankAccountType, HR_BANK_ACCOUNT_TYPES, 'bankAccountType') : null)
+  if (input.bankAccountNumber !== undefined) setProfileField('bank_account_number', 'bankAccountNumber', normalizeNullableString(input.bankAccountNumber))
+  if (input.cvUrl !== undefined) setProfileField('cv_url', 'cvUrl', normalizeNullableString(input.cvUrl))
+  if (input.linkedinUrl !== undefined) setProfileField('linkedin_url', 'linkedinUrl', normalizeNullableString(input.linkedinUrl))
+  if (input.portfolioUrl !== undefined) setProfileField('portfolio_url', 'portfolioUrl', normalizeNullableString(input.portfolioUrl))
+  if (input.skills !== undefined) setProfileField('skills', 'skills', input.skills)
+  if (input.tools !== undefined) setProfileField('tools', 'tools', input.tools)
+  if (input.aiSuites !== undefined) setProfileField('ai_suites', 'aiSuites', input.aiSuites)
+  if (input.strengths !== undefined) setProfileField('strengths', 'strengths', input.strengths)
+  if (input.improvementAreas !== undefined) setProfileField('improvement_areas', 'improvementAreas', input.improvementAreas)
+  if (input.pieceTypes !== undefined) setProfileField('piece_types', 'pieceTypes', input.pieceTypes)
+  if (input.avgMonthlyVolume !== undefined)
+    setProfileField(
+      'avg_monthly_volume',
+      'avgMonthlyVolume',
+      input.avgMonthlyVolume === null ? null : assertNonNegativeNumber(input.avgMonthlyVolume, 'avgMonthlyVolume')
+    )
+  if (input.throughputAvg30d !== undefined)
+    setProfileField(
+      'throughput_avg_30d',
+      'throughputAvg30d',
+      input.throughputAvg30d === null ? null : assertNonNegativeNumber(input.throughputAvg30d, 'throughputAvg30d')
+    )
+  if (input.rpaAvg30d !== undefined)
+    setProfileField('rpa_avg_30d', 'rpaAvg30d', input.rpaAvg30d === null ? null : assertNonNegativeNumber(input.rpaAvg30d, 'rpaAvg30d'))
+  if (input.otdPercent30d !== undefined)
+    setProfileField(
+      'otd_percent_30d',
+      'otdPercent30d',
+      input.otdPercent30d === null ? null : assertNonNegativeNumber(input.otdPercent30d, 'otdPercent30d')
+    )
+  if (input.notes !== undefined) setProfileField('notes', 'notes', normalizeNullableString(input.notes))
 
   if (teamMemberUpdates.length > 0) {
     await runHrCoreQuery(
@@ -1018,162 +1079,41 @@ export const updateMemberHrProfile = async ({
     )
   }
 
-  await runHrCoreQuery(
-    `
-      MERGE \`${projectId}.greenhouse.member_profiles\` AS target
-      USING (
-        SELECT
-          @memberId AS member_id,
-          @identityDocumentType AS identity_document_type,
-          @identityDocumentNumber AS identity_document_number,
-          @emergencyContactName AS emergency_contact_name,
-          @emergencyContactPhone AS emergency_contact_phone,
-          @healthSystem AS health_system,
-          @isapreName AS isapre_name,
-          @bankName AS bank_name,
-          @bankAccountType AS bank_account_type,
-          @bankAccountNumber AS bank_account_number,
-          @cvUrl AS cv_url,
-          @linkedinUrl AS linkedin_url,
-          @portfolioUrl AS portfolio_url,
-          @skills AS skills,
-          @tools AS tools,
-          @aiSuites AS ai_suites,
-          @strengths AS strengths,
-          @improvementAreas AS improvement_areas,
-          @pieceTypes AS piece_types,
-          @avgMonthlyVolume AS avg_monthly_volume,
-          @throughputAvg30d AS throughput_avg_30d,
-          @rpaAvg30d AS rpa_avg_30d,
-          @otdPercent30d AS otd_percent_30d,
-          @notes AS notes,
-          @updatedBy AS updated_by
-      ) AS source
-      ON target.member_id = source.member_id
-      WHEN MATCHED THEN
-        UPDATE SET
-          identity_document_type = COALESCE(source.identity_document_type, target.identity_document_type),
-          identity_document_number = COALESCE(source.identity_document_number, target.identity_document_number),
-          emergency_contact_name = COALESCE(source.emergency_contact_name, target.emergency_contact_name),
-          emergency_contact_phone = COALESCE(source.emergency_contact_phone, target.emergency_contact_phone),
-          health_system = COALESCE(source.health_system, target.health_system),
-          isapre_name = source.isapre_name,
-          bank_name = source.bank_name,
-          bank_account_type = source.bank_account_type,
-          bank_account_number = source.bank_account_number,
-          cv_url = source.cv_url,
-          linkedin_url = source.linkedin_url,
-          portfolio_url = source.portfolio_url,
-          skills = source.skills,
-          tools = source.tools,
-          ai_suites = source.ai_suites,
-          strengths = source.strengths,
-          improvement_areas = source.improvement_areas,
-          piece_types = source.piece_types,
-          avg_monthly_volume = source.avg_monthly_volume,
-          throughput_avg_30d = source.throughput_avg_30d,
-          rpa_avg_30d = source.rpa_avg_30d,
-          otd_percent_30d = source.otd_percent_30d,
-          notes = source.notes,
-          updated_by = source.updated_by,
-          updated_at = CURRENT_TIMESTAMP()
-      WHEN NOT MATCHED THEN
-        INSERT (
-          member_id,
-          identity_document_type,
-          identity_document_number,
-          emergency_contact_name,
-          emergency_contact_phone,
-          health_system,
-          isapre_name,
-          bank_name,
-          bank_account_type,
-          bank_account_number,
-          cv_url,
-          linkedin_url,
-          portfolio_url,
-          skills,
-          tools,
-          ai_suites,
-          strengths,
-          improvement_areas,
-          piece_types,
-          avg_monthly_volume,
-          throughput_avg_30d,
-          rpa_avg_30d,
-          otd_percent_30d,
-          notes,
-          updated_by,
-          created_at,
-          updated_at
-        )
-        VALUES (
-          source.member_id,
-          source.identity_document_type,
-          source.identity_document_number,
-          source.emergency_contact_name,
-          source.emergency_contact_phone,
-          source.health_system,
-          source.isapre_name,
-          source.bank_name,
-          source.bank_account_type,
-          source.bank_account_number,
-          source.cv_url,
-          source.linkedin_url,
-          source.portfolio_url,
-          source.skills,
-          source.tools,
-          source.ai_suites,
-          source.strengths,
-          source.improvement_areas,
-          source.piece_types,
-          source.avg_monthly_volume,
-          source.throughput_avg_30d,
-          source.rpa_avg_30d,
-          source.otd_percent_30d,
-          source.notes,
-          source.updated_by,
-          CURRENT_TIMESTAMP(),
-          CURRENT_TIMESTAMP()
-        )
-    `,
-    {
-      memberId,
-      identityDocumentType: normalizeNullableString(input.identityDocumentType),
-      identityDocumentNumber: normalizeNullableString(input.identityDocumentNumber),
-      emergencyContactName: normalizeNullableString(input.emergencyContactName),
-      emergencyContactPhone: normalizeNullableString(input.emergencyContactPhone),
-      healthSystem: input.healthSystem ? assertEnum(input.healthSystem, HR_HEALTH_SYSTEMS, 'healthSystem') : null,
-      isapreName: normalizeNullableString(input.isapreName),
-      bankName: normalizeNullableString(input.bankName),
-      bankAccountType: input.bankAccountType ? assertEnum(input.bankAccountType, HR_BANK_ACCOUNT_TYPES, 'bankAccountType') : null,
-      bankAccountNumber: normalizeNullableString(input.bankAccountNumber),
-      cvUrl: normalizeNullableString(input.cvUrl),
-      linkedinUrl: normalizeNullableString(input.linkedinUrl),
-      portfolioUrl: normalizeNullableString(input.portfolioUrl),
-      skills: input.skills ?? [],
-      tools: input.tools ?? [],
-      aiSuites: input.aiSuites ?? [],
-      strengths: input.strengths ?? [],
-      improvementAreas: input.improvementAreas ?? [],
-      pieceTypes: input.pieceTypes ?? [],
-      avgMonthlyVolume:
-        input.avgMonthlyVolume === undefined || input.avgMonthlyVolume === null
-          ? null
-          : assertNonNegativeNumber(input.avgMonthlyVolume, 'avgMonthlyVolume'),
-      throughputAvg30d:
-        input.throughputAvg30d === undefined || input.throughputAvg30d === null
-          ? null
-          : assertNonNegativeNumber(input.throughputAvg30d, 'throughputAvg30d'),
-      rpaAvg30d: input.rpaAvg30d === undefined || input.rpaAvg30d === null ? null : assertNonNegativeNumber(input.rpaAvg30d, 'rpaAvg30d'),
-      otdPercent30d:
-        input.otdPercent30d === undefined || input.otdPercent30d === null
-          ? null
-          : assertNonNegativeNumber(input.otdPercent30d, 'otdPercent30d'),
-      notes: normalizeNullableString(input.notes),
-      updatedBy: actorUserId
-    }
-  )
+  if (profileUpdates.length > 0) {
+    await runHrCoreQuery(
+      `
+        MERGE \`${projectId}.greenhouse.member_profiles\` AS target
+        USING (
+          SELECT
+            @memberId AS member_id,
+            ${profileSelects.join(',\n            ')},
+            @updatedBy AS updated_by
+        ) AS source
+        ON target.member_id = source.member_id
+        WHEN MATCHED THEN
+          UPDATE SET
+            ${profileUpdates.join(',\n            ')},
+            updated_by = source.updated_by,
+            updated_at = CURRENT_TIMESTAMP()
+        WHEN NOT MATCHED THEN
+          INSERT (
+            member_id,
+            ${profileInsertColumns.join(',\n            ')},
+            updated_by,
+            created_at,
+            updated_at
+          )
+          VALUES (
+            source.member_id,
+            ${profileInsertValues.join(',\n            ')},
+            source.updated_by,
+            CURRENT_TIMESTAMP(),
+            CURRENT_TIMESTAMP()
+          )
+      `,
+      profileParams
+    )
+  }
 }
 
 export const listLeaveBalances = async ({
