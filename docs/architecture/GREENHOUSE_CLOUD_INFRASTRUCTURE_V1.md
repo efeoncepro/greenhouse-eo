@@ -6,6 +6,31 @@
 
 ---
 
+## Delta 2026-03-31 — Shared asset buckets fully provisioned and cut over
+
+- La topología dedicada de assets ya no es una decisión futura; quedó provisionada y en uso:
+  - `efeonce-group-greenhouse-public-media-dev`
+  - `efeonce-group-greenhouse-public-media-staging`
+  - `efeonce-group-greenhouse-public-media-prod`
+  - `efeonce-group-greenhouse-private-assets-dev`
+  - `efeonce-group-greenhouse-private-assets-staging`
+  - `efeonce-group-greenhouse-private-assets-prod`
+- Verificación operativa ejecutada en GCP:
+  - upload autenticado a bucket público: `200`
+  - upload autenticado a bucket privado: `200`
+  - lectura anónima en bucket público: `200`
+  - lectura anónima en bucket privado: `401`
+  - cleanup autenticado de probes: `204`
+- Estado efectivo de runtime:
+  - `development` usa buckets `dev`
+  - `staging` usa buckets `staging`
+  - `production` usa buckets `prod`
+  - `preview (develop)` usa buckets `staging`
+- Compatibilidad transicional:
+  - `GREENHOUSE_PUBLIC_MEDIA_BUCKET` es el carril canónico de media pública
+  - `GREENHOUSE_PRIVATE_ASSETS_BUCKET` es el carril canónico de adjuntos privados
+  - `GREENHOUSE_MEDIA_BUCKET` queda solo como fallback legacy para surfaces públicas aún no cortadas completamente
+
 ## Delta 2026-03-29 — Health runtime ya no degrada por perfiles Postgres de tooling
 
 - El repo cerró `TASK-131` para corregir el warning residual del health cloud.
