@@ -2,6 +2,10 @@
 
 ## Delta 2026-03-31
 
+- La foundation compartida de adjuntos, receipts y gobernanza GCP se separa a `TASK-173`.
+- Esta task conserva el dominio `expense reports`, approvals y reimbursement flow, pero debe consumir el contrato shared de assets/uploader en vez de definir storage base propio.
+- Los comprobantes deben leerse como `consumer` del patrón de `TASK-173`, no como owner del bucket/helper canónico.
+
 - Mantener la alineación con el patrón real del repo:
   - tablas de acciones dedicadas por dominio, no `greenhouse_hr.approval_actions` genérica
   - notifications vía outbox granular + `src/lib/sync/projections/notifications.ts`, no wiring manual inline por módulo
@@ -24,6 +28,7 @@ Implementar el **módulo de gastos y reembolsos** del HRIS en Greenhouse. Permit
 **El problema hoy:** Los reembolsos se gestionan por email y planillas. No hay trazabilidad, no hay flujo de aprobación estandarizado, y Finance registra los gastos manualmente.
 
 **La solución:** Un módulo con dos superficies:
+
 1. **`/my/expenses`** — Vista self-service donde el colaborador crea reportes de gastos, adjunta comprobantes y trackea el estado
 2. **`/hr/expenses`** — Vista admin donde HR y Finance ven, aprueban/rechazan y marcan como reembolsados
 
@@ -41,25 +46,25 @@ Implementar el **módulo de gastos y reembolsos** del HRIS en Greenhouse. Permit
 
 ### Documentos normativos
 
-| Documento | Qué aporta |
-|-----------|------------|
-| `Greenhouse_HRIS_Architecture_v1.md` | Schema DDL §4.3, elegibilidad §5, navegación §6 |
-| `CODEX_TASK_HR_Core_Module.md` | Approvals engine pattern, leave request flow |
-| `CODEX_TASK_Financial_Module.md` | `fin_expenses` table, expense types, Finance integration |
-| `FINANCE_DUAL_STORE_CUTOVER_V1.md` | Postgres-first writes for finance |
-| `Greenhouse_Nomenclatura_Portal_v3.md` | Constantes, colores |
+| Documento                              | Qué aporta                                               |
+| -------------------------------------- | -------------------------------------------------------- |
+| `Greenhouse_HRIS_Architecture_v1.md`   | Schema DDL §4.3, elegibilidad §5, navegación §6          |
+| `CODEX_TASK_HR_Core_Module.md`         | Approvals engine pattern, leave request flow             |
+| `CODEX_TASK_Financial_Module.md`       | `fin_expenses` table, expense types, Finance integration |
+| `FINANCE_DUAL_STORE_CUTOVER_V1.md`     | Postgres-first writes for finance                        |
+| `Greenhouse_Nomenclatura_Portal_v3.md` | Constantes, colores                                      |
 
 ---
 
 ## Dependencias
 
-| Dependencia | Estado | Impacto si no está |
-|---|---|---|
-| Fase 0.5 (contract types) | Prerequisito | Elegibilidad por `contract_type` |
-| Fase 1A (Document Vault) | Prerequisito | Reutiliza GCS bucket y `gcs-signed-urls.ts` |
-| `greenhouse_hr` schema | Existe | Tablas van aquí |
-| `greenhouse_finance.expenses` table | Existe | Link de reembolso crea registro aquí |
-| Approvals engine (`approval_actions`) | Existe | Se reutiliza para el flujo de aprobación |
+| Dependencia                           | Estado       | Impacto si no está                          |
+| ------------------------------------- | ------------ | ------------------------------------------- |
+| Fase 0.5 (contract types)             | Prerequisito | Elegibilidad por `contract_type`            |
+| Fase 1A (Document Vault)              | Prerequisito | Reutiliza GCS bucket y `gcs-signed-urls.ts` |
+| `greenhouse_hr` schema                | Existe       | Tablas van aquí                             |
+| `greenhouse_finance.expenses` table   | Existe       | Link de reembolso crea registro aquí        |
+| Approvals engine (`approval_actions`) | Existe       | Se reutiliza para el flujo de aprobación    |
 
 ---
 
@@ -87,35 +92,35 @@ INSERT INTO greenhouse_hr.expense_categories (category_id, category_name, descri
 
 ### B1. Categorías (config)
 
-| Endpoint | Method | Auth |
-|---|---|---|
-| `GET /api/hr/expenses/categories` | GET | Any authenticated |
-| `POST /api/hr/expenses/categories` | POST | `hr`, `admin` |
-| `PATCH /api/hr/expenses/categories/[categoryId]` | PATCH | `hr`, `admin` |
+| Endpoint                                         | Method | Auth              |
+| ------------------------------------------------ | ------ | ----------------- |
+| `GET /api/hr/expenses/categories`                | GET    | Any authenticated |
+| `POST /api/hr/expenses/categories`               | POST   | `hr`, `admin`     |
+| `PATCH /api/hr/expenses/categories/[categoryId]` | PATCH  | `hr`, `admin`     |
 
 ### B2. Reports (CRUD + workflow)
 
-| Endpoint | Method | Auth | Description |
-|---|---|---|---|
-| `GET /api/hr/expenses/reports` | GET | `collaborator` (own), `hr`/`finance`/`admin` (all) | List with filters |
-| `POST /api/hr/expenses/reports` | POST | `collaborator` | Create draft report |
-| `GET /api/hr/expenses/reports/[reportId]` | GET | Owner, `hr`, `finance`, `admin` | Detail with items |
-| `PATCH /api/hr/expenses/reports/[reportId]` | PATCH | Owner (only if draft) | Update title, period |
-| `POST /api/hr/expenses/reports/[reportId]/submit` | POST | Owner | Submit for approval (draft → pending_supervisor) |
-| `POST /api/hr/expenses/reports/[reportId]/approve` | POST | Supervisor or Finance | Approve at current level |
-| `POST /api/hr/expenses/reports/[reportId]/reject` | POST | Supervisor or Finance | Reject with reason |
-| `POST /api/hr/expenses/reports/[reportId]/reimburse` | POST | `finance_admin`, `admin` | Mark as reimbursed → creates finance record |
-| `DELETE /api/hr/expenses/reports/[reportId]` | DELETE | Owner (only if draft) | Delete draft |
-| `GET /api/hr/expenses/reports/my` | GET | `collaborator` | My reports |
+| Endpoint                                             | Method | Auth                                               | Description                                      |
+| ---------------------------------------------------- | ------ | -------------------------------------------------- | ------------------------------------------------ |
+| `GET /api/hr/expenses/reports`                       | GET    | `collaborator` (own), `hr`/`finance`/`admin` (all) | List with filters                                |
+| `POST /api/hr/expenses/reports`                      | POST   | `collaborator`                                     | Create draft report                              |
+| `GET /api/hr/expenses/reports/[reportId]`            | GET    | Owner, `hr`, `finance`, `admin`                    | Detail with items                                |
+| `PATCH /api/hr/expenses/reports/[reportId]`          | PATCH  | Owner (only if draft)                              | Update title, period                             |
+| `POST /api/hr/expenses/reports/[reportId]/submit`    | POST   | Owner                                              | Submit for approval (draft → pending_supervisor) |
+| `POST /api/hr/expenses/reports/[reportId]/approve`   | POST   | Supervisor or Finance                              | Approve at current level                         |
+| `POST /api/hr/expenses/reports/[reportId]/reject`    | POST   | Supervisor or Finance                              | Reject with reason                               |
+| `POST /api/hr/expenses/reports/[reportId]/reimburse` | POST   | `finance_admin`, `admin`                           | Mark as reimbursed → creates finance record      |
+| `DELETE /api/hr/expenses/reports/[reportId]`         | DELETE | Owner (only if draft)                              | Delete draft                                     |
+| `GET /api/hr/expenses/reports/my`                    | GET    | `collaborator`                                     | My reports                                       |
 
 ### B3. Items (within report)
 
-| Endpoint | Method | Auth |
-|---|---|---|
-| `POST /api/hr/expenses/reports/[reportId]/items` | POST | Owner (only if draft) |
-| `PATCH /api/hr/expenses/reports/[reportId]/items/[itemId]` | PATCH | Owner (only if draft) |
-| `DELETE /api/hr/expenses/reports/[reportId]/items/[itemId]` | DELETE | Owner (only if draft) |
-| `POST /api/hr/expenses/reports/[reportId]/items/[itemId]/receipt-url` | POST | Owner | Signed URL for receipt upload |
+| Endpoint                                                              | Method | Auth                  |
+| --------------------------------------------------------------------- | ------ | --------------------- | ----------------------------- |
+| `POST /api/hr/expenses/reports/[reportId]/items`                      | POST   | Owner (only if draft) |
+| `PATCH /api/hr/expenses/reports/[reportId]/items/[itemId]`            | PATCH  | Owner (only if draft) |
+| `DELETE /api/hr/expenses/reports/[reportId]/items/[itemId]`           | DELETE | Owner (only if draft) |
+| `POST /api/hr/expenses/reports/[reportId]/items/[itemId]/receipt-url` | POST   | Owner                 | Signed URL for receipt upload |
 
 ### B4. Approval flow
 
@@ -139,6 +144,7 @@ Each action creates a row in `greenhouse_hr.approval_actions` with `request_type
 ### B5. Finance integration
 
 When an expense report reaches `reimbursed` status:
+
 1. Create a record in `greenhouse_finance.expenses` with:
    - `expense_type = 'reimbursement'`
    - `description = 'Reembolso: {report.title}'`
@@ -279,20 +285,25 @@ src/
 ## PARTE F: Orden de ejecución
 
 ### Fase 1: Infraestructura
+
 1. Crear 3 tablas PostgreSQL
 2. Insertar seed categorías
 3. Crear TypeScript types
 
 ### Fase 2: APIs — Categories + Reports CRUD
+
 4-9. Categories CRUD, Reports CRUD, Items CRUD
 
 ### Fase 3: APIs — Approval flow
+
 10-13. Submit, approve, reject, reimburse
 
 ### Fase 4: Finance integration
+
 14. `finance-integration.ts` — crear registro en `greenhouse_finance.expenses` on reimburse
 
 ### Fase 5: UI
+
 15-17. Self-service view, admin view, aprobaciones badge update
 
 ---
@@ -329,4 +340,4 @@ src/
 
 ---
 
-*Efeonce Greenhouse™ · Efeonce Group · Marzo 2026*
+_Efeonce Greenhouse™ · Efeonce Group · Marzo 2026_

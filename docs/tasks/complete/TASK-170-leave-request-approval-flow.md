@@ -12,6 +12,8 @@
 
 ## Delta 2026-03-31
 
+- El flow de `leave` quedó funcional con `attachmentUrl` transicional, pero la foundation compartida de adjuntos se deriva a `TASK-173`.
+- Esta task ya no debe expandirse creando un uploader/storage propio de `leave`; el cutover correcto es consumir la capability shared de assets/attachments cuando se materialice.
 - La task ya no debe leerse como “crear Permisos desde cero”.
 - El runtime real ya existe en PostgreSQL y UI:
   - `greenhouse_hr.leave_types`

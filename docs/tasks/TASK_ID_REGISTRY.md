@@ -222,3 +222,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-170` | `complete` | Leave Request & Approval Flow | `docs/tasks/complete/TASK-170-leave-request-approval-flow.md` |
 | `TASK-171` | `complete` | Access Model Hardening: Route Group Unification, Type Safety & Fallback Strategy | `docs/tasks/complete/TASK-171-access-model-hardening.md` |
 | `TASK-172` | `to-do` | Platform Hardening: CI Pipeline, Structured Logging, Test Coverage & Security Headers | `docs/tasks/to-do/TASK-172-platform-hardening-ci-observability-security.md` |
+| `TASK-173` | `to-do` | Shared Attachments Platform and GCP Bucket Governance | `docs/tasks/to-do/TASK-173-shared-attachments-platform-gcp-governance.md` |
