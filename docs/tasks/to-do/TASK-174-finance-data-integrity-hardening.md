@@ -1,3 +1,6 @@
+## Delta 2026-03-31
+- TASK-181 (Finance Clients → Organizations canonical source) impacta los endpoints de client creates/updates que esta task protege con transacciones e idempotency. Coordinar: si TASK-181 se ejecuta primero, los writes de clientes operan sobre `organizations` y `client_profiles` — las transacciones envolventes deben cubrir ambas tablas.
+
 # TASK-174 — Finance Data Integrity: Transactions, Idempotency & Concurrent Safety
 
 ## Status

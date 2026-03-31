@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-181`
+- siguiente ID disponible: `TASK-182`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -210,6 +210,7 @@ Primer bloque operativo asignado:
 | 49   | `TASK-178`                                                                                               | [TASK-178-finance-budget-engine.md](to-do/TASK-178-finance-budget-engine.md)                                                         | P2        | Alto       | Alto              | Diseño                                                                                                               | Budget engine: tabla versionada, CRUD API, variance analysis, forecast YTD, template from actual — cierra gap de management accounting sin presupuesto                                  |
 | 50   | `TASK-179`                                                                                               | [TASK-179-finance-reconciliation-cutover-hardening.md](to-do/TASK-179-finance-reconciliation-cutover-hardening.md)                   | P1        | Alto       | Medio             | Diseño                                                                                                               | Cortar reconciliacion a Postgres-only (ultimo componente dual-write), hardening HubSpot schema validation, cleanup BigQuery write flag                                                   |
 | 51   | `TASK-180`                                                                                               | [TASK-180-hr-departments-postgres-runtime-cutover.md](to-do/TASK-180-hr-departments-postgres-runtime-cutover.md)                     | P1        | Alto       | Medio             | Diseño                                                                                                               | Cortar `HR > Departments` a PostgreSQL, alinear `greenhouse_core.departments` con `members` y retirar el write path legacy sobre BigQuery                                               |
+| 52   | `TASK-181`                                                                                               | [TASK-181-finance-clients-organization-canonical-source.md](to-do/TASK-181-finance-clients-organization-canonical-source.md)         | P1        | Alto       | Medio             | Diseño                                                                                                               | Re-apuntar Finance Clients de `greenhouse_core.clients` (tenants) a `greenhouse_core.organizations WHERE organization_type IN ('client','both')` — alinear con 360 Object Model         |
 
 ### Briefs Históricos o de Producto
 

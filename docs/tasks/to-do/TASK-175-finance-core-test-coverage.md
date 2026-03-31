@@ -1,3 +1,6 @@
+## Delta 2026-03-31
+- TASK-181 (Finance Clients → Organizations canonical source) reescribira queries en `canonical.ts` y `route.ts` de clients. Los tests que esta task cree para esos archivos deben considerar que el anchor cambiara de `greenhouse_core.clients` a `greenhouse_core.organizations`. Recomendacion: ejecutar TASK-181 antes o coordinar para que los tests se escriban contra la fuente canonica final.
+
 # TASK-175 — Finance Core Test Coverage & Regression Safety Net
 
 ## Status
