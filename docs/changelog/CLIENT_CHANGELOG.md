@@ -57,6 +57,7 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 - `Permisos` y `Purchase Orders` ya quedaron preparados para usar un uploader unificado en vez de depender de URLs manuales.
 - Los recibos y exportaciones de nómina convergen hacia el mismo contrato privado de archivos.
+- `HR > Permisos` ahora deja abrir el respaldo adjunto directamente desde `Revisar solicitud`, sin depender de rutas ocultas o lectura técnica del registro.
 
 ### Correcciones
 

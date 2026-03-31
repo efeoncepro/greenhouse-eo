@@ -4,6 +4,32 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-31 — HR leave review modal muestra respaldo adjunto
+
+### Objetivo
+
+- Hacer visible el documento de respaldo dentro del modal `Revisar solicitud` en `HR > Permisos`.
+
+### Causa raíz confirmada
+
+- El backend ya persistía correctamente `attachment_asset_id` y `attachment_url`.
+- La UI de revisión no renderizaba ningún bloque para `reviewReq.attachmentUrl`, así que el archivo existía pero quedaba invisible para HR al revisar la solicitud.
+
+### Delta de ejecución
+
+- `src/views/greenhouse/hr-core/HrLeaveView.tsx` ahora renderiza una sección `Respaldo adjunto` dentro del modal de revisión.
+- La acción visible es `Abrir respaldo`, enlazando al download privado del asset en una nueva pestaña.
+- Se agregó regresión en `src/views/greenhouse/hr-core/HrLeaveView.test.tsx` para cubrir el flujo:
+  - carga de solicitudes
+  - apertura de `Revisar`
+  - presencia del CTA `Abrir respaldo`
+
+### Validación ejecutada
+
+- `pnpm exec vitest run src/views/greenhouse/hr-core/HrLeaveView.test.tsx src/lib/storage/greenhouse-assets-shared.test.ts src/app/api/assets/private/route.test.ts src/components/greenhouse/LeaveRequestDialog.test.tsx`
+- `pnpm exec eslint src/views/greenhouse/hr-core/HrLeaveView.tsx src/views/greenhouse/hr-core/HrLeaveView.test.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+
 ## Sesión 2026-03-31 — shared assets hardening para attach de leave
 
 ### Objetivo

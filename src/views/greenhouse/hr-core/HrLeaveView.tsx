@@ -620,6 +620,35 @@ const HrLeaveView = () => {
                       <Typography variant='body2'>{reviewReq.reason}</Typography>
                     </Box>
                   )}
+                  {reviewReq.attachmentUrl && (
+                    <Box sx={{ mt: 2.5, pt: 2.5, borderTop: theme => `1px solid ${theme.palette.divider}` }}>
+                      <Typography variant='caption' color='text.secondary' sx={{ textTransform: 'uppercase' }}>
+                        Respaldo adjunto
+                      </Typography>
+                      <Stack
+                        direction={{ xs: 'column', sm: 'row' }}
+                        spacing={1.5}
+                        justifyContent='space-between'
+                        alignItems={{ sm: 'center' }}
+                        sx={{ mt: 1 }}
+                      >
+                        <Typography variant='body2' color='text.secondary'>
+                          Esta solicitud incluye un documento de respaldo listo para revisión.
+                        </Typography>
+                        <Button
+                          component='a'
+                          href={reviewReq.attachmentUrl}
+                          target='_blank'
+                          rel='noreferrer'
+                          variant='tonal'
+                          size='small'
+                          startIcon={<i className='tabler-paperclip' />}
+                        >
+                          Abrir respaldo
+                        </Button>
+                      </Stack>
+                    </Box>
+                  )}
                 </CardContent>
               </Card>
 

@@ -2,6 +2,10 @@
 
 ## 2026-03-31
 
+- `HR > Permisos` ahora muestra el respaldo adjunto dentro del modal `Revisar solicitud`:
+  - el backend ya guardaba `attachment_asset_id`, pero la UI no lo exponía
+  - se agregó CTA `Abrir respaldo` directo en la revisión HR
+  - queda cubierta con test de vista para evitar regresiones
 - Se endureció la foundation shared de adjuntos para evitar fallos al adjuntar respaldos de `leave` después de un upload exitoso:
   - `ownerClientId`, `ownerSpaceId` y `ownerMemberId` ahora se normalizan en la capa shared antes de tocar FKs
   - esto corrige el caso de usuarios internos cuyo `tenant.clientId` llega como cadena vacía `''`
