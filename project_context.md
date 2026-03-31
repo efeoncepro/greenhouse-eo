@@ -3,9 +3,13 @@
 ## Delta 2026-03-31 Shared attachments and GCP bucket topology
 
 - Alineación operativa de entorno:
-  - `staging` y `production` ahora fijan `GREENHOUSE_PRIVATE_ASSETS_BUCKET=efeonce-group-greenhouse-media` en Vercel
-  - esto evita que el runtime derive buckets privados por entorno aún no provisionados en GCP
-  - la foundation shared de assets sigue vigente; el siguiente paso infra es provisionar los buckets dedicados `greenhouse-private-assets-{env}` y luego mover la config explícita
+  - `development`, `staging` y `production` ahora fijan en Vercel:
+    - `GREENHOUSE_PRIVATE_ASSETS_BUCKET=efeonce-group-greenhouse-media`
+    - `GREENHOUSE_PUBLIC_MEDIA_BUCKET=efeonce-group-greenhouse-media`
+  - `preview (develop)` quedó fijado con esos mismos valores para no depender del fallback por convención
+  - esto evita que el runtime derive buckets `public/private` por entorno aún no provisionados en GCP
+  - la foundation shared de assets sigue vigente; el siguiente paso infra es provisionar los buckets dedicados `greenhouse-public-media-{env}` y `greenhouse-private-assets-{env}` y luego mover la config explícita
+  - en este proyecto `Preview` no funciona como carril totalmente shared porque Vercel ya tiene múltiples env vars branch-scoped; por eso el baseline operativo mínimo quedó amarrado explícitamente a `develop`
 - Hotfix operativo:
   - los drafts de `leave` ya no dependen solamente de que la sesión exponga `tenant.memberId`
   - `/api/hr/core/meta` ahora entrega `currentMemberId` resuelto para superficies HR/My que necesiten ownership documental

@@ -56,14 +56,27 @@
 
 - Se confirmó un gap de infraestructura restante:
   - el runtime shared ya deriva `${GCP_PROJECT}-greenhouse-private-assets-{env}`
-  - pero `staging` y `production` no tenían `GREENHOUSE_PRIVATE_ASSETS_BUCKET` configurado y los buckets privados dedicados todavía no existen/provisionan como baseline real
+  - y también `${GCP_PROJECT}-greenhouse-public-media-{env}`
+  - pero los entornos activos todavía no tenían ambos env vars fijados de forma consistente mientras los buckets dedicados siguen sin existir/provisionar como baseline real
 - Mitigación operativa aplicada:
-  - `GREENHOUSE_PRIVATE_ASSETS_BUCKET=efeonce-group-greenhouse-media` en `staging`
-  - `GREENHOUSE_PRIVATE_ASSETS_BUCKET=efeonce-group-greenhouse-media` en `production`
+  - `GREENHOUSE_PRIVATE_ASSETS_BUCKET=efeonce-group-greenhouse-media` en:
+    - `development`
+    - `staging`
+    - `production`
+    - `preview (develop)`
+  - `GREENHOUSE_PUBLIC_MEDIA_BUCKET=efeonce-group-greenhouse-media` en:
+    - `development`
+    - `staging`
+    - `production`
+    - `preview (develop)`
 - Resultado:
   - el carril shared vuelve a apoyarse en el bucket operativo real mientras se completa la infraestructura dedicada
+  - se elimina el drift entre entornos visibles y el runtime deja de adivinar nombres de bucket inexistentes
+  - `staging` y `production` ya fueron redeployados y verificados sobre:
+    - `https://greenhouse-12ehg5shd-efeonce-7670142f.vercel.app`
+    - `https://greenhouse-cosgfclp0-efeonce-7670142f.vercel.app`
 - La task sigue `in-progress` porque aún falta:
-  - provisionar buckets privados por entorno como destino real de largo plazo
+  - provisionar buckets públicos y privados por entorno como destino real de largo plazo
   - ejecutar smoke autenticado final de upload/download con sesión real
 
 ## Delta 2026-03-31 — implementación en repo y limitación operativa real

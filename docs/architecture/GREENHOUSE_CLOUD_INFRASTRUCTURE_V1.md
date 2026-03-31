@@ -43,31 +43,43 @@
 ## Delta 2026-03-31 — Shared attachments bootstrap path
 
 El repo ya incluye el bootstrap canónico de la foundation shared:
+
 - `scripts/setup-postgres-shared-assets.sql`
 - `scripts/setup-postgres-shared-assets.ts`
 - comando `pnpm setup:postgres:shared-assets`
 
 Estado real:
-- el DDL quedó listo para `migrator`
-- en esta sesión no quedó aplicado remotamente en Cloud SQL porque faltó acceso al secreto `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD`
+
+- el DDL ya quedó aplicado remotamente en `greenhouse-pg-dev / greenhouse_app`
+- `greenhouse_sync.schema_migrations` ya registra `shared-assets-platform-v1`
+- `greenhouse_migrator_user` ya puede reejecutar `pnpm setup:postgres:shared-assets` sin depender de `postgres`
 
 Regla operativa:
-- no declarar la lane cerrada en infraestructura hasta correr el setup con `migrator`
-- no promover consumers que dependan de esas columnas/FKs en entornos compartidos sin ese bootstrap aplicado
 
-## Delta 2026-03-31 — Runtime bucket pinning while dedicated private buckets remain pending
+- no volver a introducir ownership drift en tablas shared que bloquee la reejecución con `migrator`
+- no promover consumers que dependan de buckets dedicados por entorno hasta que esos buckets existan realmente en GCP
+
+## Delta 2026-03-31 — Runtime bucket pinning while dedicated buckets remain pending
 
 - `GREENHOUSE_PRIVATE_ASSETS_BUCKET` quedó configurado explícitamente en Vercel para:
+  - `development`
   - `staging`
   - `production`
+  - `preview (develop)`
+- `GREENHOUSE_PUBLIC_MEDIA_BUCKET` quedó configurado explícitamente en Vercel para:
+  - `development`
+  - `staging`
+  - `production`
+  - `preview (develop)`
 - Valor operativo actual:
   - `efeonce-group-greenhouse-media`
 - Motivo:
-  - el runtime ya soporta buckets privados dedicados por entorno
-  - pero la infraestructura real de `greenhouse-private-assets-{env}` todavía no está provisionada como baseline compartida
+  - el runtime ya soporta buckets públicos/privados dedicados por entorno
+  - pero la infraestructura real de `greenhouse-public-media-{env}` y `greenhouse-private-assets-{env}` todavía no está provisionada como baseline compartida
 - Regla:
   - mientras esos buckets no existan realmente en GCP, no dejar el runtime derivando nombres por convención
   - usar env explícita apuntando al bucket operativo vigente
+  - en este proyecto `Preview` no debe asumirse como entorno shared puro: la presencia de env vars branch-scoped obliga a fijar como mínimo `preview (develop)` si queremos un baseline consistente
 
 ## Delta 2026-03-29 — Secret Manager rollout validated in staging + production
 
@@ -85,7 +97,7 @@ Regla operativa:
   - `AZURE_AD_CLIENT_SECRET_SECRET_REF`
   - `GOOGLE_CLIENT_SECRET_SECRET_REF`
   - `NUBOX_BEARER_TOKEN_SECRET_REF`
-  para `staging` y `production`, sin retirar aún los env vars legacy.
+    para `staging` y `production`, sin retirar aún los env vars legacy.
 - Estado residual observado en `staging`:
   - `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` y `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` no están proyectados en el runtime del portal
 
@@ -179,11 +191,11 @@ Regla operativa:
 
 Greenhouse EO runs on **Google Cloud Platform** under the project **`efeonce-group`**, with Vercel handling the Next.js frontend and API routes. The workload is spread across three GCP regions chosen for latency, cost, and service availability:
 
-| Concern | Region | Rationale |
-|---------|--------|-----------|
-| Cloud SQL (PostgreSQL) | `us-east4` (Northern Virginia) | Low-latency transactional DB |
-| Cloud Run / Cloud Functions | `us-central1` (Iowa) | Broadest service catalog, default for serverless |
-| BigQuery | `US` (multi-region) | Maximizes co-location with Cloud Functions and analytics exports |
+| Concern                     | Region                         | Rationale                                                        |
+| --------------------------- | ------------------------------ | ---------------------------------------------------------------- |
+| Cloud SQL (PostgreSQL)      | `us-east4` (Northern Virginia) | Low-latency transactional DB                                     |
+| Cloud Run / Cloud Functions | `us-central1` (Iowa)           | Broadest service catalog, default for serverless                 |
+| BigQuery                    | `US` (multi-region)            | Maximizes co-location with Cloud Functions and analytics exports |
 
 All inter-service communication stays within GCP, except for Vercel-originated calls to Cloud Run/Cloud SQL and external webhook traffic from Notion, HubSpot, and Frame.io.
 
@@ -193,51 +205,51 @@ All inter-service communication stays within GCP, except for Vercel-originated c
 
 ### Instance Details
 
-| Property | Value |
-|----------|-------|
-| Instance name | `greenhouse-pg-dev` |
-| Engine | PostgreSQL **16.13** |
-| Zone | `us-east4-a` |
-| Machine type | `db-custom-1-3840` (1 vCPU, 3.75 GB RAM) |
-| Storage | 20 GB SSD, **auto-resize enabled** |
-| Public IP | `34.86.135.144` |
-| SSL mode | `ALLOW_UNENCRYPTED_AND_ENCRYPTED` |
-| `requireSsl` | `false` |
-| Authorized networks | `0.0.0.0/0` (**see Security Notes**) |
-| Backup window | Daily at **07:00 UTC**, 7-day retention |
-| PITR | `Enabled` |
-| WAL retention | `7 days` |
-| Replication log archiving | `Enabled` |
-| Database flags | `log_min_duration_statement=1000`, `log_statement=ddl` |
+| Property                  | Value                                                  |
+| ------------------------- | ------------------------------------------------------ |
+| Instance name             | `greenhouse-pg-dev`                                    |
+| Engine                    | PostgreSQL **16.13**                                   |
+| Zone                      | `us-east4-a`                                           |
+| Machine type              | `db-custom-1-3840` (1 vCPU, 3.75 GB RAM)               |
+| Storage                   | 20 GB SSD, **auto-resize enabled**                     |
+| Public IP                 | `34.86.135.144`                                        |
+| SSL mode                  | `ALLOW_UNENCRYPTED_AND_ENCRYPTED`                      |
+| `requireSsl`              | `false`                                                |
+| Authorized networks       | `0.0.0.0/0` (**see Security Notes**)                   |
+| Backup window             | Daily at **07:00 UTC**, 7-day retention                |
+| PITR                      | `Enabled`                                              |
+| WAL retention             | `7 days`                                               |
+| Replication log archiving | `Enabled`                                              |
+| Database flags            | `log_min_duration_statement=1000`, `log_statement=ddl` |
 
 ### Databases
 
-| Database | Role |
-|----------|------|
-| `postgres` | Default system database |
+| Database         | Role                                       |
+| ---------------- | ------------------------------------------ |
+| `postgres`       | Default system database                    |
 | `greenhouse_app` | Application database (all product schemas) |
 
 ### Schemas in `greenhouse_app`
 
-| Schema | Domain |
-|--------|--------|
-| `greenhouse_core` | Tenants, users, roles, permissions, feature flags |
-| `greenhouse_serving` | Materialized views and API-optimized projections |
-| `greenhouse_sync` | Outbox, watermarks, sync state |
-| `greenhouse_hr` | People, org charts, employment records |
-| `greenhouse_payroll` | Payroll entries, periods, calculations |
-| `greenhouse_finance` | Accounts, transactions, exchange rates, expenses |
-| `greenhouse_delivery` | Projects, tasks, sprints, capacity |
-| `greenhouse_crm` | Companies, contacts, deals (CRM mirror) |
-| `greenhouse_ai` | AI scoring, recommendations, embeddings |
+| Schema                | Domain                                            |
+| --------------------- | ------------------------------------------------- |
+| `greenhouse_core`     | Tenants, users, roles, permissions, feature flags |
+| `greenhouse_serving`  | Materialized views and API-optimized projections  |
+| `greenhouse_sync`     | Outbox, watermarks, sync state                    |
+| `greenhouse_hr`       | People, org charts, employment records            |
+| `greenhouse_payroll`  | Payroll entries, periods, calculations            |
+| `greenhouse_finance`  | Accounts, transactions, exchange rates, expenses  |
+| `greenhouse_delivery` | Projects, tasks, sprints, capacity                |
+| `greenhouse_crm`      | Companies, contacts, deals (CRM mirror)           |
+| `greenhouse_ai`       | AI scoring, recommendations, embeddings           |
 
 ### Access Model
 
-| Role | Purpose | Privileges |
-|------|---------|------------|
-| `postgres` | Superuser / admin | Full DDL + DML on all schemas |
-| `greenhouse_migrator` | Schema migrations (CI/CD) | DDL on application schemas |
-| `greenhouse_runtime` | Application runtime | DML only (SELECT, INSERT, UPDATE, DELETE) |
+| Role                  | Purpose                   | Privileges                                |
+| --------------------- | ------------------------- | ----------------------------------------- |
+| `postgres`            | Superuser / admin         | Full DDL + DML on all schemas             |
+| `greenhouse_migrator` | Schema migrations (CI/CD) | DDL on application schemas                |
+| `greenhouse_runtime`  | Application runtime       | DML only (SELECT, INSERT, UPDATE, DELETE) |
 
 ### Connectivity
 
@@ -248,23 +260,23 @@ All inter-service communication stays within GCP, except for Vercel-originated c
 
 ## 3. BigQuery Datasets
 
-The analytics warehouse is organized into 13 datasets. Tables marked *legacy* are still queryable but are being superseded by the conformed layer.
+The analytics warehouse is organized into 13 datasets. Tables marked _legacy_ are still queryable but are being superseded by the conformed layer.
 
-| Dataset | Tables | Purpose | Status |
-|---------|--------|---------|--------|
-| `greenhouse` | 41 | Core platform tables: auth, finance, HR, payroll, AI, identity, service modules | **Active** |
-| `greenhouse_raw` | 11 | Immutable source snapshots — Notion (projects, tasks, sprints, people, databases), HubSpot (companies, contacts, deals, owners, line_items), Postgres outbox events | **Active** |
-| `greenhouse_conformed` | 6 | Normalized analytical tables: `delivery_projects`, `delivery_tasks`, `delivery_sprints`, `crm_companies`, `crm_deals`, `crm_contacts`. Partitioned by `synced_at`, clustered by key dimensions | **Active** |
-| `greenhouse_marts` | 5 views | Outbox-derived marts: `fin_accounts_from_outbox`, `fin_expenses_from_outbox`, `payroll_entries_from_outbox`, `outbox_entity_latest`, `outbox_event_volume` | **Active** |
-| `ico_engine` | 5 tables + 2 views | ICO metrics engine: `metric_snapshots_monthly` (range-partitioned by year), `ai_metric_scores`, `stuck_assets_detail`, `rpa_trend`, `metrics_by_project`; views `v_tasks_enriched`, `v_metric_latest` | **Active** |
-| `hubspot_crm` | 35 | HubSpot CRM mirror — companies, contacts, deals, owners, leads, line_items, quotes, products, pipelines, tickets, calls, emails, meetings, notes, tasks + `*_history` tables + `integration_bridge_log` + `greenhouse_capability_catalog` + `greenhouse_tenant_pulls` + `sync_log` | **Active** (legacy, being replaced by `greenhouse_conformed`) |
-| `notion_ops` | 10 | Legacy Notion sync — `proyectos`, `tareas`, `sprints`, `revisiones` + `stg_*` staging tables + `raw_pages_snapshot` + `sync_log` | **Active** (legacy, being replaced by `greenhouse_conformed`) |
-| `hubspot_notion_sync` | 3 | HubSpot to Notion deal sync: `project_anchor_registry`, `sync_log`, `sync_watermark` | **Active** |
-| `notion_hubspot_reverse_sync` | 2 | Notion to HubSpot reverse sync: `sync_log`, `sync_watermark` | **Active** |
-| `hubspot_notion_sync_staging` | 3 | Staging variant of deal sync | **Staging** |
-| `notion_hubspot_sync_staging` | 2 | Staging variant of reverse sync | **Staging** |
-| `analytics_486264460` | 50+ daily | Google Analytics 4 event exports (`events_YYYYMMDD` sharded tables, accumulating since December 2025) | **Active** (external) |
-| `searchconsole` | 3 | Google Search Console data: `ExportLog`, `searchdata_site_impression`, `searchdata_url_impression` | **Active** (external) |
+| Dataset                       | Tables             | Purpose                                                                                                                                                                                                                                                                            | Status                                                        |
+| ----------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| `greenhouse`                  | 41                 | Core platform tables: auth, finance, HR, payroll, AI, identity, service modules                                                                                                                                                                                                    | **Active**                                                    |
+| `greenhouse_raw`              | 11                 | Immutable source snapshots — Notion (projects, tasks, sprints, people, databases), HubSpot (companies, contacts, deals, owners, line_items), Postgres outbox events                                                                                                                | **Active**                                                    |
+| `greenhouse_conformed`        | 6                  | Normalized analytical tables: `delivery_projects`, `delivery_tasks`, `delivery_sprints`, `crm_companies`, `crm_deals`, `crm_contacts`. Partitioned by `synced_at`, clustered by key dimensions                                                                                     | **Active**                                                    |
+| `greenhouse_marts`            | 5 views            | Outbox-derived marts: `fin_accounts_from_outbox`, `fin_expenses_from_outbox`, `payroll_entries_from_outbox`, `outbox_entity_latest`, `outbox_event_volume`                                                                                                                         | **Active**                                                    |
+| `ico_engine`                  | 5 tables + 2 views | ICO metrics engine: `metric_snapshots_monthly` (range-partitioned by year), `ai_metric_scores`, `stuck_assets_detail`, `rpa_trend`, `metrics_by_project`; views `v_tasks_enriched`, `v_metric_latest`                                                                              | **Active**                                                    |
+| `hubspot_crm`                 | 35                 | HubSpot CRM mirror — companies, contacts, deals, owners, leads, line_items, quotes, products, pipelines, tickets, calls, emails, meetings, notes, tasks + `*_history` tables + `integration_bridge_log` + `greenhouse_capability_catalog` + `greenhouse_tenant_pulls` + `sync_log` | **Active** (legacy, being replaced by `greenhouse_conformed`) |
+| `notion_ops`                  | 10                 | Legacy Notion sync — `proyectos`, `tareas`, `sprints`, `revisiones` + `stg_*` staging tables + `raw_pages_snapshot` + `sync_log`                                                                                                                                                   | **Active** (legacy, being replaced by `greenhouse_conformed`) |
+| `hubspot_notion_sync`         | 3                  | HubSpot to Notion deal sync: `project_anchor_registry`, `sync_log`, `sync_watermark`                                                                                                                                                                                               | **Active**                                                    |
+| `notion_hubspot_reverse_sync` | 2                  | Notion to HubSpot reverse sync: `sync_log`, `sync_watermark`                                                                                                                                                                                                                       | **Active**                                                    |
+| `hubspot_notion_sync_staging` | 3                  | Staging variant of deal sync                                                                                                                                                                                                                                                       | **Staging**                                                   |
+| `notion_hubspot_sync_staging` | 2                  | Staging variant of reverse sync                                                                                                                                                                                                                                                    | **Staging**                                                   |
+| `analytics_486264460`         | 50+ daily          | Google Analytics 4 event exports (`events_YYYYMMDD` sharded tables, accumulating since December 2025)                                                                                                                                                                              | **Active** (external)                                         |
+| `searchconsole`               | 3                  | Google Search Console data: `ExportLog`, `searchdata_site_impression`, `searchdata_url_impression`                                                                                                                                                                                 | **Active** (external)                                         |
 
 ### Dataset Lineage
 
@@ -283,83 +295,83 @@ notion_ops  (legacy)   ─┤──►  greenhouse_conformed (replacement target
 
 #### 1. notion-bq-sync
 
-| Property | Value |
-|----------|-------|
-| Type | Custom Cloud Run service |
-| Purpose | Multi-tenant Notion to BigQuery sync. Pulls projects, tasks, sprints, and reviews from Notion workspaces and writes to `greenhouse_raw` + `greenhouse_conformed` tables. |
+| Property | Value                                                                                                                                                                    |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Type     | Custom Cloud Run service                                                                                                                                                 |
+| Purpose  | Multi-tenant Notion to BigQuery sync. Pulls projects, tasks, sprints, and reviews from Notion workspaces and writes to `greenhouse_raw` + `greenhouse_conformed` tables. |
 
 #### 2. hubspot-bq-sync
 
-| Property | Value |
-|----------|-------|
-| Type | Cloud Function (Gen 2) |
-| Runtime | Python 3.12 |
-| Memory | 1024 MB |
-| Max instances | 3 |
-| Secrets | `GREENHOUSE_INTEGRATION_API_TOKEN` (Secret Manager) |
-| Purpose | Full HubSpot CRM sync to BigQuery. Pulls all CRM object types into `hubspot_crm` and `greenhouse_raw`. |
+| Property      | Value                                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------------------------ |
+| Type          | Cloud Function (Gen 2)                                                                                 |
+| Runtime       | Python 3.12                                                                                            |
+| Memory        | 1024 MB                                                                                                |
+| Max instances | 3                                                                                                      |
+| Secrets       | `GREENHOUSE_INTEGRATION_API_TOKEN` (Secret Manager)                                                    |
+| Purpose       | Full HubSpot CRM sync to BigQuery. Pulls all CRM object types into `hubspot_crm` and `greenhouse_raw`. |
 
 #### 3. hubspot-greenhouse-integration
 
-| Property | Value |
-|----------|-------|
-| Type | Custom Cloud Run service |
-| Purpose | Bidirectional HubSpot and Greenhouse integration. Manages company profiles, contacts, and owners. Called from the Next.js application layer. |
+| Property | Value                                                                                                                                        |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Type     | Custom Cloud Run service                                                                                                                     |
+| Purpose  | Bidirectional HubSpot and Greenhouse integration. Manages company profiles, contacts, and owners. Called from the Next.js application layer. |
 
 #### 4. hubspot-notion-deal-sync
 
-| Property | Value |
-|----------|-------|
-| Type | Cloud Function (Gen 2) |
-| Runtime | Python 3.12 |
-| Memory | 512 MB |
-| Max instances | 5 |
-| Timeout | 600 s |
-| BQ dataset | `hubspot_notion_sync` |
-| Purpose | Syncs HubSpot deals to Notion project pages. Polls for new/updated deals and creates or updates corresponding Notion pages. |
+| Property      | Value                                                                                                                       |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Type          | Cloud Function (Gen 2)                                                                                                      |
+| Runtime       | Python 3.12                                                                                                                 |
+| Memory        | 512 MB                                                                                                                      |
+| Max instances | 5                                                                                                                           |
+| Timeout       | 600 s                                                                                                                       |
+| BQ dataset    | `hubspot_notion_sync`                                                                                                       |
+| Purpose       | Syncs HubSpot deals to Notion project pages. Polls for new/updated deals and creates or updates corresponding Notion pages. |
 
 #### 5. notion-hubspot-reverse-sync
 
-| Property | Value |
-|----------|-------|
-| Type | Cloud Function (Gen 2) |
-| Runtime | Python 3.12 |
-| Memory | 512 MB |
-| Max instances | 5 |
-| Timeout | 300 s |
-| BQ dataset | `notion_hubspot_reverse_sync` |
-| Purpose | Reverse sync: Notion task property changes are pushed back to HubSpot deal properties. |
+| Property      | Value                                                                                  |
+| ------------- | -------------------------------------------------------------------------------------- |
+| Type          | Cloud Function (Gen 2)                                                                 |
+| Runtime       | Python 3.12                                                                            |
+| Memory        | 512 MB                                                                                 |
+| Max instances | 5                                                                                      |
+| Timeout       | 300 s                                                                                  |
+| BQ dataset    | `notion_hubspot_reverse_sync`                                                          |
+| Purpose       | Reverse sync: Notion task property changes are pushed back to HubSpot deal properties. |
 
 #### 6. notion-frameio-sync
 
-| Property | Value |
-|----------|-------|
-| Type | Cloud Function (Gen 2) |
-| Runtime | Python 3.12 |
-| Memory | 256 MB |
-| Max instances | 10 |
-| Timeout | 60 s |
-| Purpose | Syncs Frame.io review statuses to Notion page properties. Keeps creative review state in sync across both platforms. |
+| Property      | Value                                                                                                                |
+| ------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Type          | Cloud Function (Gen 2)                                                                                               |
+| Runtime       | Python 3.12                                                                                                          |
+| Memory        | 256 MB                                                                                                               |
+| Max instances | 10                                                                                                                   |
+| Timeout       | 60 s                                                                                                                 |
+| Purpose       | Syncs Frame.io review statuses to Notion page properties. Keeps creative review state in sync across both platforms. |
 
 #### 7. notion-teams-notify
 
-| Property | Value |
-|----------|-------|
-| Type | Cloud Function (Gen 2) |
-| Runtime | Python 3.12 |
-| Memory | 256 MB |
-| Max instances | 5 |
-| Timeout | 30 s |
-| Secrets | `MS_CLIENT_SECRET`, `NOTION_TOKEN` (Secret Manager) |
-| Purpose | Sends Microsoft Teams channel notifications triggered by Notion task events (assignments, status changes, due-date alerts). |
+| Property      | Value                                                                                                                       |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Type          | Cloud Function (Gen 2)                                                                                                      |
+| Runtime       | Python 3.12                                                                                                                 |
+| Memory        | 256 MB                                                                                                                      |
+| Max instances | 5                                                                                                                           |
+| Timeout       | 30 s                                                                                                                        |
+| Secrets       | `MS_CLIENT_SECRET`, `NOTION_TOKEN` (Secret Manager)                                                                         |
+| Purpose       | Sends Microsoft Teams channel notifications triggered by Notion task events (assignments, status changes, due-date alerts). |
 
 ### Staging Services
 
-| # | Service | Mirrors |
-|---|---------|---------|
-| 8 | `hubspot-notion-deal-sync-staging` | `hubspot-notion-deal-sync` |
-| 9 | `notion-frameio-sync-staging` | `notion-frameio-sync` |
-| 10 | `notion-hubspot-reverse-sync-staging` | `notion-hubspot-reverse-sync` |
+| #   | Service                               | Mirrors                       |
+| --- | ------------------------------------- | ----------------------------- |
+| 8   | `hubspot-notion-deal-sync-staging`    | `hubspot-notion-deal-sync`    |
+| 9   | `notion-frameio-sync-staging`         | `notion-frameio-sync`         |
+| 10  | `notion-hubspot-reverse-sync-staging` | `notion-hubspot-reverse-sync` |
 
 Staging services share the same configuration as their production counterparts but target `*_staging` BigQuery datasets and are triggered by paused scheduler jobs (manually invocable for testing).
 
@@ -369,20 +381,20 @@ Staging services share the same configuration as their production counterparts b
 
 ### Active Jobs
 
-| Job | Schedule | Target Service | Timezone |
-|-----|----------|----------------|----------|
-| `notion-bq-daily-sync` | `0 3 * * *` (daily at 3:00 AM) | `notion-bq-sync` | America/Santiago |
-| `hubspot-bq-daily-sync` | `30 3 * * *` (daily at 3:30 AM) | `hubspot-bq-sync` | America/Santiago |
-| `hubspot-notion-deal-poll` | `*/15 * * * *` (every 15 min) | `hubspot-notion-deal-sync` | America/Santiago |
+| Job                           | Schedule                                             | Target Service                | Timezone         |
+| ----------------------------- | ---------------------------------------------------- | ----------------------------- | ---------------- |
+| `notion-bq-daily-sync`        | `0 3 * * *` (daily at 3:00 AM)                       | `notion-bq-sync`              | America/Santiago |
+| `hubspot-bq-daily-sync`       | `30 3 * * *` (daily at 3:30 AM)                      | `hubspot-bq-sync`             | America/Santiago |
+| `hubspot-notion-deal-poll`    | `*/15 * * * *` (every 15 min)                        | `hubspot-notion-deal-sync`    | America/Santiago |
 | `notion-hubspot-reverse-poll` | `7,22,37,52 * * * *` (every 15 min, offset by 7 min) | `notion-hubspot-reverse-sync` | America/Santiago |
 
 The 7-minute offset on `notion-hubspot-reverse-poll` prevents overlap with the forward sync job, reducing contention on shared Notion API rate limits.
 
 ### Paused Jobs (Staging)
 
-| Job | Schedule | Target Service |
-|-----|----------|----------------|
-| `hubspot-notion-deal-poll-staging` | `*/15 * * * *` | `hubspot-notion-deal-sync-staging` |
+| Job                                   | Schedule             | Target Service                        |
+| ------------------------------------- | -------------------- | ------------------------------------- |
+| `hubspot-notion-deal-poll-staging`    | `*/15 * * * *`       | `hubspot-notion-deal-sync-staging`    |
 | `notion-hubspot-reverse-poll-staging` | `7,22,37,52 * * * *` | `notion-hubspot-reverse-sync-staging` |
 
 ---
@@ -391,29 +403,29 @@ The 7-minute offset on `notion-hubspot-reverse-poll` prevents overlap with the f
 
 Defined in `vercel.json` at the repository root. These are Next.js API routes invoked by Vercel's built-in cron scheduler.
 
-| Path | Schedule (UTC) | Purpose |
-|------|----------------|---------|
-| `/api/cron/outbox-publish` | `*/5 * * * *` (every 5 min) | Consumes the Postgres transactional outbox and publishes events to BigQuery |
-| `/api/cron/outbox-react` | `*/5 * * * *` (every 5 min) | Processes reactive projections (all domains sequentially) |
-| `/api/cron/webhook-dispatch` | `*/2 * * * *` (every 2 min) | Dispatches pending outbound webhooks to subscribed endpoints |
-| `/api/cron/email-delivery-retry` | `*/5 * * * *` (every 5 min) | Retries failed email deliveries |
-| `/api/cron/projection-recovery` | `*/15 * * * *` (every 15 min) | Recovers orphaned projection refresh items stuck as pending/processing >30 min |
-| `/api/cron/sync-conformed` | `45 3 * * *` (daily 3:45 AM) | Transforms raw Notion data (`notion_ops`) into normalized conformed layer (`greenhouse_conformed`) with PostgreSQL projections. Runs after `notion-bq-sync` (3:00 AM) and before ICO materialization |
-| `/api/cron/ico-materialize` | `15 6 * * *` (daily 6:15 AM) | Materializes ICO Engine monthly metric snapshots from conformed and raw data |
-| `/api/cron/nubox-sync` | `30 7 * * *` (daily 7:30 AM) | Syncs Nubox DTE and financial data |
-| `/api/finance/exchange-rates/sync` | `5 23 * * *` (daily 11:05 PM) | Fetches latest currency exchange rates and persists to Postgres |
-| `/api/finance/economic-indicators/sync` | `5 23 * * *` (daily 11:05 PM) | Fetches economic indicators (UF, UTM, IPC) |
+| Path                                    | Schedule (UTC)                | Purpose                                                                                                                                                                                              |
+| --------------------------------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/api/cron/outbox-publish`              | `*/5 * * * *` (every 5 min)   | Consumes the Postgres transactional outbox and publishes events to BigQuery                                                                                                                          |
+| `/api/cron/outbox-react`                | `*/5 * * * *` (every 5 min)   | Processes reactive projections (all domains sequentially)                                                                                                                                            |
+| `/api/cron/webhook-dispatch`            | `*/2 * * * *` (every 2 min)   | Dispatches pending outbound webhooks to subscribed endpoints                                                                                                                                         |
+| `/api/cron/email-delivery-retry`        | `*/5 * * * *` (every 5 min)   | Retries failed email deliveries                                                                                                                                                                      |
+| `/api/cron/projection-recovery`         | `*/15 * * * *` (every 15 min) | Recovers orphaned projection refresh items stuck as pending/processing >30 min                                                                                                                       |
+| `/api/cron/sync-conformed`              | `45 3 * * *` (daily 3:45 AM)  | Transforms raw Notion data (`notion_ops`) into normalized conformed layer (`greenhouse_conformed`) with PostgreSQL projections. Runs after `notion-bq-sync` (3:00 AM) and before ICO materialization |
+| `/api/cron/ico-materialize`             | `15 6 * * *` (daily 6:15 AM)  | Materializes ICO Engine monthly metric snapshots from conformed and raw data                                                                                                                         |
+| `/api/cron/nubox-sync`                  | `30 7 * * *` (daily 7:30 AM)  | Syncs Nubox DTE and financial data                                                                                                                                                                   |
+| `/api/finance/exchange-rates/sync`      | `5 23 * * *` (daily 11:05 PM) | Fetches latest currency exchange rates and persists to Postgres                                                                                                                                      |
+| `/api/finance/economic-indicators/sync` | `5 23 * * *` (daily 11:05 PM) | Fetches economic indicators (UF, UTM, IPC)                                                                                                                                                           |
 
 ---
 
 ## 7. Vercel Deployment
 
-| Property | Value |
-|----------|-------|
-| Production URL | `greenhouse.efeoncepro.com` |
-| Shared non-prod URL | `dev-greenhouse.efeoncepro.com` |
-| Framework | Next.js **16.1** with Turbopack |
-| Build system | Vercel (automatic deploys from Git) |
+| Property            | Value                               |
+| ------------------- | ----------------------------------- |
+| Production URL      | `greenhouse.efeoncepro.com`         |
+| Shared non-prod URL | `dev-greenhouse.efeoncepro.com`     |
+| Framework           | Next.js **16.1** with Turbopack     |
+| Build system        | Vercel (automatic deploys from Git) |
 
 ### Deployment Notes
 
@@ -423,17 +435,17 @@ Defined in `vercel.json` at the repository root. These are Next.js API routes in
 
 ### Key Environment Variables
 
-| Variable | Purpose |
-|----------|---------|
-| `NEXTAUTH_SECRET` | NextAuth.js session encryption |
-| `AZURE_AD_CLIENT_ID`, `AZURE_AD_CLIENT_SECRET`, `AZURE_AD_TENANT_ID` | Azure AD SSO provider |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google OAuth provider |
-| `GCP_PROJECT` | Project ID efectivo para BigQuery/clients GCP |
-| `GCP_WORKLOAD_IDENTITY_PROVIDER` | Workload Identity Pool Provider resource name for Vercel OIDC |
-| `GCP_SERVICE_ACCOUNT_EMAIL` | Service account to impersonate from Vercel via WIF |
-| `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` | Cloud SQL instance connection name para Cloud SQL Connector |
-| `GOOGLE_APPLICATION_CREDENTIALS_JSON` | Transitional fallback SA key for Preview/local or runtimes where WIF is not yet active |
-| `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64` | Transitional fallback SA key variant |
+| Variable                                                             | Purpose                                                                                |
+| -------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `NEXTAUTH_SECRET`                                                    | NextAuth.js session encryption                                                         |
+| `AZURE_AD_CLIENT_ID`, `AZURE_AD_CLIENT_SECRET`, `AZURE_AD_TENANT_ID` | Azure AD SSO provider                                                                  |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`                           | Google OAuth provider                                                                  |
+| `GCP_PROJECT`                                                        | Project ID efectivo para BigQuery/clients GCP                                          |
+| `GCP_WORKLOAD_IDENTITY_PROVIDER`                                     | Workload Identity Pool Provider resource name for Vercel OIDC                          |
+| `GCP_SERVICE_ACCOUNT_EMAIL`                                          | Service account to impersonate from Vercel via WIF                                     |
+| `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`                       | Cloud SQL instance connection name para Cloud SQL Connector                            |
+| `GOOGLE_APPLICATION_CREDENTIALS_JSON`                                | Transitional fallback SA key for Preview/local or runtimes where WIF is not yet active |
+| `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64`                         | Transitional fallback SA key variant                                                   |
 
 ---
 
@@ -441,9 +453,9 @@ Defined in `vercel.json` at the repository root. These are Next.js API routes in
 
 Secret Manager adoption is **partial**. Only two services currently use it:
 
-| Service | Secrets Managed |
-|---------|----------------|
-| `hubspot-bq-sync` | `GREENHOUSE_INTEGRATION_API_TOKEN` |
+| Service               | Secrets Managed                    |
+| --------------------- | ---------------------------------- |
+| `hubspot-bq-sync`     | `GREENHOUSE_INTEGRATION_API_TOKEN` |
 | `notion-teams-notify` | `MS_CLIENT_SECRET`, `NOTION_TOKEN` |
 
 All other Cloud Functions and Cloud Run services store API tokens and credentials as **plaintext environment variables** in their service configurations. See **Security Notes** for the recommended migration path.
@@ -457,18 +469,18 @@ All other Cloud Functions and Cloud Run services store API tokens and credential
 
 ### Current Gaps
 
-| Issue | Severity | Current State | Recommendation | Task |
-|-------|----------|---------------|----------------|------|
-| Cloud SQL authorized network | **High** | `0.0.0.0/0` — any IP can attempt connection | Restrict to Vercel edge IPs, Cloud Run egress, and developer VPN CIDR blocks | TASK-096 Fase 1 |
-| Cloud SQL SSL enforcement | **Medium** | `ALLOW_UNENCRYPTED_AND_ENCRYPTED` — SSL optional | Set to `ENCRYPTED_ONLY` to enforce TLS for all connections | TASK-096 Fase 1 |
-| Plaintext API tokens | **Medium** | Most Cloud Functions store tokens in env vars | Migrate critical secrets to Secret Manager | TASK-096 Fase 3 |
-| Cloud SQL Connector adoption | **Low** | Preview WIF path ya quedó validado con connector, pero `develop/dev-greenhouse` sigue observándose con host directo | Estandarizar connector en el entorno compartido antes del hardening externo | TASK-096 Fase 2 |
-| Service account key in Vercel | **Medium** | WIF ya existe y quedó validado en preview, pero la SA key sigue presente como fallback transicional | Retirar la SA key después de validar entorno compartido y producción | TASK-096 Fase 2 |
-| No security headers | **Medium** | No middleware.ts, no CSP/HSTS/X-Frame-Options | Create middleware.ts with security headers | TASK-099 |
-| Silent production failures | **High** | console.error() only, zero alerting | Sentry + health endpoint + Slack alerts | TASK-098 |
-| Inconsistent cron auth | **Medium** | 2 patterns, some fail-open, no timing-safe | Centralized requireCronAuth() helper | TASK-101 |
-| Restore test pendiente | **Resolved** | Restore test ya quedó verificado con clone efímero y evidencia SQL documentada | Mantener runbook y repetir ante cambios mayores de postura | TASK-102 |
-| No cost visibility | **Low** | Zero budget alerts | GCP budget alerts + BigQuery cost guards | TASK-103 |
+| Issue                         | Severity     | Current State                                                                                                       | Recommendation                                                               | Task            |
+| ----------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | --------------- |
+| Cloud SQL authorized network  | **High**     | `0.0.0.0/0` — any IP can attempt connection                                                                         | Restrict to Vercel edge IPs, Cloud Run egress, and developer VPN CIDR blocks | TASK-096 Fase 1 |
+| Cloud SQL SSL enforcement     | **Medium**   | `ALLOW_UNENCRYPTED_AND_ENCRYPTED` — SSL optional                                                                    | Set to `ENCRYPTED_ONLY` to enforce TLS for all connections                   | TASK-096 Fase 1 |
+| Plaintext API tokens          | **Medium**   | Most Cloud Functions store tokens in env vars                                                                       | Migrate critical secrets to Secret Manager                                   | TASK-096 Fase 3 |
+| Cloud SQL Connector adoption  | **Low**      | Preview WIF path ya quedó validado con connector, pero `develop/dev-greenhouse` sigue observándose con host directo | Estandarizar connector en el entorno compartido antes del hardening externo  | TASK-096 Fase 2 |
+| Service account key in Vercel | **Medium**   | WIF ya existe y quedó validado en preview, pero la SA key sigue presente como fallback transicional                 | Retirar la SA key después de validar entorno compartido y producción         | TASK-096 Fase 2 |
+| No security headers           | **Medium**   | No middleware.ts, no CSP/HSTS/X-Frame-Options                                                                       | Create middleware.ts with security headers                                   | TASK-099        |
+| Silent production failures    | **High**     | console.error() only, zero alerting                                                                                 | Sentry + health endpoint + Slack alerts                                      | TASK-098        |
+| Inconsistent cron auth        | **Medium**   | 2 patterns, some fail-open, no timing-safe                                                                          | Centralized requireCronAuth() helper                                         | TASK-101        |
+| Restore test pendiente        | **Resolved** | Restore test ya quedó verificado con clone efímero y evidencia SQL documentada                                      | Mantener runbook y repetir ante cambios mayores de postura                   | TASK-102        |
+| No cost visibility            | **Low**      | Zero budget alerts                                                                                                  | GCP budget alerts + BigQuery cost guards                                     | TASK-103        |
 
 ### Priority Actions
 
@@ -560,4 +572,4 @@ All other Cloud Functions and Cloud Run services store API tokens and credential
 
 ---
 
-*End of document.*
+_End of document._

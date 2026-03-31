@@ -2,6 +2,11 @@
 
 ## 2026-03-31
 
+- Se alineó el runtime de storage en Vercel para evitar drift entre código y cloud real:
+  - `GREENHOUSE_PRIVATE_ASSETS_BUCKET=efeonce-group-greenhouse-media` quedó explícito en `development`, `staging`, `production` y `preview (develop)`
+  - `GREENHOUSE_PUBLIC_MEDIA_BUCKET=efeonce-group-greenhouse-media` quedó explícito en `development`, `staging`, `production` y `preview (develop)`
+  - esto evita que el runtime derive buckets `greenhouse-public-media-*` y `greenhouse-private-assets-*` que todavía no existen/provisionan como baseline real
+  - ambos nombres de bucket quedan documentados como configuración de entorno, no secretos
 - `TASK-173` ya cerró el pendiente remoto en Cloud SQL:
   - `pnpm setup:postgres:shared-assets` quedó aplicado realmente en `greenhouse-pg-dev / greenhouse_app`
   - se validó `shared-assets-platform-v1` en `greenhouse_sync.schema_migrations`
@@ -3747,6 +3752,7 @@
 - `TASK-162` agregó la materialización inicial `greenhouse_serving.commercial_cost_attribution`; la capa de attribution ya es serving-first con fallback a recompute y `materializeOperationalPl()` la rematerializa antes del snapshot de P&L.
 - `TASK-162` sumó wiring reactivo dedicado: nueva projection `commercial_cost_attribution`, registro en el projection registry y evento `accounting.commercial_cost_attribution.materialized` para desacoplar la capa del refresh exclusivo de `operational_pl`.
 - `TASK-162` agregó health semántico y explain surface mínima para commercial cost attribution, con APIs dedicadas y chequeo de freshness en `/api/cron/materialization-health`.
+
 # 2026-03-31
 
 - Infra/runtime de assets privados:
