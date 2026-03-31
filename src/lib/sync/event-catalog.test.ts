@@ -53,4 +53,9 @@ describe('event catalog', () => {
     expect(REACTIVE_EVENT_TYPES).toContain('staff_aug.placement.created')
     expect(REACTIVE_EVENT_TYPES).toContain('staff_aug.placement.updated')
   })
+
+  it('includes leave payroll impact events in both event catalog and reactive triggers', () => {
+    expect(EVENT_TYPES.leaveRequestPayrollImpactDetected).toBe('leave_request.payroll_impact_detected')
+    expect(REACTIVE_EVENT_TYPES).toContain('leave_request.payroll_impact_detected')
+  })
 })

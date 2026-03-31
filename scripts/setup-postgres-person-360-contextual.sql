@@ -155,7 +155,9 @@ SELECT
   COALESCE(bal.vacation_used, 0)        AS vacation_used,
   COALESCE(bal.vacation_reserved, 0)    AS vacation_reserved,
   COALESCE(bal.vacation_allowance, 0)
+    + COALESCE(bal.vacation_progressive, 0)
     + COALESCE(bal.vacation_carried, 0)
+    + COALESCE(bal.vacation_adjustment, 0)
     - COALESCE(bal.vacation_used, 0)
     - COALESCE(bal.vacation_reserved, 0) AS vacation_available,
   COALESCE(bal.personal_allowance, 0)   AS personal_allowance,
@@ -187,7 +189,9 @@ LEFT JOIN greenhouse_core.members AS mgr
 LEFT JOIN LATERAL (
   SELECT
     SUM(lb.allowance_days) FILTER (WHERE lb.leave_type_code = 'vacation')      AS vacation_allowance,
+    SUM(lb.progressive_extra_days) FILTER (WHERE lb.leave_type_code = 'vacation') AS vacation_progressive,
     SUM(lb.carried_over_days) FILTER (WHERE lb.leave_type_code = 'vacation')   AS vacation_carried,
+    SUM(lb.adjustment_days) FILTER (WHERE lb.leave_type_code = 'vacation')     AS vacation_adjustment,
     SUM(lb.used_days) FILTER (WHERE lb.leave_type_code = 'vacation')           AS vacation_used,
     SUM(lb.reserved_days) FILTER (WHERE lb.leave_type_code = 'vacation')       AS vacation_reserved,
     SUM(lb.allowance_days) FILTER (WHERE lb.leave_type_code = 'personal')      AS personal_allowance,

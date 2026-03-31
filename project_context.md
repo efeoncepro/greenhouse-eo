@@ -1967,6 +1967,34 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - sólo `HR > Permisos` quedó cortado a PostgreSQL
   - `departamentos`, `member profile` y `attendance` siguen en BigQuery, pero ya sin bootstraps mutantes en navegación normal
 
+## Delta 2026-03-31 HR leave policy, calendar and payroll impact hardening
+- `HR > Permisos` ya no depende de `requestedDays` enviado por el caller:
+  - los días hábiles se derivan desde `src/lib/hr-core/leave-domain.ts`
+  - esa capa se apoya en el calendario operativo canónico y en `Nager.Date` para feriados Chile
+- El dominio `greenhouse_hr` suma `leave_policies` como capa explícita de policy para leave.
+- `/api/hr/core/leave/calendar` queda disponible como source canónica del calendario de ausencias del equipo.
+- `/api/my/leave` deja de ser solo balances y ahora devuelve también `requests` + `calendar`.
+- El setup real del dominio quedó aplicado en `greenhouse-pg-dev / greenhouse_app`:
+  - `pnpm setup:postgres:hr-leave`
+  - `pnpm setup:postgres:person-360-contextual`
+  - validación runtime posterior: `leave_policies=10`, `leave_types=10`, `leave_balances=4`
+- El outbox de leave ahora emite:
+  - `leave_request.created`
+  - `leave_request.escalated_to_hr`
+  - `leave_request.approved`
+  - `leave_request.rejected`
+  - `leave_request.cancelled`
+  - `leave_request.payroll_impact_detected`
+- Regla arquitectónica vigente:
+  - leave no calcula costos ni provider/tooling directo
+  - el carril canónico es `leave -> payroll -> cost projections`
+- Cuando un permiso aprobado impacta un período de nómina no exportado:
+  - se recalcula payroll oficial desde la proyección reactiva `leave_payroll_recalculation`
+  - luego siguen reaccionando los consumers habituales de payroll/cost attribution
+- Cuando el período ya está `exported`, el sistema no recalculea automáticamente:
+  - emite alerta operativa para payroll/finance
+  - el ajuste queda como downstream manual/diferido por política
+
 ## Delta 2026-03-15 Data platform architecture and Cloud SQL foundation
 - Se agregó la arquitectura de datos objetivo en:
   - `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md`

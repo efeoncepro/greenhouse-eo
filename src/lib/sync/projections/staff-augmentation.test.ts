@@ -43,6 +43,7 @@ describe('staffAugPlacementProjection', () => {
     expect(STAFF_AUG_PLACEMENT_TRIGGER_EVENTS).toContain('staff_aug.placement.created')
     expect(STAFF_AUG_PLACEMENT_TRIGGER_EVENTS).toContain('assignment.updated')
     expect(STAFF_AUG_PLACEMENT_TRIGGER_EVENTS).toContain('finance.expense.updated')
+    expect(STAFF_AUG_PLACEMENT_TRIGGER_EVENTS).toContain('accounting.commercial_cost_attribution.materialized')
     expect(STAFF_AUG_PLACEMENT_TRIGGER_EVENTS).toContain('provider.tooling_snapshot.materialized')
     expect(STAFF_AUG_PLACEMENT_TRIGGER_EVENTS).toContain('payroll_period.exported')
     expect(staffAugPlacementProjection.domain).toBe('finance')

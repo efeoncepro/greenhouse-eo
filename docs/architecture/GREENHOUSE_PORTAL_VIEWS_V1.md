@@ -26,7 +26,7 @@ Catálogo de todas las vistas del portal organizadas por audiencia.
 | Mis Asignaciones | `/my/assignments` | Implementada | Clientes, FTE y capacidad personal; candidato a converger al snapshot `member_capacity_economics` |
 | Mi Desempeño | `/my/performance` | Implementada | ICO metrics, trend 6 meses, health, operational |
 | Mi Nómina | `/my/payroll` | Implementada | Liquidaciones, compensación, historial |
-| Mis Permisos | `/my/leave` | Implementada | Balance vacaciones, solicitudes |
+| Mis Permisos | `/my/leave` | Implementada | Balance, historial de solicitudes y calendario operativo de ausencias |
 | Mi Delivery | `/my/delivery` | Implementada | Proyectos propios, tasks, CRM |
 | Mi Organización | `/my/organization` | Implementada | Directorio de colegas, datos de la organización |
 | Configuración | `/my/settings` | Pendiente | Notificaciones, timezone |
@@ -63,7 +63,7 @@ Catálogo de todas las vistas del portal organizadas por audiencia.
 | `/api/my/assignments` | GET | Client assignments + capacity |
 | `/api/my/performance` | GET | ICO metrics + operational serving |
 | `/api/my/payroll` | GET | Payroll history + compensation |
-| `/api/my/leave` | GET | Leave balances |
+| `/api/my/leave` | GET | Leave balances + requests + calendar |
 | `/api/my/delivery` | GET | Projects, tasks, CRM |
 
 Todas las APIs `/api/my/*` resuelven `memberId` desde el JWT — sin parámetro URL. Esto previene estructuralmente que un colaborador vea datos de otro.

@@ -40,9 +40,12 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'
 import CustomTextField from '@core/components/mui/TextField'
 
+import GreenhouseCalendar from '@/components/greenhouse/GreenhouseCalendar'
+import LeaveRequestDialog from '@/components/greenhouse/LeaveRequestDialog'
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
 import type {
   HrApprovalAction,
+  HrLeaveCalendarResponse,
   HrLeaveRequest,
   HrLeaveRequestsResponse,
   HrLeaveBalancesResponse,
@@ -67,6 +70,11 @@ const getHrLeaveErrorMessage = (payload: { error?: string | null; code?: string 
   }
 }
 
+const getCalendarRangeForYear = (year: number) => ({
+  from: `${year}-01-01`,
+  to: `${year}-12-31`
+})
+
 const HrLeaveView = () => {
   const theme = useTheme()
   const [tab, setTab] = useState('requests')
@@ -74,6 +82,7 @@ const HrLeaveView = () => {
   const [error, setError] = useState<string | null>(null)
   const [reqData, setReqData] = useState<HrLeaveRequestsResponse | null>(null)
   const [balData, setBalData] = useState<HrLeaveBalancesResponse | null>(null)
+  const [calData, setCalData] = useState<HrLeaveCalendarResponse | null>(null)
   const [leaveTypes, setLeaveTypes] = useState<HrLeaveType[]>([])
 
   // Filters
@@ -83,11 +92,6 @@ const HrLeaveView = () => {
   // Create dialog
   const [createOpen, setCreateOpen] = useState(false)
   const [createSaving, setCreateSaving] = useState(false)
-  const [createType, setCreateType] = useState('')
-  const [createStart, setCreateStart] = useState('')
-  const [createEnd, setCreateEnd] = useState('')
-  const [createDays, setCreateDays] = useState<number | ''>(1)
-  const [createReason, setCreateReason] = useState('')
 
   // Review dialog
   const [reviewReq, setReviewReq] = useState<HrLeaveRequest | null>(null)
@@ -99,12 +103,14 @@ const HrLeaveView = () => {
   const fetchData = useCallback(async () => {
     try {
       const params = new URLSearchParams({ year: String(filterYear) })
+      const calendarRange = getCalendarRangeForYear(filterYear)
 
       if (filterStatus) params.set('status', filterStatus)
 
-      const [reqRes, balRes, metaRes] = await Promise.all([
+      const [reqRes, balRes, calRes, metaRes] = await Promise.all([
         fetch(`/api/hr/core/leave/requests?${params}`),
         fetch(`/api/hr/core/leave/balances?year=${filterYear}`),
+        fetch(`/api/hr/core/leave/calendar?from=${calendarRange.from}&to=${calendarRange.to}`),
         fetch('/api/hr/core/meta')
       ])
 
@@ -122,6 +128,14 @@ const HrLeaveView = () => {
         const payload = await balRes.json().catch(() => null)
 
         setError(current => current || getHrLeaveErrorMessage(payload, 'No fue posible cargar los saldos de permisos.'))
+      }
+
+      if (calRes.ok) {
+        setCalData(await calRes.json())
+      } else {
+        const payload = await calRes.json().catch(() => null)
+
+        setError(current => current || getHrLeaveErrorMessage(payload, 'No fue posible cargar el calendario de permisos.'))
       }
 
       if (metaRes.ok) {
@@ -142,15 +156,14 @@ const HrLeaveView = () => {
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  useEffect(() => {
-    if (!createOpen || createType || activeLeaveTypes.length === 0) {
-      return
-    }
-
-    setCreateType(activeLeaveTypes[0]?.leaveTypeCode ?? '')
-  }, [activeLeaveTypes, createOpen, createType])
-
-  const handleCreate = async () => {
+  const handleCreate = async (input: {
+    leaveTypeCode: string
+    startDate: string
+    endDate: string
+    reason?: string | null
+    attachmentUrl?: string | null
+    notes?: string | null
+  }) => {
     setCreateSaving(true)
     setError(null)
 
@@ -158,13 +171,7 @@ const HrLeaveView = () => {
       const res = await fetch('/api/hr/core/leave/requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          leaveTypeCode: createType,
-          startDate: createStart,
-          endDate: createEnd,
-          requestedDays: createDays,
-          reason: createReason || null
-        })
+        body: JSON.stringify(input)
       })
 
       if (!res.ok) {
@@ -176,12 +183,7 @@ const HrLeaveView = () => {
       }
 
       setCreateOpen(false)
-      setCreateType('')
-      setCreateStart('')
-      setCreateEnd('')
-      setCreateDays(1)
-      setCreateReason('')
-      fetchData()
+      await fetchData()
     } finally {
       setCreateSaving(false)
     }
@@ -324,6 +326,7 @@ const HrLeaveView = () => {
       <TabContext value={tab}>
         <CustomTabList onChange={(_, v) => setTab(v)} variant='scrollable'>
           <Tab value='requests' label='Solicitudes' icon={<i className='tabler-file-text' />} iconPosition='start' />
+          <Tab value='calendar' label='Calendario' icon={<i className='tabler-calendar-month' />} iconPosition='start' />
           <Tab value='balances' label='Saldos' icon={<i className='tabler-scale' />} iconPosition='start' />
         </CustomTabList>
 
@@ -462,6 +465,31 @@ const HrLeaveView = () => {
           </Card>
         </TabPanel>
 
+        <TabPanel value='calendar' sx={{ p: 0 }}>
+          <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+            <CardHeader
+              title='Calendario operativo de ausencias'
+              subheader={
+                calData?.holidaySource === 'empty-fallback'
+                  ? 'Feriados sin sincronizar desde Nager.Date; usando fallback vacío.'
+                  : 'Permisos y feriados derivados desde el calendario operativo canónico.'
+              }
+              avatar={
+                <Avatar variant='rounded' sx={{ bgcolor: 'info.lightOpacity' }}>
+                  <i className='tabler-calendar-month' style={{ fontSize: 22, color: 'var(--mui-palette-info-main)' }} />
+                </Avatar>
+              }
+            />
+            <Divider />
+            <CardContent>
+              <GreenhouseCalendar
+                events={calData?.events ?? []}
+                initialDate={calData?.from ?? `${filterYear}-01-01`}
+              />
+            </CardContent>
+          </Card>
+        </TabPanel>
+
         {/* Balances Tab */}
         <TabPanel value='balances' sx={{ p: 0 }}>
           <Grid container spacing={6}>
@@ -535,94 +563,13 @@ const HrLeaveView = () => {
         </TabPanel>
       </TabContext>
 
-      {/* Create Leave Dialog */}
-      <Dialog
+      <LeaveRequestDialog
         open={createOpen}
-        onClose={() => !createSaving && setCreateOpen(false)}
-        maxWidth='sm'
-        fullWidth
-        closeAfterTransition={false}
-      >
-        <DialogTitle>Solicitar permiso</DialogTitle>
-        <Divider />
-        <DialogContent>
-          <Stack spacing={3} sx={{ mt: 1 }}>
-            <CustomTextField
-              select
-              fullWidth
-              size='small'
-              label='Tipo de permiso'
-              value={createType}
-              onChange={e => setCreateType(e.target.value)}
-              helperText={activeLeaveTypes.length === 0 ? 'No hay tipos de permiso activos disponibles.' : undefined}
-              required
-            >
-              {activeLeaveTypes.length === 0 ? (
-                <MenuItem disabled value=''>
-                  No hay tipos disponibles
-                </MenuItem>
-              ) : (
-                activeLeaveTypes.map(lt => (
-                  <MenuItem key={lt.leaveTypeCode} value={lt.leaveTypeCode}>{lt.leaveTypeName}</MenuItem>
-                ))
-              )}
-            </CustomTextField>
-            <Grid container spacing={2}>
-              <Grid size={{ xs: 6 }}>
-                <CustomTextField
-                  fullWidth
-                  size='small'
-                  label='Desde'
-                  type='date'
-                  value={createStart}
-                  onChange={e => setCreateStart(e.target.value)}
-                  InputLabelProps={{ shrink: true }}
-                  required
-                />
-              </Grid>
-              <Grid size={{ xs: 6 }}>
-                <CustomTextField
-                  fullWidth
-                  size='small'
-                  label='Hasta'
-                  type='date'
-                  value={createEnd}
-                  onChange={e => setCreateEnd(e.target.value)}
-                  InputLabelProps={{ shrink: true }}
-                  required
-                />
-              </Grid>
-            </Grid>
-            <CustomTextField
-              fullWidth
-              size='small'
-              label='Días solicitados'
-              type='number'
-              value={createDays}
-              onChange={e => setCreateDays(e.target.value === '' ? '' : Number(e.target.value))}
-              inputProps={{ min: 0.5, step: 0.5 }}
-              required
-            />
-            <CustomTextField
-              fullWidth
-              size='small'
-              label='Motivo'
-              multiline
-              rows={2}
-              value={createReason}
-              onChange={e => setCreateReason(e.target.value)}
-            />
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button variant='tonal' color='secondary' onClick={() => setCreateOpen(false)} disabled={createSaving}>
-            Cancelar
-          </Button>
-          <Button variant='contained' onClick={handleCreate} disabled={createSaving || !createType || !createStart || !createEnd}>
-            {createSaving ? 'Enviando...' : 'Solicitar'}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        saving={createSaving}
+        leaveTypes={leaveTypes}
+        onClose={() => setCreateOpen(false)}
+        onSubmit={handleCreate}
+      />
 
       {/* Review Dialog */}
       <Dialog

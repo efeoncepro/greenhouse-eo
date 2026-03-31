@@ -13,13 +13,41 @@ CREATE TABLE IF NOT EXISTS greenhouse_hr.leave_types (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS greenhouse_hr.leave_policies (
+  policy_id TEXT PRIMARY KEY,
+  leave_type_code TEXT NOT NULL REFERENCES greenhouse_hr.leave_types(leave_type_code) ON DELETE CASCADE,
+  policy_name TEXT NOT NULL,
+  accrual_type TEXT NOT NULL DEFAULT 'annual_fixed'
+    CHECK (accrual_type IN ('annual_fixed', 'monthly_accrual', 'unlimited', 'custom')),
+  annual_days NUMERIC(10, 2) NOT NULL DEFAULT 0,
+  max_carry_over_days NUMERIC(10, 2) NOT NULL DEFAULT 0,
+  requires_approval BOOLEAN NOT NULL DEFAULT TRUE,
+  min_advance_days INTEGER NOT NULL DEFAULT 0,
+  max_consecutive_days NUMERIC(10, 2),
+  min_continuous_days NUMERIC(10, 2),
+  max_accumulation_periods NUMERIC(10, 2),
+  progressive_enabled BOOLEAN NOT NULL DEFAULT FALSE,
+  progressive_base_years INTEGER NOT NULL DEFAULT 10,
+  progressive_interval_years INTEGER NOT NULL DEFAULT 3,
+  progressive_max_extra_days INTEGER NOT NULL DEFAULT 10,
+  applicable_employment_types TEXT[] NOT NULL DEFAULT '{}',
+  applicable_pay_regimes TEXT[] NOT NULL DEFAULT '{}',
+  allow_negative_balance BOOLEAN NOT NULL DEFAULT FALSE,
+  active BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS greenhouse_hr.leave_balances (
   balance_id TEXT PRIMARY KEY,
   member_id TEXT NOT NULL REFERENCES greenhouse_core.members(member_id) ON DELETE CASCADE,
   leave_type_code TEXT NOT NULL REFERENCES greenhouse_hr.leave_types(leave_type_code),
   year INTEGER NOT NULL,
   allowance_days NUMERIC(10, 2) NOT NULL DEFAULT 0,
+  progressive_extra_days NUMERIC(10, 2) NOT NULL DEFAULT 0,
   carried_over_days NUMERIC(10, 2) NOT NULL DEFAULT 0,
+  adjustment_days NUMERIC(10, 2) NOT NULL DEFAULT 0,
+  accumulated_periods NUMERIC(10, 2) NOT NULL DEFAULT 0,
   used_days NUMERIC(10, 2) NOT NULL DEFAULT 0,
   reserved_days NUMERIC(10, 2) NOT NULL DEFAULT 0,
   updated_by_user_id TEXT REFERENCES greenhouse_core.client_users(user_id),
@@ -59,11 +87,26 @@ CREATE TABLE IF NOT EXISTS greenhouse_hr.leave_request_actions (
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+ALTER TABLE greenhouse_core.members
+  ADD COLUMN IF NOT EXISTS prior_work_years NUMERIC(10, 2) NOT NULL DEFAULT 0;
+
+ALTER TABLE greenhouse_hr.leave_balances
+  ADD COLUMN IF NOT EXISTS progressive_extra_days NUMERIC(10, 2) NOT NULL DEFAULT 0;
+
+ALTER TABLE greenhouse_hr.leave_balances
+  ADD COLUMN IF NOT EXISTS adjustment_days NUMERIC(10, 2) NOT NULL DEFAULT 0;
+
+ALTER TABLE greenhouse_hr.leave_balances
+  ADD COLUMN IF NOT EXISTS accumulated_periods NUMERIC(10, 2) NOT NULL DEFAULT 0;
+
 CREATE INDEX IF NOT EXISTS leave_balances_member_year_idx
   ON greenhouse_hr.leave_balances (member_id, year);
 
 CREATE INDEX IF NOT EXISTS leave_balances_type_year_idx
   ON greenhouse_hr.leave_balances (leave_type_code, year);
+
+CREATE INDEX IF NOT EXISTS leave_policies_leave_type_idx
+  ON greenhouse_hr.leave_policies (leave_type_code, active);
 
 CREATE INDEX IF NOT EXISTS leave_requests_member_created_idx
   ON greenhouse_hr.leave_requests (member_id, created_at DESC);
@@ -109,6 +152,60 @@ SET
   active = EXCLUDED.active,
   updated_at = CURRENT_TIMESTAMP;
 
+INSERT INTO greenhouse_hr.leave_policies (
+  policy_id,
+  leave_type_code,
+  policy_name,
+  accrual_type,
+  annual_days,
+  max_carry_over_days,
+  requires_approval,
+  min_advance_days,
+  max_consecutive_days,
+  min_continuous_days,
+  max_accumulation_periods,
+  progressive_enabled,
+  progressive_base_years,
+  progressive_interval_years,
+  progressive_max_extra_days,
+  applicable_employment_types,
+  applicable_pay_regimes,
+  allow_negative_balance,
+  active
+)
+VALUES
+  ('policy-vacation-chile', 'vacation', 'Vacaciones Chile dependientes', 'annual_fixed', 15, 5, TRUE, 7, 15, 5, 2, TRUE, 10, 3, 10, ARRAY['full_time'], ARRAY['chile'], FALSE, TRUE),
+  ('policy-vacation-default', 'vacation', 'Vacaciones base portal', 'annual_fixed', 15, 0, TRUE, 7, 15, 5, 1, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], FALSE, TRUE),
+  ('policy-floating-holiday-default', 'floating_holiday', 'Día libre flotante', 'annual_fixed', 1, 0, TRUE, 2, 1, 1, 0, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], FALSE, TRUE),
+  ('policy-bereavement-default', 'bereavement', 'Permiso por duelo', 'annual_fixed', 3, 0, TRUE, 0, 3, 1, 0, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], FALSE, TRUE),
+  ('policy-civic-duty-default', 'civic_duty', 'Permiso por deber cívico', 'annual_fixed', 2, 0, TRUE, 0, 2, 1, 0, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], FALSE, TRUE),
+  ('policy-parental-default', 'parental', 'Permiso parental extendido', 'custom', 0, 0, TRUE, 0, NULL, NULL, NULL, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], TRUE, TRUE),
+  ('policy-study-default', 'study', 'Permiso por estudio', 'custom', 0, 0, TRUE, 3, NULL, NULL, NULL, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], TRUE, TRUE),
+  ('policy-personal-default', 'personal', 'Permiso personal', 'custom', 0, 0, TRUE, 1, NULL, NULL, NULL, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], TRUE, TRUE),
+  ('policy-medical-default', 'medical', 'Permiso médico', 'custom', 0, 0, TRUE, 0, NULL, NULL, NULL, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], TRUE, TRUE),
+  ('policy-unpaid-default', 'unpaid', 'Permiso sin goce', 'custom', 0, 0, TRUE, 1, NULL, NULL, NULL, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], TRUE, TRUE)
+ON CONFLICT (policy_id) DO UPDATE
+SET
+  leave_type_code = EXCLUDED.leave_type_code,
+  policy_name = EXCLUDED.policy_name,
+  accrual_type = EXCLUDED.accrual_type,
+  annual_days = EXCLUDED.annual_days,
+  max_carry_over_days = EXCLUDED.max_carry_over_days,
+  requires_approval = EXCLUDED.requires_approval,
+  min_advance_days = EXCLUDED.min_advance_days,
+  max_consecutive_days = EXCLUDED.max_consecutive_days,
+  min_continuous_days = EXCLUDED.min_continuous_days,
+  max_accumulation_periods = EXCLUDED.max_accumulation_periods,
+  progressive_enabled = EXCLUDED.progressive_enabled,
+  progressive_base_years = EXCLUDED.progressive_base_years,
+  progressive_interval_years = EXCLUDED.progressive_interval_years,
+  progressive_max_extra_days = EXCLUDED.progressive_max_extra_days,
+  applicable_employment_types = EXCLUDED.applicable_employment_types,
+  applicable_pay_regimes = EXCLUDED.applicable_pay_regimes,
+  allow_negative_balance = EXCLUDED.allow_negative_balance,
+  active = EXCLUDED.active,
+  updated_at = CURRENT_TIMESTAMP;
+
 -- ============================================================
 -- Serving view: member_leave_360
 -- Combines canonical member identity with current-year leave
@@ -126,10 +223,13 @@ SELECT
   mgr.member_id AS supervisor_member_id,
   mgr.display_name AS supervisor_name,
   COALESCE(bal.vacation_allowance, 0) AS vacation_allowance,
+  COALESCE(bal.vacation_progressive, 0) AS vacation_progressive,
   COALESCE(bal.vacation_used, 0) AS vacation_used,
   COALESCE(bal.vacation_reserved, 0) AS vacation_reserved,
   COALESCE(bal.vacation_allowance, 0)
+    + COALESCE(bal.vacation_progressive, 0)
     + COALESCE(bal.vacation_carried, 0)
+    + COALESCE(bal.vacation_adjustment, 0)
     - COALESCE(bal.vacation_used, 0)
     - COALESCE(bal.vacation_reserved, 0) AS vacation_available,
   COALESCE(req.pending_count, 0) AS pending_requests,
@@ -141,7 +241,9 @@ LEFT JOIN greenhouse_core.members mgr ON mgr.member_id = m.reports_to_member_id
 LEFT JOIN LATERAL (
   SELECT
     SUM(allowance_days) FILTER (WHERE leave_type_code = 'vacation') AS vacation_allowance,
+    SUM(progressive_extra_days) FILTER (WHERE leave_type_code = 'vacation') AS vacation_progressive,
     SUM(carried_over_days) FILTER (WHERE leave_type_code = 'vacation') AS vacation_carried,
+    SUM(adjustment_days) FILTER (WHERE leave_type_code = 'vacation') AS vacation_adjustment,
     SUM(used_days) FILTER (WHERE leave_type_code = 'vacation') AS vacation_used,
     SUM(reserved_days) FILTER (WHERE leave_type_code = 'vacation') AS vacation_reserved
   FROM greenhouse_hr.leave_balances lb

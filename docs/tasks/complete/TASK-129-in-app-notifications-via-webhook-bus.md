@@ -1,5 +1,9 @@
 # TASK-129 — In-App Notifications via Webhook Bus
 
+## Delta 2026-03-31
+- `leave_status` ya no es un caso futuro: `TASK-170` conectó `leave_request.approved`, `leave_request.rejected` y `leave_request.cancelled` al carril reactivo de notificaciones.
+- Se agrega además la categoría `leave_review` para revisión supervisor/HR, por lo que la referencia histórica a “10 categorías” queda desactualizada.
+
 ## Delta 2026-03-29 — recipient resolution canónica
 - El consumer webhook ya quedó alineado al resolver compartido `person-first`.
 - Contrato vigente del carril:
@@ -131,7 +135,8 @@ outbox_events (published)
 |-----------|----------|-------------------|---------------------------|
 | `payroll_ready` | collaborator | in_app + email | `payroll_period.exported` |
 | `assignment_change` | collaborator | in_app | `assignment.created`, `assignment.updated` |
-| `leave_status` | collaborator | in_app + email | (futuro: `leave_request.approved/rejected`) |
+| `leave_status` | collaborator | in_app + email | Solicitud de permiso aprobada, rechazada o cancelada |
+| `leave_review` | internal | in_app + email | Solicitud pendiente de revisión por supervisor o HR |
 | `ico_alert` | internal | in_app + email | `ico.materialization.completed` + umbral |
 | `system_event` | admin | in_app | `identity.reconciliation.*`, `service.created` |
 | `feedback_requested` | client | in_app + email | (futuro: review request events) |

@@ -12,6 +12,7 @@ import { organizationOperationalProjection } from './organization-operational'
 import { memberCapacityEconomicsProjection } from './member-capacity-economics'
 import { assignmentMembershipSyncProjection } from './assignment-membership-sync'
 import { projectedPayrollProjection } from './projected-payroll'
+import { leavePayrollRecalculationProjection } from './leave-payroll-recalculation'
 import { payrollReceiptsProjection } from './payroll-receipts'
 import { payrollExportReadyProjection } from './payroll-export-ready'
 import { periodClosureStatusProjection } from './period-closure-status'
@@ -41,6 +42,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(memberCapacityEconomicsProjection)
   registerProjection(assignmentMembershipSyncProjection)
   registerProjection(projectedPayrollProjection)
+  registerProjection(leavePayrollRecalculationProjection)
   registerProjection(payrollReceiptsProjection)
   registerProjection(payrollExportReadyProjection)
   registerProjection(periodClosureStatusProjection)

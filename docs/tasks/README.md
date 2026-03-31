@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-170`
+- siguiente ID disponible: `TASK-173`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -46,6 +46,7 @@ Primer bloque operativo asignado:
 | `TASK-110` | [TASK-110-nexa-assistant-ui-features.md](in-progress/TASK-110-nexa-assistant-ui-features.md) | P1 | Alto | Medio | Implementación | Lane A activa: contrato de tools, ejecución backend y grounding operativo para Nexa en `/home`; la continuación natural de UI quedó más claramente separada en `TASK-115` |
 | `TASK-115` | [TASK-115-nexa-ui-completion.md](in-progress/TASK-115-nexa-ui-completion.md) | P1 | Alto | Medio | Implementación | Edit inline, suggestions, feedback, floating portal-wide, thread history, NexaPanel cleanup |
 | `TASK-137` | [TASK-137-ui-foundation-activation.md](in-progress/TASK-137-ui-foundation-activation.md) | P1 | Alto | Medio | Parcial | Foundation UI ya activada con RHF en auth, `GreenhouseCalendar`, `GreenhouseDatePicker`, `GreenhouseDragList` y primer calendario operativo en `/admin/operational-calendar` |
+| `TASK-170` | [TASK-170-leave-request-approval-flow.md](complete/TASK-170-leave-request-approval-flow.md) | P1 | Alto | Alto | Cerrada | Leave quedó alineado al calendario operativo, `leave_policies`, outbox granular, recálculo reactivo de payroll y setup real aplicado en `greenhouse-pg-dev` |
 
 ## To Do
 

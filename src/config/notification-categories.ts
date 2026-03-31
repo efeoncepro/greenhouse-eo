@@ -66,6 +66,16 @@ export const NOTIFICATION_CATEGORIES: Record<string, NotificationCategoryConfig>
     priority: 'high'
   },
 
+  leave_review: {
+    code: 'leave_review',
+    label: 'Revisión de permisos',
+    description: 'Solicitudes pendientes de revisión por supervisor o HR',
+    icon: 'tabler-calendar-time',
+    audience: 'internal',
+    defaultChannels: ['in_app', 'email'],
+    priority: 'high'
+  },
+
   payroll_ready: {
     code: 'payroll_ready',
     label: 'Liquidación disponible',

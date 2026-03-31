@@ -8,6 +8,7 @@ import type {
   HrAttendanceRecord,
   HrAttendanceResponse,
   HrCoreMetadata,
+  HrLeaveCalendarResponse,
   HrDepartment,
   HrDepartmentsResponse,
   HrLeaveBalance,
@@ -29,6 +30,7 @@ import {
   getHrCoreMetadataFromPostgres,
   getLeaveRequestByIdFromPostgres,
   isHrCoreLeavePostgresEnabled,
+  listLeaveCalendarFromPostgres,
   listLeaveBalancesFromPostgres,
   listLeaveRequestsFromPostgres,
   reviewLeaveRequestInPostgres
@@ -1377,6 +1379,20 @@ export const getLeaveRequestById = async ({
     postgres: () => getLeaveRequestByIdFromPostgres({ tenant, requestId }),
     fallback
   })
+}
+
+export const listLeaveCalendar = async ({
+  tenant,
+  from,
+  to,
+  memberId
+}: {
+  tenant: TenantContext
+  from: string
+  to: string
+  memberId?: string | null
+}): Promise<HrLeaveCalendarResponse> => {
+  return listLeaveCalendarFromPostgres({ tenant, from, to, memberId })
 }
 
 export const createLeaveRequest = async ({

@@ -1,5 +1,12 @@
 # CODEX TASK — HRIS Fase 2A: Expense Reports (Gastos y Reembolsos)
 
+## Delta 2026-03-31
+
+- Mantener la alineación con el patrón real del repo:
+  - tablas de acciones dedicadas por dominio, no `greenhouse_hr.approval_actions` genérica
+  - notifications vía outbox granular + `src/lib/sync/projections/notifications.ts`, no wiring manual inline por módulo
+- `TASK-170` endureció precisamente ese patrón en leave (`leave_request.*` + notification projection), así que esta task debe reutilizar esa convención como baseline vigente.
+
 ## Delta 2026-03-27 — Alineación arquitectónica
 
 - **Tabla de approval**: NO existe `greenhouse_hr.approval_actions` genérica. El patrón actual es tablas dedicadas por dominio (`leave_request_actions`). Crear `greenhouse_hr.expense_report_actions` con el mismo schema (action_id, report_id, action, actor_user_id, actor_member_id, actor_name, notes, created_at).

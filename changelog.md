@@ -2,6 +2,22 @@
 
 ## 2026-03-31
 
+- `TASK-170` se reconcilió contra el runtime real de HR Leave:
+  - la task deja de asumir un módulo “nuevo” y se alinea al baseline existente en PostgreSQL, serving views, APIs y UI
+  - `leave` ya calcula días hábiles desde el calendario operativo canónico + feriados Chile
+  - se agrega `leave_policies` y semántica de balances con progressive extra days, adjustments y carry-over
+  - el setup real quedó aplicado en `greenhouse-pg-dev / greenhouse_app` y el runtime volvió a validarse por connector con `leave_policies=10`, `leave_types=10`, `leave_balances=4`
+- `HR Leave` gana wiring operativo y cross-module real:
+  - nuevos eventos `leave_request.created`, `leave_request.escalated_to_hr`, `leave_request.approved`, `leave_request.rejected`, `leave_request.cancelled`, `leave_request.payroll_impact_detected`
+  - notificaciones para supervisor/HR, solicitante y payroll/finance según el estado del período impactado
+  - nueva proyección `leave_payroll_recalculation` para recalcular nómina oficial cuando un permiso aprobado toca un período no exportado
+  - `staff_augmentation` vuelve a materializar snapshots tras `accounting.commercial_cost_attribution.materialized`
+- `Permisos` ahora expone calendario real en ambas surfaces:
+  - nueva route `GET /api/hr/core/leave/calendar`
+  - `/api/my/leave` devuelve historial + calendario
+  - `/hr/leave` suma tab calendario
+  - `/my/leave` pasa a vista self-service con historial, calendario y solicitud compartida
+
 - Staff Aug `Crear placement` vuelve a experiencia tipo drawer:
   - `/agency/staff-augmentation/create` ya no muestra una página-card separada
   - ahora reutiliza el listado con un drawer route-driven abierto sobre la misma vista

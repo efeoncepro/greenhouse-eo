@@ -22,6 +22,9 @@ const getAdminRecipients = async () => getRoleCodeNotificationRecipients([ROLE_C
 
 const getFinanceRecipients = async () => getRoleCodeNotificationRecipients([ROLE_CODES.FINANCE_MANAGER, ROLE_CODES.EFEONCE_ADMIN])
 
+const getHrReviewRecipients = async () =>
+  getRoleCodeNotificationRecipients([ROLE_CODES.HR_MANAGER, ROLE_CODES.HR_PAYROLL, ROLE_CODES.EFEONCE_ADMIN])
+
 const getPayrollOpsRecipients = async (): Promise<PersonNotificationRecipient[]> => {
   const recipientsByMemberId = await getMemberNotificationRecipients(
     PAYROLL_OPS_RECIPIENTS.map(recipient => recipient.memberId),
@@ -86,6 +89,12 @@ export const notificationProjection: ProjectionDefinition = {
     'finance.dte.discrepancy_found',
     'identity.profile.linked',
     'payroll_period.calculated',
+    'leave_request.created',
+    'leave_request.escalated_to_hr',
+    'leave_request.approved',
+    'leave_request.rejected',
+    'leave_request.cancelled',
+    'leave_request.payroll_impact_detected',
     'access.view_override_changed',
     'accounting.margin_alert.triggered'
   ],
@@ -226,6 +235,135 @@ export const notificationProjection: ProjectionDefinition = {
       })
 
       return `notified ${eligibleUsers.length} payroll ops users about payroll_period.calculated`
+    }
+
+    if (eventType === 'leave_request.created') {
+      const requestId = typeof payload.requestId === 'string' ? payload.requestId : null
+      const supervisorMemberId = typeof payload.supervisorMemberId === 'string' ? payload.supervisorMemberId : null
+      const memberName = typeof payload.memberName === 'string' ? payload.memberName : 'Colaborador'
+      const leaveTypeName = typeof payload.leaveTypeName === 'string' ? payload.leaveTypeName : 'Permiso'
+      const startDate = typeof payload.startDate === 'string' ? payload.startDate : null
+      const endDate = typeof payload.endDate === 'string' ? payload.endDate : null
+
+      const recipients = supervisorMemberId
+        ? [...(await getMemberNotificationRecipients([supervisorMemberId])).values()].filter(
+          (recipient): recipient is PersonNotificationRecipient => recipient !== null
+        )
+        : await getHrReviewRecipients()
+
+      if (!requestId || recipients.length === 0) return null
+
+      await NotificationService.dispatch({
+        category: 'leave_review',
+        title: `${memberName} solicitó ${leaveTypeName}`,
+        body: startDate && endDate
+          ? `Revisar tramo ${startDate} al ${endDate}.`
+          : 'Hay una solicitud pendiente de revisión.',
+        actionUrl: '/hr/leave',
+        metadata: payload,
+        recipients
+      })
+
+      return `notified ${recipients.length} recipients about leave_request.created`
+    }
+
+    if (eventType === 'leave_request.escalated_to_hr') {
+      const requestId = typeof payload.requestId === 'string' ? payload.requestId : null
+      const memberName = typeof payload.memberName === 'string' ? payload.memberName : 'Colaborador'
+      const leaveTypeName = typeof payload.leaveTypeName === 'string' ? payload.leaveTypeName : 'Permiso'
+      const recipients = await getHrReviewRecipients()
+
+      if (!requestId || recipients.length === 0) return null
+
+      await NotificationService.dispatch({
+        category: 'leave_review',
+        title: `${leaveTypeName} pendiente HR`,
+        body: `${memberName} ya pasó la etapa de jefatura y espera resolución final.`,
+        actionUrl: '/hr/leave',
+        metadata: payload,
+        recipients
+      })
+
+      return `notified ${recipients.length} HR recipients about leave_request.escalated_to_hr`
+    }
+
+    if (
+      eventType === 'leave_request.approved' ||
+      eventType === 'leave_request.rejected' ||
+      eventType === 'leave_request.cancelled'
+    ) {
+      const memberId = typeof payload.memberId === 'string' ? payload.memberId : null
+      const requestId = typeof payload.requestId === 'string' ? payload.requestId : null
+      const leaveTypeName = typeof payload.leaveTypeName === 'string' ? payload.leaveTypeName : 'permiso'
+      const recipientMap = memberId ? await getMemberNotificationRecipients([memberId]) : new Map()
+      const recipient = memberId ? recipientMap.get(memberId) ?? null : null
+
+      if (!requestId || !recipient) return null
+
+      const title =
+        eventType === 'leave_request.approved'
+          ? `${leaveTypeName} aprobado`
+          : eventType === 'leave_request.rejected'
+            ? `${leaveTypeName} rechazado`
+            : `${leaveTypeName} cancelado`
+
+      const body =
+        eventType === 'leave_request.approved'
+          ? 'Tu solicitud fue aprobada y ya impacta la planificación operativa.'
+          : eventType === 'leave_request.rejected'
+            ? 'Tu solicitud fue rechazada. Revisa el detalle y las notas del revisor.'
+            : 'La solicitud quedó cancelada y ya no se considera pendiente.'
+
+      await NotificationService.dispatch({
+        category: 'leave_status',
+        title,
+        body,
+        actionUrl: '/my/leave',
+        metadata: payload,
+        recipients: [recipient]
+      })
+
+      return `notified ${buildNotificationRecipientKey(recipient)} about ${eventType}`
+    }
+
+    if (eventType === 'leave_request.payroll_impact_detected') {
+      const payrollImpactMode = typeof payload.payrollImpactMode === 'string' ? payload.payrollImpactMode : 'none'
+      const periodId = typeof payload.periodId === 'string' ? payload.periodId : null
+      const requestId = typeof payload.requestId === 'string' ? payload.requestId : null
+
+      if (!periodId || !requestId || payrollImpactMode === 'none') return null
+
+      const payrollRecipients = await getPayrollOpsRecipients()
+
+      const financeRecipients = payrollImpactMode === 'deferred_adjustment_required'
+        ? await getFinanceRecipients()
+        : []
+
+      if (payrollRecipients.length > 0) {
+        await NotificationService.dispatch({
+          category: 'payroll_ops',
+          title: `Permiso aprobado con impacto en nómina ${periodId}`,
+          body: payrollImpactMode === 'deferred_adjustment_required'
+            ? 'El período ya fue exportado y requiere ajuste diferido.'
+            : 'Conviene recalcular la nómina oficial con la ausencia aprobada.',
+          actionUrl: '/hr/payroll',
+          metadata: payload,
+          recipients: payrollRecipients
+        })
+      }
+
+      if (financeRecipients.length > 0) {
+        await NotificationService.dispatch({
+          category: 'finance_alert',
+          title: `Ajuste financiero diferido por permiso ${periodId}`,
+          body: 'La ausencia aprobada afecta un período exportado y puede mover costos imputados.',
+          actionUrl: '/finance/intelligence',
+          metadata: payload,
+          recipients: financeRecipients
+        })
+      }
+
+      return `notified payroll/finance recipients about leave_request.payroll_impact_detected`
     }
 
     if (eventType === 'accounting.margin_alert.triggered') {

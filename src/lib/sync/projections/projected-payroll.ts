@@ -76,6 +76,7 @@ export const projectedPayrollProjection: ProjectionDefinition = {
     'compensation_version.created',
     'compensation_version.updated',
     'payroll_entry.upserted',
+    'leave_request.payroll_impact_detected',
     'payroll_period.calculated',
     'finance.exchange_rate.upserted',
     'payroll.previsional_snapshot.upserted',

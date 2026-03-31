@@ -4,6 +4,72 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-31 — TASK-170 leave flow canónico + calendario + impacto payroll
+
+### Objetivo
+- Reconciliar `TASK-170` contra arquitectura/runtime real y cerrar la lane operativa de permisos con calendario canónico, policies, outbox granular y wiring reactivo hacia payroll/costos/notificaciones.
+
+### Delta de ejecución
+- `TASK-170` se movió a `in-progress` y se reescribió para reflejar el baseline real del repo en vez de asumir un módulo inexistente.
+- `leave` ahora deriva días hábiles desde la capa hija `src/lib/hr-core/leave-domain.ts`, apoyada en:
+  - `src/lib/calendar/operational-calendar.ts`
+  - `src/lib/calendar/nager-date-holidays.ts`
+- El store Postgres de permisos quedó endurecido:
+  - ya no confía en `requestedDays` enviado por el caller
+  - calcula breakdown por año y valida overlap, ventana mínima, attachment y balance según policy
+  - introduce `leave_policies`, progressive/carry-over/adjustment fields y calendar payloads
+- Outbox/eventos:
+  - nuevos eventos `leave_request.created`, `leave_request.escalated_to_hr`, `leave_request.approved`, `leave_request.rejected`, `leave_request.cancelled`, `leave_request.payroll_impact_detected`
+  - notificaciones para revisión HR/supervisor, estado del solicitante y alertas payroll/finance
+- Wiring reactivo:
+  - `projected_payroll` refresca snapshots proyectados
+  - nueva projection `leave_payroll_recalculation` recalcula nómina oficial para períodos no exportados
+  - `staff_augmentation` vuelve a refrescar tras `accounting.commercial_cost_attribution.materialized`
+- UI/API:
+  - nueva route `GET /api/hr/core/leave/calendar`
+  - `/api/my/leave` ahora entrega `requests` + `calendar`
+  - `/hr/leave` suma tab de calendario y deja de pedir días manuales
+  - `/my/leave` pasa a vista self-service con calendario, historial y solicitud compartida
+  - nuevo componente `src/components/greenhouse/LeaveRequestDialog.tsx`
+- DDL/documentación runtime:
+  - `scripts/setup-postgres-hr-leave.sql`
+  - `scripts/setup-postgres-person-360-contextual.sql`
+- Validación y aplicación real en GCP / Cloud SQL:
+  - `pg:doctor` pasó con `runtime`, `migrator` y `admin` vía connector contra `greenhouse-pg-dev`
+  - `setup:postgres:hr-leave` quedó aplicado en `greenhouse_app`
+  - `setup:postgres:person-360-contextual` quedó reaplicado y verificó que el carril `person_hr_360` sigue reproducible con `migrator`
+  - lectura runtime posterior validada:
+    - `leave_policies = 10`
+    - `leave_types = 10`
+    - `leave_balances = 4`
+  - se detectó drift de ownership en objetos `greenhouse_hr.leave_*`; se usó el carril admin temporal para sanearlos y dejar `setup:postgres:hr-leave` pasando otra vez con `migrator`
+
+### Archivos de alto impacto
+- `src/lib/hr-core/postgres-leave-store.ts`
+- `src/lib/hr-core/leave-domain.ts`
+- `src/lib/hr-core/service.ts`
+- `src/lib/sync/event-catalog.ts`
+- `src/lib/sync/projections/notifications.ts`
+- `src/lib/sync/projections/projected-payroll.ts`
+- `src/lib/sync/projections/leave-payroll-recalculation.ts`
+- `src/lib/sync/projections/staff-augmentation.ts`
+- `src/views/greenhouse/hr-core/HrLeaveView.tsx`
+- `src/views/greenhouse/my/MyLeaveView.tsx`
+- `scripts/setup-postgres-hr-leave.sql`
+
+### Validación ejecutada
+- `pnpm exec eslint` focalizado sobre los archivos modificados de HR leave, projections, APIs y vistas
+- `pnpm exec vitest run src/lib/hr-core/leave-domain.test.ts src/lib/sync/event-catalog.test.ts src/lib/sync/projections/notifications.test.ts src/lib/sync/projections/staff-augmentation.test.ts src/lib/sync/projections/leave-payroll-recalculation.test.ts`
+- `pnpm build`
+- `pnpm pg:doctor --profile=runtime` por connector contra `greenhouse-pg-dev`
+- `pnpm pg:doctor --profile=migrator` por connector contra `greenhouse-pg-dev`
+- `pnpm pg:doctor --profile=admin` por connector contra `greenhouse-pg-dev`
+- `pnpm setup:postgres:hr-leave` aplicado en Cloud SQL
+- `pnpm setup:postgres:person-360-contextual` aplicado en Cloud SQL
+
+### Limitación real
+- No hubo smoke manual autenticado de `/my/leave` ni `/hr/leave`.
+
 ## Sesión 2026-03-31 — Staff Aug create flow vuelve a drawer seguro
 
 ### Objetivo

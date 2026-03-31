@@ -90,6 +90,7 @@ export const STAFF_AUG_PLACEMENT_TRIGGER_EVENTS = [
   EVENT_TYPES.financeToolingCostUpdated,
   EVENT_TYPES.providerUpserted,
   EVENT_TYPES.providerToolingSnapshotMaterialized,
+  EVENT_TYPES.accountingCommercialCostAttributionMaterialized,
   EVENT_TYPES.payrollPeriodCalculated,
   EVENT_TYPES.payrollPeriodApproved,
   EVENT_TYPES.payrollPeriodExported,
