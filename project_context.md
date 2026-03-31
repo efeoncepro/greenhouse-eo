@@ -1,5 +1,10 @@
 # project_context.md
 
+## Delta 2026-03-30 Nubox DTE download hardening
+- `IncomeDetailView` ahora reutiliza `nuboxPdfUrl` y `nuboxXmlUrl` directos cuando el sync ya los materializó, en vez de forzar siempre el proxy server-side de descarga.
+- `src/lib/nubox/client.ts` normaliza `NUBOX_API_BASE_URL` y `NUBOX_X_API_KEY` con `trim()` y envía `Accept` explícito para descargas `pdf/xml`.
+- Esto reduce fallos `401` en staging cuando el detalle intentaba descargar PDF/XML por el carril proxy aun teniendo URLs directas ya disponibles.
+
 ## Delta 2026-03-30 Finance read identity drift hardening
 - `GET /api/finance/income` y `GET /api/finance/expenses` ahora resuelven filtros de cliente contra el contexto canónico antes de consultar Postgres o BigQuery fallback.
 - `income` deja de depender internamente de la equivalencia ad hoc `clientProfileId -> hubspot_company_id`; el filtro usa anclas canónicas resueltas.

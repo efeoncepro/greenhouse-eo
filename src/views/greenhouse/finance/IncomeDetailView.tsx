@@ -84,6 +84,8 @@ interface IncomeDetail {
   dteFolio: string | null
   nuboxEmittedAt: string | null
   nuboxLastSyncedAt: string | null
+  nuboxPdfUrl: string | null
+  nuboxXmlUrl: string | null
 }
 
 // ---------------------------------------------------------------------------
@@ -299,6 +301,22 @@ const IncomeDetailView = () => {
   }
 
   const handleDownloadDte = async (format: 'pdf' | 'xml') => {
+    const directUrl = format === 'pdf' ? data?.nuboxPdfUrl : data?.nuboxXmlUrl
+
+    if (directUrl) {
+      const a = document.createElement('a')
+
+      a.href = directUrl
+      a.target = '_blank'
+      a.rel = 'noopener noreferrer'
+      a.style.display = 'none'
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+
+      return
+    }
+
     try {
       const res = await fetch(`/api/finance/income/${incomeId}/dte-${format}`)
 

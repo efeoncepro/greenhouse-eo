@@ -4,6 +4,27 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — fix de descarga PDF/XML Nubox en Finance income detail
+
+### Objetivo
+- Resolver el incidente visible en `staging` donde el detalle de ingreso mostraba `Nubox PDF download failed with 401`.
+
+### Delta de ejecución
+- Se verificó contra Nubox real que `/sales/{id}`, `/sales/{id}/pdf?template=TEMPLATE_A4` y `/sales/{id}/xml` responden `200` con credenciales válidas.
+- El detalle de ingreso ya no fuerza siempre el proxy `/api/finance/income/[id]/dte-pdf|xml`:
+  - ahora prioriza `nuboxPdfUrl` / `nuboxXmlUrl` directos cuando el sync ya los dejó en el record
+  - conserva fallback al proxy cuando esos links no existen
+- `src/lib/nubox/client.ts` ahora:
+  - hace `trim()` de `NUBOX_API_BASE_URL` y `NUBOX_X_API_KEY`
+  - envía `Accept` explícito para PDF/XML
+- Test reforzado en `src/lib/nubox/client.test.ts`.
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/nubox/client.test.ts`
+- `pnpm exec eslint src/lib/nubox/client.ts src/lib/nubox/client.test.ts src/views/greenhouse/finance/IncomeDetailView.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
 ## Sesión 2026-03-30 — hardening del drift de lectura en income y expenses
 
 ### Objetivo
