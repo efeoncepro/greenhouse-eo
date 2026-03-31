@@ -155,14 +155,19 @@ Fase 3 completada:
 - `sync-notion-conformed.ts` extendido: normaliza label→module_code, escribe `operating_business_unit`
 - BQ `delivery_projects.operating_business_unit` columna agregada
 
-### Pendiente
+Fase 4 completada:
+- `ICO_DIMENSIONS` allowlist: `business_unit` → `operating_business_unit`
+- `v_tasks_enriched` JOIN a `delivery_projects` para exponer BU
+- `ico_engine.metrics_by_business_unit` tabla + materialization (Step 10)
+- Live compute disponible: `/api/ico-engine/context?dimension=business_unit&value=wave`
 
-- Fase 4: ICO metrics by BU
+### Estado: TASK-016 CERRADA — Fases 1-4 completas
 
-### Riesgos
+### Riesgos residuales
 
 - `.env.local` tiene `GOOGLE_APPLICATION_CREDENTIALS_JSON` malformado (literal \n). ETL requiere `GOOGLE_APPLICATION_CREDENTIALS_JSON=""` para caer a ADC
 - `getCachedBusinessLineSummaries()` falla gracefully si tabla no existe (returns [])
+- `metrics_by_business_unit` solo tendrá datos cuando el equipo asigne BU en Notion y corra materialization
 
 ---
 

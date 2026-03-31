@@ -29,11 +29,16 @@ Fase 3 implementada:
 - BQ `greenhouse_conformed.delivery_projects` — columna `operating_business_unit` agregada
 - DDL en `setup-bigquery-source-sync.sql` actualizado
 
-Pendiente Fase 4: ICO metrics by BU.
+Fase 4 implementada:
+- `ICO_DIMENSIONS` allowlist: agregado `business_unit` → `operating_business_unit`
+- `v_tasks_enriched` view: JOIN a `delivery_projects` para exponer `operating_business_unit`
+- BQ tabla `ico_engine.metrics_by_business_unit` (DDL + infra provisioning)
+- `materializeBusinessUnitMetrics()` en `materialize.ts` (Step 10)
+- API live compute via `/api/ico-engine/context?dimension=business_unit&value=wave`
 
 ## Estado
 
-**In Progress** — Fases 1-3 implementadas 2026-03-31.
+**Complete** — Fases 1-4 implementadas 2026-03-31.
 
 Baseline canonica de implementacion al 2026-03-19.
 

@@ -14,6 +14,7 @@ interface MaterializationResult {
   memberMetricsWritten: number
   sprintMetricsWritten: number
   organizationMetricsWritten: number
+  businessUnitMetricsWritten: number
   durationMs: number
   periodYear: number
   periodMonth: number
@@ -219,6 +220,9 @@ export const materializeMonthlySnapshots = async (
   // Step 9: Materialize organization-level metrics for current period
   const organizationMetricsWritten = await materializeOrganizationMetrics(projectId, periodYear, periodMonth)
 
+  // Step 10: Materialize business-unit-level metrics (operating BU from Notion projects)
+  const businessUnitMetricsWritten = await materializeBusinessUnitMetrics(projectId, periodYear, periodMonth)
+
   // Step 9b: Publish ico.materialization.completed for each affected organization
   if (organizationMetricsWritten > 0) {
     try {
@@ -257,6 +261,7 @@ export const materializeMonthlySnapshots = async (
     memberMetricsWritten,
     sprintMetricsWritten,
     organizationMetricsWritten,
+    businessUnitMetricsWritten,
     durationMs: Date.now() - start,
     periodYear,
     periodMonth,
@@ -528,4 +533,50 @@ const materializeOrganizationMetrics = async (
   `, { periodYear, periodMonth })
 
   return toNumber(orgCountRows[0]?.cnt)
+}
+
+// ─── Business Unit Metrics Materialization ─────────────────────────────────
+
+const materializeBusinessUnitMetrics = async (
+  projectId: string,
+  periodYear: number,
+  periodMonth: number
+): Promise<number> => {
+  await runIcoEngineQuery(`
+    DELETE FROM \`${projectId}.${ICO_DATASET}.metrics_by_business_unit\`
+    WHERE period_year = @periodYear AND period_month = @periodMonth
+  `, { periodYear, periodMonth })
+
+  await runIcoEngineQuery(`
+    INSERT INTO \`${projectId}.${ICO_DATASET}.metrics_by_business_unit\`
+      (business_unit, period_year, period_month,
+       rpa_avg, rpa_median, otd_pct, ftr_pct,
+       cycle_time_avg_days, cycle_time_p50_days, cycle_time_variance,
+       throughput_count, pipeline_velocity,
+       stuck_asset_count, stuck_asset_pct,
+       total_tasks, completed_tasks, active_tasks,
+       materialized_at)
+    SELECT
+      operating_business_unit AS business_unit,
+      @periodYear AS period_year,
+      @periodMonth AS period_month,
+
+      ${buildMetricSelectSQL()},
+
+      CURRENT_TIMESTAMP() AS materialized_at
+
+    FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\`
+    WHERE operating_business_unit IS NOT NULL
+      AND operating_business_unit != ''
+      AND (${buildPeriodFilterSQL()})
+    GROUP BY operating_business_unit
+  `, { periodYear, periodMonth })
+
+  const buCountRows = await runIcoEngineQuery<{ cnt: unknown }>(`
+    SELECT COUNT(*) AS cnt
+    FROM \`${projectId}.${ICO_DATASET}.metrics_by_business_unit\`
+    WHERE period_year = @periodYear AND period_month = @periodMonth
+  `, { periodYear, periodMonth })
+
+  return toNumber(buCountRows[0]?.cnt)
 }
