@@ -1,3 +1,6 @@
+## Delta 2026-03-31
+- TASK-182 (Expense Drawer Agency Taxonomy) agrega `cost_category` granular a cada expense. El P&L por BU que esta task materializa puede desagregar costos por categoria (operational, infrastructure, tax_social) en vez de solo por expense_type generico.
+
 # TASK-177 — Operational P&L: Business Unit Scope Materialization
 
 ## Status

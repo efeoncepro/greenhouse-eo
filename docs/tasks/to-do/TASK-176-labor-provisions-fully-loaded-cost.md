@@ -1,3 +1,6 @@
+## Delta 2026-03-31
+- TASK-182 (Expense Drawer Agency Taxonomy) redefine Previred como egreso al proveedor "Previred" en vez de tipo `social_security`. Las provisiones laborales que esta task materializa en `member_capacity_economics` deben alinearse: el gasto Previred consolidado se registra como expense operacional, y el desglose por persona viene del calculo de provisiones de esta task.
+
 # TASK-176 — Labor Provisions: Fully-Loaded Cost Model Completeness
 
 ## Status
