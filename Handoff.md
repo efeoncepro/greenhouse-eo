@@ -74,6 +74,40 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - `pnpm build` ✅
 - `pnpm lint` ✅ (`0 errors`, `2 warnings` legacy en `src/views/greenhouse/hr-core/HrDepartmentsView.tsx`)
 
+## Sesión 2026-03-31 — PostgreSQL Finance setup ejecutado en Cloud SQL
+
+### Objetivo
+
+- Cerrar el pendiente operativo de PostgreSQL para la lane `TASK-182` + `TASK-183`.
+
+### Delta de ejecución
+
+- Se reautenticó `gcloud` con `julio.reyes@efeonce.org`.
+- Se descubrieron los secretos reales del entorno `greenhouse-pg-dev`:
+  - `greenhouse-pg-dev-app-password`
+  - `greenhouse-pg-dev-migrator-password`
+  - `greenhouse-pg-dev-postgres-password`
+- Se validó acceso real a Cloud SQL `greenhouse-pg-dev` / DB `greenhouse_app`:
+  - `pnpm pg:doctor --profile=runtime` ✅
+  - `pnpm pg:doctor --profile=migrator` ✅
+- Se aplicó en Cloud SQL la migración puntual `scripts/migrations/add-expense-ledger-reactive-columns.sql`.
+- Se verificó en DB real que `greenhouse_finance.expenses` ya tiene:
+  - `space_id`
+  - `source_type`
+  - `payment_provider`
+  - `payment_rail`
+  - índices `finance_expenses_space_idx`, `finance_expenses_source_type_idx`, `finance_expenses_payroll_period_idx`
+- `pnpm setup:postgres:finance` inicialmente falló por ownership drift en `greenhouse_finance`.
+- Se saneó ownership operativo para reproducibilidad del setup:
+  - tablas de `greenhouse_finance` movidas a `greenhouse_migrator` salvo `economic_indicators` que ya estaba en `greenhouse_migrator_user`
+  - vistas serving de Finance alineadas a `greenhouse_migrator`
+  - se otorgó temporalmente `greenhouse_migrator` a `greenhouse_app` solo para transferir ownership y luego se revocó
+- Tras ese saneamiento, `pnpm setup:postgres:finance` quedó ejecutado con éxito vía `greenhouse_migrator_user`.
+
+### Nota de coordinación
+
+- El entorno Cloud SQL quedó más alineado al modelo de acceso documentado, pero sigue valiendo revisar ownership drift en otros schemas si futuros setups vuelven a fallar por `must be owner`.
+
 ## Sesión 2026-03-31 — TASK-183 creada para ledger reactivo de Expenses
 
 ### Objetivo
