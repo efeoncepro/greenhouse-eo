@@ -150,9 +150,14 @@ Fase 2 completada:
 - Hallazgo: producción PG faltaban `efeonce_digital` y `reach` — insertados
 - Todas las migraciones aplicadas contra `greenhouse-pg-dev` con `greenhouse_ops`
 
+Fase 3 completada:
+- Propiedad `Business Unit` (Select: Globe, Efeonce Digital, Reach, Wave, CRM Solutions) creada en Notion Proyectos via API
+- `sync-notion-conformed.ts` extendido: normaliza label→module_code, escribe `operating_business_unit`
+- BQ `delivery_projects.operating_business_unit` columna agregada
+
 ### Pendiente
 
-- Fases 3-4: Notion BU property + sync, ICO metrics by BU
+- Fase 4: ICO metrics by BU
 
 ### Riesgos
 

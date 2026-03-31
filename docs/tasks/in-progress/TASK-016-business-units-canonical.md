@@ -21,11 +21,19 @@ Fase 2 implementada:
 - Finance `/api/finance/dashboard/by-service-line` enriched con label, colorHex, loopPhase desde metadata
 - Missing BLs (efeonce_digital, reach) insertadas en PG service_modules de producción
 
-Pendiente Fases 3-4: Notion BU property, ICO by BU.
+Fase 3 implementada:
+- Propiedad `Business Unit` (Select) creada en Notion Proyectos via API
+  Opciones: Globe, Efeonce Digital, Reach, Wave, CRM Solutions
+- `sync-notion-conformed.ts` extendido: lee `business_unit` de `notion_ops.proyectos`,
+  normaliza label→module_code, escribe `operating_business_unit` a `delivery_projects`
+- BQ `greenhouse_conformed.delivery_projects` — columna `operating_business_unit` agregada
+- DDL en `setup-bigquery-source-sync.sql` actualizado
+
+Pendiente Fase 4: ICO metrics by BU.
 
 ## Estado
 
-**In Progress** — Fases 1-2 implementadas 2026-03-31.
+**In Progress** — Fases 1-3 implementadas 2026-03-31.
 
 Baseline canonica de implementacion al 2026-03-19.
 

@@ -40,6 +40,7 @@ type NotionProjectRow = {
   fechas_end: string | null
   page_url: string | null
   propietario_ids: string[] | null
+  business_unit: string | null
 }
 
 type NotionTaskRow = {
@@ -100,6 +101,23 @@ type NotionSprintRow = {
 }
 
 // ─── Helpers (pure functions, mirrored from sync script) ────────────────────
+
+/** Normalize Notion Business Unit label → canonical module_code. */
+const BUSINESS_UNIT_LABEL_MAP: Record<string, string> = {
+  globe: 'globe',
+  'efeonce digital': 'efeonce_digital',
+  reach: 'reach',
+  wave: 'wave',
+  'crm solutions': 'crm_solutions'
+}
+
+const normalizeBusinessUnit = (value: unknown): string | null => {
+  const raw = toNullableString(value)
+
+  if (!raw) return null
+
+  return BUSINESS_UNIT_LABEL_MAP[raw.toLowerCase().trim()] || raw.toLowerCase().replace(/\s+/g, '_')
+}
 
 const toNullableString = (value: unknown): string | null => {
   if (value === null || value === undefined) return null
@@ -239,7 +257,8 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
     runBigQuery<NotionProjectRow>(`
       SELECT notion_page_id, _source_database_id, space_id, created_time, last_edited_time,
              nombre_del_proyecto, resumen, estado, \`finalización\`, pct_on_time,
-             prioridad, rpa_promedio, fechas, fechas_end, page_url, propietario_ids
+             prioridad, rpa_promedio, fechas, fechas_end, page_url, propietario_ids,
+             business_unit
       FROM \`${projectId}.notion_ops.proyectos\`
       WHERE notion_page_id IS NOT NULL
     `),
@@ -340,6 +359,7 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
       owner_member_id: ownerSourceId ? (notionMemberMap.get(ownerSourceId) || null) : null,
       start_date: toDateValue(row.fechas),
       end_date: toDateValue(row.fechas_end),
+      operating_business_unit: normalizeBusinessUnit(row.business_unit),
       page_url: toNullableString(row.page_url),
       last_edited_time: toTimestampValue(row.last_edited_time),
       payload_hash: buildPayloadHash(row),

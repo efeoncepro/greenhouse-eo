@@ -427,6 +427,10 @@ ADD COLUMN IF NOT EXISTS avg_rpa_source FLOAT64;
 ALTER TABLE `__PROJECT_ID__.greenhouse_conformed.delivery_projects`
 ADD COLUMN IF NOT EXISTS page_url STRING;
 
+-- TASK-016: Operating business unit from Notion (semantic: who executes the project)
+ALTER TABLE `__PROJECT_ID__.greenhouse_conformed.delivery_projects`
+ADD COLUMN IF NOT EXISTS operating_business_unit STRING;
+
 ALTER TABLE `__PROJECT_ID__.greenhouse_conformed.delivery_tasks`
 ADD COLUMN IF NOT EXISTS space_id STRING;
 
