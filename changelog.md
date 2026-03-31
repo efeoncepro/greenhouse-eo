@@ -2,6 +2,12 @@
 
 ## 2026-03-31
 
+- `TASK-182` y `TASK-183` quedaron documentadas en conjunto con su contrato final de Finance Expenses:
+  - el drawer ahora usa la taxonomía visible `Operacional / Tooling / Impuesto / Otro`
+  - el ledger quedó endurecido con `space_id`, `source_type`, `payment_provider` y `payment_rail`
+  - `payroll_period.exported` quedó formalizado como trigger reactivo para materializar expenses de `payroll` y `social_security`
+  - `Finance` sigue como owner del ledger y `Cost Intelligence` como consumer/attributor
+  - la validación runtime no se re-ejecutó en este turno documental; el cierre se apoya en la implementación ya validada en la lane anterior
 - `Finance > Suppliers` ya no deja huérfano el estado `Sin vínculo canónico`:
   - el detalle del supplier ahora permite `Crear vínculo canónico`
   - el tab `Provider 360` también ofrece ese CTA en el empty state

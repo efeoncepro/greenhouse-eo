@@ -15,6 +15,10 @@ type ClientRow = {
   hubspot_company_id: string | null
 }
 
+type SpaceRow = {
+  space_id: string
+}
+
 type ClientProfileRow = {
   client_profile_id: string
   client_id: string | null
@@ -40,6 +44,7 @@ export type ResolvedFinanceClientContext = {
   clientName: string | null
   legalName: string | null
   organizationId: string | null
+  spaceId: string | null
 }
 
 export type ResolvedFinanceMemberContext = {
@@ -141,7 +146,8 @@ export const resolveFinanceClientContext = async ({
       hubspotCompanyId: null,
       clientName: null,
       legalName: null,
-      organizationId: null
+      organizationId: null,
+      spaceId: null
     }
   }
 
@@ -283,6 +289,24 @@ export const resolveFinanceClientContext = async ({
     throw new FinanceValidationError('clientProfileId points to a different HubSpot company than hubspotCompanyId.', 409)
   }
 
+  let spaceId: string | null = null
+
+  if (canonicalClientId) {
+    const { runGreenhousePostgresQuery } = await import('@/lib/postgres/client')
+
+    const pgSpaceRows = await runGreenhousePostgresQuery<SpaceRow>(
+      `SELECT space_id
+       FROM greenhouse_core.spaces
+       WHERE client_id = $1
+         AND active = TRUE
+       ORDER BY updated_at DESC NULLS LAST, created_at DESC NULLS LAST, space_id ASC
+       LIMIT 1`,
+      [canonicalClientId]
+    ).catch(() => [])
+
+    spaceId = normalizeString(pgSpaceRows[0]?.space_id) || null
+  }
+
   // Resolve organization_id via spaces bridge (PostgreSQL)
   const organizationId = canonicalClientId
     ? await resolveOrganizationForClient(canonicalClientId)
@@ -294,7 +318,8 @@ export const resolveFinanceClientContext = async ({
     hubspotCompanyId: canonicalHubspotCompanyId || null,
     clientName: normalizeString(preferredClient?.client_name) || null,
     legalName: normalizeString(preferredProfile?.legal_name) || null,
-    organizationId
+    organizationId,
+    spaceId
   }
 }
 

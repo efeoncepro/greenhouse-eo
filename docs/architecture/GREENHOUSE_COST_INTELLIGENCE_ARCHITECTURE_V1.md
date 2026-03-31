@@ -1,5 +1,18 @@
 # GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md
 
+## Delta 2026-03-31 — Finance ledger más expresivo para consumers downstream
+- `TASK-182` + `TASK-183` dejan explícito que Cost Intelligence ya no debe inferir parte de la semántica fina de gastos desde surfaces ambiguas.
+- El ledger `greenhouse_finance.expenses` ahora expone mejor contexto operativo para consumers:
+  - `space_id`
+  - `source_type`
+  - `payment_provider`
+  - `payment_rail`
+  - `cost_category`
+- Implicancia:
+  - Cost Intelligence sigue consumiendo `finance.expense.created|updated`
+  - pero puede distinguir mejor gasto manual vs system-generated, tenant scope y fees financieros sin reinventar clasificación local
+- La regla anti-doble-conteo de payroll se mantiene: los expenses derivados desde `payroll_period.exported` deben convivir con `member_capacity_economics` y `operational_pl` sin sumar dos veces el mismo costo laboral.
+
 ## Delta 2026-03-30 — Consumers distribuidos ya iniciaron cutover
 - `TASK-071` ya no está solo en diseño.
 - Consumers que ya leen serving materializado:

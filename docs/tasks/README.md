@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-183`
+- siguiente ID disponible: `TASK-184`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -211,7 +211,6 @@ Primer bloque operativo asignado:
 | 50   | `TASK-179`                                                                                               | [TASK-179-finance-reconciliation-cutover-hardening.md](to-do/TASK-179-finance-reconciliation-cutover-hardening.md)                   | P1        | Alto       | Medio             | Diseño                                                                                                               | Cortar reconciliacion a Postgres-only (ultimo componente dual-write), hardening HubSpot schema validation, cleanup BigQuery write flag                                                   |
 | 51   | `TASK-180`                                                                                               | [TASK-180-hr-departments-postgres-runtime-cutover.md](to-do/TASK-180-hr-departments-postgres-runtime-cutover.md)                     | P1        | Alto       | Medio             | Diseño                                                                                                               | Cortar `HR > Departments` a PostgreSQL, alinear `greenhouse_core.departments` con `members` y retirar el write path legacy sobre BigQuery                                               |
 | 52   | `TASK-181`                                                                                               | [TASK-181-finance-clients-organization-canonical-source.md](to-do/TASK-181-finance-clients-organization-canonical-source.md)         | P1        | Alto       | Medio             | Diseño                                                                                                               | Re-apuntar Finance Clients de `greenhouse_core.clients` (tenants) a `greenhouse_core.organizations WHERE organization_type IN ('client','both')` — alinear con 360 Object Model         |
-| 53   | `TASK-182`                                                                                               | [TASK-182-finance-expense-drawer-agency-taxonomy.md](to-do/TASK-182-finance-expense-drawer-agency-taxonomy.md)                       | P1        | Alto       | Alto              | Diseño                                                                                                               | Rediseñar drawer de egresos con taxonomia de agencia, eliminar tabs Nomina/Prevision (automatizar), agregar categorias, imputacion, recurrencia y sinergia AI Tools/Tooling              |
 
 ### Briefs Históricos o de Producto
 
@@ -240,6 +239,8 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 
 ## Complete
 
+| [TASK-182-finance-expense-drawer-agency-taxonomy.md](complete/TASK-182-finance-expense-drawer-agency-taxonomy.md) | Drawer de `Finance > Expenses` cerrado con taxonomía `Operacional / Tooling / Impuesto / Otro`, categorías contextuales, imputación por `member/space/shared`, recurrencia y metadata reusable para AI Tools/Provider 360 sin romper compatibilidad legacy. |
+| [TASK-183-finance-expenses-reactive-intake-cost-ledger.md](complete/TASK-183-finance-expenses-reactive-intake-cost-ledger.md) | Ledger `expenses` endurecido con `space_id`, `source_type`, `payment_provider` y `payment_rail`, más intake reactivo desde `payroll_period.exported` para `payroll` y `social_security`, preservando a Finance como owner del ledger y a Cost Intelligence como consumer. |
 | [TASK-121-admin-center-hardening.md](complete/TASK-121-admin-center-hardening.md) | Hardening de `/admin` cerrado: sorting manual en la tabla de spaces, deep-link compartible por filtros, skeleton route-level, domain cards con health real y bloque consolidado de alertas; el cierre además corrigió un loop de re-render en `AdminCenterView` y dejó tests UI dedicados para el slice. |
 | [TASK-173-shared-attachments-platform-gcp-governance.md](complete/TASK-173-shared-attachments-platform-gcp-governance.md) | Foundation shared de adjuntos ya cerrada: registry `greenhouse_core.assets`, uploader reusable Vuexy, buckets GCP dedicados por entorno, cutover Vercel completo y flujo validado en `leave` con upload, attach y revisión HR del respaldo. |
 | [TASK-059-tool-provider-canonical-object.md](complete/TASK-059-tool-provider-canonical-object.md) | Provider canónico cross-module ya reconciliado al runtime real: se descarta `tool_providers`, se institucionaliza `greenhouse_core.providers` como ancla única y queda materializado `provider_tooling` con snapshot reactivo mensual, bridge supplier/provider explícito y consumer real en analytics de herramientas. |

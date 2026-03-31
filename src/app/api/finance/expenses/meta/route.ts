@@ -3,6 +3,15 @@ import { NextResponse } from 'next/server'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
 import {
+  EXPENSE_DRAWER_CATEGORIES,
+  EXPENSE_DRAWER_TAB_LABELS,
+  EXPENSE_DRAWER_TABS,
+  EXPENSE_SOURCE_TYPES,
+  PAYMENT_PROVIDERS,
+  PAYMENT_RAILS,
+  RECURRENCE_FREQUENCIES
+} from '@/lib/finance/expense-taxonomy'
+import {
   ACCOUNT_TYPES,
   PAYMENT_METHODS,
   SERVICE_LINES,
@@ -12,6 +21,7 @@ import {
   runFinanceQuery,
   getFinanceProjectId
 } from '@/lib/finance/shared'
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import {
   listFinanceSuppliersFromPostgres,
   listFinanceAccountsFromPostgres,
@@ -20,6 +30,25 @@ import {
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
+
+type FinanceMemberOption = {
+  member_id: string
+  display_name: string | null
+}
+
+type FinanceSpaceOption = {
+  space_id: string
+  space_name: string | null
+  client_id: string | null
+  organization_id: string | null
+}
+
+type SupplierToolLinkRow = {
+  supplier_id: string
+  tool_id: string
+  tool_name: string
+  provider_name: string | null
+}
 
 const DEFAULT_SOCIAL_SECURITY_INSTITUTIONS = [
   'AFP Capital',
@@ -89,7 +118,7 @@ export async function GET() {
     }
   }
 
-  const [suppliers, bqAccounts, priorInstitutions, payrollInstitutions] = await Promise.all([
+  const [suppliers, bqAccounts, priorInstitutions, payrollInstitutions, members, spaces, supplierToolLinks] = await Promise.all([
     suppliersList
       ? Promise.resolve(null)
       : runFinanceQuery<{
@@ -136,7 +165,38 @@ export async function GET() {
         FROM \`${projectId}.greenhouse.compensation_versions\`
       )
       WHERE institution IS NOT NULL
-    `)
+    `),
+    runGreenhousePostgresQuery<FinanceMemberOption>(
+      `
+        SELECT member_id, display_name
+        FROM greenhouse_core.members
+        WHERE active = TRUE
+        ORDER BY display_name ASC NULLS LAST, member_id ASC
+      `
+    ).catch(() => []),
+    runGreenhousePostgresQuery<FinanceSpaceOption>(
+      `
+        SELECT space_id, space_name, client_id, organization_id
+        FROM greenhouse_core.spaces
+        WHERE active = TRUE
+        ORDER BY space_name ASC NULLS LAST, space_id ASC
+      `
+    ).catch(() => []),
+    runGreenhousePostgresQuery<SupplierToolLinkRow>(
+      `
+        SELECT
+          t.fin_supplier_id AS supplier_id,
+          t.tool_id,
+          t.tool_name,
+          p.provider_name
+        FROM greenhouse_ai.tool_catalog AS t
+        LEFT JOIN greenhouse_core.providers AS p
+          ON p.provider_id = t.provider_id
+        WHERE t.fin_supplier_id IS NOT NULL
+          AND t.is_active = TRUE
+        ORDER BY t.tool_name ASC
+      `
+    ).catch(() => [])
   ])
 
   const institutionSet = new Set(
@@ -164,9 +224,34 @@ export async function GET() {
         : 'other'
     })),
     paymentMethods: PAYMENT_METHODS,
+    paymentProviders: PAYMENT_PROVIDERS,
+    paymentRails: PAYMENT_RAILS,
+    sourceTypes: EXPENSE_SOURCE_TYPES,
+    recurrenceFrequencies: RECURRENCE_FREQUENCIES,
     serviceLines: SERVICE_LINES,
+    drawerTabs: EXPENSE_DRAWER_TABS.map(tab => ({
+      value: tab,
+      label: EXPENSE_DRAWER_TAB_LABELS[tab],
+      categories: EXPENSE_DRAWER_CATEGORIES[tab]
+    })),
     socialSecurityTypes: SOCIAL_SECURITY_TYPES,
     socialSecurityInstitutions: Array.from(institutionSet).sort((left, right) => left.localeCompare(right)),
-    taxTypes: TAX_TYPES
+    taxTypes: TAX_TYPES,
+    members: members.map(row => ({
+      memberId: normalizeString(row.member_id),
+      displayName: normalizeString(row.display_name) || normalizeString(row.member_id)
+    })),
+    spaces: spaces.map(row => ({
+      spaceId: normalizeString(row.space_id),
+      spaceName: normalizeString(row.space_name) || normalizeString(row.space_id),
+      clientId: row.client_id ? normalizeString(row.client_id) : null,
+      organizationId: row.organization_id ? normalizeString(row.organization_id) : null
+    })),
+    supplierToolLinks: supplierToolLinks.map(row => ({
+      supplierId: normalizeString(row.supplier_id),
+      toolId: normalizeString(row.tool_id),
+      toolName: normalizeString(row.tool_name),
+      providerName: row.provider_name ? normalizeString(row.provider_name) : null
+    }))
   })
 }

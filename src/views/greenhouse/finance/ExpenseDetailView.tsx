@@ -72,6 +72,9 @@ const typeLabel = (type: string) => {
     case 'payroll': return 'Nómina'
     case 'social_security': return 'Previsión'
     case 'tax': return 'Impuesto'
+    case 'bank_fee': return 'Fee bancario'
+    case 'gateway_fee': return 'Fee gateway'
+    case 'financial_cost': return 'Costo financiero'
     case 'miscellaneous': return 'Varios'
     default: return type
   }
@@ -83,6 +86,9 @@ const typeColor = (type: string) => {
     case 'payroll': return 'info'
     case 'social_security': return 'warning'
     case 'tax': return 'error'
+    case 'bank_fee': return 'secondary'
+    case 'gateway_fee': return 'secondary'
+    case 'financial_cost': return 'secondary'
     case 'miscellaneous': return 'secondary'
     default: return 'primary'
   }

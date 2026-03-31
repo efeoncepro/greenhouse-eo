@@ -160,7 +160,9 @@ CREATE INDEX IF NOT EXISTS finance_factoring_status_idx
 CREATE TABLE IF NOT EXISTS greenhouse_finance.expenses (
   expense_id TEXT PRIMARY KEY,
   client_id TEXT REFERENCES greenhouse_core.clients(client_id),
+  space_id TEXT REFERENCES greenhouse_core.spaces(space_id),
   expense_type TEXT NOT NULL,
+  source_type TEXT,
   description TEXT NOT NULL,
   currency TEXT NOT NULL CHECK (currency IN ('CLP', 'USD')),
   subtotal NUMERIC(14, 2) NOT NULL,
@@ -173,6 +175,8 @@ CREATE TABLE IF NOT EXISTS greenhouse_finance.expenses (
   payment_status TEXT NOT NULL DEFAULT 'pending'
     CHECK (payment_status IN ('pending', 'partial', 'paid', 'overdue', 'written_off')),
   payment_method TEXT,
+  payment_provider TEXT,
+  payment_rail TEXT,
   payment_account_id TEXT REFERENCES greenhouse_finance.accounts(account_id),
   payment_reference TEXT,
   document_number TEXT,
@@ -212,14 +216,23 @@ CREATE TABLE IF NOT EXISTS greenhouse_finance.expenses (
 CREATE INDEX IF NOT EXISTS finance_expenses_client_idx
   ON greenhouse_finance.expenses (client_id);
 
+CREATE INDEX IF NOT EXISTS finance_expenses_space_idx
+  ON greenhouse_finance.expenses (space_id, payment_date DESC);
+
 CREATE INDEX IF NOT EXISTS finance_expenses_type_idx
   ON greenhouse_finance.expenses (expense_type, payment_date DESC);
+
+CREATE INDEX IF NOT EXISTS finance_expenses_source_type_idx
+  ON greenhouse_finance.expenses (source_type, payment_date DESC);
 
 CREATE INDEX IF NOT EXISTS finance_expenses_supplier_idx
   ON greenhouse_finance.expenses (supplier_id);
 
 CREATE INDEX IF NOT EXISTS finance_expenses_member_idx
   ON greenhouse_finance.expenses (member_id);
+
+CREATE INDEX IF NOT EXISTS finance_expenses_payroll_period_idx
+  ON greenhouse_finance.expenses (payroll_period_id, expense_type, source_type);
 
 CREATE INDEX IF NOT EXISTS finance_expenses_status_idx
   ON greenhouse_finance.expenses (payment_status, due_date DESC);

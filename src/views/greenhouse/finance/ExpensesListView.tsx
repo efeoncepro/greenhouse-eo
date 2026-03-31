@@ -83,6 +83,9 @@ const TYPE_CONFIG: Record<string, { label: string; color: 'primary' | 'info' | '
   payroll: { label: 'Nómina', color: 'info' },
   social_security: { label: 'Previsión', color: 'warning' },
   tax: { label: 'Impuesto', color: 'error' },
+  bank_fee: { label: 'Fee bancario', color: 'secondary' },
+  gateway_fee: { label: 'Fee gateway', color: 'secondary' },
+  financial_cost: { label: 'Costo financiero', color: 'secondary' },
   miscellaneous: { label: 'Varios', color: 'secondary' }
 }
 
@@ -100,6 +103,9 @@ const TYPE_OPTIONS = [
   { value: 'payroll', label: 'Nómina' },
   { value: 'social_security', label: 'Previsión' },
   { value: 'tax', label: 'Impuesto' },
+  { value: 'bank_fee', label: 'Fee bancario' },
+  { value: 'gateway_fee', label: 'Fee gateway' },
+  { value: 'financial_cost', label: 'Costo financiero' },
   { value: 'miscellaneous', label: 'Varios' }
 ]
 

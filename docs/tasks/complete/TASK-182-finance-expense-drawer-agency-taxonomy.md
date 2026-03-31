@@ -1,14 +1,34 @@
+# Delta 2026-03-31
+- Cerrada por implementación conjunta con `TASK-183`.
+- Entregado en runtime:
+  - drawer con taxonomía `Operacional / Tooling / Impuesto / Otro`
+  - categorías contextuales, imputación por `shared/member/space`, recurrencia y señales de tooling
+  - metadata enriquecida con `spaces`, `members`, `supplierToolLinks`, `paymentProviders` y `paymentRails`
+  - compatibilidad transicional preservada para `expense_type` legacy
+- Validación ejecutada:
+  - `pnpm build` ✅
+  - `pnpm lint` ✅ (`0 errors`, quedan 2 warnings legacy en `src/views/greenhouse/hr-core/HrDepartmentsView.tsx`)
+
+# Delta 2026-03-31
+- `TASK-183` abre la lane hermana de ledger reactivo y automatización cross-module para `expenses`. Esta task se mantiene como owner del rediseño UX/taxonomía visible del drawer, pero ya no debe intentar cerrar por sí sola el contrato reactivo entre Finance, Payroll, Reconciliation y Cost Intelligence.
+- Auditoría del runtime/documentación:
+  - el trigger canónico para materializar nómina en ledger no es `payroll_entry.approved`; la arquitectura vigente usa `payroll_period.exported`
+  - el helper reusable de costos de tooling vive en `src/lib/team-capacity/tool-cost-reader.ts`, no en `src/lib/ai-tools/tool-cost-reader.ts`
+  - no existe evento catalogado `expense.tool_linked`; el contrato reactivo vigente pasa por `finance.expense.created|updated`
+  - esta task no puede asumir que el schema actual resuelve tenant isolation; `expenses` todavía no está filtrado por `space_id` en runtime y ese hardening queda alineado con `TASK-183`
+  - la referencia externa `../Greenhouse_Portal_Spec_v1.md` no existe en este workspace, por lo que la auditoría se hizo contra arquitectura viva + código + DDL versionado
+
 # TASK-182 — Finance Expense Drawer: Agency Taxonomy, Cross-Module Synergies & Automation
 
 ## Status
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Alto` |
-| Status real | `Diseno` |
+| Status real | `Cerrada` |
 | Domain | Finance / UX / Cost Allocation |
 | Sequence | Independiente — mejora UX + habilita cost allocation enterprise |
 
@@ -191,12 +211,13 @@ Cuando se paga una suscripcion de herramienta (ej. Anthropic/Claude, Figma, Adob
    - Auto-setear `direct_overhead_kind = 'tool_license'`
    - Sugerir `direct_overhead_scope = 'shared'` (si la herramienta tiene multiples licencias)
 2. Crear endpoint ligero: `GET /api/ai-tools/by-supplier?supplierId=X` para resolver la vinculacion
-3. Al guardar el egreso con vinculacion tooling, publicar evento outbox `expense.tool_linked` para que el modulo AI Tools actualice costos
+3. Al guardar el egreso con vinculacion tooling, reutilizar `finance.expense.created|updated` como señal reactiva; si falta contexto, enriquecer payload o consumer antes de inventar un evento nuevo
 
 ### Fase 3 — Automatizacion Nomina → Expense
 
-1. Cuando Payroll cambia status de una liquidacion a `approved` o `exported`:
-   - Publicar evento outbox `payroll_entry.approved`
+1. Cuando Payroll cierra/exporta un período:
+   - usar `payroll_period.exported` como trigger canónico del ledger
+   - `approved` puede seguir sirviendo para readiness/candidates, pero no como disparador final del gasto canónico
    - Listener en Finance crea automaticamente el expense con:
      - `expense_type = 'payroll'`
      - `payroll_entry_id`, `payroll_period_id`, `member_id`
@@ -211,8 +232,8 @@ Cuando se paga una suscripcion de herramienta (ej. Anthropic/Claude, Figma, Adob
 ### Fase 4 — Actualizacion de constantes y validacion
 
 1. Actualizar `EXPENSE_TYPES` en `src/lib/finance/shared.ts`:
-   - Remover: `payroll` (se vuelve automatico), `social_security` (se absorbe en supplier)
-   - Agregar: `tooling` (nuevo tipo con sinergia AI Tools)
+   - Mantener compatibilidad transicional con `payroll` y `social_security` mientras existan rows legacy, APIs y vistas que los consumen
+   - Evaluar si `tooling` vive como `expense_type` nuevo o como categoría/tab visible sobre `supplier`; no cortar compatibilidad antes del slice reactivo de `TASK-183`
    - Mantener: `supplier`, `tax`, `miscellaneous`
 2. Agregar constante `EXPENSE_CATEGORIES` con las categorias por tab
 3. Actualizar `auto-allocation-rules.ts` para considerar `direct_overhead_scope` del drawer
@@ -286,14 +307,14 @@ export const EXPENSE_CATEGORIES = {
 ## Risks
 
 1. **Backward compatibility** — expenses existentes con `expense_type = 'payroll'` o `'social_security'` deben seguir renderizando correctamente. No borrar tipos, solo dejar de exponerlos en el drawer
-2. **Automatizacion Nomina** — requiere que el outbox event system este operativo para `payroll_entry.approved`. Si no existe el listener, la Fase 3 no puede activarse
+2. **Automatizacion Nomina** — requiere que el outbox/event system opere sobre `payroll_period.exported`. Si no existe ese carril, la Fase 3 no puede activarse
 3. **Previred como proveedor** — debe existir en el maestro de proveedores. Verificar si ya esta registrado o crearlo en seed
 4. **AI Tools sinergia** — depende de que `ai_tool_catalog.fin_supplier_id` este poblado. Auditar cobertura actual
 5. **Migration de datos** — expenses existentes tipo `social_security` necesitan mapeo a `supplier` con proveedor Previred retroactivamente (o aceptar que coexistan)
 
 ## Dependencies & Impact
 
-- **Depende de:** Schema `fin_expenses` ya tiene todos los campos necesarios (no requiere DDL)
+- **Depende de:** El schema actual cubre la mayor parte del rediseño UX/imputación, pero tenant isolation por `space_id` y el hardening de origen/rails quedan coordinados con `TASK-183`
 - **Depende de:** Outbox event system operativo (para Fase 3 — automatizacion Nomina)
 - **Depende de:** `ai_tool_catalog.fin_supplier_id` poblado (para Fase 2 — sinergia Tooling)
 - **Impacta a:** TASK-174 (data integrity — validaciones en nuevos campos), TASK-176 (labor provisions — Previred como expense), TASK-177 (P&L por BU — categorias de gasto en breakdown)

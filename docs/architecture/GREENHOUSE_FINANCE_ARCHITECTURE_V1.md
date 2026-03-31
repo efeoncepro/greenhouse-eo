@@ -38,6 +38,26 @@ Matriz de consumo:
   - debe seguir sobre `member_capacity_economics`
   - usando `commercial_cost_attribution` solo para explain cuando aplique
 
+## Delta 2026-03-31 — Expense ledger hardening y intake reactivo desde Payroll
+
+`Finance > Expenses` quedó alineado como ledger canónico con un contrato más explícito para clasificación y tenant isolation:
+
+- el ledger ahora modela de forma separada:
+  - `space_id`
+  - `source_type`
+  - `payment_provider`
+  - `payment_rail`
+- el drawer de egresos dejó de tratar `Nomina` y `Prevision` como tabs manuales y pasó a una taxonomía visible por naturaleza del gasto:
+  - `Operacional`
+  - `Tooling`
+  - `Impuesto`
+  - `Otro`
+- `payroll_period.exported` quedó documentado como trigger reactivo para materializar expenses system-generated de:
+  - `payroll`
+  - `social_security`
+- `Finance` sigue siendo el owner del ledger; `Cost Intelligence` consume y atribuye sin recomputar el costo desde cero.
+- La regla anti-doble-conteo de payroll se mantiene: los expenses derivados deben convivir con `operational_pl` sin duplicar carga laboral.
+
 ## Delta 2026-03-30 — revenue aggregation usa client_id canónico
 
 Regla canónica vigente para agregaciones financieras:
@@ -258,6 +278,21 @@ Margins:
 2. **Multi-moneda** — entries en USD se convierten con el último tipo de cambio disponible
 3. **Anti-doble-conteo** — si un expense tiene `payroll_entry_id`, su monto no se suma al payroll
 4. **Partner share** — se descuenta del revenue total para obtener netRevenue
+
+### Expense ledger contract
+
+La surface de `expenses` expone y persiste un contrato más rico para lecturas y writes nuevos:
+
+- `space_id` para aislamiento por tenant
+- `source_type` para distinguir gasto manual, derivado o system-generated
+- `payment_provider` y `payment_rail` para separar proveedor de rail/método operativo
+- `cost_category` sigue siendo la dimensión analítica usada por P&L y consumers downstream
+
+Para el intake reactivo de nómina:
+
+- `payroll_period.exported` es la señal canónica
+- el materializador debe crear gastos para nómina y cargas sociales cuando falten en el ledger
+- la publicación downstream sigue usando `finance.expense.created|updated`; no se introdujo un evento nuevo específico para tooling
 5. **`completeness`** — `'complete'` solo si hay payroll Y expenses; `'partial'` si falta alguno
 
 ## Dashboard Summary Endpoint

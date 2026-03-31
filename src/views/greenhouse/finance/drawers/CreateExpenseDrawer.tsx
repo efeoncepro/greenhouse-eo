@@ -16,8 +16,6 @@ import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
 import ListSubheader from '@mui/material/ListSubheader'
 import MenuItem from '@mui/material/MenuItem'
-import Radio from '@mui/material/Radio'
-import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
@@ -25,78 +23,49 @@ import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+import {
+  DIRECT_OVERHEAD_KINDS,
+  PAYMENT_METHODS,
+  VALID_CURRENCIES
+} from '@/lib/finance/contracts'
+import {
+  EXPENSE_DRAWER_CATEGORIES,
+  EXPENSE_DRAWER_TAB_LABELS,
+  EXPENSE_DRAWER_TABS,
+  RECURRENCE_FREQUENCIES,
+  type ExpenseDrawerCategory,
+  type ExpenseDrawerTab
+} from '@/lib/finance/expense-taxonomy'
 import CreateSupplierDrawer from '@views/greenhouse/finance/drawers/CreateSupplierDrawer'
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-type ExpenseType = 'supplier' | 'payroll' | 'social_security' | 'tax' | 'miscellaneous'
-
-interface SupplierOption {
+type SupplierOption = {
   supplierId: string
   legalName: string
   tradeName: string | null
   paymentCurrency?: string | null
 }
 
-interface AccountOption {
-  accountId: string
-  accountName: string
-  currency: string
-  accountType: string
-}
-
-interface ExpenseMeta {
+type ExpenseMeta = {
   suppliers: SupplierOption[]
-  accounts: AccountOption[]
   paymentMethods: string[]
-  serviceLines: string[]
-  socialSecurityTypes: string[]
-  socialSecurityInstitutions: string[]
-  taxTypes: string[]
+  paymentProviders: string[]
+  paymentRails: string[]
+  recurrenceFrequencies: string[]
+  members: Array<{ memberId: string; displayName: string }>
+  spaces: Array<{ spaceId: string; spaceName: string; clientId: string | null; organizationId: string | null }>
+  supplierToolLinks: Array<{ supplierId: string; toolId: string; toolName: string; providerName: string | null }>
+  drawerTabs?: Array<{
+    value: ExpenseDrawerTab
+    label: string
+    categories: ExpenseDrawerCategory[]
+  }>
 }
 
-interface PayrollCandidate {
-  payrollEntryId: string
-  payrollPeriodId: string
-  payrollStatus: string
-  approvedAt: string | null
-  memberId: string
-  memberName: string
-  currency: string
-  grossTotal: number
-  netTotal: number
-  linkedExpenseId: string | null
-  linkedPaymentStatus: string | null
-  isLinked: boolean
-}
-
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
-const EXPENSE_TYPE_CONFIG: Record<ExpenseType, { label: string; icon: string }> = {
-  supplier: { label: 'Proveedor', icon: 'tabler-building-store' },
-  payroll: { label: 'Nomina', icon: 'tabler-users' },
-  social_security: { label: 'Prevision', icon: 'tabler-shield-check' },
-  tax: { label: 'Impuesto', icon: 'tabler-receipt-tax' },
-  miscellaneous: { label: 'Varios', icon: 'tabler-dots' }
-}
-
-const CURRENCIES = ['CLP', 'USD']
-
-const SERVICE_LINE_LABELS: Record<string, string> = {
-  globe: 'Globe',
-  efeonce_digital: 'Efeonce Digital',
-  reach: 'Reach',
-  wave: 'Wave',
-  crm_solutions: 'CRM Solutions'
-}
+const ADD_NEW_SUPPLIER = '__ADD_NEW__'
 
 const PAYMENT_METHOD_LABELS: Record<string, string> = {
   transfer: 'Transferencia',
-  credit_card: 'Tarjeta de credito',
+  credit_card: 'Tarjeta',
   paypal: 'PayPal',
   wise: 'Wise',
   check: 'Cheque',
@@ -104,32 +73,67 @@ const PAYMENT_METHOD_LABELS: Record<string, string> = {
   other: 'Otro'
 }
 
-const SOCIAL_SECURITY_TYPE_LABELS: Record<string, string> = {
-  afp: 'AFP',
-  health: 'Salud',
-  unemployment: 'Seguro cesantia',
-  mutual: 'Mutual',
-  caja_compensacion: 'Caja de compensacion'
-}
-
-const TAX_TYPE_LABELS: Record<string, string> = {
-  iva_mensual: 'IVA mensual',
-  ppm: 'PPM',
-  renta_anual: 'Renta anual',
-  patente: 'Patente',
-  contribuciones: 'Contribuciones',
-  retencion_honorarios: 'Retencion honorarios',
+const PAYMENT_PROVIDER_LABELS: Record<string, string> = {
+  bank: 'Banco',
+  previred: 'Previred',
+  stripe: 'Stripe',
+  webpay: 'Webpay',
+  paypal: 'PayPal',
+  mercadopago: 'Mercado Pago',
+  wise: 'Wise',
   other: 'Otro'
 }
 
-const ADD_NEW_SUPPLIER = '__ADD_NEW__'
+const PAYMENT_RAIL_LABELS: Record<string, string> = {
+  bank_transfer: 'Transferencia bancaria',
+  card: 'Tarjeta',
+  gateway: 'Gateway',
+  wallet: 'Wallet',
+  cash: 'Efectivo',
+  check: 'Cheque',
+  payroll_file: 'Archivo payroll',
+  previred: 'Previred',
+  other: 'Otro'
+}
 
-const formatCLP = (amount: number): string =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+const DIRECT_OVERHEAD_KIND_LABELS: Record<string, string> = {
+  tool_license: 'Licencia',
+  tool_usage: 'Consumo',
+  equipment: 'Equipamiento',
+  reimbursement: 'Reembolso',
+  other: 'Otro'
+}
 
-// ---------------------------------------------------------------------------
-// Props
-// ---------------------------------------------------------------------------
+const RECURRENCE_LABELS: Record<string, string> = {
+  monthly: 'Mensual',
+  quarterly: 'Trimestral',
+  annual: 'Anual'
+}
+
+const typeInfoByTab: Record<ExpenseDrawerTab, { caption: string; helper: string }> = {
+  operational: {
+    caption: 'Operacional',
+    helper: 'Servicios profesionales, producción externa, oficina, equipamiento y otros gastos operativos.'
+  },
+  tooling: {
+    caption: 'Tooling',
+    helper: 'Licencias SaaS, cloud, hosting y activos tecnológicos con bridge a AI Tools/Provider 360.'
+  },
+  tax: {
+    caption: 'Impuesto',
+    helper: 'Obligaciones fiscales y tributarias registradas desde Finance.'
+  },
+  other: {
+    caption: 'Otro',
+    helper: 'Fees bancarios, costos financieros y casos residuales.'
+  }
+}
+
+const getTabCategories = (meta: ExpenseMeta | null, tab: ExpenseDrawerTab) => {
+  const fromMeta = meta?.drawerTabs?.find(item => item.value === tab)?.categories
+
+  return fromMeta && fromMeta.length > 0 ? fromMeta : EXPENSE_DRAWER_CATEGORIES[tab]
+}
 
 type Props = {
   open: boolean
@@ -137,54 +141,32 @@ type Props = {
   onSuccess: () => void
 }
 
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
-
 const CreateExpenseDrawer = ({ open, onClose, onSuccess }: Props) => {
-  // Common fields
-  const [expenseType, setExpenseType] = useState<ExpenseType>('supplier')
-  const [description, setDescription] = useState('')
-  const [currency, setCurrency] = useState('')
-  const [exchangeRate, setExchangeRate] = useState('')
-  const [totalAmount, setTotalAmount] = useState('')
-  const [paymentDate, setPaymentDate] = useState('')
-  const [documentNumber, setDocumentNumber] = useState('')
-  const [documentDate, setDocumentDate] = useState('')
-  const [serviceLine, setServiceLine] = useState('')
-  const [paymentMethod, setPaymentMethod] = useState('')
-  const [notes, setNotes] = useState('')
-
-  // Supplier-specific
-  const [supplierId, setSupplierId] = useState('')
-  const [supplierDrawerOpen, setSupplierDrawerOpen] = useState(false)
-
-  // Social security-specific
-  const [socialSecurityType, setSocialSecurityType] = useState('')
-  const [socialSecurityInstitution, setSocialSecurityInstitution] = useState('')
-  const [socialSecurityPeriod, setSocialSecurityPeriod] = useState('')
-
-  // Tax-specific
-  const [taxType, setTaxType] = useState('')
-  const [taxPeriod, setTaxPeriod] = useState('')
-  const [taxFormNumber, setTaxFormNumber] = useState('')
-
-  // Payroll-specific
-  const [selectedPayrollEntry, setSelectedPayrollEntry] = useState<PayrollCandidate | null>(null)
-  const [payrollCandidates, setPayrollCandidates] = useState<PayrollCandidate[]>([])
-  const [loadingPayroll, setLoadingPayroll] = useState(false)
-
-  // Meta
   const [meta, setMeta] = useState<ExpenseMeta | null>(null)
   const [loadingMeta, setLoadingMeta] = useState(false)
 
-  // Form state
+  const [drawerTab, setDrawerTab] = useState<ExpenseDrawerTab>('operational')
+  const [category, setCategory] = useState(EXPENSE_DRAWER_CATEGORIES.operational[0]?.value || '')
+  const [description, setDescription] = useState('')
+  const [currency, setCurrency] = useState<'CLP' | 'USD' | ''>('CLP')
+  const [exchangeRate, setExchangeRate] = useState('')
+  const [totalAmount, setTotalAmount] = useState('')
+  const [paymentDate, setPaymentDate] = useState('')
+  const [paymentMethod, setPaymentMethod] = useState('')
+  const [paymentProvider, setPaymentProvider] = useState('')
+  const [paymentRail, setPaymentRail] = useState('')
+  const [supplierId, setSupplierId] = useState('')
+  const [documentNumber, setDocumentNumber] = useState('')
+  const [documentDate, setDocumentDate] = useState('')
+  const [imputationScope, setImputationScope] = useState<'shared' | 'member' | 'space'>('shared')
+  const [memberId, setMemberId] = useState('')
+  const [spaceId, setSpaceId] = useState('')
+  const [directOverheadKind, setDirectOverheadKind] = useState('')
+  const [recurrenceFrequency, setRecurrenceFrequency] = useState('')
+  const [notes, setNotes] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  // ---------------------------------------------------------------------------
-  // Data fetching
-  // ---------------------------------------------------------------------------
+  const [supplierDrawerOpen, setSupplierDrawerOpen] = useState(false)
 
   const fetchMeta = useCallback(async () => {
     setLoadingMeta(true)
@@ -192,29 +174,15 @@ const CreateExpenseDrawer = ({ open, onClose, onSuccess }: Props) => {
     try {
       const res = await fetch('/api/finance/expenses/meta')
 
-      if (res.ok) {
-        const data = await res.json()
-
-        setMeta(data)
+      if (!res.ok) {
+        return
       }
+
+      const data = await res.json()
+
+      setMeta(data)
     } finally {
       setLoadingMeta(false)
-    }
-  }, [])
-
-  const fetchPayrollCandidates = useCallback(async () => {
-    setLoadingPayroll(true)
-
-    try {
-      const res = await fetch('/api/finance/expenses/payroll-candidates?linkStatus=available')
-
-      if (res.ok) {
-        const data = await res.json()
-
-        setPayrollCandidates(data.items ?? [])
-      }
-    } finally {
-      setLoadingPayroll(false)
     }
   }, [])
 
@@ -222,19 +190,73 @@ const CreateExpenseDrawer = ({ open, onClose, onSuccess }: Props) => {
     if (open && !meta) {
       fetchMeta()
     }
-  }, [open, meta, fetchMeta])
+  }, [fetchMeta, meta, open])
+
+  const resetForm = useCallback(() => {
+    setDrawerTab('operational')
+    setCategory(EXPENSE_DRAWER_CATEGORIES.operational[0]?.value || '')
+    setDescription('')
+    setCurrency('CLP')
+    setExchangeRate('')
+    setTotalAmount('')
+    setPaymentDate('')
+    setPaymentMethod('')
+    setPaymentProvider('')
+    setPaymentRail('')
+    setSupplierId('')
+    setDocumentNumber('')
+    setDocumentDate('')
+    setImputationScope('shared')
+    setMemberId('')
+    setSpaceId('')
+    setDirectOverheadKind('')
+    setRecurrenceFrequency('')
+    setNotes('')
+    setError(null)
+  }, [])
+
+  const handleClose = () => {
+    resetForm()
+    onClose()
+  }
+
+  const handleSupplierCreated = () => {
+    setSupplierDrawerOpen(false)
+    setMeta(null)
+    fetchMeta()
+  }
+
+  const currentCategories = getTabCategories(meta, drawerTab)
+  const selectedCategory = currentCategories.find(item => item.value === category) || currentCategories[0] || null
+  const suppliers = meta?.suppliers ?? []
+  const members = meta?.members ?? []
+  const spaces = meta?.spaces ?? []
+  const selectedSpace = spaces.find(item => item.spaceId === spaceId) || null
+
+  const selectedToolLink = supplierId
+    ? (meta?.supplierToolLinks ?? []).find(item => item.supplierId === supplierId) || null
+    : null
 
   useEffect(() => {
-    if (open && expenseType === 'payroll' && payrollCandidates.length === 0) {
-      fetchPayrollCandidates()
+    const nextCategories = getTabCategories(meta, drawerTab)
+
+    if (!nextCategories.some(item => item.value === category)) {
+      setCategory(nextCategories[0]?.value || '')
     }
-  }, [open, expenseType, payrollCandidates.length, fetchPayrollCandidates])
+  }, [category, drawerTab, meta])
 
-  // ---------------------------------------------------------------------------
-  // Handlers
-  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if (selectedToolLink && !directOverheadKind) {
+      setDirectOverheadKind('tool_license')
+    }
+  }, [directOverheadKind, selectedToolLink])
 
-  const suppliers = meta?.suppliers ?? []
+  const handleDrawerTabChange = (_event: React.MouseEvent<HTMLElement>, nextTab: ExpenseDrawerTab | null) => {
+    if (!nextTab) return
+
+    setDrawerTab(nextTab)
+    setError(null)
+  }
 
   const handleSupplierChange = (value: string) => {
     if (value === ADD_NEW_SUPPLIER) {
@@ -245,61 +267,27 @@ const CreateExpenseDrawer = ({ open, onClose, onSuccess }: Props) => {
 
     setSupplierId(value)
 
-    const supplier = suppliers.find(s => s.supplierId === value)
+    const supplier = suppliers.find(item => item.supplierId === value)
 
-    if (supplier?.paymentCurrency && !currency) {
-      setCurrency(supplier.paymentCurrency)
+    if (supplier?.paymentCurrency && VALID_CURRENCIES.includes(supplier.paymentCurrency as 'CLP' | 'USD')) {
+      setCurrency(supplier.paymentCurrency as 'CLP' | 'USD')
     }
   }
 
-  const handleSupplierCreated = () => {
-    setSupplierDrawerOpen(false)
-    setMeta(null)
-    fetchMeta()
-  }
+  const resolveExpenseType = () => selectedCategory?.expenseType || 'supplier'
 
-  const handlePayrollSelect = (candidate: PayrollCandidate) => {
-    setSelectedPayrollEntry(candidate)
-    setDescription(`Nomina — ${candidate.memberName}`)
-    setCurrency(candidate.currency || 'CLP')
-    setTotalAmount(String(candidate.netTotal))
-  }
+  const resolveCostCategory = () => selectedCategory?.costCategory || 'operational'
 
-  const handleTypeChange = (_: React.MouseEvent<HTMLElement>, newType: ExpenseType | null) => {
-    if (newType) {
-      setExpenseType(newType)
-      setError(null)
-    }
-  }
-
-  const resetForm = () => {
-    setDescription('')
-    setExpenseType('supplier')
-    setCurrency('')
-    setExchangeRate('')
-    setTotalAmount('')
-    setPaymentDate('')
-    setSupplierId('')
-    setDocumentNumber('')
-    setDocumentDate('')
-    setServiceLine('')
-    setPaymentMethod('')
-    setNotes('')
-    setSocialSecurityType('')
-    setSocialSecurityInstitution('')
-    setSocialSecurityPeriod('')
-    setTaxType('')
-    setTaxPeriod('')
-    setTaxFormNumber('')
-    setSelectedPayrollEntry(null)
-    setError(null)
-  }
-
-  // ---------------------------------------------------------------------------
-  // Submit
-  // ---------------------------------------------------------------------------
+  const resolveDirectOverheadKind = () =>
+    directOverheadKind || selectedToolLink ? (directOverheadKind || selectedCategory?.directOverheadKind || 'tool_license') : (selectedCategory?.directOverheadKind || null)
 
   const handleSubmit = async () => {
+    if (!selectedCategory) {
+      setError('Selecciona una categoria de gasto.')
+
+      return
+    }
+
     if (!description.trim() || !currency || !totalAmount || !paymentDate) {
       setError('Descripcion, moneda, monto total y fecha de pago son obligatorios.')
 
@@ -312,73 +300,74 @@ const CreateExpenseDrawer = ({ open, onClose, onSuccess }: Props) => {
       return
     }
 
+    if (imputationScope === 'member' && !memberId) {
+      setError('Selecciona la persona a la que imputas el costo.')
+
+      return
+    }
+
+    if (imputationScope === 'space' && !selectedSpace) {
+      setError('Selecciona el espacio/cliente al que imputas el costo.')
+
+      return
+    }
+
     const amount = Number(totalAmount)
 
-    if (isNaN(amount) || amount <= 0) {
+    if (Number.isNaN(amount) || amount <= 0) {
       setError('El monto total debe ser un numero mayor a 0.')
 
       return
     }
 
-    if (expenseType === 'payroll' && !selectedPayrollEntry) {
-      setError('Selecciona una entrada de nomina.')
-
-      return
-    }
-
-    if (expenseType === 'social_security' && !socialSecurityType) {
-      setError('Selecciona el tipo de prevision.')
-
-      return
-    }
-
-    if (expenseType === 'tax' && !taxType) {
-      setError('Selecciona el tipo de impuesto.')
-
-      return
-    }
-
-    setSaving(true)
-    setError(null)
+    const expenseType = resolveExpenseType()
+    const selectedMember = members.find(item => item.memberId === memberId) || null
+    const resolvedOverheadKind = resolveDirectOverheadKind()
 
     const body: Record<string, unknown> = {
       description: description.trim(),
       expenseType,
+      sourceType: 'manual',
       currency,
       subtotal: amount,
       totalAmount: amount,
       paymentDate,
+      paymentMethod: paymentMethod || null,
+      paymentProvider: paymentProvider || null,
+      paymentRail: paymentRail || null,
+      costCategory: resolveCostCategory(),
+      costIsDirect: imputationScope !== 'shared',
+      directOverheadScope: imputationScope === 'member' ? 'member_direct' : imputationScope === 'shared' ? 'shared' : 'none',
+      directOverheadKind: resolvedOverheadKind,
+      isRecurring: Boolean(recurrenceFrequency),
+      recurrenceFrequency: recurrenceFrequency || null,
+      miscellaneousCategory: drawerTab === 'other' ? selectedCategory.value : null,
+      notes: notes.trim() || null,
       ...(currency !== 'CLP' && exchangeRate && { exchangeRateToClp: Number(exchangeRate) }),
+      ...(supplierId && { supplierId }),
       ...(documentNumber.trim() && { documentNumber: documentNumber.trim() }),
-      ...(documentDate && { documentDate }),
-      ...(serviceLine && { serviceLine }),
-      ...(paymentMethod && { paymentMethod }),
-      ...(notes.trim() && { notes: notes.trim() })
+      ...(documentDate && { documentDate })
     }
 
-    // Type-specific fields
-    if (expenseType === 'supplier' && supplierId.trim()) {
-      body.supplierId = supplierId.trim()
+    if (drawerTab === 'tax') {
+      body.taxType = selectedCategory.value
+      body.taxPeriod = paymentDate.slice(0, 7) || null
     }
 
-    if (expenseType === 'payroll' && selectedPayrollEntry) {
-      body.payrollEntryId = selectedPayrollEntry.payrollEntryId
-      body.payrollPeriodId = selectedPayrollEntry.payrollPeriodId
-      body.memberId = selectedPayrollEntry.memberId
-      body.memberName = selectedPayrollEntry.memberName
+    if (imputationScope === 'member' && selectedMember) {
+      body.memberId = selectedMember.memberId
+      body.memberName = selectedMember.displayName
+      body.directOverheadMemberId = selectedMember.memberId
     }
 
-    if (expenseType === 'social_security') {
-      body.socialSecurityType = socialSecurityType
-      if (socialSecurityInstitution) body.socialSecurityInstitution = socialSecurityInstitution
-      if (socialSecurityPeriod) body.socialSecurityPeriod = socialSecurityPeriod
+    if (imputationScope === 'space' && selectedSpace) {
+      body.spaceId = selectedSpace.spaceId
+      body.allocatedClientId = selectedSpace.clientId
+      body.clientId = selectedSpace.clientId
     }
 
-    if (expenseType === 'tax') {
-      body.taxType = taxType
-      if (taxPeriod) body.taxPeriod = taxPeriod
-      if (taxFormNumber.trim()) body.taxFormNumber = taxFormNumber.trim()
-    }
+    setSaving(true)
+    setError(null)
 
     try {
       const res = await fetch('/api/finance/expenses', {
@@ -407,532 +396,417 @@ const CreateExpenseDrawer = ({ open, onClose, onSuccess }: Props) => {
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // Render helpers
-  // ---------------------------------------------------------------------------
-
-  const renderCommonFields = () => (
-    <>
-      <Grid size={{ xs: 12 }}>
-        <CustomTextField
-          fullWidth
-          size='small'
-          label='Descripcion'
-          value={description}
-          onChange={e => setDescription(e.target.value)}
-          required
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <CustomTextField
-          select
-          fullWidth
-          size='small'
-          label='Moneda'
-          value={currency}
-          onChange={e => setCurrency(e.target.value)}
-          required
-        >
-          <MenuItem value=''>—</MenuItem>
-          {CURRENCIES.map(c => (
-            <MenuItem key={c} value={c}>{c}</MenuItem>
-          ))}
-        </CustomTextField>
-      </Grid>
-
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <CustomTextField
-          fullWidth
-          size='small'
-          label='Monto total'
-          type='number'
-          value={totalAmount}
-          onChange={e => setTotalAmount(e.target.value)}
-          required
-        />
-      </Grid>
-
-      {currency && currency !== 'CLP' && (
-        <Grid size={{ xs: 12 }}>
-          <CustomTextField
-            fullWidth
-            size='small'
-            label={`Tipo de cambio ${currency}/CLP`}
-            type='number'
-            value={exchangeRate}
-            onChange={e => setExchangeRate(e.target.value)}
-            required
-            helperText={
-              exchangeRate && totalAmount
-                ? `Total CLP: $${Math.round(Number(totalAmount) * Number(exchangeRate)).toLocaleString('es-CL')}`
-                : `Ingresa el valor de 1 ${currency} en CLP`
-            }
-          />
-        </Grid>
-      )}
-
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <CustomTextField
-          fullWidth
-          size='small'
-          label='Fecha de pago'
-          type='date'
-          value={paymentDate}
-          onChange={e => setPaymentDate(e.target.value)}
-          InputLabelProps={{ shrink: true }}
-          required
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <CustomTextField
-          select
-          fullWidth
-          size='small'
-          label='Metodo de pago'
-          value={paymentMethod}
-          onChange={e => setPaymentMethod(e.target.value)}
-        >
-          <MenuItem value=''>—</MenuItem>
-          {(meta?.paymentMethods ?? Object.keys(PAYMENT_METHOD_LABELS)).map(m => (
-            <MenuItem key={m} value={m}>{PAYMENT_METHOD_LABELS[m] || m}</MenuItem>
-          ))}
-        </CustomTextField>
-      </Grid>
-    </>
-  )
-
-  const renderSupplierFields = () => (
-    <>
-      <Grid size={{ xs: 12 }}>
-        <CustomTextField
-          select
-          fullWidth
-          size='small'
-          label='Proveedor'
-          value={supplierId}
-          onChange={e => handleSupplierChange(e.target.value)}
-          disabled={loadingMeta}
-        >
-          <MenuItem value=''>{loadingMeta ? 'Cargando...' : '— Seleccionar proveedor —'}</MenuItem>
-          {suppliers.map(s => (
-            <MenuItem key={s.supplierId} value={s.supplierId}>
-              {s.tradeName || s.legalName}
-            </MenuItem>
-          ))}
-          <ListSubheader sx={{ p: 0 }}>
-            <Divider />
-          </ListSubheader>
-          <MenuItem value={ADD_NEW_SUPPLIER} sx={{ color: 'primary.main', fontWeight: 600 }}>
-            <i className='tabler-plus' style={{ marginRight: 8, fontSize: 18 }} />
-            Agregar proveedor
-          </MenuItem>
-        </CustomTextField>
-      </Grid>
-
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <CustomTextField
-          fullWidth
-          size='small'
-          label='N° Documento'
-          value={documentNumber}
-          onChange={e => setDocumentNumber(e.target.value)}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <CustomTextField
-          fullWidth
-          size='small'
-          label='Fecha documento'
-          type='date'
-          value={documentDate}
-          onChange={e => setDocumentDate(e.target.value)}
-          InputLabelProps={{ shrink: true }}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <CustomTextField
-          select
-          fullWidth
-          size='small'
-          label='Linea de servicio'
-          value={serviceLine}
-          onChange={e => setServiceLine(e.target.value)}
-        >
-          <MenuItem value=''>—</MenuItem>
-          {(meta?.serviceLines ?? Object.keys(SERVICE_LINE_LABELS)).map(s => (
-            <MenuItem key={s} value={s}>{SERVICE_LINE_LABELS[s] || s}</MenuItem>
-          ))}
-        </CustomTextField>
-      </Grid>
-    </>
-  )
-
-  const renderPayrollFields = () => (
-    <>
-      <Grid size={{ xs: 12 }}>
-        <Typography variant='subtitle2' color='text.secondary' sx={{ mb: 1 }}>
-          Selecciona una entrada de nomina aprobada
-        </Typography>
-
-        {loadingPayroll ? (
-          <Stack spacing={1}>
-            {[0, 1, 2].map(i => <Skeleton key={i} variant='rounded' height={64} />)}
-          </Stack>
-        ) : payrollCandidates.length === 0 ? (
-          <Box sx={{ textAlign: 'center', py: 4 }} role='status'>
-            <Typography variant='body2' color='text.secondary'>
-              No hay entradas de nomina disponibles para vincular.
-            </Typography>
-          </Box>
-        ) : (
-          <Box sx={{ maxHeight: 240, overflowY: 'auto' }}>
-            <Stack spacing={1}>
-              {payrollCandidates.map(candidate => {
-                const isSelected = selectedPayrollEntry?.payrollEntryId === candidate.payrollEntryId
-
-                return (
-                  <Card
-                    key={candidate.payrollEntryId}
-                    elevation={0}
-                    onClick={() => handlePayrollSelect(candidate)}
-                    sx={{
-                      border: t => `1px solid ${isSelected ? t.palette.primary.main : t.palette.divider}`,
-                      bgcolor: isSelected ? 'primary.lightOpacity' : 'transparent',
-                      cursor: 'pointer',
-                      transition: 'border-color 0.15s',
-                      '&:hover': { borderColor: 'primary.main' }
-                    }}
-                    role='option'
-                    aria-selected={isSelected}
-                  >
-                    <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <Radio checked={isSelected} size='small' tabIndex={-1} inputProps={{ 'aria-label': `Seleccionar ${candidate.memberName}` }} />
-                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Typography variant='body2' fontWeight={600} noWrap>
-                            {candidate.memberName}
-                          </Typography>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Typography variant='caption' color='text.secondary'>
-                              Periodo: {candidate.payrollPeriodId}
-                            </Typography>
-                            <CustomChip round='true' size='small' color='success' label={candidate.payrollStatus} />
-                          </Box>
-                        </Box>
-                        <Box sx={{ textAlign: 'right', flexShrink: 0 }}>
-                          <Typography variant='body2' fontWeight={700}>
-                            {formatCLP(candidate.netTotal)}
-                          </Typography>
-                          <Typography variant='caption' color='text.secondary'>
-                            Bruto: {formatCLP(candidate.grossTotal)}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                )
-              })}
-            </Stack>
-          </Box>
-        )}
-      </Grid>
-    </>
-  )
-
-  const renderSocialSecurityFields = () => (
-    <>
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <CustomTextField
-          select
-          fullWidth
-          size='small'
-          label='Tipo de prevision'
-          value={socialSecurityType}
-          onChange={e => setSocialSecurityType(e.target.value)}
-          required
-        >
-          <MenuItem value=''>—</MenuItem>
-          {(meta?.socialSecurityTypes ?? Object.keys(SOCIAL_SECURITY_TYPE_LABELS)).map(t => (
-            <MenuItem key={t} value={t}>{SOCIAL_SECURITY_TYPE_LABELS[t] || t}</MenuItem>
-          ))}
-        </CustomTextField>
-      </Grid>
-
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <CustomTextField
-          select
-          fullWidth
-          size='small'
-          label='Institucion'
-          value={socialSecurityInstitution}
-          onChange={e => setSocialSecurityInstitution(e.target.value)}
-        >
-          <MenuItem value=''>—</MenuItem>
-          {(meta?.socialSecurityInstitutions ?? []).map(inst => (
-            <MenuItem key={inst} value={inst}>{inst}</MenuItem>
-          ))}
-        </CustomTextField>
-      </Grid>
-
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <CustomTextField
-          fullWidth
-          size='small'
-          label='Periodo'
-          type='month'
-          value={socialSecurityPeriod}
-          onChange={e => setSocialSecurityPeriod(e.target.value)}
-          InputLabelProps={{ shrink: true }}
-          helperText='Mes al que corresponde el pago'
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <CustomTextField
-          fullWidth
-          size='small'
-          label='N° Documento'
-          value={documentNumber}
-          onChange={e => setDocumentNumber(e.target.value)}
-        />
-      </Grid>
-    </>
-  )
-
-  const renderTaxFields = () => (
-    <>
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <CustomTextField
-          select
-          fullWidth
-          size='small'
-          label='Tipo de impuesto'
-          value={taxType}
-          onChange={e => setTaxType(e.target.value)}
-          required
-        >
-          <MenuItem value=''>—</MenuItem>
-          {(meta?.taxTypes ?? Object.keys(TAX_TYPE_LABELS)).map(t => (
-            <MenuItem key={t} value={t}>{TAX_TYPE_LABELS[t] || t}</MenuItem>
-          ))}
-        </CustomTextField>
-      </Grid>
-
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <CustomTextField
-          fullWidth
-          size='small'
-          label='Periodo tributario'
-          type='month'
-          value={taxPeriod}
-          onChange={e => setTaxPeriod(e.target.value)}
-          InputLabelProps={{ shrink: true }}
-          helperText='Mes al que corresponde la obligacion'
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <CustomTextField
-          fullWidth
-          size='small'
-          label='N° Formulario'
-          value={taxFormNumber}
-          onChange={e => setTaxFormNumber(e.target.value)}
-          helperText='ej. F29, F22'
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <CustomTextField
-          fullWidth
-          size='small'
-          label='N° Documento'
-          value={documentNumber}
-          onChange={e => setDocumentNumber(e.target.value)}
-        />
-      </Grid>
-    </>
-  )
-
-  const renderMiscellaneousFields = () => (
-    <>
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <CustomTextField
-          fullWidth
-          size='small'
-          label='N° Documento'
-          value={documentNumber}
-          onChange={e => setDocumentNumber(e.target.value)}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <CustomTextField
-          fullWidth
-          size='small'
-          label='Fecha documento'
-          type='date'
-          value={documentDate}
-          onChange={e => setDocumentDate(e.target.value)}
-          InputLabelProps={{ shrink: true }}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <CustomTextField
-          select
-          fullWidth
-          size='small'
-          label='Linea de servicio'
-          value={serviceLine}
-          onChange={e => setServiceLine(e.target.value)}
-        >
-          <MenuItem value=''>—</MenuItem>
-          {(meta?.serviceLines ?? Object.keys(SERVICE_LINE_LABELS)).map(s => (
-            <MenuItem key={s} value={s}>{SERVICE_LINE_LABELS[s] || s}</MenuItem>
-          ))}
-        </CustomTextField>
-      </Grid>
-    </>
-  )
-
-  // ---------------------------------------------------------------------------
-  // Render
-  // ---------------------------------------------------------------------------
-
   return (
     <>
-    <Drawer
-      anchor='right'
-      open={open}
-      onClose={onClose}
-      PaperProps={{ sx: { width: { xs: '100%', sm: 460 } } }}
-    >
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 4 }}>
-        <Typography variant='h6'>Registrar egreso</Typography>
-        <IconButton onClick={onClose} size='small' aria-label='Cerrar'>
-          <i className='tabler-x' />
-        </IconButton>
-      </Box>
-
-      <Divider />
-
-      <Stack spacing={3} sx={{ p: 4, overflowY: 'auto', flex: 1 }}>
-        {error && <Alert severity='error' onClose={() => setError(null)}>{error}</Alert>}
-
-        {/* Type selector */}
-        <Box>
-          <Typography variant='subtitle2' color='text.secondary' sx={{ mb: 1 }}>
-            Tipo de egreso
-          </Typography>
-          <ToggleButtonGroup
-            value={expenseType}
-            exclusive
-            onChange={handleTypeChange}
-            size='small'
-            fullWidth
-            aria-label='Tipo de egreso'
-            sx={{
-              '& .MuiToggleButton-root': {
-                textTransform: 'none',
-                fontSize: '0.8rem',
-                py: 1,
-                gap: 0.5
-              }
-            }}
-          >
-            {(Object.keys(EXPENSE_TYPE_CONFIG) as ExpenseType[]).map(type => (
-              <ToggleButton key={type} value={type} aria-label={EXPENSE_TYPE_CONFIG[type].label}>
-                <i className={EXPENSE_TYPE_CONFIG[type].icon} style={{ fontSize: 16 }} />
-                {EXPENSE_TYPE_CONFIG[type].label}
-              </ToggleButton>
-            ))}
-          </ToggleButtonGroup>
+      <Drawer
+        anchor='right'
+        open={open}
+        onClose={handleClose}
+        ModalProps={{ keepMounted: true }}
+        sx={{
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 720 }
+          }
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 5, pb: 3 }}>
+          <Box>
+            <Typography variant='h5'>Registrar egreso</Typography>
+            <Typography variant='body2' color='text.secondary'>
+              Finance ledger canónico con imputación, recurrencia y bridge cross-module.
+            </Typography>
+          </Box>
+          <IconButton size='small' onClick={handleClose}>
+            <i className='tabler-x' />
+          </IconButton>
         </Box>
 
         <Divider />
 
-        {/* Type-specific fields + common fields */}
-        <Grid container spacing={2}>
-          {/* Type-specific section */}
-          {expenseType === 'payroll' && renderPayrollFields()}
-          {expenseType === 'social_security' && renderSocialSecurityFields()}
-          {expenseType === 'tax' && renderTaxFields()}
+        <Box sx={{ p: 5, pt: 4, overflowY: 'auto' }}>
+          <Stack spacing={4}>
+            <Card variant='outlined'>
+              <CardContent sx={{ p: 3 }}>
+                <Stack spacing={2.5}>
+                  <Box>
+                    <Typography variant='overline' sx={{ letterSpacing: 1.1, color: 'text.secondary' }}>
+                      Tipo de egreso
+                    </Typography>
+                    <ToggleButtonGroup
+                      exclusive
+                      fullWidth
+                      color='primary'
+                      value={drawerTab}
+                      onChange={handleDrawerTabChange}
+                      sx={{ mt: 1.5, display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', sm: 'repeat(4, 1fr)' } }}
+                    >
+                      {EXPENSE_DRAWER_TABS.map(tab => (
+                        <ToggleButton key={tab} value={tab} sx={{ textTransform: 'none' }}>
+                          {EXPENSE_DRAWER_TAB_LABELS[tab]}
+                        </ToggleButton>
+                      ))}
+                    </ToggleButtonGroup>
+                  </Box>
 
-          {/* Common fields (always visible) */}
-          {renderCommonFields()}
+                  <Alert severity='info' variant='outlined'>
+                    <strong>{typeInfoByTab[drawerTab].caption}:</strong> {typeInfoByTab[drawerTab].helper}
+                  </Alert>
 
-          {/* Supplier-specific fields (after common, as optional section) */}
-          {expenseType === 'supplier' && (
-            <>
-              <Grid size={{ xs: 12 }}>
-                <Divider />
-              </Grid>
-              <Grid size={{ xs: 12 }}>
-                <Typography variant='subtitle2' color='text.secondary'>Datos del proveedor</Typography>
-              </Grid>
-              {renderSupplierFields()}
-            </>
-          )}
+                  <Alert severity='warning' variant='outlined'>
+                    Nómina y Previred no se registran manualmente en este drawer. Esa materialización queda reactiva desde Payroll al exportar el período.
+                  </Alert>
+                </Stack>
+              </CardContent>
+            </Card>
 
-          {/* Miscellaneous optional fields */}
-          {expenseType === 'miscellaneous' && (
-            <>
-              <Grid size={{ xs: 12 }}>
-                <Divider />
-              </Grid>
-              <Grid size={{ xs: 12 }}>
-                <Typography variant='subtitle2' color='text.secondary'>Campos adicionales</Typography>
-              </Grid>
-              {renderMiscellaneousFields()}
-            </>
-          )}
+            {error && <Alert severity='error'>{error}</Alert>}
 
-          {/* Notes (always) */}
-          <Grid size={{ xs: 12 }}>
-            <Divider />
-          </Grid>
-          <Grid size={{ xs: 12 }}>
-            <CustomTextField
-              fullWidth
-              size='small'
-              label='Notas'
-              multiline
-              rows={2}
-              value={notes}
-              onChange={e => setNotes(e.target.value)}
-            />
-          </Grid>
-        </Grid>
-      </Stack>
+            <Card variant='outlined'>
+              <CardContent sx={{ p: 3 }}>
+                <Stack spacing={2.5}>
+                  <Typography variant='subtitle1'>Datos del egreso</Typography>
 
-      <Divider />
-      <Box sx={{ display: 'flex', gap: 2, p: 4 }}>
-        <Button variant='outlined' color='secondary' onClick={onClose} fullWidth>
-          Cancelar
-        </Button>
-        <Button
-          variant='contained'
-          color='error'
-          onClick={handleSubmit}
-          disabled={saving}
-          fullWidth
-          startIcon={saving ? <CircularProgress size={16} color='inherit' /> : undefined}
-        >
-          {saving ? 'Guardando...' : 'Guardar egreso'}
-        </Button>
-      </Box>
-    </Drawer>
+                  <Grid container spacing={3}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <CustomTextField
+                        select
+                        fullWidth
+                        size='small'
+                        label='Categoria de gasto'
+                        value={category}
+                        onChange={event => setCategory(event.target.value)}
+                        required
+                      >
+                        {currentCategories.map(item => (
+                          <MenuItem key={item.value} value={item.value}>
+                            {item.label}
+                          </MenuItem>
+                        ))}
+                      </CustomTextField>
+                    </Grid>
 
-    <CreateSupplierDrawer
-      open={supplierDrawerOpen}
-      onClose={() => setSupplierDrawerOpen(false)}
-      onSuccess={handleSupplierCreated}
-    />
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <CustomTextField
+                        select
+                        fullWidth
+                        size='small'
+                        label='Frecuencia'
+                        value={recurrenceFrequency}
+                        onChange={event => setRecurrenceFrequency(event.target.value)}
+                        helperText='Deja vacío si es un gasto puntual'
+                      >
+                        <MenuItem value=''>No recurrente</MenuItem>
+                        {(meta?.recurrenceFrequencies ?? RECURRENCE_FREQUENCIES).map(item => (
+                          <MenuItem key={item} value={item}>
+                            {RECURRENCE_LABELS[item] || item}
+                          </MenuItem>
+                        ))}
+                      </CustomTextField>
+                    </Grid>
+
+                    <Grid size={{ xs: 12 }}>
+                      <CustomTextField
+                        fullWidth
+                        size='small'
+                        label='Descripcion'
+                        value={description}
+                        onChange={event => setDescription(event.target.value)}
+                        required
+                      />
+                    </Grid>
+
+                    <Grid size={{ xs: 12, sm: 4 }}>
+                      <CustomTextField
+                        select
+                        fullWidth
+                        size='small'
+                        label='Moneda'
+                        value={currency}
+                        onChange={event => setCurrency(event.target.value as 'CLP' | 'USD' | '')}
+                        required
+                      >
+                        {VALID_CURRENCIES.map(item => (
+                          <MenuItem key={item} value={item}>
+                            {item}
+                          </MenuItem>
+                        ))}
+                      </CustomTextField>
+                    </Grid>
+
+                    <Grid size={{ xs: 12, sm: 4 }}>
+                      <CustomTextField
+                        fullWidth
+                        size='small'
+                        label='Monto total'
+                        type='number'
+                        value={totalAmount}
+                        onChange={event => setTotalAmount(event.target.value)}
+                        required
+                      />
+                    </Grid>
+
+                    <Grid size={{ xs: 12, sm: 4 }}>
+                      <CustomTextField
+                        fullWidth
+                        size='small'
+                        label='Fecha de pago'
+                        type='date'
+                        value={paymentDate}
+                        onChange={event => setPaymentDate(event.target.value)}
+                        InputLabelProps={{ shrink: true }}
+                        required
+                      />
+                    </Grid>
+
+                    {currency === 'USD' && (
+                      <Grid size={{ xs: 12 }}>
+                        <CustomTextField
+                          fullWidth
+                          size='small'
+                          label='Tipo de cambio USD/CLP'
+                          type='number'
+                          value={exchangeRate}
+                          onChange={event => setExchangeRate(event.target.value)}
+                        />
+                      </Grid>
+                    )}
+
+                    <Grid size={{ xs: 12, sm: 4 }}>
+                      <CustomTextField
+                        select
+                        fullWidth
+                        size='small'
+                        label='Metodo de pago'
+                        value={paymentMethod}
+                        onChange={event => setPaymentMethod(event.target.value)}
+                      >
+                        <MenuItem value=''>—</MenuItem>
+                        {(meta?.paymentMethods ?? PAYMENT_METHODS).map(item => (
+                          <MenuItem key={item} value={item}>
+                            {PAYMENT_METHOD_LABELS[item] || item}
+                          </MenuItem>
+                        ))}
+                      </CustomTextField>
+                    </Grid>
+
+                    <Grid size={{ xs: 12, sm: 4 }}>
+                      <CustomTextField
+                        select
+                        fullWidth
+                        size='small'
+                        label='Proveedor de pago'
+                        value={paymentProvider}
+                        onChange={event => setPaymentProvider(event.target.value)}
+                      >
+                        <MenuItem value=''>—</MenuItem>
+                        {(meta?.paymentProviders ?? []).map(item => (
+                          <MenuItem key={item} value={item}>
+                            {PAYMENT_PROVIDER_LABELS[item] || item}
+                          </MenuItem>
+                        ))}
+                      </CustomTextField>
+                    </Grid>
+
+                    <Grid size={{ xs: 12, sm: 4 }}>
+                      <CustomTextField
+                        select
+                        fullWidth
+                        size='small'
+                        label='Rail'
+                        value={paymentRail}
+                        onChange={event => setPaymentRail(event.target.value)}
+                      >
+                        <MenuItem value=''>—</MenuItem>
+                        {(meta?.paymentRails ?? []).map(item => (
+                          <MenuItem key={item} value={item}>
+                            {PAYMENT_RAIL_LABELS[item] || item}
+                          </MenuItem>
+                        ))}
+                      </CustomTextField>
+                    </Grid>
+                  </Grid>
+                </Stack>
+              </CardContent>
+            </Card>
+
+            <Card variant='outlined'>
+              <CardContent sx={{ p: 3 }}>
+                <Stack spacing={2.5}>
+                  <Typography variant='subtitle1'>Proveedor y documento</Typography>
+
+                  <Grid container spacing={3}>
+                    <Grid size={{ xs: 12 }}>
+                      <CustomTextField
+                        select
+                        fullWidth
+                        size='small'
+                        label='Proveedor'
+                        value={supplierId}
+                        onChange={event => handleSupplierChange(event.target.value)}
+                        disabled={loadingMeta}
+                      >
+                        <MenuItem value=''>{loadingMeta ? 'Cargando...' : '— Seleccionar proveedor —'}</MenuItem>
+                        {suppliers.map(item => (
+                          <MenuItem key={item.supplierId} value={item.supplierId}>
+                            {item.tradeName || item.legalName}
+                          </MenuItem>
+                        ))}
+                        <ListSubheader sx={{ p: 0 }}>
+                          <Divider />
+                        </ListSubheader>
+                        <MenuItem value={ADD_NEW_SUPPLIER} sx={{ color: 'primary.main', fontWeight: 600 }}>
+                          <i className='tabler-plus' style={{ marginRight: 8, fontSize: 18 }} />
+                          Agregar proveedor
+                        </MenuItem>
+                      </CustomTextField>
+                    </Grid>
+
+                    {selectedToolLink && (
+                      <Grid size={{ xs: 12 }}>
+                        <Alert severity='success' variant='outlined'>
+                          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems={{ xs: 'flex-start', sm: 'center' }}>
+                            <span>Herramienta vinculada:</span>
+                            <CustomChip round='true' size='small' variant='tonal' color='success' label={selectedToolLink.toolName} />
+                            {selectedToolLink.providerName && (
+                              <Typography variant='caption' color='text.secondary'>
+                                Provider: {selectedToolLink.providerName}
+                              </Typography>
+                            )}
+                          </Stack>
+                        </Alert>
+                      </Grid>
+                    )}
+
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <CustomTextField
+                        fullWidth
+                        size='small'
+                        label='N° Documento'
+                        value={documentNumber}
+                        onChange={event => setDocumentNumber(event.target.value)}
+                      />
+                    </Grid>
+
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <CustomTextField
+                        fullWidth
+                        size='small'
+                        label='Fecha documento'
+                        type='date'
+                        value={documentDate}
+                        onChange={event => setDocumentDate(event.target.value)}
+                        InputLabelProps={{ shrink: true }}
+                      />
+                    </Grid>
+                  </Grid>
+                </Stack>
+              </CardContent>
+            </Card>
+
+            <Card variant='outlined'>
+              <CardContent sx={{ p: 3 }}>
+                <Stack spacing={2.5}>
+                  <Typography variant='subtitle1'>Imputacion</Typography>
+
+                  <ToggleButtonGroup
+                    exclusive
+                    color='primary'
+                    value={imputationScope}
+                    onChange={(_event, value: 'shared' | 'member' | 'space' | null) => value && setImputationScope(value)}
+                    sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' } }}
+                  >
+                    <ToggleButton value='shared'>Compartido</ToggleButton>
+                    <ToggleButton value='member'>Directo a persona</ToggleButton>
+                    <ToggleButton value='space'>Directo a space</ToggleButton>
+                  </ToggleButtonGroup>
+
+                  <Grid container spacing={3}>
+                    {imputationScope === 'member' && (
+                      <Grid size={{ xs: 12 }}>
+                        <CustomTextField
+                          select
+                          fullWidth
+                          size='small'
+                          label='Persona'
+                          value={memberId}
+                          onChange={event => setMemberId(event.target.value)}
+                        >
+                          <MenuItem value=''>—</MenuItem>
+                          {members.map(item => (
+                            <MenuItem key={item.memberId} value={item.memberId}>
+                              {item.displayName}
+                            </MenuItem>
+                          ))}
+                        </CustomTextField>
+                      </Grid>
+                    )}
+
+                    {imputationScope === 'space' && (
+                      <Grid size={{ xs: 12 }}>
+                        <CustomTextField
+                          select
+                          fullWidth
+                          size='small'
+                          label='Space / cliente'
+                          value={spaceId}
+                          onChange={event => setSpaceId(event.target.value)}
+                        >
+                          <MenuItem value=''>—</MenuItem>
+                          {spaces.map(item => (
+                            <MenuItem key={item.spaceId} value={item.spaceId}>
+                              {item.spaceName}
+                            </MenuItem>
+                          ))}
+                        </CustomTextField>
+                      </Grid>
+                    )}
+
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <CustomTextField
+                        select
+                        fullWidth
+                        size='small'
+                        label='Tipo overhead'
+                        value={directOverheadKind}
+                        onChange={event => setDirectOverheadKind(event.target.value)}
+                        helperText='Sugerido automáticamente para tooling cuando existe bridge supplier → tool'
+                      >
+                        <MenuItem value=''>—</MenuItem>
+                        {DIRECT_OVERHEAD_KINDS.map(item => (
+                          <MenuItem key={item} value={item}>
+                            {DIRECT_OVERHEAD_KIND_LABELS[item] || item}
+                          </MenuItem>
+                        ))}
+                      </CustomTextField>
+                    </Grid>
+
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <CustomTextField
+                        fullWidth
+                        size='small'
+                        label='Notas'
+                        value={notes}
+                        onChange={event => setNotes(event.target.value)}
+                      />
+                    </Grid>
+                  </Grid>
+                </Stack>
+              </CardContent>
+            </Card>
+
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+              <Button color='secondary' variant='tonal' onClick={handleClose} disabled={saving}>
+                Cancelar
+              </Button>
+              <Button variant='contained' onClick={handleSubmit} disabled={saving || loadingMeta}>
+                {saving ? <CircularProgress size={20} color='inherit' /> : 'Guardar egreso'}
+              </Button>
+            </Box>
+          </Stack>
+        </Box>
+      </Drawer>
+
+      <CreateSupplierDrawer open={supplierDrawerOpen} onClose={() => setSupplierDrawerOpen(false)} onSuccess={handleSupplierCreated} />
     </>
   )
 }

@@ -1,9 +1,10 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useForm, Controller } from 'react-hook-form'
 
 import Link from 'next/link'
+
+import { useForm, Controller } from 'react-hook-form'
 
 import Alert from '@mui/material/Alert'
 import Autocomplete from '@mui/material/Autocomplete'
@@ -90,7 +91,7 @@ const HrDepartmentsView = ({ isAdmin }: Props) => {
   const [loadingBL, setLoadingBL] = useState(false)
   const [loadingMembers, setLoadingMembers] = useState(false)
 
-  const { control, handleSubmit, reset, formState: { isDirty, isValid } } = useForm<DepartmentFormValues>({
+  const { control, handleSubmit, reset, formState: { isValid } } = useForm<DepartmentFormValues>({
     defaultValues: FORM_DEFAULTS,
     mode: 'onChange'
   })

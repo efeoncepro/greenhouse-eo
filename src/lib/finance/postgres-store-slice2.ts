@@ -106,7 +106,9 @@ type PostgresIncomeRow = {
 type PostgresExpenseRow = {
   expense_id: string
   client_id: string | null
+  space_id: string | null
   expense_type: string
+  source_type: string | null
   description: string
   currency: string
   subtotal: unknown
@@ -118,6 +120,8 @@ type PostgresExpenseRow = {
   payment_date: string | Date | null
   payment_status: string
   payment_method: string | null
+  payment_provider: string | null
+  payment_rail: string | null
   payment_account_id: string | null
   payment_reference: string | null
   document_number: string | null
@@ -276,7 +280,9 @@ export type AllocationMethod = 'manual' | 'fte_weighted' | 'revenue_weighted' | 
 export type FinanceExpenseRecord = {
   expenseId: string
   clientId: string | null
+  spaceId: string | null
   expenseType: string
+  sourceType: string | null
   description: string
   currency: string
   subtotal: number
@@ -288,6 +294,8 @@ export type FinanceExpenseRecord = {
   paymentDate: string | null
   paymentStatus: string
   paymentMethod: string | null
+  paymentProvider: string | null
+  paymentRail: string | null
   paymentAccountId: string | null
   paymentReference: string | null
   documentNumber: string | null
@@ -490,7 +498,9 @@ const mapIncome = (row: PostgresIncomeRow): FinanceIncomeRecord => {
 const mapExpense =(row: PostgresExpenseRow): FinanceExpenseRecord => ({
   expenseId: normalizeString(row.expense_id),
   clientId: str(row.client_id),
+  spaceId: str(row.space_id),
   expenseType: normalizeString(row.expense_type),
+  sourceType: str(row.source_type),
   description: normalizeString(row.description),
   currency: normalizeString(row.currency),
   subtotal: toNumber(row.subtotal),
@@ -502,6 +512,8 @@ const mapExpense =(row: PostgresExpenseRow): FinanceExpenseRecord => ({
   paymentDate: toDateString(row.payment_date as string | { value?: string } | null),
   paymentStatus: normalizeString(row.payment_status),
   paymentMethod: str(row.payment_method),
+  paymentProvider: str(row.payment_provider),
+  paymentRail: str(row.payment_rail),
   paymentAccountId: str(row.payment_account_id),
   paymentReference: str(row.payment_reference),
   documentNumber: str(row.document_number),
@@ -1364,7 +1376,9 @@ export const updateFinanceExpenseInPostgres = async (
 
   const fieldMap: Record<string, string> = {
     clientId: 'client_id',
+    spaceId: 'space_id',
     expenseType: 'expense_type',
+    sourceType: 'source_type',
     description: 'description',
     currency: 'currency',
     subtotal: 'subtotal',
@@ -1376,6 +1390,8 @@ export const updateFinanceExpenseInPostgres = async (
     paymentDate: 'payment_date',
     paymentStatus: 'payment_status',
     paymentMethod: 'payment_method',
+    paymentProvider: 'payment_provider',
+    paymentRail: 'payment_rail',
     paymentAccountId: 'payment_account_id',
     paymentReference: 'payment_reference',
     documentNumber: 'document_number',
@@ -1581,6 +1597,7 @@ export const listFinanceExpensesFromPostgres = async ({
   expenseType,
   status,
   clientId,
+  spaceId,
   memberId,
   supplierId,
   serviceLine,
@@ -1592,6 +1609,7 @@ export const listFinanceExpensesFromPostgres = async ({
   expenseType?: string | null
   status?: string | null
   clientId?: string | null
+  spaceId?: string | null
   memberId?: string | null
   supplierId?: string | null
   serviceLine?: string | null
@@ -1615,6 +1633,7 @@ export const listFinanceExpensesFromPostgres = async ({
   if (expenseType) push('expense_type = $?', expenseType)
   if (status) push('payment_status = $?', status)
   if (clientId) push('client_id = $?', clientId)
+  if (spaceId) push('space_id = $?', spaceId)
   if (memberId) push('member_id = $?', memberId)
   if (supplierId) push('supplier_id = $?', supplierId)
   if (serviceLine) push('service_line = $?', serviceLine)
@@ -1641,10 +1660,10 @@ export const listFinanceExpensesFromPostgres = async ({
   const rows = await runGreenhousePostgresQuery<PostgresExpenseRow>(
     `
       SELECT
-        expense_id, client_id, expense_type, description, currency,
+        expense_id, client_id, space_id, expense_type, source_type, description, currency,
         subtotal, tax_rate, tax_amount, total_amount,
         exchange_rate_to_clp, total_amount_clp,
-        payment_date, payment_status, payment_method, payment_account_id, payment_reference,
+        payment_date, payment_status, payment_method, payment_provider, payment_rail, payment_account_id, payment_reference,
         document_number, document_date, due_date,
         supplier_id, supplier_name, supplier_invoice_number,
         payroll_period_id, payroll_entry_id, member_id, member_name,
@@ -1653,6 +1672,7 @@ export const listFinanceExpensesFromPostgres = async ({
         miscellaneous_category, service_line, is_recurring, recurrence_frequency,
         is_reconciled, reconciliation_id, linked_income_id,
         cost_category, cost_is_direct, allocated_client_id,
+        direct_overhead_scope, direct_overhead_kind, direct_overhead_member_id,
         notes, created_by_user_id,
         created_at, updated_at,
         nubox_purchase_id, nubox_document_status, nubox_supplier_rut,
@@ -1677,10 +1697,10 @@ export const getFinanceExpenseFromPostgres = async (expenseId: string) => {
   const rows = await runGreenhousePostgresQuery<PostgresExpenseRow>(
     `
       SELECT
-        expense_id, client_id, expense_type, description, currency,
+        expense_id, client_id, space_id, expense_type, source_type, description, currency,
         subtotal, tax_rate, tax_amount, total_amount,
         exchange_rate_to_clp, total_amount_clp,
-        payment_date, payment_status, payment_method, payment_account_id, payment_reference,
+        payment_date, payment_status, payment_method, payment_provider, payment_rail, payment_account_id, payment_reference,
         document_number, document_date, due_date,
         supplier_id, supplier_name, supplier_invoice_number,
         payroll_period_id, payroll_entry_id, member_id, member_name,
@@ -1689,6 +1709,7 @@ export const getFinanceExpenseFromPostgres = async (expenseId: string) => {
         miscellaneous_category, service_line, is_recurring, recurrence_frequency,
         is_reconciled, reconciliation_id, linked_income_id,
         cost_category, cost_is_direct, allocated_client_id,
+        direct_overhead_scope, direct_overhead_kind, direct_overhead_member_id,
         notes, created_by_user_id,
         created_at, updated_at,
         nubox_purchase_id, nubox_document_status, nubox_supplier_rut,
@@ -1709,7 +1730,9 @@ export const getFinanceExpenseFromPostgres = async (expenseId: string) => {
 export const createFinanceExpenseInPostgres = async ({
   expenseId,
   clientId,
+  spaceId,
   expenseType,
+  sourceType,
   description,
   currency,
   subtotal,
@@ -1721,6 +1744,8 @@ export const createFinanceExpenseInPostgres = async ({
   paymentDate,
   paymentStatus,
   paymentMethod,
+  paymentProvider,
+  paymentRail,
   paymentAccountId,
   paymentReference,
   documentNumber,
@@ -1754,7 +1779,9 @@ export const createFinanceExpenseInPostgres = async ({
 }: {
   expenseId: string
   clientId: string | null
+  spaceId: string | null
   expenseType: string
+  sourceType: string | null
   description: string
   currency: string
   subtotal: number
@@ -1766,6 +1793,8 @@ export const createFinanceExpenseInPostgres = async ({
   paymentDate: string | null
   paymentStatus: string
   paymentMethod: string | null
+  paymentProvider: string | null
+  paymentRail: string | null
   paymentAccountId: string | null
   paymentReference: string | null
   documentNumber: string | null
@@ -1803,10 +1832,10 @@ export const createFinanceExpenseInPostgres = async ({
     const rows = await queryRows<PostgresExpenseRow>(
       `
         INSERT INTO greenhouse_finance.expenses (
-          expense_id, client_id, expense_type, description, currency,
+          expense_id, client_id, space_id, expense_type, source_type, description, currency,
           subtotal, tax_rate, tax_amount, total_amount,
           exchange_rate_to_clp, total_amount_clp,
-          payment_date, payment_status, payment_method, payment_account_id, payment_reference,
+          payment_date, payment_status, payment_method, payment_provider, payment_rail, payment_account_id, payment_reference,
           document_number, document_date, due_date,
           supplier_id, supplier_name, supplier_invoice_number,
           payroll_period_id, payroll_entry_id, member_id, member_name,
@@ -1820,29 +1849,28 @@ export const createFinanceExpenseInPostgres = async ({
           created_at, updated_at
         )
         VALUES (
-          $1, $2, $3, $4, $5,
-          $6, $7, $8, $9,
-          $10, $11,
-          $12::date, $13, $14, $15, $16,
-          $17, $18::date, $19::date,
-          $20, $21, $22,
-          $23, $24, $25, $26,
-          $27, $28, $29,
-          $30, $31, $32,
-          $33, $34, $35, $36,
+          $1, $2, $3, $4, $5, $6, $7,
+          $8, $9, $10, $11,
+          $12, $13,
+          $14::date, $15, $16, $17, $18, $19, $20,
+          $21, $22::date, $23::date,
+          $24, $25, $26,
+          $27, $28, $29, $30,
+          $31, $32, $33,
+          $34, $35, $36, $37,
           FALSE,
-          $37, $38, $39,
-          $40, $41, $42,
-          $43, $44,
+          $38, $39, $40,
+          $41, $42, $43,
+          $44, $45,
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
         RETURNING *
       `,
       [
-        expenseId, clientId, expenseType, description, currency,
+        expenseId, clientId, spaceId, expenseType, sourceType, description, currency,
         subtotal, taxRate, taxAmount, totalAmount,
         exchangeRateToClp, totalAmountClp,
-        paymentDate, paymentStatus, paymentMethod, paymentAccountId, paymentReference,
+        paymentDate, paymentStatus, paymentMethod, paymentProvider, paymentRail, paymentAccountId, paymentReference,
         documentNumber, documentDate, dueDate,
         supplierId, supplierName, supplierInvoiceNumber,
         payrollPeriodId, payrollEntryId, memberId, memberName,

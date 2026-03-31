@@ -1,6 +1,7 @@
 ## Delta 2026-03-31
 - TASK-181 (Finance Clients → Organizations canonical source) impacta los endpoints de client creates/updates que esta task protege con transacciones e idempotency. Coordinar: si TASK-181 se ejecuta primero, los writes de clientes operan sobre `organizations` y `client_profiles` — las transacciones envolventes deben cubrir ambas tablas.
 - TASK-182 (Expense Drawer Agency Taxonomy) agrega campos de imputacion y recurrencia al POST de expenses. Las validaciones de integridad de esta task deben cubrir los nuevos campos (`direct_overhead_scope`, `allocated_client_id`, `is_recurring`).
+- TASK-182 + TASK-183 ya cerraron el contrato expandido de `expenses`: esta task ahora tambien debe cubrir `space_id`, `source_type`, `payment_provider`, `payment_rail` y el flujo reactivo/idempotente desde `payroll_period.exported`.
 
 # TASK-174 — Finance Data Integrity: Transactions, Idempotency & Concurrent Safety
 

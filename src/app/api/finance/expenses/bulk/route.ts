@@ -142,7 +142,9 @@ export async function POST(request: Request) {
         await createFinanceExpenseInPostgres({
           expenseId,
           clientId: resolvedClient.clientId,
+          spaceId: resolvedClient.spaceId,
           expenseType,
+          sourceType: 'manual',
           description,
           currency,
           subtotal,
@@ -154,6 +156,8 @@ export async function POST(request: Request) {
           paymentDate: item.paymentDate ? normalizeString(item.paymentDate) : null,
           paymentStatus,
           paymentMethod,
+          paymentProvider: null,
+          paymentRail: null,
           paymentAccountId: item.paymentAccountId ? normalizeString(item.paymentAccountId) : null,
           paymentReference: item.paymentReference ? normalizeString(item.paymentReference) : null,
           documentNumber: item.documentNumber ? normalizeString(item.documentNumber) : null,

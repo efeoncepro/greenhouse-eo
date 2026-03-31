@@ -4,6 +4,109 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-31 — TASK-182 + TASK-183 en descubrimiento/auditoría conjunta
+
+### Objetivo
+
+- Implementar la lane conjunta `TASK-182` + `TASK-183` respetando el orden descubrimiento → auditoría → mapa de conexiones → plan → implementación.
+
+### Delta de ejecución
+
+- Se movieron ambas tasks a `docs/tasks/in-progress/` y se actualizó el índice operativo.
+- Se auditó arquitectura, código Finance/Payroll/Cost y DDL versionado antes de tocar runtime.
+- Se confirmó drift que obliga a corregir spec antes de implementar:
+  - trigger canónico de nómina: `payroll_period.exported`, no `payroll_entry.approved`
+  - no existe evento `expense.tool_linked`; el contrato reactivo vigente es `finance.expense.created|updated`
+  - el helper reusable de tooling está en `src/lib/team-capacity/tool-cost-reader.ts`
+  - `expenses` todavía no aplica tenant isolation por `space_id`
+  - el schema versionado no muestra columnas `source_type`, `payment_provider`, `payment_rail` ni `space_id`
+  - el spec externo `../Greenhouse_Portal_Spec_v1.md` no existe en este workspace
+- La inspección live de PostgreSQL quedó bloqueada:
+  - `psql` no está instalado
+  - `pnpm pg:doctor` no pudo correr por credenciales/permisos faltantes
+
+### Nota de coordinación
+
+- Esta lane tocará zona sensible de `Finance > Expenses`, `Payroll` y projections de `Cost Intelligence`.
+- Mantener compatibilidad transicional con `expense_type` legacy (`payroll`, `social_security`) hasta cerrar el slice completo.
+
+## Sesión 2026-03-31 — cierre documental TASK-182 + TASK-183
+
+### Objetivo
+
+- Dejar actualizados los docs de cierre para reflejar el contrato final implementado en la lane conjunta.
+
+### Delta de ejecución
+
+- Se ajustó `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` para documentar:
+  - `space_id`, `source_type`, `payment_provider` y `payment_rail` como parte del contrato del ledger
+  - la taxonomía visible del drawer `Operacional / Tooling / Impuesto / Otro`
+  - `payroll_period.exported` como trigger reactivo para expenses de `payroll` y `social_security`
+- Se ajustó `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md` para registrar:
+  - el consumer/projection `finance_expense_reactive_intake`
+  - el rol downstream de `payroll_period.exported` sobre Finance
+- Se actualizó `changelog.md` con el cierre conjunto de `TASK-182` + `TASK-183`.
+
+### Validación
+
+- En este turno documental no se re-ejecutaron `build` ni `lint`.
+- El cierre documental se apoya en la verificación ya obtenida en la implementación previa de la lane.
+
+## Sesión 2026-03-31 — cierre runtime TASK-182 + TASK-183
+
+### Objetivo
+
+- Cerrar la implementación runtime y dejar ambas tasks listas para pasar a `complete`.
+
+### Delta de ejecución
+
+- Se endureció el ledger `greenhouse_finance.expenses` con `space_id`, `source_type`, `payment_provider` y `payment_rail`.
+- Se actualizó `CreateExpenseDrawer` a la taxonomía `Operacional / Tooling / Impuesto / Otro` con imputación, recurrencia y sinergia de tooling.
+- Se registró la proyección `finance_expense_reactive_intake` para materializar expenses de `payroll` y `social_security` desde `payroll_period.exported`.
+- Se separaron constantes cliente-safe en `src/lib/finance/contracts.ts` para evitar que el drawer arrastrara dependencias `server-only` al bundle del cliente.
+- Se ejecutó chequeo de impacto cruzado mínimo:
+  - `TASK-174` ahora debe cubrir el contrato expandido de `expenses`
+  - `TASK-176` se corrigió para reflejar que Previred sigue en compatibilidad transicional como `social_security`
+  - `TASK-177` ya puede apoyarse en `cost_category`, `space_id` y fees financieros del ledger
+
+### Validación
+
+- `pnpm build` ✅
+- `pnpm lint` ✅ (`0 errors`, `2 warnings` legacy en `src/views/greenhouse/hr-core/HrDepartmentsView.tsx`)
+
+## Sesión 2026-03-31 — TASK-183 creada para ledger reactivo de Expenses
+
+### Objetivo
+
+- Abrir una lane formal para robustecer `Finance > Expenses` más allá del drawer: intake reactivo de nómina, fees bancarios/gateway y boundary explícito entre Finance ledger y Cost Intelligence.
+
+### Delta de ejecución
+
+- Se creó `docs/tasks/to-do/TASK-183-finance-expenses-reactive-intake-cost-ledger.md`.
+- La task fija como postura:
+  - `expenses` sigue siendo ledger canónico y owner de egresos
+  - `Cost Intelligence` consume y atribuye; no crea gastos
+  - `Payroll` debe poder materializar expenses system-generated
+  - fees bancarios y rails de pago requieren taxonomía y carriles propios
+  - `payment_method` y `payment_provider/payment_rail` no deben mezclarse en un solo campo
+- También se dejó explícita la relación con:
+  - `TASK-182` como lane UX/taxonomía visible del drawer
+  - `TASK-174`, `TASK-175`, `TASK-176`, `TASK-177`, `TASK-179`
+
+### Nota de coordinación
+
+- `TASK-182` recibió delta para aclarar que ya no debe intentar cerrar sola el contrato reactivo cross-module de `expenses`.
+- No hubo cambios de runtime; este turno fue documental únicamente.
+
+### Delta adicional
+
+- `TASK-183` ya no queda solo como framing; se agregaron recomendaciones concretas para:
+  - usar `payroll_period.exported` como trigger de generación reactiva
+  - modelar `Previred` como `social_security` consolidado por período
+  - separar `bank_fee` y `gateway_fee`
+  - separar `payment_method` de `payment_provider/payment_rail`
+  - mantener a `Finance` como owner del ledger y a `Cost Intelligence` como consumer/attributor
+
 ## Sesión 2026-03-31 — Finance Expenses: selector de proveedores alineado a Postgres
 
 ### Objetivo

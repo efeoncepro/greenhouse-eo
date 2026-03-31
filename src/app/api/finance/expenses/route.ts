@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 
 import { resolveFinanceClientContext, resolveFinanceMemberContext } from '@/lib/finance/canonical'
+import { resolveExpenseSpaceScope } from '@/lib/finance/expense-scope'
+import { EXPENSE_SOURCE_TYPES, PAYMENT_PROVIDERS, PAYMENT_RAILS } from '@/lib/finance/expense-taxonomy'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
@@ -43,7 +45,9 @@ export const dynamic = 'force-dynamic'
 interface ExpenseRow {
   expense_id: string
   client_id: string | null
+  space_id: string | null
   expense_type: string
+  source_type: string | null
   description: string
   currency: string
   subtotal: unknown
@@ -55,6 +59,8 @@ interface ExpenseRow {
   payment_date: unknown
   payment_status: string
   payment_method: string | null
+  payment_provider: string | null
+  payment_rail: string | null
   payment_account_id: string | null
   payment_reference: string | null
   document_number: string | null
@@ -87,7 +93,9 @@ interface ExpenseRow {
 const normalizeExpense = (row: ExpenseRow) => ({
   expenseId: normalizeString(row.expense_id),
   clientId: row.client_id ? normalizeString(row.client_id) : null,
+  spaceId: row.space_id ? normalizeString(row.space_id) : null,
   expenseType: normalizeString(row.expense_type),
+  sourceType: row.source_type ? normalizeString(row.source_type) : null,
   description: normalizeString(row.description),
   currency: normalizeString(row.currency),
   subtotal: toNumber(row.subtotal),
@@ -99,6 +107,8 @@ const normalizeExpense = (row: ExpenseRow) => ({
   paymentDate: toDateString(row.payment_date as string | { value?: string } | null),
   paymentStatus: normalizeString(row.payment_status),
   paymentMethod: row.payment_method ? normalizeString(row.payment_method) : null,
+  paymentProvider: row.payment_provider ? normalizeString(row.payment_provider) : null,
+  paymentRail: row.payment_rail ? normalizeString(row.payment_rail) : null,
   paymentAccountId: row.payment_account_id ? normalizeString(row.payment_account_id) : null,
   paymentReference: row.payment_reference ? normalizeString(row.payment_reference) : null,
   documentNumber: row.document_number ? normalizeString(row.document_number) : null,
@@ -139,6 +149,7 @@ export async function GET(request: Request) {
   const expenseType = searchParams.get('expenseType')
   const status = searchParams.get('status')
   const clientId = searchParams.get('clientId')
+  const spaceId = searchParams.get('spaceId')
   const clientProfileId = searchParams.get('clientProfileId')
   const hubspotCompanyId = searchParams.get('hubspotCompanyId')
   const memberId = searchParams.get('memberId')
@@ -159,6 +170,7 @@ export async function GET(request: Request) {
       expenseType,
       status,
       clientId: resolvedClient?.clientId ?? clientId,
+      spaceId: spaceId || resolvedClient?.spaceId || null,
       memberId,
       supplierId,
       serviceLine,
@@ -197,6 +209,11 @@ export async function GET(request: Request) {
     if (resolvedClient?.clientId ?? clientId) {
       filters += ' AND client_id = @clientId'
       params.clientId = resolvedClient?.clientId ?? clientId
+    }
+
+    if (spaceId || resolvedClient?.spaceId) {
+      filters += ' AND space_id = @spaceId'
+      params.spaceId = spaceId || resolvedClient?.spaceId
     }
 
     if (memberId) {
@@ -279,8 +296,18 @@ export async function POST(request: Request) {
       payrollEntryId: body.payrollEntryId
     })
 
+    const resolvedScope = await resolveExpenseSpaceScope({
+      requestedSpaceId: body.spaceId ? normalizeString(body.spaceId) : resolvedClient.spaceId,
+      requestedClientId: resolvedClient.clientId,
+      allocatedClientId: body.allocatedClientId ? normalizeString(body.allocatedClientId) : null
+    })
+
     const expenseType = body.expenseType && EXPENSE_TYPES.includes(body.expenseType)
       ? (body.expenseType as ExpenseType) : 'supplier'
+
+    const sourceType = body.sourceType && EXPENSE_SOURCE_TYPES.includes(body.sourceType)
+      ? normalizeString(body.sourceType)
+      : 'manual'
 
     const taxRate = toNumber(body.taxRate ?? 0)
     const taxAmount = toNumber(body.taxAmount) || subtotal * taxRate
@@ -296,6 +323,14 @@ export async function POST(request: Request) {
 
     const paymentMethod = body.paymentMethod && PAYMENT_METHODS.includes(body.paymentMethod)
       ? (body.paymentMethod as PaymentMethod) : null
+
+    const paymentProvider = body.paymentProvider && PAYMENT_PROVIDERS.includes(body.paymentProvider)
+      ? normalizeString(body.paymentProvider)
+      : null
+
+    const paymentRail = body.paymentRail && PAYMENT_RAILS.includes(body.paymentRail)
+      ? normalizeString(body.paymentRail)
+      : null
 
     const serviceLine = body.serviceLine && SERVICE_LINES.includes(body.serviceLine)
       ? (body.serviceLine as ServiceLine) : null
@@ -321,8 +356,10 @@ export async function POST(request: Request) {
 
       await createFinanceExpenseInPostgres({
         expenseId,
-        clientId: resolvedClient.clientId,
+        clientId: resolvedScope.clientId ?? resolvedClient.clientId,
+        spaceId: resolvedScope.spaceId,
         expenseType,
+        sourceType,
         description,
         currency,
         subtotal,
@@ -334,6 +371,8 @@ export async function POST(request: Request) {
         paymentDate: body.paymentDate ? normalizeString(body.paymentDate) : null,
         paymentStatus,
         paymentMethod,
+        paymentProvider,
+        paymentRail,
         paymentAccountId: body.paymentAccountId ? normalizeString(body.paymentAccountId) : null,
         paymentReference: body.paymentReference ? normalizeString(body.paymentReference) : null,
         documentNumber: body.documentNumber ? normalizeString(body.documentNumber) : null,

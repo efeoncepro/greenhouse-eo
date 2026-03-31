@@ -231,4 +231,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-179` | `to-do` | Finance Reconciliation Postgres-Only Cutover & Integration Hardening | `docs/tasks/to-do/TASK-179-finance-reconciliation-cutover-hardening.md` |
 | `TASK-180` | `to-do` | HR Departments Postgres Runtime Cutover | `docs/tasks/to-do/TASK-180-hr-departments-postgres-runtime-cutover.md` |
 | `TASK-181` | `to-do` | Finance Clients: Canonical Source Migration to Organizations | `docs/tasks/to-do/TASK-181-finance-clients-organization-canonical-source.md` |
-| `TASK-182` | `to-do` | Finance Expense Drawer: Agency Taxonomy, Cross-Module Synergies & Automation | `docs/tasks/to-do/TASK-182-finance-expense-drawer-agency-taxonomy.md` |
+| `TASK-182` | `complete` | Finance Expense Drawer: Agency Taxonomy, Cross-Module Synergies & Automation | `docs/tasks/complete/TASK-182-finance-expense-drawer-agency-taxonomy.md` |
+| `TASK-183` | `complete` | Finance Expenses Reactive Intake & Cost Ledger Hardening | `docs/tasks/complete/TASK-183-finance-expenses-reactive-intake-cost-ledger.md` |
+| `TASK-184` | `to-do` | Database Migration Framework (node-pg-migrate) | `docs/tasks/to-do/TASK-184-database-migration-framework.md` |
