@@ -38,6 +38,13 @@ Matriz de consumo:
   - debe seguir sobre `member_capacity_economics`
   - usando `commercial_cost_attribution` solo para explain cuando aplique
 
+## Delta 2026-03-30 — revenue aggregation usa client_id canónico
+
+Regla canónica vigente para agregaciones financieras:
+- `client_economics` y `operational_pl` deben agregar revenue por `client_id` comercial canónico.
+- Si un income histórico solo trae `client_profile_id`, el runtime debe traducirlo vía `greenhouse_finance.client_profiles` antes de agrupar.
+- No se debe usar `client_profile_id` como sustituto directo de `client_id` en snapshots o serving ejecutivo nuevo.
+
 ## Delta 2026-03-30 — Cost Intelligence ya opera como layer de management accounting
 
 Finance sigue siendo el owner del motor financiero central, pero ya no es la única surface que expone semántica de rentabilidad.

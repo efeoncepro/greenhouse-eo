@@ -117,4 +117,25 @@ describe('computeOperationalPl', () => {
       grossMarginPct: null
     })
   })
+
+  it('anchors revenue aggregation to canonical client_id via client_profiles when needed', async () => {
+    mockRunGreenhousePostgresQuery
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([
+        { client_id: 'client-1', client_name: 'Acme', total_revenue_clp: 1000, partner_share_clp: 0 }
+      ])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+
+    mockReadCommercialCostAttributionByClientForPeriod.mockResolvedValue([])
+
+    await computeOperationalPl(2026, 5, 'canonical-client-test')
+
+    const revenueQuery = mockRunGreenhousePostgresQuery.mock.calls[1]?.[0] as string
+
+    expect(revenueQuery).toContain('LEFT JOIN greenhouse_finance.client_profiles cp')
+    expect(revenueQuery).toContain('COALESCE(i.client_id, cp.client_id) AS client_id')
+    expect(revenueQuery).not.toContain('COALESCE(i.client_id, i.client_profile_id) AS client_id')
+  })
 })

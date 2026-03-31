@@ -278,17 +278,31 @@ export const computeOperationalPl = async (
       runGreenhousePostgresQuery<RevenueRow>(
         `
           SELECT
-            COALESCE(i.client_id, i.client_profile_id) AS client_id,
-            MAX(i.client_name) AS client_name,
+            COALESCE(i.client_id, cp.client_id) AS client_id,
+            MAX(
+              COALESCE(
+                NULLIF(TRIM(i.client_name), ''),
+                NULLIF(TRIM(c.client_name), ''),
+                NULLIF(TRIM(cp.legal_name), ''),
+                COALESCE(i.client_id, cp.client_id)
+              )
+            ) AS client_name,
             COALESCE(SUM(i.total_amount_clp), 0) AS total_revenue_clp,
             COALESCE(SUM(COALESCE(i.partner_share_amount, 0) * COALESCE(i.exchange_rate_to_clp, 1)), 0) AS partner_share_clp
           FROM greenhouse_finance.income i
+          LEFT JOIN greenhouse_finance.client_profiles cp
+            ON cp.client_profile_id = i.client_profile_id
+          LEFT JOIN greenhouse_core.clients c
+            ON c.client_id = COALESCE(i.client_id, cp.client_id)
           WHERE i.invoice_date >= $1::date
             AND i.invoice_date <= $2::date
-            AND COALESCE(i.client_id, i.client_profile_id) IS NOT NULL
-            AND COALESCE(NULLIF(LOWER(TRIM(COALESCE(i.client_id, i.client_profile_id))), ''), '__missing__') <> ALL($3::text[])
-            AND COALESCE(NULLIF(LOWER(TRIM(i.client_name)), ''), '__missing__') <> ALL($4::text[])
-          GROUP BY COALESCE(i.client_id, i.client_profile_id)
+            AND COALESCE(i.client_id, cp.client_id) IS NOT NULL
+            AND COALESCE(NULLIF(LOWER(TRIM(COALESCE(i.client_id, cp.client_id))), ''), '__missing__') <> ALL($3::text[])
+            AND COALESCE(
+              NULLIF(LOWER(TRIM(COALESCE(i.client_name, c.client_name, cp.legal_name))), ''),
+              '__missing__'
+            ) <> ALL($4::text[])
+          GROUP BY COALESCE(i.client_id, cp.client_id)
         `,
         [periodStart, periodEnd, INTERNAL_COMMERCIAL_CLIENT_IDS, INTERNAL_COMMERCIAL_CLIENT_NAMES]
       ),

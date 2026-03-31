@@ -375,13 +375,24 @@ export const computeClientEconomicsSnapshots = async (
     total_revenue_clp: string
   }>(
     `SELECT
-       COALESCE(client_id, client_profile_id) AS client_id,
-       client_name,
+       COALESCE(i.client_id, cp.client_id) AS client_id,
+       MAX(
+         COALESCE(
+           NULLIF(TRIM(i.client_name), ''),
+           NULLIF(TRIM(c.client_name), ''),
+           NULLIF(TRIM(cp.legal_name), ''),
+           COALESCE(i.client_id, cp.client_id)
+         )
+       ) AS client_name,
        COALESCE(SUM(total_amount_clp), 0) AS total_revenue_clp
-     FROM greenhouse_finance.income
+     FROM greenhouse_finance.income i
+     LEFT JOIN greenhouse_finance.client_profiles cp
+       ON cp.client_profile_id = i.client_profile_id
+     LEFT JOIN greenhouse_core.clients c
+       ON c.client_id = COALESCE(i.client_id, cp.client_id)
      WHERE invoice_date >= $1::date AND invoice_date <= $2::date
-       AND COALESCE(client_id, client_profile_id) IS NOT NULL
-     GROUP BY COALESCE(client_id, client_profile_id), client_name`,
+       AND COALESCE(i.client_id, cp.client_id) IS NOT NULL
+     GROUP BY COALESCE(i.client_id, cp.client_id)`,
     [periodStart, periodEnd]
   )
 

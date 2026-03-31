@@ -42,6 +42,24 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - `pnpm exec eslint src/app/api/finance/income/route.ts src/app/api/finance/income/[id]/route.ts src/app/api/finance/expenses/route.ts src/app/api/finance/expenses/[id]/route.ts src/app/api/finance/identity-drift-payloads.test.ts src/lib/finance/postgres-store-slice2.ts src/lib/finance/canonical.ts src/lib/finance/canonical.test.ts`
 - `pnpm exec tsc --noEmit --pretty false`
 
+## Sesión 2026-03-30 — agregaciones financieras con client_id canónico
+
+### Objetivo
+- Cortar el bridge legacy donde `client_economics` y `operational_pl` seguían tratando `client_profile_id` como si fuera `client_id`.
+
+### Delta de ejecución
+- `src/lib/finance/postgres-store-intelligence.ts` ya no agrega revenue por `COALESCE(client_id, client_profile_id)`.
+- `computeClientEconomicsSnapshots()` ahora resuelve `client_id` canónico desde `greenhouse_finance.client_profiles` cuando un income histórico viene solo con `client_profile_id`.
+- `src/lib/cost-intelligence/compute-operational-pl.ts` quedó alineado al mismo criterio para snapshots de margen operativo.
+- Tests nuevos/reforzados:
+  - `src/lib/finance/postgres-store-intelligence.test.ts`
+  - `src/lib/cost-intelligence/compute-operational-pl.test.ts`
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/finance/postgres-store-intelligence.test.ts src/lib/cost-intelligence/compute-operational-pl.test.ts`
+- `pnpm exec eslint src/lib/finance/postgres-store-intelligence.ts src/lib/finance/postgres-store-intelligence.test.ts src/lib/cost-intelligence/compute-operational-pl.ts src/lib/cost-intelligence/compute-operational-pl.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+
 ## Sesión 2026-03-30 — cierre formal de TASK-166 Finance BigQuery write cutover
 
 ### Objetivo

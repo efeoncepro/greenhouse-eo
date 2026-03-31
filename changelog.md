@@ -6,6 +6,10 @@
   - el detalle de ingreso ahora reutiliza `nuboxPdfUrl` / `nuboxXmlUrl` directos cuando existen, en vez de forzar siempre el proxy server-side
   - `src/lib/nubox/client.ts` normaliza config Nubox con `trim()` y manda `Accept` explícito para descargas PDF/XML
   - se mitigó el incidente de `Nubox PDF download failed with 401` observado en `staging`
+- Finance aggregates hardening:
+  - `client_economics` y `operational_pl` ya no agrupan revenue con `COALESCE(client_id, client_profile_id)`
+  - los incomes legacy `profile-only` ahora se traducen vía `greenhouse_finance.client_profiles` para resolver `client_id` canónico antes de agregar
+  - se evita tratar `client_profile_id` como si fuera el ID comercial del cliente en snapshots financieros
 - Finance read identity drift hardening:
   - `GET /api/finance/income` y `GET /api/finance/expenses` ahora resuelven filtros de cliente por contexto canónico antes de consultar Postgres/BQ
   - `income` ya no depende de la equivalencia ad hoc `clientProfileId -> hubspot_company_id` en SQL
