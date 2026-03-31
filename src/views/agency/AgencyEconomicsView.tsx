@@ -141,7 +141,7 @@ const AgencyEconomicsView = () => {
 
         setTrends(d.periods ?? [])
       }
-    } catch { /* silent */ } finally {
+    } catch (err) { console.error('[AgencyEconomics] load error:', err) } finally {
       setLoading(false)
     }
   }, [])
