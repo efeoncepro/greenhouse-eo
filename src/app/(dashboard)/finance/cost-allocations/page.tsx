@@ -6,6 +6,7 @@ import type { Metadata } from 'next'
 import CostAllocationsView from '@/views/greenhouse/finance/CostAllocationsView'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
+import { ROLE_CODES } from '@/config/role-codes'
 
 export const metadata: Metadata = {
   title: 'Asignaciones de costos | Finance | Greenhouse'
@@ -23,7 +24,7 @@ const Page = async () => {
   const hasAccess = hasAuthorizedViewCode({
     tenant,
     viewCode: 'finanzas.asignaciones_costos',
-    fallback: tenant.routeGroups.includes('finance') || tenant.roleCodes.includes('efeonce_admin')
+    fallback: tenant.routeGroups.includes('finance') || tenant.roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)
   })
 
   if (!hasAccess) {

@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 
 import { authOptions } from '@/lib/auth'
+import { ROLE_CODES } from '@/config/role-codes'
 import { generateToken, storeToken } from '@/lib/auth-tokens'
 import { sendEmail } from '@/lib/email/delivery'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
@@ -11,7 +12,7 @@ export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions)
 
-    if (!session?.user?.roleCodes?.includes('efeonce_admin')) {
+    if (!session?.user?.roleCodes?.includes(ROLE_CODES.EFEONCE_ADMIN)) {
       return NextResponse.json({ error: 'Acceso denegado.' }, { status: 403 })
     }
 
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
     // Resolve roles
     let roles: string[] = role_codes || []
 
-    if (tenant_type === 'efeonce_internal' && !roles.includes('collaborator')) {
+    if (tenant_type === 'efeonce_internal' && !roles.includes(ROLE_CODES.COLLABORATOR)) {
       roles = ['collaborator', ...roles]
     } else if (tenant_type === 'client' && roles.length === 0) {
       roles = ['client_executive']

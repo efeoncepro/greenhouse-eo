@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 
 import { hasAnyAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
+import { ROLE_CODES } from '@/config/role-codes'
 
 export default async function FinanceLayout({ children }: { children: ReactNode }) {
   const tenant = await getTenantContext()
@@ -20,7 +21,7 @@ export default async function FinanceLayout({ children }: { children: ReactNode 
       'finanzas.egresos',
       'finanzas.conciliacion'
     ],
-    fallback: tenant.routeGroups.includes('finance') || tenant.roleCodes.includes('efeonce_admin')
+    fallback: tenant.routeGroups.includes('finance') || tenant.roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)
   })
 
   if (!hasAccess) {

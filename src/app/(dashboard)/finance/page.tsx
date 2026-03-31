@@ -6,6 +6,7 @@ import type { Metadata } from 'next'
 import FinanceDashboardView from '@views/greenhouse/finance/FinanceDashboardView'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
+import { ROLE_CODES } from '@/config/role-codes'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,7 +24,7 @@ const FinanceDashboardPage = async () => {
   const hasAccess = hasAuthorizedViewCode({
     tenant,
     viewCode: 'finanzas.resumen',
-    fallback: tenant.routeGroups.includes('finance') || tenant.roleCodes.includes('efeonce_admin')
+    fallback: tenant.routeGroups.includes('finance') || tenant.roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)
   })
 
   if (!hasAccess) {

@@ -49,12 +49,14 @@ export type { PersonTab } from '@/types/people'
 
 import type { PersonTab } from '@/types/people'
 
+import { ROLE_CODES } from '@/config/role-codes'
+
 export const TAB_PERMISSIONS: Record<PersonTab, string[]> = {
-  profile: ['efeonce_admin', 'efeonce_operations', 'hr_payroll'],
-  activity: ['efeonce_admin', 'efeonce_operations'],
-  memberships: ['efeonce_admin', 'efeonce_operations'],
-  economy: ['efeonce_admin', 'hr_payroll', 'finance_manager'],
-  'ai-tools': ['efeonce_admin', 'efeonce_operations']
+  profile: [ROLE_CODES.EFEONCE_ADMIN, ROLE_CODES.EFEONCE_OPERATIONS, ROLE_CODES.HR_PAYROLL],
+  activity: [ROLE_CODES.EFEONCE_ADMIN, ROLE_CODES.EFEONCE_OPERATIONS],
+  memberships: [ROLE_CODES.EFEONCE_ADMIN, ROLE_CODES.EFEONCE_OPERATIONS],
+  economy: [ROLE_CODES.EFEONCE_ADMIN, ROLE_CODES.HR_PAYROLL, ROLE_CODES.FINANCE_MANAGER],
+  'ai-tools': [ROLE_CODES.EFEONCE_ADMIN, ROLE_CODES.EFEONCE_OPERATIONS]
 }
 
 export const TAB_CONFIG: Array<{ value: PersonTab; label: string; icon: string }> = [

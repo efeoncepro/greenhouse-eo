@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { ROLE_CODES } from '@/config/role-codes'
 import {
   getMemberNotificationRecipients,
   getRoleCodeNotificationRecipients,
@@ -102,7 +103,7 @@ export const getUserRecipient = async (userId: string): Promise<RecipientResolut
 
 export const getHrAdminRecipients = async (): Promise<RecipientResolutionResult> => {
   return toResolutionResult(
-    (await getRoleCodeNotificationRecipients(['hr_manager', 'efeonce_admin']))
+    (await getRoleCodeNotificationRecipients([ROLE_CODES.HR_MANAGER, ROLE_CODES.EFEONCE_ADMIN]))
       .map(toNotificationRecipient)
       .filter((value): value is NotificationRecipient => value !== null)
   )
@@ -110,7 +111,7 @@ export const getHrAdminRecipients = async (): Promise<RecipientResolutionResult>
 
 export const getFinanceAdminRecipients = async (): Promise<RecipientResolutionResult> => {
   return toResolutionResult(
-    (await getRoleCodeNotificationRecipients(['finance_manager', 'efeonce_admin']))
+    (await getRoleCodeNotificationRecipients([ROLE_CODES.FINANCE_MANAGER, ROLE_CODES.EFEONCE_ADMIN]))
       .map(toNotificationRecipient)
       .filter((value): value is NotificationRecipient => value !== null)
   )

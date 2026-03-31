@@ -19,6 +19,7 @@ import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
 
 import { GenerateVerticalMenu } from '@/components/GenerateMenu'
 import { GH_AGENCY_NAV, GH_CLIENT_NAV, GH_FINANCE_NAV, GH_HR_NAV, GH_INTERNAL_NAV, GH_MY_NAV, GH_PEOPLE_NAV } from '@/config/greenhouse-nomenclature'
+import { ROLE_CODES } from '@/config/role-codes'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
 
 type RenderExpandIconProps = {
@@ -68,9 +69,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
 
   const canSeePeople =
     isPeopleRouteGroup ||
-    roleCodes.includes('efeonce_admin') ||
-    roleCodes.includes('efeonce_operations') ||
-    roleCodes.includes('hr_payroll')
+    roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN) ||
+    roleCodes.includes(ROLE_CODES.EFEONCE_OPERATIONS) ||
+    roleCodes.includes(ROLE_CODES.HR_PAYROLL)
 
   const dashboardHref = session?.user?.portalHomePath || '/dashboard'
 

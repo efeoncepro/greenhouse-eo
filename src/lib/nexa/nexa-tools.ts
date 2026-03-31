@@ -2,6 +2,7 @@ import 'server-only'
 
 import type { FunctionDeclaration } from '@google/genai'
 
+import { ROLE_CODES } from '@/config/role-codes'
 import { getOrganizationOperationalServing } from '@/lib/account-360/get-organization-operational-serving'
 import { getAgencyPulseKpis } from '@/lib/agency/agency-queries'
 import { ensureEmailSchema } from '@/lib/email/schema'
@@ -109,7 +110,7 @@ const hasRouteGroup = (tenant: NexaRuntimeContext, routeGroup: string) => tenant
 const hasRoleCode = (tenant: NexaRuntimeContext, roleCode: string) => tenant.roleCodes.includes(roleCode)
 
 const isInternalOperationsUser = (tenant: NexaRuntimeContext) =>
-  hasRouteGroup(tenant, 'internal') || hasRouteGroup(tenant, 'agency') || hasRouteGroup(tenant, 'admin') || hasRoleCode(tenant, 'efeonce_admin')
+  hasRouteGroup(tenant, 'internal') || hasRouteGroup(tenant, 'agency') || hasRouteGroup(tenant, 'admin') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
 
 const buildToolUnavailableResult = (toolName: NexaToolName, reason: string): NexaToolResult => ({
   available: false,
@@ -133,7 +134,7 @@ const checkPayrollTool: NexaToolDefinition = {
     }
   },
   isAvailable: tenant =>
-    hasRouteGroup(tenant, 'hr') || hasRouteGroup(tenant, 'finance') || hasRouteGroup(tenant, 'internal') || hasRouteGroup(tenant, 'admin') || hasRoleCode(tenant, 'efeonce_admin'),
+    hasRouteGroup(tenant, 'hr') || hasRouteGroup(tenant, 'finance') || hasRouteGroup(tenant, 'internal') || hasRouteGroup(tenant, 'admin') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN),
   async execute(args, context) {
     void args
     void context
@@ -300,7 +301,7 @@ const checkEmailsTool: NexaToolDefinition = {
       }
     }
   },
-  isAvailable: tenant => hasRouteGroup(tenant, 'admin') || hasRoleCode(tenant, 'efeonce_admin'),
+  isAvailable: tenant => hasRouteGroup(tenant, 'admin') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN),
   async execute(args, context) {
     void args
     void context

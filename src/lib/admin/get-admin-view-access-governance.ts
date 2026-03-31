@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { ROLE_CODES } from '@/config/role-codes'
 import { getAdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
 import { enrichGovernancePreviewUsers, type AdminGovernanceUserPreview } from '@/lib/admin/admin-preview-persons'
 import { getAdminPersistedViewAccessGovernance } from '@/lib/admin/view-access-store'
@@ -71,7 +72,7 @@ const roleCanAccessView = (role: AdminGovernanceRole, view: GovernanceViewRegist
   }
 
   if (view.routeGroup === 'people') {
-    return role.roleCode === 'efeonce_operations' || role.roleCode === 'hr_payroll'
+    return role.roleCode === ROLE_CODES.EFEONCE_OPERATIONS || role.roleCode === ROLE_CODES.HR_PAYROLL
   }
 
   if (view.routeGroup === 'internal') {
@@ -91,7 +92,7 @@ const userCanAccessView = (user: AdminGovernanceUserPreview, view: GovernanceVie
   }
 
   if (view.routeGroup === 'people') {
-    return user.roleCodes.includes('efeonce_operations') || user.roleCodes.includes('hr_payroll')
+    return user.roleCodes.includes(ROLE_CODES.EFEONCE_OPERATIONS) || user.roleCodes.includes(ROLE_CODES.HR_PAYROLL)
   }
 
   if (view.routeGroup === 'internal') {

@@ -6,6 +6,7 @@ import type { Metadata } from 'next'
 import FinanceIntelligenceView from '@views/greenhouse/finance/FinanceIntelligenceView'
 import { canCloseCostIntelligencePeriod, canReopenCostIntelligencePeriod, hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
+import { ROLE_CODES } from '@/config/role-codes'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,7 +24,7 @@ const IntelligencePage = async () => {
   const hasAccess = hasAuthorizedViewCode({
     tenant,
     viewCode: 'finanzas.inteligencia',
-    fallback: tenant.routeGroups.includes('finance') || tenant.roleCodes.includes('efeonce_admin')
+    fallback: tenant.routeGroups.includes('finance') || tenant.roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)
   })
 
   if (!hasAccess) {

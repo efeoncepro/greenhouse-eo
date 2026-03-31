@@ -12,6 +12,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { ROLE_CODES } from '@/config/role-codes'
 import type { PeopleListPayload } from '@/types/people'
 
 import CreateMemberDrawer from './drawers/CreateMemberDrawer'
@@ -25,7 +26,7 @@ const PeopleList = () => {
   const [loading, setLoading] = useState(true)
   const [createOpen, setCreateOpen] = useState(false)
 
-  const isAdmin = session?.user?.roleCodes?.includes('efeonce_admin') ?? false
+  const isAdmin = session?.user?.roleCodes?.includes(ROLE_CODES.EFEONCE_ADMIN) ?? false
 
   const loadData = useCallback(async () => {
     const res = await fetch('/api/people')

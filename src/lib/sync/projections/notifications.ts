@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { ROLE_CODES } from '@/config/role-codes'
 import {
   getMemberNotificationRecipients,
   getProfileNotificationRecipient,
@@ -17,9 +18,9 @@ const PAYROLL_OPS_RECIPIENTS = [
   { memberId: 'humberly-henriquez', contactEmail: 'hhumberly@efeoncepro.com', fullName: 'Humberly Henriquez' }
 ] as const
 
-const getAdminRecipients = async () => getRoleCodeNotificationRecipients(['efeonce_admin'])
+const getAdminRecipients = async () => getRoleCodeNotificationRecipients([ROLE_CODES.EFEONCE_ADMIN])
 
-const getFinanceRecipients = async () => getRoleCodeNotificationRecipients(['finance_manager', 'efeonce_admin'])
+const getFinanceRecipients = async () => getRoleCodeNotificationRecipients([ROLE_CODES.FINANCE_MANAGER, ROLE_CODES.EFEONCE_ADMIN])
 
 const getPayrollOpsRecipients = async (): Promise<PersonNotificationRecipient[]> => {
   const recipientsByMemberId = await getMemberNotificationRecipients(

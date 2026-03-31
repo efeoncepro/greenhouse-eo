@@ -115,7 +115,7 @@ export interface TenantAccessRecord {
   identityProfileId: string | null
 }
 
-import { ROLE_PRIORITY } from '@/config/role-codes'
+import { ROLE_CODES, ROLE_PRIORITY } from '@/config/role-codes'
 import { deriveRouteGroupsFromRoles } from '@/lib/tenant/role-route-mapping'
 
 const rolePriority = ROLE_PRIORITY as readonly string[]
@@ -133,7 +133,7 @@ const resolveTenantType = (value: string | null | undefined): TenantType =>
 
 const getPrimaryRoleCode = (roleCodes: string[], tenantType: TenantType) => {
   if (roleCodes.length === 0) {
-    return tenantType === 'efeonce_internal' ? 'efeonce_account' : 'client_executive'
+    return tenantType === 'efeonce_internal' ? ROLE_CODES.EFEONCE_ACCOUNT : ROLE_CODES.CLIENT_EXECUTIVE
   }
 
   const sorted = [...roleCodes].sort((left, right) => {

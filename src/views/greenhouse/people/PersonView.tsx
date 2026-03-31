@@ -14,6 +14,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import ConfirmDialog from '@/components/dialogs/ConfirmDialog'
+import { ROLE_CODES } from '@/config/role-codes'
 import type { PersonDetail, PersonDetailAssignment } from '@/types/people'
 
 import CompensationDrawer, { type CompensationSavePayload } from '@views/greenhouse/payroll/CompensationDrawer'
@@ -41,7 +42,7 @@ const PersonView = ({ memberId }: Props) => {
   const [editMembership, setEditMembership] = useState<{ membership: MembershipRowData; assignment?: PersonDetailAssignment } | null>(null)
   const [membershipReloadKey, setMembershipReloadKey] = useState(0)
 
-  const isAdmin = session?.user?.roleCodes?.includes('efeonce_admin') ?? false
+  const isAdmin = session?.user?.roleCodes?.includes(ROLE_CODES.EFEONCE_ADMIN) ?? false
 
   const loadDetail = useCallback(async () => {
     const res = await fetch(`/api/people/${memberId}`)

@@ -2,6 +2,7 @@ import 'server-only'
 
 import { NextResponse } from 'next/server'
 
+import { ROLE_CODES } from '@/config/role-codes'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import type { TeamContactChannel, TeamIdentityConfidence, TeamIdentityProvider, TeamMemberProfile, TeamRoleCategory } from '@/types/team'
 
@@ -17,7 +18,7 @@ export class PeopleValidationError extends Error {
   }
 }
 
-export const peopleRoleCodes = ['efeonce_admin', 'efeonce_operations', 'hr_payroll'] as const
+export const peopleRoleCodes = [ROLE_CODES.EFEONCE_ADMIN, ROLE_CODES.EFEONCE_OPERATIONS, ROLE_CODES.HR_PAYROLL] as const
 
 export const toPeopleErrorResponse = (error: unknown, fallbackMessage: string) => {
   if (error instanceof PeopleValidationError) {

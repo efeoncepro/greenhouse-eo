@@ -22,6 +22,7 @@ import Typography from '@mui/material/Typography'
 
 import { ExecutiveMiniStatCard } from '@/components/greenhouse'
 import type { AdminGovernanceOverview } from '@/lib/admin/get-admin-view-access-governance'
+import { ROLE_CODES } from '@/config/role-codes'
 
 type Props = {
   data: AdminGovernanceOverview
@@ -222,7 +223,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
       if (roleGranted) return true
       if (previewUser.routeGroups.includes(view.routeGroup)) return true
       if (previewUser.routeGroups.includes('admin')) return ['admin', 'finance', 'hr', 'people', 'ai_tooling', 'internal'].includes(view.routeGroup)
-      if (view.routeGroup === 'people') return previewUser.roleCodes.includes('efeonce_operations') || previewUser.roleCodes.includes('hr_payroll')
+      if (view.routeGroup === 'people') return previewUser.roleCodes.includes(ROLE_CODES.EFEONCE_OPERATIONS) || previewUser.roleCodes.includes(ROLE_CODES.HR_PAYROLL)
       if (view.routeGroup === 'internal') return previewUser.routeGroups.includes('internal')
 
       return false
@@ -254,7 +255,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
       if (roleGranted) return true
       if (previewUser.routeGroups.includes(view.routeGroup)) return true
       if (previewUser.routeGroups.includes('admin')) return ['admin', 'finance', 'hr', 'people', 'ai_tooling', 'internal'].includes(view.routeGroup)
-      if (view.routeGroup === 'people') return previewUser.roleCodes.includes('efeonce_operations') || previewUser.roleCodes.includes('hr_payroll')
+      if (view.routeGroup === 'people') return previewUser.roleCodes.includes(ROLE_CODES.EFEONCE_OPERATIONS) || previewUser.roleCodes.includes(ROLE_CODES.HR_PAYROLL)
       if (view.routeGroup === 'internal') return previewUser.routeGroups.includes('internal')
 
       return false
