@@ -37,6 +37,24 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.03-beta.2
+**Canal:** Beta
+**Fecha:** 2026-03-31
+**Disponible para:** internal
+**Módulos:** Agencia / Staff Augmentation
+
+### Novedades
+- No aplica como capacidad nueva.
+
+### Mejoras
+- `Crear placement` en `Agency > Staff Augmentation` ahora abre el formulario inline en la página, en vez de un modal.
+
+### Correcciones
+- Se reduce el riesgo de cuelgue del navegador al abrir el flujo de alta de placement sobre assignments existentes.
+
+### Notas
+- El flujo conserva búsqueda incremental, lectura contextual del assignment y creación del placement sobre el modelo canónico vigente.
+
 ## 2026.03-beta.1
 **Canal:** Beta
 **Fecha:** 2026-03-29

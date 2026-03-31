@@ -5,7 +5,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import CardHeader from '@mui/material/CardHeader'
 import CircularProgress from '@mui/material/CircularProgress'
+import Divider from '@mui/material/Divider'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
@@ -65,9 +69,10 @@ interface Props {
   onClose: () => void
   onCreated: (placementId: string) => void
   initialAssignmentId?: string | null
+  inline?: boolean
 }
 
-const CreatePlacementDialog = ({ open, onClose, onCreated, initialAssignmentId }: Props) => {
+const CreatePlacementDialog = ({ open, onClose, onCreated, initialAssignmentId, inline = false }: Props) => {
   const [loading, setLoading] = useState(false)
   const [metaLoading, setMetaLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -206,6 +211,203 @@ const CreatePlacementDialog = ({ open, onClose, onCreated, initialAssignmentId }
     }
   }
 
+  const formContent = (
+    <>
+      <Typography variant='body2' color='text.secondary' sx={{ mb: 4 }}>
+        Staff Aug se monta sobre un assignment existente. Aquí solo definimos la capa comercial y operativa inicial.
+      </Typography>
+
+      {error ? <Alert severity='warning' sx={{ mb: 4 }}>{error}</Alert> : null}
+
+      <Grid container spacing={4}>
+        <Grid size={{ xs: 12 }}>
+          <CustomTextField
+            fullWidth
+            label='Buscar assignment'
+            placeholder='Miembro, cliente, organización o ID'
+            value={searchQuery}
+            onChange={event => {
+              const value = event.target.value
+
+              setSearchQuery(value)
+
+              if (!value.trim()) {
+                setAssignmentId('')
+                setOptions([])
+              }
+            }}
+            disabled={loading}
+            helperText={
+              selectedAssignment
+                ? `${selectedAssignment.memberLabel} · ${selectedAssignment.clientLabel}`
+                : 'Busca una asignación activa sin placement previo. No cargamos toda la lista para evitar cuelgues.'
+            }
+            InputProps={{
+              endAdornment: metaLoading ? <CircularProgress size={18} color='inherit' /> : null
+            }}
+          />
+          {searchQuery.trim().length >= 2 && !selectedAssignment ? (
+            <Paper variant='outlined' sx={{ mt: 2, overflow: 'hidden' }}>
+              {options.length ? (
+                options.map(option => (
+                  <Box
+                    key={option.assignmentId}
+                    component='button'
+                    type='button'
+                    onClick={() => {
+                      setAssignmentId(option.assignmentId)
+                      setSearchQuery(option.label)
+                    }}
+                    sx={{
+                      width: '100%',
+                      px: 3,
+                      py: 2.5,
+                      border: 0,
+                      borderBottom: theme => `1px solid ${theme.palette.divider}`,
+                      backgroundColor: 'transparent',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      '&:last-of-type': {
+                        borderBottom: 0
+                      },
+                      '&:hover': {
+                        backgroundColor: 'action.hover'
+                      }
+                    }}
+                  >
+                    <Typography variant='body2' fontWeight={600}>{option.memberLabel}</Typography>
+                    <Typography variant='caption' color='text.secondary'>
+                      {option.clientLabel}{option.organizationLabel ? ` · ${option.organizationLabel}` : ''}
+                    </Typography>
+                  </Box>
+                ))
+              ) : (
+                <Typography variant='body2' color='text.secondary' sx={{ px: 3, py: 2.5 }}>
+                  {metaLoading
+                    ? 'Buscando assignments elegibles...'
+                    : 'No encontramos assignments elegibles con ese criterio.'}
+                </Typography>
+              )}
+            </Paper>
+          ) : null}
+          {searchQuery.trim().length > 0 && searchQuery.trim().length < 2 && !selectedAssignment ? (
+            <Typography variant='caption' color='text.secondary' sx={{ mt: 1, display: 'block' }}>
+              Escribe al menos 2 caracteres para buscar assignments elegibles.
+            </Typography>
+          ) : null}
+        </Grid>
+        {selectedAssignment ? (
+          <Grid size={{ xs: 12 }}>
+            <Alert severity='info' icon={<i className='tabler-briefcase' />}>
+              {selectedAssignment.organizationLabel ? `${selectedAssignment.organizationLabel} · ` : ''}
+              {selectedAssignment.compensation.contractType || 'Sin contract type'} · {selectedAssignment.compensation.payRegime || 'Sin pay regime'}
+              {selectedAssignment.compensation.costRateAmount != null
+                ? ` · costo base ${new Intl.NumberFormat('es-CL', {
+                  style: 'currency',
+                  currency: selectedAssignment.compensation.costRateCurrency || 'USD',
+                  maximumFractionDigits: 0
+                }).format(selectedAssignment.compensation.costRateAmount)}`
+                : ' · sin costo base vigente en Payroll'}
+            </Alert>
+          </Grid>
+        ) : null}
+        <Grid size={{ xs: 12, md: 6 }}>
+          <CustomTextField
+            select
+            fullWidth
+            label='Business Unit'
+            value={businessUnit}
+            onChange={event => setBusinessUnit(event.target.value)}
+            disabled={loading}
+          >
+            {BUSINESS_UNIT_OPTIONS.map(option => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </CustomTextField>
+        </Grid>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <CustomTextField
+            select
+            fullWidth
+            label='Estado inicial'
+            value={status}
+            onChange={event => setStatus(event.target.value)}
+            disabled={loading}
+          >
+            <MenuItem value='pipeline'>Pipeline</MenuItem>
+            <MenuItem value='onboarding'>Onboarding</MenuItem>
+            <MenuItem value='active'>Activo</MenuItem>
+          </CustomTextField>
+        </Grid>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <CustomTextField
+            fullWidth
+            label='Billing rate'
+            type='number'
+            value={billingRateAmount}
+            onChange={event => setBillingRateAmount(event.target.value)}
+            disabled={loading}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <CustomTextField
+            select
+            fullWidth
+            label='Moneda'
+            value={billingRateCurrency}
+            onChange={event => setBillingRateCurrency(event.target.value)}
+            disabled={loading}
+          >
+            <MenuItem value='USD'>USD</MenuItem>
+            <MenuItem value='CLP'>CLP</MenuItem>
+          </CustomTextField>
+        </Grid>
+        <Grid size={{ xs: 12 }}>
+          <CustomTextField
+            fullWidth
+            multiline
+            minRows={3}
+            label='Notas operativas'
+            value={placementNotes}
+            onChange={event => setPlacementNotes(event.target.value)}
+            disabled={loading}
+            helperText='Úsalo para capturar el contexto comercial, expectativas del cliente o setup inicial.'
+          />
+        </Grid>
+      </Grid>
+    </>
+  )
+
+  const actions = (
+    <>
+      <Button onClick={onClose} color='secondary' disabled={loading}>Cancelar</Button>
+      <Button onClick={handleSubmit} variant='contained' disabled={loading || metaLoading || !assignmentId}>
+        {loading ? 'Creando…' : 'Crear placement'}
+      </Button>
+    </>
+  )
+
+  if (inline) {
+    return (
+      <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
+        <CardHeader
+          title='Crear placement'
+          subheader='Alta comercial-operativa sobre un assignment existente.'
+          action={<Button onClick={onClose} color='secondary'>Cerrar</Button>}
+        />
+        <Divider />
+        <CardContent>
+          {formContent}
+          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+            {actions}
+          </Box>
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Dialog
       open={open}
@@ -219,177 +421,9 @@ const CreatePlacementDialog = ({ open, onClose, onCreated, initialAssignmentId }
     >
       <DialogTitle>Crear placement</DialogTitle>
       <DialogContent>
-        <Typography variant='body2' color='text.secondary' sx={{ mb: 4 }}>
-          Staff Aug se monta sobre un assignment existente. Aquí solo definimos la capa comercial y operativa inicial.
-        </Typography>
-
-        {error ? <Alert severity='warning' sx={{ mb: 4 }}>{error}</Alert> : null}
-
-        <Grid container spacing={4}>
-          <Grid size={{ xs: 12 }}>
-            <CustomTextField
-              fullWidth
-              label='Buscar assignment'
-              placeholder='Miembro, cliente, organización o ID'
-              value={searchQuery}
-              onChange={event => {
-                const value = event.target.value
-
-                setSearchQuery(value)
-
-                if (!value.trim()) {
-                  setAssignmentId('')
-                  setOptions([])
-                }
-              }}
-              disabled={loading}
-              helperText={
-                selectedAssignment
-                  ? `${selectedAssignment.memberLabel} · ${selectedAssignment.clientLabel}`
-                  : 'Busca una asignación activa sin placement previo. No cargamos toda la lista para evitar cuelgues.'
-              }
-              InputProps={{
-                endAdornment: metaLoading ? <CircularProgress size={18} color='inherit' /> : null
-              }}
-            />
-            {searchQuery.trim().length >= 2 && !selectedAssignment ? (
-              <Paper variant='outlined' sx={{ mt: 2, overflow: 'hidden' }}>
-                {options.length ? (
-                  options.map(option => (
-                    <Box
-                      key={option.assignmentId}
-                      component='button'
-                      type='button'
-                      onClick={() => {
-                        setAssignmentId(option.assignmentId)
-                        setSearchQuery(option.label)
-                      }}
-                      sx={{
-                        width: '100%',
-                        px: 3,
-                        py: 2.5,
-                        border: 0,
-                        borderBottom: theme => `1px solid ${theme.palette.divider}`,
-                        backgroundColor: 'transparent',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        '&:last-of-type': {
-                          borderBottom: 0
-                        },
-                        '&:hover': {
-                          backgroundColor: 'action.hover'
-                        }
-                      }}
-                    >
-                      <Typography variant='body2' fontWeight={600}>{option.memberLabel}</Typography>
-                      <Typography variant='caption' color='text.secondary'>
-                        {option.clientLabel}{option.organizationLabel ? ` · ${option.organizationLabel}` : ''}
-                      </Typography>
-                    </Box>
-                  ))
-                ) : (
-                  <Typography variant='body2' color='text.secondary' sx={{ px: 3, py: 2.5 }}>
-                    {metaLoading
-                      ? 'Buscando assignments elegibles...'
-                      : 'No encontramos assignments elegibles con ese criterio.'}
-                  </Typography>
-                )}
-              </Paper>
-            ) : null}
-            {searchQuery.trim().length > 0 && searchQuery.trim().length < 2 && !selectedAssignment ? (
-              <Typography variant='caption' color='text.secondary' sx={{ mt: 1, display: 'block' }}>
-                Escribe al menos 2 caracteres para buscar assignments elegibles.
-              </Typography>
-            ) : null}
-          </Grid>
-          {selectedAssignment ? (
-            <Grid size={{ xs: 12 }}>
-              <Alert severity='info' icon={<i className='tabler-briefcase' />}>
-                {selectedAssignment.organizationLabel ? `${selectedAssignment.organizationLabel} · ` : ''}
-                {selectedAssignment.compensation.contractType || 'Sin contract type'} · {selectedAssignment.compensation.payRegime || 'Sin pay regime'}
-                {selectedAssignment.compensation.costRateAmount != null
-                  ? ` · costo base ${new Intl.NumberFormat('es-CL', {
-                    style: 'currency',
-                    currency: selectedAssignment.compensation.costRateCurrency || 'USD',
-                    maximumFractionDigits: 0
-                  }).format(selectedAssignment.compensation.costRateAmount)}`
-                  : ' · sin costo base vigente en Payroll'}
-              </Alert>
-            </Grid>
-          ) : null}
-          <Grid size={{ xs: 12, md: 6 }}>
-            <CustomTextField
-              select
-              fullWidth
-              label='Business Unit'
-              value={businessUnit}
-              onChange={event => setBusinessUnit(event.target.value)}
-              disabled={loading}
-            >
-              {BUSINESS_UNIT_OPTIONS.map(option => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </CustomTextField>
-          </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <CustomTextField
-              select
-              fullWidth
-              label='Estado inicial'
-              value={status}
-              onChange={event => setStatus(event.target.value)}
-              disabled={loading}
-            >
-              <MenuItem value='pipeline'>Pipeline</MenuItem>
-              <MenuItem value='onboarding'>Onboarding</MenuItem>
-              <MenuItem value='active'>Activo</MenuItem>
-            </CustomTextField>
-          </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <CustomTextField
-              fullWidth
-              label='Billing rate'
-              type='number'
-              value={billingRateAmount}
-              onChange={event => setBillingRateAmount(event.target.value)}
-              disabled={loading}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <CustomTextField
-              select
-              fullWidth
-              label='Moneda'
-              value={billingRateCurrency}
-              onChange={event => setBillingRateCurrency(event.target.value)}
-              disabled={loading}
-            >
-              <MenuItem value='USD'>USD</MenuItem>
-              <MenuItem value='CLP'>CLP</MenuItem>
-            </CustomTextField>
-          </Grid>
-          <Grid size={{ xs: 12 }}>
-            <CustomTextField
-              fullWidth
-              multiline
-              minRows={3}
-              label='Notas operativas'
-              value={placementNotes}
-              onChange={event => setPlacementNotes(event.target.value)}
-              disabled={loading}
-              helperText='Úsalo para capturar el contexto comercial, expectativas del cliente o setup inicial.'
-            />
-          </Grid>
-        </Grid>
+        {formContent}
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color='secondary' disabled={loading}>Cancelar</Button>
-        <Button onClick={handleSubmit} variant='contained' disabled={loading || metaLoading || !assignmentId}>
-          {loading ? 'Creando…' : 'Crear placement'}
-        </Button>
-      </DialogActions>
+      <DialogActions>{actions}</DialogActions>
     </Dialog>
   )
 }

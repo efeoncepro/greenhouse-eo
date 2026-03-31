@@ -2,6 +2,11 @@
 
 ## 2026-03-31
 
+- Staff Aug `Crear placement` se replanteó otra vez para salir del carril que seguía congelando Chrome:
+  - el formulario ya no se abre en `Dialog`
+  - `Agency > Staff Augmentation` ahora lo renderiza inline dentro de la misma vista
+  - se mantiene la búsqueda incremental remota y la preselección por `assignmentId`
+  - el objetivo explícito fue sacar del flujo crítico el shell `MUI Dialog` después de que el fix anterior no resolviera el freeze real reportado en `dev-greenhouse`
 - Staff Aug `Crear placement` deja de usar un patrón propenso a congelar la UI:
   - el modal ya no carga/renderiza todas las asignaciones elegibles como `select`
   - ahora usa búsqueda incremental remota con límite

@@ -4,6 +4,33 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-31 — Staff Aug create placement freeze replanteado inline
+
+### Objetivo
+- Sacar `Crear placement` del carril `MUI Dialog` porque el freeze siguió ocurriendo en `dev-greenhouse` aun después de simplificar búsqueda y focus handling.
+
+### Delta de ejecución
+- Replanteamiento del flujo:
+  - `CreatePlacementDialog` ahora soporta modo `inline`
+  - `StaffAugmentationListView` deja de abrir el create flow como modal y lo renderiza inline dentro de la misma página
+- La búsqueda incremental, preselección por `assignmentId` y creación del placement se mantienen; lo que cambia es el shell de interacción para evitar el bloqueo al abrir.
+- Contexto relevante:
+  - el reporte manual del usuario en `dev-greenhouse` confirmó que el deployment previo seguía congelando Chrome al hacer click en `Crear placement`
+  - por eso se descartó seguir endureciendo el modal y se movió el flujo fuera de `Dialog`
+- Archivos tocados:
+  - `src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.tsx`
+  - `src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.tsx`
+  - `src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.test.tsx`
+
+### Validación ejecutada
+- `pnpm exec vitest run src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.test.tsx src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.test.tsx --reporter=verbose`
+- `pnpm exec eslint src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.tsx src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.tsx src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.test.tsx src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.test.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Limitación real
+- No hubo verificación autenticada end-to-end en `dev-greenhouse` desde el runner porque el portal exige sesión y no hay bypass reutilizable en Playwright dentro de este entorno.
+- Sí queda evidencia local de que el click ya no monta `role="dialog"` y abre el formulario inline, que es precisamente el carril replanteado para evitar el cuelgue.
+
 ## Sesión 2026-03-31 — Staff Aug create placement freeze fallback simplification
 
 ### Objetivo

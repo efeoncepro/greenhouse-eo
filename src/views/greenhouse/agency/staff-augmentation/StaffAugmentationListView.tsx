@@ -254,6 +254,22 @@ const StaffAugmentationListView = () => {
       </Grid>
 
       <Grid size={{ xs: 12 }}>
+        {createOpen ? (
+          <Box sx={{ mb: 6 }}>
+            <CreatePlacementDialog
+              open
+              inline
+              onClose={handleCloseCreate}
+              initialAssignmentId={initialAssignmentId}
+              onCreated={placementId => {
+                handleCloseCreate()
+                void loadData()
+                router.push(`/agency/staff-augmentation/${placementId}`)
+              }}
+            />
+          </Box>
+        ) : null}
+
         <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
           <CardHeader
             avatar={<Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}><i className='tabler-users-plus' /></Avatar>}
@@ -335,19 +351,6 @@ const StaffAugmentationListView = () => {
           </CardContent>
         </Card>
       </Grid>
-
-      {createOpen ? (
-        <CreatePlacementDialog
-          open
-          onClose={handleCloseCreate}
-          initialAssignmentId={initialAssignmentId}
-          onCreated={placementId => {
-            handleCloseCreate()
-            void loadData()
-            router.push(`/agency/staff-augmentation/${placementId}`)
-          }}
-        />
-      ) : null}
     </Grid>
   )
 }

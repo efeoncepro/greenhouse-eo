@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react'
 
 import { cleanup, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithTheme } from '@/test/render'
@@ -77,5 +78,31 @@ describe('StaffAugmentationListView', () => {
     expect(screen.getByText('Activo')).toBeInTheDocument()
     expect(screen.getByText('360 listo')).toBeInTheDocument()
     expect(screen.getByText('Reach')).toBeInTheDocument()
+  })
+
+  it('opens the placement creation flow inline instead of mounting a blocking dialog', async () => {
+    const user = userEvent.setup()
+
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        items: [],
+        total: 0,
+        page: 1,
+        pageSize: 25
+      })
+    })
+
+    renderWithTheme(<StaffAugmentationListView />)
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Crear placement' }))
+
+    expect(await screen.findByText('Alta comercial-operativa sobre un assignment existente.')).toBeInTheDocument()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Buscar assignment' })).toBeInTheDocument()
   })
 })
