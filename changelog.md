@@ -3749,6 +3749,9 @@
 - `TASK-162` agregó health semántico y explain surface mínima para commercial cost attribution, con APIs dedicadas y chequeo de freshness en `/api/cron/materialization-health`.
 # 2026-03-31
 
+- Infra/runtime de assets privados:
+  - `staging` y `production` fijaron `GREENHOUSE_PRIVATE_ASSETS_BUCKET=efeonce-group-greenhouse-media` en Vercel
+  - esto corrige el runtime de upload mientras los buckets privados dedicados por entorno siguen pendientes de provisioning real
 - Hotfix en `leave` para uploads de respaldo:
   - `LeaveRequestDialog` ahora propaga el `memberId` efectivo al draft upload y a la creación de la solicitud
   - `/api/hr/core/meta` devuelve `currentMemberId` resuelto para superficies HR/My
