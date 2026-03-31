@@ -4,6 +4,69 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-31 — research abierto para Hiring Desk reactivo
+
+### Objetivo
+
+- Formalizar un research inicial para el futuro módulo `Hiring` / mini ATS enfocado en `Staff Augmentation`, sin abrir todavía una task de implementación.
+
+### Delta de ejecución
+
+- Se creó `docs/research/RESEARCH-003-hiring-desk-reactive-ecosystem.md`.
+- El brief deja fijado:
+  - aggregate types sugeridos
+  - eventos salientes y eventos entrantes del dominio
+  - estrategia de projections sobre dominios existentes (`organization`, `people`, `finance`, `notifications`)
+  - modelo recomendado de notificaciones `in_app` vs `email`
+  - sinergias con `Staff Aug`, `People`, `HRIS`, `Identity`, `Payroll`, `Finance`, `shared assets` y repos upstream
+- Se actualizaron índices:
+  - `docs/research/README.md`
+  - `docs/README.md`
+
+### Regla operativa propuesta
+
+- La secuencia canónica a preservar es:
+  - `person(candidate facet) -> member facet -> assignment -> placement`
+- `Hiring` no debe tratarse como reemplazo de `People` ni de `Staff Augmentation`.
+
+### Delta adicional
+
+- Se refinó la decisión de modelado:
+  - `candidate` no debe vivir como identidad humana paralela
+  - debe vivir como `Person` temprana dentro del grafo Greenhouse
+  - la separación correcta es por `facets`:
+    - `candidate facet`
+    - `member facet`
+    - facets comerciales/operativas posteriores
+- Implicación directa:
+  - `Person 360` pasa a ser el lugar natural para trazar el journey longitudinal desde candidate hasta historia multi-cliente
+- Se añadió otra decisión upstream:
+  - antes de `HiringOpening` debe existir una capa `StaffingRequest`
+  - captura solicitudes de búsqueda desde cliente existente, prospecto o demanda interna
+  - funciona como intake de demanda muy sinérgico con `Staff Aug`, pero no como extensión del `placement`
+- Se consolidó una matriz de recomendaciones `P0` en el research:
+  - producto/modelo
+  - operación/gobierno
+  - sistema/ecosistema
+  - corte recomendado de alcance para primera iteración
+
+### Validación ejecutada
+
+- No aplica validación runtime; cambio documental únicamente.
+
+### Nota de coordinación
+
+- Al iniciar la sesión el árbol ya venía dirty en:
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/to-do/TASK-174-finance-data-integrity-hardening.md`
+  - `docs/tasks/to-do/TASK-175-finance-core-test-coverage.md`
+  - `docs/tasks/to-do/TASK-176-labor-provisions-fully-loaded-cost.md`
+  - `docs/tasks/to-do/TASK-177-operational-pl-business-unit-scope.md`
+  - `docs/tasks/to-do/TASK-178-finance-budget-engine.md`
+  - `docs/tasks/to-do/TASK-179-finance-reconciliation-cutover-hardening.md`
+- No fueron tocados por este trabajo.
+
 ## Sesión 2026-03-31 — TASK-173 cierre formal
 
 ### Estado final

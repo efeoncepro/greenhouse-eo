@@ -64,6 +64,7 @@ Indice maestro de la documentacion no operativa del repo.
 
 - [Research Briefs](research/README.md)
 - [RESEARCH-002-staff-augmentation-enterprise-module.md](research/RESEARCH-002-staff-augmentation-enterprise-module.md)
+- [RESEARCH-003-hiring-desk-reactive-ecosystem.md](research/RESEARCH-003-hiring-desk-reactive-ecosystem.md)
 
 ### Operations
 
