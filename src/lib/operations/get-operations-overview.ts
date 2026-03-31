@@ -195,7 +195,7 @@ const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubsystem> 
       ),
       safeCount(
         `SELECT COUNT(*) AS cnt FROM greenhouse_finance.expenses
-         WHERE (client_id IS NULL OR client_id = '') AND expense_type NOT IN ('tax', 'social_security')`
+         WHERE (client_id IS NULL OR client_id = '') AND expense_type = 'supplier'`
       ),
       safeCount(
         `SELECT COUNT(*) AS cnt FROM greenhouse_finance.income
