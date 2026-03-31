@@ -115,23 +115,10 @@ export interface TenantAccessRecord {
   identityProfileId: string | null
 }
 
-const rolePriority = [
-  'efeonce_admin',
-  'employee',
-  'finance_manager',
-  'finance_admin',
-  'finance_analyst',
-  'hr_payroll',
-  'hr_manager',
-  'efeonce_operations',
-  'efeonce_account',
-  'people_viewer',
-  'ai_tooling_admin',
-  'collaborator',
-  'client_executive',
-  'client_manager',
-  'client_specialist'
-]
+import { ROLE_PRIORITY } from '@/config/role-codes'
+import { deriveRouteGroupsFromRoles } from '@/lib/tenant/role-route-mapping'
+
+const rolePriority = ROLE_PRIORITY as readonly string[]
 
 const normalizeStringArray = (value: string[] | null | undefined, fallback: string[] = []) => {
   if (!Array.isArray(value)) {
@@ -166,64 +153,8 @@ const getPrimaryRoleCode = (roleCodes: string[], tenantType: TenantType) => {
   return sorted[0]
 }
 
-const deriveRouteGroups = (roleCodes: string[], tenantType: TenantType) => {
-  const routeGroups = new Set<string>()
-
-  for (const roleCode of roleCodes) {
-    if (roleCode.startsWith('efeonce_')) {
-      routeGroups.add('internal')
-    }
-
-    if (roleCode === 'hr_payroll') {
-      routeGroups.add('internal')
-      routeGroups.add('hr')
-    }
-
-    if (roleCode === 'employee') {
-      routeGroups.add('internal')
-      routeGroups.add('employee')
-    }
-
-    if (roleCode === 'finance_manager') {
-      routeGroups.add('internal')
-      routeGroups.add('finance')
-    }
-
-    if (roleCode === 'efeonce_admin') {
-      routeGroups.add('admin')
-    }
-
-    if (roleCode === 'collaborator') {
-      routeGroups.add('my')
-    }
-
-    if (roleCode === 'hr_manager') {
-      routeGroups.add('hr')
-    }
-
-    if (roleCode === 'finance_analyst' || roleCode === 'finance_admin') {
-      routeGroups.add('finance')
-    }
-
-    if (roleCode === 'people_viewer') {
-      routeGroups.add('people')
-    }
-
-    if (roleCode === 'ai_tooling_admin') {
-      routeGroups.add('ai_tooling')
-    }
-
-    if (roleCode.startsWith('client_')) {
-      routeGroups.add('client')
-    }
-  }
-
-  if (routeGroups.size === 0) {
-    routeGroups.add(tenantType === 'efeonce_internal' ? 'internal' : 'client')
-  }
-
-  return Array.from(routeGroups)
-}
+const deriveRouteGroups = (roleCodes: string[], tenantType: TenantType) =>
+  deriveRouteGroupsFromRoles(roleCodes, tenantType)
 
 const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
   const tenantType = resolveTenantType(row.tenant_type)

@@ -2,6 +2,7 @@ import 'server-only'
 
 import { NextResponse } from 'next/server'
 
+import { ROLE_CODES } from '@/config/role-codes'
 import { getTenantContext, type TenantContext } from '@/lib/tenant/get-tenant-context'
 
 export type TenantRouteGroup = 'client' | 'internal' | 'admin' | 'agency' | 'hr' | 'finance' | 'employee' | 'my' | 'people' | 'ai_tooling'
@@ -47,18 +48,18 @@ export const hasRouteGroup = (tenant: TenantContext, routeGroup: TenantRouteGrou
 export const canAccessProject = (tenant: TenantContext, projectId: string) => tenant.projectIds.includes(projectId)
 
 export const canReadCostIntelligence = (tenant: TenantContext) =>
-  hasRouteGroup(tenant, 'finance') || hasRoleCode(tenant, 'efeonce_admin')
+  hasRouteGroup(tenant, 'finance') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
 
 export const canCloseCostIntelligencePeriod = (tenant: TenantContext) =>
-  hasRoleCode(tenant, 'finance_manager') || hasRoleCode(tenant, 'efeonce_admin')
+  hasRoleCode(tenant, ROLE_CODES.FINANCE_MANAGER) || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
 
 export const canReopenCostIntelligencePeriod = (tenant: TenantContext) =>
-  hasRoleCode(tenant, 'efeonce_admin')
+  hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
 
 export const canAccessPeopleModule = (tenant: TenantContext) =>
   hasRouteGroup(tenant, 'people') ||
   (hasRouteGroup(tenant, 'internal') &&
-    (hasRoleCode(tenant, 'efeonce_admin') || hasRoleCode(tenant, 'efeonce_operations') || hasRoleCode(tenant, 'hr_payroll') || hasRoleCode(tenant, 'finance_manager')))
+    (hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN) || hasRoleCode(tenant, ROLE_CODES.EFEONCE_OPERATIONS) || hasRoleCode(tenant, ROLE_CODES.HR_PAYROLL) || hasRoleCode(tenant, ROLE_CODES.FINANCE_MANAGER)))
 
 export const requireMyTenantContext = async (): Promise<{
   tenant: TenantContext | null
@@ -179,7 +180,7 @@ export const requireHrTenantContext = async () => {
     }
   }
 
-  if (!hasRouteGroup(tenant, 'hr') && !hasRoleCode(tenant, 'efeonce_admin')) {
+  if (!hasRouteGroup(tenant, 'hr') && !hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)) {
     return {
       tenant: null,
       errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
@@ -202,7 +203,7 @@ export const requireEmployeeTenantContext = async () => {
     }
   }
 
-  if (!hasRouteGroup(tenant, 'employee') && !hasRouteGroup(tenant, 'hr') && !hasRoleCode(tenant, 'efeonce_admin')) {
+  if (!hasRouteGroup(tenant, 'employee') && !hasRouteGroup(tenant, 'hr') && !hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)) {
     return {
       tenant: null,
       errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
@@ -248,7 +249,7 @@ export const requireFinanceTenantContext = async () => {
     }
   }
 
-  if (!hasRouteGroup(tenant, 'finance') && !hasRoleCode(tenant, 'efeonce_admin')) {
+  if (!hasRouteGroup(tenant, 'finance') && !hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)) {
     return {
       tenant: null,
       errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
@@ -294,7 +295,7 @@ export const requireAdminTenantContext = async () => {
     }
   }
 
-  if (!hasRouteGroup(tenant, 'admin') || !hasRoleCode(tenant, 'efeonce_admin')) {
+  if (!hasRouteGroup(tenant, 'admin') || !hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)) {
     return {
       tenant: null,
       errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
@@ -317,7 +318,7 @@ export const requireAiToolingTenantContext = async () => {
     }
   }
 
-  if (!hasRouteGroup(tenant, 'ai_tooling') && !hasRoleCode(tenant, 'efeonce_admin')) {
+  if (!hasRouteGroup(tenant, 'ai_tooling') && !hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)) {
     return {
       tenant: null,
       errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })

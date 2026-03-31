@@ -9,7 +9,6 @@ import type { PersonDetail } from '@/types/people'
 import PersonTabs from './PersonTabs'
 
 const replace = vi.fn()
-const hrProfileTabCapture = vi.hoisted(() => ({ current: null as unknown }))
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace }),
@@ -17,32 +16,20 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams()
 }))
 
-vi.mock('./tabs/PersonMembershipsTab', () => ({
-  default: () => <div>Memberships content</div>
+vi.mock('./tabs/PersonProfileTab', () => ({
+  default: () => <div>Profile content</div>
 }))
 
 vi.mock('./tabs/PersonActivityTab', () => ({
   default: () => <div>Activity content</div>
 }))
 
-vi.mock('./tabs/PersonCompensationTab', () => ({
-  default: () => <div>Compensation content</div>
+vi.mock('./tabs/PersonMembershipsTab', () => ({
+  default: () => <div>Memberships content</div>
 }))
 
-vi.mock('./tabs/PersonPayrollTab', () => ({
-  default: () => <div>Payroll content</div>
-}))
-
-vi.mock('./tabs/PersonFinanceTab', () => ({
-  default: () => <div>Finance content</div>
-}))
-
-vi.mock('./tabs/PersonHrProfileTab', () => ({
-  default: (props: unknown) => {
-    hrProfileTabCapture.current = props
-
-    return <div>HR content</div>
-  }
+vi.mock('./tabs/PersonEconomyTab', () => ({
+  default: () => <div>Economy content</div>
 }))
 
 vi.mock('./tabs/PersonAiToolsTab', () => ({
@@ -136,7 +123,6 @@ const detail: PersonDetail = {
 describe('PersonTabs', () => {
   beforeEach(() => {
     replace.mockReset()
-    hrProfileTabCapture.current = null
   })
 
   it('keeps the pill tablist and panel inside grid rows to avoid root overflow', () => {
@@ -152,71 +138,20 @@ describe('PersonTabs', () => {
     expect(liveRegion).toHaveStyle({ width: '1px', height: '1px' })
   })
 
-  it('passes hrContext and operational metrics into the HR profile tab', () => {
-    const hrDetail: PersonDetail = {
+  it('renders consolidated tabs without crashing', () => {
+    const allTabsDetail: PersonDetail = {
       ...detail,
       access: {
         ...detail.access,
-        canViewHrProfile: true,
-        visibleTabs: ['profile']
-      },
-      operationalMetrics: {
-        rpaAvg30d: 1.8,
-        otdPercent30d: 90,
-        tasksCompleted30d: 12,
-        tasksActiveNow: 4,
-        projectBreakdown: []
-      },
-      hrContext: {
-        identityProfileId: 'ip-1',
-        eoId: 'EO-001',
-        memberId: 'member-1',
-        displayName: 'Andres Carlosama',
-        email: 'andres@efeoncepro.com',
-        departmentName: 'Diseño',
-        jobLevel: 'senior',
-        employmentType: 'full_time',
-        hireDate: '2026-03-15',
-        contractEndDate: null,
-        dailyRequired: true,
-        supervisorMemberId: 'member-2',
-        supervisorName: 'Daniela Ferreira',
-        compensation: {
-          payRegime: 'international',
-          currency: 'USD',
-          baseSalary: 675,
-          contractType: 'indefinido'
-        },
-        leave: {
-          vacationAllowance: 15,
-          vacationCarried: 2,
-          vacationUsed: 3,
-          vacationReserved: 1,
-          vacationAvailable: 13,
-          personalAllowance: 2,
-          personalUsed: 1,
-          pendingRequests: 1,
-          approvedRequestsThisYear: 2,
-          totalApprovedDaysThisYear: 4
-        }
+        visibleTabs: ['profile', 'activity', 'memberships', 'economy', 'ai-tools']
       }
     }
 
-    renderWithTheme(<PersonTabs detail={hrDetail} />)
+    renderWithTheme(<PersonTabs detail={allTabsDetail} />)
 
-    expect(screen.getByText('HR content')).toBeInTheDocument()
-    expect(hrProfileTabCapture.current).toEqual(
-      expect.objectContaining({
-        memberId: 'member-1',
-        hrContext: expect.objectContaining({
-          departmentName: 'Diseño',
-          supervisorName: 'Daniela Ferreira'
-        }),
-        defaultOperationalMetrics: expect.objectContaining({
-          rpaAvg30d: 1.8,
-          otdPercent30d: 90
-        })
-      })
-    )
+    // All 5 consolidated tabs should render
+    const tabs = screen.getAllByRole('tab')
+
+    expect(tabs.length).toBeGreaterThanOrEqual(5)
   })
 })

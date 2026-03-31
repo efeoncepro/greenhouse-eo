@@ -1,14 +1,15 @@
+import { ROLE_CODES } from '@/config/role-codes'
 import type { PersonAccess, PersonTab } from '@/types/people'
 
 const personTabOrder: PersonTab[] = ['profile', 'activity', 'memberships', 'economy', 'ai-tools']
 
 export const getPersonAccess = (roleCodes: string[]): PersonAccess => {
-  const isAdmin = roleCodes.includes('efeonce_admin')
-  const isOps = roleCodes.includes('efeonce_operations')
-  const isHrPayroll = roleCodes.includes('hr_payroll')
-  const isHrManager = roleCodes.includes('hr_manager')
-  const isFinance = roleCodes.includes('finance_manager')
-  const isPeopleViewer = roleCodes.includes('people_viewer')
+  const isAdmin = roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)
+  const isOps = roleCodes.includes(ROLE_CODES.EFEONCE_OPERATIONS)
+  const isHrPayroll = roleCodes.includes(ROLE_CODES.HR_PAYROLL)
+  const isHrManager = roleCodes.includes(ROLE_CODES.HR_MANAGER)
+  const isFinance = roleCodes.includes(ROLE_CODES.FINANCE_MANAGER)
+  const isPeopleViewer = roleCodes.includes(ROLE_CODES.PEOPLE_VIEWER)
 
   const canViewMemberships = isAdmin || isOps
   const canViewAssignments = isAdmin || isOps || isPeopleViewer

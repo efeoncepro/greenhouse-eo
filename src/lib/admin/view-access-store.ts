@@ -111,62 +111,7 @@ const roleCanAccessViewFallback = (
   return false
 }
 
-const deriveRouteGroupsForSingleRole = (roleCode: string, tenantType: 'client' | 'efeonce_internal') => {
-  const routeGroups = new Set<string>()
-
-  if (roleCode.startsWith('efeonce_')) {
-    routeGroups.add('internal')
-  }
-
-  if (roleCode === 'hr_payroll') {
-    routeGroups.add('internal')
-    routeGroups.add('hr')
-  }
-
-  if (roleCode === 'employee') {
-    routeGroups.add('internal')
-    routeGroups.add('employee')
-  }
-
-  if (roleCode === 'finance_manager') {
-    routeGroups.add('internal')
-    routeGroups.add('finance')
-  }
-
-  if (roleCode === 'efeonce_admin') {
-    routeGroups.add('admin')
-  }
-
-  if (roleCode === 'collaborator') {
-    routeGroups.add('my')
-  }
-
-  if (roleCode === 'hr_manager') {
-    routeGroups.add('hr')
-  }
-
-  if (roleCode === 'finance_analyst' || roleCode === 'finance_admin') {
-    routeGroups.add('finance')
-  }
-
-  if (roleCode === 'people_viewer') {
-    routeGroups.add('people')
-  }
-
-  if (roleCode === 'ai_tooling_admin') {
-    routeGroups.add('ai_tooling')
-  }
-
-  if (roleCode.startsWith('client_')) {
-    routeGroups.add('client')
-  }
-
-  if (routeGroups.size === 0) {
-    routeGroups.add(tenantType === 'efeonce_internal' ? 'internal' : 'client')
-  }
-
-  return Array.from(routeGroups)
-}
+import { deriveRouteGroupsForSingleRole } from '@/lib/tenant/role-route-mapping'
 
 const toRegistryRows = (persistedRegistryRows: ViewRegistryRow[]) =>
   persistedRegistryRows.length > 0
