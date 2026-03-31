@@ -143,15 +143,21 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - `brand-assets.ts`: added `crm_solutions` entry
 - `helpers.ts`: added `getCapabilityPaletteFromMetadata()` (metadata-driven palette resolver)
 
+Fase 2 completada:
+- `greenhouse_conformed.dim_business_lines` creada y poblada en BigQuery (5 BLs)
+- ETL `scripts/etl-business-lines-to-bigquery.ts` (PG → BQ full replace)
+- Finance `/api/finance/dashboard/by-service-line` enriched con metadata (label, colorHex, loopPhase)
+- Hallazgo: producción PG faltaban `efeonce_digital` y `reach` — insertados
+- Todas las migraciones aplicadas contra `greenhouse-pg-dev` con `greenhouse_ops`
+
 ### Pendiente
 
-- Ejecutar migraciones SQL en `greenhouse-pg-dev` (scripts listos, no aplicados)
-- Fases 2-4: BigQuery dimension, FK migrations, Notion BU property, ICO by BU
+- Fases 3-4: Notion BU property + sync, ICO metrics by BU
 
 ### Riesgos
 
-- Migraciones dependen de que `service_modules` ya tenga rows seeded (verificado: 19 rows existen)
-- `getCachedBusinessLineSummaries()` falla gracefully si tabla no existe aún (returns [])
+- `.env.local` tiene `GOOGLE_APPLICATION_CREDENTIALS_JSON` malformado (literal \n). ETL requiere `GOOGLE_APPLICATION_CREDENTIALS_JSON=""` para caer a ADC
+- `getCachedBusinessLineSummaries()` falla gracefully si tabla no existe (returns [])
 
 ---
 

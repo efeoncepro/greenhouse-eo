@@ -14,11 +14,18 @@ Fase 1 implementada:
 - `brand-assets.ts` — added crm_solutions
 - `getCapabilityPaletteFromMetadata()` — metadata-driven palette resolver
 
-Pendiente Fases 2-4: BigQuery dimension, FK migrations, Notion BU property, ICO by BU.
+Fase 2 implementada:
+- BQ DDL `bigquery/greenhouse_dim_business_lines_v1.sql`
+- ETL script `scripts/etl-business-lines-to-bigquery.ts` (PG → BQ full replace)
+- `greenhouse_conformed.dim_business_lines` live con 5 BLs
+- Finance `/api/finance/dashboard/by-service-line` enriched con label, colorHex, loopPhase desde metadata
+- Missing BLs (efeonce_digital, reach) insertadas en PG service_modules de producción
+
+Pendiente Fases 3-4: Notion BU property, ICO by BU.
 
 ## Estado
 
-**In Progress** — Fase 1 implementada 2026-03-31.
+**In Progress** — Fases 1-2 implementadas 2026-03-31.
 
 Baseline canonica de implementacion al 2026-03-19.
 
