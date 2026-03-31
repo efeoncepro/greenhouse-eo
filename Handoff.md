@@ -37,6 +37,7 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 
 ### Cierre
 - `TASK-169` queda cerrada como baseline mínimo del bridge `People -> assignment -> placement`.
+- `TASK-038` y `TASK-041` quedan cerradas administrativamente como documentos históricos absorbidos; la próxima iteración del módulo enterprise de Staff Aug debe nacer como task nueva, no reabrir estos briefs.
 - Validación adicional completada después de este delta:
   - `pnpm exec vitest run src/app/api/agency/staff-augmentation/placement-options/route.test.ts src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.test.tsx src/views/greenhouse/people/tabs/PersonMembershipsTab.test.tsx src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.test.tsx src/app/api/agency/staff-augmentation/placements/route.test.ts`
   - `pnpm exec eslint src/lib/staff-augmentation/store.ts src/app/api/agency/staff-augmentation/placement-options/route.ts src/app/api/agency/staff-augmentation/placement-options/route.test.ts src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.tsx src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.test.tsx src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.tsx src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.test.tsx src/lib/people/get-person-detail.ts src/types/people.ts src/views/greenhouse/people/tabs/PersonMembershipsTab.tsx src/views/greenhouse/people/tabs/PersonMembershipsTab.test.tsx`

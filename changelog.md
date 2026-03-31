@@ -14,6 +14,9 @@
 - Nueva lane documental activa:
   - `TASK-169` consolida el bridge `People -> assignment context -> placement`
   - `TASK-038` y `TASK-041` quedan absorbidas como framing histórico/addendum ya reconciliado con el runtime real
+- Cierre administrativo adicional:
+  - `TASK-038` y `TASK-041` pasan a `complete` como referencia histórica absorbida
+  - la próxima definición enterprise de Staff Aug quedará como task nueva, complementaria al roadmap HRIS
 
 ## 2026-03-30 (session 12)
 

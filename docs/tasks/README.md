@@ -84,9 +84,9 @@ Primer bloque operativo asignado:
 ### Prioridad vigente — Staff Aug `TASK-038` y `TASK-041`
 
 - Lectura recomendada a 2026-03-28:
-- `TASK-038`: tratarla como brief histórico de producto; el baseline runtime ya quedó cerrado por `TASK-019`.
-- `TASK-041`: necesaria solo al momento de conectar Staff Aug con HRIS canónico y contract model consolidado; no compite como lane autónoma antes de `TASK-026`.
-- Criterio: el baseline moderno de Staff Aug ya existe; lo pendiente es integración HRIS adicional y follow-ons de consumers.
+  - `TASK-038`: ya queda cerrada como brief histórico absorbido.
+  - `TASK-041`: ya queda cerrada como addendum absorbida.
+- Criterio: el baseline moderno de Staff Aug ya existe y estas dos tasks quedan solo como referencia histórica hasta iterar una nueva lane enterprise del módulo complementario a HRIS.
 
 ### Prioridad vigente — Staff Aug bridge `TASK-169`
 
@@ -102,7 +102,7 @@ Primer bloque operativo asignado:
 - **Siguiente ola:** `TASK-027` → `TASK-028` → `TASK-116` → `TASK-070` → `TASK-071` → `TASK-011`.
 - **Estratégicas pero caras:** `TASK-008` → `TASK-005` → `TASK-071` → `TASK-118` → `TASK-018`.
 - **Later / oportunistas:** `TASK-029` → `TASK-031` → `TASK-015` → `TASK-016` → `TASK-020` → `TASK-115` → `TASK-107` → `TASK-103` → `TASK-021` → `TASK-032` → `TASK-053` → `TASK-054` → `TASK-055` → `TASK-058` → `TASK-071`.
-- **No gastar tokens ahora:** `TASK-025`, `TASK-033` a `TASK-038`, `TASK-039`, `TASK-041`.
+- **No gastar tokens ahora:** `TASK-025`, `TASK-033` a `TASK-037`, `TASK-039`.
 - Criterio: priorizar guardrails baratos, tareas que desbloquean módulos enteros, hardening sobre foundations ya implementadas y lanes con valor operativo inmediato; postergar briefs históricos, addenda dependientes y apuestas estratégicas de alto costo que todavía no desbloquean runtime cercano.
 
 ### Backlog Priorizado
@@ -210,7 +210,8 @@ Primer bloque operativo asignado:
 | [TASK-035-frameio-analytics-brief.md](to-do/TASK-035-frameio-analytics-brief.md) | Brief original `BigQuery-first` | Usar solo como referencia de objetivo; implementar sobre `v2` |
 | [TASK-036-greenhouse-home-nexa-brief.md](to-do/TASK-036-greenhouse-home-nexa-brief.md) | Brief original previo al runtime actual del portal | Usar solo como visión UX; implementar sobre `v2` |
 | [TASK-037-scim-user-provisioning-brief.md](to-do/TASK-037-scim-user-provisioning-brief.md) | Brief original previo a `Identity & Access V2` | Usar solo como referencia; implementar sobre `v2` |
-| [TASK-038-staff-augmentation-module-brief.md](to-do/TASK-038-staff-augmentation-module-brief.md) | Brief original con drift en IDs y runtime | Usar solo como contexto; implementar sobre `v2` |
+| [TASK-038-staff-augmentation-module-brief.md](complete/TASK-038-staff-augmentation-module-brief.md) | Brief original ya absorbido por `TASK-169` | Referencia histórica; no ejecutar literalmente |
+| [TASK-041-staff-augmentation-hris-addendum.md](complete/TASK-041-staff-augmentation-hris-addendum.md) | Addendum HRIS ya absorbida por `TASK-169` | Referencia histórica; reutilizar ideas al iterar la nueva lane enterprise |
 
 ## Supporting Specs
 
