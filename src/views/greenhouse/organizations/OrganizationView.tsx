@@ -9,15 +9,49 @@ import { toast } from 'react-toastify'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
 import CircularProgress from '@mui/material/CircularProgress'
+import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
+import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import CustomAvatar from '@core/components/mui/Avatar'
+import CustomChip from '@core/components/mui/Chip'
+import CustomIconButton from '@core/components/mui/IconButton'
+import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+
 import type { OrganizationDetailData } from './types'
-import OrganizationLeftSidebar from './OrganizationLeftSidebar'
 import OrganizationTabs from './OrganizationTabs'
 import EditOrganizationDrawer from './drawers/EditOrganizationDrawer'
 import AddMembershipDrawer from './drawers/AddMembershipDrawer'
+
+// ── Helpers ──
+
+const COUNTRY_FLAGS: Record<string, string> = {
+  CL: '🇨🇱', CO: '🇨🇴', VE: '🇻🇪', MX: '🇲🇽', PE: '🇵🇪', US: '🇺🇸', AR: '🇦🇷', BR: '🇧🇷', EC: '🇪🇨'
+}
+
+const STATUS_COLOR: Record<string, 'success' | 'warning' | 'error' | 'secondary'> = {
+  active: 'success', inactive: 'secondary', prospect: 'warning', churned: 'error'
+}
+
+const STATUS_LABEL: Record<string, string> = {
+  active: 'Activa', inactive: 'Inactiva', prospect: 'Prospecto', churned: 'Churned'
+}
+
+const fmtClp = (n: number) =>
+  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(n)
+
+// ── Types ──
+
+interface OrgKpis {
+  revenueClp: number
+  grossMarginPct: number | null
+  headcountFte: number | null
+  totalCostClp: number
+}
 
 type Props = {
   organizationId: string
@@ -32,12 +66,37 @@ const OrganizationView = ({ organizationId }: Props) => {
   const [editDrawerOpen, setEditDrawerOpen] = useState(false)
   const [addMembershipOpen, setAddMembershipOpen] = useState(false)
   const [syncing, setSyncing] = useState(false)
+  const [kpis, setKpis] = useState<OrgKpis | null>(null)
 
   const loadDetail = useCallback(async () => {
     try {
       const res = await fetch(`/api/organizations/${organizationId}`)
 
-      if (res.ok) setDetail(await res.json())
+      if (res.ok) {
+        const data = await res.json()
+
+        setDetail(data)
+
+        // Fetch KPIs from operational PL
+        try {
+          const now = new Date()
+          const plRes = await fetch(`/api/finance/intelligence/operational-pl?year=${now.getFullYear()}&month=${now.getMonth() + 1}&scope=organization`)
+
+          if (plRes.ok) {
+            const plData = await plRes.json()
+            const snap = (plData.snapshots ?? []).find((s: Record<string, unknown>) => s.scopeId === data.organizationId)
+
+            if (snap) {
+              setKpis({
+                revenueClp: Number(snap.revenueClp ?? 0),
+                grossMarginPct: snap.grossMarginPct != null ? Number(snap.grossMarginPct) : null,
+                headcountFte: snap.headcountFte != null ? Number(snap.headcountFte) : null,
+                totalCostClp: Number(snap.totalCostClp ?? 0)
+              })
+            }
+          }
+        } catch { /* non-blocking */ }
+      }
     } catch {
       // Non-blocking
     } finally {
@@ -107,26 +166,126 @@ const OrganizationView = ({ organizationId }: Props) => {
     )
   }
 
+  const initial = detail.organizationName.charAt(0).toUpperCase()
+  const flag = detail.country ? COUNTRY_FLAGS[detail.country.toUpperCase()] ?? '🌐' : null
+
   return (
     <>
-      <Grid container spacing={6}>
-        <Grid size={{ xs: 12, md: 5, lg: 4 }}>
-          <OrganizationLeftSidebar
-            detail={detail}
-            isAdmin={isAdmin}
-            syncing={syncing}
-            onEditOrganization={() => setEditDrawerOpen(true)}
-            onSyncHubspot={handleSyncHubspot}
-          />
+      <Stack spacing={6}>
+        {/* ── Identity Header ── */}
+        <Card variant='outlined'>
+          <CardContent sx={{ py: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
+              {/* Avatar + Identity */}
+              <CustomAvatar variant='rounded' skin='light' color='primary' size={56}>
+                <Typography variant='h5' sx={{ fontWeight: 700 }}>{initial}</Typography>
+              </CustomAvatar>
+
+              <Box sx={{ flex: 1, minWidth: 200 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+                  <Typography variant='h5' sx={{ fontWeight: 600 }}>{detail.organizationName}</Typography>
+                  <CustomChip
+                    round='true' size='small' variant='tonal'
+                    color={STATUS_COLOR[detail.status] ?? 'secondary'}
+                    label={STATUS_LABEL[detail.status] ?? detail.status}
+                  />
+                  {flag && <Typography variant='body2' color='text.secondary'>{flag} {detail.country}</Typography>}
+                </Box>
+                {detail.industry && (
+                  <Typography variant='body2' color='text.secondary'>{detail.industry}</Typography>
+                )}
+                {(detail.legalName || detail.taxId) && (
+                  <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                    {detail.legalName}{detail.taxId ? ` · ${detail.taxIdType ? `${detail.taxIdType}: ` : ''}${detail.taxId}` : ''}
+                  </Typography>
+                )}
+              </Box>
+
+              {/* Stats chips */}
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+                <CustomChip round='true' size='small' variant='tonal' color='primary' label={`${detail.spaceCount} Space${detail.spaceCount !== 1 ? 's' : ''}`} />
+                <CustomChip round='true' size='small' variant='tonal' color='info' label={`${detail.uniquePersonCount} Personas`} />
+                {detail.hubspotCompanyId && (
+                  <CustomChip
+                    round='true' size='small' variant='tonal' color='warning'
+                    label='HubSpot'
+                    icon={<Box component='img' src='/images/integrations/hubspot.svg' alt='' sx={{ width: 14, height: 14 }} />}
+                  />
+                )}
+              </Box>
+
+              {/* Actions */}
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                {isAdmin && detail.hubspotCompanyId && (
+                  <CustomIconButton
+                    variant='tonal' color='warning' size='small'
+                    onClick={handleSyncHubspot} disabled={syncing}
+                    aria-label='Sincronizar con HubSpot'
+                  >
+                    {syncing ? <CircularProgress size={18} color='inherit' /> : <i className='tabler-refresh' />}
+                  </CustomIconButton>
+                )}
+                {isAdmin && (
+                  <CustomIconButton
+                    variant='tonal' color='primary' size='small'
+                    onClick={() => setEditDrawerOpen(true)}
+                    aria-label='Editar organización'
+                  >
+                    <i className='tabler-edit' />
+                  </CustomIconButton>
+                )}
+              </Box>
+            </Box>
+          </CardContent>
+        </Card>
+
+        {/* ── Cross-domain KPIs ── */}
+        <Grid container spacing={6}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <HorizontalWithSubtitle
+              title='Revenue'
+              stats={kpis ? fmtClp(kpis.revenueClp) : '—'}
+              subtitle='Ingresos del período'
+              avatarIcon='tabler-cash'
+              avatarColor='success'
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <HorizontalWithSubtitle
+              title='Margen bruto'
+              stats={kpis?.grossMarginPct != null ? `${Math.round(kpis.grossMarginPct)}%` : '—'}
+              subtitle={kpis ? fmtClp(kpis.revenueClp - kpis.totalCostClp) : 'Sin datos'}
+              avatarIcon='tabler-trending-up'
+              avatarColor={kpis?.grossMarginPct != null && kpis.grossMarginPct >= 30 ? 'success' : kpis?.grossMarginPct != null && kpis.grossMarginPct >= 15 ? 'warning' : 'error'}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <HorizontalWithSubtitle
+              title='Equipo'
+              stats={kpis?.headcountFte != null ? `${kpis.headcountFte} FTE` : '—'}
+              subtitle='Personas asignadas'
+              avatarIcon='tabler-users'
+              avatarColor='info'
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <HorizontalWithSubtitle
+              title='Spaces'
+              stats={String(detail.spaceCount)}
+              subtitle={`${detail.membershipCount} membresías`}
+              avatarIcon='tabler-grid-4x4'
+              avatarColor='primary'
+            />
+          </Grid>
         </Grid>
-        <Grid size={{ xs: 12, md: 7, lg: 8 }}>
-          <OrganizationTabs
-            detail={detail}
-            isAdmin={isAdmin}
-            onAddMembership={() => setAddMembershipOpen(true)}
-          />
-        </Grid>
-      </Grid>
+
+        {/* ── Tabs (full width) ── */}
+        <OrganizationTabs
+          detail={detail}
+          isAdmin={isAdmin}
+          onAddMembership={() => setAddMembershipOpen(true)}
+        />
+      </Stack>
 
       <EditOrganizationDrawer
         open={editDrawerOpen}
