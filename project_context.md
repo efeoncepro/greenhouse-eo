@@ -1,5 +1,27 @@
 # project_context.md
 
+## Delta 2026-03-31 Operación GCP: cuenta preferida y carril ADC
+
+- Preferencia operativa explícita del owner/admin del proyecto:
+  - usar `gcloud` primero para operaciones GCP/Cloud SQL/BigQuery
+  - la cuenta humana preferida es `julio.reyes@efeonce.org`
+  - asumir que ese usuario es admin/owner salvo evidencia contraria del entorno
+- Carril recomendado:
+  - priorizar `Application Default Credentials (ADC)` para scripts y tooling local antes de depender de `.env` remotos o pulls de Vercel
+  - validar al inicio:
+    - `gcloud auth list`
+    - `gcloud config get-value account`
+    - `gcloud auth application-default print-access-token`
+- Fallback operativo:
+  - si `ADC` no está inicializado o no tiene alcance suficiente, documentarlo explícitamente
+  - recién después usar env remoto (`vercel env pull` u otra vía equivalente) como workaround
+- Regla de coordinación:
+  - no asumir que el mejor carril para ejecutar backfills o scripts operativos es Vercel
+  - intentar primero el carril `gcloud + ADC` y dejar nota en `Handoff.md` si no estuvo disponible
+- Estado observado en esta máquina durante esta sesión:
+  - `gcloud` sí estaba autenticado con `julio.reyes@efeonce.org` como cuenta activa
+  - `ADC` no estaba inicializado, por lo que algunas operaciones terminaron requiriendo fallback temporal
+  - esta situación debe corregirse antes de normalizar nuevos flujos operativos sobre GCP
 ## Delta 2026-03-31 Shared attachments and GCP bucket topology
 
 - Alineación operativa de entorno:

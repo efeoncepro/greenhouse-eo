@@ -3746,6 +3746,7 @@
 
 # 2026-03-31
 
+- fix: `Finance > Expenses > Registrar egreso` ahora carga el selector de `Proveedor` desde el mismo source of truth Postgres-first que `Finance > Suppliers`; se elimina el drift donde el drawer seguía leyendo `greenhouse.fin_suppliers` en BigQuery y mostraba un catálogo distinto al del directorio principal.
 - fix: `HR > Permisos` en staging dejó de caerse por schema drift después de `TASK-173`; se aplicó en Cloud SQL la foundation shared mínima para `leave` (`greenhouse_core.assets`, `greenhouse_core.asset_access_log` y `greenhouse_hr.leave_requests.attachment_asset_id`), restaurando la carga de solicitudes en `dev-greenhouse.efeoncepro.com/hr/leave`.
 - fix: `src/lib/hr-core/service.ts` ahora considera `undefined_column` / `relation does not exist` (`42703` / `42P01`) como fallback recuperable a BigQuery para que `leave requests` no derribe toda la vista si un deploy llega antes que el bootstrap de Postgres.
 - fix: `purchase orders` y `payroll receipts` ya conviven con schemas legacy durante el rollout de `TASK-173`; ambos stores detectan si existen `attachment_asset_id` / `asset_id` antes de escribir, evitando que staging dependa de cerrar el DDL remoto sobre tablas todavía owned por `postgres`.

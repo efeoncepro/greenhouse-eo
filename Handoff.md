@@ -4,6 +4,68 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-31 — Finance Expenses: selector de proveedores alineado a Postgres
+
+### Objetivo
+
+- Corregir el dropdown `Proveedor` de `Finance > Expenses > Registrar egreso`, que no reflejaba el universo actual de suppliers aunque el módulo `Finance > Suppliers` y el backfill ya estuvieran alineados.
+
+### Causa raíz confirmada
+
+- El drawer `CreateExpenseDrawer` consume `/api/finance/expenses/meta`.
+- Ese endpoint seguía leyendo suppliers desde `greenhouse.fin_suppliers` en BigQuery.
+- El listado principal de `Finance > Suppliers` y el backfill reciente operan sobre `greenhouse_finance.suppliers` en PostgreSQL.
+- Resultado: el selector de egresos y el directorio de proveedores podían mostrar catálogos distintos.
+
+### Delta de ejecución
+
+- `src/app/api/finance/expenses/meta/route.ts` ahora usa suppliers `Postgres-first`, alineado con `Finance > Suppliers`.
+- BigQuery queda solo como fallback para suppliers si el carril Postgres no está disponible.
+- Se agregó regresión en:
+  - `src/app/api/finance/expenses/meta/route.test.ts`
+  - valida que `expenses/meta` devuelva suppliers desde Postgres y no consulte la tabla legacy `greenhouse.fin_suppliers` cuando Postgres está sano
+
+### Validación ejecutada
+
+- `pnpm exec vitest run src/app/api/finance/expenses/meta/route.test.ts`
+- `pnpm exec eslint src/app/api/finance/expenses/meta/route.ts src/app/api/finance/expenses/meta/route.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Nota de coordinación
+
+- El backfill previo de vínculo canónico se ejecutó en `staging`.
+- Este hotfix corrige el source of truth del dropdown; no implica por sí solo que `dev` y `staging` tengan exactamente el mismo set de suppliers si el dato operativo entre entornos ya venía distinto.
+
+## Sesión 2026-03-31 — memoria operativa GCP/ADC solicitada por owner
+
+### Objetivo
+
+- Persistir una preferencia operativa explícita del usuario para futuros turnos y evitar repetir el mismo desvío de ejecución.
+
+### Regla operativa fijada
+
+- Para operaciones GCP/Cloud SQL/BigQuery:
+  - entrar primero por `gcloud`
+  - usar preferentemente la cuenta humana `julio.reyes@efeonce.org`
+  - priorizar `Application Default Credentials (ADC)` como carril base para tooling y scripts locales
+- Solo usar `vercel env pull` o env remotos como fallback cuando:
+  - `ADC` no esté inicializado, o
+  - el alcance efectivo no permita ejecutar la operación requerida
+
+### Estado observado en esta sesión
+
+- `gcloud` sí mostró `julio.reyes@efeonce.org` como cuenta activa.
+- `ADC` no estaba inicializado en esta máquina al momento de la verificación.
+- Por esa razón, el backfill operativo reciente de suppliers terminó corriendo con env remoto de `staging` y no por `ADC`.
+
+### Nota de coordinación
+
+- No volver a asumir como primer carril operativo que Vercel/env pull es la vía correcta para backfills o scripts GCP.
+- Antes de cambiar de carril, verificar y dejar evidencia mínima de:
+  - `gcloud auth list`
+  - `gcloud config get-value account`
+  - `gcloud auth application-default print-access-token`
+
 ## Sesión 2026-03-31 — Suppliers / Provider 360: vínculo manual + backfill batch
 
 ### Objetivo

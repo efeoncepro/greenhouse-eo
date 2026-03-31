@@ -13,6 +13,7 @@ import {
   getFinanceProjectId
 } from '@/lib/finance/shared'
 import {
+  listFinanceSuppliersFromPostgres,
   listFinanceAccountsFromPostgres,
   shouldFallbackFromFinancePostgres
 } from '@/lib/finance/postgres-store'
@@ -47,7 +48,29 @@ export async function GET() {
   const projectId = getFinanceProjectId()
 
   // ── Postgres-first for accounts ──
+  let suppliersList:
+    | { supplierId: string; legalName: string; tradeName: string | null; paymentCurrency: string | null }[]
+    | null = null
   let accountsList: { accountId: string; accountName: string; currency: string; accountType: string }[] | null = null
+
+  try {
+    const pgSuppliers = await listFinanceSuppliersFromPostgres({
+      active: true,
+      page: 1,
+      pageSize: 1000
+    })
+
+    suppliersList = pgSuppliers.items.map(s => ({
+      supplierId: s.supplierId,
+      legalName: s.legalName,
+      tradeName: s.tradeName,
+      paymentCurrency: s.paymentCurrency
+    }))
+  } catch (error) {
+    if (!shouldFallbackFromFinancePostgres(error)) {
+      throw error
+    }
+  }
 
   try {
     const pgAccounts = await listFinanceAccountsFromPostgres()
@@ -67,17 +90,19 @@ export async function GET() {
   }
 
   const [suppliers, bqAccounts, priorInstitutions, payrollInstitutions] = await Promise.all([
-    runFinanceQuery<{
-      supplier_id: string
-      legal_name: string
-      trade_name: string | null
-      payment_currency: string | null
-    }>(`
-      SELECT supplier_id, legal_name, trade_name, payment_currency
-      FROM \`${projectId}.greenhouse.fin_suppliers\`
-      WHERE is_active = TRUE
-      ORDER BY COALESCE(trade_name, legal_name) ASC
-    `),
+    suppliersList
+      ? Promise.resolve(null)
+      : runFinanceQuery<{
+          supplier_id: string
+          legal_name: string
+          trade_name: string | null
+          payment_currency: string | null
+        }>(`
+          SELECT supplier_id, legal_name, trade_name, payment_currency
+          FROM \`${projectId}.greenhouse.fin_suppliers\`
+          WHERE is_active = TRUE
+          ORDER BY COALESCE(trade_name, legal_name) ASC
+        `),
     accountsList ? Promise.resolve(null) : runFinanceQuery<{
       account_id: string
       account_name: string
@@ -122,12 +147,14 @@ export async function GET() {
   )
 
   return NextResponse.json({
-    suppliers: suppliers.map(row => ({
-      supplierId: normalizeString(row.supplier_id),
-      legalName: normalizeString(row.legal_name),
-      tradeName: row.trade_name ? normalizeString(row.trade_name) : null,
-      paymentCurrency: row.payment_currency ? normalizeString(row.payment_currency) : null
-    })),
+    suppliers:
+      suppliersList ??
+      (suppliers ?? []).map(row => ({
+        supplierId: normalizeString(row.supplier_id),
+        legalName: normalizeString(row.legal_name),
+        tradeName: row.trade_name ? normalizeString(row.trade_name) : null,
+        paymentCurrency: row.payment_currency ? normalizeString(row.payment_currency) : null
+      })),
     accounts: accountsList ?? (bqAccounts ?? []).map(row => ({
       accountId: normalizeString(row.account_id),
       accountName: normalizeString(row.account_name),
