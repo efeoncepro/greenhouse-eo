@@ -223,3 +223,9 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-171` | `complete` | Access Model Hardening: Route Group Unification, Type Safety & Fallback Strategy | `docs/tasks/complete/TASK-171-access-model-hardening.md` |
 | `TASK-172` | `to-do` | Platform Hardening: CI Pipeline, Structured Logging, Test Coverage & Security Headers | `docs/tasks/to-do/TASK-172-platform-hardening-ci-observability-security.md` |
 | `TASK-173` | `in-progress` | Shared Attachments Platform and GCP Bucket Governance | `docs/tasks/in-progress/TASK-173-shared-attachments-platform-gcp-governance.md` |
+| `TASK-174` | `to-do` | Finance Data Integrity: Transactions, Idempotency & Concurrent Safety | `docs/tasks/to-do/TASK-174-finance-data-integrity-hardening.md` |
+| `TASK-175` | `to-do` | Finance Core Test Coverage & Regression Safety Net | `docs/tasks/to-do/TASK-175-finance-core-test-coverage.md` |
+| `TASK-176` | `to-do` | Labor Provisions: Fully-Loaded Cost Model Completeness | `docs/tasks/to-do/TASK-176-labor-provisions-fully-loaded-cost.md` |
+| `TASK-177` | `to-do` | Operational P&L: Business Unit Scope Materialization | `docs/tasks/to-do/TASK-177-operational-pl-business-unit-scope.md` |
+| `TASK-178` | `to-do` | Finance Budget Engine: Budget vs. Actual & Variance Analysis | `docs/tasks/to-do/TASK-178-finance-budget-engine.md` |
+| `TASK-179` | `to-do` | Finance Reconciliation Postgres-Only Cutover & Integration Hardening | `docs/tasks/to-do/TASK-179-finance-reconciliation-cutover-hardening.md` |
