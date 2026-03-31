@@ -16,6 +16,11 @@
 - El runtime ahora traduce ingresos legacy `profile-only` vía `greenhouse_finance.client_profiles` para resolver `client_id` canónico antes de agregar métricas financieras.
 - Impacto: `client_economics` y `operational_pl` dejan de tratar `client_profile_id` como si fuera la llave de cliente comercial, pero siguen incorporando ingresos históricos cuando el profile mapea a un `client_id` real.
 
+## Delta 2026-03-30 Finance clients and campaigns canonized on client_id
+- `GET /api/finance/clients` y `GET /api/finance/clients/[id]` ya calculan receivables e invoices por `client_id` canónico, traduciendo incomes legacy vía `greenhouse_finance.client_profiles` cuando aplica.
+- El fallback BigQuery de `Finance Clients` quedó alineado al mismo criterio, sin volver a tratar `client_profile_id` como llave comercial primaria.
+- `getCampaignFinancials()` ya no usa `COALESCE(client_id, client_profile_id)` para revenue; ahora reancla ingresos al `client_id` canónico antes de calcular margen.
+
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
 

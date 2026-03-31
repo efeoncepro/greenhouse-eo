@@ -129,7 +129,7 @@ describe('Finance clients read-path cutover', () => {
         {
           income_id: 'inc-1',
           outstanding_amount_clp: '1234',
-          income_key: 'client-1'
+          canonical_client_id: 'client-1'
         }
       ])
 
@@ -270,6 +270,46 @@ describe('Finance clients read-path cutover', () => {
       amountPending: 4000
     })
     expect(body.deals).toEqual([])
+  })
+
+  it('uses canonical client_id aggregation for receivables in the Postgres read path', async () => {
+    mockRunGreenhousePostgresQuery
+      .mockResolvedValueOnce([{ total: '1' }])
+      .mockResolvedValueOnce([
+        {
+          client_id: 'client-1',
+          client_profile_id: 'profile-1',
+          greenhouse_client_name: 'Sky Airline',
+          hubspot_company_id: 'hub-1',
+          company_name: 'Sky Airline',
+          company_domain: 'skyairline.com',
+          company_country: 'CL',
+          business_line: 'creative',
+          service_modules_raw: 'creative-hub',
+          legal_name: 'Sky Airline SA',
+          tax_id: '76.123.456-7',
+          payment_terms_days: '30',
+          payment_currency: 'CLP',
+          requires_po: false,
+          requires_hes: false,
+          total_receivable: '5000',
+          active_invoices_count: '1',
+          created_at: '2026-03-01T00:00:00.000Z',
+          updated_at: '2026-03-02T00:00:00.000Z'
+        }
+      ])
+
+    const response = await getClients(
+      new Request('http://localhost/api/finance/clients?page=1&pageSize=20')
+    )
+
+    expect(response.status).toBe(200)
+
+    const countQuery = mockRunGreenhousePostgresQuery.mock.calls[0]?.[0] as string
+
+    expect(countQuery).toContain('LEFT JOIN greenhouse_finance.client_profiles cp_income')
+    expect(countQuery).toContain('COALESCE(i.client_id, cp_income.client_id) AS client_id')
+    expect(countQuery).not.toContain('COALESCE(client_id, client_profile_id, hubspot_company_id) AS income_key')
   })
 
   it.skip('prefers a Postgres-first read path for finance clients once the list/detail cutover is wired', () => {})

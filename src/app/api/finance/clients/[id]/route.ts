@@ -295,12 +295,15 @@ const readFinanceClientDetailFromPostgres = async (id: string) => {
   const invoices = await runGreenhousePostgresQuery<InvoiceRow>(
     `
       SELECT income_id, invoice_number, invoice_date, due_date, total_amount, currency, payment_status, amount_paid
-      FROM greenhouse_finance.income
-      WHERE client_id = $1 OR client_profile_id = $2 OR hubspot_company_id = $3
+      FROM greenhouse_finance.income i
+      LEFT JOIN greenhouse_finance.client_profiles cp_income
+        ON cp_income.client_profile_id = i.client_profile_id
+      WHERE ($1::text IS NOT NULL AND COALESCE(i.client_id, cp_income.client_id) = $1)
+         OR ($2::text IS NOT NULL AND i.hubspot_company_id = $2)
       ORDER BY invoice_date DESC
       LIMIT 50
     `,
-    [clientId, clientProfileId, hubspotCompanyId]
+    [clientId, hubspotCompanyId]
   )
 
   const summaryRows = await runGreenhousePostgresQuery<{
@@ -312,19 +315,22 @@ const readFinanceClientDetailFromPostgres = async (id: string) => {
       SELECT
         COALESCE(
           SUM(
-            COALESCE(total_amount_clp, 0) * CASE
-              WHEN COALESCE(total_amount, 0) = 0 THEN 0
-              ELSE GREATEST(COALESCE(total_amount, 0) - COALESCE(amount_paid, 0), 0) / NULLIF(COALESCE(total_amount, 0), 0)
+            COALESCE(i.total_amount_clp, 0) * CASE
+              WHEN COALESCE(i.total_amount, 0) = 0 THEN 0
+              ELSE GREATEST(COALESCE(i.total_amount, 0) - COALESCE(i.amount_paid, 0), 0) / NULLIF(COALESCE(i.total_amount, 0), 0)
             END
           ),
           0
         ) AS total_receivable,
-        COUNT(*) FILTER (WHERE payment_status IN ('pending', 'overdue', 'partial')) AS active_invoices_count,
-        COUNT(*) FILTER (WHERE payment_status = 'overdue') AS overdue_invoices_count
-      FROM greenhouse_finance.income
-      WHERE client_id = $1 OR client_profile_id = $2 OR hubspot_company_id = $3
+        COUNT(*) FILTER (WHERE i.payment_status IN ('pending', 'overdue', 'partial')) AS active_invoices_count,
+        COUNT(*) FILTER (WHERE i.payment_status = 'overdue') AS overdue_invoices_count
+      FROM greenhouse_finance.income i
+      LEFT JOIN greenhouse_finance.client_profiles cp_income
+        ON cp_income.client_profile_id = i.client_profile_id
+      WHERE ($1::text IS NOT NULL AND COALESCE(i.client_id, cp_income.client_id) = $1)
+         OR ($2::text IS NOT NULL AND i.hubspot_company_id = $2)
     `,
-    [clientId, clientProfileId, hubspotCompanyId]
+    [clientId, hubspotCompanyId]
   )
 
   const deals = hubspotCompanyId
@@ -654,33 +660,61 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const clientId = row.client_id ? normalizeString(row.client_id) : null
 
   const invoices = await runFinanceQuery<InvoiceRow>(`
-    SELECT income_id, invoice_number, invoice_date, due_date, total_amount, currency, payment_status, amount_paid
-    FROM \`${projectId}.greenhouse.fin_income\`
-    WHERE client_id = @clientId OR client_profile_id = @clientProfileId OR hubspot_company_id = @hubspotCompanyId
+    WITH profile_bridge AS (
+      SELECT client_profile_id, client_id, hubspot_company_id
+      FROM \`${projectId}.greenhouse.fin_client_profiles\`
+      WHERE client_id IS NOT NULL
+    )
+    SELECT
+      i.income_id,
+      i.invoice_number,
+      i.invoice_date,
+      i.due_date,
+      i.total_amount,
+      i.currency,
+      i.payment_status,
+      i.amount_paid
+    FROM \`${projectId}.greenhouse.fin_income\` i
+    LEFT JOIN profile_bridge pb_profile
+      ON pb_profile.client_profile_id = i.client_profile_id
+    LEFT JOIN profile_bridge pb_hubspot
+      ON pb_hubspot.hubspot_company_id = i.hubspot_company_id
+    WHERE (@clientId IS NOT NULL AND COALESCE(i.client_id, pb_profile.client_id, pb_hubspot.client_id) = @clientId)
+       OR (@hubspotCompanyId IS NOT NULL AND i.hubspot_company_id = @hubspotCompanyId)
     ORDER BY invoice_date DESC
     LIMIT 50
-  `, { clientId, clientProfileId, hubspotCompanyId })
+  `, { clientId, hubspotCompanyId })
 
   const summaryRows = await runFinanceQuery<{
     total_receivable: unknown
     active_invoices_count: unknown
     overdue_invoices_count: unknown
   }>(`
+    WITH profile_bridge AS (
+      SELECT client_profile_id, client_id, hubspot_company_id
+      FROM \`${projectId}.greenhouse.fin_client_profiles\`
+      WHERE client_id IS NOT NULL
+    )
     SELECT
       COALESCE(
         SUM(
-          COALESCE(total_amount_clp, 0) * SAFE_DIVIDE(
-            GREATEST(COALESCE(total_amount, 0) - COALESCE(amount_paid, 0), 0),
-            NULLIF(COALESCE(total_amount, 0), 0)
+          COALESCE(i.total_amount_clp, 0) * SAFE_DIVIDE(
+            GREATEST(COALESCE(i.total_amount, 0) - COALESCE(i.amount_paid, 0), 0),
+            NULLIF(COALESCE(i.total_amount, 0), 0)
           )
         ),
         0
       ) AS total_receivable,
-      COUNTIF(payment_status IN ('pending', 'overdue', 'partial')) AS active_invoices_count,
-      COUNTIF(payment_status = 'overdue') AS overdue_invoices_count
-    FROM \`${projectId}.greenhouse.fin_income\`
-    WHERE client_id = @clientId OR client_profile_id = @clientProfileId OR hubspot_company_id = @hubspotCompanyId
-  `, { clientId, clientProfileId, hubspotCompanyId })
+      COUNTIF(i.payment_status IN ('pending', 'overdue', 'partial')) AS active_invoices_count,
+      COUNTIF(i.payment_status = 'overdue') AS overdue_invoices_count
+    FROM \`${projectId}.greenhouse.fin_income\` i
+    LEFT JOIN profile_bridge pb_profile
+      ON pb_profile.client_profile_id = i.client_profile_id
+    LEFT JOIN profile_bridge pb_hubspot
+      ON pb_hubspot.hubspot_company_id = i.hubspot_company_id
+    WHERE (@clientId IS NOT NULL AND COALESCE(i.client_id, pb_profile.client_id, pb_hubspot.client_id) = @clientId)
+       OR (@hubspotCompanyId IS NOT NULL AND i.hubspot_company_id = @hubspotCompanyId)
+  `, { clientId, hubspotCompanyId })
 
   const summary = summaryRows[0]
 

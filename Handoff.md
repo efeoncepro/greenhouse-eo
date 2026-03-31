@@ -60,6 +60,25 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - `pnpm exec eslint src/lib/finance/postgres-store-intelligence.ts src/lib/finance/postgres-store-intelligence.test.ts src/lib/cost-intelligence/compute-operational-pl.ts src/lib/cost-intelligence/compute-operational-pl.test.ts`
 - `pnpm exec tsc --noEmit --pretty false`
 
+## Sesión 2026-03-30 — cierre de residuals canon client_id en Finance Clients y Campaigns
+
+### Objetivo
+- Cerrar los últimos consumers obvios que seguían tratando `client_profile_id` como si fuera `client_id`.
+
+### Delta de ejecución
+- `src/app/api/finance/clients/route.ts` ya calcula receivables por `client_id` canónico en Postgres y BigQuery fallback.
+- `src/app/api/finance/clients/[id]/route.ts` ya consulta invoices y summary con la misma traducción canónica vía `client_profiles`.
+- `src/lib/campaigns/campaign-extended.ts` ya reancla revenue al `client_id` canónico antes de calcular `CampaignFinancials`.
+- Tests nuevos/reforzados:
+  - `src/app/api/finance/clients/read-cutover.test.ts`
+  - `src/lib/campaigns/campaign-extended.test.ts`
+
+### Validación ejecutada
+- `pnpm exec vitest run src/app/api/finance/clients/read-cutover.test.ts src/lib/campaigns/campaign-extended.test.ts src/lib/finance/postgres-store-intelligence.test.ts src/lib/cost-intelligence/compute-operational-pl.test.ts`
+- `pnpm exec eslint src/app/api/finance/clients/route.ts src/app/api/finance/clients/[id]/route.ts src/app/api/finance/clients/read-cutover.test.ts src/lib/campaigns/campaign-extended.ts src/lib/campaigns/campaign-extended.test.ts src/lib/finance/postgres-store-intelligence.ts src/lib/finance/postgres-store-intelligence.test.ts src/lib/cost-intelligence/compute-operational-pl.ts src/lib/cost-intelligence/compute-operational-pl.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
 ## Sesión 2026-03-30 — cierre formal de TASK-166 Finance BigQuery write cutover
 
 ### Objetivo

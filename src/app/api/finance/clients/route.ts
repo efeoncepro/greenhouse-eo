@@ -48,7 +48,7 @@ type ClientListRow = Record<string, unknown> & {
 type ClientReceivableMatchRow = Record<string, unknown> & {
   income_id: string
   outstanding_amount_clp: unknown
-  income_key: string
+  canonical_client_id: string
 }
 
 const parseServiceModules = (value: string | null) =>
@@ -172,17 +172,19 @@ const readFinanceClientsFromPostgres = async ({
     ),
     receivable_summary AS (
       SELECT
-        COALESCE(client_id, client_profile_id, hubspot_company_id) AS income_key,
+        COALESCE(i.client_id, cp_income.client_id) AS client_id,
         SUM(
-          COALESCE(total_amount_clp, 0) * CASE
-            WHEN COALESCE(total_amount, 0) = 0 THEN 0
-            ELSE GREATEST(COALESCE(total_amount, 0) - COALESCE(amount_paid, 0), 0) / NULLIF(COALESCE(total_amount, 0), 0)
+          COALESCE(i.total_amount_clp, 0) * CASE
+            WHEN COALESCE(i.total_amount, 0) = 0 THEN 0
+            ELSE GREATEST(COALESCE(i.total_amount, 0) - COALESCE(i.amount_paid, 0), 0) / NULLIF(COALESCE(i.total_amount, 0), 0)
           END
         ) AS total_receivable,
-        COUNT(*) FILTER (WHERE payment_status IN ('pending', 'overdue', 'partial')) AS active_invoices_count
-      FROM greenhouse_finance.income
-      WHERE COALESCE(client_id, client_profile_id, hubspot_company_id) IS NOT NULL
-      GROUP BY COALESCE(client_id, client_profile_id, hubspot_company_id)
+        COUNT(*) FILTER (WHERE i.payment_status IN ('pending', 'overdue', 'partial')) AS active_invoices_count
+      FROM greenhouse_finance.income i
+      LEFT JOIN greenhouse_finance.client_profiles cp_income
+        ON cp_income.client_profile_id = i.client_profile_id
+      WHERE COALESCE(i.client_id, cp_income.client_id) IS NOT NULL
+      GROUP BY COALESCE(i.client_id, cp_income.client_id)
     ),
     base_clients AS (
       SELECT
@@ -203,15 +205,13 @@ const readFinanceClientsFromPostgres = async ({
         COALESCE(cp.requires_hes, FALSE) AS requires_hes,
         COALESCE(cp.created_at, c.created_at) AS created_at,
         COALESCE(cp.updated_at, c.updated_at) AS updated_at,
-        COALESCE(rs_client.total_receivable, rs_profile.total_receivable, rs_hubspot.total_receivable, 0) AS total_receivable,
-        COALESCE(rs_client.active_invoices_count, rs_profile.active_invoices_count, rs_hubspot.active_invoices_count, 0) AS active_invoices_count
+        COALESCE(rs_client.total_receivable, 0) AS total_receivable,
+        COALESCE(rs_client.active_invoices_count, 0) AS active_invoices_count
       FROM greenhouse_core.clients c
       LEFT JOIN latest_profiles cp ON cp.client_id = c.client_id
       LEFT JOIN crm_company_by_client cc ON cc.client_id = c.client_id
       LEFT JOIN module_summary_by_client ms ON ms.client_id = c.client_id
-      LEFT JOIN receivable_summary rs_client ON rs_client.income_key = c.client_id
-      LEFT JOIN receivable_summary rs_profile ON rs_profile.income_key = cp.client_profile_id
-      LEFT JOIN receivable_summary rs_hubspot ON rs_hubspot.income_key = COALESCE(cp.hubspot_company_id, c.hubspot_company_id)
+      LEFT JOIN receivable_summary rs_client ON rs_client.client_id = c.client_id
       WHERE ${whereClause}
     )
   `
@@ -484,68 +484,51 @@ export async function GET(request: Request) {
   const clientRollups = new Map<string, { totalReceivable: number; activeInvoicesCount: number }>()
 
   if (rows.length > 0) {
-    const clientIdsByKey = new Map<string, Set<string>>()
-
-    rows.forEach(row => {
-      const keys = [normalizeString(row.client_id), normalizeString(row.client_profile_id), normalizeString(row.hubspot_company_id)]
-        .filter(Boolean)
-
-      keys.forEach(key => {
-        const existing = clientIdsByKey.get(key) ?? new Set<string>()
-
-        existing.add(row.client_id)
-        clientIdsByKey.set(key, existing)
-      })
-    })
-
     try {
       const receivableRows = await runFinanceQuery<ClientReceivableMatchRow>(`
-        WITH open_income AS (
-          SELECT income_id, outstanding_amount_clp, income_key
-          FROM (
-            SELECT
-              income_id,
-              COALESCE(total_amount_clp, 0) * SAFE_DIVIDE(
-                GREATEST(COALESCE(total_amount, 0) - COALESCE(amount_paid, 0), 0),
-                NULLIF(COALESCE(total_amount, 0), 0)
-              ) AS outstanding_amount_clp,
-              [client_id, client_profile_id, hubspot_company_id] AS income_keys
-            FROM \`${projectId}.greenhouse.fin_income\`
-            WHERE payment_status IN ('pending', 'overdue', 'partial')
-          ),
-          UNNEST(income_keys) AS income_key
-          WHERE income_key IS NOT NULL
-            AND income_key != ''
-            AND income_key IN UNNEST(@clientKeys)
+        WITH profile_bridge AS (
+          SELECT client_profile_id, client_id, hubspot_company_id
+          FROM \`${projectId}.greenhouse.fin_client_profiles\`
+          WHERE client_id IS NOT NULL
+        ),
+        open_income AS (
+          SELECT DISTINCT
+            i.income_id,
+            COALESCE(i.total_amount_clp, 0) * SAFE_DIVIDE(
+              GREATEST(COALESCE(i.total_amount, 0) - COALESCE(i.amount_paid, 0), 0),
+              NULLIF(COALESCE(i.total_amount, 0), 0)
+            ) AS outstanding_amount_clp,
+            COALESCE(i.client_id, pb_profile.client_id, pb_hubspot.client_id) AS canonical_client_id
+          FROM \`${projectId}.greenhouse.fin_income\` i
+          LEFT JOIN profile_bridge pb_profile
+            ON pb_profile.client_profile_id = i.client_profile_id
+          LEFT JOIN profile_bridge pb_hubspot
+            ON pb_hubspot.hubspot_company_id = i.hubspot_company_id
+          WHERE i.payment_status IN ('pending', 'overdue', 'partial')
+            AND COALESCE(i.client_id, pb_profile.client_id, pb_hubspot.client_id) IN UNNEST(@clientIds)
         )
-        SELECT DISTINCT income_id, outstanding_amount_clp, income_key
+        SELECT income_id, outstanding_amount_clp, canonical_client_id
         FROM open_income
-      `, { clientKeys: Array.from(clientIdsByKey.keys()) })
+        WHERE canonical_client_id IS NOT NULL
+      `, { clientIds: rows.map(row => normalizeString(row.client_id)) })
 
       const incomeIdsByClientId = new Map<string, Set<string>>()
       const receivableByClientId = new Map<string, number>()
 
       receivableRows.forEach(row => {
-        const matchingClientIds = clientIdsByKey.get(row.income_key)
+        const clientId = normalizeString(row.canonical_client_id)
+        const seenIncomeIds = incomeIdsByClientId.get(clientId) ?? new Set<string>()
 
-        if (!matchingClientIds || matchingClientIds.size === 0) {
+        if (seenIncomeIds.has(row.income_id)) {
           return
         }
 
-        matchingClientIds.forEach(clientId => {
-          const seenIncomeIds = incomeIdsByClientId.get(clientId) ?? new Set<string>()
-
-          if (seenIncomeIds.has(row.income_id)) {
-            return
-          }
-
-          seenIncomeIds.add(row.income_id)
-          incomeIdsByClientId.set(clientId, seenIncomeIds)
-          receivableByClientId.set(
-            clientId,
-            (receivableByClientId.get(clientId) ?? 0) + toNumber(row.outstanding_amount_clp)
-          )
-        })
+        seenIncomeIds.add(row.income_id)
+        incomeIdsByClientId.set(clientId, seenIncomeIds)
+        receivableByClientId.set(
+          clientId,
+          (receivableByClientId.get(clientId) ?? 0) + toNumber(row.outstanding_amount_clp)
+        )
       })
 
       rows.forEach(row => {
