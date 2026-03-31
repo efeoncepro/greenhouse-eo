@@ -27,7 +27,8 @@ export const GH_INTERNAL_NAV = {
   adminCorreos: { label: 'Correos', subtitle: 'Historial de envíos y suscripciones' },
   adminCloudIntegrations: { label: 'Cloud & Integrations', subtitle: 'Syncs, webhooks, auth y runtime operativo' },
   adminNotifications: { label: 'Notificaciones', subtitle: 'Sistema de notificaciones in-app y email' },
-  adminOpsHealth: { label: 'Ops Health', subtitle: 'Outbox, proyecciones y freshness del serving' }
+  adminOpsHealth: { label: 'Ops Health', subtitle: 'Outbox, proyecciones y freshness del serving' },
+  adminBusinessLines: { label: 'Business Lines', subtitle: 'Metadata canonica de las lineas de negocio' }
 } as const
 
 export const GH_PEOPLE_NAV = {

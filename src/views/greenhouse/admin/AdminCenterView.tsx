@@ -244,6 +244,22 @@ const buildDomainCards = ({ access, tenants, operations }: Pick<Props, 'access' 
       `${tenants.totals.tenantsWithScopedProjects} con proyectos scoped`,
       'Contexto de capabilities y acceso por empresa'
     ]
+  },
+  {
+    id: 'business-lines',
+    title: 'Business Lines',
+    subtitle: 'Metadata canonica de las lineas de negocio y semantica comercial vs operativa.',
+    icon: 'tabler-building',
+    avatarColor: 'warning',
+    status: { label: 'Activo', color: 'success' },
+    href: '/admin/business-lines',
+    primaryAction: 'Abrir business lines',
+    routes: ['/admin/business-lines'],
+    points: [
+      '5 lineas de negocio canonicas con metadata rica',
+      'Colores, claim, lead, loop phase por BU',
+      'Semantica: BU comercial vs BU operativa'
+    ]
   }
 ]
 

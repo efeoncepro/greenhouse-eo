@@ -286,7 +286,8 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               { label: nl(GH_INTERNAL_NAV.adminUsers), href: '/admin/users' },
               { label: nl(GH_INTERNAL_NAV.adminRoles), href: '/admin/roles' },
               { label: nl(GH_INTERNAL_NAV.adminViews), href: '/admin/views' },
-              { label: nl(GH_INTERNAL_NAV.adminTeam), href: '/admin/team' }
+              { label: nl(GH_INTERNAL_NAV.adminTeam), href: '/admin/team' },
+              { label: nl(GH_INTERNAL_NAV.adminBusinessLines), href: '/admin/business-lines' }
             ].filter(item => {
               if (item.href === '/admin') return canSeeView('administracion.admin_center', true)
               if (item.href === '/admin/tenants') return canSeeView('administracion.spaces', true)
@@ -294,6 +295,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               if (item.href === '/admin/roles') return canSeeView('administracion.roles', true)
               if (item.href === '/admin/views') return canSeeView('administracion.vistas', true)
               if (item.href === '/admin/team') return canSeeView('administracion.equipo', true)
+              if (item.href === '/admin/business-lines') return canSeeView('administracion.admin_center', true)
 
               return true
             })
