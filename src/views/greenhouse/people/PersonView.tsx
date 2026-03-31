@@ -10,7 +10,7 @@ import { toast } from 'react-toastify'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
-import Grid from '@mui/material/Grid'
+import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import ConfirmDialog from '@/components/dialogs/ConfirmDialog'
@@ -20,7 +20,7 @@ import CompensationDrawer, { type CompensationSavePayload } from '@views/greenho
 import EditProfileDrawer from './drawers/EditProfileDrawer'
 import AddPersonMembershipDrawer from './drawers/AddPersonMembershipDrawer'
 import EditPersonMembershipDrawer, { type MembershipRowData } from './drawers/EditPersonMembershipDrawer'
-import PersonLeftSidebar from './PersonLeftSidebar'
+import PersonProfileHeader from './PersonProfileHeader'
 import PersonTabs from './PersonTabs'
 
 type Props = {
@@ -140,27 +140,24 @@ const PersonView = ({ memberId }: Props) => {
 
   return (
     <>
-      <Grid container spacing={6}>
-        <Grid size={{ xs: 12, md: 5, lg: 4 }}>
-          <PersonLeftSidebar
-            detail={detail}
-            isAdmin={isAdmin}
-            onEditProfile={() => setEditProfileOpen(true)}
-            onDeactivate={() => setDeactivateConfirmOpen(true)}
-            onEditCompensation={() => setCompensationOpen(true)}
-          />
-        </Grid>
-        <Grid size={{ xs: 12, md: 7, lg: 8 }} sx={{ minWidth: 0 }}>
-          <PersonTabs
-            detail={detail}
-            isAdmin={isAdmin}
-            membershipReloadKey={membershipReloadKey}
-            onNewMembership={() => setMembershipDrawerOpen(true)}
-            onEditMembership={(membership, assignment) => setEditMembership({ membership, assignment })}
-            onEditCompensation={isAdmin ? () => setCompensationOpen(true) : undefined}
-          />
-        </Grid>
-      </Grid>
+      {/* Full-width layout: header → tabs → content */}
+      <Stack spacing={6}>
+        <PersonProfileHeader
+          detail={detail}
+          isAdmin={isAdmin}
+          onEditProfile={() => setEditProfileOpen(true)}
+          onDeactivate={() => setDeactivateConfirmOpen(true)}
+          onEditCompensation={() => setCompensationOpen(true)}
+        />
+        <PersonTabs
+          detail={detail}
+          isAdmin={isAdmin}
+          membershipReloadKey={membershipReloadKey}
+          onNewMembership={() => setMembershipDrawerOpen(true)}
+          onEditMembership={(membership, assignment) => setEditMembership({ membership, assignment })}
+          onEditCompensation={isAdmin ? () => setCompensationOpen(true) : undefined}
+        />
+      </Stack>
 
       {isAdmin && (
         <>

@@ -104,7 +104,7 @@ const detail: PersonDetail = {
     canViewAiTools: false,
     canViewIdentityContext: false,
     canViewAccessContext: false,
-    visibleTabs: ['memberships', 'activity', 'compensation', 'payroll', 'finance']
+    visibleTabs: ['profile', 'activity', 'memberships', 'economy']
   },
   summary: {
     activeAssignments: 1,
@@ -158,7 +158,7 @@ describe('PersonTabs', () => {
       access: {
         ...detail.access,
         canViewHrProfile: true,
-        visibleTabs: ['hr-profile']
+        visibleTabs: ['profile']
       },
       operationalMetrics: {
         rpaAvg30d: 1.8,

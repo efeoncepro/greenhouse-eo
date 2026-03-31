@@ -50,28 +50,30 @@ export type { PersonTab } from '@/types/people'
 import type { PersonTab } from '@/types/people'
 
 export const TAB_PERMISSIONS: Record<PersonTab, string[]> = {
+  profile: ['efeonce_admin', 'efeonce_operations', 'hr_payroll'],
   activity: ['efeonce_admin', 'efeonce_operations'],
-  compensation: ['efeonce_admin', 'hr_payroll'],
-  payroll: ['efeonce_admin', 'hr_payroll'],
-  finance: ['efeonce_admin', 'finance_manager'],
   memberships: ['efeonce_admin', 'efeonce_operations'],
-  'hr-profile': ['efeonce_admin', 'hr_payroll'],
-  'ai-tools': ['efeonce_admin', 'efeonce_operations'],
-  'identity': ['efeonce_admin', 'efeonce_operations', 'hr_payroll'],
-  'intelligence': ['efeonce_admin', 'efeonce_operations']
+  economy: ['efeonce_admin', 'hr_payroll', 'finance_manager'],
+  'ai-tools': ['efeonce_admin', 'efeonce_operations']
 }
 
 export const TAB_CONFIG: Array<{ value: PersonTab; label: string; icon: string }> = [
+  { value: 'profile', label: 'Perfil', icon: 'tabler-user' },
+  { value: 'activity', label: 'Actividad', icon: 'tabler-chart-dots' },
   { value: 'memberships', label: 'Organizaciones', icon: 'tabler-building' },
-  { value: 'activity', label: 'Actividad', icon: 'tabler-chart-bar' },
-  { value: 'intelligence', label: 'Inteligencia', icon: 'tabler-brain' },
-  { value: 'compensation', label: 'Compensación', icon: 'tabler-cash' },
-  { value: 'payroll', label: 'Nómina', icon: 'tabler-receipt-2' },
-  { value: 'finance', label: 'Finanzas', icon: 'tabler-report-money' },
-  { value: 'hr-profile', label: 'Perfil HR', icon: 'tabler-user-heart' },
-  { value: 'ai-tools', label: 'AI Tools', icon: 'tabler-wand' },
-  { value: 'identity', label: 'Identidad', icon: 'tabler-fingerprint' }
+  { value: 'economy', label: 'Economia', icon: 'tabler-wallet' },
+  { value: 'ai-tools', label: 'Herramientas', icon: 'tabler-wand' }
 ]
+
+/** Map old tab URL params to new consolidated tabs */
+export const LEGACY_TAB_REDIRECT: Record<string, PersonTab> = {
+  compensation: 'economy',
+  payroll: 'economy',
+  finance: 'economy',
+  'hr-profile': 'profile',
+  identity: 'profile',
+  intelligence: 'activity'
+}
 
 export const getVisibleTabs = (roleCodes: string[]) =>
   TAB_CONFIG.filter(tab => TAB_PERMISSIONS[tab.value].some(role => roleCodes.includes(role)))

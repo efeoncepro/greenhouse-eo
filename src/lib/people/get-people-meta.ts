@@ -11,7 +11,7 @@ export const getPeopleMeta = (roleCodes: string[]): PeopleMetaPayload => {
   return {
     canManageTeam: roleCodes.includes('efeonce_admin'),
     visibleTabs: access.visibleTabs,
-    supportedTabs: ['memberships', 'activity', 'intelligence', 'compensation', 'payroll', 'finance', 'hr-profile', 'ai-tools', 'identity'],
+    supportedTabs: ['profile', 'activity', 'memberships', 'economy', 'ai-tools'],
     availableEnrichments: {
       activity: true,
       compensation: true,
