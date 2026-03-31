@@ -42,6 +42,24 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 ### Validación ejecutada
 - Browser verification en `staging`
 
+## Sesión 2026-03-30 — hardening de OPTIONS en page routes del portal
+
+### Objetivo
+- Eliminar el `OPTIONS /dashboard -> 400` observado durante prefetch en `finance/intelligence` sin tocar el comportamiento de las APIs.
+
+### Delta de ejecución
+- `src/proxy.ts` ahora responde `204` a `OPTIONS` sobre page routes no-API.
+- El cambio preserva el comportamiento normal de `/api/**`, que no queda short-circuiteado por el proxy.
+- Tests reforzados en `src/proxy.test.ts`:
+  - page route `OPTIONS` → `204`
+  - api route `OPTIONS` → no interceptado como página
+
+### Validación ejecutada
+- `pnpm exec vitest run src/proxy.test.ts`
+- `pnpm exec eslint src/proxy.ts src/proxy.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
 ## Sesión 2026-03-30 — reconciliación documental final Finance/Nubox
 
 ### Objetivo

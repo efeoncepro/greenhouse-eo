@@ -29,6 +29,27 @@ describe('proxy', () => {
 
     vi.unstubAllEnvs()
   })
+
+  it('responds cleanly to page OPTIONS requests', () => {
+    const request = new NextRequest('https://example.com/dashboard', {
+      method: 'OPTIONS'
+    })
+
+    const response = proxy(request)
+
+    expect(response.status).toBe(204)
+    expect(response.headers.get('X-Frame-Options')).toBe('DENY')
+  })
+
+  it('does not short-circuit api OPTIONS requests', () => {
+    const request = new NextRequest('https://example.com/api/finance/income', {
+      method: 'OPTIONS'
+    })
+
+    const response = proxy(request)
+
+    expect(response.status).toBe(200)
+  })
 })
 
 describe('proxy config', () => {

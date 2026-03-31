@@ -19,6 +19,14 @@
   - `finance/intelligence` dispara un `OPTIONS /dashboard -> 400` durante prefetch; no impidió render ni la carga de datos principales del módulo
 - El resto del ruido de consola observado sigue siendo el embed/CSP report-only de `vercel.live`.
 
+## Delta 2026-03-30 proxy hardening para OPTIONS de page routes
+- `src/proxy.ts` ahora responde `204` a requests `OPTIONS` sobre rutas de página del portal.
+- Objetivo:
+  - evitar `400` espurios durante prefetch/navegación de surfaces que siguen referenciando `/dashboard`
+  - no intervenir el comportamiento de `/api/**`
+- Cobertura:
+  - `src/proxy.test.ts` ahora valida tanto el caso page-route como el guard explícito sobre API routes.
+
 ## Delta 2026-03-30 Finance/Nubox docs reconciled to runtime
 - `docs/architecture/FINANCE_DUAL_STORE_CUTOVER_V1.md` ya no debe leerse como snapshot operativo actual; quedó explícitamente reclasificado como historial de migración.
 - `TASK-163` y `TASK-165` quedaron alineadas al estado real ya absorbido por runtime para evitar que futuros agentes reabran lanes que ya cerraron en código.

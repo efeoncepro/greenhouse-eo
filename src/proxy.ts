@@ -27,9 +27,13 @@ const CONTENT_SECURITY_POLICY_REPORT_ONLY = [
 ].join('; ')
 
 export function proxy(request: NextRequest) {
-  void request
+  const pathname = request.nextUrl.pathname
+  const isApiRequest = pathname.startsWith('/api')
+  const isPageOptionsRequest = request.method === 'OPTIONS' && !isApiRequest
 
-  const response = NextResponse.next()
+  const response = isPageOptionsRequest
+    ? new NextResponse(null, { status: 204 })
+    : NextResponse.next()
 
   for (const [headerName, headerValue] of Object.entries(SECURITY_HEADERS)) {
     response.headers.set(headerName, headerValue)

@@ -22,6 +22,13 @@
   - `GET /api/notifications/unread-count` respondió `200`
   - en `finance/intelligence` quedó observación no bloqueante de `OPTIONS /dashboard -> 400` durante prefetch, sin impacto visible en el módulo
 
+## 2026-03-30 (session 6)
+
+- Hardening del `proxy` del portal:
+  - las page routes ahora responden `204` a `OPTIONS`
+  - el cambio apunta a eliminar `400` espurios vistos durante prefetch de `/dashboard`
+  - `/api/**` conserva su comportamiento normal y no queda short-circuiteado por este fix
+
 ## 2026-03-30 (session 3)
 
 - Se reconciliaron documentos rezagados de Finance/Nubox para que la documentación no siga describiendo un estado anterior al runtime real:
