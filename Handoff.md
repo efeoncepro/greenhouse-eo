@@ -3834,5 +3834,15 @@ Fase 2 completada:
   - `pnpm build`
 - Estado real de `TASK-173` tras esta mitigación:
   - `leave` quedó restaurado en staging
+  - `purchase orders` y `payroll receipts` ya quedaron endurecidos en repo para convivir con schema legacy:
+    - `src/lib/finance/purchase-order-store.ts` detecta `attachment_asset_id` antes de escribir
+    - `src/lib/payroll/payroll-receipts-store.ts` detecta `asset_id` antes de persistir/regenerar
+    - ambos tienen tests focalizados nuevos
+  - validación local posterior:
+    - `pnpm exec vitest run src/lib/finance/purchase-order-store.test.ts src/lib/payroll/payroll-receipts-store.test.ts src/lib/hr-core/service.test.ts`
+    - `pnpm exec eslint src/lib/finance/purchase-order-store.ts src/lib/finance/purchase-order-store.test.ts src/lib/payroll/payroll-receipts-store.ts src/lib/payroll/payroll-receipts-store.test.ts src/lib/hr-core/service.ts src/lib/hr-core/service.test.ts`
+    - `pnpm lint`
+    - `pnpm build`
   - el bootstrap full sigue incompleto porque `greenhouse_finance.purchase_orders` y `greenhouse_payroll.payroll_receipts` continúan owned por `postgres`
+  - verificación explícita: con credenciales runtime, `ALTER TABLE greenhouse_finance.purchase_orders ...` falla con `must be owner of table purchase_orders`
   - falta resolver acceso/owner `postgres` para cerrar completamente la task en GCP

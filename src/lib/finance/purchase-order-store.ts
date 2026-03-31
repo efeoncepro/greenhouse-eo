@@ -38,6 +38,31 @@ export type PurchaseOrderRecord = {
 
 type PoRow = Record<string, unknown>
 
+let purchaseOrderAttachmentAssetIdSupportPromise: Promise<boolean> | null = null
+
+const hasPurchaseOrderAttachmentAssetIdColumn = async () => {
+  if (!purchaseOrderAttachmentAssetIdSupportPromise) {
+    purchaseOrderAttachmentAssetIdSupportPromise = runGreenhousePostgresQuery<{ has_attachment_asset_id: boolean }>(
+      `
+        SELECT EXISTS (
+          SELECT 1
+          FROM information_schema.columns
+          WHERE table_schema = 'greenhouse_finance'
+            AND table_name = 'purchase_orders'
+            AND column_name = 'attachment_asset_id'
+        ) AS has_attachment_asset_id
+      `
+    )
+      .then(rows => Boolean(rows[0]?.has_attachment_asset_id))
+      .catch(error => {
+        purchaseOrderAttachmentAssetIdSupportPromise = null
+        throw error
+      })
+  }
+
+  return purchaseOrderAttachmentAssetIdSupportPromise
+}
+
 const mapRow = (r: PoRow): PurchaseOrderRecord => ({
   poId: String(r.po_id),
   poNumber: String(r.po_number),
@@ -59,10 +84,34 @@ const mapRow = (r: PoRow): PurchaseOrderRecord => ({
   contactEmail: r.contact_email ? String(r.contact_email) : null,
   notes: r.notes ? String(r.notes) : null,
   attachmentAssetId: r.attachment_asset_id ? String(r.attachment_asset_id) : null,
-  attachmentUrl: r.attachment_asset_id ? buildPrivateAssetDownloadUrl(String(r.attachment_asset_id)) : r.attachment_url ? String(r.attachment_url) : null,
+  attachmentUrl: r.attachment_asset_id
+    ? buildPrivateAssetDownloadUrl(String(r.attachment_asset_id))
+    : r.attachment_url
+      ? String(r.attachment_url)
+      : null,
   createdAt: r.created_at ? String(r.created_at) : null,
   updatedAt: r.updated_at ? String(r.updated_at) : null
 })
+
+const buildPurchaseOrderAttachmentPersistence = async ({
+  attachmentAssetId,
+  attachmentUrl
+}: {
+  attachmentAssetId?: string | null
+  attachmentUrl?: string | null
+}) => {
+  const normalizedAttachmentAssetId = attachmentAssetId?.trim() || null
+  const supportsAttachmentAssetId = await hasPurchaseOrderAttachmentAssetIdColumn()
+
+  const normalizedAttachmentUrl =
+    normalizedAttachmentAssetId ? buildPrivateAssetDownloadUrl(normalizedAttachmentAssetId) : attachmentUrl || null
+
+  return {
+    supportsAttachmentAssetId,
+    attachmentAssetId: normalizedAttachmentAssetId,
+    attachmentUrl: normalizedAttachmentUrl
+  }
+}
 
 // ─── List ───────────────────────────────────────────────────────────────────
 
@@ -137,39 +186,79 @@ export const createPurchaseOrder = async (input: CreatePurchaseOrderInput): Prom
   const currency = input.currency || 'CLP'
   const exchangeRate = input.exchangeRateToClp ?? 1
   const authorizedClp = roundCurrency(input.authorizedAmount * exchangeRate)
-  const attachmentAssetId = input.attachmentAssetId?.trim() || null
-  const attachmentUrl = attachmentAssetId ? buildPrivateAssetDownloadUrl(attachmentAssetId) : input.attachmentUrl || null
+
+  const attachmentPersistence = await buildPurchaseOrderAttachmentPersistence({
+    attachmentAssetId: input.attachmentAssetId,
+    attachmentUrl: input.attachmentUrl
+  })
 
   return withGreenhousePostgresTransaction(async client => {
+    const columns = [
+      'po_id',
+      'po_number',
+      'client_id',
+      'organization_id',
+      'space_id',
+      'authorized_amount',
+      'currency',
+      'exchange_rate_to_clp',
+      'authorized_amount_clp',
+      'invoiced_amount_clp',
+      'remaining_amount_clp',
+      'invoice_count',
+      'status',
+      'issue_date',
+      'expiry_date',
+      'description',
+      'service_scope',
+      'contact_name',
+      'contact_email',
+      'notes'
+    ]
+
+    const values: unknown[] = [
+      poId,
+      input.poNumber,
+      input.clientId,
+      input.organizationId || null,
+      input.spaceId || null,
+      input.authorizedAmount,
+      currency,
+      exchangeRate,
+      authorizedClp,
+      0,
+      authorizedClp,
+      0,
+      'active',
+      input.issueDate,
+      input.expiryDate || null,
+      input.description || null,
+      input.serviceScope || null,
+      input.contactName || null,
+      input.contactEmail || null,
+      input.notes || null
+    ]
+
+    if (attachmentPersistence.supportsAttachmentAssetId) {
+      columns.push('attachment_asset_id')
+      values.push(attachmentPersistence.attachmentAssetId)
+    }
+
+    columns.push('attachment_url', 'created_by')
+    values.push(attachmentPersistence.attachmentUrl, input.createdBy || null)
+
     const result = await client.query<PoRow>(
       `INSERT INTO greenhouse_finance.purchase_orders (
-        po_id, po_number, client_id, organization_id, space_id,
-        authorized_amount, currency, exchange_rate_to_clp, authorized_amount_clp,
-        invoiced_amount_clp, remaining_amount_clp, invoice_count,
-        status, issue_date, expiry_date,
-        description, service_scope, contact_name, contact_email,
-        notes, attachment_asset_id, attachment_url, created_by
+        ${columns.join(', ')}
       ) VALUES (
-        $1, $2, $3, $4, $5,
-        $6, $7, $8, $9,
-        0, $9, 0,
-        'active', $10, $11,
-        $12, $13, $14, $15,
-        $16, $17, $18, $19
+        ${values.map((_, index) => `$${index + 1}`).join(', ')}
       ) RETURNING *`,
-      [
-        poId, input.poNumber, input.clientId, input.organizationId || null, input.spaceId || null,
-        input.authorizedAmount, currency, exchangeRate, authorizedClp,
-        input.issueDate, input.expiryDate || null,
-        input.description || null, input.serviceScope || null,
-        input.contactName || null, input.contactEmail || null,
-        input.notes || null, attachmentAssetId, attachmentUrl, input.createdBy || null
-      ]
+      values
     )
 
-    if (attachmentAssetId && input.createdBy) {
+    if (attachmentPersistence.attachmentAssetId && input.createdBy) {
       await attachAssetToAggregate({
-        assetId: attachmentAssetId,
+        assetId: attachmentPersistence.attachmentAssetId,
         ownerAggregateType: 'purchase_order',
         ownerAggregateId: poId,
         actorUserId: input.createdBy,
@@ -197,6 +286,13 @@ export const updatePurchaseOrder = async (
     const values: unknown[] = []
     let idx = 0
 
+    const attachmentPersistence = updates.attachmentAssetId !== undefined
+      ? await buildPurchaseOrderAttachmentPersistence({
+          attachmentAssetId: updates.attachmentAssetId,
+          attachmentUrl: updates.attachmentUrl
+        })
+      : null
+
     const add = (column: string, value: unknown) => {
       if (value !== undefined) {
         idx++
@@ -213,11 +309,12 @@ export const updatePurchaseOrder = async (
     add('contact_email', updates.contactEmail)
     add('notes', updates.notes)
 
-    if (updates.attachmentAssetId !== undefined) {
-      const attachmentAssetId = updates.attachmentAssetId?.trim() || null
+    if (attachmentPersistence) {
+      if (attachmentPersistence.supportsAttachmentAssetId) {
+        add('attachment_asset_id', attachmentPersistence.attachmentAssetId)
+      }
 
-      add('attachment_asset_id', attachmentAssetId)
-      add('attachment_url', attachmentAssetId ? buildPrivateAssetDownloadUrl(attachmentAssetId) : updates.attachmentUrl || null)
+      add('attachment_url', attachmentPersistence.attachmentUrl)
     } else {
       add('attachment_url', updates.attachmentUrl)
     }
@@ -237,9 +334,9 @@ export const updatePurchaseOrder = async (
       return null
     }
 
-    if (updates.attachmentAssetId && updates.createdBy) {
+    if (attachmentPersistence?.attachmentAssetId && updates.createdBy) {
       await attachAssetToAggregate({
-        assetId: updates.attachmentAssetId,
+        assetId: attachmentPersistence.attachmentAssetId,
         ownerAggregateType: 'purchase_order',
         ownerAggregateId: poId,
         actorUserId: updates.createdBy,

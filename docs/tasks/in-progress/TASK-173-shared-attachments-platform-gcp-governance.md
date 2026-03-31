@@ -71,6 +71,25 @@
   - `greenhouse_payroll.payroll_receipts` sigue owned por `postgres`
   - por eso el bootstrap full `pnpm setup:postgres:shared-assets` todavía no puede cerrar `purchase orders` ni `payroll receipts` sin acceso al secreto/owner `postgres`
 
+## Delta 2026-03-31 — compatibilidad repo para consumers legacy restantes
+
+- `purchase orders` ya no rompe el rollout shared si Cloud SQL sigue sin `attachment_asset_id`:
+  - `src/lib/finance/purchase-order-store.ts` detecta si la columna existe antes de escribir
+  - en schema legacy sigue persistiendo `attachment_url`
+  - en schema actualizado sigue preservando `attachmentAssetId` + URL privada derivada
+- `payroll receipts` ya no depende de `asset_id` para persistir/regenerar PDFs:
+  - `src/lib/payroll/payroll-receipts-store.ts` detecta si `greenhouse_payroll.payroll_receipts.asset_id` existe
+  - si no existe, mantiene write path con `storage_bucket/storage_path`
+  - si existe, sigue usando el contrato shared completo
+- Validación local ejecutada después de endurecer ambos consumers:
+  - `pnpm exec vitest run src/lib/finance/purchase-order-store.test.ts src/lib/payroll/payroll-receipts-store.test.ts src/lib/hr-core/service.test.ts`
+  - `pnpm exec eslint src/lib/finance/purchase-order-store.ts src/lib/finance/purchase-order-store.test.ts src/lib/payroll/payroll-receipts-store.ts src/lib/payroll/payroll-receipts-store.test.ts src/lib/hr-core/service.ts src/lib/hr-core/service.test.ts`
+  - `pnpm lint`
+  - `pnpm build`
+- Verificación remota del bloqueo residual:
+  - con credenciales runtime, `ALTER TABLE greenhouse_finance.purchase_orders ...` responde `must be owner of table purchase_orders`
+  - por lo tanto, el único pendiente real para cerrar `TASK-173` en GCP es acceso con el owner/credencial correcta para `purchase_orders` y `payroll_receipts`
+
 ## Summary
 
 Crear la foundation compartida de adjuntos y archivos de Greenhouse para que `leave`, `purchase orders`, `payroll receipts`, `payroll export packages`, `Document Vault`, `Expense Reports`, proveedores, herramientas y otros módulos compatibles dejen de resolver uploads de forma ad hoc.

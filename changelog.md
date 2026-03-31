@@ -3552,6 +3552,7 @@
 
 - fix: `HR > Permisos` en staging dejó de caerse por schema drift después de `TASK-173`; se aplicó en Cloud SQL la foundation shared mínima para `leave` (`greenhouse_core.assets`, `greenhouse_core.asset_access_log` y `greenhouse_hr.leave_requests.attachment_asset_id`), restaurando la carga de solicitudes en `dev-greenhouse.efeoncepro.com/hr/leave`.
 - fix: `src/lib/hr-core/service.ts` ahora considera `undefined_column` / `relation does not exist` (`42703` / `42P01`) como fallback recuperable a BigQuery para que `leave requests` no derribe toda la vista si un deploy llega antes que el bootstrap de Postgres.
+- fix: `purchase orders` y `payroll receipts` ya conviven con schemas legacy durante el rollout de `TASK-173`; ambos stores detectan si existen `attachment_asset_id` / `asset_id` antes de escribir, evitando que staging dependa de cerrar el DDL remoto sobre tablas todavía owned por `postgres`.
 - Staff Aug `Crear placement` recibió una segunda mitigación conservadora: el modal ya no depende de `MUI Autocomplete` dentro del `Dialog`; ahora usa búsqueda incremental con input controlado y lista inline de resultados elegibles para reducir el riesgo de freeze al abrir.
 - Staff Aug `Crear placement` ahora además monta el modal solo al abrirlo y desactiva el focus management más agresivo de `MUI Dialog`, para reducir el riesgo de cuelgue del navegador en el click inicial.
 
