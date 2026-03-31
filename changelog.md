@@ -8,6 +8,16 @@
   - topología aprobada en GCP: `public media` por entorno + `private assets` por entorno
   - `public media` queda reservado para logos/avatars/assets no sensibles
   - todo adjunto documental u operativo cae en `private assets` y se sirve bajo control de acceso Greenhouse
+- `TASK-173` pasó de decisión a implementación de repo:
+  - registry shared `greenhouse_core.assets`
+  - audit trail `greenhouse_core.asset_access_log`
+  - helper `src/lib/storage/greenhouse-assets.ts`
+  - uploader reusable `GreenhouseFileUploader`
+  - upload/download autenticado para assets privados
+  - cutover inicial en `leave`, `purchase orders`, `payroll receipts` y `payroll export packages`
+- Limitación operativa explícita:
+  - el bootstrap remoto `pnpm setup:postgres:shared-assets` quedó pendiente porque esta sesión no tuvo acceso al secreto `migrator`
+  - por eso la lane queda `in-progress` aunque `lint`, `tsc` y `build` ya pasaron en repo
 - `People > HR profile` ahora permite editar `Fecha de ingreso` desde la propia card de información laboral:
   - usa el endpoint existente `PATCH /api/hr/core/members/[memberId]/profile`
   - el valor se refleja de inmediato en la UI sin esperar otro refresh de contexto

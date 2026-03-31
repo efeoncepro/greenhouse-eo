@@ -10,10 +10,37 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 
 - Formalizar una lane propia para adjuntos/archivos compartidos del portal después de detectar que `leave` sigue con `attachmentUrl` manual y que `Document Vault`/`Expense Reports` estaban intentando resolver storage desde una óptica HR-first.
 
+### Estado actual
+
+- `TASK-173` quedó movida a `in-progress`.
+- El repo ya quedó implementado para la foundation shared:
+  - registry `greenhouse_core.assets`
+  - access log `greenhouse_core.asset_access_log`
+  - helper `src/lib/storage/greenhouse-assets.ts`
+  - routes `/api/assets/private` y `/api/assets/private/[assetId]`
+  - `GreenhouseFileUploader`
+  - convergencia inicial en `leave`, `purchase orders`, `payroll receipts` y `payroll export packages`
+- La auditoría ya contrastó:
+  - arquitectura (`core`, `identity/access`, `data model`, `cloud/security`)
+  - codebase real
+  - PostgreSQL real en `greenhouse-pg-dev / greenhouse_app`
+- Realidad confirmada:
+  - `leave` es el único consumer HR runtime hoy
+  - `Document Vault` y `Expense Reports` siguen sin runtime
+  - `purchase_orders` ya persiste `attachment_url`
+  - `payroll_receipts` y `payroll_export_packages` ya persisten `storage_bucket/storage_path`
+  - no existe todavía un registry genérico de `assets/attachments` en PostgreSQL
+  - las tablas runtime auditadas no tienen FKs físicas declaradas hacia sus anchors canónicos
+- La spec se corrigió para que la primera ola real no sea solo HR:
+  - `leave`
+  - `purchase orders`
+  - convergencia shared de `payroll receipts`
+  - convergencia shared de `payroll export packages`
+
 ### Delta de ejecución
 
-- Nueva task creada:
-  - `docs/tasks/to-do/TASK-173-shared-attachments-platform-gcp-governance.md`
+- Task movida y corregida en:
+  - `docs/tasks/in-progress/TASK-173-shared-attachments-platform-gcp-governance.md`
 - La task fija el baseline recomendado:
   - UI basada en `react-dropzone` + `AppReactDropzone`
   - registry compartido de assets/attachments en PostgreSQL
@@ -37,11 +64,20 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 ### Validación ejecutada
 
 - Revisión de arquitectura/task taxonomy y búsqueda de solapes en repo/docs
-- Sin validación de build/test porque el cambio de esta sesión es documental
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm lint`
+- `pnpm build`
 
 ### Limitación real
 
-- No hay cambio runtime todavía; la sesión abre y alinea la lane de implementación para evitar divergencias de diseño entre HR, leave y futuros módulos con adjuntos.
+- El repo ya quedó implementado y validado, pero la sesión no pudo aplicar `pnpm setup:postgres:shared-assets` en Cloud SQL porque no hubo acceso al secreto `migrator`.
+- Estado real:
+  - foundation shared lista en código
+  - docs/taxonomía alineadas
+  - bootstrap remoto pendiente
+- Siguiente paso operativo:
+  - correr `pnpm setup:postgres:shared-assets` con perfil `migrator`
+  - smoke autenticado de upload/download en `leave` y `purchase orders`
 
 ## Sesión 2026-03-31 — HR profile UI para fecha de ingreso
 

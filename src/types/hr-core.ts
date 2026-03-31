@@ -115,6 +115,7 @@ export interface HrLeaveRequest {
   requestedDays: number
   status: HrLeaveRequestStatus
   reason: string | null
+  attachmentAssetId?: string | null
   attachmentUrl: string | null
   supervisorMemberId: string | null
   supervisorName: string | null
@@ -278,6 +279,7 @@ export interface CreateLeaveRequestInput {
   endDate: string
   requestedDays?: number | null
   reason?: string | null
+  attachmentAssetId?: string | null
   attachmentUrl?: string | null
   notes?: string | null
 }

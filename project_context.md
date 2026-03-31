@@ -15,6 +15,10 @@
   - `private assets` entra por control de acceso Greenhouse y no debe persistirse como signed URL estable en el dominio
 - Baseline UI aprobado:
   - el uploader shared debe construirse sobre `react-dropzone` + `src/libs/styles/AppReactDropzone.ts`
+- Estado operativo actualizado:
+  - el repo ya incluye `src/lib/storage/greenhouse-assets.ts`, routes `/api/assets/private*`, `GreenhouseFileUploader` y el setup `pnpm setup:postgres:shared-assets`
+  - `leave`, `purchase orders`, `payroll receipts` y `payroll export packages` ya convergen en código al contrato shared
+  - el bootstrap remoto en GCP/Cloud SQL sigue pendiente por falta de credenciales `migrator` en esta sesión
 
 ## Delta 2026-03-31 HR profile hire-date editing
 - `People > HR profile` ya expone edición visible de `hireDate` en la card `Información laboral`.

@@ -8,8 +8,9 @@ import Stack from '@mui/material/Stack'
 import Tab from '@mui/material/Tab'
 import Typography from '@mui/material/Typography'
 
-import CustomTabList from '@core/components/mui/TabList'
 import { TabContext, TabPanel } from '@mui/lab'
+
+import CustomTabList from '@core/components/mui/TabList'
 
 import FinancePeriodClosureDashboardView from './FinancePeriodClosureDashboardView'
 import ClientEconomicsView from './ClientEconomicsView'

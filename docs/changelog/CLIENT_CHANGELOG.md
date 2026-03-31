@@ -37,6 +37,25 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.03-beta.3
+**Canal:** Beta
+**Fecha:** 2026-03-31
+**Disponible para:** internal
+**Módulos:** HRIS / Finanzas / Nómina / Plataforma
+
+### Novedades
+- Greenhouse ya tiene una foundation compartida de adjuntos privados para el portal, pensada para reutilizarse entre permisos, órdenes de compra, recibos de nómina y futuros módulos documentales.
+
+### Mejoras
+- `Permisos` y `Purchase Orders` ya quedaron preparados para usar un uploader unificado en vez de depender de URLs manuales.
+- Los recibos y exportaciones de nómina convergen hacia el mismo contrato privado de archivos.
+
+### Correcciones
+- Se deja explícito que los archivos sensibles no deben circular como links permanentes del bucket, sino bajo acceso autenticado del portal.
+
+### Notas
+- El bootstrap remoto de base de datos asociado a esta foundation sigue pendiente en infraestructura; la convergencia visible por usuario se irá habilitando por módulo a medida que ese setup quede aplicado en entornos compartidos.
+
 ## 2026.03-beta.2
 **Canal:** Beta
 **Fecha:** 2026-03-31

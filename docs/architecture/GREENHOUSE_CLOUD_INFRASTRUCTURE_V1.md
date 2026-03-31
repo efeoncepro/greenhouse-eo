@@ -40,6 +40,21 @@
   - `tooling/`
 - El bucket actual `${GCP_PROJECT}-greenhouse-media` pasa a leerse como baseline legacy/transicional; no debe seguir siendo el destino por defecto para nuevas capacidades documentales privadas.
 
+## Delta 2026-03-31 — Shared attachments bootstrap path
+
+El repo ya incluye el bootstrap canónico de la foundation shared:
+- `scripts/setup-postgres-shared-assets.sql`
+- `scripts/setup-postgres-shared-assets.ts`
+- comando `pnpm setup:postgres:shared-assets`
+
+Estado real:
+- el DDL quedó listo para `migrator`
+- en esta sesión no quedó aplicado remotamente en Cloud SQL porque faltó acceso al secreto `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD`
+
+Regla operativa:
+- no declarar la lane cerrada en infraestructura hasta correr el setup con `migrator`
+- no promover consumers que dependan de esas columnas/FKs en entornos compartidos sin ese bootstrap aplicado
+
 ## Delta 2026-03-29 — Secret Manager rollout validated in staging + production
 
 - `origin/develop` ya quedó en `497cb19` con los tres slices de `TASK-124`.

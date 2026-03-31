@@ -291,6 +291,7 @@ export const checkPeriodReadiness = async (
   const payrollClosed = config.requirePayrollExported
     ? payrollStatus === 'exported'
     : payrollStatus === 'approved' || payrollStatus === 'exported'
+
   const incomeClosed = config.requireIncomeRecorded ? incomeStatus === 'complete' : true
   const expensesClosed = config.requireExpensesRecorded ? expenseStatus === 'complete' : true
   const reconciliationClosed = config.requireBankReconciled ? false : true
@@ -469,6 +470,7 @@ export const getPeriodClosureStatus = async (year: number, month: number) =>
 
 export const listPeriodClosureStatuses = async (limit = DEFAULT_PERIOD_LIMIT) => {
   const periods = getTrailingPeriods(limit)
+
   const snapshots = await Promise.all(
     periods.map(period => refreshPeriodClosureStatus(period))
   )

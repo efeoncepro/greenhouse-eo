@@ -18,7 +18,8 @@ import {
   type PayrollExportPackageRecord
 } from '@/lib/payroll/payroll-export-packages-store'
 import { PayrollValidationError } from '@/lib/payroll/shared'
-import { downloadGreenhouseMediaAsset, getGreenhouseMediaBucket, uploadGreenhouseStorageObject } from '@/lib/storage/greenhouse-media'
+import { downloadGreenhouseMediaAsset, uploadGreenhouseStorageObject } from '@/lib/storage/greenhouse-media'
+import { getGreenhousePrivateAssetsBucket, upsertSystemGeneratedAsset } from '@/lib/storage/greenhouse-assets'
 
 const MONTH_NAMES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -100,22 +101,25 @@ const canReuseStoredPackage = (record: PayrollExportPackageRecord) =>
 const generateAndPersistPackage = async (params: {
   periodId: string
   generatedBy?: string | null
+  existingRecord?: PayrollExportPackageRecord | null
 }) => {
   const pdfBuffer = await generatePayrollPeriodPdf(params.periodId)
   const csvText = await generatePayrollCsv(params.periodId)
   const csvBuffer = Buffer.from(csvText, 'utf8')
-  const storageBucket = getGreenhouseMediaBucket()
+  const storageBucket = getGreenhousePrivateAssetsBucket()
   const pdfStoragePath = buildPayrollExportPackageStoragePath(params.periodId, 'pdf')
   const csvStoragePath = buildPayrollExportPackageStoragePath(params.periodId, 'csv')
 
   const [pdfUploadedPath, csvUploadedPath] = await Promise.all([
     uploadGreenhouseStorageObject({
+      bucketName: storageBucket,
       objectName: pdfStoragePath,
       contentType: 'application/pdf',
       bytes: pdfBuffer,
       cacheControl: 'private, max-age=0, must-revalidate'
     }),
     uploadGreenhouseStorageObject({
+      bucketName: storageBucket,
       objectName: csvStoragePath,
       contentType: 'text/csv; charset=utf-8',
       bytes: csvBuffer,
@@ -123,9 +127,44 @@ const generateAndPersistPackage = async (params: {
     })
   ])
 
+  const [pdfAsset, csvAsset] = await Promise.all([
+    upsertSystemGeneratedAsset({
+      assetId: params.existingRecord?.pdfAssetId ?? null,
+      ownerAggregateType: 'payroll_export_pdf',
+      ownerAggregateId: params.periodId,
+      bucketName: storageBucket,
+      objectPath: pdfStoragePath,
+      fileName: buildPayrollExportArtifactFilename(params.periodId, 'pdf'),
+      mimeType: 'application/pdf',
+      sizeBytes: pdfBuffer.byteLength,
+      actorUserId: params.generatedBy ?? null,
+      metadata: {
+        periodId: params.periodId,
+        kind: 'pdf'
+      }
+    }),
+    upsertSystemGeneratedAsset({
+      assetId: params.existingRecord?.csvAssetId ?? null,
+      ownerAggregateType: 'payroll_export_csv',
+      ownerAggregateId: params.periodId,
+      bucketName: storageBucket,
+      objectPath: csvStoragePath,
+      fileName: buildPayrollExportArtifactFilename(params.periodId, 'csv'),
+      mimeType: 'text/csv; charset=utf-8',
+      sizeBytes: csvBuffer.byteLength,
+      actorUserId: params.generatedBy ?? null,
+      metadata: {
+        periodId: params.periodId,
+        kind: 'csv'
+      }
+    })
+  ])
+
   const record = await upsertPayrollExportPackageArtifacts({
     periodId: params.periodId,
     storageBucket,
+    pdfAssetId: pdfAsset.assetId,
+    csvAssetId: csvAsset.assetId,
     pdfStoragePath: pdfUploadedPath,
     csvStoragePath: csvUploadedPath,
     pdfFileSizeBytes: pdfBuffer.byteLength,
@@ -189,7 +228,8 @@ export const getOrCreatePayrollExportPackageAssets = async (
 
   const generated = await generateAndPersistPackage({
     periodId,
-    generatedBy
+    generatedBy,
+    existingRecord: existing
   })
 
   return {

@@ -10,6 +10,19 @@
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
 
+## Delta 2026-03-31 — Shared uploader pattern
+
+`TASK-173` ya deja un patrón canónico de upload para el portal:
+- componente shared `src/components/greenhouse/GreenhouseFileUploader.tsx`
+- base visual y funcional:
+  - `react-dropzone`
+  - `src/libs/styles/AppReactDropzone.ts`
+
+Regla de plataforma:
+- si una surface del portal necesita adjuntos, debe intentar reutilizar `GreenhouseFileUploader` antes de crear un uploader propio
+- la personalización por módulo debe vivir en props, labels, allowed mime types y aggregate context
+- no copiar el demo de Vuexy inline en cada módulo
+
 ## Delta 2026-03-30 — View Governance UI ya es parte de la plataforma
 
 `/admin/views` ya no debe leerse como experimento aislado.

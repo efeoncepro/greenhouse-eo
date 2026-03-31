@@ -16,6 +16,7 @@ import Typography from '@mui/material/Typography'
 import CustomTextField from '@core/components/mui/TextField'
 
 import type { CreateLeaveRequestInput, HrLeaveType } from '@/types/hr-core'
+import GreenhouseFileUploader, { type UploadedFileValue } from './GreenhouseFileUploader'
 
 type LeaveRequestDialogProps = {
   open: boolean
@@ -39,8 +40,9 @@ const LeaveRequestDialog = ({
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const [reason, setReason] = useState('')
-  const [attachmentUrl, setAttachmentUrl] = useState('')
+  const [attachmentAsset, setAttachmentAsset] = useState<UploadedFileValue | null>(null)
   const [notes, setNotes] = useState('')
+  const selectedLeaveType = activeLeaveTypes.find(leaveType => leaveType.leaveTypeCode === leaveTypeCode) || null
 
   useEffect(() => {
     if (!open) {
@@ -55,7 +57,7 @@ const LeaveRequestDialog = ({
     setStartDate('')
     setEndDate('')
     setReason('')
-    setAttachmentUrl('')
+    setAttachmentAsset(null)
     setNotes('')
   }
 
@@ -74,7 +76,8 @@ const LeaveRequestDialog = ({
       startDate,
       endDate,
       reason: reason || null,
-      attachmentUrl: attachmentUrl || null,
+      attachmentAssetId: attachmentAsset?.assetId || null,
+      attachmentUrl: null,
       notes: notes || null
     })
 
@@ -151,13 +154,22 @@ const LeaveRequestDialog = ({
             onChange={event => setReason(event.target.value)}
           />
 
-          <CustomTextField
-            fullWidth
-            size='small'
-            label='Adjunto URL'
-            value={attachmentUrl}
-            onChange={event => setAttachmentUrl(event.target.value)}
-            placeholder='https://...'
+          <GreenhouseFileUploader
+            contextType='leave_request_draft'
+            title={selectedLeaveType?.requiresAttachment ? 'Respaldo obligatorio' : 'Adjunto opcional'}
+            helperText={
+              selectedLeaveType?.requiresAttachment
+                ? 'Este tipo de permiso exige un respaldo en PDF o imagen antes de enviarlo.'
+                : 'Puedes adjuntar un respaldo en PDF o imagen si ayuda a la revisión.'
+            }
+            emptyTitle='Arrastra tu respaldo aquí'
+            emptyDescription='Acepta PDF, JPG, PNG y WEBP hasta 10 MB.'
+            browseCta='Seleccionar archivo'
+            replaceCta='Reemplazar archivo'
+            value={attachmentAsset}
+            onChange={setAttachmentAsset}
+            metadataLabel={selectedLeaveType?.leaveTypeName || 'leave-request'}
+            disabled={saving}
           />
 
           <CustomTextField
@@ -178,7 +190,7 @@ const LeaveRequestDialog = ({
         <Button
           variant='contained'
           onClick={handleSubmit}
-          disabled={saving || !leaveTypeCode || !startDate || !endDate}
+          disabled={saving || !leaveTypeCode || !startDate || !endDate || Boolean(selectedLeaveType?.requiresAttachment && !attachmentAsset)}
         >
           {saving ? 'Enviando...' : 'Solicitar'}
         </Button>

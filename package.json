@@ -43,6 +43,7 @@
     "setup:postgres:payroll": "tsx scripts/setup-postgres-payroll.ts",
     "setup:postgres:person-360": "tsx scripts/setup-postgres-person-360-v2.ts",
     "setup:postgres:person-360-contextual": "tsx scripts/setup-postgres-person-360-contextual.ts",
+    "setup:postgres:shared-assets": "tsx scripts/setup-postgres-shared-assets.ts",
     "setup:postgres:source-sync": "tsx scripts/setup-postgres-source-sync.ts",
     "setup:postgres:staff-augmentation": "tsx scripts/setup-postgres-staff-augmentation.ts",
     "setup:postgres:transactional-email": "tsx scripts/setup-postgres-transactional-email.ts",

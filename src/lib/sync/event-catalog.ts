@@ -49,6 +49,7 @@ export const AGGREGATE_TYPES = {
   identityReconciliation: 'identity_reconciliation',
   identityProfile: 'identity_profile',
   viewAccess: 'view_access',
+  asset: 'asset',
 
   // Services
   service: 'service',
@@ -195,6 +196,12 @@ export const EVENT_TYPES = {
 
   // View Access
   viewAccessOverrideChanged: 'access.view_override_changed',
+
+  // Shared Assets
+  assetUploaded: 'asset.uploaded',
+  assetAttached: 'asset.attached',
+  assetDeleted: 'asset.deleted',
+  assetDownloaded: 'asset.downloaded',
 
   // Capacity Economics
   financeExchangeRateUpserted: 'finance.exchange_rate.upserted',

@@ -15,6 +15,7 @@ export interface PayrollReceiptRecord {
   revision: number
   sourceEventId: string
   status: PayrollReceiptStatus
+  assetId: string | null
   storageBucket: string | null
   storagePath: string | null
   fileSizeBytes: number | null
@@ -39,6 +40,7 @@ type PayrollReceiptRow = {
   revision: number | string
   source_event_id: string
   status: string
+  asset_id: string | null
   storage_bucket: string | null
   storage_path: string | null
   file_size_bytes: number | string | null
@@ -71,6 +73,7 @@ const mapReceipt = (row: PayrollReceiptRow): PayrollReceiptRecord => ({
   revision: toNumber(row.revision),
   sourceEventId: row.source_event_id,
   status: normalizeReceiptStatus(row.status),
+  assetId: normalizeNullableString(row.asset_id),
   storageBucket: normalizeNullableString(row.storage_bucket),
   storagePath: normalizeNullableString(row.storage_path),
   fileSizeBytes: row.file_size_bytes == null ? null : toNumber(row.file_size_bytes),
@@ -148,6 +151,7 @@ export const savePayrollReceipt = async (input: {
   revision: number
   sourceEventId: string
   status: PayrollReceiptStatus
+  assetId?: string | null
   storageBucket?: string | null
   storagePath?: string | null
   fileSizeBytes?: number | null
@@ -173,6 +177,7 @@ export const savePayrollReceipt = async (input: {
         revision,
         source_event_id,
         status,
+        asset_id,
         storage_bucket,
         storage_path,
         file_size_bytes,
@@ -188,12 +193,13 @@ export const savePayrollReceipt = async (input: {
         updated_at
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8,
-        $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19,
+        $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20,
         CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
       )
       ON CONFLICT (entry_id, revision) DO UPDATE SET
         source_event_id = EXCLUDED.source_event_id,
         status = EXCLUDED.status,
+        asset_id = COALESCE(EXCLUDED.asset_id, greenhouse_payroll.payroll_receipts.asset_id),
         storage_bucket = COALESCE(EXCLUDED.storage_bucket, greenhouse_payroll.payroll_receipts.storage_bucket),
         storage_path = COALESCE(EXCLUDED.storage_path, greenhouse_payroll.payroll_receipts.storage_path),
         file_size_bytes = COALESCE(EXCLUDED.file_size_bytes, greenhouse_payroll.payroll_receipts.file_size_bytes),
@@ -216,6 +222,7 @@ export const savePayrollReceipt = async (input: {
       input.revision,
       input.sourceEventId,
       input.status,
+      input.assetId ?? null,
       input.storageBucket ?? null,
       input.storagePath ?? null,
       input.fileSizeBytes ?? null,
@@ -237,6 +244,7 @@ export const savePayrollReceipt = async (input: {
  */
 export const updateReceiptAfterRegeneration = async (input: {
   receiptId: string
+  assetId?: string | null
   storagePath: string
   storageBucket: string
   fileSizeBytes: number
@@ -247,14 +255,15 @@ export const updateReceiptAfterRegeneration = async (input: {
   await runGreenhousePostgresQuery(
     `
       UPDATE greenhouse_payroll.payroll_receipts
-      SET storage_path = $2,
-          storage_bucket = $3,
-          file_size_bytes = $4,
-          template_version = $5,
+      SET asset_id = COALESCE($2, asset_id),
+          storage_path = $3,
+          storage_bucket = $4,
+          file_size_bytes = $5,
+          template_version = $6,
           generated_at = CURRENT_TIMESTAMP,
           updated_at = CURRENT_TIMESTAMP
       WHERE receipt_id = $1
     `,
-    [input.receiptId, input.storagePath, input.storageBucket, input.fileSizeBytes, input.templateVersion]
+    [input.receiptId, input.assetId ?? null, input.storagePath, input.storageBucket, input.fileSizeBytes, input.templateVersion]
   )
 }

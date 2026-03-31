@@ -52,6 +52,10 @@
 - `notification_dispatch` ya cubre revisión, estado del solicitante y alertas payroll/finance.
 - `leave_request.payroll_impact_detected` ahora puede recalcular nómina oficial para períodos no exportados antes de que se refresquen consumers de costo.
 - `Staff Augmentation` vuelve a refrescar snapshots al materializarse `commercial_cost_attribution`, cerrando mejor la sinergia indirecta con leave vía payroll.
+- Follow-on ya absorbido por `TASK-173`:
+  - `leave` ahora corta en repo a `attachmentAssetId` + uploader shared
+  - la descarga privada deriva al access model central `/api/assets/private/[assetId]`
+  - el antiguo `attachmentUrl` queda solo como carril transicional de compatibilidad/read model
 
 ## Delta 2026-03-31 — aplicación real en GCP
 

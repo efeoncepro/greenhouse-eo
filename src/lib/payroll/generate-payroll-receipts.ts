@@ -18,6 +18,7 @@ import {
 } from '@/lib/payroll/payroll-receipts-store'
 import { sendEmail } from '@/lib/email/delivery'
 import { downloadGreenhouseMediaAsset, uploadGreenhouseStorageObject } from '@/lib/storage/greenhouse-media'
+import { getGreenhousePrivateAssetsBucket, upsertSystemGeneratedAsset } from '@/lib/storage/greenhouse-assets'
 import { PayrollValidationError } from '@/lib/payroll/shared'
 
 export interface GeneratePayrollReceiptsInput {
@@ -134,12 +135,14 @@ export const generatePayrollReceiptsForPeriod = async (
 
     let pdfBuffer: Buffer | null = null
     let receiptStoragePath = existing?.storagePath || null
+    let currentAssetId = existing?.assetId ?? null
 
     if (!existing || existing.status === 'generation_failed' || !existing.storagePath) {
       try {
         pdfBuffer = await generatePayrollReceiptPdf(entry.entryId)
 
         receiptStoragePath = await uploadGreenhouseStorageObject({
+          bucketName: getGreenhousePrivateAssetsBucket(),
           objectName,
           contentType: 'application/pdf',
           bytes: pdfBuffer,
@@ -147,6 +150,28 @@ export const generatePayrollReceiptsForPeriod = async (
         })
 
         const receiptBucket = receiptStoragePath.split('/')[2] || null
+
+        const asset = receiptBucket
+          ? await upsertSystemGeneratedAsset({
+              assetId: existing?.assetId ?? null,
+              ownerAggregateType: 'payroll_receipt',
+              ownerAggregateId: receiptId,
+              ownerMemberId: entry.memberId,
+              bucketName: receiptBucket,
+              objectPath: objectName,
+              fileName: `receipt-${input.periodId}-${entry.memberId}-r${revision}.pdf`,
+              mimeType: 'application/pdf',
+              sizeBytes: pdfBuffer.byteLength,
+              actorUserId: input.actorEmail ?? null,
+              metadata: {
+                entryId: entry.entryId,
+                periodId: input.periodId,
+                payRegime: entry.payRegime
+              }
+            })
+          : null
+
+        currentAssetId = asset?.assetId ?? currentAssetId
 
         await savePayrollReceipt({
           receiptId,
@@ -157,6 +182,7 @@ export const generatePayrollReceiptsForPeriod = async (
           revision,
           sourceEventId: input.sourceEventId,
           status: 'generated',
+          assetId: currentAssetId,
           storageBucket: receiptBucket,
           storagePath: receiptStoragePath,
           fileSizeBytes: pdfBuffer.byteLength,
@@ -178,6 +204,7 @@ export const generatePayrollReceiptsForPeriod = async (
           revision,
           sourceEventId: input.sourceEventId,
           status: 'generation_failed',
+          assetId: currentAssetId,
           storagePath: receiptStoragePath,
           generatedBy: input.actorEmail ?? null,
           generationError: error instanceof Error ? error.message : String(error),
@@ -224,6 +251,7 @@ export const generatePayrollReceiptsForPeriod = async (
           revision,
           sourceEventId: input.sourceEventId,
           status: 'generated',
+          assetId: currentAssetId,
           storageBucket: null,
           storagePath: receiptStoragePath,
           fileSizeBytes: attachmentBuffer.byteLength,
@@ -250,6 +278,7 @@ export const generatePayrollReceiptsForPeriod = async (
           revision,
           sourceEventId: input.sourceEventId,
           status: 'email_sent',
+          assetId: currentAssetId,
           storagePath: receiptStoragePath,
           emailRecipient: entry.memberEmail,
           emailSentAt: new Date().toISOString(),
@@ -271,6 +300,7 @@ export const generatePayrollReceiptsForPeriod = async (
           revision,
           sourceEventId: input.sourceEventId,
           status: 'email_failed',
+          assetId: currentAssetId,
           storagePath: receiptStoragePath,
           emailRecipient: entry.memberEmail,
           emailError: sendResult.error || 'Email delivery skipped.',
@@ -289,6 +319,7 @@ export const generatePayrollReceiptsForPeriod = async (
         revision,
         sourceEventId: input.sourceEventId,
         status: 'email_failed',
+        assetId: currentAssetId,
         storagePath: receiptStoragePath,
         emailRecipient: entry.memberEmail,
         emailError: error instanceof Error ? error.message : String(error),

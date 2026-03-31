@@ -5,6 +5,15 @@
 - La foundation compartida de adjuntos, receipts y gobernanza GCP se separa a `TASK-173`.
 - Esta task conserva el dominio `expense reports`, approvals y reimbursement flow, pero debe consumir el contrato shared de assets/uploader en vez de definir storage base propio.
 - Los comprobantes deben leerse como `consumer` del patrón de `TASK-173`, no como owner del bucket/helper canónico.
+- `TASK-173` ya dejó implementado en repo el baseline shared:
+  - registry `greenhouse_core.assets`
+  - uploader Vuexy reusable `GreenhouseFileUploader`
+  - upload/download autenticado para assets privados
+  - convergencia inicial con `leave`, `purchase orders`, `payroll receipts` y `payroll export packages`
+- Esta task ya no debe:
+  - reutilizar un bucket HR-only
+  - crear `receipt-url` como contrato principal si el aggregate puede usar el asset registry shared
+  - definir helpers de upload paralelos a la capa shared
 
 - Mantener la alineación con el patrón real del repo:
   - tablas de acciones dedicadas por dominio, no `greenhouse_hr.approval_actions` genérica
@@ -42,7 +51,7 @@ Implementar el **módulo de gastos y reembolsos** del HRIS en Greenhouse. Permit
 - **Branch de trabajo:** `feature/hris-expenses`
 - **Documento rector:** `Greenhouse_HRIS_Architecture_v1.md` §4.3
 - **Schema:** `greenhouse_hr`
-- **Prerequisitos:** Fase 0.5 (contract types), Fase 1A (Document Vault — reutiliza GCS bucket y signed URLs)
+- **Prerequisitos:** Fase 0.5 (contract types), foundation shared `TASK-173` para receipts/attachments
 
 ### Documentos normativos
 
@@ -61,7 +70,7 @@ Implementar el **módulo de gastos y reembolsos** del HRIS en Greenhouse. Permit
 | Dependencia                           | Estado       | Impacto si no está                          |
 | ------------------------------------- | ------------ | ------------------------------------------- |
 | Fase 0.5 (contract types)             | Prerequisito | Elegibilidad por `contract_type`            |
-| Fase 1A (Document Vault)              | Prerequisito | Reutiliza GCS bucket y `gcs-signed-urls.ts` |
+| `TASK-173` shared attachments         | Prerequisito | Reutiliza registry, uploader y download model privados    |
 | `greenhouse_hr` schema                | Existe       | Tablas van aquí                             |
 | `greenhouse_finance.expenses` table   | Existe       | Link de reembolso crea registro aquí        |
 | Approvals engine (`approval_actions`) | Existe       | Se reutiliza para el flujo de aprobación    |
@@ -175,7 +184,7 @@ When an expense report reaches `reimbursed` status:
 
 **Crear reporte flow:** Drawer → título + período → guardado como draft → agregar items (categoría, monto, fecha, descripción, comprobante) → submit.
 
-**Cada item tiene upload de comprobante** usando signed URLs (reutiliza `gcs-signed-urls.ts` de Document Vault). El archivo se guarda en `gs://greenhouse-documents/receipts/{report_id}/{item_id}/{file_name}`.
+**Cada item tiene upload de comprobante** usando la foundation shared de assets privados. El dominio de gastos decide el aggregate y metadatos del receipt, pero no redefine bucket/base helper.
 
 ### C2. `/hr/expenses` — Gastos y reembolsos (admin)
 
@@ -315,7 +324,7 @@ src/
 - [ ] Approval flow: pending_supervisor → pending_finance → approved → reimbursed
 - [ ] Supervisor solo ve reports de sus reportes directos
 - [ ] Finance ve todos los reports
-- [ ] Receipt upload usa signed URLs (mismo bucket que Document Vault)
+- [ ] Receipt upload consume la foundation shared de `TASK-173`
 - [ ] `reports_to = NULL` → skip supervisor, va directo a finance
 - [ ] Report no editable después de submit (solo drafts son editables)
 - [ ] Reembolso crea registro en `greenhouse_finance.expenses` automáticamente
@@ -333,7 +342,7 @@ src/
 ## Notas para el agente
 
 - **Reutiliza `approval_actions` de HR Core.** Mismo patrón, nuevo `request_type = 'expense_report'`.
-- **Reutiliza `gcs-signed-urls.ts` de Document Vault.** Los receipts van al mismo bucket, subfolder diferente.
+- **No crear helper de storage paralelo.** Los receipts deben consumir el registry/upload/download model shared de `TASK-173`.
 - **El `finance_record_id` link es unidirectional.** Expense report → finance expense. No al revés.
 - **`total_amount` se recalcula server-side** al agregar/modificar/eliminar items. Nunca confiar en el monto enviado por el client.
 - **Branch naming:** `feature/hris-expenses`.

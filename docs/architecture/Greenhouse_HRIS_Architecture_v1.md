@@ -1,5 +1,18 @@
 # Greenhouse HRIS Architecture V1
 
+## Delta 2026-03-31 — HR document handling now depends on shared attachments foundation
+
+La arquitectura HRIS ya no debe asumir que cada módulo HR resuelve storage por sí solo.
+
+Regla nueva:
+- `Document Vault`, `Expense Reports` y adjuntos de `leave` deben consumir la foundation shared de `TASK-173`
+- el HRIS mantiene ownership del dominio documental y sus reglas de elegibilidad/visibilidad
+- pero el patrón base de upload, access model privado y asset registry es cross-module
+
+Estado vigente:
+- `leave` ya usa el uploader shared en repo
+- `Document Vault` y `Expense Reports` siguen como follow-ons del dominio HRIS, pero nacen sobre esa capa compartida
+
 ## Purpose
 
 This document defines the architecture of the Human Resource Information System (HRIS) embedded in Greenhouse EO. It establishes the contract type taxonomy, module composition, data model extensions, navigation structure, and phased implementation roadmap.

@@ -42,6 +42,17 @@
   - uploads y downloads privados deben dejar trazabilidad mínima de actor, aggregate y timestamp
   - assets subidos y no asociados deben poder limpiarse por lifecycle/housekeeping
 
+## Delta 2026-03-31 — Runtime security implementation for private assets
+
+La postura ya tiene primera materialización en repo:
+- upload autenticado vía `POST /api/assets/private`
+- download/delete autenticado vía `/api/assets/private/[assetId]`
+- access logging en `greenhouse_core.asset_access_log`
+
+Regla vigente:
+- el portal valida acceso por aggregate owner antes de entregar el asset
+- los consumers nuevos deben extender el access model shared, no bypassarlo con URLs directas persistidas
+
 ## Delta 2026-03-29 — Secret Manager validated in shared staging
 
 - `TASK-124` ya salió del estado solo-repo y quedó validada en el entorno compartido `staging`.

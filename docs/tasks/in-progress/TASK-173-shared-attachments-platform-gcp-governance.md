@@ -2,17 +2,60 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
-- Status real: `Diseño`
+- Status real: `Implementación repo lista; bootstrap GCP pendiente`
 - Rank: `56`
 - Domain: `platform`
 
+## Delta 2026-03-31
+
+- La auditoría contra arquitectura, codebase y PostgreSQL real confirmó que:
+  - `leave` es el único consumer HR runtime hoy.
+  - `Document Vault` y `Expense Reports` siguen sin runtime y deben nacer sobre esta foundation.
+  - `purchase_orders` ya persiste `attachment_url` libre.
+  - `payroll_receipts` y `payroll_export_packages` ya persisten `storage_bucket/storage_path`.
+- La task deja de leerse como `HR-first` y pasa a leerse como foundation shared para:
+  - `leave`
+  - `purchase orders`
+  - `payroll receipts`
+  - `payroll export packages`
+  - futuros `Document Vault`, `Expense Reports`, providers y tooling
+- Regla de scoping corregida:
+  - el registry shared no puede depender solo de `space_id`
+  - debe soportar aggregate ownership `space-scoped`, `client-scoped`, `member-scoped` y `period/entry-scoped` según el módulo
+- La base real auditada no tiene hoy un registry genérico de `assets/attachments` en PostgreSQL.
+- Las tablas activas revisadas (`leave_requests`, `leave_balances`, `payroll_receipts`, `payroll_export_packages`, `purchase_orders`) tampoco exponen FKs físicas declaradas, así que el contrato shared debe validar anchors canónicos desde aplicación y no asumir FK enforcement ya existente.
+
+## Delta 2026-03-31 — implementación en repo y limitación operativa real
+
+- La foundation shared ya quedó implementada en el repo:
+  - registry canónico `greenhouse_core.assets`
+  - audit trail `greenhouse_core.asset_access_log`
+  - helper shared `src/lib/storage/greenhouse-assets.ts`
+  - route autenticada `POST /api/assets/private`
+  - route autenticada `GET/DELETE /api/assets/private/[assetId]`
+  - uploader reusable `src/components/greenhouse/GreenhouseFileUploader.tsx`
+  - script de bootstrap `pnpm setup:postgres:shared-assets`
+- Primeros consumers ya cortados en código:
+  - `leave`
+  - `purchase orders`
+  - convergencia shared de `payroll receipts`
+  - convergencia shared de `payroll export packages`
+- Estado real de despliegue:
+  - la implementación de repo quedó validada con `tsc`, `lint` y `build`
+  - el bootstrap remoto en GCP/Cloud SQL quedó pendiente porque en esta sesión no hubo acceso al secreto `migrator`
+  - por lo tanto, la task sigue `in-progress` hasta aplicar `setup:postgres:shared-assets` con credenciales `migrator` y validar smoke autenticado
+- Cambio de lectura importante:
+  - `leave` ya no depende de `attachmentUrl` manual en el código nuevo
+  - `purchase orders` ya no depende solo de `attachment_url` libre
+  - `payroll receipts` y `payroll export packages` ya pueden persistir `asset_id`/`pdf_asset_id`/`csv_asset_id` sin romper compatibilidad con `storage_path`
+
 ## Summary
 
-Crear la foundation compartida de adjuntos y archivos de Greenhouse para que `leave`, `Document Vault`, `Expense Reports`, proveedores, herramientas y otros módulos dejen de resolver uploads de forma ad hoc.
+Crear la foundation compartida de adjuntos y archivos de Greenhouse para que `leave`, `purchase orders`, `payroll receipts`, `payroll export packages`, `Document Vault`, `Expense Reports`, proveedores, herramientas y otros módulos compatibles dejen de resolver uploads de forma ad hoc.
 
 La task define el contrato canónico de assets, el patrón UI reusable basado en Vuexy, la gobernanza de buckets en GCP y el path seguro de upload/download autenticado para todo el portal.
 
@@ -25,6 +68,7 @@ Hoy Greenhouse tiene piezas parciales, pero no una plataforma compartida de arch
 - `leave` sigue usando `attachmentUrl` manual en vez de un adjunto gestionado por Greenhouse.
 - `TASK-027` y `TASK-028` asumen storage y signed URLs desde una óptica HR-first, no como capability shared del portal.
 - otros dominios ya consumen storage GCS (`payroll receipts`, export packages), pero con convenciones propias.
+- `purchase orders` ya tiene un campo `attachment_url`, pero como URL libre y no como asset gobernado.
 
 Sin una foundation común el riesgo es alto:
 
@@ -38,7 +82,7 @@ Sin una foundation común el riesgo es alto:
 - Definir un contrato canónico de assets/attachments reusable por todo Greenhouse.
 - Formalizar la topología y gobernanza de buckets GCP para media pública y documentos privados.
 - Estandarizar la experiencia de upload sobre el patrón Vuexy existente.
-- Cortar `leave` y futuros módulos a adjuntos gestionados por Greenhouse en vez de `attachmentUrl` arbitrario.
+- Cortar `leave` y módulos compatibles a adjuntos gestionados por Greenhouse en vez de `attachmentUrl` arbitrario o `storage_path` aislado por dominio.
 
 ## Architectural Decision Locked
 
@@ -74,8 +118,12 @@ Sin una foundation común el riesgo es alto:
 - Baseline UI aprobada:
   - `react-dropzone` + `AppReactDropzone`
   - componente shared `GreenhouseFileUploader`
-- Primeros consumers aprobados:
+- Primera ola de implementación:
   - `leave`
+  - `purchase orders`
+  - convergencia shared para `payroll receipts`
+  - convergencia shared para `payroll export packages`
+- Primeros consumers futuros ya alineados:
   - `TASK-027`
   - `TASK-028`
 
@@ -101,7 +149,11 @@ Reglas obligatorias:
 - La UX debe reutilizar el patrón base `react-dropzone` + `AppReactDropzone`, no inventar otro uploader.
 - Los documentos sensibles no se exponen por bucket público ni por links permanentes sin autorización.
 - La topología de buckets debe ser pequeña y gobernable; evitar un bucket por módulo salvo necesidad regulatoria real.
-- `Document Vault`, `Expense Reports` y `leave` deben consumir esta capability shared, no redefinir la foundation.
+- `Document Vault`, `Expense Reports`, `leave`, `purchase orders` y los consumers documentales de Payroll deben consumir esta capability shared o converger explícitamente hacia ella.
+- El isolation boundary del registry se resuelve por aggregate owner:
+  - usar `space_id` cuando el agregado sea `space-scoped`
+  - usar anchors canónicos `client_id`, `member_id`, `period_id`, `entry_id` u otros IDs del agregado cuando no exista `space_id`
+  - no asumir que todo documento compatible del portal es `space-scoped`
 
 ## Dependencies & Impact
 
@@ -117,7 +169,10 @@ Reglas obligatorias:
 - `TASK-170` Leave Request & Approval Flow
 - `TASK-027` HRIS Document Vault
 - `TASK-028` HRIS Expense Reports
-- surfaces de proveedores, tooling, purchase orders y futuros módulos con adjuntos
+- purchase orders
+- payroll receipts
+- payroll export packages
+- surfaces de proveedores, tooling y futuros módulos con adjuntos
 - `CSP`/uploads (`TASK-126`) por dominios y paths que deben permanecer compatibles
 
 ### Files owned
@@ -144,6 +199,8 @@ Reglas obligatorias:
   - logos/avatars
   - payroll receipts
   - payroll export packages
+- consumer documental legacy:
+  - purchase orders con `attachment_url`
 - `leave` ya valida si un tipo requiere adjunto, pero todavía consume `attachmentUrl`
 
 ### Gap actual
@@ -153,6 +210,8 @@ Reglas obligatorias:
 - no existe un uploader shared de Greenhouse basado en Vuexy
 - no existe un contrato uniforme `upload -> finalize -> attach to aggregate`
 - módulos HR siguen describiendo signed URLs/buckets como si fueran foundations propias
+- Finance y Payroll siguen resolviendo adjuntos bajo contratos distintos (`attachment_url` libre vs `storage_bucket/storage_path`)
+- las tablas runtime activas relevantes no exponen FKs físicas declaradas hacia sus anchors canónicos
 
 ## Scope
 
@@ -229,9 +288,12 @@ Reglas obligatorias:
 ### Slice 5 - Primeros consumers
 
 - `leave`: reemplazar `attachmentUrl` por adjunto gestionado por Greenhouse.
+- `purchase orders`: reemplazar `attachment_url` por asset gestionado por Greenhouse.
+- `payroll receipts`: converger metadata y delivery sobre el contrato shared sin romper el comportamiento actual.
+- `payroll export packages`: converger metadata y delivery sobre el contrato shared sin romper el comportamiento actual.
 - `TASK-027 Document Vault`: consumir esta foundation en vez de definir bucket/helper propios.
 - `TASK-028 Expense Reports`: receipts sobre el mismo contrato shared.
-- dejar a proveedores, tooling y purchase orders con contrato listo aunque su rollout quede como follow-on.
+- dejar a providers y tooling con contrato listo aunque su rollout quede como follow-on.
 
 ### Slice 6 - Baseline v1 de tipos y límites
 
@@ -260,14 +322,18 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Existe una decisión arquitectónica explícita para topología de buckets GCP y gobierno por visibilidad/retención.
-- [ ] Existe un contrato compartido de `assets/attachments` con registry canónico y associations por aggregate.
-- [ ] Existe un uploader reusable de Greenhouse basado en el patrón Vuexy actual.
-- [ ] La decisión deja explícito qué cae en `public media` y qué cae en `private assets`.
-- [ ] La decisión deja explícito que descargas privadas pasan por control de acceso Greenhouse.
-- [ ] `leave` deja de depender de `attachmentUrl` manual y consume adjuntos gestionados.
-- [ ] `TASK-027` y `TASK-028` quedan actualizadas para consumir la foundation shared en vez de redefinir storage base.
-- [ ] El path de downloads privados queda autenticado y no depende de exponer URLs permanentes del bucket.
+- [x] Existe una decisión arquitectónica explícita para topología de buckets GCP y gobierno por visibilidad/retención.
+- [x] Existe un contrato compartido de `assets/attachments` con registry canónico y associations por aggregate.
+- [x] Existe un uploader reusable de Greenhouse basado en el patrón Vuexy actual.
+- [x] La decisión deja explícito qué cae en `public media` y qué cae en `private assets`.
+- [x] La decisión deja explícito que descargas privadas pasan por control de acceso Greenhouse.
+- [x] `leave` deja de depender de `attachmentUrl` manual y consume adjuntos gestionados.
+- [x] `purchase orders` deja de depender de `attachment_url` libre y consume adjuntos gestionados.
+- [x] `payroll receipts` y `payroll export packages` quedan alineados al contrato shared aunque mantengan sus surfaces actuales.
+- [x] `TASK-027` y `TASK-028` quedan actualizadas para consumir la foundation shared en vez de redefinir storage base.
+- [x] El path de downloads privados queda autenticado y no depende de exponer URLs permanentes del bucket.
+- [ ] Aplicar `pnpm setup:postgres:shared-assets` en GCP/Cloud SQL con perfil `migrator`.
+- [ ] Validar smoke manual autenticado de upload/download sobre `leave` y `purchase orders` en `staging`.
 
 ## Verification
 
@@ -292,6 +358,6 @@ Esto da el mejor equilibrio entre seguridad, gobernanza y simplicidad operativa.
 
 ## Follow-ups
 
-- Actualizar arquitectura cloud/security cuando la decisión de bucket topology quede aprobada.
 - Derivar una task de migración/backfill si se decide mover `greenhouse-media` actual a buckets separados por visibilidad.
 - Evaluar scanning y retención avanzada como lane aparte si aparecen requisitos legales o enterprise.
+- Aplicar el DDL remoto y validar permisos `migrator/runtime` como cierre operativo real de la lane.

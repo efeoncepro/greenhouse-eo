@@ -1,5 +1,25 @@
 # Greenhouse 360 Object Model V1
 
+## Delta 2026-03-31 — `Asset` entra como object cross-module governado
+
+Greenhouse ya debe tratar `Asset` como object técnico compartido del portal.
+
+Regla:
+- `Asset` no reemplaza al documento de negocio del dominio
+- `Asset` ancla bytes, metadata base, visibilidad, retention y access log
+- cada dominio conserva su agregado semántico:
+  - `leave_request`
+  - `purchase_order`
+  - `member_document`
+  - `expense_report_item`
+  - `payroll_receipt`
+  - `payroll_export_package`
+
+Consecuencia:
+- los módulos pueden extender o asociar assets
+- no deben crear identidades paralelas para el mismo archivo cuando el registry shared ya cubre el caso
+- el ownership de acceso se resuelve por aggregate owner y no solo por `space_id`
+
 ## Purpose
 
 This document defines the platform-level architecture rule that Greenhouse must evolve around canonical enriched objects instead of siloed module-local identities.

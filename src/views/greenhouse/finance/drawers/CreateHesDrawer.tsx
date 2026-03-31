@@ -148,7 +148,9 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
   // ── Fetch active POs for client ──
 
   const fetchPOs = useCallback(async (clientId: string) => {
-    if (!clientId) { setActivePOs([]); return }
+    if (!clientId) { setActivePOs([]); 
+
+return }
 
     try {
       const res = await fetch(`/api/finance/purchase-orders?clientId=${clientId}&status=active`)
@@ -294,6 +296,7 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
 
     try {
       const url = `/api/finance/hes/${editHes.hesId}/${action}`
+
       const body = action === 'approve'
         ? { approvedBy: approvedBy.trim() }
         : action === 'reject'

@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     poNumber,
     clientId,
     organizationId: body.organizationId,
-    spaceId: body.spaceId,
+    spaceId: body.spaceId ?? tenant.spaceId ?? null,
     authorizedAmount: Number(authorizedAmount),
     currency: body.currency,
     exchangeRateToClp: body.exchangeRateToClp ? Number(body.exchangeRateToClp) : undefined,
@@ -53,6 +53,7 @@ export async function POST(request: Request) {
     serviceScope: body.serviceScope,
     contactName: body.contactName,
     contactEmail: body.contactEmail,
+    attachmentAssetId: body.attachmentAssetId,
     notes: body.notes,
     attachmentUrl: body.attachmentUrl,
     createdBy: tenant.userId

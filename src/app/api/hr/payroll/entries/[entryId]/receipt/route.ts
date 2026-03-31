@@ -5,7 +5,8 @@ import { toPayrollErrorResponse } from '@/lib/payroll/api-response'
 import { getPayrollReceiptByEntryId, updateReceiptAfterRegeneration } from '@/lib/payroll/payroll-receipts-store'
 import { buildPayrollReceiptDownloadFilename } from '@/lib/payroll/receipt-filename'
 import { requireHrTenantContext } from '@/lib/tenant/authorization'
-import { downloadGreenhouseMediaAsset, uploadGreenhouseStorageObject, getGreenhouseMediaBucket } from '@/lib/storage/greenhouse-media'
+import { downloadGreenhouseMediaAsset, uploadGreenhouseStorageObject } from '@/lib/storage/greenhouse-media'
+import { getGreenhousePrivateAssetsBucket, upsertSystemGeneratedAsset } from '@/lib/storage/greenhouse-assets'
 
 export const dynamic = 'force-dynamic'
 
@@ -44,17 +45,43 @@ export async function GET(_: Request, { params }: { params: Promise<{ entryId: s
       if (storedReceipt) {
         try {
           const storagePath = `payroll-receipts/${storedReceipt.periodId}/${storedReceipt.memberId}-r${storedReceipt.revision}.pdf`
+          const bucketName = getGreenhousePrivateAssetsBucket()
 
           await uploadGreenhouseStorageObject({
+            bucketName,
             objectName: storagePath,
             contentType: 'application/pdf',
             bytes: buffer
           })
 
+          const asset = await upsertSystemGeneratedAsset({
+            assetId: storedReceipt.assetId,
+            ownerAggregateType: 'payroll_receipt',
+            ownerAggregateId: storedReceipt.receiptId,
+            ownerMemberId: storedReceipt.memberId,
+            bucketName,
+            objectPath: storagePath,
+            fileName: buildPayrollReceiptDownloadFilename({
+              entryId,
+              periodId: storedReceipt.periodId,
+              memberId: storedReceipt.memberId,
+              payRegime: storedReceipt.payRegime
+            }),
+            mimeType: 'application/pdf',
+            sizeBytes: buffer.length,
+            actorUserId: tenant.userId,
+            metadata: {
+              entryId,
+              periodId: storedReceipt.periodId,
+              payRegime: storedReceipt.payRegime
+            }
+          })
+
           await updateReceiptAfterRegeneration({
             receiptId: storedReceipt.receiptId,
-            storagePath: `gs://${getGreenhouseMediaBucket()}/${storagePath}`,
-            storageBucket: getGreenhouseMediaBucket(),
+            assetId: asset.assetId,
+            storagePath: `gs://${bucketName}/${storagePath}`,
+            storageBucket: bucketName,
             fileSizeBytes: buffer.length,
             templateVersion: RECEIPT_TEMPLATE_VERSION
           })

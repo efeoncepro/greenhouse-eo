@@ -1,5 +1,26 @@
 # Greenhouse Data Model Master V1
 
+## Delta 2026-03-31 — Shared assets registry en PostgreSQL + bytes en GCS
+
+`TASK-173` deja fijado el patrón canónico de archivos del portal:
+- `PostgreSQL` guarda registry y audit trail del asset
+- `GCS` guarda los bytes
+
+Placement nuevo:
+- `greenhouse_core.assets`
+- `greenhouse_core.asset_access_log`
+
+Bridges transaccionales iniciales:
+- `greenhouse_hr.leave_requests.attachment_asset_id`
+- `greenhouse_finance.purchase_orders.attachment_asset_id`
+- `greenhouse_payroll.payroll_receipts.asset_id`
+- `greenhouse_payroll.payroll_export_packages.pdf_asset_id`
+- `greenhouse_payroll.payroll_export_packages.csv_asset_id`
+
+Regla:
+- URLs firmadas o paths de bucket no son el contrato canónico del dominio
+- el contrato canónico es la referencia al asset governado más los metadatos del agregado consumidor
+
 ## Purpose
 
 This is the canonical snapshot of how Greenhouse data is modeled today and how it must keep evolving.

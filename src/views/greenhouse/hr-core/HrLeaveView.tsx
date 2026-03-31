@@ -44,6 +44,7 @@ import GreenhouseCalendar from '@/components/greenhouse/GreenhouseCalendar'
 import LeaveRequestDialog from '@/components/greenhouse/LeaveRequestDialog'
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
 import type {
+  CreateLeaveRequestInput,
   HrApprovalAction,
   HrLeaveCalendarResponse,
   HrLeaveRequest,
@@ -156,14 +157,7 @@ const HrLeaveView = () => {
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  const handleCreate = async (input: {
-    leaveTypeCode: string
-    startDate: string
-    endDate: string
-    reason?: string | null
-    attachmentUrl?: string | null
-    notes?: string | null
-  }) => {
+  const handleCreate = async (input: CreateLeaveRequestInput) => {
     setCreateSaving(true)
     setError(null)
 

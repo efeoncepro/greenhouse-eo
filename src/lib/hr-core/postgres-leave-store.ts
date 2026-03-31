@@ -60,6 +60,7 @@ import {
   toNullableNumber
 } from '@/lib/hr-core/shared'
 import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
+import { attachAssetToAggregate, buildPrivateAssetDownloadUrl } from '@/lib/storage/greenhouse-assets'
 
 type PostgresDepartmentRow = {
   department_id: string
@@ -112,6 +113,7 @@ type PostgresLeaveRequestRow = {
   requested_days: number | string
   status: string
   reason: string | null
+  attachment_asset_id: string | null
   attachment_url: string | null
   supervisor_member_id: string | null
   supervisor_name: string | null
@@ -303,7 +305,11 @@ const mapLeaveRequest = (row: PostgresLeaveRequestRow): HrLeaveRequest => ({
   requestedDays: toNullableNumber(row.requested_days) ?? 0,
   status: (normalizeNullableString(row.status) || 'pending_supervisor') as HrLeaveRequest['status'],
   reason: normalizeNullableString(row.reason),
-  attachmentUrl: normalizeNullableString(row.attachment_url),
+  attachmentAssetId: normalizeNullableString(row.attachment_asset_id),
+  attachmentUrl:
+    normalizeNullableString(row.attachment_asset_id)
+      ? buildPrivateAssetDownloadUrl(String(row.attachment_asset_id))
+      : normalizeNullableString(row.attachment_url),
   supervisorMemberId: normalizeNullableString(row.supervisor_member_id),
   supervisorName: normalizeNullableString(row.supervisor_name),
   hrReviewerUserId: normalizeNullableString(row.hr_reviewer_user_id),
@@ -856,6 +862,7 @@ const getLeaveRequestByIdInternal = async (requestId: string, client?: PoolClien
         r.requested_days,
         r.status,
         r.reason,
+        r.attachment_asset_id,
         r.attachment_url,
         r.supervisor_member_id,
         supervisor.display_name AS supervisor_name,
@@ -1155,6 +1162,7 @@ export const listLeaveRequestsFromPostgres = async ({
         r.requested_days,
         r.status,
         r.reason,
+        r.attachment_asset_id,
         r.attachment_url,
         r.supervisor_member_id,
         supervisor.display_name AS supervisor_name,
@@ -1258,6 +1266,7 @@ export const listLeaveCalendarFromPostgres = async ({
         r.requested_days,
         r.status,
         r.reason,
+        r.attachment_asset_id,
         r.attachment_url,
         r.supervisor_member_id,
         supervisor.display_name AS supervisor_name,
@@ -1399,7 +1408,10 @@ export const createLeaveRequestInPostgres = async ({
       })
     }
 
-    if (leaveType.requiresAttachment && !normalizeNullableString(input.attachmentUrl)) {
+    const attachmentAssetId = normalizeNullableString(input.attachmentAssetId)
+    const attachmentUrlFallback = normalizeNullableString(input.attachmentUrl)
+
+    if (leaveType.requiresAttachment && !attachmentAssetId && !attachmentUrlFallback) {
       throw new HrCoreValidationError('This leave type requires an attachment.', 409)
     }
 
@@ -1468,7 +1480,7 @@ export const createLeaveRequestInPostgres = async ({
     const supervisorMemberId = normalizeNullableString(member.reports_to)
     const status = supervisorMemberId ? 'pending_supervisor' : 'pending_hr'
     const reason = normalizeNullableString(input.reason)
-    const attachmentUrl = normalizeNullableString(input.attachmentUrl)
+    const attachmentUrl = attachmentAssetId ? buildPrivateAssetDownloadUrl(attachmentAssetId) : attachmentUrlFallback
     const notes = normalizeNullableString(input.notes)
 
     await client.query(
@@ -1482,12 +1494,13 @@ export const createLeaveRequestInPostgres = async ({
           requested_days,
           status,
           reason,
+          attachment_asset_id,
           attachment_url,
           supervisor_member_id,
           notes,
           created_by_user_id
         )
-        VALUES ($1, $2, $3, $4::date, $5::date, $6, $7, $8, $9, $10, $11, $12)
+        VALUES ($1, $2, $3, $4::date, $5::date, $6, $7, $8, $9, $10, $11, $12, $13)
       `,
       [
         requestId,
@@ -1498,12 +1511,40 @@ export const createLeaveRequestInPostgres = async ({
         requestedDays,
         status,
         reason,
+        attachmentAssetId,
         attachmentUrl,
         supervisorMemberId,
         notes,
         actorUserId
       ]
     )
+
+    if (attachmentAssetId) {
+      try {
+        await attachAssetToAggregate({
+          assetId: attachmentAssetId,
+          ownerAggregateType: 'leave_request',
+          ownerAggregateId: requestId,
+          actorUserId,
+          ownerClientId: tenant.clientId,
+          ownerSpaceId: tenant.spaceId ?? null,
+          ownerMemberId: effectiveMemberId,
+          metadata: {
+            leaveTypeCode,
+            startDate,
+            endDate
+          },
+          client
+        })
+      } catch (error) {
+        throw new HrCoreValidationError(
+          error instanceof Error && error.message === 'asset_not_found'
+            ? 'Attachment asset not found.'
+            : 'Unable to attach the supporting document.',
+          409
+        )
+      }
+    }
 
     await client.query(
       `
@@ -1536,6 +1577,7 @@ export const createLeaveRequestInPostgres = async ({
       requestedDays,
       status,
       reason,
+      attachmentAssetId,
       attachmentUrl,
       supervisorMemberId,
       supervisorName: null,

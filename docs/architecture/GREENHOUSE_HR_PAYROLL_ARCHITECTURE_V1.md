@@ -1,5 +1,18 @@
 # GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md
 
+## Delta 2026-03-31 — Payroll artifacts convergen a shared assets
+
+`TASK-173` deja explícito que los artefactos documentales de Payroll no deben seguir como carriles aislados.
+
+Estado vigente en repo:
+- `payroll_receipts` ya puede persistir `asset_id`
+- `payroll_export_packages` ya puede persistir `pdf_asset_id` y `csv_asset_id`
+- la generación de recibos y export packages ya puede registrar metadata shared sobre el bucket privado canónico
+
+Regla:
+- Payroll sigue siendo owner del agregado `receipt` / `export package`
+- pero el archivo físico y su delivery privado convergen sobre la foundation shared de assets
+
 ## Objetivo
 Definir el contrato arquitectónico del módulo `Payroll` de Greenhouse: qué ownership tiene, sobre qué anclas canónicas opera, cómo se calcula una nómina mensual, qué estados atraviesa, qué integra con otros módulos y qué superficies son las oficiales.
 

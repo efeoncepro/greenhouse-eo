@@ -62,6 +62,7 @@ import {
 } from '@/lib/hr-core/shared'
 import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 import { getPeopleTableColumns } from '@/lib/people/shared'
+import { buildPrivateAssetDownloadUrl } from '@/lib/storage/greenhouse-assets'
 
 type DepartmentRow = {
   department_id: string | null
@@ -168,6 +169,7 @@ type LeaveRequestRow = {
   requested_days: number | string | null
   status: string | null
   reason: string | null
+  attachment_asset_id: string | null
   attachment_url: string | null
   supervisor_member_id: string | null
   supervisor_name: string | null
@@ -311,7 +313,11 @@ const mapLeaveRequest = (row: LeaveRequestRow): HrLeaveRequest => ({
   requestedDays: toNullableNumber(row.requested_days) ?? 0,
   status: (row.status || 'pending_supervisor') as HrLeaveRequest['status'],
   reason: normalizeNullableString(row.reason),
-  attachmentUrl: normalizeNullableString(row.attachment_url),
+  attachmentAssetId: normalizeNullableString(row.attachment_asset_id),
+  attachmentUrl:
+    normalizeNullableString(row.attachment_asset_id)
+      ? buildPrivateAssetDownloadUrl(String(row.attachment_asset_id))
+      : normalizeNullableString(row.attachment_url),
   supervisorMemberId: normalizeNullableString(row.supervisor_member_id),
   supervisorName: normalizeNullableString(row.supervisor_name),
   hrReviewerUserId: normalizeNullableString(row.hr_reviewer_user_id),
