@@ -58,6 +58,20 @@ const brandAssetRegistry: Record<string, BrandAssetEntry> = {
     negativeWordmarkSrc: '/branding/logo-negative.svg',
     markSrc: '/branding/SVG/isotipo-full-efeonce.svg',
     negativeMarkSrc: '/branding/SVG/isotipo-efeonce-negativo.svg'
+  },
+  crm_solutions: {
+    label: 'CRM Solutions',
+    wordmarkSrc: '/branding/logo-full.svg',
+    negativeWordmarkSrc: '/branding/logo-negative.svg',
+    markSrc: '/branding/SVG/isotipo-full-efeonce.svg',
+    negativeMarkSrc: '/branding/SVG/isotipo-efeonce-negativo.svg'
+  },
+  'crm solutions': {
+    label: 'CRM Solutions',
+    wordmarkSrc: '/branding/logo-full.svg',
+    negativeWordmarkSrc: '/branding/logo-negative.svg',
+    markSrc: '/branding/SVG/isotipo-full-efeonce.svg',
+    negativeMarkSrc: '/branding/SVG/isotipo-efeonce-negativo.svg'
   }
 }
 

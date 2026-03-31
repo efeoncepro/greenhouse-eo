@@ -4,6 +4,34 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-31 — TASK-016 Business Units Canonical v2 Fase 1
+
+### Objetivo
+- Implementar Fase 1 de TASK-016: metadata canónica de business lines, helpers, API, admin UI y TenantContext enrichment.
+
+### Delta de ejecución
+- PG `service_modules` extendida con `module_kind` + `parent_module_code` (paridad con BigQuery)
+- Nueva tabla `greenhouse_core.business_line_metadata`: metadata rica por module_code con colores de `GH_COLORS.service`
+- Seed: 5 BLs (globe, efeonce_digital, reach, wave, crm_solutions)
+- Type: `BusinessLineMetadata` + `BusinessLineMetadataSummary` en `src/types/business-line.ts`
+- Helper: `loadBusinessLineMetadata()`, `updateBusinessLineMetadata()`, `getCachedBusinessLineSummaries()` en `src/lib/business-line/metadata.ts`
+- API: `GET/PUT /api/admin/business-lines` y `/api/admin/business-lines/[moduleCode]`
+- `TenantContext` extendido con `businessLineMetadata?: BusinessLineMetadataSummary[]` (cached server-side, no JWT)
+- Componente `BusinessLineMetadataCard` + barrel export
+- Admin page `/admin/business-lines` con `AdminBusinessLinesView` + `BusinessLineEditDialog`
+- `brand-assets.ts`: added `crm_solutions` entry
+- `helpers.ts`: added `getCapabilityPaletteFromMetadata()` (metadata-driven palette resolver)
+
+### Pendiente
+- Ejecutar migraciones SQL en `greenhouse-pg-dev` (scripts listos, no aplicados)
+- Fases 2-4: BigQuery dimension, FK migrations, Notion BU property, ICO by BU
+
+### Riesgos
+- Migraciones dependen de que `service_modules` ya tenga rows seeded (verificado: 19 rows existen)
+- `getCachedBusinessLineSummaries()` falla gracefully si tabla no existe aún (returns [])
+
+---
+
 ## Sesión 2026-03-31 — TASK-170 leave flow canónico + calendario + impacto payroll
 
 ### Objetivo

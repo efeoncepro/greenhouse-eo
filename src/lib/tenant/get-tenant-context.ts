@@ -3,6 +3,8 @@ import 'server-only'
 import { getServerSession } from 'next-auth'
 
 import { authOptions } from '@/lib/auth'
+import { getCachedBusinessLineSummaries } from '@/lib/business-line/metadata'
+import type { BusinessLineMetadataSummary } from '@/types/business-line'
 
 export interface TenantContext {
   userId: string
@@ -24,6 +26,9 @@ export interface TenantContext {
   portalHomePath: string
   authMode: string
 
+  // Business line enrichment (cached server-side, not stored in JWT)
+  businessLineMetadata?: BusinessLineMetadataSummary[]
+
   // Account 360 — nullable until M1 migration populates data
   spaceId?: string
   organizationId?: string
@@ -40,6 +45,11 @@ export const getTenantContext = async (): Promise<TenantContext | null> => {
   if (!session?.user) {
     return null
   }
+
+  // Enrich with cached BL metadata (global, not per-tenant)
+  const allSummaries = await getCachedBusinessLineSummaries()
+  const userBLSet = new Set(session.user.businessLines)
+  const businessLineMetadata = allSummaries.filter(s => userBLSet.has(s.moduleCode))
 
   return {
     userId: session.user.userId,
@@ -60,6 +70,9 @@ export const getTenantContext = async (): Promise<TenantContext | null> => {
     timezone: session.user.timezone,
     portalHomePath: session.user.portalHomePath,
     authMode: session.user.authMode,
+
+    // Business line enrichment
+    businessLineMetadata,
 
     // Account 360
     ...(session.user.spaceId ? { spaceId: session.user.spaceId } : {}),

@@ -4,6 +4,8 @@ import { es } from 'date-fns/locale'
 import type { ThemeColor } from '@core/types'
 
 import type { TenantCapabilityRecord } from '@/lib/admin/tenant-capability-types'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
+import type { BusinessLineMetadata } from '@/types/business-line'
 
 export const toTitleCase = (value: string) =>
   value
@@ -110,6 +112,42 @@ export const getCapabilityPalette = (
   }
 
   return { accent: '#1E3A5F', soft: 'rgba(30,58,95,0.12)', contrast: '#EFF6FF', label: 'Efeonce Core' }
+}
+
+/**
+ * Resolve capability palette from business_line_metadata when available.
+ * Falls back to the hardcoded heuristic-based resolution above.
+ */
+export const getCapabilityPaletteFromMetadata = (
+  capability: Pick<TenantCapabilityRecord, 'moduleCode' | 'parentModuleCode' | 'moduleLabel'>,
+  metadataMap: Map<string, BusinessLineMetadata>
+): CapabilityPalette => {
+  // Try exact match on moduleCode (for business_line records)
+  const direct = metadataMap.get(capability.moduleCode)
+
+  if (direct) {
+    return {
+      accent: direct.colorHex,
+      soft: direct.colorBg || `${direct.colorHex}12`,
+      contrast: GH_COLORS.service[direct.moduleCode as keyof typeof GH_COLORS.service]?.bg || '#F5F5F5',
+      label: direct.label
+    }
+  }
+
+  // Try parent module (for service_module records under a business_line)
+  const parent = capability.parentModuleCode ? metadataMap.get(capability.parentModuleCode) : null
+
+  if (parent) {
+    return {
+      accent: parent.colorHex,
+      soft: parent.colorBg || `${parent.colorHex}12`,
+      contrast: GH_COLORS.service[parent.moduleCode as keyof typeof GH_COLORS.service]?.bg || '#F5F5F5',
+      label: parent.label
+    }
+  }
+
+  // Fallback to legacy heuristic
+  return getCapabilityPalette(capability)
 }
 
 export const getCapabilitySourceLabel = (capability: TenantCapabilityRecord) => {

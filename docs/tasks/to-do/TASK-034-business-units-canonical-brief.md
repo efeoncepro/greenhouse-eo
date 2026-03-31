@@ -1,11 +1,17 @@
 # CODEX TASK — Business Units: Dimension Table Canónica y Sinergias Cross-System
 
+## Delta 2026-03-31
+- Fase 1 implementada en TASK-016. Ver `docs/tasks/in-progress/TASK-016-business-units-canonical.md`.
+- Arquitectura v2 usa `business_line_metadata` (1:1 sobre service_modules.module_code), NO `business_units(slug)` propuesta aquí.
+- PG service_modules ahora tiene `module_kind` y `parent_module_code` (paridad con BQ).
+- P0 de este brief está parcialmente cubierto por Fase 1 de TASK-016; P1-P4 siguen pendientes.
+
 ## Estado 2026-03-19
 
 Este brief se conserva como framing del problema de negocio y de la necesidad de normalizar Business Units en Greenhouse.
 
 Para implementación nueva y decisiones técnicas, usar como baseline:
-- `docs/tasks/to-do/CODEX_TASK_Business_Units_Canonical_v2.md`
+- `docs/tasks/in-progress/TASK-016-business-units-canonical.md` (v2 — Fase 1 implementada)
 
 En particular, no implementar literalmente desde esta versión:
 - una segunda identidad canónica de catálogo que compita con `service_modules`

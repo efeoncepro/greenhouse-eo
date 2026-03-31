@@ -157,7 +157,7 @@ Primer bloque operativo asignado:
 | 18 | ~~TASK-013~~ | — | — | — | — | **Cerrada** | DTE matching engine (multi-signal scoring), reconciliation proposals store, DTE coverage per org, 3 API endpoints, 12 unit tests. Cierra circuito Nubox→Finance. |
 | 19 | ~~TASK-014~~ | — | — | — | — | **Cerrada** | **Sinergia cross-module.** Conectar Projects con Account 360 vía Space-Notion bridge. Account Operational Metrics. |
 | 20 | `TASK-015` | [TASK-015-financial-intelligence-layer.md](to-do/TASK-015-financial-intelligence-layer.md) | P2 | Alto | Medio | Diseño | Trends, partnerships, cost allocations UI, LTV/CAC y vista analytics consolidada sobre foundation ya implementada |
-| 21 | `TASK-016` | [TASK-016-business-units-canonical.md](to-do/TASK-016-business-units-canonical.md) | P2 | Alto | Medio | Diseño | Metadata canónica para BU comercial vs operativa y analítica futura en Finance/ICO |
+| 21 | `TASK-016` | [TASK-016-business-units-canonical.md](in-progress/TASK-016-business-units-canonical.md) | P2 | Alto | Medio | **In Progress** | Fase 1 implementada: metadata PG, helpers, API, admin UI. Fases 2-4 pendientes. |
 | 22 | `TASK-017` | [TASK-017-campaign-360.md](to-do/TASK-017-campaign-360.md) | P2 | Alto | Alto | Diseño | Nuevo objeto canónico de negocio encima de `Space`, `Project` e `ICO Engine` |
 | 23 | `TASK-018` | [TASK-018-scim-user-provisioning.md](to-do/TASK-018-scim-user-provisioning.md) | P2 | Alto | Alto | Diseño | Provisioning enterprise sobre `Identity & Access V2` y PostgreSQL |
 | 24 | ~~`TASK-019`~~ | [TASK-019-staff-augmentation-module.md](complete/TASK-019-staff-augmentation-module.md) | P2 | Alto | Alto | **Cerrada** | Baseline runtime de Staff Augmentation sobre assignments, Finance, Payroll, providers y tooling |
