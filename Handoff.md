@@ -4,6 +4,42 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-31 — Staff Aug Postgres baseline reparado en GCP para develop
+
+### Objetivo
+- Investigar el `500` persistente de `GET /api/agency/staff-augmentation/placements` y corregirlo en la base real detrás de `develop`.
+
+### Delta de ejecución
+- Se confirmó en Vercel que el `500` venía de `error: relation "greenhouse...` sobre `/api/agency/staff-augmentation/placements`.
+- Verificación directa en GCP / Cloud SQL:
+  - instancia: `greenhouse-pg-dev`
+  - base: `greenhouse_app`
+  - usuario runtime: `greenhouse_app`
+  - las tablas de Staff Aug no existían realmente:
+    - `greenhouse_delivery.staff_aug_placements`
+    - `greenhouse_delivery.staff_aug_onboarding_items`
+    - `greenhouse_delivery.staff_aug_events`
+    - `greenhouse_serving.staff_aug_placement_snapshots`
+- Se aplicó el bootstrap canónico `pnpm setup:postgres:staff-augmentation` contra Cloud SQL usando el perfil `migrator` vía connector.
+- El problema no estaba en el código del endpoint sino en drift de schema en PostgreSQL para el entorno compartido.
+
+### Validación ejecutada
+- Confirmación previa del error en runtime logs de Vercel sobre `GET /api/agency/staff-augmentation/placements`.
+- Consulta directa por Cloud SQL Connector antes del fix:
+  - `to_regclass(...) = null` para las 4 tablas Staff Aug
+- Ejecución exitosa de setup:
+  - `pnpm setup:postgres:staff-augmentation`
+- Consulta directa por Cloud SQL Connector después del fix:
+  - `greenhouse_delivery.staff_aug_placements`
+  - `greenhouse_delivery.staff_aug_onboarding_items`
+  - `greenhouse_delivery.staff_aug_events`
+  - `greenhouse_serving.staff_aug_placement_snapshots`
+  - `COUNT(*) FROM greenhouse_delivery.staff_aug_placements = 0`
+
+### Limitación real
+- En esta pasada no hubo smoke autenticado final del listado contra `dev-greenhouse` después del repair de Cloud SQL porque el runner no conserva una sesión autenticada reutilizable del portal.
+- Sí queda verificación directa sobre la base real de `develop` de que el schema faltante ya existe y es legible por el usuario runtime.
+
 ## Sesión 2026-03-31 — Staff Aug create placement moved to dedicated route after real freeze reproduction
 
 ### Objetivo

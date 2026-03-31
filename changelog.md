@@ -2,6 +2,14 @@
 
 ## 2026-03-31
 
+- Se reparó en GCP el baseline faltante de PostgreSQL para Staff Aug en el entorno de `develop`:
+  - `GET /api/agency/staff-augmentation/placements` estaba cayendo con `500` porque no existían las tablas `staff_aug_*` en `greenhouse-pg-dev / greenhouse_app`
+  - se aplicó el setup canónico `pnpm setup:postgres:staff-augmentation` vía Cloud SQL Connector con perfil `migrator`
+  - quedaron materializadas:
+    - `greenhouse_delivery.staff_aug_placements`
+    - `greenhouse_delivery.staff_aug_onboarding_items`
+    - `greenhouse_delivery.staff_aug_events`
+    - `greenhouse_serving.staff_aug_placement_snapshots`
 - Staff Aug `Crear placement` ya no se monta dentro del listado:
   - `Agency > Staff Augmentation` ahora navega a `/agency/staff-augmentation/create`
   - el bridge desde `People` también usa la ruta dedicada con `assignmentId`
