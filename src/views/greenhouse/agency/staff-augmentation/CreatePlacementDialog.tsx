@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import Alert from '@mui/material/Alert'
-import Autocomplete from '@mui/material/Autocomplete'
+import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 import Dialog from '@mui/material/Dialog'
@@ -12,6 +12,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
+import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
 
 import CustomTextField from '@core/components/mui/TextField'
@@ -217,64 +218,80 @@ const CreatePlacementDialog = ({ open, onClose, onCreated, initialAssignmentId }
 
         <Grid container spacing={4}>
           <Grid size={{ xs: 12 }}>
-            <Autocomplete
-              options={options}
-              value={selectedAssignment}
-              inputValue={searchQuery}
-              onInputChange={(_event, value, reason) => {
+            <CustomTextField
+              fullWidth
+              label='Buscar assignment'
+              placeholder='Miembro, cliente, organización o ID'
+              value={searchQuery}
+              onChange={event => {
+                const value = event.target.value
+
                 setSearchQuery(value)
 
-                if (reason === 'clear') {
+                if (!value.trim()) {
                   setAssignmentId('')
                   setOptions([])
                 }
               }}
-              onChange={(_event, option) => {
-                setAssignmentId(option?.assignmentId || '')
-                setSearchQuery(option?.label || '')
-              }}
-              loading={metaLoading}
               disabled={loading}
-              noOptionsText={
-                searchQuery.trim().length < 2
-                  ? 'Escribe al menos 2 caracteres para buscar assignments elegibles.'
-                  : 'No encontramos assignments elegibles con ese criterio.'
+              helperText={
+                selectedAssignment
+                  ? `${selectedAssignment.memberLabel} · ${selectedAssignment.clientLabel}`
+                  : 'Busca una asignación activa sin placement previo. No cargamos toda la lista para evitar cuelgues.'
               }
-              getOptionLabel={option => option.label}
-              isOptionEqualToValue={(option, value) => option.assignmentId === value.assignmentId}
-              renderOption={(props, option) => (
-                <li {...props} key={option.assignmentId}>
-                  <div>
-                    <Typography variant='body2' fontWeight={600}>{option.memberLabel}</Typography>
-                    <Typography variant='caption' color='text.secondary'>
-                      {option.clientLabel}{option.organizationLabel ? ` · ${option.organizationLabel}` : ''}
-                    </Typography>
-                  </div>
-                </li>
-              )}
-              renderInput={params => (
-                <CustomTextField
-                  {...params}
-                  fullWidth
-                  label='Buscar assignment'
-                  placeholder='Miembro, cliente, organización o ID'
-                  helperText={
-                    selectedAssignment
-                      ? `${selectedAssignment.memberLabel} · ${selectedAssignment.clientLabel}`
-                      : 'Busca una asignación activa sin placement previo. No cargamos toda la lista para evitar cuelgues.'
-                  }
-                  InputProps={{
-                    ...params.InputProps,
-                    endAdornment: (
-                      <>
-                        {metaLoading ? <CircularProgress size={18} color='inherit' /> : null}
-                        {params.InputProps.endAdornment}
-                      </>
-                    )
-                  }}
-                />
-              )}
+              InputProps={{
+                endAdornment: metaLoading ? <CircularProgress size={18} color='inherit' /> : null
+              }}
             />
+            {searchQuery.trim().length >= 2 && !selectedAssignment ? (
+              <Paper variant='outlined' sx={{ mt: 2, overflow: 'hidden' }}>
+                {options.length ? (
+                  options.map(option => (
+                    <Box
+                      key={option.assignmentId}
+                      component='button'
+                      type='button'
+                      onClick={() => {
+                        setAssignmentId(option.assignmentId)
+                        setSearchQuery(option.label)
+                      }}
+                      sx={{
+                        width: '100%',
+                        px: 3,
+                        py: 2.5,
+                        border: 0,
+                        borderBottom: theme => `1px solid ${theme.palette.divider}`,
+                        backgroundColor: 'transparent',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        '&:last-of-type': {
+                          borderBottom: 0
+                        },
+                        '&:hover': {
+                          backgroundColor: 'action.hover'
+                        }
+                      }}
+                    >
+                      <Typography variant='body2' fontWeight={600}>{option.memberLabel}</Typography>
+                      <Typography variant='caption' color='text.secondary'>
+                        {option.clientLabel}{option.organizationLabel ? ` · ${option.organizationLabel}` : ''}
+                      </Typography>
+                    </Box>
+                  ))
+                ) : (
+                  <Typography variant='body2' color='text.secondary' sx={{ px: 3, py: 2.5 }}>
+                    {metaLoading
+                      ? 'Buscando assignments elegibles...'
+                      : 'No encontramos assignments elegibles con ese criterio.'}
+                  </Typography>
+                )}
+              </Paper>
+            ) : null}
+            {searchQuery.trim().length > 0 && searchQuery.trim().length < 2 && !selectedAssignment ? (
+              <Typography variant='caption' color='text.secondary' sx={{ mt: 1, display: 'block' }}>
+                Escribe al menos 2 caracteres para buscar assignments elegibles.
+              </Typography>
+            ) : null}
           </Grid>
           {selectedAssignment ? (
             <Grid size={{ xs: 12 }}>

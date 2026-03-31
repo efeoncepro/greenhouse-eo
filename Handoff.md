@@ -4,6 +4,32 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-31 — Staff Aug create placement freeze fallback simplification
+
+### Objetivo
+- Aplicar una mitigación más conservadora al cuelgue de `Crear placement` sin depender del stack `Dialog + Autocomplete`.
+
+### Delta de ejecución
+- Se reemplazó el selector `Autocomplete` del modal por un buscador incremental más simple:
+  - input controlado
+  - búsqueda remota debounceada
+  - lista inline de resultados elegibles dentro del dialog
+- Objetivo técnico:
+  - sacar del carril crítico la combinación `MUI Dialog + Autocomplete + Popper`
+  - mantener el contrato funcional del flujo sin volver al `select` masivo
+- Archivos tocados:
+  - `src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.tsx`
+  - `src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.test.tsx`
+
+### Validación ejecutada
+- `pnpm exec vitest run src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.test.tsx src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.test.tsx --reporter=verbose`
+- `pnpm exec eslint src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.tsx src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.test.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Limitación real
+- Se intentó verificación browser sobre `dev-greenhouse` pero quedó bloqueada por autenticación del portal dentro de Playwright.
+- Sí se confirmó que el alias `dev-greenhouse.efeoncepro.com` apunta al deployment del commit `e3936909`; lo que faltó fue una sesión Greenhouse reutilizable dentro del runner para ejecutar el click autenticado.
+
 ## Sesión 2026-03-31 — Staff Aug create placement freeze hardening
 
 ### Objetivo

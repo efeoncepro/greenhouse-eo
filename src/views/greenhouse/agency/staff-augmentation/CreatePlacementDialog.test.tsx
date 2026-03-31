@@ -66,7 +66,7 @@ describe('CreatePlacementDialog', () => {
       />
     )
 
-    const input = screen.getByRole('combobox', { name: 'Buscar assignment' })
+    const input = screen.getByRole('textbox', { name: 'Buscar assignment' })
 
     await user.type(input, 'dan')
 
@@ -77,7 +77,7 @@ describe('CreatePlacementDialog', () => {
     expect(String(fetchMock.mock.calls[0]?.[0])).toContain('/api/agency/staff-augmentation/placement-options?limit=20&search=dan')
     expect(screen.getByRole('heading', { name: 'Crear placement' })).toBeInTheDocument()
 
-    fireEvent.click(await screen.findByText('Daniela Ferreira'))
+    fireEvent.click(await screen.findByRole('button', { name: /Daniela Ferreira/i }))
 
     expect(await screen.findByText(/Sky Org · contractor · international/i)).toBeInTheDocument()
     expect(screen.getByText(/\$2\.800/i)).toBeInTheDocument()
