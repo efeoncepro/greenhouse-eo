@@ -77,21 +77,34 @@ const OrganizationView = ({ organizationId }: Props) => {
 
         setDetail(data)
 
-        // Fetch KPIs from operational PL
+        // Fetch KPIs from operational PL — aggregate client snapshots for this org's spaces
         try {
           const now = new Date()
-          const plRes = await fetch(`/api/finance/intelligence/operational-pl?year=${now.getFullYear()}&month=${now.getMonth() + 1}&scope=organization`)
+          const plRes = await fetch(`/api/finance/intelligence/operational-pl?year=${now.getFullYear()}&month=${now.getMonth() + 1}&scope=client`)
 
           if (plRes.ok) {
             const plData = await plRes.json()
-            const snap = (plData.snapshots ?? []).find((s: Record<string, unknown>) => s.scopeId === data.organizationId)
+            const allSnaps = plData.snapshots ?? []
 
-            if (snap) {
+            // Match by organization_id or by client IDs from this org's spaces
+            const orgClientIds = new Set(
+              (data.spaces ?? []).map((s: { clientId: string | null }) => s.clientId).filter(Boolean)
+            )
+
+            const orgSnaps = allSnaps.filter((s: Record<string, unknown>) =>
+              s.scopeId === data.organizationId || orgClientIds.has(s.scopeId as string)
+            )
+
+            if (orgSnaps.length > 0) {
+              const totalRev = orgSnaps.reduce((sum: number, s: Record<string, unknown>) => sum + Number(s.revenueClp ?? 0), 0)
+              const totalCost = orgSnaps.reduce((sum: number, s: Record<string, unknown>) => sum + Number(s.totalCostClp ?? 0), 0)
+              const totalFte = orgSnaps.reduce((sum: number, s: Record<string, unknown>) => sum + Number(s.headcountFte ?? 0), 0)
+
               setKpis({
-                revenueClp: Number(snap.revenueClp ?? 0),
-                grossMarginPct: snap.grossMarginPct != null ? Number(snap.grossMarginPct) : null,
-                headcountFte: snap.headcountFte != null ? Number(snap.headcountFte) : null,
-                totalCostClp: Number(snap.totalCostClp ?? 0)
+                revenueClp: totalRev,
+                grossMarginPct: totalRev > 0 ? Math.round(((totalRev - totalCost) / totalRev) * 1000) / 10 : null,
+                headcountFte: totalFte > 0 ? totalFte : null,
+                totalCostClp: totalCost
               })
             }
           }
