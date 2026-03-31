@@ -1,15 +1,24 @@
 'use client'
 
+import { useState } from 'react'
+
 import Accordion from '@mui/material/Accordion'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionSummary from '@mui/material/AccordionSummary'
+import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Divider from '@mui/material/Divider'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
+import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
@@ -110,10 +119,68 @@ type Props = {
 
 const PersonProfileTab = ({ detail }: Props) => {
   const { hrContext, identityContext, accessContext, deliveryContext, member } = detail
+  const [employmentDialogOpen, setEmploymentDialogOpen] = useState(false)
+  const [hireDateDraft, setHireDateDraft] = useState('')
+  const [hireDateOverride, setHireDateOverride] = useState<string | null>(null)
+  const [savingEmployment, setSavingEmployment] = useState(false)
+  const [employmentSaveError, setEmploymentSaveError] = useState<string | null>(null)
 
   const hasHr = !!hrContext
   const hasIdentityOrAccess = !!identityContext || !!accessContext
   const hasDelivery = !!deliveryContext
+  const effectiveHireDate = hireDateOverride ?? hrContext?.hireDate ?? null
+
+  const handleOpenEmploymentDialog = () => {
+    setHireDateDraft(effectiveHireDate ?? '')
+    setEmploymentSaveError(null)
+    setEmploymentDialogOpen(true)
+  }
+
+  const handleCloseEmploymentDialog = () => {
+    if (savingEmployment) {
+      return
+    }
+
+    setEmploymentDialogOpen(false)
+    setEmploymentSaveError(null)
+  }
+
+  const handleSaveEmployment = async () => {
+    setSavingEmployment(true)
+    setEmploymentSaveError(null)
+
+    try {
+      const response = await fetch(`/api/hr/core/members/${member.memberId}/profile`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          hireDate: hireDateDraft || null
+        })
+      })
+
+      const payload = await response.json().catch(() => null)
+
+      if (!response.ok) {
+        const errorMessage =
+          typeof payload?.error === 'string'
+            ? payload.error
+            : typeof payload?.message === 'string'
+              ? payload.message
+              : 'No se pudo guardar la fecha de ingreso.'
+
+        throw new Error(errorMessage)
+      }
+
+      setHireDateOverride(typeof payload?.hireDate === 'string' || payload?.hireDate === null ? payload.hireDate : hireDateDraft || null)
+      setEmploymentDialogOpen(false)
+    } catch (error) {
+      setEmploymentSaveError(error instanceof Error ? error.message : 'No se pudo guardar la fecha de ingreso.')
+    } finally {
+      setSavingEmployment(false)
+    }
+  }
 
   // ── Empty state ──
   if (!hasHr && !hasIdentityOrAccess && !hasDelivery) {
@@ -146,7 +213,7 @@ const PersonProfileTab = ({ detail }: Props) => {
         { label: 'Nivel de cargo', value: hrContext.jobLevel ?? '' },
         { label: 'Tipo de empleo', value: hrContext.employmentType ?? '' },
         { label: 'Tipo de contrato', value: hrContext.compensation?.contractType ?? '' },
-        { label: 'Fecha de ingreso', value: formatDate(hrContext.hireDate) },
+        { label: 'Fecha de ingreso', value: formatDate(effectiveHireDate) },
         { label: 'Fin de contrato', value: formatDate(hrContext.contractEndDate) },
         { label: 'Supervisor', value: hrContext.supervisorName ?? '' },
         {
@@ -206,7 +273,21 @@ const PersonProfileTab = ({ detail }: Props) => {
               </AccordionSummary>
               <Divider />
               <AccordionDetails sx={{ pt: 4 }}>
-                <FieldGrid fields={hrFields} />
+                <Stack spacing={4}>
+                  <Stack direction='row' justifyContent='flex-end'>
+                    <Button
+                      size='small'
+                      variant='tonal'
+                      color='primary'
+                      startIcon={<i className='tabler-edit' />}
+                      onClick={handleOpenEmploymentDialog}
+                    >
+                      Editar ingreso
+                    </Button>
+                  </Stack>
+
+                  <FieldGrid fields={hrFields} />
+                </Stack>
               </AccordionDetails>
             </Accordion>
           </Card>
@@ -478,6 +559,37 @@ const PersonProfileTab = ({ detail }: Props) => {
           </Card>
         </Grid>
       )}
+
+      <Dialog open={employmentDialogOpen} onClose={handleCloseEmploymentDialog} maxWidth='xs' fullWidth>
+        <DialogTitle>Editar fecha de ingreso</DialogTitle>
+        <DialogContent>
+          <Stack spacing={3} sx={{ pt: 1 }}>
+            <Typography variant='body2' color='text.secondary'>
+              Este dato se usa como referencia laboral del colaborador y también afecta reglas como vacaciones por antiguedad.
+            </Typography>
+
+            <TextField
+              fullWidth
+              size='small'
+              label='Fecha de ingreso'
+              type='date'
+              value={hireDateDraft}
+              onChange={event => setHireDateDraft(event.target.value)}
+              slotProps={{ inputLabel: { shrink: true } }}
+            />
+
+            {employmentSaveError && <Alert severity='error'>{employmentSaveError}</Alert>}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button variant='tonal' color='secondary' onClick={handleCloseEmploymentDialog} disabled={savingEmployment}>
+            Cancelar
+          </Button>
+          <Button variant='contained' onClick={handleSaveEmployment} disabled={savingEmployment}>
+            {savingEmployment ? 'Guardando...' : 'Guardar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Grid>
   )
 }

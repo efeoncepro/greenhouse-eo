@@ -245,6 +245,15 @@ Regla de producto para self-service y HR:
 - `/hr/leave` es la superficie operativa de revisión, saldos y calendario del equipo
 - ambas surfaces deben consumir el mismo runtime canónico de leave, no helpers paralelos ni cálculos locales en la UI
 
+Regla de captura de `hire_date`:
+
+- `hire_date` sí afecta el dominio de vacaciones por antigüedad/progresivos
+- mientras `HR profile` no tenga cutover formal a PostgreSQL, la edición operativa de `hire_date` permanece en el carril HR legacy:
+  - write path: `PATCH /api/hr/core/members/[memberId]/profile`
+  - persistencia actual: `greenhouse.team_members.hire_date` en BigQuery
+- `greenhouse_core.members.hire_date` puede existir como proyección o snapshot canónico de consumo, pero no debe reemplazar el write path operativo antes del cutover explícito del módulo
+- no mover esta edición a `Postgres-first` por simetría con `leave` o `payroll`; aquí prevalece el ownership operativo actual de `HR profile`
+
 Contrato de eventos:
 
 - `leave_request.created`

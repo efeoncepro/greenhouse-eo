@@ -4,6 +4,10 @@
 - `People > HR profile` ya expone edición visible de `hireDate` en la card `Información laboral`.
 - La UI usa `PATCH /api/hr/core/members/[memberId]/profile` y refleja el valor guardado en la misma tab sin depender de un refresh posterior del contexto HR agregado.
 - Esto cierra la brecha operativa detectada después de endurecer `leave`: el sistema ya podía usar `hire_date` para antigüedad/progresivos, pero RRHH no tenía una surface clara para mantener ese dato.
+- Decisión explícita de runtime:
+  - `hireDate` sigue escribiéndose en `greenhouse.team_members.hire_date` sobre BigQuery
+  - `greenhouse_core.members.hire_date` no reemplaza todavía ese write path
+  - mientras `HR profile` no tenga cutover formal a PostgreSQL, este dato debe mantenerse BigQuery-first en edición y Postgres como consumo/proyección
 
 ## Delta 2026-03-31 TASK-169 Staff Aug bridge People -> Assignment -> Placement
 - El bridge real de `Staff Augmentation` ya no debe interpretarse como `ghost slot -> placement`.

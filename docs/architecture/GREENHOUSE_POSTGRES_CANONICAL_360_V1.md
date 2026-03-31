@@ -254,6 +254,13 @@ The first runtime cutover already follows this pattern:
   - `greenhouse_serving.member_leave_360`
   - `greenhouse_serving.person_hr_360`
 
+Important boundary:
+- `HR > Permisos` already consumes canonical member identity from Postgres
+- `HR profile` editing is not fully cut over to PostgreSQL yet
+- fields such as `hire_date` still have their operational write path in BigQuery legacy tables:
+  - `greenhouse.team_members.hire_date`
+- therefore `greenhouse_core.members` must still be treated here as canonical identity plus downstream consumption anchor, not as the operational source of every mutable HR profile field
+
 That is the actual platform synergy we want.
 
 ## Serving Views

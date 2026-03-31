@@ -14,14 +14,20 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - La tab abre un diálogo pequeño y guarda `hireDate` vía `PATCH /api/hr/core/members/[memberId]/profile`.
 - La vista prioriza el valor devuelto por el profile HR recién guardado para que el cambio se refleje de inmediato aunque otro contexto de lectura todavía no se refresque.
 - Esto deja operativa la captura del dato que `leave` ya usa para antigüedad/progresivos en vacaciones.
+- Se deja explícito en arquitectura que este dato sigue siendo `BigQuery-first` para edición y no debe moverse todavía a `Postgres-first`.
+- Corrección posterior: la edición visible quedó finalmente en la surface real `People > [colaborador] > Perfil > Datos laborales`; el primer intento había quedado en `PersonHrProfileTab`, componente hoy no montado por `PersonTabs`.
 
 ### Archivos de alto impacto
 - `src/views/greenhouse/people/tabs/PersonHrProfileTab.tsx`
 - `src/views/greenhouse/people/tabs/PersonHrProfileTab.test.tsx`
+- `src/views/greenhouse/people/tabs/PersonProfileTab.tsx`
+- `src/views/greenhouse/people/tabs/PersonProfileTab.test.tsx`
 
 ### Validación ejecutada
 - `pnpm exec vitest run src/views/greenhouse/people/tabs/PersonHrProfileTab.test.tsx`
+- `pnpm exec vitest run src/views/greenhouse/people/tabs/PersonProfileTab.test.tsx src/views/greenhouse/people/PersonTabs.test.tsx`
 - `pnpm exec eslint src/views/greenhouse/people/tabs/PersonHrProfileTab.tsx src/views/greenhouse/people/tabs/PersonHrProfileTab.test.tsx`
+- `pnpm exec eslint src/views/greenhouse/people/tabs/PersonProfileTab.tsx src/views/greenhouse/people/tabs/PersonProfileTab.test.tsx`
 - `pnpm exec tsc --noEmit --pretty false`
 - `pnpm build`
 
