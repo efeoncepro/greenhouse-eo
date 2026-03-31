@@ -7,6 +7,18 @@
 - En la verificación manual asistida solo aparecieron errores de `vercel.live`/CSP embed, no fallos funcionales del runtime Greenhouse.
 - `TASK-164` quedó alineada documentalmente a su estado real implementado; Purchase Orders y HES ya no deben interpretarse como diseño pendiente.
 
+## Delta 2026-03-30 Finance staging smoke for PO/HES/Intelligence
+- `staging` ya carga también las surfaces:
+  - `/finance/purchase-orders`
+  - `/finance/hes`
+  - `/finance/intelligence`
+- Durante la verificación:
+  - `GET /api/cost-intelligence/periods?limit=12` respondió `200`
+  - `GET /api/notifications/unread-count` respondió `200`
+- Observación abierta pero no bloqueante:
+  - `finance/intelligence` dispara un `OPTIONS /dashboard -> 400` durante prefetch; no impidió render ni la carga de datos principales del módulo
+- El resto del ruido de consola observado sigue siendo el embed/CSP report-only de `vercel.live`.
+
 ## Delta 2026-03-30 Finance/Nubox docs reconciled to runtime
 - `docs/architecture/FINANCE_DUAL_STORE_CUTOVER_V1.md` ya no debe leerse como snapshot operativo actual; quedó explícitamente reclasificado como historial de migración.
 - `TASK-163` y `TASK-165` quedaron alineadas al estado real ya absorbido por runtime para evitar que futuros agentes reabran lanes que ya cerraron en código.

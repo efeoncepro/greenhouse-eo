@@ -22,6 +22,26 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - Browser verification en `staging`
 - `git diff --check`
 
+## Sesión 2026-03-30 — smoke visual de Purchase Orders, HES y Finance Intelligence en staging
+
+### Objetivo
+- Verificar que las surfaces nuevas/cerradas de Finance cargan realmente en `staging` después de los últimos cortes.
+
+### Delta de ejecución
+- Verificación manual asistida con browser:
+  - `https://dev-greenhouse.efeoncepro.com/finance/purchase-orders` carga como `Órdenes de compra`
+  - `https://dev-greenhouse.efeoncepro.com/finance/hes` carga como `Hojas de entrada de servicio`
+  - `https://dev-greenhouse.efeoncepro.com/finance/intelligence` carga como `Economía operativa — Greenhouse`
+- Requests relevantes observados:
+  - `GET /api/cost-intelligence/periods?limit=12` → `200`
+  - `GET /api/notifications/unread-count` → `200`
+- Consola:
+  - se mantiene ruido conocido de `vercel.live` / CSP report-only
+  - en `finance/intelligence` apareció además `OPTIONS /dashboard -> 400` durante prefetch; no bloqueó render ni las llamadas principales del módulo
+
+### Validación ejecutada
+- Browser verification en `staging`
+
 ## Sesión 2026-03-30 — reconciliación documental final Finance/Nubox
 
 ### Objetivo

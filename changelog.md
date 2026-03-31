@@ -10,6 +10,18 @@
   - Purchase Orders y HES ya no se leen como spec pendiente
   - el documento ahora deja claro que el módulo ya fue absorbido por runtime y UI
 
+## 2026-03-30 (session 5)
+
+- Smoke visual en `staging` completado para:
+  - `/finance/purchase-orders`
+  - `/finance/hes`
+  - `/finance/intelligence`
+- Resultado:
+  - las tres surfaces cargan y renderizan
+  - `GET /api/cost-intelligence/periods?limit=12` respondió `200`
+  - `GET /api/notifications/unread-count` respondió `200`
+  - en `finance/intelligence` quedó observación no bloqueante de `OPTIONS /dashboard -> 400` durante prefetch, sin impacto visible en el módulo
+
 ## 2026-03-30 (session 3)
 
 - Se reconciliaron documentos rezagados de Finance/Nubox para que la documentación no siga describiendo un estado anterior al runtime real:
