@@ -206,6 +206,62 @@ Non-fit modules:
 - módulos sin concepto de cierre mensual ni ventana de aprobación no deberían depender de esta policy por defecto
 - si un módulo solo necesita una fecha de calendario civil simple, no debe cargar la complejidad de la policy operativa
 
+## 2.8. Leave, vacations and payroll impact contract
+
+`Leave` y `Payroll` comparten el mismo calendario operativo canónico, pero no el mismo ownership transaccional.
+
+Regla arquitectónica:
+
+- `leave` vive en `greenhouse_hr`
+- `payroll` vive en `greenhouse_payroll`
+- el puente entre ambos no es una tabla compartida mutable, sino:
+  - calendario operativo común
+  - lectura de licencias aprobadas por período
+  - eventos de outbox semánticos cuando una licencia cambia
+
+Source of truth de permisos:
+
+- `greenhouse_hr.leave_types`
+- `greenhouse_hr.leave_policies`
+- `greenhouse_hr.leave_balances`
+- `greenhouse_hr.leave_requests`
+- `greenhouse_hr.leave_request_actions`
+- serving views:
+  - `greenhouse_serving.member_leave_360`
+  - `greenhouse_serving.person_hr_360`
+
+Regla para vacaciones:
+
+- la persona solicita vacaciones por rango de fechas, no por “cantidad manual” de días
+- el sistema deriva los días hábiles desde `src/lib/calendar/operational-calendar.ts`
+- la capa de feriados usa `src/lib/calendar/nager-date-holidays.ts` con `Nager.Date` + overrides locales persistidos
+- no se cuentan fines de semana ni feriados
+- la timezone canónica sigue siendo `America/Santiago`
+- el saldo se valida contra `leave_policies` y `leave_balances`, incluyendo carry-over, progressive extra days y ajustes
+
+Regla de producto para self-service y HR:
+
+- `/my/leave` es la superficie personal de saldo, historial y calendario
+- `/hr/leave` es la superficie operativa de revisión, saldos y calendario del equipo
+- ambas surfaces deben consumir el mismo runtime canónico de leave, no helpers paralelos ni cálculos locales en la UI
+
+Contrato de eventos:
+
+- `leave_request.created`
+- `leave_request.escalated_to_hr`
+- `leave_request.approved`
+- `leave_request.rejected`
+- `leave_request.cancelled`
+- `leave_request.payroll_impact_detected`
+
+Regla de impacto en nómina:
+
+- cuando una licencia aprobada, rechazada o cancelada toca un período existente de nómina, el sistema debe detectarlo
+- si el período aún no está exportado, la proyección reactiva `leave_payroll_recalculation` puede recalcular la nómina oficial
+- si el período ya está exportado, no se debe mutar automáticamente; el sistema solo alerta a Payroll/Finance para ajuste controlado
+- costos, finanzas, providers y tooling no consumen `leave_request.*` directo como source of truth económico
+- el carril canónico es `leave -> payroll -> projections downstream`
+
 ## 3. Superficies oficiales
 
 ### Rutas UI
@@ -545,6 +601,19 @@ Snapshot guardado por entry:
 Regla:
 - la asistencia afecta salario base y conectividad cuando corresponde
 - el entry guarda el resultado ajustado, no solo el valor fuente
+
+Semántica adicional de licencias:
+
+- `days_on_leave` representa días de licencia aprobada dentro del período
+- `days_on_unpaid_leave` representa la porción sin goce de sueldo o equivalente no pagado
+- `vacaciones` y otras licencias pagadas pueden reducir presencia efectiva sin necesariamente reducir base imponible del mismo modo que una ausencia no pagada
+- la clasificación de impacto debe salir del dominio `leave` y de la policy asociada al tipo de permiso, no de heurísticas en el cálculo de nómina
+
+Regla de recalculo:
+
+- si cambia una licencia que ya intersecta un período creado/calculado/aprobado, la señal nace en `leave_request.payroll_impact_detected`
+- Payroll decide si recalcula automáticamente o deja solo alerta operativa según el estado del período
+- `exported` sigue siendo lock final y no debe recibir recálculo automático desde `leave`
 
 ## 14. Edición manual y recálculo de entries
 

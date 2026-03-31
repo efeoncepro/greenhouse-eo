@@ -2,15 +2,22 @@
 
 import { useEffect, useRef, useState } from 'react'
 
+import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
 import Divider from '@mui/material/Divider'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
 import Grid from '@mui/material/Grid'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
+import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import type { Theme } from '@mui/material/styles'
 
@@ -79,6 +86,10 @@ const PersonHrProfileTab = ({ memberId, hrContext = null, defaultOperationalMetr
   const [supplementalLoaded, setSupplementalLoaded] = useState(false)
   const [icoSnapshot, setIcoSnapshot] = useState<IcoMetricSnapshot | null>(null)
   const [icoLoaded, setIcoLoaded] = useState(false)
+  const [employmentDialogOpen, setEmploymentDialogOpen] = useState(false)
+  const [hireDateDraft, setHireDateDraft] = useState('')
+  const [savingEmployment, setSavingEmployment] = useState(false)
+  const [employmentSaveError, setEmploymentSaveError] = useState<string | null>(null)
 
   useEffect(() => {
     let active = true
@@ -229,6 +240,7 @@ const PersonHrProfileTab = ({ memberId, hrContext = null, defaultOperationalMetr
   const rpa = viewModel.operational.rpa != null ? viewModel.operational.rpa.toFixed(2) : null
   const throughput = viewModel.operational.throughput != null ? viewModel.operational.throughput.toFixed(1) : null
   const operationalSubtitle = [viewModel.operational.sourceLabel, viewModel.operational.periodLabel].filter(Boolean).join(' · ')
+  const effectiveHireDate = supplementalProfile?.hireDate ?? viewModel.employment.hireDate
 
   const documentValue = viewModel.personal.documentNumberMasked
     ? `${viewModel.personal.documentType ?? ''} ${viewModel.personal.documentNumberMasked}`.trim()
@@ -237,6 +249,69 @@ const PersonHrProfileTab = ({ memberId, hrContext = null, defaultOperationalMetr
   const bankValue = viewModel.personal.bankAccountNumberMasked
     ? `${viewModel.personal.bankAccountType ?? ''} ${viewModel.personal.bankAccountNumberMasked}`.trim()
     : '—'
+
+  const handleOpenEmploymentDialog = () => {
+    setHireDateDraft(effectiveHireDate ?? '')
+    setEmploymentSaveError(null)
+    setEmploymentDialogOpen(true)
+  }
+
+  const handleCloseEmploymentDialog = () => {
+    if (savingEmployment) {
+      return
+    }
+
+    setEmploymentDialogOpen(false)
+    setEmploymentSaveError(null)
+  }
+
+  const handleSaveEmployment = async () => {
+    setSavingEmployment(true)
+    setEmploymentSaveError(null)
+
+    try {
+      const response = await fetch(`/api/hr/core/members/${memberId}/profile`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          hireDate: hireDateDraft || null
+        })
+      })
+
+      const payload = await response.json().catch(() => null)
+
+      if (!response.ok) {
+        const errorMessage =
+          typeof payload?.error === 'string'
+            ? payload.error
+            : typeof payload?.message === 'string'
+              ? payload.message
+              : 'No se pudo guardar la fecha de ingreso.'
+
+        throw new Error(errorMessage)
+      }
+
+      const nextProfile = payload?.profile ?? payload ?? null
+
+      setSupplementalProfile(current => {
+        if (!nextProfile) {
+          return current
+        }
+
+        return {
+          ...(current ?? {}),
+          ...nextProfile
+        } as HrMemberProfile
+      })
+      setEmploymentDialogOpen(false)
+    } catch (error) {
+      setEmploymentSaveError(error instanceof Error ? error.message : 'No se pudo guardar la fecha de ingreso.')
+    } finally {
+      setSavingEmployment(false)
+    }
+  }
 
   return (
     <Grid container spacing={6}>
@@ -290,6 +365,17 @@ const PersonHrProfileTab = ({ memberId, hrContext = null, defaultOperationalMetr
         <Card elevation={0} sx={cardBorderSx}>
           <CardHeader
             title='Información laboral'
+            action={
+              <Button
+                size='small'
+                variant='tonal'
+                color='primary'
+                startIcon={<i className='tabler-edit' />}
+                onClick={handleOpenEmploymentDialog}
+              >
+                Editar ingreso
+              </Button>
+            }
             avatar={
               <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
                 <i className='tabler-briefcase' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} />
@@ -314,7 +400,7 @@ const PersonHrProfileTab = ({ memberId, hrContext = null, defaultOperationalMetr
                 <DetailRow label='Reporta a' value={viewModel.employment.supervisorName ?? '—'} />
                 <DetailRow label='Nivel' value={viewModel.employment.jobLevel ? jobLevelLabel[viewModel.employment.jobLevel] ?? viewModel.employment.jobLevel : '—'} />
                 <DetailRow label='Tipo empleo' value={viewModel.employment.employmentType ? employmentTypeLabel[viewModel.employment.employmentType] ?? viewModel.employment.employmentType : '—'} />
-                <DetailRow label='Fecha ingreso' value={formatDate(viewModel.employment.hireDate)} />
+                <DetailRow label='Fecha ingreso' value={formatDate(effectiveHireDate)} />
                 {viewModel.employment.contractEndDate && (
                   <DetailRow label='Fin contrato' value={formatDate(viewModel.employment.contractEndDate)} />
                 )}
@@ -544,6 +630,37 @@ const PersonHrProfileTab = ({ memberId, hrContext = null, defaultOperationalMetr
 
       {/* Finance Impact */}
       <FinanceImpactCard memberId={memberId} />
+
+      <Dialog open={employmentDialogOpen} onClose={handleCloseEmploymentDialog} maxWidth='xs' fullWidth>
+        <DialogTitle>Editar fecha de ingreso</DialogTitle>
+        <DialogContent>
+          <Stack spacing={3} sx={{ pt: 1 }}>
+            <Typography variant='body2' color='text.secondary'>
+              Este dato se usa como referencia laboral del colaborador y también afecta reglas como vacaciones por antiguedad.
+            </Typography>
+
+            <TextField
+              fullWidth
+              size='small'
+              label='Fecha de ingreso'
+              type='date'
+              value={hireDateDraft}
+              onChange={event => setHireDateDraft(event.target.value)}
+              slotProps={{ inputLabel: { shrink: true } }}
+            />
+
+            {employmentSaveError && <Alert severity='error'>{employmentSaveError}</Alert>}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button variant='tonal' color='secondary' onClick={handleCloseEmploymentDialog} disabled={savingEmployment}>
+            Cancelar
+          </Button>
+          <Button variant='contained' onClick={handleSaveEmployment} disabled={savingEmployment}>
+            {savingEmployment ? 'Guardando...' : 'Guardar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Grid>
   )
 }

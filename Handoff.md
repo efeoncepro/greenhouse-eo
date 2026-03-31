@@ -4,6 +4,30 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-31 — HR profile UI para fecha de ingreso
+
+### Objetivo
+- Cerrar la brecha operativa detectada después de `TASK-170`: el backend ya soportaba `hire_date`, pero RRHH no tenía una UI visible para editarla y eso debilitaba el uso real de vacaciones por antigüedad.
+
+### Delta de ejecución
+- `People > HR profile` ahora expone acción `Editar ingreso` en la card `Información laboral`.
+- La tab abre un diálogo pequeño y guarda `hireDate` vía `PATCH /api/hr/core/members/[memberId]/profile`.
+- La vista prioriza el valor devuelto por el profile HR recién guardado para que el cambio se refleje de inmediato aunque otro contexto de lectura todavía no se refresque.
+- Esto deja operativa la captura del dato que `leave` ya usa para antigüedad/progresivos en vacaciones.
+
+### Archivos de alto impacto
+- `src/views/greenhouse/people/tabs/PersonHrProfileTab.tsx`
+- `src/views/greenhouse/people/tabs/PersonHrProfileTab.test.tsx`
+
+### Validación ejecutada
+- `pnpm exec vitest run src/views/greenhouse/people/tabs/PersonHrProfileTab.test.tsx`
+- `pnpm exec eslint src/views/greenhouse/people/tabs/PersonHrProfileTab.tsx src/views/greenhouse/people/tabs/PersonHrProfileTab.test.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Limitación real
+- El endpoint de edición sigue escribiendo por el carril HR legacy/profile y no corta todavía directo a `greenhouse_core.members` en Postgres.
+
 ## Sesión 2026-03-31 — TASK-016 Business Units Canonical v2 Fase 1
 
 ### Objetivo

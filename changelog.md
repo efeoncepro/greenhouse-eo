@@ -2,6 +2,10 @@
 
 ## 2026-03-31
 
+- `People > HR profile` ahora permite editar `Fecha de ingreso` desde la propia card de información laboral:
+  - usa el endpoint existente `PATCH /api/hr/core/members/[memberId]/profile`
+  - el valor se refleja de inmediato en la UI sin esperar otro refresh de contexto
+  - esto cierra la brecha operativa que dejaba a `leave`/vacaciones con `hire_date` técnicamente soportado pero no mantenible desde pantalla
 - `TASK-170` se reconcilió contra el runtime real de HR Leave:
   - la task deja de asumir un módulo “nuevo” y se alinea al baseline existente en PostgreSQL, serving views, APIs y UI
   - `leave` ya calcula días hábiles desde el calendario operativo canónico + feriados Chile

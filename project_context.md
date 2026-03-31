@@ -1,5 +1,10 @@
 # project_context.md
 
+## Delta 2026-03-31 HR profile hire-date editing
+- `People > HR profile` ya expone edición visible de `hireDate` en la card `Información laboral`.
+- La UI usa `PATCH /api/hr/core/members/[memberId]/profile` y refleja el valor guardado en la misma tab sin depender de un refresh posterior del contexto HR agregado.
+- Esto cierra la brecha operativa detectada después de endurecer `leave`: el sistema ya podía usar `hire_date` para antigüedad/progresivos, pero RRHH no tenía una surface clara para mantener ese dato.
+
 ## Delta 2026-03-31 TASK-169 Staff Aug bridge People -> Assignment -> Placement
 - El bridge real de `Staff Augmentation` ya no debe interpretarse como `ghost slot -> placement`.
 - Estado vigente:

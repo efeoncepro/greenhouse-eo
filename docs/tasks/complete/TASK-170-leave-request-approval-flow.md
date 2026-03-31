@@ -66,6 +66,12 @@
   - `leave_types = 10`
   - `leave_balances = 4`
 
+## Delta 2026-03-31 — captura operativa de hire date
+
+- `leave` ya usaba `hire_date` para reglas de antigüedad/progresivos, pero faltaba una surface visible para que RRHH mantuviera ese dato.
+- `People > HR profile` ahora permite editar `Fecha de ingreso` desde la card de información laboral usando el endpoint HR ya existente.
+- Esto no cambia la semántica del dominio leave, pero sí cierra una dependencia operativa real para que vacaciones por antigüedad no queden apoyadas en un dato “solo técnico”.
+
 ## Summary
 
 Cerrar la lane operativa de permisos sobre el baseline ya existente de HR Core, endureciendo:
