@@ -4,6 +4,67 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-31 — TASK-173 bootstrap remoto Cloud SQL + ownership drift
+
+### Objetivo
+
+- Cerrar el pendiente remoto de `TASK-173`: aplicar `setup:postgres:shared-assets` en Cloud SQL y dejar el setup reproducible con el perfil `migrator`, sin seguir dependiendo de `postgres` ni de fallbacks por schema drift.
+
+### Estado actual
+
+- `greenhouse-pg-dev / greenhouse_app` ya tiene aplicado `shared-assets-platform-v1`.
+- Validación remota confirmada:
+  - `greenhouse_core.assets`
+  - `greenhouse_core.asset_access_log`
+  - `greenhouse_hr.leave_requests.attachment_asset_id`
+  - `greenhouse_finance.purchase_orders.attachment_asset_id`
+  - `greenhouse_payroll.payroll_receipts.asset_id`
+  - `greenhouse_payroll.payroll_export_packages.pdf_asset_id`
+  - `greenhouse_payroll.payroll_export_packages.csv_asset_id`
+  - FKs e índices shared asociados
+- Ownership corregido:
+  - `greenhouse_finance.purchase_orders -> greenhouse_migrator`
+  - `greenhouse_payroll.payroll_receipts -> greenhouse_migrator`
+  - `greenhouse_payroll.payroll_export_packages -> greenhouse_migrator`
+- Revalidación canónica ejecutada:
+  - `pnpm pg:doctor --profile=admin` OK (`current_user=postgres`)
+  - `pnpm pg:doctor --profile=migrator` OK (`current_user=greenhouse_migrator_user`)
+  - `pnpm setup:postgres:shared-assets` OK con `greenhouse_migrator_user`
+
+### Hallazgo operativo importante
+
+- El proyecto sí tiene un login break-glass `greenhouse_ops`.
+- Hereda:
+  - `greenhouse_app`
+  - `greenhouse_migrator`
+  - `greenhouse_migrator_user`
+  - `postgres`
+- Se usó solo para resolver ownership drift histórico cuando `postgres` no pudo hacer `ALTER TABLE ... OWNER TO ...` sobre un objeto owned por `greenhouse_app`.
+- Después del saneamiento, el carril canónico volvió a quedar en `greenhouse_migrator_user`.
+
+### Pendiente real
+
+- `TASK-173` ya no tiene pendiente GCP/DDL.
+- El único punto abierto es smoke manual autenticado en `staging` de upload/download sobre:
+  - `leave`
+  - `purchase orders`
+
+### Archivos tocados
+
+- `docs/tasks/in-progress/TASK-173-shared-attachments-platform-gcp-governance.md`
+- `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Nota de coordinación
+
+- Al iniciar esta sesión el árbol ya venía dirty en:
+  - `src/lib/ico-engine/materialize.ts`
+  - `src/lib/ico-engine/schema.ts`
+  - `src/lib/ico-engine/shared.ts`
+- No fueron tocados por este trabajo y deben considerarse cambios ajenos.
+
 ## Sesión 2026-03-31 — TASK-173 foundation compartida de adjuntos + buckets GCP
 
 ### Objetivo
@@ -144,6 +205,7 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
 - `helpers.ts`: added `getCapabilityPaletteFromMetadata()` (metadata-driven palette resolver)
 
 Fase 2 completada:
+
 - `greenhouse_conformed.dim_business_lines` creada y poblada en BigQuery (5 BLs)
 - ETL `scripts/etl-business-lines-to-bigquery.ts` (PG → BQ full replace)
 - Finance `/api/finance/dashboard/by-service-line` enriched con metadata (label, colorHex, loopPhase)
@@ -151,11 +213,13 @@ Fase 2 completada:
 - Todas las migraciones aplicadas contra `greenhouse-pg-dev` con `greenhouse_ops`
 
 Fase 3 completada:
+
 - Propiedad `Business Unit` (Select: Globe, Efeonce Digital, Reach, Wave, CRM Solutions) creada en Notion Proyectos via API
 - `sync-notion-conformed.ts` extendido: normaliza label→module_code, escribe `operating_business_unit`
 - BQ `delivery_projects.operating_business_unit` columna agregada
 
 Fase 4 completada:
+
 - `ICO_DIMENSIONS` allowlist: `business_unit` → `operating_business_unit`
 - `v_tasks_enriched` JOIN a `delivery_projects` para exponer BU
 - `ico_engine.metrics_by_business_unit` tabla + materialization (Step 10)

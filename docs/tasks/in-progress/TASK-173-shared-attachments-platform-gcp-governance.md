@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
-- Status real: `Implementación repo lista; bootstrap GCP pendiente`
+- Status real: `Bootstrap GCP aplicado; smoke autenticado pendiente`
 - Rank: `56`
 - Domain: `platform`
 
@@ -29,6 +29,29 @@
 - La base real auditada no tiene hoy un registry genérico de `assets/attachments` en PostgreSQL.
 - Las tablas activas revisadas (`leave_requests`, `leave_balances`, `payroll_receipts`, `payroll_export_packages`, `purchase_orders`) tampoco exponen FKs físicas declaradas, así que el contrato shared debe validar anchors canónicos desde aplicación y no asumir FK enforcement ya existente.
 
+## Delta 2026-03-31 — bootstrap remoto aplicado y ownership saneado
+
+- `pnpm setup:postgres:shared-assets` ya quedó aplicado realmente en `greenhouse-pg-dev / greenhouse_app` usando el perfil `migrator`.
+- Validación remota confirmada:
+  - `greenhouse_sync.schema_migrations` registra `shared-assets-platform-v1`
+  - existen las columnas:
+    - `greenhouse_hr.leave_requests.attachment_asset_id`
+    - `greenhouse_finance.purchase_orders.attachment_asset_id`
+    - `greenhouse_payroll.payroll_receipts.asset_id`
+    - `greenhouse_payroll.payroll_export_packages.pdf_asset_id`
+    - `greenhouse_payroll.payroll_export_packages.csv_asset_id`
+  - existen sus FKs e índices canónicos
+- Drift operativo corregido en Cloud SQL:
+  - `greenhouse_finance.purchase_orders`
+  - `greenhouse_payroll.payroll_receipts`
+  - `greenhouse_payroll.payroll_export_packages`
+    quedaron `OWNER TO greenhouse_migrator` para que el setup sea reproducible con `greenhouse_migrator_user` y no dependa de `postgres`.
+- Hallazgo operativo documentado:
+  - `greenhouse_ops` existe como carril break-glass y hereda `greenhouse_migrator`, `greenhouse_migrator_user`, `greenhouse_app` y `postgres`
+  - se usó solo para sanear ownership histórico cuando `postgres` no alcanzó a transferir un objeto owned por `greenhouse_app`
+- La lane sigue `in-progress` solo por un punto restante:
+  - smoke manual autenticado de upload/download en `staging` sobre `leave` y `purchase orders`
+
 ## Delta 2026-03-31 — implementación en repo y limitación operativa real
 
 - La foundation shared ya quedó implementada en el repo:
@@ -46,8 +69,8 @@
   - convergencia shared de `payroll export packages`
 - Estado real de despliegue:
   - la implementación de repo quedó validada con `tsc`, `lint` y `build`
-  - el bootstrap remoto en GCP/Cloud SQL quedó pendiente porque en esta sesión no hubo acceso al secreto `migrator`
-  - por lo tanto, la task sigue `in-progress` hasta aplicar `setup:postgres:shared-assets` con credenciales `migrator` y validar smoke autenticado
+  - el bootstrap remoto en GCP/Cloud SQL ya quedó aplicado
+  - la task sigue `in-progress` solo hasta validar smoke autenticado manual en `staging`
 - Cambio de lectura importante:
   - `leave` ya no depende de `attachmentUrl` manual en el código nuevo
   - `purchase orders` ya no depende solo de `attachment_url` libre
@@ -67,9 +90,8 @@
   - `leave` vuelve a quedar compatible con el deploy actual
   - el upload/download privado shared ya tiene foundation suficiente para `leave`
 - Estado aún pendiente para cerrar la task completa:
-  - `greenhouse_finance.purchase_orders` sigue owned por `postgres`
-  - `greenhouse_payroll.payroll_receipts` sigue owned por `postgres`
-  - por eso el bootstrap full `pnpm setup:postgres:shared-assets` todavía no puede cerrar `purchase orders` ni `payroll receipts` sin acceso al secreto/owner `postgres`
+  - este delta ya quedó absorbido por el bootstrap full posterior
+  - el pendiente operativo real se redujo a smoke manual autenticado
 
 ## Delta 2026-03-31 — compatibilidad repo para consumers legacy restantes
 
@@ -87,8 +109,8 @@
   - `pnpm lint`
   - `pnpm build`
 - Verificación remota del bloqueo residual:
-  - con credenciales runtime, `ALTER TABLE greenhouse_finance.purchase_orders ...` responde `must be owner of table purchase_orders`
-  - por lo tanto, el único pendiente real para cerrar `TASK-173` en GCP es acceso con el owner/credencial correcta para `purchase_orders` y `payroll_receipts`
+  - este bloqueo quedó resuelto después de aplicar ownership con el carril break-glass `greenhouse_ops`
+  - `greenhouse_migrator_user` ya puede reejecutar `pnpm setup:postgres:shared-assets` sin depender de `postgres`
 
 ## Summary
 
@@ -369,7 +391,7 @@ Reglas obligatorias:
 - [x] `payroll receipts` y `payroll export packages` quedan alineados al contrato shared aunque mantengan sus surfaces actuales.
 - [x] `TASK-027` y `TASK-028` quedan actualizadas para consumir la foundation shared en vez de redefinir storage base.
 - [x] El path de downloads privados queda autenticado y no depende de exponer URLs permanentes del bucket.
-- [ ] Aplicar `pnpm setup:postgres:shared-assets` en GCP/Cloud SQL con perfil `migrator`.
+- [x] Aplicar `pnpm setup:postgres:shared-assets` en GCP/Cloud SQL con perfil `migrator`.
 - [ ] Validar smoke manual autenticado de upload/download sobre `leave` y `purchase orders` en `staging`.
 
 ## Verification
@@ -397,4 +419,4 @@ Esto da el mejor equilibrio entre seguridad, gobernanza y simplicidad operativa.
 
 - Derivar una task de migración/backfill si se decide mover `greenhouse-media` actual a buckets separados por visibilidad.
 - Evaluar scanning y retención avanzada como lane aparte si aparecen requisitos legales o enterprise.
-- Aplicar el DDL remoto y validar permisos `migrator/runtime` como cierre operativo real de la lane.
+- Ejecutar smoke autenticado en `staging` para marcar la lane como `complete`.
