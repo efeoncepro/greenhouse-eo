@@ -1,5 +1,49 @@
 # project_context.md
 
+## Delta 2026-03-30 TASK-142 agency space 360 runtime
+- `Agency Space 360` ya existe como surface operativa y no debe leerse como redirect pendiente.
+- Surface visible vigente:
+  - `/agency/spaces/[id]`
+  - `GET /api/agency/spaces/[id]`
+- Contrato runtime nuevo:
+  - `src/lib/agency/space-360.ts`
+  - resuelve `clientId` como key operativa actual y enriquece con `space_id` + organización cuando existe vínculo canónico
+- Fuentes activas de la 360:
+  - `greenhouse_core.spaces`
+  - `greenhouse_serving.operational_pl_snapshots`
+  - `agency-finance-metrics`
+  - `greenhouse_core.client_team_assignments`
+  - `member_capacity_economics`
+  - `services`
+  - `greenhouse_delivery.staff_aug_placements`
+  - `greenhouse_sync.outbox_events`
+  - ICO latest snapshot + project metrics + stuck assets
+- Regla vigente:
+  - `Health` y `Risk` visibles en la 360 siguen siendo heurísticas transicionales
+  - scores materializados y eventos Agency propios quedan como follow-ons (`TASK-150`, `TASK-151`, `TASK-148`)
+
+## Delta 2026-03-30 TASK-019 staff augmentation baseline closure
+- `Staff Augmentation` ya existe como módulo runtime de `Agency`, no como brief futuro.
+- Ancla canónica:
+  - `greenhouse_core.client_team_assignments`
+  - `assignment_type = 'staff_augmentation'`
+- Tablas vigentes:
+  - `greenhouse_delivery.staff_aug_placements`
+  - `greenhouse_delivery.staff_aug_onboarding_items`
+  - `greenhouse_delivery.staff_aug_events`
+  - `greenhouse_serving.staff_aug_placement_snapshots`
+- Wiring reactivo vigente:
+  - eventos `staff_aug.*`
+  - proyección `staff_augmentation_placements`
+  - refresh entrante desde assignments, finance, providers, tooling y payroll
+- Surface visible vigente:
+  - `/agency/staff-augmentation`
+  - `/agency/staff-augmentation/[placementId]`
+  - `Agency > Team` ya expone signal de placement en assignments
+- Regla vigente:
+  - Staff Aug se monta sobre assignments existentes
+  - providers, finance suppliers y AI tooling actúan como consumidores y referencias del placement, no como identidades paralelas
+
 ## Delta 2026-03-30 TASK-059 provider canonical object reactivo
 - `Provider` ya no debe leerse como ancla parcial o solo documental.
 - Estado vigente:

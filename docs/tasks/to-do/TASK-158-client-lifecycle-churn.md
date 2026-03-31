@@ -1,3 +1,7 @@
+## Delta 2026-03-30
+- `TASK-142` ya dejó listo el `OverviewTab` de `Space 360` como punto de consumo para lifecycle.
+- Esta task puede agregar badge/timeline sobre la shell existente y reutilizar `GET /api/agency/spaces/[id]` como contexto base.
+
 # TASK-158 — Client Lifecycle Intelligence & Churn Prediction
 
 ## Status

@@ -10,8 +10,11 @@ CREATE TABLE IF NOT EXISTS greenhouse_core.client_team_assignments (
   assignment_id TEXT PRIMARY KEY,
   client_id TEXT NOT NULL REFERENCES greenhouse_core.clients(client_id),
   member_id TEXT NOT NULL REFERENCES greenhouse_core.members(member_id),
+  assignment_type TEXT NOT NULL DEFAULT 'internal'
+    CHECK (assignment_type IN ('internal', 'staff_augmentation')),
   fte_allocation NUMERIC(5,3) NOT NULL DEFAULT 0,
   hours_per_month INTEGER,
+  contracted_hours_month INTEGER,
   role_title_override TEXT,
   relevance_note_override TEXT,
   contact_channel_override TEXT,
@@ -37,9 +40,26 @@ GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER ON greenhous
 DO $$
 BEGIN
   ALTER TABLE greenhouse_core.client_team_assignments
+    ADD COLUMN IF NOT EXISTS assignment_type TEXT NOT NULL DEFAULT 'internal';
+  ALTER TABLE greenhouse_core.client_team_assignments
+    ADD COLUMN IF NOT EXISTS contracted_hours_month INTEGER;
+  ALTER TABLE greenhouse_core.client_team_assignments
     ADD COLUMN IF NOT EXISTS relevance_note_override TEXT;
   ALTER TABLE greenhouse_core.client_team_assignments
     ADD COLUMN IF NOT EXISTS contact_channel_override TEXT;
   ALTER TABLE greenhouse_core.client_team_assignments
     ADD COLUMN IF NOT EXISTS contact_handle_override TEXT;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'client_team_assignments_assignment_type_check'
+  ) THEN
+    ALTER TABLE greenhouse_core.client_team_assignments
+      ADD CONSTRAINT client_team_assignments_assignment_type_check
+      CHECK (assignment_type IN ('internal', 'staff_augmentation'));
+  END IF;
 END $$;

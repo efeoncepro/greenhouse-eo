@@ -54,6 +54,9 @@ interface MemberAssignment {
   fteAllocation: number
   hoursPerMonth: number
   startDate: string | null
+  assignmentType?: string
+  placementId?: string | null
+  placementStatus?: string | null
 }
 
 interface CapacityBreakdown {
@@ -106,6 +109,24 @@ const HEALTH_COLORS: Record<string, 'secondary' | 'success' | 'warning' | 'error
 
 const HEALTH_LABELS: Record<string, string> = {
   idle: 'Disponible', balanced: 'Balanceado', high: 'Dedicación completa', overloaded: 'Sobrecomprometido'
+}
+
+const PLACEMENT_STATUS_LABELS: Record<string, string> = {
+  pipeline: 'Pipeline',
+  onboarding: 'Onboarding',
+  active: 'Activo',
+  renewal_pending: 'Renovación',
+  renewed: 'Renovado',
+  ended: 'Cerrado'
+}
+
+const PLACEMENT_STATUS_COLORS: Record<string, 'secondary' | 'info' | 'success' | 'warning' | 'primary' | 'error'> = {
+  pipeline: 'secondary',
+  onboarding: 'info',
+  active: 'success',
+  renewal_pending: 'warning',
+  renewed: 'primary',
+  ended: 'error'
 }
 
 const formatHours = (value: number | null) => (value === null ? '—' : `${value}h`)
@@ -509,7 +530,18 @@ return acc }, {} as Record<string, number>)
                                     {row.original.assignments?.map((a: MemberAssignment) => (
                                       <tr key={a.assignmentId}>
                                         <td style={{ padding: '4px 8px' }}>
-                                          <Typography variant='body2'>{a.clientName || a.clientId}</Typography>
+                                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                                            <Typography variant='body2'>{a.clientName || a.clientId}</Typography>
+                                            {a.assignmentType === 'staff_augmentation' ? (
+                                              <CustomChip
+                                                round='true'
+                                                size='small'
+                                                variant='tonal'
+                                                color={PLACEMENT_STATUS_COLORS[a.placementStatus || 'pipeline'] || 'secondary'}
+                                                label={a.placementStatus ? `Staff Aug · ${PLACEMENT_STATUS_LABELS[a.placementStatus] || a.placementStatus}` : 'Staff Aug'}
+                                              />
+                                            ) : null}
+                                          </Box>
                                         </td>
                                         <td style={{ textAlign: 'right', padding: '4px 8px' }}>
                                           <Typography variant='body2'>{a.fteAllocation.toFixed(2)}</Typography>
@@ -522,6 +554,17 @@ return acc }, {} as Record<string, number>)
                                         </td>
                                         <td style={{ textAlign: 'right', padding: '4px 8px' }}>
                                           <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
+                                            {a.placementId ? (
+                                              <Tooltip title='Abrir placement'>
+                                                <IconButton
+                                                  size='small'
+                                                  component='a'
+                                                  href={`/agency/staff-augmentation/${a.placementId}`}
+                                                >
+                                                  <i className='tabler-briefcase-2' style={{ fontSize: 16 }} />
+                                                </IconButton>
+                                              </Tooltip>
+                                            ) : null}
                                             <Tooltip title='Editar'>
                                               <IconButton size='small' onClick={() => handleEditAssignment(row.original, a)}>
                                                 <i className='tabler-edit' style={{ fontSize: 16 }} />

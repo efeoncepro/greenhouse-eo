@@ -614,7 +614,15 @@ Goals connect to evaluations in Phase 3: the eval summary pulls goal completion 
 
 Staff Augmentation is the most tightly coupled external module. A placement IS a member with `contract_type IN ('contractor', 'eor')` assigned to a client Space with `assignment_type = 'staff_augmentation'`. The HRIS owns the person's HR lifecycle; Staff Aug owns the commercial relationship with the client.
 
-Reference: `CODEX_TASK_Staff_Augmentation_Module.md`
+Runtime baseline as of 2026-03-30:
+- UI/API surface: `/agency/staff-augmentation/*`
+- Transactional tables:
+  - `greenhouse_delivery.staff_aug_placements`
+  - `greenhouse_delivery.staff_aug_onboarding_items`
+  - `greenhouse_delivery.staff_aug_events`
+- Serving table:
+  - `greenhouse_serving.staff_aug_placement_snapshots`
+- Reference task: `TASK-019-staff-augmentation-module.md`
 
 **6 integration points:**
 
@@ -626,7 +634,7 @@ Rule: when creating a placement, copy `members.contract_type`, `members.deel_con
 
 **8.6.2 Onboarding (sequential, not overlapping)**
 
-HRIS onboarding (`greenhouse_hr.onboarding_instances`) handles the person's entry into Efeonce: accounts, contracts, internal access. Staff Aug onboarding (`placement_onboarding_checklists`) handles the person's placement into a client: client stack access, client team intro, client communication setup.
+HRIS onboarding (`greenhouse_hr.onboarding_instances`) handles the person's entry into Efeonce: accounts, contracts, internal access. Staff Aug onboarding (`greenhouse_delivery.staff_aug_onboarding_items`) handles the person's placement into a client: client stack access, client team intro, client communication setup.
 
 Sequence: HRIS onboarding runs first (or concurrently), Staff Aug onboarding runs when the placement is created. They are separate checklist instances with separate templates, but both reference the same `member_id`.
 
@@ -656,7 +664,7 @@ Rule: only non-confidential documents of types `contrato`, `nda`, and `certifica
 
 **8.6.6 Member profile / skills → talent matching**
 
-The `MemberProfile` in HRIS (skills, tools, AI suites, output type) feeds Staff Aug's talent matching. When creating a placement, the `CreatePlacementDrawer` should:
+The `MemberProfile` in HRIS (skills, tools, AI suites, output type) feeds Staff Aug's talent matching. When creating a placement, the `CreatePlacementDialog` should:
 1. Load the member's `skills_highlighted` from `MemberProfile`
 2. Compare against the `required_skills` specified for the placement
 3. Auto-populate `matched_skills` as the intersection

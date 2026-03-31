@@ -77,7 +77,10 @@ export const AGGREGATE_TYPES = {
   periodClosure: 'period_closure',
   commercialCostAttribution: 'commercial_cost_attribution',
   operationalPl: 'operational_pl',
-  marginAlert: 'margin_alert'
+  marginAlert: 'margin_alert',
+  staffAugPlacement: 'staff_aug_placement',
+  staffAugOnboardingItem: 'staff_aug_onboarding_item',
+  staffAugPlacementSnapshot: 'staff_aug_placement_snapshot'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -198,7 +201,12 @@ export const EVENT_TYPES = {
   accountingPeriodReopened: 'accounting.period_reopened',
   accountingCommercialCostAttributionMaterialized: 'accounting.commercial_cost_attribution.materialized',
   accountingPlSnapshotMaterialized: 'accounting.pl_snapshot.materialized',
-  accountingMarginAlertTriggered: 'accounting.margin_alert.triggered'
+  accountingMarginAlertTriggered: 'accounting.margin_alert.triggered',
+  staffAugPlacementCreated: 'staff_aug.placement.created',
+  staffAugPlacementUpdated: 'staff_aug.placement.updated',
+  staffAugPlacementStatusChanged: 'staff_aug.placement.status_changed',
+  staffAugOnboardingItemUpdated: 'staff_aug.onboarding_item.updated',
+  staffAugPlacementSnapshotMaterialized: 'staff_aug.placement_snapshot.materialized'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
@@ -227,6 +235,10 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.financeSupplierCreated,
   EVENT_TYPES.financeSupplierUpdated,
   EVENT_TYPES.providerUpserted,
+  EVENT_TYPES.staffAugPlacementCreated,
+  EVENT_TYPES.staffAugPlacementUpdated,
+  EVENT_TYPES.staffAugPlacementStatusChanged,
+  EVENT_TYPES.staffAugOnboardingItemUpdated,
   EVENT_TYPES.payrollPeriodCreated,
   EVENT_TYPES.payrollPeriodUpdated,
   EVENT_TYPES.payrollPeriodCalculated,

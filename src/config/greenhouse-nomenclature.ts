@@ -41,6 +41,7 @@ export const GH_AGENCY_NAV = {
   capacity: { label: 'Capacidad', subtitle: 'Carga operativa global del equipo' },
   organizations: { label: 'Organizaciones', subtitle: 'Cuentas, relaciones y estructura' },
   services: { label: 'Servicios', subtitle: 'Servicios contratados por Space' },
+  staffAugmentation: { label: 'Staff Augmentation', subtitle: 'Placements, onboarding y economía por assignment' },
   economics: { label: 'Economía', subtitle: 'P&L y rentabilidad' },
   team: { label: 'Equipo', subtitle: 'Capacidad y dedicación' },
   delivery: { label: 'Delivery', subtitle: 'ICO, sprints y producción' },

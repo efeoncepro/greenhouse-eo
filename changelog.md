@@ -1,5 +1,47 @@
 # changelog.md
 
+## 2026-03-30 (session 12)
+
+- `TASK-142` quedó cerrada como `Agency Space 360` operativa:
+  - `/agency/spaces/[id]` ya no redirige a Admin
+  - nueva store `src/lib/agency/space-360.ts`
+  - nueva route `GET /api/agency/spaces/[id]`
+  - nueva surface `src/views/greenhouse/agency/space-360/*`
+- La 360 compone el baseline real del repo:
+  - resolución `clientId -> space_id`
+  - `operational_pl_snapshots` y `agency-finance-metrics`
+  - assignments + `member_capacity_economics`
+  - `services`
+  - `staff_aug_placements`
+  - `greenhouse_sync.outbox_events`
+  - métricas ICO, project metrics y stuck assets
+- Cobertura nueva:
+  - `src/lib/agency/space-360.test.ts`
+  - `src/app/api/agency/spaces/[id]/route.test.ts`
+  - `src/views/greenhouse/agency/space-360/Space360View.test.tsx`
+- Impacto cruzado documentado:
+  - `TASK-146`, `TASK-150`, `TASK-151`, `TASK-158` y `TASK-159` ya no deben asumir que `Space 360` sigue pendiente como shell
+
+## 2026-03-30 (session 11)
+
+- `TASK-019` quedó cerrada como baseline real de `Staff Augmentation`:
+  - setup Postgres dedicado para placements, onboarding, event log y serving snapshots
+  - store/runtime en `src/lib/staff-augmentation/*`
+  - eventos `staff_aug.*` y proyección reactiva `staff_augmentation_placements`
+  - rutas `Agency > Staff Augmentation` con listado, creación y detalle `Placement 360`
+- Sinergias conectadas:
+  - `Agency > Team` ahora expone estado de placement por assignment y CTA al placement
+  - snapshots económicos combinan Finance, Payroll, cost attribution, direct expenses y provider tooling
+  - drilldowns desde placement hacia `Agency Team`, `Payroll` y `AI Tooling`
+- Cobertura nueva:
+  - tests de projection/event catalog para `staff_aug.*`
+  - test del route contract de `capacity-breakdown` con `assignment_type`/placement metadata
+  - tests UI de listado y detalle de `Staff Augmentation`
+- Documentación reconciliada:
+  - `TASK-019` movida a `complete`
+  - deltas agregados a `TASK-038` y `TASK-041`
+  - `project_context`, `Handoff` y `Greenhouse_HRIS_Architecture_v1.md` actualizados
+
 ## 2026-03-30 (session 10)
 
 - `TASK-059` quedó cerrada también en navegación y pruebas:

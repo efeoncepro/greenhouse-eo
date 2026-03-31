@@ -4,6 +4,117 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — cierre de TASK-142 Agency Space 360
+
+### Objetivo
+- Cerrar `TASK-142` end-to-end: runtime, API, UI, pruebas y documentación viva.
+
+### Delta de ejecución
+- `/agency/spaces/[id]` ya no redirige a `/admin/tenants/*`.
+- Nueva agregación canónica:
+  - `src/lib/agency/space-360.ts`
+  - resuelve `clientId` como clave operativa y la enriquece con `space_id`, organización, Finance, ICO, Team, Services, Staff Aug y outbox activity
+- Nueva surface:
+  - `src/views/greenhouse/agency/space-360/Space360View.tsx`
+  - tabs `Overview`, `Team`, `Services`, `Delivery`, `Finance`, `ICO`
+- Nueva route:
+  - `src/app/api/agency/spaces/[id]/route.ts`
+- Governance:
+  - la page usa `getTenantContext()` + `hasAuthorizedViewCode('gestion.spaces')`
+- Impacto cruzado ya documentado:
+  - `TASK-146`, `TASK-150`, `TASK-151`, `TASK-158`, `TASK-159`
+
+### Validación ejecutada
+- `pnpm exec vitest run 'src/app/api/agency/spaces/[id]/route.test.ts' 'src/views/greenhouse/agency/space-360/Space360View.test.tsx' src/lib/agency/space-360.test.ts`
+- `pnpm exec eslint 'src/app/api/agency/spaces/[id]/route.ts' 'src/app/api/agency/spaces/[id]/route.test.ts' 'src/app/(dashboard)/agency/spaces/[id]/page.tsx' 'src/lib/agency/space-360.ts' 'src/lib/agency/space-360.test.ts' 'src/views/greenhouse/agency/space-360/Space360View.tsx' 'src/views/greenhouse/agency/space-360/Space360View.test.tsx' 'src/views/greenhouse/agency/space-360/shared.ts' 'src/views/greenhouse/agency/space-360/tabs/*.tsx'`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm pg:doctor --profile=runtime` intentado al inicio, pero bloqueado por variables faltantes:
+  - `GREENHOUSE_POSTGRES_DATABASE`
+  - `GREENHOUSE_POSTGRES_USER`
+  - `GREENHOUSE_POSTGRES_PASSWORD` / secret ref
+
+### Lifecycle
+- `TASK-142` debe quedar en `docs/tasks/complete/`
+- `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `project_context.md` y `changelog.md` quedan actualizados
+
+## Sesión 2026-03-30 — inicio de TASK-142 Agency Space 360
+
+### Objetivo
+- Reconciliar `TASK-142` con la arquitectura real y reemplazar el redirect de `/agency/spaces/[id]` por una vista `Space 360` operativa sobre el baseline actual de Agency.
+
+### Contexto clave
+- `TASK-142` estaba desalineada:
+  - asumía `BigQuery-first`
+  - asumía que el route param ya era `space_id` puro
+  - dejaba implícito que el health/risk engine ya existía
+- Estado real confirmado:
+  - el listado Agency navega hoy por `clientId` como proxy del Space
+  - el runtime sí tiene `greenhouse_core.spaces`, `services`, `operational_pl_snapshots`, `member_capacity_economics`, `staff_aug_*` y `outbox_events` para componer una 360 útil
+  - la emisión específica de eventos Agency sigue siendo follow-on de `TASK-148`, no un bloqueo para esta vista
+- `pnpm pg:doctor --profile=runtime` fue intentado y falló por variables faltantes:
+  - `GREENHOUSE_POSTGRES_DATABASE`
+  - `GREENHOUSE_POSTGRES_USER`
+  - `GREENHOUSE_POSTGRES_PASSWORD` / secret ref
+
+### Delta de ejecución
+- `TASK-142` movida a `docs/tasks/in-progress/`
+- `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` alineados a `in-progress`
+- La task ya quedó corregida con delta explícito:
+  - `clientId` como key operativa actual con resolución posterior a `space_id`
+  - consumo preferente de serving/projections existentes
+  - health/risk como heurística transicional en esta lane
+
+## Sesión 2026-03-30 — cierre de TASK-019 Staff Augmentation
+
+### Objetivo
+- Reconciliar `TASK-019` contra arquitectura/modelo de datos/codebase/cloud y cerrarla completa con runtime, outbox/projections, consumers Agency y documentación viva.
+
+### Delta de ejecución
+- Baseline Staff Aug cerrado sobre `client_team_assignments`:
+  - `assignment_type` ya forma parte del flujo operativo
+  - nuevo bootstrap en `scripts/setup-postgres-staff-augmentation.sql` + `setup-postgres-staff-augmentation.ts`
+  - tablas vigentes:
+    - `greenhouse_delivery.staff_aug_placements`
+    - `greenhouse_delivery.staff_aug_onboarding_items`
+    - `greenhouse_delivery.staff_aug_events`
+    - `greenhouse_serving.staff_aug_placement_snapshots`
+- Runtime nuevo:
+  - `src/lib/staff-augmentation/store.ts`
+  - `src/lib/staff-augmentation/snapshots.ts`
+  - `src/lib/sync/projections/staff-augmentation.ts`
+  - eventos `staff_aug.*` en `src/lib/sync/event-catalog.ts`
+- Surface nueva en Agency:
+  - `/agency/staff-augmentation`
+  - `/agency/staff-augmentation/[placementId]`
+  - navegación/gobernanza:
+    - `gestion.staff_augmentation`
+    - `GH_AGENCY_NAV.staffAugmentation`
+    - sidebar de Agency
+- Consumer actualizado:
+  - `src/app/api/team/capacity-breakdown/route.ts` ahora expone `assignmentType`, `placementId` y `placementStatus`
+  - `src/views/agency/AgencyTeamView.tsx` muestra chip Staff Aug y CTA al placement
+- Drilldowns del placement:
+  - `/agency/team`
+  - `/hr/payroll`
+  - `/admin/ai-tools?tab=catalog&providerId=<id>`
+- Consistencia corregida:
+  - onboarding limpia `verified_at` / `verified_by_user_id` al salir de `done`
+  - latest snapshot del detail se normaliza a camelCase
+  - KPI cards del listado usan summary real del backend, no solo la página visible
+  - creación redirige al `Placement 360` recién creado
+
+### Validación ejecutada
+- `pnpm exec vitest run src/app/api/team/capacity-breakdown/route.test.ts src/lib/sync/projections/staff-augmentation.test.ts src/lib/sync/event-catalog.test.ts src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.test.tsx src/views/greenhouse/agency/staff-augmentation/PlacementDetailView.test.tsx`
+- `pnpm exec eslint src/lib/staff-augmentation/store.ts src/lib/staff-augmentation/snapshots.ts src/lib/sync/projections/staff-augmentation.ts src/lib/sync/event-catalog.ts src/app/api/team/capacity-breakdown/route.ts src/app/api/team/capacity-breakdown/route.test.ts src/views/agency/AgencyTeamView.tsx src/views/greenhouse/agency/staff-augmentation/CreatePlacementDialog.tsx src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.tsx src/views/greenhouse/agency/staff-augmentation/StaffAugmentationListView.test.tsx src/views/greenhouse/agency/staff-augmentation/PlacementDetailView.tsx src/views/greenhouse/agency/staff-augmentation/PlacementDetailView.test.tsx 'src/app/(dashboard)/agency/layout.tsx' 'src/app/(dashboard)/agency/staff-augmentation/page.tsx' 'src/app/(dashboard)/agency/staff-augmentation/[placementId]/page.tsx' src/components/layout/vertical/VerticalMenu.tsx src/config/greenhouse-nomenclature.ts src/lib/admin/view-access-catalog.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
+### Impacto documental
+- `TASK-019` movida a `docs/tasks/complete/`
+- `docs/tasks/README.md` debe quedar con `TASK-019` cerrada y con `TASK-038`/`TASK-041` reinterpretadas como follow-ons/documentos históricos
+- `TASK-038` y `TASK-041` ya tienen delta aclarando el baseline real
+- `docs/architecture/Greenhouse_HRIS_Architecture_v1.md`, `project_context.md` y `changelog.md` quedaron reconciliados con el runtime actual
+
 ## Sesión 2026-03-30 — cierre end-to-end UI/tests de TASK-059
 
 ### Objetivo

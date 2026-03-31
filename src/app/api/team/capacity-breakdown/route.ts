@@ -32,6 +32,9 @@ interface AssignmentRow extends Record<string, unknown> {
   fte_allocation: string | number
   contracted_hours_month: number | null
   start_date: string | null
+  assignment_type: string | null
+  placement_id: string | null
+  placement_status: string | null
 }
 
 const isInternalAssignment = (row: AssignmentRow) => {
@@ -84,9 +87,13 @@ export async function GET() {
           a.assignment_id, a.member_id, a.client_id, c.client_name,
           a.role_title_override, a.fte_allocation,
           COALESCE(a.contracted_hours_month, ROUND(a.fte_allocation * 160))::int AS contracted_hours_month,
-          a.start_date::text AS start_date
+          a.start_date::text AS start_date,
+          a.assignment_type,
+          placement.placement_id,
+          placement.status AS placement_status
         FROM greenhouse_core.client_team_assignments a
         LEFT JOIN greenhouse_core.clients c ON c.client_id = a.client_id
+        LEFT JOIN greenhouse_delivery.staff_aug_placements placement ON placement.assignment_id = a.assignment_id
         WHERE a.active = TRUE
           AND (a.end_date IS NULL OR a.end_date >= CURRENT_DATE)
         ORDER BY a.member_id, c.client_name`
@@ -141,6 +148,9 @@ export async function GET() {
         fteAllocation: number
         hoursPerMonth: number
         startDate: string | null
+        assignmentType: string
+        placementId: string | null
+        placementStatus: string | null
       }>
     }> = []
 
@@ -201,7 +211,10 @@ export async function GET() {
           clientName: row.client_name,
           fteAllocation: Number(row.fte_allocation) || 0,
           hoursPerMonth: Number(row.contracted_hours_month) || 0,
-          startDate: row.start_date
+          startDate: row.start_date,
+          assignmentType: String(row.assignment_type || 'internal'),
+          placementId: row.placement_id,
+          placementStatus: row.placement_status
         }))
       })
     }

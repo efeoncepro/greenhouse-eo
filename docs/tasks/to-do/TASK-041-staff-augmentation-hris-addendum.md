@@ -1,5 +1,18 @@
 # CODEX TASK — Staff Augmentation Module: Addendum HRIS Integration
 
+## Delta 2026-03-30
+- `TASK-019` ya quedó cerrada como baseline runtime de Staff Augmentation sobre `Postgres-first`; esta addendum ya no depende de un módulo inexistente, sino de un baseline operativo real.
+- La surface vigente del módulo es `Agency > Staff Augmentation`:
+  - `/agency/staff-augmentation`
+  - `/agency/staff-augmentation/[placementId]`
+- El runtime actual usa:
+  - `greenhouse_delivery.staff_aug_placements`
+  - `greenhouse_delivery.staff_aug_onboarding_items`
+  - `greenhouse_delivery.staff_aug_events`
+  - `greenhouse_serving.staff_aug_placement_snapshots`
+- El helper de creación ya no es `CreatePlacementDrawer`; el baseline real usa `CreatePlacementDialog`.
+- `cost_rate_source` vigente en runtime es `payroll_snapshot | manual`, no `payroll | manual`.
+
 ## Delta 2026-03-27
 - TASK-060 (Team Assignment Admin) es prerequisito de TASK-038, que a su vez es prerequisito de esta addendum. La cadena es: TASK-060 (CRUD assignments) → TASK-038 (Staff Aug placements) → TASK-041 (HRIS enrichment)
 - El drawer de "Asignar miembro" que construye TASK-060 es el que TASK-041 enriquece con pre-fill de campos HRIS (contract_type, cost_rate_source, deel_contract_id)

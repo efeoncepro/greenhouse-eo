@@ -1,3 +1,7 @@
+## Delta 2026-03-30
+- `TASK-142` ya expone badges `Health` y breakdown operativo heurístico en `Space 360`.
+- Esta task ya no debe recrear la shell de UI; debe reemplazar la heurística transicional por un score materializado y reutilizar la superficie ya implementada en `src/views/greenhouse/agency/space-360/tabs/OverviewTab.tsx`.
+
 # TASK-150 — Space Health Score: Composite Indicator
 
 ## Status

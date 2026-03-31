@@ -56,6 +56,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'internal'
   },
   {
+    viewCode: 'gestion.staff_augmentation',
+    section: 'gestion',
+    label: 'Staff Augmentation',
+    description: 'Placements comerciales, onboarding y economics sobre assignments canónicos.',
+    routePath: '/agency/staff-augmentation',
+    routeGroup: 'internal'
+  },
+  {
     viewCode: 'gestion.spaces',
     section: 'gestion',
     label: 'Spaces',

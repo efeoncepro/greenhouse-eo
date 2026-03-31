@@ -1,3 +1,7 @@
+## Delta 2026-03-30
+- `TASK-142` ya expone badge `Risk` heurístico en `Space 360`.
+- Esta task queda enfocada en materializar el score/factor breakdown canónico y enchufarlo al `OverviewTab` existente, no en crear una surface nueva.
+
 # TASK-151 — Space Risk Score & Churn Prediction
 
 ## Status
