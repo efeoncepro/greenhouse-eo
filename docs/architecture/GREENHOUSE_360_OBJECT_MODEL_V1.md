@@ -796,24 +796,26 @@ Examples:
 ### Canonical anchor
 
 Primary anchor:
-- `greenhouse.providers.provider_id`
+- `greenhouse_core.providers.provider_id`
 
 ### Current reality
 
-Today Provider is not yet formalized as a first-class object.
+Provider is already formalized as a first-class object in PostgreSQL:
 
-Instead, provider information is fragmented across:
-- free-text vendor labels in domain tables
-- finance supplier rows
-- identity provider codes in `identity_profile_source_links`
-- integration-specific references in module-local payloads
+- canonical anchor: `greenhouse_core.providers`
+- base serving view: `greenhouse_serving.provider_360`
+- finance extension view: `greenhouse_serving.provider_finance_360`
 
-This is enough for isolated screens, but too weak for cross-module tooling, AI, finance, and identity relationships.
+The remaining drift is no longer identity drift but enrichment drift:
+
+- some legacy lanes still keep free-text vendor labels
+- auth/identity provider codes still live as source references
+- provider-centric operational summary needed explicit materialization for tooling + finance + payroll exposure
 
 ### Recommended canonical model
 
 Near-term canonical table:
-- `greenhouse.providers`
+- `greenhouse_core.providers`
 
 Recommended minimum fields:
 - `provider_id`
@@ -839,6 +841,7 @@ Suggested examples of `provider_kind`:
 
 Secondary identifiers may include:
 - `greenhouse.fin_suppliers.supplier_id`
+- `greenhouse_finance.suppliers.supplier_id`
 - auth or identity provider codes
 - vendor account IDs
 - external billing account IDs
@@ -902,11 +905,19 @@ Possible Provider-centered read models:
 
 ### Current implementation state
 
-Not yet formalized as a canonical object.
+Provider is already formalized as a canonical object.
+
+Current implemented shape:
+- `greenhouse_core.providers` owns the reusable identity
+- `greenhouse_finance.suppliers` acts as Finance extension profile
+- `greenhouse_ai.tool_catalog` points to `provider_id`
+- `greenhouse_ai.member_tool_licenses`, `credit_wallets` and `credit_ledger` extend the same graph indirectly through tools
+- `greenhouse_serving.provider_tooling_snapshots` materializes provider-centric monthly tooling + finance + payroll exposure
+- `greenhouse_serving.provider_tooling_360` exposes the latest provider-centric operational summary
 
 Architectural rule:
 - future tooling, AI, or vendor-linked modules should not keep `vendor` only as ungoverned free text when the relation is reusable across modules
-- finance supplier profiles should be treated as an extension of Provider once the registry exists, not as the platform-wide provider identity
+- finance supplier profiles must continue to be treated as an extension of Provider, not as the platform-wide provider identity
 - auth provider codes or integration handles must remain source references unless explicitly mapped to `provider_id`
 
 ## Cross-Object Relationships

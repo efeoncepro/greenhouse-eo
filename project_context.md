@@ -1,5 +1,30 @@
 # project_context.md
 
+## Delta 2026-03-30 TASK-059 provider canonical object reactivo
+- `Provider` ya no debe leerse como ancla parcial o solo documental.
+- Estado vigente:
+  - identidad canónica: `greenhouse_core.providers`
+  - serving base: `greenhouse_serving.provider_360`
+  - bridge Finance: `greenhouse_serving.provider_finance_360`
+  - snapshot operativo mensual nuevo: `greenhouse_serving.provider_tooling_snapshots`
+  - latest-state nuevo: `greenhouse_serving.provider_tooling_360`
+- Wiring reactivo nuevo:
+  - `provider.upserted`
+  - `finance.supplier.created`
+  - `finance.supplier.updated`
+  - proyección `provider_tooling` en domain `finance`
+  - evento saliente `provider.tooling_snapshot.materialized`
+- Consumer ya alineado:
+  - `/api/finance/analytics/trends?type=tools` ahora consume el snapshot provider-centric en vez de agrupar por `supplier_name` o `description`
+- Surface visible ya alineada:
+  - `Finance > Suppliers` expone cobertura `Provider 360` en el listado
+  - `Finance > Suppliers > [id]` expone tab `Provider 360`
+  - `Admin > AI Tooling` ahora acepta drilldown por `providerId` y `tab` vía query string para catálogo/licencias/wallets desde Finanzas
+- Regla vigente:
+  - no crear `tool_providers` ni mover licencias/ledger al core
+  - `greenhouse_ai.*` sigue siendo el runtime transaccional de tooling
+  - `greenhouse_finance.suppliers` sigue siendo extensión payable del provider
+
 ## Delta 2026-03-30 Finance staging verification + TASK-164 docs reconciled
 - `staging` ya carga correctamente al menos dos surfaces críticas del carril Finance actual:
   - `/finance/income/[id]`

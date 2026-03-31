@@ -75,7 +75,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-057` | `complete` | Direct Overhead Tool Cost Attribution | `docs/tasks/complete/TASK-057-direct-overhead-tool-cost-attribution.md` |
 | `TASK-058` | `complete` | Economic Indicators Runtime Layer | `docs/tasks/complete/TASK-058-economic-indicators-runtime-layer.md` |
 
-| `TASK-059` | `to-do` | Tool Provider Canonical Object | `docs/tasks/to-do/TASK-059-tool-provider-canonical-object.md` |
+| `TASK-059` | `complete` | Tool Provider Canonical Object | `docs/tasks/complete/TASK-059-tool-provider-canonical-object.md` |
 | `TASK-060` | `complete` | Team Assignment Admin (Agency > Team CRUD) | `docs/tasks/complete/TASK-060-team-assignment-admin.md` |
 | `TASK-061` | `complete` | Payroll Go-Live Readiness Audit | `docs/tasks/complete/TASK-061-payroll-go-live-readiness-audit.md` |
 | `TASK-062` | `complete` | Payroll Recurring Fixed Bonus Support | `docs/tasks/complete/TASK-062-payroll-recurring-fixed-bonus-support.md` |

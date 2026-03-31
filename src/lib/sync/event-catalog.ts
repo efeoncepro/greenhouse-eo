@@ -8,6 +8,8 @@ export const AGGREGATE_TYPES = {
   supplier: 'supplier',
   exchangeRate: 'exchange_rate',
   economicIndicator: 'economic_indicator',
+  provider: 'provider',
+  providerToolingSnapshot: 'provider_tooling_snapshot',
 
   // Nubox
   nuboxEmission: 'nubox_emission',
@@ -28,6 +30,8 @@ export const AGGREGATE_TYPES = {
   payrollPrevisionalSnapshot: 'payroll_previsional_snapshot',
 
   // AI Tools
+  aiTool: 'ai_tool',
+  aiLicense: 'ai_license',
   aiCredits: 'ai_credits',
   aiWallet: 'ai_wallet',
 
@@ -112,11 +116,25 @@ export const EVENT_TYPES = {
   financeIncomeUpdated: 'finance.income.updated',
   financeExpenseCreated: 'finance.expense.created',
   financeExpenseUpdated: 'finance.expense.updated',
+  financeSupplierCreated: 'finance.supplier.created',
+  financeSupplierUpdated: 'finance.supplier.updated',
   financeIncomePaymentCreated: 'finance.income_payment.created',
   financeIncomePaymentRecorded: 'finance.income_payment.recorded',
   financeCostAllocationCreated: 'finance.cost_allocation.created',
   financeCostAllocationDeleted: 'finance.cost_allocation.deleted',
   financeEconomicIndicatorUpserted: 'finance.economic_indicator.upserted',
+  providerUpserted: 'provider.upserted',
+  providerToolingSnapshotMaterialized: 'provider.tooling_snapshot.materialized',
+
+  // AI Tooling structural events
+  aiToolCreated: 'ai_tool.created',
+  aiToolUpdated: 'ai_tool.updated',
+  aiLicenseCreated: 'ai_license.created',
+  aiLicenseReactivated: 'ai_license.reactivated',
+  aiLicenseUpdated: 'ai_license.updated',
+  aiWalletCreated: 'ai_wallet.created',
+  aiWalletUpdated: 'ai_wallet.updated',
+  aiWalletCreditsConsumed: 'ai_wallet.credits_consumed',
 
   // Payroll
   payrollPeriodCreated: 'payroll_period.created',
@@ -199,11 +217,16 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.financeIncomeUpdated,
   EVENT_TYPES.financeExpenseCreated,
   EVENT_TYPES.financeExpenseUpdated,
+  EVENT_TYPES.financeSupplierCreated,
+  EVENT_TYPES.financeSupplierUpdated,
   EVENT_TYPES.financeIncomePaymentCreated,
   EVENT_TYPES.financeIncomePaymentRecorded,
   EVENT_TYPES.financeCostAllocationCreated,
   EVENT_TYPES.financeCostAllocationDeleted,
   EVENT_TYPES.financeEconomicIndicatorUpserted,
+  EVENT_TYPES.financeSupplierCreated,
+  EVENT_TYPES.financeSupplierUpdated,
+  EVENT_TYPES.providerUpserted,
   EVENT_TYPES.payrollPeriodCreated,
   EVENT_TYPES.payrollPeriodUpdated,
   EVENT_TYPES.payrollPeriodCalculated,
@@ -231,6 +254,15 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.financeOverheadUpdated,
   EVENT_TYPES.financeLicenseCostUpdated,
   EVENT_TYPES.financeToolingCostUpdated,
+  EVENT_TYPES.providerUpserted,
+  EVENT_TYPES.aiToolCreated,
+  EVENT_TYPES.aiToolUpdated,
+  EVENT_TYPES.aiLicenseCreated,
+  EVENT_TYPES.aiLicenseReactivated,
+  EVENT_TYPES.aiLicenseUpdated,
+  EVENT_TYPES.aiWalletCreated,
+  EVENT_TYPES.aiWalletUpdated,
+  EVENT_TYPES.aiWalletCreditsConsumed,
   EVENT_TYPES.accountingMarginAlertTriggered,
 
   // Data quality / SII alerts

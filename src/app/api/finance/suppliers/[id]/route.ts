@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { syncProviderFromFinanceSupplier } from '@/lib/providers/canonical'
+import { getLatestProviderToolingSnapshot } from '@/lib/providers/provider-tooling-snapshots'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
   runFinanceQuery,
@@ -85,14 +86,20 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     const supplier = await getFinanceSupplierFromPostgres(supplierId)
 
     if (supplier) {
-      const expenses = await listFinanceExpensesFromPostgres({
-        supplierId,
-        page: 1,
-        pageSize: 20
-      })
+      const [expenses, providerTooling] = await Promise.all([
+        listFinanceExpensesFromPostgres({
+          supplierId,
+          page: 1,
+          pageSize: 20
+        }),
+        supplier.providerId
+          ? getLatestProviderToolingSnapshot(supplier.providerId).catch(() => null)
+          : Promise.resolve(null)
+      ])
 
       return NextResponse.json({
         ...supplier,
+        providerTooling,
         paymentHistory: expenses.items.map(expense => ({
           expenseId: expense.expenseId,
           amount: expense.totalAmount,
@@ -129,13 +136,18 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
   const row = rows[0]
 
-  const expenses = await runFinanceQuery<ExpenseHistoryRow>(`
-    SELECT expense_id, total_amount, currency, payment_date, document_date, due_date, payment_method, document_number, description
-    FROM \`${projectId}.greenhouse.fin_expenses\`
-    WHERE supplier_id = @supplierId
-    ORDER BY COALESCE(payment_date, document_date, due_date) DESC
-    LIMIT 20
-  `, { supplierId })
+  const [expenses, providerTooling] = await Promise.all([
+    runFinanceQuery<ExpenseHistoryRow>(`
+      SELECT expense_id, total_amount, currency, payment_date, document_date, due_date, payment_method, document_number, description
+      FROM \`${projectId}.greenhouse.fin_expenses\`
+      WHERE supplier_id = @supplierId
+      ORDER BY COALESCE(payment_date, document_date, due_date) DESC
+      LIMIT 20
+    `, { supplierId }),
+    row.provider_id
+      ? getLatestProviderToolingSnapshot(normalizeString(row.provider_id)).catch(() => null)
+      : Promise.resolve(null)
+  ])
 
   return NextResponse.json({
     supplierId: normalizeString(row.supplier_id),
@@ -165,6 +177,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     createdBy: row.created_by ? normalizeString(row.created_by) : null,
     createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
     updatedAt: toTimestampString(row.updated_at as string | { value?: string } | null),
+    providerTooling,
     paymentHistory: expenses.map(e => ({
       expenseId: normalizeString(e.expense_id),
       amount: toNumber(e.total_amount),

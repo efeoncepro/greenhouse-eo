@@ -28,6 +28,9 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'
 
+import SupplierProviderToolingTab from './SupplierProviderToolingTab'
+import type { SupplierProviderToolingSnapshot } from './SupplierProviderToolingTab'
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -44,6 +47,7 @@ interface PaymentRecord {
 
 interface SupplierDetail {
   supplierId: string
+  providerId: string | null
   legalName: string
   tradeName: string | null
   taxId: string
@@ -69,6 +73,7 @@ interface SupplierDetail {
   createdBy: string
   createdAt: string
   updatedAt: string
+  providerTooling: SupplierProviderToolingSnapshot | null
   paymentHistory: PaymentRecord[]
 }
 
@@ -251,6 +256,13 @@ const SupplierDetailView = () => {
             </Typography>
             <CustomChip label={categoryLabel} size='small' round='true' variant='tonal' color='primary' />
             <CustomChip
+              label={supplier.providerId ? 'Provider 360 conectado' : 'Sin vínculo canónico'}
+              size='small'
+              round='true'
+              variant='tonal'
+              color={supplier.providerId ? 'info' : 'warning'}
+            />
+            <CustomChip
               label={supplier.isActive ? 'Activo' : 'Inactivo'}
               size='small'
               round='true'
@@ -279,6 +291,12 @@ const SupplierDetailView = () => {
             value='payments'
             label='Historial de pagos'
             icon={<i className='tabler-receipt' />}
+            iconPosition='start'
+          />
+          <Tab
+            value='provider'
+            label='Provider 360'
+            icon={<i className='tabler-building-store' />}
             iconPosition='start'
           />
         </CustomTabList>
@@ -496,6 +514,15 @@ const SupplierDetailView = () => {
               )}
             </CardContent>
           </Card>
+        </TabPanel>
+
+        <TabPanel value='provider' sx={{ p: 0 }}>
+          <SupplierProviderToolingTab
+            supplierId={supplier.supplierId}
+            supplierName={supplier.tradeName || supplier.legalName}
+            providerId={supplier.providerId}
+            providerTooling={supplier.providerTooling}
+          />
         </TabPanel>
       </TabContext>
     </Box>

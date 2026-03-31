@@ -20,10 +20,12 @@ type PayrollTrendRow = Record<string, unknown> & {
 }
 
 type ToolRow = Record<string, unknown> & {
-  supplier_name: string
-  category: string
+  provider_name: string
+  provider_type: string | null
+  supplier_category: string | null
   total_clp: string | number
-  transaction_count: string | number
+  active_license_count: string | number
+  active_member_count: string | number
 }
 
 const toNum = (v: unknown): number => {
@@ -114,24 +116,30 @@ export async function GET(request: Request) {
     if (type === 'tools') {
       const rows = await runGreenhousePostgresQuery<ToolRow>(
         `SELECT
-           COALESCE(supplier_name, description) AS supplier_name,
-           COALESCE(cost_category, 'uncategorized') AS category,
-           COALESCE(SUM(total_amount_clp), 0) AS total_clp,
-           COUNT(*) AS transaction_count
-         FROM greenhouse_finance.expenses
-         WHERE cost_category IN ('software', 'infrastructure')
-           AND COALESCE(document_date, payment_date) >= (CURRENT_DATE - ($1 || ' months')::interval)::date
-         GROUP BY supplier_name, category
+           provider_name,
+           provider_type,
+           supplier_category,
+           COALESCE(SUM(total_provider_cost_clp), 0) AS total_clp,
+           MAX(active_license_count) AS active_license_count,
+           MAX(active_member_count) AS active_member_count
+         FROM greenhouse_serving.provider_tooling_snapshots
+         WHERE (period_year * 100 + period_month) >= (
+           EXTRACT(YEAR FROM (CURRENT_DATE - ($1 || ' months')::interval)) * 100 +
+           EXTRACT(MONTH FROM (CURRENT_DATE - ($1 || ' months')::interval))
+         )
+         GROUP BY provider_name, provider_type, supplier_category
          ORDER BY total_clp DESC
          LIMIT 30`,
         [months]
       )
 
       const providers = rows.map(r => ({
-        supplierName: r.supplier_name,
-        category: r.category,
+        providerName: r.provider_name,
+        providerType: r.provider_type,
+        supplierCategory: r.supplier_category,
         totalClp: toNum(r.total_clp),
-        transactionCount: toNum(r.transaction_count)
+        activeLicenseCount: toNum(r.active_license_count),
+        activeMemberCount: toNum(r.active_member_count)
       }))
 
       return NextResponse.json({ type: 'tools', months, providers })

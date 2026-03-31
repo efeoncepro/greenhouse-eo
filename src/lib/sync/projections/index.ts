@@ -17,6 +17,7 @@ import { payrollExportReadyProjection } from './payroll-export-ready'
 import { periodClosureStatusProjection } from './period-closure-status'
 import { commercialCostAttributionProjection } from './commercial-cost-attribution'
 import { operationalPlProjection } from './operational-pl'
+import { providerToolingProjection } from './provider-tooling'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
 // DEPRECATED: icoMemberProjection kept for backward compat (BQ → Postgres sync) but person_intelligence
@@ -42,6 +43,7 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(payrollReceiptsProjection)
   registerProjection(payrollExportReadyProjection)
   registerProjection(periodClosureStatusProjection)
+  registerProjection(providerToolingProjection)
   registerProjection(commercialCostAttributionProjection)
   registerProjection(operationalPlProjection)
 }

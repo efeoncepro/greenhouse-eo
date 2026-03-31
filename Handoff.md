@@ -4,6 +4,89 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — cierre end-to-end UI/tests de TASK-059
+
+### Objetivo
+- Cerrar el remanente operativo de `TASK-059` después del carril reactivo y del aterrizaje inicial en Finanzas.
+
+### Delta de ejecución
+- `Provider 360` quedó navegable de verdad:
+  - `src/views/greenhouse/finance/SupplierProviderToolingTab.tsx` ahora expone drilldowns a:
+    - `/finance/expenses?supplierId=<id>`
+    - `/admin/ai-tools?tab=catalog&providerId=<id>`
+    - `/admin/ai-tools?tab=licenses&providerId=<id>`
+    - `/hr/payroll`
+- `src/views/greenhouse/ai-tools/AiToolingDashboard.tsx` ahora acepta `providerId` y `tab` por query string y filtra client-side catálogo/licencias/wallets para sostener ese drilldown desde Finanzas.
+- Cobertura nueva agregada:
+  - `src/app/api/finance/suppliers/[id]/route.test.ts`
+  - `src/views/greenhouse/finance/SupplierProviderToolingTab.test.tsx`
+  - `src/lib/providers/provider-tooling-snapshots.test.ts` ahora cubre también `getLatestProviderToolingSnapshot()`
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/providers/provider-tooling-snapshots.test.ts 'src/app/api/finance/suppliers/[id]/route.test.ts' src/views/greenhouse/finance/SupplierProviderToolingTab.test.tsx src/lib/sync/projections/provider-tooling.test.ts src/lib/sync/event-catalog.test.ts`
+- `pnpm exec eslint src/lib/providers/provider-tooling-snapshots.ts src/lib/providers/provider-tooling-snapshots.test.ts 'src/app/api/finance/suppliers/[id]/route.ts' 'src/app/api/finance/suppliers/[id]/route.test.ts' src/views/greenhouse/finance/SupplierDetailView.tsx src/views/greenhouse/finance/SupplierProviderToolingTab.tsx src/views/greenhouse/finance/SupplierProviderToolingTab.test.tsx src/views/greenhouse/finance/SuppliersListView.tsx src/views/greenhouse/ai-tools/AiToolingDashboard.tsx src/lib/providers/monthly-snapshot.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+- Smoke local intentado con `pnpm dev`:
+  - `HEAD /finance/suppliers` respondió `307 -> /login`
+  - `HEAD /admin/ai-tools?tab=catalog&providerId=anthropic` respondió `307 -> /login`
+  - conclusión: el entorno local respondió sano, pero no hubo browser QA autenticado desde este turno por barrera de auth
+- Residual no bloqueante confirmado:
+  - `src/lib/providers/monthly-snapshot.ts` queda como stack legacy sin consumers activos detectados fuera de su propio archivo; no bloquea el cierre de `TASK-059`
+
+## Sesión 2026-03-30 — aterrizaje UI de TASK-059 en Finance Suppliers
+
+### Objetivo
+- Llevar la lectura canónica `provider 360` al módulo correcto de Finanzas, sin duplicar la consola táctica de `AI Tooling`.
+
+### Delta de ejecución
+- `Finance > Suppliers` ahora expone explícitamente la sinergia supplier/provider:
+  - `src/views/greenhouse/finance/SuppliersListView.tsx` muestra cobertura `Provider 360` y estado de vínculo canónico por fila
+  - `src/views/greenhouse/finance/SupplierDetailView.tsx` agrega chip de vínculo canónico y nuevo tab `Provider 360`
+  - nuevo componente route-local `src/views/greenhouse/finance/SupplierProviderToolingTab.tsx`
+- `GET /api/finance/suppliers/[id]` ahora devuelve además `providerTooling` cuando el supplier ya está enlazado a `providerId`
+- `src/lib/providers/provider-tooling-snapshots.ts` suma helper de lectura puntual del último snapshot por provider para surfaces de UI
+- La UX queda deliberadamente separada:
+  - `Finance > Suppliers` como home canónica del objeto provider/supplier
+  - `Admin > AI Tooling` como consola operativa de catálogo, licencias, wallets y consumo
+
+### Validación ejecutada
+- `pnpm exec eslint src/lib/providers/monthly-snapshot.ts 'src/app/api/finance/suppliers/[id]/route.ts' src/lib/providers/provider-tooling-snapshots.ts src/views/greenhouse/finance/SupplierDetailView.tsx src/views/greenhouse/finance/SupplierProviderToolingTab.tsx src/views/greenhouse/finance/SuppliersListView.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
+## Sesión 2026-03-30 — cierre reactivo de TASK-059 Provider canónico cross-module
+
+### Objetivo
+- Corregir `TASK-059` contra la arquitectura vigente e implementar el carril provider-centric faltante entre tooling, Finance, costos y Payroll.
+
+### Delta de ejecución
+- `TASK-059` quedó reconciliada y cerrada:
+  - se descarta la propuesta vieja de `tool_providers`
+  - el ancla vigente queda reafirmada en `greenhouse_core.providers`
+  - `greenhouse_finance.suppliers` se preserva como extensión Finance
+  - `greenhouse_ai.*` se preserva como runtime transaccional de tooling
+- Nuevo wiring reactivo cerrado:
+  - `src/lib/providers/postgres.ts` ahora publica `provider.upserted`
+  - `src/lib/finance/postgres-store.ts` ahora publica `finance.supplier.created` / `finance.supplier.updated`
+  - nueva materialización `src/lib/providers/provider-tooling-snapshots.ts`
+  - nueva proyección `src/lib/sync/projections/provider-tooling.ts`
+  - nueva tabla `greenhouse_serving.provider_tooling_snapshots`
+  - nueva vista `greenhouse_serving.provider_tooling_360`
+  - nuevo evento saliente `provider.tooling_snapshot.materialized`
+- Consumer ya absorbido:
+  - `GET /api/finance/analytics/trends?type=tools` ahora lee el snapshot provider-centric y deja de agrupar por labels legacy de supplier/description
+- Documentación viva actualizada:
+  - `project_context.md`
+  - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+  - lifecycle de `TASK-059` en `docs/tasks/*`
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/providers/provider-tooling-snapshots.test.ts src/lib/sync/projections/provider-tooling.test.ts src/lib/sync/event-catalog.test.ts`
+- `pnpm exec eslint src/lib/providers/provider-tooling-snapshots.ts src/lib/providers/provider-tooling-snapshots.test.ts src/lib/providers/postgres.ts src/lib/finance/postgres-store.ts src/lib/sync/projections/provider-tooling.ts src/lib/sync/projections/provider-tooling.test.ts src/lib/sync/projections/index.ts src/lib/sync/event-catalog.ts src/app/api/finance/analytics/trends/route.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+
 ## Sesión 2026-03-30 — verificación staging Finance + reconciliación TASK-164
 
 ### Objetivo

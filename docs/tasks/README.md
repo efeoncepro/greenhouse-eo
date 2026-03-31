@@ -93,7 +93,7 @@ Primer bloque operativo asignado:
 - **Top ROI ahora:** `TASK-100` → `TASK-101` → `TASK-072` → `TASK-098` → `TASK-026` → `TASK-109` → `TASK-030`.
 - **Siguiente ola:** `TASK-027` → `TASK-028` → `TASK-116` → `TASK-070` → `TASK-071` → `TASK-011`.
 - **Estratégicas pero caras:** `TASK-008` → `TASK-005` → `TASK-071` → `TASK-118` → `TASK-018` → `TASK-019`.
-- **Later / oportunistas:** `TASK-029` → `TASK-031` → `TASK-015` → `TASK-016` → `TASK-020` → `TASK-115` → `TASK-107` → `TASK-103` → `TASK-021` → `TASK-032` → `TASK-053` → `TASK-054` → `TASK-055` → `TASK-058` → `TASK-059` → `TASK-071`.
+- **Later / oportunistas:** `TASK-029` → `TASK-031` → `TASK-015` → `TASK-016` → `TASK-020` → `TASK-115` → `TASK-107` → `TASK-103` → `TASK-021` → `TASK-032` → `TASK-053` → `TASK-054` → `TASK-055` → `TASK-058` → `TASK-071`.
 - **No gastar tokens ahora:** `TASK-025`, `TASK-033` a `TASK-038`, `TASK-039`, `TASK-041`.
 - Criterio: priorizar guardrails baratos, tareas que desbloquean módulos enteros, hardening sobre foundations ya implementadas y lanes con valor operativo inmediato; postergar briefs históricos, addenda dependientes y apuestas estratégicas de alto costo que todavía no desbloquean runtime cercano.
 
@@ -219,6 +219,7 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 
 ## Complete
 
+| [TASK-059-tool-provider-canonical-object.md](complete/TASK-059-tool-provider-canonical-object.md) | Provider canónico cross-module ya reconciliado al runtime real: se descarta `tool_providers`, se institucionaliza `greenhouse_core.providers` como ancla única y queda materializado `provider_tooling` con snapshot reactivo mensual, bridge supplier/provider explícito y consumer real en analytics de herramientas. |
 | [TASK-067-cost-intelligence-foundation.md](complete/TASK-067-cost-intelligence-foundation.md) | Foundation técnica de Cost Intelligence cerrada: schema `greenhouse_cost_intelligence`, serving tables base, eventos `accounting.*`, domain `cost_intelligence`, cron route dedicada validada y continuidad amarrada al P&L canónico de Finance. |
 | [TASK-140-admin-views-person-first-preview.md](complete/TASK-140-admin-views-person-first-preview.md) | `/admin/views` ya quedó alineado al contrato persona-first: selector/preview por persona canónica cuando existe `identityProfileId`, bridge explícito persona/member/principal y compatibilidad preservada con overrides, auditoría y `authorizedViews` user-scoped. |
 | [TASK-141-canonical-person-identity-consumption.md](complete/TASK-141-canonical-person-identity-consumption.md) | Contrato canónico de persona cerrado como baseline institucional: `identity_profile` raíz humana, `member` faceta operativa, `client_user` principal portal; resolver shared activo y primer bridge en notifications y `/admin/views` sin romper `user_id` ni `member_id`. |

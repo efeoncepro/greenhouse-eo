@@ -1,5 +1,39 @@
 # changelog.md
 
+## 2026-03-30 (session 10)
+
+- `TASK-059` quedó cerrada también en navegación y pruebas:
+  - `Provider 360` ahora abre drilldowns hacia `Finance Expenses`, `AI Tooling` y `Payroll`
+  - `AI Tooling` ya acepta `providerId` + `tab` por query string para sostener el recorrido desde Finanzas
+- Cobertura nueva:
+  - test de contrato para `/api/finance/suppliers/[id]`
+  - test del tab `SupplierProviderToolingTab`
+  - test directo del helper `getLatestProviderToolingSnapshot()`
+
+## 2026-03-30 (session 9)
+
+- `TASK-059` aterrizó también en la UI correcta de Finanzas:
+  - `Finance > Suppliers` ahora muestra cobertura `Provider 360` en el listado
+  - el detalle de supplier incorpora un tab `Provider 360` con KPIs de tooling, composición de costo y proveniencia del snapshot
+- `/api/finance/suppliers/[id]` ahora devuelve `providerTooling` cuando existe vínculo canónico `supplier -> provider`
+- `provider-tooling-snapshots` suma helper de lectura puntual para servir el último snapshot del provider en surfaces de Finanzas
+
+## 2026-03-30 (session 8)
+
+- `TASK-059` quedó cerrada y reconciliada al runtime real:
+  - se descarta la identidad paralela `tool_providers`
+  - `greenhouse_core.providers` queda reafirmado como ancla canónica única para tooling/vendor/provider cross-module
+- Nuevo carril reactivo provider-centric:
+  - `provider.upserted`
+  - `finance.supplier.created`
+  - `finance.supplier.updated`
+  - proyección `provider_tooling`
+  - snapshot mensual `greenhouse_serving.provider_tooling_snapshots`
+  - vista latest-state `greenhouse_serving.provider_tooling_360`
+  - evento saliente `provider.tooling_snapshot.materialized`
+- Consumer absorbido:
+  - `/api/finance/analytics/trends?type=tools` ya no agrega por labels legacy y ahora consume la capa provider-centric
+
 ## 2026-03-30 (session 4)
 
 - Verificación rápida de `staging` completada:
