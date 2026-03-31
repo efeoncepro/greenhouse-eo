@@ -3,9 +3,20 @@
 ## Delta 2026-03-31 Shared attachments and GCP bucket topology
 
 - Alineación operativa de entorno:
-  - `staging` y `production` ahora fijan `GREENHOUSE_PRIVATE_ASSETS_BUCKET=efeonce-group-greenhouse-media` en Vercel
-  - esto evita que el runtime derive buckets privados por entorno aún no provisionados en GCP
-  - la foundation shared de assets sigue vigente; el siguiente paso infra es provisionar los buckets dedicados `greenhouse-private-assets-{env}` y luego mover la config explícita
+  - ya existen buckets dedicados reales en GCP:
+    - `efeonce-group-greenhouse-public-media-dev`
+    - `efeonce-group-greenhouse-public-media-staging`
+    - `efeonce-group-greenhouse-public-media-prod`
+    - `efeonce-group-greenhouse-private-assets-dev`
+    - `efeonce-group-greenhouse-private-assets-staging`
+    - `efeonce-group-greenhouse-private-assets-prod`
+  - Vercel ahora fija:
+    - `development` -> `public-media-dev` / `private-assets-dev`
+    - `staging` -> `public-media-staging` / `private-assets-staging`
+    - `production` -> `public-media-prod` / `private-assets-prod`
+    - `preview (develop)` -> `public-media-staging` / `private-assets-staging`
+  - el helper legacy de media pública ahora prioriza `GREENHOUSE_PUBLIC_MEDIA_BUCKET`; `GREENHOUSE_MEDIA_BUCKET` queda alineado como compatibilidad transicional
+  - en este proyecto `Preview` no funciona como carril totalmente shared porque Vercel ya tiene múltiples env vars branch-scoped; por eso el baseline operativo mínimo sigue amarrado explícitamente a `develop`
 - Hotfix operativo:
   - los drafts de `leave` ya no dependen solamente de que la sesión exponga `tenant.memberId`
   - `/api/hr/core/meta` ahora entrega `currentMemberId` resuelto para superficies HR/My que necesiten ownership documental
@@ -2901,8 +2912,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `GET /api/media/tenants/[id]/logo`
   - `GET /api/media/users/[id]/avatar`
 - Regla operativa:
-  - el bucket por defecto es `${GCP_PROJECT}-greenhouse-media`
-  - puede overridearse con `GREENHOUSE_MEDIA_BUCKET`
+  - el carril canónico de media pública ahora debe leerse desde `GREENHOUSE_PUBLIC_MEDIA_BUCKET`
+  - `GREENHOUSE_MEDIA_BUCKET` queda como fallback legacy para superficies que todavía no hayan sido reconciliadas
+  - si ninguna env está configurada, el fallback final sigue siendo `${GCP_PROJECT}-greenhouse-media`
   - los assets se guardan como `gs://...` en BigQuery y se sirven via proxy autenticado del portal, no via URL publica del bucket
 - El uploader UI reusable para admin ahora vive en `src/components/greenhouse/IdentityImageUploader.tsx`.
 - `greenhouse.clients` no traia `logo_url` en el DDL base; el runtime agrega la columna on-demand con `ALTER TABLE ... ADD COLUMN IF NOT EXISTS logo_url STRING` antes de persistir logos de tenant.

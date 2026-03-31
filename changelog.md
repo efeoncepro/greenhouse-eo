@@ -2,6 +2,24 @@
 
 ## 2026-03-31
 
+- Se provisionó la topología definitiva de buckets GCP para assets compartidos:
+  - `efeonce-group-greenhouse-public-media-dev`
+  - `efeonce-group-greenhouse-public-media-staging`
+  - `efeonce-group-greenhouse-public-media-prod`
+  - `efeonce-group-greenhouse-private-assets-dev`
+  - `efeonce-group-greenhouse-private-assets-staging`
+  - `efeonce-group-greenhouse-private-assets-prod`
+  - todos en `US-CENTRAL1`, `STANDARD`, con `uniform bucket-level access`
+  - los buckets privados quedaron con `publicAccessPrevention=enforced`
+  - `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` recibió `roles/storage.objectAdmin` bucket-level
+  - los buckets públicos quedaron legibles anónimamente vía `roles/storage.objectViewer` para `allUsers`
+- Se alineó el runtime de storage en Vercel para evitar drift entre código y cloud real:
+  - `development` ahora apunta a `public-media-dev` / `private-assets-dev`
+  - `staging` ahora apunta a `public-media-staging` / `private-assets-staging`
+  - `production` ahora apunta a `public-media-prod` / `private-assets-prod`
+  - `preview (develop)` ahora apunta a `public-media-staging` / `private-assets-staging`
+  - además se fijó `GREENHOUSE_MEDIA_BUCKET` a los buckets públicos dedicados como carril legacy de compatibilidad
+  - `src/lib/storage/greenhouse-media.ts` ya prioriza `GREENHOUSE_PUBLIC_MEDIA_BUCKET` sobre `GREENHOUSE_MEDIA_BUCKET`
 - `TASK-173` ya cerró el pendiente remoto en Cloud SQL:
   - `pnpm setup:postgres:shared-assets` quedó aplicado realmente en `greenhouse-pg-dev / greenhouse_app`
   - se validó `shared-assets-platform-v1` en `greenhouse_sync.schema_migrations`
@@ -3747,6 +3765,7 @@
 - `TASK-162` agregó la materialización inicial `greenhouse_serving.commercial_cost_attribution`; la capa de attribution ya es serving-first con fallback a recompute y `materializeOperationalPl()` la rematerializa antes del snapshot de P&L.
 - `TASK-162` sumó wiring reactivo dedicado: nueva projection `commercial_cost_attribution`, registro en el projection registry y evento `accounting.commercial_cost_attribution.materialized` para desacoplar la capa del refresh exclusivo de `operational_pl`.
 - `TASK-162` agregó health semántico y explain surface mínima para commercial cost attribution, con APIs dedicadas y chequeo de freshness en `/api/cron/materialization-health`.
+
 # 2026-03-31
 
 - Infra/runtime de assets privados:
