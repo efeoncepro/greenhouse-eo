@@ -271,6 +271,129 @@ Regla de impacto en nómina:
 - costos, finanzas, providers y tooling no consumen `leave_request.*` directo como source of truth económico
 - el carril canónico es `leave -> payroll -> projections downstream`
 
+### 2.8.1. Leave runtime rules currently enforced
+
+Estas son las reglas observables del runtime real al `2026-03-31`.
+
+Resolución de policy:
+
+- el sistema primero resuelve `leave_type`
+- luego selecciona la `leave_policy` aplicable según:
+  - `employment_type`
+  - `pay_regime`
+- si no existe match exacto, usa una policy default derivada del `leave_type`
+
+Cálculo de días:
+
+- el usuario selecciona `startDate` y `endDate`
+- si `endDate < startDate`, la solicitud falla
+- los días no se toman del cliente como source of truth; se recalculan server-side
+- solo cuentan días hábiles:
+  - excluye fines de semana
+  - excluye feriados nacionales
+  - timezone canónica: `America/Santiago`
+- si el rango no contiene días hábiles pagables, la solicitud falla
+
+Validaciones al crear una solicitud:
+
+- no puede existir overlap con otra solicitud activa del mismo colaborador
+- si el tipo requiere attachment, debe venir `attachmentUrl`
+- si la policy define `minAdvanceDays`, se exige esa anticipación en días calendario contra la fecha operativa de hoy
+- si la policy define `minContinuousDays`, la solicitud debe cubrir al menos esa cantidad de días hábiles
+- si la policy define `maxConsecutiveDays`, la solicitud no puede exceder ese tope
+- si la licencia trackea balance y la policy no permite saldo negativo, cada año afectado debe tener saldo suficiente
+
+Semántica de balance:
+
+- el seed anual se arma por `member_id + leave_type_code + year`
+- `availableDays` se calcula como:
+  - `allowance_days`
+  - `+ progressive_extra_days`
+  - `+ carried_over_days`
+  - `+ adjustment_days`
+  - `- used_days`
+  - `- reserved_days`
+- al crear una solicitud pendiente, el sistema reserva días
+- al aprobarla en HR, libera reserva y mueve esos días a usados
+- al rechazar o cancelar, revierte la reserva
+
+Carry-over y progresivos:
+
+- `carry-over` se limita por `maxCarryOverDays`
+- `progressive_extra_days` solo se calcula cuando la policy lo habilita
+- hoy el cálculo progresivo usa:
+  - `hire_date`
+  - `prior_work_years`
+  - `progressive_base_years`
+  - `progressive_interval_years`
+  - `progressive_max_extra_days`
+- para vacaciones Chile, esa lógica se aplica sobre `pay_regime = 'chile'`
+
+Flujo de aprobación:
+
+- si existe supervisor, una solicitud nueva entra como `pending_supervisor`
+- si no existe supervisor, entra directo como `pending_hr`
+- supervisor no-HR:
+  - puede aprobar hacia `pending_hr`
+  - puede rechazar
+- HR:
+  - puede aprobar
+  - puede rechazar
+- el solicitante puede cancelar solo solicitudes todavía pendientes
+- solicitudes ya cerradas no pueden volver a revisarse como si siguieran pendientes
+
+Reglas base seed observables por tipo:
+
+- `vacation`
+  - policy Chile dependientes:
+    - `annual_days = 15`
+    - `max_carry_over_days = 5`
+    - `min_advance_days = 7`
+    - `max_consecutive_days = 15`
+    - `min_continuous_days = 5`
+    - `max_accumulation_periods = 2`
+    - `progressive_enabled = true`
+    - `applicable_employment_types = ['full_time']`
+    - `applicable_pay_regimes = ['chile']`
+    - `allow_negative_balance = false`
+  - policy default portal:
+    - `annual_days = 15`
+    - `min_advance_days = 7`
+    - `max_consecutive_days = 15`
+    - `min_continuous_days = 5`
+    - `allow_negative_balance = false`
+- `floating_holiday`
+  - `annual_days = 1`
+  - `min_advance_days = 2`
+  - `max_consecutive_days = 1`
+  - `min_continuous_days = 1`
+- `bereavement`
+  - `annual_days = 3`
+  - `min_advance_days = 0`
+  - `max_consecutive_days = 3`
+  - `min_continuous_days = 1`
+- `civic_duty`
+  - `annual_days = 2`
+  - `min_advance_days = 0`
+  - `max_consecutive_days = 2`
+  - `min_continuous_days = 1`
+- `study`
+  - `min_advance_days = 3`
+  - `allow_negative_balance = true`
+- `personal`
+  - `min_advance_days = 1`
+  - `allow_negative_balance = true`
+- `medical`
+  - `min_advance_days = 0`
+  - `allow_negative_balance = true`
+  - hoy el seed no exige attachment por defecto; si negocio quiere licencia médica con respaldo obligatorio, eso debe expresarse en `leave_types`/`leave_policies`
+
+Implicación funcional importante:
+
+- tener saldo disponible no implica aprobación automática
+- una solicitud puede fallar por policy aunque el saldo exista
+- ejemplo vigente: vacaciones con saldo disponible igual fallan si se intentan pedir con menos de `7` días de anticipación
+
 ## 3. Superficies oficiales
 
 ### Rutas UI

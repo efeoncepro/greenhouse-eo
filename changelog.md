@@ -9,6 +9,12 @@
   - queda documentado además que este campo sigue siendo `BigQuery-first` para edición (`greenhouse.team_members.hire_date`) mientras `HR profile` no haga cutover formal a PostgreSQL
   - la acción visible quedó finalmente en la surface real `People > [colaborador] > Perfil > Datos laborales`; ya no depende de un componente no montado
   - se corrigió además el write path para que cambiar solo `hireDate` no ejecute un `MERGE` innecesario sobre `greenhouse.member_profiles`, eliminando el `500` observado al guardar
+- Arquitectura HR/Leave ahora documenta explícitamente las reglas runtime del módulo:
+  - cálculo de días hábiles desde calendario operativo
+  - overlap, attachments y balance
+  - anticipación mínima, continuidad mínima y máximos consecutivos
+  - carry-over, progresivos y matrix seed de policies por tipo
+  - aclaración de que saldo disponible no evita rechazos por policy
 - `TASK-170` se reconcilió contra el runtime real de HR Leave:
   - la task deja de asumir un módulo “nuevo” y se alinea al baseline existente en PostgreSQL, serving views, APIs y UI
   - `leave` ya calcula días hábiles desde el calendario operativo canónico + feriados Chile

@@ -8,6 +8,14 @@
   - `hireDate` sigue escribiéndose en `greenhouse.team_members.hire_date` sobre BigQuery
   - `greenhouse_core.members.hire_date` no reemplaza todavía ese write path
   - mientras `HR profile` no tenga cutover formal a PostgreSQL, este dato debe mantenerse BigQuery-first en edición y Postgres como consumo/proyección
+- Arquitectura leave documentada con reglas runtime explícitas:
+  - cálculo de días hábiles
+  - overlap
+  - attachment
+  - min/max de anticipación y continuidad
+  - balance, carry-over y progresivos
+  - matrix seed de policies por tipo
+  - aclaración de que saldo disponible no anula validaciones de policy
 
 ## Delta 2026-03-31 TASK-169 Staff Aug bridge People -> Assignment -> Placement
 - El bridge real de `Staff Augmentation` ya no debe interpretarse como `ghost slot -> placement`.

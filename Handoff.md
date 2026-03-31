@@ -38,6 +38,10 @@ Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y c
   - guardar solo `hireDate` estaba disparando también un `MERGE` innecesario contra `greenhouse.member_profiles`
   - eso exponía al runtime a `500` y además era riesgoso porque podía tocar campos suplementarios no editados
   - `updateMemberHrProfile()` ahora solo muta `member_profiles` cuando realmente vienen campos de ese subperfil
+- Arquitectura actualizada:
+  - `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md` ahora enumera las reglas runtime vigentes de `leave`
+  - incluye policy resolution, cálculo de días, validaciones de creación, balances, aprobación y baseline seed por tipo
+  - deja explícito que saldo disponible no reemplaza reglas como `min_advance_days`
 
 ## Sesión 2026-03-31 — TASK-016 Business Units Canonical v2 Fase 1
 
