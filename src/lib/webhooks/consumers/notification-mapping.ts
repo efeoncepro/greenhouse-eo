@@ -1,7 +1,7 @@
 import 'server-only'
 
 import type { WebhookEnvelope } from '@/lib/webhooks/types'
-import { getHrAdminRecipients, getMemberRecipient, getPayrollPeriodRecipients, getUserRecipient, type RecipientResolutionResult } from './notification-recipients'
+import { getFinanceAdminRecipients, getHrAdminRecipients, getMemberRecipient, getPayrollPeriodRecipients, getUserRecipient, type RecipientResolutionResult } from './notification-recipients'
 
 export interface NotificationDispatchMetadata {
   eventId: string
@@ -128,6 +128,261 @@ export const NOTIFICATION_MAPPINGS: NotificationMapping[] = [
     resolveRecipients: getHrAdminRecipients,
     metadata: baseMetadata
   },
+  // ── Finance alerts ──
+
+  {
+    eventType: 'finance.income_payment.recorded',
+    category: 'finance_alert',
+    title: envelope => {
+      const amount = typeof envelope.data.amount === 'number'
+        ? `$${envelope.data.amount.toLocaleString('es-CL')}`
+        : 'un pago'
+
+      return `Pago registrado: ${amount}`
+    },
+    body: envelope => {
+      const incomeId = typeof envelope.data.incomeId === 'string' ? envelope.data.incomeId : null
+
+      return incomeId ? `Factura: ${incomeId}` : 'Pago registrado en el sistema.'
+    },
+    actionUrl: envelope => {
+      const incomeId = typeof envelope.data.incomeId === 'string' ? envelope.data.incomeId : null
+
+      return incomeId ? `/finance/income/${incomeId}` : '/finance/income'
+    },
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+  {
+    eventType: 'finance.expense.created',
+    category: 'finance_alert',
+    title: envelope => {
+      const description = typeof envelope.data.description === 'string' && envelope.data.description.trim()
+        ? envelope.data.description
+        : 'Nuevo gasto'
+
+      return description.length > 50 ? `${description.slice(0, 47)}...` : description
+    },
+    body: envelope => {
+      const amount = typeof envelope.data.totalAmountClp === 'number'
+        ? `$${envelope.data.totalAmountClp.toLocaleString('es-CL')} CLP`
+        : null
+
+      return amount ? `Monto: ${amount}` : 'Gasto registrado en el sistema.'
+    },
+    actionUrl: envelope => {
+      const expenseId = typeof envelope.data.expenseId === 'string' ? envelope.data.expenseId : null
+
+      return expenseId ? `/finance/expenses/${expenseId}` : '/finance/expenses'
+    },
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+  {
+    eventType: 'finance.dte.discrepancy_found',
+    category: 'finance_alert',
+    title: envelope => {
+      const orgName = typeof envelope.data.organizationName === 'string' && envelope.data.organizationName.trim()
+        ? envelope.data.organizationName
+        : 'una organización'
+
+      return `Discrepancia DTE detectada en ${orgName}`
+    },
+    body: () => 'Se encontró una diferencia entre el monto registrado y el DTE tributario.',
+    actionUrl: () => '/finance/reconciliation',
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+  {
+    eventType: 'finance.income.created',
+    category: 'finance_alert',
+    title: envelope => {
+      const clientName = typeof envelope.data.clientName === 'string' && envelope.data.clientName.trim()
+        ? envelope.data.clientName
+        : null
+
+      return clientName ? `Nuevo ingreso para ${clientName}` : 'Nuevo ingreso registrado'
+    },
+    body: envelope => {
+      const amount = typeof envelope.data.totalAmountClp === 'number'
+        ? `$${envelope.data.totalAmountClp.toLocaleString('es-CL')} CLP`
+        : null
+
+      return amount ? `Monto: ${amount}` : null
+    },
+    actionUrl: envelope => {
+      const incomeId = typeof envelope.data.incomeId === 'string' ? envelope.data.incomeId : null
+
+      return incomeId ? `/finance/income/${incomeId}` : '/finance/income'
+    },
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+  {
+    eventType: 'finance.exchange_rate.upserted',
+    category: 'finance_alert',
+    title: () => 'Tipo de cambio actualizado',
+    body: envelope => {
+      const rate = typeof envelope.data.rate === 'number' ? envelope.data.rate : null
+      const from = typeof envelope.data.fromCurrency === 'string' ? envelope.data.fromCurrency : 'USD'
+      const to = typeof envelope.data.toCurrency === 'string' ? envelope.data.toCurrency : 'CLP'
+
+      return rate ? `${from}/${to}: $${rate.toLocaleString('es-CL')}` : `${from}/${to} actualizado.`
+    },
+    actionUrl: () => '/finance',
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+
+  {
+    eventType: 'finance.credit_note.created',
+    category: 'finance_alert',
+    title: envelope => {
+      const clientName = typeof envelope.data.clientName === 'string' && envelope.data.clientName.trim()
+        ? envelope.data.clientName
+        : null
+
+      return clientName ? `Nota de crédito registrada para ${clientName}` : 'Nota de crédito registrada'
+    },
+    body: envelope => {
+      const amount = typeof envelope.data.totalAmountClp === 'number'
+        ? `$${Math.abs(envelope.data.totalAmountClp).toLocaleString('es-CL')} CLP`
+        : null
+
+      return amount ? `Monto: ${amount} (resta del ingreso)` : 'Resta del ingreso del período.'
+    },
+    actionUrl: () => '/finance/income',
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+
+  // ── Purchase Orders & HES ──
+
+  {
+    eventType: 'finance.purchase_order.expiring',
+    category: 'finance_alert',
+    title: envelope => {
+      const poNumber = typeof envelope.data.poNumber === 'string' ? envelope.data.poNumber : 'OC'
+
+      return `OC ${poNumber} próxima a vencer`
+    },
+    body: envelope => {
+      const clientName = typeof envelope.data.clientName === 'string' ? envelope.data.clientName : 'cliente'
+      const daysLeft = typeof envelope.data.daysLeft === 'number' ? envelope.data.daysLeft : null
+
+      return daysLeft != null
+        ? `OC de ${clientName} vence en ${daysLeft} días. Solicite renovación.`
+        : `OC de ${clientName} está próxima a vencer.`
+    },
+    actionUrl: envelope => {
+      const poId = typeof envelope.data.poId === 'string' ? envelope.data.poId : null
+
+      return poId ? `/finance/purchase-orders/${poId}` : '/finance/purchase-orders'
+    },
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+  {
+    eventType: 'finance.purchase_order.consumed',
+    category: 'finance_alert',
+    title: envelope => {
+      const poNumber = typeof envelope.data.poNumber === 'string' ? envelope.data.poNumber : 'OC'
+
+      return `OC ${poNumber} consumida — saldo $0`
+    },
+    body: envelope => {
+      const clientName = typeof envelope.data.clientName === 'string' ? envelope.data.clientName : ''
+
+      return clientName ? `Toda la OC de ${clientName} fue facturada.` : 'OC totalmente facturada.'
+    },
+    actionUrl: () => '/finance/purchase-orders',
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+  {
+    eventType: 'finance.hes.approved',
+    category: 'finance_alert',
+    title: envelope => {
+      const hesNumber = typeof envelope.data.hesNumber === 'string' ? envelope.data.hesNumber : 'HES'
+
+      return `HES ${hesNumber} aprobada — lista para facturar`
+    },
+    body: envelope => {
+      const approvedBy = typeof envelope.data.approvedBy === 'string' ? envelope.data.approvedBy : ''
+
+      return approvedBy ? `Aprobada por ${approvedBy}.` : 'HES aprobada por el cliente.'
+    },
+    actionUrl: () => '/finance/hes',
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+  {
+    eventType: 'finance.hes.rejected',
+    category: 'finance_alert',
+    title: envelope => {
+      const hesNumber = typeof envelope.data.hesNumber === 'string' ? envelope.data.hesNumber : 'HES'
+
+      return `HES ${hesNumber} rechazada`
+    },
+    body: envelope => {
+      const reason = typeof envelope.data.reason === 'string' ? envelope.data.reason : ''
+
+      return reason ? `Motivo: ${reason}` : 'HES rechazada por el cliente. Requiere acción.'
+    },
+    actionUrl: () => '/finance/hes',
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+
+  // ── Data Quality / SII Alerts ──
+
+  {
+    eventType: 'finance.sii_claim.detected',
+    category: 'finance_alert',
+    title: envelope => {
+      const supplierName = typeof envelope.data.supplierName === 'string' && envelope.data.supplierName.trim()
+        ? envelope.data.supplierName
+        : 'un proveedor'
+
+      return `DTE Reclamado: ${supplierName}`
+    },
+    body: envelope => {
+      const folio = typeof envelope.data.dteFolio === 'string' ? envelope.data.dteFolio : null
+
+      return folio
+        ? `El documento ${folio} fue reclamado ante el SII. Requiere revisión.`
+        : 'Un documento fue reclamado ante el SII. Requiere revisión.'
+    },
+    actionUrl: envelope => {
+      const expenseId = typeof envelope.data.expenseId === 'string' ? envelope.data.expenseId : null
+
+      return expenseId ? `/finance/expenses/${expenseId}` : '/finance/expenses'
+    },
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+  {
+    eventType: 'finance.balance_divergence.detected',
+    category: 'finance_alert',
+    title: envelope => {
+      const folio = typeof envelope.data.dteFolio === 'string' && envelope.data.dteFolio.trim()
+        ? envelope.data.dteFolio
+        : null
+
+      return folio ? `Divergencia de cobro: Factura #${folio}` : 'Divergencia de cobro detectada'
+    },
+    body: () => 'Nubox marca como cobrada pero Greenhouse tiene pago pendiente.',
+    actionUrl: envelope => {
+      const incomeId = typeof envelope.data.incomeId === 'string' ? envelope.data.incomeId : null
+
+      return incomeId ? `/finance/income/${incomeId}` : '/finance/income'
+    },
+    resolveRecipients: getFinanceAdminRecipients,
+    metadata: baseMetadata
+  },
+
+  // ── Identity ──
+
   {
     eventType: 'identity.email_verification.completed',
     category: 'system_event',

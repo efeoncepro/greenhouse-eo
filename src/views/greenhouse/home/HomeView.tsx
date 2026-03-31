@@ -339,12 +339,62 @@ const HomeView = () => {
   const nexaIntro = snapshot?.nexaIntro ?? 'Hola, soy Nexa. ¿En que puedo ayudarte hoy?'
 
   const operationItems = useMemo((): StatusItem[] => {
+    if (snapshot?.financeStatus) {
+      const closureStatus = snapshot.financeStatus.closureStatus
+      const readinessPct = snapshot.financeStatus.readinessPct
+
+      const closureTone = closureStatus === 'closed'
+        ? 'success'
+        : closureStatus === 'ready'
+          ? 'warning'
+          : closureStatus === 'reopened'
+            ? 'warning'
+            : 'secondary'
+
+      return [
+        {
+          label: `Cierre ${snapshot.financeStatus.periodLabel}`,
+          value: closureStatus === 'closed'
+            ? 'Cerrado'
+            : closureStatus === 'ready'
+              ? 'Listo para cierre'
+              : closureStatus === 'reopened'
+                ? 'Reabierto'
+                : readinessPct != null
+                  ? `${readinessPct}% listo`
+                  : 'Provisional',
+          status: closureTone,
+          icon: 'tabler-calendar-check'
+        },
+        {
+          label: 'Margen operativo',
+          value: snapshot.financeStatus.latestMarginPct != null
+            ? `${snapshot.financeStatus.latestMarginPct}%`
+            : 'Sin datos',
+          status: snapshot.financeStatus.latestMarginPct == null
+            ? 'secondary'
+            : snapshot.financeStatus.latestMarginPct >= 20
+              ? 'success'
+              : snapshot.financeStatus.latestMarginPct >= 5
+                ? 'warning'
+                : 'error',
+          icon: 'tabler-chart-donut'
+        },
+        {
+          label: 'Período del margen',
+          value: snapshot.financeStatus.latestMarginPeriodLabel || 'Sin datos',
+          status: snapshot.financeStatus.latestPeriodClosed ? 'success' : 'secondary',
+          icon: 'tabler-coins'
+        }
+      ]
+    }
+
     return [
       { label: 'Nomina del mes', value: 'Sin datos', status: 'secondary', icon: 'tabler-file-invoice' },
       { label: 'OTD global', value: 'Sin datos', status: 'secondary', icon: 'tabler-target' },
       { label: 'Correos fallidos', value: '0', status: 'success', icon: 'tabler-mail-check' }
     ]
-  }, [])
+  }, [snapshot?.financeStatus])
 
   const nexaAdapter = useMemo(() => createNexaAdapter({
     selectedModelRef,

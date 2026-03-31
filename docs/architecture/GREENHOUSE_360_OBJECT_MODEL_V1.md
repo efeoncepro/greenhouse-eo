@@ -219,12 +219,62 @@ Not allowed:
 
 During transition, APIs may continue returning legacy references.
 
+## Delta 2026-03-30 — Notifications contract after person-first hardening
+
+Notifications ya no pueden modelarse como `client_user-first` cuando el problema real es resolver un humano.
+
+Regla institucional:
+- la resolución conceptual del recipient es `person-first`
+- `identity_profile` es la raíz humana
+- `member` sigue siendo la faceta operativa válida para payroll y colaboración
+- `client_user` sigue siendo la capacidad portal para inbox, preferencias y auditoría
+
+Para Notifications esto significa:
+- projections y webhook consumers deben compartir un shape explícito con:
+  - `identityProfileId`
+  - `memberId`
+  - `userId`
+  - `email`
+  - `fullName`
+- el sistema no debe colapsar ese grafo a un solo identificador
+- la recipient key efectiva puede seguir siendo `userId` o fallback `person:*` / `member:*` / `external:*` según el delivery disponible
+
+No permitido:
+- tratar `client_user` como raíz humana del sistema de notificaciones
+- reemplazar `notification_preferences`, `notifications` o `notification_log` por una semántica `identity_profile`-scoped sin migración explícita
+
 But every modern API should increasingly expose:
 - the canonical ID
 - relevant source IDs
 - the resolved relationship shape
 
 The response contract should make the object graph clearer over time, not more ambiguous.
+
+### Rule 8: Person-first must preserve reactive operating keys
+
+Greenhouse debe converger a una lectura `person-first`, pero sin reescribir a ciegas los identificadores operativos de los carriles reactivos.
+
+Reglas:
+- el ancla humana canónica sigue siendo `identity_profile_id`
+- `member_id` sigue siendo la ancla operativa para colaboradores, ICO, payroll, capacity y varios snapshots serving
+- `user_id` sigue siendo la ancla operativa para sesión, inbox, preferencias, overrides y auditoría user-scoped
+- ningún consumer reactivo debe perder uno de esos enlaces solo porque la persona canónica exista
+
+Implicación de diseño:
+- el resolver compartido debe enriquecer el grafo humano
+- no debe colapsar el grafo a un solo identificador
+- un contrato correcto debe poder exponer simultáneamente:
+  - `identity_profile_id`
+  - `member_id`
+  - `user_id`
+  - estado de resolución y degradación
+
+Carriles que dependen explícitamente de esta coexistencia:
+- projections de notifications
+- recipients para webhook notifications
+- serving de ICO por miembro
+- snapshots financieros con collaborator linkage
+- access previews y overrides user-scoped
 
 ## Object Catalog
 

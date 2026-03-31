@@ -41,7 +41,10 @@ export async function GET(request: Request) {
          COUNT(*) AS record_count,
          COALESCE(SUM(partner_share_amount * COALESCE(exchange_rate_to_clp, 1)), 0) AS partner_share_clp
        FROM greenhouse_finance.income
-       WHERE invoice_date >= $1::date AND invoice_date <= $2::date`,
+       WHERE invoice_date >= $1::date AND invoice_date <= $2::date
+         AND COALESCE(income_type, 'service_fee') NOT IN ('quote')
+         AND COALESCE(dte_type_code, '') NOT IN ('52', 'COT')
+         AND COALESCE(is_annulled, FALSE) = FALSE`,
       [periodStart, periodEnd]
     ),
 
@@ -66,6 +69,7 @@ export async function GET(request: Request) {
        FROM greenhouse_finance.expenses
        WHERE COALESCE(document_date, payment_date) >= $1::date
          AND COALESCE(document_date, payment_date) <= $2::date
+         AND COALESCE(is_annulled, FALSE) = FALSE
        GROUP BY cost_category`,
       [periodStart, periodEnd]
     ),
@@ -94,7 +98,8 @@ export async function GET(request: Request) {
        FROM greenhouse_finance.expenses
        WHERE payroll_entry_id IS NOT NULL
          AND COALESCE(document_date, payment_date) >= $1::date
-         AND COALESCE(document_date, payment_date) <= $2::date`,
+         AND COALESCE(document_date, payment_date) <= $2::date
+         AND COALESCE(is_annulled, FALSE) = FALSE`,
       [periodStart, periodEnd]
     ),
 

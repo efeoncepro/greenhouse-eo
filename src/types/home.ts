@@ -39,6 +39,14 @@ export interface HomeSnapshot {
   }
   modules: ModuleCard[]
   tasks: PendingTask[]
+  financeStatus?: {
+    periodLabel: string
+    closureStatus: string | null
+    readinessPct: number | null
+    latestMarginPct: number | null
+    latestMarginPeriodLabel: string | null
+    latestPeriodClosed: boolean
+  } | null
   nexaIntro: string
   computedAt: string
 }

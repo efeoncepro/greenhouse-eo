@@ -35,6 +35,10 @@
     {
       "path": "/api/cron/projection-recovery",
       "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/nubox-balance-sync",
+      "schedule": "0 */4 * * *"
     }
   ]
 }

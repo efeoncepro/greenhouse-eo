@@ -1,5 +1,18 @@
 # Finance Dual-Store Cutover Plan V1
 
+## Delta 2026-03-30
+
+- Este documento ya no debe leerse como plan vigente de ejecución por fases tempranas.
+- El estado real post `TASK-166` es:
+  - los write paths core de Finance ya operan `Postgres-first` y pueden fallar cerrado con `FINANCE_BQ_WRITE_DISABLED`
+  - `Finance Clients` ya opera `Postgres-first` también en list/detail/create/update/sync
+  - BigQuery queda solo como fallback transicional y compatibilidad localizada, no como source of truth operativa para request paths nuevos
+  - los consumers financieros críticos ya deben resolver `client_id` canónico vía `greenhouse_finance.client_profiles` cuando aparecen ingresos legacy `profile-only`
+- Fuente canónica del estado actual:
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/tasks/complete/TASK-166-finance-bigquery-write-cutover.md`
+  - `docs/tasks/complete/TASK-050-finance-client-canonical-runtime-cutover.md`
+
 ## Context
 
 The Finance module operates with a **dual-store architecture**: PostgreSQL (Cloud SQL) as the target canonical store, and BigQuery as the current source of truth for reads. This document defines the cutover phases, the current state, and the criteria for advancing each phase.
@@ -9,15 +22,15 @@ Related docs:
 - `GREENHOUSE_POSTGRES_CANONICAL_360_V1.md` — Postgres schema reference
 - `GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md` — data platform overview
 
-## Current State (Phase 3 — Postgres-first reads, BigQuery fallback)
+## Historical Snapshot (superseded)
 
-As of 2026-03-15, Finance API routes follow this pattern:
+As of 2026-03-15, Finance API routes followed this pattern:
 
 | Operation | Primary store | Fallback | Notes |
 |-----------|--------------|----------|-------|
 | **GET** (list, detail) | PostgreSQL | BigQuery | Reads from Postgres first; falls back to BigQuery on connection/config errors |
 | **POST** (create) | PostgreSQL | BigQuery | Writes to Postgres first; if Postgres is unavailable, writes to BigQuery |
-| **PUT** (update) | BigQuery | — | Updates go to BigQuery only (Postgres update paths not yet wired) |
+| **PUT** (update) | BigQuery | — | Historical snapshot only; no longer describes the current runtime |
 
 ### Phase history
 
@@ -25,17 +38,17 @@ As of 2026-03-15, Finance API routes follow this pattern:
 - **Phase 2** (2026-03-15): Backfilled all 9 Postgres tables from BigQuery. Row counts validated.
 - **Phase 3** (2026-03-15): Restored Postgres-first reads in all GET handlers with BigQuery fallback.
 
-### Affected endpoints
+### Historical endpoint map
 
 | Endpoint | GET reads from | POST writes to |
 |----------|---------------|----------------|
 | `/api/finance/income` | Postgres → BQ fallback | Postgres → BQ fallback |
-| `/api/finance/income/[id]` | Postgres → BQ fallback | — |
+| `/api/finance/income/[id]` | Postgres → BQ fallback | Historical snapshot |
 | `/api/finance/expenses` | Postgres → BQ fallback | Postgres → BQ fallback |
-| `/api/finance/expenses/[id]` | Postgres → BQ fallback | — |
+| `/api/finance/expenses/[id]` | Postgres → BQ fallback | Historical snapshot |
 | `/api/finance/accounts` | Postgres → BQ fallback (+ BQ balance enrichment) | Postgres → BQ fallback |
 | `/api/finance/exchange-rates` | Postgres → BQ fallback | Postgres → BQ fallback |
-| `/api/finance/expenses/meta` | Postgres (accounts) + BQ (suppliers, institutions) | — |
+| `/api/finance/expenses/meta` | Postgres (accounts) + BQ (suppliers, institutions) | Historical snapshot |
 | `/api/finance/reconciliation` | BigQuery | BigQuery |
 | `/api/finance/suppliers` | Postgres → BQ fallback | Postgres → BQ fallback |
 
@@ -150,11 +163,24 @@ Postgres-first paths only activate when these env vars are set:
 | `GREENHOUSE_POSTGRES_MAX_CONNECTIONS` | Optional (default: 5) |
 
 Current deployment:
-- **Production**: Not configured → always BigQuery
-- **Staging (develop)**: Not configured → always BigQuery
-- **Preview (fix/codex-operational-finance)**: Configured → Postgres writes active, BigQuery reads
+- Historical note only; no longer authoritative for current environment readiness.
 
 ---
+
+## Current authoritative interpretation
+
+Use this document only as migration history.
+
+Current guardrails:
+
+1. `FINANCE_BIGQUERY_WRITE_ENABLED` is a real operational guard, not a planning flag.
+2. New Finance runtime lanes must be `Postgres-first`.
+3. BigQuery fallback is transitional compatibility only and must not be treated as the target architecture.
+4. `client_profile_id` is not a commercial client identity substitute; downstream consumers must resolve canonical `client_id` before aggregating revenue or receivables.
+5. For current endpoint-by-endpoint status, prefer:
+   - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+   - `docs/tasks/complete/TASK-166-finance-bigquery-write-cutover.md`
+   - `docs/tasks/complete/TASK-050-finance-client-canonical-runtime-cutover.md`
 
 ## Key design decisions
 

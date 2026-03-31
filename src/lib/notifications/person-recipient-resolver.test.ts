@@ -2,7 +2,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('server-only', () => ({}))
 
+const mockGetCanonicalPersonsByMemberIds = vi.fn()
+const mockGetCanonicalPersonsByIdentityProfileIds = vi.fn()
+const mockGetCanonicalPersonByUserId = vi.fn()
 const mockRunGreenhousePostgresQuery = vi.fn()
+
+vi.mock('@/lib/identity/canonical-person', () => ({
+  getCanonicalPersonsByMemberIds: (...args: unknown[]) => mockGetCanonicalPersonsByMemberIds(...args),
+  getCanonicalPersonsByIdentityProfileIds: (...args: unknown[]) => mockGetCanonicalPersonsByIdentityProfileIds(...args),
+  getCanonicalPersonByUserId: (...args: unknown[]) => mockGetCanonicalPersonByUserId(...args)
+}))
 
 vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
@@ -11,6 +20,7 @@ vi.mock('@/lib/postgres/client', () => ({
 const {
   getIdentityProfileNotificationRecipients,
   getMemberNotificationRecipients,
+  getRoleCodeNotificationRecipients,
   getUserNotificationRecipient,
   resolveNotificationRecipients
 } = await import('./person-recipient-resolver')
@@ -21,19 +31,20 @@ describe('person recipient resolver', () => {
   })
 
   it('prefers a linked portal user but keeps person context when resolving a member', async () => {
-    mockRunGreenhousePostgresQuery.mockResolvedValueOnce([
-      {
-        member_id: 'member-1',
-        identity_profile_id: 'profile-1',
-        display_name: 'Member One',
-        primary_email: 'member.one@efeonce.org',
-        canonical_email: 'member.one@efeonce.org',
-        profile_full_name: 'Member One Canonical',
-        user_id: 'user-1',
-        client_user_email: 'member.one@login.efeonce.org',
-        client_user_full_name: 'Member One Login'
-      }
-    ])
+    mockGetCanonicalPersonsByMemberIds.mockResolvedValueOnce(
+      new Map([
+        ['member-1', {
+          identityProfileId: 'profile-1',
+          memberId: 'member-1',
+          userId: 'user-1',
+          displayName: 'Member One Canonical',
+          canonicalEmail: 'member.one@efeonce.org',
+          portalEmail: 'member.one@login.efeonce.org',
+          portalDisplayName: 'Member One Login',
+          memberEmail: 'member.one@efeonce.org'
+        }]
+      ])
+    )
 
     await expect(getMemberNotificationRecipients(['member-1'])).resolves.toEqual(
       new Map([
@@ -49,19 +60,20 @@ describe('person recipient resolver', () => {
   })
 
   it('falls back to canonical person contact when there is no portal user', async () => {
-    mockRunGreenhousePostgresQuery.mockResolvedValueOnce([
-      {
-        member_id: 'member-2',
-        identity_profile_id: 'profile-2',
-        display_name: 'Member Two',
-        primary_email: 'member.two@efeonce.org',
-        canonical_email: 'member.two@efeonce.org',
-        profile_full_name: 'Member Two Canonical',
-        user_id: null,
-        client_user_email: null,
-        client_user_full_name: null
-      }
-    ])
+    mockGetCanonicalPersonsByMemberIds.mockResolvedValueOnce(
+      new Map([
+        ['member-2', {
+          identityProfileId: 'profile-2',
+          memberId: 'member-2',
+          userId: null,
+          displayName: 'Member Two Canonical',
+          canonicalEmail: 'member.two@efeonce.org',
+          portalEmail: null,
+          portalDisplayName: null,
+          memberEmail: 'member.two@efeonce.org'
+        }]
+      ])
+    )
 
     await expect(getMemberNotificationRecipients(['member-2'])).resolves.toEqual(
       new Map([
@@ -76,19 +88,20 @@ describe('person recipient resolver', () => {
   })
 
   it('can resolve a person directly from identity_profile_id', async () => {
-    mockRunGreenhousePostgresQuery.mockResolvedValueOnce([
-      {
-        profile_id: 'profile-3',
-        member_id: 'member-3',
-        display_name: 'Member Three',
-        primary_email: 'member.three@efeonce.org',
-        canonical_email: 'canonical.three@efeonce.org',
-        profile_full_name: 'Person Three',
-        user_id: 'user-3',
-        client_user_email: 'member.three@login.efeonce.org',
-        client_user_full_name: 'Member Three Login'
-      }
-    ])
+    mockGetCanonicalPersonsByIdentityProfileIds.mockResolvedValueOnce(
+      new Map([
+        ['profile-3', {
+          identityProfileId: 'profile-3',
+          memberId: 'member-3',
+          userId: 'user-3',
+          displayName: 'Person Three',
+          canonicalEmail: 'canonical.three@efeonce.org',
+          portalEmail: 'member.three@login.efeonce.org',
+          portalDisplayName: 'Member Three Login',
+          memberEmail: 'member.three@efeonce.org'
+        }]
+      ])
+    )
 
     await expect(getIdentityProfileNotificationRecipients(['profile-3'])).resolves.toEqual(
       new Map([
@@ -104,19 +117,16 @@ describe('person recipient resolver', () => {
   })
 
   it('can resolve a person starting from userId and recover member/profile context', async () => {
-    mockRunGreenhousePostgresQuery.mockResolvedValueOnce([
-      {
-        profile_id: 'profile-4',
-        member_id: 'member-4',
-        display_name: 'Member Four',
-        primary_email: 'member.four@efeonce.org',
-        canonical_email: 'canonical.four@efeonce.org',
-        profile_full_name: 'Person Four',
-        user_id: 'user-4',
-        client_user_email: 'member.four@login.efeonce.org',
-        client_user_full_name: 'Member Four Login'
-      }
-    ])
+    mockGetCanonicalPersonByUserId.mockResolvedValueOnce({
+      identityProfileId: 'profile-4',
+      memberId: 'member-4',
+      userId: 'user-4',
+      displayName: 'Person Four',
+      canonicalEmail: 'canonical.four@efeonce.org',
+      portalEmail: 'member.four@login.efeonce.org',
+      portalDisplayName: 'Member Four Login',
+      memberEmail: 'member.four@efeonce.org'
+    })
 
     await expect(getUserNotificationRecipient('user-4')).resolves.toEqual({
       identityProfileId: 'profile-4',
@@ -128,33 +138,34 @@ describe('person recipient resolver', () => {
   })
 
   it('resolves a mixed recipient list through person-first lookups', async () => {
-    mockRunGreenhousePostgresQuery
-      .mockResolvedValueOnce([
-        {
-          member_id: 'member-5',
-          identity_profile_id: 'profile-5',
-          display_name: 'Member Five',
-          primary_email: 'member.five@efeonce.org',
-          canonical_email: 'canonical.five@efeonce.org',
-          profile_full_name: 'Person Five',
-          user_id: 'user-5',
-          client_user_email: 'member.five@login.efeonce.org',
-          client_user_full_name: 'Member Five Login'
-        }
+    mockGetCanonicalPersonsByMemberIds.mockResolvedValueOnce(
+      new Map([
+        ['member-5', {
+          identityProfileId: 'profile-5',
+          memberId: 'member-5',
+          userId: 'user-5',
+          displayName: 'Person Five',
+          canonicalEmail: 'canonical.five@efeonce.org',
+          portalEmail: 'member.five@login.efeonce.org',
+          portalDisplayName: 'Member Five Login',
+          memberEmail: 'member.five@efeonce.org'
+        }]
       ])
-      .mockResolvedValueOnce([
-        {
-          profile_id: 'profile-6',
-          member_id: null,
-          display_name: null,
-          primary_email: null,
-          canonical_email: 'person.six@efeonce.org',
-          profile_full_name: 'Person Six',
-          user_id: null,
-          client_user_email: null,
-          client_user_full_name: null
-        }
+    )
+    mockGetCanonicalPersonsByIdentityProfileIds.mockResolvedValueOnce(
+      new Map([
+        ['profile-6', {
+          identityProfileId: 'profile-6',
+          memberId: null,
+          userId: null,
+          displayName: 'Person Six',
+          canonicalEmail: 'person.six@efeonce.org',
+          portalEmail: null,
+          portalDisplayName: null,
+          memberEmail: null
+        }]
       ])
+    )
 
     await expect(resolveNotificationRecipients([
       { memberId: 'member-5' },
@@ -176,6 +187,48 @@ describe('person recipient resolver', () => {
       {
         email: 'external@example.com',
         fullName: 'External Ops'
+      }
+    ])
+  })
+
+  it('resolves active role-based recipients through the shared person-first notification shape', async () => {
+    mockRunGreenhousePostgresQuery.mockResolvedValueOnce([
+      {
+        identity_profile_id: 'profile-admin',
+        member_id: 'member-admin',
+        user_id: 'user-admin',
+        email: 'admin@efeoncepro.com',
+        full_name: 'Admin One'
+      },
+      {
+        identity_profile_id: 'profile-fallback',
+        member_id: 'member-fallback',
+        user_id: null,
+        email: 'fallback@efeonce.org',
+        full_name: 'Fallback Person'
+      },
+      {
+        identity_profile_id: 'profile-admin',
+        member_id: 'member-admin',
+        user_id: 'user-admin',
+        email: 'admin@efeoncepro.com',
+        full_name: 'Admin One'
+      }
+    ])
+
+    await expect(getRoleCodeNotificationRecipients(['efeonce_admin', 'finance_manager'])).resolves.toEqual([
+      {
+        identityProfileId: 'profile-admin',
+        memberId: 'member-admin',
+        userId: 'user-admin',
+        email: 'admin@efeoncepro.com',
+        fullName: 'Admin One'
+      },
+      {
+        identityProfileId: 'profile-fallback',
+        memberId: 'member-fallback',
+        email: 'fallback@efeonce.org',
+        fullName: 'Fallback Person'
       }
     ])
   })

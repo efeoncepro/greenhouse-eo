@@ -1,7 +1,486 @@
 # project_context.md
 
+## Delta 2026-03-30 Finance staging verification + TASK-164 docs reconciled
+- `staging` ya carga correctamente al menos dos surfaces críticas del carril Finance actual:
+  - `/finance/income/[id]`
+  - `/finance/clients`
+- En la verificación manual asistida solo aparecieron errores de `vercel.live`/CSP embed, no fallos funcionales del runtime Greenhouse.
+- `TASK-164` quedó alineada documentalmente a su estado real implementado; Purchase Orders y HES ya no deben interpretarse como diseño pendiente.
+
+## Delta 2026-03-30 Finance staging smoke for PO/HES/Intelligence
+- `staging` ya carga también las surfaces:
+  - `/finance/purchase-orders`
+  - `/finance/hes`
+  - `/finance/intelligence`
+- Durante la verificación:
+  - `GET /api/cost-intelligence/periods?limit=12` respondió `200`
+  - `GET /api/notifications/unread-count` respondió `200`
+- Observación abierta pero no bloqueante:
+  - `finance/intelligence` dispara un `OPTIONS /dashboard -> 400` durante prefetch; no impidió render ni la carga de datos principales del módulo
+- El resto del ruido de consola observado sigue siendo el embed/CSP report-only de `vercel.live`.
+
+## Delta 2026-03-30 proxy hardening para OPTIONS de page routes
+- `src/proxy.ts` ahora responde `204` a requests `OPTIONS` sobre rutas de página del portal.
+- Objetivo:
+  - evitar `400` espurios durante prefetch/navegación de surfaces que siguen referenciando `/dashboard`
+  - no intervenir el comportamiento de `/api/**`
+- Cobertura:
+  - `src/proxy.test.ts` ahora valida tanto el caso page-route como el guard explícito sobre API routes.
+
+## Delta 2026-03-30 CSP report-only ajustada para Vercel Live fuera de production
+- `src/proxy.ts` ahora arma `frame-src` de la CSP report-only según entorno.
+- Regla vigente:
+  - `production` no incorpora `https://vercel.live`
+  - `preview/staging` sí lo incorporan para evitar ruido de consola del toolbar/bridge de Vercel Live
+- Esto no cambia la política efectiva de negocio del portal; solo limpia señal observacional en entornos no productivos.
+
+## Delta 2026-03-30 Finance/Nubox docs reconciled to runtime
+- `docs/architecture/FINANCE_DUAL_STORE_CUTOVER_V1.md` ya no debe leerse como snapshot operativo actual; quedó explícitamente reclasificado como historial de migración.
+- `TASK-163` y `TASK-165` quedaron alineadas al estado real ya absorbido por runtime para evitar que futuros agentes reabran lanes que ya cerraron en código.
+- La lectura canónica del estado actual de Finance sigue concentrada en:
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/tasks/complete/TASK-166-finance-bigquery-write-cutover.md`
+  - `docs/tasks/complete/TASK-050-finance-client-canonical-runtime-cutover.md`
+
+## Delta 2026-03-30 Nubox DTE download hardening
+- `IncomeDetailView` ahora reutiliza `nuboxPdfUrl` y `nuboxXmlUrl` directos cuando el sync ya los materializó, en vez de forzar siempre el proxy server-side de descarga.
+- `src/lib/nubox/client.ts` normaliza `NUBOX_API_BASE_URL` y `NUBOX_X_API_KEY` con `trim()` y envía `Accept` explícito para descargas `pdf/xml`.
+- Esto reduce fallos `401` en staging cuando el detalle intentaba descargar PDF/XML por el carril proxy aun teniendo URLs directas ya disponibles.
+
+## Delta 2026-03-30 Finance read identity drift hardening
+- `GET /api/finance/income` y `GET /api/finance/expenses` ahora resuelven filtros de cliente contra el contexto canónico antes de consultar Postgres o BigQuery fallback.
+- `income` deja de depender internamente de la equivalencia ad hoc `clientProfileId -> hubspot_company_id`; el filtro usa anclas canónicas resueltas.
+- Se preserva compatibilidad transicional para `GET /api/finance/income`: si un caller legacy sigue mandando `clientProfileId` usando en realidad un `hubspotCompanyId`, el handler reintenta esa lectura como alias legacy en vez de romperla.
+- `expenses` ahora acepta `clientProfileId` y `hubspotCompanyId` como filtros de lectura, resolviéndolos a `clientId` canónico sin cambiar el modelo operativo de `expenses`.
+
+## Delta 2026-03-30 Finance aggregates ya no usan client_profile_id como client_id
+- `computeClientEconomicsSnapshots()` y `computeOperationalPl()` ya no agrupan revenue con `COALESCE(client_id, client_profile_id)`.
+- El runtime ahora traduce ingresos legacy `profile-only` vía `greenhouse_finance.client_profiles` para resolver `client_id` canónico antes de agregar métricas financieras.
+- Impacto: `client_economics` y `operational_pl` dejan de tratar `client_profile_id` como si fuera la llave de cliente comercial, pero siguen incorporando ingresos históricos cuando el profile mapea a un `client_id` real.
+
+## Delta 2026-03-30 Finance clients and campaigns canonized on client_id
+- `GET /api/finance/clients` y `GET /api/finance/clients/[id]` ya calculan receivables e invoices por `client_id` canónico, traduciendo incomes legacy vía `greenhouse_finance.client_profiles` cuando aplica.
+- El fallback BigQuery de `Finance Clients` quedó alineado al mismo criterio, sin volver a tratar `client_profile_id` como llave comercial primaria.
+- `getCampaignFinancials()` ya no usa `COALESCE(client_id, client_profile_id)` para revenue; ahora reancla ingresos al `client_id` canónico antes de calcular margen.
+
 ## Resumen
 Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.js con TypeScript, App Router y MUI. El objetivo no es mantener el producto como template, sino usarlo como base operativa para evolucionarlo hacia el portal Greenhouse.
+
+## Delta 2026-03-30 TASK-166 cerró el lifecycle real del flag de BigQuery writes en Finance
+- `FINANCE_BIGQUERY_WRITE_ENABLED` ya no es solo documentación; ahora es un guard operativo real.
+- Carriles cubiertos:
+  - `POST /api/finance/income`
+  - `POST /api/finance/expenses`
+  - `PUT /api/finance/income/[id]`
+  - `PUT /api/finance/expenses/[id]`
+  - `POST /api/finance/income/[id]/payment`
+  - `POST /api/finance/expenses/bulk`
+  - `POST /api/finance/accounts`
+  - `PUT /api/finance/accounts/[id]`
+  - `POST /api/finance/exchange-rates`
+  - `POST /api/finance/suppliers`
+  - `PUT /api/finance/suppliers/[id]`
+  - `POST /api/finance/clients`
+  - `PUT /api/finance/clients/[id]`
+  - `POST /api/finance/reconciliation`
+  - `PUT /api/finance/reconciliation/[id]`
+  - `POST /api/finance/reconciliation/[id]/match`
+  - `POST /api/finance/reconciliation/[id]/unmatch`
+  - `POST /api/finance/reconciliation/[id]/exclude`
+  - `POST /api/finance/reconciliation/[id]/statements`
+  - `POST /api/finance/reconciliation/[id]/auto-match`
+- Regla vigente:
+  - si PostgreSQL falla y `FINANCE_BIGQUERY_WRITE_ENABLED=false`, estas rutas responden `503` con `FINANCE_BQ_WRITE_DISABLED`
+  - BigQuery queda como fallback transicional solo cuando el flag permanece activo
+- Ajuste relevante:
+  - `suppliers` ya es Postgres-first para writes y dejó de depender de BigQuery como path principal
+  - `clients` ya es Postgres-first para `create/update/sync` vía `greenhouse_finance.client_profiles`
+  - `GET /api/finance/clients` y `GET /api/finance/clients/[id]` también ya nacen desde PostgreSQL (`greenhouse_core`, `greenhouse_finance`, `greenhouse_crm`, `v_client_active_modules`)
+  - BigQuery queda en `Finance Clients` solo como fallback explícito de compatibilidad, no como request path principal
+- Guardrail nuevo:
+  - `resolveFinanceClientContext()` ya no cae a BigQuery por cualquier excepción de PostgreSQL
+  - el fallback solo se activa para errores clasificados como permitidos por `shouldFallbackFromFinancePostgres()`
+
+## Delta 2026-03-30 UI/UX skill stack local reforzada
+- Greenhouse ya no debe depender solo de skills globales de UI para frontend portal.
+- Nuevo baseline canónico:
+  - `docs/ui/GREENHOUSE_MODERN_UI_UX_BASELINE_V1.md`
+- La capa local de skills en `.codex/skills/*` ya debe tratar este baseline como fuente operativa para:
+  - first-fold hierarchy
+  - estado vacio/parcial/error
+  - UX writing
+  - accessibility basica
+- Nueva skill local:
+  - `greenhouse-ux-content-accessibility`
+- Decisión operativa:
+  - `greenhouse-ui-orchestrator` sigue resolviendo patron y target
+  - `greenhouse-vuexy-ui-expert` y `greenhouse-portal-ui-implementer` ya deben endurecer copy, state design y accessibility con la baseline moderna
+
+## Delta 2026-03-30 view governance ya forma parte de la arquitectura base
+- El portal ya no debe interpretarse como acceso fino gobernado solo por `routeGroups`.
+- Estado vigente:
+  - broad access por `routeGroups`
+  - fine-grained access por `authorizedViews` + `view_code`
+- Persistencia canónica en `greenhouse_core`:
+  - `view_registry`
+  - `role_view_assignments`
+  - `user_view_overrides`
+  - `view_access_log`
+- Superficie operativa:
+  - `/admin/views`
+- Regla para trabajo futuro:
+  - nuevas superficies visibles del portal deberían evaluarse explícitamente como:
+    - gobernables por `view_code`, o
+    - rutas base transversales fuera del modelo
+- Excepción explícita vigente:
+  - `/home` queda fuera del modelo de `view_code`
+  - sigue siendo landing base de internos vía `portalHomePath`
+
+## Delta 2026-03-30 capability modules cliente ya forman parte del gobierno de vistas
+- Los capability modules client-facing ya no deben leerse como navegación implícita derivada solo desde `routeGroups`.
+- Nuevo access point gobernable:
+  - `cliente.modulos`
+- Regla operativa vigente:
+  - menú de `Módulos` visible solo si la sesión conserva `cliente.modulos`
+  - `/capabilities/[moduleId]` exige tanto ese `view_code` como la validación específica del módulo
+
+## Delta 2026-03-30 person-first identity debe preservar carriles reactivos
+- La institucionalización de identidad `person-first` no puede ejecutarse como reemplazo ciego de `client_user`.
+- Contrato operativo vigente:
+  - `identity_profile` = raíz humana canónica
+  - `member` = faceta operativa para payroll, HR, ICO, capacity, People y serving por colaborador
+  - `client_user` = principal de acceso para sesión, inbox, preferencias, overrides y auditoría user-scoped
+- Carriles sensibles revisados:
+  - outbox / webhook dispatch
+  - notification recipients
+  - projections de notifications
+  - projections de finance / client economics
+  - projections de ICO / person intelligence
+- Regla para follow-ons como `TASK-141`:
+  - no mutar silenciosamente payloads, recipient keys ni identifiers operativos (`identity_profile_id`, `member_id`, `user_id`)
+  - resolver el grafo humano completo sin degradar consumers que hoy dependen de `member` o `user`
+
+## Delta 2026-03-30 canonical person resolver ya tiene primer slice reusable
+- `TASK-141` dejó de ser solo framing documental.
+- Baseline técnica nueva:
+  - `src/lib/identity/canonical-person.ts`
+- El resolver shared ya puede publicar el grafo humano mínimo por:
+  - `userId`
+  - `memberId`
+  - `identityProfileId`
+- Shape institucional aplicada:
+  - `identityProfileId`
+  - `memberId`
+  - `userId`
+  - `eoId`
+  - `displayName`
+  - `canonicalEmail`
+  - `portalAccessState`
+  - `resolutionSource`
+- Guardrail vigente:
+  - esto no reemplaza stores `userId`-scoped ni serving `memberId`-scoped
+  - expone el bridge canónico sin hacer cutover big bang
+
+## Delta 2026-03-30 /admin/views ya expone bridge persona sin romper overrides
+- `Admin Center > Vistas y acceso` sigue siendo compatible con:
+  - `user_view_overrides`
+  - `view_access_log`
+  - `authorizedViews`
+- Cambio aplicado:
+  - el preview ya enriquece cada principal portal con:
+    - `identityProfileId`
+    - `memberId`
+    - `portalAccessState`
+    - `resolutionSource`
+- Lectura operativa:
+  - `/admin/views` todavía no es una surface persona-first cerrada
+  - pero ya no depende ciegamente de leer `client_user` como si fuera la raíz humana
+  - `TASK-140` queda como follow-on para el universo previewable y la UX completa de persona
+
+## Delta 2026-03-30 TASK-141 ya tiene resolver shared conservador
+- Greenhouse ya no depende solo de contrato documental para la lane `person-first`.
+- Slice runtime nuevo:
+  - `src/lib/identity/canonical-person.ts`
+- Adopción inicial cerrada:
+  - `src/lib/notifications/person-recipient-resolver.ts`
+  - `src/lib/webhooks/consumers/notification-recipients.ts`
+- Regla operativa de este slice:
+  - el resolver shared expone simultáneamente `identityProfileId`, `memberId`, `userId`, `portalAccessState` y `resolutionSource`
+  - notifications sigue privilegiando `userId` como recipient key efectiva cuando existe principal portal
+  - el carril no cambia todavía `/admin/views`, outbox payloads ni projections member-scoped
+
+## Delta 2026-03-30 TASK-134 ya comparte recipients role-based sobre el contrato persona-first
+- Notifications ya no mantiene dos lecturas distintas de recipients role-based entre projections y webhook consumers.
+- Nuevo baseline shared:
+  - `src/lib/notifications/person-recipient-resolver.ts`
+    - `getRoleCodeNotificationRecipients(roleCodes)`
+- Adopción inicial cerrada:
+  - `src/lib/sync/projections/notifications.ts`
+  - `src/lib/webhooks/consumers/notification-recipients.ts`
+- Guardrail vigente:
+  - inbox, preferencias y notificaciones persistidas siguen `userId`-scoped
+  - dedupe y `notification_log.user_id` siguen dependiendo de `buildNotificationRecipientKey()`
+  - el cut elimina drift de mapping, no cambia recipient keys ni semántica de delivery
+
+## Delta 2026-03-30 TASK-134 quedó cerrada como contrato transversal de Notifications
+- Greenhouse Notifications ya no tiene deuda estructural abierta entre identidad humana y delivery portal.
+- Contrato vigente:
+  - resolución humana `person-first`
+  - `identity_profile` como raíz humana
+  - `member` como faceta operativa cuando el evento nace desde colaboración/payroll
+  - `userId` preservado como llave operativa para inbox, preferencias, auditoría y recipient key efectiva
+- Regla para follow-ons:
+  - nuevos consumers UX-facing o webhook-based deben nacer sobre este contrato shared
+  - no reintroducir mappings `client_user-first` ni reinterpretar `notification_log.user_id` como FK estricta a portal user
+
+## Delta 2026-03-30 TASK-141 quedó cerrada como baseline institucional
+- La lane `canonical person identity consumption` ya no queda abierta como framing.
+- Estado resultante:
+  - `identity_profile` queda institucionalizado como raíz humana canónica
+  - `member` sigue siendo la llave operativa fuerte para payroll, capacity, finance serving, ICO y costos
+  - `client_user` sigue siendo principal de acceso para sesión, inbox, preferencias, overrides y auditoría
+- Los siguientes cortes ya no deben reabrir este contrato:
+  - `TASK-140` consume el bridge para completar `/admin/views` person-first
+  - `TASK-134` endurece notifications sobre el resolver shared
+  - `TASK-162` construye costo comercial canónico encima de esta separación explícita
+
+## Delta 2026-03-30 `/admin/views` ya consume persona previewable
+- `Admin Center > Vistas y acceso` ya no selecciona conceptualmente solo un `client_user`.
+- Slice vigente:
+  - el universo previewable se agrupa por persona canónica cuando existe `identityProfileId`
+  - el fallback sigue siendo un principal portal aislado cuando el bridge humano está degradado
+- Invariante preservada:
+  - `userId` sigue siendo la llave operativa para overrides, auditoría de vistas y `authorizedViews`
+  - el cut es persona-first para lectura y preview, no un reemplazo big bang del principal portal
+
+## Delta 2026-03-30 runtime Postgres más resiliente a fallos TLS transitorios
+- `src/lib/postgres/client.ts` ya no deja cacheado indefinidamente un pool fallido.
+- Cambios operativos:
+  - si `buildPool()` falla, el singleton se limpia para permitir recovery en el siguiente intento
+  - si `pg` emite errores de conexión/TLS, el pool y el connector se resetean
+  - queries y transacciones reintentan una vez para errores retryable como `ssl alert bad certificate`
+- Lectura práctica:
+  - esto no reemplaza el diagnóstico de infraestructura si Cloud SQL o el connector siguen fallando
+  - sí evita que un handshake roto quede pegado en un runtime caliente y multiplique alertas innecesarias
+
+## Delta 2026-03-30 Cost Intelligence foundation bootstrap
+- Greenhouse ya reconoce `cost_intelligence` como domain soportado del projection registry.
+- Base técnica nueva:
+  - schema `greenhouse_cost_intelligence`
+  - `period_closure_config`
+  - `period_closures`
+  - serving tables `greenhouse_serving.period_closure_status` y `greenhouse_serving.operational_pl_snapshots`
+- Event catalog ya reserva el prefijo `accounting.*` para:
+  - `accounting.period_closed`
+  - `accounting.period_reopened`
+  - `accounting.pl_snapshot.materialized`
+  - `accounting.margin_alert.triggered`
+- Route nueva:
+  - `/api/cron/outbox-react-cost-intelligence`
+- Decisión operativa actual:
+  - el dominio ya puede procesarse de forma dedicada
+  - el smoke local autenticado del path dedicado ya responde `200`
+  - el scheduling fino puede seguir temporalmente apoyado en el catch-all `outbox-react` mientras no existan projections registradas; ya no por un bloqueo técnico del runtime, sino por secuenciación de rollout
+- Regla nueva de continuidad:
+  - `TASK-068` y `TASK-069` deben mantenerse consistentes con `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - Cost Intelligence no debe redefinir un P&L paralelo; debe materializar y agregar la semántica financiera canónica ya definida en Finance
+
+## Delta 2026-03-30 TASK-068 period closure status ya tiene primer slice real
+- Cost Intelligence ya no tiene solo foundation; ahora existe un carril operativo inicial para cierre de período:
+  - `checkPeriodReadiness()`
+  - `closePeriod()` / `reopenPeriod()`
+  - projection `period_closure_status`
+  - APIs bajo `/api/cost-intelligence/periods/**`
+- Decisión semántica actual para readiness mensual:
+  - ingreso por `greenhouse_finance.income.invoice_date`
+  - gasto por `COALESCE(document_date, payment_date)`
+  - FX por `greenhouse_finance.exchange_rates.rate_date`
+  - payroll gating por `greenhouse_payroll.payroll_periods.status`
+- Ajuste de continuidad aplicado:
+  - el período ya se resuelve además contra el calendario operativo compartido de Greenhouse
+  - `checkPeriodReadiness()` expone timezone/jurisdicción, ventana operativa y último día hábil del mes objetivo
+  - `listRecentClosurePeriods()` garantiza incluir el mes operativo actual aunque todavía no existan señales materializadas en Finance/Payroll
+- Estado actual:
+  - task cerrada para su alcance
+  - smoke reactivo end-to-end validado con `pnpm smoke:cost-intelligence:period-closure`
+  - el remanente real ya no es de wiring/runtime; cualquier mejora futura cae como follow-on semántico, no como blocker del carril
+
+## Delta 2026-03-30 TASK-069 operational_pl ya tiene primer slice materializado
+- Cost Intelligence ya no depende solo de `client_economics` on-read para economics agregada.
+- Nuevo carril implementado:
+  - `computeOperationalPl()` materializa snapshots en `greenhouse_serving.operational_pl_snapshots`
+  - scopes soportados: `client`, `space`, `organization`
+  - APIs:
+    - `/api/cost-intelligence/pl`
+    - `/api/cost-intelligence/pl/[scopeType]/[scopeId]`
+- Contrato aplicado:
+  - revenue por client = net revenue (`total_amount_clp - partner_share`)
+  - labor cost desde `client_labor_cost_allocation`
+  - overhead desde `member_capacity_economics`
+  - `period_closed` y `snapshot_revision` desde `period_closure_status`
+  - anti-doble-conteo: `direct_expense` excluye `expenses.payroll_entry_id`
+- Integraciones nuevas:
+  - projection reactiva `operational_pl` dentro del domain `cost_intelligence`
+  - `notification_dispatch` ya escucha `accounting.margin_alert.triggered`
+  - `materialization-health` ya observa `operational_pl_snapshots`
+- Estado actual:
+  - task abierta todavía
+  - el remanente principal ahora son consumers downstream (`TASK-071`) y hardening semántico, no wiring base
+
+## Delta 2026-03-30 TASK-069 smoke reactivo E2E validado
+- `operational_pl` ya quedó validada también en runtime reactivo real.
+- Nuevo smoke reusable:
+  - `pnpm smoke:cost-intelligence:operational-pl`
+- Evidencia real del carril:
+  - evento sintético `finance.income.updated`
+  - handler `operational_pl:finance.income.updated` sin error en `outbox_reactive_log`
+  - snapshots materializados en `greenhouse_serving.operational_pl_snapshots`
+  - eventos `accounting.pl_snapshot.materialized` publicados
+- Estado actual:
+  - el carril base `outbox -> operational_pl` ya no está pendiente
+  - lo siguiente con más valor es consumers downstream y hardening semántico
+
+## Delta 2026-03-30 Finance Intelligence ya usa Cost Intelligence como surface principal
+- `/finance/intelligence` ya no usa `ClientEconomicsView` como portada principal del módulo.
+- Nueva surface activa:
+  - `FinancePeriodClosureDashboardView`
+- Capacidades visibles ya integradas en la UI:
+  - hero y KPIs de cierre operativo
+  - tabla de últimos 12 períodos con semáforos por pata
+  - P&L inline expandible por cliente
+  - cierre manual y reapertura con control por rol
+- Regla operativa:
+  - `finance_manager` y `efeonce_admin` pueden cerrar períodos listos
+  - solo `efeonce_admin` puede reabrir períodos cerrados
+- Estado:
+  - implementación técnica ya validada con `eslint`, `tsc` y `build`
+  - validación visual todavía pendiente antes de declarar `TASK-070` cerrada
+
+## Delta 2026-03-30 Cost Intelligence ya tiene baseline cerrada como módulo
+- Cost Intelligence ya no debe leerse como una lane experimental separada, sino como módulo operativo con baseline implementada.
+- Estado consolidado:
+  - `TASK-067` cerrada: foundation técnica
+  - `TASK-068` cerrada: cierre de período
+  - `TASK-069` cerrada: P&L operativo materializado
+  - `TASK-070` en implementación avanzada: UI principal de Finance ya sobre el módulo
+- Contrato canónico vigente:
+  - serving base:
+    - `greenhouse_serving.period_closure_status`
+    - `greenhouse_serving.operational_pl_snapshots`
+  - auth:
+    - lectura para `finance` y `efeonce_admin`
+    - cierre para `finance_manager` y `efeonce_admin`
+    - reapertura solo para `efeonce_admin`
+- Siguiente ola explícita:
+  - `TASK-071` como consumers distribuidos en Agency, Org 360, People 360 y Home/Nexa
+
+## Delta 2026-03-30 TASK-071 ya tiene primer cutover de consumers distribuidos
+- Cost Intelligence ya no vive solo en `/finance/intelligence`; el serving materializado empezó a alimentar consumers existentes del portal.
+- Estado real del cutover:
+  - Agency lee `operational_pl_snapshots` para el resumen financiero de `SpaceCard`
+  - Organization 360 (`Rentabilidad`) ya es serving-first con fallback al compute legacy
+  - People 360 ya expone `latestCostSnapshot` con closure awareness en `PersonFinanceTab`
+  - `FinanceImpactCard` de People HR Profile ya muestra período y estado de cierre
+  - Home ya puede resolver un `financeStatus` resumido para roles internos/finance y usarlo en `OperationStatus`
+- Remanente explícito de la lane:
+  - endurecer fallback semantics
+  - validación visual real
+  - el resumen ya también entra a Nexa `lightContext`
+  - sigue pendiente solo validación visual/cierre limpio de la lane
+
+## Delta 2026-03-30 Cost Intelligence documentado end-to-end
+- La documentación viva del repo ya refleja Cost Intelligence como módulo operativo transversal, no como lane aislada.
+- Capas ya explicitadas en arquitectura:
+  - foundation técnica (`TASK-067`)
+  - period closure (`TASK-068`)
+  - operational P&L (`TASK-069`)
+  - finance UI principal (`TASK-070`)
+  - consumers distribuidos (`TASK-071`)
+- Finance conserva ownership del motor financiero central.
+- Cost Intelligence queda formalizado como layer de management accounting, closure awareness y serving distribuido hacia Agency, Organization 360, People 360, Home y Nexa.
+
+## Delta 2026-03-30 Cost Intelligence visual validation found a display-only date bug
+- La validación visual real de `/finance/intelligence` confirmó que `lastBusinessDayOfTargetMonth` sí viene del calendario operativo compartido.
+- El bug detectado fue de render y timezone:
+  - la UI parseaba fechas `YYYY-MM-DD` con `new Date(...)`
+  - eso corría el “último día hábil” un día hacia atrás en algunos períodos
+- El fix quedó aplicado en `FinancePeriodClosureDashboardView` con parseo seguro para display.
+- Con ese ajuste, el carril `TASK-070` queda todavía más cerca de cierre funcional real; el remanente ya es principalmente visual/UX, no de datos ni semántica operativa.
+
+## Delta 2026-03-30 Cost Intelligence ya excluye assignments internos de la atribución comercial
+- Se consolidó una regla canónica shared para assignments internos:
+  - `space-efeonce`
+  - `efeonce_internal`
+  - `client_internal`
+- Esa regla ya se reutiliza en:
+  - `Agency > Team`
+  - `member_capacity_economics`
+  - `auto-allocation-rules`
+  - `client_labor_cost_allocation`
+  - `computeOperationalPl()`
+- Decisión operativa:
+  - la carga interna sigue siendo válida para operación/capacity
+  - no debe competir como cliente comercial en labor cost ni en snapshots de Cost Intelligence
+- Ajuste técnico asociado:
+  - `greenhouse_runtime` necesita `DELETE` acotado sobre `greenhouse_serving.operational_pl_snapshots`
+  - se usa solo para purgar snapshots obsoletos de la misma revisión antes del upsert vigente
+
+## Delta 2026-03-30 Commercial cost attribution queda definida como capa canónica
+- Greenhouse ya no debe leer la atribución comercial de costos como lógica repartida entre Payroll, Team Capacity, Finance y Cost Intelligence.
+- Decisión acordada:
+- existe una capa canónica explícita de `commercial cost attribution`
+- la fuente canónica del contrato vive en `docs/architecture/GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`
+- primer slice shared ya implementado:
+  - `src/lib/commercial-cost-attribution/assignment-classification.ts`
+  - clasifica assignments en:
+    - `commercial_billable`
+    - `commercial_non_billable`
+    - `internal_operational`
+    - `excluded_invalid`
+- estado actual del dominio:
+  - `client_labor_cost_allocation` sigue siendo el bridge laboral histórico
+  - `member_capacity_economics` sigue siendo la fuente reusable de labor cost cargado + overhead por miembro
+  - `src/lib/commercial-cost-attribution/member-period-attribution.ts` ya actúa como capa intermedia canónica on-read por `member_id + período`
+  - `src/lib/cost-intelligence/compute-operational-pl.ts` ya consume esa capa intermedia en vez de mezclar directamente labor bridge + overhead query local
+  - `src/lib/finance/postgres-store-intelligence.ts` y `src/lib/account-360/organization-economics.ts` también ya consumen esa capa intermedia
+  - `src/lib/commercial-cost-attribution/store.ts` ya materializa la truth layer inicial en `greenhouse_serving.commercial_cost_attribution`
+  - `member-period-attribution.ts` hace serving-first con fallback a recompute
+  - `materializeOperationalPl()` ya rematerializa primero esta capa y luego el P&L operativo
+  - `src/lib/sync/projections/commercial-cost-attribution.ts` ya hace refresh reactivo dedicado y publica `accounting.commercial_cost_attribution.materialized`
+  - `src/lib/commercial-cost-attribution/insights.ts` ya expone health semántico y explain por cliente/período
+  - APIs disponibles:
+    - `/api/cost-intelligence/commercial-cost-attribution/health`
+    - `/api/cost-intelligence/commercial-cost-attribution/explain/[year]/[month]/[clientId]`
+  - `/api/cron/materialization-health` ya observa freshness de `commercial_cost_attribution`
+  - el siguiente remanente es endurecer policy/UX de observabilidad y decidir cierre formal de la lane
+  - Payroll, Team Capacity y Finance siguen calculando sus piezas de dominio
+  - la verdad consolidada de costo comercial sale de una sola capa shared
+  - esa capa alimenta primero a:
+    - Finance
+    - Cost Intelligence
+  - y desde ahí a consumers derivados:
+    - Agency
+    - Organization 360
+    - People
+    - Home
+    - Nexa
+    - futuros Service P&L / Campaign bridges
+- Task canónica abierta:
+  - `TASK-162`
+
+## Delta 2026-03-30 TASK-162 queda cerrada como baseline canónica de atribución comercial
+- La lane `commercial cost attribution` ya no queda abierta como framing o implementación parcial.
+- Estado resultante:
+  - `greenhouse_serving.commercial_cost_attribution` queda institucionalizada como truth layer materializada
+  - `operational_pl_snapshots` sigue como serving derivado para margen/rentabilidad por scope
+  - `member_capacity_economics` sigue como serving derivado para costo/capacidad por miembro
+  - `client_labor_cost_allocation` queda acotado a bridge/input interno del materializer y provenance histórica
+- Corte final aplicado:
+  - `src/lib/person-360/get-person-finance.ts` ya no lee el bridge legacy
+  - `src/lib/finance/payroll-cost-allocation.ts` ya resume la capa canónica/shared
+- Regla para follow-ons:
+  - lanes como `TASK-143`, `TASK-146`, `TASK-147` y `TASK-160` no deben reintroducir lecturas directas del bridge legacy
+  - si necesitan explain comercial deben apoyarse en `commercial_cost_attribution`
 
 ## Delta 2026-03-30 Sentry incident reader hardening
 - `Ops Health` ya distingue entre el token de build/source maps y el token de lectura de incidentes.
@@ -14,7 +493,29 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - el reader requiere un token con scope `event:read`
 - Decisión operativa:
   - `SENTRY_AUTH_TOKEN` sigue siendo el token principal de build/source maps
-  - `SENTRY_INCIDENTS_AUTH_TOKEN` pasa a ser el canal recomendado para `Ops Health`
+- `SENTRY_INCIDENTS_AUTH_TOKEN` pasa a ser el canal recomendado para `Ops Health`
+
+## Delta 2026-03-30 Finance hardening ya conecta retry DTE con emisión real
+- El carril de `TASK-139` ya no deja la cola DTE como stub operativo.
+- Estado vigente:
+  - `greenhouse_finance.dte_emission_queue` preserva `dte_type_code`
+  - `/api/cron/dte-emission-retry` reintenta con `emitDte()` real
+  - las rutas de emisión encolan fallos retryable para recuperación posterior
+- Lectura operativa:
+  - el retry DTE ya es un mecanismo real de resiliencia
+  - `FINANCE_BIGQUERY_WRITE_ENABLED` sigue siendo un follow-on de lifecycle/cutover, no un bloqueo funcional del hardening base
+
+## Delta 2026-03-30 arranca el cutover real de writes legacy de Finance
+- El flag `FINANCE_BIGQUERY_WRITE_ENABLED` ya no queda solo documentado.
+- Slice inicial activo:
+  - `src/lib/finance/bigquery-write-flag.ts`
+  - `POST /api/finance/income`
+  - `POST /api/finance/expenses`
+- Regla vigente:
+  - si PostgreSQL falla y el flag está en `false`, esas rutas fallan cerrado con `FINANCE_BQ_WRITE_DISABLED`
+  - si el flag está en `true`, el fallback BigQuery actual sigue disponible como compatibilidad transicional
+- Lane nueva:
+  - `TASK-166`
 
 ## Delta 2026-03-29 notifications identity model
 - El sistema de notificaciones ya no debe leerse como `client_user-first`.

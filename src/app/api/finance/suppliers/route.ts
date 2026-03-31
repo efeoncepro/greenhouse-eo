@@ -19,7 +19,12 @@ import {
   type SupplierCategory,
   type PaymentMethod
 } from '@/lib/finance/shared'
-import { listFinanceSuppliersFromPostgres, shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
+import {
+  listFinanceSuppliersFromPostgres,
+  seedFinanceSupplierInPostgres,
+  shouldFallbackFromFinancePostgres
+} from '@/lib/finance/postgres-store'
+import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
 
 export const dynamic = 'force-dynamic'
 
@@ -176,8 +181,6 @@ export async function POST(request: Request) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  await ensureFinanceInfrastructure()
-
   try {
     const body = await request.json()
     const legalName = assertNonEmptyString(body.legalName, 'legalName')
@@ -210,52 +213,97 @@ export async function POST(request: Request) {
       ? (body.defaultPaymentMethod as PaymentMethod)
       : 'transfer'
 
-    const projectId = getFinanceProjectId()
+    try {
+      await seedFinanceSupplierInPostgres({
+        supplierId,
+        providerId: normalizedProviderId || null,
+        legalName,
+        tradeName: body.tradeName ? normalizeString(body.tradeName) : null,
+        taxId: body.taxId ? normalizeString(body.taxId) : null,
+        taxIdType: body.taxIdType ? assertValidTaxIdType(body.taxIdType) : 'RUT',
+        country: normalizeString(body.country) || 'CL',
+        category,
+        serviceType: body.serviceType ? normalizeString(body.serviceType) : null,
+        isInternational: Boolean(body.isInternational),
+        primaryContactName: body.primaryContactName ? normalizeString(body.primaryContactName) : null,
+        primaryContactEmail: body.primaryContactEmail ? normalizeString(body.primaryContactEmail) : null,
+        primaryContactPhone: body.primaryContactPhone ? normalizeString(body.primaryContactPhone) : null,
+        website: body.website ? normalizeString(body.website) : null,
+        bankName: body.bankName ? normalizeString(body.bankName) : null,
+        bankAccountNumber: body.bankAccountNumber ? normalizeString(body.bankAccountNumber) : null,
+        bankAccountType: body.bankAccountType ? normalizeString(body.bankAccountType) : null,
+        bankRouting: body.bankRouting ? normalizeString(body.bankRouting) : null,
+        paymentCurrency,
+        defaultPaymentTerms: toNumber(body.defaultPaymentTerms) || 30,
+        defaultPaymentMethod,
+        requiresPo: Boolean(body.requiresPo),
+        isActive: true,
+        notes: body.notes ? normalizeString(body.notes) : null,
+        createdBy: tenant.userId || null
+      })
+    } catch (error) {
+      if (!shouldFallbackFromFinancePostgres(error)) {
+        throw error
+      }
 
-    await runFinanceQuery(`
-      INSERT INTO \`${projectId}.greenhouse.fin_suppliers\` (
-        supplier_id, provider_id, legal_name, trade_name, tax_id, tax_id_type,
-        country, category, service_type, is_international,
-        primary_contact_name, primary_contact_email, primary_contact_phone, website,
-        bank_name, bank_account_number, bank_account_type, bank_routing,
-        payment_currency, default_payment_terms, default_payment_method, requires_po,
-        is_active, notes, created_by,
-        created_at, updated_at
-      ) VALUES (
-        @supplierId, @providerId, @legalName, @tradeName, @taxId, @taxIdType,
-        @country, @category, @serviceType, @isInternational,
-        @contactName, @contactEmail, @contactPhone, @website,
-        @bankName, @bankAccountNumber, @bankAccountType, @bankRouting,
-        @paymentCurrency, @defaultPaymentTerms, @defaultPaymentMethod, @requiresPo,
-        TRUE, @notes, @createdBy,
-        CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP()
-      )
-    `, {
-      supplierId,
-      providerId: normalizedProviderId || null,
-      legalName,
-      tradeName: body.tradeName ? normalizeString(body.tradeName) : null,
-      taxId: body.taxId ? normalizeString(body.taxId) : null,
-      taxIdType: body.taxIdType ? assertValidTaxIdType(body.taxIdType) : 'RUT',
-      country: normalizeString(body.country) || 'CL',
-      category,
-      serviceType: body.serviceType ? normalizeString(body.serviceType) : null,
-      isInternational: Boolean(body.isInternational),
-      contactName: body.primaryContactName ? normalizeString(body.primaryContactName) : null,
-      contactEmail: body.primaryContactEmail ? normalizeString(body.primaryContactEmail) : null,
-      contactPhone: body.primaryContactPhone ? normalizeString(body.primaryContactPhone) : null,
-      website: body.website ? normalizeString(body.website) : null,
-      bankName: body.bankName ? normalizeString(body.bankName) : null,
-      bankAccountNumber: body.bankAccountNumber ? normalizeString(body.bankAccountNumber) : null,
-      bankAccountType: body.bankAccountType ? normalizeString(body.bankAccountType) : null,
-      bankRouting: body.bankRouting ? normalizeString(body.bankRouting) : null,
-      paymentCurrency,
-      defaultPaymentTerms: toNumber(body.defaultPaymentTerms) || 30,
-      defaultPaymentMethod,
-      requiresPo: Boolean(body.requiresPo),
-      notes: body.notes ? normalizeString(body.notes) : null,
-      createdBy: tenant.userId || null
-    })
+      if (!isFinanceBigQueryWriteEnabled()) {
+        return NextResponse.json(
+          {
+            error: 'Finance BigQuery fallback write is disabled. Postgres write path failed.',
+            code: 'FINANCE_BQ_WRITE_DISABLED'
+          },
+          { status: 503 }
+        )
+      }
+
+      await ensureFinanceInfrastructure()
+      const projectId = getFinanceProjectId()
+
+      await runFinanceQuery(`
+        INSERT INTO \`${projectId}.greenhouse.fin_suppliers\` (
+          supplier_id, provider_id, legal_name, trade_name, tax_id, tax_id_type,
+          country, category, service_type, is_international,
+          primary_contact_name, primary_contact_email, primary_contact_phone, website,
+          bank_name, bank_account_number, bank_account_type, bank_routing,
+          payment_currency, default_payment_terms, default_payment_method, requires_po,
+          is_active, notes, created_by,
+          created_at, updated_at
+        ) VALUES (
+          @supplierId, @providerId, @legalName, @tradeName, @taxId, @taxIdType,
+          @country, @category, @serviceType, @isInternational,
+          @contactName, @contactEmail, @contactPhone, @website,
+          @bankName, @bankAccountNumber, @bankAccountType, @bankRouting,
+          @paymentCurrency, @defaultPaymentTerms, @defaultPaymentMethod, @requiresPo,
+          TRUE, @notes, @createdBy,
+          CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP()
+        )
+      `, {
+        supplierId,
+        providerId: normalizedProviderId || null,
+        legalName,
+        tradeName: body.tradeName ? normalizeString(body.tradeName) : null,
+        taxId: body.taxId ? normalizeString(body.taxId) : null,
+        taxIdType: body.taxIdType ? assertValidTaxIdType(body.taxIdType) : 'RUT',
+        country: normalizeString(body.country) || 'CL',
+        category,
+        serviceType: body.serviceType ? normalizeString(body.serviceType) : null,
+        isInternational: Boolean(body.isInternational),
+        contactName: body.primaryContactName ? normalizeString(body.primaryContactName) : null,
+        contactEmail: body.primaryContactEmail ? normalizeString(body.primaryContactEmail) : null,
+        contactPhone: body.primaryContactPhone ? normalizeString(body.primaryContactPhone) : null,
+        website: body.website ? normalizeString(body.website) : null,
+        bankName: body.bankName ? normalizeString(body.bankName) : null,
+        bankAccountNumber: body.bankAccountNumber ? normalizeString(body.bankAccountNumber) : null,
+        bankAccountType: body.bankAccountType ? normalizeString(body.bankAccountType) : null,
+        bankRouting: body.bankRouting ? normalizeString(body.bankRouting) : null,
+        paymentCurrency,
+        defaultPaymentTerms: toNumber(body.defaultPaymentTerms) || 30,
+        defaultPaymentMethod,
+        requiresPo: Boolean(body.requiresPo),
+        notes: body.notes ? normalizeString(body.notes) : null,
+        createdBy: tenant.userId || null
+      })
+    }
 
     const syncResult = await syncProviderFromFinanceSupplier({
       supplierId,

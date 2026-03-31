@@ -6,6 +6,38 @@ import { getTenantContext, type TenantContext } from '@/lib/tenant/get-tenant-co
 
 export type TenantRouteGroup = 'client' | 'internal' | 'admin' | 'agency' | 'hr' | 'finance' | 'employee' | 'my' | 'people' | 'ai_tooling'
 
+export const hasAuthorizedViewCode = ({
+  tenant,
+  viewCode,
+  fallback
+}: {
+  tenant: TenantContext
+  viewCode: string
+  fallback: boolean
+}) => {
+  if (tenant.authorizedViews.length === 0) {
+    return fallback
+  }
+
+  return tenant.authorizedViews.includes(viewCode)
+}
+
+export const hasAnyAuthorizedViewCode = ({
+  tenant,
+  viewCodes,
+  fallback
+}: {
+  tenant: TenantContext
+  viewCodes: string[]
+  fallback: boolean
+}) => {
+  if (tenant.authorizedViews.length === 0) {
+    return fallback
+  }
+
+  return viewCodes.some(viewCode => tenant.authorizedViews.includes(viewCode))
+}
+
 export const isClientTenant = (tenant: TenantContext) => tenant.tenantType === 'client' && Boolean(tenant.clientId)
 
 export const hasRoleCode = (tenant: TenantContext, roleCode: string) => tenant.roleCodes.includes(roleCode)
@@ -13,6 +45,15 @@ export const hasRoleCode = (tenant: TenantContext, roleCode: string) => tenant.r
 export const hasRouteGroup = (tenant: TenantContext, routeGroup: TenantRouteGroup) => tenant.routeGroups.includes(routeGroup)
 
 export const canAccessProject = (tenant: TenantContext, projectId: string) => tenant.projectIds.includes(projectId)
+
+export const canReadCostIntelligence = (tenant: TenantContext) =>
+  hasRouteGroup(tenant, 'finance') || hasRoleCode(tenant, 'efeonce_admin')
+
+export const canCloseCostIntelligencePeriod = (tenant: TenantContext) =>
+  hasRoleCode(tenant, 'finance_manager') || hasRoleCode(tenant, 'efeonce_admin')
+
+export const canReopenCostIntelligencePeriod = (tenant: TenantContext) =>
+  hasRoleCode(tenant, 'efeonce_admin')
 
 export const canAccessPeopleModule = (tenant: TenantContext) =>
   hasRouteGroup(tenant, 'people') ||
@@ -208,6 +249,29 @@ export const requireFinanceTenantContext = async () => {
   }
 
   if (!hasRouteGroup(tenant, 'finance') && !hasRoleCode(tenant, 'efeonce_admin')) {
+    return {
+      tenant: null,
+      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+  }
+
+  return {
+    tenant,
+    errorResponse: null
+  }
+}
+
+export const requireCostIntelligenceTenantContext = async () => {
+  const { tenant, unauthorizedResponse } = await requireTenantContext()
+
+  if (!tenant) {
+    return {
+      tenant: null,
+      errorResponse: unauthorizedResponse
+    }
+  }
+
+  if (!canReadCostIntelligence(tenant)) {
     return {
       tenant: null,
       errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })

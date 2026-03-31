@@ -17,7 +17,7 @@ import { resolveSecret } from '@/lib/secrets/secret-manager'
 // ─── Configuration ──────────────────────────────────────────────────────────
 
 const getBaseUrl = () => {
-  const url = process.env.NUBOX_API_BASE_URL
+  const url = process.env.NUBOX_API_BASE_URL?.trim()
 
   if (!url) throw new Error('NUBOX_API_BASE_URL is not configured')
 
@@ -35,7 +35,7 @@ const getBearerToken = async () => {
 }
 
 const getApiKey = () => {
-  const key = process.env.NUBOX_X_API_KEY
+  const key = process.env.NUBOX_X_API_KEY?.trim()
 
   if (!key) throw new Error('NUBOX_X_API_KEY is not configured')
 
@@ -197,7 +197,8 @@ export const getNuboxSalePdf = async (id: number): Promise<ArrayBuffer> => {
   const response = await fetch(url, {
     headers: {
       Authorization: `Bearer ${await getBearerToken()}`,
-      'x-api-key': getApiKey()
+      'x-api-key': getApiKey(),
+      Accept: 'application/pdf'
     },
     cache: 'no-store',
     signal: AbortSignal.timeout(30_000)
@@ -217,7 +218,8 @@ export const getNuboxSaleXml = async (id: number): Promise<string> => {
   const response = await fetch(url, {
     headers: {
       Authorization: `Bearer ${await getBearerToken()}`,
-      'x-api-key': getApiKey()
+      'x-api-key': getApiKey(),
+      Accept: 'application/xml,text/xml,application/json'
     },
     cache: 'no-store',
     signal: AbortSignal.timeout(15_000)

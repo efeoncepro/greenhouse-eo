@@ -5,6 +5,7 @@ import GreenhouseDashboard from '@views/greenhouse/GreenhouseDashboard'
 import { getDashboardOverview } from '@/lib/dashboard/get-dashboard-overview'
 import { getTeamMembers } from '@/lib/team-queries'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
+import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 
 export default async function Page() {
   const tenant = await getTenantContext()
@@ -13,7 +14,13 @@ export default async function Page() {
     redirect('/login')
   }
 
-  if (!tenant.routeGroups.includes('client')) {
+  const hasAccess = hasAuthorizedViewCode({
+    tenant,
+    viewCode: 'cliente.pulse',
+    fallback: tenant.routeGroups.includes('client')
+  })
+
+  if (!hasAccess) {
     redirect(tenant.portalHomePath || '/auth/landing')
   }
 

@@ -118,6 +118,16 @@ export const NOTIFICATION_CATEGORIES: Record<string, NotificationCategoryConfig>
     priority: 'high'
   },
 
+  finance_alert: {
+    code: 'finance_alert',
+    label: 'Alertas financieras',
+    description: 'Pagos registrados, gastos significativos y cierre de período',
+    icon: 'tabler-chart-bar',
+    audience: 'internal',
+    defaultChannels: ['in_app', 'email'],
+    priority: 'high'
+  },
+
   system_event: {
     code: 'system_event',
     label: 'Eventos del sistema',

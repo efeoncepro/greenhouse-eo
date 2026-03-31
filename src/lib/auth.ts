@@ -226,6 +226,7 @@ export const authOptions: NextAuthOptions = {
           roleCodes: tenant.roleCodes,
           primaryRoleCode: tenant.primaryRoleCode,
           routeGroups: tenant.routeGroups,
+          authorizedViews: tenant.authorizedViews,
           projectScopes: tenant.projectScopes,
           campaignScopes: tenant.campaignScopes,
           businessLines: tenant.businessLines,
@@ -363,6 +364,7 @@ export const authOptions: NextAuthOptions = {
         token.roleCodes = user.roleCodes
         token.primaryRoleCode = user.primaryRoleCode
         token.routeGroups = user.routeGroups
+        token.authorizedViews = user.authorizedViews
         token.projectScopes = user.projectScopes
         token.campaignScopes = user.campaignScopes
         token.businessLines = user.businessLines
@@ -420,6 +422,7 @@ export const authOptions: NextAuthOptions = {
           token.roleCodes = tenant.roleCodes
           token.primaryRoleCode = tenant.primaryRoleCode
           token.routeGroups = tenant.routeGroups
+          token.authorizedViews = tenant.authorizedViews
           token.projectScopes = tenant.projectScopes
           token.campaignScopes = tenant.campaignScopes
           token.businessLines = tenant.businessLines
@@ -477,6 +480,7 @@ export const authOptions: NextAuthOptions = {
           token.roleCodes = tenant.roleCodes
           token.primaryRoleCode = tenant.primaryRoleCode
           token.routeGroups = tenant.routeGroups
+          token.authorizedViews = tenant.authorizedViews
           token.projectScopes = tenant.projectScopes
           token.campaignScopes = tenant.campaignScopes
           token.businessLines = tenant.businessLines
@@ -527,6 +531,7 @@ export const authOptions: NextAuthOptions = {
               ? 'efeonce_account'
               : 'client_executive'
         session.user.routeGroups = Array.isArray(token.routeGroups) ? token.routeGroups.filter(Boolean) : []
+        session.user.authorizedViews = Array.isArray(token.authorizedViews) ? token.authorizedViews.filter(Boolean) : []
         session.user.projectScopes = Array.isArray(token.projectScopes) ? token.projectScopes.filter(Boolean) : []
         session.user.campaignScopes = Array.isArray(token.campaignScopes) ? token.campaignScopes.filter(Boolean) : []
         session.user.businessLines = Array.isArray(token.businessLines) ? token.businessLines.filter(Boolean) : []

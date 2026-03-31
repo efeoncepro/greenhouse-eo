@@ -193,6 +193,45 @@ These domains are operational and write-heavy:
 - account balances and mutable account metadata
 - expense/income states that change due to reconciliation or approvals
 
+##### Finance BigQuery → Postgres Cutover Plan (Delta 2026-03-30)
+
+Finance module migrated to Postgres-first with BigQuery fallback (Slice 1 + 2). Current state:
+
+| Component | Primary Store | BigQuery Status | Cutover Plan |
+|-----------|--------------|----------------|--------------|
+| Accounts CRUD | Postgres | Fallback | Remove fallback after 30d stable |
+| Suppliers CRUD | Postgres | Fallback | Remove fallback after 30d stable |
+| Income CRUD | Postgres | Fallback (Slice 2) | Remove fallback after 30d stable |
+| Expenses CRUD | Postgres | Fallback (Slice 2) | Remove fallback after 30d stable |
+| Income Payments | Postgres only | No BQ table | Done |
+| Exchange Rates | Postgres | Fallback | Remove fallback after 30d stable |
+| Economic Indicators | Postgres | Fallback | Remove fallback after 30d stable |
+| Reconciliation | `postgres-reconciliation.ts` | `reconciliation.ts` (@deprecated) | Remove BQ version after 30d |
+| Dashboard Summary | Postgres | Full BQ fallback path | Remove `handleBigQueryFallback()` |
+| Bulk Expense Import | BigQuery only | Primary! | Add Postgres version |
+| DTE Coverage | Verify | May use BQ | Migrate if needed |
+| Agency economics | BigQuery | Primary for BQ CTEs | Depends on TASK-069 materialized P&L |
+
+Flag: `FINANCE_BIGQUERY_WRITE_ENABLED` controls BQ writes (default: true).
+Operational status after `TASK-166`:
+- covered core/master-data routes now fail closed with `503 FINANCE_BQ_WRITE_DISABLED` when Postgres fails and the flag is `false`
+- covered routes:
+  - income create
+  - income update
+  - income payment create
+  - expense create
+  - expense update
+  - bulk expense create
+  - accounts create/update
+  - exchange-rates upsert
+  - suppliers create/update
+  - clients create/update/sync
+  - reconciliation create/update/match/unmatch/exclude/statements/auto-match
+- `suppliers` no longer uses BigQuery as its primary write path; it is Postgres-first with transitional fallback only when the flag remains enabled
+- `clients` no longer uses BigQuery as its primary write path for mutations; `greenhouse_finance.client_profiles` is now the write baseline and BigQuery remains only as transitional fallback when the flag remains enabled
+- `Finance Clients` list/detail no longer use BigQuery as the primary request path either; PostgreSQL (`greenhouse_core`, `greenhouse_finance`, `greenhouse_crm`, `v_client_active_modules`) is the baseline and BigQuery remains only as explicit read fallback
+Cutover sequence: automated fail-closed validation with flag `false` → staging rollout with flag `false` on covered routes → production rollout with flag `false` → remove BQ write code route by route.
+
 #### AI Tooling operational workflows
 - wallets
 - credit ledger

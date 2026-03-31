@@ -1,5 +1,100 @@
 # GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md
 
+## Delta 2026-03-30 — Consumers distribuidos ya iniciaron cutover
+- `TASK-071` ya no está solo en diseño.
+- Consumers que ya leen serving materializado:
+  - Agency `SpaceCard` vía `agency-finance-metrics.ts`
+  - Organization 360 `Rentabilidad` vía `organization-economics.ts`
+  - People 360 vía `latestCostSnapshot` en `PersonFinanceTab`
+  - Home vía `financeStatus` en `getHomeSnapshot()`
+  - Nexa vía `financeStatus` resumido en `lightContext`
+- Patrón aplicado:
+  - serving-first sobre `greenhouse_serving.operational_pl_snapshots`
+  - `period_closure_status` para closure awareness
+  - fallback honesto a compute legacy solo donde todavía conviene resiliencia (`organization-economics.ts`)
+- Remanente de la ola:
+  - validación visual
+  - cierre semántico de fallbacks
+  - cierre formal de `TASK-070` y `TASK-071`
+
+## Delta 2026-03-30 — La atribución comercial excluye assignments internos
+- Se formaliza una regla canónica compartida con Team Capacity y Finance:
+  - `space-efeonce`
+  - `efeonce_internal`
+  - `client_internal`
+  no participan como cliente comercial en labor attribution, auto-allocation ni `operational_pl`.
+- Motivación:
+  - esos assignments sí representan carga operativa interna válida
+  - pero no deben partir la nómina comercial contra clientes billables cuando el objetivo es management accounting
+- Impacto directo:
+  - `client_labor_cost_allocation` ya no reparte salario hacia `Efeonce` cuando también existe un assignment comercial activo
+  - `computeOperationalPl()` ya filtra esos scopes en revenue, direct expenses, labor y overhead
+  - la materialización puede purgar snapshots obsoletos por período/revisión para no dejar filas stale de clientes internos
+- Excepción de access model:
+  - `greenhouse_runtime` mantiene un permiso acotado de `DELETE` sobre `greenhouse_serving.operational_pl_snapshots`
+  - se usa solo para purgar scopes viejos dentro de la misma revisión antes del upsert del snapshot vigente
+
+## Delta 2026-03-30 — Cost Intelligence consume una capa canónica previa
+
+Cost Intelligence no debería seguir siendo el lugar donde se “termina de inventar” la atribución comercial de costos.
+
+Decisión arquitectónica:
+- la atribución comercial debe consolidarse en una capa canónica previa
+- esa capa debe alimentar a Cost Intelligence con una verdad ya resuelta para:
+  - labor cost comercial
+  - costo interno excluido
+  - overhead atribuible
+  - metadata de fuente, razón y materialización
+
+Implicancia:
+- Cost Intelligence sigue siendo owner de:
+  - cierre de período
+  - `operational_pl`
+  - snapshots y closure awareness
+- pero deja de cargar con toda la semántica de attribution por su cuenta
+
+Consumers que se benefician de esta separación:
+- `/finance/intelligence`
+- Agency economics
+- Organization 360
+- People 360
+- Home
+- Nexa
+- futuros `service_economics` y bridges de campaign/scope
+
+## Delta 2026-03-30 — Baseline del módulo ya implementada
+- El módulo de Cost Intelligence ya no está solo en diseño.
+- Estado implementado en repo:
+  - foundation técnica cerrada (`TASK-067`)
+  - `period_closure_status` cerrada (`TASK-068`)
+  - `operational_pl` cerrada para su baseline (`TASK-069`)
+  - Finance Intelligence ya consume el módulo como surface principal (`TASK-070`)
+- Elementos ya operativos:
+  - schema `greenhouse_cost_intelligence`
+  - serving views:
+    - `greenhouse_serving.period_closure_status`
+    - `greenhouse_serving.operational_pl_snapshots`
+  - APIs:
+    - `GET /api/cost-intelligence/periods`
+    - `GET /api/cost-intelligence/periods/[year]/[month]`
+    - `POST /api/cost-intelligence/periods/[year]/[month]/close`
+    - `POST /api/cost-intelligence/periods/[year]/[month]/reopen`
+    - `GET /api/cost-intelligence/pl`
+    - `GET /api/cost-intelligence/pl/[scopeType]/[scopeId]`
+  - cron reactivo:
+    - `/api/cron/outbox-react-cost-intelligence`
+  - UI principal:
+    - `/finance/intelligence`
+  - consumers distribuidos iniciales:
+    - Agency
+    - Organization 360
+    - People 360
+    - Home
+    - Nexa
+- Decisión operativa vigente:
+  - el engine base del módulo ya se considera estable
+  - lo siguiente ya no es “fundación”, sino consumers distribuidos y profundización funcional
+
 ## Delta 2026-03-28
 - `member_capacity_economics.total_labor_cost_target` ahora puede absorber el costo empleador real calculado por Payroll Chile desde `payroll_entries`, reutilizando la proyección canónica de Team Capacity como base loaded cost en vez de crear un store paralelo.
 - El boundary de Cost Intelligence sigue igual: consume `member_capacity_economics` y no recalcula payroll ni employer costs por su cuenta.
@@ -406,3 +501,67 @@ El layer trabaja con data `provisional` y lo marca así. Consumers pueden leer P
 | Budget/presupuesto no existe | No hay variance analysis | Fase 3 |
 | Bank reconciliation no es condición de cierre | Cierre posible sin reconciliación completa | Fase 3 |
 | Cost centers solo a nivel client + member | No hay visión por department ni BU | Fase 3 |
+
+## 14. Estado implementado y contrato operativo actual
+
+### 14.1 Qué ya está cerrado
+
+| Lane | Estado | Resultado |
+|------|--------|-----------|
+| `TASK-067` | Cerrada | Foundation técnica, schema, eventos `accounting.*`, domain `cost_intelligence`, cron dedicada |
+| `TASK-068` | Cerrada | `period_closure_status`, readiness mensual, close/reopen, calendario operativo, smoke reactivo |
+| `TASK-069` | Cerrada | `operational_pl_snapshots`, APIs P&L, smoke reactivo, health/alerts básicas |
+| `TASK-070` | En implementación avanzada | UI principal de Finance ya sobre Cost Intelligence |
+
+### 14.2 Serving canónico del módulo
+
+| Serving | Owner | Uso actual |
+|---------|-------|-----------|
+| `greenhouse_serving.period_closure_status` | Cost Intelligence | Cierre mensual, readiness, status visible en UI y downstream |
+| `greenhouse_serving.operational_pl_snapshots` | Cost Intelligence | P&L por `client`, `space`, `organization`; reads API y consumers futuros |
+
+### 14.3 Invariantes operativos vigentes
+
+- Cost Intelligence no redefine el P&L financiero canónico; lo materializa y lo distribuye por scope.
+- Revenue operativo sigue siendo net revenue:
+  - `total_amount_clp - partner_share`
+- Costo laboral no se recalcula aquí:
+  - se consume desde `client_labor_cost_allocation`
+- Overhead no se recalcula aquí:
+  - se consume desde `member_capacity_economics`
+- Anti-doble-conteo:
+  - `direct_expense` excluye `expenses.payroll_entry_id`
+- Closure awareness:
+  - `period_closed` y `snapshot_revision` derivan de `period_closure_status`
+
+### 14.4 Authorization vigente
+
+| Acción | Regla actual |
+|--------|--------------|
+| Leer Cost Intelligence | `finance` route group o `efeonce_admin` |
+| Cerrar período | `finance_manager` o `efeonce_admin` |
+| Reabrir período | solo `efeonce_admin` |
+
+### 14.5 Superficie principal implementada
+
+- Ruta activa:
+  - `/finance/intelligence`
+- Surface actual:
+  - dashboard de cierre de período
+  - tabla de 12 meses con semáforos por pata
+  - P&L inline expandible por cliente
+  - acciones `close/reopen`
+- Decisión de producto:
+  - esta ya es la portada principal del módulo
+  - `ClientEconomicsView` queda como surface legacy mientras se decide reubicación o retiro
+
+### 14.6 Consumers todavía pendientes
+
+Los siguientes consumidores no bloquean el módulo base y se tratan como siguiente ola:
+
+- Agency: badge de margen por space
+- Organization 360: rentabilidad leyendo snapshots materializados
+- People 360: costo fully-loaded con closure awareness
+- Home/Nexa: widget financiero resumido
+
+Eso vive en `TASK-071`.

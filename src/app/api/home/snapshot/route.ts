@@ -25,6 +25,8 @@ export async function GET() {
       roleName: user.role || 'client_executive',
       businessLines: user.businessLines || [],
       serviceModules: user.serviceModules || [],
+      roleCodes: user.roleCodes || [],
+      routeGroups: user.routeGroups || [],
       organizationId: user.organizationId
     })
 

@@ -18,6 +18,11 @@ import {
 import { computeDirectOverheadForMember } from '@/lib/team-capacity/tool-cost-attribution'
 import { readMemberDirectToolCosts } from '@/lib/team-capacity/tool-cost-reader'
 import {
+  INTERNAL_COMMERCIAL_CLIENT_IDS,
+  INTERNAL_COMMERCIAL_CLIENT_NAMES,
+  isInternalCommercialAssignment
+} from '@/lib/team-capacity/internal-assignments'
+import {
   getBasePricingPolicy,
   getLoadedCostPerHour,
   getSuggestedBillRate
@@ -245,16 +250,10 @@ export const getMemberCapacityEconomicsScopeFromPayload = (
 }
 
 const isInternalAssignment = (row: AssignmentRow) => {
-  const clientId = String(row.client_id || '').trim().toLowerCase()
-  const clientName = String(row.client_name || '').trim().toLowerCase()
-
-  return (
-    clientId === 'efeonce_internal' ||
-    clientId === 'client_internal' ||
-    clientId === 'space-efeonce' ||
-    clientName === 'efeonce internal' ||
-    clientName === 'efeonce'
-  )
+  return isInternalCommercialAssignment({
+    clientId: row.client_id,
+    clientName: row.client_name
+  })
 }
 
 const inferRoleCategory = (roleTitle: string | null): TeamRoleCategory => {
@@ -679,8 +678,8 @@ const loadMemberCapacityEconomicsSources = async (memberId: string, period: Peri
           WHERE a2.active = TRUE
             AND a2.start_date <= $2::date
             AND (a2.end_date IS NULL OR a2.end_date >= $1::date)
-            AND COALESCE(NULLIF(LOWER(TRIM(a2.client_id)), ''), '__missing__') NOT IN ('efeonce_internal', 'client_internal', 'space-efeonce')
-            AND COALESCE(NULLIF(LOWER(TRIM(c2.client_name)), ''), '__missing__') NOT IN ('efeonce internal', 'efeonce')
+            AND COALESCE(NULLIF(LOWER(TRIM(a2.client_id)), ''), '__missing__') <> ALL($3::text[])
+            AND COALESCE(NULLIF(LOWER(TRIM(c2.client_name)), ''), '__missing__') <> ALL($4::text[])
         ) AS billable_member_count
       FROM greenhouse_finance.expenses
       WHERE allocated_client_id IS NULL
@@ -689,7 +688,7 @@ const loadMemberCapacityEconomicsSources = async (memberId: string, period: Peri
         AND COALESCE(document_date, payment_date) >= $1::date
         AND COALESCE(document_date, payment_date) <= $2::date
     `,
-    [periodStart, periodEnd]
+    [periodStart, periodEnd, INTERNAL_COMMERCIAL_CLIENT_IDS, INTERNAL_COMMERCIAL_CLIENT_NAMES]
   )
 
   const sharedOverheadContext = buildSharedOverheadPool(period, sharedOverheadPoolRow || null)

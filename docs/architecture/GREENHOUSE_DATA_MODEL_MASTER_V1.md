@@ -434,6 +434,37 @@ Required meaning:
 - used by HR, Payroll and Finance
 - this is the internal collaborator or employee facet of `Person 360`, not a separate person identity
 
+## Commercial Cost Attribution
+
+Canonical anchor:
+- `greenhouse_serving.commercial_cost_attribution`
+
+Required meaning:
+- capa canónica materializada de costo comercial atribuible por período
+- no reemplaza la identidad humana ni la faceta operativa del colaborador
+- usa `member_id` como llave operativa fuerte y `client_id` como boundary comercial
+
+Required relationships:
+- `member_id -> greenhouse_core.members`
+- `client_id -> greenhouse_core.clients`
+- el explain humano puede reconciliar hacia `identity_profile_id`, pero esa no es la llave operativa del costo
+
+Required semantics:
+- separar explícitamente:
+  - costo base laboral del período
+  - costo comercial atribuible
+  - carga interna excluida
+  - overhead comercial atribuible
+- servir como source compartido para:
+  - Finance base
+  - Cost Intelligence
+  - explain/audit surfaces de atribución comercial
+
+Non-negotiable rule:
+- `client_labor_cost_allocation` puede seguir existiendo como bridge histórico de entrada
+- no debe seguir naciendo como contrato consumidor directo para módulos nuevos
+- consumers de margen/rentabilidad resumida deben preferir serving derivado como `operational_pl_snapshots`
+
 ## Provider
 
 Canonical anchor:

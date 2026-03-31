@@ -44,6 +44,7 @@ export const AGGREGATE_TYPES = {
   // Identity
   identityReconciliation: 'identity_reconciliation',
   identityProfile: 'identity_profile',
+  viewAccess: 'view_access',
 
   // Services
   service: 'service',
@@ -55,11 +56,24 @@ export const AGGREGATE_TYPES = {
   // Email Verification
   emailVerification: 'email_verification',
 
+  // Quotes
+  quote: 'quote',
+
+  // Purchase Orders & HES
+  purchaseOrder: 'purchase_order',
+  serviceEntrySheet: 'service_entry_sheet',
+
   // Capacity Economics
   financeExchangeRate: 'finance_exchange_rate',
   financeOverhead: 'finance_overhead',
   financeLicenseCost: 'finance_license_cost',
-  financeToolingCost: 'finance_tooling_cost'
+  financeToolingCost: 'finance_tooling_cost',
+
+  // Cost Intelligence
+  periodClosure: 'period_closure',
+  commercialCostAttribution: 'commercial_cost_attribution',
+  operationalPl: 'operational_pl',
+  marginAlert: 'margin_alert'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -134,11 +148,39 @@ export const EVENT_TYPES = {
   emailVerificationRequested: 'identity.email_verification.requested',
   emailVerificationCompleted: 'identity.email_verification.completed',
 
+  // Quotes & Credit Notes
+  quoteCreated: 'finance.quote.created',
+  quoteConverted: 'finance.quote.converted',
+  creditNoteCreated: 'finance.credit_note.created',
+
+  // Purchase Orders & HES
+  purchaseOrderCreated: 'finance.purchase_order.created',
+  purchaseOrderConsumed: 'finance.purchase_order.consumed',
+  purchaseOrderExpiring: 'finance.purchase_order.expiring',
+  purchaseOrderExpired: 'finance.purchase_order.expired',
+  hesSubmitted: 'finance.hes.submitted',
+  hesApproved: 'finance.hes.approved',
+  hesRejected: 'finance.hes.rejected',
+
+  // Data Quality Alerts
+  balanceDivergenceDetected: 'finance.balance_divergence.detected',
+  siiClaimDetected: 'finance.sii_claim.detected',
+
+  // View Access
+  viewAccessOverrideChanged: 'access.view_override_changed',
+
   // Capacity Economics
   financeExchangeRateUpserted: 'finance.exchange_rate.upserted',
   financeOverheadUpdated: 'finance.overhead.updated',
   financeLicenseCostUpdated: 'finance.license_cost.updated',
-  financeToolingCostUpdated: 'finance.tooling_cost.updated'
+  financeToolingCostUpdated: 'finance.tooling_cost.updated',
+
+  // Cost Intelligence
+  accountingPeriodClosed: 'accounting.period_closed',
+  accountingPeriodReopened: 'accounting.period_reopened',
+  accountingCommercialCostAttributionMaterialized: 'accounting.commercial_cost_attribution.materialized',
+  accountingPlSnapshotMaterialized: 'accounting.pl_snapshot.materialized',
+  accountingMarginAlertTriggered: 'accounting.margin_alert.triggered'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
@@ -176,6 +218,7 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.reconciliationApproved,
   EVENT_TYPES.dteDiscrepancyFound,
   EVENT_TYPES.profileLinked,
+  EVENT_TYPES.viewAccessOverrideChanged,
 
   // Person Intelligence triggers
   EVENT_TYPES.compensationUpdated,
@@ -188,6 +231,11 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.financeOverheadUpdated,
   EVENT_TYPES.financeLicenseCostUpdated,
   EVENT_TYPES.financeToolingCostUpdated,
+  EVENT_TYPES.accountingMarginAlertTriggered,
+
+  // Data quality / SII alerts
+  EVENT_TYPES.balanceDivergenceDetected,
+  EVENT_TYPES.siiClaimDetected,
 
   // Payroll compensation (published by payroll store directly)
   EVENT_TYPES.compensationVersionCreated,

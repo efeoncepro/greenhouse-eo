@@ -3,16 +3,74 @@ import 'server-only'
 import { NotificationService } from '@/lib/notifications/notification-service'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
 import { HOME_GREETINGS, HOME_SUBTITLE } from '@/config/home-greetings'
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import type { HomeSnapshot, ModuleCard, PendingTask } from '@/types/home'
 
-interface HomeSnapshotInput {
+export interface HomeSnapshotInput {
   userId: string
   firstName: string
   lastName: string | null
   roleName: string
   businessLines: string[]
   serviceModules: string[]
+  roleCodes?: string[]
+  routeGroups?: string[]
   organizationId?: string | null
+}
+
+const MONTH_SHORT = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+
+export const canSeeFinanceStatus = (input: Pick<HomeSnapshotInput, 'roleCodes' | 'routeGroups'>) =>
+  (input.routeGroups || []).includes('finance') ||
+  (input.roleCodes || []).some(code => code === 'finance_manager' || code === 'efeonce_admin' || code === 'efeonce_operations')
+
+export const getHomeFinanceStatus = async () => {
+  const [currentPeriod, latestMargin] = await Promise.all([
+    runGreenhousePostgresQuery<{
+      period_year: number | string
+      period_month: number | string
+      closure_status: string | null
+      readiness_pct: number | string | null
+    } & Record<string, unknown>>(
+      `SELECT period_year, period_month, closure_status, readiness_pct
+       FROM greenhouse_serving.period_closure_status
+       ORDER BY period_year DESC, period_month DESC
+       LIMIT 1`
+    ).catch(() => []),
+    runGreenhousePostgresQuery<{
+      period_year: number | string
+      period_month: number | string
+      gross_margin_pct: number | string | null
+      period_closed: boolean | null
+    } & Record<string, unknown>>(
+      `SELECT period_year, period_month, gross_margin_pct, period_closed
+       FROM greenhouse_serving.operational_pl_snapshots
+       WHERE scope_type = 'organization'
+       ORDER BY period_year DESC, period_month DESC, revenue_clp DESC
+       LIMIT 1`
+    ).catch(() => [])
+  ])
+
+  const current = currentPeriod[0]
+  const margin = latestMargin[0]
+
+  if (!current && !margin) {
+    return null
+  }
+
+  const currentYear = current ? Number(current.period_year) : Number(margin?.period_year)
+  const currentMonth = current ? Number(current.period_month) : Number(margin?.period_month)
+  const marginYear = margin ? Number(margin.period_year) : null
+  const marginMonth = margin ? Number(margin.period_month) : null
+
+  return {
+    periodLabel: `${MONTH_SHORT[currentMonth]} ${currentYear}`,
+    closureStatus: current?.closure_status ?? null,
+    readinessPct: current?.readiness_pct == null ? null : Number(current.readiness_pct),
+    latestMarginPct: margin?.gross_margin_pct == null ? null : Math.round(Number(margin.gross_margin_pct) * 10) / 10,
+    latestMarginPeriodLabel: marginYear && marginMonth ? `${MONTH_SHORT[marginMonth]} ${marginYear}` : null,
+    latestPeriodClosed: margin?.period_closed === true
+  }
 }
 
 /**
@@ -73,6 +131,10 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
     ctaRoute: n.action_url || undefined
   }))
 
+  const financeStatus = canSeeFinanceStatus(input)
+    ? await getHomeFinanceStatus()
+    : null
+
   // 4. Nexa Intro (Simple logic for now)
   const nexaIntro = `Hola ${input.firstName}, soy Nexa. Tengo acceso al catálogo reactivo de Greenhouse y puedo ayudarte a navegar tu operación. Veo que tienes ${tasks.length} pendientes hoy. ¿Por dónde quieres empezar?`
 
@@ -88,6 +150,7 @@ export async function getHomeSnapshot(input: HomeSnapshotInput): Promise<HomeSna
     },
     modules,
     tasks,
+    financeStatus,
     nexaIntro,
     computedAt: now.toISOString()
   }

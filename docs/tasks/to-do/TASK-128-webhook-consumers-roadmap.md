@@ -9,6 +9,14 @@
 - Los consumers UX-facing del bus ya deben nacer sobre recipient resolution `person-first`, no `client_user-first`.
 - La deuda transversal del modelo de identidad en Notifications quedó formalizada en `TASK-134`.
 
+## Delta 2026-03-30
+- `TASK-134` ya endureció el contrato transversal de identidad en Notifications.
+- Este roadmap ya no debe tratar la higiene del recipient model como gap abierto del consumer base.
+- Regla vigente para futuros consumers UX-facing:
+  - resolver humanos `person-first`
+  - preservar `userId` como llave operativa cuando el canal sea inbox/preferences/audit
+  - no reintroducir mappings ad hoc `client_user-first`
+
 ## Status
 
 | Campo | Valor |

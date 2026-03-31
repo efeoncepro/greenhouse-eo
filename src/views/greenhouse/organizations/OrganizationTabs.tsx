@@ -23,14 +23,16 @@ import OrganizationProjectsTab from './tabs/OrganizationProjectsTab'
 import OrganizationIcoTab from './tabs/OrganizationIcoTab'
 import OrganizationIntegrationsTab from './tabs/OrganizationIntegrationsTab'
 
+// Consolidated from 7 tabs to 4:
+// Operaciones = ICO + Overview
+// Finanzas = Finance + Economics
+// Equipo = People + Projects
+// Configuración = Integrations
 const TAB_CONFIG: Array<{ value: OrganizationTab; label: string; icon: string }> = [
-  { value: 'overview', label: 'Resumen', icon: 'tabler-layout-dashboard' },
-  { value: 'people', label: 'Personas', icon: 'tabler-users' },
+  { value: 'ico', label: 'Operaciones', icon: 'tabler-cpu' },
   { value: 'finance', label: 'Finanzas', icon: 'tabler-report-money' },
-  { value: 'economics', label: 'Rentabilidad', icon: 'tabler-chart-dots' },
-  { value: 'projects', label: 'Proyectos', icon: 'tabler-folders' },
-  { value: 'ico', label: 'ICO', icon: 'tabler-cpu' },
-  { value: 'integrations', label: 'Integraciones', icon: 'tabler-plug-connected' }
+  { value: 'people', label: 'Equipo', icon: 'tabler-users' },
+  { value: 'integrations', label: 'Configuración', icon: 'tabler-settings' }
 ]
 
 type Props = {
@@ -46,7 +48,7 @@ const OrganizationTabs = ({ detail, isAdmin, onAddMembership }: Props) => {
 
   const urlTab = searchParams.get('tab') as OrganizationTab | null
   const validValues = TAB_CONFIG.map(t => t.value)
-  const initialTab = urlTab && validValues.includes(urlTab) ? urlTab : 'overview'
+  const initialTab = urlTab && validValues.includes(urlTab) ? urlTab : 'ico'
 
   const [activeTab, setActiveTab] = useState<OrganizationTab>(initialTab)
 
@@ -61,7 +63,7 @@ const OrganizationTabs = ({ detail, isAdmin, onAddMembership }: Props) => {
 
     const params = new URLSearchParams(searchParams.toString())
 
-    if (newTab === 'overview') {
+    if (newTab === 'ico') {
       params.delete('tab')
     } else {
       params.set('tab', newTab)
@@ -94,36 +96,51 @@ const OrganizationTabs = ({ detail, isAdmin, onAddMembership }: Props) => {
           </CustomTabList>
         </Grid>
         <Grid size={{ xs: 12 }}>
-          <Box
-            aria-live='polite'
-            aria-atomic='true'
-            sx={visuallyHiddenSx}
-          />
+          <Box aria-live='polite' aria-atomic='true' sx={visuallyHiddenSx} />
 
-          <TabPanel value='overview' className='p-0'>
-            {activeTab === 'overview' && <OrganizationOverviewTab detail={detail} />}
-          </TabPanel>
-
-          <TabPanel value='people' className='p-0'>
-            {activeTab === 'people' && <OrganizationPeopleTab organizationId={detail.organizationId} isAdmin={isAdmin} onAddMembership={onAddMembership} />}
-          </TabPanel>
-
-          <TabPanel value='finance' className='p-0'>
-            {activeTab === 'finance' && <OrganizationFinanceTab detail={detail} />}
-          </TabPanel>
-
-          <TabPanel value='economics' className='p-0'>
-            {activeTab === 'economics' && <OrganizationEconomicsTab detail={detail} />}
-          </TabPanel>
-
-          <TabPanel value='projects' className='p-0'>
-            {activeTab === 'projects' && <OrganizationProjectsTab detail={detail} />}
-          </TabPanel>
-
+          {/* Operaciones = ICO delivery + Overview summary */}
           <TabPanel value='ico' className='p-0'>
-            {activeTab === 'ico' && <OrganizationIcoTab detail={detail} />}
+            {activeTab === 'ico' && (
+              <Grid container spacing={6}>
+                <Grid size={{ xs: 12 }}>
+                  <OrganizationIcoTab detail={detail} />
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <OrganizationOverviewTab detail={detail} />
+                </Grid>
+              </Grid>
+            )}
           </TabPanel>
 
+          {/* Finanzas = Finance invoices + Economics margin */}
+          <TabPanel value='finance' className='p-0'>
+            {activeTab === 'finance' && (
+              <Grid container spacing={6}>
+                <Grid size={{ xs: 12 }}>
+                  <OrganizationFinanceTab detail={detail} />
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <OrganizationEconomicsTab detail={detail} />
+                </Grid>
+              </Grid>
+            )}
+          </TabPanel>
+
+          {/* Equipo = People assignments + Projects */}
+          <TabPanel value='people' className='p-0'>
+            {activeTab === 'people' && (
+              <Grid container spacing={6}>
+                <Grid size={{ xs: 12 }}>
+                  <OrganizationPeopleTab organizationId={detail.organizationId} isAdmin={isAdmin} onAddMembership={onAddMembership} />
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <OrganizationProjectsTab detail={detail} />
+                </Grid>
+              </Grid>
+            )}
+          </TabPanel>
+
+          {/* Configuración = Integrations + IDs + fiscal */}
           <TabPanel value='integrations' className='p-0'>
             {activeTab === 'integrations' && <OrganizationIntegrationsTab detail={detail} />}
           </TabPanel>

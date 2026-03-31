@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-135`
+- siguiente ID disponible: `TASK-167`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -38,16 +38,14 @@ Primer bloque operativo asignado:
 | `TASK-083` | [TASK-083-compensation-drawer-enterprise-ux-redesign.md](complete/TASK-083-compensation-drawer-enterprise-ux-redesign.md) | P1 | Alto | Medio | Cerrada | Preview con secciones semánticas, salary base como chip, accordion MUI, font mono, micro-copy conciso. |
 | `TASK-084` | [TASK-084-compensation-drawer-manual-mode-ux-polish.md](complete/TASK-084-compensation-drawer-manual-mode-ux-polish.md) | P2 | Medio | Bajo | Cerrada | Secciones con borders, accordion previsional en todos los modos, overline labels. |
 | `TASK-085` | [TASK-085-compensation-chile-liquido-first-flow.md](complete/TASK-085-compensation-chile-liquido-first-flow.md) | P1 | Alto | Bajo | Cerrada | Chile siempre en modo reverse (sin switch). Líquido deseado es el campo principal. |
-| `TASK-067` | [TASK-067-cost-intelligence-foundation.md](to-do/TASK-067-cost-intelligence-foundation.md) | P1 | Alto | Medio | Diseño | Bootstrap schema `greenhouse_cost_intelligence`, event catalog `accounting.*`, projection domain `cost_intelligence` |
-| `TASK-068` | [TASK-068-period-closure-status-projection.md](to-do/TASK-068-period-closure-status-projection.md) | P1 | Muy alto | Medio | Diseño | Projection `period_closure_status`: auto-detect readiness, serving view, APIs close/reopen |
-| `TASK-069` | [TASK-069-operational-pl-projection.md](to-do/TASK-069-operational-pl-projection.md) | P1 | Muy alto | Alto | Diseño | Projection `operational_pl`: P&L por scope (client/space/org), closure awareness, margin alerts |
-| `TASK-070` | [TASK-070-cost-intelligence-finance-ui.md](to-do/TASK-070-cost-intelligence-finance-ui.md) | P1 | Alto | Medio | Diseño | Economía UI: surface "Cierre de Período" con semáforos, P&L inline, close/reopen |
-| `TASK-071` | [TASK-071-cost-intelligence-cross-module-consumers.md](to-do/TASK-071-cost-intelligence-cross-module-consumers.md) | P2 | Alto | Medio | Diseño | Enriquecer Agency, Org 360, People 360 y Home con datos de Cost Intelligence |
+| `TASK-070` | [TASK-070-cost-intelligence-finance-ui.md](in-progress/TASK-070-cost-intelligence-finance-ui.md) | P1 | Alto | Medio | Implementación avanzada | Economía UI ya reemplaza `/finance/intelligence` con dashboard de cierre de período + P&L inline; falta validación visual final y decidir el destino del dashboard legacy |
+| `TASK-071` | [TASK-071-cost-intelligence-cross-module-consumers.md](in-progress/TASK-071-cost-intelligence-cross-module-consumers.md) | P2 | Alto | Medio | Implementación | Agency, Organization 360, People, Home y Nexa ya tienen primer cutover a Cost Intelligence; resta validación visual y cierre formal de fallbacks |
 | `TASK-073` | [TASK-073-people-canonical-capacity-cutover.md](to-do/TASK-073-people-canonical-capacity-cutover.md) | P1 | Alto | Medio | Diseño | Cutover de `People` para dejar de derivar FTE/capacidad desde assignments y raw metrics, y pasar a serving canónico (`member_capacity_economics`, `person_intelligence`) |
 | `TASK-093` | [TASK-093-personnel-expense-data-consistency.md](complete/TASK-093-personnel-expense-data-consistency.md) | P1 | Alto | Medio | Cerrada | Consistencia de datos en Gasto de Personal: promedios per-currency, labels semánticos, donut sin mix, headcount breakdown |
 | `TASK-110` | [TASK-110-nexa-assistant-ui-features.md](in-progress/TASK-110-nexa-assistant-ui-features.md) | P1 | Alto | Medio | Implementación | Lane A activa: contrato de tools, ejecución backend y grounding operativo para Nexa en `/home`; la continuación natural de UI quedó más claramente separada en `TASK-115` |
 | `TASK-115` | [TASK-115-nexa-ui-completion.md](in-progress/TASK-115-nexa-ui-completion.md) | P1 | Alto | Medio | Implementación | Edit inline, suggestions, feedback, floating portal-wide, thread history, NexaPanel cleanup |
 | `TASK-121` | [TASK-121-admin-center-hardening.md](in-progress/TASK-121-admin-center-hardening.md) | P1 | Alto | Bajo | Implementación | Sorting, skeleton, health real, deep-link filtros y alertas consolidadas para Admin Center |
+| `TASK-137` | [TASK-137-ui-foundation-activation.md](in-progress/TASK-137-ui-foundation-activation.md) | P1 | Alto | Medio | Parcial | Foundation UI ya activada con RHF en auth, `GreenhouseCalendar`, `GreenhouseDatePicker`, `GreenhouseDragList` y primer calendario operativo en `/admin/operational-calendar` |
 
 ## To Do
 
@@ -73,6 +71,9 @@ Primer bloque operativo asignado:
 - `TASK-126` nace como follow-on explícito de `TASK-099` para endurecer `CSP` más allá de `Report-Only`, pero no bloquea el cierre del baseline cloud.
 - `TASK-127` nace como follow-on institucional para consolidar la lectura arquitectónica Cloud post-baseline, sin reabrir lanes ya cerradas.
 - `TASK-134` nace como follow-on institucional para consolidar Notifications sobre identidad canónica `person-first`, sin reabrir el cierre funcional de `TASK-117` ni `TASK-129`.
+- `TASK-140` nace como follow-on de `TASK-136` para alinear `/admin/views` con el modelo persona-first del producto, sin reabrir la gobernanza por `view_code` ya cerrada.
+- `TASK-141` nace como contrato institucional más amplio para formalizar el consumo canónico de identidad humana en Greenhouse; `TASK-140` y `TASK-134` se leen como consumers/follow-ons concretos de esa política.
+- `TASK-162` nace como contrato institucional para consolidar la atribución comercial de costos entre Payroll, Team Capacity, Finance y Cost Intelligence antes de seguir expandiendo Agency Economics y Service P&L.
 - Criterio vigente: cerrar costo y guardrails de BigQuery como último remanente del bloque cloud baseline.
 
 ### Prioridad vigente — bloque `TASK-025` a `TASK-031`
@@ -90,8 +91,8 @@ Primer bloque operativo asignado:
 ### Prioridad vigente — backlog `to-do` por impacto vs esfuerzo
 
 - **Top ROI ahora:** `TASK-100` → `TASK-101` → `TASK-072` → `TASK-098` → `TASK-026` → `TASK-109` → `TASK-030`.
-- **Siguiente ola:** `TASK-027` → `TASK-028` → `TASK-116` → `TASK-067` → `TASK-068` → `TASK-070` → `TASK-011`.
-- **Estratégicas pero caras:** `TASK-008` → `TASK-005` → `TASK-069` → `TASK-118` → `TASK-018` → `TASK-019`.
+- **Siguiente ola:** `TASK-027` → `TASK-028` → `TASK-116` → `TASK-070` → `TASK-071` → `TASK-011`.
+- **Estratégicas pero caras:** `TASK-008` → `TASK-005` → `TASK-071` → `TASK-118` → `TASK-018` → `TASK-019`.
 - **Later / oportunistas:** `TASK-029` → `TASK-031` → `TASK-015` → `TASK-016` → `TASK-020` → `TASK-115` → `TASK-107` → `TASK-103` → `TASK-021` → `TASK-032` → `TASK-053` → `TASK-054` → `TASK-055` → `TASK-058` → `TASK-059` → `TASK-071`.
 - **No gastar tokens ahora:** `TASK-025`, `TASK-033` a `TASK-038`, `TASK-039`, `TASK-041`.
 - Criterio: priorizar guardrails baratos, tareas que desbloquean módulos enteros, hardening sobre foundations ya implementadas y lanes con valor operativo inmediato; postergar briefs históricos, addenda dependientes y apuestas estratégicas de alto costo que todavía no desbloquean runtime cercano.
@@ -173,8 +174,8 @@ Primer bloque operativo asignado:
 | 50 | `TASK-125` | [TASK-125-webhook-activation-first-consumers.md](complete/TASK-125-webhook-activation-first-consumers.md) | P2 | Medio | Bajo | **Cerrada** | Primer consumer outbound validado E2E en `staging`: schema provisionado, canary self-loop con Secret Manager + Vercel bypass, delivery `HTTP 200` y counters activos para Admin Center |
 | 51 | `TASK-126` | [TASK-126-csp-enforcement-hardening.md](to-do/TASK-126-csp-enforcement-hardening.md) | P2 | Medio | Medio | Diseño | Follow-on de security headers para pasar de `CSP-Report-Only` a una política más estricta sin romper auth, MUI, observability ni uploads |
 | 52 | `TASK-127` | [TASK-127-cloud-architecture-posture-consolidation.md](to-do/TASK-127-cloud-architecture-posture-consolidation.md) | P2 | Alto | Medio | Diseño | Consolidar la arquitectura Cloud post-baseline con scorecard semáforo por dominio, cleanup de drift documental y plan corto de next hardening wave |
-| 53 | `TASK-134` | [TASK-134-notification-identity-model-hardening.md](to-do/TASK-134-notification-identity-model-hardening.md) | P1 | Alto | Medio | Descubierta | Consolidar Notifications sobre identidad canónica `person-first`: `identity_profile` raíz, `member` faceta operativa y `client_user` como acceso portal |
-| 54 | `TASK-131` | [TASK-131-cloud-health-runtime-tooling-posture-separation.md](complete/TASK-131-cloud-health-runtime-tooling-posture-separation.md) | P1 | Alto | Medio | **Cerrada** | Health Cloud ya separa secretos runtime vs tooling: `migrator/admin` siguen visibles en `postgresAccessProfiles`, pero ya no degradan `overallStatus` del portal sano |
+| 54 | `TASK-135` | [TASK-135-ops-health-sentry-reactive-refresh.md](to-do/TASK-135-ops-health-sentry-reactive-refresh.md) | P2 | Alto | Medio | Diseño | Hacer que `Incidentes Sentry` en `Ops Health` sea una superficie reactiva: auto-refresh, `Refrescar ahora` y fallback `stale` con último snapshot bueno |
+| 55 | `TASK-131` | [TASK-131-cloud-health-runtime-tooling-posture-separation.md](complete/TASK-131-cloud-health-runtime-tooling-posture-separation.md) | P1 | Alto | Medio | **Cerrada** | Health Cloud ya separa secretos runtime vs tooling: `migrator/admin` siguen visibles en `postgresAccessProfiles`, pero ya no degradan `overallStatus` del portal sano |
 | 38 | ~~CODEX_TASK_Greenhouse_Email_Catalog_v1.md~~ | — | — | — | **Movida a spec** | Reclasificada como documento de referencia → `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md` |
 | 30 | [CODEX_TASK_Portal_View_Surface_Consolidation.md](to-do/CODEX_TASK_Portal_View_Surface_Consolidation.md) | P3 | Medio | Medio | Parcial | Consolidación UX transversal de shells, vistas y navegación |
 | 31 | ~~CODEX_TASK_Typography_Hierarchy_Fix.md~~ | — | — | — | **Cerrada** | Jerarquía core absorbida en mergedTheme.ts; custom variants `monoId`, `monoAmount`, `kpiValue` para adopción gradual |
@@ -218,6 +219,15 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 
 ## Complete
 
+| [TASK-067-cost-intelligence-foundation.md](complete/TASK-067-cost-intelligence-foundation.md) | Foundation técnica de Cost Intelligence cerrada: schema `greenhouse_cost_intelligence`, serving tables base, eventos `accounting.*`, domain `cost_intelligence`, cron route dedicada validada y continuidad amarrada al P&L canónico de Finance. |
+| [TASK-140-admin-views-person-first-preview.md](complete/TASK-140-admin-views-person-first-preview.md) | `/admin/views` ya quedó alineado al contrato persona-first: selector/preview por persona canónica cuando existe `identityProfileId`, bridge explícito persona/member/principal y compatibilidad preservada con overrides, auditoría y `authorizedViews` user-scoped. |
+| [TASK-141-canonical-person-identity-consumption.md](complete/TASK-141-canonical-person-identity-consumption.md) | Contrato canónico de persona cerrado como baseline institucional: `identity_profile` raíz humana, `member` faceta operativa, `client_user` principal portal; resolver shared activo y primer bridge en notifications y `/admin/views` sin romper `user_id` ni `member_id`. |
+| [TASK-134-notification-identity-model-hardening.md](complete/TASK-134-notification-identity-model-hardening.md) | Notifications ya cerró su contract hardening: recipient resolution `person-first` compartida entre webhook consumers y projections, sin romper inbox/preferences `userId`-scoped ni dedupe por recipient key efectiva. |
+| [TASK-068-period-closure-status-projection.md](complete/TASK-068-period-closure-status-projection.md) | `period_closure_status` cerrada: readiness por período, close/reopen, APIs, alineación con calendario operativo y smoke reactivo E2E validado para el domain `cost_intelligence`. |
+| [TASK-069-operational-pl-projection.md](complete/TASK-069-operational-pl-projection.md) | `operational_pl` cerrada para su baseline: snapshots materializados por `client/space/organization`, APIs de lectura, smoke reactivo E2E, health/alerts básicas y contrato estable ya consumido por Finance Intelligence. |
+| [TASK-162-canonical-commercial-cost-attribution.md](complete/TASK-162-canonical-commercial-cost-attribution.md) | Capa canónica de atribución comercial cerrada: clasificación shared, truth layer materializada, projection reactiva propia, health/explain, cutover explícito por consumer y residual runtime directo del bridge legacy ya cortado fuera del materializer. |
+| [TASK-166-finance-bigquery-write-cutover.md](complete/TASK-166-finance-bigquery-write-cutover.md) | `FINANCE_BIGQUERY_WRITE_ENABLED` ya es guard operativo real: `income`, `expenses`, `expenses/bulk`, `accounts`, `exchange-rates` y `suppliers` fallan cerrado con `FINANCE_BQ_WRITE_DISABLED` cuando Postgres falla y el flag está apagado; `suppliers` ya es Postgres-first para writes. |
+| [TASK-136-admin-view-access-governance.md](complete/TASK-136-admin-view-access-governance.md) | Gobernanza de vistas cerrada: catálogo `view_code`, persistencia role/user, expiración, auditoría, notificación reactiva, `authorizedViews` en sesión, enforcement por layout/página y `/admin/views` como superficie operable de administración. |
 | [TASK-133-ops-health-sentry-incident-surfacing.md](complete/TASK-133-ops-health-sentry-incident-surfacing.md) | Incidentes Sentry abiertos/relevantes visibles en `Ops Health` y `Cloud & Integrations` con snapshot fail-soft separado de la postura base de observability. |
 | [TASK-117-payroll-last-business-day-auto-calculation.md](complete/TASK-117-payroll-last-business-day-auto-calculation.md) | Policy operativa de último día hábil cerrada y revalidada con recipients reales: helper temporal canónico, readiness de cálculo separado, cron idempotente con auto-creación del período y `payroll_ops` ya resuelta sobre identidad persona-first. |
 | [TASK-124-gcp-secret-manager-critical-secrets-migration.md](complete/TASK-124-gcp-secret-manager-critical-secrets-migration.md) | Secret Manager crítico cerrado: helper canónico, postura en `/api/internal/health`, migración de Nubox/Postgres/Auth-SSO y validación real en `staging` + `production` con secretos sirviéndose desde Secret Manager. |

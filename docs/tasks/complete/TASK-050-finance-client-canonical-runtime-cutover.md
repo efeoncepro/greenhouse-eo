@@ -1,5 +1,43 @@
 # TASK-050 - Finance Client Canonical Runtime Cutover
 
+## Delta 2026-03-30 — filtros canónicos sin romper alias legacy
+
+- `GET /api/finance/income` y `GET /api/finance/expenses` ya resuelven filtros de cliente desde el contexto canónico antes de leer Postgres o BigQuery fallback.
+- `income` deja de basarse en la comparación SQL ambigua `client_profile_id = ? OR hubspot_company_id = ?` para el filtro `clientProfileId`; ahora usa anclas canónicas resueltas.
+- Se mantiene una compatibilidad transicional explícita para lecturas legacy de `income` donde `clientProfileId` todavía se usaba como alias de `hubspotCompanyId`.
+
+## Delta 2026-03-30
+
+- El write path de `Finance Clients` ya no queda completamente anclado a BigQuery:
+  - `POST /api/finance/clients`
+  - `PUT /api/finance/clients/[id]`
+  - `POST /api/finance/clients/sync`
+  ahora corren Postgres-first sobre `greenhouse_finance.client_profiles`.
+- Baseline runtime nuevo:
+  - `getFinanceClientProfileFromPostgres()`
+  - `upsertFinanceClientProfileInPostgres()`
+  - `syncFinanceClientProfilesFromPostgres()`
+- El remanente real de esta lane ya no es write-path sino read-path:
+  - list/detail y enrichment de `Finance Clients` siguen usando lecturas BigQuery-first e híbridas
+  - el resolver `resolveFinanceClientContext()` conserva fallback BigQuery explícito por compatibilidad
+- Este delta fue absorbido por el trabajo de `TASK-166`; no reabre la task, pero sí cambia el estado real del gap.
+
+## Delta 2026-03-30 — cierre real del read path
+
+- `GET /api/finance/clients` y `GET /api/finance/clients/[id]` ya intentan resolver la surface completa desde PostgreSQL primero:
+  - `greenhouse_core.clients`
+  - `greenhouse_finance.client_profiles`
+  - `greenhouse_crm.companies`
+  - `greenhouse_crm.deals`
+  - `greenhouse_core.v_client_active_modules`
+  - `greenhouse_finance.income`
+- BigQuery queda solo como fallback explícito cuando el carril Postgres no está disponible o no está listo.
+- El request path principal de `Finance Clients` ya no nace desde `greenhouse.clients`, `greenhouse.fin_client_profiles` ni `greenhouse_conformed.crm_*`.
+- Con esto, el drift histórico de esta task queda resuelto: el runtime principal sí quedó cortado al grafo canónico actual.
+- Hardening adicional:
+  - `resolveFinanceClientContext()` ya no ejecuta fallback BigQuery ciego ante cualquier excepción de PostgreSQL
+  - solo conserva fallback para errores clasificados como permitidos por `shouldFallbackFromFinancePostgres()`
+
 ## Status
 
 - Lifecycle: `complete`
@@ -128,13 +166,13 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] `Finance Clients` y `Finance Client Detail` operan Postgres-first sobre el grafo canónico actual
-- [ ] `resolveFinanceClientContext()` deja de depender primariamente de BigQuery legacy
-- [ ] `organizationId` se resuelve de forma coherente con `Account 360`
-- [ ] fallback legacy queda explícito y observable cuando siga siendo necesario
-- [ ] `pnpm lint` pasa sin nuevos errores
-- [ ] `pnpm test` cubre conflictos de identidad y resolución canónica
-- [ ] `npx tsc --noEmit` no introduce errores nuevos
+- [x] `Finance Clients` y `Finance Client Detail` operan Postgres-first sobre el grafo canónico actual
+- [x] `resolveFinanceClientContext()` deja de depender primariamente de BigQuery legacy
+- [x] `organizationId` se resuelve de forma coherente con `Account 360`
+- [x] fallback legacy queda explícito y observable cuando siga siendo necesario
+- [x] `pnpm lint` pasa sin nuevos errores
+- [x] `pnpm test` cubre conflictos de identidad y resolución canónica
+- [x] `npx tsc --noEmit` no introduce errores nuevos
 
 ## Verification
 
@@ -142,3 +180,6 @@ Reglas obligatorias:
 - `pnpm test`
 - `npx tsc --noEmit`
 - smoke manual sobre `/api/finance/clients` y `/api/finance/clients/[id]` verificando consistencia entre client profile, org y receivables
+- `pnpm exec eslint src/app/api/finance/clients/route.ts 'src/app/api/finance/clients/[id]/route.ts' src/app/api/finance/clients/sync/route.ts src/lib/finance/postgres-store-slice2.ts src/app/api/finance/bigquery-write-cutover.test.ts`
+- `pnpm exec vitest run src/app/api/finance/bigquery-write-cutover.test.ts src/lib/finance/bigquery-write-flag.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`

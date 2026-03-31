@@ -4,6 +4,1812 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-03-30 — verificación staging Finance + reconciliación TASK-164
+
+### Objetivo
+- Confirmar que los flujos visibles de Finance ya cargan en `staging` y dejar `TASK-164` alineada al estado real del repo.
+
+### Delta de ejecución
+- Verificación manual asistida con browser en `staging`:
+  - `https://dev-greenhouse.efeoncepro.com/finance/income/INC-NB-26639047` carga como `Ingreso — Greenhouse`
+  - `https://dev-greenhouse.efeoncepro.com/finance/clients` carga como `Clientes — Greenhouse`
+  - los únicos errores observados en consola son de `vercel.live` embed/CSP y no del runtime funcional del módulo
+- `docs/tasks/complete/TASK-164-purchase-orders-module.md` quedó reconciliada con su estado real:
+  - ya no debe leerse como plan pendiente
+  - los slices/checklists pasan a ser contexto histórico del diseño original
+
+### Validación ejecutada
+- Browser verification en `staging`
+- `git diff --check`
+
+## Sesión 2026-03-30 — smoke visual de Purchase Orders, HES y Finance Intelligence en staging
+
+### Objetivo
+- Verificar que las surfaces nuevas/cerradas de Finance cargan realmente en `staging` después de los últimos cortes.
+
+### Delta de ejecución
+- Verificación manual asistida con browser:
+  - `https://dev-greenhouse.efeoncepro.com/finance/purchase-orders` carga como `Órdenes de compra`
+  - `https://dev-greenhouse.efeoncepro.com/finance/hes` carga como `Hojas de entrada de servicio`
+  - `https://dev-greenhouse.efeoncepro.com/finance/intelligence` carga como `Economía operativa — Greenhouse`
+- Requests relevantes observados:
+  - `GET /api/cost-intelligence/periods?limit=12` → `200`
+  - `GET /api/notifications/unread-count` → `200`
+- Consola:
+  - se mantiene ruido conocido de `vercel.live` / CSP report-only
+  - en `finance/intelligence` apareció además `OPTIONS /dashboard -> 400` durante prefetch; no bloqueó render ni las llamadas principales del módulo
+
+### Validación ejecutada
+- Browser verification en `staging`
+
+## Sesión 2026-03-30 — hardening de OPTIONS en page routes del portal
+
+### Objetivo
+- Eliminar el `OPTIONS /dashboard -> 400` observado durante prefetch en `finance/intelligence` sin tocar el comportamiento de las APIs.
+
+### Delta de ejecución
+- `src/proxy.ts` ahora responde `204` a `OPTIONS` sobre page routes no-API.
+- El cambio preserva el comportamiento normal de `/api/**`, que no queda short-circuiteado por el proxy.
+- Tests reforzados en `src/proxy.test.ts`:
+  - page route `OPTIONS` → `204`
+  - api route `OPTIONS` → no interceptado como página
+
+### Validación ejecutada
+- `pnpm exec vitest run src/proxy.test.ts`
+- `pnpm exec eslint src/proxy.ts src/proxy.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
+## Sesión 2026-03-30 — cierre del ruido `vercel.live` en CSP report-only
+
+### Objetivo
+- Cerrar el ruido residual de consola en `staging/preview` sin relajar la postura de `production`.
+
+### Delta de ejecución
+- `src/proxy.ts` ahora construye la CSP report-only según entorno:
+  - `production` conserva `frame-src` limitado a las fuentes originales
+  - `preview/staging` permiten además `https://vercel.live` en `frame-src`
+- El cambio es deliberadamente acotado al canal report-only y no modifica la política efectiva de runtime de `production`.
+- Tests reforzados en `src/proxy.test.ts`:
+  - `vercel.live` presente fuera de `production`
+  - `vercel.live` ausente en `production`
+
+### Validación ejecutada
+- `pnpm exec vitest run src/proxy.test.ts`
+- `pnpm exec eslint src/proxy.ts src/proxy.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
+## Sesión 2026-03-30 — reconciliación documental final Finance/Nubox
+
+### Objetivo
+- Cerrar el drift documental que quedaba después de los últimos cutovers de Finance Clients, BigQuery fail-closed y Nubox enrichment.
+
+### Delta de ejecución
+- `docs/architecture/FINANCE_DUAL_STORE_CUTOVER_V1.md` quedó degradado explícitamente a historial de migración; ya no debe leerse como estado operativo vigente.
+- `docs/tasks/complete/TASK-163-finance-document-type-separation.md` quedó alineada a estado `complete`, dejando claro que el problema original fue absorbido por el runtime actual.
+- `docs/tasks/complete/TASK-165-nubox-full-data-enrichment.md` quedó alineada a estado implementado real y al hardening reciente de PDF/XML en Income detail.
+- La fuente viva para el estado actual de Finance queda reafirmada en:
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/tasks/complete/TASK-166-finance-bigquery-write-cutover.md`
+  - `docs/tasks/complete/TASK-050-finance-client-canonical-runtime-cutover.md`
+
+### Validación ejecutada
+- `git diff --check`
+
+## Sesión 2026-03-30 — fix de descarga PDF/XML Nubox en Finance income detail
+
+### Objetivo
+- Resolver el incidente visible en `staging` donde el detalle de ingreso mostraba `Nubox PDF download failed with 401`.
+
+### Delta de ejecución
+- Se verificó contra Nubox real que `/sales/{id}`, `/sales/{id}/pdf?template=TEMPLATE_A4` y `/sales/{id}/xml` responden `200` con credenciales válidas.
+- El detalle de ingreso ya no fuerza siempre el proxy `/api/finance/income/[id]/dte-pdf|xml`:
+  - ahora prioriza `nuboxPdfUrl` / `nuboxXmlUrl` directos cuando el sync ya los dejó en el record
+  - conserva fallback al proxy cuando esos links no existen
+- `src/lib/nubox/client.ts` ahora:
+  - hace `trim()` de `NUBOX_API_BASE_URL` y `NUBOX_X_API_KEY`
+  - envía `Accept` explícito para PDF/XML
+- Test reforzado en `src/lib/nubox/client.test.ts`.
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/nubox/client.test.ts`
+- `pnpm exec eslint src/lib/nubox/client.ts src/lib/nubox/client.test.ts src/views/greenhouse/finance/IncomeDetailView.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
+## Sesión 2026-03-30 — hardening del drift de lectura en income y expenses
+
+### Objetivo
+- Reducir el drift residual de identidad financiera en lectura sin romper compatibilidad histórica de `income`.
+
+### Delta de ejecución
+- `GET /api/finance/income` ahora resuelve `clientId` / `clientProfileId` / `hubspotCompanyId` contra el contexto canónico antes de consultar Postgres o BigQuery fallback.
+- `src/lib/finance/postgres-store-slice2.ts` ya no mezcla `clientProfileId` con `hubspot_company_id` en una sola comparación ad hoc; el filtro usa anclas canónicas separadas.
+- Se dejó un shim transicional explícito para no romper callers legacy de `income`: si `clientProfileId` se usaba como alias de `hubspotCompanyId`, el handler reintenta esa lectura solo para esa compatibilidad histórica.
+- `GET /api/finance/expenses` ahora acepta filtros por `clientProfileId` y `hubspotCompanyId`, resolviéndolos a `clientId` canónico sin cambiar el modelo operativo del expense runtime.
+- Cobertura reforzada en `src/app/api/finance/identity-drift-payloads.test.ts`.
+
+### Validación ejecutada
+- `pnpm exec vitest run src/app/api/finance/identity-drift-payloads.test.ts src/lib/finance/canonical.test.ts src/app/api/finance/bigquery-write-cutover.test.ts src/app/api/finance/clients/read-cutover.test.ts src/lib/finance/bigquery-write-flag.test.ts`
+- `pnpm exec eslint src/app/api/finance/income/route.ts src/app/api/finance/income/[id]/route.ts src/app/api/finance/expenses/route.ts src/app/api/finance/expenses/[id]/route.ts src/app/api/finance/identity-drift-payloads.test.ts src/lib/finance/postgres-store-slice2.ts src/lib/finance/canonical.ts src/lib/finance/canonical.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+
+## Sesión 2026-03-30 — agregaciones financieras con client_id canónico
+
+### Objetivo
+- Cortar el bridge legacy donde `client_economics` y `operational_pl` seguían tratando `client_profile_id` como si fuera `client_id`.
+
+### Delta de ejecución
+- `src/lib/finance/postgres-store-intelligence.ts` ya no agrega revenue por `COALESCE(client_id, client_profile_id)`.
+- `computeClientEconomicsSnapshots()` ahora resuelve `client_id` canónico desde `greenhouse_finance.client_profiles` cuando un income histórico viene solo con `client_profile_id`.
+- `src/lib/cost-intelligence/compute-operational-pl.ts` quedó alineado al mismo criterio para snapshots de margen operativo.
+- Tests nuevos/reforzados:
+  - `src/lib/finance/postgres-store-intelligence.test.ts`
+  - `src/lib/cost-intelligence/compute-operational-pl.test.ts`
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/finance/postgres-store-intelligence.test.ts src/lib/cost-intelligence/compute-operational-pl.test.ts`
+- `pnpm exec eslint src/lib/finance/postgres-store-intelligence.ts src/lib/finance/postgres-store-intelligence.test.ts src/lib/cost-intelligence/compute-operational-pl.ts src/lib/cost-intelligence/compute-operational-pl.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+
+## Sesión 2026-03-30 — cierre de residuals canon client_id en Finance Clients y Campaigns
+
+### Objetivo
+- Cerrar los últimos consumers obvios que seguían tratando `client_profile_id` como si fuera `client_id`.
+
+### Delta de ejecución
+- `src/app/api/finance/clients/route.ts` ya calcula receivables por `client_id` canónico en Postgres y BigQuery fallback.
+- `src/app/api/finance/clients/[id]/route.ts` ya consulta invoices y summary con la misma traducción canónica vía `client_profiles`.
+- `src/lib/campaigns/campaign-extended.ts` ya reancla revenue al `client_id` canónico antes de calcular `CampaignFinancials`.
+- Tests nuevos/reforzados:
+  - `src/app/api/finance/clients/read-cutover.test.ts`
+  - `src/lib/campaigns/campaign-extended.test.ts`
+
+### Validación ejecutada
+- `pnpm exec vitest run src/app/api/finance/clients/read-cutover.test.ts src/lib/campaigns/campaign-extended.test.ts src/lib/finance/postgres-store-intelligence.test.ts src/lib/cost-intelligence/compute-operational-pl.test.ts`
+- `pnpm exec eslint src/app/api/finance/clients/route.ts src/app/api/finance/clients/[id]/route.ts src/app/api/finance/clients/read-cutover.test.ts src/lib/campaigns/campaign-extended.ts src/lib/campaigns/campaign-extended.test.ts src/lib/finance/postgres-store-intelligence.ts src/lib/finance/postgres-store-intelligence.test.ts src/lib/cost-intelligence/compute-operational-pl.ts src/lib/cost-intelligence/compute-operational-pl.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
+## Sesión 2026-03-30 — cierre formal de TASK-166 Finance BigQuery write cutover
+
+### Objetivo
+- Cerrar el lifecycle real de `FINANCE_BIGQUERY_WRITE_ENABLED` como guard operativo de Finance y dejar el remanente clasificado explícitamente.
+
+### Delta de ejecución
+- Guard operativo extendido a:
+  - `POST /api/finance/accounts`
+  - `PUT /api/finance/accounts/[id]`
+  - `POST /api/finance/exchange-rates`
+  - `POST /api/finance/suppliers`
+  - `PUT /api/finance/suppliers/[id]`
+  - `POST /api/finance/expenses/bulk`
+- `suppliers` ya no escribe primariamente a BigQuery:
+  - `POST` y `PUT` usan `seedFinanceSupplierInPostgres()`
+- Test nuevo:
+  - `src/app/api/finance/bigquery-write-cutover.test.ts`
+- Lifecycle cerrado:
+  - `docs/tasks/complete/TASK-166-finance-bigquery-write-cutover.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+- Delta cruzado:
+  - `docs/tasks/complete/TASK-139-finance-module-hardening.md` ahora explicita que el remanente del flag quedó absorbido y cerrado por `TASK-166`
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/finance/bigquery-write-flag.test.ts src/app/api/finance/bigquery-write-cutover.test.ts`
+- `pnpm exec eslint src/lib/finance/bigquery-write-flag.ts src/lib/finance/bigquery-write-flag.test.ts src/app/api/finance/bigquery-write-cutover.test.ts src/app/api/finance/accounts/route.ts src/app/api/finance/accounts/[id]/route.ts src/app/api/finance/exchange-rates/route.ts src/app/api/finance/suppliers/route.ts src/app/api/finance/suppliers/[id]/route.ts src/app/api/finance/expenses/bulk/route.ts src/app/api/finance/income/route.ts src/app/api/finance/expenses/route.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
+### Residual explícito
+- Siguen clasificados fuera de `TASK-166`:
+  - reads legacy de `Finance Clients` que aún consultan BigQuery por compatibilidad
+- El criterio vigente es tratarlos como lanes o follow-ons localizados, no como bloqueo del flag operativo core.
+
+## Sesión 2026-03-30 — expansión final del guard sobre core + reconciliation + clients
+
+### Objetivo
+- Extender el guard operativo más allá del bloque master-data inicial para que el remanente sensible de Finance tampoco pueda reabrir writes legacy con el flag apagado.
+
+### Delta de ejecución
+- El guard se extendió a:
+  - `income/[id]`
+  - `expenses/[id]`
+  - `income/[id]/payment`
+  - `clients` create/update
+  - `reconciliation` create/update/match/unmatch/exclude/statements/auto-match
+- `economic-indicators.ts` y `exchange-rates.ts` ahora lanzan `FINANCE_BQ_WRITE_DISABLED` antes del write BigQuery fallback cuando PostgreSQL falla y el flag está apagado.
+- Las rutas `sync` ya propagan ese `code` en la respuesta.
+- Apoyo de subagentes utilizado:
+  - un worker cerró `clients`
+  - otro worker endureció `exchange-rates`/sync helpers
+  - un explorer auditó el bloque `core + reconciliation` para reducir riesgo antes del cambio
+
+### Validación ejecutada
+- `pnpm exec vitest run src/app/api/finance/bigquery-write-cutover.test.ts src/lib/finance/bigquery-write-flag.test.ts`
+- `pnpm exec eslint ...` del bloque expandido
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
+## Sesión 2026-03-30 — clients write path Postgres-first
+
+### Objetivo
+- Cortar el residual real que quedaba después del fail-closed: `clients/sync` y el writer canónico de `Finance Clients`.
+
+### Delta de ejecución
+- Nuevo baseline shared en `src/lib/finance/postgres-store-slice2.ts`:
+  - `getFinanceClientProfileFromPostgres()`
+  - `upsertFinanceClientProfileInPostgres()`
+  - `syncFinanceClientProfilesFromPostgres()`
+- `Finance Clients` write path ya opera Postgres-first en:
+  - `src/app/api/finance/clients/route.ts`
+  - `src/app/api/finance/clients/[id]/route.ts`
+  - `src/app/api/finance/clients/sync/route.ts`
+- Compatibilidad preservada:
+  - si PostgreSQL no está disponible y `FINANCE_BIGQUERY_WRITE_ENABLED=true`, las rutas todavía conservan fallback BigQuery transicional
+  - si el flag está apagado, responden `503` con `FINANCE_BQ_WRITE_DISABLED`
+- Apoyo de subagentes utilizado:
+  - explorer para confirmar el estado real de `Finance Clients`
+  - worker de tests para el carril `clients`
+
+### Validación ejecutada
+- `pnpm exec vitest run src/app/api/finance/bigquery-write-cutover.test.ts src/lib/finance/bigquery-write-flag.test.ts`
+- `pnpm exec eslint src/app/api/finance/bigquery-write-cutover.test.ts src/app/api/finance/clients/route.ts 'src/app/api/finance/clients/[id]/route.ts' src/app/api/finance/clients/sync/route.ts src/lib/finance/postgres-store-slice2.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
+### Residual explícito
+- El remanente de `Finance Clients` ya no es write path:
+  - solo queda fallback transicional de compatibilidad cuando el carril Postgres no está disponible
+  - `TASK-050` ya no queda abierta por request path principal
+
+## Sesión 2026-03-30 — cierre del read path de Finance Clients
+
+### Objetivo
+- Cortar `GET /api/finance/clients` y `GET /api/finance/clients/[id]` al grafo Postgres-first para dejar `Finance Clients` realmente alineado con `TASK-050`.
+
+### Delta de ejecución
+- `GET /api/finance/clients` ya intenta resolver primero desde:
+  - `greenhouse_core.clients`
+  - `greenhouse_finance.client_profiles`
+  - `greenhouse_crm.companies`
+  - `greenhouse_core.v_client_active_modules`
+  - `greenhouse_finance.income`
+- `GET /api/finance/clients/[id]` ya intenta resolver primero desde:
+  - `greenhouse_core.clients`
+  - `greenhouse_finance.client_profiles`
+  - `greenhouse_crm.companies`
+  - `greenhouse_crm.deals`
+  - `greenhouse_core.v_client_active_modules`
+  - `greenhouse_finance.income`
+- BigQuery queda solo como fallback explícito cuando el read-path Postgres no está disponible.
+- Apoyo de subagentes utilizado:
+  - explorer para mapear el drift real del read path
+  - worker para sugerir cobertura de tests del cutover
+
+### Validación ejecutada
+- `pnpm exec eslint src/app/api/finance/clients/route.ts 'src/app/api/finance/clients/[id]/route.ts' src/app/api/finance/clients/sync/route.ts src/lib/finance/postgres-store-slice2.ts src/app/api/finance/bigquery-write-cutover.test.ts`
+- `pnpm exec vitest run src/app/api/finance/bigquery-write-cutover.test.ts src/lib/finance/bigquery-write-flag.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
+### Residual explícito
+- `Finance Clients` conserva fallback BigQuery transicional por compatibilidad.
+- El request path principal ya no depende de BigQuery; el remanente dejó de ser blocker arquitectónico.
+
+## Sesión 2026-03-30 — hardening del resolver canónico Finance Clients
+
+### Objetivo
+- Evitar que `resolveFinanceClientContext()` tape errores arbitrarios del carril canónico detrás de fallback BigQuery.
+
+### Delta de ejecución
+- `src/lib/finance/canonical.ts` ahora consulta `shouldFallbackFromFinancePostgres()` antes de caer a BigQuery.
+- Nuevo test canónico:
+  - `src/lib/finance/canonical.test.ts`
+- Comportamiento fijado:
+  - Postgres-first cuando el carril está sano
+  - fallback BigQuery solo para errores permitidos de readiness/conectividad
+  - errores no permitidos ya no se esconden detrás de compatibilidad legacy
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/finance/canonical.test.ts src/app/api/finance/bigquery-write-cutover.test.ts src/app/api/finance/clients/read-cutover.test.ts src/lib/finance/bigquery-write-flag.test.ts`
+- `pnpm exec eslint src/lib/finance/canonical.ts src/lib/finance/canonical.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+
+## Sesión 2026-03-30 — arranque de TASK-166 Finance BigQuery write cutover
+
+### Objetivo
+- Empezar el cutover real del write fallback legacy de Finance sin big bang, usando `FINANCE_BIGQUERY_WRITE_ENABLED` como guard operativo verdadero.
+
+### Delta de ejecución
+- Nueva task activa:
+  - `docs/tasks/complete/TASK-166-finance-bigquery-write-cutover.md`
+- Helper nuevo:
+  - `src/lib/finance/bigquery-write-flag.ts`
+- Primer slice runtime:
+  - `POST /api/finance/income`
+  - `POST /api/finance/expenses`
+  - si PostgreSQL falla y el flag está apagado, responden `503` con `FINANCE_BQ_WRITE_DISABLED`
+
+### Pendiente inmediato
+- expandir el inventario/wiring a writes secundarios:
+  - `expenses/bulk`
+  - `accounts`
+  - `suppliers`
+  - `exchange-rates`
+- validar manualmente en staging con `FINANCE_BIGQUERY_WRITE_ENABLED=false`
+
+## Sesión 2026-03-30 — reconciliación final de TASK-138 + TASK-139
+
+### Objetivo
+- Contrastar ambas tasks ya cerradas contra el repo real y resolver el remanente técnico auténtico sin reabrir lanes artificialmente.
+
+### Delta de ejecución
+- `TASK-138`:
+  - se confirmó que el repo actual ya absorbió la adopción UI/runtime que el doc seguía marcando como “pendiente”
+  - el drift quedó saneado en la task markdown
+- `TASK-139`:
+  - `src/lib/finance/dte-emission-queue.ts` ahora preserva `dte_type_code`
+  - `src/app/api/cron/dte-emission-retry/route.ts` ya llama `emitDte()` real, no stub
+  - `src/app/api/finance/income/[id]/emit-dte/route.ts` y `src/app/api/finance/income/batch-emit-dte/route.ts` encolan fallos retryable
+  - nuevo test:
+    - `src/app/api/cron/dte-emission-retry/route.test.ts`
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/finance/dte-emission-queue.test.ts src/app/api/cron/dte-emission-retry/route.test.ts`
+- `pnpm exec eslint src/lib/finance/dte-emission-queue.ts src/lib/finance/dte-emission-queue.test.ts src/app/api/cron/dte-emission-retry/route.ts src/app/api/cron/dte-emission-retry/route.test.ts 'src/app/api/finance/income/[id]/emit-dte/route.ts' 'src/app/api/finance/income/batch-emit-dte/route.ts'`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
+## Sesión 2026-03-30 — cierre formal de TASK-162
+
+### Objetivo
+- Ejecutar el último cut técnico sobre consumers residuales del bridge legacy y cerrar `TASK-162` como baseline institucional.
+
+### Delta de ejecución
+- Residual runtime cortado:
+  - `src/lib/person-360/get-person-finance.ts`
+  - `Person Finance` ya usa `greenhouse_serving.commercial_cost_attribution` para explain por miembro/período
+- Residual técnico secundario cortado:
+  - `src/lib/finance/payroll-cost-allocation.ts`
+  - ahora resume `readCommercialCostAttributionByClientForPeriod()`
+- Test nuevo:
+  - `src/lib/person-360/get-person-finance.test.ts`
+- Lifecycle cerrado:
+  - `docs/tasks/complete/TASK-162-canonical-commercial-cost-attribution.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+- Documentación viva alineada:
+  - `project_context.md`
+  - `changelog.md`
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/finance/payroll-cost-allocation.test.ts src/lib/person-360/get-person-finance.test.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/commercial-cost-attribution/insights.test.ts src/lib/commercial-cost-attribution/store.test.ts src/lib/sync/projections/commercial-cost-attribution.test.ts src/lib/cost-intelligence/compute-operational-pl.test.ts`
+- `pnpm exec eslint src/lib/finance/payroll-cost-allocation.ts src/lib/finance/payroll-cost-allocation.test.ts src/lib/person-360/get-person-finance.ts src/lib/person-360/get-person-finance.test.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
+## Sesión 2026-03-30 — consolidación arquitectónica de TASK-162
+
+### Objetivo
+- Dejar la estrategia de cutover de `commercial cost attribution` consolidada en arquitectura canónica, no solo en la task operativa.
+
+### Delta de ejecución
+- Se actualizaron las fuentes canónicas:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+- Quedó explícito que:
+  - `greenhouse_serving.commercial_cost_attribution` es la truth layer canónica
+  - `operational_pl_snapshots` y `member_capacity_economics` siguen siendo serving derivado por consumer
+  - `client_labor_cost_allocation` queda como bridge/input histórico y no como contrato consumidor nuevo
+
+### Validación ejecutada
+- `git diff --check`
+
+## Sesión 2026-03-30 (session 2) — TASK-165 + TASK-164 + ISSUE-002
+
+### Objetivo
+- Implementar completamente TASK-165 (Nubox Full Data Enrichment) y TASK-164 (Purchase Orders & HES).
+- Cerrar ISSUE-002 (Nubox sync data integrity).
+
+### Delta de ejecución
+- **TASK-165** cerrada — 33 archivos, 2,746 líneas:
+  - Schema: 16 columnas nuevas en income + 16 en expenses + tabla `income_line_items`
+  - Sync: mappers conformed capturan TODOS los campos Nubox, sync migrado de DELETE-all a upsert selectivo
+  - Cron: `/api/cron/nubox-balance-sync` cada 4h con detección de divergencias
+  - Events: `finance.sii_claim.detected`, `finance.balance_divergence.detected`
+  - Cross-module: PnL filtra annulled expenses, 2 data quality checks nuevos
+  - UI: PDF/XML links en income, SII chips + annulled badge en expenses
+- **TASK-164** implementada — 19 archivos nuevos:
+  - `purchase_orders`: CRUD + reconciliación de saldo + auto-expire
+  - `service_entry_sheets`: lifecycle draft→submitted→approved/rejected
+  - 9 API routes, 7 event types, 4 notification mappings
+  - `PurchaseOrdersListView` con progress bars, `HesListView` con status chips
+- **ISSUE-002** cerrada — los 3 fixes aplicados
+
+### DDL ejecutados
+- `scripts/setup-nubox-enrichment.sql` — ejecutado en Cloud SQL (greenhouse_app)
+- `scripts/setup-postgres-purchase-orders.sql` — ejecutado en Cloud SQL (greenhouse_app)
+- GRANTs corregidos a `greenhouse_runtime` (el DDL original decía `runtime`)
+
+### Pendiente inmediato
+- Re-ejecutar Nubox sync para poblar los campos enriquecidos con los nuevos datos
+- Verificar visualmente en staging que las nuevas columnas aparecen en las vistas
+
+### Validación ejecutada
+- `npx tsc --noEmit` — sin errores
+- `pnpm test` — 138/139 test files passed (1 pre-existing failure)
+- `pnpm build` — exitoso
+- Committed y pushed a `develop`
+
+## Sesión 2026-03-30 — TASK-141 contrato canónico + bridge inicial en /admin/views
+
+### Objetivo
+- Convertir `TASK-141` desde contrato endurecido a primer slice real de implementación, sin romper carriles reactivos ni llaves operativas.
+
+### Delta de ejecución
+- Nueva fuente canónica del contrato:
+  - `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
+- Nuevo baseline shared:
+  - `src/lib/identity/canonical-person.ts`
+  - `src/lib/identity/canonical-person.test.ts`
+- Contrato runtime que ya expone el resolver:
+  - `identityProfileId`
+  - `memberId`
+  - `userId`
+  - `canonicalEmail`
+  - `portalAccessState`
+  - `resolutionSource`
+- Primer consumer adoptado:
+  - `src/lib/admin/get-admin-view-access-governance.ts`
+  - `src/lib/admin/view-access-store.ts`
+  - `src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx`
+- Postura aplicada en el cut:
+  - `/admin/views` ahora muestra `identityProfileId`, `memberId`, `portalAccessState` y `resolutionSource`
+  - overrides y auditoría siguen `userId`-scoped
+  - no se tocaron payloads de outbox, webhook envelopes ni serving member-scoped
+- Documentación viva actualizada:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
+  - `docs/tasks/in-progress/TASK-141-canonical-person-identity-consumption.md`
+  - `docs/tasks/to-do/TASK-140-admin-views-person-first-preview.md`
+  - `docs/tasks/to-do/TASK-134-notification-identity-model-hardening.md`
+  - `docs/tasks/in-progress/TASK-162-canonical-commercial-cost-attribution.md`
+  - `docs/tasks/README.md`
+  - `project_context.md`
+  - `changelog.md`
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/identity/canonical-person.test.ts`
+- `pnpm exec eslint src/lib/identity/canonical-person.ts src/lib/identity/canonical-person.test.ts src/lib/admin/get-admin-view-access-governance.ts src/lib/admin/view-access-store.ts src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Pendiente inmediato
+- `TASK-140`:
+  - mover el universo base del preview desde principal portal a persona previewable real
+- `TASK-134`:
+  - terminar de alinear notifications y callers legacy sobre el contrato shared
+- `TASK-162`:
+  - ya puede apoyarse en este contrato sin reabrir persona/member/user, preservando `member_id` como llave operativa de costo
+
+## Sesión 2026-03-30 — cierre formal de `TASK-141` en `develop`
+
+### Objetivo
+- Cerrar la lane institucional sin mover de rama y sin mezclar el trabajo paralelo de Finance ya abierto en `develop`.
+
+### Delta de ejecución
+- `TASK-141` se reclasificó de `in-progress` a `complete`.
+- El archivo canónico quedó en:
+  - `docs/tasks/complete/TASK-141-canonical-person-identity-consumption.md`
+- Se actualizaron:
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `project_context.md`
+  - `changelog.md`
+- Criterio de cierre explicitado:
+  - la lane queda cerrada por contrato institucional + resolver shared + primera adopción real
+  - la adopción restante se delega formalmente a `TASK-140`, `TASK-134` y `TASK-162`
+
+### Validación ejecutada
+- `git diff --check`
+
+### Riesgo / coordinación
+- `develop` mantiene además cambios paralelos sin commitear en Finance:
+  - `src/app/api/finance/dashboard/pnl/route.ts`
+  - `src/app/api/finance/dashboard/summary/route.ts`
+  - `src/app/api/finance/income/route.ts`
+  - `src/lib/finance/postgres-store-slice2.ts`
+  - `src/views/greenhouse/finance/IncomeListView.tsx`
+- No se deben mezclar en este cierre de `TASK-141`; stage/commit selectivo solamente.
+
+## Sesión 2026-03-30 — `TASK-140` slice 1 persona-first en `/admin/views`
+
+### Objetivo
+- Empezar implementación real de `TASK-140` sin reabrir `TASK-141` y sin romper overrides, auditoría ni `authorizedViews`.
+
+### Delta de ejecución
+- Nueva pieza shared:
+  - `src/lib/admin/admin-preview-persons.ts`
+  - `src/lib/admin/admin-preview-persons.test.ts`
+- `getAdminViewAccessGovernance()` y `view-access-store` ya construyen el universo previewable agrupando por:
+  - `identityProfileId` cuando existe
+  - fallback `user:<userId>` cuando todavía no hay bridge persona completo
+- `/admin/views` ya cambió el selector y el framing del preview:
+  - ahora habla de `persona previewable`
+  - muestra si el caso es `persona canónica` o `principal portal`
+  - conserva el principal portal compatible para guardar overrides
+- Guardrail preservado:
+  - `user_view_overrides`, `view_access_log`, `authorizedViews` y la resolución runtime siguen `userId`-scoped
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/admin/admin-preview-persons.test.ts`
+- `pnpm exec eslint src/lib/admin/admin-preview-persons.ts src/lib/admin/admin-preview-persons.test.ts src/lib/admin/get-admin-view-access-governance.ts src/lib/admin/view-access-store.ts src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Pendiente inmediato
+- Validación manual visual en `/admin/views` para confirmar copy, chips y casos borde.
+- Decidir si un siguiente slice debe abrir el universo a personas sin principal portal persistible o si ese caso queda fuera del preview editable.
+- UX hardening ya aplicado en este mismo carril:
+  - copy del panel alineado a `persona previewable`
+  - alertas explícitas para `active`, `inactive`, `missing_principal` y `degraded_link`
+  - roadmap tab ya refleja los remanentes reales de `TASK-140`
+
+## Sesión 2026-03-30 — cierre formal de `TASK-140`
+
+### Objetivo
+- Cerrar el consumer `/admin/views` como adopción real de la policy persona-first sin reabrir `TASK-141` ni romper el runtime user-scoped existente.
+
+### Delta de ejecución
+- `TASK-140` se movió de `in-progress` a `complete`.
+- El archivo canónico quedó en:
+  - `docs/tasks/complete/TASK-140-admin-views-person-first-preview.md`
+- Se actualizaron:
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `changelog.md`
+- Criterio de cierre explicitado:
+  - el selector y preview ya son persona-first cuando existe `identityProfileId`
+  - `userId` quedó preservado como llave operativa de compatibilidad para overrides, auditoría y `authorizedViews`
+  - el remanente pasa a policy/validación continua, no a gap estructural del consumer
+
+### Validación ejecutada
+- `git diff --check`
+
+## Sesión 2026-03-30 — `TASK-134` slice 1 shared recipients en Notifications
+
+### Objetivo
+- Empezar implementación real de `TASK-134` sin tocar llaves `userId`-scoped de inbox/preferences/dedupe y sin romper el carril reactivo webhook/projections.
+
+### Delta de ejecución
+- `TASK-134` ya quedó en `in-progress`.
+- Nuevo helper shared:
+  - `src/lib/notifications/person-recipient-resolver.ts`
+    - `getRoleCodeNotificationRecipients(roleCodes)`
+- Adopción inicial en callers legacy/duplicados:
+  - `src/lib/sync/projections/notifications.ts`
+  - `src/lib/webhooks/consumers/notification-recipients.ts`
+- Efecto del slice:
+  - recipients role-based ya no repiten mapping ad hoc desde `greenhouse_serving.session_360`
+  - projections y webhook consumers ya comparten el mismo shape persona/member/user/email/fullName
+  - `NotificationService`, `notification_preferences`, `notifications` y `notification_log` siguen intactos en su semántica `userId`-scoped / recipient-key-scoped
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/notifications/person-recipient-resolver.test.ts src/lib/webhooks/consumers/notification-recipients.test.ts src/lib/sync/projections/notifications.test.ts`
+- `pnpm exec eslint src/lib/notifications/person-recipient-resolver.ts src/lib/notifications/person-recipient-resolver.test.ts src/lib/webhooks/consumers/notification-recipients.ts src/lib/webhooks/consumers/notification-recipients.test.ts src/lib/sync/projections/notifications.ts src/lib/sync/projections/notifications.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Pendiente inmediato
+- Cerrar el resto de callers legacy de Notifications que todavía no consuman el contrato shared.
+- Documentar el contrato transversal final de Notifications para poder cerrar `TASK-134` sin mover las fronteras `userId`-scoped del sistema.
+
+## Sesión 2026-03-30 — cierre formal de `TASK-134`
+
+### Objetivo
+- Cerrar la lane de hardening de identidad en Notifications sin cambiar la semántica `userId`-scoped del sistema.
+
+### Delta de ejecución
+- `TASK-134` se movió a `complete`.
+- La institucionalización final quedó reflejada en:
+  - `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `docs/tasks/to-do/TASK-128-webhook-consumers-roadmap.md`
+- Criterio de cierre explicitado:
+  - recipient resolution `person-first` ya es shared en projections y webhook consumers
+  - `identity_profile` es la raíz humana, pero `userId` sigue siendo la llave operativa de inbox/preferences/audit/dedupe
+  - no queda gap estructural abierto del recipient model; los remanentes futuros pasan a consumers de dominio, no a la base transversal de Notifications
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/notifications/person-recipient-resolver.test.ts src/lib/webhooks/consumers/notification-recipients.test.ts src/lib/sync/projections/notifications.test.ts`
+- `pnpm exec eslint src/lib/notifications/person-recipient-resolver.ts src/lib/notifications/person-recipient-resolver.test.ts src/lib/webhooks/consumers/notification-recipients.ts src/lib/webhooks/consumers/notification-recipients.test.ts src/lib/sync/projections/notifications.ts src/lib/sync/projections/notifications.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
+## Sesión 2026-03-30 — hardening urgente de Postgres por incidentes TLS en cron
+
+### Objetivo
+- Cortar la cascada de fallos repetidos en `outbox-publish` y `webhook-dispatch` ante errores TLS/SSL transitorios de PostgreSQL en `production`.
+
+### Diagnóstico
+- Slack mostró errores repetidos `SSL routines:ssl3_read_bytes:sslv3 alert bad certificate`.
+- Verificación operativa local:
+  - `production` sí tiene `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`
+  - Cloud SQL sigue con `sslMode=ENCRYPTED_ONLY`
+  - el runtime usa Cloud SQL Connector por diseño; no hay evidencia de que el issue venga de falta de env del connector
+- Riesgo detectado en código:
+  - `src/lib/postgres/client.ts` cacheaba `__greenhousePostgresPoolPromise` incluso si la creación del pool fallaba una vez
+  - un fallo TLS/handshake podía quedar pegado en el runtime caliente y repetir alertas hasta el próximo cold start
+
+### Delta de ejecución
+- `src/lib/postgres/client.ts` ahora:
+  - normaliza envs boolean/number con `trim()`
+  - resetea el pool global si `buildPool()` falla
+  - cierra pool/connector ante errores emitidos por `pg`
+  - reintenta una vez queries y transacciones cuando detecta fallos retryable de conexión/TLS
+
+### Validación ejecutada
+- `pnpm exec eslint src/lib/postgres/client.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Pendiente inmediato
+- Desplegar este hardening para observar si desaparece el spam de cron failures en `production`.
+- Si reaparece el mismo error después del deploy, revisar ya a nivel infra/Cloud SQL Connector rotation y runtime logs productivos.
+
+## Sesión 2026-03-30 — Hardening canónico de atribución comercial para Cost Intelligence
+
+### Objetivo
+- Contrastar `TASK-162` contra la arquitectura y el código real para decidir si la lane ya estaba lista o si necesitaba endurecerse antes del cutover.
+
+### Delta de ejecución
+- El contraste confirmó drift semántico real:
+  - `computeOperationalPl()` mezcla `client_labor_cost_allocation` para labor y `member_capacity_economics` para overhead
+  - `client_economics` y `organization-economics` todavía dependen del bridge histórico
+  - `auto-allocation-rules.ts` mantenía heurísticas locales de clasificación
+- Se endureció la fuente canónica del dominio:
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`
+- `TASK-162` se movió a `in-progress` con slice 1 explícito:
+  - `docs/tasks/in-progress/TASK-162-canonical-commercial-cost-attribution.md`
+- Primer módulo shared implementado:
+  - `src/lib/commercial-cost-attribution/assignment-classification.ts`
+  - `src/lib/commercial-cost-attribution/assignment-classification.test.ts`
+- Slice 2 ya implementado:
+  - `src/lib/commercial-cost-attribution/member-period-attribution.ts`
+  - `src/lib/commercial-cost-attribution/member-period-attribution.test.ts`
+  - combina `member_capacity_economics` + `client_labor_cost_allocation` por `member_id + período`
+  - expone costo base, labor comercial, internal load y overhead comercialmente atribuible
+- Primer consumer ya cortado a la capa intermedia:
+  - `src/lib/cost-intelligence/compute-operational-pl.ts`
+  - `src/lib/cost-intelligence/compute-operational-pl.test.ts`
+- Consumers adicionales ya alineados:
+  - `src/lib/finance/postgres-store-intelligence.ts`
+  - `src/lib/account-360/organization-economics.ts`
+  - ambos dejaron de depender directamente de `computeClientLaborCosts()`
+- Slice 4 ya implementado:
+  - `src/lib/commercial-cost-attribution/store.ts`
+  - `src/lib/commercial-cost-attribution/store.test.ts`
+  - tabla `greenhouse_serving.commercial_cost_attribution`
+  - `member-period-attribution.ts` ahora hace read serving-first con fallback
+  - `materializeOperationalPl()` rematerializa primero `commercial_cost_attribution`
+- Slice 5 ya implementado:
+  - `src/lib/sync/projections/commercial-cost-attribution.ts`
+  - `src/lib/sync/projections/commercial-cost-attribution.test.ts`
+  - `src/lib/sync/projections/index.ts`
+  - `src/lib/sync/event-catalog.ts`
+  - la capa ya tiene refresh reactivo dedicado y evento `accounting.commercial_cost_attribution.materialized`
+- Slice 6 ya implementado:
+  - `src/lib/commercial-cost-attribution/insights.ts`
+  - `src/lib/commercial-cost-attribution/insights.test.ts`
+  - `src/app/api/cost-intelligence/commercial-cost-attribution/health/route.ts`
+  - `src/app/api/cost-intelligence/commercial-cost-attribution/explain/[year]/[month]/[clientId]/route.ts`
+  - `src/app/api/cron/materialization-health/route.ts`
+  - la capa ya tiene health semántico por período, explain por cliente y freshness visible en materialization health
+- Adopción inicial sin big bang:
+  - `src/lib/team-capacity/internal-assignments.ts` ahora reexporta la regla shared
+  - `src/lib/finance/auto-allocation-rules.ts` ya filtra assignments con el classifier shared
+- Guardrail aplicado:
+  - no se tocó todavía `client_labor_cost_allocation`
+  - no se tocó serving de `operational_pl`
+  - no se mezcló con los cambios paralelos abiertos en Finance/Nubox
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/team-capacity/internal-assignments.test.ts src/lib/finance/auto-allocation-rules.test.ts`
+- `pnpm exec eslint src/lib/commercial-cost-attribution/assignment-classification.ts src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/team-capacity/internal-assignments.ts src/lib/team-capacity/internal-assignments.test.ts src/lib/finance/auto-allocation-rules.ts src/lib/finance/auto-allocation-rules.test.ts`
+- `pnpm exec vitest run src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/team-capacity/internal-assignments.test.ts src/lib/finance/auto-allocation-rules.test.ts src/lib/cost-intelligence/compute-operational-pl.test.ts`
+- `pnpm exec vitest run src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/commercial-cost-attribution/store.test.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/team-capacity/internal-assignments.test.ts src/lib/finance/auto-allocation-rules.test.ts src/lib/cost-intelligence/compute-operational-pl.test.ts`
+- `pnpm exec vitest run src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/commercial-cost-attribution/store.test.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/sync/projections/commercial-cost-attribution.test.ts src/lib/sync/projections/operational-pl.test.ts src/lib/sync/projections/client-economics.test.ts src/lib/sync/event-catalog.test.ts`
+- `pnpm exec vitest run src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/commercial-cost-attribution/store.test.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/commercial-cost-attribution/insights.test.ts src/lib/sync/projections/commercial-cost-attribution.test.ts src/lib/sync/projections/operational-pl.test.ts src/lib/sync/projections/client-economics.test.ts src/lib/sync/event-catalog.test.ts`
+- `pnpm exec eslint src/lib/commercial-cost-attribution/assignment-classification.ts src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/commercial-cost-attribution/member-period-attribution.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/team-capacity/internal-assignments.ts src/lib/team-capacity/internal-assignments.test.ts src/lib/finance/auto-allocation-rules.ts src/lib/finance/auto-allocation-rules.test.ts src/lib/cost-intelligence/compute-operational-pl.ts src/lib/cost-intelligence/compute-operational-pl.test.ts`
+- `pnpm exec eslint src/lib/commercial-cost-attribution/assignment-classification.ts src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/commercial-cost-attribution/member-period-attribution.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/team-capacity/internal-assignments.ts src/lib/team-capacity/internal-assignments.test.ts src/lib/finance/auto-allocation-rules.ts src/lib/finance/auto-allocation-rules.test.ts src/lib/cost-intelligence/compute-operational-pl.ts src/lib/cost-intelligence/compute-operational-pl.test.ts src/lib/finance/postgres-store-intelligence.ts src/lib/account-360/organization-economics.ts`
+- `pnpm exec eslint src/lib/commercial-cost-attribution/assignment-classification.ts src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/commercial-cost-attribution/store.ts src/lib/commercial-cost-attribution/store.test.ts src/lib/commercial-cost-attribution/member-period-attribution.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/team-capacity/internal-assignments.ts src/lib/team-capacity/internal-assignments.test.ts src/lib/finance/auto-allocation-rules.ts src/lib/finance/auto-allocation-rules.test.ts src/lib/cost-intelligence/compute-operational-pl.ts src/lib/cost-intelligence/compute-operational-pl.test.ts src/lib/finance/postgres-store-intelligence.ts src/lib/account-360/organization-economics.ts`
+- `pnpm exec eslint src/lib/commercial-cost-attribution/assignment-classification.ts src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/commercial-cost-attribution/store.ts src/lib/commercial-cost-attribution/store.test.ts src/lib/commercial-cost-attribution/member-period-attribution.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/sync/projections/commercial-cost-attribution.ts src/lib/sync/projections/commercial-cost-attribution.test.ts src/lib/sync/projections/index.ts src/lib/sync/event-catalog.ts src/lib/cost-intelligence/compute-operational-pl.ts src/lib/cost-intelligence/compute-operational-pl.test.ts src/lib/finance/postgres-store-intelligence.ts src/lib/account-360/organization-economics.ts`
+- `pnpm exec eslint src/lib/commercial-cost-attribution/assignment-classification.ts src/lib/commercial-cost-attribution/assignment-classification.test.ts src/lib/commercial-cost-attribution/store.ts src/lib/commercial-cost-attribution/store.test.ts src/lib/commercial-cost-attribution/member-period-attribution.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/commercial-cost-attribution/insights.ts src/lib/commercial-cost-attribution/insights.test.ts src/lib/sync/projections/commercial-cost-attribution.ts src/lib/sync/projections/commercial-cost-attribution.test.ts src/lib/sync/projections/index.ts src/lib/sync/event-catalog.ts src/app/api/cost-intelligence/commercial-cost-attribution/health/route.ts src/app/api/cost-intelligence/commercial-cost-attribution/explain/[year]/[month]/[clientId]/route.ts src/app/api/cron/materialization-health/route.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `git diff --check`
+
+### Limitación de validación
+- `pnpm exec tsc --noEmit --pretty false` falla por cambios paralelos ajenos:
+  - `src/app/(dashboard)/finance/hes/page.tsx`
+  - `src/app/(dashboard)/finance/purchase-orders/page.tsx`
+  - faltan views `HesListView` y `PurchaseOrdersListView`
+- La lane `TASK-162` no introdujo ese fallo.
+
+### Pendiente inmediato
+- Siguiente slice de `TASK-162`:
+  - revisar si hace falta projection domain propio o si `cost_intelligence` basta como partición operativa
+  - decidir si el explain surface necesita UI en `/finance/intelligence`
+  - luego evaluar cierre formal del bridge legacy como contrato interno en vez de consumer API
+
+### Objetivo
+- Corregir la divergencia entre la FTE visible en `Agency > Team` / Person 360 y la atribución comercial usada por Finance / Cost Intelligence.
+- Dejar la regla documentada para que no vuelva a bifurcarse por consumer.
+
+### Delta de ejecución
+- Se creó una regla shared en:
+  - `src/lib/team-capacity/internal-assignments.ts`
+- Esa regla ya se reutiliza en:
+  - `src/app/api/team/capacity-breakdown/route.ts`
+  - `src/lib/sync/projections/member-capacity-economics.ts`
+  - `src/lib/finance/auto-allocation-rules.ts`
+  - `scripts/setup-postgres-finance-intelligence-p2.sql`
+  - `src/lib/cost-intelligence/compute-operational-pl.ts`
+- Semántica consolidada:
+  - `space-efeonce`, `efeonce_internal` y `client_internal` siguen siendo válidos para carga operativa interna
+  - no participan como cliente comercial en labor attribution, auto-allocation ni snapshots de `operational_pl`
+- También se endureció el serving runtime:
+  - `greenhouse_runtime` requiere `DELETE` acotado sobre `greenhouse_serving.operational_pl_snapshots`
+  - el materializador lo usa solo para purgar scopes obsoletos de la misma revisión antes del upsert
+
+### Pendiente inmediato
+- Reaplicar `setup-postgres-cost-intelligence.sql`
+- Re-materializar `operational_pl` y verificar que filas stale de `Efeonce` desaparezcan del período afectado
+- Cerrar con validación + documentación final + commit/push
+
+## Sesión 2026-03-30 — Documentación de la capa canónica de commercial cost attribution
+
+### Objetivo
+- Dejar explícito en docs que la consolidación pendiente ya no debe pensarse como “más lógica dentro de Cost Intelligence”, sino como una capa canónica nueva de plataforma ya decidida.
+
+### Delta de ejecución
+- Se documentó que la capa de `commercial cost attribution` debe ubicarse entre:
+  - Payroll / Team Capacity / Finance base
+  - y Finance / Cost Intelligence / Agency / People / Home / Nexa
+- `TASK-162` queda como la lane institucional para esa capa.
+
+### Pendiente inmediato
+- Mover `TASK-162` a `in-progress` cuando empecemos implementación real.
+- Usarla como prerequisito semántico antes de profundizar más `Agency Economics`, `Service P&L` y scorecards financieros.
+
+## Sesión 2026-03-30 — TASK-071 slice 1-3 consumers distribuidos
+
+### Objetivo
+- Ejecutar el primer corte real de `TASK-071` contrastando primero arquitectura, consumers y serving ya implementado del módulo Cost Intelligence.
+
+### Delta de ejecución
+- Agency:
+  - `src/lib/agency/agency-finance-metrics.ts` ya no calcula este consumer desde `greenhouse_finance.income` / `expenses`; ahora lee `greenhouse_serving.operational_pl_snapshots`.
+  - `src/components/agency/SpaceCard.tsx` ya puede mostrar período del snapshot y si el margen corresponde a cierre efectivo.
+- Organization 360:
+  - `src/lib/account-360/organization-economics.ts` ya es serving-first para `organization` y breakdown `client`, con fallback al compute legacy si falta snapshot.
+  - `src/views/greenhouse/organizations/tabs/OrganizationEconomicsTab.tsx` ya muestra chips de cierre por período y badge del período actual.
+- People 360:
+  - `src/lib/person-360/get-person-finance.ts` ahora publica `latestCostSnapshot`.
+  - `src/views/greenhouse/people/tabs/PersonFinanceTab.tsx` suma card `Costo total del período` con desglose y badge de cierre.
+  - `src/app/api/people/[memberId]/finance-impact/route.ts` y `src/views/greenhouse/people/tabs/PersonHrProfileTab.tsx` ya muestran período + closure awareness.
+- Home:
+  - `src/lib/home/get-home-snapshot.ts` ahora resuelve `financeStatus` para roles internos/finance.
+  - `src/views/greenhouse/home/HomeView.tsx` reemplaza placeholders por estado real de cierre/margen.
+
+### Validación ejecutada
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec eslint src/lib/agency/agency-finance-metrics.ts src/lib/account-360/organization-economics.ts src/views/greenhouse/organizations/tabs/OrganizationEconomicsTab.tsx src/types/people.ts src/lib/person-360/get-person-finance.ts 'src/app/api/people/[memberId]/finance-impact/route.ts' src/views/greenhouse/people/tabs/PersonFinanceTab.tsx src/views/greenhouse/people/tabs/PersonHrProfileTab.tsx src/types/home.ts src/lib/home/get-home-snapshot.ts src/app/api/home/snapshot/route.ts src/views/greenhouse/home/HomeView.tsx`
+
+### Limitación de validación
+- `pnpm build` quedó inestable en esta sesión por locks/artifacts de `.next` (`Unable to acquire lock` y luego `ENOENT` sobre `_buildManifest.js.tmp`), incluso después de limpiar `.next`.
+- No apareció error de tipos del slice después de `tsc`; el ruido observado fue del runtime/build workspace de Next en esta máquina.
+
+### Pendiente inmediato
+- Validación visual real del slice en Agency / Organization 360 / People / Home.
+- Nexa ya recibe el mismo `financeStatus` resumido en `lightContext`; el remanente ya no es funcional sino de validación/cierre formal.
+
+## Sesión 2026-03-30 — TASK-070 validación visual + fix de fecha operativa
+
+### Objetivo
+- Validar visualmente `/finance/intelligence` con sesión local admin.
+- Confirmar que el “último día hábil” realmente venga del calendario operativo y no quede roto en UI.
+
+### Delta de ejecución
+- Se usó sesión local firmada vía `scripts/mint-local-admin-jwt.js` para entrar al portal en dev y validar `/finance/intelligence`.
+- Resultado:
+  - la API `/api/cost-intelligence/periods?limit=12` ya devolvía períodos correctos y `lastBusinessDayOfTargetMonth` calculado desde el calendario operativo
+  - el bug estaba en display: la UI parseaba `YYYY-MM-DD` con `new Date(...)` y corría la fecha por timezone
+- Fix aplicado:
+  - `src/views/greenhouse/finance/FinancePeriodClosureDashboardView.tsx`
+  - `src/views/greenhouse/finance/FinancePeriodClosureDashboardView.test.tsx`
+- Validación visual adicional:
+  - la tabla de períodos, el expandible inline de P&L y el diálogo de cierre funcionan con datos reales
+  - Home ya muestra `financeStatus` usable
+  - People 360 ya muestra `latestCostSnapshot` y closure awareness
+  - Organization 360 no pudo validarse bien en este entorno por falta de datos
+  - Agency no mostró issue técnico; el consumer financiero está en `SpaceCard`, no en cualquier tabla listada
+
+### Validación ejecutada
+- `pnpm exec vitest run src/views/greenhouse/finance/FinancePeriodClosureDashboardView.test.tsx`
+- `pnpm exec eslint src/views/greenhouse/finance/FinancePeriodClosureDashboardView.tsx src/views/greenhouse/finance/FinancePeriodClosureDashboardView.test.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+
+### Pendiente inmediato
+- Seguir validación visual de Agency/Organization 360 con dataset más representativo.
+- Decidir si el lifecycle de `TASK-070` y `TASK-071` se normaliza en docs, porque hoy sus archivos viven en `complete/` pero varias notas todavía las describen como lanes abiertas.
+
+## Sesión 2026-03-30 — Consolidación documental de Cost Intelligence
+
+### Objetivo
+- Dejar el módulo documentado a todo nivel antes del siguiente corte funcional.
+
+### Delta de ejecución
+- Arquitectura master actualizada:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- Arquitectura especializada actualizada:
+  - `docs/architecture/GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+- Índice de docs actualizado:
+  - `docs/README.md`
+- Pipeline de tasks reconciliado:
+  - `docs/tasks/README.md`
+  - `docs/tasks/in-progress/TASK-070-cost-intelligence-finance-ui.md`
+- Contexto vivo actualizado:
+  - `project_context.md`
+
+### Estado real tras la consolidación
+- Cost Intelligence ya debe leerse como módulo operativo distribuido.
+- Finance sigue siendo owner del motor financiero central.
+- Cost Intelligence ya sirve:
+  - `/finance/intelligence`
+  - Agency
+  - Organization 360
+  - People 360
+  - Home
+  - Nexa
+
+### Pendiente inmediato
+- Validación visual final de `TASK-070` y `TASK-071`.
+- Cierre formal de fallbacks legacy donde todavía existen por resiliencia.
+
+## Sesión 2026-03-30 — TASK-069 cerrada + arquitectura del módulo endurecida
+
+### Objetivo
+- Cerrar formalmente `TASK-069`.
+- Dejar el módulo de Cost Intelligence documentado de forma más completa en arquitectura.
+
+### Delta de ejecución
+- `TASK-069` pasó de `in-progress` a `complete`.
+- Motivo:
+  - `operational_pl` ya materializa snapshots por `client`, `space` y `organization`
+  - APIs de lectura ya están expuestas
+  - smoke reactivo E2E ya quedó validado
+  - la UI principal de Finance ya consume este serving como contrato estable
+- Arquitectura endurecida en:
+  - `docs/architecture/GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md`
+- Lo documentado ahora incluye:
+  - estado implementado por lanes `067-070`
+  - serving canónico
+  - invariantes operativos
+  - authorization vigente
+  - consumers pendientes (`TASK-071`)
+
+### Pendiente inmediato
+- `TASK-070` sigue abierta solo por validación visual final y decisión sobre `ClientEconomicsView`.
+- El siguiente carril funcional natural ya es `TASK-071`.
+
+## Sesión 2026-03-30 — TASK-070 surface principal de Finance Intelligence implementada
+
+### Objetivo
+- Ejecutar `TASK-070` después de contrastarla con:
+  - `docs/architecture/GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - APIs reales de `period closure` y `operational_pl`
+- Confirmar el orden operativo:
+  - `TASK-070` antes de `TASK-071`
+
+### Delta de ejecución
+- `TASK-070` pasó a `in-progress`.
+- `/finance/intelligence` ya dejó de renderizar `ClientEconomicsView` como portada y ahora usa:
+  - `src/views/greenhouse/finance/FinancePeriodClosureDashboardView.tsx`
+- La nueva surface ya incluye:
+  - hero de cierre operativo
+  - KPIs agregados de readiness
+  - tabla de 12 períodos con semáforos por pata
+  - expandible inline de P&L por cliente
+  - diálogo de cierre con summary agregado
+  - reapertura con razón obligatoria
+- Gating aplicado en UI:
+  - cierre para `finance_manager` y `efeonce_admin`
+  - reapertura solo para `efeonce_admin`
+
+### Validación ejecutada
+- `pnpm exec eslint 'src/app/(dashboard)/finance/intelligence/page.tsx' 'src/views/greenhouse/finance/FinancePeriodClosureDashboardView.tsx'`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- Validación visual real del flujo en local/preview antes de cerrar `TASK-070`.
+- Decidir si `ClientEconomicsView`:
+  - se reubica a otra route/surface de analytics, o
+  - queda como legacy candidate para retiro en un follow-on.
+
+## Sesión 2026-03-30 — TASK-069 slice 1 materializado
+
+### Objetivo
+- Abrir `TASK-069` con contraste previo duro contra:
+  - `docs/architecture/GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - motor canónico de `src/app/api/finance/dashboard/pnl/route.ts`
+  - serving actual (`client_labor_cost_allocation`, `member_capacity_economics`, `period_closure_status`)
+
+### Delta de ejecución
+- `TASK-069` pasó a `in-progress`.
+- Slice implementado:
+  - `src/lib/cost-intelligence/pl-types.ts`
+  - `src/lib/cost-intelligence/compute-operational-pl.ts`
+  - `src/lib/sync/projections/operational-pl.ts`
+  - `src/app/api/cost-intelligence/pl/route.ts`
+  - `src/app/api/cost-intelligence/pl/[scopeType]/[scopeId]/route.ts`
+  - tests:
+    - `src/lib/cost-intelligence/compute-operational-pl.test.ts`
+    - `src/lib/sync/projections/operational-pl.test.ts`
+- Integraciones mínimas cerradas en el mismo slice:
+  - registro de `operational_pl` en `src/lib/sync/projections/index.ts`
+  - `accounting.margin_alert.triggered` entra al carril reactivo
+  - `notification_dispatch` ya lo consume
+  - `materialization-health` ya revisa `greenhouse_serving.operational_pl_snapshots`
+
+### Decisiones semánticas aplicadas
+- `operational_pl` no redefine el P&L de Finance:
+  - revenue cliente = `total_amount_clp - partner_share`
+  - costo laboral = `client_labor_cost_allocation`
+  - overhead = `member_capacity_economics`
+  - `period_closed` / `snapshot_revision` = `period_closure_status`
+- Para evitar doble conteo, el carril `direct_expense` excluye `expenses.payroll_entry_id`.
+- El primer slice ya materializa `client -> space -> organization`; todavía no reemplaza consumers on-read existentes como `organization-economics.ts`.
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/cost-intelligence/compute-operational-pl.test.ts src/lib/sync/projections/operational-pl.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec eslint src/lib/cost-intelligence/compute-operational-pl.ts src/lib/cost-intelligence/compute-operational-pl.test.ts src/lib/sync/projections/operational-pl.ts src/lib/sync/projections/operational-pl.test.ts src/app/api/cost-intelligence/pl/route.ts 'src/app/api/cost-intelligence/pl/[scopeType]/[scopeId]/route.ts' src/lib/sync/projections/notifications.ts src/app/api/cron/materialization-health/route.ts src/lib/sync/projections/index.ts src/lib/sync/event-catalog.ts`
+- `pnpm build`
+
+### Pendiente inmediato
+- Siguiente corte sano:
+  - smoke reactivo E2E de `operational_pl`
+  - consumers downstream (`TASK-071`)
+  - decidir si el cron dedicado `outbox-react-cost-intelligence` ya merece scheduling propio o si seguimos temporalmente con catch-all
+
+## Sesión 2026-03-30 — TASK-069 smoke reactivo E2E validado
+
+### Objetivo
+- Cerrar el remanente técnico más claro de `TASK-069`: demostrar que `operational_pl` ya procesa el carril reactivo real, no solo tests y build.
+
+### Delta de ejecución
+- Nuevo smoke script:
+  - `scripts/smoke-cost-intelligence-operational-pl.ts`
+  - comando: `pnpm smoke:cost-intelligence:operational-pl`
+- El smoke:
+  - detecta un período real con actividad
+  - inserta un evento sintético `finance.income.updated`
+  - lo publica de forma aislada
+  - procesa solo `cost_intelligence`
+  - valida reactive log + snapshots materializados + eventos salientes `accounting.pl_snapshot.materialized`
+
+### Evidencia obtenida
+- `periodId=2026-03`
+- `eventsProcessed=5`
+- `eventsFailed=0`
+- `projectionsTriggered=6`
+- `snapshotCount=3`
+- `publishedEventsCount=10`
+- handler validado:
+  - `operational_pl:finance.income.updated`
+
+### Validación ejecutada
+- `pnpm smoke:cost-intelligence:operational-pl`
+- `pnpm exec eslint scripts/smoke-cost-intelligence-operational-pl.ts package.json`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- El remanente principal de `TASK-069` ya no es de wiring base.
+- Siguiente corte lógico:
+  - consumers downstream (`TASK-071`)
+  - decidir si el cron dedicado de `cost_intelligence` ya merece scheduling propio
+
+## Sesión 2026-03-30 — TASK-068 cerrada
+
+### Completado
+- `TASK-068` pasó de `in-progress` a `complete`.
+- Criterio de cierre validado:
+  - checker de readiness operativo
+  - close/reopen operativos
+  - projection `period_closure_status` registrada
+  - alineación con calendario operativo aplicada
+  - smoke reactivo E2E validado
+- Chequeo de impacto cruzado ejecutado:
+  - `TASK-069` ya no queda bloqueada por remanentes de `TASK-068`
+  - `TASK-070` y `TASK-071` pasan a depender solo de `TASK-069`
+
+### Archivos tocados
+- `docs/tasks/complete/TASK-068-period-closure-status-projection.md`
+- `docs/tasks/README.md`
+- `docs/tasks/to-do/TASK-069-operational-pl-projection.md`
+- `docs/tasks/to-do/TASK-070-cost-intelligence-finance-ui.md`
+- `docs/tasks/to-do/TASK-071-cost-intelligence-cross-module-consumers.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Validación ejecutada
+- `pnpm smoke:cost-intelligence:period-closure`
+- `pnpm exec vitest run src/lib/cost-intelligence/check-period-readiness.test.ts src/lib/sync/projections/period-closure-status.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec eslint scripts/smoke-cost-intelligence-period-closure.ts src/lib/cost-intelligence/check-period-readiness.ts src/lib/cost-intelligence/check-period-readiness.test.ts`
+- `pnpm build`
+
+### Pendiente inmediato
+- La continuación natural del carril ya es `TASK-069`.
+
+## Sesión 2026-03-30 — TASK-068 smoke reactivo E2E validado
+
+### Objetivo
+- Cerrar el remanente real de `TASK-068` verificando el circuito reactivo del domain `cost_intelligence` con evidencia de runtime, no solo tests unitarios.
+
+### Contexto operativo
+- Antes de implementarlo se recontrastó `TASK-068` contra:
+  - `docs/architecture/GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+  - projection registry, outbox consumer y reactive consumer del codebase
+- Hallazgo clave:
+  - la tarea sí estaba alineada con arquitectura y modelo de datos
+  - el único gap real restante era demostrar la cadena `outbox -> reactive -> serving`
+
+### Delta de ejecución
+- Se agregó el smoke script:
+  - `scripts/smoke-cost-intelligence-period-closure.ts`
+  - comando: `pnpm smoke:cost-intelligence:period-closure`
+- El smoke inserta un evento sintético `finance.expense.updated`, lo publica de forma aislada y procesa solo `cost_intelligence` con `batchSize: 1`.
+- Evidencia obtenida:
+  - `periodId=2026-03`
+  - `eventsProcessed=1`
+  - `eventsFailed=0`
+  - `projectionsTriggered=1`
+  - row materializada en `greenhouse_serving.period_closure_status`
+  - row reactiva registrada en `greenhouse_sync.outbox_reactive_log`
+
+### Validación ejecutada
+- `pnpm smoke:cost-intelligence:period-closure`
+- `pnpm exec vitest run src/lib/cost-intelligence/check-period-readiness.test.ts src/lib/sync/projections/period-closure-status.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- El remanente de `TASK-068` ya no es de wiring técnico.
+- Solo queda decidir si vale la pena endurecer `income_status` / `expense_status` a un `partial` más rico cuando Finance exponga señales de completitud más finas.
+
+## Sesión 2026-03-30 — TASK-068 alineada al calendario operativo
+
+### Objetivo
+- Evitar que `period closure` nazca como lógica de mes calendario puro y alinearlo al calendario operativo ya existente en Payroll.
+
+### Contexto operativo
+- La implementación inicial de `TASK-068` ya estaba en `develop` y validada.
+- Se revisaron explícitamente:
+  - `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+  - `src/lib/calendar/operational-calendar.ts`
+  - `src/lib/calendar/nager-date-holidays.ts`
+  - `src/lib/payroll/auto-calculate-payroll.ts`
+  - `src/lib/payroll/current-payroll-period.ts`
+- Hallazgo clave:
+  - Cost Intelligence ya estaba documentado como consumidor potencial del calendario operativo; convenía alinearlo ahora y no más tarde.
+
+### Delta de ejecución
+- `src/lib/cost-intelligence/check-period-readiness.ts` ahora:
+  - resuelve contexto operativo con `resolveOperationalCalendarContext()`
+  - hidrata feriados vía `loadNagerDateHolidayDateSet()`
+  - calcula `currentOperationalMonthKey`, `inCurrentCloseWindow` y `lastBusinessDayOfTargetMonth`
+  - expone ese bloque en `operationalCalendar`
+- `listRecentClosurePeriods()` ahora asegura presencia del mes operativo actual aunque aún no existan señales materializadas del período.
+- `src/lib/cost-intelligence/check-period-readiness.test.ts` ganó cobertura para el bloque `operationalCalendar`.
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/cost-intelligence/check-period-readiness.test.ts src/lib/sync/projections/period-closure-status.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- Sigue pendiente el smoke reactivo end-to-end del domain `cost_intelligence` para cerrar `TASK-068`.
+
+## Sesión 2026-03-30 — TASK-068 Period Closure Status iniciada
+
+### Objetivo
+- Implementar el primer slice operativo de Cost Intelligence después de `TASK-067`:
+  - checker de readiness mensual
+  - projection `period_closure_status`
+  - base de APIs close/reopen para ceremonia de cierre
+
+### Contexto operativo
+- `TASK-068` ya fue movida a `in-progress`.
+- Esta lane se ejecuta apoyándose en:
+  - `docs/architecture/GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`
+- Restricción arquitectónica explícita:
+  - el readiness y el cierre deben conversar con el lifecycle canónico de Payroll/Finance
+  - no inventar semánticas paralelas para el período financiero
+
+### Pendiente inmediato
+- mapear columnas canónicas de `payroll_periods`, `income`, `expenses`, `exchange_rates`
+- implementar helper `check-period-readiness`
+- registrar projection reactiva y su scope `finance_period`
+
+### Delta de ejecución
+- El slice principal ya quedó materializado:
+  - `src/lib/cost-intelligence/check-period-readiness.ts`
+  - `src/lib/cost-intelligence/close-period.ts`
+  - `src/lib/cost-intelligence/reopen-period.ts`
+  - `src/lib/sync/projections/period-closure-status.ts`
+  - rutas `GET/POST` bajo `/api/cost-intelligence/periods/**`
+- Decisiones semánticas implementadas:
+  - income mensual se lee por `invoice_date`
+  - expenses mensuales se leen por `COALESCE(document_date, payment_date)`
+  - FX mensual se considera por `rate_date`
+  - payroll gating usa `payroll_periods.status`, con `exported` como condición default de readiness
+- Validación pasada:
+  - tests del carril `cost-intelligence`
+  - `tsc --noEmit`
+  - `pnpm build`
+- Remanente inmediato:
+  - smoke reactivo E2E del projection domain
+  - evaluar si Finance amerita una semántica `partial` más rica para income/expenses antes de cerrar `TASK-068`
+
+## Sesión 2026-03-30 — TASK-067 Cost Intelligence Foundation iniciada
+
+### Objetivo
+- bootstrap técnico de Cost Intelligence:
+  - schema `greenhouse_cost_intelligence`
+  - serving tables base
+  - eventos `accounting.*`
+  - domain `cost_intelligence` en projections
+  - cron route dedicada
+
+### Contexto operativo
+- Esta lane se ejecuta después de revisar:
+  - `docs/architecture/GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
+  - `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`
+- Hay un cambio ajeno ya abierto y no mezclado en:
+  - `src/app/api/finance/dashboard/summary/route.ts`
+
+### Pendiente inmediato
+- ninguno dentro del alcance de `TASK-067`; la continuation natural es `TASK-068` / `TASK-069`
+
+### Delta de ejecución
+- El bootstrap ya quedó implementado y validado:
+  - `pnpm setup:postgres:cost-intelligence`
+  - `pnpm pg:doctor --profile=runtime`
+  - `pnpm pg:doctor --profile=migrator`
+  - `pnpm exec eslint ...`
+  - `pnpm build`
+- Resultado:
+  - schema `greenhouse_cost_intelligence` visible para runtime y migrator
+  - route `outbox-react-cost-intelligence` compila y entra al build
+  - `supportedDomains` ya incluye `cost_intelligence`
+- El remanente del smoke local ya quedó resuelto:
+  - raíz del problema: `GOOGLE_APPLICATION_CREDENTIALS_JSON` podía traer `private_key` PEM colapsada en una sola línea
+  - fix aplicado en `src/lib/google-credentials.ts` reconstruyendo los saltos de línea del PEM antes de instanciar `google-auth-library`
+  - cobertura agregada en `src/lib/google-credentials.test.ts`
+  - smoke local autenticado de `/api/cron/outbox-react-cost-intelligence` ya responde `200`
+- Decisión operativa vigente:
+  - `TASK-067` queda cerrada para su alcance
+  - la cron dedicada en `vercel.json` puede seguir diferida mientras `068/069` aún no registran projections reales; ya no por bloqueo OpenSSL/JWT
+- Alineación nueva obligatoria para el siguiente slice:
+  - `TASK-068` y `TASK-069` deben respetar también `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `TASK-069` no redefine el P&L; materializa y distribuye por scope la semántica financiera canónica ya documentada por Finance
+
+## Sesión 2026-03-30 — hardening documental para `TASK-141` sin romper reactive lanes
+
+### Completado
+- Se revisaron explícitamente los carriles sensibles antes de profundizar el cutover `person-first`:
+  - `src/lib/sync/publish-event.ts`
+  - `src/lib/webhooks/dispatcher.ts`
+  - `src/lib/webhooks/consumers/notification-recipients.ts`
+  - `src/lib/notifications/person-recipient-resolver.ts`
+  - `src/lib/notifications/notification-service.ts`
+  - `src/lib/sync/projections/notifications.ts`
+  - `src/lib/sync/projections/client-economics.ts`
+  - `src/lib/sync/projections/ico-member-metrics.ts`
+  - `src/lib/sync/projections/person-intelligence.ts`
+- Se dejó explícito en arquitectura y en `TASK-141` que:
+  - persona canónica no reemplaza a ciegas `member_id` ni `user_id`
+  - notificaciones siguen necesitando `userId` para inbox/preferencias cuando aplique
+  - ICO, finance y serving por colaborador siguen necesitando `member_id` como clave operativa
+  - cualquier cutover futuro debe ser gradual, observable y con compatibilidad transicional
+
+### Archivos tocados
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+- `docs/tasks/to-do/TASK-141-canonical-person-identity-consumption.md`
+- `project_context.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Validación ejecutada
+- revisión documental/manual del contrato
+- lectura explícita de outbox, webhook dispatcher, recipient resolution y projections sensibles
+
+### Pendiente inmediato
+- si se implementa `TASK-141`, el primer slice debería crear o endurecer el resolver shared sin cambiar todavía recipient keys ni payloads reactivos
+- consumers de notifications, finance e ICO deben verificarse con evidencia antes de cualquier cutover más agresivo
+
+## Sesión 2026-03-30 — documentación arquitectónica del modelo de views
+
+### Completado
+- El modelo de gobernanza por vistas ya quedó documentado en arquitectura, no solo en tasks/handoff:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
+  - `project_context.md`
+- Quedó explícito que:
+  - `routeGroups` siguen como boundary broad
+  - `authorizedViews` + `view_code` son la capa fina
+  - `/admin/views` es la superficie oficial para operar matrix, overrides, expiración, auditoría y preview
+
+### Validación ejecutada
+- Validación documental/manual del delta en arquitectura
+
+### Pendiente inmediato
+- Si en el siguiente corte nacen más superficies gobernables, ya no deberían documentarse solo en la task; deben actualizar también la arquitectura canónica.
+
+## Sesión 2026-03-30 — decisión explícita: `/home` queda fuera de `view_code`
+
+### Completado
+- Se revisó el rol arquitectónico de `/home` y se dejó la decisión documentada en:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
+  - `project_context.md`
+  - `docs/tasks/in-progress/TASK-136-admin-view-access-governance.md`
+- Decisión vigente:
+  - `/home` no entra al catálogo gobernable
+  - sigue siendo landing transversal interna resuelta por `portalHomePath`
+
+### Razón corta
+- Gobernar `/home` como vista revocable hoy metería riesgo innecesario en el punto de entrada base de internos.
+
+## Sesión 2026-03-30 — TASK-136 cierra capability modules cliente y mejora bulk ops en la matrix
+
+### Completado
+- Se agregó `cliente.modulos` al catálogo gobernable para cubrir `/capabilities/**`.
+- El menú cliente ya no expone `Módulos` solo por `routeGroups`; ahora exige `authorizedViews` vía `cliente.modulos`.
+- El layout dinámico `src/app/(dashboard)/capabilities/[moduleId]/layout.tsx` ahora aplica:
+  - guard broad por `view_code` (`cliente.modulos`)
+  - guard fino por módulo (`verifyCapabilityModuleAccess`)
+- `/admin/views` ganó acciones masivas por rol sobre el set filtrado actual:
+  - conceder filtradas
+  - revocar filtradas
+  - restablecer filtradas
+
+### Archivos tocados
+- `src/lib/admin/view-access-catalog.ts`
+- `src/components/layout/vertical/VerticalMenu.tsx`
+- `src/app/(dashboard)/capabilities/[moduleId]/layout.tsx`
+- `src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx`
+- `docs/tasks/in-progress/TASK-136-admin-view-access-governance.md`
+- `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
+- `project_context.md`
+- `changelog.md`
+
+### Validación ejecutada
+- `pnpm exec eslint src/lib/admin/view-access-catalog.ts src/app/'(dashboard)'/capabilities/[moduleId]/layout.tsx src/components/layout/vertical/VerticalMenu.tsx src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx`
+- `pnpm build`
+
+### Limitación observada
+- `pnpm exec tsc --noEmit --pretty false` falló por drift ajeno en una ruta nueva ya presente en el árbol:
+  - `src/app/api/people/[memberId]/finance-impact/route.ts`
+- El build completo sí pasó, incluyendo `/capabilities/[moduleId]` y `/admin/views`.
+
+### Pendiente inmediato
+- El remanente fino de `TASK-136` ya se parece más a cleanup/cobertura residual que a un gap estructural:
+  - decidir si más access points transversales merecen `view_code` propio
+  - cerrar rutas profundas que aún hereden por layouts amplios
+
+## Sesión 2026-03-30 — TASK-136 cerrada
+
+### Completado
+- `TASK-136` pasó de `in-progress` a `complete`.
+- Se validó el criterio de cierre:
+  - catálogo gobernable por `view_code` activo
+  - persistencia role/user activa
+  - expiración, auditoría y notificación reactiva activas
+  - `authorizedViews` integrado a sesión, menú y guards
+  - `/admin/views` ya funciona como superficie operativa real
+- Chequeo de impacto cruzado ejecutado:
+  - no se detectaron otras tasks activas o `to-do` que requieran delta inmediato por este cierre
+  - el remanente futuro debe abrirse como follow-on, no reabrir artificialmente `TASK-136`
+
+### Archivos tocados
+- `docs/tasks/complete/TASK-136-admin-view-access-governance.md`
+- `docs/tasks/README.md`
+- `Handoff.md`
+- `changelog.md`
+
+### Validación ejecutada
+- Validación documental/manual del cierre y del índice de tasks
+
+## Sesión 2026-03-30 — TASK-136 cierra más rutas terciarias y completa la operabilidad de `/admin/views`
+
+### Completado
+- Se ampliaron superficies gobernables client-facing en `view_registry`:
+  - `cliente.campanas`
+  - `cliente.notificaciones`
+- Nuevos guards por layout activos en:
+  - `src/app/(dashboard)/campaigns/layout.tsx`
+  - `src/app/(dashboard)/campanas/layout.tsx`
+  - `src/app/(dashboard)/notifications/layout.tsx`
+- `/admin/views` ya no se comporta solo como matrix editable básica:
+  - resumen de cambios pendientes vs estado persistido
+  - foco sobre vistas que siguen en fallback hardcoded
+  - preview con baseline visible, overrides activos, grants extra y revokes efectivos
+  - filtro del panel de overrides por `impact / overrides / visibles / todas`
+  - lectura más clara de vistas ocultas por revoke
+
+### Archivos tocados
+- `src/lib/admin/view-access-catalog.ts`
+- `src/app/(dashboard)/campaigns/layout.tsx`
+- `src/app/(dashboard)/campanas/layout.tsx`
+- `src/app/(dashboard)/notifications/layout.tsx`
+- `src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx`
+- `docs/tasks/in-progress/TASK-136-admin-view-access-governance.md`
+- `docs/tasks/README.md`
+- `changelog.md`
+
+### Validación ejecutada
+- `pnpm exec eslint src/lib/admin/view-access-catalog.ts src/app/'(dashboard)'/campaigns/layout.tsx src/app/'(dashboard)'/campanas/layout.tsx src/app/'(dashboard)'/notifications/layout.tsx src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- `home` y algunos access points transversales siguen sin `view_code` propio porque todavía conviene decidir si deben ser superficies gobernables o rutas base siempre disponibles para sesión autenticada.
+- Quedan cambios ajenos en el árbol fuera de este carril:
+  - `src/lib/operations/get-operations-overview.ts`
+  - `src/views/greenhouse/admin/AdminOpsHealthView.tsx`
+  - `src/lib/finance/dte-emission-queue.test.ts`
+
+## Sesión 2026-03-30 — TASK-136 agrega notificación reactiva al usuario afectado
+
+### Completado
+- Los overrides por usuario de `/admin/views` ya no quedan solo en persistencia + auditoría:
+  - `saveUserViewOverrides()` ahora compara acceso efectivo antes/después del save
+  - cuando el set real de vistas cambia, publica un evento outbox `access.view_override_changed`
+- Los overrides expirados ya no quedan como deuda silenciosa:
+  - `getPersistedUserOverrides()` limpia overrides vencidos de forma oportunista
+  - registra `expire_user` en `greenhouse_core.view_access_log`
+  - publica el mismo evento reactivo si la expiración cambia el acceso efectivo del usuario
+- El dominio `notifications` ya consume ese evento y notifica al usuario afectado con:
+  - resumen de vistas concedidas
+  - resumen de vistas revocadas
+  - deep-link preferente a la vista recién habilitada o fallback `/dashboard`
+- Se agregó cobertura unitaria del projection reactivo para este caso.
+
+### Archivos tocados
+- `src/lib/admin/view-access-store.ts`
+- `src/lib/sync/projections/notifications.ts`
+- `src/lib/sync/projections/notifications.test.ts`
+- `docs/tasks/in-progress/TASK-136-admin-view-access-governance.md`
+- `docs/tasks/README.md`
+- `changelog.md`
+
+### Validación ejecutada
+- `pnpm exec vitest run src/lib/sync/projections/notifications.test.ts`
+- `pnpm exec eslint src/lib/admin/view-access-store.ts src/lib/sync/event-catalog.ts src/lib/sync/projections/notifications.ts src/lib/sync/projections/notifications.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- El evento hoy notifica solo cuando cambia el acceso efectivo; ajustes de razón sin cambio de vistas no notifican al usuario, por diseño.
+- El siguiente cierre fuerte de `TASK-136` pasa por:
+  - modelar más rutas terciarias con `view_code` propio donde todavía exista herencia amplia
+  - decidir si conviene exponer en UI un historial más rico de expiraciones/cleanup automático
+
+## Sesión 2026-03-30 — baseline moderna de UI/UX y skills locales
+
+### Completado
+- Se auditó la capa local de skills UI de Greenhouse y se confirmó drift operativo:
+  - el repo dependía demasiado de skills globales y de una lectura vieja de Vuexy
+  - `greenhouse-ui-orchestrator` referenciaba heurísticas no alineadas con el estado actual
+- Se agregó `docs/ui/GREENHOUSE_MODERN_UI_UX_BASELINE_V1.md` como referencia canónica para:
+  - first-fold hierarchy
+  - densidad y ritmo visual
+  - estados empty/partial/warning/error
+  - UX writing
+  - accessibility baseline
+- Se reforzaron las skills locales:
+  - `.codex/skills/greenhouse-agent/SKILL.md`
+  - `.codex/skills/greenhouse-vuexy-ui-expert/SKILL.md`
+  - `.codex/skills/greenhouse-portal-ui-implementer/SKILL.md`
+  - `.codex/skills/greenhouse-ui-orchestrator/SKILL.md`
+- Nueva skill creada:
+  - `.codex/skills/greenhouse-ux-content-accessibility/SKILL.md`
+
+### Fuentes externas sintetizadas
+- Android Developers / Material guidance para layouts adaptativos y list-detail
+- GOV.UK Design System
+- US Web Design System
+- Atlassian content design
+- W3C WAI / WCAG quick reference
+
+### Pendiente inmediato
+- No hay validación de build necesaria por ser un cambio documental/skills, pero conviene probar en los siguientes trabajos UI que la selección automática de skills ya priorice la baseline local.
+
+## Sesión 2026-03-30 — TASK-136 iniciada con slice UI de gobernanza de vistas
+
+### Completado
+- `TASK-136` pasó a `in-progress`.
+- Se abrió el primer corte real del módulo en `/admin/views` para probar la nueva baseline UI/UX en una superficie compleja de admin governance.
+- El slice actual implementa:
+  - hero y KPIs de contexto
+  - matriz de acceso por vista × rol
+  - filtros por sección y tipo de rol
+  - preview por usuario de la navegación efectiva
+  - cards de siguiente slice para overrides, persistencia configurable y auditoría
+- Integración inicial aplicada en:
+  - `Admin Center` landing
+  - sidebar admin
+- Decisión deliberada del slice:
+  - la pantalla usa el baseline real actual (`roles` + `routeGroups`) sin fingir todavía `view_registry` persistido
+  - esto deja honesto el estado parcial de la lane y permite validar UX antes del cambio fuerte de backend
+
+### Archivos tocados
+- `src/lib/admin/get-admin-view-access-governance.ts`
+- `src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx`
+- `src/app/(dashboard)/admin/views/page.tsx`
+- `src/views/greenhouse/admin/AdminCenterView.tsx`
+- `src/components/layout/vertical/VerticalMenu.tsx`
+- `src/config/greenhouse-nomenclature.ts`
+- `docs/tasks/in-progress/TASK-136-admin-view-access-governance.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+
+### Pendiente inmediato
+- Validar `lint` del slice nuevo.
+- Evaluar si el helper actual debe endurecer la simulación de acceso de admin para empatar exactamente todos los casos especiales del menú vigente.
+- Siguiente salto funcional de la task:
+  - persistencia `view_registry` / `role_view_assignments`
+  - overrides por usuario
+  - auditoría y save real
+
+## Sesión 2026-03-30 — TASK-137 iniciada con activación real de la foundation UI
+
+### Completado
+- `TASK-137` pasó a `in-progress`.
+- Se activó un slice inicial real de la capa UI transversal:
+  - `react-hook-form` en `Login`
+  - `react-hook-form` en `Forgot Password`
+  - `GreenhouseDatePicker`
+  - `GreenhouseCalendar`
+  - `GreenhouseDragList`
+- Primera vista de calendario en repo:
+  - `/admin/operational-calendar`
+- Primer uso real de drag-and-drop:
+  - reorder local de domain cards en `Admin Center`
+- Arquitectura UI actualizada para reflejar activación real en:
+  - `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
+
+### Archivos tocados
+- `src/lib/forms/greenhouse-form-patterns.ts`
+- `src/views/Login.tsx`
+- `src/app/(blank-layout-pages)/auth/forgot-password/page.tsx`
+- `src/components/greenhouse/GreenhouseDatePicker.tsx`
+- `src/components/greenhouse/GreenhouseCalendar.tsx`
+- `src/components/greenhouse/GreenhouseDragList.tsx`
+- `src/components/greenhouse/index.ts`
+- `src/lib/calendar/get-admin-operational-calendar-overview.ts`
+- `src/views/greenhouse/admin/AdminOperationalCalendarView.tsx`
+- `src/app/(dashboard)/admin/operational-calendar/page.tsx`
+- `src/views/greenhouse/admin/AdminCenterView.tsx`
+- `src/components/layout/vertical/VerticalMenu.tsx`
+- `src/config/greenhouse-nomenclature.ts`
+- `docs/tasks/in-progress/TASK-137-ui-foundation-activation.md`
+- `docs/tasks/README.md`
+- `docs/tasks/TASK_ID_REGISTRY.md`
+- `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
+
+### Pendiente inmediato
+- Correr validación local del slice (`eslint`, `tsc`, `build`, `test`).
+- Confirmar si el wrapper de date picker necesita endurecer integración explícita con `Controller` para forms complejos futuros.
+
+## Sesión 2026-03-30 — TASK-136 avanza a persistencia inicial por rol
+
+### Completado
+- `/admin/views` ya soporta save real de la matriz role × view.
+- Nuevo slice persistido implementado:
+  - store Postgres para catálogo de vistas y assignments
+  - API admin `POST /api/admin/views/assignments`
+  - matrix editable en UI con guardar/restablecer
+  - fallback seguro al baseline hardcoded cuando la capa persistida no está lista
+- Infra aplicada en dev con:
+  - `pnpm setup:postgres:view-access`
+
+### Archivos tocados
+- `src/lib/admin/view-access-catalog.ts`
+- `src/lib/admin/view-access-store.ts`
+- `src/lib/admin/get-admin-view-access-governance.ts`
+- `src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx`
+- `src/app/api/admin/views/assignments/route.ts`
+- `scripts/setup-postgres-view-access.sql`
+- `scripts/setup-postgres-view-access.ts`
+- `package.json`
+- `docs/tasks/in-progress/TASK-136-admin-view-access-governance.md`
+
+### Validación ejecutada
+- `pnpm pg:doctor`
+- `pnpm setup:postgres:view-access`
+- `pnpm exec eslint src/lib/admin/view-access-catalog.ts src/lib/admin/view-access-store.ts src/lib/admin/get-admin-view-access-governance.ts src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx src/app/api/admin/views/assignments/route.ts scripts/setup-postgres-view-access.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- Conectar esta persistencia al runtime de sesión (`TenantContext`, `NextAuth`, guards y menú) para que las vistas guardadas gobiernen acceso real y no solo la matrix administrativa.
+- Activar overrides por usuario y auditoría visible en la misma pantalla.
+
+## Sesión 2026-03-30 — TASK-136 integra authorizedViews en sesión y navegación
+
+### Completado
+- `TenantAccessRecord` ahora resuelve `authorizedViews` desde la capa persistida de view access cuando existe.
+- `NextAuth` y `TenantContext` ya propagan:
+  - `authorizedViews`
+  - `routeGroups` derivados de las vistas autorizadas
+- `VerticalMenu` ya usa `authorizedViews` para filtrar items clave de:
+  - Gestión
+  - Finanzas
+  - HR
+  - Administración
+  - AI tooling
+
+### Validación ejecutada
+- `pnpm exec eslint src/lib/admin/view-access-store.ts src/lib/tenant/access.ts src/lib/auth.ts src/lib/tenant/get-tenant-context.ts src/types/next-auth.d.ts src/components/layout/vertical/VerticalMenu.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- Los guards broad por layout ya heredan `routeGroups` derivados, pero aún no existe enforcement page-level exhaustivo por `view_code` en todas las rutas del portal.
+- El warning OpenSSL/JWT durante `build` sigue apareciendo en static generation de `/admin/views`; el artefacto termina bien y cae a fallback hardcoded durante esa fase.
+
+## Sesión 2026-03-30 — TASK-136 cierra el primer enforcement page-level por view_code
+
+### Completado
+- Se agregó `hasAuthorizedViewCode()` en `src/lib/tenant/authorization.ts` para resolver autorización por vista usando:
+  - `tenant.authorizedViews`
+  - fallback explícito a `routeGroups` cuando el catálogo persistido aún no gobierna ese usuario
+- Ya hay enforcement page-level o nested layout específico para superficies catalogadas clave:
+  - `/dashboard`, `/settings`
+  - `/proyectos/**`, `/sprints/**`
+  - `/agency`, `/agency/organizations/**`, `/agency/services/**`
+  - `/people/**`, `/hr/payroll/**`
+  - `/finance`, `/finance/income/**`, `/finance/expenses/**`, `/finance/reconciliation/**`
+  - `/admin`, `/admin/roles`, `/admin/views`, `/admin/ops-health`, `/admin/ai-tools`, `/admin/tenants/**`, `/admin/users/**`
+  - `/my/profile`, `/my/payroll`
+
+### Archivos tocados
+- `src/lib/tenant/authorization.ts`
+- `src/app/(dashboard)/dashboard/page.tsx`
+- `src/app/(dashboard)/settings/page.tsx`
+- `src/app/(dashboard)/proyectos/layout.tsx`
+- `src/app/(dashboard)/sprints/layout.tsx`
+- `src/app/(dashboard)/agency/page.tsx`
+- `src/app/(dashboard)/agency/organizations/layout.tsx`
+- `src/app/(dashboard)/agency/services/layout.tsx`
+- `src/app/(dashboard)/people/layout.tsx`
+- `src/app/(dashboard)/hr/payroll/layout.tsx`
+- `src/app/(dashboard)/finance/page.tsx`
+- `src/app/(dashboard)/finance/income/layout.tsx`
+- `src/app/(dashboard)/finance/expenses/layout.tsx`
+- `src/app/(dashboard)/finance/reconciliation/layout.tsx`
+- `src/app/(dashboard)/admin/page.tsx`
+- `src/app/(dashboard)/admin/roles/page.tsx`
+- `src/app/(dashboard)/admin/views/page.tsx`
+- `src/app/(dashboard)/admin/ops-health/page.tsx`
+- `src/app/(dashboard)/admin/ai-tools/page.tsx`
+- `src/app/(dashboard)/admin/tenants/layout.tsx`
+- `src/app/(dashboard)/admin/users/layout.tsx`
+- `src/app/(dashboard)/my/profile/page.tsx`
+- `src/app/(dashboard)/my/payroll/page.tsx`
+- `docs/tasks/in-progress/TASK-136-admin-view-access-governance.md`
+- `changelog.md`
+
+### Validación ejecutada
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm exec eslint src/lib/tenant/authorization.ts src/app/'(dashboard)'/agency/page.tsx src/app/'(dashboard)'/agency/organizations/layout.tsx src/app/'(dashboard)'/agency/services/layout.tsx src/app/'(dashboard)'/dashboard/page.tsx src/app/'(dashboard)'/finance/page.tsx src/app/'(dashboard)'/finance/income/layout.tsx src/app/'(dashboard)'/finance/expenses/layout.tsx src/app/'(dashboard)'/finance/reconciliation/layout.tsx src/app/'(dashboard)'/hr/payroll/layout.tsx src/app/'(dashboard)'/people/layout.tsx src/app/'(dashboard)'/admin/page.tsx src/app/'(dashboard)'/admin/roles/page.tsx src/app/'(dashboard)'/admin/views/page.tsx src/app/'(dashboard)'/admin/ops-health/page.tsx src/app/'(dashboard)'/admin/ai-tools/page.tsx src/app/'(dashboard)'/admin/tenants/layout.tsx src/app/'(dashboard)'/admin/users/layout.tsx src/app/'(dashboard)'/my/profile/page.tsx src/app/'(dashboard)'/my/payroll/page.tsx src/app/'(dashboard)'/settings/page.tsx src/app/'(dashboard)'/proyectos/layout.tsx src/app/'(dashboard)'/sprints/layout.tsx`
+- `pnpm build`
+
+### Pendiente inmediato
+- Extender el mismo enforcement a rutas todavía no catalogadas en `view_registry` para reducir los últimos escapes por subpath.
+- Decidir si algunos módulos amplios deben endurecerse con layouts más altos en el árbol una vez que el catálogo de vistas cubra todos los descendants.
+
+## Sesión 2026-03-30 — TASK-136 amplía enforcement sobre layouts amplios y páginas vecinas
+
+### Completado
+- `src/lib/tenant/authorization.ts` ahora también expone `hasAnyAuthorizedViewCode()`.
+- Los layouts amplios ya respetan catálogo persistido cuando existe:
+  - `src/app/(dashboard)/admin/layout.tsx`
+  - `src/app/(dashboard)/finance/layout.tsx`
+  - `src/app/(dashboard)/hr/layout.tsx`
+  - `src/app/(dashboard)/my/layout.tsx` nuevo
+- Páginas vecinas no catalogadas todavía quedaron amarradas al `view_code` más cercano:
+  - `src/app/(dashboard)/hr/leave/page.tsx` → `equipo.permisos`
+  - `src/app/(dashboard)/admin/team/page.tsx` → `administracion.usuarios`
+  - `src/app/(dashboard)/admin/operational-calendar/page.tsx` → `administracion.admin_center`
+  - `src/app/(dashboard)/admin/cloud-integrations/page.tsx` → `administracion.ops_health`
+  - `src/app/(dashboard)/admin/email-delivery/page.tsx` → `administracion.ops_health`
+  - `src/app/(dashboard)/admin/notifications/page.tsx` → `administracion.ops_health`
+  - `src/app/(dashboard)/finance/intelligence/page.tsx` → `finanzas.resumen`
+  - `src/app/(dashboard)/finance/cost-allocations/page.tsx` → `finanzas.resumen`
+
+### Validación ejecutada
+- `pnpm exec eslint src/lib/tenant/authorization.ts src/app/'(dashboard)'/admin/layout.tsx src/app/'(dashboard)'/finance/layout.tsx src/app/'(dashboard)'/hr/layout.tsx src/app/'(dashboard)'/my/layout.tsx src/app/'(dashboard)'/hr/leave/page.tsx src/app/'(dashboard)'/admin/team/page.tsx src/app/'(dashboard)'/admin/operational-calendar/page.tsx src/app/'(dashboard)'/admin/email-delivery/page.tsx src/app/'(dashboard)'/admin/notifications/page.tsx src/app/'(dashboard)'/admin/cloud-integrations/page.tsx src/app/'(dashboard)'/finance/intelligence/page.tsx src/app/'(dashboard)'/finance/cost-allocations/page.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- El enforcement ya cubre mejor navegación y descendencia visible, pero el catálogo `view_registry` sigue sin modelar cada superficie secundaria del portal.
+- El siguiente paso saludable es expandir `view_registry` antes de seguir repartiendo ownership de subpaths ambiguos por inferencia.
+
+## Sesión 2026-03-30 — TASK-136 empieza el cierre del cuello de modelo en Admin + Finance
+
+### Completado
+- `src/lib/admin/view-access-catalog.ts` sumó nuevos `view_code` explícitos:
+  - `finanzas.clientes`
+  - `finanzas.proveedores`
+  - `finanzas.inteligencia`
+  - `finanzas.asignaciones_costos`
+  - `administracion.cloud_integrations`
+  - `administracion.email_delivery`
+  - `administracion.notifications`
+  - `administracion.calendario_operativo`
+  - `administracion.equipo`
+- Se alinearon guards directos con esos códigos nuevos en:
+  - `src/app/(dashboard)/admin/team/page.tsx`
+  - `src/app/(dashboard)/admin/operational-calendar/page.tsx`
+  - `src/app/(dashboard)/admin/email-delivery/page.tsx`
+  - `src/app/(dashboard)/admin/notifications/page.tsx`
+  - `src/app/(dashboard)/admin/cloud-integrations/page.tsx`
+  - `src/app/(dashboard)/finance/intelligence/page.tsx`
+  - `src/app/(dashboard)/finance/cost-allocations/page.tsx`
+  - `src/app/(dashboard)/finance/clients/layout.tsx`
+  - `src/app/(dashboard)/finance/suppliers/layout.tsx`
+- `src/components/layout/vertical/VerticalMenu.tsx` ya filtra también esos accesos nuevos en sidebar.
+- Hardening clave del resolver:
+  - `src/lib/admin/view-access-store.ts` ya no apaga por defecto un `view_code` nuevo cuando un rol tiene assignments persistidos parciales
+  - si falta la combinación `role_code + view_code`, se usa fallback por vista hasta que se persista explícitamente
+
+### Validación ejecutada
+- `pnpm exec eslint src/lib/admin/view-access-catalog.ts src/lib/admin/view-access-store.ts src/components/layout/vertical/VerticalMenu.tsx src/app/'(dashboard)'/finance/clients/layout.tsx src/app/'(dashboard)'/finance/suppliers/layout.tsx src/app/'(dashboard)'/admin/team/page.tsx src/app/'(dashboard)'/admin/operational-calendar/page.tsx src/app/'(dashboard)'/admin/email-delivery/page.tsx src/app/'(dashboard)'/admin/notifications/page.tsx src/app/'(dashboard)'/admin/cloud-integrations/page.tsx src/app/'(dashboard)'/finance/intelligence/page.tsx src/app/'(dashboard)'/finance/cost-allocations/page.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- Repetir la misma expansión de modelo en `Agency`, `HR`, `My` y otras superficies secundarias para quitar más inferencias del catálogo.
+- Luego de eso, recién tiene sentido abrir con fuerza los overrides por usuario y la auditoría fina desde `/admin/views`.
+
+## Sesión 2026-03-30 — TASK-136 extiende el catálogo a Agency, HR y My
+
+### Completado
+- `src/lib/admin/view-access-catalog.ts` sumó nuevos `view_code` explícitos en:
+  - Agency: `gestion.spaces`, `gestion.economia`, `gestion.equipo`, `gestion.delivery`, `gestion.campanas`, `gestion.operaciones`
+  - HR: `equipo.departamentos`, `equipo.asistencia`
+  - My: `mi_ficha.mi_inicio`, `mi_ficha.mis_asignaciones`, `mi_ficha.mi_desempeno`, `mi_ficha.mi_delivery`, `mi_ficha.mis_permisos`, `mi_ficha.mi_organizacion`
+- Se alinearon guards concretos en:
+  - `src/app/(dashboard)/agency/layout.tsx`
+  - `src/app/(dashboard)/agency/spaces/page.tsx`
+  - `src/app/(dashboard)/agency/economics/page.tsx`
+  - `src/app/(dashboard)/agency/team/page.tsx`
+  - `src/app/(dashboard)/agency/delivery/page.tsx`
+  - `src/app/(dashboard)/agency/campaigns/page.tsx`
+  - `src/app/(dashboard)/agency/operations/page.tsx`
+  - `src/app/(dashboard)/hr/departments/page.tsx`
+  - `src/app/(dashboard)/hr/attendance/page.tsx`
+  - `src/app/(dashboard)/my/layout.tsx`
+  - `src/app/(dashboard)/my/page.tsx`
+  - `src/app/(dashboard)/my/assignments/page.tsx`
+  - `src/app/(dashboard)/my/delivery/page.tsx`
+  - `src/app/(dashboard)/my/performance/page.tsx`
+  - `src/app/(dashboard)/my/leave/page.tsx`
+  - `src/app/(dashboard)/my/organization/page.tsx`
+- `src/components/layout/vertical/VerticalMenu.tsx` ya filtra también `Agency`, `HR` y `Mi Ficha` con esos `view_code` nuevos.
+
+### Validación ejecutada
+- `pnpm exec eslint src/lib/admin/view-access-catalog.ts src/app/'(dashboard)'/agency/layout.tsx src/app/'(dashboard)'/agency/spaces/page.tsx src/app/'(dashboard)'/agency/economics/page.tsx src/app/'(dashboard)'/agency/team/page.tsx src/app/'(dashboard)'/agency/delivery/page.tsx src/app/'(dashboard)'/agency/campaigns/page.tsx src/app/'(dashboard)'/agency/operations/page.tsx src/app/'(dashboard)'/hr/departments/page.tsx src/app/'(dashboard)'/hr/attendance/page.tsx src/app/'(dashboard)'/my/layout.tsx src/app/'(dashboard)'/my/page.tsx src/app/'(dashboard)'/my/assignments/page.tsx src/app/'(dashboard)'/my/delivery/page.tsx src/app/'(dashboard)'/my/performance/page.tsx src/app/'(dashboard)'/my/leave/page.tsx src/app/'(dashboard)'/my/organization/page.tsx src/components/layout/vertical/VerticalMenu.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- El mayor remanente ya queda en rutas secundarias que no están directamente en menú o que representan tabs/flows internos más finos.
+- El siguiente paso útil puede ser:
+  - expandir catálogo a superficies secundarias restantes, o
+  - empezar overrides por usuario y auditoría visible apoyados en el catálogo ya bastante más completo.
+
+## Sesión 2026-03-30 — TASK-136 alinea portal cliente y access points secundarios
+
+### Completado
+- `src/lib/admin/view-access-catalog.ts` sumó:
+  - `gestion.capacidad`
+  - `cliente.equipo`
+  - `cliente.analytics`
+  - `cliente.revisiones`
+  - `cliente.actualizaciones`
+- Se alinearon guards en:
+  - `src/app/(dashboard)/agency/capacity/page.tsx`
+  - `src/app/(dashboard)/hr/page.tsx`
+  - `src/app/(dashboard)/equipo/page.tsx`
+  - `src/app/(dashboard)/analytics/page.tsx`
+  - `src/app/(dashboard)/reviews/page.tsx`
+  - `src/app/(dashboard)/updates/page.tsx`
+- `src/components/layout/vertical/VerticalMenu.tsx` ahora filtra también la navegación primaria cliente con `authorizedViews`.
+
+### Validación ejecutada
+- `pnpm exec eslint src/lib/admin/view-access-catalog.ts src/app/'(dashboard)'/agency/capacity/page.tsx src/app/'(dashboard)'/hr/page.tsx src/app/'(dashboard)'/equipo/page.tsx src/app/'(dashboard)'/analytics/page.tsx src/app/'(dashboard)'/reviews/page.tsx src/app/'(dashboard)'/updates/page.tsx src/components/layout/vertical/VerticalMenu.tsx`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- El remanente más claro ahora está en superficies terciarias, redirects/tabs internas y algunas páginas genéricas no modeladas como vistas gobernables.
+- Ya empieza a tener sentido abrir el siguiente gran bloque: overrides por usuario y auditoría visible, o bien hacer una última pasada de catálogo fino en rutas profundas.
+
+## Sesión 2026-03-30 — TASK-136 activa overrides por usuario
+
+### Completado
+- Nuevo endpoint:
+  - `src/app/api/admin/views/overrides/route.ts`
+- `src/lib/admin/view-access-store.ts` ahora:
+  - lee overrides activos desde `greenhouse_core.user_view_overrides`
+  - guarda overrides por usuario
+  - aplica `grant/revoke` al resolver final de `authorizedViews`
+- `src/lib/tenant/access.ts` ya pasa `userId` al resolver para que la sesión reciba la lectura efectiva final.
+- `src/lib/admin/get-admin-view-access-governance.ts` y `src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx` ya exponen y usan `userOverrides`.
+- El tab `Preview` de `/admin/views` ahora permite:
+  - alternar cada vista entre `inherit`, `grant` y `revoke`
+  - guardar overrides permanentes con razón
+  - ver el resultado efectivo en la sidebar simulada y el detalle de vistas
+
+### Validación ejecutada
+- `pnpm exec eslint src/lib/admin/get-admin-view-access-governance.ts src/lib/admin/view-access-store.ts src/lib/tenant/access.ts src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx src/app/api/admin/views/overrides/route.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
+
+### Pendiente inmediato
+- Este slice inicial ya hace el trabajo útil, pero aún faltan:
+  - reasons por vista más finas
+  - evento/notificación al usuario afectado cuando cambie su acceso
+
+## Sesión 2026-03-30 — TASK-136 suma expiración opcional y auditoría visible
+
+### Completado
+- `src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx` ahora soporta:
+  - expiración opcional por batch de overrides del usuario seleccionado
+  - feed de auditoría reciente por usuario en el tab `Preview`
+- `src/lib/admin/get-admin-view-access-governance.ts` y `src/lib/admin/view-access-store.ts` ahora exponen `auditLog` desde `greenhouse_core.view_access_log`.
+- Para sostener el repo verde durante el cierre se corrigió un drift de tipos en:
+  - `src/app/api/finance/income/reconcile-payments/route.ts`
+  - el handler usaba `newAmountPaid`, pero el contrato actual del ledger expone `amountPaid`
+
+### Validación ejecutada
+- `pnpm exec eslint src/lib/admin/get-admin-view-access-governance.ts src/lib/admin/view-access-store.ts src/views/greenhouse/admin/AdminViewAccessGovernanceView.tsx src/app/api/finance/income/reconcile-payments/route.ts`
+- `pnpm build`
+
+### Pendiente inmediato
+- El remanente más valioso de `TASK-136` ya es:
+  - reasons por vista más finas
+  - expiración individual por override, no solo por batch
+  - notificación/evento al usuario afectado
+
 ## Sesión 2026-03-30 — hardening Sentry incident reader
 
 ### Completado

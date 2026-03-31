@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
@@ -17,6 +17,7 @@ import SpaceHealthTable from '@/components/agency/SpaceHealthTable'
 import SpacesCharts from '@/components/agency/SpacesCharts'
 import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type { AgencySpaceHealth } from '@/lib/agency/agency-queries'
+import type { SpaceFinanceMetrics } from '@/lib/agency/agency-finance-metrics'
 
 type Props = {
   spaces: AgencySpaceHealth[]
@@ -37,6 +38,28 @@ const getOtdTone = (v: number | null) =>
 const AgencySpacesView = ({ spaces }: Props) => {
   const [filtered, setFiltered] = useState<AgencySpaceHealth[]>(spaces)
   const [viewMode, setViewMode] = useState<ViewMode>('table')
+  const [financeMetrics, setFinanceMetrics] = useState<Map<string, SpaceFinanceMetrics>>(new Map())
+  const financeFetched = useRef(false)
+
+  useEffect(() => {
+    if (financeFetched.current) return
+    financeFetched.current = true
+
+    fetch('/api/agency/finance-metrics', { cache: 'no-store' })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (Array.isArray(data)) {
+          const map = new Map<string, SpaceFinanceMetrics>()
+
+          for (const item of data) {
+            if (item.clientId) map.set(item.clientId, item)
+          }
+
+          setFinanceMetrics(map)
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   // KPIs computed from filtered data (respond to filter changes)
   const kpis = useMemo(() => {
@@ -173,7 +196,7 @@ const AgencySpacesView = ({ spaces }: Props) => {
             }}
           >
             {filtered.map(space => (
-              <SpaceCard key={space.clientId} space={space} />
+              <SpaceCard key={space.clientId} space={space} financeMetrics={financeMetrics.get(space.clientId) ?? null} />
             ))}
           </Box>
         )}

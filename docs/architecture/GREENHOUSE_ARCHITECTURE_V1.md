@@ -1,5 +1,111 @@
 # Greenhouse Architecture V1
 
+## Delta 2026-03-30 — TASK-162 ya dejó capa canónica materializada + estrategia de cutover
+
+La decisión de `commercial cost attribution` ya no debe leerse solo como framing.
+
+Estado arquitectónico vigente:
+- la truth layer ya existe como capa explícita y materializada:
+  - `greenhouse_serving.commercial_cost_attribution`
+- la capa ya tiene:
+  - reader shared
+  - materializer propio
+  - projection reactiva dedicada
+  - health semántico
+  - explain surface mínima
+- `operational_pl` ya consume esta capa en vez de recomponer labor + overhead desde bridges divergentes
+
+Política de consumo vigente:
+- `commercial_cost_attribution`
+  - truth layer canónica de costo comercial
+- `operational_pl_snapshots`
+  - serving derivado para rentabilidad por scope
+- `member_capacity_economics`
+  - serving derivado para costo/capacidad por miembro
+- `client_labor_cost_allocation`
+  - bridge histórico e input interno
+  - ya no debe tratarse como contrato directo para consumers nuevos
+
+Consecuencia arquitectónica:
+- el cutover no significa que todo el portal lea la tabla nueva directamente
+- Agency, Home, Nexa y surfaces resumidas deben seguir privilegiando serving derivado
+- Finance base, Cost Intelligence y explain surfaces sí deben apoyarse en la capa canónica/shared
+
+## Delta 2026-03-30 — TASK-141 ya tiene primer slice runtime conservador
+
+Greenhouse ya no tiene solo un contrato documental para la migración `person-first`.
+
+Slice operativo nuevo:
+- resolver shared:
+  - `src/lib/identity/canonical-person.ts`
+- adopción inicial:
+  - notifications recipient resolution
+  - webhook notification recipient resolution
+
+Regla de este slice:
+- el consumer se enriquece con `identityProfileId`, `memberId`, `userId`, `portalAccessState` y `resolutionSource`
+- el carril sigue siendo `userId`-scoped para inbox, preferencias, overrides y auditoría
+- no se tocan recipient keys, payloads de outbox ni serving member-scoped
+
+## Delta 2026-03-30 — Cost Intelligence ya es módulo operativo distribuido
+
+Greenhouse ya no debe leer Cost Intelligence como una lane experimental de Finance.
+
+Estado canónico vigente:
+- `TASK-067` dejó la fundación técnica del dominio `cost_intelligence`.
+- `TASK-068` cerró `period_closure_status` como serving canónico de readiness y cierre.
+- `TASK-069` cerró `operational_pl_snapshots` como serving canónico de P&L operativo.
+- `TASK-070` ya convirtió `/finance/intelligence` en la surface principal del módulo.
+- `TASK-071` ya inició el cutover de consumers distribuidos:
+  - Agency
+  - Organization 360
+  - People 360
+  - Home
+  - Nexa
+
+Regla arquitectónica:
+- Finance sigue siendo owner del motor financiero central.
+- Cost Intelligence es el layer operativo de management accounting y closure awareness.
+- Los consumers que necesiten margen, costo total, closure status o snapshot de período deberían preferir serving materializado antes de recomputar on-read.
+
+## Delta 2026-03-30 — Commercial cost attribution queda definido como capa canónica separada
+
+Greenhouse ya no debe resolver la atribución comercial de costos solo como una suma implícita de Payroll + Team Capacity + Finance bridges dentro de cada consumer.
+
+Decisión arquitectónica:
+- existe una capa canónica nueva de `commercial cost attribution`
+- esta capa se ubica entre:
+  - Payroll
+  - Team Capacity
+  - Finance base
+  y:
+  - Cost Intelligence
+  - Finance consumers
+  - Agency / Organization 360 / People / Home / Nexa
+
+Responsabilidad de la nueva capa:
+- resolver la verdad única de costo comercial atribuible por período
+- separar explícitamente:
+  - labor cost comercial
+  - carga interna / internal assignments
+  - overhead interno
+  - costo no billable o no atribuible
+- publicar una semántica reusable para serving, projections y consumers
+
+Regla de consumo:
+- Finance y Cost Intelligence deben consumir esta capa, no reinventar localmente la atribución
+- los demás módulos deben consumirla directa o indirectamente a través de serving materializado
+
+Módulos que deberían alimentarse desde esta capa:
+- Finance
+- Cost Intelligence
+- Agency
+- Organization 360
+- People
+- Home
+- Nexa
+- futuros `Service P&L`, `Campaign ↔ Service`, forecasting y scorecards financieros
+
 ## Delta 2026-03-29 — Release channels model reference
 
 Greenhouse maneja release channels principalmente por modulo o feature visible, con una capa opcional de canal global de plataforma.
@@ -14,6 +120,64 @@ vive en:
 
 - `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md`
 - `docs/changelog/CLIENT_CHANGELOG.md`
+
+## Delta 2026-03-30 — View access governance model
+
+Greenhouse ya no debe leerse solo como `role -> route_groups`.
+
+Estado canónico vigente:
+- `routeGroups` siguen existiendo como capa broad/fallback
+- la gobernanza fina de superficies visibles ya vive en `view_code`
+- la sesión ya carga `authorizedViews` resueltos desde PostgreSQL cuando la capa persistida existe
+- `Admin Center > Vistas y acceso` es la superficie operativa para:
+  - matrix por rol
+  - overrides por usuario
+  - expiración
+  - auditoría
+  - preview efectivo
+
+Modelo persistido en `greenhouse_core`:
+- `view_registry`
+- `role_view_assignments`
+- `user_view_overrides`
+- `view_access_log`
+
+Regla arquitectónica:
+- nuevas superficies visibles del portal deberían nacer con `view_code` explícito cuando sea razonable gobernarlas
+- `routeGroups` no deben seguir creciendo como mecanismo principal de autorización fina
+- cuando falte modelado explícito, el fallback puede existir, pero debe tratarse como estado transicional
+
+## Delta 2026-03-30 — Person-first identity with reactive compatibility
+
+Greenhouse debe institucionalizar el consumo `person-first` sin romper los carriles reactivos ya operativos.
+
+Regla canónica:
+- cuando una surface, recipient resolver o preview represente a un humano, la raíz conceptual es la persona canónica (`identity_profile`)
+- `member` sigue siendo la faceta operativa fuerte para HR, payroll, capacity, ICO y People
+- `client_user` sigue siendo el principal de acceso para sesión, inbox, preferencias, auditoría de login y overrides user-scoped
+
+Guardrails obligatorios para la migración:
+- no cambiar de forma silenciosa la semántica de `event_id`, `aggregate_id`, `member_id`, `identity_profile_id` o `user_id` en outbox, projections o webhook envelopes
+- no reemplazar recipients `userId`-scoped en notificaciones cuando la operación sigue dependiendo de inbox o preferencias por usuario
+- consumers reactivos de `finance`, `people`, `ICO` y `notifications` deben seguir pudiendo resolver:
+  - persona canónica
+  - faceta operativa (`member`)
+  - principal portal (`client_user`)
+- toda adopción `person-first` debe ser gradual, observable y con fallback explícito, no por cutover implícito
+
+Piezas especialmente sensibles para esta regla:
+- `src/lib/notifications/person-recipient-resolver.ts`
+- `src/lib/notifications/notification-service.ts`
+- `src/lib/webhooks/consumers/notification-recipients.ts`
+- `src/lib/sync/projections/notifications.ts`
+- `src/lib/sync/projections/client-economics.ts`
+- `src/lib/sync/projections/ico-member-metrics.ts`
+- `src/lib/sync/projections/person-intelligence.ts`
+- `src/lib/webhooks/dispatcher.ts`
+
+Consecuencia arquitectónica:
+- `TASK-141` no debe ejecutarse como “swap `client_user` por persona en todas partes”
+- debe implementarse como un contrato shared que expone la identidad humana canónica sin degradar los consumers que todavía necesitan `userId` o `memberId` como claves operativas
 
 ## Purpose
 
@@ -111,13 +275,56 @@ Greenhouse must not become:
 
 NextAuth.js with three providers: Azure AD, Google OAuth, and Credentials.
 
-Auth guards are enforced at the layout level using route group wrappers — there is no `middleware.ts`. Route groups define the access boundary: `client`, `admin`, `internal`, `finance`, `hr`, `people`, `agency`.
+Auth guards are enforced at the layout level using route group wrappers plus `view_code` checks — there is no `middleware.ts`.
+
+Current access model:
+- broad boundary:
+  - `client`, `admin`, `internal`, `finance`, `hr`, `people`, `agency`, `my`, `ai_tooling`
+- fine-grained boundary:
+  - `authorizedViews` on session
+  - `hasAuthorizedViewCode()` / `hasAnyAuthorizedViewCode()` in route pages/layouts
+
+Route groups still define the high-level access boundary, but they are no longer the intended long-term source of truth for every visible surface.
 
 Roles are composable (not hierarchical). `efeonce_admin` serves as the universal override role.
 
-The `TenantContext` carries: `userId`, `clientId`, `roleCodes`, `routeGroups`, `spaceId`, `organizationId`.
+The `TenantContext` carries:
+- `userId`
+- `clientId`
+- `roleCodes`
+- `routeGroups`
+- `authorizedViews`
+- `spaceId`
+- `organizationId`
 
-Tables live in `greenhouse_core`: `client_users`, `roles`, `user_role_assignments`, `identity_profiles`.
+Tables live in `greenhouse_core`:
+- `client_users`
+- `roles`
+- `user_role_assignments`
+- `identity_profiles`
+- `view_registry`
+- `role_view_assignments`
+- `user_view_overrides`
+- `view_access_log`
+
+Operational rule:
+- role baseline still seeds default visibility
+- persisted role assignments can override that baseline by `view_code`
+- user overrides apply after role baseline
+- expired overrides should degrade automatically and register audit history
+
+Explicit exception:
+- `/home` remains a base internal landing surface driven by `portalHomePath`
+- it is not currently modeled as a governed `view_code`
+- rationale:
+  - it is the default safe landing for many internal sessions
+  - revoking it would create avoidable dead-end navigation for authenticated users
+  - its content is already shaped by downstream modules, notifications, and capability resolution
+- future rule:
+  - if `/home` ever becomes a privilege-sensitive module instead of a transversal landing surface, that decision should be made explicitly and documented before introducing a `view_code`
+
+Primary admin surface:
+- `/admin/views`
 
 ### Executive Dashboard
 

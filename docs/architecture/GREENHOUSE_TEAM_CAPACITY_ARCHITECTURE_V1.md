@@ -15,6 +15,18 @@
 - Regla explícita de arquitectura:
   - no sumar `greenhouse_finance.expenses` genéricos a `direct_overhead_target` hasta que exista taxonomía canónica de overhead directo por persona
 
+## Delta 2026-03-30
+
+- La exclusión de carga interna de `Efeonce` ya no debe vivir como heurística local de `Agency > Team`.
+- Regla canónica nueva:
+  - assignments internos (`space-efeonce`, `efeonce_internal`, `client_internal`) siguen siendo válidos para operación interna
+  - pero no forman parte de la verdad comercial compartida para:
+    - `assigned_hours` comerciales
+    - billable member count
+    - labor attribution de Finance / Cost Intelligence
+- Implementación esperada:
+  - consumers de Team Capacity, Finance y Cost Intelligence deben reutilizar una misma regla shared para detectar assignments internos
+
 ## Purpose
 
 Este documento define la arquitectura canónica de capacidad de equipo en Greenhouse.

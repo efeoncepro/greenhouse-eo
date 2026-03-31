@@ -11,7 +11,16 @@ import 'server-only'
  * - Domain partition for parallel cron execution
  */
 
-export type ProjectionDomain = 'organization' | 'people' | 'finance' | 'notifications' | 'delivery'
+export const PROJECTION_DOMAINS = [
+  'organization',
+  'people',
+  'finance',
+  'notifications',
+  'delivery',
+  'cost_intelligence'
+] as const
+
+export type ProjectionDomain = (typeof PROJECTION_DOMAINS)[number]
 
 export interface ProjectionDefinition {
 
@@ -62,3 +71,5 @@ export const getAllTriggerEventTypes = (domain?: ProjectionDomain): string[] =>
 
 export const getRegisteredDomains = (): ProjectionDomain[] =>
   [...new Set(registry.map(p => p.domain))]
+
+export const getSupportedProjectionDomains = (): readonly ProjectionDomain[] => PROJECTION_DOMAINS

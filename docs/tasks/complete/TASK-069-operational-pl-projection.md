@@ -1,0 +1,250 @@
+# TASK-069 — Operational P&L Projection
+
+## Delta 2026-03-30 — Task cerrada
+
+- `TASK-069` pasa a `complete`.
+- Motivo de cierre:
+  - `operational_pl` ya materializa snapshots por `client`, `space` y `organization`
+  - APIs de lectura ya están expuestas
+  - smoke reactivo E2E ya quedó validado
+  - health y alertas básicas ya están integradas
+  - la UI principal de Finance (`TASK-070`) ya consume este serving como contrato estable
+- Lo que queda pendiente ya no es parte de esta task:
+  - consumers downstream distribuidos (`TASK-071`)
+  - validaciones visuales y refinamientos de surfaces consumidoras
+  - profundización semántica futura del módulo (budget, cost centers, projected P&L)
+
+## Delta 2026-03-30 — Slice 1 operativo implementado
+
+- `TASK-069` ya no está en diseño puro.
+- Slice implementado en repo:
+  - engine `computeOperationalPl()` en `src/lib/cost-intelligence/compute-operational-pl.ts`
+  - tipos `OperationalPlSnapshot` / `PlComputationResult` en `src/lib/cost-intelligence/pl-types.ts`
+  - projection reactiva `operational_pl` en `src/lib/sync/projections/operational-pl.ts`
+  - APIs:
+    - `GET /api/cost-intelligence/pl`
+    - `GET /api/cost-intelligence/pl/[scopeType]/[scopeId]`
+  - health check nuevo en `materialization-health` para `greenhouse_serving.operational_pl_snapshots`
+  - integración mínima con notificaciones para `accounting.margin_alert.triggered`
+- Contrato endurecido antes de implementar:
+  - revenue por cliente ya sale como net revenue (`total_amount_clp - partner_share`)
+  - costo laboral sale desde `client_labor_cost_allocation`
+  - overhead sale desde `member_capacity_economics`
+  - `period_closed` / `snapshot_revision` salen desde `period_closure_status`
+  - se evita doble conteo excluyendo `expenses.payroll_entry_id` del carril `direct_expense`
+- Estado real después de este slice:
+  - ya existe serving materializado de P&L por `client`, `space` y `organization`
+  - todavía queda abierto para endurecer consumers downstream y semántica fina de alertas si hace falta
+
+## Delta 2026-03-30 — Smoke reactivo E2E validado
+
+- `operational_pl` ya no solo compila y pasa unit tests; el carril reactivo quedó validado con evidencia real.
+- Nuevo smoke reusable:
+  - `pnpm smoke:cost-intelligence:operational-pl`
+  - script: `scripts/smoke-cost-intelligence-operational-pl.ts`
+- El smoke:
+  - detecta un período real con actividad
+  - publica un evento sintético `finance.income.updated`
+  - procesa el domain `cost_intelligence`
+  - verifica:
+    - `greenhouse_sync.outbox_reactive_log` para `operational_pl`
+    - filas en `greenhouse_serving.operational_pl_snapshots`
+    - eventos `accounting.pl_snapshot.materialized`
+- Evidencia obtenida:
+  - `periodId=2026-03`
+  - `eventsProcessed=5`
+  - `eventsFailed=0`
+  - `projectionsTriggered=6`
+  - `snapshotCount=3`
+  - `publishedEventsCount=10`
+- Con esto, el remanente de `TASK-069` ya no es el wiring reactivo base.
+
+## Delta 2026-03-30 — TASK-068 cerrada
+
+- `TASK-068` ya quedó cerrada:
+  - `period_closure_status` materializada
+  - close/reopen operativos
+  - alineación al calendario operativo aplicada
+  - smoke reactivo E2E validado para el domain `cost_intelligence`
+- Esta task ya no depende de ningún remanente técnico de cierre de período.
+- Desde ahora, el único blocker estructural real para `TASK-069` es su propia implementación.
+
+## Delta 2026-03-30 — TASK-067 cerrada + amarre al motor Finance
+
+- `TASK-067` ya quedó cerrada:
+  - schema `greenhouse_cost_intelligence`
+  - serving tables base
+  - domain `cost_intelligence`
+  - eventos `accounting.*`
+  - cron route dedicada con smoke `200`
+- Esta task ya no está bloqueada por foundation técnica.
+- Alineación obligatoria desde ahora:
+  - `TASK-069` no debe construir un P&L alternativo o semánticamente distinto al de Finance
+  - debe materializar, agregar por scope y volver reactiva la lógica financiera canónica definida en `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - invariantes mínimas:
+    - revenue neto con `partnerShare`
+    - payroll multi-moneda con FX canónico
+    - anti-doble-conteo vía `expenses.payroll_entry_id`
+    - reuse preferente de `resolveExchangeRateToClp()`, `client_labor_cost_allocation`, `member_capacity_economics` y `total-company-cost.ts`
+
+## Delta 2026-03-30 — Auditoría Finance + dependencias clarificadas
+
+- **TASK-067 ya cerrada** (schema + domain + events disponibles).
+- Ya no depende de ejecución paralela con `TASK-068`; esa lane quedó cerrada.
+- TASK-070 (UI) y TASK-071 (cross-module) necesitan ESTA task completada.
+- `computeClientEconomicsSnapshots()` ya existe en `postgres-store-intelligence.ts` — esta task la evoluciona a un P&L materializado con scopes (client → space → organization).
+- `client_labor_cost_allocation` ya existe como serving view — esta task lo consume para labor costs.
+- `member_capacity_economics` ya existe — esta task lo consume para overhead distribution.
+- El P&L actual se computa on-demand; esta task lo materializa como projection reactiva.
+- TASK-071 reemplazará el on-demand compute de `organization-economics.ts` con reads del P&L materializado.
+- TASK-138 Slice 4 (Agency synergy) también depende del P&L materializado de esta task.
+
+## Status
+
+| Campo | Valor |
+|-------|-------|
+| Lifecycle | `in-progress` |
+| Priority | `P1` |
+| Impact | `Muy alto` |
+| Effort | `Alto` |
+| Status real | `Parcial` |
+| Rank | — |
+| Domain | Cost Intelligence |
+
+## Summary
+
+Implementar la projection `operational_pl` que consolida revenue (Finance income), costo laboral (Payroll × FTE allocation), gastos directos (Finance expenses + cost allocations) y overhead en un P&L operativo por scope (client, space, organization) y período, con closure awareness y alertas de margen.
+
+## Why This Task Exists
+
+`client_economics` ya computa snapshots de economics por cliente, pero:
+- No tiene closure awareness (no sabe si el período está cerrado)
+- No agrega a nivel space ni organization
+- No emite alertas de margen
+- No produce un "financial statement" legible como P&L
+
+Este task formaliza el P&L operativo como serving view materializada, consumible por Finance, Agency, Organization 360 y Home.
+
+## Goal
+
+Materializar `greenhouse_serving.operational_pl_snapshots` con P&L por scope/período, emitir `accounting.pl_snapshot.materialized` y `accounting.margin_alert.triggered` cuando corresponda.
+
+## Architecture Alignment
+
+- Fuente canónica: `docs/architecture/GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md` § 4.2, § 6.2
+- Fuente complementaria obligatoria: `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+- Relación con `client_economics`: este projection es un **consumer enriquecido** de `client_economics`, no un reemplazo. Lee los snapshots existentes y los consolida/agrega.
+- Si `client_economics` (TASK-055) completa su pipeline, `operational_pl` lo consume directamente. Si no, computa desde las mismas fuentes.
+- Regla de implementación:
+  - este projection materializa y distribuye por scope la semántica financiera canónica; no redefine revenue/cost/margin por fuera del contrato ya documentado por Finance
+
+## Dependencies & Impact
+
+- **Depende de:**
+  - TASK-067 (schema + domain) — **cerrada**
+  - TASK-068 (period closure status) — **cerrada**, ya disponible para `period_closed` flag
+  - `greenhouse_serving.client_economics_snapshots` o fuentes directas si no disponible
+  - `greenhouse_payroll.payroll_entries` + `greenhouse_core.client_team_assignments`
+  - `greenhouse_finance.income`, `greenhouse_finance.expenses`
+  - `greenhouse_finance.exchange_rates`
+  - `greenhouse_serving.member_capacity_economics` (overhead data)
+- **Impacta a:**
+  - TASK-070 (Finance UI) — muestra P&L inline
+  - TASK-071 (consumers) — Agency, Org 360, Home leen P&L
+  - `organization_executive` projection existente — puede consumir P&L materializado en vez de computar on-demand
+  - `notification_dispatch` — recibe `margin_alert.triggered`
+- **Archivos owned:**
+  - `src/lib/sync/projections/operational-pl.ts`
+  - `src/lib/cost-intelligence/compute-operational-pl.ts`
+  - `src/lib/cost-intelligence/pl-types.ts`
+  - `src/app/api/cost-intelligence/pl/route.ts`
+  - `src/app/api/cost-intelligence/pl/[scopeType]/[scopeId]/route.ts`
+
+## Current Repo State
+
+- `client_economics` projection existe (TASK-055) con 20 trigger events
+- `computeClientEconomicsSnapshots()` en `src/lib/finance/postgres-store-intelligence.ts`
+- `client_labor_cost_allocation` serving view existe
+- `member_capacity_economics` materializa overhead + loaded cost
+- `organization-economics.ts` computa on-demand (no materializado)
+- Ya existe P&L materializado por scope/período, pero todavía no reemplaza consumers downstream como `organization-economics.ts`
+
+## Scope
+
+### Slice 1 — P&L computation engine
+1. `src/lib/cost-intelligence/compute-operational-pl.ts`:
+   - Input: `(year, month, reason)`
+   - Para cada client con actividad en el período:
+     - Revenue: net revenue (`SUM(total_amount_clp) - partner_share`)
+     - Labor cost: leer `client_labor_cost_allocation`
+     - Direct expenses: expenses atribuidos + cost allocations, excluyendo `payroll_entry_id` para no doble contar
+     - Overhead: leer member_capacity_economics overhead pool, distribuir por FTE weight
+   - Computar: `gross_margin = revenue - total_cost`, `margin_pct`
+   - Agregar a nivel space: SUM clients del space
+   - Agregar a nivel organization: SUM clients de la org
+   - Retornar array de snapshots
+
+2. `src/lib/cost-intelligence/pl-types.ts`:
+   - `OperationalPlSnapshot` type
+   - `PlComputationResult` type
+
+### Slice 2 — Projection
+1. `src/lib/sync/projections/operational-pl.ts`:
+   - Domain: `cost_intelligence`
+   - Triggers: ~16 eventos (income, expenses, payroll, assignments, overhead, period_closed)
+   - Entity scope: `finance_period`
+   - Refresh: llama `computeOperationalPl(year, month, reason)`
+   - Upsert en `operational_pl_snapshots`
+   - Si margin < threshold de `period_closure_config`: emite `accounting.margin_alert.triggered`
+   - Emite `accounting.pl_snapshot.materialized`
+2. Registrar en projection index
+
+### Slice 3 — APIs
+1. `GET /api/cost-intelligence/pl?year=2026&month=3&scopeType=client`
+   - Filtros: `scopeType`, `scopeId`, `year`, `month`, `periodClosed`
+   - Retorna array de snapshots con totals
+2. `GET /api/cost-intelligence/pl/[scopeType]/[scopeId]`
+   - Últimos N períodos para un scope específico (trend)
+   - Retorna: `snapshots[]`, `trend { periods, avgMarginPct }`
+
+### Slice 4 — Margin alert integration
+1. Cuando `operational_pl` detecta margin < threshold:
+   - Emite `accounting.margin_alert.triggered`
+   - `notification_dispatch` projection ya lo puede consumir (agregar al trigger list)
+   - Notifica a `finance_manager` y `efeonce_admin`
+
+### Slice 5 — Tests
+1. Unit tests para `computeOperationalPl()`:
+   - Client con income + payroll → margin correcto
+   - Client sin income → margin negativo
+   - Multi-currency (USD payroll + CLP income) → FX conversion
+   - Aggregation: client → space → organization
+2. Unit tests para margin alert trigger
+
+## Out of Scope
+
+- UI (TASK-069)
+- Budget vs actual (fase 3)
+- Cost centers por department/BU (fase 3)
+- Provisiones laborales (fase 3)
+
+## Acceptance Criteria
+
+- [x] `computeOperationalPl()` retorna P&L correcto para clients con income y payroll
+- [x] Snapshots materializados en `operational_pl_snapshots` con `period_closed` flag
+- [x] Aggregation funciona: client → space → organization
+- [x] Multi-currency: costo laboral llega normalizado a CLP vía `client_labor_cost_allocation`
+- [x] Margin alert se emite cuando margin < threshold
+- [x] `GET /api/cost-intelligence/pl` retorna snapshots filtrados
+- [x] `GET /api/cost-intelligence/pl/client/[id]` retorna trend
+- [x] Tests unitarios cubren: happy path, sin income, aggregation, alerts
+- [x] `pnpm build` pasa
+- [x] `pnpm test` pasa
+
+## Verification
+
+- `pnpm test src/lib/cost-intelligence/`
+- `pnpm smoke:cost-intelligence:operational-pl`
+- `pnpm build`
+- `pnpm lint`
+- Smoke local: trigger events → verificar snapshot materializado con valores correctos

@@ -19,8 +19,31 @@ import {
   toNullableNumber,
   toTimestampString
 } from '@/lib/finance/shared'
+import { resolveAutoAllocation, type AutoAllocationInput } from '@/lib/finance/auto-allocation-rules'
 
 type QueryableClient = Pick<PoolClient, 'query'>
+
+// ─── Auto-allocation helper (fire-and-forget after expense creation) ──────
+
+const tryAutoAllocateExpense = async (input: AutoAllocationInput) => {
+  const result = await resolveAutoAllocation(input)
+
+  if (!result || result.allocations.length === 0) return
+
+  for (const allocation of result.allocations) {
+    const allocationId = `alloc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+
+    await runGreenhousePostgresQuery(
+      `INSERT INTO greenhouse_finance.cost_allocations
+         (allocation_id, expense_id, client_id, allocation_percent, allocated_amount_clp, allocation_method, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, now())
+       ON CONFLICT DO NOTHING`,
+      [allocationId, input.expenseId, allocation.clientId, allocation.allocationPercent, allocation.allocatedAmountClp, allocation.method]
+    )
+  }
+
+  console.log(`[auto-allocation] ${result.ruleApplied}: ${result.allocations.length} allocations for expense ${input.expenseId}`)
+}
 
 // ─── Row types ──────────────────────────────────────────────────────
 
@@ -70,6 +93,14 @@ type PostgresIncomeRow = {
   dte_folio: string | null
   nubox_emitted_at: string | Date | null
   nubox_last_synced_at: string | Date | null
+
+  // Enrichment fields (TASK-165)
+  is_annulled: boolean
+  nubox_pdf_url: string | null
+  nubox_xml_url: string | null
+  referenced_income_id: string | null
+  payment_form: string | null
+  balance_nubox: unknown
 }
 
 type PostgresExpenseRow = {
@@ -130,6 +161,12 @@ type PostgresExpenseRow = {
   nubox_supplier_name: string | null
   nubox_origin: string | null
   nubox_last_synced_at: string | Date | null
+
+  // Enrichment fields (TASK-165)
+  is_annulled: boolean
+  sii_document_status: string | null
+  nubox_pdf_url: string | null
+  balance_nubox: unknown
 }
 
 type PostgresIncomePaymentRow = {
@@ -148,6 +185,29 @@ type PostgresIncomePaymentRow = {
   reconciliation_row_id: string | null
   reconciled_at: string | Date | null
   created_at: string | Date | null
+}
+
+type PostgresClientProfileRow = {
+  client_profile_id: string
+  client_id: string | null
+  organization_id: string | null
+  hubspot_company_id: string | null
+  tax_id: string | null
+  tax_id_type: string | null
+  legal_name: string | null
+  billing_address: string | null
+  billing_country: string | null
+  payment_terms_days: unknown
+  payment_currency: string | null
+  requires_po: boolean
+  requires_hes: boolean
+  current_po_number: string | null
+  current_hes_number: string | null
+  finance_contacts: unknown
+  special_conditions: string | null
+  created_by_user_id: string | null
+  created_at: string | Date | null
+  updated_at: string | Date | null
 }
 
 // ─── Record types ───────────────────────────────────────────────────
@@ -199,6 +259,14 @@ export type FinanceIncomeRecord = {
   dteFolio: string | null
   nuboxEmittedAt: string | null
   nuboxLastSyncedAt: string | null
+
+  // Enrichment fields (TASK-165)
+  isAnnulled: boolean
+  nuboxPdfUrl: string | null
+  nuboxXmlUrl: string | null
+  referencedIncomeId: string | null
+  paymentForm: string | null
+  balanceNubox: number | null
 }
 
 export type CostCategory = 'direct_labor' | 'indirect_labor' | 'operational' | 'infrastructure' | 'tax_social'
@@ -263,6 +331,12 @@ export type FinanceExpenseRecord = {
   nuboxSupplierName: string | null
   nuboxOrigin: string | null
   nuboxLastSyncedAt: string | null
+
+  // Enrichment fields (TASK-165)
+  isAnnulled: boolean
+  siiDocumentStatus: string | null
+  nuboxPdfUrl: string | null
+  balanceNubox: number | null
 }
 
 export type CostAllocationRecord = {
@@ -323,6 +397,29 @@ export type FinanceIncomePaymentRecord = {
   createdAt: string | null
 }
 
+export type FinanceClientProfileRecord = {
+  clientProfileId: string
+  clientId: string | null
+  organizationId: string | null
+  hubspotCompanyId: string | null
+  taxId: string | null
+  taxIdType: string | null
+  legalName: string | null
+  billingAddress: string | null
+  billingCountry: string | null
+  paymentTermsDays: number
+  paymentCurrency: string | null
+  requiresPo: boolean
+  requiresHes: boolean
+  currentPoNumber: string | null
+  currentHesNumber: string | null
+  financeContacts: unknown[]
+  specialConditions: string | null
+  createdByUserId: string | null
+  createdAt: string | null
+  updatedAt: string | null
+}
+
 // ─── Mappers ────────────────────────────────────────────────────────
 
 const str = (v: unknown): string | null => {
@@ -380,7 +477,13 @@ const mapIncome = (row: PostgresIncomeRow): FinanceIncomeRecord => {
     dteTypeCode: str(row.dte_type_code),
     dteFolio: str(row.dte_folio),
     nuboxEmittedAt: toTimestampString(row.nubox_emitted_at as string | { value?: string } | null),
-    nuboxLastSyncedAt: toTimestampString(row.nubox_last_synced_at as string | { value?: string } | null)
+    nuboxLastSyncedAt: toTimestampString(row.nubox_last_synced_at as string | { value?: string } | null),
+    isAnnulled: normalizeBoolean(row.is_annulled),
+    nuboxPdfUrl: str(row.nubox_pdf_url),
+    nuboxXmlUrl: str(row.nubox_xml_url),
+    referencedIncomeId: str(row.referenced_income_id),
+    paymentForm: str(row.payment_form),
+    balanceNubox: toNullableNumber(row.balance_nubox)
   }
 }
 
@@ -439,7 +542,11 @@ const mapExpense =(row: PostgresExpenseRow): FinanceExpenseRecord => ({
   nuboxSupplierRut: str(row.nubox_supplier_rut),
   nuboxSupplierName: str(row.nubox_supplier_name),
   nuboxOrigin: str(row.nubox_origin),
-  nuboxLastSyncedAt: toTimestampString(row.nubox_last_synced_at as string | { value?: string } | null)
+  nuboxLastSyncedAt: toTimestampString(row.nubox_last_synced_at as string | { value?: string } | null),
+  isAnnulled: normalizeBoolean(row.is_annulled),
+  siiDocumentStatus: str(row.sii_document_status),
+  nuboxPdfUrl: str(row.nubox_pdf_url),
+  balanceNubox: toNullableNumber(row.balance_nubox)
 })
 
 const mapIncomePayment =(row: PostgresIncomePaymentRow): FinanceIncomePaymentRecord => ({
@@ -459,6 +566,43 @@ const mapIncomePayment =(row: PostgresIncomePaymentRow): FinanceIncomePaymentRec
   reconciledAt: toTimestampString(row.reconciled_at as string | { value?: string } | null),
   createdAt: toTimestampString(row.created_at as string | { value?: string } | null)
 })
+
+const mapClientProfile = (row: PostgresClientProfileRow): FinanceClientProfileRecord => {
+  let financeContacts: unknown[] = []
+
+  try {
+    const parsed = typeof row.finance_contacts === 'string'
+      ? JSON.parse(row.finance_contacts)
+      : row.finance_contacts
+
+    financeContacts = Array.isArray(parsed) ? parsed : []
+  } catch {
+    financeContacts = []
+  }
+
+  return {
+    clientProfileId: normalizeString(row.client_profile_id),
+    clientId: str(row.client_id),
+    organizationId: str(row.organization_id),
+    hubspotCompanyId: str(row.hubspot_company_id),
+    taxId: str(row.tax_id),
+    taxIdType: str(row.tax_id_type),
+    legalName: str(row.legal_name),
+    billingAddress: str(row.billing_address),
+    billingCountry: str(row.billing_country),
+    paymentTermsDays: toNumber(row.payment_terms_days) || 30,
+    paymentCurrency: str(row.payment_currency),
+    requiresPo: normalizeBoolean(row.requires_po),
+    requiresHes: normalizeBoolean(row.requires_hes),
+    currentPoNumber: str(row.current_po_number),
+    currentHesNumber: str(row.current_hes_number),
+    financeContacts,
+    specialConditions: str(row.special_conditions),
+    createdByUserId: str(row.created_by_user_id),
+    createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
+    updatedAt: toTimestampString(row.updated_at as string | { value?: string } | null)
+  }
+}
 
 // ─── Helpers ────────────────────────────────────────────────────────
 
@@ -572,20 +716,24 @@ export const listFinanceIncomeFromPostgres = async ({
   status,
   clientId,
   clientProfileId,
+  hubspotCompanyId,
   organizationId,
   serviceLine,
   fromDate,
   toDate,
+  incomeType,
   page = 1,
   pageSize = 50
 }: {
   status?: string | null
   clientId?: string | null
   clientProfileId?: string | null
+  hubspotCompanyId?: string | null
   organizationId?: string | null
   serviceLine?: string | null
   fromDate?: string | null
   toDate?: string | null
+  incomeType?: string | null
   page?: number
   pageSize?: number
 } = {}) => {
@@ -602,18 +750,36 @@ export const listFinanceIncomeFromPostgres = async ({
   }
 
   if (status) push('payment_status = $?', status)
-  if (clientId) push('client_id = $?', clientId)
 
-  if (clientProfileId) {
-    idx++
-    conditions.push(`(client_profile_id = $${idx} OR hubspot_company_id = $${idx})`)
-    values.push(clientProfileId)
+  if (clientId || clientProfileId || hubspotCompanyId) {
+    const clientConditions: string[] = []
+
+    if (clientId) {
+      idx++
+      clientConditions.push(`client_id = $${idx}`)
+      values.push(clientId)
+    }
+
+    if (clientProfileId) {
+      idx++
+      clientConditions.push(`client_profile_id = $${idx}`)
+      values.push(clientProfileId)
+    }
+
+    if (hubspotCompanyId) {
+      idx++
+      clientConditions.push(`hubspot_company_id = $${idx}`)
+      values.push(hubspotCompanyId)
+    }
+
+    conditions.push(`(${clientConditions.join(' OR ')})`)
   }
 
   if (organizationId) push('organization_id = $?', organizationId)
   if (serviceLine) push('service_line = $?', serviceLine)
   if (fromDate) push('invoice_date >= $?::date', fromDate)
   if (toDate) push('invoice_date <= $?::date', toDate)
+  if (incomeType) push('income_type = $?', incomeType)
 
   const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
 
@@ -647,7 +813,9 @@ export const listFinanceIncomeFromPostgres = async ({
         notes, created_by_user_id,
         created_at, updated_at,
         nubox_document_id, nubox_sii_track_id, nubox_emission_status,
-        dte_type_code, dte_folio, nubox_emitted_at, nubox_last_synced_at
+        dte_type_code, dte_folio, nubox_emitted_at, nubox_last_synced_at,
+        is_annulled, income_type, nubox_pdf_url, nubox_xml_url, referenced_income_id,
+        payment_form, balance_nubox
       FROM greenhouse_finance.income
       ${whereClause}
       ORDER BY invoice_date DESC
@@ -657,6 +825,268 @@ export const listFinanceIncomeFromPostgres = async ({
   )
 
   return { items: rows.map(mapIncome), total, page, pageSize }
+}
+
+// ─── Client profiles ────────────────────────────────────────────────
+
+export const getFinanceClientProfileFromPostgres = async (clientProfileId: string) => {
+  await assertFinanceSlice2PostgresReady()
+
+  const rows = await runGreenhousePostgresQuery<PostgresClientProfileRow>(
+    `
+      SELECT
+        client_profile_id,
+        client_id,
+        organization_id,
+        hubspot_company_id,
+        tax_id,
+        tax_id_type,
+        legal_name,
+        billing_address,
+        billing_country,
+        payment_terms_days,
+        payment_currency,
+        requires_po,
+        requires_hes,
+        current_po_number,
+        current_hes_number,
+        finance_contacts,
+        special_conditions,
+        created_by_user_id,
+        created_at,
+        updated_at
+      FROM greenhouse_finance.client_profiles
+      WHERE client_profile_id = $1
+      LIMIT 1
+    `,
+    [clientProfileId]
+  )
+
+  return rows[0] ? mapClientProfile(rows[0]) : null
+}
+
+export const upsertFinanceClientProfileInPostgres = async ({
+  clientProfileId,
+  clientId,
+  hubspotCompanyId,
+  taxId,
+  taxIdType,
+  legalName,
+  billingAddress,
+  billingCountry,
+  paymentTermsDays,
+  paymentCurrency,
+  requiresPo,
+  requiresHes,
+  currentPoNumber,
+  currentHesNumber,
+  financeContacts,
+  specialConditions,
+  createdByUserId
+}: {
+  clientProfileId: string
+  clientId?: string | null
+  hubspotCompanyId?: string | null
+  taxId?: string | null
+  taxIdType?: string | null
+  legalName?: string | null
+  billingAddress?: string | null
+  billingCountry?: string | null
+  paymentTermsDays?: number
+  paymentCurrency?: string | null
+  requiresPo?: boolean
+  requiresHes?: boolean
+  currentPoNumber?: string | null
+  currentHesNumber?: string | null
+  financeContacts?: unknown[]
+  specialConditions?: string | null
+  createdByUserId?: string | null
+}) => {
+  await assertFinanceSlice2PostgresReady()
+
+  return withGreenhousePostgresTransaction(async client => {
+    let organizationId: string | null = null
+
+    if (clientId) {
+      const organizationRows = await queryRows<{ organization_id: string }>(
+        `
+          SELECT organization_id
+          FROM greenhouse_core.spaces
+          WHERE client_id = $1
+            AND organization_id IS NOT NULL
+            AND active = TRUE
+          LIMIT 1
+        `,
+        [clientId],
+        client
+      )
+
+      organizationId = organizationRows[0]?.organization_id ?? null
+    }
+
+    const rows = await queryRows<PostgresClientProfileRow>(
+      `
+        INSERT INTO greenhouse_finance.client_profiles (
+          client_profile_id,
+          client_id,
+          organization_id,
+          hubspot_company_id,
+          tax_id,
+          tax_id_type,
+          legal_name,
+          billing_address,
+          billing_country,
+          payment_terms_days,
+          payment_currency,
+          requires_po,
+          requires_hes,
+          current_po_number,
+          current_hes_number,
+          finance_contacts,
+          special_conditions,
+          created_by_user_id,
+          created_at,
+          updated_at
+        )
+        VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8, $9,
+          $10, $11, $12, $13, $14, $15, $16::jsonb, $17, $18,
+          CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+        )
+        ON CONFLICT (client_profile_id) DO UPDATE
+        SET
+          client_id = COALESCE(EXCLUDED.client_id, greenhouse_finance.client_profiles.client_id),
+          organization_id = COALESCE(EXCLUDED.organization_id, greenhouse_finance.client_profiles.organization_id),
+          hubspot_company_id = COALESCE(EXCLUDED.hubspot_company_id, greenhouse_finance.client_profiles.hubspot_company_id),
+          tax_id = EXCLUDED.tax_id,
+          tax_id_type = EXCLUDED.tax_id_type,
+          legal_name = EXCLUDED.legal_name,
+          billing_address = EXCLUDED.billing_address,
+          billing_country = EXCLUDED.billing_country,
+          payment_terms_days = EXCLUDED.payment_terms_days,
+          payment_currency = EXCLUDED.payment_currency,
+          requires_po = EXCLUDED.requires_po,
+          requires_hes = EXCLUDED.requires_hes,
+          current_po_number = EXCLUDED.current_po_number,
+          current_hes_number = EXCLUDED.current_hes_number,
+          finance_contacts = EXCLUDED.finance_contacts,
+          special_conditions = EXCLUDED.special_conditions,
+          updated_at = CURRENT_TIMESTAMP
+        RETURNING
+          client_profile_id,
+          client_id,
+          organization_id,
+          hubspot_company_id,
+          tax_id,
+          tax_id_type,
+          legal_name,
+          billing_address,
+          billing_country,
+          payment_terms_days,
+          payment_currency,
+          requires_po,
+          requires_hes,
+          current_po_number,
+          current_hes_number,
+          finance_contacts,
+          special_conditions,
+          created_by_user_id,
+          created_at,
+          updated_at
+      `,
+      [
+        clientProfileId,
+        clientId ?? null,
+        organizationId,
+        hubspotCompanyId ?? null,
+        taxId ?? null,
+        taxIdType ?? null,
+        legalName ?? null,
+        billingAddress ?? null,
+        billingCountry ?? 'CL',
+        paymentTermsDays ?? 30,
+        paymentCurrency ?? 'CLP',
+        requiresPo ?? false,
+        requiresHes ?? false,
+        currentPoNumber ?? null,
+        currentHesNumber ?? null,
+        JSON.stringify(Array.isArray(financeContacts) ? financeContacts : []),
+        specialConditions ?? null,
+        createdByUserId ?? null
+      ],
+      client
+    )
+
+    return mapClientProfile(rows[0])
+  })
+}
+
+export const syncFinanceClientProfilesFromPostgres = async ({
+  createdByUserId
+}: {
+  createdByUserId?: string | null
+} = {}) => {
+  await assertFinanceSlice2PostgresReady()
+
+  await runGreenhousePostgresQuery(
+    `
+      INSERT INTO greenhouse_finance.client_profiles (
+        client_profile_id,
+        client_id,
+        organization_id,
+        hubspot_company_id,
+        legal_name,
+        billing_country,
+        payment_terms_days,
+        payment_currency,
+        requires_po,
+        requires_hes,
+        created_by_user_id,
+        created_at,
+        updated_at
+      )
+      SELECT
+        c.client_id,
+        c.client_id,
+        (
+          SELECT s.organization_id
+          FROM greenhouse_core.spaces s
+          WHERE s.client_id = c.client_id
+            AND s.organization_id IS NOT NULL
+            AND s.active = TRUE
+          LIMIT 1
+        ),
+        COALESCE(c.hubspot_company_id, c.client_id),
+        c.client_name,
+        'CL',
+        30,
+        'CLP',
+        FALSE,
+        FALSE,
+        $1,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP
+      FROM greenhouse_core.clients c
+      WHERE c.active = TRUE
+      ON CONFLICT (client_profile_id) DO UPDATE
+      SET
+        client_id = COALESCE(greenhouse_finance.client_profiles.client_id, EXCLUDED.client_id),
+        organization_id = COALESCE(greenhouse_finance.client_profiles.organization_id, EXCLUDED.organization_id),
+        hubspot_company_id = COALESCE(greenhouse_finance.client_profiles.hubspot_company_id, EXCLUDED.hubspot_company_id),
+        legal_name = COALESCE(greenhouse_finance.client_profiles.legal_name, EXCLUDED.legal_name),
+        updated_at = CURRENT_TIMESTAMP
+    `,
+    [createdByUserId ?? 'sync']
+  )
+
+  const rows = await runGreenhousePostgresQuery<{ total: string }>(
+    `SELECT COUNT(*) AS total FROM greenhouse_finance.client_profiles`,
+    []
+  )
+
+  return {
+    total: toNumber(rows[0]?.total)
+  }
 }
 
 // ─── Income: get by ID ──────────────────────────────────────────────
@@ -677,7 +1107,9 @@ export const getFinanceIncomeFromPostgres = async (incomeId: string) => {
         notes, created_by_user_id,
         created_at, updated_at,
         nubox_document_id, nubox_sii_track_id, nubox_emission_status,
-        dte_type_code, dte_folio, nubox_emitted_at, nubox_last_synced_at
+        dte_type_code, dte_folio, nubox_emitted_at, nubox_last_synced_at,
+        is_annulled, income_type, nubox_pdf_url, nubox_xml_url, referenced_income_id,
+        payment_form, balance_nubox
       FROM greenhouse_finance.income
       WHERE income_id = $1
       LIMIT 1
@@ -1224,7 +1656,8 @@ export const listFinanceExpensesFromPostgres = async ({
         notes, created_by_user_id,
         created_at, updated_at,
         nubox_purchase_id, nubox_document_status, nubox_supplier_rut,
-        nubox_supplier_name, nubox_origin, nubox_last_synced_at
+        nubox_supplier_name, nubox_origin, nubox_last_synced_at,
+        is_annulled, sii_document_status, nubox_pdf_url, balance_nubox
       FROM greenhouse_finance.expenses
       ${whereClause}
       ORDER BY COALESCE(document_date, payment_date, created_at::date) DESC
@@ -1259,7 +1692,8 @@ export const getFinanceExpenseFromPostgres = async (expenseId: string) => {
         notes, created_by_user_id,
         created_at, updated_at,
         nubox_purchase_id, nubox_document_status, nubox_supplier_rut,
-        nubox_supplier_name, nubox_origin, nubox_last_synced_at
+        nubox_supplier_name, nubox_origin, nubox_last_synced_at,
+        is_annulled, sii_document_status, nubox_pdf_url, balance_nubox
       FROM greenhouse_finance.expenses
       WHERE expense_id = $1
       LIMIT 1
@@ -1431,6 +1865,16 @@ export const createFinanceExpenseInPostgres = async ({
       eventType: 'finance.expense.created',
       payload: created
     })
+
+    // Fire-and-forget auto-allocation for payroll/infrastructure expenses
+    tryAutoAllocateExpense({
+      expenseId,
+      expenseType,
+      memberId: memberId ?? null,
+      clientId: clientId ?? null,
+      costCategory: costCategory ?? null,
+      totalAmountClp
+    }).catch(err => console.error('[auto-allocation] Failed:', err))
 
     return created
   })

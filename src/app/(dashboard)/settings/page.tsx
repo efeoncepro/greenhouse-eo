@@ -4,6 +4,7 @@ import GreenhouseSettings from '@views/greenhouse/GreenhouseSettings'
 
 import { hasGoogleAuthProvider, hasMicrosoftAuthProvider } from '@/lib/auth-secrets'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
+import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 
 export default async function Page() {
   const tenant = await getTenantContext()
@@ -14,7 +15,13 @@ export default async function Page() {
     redirect('/login')
   }
 
-  if (!tenant.routeGroups.includes('client')) {
+  const hasAccess = hasAuthorizedViewCode({
+    tenant,
+    viewCode: 'cliente.configuracion',
+    fallback: tenant.routeGroups.includes('client')
+  })
+
+  if (!hasAccess) {
     redirect(tenant.portalHomePath || '/auth/landing')
   }
 

@@ -27,6 +27,18 @@ describe('notification mappings', () => {
       'assignment.removed',
       'compensation_version.created',
       'member.created',
+      'finance.income_payment.recorded',
+      'finance.expense.created',
+      'finance.dte.discrepancy_found',
+      'finance.income.created',
+      'finance.exchange_rate.upserted',
+      'finance.credit_note.created',
+      'finance.purchase_order.expiring',
+      'finance.purchase_order.consumed',
+      'finance.hes.approved',
+      'finance.hes.rejected',
+      'finance.sii_claim.detected',
+      'finance.balance_divergence.detected',
       'identity.email_verification.completed',
       'payroll_period.exported'
     ])

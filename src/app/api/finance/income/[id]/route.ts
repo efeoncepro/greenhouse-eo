@@ -23,6 +23,7 @@ import {
   type PaymentStatus,
   type ServiceLine
 } from '@/lib/finance/shared'
+import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
 
 export const dynamic = 'force-dynamic'
 
@@ -243,6 +244,16 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     } catch (error) {
       if (!shouldFallbackFromFinancePostgres(error)) {
         throw error
+      }
+
+      if (!isFinanceBigQueryWriteEnabled()) {
+        return NextResponse.json(
+          {
+            error: 'Finance BigQuery fallback write is disabled. Postgres write path failed.',
+            code: 'FINANCE_BQ_WRITE_DISABLED'
+          },
+          { status: 503 }
+        )
       }
     }
 

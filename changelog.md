@@ -1,11 +1,281 @@
 # changelog.md
 
+## 2026-03-30 (session 4)
+
+- Verificación rápida de `staging` completada:
+  - `/finance/income/[id]` carga como `Ingreso — Greenhouse`
+  - `/finance/clients` carga como `Clientes — Greenhouse`
+  - los errores vistos en consola quedaron limitados a `vercel.live`/CSP embed, sin evidencia de fallo funcional del runtime
+- `TASK-164` quedó reconciliada documentalmente con el estado real del repo:
+  - Purchase Orders y HES ya no se leen como spec pendiente
+  - el documento ahora deja claro que el módulo ya fue absorbido por runtime y UI
+
+## 2026-03-30 (session 5)
+
+- Smoke visual en `staging` completado para:
+  - `/finance/purchase-orders`
+  - `/finance/hes`
+  - `/finance/intelligence`
+- Resultado:
+  - las tres surfaces cargan y renderizan
+  - `GET /api/cost-intelligence/periods?limit=12` respondió `200`
+  - `GET /api/notifications/unread-count` respondió `200`
+  - en `finance/intelligence` quedó observación no bloqueante de `OPTIONS /dashboard -> 400` durante prefetch, sin impacto visible en el módulo
+
+## 2026-03-30 (session 6)
+
+- Hardening del `proxy` del portal:
+  - las page routes ahora responden `204` a `OPTIONS`
+  - el cambio apunta a eliminar `400` espurios vistos durante prefetch de `/dashboard`
+  - `/api/**` conserva su comportamiento normal y no queda short-circuiteado por este fix
+
+## 2026-03-30 (session 7)
+
+- Ajuste final de CSP report-only para entornos no productivos:
+  - `preview/staging` permiten `https://vercel.live` en `frame-src`
+  - `production` se mantiene más estricta y no incorpora esa fuente
+- Con esto, el ruido de consola asociado a Vercel Live deja de contaminar la verificación manual de `staging`.
+
+## 2026-03-30 (session 3)
+
+- Se reconciliaron documentos rezagados de Finance/Nubox para que la documentación no siga describiendo un estado anterior al runtime real:
+  - `FINANCE_DUAL_STORE_CUTOVER_V1.md` quedó explícitamente marcado como historial de migración y no como estado operativo vigente
+  - `TASK-163` quedó alineada al estado implementado de separación documental DTE
+  - `TASK-165` quedó alineada al enrichment Nubox ya absorbido por runtime y UI/detail
+- Con esto, la lectura canónica del estado actual de Finance vuelve a concentrarse en `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `TASK-166` y `TASK-050`.
+
+## 2026-03-30 (session 2)
+
+- Finance DTE download hardening:
+  - el detalle de ingreso ahora reutiliza `nuboxPdfUrl` / `nuboxXmlUrl` directos cuando existen, en vez de forzar siempre el proxy server-side
+  - `src/lib/nubox/client.ts` normaliza config Nubox con `trim()` y manda `Accept` explícito para descargas PDF/XML
+  - se mitigó el incidente de `Nubox PDF download failed with 401` observado en `staging`
+- Finance aggregates hardening:
+  - `client_economics` y `operational_pl` ya no agrupan revenue con `COALESCE(client_id, client_profile_id)`
+  - los incomes legacy `profile-only` ahora se traducen vía `greenhouse_finance.client_profiles` para resolver `client_id` canónico antes de agregar
+  - se evita tratar `client_profile_id` como si fuera el ID comercial del cliente en snapshots financieros
+- Finance residual consumers hardening:
+  - `Finance Clients` ya calcula receivables e invoices por `client_id` canónico también en el fallback legacy
+  - `CampaignFinancials` ya no usa `COALESCE(client_id, client_profile_id)` para revenue
+  - con esto ya no quedan consumers obvios del carril financiero tratando `client_profile_id` como sustituto directo de `client_id`
+- Finance read identity drift hardening:
+  - `GET /api/finance/income` y `GET /api/finance/expenses` ahora resuelven filtros de cliente por contexto canónico antes de consultar Postgres/BQ
+  - `income` ya no depende de la equivalencia ad hoc `clientProfileId -> hubspot_company_id` en SQL
+  - se mantiene compatibilidad transicional para callers legacy que seguían usando `clientProfileId` como alias de HubSpot en lecturas de income
+- `TASK-165` (Nubox Full Data Enrichment) cerrada: 16 nuevas columnas en income, 16 en expenses, tabla `income_line_items`, mappers conformed enriquecidos con todos los campos Nubox, sync migrado de DELETE-all a upsert selectivo, cron `nubox-balance-sync` cada 4h, 2 nuevos event types (SII claim + balance divergence), 2 nuevos data quality checks, filtro de annulled en PnL, PDF/XML links + SII chips en UI.
+- `TASK-164` (Purchase Orders & HES) implementada: tablas `purchase_orders` y `service_entry_sheets`, CRUD completo con reconciliación de saldo y lifecycle (draft→submitted→approved/rejected), 9 API routes, 7 event types nuevos, 4 notification mappings, `PurchaseOrdersListView` con progress bars de consumo, `HesListView` con status chips.
+- `ISSUE-002` (Nubox sync data integrity) cerrada: Fix 1 (annulled handling), Fix 2 (identity resolution GROUP BY), Fix 3 (upsert selectivo en conformed).
+- DDL ejecutado en Cloud SQL (`greenhouse_app`): `setup-nubox-enrichment.sql` y `setup-postgres-purchase-orders.sql`. GRANTs corregidos a `greenhouse_runtime`.
+
+## 2026-03-30
+
+- `TASK-166` cerró el lifecycle real de `FINANCE_BIGQUERY_WRITE_ENABLED`:
+  - `income`, `expenses`, `expenses/bulk`, `accounts`, `exchange-rates` y `suppliers` ya pueden fallar cerrado con `FINANCE_BQ_WRITE_DISABLED` cuando PostgreSQL falla y el flag está apagado
+  - `suppliers` pasó a write path Postgres-first; BigQuery queda solo como fallback transicional
+- `TASK-166` se expandió después del cierre inicial:
+  - `income/[id]`, `expenses/[id]`, `income/[id]/payment`, `clients`, `reconciliation/**` y los sync helpers principales ya respetan el mismo guard fail-closed
+  - `clients` dejó de ser solo fail-closed: `create/update/sync` ya corre Postgres-first y conserva fallback BigQuery explícito solo mientras el flag legacy siga activo
+- `Finance Clients` dejó de depender de BigQuery también en lectura principal: `GET /api/finance/clients` y `GET /api/finance/clients/[id]` ahora nacen desde PostgreSQL (`greenhouse_core`, `greenhouse_finance`, `greenhouse_crm`, `v_client_active_modules`) y solo usan BigQuery como fallback transicional.
+- `resolveFinanceClientContext()` quedó endurecido: ya no cae a BigQuery por cualquier excepción de PostgreSQL, sino solo para errores clasificados como fallback permitido.
+- `TASK-166` arrancó el cutover real del write fallback legacy de Finance:
+  - nuevo helper `src/lib/finance/bigquery-write-flag.ts`
+  - `POST /api/finance/income` y `POST /api/finance/expenses` ya respetan `FINANCE_BIGQUERY_WRITE_ENABLED`
+  - con el flag apagado y fallo Postgres, esas rutas ahora fallan cerrado en vez de mutar `fin_*` por compatibilidad implícita
+- `TASK-138` quedó reconciliada con el estado real del repo:
+  - `FinanceDashboardView` ya consume `dso`, `dpo` y `payrollToRevenueRatio`
+  - `PersonHrProfileTab` ya consume `finance-impact`
+  - Agency ya expone `getSpaceFinanceMetrics()` por endpoint dedicado
+- `TASK-139` cerró el remanente técnico más importante:
+  - la cola `dte_emission_queue` ya preserva `dte_type_code`
+  - `/api/cron/dte-emission-retry` ya reintenta vía `emitDte()` real
+  - las rutas de emisión ahora encolan fallos retryable para recuperación posterior
+- `TASK-162` quedó formalmente cerrada:
+  - `commercial_cost_attribution` ya es truth layer materializada con projection reactiva, health y explain
+  - `Person Finance` dejó de leer `client_labor_cost_allocation` y ahora explica costo desde la capa canónica
+  - `computeClientLaborCosts()` dejó de resumir el bridge legacy directo y ahora reutiliza el reader shared
+  - el bridge `client_labor_cost_allocation` queda acotado al materializer/provenance interna, no a consumers runtime nuevos
+- Se consolidó en arquitectura canónica el estado actual de `TASK-162`:
+  - `commercial_cost_attribution` quedó documentada como truth layer materializada
+  - Finance, Cost Intelligence y el modelo maestro ya explicitan la matriz de cutover por consumer
+  - `client_labor_cost_allocation` queda reafirmado como bridge/input histórico, no como contrato directo para lanes nuevas
+- `TASK-134` quedó formalmente cerrada:
+  - Notifications institucionaliza `person-first` para recipient resolution
+  - webhook consumers y projections ya comparten el mismo shape de recipient
+  - `userId` se preserva explícitamente como llave operativa para inbox, preferencias, auditoría y dedupe por recipient key efectiva
+- `TASK-134` ya tiene primer slice real de implementación:
+  - `Notifications` ahora comparte resolución role-based `person-first` entre projections y webhook consumers
+  - nuevo helper shared `getRoleCodeNotificationRecipients(roleCodes)` en `src/lib/notifications/person-recipient-resolver.ts`
+  - el cambio elimina drift de mapping desde `session_360` sin tocar `buildNotificationRecipientKey()`, inbox, preferencias ni dedupe `userId`-scoped
+- `TASK-140` quedó formalmente cerrada:
+  - `/admin/views` ya se interpreta y se opera como consumer persona-first
+  - el selector/preview usa persona canónica cuando existe `identityProfileId`
+  - `userId` se preserva solo como llave operativa para overrides, auditoría y `authorizedViews`
+- Se endureció `src/lib/postgres/client.ts` ante incidentes TLS/SSL transitorios:
+  - normaliza `GREENHOUSE_POSTGRES_SSL` y numerics con `trim()`
+  - evita cachear un `Pool` fallido de forma indefinida
+  - resetea pool/connector cuando `pg` emite errores de conexión
+  - reintenta una vez queries y transacciones ante fallos retryable como `ssl alert bad certificate`
+- `TASK-140` salió de diseño y ya tiene `Slice 1` implementado en `/admin/views`:
+  - nuevo helper shared `src/lib/admin/admin-preview-persons.ts`
+  - el selector de preview ahora agrupa por persona canónica cuando existe `identityProfileId`
+  - el consumer sigue preservando `userId` como llave operativa para overrides, auditoría y `authorizedViews`
+  - la UI distingue mejor entre persona, faceta operativa y principal portal compatible
+  - el panel además ya explica con alertas el estado `active`, `inactive`, `missing_principal` y `degraded_link`, y el roadmap del módulo quedó alineado al remanente real de `TASK-140`
+- `TASK-141` quedó formalmente cerrada como lane institucional:
+  - el contrato canónico persona/member/client_user ya no queda abierto como diseño
+  - la implementación mínima reusable quedó activa con `src/lib/identity/canonical-person.ts`
+  - el remanente operativo se distribuye explícitamente a `TASK-140`, `TASK-134` y `TASK-162`
+- `TASK-141` avanzó de contrato endurecido a primer slice runtime conservador:
+  - nueva fuente canónica `docs/architecture/GREENHOUSE_PERSON_IDENTITY_CONSUMPTION_V1.md`
+  - nuevo resolver shared `src/lib/identity/canonical-person.ts`
+  - contrato runtime explícito para `identityProfileId`, `memberId`, `userId`, `portalAccessState` y `resolutionSource`
+  - primera adopción visible en `/admin/views` sin romper overrides `userId`-scoped ni auditoría de acceso
+- La arquitectura de identidad quedó más precisa para los follow-ons:
+  - `TASK-140` ya no necesita inventar el bridge persona/member/user, sino mover el preview a persona previewable real
+  - `TASK-134` ya puede consumir el contrato shared en vez de rediscutir persona/member/user
+  - `TASK-162` queda reafirmada como lane posterior a `TASK-141`, preservando `member_id` como llave operativa de costo, payroll, capacity e ICO
+
+- Se documentó formalmente la decisión de una capa canónica de `commercial cost attribution`:
+  - no reemplaza a Finance ni a Cost Intelligence
+  - consolida una sola verdad de costo comercial por encima de Payroll, Team Capacity y Finance base
+  - alimenta primero a Finance y Cost Intelligence
+  - y desde ahí a Agency, Organization 360, People, Home, Nexa y futuros consumers financieros
+  - `TASK-162` queda abierta como lane institucional para implementarla
+
+- Se corrigió una desviación semántica importante entre Team Capacity y Cost Intelligence:
+  - assignments internos de `Efeonce` (`space-efeonce`, `efeonce_internal`, `client_internal`) ya no compiten como clientes comerciales en la atribución de costo laboral
+  - la regla ahora es shared entre `Agency > Team`, `member_capacity_economics`, `auto-allocation-rules`, `client_labor_cost_allocation` y `computeOperationalPl()`
+  - Cost Intelligence puede además purgar snapshots obsoletos por período/revisión antes de upsert, evitando que queden filas stale de clientes internos después de un recompute
+
+- La validación visual real de `TASK-070` encontró y corrigió un bug de display en `/finance/intelligence`:
+  - `lastBusinessDayOfTargetMonth` ya venía correctamente calculado desde el calendario operativo
+  - la UI lo mostraba corrido por parsear `YYYY-MM-DD` con `new Date(...)`
+  - `FinancePeriodClosureDashboardView` ahora usa parseo seguro para fechas de solo fecha
+- El flujo principal de `TASK-070` quedó además validado con datos reales:
+  - tabla de períodos
+  - expandible inline de P&L
+  - diálogo de cierre
+
+- Se consolidó la documentación viva de Cost Intelligence a nivel arquitectura, índice de docs, pipeline de tasks y contexto operativo.
+- El módulo ya queda descrito como sistema operativo distribuido:
+  - foundation (`TASK-067`)
+  - period closure (`TASK-068`)
+  - operational P&L (`TASK-069`)
+  - Finance UI (`TASK-070`)
+  - consumers en Agency, Organization 360, People 360, Home y Nexa (`TASK-071`)
+- Finance queda reafirmado como owner del motor financiero central; Cost Intelligence queda formalizado como layer de management accounting y serving distribuido.
+
+- `TASK-071` ya tiene su primer cutover real de consumers distribuidos:
+  - Agency ahora resuelve `SpaceCard` desde `greenhouse_serving.operational_pl_snapshots` en vez de recomputar con `income` / `expenses`
+  - Organization 360 (`Rentabilidad`) ya es serving-first con fallback al compute legacy
+  - People 360 ahora expone `latestCostSnapshot` y muestra closure awareness en `PersonFinanceTab`
+  - `FinanceImpactCard` también muestra período + estado de cierre
+  - Home ya reemplaza placeholders por un resumen financiero real del período para roles internos/finance
+- `TASK-071` sigue abierta:
+  - falta validación visual real
+  - el resumen ya también entra a Nexa `lightContext`; el remanente es de validación y cierre formal
+- Nexa ahora recibe el mismo `financeStatus` resumido del Home snapshot y lo incorpora al prompt de contexto para responder mejor sobre cierre de período y margen operativo.
+- Validación técnica del slice:
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm exec eslint ...` del slice
+- `pnpm build` quedó inestable por artifacts/locks de `.next` en esta sesión de trabajo; no se observó error de tipado posterior a `tsc`.
+
+- `TASK-069` quedó formalmente cerrada:
+  - `operational_pl` ya se considera baseline implementada del módulo de Cost Intelligence
+  - snapshots materializados por `client`, `space` y `organization`
+  - APIs estables de lectura
+  - smoke reactivo E2E ya validado
+- La arquitectura de Cost Intelligence quedó endurecida para reflejar el estado real del módulo:
+  - foundation `067`, cierre `068`, P&L `069` y UI principal `070`
+  - serving canónico
+  - invariantes de revenue/costo/closure
+  - authorization actual
+  - consumers pendientes vía `TASK-071`
+- `TASK-070` ya sustituyó la portada de `/finance/intelligence` por una surface real de Cost Intelligence:
+  - `FinancePeriodClosureDashboardView`
+  - hero + KPIs de cierre
+  - tabla de 12 períodos con semáforos por nómina, ingresos, gastos y FX
+  - P&L inline expandible por cliente
+  - diálogo de cierre y reapertura con control por rol
+- La UI de cierre de período ya respeta el contrato operativo:
+  - cierre para `finance_manager` y `efeonce_admin`
+  - reapertura solo para `efeonce_admin`
+- Validación técnica del slice:
+  - `pnpm exec eslint 'src/app/(dashboard)/finance/intelligence/page.tsx' 'src/views/greenhouse/finance/FinancePeriodClosureDashboardView.tsx'`
+  - `pnpm exec tsc --noEmit --pretty false`
+  - `pnpm build`
+- `TASK-070` sigue abierta solo por validación visual pendiente y por la decisión posterior sobre el destino del dashboard legacy `ClientEconomicsView`.
+
+- `TASK-069` ya tiene smoke reactivo E2E reusable:
+  - `pnpm smoke:cost-intelligence:operational-pl`
+  - el carril valida `outbox -> operational_pl -> operational_pl_snapshots -> accounting.pl_snapshot.materialized`
+- Evidencia real del smoke:
+  - `periodId=2026-03`
+  - `eventsProcessed=5`
+  - `eventsFailed=0`
+  - `projectionsTriggered=6`
+  - `snapshotCount=3`
+- `TASK-069` deja de estar en diseño puro:
+  - nuevo engine `computeOperationalPl()` para materializar `greenhouse_serving.operational_pl_snapshots`
+  - scopes soportados: `client`, `space`, `organization`
+  - APIs nuevas:
+    - `GET /api/cost-intelligence/pl`
+    - `GET /api/cost-intelligence/pl/[scopeType]/[scopeId]`
+- El carril `operational_pl` ya nace amarrado al contrato financiero canónico:
+  - revenue por cliente como net revenue (`total_amount_clp - partner_share`)
+  - costo laboral desde `client_labor_cost_allocation`
+  - overhead desde `member_capacity_economics`
+  - `period_closed` / `snapshot_revision` desde `period_closure_status`
+  - exclusión de `expenses.payroll_entry_id` para evitar doble conteo de payroll
+- `notification_dispatch` ya consume `accounting.margin_alert.triggered`.
+- `materialization-health` ya observa `greenhouse_serving.operational_pl_snapshots`.
+- `TASK-067` dejó aplicada la fundación técnica de Cost Intelligence: schema `greenhouse_cost_intelligence`, tablas base de cierre de período y P&L operativo, script `setup:postgres:cost-intelligence`, eventos `accounting.*`, domain `cost_intelligence` soportado por el projection registry y route `/api/cron/outbox-react-cost-intelligence`.
+- El remanente local de `TASK-067` quedó resuelto: `src/lib/google-credentials.ts` ahora normaliza PEMs colapsados para `google-auth-library`, y el smoke autenticado de `/api/cron/outbox-react-cost-intelligence` ya responde `200`.
+- Cost Intelligence queda además amarrado a la arquitectura canónica de Finance: `TASK-068` y `TASK-069` deben respetar el contrato del P&L financiero central y no redefinir semántica paralela para revenue, payroll multi-moneda ni anti-doble-conteo.
+- `TASK-068` ya tiene su primer slice real: readiness mensual por período, serving/materialización de `period_closure_status`, mutations `close/reopen` y APIs bajo `/api/cost-intelligence/periods/**`, todo consistente con la semántica de Finance (`invoice_date`, `COALESCE(document_date, payment_date)`, `rate_date`, `payroll_periods.status`).
+- `TASK-068` ya conversa también con el calendario operativo compartido: `checkPeriodReadiness()` expone timezone/jurisdicción, ventana operativa y último día hábil del mes objetivo, y el listing de períodos garantiza incluir el mes operativo actual.
+- `TASK-068` ya tiene además smoke reactivo end-to-end reusable: `pnpm smoke:cost-intelligence:period-closure` inserta un evento sintético, procesa el domain `cost_intelligence` y verifica serving + reactive log sin arrastrar backlog ajeno.
+- `TASK-068` queda cerrada y deja desbloqueadas `TASK-069`, `TASK-070` y `TASK-071` del lado `period closure`; el único blocker estructural restante para esa ola ya es el P&L materializado de `TASK-069`.
+- Se endureció documentalmente `TASK-141` para que la futura institucionalización `person-first` preserve los carriles reactivos: notificaciones, outbox, webhook dispatch, projections de finance, ICO y person intelligence.
+- La arquitectura ya deja explícito que `identity_profile` es la raíz humana, pero `member_id` y `user_id` siguen siendo claves operativas que no deben romperse en recipients, inbox/preferencias, overrides, serving por colaborador ni envelopes reactivos.
+- `TASK-136` quedó formalmente cerrada y movida a `docs/tasks/complete/`, ya que la gobernanza por vistas alcanzó el baseline operativo comprometido del portal actual.
+- `TASK-136` agrega `cliente.modulos` al catálogo de views gobernables y endurece `/capabilities/[moduleId]` para requerir tanto el access point broad del carril como el permiso específico del módulo.
+- `/admin/views` suma acciones masivas por rol sobre el set filtrado actual, permitiendo conceder, revocar o restablecer bloques completos de vistas sin editar celda por celda.
+- Se documentó además la excepción arquitectónica de `/home`: sigue fuera del modelo de `view_code` y se mantiene como landing transversal interna vía `portalHomePath`.
+- La arquitectura canónica ya documenta el modelo de gobernanza de vistas: `routeGroups` como capa broad y `view_code` / `authorizedViews` como capa fina, con `/admin/views` como superficie operativa oficial.
+- `TASK-136` amplió el catálogo de vistas client-facing con `cliente.campanas` y `cliente.notificaciones`, y esas superficies ya quedaron protegidas por layout en `/campanas/**`, `/campaigns/**` y `/notifications/**`.
+- `/admin/views` mejoró su operabilidad real: la matrix ahora expone cambios pendientes vs persistido, foco sobre fallback heredado y el preview ya separa baseline, grants extra, revokes efectivos e impacto visible por usuario.
+- `TASK-136` ahora emite un evento reactivo cuando un override por usuario cambia el acceso efectivo; además limpia overrides expirados, registra `expire_user` y el carril `notifications` ya avisa al usuario afectado con un resumen de vistas concedidas/revocadas.
+- `TASK-136` cerró el primer enforcement page-level por `view_code` usando `authorizedViews` en runtime con fallback controlado a `routeGroups`.
+- Rutas clave del portal ya bloquean acceso a nivel de página o nested layout para `dashboard`, `settings`, `proyectos`, `sprints`, Agency, People, Payroll, Finance, Admin Center, AI tools y `Mi Ficha`.
+- `TASK-136` amplió además el enforcement a layouts amplios de `Admin`, `Finance`, `HR` y `My`, y cubrió páginas vecinas como `hr/leave`, `admin/cloud-integrations`, `admin/email-delivery`, `admin/notifications`, `admin/operational-calendar`, `admin/team`, `finance/intelligence` y `finance/cost-allocations`.
+- `TASK-136` empezó además a cerrar el gap de modelo: `view_registry` ya incluye nuevas superficies explícitas en `Admin + Finance`, y el resolver ahora hace fallback por vista faltante cuando existen assignments persistidos parciales para un rol.
+- `TASK-136` extendió ese mismo modelo a `Agency`, `HR` y `My`, con nuevos `view_code` explícitos y guards/sidebar alineados a esas superficies visibles.
+- `TASK-136` alineó además el portal cliente y access points secundarios con nuevos `view_code` (`cliente.equipo`, `cliente.analytics`, `cliente.revisiones`, `cliente.actualizaciones`, `gestion.capacidad`) y el menú cliente ya filtra también por `authorizedViews`.
+- `TASK-136` activó además overrides por usuario iniciales en `/admin/views`, con persistencia en `user_view_overrides`, resolución runtime sobre `authorizedViews` y una primera UI de `inherit/grant/revoke` en el tab `Preview`.
+- `TASK-136` ya suma expiración opcional por batch de overrides y auditoría visible en `Preview`, dejando el módulo bastante más operable para admins.
+- `TASK-136` avanzó de baseline visual a persistencia inicial real en `Admin Center > Vistas y acceso`.
+- Nuevo contrato backend:
+  - `POST /api/admin/views/assignments`
+- Nueva base PostgreSQL en `greenhouse_core`:
+  - `view_registry`
+  - `role_view_assignments`
+  - `user_view_overrides`
+  - `view_access_log`
+- `/admin/views` ahora permite editar y guardar la matriz role × view con fallback seguro al baseline hardcoded mientras el cutover completo de sesión sigue pendiente.
+- La sesión ahora propaga `authorizedViews` y el sidebar ya filtra navegación principal con esa capa cuando existe configuración persistida.
+
 ## Regla
 
 - Registrar solo cambios con impacto real en comportamiento, estructura, flujo de trabajo o despliegue.
 - Usar entradas cortas, fechadas y accionables.
 
 ## 2026-03-30
+
+### UI/UX skill stack modernized for Greenhouse
+- Se agregó `docs/ui/GREENHOUSE_MODERN_UI_UX_BASELINE_V1.md` como baseline moderna para jerarquía visual, UX writing, estados y accessibility.
+- Las skills locales de Greenhouse UI ahora leen explícitamente esta baseline y dejan de depender solo de heurísticas heredadas de Vuexy.
+- Se creó la skill `greenhouse-ux-content-accessibility` para revisar y mejorar copy, empty states, errores, formularios y accesibilidad con criterio de producto.
 
 ### Sentry incident reader hardened for Ops Health
 - `src/lib/cloud/observability.ts` ya soporta un token dedicado `SENTRY_INCIDENTS_AUTH_TOKEN` / `_SECRET_REF` para leer incidentes, sin asumir que `SENTRY_AUTH_TOKEN` también tiene permisos de issues.
@@ -3143,3 +3413,9 @@
 - Payroll Chile liquidation parity: added `gratificacionLegalMode` to compensation versions and `chileGratificacionLegalAmount` to payroll entries so the forward engine now computes legal gratification over IMM when applicable; the slice reuses the existing `compensation_version.created/updated` and `payroll_entry.upserted` outbox events so projections refresh without introducing a new reactive contract.
 - Payroll Chile migration: applied `scripts/migrations/add-gratificacion-legal-mode.sql` with the `admin` profile because the existing tables are owned by `postgres`; runtime now sees `gratificacion_legal_mode` and `chile_gratificacion_legal` in `greenhouse_payroll`.
 - Payroll Chile smoke validation: `dev-greenhouse.efeoncepro.com` remained protected by Vercel auth during staging smoke, so manual validation was recorded as blocked by access protection rather than as an application regression.
+- `TASK-162` pasó de framing a implementación inicial: se agregó la fuente canónica `docs/architecture/GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md` y el helper shared `src/lib/commercial-cost-attribution/assignment-classification.ts` para versionar la clasificación de assignments comerciales vs internos sin hacer big bang sobre Finance o Cost Intelligence.
+- `TASK-162` avanzó con un segundo slice runtime: `src/lib/commercial-cost-attribution/member-period-attribution.ts` ya consolida labor + overhead por `member_id` y `computeOperationalPl()` empezó el cutover a esa capa intermedia en vez de mezclar queries legacy por separado.
+- `TASK-162` alineó también `client_economics` y `organization-economics` al mismo reader canónico intermedio, reduciendo el uso directo de `client_labor_cost_allocation` a insumo interno del dominio.
+- `TASK-162` agregó la materialización inicial `greenhouse_serving.commercial_cost_attribution`; la capa de attribution ya es serving-first con fallback a recompute y `materializeOperationalPl()` la rematerializa antes del snapshot de P&L.
+- `TASK-162` sumó wiring reactivo dedicado: nueva projection `commercial_cost_attribution`, registro en el projection registry y evento `accounting.commercial_cost_attribution.materialized` para desacoplar la capa del refresh exclusivo de `operational_pl`.
+- `TASK-162` agregó health semántico y explain surface mínima para commercial cost attribution, con APIs dedicadas y chequeo de freshness en `/api/cron/materialization-health`.

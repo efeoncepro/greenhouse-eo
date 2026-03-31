@@ -76,6 +76,17 @@ export class NexaService {
   private static buildSystemPrompt(context: HomeSnapshot): string {
     const { user, modules, tasks } = context
 
+    const financeContext = context.financeStatus
+      ? [
+          '',
+          'SEÑAL FINANCIERA DISPONIBLE:',
+          `- Período: ${context.financeStatus.periodLabel}`,
+          `- Estado de cierre: ${context.financeStatus.closureStatus || 'provisional'}`,
+          `- Readiness: ${context.financeStatus.readinessPct != null ? `${context.financeStatus.readinessPct}%` : 'sin dato'}`,
+          `- Margen operativo reciente: ${context.financeStatus.latestMarginPct != null ? `${context.financeStatus.latestMarginPct}% (${context.financeStatus.latestMarginPeriodLabel || 'último período'})` : 'sin dato'}`
+        ]
+      : []
+
     return [
       'Eres Nexa, el asistente inteligente de Greenhouse.',
       'Tu misión es ayudar a navegar la operación real del portal y resolver dudas rápidas con contexto confiable.',
@@ -87,6 +98,7 @@ export class NexaService {
       'OPERACIÓN ACTIVA:',
       `- Módulos disponibles: ${modules.map(m => m.title).join(', ')}`,
       `- Tareas pendientes: ${tasks.length} identificadas (OTD, FTR, RPA, etc.)`,
+      ...financeContext,
       '',
       'REGLAS DE RESPUESTA:',
       '- Sé conciso, profesional y humano.',
@@ -94,6 +106,7 @@ export class NexaService {
       '- Si el usuario pregunta por nómina, OTD, correos operativos, capacidad o cuentas por cobrar, usa los tools disponibles antes de responder.',
       '- Si un tool no está disponible por permisos o por falta de datos, dilo con honestidad.',
       '- Si el usuario pregunta por algo que está en sus tareas pendientes, menciónalo directamente.',
+      '- Si el usuario pregunta por cierre de período, margen o estado financiero y ya hay señal en contexto, úsala antes de responder con generalidades.',
       '- Mantén las respuestas breves para que quepan bien en el panel de Home.',
       '',
       'Recuerda: Eres parte de Efeonce Group y Greenhouse es la plataforma que materializa la visión de sus proyectos.'

@@ -89,7 +89,7 @@ const sentryLevelColor = (level: string): 'success' | 'warning' | 'error' | 'sec
 }
 
 const healthSubsystems = (subsystems: OperationsSubsystem[]) =>
-  subsystems.filter(subsystem => ['Outbox', 'Proyecciones', 'Notificaciones'].includes(subsystem.name))
+  subsystems.filter(subsystem => ['Outbox', 'Proyecciones', 'Notificaciones', 'Finance Data Quality'].includes(subsystem.name))
 
 /* ── TASK-113: Styled Timeline (Vuexy pattern) ── */
 const Timeline = styled(MuiTimeline)<TimelineProps>({

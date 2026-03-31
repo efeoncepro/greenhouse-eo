@@ -105,6 +105,20 @@ outbox_events (published) → webhook-dispatch cron (*/2 min) → matches wh-sub
   - fallback `email-only` cuando la persona existe pero no tiene inbox portal
   - recipients del período exportado en nómina
   - respeto de preferencias in-app/email a través de `notification-service`
+- Contrato institucional vigente después de `TASK-134`:
+  - webhook consumers y projections deben compartir el mismo shape de recipient:
+    - `identityProfileId`
+    - `memberId`
+    - `userId`
+    - `email`
+    - `fullName`
+  - la resolución humana es `person-first`, pero el delivery no deja de ser `userId`-scoped cuando existe principal portal
+  - `buildNotificationRecipientKey()` sigue siendo la fuente efectiva para dedupe:
+    - `userId`
+    - `person:${identityProfileId}`
+    - `member:${memberId}`
+    - `external:${email}`
+  - `greenhouse_notifications.notification_log.user_id` preserva esa recipient key efectiva; no debe reinterpretarse como FK estricta a `client_users`
 - Guardrails ya implementados:
   - firma HMAC obligatoria cuando existe secreto resuelto
   - dedupe cubriendo `notifications` y también `notification_log` para casos `email-only`

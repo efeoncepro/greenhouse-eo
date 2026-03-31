@@ -39,17 +39,44 @@ const toIpType = (value: string | undefined) => {
   }
 }
 
+const normalizeBoolean = (value: string | undefined) => value?.trim().toLowerCase() === 'true'
+
+const normalizeNumber = (value: string | undefined, fallback: number) => {
+  const parsed = Number(value?.trim() || fallback)
+
+  return Number.isFinite(parsed) ? parsed : fallback
+}
+
+const isRetryableConnectionError = (error: unknown) => {
+  if (!(error instanceof Error)) {
+    return false
+  }
+
+  const message = error.message.toLowerCase()
+
+  return [
+    'ssl alert bad certificate',
+    'connection terminated unexpectedly',
+    'the database system is starting up',
+    'server closed the connection unexpectedly',
+    'connection ended unexpectedly',
+    'read etimedout',
+    'read econnreset',
+    'write epipe'
+  ].some(fragment => message.includes(fragment))
+}
+
 export const getGreenhousePostgresConfig = (): GreenhousePostgresConfig => ({
   instanceConnectionName: process.env.GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME?.trim() || null,
   ipType: toIpType(process.env.GREENHOUSE_POSTGRES_IP_TYPE),
   host: process.env.GREENHOUSE_POSTGRES_HOST?.trim() || null,
-  port: Number(process.env.GREENHOUSE_POSTGRES_PORT || 5432),
+  port: normalizeNumber(process.env.GREENHOUSE_POSTGRES_PORT, 5432),
   database: process.env.GREENHOUSE_POSTGRES_DATABASE?.trim() || null,
   user: process.env.GREENHOUSE_POSTGRES_USER?.trim() || null,
   password: process.env.GREENHOUSE_POSTGRES_PASSWORD || null,
   passwordSecretRef: process.env.GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF?.trim() || null,
-  maxConnections: Number(process.env.GREENHOUSE_POSTGRES_MAX_CONNECTIONS || 15),
-  sslEnabled: String(process.env.GREENHOUSE_POSTGRES_SSL || '').toLowerCase() === 'true'
+  maxConnections: normalizeNumber(process.env.GREENHOUSE_POSTGRES_MAX_CONNECTIONS, 15),
+  sslEnabled: normalizeBoolean(process.env.GREENHOUSE_POSTGRES_SSL)
 })
 
 export const getGreenhousePostgresMissingConfig = () => {
@@ -117,50 +144,112 @@ const buildPool = async () => {
       ipType: config.ipType
     })
 
-    return new Pool({
+    const pool = new Pool({
       ...baseOptions,
       ...connectorOptions
     })
+
+    pool.on('error', error => {
+      console.error('Greenhouse Postgres pool emitted an error; resetting connector state.', error)
+      void closeGreenhousePostgres().catch(closeError => {
+        console.error('Unable to close Greenhouse Postgres after pool error.', closeError)
+      })
+    })
+
+    return pool
   }
 
-  return new Pool({
+  const pool = new Pool({
     ...baseOptions,
     host: config.host || undefined,
     port: config.port,
     ssl: config.sslEnabled ? { rejectUnauthorized: false } : undefined
   })
+
+  pool.on('error', error => {
+    console.error('Greenhouse Postgres pool emitted an error; resetting direct connection state.', error)
+    void closeGreenhousePostgres().catch(closeError => {
+      console.error('Unable to close Greenhouse Postgres after direct pool error.', closeError)
+    })
+  })
+
+  return pool
 }
 
 export const getGreenhousePostgresPool = async () => {
-  globalThis.__greenhousePostgresPoolPromise ??= buildPool()
+  globalThis.__greenhousePostgresPoolPromise ??= buildPool().catch(error => {
+    globalThis.__greenhousePostgresPoolPromise = undefined
+    throw error
+  })
 
   return globalThis.__greenhousePostgresPoolPromise
 }
 
 export const runGreenhousePostgresQuery = async <T extends Record<string, unknown>>(text: string, values: unknown[] = []) => {
-  const pool = await getGreenhousePostgresPool()
-  const result = await pool.query<T>(text, values)
+  try {
+    const pool = await getGreenhousePostgresPool()
+    const result = await pool.query<T>(text, values)
 
-  return result.rows
+    return result.rows
+  } catch (error) {
+    if (!isRetryableConnectionError(error)) {
+      throw error
+    }
+
+    console.warn('Retrying Greenhouse Postgres query after retryable connection failure.', error)
+    await closeGreenhousePostgres().catch(() => undefined)
+
+    const pool = await getGreenhousePostgresPool()
+    const result = await pool.query<T>(text, values)
+
+    return result.rows
+  }
 }
 
 export const withGreenhousePostgresTransaction = async <T>(callback: (client: PoolClient) => Promise<T>) => {
-  const pool = await getGreenhousePostgresPool()
-  const client = await pool.connect()
-
   try {
-    await client.query('BEGIN')
+    const pool = await getGreenhousePostgresPool()
+    const client = await pool.connect()
 
-    const result = await callback(client)
+    try {
+      await client.query('BEGIN')
 
-    await client.query('COMMIT')
+      const result = await callback(client)
 
-    return result
+      await client.query('COMMIT')
+
+      return result
+    } catch (error) {
+      await client.query('ROLLBACK').catch(() => undefined)
+      throw error
+    } finally {
+      client.release()
+    }
   } catch (error) {
-    await client.query('ROLLBACK').catch(() => undefined)
-    throw error
-  } finally {
-    client.release()
+    if (!isRetryableConnectionError(error)) {
+      throw error
+    }
+
+    console.warn('Retrying Greenhouse Postgres transaction after retryable connection failure.', error)
+    await closeGreenhousePostgres().catch(() => undefined)
+
+    const pool = await getGreenhousePostgresPool()
+    const client = await pool.connect()
+
+    try {
+      await client.query('BEGIN')
+
+      const result = await callback(client)
+
+      await client.query('COMMIT')
+
+      return result
+    } catch (retryError) {
+      await client.query('ROLLBACK').catch(() => undefined)
+      throw retryError
+    } finally {
+      client.release()
+    }
   }
 }
 

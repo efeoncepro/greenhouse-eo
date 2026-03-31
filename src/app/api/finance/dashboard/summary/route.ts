@@ -30,6 +30,7 @@ interface PgExpenseRow extends Record<string, unknown> {
   payment_date: string | Date | null
   total_amount_clp: string | number
   payment_status: string
+  expense_type: string | null
 }
 
 // ── BigQuery types ─────────────────────────────────────────────────
@@ -49,6 +50,7 @@ interface BqExpenseDashboardRow {
   payment_date: unknown
   total_amount_clp: unknown
   payment_status: string
+  expense_type: unknown
 }
 
 // ── Route ──────────────────────────────────────────────────────────
@@ -84,7 +86,10 @@ async function handlePostgresFirst(monthKeys: string[]) {
   const [incomeRows, paymentRows, expenseRows] = await Promise.all([
     runGreenhousePostgresQuery<PgIncomeRow>(
       `SELECT invoice_date, total_amount, total_amount_clp, amount_paid, payment_status
-       FROM greenhouse_finance.income`
+       FROM greenhouse_finance.income
+       WHERE COALESCE(income_type, 'service_fee') NOT IN ('quote')
+         AND COALESCE(dte_type_code, '') NOT IN ('52', 'COT')
+         AND COALESCE(is_annulled, FALSE) = FALSE`
     ),
     runGreenhousePostgresQuery<PgPaymentRow>(
       `SELECT ip.payment_date,
@@ -94,7 +99,7 @@ async function handlePostgresFirst(monthKeys: string[]) {
        WHERE ip.payment_date IS NOT NULL AND ip.amount > 0`
     ),
     runGreenhousePostgresQuery<PgExpenseRow>(
-      `SELECT document_date, payment_date, total_amount_clp, payment_status
+      `SELECT document_date, payment_date, total_amount_clp, payment_status, expense_type
        FROM greenhouse_finance.expenses`
     )
   ])
@@ -142,7 +147,7 @@ async function handlePostgresFirst(monthKeys: string[]) {
     monthKeys
   )
 
-  return buildResponse(incomeRows, incomeAccrualSeries, incomeCashSeries, expenseRows, expenseAccrualSeries, expenseCashSeries)
+  return await buildResponse(incomeRows, incomeAccrualSeries, incomeCashSeries, expenseRows, expenseAccrualSeries, expenseCashSeries)
 }
 
 // ── BigQuery fallback path ─────────────────────────────────────────
@@ -158,7 +163,7 @@ async function handleBigQueryFallback(monthKeys: string[]) {
       FROM \`${projectId}.greenhouse.fin_income\`
     `),
     runFinanceQuery<BqExpenseDashboardRow>(`
-      SELECT document_date, payment_date, total_amount_clp, payment_status
+      SELECT document_date, payment_date, total_amount_clp, payment_status, expense_type
       FROM \`${projectId}.greenhouse.fin_expenses\`
     `)
   ])
@@ -212,16 +217,16 @@ async function handleBigQueryFallback(monthKeys: string[]) {
     monthKeys
   )
 
-  return buildResponse(incomeRows, incomeAccrualSeries, incomeCashSeries, expenseRows, expenseAccrualSeries, expenseCashSeries)
+  return await buildResponse(incomeRows, incomeAccrualSeries, incomeCashSeries, expenseRows, expenseAccrualSeries, expenseCashSeries)
 }
 
 // ── Shared response builder ────────────────────────────────────────
 
-function buildResponse(
+async function buildResponse(
   incomeRows: Array<{ total_amount: unknown; total_amount_clp: unknown; amount_paid: unknown; payment_status: string }>,
   incomeAccrualSeries: ReturnType<typeof aggregateMonthlyEntries>,
   incomeCashSeries: ReturnType<typeof aggregateMonthlyEntries>,
-  expenseRows: Array<{ total_amount_clp: unknown; payment_status: string }>,
+  expenseRows: Array<{ total_amount_clp: unknown; payment_status: string; expense_type?: unknown }>,
   expenseAccrualSeries: ReturnType<typeof aggregateMonthlyEntries>,
   expenseCashSeries: ReturnType<typeof aggregateMonthlyEntries>
 ) {
@@ -264,6 +269,23 @@ function buildResponse(
 
   const payableCount = expenseRows.filter(row => row.payment_status === 'pending').length
 
+  // Working capital metrics
+  const monthlyRevenue = incomeAccrualMetrics.totalAmountClp
+  const monthlyExpenses = expenseAccrualMetrics.totalAmountClp
+  const dso = monthlyRevenue > 0 ? Math.round((receivables / monthlyRevenue) * 30) : null
+  const dpo = monthlyExpenses > 0 ? Math.round((payables / monthlyExpenses) * 30) : null
+
+  // Payroll-to-revenue ratio: use canonical helper that computes
+  // gross_total + chile_employer_total_cost = true company cost
+  const { getLatestPeriodCompanyCost } = await import('@/lib/payroll/total-company-cost')
+  const companyCost = await getLatestPeriodCompanyCost()
+  const payrollCostClp = companyCost?.totalCompanyCostClp ?? 0
+  const payrollPeriodLabel = companyCost ? `${companyCost.year}-${String(companyCost.month).padStart(2, '0')}` : null
+
+  const payrollToRevenueRatio = monthlyRevenue > 0
+    ? Math.round((payrollCostClp / monthlyRevenue) * 1000) / 10
+    : null
+
   return NextResponse.json({
     incomeMonth: incomeCashMetrics.totalAmountClp,
     incomePrev: incomeCashMetrics.previousTotalAmountClp,
@@ -276,6 +298,18 @@ function buildResponse(
     receivableInvoices,
     payables,
     payableCount,
+    dso,
+    dpo,
+    payrollToRevenueRatio,
+    payrollContext: companyCost ? {
+      periodLabel: payrollPeriodLabel,
+      periodStatus: companyCost.periodStatus,
+      entryCount: companyCost.entryCount,
+      grossClp: companyCost.totalGrossClp,
+      employerChargesClp: companyCost.totalEmployerChargesClp,
+      companyCostClp: companyCost.totalCompanyCostClp,
+      revenueClp: monthlyRevenue
+    } : null,
     cash: {
       incomeMonth: incomeCashMetrics.totalAmountClp,
       incomePrev: incomeCashMetrics.previousTotalAmountClp,

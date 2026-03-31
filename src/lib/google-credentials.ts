@@ -83,6 +83,29 @@ const normalizeCredentialString = (value: string) =>
     .replace(/\\n/g, '\n')
     .trim()
 
+const normalizePrivateKey = (value: string) => {
+  const normalized = normalizeCredentialString(value)
+
+  if (!normalized) {
+    return normalized
+  }
+
+  if (normalized.includes('\n')) {
+    return normalized.endsWith('\n') ? normalized : `${normalized}\n`
+  }
+
+  const beginMarker = '-----BEGIN PRIVATE KEY-----'
+  const endMarker = '-----END PRIVATE KEY-----'
+
+  if (normalized.startsWith(beginMarker) && normalized.endsWith(endMarker)) {
+    const body = normalized.slice(beginMarker.length, normalized.length - endMarker.length).trim()
+
+    return `${beginMarker}\n${body}\n${endMarker}\n`
+  }
+
+  return normalized.endsWith('\n') ? normalized : `${normalized}\n`
+}
+
 const normalizeParsedCredentials = (value: unknown) => {
   if (!value || typeof value !== 'object') {
     return undefined
@@ -91,11 +114,7 @@ const normalizeParsedCredentials = (value: unknown) => {
   const credentials = { ...(value as Record<string, unknown>) }
 
   if (typeof credentials.private_key === 'string') {
-    const normalizedPrivateKey = normalizeCredentialString(credentials.private_key)
-
-    credentials.private_key = normalizedPrivateKey.endsWith('\n')
-      ? normalizedPrivateKey
-      : `${normalizedPrivateKey}\n`
+    credentials.private_key = normalizePrivateKey(credentials.private_key)
   }
 
   if (typeof credentials.client_email === 'string') {

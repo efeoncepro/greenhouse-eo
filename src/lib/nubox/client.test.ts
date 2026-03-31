@@ -8,7 +8,12 @@ vi.mock('@/lib/secrets/secret-manager', () => ({
   resolveSecret
 }))
 
-import { decodeNuboxXmlPayload, listNuboxSales } from '@/lib/nubox/client'
+import {
+  decodeNuboxXmlPayload,
+  getNuboxSalePdf,
+  getNuboxSaleXml,
+  listNuboxSales
+} from '@/lib/nubox/client'
 
 describe('decodeNuboxXmlPayload', () => {
   afterEach(() => {
@@ -100,5 +105,55 @@ describe('decodeNuboxXmlPayload', () => {
     })
 
     await expect(listNuboxSales('2026-03')).rejects.toThrow('NUBOX_BEARER_TOKEN is not configured')
+  })
+
+  it('normalizes config and sends explicit binary Accept headers for PDF/XML downloads', async () => {
+    vi.stubEnv('NUBOX_API_BASE_URL', 'https://nubox.example.com/\n')
+    vi.stubEnv('NUBOX_X_API_KEY', 'nubox-api-key\n')
+    resolveSecret.mockResolvedValue({
+      source: 'env',
+      value: 'env-token'
+    })
+
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        arrayBuffer: async () => new ArrayBuffer(8)
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        text: async () => '<xml />'
+      })
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    await getNuboxSalePdf(114)
+    await getNuboxSaleXml(114)
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      'https://nubox.example.com/sales/114/pdf?template=TEMPLATE_A4',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: 'Bearer env-token',
+          'x-api-key': 'nubox-api-key',
+          Accept: 'application/pdf'
+        })
+      })
+    )
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      'https://nubox.example.com/sales/114/xml',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: 'Bearer env-token',
+          'x-api-key': 'nubox-api-key',
+          Accept: 'application/xml,text/xml,application/json'
+        })
+      })
+    )
   })
 })

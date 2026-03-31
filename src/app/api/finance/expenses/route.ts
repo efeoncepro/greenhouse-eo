@@ -36,6 +36,7 @@ import {
   buildMonthlySequenceIdFromPostgres
 } from '@/lib/finance/postgres-store-slice2'
 import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
+import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
 
 export const dynamic = 'force-dynamic'
 
@@ -138,6 +139,8 @@ export async function GET(request: Request) {
   const expenseType = searchParams.get('expenseType')
   const status = searchParams.get('status')
   const clientId = searchParams.get('clientId')
+  const clientProfileId = searchParams.get('clientProfileId')
+  const hubspotCompanyId = searchParams.get('hubspotCompanyId')
   const memberId = searchParams.get('memberId')
   const supplierId = searchParams.get('supplierId')
   const serviceLine = searchParams.get('serviceLine')
@@ -146,10 +149,23 @@ export async function GET(request: Request) {
   const page = Math.max(1, toNumber(searchParams.get('page') || '1'))
   const pageSize = Math.min(200, Math.max(1, toNumber(searchParams.get('pageSize') || '50')))
 
+  const resolvedClient = (clientId || clientProfileId || hubspotCompanyId)
+    ? await resolveFinanceClientContext({ clientId, clientProfileId, hubspotCompanyId })
+    : null
+
   // ── Postgres-first path ──
   try {
     const result = await listFinanceExpensesFromPostgres({
-      expenseType, status, clientId, memberId, supplierId, serviceLine, fromDate, toDate, page, pageSize
+      expenseType,
+      status,
+      clientId: resolvedClient?.clientId ?? clientId,
+      memberId,
+      supplierId,
+      serviceLine,
+      fromDate,
+      toDate,
+      page,
+      pageSize
     })
 
     return NextResponse.json(result)
@@ -178,9 +194,9 @@ export async function GET(request: Request) {
       params.status = status
     }
 
-    if (clientId) {
+    if (resolvedClient?.clientId ?? clientId) {
       filters += ' AND client_id = @clientId'
-      params.clientId = clientId
+      params.clientId = resolvedClient?.clientId ?? clientId
     }
 
     if (memberId) {
@@ -356,6 +372,16 @@ export async function POST(request: Request) {
     } catch (pgError) {
       if (!shouldFallbackFromFinancePostgres(pgError)) {
         throw pgError
+      }
+
+      if (!isFinanceBigQueryWriteEnabled()) {
+        return NextResponse.json(
+          {
+            error: 'Finance BigQuery fallback write is disabled. Postgres write path failed.',
+            code: 'FINANCE_BQ_WRITE_DISABLED'
+          },
+          { status: 503 }
+        )
       }
     }
 

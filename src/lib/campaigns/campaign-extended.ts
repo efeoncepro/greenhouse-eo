@@ -64,8 +64,10 @@ export const getCampaignFinancials = async (campaignId: string): Promise<Campaig
   // Revenue: income attributed to this client during campaign period
   const revenueRows = await runGreenhousePostgresQuery<{ total: string } & Record<string, unknown>>(
     `SELECT COALESCE(SUM(total_amount_clp), 0) AS total
-     FROM greenhouse_finance.income
-     WHERE COALESCE(client_id, client_profile_id) = $1`,
+     FROM greenhouse_finance.income i
+     LEFT JOIN greenhouse_finance.client_profiles cp_income
+       ON cp_income.client_profile_id = i.client_profile_id
+     WHERE COALESCE(i.client_id, cp_income.client_id) = $1`,
     [clientId]
   )
 

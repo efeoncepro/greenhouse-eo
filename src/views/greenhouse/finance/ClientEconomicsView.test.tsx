@@ -81,7 +81,7 @@ describe('ClientEconomicsView', () => {
       expect(screen.getByText('La rentabilidad del período todavía no tiene cobertura de costos suficiente. Los ingresos sí están cargados, pero los márgenes quedan ocultos hasta que existan costos directos y/o laborales canonizados.')).toBeInTheDocument()
     })
 
-    expect(screen.getAllByText('costos incompletos').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('sin cobertura').length).toBeGreaterThan(0)
     expect(screen.getAllByText('—').length).toBeGreaterThan(0)
     expect(screen.queryByText('100.0%')).not.toBeInTheDocument()
   })

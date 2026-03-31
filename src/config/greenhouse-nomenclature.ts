@@ -16,6 +16,8 @@ export const GH_INTERNAL_NAV = {
   adminTeam: { label: 'Equipo', subtitle: 'Colaboradores, activación y asignaciones' },
   adminUsers: { label: 'Usuarios', subtitle: 'Acceso, roles y scopes visibles' },
   adminRoles: { label: 'Roles y permisos', subtitle: 'Gobernanza operativa del portal' },
+  adminViews: { label: 'Vistas y acceso', subtitle: 'Gobernanza por vista y lectura efectiva del portal' },
+  adminOperationalCalendar: { label: 'Calendario operativo', subtitle: 'Feriados, cierre y hitos del mes operativo' },
   adminAiTools: { label: 'Herramientas IA', subtitle: 'Catálogo, licencias y créditos IA' },
   adminCorreos: { label: 'Correos', subtitle: 'Historial de envíos y suscripciones' },
   adminCloudIntegrations: { label: 'Cloud & Integrations', subtitle: 'Syncs, webhooks, auth y runtime operativo' },
@@ -42,7 +44,10 @@ export const GH_FINANCE_NAV = {
   expenses: { label: 'Egresos', subtitle: 'Pagos y obligaciones' },
   suppliers: { label: 'Proveedores', subtitle: 'Directorio de proveedores' },
   reconciliation: { label: 'Conciliación', subtitle: 'Conciliación bancaria' },
-  intelligence: { label: 'Inteligencia', subtitle: 'Rentabilidad y economía por Space' }
+  intelligence: { label: 'Economía', subtitle: 'Cierre de período y P&L operativo' },
+  quotes: { label: 'Cotizaciones', subtitle: 'Cotizaciones emitidas y su seguimiento' },
+  purchaseOrders: { label: 'Órdenes de compra', subtitle: 'OC de clientes, saldos y consumo' },
+  hes: { label: 'HES', subtitle: 'Hojas de entrada de servicio' }
 } as const
 
 export const GH_HR_NAV = {
