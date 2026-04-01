@@ -1,5 +1,27 @@
 # changelog.md
 
+## 2026-04-01
+
+- **Database Tooling Foundation** (TASK-184 + TASK-185):
+  - Instalado `node-pg-migrate` para migraciones SQL versionadas — wrapper TypeScript en `scripts/migrate.ts`, migraciones en `migrations/`
+  - Creado `src/lib/db.ts` como conexión centralizada: re-exporta `postgres/client.ts` + agrega Kysely lazy via `getDb()`
+  - Instalado `kysely` + `kysely-codegen` — tipos generados desde DB live: 140 tablas, 3042 líneas en `src/types/db.d.ts`
+  - `pnpm migrate:up` ahora auto-regenera tipos Kysely después de aplicar migraciones (saltar con `MIGRATE_SKIP_TYPES=true`)
+  - Baseline migration aplicada en `greenhouse-pg-dev`
+  - CI check de migraciones agregado a `.github/workflows/ci.yml`
+- **Ownership consolidation** — 122 tablas, 11 schemas, 17 views consolidados bajo `greenhouse_ops`:
+  - Antes: 5 owners distintos (`greenhouse_migrator` 41, `greenhouse_migrator_user` 39, `postgres` 32, `greenhouse_app` 9, `greenhouse_ops` 1)
+  - Después: `greenhouse_ops` 122/122
+  - Default privileges configurados para grants automáticos en objetos futuros
+  - Password de `greenhouse_ops` almacenada en Secret Manager (`greenhouse-pg-dev-ops-password`)
+  - `pg_dump` ahora funciona correctamente — schema snapshot baseline generado (8636 líneas)
+- **Documentación**:
+  - Creado `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md` — spec completa de tooling
+  - Actualizado `CLAUDE.md`, `AGENTS.md`, `project_context.md`, `Handoff.md`
+  - Actualizado 3 docs de arquitectura existentes (Architecture, Cloud Infrastructure, Data Platform)
+  - Actualizado Access Model con delta de ownership consolidation
+  - Delta notes en TASK-172, TASK-174, TASK-180
+
 ## 2026-03-31
 
 - `Finance > Egresos` ya materializa correctamente las nóminas exportadas atrasadas de febrero/marzo:
