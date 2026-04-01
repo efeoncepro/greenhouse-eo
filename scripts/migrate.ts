@@ -111,19 +111,36 @@ const main = () => {
   }
 
   const fullCommand = `npx node-pg-migrate ${pgMigrateCommand}`
+  const envWithUrl = { ...process.env, DATABASE_URL: databaseUrl }
 
   console.log(`[migrate] Running: ${fullCommand}`)
 
   try {
-    execSync(fullCommand, {
-      stdio: 'inherit',
-      env: {
-        ...process.env,
-        DATABASE_URL: databaseUrl
-      }
-    })
+    execSync(fullCommand, { stdio: 'inherit', env: envWithUrl })
   } catch {
     process.exit(1)
+  }
+
+  // After up/down, auto-regenerate Kysely types so they stay in sync
+  if (command === 'up' || command === 'down') {
+    const skipTypes = process.env.MIGRATE_SKIP_TYPES === 'true'
+
+    if (skipTypes) {
+      console.log('[migrate] Skipping type generation (MIGRATE_SKIP_TYPES=true)')
+    } else {
+      console.log('[migrate] Regenerating Kysely types...')
+
+      try {
+        execSync(`npx kysely-codegen --out-file src/types/db.d.ts`, {
+          stdio: 'inherit',
+          env: envWithUrl
+        })
+
+        console.log('[migrate] Types updated in src/types/db.d.ts')
+      } catch {
+        console.warn('[migrate] Type generation failed — run pnpm db:generate-types manually')
+      }
+    }
   }
 }
 

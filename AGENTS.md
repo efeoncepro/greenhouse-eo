@@ -240,19 +240,25 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` o `GREENHOUSE_POSTGRES_HOST`
   - `GREENHOUSE_POSTGRES_DATABASE`
   - `GREENHOUSE_POSTGRES_PORT`
+- Ownership:
+  - **`greenhouse_ops`** es el canonical owner de todos los objetos (122 tablas, 11 schemas, 17 views)
+  - Consolidado en migración `20260401084334779_consolidate-ownership-to-greenhouse-ops.sql`
+  - Password en Secret Manager: `greenhouse-pg-dev-ops-password`
+  - Default privileges configurados: objetos nuevos de `greenhouse_ops` otorgan grants automáticos a `greenhouse_runtime` y `greenhouse_migrator`
 - Regla operativa:
   - runtime del portal usa solo credenciales `runtime`
-  - setup y migraciones usan `migrator`
-  - bootstrap de acceso usa `admin`
+  - migraciones DDL usan `migrator` (via `pnpm migrate:up`)
+  - bootstrap y ownership usan `admin` o `greenhouse_ops`
   - no hacer DDL con el usuario runtime salvo que exista una razon excepcional y quede documentada
+  - no crear objetos con users distintos a `greenhouse_ops` — si una migración corre como `migrator`, los DEFAULT PRIVILEGES otorgan acceso automáticamente
 - Comandos canonicos:
-  - `pnpm setup:postgres:access`
   - `pnpm pg:doctor`
-  - `pnpm setup:postgres:canonical-360`
-  - `pnpm setup:postgres:hr-leave`
-  - `pnpm setup:postgres:payroll`
-  - `pnpm setup:postgres:finance`
-  - `pnpm setup:postgres:source-sync`
+  - `pnpm migrate:create <nombre>` — crear migración nueva
+  - `pnpm migrate:up` — aplicar migraciones pendientes
+  - `pnpm migrate:down` — revertir última migración
+  - `pnpm migrate:status` — estado de migraciones
+  - `pnpm db:generate-types` — regenerar tipos Kysely
+  - `pnpm setup:postgres:access` — setup de roles y grants (legacy)
 - Antes de cortar cualquier dominio nuevo a PostgreSQL:
   - correr `pnpm pg:doctor --profile=runtime`
   - correr `pnpm pg:doctor --profile=migrator`
@@ -274,18 +280,21 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 ### Database Migrations
 - Todo cambio de schema PostgreSQL (DDL) debe hacerse via migración versionada, nunca con ALTER/CREATE manual.
 - Framework: `node-pg-migrate` — wrapper en `scripts/migrate.ts`, migraciones en `migrations/`.
-- Comandos canónicos:
-  - `pnpm migrate:create <nombre>` — crea archivo de migración con timestamp UTC
-  - `pnpm migrate:up` — aplica migraciones pendientes
-  - `pnpm migrate:down` — revierte la última migración
-  - `pnpm migrate:status` — muestra estado (dry-run)
 - Tabla de tracking: `public.pgmigrations`
-- Credenciales: usa perfil `migrator` de `.env.local` automáticamente.
+- Credenciales: usa perfil `migrator` de `.env.local` automáticamente. Override con `MIGRATE_PROFILE=admin`.
 - Convención de nombres: `YYYYMMDDHHMMSS_descripcion-kebab-case.sql`
 - Cada migración DEBE incluir `SET search_path = <target_schema>, greenhouse_core, public;` al inicio.
 - Regla de orden: **migración ANTES del deploy, siempre** (Vercel no ejecuta migraciones en deploy time).
 - Regla de backward-compatibility: columnas nullable primero, deploy código, backfill, luego constraint.
-- Después de `pnpm migrate:up`, ejecutar `pnpm db:generate-types` para regenerar tipos Kysely.
+- Flujo obligatorio al modificar schema:
+  1. `pnpm migrate:create <nombre>` — crea archivo SQL
+  2. Editar el archivo con el DDL necesario
+  3. `pnpm migrate:up` — aplica contra la base de datos
+  4. `pnpm db:generate-types` — regenera tipos Kysely para reflejar los cambios
+  5. Commit migración + `db.d.ts` actualizado **juntos** en el mismo commit
+  6. `pnpm build` para verificar que los tipos son consistentes
+- Conexión local: requiere Cloud SQL Proxy (`cloud-sql-proxy "efeonce-group:us-east4:greenhouse-pg-dev" --port 15432`) y `GREENHOUSE_POSTGRES_HOST=127.0.0.1`, `PORT=15432` en `.env.local`.
+- Spec completa: `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`
 
 ## Task Lifecycle Protocol
 

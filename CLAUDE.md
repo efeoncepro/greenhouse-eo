@@ -44,6 +44,8 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - **Test:** `pnpm test` (Vitest)
 - **Type check:** `npx tsc --noEmit`
 - **PostgreSQL health:** `pnpm pg:doctor`
+- **Migrations:** `pnpm migrate:up`, `pnpm migrate:down`, `pnpm migrate:create <nombre>`, `pnpm migrate:status`
+- **DB types:** `pnpm db:generate-types` (regenerar después de cada migración)
 
 ## Key Docs
 
@@ -72,6 +74,7 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md` — infraestructura de webhooks inbound/outbound
 - `GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md` — playbook de proyecciones reactivas + recovery
 - `GREENHOUSE_BUSINESS_LINES_ARCHITECTURE_V1.md` — business lines canónicas, BU comercial vs operativa, ICO by BU
+- `GREENHOUSE_DATABASE_TOOLING_V1.md` — node-pg-migrate, Kysely, conexión centralizada, ownership model
 
 ## Issue Lifecycle Protocol
 
@@ -157,8 +160,24 @@ Si un archivo en `docs/tasks/` no es una task sino una spec de arquitectura o re
 ### PostgreSQL Access
 - **Runtime** del portal: solo credenciales `runtime` (`GREENHOUSE_POSTGRES_USER`)
 - **Migraciones**: `migrator` (`GREENHOUSE_POSTGRES_MIGRATOR_USER`)
-- **Bootstrap**: `admin` (`GREENHOUSE_POSTGRES_ADMIN_USER`)
+- **Bootstrap/ownership**: `admin` (`GREENHOUSE_POSTGRES_ADMIN_USER`) o `greenhouse_ops`
+- **Canonical owner**: `greenhouse_ops` es dueño de todos los objetos (122 tablas, 11 schemas)
 - Health check: `pnpm pg:doctor`
+
+### Database Connection
+- **Archivo centralizado**: `src/lib/db.ts` — único punto de entrada para toda conexión PostgreSQL
+- **Import `query`** para raw SQL, **`getDb()`** para Kysely tipado, **`withTransaction`** para transacciones
+- **NUNCA** crear `new Pool()` fuera de `src/lib/postgres/client.ts`
+- Módulos existentes usando `runGreenhousePostgresQuery` de `@/lib/postgres/client` están OK
+- Módulos nuevos deben usar Kysely (`getDb()`) para type safety
+- Tipos generados: `src/types/db.d.ts` (140 tablas, generado por `kysely-codegen`)
+
+### Database Migrations
+- **Framework**: `node-pg-migrate` — SQL-first, versionado en `migrations/`
+- **Comandos**: `pnpm migrate:create <nombre>`, `pnpm migrate:up`, `pnpm migrate:down`, `pnpm migrate:status`
+- **Flujo obligatorio**: crear migración → `migrate:up` → `db:generate-types` → commit todo junto
+- **Regla**: migración ANTES del deploy, siempre. Columnas nullable primero, constraints después.
+- **Spec completa**: `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`
 
 ### Tests y validación
 - Tests unitarios: Vitest + Testing Library + jsdom
