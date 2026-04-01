@@ -2,6 +2,9 @@
 
 ## 2026-04-01
 
+- **PostgreSQL runtime grant reconciliation**:
+  - staging recuperó acceso real a `greenhouse_notifications` y a tablas serving como `member_capacity_economics` e `ico_member_metrics`; además se alinearon los scripts de setup y `pg:doctor` para que el drift no reaparezca en futuros bootstrap
+
 - **People + Notifications staging fallback**:
   - `/people` ya no cae si el overlay `member_capacity_economics` no tiene permisos en staging, y el contador de notificaciones ahora degrada a `0` si `greenhouse_notifications` no es accesible
 

@@ -1,5 +1,38 @@
 # Handoff.md
 
+## Sesión 2026-04-01 — Reconciliación real de grants runtime/migrator en PostgreSQL
+
+### Objetivo
+
+- Cerrar la causa raíz detrás de `/people` y notificaciones en staging: grants incompletos del principal runtime sobre objetos existentes en `greenhouse_notifications`, `greenhouse_serving` y parte de `greenhouse_payroll`.
+
+### Delta de ejecución
+
+- Se auditó Cloud SQL con `greenhouse_ops` y se confirmó drift real:
+  - `greenhouse_runtime` no tenía `USAGE` sobre `greenhouse_notifications`
+  - también faltaban grants explícitos sobre tablas existentes como `greenhouse_serving.member_capacity_economics`, `greenhouse_serving.ico_member_metrics` y tablas de `greenhouse_notifications`
+- Se creó la migración versionada `20260402001200000_postgres-runtime-grant-reconciliation.sql` para reconciliar grants de `runtime` y `migrator` sobre schemas, tablas y secuencias ya existentes.
+- La reconciliación se aplicó contra Cloud SQL usando `greenhouse_ops` vía proxy local y quedó registrada en `public.pgmigrations`.
+- `scripts/setup-postgres-access-runtime.sql`, `scripts/setup-postgres-operations-infra.sql` y `scripts/setup-postgres-notifications.sql` quedaron alineados con el access model canónico para no reintroducir el drift en bootstrap/setup.
+- `scripts/pg-doctor.ts` ahora audita también `greenhouse_notifications`, que antes quedaba fuera del diagnóstico.
+
+### Validación
+
+- Auditoría `greenhouse_runtime` post-fix:
+  - `greenhouse_notifications` `USAGE` ✅
+  - `greenhouse_notifications.notifications` `SELECT` ✅
+  - `greenhouse_notifications.notification_preferences` `SELECT` ✅
+  - `greenhouse_serving.member_capacity_economics` `SELECT` ✅
+  - `greenhouse_serving.ico_member_metrics` `SELECT` ✅
+- Barrido completo de privilegios runtime esperados en schemas canónicos: `0` objetos faltantes ✅
+- `pnpm pg:doctor --profile=runtime` ✅
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint -- scripts/pg-doctor.ts` ✅
+
+### Nota operativa
+
+- `pnpm migrate:up` desde `.env.local` seguía intentando salir por la IP pública (`34.86.135.144`) y no por el proxy local; además `node-pg-migrate` devolvió `ECONNRESET` en ese carril. La migración quedó igualmente aplicada y registrada usando `greenhouse_ops` sobre `127.0.0.1:15432`, que era la ruta operativa sana.
+
 ## Sesión 2026-04-01 — People y Notifications con fallback por grants rotos en staging
 
 ### Objetivo

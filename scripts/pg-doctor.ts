@@ -70,7 +70,8 @@ const main = async () => {
           'greenhouse_cost_intelligence',
           'greenhouse_ai',
           'greenhouse_crm',
-          'greenhouse_delivery'
+          'greenhouse_delivery',
+          'greenhouse_notifications'
         )
         ORDER BY n.nspname
       `

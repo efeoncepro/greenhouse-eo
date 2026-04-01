@@ -7,12 +7,19 @@
 CREATE SCHEMA IF NOT EXISTS greenhouse_notifications;
 
 -- Grants
-GRANT USAGE ON SCHEMA greenhouse_notifications TO greenhouse_app;
+GRANT USAGE ON SCHEMA greenhouse_notifications TO greenhouse_runtime;
+GRANT USAGE, CREATE ON SCHEMA greenhouse_notifications TO greenhouse_migrator;
 GRANT USAGE ON SCHEMA greenhouse_notifications TO greenhouse_ops;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_notifications TO greenhouse_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_notifications TO greenhouse_runtime;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA greenhouse_notifications TO greenhouse_migrator;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA greenhouse_notifications TO greenhouse_ops;
-ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_notifications GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_app;
-ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_notifications GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_ops;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA greenhouse_notifications TO greenhouse_runtime;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA greenhouse_notifications TO greenhouse_migrator;
+ALTER DEFAULT PRIVILEGES FOR ROLE greenhouse_ops IN SCHEMA greenhouse_notifications GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_runtime;
+ALTER DEFAULT PRIVILEGES FOR ROLE greenhouse_ops IN SCHEMA greenhouse_notifications GRANT ALL PRIVILEGES ON TABLES TO greenhouse_migrator;
+ALTER DEFAULT PRIVILEGES FOR ROLE greenhouse_ops IN SCHEMA greenhouse_notifications GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_ops;
+ALTER DEFAULT PRIVILEGES FOR ROLE greenhouse_ops IN SCHEMA greenhouse_notifications GRANT USAGE, SELECT ON SEQUENCES TO greenhouse_runtime;
+ALTER DEFAULT PRIVILEGES FOR ROLE greenhouse_ops IN SCHEMA greenhouse_notifications GRANT ALL PRIVILEGES ON SEQUENCES TO greenhouse_migrator;
 
 -- ── 1. Notifications table ───────────────────────────────────────
 
