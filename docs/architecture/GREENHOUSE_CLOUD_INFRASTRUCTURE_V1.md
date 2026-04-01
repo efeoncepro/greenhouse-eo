@@ -477,6 +477,8 @@ Defined in `vercel.json` at the repository root. These are Next.js API routes in
 | `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`                       | Cloud SQL instance connection name para Cloud SQL Connector                            |
 | `GOOGLE_APPLICATION_CREDENTIALS_JSON`                                | Transitional fallback SA key for Preview/local or runtimes where WIF is not yet active |
 | `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64`                         | Transitional fallback SA key variant                                                   |
+| `GREENHOUSE_POSTGRES_HOST`                                           | Direct TCP host for CLI tools (migrations, type generation) — not used by runtime      |
+| `GREENHOUSE_POSTGRES_MIGRATOR_USER`, `..._PASSWORD`                  | Migrator profile credentials for `node-pg-migrate` DDL operations                      |
 
 ---
 

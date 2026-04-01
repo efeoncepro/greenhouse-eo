@@ -351,6 +351,14 @@ Priority order:
 - replace feature-level joins to `hubspot_crm.*` and `notion_ops.*` with conformed/core/mart reads
 - keep raw datasets available for lineage and recovery only
 
+### Phase 6. Schema management and database tooling (active)
+
+- `node-pg-migrate` adopted for versioned SQL migrations (TASK-184)
+- `kysely` + `kysely-codegen` adopted for typed queries in new modules (TASK-185)
+- Centralized connection via `src/lib/db.ts` wrapping existing `postgres/client.ts`
+- All future DDL must go through `pnpm migrate:create` — no manual schema changes
+- See `GREENHOUSE_DATABASE_TOOLING_V1.md` for complete specification
+
 ## Google Cloud Recommendation
 
 For Greenhouse, the recommended first operational database is:

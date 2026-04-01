@@ -317,6 +317,8 @@ Greenhouse must not become:
 | Hosting           | Vercel                                    | —                    |
 | Sync Runtime      | Cloud Functions (Python 3.12) + Cloud Run | —                    |
 | Orchestration     | Cloud Scheduler                           | —                    |
+| DB Migrations     | node-pg-migrate                           | 8.x                  |
+| DB Query Builder  | Kysely + kysely-codegen                   | 0.28.x               |
 
 ## Architecture Principles
 
