@@ -233,4 +233,5 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-181` | `to-do` | Finance Clients: Canonical Source Migration to Organizations | `docs/tasks/to-do/TASK-181-finance-clients-organization-canonical-source.md` |
 | `TASK-182` | `complete` | Finance Expense Drawer: Agency Taxonomy, Cross-Module Synergies & Automation | `docs/tasks/complete/TASK-182-finance-expense-drawer-agency-taxonomy.md` |
 | `TASK-183` | `complete` | Finance Expenses Reactive Intake & Cost Ledger Hardening | `docs/tasks/complete/TASK-183-finance-expenses-reactive-intake-cost-ledger.md` |
-| `TASK-184` | `to-do` | Database Migration Framework (node-pg-migrate) | `docs/tasks/to-do/TASK-184-database-migration-framework.md` |
+| `TASK-184` | `in-progress` | Database Migration Framework (node-pg-migrate) | `docs/tasks/in-progress/TASK-184-database-migration-framework.md` |
+| `TASK-185` | `in-progress` | Database Tooling Foundation (db.ts + Kysely + Migrations) | `docs/tasks/in-progress/TASK-185_Database_Tooling_Foundation.md` |

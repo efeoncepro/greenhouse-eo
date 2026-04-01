@@ -260,6 +260,33 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Fuente canonica del modelo:
   - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
 
+### Database Connection
+- **Import `query` from `@/lib/db`** for raw SQL queries (convenience alias for `runGreenhousePostgresQuery`).
+- **Import `getDb` from `@/lib/db`** for Kysely typed queries in new modules.
+- **Import `withTransaction` from `@/lib/db`** for transactions.
+- **NEVER** create new `Pool` instances — the singleton lives in `src/lib/postgres/client.ts`.
+- **NEVER** read `GREENHOUSE_POSTGRES_*` directly outside `src/lib/postgres/client.ts`.
+- **NEVER** import `Pool` from `pg` directly — always go through `@/lib/db` or `@/lib/postgres/client`.
+- Importing `type PoolClient` from `pg` for function signatures is fine.
+- Existing modules using `runGreenhousePostgresQuery` from `@/lib/postgres/client` are fine — no need to migrate retroactively.
+- New modules SHOULD use Kysely (`getDb()`) for type safety.
+
+### Database Migrations
+- Todo cambio de schema PostgreSQL (DDL) debe hacerse via migración versionada, nunca con ALTER/CREATE manual.
+- Framework: `node-pg-migrate` — wrapper en `scripts/migrate.ts`, migraciones en `migrations/`.
+- Comandos canónicos:
+  - `pnpm migrate:create <nombre>` — crea archivo de migración con timestamp UTC
+  - `pnpm migrate:up` — aplica migraciones pendientes
+  - `pnpm migrate:down` — revierte la última migración
+  - `pnpm migrate:status` — muestra estado (dry-run)
+- Tabla de tracking: `public.pgmigrations`
+- Credenciales: usa perfil `migrator` de `.env.local` automáticamente.
+- Convención de nombres: `YYYYMMDDHHMMSS_descripcion-kebab-case.sql`
+- Cada migración DEBE incluir `SET search_path = <target_schema>, greenhouse_core, public;` al inicio.
+- Regla de orden: **migración ANTES del deploy, siempre** (Vercel no ejecuta migraciones en deploy time).
+- Regla de backward-compatibility: columnas nullable primero, deploy código, backfill, luego constraint.
+- Después de `pnpm migrate:up`, ejecutar `pnpm db:generate-types` para regenerar tipos Kysely.
+
 ## Task Lifecycle Protocol
 
 ### Regla general

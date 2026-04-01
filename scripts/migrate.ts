@@ -1,0 +1,130 @@
+#!/usr/bin/env tsx
+// ============================================================
+// Greenhouse PostgreSQL — Migration Wrapper (node-pg-migrate)
+// ============================================================
+// Uses the existing profile system (load-greenhouse-tool-env.ts)
+// to resolve credentials, then invokes node-pg-migrate via CLI.
+//
+// Usage:
+//   tsx scripts/migrate.ts up
+//   tsx scripts/migrate.ts down
+//   tsx scripts/migrate.ts create <name>
+//   tsx scripts/migrate.ts status
+//
+// Environment:
+//   Reads from .env.local via loadGreenhouseToolEnv().
+//   Uses the 'migrator' profile by default (GREENHOUSE_POSTGRES_MIGRATOR_*).
+//   Override with MIGRATE_PROFILE=admin for break-glass ops.
+// ============================================================
+
+import { execSync } from 'node:child_process'
+
+import { loadGreenhouseToolEnv, applyGreenhousePostgresProfile, type PostgresProfile } from './lib/load-greenhouse-tool-env'
+
+const MIGRATIONS_DIR = 'migrations'
+const MIGRATIONS_TABLE = 'pgmigrations'
+const MIGRATIONS_SCHEMA = 'public'
+
+const buildDatabaseUrl = () => {
+  const host = process.env.GREENHOUSE_POSTGRES_HOST?.trim()
+  const port = process.env.GREENHOUSE_POSTGRES_PORT?.trim() || '5432'
+  const database = process.env.GREENHOUSE_POSTGRES_DATABASE?.trim()
+  const user = process.env.GREENHOUSE_POSTGRES_USER?.trim()
+  const password = process.env.GREENHOUSE_POSTGRES_PASSWORD?.trim()
+  const ssl = process.env.GREENHOUSE_POSTGRES_SSL?.trim()?.toLowerCase() === 'true'
+
+  if (!host || !database || !user || !password) {
+    const missing = [
+      !host && 'GREENHOUSE_POSTGRES_HOST',
+      !database && 'GREENHOUSE_POSTGRES_DATABASE',
+      !user && 'GREENHOUSE_POSTGRES_USER (resolved from profile)',
+      !password && 'GREENHOUSE_POSTGRES_PASSWORD (resolved from profile)'
+    ].filter(Boolean)
+
+    throw new Error(`Cannot build DATABASE_URL. Missing: ${missing.join(', ')}`)
+  }
+
+  const encodedPassword = encodeURIComponent(password)
+  const sslParam = ssl ? '?sslmode=require' : '?sslmode=disable'
+
+  return `postgresql://${user}:${encodedPassword}@${host}:${port}/${database}${sslParam}`
+}
+
+const main = () => {
+  const [command, ...rest] = process.argv.slice(2)
+
+  if (!command) {
+    console.error('Usage: tsx scripts/migrate.ts <up|down|create|status> [args...]')
+    process.exit(1)
+  }
+
+  // Load env and apply profile
+  loadGreenhouseToolEnv()
+
+  const profile = (process.env.MIGRATE_PROFILE as PostgresProfile) || 'migrator'
+
+  console.log(`[migrate] Using profile: ${profile}`)
+  applyGreenhousePostgresProfile(profile)
+
+  // Build the DATABASE_URL that node-pg-migrate expects
+  const databaseUrl = buildDatabaseUrl()
+
+  // Build the node-pg-migrate command
+  const baseArgs = [
+    `--database-url-var DATABASE_URL`,
+    `--migrations-dir ${MIGRATIONS_DIR}`,
+    `--migrations-table ${MIGRATIONS_TABLE}`,
+    `--schema ${MIGRATIONS_SCHEMA}`,
+    `--migration-filename-format utc`
+  ].join(' ')
+
+  let pgMigrateCommand: string
+
+  switch (command) {
+    case 'up':
+      pgMigrateCommand = `up ${baseArgs} ${rest.join(' ')}`
+      break
+    case 'down':
+      pgMigrateCommand = `down ${baseArgs} ${rest.join(' ')}`
+      break
+
+    case 'create':
+      if (rest.length === 0) {
+        console.error('Usage: tsx scripts/migrate.ts create <migration-name>')
+        process.exit(1)
+      }
+
+      pgMigrateCommand = `create ${rest.join(' ')} --migrations-dir ${MIGRATIONS_DIR} --migration-filename-format utc --migration-file-language sql`
+      break
+
+    case 'status': {
+      // node-pg-migrate doesn't have a native status command.
+      // We query the pgmigrations table directly.
+      console.log(`[migrate] Querying ${MIGRATIONS_SCHEMA}.${MIGRATIONS_TABLE} ...`)
+      pgMigrateCommand = `up --dry-run ${baseArgs}`
+      break
+    }
+
+    default:
+      console.error(`Unknown command: ${command}. Expected: up, down, create, status`)
+      process.exit(1)
+  }
+
+  const fullCommand = `npx node-pg-migrate ${pgMigrateCommand}`
+
+  console.log(`[migrate] Running: ${fullCommand}`)
+
+  try {
+    execSync(fullCommand, {
+      stdio: 'inherit',
+      env: {
+        ...process.env,
+        DATABASE_URL: databaseUrl
+      }
+    })
+  } catch {
+    process.exit(1)
+  }
+}
+
+main()

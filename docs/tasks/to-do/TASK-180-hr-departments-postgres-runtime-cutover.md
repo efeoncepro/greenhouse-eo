@@ -1,3 +1,6 @@
+## Delta 2026-04-01
+- TASK-184/TASK-185 (Database Tooling Foundation) ahora disponible: todo schema change de esta task debe ir como migración versionada via `pnpm migrate:create`. Usar `src/lib/db.ts` para nuevos queries tipados (Kysely).
+
 # TASK-180 - HR Departments Postgres Runtime Cutover
 
 ## Status

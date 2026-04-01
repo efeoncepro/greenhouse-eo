@@ -1,10 +1,16 @@
+## Delta 2026-04-01
+- **Implementado** — node-pg-migrate instalado, wrapper TypeScript en `scripts/migrate.ts`, baseline migration creada, scripts en package.json, AGENTS.md actualizado.
+- **Desviación**: wrapper TypeScript (no bash) para respetar convención del proyecto. Reutiliza `loadGreenhouseToolEnv()` + `applyGreenhousePostgresProfile('migrator')` en vez de `.env.migrations` separado.
+- **Schema snapshot** (Phase 2): aplazado — requiere `pg_dump` contra Cloud SQL remoto.
+- **CI integration** (Phase 3): aplazada — no hay GitHub Actions configuradas aún.
+
 # TASK-184 — Database Migration Framework (node-pg-migrate)
 
 ## Status
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `in-progress` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Bajo` |

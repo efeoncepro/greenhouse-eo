@@ -1,3 +1,6 @@
+## Delta 2026-04-01
+- TASK-184/TASK-185 (Database Tooling Foundation) cerró el gap de migraciones versionadas. CI integration de `pnpm migrate:status` puede ahora incorporarse al pipeline de esta task.
+
 # TASK-172 — Platform Hardening: CI Pipeline, Structured Logging, Test Coverage & Security Headers
 
 **Status:** to-do
