@@ -2,6 +2,11 @@
 
 ## 2026-04-01
 
+- **Vitest tooling coverage**:
+  - `pnpm test` ya descubre también tests unitarios versionados en `scripts/**`, cerrando el hueco que dejaba fuera el carril de tooling/CLI
+
+## 2026-04-01
+
 - **TASK-026 HRIS contract canonicalization**:
   - `greenhouse_core.members` pasó a ser el canon de `contract_type`, `pay_regime`, `payroll_via` y `deel_contract_id`
   - `greenhouse_payroll.compensation_versions` conserva el snapshot historico del contrato para payroll, pero ya no es la fuente de verdad del colaborador

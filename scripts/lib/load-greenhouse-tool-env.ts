@@ -63,7 +63,7 @@ export const loadGreenhouseToolEnv = (envFiles = DEFAULT_ENV_FILES) => {
 }
 
 const assignOrDeleteEnv = (key: string, value: string | undefined) => {
-  if (value === undefined) {
+  if (value === undefined || value.trim() === '') {
     delete process.env[key]
 
     return

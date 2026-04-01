@@ -1,5 +1,14 @@
 # project_context.md
 
+## Delta 2026-04-01 Vitest tooling coverage
+
+- `Vitest` ya descubre también tests de `scripts/**`, no solo `src/**`.
+- La fuente de verdad sigue siendo `vitest.config.ts`; el setup compartido continúa en `src/test/setup.ts`.
+- Regla vigente:
+  - tests unitarios de tooling/CLI local pueden vivir en `scripts/**/*.test.ts` o `scripts/**/*.spec.ts`
+  - `pnpm test` y `pnpm exec vitest run <archivo>` ya deben encontrarlos sin workarounds
+  - esto cubre carriles de DB/tooling como `pg:doctor`, migraciones y generación de tipos cuando tengan lógica testeable
+- El helper `scripts/lib/load-greenhouse-tool-env.ts` ahora normaliza passwords vacías (`''`) como no definidas cuando un profile usa `*_PASSWORD_SECRET_REF`, para no contaminar `GREENHOUSE_POSTGRES_PASSWORD` con un valor vacío.
 ## Delta 2026-04-01 TASK-026 contract canonicalization
 
 - `greenhouse_core.members` ya es el ancla canonica de contrato para HRIS:

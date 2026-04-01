@@ -1,5 +1,29 @@
 # Handoff.md
 
+## Sesión 2026-04-01 — Vitest scripts discovery alineado
+
+### Objetivo
+
+- Cerrar la deuda de plataforma que impedía correr tests unitarios ubicados en `scripts/**`.
+
+### Delta de ejecución
+
+- `vitest.config.ts` ya incluye discovery para:
+  - `scripts/**/*.test.ts`
+  - `scripts/**/*.test.tsx`
+  - `scripts/**/*.spec.ts`
+  - `scripts/**/*.spec.tsx`
+- El caso real que motivó el ajuste fue `scripts/lib/load-greenhouse-tool-env.test.ts`, agregado al endurecer el soporte de `greenhouse_ops`.
+- `scripts/lib/load-greenhouse-tool-env.ts` ahora elimina `GREENHOUSE_POSTGRES_PASSWORD` cuando el profile trae password vacía y `*_PASSWORD_SECRET_REF`, manteniendo limpio el contrato canónico del entorno.
+- Se actualizó `project_context.md` para dejar explícito que tooling/CLI también puede versionar tests unitarios bajo `scripts/**`.
+
+### Validación
+
+- `pnpm exec vitest run scripts/lib/load-greenhouse-tool-env.test.ts` ✅
+- `pnpm exec vitest run scripts/lib/load-greenhouse-tool-env.test.ts src/lib/google-credentials.test.ts` ✅
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint` ✅
+
 ## Sesión 2026-04-01 — TASK-026 contract canonicalization cerrada end-to-end
 
 ### Objetivo
