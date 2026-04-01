@@ -312,6 +312,7 @@ export interface GreenhouseCoreClientTeamAssignments {
   assignment_id: string;
   assignment_type: Generated<string>;
   client_id: string;
+
   /**
    * Baseline contractual hours per month for this assignment. If NULL, computed as fte_allocation * 160. Used for capacity planning: available = contracted - used.
    */
@@ -631,6 +632,7 @@ export interface GreenhouseCoreSpaceNotionSources {
   created_at: Generated<Timestamp>;
   created_by: string | null;
   last_synced_at: Timestamp | null;
+
   /**
    * Database ID of the client's Proyectos base in Notion. Conceptual root — tasks, sprints, and reviews derive from projects via Notion relations.
    */
@@ -640,6 +642,7 @@ export interface GreenhouseCoreSpaceNotionSources {
   notion_db_tareas: string;
   notion_workspace_id: string | null;
   source_id: string;
+
   /**
    * FK to greenhouse_core.spaces(space_id). One Space = one tenant boundary = one set of Notion databases.
    */
@@ -1173,16 +1176,19 @@ export interface GreenhouseFinanceExchangeRates {
 }
 
 export interface GreenhouseFinanceExpenses {
+
   /**
    * FK to greenhouse_core.client_profiles when expense is directly allocated
    */
   allocated_client_id: string | null;
   balance_nubox: Numeric | null;
   client_id: string | null;
+
   /**
    * direct_labor | indirect_labor | operational | infrastructure | tax_social
    */
   cost_category: Generated<string | null>;
+
   /**
    * Whether expense is directly attributable to client delivery
    */
@@ -1222,10 +1228,12 @@ export interface GreenhouseFinanceExpenses {
   payment_account_id: string | null;
   payment_date: Timestamp | null;
   payment_method: string | null;
+
   /**
    * Named payment provider or operator when payment_method is insufficient (bank, stripe, webpay, previred, etc.).
    */
   payment_provider: string | null;
+
   /**
    * Operational rail for the payment (bank_transfer, card, gateway, payroll_file, previred, etc.).
    */
@@ -1245,10 +1253,12 @@ export interface GreenhouseFinanceExpenses {
   social_security_institution: string | null;
   social_security_period: string | null;
   social_security_type: string | null;
+
   /**
    * manual | payroll_generated | bank_statement_detected | reconciliation_suggested | gateway_sync | system_adjustment
    */
   source_type: string | null;
+
   /**
    * Canonical tenant scope for the expense; resolves to greenhouse_core.spaces.
    */
@@ -1319,6 +1329,7 @@ export interface GreenhouseFinanceIncome {
   invoice_number: string | null;
   is_annulled: Generated<boolean | null>;
   is_reconciled: Generated<boolean>;
+
   /**
    * total_amount minus partner_share_amount
    */
@@ -1336,12 +1347,14 @@ export interface GreenhouseFinanceIncome {
   organization_id: string | null;
   origin: string | null;
   other_taxes_amount: Numeric | null;
+
   /**
    * External partner identifier (e.g. HubSpot referral partner)
    */
   partner_id: string | null;
   partner_name: string | null;
   partner_share_amount: Numeric | null;
+
   /**
    * Partner revenue share as decimal (0.0000–1.0000)
    */
@@ -1941,6 +1954,7 @@ export interface GreenhousePayrollPayrollReceipts {
   status: Generated<string>;
   storage_bucket: string | null;
   storage_path: string | null;
+
   /**
    * PDF template version that generated this receipt. NULL = pre-versioning (stale). Compared against RECEIPT_TEMPLATE_VERSION at serve time; mismatch triggers lazy regeneration.
    */

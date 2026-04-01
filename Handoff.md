@@ -4,6 +4,35 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-04-01 — Database Tooling Foundation (TASK-184 + TASK-185)
+
+### Objetivo
+
+Instalar infraestructura fundacional de base de datos: migraciones versionadas, conexión centralizada, y query builder tipado.
+
+### Lo que se hizo
+
+- Instaló `node-pg-migrate`, `kysely`, `kysely-codegen`
+- Creó `src/lib/db.ts` — wrapper centralizado que re-exporta `postgres/client.ts` + agrega Kysely lazy
+- Creó `scripts/migrate.ts` — wrapper TypeScript para migraciones, reutiliza sistema de profiles existente
+- Creó `migrations/20260401120000_initial-baseline.sql` — baseline no-op aplicada en dev
+- Generó `src/types/db.d.ts` — 140 tablas, 3042 líneas, introspectadas desde `greenhouse-pg-dev`
+- Creó `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md` — spec de arquitectura completa
+- Actualizó `AGENTS.md`, `project_context.md`, 3 docs de arquitectura existentes
+- Tasks cerradas en pipeline con delta notes en TASK-172, TASK-174, TASK-180
+
+### Nota operativa
+
+- Migraciones y codegen requieren Cloud SQL Proxy local (`cloud-sql-proxy ... --port 15432`) porque la IP pública de Cloud SQL no es alcanzable directamente desde esta máquina.
+- Credenciales migrator: user `greenhouse_migrator_user`, password en Secret Manager `greenhouse-pg-dev-migrator-password`.
+- Schema snapshot (`pg_dump --schema-only`) y CI integration quedan como follow-ups (TASK-172).
+
+### Rama
+
+`develop` — commits `362e6ba9`, `b5d77224`, `094fcd96`
+
+---
+
 ## Sesión 2026-03-31 — Finance reactive backlog starvation + payroll expenses backfill
 
 ### Objetivo

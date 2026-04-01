@@ -3134,6 +3134,10 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - MUI 7.x
 - App Router en `src/app`
 - PNPM lockfile presente
+- PostgreSQL via `pg` (Cloud SQL Connector + Secret Manager), conexión centralizada en `src/lib/db.ts`
+- Kysely query builder tipado para módulos nuevos (`getDb()` de `@/lib/db`)
+- node-pg-migrate para migraciones versionadas (`pnpm migrate:up/down/create/status`)
+- kysely-codegen para generar tipos de DB (`pnpm db:generate-types`)
 - `apexcharts` + `react-apexcharts` activos para charts ejecutivos
 - El portal ya tiene un `space-efeonce` sembrado en BigQuery para validar el MVP del dashboard cliente sobre el portfolio interno con mayor densidad de datos.
 - En producto, la label visible debe migrar a `space`; `tenant` se mantiene solo como termino interno de runtime y datos.
@@ -3162,6 +3166,18 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Greenhouse tambien debe componer vistas y charts segun linea de negocio y servicios contratados del cliente.
 - Proyectos, tareas y sprints existen como drilldown explicativo, no como centro del producto.
 - El centro actual del producto ya es `/dashboard`; las siguientes capas objetivo son `/equipo` y `/campanas`.
+
+## Database Connection
+
+- **Import `query` from `@/lib/db`** para raw SQL queries.
+- **Import `getDb` from `@/lib/db`** para Kysely typed queries en módulos nuevos.
+- **Import `withTransaction` from `@/lib/db`** para transacciones.
+- **NUNCA** crear `new Pool()` fuera de `src/lib/postgres/client.ts`.
+- **NUNCA** leer `GREENHOUSE_POSTGRES_*` directamente fuera de `client.ts`.
+- Módulos existentes usando `runGreenhousePostgresQuery` de `@/lib/postgres/client` están bien — no migrar retroactivamente.
+- Todo cambio de schema DDL debe ir como migración versionada: `pnpm migrate:create <nombre>`.
+- Después de aplicar migraciones: `pnpm db:generate-types` para regenerar tipos Kysely.
+- Spec completa: `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`.
 
 ## Comandos Utiles
 
