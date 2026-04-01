@@ -58,11 +58,26 @@ const enrichFromCapacitySnapshot = async (items: PersonListItem[]): Promise<void
   const now = new Date()
   const memberIds = items.map(item => item.memberId).filter(Boolean)
 
-  const snapshots = await readMemberCapacityEconomicsBatch({
-    memberIds,
-    year: now.getFullYear(),
-    month: now.getMonth() + 1
-  })
+  let snapshots: Map<string, { contractedFte: number; assignedHours: number; assignmentCount: number }>
+
+  try {
+    snapshots = await readMemberCapacityEconomicsBatch({
+      memberIds,
+      year: now.getFullYear(),
+      month: now.getMonth() + 1
+    })
+  } catch (error) {
+    if (!shouldIgnoreCapacitySnapshotError(error)) {
+      throw error
+    }
+
+    console.warn(
+      '[people/list] Capacity snapshot enrichment unavailable, serving roster without economics overlay:',
+      error instanceof Error ? error.message : error
+    )
+
+    return
+  }
 
   for (const item of items) {
     const snapshot = snapshots.get(item.memberId)
@@ -74,6 +89,17 @@ const enrichFromCapacitySnapshot = async (items: PersonListItem[]): Promise<void
       item.totalAssignments = snapshot.assignmentCount
     }
   }
+}
+
+const shouldIgnoreCapacitySnapshotError = (error: unknown) => {
+  const msg = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase()
+
+  return (
+    msg.includes('permission denied') ||
+    msg.includes('not authorized') ||
+    (msg.includes('schema') && msg.includes('greenhouse_serving')) ||
+    msg.includes('member_capacity_economics')
+  )
 }
 
 const buildRoleCategoryFilters = (items: PersonListItem[]) =>

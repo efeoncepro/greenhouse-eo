@@ -20,8 +20,16 @@ const {
     getDepartmentByIdFromPostgresMock: vi.fn(),
     getMemberDepartmentContextFromPostgresMock: vi.fn(),
     listDepartmentHeadOptionsFromPostgresMock: vi.fn(),
-    publishOutboxEventMock: vi.fn(async (..._args: unknown[]) => 'outbox-test'),
-    runGreenhousePostgresQueryMock: vi.fn(async (..._args: unknown[]) => []),
+    publishOutboxEventMock: vi.fn(async (...args: unknown[]) => {
+      void args
+
+      return 'outbox-test'
+    }),
+    runGreenhousePostgresQueryMock: vi.fn(async (...args: unknown[]) => {
+      void args
+
+      return []
+    }),
     updateMemberDepartmentContextInPostgresMock: vi.fn()
   }
 })
@@ -54,12 +62,12 @@ vi.mock('@/lib/postgres/client', async () => {
 
   return {
     ...actual,
-    runGreenhousePostgresQuery: (...args: unknown[]) => runGreenhousePostgresQueryMock.apply(null, args)
+    runGreenhousePostgresQuery: (...args: unknown[]) => runGreenhousePostgresQueryMock(...args)
   }
 })
 
 vi.mock('@/lib/sync/publish-event', () => ({
-  publishOutboxEvent: (...args: unknown[]) => publishOutboxEventMock.apply(null, args)
+  publishOutboxEvent: (...args: unknown[]) => publishOutboxEventMock(...args)
 }))
 
 vi.mock('@/lib/hr-core/postgres-departments-store', () => ({

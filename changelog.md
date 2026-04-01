@@ -2,8 +2,8 @@
 
 ## 2026-04-01
 
-- **HR Departments responsable lookup**:
-  - el modal de `Nuevo departamento` vuelve a poblar `Responsable` desde un endpoint HR propio apoyado en `greenhouse_core.members`, sin depender del permiso del módulo `People`
+- **People + Notifications staging fallback**:
+  - `/people` ya no cae si el overlay `member_capacity_economics` no tiene permisos en staging, y el contador de notificaciones ahora degrada a `0` si `greenhouse_notifications` no es accesible
 
 - **Vitest tooling coverage**:
   - `pnpm test` ya descubre también tests unitarios versionados en `scripts/**`, cerrando el hueco que dejaba fuera el carril de tooling/CLI

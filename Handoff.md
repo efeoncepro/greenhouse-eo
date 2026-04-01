@@ -1,5 +1,26 @@
 # Handoff.md
 
+## Sesión 2026-04-01 — People y Notifications con fallback por grants rotos en staging
+
+### Objetivo
+
+- Restaurar la carga de `/people` y evitar que el shell siga degradándose cuando staging tenga permisos incompletos sobre tablas/schemas de PostgreSQL.
+
+### Delta de ejecución
+
+- Se verificó en logs del deployment activo que:
+  - `GET /api/people` fallaba por `permission denied for table member_capacity_economics`
+  - `GET /api/notifications/unread-count` fallaba por `permission denied for schema greenhouse_notifications`
+- `src/lib/people/get-people-list.ts` ahora mantiene el roster operativo aunque falle el overlay de `member_capacity_economics`; deja warning y conserva valores base.
+- `src/app/api/notifications/unread-count/route.ts` ahora devuelve `unreadCount: 0` cuando el store de notificaciones no es accesible por permisos, en vez de romper el shell con `500`.
+- Se agregaron tests para ambos fallbacks.
+
+### Validación
+
+- `pnpm exec vitest run src/lib/people/get-people-list.test.ts src/app/api/notifications/unread-count/route.test.ts` ✅
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint -- src/lib/people/get-people-list.ts src/lib/people/get-people-list.test.ts src/app/api/notifications/unread-count/route.ts src/app/api/notifications/unread-count/route.test.ts src/lib/hr-core/service.test.ts` ✅
+
 ## Sesión 2026-04-01 — HR Departments responsable lookup reparado
 
 ### Objetivo
