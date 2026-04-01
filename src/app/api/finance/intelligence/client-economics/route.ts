@@ -12,6 +12,7 @@ import {
   getClientEconomics,
   listClientEconomicsByPeriod
 } from '@/lib/finance/postgres-store-intelligence'
+import { getFinanceCurrentPeriod } from '@/lib/finance/reporting'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,8 +25,9 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url)
   const clientId = searchParams.get('clientId')
-  const year = Number(searchParams.get('year')) || new Date().getFullYear()
-  const month = Number(searchParams.get('month')) || new Date().getMonth() + 1
+  const currentPeriod = getFinanceCurrentPeriod()
+  const year = Number(searchParams.get('year')) || currentPeriod.year
+  const month = Number(searchParams.get('month')) || currentPeriod.month
 
   if (clientId) {
     const snapshot = await getClientEconomics(clientId, year, month)
@@ -55,8 +57,9 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json()
-    const year = toNumber(body.year) || new Date().getFullYear()
-    const month = toNumber(body.month) || new Date().getMonth() + 1
+    const postPeriod = getFinanceCurrentPeriod()
+    const year = toNumber(body.year) || postPeriod.year
+    const month = toNumber(body.month) || postPeriod.month
 
     if (month < 1 || month > 12) {
       throw new FinanceValidationError('month must be between 1 and 12')

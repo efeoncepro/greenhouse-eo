@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { listOperationalPlSnapshots } from '@/lib/cost-intelligence/compute-operational-pl'
+import { getFinanceCurrentPeriod } from '@/lib/finance/reporting'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,8 +14,9 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url)
-  const year = Number(searchParams.get('year')) || new Date().getFullYear()
-  const month = Number(searchParams.get('month')) || new Date().getMonth() + 1
+  const currentPeriod = getFinanceCurrentPeriod()
+  const year = Number(searchParams.get('year')) || currentPeriod.year
+  const month = Number(searchParams.get('month')) || currentPeriod.month
   const scope = searchParams.get('scope') as 'client' | 'space' | 'organization' | undefined
 
   try {
