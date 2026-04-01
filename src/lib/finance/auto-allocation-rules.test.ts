@@ -32,7 +32,7 @@ describe('resolveAutoAllocation', () => {
       allocations: [
         {
           clientId: 'client-sky',
-          allocationPercent: 100,
+          allocationPercent: 1,
           allocatedAmountClp: 100000,
           method: 'fte_weighted'
         }
