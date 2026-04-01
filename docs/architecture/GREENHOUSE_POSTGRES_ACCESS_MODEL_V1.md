@@ -1,5 +1,18 @@
 # Greenhouse PostgreSQL Access Model V1
 
+## Delta 2026-04-01 — Ownership consolidation to greenhouse_ops
+
+- **Problema resuelto:** 5 owners distintos (`greenhouse_migrator` 41, `greenhouse_migrator_user` 39, `postgres` 32, `greenhouse_app` 9, `greenhouse_ops` 1) sobre 122 tablas, causando fallos en `pg_dump` y errores de permisos.
+- **Acción:** migración `20260401084334779_consolidate-ownership-to-greenhouse-ops.sql` ejecutada — **122/122 tablas, 11/11 schemas, 7 sequences, 17 views** ahora owned by `greenhouse_ops`.
+- **Password:** almacenada en Secret Manager como `greenhouse-pg-dev-ops-password`.
+- **Default privileges:** configurados para que objetos creados por `greenhouse_ops` otorguen automáticamente DML a `greenhouse_runtime` y ALL a `greenhouse_migrator`.
+- **Regla vigente actualizada:**
+  - `greenhouse_ops` es ahora el **canonical owner** de todos los objetos de la base de datos
+  - El runtime (`greenhouse_app`) sigue usando solo DML via `greenhouse_runtime` grants
+  - Migraciones corren como `greenhouse_migrator_user` para DDL cotidiano
+  - Para operaciones de ownership o `pg_dump`, usar `greenhouse_ops` (profile admin o break-glass)
+  - Schema snapshot baseline regenerado: `docs/architecture/schema-snapshot-baseline.sql` (8636 líneas)
+
 ## Delta 2026-03-31 — break-glass ops login for ownership repair
 
 - Se confirmó operativamente un carril adicional de soporte:
