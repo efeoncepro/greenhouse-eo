@@ -37,4 +37,19 @@ describe('load-greenhouse-tool-env postgres profiles', () => {
     expect(process.env.GREENHOUSE_POSTGRES_PASSWORD).toBeUndefined()
     expect(process.env.GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF).toBe('pg-migrator-password')
   })
+
+  it('supports the ops profile for break-glass ownership operations', () => {
+    vi.stubEnv('GREENHOUSE_POSTGRES_DATABASE', 'greenhouse_app')
+    vi.stubEnv('GREENHOUSE_POSTGRES_HOST', '127.0.0.1')
+    vi.stubEnv('GREENHOUSE_POSTGRES_OPS_USER', 'greenhouse_ops')
+    vi.stubEnv('GREENHOUSE_POSTGRES_OPS_PASSWORD', '')
+    vi.stubEnv('GREENHOUSE_POSTGRES_OPS_PASSWORD_SECRET_REF', 'greenhouse-pg-dev-ops-password')
+
+    const applied = applyGreenhousePostgresProfile('ops')
+
+    expect(applied.profile).toBe('ops')
+    expect(process.env.GREENHOUSE_POSTGRES_USER).toBe('greenhouse_ops')
+    expect(process.env.GREENHOUSE_POSTGRES_PASSWORD).toBeUndefined()
+    expect(process.env.GREENHOUSE_POSTGRES_PASSWORD_SECRET_REF).toBe('greenhouse-pg-dev-ops-password')
+  })
 })

@@ -17,14 +17,14 @@
 
 import { execSync } from 'node:child_process'
 
-import { loadGreenhouseToolEnv, applyGreenhousePostgresProfile } from './lib/load-greenhouse-tool-env'
+import { loadGreenhouseToolEnv, applyGreenhousePostgresProfile, type PostgresProfile } from './lib/load-greenhouse-tool-env'
 
 const OUT_FILE = 'src/types/db.d.ts'
 
 const main = () => {
   loadGreenhouseToolEnv()
 
-  const profile = (process.env.DB_TYPES_PROFILE as 'runtime' | 'migrator' | 'admin') || 'runtime'
+  const profile = (process.env.DB_TYPES_PROFILE as PostgresProfile) || 'runtime'
 
   console.log(`[db:generate-types] Using profile: ${profile}`)
   applyGreenhousePostgresProfile(profile)

@@ -6,11 +6,11 @@ const parseProfile = (): PostgresProfile => {
   const profileArg = process.argv.find(argument => argument.startsWith('--profile='))
   const value = profileArg?.slice('--profile='.length).trim() || 'runtime'
 
-  if (value === 'runtime' || value === 'migrator' || value === 'admin') {
+  if (value === 'runtime' || value === 'migrator' || value === 'admin' || value === 'ops') {
     return value
   }
 
-  throw new Error(`Unsupported Postgres profile "${value}". Use runtime, migrator or admin.`)
+  throw new Error(`Unsupported Postgres profile "${value}". Use runtime, migrator, admin or ops.`)
 }
 
 const main = async () => {

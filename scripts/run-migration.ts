@@ -5,7 +5,7 @@
 import { readFileSync } from 'node:fs'
 import process from 'node:process'
 
-import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from './lib/load-greenhouse-tool-env'
+import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv, type PostgresProfile } from './lib/load-greenhouse-tool-env'
 
 const stripLeadingSqlComments = (sql: string) => {
   let out = sql
@@ -160,7 +160,7 @@ const splitSqlStatements = (sql: string) => {
 const main = async () => {
   const sqlFile = process.argv[2]
   const profileArg = process.argv.find(arg => arg.startsWith('--profile='))
-  const profile = profileArg?.split('=')[1] ?? 'migrator'
+  const profile = (profileArg?.split('=')[1] as PostgresProfile | undefined) ?? 'migrator'
 
   if (!sqlFile) {
     console.error('Usage: npx tsx scripts/run-migration.ts <path-to-sql-file>')
@@ -170,7 +170,7 @@ const main = async () => {
   console.log(`=== Running migration: ${sqlFile} ===\n`)
 
   loadGreenhouseToolEnv()
-  applyGreenhousePostgresProfile(profile as 'runtime' | 'migrator' | 'admin')
+  applyGreenhousePostgresProfile(profile)
 
   const { closeGreenhousePostgres, runGreenhousePostgresQuery } = await import('@/lib/postgres/client')
 

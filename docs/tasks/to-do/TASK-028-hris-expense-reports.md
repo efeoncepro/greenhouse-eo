@@ -1,5 +1,17 @@
 # CODEX TASK — HRIS Fase 2A: Expense Reports (Gastos y Reembolsos)
 
+## Delta 2026-04-01
+
+- `TASK-026` ya quedó cerrada y esta lane debe consumir el contrato canónico desde `greenhouse_core.members`, no desde snapshots de payroll ni heurísticas de `employment_type`.
+- Reglas vigentes para elegibilidad y policy:
+  - usar `members.contract_type` como fuente de verdad
+  - usar `members.payroll_via` para distinguir gastos internos vs. colaboradores gestionados por Deel
+  - no inferir elegibilidad desde `compensation_versions.contract_type`; ese campo ahora es snapshot histórico
+- Lectura operativa inicial para este módulo:
+  - `indefinido` y `plazo_fijo` con `payroll_via = 'internal'` mantienen acceso full a reembolsos
+  - `honorarios`, `contractor` y `eor` quedan fuera del flujo MVP de reembolso interno salvo decisión explícita de producto
+  - `daily_required` sigue siendo el backing field canónico si alguna policy futura de gastos depende de presencialidad/schedule; `schedule_required` debe tratarse solo como alias de lectura
+
 ## Delta 2026-03-31
 
 - La foundation compartida de adjuntos, receipts y gobernanza GCP se separa a `TASK-173`.
@@ -69,7 +81,7 @@ Implementar el **módulo de gastos y reembolsos** del HRIS en Greenhouse. Permit
 
 | Dependencia                           | Estado       | Impacto si no está                          |
 | ------------------------------------- | ------------ | ------------------------------------------- |
-| Fase 0.5 (contract types)             | Prerequisito | Elegibilidad por `contract_type`            |
+| Fase 0.5 (contract types)             | Cerrada      | Ya existe canon en `greenhouse_core.members` para elegibilidad por `contract_type` y `payroll_via` |
 | `TASK-173` shared attachments         | Prerequisito | Reutiliza registry, uploader y download model privados    |
 | `greenhouse_hr` schema                | Existe       | Tablas van aquí                             |
 | `greenhouse_finance.expenses` table   | Existe       | Link de reembolso crea registro aquí        |
@@ -217,7 +229,7 @@ const pendingCount = pendingLeaveRequests + pendingExpenseReports
 
 ## PARTE D: Elegibilidad
 
-Solo colaboradores con `contract_type IN ('indefinido', 'plazo_fijo')` ven `/my/expenses`. Honorarios y contractors gestionan sus gastos por fuera (vía Deel o por su cuenta). EOR podría tener acceso en el futuro, pero no en MVP.
+Solo colaboradores con `members.contract_type IN ('indefinido', 'plazo_fijo')` y `members.payroll_via = 'internal'` ven `/my/expenses`. `honorarios`, `contractor` y `eor` gestionan sus gastos por fuera (vía Deel o por su cuenta). EOR podría tener acceso en el futuro, pero no en MVP.
 
 ```typescript
 function canAccessExpenses(member: Member): boolean {
