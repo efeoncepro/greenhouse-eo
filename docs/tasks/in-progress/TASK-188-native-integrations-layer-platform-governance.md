@@ -1,12 +1,23 @@
 # TASK-188 - Native Integrations Layer: Platform Governance, Runtime Contracts & Shared Operating Model
 
+## Delta 2026-04-01
+
+- Migration `integration-registry` created: `greenhouse_sync.integration_registry` table with taxonomy, ownership, readiness, consumer domains
+- Seeded 4 native integrations: Notion, HubSpot, Nubox, Frame.io
+- Shared types: `src/types/integrations.ts` (IntegrationType, IntegrationReadiness, IntegrationHealth, IntegrationRegistryEntry, IntegrationHealthSnapshot, IntegrationWithHealth)
+- Registry + health helpers: `src/lib/integrations/registry.ts`, `src/lib/integrations/health.ts`
+- API routes: `GET /api/admin/integrations` (list + health), `GET /api/admin/integrations/[key]/health` (detail)
+- Admin governance page: `/admin/integrations` with registry table, health/freshness, consumer domain map
+- Admin Center card added for Integration Governance
+- Architecture docs updated: GREENHOUSE_ARCHITECTURE_V1, SOURCE_SYNC_PIPELINES, DATA_MODEL_MASTER
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Diseño`
+- Status real: `Implementacion`
 - Rank: `4`
 - Domain: `platform`
 

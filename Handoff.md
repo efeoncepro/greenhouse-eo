@@ -1,5 +1,128 @@
 # Handoff.md
 
+## Sesión 2026-04-01 — TASK-188 Native Integrations Layer
+
+### Objetivo
+
+- Institucionalizar la `Native Integrations Layer` como capability de plataforma con registro central, taxonomía, health y governance surface.
+
+### Delta de ejecución
+
+- Migration `integration-registry`: tabla `greenhouse_sync.integration_registry` con taxonomía, ownership, readiness, consumer domains, auth mode, sync cadence
+- Seed de 4 integraciones nativas: Notion (hybrid), HubSpot (system_upstream), Nubox (api_connector), Frame.io (event_provider)
+- Shared types: `src/types/integrations.ts`
+- Helpers: `src/lib/integrations/registry.ts` (Kysely), `src/lib/integrations/health.ts` (aggregation from sync_runs + source signals)
+- API: `GET /api/admin/integrations`, `GET /api/admin/integrations/[key]/health`
+- Admin governance page: `/admin/integrations` — registry table, health/freshness bars, consumer domain map
+- Admin Center card added linking to governance page
+- Cloud & Integrations view links to governance page
+- Architecture docs updated: GREENHOUSE_ARCHITECTURE_V1, SOURCE_SYNC_PIPELINES, DATA_MODEL_MASTER
+
+### Validación
+
+- Pendiente: `pnpm build`, `pnpm lint`
+- Pendiente: `pnpm migrate:up` (requiere Cloud SQL Proxy)
+
+### Riesgos / próximos pasos
+
+- Migration requiere `pnpm migrate:up` + `pnpm db:generate-types` para que Kysely tenga los types de `integration_registry`
+- Follow-up: `TASK-187` formaliza Notion como primer consumer fuerte del registry
+- Follow-up: contract registry (OpenAPI/AsyncAPI) y readiness automática son fases posteriores
+- Follow-up: integration inventory en el v1 integration API para acceso externo
+
+## Sesión 2026-04-01 — Implementación MVP para TASK-189 + TASK-186
+
+### Objetivo
+
+- Implementar el tramo MVP de trust de métricas Delivery sin romper `ICO`, payroll ni serving runtime.
+- Aclaración posterior: el trabajo ejecutado en `TASK-186` durante este tramo corresponde a un sub-slice técnico de soporte y no al foco principal de la lane.
+
+### Delta de ejecución
+
+- `TASK-189`:
+  - `buildPeriodFilterSQL()` quedó anclado en `due_date` con fallback a `created_at` / `synced_at`
+  - `carry-over` quedó modelado relativo al período consultado/materializado
+  - `buildMetricSelectSQL()` ahora expone `carry_over_count`
+  - `v_tasks_enriched` ahora expone `period_anchor_date`
+  - las materializaciones BigQuery principales se extendieron de forma aditiva para persistir `carry_over_count`
+- `TASK-186`:
+  - `readMemberMetrics()` ya reconstruye `CSC distribution` en el path materializado por miembro
+  - el contrato `IcoMetricSnapshot` / `SpaceMetricSnapshot` ahora expone contexto aditivo del scorecard: `onTimeTasks`, `lateDropTasks`, `overdueTasks`, `carryOverTasks`
+  - `PersonActivityTab` ahora muestra chip de `carry-over` y banner informativo cuando el período tiene carga pero aún no tiene cierres
+  - `buildMetricSelectSQL()` y las materializaciones BigQuery del engine ahora persisten buckets canónicos aditivos (`on_time_count`, `late_drop_count`, `overdue_count`) sin redefinir `otd_pct` ni `ftr_pct`
+  - se cerró la semántica actual del engine:
+    - `on_time` / `late_drop` prefieren `performance_indicator_code` y caen a derivación por fechas cuando no existe
+    - `overdue` / `carry-over` permanecen período-relativos dentro de `ICO`
+    - `FTR` ya no se trata como una sola columna: usa `rpa_value <= 1` cuando existe, o fallback a rounds cliente/workflow en cero cuando no existe
+    - `FTR` además exige cierre limpio: sin `client_review_open`, sin `workflow_review_open` y sin `open_frame_comments`
+  - se agregó `src/lib/ico-engine/performance-report.ts` como read-model mensual reusable del `Performance Report`
+  - `GET /api/ico-engine/metrics/agency` ahora devuelve `report` de forma aditiva
+  - `AgencyIcoEngineView` ya muestra:
+    - comparativo `On-Time %` vs mes anterior
+    - `Late Drops`, `Overdue`, `Carry-Over`
+    - `Top Performer` MVP
+  - supuestos MVP actuales del ranking:
+    - elegibilidad `throughput_count >= 5`
+    - ranking por `OTD` del período
+    - desempate por `throughput_count DESC`, luego `rpa_avg ASC`
+    - multi-assignee usa el modelo actual de `metrics_by_member`
+  - `Space 360 > ICO` ya muestra esos buckets como contexto visible del snapshot para auditoría operativa
+  - `scripts/materialize-member-metrics.ts` dejó de duplicar SQL y pasó a usar `materializeMonthlySnapshots()` como wrapper canónico
+  - este tramo debe leerse como un hardening técnico de contrato/runtime y buckets del scorecard, no como cierre del problema principal de `TASK-186`
+- Documentación actualizada:
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+  - `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
+  - `docs/tasks/README.md`
+  - `changelog.md`
+
+### Validación
+
+- `pnpm lint` ✅
+- `pnpm build` quedó colgado después de `Compiled successfully` / `Running TypeScript`; no devolvió error explícito
+- `pnpm exec tsc --noEmit --pretty false` también quedó colgado sin emitir errores
+- No se crearon `new Pool()` nuevos fuera de `src/lib/postgres/client.ts`
+- No hubo migraciones PostgreSQL nuevas en este slice; el cambio fue aditivo sobre DDL BigQuery del `ICO Engine`
+
+### Riesgos / próximos pasos
+
+- `greenhouse_serving.ico_member_metrics` aún no replica `carry_over_count`; por ahora el nuevo contexto vive en BigQuery/live/materialized-read path, no en serving Postgres.
+- Falta decidir si el siguiente slice baja `carry_over_count` también a serving/Postgres o si se mantiene solo como contexto de `ICO`.
+- El scope más amplio de `TASK-186` sigue abierto: paridad completa del `Performance Report`, revisión de FTR drift y matriz completa `propiedad -> contrato -> prioridad`.
+- Prioridad correcta de `TASK-186` para los siguientes slices:
+  - unificar `FTR`
+  - materializar snapshot mensual y comparativo vs mes anterior
+  - formalizar `Top Performer` y el serving del `Performance Report`
+
+## Sesión 2026-04-01 — TASK-189 y TASK-186 activadas para MVP de trust de métricas
+
+### Objetivo
+
+- Iniciar formalmente la ejecución de `TASK-189` y `TASK-186` bajo el orden `MVP` definido, corrigiendo primero los supuestos rotos antes de implementar.
+
+### Delta de ejecución
+
+- `TASK-189` y `TASK-186` se movieron de `to-do/` a `in-progress/`.
+- Se actualizó `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` para reflejar el lifecycle activo.
+- La auditoría confirmó dos correcciones clave de spec:
+  - `TASK-189`: `carry-over` no puede definirse contra `CURRENT_DATE()`; debe ser relativo al período consultado/materializado.
+  - `TASK-186`: la lane no es solo `Notion -> conformed`; hoy ya existe una cadena runtime activa `Notion -> conformed -> ICO -> serving Postgres -> payroll / person intelligence`.
+- Quedó explícito en ambas tasks que:
+  - `ICO` sigue siendo consumer protegido
+  - el MVP debe ser incremental y compatible con payroll/serving
+  - cualquier divergencia con `scripts/materialize-member-metrics.ts` debe alinearse o deprecarse
+
+### Validación
+
+- Descubrimiento y auditoría manual de:
+  - `src/lib/ico-engine/shared.ts`
+  - `src/lib/ico-engine/read-metrics.ts`
+  - `src/lib/ico-engine/materialize.ts`
+  - `src/lib/sync/sync-notion-conformed.ts`
+  - `src/lib/sync/projections/ico-member-metrics.ts`
+  - `src/lib/payroll/fetch-kpis-for-period.ts`
+  - `docs/architecture/schema-snapshot-baseline.sql`
+- No se ejecutaron `build/lint/test` todavía porque este tramo fue de discovery + corrección de spec previa a implementación.
+
 ## Sesión 2026-04-01 — Guardrail explícito para no romper ICO
 
 ### Objetivo

@@ -209,6 +209,25 @@ const buildDomainCards = ({ access, tenants, operations }: Pick<Props, 'access' 
     ]
   },
   {
+    id: 'integration-governance',
+    title: 'Integration Governance',
+    subtitle: GH_INTERNAL_NAV.adminIntegrationGovernance.subtitle,
+    icon: 'tabler-topology-ring-3',
+    avatarColor: 'info',
+    status: {
+      label: `${operations.kpis.activeSyncs} activas`,
+      color: 'success'
+    },
+    href: '/admin/integrations',
+    primaryAction: 'Abrir governance',
+    routes: ['/admin/integrations'],
+    points: [
+      'Taxonomia y ownership de integraciones nativas',
+      'Readiness downstream por integracion',
+      'Health y freshness unificados'
+    ]
+  },
+  {
     id: 'ops-health',
     title: 'Ops Health',
     subtitle: GH_INTERNAL_NAV.adminOpsHealth.subtitle,

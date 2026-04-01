@@ -2102,6 +2102,7 @@ export interface GreenhouseServingCommercialCostAttribution {
 
 export interface GreenhouseServingIcoMemberMetrics {
   active_tasks: number | null;
+  carry_over_count: number | null;
   completed_tasks: number | null;
   cycle_time_avg_days: Numeric | null;
   ftr_pct: Numeric | null;
@@ -2763,6 +2764,25 @@ export interface GreenhouseSyncIdentityReconciliationProposals {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseSyncIntegrationRegistry {
+  active: Generated<boolean>;
+  auth_mode: string | null;
+  consumer_domains: Generated<string[]>;
+  contract_version: string | null;
+  created_at: Generated<Timestamp>;
+  description: string | null;
+  display_name: string;
+  environment: Generated<string>;
+  integration_key: string;
+  integration_type: string;
+  metadata: Generated<Json>;
+  owner: string | null;
+  readiness_status: Generated<string>;
+  source_system: string;
+  sync_cadence: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseSyncOutboxEvents {
   aggregate_id: string;
   aggregate_type: string;
@@ -3064,6 +3084,7 @@ export interface DB {
   "greenhouse_serving.staff_aug_placement_snapshots": GreenhouseServingStaffAugPlacementSnapshots;
   "greenhouse_serving.user_360": GreenhouseServingUser360;
   "greenhouse_sync.identity_reconciliation_proposals": GreenhouseSyncIdentityReconciliationProposals;
+  "greenhouse_sync.integration_registry": GreenhouseSyncIntegrationRegistry;
   "greenhouse_sync.outbox_events": GreenhouseSyncOutboxEvents;
   "greenhouse_sync.outbox_reactive_log": GreenhouseSyncOutboxReactiveLog;
   "greenhouse_sync.projection_refresh_queue": GreenhouseSyncProjectionRefreshQueue;

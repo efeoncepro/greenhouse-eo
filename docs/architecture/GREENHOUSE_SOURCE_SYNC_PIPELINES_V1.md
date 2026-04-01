@@ -268,6 +268,11 @@ Recommended business fields for tasks:
 - `is_deleted`
 - `sync_run_id`
 
+Delta 2026-04-01:
+- `due_date` quedó ratificado como ancla operativa principal del período para `ICO` / `Performance Report`.
+- `completed_at` sigue siendo señal de cierre y calidad, pero ya no debe usarse como único criterio de pertenencia mensual.
+- El sync no necesita recalcular métricas; su responsabilidad sigue siendo preservar primitivas suficientes para que `ICO` derive período, carry-over y scorecards de forma auditable.
+
 Multi-assignee enrichment:
 - `responsables_ids` (Notion array) is mapped through `team_members.notion_user_id` → `member_id`
 - `assignee_member_id` keeps first assignee for backward compatibility
@@ -422,6 +427,7 @@ Recommended tables under `greenhouse_sync`:
 - `source_sync_runs`
 - `source_sync_watermarks`
 - `source_sync_failures`
+- `integration_registry` — central registry of native integrations with taxonomy, ownership, readiness status, consumer domains and sync cadence. Introduced by `TASK-188` as Layer 1 of the Native Integrations Layer (`GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md`).
 
 ### `source_sync_runs`
 

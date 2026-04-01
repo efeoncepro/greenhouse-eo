@@ -192,6 +192,9 @@ const AdminCloudIntegrationsView = ({ data }: Props) => {
               <Button component={Link} href='/agency/operations' variant='contained'>
                 Abrir operaciones extendidas
               </Button>
+              <Button component={Link} href='/admin/integrations' variant='outlined'>
+                Integration Governance
+              </Button>
               <Button component={Link} href='/admin' variant='outlined'>
                 Volver a Admin Center
               </Button>

@@ -258,9 +258,11 @@ Current objects:
 - `source_sync_runs`
 - `source_sync_watermarks`
 - `source_sync_failures`
+- `integration_registry` — central registry of native integrations (`TASK-188`). Stores taxonomy (`system_upstream`, `event_provider`, `batch_file`, `api_connector`, `hybrid`), ownership, readiness status, consumer domains, auth mode and sync cadence per upstream.
 
 Rule:
 - every cross-system sync must register control-plane state here
+- every native integration must be registered in `integration_registry` with explicit taxonomy, ownership and readiness
 
 ### `greenhouse_serving`
 

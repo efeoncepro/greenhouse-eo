@@ -587,6 +587,8 @@ Rule:
 - do not keep adding one-off webhook routes as permanent integration strategy
 - new webhook or callback work should align with the shared webhook architecture and the existing outbox model
 
+The **Native Integrations Layer** (`TASK-188`) institutionalizes integration governance as a platform capability. The central registry lives in `greenhouse_sync.integration_registry` and tracks taxonomy, ownership, readiness, health and consumer domains for each upstream (Notion, HubSpot, Nubox, Frame.io). Architecture details in `GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md`. Admin surface at `/admin/integrations`.
+
 ### Admin & Governance
 
 Routes: `/admin/tenants`, `/admin/tenants/[id]`, `/admin/tenants/[id]/capability-preview/[moduleId]`, `/admin/tenants/[id]/view-as/dashboard`, `/admin/users`, `/admin/users/[id]`, `/admin/roles`, `/admin/ai-tools`, `/admin/team`

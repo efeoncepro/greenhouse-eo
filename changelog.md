@@ -2,6 +2,31 @@
 
 ## 2026-04-01
 
+- **TASK-188: Native Integrations Layer — Platform Governance**:
+  - nueva tabla `greenhouse_sync.integration_registry` como Layer 1 del registry central de integraciones nativas
+  - seeded con 4 integraciones: Notion (hybrid), HubSpot (system_upstream), Nubox (api_connector), Frame.io (event_provider)
+  - taxonomia formal: `system_upstream`, `event_provider`, `batch_file`, `api_connector`, `hybrid`
+  - shared types en `src/types/integrations.ts` para registry, health y readiness
+  - helpers Kysely en `src/lib/integrations/registry.ts` y health aggregation en `src/lib/integrations/health.ts`
+  - API admin: `GET /api/admin/integrations`, `GET /api/admin/integrations/[key]/health`
+  - admin governance page en `/admin/integrations` con registry table, health/freshness bars y consumer domain map
+  - architecture docs actualizados: GREENHOUSE_ARCHITECTURE_V1, SOURCE_SYNC_PIPELINES, DATA_MODEL_MASTER
+
+## 2026-04-01
+
+- **ICO period hardening + Delivery metrics trust MVP**:
+  - `ICO` ahora ancla el período operativo en `due_date` con fallback a `created_at` / `synced_at`, dejando atrás el criterio exclusivo por `completed_at`
+  - se agregó `carry_over_count` al contrato canónico del engine y a las materializaciones BigQuery principales (`metric_snapshots_monthly`, `metrics_by_member`, `metrics_by_project`, `metrics_by_sprint`, `metrics_by_organization`, `metrics_by_business_unit`)
+  - el engine ahora también materializa buckets canónicos aditivos (`on_time_count`, `late_drop_count`, `overdue_count`) y los expone como contexto de snapshot sin redefinir los KPIs existentes
+  - se cerró la semántica canónica actual: `on_time` / `late_drop` prefieren `performance_indicator_code` con fallback por fechas; `overdue` / `carry-over` siguen siendo período-relativos; `FTR` ahora usa una señal compuesta sobre `RpA`, rounds cliente/workflow y cierre real de revisión/comentarios
+  - `readMemberMetrics()` ya no pierde `CSC distribution` en el path materializado y el `PersonActivityTab` ahora muestra `carry-over` + banner cuando aún no hay cierres en el período
+  - `Space 360 > ICO` ahora deja visibles esos buckets para auditoría operativa del snapshot
+  - Agency `ICO Engine` ahora muestra un `Performance Report` mensual MVP con comparativo vs mes anterior y `Top Performer` sobre el engine materializado
+  - `scripts/materialize-member-metrics.ts` quedó alineado como wrapper del motor canónico para evitar deriva semántica
+  - arquitectura viva actualizada en `Greenhouse_ICO_Engine_v1.md` y `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
+
+## 2026-04-01
+
 - **Native Integrations Layer architecture**:
   - se agregó `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md` como fuente canónica para la capability shared de integraciones enterprise; `TASK-188` queda como lane operativa y `Notion` como primera implementación fuerte del modelo
 
