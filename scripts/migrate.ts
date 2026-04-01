@@ -31,7 +31,16 @@ const buildDatabaseUrl = () => {
   const database = process.env.GREENHOUSE_POSTGRES_DATABASE?.trim()
   const user = process.env.GREENHOUSE_POSTGRES_USER?.trim()
   const password = process.env.GREENHOUSE_POSTGRES_PASSWORD?.trim()
-  const ssl = process.env.GREENHOUSE_POSTGRES_SSL?.trim()?.toLowerCase() === 'true'
+  const isLocalProxy = host === '127.0.0.1' || host === 'localhost'
+  const sslEnv = process.env.GREENHOUSE_POSTGRES_SSL?.trim()?.toLowerCase() === 'true'
+
+  // Cloud SQL Proxy handles encryption — SSL on top of the tunnel causes a handshake deadlock.
+  // Auto-disable SSL when connecting through the local proxy, regardless of env var.
+  const ssl = sslEnv && !isLocalProxy
+
+  if (isLocalProxy && sslEnv) {
+    console.log('[migrate] Auto-disabled SSL for local proxy connection (127.0.0.1/localhost)')
+  }
 
   if (!host || !database || !user || !password) {
     const missing = [
