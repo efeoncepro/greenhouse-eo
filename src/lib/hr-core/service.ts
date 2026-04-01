@@ -12,6 +12,7 @@ import type {
   HrDepartmentsResponse,
   HrLeaveBalance,
   HrLeaveBalancesResponse,
+  HrMemberOption,
   HrLeaveRequest,
   HrLeaveRequestsResponse,
   HrLeaveType,
@@ -39,6 +40,7 @@ import {
   createDepartmentInPostgres,
   getDepartmentByIdFromPostgres,
   getMemberDepartmentContextFromPostgres,
+  listDepartmentHeadOptionsFromPostgres,
   listDepartmentsFromPostgres,
   updateDepartmentInPostgres,
   updateMemberDepartmentContextInPostgres
@@ -814,6 +816,10 @@ export const listDepartments = async (): Promise<HrDepartmentsResponse> => {
       active: departments.filter(department => department.active).length
     }
   }
+}
+
+export const listDepartmentHeadOptions = async (): Promise<HrMemberOption[]> => {
+  return listDepartmentHeadOptionsFromPostgres()
 }
 
 export const getDepartmentById = async (departmentId: string) => {

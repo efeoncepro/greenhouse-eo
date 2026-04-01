@@ -6,6 +6,9 @@ const {
   createDepartmentInPostgresMock,
   getDepartmentByIdFromPostgresMock,
   getMemberDepartmentContextFromPostgresMock,
+  listDepartmentHeadOptionsFromPostgresMock,
+  publishOutboxEventMock,
+  runGreenhousePostgresQueryMock,
   updateMemberDepartmentContextInPostgresMock
 } = vi.hoisted(() => {
   process.env.NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET || 'test-secret'
@@ -16,6 +19,9 @@ const {
     createDepartmentInPostgresMock: vi.fn(),
     getDepartmentByIdFromPostgresMock: vi.fn(),
     getMemberDepartmentContextFromPostgresMock: vi.fn(),
+    listDepartmentHeadOptionsFromPostgresMock: vi.fn(),
+    publishOutboxEventMock: vi.fn(async (..._args: unknown[]) => 'outbox-test'),
+    runGreenhousePostgresQueryMock: vi.fn(async (..._args: unknown[]) => []),
     updateMemberDepartmentContextInPostgresMock: vi.fn()
   }
 })
@@ -43,16 +49,30 @@ vi.mock('@/lib/people/shared', () => ({
   getPeopleTableColumns: vi.fn(async () => new Set(['reports_to']))
 }))
 
+vi.mock('@/lib/postgres/client', async () => {
+  const actual = await vi.importActual('@/lib/postgres/client')
+
+  return {
+    ...actual,
+    runGreenhousePostgresQuery: (...args: unknown[]) => runGreenhousePostgresQueryMock.apply(null, args)
+  }
+})
+
+vi.mock('@/lib/sync/publish-event', () => ({
+  publishOutboxEvent: (...args: unknown[]) => publishOutboxEventMock.apply(null, args)
+}))
+
 vi.mock('@/lib/hr-core/postgres-departments-store', () => ({
   createDepartmentInPostgres: (...args: unknown[]) => createDepartmentInPostgresMock(...args),
   getDepartmentByIdFromPostgres: (...args: unknown[]) => getDepartmentByIdFromPostgresMock(...args),
   getMemberDepartmentContextFromPostgres: (...args: unknown[]) => getMemberDepartmentContextFromPostgresMock(...args),
+  listDepartmentHeadOptionsFromPostgres: (...args: unknown[]) => listDepartmentHeadOptionsFromPostgresMock(...args),
   listDepartmentsFromPostgres: vi.fn(),
   updateDepartmentInPostgres: vi.fn(),
   updateMemberDepartmentContextInPostgres: (...args: unknown[]) => updateMemberDepartmentContextInPostgresMock(...args)
 }))
 
-import { createDepartment, isHrLeavePostgresFallbackError, updateMemberHrProfile } from '@/lib/hr-core/service'
+import { createDepartment, isHrLeavePostgresFallbackError, listDepartmentHeadOptions, updateMemberHrProfile } from '@/lib/hr-core/service'
 
 describe('updateMemberHrProfile', () => {
   beforeEach(() => {
@@ -60,6 +80,8 @@ describe('updateMemberHrProfile', () => {
     assertHrCoreInfrastructureReadyMock.mockClear()
     getDepartmentByIdFromPostgresMock.mockReset()
     getMemberDepartmentContextFromPostgresMock.mockReset()
+    publishOutboxEventMock.mockClear()
+    runGreenhousePostgresQueryMock.mockClear()
     updateMemberDepartmentContextInPostgresMock.mockReset()
   })
 
@@ -175,6 +197,33 @@ describe('createDepartment', () => {
       active: true,
       sortOrder: 1
     })
+  })
+})
+
+describe('listDepartmentHeadOptions', () => {
+  beforeEach(() => {
+    listDepartmentHeadOptionsFromPostgresMock.mockReset()
+  })
+
+  it('delegates department head options to the Postgres store', async () => {
+    listDepartmentHeadOptionsFromPostgresMock.mockResolvedValue([
+      {
+        memberId: 'member-1',
+        displayName: 'Daniela Ferreira',
+        roleTitle: 'Creative Lead'
+      }
+    ])
+
+    const members = await listDepartmentHeadOptions()
+
+    expect(members).toEqual([
+      {
+        memberId: 'member-1',
+        displayName: 'Daniela Ferreira',
+        roleTitle: 'Creative Lead'
+      }
+    ])
+    expect(listDepartmentHeadOptionsFromPostgresMock).toHaveBeenCalledTimes(1)
   })
 })
 

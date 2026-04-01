@@ -205,7 +205,7 @@ export interface HrDepartmentsResponse {
 export interface HrMemberOption {
   memberId: string
   displayName: string
-  roleTitle: string
+  roleTitle: string | null
 }
 
 export interface HrMemberOptionsResponse {

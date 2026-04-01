@@ -2,7 +2,7 @@ import 'server-only'
 
 import type { PoolClient } from 'pg'
 
-import type { CreateDepartmentInput, HrDepartment, UpdateDepartmentInput } from '@/types/hr-core'
+import type { CreateDepartmentInput, HrDepartment, HrMemberOption, UpdateDepartmentInput } from '@/types/hr-core'
 
 import { query, withTransaction } from '@/lib/db'
 import { isGreenhousePostgresConfigured } from '@/lib/postgres/client'
@@ -24,6 +24,12 @@ type MemberDepartmentContextRow = {
   member_id: string
   department_id: string | null
   department_name: string | null
+}
+
+type DepartmentHeadOptionRow = {
+  member_id: string
+  display_name: string | null
+  role_title: string | null
 }
 
 const HR_DEPARTMENTS_POSTGRES_REQUIRED_TABLES = [
@@ -201,6 +207,28 @@ export const listDepartmentsFromPostgres = async ({ activeOnly = false }: { acti
   )
 
   return rows.map(mapDepartment)
+}
+
+export const listDepartmentHeadOptionsFromPostgres = async (): Promise<HrMemberOption[]> => {
+  await assertHrDepartmentsPostgresReady()
+
+  const rows = await query<DepartmentHeadOptionRow>(
+    `
+      SELECT
+        m.member_id,
+        m.display_name,
+        m.role_title
+      FROM greenhouse_core.members AS m
+      WHERE m.active = TRUE
+      ORDER BY m.display_name ASC NULLS LAST, m.member_id ASC
+    `
+  )
+
+  return rows.map(row => ({
+    memberId: row.member_id,
+    displayName: normalizeNullableString(row.display_name) || row.member_id,
+    roleTitle: normalizeNullableString(row.role_title)
+  }))
 }
 
 export const getDepartmentByIdFromPostgres = async (departmentId: string, client?: PoolClient) => {

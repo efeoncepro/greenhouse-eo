@@ -70,6 +70,29 @@ describe('postgres-departments-store', () => {
     ])
   })
 
+  it('lists active member options for department heads from Postgres', async () => {
+    mockQuery
+      .mockResolvedValueOnce(REQUIRED_TABLES)
+      .mockResolvedValueOnce([
+        {
+          member_id: 'member-1',
+          display_name: 'Daniela Ferreira',
+          role_title: 'Creative Lead'
+        }
+      ])
+
+    const { listDepartmentHeadOptionsFromPostgres } = await loadStore()
+    const members = await listDepartmentHeadOptionsFromPostgres()
+
+    expect(members).toEqual([
+      {
+        memberId: 'member-1',
+        displayName: 'Daniela Ferreira',
+        roleTitle: 'Creative Lead'
+      }
+    ])
+  })
+
   it('creates a department in Postgres and reloads it inside the same transaction', async () => {
     mockQuery.mockResolvedValueOnce(REQUIRED_TABLES)
 

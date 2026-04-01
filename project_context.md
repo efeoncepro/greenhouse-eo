@@ -1,5 +1,14 @@
 # project_context.md
 
+## Delta 2026-04-01 HR departments head selector desacoplado de People
+
+- El selector `Responsable` en `HR > Departments` ya no depende de `GET /api/people`.
+- La vista ahora consume `GET /api/hr/core/members/options`, autorizado por `requireHrCoreManageTenantContext`.
+- La fuente del dropdown es `greenhouse_core.members` vía reader liviano del módulo HR.
+- Regla vigente:
+  - selectors operativos de HR no deben depender del route group `people` para resolver miembros activos
+  - cuando el write target sea `members.member_id`, preferir un reader HR liviano y local antes que el listado full de People
+
 ## Delta 2026-04-01 Vitest tooling coverage
 
 - `Vitest` ya descubre también tests de `scripts/**`, no solo `src/**`.
@@ -9,6 +18,7 @@
   - `pnpm test` y `pnpm exec vitest run <archivo>` ya deben encontrarlos sin workarounds
   - esto cubre carriles de DB/tooling como `pg:doctor`, migraciones y generación de tipos cuando tengan lógica testeable
 - El helper `scripts/lib/load-greenhouse-tool-env.ts` ahora normaliza passwords vacías (`''`) como no definidas cuando un profile usa `*_PASSWORD_SECRET_REF`, para no contaminar `GREENHOUSE_POSTGRES_PASSWORD` con un valor vacío.
+
 ## Delta 2026-04-01 TASK-026 contract canonicalization
 
 - `greenhouse_core.members` ya es el ancla canonica de contrato para HRIS:

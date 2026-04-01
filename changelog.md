@@ -3,7 +3,7 @@
 ## 2026-04-01
 
 - **HR Departments responsable lookup**:
-  - el modal de `Nuevo departamento` vuelve a poblar `Responsable` desde un endpoint HR propio que reutiliza el reader canónico de personas, sin depender del permiso del módulo `People`
+  - el modal de `Nuevo departamento` vuelve a poblar `Responsable` desde un endpoint HR propio apoyado en `greenhouse_core.members`, sin depender del permiso del módulo `People`
 
 - **Vitest tooling coverage**:
   - `pnpm test` ya descubre también tests unitarios versionados en `scripts/**`, cerrando el hueco que dejaba fuera el carril de tooling/CLI

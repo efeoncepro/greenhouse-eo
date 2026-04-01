@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const mockRequireHrCoreReadTenantContext = vi.fn()
-const mockGetPeopleList = vi.fn()
+const mockRequireHrCoreManageTenantContext = vi.fn()
+const mockListDepartmentHeadOptions = vi.fn()
 
 vi.mock('@/lib/hr-core/shared', () => ({
-  requireHrCoreReadTenantContext: (...args: unknown[]) => mockRequireHrCoreReadTenantContext(...args),
+  requireHrCoreManageTenantContext: (...args: unknown[]) => mockRequireHrCoreManageTenantContext(...args),
   toHrCoreErrorResponse: vi.fn((error: unknown, fallbackMessage: string) => {
     const message = error instanceof Error ? error.message : fallbackMessage
 
@@ -12,8 +12,8 @@ vi.mock('@/lib/hr-core/shared', () => ({
   })
 }))
 
-vi.mock('@/lib/people/get-people-list', () => ({
-  getPeopleList: (...args: unknown[]) => mockGetPeopleList(...args)
+vi.mock('@/lib/hr-core/service', () => ({
+  listDepartmentHeadOptions: (...args: unknown[]) => mockListDepartmentHeadOptions(...args)
 }))
 
 import { GET } from '@/app/api/hr/core/members/options/route'
@@ -22,29 +22,20 @@ describe('GET /api/hr/core/members/options', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
-    mockRequireHrCoreReadTenantContext.mockResolvedValue({
+    mockRequireHrCoreManageTenantContext.mockResolvedValue({
       tenant: { userId: 'user-1', routeGroups: ['hr'] },
       errorResponse: null
     })
   })
 
-  it('returns active members from the canonical people reader', async () => {
-    mockGetPeopleList.mockResolvedValue({
-      items: [
-        {
-          memberId: 'member-1',
-          displayName: 'Daniela Ferreira',
-          roleTitle: 'Operations Lead',
-          active: true
-        },
-        {
-          memberId: 'member-2',
-          displayName: 'Inactive Person',
-          roleTitle: 'Former Role',
-          active: false
-        }
-      ]
-    })
+  it('returns active members from the HR member options reader', async () => {
+    mockListDepartmentHeadOptions.mockResolvedValue([
+      {
+        memberId: 'member-1',
+        displayName: 'Daniela Ferreira',
+        roleTitle: 'Operations Lead'
+      }
+    ])
 
     const response = await GET()
     const body = await response.json()

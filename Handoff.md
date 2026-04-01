@@ -10,14 +10,15 @@
 
 - `HrDepartmentsView` ya no consulta `/api/people` para ese lookup.
 - Nueva route `GET /api/hr/core/members/options` bajo permisos HR:
-  - reutiliza `getPeopleList()` como reader canónico del objeto persona
-  - filtra solo miembros activos
+  - usa `requireHrCoreManageTenantContext`
+  - lee miembros activos desde `greenhouse_core.members` vía reader liviano del módulo HR
   - entrega un payload liviano con `memberId`, `displayName` y `roleTitle`
 - Con esto, el modal de departamentos deja de depender de permisos del módulo `People` para resolver responsables.
+- Se agregó cobertura en route/store/service tests del carril nuevo.
 
 ### Validación
 
-- `pnpm exec vitest run src/app/api/hr/core/members/options/route.test.ts src/app/api/hr/core/departments/route.test.ts 'src/app/api/hr/core/departments/[departmentId]/route.test.ts'` ✅
+- `pnpm exec vitest run src/app/api/hr/core/members/options/route.test.ts src/lib/hr-core/postgres-departments-store.test.ts src/lib/hr-core/service.test.ts src/app/api/hr/core/departments/route.test.ts 'src/app/api/hr/core/departments/[departmentId]/route.test.ts'` ✅
 - `pnpm exec tsc --noEmit --pretty false` ✅
 - `pnpm lint` ✅
 
