@@ -156,7 +156,7 @@ const HrDepartmentsView = ({ isAdmin }: Props) => {
 
   // ── Computed ──
 
-  const departments = data?.departments ?? []
+  const departments = useMemo(() => data?.departments ?? [], [data?.departments])
   const uniqueBUs = new Set(departments.map(d => d.businessUnit))
 
   const nextSortOrder = useMemo(() => {

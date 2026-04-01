@@ -231,7 +231,7 @@ MIGRATION_DATABASE_URL=postgresql://greenhouse_migrator_user:<password>@34.86.13
 
 ```
 migrations/
-├── 20260401120000_initial-baseline.sql
+├── 20260401120000000_initial-baseline.sql
 ├── 20260402090000_add-hr-performance-tables.sql
 └── ...
 ```
@@ -246,7 +246,7 @@ migrations/
 La primera migración es un **no-op baseline** que marca el estado actual del schema como "migración 0". No ejecuta DDL — solo registra que el schema existente ya está aplicado.
 
 ```sql
--- migrations/20260401120000_initial-baseline.sql
+-- migrations/20260401120000000_initial-baseline.sql
 -- Baseline migration: marks existing schema as migrated.
 -- All tables in greenhouse_core, greenhouse_hr, greenhouse_payroll,
 -- greenhouse_finance, greenhouse_delivery, greenhouse_crm,
@@ -352,7 +352,7 @@ Kysely y `pool.query()` coexisten sin conflicto — ambos usan el mismo Pool sub
 ```
 greenhouse-eo/
 ├── migrations/                              # NUEVO — migraciones SQL
-│   └── 20260401120000_initial-baseline.sql
+│   └── 20260401120000000_initial-baseline.sql
 ├── src/
 │   ├── lib/
 │   │   └── db.ts                            # NUEVO — singleton de conexión

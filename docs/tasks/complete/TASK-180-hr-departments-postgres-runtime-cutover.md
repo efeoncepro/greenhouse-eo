@@ -1,3 +1,41 @@
+## Delta 2026-04-01 — auditoría live del cutover
+- Verificación live en `greenhouse-pg-dev` y BigQuery dev:
+  - `greenhouse_core.departments` existe pero hoy está vacío (`0` filas)
+  - `greenhouse.departments` en BigQuery también está vacío (`0` filas)
+  - `greenhouse_core.members.department_id` y `greenhouse.team_members.department_id` hoy no tienen valores poblados (`0` miembros con departamento en ambos stores)
+- Consecuencia operativa:
+  - en este entorno `dev` no hace falta backfill inicial de datos para cerrar el cutover
+  - la task debe seguir dejando un carril idempotente de backfill/reconciliación para otros entornos, pero no debe asumir drift real ya existente en `dev`
+- Restricción de schema confirmada:
+  - `greenhouse_core.departments` **no** tiene columna `space_id`
+  - `head_member_id` tampoco tiene FK real a `greenhouse_core.members(member_id)`; la integridad de ese vínculo debe endurecerse en esta lane si el cutover la exige
+- Regla de tenancy corregida para esta lane:
+  - `HR > Departments` sigue siendo un módulo interno del tenant `efeonce`
+  - el aislamiento vigente se resuelve por `TenantContext` + route group/view access, no por filtro `space_id` en la tabla `greenhouse_core.departments`
+
+## Delta 2026-04-01 — implementación cerrada
+- Runtime cortado:
+  - `src/lib/hr-core/service.ts` ya usa PostgreSQL para `listDepartments`, `getDepartmentById`, `createDepartment`, `updateDepartment`
+  - `getHrCoreMetadata()` ya sirve departamentos desde PostgreSQL
+  - `getMemberHrProfile()` y `updateMemberHrProfile()` ya resuelven/asignan `department_id` por el carril canónico Postgres
+- Store y data lane:
+  - nuevo store `src/lib/hr-core/postgres-departments-store.ts`
+  - nuevo backfill idempotente `scripts/backfill-hr-departments-to-postgres.ts`
+  - BigQuery `greenhouse.departments` queda sin writes operativos desde el módulo
+- Integridad:
+  - nueva migración `20260402001000000_hr-departments-head-member-fk.sql`
+  - endurece `head_member_id -> greenhouse_core.members(member_id)` e índices de apoyo
+- Verificación ejecutada:
+  - `pnpm exec vitest run src/lib/hr-core/postgres-departments-store.test.ts src/lib/hr-core/service.test.ts src/app/api/hr/core/departments/route.test.ts src/app/api/hr/core/departments/[departmentId]/route.test.ts` ✅
+  - `pnpm lint` ✅
+  - `pnpm build` ✅
+  - `pnpm exec tsc --noEmit --pretty false` ✅
+- Validación DB cerrada:
+  - `AGENTS.md` confirmó que el carril CLI correcto requiere Cloud SQL Auth Proxy
+  - `pnpm pg:doctor --profile=runtime` y `--profile=migrator` pasaron por `127.0.0.1:15432`
+  - `pnpm migrate:up` quedó aplicado y en estado `No migrations to run!`
+  - `pnpm db:generate-types` regeneró `src/types/db.d.ts`
+
 ## Delta 2026-04-01
 - TASK-184/TASK-185 (Database Tooling Foundation) ahora disponible: todo schema change de esta task debe ir como migración versionada via `pnpm migrate:create`. Usar `src/lib/db.ts` para nuevos queries tipados (Kysely).
 
@@ -5,11 +43,11 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
-- Status real: `Diseño`
+- Status real: `Implementada`
 - Rank: `51`
 - Domain: `hr / data / platform`
 
@@ -176,16 +214,16 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] existe una estrategia explícita de completitud/backfill entre BigQuery y PostgreSQL para departamentos
-- [ ] `/api/hr/core/departments` lee desde PostgreSQL
-- [ ] create/update de departamentos escriben en PostgreSQL
-- [ ] `HR > Departments` deja de depender del write path BigQuery-first
-- [ ] `head_member_id` y `department_id` quedan alineados con `greenhouse_core.members`
-- [ ] el legacy BigQuery path queda clasificado como downstream, histórico o deprecado
-- [ ] hay tests de regresión para create/list/update del módulo
-- [ ] `pnpm lint` pasa
-- [ ] `pnpm test` cubre el slice nuevo
-- [ ] `pnpm exec tsc --noEmit --pretty false` no introduce errores nuevos
+- [x] existe una estrategia explícita de completitud/backfill entre BigQuery y PostgreSQL para departamentos
+- [x] `/api/hr/core/departments` lee desde PostgreSQL
+- [x] create/update de departamentos escriben en PostgreSQL
+- [x] `HR > Departments` deja de depender del write path BigQuery-first
+- [x] `head_member_id` y `department_id` quedan alineados con `greenhouse_core.members`
+- [x] el legacy BigQuery path queda clasificado como downstream, histórico o deprecado
+- [x] hay tests de regresión para create/list/update del módulo
+- [x] `pnpm lint` pasa
+- [x] `pnpm test` cubre el slice nuevo
+- [x] `pnpm exec tsc --noEmit --pretty false` no introduce errores nuevos
 
 ## Verification
 
@@ -194,11 +232,23 @@ Reglas obligatorias:
 - `pnpm lint`
 - `pnpm test`
 - `pnpm exec tsc --noEmit --pretty false`
+- `pnpm build`
 - smoke manual en `/hr/departments`:
   - crear departamento raíz
   - crear subdepartamento
   - editar responsable
   - verificar reflejo correcto en perfiles HR y consumers relacionados
+
+Resultado de este turno:
+
+- `pnpm exec vitest run src/lib/hr-core/postgres-departments-store.test.ts src/lib/hr-core/service.test.ts src/app/api/hr/core/departments/route.test.ts src/app/api/hr/core/departments/[departmentId]/route.test.ts` ✅
+- `pnpm lint` ✅
+- `pnpm build` ✅
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm pg:doctor --profile=runtime` ✅
+- `pnpm pg:doctor --profile=migrator` ✅
+- `pnpm migrate:up` ✅
+- `pnpm db:generate-types` ✅
 
 ## Follow-ups
 

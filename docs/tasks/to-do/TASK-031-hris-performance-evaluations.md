@@ -1,5 +1,10 @@
 # CODEX TASK — HRIS Fase 3: Evaluaciones de Desempeño 360°
 
+## Delta 2026-04-01
+
+- `greenhouse_core.departments` ya quedó operacional en PostgreSQL por cierre de `TASK-180`.
+- Los filtros, cohorts y vistas por departamento de esta lane deben consumir el carril Postgres canónico y no asumir ninguna dependencia runtime de BigQuery para estructura organizacional.
+
 ## Delta 2026-03-27 — Alineación arquitectónica
 
 - **Fuente ICO corregida**: métricas ICO (RpA, OTD%, FTR%, throughput, cycle time) deben leerse de `greenhouse_serving.ico_member_metrics` (PostgreSQL). NUNCA leer de BigQuery directamente en este módulo. El pipeline BQ→PG ya está manejado por `src/lib/sync/projections/ico-member-metrics.ts`.

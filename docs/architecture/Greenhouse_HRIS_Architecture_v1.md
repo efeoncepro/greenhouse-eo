@@ -1,5 +1,19 @@
 # Greenhouse HRIS Architecture V1
 
+## Delta 2026-04-01 — Departments ya es Postgres-first
+
+La estructura organizacional del HRIS ya no debe asumirse como un carril legacy de BigQuery.
+
+Estado vigente:
+- `HR > Departments` opera sobre `greenhouse_core.departments` en PostgreSQL
+- la asignación `members.department_id` y la validación de `head_member_id` se resuelven en el mismo store operacional que `members`
+- la route visible vigente del módulo es `/hr/departments`
+- BigQuery `greenhouse.departments` deja de ser source of truth del runtime y queda como downstream/legacy
+
+Regla nueva:
+- cualquier follow-on HRIS que filtre, agrupe o navegue por departamentos debe reutilizar `greenhouse_core.departments`
+- no se deben introducir writes operativos a `greenhouse.departments`
+
 ## Delta 2026-03-31 — HR document handling now depends on shared attachments foundation
 
 La arquitectura HRIS ya no debe asumir que cada módulo HR resuelve storage por sí solo.
@@ -550,7 +564,7 @@ Management views for `hr_manager`, `hr_payroll`, and `efeonce_admin`.
 | — Resultados consolidados | `/hr/evaluations/results` | — | 3 | `hr`, `admin` |
 | Configuración HR | `/hr/settings` | `tabler-settings` | 0+ | `hr`, `admin` |
 | — Tipos de permiso | `/hr/settings/leave-types` | — | 0 | `hr`, `admin` |
-| — Departamentos | `/hr/settings/departments` | — | 0 | `hr`, `admin` |
+| — Departamentos | `/hr/departments` | — | 0 | `hr`, `admin` |
 | — Feriados | `/hr/settings/holidays` | — | 0 | `hr`, `admin` |
 | — Categorías de gasto | `/hr/settings/expense-categories` | — | 2 | `hr`, `admin` |
 | — Competencias | `/hr/settings/competencies` | — | 3 | `hr`, `admin` |
@@ -561,7 +575,7 @@ Add to `GREENHOUSE_IDENTITY_ACCESS_V2.md` route group registry:
 
 ```
 my:  /my/documents, /my/onboarding, /my/expenses, /my/goals, /my/evaluation
-hr:  /hr/documents, /hr/onboarding, /hr/onboarding/*, /hr/expenses, /hr/goals, /hr/goals/*, /hr/evaluations, /hr/evaluations/*,  /hr/settings/expense-categories, /hr/settings/competencies
+hr:  /hr/departments, /hr/documents, /hr/onboarding, /hr/onboarding/*, /hr/expenses, /hr/goals, /hr/goals/*, /hr/evaluations, /hr/evaluations/*, /hr/settings/expense-categories, /hr/settings/competencies
 ```
 
 ---

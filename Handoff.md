@@ -4,6 +4,49 @@
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.
 
+## Sesión 2026-04-01 — TASK-180 implementada y validada end-to-end
+
+### Objetivo
+
+- Implementar `TASK-180` respetando la secuencia descubrimiento -> auditoría -> mapa de conexiones -> plan -> implementación para cortar `HR > Departments` a PostgreSQL.
+
+### Delta de ejecución
+
+- `TASK-180` se movió a `docs/tasks/in-progress/` y el índice operativo quedó actualizado durante la ejecución.
+- Se auditó arquitectura, runtime HR/People y schema live antes de tocar código.
+- Hallazgos confirmados en auditoría:
+  - `src/lib/hr-core/service.ts` sigue leyendo/escribiendo `departments` en BigQuery para `list/create/update`.
+  - `src/lib/hr-core/postgres-leave-store.ts`, `greenhouse_serving.person_360` y views HR/Payroll ya consumen `greenhouse_core.departments` en PostgreSQL.
+  - en `dev`, tanto `greenhouse.departments` (BigQuery) como `greenhouse_core.departments` (Postgres) están vacías; tampoco hay `members` con `department_id` poblado en ninguno de los dos stores.
+  - `greenhouse_core.departments` no tiene `space_id`; el tenancy vigente del módulo sigue siendo `efeonce` via `TenantContext`/route group.
+  - `greenhouse_core.departments` no tiene FK para `head_member_id`; solo existe FK recursiva para `parent_department_id`.
+- La spec de la task recibió delta corto con esos supuestos corregidos para no implementar sobre drift inexistente en `dev`.
+- Implementación aterrizada:
+  - nuevo store `src/lib/hr-core/postgres-departments-store.ts`
+  - `src/lib/hr-core/service.ts` ya corta `departments` a PostgreSQL para list/detail/create/update y para la asignación `member.department_id`
+  - `getMemberHrProfile()` ya overlaya `departmentId`/`departmentName` desde PostgreSQL
+  - nuevo backfill `scripts/backfill-hr-departments-to-postgres.ts`
+  - nueva migración `migrations/20260402001000000_hr-departments-head-member-fk.sql`
+  - tests nuevos/ajustados en store, service y routes de departments
+- Verificación cerrada:
+  - `pnpm exec vitest run src/lib/hr-core/postgres-departments-store.test.ts src/lib/hr-core/service.test.ts src/app/api/hr/core/departments/route.test.ts src/app/api/hr/core/departments/[departmentId]/route.test.ts` ✅
+  - `pnpm lint` ✅
+  - `pnpm build` ✅
+  - `pnpm exec tsc --noEmit --pretty false` ✅
+- Cierre operativo de DB:
+  - se releyó `AGENTS.md` y se confirmó el carril correcto para CLI: Cloud SQL Auth Proxy en `127.0.0.1:15432`
+  - `pnpm pg:doctor --profile=runtime` ✅ por proxy
+  - `pnpm pg:doctor --profile=migrator` ✅ por proxy
+  - la baseline quedó normalizada a `20260401120000000_initial-baseline`
+  - la migración de ownership quedó reconciliada en tracking como `20260402000000000_consolidate-ownership-to-greenhouse-ops`
+  - `pnpm migrate:up` ✅ (`No migrations to run!` después de aplicar la nueva)
+  - `pnpm db:generate-types` ✅
+  - `public.pgmigrations` ya registró `20260402001000000_hr-departments-head-member-fk`
+
+### Rama
+
+- `develop`
+
 ## Sesión 2026-04-01 — Database Tooling Foundation (TASK-184 + TASK-185)
 
 ### Objetivo
@@ -15,7 +58,7 @@ Instalar infraestructura fundacional de base de datos: migraciones versionadas, 
 - Instaló `node-pg-migrate`, `kysely`, `kysely-codegen`
 - Creó `src/lib/db.ts` — wrapper centralizado que re-exporta `postgres/client.ts` + agrega Kysely lazy
 - Creó `scripts/migrate.ts` — wrapper TypeScript para migraciones, reutiliza sistema de profiles existente
-- Creó `migrations/20260401120000_initial-baseline.sql` — baseline no-op aplicada en dev
+- Creó `migrations/20260401120000000_initial-baseline.sql` — baseline no-op aplicada en dev
 - Generó `src/types/db.d.ts` — 140 tablas, 3042 líneas, introspectadas desde `greenhouse-pg-dev`
 - Creó `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md` — spec de arquitectura completa
 - Actualizó `AGENTS.md`, `project_context.md`, 3 docs de arquitectura existentes

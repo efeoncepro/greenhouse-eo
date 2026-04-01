@@ -2,6 +2,15 @@
 
 ## 2026-04-01
 
+- **HR Departments Postgres runtime cutover** (`TASK-180`):
+  - `HR > Departments` deja de leer/escribir `greenhouse.departments` en BigQuery y pasa a operar sobre `greenhouse_core.departments` en PostgreSQL
+  - nuevo store `src/lib/hr-core/postgres-departments-store.ts` para list/detail/create/update y para alinear la asignación `members.department_id`
+  - `getMemberHrProfile()` ya resuelve `departmentId`/`departmentName` desde PostgreSQL y el update de perfil HR deja de mutar `team_members.department_id` en BigQuery
+  - se agregó backfill idempotente `scripts/backfill-hr-departments-to-postgres.ts` para otros entornos aunque `dev` no tenía drift real (`0` departamentos en BigQuery y Postgres)
+  - nueva migración `20260402001000000_hr-departments-head-member-fk.sql` para endurecer FK `head_member_id -> greenhouse_core.members(member_id)` e índices de apoyo
+  - validación cerrada end-to-end: `vitest`, `lint`, `build`, `tsc`, `pg:doctor` (`runtime` y `migrator`), `pnpm migrate:up` y `pnpm db:generate-types`
+  - el bloqueo inicial de `ETIMEDOUT` se resolvió usando Cloud SQL Auth Proxy en `127.0.0.1:15432` como ya exigía `AGENTS.md`
+
 - **Database Tooling Foundation** (TASK-184 + TASK-185):
   - Instalado `node-pg-migrate` para migraciones SQL versionadas — wrapper TypeScript en `scripts/migrate.ts`, migraciones en `migrations/`
   - Creado `src/lib/db.ts` como conexión centralizada: re-exporta `postgres/client.ts` + agrega Kysely lazy via `getDb()`

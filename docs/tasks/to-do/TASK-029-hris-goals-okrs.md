@@ -1,5 +1,10 @@
 # CODEX TASK — HRIS Fase 2B: Goals y OKRs
 
+## Delta 2026-04-01
+
+- `greenhouse_core.departments` ya es runtime operacional Postgres-first por cierre de `TASK-180`.
+- Los futuros owners por departamento de esta lane no deben introducir reads o writes contra `greenhouse.departments` en BigQuery.
+
 ## Delta 2026-03-27 — Alineación arquitectónica
 
 - **Fuente ICO corregida**: las métricas ICO como contexto operativo (RpA, OTD%, throughput) deben leerse de `greenhouse_serving.ico_member_metrics` (PostgreSQL serving view, materializada por `src/lib/sync/projections/ico-member-metrics.ts`). NO leer de BigQuery `member_performance_snapshots` ni de `notion_ops` directo.

@@ -9,7 +9,6 @@ import type {
   HrAttendanceResponse,
   HrCoreMetadata,
   HrLeaveCalendarResponse,
-  HrDepartment,
   HrDepartmentsResponse,
   HrLeaveBalance,
   HrLeaveBalancesResponse,
@@ -36,6 +35,14 @@ import {
   reviewLeaveRequestInPostgres
 } from '@/lib/hr-core/postgres-leave-store'
 import {
+  createDepartmentInPostgres,
+  getDepartmentByIdFromPostgres,
+  getMemberDepartmentContextFromPostgres,
+  listDepartmentsFromPostgres,
+  updateDepartmentInPostgres,
+  updateMemberDepartmentContextInPostgres
+} from '@/lib/hr-core/postgres-departments-store'
+import {
   HR_ATTENDANCE_STATUSES,
   HR_BANK_ACCOUNT_TYPES,
   HR_EMPLOYMENT_TYPES,
@@ -53,7 +60,6 @@ import {
   normalizeNullableString,
   normalizeString,
   runHrCoreQuery,
-  slugify,
   toDateString,
   toInt,
   toNullableNumber,
@@ -63,18 +69,6 @@ import {
 import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 import { getPeopleTableColumns } from '@/lib/people/shared'
 import { buildPrivateAssetDownloadUrl } from '@/lib/storage/greenhouse-assets'
-
-type DepartmentRow = {
-  department_id: string | null
-  name: string | null
-  description: string | null
-  parent_department_id: string | null
-  head_member_id: string | null
-  head_member_name: string | null
-  business_unit: string | null
-  active: boolean | null
-  sort_order: number | string | null
-}
 
 type MemberUserRow = {
   user_id: string | null
@@ -258,18 +252,6 @@ const withHrLeavePostgresFallback = async <T>({
   }
 }
 
-const mapDepartment = (row: DepartmentRow): HrDepartment => ({
-  departmentId: String(row.department_id || ''),
-  name: String(row.name || ''),
-  description: normalizeNullableString(row.description),
-  parentDepartmentId: normalizeNullableString(row.parent_department_id),
-  headMemberId: normalizeNullableString(row.head_member_id),
-  headMemberName: normalizeNullableString(row.head_member_name),
-  businessUnit: String(row.business_unit || ''),
-  active: Boolean(row.active),
-  sortOrder: toInt(row.sort_order)
-})
-
 const mapLeaveType = (row: LeaveTypeRow): HrLeaveType => ({
   leaveTypeCode: String(row.leave_type_code || ''),
   leaveTypeName: String(row.leave_type_name || ''),
@@ -389,32 +371,6 @@ const mapMemberProfile = (row: MemberProfileRow, { includeSensitive }: { include
   notes: normalizeNullableString(row.notes),
   updatedAt: toTimestampString(row.updated_at)
 })
-
-const getActiveDepartmentsInternal = async () => {
-  await assertHrCoreInfrastructureReady()
-  const projectId = getProjectId()
-
-  const rows = await runHrCoreQuery<DepartmentRow>(
-    `
-      SELECT
-        d.department_id,
-        d.name,
-        d.description,
-        d.parent_department_id,
-        d.head_member_id,
-        m.display_name AS head_member_name,
-        d.business_unit,
-        d.active,
-        d.sort_order
-      FROM \`${projectId}.greenhouse.departments\` AS d
-      LEFT JOIN \`${projectId}.greenhouse.team_members\` AS m
-        ON m.member_id = d.head_member_id
-      ORDER BY d.sort_order ASC, d.name ASC
-    `
-  )
-
-  return rows.map(mapDepartment)
-}
 
 const getLeaveTypesInternal = async () => {
   await assertHrCoreInfrastructureReady()
@@ -770,30 +726,31 @@ const getLeaveRequestByIdInternal = async (requestId: string) => {
 }
 
 export const getHrCoreMetadata = async (): Promise<HrCoreMetadata> => {
-  const fallback = async () => {
-    const [departments, leaveTypes] = await Promise.all([getActiveDepartmentsInternal(), getLeaveTypesInternal()])
+  const departments = await listDepartmentsFromPostgres({ activeOnly: true })
 
-    return {
-      departments,
-      leaveTypes,
+  const metadata = await withHrLeavePostgresFallback({
+    operation: 'getHrCoreMetadata',
+    postgres: () => getHrCoreMetadataFromPostgres(),
+    fallback: async () => ({
+      departments: [],
+      leaveTypes: await getLeaveTypesInternal(),
       jobLevels: [...HR_JOB_LEVELS],
       employmentTypes: [...HR_EMPLOYMENT_TYPES],
       healthSystems: [...HR_HEALTH_SYSTEMS],
       bankAccountTypes: [...HR_BANK_ACCOUNT_TYPES],
       leaveRequestStatuses: [...HR_LEAVE_REQUEST_STATUSES],
       attendanceStatuses: [...HR_ATTENDANCE_STATUSES]
-    }
-  }
-
-  return withHrLeavePostgresFallback({
-    operation: 'getHrCoreMetadata',
-    postgres: () => getHrCoreMetadataFromPostgres(),
-    fallback
+    })
   })
+
+  return {
+    ...metadata,
+    departments
+  }
 }
 
 export const listDepartments = async (): Promise<HrDepartmentsResponse> => {
-  const departments = await getActiveDepartmentsInternal()
+  const departments = await listDepartmentsFromPostgres()
 
   return {
     departments,
@@ -805,132 +762,15 @@ export const listDepartments = async (): Promise<HrDepartmentsResponse> => {
 }
 
 export const getDepartmentById = async (departmentId: string) => {
-  const departments = await getActiveDepartmentsInternal()
-
-  return departments.find(department => department.departmentId === departmentId) || null
+  return getDepartmentByIdFromPostgres(departmentId)
 }
 
 export const createDepartment = async (input: CreateDepartmentInput) => {
-  await assertHrCoreInfrastructureReady()
-  const projectId = getProjectId()
-  const departmentId = slugify(normalizeString(input.departmentId || input.name))
-
-  const nullableStringTypes = {
-    description: 'STRING',
-    parentDepartmentId: 'STRING',
-    headMemberId: 'STRING'
-  } as const
-
-  if (!departmentId) {
-    throw new HrCoreValidationError('departmentId is required.')
-  }
-
-  const [existing] = await runHrCoreQuery<DepartmentRow>(
-    `
-      SELECT department_id
-      FROM \`${projectId}.greenhouse.departments\`
-      WHERE department_id = @departmentId
-      LIMIT 1
-    `,
-    { departmentId }
-  )
-
-  if (existing) {
-    throw new HrCoreValidationError('Department already exists.', 409)
-  }
-
-  await runHrCoreQuery(
-    `
-      INSERT INTO \`${projectId}.greenhouse.departments\` (
-        department_id,
-        name,
-        description,
-        parent_department_id,
-        head_member_id,
-        business_unit,
-        active,
-        sort_order,
-        created_at,
-        updated_at
-      )
-      VALUES (
-        @departmentId,
-        @name,
-        @description,
-        @parentDepartmentId,
-        @headMemberId,
-        @businessUnit,
-        @active,
-        @sortOrder,
-        CURRENT_TIMESTAMP(),
-        CURRENT_TIMESTAMP()
-      )
-    `,
-    {
-      departmentId,
-      name: normalizeString(input.name),
-      description: normalizeNullableString(input.description),
-      parentDepartmentId: normalizeNullableString(input.parentDepartmentId),
-      headMemberId: normalizeNullableString(input.headMemberId),
-      businessUnit: normalizeString(input.businessUnit),
-      active: input.active ?? true,
-      sortOrder: input.sortOrder ?? 0
-    },
-    nullableStringTypes
-  )
-
-  return getDepartmentById(departmentId)
+  return createDepartmentInPostgres(input)
 }
 
 export const updateDepartment = async (departmentId: string, input: UpdateDepartmentInput) => {
-  await assertHrCoreInfrastructureReady()
-  const projectId = getProjectId()
-  const existing = await getDepartmentById(departmentId)
-
-  if (!existing) {
-    throw new HrCoreValidationError('Department not found.', 404)
-  }
-
-  const updates: string[] = []
-  const params: Record<string, unknown> = { departmentId }
-  const types: Record<string, string> = {}
-
-  const setField = (column: string, paramKey: string, value: unknown) => {
-    updates.push(`${column} = @${paramKey}`)
-    params[paramKey] = value
-  }
-
-  const setNullableStringField = (column: string, paramKey: string, value: unknown) => {
-    setField(column, paramKey, normalizeNullableString(value))
-    types[paramKey] = 'STRING'
-  }
-
-  if (input.name !== undefined) setField('name', 'name', normalizeString(input.name))
-  if (input.description !== undefined) setNullableStringField('description', 'description', input.description)
-  if (input.parentDepartmentId !== undefined)
-    setNullableStringField('parent_department_id', 'parentDepartmentId', input.parentDepartmentId)
-  if (input.headMemberId !== undefined) setNullableStringField('head_member_id', 'headMemberId', input.headMemberId)
-  if (input.businessUnit !== undefined) setField('business_unit', 'businessUnit', normalizeString(input.businessUnit))
-  if (input.active !== undefined) setField('active', 'active', Boolean(input.active))
-  if (input.sortOrder !== undefined) setField('sort_order', 'sortOrder', input.sortOrder)
-
-  if (updates.length === 0) {
-    return existing
-  }
-
-  updates.push('updated_at = CURRENT_TIMESTAMP()')
-
-  await runHrCoreQuery(
-    `
-      UPDATE \`${projectId}.greenhouse.departments\`
-      SET ${updates.join(', ')}
-      WHERE department_id = @departmentId
-    `,
-    params,
-    Object.keys(types).length > 0 ? types : undefined
-  )
-
-  return getDepartmentById(departmentId)
+  return updateDepartmentInPostgres(departmentId, input)
 }
 
 export const getMemberHrProfile = async ({
@@ -1002,7 +842,14 @@ export const getMemberHrProfile = async ({
     throw new HrCoreValidationError('Team member not found.', 404)
   }
 
-  return mapMemberProfile(row, { includeSensitive: isHrAdminTenant(tenant) })
+  const departmentContext = await getMemberDepartmentContextFromPostgres(memberId)
+  const profile = mapMemberProfile(row, { includeSensitive: isHrAdminTenant(tenant) })
+
+  return {
+    ...profile,
+    departmentId: departmentContext.departmentId,
+    departmentName: departmentContext.departmentName
+  }
 }
 
 export const updateMemberHrProfile = async ({
@@ -1031,6 +878,21 @@ export const updateMemberHrProfile = async ({
     updatedBy: actorUserId
   }
 
+  const departmentIdInput =
+    input.departmentId !== undefined ? normalizeNullableString(input.departmentId) : undefined
+
+  if (departmentIdInput !== undefined) {
+    await getMemberDepartmentContextFromPostgres(memberId)
+
+    if (departmentIdInput) {
+      const department = await getDepartmentByIdFromPostgres(departmentIdInput)
+
+      if (!department) {
+        throw new HrCoreValidationError('Department not found.', 404, { departmentId: departmentIdInput })
+      }
+    }
+  }
+
   const setTeamField = (column: string, paramKey: string, value: unknown) => {
     teamMemberUpdates.push(`${column} = @${paramKey}`)
     teamMemberParams[paramKey] = value
@@ -1044,7 +906,6 @@ export const updateMemberHrProfile = async ({
     profileParams[paramKey] = value
   }
 
-  if (input.departmentId !== undefined) setTeamField('department_id', 'departmentId', normalizeNullableString(input.departmentId))
   if (input.reportsTo !== undefined) setTeamField('reports_to', 'reportsTo', normalizeNullableString(input.reportsTo))
   if (input.jobLevel !== undefined)
     setTeamField('job_level', 'jobLevel', input.jobLevel ? assertEnum(input.jobLevel, HR_JOB_LEVELS, 'jobLevel') : null)
@@ -1149,6 +1010,13 @@ export const updateMemberHrProfile = async ({
       `,
       profileParams
     )
+  }
+
+  if (departmentIdInput !== undefined) {
+    await updateMemberDepartmentContextInPostgres({
+      memberId,
+      departmentId: departmentIdInput
+    })
   }
 }
 

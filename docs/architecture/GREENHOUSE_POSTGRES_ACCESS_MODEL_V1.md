@@ -3,7 +3,7 @@
 ## Delta 2026-04-01 — Ownership consolidation to greenhouse_ops
 
 - **Problema resuelto:** 5 owners distintos (`greenhouse_migrator` 41, `greenhouse_migrator_user` 39, `postgres` 32, `greenhouse_app` 9, `greenhouse_ops` 1) sobre 122 tablas, causando fallos en `pg_dump` y errores de permisos.
-- **Acción:** migración `20260401084334779_consolidate-ownership-to-greenhouse-ops.sql` ejecutada — **122/122 tablas, 11/11 schemas, 7 sequences, 17 views** ahora owned by `greenhouse_ops`.
+- **Acción:** migración `20260402000000000_consolidate-ownership-to-greenhouse-ops.sql` ejecutada — **122/122 tablas, 11/11 schemas, 7 sequences, 17 views** ahora owned by `greenhouse_ops`.
 - **Password:** almacenada en Secret Manager como `greenhouse-pg-dev-ops-password`.
 - **Default privileges:** configurados para que objetos creados por `greenhouse_ops` otorguen automáticamente DML a `greenhouse_runtime` y ALL a `greenhouse_migrator`.
 - **Regla vigente actualizada:**

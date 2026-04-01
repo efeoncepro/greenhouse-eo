@@ -1,5 +1,19 @@
 # Greenhouse PostgreSQL Canonical 360 V1
 
+## Delta 2026-04-01 — HR Departments runtime cutover
+
+`HR > Departments` ya debe leerse como un consumer operativo de `greenhouse_core.departments`, no como un módulo BigQuery-first.
+
+Estado vigente:
+- `/api/hr/core/departments` y `/hr/departments` leen/escriben contra PostgreSQL
+- `greenhouse_core.members.department_id` y `greenhouse_core.departments.head_member_id` se validan dentro del mismo store operacional
+- BigQuery `greenhouse.departments` deja de ser write path del módulo y queda como carril legacy/downstream si algún consumer analítico todavía lo requiere
+- la integridad de `head_member_id` se endurece con FK versionada en migración SQL
+
+Regla nueva:
+- cualquier módulo que necesite estructura organizacional interna debe consumir `greenhouse_core.departments` como source of truth runtime
+- si BigQuery necesita la estructura para analytics, debe recibirla por proyección explícita desde Postgres y no por dual-write silencioso
+
 ## Purpose
 
 Define the first canonical PostgreSQL model that will support Greenhouse as:

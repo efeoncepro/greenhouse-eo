@@ -1,11 +1,22 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { runHrCoreQueryMock, assertHrCoreInfrastructureReadyMock } = vi.hoisted(() => {
+const {
+  runHrCoreQueryMock,
+  assertHrCoreInfrastructureReadyMock,
+  createDepartmentInPostgresMock,
+  getDepartmentByIdFromPostgresMock,
+  getMemberDepartmentContextFromPostgresMock,
+  updateMemberDepartmentContextInPostgresMock
+} = vi.hoisted(() => {
   process.env.NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET || 'test-secret'
 
   return {
     runHrCoreQueryMock: vi.fn(),
-    assertHrCoreInfrastructureReadyMock: vi.fn(async () => undefined)
+    assertHrCoreInfrastructureReadyMock: vi.fn(async () => undefined),
+    createDepartmentInPostgresMock: vi.fn(),
+    getDepartmentByIdFromPostgresMock: vi.fn(),
+    getMemberDepartmentContextFromPostgresMock: vi.fn(),
+    updateMemberDepartmentContextInPostgresMock: vi.fn()
   }
 })
 
@@ -32,12 +43,24 @@ vi.mock('@/lib/people/shared', () => ({
   getPeopleTableColumns: vi.fn(async () => new Set(['reports_to']))
 }))
 
+vi.mock('@/lib/hr-core/postgres-departments-store', () => ({
+  createDepartmentInPostgres: (...args: unknown[]) => createDepartmentInPostgresMock(...args),
+  getDepartmentByIdFromPostgres: (...args: unknown[]) => getDepartmentByIdFromPostgresMock(...args),
+  getMemberDepartmentContextFromPostgres: (...args: unknown[]) => getMemberDepartmentContextFromPostgresMock(...args),
+  listDepartmentsFromPostgres: vi.fn(),
+  updateDepartmentInPostgres: vi.fn(),
+  updateMemberDepartmentContextInPostgres: (...args: unknown[]) => updateMemberDepartmentContextInPostgresMock(...args)
+}))
+
 import { createDepartment, isHrLeavePostgresFallbackError, updateMemberHrProfile } from '@/lib/hr-core/service'
 
 describe('updateMemberHrProfile', () => {
   beforeEach(() => {
     runHrCoreQueryMock.mockReset()
     assertHrCoreInfrastructureReadyMock.mockClear()
+    getDepartmentByIdFromPostgresMock.mockReset()
+    getMemberDepartmentContextFromPostgresMock.mockReset()
+    updateMemberDepartmentContextInPostgresMock.mockReset()
   })
 
   it('updates only team_members when only hireDate changes', async () => {
@@ -69,58 +92,88 @@ describe('updateMemberHrProfile', () => {
       hireDate: '2024-12-15'
     })
   })
-})
 
-describe('createDepartment', () => {
-  beforeEach(() => {
-    runHrCoreQueryMock.mockReset()
-    assertHrCoreInfrastructureReadyMock.mockClear()
-  })
-
-  it('passes explicit STRING types for nullable department fields', async () => {
+  it('updates department assignment in Postgres without touching BigQuery team_members.department_id', async () => {
     runHrCoreQueryMock
-      .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([])
       .mockResolvedValueOnce([
         {
-          department_id: 'creative-team',
-          name: 'Creative Team',
-          description: 'Equipo creativo',
-          parent_department_id: null,
-          head_member_id: 'member-1',
-          head_member_name: 'Daniela Ferreira',
-          business_unit: 'globe',
-          active: true,
-          sort_order: 1
+          member_id: 'member-1',
+          display_name: 'Daniela Ferreira',
+          email: 'dferreira@efeoncepro.com',
+          identity_profile_id: null,
+          reports_to: null
         }
       ])
 
-    await createDepartment({
+    getMemberDepartmentContextFromPostgresMock.mockResolvedValue({
+      departmentId: null,
+      departmentName: null
+    })
+    getDepartmentByIdFromPostgresMock.mockResolvedValue({
+      departmentId: 'creative-team',
       name: 'Creative Team',
-      description: 'Equipo creativo',
+      description: null,
       parentDepartmentId: null,
-      headMemberId: 'member-1',
+      headMemberId: null,
+      headMemberName: null,
       businessUnit: 'globe',
       active: true,
       sortOrder: 1
     })
 
-    expect(runHrCoreQueryMock).toHaveBeenCalledTimes(3)
-    expect(runHrCoreQueryMock.mock.calls[1]?.[0]).toContain('INSERT INTO `test-project.greenhouse.departments`')
-    expect(runHrCoreQueryMock.mock.calls[1]?.[1]).toEqual({
+    await updateMemberHrProfile({
+      memberId: 'member-1',
+      input: {
+        departmentId: 'creative-team'
+      },
+      actorUserId: 'user-1'
+    })
+
+    expect(runHrCoreQueryMock).toHaveBeenCalledTimes(1)
+    expect(updateMemberDepartmentContextInPostgresMock).toHaveBeenCalledWith({
+      memberId: 'member-1',
+      departmentId: 'creative-team'
+    })
+  })
+})
+
+describe('createDepartment', () => {
+  beforeEach(() => {
+    createDepartmentInPostgresMock.mockReset()
+  })
+
+  it('delegates department creation to the Postgres store', async () => {
+    createDepartmentInPostgresMock.mockResolvedValue({
       departmentId: 'creative-team',
       name: 'Creative Team',
       description: 'Equipo creativo',
       parentDepartmentId: null,
       headMemberId: 'member-1',
+      headMemberName: 'Daniela Ferreira',
       businessUnit: 'globe',
       active: true,
       sortOrder: 1
     })
-    expect(runHrCoreQueryMock.mock.calls[1]?.[2]).toEqual({
-      description: 'STRING',
-      parentDepartmentId: 'STRING',
-      headMemberId: 'STRING'
+
+    const created = await createDepartment({
+      name: 'Creative Team',
+      description: 'Equipo creativo',
+      parentDepartmentId: null,
+      headMemberId: 'member-1',
+      businessUnit: 'globe',
+      active: true,
+      sortOrder: 1
+    })
+
+    expect(created.departmentId).toBe('creative-team')
+    expect(createDepartmentInPostgresMock).toHaveBeenCalledWith({
+      name: 'Creative Team',
+      description: 'Equipo creativo',
+      parentDepartmentId: null,
+      headMemberId: 'member-1',
+      businessUnit: 'globe',
+      active: true,
+      sortOrder: 1
     })
   })
 })

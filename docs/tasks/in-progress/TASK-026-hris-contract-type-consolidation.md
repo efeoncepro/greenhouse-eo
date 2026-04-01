@@ -1,5 +1,10 @@
 # CODEX TASK — HRIS: Consolidación del Modelo de Tipos de Contrato
 
+## Delta 2026-04-01
+
+- `greenhouse_core.departments` ya quedó como source of truth operativo del módulo `HR > Departments` por cierre de `TASK-180`.
+- Cualquier join o filtro auxiliar `members -> departments` en esta lane debe asumir PostgreSQL runtime, no `greenhouse.departments` en BigQuery.
+
 ## Resumen
 
 Consolidar el modelo de tipos de contrato en Greenhouse para soportar los 5 tipos reales de vinculación que maneja Efeonce Group: indefinido, plazo fijo, honorarios (Chile), contractor (Deel) y EOR (Deel). Agregar los campos canónicos `contract_type`, `payroll_via`, `schedule_required` y `deel_contract_id` a `greenhouse_core.members`, crear la rama de cálculo de honorarios en el payroll calculator, y agregar la rama de registro Deel.
