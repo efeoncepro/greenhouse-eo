@@ -1,0 +1,264 @@
+# TASK-188 - Native Integrations Layer: Platform Governance, Runtime Contracts & Shared Operating Model
+
+## Status
+
+- Lifecycle: `to-do`
+- Priority: `P0`
+- Impact: `Muy alto`
+- Effort: `Alto`
+- Status real: `Diseño`
+- Rank: `4`
+- Domain: `platform`
+
+## Summary
+
+Institucionalizar una `Native Integrations Layer` dentro de Greenhouse como capability nativa del platform layer, en vez de seguir operando integraciones críticas como una suma de scripts, sync jobs, tablas auxiliares y conocimiento tácito.
+
+La idea no es romper lo que ya existe, sino absorberlo dentro de una arquitectura formal y reusable para conectores como `Notion`, `HubSpot`, `Nubox`, `Frame.io` y futuros upstreams estratégicos.
+
+Esta lane debe leerse como refuerzo estructural del estado actual: tomar los bindings, tablas, syncs, health checks y surfaces existentes, ordenarlos bajo un operating model común y hacer que futuras integraciones nazcan con el mismo contrato desde el día 1.
+
+La fuente canónica de arquitectura para esta lane ahora vive en `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md`. Esta task queda como carril operativo, backlog y secuencia de implementación.
+
+En términos de priorización, esta lane queda después del `MVP` inmediato de confianza de métricas (`TASK-189` + `TASK-186`), para permitir un resultado visible y usable antes del hardening enterprise completo.
+
+## Why This Task Exists
+
+Greenhouse ya está en un punto de madurez donde varias capacidades visibles y críticas dependen de integraciones externas:
+
+- `Notion` alimenta Delivery e `ICO`
+- `HubSpot` alimenta CRM y comercial
+- `Nubox` alimenta Finance
+- `Frame.io` alimenta señales operativas y de revisión
+
+Estas integraciones ya no son “conectores opcionales”. Tienen impacto real en:
+
+- runtime operativo
+- métricas y scorecards
+- freshness y health visibles
+- onboarding de clientes/spaces
+- auditabilidad y confianza en el dato
+
+Sin una capa nativa de integraciones:
+
+- cada fuente evoluciona con patrones propios
+- el onboarding se vuelve artesanal
+- el health y la observabilidad quedan fragmentados
+- schema drift y readiness downstream se manejan de forma inconsistente
+- el platform layer no tiene un lenguaje común para gobernar upstreams críticos
+
+## Goal
+
+- Definir la `Native Integrations Layer` como capability formal de Greenhouse.
+- Establecer un modelo común para todas las integraciones críticas del portal.
+- Unificar contratos de:
+  - binding
+  - auth/access
+  - schema/mapping governance
+  - sync execution
+  - health/freshness
+  - downstream readiness
+- Dejar una arquitectura donde `TASK-187` sea el primer slice fuerte sobre Notion, pero dentro de un marco reusable para otras integraciones.
+
+## Iteration Principle
+
+- No reemplazar de golpe los pipelines o bindings que hoy mantienen el runtime operativo.
+- Institucionalizar patrones que ya existen parcialmente antes de introducir nuevos frameworks o abstractions grandes.
+- Preferir migración incremental con compatibilidad hacia atrás y observabilidad del estado actual.
+- Usar Notion como primera implementación fuerte, pero sin acoplar la capa completa a un solo upstream.
+
+## Recommended Execution Order
+
+1. Definir en `TASK-188` la taxonomía, operating model y contratos compartidos de integraciones nativas.
+2. Aplicar ese marco en `TASK-187` para formalizar Notion sin perder el trabajo ya hecho.
+3. Capitalizar esa foundation en `TASK-186` para llevar métricas Delivery y `Performance Report` a un estado confiable y auditable.
+
+## Architecture Alignment
+
+Revisar y respetar:
+
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md`
+- `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+- `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
+- `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
+- `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`
+
+Reglas obligatorias:
+
+- las integraciones externas no deben quedar como conocimiento implícito de scripts o agentes
+- cada integración crítica debe tener contrato operativo, health y ownership explícitos
+- los upstreams externos siguen siendo `source systems`, no identidad canónica de Greenhouse
+- la capa de integraciones debe integrarse con runtime, observabilidad y governance sin duplicar la capa de datos canónicos
+- esta lane no autoriza romper `ICO`; la `Native Integrations Layer` debe fortalecer sus upstreams y contratos sin desestabilizar el engine que hoy ya entrega valor
+
+## Dependencies & Impact
+
+### Depends on
+
+- `greenhouse_core.space_notion_sources`
+- `greenhouse_delivery.space_property_mappings`
+- pipelines y sync jobs existentes de Notion, HubSpot, Nubox y Frame.io
+- surfaces de admin/ops que ya muestran health parcial de integraciones
+
+### Impacts to
+
+- `TASK-187 - Notion Integration Formalization: Space Onboarding, Schema Governance & KPI Readiness`
+- `TASK-186 - Delivery Metrics Trust: Notion Property Audit & Conformed Contract Hardening`
+- onboarding de spaces/clientes
+- admin/integrations governance
+- health/freshness de datos externos
+- confiabilidad de `ICO`, CRM, Finance y Agency
+- roadmap de nuevos conectores y futuras APIs externas
+
+### Files owned
+
+- `docs/tasks/to-do/TASK-188-native-integrations-layer-platform-governance.md`
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
+- `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+- `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`
+
+## Current Repo State
+
+### Ya existe
+
+- múltiples integraciones reales ya operando
+- bindings y tablas específicas para algunas fuentes
+- syncs con raw/conformed/projection layering
+- health/freshness parcial en algunos dominios
+- primeros endpoints/admin surfaces para registrar o auditar integraciones
+
+### Gap actual
+
+- no existe una capa arquitectónica única llamada y gobernada como `Native Integrations Layer`
+- cada integración resuelve con patrones parciales distintos
+- no hay taxonomía institucional común para source binding, discovery, schema drift, readiness y health
+- Notion ya exige gobernanza propia, pero el problema no es solo de Notion
+
+## Scope
+
+### Slice 1 - Integration taxonomy
+
+- definir qué cuenta como integración nativa en Greenhouse
+- separar:
+  - upstream crítico
+  - conector auxiliar
+  - export/API de terceros
+  - webhook/event provider
+
+### Slice 2 - Shared operating model
+
+- definir el modelo común mínimo para cada integración:
+  - registro
+  - autenticación/autorización
+  - binding a `space`, `organization` o dominio
+  - schema/discovery cuando aplique
+  - sync cadence
+  - health/freshness
+  - readiness downstream
+
+### Slice 3 - Shared governance surfaces
+
+- definir qué debe vivir como capability admin/ops compartida
+- proponer surfaces para:
+  - inventory
+  - status
+  - drift
+  - replay/resync
+  - ownership
+
+### Slice 4 - Notion as first reference implementation
+
+- dejar explícito que `TASK-187` es el primer caso fuerte
+- usar Notion para validar el modelo sin acoplar toda la capa a un solo conector
+
+### Slice 5 - Cross-integration roadmap
+
+- aterrizar cómo encajan después:
+  - `HubSpot`
+  - `Nubox`
+  - `Frame.io`
+  - otros conectores futuros
+
+## Out of Scope
+
+- implementar todos los conectores bajo un solo framework en esta task
+- reemplazar los pipelines actuales inmediatamente
+- mezclar esta lane con refactors grandes de todos los dominios consumidores
+- cerrar aquí todos los gaps específicos de Notion de `TASK-187`
+
+## Target Operating Thesis
+
+Greenhouse ya no debe pensarse como “módulos con algunas integraciones”.
+
+Debe pensarse como:
+
+- módulos de producto
+- datos canónicos
+- serving/runtime
+- y una `Native Integrations Layer` que gobierna cómo entran, se validan, se sincronizan y se observan los upstreams críticos
+
+## Canonical Architecture Source
+
+La definición arquitectónica detallada, los principios enterprise y la arquitectura de referencia de esta lane viven en:
+
+- `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md`
+
+Esta task debe concentrarse en:
+
+- slices
+- backlog
+- secuencia
+- aceptación
+- follow-ups de implementación
+
+## External References
+
+- Microsoft Azure API Center overview: `https://learn.microsoft.com/en-us/azure/api-center/overview`
+- Microsoft API gateway pattern: `https://learn.microsoft.com/en-us/azure/architecture/microservices/design/gateway`
+- Microsoft architecture styles: `https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/`
+- Microsoft event-driven style: `https://learn.microsoft.com/en-us/azure/architecture/guide/architecture-styles/event-driven`
+- Microsoft messaging choices: `https://learn.microsoft.com/en-us/azure/architecture/guide/technology-choices/messaging`
+- Google Apigee API hub: `https://cloud.google.com/apigee/docs/apihub/what-is-api-hub`
+- Google Eventarc event-driven architectures: `https://docs.cloud.google.com/eventarc/advanced/docs/event-driven-architectures`
+- AWS event sourcing pattern: `https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/event-sourcing.html`
+- AWS publish-subscribe pattern: `https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/publish-subscribe.html`
+- AWS circuit breaker pattern: `https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/circuit-breaker.html`
+- AWS API contracts: `https://docs.aws.amazon.com/prescriptive-guidance/latest/micro-frontends-aws/api-contracts.html`
+- MuleSoft API Visualizer: `https://docs.mulesoft.com/visualizer/`
+- MuleSoft API Governance: `https://docs.mulesoft.com/api-governance/`
+- OpenAPI specification: `https://spec.openapis.org/oas/latest`
+- AsyncAPI documentation: `https://www.asyncapi.com/docs`
+- AsyncAPI validation guide: `https://www.asyncapi.com/docs/guides/validate`
+- Enterprise Integration Patterns - Canonical Data Model: `https://www.enterpriseintegrationpatterns.com/patterns/messaging/CanonicalDataModel.html`
+- Enterprise Integration Patterns - Message Broker: `https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessageBroker.html`
+
+## Acceptance Criteria
+
+- [ ] Existe una definición clara de `Native Integrations Layer` para Greenhouse.
+- [ ] Queda definido un modelo común para integraciones críticas.
+- [ ] Queda claro por qué Notion es un consumer/follow-on fuerte, pero no el único caso.
+- [ ] La task deja follow-ups concretos para arquitectura, backend y admin surfaces.
+- [ ] Se establece relación explícita entre `TASK-188` y `TASK-187`.
+- [ ] La task queda alineada con `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md` como fuente canónica.
+
+## Verification
+
+- Revisión de arquitectura actual de source sync, repo ecosystem y webhook model
+- Contraste con `TASK-187` para evitar duplicidad de alcance
+- Verificación documental de que la layer propuesta no contradice el modelo canónico actual
+- Contraste con patrones enterprise oficiales y documentación vigente al `2026-04-01`
+
+## Open Questions
+
+- ¿la `Native Integrations Layer` debe vivir como capability visible en `Admin Center` o como dominio técnico transversal con surfaces parciales?
+- ¿qué integraciones entran en la primera ola formal además de Notion?
+- ¿qué parte de observabilidad debe ser shared y cuál seguir siendo dominio-específica?
+
+## Follow-ups
+
+- `TASK-187 - Notion Integration Formalization: Space Onboarding, Schema Governance & KPI Readiness`
+- arquitectura específica de `Native Integrations Layer`
+- inventory y health shared de integraciones en Admin/Ops

@@ -1,5 +1,32 @@
 # Greenhouse Source Sync Pipelines V1
 
+## Delta 2026-04-01 — Notion DB IDs canónicos para Delivery / ICO
+
+Los teamspaces y databases de Notion que hoy alimentan el baseline operativo de Delivery e `ICO` deben tratarse como referencia arquitectónica viva, no solo como contexto de una task.
+
+Baseline auditado vía MCP:
+
+- `Efeonce`
+  - `Proyectos`: `15288d9b-1459-4052-9acc-75439bbd5470`
+  - `Tareas`: `3a54f090-4be1-4158-8335-33ba96557a73`
+- `Sky Airlines`
+  - `Proyectos`: `23039c2f-efe7-817a-8272-ffe6be1a696a`
+  - `Tareas`: `23039c2f-efe7-8138-9d1e-c8238fc40523`
+- `ANAM`
+  - `Proyectos`: `32539c2f-efe7-8053-94f7-c06eb3bbf530`
+  - `Tareas`: `32539c2f-efe7-81a4-92f4-f4725309935c`
+
+Uso correcto de estos IDs:
+
+- son `source ids` de Notion, no identidades canónicas de Greenhouse
+- son el ancla operativa para auditar `space_notion_sources`, `notion_ops.*`, `greenhouse_conformed.delivery_projects` y `greenhouse_conformed.delivery_tasks`
+- si cambian en Notion o se agrega un nuevo Space relevante para `ICO`, actualizar este documento y `TASK-186` en el mismo cambio
+
+Regla operativa:
+
+- para auditorías de métricas Delivery, primero verificar que el sync sigue leyendo estas DBs correctas antes de asumir que el problema está en `ICO` o en el serving layer
+- no confiar en memoria conversacional para redescubrir estos IDs; este documento es la referencia viva
+
 ## Purpose
 
 Define how Greenhouse should ingest, back up, normalize, and serve data that currently comes from external operational systems such as Notion and HubSpot.
@@ -530,6 +557,16 @@ If the incoming `payload_hash` did not change, projection to Postgres can be ski
 
 The conformed data layer now supports **config-driven property mappings** via a Postgres configuration table. This enables onboarding new Spaces (clients) with different Notion property names or types without modifying the sync script.
 
+Design rule reinforced after auditing `Efeonce`, `Sky Airlines`, and `ANAM`:
+
+- Spaces may share a broad operational shape (`Proyectos`, `Tareas`, similar KPI intent), but they do not have identical schemas.
+- Greenhouse must preserve a **common KPI core contract** for Delivery/ICO while allowing **space-specific extensions** for client, vertical, or project-type particularities.
+- The right answer is not a rigid one-size-fits-all schema, nor uncontrolled per-client hardcoding.
+- The right answer is:
+  - stable core fields for cross-space KPIs
+  - config-driven mapping for property name/type drift
+  - explicit classification of `space-specific` fields that enrich explanation, workflow, or client context without redefining the KPI core
+
 ### Architecture
 
 ```
@@ -602,6 +639,12 @@ Constraints:
 ### Fallback behavior
 
 Spaces without entries in `space_property_mappings` use the hardcoded default mapping. This is the permanent fallback for Efeonce and any Space whose Notion properties match the default schema.
+
+Important nuance:
+
+- “matches the default schema” does not mean “is identical to Efeonce”
+- a Space can share the KPI core and still require additional fields or different semantics for project-specific use cases
+- when that happens, prefer extending mappings and downstream contracts explicitly instead of silently overfitting the default schema
 
 If the Postgres query for mappings fails (connection error, table missing), the pipeline logs a warning and continues with the default mapping. The sync never blocks on a configuration error.
 

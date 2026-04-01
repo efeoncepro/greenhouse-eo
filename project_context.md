@@ -1,5 +1,18 @@
 # project_context.md
 
+## Delta 2026-04-01 Native Integrations Layer como arquitectura viva
+
+- La `Native Integrations Layer` ya no vive solo en `TASK-188`; su fuente canónica ahora es:
+  - `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md`
+- Regla vigente:
+  - integraciones críticas como `Notion`, `HubSpot`, `Nubox` y `Frame.io` deben evolucionar bajo un marco común de plataforma
+  - el patrón objetivo combina `API-led connectivity`, `event-driven architecture`, `contract-first governance` y `canonical core`
+  - Greenhouse debe fortalecer foundations existentes antes de reemplazarlas
+- Relación operativa:
+  - `TASK-188` queda como lane/backlog paraguas
+  - `TASK-187` es la primera implementación fuerte sobre `Notion`
+  - `TASK-186` consume esa foundation para trust y paridad de métricas Delivery
+
 ## Delta 2026-04-01 HR departments head selector desacoplado de People
 
 - El selector `Responsable` en `HR > Departments` ya no depende de `GET /api/people`.

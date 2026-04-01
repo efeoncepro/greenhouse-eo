@@ -1,5 +1,26 @@
 # Greenhouse Architecture V1
 
+## Delta 2026-04-01 — Native Integrations Layer ya tiene arquitectura canónica propia
+
+La `Native Integrations Layer` ya no debe leerse solo como task o intuición de plataforma.
+
+Fuente canónica nueva:
+
+- `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md`
+
+Regla arquitectónica nueva:
+
+- las integraciones críticas (`Notion`, `HubSpot`, `Nubox`, `Frame.io` y futuras equivalentes) deben diseñarse y evolucionar bajo un marco común de:
+  - registry
+  - contract governance
+  - adapters por source
+  - canonical mapping layer
+  - event/workflow backbone
+  - runtime governance
+  - readiness downstream
+
+La primera implementación fuerte de este marco sigue siendo `Notion`, pero la arquitectura ya queda definida como capability reusable de plataforma.
+
 ## Delta 2026-03-31 — TASK-173 ya tiene infraestructura dedicada además de foundation runtime
 
 `TASK-173` ya no debe leerse como “shared assets en código, pero infra pendiente”.

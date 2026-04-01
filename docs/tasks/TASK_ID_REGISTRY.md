@@ -235,3 +235,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-183` | `complete` | Finance Expenses Reactive Intake & Cost Ledger Hardening | `docs/tasks/complete/TASK-183-finance-expenses-reactive-intake-cost-ledger.md` |
 | `TASK-184` | `in-progress` | Database Migration Framework (node-pg-migrate) | `docs/tasks/in-progress/TASK-184-database-migration-framework.md` |
 | `TASK-185` | `in-progress` | Database Tooling Foundation (db.ts + Kysely + Migrations) | `docs/tasks/in-progress/TASK-185_Database_Tooling_Foundation.md` |
+| `TASK-186` | `to-do` | Delivery Metrics Trust: Notion Property Audit & Conformed Contract Hardening | `docs/tasks/to-do/TASK-186-delivery-metrics-trust-notion-property-audit-contract.md` |
+| `TASK-187` | `to-do` | Notion Integration Formalization: Space Onboarding, Schema Governance & KPI Readiness | `docs/tasks/to-do/TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md` |
+| `TASK-188` | `to-do` | Native Integrations Layer: Platform Governance, Runtime Contracts & Shared Operating Model | `docs/tasks/to-do/TASK-188-native-integrations-layer-platform-governance.md` |
+| `TASK-189` | `to-do` | ICO Period Filter: Due-Date Anchor & Carry-Over Logic | `docs/tasks/to-do/TASK-189-ico-period-filter-due-date-anchor.md` |

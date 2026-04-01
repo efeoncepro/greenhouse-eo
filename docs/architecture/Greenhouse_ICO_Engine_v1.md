@@ -1,5 +1,44 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-01 — Bases de Notion que actúan como insumo principal del ICO actual
+
+Aunque `ICO` consume su capa base desde `greenhouse_conformed.delivery_tasks` y no directamente desde Notion, los upstreams principales auditados hoy siguen siendo estas DBs de Notion:
+
+- `Efeonce`
+  - `Proyectos`: `15288d9b-1459-4052-9acc-75439bbd5470`
+  - `Tareas`: `3a54f090-4be1-4158-8335-33ba96557a73`
+- `Sky Airlines`
+  - `Proyectos`: `23039c2f-efe7-817a-8272-ffe6be1a696a`
+  - `Tareas`: `23039c2f-efe7-8138-9d1e-c8238fc40523`
+- `ANAM`
+  - `Proyectos`: `32539c2f-efe7-8053-94f7-c06eb3bbf530`
+  - `Tareas`: `32539c2f-efe7-81a4-92f4-f4725309935c`
+
+Lectura correcta:
+
+- estos IDs no reemplazan el contrato `space_id -> space_notion_sources -> greenhouse_conformed`
+- sí son la referencia práctica para auditar de dónde viene la señal que luego entra a `v_tasks_enriched` y a las materializaciones de `ICO`
+- si una métrica de `ICO` deja de cuadrar con Notion, primero validar que el sync sigue apuntando a estas DBs antes de revisar fórmulas o materializaciones
+
+Referencia cruzada:
+
+- `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
+- `docs/tasks/to-do/TASK-186-delivery-metrics-trust-notion-property-audit-contract.md`
+
+## Delta 2026-04-01 — ICO es consumer protegido frente a nuevas lanes de integraciones
+
+`ICO` ya entrega valor operativo real y no debe tratarse como un target libre para refactors amplios desde `TASK-186`, `TASK-187`, `TASK-188` o `TASK-189`.
+
+Regla operativa:
+
+- cambios para confianza de métricas o formalización de integraciones deben fortalecer el engine vigente
+- no deben romper readers, materializaciones ni contratos existentes salvo corrección puntual y validada
+- cualquier cambio al engine debe ser:
+  - incremental
+  - compatible hacia atrás cuando sea posible
+  - verificable contra métricas existentes
+  - reversible si degrada el comportamiento actual
+
 ## Especificación Técnica v1.0
 
 **Efeonce Group — Marzo 2026 — CONFIDENCIAL**

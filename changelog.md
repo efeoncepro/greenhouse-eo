@@ -2,6 +2,11 @@
 
 ## 2026-04-01
 
+- **Native Integrations Layer architecture**:
+  - se agregó `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md` como fuente canónica para la capability shared de integraciones enterprise; `TASK-188` queda como lane operativa y `Notion` como primera implementación fuerte del modelo
+
+## 2026-04-01
+
 - **PostgreSQL runtime grant reconciliation**:
   - staging recuperó acceso real a `greenhouse_notifications` y a tablas serving como `member_capacity_economics` e `ico_member_metrics`; además se alinearon los scripts de setup y `pg:doctor` para que el drift no reaparezca en futuros bootstrap
 

@@ -1,5 +1,256 @@
 # Handoff.md
 
+## Sesión 2026-04-01 — Guardrail explícito para no romper ICO
+
+### Objetivo
+
+- Dejar documentado que las lanes de métricas e integraciones no autorizan romper o reescribir `ICO`.
+
+### Delta de ejecución
+
+- Se agregó guardrail explícito en:
+  - `TASK-186`
+  - `TASK-187`
+  - `TASK-188`
+  - `TASK-189`
+  - `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md`
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+- La regla común quedó así:
+  - `ICO` es un consumer protegido
+  - las nuevas lanes deben fortalecerlo, no desestabilizarlo
+  - cualquier cambio al engine debe ser incremental, compatible y verificable
+
+### Validación
+
+- Revisión documental de coherencia entre tasks activas y arquitectura viva.
+- No se ejecutaron `build/lint/test` porque el cambio de este turno fue solo documental.
+
+## Sesión 2026-04-01 — Secuencia reajustada a MVP primero para métricas Delivery
+
+### Objetivo
+
+- Dejar explícito que el siguiente carril de ejecución prioriza un `MVP` visible y confiable de métricas antes del hardening enterprise completo de integraciones.
+
+### Delta de ejecución
+
+- La secuencia de la lane quedó reajustada así:
+  - `Fase 1 MVP`: `TASK-189` -> `TASK-186`
+  - `Fase 2 hardening estructural`: `TASK-188` -> `TASK-187`
+- `TASK-189` quedó explicitada como fix quirúrgico inmediato del filtro de período/carry-over.
+- `TASK-186` quedó explicitada como carril de confianza visible en métricas y scorecards sobre la foundation actual.
+- `TASK-188` y `TASK-187` quedaron posicionadas como el siguiente tramo de institucionalización enterprise, una vez validado el MVP operativo.
+- `docs/tasks/README.md` y las tasks involucradas quedaron alineadas con esta priorización.
+
+### Validación
+
+- Revisión documental de consistencia entre:
+  - `docs/tasks/to-do/TASK-189-ico-period-filter-due-date-anchor.md`
+  - `docs/tasks/to-do/TASK-186-delivery-metrics-trust-notion-property-audit-contract.md`
+  - `docs/tasks/to-do/TASK-188-native-integrations-layer-platform-governance.md`
+  - `docs/tasks/to-do/TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md`
+  - `docs/tasks/README.md`
+- No se ejecutaron `build/lint/test` porque el cambio de este turno fue solo documental.
+
+## Sesión 2026-04-01 — TASK-186 y TASK-187 reencuadradas bajo la Native Integrations Layer
+
+### Objetivo
+
+- Ajustar `TASK-186` y `TASK-187` para que queden explícitamente subordinadas a la arquitectura canónica de `TASK-188` y `GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md`.
+
+### Delta de ejecución
+
+- `TASK-187` ahora queda posicionada como `reference implementation` de la `Native Integrations Layer` para `Notion`.
+- `TASK-186` ahora queda posicionada como `consumer hardening` para `Delivery / ICO / Performance Report` sobre esa foundation.
+- Se reforzaron en ambas tasks:
+  - la referencia a `GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md`
+  - la nueva posición arquitectónica
+  - el criterio de implementación subordinado a `TASK-188`
+- `docs/tasks/README.md` quedó con una nota más explícita sobre esta jerarquía:
+  - `TASK-187` implementa la layer para `Notion`
+  - `TASK-186` endurece el consumer de métricas
+
+### Validación
+
+- Revisión documental de consistencia entre:
+  - `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md`
+  - `docs/tasks/to-do/TASK-188-native-integrations-layer-platform-governance.md`
+  - `docs/tasks/to-do/TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md`
+  - `docs/tasks/to-do/TASK-186-delivery-metrics-trust-notion-property-audit-contract.md`
+- No se ejecutaron `build/lint/test` porque el cambio de este turno fue solo documental.
+
+## Sesión 2026-04-01 — Native Integrations Layer promovida a arquitectura viva
+
+### Objetivo
+
+- Sacar la `Native Integrations Layer` del estado “solo task” y dejarla como documento canónico de arquitectura.
+
+### Delta de ejecución
+
+- Se creó `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md` como fuente de verdad de la capability.
+- El documento consolida:
+  - tesis arquitectónica
+  - principios enterprise
+  - taxonomía de integraciones
+  - reference architecture
+  - design-time vs runtime governance
+  - anti-patterns
+  - relación con `TASK-188`, `TASK-187` y `TASK-186`
+- `TASK-188` quedó actualizada para referenciar esta nueva fuente canónica en vez de absorber toda la arquitectura dentro de la task.
+- Se actualizaron:
+  - `docs/README.md`
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `project_context.md`
+  - `changelog.md`
+
+### Validación
+
+- Revisión documental de consistencia entre arquitectura maestra, task lane y contexto operativo.
+- No se ejecutaron `build/lint/test` porque el cambio de este turno fue solo documental.
+
+## Sesión 2026-04-01 — TASK-188 enriquecida con research enterprise externo
+
+### Objetivo
+
+- Dejar `TASK-188` respaldada por patrones enterprise vigentes, no solo por intuición arquitectónica interna.
+
+### Delta de ejecución
+
+- `TASK-188` ahora incluye una baseline de investigación externa al `2026-04-01` con:
+  - principios enterprise convergentes
+  - arquitectura de referencia recomendada para Greenhouse
+  - metodología sugerida (`API-led`, `EDA`, `contract-first`, `canonical core`)
+  - anti-patterns a evitar
+  - referencias oficiales y de patrones de integración
+- La task ya deja explícito que una integration layer enterprise para Greenhouse debe incluir:
+  - registry
+  - contract governance
+  - source adapters
+  - canonical mapping layer
+  - event/workflow backbone
+  - runtime governance
+  - readiness downstream
+
+### Validación
+
+- Revisión documental + contraste con fuentes externas vigentes al `2026-04-01`.
+- No se ejecutaron `build/lint/test` porque el cambio de este turno fue solo documental.
+
+## Sesión 2026-04-01 — Secuencia conectada para TASK-188 / TASK-187 / TASK-186
+
+### Objetivo
+
+- Dejar explícito que las tres tasks forman una misma lane conectada, pero deben iterarse fortaleciendo lo existente y no rompiendo el carril actual de Notion, `greenhouse_conformed` e `ICO`.
+
+### Delta de ejecución
+
+- `TASK-188`, `TASK-187` y `TASK-186` quedaron actualizadas con un principio común de iteración:
+  - no hacer `rip-and-replace`
+  - construir sobre bindings, mappings, syncs y métricas ya existentes
+  - encapsular y gobernar primero; reemplazar después solo si todavía hace falta
+- Se dejó explícito el orden recomendado de ejecución:
+  - `TASK-188` como paraguas de `Native Integrations Layer`
+  - `TASK-187` como formalización de Notion dentro de ese marco
+  - `TASK-186` como endurecimiento final de confianza/paridad de métricas Delivery
+- `docs/tasks/README.md` también quedó con nota breve de secuencia para esta lane conectada.
+
+### Validación
+
+- Revisión documental de coherencia entre:
+  - `docs/tasks/to-do/TASK-186-delivery-metrics-trust-notion-property-audit-contract.md`
+  - `docs/tasks/to-do/TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md`
+  - `docs/tasks/to-do/TASK-188-native-integrations-layer-platform-governance.md`
+  - `docs/tasks/README.md`
+- No se ejecutaron `build/lint/test` porque el cambio de este turno fue solo documental.
+
+## Sesión 2026-04-01 — TASK-188 abierta para Native Integrations Layer
+
+### Objetivo
+
+- Abrir la lane paraguas de arquitectura para institucionalizar una `Native Integrations Layer` en Greenhouse, más allá del caso específico de Notion.
+
+### Delta de ejecución
+
+- Se creó `docs/tasks/to-do/TASK-188-native-integrations-layer-platform-governance.md`.
+- La task posiciona a `TASK-187` como primer consumer fuerte del modelo, pero explicita que el problema y la solución son cross-integration.
+- Se actualizó `docs/tasks/TASK_ID_REGISTRY.md` y `docs/tasks/README.md` para registrar `TASK-188` y dejar `TASK-189` como siguiente ID disponible.
+- `TASK-187` quedó referenciando a `TASK-188` como follow-up/paraguas arquitectónico.
+
+### Validación
+
+- Documentación revisada contra:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
+  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+  - `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
+  - `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`
+- No se ejecutaron `build/lint/test` porque el cambio de este turno fue solo documental.
+
+## Sesión 2026-04-01 — TASK-187 abierta para formalizar integración Notion
+
+### Objetivo
+
+- Abrir una lane separada de `TASK-186` para formalizar Notion como integración gobernada del platform layer, evitando que el onboarding de nuevos spaces dependa de discovery manual por agente/MCP.
+
+### Delta de ejecución
+
+- Se creó `docs/tasks/to-do/TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md`.
+- La task captura el gap estructural detrás de `TASK-186`:
+  - hoy existen bindings, mappings y scripts
+  - pero todavía no existe onboarding gobernado, schema registry, drift detection ni KPI readiness formal
+- `TASK-186` quedó referenciando a `TASK-187` como follow-up explícito.
+- Se actualizó `docs/tasks/TASK_ID_REGISTRY.md` y `docs/tasks/README.md` para registrar `TASK-187` y dejar `TASK-188` como siguiente ID disponible.
+
+### Validación
+
+- Documentación revisada contra:
+  - `src/app/api/integrations/notion/register/route.ts`
+  - `scripts/notion-schema-discovery.ts`
+  - `scripts/sync-source-runtime-projections.ts`
+  - `src/lib/space-notion/space-notion-store.ts`
+  - `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
+- No se ejecutaron `build/lint/test` porque el cambio de este turno fue solo documental.
+
+## Sesión 2026-04-01 — TASK-186 creada para confianza de métricas Delivery
+
+### Objetivo
+
+- Dejar institucionalizada una task específica para auditar propiedades Notion que alimentan métricas de Delivery y cerrar la brecha de confianza entre Notion, `greenhouse_conformed` e `ICO`.
+
+### Delta de ejecución
+
+- Se creó `docs/tasks/to-do/TASK-186-delivery-metrics-trust-notion-property-audit-contract.md`.
+- La task ya incorpora baseline de auditoría hecha vía MCP sobre Notion:
+  - `Efeonce > Proyectos`: `15288d9b-1459-4052-9acc-75439bbd5470`
+  - `Efeonce > Tareas`: `3a54f090-4be1-4158-8335-33ba96557a73`
+  - `Sky Airlines > Proyectos`: `23039c2f-efe7-817a-8272-ffe6be1a696a`
+  - `Sky Airlines > Tareas`: `23039c2f-efe7-8138-9d1e-c8238fc40523`
+  - `ANAM > Proyectos`: `32539c2f-efe7-8053-94f7-c06eb3bbf530`
+  - `ANAM > Tareas`: `32539c2f-efe7-81a4-92f4-f4725309935c`
+- La task documenta:
+  - propiedades auditadas por DB
+  - cobertura actual de `sync-notion-conformed`
+  - gaps de primitivas para scorecards auditables
+  - deriva semántica actual de `FTR`
+  - regla explícita de diseño: `core KPI contract` compartido + flexibilidad por `space_id` para particularidades de cliente/proyecto
+  - matriz de cobertura del `Performance Report` (`qué ya se puede calcular`, `qué falta`, `prioridad`)
+- Los DB IDs auditados también quedaron promovidos a arquitectura viva en:
+  - `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+- Se actualizó `docs/tasks/TASK_ID_REGISTRY.md` y `docs/tasks/README.md` para registrar `TASK-186` como lane nueva y dejar `TASK-187` como siguiente ID disponible.
+
+### Validación
+
+- Documentación revisada contra:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+  - `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
+  - `src/lib/sync/sync-notion-conformed.ts`
+  - `scripts/setup-bigquery-source-sync.sql`
+  - `src/lib/ico-engine/shared.ts`
+  - `scripts/materialize-member-metrics.ts`
+- No se ejecutaron `build/lint/test` porque el cambio de este turno fue solo documental.
+
 ## Sesión 2026-04-01 — Reconciliación real de grants runtime/migrator en PostgreSQL
 
 ### Objetivo
