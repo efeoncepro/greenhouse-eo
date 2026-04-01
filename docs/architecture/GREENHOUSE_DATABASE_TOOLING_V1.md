@@ -106,7 +106,17 @@ The wrapper uses the `migrator` profile by default. Override with `MIGRATE_PROFI
 2. **Migration before deploy.** Vercel cannot run migrations at deploy time. Apply migrations, then deploy.
 3. **Backward-compatible first.** Add nullable columns → deploy code → backfill → add constraints.
 4. **Set search_path.** Every migration must start with `SET search_path = <target_schema>, greenhouse_core, public;`
-5. **Regenerate types after migration.** Run `pnpm db:generate-types` after `pnpm migrate:up`.
+5. **Types auto-regenerate.** `pnpm migrate:up` and `migrate:down` automatically run `kysely-codegen` after applying. Skip with `MIGRATE_SKIP_TYPES=true`.
+
+### Timestamp Rules (critical)
+
+`node-pg-migrate` orders migrations by their filename timestamp. It **refuses to execute** any migration whose timestamp is earlier than the last applied migration in `pgmigrations`.
+
+1. **ALWAYS** use `pnpm migrate:create <name>` to generate files. It produces the correct UTC timestamp automatically.
+2. **NEVER** rename a migration file's timestamp manually. This breaks the ordering chain.
+3. **NEVER** create migration files by hand with invented timestamps. If the timestamp falls before the baseline (`20260401120000`), the migration will be silently skipped or error out.
+4. **If two pending migrations must run in a specific order**, combine them into a single file rather than manipulating timestamps.
+5. **If a migration was already applied** and you need to change it, create a new migration that alters/corrects — never edit an applied migration.
 
 ### Migration vs Legacy Setup Scripts
 
@@ -224,7 +234,7 @@ Require Cloud SQL Auth Proxy running locally.
 ```
 greenhouse-eo/
 ├── migrations/                              # Versioned SQL migrations
-│   └── 20260401120000_initial-baseline.sql  # Baseline (no-op)
+│   └── 20260401120000000_initial-baseline.sql  # Baseline (no-op)
 ├── scripts/
 │   ├── migrate.ts                           # Migration CLI wrapper
 │   ├── generate-db-types.ts                 # Kysely codegen wrapper

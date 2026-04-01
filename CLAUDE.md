@@ -179,8 +179,9 @@ Si un archivo en `docs/tasks/` no es una task sino una spec de arquitectura o re
 ### Database Migrations
 - **Framework**: `node-pg-migrate` — SQL-first, versionado en `migrations/`
 - **Comandos**: `pnpm migrate:create <nombre>`, `pnpm migrate:up`, `pnpm migrate:down`, `pnpm migrate:status`
-- **Flujo obligatorio**: crear migración → `migrate:up` → `db:generate-types` → commit todo junto
+- **Flujo obligatorio**: `migrate:create` → editar SQL → `migrate:up` (auto-regenera tipos) → commit todo junto
 - **Regla**: migración ANTES del deploy, siempre. Columnas nullable primero, constraints después.
+- **Timestamps**: SIEMPRE usar `pnpm migrate:create` para generar archivos. NUNCA renombrar timestamps manualmente ni crear archivos a mano — `node-pg-migrate` rechaza migraciones con timestamp anterior a la última aplicada.
 - **Spec completa**: `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`
 
 ### Tests y validación

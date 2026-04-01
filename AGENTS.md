@@ -262,7 +262,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - `GREENHOUSE_POSTGRES_PORT`
 - Ownership:
   - **`greenhouse_ops`** es el canonical owner de todos los objetos (122 tablas, 11 schemas, 17 views)
-  - Consolidado en migración `20260401084334779_consolidate-ownership-to-greenhouse-ops.sql`
+  - Consolidado en migración `20260402000000000_consolidate-ownership-to-greenhouse-ops.sql`
   - Password en Secret Manager: `greenhouse-pg-dev-ops-password`
   - Default privileges configurados: objetos nuevos de `greenhouse_ops` otorgan grants automáticos a `greenhouse_runtime` y `greenhouse_migrator`
 - Regla operativa:
@@ -306,13 +306,17 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Cada migración DEBE incluir `SET search_path = <target_schema>, greenhouse_core, public;` al inicio.
 - Regla de orden: **migración ANTES del deploy, siempre** (Vercel no ejecuta migraciones en deploy time).
 - Regla de backward-compatibility: columnas nullable primero, deploy código, backfill, luego constraint.
+- Reglas de timestamps:
+  - **SIEMPRE** usar `pnpm migrate:create <nombre>` para generar el archivo — genera el timestamp UTC correcto automáticamente.
+  - **NUNCA** renombrar manualmente el timestamp de un archivo de migración. `node-pg-migrate` ordena por timestamp y rechaza ejecutar migraciones cuyo timestamp sea anterior a la última aplicada.
+  - **NUNCA** crear archivos de migración a mano con timestamps inventados. Si el timestamp cae antes del baseline (`20260401120000000`), la migración será ignorada silenciosamente o causará error.
+  - Si necesitas que una migración corra antes que otra pendiente, la solución es reordenar el contenido dentro de un solo archivo, no manipular timestamps.
 - Flujo obligatorio al modificar schema:
-  1. `pnpm migrate:create <nombre>` — crea archivo SQL
+  1. `pnpm migrate:create <nombre>` — crea archivo SQL con timestamp UTC correcto
   2. Editar el archivo con el DDL necesario
-  3. `pnpm migrate:up` — aplica contra la base de datos
-  4. `pnpm db:generate-types` — regenera tipos Kysely para reflejar los cambios
-  5. Commit migración + `db.d.ts` actualizado **juntos** en el mismo commit
-  6. `pnpm build` para verificar que los tipos son consistentes
+  3. `pnpm migrate:up` — aplica contra la base de datos (auto-regenera tipos Kysely)
+  4. Commit migración + `db.d.ts` actualizado **juntos** en el mismo commit
+  5. `pnpm build` para verificar que los tipos son consistentes
 - Conexión local: requiere Cloud SQL Proxy (`cloud-sql-proxy "efeonce-group:us-east4:greenhouse-pg-dev" --port 15432`) y `GREENHOUSE_POSTGRES_HOST=127.0.0.1`, `PORT=15432` en `.env.local`.
 - Spec completa: `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`
 
