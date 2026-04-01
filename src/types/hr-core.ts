@@ -202,6 +202,16 @@ export interface HrDepartmentsResponse {
   }
 }
 
+export interface HrMemberOption {
+  memberId: string
+  displayName: string
+  roleTitle: string
+}
+
+export interface HrMemberOptionsResponse {
+  members: HrMemberOption[]
+}
+
 export interface HrLeaveBalancesResponse {
   balances: HrLeaveBalance[]
   policies?: HrLeavePolicy[]

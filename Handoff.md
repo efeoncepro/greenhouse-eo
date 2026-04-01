@@ -1,5 +1,26 @@
 # Handoff.md
 
+## Sesión 2026-04-01 — HR Departments responsable lookup reparado
+
+### Objetivo
+
+- Recuperar el selector `Responsable` en `HR > Departments`, que había dejado de poblar opciones al abrir el modal.
+
+### Delta de ejecución
+
+- `HrDepartmentsView` ya no consulta `/api/people` para ese lookup.
+- Nueva route `GET /api/hr/core/members/options` bajo permisos HR:
+  - reutiliza `getPeopleList()` como reader canónico del objeto persona
+  - filtra solo miembros activos
+  - entrega un payload liviano con `memberId`, `displayName` y `roleTitle`
+- Con esto, el modal de departamentos deja de depender de permisos del módulo `People` para resolver responsables.
+
+### Validación
+
+- `pnpm exec vitest run src/app/api/hr/core/members/options/route.test.ts src/app/api/hr/core/departments/route.test.ts 'src/app/api/hr/core/departments/[departmentId]/route.test.ts'` ✅
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm lint` ✅
+
 ## Sesión 2026-04-01 — Vitest scripts discovery alineado
 
 ### Objetivo

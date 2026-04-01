@@ -40,8 +40,7 @@ import CustomTextField from '@core/components/mui/TextField'
 
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
 import type { BusinessLineMetadata } from '@/types/business-line'
-import type { HrDepartment, HrDepartmentsResponse } from '@/types/hr-core'
-import type { PersonListItem } from '@/types/people'
+import type { HrDepartment, HrDepartmentsResponse, HrMemberOption, HrMemberOptionsResponse } from '@/types/hr-core'
 
 // ── Form types ──
 
@@ -65,14 +64,6 @@ const FORM_DEFAULTS: DepartmentFormValues = {
   active: true
 }
 
-// ── Lightweight member option for autocomplete ──
-
-interface MemberOption {
-  memberId: string
-  displayName: string
-  roleTitle: string
-}
-
 type Props = {
   isAdmin?: boolean
 }
@@ -87,7 +78,7 @@ const HrDepartmentsView = ({ isAdmin }: Props) => {
 
   // Reference data for selects
   const [businessLines, setBusinessLines] = useState<BusinessLineMetadata[]>([])
-  const [members, setMembers] = useState<MemberOption[]>([])
+  const [members, setMembers] = useState<HrMemberOption[]>([])
   const [loadingBL, setLoadingBL] = useState(false)
   const [loadingMembers, setLoadingMembers] = useState(false)
 
@@ -132,20 +123,12 @@ const HrDepartmentsView = ({ isAdmin }: Props) => {
     setLoadingMembers(true)
 
     try {
-      const res = await fetch('/api/people', { signal: AbortSignal.timeout(5000) })
+      const res = await fetch('/api/hr/core/members/options', { signal: AbortSignal.timeout(5000) })
 
       if (res.ok) {
-        const payload = await res.json()
+        const payload = (await res.json()) as HrMemberOptionsResponse
 
-        setMembers(
-          (payload.items ?? [])
-            .filter((p: PersonListItem) => p.active)
-            .map((p: PersonListItem) => ({
-              memberId: p.memberId,
-              displayName: p.displayName,
-              roleTitle: p.roleTitle
-            }))
-        )
+        setMembers(payload.members ?? [])
       }
     } catch {
       // silently fail
