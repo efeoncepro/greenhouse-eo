@@ -427,8 +427,10 @@ export interface GreenhouseCoreMembers {
   contact_channel: string | null;
   contact_handle: string | null;
   contract_end_date: Timestamp | null;
+  contract_type: Generated<string>;
   created_at: Generated<Timestamp>;
   daily_required: Generated<boolean>;
+  deel_contract_id: string | null;
   department_id: string | null;
   display_name: string;
   efeonce_start_date: Timestamp | null;
@@ -448,6 +450,8 @@ export interface GreenhouseCoreMembers {
   notion_display_name: string | null;
   notion_user_id: string | null;
   org_role_id: string | null;
+  pay_regime: Generated<string>;
+  payroll_via: Generated<string>;
   phone: string | null;
   preferred_name: string | null;
   primary_email: string | null;
@@ -1652,6 +1656,79 @@ export interface GreenhouseHrLeaveTypes {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseNotificationsEmailDeliveries {
+  actor_email: string | null;
+  attempt_number: Generated<number>;
+  batch_id: string;
+  created_at: Generated<Timestamp>;
+  delivery_id: Generated<string>;
+  delivery_payload: Generated<Json>;
+  domain: string;
+  email_type: string;
+  error_message: string | null;
+  has_attachments: Generated<boolean>;
+  recipient_email: string;
+  recipient_name: string | null;
+  recipient_user_id: string | null;
+  resend_id: string | null;
+  source_entity: string | null;
+  source_event_id: string | null;
+  status: Generated<string>;
+  subject: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseNotificationsEmailSubscriptions {
+  active: Generated<boolean>;
+  created_at: Generated<Timestamp>;
+  email_type: string;
+  recipient_email: string;
+  recipient_name: string | null;
+  recipient_user_id: string | null;
+  subscription_id: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseNotificationsNotificationLog {
+  category: string;
+  channel: string;
+  created_at: Generated<Timestamp>;
+  error_message: string | null;
+  log_id: Generated<string>;
+  metadata: Generated<Json | null>;
+  notification_id: string | null;
+  skip_reason: string | null;
+  status: string;
+  user_id: string;
+}
+
+export interface GreenhouseNotificationsNotificationPreferences {
+  category: string;
+  email_enabled: Generated<boolean>;
+  in_app_enabled: Generated<boolean>;
+  muted_until: Timestamp | null;
+  preference_id: Generated<string>;
+  updated_at: Generated<Timestamp>;
+  user_id: string;
+}
+
+export interface GreenhouseNotificationsNotifications {
+  action_url: string | null;
+  archived_at: Timestamp | null;
+  body: string | null;
+  category: string;
+  channel: Generated<string | null>;
+  created_at: Generated<Timestamp>;
+  icon: string | null;
+  metadata: Generated<Json | null>;
+  notification_id: Generated<string>;
+  read_at: Timestamp | null;
+  space_id: string | null;
+  status: Generated<string | null>;
+  title: string;
+  user_id: string;
+}
+
 export interface GreenhousePayrollAttendanceMonthlySnapshot {
   days_absent: Generated<number>;
   days_holiday: Generated<number>;
@@ -1795,6 +1872,7 @@ export interface GreenhousePayrollPayrollEntries {
   days_on_leave: number | null;
   days_on_unpaid_leave: number | null;
   days_present: number | null;
+  deel_contract_id: string | null;
   entry_id: string;
   fixed_bonus_amount: Generated<Numeric>;
   fixed_bonus_label: string | null;
@@ -1814,8 +1892,11 @@ export interface GreenhousePayrollPayrollEntries {
   net_total_calculated: Numeric | null;
   net_total_override: Numeric | null;
   pay_regime: string;
+  payroll_via: Generated<string>;
   period_id: string;
   remote_allowance: Generated<Numeric>;
+  sii_retention_amount: Numeric | null;
+  sii_retention_rate: Numeric | null;
   updated_at: Generated<Timestamp>;
   working_days_in_period: number | null;
 }
@@ -2088,8 +2169,10 @@ export interface GreenhouseServingMember360 {
   active: boolean | null;
   canonical_email: string | null;
   contract_end_date: Timestamp | null;
+  contract_type: string | null;
   created_at: Timestamp | null;
   daily_required: boolean | null;
+  deel_contract_id: string | null;
   department_id: string | null;
   department_name: string | null;
   display_name: string | null;
@@ -2101,12 +2184,15 @@ export interface GreenhouseServingMember360 {
   job_level: string | null;
   linked_user_count: Int8 | null;
   member_id: string | null;
+  pay_regime: string | null;
+  payroll_via: string | null;
   phone: string | null;
   primary_email: string | null;
   profile_type: string | null;
   public_id: string | null;
   reports_to_member_id: string | null;
   reports_to_member_name: string | null;
+  schedule_required: boolean | null;
   status: string | null;
   updated_at: Timestamp | null;
 }
@@ -2164,21 +2250,29 @@ export interface GreenhouseServingMemberLeave360 {
 
 export interface GreenhouseServingMemberPayroll360 {
   base_salary: Numeric | null;
+  compensation_contract_type: string | null;
   compensation_effective_from: Timestamp | null;
   compensation_effective_to: Timestamp | null;
+  compensation_pay_regime: string | null;
   contract_type: string | null;
   currency: string | null;
   current_compensation_version_id: string | null;
+  daily_required: boolean | null;
+  deel_contract_id: string | null;
   department_name: string | null;
   display_name: string | null;
   employment_type: string | null;
+  fixed_bonus_amount: Numeric | null;
+  fixed_bonus_label: string | null;
   job_level: string | null;
   member_active: boolean | null;
   member_id: string | null;
   member_status: string | null;
   pay_regime: string | null;
+  payroll_via: string | null;
   primary_email: string | null;
   remote_allowance: Numeric | null;
+  schedule_required: boolean | null;
   total_compensation_versions: Int8 | null;
   total_payroll_entries: Int8 | null;
 }
@@ -2404,9 +2498,11 @@ export interface GreenhouseServingPersonHr360 {
   approved_requests_this_year: number | null;
   base_salary: Numeric | null;
   comp_currency: string | null;
+  compensation_contract_type: string | null;
   contract_end_date: Timestamp | null;
   contract_type: string | null;
   daily_required: boolean | null;
+  deel_contract_id: string | null;
   department_name: string | null;
   employment_type: string | null;
   eo_id: string | null;
@@ -2416,11 +2512,13 @@ export interface GreenhouseServingPersonHr360 {
   member_email: string | null;
   member_id: string | null;
   pay_regime: string | null;
+  payroll_via: string | null;
   pending_requests: number | null;
   personal_allowance: Numeric | null;
   personal_used: Numeric | null;
   reports_to_member_id: string | null;
   resolved_display_name: string | null;
+  schedule_required: boolean | null;
   supervisor_name: string | null;
   total_approved_days_this_year: Numeric | null;
   vacation_allowance: Numeric | null;
@@ -2919,6 +3017,11 @@ export interface DB {
   "greenhouse_hr.leave_request_actions": GreenhouseHrLeaveRequestActions;
   "greenhouse_hr.leave_requests": GreenhouseHrLeaveRequests;
   "greenhouse_hr.leave_types": GreenhouseHrLeaveTypes;
+  "greenhouse_notifications.email_deliveries": GreenhouseNotificationsEmailDeliveries;
+  "greenhouse_notifications.email_subscriptions": GreenhouseNotificationsEmailSubscriptions;
+  "greenhouse_notifications.notification_log": GreenhouseNotificationsNotificationLog;
+  "greenhouse_notifications.notification_preferences": GreenhouseNotificationsNotificationPreferences;
+  "greenhouse_notifications.notifications": GreenhouseNotificationsNotifications;
   "greenhouse_payroll.attendance_monthly_snapshot": GreenhousePayrollAttendanceMonthlySnapshot;
   "greenhouse_payroll.chile_afp_rates": GreenhousePayrollChileAfpRates;
   "greenhouse_payroll.chile_previred_indicators": GreenhousePayrollChilePreviredIndicators;

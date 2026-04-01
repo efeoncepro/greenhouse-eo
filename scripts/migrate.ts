@@ -70,7 +70,10 @@ const main = () => {
   // Load env and apply profile
   loadGreenhouseToolEnv()
 
-  const profile = (process.env.MIGRATE_PROFILE as PostgresProfile) || 'migrator'
+  // Default to 'ops' — greenhouse_ops is the canonical owner of all objects
+  // and has DDL privileges across all schemas. Override with MIGRATE_PROFILE
+  // if needed (e.g., MIGRATE_PROFILE=migrator for restricted DDL).
+  const profile = (process.env.MIGRATE_PROFILE as PostgresProfile) || 'ops'
 
   console.log(`[migrate] Using profile: ${profile}`)
   applyGreenhousePostgresProfile(profile)
