@@ -1,5 +1,39 @@
 # Handoff.md
 
+## Sesión 2026-04-01 — TASK-026 contract canonicalization cerrada end-to-end
+
+### Objetivo
+
+- Cerrar `TASK-026` end-to-end: runtime, migración aplicada en Cloud SQL, regeneración de tipos y documentación viva alineada.
+
+### Estado vigente
+
+- `greenhouse_core.members` ya es el ancla canónica para `contract_type`, `pay_regime`, `payroll_via` y `deel_contract_id`.
+- `compensation_versions` sigue guardando snapshot histórico del contrato, pero no reemplaza al miembro como fuente de verdad.
+- `payroll_entries` ya expone `payroll_via`, `deel_contract_id`, `sii_retention_rate` y `sii_retention_amount`.
+- `daily_required` sigue siendo el flag almacenado; `schedule_required` queda como alias de lectura en serving, UI y helpers.
+- Se actualizaron docs vivos y task pipeline:
+  - `docs/architecture/Greenhouse_HRIS_Architecture_v1.md`
+  - `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
+  - `project_context.md`
+  - `changelog.md`
+  - `Handoff.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/complete/TASK-026-hris-contract-type-consolidation.md`
+  - `docs/tasks/to-do/TASK-027-hris-document-vault.md`
+
+### Nota operativa
+
+- La migracion de `TASK-026` requirio Cloud SQL Proxy local en `127.0.0.1:15432`; el intento directo a la IP publica de Cloud SQL termino en `ETIMEDOUT`.
+- Las primeras migraciones generadas quedaron con timestamps anteriores a migraciones ya aplicadas; se regeneraron con `node-pg-migrate create` hasta quedar posteriores al tracking real en `public.pgmigrations`.
+- El DDL cross-schema no pudo aplicar con `migrator` ni con el `admin` legacy (`postgres`); se usó `greenhouse_ops` via Secret Manager como carril break-glass efectivo.
+- Validación ya cerrada en el branch:
+  - `pnpm migrate:up` ✅
+  - `pnpm db:generate-types` ✅
+  - `pnpm lint` ✅
+  - `pnpm build` ✅
+
 ## Uso
 
 Este archivo es el snapshot operativo entre agentes. Debe priorizar claridad y continuidad.

@@ -78,6 +78,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
         <TableBody>
           {entries.map(entry => {
             const isChile = entry.payRegime === 'chile'
+            const isHonorarios = (entry.siiRetentionAmount ?? 0) > 0
             const isExpanded = expandedId === entry.entryId
             const otd = otdSemaphore(entry.kpiOtdPercent, entry.bonusOtdProrationFactor)
             const rpa = rpaSemaphore(entry.kpiRpaAvg, entry.bonusRpaProrationFactor)
@@ -115,13 +116,21 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
                             {entry.memberName}
                           </Typography>
                         </Link>
-                        <CustomChip
-                          round='true'
-                          size='small'
-                          label={regimeLabel[entry.payRegime]}
-                          color={regimeColor[entry.payRegime]}
-                          sx={{ height: 18, fontSize: '0.65rem' }}
-                        />
+                        <Stack direction='row' spacing={0.75} sx={{ mt: 0.5 }}>
+                          <CustomChip
+                            round='true'
+                            size='small'
+                            label={regimeLabel[entry.payRegime]}
+                            color={regimeColor[entry.payRegime]}
+                            sx={{ height: 18, fontSize: '0.65rem' }}
+                          />
+                          {entry.payrollVia === 'deel' && (
+                            <CustomChip round='true' size='small' label='Deel' color='secondary' sx={{ height: 18, fontSize: '0.65rem' }} />
+                          )}
+                          {isHonorarios && (
+                            <CustomChip round='true' size='small' label='Honorarios' color='warning' sx={{ height: 18, fontSize: '0.65rem' }} />
+                          )}
+                        </Stack>
                       </Box>
                     </Stack>
                   </TableCell>
@@ -249,14 +258,14 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
 
                   {/* Descuentos */}
                   <TableCell align='right'>
-                    {isChile ? (
+                    {isChile || isHonorarios ? (
                       <Typography
                         variant='body2'
                         color='error.main'
                         sx={{ fontFamily: 'monospace', cursor: 'pointer' }}
                         onClick={() => toggleExpand(entry.entryId)}
                       >
-                        - {formatCurrency(entry.chileTotalDeductions, 'CLP')}
+                        - {formatCurrency(isHonorarios ? entry.siiRetentionAmount : entry.chileTotalDeductions, 'CLP')}
                       </Typography>
                     ) : (
                       <Typography variant='body2' color='text.disabled'>—</Typography>
@@ -356,6 +365,58 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
                               <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                                 <ChileDeductionBreakdown entry={entry} />
                               </Box>
+                            )}
+
+                            {isHonorarios && (
+                              <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+                                <CardContent sx={{ py: 2 }}>
+                                  <Typography variant='subtitle2' color='text.secondary' sx={{ mb: 2 }}>
+                                    <i className='tabler-receipt-tax' style={{ fontSize: 16, verticalAlign: 'text-bottom', marginRight: 4 }} />
+                                    Honorarios Chile
+                                  </Typography>
+                                  <Grid container spacing={2}>
+                                    <Grid size={{ xs: 6, sm: 3 }}>
+                                      <Typography variant='caption' color='text.secondary'>Bruto</Typography>
+                                      <Typography variant='body2' fontWeight={500}>{formatCurrency(entry.grossTotal, entry.currency)}</Typography>
+                                    </Grid>
+                                    <Grid size={{ xs: 6, sm: 3 }}>
+                                      <Typography variant='caption' color='text.secondary'>Retención SII</Typography>
+                                      <Typography variant='body2' fontWeight={500} color='error.main'>
+                                        {formatCurrency(entry.siiRetentionAmount, 'CLP')}
+                                      </Typography>
+                                    </Grid>
+                                    <Grid size={{ xs: 6, sm: 3 }}>
+                                      <Typography variant='caption' color='text.secondary'>Tasa</Typography>
+                                      <Typography variant='body2' fontWeight={500}>
+                                        {entry.siiRetentionRate != null ? `${(entry.siiRetentionRate * 100).toFixed(2)}%` : '—'}
+                                      </Typography>
+                                    </Grid>
+                                    <Grid size={{ xs: 6, sm: 3 }}>
+                                      <Typography variant='caption' color='text.secondary'>Neto</Typography>
+                                      <Typography variant='body2' fontWeight={600}>{formatCurrency(entry.netTotal, entry.currency)}</Typography>
+                                    </Grid>
+                                  </Grid>
+                                </CardContent>
+                              </Card>
+                            )}
+
+                            {entry.payrollVia === 'deel' && (
+                              <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+                                <CardContent sx={{ py: 2 }}>
+                                  <Typography variant='subtitle2' color='text.secondary' sx={{ mb: 1.5 }}>
+                                    <i className='tabler-world-dollar' style={{ fontSize: 16, verticalAlign: 'text-bottom', marginRight: 4 }} />
+                                    Registro Deel
+                                  </Typography>
+                                  <Typography variant='body2' color='text.secondary'>
+                                    Greenhouse registra el monto y los bonos discrecionales, pero Deel gestiona cumplimiento y pago final.
+                                  </Typography>
+                                  {entry.deelContractId && (
+                                    <Typography variant='caption' sx={{ display: 'block', mt: 1.5, fontFamily: 'monospace' }}>
+                                      Contrato: {entry.deelContractId}
+                                    </Typography>
+                                  )}
+                                </CardContent>
+                              </Card>
                             )}
 
                             {/* Manual KPI fields */}

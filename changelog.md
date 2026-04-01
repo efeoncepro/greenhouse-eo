@@ -2,6 +2,18 @@
 
 ## 2026-04-01
 
+- **TASK-026 HRIS contract canonicalization**:
+  - `greenhouse_core.members` pasó a ser el canon de `contract_type`, `pay_regime`, `payroll_via` y `deel_contract_id`
+  - `greenhouse_payroll.compensation_versions` conserva el snapshot historico del contrato para payroll, pero ya no es la fuente de verdad del colaborador
+  - `greenhouse_payroll.payroll_entries` ahora guarda `payroll_via`, `deel_contract_id`, `sii_retention_rate` y `sii_retention_amount`
+  - `member_360`, `member_payroll_360` y `person_hr_360` quedaron alineadas para exponer canon + aliases de snapshot sin duplicar semantica
+  - `daily_required` sigue siendo el flag canónico; `schedule_required` queda solo como alias semantico de lectura
+  - la migración aplicada quedó versionada como `20260402001100000_hris-contract-types.sql`
+  - validacion cerrada del branch: `pnpm migrate:up` ✅, `pnpm db:generate-types` ✅, `pnpm lint` ✅, `pnpm build` ✅
+  - nota operativa: la corrida de migracion detecto `ETIMEDOUT` contra la IP publica de Cloud SQL hasta levantar Cloud SQL Proxy local; luego aparecio un conflicto de orden por timestamps anteriores a migraciones ya aplicadas, y finalmente el DDL cross-schema solo pudo ejecutar con `greenhouse_ops` como owner efectivo
+
+## 2026-04-01
+
 - **HR Departments Postgres runtime cutover** (`TASK-180`):
   - `HR > Departments` deja de leer/escribir `greenhouse.departments` en BigQuery y pasa a operar sobre `greenhouse_core.departments` en PostgreSQL
   - nuevo store `src/lib/hr-core/postgres-departments-store.ts` para list/detail/create/update y para alinear la asignación `members.department_id`

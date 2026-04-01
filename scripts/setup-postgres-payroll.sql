@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_payroll.compensation_versions (
   health_system TEXT CHECK (health_system IS NULL OR health_system IN ('fonasa', 'isapre')),
   health_plan_uf NUMERIC(10, 4),
   unemployment_rate NUMERIC(6, 4),
-  contract_type TEXT NOT NULL DEFAULT 'indefinido' CHECK (contract_type IN ('indefinido', 'plazo_fijo')),
+  contract_type TEXT NOT NULL DEFAULT 'indefinido' CHECK (contract_type IN ('indefinido', 'plazo_fijo', 'honorarios', 'contractor', 'eor')),
   has_apv BOOLEAN NOT NULL DEFAULT FALSE,
   apv_amount NUMERIC(14, 2) NOT NULL DEFAULT 0,
   effective_from DATE NOT NULL,
@@ -90,6 +90,8 @@ CREATE TABLE IF NOT EXISTS greenhouse_payroll.payroll_entries (
 
   -- Snapshot: compensation at calculation time
   pay_regime TEXT NOT NULL CHECK (pay_regime IN ('chile', 'international')),
+  payroll_via TEXT NOT NULL DEFAULT 'internal' CHECK (payroll_via IN ('internal', 'deel')),
+  deel_contract_id TEXT,
   currency TEXT NOT NULL CHECK (currency IN ('CLP', 'USD')),
   base_salary NUMERIC(14, 2) NOT NULL,
   remote_allowance NUMERIC(14, 2) NOT NULL DEFAULT 0,
@@ -137,6 +139,8 @@ CREATE TABLE IF NOT EXISTS greenhouse_payroll.payroll_entries (
   chile_unemployment_amount NUMERIC(14, 2),
   chile_taxable_base NUMERIC(14, 2),
   chile_tax_amount NUMERIC(14, 2),
+  sii_retention_rate NUMERIC(6, 4),
+  sii_retention_amount NUMERIC(14, 2),
   chile_apv_amount NUMERIC(14, 2),
   chile_uf_value NUMERIC(10, 2),
   chile_total_deductions NUMERIC(14, 2),
@@ -599,6 +603,7 @@ END $$;
 -- Combines canonical member identity with current compensation.
 -- ============================================================
 
+DROP VIEW IF EXISTS greenhouse_serving.member_payroll_360;
 CREATE OR REPLACE VIEW greenhouse_serving.member_payroll_360 AS
 SELECT
   m.member_id,
@@ -606,17 +611,23 @@ SELECT
   m.primary_email,
   m.job_level,
   m.employment_type,
+  m.contract_type,
+  m.pay_regime,
+  m.payroll_via,
+  m.daily_required,
+  m.daily_required AS schedule_required,
+  m.deel_contract_id,
   m.status AS member_status,
   m.active AS member_active,
   d.name AS department_name,
   cv.version_id AS current_compensation_version_id,
-  cv.pay_regime,
+  cv.pay_regime AS compensation_pay_regime,
   cv.currency,
   cv.base_salary,
   cv.remote_allowance,
   cv.fixed_bonus_label,
   cv.fixed_bonus_amount,
-  cv.contract_type,
+  cv.contract_type AS compensation_contract_type,
   cv.effective_from AS compensation_effective_from,
   cv.effective_to AS compensation_effective_to,
   (SELECT COUNT(*) FROM greenhouse_payroll.compensation_versions cv2 WHERE cv2.member_id = m.member_id) AS total_compensation_versions,

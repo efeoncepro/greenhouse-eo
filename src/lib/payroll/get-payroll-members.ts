@@ -67,7 +67,12 @@ const normalizeCompensationMember = (row: PayrollCompensationMemberRow): Payroll
     compensationVersionCount,
     currentCompensationVersionId,
     currentCompensationEffectiveFrom: toDateString(row.current_effective_from),
+    currentContractType: null,
     currentPayRegime: normalizePayRegime(row.current_pay_regime),
+    currentPayrollVia: normalizePayRegime(row.current_pay_regime) === 'international' ? 'deel' : normalizePayRegime(row.current_pay_regime) === 'chile' ? 'internal' : null,
+    currentScheduleRequired: null,
+    currentDeelContractId: null,
+    currentContractEndDate: null,
     currentCurrency: normalizePayrollCurrency(row.current_currency)
   }
 }

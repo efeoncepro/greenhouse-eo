@@ -4,6 +4,7 @@ import { BigQuery } from '@google-cloud/bigquery'
 
 import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from './lib/load-greenhouse-tool-env'
 import { getGoogleAuthOptions, getGoogleProjectId } from '@/lib/google-credentials'
+import { getSiiRetentionRate, normalizeContractType, normalizePayRegime, normalizePayrollVia } from '@/types/hr-contracts'
 
 const toNum = (v: unknown): number => {
   if (v === null || v === undefined) return 0
@@ -54,6 +55,39 @@ return null
 
 const toBool = (v: unknown): boolean => Boolean(v)
 
+const deriveContractType = (row: Record<string, unknown>) => {
+  const payRegime = normalizePayRegime(toStr(row.pay_regime))
+  const explicit = normalizeContractType(toStr(row.contract_type))
+
+  if (explicit) {
+    return explicit
+  }
+
+  return payRegime === 'international' ? 'contractor' : 'indefinido'
+}
+
+const derivePayrollVia = (row: Record<string, unknown>) => {
+  const contractType = deriveContractType(row)
+
+  return normalizePayrollVia(toStr(row.payroll_via), contractType)
+}
+
+const deriveSiiRetentionRate = (row: Record<string, unknown>) => {
+  const explicit = toNullNum(row.sii_retention_rate)
+
+  if (explicit != null) {
+    return explicit
+  }
+
+  if (deriveContractType(row) !== 'honorarios') {
+    return null
+  }
+
+  const year = toNum(row.year) || Number(String(toDate(row.created_at) || '').slice(0, 4)) || new Date().getFullYear()
+
+  return getSiiRetentionRate(year)
+}
+
 const main = async () => {
   loadGreenhouseToolEnv()
   applyGreenhousePostgresProfile('migrator')
@@ -86,14 +120,14 @@ const main = async () => {
         ON CONFLICT (version_id) DO NOTHING`,
         [
           toStr(r.version_id), toStr(r.member_id), toNum(r.version),
-          toStr(r.pay_regime) || 'chile', toStr(r.currency) || 'CLP',
+          normalizePayRegime(toStr(r.pay_regime)) || 'chile', toStr(r.currency) || 'CLP',
           toNum(r.base_salary), toNum(r.remote_allowance),
           toNum(r.bonus_otd_min), toNum(r.bonus_otd_max),
           toNum(r.bonus_rpa_min), toNum(r.bonus_rpa_max),
           toStr(r.afp_name), toNullNum(r.afp_rate),
           toStr(r.health_system), toNullNum(r.health_plan_uf),
           toNullNum(r.unemployment_rate),
-          toStr(r.contract_type) || 'indefinido',
+          deriveContractType(r),
           toBool(r.has_apv), toNum(r.apv_amount),
           toDate(r.effective_from), toDate(r.effective_to),
           toBool(r.is_current),
@@ -152,7 +186,7 @@ const main = async () => {
       await runGreenhousePostgresQuery(
         `INSERT INTO greenhouse_payroll.payroll_entries (
           entry_id, period_id, member_id, compensation_version_id,
-          pay_regime, currency, base_salary, remote_allowance,
+          pay_regime, payroll_via, deel_contract_id, currency, base_salary, remote_allowance,
           member_display_name,
           kpi_otd_percent, kpi_rpa_avg, kpi_otd_qualifies, kpi_rpa_qualifies,
           kpi_tasks_completed, kpi_data_source,
@@ -161,17 +195,20 @@ const main = async () => {
           chile_afp_name, chile_afp_rate, chile_afp_amount,
           chile_health_system, chile_health_amount,
           chile_unemployment_rate, chile_unemployment_amount,
-          chile_taxable_base, chile_tax_amount, chile_apv_amount,
+          chile_taxable_base, chile_tax_amount, sii_retention_rate, sii_retention_amount, chile_apv_amount,
           chile_uf_value, chile_total_deductions,
           net_total_calculated, net_total_override, net_total,
           manual_override, manual_override_note,
           created_at, updated_at
-        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35,$36,$37,$38)
+        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33,$34,$35,$36,$37,$38,$39,$40,$41,$42)
         ON CONFLICT (entry_id) DO NOTHING`,
         [
           toStr(r.entry_id), toStr(r.period_id), toStr(r.member_id),
           toStr(r.compensation_version_id),
-          toStr(r.pay_regime) || 'chile', toStr(r.currency) || 'CLP',
+          normalizePayRegime(toStr(r.pay_regime)) || 'chile',
+          derivePayrollVia(r),
+          toStr(r.deel_contract_id),
+          toStr(r.currency) || 'CLP',
           toNum(r.base_salary), toNum(r.remote_allowance),
           toStr(r.member_display_name),
           toNullNum(r.kpi_otd_percent), toNullNum(r.kpi_rpa_avg),
@@ -185,6 +222,7 @@ const main = async () => {
           toStr(r.chile_health_system), toNullNum(r.chile_health_amount),
           toNullNum(r.chile_unemployment_rate), toNullNum(r.chile_unemployment_amount),
           toNullNum(r.chile_taxable_base), toNullNum(r.chile_tax_amount),
+          deriveSiiRetentionRate(r), toNullNum(r.sii_retention_amount),
           toNullNum(r.chile_apv_amount), toNullNum(r.chile_uf_value),
           toNullNum(r.chile_total_deductions),
           toNullNum(r.net_total_calculated), toNullNum(r.net_total_override),

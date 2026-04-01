@@ -14,6 +14,12 @@ import type {
   UpdateCompensationVersionInput,
   UpdatePayrollPeriodInput
 } from '@/types/payroll'
+import {
+  CONTRACT_DERIVATIONS,
+  normalizeContractType,
+  normalizePayrollVia,
+  resolveScheduleRequired
+} from '@/types/hr-contracts'
 
 import {
   isGreenhousePostgresConfigured,
@@ -78,6 +84,9 @@ type PgCompensationRow = {
   health_plan_uf: number | string | null
   unemployment_rate: number | string | null
   contract_type: string
+  payroll_via: string | null
+  deel_contract_id: string | null
+  daily_required: boolean | null
   has_apv: boolean
   apv_amount: number | string
   effective_from: string | Date
@@ -138,6 +147,8 @@ type PgEntryRow = {
   avatar_url: string | null
   compensation_version_id: string
   pay_regime: string
+  payroll_via: string | null
+  deel_contract_id: string | null
   currency: string
   base_salary: number | string
   remote_allowance: number | string
@@ -182,6 +193,8 @@ type PgEntryRow = {
   chile_unemployment_amount: number | string | null
   chile_taxable_base: number | string | null
   chile_tax_amount: number | string | null
+  sii_retention_rate: number | string | null
+  sii_retention_amount: number | string | null
   chile_apv_amount: number | string | null
   chile_uf_value: number | string | null
   chile_total_deductions: number | string | null
@@ -218,7 +231,12 @@ type PgCompensationMemberRow = PgMemberRow & {
   compensation_version_count: number | string | null
   current_version_id: string | null
   current_effective_from: string | Date | null
+  current_contract_type: string | null
   current_pay_regime: string | null
+  current_payroll_via: string | null
+  current_daily_required: boolean | null
+  current_deel_contract_id: string | null
+  contract_end_date: string | Date | null
   current_currency: string | null
 }
 
@@ -412,6 +430,7 @@ const mapCompensationVersion = (row: PgCompensationRow): CompensationVersion => 
   const effectiveTo = toPgDateString(row.effective_to)
   const payRegime = row.pay_regime === 'international' ? 'international' : 'chile'
   const afpRate = toNullableNumber(row.afp_rate)
+  const contractType = normalizeContractType(row.contract_type)
 
   const resolvedAfpSplitRates = resolveChileAfpSplitRates({
     totalRate: afpRate,
@@ -447,7 +466,10 @@ const mapCompensationVersion = (row: PgCompensationRow): CompensationVersion => 
     healthSystem: row.health_system === 'isapre' ? 'isapre' : row.health_system === 'fonasa' ? 'fonasa' : null,
     healthPlanUf: toNullableNumber(row.health_plan_uf),
     unemploymentRate: toNumber(row.unemployment_rate),
-    contractType: row.contract_type === 'plazo_fijo' ? 'plazo_fijo' : 'indefinido',
+    contractType,
+    payrollVia: normalizePayrollVia(row.payroll_via, contractType),
+    scheduleRequired: row.daily_required ?? resolveScheduleRequired({ contractType }),
+    deelContractId: normalizeNullableString(row.deel_contract_id),
     hasApv: Boolean(row.has_apv),
     apvAmount: toNumber(row.apv_amount),
     effectiveFrom,
@@ -485,19 +507,27 @@ const mapEntry = (row: PgEntryRow): PayrollEntry => ({
   memberAvatarUrl: normalizeNullableString(row.avatar_url) || resolveAvatarPath({ name: row.display_name || row.member_display_name, email: row.primary_email }),
   compensationVersionId: row.compensation_version_id,
   payRegime: row.pay_regime === 'international' ? 'international' : 'chile',
-    currency: row.currency === 'USD' ? 'USD' : 'CLP',
-    baseSalary: toNumber(row.base_salary),
-    remoteAllowance: toNumber(row.remote_allowance),
-    colacionAmount: toNumber(row.colacion_amount),
-    movilizacionAmount: toNumber(row.movilizacion_amount),
-    fixedBonusLabel: normalizeNullableString(row.fixed_bonus_label),
+  payrollVia: row.payroll_via === 'deel' ? 'deel' : 'internal',
+  currency: row.currency === 'USD' ? 'USD' : 'CLP',
+  baseSalary: toNumber(row.base_salary),
+  remoteAllowance: toNumber(row.remote_allowance),
+  colacionAmount: toNumber(row.colacion_amount),
+  movilizacionAmount: toNumber(row.movilizacion_amount),
+  fixedBonusLabel: normalizeNullableString(row.fixed_bonus_label),
   fixedBonusAmount: toNumber(row.fixed_bonus_amount),
   kpiOtdPercent: toNullableNumber(row.kpi_otd_percent),
   kpiRpaAvg: toNullableNumber(row.kpi_rpa_avg),
   kpiOtdQualifies: normalizeBoolean(row.kpi_otd_qualifies),
   kpiRpaQualifies: normalizeBoolean(row.kpi_rpa_qualifies),
   kpiTasksCompleted: toNullableNumber(row.kpi_tasks_completed),
-  kpiDataSource: row.kpi_data_source === 'manual' ? 'manual' : row.kpi_data_source === 'ico' ? 'ico' : 'notion_ops',
+  kpiDataSource:
+    row.kpi_data_source === 'manual'
+      ? 'manual'
+      : row.kpi_data_source === 'ico'
+        ? 'ico'
+        : row.kpi_data_source === 'external'
+          ? 'external'
+          : 'notion_ops',
   bonusOtdAmount: toNumber(row.bonus_otd_amount),
   bonusRpaAmount: toNumber(row.bonus_rpa_amount),
   bonusOtherAmount: toNumber(row.bonus_other_amount),
@@ -527,9 +557,12 @@ const mapEntry = (row: PgEntryRow): PayrollEntry => ({
   chileUnemploymentAmount: toNullableNumber(row.chile_unemployment_amount),
   chileTaxableBase: toNullableNumber(row.chile_taxable_base),
   chileTaxAmount: toNullableNumber(row.chile_tax_amount),
+  siiRetentionRate: toNullableNumber(row.sii_retention_rate),
+  siiRetentionAmount: toNullableNumber(row.sii_retention_amount),
   chileApvAmount: toNullableNumber(row.chile_apv_amount),
   chileUfValue: toNullableNumber(row.chile_uf_value),
   chileTotalDeductions: toNullableNumber(row.chile_total_deductions),
+  deelContractId: normalizeNullableString(row.deel_contract_id),
   netTotalCalculated: toNullableNumber(row.net_total_calculated),
   netTotalOverride: toNullableNumber(row.net_total_override),
   netTotal: toNumber(row.net_total),
@@ -571,7 +604,12 @@ const mapCompensationMember = (row: PgCompensationMemberRow): PayrollCompensatio
     compensationVersionCount: count,
     currentCompensationVersionId: currentId,
     currentCompensationEffectiveFrom: toPgDateString(row.current_effective_from),
+    currentContractType: row.current_contract_type ? normalizeContractType(row.current_contract_type) : null,
     currentPayRegime: row.current_pay_regime === 'chile' || row.current_pay_regime === 'international' ? row.current_pay_regime : null,
+    currentPayrollVia: row.current_payroll_via === 'deel' ? 'deel' : row.current_payroll_via === 'internal' ? 'internal' : null,
+    currentScheduleRequired: row.current_daily_required,
+    currentDeelContractId: normalizeNullableString(row.current_deel_contract_id),
+    currentContractEndDate: toPgDateString(row.contract_end_date),
     currentCurrency: row.current_currency === 'CLP' || row.current_currency === 'USD' ? row.current_currency : null
   }
 }
@@ -609,6 +647,9 @@ const COMPENSATION_BASE_SELECT = `
     cv.health_plan_uf,
     cv.unemployment_rate,
     cv.contract_type,
+    m.payroll_via,
+    m.deel_contract_id,
+    m.daily_required,
     cv.has_apv,
     cv.apv_amount,
     cv.effective_from,
@@ -621,6 +662,100 @@ const COMPENSATION_BASE_SELECT = `
   FROM greenhouse_payroll.compensation_versions AS cv
   INNER JOIN greenhouse_core.members AS m ON m.member_id = cv.member_id
 `
+
+const resolveMemberContractForCompensation = async ({
+  memberId,
+  contractType,
+  scheduleRequired,
+  deelContractId,
+  client
+}: {
+  memberId: string
+  contractType?: CreateCompensationVersionInput['contractType']
+  scheduleRequired?: CreateCompensationVersionInput['scheduleRequired']
+  deelContractId?: CreateCompensationVersionInput['deelContractId']
+  client: PoolClient
+}) => {
+  const [member] = await queryRows<{
+    contract_type: string | null
+    pay_regime: string | null
+    payroll_via: string | null
+    daily_required: boolean | null
+    deel_contract_id: string | null
+  }>(
+    `
+      SELECT contract_type, pay_regime, payroll_via, daily_required, deel_contract_id
+      FROM greenhouse_core.members
+      WHERE member_id = $1
+      LIMIT 1
+    `,
+    [memberId],
+    client
+  )
+
+  if (!member) {
+    throw new PayrollValidationError('Member not found.', 404, { memberId })
+  }
+
+  const resolvedContractType = contractType ?? normalizeContractType(member.contract_type)
+  const derivation = CONTRACT_DERIVATIONS[resolvedContractType]
+
+  const resolvedScheduleRequired = resolveScheduleRequired({
+    contractType: resolvedContractType,
+    scheduleRequired: scheduleRequired ?? member.daily_required
+  })
+
+  const resolvedDeelContractId = normalizeNullableString(
+    derivation.payrollVia === 'deel' ? (deelContractId ?? member.deel_contract_id) : null
+  )
+
+  if ((resolvedContractType === 'contractor' || resolvedContractType === 'eor') && !resolvedDeelContractId) {
+    throw new PayrollValidationError('deelContractId is required for contractor and eor contracts.', 400, {
+      memberId
+    })
+  }
+
+  return {
+    contractType: resolvedContractType,
+    payRegime: derivation.payRegime,
+    payrollVia: derivation.payrollVia,
+    scheduleRequired: resolvedScheduleRequired,
+    deelContractId: resolvedDeelContractId
+  }
+}
+
+const syncMemberContractForCompensation = async ({
+  memberId,
+  contractType,
+  payRegime,
+  payrollVia,
+  scheduleRequired,
+  deelContractId,
+  client
+}: {
+  memberId: string
+  contractType: CompensationVersion['contractType']
+  payRegime: CompensationVersion['payRegime']
+  payrollVia: CompensationVersion['payrollVia']
+  scheduleRequired: CompensationVersion['scheduleRequired']
+  deelContractId: CompensationVersion['deelContractId']
+  client: PoolClient
+}) => {
+  await client.query(
+    `
+      UPDATE greenhouse_core.members
+      SET
+        contract_type = $1,
+        pay_regime = $2,
+        payroll_via = $3,
+        daily_required = $4,
+        deel_contract_id = $5,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE member_id = $6
+    `,
+    [contractType, payRegime, payrollVia, scheduleRequired, deelContractId, memberId]
+  )
+}
 
 export const pgGetCurrentCompensation = async () => {
   await assertPayrollPostgresReady()
@@ -701,6 +836,9 @@ export const pgGetApplicableCompensationVersionsForPeriod = async (periodStart: 
         cv.health_plan_uf,
         cv.unemployment_rate,
         cv.contract_type,
+        m.payroll_via,
+        m.deel_contract_id,
+        m.daily_required,
         cv.has_apv,
         cv.apv_amount,
         cv.effective_from,
@@ -811,6 +949,14 @@ export const pgCreateCompensationVersion = async ({
       actorUserId = actorRow?.user_id ?? null
     }
 
+    const memberContract = await resolveMemberContractForCompensation({
+      memberId: input.memberId,
+      contractType: input.contractType,
+      scheduleRequired: input.scheduleRequired,
+      deelContractId: input.deelContractId,
+      client
+    })
+
     // Get next version number
     const [versionRow] = await queryRows<{ next_version: number | string }>(
       `SELECT COALESCE(MAX(version), 0) + 1 AS next_version FROM greenhouse_payroll.compensation_versions WHERE member_id = $1`,
@@ -879,6 +1025,16 @@ export const pgCreateCompensationVersion = async ({
       comisionRate: input.afpComisionRate ?? null
     })
 
+    await syncMemberContractForCompensation({
+      memberId: input.memberId,
+      contractType: memberContract.contractType,
+      payRegime: memberContract.payRegime,
+      payrollVia: memberContract.payrollVia,
+      scheduleRequired: memberContract.scheduleRequired,
+      deelContractId: memberContract.deelContractId,
+      client
+    })
+
     // Close covering version
     if (coveringVersion) {
       await client.query(
@@ -915,18 +1071,18 @@ export const pgCreateCompensationVersion = async ({
         )
       `,
       [
-        versionId, input.memberId, nextVersion, input.payRegime, input.currency,
+        versionId, input.memberId, nextVersion, memberContract.payRegime, input.currency,
         Number(input.baseSalary), Number(input.remoteAllowance ?? 0), Number(input.colacionAmount ?? 0), Number(input.movilizacionAmount ?? 0),
         normalizeNullableString(input.fixedBonusLabel), Number(input.fixedBonusAmount ?? 0),
         Number(input.bonusOtdMin ?? 0), Number(input.bonusOtdMax ?? 0),
         Number(input.bonusRpaMin ?? 0), Number(input.bonusRpaMax ?? 0),
-        normalizeGratificacionLegalMode(input.gratificacionLegalMode, input.payRegime),
+        normalizeGratificacionLegalMode(input.gratificacionLegalMode, memberContract.payRegime),
         normalizeNullableString(input.afpName), input.afpRate ?? null,
         resolvedAfpSplitRates?.cotizacionRate ?? null,
         resolvedAfpSplitRates?.comisionRate ?? null,
         input.healthSystem ?? null, input.healthPlanUf ?? null,
-        input.unemploymentRate ?? (input.contractType === 'plazo_fijo' ? 0.03 : 0.006),
-        input.contractType ?? 'indefinido', Boolean(input.hasApv), Number(input.apvAmount ?? 0),
+        input.unemploymentRate ?? (memberContract.contractType === 'plazo_fijo' ? 0.03 : 0.006),
+        memberContract.contractType, Boolean(input.hasApv), Number(input.apvAmount ?? 0),
         effectiveFrom, nextEffectiveTo, isCurrent,
         input.changeReason.trim(), input.desiredNetClp ?? null, actorUserId
       ]
@@ -941,7 +1097,7 @@ export const pgCreateCompensationVersion = async ({
         versionId,
         memberId: input.memberId,
         effectiveFrom,
-        payRegime: input.payRegime,
+        payRegime: memberContract.payRegime,
         currency: input.currency,
         baseSalary: Number(input.baseSalary)
       },
@@ -1035,6 +1191,14 @@ export const pgUpdateCompensationVersion = async ({
 
     const existingVersion = mapCompensationVersion(versionRow)
 
+    const memberContract = await resolveMemberContractForCompensation({
+      memberId: existingVersion.memberId,
+      contractType: input.contractType,
+      scheduleRequired: input.scheduleRequired,
+      deelContractId: input.deelContractId,
+      client
+    })
+
     if (existingVersion.effectiveFrom !== effectiveFrom) {
       throw new PayrollValidationError(
         'Changing the effective date requires creating a new compensation version.',
@@ -1071,6 +1235,16 @@ export const pgUpdateCompensationVersion = async ({
       )
     }
 
+    await syncMemberContractForCompensation({
+      memberId: existingVersion.memberId,
+      contractType: memberContract.contractType,
+      payRegime: memberContract.payRegime,
+      payrollVia: memberContract.payrollVia,
+      scheduleRequired: memberContract.scheduleRequired,
+      deelContractId: memberContract.deelContractId,
+      client
+    })
+
     await client.query(
       `
         UPDATE greenhouse_payroll.compensation_versions
@@ -1103,7 +1277,7 @@ export const pgUpdateCompensationVersion = async ({
         WHERE version_id = $26
       `,
       [
-        input.payRegime,
+        memberContract.payRegime,
         input.currency,
         Number(input.baseSalary),
         Number(input.remoteAllowance ?? 0),
@@ -1115,15 +1289,15 @@ export const pgUpdateCompensationVersion = async ({
         Number(input.bonusOtdMax ?? 0),
         Number(input.bonusRpaMin ?? 0),
         Number(input.bonusRpaMax ?? 0),
-        normalizeGratificacionLegalMode(input.gratificacionLegalMode, input.payRegime),
+        normalizeGratificacionLegalMode(input.gratificacionLegalMode, memberContract.payRegime),
         normalizeNullableString(input.afpName),
         input.afpRate ?? null,
         resolvedAfpSplitRates?.cotizacionRate ?? null,
         resolvedAfpSplitRates?.comisionRate ?? null,
         input.healthSystem ?? null,
         input.healthPlanUf ?? null,
-        input.unemploymentRate ?? (input.contractType === 'plazo_fijo' ? 0.03 : 0.006),
-        input.contractType ?? 'indefinido',
+        input.unemploymentRate ?? (memberContract.contractType === 'plazo_fijo' ? 0.03 : 0.006),
+        memberContract.contractType,
         Boolean(input.hasApv),
         Number(input.apvAmount ?? 0),
         input.changeReason.trim(),
@@ -1140,7 +1314,7 @@ export const pgUpdateCompensationVersion = async ({
         versionId,
         memberId: existingVersion.memberId,
         effectiveFrom,
-        payRegime: input.payRegime,
+        payRegime: memberContract.payRegime,
         currency: input.currency,
         baseSalary: Number(input.baseSalary),
         updatedBy: normalizeNullableString(actorEmail)
@@ -1621,6 +1795,8 @@ const ENTRY_BASE_SELECT = `
     m.avatar_url,
     e.compensation_version_id,
     e.pay_regime,
+    e.payroll_via,
+    e.deel_contract_id,
     e.currency,
     e.base_salary,
     e.remote_allowance,
@@ -1664,6 +1840,8 @@ const ENTRY_BASE_SELECT = `
     e.chile_unemployment_amount,
     e.chile_taxable_base,
     e.chile_tax_amount,
+    e.sii_retention_rate,
+    e.sii_retention_amount,
     e.chile_apv_amount,
     e.chile_uf_value,
     e.chile_total_deductions,
@@ -1753,7 +1931,7 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
       `
         INSERT INTO greenhouse_payroll.payroll_entries (
           entry_id, period_id, member_id, compensation_version_id,
-          pay_regime, currency, base_salary, remote_allowance, colacion_amount, movilizacion_amount, fixed_bonus_label, fixed_bonus_amount,
+          pay_regime, payroll_via, deel_contract_id, currency, base_salary, remote_allowance, colacion_amount, movilizacion_amount, fixed_bonus_label, fixed_bonus_amount,
           member_display_name,
           kpi_otd_percent, kpi_rpa_avg, kpi_otd_qualifies, kpi_rpa_qualifies,
           kpi_tasks_completed, kpi_data_source,
@@ -1765,7 +1943,7 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
           chile_health_system, chile_health_amount, chile_health_obligatoria_amount, chile_health_voluntaria_amount,
           chile_employer_sis_amount, chile_employer_cesantia_amount, chile_employer_mutual_amount, chile_employer_total_cost,
           chile_unemployment_rate, chile_unemployment_amount,
-          chile_taxable_base, chile_tax_amount, chile_apv_amount, chile_uf_value,
+          chile_taxable_base, chile_tax_amount, sii_retention_rate, sii_retention_amount, chile_apv_amount, chile_uf_value,
           chile_total_deductions,
           net_total_calculated, net_total_override, net_total,
           manual_override, manual_override_note,
@@ -1776,30 +1954,32 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
         )
         VALUES (
           $1, $2, $3, $4,
-          $5, $6, $7, $8, $9, $10, $11, $12,
-          $13,
-          $14, $15, $16, $17,
-          $18, $19,
-          $20, $21, $22, $23,
-          $24,
-          $25, $26, $27, $28,
-          $29, $30, $31, $32,
-          $33, $34,
+          $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,
+          $15,
+          $16, $17, $18, $19,
+          $20, $21,
+          $22, $23, $24, $25,
+          $26,
+          $27, $28, $29, $30,
+          $31, $32, $33, $34,
           $35, $36,
-          $37, $38, $39, $40,
-          $41, $42, $43, $44,
-          $45, $46, $47, $48,
-          $49, $50,
-          $51, $52,
-          $53, $54, $55,
-          $56, $57,
-          $58, $59, $60, $61, $62, $63, $64
+          $37, $38,
+          $39, $40, $41, $42,
+          $43, $44, $45, $46,
+          $47, $48, $49, $50,
+          $51, $52, $53, $54,
+          $55,
+          $56, $57, $58,
+          $59, $60,
+          $61, $62, $63, $64, $65, $66, $67, $68
         )
         ON CONFLICT (entry_id) DO UPDATE SET
           period_id = EXCLUDED.period_id,
           member_id = EXCLUDED.member_id,
           compensation_version_id = EXCLUDED.compensation_version_id,
           pay_regime = EXCLUDED.pay_regime,
+          payroll_via = EXCLUDED.payroll_via,
+          deel_contract_id = EXCLUDED.deel_contract_id,
           currency = EXCLUDED.currency,
           base_salary = EXCLUDED.base_salary,
           remote_allowance = EXCLUDED.remote_allowance,
@@ -1837,6 +2017,8 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
           chile_unemployment_amount = EXCLUDED.chile_unemployment_amount,
           chile_taxable_base = EXCLUDED.chile_taxable_base,
           chile_tax_amount = EXCLUDED.chile_tax_amount,
+          sii_retention_rate = EXCLUDED.sii_retention_rate,
+          sii_retention_amount = EXCLUDED.sii_retention_amount,
           chile_apv_amount = EXCLUDED.chile_apv_amount,
           chile_uf_value = EXCLUDED.chile_uf_value,
           chile_total_deductions = EXCLUDED.chile_total_deductions,
@@ -1861,7 +2043,7 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
       `,
       [
         entry.entryId, entry.periodId, entry.memberId, entry.compensationVersionId,
-        entry.payRegime, entry.currency, entry.baseSalary, entry.remoteAllowance, entry.colacionAmount, entry.movilizacionAmount, entry.fixedBonusLabel, entry.fixedBonusAmount,
+        entry.payRegime, entry.payrollVia, entry.deelContractId, entry.currency, entry.baseSalary, entry.remoteAllowance, entry.colacionAmount, entry.movilizacionAmount, entry.fixedBonusLabel, entry.fixedBonusAmount,
         memberRow?.display_name ?? entry.memberName,
         entry.kpiOtdPercent, entry.kpiRpaAvg, entry.kpiOtdQualifies, entry.kpiRpaQualifies,
         entry.kpiTasksCompleted, entry.kpiDataSource,
@@ -1873,7 +2055,7 @@ export const pgUpsertPayrollEntry = async (entry: PayrollEntry) => {
         entry.chileHealthSystem, entry.chileHealthAmount, entry.chileHealthObligatoriaAmount, entry.chileHealthVoluntariaAmount,
         entry.chileEmployerSisAmount, entry.chileEmployerCesantiaAmount, entry.chileEmployerMutualAmount, entry.chileEmployerTotalCost,
         entry.chileUnemploymentRate, entry.chileUnemploymentAmount,
-        entry.chileTaxableBase, entry.chileTaxAmount, entry.chileApvAmount, entry.chileUfValue,
+        entry.chileTaxableBase, entry.chileTaxAmount, entry.siiRetentionRate, entry.siiRetentionAmount, entry.chileApvAmount, entry.chileUfValue,
         entry.chileTotalDeductions,
         entry.netTotalCalculated, entry.netTotalOverride, entry.netTotal,
         entry.manualOverride, entry.manualOverrideNote,
@@ -1966,9 +2148,15 @@ export const pgListPayrollCompensationMembers = async (): Promise<PayrollCompens
           member_id,
           version_id AS current_version_id,
           effective_from AS current_effective_from,
+          contract_type AS current_contract_type,
           pay_regime AS current_pay_regime,
+          m.payroll_via AS current_payroll_via,
+          m.daily_required AS current_daily_required,
+          m.deel_contract_id AS current_deel_contract_id,
+          m.contract_end_date,
           currency AS current_currency
-        FROM greenhouse_payroll.compensation_versions
+        FROM greenhouse_payroll.compensation_versions AS cv
+        INNER JOIN greenhouse_core.members AS m ON m.member_id = cv.member_id
         WHERE effective_from <= CURRENT_DATE
           AND (effective_to IS NULL OR effective_to >= CURRENT_DATE)
         ORDER BY member_id, effective_from DESC, version DESC
@@ -1982,7 +2170,12 @@ export const pgListPayrollCompensationMembers = async (): Promise<PayrollCompens
         cc.compensation_version_count,
         cur.current_version_id,
         cur.current_effective_from,
+        cur.current_contract_type,
         cur.current_pay_regime,
+        cur.current_payroll_via,
+        cur.current_daily_required,
+        cur.current_deel_contract_id,
+        cur.contract_end_date,
         cur.current_currency
       FROM greenhouse_core.members AS m
           LEFT JOIN compensation_counts AS cc ON cc.member_id = m.member_id

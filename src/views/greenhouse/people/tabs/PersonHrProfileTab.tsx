@@ -28,7 +28,7 @@ import type { IcoMetricSnapshot } from '@/lib/ico-engine/read-metrics'
 import type { PersonHrContext } from '@/lib/person-360/get-person-hr'
 import type { HrMemberProfile } from '@/types/hr-core'
 import type { PersonOperationalMetrics } from '@/types/people'
-import { jobLevelLabel, employmentTypeLabel, healthSystemLabel, formatDate } from '@views/greenhouse/hr-core/helpers'
+import { contractTypeLabel, employmentTypeLabel, formatDate, healthSystemLabel, jobLevelLabel, payrollViaLabel } from '@views/greenhouse/hr-core/helpers'
 import { buildPersonHrProfileViewModel } from './person-hr-profile-view-model'
 
 type Props = {
@@ -407,9 +407,13 @@ const PersonHrProfileTab = ({ memberId, hrContext = null, defaultOperationalMetr
                 <DetailRow label='Asistencia diaria' value={viewModel.employment.dailyRequired ? 'Sí' : 'No'} />
                 <Divider sx={{ my: 1 }} />
                 <DetailRow label='Régimen' value={viewModel.employment.payRegime ?? '—'} />
+                <DetailRow label='Pago vía' value={viewModel.employment.payrollVia ? payrollViaLabel[viewModel.employment.payrollVia] ?? viewModel.employment.payrollVia : '—'} />
                 <DetailRow label='Moneda' value={viewModel.employment.currency ?? '—'} />
                 <DetailRow label='Salario base' value={formatCurrency(viewModel.employment.baseSalary, viewModel.employment.currency)} />
-                <DetailRow label='Contrato' value={viewModel.employment.contractType ?? '—'} />
+                <DetailRow label='Contrato' value={viewModel.employment.contractType ? contractTypeLabel[viewModel.employment.contractType] ?? viewModel.employment.contractType : '—'} />
+                {viewModel.employment.deelContractId && (
+                  <DetailRow label='Contrato Deel' value={viewModel.employment.deelContractId} />
+                )}
               </Stack>
             ) : (
               <EmptyBlock message='No hay datos laborales maestros consolidados para este colaborador.' />

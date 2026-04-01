@@ -1,5 +1,18 @@
 # project_context.md
 
+## Delta 2026-04-01 TASK-026 contract canonicalization
+
+- `greenhouse_core.members` ya es el ancla canonica de contrato para HRIS:
+  - `contract_type`
+  - `pay_regime`
+  - `payroll_via`
+  - `deel_contract_id`
+- `greenhouse_payroll.compensation_versions` conserva snapshot historico de contrato y regimen; no reemplaza el canon colaborador.
+- `greenhouse_payroll.payroll_entries` ya publica `payroll_via`, `deel_contract_id`, `sii_retention_rate` y `sii_retention_amount`.
+- `daily_required` sigue siendo el flag almacenado en Postgres; `schedule_required` solo debe tratarse como alias de lectura en views, UI y helpers.
+- Las vistas `member_360`, `member_payroll_360` y `person_hr_360` quedaron alineadas para que HR, Payroll, People y cualquier consumer cross-module lean el mismo contrato base.
+- Nota operativa: la migracion de TASK-026 requirio Cloud SQL Proxy local para CLI; la primera corrida detecto un timestamp anterior al baseline de `node-pg-migrate`, por lo que el archivo se regenero con un timestamp valido generado por la herramienta; `pnpm lint` y `pnpm build` quedaron verdes y `pnpm migrate:up` / `pnpm db:generate-types` siguen como cierre operativo pendiente del agente principal.
+
 ## Delta 2026-03-31 Operación GCP: cuenta preferida y carril ADC
 
 - Preferencia operativa explícita del owner/admin del proyecto:

@@ -21,6 +21,7 @@ import type {
   UpdateDepartmentInput,
   UpdateHrMemberProfileInput
 } from '@/types/hr-core'
+import type { PayRegime, PayrollVia } from '@/types/hr-contracts'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
 import { assertHrCoreInfrastructureReady } from '@/lib/hr-core/schema'
@@ -45,6 +46,7 @@ import {
 import {
   HR_ATTENDANCE_STATUSES,
   HR_BANK_ACCOUNT_TYPES,
+  HR_CONTRACT_TYPES,
   HR_EMPLOYMENT_TYPES,
   HR_HEALTH_SYSTEMS,
   HR_JOB_LEVELS,
@@ -68,7 +70,11 @@ import {
 } from '@/lib/hr-core/shared'
 import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 import { getPeopleTableColumns } from '@/lib/people/shared'
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { buildPrivateAssetDownloadUrl } from '@/lib/storage/greenhouse-assets'
+import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { CONTRACT_DERIVATIONS, normalizeContractType, resolveScheduleRequired, SCHEDULE_DEFAULTS } from '@/types/hr-contracts'
 
 type MemberUserRow = {
   user_id: string | null
@@ -124,6 +130,15 @@ type MemberProfileRow = {
   otd_percent_30d: number | string | null
   notes: string | null
   updated_at: { value?: string } | string | null
+}
+
+type MemberContractRow = {
+  contract_type: string | null
+  pay_regime: string | null
+  payroll_via: string | null
+  deel_contract_id: string | null
+  daily_required: boolean | null
+  contract_end_date: string | Date | null
 }
 
 type LeaveTypeRow = {
@@ -194,6 +209,18 @@ type AttendanceRow = {
 const getProjectId = () => getHrCoreProjectId()
 
 const getCurrentYear = () => new Date().getUTCFullYear()
+
+const toDateStringFromAny = (value: string | Date | { value?: string } | null | undefined) => {
+  if (!value) {
+    return null
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString().slice(0, 10)
+  }
+
+  return toDateString(value)
+}
 
 export const isHrLeavePostgresFallbackError = (error: unknown) => {
   if (error instanceof HrCoreValidationError) {
@@ -332,7 +359,11 @@ const mapAttendance = (row: AttendanceRow): HrAttendanceRecord => ({
   updatedAt: toTimestampString(row.updated_at)
 })
 
-const mapMemberProfile = (row: MemberProfileRow, { includeSensitive }: { includeSensitive: boolean }): HrMemberProfile => ({
+const mapMemberProfile = (
+  row: MemberProfileRow,
+  contract: MemberContractRow | null,
+  { includeSensitive }: { includeSensitive: boolean }
+): HrMemberProfile => ({
   memberId: String(row.member_id || ''),
   displayName: String(row.display_name || ''),
   email: String(row.email || ''),
@@ -342,9 +373,13 @@ const mapMemberProfile = (row: MemberProfileRow, { includeSensitive }: { include
   reportsToName: normalizeNullableString(row.reports_to_name),
   jobLevel: normalizeNullableString(row.job_level) as HrMemberProfile['jobLevel'],
   hireDate: toDateString(row.hire_date),
-  contractEndDate: toDateString(row.contract_end_date),
+  contractEndDate: toDateStringFromAny(contract?.contract_end_date ?? row.contract_end_date),
   employmentType: normalizeNullableString(row.employment_type) as HrMemberProfile['employmentType'],
-  dailyRequired: row.daily_required !== false,
+  dailyRequired: contract?.daily_required ?? row.daily_required !== false,
+  contractType: normalizeContractType(contract?.contract_type),
+  payRegime: (contract?.pay_regime === 'international' ? 'international' : 'chile') as PayRegime,
+  payrollVia: (contract?.payroll_via === 'deel' ? 'deel' : 'internal') as PayrollVia,
+  deelContractId: normalizeNullableString(contract?.deel_contract_id),
   identityDocumentType: includeSensitive ? normalizeNullableString(row.identity_document_type) : null,
   identityDocumentNumberMasked: includeSensitive ? maskSensitiveValue(normalizeNullableString(row.identity_document_number)) : null,
   phone: includeSensitive ? normalizeNullableString(row.phone) : null,
@@ -371,6 +406,26 @@ const mapMemberProfile = (row: MemberProfileRow, { includeSensitive }: { include
   notes: normalizeNullableString(row.notes),
   updatedAt: toTimestampString(row.updated_at)
 })
+
+const getMemberContractFromPostgres = async (memberId: string): Promise<MemberContractRow | null> => {
+  const rows = await runGreenhousePostgresQuery<MemberContractRow>(
+    `
+      SELECT
+        contract_type,
+        pay_regime,
+        payroll_via,
+        deel_contract_id,
+        daily_required,
+        contract_end_date
+      FROM greenhouse_core.members
+      WHERE member_id = $1
+      LIMIT 1
+    `,
+    [memberId]
+  ).catch(() => [])
+
+  return rows[0] ?? null
+}
 
 const getLeaveTypesInternal = async () => {
   await assertHrCoreInfrastructureReady()
@@ -843,7 +898,8 @@ export const getMemberHrProfile = async ({
   }
 
   const departmentContext = await getMemberDepartmentContextFromPostgres(memberId)
-  const profile = mapMemberProfile(row, { includeSensitive: isHrAdminTenant(tenant) })
+  const contract = await getMemberContractFromPostgres(memberId)
+  const profile = mapMemberProfile(row, contract, { includeSensitive: isHrAdminTenant(tenant) })
 
   return {
     ...profile,
@@ -865,6 +921,7 @@ export const updateMemberHrProfile = async ({
   const projectId = getProjectId()
 
   await getMemberResolverById(memberId)
+  const existingContract = await getMemberContractFromPostgres(memberId)
 
   const teamMemberUpdates: string[] = []
   const teamMemberParams: Record<string, unknown> = { memberId }
@@ -872,6 +929,9 @@ export const updateMemberHrProfile = async ({
   const profileSelects: string[] = []
   const profileInsertColumns: string[] = []
   const profileInsertValues: string[] = []
+  const postgresMemberUpdates: string[] = []
+  const postgresMemberValues: unknown[] = []
+  const updatedFields = new Set<string>()
 
   const profileParams: Record<string, unknown> = {
     memberId,
@@ -896,6 +956,7 @@ export const updateMemberHrProfile = async ({
   const setTeamField = (column: string, paramKey: string, value: unknown) => {
     teamMemberUpdates.push(`${column} = @${paramKey}`)
     teamMemberParams[paramKey] = value
+    updatedFields.add(paramKey)
   }
 
   const setProfileField = (column: string, paramKey: string, value: unknown) => {
@@ -904,6 +965,11 @@ export const updateMemberHrProfile = async ({
     profileInsertColumns.push(column)
     profileInsertValues.push(`source.${column}`)
     profileParams[paramKey] = value
+  }
+
+  const setPostgresField = (column: string, value: unknown) => {
+    postgresMemberUpdates.push(`${column} = $${postgresMemberValues.length + 1}`)
+    postgresMemberValues.push(value)
   }
 
   if (input.reportsTo !== undefined) setTeamField('reports_to', 'reportsTo', normalizeNullableString(input.reportsTo))
@@ -965,6 +1031,69 @@ export const updateMemberHrProfile = async ({
     )
   if (input.notes !== undefined) setProfileField('notes', 'notes', normalizeNullableString(input.notes))
 
+  const nextContractType =
+    input.contractType !== undefined
+      ? assertEnum(input.contractType, HR_CONTRACT_TYPES, 'contractType')
+      : normalizeContractType(existingContract?.contract_type)
+
+  const scheduleConfig = SCHEDULE_DEFAULTS[nextContractType]
+
+  if (
+    input.dailyRequired !== undefined &&
+    !scheduleConfig.overridable &&
+    input.dailyRequired !== scheduleConfig.defaultValue
+  ) {
+    throw new HrCoreValidationError('schedule_required cannot be overridden for this contract type.', 400, {
+      contractType: nextContractType
+    })
+  }
+
+  const nextContractEndDate =
+    input.contractEndDate !== undefined
+      ? (input.contractEndDate ? assertDateString(input.contractEndDate, 'contractEndDate') : null)
+      : toDateStringFromAny(existingContract?.contract_end_date)
+
+  if (nextContractType === 'plazo_fijo' && !nextContractEndDate) {
+    throw new HrCoreValidationError('contractEndDate is required for plazo_fijo contracts.', 400)
+  }
+
+  const nextDeelContractId =
+    input.deelContractId !== undefined
+      ? normalizeNullableString(input.deelContractId)
+      : normalizeNullableString(existingContract?.deel_contract_id)
+
+  if ((nextContractType === 'contractor' || nextContractType === 'eor') && !nextDeelContractId) {
+    throw new HrCoreValidationError('deelContractId is required for contractor and eor contracts.', 400)
+  }
+
+  if (input.contractType !== undefined || input.deelContractId !== undefined || input.dailyRequired !== undefined) {
+    const derivation = CONTRACT_DERIVATIONS[nextContractType]
+
+    const nextDailyRequired = resolveScheduleRequired({
+      contractType: nextContractType,
+      scheduleRequired: input.dailyRequired
+    })
+
+    setPostgresField('contract_type', nextContractType)
+    setPostgresField('pay_regime', derivation.payRegime)
+    setPostgresField('payroll_via', derivation.payrollVia)
+    setPostgresField('daily_required', nextDailyRequired)
+    setPostgresField('deel_contract_id', derivation.payrollVia === 'deel' ? nextDeelContractId : null)
+    updatedFields.add('contract')
+  }
+
+  if (input.contractEndDate !== undefined) setPostgresField('contract_end_date', nextContractEndDate)
+  if (input.hireDate !== undefined) setPostgresField('hire_date', input.hireDate ? assertDateString(input.hireDate, 'hireDate') : null)
+  if (input.jobLevel !== undefined)
+    setPostgresField('job_level', input.jobLevel ? assertEnum(input.jobLevel, HR_JOB_LEVELS, 'jobLevel') : null)
+  if (input.reportsTo !== undefined) setPostgresField('reports_to_member_id', normalizeNullableString(input.reportsTo))
+  if (input.employmentType !== undefined)
+    setPostgresField(
+      'employment_type',
+      input.employmentType ? assertEnum(input.employmentType, HR_EMPLOYMENT_TYPES, 'employmentType') : null
+    )
+  if (input.phone !== undefined) setPostgresField('phone', normalizeNullableString(input.phone))
+
   if (teamMemberUpdates.length > 0) {
     await runHrCoreQuery(
       `
@@ -1012,10 +1141,39 @@ export const updateMemberHrProfile = async ({
     )
   }
 
+  if (postgresMemberUpdates.length > 0) {
+    postgresMemberValues.push(memberId)
+
+    await runGreenhousePostgresQuery(
+      `
+        UPDATE greenhouse_core.members
+        SET ${postgresMemberUpdates.join(', ')}, updated_at = CURRENT_TIMESTAMP
+        WHERE member_id = $${postgresMemberValues.length}
+      `,
+      postgresMemberValues
+    )
+  }
+
   if (departmentIdInput !== undefined) {
     await updateMemberDepartmentContextInPostgres({
       memberId,
       departmentId: departmentIdInput
+    })
+  }
+
+  if (updatedFields.size > 0 || postgresMemberUpdates.length > 0 || departmentIdInput !== undefined) {
+    if (departmentIdInput !== undefined) {
+      updatedFields.add('departmentId')
+    }
+
+    await publishOutboxEvent({
+      aggregateType: AGGREGATE_TYPES.member,
+      aggregateId: memberId,
+      eventType: EVENT_TYPES.memberUpdated,
+      payload: {
+        memberId,
+        updatedFields: Array.from(updatedFields)
+      }
     })
   }
 }

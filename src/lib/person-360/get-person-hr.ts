@@ -17,6 +17,10 @@ export interface PersonHrContext {
   hireDate: string | null
   contractEndDate: string | null
   dailyRequired: boolean
+  contractType?: string | null
+  payRegime?: string | null
+  payrollVia?: string | null
+  deelContractId?: string | null
   supervisorMemberId: string | null
   supervisorName: string | null
   compensation: {
@@ -53,6 +57,10 @@ type HrRow = {
   hire_date: string | null
   contract_end_date: string | null
   daily_required: boolean | null
+  contract_type: string | null
+  pay_regime: string | null
+  payroll_via: string | null
+  deel_contract_id: string | null
   reports_to_member_id: string | null
   supervisor_name: string | null
   vacation_allowance: string | number
@@ -65,10 +73,10 @@ type HrRow = {
   pending_requests: string | number
   approved_requests_this_year: string | number
   total_approved_days_this_year: string | number
-  pay_regime: string | null
+  compensation_pay_regime: string | null
   comp_currency: string | null
   base_salary: string | null
-  contract_type: string | null
+  compensation_contract_type: string | null
 }
 
 // ── Helpers ──
@@ -117,13 +125,17 @@ export const getPersonHrContext = async (identifier: string): Promise<PersonHrCo
     hireDate: toDateStr(row.hire_date),
     contractEndDate: toDateStr(row.contract_end_date),
     dailyRequired: row.daily_required ?? true,
+    contractType: row.contract_type,
+    payRegime: row.pay_regime,
+    payrollVia: row.payroll_via,
+    deelContractId: row.deel_contract_id,
     supervisorMemberId: row.reports_to_member_id,
     supervisorName: row.supervisor_name,
     compensation: {
-      payRegime: row.pay_regime,
+      payRegime: row.compensation_pay_regime ?? row.pay_regime,
       currency: row.comp_currency,
       baseSalary: row.base_salary ? toNum(row.base_salary) : null,
-      contractType: row.contract_type
+      contractType: row.compensation_contract_type ?? row.contract_type
     },
     leave: {
       vacationAllowance: toNum(row.vacation_allowance),

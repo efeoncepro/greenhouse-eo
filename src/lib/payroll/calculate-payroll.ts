@@ -13,6 +13,7 @@ import { getBigQueryProjectId } from '@/lib/bigquery'
 import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
 import { DEFAULT_BONUS_PRORATION_CONFIG, normalizeBonusProrationConfig } from '@/lib/payroll/bonus-config'
 import { calculateOtdBonus, calculateRpaBonus } from '@/lib/payroll/bonus-proration'
+import { calculateHonorariosTotals } from '@/lib/payroll/calculate-honorarios'
 import { calculatePayrollTotals } from '@/lib/payroll/calculate-chile-deductions'
 import { computeChileTax } from '@/lib/payroll/compute-chile-tax'
 import { fetchAttendanceForPayrollPeriod } from '@/lib/payroll/fetch-attendance-for-period'
@@ -156,16 +157,22 @@ export const buildPayrollEntry = async ({
 }): Promise<PayrollEntry> => {
   const kpiOtdPercent = kpi?.otdPercent ?? null
   const kpiRpaAvg = kpi?.rpaAvg ?? null
+  const usesDiscretionaryBonuses = compensation.contractType === 'honorarios' || compensation.payrollVia === 'deel'
 
-  const otdResult = calculateOtdBonus(kpiOtdPercent, compensation.bonusOtdMax, bonusConfig)
-  const rpaResult = calculateRpaBonus(kpiRpaAvg, compensation.bonusRpaMax, bonusConfig)
+  const otdResult = usesDiscretionaryBonuses
+    ? { amount: 0, qualifies: true, prorationFactor: null }
+    : calculateOtdBonus(kpiOtdPercent, compensation.bonusOtdMax, bonusConfig)
+
+  const rpaResult = usesDiscretionaryBonuses
+    ? { amount: 0, qualifies: true, prorationFactor: null }
+    : calculateRpaBonus(kpiRpaAvg, compensation.bonusRpaMax, bonusConfig)
 
   const bonusOtdAmount = otdResult.amount
   const bonusRpaAmount = rpaResult.amount
 
   // Attendance-based adjustments
-  const deductibleDays = attendance ? attendance.daysAbsent + attendance.daysOnUnpaidLeave : 0
-  const workingDays = attendance?.workingDaysInPeriod ?? 22
+  const deductibleDays = usesDiscretionaryBonuses ? 0 : attendance ? attendance.daysAbsent + attendance.daysOnUnpaidLeave : 0
+  const workingDays = usesDiscretionaryBonuses ? 22 : attendance?.workingDaysInPeriod ?? 22
   const attendanceRatio = workingDays > 0 ? Math.max(0, (workingDays - deductibleDays) / workingDays) : 1
 
   const adjustedBaseSalary = deductibleDays > 0
@@ -188,31 +195,104 @@ export const buildPayrollEntry = async ({
     ? roundCurrency(compensation.fixedBonusAmount * attendanceRatio)
     : compensation.fixedBonusAmount
 
-  const totals = await calculatePayrollTotals({
-    payRegime: compensation.payRegime,
-    baseSalary: adjustedBaseSalary,
-    remoteAllowance: adjustedRemoteAllowance,
-    colacionAmount: adjustedColacionAmount,
-    movilizacionAmount: adjustedMovilizacionAmount,
-    fixedBonusAmount: adjustedFixedBonusAmount,
-    bonusOtdAmount,
-    bonusRpaAmount,
-    bonusOtherAmount: 0,
-    gratificacionLegalMode: compensation.gratificacionLegalMode,
-    afpName: compensation.afpName,
-    afpRate: compensation.afpRate,
-    afpCotizacionRate: compensation.afpCotizacionRate,
-    afpComisionRate: compensation.afpComisionRate,
-    healthSystem: compensation.healthSystem,
-    healthPlanUf: compensation.healthPlanUf,
-    unemploymentRate: compensation.unemploymentRate,
-    contractType: compensation.contractType,
-    hasApv: compensation.hasApv,
-    apvAmount: compensation.apvAmount,
-    ufValue,
-    taxAmount: 0,
-    periodDate
-  })
+  const honorariosTotals =
+    compensation.contractType === 'honorarios'
+      ? calculateHonorariosTotals({
+          periodDate,
+          baseSalary: adjustedBaseSalary,
+          fixedBonusAmount: adjustedFixedBonusAmount,
+          bonusOtdAmount,
+          bonusRpaAmount,
+          bonusOtherAmount: 0
+        })
+      : null
+
+  const deelGrossTotal = compensation.payrollVia === 'deel'
+    ? roundCurrency(adjustedBaseSalary + adjustedFixedBonusAmount + bonusOtdAmount + bonusRpaAmount)
+    : null
+
+  const totals =
+    honorariosTotals
+      ? {
+          grossTotal: honorariosTotals.grossTotal,
+          netTotalCalculated: honorariosTotals.netTotalCalculated,
+          chileAfpName: null,
+          chileAfpRate: null,
+          chileAfpAmount: null,
+          chileAfpCotizacionAmount: null,
+          chileAfpComisionAmount: null,
+          chileGratificacionLegalAmount: null,
+          chileColacionAmount: null,
+          chileMovilizacionAmount: null,
+          chileHealthSystem: null,
+          chileHealthAmount: null,
+          chileHealthObligatoriaAmount: null,
+          chileHealthVoluntariaAmount: null,
+          chileEmployerSisAmount: null,
+          chileEmployerCesantiaAmount: null,
+          chileEmployerMutualAmount: null,
+          chileEmployerTotalCost: null,
+          chileUnemploymentRate: null,
+          chileUnemploymentAmount: null,
+          chileTaxableBase: honorariosTotals.grossTotal,
+          chileTaxAmount: null,
+          chileApvAmount: null,
+          chileUfValue: null,
+          chileTotalDeductions: honorariosTotals.siiRetentionAmount
+        }
+      : compensation.payrollVia === 'deel'
+        ? {
+            grossTotal: deelGrossTotal ?? 0,
+            netTotalCalculated: deelGrossTotal ?? 0,
+            chileAfpName: null,
+            chileAfpRate: null,
+            chileAfpAmount: null,
+            chileAfpCotizacionAmount: null,
+            chileAfpComisionAmount: null,
+            chileGratificacionLegalAmount: null,
+            chileColacionAmount: null,
+            chileMovilizacionAmount: null,
+            chileHealthSystem: null,
+            chileHealthAmount: null,
+            chileHealthObligatoriaAmount: null,
+            chileHealthVoluntariaAmount: null,
+            chileEmployerSisAmount: null,
+            chileEmployerCesantiaAmount: null,
+            chileEmployerMutualAmount: null,
+            chileEmployerTotalCost: null,
+            chileUnemploymentRate: null,
+            chileUnemploymentAmount: null,
+            chileTaxableBase: null,
+            chileTaxAmount: null,
+            chileApvAmount: null,
+            chileUfValue: null,
+            chileTotalDeductions: 0
+          }
+        : await calculatePayrollTotals({
+            payRegime: compensation.payRegime,
+            baseSalary: adjustedBaseSalary,
+            remoteAllowance: adjustedRemoteAllowance,
+            colacionAmount: adjustedColacionAmount,
+            movilizacionAmount: adjustedMovilizacionAmount,
+            fixedBonusAmount: adjustedFixedBonusAmount,
+            bonusOtdAmount,
+            bonusRpaAmount,
+            bonusOtherAmount: 0,
+            gratificacionLegalMode: compensation.gratificacionLegalMode,
+            afpName: compensation.afpName,
+            afpRate: compensation.afpRate,
+            afpCotizacionRate: compensation.afpCotizacionRate,
+            afpComisionRate: compensation.afpComisionRate,
+            healthSystem: compensation.healthSystem,
+            healthPlanUf: compensation.healthPlanUf,
+            unemploymentRate: compensation.unemploymentRate,
+            contractType: compensation.contractType,
+            hasApv: compensation.hasApv,
+            apvAmount: compensation.apvAmount,
+            ufValue,
+            taxAmount: 0,
+            periodDate
+          })
 
   return {
     entryId: `${periodId}_${compensation.memberId}`,
@@ -223,11 +303,12 @@ export const buildPayrollEntry = async ({
     memberAvatarUrl: compensation.memberAvatarUrl,
     compensationVersionId: compensation.versionId,
     payRegime: compensation.payRegime,
+    payrollVia: compensation.payrollVia,
     currency: compensation.currency,
     baseSalary: compensation.baseSalary,
-    remoteAllowance: compensation.remoteAllowance,
-    colacionAmount: compensation.colacionAmount,
-    movilizacionAmount: compensation.movilizacionAmount,
+    remoteAllowance: compensation.payrollVia === 'deel' || compensation.contractType === 'honorarios' ? 0 : compensation.remoteAllowance,
+    colacionAmount: compensation.contractType === 'honorarios' ? 0 : compensation.colacionAmount,
+    movilizacionAmount: compensation.contractType === 'honorarios' ? 0 : compensation.movilizacionAmount,
     fixedBonusLabel: compensation.fixedBonusLabel,
     fixedBonusAmount: compensation.fixedBonusAmount,
     kpiOtdPercent,
@@ -235,7 +316,7 @@ export const buildPayrollEntry = async ({
     kpiOtdQualifies: otdResult.qualifies,
     kpiRpaQualifies: rpaResult.qualifies,
     kpiTasksCompleted: kpi ? kpi.tasksCompleted : null,
-    kpiDataSource: kpi ? kpi.dataSource : 'manual',
+    kpiDataSource: compensation.payrollVia === 'deel' ? 'external' : kpi ? kpi.dataSource : 'manual',
     bonusOtdAmount,
     bonusRpaAmount,
     bonusOtherAmount: 0,
@@ -265,9 +346,12 @@ export const buildPayrollEntry = async ({
     chileUnemploymentAmount: totals.chileUnemploymentAmount,
     chileTaxableBase: totals.chileTaxableBase,
     chileTaxAmount: totals.chileTaxAmount,
+    siiRetentionRate: honorariosTotals?.siiRetentionRate ?? null,
+    siiRetentionAmount: honorariosTotals?.siiRetentionAmount ?? null,
     chileApvAmount: totals.chileApvAmount,
     chileUfValue: totals.chileUfValue,
     chileTotalDeductions: totals.chileTotalDeductions,
+    deelContractId: compensation.deelContractId,
     netTotalCalculated: totals.netTotalCalculated,
     netTotalOverride: null,
     netTotal: totals.netTotalCalculated,
@@ -275,11 +359,11 @@ export const buildPayrollEntry = async ({
     manualOverrideNote: null,
     bonusOtdProrationFactor: otdResult.prorationFactor,
     bonusRpaProrationFactor: rpaResult.prorationFactor,
-    workingDaysInPeriod: attendance?.workingDaysInPeriod ?? null,
-    daysPresent: attendance?.daysPresent ?? null,
-    daysAbsent: attendance?.daysAbsent ?? null,
-    daysOnLeave: attendance?.daysOnLeave ?? null,
-    daysOnUnpaidLeave: attendance?.daysOnUnpaidLeave ?? null,
+    workingDaysInPeriod: usesDiscretionaryBonuses ? null : attendance?.workingDaysInPeriod ?? null,
+    daysPresent: usesDiscretionaryBonuses ? null : attendance?.daysPresent ?? null,
+    daysAbsent: usesDiscretionaryBonuses ? null : attendance?.daysAbsent ?? null,
+    daysOnLeave: usesDiscretionaryBonuses ? null : attendance?.daysOnLeave ?? null,
+    daysOnUnpaidLeave: usesDiscretionaryBonuses ? null : attendance?.daysOnUnpaidLeave ?? null,
     adjustedBaseSalary: deductibleDays > 0 ? adjustedBaseSalary : null,
     adjustedRemoteAllowance: deductibleDays > 0 ? adjustedRemoteAllowance : null,
     adjustedColacionAmount: deductibleDays > 0 ? adjustedColacionAmount : null,
@@ -333,7 +417,9 @@ export const calculatePayroll = async ({
     row => row.payRegime === 'chile' && row.healthSystem === 'isapre' && (row.healthPlanUf || 0) > 0
   )
 
-  const includesChilePayroll = compensationRows.some(row => row.payRegime === 'chile')
+  const includesChilePayroll = compensationRows.some(
+    row => row.payRegime === 'chile' && row.contractType !== 'honorarios'
+  )
 
   const indicatorValues = await resolvePayrollPeriodIndicators({
     periodId,

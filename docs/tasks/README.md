@@ -81,7 +81,7 @@ Primer bloque operativo asignado:
 
 ### Prioridad vigente — bloque `TASK-025` a `TASK-031`
 
-- Orden recomendado de ejecución a 2026-03-28: `TASK-026` → `TASK-030` → `TASK-027` → `TASK-028` → `TASK-029` → `TASK-031` → `TASK-025`.
+- Orden recomendado de ejecución a 2026-04-01: `TASK-030` → `TASK-027` → `TASK-028` → `TASK-029` → `TASK-031` → `TASK-025`.
 - Criterio: primero cerrar la taxonomía canónica de vinculación (`contract_type`, `payroll_via`, elegibilidad), luego módulos operativos que reutilizan outbox/notificaciones y entregan valor inmediato, después módulos de gestión y finalmente evaluaciones dependientes de goals. `TASK-025` queda al final porque sigue en `deferred`.
 
 ### Prioridad vigente — Staff Aug `TASK-038` y `TASK-041`
@@ -101,7 +101,7 @@ Primer bloque operativo asignado:
 
 ### Prioridad vigente — backlog `to-do` por impacto vs esfuerzo
 
-- **Top ROI ahora:** `TASK-100` → `TASK-101` → `TASK-072` → `TASK-098` → `TASK-026` → `TASK-109` → `TASK-030`.
+- **Top ROI ahora:** `TASK-100` → `TASK-101` → `TASK-072` → `TASK-098` → `TASK-109` → `TASK-030` → `TASK-027`.
 - **Finance Enterprise Hardening:** `TASK-174` (P0 data integrity) → `TASK-175` (test coverage) → `TASK-179` (reconciliation cutover) → `TASK-176` (labor provisions) → `TASK-177` (BU P&L) → `TASK-178` (budget engine).
 - **Siguiente ola:** `TASK-173` → `TASK-027` → `TASK-028` → `TASK-116` → `TASK-070` → `TASK-071` → `TASK-011`.
 - **Estratégicas pero caras:** `TASK-008` → `TASK-005` → `TASK-071` → `TASK-118` → `TASK-018`.
@@ -240,7 +240,8 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 
 ## Complete
 
-| [TASK-180-hr-departments-postgres-runtime-cutover.md](complete/TASK-180-hr-departments-postgres-runtime-cutover.md) | `HR > Departments` ya quedó Postgres-first: list/detail/create/update y asignación `member.department_id` corren sobre `greenhouse_core.departments`, BigQuery sale del write path operativo y la integridad de `head_member_id` queda endurecida con migración versionada; validación de código cerrada y aplicación de migración pendiente solo por timeout de red al host directo de Cloud SQL. |
+| [TASK-026-hris-contract-type-consolidation.md](complete/TASK-026-hris-contract-type-consolidation.md) | HRIS ya consolidó el contrato canónico en `greenhouse_core.members` con `contract_type`, `pay_regime`, `payroll_via` y `deel_contract_id`; `payroll` consume ramas Chile, `honorarios` y Deel sin cálculo inline para métricas, `daily_required` queda como backing flag de `schedule_required`, y la migración quedó aplicada en Cloud SQL con tipos Kysely regenerados. |
+| [TASK-180-hr-departments-postgres-runtime-cutover.md](complete/TASK-180-hr-departments-postgres-runtime-cutover.md) | `HR > Departments` ya quedó Postgres-first: list/detail/create/update y asignación `member.department_id` corren sobre `greenhouse_core.departments`, BigQuery sale del write path operativo y la integridad de `head_member_id` quedó endurecida con migración versionada ya aplicada por proxy junto con regeneración de tipos. |
 | [TASK-182-finance-expense-drawer-agency-taxonomy.md](complete/TASK-182-finance-expense-drawer-agency-taxonomy.md) | Drawer de `Finance > Expenses` cerrado con taxonomía `Operacional / Tooling / Impuesto / Otro`, categorías contextuales, imputación por `member/space/shared`, recurrencia y metadata reusable para AI Tools/Provider 360 sin romper compatibilidad legacy. |
 | [TASK-183-finance-expenses-reactive-intake-cost-ledger.md](complete/TASK-183-finance-expenses-reactive-intake-cost-ledger.md) | Ledger `expenses` endurecido con `space_id`, `source_type`, `payment_provider` y `payment_rail`, más intake reactivo desde `payroll_period.exported` para `payroll` y `social_security`, preservando a Finance como owner del ledger y a Cost Intelligence como consumer. |
 | [TASK-121-admin-center-hardening.md](complete/TASK-121-admin-center-hardening.md) | Hardening de `/admin` cerrado: sorting manual en la tabla de spaces, deep-link compartible por filtros, skeleton route-level, domain cards con health real y bloque consolidado de alertas; el cierre además corrigió un loop de re-render en `AdminCenterView` y dejó tests UI dedicados para el slice. |

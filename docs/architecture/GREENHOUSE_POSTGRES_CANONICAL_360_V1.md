@@ -1,5 +1,20 @@
 # Greenhouse PostgreSQL Canonical 360 V1
 
+## Delta 2026-04-01 — TASK-026 contract canonicalization
+
+El modelo 360 ya debe leerse con el contrato HRIS consolidado.
+
+Estado vigente:
+- `greenhouse_core.members` publica el canon de contrato colaborador
+- `greenhouse_payroll.compensation_versions` mantiene snapshot historico de la version de compensacion
+- `greenhouse_payroll.payroll_entries` ya conserva `payroll_via`, `deel_contract_id` y retencion SII para honorarios
+- `member_360`, `member_payroll_360` y `person_hr_360` exponen el canon actual mas aliases de snapshot para que HR, Payroll, People y Finance consuman una sola lectura coherente
+- `daily_required` sigue siendo el flag almacenado; `schedule_required` solo aparece como alias de lectura
+
+Nota operativa:
+- para ejecutar migraciones y regenerar tipos desde esta base se requiere Cloud SQL Proxy local, no acceso directo a la IP publica de Cloud SQL
+- durante la corrida inicial se detecto que la migracion nueva quedo con timestamp anterior al baseline de `node-pg-migrate`; el archivo fue regenerado con un timestamp valido generado por la herramienta
+
 ## Delta 2026-04-01 — HR Departments runtime cutover
 
 `HR > Departments` ya debe leerse como un consumer operativo de `greenhouse_core.departments`, no como un módulo BigQuery-first.
@@ -289,7 +304,8 @@ Purpose:
 Includes:
 - core member fields (display_name, primary_email, job_level, employment_type, status)
 - department name
-- current compensation version (pay_regime, currency, base_salary, remote_allowance, contract_type)
+- current compensation version snapshot (`compensation_pay_regime`, `currency`, `base_salary`, `remote_allowance`, `compensation_contract_type`)
+- canonical contract fields from `greenhouse_core.members` (`contract_type`, `pay_regime`, `payroll_via`, `deel_contract_id`)
 - total compensation versions count
 - total payroll entries count
 
@@ -325,6 +341,8 @@ Includes:
 - identity profile data
 - department
 - manager
+- canonical contract fields from `greenhouse_core.members`
+- `daily_required` plus the read-model alias `schedule_required`
 - linked auth principal count
 
 ### `greenhouse_serving.provider_360`

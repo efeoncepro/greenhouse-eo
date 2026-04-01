@@ -1,3 +1,5 @@
+import type { ContractType, PayrollVia, PayRegime } from '@/types/hr-contracts'
+
 export type HrJobLevel = 'junior' | 'semi_senior' | 'senior' | 'lead' | 'manager' | 'director'
 export type HrEmploymentType = 'full_time' | 'part_time' | 'contractor'
 export type HrHealthSystem = 'fonasa' | 'isapre' | 'none'
@@ -36,6 +38,10 @@ export interface HrMemberProfile {
   contractEndDate: string | null
   employmentType: HrEmploymentType | null
   dailyRequired: boolean
+  contractType?: ContractType
+  payRegime?: PayRegime
+  payrollVia?: PayrollVia
+  deelContractId?: string | null
   identityDocumentType: string | null
   identityDocumentNumberMasked: string | null
   phone: string | null
@@ -247,6 +253,8 @@ export interface UpdateHrMemberProfileInput {
   contractEndDate?: string | null
   employmentType?: HrEmploymentType | null
   dailyRequired?: boolean
+  contractType?: ContractType | null
+  deelContractId?: string | null
   identityDocumentType?: string | null
   identityDocumentNumber?: string | null
   phone?: string | null

@@ -1,5 +1,20 @@
 # Greenhouse HRIS Architecture V1
 
+## Delta 2026-04-01 — Contract model consolidation for TASK-026
+
+La consolidacion del contrato HRIS ya quedo implementada en el branch y debe leerse como contrato vigente, no como propuesta futura.
+
+Estado vigente:
+- `greenhouse_core.members` es la fuente canonica para `contract_type`, `pay_regime`, `payroll_via` y `deel_contract_id`
+- `greenhouse_payroll.compensation_versions` conserva `contract_type` y `pay_regime` como snapshot historico de la version de compensacion
+- `greenhouse_payroll.payroll_entries` ya expone `payroll_via`, `deel_contract_id`, `sii_retention_rate` y `sii_retention_amount`
+- las serving views `member_360`, `member_payroll_360` y `person_hr_360` publican el canon de member + aliases de snapshot para consumo cross-module
+- `daily_required` sigue siendo el flag canonicamente almacenado para calendario/attendance; `schedule_required` solo opera como alias semantico de lectura en views y helpers
+
+Nota operativa:
+- la migracion asociada requiere Cloud SQL Proxy local para CLI
+- la ejecucion inicial detecto un timestamp anterior al baseline de `node-pg-migrate`; el archivo se regenero con un timestamp valido generado por la herramienta, no manualmente
+
 ## Delta 2026-04-01 — Departments ya es Postgres-first
 
 La estructura organizacional del HRIS ya no debe asumirse como un carril legacy de BigQuery.
@@ -126,7 +141,6 @@ pay_regime          VARCHAR(20) NOT NULL DEFAULT 'chile'
   -- CHECK (pay_regime IN ('chile', 'international'))
 payroll_via         VARCHAR(20) NOT NULL DEFAULT 'internal'
   -- CHECK (payroll_via IN ('internal', 'deel'))
-schedule_required   BOOLEAN NOT NULL DEFAULT TRUE
 deel_contract_id    TEXT  -- Deel contract identifier (null for non-Deel)
 contract_end_date   DATE  -- Required for plazo_fijo; optional for others
 ```
@@ -145,9 +159,9 @@ These derivations are enforced at the API layer, not at the database constraint 
 
 ### 2.5 `schedule_required` semantics
 
-This field determines whether a collaborator appears in attendance tracking (Teams webhook, daily dashboard, team calendar).
+`daily_required` remains the canonical storage flag in Postgres. `schedule_required` is the semantic alias used by serving views, UI helpers and read models when a consumer needs the attendance concept under a clearer name.
 
-| contract_type | schedule_required default | Override allowed |
+| contract_type | daily_required default | Override allowed |
 |---|---|---|
 | `indefinido` | `true` | No (labor law requires attendance) |
 | `plazo_fijo` | `true` | No |
