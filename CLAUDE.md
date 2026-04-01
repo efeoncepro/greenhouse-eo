@@ -158,9 +158,13 @@ Si un archivo en `docs/tasks/` no es una task sino una spec de arquitectura o re
 - Cron: `/api/cron/**`, `/api/finance/economic-indicators/sync`
 
 ### PostgreSQL Access
-- **Runtime** del portal: solo credenciales `runtime` (`GREENHOUSE_POSTGRES_USER`)
-- **Migraciones**: `migrator` (`GREENHOUSE_POSTGRES_MIGRATOR_USER`)
-- **Bootstrap/ownership**: `admin` (`GREENHOUSE_POSTGRES_ADMIN_USER`) o `greenhouse_ops`
+- **Runtime** del portal: Cloud SQL Connector + IAM en Vercel. No necesita IP directa.
+- **CLI local** (migraciones, setup, codegen, pg_dump): **requiere Cloud SQL Proxy** — la IP pública de Cloud SQL no es accesible directamente. Sin proxy, da `ETIMEDOUT`.
+  ```bash
+  cloud-sql-proxy "efeonce-group:us-east4:greenhouse-pg-dev" --port 15432
+  # .env.local: GREENHOUSE_POSTGRES_HOST="127.0.0.1", PORT="15432", SSL="false"
+  ```
+- **Perfiles**: `runtime` (DML), `migrator` (DDL), `admin` (bootstrap), `ops` (canonical owner)
 - **Canonical owner**: `greenhouse_ops` es dueño de todos los objetos (122 tablas, 11 schemas)
 - Health check: `pnpm pg:doctor`
 

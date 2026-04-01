@@ -156,30 +156,66 @@ const members = await db
 
 ---
 
-## 5. Credential Requirements
+## 5. Connectivity & Credentials
+
+### Critical: Cloud SQL is NOT directly accessible
+
+The Cloud SQL public IP (`34.86.135.144`) has **authorized networks** configured. Most developer machines and CI environments are NOT in that list. Connecting directly will fail with `ETIMEDOUT` or `connection timeout`.
+
+**This affects ALL CLI tools**: `pnpm migrate:*`, `pnpm db:generate-types`, `pnpm setup:postgres:*`, `pnpm pg:doctor`, `pg_dump`, and any direct query script.
+
+### Solution: Cloud SQL Auth Proxy
+
+```bash
+# Install (once)
+gcloud components install cloud-sql-proxy
+
+# Start proxy (each session)
+cloud-sql-proxy "efeonce-group:us-east4:greenhouse-pg-dev" --port 15432
+
+# Configure .env.local for proxy
+GREENHOUSE_POSTGRES_HOST="127.0.0.1"
+GREENHOUSE_POSTGRES_PORT="15432"
+GREENHOUSE_POSTGRES_SSL="false"
+```
+
+The proxy authenticates via Application Default Credentials (`gcloud auth application-default login`).
+
+### Two connection paths
+
+| Path | Used by | How |
+|------|---------|-----|
+| **Cloud SQL Connector** | Portal runtime (Vercel) | `@google-cloud/cloud-sql-connector` + IAM auth, via `src/lib/postgres/client.ts` |
+| **Cloud SQL Auth Proxy** | All CLI tools (local/CI) | TCP tunnel via `cloud-sql-proxy`, connects to `127.0.0.1:15432` |
+
+These are two different mechanisms for the same database. The Connector is embedded in the Node.js runtime; the Proxy is a standalone binary that creates a local TCP tunnel.
 
 ### Runtime (portal application)
 
-Uses Cloud SQL Connector + Secret Manager. No changes needed.
+Uses Cloud SQL Connector + Secret Manager. No changes needed. Connection is managed by `src/lib/postgres/client.ts`.
 
-### Migrations (CLI)
+### CLI tools (migrations, setup, codegen)
 
-Requires **direct TCP connection** — Cloud SQL Connector is not available in CLI context.
+Require Cloud SQL Auth Proxy running locally.
 
-| Variable | Required for migrations | Source |
-|----------|------------------------|--------|
-| `GREENHOUSE_POSTGRES_HOST` | Yes | Direct IP/hostname of Cloud SQL |
-| `GREENHOUSE_POSTGRES_PORT` | Yes (default 5432) | — |
+| Variable | Required | Value with proxy |
+|----------|----------|-----------------|
+| `GREENHOUSE_POSTGRES_HOST` | Yes | `127.0.0.1` |
+| `GREENHOUSE_POSTGRES_PORT` | Yes | `15432` |
 | `GREENHOUSE_POSTGRES_DATABASE` | Yes | `greenhouse_app` |
-| `GREENHOUSE_POSTGRES_MIGRATOR_USER` | Yes | `greenhouse_migrator_user` |
-| `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` | Yes | From Secret Manager or env |
-| `GREENHOUSE_POSTGRES_SSL` | Optional | `false` for direct connection |
+| `GREENHOUSE_POSTGRES_MIGRATOR_USER` | For DDL | `greenhouse_migrator_user` |
+| `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD` | For DDL | Secret Manager: `greenhouse-pg-dev-migrator-password` |
+| `GREENHOUSE_POSTGRES_SSL` | Yes | `false` (proxy handles encryption) |
 
-These must be present in `.env.local` for local migration execution. In CI, they would be injected as environment variables.
+### Troubleshooting
 
-### Type Generation
-
-Uses the same connection as migrations (direct TCP to introspect schema). Requires `DATABASE_URL` or equivalent constructed by `scripts/generate-db-types.ts`.
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| `ETIMEDOUT` on `34.86.135.144:5432` | Direct IP not accessible | Start Cloud SQL Proxy, use `127.0.0.1:15432` |
+| `connection refused` on `127.0.0.1:15432` | Proxy not running | `cloud-sql-proxy "efeonce-group:us-east4:greenhouse-pg-dev" --port 15432` |
+| `password authentication failed` | Wrong credentials | Check profile in `.env.local`, verify with Secret Manager |
+| `permission denied for table X` | Object owned by different user | Use `greenhouse_ops` profile (inherits all roles) |
+| `SSL SYSCALL error` | SSL mismatch | Set `GREENHOUSE_POSTGRES_SSL=false` when using proxy |
 
 ---
 

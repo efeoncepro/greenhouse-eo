@@ -221,11 +221,31 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Mantener `.env.example` alineado con cualquier variable requerida por el proyecto.
 - No asumir que Vercel tiene variables cargadas.
 
+### Conectividad PostgreSQL (leer ANTES de cualquier operación DB)
+- **El runtime del portal** (Vercel) conecta via Cloud SQL Connector + IAM. No necesita IP directa ni proxy.
+- **Scripts CLI locales** (migraciones, setup, codegen, pg_dump) **NO pueden usar el Connector**. Necesitan conexión TCP directa.
+- **La IP pública de Cloud SQL (`34.86.135.144`) NO es accesible directamente** desde máquinas que no estén en la lista de authorized networks de Cloud SQL. Intentar conectar da `ETIMEDOUT`.
+- **Solución obligatoria para CLI**: usar Cloud SQL Auth Proxy como tunnel local:
+  ```bash
+  cloud-sql-proxy "efeonce-group:us-east4:greenhouse-pg-dev" --port 15432
+  ```
+  Luego en `.env.local`:
+  ```
+  GREENHOUSE_POSTGRES_HOST="127.0.0.1"
+  GREENHOUSE_POSTGRES_PORT="15432"
+  GREENHOUSE_POSTGRES_SSL="false"
+  ```
+- **Esto aplica a TODO lo que conecte por TCP**: `pnpm migrate:up`, `pnpm db:generate-types`, `pnpm setup:postgres:*`, `pnpm pg:doctor`, scripts de backfill, `pg_dump`, y cualquier query directo.
+- **Prerequisito**: `gcloud auth application-default login` y acceso al proyecto `efeonce-group`.
+- **Si no tienes `cloud-sql-proxy`**: `gcloud components install cloud-sql-proxy` o descargarlo de https://cloud.google.com/sql/docs/postgres/sql-proxy.
+- **Regla**: si un script falla con `ETIMEDOUT`, `connection refused`, o `connection timeout`, el problema es la conectividad, no las credenciales. Verificar que el proxy esté corriendo.
+
 ### Acceso PostgreSQL
-- Greenhouse usa tres perfiles de acceso para PostgreSQL:
-  - `runtime`
-  - `migrator`
-  - `admin`
+- Greenhouse usa cuatro perfiles de acceso para PostgreSQL:
+  - `runtime` — portal app (DML, via Cloud SQL Connector en Vercel)
+  - `migrator` — migraciones DDL (`pnpm migrate:up`, `pnpm setup:postgres:*`)
+  - `admin` — bootstrap y ownership (`postgres` user)
+  - `ops` — canonical owner de todos los objetos (`greenhouse_ops`, break-glass)
 - Variables por perfil:
   - `runtime`:
     - `GREENHOUSE_POSTGRES_USER`
