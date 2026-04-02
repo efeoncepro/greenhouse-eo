@@ -95,8 +95,8 @@
 ### Validación
 
 - `pnpm lint` ✅
-- `pnpm build` se reintentó con limpieza del lock de `.next`; vuelve a quedar colgado después de `Compiled successfully` / `Running TypeScript` sin devolver error explícito
-- `pnpm exec tsc --noEmit --pretty false` también quedó colgado sin emitir errores
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm build` ✅
 - `pnpm migrate:up` ✅ usando `GREENHOUSE_POSTGRES_HOST=127.0.0.1`, `GREENHOUSE_POSTGRES_PORT=15432`, `GREENHOUSE_POSTGRES_SSL=false`
 - `pnpm db:generate-types` ✅ usando el mismo carril local por proxy
 - No se crearon `new Pool()` nuevos fuera de `src/lib/postgres/client.ts`

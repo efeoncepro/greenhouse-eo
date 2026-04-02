@@ -614,7 +614,17 @@ Para declarar que Greenhouse ya puede reproducir el `Performance Report` mensual
 - regla unificada de `FTR`
 - serving formal del scorecard mensual para consumers OLTP
 
-Que `carry-over` exista en `ICO` o incluso en `serving` no es suficiente para considerar esta task cerrada.
+Baseline MVP ya cerrado en 2026-04-01:
+
+- buckets canónicos formalizados dentro de `ICO`
+- `FTR` endurecido como señal compuesta sobre primitives/review state
+- snapshot mensual `ico_engine.performance_report_monthly`
+- comparativo contra mes anterior y `Top Performer`
+- `alertText` / `executiveSummary` determinísticos
+- segmentación explícita `Tareas Efeonce` / `Tareas Sky`
+- serving formal `greenhouse_serving.agency_performance_reports`
+
+Con eso Greenhouse ya puede reproducir el `Performance Report` mensual con confianza visible sin abrir un carril paralelo a `ICO`.
 
 ## Recommended Implementation Order
 
