@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { withTransaction } from '@/lib/db'
 import { ensureOrganizationForClient } from '@/lib/account-360/organization-identity'
+import { getOrganizationMemberships } from '@/lib/account-360/organization-store'
 import {
   getHubspotCompaniesExpressions,
   getHubspotDealsExpressions,
@@ -81,6 +82,15 @@ type DealRow = Record<string, unknown> & {
   close_date: unknown
 }
 
+type FinanceOrganizationContact = {
+  name: string
+  email: string
+  phone: string
+  role: string
+}
+
+const FINANCE_CLIENT_CONTACT_MEMBERSHIP_TYPES = new Set(['billing', 'contact', 'client_contact'])
+
 const parseFinanceContacts = (value: unknown) => {
   try {
     if (!value) {
@@ -100,6 +110,25 @@ const parseServiceModules = (value: string | null) =>
     .split(';')
     .map(item => item.trim())
     .filter(Boolean)
+
+const toFinanceOrganizationContacts = async (organizationId: string | null): Promise<FinanceOrganizationContact[]> => {
+  if (!organizationId) {
+    return []
+  }
+
+  const memberships = await getOrganizationMemberships(organizationId)
+
+  return memberships
+    .filter(membership => FINANCE_CLIENT_CONTACT_MEMBERSHIP_TYPES.has(membership.membershipType))
+    .map(membership => ({
+      name: membership.fullName?.trim() || membership.canonicalEmail?.trim() || 'Sin nombre',
+      email: membership.canonicalEmail?.trim() || '',
+      phone: '',
+      role: membership.membershipType === 'billing'
+        ? 'billing'
+        : membership.roleLabel?.trim() || membership.membershipType
+    }))
+}
 
 const shouldFallbackFromFinanceClientDetailReads = (error: unknown) => {
   if (shouldFallbackFromFinancePostgres(error)) {
@@ -326,76 +355,78 @@ const readFinanceClientDetailFromPostgres = async (id: string) => {
     return null
   }
 
-  const financeContacts = parseFinanceContacts(row.finance_contacts)
+  const legacyFinanceContacts = parseFinanceContacts(row.finance_contacts)
   const organizationId = row.organization_id ? normalizeString(row.organization_id) : null
   const hubspotCompanyId = row.hubspot_company_id ? normalizeString(row.hubspot_company_id) : null
   const clientProfileId = normalizeString(row.client_profile_id)
   const clientId = row.client_id ? normalizeString(row.client_id) : null
 
-  const invoices = await runGreenhousePostgresQuery<InvoiceRow>(
-    `
-      SELECT income_id, invoice_number, invoice_date, due_date, total_amount, currency, payment_status, amount_paid
-      FROM greenhouse_finance.income i
-      LEFT JOIN greenhouse_finance.client_profiles cp_income
-        ON cp_income.client_profile_id = i.client_profile_id
-      WHERE ($1::text IS NOT NULL AND COALESCE(i.organization_id, cp_income.organization_id) = $1)
-         OR ($2::text IS NOT NULL AND COALESCE(i.client_id, cp_income.client_id) = $2)
-         OR ($3::text IS NOT NULL AND i.hubspot_company_id = $3)
-      ORDER BY invoice_date DESC
-      LIMIT 50
-    `,
-    [organizationId, clientId, hubspotCompanyId]
-  )
-
-  const summaryRows = await runGreenhousePostgresQuery<{
-    total_receivable: unknown
-    active_invoices_count: unknown
-    overdue_invoices_count: unknown
-  }>(
-    `
-      SELECT
-        COALESCE(
-          SUM(
-            COALESCE(i.total_amount_clp, 0) * CASE
-              WHEN COALESCE(i.total_amount, 0) = 0 THEN 0
-              ELSE GREATEST(COALESCE(i.total_amount, 0) - COALESCE(i.amount_paid, 0), 0) / NULLIF(COALESCE(i.total_amount, 0), 0)
-            END
-          ),
-          0
-        ) AS total_receivable,
-        COUNT(*) FILTER (WHERE i.payment_status IN ('pending', 'overdue', 'partial')) AS active_invoices_count,
-        COUNT(*) FILTER (WHERE i.payment_status = 'overdue') AS overdue_invoices_count
-      FROM greenhouse_finance.income i
-      LEFT JOIN greenhouse_finance.client_profiles cp_income
-        ON cp_income.client_profile_id = i.client_profile_id
-      WHERE ($1::text IS NOT NULL AND COALESCE(i.organization_id, cp_income.organization_id) = $1)
-         OR ($2::text IS NOT NULL AND COALESCE(i.client_id, cp_income.client_id) = $2)
-         OR ($3::text IS NOT NULL AND i.hubspot_company_id = $3)
-    `,
-    [organizationId, clientId, hubspotCompanyId]
-  )
-
-  const deals = hubspotCompanyId
-    ? await runGreenhousePostgresQuery<DealRow>(
+  const [invoices, summaryRows, deals, organizationFinanceContacts] = await Promise.all([
+    runGreenhousePostgresQuery<InvoiceRow>(
+      `
+        SELECT income_id, invoice_number, invoice_date, due_date, total_amount, currency, payment_status, amount_paid
+        FROM greenhouse_finance.income i
+        LEFT JOIN greenhouse_finance.client_profiles cp_income
+          ON cp_income.client_profile_id = i.client_profile_id
+        WHERE ($1::text IS NOT NULL AND COALESCE(i.organization_id, cp_income.organization_id) = $1)
+           OR ($2::text IS NOT NULL AND COALESCE(i.client_id, cp_income.client_id) = $2)
+           OR ($3::text IS NOT NULL AND i.hubspot_company_id = $3)
+        ORDER BY invoice_date DESC
+        LIMIT 50
+      `,
+      [organizationId, clientId, hubspotCompanyId]
+    ),
+    runGreenhousePostgresQuery<{
+      total_receivable: unknown
+      active_invoices_count: unknown
+      overdue_invoices_count: unknown
+    }>(
       `
         SELECT
-          hubspot_deal_id AS deal_id,
-          deal_name,
-          stage_name AS deal_stage,
-          pipeline_id AS pipeline,
-          amount,
-          close_date
-        FROM greenhouse_crm.deals
-        WHERE hubspot_company_id = $1
-          AND is_deleted = FALSE
-        ORDER BY close_date DESC NULLS LAST, hubspot_deal_id DESC
-        LIMIT 25
+          COALESCE(
+            SUM(
+              COALESCE(i.total_amount_clp, 0) * CASE
+                WHEN COALESCE(i.total_amount, 0) = 0 THEN 0
+                ELSE GREATEST(COALESCE(i.total_amount, 0) - COALESCE(i.amount_paid, 0), 0) / NULLIF(COALESCE(i.total_amount, 0), 0)
+              END
+            ),
+            0
+          ) AS total_receivable,
+          COUNT(*) FILTER (WHERE i.payment_status IN ('pending', 'overdue', 'partial')) AS active_invoices_count,
+          COUNT(*) FILTER (WHERE i.payment_status = 'overdue') AS overdue_invoices_count
+        FROM greenhouse_finance.income i
+        LEFT JOIN greenhouse_finance.client_profiles cp_income
+          ON cp_income.client_profile_id = i.client_profile_id
+        WHERE ($1::text IS NOT NULL AND COALESCE(i.organization_id, cp_income.organization_id) = $1)
+           OR ($2::text IS NOT NULL AND COALESCE(i.client_id, cp_income.client_id) = $2)
+           OR ($3::text IS NOT NULL AND i.hubspot_company_id = $3)
       `,
-      [hubspotCompanyId]
-    )
-    : []
+      [organizationId, clientId, hubspotCompanyId]
+    ),
+    hubspotCompanyId
+      ? runGreenhousePostgresQuery<DealRow>(
+        `
+          SELECT
+            hubspot_deal_id AS deal_id,
+            deal_name,
+            stage_name AS deal_stage,
+            pipeline_id AS pipeline,
+            amount,
+            close_date
+          FROM greenhouse_crm.deals
+          WHERE hubspot_company_id = $1
+            AND is_deleted = FALSE
+          ORDER BY close_date DESC NULLS LAST, hubspot_deal_id DESC
+          LIMIT 25
+        `,
+        [hubspotCompanyId]
+      )
+      : Promise.resolve([]),
+    toFinanceOrganizationContacts(organizationId).catch(() => [])
+  ])
 
   const summary = summaryRows[0]
+  const financeContacts = organizationFinanceContacts.length > 0 ? organizationFinanceContacts : legacyFinanceContacts
 
   return {
     company: {

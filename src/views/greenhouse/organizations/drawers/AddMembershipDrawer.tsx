@@ -40,16 +40,46 @@ type Props = {
   spaces: OrganizationSpace[] | null
   onClose: () => void
   onSuccess: () => void
+  title?: string
+  submitLabel?: string
+  allowedMembershipTypes?: string[]
+  initialMembershipType?: string
 }
 
-const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess }: Props) => {
+const getAllowedMembershipOptions = (allowedMembershipTypes?: string[]) => {
+  if (!allowedMembershipTypes || allowedMembershipTypes.length === 0) {
+    return MEMBERSHIP_TYPES
+  }
+
+  const allowed = new Set(allowedMembershipTypes)
+
+  return MEMBERSHIP_TYPES.filter(type => allowed.has(type.value))
+}
+
+const AddMembershipDrawer = ({
+  open,
+  organizationId,
+  spaces,
+  onClose,
+  onSuccess,
+  title = 'Agregar persona',
+  submitLabel = 'Agregar persona',
+  allowedMembershipTypes,
+  initialMembershipType = 'contact'
+}: Props) => {
+  const membershipTypeOptions = getAllowedMembershipOptions(allowedMembershipTypes)
+
+  const defaultMembershipType = membershipTypeOptions.some(type => type.value === initialMembershipType)
+    ? initialMembershipType
+    : (membershipTypeOptions[0]?.value ?? 'contact')
+
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [searching, setSearching] = useState(false)
   const [selectedProfile, setSelectedProfile] = useState<SearchResult | null>(null)
   const [fullName, setFullName] = useState('')
   const [canonicalEmail, setCanonicalEmail] = useState('')
-  const [membershipType, setMembershipType] = useState('contact')
+  const [membershipType, setMembershipType] = useState(defaultMembershipType)
   const [roleLabel, setRoleLabel] = useState('')
   const [department, setDepartment] = useState('')
   const [spaceId, setSpaceId] = useState('')
@@ -64,17 +94,23 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
     setSelectedProfile(null)
     setFullName('')
     setCanonicalEmail('')
-    setMembershipType('contact')
+    setMembershipType(defaultMembershipType)
     setRoleLabel('')
     setDepartment('')
     setSpaceId('')
     setIsPrimary(false)
     setError(null)
-  }, [])
+  }, [defaultMembershipType])
 
   useEffect(() => {
     if (open) resetForm()
   }, [open, resetForm])
+
+  useEffect(() => {
+    if (!membershipTypeOptions.some(type => type.value === membershipType)) {
+      setMembershipType(defaultMembershipType)
+    }
+  }, [defaultMembershipType, membershipType, membershipTypeOptions])
 
   const handleSearch = (query: string) => {
     setSearchQuery(query)
@@ -167,7 +203,7 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
       PaperProps={{ sx: { width: { xs: '100%', sm: 480 } } }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 4 }}>
-        <Typography variant='h6'>Agregar persona</Typography>
+        <Typography variant='h6'>{title}</Typography>
         <IconButton onClick={onClose} size='small' aria-label='Cerrar'>
           <i className='tabler-x' />
         </IconButton>
@@ -265,7 +301,7 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
           value={membershipType}
           onChange={e => setMembershipType(e.target.value)}
         >
-          {MEMBERSHIP_TYPES.map(t => (
+          {membershipTypeOptions.map(t => (
             <MenuItem key={t.value} value={t.value}>{t.label}</MenuItem>
           ))}
         </CustomTextField>
@@ -320,7 +356,7 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
           disabled={saving || (!selectedProfile && (!fullName.trim() || !canonicalEmail.trim()))}
           fullWidth
         >
-          {saving ? 'Guardando...' : 'Agregar persona'}
+          {saving ? 'Guardando...' : submitLabel}
         </Button>
       </Box>
     </Drawer>

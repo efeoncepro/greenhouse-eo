@@ -1,5 +1,35 @@
 # Handoff.md
 
+## Sesión 2026-04-02 — Finance Clients financial contacts org-first UI follow-on
+
+### Objetivo
+
+- Cerrar el hueco operativo detectado post `TASK-193`: `Finance > Clients > Contactos` ya leía sinergia parcial `Person ↔ Organization`, pero seguía sin CTA UI para crear contactos financieros desde la propia ficha del cliente.
+
+### Delta de ejecución
+
+- `ClientDetailView` dejó de ser read-only en la tab `Contactos`:
+  - ahora expone CTA `Agregar contacto` cuando el cliente tiene `organizationId` y el usuario tiene rol admin
+  - el CTA reutiliza `AddMembershipDrawer` desde `Organization` en modo restringido (`billing` / `contact`, default `billing`)
+- `AddMembershipDrawer` quedó endurecido como primitive reusable:
+  - acepta `title`
+  - acepta `submitLabel`
+  - acepta `allowedMembershipTypes`
+  - acepta `initialMembershipType`
+- `GET /api/finance/clients/[id]` ahora prioriza contactos canónicos desde `getOrganizationMemberships()` cuando existe `organization_id`:
+  - memberships `billing`, `contact`, `client_contact`
+  - `finance_contacts` permanece como fallback legacy
+- La decisión de auth no cambió en este slice:
+  - el write path sigue pasando por `POST /api/organizations/[id]/memberships`
+  - ese route continúa protegido por `requireAdminTenantContext`
+  - por eso el CTA quedó visible solo para admins, no para cualquier usuario Finance
+
+### Validación
+
+- `pnpm exec vitest run src/app/api/finance/clients/read-cutover.test.ts src/views/greenhouse/finance/ClientDetailView.test.tsx` ✅
+- `pnpm lint` ✅
+- `pnpm build` ✅
+
 ## Sesión 2026-04-02 — TASK-193 person-organization synergy activation
 
 ### Objetivo

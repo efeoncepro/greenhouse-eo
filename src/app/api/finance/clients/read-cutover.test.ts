@@ -10,6 +10,7 @@ const mockGetHubspotDealsExpressions = vi.fn()
 const mockRunGreenhousePostgresQuery = vi.fn()
 const mockWithGreenhousePostgresTransaction = vi.fn()
 const mockGetGreenhousePostgresPool = vi.fn()
+const mockGetOrganizationMemberships = vi.fn()
 
 vi.mock('@/lib/tenant/authorization', () => ({
   requireFinanceTenantContext: (...args: unknown[]) => mockRequireFinanceTenantContext(...args)
@@ -39,6 +40,10 @@ vi.mock('@/lib/postgres/client', () => ({
 vi.mock('@/lib/finance/postgres-store-slice2', () => ({
   upsertFinanceClientProfileInPostgres: vi.fn(),
   getFinanceClientProfileFromPostgres: vi.fn()
+}))
+
+vi.mock('@/lib/account-360/organization-store', () => ({
+  getOrganizationMemberships: (...args: unknown[]) => mockGetOrganizationMemberships(...args)
 }))
 
 vi.mock('@/lib/finance/canonical', () => ({
@@ -96,6 +101,7 @@ describe('Finance clients read-path cutover', () => {
     })
 
     mockRunGreenhousePostgresQuery.mockResolvedValue([])
+    mockGetOrganizationMemberships.mockResolvedValue([])
   })
 
   it('lists normalized finance clients even when HubSpot metadata lookup fails', async () => {
@@ -315,6 +321,82 @@ describe('Finance clients read-path cutover', () => {
     expect(countQuery).toContain('LEFT JOIN greenhouse_finance.client_profiles cp_income')
     expect(countQuery).toContain('COALESCE(i.client_id, cp_income.client_id) AS client_id')
     expect(countQuery).not.toContain('COALESCE(client_id, client_profile_id, hubspot_company_id) AS income_key')
+  })
+
+  it('prefers organization memberships over legacy finance_contacts in the Postgres detail path', async () => {
+    mockRunGreenhousePostgresQuery
+      .mockResolvedValueOnce([
+        {
+          organization_id: 'org-1',
+          client_id: 'client-1',
+          greenhouse_client_name: 'Sky Airline',
+          client_profile_id: 'profile-1',
+          hubspot_company_id: 'hub-1',
+          company_name: 'Sky Airline',
+          company_domain: 'skyairline.com',
+          company_country: 'CL',
+          business_line: 'creative',
+          service_modules_raw: 'creative-hub',
+          tax_id: '76.123.456-7',
+          tax_id_type: 'RUT',
+          legal_name: 'Sky Airline SA',
+          billing_address: 'Av. Test 123',
+          billing_country: 'CL',
+          payment_terms_days: '30',
+          payment_currency: 'CLP',
+          requires_po: false,
+          requires_hes: false,
+          current_po_number: null,
+          current_hes_number: null,
+          finance_contacts: JSON.stringify([{ name: 'Legacy Contact', email: 'legacy@skyairline.com' }]),
+          special_conditions: null,
+          created_by: 'user-1',
+          created_at: '2026-03-01T00:00:00.000Z',
+          updated_at: '2026-03-02T00:00:00.000Z'
+        }
+      ])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([
+        {
+          total_receivable: '0',
+          active_invoices_count: '0',
+          overdue_invoices_count: '0'
+        }
+      ])
+      .mockResolvedValueOnce([])
+
+    mockGetOrganizationMemberships.mockResolvedValue([
+      {
+        membershipId: 'membership-1',
+        publicId: 'EO-MBR-001',
+        profileId: 'profile-contact-1',
+        fullName: 'Ana Billing',
+        canonicalEmail: 'ana@skyairline.com',
+        membershipType: 'billing',
+        roleLabel: 'Accounts Payable',
+        department: 'Finance',
+        isPrimary: true,
+        spaceId: null
+      }
+    ])
+
+    const response = await getClientById(
+      new Request('http://localhost/api/finance/clients/profile-1'),
+      { params: Promise.resolve({ id: 'profile-1' }) }
+    )
+
+    const body = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(mockGetOrganizationMemberships).toHaveBeenCalledWith('org-1')
+    expect(body.financialProfile.financeContacts).toEqual([
+      {
+        name: 'Ana Billing',
+        email: 'ana@skyairline.com',
+        phone: '',
+        role: 'billing'
+      }
+    ])
   })
 
   it.skip('prefers a Postgres-first read path for finance clients once the list/detail cutover is wired', () => {})

@@ -1,5 +1,14 @@
 # project_context.md
 
+## Delta 2026-04-02 Finance Clients financial contacts org-first UI
+
+- `Finance > Clients > Contactos` dejó de ser una pestaña read-only basada solo en `greenhouse_finance.client_profiles.finance_contacts`.
+- La ficha ahora puede abrir el drawer shared de `organization memberships` directamente desde la pestaña de contactos, restringido a tipos `billing` / `contact`.
+- `GET /api/finance/clients/[id]` ahora prioriza `person_memberships` de la organización canónica (`billing`, `contact`, `client_contact`) cuando existe `organization_id`; `finance_contacts` queda como fallback legacy.
+- Regla vigente:
+  - los contactos financieros de clientes deben converger al backbone `Person ↔ Organization`
+  - el JSON embebido `finance_contacts` se mantiene solo como compatibilidad transicional y fallback cuando no exista org canónica o memberships
+
 ## Delta 2026-04-02 TASK-193 person-organization synergy activation
 
 - `Efeonce` ya existe como `operating entity` persistida en `greenhouse_core.organizations` usando el flag `is_operating_entity = TRUE`; la org canónica quedó regularizada sobre el registro existente `Efeonce`.

@@ -1,12 +1,16 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 
+import { useSession } from 'next-auth/react'
+import { toast } from 'react-toastify'
+
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
+import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -28,6 +32,8 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import { ROLE_CODES } from '@/config/role-codes'
+import AddMembershipDrawer from '@/views/greenhouse/organizations/drawers/AddMembershipDrawer'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -41,6 +47,7 @@ interface FinanceContact {
 }
 
 interface Company {
+  organizationId?: string | null
   clientId: string | null
   greenhouseClientName: string | null
   hubspotCompanyId: string | null
@@ -52,6 +59,8 @@ interface Company {
 }
 
 interface FinancialProfile {
+  organizationId?: string | null
+  clientId?: string | null
   clientProfileId: string
   hubspotCompanyId: string | null
   taxId: string | null
@@ -152,33 +161,36 @@ const roleLabels: Record<string, string> = {
 // ---------------------------------------------------------------------------
 
 const ClientDetailView = () => {
+  const { data: session } = useSession()
   const params = useParams()
   const router = useRouter()
   const id = params.id as string
+  const isAdmin = session?.user?.roleCodes?.includes(ROLE_CODES.EFEONCE_ADMIN) ?? false
 
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<ClientDetailData | null>(null)
   const [activeTab, setActiveTab] = useState('profile')
+  const [addContactOpen, setAddContactOpen] = useState(false)
 
-  useEffect(() => {
+  const loadClientDetail = useCallback(async () => {
     if (!id) return
 
-    const fetchData = async () => {
-      setLoading(true)
+    setLoading(true)
 
-      try {
-        const res = await fetch(`/api/finance/clients/${id}`)
+    try {
+      const res = await fetch(`/api/finance/clients/${id}`)
 
-        if (res.ok) {
-          setData(await res.json())
-        }
-      } finally {
-        setLoading(false)
+      if (res.ok) {
+        setData(await res.json())
       }
+    } finally {
+      setLoading(false)
     }
-
-    fetchData()
   }, [id])
+
+  useEffect(() => {
+    void loadClientDetail()
+  }, [loadClientDetail])
 
   // Loading
   if (loading) {
@@ -214,6 +226,13 @@ const ClientDetailView = () => {
   }
 
   const { company, financialProfile: fp, summary, invoices, deals } = data
+  const canAddFinanceContact = isAdmin && Boolean(fp.organizationId)
+  const hasCanonicalOrganization = Boolean(fp.organizationId)
+
+  const handleAddContactSuccess = () => {
+    toast.success('Contacto financiero agregado.')
+    void loadClientDetail()
+  }
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -351,13 +370,41 @@ const ClientDetailView = () => {
               <CardHeader
                 title='Contactos financieros'
                 avatar={<Avatar variant='rounded' sx={{ bgcolor: 'info.lightOpacity' }}><i className='tabler-address-book' style={{ fontSize: 22, color: 'var(--mui-palette-info-main)' }} /></Avatar>}
+                action={canAddFinanceContact ? (
+                  <Button
+                    variant='contained'
+                    size='small'
+                    startIcon={<i className='tabler-plus' />}
+                    onClick={() => setAddContactOpen(true)}
+                  >
+                    Agregar contacto
+                  </Button>
+                ) : undefined}
               />
               <Divider />
               <CardContent>
+                {!hasCanonicalOrganization && (
+                  <Alert severity='info' sx={{ mb: 4 }}>
+                    Este cliente todavía no tiene una organización canónica vinculada, así que no se pueden agregar contactos desde esta vista.
+                  </Alert>
+                )}
                 {fp.financeContacts.length === 0 ? (
-                  <Typography variant='body2' color='text.secondary' sx={{ py: 4, textAlign: 'center' }}>
-                    Sin contactos financieros registrados
-                  </Typography>
+                  <Box sx={{ py: 4, textAlign: 'center' }}>
+                    <Typography variant='body2' color='text.secondary'>
+                      Sin contactos financieros registrados
+                    </Typography>
+                    {canAddFinanceContact && (
+                      <Button
+                        variant='tonal'
+                        size='small'
+                        startIcon={<i className='tabler-plus' />}
+                        sx={{ mt: 3 }}
+                        onClick={() => setAddContactOpen(true)}
+                      >
+                        Crear primer contacto
+                      </Button>
+                    )}
+                  </Box>
                 ) : (
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     {fp.financeContacts.map((contact, idx) => (
@@ -496,6 +543,23 @@ const ClientDetailView = () => {
           </Box>
         </TabPanel>
       </TabContext>
+
+      {fp.organizationId && (
+        <AddMembershipDrawer
+          open={addContactOpen}
+          organizationId={fp.organizationId}
+          spaces={null}
+          title='Agregar contacto financiero'
+          submitLabel='Agregar contacto'
+          allowedMembershipTypes={['billing', 'contact']}
+          initialMembershipType='billing'
+          onClose={() => setAddContactOpen(false)}
+          onSuccess={() => {
+            setAddContactOpen(false)
+            handleAddContactSuccess()
+          }}
+        />
+      )}
     </Box>
   )
 }

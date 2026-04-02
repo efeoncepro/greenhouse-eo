@@ -2,6 +2,12 @@
 
 ## 2026-04-02
 
+- **Finance Clients financial contacts org-first UI follow-on**:
+  - `Finance > Clients > Contactos` ya permite agregar contactos financieros desde la propia ficha del cliente cuando existe `organization_id`
+  - la vista reutiliza `AddMembershipDrawer` del dominio `Organization` restringido a memberships `billing` / `contact`, en vez de abrir otro flujo paralelo
+  - `GET /api/finance/clients/[id]` ahora prioriza `person_memberships` de la organización canónica para poblar contactos; `finance_contacts` queda como fallback legacy
+  - validación ejecutada: targeted `vitest`, `pnpm lint`, `pnpm build`
+
 - **TASK-193 person-organization synergy activation**:
   - `Efeonce` quedó regularizada como operating entity real en `greenhouse_core.organizations` con razón social, RUT y dirección legal canónicos
   - se aplicó la migración `20260402094316652_task-193-operating-entity-session-canonical-person.sql`, incluyendo backfill de `person_memberships(team_member)` para los `members` activos y regeneración de `src/types/db.d.ts`
