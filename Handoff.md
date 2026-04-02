@@ -1,5 +1,86 @@
 # Handoff.md
 
+## Sesión 2026-04-02 — TASK-187 Notion integration formalization
+
+### Objetivo
+
+- Ejecutar discovery y auditoría de `TASK-187` antes de implementar, para corregir la spec contra el runtime real de Notion, Native Integrations Layer, Delivery/ICO y el schema vigente.
+
+### Delta de ejecución
+
+- Implementación completada sobre el carril auditado:
+  - migración aplicada: `20260402120604104_notion-space-governance-registry.sql`
+  - nota operativa: `20260402120531440_notion-space-governance.sql` queda como placeholder no-op ya aplicado durante el bootstrap del slice
+  - nuevas tablas:
+    - `greenhouse_sync.notion_space_schema_snapshots`
+    - `greenhouse_sync.notion_space_schema_drift_events`
+    - `greenhouse_sync.notion_space_kpi_readiness`
+  - nuevos helpers/types:
+    - `src/lib/space-notion/notion-governance.ts`
+    - `src/lib/space-notion/notion-governance-contract.ts`
+    - `src/types/notion-governance.ts`
+  - nuevas APIs admin tenant-scoped:
+    - `GET /api/admin/tenants/[id]/notion-governance`
+    - `POST /api/admin/tenants/[id]/notion-governance/refresh`
+  - `POST /api/integrations/notion/register` ahora:
+    - intenta `refreshSpaceNotionGovernance()` best-effort después del binding
+    - devuelve `governanceRefresh`
+    - corrige `nextStep` al control plane real `POST /api/admin/integrations/notion/sync`
+  - `TenantNotionPanel` ahora expone:
+    - KPI readiness por `space`
+    - snapshots por base (`proyectos/tareas/sprints/revisiones`)
+    - drift abierto por DB role
+    - CTA admin `Refrescar schema`
+  - `scripts/notion-schema-discovery.ts` quedó corregido para leer el binding canónico actual desde `greenhouse_core.space_notion_sources` sin el join legacy roto
+  - `.env.example` y `project_context.md` documentan ahora:
+    - `NOTION_PIPELINE_URL`
+    - `NOTION_TOKEN`
+    - el split entre discovery vía pipeline y refresh governance vía token server-side
+- Verificación final ejecutada:
+  - `pnpm migrate:up` ✅
+  - `pnpm lint` ✅
+  - `pnpm build` ✅
+  - `rg -n "new Pool\\(" src` ✅ solo `src/lib/postgres/client.ts`
+
+- `TASK-187` se movió de `to-do/` a `in-progress/`.
+- La auditoría inicial confirmó drift importante en la spec:
+  - `scripts/notion-schema-discovery.ts` ya no refleja el schema real ni los joins actuales de `space_notion_sources`.
+  - `greenhouse_delivery.space_property_mappings` existe, pero hoy está vacía en DB real y todavía no participa del carril runtime principal `sync-notion-conformed`.
+  - el onboarding básico ya no es greenfield:
+    - `TenantNotionPanel`
+    - `GET /api/admin/tenants/[id]/notion-status`
+    - `POST /api/admin/spaces`
+    - `POST /api/integrations/notion/register`
+    - `GET /api/integrations/notion/discover`
+  - la governance shared de integraciones ya existe, pero solo a nivel integración global:
+    - `greenhouse_sync.integration_registry`
+    - helpers `registry/health/readiness/sync-trigger`
+    - control plane `/admin/integrations`
+  - el readiness ya existe para `notion` a nivel upstream global y ya bloquea `sync-conformed` / `ico-member-sync`; el gap real es readiness contractual por `space`
+  - persisten dos carriles de sync con drift entre sí:
+    - `src/lib/sync/sync-notion-conformed.ts` ya consume `space_id`
+    - `scripts/sync-source-runtime-projections.ts` sigue siendo seed/manual path con fallback legacy
+  - `POST /api/integrations/notion/register` devuelve un `nextStep` hacia `/api/integrations/notion/sync`, pero ese route no existe en el repo
+  - persiste dualidad estructural entre el binding nuevo (`space_notion_sources -> greenhouse_core.spaces`) y FKs legacy de `greenhouse_delivery.{projects,sprints,tasks}` hacia `greenhouse_core.notion_workspaces`
+  - el coverage real de bindings activos hoy es parcial:
+    - `Efeonce`
+    - `Sky`
+    - `ANAM` sigue auditado documentalmente, pero todavía no está registrado en `space_notion_sources`
+- Validación operativa ejecutada:
+  - `git status --short` ✅ limpio al iniciar
+  - `pnpm pg:doctor --profile=runtime` ✅
+  - introspección ad hoc de PostgreSQL runtime:
+    - `greenhouse_core.space_notion_sources` → `2` rows
+    - `greenhouse_delivery.space_property_mappings` → `0` rows
+    - `greenhouse_sync.integration_registry` → `4` rows
+    - `greenhouse_delivery.projects` → `131` rows
+    - `greenhouse_delivery.tasks` → `3997` rows
+  - introspección ad hoc de BigQuery:
+    - `notion_ops.proyectos` → `135` rows / `2` spaces
+    - `notion_ops.tareas` → `4259` rows / `2` spaces
+    - `greenhouse_conformed.delivery_tasks` → `4112` rows / `2` spaces
+- La spec de `TASK-187` quedó corregida para reflejar este estado real antes de pasar a mapa de conexiones, plan e implementación.
+
 ## Sesión 2026-04-02 — Finance Clients financial contacts org-first UI follow-on
 
 ### Objetivo

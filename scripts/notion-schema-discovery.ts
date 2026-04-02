@@ -11,7 +11,7 @@
  *
  * Requires:
  *   - NOTION_TOKEN env var (or in .env.local) with access to all target databases
- *   - Postgres connection (reads client_notion_bindings for database IDs)
+ *   - Postgres connection (reads greenhouse_core.space_notion_sources)
  */
 
 import process from 'node:process'
@@ -487,53 +487,36 @@ async function main() {
   console.log(`   Target: ${targetSpaceId || 'all spaces with Notion bindings'}`)
   console.log()
 
-  // Load space configurations from Postgres (client_notion_bindings / clients table)
+  // Load space configurations from Postgres (canonical space_notion_sources binding)
   let spaceConfigs: Array<{ spaceName: string; spaceId: string; dbTareas: string }>
 
   try {
-    // Get Notion database IDs from the registered spaces
     const rows = await runGreenhousePostgresQuery<Record<string, unknown>>(
       `SELECT
          sns.space_id,
-         c.client_name,
-         sns.notion_database_ids
+         COALESCE(c.client_name, s.space_name, sns.space_id) AS space_name,
+         sns.notion_db_tareas
        FROM greenhouse_core.space_notion_sources sns
-       INNER JOIN greenhouse_core.clients c ON c.client_id = sns.client_id
+       INNER JOIN greenhouse_core.spaces s ON s.space_id = sns.space_id
+       LEFT JOIN greenhouse_core.clients c ON c.client_id = s.client_id
        WHERE sns.sync_enabled = TRUE
-       ${targetSpaceId ? 'AND sns.space_id = $1' : ''}`,
+         AND s.active = TRUE
+       ${targetSpaceId ? 'AND sns.space_id = $1' : ''}
+       ORDER BY s.created_at`,
       targetSpaceId ? [targetSpaceId] : []
     )
 
     if (rows.length === 0) {
-      // Fallback: read from clients table directly
-      const clientRows = await runGreenhousePostgresQuery<Record<string, unknown>>(
-        `SELECT client_id, client_name, notion_project_ids
-         FROM greenhouse_core.clients
-         WHERE notion_project_ids IS NOT NULL
-         ${targetSpaceId ? 'AND client_id = $1' : ''}`,
-        targetSpaceId ? [targetSpaceId] : []
-      )
-
-      console.log(`   Found ${clientRows.length} client(s) with Notion bindings (clients table fallback)`)
-
-      spaceConfigs = clientRows
-        .filter(r => r.client_id)
-        .map(r => ({
-          spaceName: String(r.client_name || r.client_id),
-          spaceId: String(r.client_id),
-          dbTareas: '' // Will need manual database ID input
-        }))
-    } else {
-      spaceConfigs = rows.map(r => {
-        const dbIds = r.notion_database_ids as Record<string, string> | null
-
-        return {
-          spaceName: String(r.client_name || r.space_id),
-          spaceId: String(r.space_id),
-          dbTareas: dbIds?.tareas || dbIds?.tasks || ''
-        }
-      })
+      console.error('❌ No active spaces found with canonical Notion bindings.')
+      await closeGreenhousePostgres()
+      process.exit(1)
     }
+
+    spaceConfigs = rows.map(r => ({
+      spaceName: String(r.space_name || r.space_id),
+      spaceId: String(r.space_id),
+      dbTareas: String(r.notion_db_tareas || '')
+    }))
   } catch (error) {
     console.error('⚠️ Could not read space configurations from Postgres:', error instanceof Error ? error.message : error)
     console.log('   Using hardcoded Efeonce config as fallback')

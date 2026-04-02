@@ -1,5 +1,32 @@
 # project_context.md
 
+## Delta 2026-04-02 TASK-187 Notion governance formalization
+
+- Notion ya tiene una lane formal de governance por `space` encima del binding existente `greenhouse_core.space_notion_sources`.
+- Nuevos objetos de control plane en PostgreSQL:
+  - `greenhouse_sync.notion_space_schema_snapshots`
+  - `greenhouse_sync.notion_space_schema_drift_events`
+  - `greenhouse_sync.notion_space_kpi_readiness`
+- Nuevas APIs admin tenant-scoped:
+  - `GET /api/admin/tenants/[id]/notion-governance`
+  - `POST /api/admin/tenants/[id]/notion-governance/refresh`
+- `POST /api/integrations/notion/register` ya no deja un `nextStep` roto:
+  - apunta al control plane real `POST /api/admin/integrations/notion/sync`
+  - intenta además refrescar governance best-effort tras persistir el binding
+- `TenantNotionPanel` ya muestra:
+  - KPI readiness por `space`
+  - snapshots de schema por base
+  - drift abierto por DB role
+  - CTA admin para refrescar governance
+- `scripts/notion-schema-discovery.ts` quedó reconciliado con el schema canónico actual:
+  - lee `greenhouse_core.space_notion_sources`
+  - ya no depende del join legacy roto a `sns.notion_database_ids` / `sns.client_id`
+- Regla vigente:
+  - el portal sigue usando `NOTION_PIPELINE_URL` para discovery UI/admin sample y verificación de DB access
+  - el refresh de governance usa `NOTION_TOKEN` server-side para leer schema de Notion y persistir snapshots/drift/readiness
+  - si `NOTION_TOKEN` no está disponible, el onboarding puede registrar bindings igual, pero governance queda pendiente de refresh explícito en un entorno con credenciales
+  - el cron runtime `sync-notion-conformed` todavía no usa `space_property_mappings` como carril principal; la tabla permanece como fuente de overrides explícitos y contract governance, no como source of truth runtime definitivo
+
 ## Delta 2026-04-02 Finance Clients financial contacts org-first UI
 
 - `Finance > Clients > Contactos` dejó de ser una pestaña read-only basada solo en `greenhouse_finance.client_profiles.finance_contacts`.

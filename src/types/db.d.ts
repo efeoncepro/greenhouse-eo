@@ -903,9 +903,11 @@ export interface GreenhouseDeliverySpacePropertyMappings {
   fallback_value: string | null;
   id: string;
   is_required: Generated<boolean>;
+  mapping_scope: Generated<string>;
   notes: string | null;
   notion_property_name: string;
   notion_type: string;
+  source_database_key: Generated<string>;
   space_id: string;
   target_type: string;
   updated_at: Generated<Timestamp>;
@@ -2861,6 +2863,99 @@ export interface GreenhouseSyncIntegrationRegistry {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseSyncIntegrationSchemaDrifts {
+  blocking_changes: Generated<number>;
+  current_snapshot_id: string;
+  detected_at: Generated<Timestamp>;
+  drift_id: string;
+  drift_status: string;
+  info_changes: Generated<number>;
+  integration_key: string;
+  previous_snapshot_id: string | null;
+  resolved_at: Timestamp | null;
+  source_database_key: string;
+  source_object_id: string;
+  space_id: string;
+  summary_json: Generated<Json>;
+  warning_changes: Generated<number>;
+}
+
+export interface GreenhouseSyncIntegrationSchemaSnapshots {
+  created_at: Generated<Timestamp>;
+  discovered_by: string | null;
+  discovered_via: Generated<string>;
+  integration_key: string;
+  properties_json: Generated<Json>;
+  schema_hash: string;
+  schema_version: number;
+  snapshot_id: string;
+  source_database_key: string;
+  source_object_id: string;
+  source_object_label: string | null;
+  space_id: string;
+}
+
+export interface GreenhouseSyncIntegrationSpaceReadiness {
+  blocking_issues_json: Generated<Json>;
+  contract_summary_json: Generated<Json>;
+  downstream_target: string;
+  evaluated_at: Generated<Timestamp>;
+  integration_key: string;
+  last_snapshot_id: string | null;
+  readiness_id: string;
+  readiness_score: Generated<number>;
+  readiness_status: string;
+  space_id: string;
+  updated_at: Generated<Timestamp>;
+  warning_issues_json: Generated<Json>;
+}
+
+export interface GreenhouseSyncNotionSpaceKpiReadiness {
+  blocking_issues: Generated<Json>;
+  contract_version: Generated<string>;
+  core_field_coverage: Generated<Json>;
+  database_status: Generated<Json>;
+  evaluated_at: Generated<Timestamp>;
+  evaluated_by: string | null;
+  mapping_summary: Generated<Json>;
+  readiness_id: Generated<string>;
+  readiness_status: Generated<string>;
+  source_id: string | null;
+  space_id: string;
+  warnings: Generated<Json>;
+}
+
+export interface GreenhouseSyncNotionSpaceSchemaDriftEvents {
+  changes: Generated<Json>;
+  current_snapshot_id: string;
+  database_kind: string;
+  detected_at: Generated<Timestamp>;
+  detected_by: string | null;
+  drift_event_id: Generated<string>;
+  drift_status: string;
+  notion_database_id: string;
+  previous_snapshot_id: string | null;
+  resolution_note: string | null;
+  resolved_at: Timestamp | null;
+  space_id: string;
+}
+
+export interface GreenhouseSyncNotionSpaceSchemaSnapshots {
+  core_field_suggestions: Generated<Json>;
+  database_kind: string;
+  database_title: string;
+  discovered_at: Generated<Timestamp>;
+  discovered_by: string | null;
+  is_current: Generated<boolean>;
+  notion_database_id: string;
+  property_catalog: Generated<Json>;
+  schema_hash: string;
+  schema_version: number;
+  snapshot_id: Generated<string>;
+  source_id: string | null;
+  space_id: string;
+}
+
 export interface GreenhouseSyncOutboxEvents {
   aggregate_id: string;
   aggregate_type: string;
@@ -3165,6 +3260,12 @@ export interface DB {
   "greenhouse_serving.user_360": GreenhouseServingUser360;
   "greenhouse_sync.identity_reconciliation_proposals": GreenhouseSyncIdentityReconciliationProposals;
   "greenhouse_sync.integration_registry": GreenhouseSyncIntegrationRegistry;
+  "greenhouse_sync.integration_schema_drifts": GreenhouseSyncIntegrationSchemaDrifts;
+  "greenhouse_sync.integration_schema_snapshots": GreenhouseSyncIntegrationSchemaSnapshots;
+  "greenhouse_sync.integration_space_readiness": GreenhouseSyncIntegrationSpaceReadiness;
+  "greenhouse_sync.notion_space_kpi_readiness": GreenhouseSyncNotionSpaceKpiReadiness;
+  "greenhouse_sync.notion_space_schema_drift_events": GreenhouseSyncNotionSpaceSchemaDriftEvents;
+  "greenhouse_sync.notion_space_schema_snapshots": GreenhouseSyncNotionSpaceSchemaSnapshots;
   "greenhouse_sync.outbox_events": GreenhouseSyncOutboxEvents;
   "greenhouse_sync.outbox_reactive_log": GreenhouseSyncOutboxReactiveLog;
   "greenhouse_sync.projection_refresh_queue": GreenhouseSyncProjectionRefreshQueue;

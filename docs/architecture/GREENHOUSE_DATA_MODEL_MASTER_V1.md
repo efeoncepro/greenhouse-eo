@@ -248,6 +248,7 @@ Core rule:
 - includes type coercion rules (16 built-in rules for handling Notion type heterogeneity)
 - Spaces without entries use hardcoded default mapping (backward compatible)
 - populated via `scripts/notion-schema-discovery.ts` during Space onboarding
+- after `TASK-187`, explicit governance/readiness can exist even when this table is still empty; the current runtime cron still falls back to default mappings unless an override lane consumes this table
 
 ### `greenhouse_sync`
 
@@ -260,6 +261,9 @@ Current objects:
 - `source_sync_watermarks`
 - `source_sync_failures`
 - `integration_registry` — central registry of native integrations (`TASK-188`). Stores taxonomy (`system_upstream`, `event_provider`, `batch_file`, `api_connector`, `hybrid`), ownership, readiness status, consumer domains, auth mode and sync cadence per upstream.
+- `notion_space_schema_snapshots` — versioned schema snapshots per `space_id` and Notion DB role (`TASK-187`)
+- `notion_space_schema_drift_events` — persisted additive/warning/breaking drift records for Notion per `space_id`
+- `notion_space_kpi_readiness` — per-space KPI contract readiness for Notion-backed Delivery/ICO consumers
 
 Rule:
 - every cross-system sync must register control-plane state here

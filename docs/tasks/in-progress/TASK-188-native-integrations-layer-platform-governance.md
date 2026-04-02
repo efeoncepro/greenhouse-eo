@@ -1,5 +1,16 @@
 # TASK-188 - Native Integrations Layer: Platform Governance, Runtime Contracts & Shared Operating Model
 
+## Delta 2026-04-02
+
+- `TASK-187` ya consumió y endureció esta foundation shared para `Notion`:
+  - nuevas tablas tenant-scoped en `greenhouse_sync` para schema snapshots, drift y KPI readiness por `space`
+  - nuevas APIs admin `GET/POST /api/admin/tenants/[id]/notion-governance*`
+  - `integration_registry.metadata.notionGovernance` ahora puede recibir rollup agregado desde el helper específico de Notion
+- Implicación:
+  - `TASK-188` queda validada como foundation shared/control plane
+  - el gap restante ya no es “demostrar aplicabilidad en un módulo”, sino seguir expandiendo el patrón a otros upstreams y cerrar convergencia runtime donde todavía haya carriles legacy
+  - Notion dejó de ser solo caso conceptual y ya opera como la primera implementación tenant-scoped real de la Native Integrations Layer
+
 ## Delta 2026-04-01
 
 - Migration `integration-registry` created: `greenhouse_sync.integration_registry` table with taxonomy, ownership, readiness, consumer domains

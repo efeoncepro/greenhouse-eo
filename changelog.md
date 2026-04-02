@@ -2,6 +2,15 @@
 
 ## 2026-04-02
 
+- **TASK-187 notion governance formalization**:
+  - nueva governance lane tenant-scoped para Notion sobre `space_notion_sources`, con snapshots, drift y KPI readiness persistidos en `greenhouse_sync.notion_space_*`
+  - nuevas APIs admin: `GET /api/admin/tenants/[id]/notion-governance` y `POST /api/admin/tenants/[id]/notion-governance/refresh`
+  - `TenantNotionPanel` ahora muestra readiness por `space`, snapshots por base, drift abierto y CTA admin para refrescar schema governance
+  - `POST /api/integrations/notion/register` ahora intenta refrescar governance best-effort y su `nextStep` quedó alineado con el control plane real `POST /api/admin/integrations/notion/sync`
+  - `scripts/notion-schema-discovery.ts` quedó reconciliado con el binding canónico actual `greenhouse_core.space_notion_sources`
+  - `.env.example` y `project_context.md` ahora documentan `NOTION_PIPELINE_URL` y el uso server-side de `NOTION_TOKEN` para el refresh administrativo de schema
+  - validación ejecutada: `pnpm migrate:up`, `pnpm lint`, `pnpm build`, `rg -n "new Pool\\(" src`
+
 - **Finance Clients financial contacts org-first UI follow-on**:
   - `Finance > Clients > Contactos` ya permite agregar contactos financieros desde la propia ficha del cliente cuando existe `organization_id`
   - la vista reutiliza `AddMembershipDrawer` del dominio `Organization` restringido a memberships `billing` / `contact`, en vez de abrir otro flujo paralelo

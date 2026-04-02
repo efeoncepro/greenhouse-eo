@@ -654,6 +654,18 @@ Important nuance:
 
 If the Postgres query for mappings fails (connection error, table missing), the pipeline logs a warning and continues with the default mapping. The sync never blocks on a configuration error.
 
+Current nuance after `TASK-187`:
+
+- the active cron lane `src/lib/sync/sync-notion-conformed.ts` still consumes default/runtime mappings and does not yet read `space_property_mappings` as its primary contract source
+- `space_property_mappings` remains the governance/config table for explicit overrides, discovery output and future runtime convergence
+- per-space Notion governance is now persisted in:
+  - `greenhouse_sync.notion_space_schema_snapshots`
+  - `greenhouse_sync.notion_space_schema_drift_events`
+  - `greenhouse_sync.notion_space_kpi_readiness`
+- admin surfaces for that governance live under:
+  - `GET /api/admin/tenants/[id]/notion-governance`
+  - `POST /api/admin/tenants/[id]/notion-governance/refresh`
+
 ### Discovery script
 
 `scripts/notion-schema-discovery.ts` automates new Space onboarding:
@@ -666,17 +678,19 @@ Output:
 1. `discovery_report.md` — property catalog, suggested mappings with confidence levels, type conflicts, seed SQL
 2. `discovery_raw.json` — full raw schema data
 
-The script reads Space configurations from `greenhouse_core.space_notion_sources` (with fallback to `greenhouse_core.clients`), calls the Notion API to enumerate database properties, and matches them against the conformed schema using name patterns and type compatibility.
+The script reads Space configurations from `greenhouse_core.space_notion_sources`, calls the Notion API to enumerate database properties, and matches them against the conformed schema using name patterns and type compatibility.
 
 ### New Space onboarding workflow
 
 1. Register Space in Greenhouse (API: `POST /api/admin/spaces`)
-2. Run discovery: `npx tsx scripts/notion-schema-discovery.ts --space-id <SPACE_ID>`
-3. Review `discovery_report.md` — adjust mappings as needed
-4. Execute seed SQL in Postgres (from the report)
-5. Run sync: `npx tsx scripts/sync-source-runtime-projections.ts`
-6. Verify data in `greenhouse_conformed.delivery_tasks` filtered by `space_id`
-7. Run ICO materialization: `npx tsx scripts/materialize-ico.ts`
+2. Register Notion DB bindings (UI `TenantNotionPanel` or `POST /api/integrations/notion/register`)
+3. Refresh/persist governance snapshots (best-effort from register or explicit `POST /api/admin/tenants/[id]/notion-governance/refresh`)
+4. Run discovery script when a human needs a richer audit/export: `npx tsx scripts/notion-schema-discovery.ts --space-id <SPACE_ID>`
+5. Review `discovery_report.md` — adjust mappings as needed
+6. Execute seed SQL in Postgres (from the report) when explicit overrides are required
+7. Run sync: shared control plane `POST /api/admin/integrations/notion/sync` or cron `GET /api/cron/sync-conformed`
+8. Verify data in `greenhouse_conformed.delivery_tasks` filtered by `space_id`
+9. Run ICO materialization: `npx tsx scripts/materialize-ico.ts`
 
 ### Operational remediation runbook
 
