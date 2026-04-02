@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-194`
+- siguiente ID disponible: `TASK-195`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -104,10 +104,10 @@ Primer bloque operativo asignado:
 ### Prioridad vigente — backlog `to-do` por impacto vs esfuerzo
 
 - **Top ROI ahora:** `TASK-100` → `TASK-101` → `TASK-072` → `TASK-098` → `TASK-109` → `TASK-030` → `TASK-027`.
-- **Finance Enterprise Hardening:** `TASK-174` (P0 data integrity) → `TASK-175` (test coverage) → `TASK-179` (reconciliation cutover) → `TASK-176` (labor provisions) → `TASK-177` (BU P&L) → `TASK-178` (budget engine).
+- **Finance Enterprise Hardening:** `TASK-174` (P0 data integrity) → `TASK-175` (test coverage) → `TASK-179` (reconciliation cutover) → `TASK-194` (expense payment ledger separation) → `TASK-176` (labor provisions) → `TASK-177` (BU P&L) → `TASK-178` (budget engine).
 - **Finance canonical cutover follow-on:** `TASK-181` cerró `Finance Clients` org-first; `TASK-191` toma los consumers downstream que todavía exigen `clientId` y encapsula el bridge legado en PO/HES/expenses/allocations/economics.
 - **Finance serving/materialization follow-on:** `TASK-192` ya cerró la persistencia org-aware base para `allocations`, `client_economics`, `commercial_cost_attribution` y `operational_pl`; el follow-on natural pasa a ser cleanup físico y nuevas extensiones como `business_unit`.
-- **Person ↔ Organization synergy activation:** `TASK-193` está en `in-progress` con el slice base ya aplicado en runtime real: operating entity de Efeonce activa, `session_360` org-aware para `client` e `efeonce_internal`, `CanonicalPerson` con org primaria y readers/UI de organizaciones distinguiendo `internal` vs `staff_augmentation` como contexto operativo sobre `team_member`. Quedan follow-ons de consumers org-scoped adicionales y modelado de proveedores.
+- **Person ↔ Organization synergy activation:** `TASK-193` está en `in-progress` con la base org-aware ya activa en runtime real: operating entity de Efeonce, `session_360` org-aware para `client` e `efeonce_internal`, `CanonicalPerson` con org primaria, `People` org-scoped en `finance` / `delivery` / `ico-profile` / `ico` / detail aggregate y memberships/UI de organizaciones distinguiendo `internal` vs `staff_augmentation`. Queda residual explícito en `HR` / `intelligence` org-aware, readers supplier org-first y modelado fino de orgs `both`.
 - **Siguiente ola:** `TASK-173` → `TASK-027` → `TASK-028` → `TASK-116` → `TASK-070` → `TASK-071` → `TASK-011`.
 - **Estratégicas pero caras:** `TASK-008` → `TASK-005` → `TASK-071` → `TASK-118` → `TASK-018`.
 - **Later / oportunistas:** `TASK-029` → `TASK-031` → `TASK-015` → `TASK-016` → `TASK-020` → `TASK-115` → `TASK-107` → `TASK-103` → `TASK-021` → `TASK-032` → `TASK-053` → `TASK-054` → `TASK-055` → `TASK-058` → `TASK-071`.
@@ -231,6 +231,7 @@ Nota de secuencia para la lane de integraciones + métricas Delivery:
 | 48   | `TASK-177`                                                                                               | [TASK-177-operational-pl-business-unit-scope.md](to-do/TASK-177-operational-pl-business-unit-scope.md)                               | P1        | Alto       | Bajo              | Diseño                                                                                                               | Materializar scope_type='business_unit' en operational_pl_snapshots — P&L por linea de negocio (Globe, Reach, Wave, etc.)                                                               |
 | 49   | `TASK-178`                                                                                               | [TASK-178-finance-budget-engine.md](to-do/TASK-178-finance-budget-engine.md)                                                         | P2        | Alto       | Alto              | Diseño                                                                                                               | Budget engine: tabla versionada, CRUD API, variance analysis, forecast YTD, template from actual — cierra gap de management accounting sin presupuesto                                  |
 | 50   | `TASK-179`                                                                                               | [TASK-179-finance-reconciliation-cutover-hardening.md](to-do/TASK-179-finance-reconciliation-cutover-hardening.md)                   | P1        | Alto       | Medio             | Diseño                                                                                                               | Cortar reconciliacion a Postgres-only (ultimo componente dual-write), hardening HubSpot schema validation, cleanup BigQuery write flag                                                   |
+| 51   | `TASK-194`                                                                                               | [TASK-194-expense-payment-ledger-separation.md](to-do/TASK-194-expense-payment-ledger-separation.md)                                 | P2        | Alto       | Medio             | Diseño                                                                                                               | Separar campos de pago embebidos en `expenses` a tabla `expense_payments` (1:N), simétrica a `income_payments` — habilita pagos parciales, audit trail y conciliación uniforme           |
 
 ### Briefs Históricos o de Producto
 
