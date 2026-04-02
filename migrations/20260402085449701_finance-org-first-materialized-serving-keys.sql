@@ -1,3 +1,5 @@
+-- Up Migration
+
 SET search_path = greenhouse_finance, greenhouse_serving, greenhouse_core, public;
 
 -- Add org-first compatibility keys to finance intelligence tables without

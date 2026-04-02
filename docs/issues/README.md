@@ -49,7 +49,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-004`
+`ISSUE-005`
 
 ## Open
 
@@ -57,6 +57,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 |----|--------|----------|-----------|--------|
 | `ISSUE-002` | [Nubox sync conformed: data integrity (period mixing, identity loss)](open/ISSUE-002-nubox-sync-conformed-data-integrity.md) | staging + production | 2026-03-30 | open |
 | `ISSUE-003` | [Permission denied for schema greenhouse_notifications](open/ISSUE-003-notification-schema-permission-denied.md) | preview | 2026-04-01 | resolved |
+| `ISSUE-004` | [column "organization_id" does not exist en finance route](resolved/ISSUE-004-finance-organization-id-column-missing.md) | preview | 2026-04-02 | resolved |
 
 ## Resolved
 
