@@ -1,5 +1,21 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-01 — Guardrail para snapshots por miembro materialized-first
+
+El carril `materialized-first` por miembro quedó endurecido para `TASK-189`:
+
+- `readMemberMetrics()` y `readMemberMetricsBatch()` ya no asumen que cualquier fila existente en `ico_engine.metrics_by_member` es válida para consumo
+- si detectan buckets/contexto críticos en `null` (`on_time_count`, `late_drop_count`, `overdue_count`, `carry_over_count`) con `total_tasks > 0`, hacen fallback live al engine
+- esto protege a:
+  - `People > Activity`
+  - `Payroll`
+  - cualquier consumer runtime o batch basado en member metrics
+
+Regla vigente:
+
+- `metrics_by_member` sigue siendo el carril preferido
+- pero un snapshot materializado legacy o parcial no debe ocultar trabajo comprometido real del período ni borrar el `carry-over` visible
+
 ## Delta 2026-04-01 — Performance Report mensual ya materializado dentro de ICO
 
 `ICO` ya no solo expone snapshots por `space` y por dimensión; ahora también materializa un read-model mensual auditable para el scorecard Agency:

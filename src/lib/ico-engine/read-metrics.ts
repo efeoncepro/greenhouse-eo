@@ -596,6 +596,18 @@ interface MemberMetricRow {
   materialized_at: unknown
 }
 
+const hasIncompleteMemberMaterialization = (row: MemberMetricRow): boolean => {
+  const totalTasks = toNumber(row.total_tasks)
+
+  if (totalTasks <= 0) {
+    return false
+  }
+
+  return [row.on_time_count, row.late_drop_count, row.overdue_count, row.carry_over_count].some(
+    value => value === null || value === undefined
+  )
+}
+
 export const readMemberMetrics = async (
   memberId: string,
   periodYear: number,
@@ -633,6 +645,14 @@ export const readMemberMetrics = async (
   if (rows.length === 0) return null
 
   const row = rows[0]
+
+  // Some early TASK-189 rows were materialized before the period buckets were
+  // fully persisted. In that case prefer a live compute over returning stale
+  // member context that makes the period look empty/incomplete.
+  if (hasIncompleteMemberMaterialization(row)) {
+    return computeMetricsByContext('member', memberId, periodYear, periodMonth)
+  }
+
   const activeTasks = toNumber(row.active_tasks)
 
   const cscDistribution: CscDistributionEntry[] = cscRows.map(csc => ({
@@ -699,11 +719,17 @@ export const readMemberMetricsBatch = async (
   `, { memberIds: normalizedMemberIds, periodYear, periodMonth })
 
   const snapshots = new Map<string, IcoMetricSnapshot>()
+  const staleMemberIds: string[] = []
 
   for (const row of rows) {
     const memberId = normalizeString(row.member_id)
 
     if (!memberId) {
+      continue
+    }
+
+    if (hasIncompleteMemberMaterialization(row)) {
+      staleMemberIds.push(memberId)
       continue
     }
 
@@ -738,6 +764,21 @@ export const readMemberMetricsBatch = async (
       engineVersion: ENGINE_VERSION,
       source: 'materialized'
     })
+  }
+
+  if (staleMemberIds.length > 0) {
+    const liveSnapshots = await Promise.all(
+      staleMemberIds.map(async memberId => ({
+        memberId,
+        snapshot: await computeMetricsByContext('member', memberId, periodYear, periodMonth)
+      }))
+    )
+
+    for (const { memberId, snapshot } of liveSnapshots) {
+      if (snapshot) {
+        snapshots.set(memberId, snapshot)
+      }
+    }
   }
 
   return snapshots

@@ -2,6 +2,13 @@
 
 ## 2026-04-01
 
+- **TASK-189 hardening de member metrics materialized-first**:
+  - `readMemberMetrics()` y `readMemberMetricsBatch()` ahora hacen fallback live por miembro si `metrics_by_member` trae buckets/contexto críticos en `null` con `total_tasks > 0`
+  - esto evita que consumers como `People` o `Payroll` sigan mostrando snapshots legacy incompletos tras el cambio de semántica por `due_date`
+  - `People > Activity` ahora muestra `Sin cierres` en KPIs de calidad cuando el período está abierto y todavía no existen completaciones reales
+
+## 2026-04-01
+
 - **TASK-188: Native Integrations Layer — Platform Governance**:
   - nueva tabla `greenhouse_sync.integration_registry` como Layer 1 del registry central de integraciones nativas
   - seeded con 4 integraciones: Notion (hybrid), HubSpot (system_upstream), Nubox (api_connector), Frame.io (event_provider)

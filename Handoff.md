@@ -1,5 +1,52 @@
 # Handoff.md
 
+## Sesión 2026-04-01 — TASK-189 cierre del hardening materialized-first por miembro
+
+### Objetivo
+
+- Cerrar el gap restante de `TASK-189`: evitar que `People` y otros consumers por miembro lean snapshots materializados legacy incompletos después del cambio de semántica por `due_date`.
+
+### Delta de ejecución
+
+- `readMemberMetrics()` ahora detecta filas incompletas de `ico_engine.metrics_by_member` y hace fallback a `computeMetricsByContext('member', ...)`.
+- `readMemberMetricsBatch()` ahora replica el mismo guardrail para consumers batch como `Payroll`.
+- `PersonActivityTab` ahora muestra `Sin cierres` en KPIs de calidad cuando hay trabajo comprometido del período pero todavía no hay completaciones reales.
+- Verificación de datos reales:
+  - `metrics_by_member` para `daniela-ferreira` en `2026-04` seguía con `carry_over_count = null` y buckets/contexto críticos vacíos
+  - el live compute sobre `v_tasks_enriched` ya devolvía `carry_over_count = 4`, `throughput_count = 3`, `otd_pct = 100`, `ftr_pct = 100`
+- `TASK-189` vuelve a `complete` después de este hardening.
+
+### Validación
+
+- `pnpm lint` ✅
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm build` ✅
+- No hubo migraciones nuevas.
+
+## Sesión 2026-04-01 — TASK-189 reabierta por gap funcional visible
+
+### Objetivo
+
+- Reabrir `TASK-189` porque el engine ya absorbió el `due_date anchor` y el `carry-over`, pero la experiencia visible del período sigue sin cerrar completamente el problema que la spec describe.
+
+### Delta de ejecución
+
+- `TASK-189` se movió de `complete/` a `in-progress/`.
+- Se corrigió la spec para dejar explícito que:
+  - el tramo implementado sí endureció el contrato temporal del engine
+  - el tramo pendiente ahora es la experiencia visible / contrato operativo cuando hay trabajo comprometido en el período y todavía no hay cierres
+- `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedaron alineados con la reapertura.
+
+### Validación
+
+- Auditoría manual de:
+  - `src/lib/ico-engine/shared.ts`
+  - `src/lib/ico-engine/read-metrics.ts`
+  - `src/views/greenhouse/people/tabs/PersonActivityTab.tsx`
+  - `src/app/api/ico-engine/context/route.ts`
+  - `src/lib/sync/projections/ico-member-metrics.ts`
+- Sin `build/lint/test` todavía en este subtramo porque el cambio fue documental de reapertura previa a implementación.
+
 ## Sesión 2026-04-01 — TASK-188 Native Integrations Layer
 
 ### Objetivo

@@ -71,6 +71,11 @@ const normalizeForRadar = (metricId: string, value: number | null): number => {
 const getZoneColor = (zone: ThresholdZone | null) =>
   zone ? THRESHOLD_ZONE_COLOR[zone] : ('secondary' as const)
 
+const QUALITY_PENDING_METRIC_IDS = new Set(['rpa', 'otd_pct', 'ftr_pct', 'cycle_time'])
+
+const shouldShowPendingClosures = (snapshot: IcoMetricSnapshot | null) =>
+  Boolean(snapshot && snapshot.context.totalTasks > 0 && snapshot.context.completedTasks === 0)
+
 // ── KPI Config ────────────────────────────────────────────────────────
 
 const KPI_CONFIG: Array<{ id: string; label: string; icon: string; format: (v: number | null) => string }> = [
@@ -119,6 +124,7 @@ const PersonActivityTab = ({ memberId }: Props) => {
 
   const hasData = data !== null
   const years = Array.from({ length: 3 }, (_, i) => now.getFullYear() - i)
+  const showPendingClosuresState = shouldShowPendingClosures(data)
 
   // ── CSC Donut ───────────────────────────────────────────────────────
 
@@ -374,11 +380,16 @@ const PersonActivityTab = ({ memberId }: Props) => {
               const value = metric?.value ?? null
               const zoneColor = getZoneColor(metric?.zone ?? null)
 
+              const stats =
+                value === null && showPendingClosuresState && QUALITY_PENDING_METRIC_IDS.has(kpi.id)
+                  ? 'Sin cierres'
+                  : kpi.format(value)
+
               return (
                 <Grid size={{ xs: 6, sm: 4, md: 4 }} key={kpi.id}>
                   <HorizontalWithSubtitle
                     title={kpi.label}
-                    stats={kpi.format(value)}
+                    stats={stats}
                     avatarIcon={kpi.icon}
                     avatarColor={zoneColor}
                     subtitle={`${MONTH_SHORT[month]} ${year}`}
@@ -447,7 +458,7 @@ const PersonActivityTab = ({ memberId }: Props) => {
                   )}
                 </Stack>
 
-                {data.context.totalTasks > 0 && data.context.completedTasks === 0 && (
+                {showPendingClosuresState && (
                   <Alert severity='info' variant='outlined'>
                     Este período tiene trabajo comprometido, pero todavía no hay tareas completadas. Las métricas de calidad se irán poblando a medida que entren cierres.
                   </Alert>

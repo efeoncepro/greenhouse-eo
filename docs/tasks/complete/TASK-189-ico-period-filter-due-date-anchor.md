@@ -1,5 +1,41 @@
 # TASK-189 — ICO Period Filter: Due-Date Anchor & Carry-Over Logic
 
+## Delta 2026-04-01 — Cierre del stale materialized-first por miembro
+
+- Se implementó el hardening faltante de `TASK-189`:
+  - `readMemberMetrics()` y `readMemberMetricsBatch()` ya no confían ciegamente en filas legacy de `ico_engine.metrics_by_member` cuando vienen con buckets/contexto críticos en `null`
+  - si detectan materialización incompleta con `total_tasks > 0`, hacen fallback live a `computeMetricsByContext('member', ...)`
+- Se ajustó `PersonActivityTab` para que, cuando de verdad haya trabajo comprometido pero todavía no haya cierres, los KPIs de calidad muestren `Sin cierres` en vez de `—`.
+- Esto cierra la brecha entre:
+  - el engine ya endurecido por `due_date anchor` + `carry-over`
+  - y la experiencia visible que todavía podía parecer vacía por snapshots materializados antiguos
+
+## Delta 2026-04-01 — Hallazgo de auditoría sobre snapshots stale
+
+- La reapertura no se explica solo por “cards vacías con 0 cierres”.
+- La auditoría cruzada entre serving y BigQuery confirmó un segundo problema real:
+  - `readMemberMetrics()` sigue privilegiando el path `materialized-first`
+  - los snapshots materializados vigentes para algunos miembros/períodos todavía reflejan semántica previa al ajuste de `TASK-189`
+- Evidencia observada para `daniela-ferreira`:
+  - `greenhouse_serving.ico_member_metrics` y `ico_engine.metrics_by_member` en `2026-04` siguen con `carry_over_count = null`
+  - el cálculo live sobre `ico_engine.v_tasks_enriched` ya devuelve `carry_over_count = 4`, `throughput_count = 3`, `otd_pct = 100`, `ftr_pct = 100`
+- Lectura correcta:
+  - el engine ya cambió
+  - pero el consumer visible puede seguir leyendo snapshots stale y por eso mostrar `—` o `0` cuando el cálculo live actual ya no lo haría
+- Implicación operativa:
+  - esta task debe cerrar tanto el contrato temporal como la estrategia de consumo/backfill para no confiar ciegamente en snapshots viejos tras un cambio de semántica
+
+## Delta 2026-04-01 — Reapertura por cierre prematuro
+
+- La task se reabre porque el hardening del engine sí resolvió el anclaje por `due_date`, `period_anchor_date`, `carry_over_count`, la replicación a serving y el contexto visible del período, pero no cerró completamente el problema funcional que la propia spec describe.
+- Estado observado en producto:
+  - el período correcto ya se filtra mejor
+  - el `carry-over` ya existe como contrato
+  - pero las cards primarias (`RpA`, `OTD%`, `FTR%`, `Ciclo`) siguen devolviendo `null`/`—` cuando el período tiene trabajo comprometido y todavía no hay cierres
+- Lectura correcta:
+  - el tramo ya implementado resolvió la base temporal del engine
+  - el tramo pendiente de esta misma task es endurecer la experiencia visible y el contrato operativo para que la pregunta “¿cómo vamos este mes?” no quede reducida a un banner + cards vacías
+
 ## Delta 2026-04-01
 
 - La auditoría del repo confirmó que esta task sí toca el contrato canónico de `ICO`, pero también impacta consumers reales en `payroll`, `serving` y proyecciones reactivas.

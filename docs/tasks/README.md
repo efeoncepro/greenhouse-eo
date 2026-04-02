@@ -112,7 +112,9 @@ Primer bloque operativo asignado:
 Nota de secuencia para la lane de integraciones + métricas Delivery:
 - `Fase 1 MVP` cerrada: `TASK-189` -> `TASK-186`
 - `Fase 2 hardening estructural`: `TASK-188` -> `TASK-187`
-- `TASK-189` ya cerró el fix quirúrgico del filtro de período (`due_date anchor` + `carry-over`) sin abrir un carril paralelo a `ICO`
+- `TASK-189` ya cerró también el hardening del carril `materialized-first` por miembro:
+  - fallback live cuando `metrics_by_member` viene incompleta
+  - UI explícita para períodos abiertos sin cierres (`Sin cierres`)
 - `TASK-186` ya cerró el `MVP` de confianza visible para métricas y scorecards sobre la foundation actual
 - `TASK-188` y `TASK-187` quedan como el carril enterprise para institucionalizar la capa nativa de integraciones después del MVP
 - `TASK-187` implementa la `Native Integrations Layer` para `Notion`
@@ -252,7 +254,7 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 
 ## Complete
 
-| [TASK-189-ico-period-filter-due-date-anchor.md](complete/TASK-189-ico-period-filter-due-date-anchor.md) | `ICO` ya usa período canónico anclado en `due_date`, `carry_over_count` materializado y replicado a serving por miembro, `cscDistribution` corregido en el path materialized-first y `PersonActivityTab` enriquecida con contexto real de arrastre. |
+| [TASK-189-ico-period-filter-due-date-anchor.md](complete/TASK-189-ico-period-filter-due-date-anchor.md) | `TASK-189` ya cubre el período canónico por `due_date`, `carry_over_count` materializado, fallback live cuando `metrics_by_member` trae buckets/contexto incompletos, y una UI más explícita para períodos con trabajo comprometido pero sin cierres. |
 | [TASK-186-delivery-metrics-trust-notion-property-audit-contract.md](complete/TASK-186-delivery-metrics-trust-notion-property-audit-contract.md) | Delivery Metrics Trust MVP ya cerró paridad visible del `Performance Report`: buckets canónicos y `FTR` endurecidos sobre `ICO`, snapshot mensual `performance_report_monthly`, serving formal `greenhouse_serving.agency_performance_reports`, comparativo mensual, `Top Performer`, `alertText`, `executiveSummary` y segmentación explícita `Tareas Efeonce` / `Tareas Sky`. |
 | [TASK-026-hris-contract-type-consolidation.md](complete/TASK-026-hris-contract-type-consolidation.md) | HRIS ya consolidó el contrato canónico en `greenhouse_core.members` con `contract_type`, `pay_regime`, `payroll_via` y `deel_contract_id`; `payroll` consume ramas Chile, `honorarios` y Deel sin cálculo inline para métricas, `daily_required` queda como backing flag de `schedule_required`, y la migración quedó aplicada en Cloud SQL con tipos Kysely regenerados. |
 | [TASK-180-hr-departments-postgres-runtime-cutover.md](complete/TASK-180-hr-departments-postgres-runtime-cutover.md) | `HR > Departments` ya quedó Postgres-first: list/detail/create/update y asignación `member.department_id` corren sobre `greenhouse_core.departments`, BigQuery sale del write path operativo y la integridad de `head_member_id` quedó endurecida con migración versionada ya aplicada por proxy junto con regeneración de tipos. |
