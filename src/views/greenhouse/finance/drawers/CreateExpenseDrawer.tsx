@@ -362,8 +362,12 @@ const CreateExpenseDrawer = ({ open, onClose, onSuccess }: Props) => {
 
     if (imputationScope === 'space' && selectedSpace) {
       body.spaceId = selectedSpace.spaceId
+      body.organizationId = selectedSpace.organizationId
       body.allocatedClientId = selectedSpace.clientId
-      body.clientId = selectedSpace.clientId
+
+      if (selectedSpace.clientId) {
+        body.clientId = selectedSpace.clientId
+      }
     }
 
     setSaving(true)

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { resolveFinanceClientContext, resolveFinanceMemberContext } from '@/lib/finance/canonical'
-import { resolveExpenseSpaceScope } from '@/lib/finance/expense-scope'
+import { resolveFinanceDownstreamScope, resolveFinanceMemberContext } from '@/lib/finance/canonical'
 import { EXPENSE_SOURCE_TYPES, PAYMENT_PROVIDERS, PAYMENT_RAILS } from '@/lib/finance/expense-taxonomy'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
@@ -149,6 +148,7 @@ export async function GET(request: Request) {
   const expenseType = searchParams.get('expenseType')
   const status = searchParams.get('status')
   const clientId = searchParams.get('clientId')
+  const organizationId = searchParams.get('organizationId')
   const spaceId = searchParams.get('spaceId')
   const clientProfileId = searchParams.get('clientProfileId')
   const hubspotCompanyId = searchParams.get('hubspotCompanyId')
@@ -160,8 +160,14 @@ export async function GET(request: Request) {
   const page = Math.max(1, toNumber(searchParams.get('page') || '1'))
   const pageSize = Math.min(200, Math.max(1, toNumber(searchParams.get('pageSize') || '50')))
 
-  const resolvedClient = (clientId || clientProfileId || hubspotCompanyId)
-    ? await resolveFinanceClientContext({ clientId, clientProfileId, hubspotCompanyId })
+  const resolvedScope = (clientId || organizationId || clientProfileId || hubspotCompanyId || spaceId)
+    ? await resolveFinanceDownstreamScope({
+        clientId,
+        organizationId,
+        clientProfileId,
+        hubspotCompanyId,
+        requestedSpaceId: spaceId
+      })
     : null
 
   // ── Postgres-first path ──
@@ -169,8 +175,8 @@ export async function GET(request: Request) {
     const result = await listFinanceExpensesFromPostgres({
       expenseType,
       status,
-      clientId: resolvedClient?.clientId ?? clientId,
-      spaceId: spaceId || resolvedClient?.spaceId || null,
+      clientId: resolvedScope?.clientId ?? clientId,
+      spaceId: resolvedScope?.spaceId ?? spaceId ?? null,
       memberId,
       supplierId,
       serviceLine,
@@ -206,14 +212,14 @@ export async function GET(request: Request) {
       params.status = status
     }
 
-    if (resolvedClient?.clientId ?? clientId) {
+    if (resolvedScope?.clientId ?? clientId) {
       filters += ' AND client_id = @clientId'
-      params.clientId = resolvedClient?.clientId ?? clientId
+      params.clientId = resolvedScope?.clientId ?? clientId
     }
 
-    if (spaceId || resolvedClient?.spaceId) {
+    if (spaceId || resolvedScope?.spaceId) {
       filters += ' AND space_id = @spaceId'
-      params.spaceId = spaceId || resolvedClient?.spaceId
+      params.spaceId = resolvedScope?.spaceId ?? spaceId
     }
 
     if (memberId) {
@@ -285,21 +291,18 @@ export async function POST(request: Request) {
     const currency = assertValidCurrency(body.currency)
     const subtotal = assertPositiveAmount(toNumber(body.subtotal), 'subtotal')
 
-    const resolvedClient = await resolveFinanceClientContext({
+    const resolvedScope = await resolveFinanceDownstreamScope({
+      organizationId: body.organizationId,
       clientId: body.clientId,
       clientProfileId: body.clientProfileId,
-      hubspotCompanyId: body.hubspotCompanyId
+      hubspotCompanyId: body.hubspotCompanyId,
+      requestedSpaceId: body.spaceId,
+      allocatedClientId: body.allocatedClientId
     })
 
     const resolvedMember = await resolveFinanceMemberContext({
       memberId: body.memberId,
       payrollEntryId: body.payrollEntryId
-    })
-
-    const resolvedScope = await resolveExpenseSpaceScope({
-      requestedSpaceId: body.spaceId ? normalizeString(body.spaceId) : resolvedClient.spaceId,
-      requestedClientId: resolvedClient.clientId,
-      allocatedClientId: body.allocatedClientId ? normalizeString(body.allocatedClientId) : null
     })
 
     const expenseType = body.expenseType && EXPENSE_TYPES.includes(body.expenseType)
@@ -356,7 +359,7 @@ export async function POST(request: Request) {
 
       await createFinanceExpenseInPostgres({
         expenseId,
-        clientId: resolvedScope.clientId ?? resolvedClient.clientId,
+        clientId: resolvedScope.clientId,
         spaceId: resolvedScope.spaceId,
         expenseType,
         sourceType,
@@ -439,7 +442,7 @@ export async function POST(request: Request) {
 
     await runFinanceQuery(`
       INSERT INTO \`${projectId}.greenhouse.fin_expenses\` (
-        expense_id, client_id, expense_type, description, currency,
+        expense_id, client_id, space_id, expense_type, description, currency,
         subtotal, tax_rate, tax_amount, total_amount,
         exchange_rate_to_clp, total_amount_clp,
         payment_date, payment_status, payment_method,
@@ -453,7 +456,7 @@ export async function POST(request: Request) {
         is_reconciled, notes, created_by,
         created_at, updated_at
       ) VALUES (
-        @expenseId, @clientId, @expenseType, @description, @currency,
+        @expenseId, @clientId, @spaceId, @expenseType, @description, @currency,
         CAST(@subtotal AS NUMERIC), CAST(@taxRate AS NUMERIC), CAST(@taxAmount AS NUMERIC), CAST(@totalAmount AS NUMERIC),
         CAST(@exchangeRateToClp AS NUMERIC), CAST(@totalAmountClp AS NUMERIC),
         IF(@paymentDate = '', NULL, CAST(@paymentDate AS DATE)), @paymentStatus, @paymentMethod,
@@ -469,7 +472,8 @@ export async function POST(request: Request) {
       )
     `, {
       expenseId,
-      clientId: resolvedClient.clientId,
+      clientId: resolvedScope.clientId,
+      spaceId: resolvedScope.spaceId,
       expenseType,
       description,
       currency,

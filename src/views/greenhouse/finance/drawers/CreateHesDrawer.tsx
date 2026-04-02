@@ -24,8 +24,10 @@ import CustomTextField from '@core/components/mui/TextField'
 // ── Types ──
 
 interface ClientOption {
+  organizationId: string | null
   clientId: string | null
   clientProfileId: string
+  hubspotCompanyId: string | null
   companyName: string | null
   greenhouseClientName: string | null
   legalName: string | null
@@ -41,7 +43,9 @@ interface POOption {
 }
 
 const getClientLabel = (c: ClientOption) =>
-  c.legalName || c.companyName || c.greenhouseClientName || c.clientId || c.clientProfileId
+  c.legalName || c.companyName || c.greenhouseClientName || c.clientId || c.organizationId || c.clientProfileId
+
+const getClientValue = (client: ClientOption) => client.clientId || client.organizationId || client.clientProfileId
 
 const formatCLP = (n: number) =>
   new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(n)
@@ -77,7 +81,7 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
 
   // Form fields
   const [hesNumber, setHesNumber] = useState('')
-  const [selectedClientId, setSelectedClientId] = useState('')
+  const [selectedClientKey, setSelectedClientKey] = useState('')
   const [selectedPoId, setSelectedPoId] = useState('')
   const [serviceDescription, setServiceDescription] = useState('')
   const [servicePeriodStart, setServicePeriodStart] = useState('')
@@ -104,14 +108,12 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const selectableClients = clients.filter((client): client is ClientOption & { clientId: string } => Boolean(client.clientId))
-
   // ── Populate form when editing ──
 
   useEffect(() => {
     if (editHes && open) {
       setHesNumber(editHes.hesNumber)
-      setSelectedClientId(editHes.clientId)
+      setSelectedClientKey(editHes.clientId)
       setSelectedPoId(editHes.purchaseOrderId || '')
       setServiceDescription(editHes.serviceDescription)
       setServicePeriodStart(editHes.servicePeriodStart || '')
@@ -149,15 +151,22 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
 
   // ── Fetch active POs for client ──
 
-  const fetchPOs = useCallback(async (clientId: string) => {
-    if (!clientId) {
+  const fetchPOs = useCallback(async (client: Pick<ClientOption, 'clientId' | 'organizationId' | 'clientProfileId' | 'hubspotCompanyId'> | null) => {
+    if (!client) {
       setActivePOs([])
 
       return
     }
 
     try {
-      const res = await fetch(`/api/finance/purchase-orders?clientId=${clientId}&status=active`)
+      const params = new URLSearchParams({ status: 'active' })
+
+      if (client.clientId) params.set('clientId', client.clientId)
+      if (client.organizationId) params.set('organizationId', client.organizationId)
+      if (client.clientProfileId) params.set('clientProfileId', client.clientProfileId)
+      if (client.hubspotCompanyId) params.set('hubspotCompanyId', client.hubspotCompanyId)
+
+      const res = await fetch(`/api/finance/purchase-orders?${params.toString()}`)
 
       if (res.ok) {
         const data = await res.json()
@@ -170,10 +179,13 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
   }, [])
 
   const handleClientChange = (value: string) => {
-    setSelectedClientId(value)
+    setSelectedClientKey(value)
     setSelectedPoId('')
     setSelectedPO(null)
-    fetchPOs(value)
+
+    const client = clients.find(item => getClientValue(item) === value) || null
+
+    fetchPOs(client)
   }
 
   const handlePOChange = (value: string) => {
@@ -188,7 +200,12 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
 
   useEffect(() => {
     if (editHes?.clientId && open) {
-      fetchPOs(editHes.clientId)
+      fetchPOs({
+        clientId: editHes.clientId,
+        organizationId: null,
+        clientProfileId: '',
+        hubspotCompanyId: null
+      })
     }
   }, [editHes, open, fetchPOs])
 
@@ -196,7 +213,7 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
 
   const resetForm = () => {
     setHesNumber('')
-    setSelectedClientId('')
+    setSelectedClientKey('')
     setSelectedPoId('')
     setServiceDescription('')
     setServicePeriodStart('')
@@ -220,7 +237,7 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
   const handleClose = () => { resetForm(); onClose() }
 
   const handleSubmit = async () => {
-    if (!hesNumber.trim() || !selectedClientId || !serviceDescription.trim() || !amount.trim()) {
+    if (!hesNumber.trim() || !selectedClientKey || !serviceDescription.trim() || !amount.trim()) {
       setError('N° HES, cliente, descripción del servicio y monto son obligatorios.')
 
       return
@@ -237,13 +254,18 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
     setSaving(true)
     setError(null)
 
+    const selectedClient = clients.find(client => getClientValue(client) === selectedClientKey)
+
     try {
       const res = await fetch('/api/finance/hes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           hesNumber: hesNumber.trim(),
-          clientId: selectedClientId,
+          ...(selectedClient?.clientId && { clientId: selectedClient.clientId }),
+          ...(selectedClient?.organizationId && { organizationId: selectedClient.organizationId }),
+          ...(selectedClient?.clientProfileId && { clientProfileId: selectedClient.clientProfileId }),
+          ...(selectedClient?.hubspotCompanyId && { hubspotCompanyId: selectedClient.hubspotCompanyId }),
           ...(selectedPoId && { purchaseOrderId: selectedPoId }),
           serviceDescription: serviceDescription.trim(),
           amount: amountNum,
@@ -392,13 +414,13 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
 
         <CustomTextField
           select fullWidth size='small' label='Cliente' required disabled={isReadOnly || loadingClients}
-          value={selectedClientId} onChange={e => handleClientChange(e.target.value)}
+          value={selectedClientKey} onChange={e => handleClientChange(e.target.value)}
         >
           <MenuItem value=''>
-            {loadingClients ? 'Cargando...' : selectableClients.length === 0 ? 'No hay clientes disponibles para HES' : '— Seleccionar cliente —'}
+            {loadingClients ? 'Cargando...' : clients.length === 0 ? 'No hay clientes disponibles para HES' : '— Seleccionar cliente —'}
           </MenuItem>
-          {selectableClients.map(c => (
-            <MenuItem key={c.clientId} value={c.clientId}>{getClientLabel(c)}</MenuItem>
+          {clients.map(c => (
+            <MenuItem key={getClientValue(c)} value={getClientValue(c)}>{getClientLabel(c)}</MenuItem>
           ))}
         </CustomTextField>
 

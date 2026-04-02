@@ -234,6 +234,29 @@ export const getCostAllocationsByClient = async (
   return rows.map(mapCostAllocation)
 }
 
+export const listCostAllocationsByPeriod = async (
+  year: number,
+  month: number
+): Promise<CostAllocationRecord[]> => {
+  await assertFinanceSlice2PostgresReady()
+
+  const rows = await runGreenhousePostgresQuery<CostAllocationRow>(
+    `
+      SELECT
+        allocation_id, expense_id, client_id, client_name,
+        allocation_percent, allocated_amount_clp,
+        period_year, period_month, allocation_method,
+        notes, created_by_user_id, created_at, updated_at
+      FROM greenhouse_finance.cost_allocations
+      WHERE period_year = $1 AND period_month = $2
+      ORDER BY allocated_amount_clp DESC, created_at DESC
+    `,
+    [year, month]
+  )
+
+  return rows.map(mapCostAllocation)
+}
+
 export const deleteCostAllocation = async (allocationId: string): Promise<void> => {
   await assertFinanceSlice2PostgresReady()
 

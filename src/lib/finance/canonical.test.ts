@@ -28,11 +28,16 @@ vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
 }))
 
-import { resolveFinanceClientContext } from '@/lib/finance/canonical'
+import { resolveFinanceClientContext, resolveFinanceDownstreamScope } from '@/lib/finance/canonical'
 
 describe('resolveFinanceClientContext', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockRunFinanceQuery.mockReset()
+    mockGetFinanceProjectId.mockReset()
+    mockResolveOrganizationForClient.mockReset()
+    mockShouldFallbackFromFinancePostgres.mockReset()
+    mockRunGreenhousePostgresQuery.mockReset()
     mockGetFinanceProjectId.mockReturnValue('test-project')
     mockResolveOrganizationForClient.mockResolvedValue('org-1')
     mockShouldFallbackFromFinancePostgres.mockReturnValue(false)
@@ -128,5 +133,92 @@ describe('resolveFinanceClientContext', () => {
     ).rejects.toThrow('syntax error at or near SELECT')
 
     expect(mockRunFinanceQuery).not.toHaveBeenCalled()
+  })
+
+  it('resolves downstream scope for org-first flows through the active space bridge', async () => {
+    mockRunGreenhousePostgresQuery
+      .mockResolvedValueOnce([
+        {
+          client_id: 'client-1',
+          client_name: 'Sky Airline',
+          hubspot_company_id: 'hubspot-1'
+        }
+      ])
+      .mockResolvedValueOnce([
+        {
+          client_profile_id: 'profile-1',
+          client_id: 'client-1',
+          organization_id: 'org-1',
+          hubspot_company_id: 'hubspot-1',
+          legal_name: 'Sky Airline SA'
+        }
+      ])
+      .mockResolvedValueOnce([
+        {
+          organization_id: 'org-1',
+          organization_name: 'Sky Airline',
+          legal_name: 'Sky Airline SA',
+          hubspot_company_id: 'hubspot-1',
+          client_id: null,
+          space_id: 'space-1'
+        }
+      ])
+      .mockResolvedValueOnce([
+        {
+          space_id: 'space-1',
+          client_id: 'client-1',
+          organization_id: 'org-1'
+        }
+      ])
+
+    const result = await resolveFinanceDownstreamScope({
+      organizationId: 'org-1',
+      requireLegacyClientBridge: true
+    })
+
+    expect(result).toMatchObject({
+      clientId: 'client-1',
+      clientProfileId: 'profile-1',
+      organizationId: 'org-1',
+      spaceId: 'space-1'
+    })
+  })
+
+  it('fails closed when a downstream flow still needs a legacy client bridge', async () => {
+    mockRunGreenhousePostgresQuery
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([
+        {
+          client_profile_id: 'profile-2',
+          client_id: null,
+          organization_id: 'org-2',
+          hubspot_company_id: null,
+          legal_name: 'Acme LLC'
+        }
+      ])
+      .mockResolvedValueOnce([
+        {
+          organization_id: 'org-2',
+          organization_name: 'Acme',
+          legal_name: 'Acme LLC',
+          hubspot_company_id: null,
+          client_id: null,
+          space_id: null
+        }
+      ])
+      .mockResolvedValueOnce([
+        {
+          space_id: 'space-2',
+          client_id: null,
+          organization_id: 'org-2'
+        }
+      ])
+
+    await expect(
+      resolveFinanceDownstreamScope({
+        organizationId: 'org-2',
+        requireLegacyClientBridge: true
+      })
+    ).rejects.toThrow('legacy clientId bridge')
   })
 })

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { resolveFinanceClientContext, resolveFinanceMemberContext } from '@/lib/finance/canonical'
+import { resolveFinanceDownstreamScope, resolveFinanceMemberContext } from '@/lib/finance/canonical'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
 import { createFinanceExpenseInPostgres } from '@/lib/finance/postgres-store-slice2'
@@ -95,10 +95,13 @@ export async function POST(request: Request) {
       const currency = assertValidCurrency(item.currency)
       const subtotal = assertPositiveAmount(toNumber(item.subtotal), 'subtotal')
 
-      const resolvedClient = await resolveFinanceClientContext({
+      const resolvedScope = await resolveFinanceDownstreamScope({
+        organizationId: item.organizationId,
         clientId: item.clientId,
         clientProfileId: item.clientProfileId,
-        hubspotCompanyId: item.hubspotCompanyId
+        hubspotCompanyId: item.hubspotCompanyId,
+        requestedSpaceId: item.spaceId,
+        allocatedClientId: item.allocatedClientId
       })
 
       const resolvedMember = await resolveFinanceMemberContext({
@@ -141,8 +144,8 @@ export async function POST(request: Request) {
       try {
         await createFinanceExpenseInPostgres({
           expenseId,
-          clientId: resolvedClient.clientId,
-          spaceId: resolvedClient.spaceId,
+          clientId: resolvedScope.clientId,
+          spaceId: resolvedScope.spaceId,
           expenseType,
           sourceType: 'manual',
           description,
@@ -209,7 +212,7 @@ export async function POST(request: Request) {
 
         await runFinanceQuery(`
           INSERT INTO \`${projectId}.greenhouse.fin_expenses\` (
-            expense_id, client_id, expense_type, description, currency,
+            expense_id, client_id, space_id, expense_type, description, currency,
             subtotal, tax_rate, tax_amount, total_amount,
             exchange_rate_to_clp, total_amount_clp,
             payment_date, payment_status, payment_method,
@@ -223,7 +226,7 @@ export async function POST(request: Request) {
             is_reconciled, notes, created_by,
             created_at, updated_at
           ) VALUES (
-            @expenseId, @clientId, @expenseType, @description, @currency,
+            @expenseId, @clientId, @spaceId, @expenseType, @description, @currency,
             CAST(@subtotal AS NUMERIC), CAST(@taxRate AS NUMERIC), CAST(@taxAmount AS NUMERIC), CAST(@totalAmount AS NUMERIC),
             CAST(@exchangeRateToClp AS NUMERIC), CAST(@totalAmountClp AS NUMERIC),
             IF(@paymentDate = '', NULL, CAST(@paymentDate AS DATE)), @paymentStatus, @paymentMethod,
@@ -239,7 +242,8 @@ export async function POST(request: Request) {
           )
         `, {
           expenseId,
-          clientId: resolvedClient.clientId,
+          clientId: resolvedScope.clientId,
+          spaceId: resolvedScope.spaceId,
           expenseType,
           description,
           currency,

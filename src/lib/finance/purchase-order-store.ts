@@ -117,16 +117,38 @@ const buildPurchaseOrderAttachmentPersistence = async ({
 
 export const listPurchaseOrders = async (filters?: {
   clientId?: string
+  organizationId?: string
+  spaceId?: string
   status?: string
 }): Promise<PurchaseOrderRecord[]> => {
   const conditions: string[] = []
   const values: unknown[] = []
   let idx = 0
 
+  const identityConditions: string[] = []
+
   if (filters?.clientId) {
     idx++
-    conditions.push(`client_id = $${idx}`)
+    identityConditions.push(`client_id = $${idx}`)
     values.push(filters.clientId)
+  }
+
+  if (filters?.organizationId) {
+    idx++
+    identityConditions.push(`organization_id = $${idx}`)
+    values.push(filters.organizationId)
+  }
+
+  if (filters?.spaceId) {
+    idx++
+    identityConditions.push(`space_id = $${idx}`)
+    values.push(filters.spaceId)
+  }
+
+  if (identityConditions.length === 1) {
+    conditions.push(identityConditions[0])
+  } else if (identityConditions.length > 1) {
+    conditions.push(`(${identityConditions.join(' OR ')})`)
   }
 
   if (filters?.status) {

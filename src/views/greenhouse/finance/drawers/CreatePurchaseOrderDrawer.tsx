@@ -21,8 +21,10 @@ import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/gre
 // ── Types ──
 
 interface ClientOption {
+  organizationId: string | null
   clientId: string | null
   clientProfileId: string
+  hubspotCompanyId: string | null
   companyName: string | null
   greenhouseClientName: string | null
   legalName: string | null
@@ -36,7 +38,9 @@ interface ActivePOSummary {
 }
 
 const getClientLabel = (c: ClientOption) =>
-  c.legalName || c.companyName || c.greenhouseClientName || c.clientId || c.clientProfileId
+  c.legalName || c.companyName || c.greenhouseClientName || c.clientId || c.organizationId || c.clientProfileId
+
+const getClientValue = (client: ClientOption) => client.clientId || client.organizationId || client.clientProfileId
 
 const CURRENCIES = ['CLP', 'USD']
 
@@ -51,7 +55,7 @@ type Props = {
 const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
   // Form fields
   const [poNumber, setPoNumber] = useState('')
-  const [selectedClientId, setSelectedClientId] = useState('')
+  const [selectedClientKey, setSelectedClientKey] = useState('')
   const [authorizedAmount, setAuthorizedAmount] = useState('')
   const [currency, setCurrency] = useState('CLP')
   const [exchangeRate, setExchangeRate] = useState('')
@@ -70,8 +74,6 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
   const [activePOs, setActivePOs] = useState<ActivePOSummary | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  const selectableClients = clients.filter((client): client is ClientOption & { clientId: string } => Boolean(client.clientId))
 
   // ── Fetch clients ──
 
@@ -97,15 +99,22 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
 
   // ── Fetch active POs for client ──
 
-  const fetchActivePOs = useCallback(async (clientId: string) => {
-    if (!clientId) {
+  const fetchActivePOs = useCallback(async (client: ClientOption | null) => {
+    if (!client) {
       setActivePOs(null)
 
       return
     }
 
     try {
-      const res = await fetch(`/api/finance/purchase-orders?clientId=${clientId}&status=active`)
+      const params = new URLSearchParams({ status: 'active' })
+
+      if (client.clientId) params.set('clientId', client.clientId)
+      if (client.organizationId) params.set('organizationId', client.organizationId)
+      if (client.clientProfileId) params.set('clientProfileId', client.clientProfileId)
+      if (client.hubspotCompanyId) params.set('hubspotCompanyId', client.hubspotCompanyId)
+
+      const res = await fetch(`/api/finance/purchase-orders?${params.toString()}`)
 
       if (res.ok) {
         const data = await res.json()
@@ -123,10 +132,11 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
   }, [])
 
   const handleClientChange = (value: string) => {
-    setSelectedClientId(value)
-    fetchActivePOs(value)
+    setSelectedClientKey(value)
 
-    const client = selectableClients.find(c => c.clientId === value)
+    const client = clients.find(c => getClientValue(c) === value) || null
+
+    fetchActivePOs(client)
 
     if (client?.paymentCurrency && !currency) {
       setCurrency(client.paymentCurrency)
@@ -137,7 +147,7 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
 
   const resetForm = () => {
     setPoNumber('')
-    setSelectedClientId('')
+    setSelectedClientKey('')
     setAuthorizedAmount('')
     setCurrency('CLP')
     setExchangeRate('')
@@ -155,8 +165,10 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
 
   const handleClose = () => { resetForm(); onClose() }
 
+  const selectedClient = clients.find(client => getClientValue(client) === selectedClientKey)
+
   const handleSubmit = async () => {
-    if (!poNumber.trim() || !selectedClientId || !authorizedAmount.trim() || !issueDate) {
+    if (!poNumber.trim() || !selectedClientKey || !authorizedAmount.trim() || !issueDate) {
       setError('N° de OC, cliente, monto y fecha de emisión son obligatorios.')
 
       return
@@ -173,16 +185,16 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
     setSaving(true)
     setError(null)
 
-    const client = selectableClients.find(c => c.clientId === selectedClientId)
-
     try {
       const res = await fetch('/api/finance/purchase-orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           poNumber: poNumber.trim(),
-          clientId: selectedClientId,
-          organizationId: null,
+          ...(selectedClient?.clientId && { clientId: selectedClient.clientId }),
+          ...(selectedClient?.organizationId && { organizationId: selectedClient.organizationId }),
+          ...(selectedClient?.clientProfileId && { clientProfileId: selectedClient.clientProfileId }),
+          ...(selectedClient?.hubspotCompanyId && { hubspotCompanyId: selectedClient.hubspotCompanyId }),
           authorizedAmount: amount,
           currency,
           ...(currency !== 'CLP' && exchangeRate && { exchangeRateToClp: Number(exchangeRate) }),
@@ -206,7 +218,7 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
         return
       }
 
-      toast.success(`OC ${poNumber} registrada para ${getClientLabel(client!)}`)
+      toast.success(`OC ${poNumber} registrada para ${getClientLabel(selectedClient!)}`)
       resetForm()
       onClose()
       onSuccess()
@@ -258,20 +270,20 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
 
         <CustomTextField
           select fullWidth size='small' label='Cliente' required
-          value={selectedClientId} onChange={e => handleClientChange(e.target.value)}
+          value={selectedClientKey} onChange={e => handleClientChange(e.target.value)}
           disabled={loadingClients}
         >
           <MenuItem value=''>
-            {loadingClients ? 'Cargando...' : selectableClients.length === 0 ? 'No hay clientes disponibles para OC' : '— Seleccionar cliente —'}
+            {loadingClients ? 'Cargando...' : clients.length === 0 ? 'No hay clientes disponibles para OC' : '— Seleccionar cliente —'}
           </MenuItem>
-          {selectableClients.map(c => (
-            <MenuItem key={c.clientId} value={c.clientId}>{getClientLabel(c)}</MenuItem>
+          {clients.map(c => (
+            <MenuItem key={getClientValue(c)} value={getClientValue(c)}>{getClientLabel(c)}</MenuItem>
           ))}
         </CustomTextField>
 
         {activePOs && activePOs.count > 0 && (
           <Alert severity='info' icon={<i className='tabler-file-check' />}>
-            {getClientLabel(selectableClients.find(c => c.clientId === selectedClientId)!)} tiene {activePOs.count} OC activa{activePOs.count > 1 ? 's' : ''}.
+            {getClientLabel(clients.find(c => getClientValue(c) === selectedClientKey)!)} tiene {activePOs.count} OC activa{activePOs.count > 1 ? 's' : ''}.
             Saldo disponible: {formatCLP(activePOs.totalRemaining)}
           </Alert>
         )}
@@ -352,9 +364,9 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
           replaceCta='Reemplazar documento'
           value={attachmentAsset}
           onChange={setAttachmentAsset}
-          ownerClientId={selectedClientId || undefined}
+          ownerClientId={selectedClient?.clientId || undefined}
           metadataLabel={poNumber.trim() || 'purchase-order'}
-          disabled={saving || !selectedClientId}
+          disabled={saving || !selectedClientKey}
         />
         <CustomTextField
           fullWidth size='small' label='Notas' multiline rows={2}

@@ -8,6 +8,7 @@ import {
 } from '@/lib/finance/shared'
 import { resolveOrganizationForClient } from '@/lib/account-360/organization-identity'
 import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
+import { resolveExpenseSpaceScope } from '@/lib/finance/expense-scope'
 
 type ClientRow = {
   client_id: string | null
@@ -63,6 +64,8 @@ export type ResolvedFinanceMemberContext = {
   payrollEntryId: string | null
   payrollPeriodId: string | null
 }
+
+export type ResolvedFinanceDownstreamScope = ResolvedFinanceClientContext
 
 const preferClientRow = ({
   clientRows,
@@ -420,6 +423,56 @@ export const resolveFinanceClientContext = async ({
       || null,
     organizationId: resolvedOrganizationId || organizationIdFromBridge || null,
     spaceId
+  }
+}
+
+export const resolveFinanceDownstreamScope = async ({
+  organizationId,
+  clientId,
+  clientProfileId,
+  hubspotCompanyId,
+  requestedSpaceId,
+  allocatedClientId,
+  requireLegacyClientBridge = false
+}: {
+  organizationId?: unknown
+  clientId?: unknown
+  clientProfileId?: unknown
+  hubspotCompanyId?: unknown
+  requestedSpaceId?: unknown
+  allocatedClientId?: unknown
+  requireLegacyClientBridge?: boolean
+}): Promise<ResolvedFinanceDownstreamScope> => {
+  const resolvedClient = await resolveFinanceClientContext({
+    organizationId,
+    clientId,
+    clientProfileId,
+    hubspotCompanyId
+  })
+
+  const resolvedScope = await resolveExpenseSpaceScope({
+    requestedSpaceId: normalizeString(requestedSpaceId) || resolvedClient.spaceId,
+    requestedOrganizationId: normalizeString(organizationId) || resolvedClient.organizationId,
+    requestedClientId: resolvedClient.clientId,
+    allocatedClientId: normalizeString(allocatedClientId)
+  })
+
+  const effectiveClientId = resolvedScope.clientId || resolvedClient.clientId || null
+  const effectiveOrganizationId = resolvedScope.organizationId || resolvedClient.organizationId || null
+  const effectiveSpaceId = resolvedScope.spaceId || resolvedClient.spaceId || null
+
+  if (requireLegacyClientBridge && !effectiveClientId) {
+    throw new FinanceValidationError(
+      'This flow still requires a legacy clientId bridge. Provide a spaceId tied to the organization or complete the client bridge in Finance Clients.',
+      422
+    )
+  }
+
+  return {
+    ...resolvedClient,
+    clientId: effectiveClientId,
+    organizationId: effectiveOrganizationId,
+    spaceId: effectiveSpaceId
   }
 }
 

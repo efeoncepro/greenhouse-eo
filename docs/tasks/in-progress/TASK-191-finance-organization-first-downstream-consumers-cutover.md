@@ -2,11 +2,11 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
-- Status real: `Diseño`
+- Status real: `Implementation complete + verified`
 - Rank: `51`
 - Domain: `finance`
 - GitHub Project: `TBD`
@@ -15,6 +15,28 @@
 ## Summary
 
 Follow-on explícito de `TASK-181` para cortar los consumers downstream de Finance que todavía dependen de `clientId` como llave operativa obligatoria. El objetivo no es ocultar el bridge legacy, sino encapsularlo: `organizationId` debe pasar a ser el anchor de entrada para `purchase orders`, `HES`, `cost allocations`, `expenses` y los readers analíticos que hoy todavía excluyen clientes org-first.
+
+## Delta 2026-04-02
+
+- La lane no arranca desde cero en analítica:
+  - `computeClientEconomicsSnapshots()` ya admite revenue org-aware con `COALESCE(i.client_id, cp.client_id, i.organization_id, cp.organization_id)`
+  - `organization-economics` ya usa bridge por `client_profiles.organization_id` para no perder snapshots de una organización que aún convive con `client_id`
+- El drift real quedó más acotado:
+  - `purchase-orders`, `hes`, `allocations` y parte de `expenses` siguen client-first en input contract
+  - `operational_pl`, `commercial_cost_attribution`, `agency-finance-metrics` y serving financiero siguen materializando/componiendo por `client_id` como compat boundary
+  - la lane debe reutilizar el hardening parcial ya existente y cerrar el contrato downstream, no reimplementar otra vez `TASK-181`
+- Lectura documental obligatoria para esta task:
+  - `GREENHOUSE_POSTGRES_CANONICAL_360_V1.md` y `GREENHOUSE_DATA_MODEL_MASTER_V1.md` prevalecen sobre secciones legacy de `GREENHOUSE_360_OBJECT_MODEL_V1.md` que todavía presentan `client` sobre `greenhouse.clients`
+- El tramo aplicado ya dejó el cutover downstream más cerca del contrato final:
+  - `purchase-orders`, `hes`, `expenses`, `expenses/bulk`, `allocations` y `client_economics` ya quedaron alineados para resolver contexto org-first downstream
+  - los drawers Finance relevantes ya no deben tratar `clientId` como único anchor visible de selección
+  - `client_id` sigue existiendo como bridge materializado y residual; no se elimina físicamente en esta lane
+- Validación ejecutada del tramo aplicado:
+  - `pnpm exec vitest run src/lib/finance/canonical.test.ts src/app/api/finance/purchase-orders/route.test.ts src/app/api/finance/intelligence/allocations/route.test.ts`
+  - `pnpm lint`
+  - `pnpm build`
+- Validación todavía pendiente:
+  - smoke manual con OC, HES, expense por `space` y allocations/economics para cliente org-first
 
 ## Why This Task Exists
 
@@ -55,6 +77,10 @@ Reglas obligatorias:
 - Toda query de runtime debe mantener tenant isolation por `space_id` o por bridge organizacional explícito; no se permiten joins ambiguos cross-tenant.
 - Nuevos cambios de acceso a base deben usar `query`, `getDb` o `withTransaction` desde `@/lib/db`; no crear pools nuevos ni leer credenciales directo.
 - Las métricas y serving cross-module no deben recalcular semántica de negocio inline si ya existe projection/materialización canónica.
+- Para esta lane, si `GREENHOUSE_360_OBJECT_MODEL_V1.md` contradice el anchor org-first, tomar como source of truth:
+  - `GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
+  - `GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+  - `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
 
 ## Dependencies & Impact
 
@@ -109,15 +135,14 @@ Reglas obligatorias:
 - `resolveFinanceClientContext()` ya resuelve `organizationId`, `clientId`, `clientProfileId`, `hubspotCompanyId` y `spaceId`.
 - `purchase_orders` y `service_entry_sheets` ya tienen columna `organization_id`.
 - `CreateIncomeDrawer` ya soporta selección org-first y preserva `clientId` solo cuando existe bridge disponible.
+- `computeClientEconomicsSnapshots()` ya contempla ingresos que llegan solo con `organization_id`.
+- `organization-economics` ya usa `client_profiles.organization_id` como bridge para no perder clientes org-first en el breakdown por organización.
 
 ### Gap actual
 
-- `purchase-orders` sigue exigiendo `clientId` en query y create path.
-- `hes` sigue exigiendo `clientId` en query y create path.
-- `CreatePurchaseOrderDrawer` y `CreateHesDrawer` excluyen clientes que no tengan `clientId`.
-- `intelligence/allocations` y su store siguen aceptando `clientId` como única llave de lectura/escritura.
-- `CreateExpenseDrawer` sigue propagando `clientId` y `allocatedClientId` desde el espacio seleccionado.
-- fallbacks analíticos (`organization-economics`, `client_economics`, `operational_pl`, `commercial_cost_attribution`) todavía agregan por `client_id` sin bridge org-aware consistente.
+- `purchase-orders`, `hes`, `expenses`, `expenses/bulk`, `allocations` y `client_economics` ya avanzaron al contrato org-first downstream, pero todavía falta validación formal del lote.
+- `client_id` sigue existiendo como bridge materializado y residual en readers y tablas legacy.
+- `operational_pl`, `commercial_cost_attribution` y consumers Agency/Finance relacionados mantienen serving y joins finales sobre `client_id`; la lane documenta ese residual sin prometer eliminación física de la clave.
 
 ## Scope
 

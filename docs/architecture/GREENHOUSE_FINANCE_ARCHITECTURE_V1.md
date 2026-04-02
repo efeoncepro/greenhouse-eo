@@ -65,6 +65,20 @@ Regla canónica vigente para agregaciones financieras:
 - Si un income histórico solo trae `client_profile_id`, el runtime debe traducirlo vía `greenhouse_finance.client_profiles` antes de agrupar.
 - No se debe usar `client_profile_id` como sustituto directo de `client_id` en snapshots o serving ejecutivo nuevo.
 
+## Delta 2026-04-02 — downstream org-first cutover y residual legacy
+
+`TASK-191` avanza el contrato downstream de Finance para que la entrada operativa deje de depender exclusivamente de `clientId`:
+
+- `purchase-orders` y `hes` deben aceptar `organizationId` como anchor org-first, con `clientId` solo como bridge de compatibilidad cuando el storage legacy lo requiera.
+- `expenses`, `expenses/bulk`, `cost allocations` y `client_economics` deben resolver scope downstream desde un helper compartido en vez de repetir bridges ad hoc en UI y API.
+- La selección de clientes en drawers Finance debe preferir el identificador org-first y mostrar `clientId` solo como bridge residual.
+
+Regla de persistencia:
+
+- `client_id` sigue siendo un bridge operativo en varias tablas y readers.
+- No se debe prometer eliminación física de `client_id` hasta una lane explícita de schema evolution.
+- Los readers/materializers que siguen materializando por `client_id` deben documentarse como compat boundary, no como contrato de entrada.
+
 ## Delta 2026-03-30 — Cost Intelligence ya opera como layer de management accounting
 
 Finance sigue siendo el owner del motor financiero central, pero ya no es la única surface que expone semántica de rentabilidad.

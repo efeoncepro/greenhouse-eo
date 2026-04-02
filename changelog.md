@@ -1,5 +1,17 @@
 # changelog.md
 
+## 2026-04-02
+
+- **TASK-191 finance organization-first downstream consumers cutover**:
+  - `purchase-orders` y `hes` quedaron alineados para aceptar contexto org-first además de `clientId`, manteniendo `client_id` solo como bridge legacy donde el storage todavía lo necesita
+  - `expenses`, `expenses/bulk`, `cost allocations` y `client_economics` pasaron a resolver scope downstream desde un helper compartido, reduciendo la dependencia de que la UI empuje `clientId` manualmente
+  - los drawers de Finance se documentaron para operar con selección org-first y mostrar el bridge legado solo cuando exista
+  - residual legacy visible:
+    - `client_id` sigue siendo la llave materializada en varias tablas y readers financieros
+    - `cost_allocations` y parte del serving analítico todavía no migran físicamente a `organization_id`
+  - validación ejecutada en este tramo: `pnpm exec vitest run src/lib/finance/canonical.test.ts src/app/api/finance/purchase-orders/route.test.ts src/app/api/finance/intelligence/allocations/route.test.ts`, `pnpm lint` y `pnpm build`
+  - queda pendiente solo el smoke manual de OC/HES/expenses/allocations con cliente org-first
+
 ## 2026-04-01
 
 - **TASK-181 finance clients canonical source cutover**:

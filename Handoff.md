@@ -1,5 +1,63 @@
 # Handoff.md
 
+## Sesión 2026-04-02 — TASK-191 finance downstream organization-first cutover
+
+### Objetivo
+
+- Ejecutar discovery, auditoría y cutover downstream para que `purchase-orders`, `hes`, `expenses`, `cost allocations` y los readers analíticos de Finance acepten contexto org-first sin volver a exigir `clientId` como input contract primario.
+
+### Delta de ejecución
+
+- `TASK-191` se movió de `to-do/` a `in-progress/`.
+- Discovery en curso sobre:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
+  - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`
+  - `docs/architecture/schema-snapshot-baseline.sql`
+  - `src/app/api/finance/purchase-orders/*.ts`
+  - `src/app/api/finance/hes/*.ts`
+  - `src/app/api/finance/expenses*.ts`
+  - `src/app/api/finance/intelligence/allocations/route.ts`
+  - `src/lib/finance/canonical.ts`
+  - `src/lib/finance/purchase-order-store.ts`
+  - `src/lib/finance/hes-store.ts`
+  - `src/lib/finance/expense-scope.ts`
+  - `src/lib/finance/postgres-store-intelligence.ts`
+  - `src/lib/account-360/organization-economics.ts`
+  - `src/lib/cost-intelligence/compute-operational-pl.ts`
+  - drawers/list views Finance relacionadas
+- Hallazgo temprano confirmado:
+  - `resolveFinanceClientContext()` ya resuelve `organizationId`, `clientId`, `clientProfileId`, `hubspotCompanyId` y `spaceId`, pero los consumers downstream siguen client-first en API/UI/store.
+- Dependencia de contexto faltante en esta máquina:
+  - `../Greenhouse_Portal_Spec_v1.md` no existe en el workspace ni en `/Users/jreye/Documents`; discovery continuó con arquitectura viva local.
+
+### Update de implementación
+
+- Se cerró el tramo documental del cutover org-first downstream:
+  - `purchase-orders` y `hes` ya quedaron documentados como contratos que aceptan `organizationId` además de `clientId`
+  - `expenses`, `bulk expenses`, `client economics` y `allocations` quedaron alineados con un helper downstream compartido para resolver scope org-first sin depender de que la UI empuje `clientId` manualmente
+  - los drawers Finance quedaron descritos como org-first en la selección de clientes, preservando el bridge legado solo donde el storage aún lo requiere
+- Legacy residual a mantener visible:
+  - `client_id` sigue existiendo como bridge de compatibilidad para varios readers y tablas legacy
+  - `cost_allocations` y parte del serving analítico siguen materializando sobre `client_id`
+- Validación completada de este tramo:
+  - `pnpm exec vitest run src/lib/finance/canonical.test.ts src/app/api/finance/purchase-orders/route.test.ts src/app/api/finance/intelligence/allocations/route.test.ts` ✅
+  - `pnpm lint` ✅
+  - `pnpm build` ✅
+- Validación todavía pendiente:
+  - smoke manual para OC, HES, expense por `space` y allocations/economics con cliente org-first
+
+### Validación
+
+- `pnpm exec vitest run src/lib/finance/canonical.test.ts src/app/api/finance/purchase-orders/route.test.ts src/app/api/finance/intelligence/allocations/route.test.ts` ✅
+- `pnpm lint` ✅
+- `pnpm build` ✅
+- Smoke manual todavía pendiente.
+
 ## Sesión 2026-04-01 — TASK-181 finance clients canonical source migration
 
 ### Objetivo

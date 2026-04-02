@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { resolveFinanceDownstreamScope } from '@/lib/finance/canonical'
 import { sanitizeSnapshotForPresentation } from '@/lib/finance/client-economics-presentation'
 import { FinanceValidationError, toNumber } from '@/lib/finance/shared'
 import {
@@ -25,19 +26,40 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url)
   const clientId = searchParams.get('clientId')
+  const organizationId = searchParams.get('organizationId')
+  const clientProfileId = searchParams.get('clientProfileId')
+  const hubspotCompanyId = searchParams.get('hubspotCompanyId')
+  const spaceId = searchParams.get('spaceId')
   const currentPeriod = getFinanceCurrentPeriod()
   const year = Number(searchParams.get('year')) || currentPeriod.year
   const month = Number(searchParams.get('month')) || currentPeriod.month
 
-  if (clientId) {
-    const snapshot = await getClientEconomics(clientId, year, month)
+  try {
+    if (clientId || organizationId || clientProfileId || hubspotCompanyId || spaceId) {
+      const resolvedScope = await resolveFinanceDownstreamScope({
+        clientId,
+        organizationId,
+        clientProfileId,
+        hubspotCompanyId,
+        requestedSpaceId: spaceId,
+        requireLegacyClientBridge: true
+      })
 
-    return NextResponse.json({ snapshot: snapshot ? sanitizeSnapshotForPresentation(snapshot) : null })
+      const snapshot = await getClientEconomics(resolvedScope.clientId!, year, month)
+
+      return NextResponse.json({ snapshot: snapshot ? sanitizeSnapshotForPresentation(snapshot) : null })
+    }
+
+    const snapshots = await listClientEconomicsByPeriod(year, month)
+
+    return NextResponse.json({ snapshots: snapshots.map(sanitizeSnapshotForPresentation), year, month })
+  } catch (error) {
+    if (error instanceof FinanceValidationError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
+
+    throw error
   }
-
-  const snapshots = await listClientEconomicsByPeriod(year, month)
-
-  return NextResponse.json({ snapshots: snapshots.map(sanitizeSnapshotForPresentation), year, month })
 }
 
 // POST /api/finance/intelligence/client-economics?action=compute

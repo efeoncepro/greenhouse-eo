@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
-import { resolveFinanceClientContext, resolveFinanceMemberContext } from '@/lib/finance/canonical'
-import { resolveExpenseSpaceScope } from '@/lib/finance/expense-scope'
+import { resolveFinanceDownstreamScope, resolveFinanceMemberContext } from '@/lib/finance/canonical'
 import { EXPENSE_SOURCE_TYPES, PAYMENT_PROVIDERS, PAYMENT_RAILS } from '@/lib/finance/expense-taxonomy'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
@@ -190,24 +189,22 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     // Client context resolution
     if (
       body.clientId !== undefined
+      || body.organizationId !== undefined
       || body.clientProfileId !== undefined
       || body.hubspotCompanyId !== undefined
       || body.spaceId !== undefined
       || body.allocatedClientId !== undefined
     ) {
-      const resolvedClient = await resolveFinanceClientContext({
+      const resolvedScope = await resolveFinanceDownstreamScope({
+        organizationId: body.organizationId,
         clientId: body.clientId,
         clientProfileId: body.clientProfileId,
-        hubspotCompanyId: body.hubspotCompanyId
+        hubspotCompanyId: body.hubspotCompanyId,
+        requestedSpaceId: body.spaceId,
+        allocatedClientId: body.allocatedClientId
       })
 
-      const resolvedScope = await resolveExpenseSpaceScope({
-        requestedSpaceId: body.spaceId ? normalizeString(body.spaceId) : resolvedClient.spaceId,
-        requestedClientId: resolvedClient.clientId,
-        allocatedClientId: body.allocatedClientId ? normalizeString(body.allocatedClientId) : null
-      })
-
-      pgUpdates.clientId = resolvedScope.clientId ?? resolvedClient.clientId
+      pgUpdates.clientId = resolvedScope.clientId
       pgUpdates.spaceId = resolvedScope.spaceId
     }
 
@@ -377,7 +374,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const bqParams: Record<string, unknown> = { expenseId }
 
     const colMap: Record<string, string> = {
-      clientId: 'client_id', expenseType: 'expense_type', description: 'description',
+      clientId: 'client_id', spaceId: 'space_id', expenseType: 'expense_type', description: 'description',
       currency: 'currency', subtotal: 'subtotal', taxRate: 'tax_rate', taxAmount: 'tax_amount',
       totalAmount: 'total_amount', exchangeRateToClp: 'exchange_rate_to_clp',
       totalAmountClp: 'total_amount_clp', paymentDate: 'payment_date',
