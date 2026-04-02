@@ -21,7 +21,9 @@
   - se cerró la semántica canónica actual: `on_time` / `late_drop` prefieren `performance_indicator_code` con fallback por fechas; `overdue` / `carry-over` siguen siendo período-relativos; `FTR` ahora usa una señal compuesta sobre `RpA`, rounds cliente/workflow y cierre real de revisión/comentarios
   - `readMemberMetrics()` ya no pierde `CSC distribution` en el path materializado y el `PersonActivityTab` ahora muestra `carry-over` + banner cuando aún no hay cierres en el período
   - `Space 360 > ICO` ahora deja visibles esos buckets para auditoría operativa del snapshot
-  - Agency `ICO Engine` ahora muestra un `Performance Report` mensual MVP con comparativo vs mes anterior y `Top Performer` sobre el engine materializado
+  - Agency `ICO Engine` ahora muestra un `Performance Report` mensual MVP con comparativo vs mes anterior y `Top Performer`
+  - ese `Performance Report` ya no vive solo como helper de lectura: ahora también se materializa en `ico_engine.performance_report_monthly`, construido desde `metric_snapshots_monthly` + `metrics_by_member` con fallback seguro al cálculo previo si el snapshot todavía no existe
+  - el reporte mensual ahora también entrega mezcla por segmento (`taskMix`), `Alerta` y `Resumen Ejecutivo` determinísticos sobre el snapshot materializado
   - `scripts/materialize-member-metrics.ts` quedó alineado como wrapper del motor canónico para evitar deriva semántica
   - arquitectura viva actualizada en `Greenhouse_ICO_Engine_v1.md` y `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
 

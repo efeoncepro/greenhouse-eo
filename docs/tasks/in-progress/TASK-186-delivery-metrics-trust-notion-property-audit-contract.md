@@ -1,22 +1,67 @@
 # TASK-186 - Delivery Metrics Trust: Notion Property Audit & Conformed Contract Hardening
 
+## Delta 2026-04-01
+
+- El `Performance Report` mensual de Agency dejó de existir solo como helper “on read” y ahora también queda materializado dentro de `ICO` como read-model auditable:
+  - nueva tabla BigQuery `ico_engine.performance_report_monthly`
+  - la materialización se construye desde `metric_snapshots_monthly` + `metrics_by_member`, no desde un cálculo paralelo
+  - `readAgencyPerformanceReport()` ahora usa `materialized-first` con fallback seguro al cálculo previo si el snapshot aún no existe
+- El scorecard mensual ahora también persiste mezcla de carga por segmento (`task_mix_json`) y el reader entrega:
+  - `taskMix` ordenado por volumen
+  - `alertText`
+  - `executiveSummary`
+- La UI Agency ICO ya muestra esas piezas del reporte sin recalcular métricas en el cliente:
+  - alerta
+  - resumen ejecutivo
+  - cards `Tareas <segmento>` para los segmentos dominantes del período
+- El snapshot mensual del reporte persiste el resumen del scorecard y el `Top Performer` MVP con sus supuestos de elegibilidad, para evitar que el comparativo mensual dependa solo de request-time aggregation.
+- Se implementó un segundo sub-slice aditivo en `ICO` para acercar el engine al `Performance Report` sin cambiar sus métricas troncales.
+- `buildMetricSelectSQL()` ahora también materializa buckets canónicos como contexto: `on_time_count`, `late_drop_count` y `overdue_count`.
+- Las materializaciones `metric_snapshots_monthly`, `metrics_by_project`, `metrics_by_member`, `metrics_by_sprint`, `metrics_by_organization` y `metrics_by_business_unit` quedaron extendidas de forma aditiva para persistir esos buckets.
+- `read-metrics.ts` ahora expone esos buckets en `SpaceMetricSnapshot`, `IcoMetricSnapshot` y snapshots por proyecto/miembro como contexto adicional (`onTimeTasks`, `lateDropTasks`, `overdueTasks`).
+- `Space 360 > ICO` ahora muestra esos buckets como contexto visible del snapshot.
+- Se cerró la regla canónica actual del engine:
+  - `on_time` y `late_drop` prefieren `performance_indicator_code` cuando existe y caen a derivación por fechas cuando no existe
+  - `overdue` y `carry-over` permanecen como reglas período-relativas de `ICO`, no como labels upstream
+  - `FTR` ya no debe leerse como una sola columna: usa `rpa_value <= 1` cuando existe, o fallback a rounds cliente/workflow en cero cuando no existe
+  - además `FTR` exige que la tarea esté cerrada sin `client_review_open`, sin `workflow_review_open` y sin `open_frame_comments`
+- Se agregó un read-model mensual reutilizable del `Performance Report` para Agency sobre `ICO` materializado:
+  - helper `src/lib/ico-engine/performance-report.ts`
+  - comparativo `mes actual vs mes anterior`
+  - tendencia MVP (`improving`, `stable`, `degrading`) sobre `On-Time %`
+  - `Top Performer` MVP desde `metrics_by_member`
+- La API `GET /api/ico-engine/metrics/agency` ahora retorna `report` de forma aditiva y la vista Agency ICO ya lo muestra sin alterar los KPI cards existentes.
+- Supuestos MVP explicitados:
+  - `Top Performer` usa `OTD` del período
+  - mínimo de elegibilidad: `throughput_count >= 5`
+  - desempate: `throughput_count DESC`, `rpa_avg ASC`
+  - multi-assignee: usa el modelo actual de crédito por miembro de `metrics_by_member`
+- La auditoría del repo confirmó que esta lane ya no puede leerse solo como `Notion -> greenhouse_conformed`.
+- Se corrigió la spec para reconocer la cadena runtime real: `Notion -> conformed -> ICO -> serving Postgres -> payroll / person intelligence`.
+- Se dejó explícito que `TASK-186` no requiere esperar la implementación completa de `TASK-187` / `TASK-188` para avanzar con el `MVP`, pero sí debe mantenerse compatible con esa arquitectura target.
+- Se reforzó el guardrail: cualquier endurecimiento del contrato de métricas debe preservar consumers actuales de `ICO`, `payroll`, `serving` y proyecciones reactivas.
+- Se aclara que el trabajo reciente sobre `carry-over` debe leerse solo como un sub-slice técnico incremental y no como el foco principal de `TASK-186`.
+- Se fija nuevamente el objetivo principal de la lane: paridad y confianza del `Performance Report`, con énfasis en buckets canónicos, `FTR`, snapshot mensual auditable, comparativo contra mes anterior y serving formal del scorecard.
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio`
-- Status real: `Diseño`
+- Status real: `Implementación parcial`
 - Rank: `2`
 - Domain: `data`
 
 ## Summary
 
-Institucionalizar la auditoría de propiedades Notion que alimentan métricas de Delivery para `Efeonce`, `Sky Airlines` y `ANAM`, dejando explícito qué campos ya entran a `greenhouse_conformed`, qué gaps siguen abiertos y qué parte del scorecard todavía depende de fórmulas o semánticas no unificadas.
+Institucionalizar la auditoría de propiedades Notion que alimentan métricas de Delivery para `Efeonce`, `Sky Airlines` y `ANAM`, dejando explícito qué campos ya entran a `greenhouse_conformed`, qué parte ya está proyectada a `greenhouse_delivery` / `greenhouse_serving`, qué gaps siguen abiertos y qué parte del scorecard todavía depende de fórmulas o semánticas no unificadas.
 
 La meta no es solo “tener más campos”, sino recuperar confianza en las métricas: que cualquier agente pueda reconstruir qué base de Notion alimenta qué KPI, qué IDs usar, qué campos son canónicos y qué contratos faltan antes de declarar el reporte como confiable. Esta lane también fija una regla de diseño: los teamspaces pueden parecerse, pero no son idénticos, por lo que el modelo debe absorber particularidades por cliente sin romper el contrato KPI base.
 
 La ejecución de esta lane debe fortalecer el carril actual de `sync-notion-conformed` + `ICO`, no reemplazarlo abruptamente. La expectativa es construir paridad auditable sobre lo ya existente, cerrar gaps de contrato y recién después de eso retirar dependencias opacas de fórmulas Notion.
+
+Esta lane no debe confundirse con “propagar `carry-over` por todos lados”. Ese trabajo puede existir como slice de soporte, pero no representa el centro de la task.
 
 Dentro de la arquitectura canónica vigente, esta task debe leerse como `consumer hardening` sobre la foundation de integración formalizada en `TASK-187`, no como una redefinición de la capa de integraciones.
 
@@ -24,12 +69,12 @@ En ejecución, esta task también forma parte del carril `MVP` inmediato junto c
 
 ## Why This Task Exists
 
-Hoy el portal ya tiene foundation importante para `ICO` y para el sync Notion -> `greenhouse_conformed`, pero la confianza en métricas sigue incompleta por cinco razones:
+Hoy el portal ya tiene foundation importante para `ICO`, para el sync Notion -> `greenhouse_conformed` y para serving Postgres downstream, pero la confianza en métricas sigue incompleta por cinco razones:
 
 - no existe una task canónica que documente, con IDs exactos, las bases de `Proyectos` y `Tareas` auditadas en Notion para `Efeonce`, `Sky Airlines` y `ANAM`
 - la capa conformed solo ingiere una parte del universo de propiedades que hoy usan o condicionan el performance report
 - seguimos dependiendo de outputs de fórmula de Notion para varias señales (`Indicador de Performance`, `Cumplimiento`, `Completitud`, `RpA`, semáforos), en vez de tener siempre las primitivas necesarias para recomputarlas en Greenhouse
-- hay deriva semántica en métricas críticas: por ejemplo `FTR` no usa exactamente la misma definición en live queries y en la materialización por miembro
+- persisten deriva y ambigüedad semántica en métricas críticas como `FTR`, pero ya no viven principalmente en la materialización por miembro de `ICO`; hoy el riesgo está en carriles/documentación paralelos y en consumers que aún no consumen el contrato completo
 - aunque los spaces comparten una base funcional similar, cada cliente introduce campos y semánticas propias; si se fuerza un esquema rígido de “one-size-fits-all”, se pierden señales valiosas o se contamina el core KPI con excepciones locales mal resueltas
 
 Mientras este contrato no quede auditado y endurecido, cualquier dashboard o reporte mensual seguirá teniendo riesgo de:
@@ -42,7 +87,8 @@ Mientras este contrato no quede auditado y endurecido, cualquier dashboard o rep
 
 - Dejar una baseline auditada de las propiedades reales en Notion para `Efeonce`, `Sky Airlines` y `ANAM`, incluyendo IDs de DB y data sources útiles para futuros agentes.
 - Mapear propiedad por propiedad qué ya entra hoy a `greenhouse_conformed.delivery_projects` y `greenhouse_conformed.delivery_tasks`.
-- Identificar qué gaps bloquean que Greenhouse sea dueño del `Performance Report` sobre la foundation de integración definida por `TASK-187` y `TASK-188`.
+- Mapear qué parte del contrato ya vive hoy en `greenhouse_delivery.tasks` y `greenhouse_serving.ico_member_metrics`.
+- Identificar qué gaps bloquean que Greenhouse sea dueño del `Performance Report` sin romper el runtime actual de `ICO`, `payroll` y serving.
 - Definir el contrato mínimo de primitivas y la secuencia de hardening para que las métricas vuelvan confiables y auditables.
 - Definir explícitamente el patrón de flexibilidad esperado: `core KPI contract` compartido + extensiones / mappings por `space_id` para particularidades de cliente o tipo de proyecto.
 
@@ -50,6 +96,7 @@ Mientras este contrato no quede auditado y endurecido, cualquier dashboard o rep
 
 - No hacer `rip-and-replace` del pipeline actual de Notion ni del cálculo vigente de `ICO`.
 - Reusar `greenhouse_conformed.delivery_projects`, `greenhouse_conformed.delivery_tasks` e `ico_engine` como foundation inicial.
+- Reusar también `greenhouse_delivery.tasks`, `greenhouse_serving.ico_member_metrics` y las proyecciones ya existentes donde aplique.
 - Priorizar compatibilidad y comparación lado a lado contra el reporte manual de Notion antes de cambiar el source of truth visible.
 - Mover dependencias de fórmulas Notion a primitivas Greenhouse en slices pequeños y auditables.
 
@@ -57,8 +104,15 @@ Mientras este contrato no quede auditado y endurecido, cualquier dashboard o rep
 
 1. `TASK-189` corrige el filtro canónico de período y carry-over como fix quirúrgico de alto impacto.
 2. `TASK-186` endurece el contrato de métricas Delivery y persigue un `MVP` confiable del `Performance Report`.
-3. `TASK-188` consolida la arquitectura paraguas de `Native Integrations Layer`.
-4. `TASK-187` formaliza Notion dentro de ese marco sin romper el binding, discovery y sync que ya existen.
+3. Dentro de `TASK-186`, priorizar primero:
+   - buckets canónicos (`On-Time`, `Late Drops`, `Overdue`, `Carry-Over`)
+   - semántica única de `FTR`
+   - snapshot mensual / comparativo `mes actual vs mes anterior`
+   - ranking `Top Performer`
+   - serving formal del scorecard mensual
+4. Tratar extensiones como `carry_over_count` en `serving/Postgres` como sub-slices de soporte y no como cierre de la lane.
+5. `TASK-188` consolida la arquitectura paraguas de `Native Integrations Layer`.
+6. `TASK-187` formaliza Notion dentro de ese marco sin romper el binding, discovery y sync que ya existen.
 
 ## Architecture Alignment
 
@@ -79,22 +133,30 @@ Reglas obligatorias:
 - Las métricas visibles y auditables deben derivarse preferentemente de primitivas canónicas en Greenhouse, no de fórmulas opacas de Notion.
 - Las diferencias entre spaces (`Efeonce` vs `Sky Airlines`) deben resolverse con normalización explícita; no con supuestos implícitos escondidos en SQL o UI.
 - Spaces parecidos no implican schemas idénticos: el contrato debe separar un núcleo KPI común de extensiones específicas por cliente, proyecto o vertical.
-- esta task no modela onboarding, registry ni drift como capability general; consume la foundation que debe cerrar `TASK-187`
+- esta task no modela onboarding, registry ni drift como capability general; consume la dirección arquitectónica de `TASK-187`, pero no necesita esperar su cierre completo para ejecutar el MVP de trust de métricas
 - esta task no debe romper ni reescribir `ICO`; cualquier cambio sobre el engine debe ser incremental, compatible y orientado a aumentar confianza, no a cambiar el contrato completo de golpe
+- cualquier ajuste debe preservar compatibilidad con consumers activos en:
+  - `src/lib/payroll/fetch-kpis-for-period.ts`
+  - `src/lib/sync/projections/ico-member-metrics.ts`
+  - `src/lib/sync/projections/person-operational.ts`
+  - `src/lib/sync/projections/person-intelligence.ts`
 
 ## Dependencies & Impact
 
 ### Depends on
 
 - `TASK-002 - Tenant / Space -> Notion mapping`
-- `TASK-187 - Notion Integration Formalization: Space Onboarding, Schema Governance & KPI Readiness`
-- `TASK-188 - Native Integrations Layer: Platform Governance, Runtime Contracts & Shared Operating Model`
 - `TASK-046 - Delivery Performance Metrics ICO Cutover`
 - `src/lib/sync/sync-notion-conformed.ts`
 - `scripts/setup-bigquery-source-sync.sql`
+- `scripts/setup-postgres-source-sync.sql`
 - `src/lib/ico-engine/shared.ts`
+- `src/lib/ico-engine/read-metrics.ts`
+- `src/lib/payroll/fetch-kpis-for-period.ts`
+- `src/lib/sync/projections/ico-member-metrics.ts`
 - `scripts/materialize-member-metrics.ts`
 - datasets `notion_ops.*`, `greenhouse_conformed.*`, `ico_engine.*`
+- tablas runtime `greenhouse_delivery.*`, `greenhouse_serving.ico_member_metrics`
 
 ### Impacts to
 
@@ -102,14 +164,20 @@ Reglas obligatorias:
 - `TASK-048 - Delivery Sprint Runtime Completion`
 - `TASK-049 - Delivery Client Runtime Consolidation`
 - cualquier scorecard mensual de Delivery / Performance Reports
+- `payroll` projected / period KPI consumers
+- `person_operational_metrics` y `person_intelligence`
 - futuros reportes de bonos, variable comp y accountability operacional basados en `ICO`
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-186-delivery-metrics-trust-notion-property-audit-contract.md`
+- `docs/tasks/in-progress/TASK-186-delivery-metrics-trust-notion-property-audit-contract.md`
 - `src/lib/sync/sync-notion-conformed.ts`
 - `scripts/setup-bigquery-source-sync.sql`
+- `scripts/setup-postgres-source-sync.sql`
 - `src/lib/ico-engine/shared.ts`
+- `src/lib/ico-engine/read-metrics.ts`
+- `src/lib/payroll/fetch-kpis-for-period.ts`
+- `src/lib/sync/projections/ico-member-metrics.ts`
 - `scripts/materialize-member-metrics.ts`
 - `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
 - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
@@ -134,8 +202,11 @@ Reglas obligatorias:
 - `greenhouse_conformed.delivery_projects` y `greenhouse_conformed.delivery_tasks` ya almacenan el núcleo del scorecard:
   - proyecto: nombre, estado, resumen, finalización, `% on-time`, `RpA promedio`, owner, fechas, business unit
   - tarea: estado, prioridad, fase, responsables, completitud, cumplimiento, días de retraso, reprogramación, indicador de performance, rounds, `rpa`, review flags, bloqueos, comentario Frame, due dates y completed date
+- `greenhouse_delivery.tasks` ya existe como proyección operacional Postgres con campos clave del scorecard (`due_date`, `completed_at`, `delivery_compliance`, `days_late`, `performance_indicator_code`, `client_change_round_final`, `rpa_value`, `review flags`, `original_due_date`)
 - `ICO` ya expone KPIs clave (`otd_pct`, `ftr_pct`, `rpa_avg`, `throughput_count`, `pipeline_velocity`, `cycle_time`, `stuck_asset_pct`)
+- `greenhouse_serving.ico_member_metrics` ya existe como puente BigQuery -> Postgres para consumo runtime y downstream
 - La arquitectura de sync ya tiene foundation para flexibilidad vía `space_property_mappings`, pero esta task aún debe explicitar cómo usarla sin degradar el contrato KPI común.
+- El endurecimiento reciente de `carry-over` en `ICO` y su propagación parcial a serving debe leerse solo como un sub-slice incremental de soporte; no cierra por sí mismo la paridad del `Performance Report`.
 
 ### Referencia MCP confirmada
 
@@ -408,10 +479,9 @@ Reglas obligatorias:
 - ANAM tiene semánticas propias de implementación CRM/RevOps (`Fase de implementación`, `Módulo HubSpot`, `Origen`, `Pendiente insumo cliente`, `Tipo de entrega RevOps`, `Facturación`) que hoy no entran al contrato conformed.
 - Falta fijar qué parte del modelo debe ser común a todos los spaces y qué parte debe vivir como extensión flexible por `space_id` o por tipo de proyecto/cliente.
 - Seguimos dependiendo de fórmulas de Notion para varias señales importantes en vez de capturar suficientes primitivas.
-- Hay deriva en `FTR`:
-  - live/shared `ICO` usa `client_change_round_final = 0`
-  - materialización por miembro usa `client_review_open = false`
-- Falta institucionalizar un contrato “as-of month-end” para reportes mensuales auditables.
+- `Carry-Over` ya quedó endurecido en el carril canónico de `ICO` (`BigQuery` + read path), pero todavía no baja completo al serving Postgres ni a todos los consumers runtime.
+- La deriva de `FTR` ya no está principalmente en la materialización por miembro: ese carril fue alineado al engine canónico. Lo pendiente es cerrar semántica única fuera de `ICO` y limpiar carriles/documentación con definiciones alternativas.
+- Falta institucionalizar un contrato “as-of month-end” para reportes mensuales auditables y un serving formal del scorecard mensual.
 
 ## Performance Report Coverage Matrix
 
@@ -526,6 +596,8 @@ Para declarar que Greenhouse ya puede reproducir el `Performance Report` mensual
 - segmentación explícita de `Tareas Efeonce` y `Tareas Sky`
 - regla unificada de `FTR`
 
+Que `carry-over` exista en `ICO` o incluso en `serving` no es suficiente para considerar esta task cerrada.
+
 ## Recommended Implementation Order
 
 1. Cerrar la fórmula canónica de buckets mensuales en Greenhouse.
@@ -594,7 +666,7 @@ Para declarar que Greenhouse ya puede reproducir el `Performance Report` mensual
 - [ ] La task documenta los DB IDs y data source IDs confirmados de `Efeonce` y `Sky Airlines`.
 - [ ] Existe una baseline explícita de propiedades auditadas para `Proyectos` y `Tareas` en ambos spaces.
 - [ ] Cada propiedad relevante para el performance report queda clasificada como `ya sincroniza`, `derivada`, `faltante` o `space-specific`.
-- [ ] Queda documentada la deriva semántica actual de `FTR` y la decisión pendiente para unificarla.
+- [ ] Queda documentada la deriva semántica actual de `FTR`, incluyendo que el drift principal ya no está en la materialización por miembro de `ICO`, y la decisión pendiente para unificarla fuera del engine canónico.
 - [ ] Queda definido el set mínimo de primitivas necesarias para que Greenhouse sea dueño del scorecard mensual.
 - [ ] Queda documentada la regla de flexibilidad: core KPI común + extensiones/mappings por `space_id` para particularidades de cliente.
 - [ ] La task incluye una matriz explícita `métrica del performance report -> ya se puede / qué falta / prioridad`.

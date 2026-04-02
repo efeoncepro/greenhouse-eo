@@ -1,5 +1,24 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-01 — Performance Report mensual ya materializado dentro de ICO
+
+`ICO` ya no solo expone snapshots por `space` y por dimensión; ahora también materializa un read-model mensual auditable para el scorecard Agency:
+
+- tabla nueva: `ico_engine.performance_report_monthly`
+- fuente del read-model:
+  - `ico_engine.metric_snapshots_monthly` para resumen agregado del período
+  - `ico_engine.metrics_by_member` para `Top Performer`
+- contenido actual del snapshot:
+  - resumen mensual (`On-Time %`, `Late Drops`, `Overdue`, `Carry-Over`, totales)
+  - `task_mix_json` con distribución por segmento/space-cliente
+  - `Top Performer` MVP y sus supuestos operativos
+- regla vigente:
+  - el `Performance Report` no debe abrir un carril de cálculo paralelo al engine
+  - debe construirse sobre materializaciones ya consolidadas del propio `ICO`
+  - el reader sigue usando fallback computado si el snapshot materializado aún no existe
+
+Esto fortalece la auditabilidad del reporte mensual sin redefinir los KPIs troncales (`otd_pct`, `ftr_pct`, `rpa_avg`, `throughput_count`) ni romper consumers existentes.
+
 ## Delta 2026-04-01 — Bases de Notion que actúan como insumo principal del ICO actual
 
 Aunque `ICO` consume su capa base desde `greenhouse_conformed.delivery_tasks` y no directamente desde Notion, los upstreams principales auditados hoy siguen siendo estas DBs de Notion:
@@ -1792,6 +1811,43 @@ El ICO Engine debe usar `space_id` directo, no el array `notion_project_ids`.
 - `client_change_round_final` (mismo nombre)
 - `blocker_count` (derivado de `bloqueado_por_ids`)
 - `last_edited_time`, `synced_at`, `space_id`, `client_id`
+
+### A.5.1 Período operativo canónico (Delta 2026-04-01)
+
+- El período operativo de `ICO` ya no debe leerse como “mes de `completed_at`”.
+- La pertenencia de una tarea al período se ancla en `due_date`, con fallback a `created_at` / `synced_at` cuando falte fecha límite.
+- `carry-over` se define relativo al período consultado/materializado:
+  - `period_anchor_date < first_day(period)`
+  - tarea aún activa
+- Este cambio endurece la paridad con los `Performance Reports` operativos sin reescribir el engine ni cambiar el upstream Notion.
+
+### A.5.2 Buckets canónicos del scorecard (Delta 2026-04-01)
+
+- `ICO` mantiene sus métricas troncales (`otd_pct`, `ftr_pct`, `rpa_avg`, `throughput_count`, etc.) sin redefinirlas.
+- Encima de ese contrato, el engine ahora materializa buckets operativos aditivos para acercarse al `Performance Report`:
+  - `on_time_count`
+  - `late_drop_count`
+  - `overdue_count`
+  - `carry_over_count`
+- Estos buckets se exponen como `context` en los snapshots (`SpaceMetricSnapshot`, `IcoMetricSnapshot`, métricas por proyecto y por miembro) para que consumers UI puedan mostrar scorecards más auditables sin recalcular inline.
+- La regla es de compatibilidad: los buckets fortalecen `ICO`, pero no reemplazan ni renombran métricas existentes consumidas por payroll, serving o inteligencia de personas.
+
+### A.5.3 FTR canónico compuesto (Delta 2026-04-01)
+
+- `FTR` no debe leerse como alias de una sola propiedad (`client_change_round_final`).
+- La definición canónica del engine queda compuesta por señales ya disponibles en `greenhouse_conformed.delivery_tasks`:
+  - tarea completada
+  - `rpa_value <= 1` cuando exista
+  - si `rpa_value` falta, fallback a `client_change_round_final = 0` y `workflow_change_round = 0`
+  - sin `client_review_open`
+  - sin `workflow_review_open`
+  - sin `open_frame_comments`
+- Esta semántica busca aproximar mejor “asset aprobado a la primera” usando correcciones, `RpA` y estado real de revisión al cierre.
+- `client_review_open` y `workflow_review_open` se usan como guardrails de cierre, no como reemplazo del núcleo de calidad.
+- Regla semántica actual:
+  - `on_time` y `late_drop` prefieren `performance_indicator_code` si el upstream ya lo trae normalizado; si no existe, el engine cae a derivación por `completed_at` vs `due_date`
+  - `overdue` y `carry-over` no se leen desde labels de Notion; permanecen como reglas propias de `ICO` relativas al período consultado/materializado
+  - `FTR` se define por `client_change_round_final = 0` en tareas completadas; `client_review_open` es estado de workflow y no fuente de verdad para esta métrica
 
 ### A.6 TypeScript: Sin `any`
 

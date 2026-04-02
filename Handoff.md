@@ -61,6 +61,15 @@
     - comparativo `On-Time %` vs mes anterior
     - `Late Drops`, `Overdue`, `Carry-Over`
     - `Top Performer` MVP
+  - el `Performance Report` mensual de Agency ahora también queda materializado dentro de `ICO`:
+    - tabla BigQuery `ico_engine.performance_report_monthly`
+    - construida desde `metric_snapshots_monthly` + `metrics_by_member`
+    - `readAgencyPerformanceReport()` usa `materialized-first` y mantiene fallback al cálculo previo si el snapshot aún no existe
+  - el read-model mensual ahora persiste y entrega además:
+    - `taskMix` por segmento dominante del período
+    - `alertText`
+    - `executiveSummary`
+  - `AgencyIcoEngineView` ya expone esas piezas del reporte como cards y texto ejecutivo
   - supuestos MVP actuales del ranking:
     - elegibilidad `throughput_count >= 5`
     - ranking por `OTD` del período
@@ -78,10 +87,11 @@
 ### Validación
 
 - `pnpm lint` ✅
-- `pnpm build` quedó colgado después de `Compiled successfully` / `Running TypeScript`; no devolvió error explícito
+- `pnpm build` volvió a quedar colgado después de `Compiled successfully` / `Running TypeScript`; no devolvió error explícito
 - `pnpm exec tsc --noEmit --pretty false` también quedó colgado sin emitir errores
+- `pnpm migrate:up` y `pnpm db:generate-types` se intentaron de nuevo, pero quedaron bloqueados por conectividad local de PostgreSQL; el carril sigue requiriendo Cloud SQL Proxy en `127.0.0.1:15432`
 - No se crearon `new Pool()` nuevos fuera de `src/lib/postgres/client.ts`
-- No hubo migraciones PostgreSQL nuevas en este slice; el cambio fue aditivo sobre DDL BigQuery del `ICO Engine`
+- Sí hay una migración PostgreSQL versionada para `greenhouse_serving.ico_member_metrics.carry_over_count`, pero no se pudo aplicar en este turno por el bloqueo de conectividad local
 
 ### Riesgos / próximos pasos
 
@@ -89,9 +99,9 @@
 - Falta decidir si el siguiente slice baja `carry_over_count` también a serving/Postgres o si se mantiene solo como contexto de `ICO`.
 - El scope más amplio de `TASK-186` sigue abierto: paridad completa del `Performance Report`, revisión de FTR drift y matriz completa `propiedad -> contrato -> prioridad`.
 - Prioridad correcta de `TASK-186` para los siguientes slices:
-  - unificar `FTR`
-  - materializar snapshot mensual y comparativo vs mes anterior
-  - formalizar `Top Performer` y el serving del `Performance Report`
+  - validar si la segmentación por nombre de `space/client` es suficiente o si necesita contrato explícito `Efeonce` / `Sky`
+  - decidir si el scorecard mensual también debe proyectarse a `greenhouse_serving`
+  - revisar si `alertText` / `executiveSummary` deben seguir siendo determinísticos o pasar luego por capa narrativa separada
 
 ## Sesión 2026-04-01 — TASK-189 y TASK-186 activadas para MVP de trust de métricas
 

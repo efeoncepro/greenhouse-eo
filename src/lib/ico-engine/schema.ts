@@ -48,7 +48,9 @@ const buildTasksEnrichedView = (projectId: string) => `
     dt.delivery_compliance,
     dt.days_late,
     dt.is_rescheduled,
+    dt.performance_indicator_code,
     dt.client_change_round_final,
+    dt.workflow_change_round,
     dt.rpa_value,
     dt.open_frame_comments,
     dt.client_review_open,
@@ -59,6 +61,9 @@ const buildTasksEnrichedView = (projectId: string) => `
     dt.last_edited_time,
     dt.synced_at,
     dt.created_at,
+
+    -- Derived: Canonical period anchor (due date preferred, fallback to created/synced date)
+    COALESCE(dt.due_date, DATE(dt.created_at), DATE(dt.synced_at)) AS period_anchor_date,
 
     -- Derived: CSC phase (configurable per space via status_phase_config, fallback to hardcoded CASE)
     COALESCE(spc.fase_csc,
@@ -145,6 +150,10 @@ const buildMonthlySnapshotTable = (projectId: string) => `
     total_tasks INT64,
     completed_tasks INT64,
     active_tasks INT64,
+    on_time_count INT64,
+    late_drop_count INT64,
+    overdue_count INT64,
+    carry_over_count INT64,
     computed_at TIMESTAMP,
     engine_version STRING
   )
@@ -258,6 +267,10 @@ const buildMetricsByProjectTable = (projectId: string) => `
     total_tasks INT64,
     completed_tasks INT64,
     active_tasks INT64,
+    on_time_count INT64,
+    late_drop_count INT64,
+    overdue_count INT64,
+    carry_over_count INT64,
     materialized_at TIMESTAMP
   )
   CLUSTER BY space_id, project_source_id
@@ -286,6 +299,10 @@ const buildMetricsByMemberTable = (projectId: string) => `
     total_tasks INT64,
     completed_tasks INT64,
     active_tasks INT64,
+    on_time_count INT64,
+    late_drop_count INT64,
+    overdue_count INT64,
+    carry_over_count INT64,
     materialized_at TIMESTAMP
   )
   CLUSTER BY member_id
@@ -314,6 +331,10 @@ const buildMetricsBySprintTable = (projectId: string) => `
     total_tasks INT64,
     completed_tasks INT64,
     active_tasks INT64,
+    on_time_count INT64,
+    late_drop_count INT64,
+    overdue_count INT64,
+    carry_over_count INT64,
     materialized_at TIMESTAMP
   )
   CLUSTER BY space_id, sprint_source_id
@@ -341,6 +362,10 @@ const buildMetricsByOrganizationTable = (projectId: string) => `
     total_tasks INT64,
     completed_tasks INT64,
     active_tasks INT64,
+    on_time_count INT64,
+    late_drop_count INT64,
+    overdue_count INT64,
+    carry_over_count INT64,
     materialized_at TIMESTAMP
   )
   CLUSTER BY organization_id
@@ -369,9 +394,47 @@ const buildMetricsByBusinessUnitTable = (projectId: string) => `
     total_tasks INT64,
     completed_tasks INT64,
     active_tasks INT64,
+    on_time_count INT64,
+    late_drop_count INT64,
+    overdue_count INT64,
+    carry_over_count INT64,
     materialized_at TIMESTAMP
   )
   CLUSTER BY business_unit
+`
+
+/**
+ * Agency-level monthly performance report snapshot.
+ * This is an auditable read model built from existing ICO materializations,
+ * not a replacement for the core engine metrics contract.
+ */
+const buildPerformanceReportMonthlyTable = (projectId: string) => `
+  CREATE TABLE IF NOT EXISTS \`${projectId}.${ICO_DATASET}.performance_report_monthly\` (
+    report_scope STRING NOT NULL,
+    period_year INT64 NOT NULL,
+    period_month INT64 NOT NULL,
+    on_time_count INT64,
+    late_drop_count INT64,
+    on_time_pct FLOAT64,
+    overdue_count INT64,
+    carry_over_count INT64,
+    total_tasks INT64,
+    completed_tasks INT64,
+    active_tasks INT64,
+    task_mix_json STRING,
+    top_performer_member_id STRING,
+    top_performer_member_name STRING,
+    top_performer_otd_pct FLOAT64,
+    top_performer_throughput_count INT64,
+    top_performer_rpa_avg FLOAT64,
+    top_performer_ftr_pct FLOAT64,
+    top_performer_min_throughput INT64,
+    trend_stable_band_pp FLOAT64,
+    multi_assignee_policy STRING,
+    materialized_at TIMESTAMP,
+    engine_version STRING
+  )
+  CLUSTER BY report_scope
 `
 
 /**
@@ -396,6 +459,10 @@ const REQUIRED_COLUMN_MIGRATIONS: Record<string, TableColumnSpec> = {
     total_tasks: 'INT64',
     completed_tasks: 'INT64',
     active_tasks: 'INT64',
+    on_time_count: 'INT64',
+    late_drop_count: 'INT64',
+    overdue_count: 'INT64',
+    carry_over_count: 'INT64',
     computed_at: 'TIMESTAMP',
     engine_version: 'STRING'
   },
@@ -407,7 +474,11 @@ const REQUIRED_COLUMN_MIGRATIONS: Record<string, TableColumnSpec> = {
     stuck_asset_pct: 'FLOAT64',
     total_tasks: 'INT64',
     completed_tasks: 'INT64',
-    active_tasks: 'INT64'
+    active_tasks: 'INT64',
+    on_time_count: 'INT64',
+    late_drop_count: 'INT64',
+    overdue_count: 'INT64',
+    carry_over_count: 'INT64'
   },
   metrics_by_member: {
     otd_pct: 'FLOAT64',
@@ -417,7 +488,25 @@ const REQUIRED_COLUMN_MIGRATIONS: Record<string, TableColumnSpec> = {
     stuck_asset_pct: 'FLOAT64',
     total_tasks: 'INT64',
     completed_tasks: 'INT64',
-    active_tasks: 'INT64'
+    active_tasks: 'INT64',
+    on_time_count: 'INT64',
+    late_drop_count: 'INT64',
+    overdue_count: 'INT64',
+    carry_over_count: 'INT64'
+  },
+  metrics_by_sprint: {
+    otd_pct: 'FLOAT64',
+    throughput_count: 'INT64',
+    pipeline_velocity: 'FLOAT64',
+    stuck_asset_count: 'INT64',
+    stuck_asset_pct: 'FLOAT64',
+    total_tasks: 'INT64',
+    completed_tasks: 'INT64',
+    active_tasks: 'INT64',
+    on_time_count: 'INT64',
+    late_drop_count: 'INT64',
+    overdue_count: 'INT64',
+    carry_over_count: 'INT64'
   },
   metrics_by_organization: {
     otd_pct: 'FLOAT64',
@@ -427,7 +516,47 @@ const REQUIRED_COLUMN_MIGRATIONS: Record<string, TableColumnSpec> = {
     stuck_asset_pct: 'FLOAT64',
     total_tasks: 'INT64',
     completed_tasks: 'INT64',
-    active_tasks: 'INT64'
+    active_tasks: 'INT64',
+    on_time_count: 'INT64',
+    late_drop_count: 'INT64',
+    overdue_count: 'INT64',
+    carry_over_count: 'INT64'
+  },
+  metrics_by_business_unit: {
+    otd_pct: 'FLOAT64',
+    throughput_count: 'INT64',
+    pipeline_velocity: 'FLOAT64',
+    stuck_asset_count: 'INT64',
+    stuck_asset_pct: 'FLOAT64',
+    total_tasks: 'INT64',
+    completed_tasks: 'INT64',
+    active_tasks: 'INT64',
+    on_time_count: 'INT64',
+    late_drop_count: 'INT64',
+    overdue_count: 'INT64',
+    carry_over_count: 'INT64'
+  },
+  performance_report_monthly: {
+    on_time_count: 'INT64',
+    late_drop_count: 'INT64',
+    on_time_pct: 'FLOAT64',
+    overdue_count: 'INT64',
+    carry_over_count: 'INT64',
+    total_tasks: 'INT64',
+    completed_tasks: 'INT64',
+    active_tasks: 'INT64',
+    task_mix_json: 'STRING',
+    top_performer_member_id: 'STRING',
+    top_performer_member_name: 'STRING',
+    top_performer_otd_pct: 'FLOAT64',
+    top_performer_throughput_count: 'INT64',
+    top_performer_rpa_avg: 'FLOAT64',
+    top_performer_ftr_pct: 'FLOAT64',
+    top_performer_min_throughput: 'INT64',
+    trend_stable_band_pp: 'FLOAT64',
+    multi_assignee_policy: 'STRING',
+    materialized_at: 'TIMESTAMP',
+    engine_version: 'STRING'
   }
 }
 
@@ -467,7 +596,8 @@ export const ensureIcoEngineInfrastructure = async () => {
             'metric_snapshots_monthly', 'ai_metric_scores',
             'stuck_assets_detail', 'rpa_trend', 'metrics_by_project',
             'metrics_by_member', 'metrics_by_sprint', 'metrics_by_organization',
-            'metrics_by_business_unit', 'status_phase_config'
+            'metrics_by_business_unit', 'performance_report_monthly',
+            'status_phase_config'
           )
         `
       })
@@ -486,6 +616,7 @@ export const ensureIcoEngineInfrastructure = async () => {
         ['metrics_by_sprint', buildMetricsBySprintTable(projectId)],
         ['metrics_by_organization', buildMetricsByOrganizationTable(projectId)],
         ['metrics_by_business_unit', buildMetricsByBusinessUnitTable(projectId)],
+        ['performance_report_monthly', buildPerformanceReportMonthlyTable(projectId)],
         ['status_phase_config', buildStatusPhaseConfigTable(projectId)]
       ]
 

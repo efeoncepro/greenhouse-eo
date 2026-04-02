@@ -92,6 +92,46 @@ export type IcoDimensionKey = keyof typeof ICO_DIMENSIONS
 
 export const DONE_STATUSES_SQL = `'Listo','Done','Finalizado','Completado','Aprobado'`
 export const EXCLUDED_STATUSES_SQL = `'Listo','Done','Finalizado','Completado','Aprobado','Archivadas','Archivada','Cancelada','Canceled','Cancelled','Archivado'`
+export const PERIOD_START_SQL = 'DATE(@periodYear, @periodMonth, 1)'
+export const PERIOD_END_SQL = `DATE_SUB(DATE_ADD(${PERIOD_START_SQL}, INTERVAL 1 MONTH), INTERVAL 1 DAY)`
+export const PERIOD_ANCHOR_SQL = 'COALESCE(period_anchor_date, due_date, DATE(created_at), DATE(synced_at))'
+export const DERIVED_ON_TIME_SQL = `(
+  completed_at IS NOT NULL
+  AND due_date IS NOT NULL
+  AND DATE(completed_at) <= due_date
+)`
+export const DERIVED_LATE_DROP_SQL = `(
+  completed_at IS NOT NULL
+  AND due_date IS NOT NULL
+  AND DATE(completed_at) > due_date
+)`
+export const CARRY_OVER_SQL = `(
+  ${PERIOD_ANCHOR_SQL} IS NOT NULL
+  AND ${PERIOD_ANCHOR_SQL} < ${PERIOD_START_SQL}
+  AND completed_at IS NULL
+  AND task_status NOT IN (${EXCLUDED_STATUSES_SQL})
+)`
+export const DERIVED_OVERDUE_SQL = `(
+  due_date IS NOT NULL
+  AND due_date <= ${PERIOD_END_SQL}
+  AND completed_at IS NULL
+  AND task_status NOT IN (${EXCLUDED_STATUSES_SQL})
+)`
+export const CANONICAL_ON_TIME_SQL = `(
+  performance_indicator_code = 'on_time'
+  OR (performance_indicator_code IS NULL AND ${DERIVED_ON_TIME_SQL})
+)`
+export const CANONICAL_LATE_DROP_SQL = `(
+  performance_indicator_code = 'late_drop'
+  OR (performance_indicator_code IS NULL AND ${DERIVED_LATE_DROP_SQL})
+)`
+export const CANONICAL_OVERDUE_SQL = DERIVED_OVERDUE_SQL
+export const CANONICAL_CARRY_OVER_SQL = CARRY_OVER_SQL
+export const CANONICAL_FTR_ELIGIBLE_SQL = '(completed_at IS NOT NULL)'
+export const CANONICAL_FTR_PASSED_SQL = `(
+  completed_at IS NOT NULL
+  AND client_change_round_final = 0
+)`
 
 // ─── Shared Metric SQL Builders ────────────────────────────────────────────
 
@@ -114,14 +154,15 @@ export const buildMetricSelectSQL = () => `
 
     -- OTD: on-time / (on-time + late)
     ROUND(SAFE_DIVIDE(
-      COUNTIF(delivery_signal = 'on_time'),
-      COUNTIF(delivery_signal IN ('on_time', 'late'))
+      COUNTIF(${CANONICAL_ON_TIME_SQL}),
+      COUNTIF(${CANONICAL_ON_TIME_SQL}) + COUNTIF(${CANONICAL_LATE_DROP_SQL})
     ) * 100, 1) AS otd_pct,
 
-    -- FTR: no client changes / total completed
+    -- FTR: completed tasks with zero final client change rounds.
+    -- client_review_open is workflow state, not the source of truth for FTR.
     ROUND(SAFE_DIVIDE(
-      COUNTIF(completed_at IS NOT NULL AND client_change_round_final = 0),
-      COUNTIF(completed_at IS NOT NULL)
+      COUNTIF(${CANONICAL_FTR_PASSED_SQL}),
+      COUNTIF(${CANONICAL_FTR_ELIGIBLE_SQL})
     ) * 100, 1) AS ftr_pct,
 
     -- Cycle time avg (completed only)
@@ -154,19 +195,25 @@ export const buildMetricSelectSQL = () => `
     -- Context
     COUNT(*) AS total_tasks,
     COUNTIF(completed_at IS NOT NULL) AS completed_tasks,
-    COUNTIF(task_status NOT IN (${EXCLUDED_STATUSES_SQL})) AS active_tasks`
+    COUNTIF(task_status NOT IN (${EXCLUDED_STATUSES_SQL})) AS active_tasks,
+    COUNTIF(${CANONICAL_ON_TIME_SQL}) AS on_time_count,
+    COUNTIF(${CANONICAL_LATE_DROP_SQL}) AS late_drop_count,
+    COUNTIF(${CANONICAL_OVERDUE_SQL}) AS overdue_count,
+
+    -- Carry-over count (tasks anchored in a previous period and still active)
+    COUNTIF(${CANONICAL_CARRY_OVER_SQL}) AS carry_over_count`
 
 /**
  * Canonical period + active tasks WHERE filter.
  * Uses @periodYear and @periodMonth query parameters.
  */
 export const buildPeriodFilterSQL = () => `
-    (completed_at IS NOT NULL
-      AND EXTRACT(YEAR FROM completed_at) = @periodYear
-      AND EXTRACT(MONTH FROM completed_at) = @periodMonth)
-    OR
-    (completed_at IS NULL
-      AND task_status NOT IN (${DONE_STATUSES_SQL}))`
+    (
+      ${PERIOD_ANCHOR_SQL} IS NOT NULL
+      AND EXTRACT(YEAR FROM ${PERIOD_ANCHOR_SQL}) = @periodYear
+      AND EXTRACT(MONTH FROM ${PERIOD_ANCHOR_SQL}) = @periodMonth
+    )
+    OR ${CARRY_OVER_SQL}`
 
 // ─── Query Runner ───────────────────────────────────────────────────────────
 

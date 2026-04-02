@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_serving.ico_member_metrics (
   total_tasks         INT,
   completed_tasks     INT,
   active_tasks        INT,
+  carry_over_count    INT,
   materialized_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
   PRIMARY KEY (member_id, period_year, period_month)

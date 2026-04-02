@@ -20,6 +20,7 @@ interface IcoMetricsRow extends Record<string, unknown> {
   total_tasks: string | number | null
   completed_tasks: string | number | null
   active_tasks: string | number | null
+  carry_over_count: string | number | null
 }
 
 export interface IcoMetricPeriod {
@@ -37,6 +38,7 @@ export interface IcoMetricPeriod {
   totalTasks: number | null
   completedTasks: number | null
   activeTasks: number | null
+  carryOverCount: number | null
 }
 
 export interface PersonIcoProfile {
@@ -76,7 +78,8 @@ const mapRow = (row: IcoMetricsRow): IcoMetricPeriod => ({
   stuckAssetPct: toNum(row.stuck_asset_pct),
   totalTasks: toNum(row.total_tasks),
   completedTasks: toNum(row.completed_tasks),
-  activeTasks: toNum(row.active_tasks)
+  activeTasks: toNum(row.active_tasks),
+  carryOverCount: toNum(row.carry_over_count)
 })
 
 const computeHealth = (m: IcoMetricPeriod): 'green' | 'yellow' | 'red' => {

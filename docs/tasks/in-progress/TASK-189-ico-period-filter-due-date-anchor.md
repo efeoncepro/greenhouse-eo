@@ -1,18 +1,25 @@
 # TASK-189 — ICO Period Filter: Due-Date Anchor & Carry-Over Logic
 
+## Delta 2026-04-01
+
+- La auditoría del repo confirmó que esta task sí toca el contrato canónico de `ICO`, pero también impacta consumers reales en `payroll`, `serving` y proyecciones reactivas.
+- Se corrigió la spec para dejar explícito que `carry-over` debe ser **relativo al período consultado/materializado**, no calculado contra `CURRENT_DATE()`.
+- Se corrigió el alcance: no basta con “filtro SQL + vista”; también hay contrato de snapshot, serving y compatibilidad con `readMemberMetrics()` / `readMemberMetricsBatch()`.
+- Se dejó explícito que cualquier ajuste debe alinear o desactivar el carril legacy paralelo en `scripts/materialize-member-metrics.ts`.
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Bajo`
-- Status real: `Diseño completo`
+- Status real: `Implementación parcial`
 - Rank: `1`
 - Domain: `delivery / ico-engine`
 
 ## Summary
 
-Cambiar el filtro de período canónico del ICO Engine (`buildPeriodFilterSQL`) para que el período de una tarea se determine por su **`due_date`** (fecha límite) en vez de `completed_at`. Incorporar lógica de **carry-over** para tareas vencidas en meses anteriores que siguen activas. Este cambio es quirúrgico: los datos ya existen en `greenhouse_conformed.delivery_tasks` y en `v_tasks_enriched`; solo hay que cambiar el filtro SQL y ajustar la vista.
+Cambiar el filtro de período canónico del ICO Engine (`buildPeriodFilterSQL`) para que el período de una tarea se determine por su **`due_date`** (fecha límite) en vez de `completed_at`. Incorporar lógica de **carry-over** para tareas vencidas en meses anteriores que siguen activas. El cambio sigue siendo quirúrgico, pero ya no se lee como “solo una view”: afecta el contrato canónico que consumen `materialize.ts`, `read-metrics.ts`, serving Postgres y payroll.
 
 Esta task forma parte del carril `MVP` inmediato para recuperar confianza operativa en métricas junto con `TASK-186`, antes de abordar el hardening estructural completo de la `Native Integrations Layer`.
 
@@ -56,7 +63,7 @@ Que el filtro de período del ICO Engine refleje la realidad operativa:
 
 - **Una tarea pertenece al mes de su `due_date`**
 - **Si no tiene `due_date`, fallback a `created_at`**
-- **Tareas de meses anteriores aún activas aparecen como carry-over en el mes actual**
+- **Tareas de meses anteriores aún activas aparecen como carry-over en el período posterior que se consulte o materialice**
 - Las métricas de un mes responden: "del trabajo comprometido para este mes, ¿cómo fue?"
 
 ## Architecture Alignment
@@ -69,6 +76,11 @@ Reglas:
 - El cambio debe ser en `buildPeriodFilterSQL()` y `buildMetricSelectSQL()` — el filtro canónico que todas las queries usan.
 - No se toca el sync ni la capa conformed (los datos ya están).
 - Las materializaciones (`metrics_by_member`, `metrics_by_project`, `metric_snapshots_monthly`) se recalculan automáticamente porque consumen el mismo filtro.
+- Debe preservarse compatibilidad con consumers protegidos:
+  - `src/lib/payroll/fetch-kpis-for-period.ts`
+  - `src/lib/sync/projections/ico-member-metrics.ts`
+  - `src/app/api/ico-engine/context/route.ts`
+  - `src/views/greenhouse/people/tabs/PersonActivityTab.tsx`
 - Esta task no autoriza reescribir `ICO`; solo permite un ajuste quirúrgico, compatible y verificable sobre el engine vigente.
 - Si el cambio rompe métricas existentes fuera del problema de período/carry-over, debe detenerse y corregirse antes de avanzar.
 
@@ -100,26 +112,18 @@ OR
 - Cláusula 1: tareas cuya fecha límite (o creación) cae en el período seleccionado — completadas o no
 - Cláusula 2: tareas de períodos anteriores que aún están activas (carry-over)
 
-### 2. Nuevo campo derivado en `v_tasks_enriched`
+### 2. Campo derivado opcional en `v_tasks_enriched`
 
 **Archivo:** `src/lib/ico-engine/schema.ts`
 
-Agregar al view:
+Si el cambio necesita un ancla reutilizable en la view, agregar solo el campo estable de anclaje:
 
 ```sql
 -- Derived: Period assignment (canonical month the task belongs to)
 COALESCE(due_date, DATE(created_at), DATE(synced_at)) AS period_anchor_date,
-
--- Derived: Is carry-over (due in a previous month, still active)
-(
-  COALESCE(due_date, DATE(created_at)) < DATE_TRUNC(CURRENT_DATE(), MONTH)
-  AND completed_at IS NULL
-  AND task_status NOT IN (
-    'Listo', 'Done', 'Finalizado', 'Completado', 'Aprobado',
-    'Archivadas', 'Archivada', 'Cancelada', 'Canceled', 'Cancelled'
-  )
-) AS is_carry_over
 ```
+
+`is_carry_over` no debe persistirse como columna estática basada en `CURRENT_DATE()`, porque eso rompe consultas históricas. La semántica de carry-over debe resolverse en `buildPeriodFilterSQL()` y en los selects canónicos usando `@periodYear` / `@periodMonth`.
 
 ### 3. Ajustes a `buildMetricSelectSQL()`
 
@@ -152,6 +156,8 @@ context: {
 }
 ```
 
+Si el snapshot por miembro sigue alimentando serving o payroll materialized-first, la introducción de `carryOverTasks` debe mantenerse backward compatible y no alterar los campos ya consumidos (`otdPercent`, `rpaAvg`, `tasksCompleted`).
+
 ### 5. Actualizar vista `PersonActivityTab`
 
 **Archivo:** `src/views/greenhouse/people/tabs/PersonActivityTab.tsx`
@@ -164,6 +170,15 @@ context: {
 **Archivo:** `src/lib/ico-engine/read-metrics.ts`
 
 `readMemberMetrics()` (línea 586) siempre retorna `cscDistribution: []` porque la tabla materializada no la incluye. Agregar query CSC en paralelo para el path materializado, igual que `computeMetricsByContext()`.
+
+### 7. Alinear carril legacy paralelo
+
+**Archivo:** `scripts/materialize-member-metrics.ts`
+
+Existe un carril legacy que duplica parte de la semántica de member metrics y hoy ya deriva del contrato canónico. Esta task debe:
+
+- alinearlo al builder canónico nuevo, o
+- dejarlo explícitamente deprecado para que no siga materializando bajo la semántica antigua
 
 ## Escenarios de Validación
 
@@ -185,10 +200,13 @@ context: {
 
 **Impacta a:**
 - `src/lib/ico-engine/shared.ts` — `buildPeriodFilterSQL()`, `buildMetricSelectSQL()`
-- `src/lib/ico-engine/schema.ts` — `v_tasks_enriched` view (agregar `period_anchor_date`, `is_carry_over`)
+- `src/lib/ico-engine/schema.ts` — `v_tasks_enriched` view (si hace falta agregar `period_anchor_date`)
 - `src/lib/ico-engine/read-metrics.ts` — tipos, `readMemberMetrics()` CSC fix
 - `src/views/greenhouse/people/tabs/PersonActivityTab.tsx` — carry-over chip, banner informativo
 - `src/app/api/ico-engine/context/route.ts` — sin cambios (consume los mismos tipos)
+- `src/lib/payroll/fetch-kpis-for-period.ts` — consumer protegido de métricas por miembro
+- `src/lib/sync/projections/ico-member-metrics.ts` — puente BigQuery -> Postgres
+- `scripts/materialize-member-metrics.ts` — carril legacy que debe alinearse o deprecarse
 - Materializaciones (`materialize.ts`) — se recalculan automáticamente con el nuevo filtro
 
 **Archivos owned:**
@@ -196,6 +214,7 @@ context: {
 - `src/lib/ico-engine/schema.ts`
 - `src/lib/ico-engine/read-metrics.ts`
 - `src/views/greenhouse/people/tabs/PersonActivityTab.tsx`
+- `scripts/materialize-member-metrics.ts`
 
 ## Relación con otras Tasks
 

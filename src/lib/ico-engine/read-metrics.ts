@@ -44,6 +44,10 @@ interface SnapshotRow {
   total_tasks: unknown
   completed_tasks: unknown
   active_tasks: unknown
+  on_time_count: unknown
+  late_drop_count: unknown
+  overdue_count: unknown
+  carry_over_count: unknown
   computed_at: unknown
   engine_version: unknown
   client_name?: unknown
@@ -64,6 +68,10 @@ interface LiveMetricRow {
   total_tasks: unknown
   completed_tasks: unknown
   active_tasks: unknown
+  on_time_count: unknown
+  late_drop_count: unknown
+  overdue_count: unknown
+  carry_over_count: unknown
 }
 
 interface CscDistributionRow {
@@ -99,6 +107,10 @@ export interface SpaceMetricSnapshot {
     totalTasks: number
     completedTasks: number
     activeTasks: number
+    onTimeTasks: number
+    lateDropTasks: number
+    overdueTasks: number
+    carryOverTasks: number
   }
   computedAt: string | null
   engineVersion: string
@@ -121,6 +133,10 @@ export interface IcoMetricSnapshot {
     totalTasks: number
     completedTasks: number
     activeTasks: number
+    onTimeTasks: number
+    lateDropTasks: number
+    overdueTasks: number
+    carryOverTasks: number
   }
   computedAt: string | null
   engineVersion: string
@@ -184,7 +200,11 @@ const normalizeSnapshot = (
     context: {
       totalTasks: toNumber(row.total_tasks),
       completedTasks: toNumber(row.completed_tasks),
-      activeTasks
+      activeTasks,
+      onTimeTasks: toNumber(row.on_time_count),
+      lateDropTasks: toNumber(row.late_drop_count),
+      overdueTasks: toNumber(row.overdue_count),
+      carryOverTasks: toNumber(row.carry_over_count)
     },
     computedAt: toTimestampString(row.computed_at as string | { value?: string } | null),
     engineVersion: normalizeString(row.engine_version) || ENGINE_VERSION,
@@ -284,10 +304,11 @@ export const computeSpaceMetricsLive = async (
       WHERE space_id = @spaceId
         AND completed_at IS NULL
         AND task_status NOT IN (${DONE_STATUSES_SQL})
+        AND (${buildPeriodFilterSQL()})
         AND fase_csc != 'otros'
       GROUP BY space_id, fase_csc
       ORDER BY fase_csc
-    `, { spaceId })
+    `, { spaceId, periodYear, periodMonth })
   ])
 
   if (metricRows.length === 0) return null
@@ -324,7 +345,11 @@ export const computeSpaceMetricsLive = async (
     context: {
       totalTasks: toNumber(row.total_tasks),
       completedTasks: toNumber(row.completed_tasks),
-      activeTasks
+      activeTasks,
+      onTimeTasks: toNumber(row.on_time_count),
+      lateDropTasks: toNumber(row.late_drop_count),
+      overdueTasks: toNumber(row.overdue_count),
+      carryOverTasks: toNumber(row.carry_over_count)
     },
     computedAt: new Date().toISOString(),
     engineVersion: ENGINE_VERSION,
@@ -350,6 +375,10 @@ interface GenericMetricRow {
   total_tasks: unknown
   completed_tasks: unknown
   active_tasks: unknown
+  on_time_count: unknown
+  late_drop_count: unknown
+  overdue_count: unknown
+  carry_over_count: unknown
 }
 
 /**
@@ -400,10 +429,11 @@ export const computeMetricsByContext = async (
       WHERE ${whereColumn} = @dimensionValue
         AND completed_at IS NULL
         AND task_status NOT IN (${DONE_STATUSES_SQL})
+        AND (${buildPeriodFilterSQL()})
         AND fase_csc != 'otros'
       GROUP BY space_id, fase_csc
       ORDER BY fase_csc
-    `, { dimensionValue })
+    `, { dimensionValue, periodYear, periodMonth })
   ])
 
   if (metricRows.length === 0) return null
@@ -439,7 +469,11 @@ export const computeMetricsByContext = async (
     context: {
       totalTasks: toNumber(row.total_tasks),
       completedTasks: toNumber(row.completed_tasks),
-      activeTasks
+      activeTasks,
+      onTimeTasks: toNumber(row.on_time_count),
+      lateDropTasks: toNumber(row.late_drop_count),
+      overdueTasks: toNumber(row.overdue_count),
+      carryOverTasks: toNumber(row.carry_over_count)
     },
     computedAt: new Date().toISOString(),
     engineVersion: ENGINE_VERSION,
@@ -468,6 +502,10 @@ interface ProjectMetricRow {
   total_tasks: unknown
   completed_tasks: unknown
   active_tasks: unknown
+  on_time_count: unknown
+  late_drop_count: unknown
+  overdue_count: unknown
+  carry_over_count: unknown
 }
 
 export interface ProjectMetricSnapshot {
@@ -480,6 +518,10 @@ export interface ProjectMetricSnapshot {
     totalTasks: number
     completedTasks: number
     activeTasks: number
+    onTimeTasks: number
+    lateDropTasks: number
+    overdueTasks: number
+    carryOverTasks: number
   }
 }
 
@@ -518,7 +560,11 @@ export const readProjectMetrics = async (
     context: {
       totalTasks: toNumber(row.total_tasks),
       completedTasks: toNumber(row.completed_tasks),
-      activeTasks: toNumber(row.active_tasks)
+      activeTasks: toNumber(row.active_tasks),
+      onTimeTasks: toNumber(row.on_time_count),
+      lateDropTasks: toNumber(row.late_drop_count),
+      overdueTasks: toNumber(row.overdue_count),
+      carryOverTasks: toNumber(row.carry_over_count)
     }
   }))
 }
@@ -543,6 +589,10 @@ interface MemberMetricRow {
   total_tasks: unknown
   completed_tasks: unknown
   active_tasks: unknown
+  on_time_count: unknown
+  late_drop_count: unknown
+  overdue_count: unknown
+  carry_over_count: unknown
   materialized_at: unknown
 }
 
@@ -553,18 +603,44 @@ export const readMemberMetrics = async (
 ): Promise<IcoMetricSnapshot | null> => {
   const projectId = getIcoEngineProjectId()
 
-  const rows = await runIcoEngineQuery<MemberMetricRow>(`
-    SELECT *
-    FROM \`${projectId}.${ICO_DATASET}.metrics_by_member\`
-    WHERE member_id = @memberId
-      AND period_year = @periodYear
-      AND period_month = @periodMonth
-    LIMIT 1
-  `, { memberId, periodYear, periodMonth })
+  const [rows, cscRows] = await Promise.all([
+    runIcoEngineQuery<MemberMetricRow>(`
+      SELECT *
+      FROM \`${projectId}.${ICO_DATASET}.metrics_by_member\`
+      WHERE member_id = @memberId
+        AND period_year = @periodYear
+        AND period_month = @periodMonth
+      LIMIT 1
+    `, { memberId, periodYear, periodMonth }),
+
+    runIcoEngineQuery<CscDistributionRow>(`
+      SELECT
+        @memberId AS space_id,
+        fase_csc,
+        COUNT(*) AS task_count
+      FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\` te,
+           UNNEST(te.assignee_member_ids) AS assignee_member_id
+      WHERE assignee_member_id = @memberId
+        AND completed_at IS NULL
+        AND task_status NOT IN (${DONE_STATUSES_SQL})
+        AND (${buildPeriodFilterSQL()})
+        AND fase_csc != 'otros'
+      GROUP BY space_id, fase_csc
+      ORDER BY fase_csc
+    `, { memberId, periodYear, periodMonth })
+  ])
 
   if (rows.length === 0) return null
 
   const row = rows[0]
+  const activeTasks = toNumber(row.active_tasks)
+
+  const cscDistribution: CscDistributionEntry[] = cscRows.map(csc => ({
+    phase: normalizeString(csc.fase_csc) as CscPhase,
+    label: CSC_PHASE_LABELS[normalizeString(csc.fase_csc) as CscPhase] ?? normalizeString(csc.fase_csc),
+    count: toNumber(csc.task_count),
+    pct: activeTasks > 0 ? Math.round((toNumber(csc.task_count) / activeTasks) * 1000) / 10 : 0
+  }))
 
   return {
     dimension: 'member',
@@ -583,11 +659,15 @@ export const readMemberMetrics = async (
       metricValueFromRow('stuck_assets', row.stuck_asset_count),
       metricValueFromRow('stuck_asset_pct', row.stuck_asset_pct)
     ],
-    cscDistribution: [],
+    cscDistribution,
     context: {
       totalTasks: toNumber(row.total_tasks),
       completedTasks: toNumber(row.completed_tasks),
-      activeTasks: toNumber(row.active_tasks)
+      activeTasks,
+      onTimeTasks: toNumber(row.on_time_count),
+      lateDropTasks: toNumber(row.late_drop_count),
+      overdueTasks: toNumber(row.overdue_count),
+      carryOverTasks: toNumber(row.carry_over_count)
     },
     computedAt: toTimestampString(row.materialized_at as string | { value?: string } | null),
     engineVersion: ENGINE_VERSION,
@@ -648,7 +728,11 @@ export const readMemberMetricsBatch = async (
       context: {
         totalTasks: toNumber(row.total_tasks),
         completedTasks: toNumber(row.completed_tasks),
-        activeTasks: toNumber(row.active_tasks)
+        activeTasks: toNumber(row.active_tasks),
+        onTimeTasks: toNumber(row.on_time_count),
+        lateDropTasks: toNumber(row.late_drop_count),
+        overdueTasks: toNumber(row.overdue_count),
+        carryOverTasks: toNumber(row.carry_over_count)
       },
       computedAt: toTimestampString(row.materialized_at as string | { value?: string } | null),
       engineVersion: ENGINE_VERSION,

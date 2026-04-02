@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { requireAgencyTenantContext } from '@/lib/tenant/authorization'
 import { ensureIcoEngineInfrastructure, ICO_DATASET } from '@/lib/ico-engine/schema'
 import { readAgencyMetrics, computeSpaceMetricsLive } from '@/lib/ico-engine/read-metrics'
+import { readAgencyPerformanceReport } from '@/lib/ico-engine/performance-report'
 import { toIcoEngineErrorResponse, runIcoEngineQuery, getIcoEngineProjectId } from '@/lib/ico-engine/shared'
 
 export const dynamic = 'force-dynamic'
@@ -76,17 +77,20 @@ export async function GET(request: Request) {
         periodYear,
         periodMonth,
         spaces: snapshots,
-        totalSpaces: snapshots.length
+        totalSpaces: snapshots.length,
+        report: null
       })
     }
 
     const snapshots = await readAgencyMetrics(periodYear, periodMonth)
+    const report = await readAgencyPerformanceReport(periodYear, periodMonth)
 
     return NextResponse.json({
       periodYear,
       periodMonth,
       spaces: snapshots,
-      totalSpaces: snapshots.length
+      totalSpaces: snapshots.length,
+      report
     })
   } catch (error) {
     return toIcoEngineErrorResponse(error, 'Failed to read agency ICO metrics')

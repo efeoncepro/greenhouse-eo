@@ -94,6 +94,10 @@ const IcoTab = ({ detail }: Props) => {
             <Typography variant='body2'><strong>Total:</strong> {snapshot.context.totalTasks}</Typography>
             <Typography variant='body2'><strong>Completadas:</strong> {snapshot.context.completedTasks}</Typography>
             <Typography variant='body2'><strong>Activas:</strong> {snapshot.context.activeTasks}</Typography>
+            <Typography variant='body2'><strong>On-Time:</strong> {snapshot.context.onTimeTasks}</Typography>
+            <Typography variant='body2'><strong>Late Drops:</strong> {snapshot.context.lateDropTasks}</Typography>
+            <Typography variant='body2'><strong>Overdue:</strong> {snapshot.context.overdueTasks}</Typography>
+            <Typography variant='body2'><strong>Carry-Over:</strong> {snapshot.context.carryOverTasks}</Typography>
             <Typography variant='caption' color='text.secondary'>
               Engine {snapshot.engineVersion} · calculado {snapshot.computedAt ? new Date(snapshot.computedAt).toLocaleString('es-CL') : 'sin fecha'}
             </Typography>
