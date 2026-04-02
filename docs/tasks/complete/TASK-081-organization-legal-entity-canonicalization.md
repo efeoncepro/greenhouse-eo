@@ -1,5 +1,14 @@
 # TASK-081 - Organization Legal Entity Canonicalization
 
+## Delta 2026-04-02
+
+- El gap runtime principal quedó cerrado por trabajo en `TASK-193`:
+  - `Efeonce` ya quedó regularizada en `greenhouse_core.organizations` como operating entity canónica (`is_operating_entity = TRUE`)
+  - la identidad legal quedó persistida con `legal_name = Efeonce Group SpA`, `tax_id = 77.357.182-1` y `legal_address = Dr. Manuel Barros Borgoño 71 of 05, Providencia, Chile`
+  - `src/lib/account-360/organization-identity.ts:getOperatingEntityIdentity()` ya resuelve datos reales desde runtime, no solo desde diseño
+- Estado real actualizado:
+  - los slices pendientes de esta task ya no son sembrar la entidad legal, sino terminar el cutover de consumers documentales que todavía lean strings hardcoded
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -208,4 +217,3 @@ Debería resolver dinámicamente desde la organización operativa:
 - `pnpm test`
 - `git diff --check`
 - Smoke manual de PDF de nómina y recibo
-

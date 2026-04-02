@@ -162,7 +162,7 @@ type Session360Row = Record<string, unknown> & {
   route_groups: string[]
   feature_flags: string[]
 
-  // Account 360 — nullable until M1 migration populates spaces/organizations
+  // Account 360 — resolved from session_360 via space bridge, primary membership, or operating entity fallback
   space_id: string | null
   space_public_id: string | null
   organization_id: string | null

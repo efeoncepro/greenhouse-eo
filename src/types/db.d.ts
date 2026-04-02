@@ -2429,6 +2429,7 @@ export interface GreenhouseServingPerson360 {
   created_at: Timestamp | null;
   default_auth_mode: string | null;
   display_name: string | null;
+  eo_id: string | null;
   has_active_contact: boolean | null;
   has_active_member: boolean | null;
   has_crm_contact_facet: boolean | null;
@@ -2438,13 +2439,16 @@ export interface GreenhouseServingPerson360 {
   identity_profile_id: string | null;
   identity_profile_public_id: string | null;
   internal_user_count: number | null;
+  is_efeonce_collaborator: boolean | null;
   job_title: string | null;
   member_count: number | null;
   member_display_name: string | null;
   member_email: string | null;
+  member_id: string | null;
   membership_count: number | null;
   memberships: Json | null;
   organization_ids: string[] | null;
+  organization_membership_count: number | null;
   person_facets: string[] | null;
   primary_contact_email: string | null;
   primary_contact_name: string | null;
@@ -2453,6 +2457,9 @@ export interface GreenhouseServingPerson360 {
   primary_hubspot_contact_id: string | null;
   primary_member_id: string | null;
   primary_member_public_id: string | null;
+  primary_membership_type: string | null;
+  primary_organization_id: string | null;
+  primary_organization_name: string | null;
   primary_source_object_id: string | null;
   primary_source_object_type: string | null;
   primary_source_system: string | null;
@@ -2464,12 +2471,19 @@ export interface GreenhouseServingPerson360 {
   profile_full_name: string | null;
   profile_status: string | null;
   profile_type: string | null;
+  resolved_display_name: string | null;
+  tenant_type: string | null;
   tenant_types: string[] | null;
   updated_at: Timestamp | null;
+  user_active: boolean | null;
   user_client_ids: string[] | null;
   user_count: number | null;
+  user_email: string | null;
   user_emails: string[] | null;
+  user_full_name: string | null;
+  user_id: string | null;
   user_ids: string[] | null;
+  user_status: string | null;
 }
 
 export interface GreenhouseServingPersonDelivery360 {

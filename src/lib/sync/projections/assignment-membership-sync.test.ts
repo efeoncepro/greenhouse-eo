@@ -11,7 +11,8 @@ const mockNextPublicId = vi.fn((_prefix?: string) => {
 })
 
 vi.mock('@/lib/postgres/client', () => ({
-  runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
+  runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args),
+  withGreenhousePostgresTransaction: vi.fn()
 }))
 
 vi.mock('@/lib/sync/publish-event', () => ({

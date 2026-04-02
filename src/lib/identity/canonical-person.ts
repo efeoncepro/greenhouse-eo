@@ -19,6 +19,10 @@ export interface CanonicalPersonRecord {
   memberId: string | null
   userId: string | null
   eoId: string | null
+  primaryOrganizationId: string | null
+  primaryOrganizationName: string | null
+  organizationMembershipType: string | null
+  isEfeonceCollaborator: boolean
   displayName: string
   canonicalEmail: string | null
   portalEmail: string | null
@@ -52,6 +56,10 @@ type Person360Row = Record<string, unknown> & {
   has_user_facet: boolean | null
   active_role_codes: string[] | null
   route_groups: string[] | null
+  primary_organization_id: string | null
+  primary_organization_name: string | null
+  primary_membership_type: string | null
+  is_efeonce_collaborator: boolean | null
 }
 
 type Person360ColumnRow = Record<string, unknown> & {
@@ -75,6 +83,10 @@ type DirectMemberRow = Record<string, unknown> & {
   has_user_facet: boolean | null
   active_role_codes: string[] | null
   route_groups: string[] | null
+  primary_organization_id: string | null
+  primary_organization_name: string | null
+  primary_membership_type: string | null
+  is_efeonce_collaborator: boolean | null
 }
 
 type DirectUserRow = Record<string, unknown> & {
@@ -94,6 +106,10 @@ type DirectUserRow = Record<string, unknown> & {
   has_user_facet: boolean | null
   active_role_codes: string[] | null
   route_groups: string[] | null
+  primary_organization_id: string | null
+  primary_organization_name: string | null
+  primary_membership_type: string | null
+  is_efeonce_collaborator: boolean | null
 }
 
 const normalizeString = (value: unknown) =>
@@ -145,6 +161,9 @@ const toCanonicalPersonRecord = (
   const memberId = normalizeString(row.member_id)
   const userId = normalizeString(row.user_id)
   const eoId = normalizeString(row.eo_id)
+  const primaryOrganizationId = normalizeString(row.primary_organization_id)
+  const primaryOrganizationName = normalizeString(row.primary_organization_name)
+  const organizationMembershipType = normalizeString(row.primary_membership_type)
 
   const displayName =
     normalizeString(row.resolved_display_name) ??
@@ -174,6 +193,10 @@ const toCanonicalPersonRecord = (
     memberId,
     userId,
     eoId,
+    primaryOrganizationId,
+    primaryOrganizationName,
+    organizationMembershipType,
+    isEfeonceCollaborator: row.is_efeonce_collaborator === true || Boolean(memberId),
     displayName,
     canonicalEmail,
     portalEmail,
@@ -255,6 +278,18 @@ const getPeopleFromPerson360 = async ({
   const memberEmailExpr = getPerson360ColumnExpr(columns, ['member_email'], 'NULL::text')
   const tenantTypeExpr = getPerson360ColumnExpr(columns, ['tenant_type'], 'NULL::text')
 
+  const primaryOrganizationIdExpr = columns.has('primary_organization_id')
+    ? 'p.primary_organization_id'
+    : 's.organization_id'
+
+  const primaryOrganizationNameExpr = columns.has('primary_organization_name')
+    ? 'p.primary_organization_name'
+    : 's.organization_name'
+
+  const primaryMembershipTypeExpr = columns.has('primary_membership_type')
+    ? 'p.primary_membership_type'
+    : 'NULL::text'
+
   const userStatusExpr = columns.has('user_status')
     ? 'p.user_status'
     : columns.has('active_user_count')
@@ -274,6 +309,12 @@ const getPeopleFromPerson360 = async ({
   const activeRoleCodesExpr = columns.has('active_role_codes')
     ? 'COALESCE(p.active_role_codes, ARRAY[]::text[])'
     : 'ARRAY[]::text[]'
+
+  const isEfeonceCollaboratorExpr = columns.has('is_efeonce_collaborator')
+    ? 'p.is_efeonce_collaborator'
+    : columns.has('has_active_member')
+      ? 'COALESCE(p.has_active_member, false)'
+      : `${memberIdExpr} IS NOT NULL`
 
   const whereExpr = getPerson360WhereExpr(columns, whereColumn)
 
@@ -295,7 +336,11 @@ const getPeopleFromPerson360 = async ({
        p.has_member_facet,
        p.has_user_facet,
        ${activeRoleCodesExpr} AS active_role_codes,
-       COALESCE(s.route_groups, ARRAY[]::text[]) AS route_groups
+       COALESCE(s.route_groups, ARRAY[]::text[]) AS route_groups,
+       ${primaryOrganizationIdExpr} AS primary_organization_id,
+       ${primaryOrganizationNameExpr} AS primary_organization_name,
+       ${primaryMembershipTypeExpr} AS primary_membership_type,
+       ${isEfeonceCollaboratorExpr} AS is_efeonce_collaborator
      FROM greenhouse_serving.person_360 AS p
      LEFT JOIN greenhouse_serving.session_360 AS s
        ON s.user_id = ${userIdExpr}
@@ -326,7 +371,11 @@ const getDirectMembers = async (memberIds: string[]) => {
        TRUE AS has_member_facet,
        (cu.user_id IS NOT NULL) AS has_user_facet,
        COALESCE(role_agg.active_role_codes, ARRAY[]::text[]) AS active_role_codes,
-       COALESCE(s.route_groups, ARRAY[]::text[]) AS route_groups
+       COALESCE(s.route_groups, ARRAY[]::text[]) AS route_groups,
+       s.organization_id AS primary_organization_id,
+       s.organization_name AS primary_organization_name,
+       NULL::text AS primary_membership_type,
+       TRUE AS is_efeonce_collaborator
      FROM greenhouse_core.members AS m
      LEFT JOIN greenhouse_core.identity_profiles AS ip
        ON ip.profile_id = m.identity_profile_id
@@ -378,7 +427,11 @@ const getDirectUsers = async (userIds: string[]) => {
        (COALESCE(cu.member_id, m.member_id) IS NOT NULL) AS has_member_facet,
        TRUE AS has_user_facet,
        COALESCE(role_agg.active_role_codes, ARRAY[]::text[]) AS active_role_codes,
-       COALESCE(s.route_groups, ARRAY[]::text[]) AS route_groups
+       COALESCE(s.route_groups, ARRAY[]::text[]) AS route_groups,
+       s.organization_id AS primary_organization_id,
+       s.organization_name AS primary_organization_name,
+       NULL::text AS primary_membership_type,
+       (COALESCE(cu.member_id, m.member_id) IS NOT NULL) AS is_efeonce_collaborator
      FROM greenhouse_core.client_users AS cu
      LEFT JOIN greenhouse_core.identity_profiles AS ip
        ON ip.profile_id = cu.identity_profile_id
@@ -427,7 +480,11 @@ const getDirectProfiles = async (profileIds: string[]) => {
        (m.member_id IS NOT NULL) AS has_member_facet,
        (cu.user_id IS NOT NULL) AS has_user_facet,
        COALESCE(role_agg.active_role_codes, ARRAY[]::text[]) AS active_role_codes,
-       COALESCE(s.route_groups, ARRAY[]::text[]) AS route_groups
+       COALESCE(s.route_groups, ARRAY[]::text[]) AS route_groups,
+       s.organization_id AS primary_organization_id,
+       s.organization_name AS primary_organization_name,
+       NULL::text AS primary_membership_type,
+       (m.member_id IS NOT NULL) AS is_efeonce_collaborator
      FROM greenhouse_core.identity_profiles AS ip
      LEFT JOIN greenhouse_core.members AS m
        ON m.identity_profile_id = ip.profile_id

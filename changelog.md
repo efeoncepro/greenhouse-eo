@@ -2,6 +2,15 @@
 
 ## 2026-04-02
 
+- **TASK-193 person-organization synergy activation**:
+  - `Efeonce` quedó regularizada como operating entity real en `greenhouse_core.organizations` con razón social, RUT y dirección legal canónicos
+  - se aplicó la migración `20260402094316652_task-193-operating-entity-session-canonical-person.sql`, incluyendo backfill de `person_memberships(team_member)` para los `members` activos y regeneración de `src/types/db.d.ts`
+  - `session_360` ahora resuelve `organization_id` para usuarios internos vía operating entity y mantiene fallback de primary membership para carriles client
+  - `person_360` ahora publica org primaria, aliases `eo_id`/`member_id`/`user_id` y `is_efeonce_collaborator`, lo que habilita a `CanonicalPersonRecord` a consumir contexto organizacional canónico
+  - `organization_360` enriqueció el aggregate `people` con `memberId`, `assignedFte`, `assignmentType`, `jobLevel` y `employmentType` para memberships `team_member`
+  - `People > Finance` ya acepta `organizationId` opcional y fuerza tenant isolation para usuarios `client`
+  - validación ejecutada: `GREENHOUSE_POSTGRES_HOST=127.0.0.1 GREENHOUSE_POSTGRES_PORT=15432 GREENHOUSE_POSTGRES_SSL=false pnpm migrate:up`, targeted `vitest`, `pnpm lint`, `pnpm build`, `rg -n "new Pool\\(" src`
+
 - **TASK-192 finance org-first materialized serving cutover**:
   - `cost_allocations`, `client_economics` y `commercial_cost_attribution` ahora persisten contexto `organization_id` y, donde aplica, `space_id`, manteniendo `client_id` solo como bridge explícito de compatibilidad
   - `operational_pl` quedó reconciliado para propagar organización desde ingresos, allocations, expenses y commercial attribution sin depender solo del bridge legacy `client -> space`

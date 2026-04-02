@@ -19,7 +19,20 @@ Contrato vigente desde 2026-04-02.
 
 Este documento describe el estado real del sistema y formaliza decisiones que estaban implícitas en el código. No introduce cambios — documenta lo que ya es.
 
-Gaps identificados están catalogados en `TASK-193` (`docs/tasks/to-do/TASK-193-person-organization-synergy-activation.md`).
+Gaps identificados están catalogados en `TASK-193` (`docs/tasks/in-progress/TASK-193-person-organization-synergy-activation.md`).
+
+## Delta 2026-04-02 — TASK-193 activation slice aplicado
+
+- La org canónica `Efeonce` quedó regularizada como `operating entity` real en runtime:
+  - `legal_name = 'Efeonce Group SpA'`
+  - `tax_id = '77.357.182-1'`
+  - `is_operating_entity = TRUE`
+- Los `members` activos con `identity_profile_id` quedaron backfilleados como `person_memberships(team_member)` en la operating entity y esa membership pasa a ser primaria para colaboradores internos.
+- `greenhouse_serving.session_360` ya resuelve `organization_id` para ambos tenant types:
+  - `client` vía `spaces.client_id -> organization_id` con fallback a primary membership
+  - `efeonce_internal` vía operating entity con fallback a membership
+- `greenhouse_serving.person_360` ya publica `primary_organization_id`, `primary_organization_name`, `primary_membership_type`, `organization_membership_count`, aliases canónicos (`eo_id`, `member_id`, `user_id`) y `is_efeonce_collaborator`.
+- `CanonicalPersonRecord` ya consume contexto organizacional primario y `Finance` ya acepta `organizationId` opcional para scoping downstream.
 
 ---
 
@@ -197,7 +210,7 @@ Efeonce (operating_entity = TRUE)
 │   ├── client_team_assignments → Client Y
 │   │   └── [assignment_membership_sync projection]
 │   │       └── person_memberships(team_member) → Org of Client Y
-│   └── (gap: NO membership en Efeonce como org)
+│   └── person_memberships(team_member) → Operating Entity Efeonce
 │
 Org Client X (organization_type = 'client')
 ├── spaces → client_id bridge
@@ -329,17 +342,17 @@ client_team_assignments (FTE per member per client)
 
 | # | Gap | Poblaciones | Referencia |
 |---|-----|-------------|-----------|
-| G0 | `membership_type` sin CHECK constraint tipado ni helpers de población | A + B | `TASK-193` Fase 0 |
-| G1 | `CanonicalPersonRecord` no tiene contexto de org | A + B | `TASK-193` Fase 1 |
-| G2 | `session_360` no resuelve `organizationId` consistentemente | A + B | `TASK-193` Fase 1 |
+| G0 | Helpers/shared typing de `membership_type` todavía parciales; el CHECK ya estaba resuelto | A + B | `TASK-193` Fase 0 |
+| G1 | `CanonicalPersonRecord` ya tiene contexto org; queda extender consumers residuales | A + B | `TASK-193` Fase 1 |
+| G2 | `session_360` ya resuelve `organizationId` para ambos tenant types; quedan consumers legacy client-first | A + B | `TASK-193` Fase 1 |
 | G3 | Person-360 facets sin org-scoping | A + B | `TASK-193` Fase 3 |
-| G4 | Colaboradores Efeonce sin membership en operating entity | A | `TASK-193` Fase 0 |
+| G4 | Cerrado en runtime: colaboradores Efeonce ya tienen membership en operating entity | A | `TASK-193` Fase 0 |
 | G5 | Proveedores sin modelo de personas (Pob. C) | C | `TASK-193` Fase 4 |
 | G6 | Orgs duales (`both`) sin distinción de facets | B + C | `TASK-193` Fase 4 |
 | G7 | Staff aug sin distinción de membership | A | `TASK-193` Fase 3 |
 | G8 | Payroll 100% member-centric, sin vista org-scoped | A | `TASK-193` Fase 4 |
-| G9 | `createIdentityProfile` fuera del reconciliation engine | B | `TASK-193` Fase 4 |
-| G10 | Serving views sin cruce operativo person↔org | A + B | `TASK-193` Fase 2 |
+| G9 | `createIdentityProfile` ahora deduplica por email, pero sigue fuera del reconciliation engine completo | B | `TASK-193` Fase 4 |
+| G10 | Serving views ya cruzan org↔person en el slice base; quedan enrichments posteriores por facet | A + B | `TASK-193` Fase 2 |
 
 ---
 
@@ -365,8 +378,8 @@ client_team_assignments (FTE per member per client)
 
 | View / Table | Schema | Purpose |
 |-------------|--------|---------|
-| `session_360` | `greenhouse_serving` | Session resolution (incluye `organization_id` nullable) |
-| `person_360` | `greenhouse_serving` | Read-optimized person (sin org data hoy) |
+| `session_360` | `greenhouse_serving` | Session resolution con fallback a primary membership y operating entity |
+| `person_360` | `greenhouse_serving` | Read-optimized person con org primaria, aliases canónicos y collaborator flag |
 | `organization_360` | `greenhouse_serving` | Read-optimized org con people aggregate |
 | `commercial_cost_attribution` | `greenhouse_serving` | Cost allocation member → client |
 | `member_capacity_economics` | `greenhouse_serving` | Capacity snapshot per member per period |

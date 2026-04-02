@@ -1,5 +1,51 @@
 # Handoff.md
 
+## Sesión 2026-04-02 — TASK-193 person-organization synergy activation
+
+### Objetivo
+
+- Ejecutar discovery y auditoría de `TASK-193` antes de tocar runtime, para alinear la spec con el estado real de Person, Organization, session, CanonicalPerson y los consumers downstream (`Finance`, `Payroll`, `ICO`, `Agency`) sobre la rama actual `develop`.
+
+### Delta de ejecución
+
+- `TASK-193` se movió de `to-do/` a `in-progress/`.
+- La auditoría inicial confirmó drift importante en la spec:
+  - `greenhouse_core.person_memberships.membership_type` ya tiene `CHECK constraint`; el gap real es helper/contrato shared y compatibilidad con `client_contact`.
+  - `greenhouse_serving.session_360` ya resuelve `organization_id` para todos los usuarios `tenant_type='client'`; el gap real de sesión está en `efeonce_internal`.
+  - `greenhouse_serving.person_360` ya publica `membership_count`, `memberships` y `organization_ids`; el gap real no es ausencia de org data, sino falta de `primaryOrganization*` y consumo downstream.
+  - La base real no tiene ninguna organización con `is_operating_entity = TRUE`; esto bloquea poblar `organizationId` interno y memberships de operating entity sin definir primero ese anchor canónico.
+- Validación adicional sobre runtime real:
+  - `person_memberships` activos hoy: `client_contact` (31) y `team_member` (4)
+  - `session_360` coverage:
+    - `client`: `31/31` con `organization_id`
+    - `efeonce_internal`: `0/8` con `organization_id`
+  - `members` activos con `identity_profile_id`: `7`
+  - `members` con membership en operating entity: `0`
+- La spec de `TASK-193` quedó corregida para reflejar este estado real antes de continuar con implementación.
+- Slice implementado sobre runtime real:
+  - migración `20260402094316652_task-193-operating-entity-session-canonical-person.sql` aplicada por Cloud SQL Proxy
+  - `Efeonce` regularizada como operating entity canónica (`is_operating_entity = TRUE`, `legal_name = Efeonce Group SpA`, `tax_id = 77.357.182-1`)
+  - backfill de `person_memberships(team_member)` para `7` members activos con `identity_profile_id`, dejando esa membership como primaria
+  - `session_360` ya resuelve `organization_id` para internos vía operating entity; coverage real post-migración:
+    - `client`: `31/31` con `organization_id`
+    - `efeonce_internal`: `8/8` con `organization_id`
+  - `person_360` ahora publica `primary_organization_*`, `primary_membership_type`, aliases `eo_id` / `member_id` / `user_id` y `is_efeonce_collaborator`
+  - `CanonicalPersonRecord` consume ya el contexto org primario
+  - `People > Finance` acepta `organizationId` opcional y fuerza tenant isolation para usuarios `client`
+  - se agregó proyección `operating_entity_membership` para mantener el vínculo forward en `member.created` / `member.updated` / `member.deactivated`
+  - `createIdentityProfile()` en Account 360 ahora deduplica por email antes de insertar un `identity_profile`
+
+### Validación
+
+- `pnpm pg:doctor --profile=runtime` ✅
+- `pnpm exec tsx scripts/verify-account-360.ts` ✅
+- Queries ad hoc via `tsx` sobre `session_360`, `person_memberships`, `organizations.is_operating_entity` y `members` ✅
+- `GREENHOUSE_POSTGRES_HOST=127.0.0.1 GREENHOUSE_POSTGRES_PORT=15432 GREENHOUSE_POSTGRES_SSL=false pnpm migrate:up` ✅
+- `NEXTAUTH_SECRET=test-secret pnpm exec vitest run src/lib/identity/canonical-person.test.ts src/lib/person-360/get-person-finance.test.ts src/lib/sync/projections/assignment-membership-sync.test.ts src/lib/sync/projections/operating-entity-membership.test.ts` ✅
+- `pnpm lint` ✅
+- `pnpm build` ✅
+- `rg -n "new Pool\\(" src` → solo `src/lib/postgres/client.ts` ✅
+
 ## Sesión 2026-04-02 — TASK-192 finance org-first materialized serving cutover
 
 ### Objetivo

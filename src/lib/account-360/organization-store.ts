@@ -56,6 +56,11 @@ export interface OrganizationPerson {
   department: string | null
   isPrimary: boolean
   spaceId: string | null
+  memberId?: string | null
+  assignedFte?: number | null
+  assignmentType?: string | null
+  jobLevel?: string | null
+  employmentType?: string | null
 }
 
 export interface PersonMembership {
@@ -637,6 +642,12 @@ export const createIdentityProfile = async (data: {
   fullName: string
   canonicalEmail: string
 }): Promise<string> => {
+  const existing = await findProfileByEmail(data.canonicalEmail)
+
+  if (existing?.profileId) {
+    return existing.profileId
+  }
+
   const profileId = buildIdentityProfileId(data)
 
   await runGreenhousePostgresQuery(`

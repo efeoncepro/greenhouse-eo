@@ -92,6 +92,13 @@ type LatestCostSnapshotRow = {
   shared_overhead_target: string | number | null
 }
 
+type ExpenseSummaryRow = {
+  expense_count: string | number
+  paid_expense_count: string | number
+  total_expenses_clp: string | number
+  last_expense_date: string | null
+}
+
 // ── Helpers ──
 
 const toNum = (v: unknown): number => {
@@ -115,7 +122,10 @@ const str = (v: string | null | undefined): string | null =>
 // ── Main function ──
 
 export const getPersonFinanceOverviewFromPostgres = async (
-  identifier: string
+  identifier: string,
+  options: {
+    organizationId?: string | null
+  } = {}
 ): Promise<PersonFinanceOverview> => {
   const resolved = await resolvePersonIdentifier(identifier)
 
@@ -156,19 +166,24 @@ export const getPersonFinanceOverviewFromPostgres = async (
 
     const row = directRows[0]
 
-    return buildFinanceOverview(row.member_id, row.identity_profile_id, row.resolved_display_name)
+    return buildFinanceOverview(row.member_id, row.identity_profile_id, row.resolved_display_name, options)
   }
 
-  return buildFinanceOverview(resolved.memberId, resolved.identityProfileId, null)
+  return buildFinanceOverview(resolved.memberId, resolved.identityProfileId, null, options)
 }
 
 const buildFinanceOverview = async (
   memberId: string,
   identityProfileId: string | null,
-  displayNameHint: string | null
+  displayNameHint: string | null,
+  options: {
+    organizationId?: string | null
+  }
 ): Promise<PersonFinanceOverview> => {
+  const organizationId = str(options.organizationId)
+
   // Run summary + detail queries in parallel
-  const [summaryRows, payrollRows, expenseRows, identityRows, assignmentRows, costAttributionRows, latestCostSnapshotRows] = await Promise.all([
+  const [summaryRows, payrollRows, expenseRows, expenseSummaryRows, identityRows, assignmentRows, costAttributionRows, latestCostSnapshotRows] = await Promise.all([
     runGreenhousePostgresQuery<FinanceSummaryRow>(
       `SELECT * FROM greenhouse_serving.person_finance_360
        WHERE member_id = $1
@@ -212,10 +227,38 @@ const buildFinanceOverview = async (
         e.created_at::text
       FROM greenhouse_finance.expenses e
       LEFT JOIN greenhouse_core.clients c ON c.client_id = e.client_id
+      LEFT JOIN greenhouse_core.spaces sp
+        ON sp.client_id = e.client_id
+       AND sp.active = TRUE
       WHERE e.member_id = $1
+        AND ($2::text IS NULL OR sp.organization_id = $2 OR e.space_id IN (
+          SELECT s2.space_id
+          FROM greenhouse_core.spaces s2
+          WHERE s2.organization_id = $2
+            AND s2.active = TRUE
+        ))
       ORDER BY COALESCE(e.document_date, e.payment_date, e.created_at::date) DESC, e.created_at DESC
       LIMIT 50`,
-      [memberId]
+      [memberId, organizationId]
+    ),
+    runGreenhousePostgresQuery<ExpenseSummaryRow>(
+      `SELECT
+         COUNT(*)::text AS expense_count,
+         COUNT(*) FILTER (WHERE e.payment_status = 'paid')::text AS paid_expense_count,
+         COALESCE(SUM(e.total_amount_clp), 0)::text AS total_expenses_clp,
+         MAX(COALESCE(e.payment_date, e.document_date)::text) AS last_expense_date
+       FROM greenhouse_finance.expenses e
+       LEFT JOIN greenhouse_core.spaces sp
+         ON sp.client_id = e.client_id
+        AND sp.active = TRUE
+       WHERE e.member_id = $1
+         AND ($2::text IS NULL OR sp.organization_id = $2 OR e.space_id IN (
+           SELECT s2.space_id
+           FROM greenhouse_core.spaces s2
+           WHERE s2.organization_id = $2
+             AND s2.active = TRUE
+         ))`,
+      [memberId, organizationId]
     ),
     identityProfileId
       ? runGreenhousePostgresQuery<IdentityLinkRow>(
@@ -240,8 +283,15 @@ const buildFinanceOverview = async (
       FROM greenhouse_core.client_team_assignments a
       LEFT JOIN greenhouse_core.clients c ON c.client_id = a.client_id
       WHERE a.member_id = $1
+        AND ($2::text IS NULL OR EXISTS (
+          SELECT 1
+          FROM greenhouse_core.spaces s
+          WHERE s.client_id = a.client_id
+            AND s.organization_id = $2
+            AND s.active = TRUE
+        ))
       ORDER BY a.active DESC, a.start_date DESC`,
-      [memberId]
+      [memberId, organizationId]
     ).catch(() => [] as AssignmentRow[]),
     runGreenhousePostgresQuery<CostAttributionRow>(
       `SELECT
@@ -256,9 +306,10 @@ const buildFinanceOverview = async (
       LEFT JOIN greenhouse_core.spaces sp ON sp.client_id = cca.client_id AND sp.active = TRUE
       LEFT JOIN greenhouse_core.organizations o ON o.organization_id = sp.organization_id
       WHERE cca.member_id = $1
+        AND ($2::text IS NULL OR COALESCE(cca.organization_id, sp.organization_id) = $2)
       ORDER BY cca.period_year DESC, cca.period_month DESC, cca.commercial_labor_cost_target DESC
       LIMIT 20`,
-      [memberId]
+      [memberId, organizationId]
     ).catch(() => [] as CostAttributionRow[]),
     runGreenhousePostgresQuery<LatestCostSnapshotRow>(
       `SELECT
@@ -283,6 +334,7 @@ const buildFinanceOverview = async (
   ])
 
   const summary = summaryRows[0]
+  const expenseSummary = expenseSummaryRows[0]
   const latestCostSnapshot = latestCostSnapshotRows[0]
 
   return {
@@ -294,10 +346,10 @@ const buildFinanceOverview = async (
     summary: {
       activeAssignmentsCount: assignmentRows.filter(r => r.active).length,
       payrollEntriesCount: toNum(summary?.total_payroll_entries),
-      expenseCount: toNum(summary?.expense_count),
-      paidExpensesCount: toNum(summary?.paid_expense_count),
-      totalExpensesClp: toNum(summary?.total_expenses_clp),
-      lastExpenseDate: toDateStr(summary?.last_expense_date ?? null)
+      expenseCount: toNum(expenseSummary?.expense_count ?? summary?.expense_count),
+      paidExpensesCount: toNum(expenseSummary?.paid_expense_count ?? summary?.paid_expense_count),
+      totalExpensesClp: toNum(expenseSummary?.total_expenses_clp ?? summary?.total_expenses_clp),
+      lastExpenseDate: toDateStr(expenseSummary?.last_expense_date ?? summary?.last_expense_date ?? null)
     },
     assignments: assignmentRows.map(r => ({
       assignmentId: r.assignment_id,

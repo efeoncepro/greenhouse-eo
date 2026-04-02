@@ -1,12 +1,19 @@
 # TASK-193 — Person ↔ Organization Synergy Activation
 
-> **Status:** to-do
+> **Status:** in-progress
 > **Priority:** P1
 > **Impact:** Alto — desbloquea org-scoping transversal para todos los módulos downstream
 > **Effort:** Alto
 > **Created:** 2026-04-02
 
 **Architecture doc:** `docs/architecture/GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md`
+
+## Delta 2026-04-02 — auditoría inicial del runtime real
+
+- `greenhouse_core.person_memberships.membership_type` **ya** tiene `CHECK constraint` en schema baseline y runtime; el gap no es crear el enum, sino institucionalizar helpers y reconciliar el legacy `client_contact`.
+- `greenhouse_serving.session_360` **ya** resuelve `organization_id` para usuarios `tenant_type = 'client'` vía `spaces.client_id -> organization_id`; el gap real de sesión está concentrado en `tenant_type = 'efeonce_internal'`.
+- La base real **no** tiene ninguna organización con `is_operating_entity = TRUE`; por lo tanto, la parte de la task que asume un operating entity listo para poblar sesión interna y memberships de Efeonce requiere primero definir/sembrar ese anchor canónico.
+- La data activa hoy en memberships está concentrada en `client_contact` y `team_member`; la spec no puede asumir que `contact`, `client_user` o `billing` ya son el contrato operativo predominante.
 
 ## Objetivo
 
@@ -37,7 +44,7 @@ Empleados del cliente (no de Efeonce). Contactos, usuarios del portal, facturaci
 | Capa | Tabla | Rol |
 |------|-------|-----|
 | Identidad | `identity_profiles` | Ancla canónica (creada por HubSpot sync o manualmente) |
-| Membership en su org | `person_memberships` tipo `contact` / `client_user` / `billing` | Relación laboral real con la org cliente |
+| Membership en su org | `person_memberships` tipo `client_contact` / `contact` / `client_user` / `billing` | Relación laboral real con la org cliente |
 | Acceso al portal | `client_users` (FK `identity_profile_id`) | Principal de autenticación, `tenant_type = 'client'` |
 | Sin facet Member | — | NO son `members` de Efeonce, no tienen payroll ni capacidad |
 
@@ -117,7 +124,7 @@ El sistema tiene dos formas de vincular colaboradores Efeonce a clientes:
 6. **Operating Entity Identity** — Payroll usa org con `is_operating_entity=TRUE` para DTEs y liquidaciones
 7. **HubSpot sync crea identities + memberships** — Auto-vincula contactos importados como Población B (tipo `contact`)
 8. **UI bidireccional** — `PersonMembershipsTab` (default `team_member`) y org detail people tab (default `contact`) permiten navegar en ambas direcciones
-9. **Session ya tiene campos org** — `TenantAccessRecord` ya incluye `organizationId`, `organizationName`, `spaceId` (nullable, migration M1)
+9. **Session ya tiene campos org** — `TenantAccessRecord` ya incluye `organizationId`, `organizationName`, `spaceId`; en runtime real están poblados para usuarios `client`, pero siguen nulos para `efeonce_internal`
 10. **Economics usa bridge space→org** — `organization-economics.ts` resuelve economics vía `client_team_assignments` → `spaces` → `organization_id`
 11. **Pob. B org-scoping funcional vía clientId** — Los usuarios cliente ya ven data filtrada por su `clientId` (proyectos, equipo, delivery). La org es implícita pero el scoping es efectivo.
 
@@ -125,11 +132,11 @@ El sistema tiene dos formas de vincular colaboradores Efeonce a clientes:
 
 | # | Gap | Poblaciones afectadas | Impacto | Archivos clave |
 |---|-----|-----------------------|---------|----------------|
-| G0 | **Membership types sin contrato fuerte** — `membership_type` es string libre sin CHECK constraint. No hay helper para distinguir "persona de Efeonce asignada" vs "persona nativa de la org". Las queries usan `= 'team_member'` hardcodeado. | A + B | Arquitectural | `greenhouse_core.person_memberships` |
+| G0 | **Membership types sin contrato institucionalizado** — el `CHECK constraint` ya existe, pero no hay helper shared para distinguir "persona de Efeonce asignada" vs "persona nativa de la org", y el runtime sigue mezclando `client_contact` legacy con los tipos nuevos. Las queries usan `= 'team_member'` hardcodeado. | A + B | Arquitectural | `greenhouse_core.person_memberships` |
 | G1 | **CanonicalPersonRecord no tiene contexto de org** — resuelve identity/member/user pero nunca toca `person_memberships` ni `organizations`. A pesar de que assignment_membership_sync mantiene memberships al día, ningún consumer de CanonicalPerson las lee. | A + B | Bloqueante para G3-G4 | `src/lib/identity/canonical-person.ts` |
-| G2 | **Session `organizationId` nullable y sin cobertura** — Los campos existen en `TenantAccessRecord` pero están vacíos para la mayoría de usuarios. `session_360` no los resuelve consistentemente. Sin `organizationId` poblado, las rutas no pueden hacer org-scoping. | A + B | Bloqueante para org-scoping | `src/lib/tenant/identity-store.ts:165`, `greenhouse_serving.session_360` |
+| G2 | **Session interna sin `organizationId`** — Los campos existen en `TenantAccessRecord` y ya se resuelven bien para `tenant_type = 'client'`, pero siguen vacíos para `efeonce_internal`. Sin un anchor organizacional interno, las rutas no pueden hacer org-scoping homogéneo. | A | Bloqueante para org-scoping interno | `src/lib/tenant/identity-store.ts:165`, `greenhouse_serving.session_360` |
 | G3 | **Person-360 facets ignoran contexto org** — delivery, HR, finance, ICO muestran toda la data del colaborador sin filtro por org/cliente. Dato sensible para multi-tenancy cuando Pob. B accede. | A + B | Seguridad y multi-tenancy | `src/lib/person-360/get-person-*.ts` |
-| G4 | **Colaboradores Efeonce no pertenecen a su propia org** — No hay `person_membership` vinculando members al operating entity (Efeonce). Un colaborador tiene memberships en orgs cliente (vía assignment sync) pero no en Efeonce como organización. Esto impide responder "quiénes son los empleados de Efeonce" desde el grafo de memberships. | A | Modelo incompleto | `greenhouse_core.person_memberships`, `assignment_membership_sync` |
+| G4 | **No existe anchor operativo de Efeonce en la base real** — no hay ninguna `organization` con `is_operating_entity = TRUE`, y por lo tanto tampoco existe `person_membership` que vincule members a Efeonce como organización. Esto bloquea responder "quiénes son los empleados de Efeonce" desde el grafo de memberships. | A | Modelo incompleto / prerrequisito | `greenhouse_core.organizations`, `greenhouse_core.person_memberships` |
 | G5 | **Proveedores sin modelo de personas (Pob. C)** — Las orgs tipo `supplier` reciben gastos, POs y HES, pero no tienen `person_memberships`. No se puede saber quién es el contacto de un proveedor. Finance referencia `supplier_name` como string libre, no como org+persona. | C | Moderado (crece con escala) | `src/lib/finance/`, `greenhouse_core.organizations` |
 | G6 | **Orgs duales (`both`) sin distinción de facets** — Una org que es cliente Y proveedor usa el mismo set de memberships. No hay forma de saber si un contacto lo es "como cliente" o "como proveedor" de esa org. | B + C | Edge case hoy, escala después | `greenhouse_core.person_memberships` |
 | G7 | **Staff augmentation sin distinción de membership** — `client_team_assignments` tiene `assignment_type = 'staff_augmentation'` para colaboradores colocados en el cliente como pseudo-empleados. Pero la membership sync los trata igual que `internal` — ambos generan `team_member`. Un staff aug es operativamente distinto (trabaja ON-SITE como si fuera del cliente). | A | Relevante para Agency | `src/lib/sync/projections/assignment-membership-sync.ts` |
@@ -143,30 +150,21 @@ El sistema tiene dos formas de vincular colaboradores Efeonce a clientes:
 
 **Objetivo:** Contrato fuerte de membership types, membership del operating entity, y helpers de población.
 
-#### 0a. Membership type como enum con CHECK constraint
+#### 0a. Membership type como contrato shared
 
-Formalizar `membership_type` con separación clara de poblaciones:
+El `CHECK constraint` ya existe. Lo pendiente es formalizar helpers/shared typing sin romper compatibilidad con el legacy activo:
 
 ```sql
--- Migración
-ALTER TABLE greenhouse_core.person_memberships
-  ADD CONSTRAINT chk_membership_type
-  CHECK (membership_type IN (
-    'team_member',    -- Pob. A: colaborador Efeonce asignado
-    'contact',        -- Pob. B/C: contacto general
-    'client_user',    -- Pob. B: usuario del portal
-    'billing',        -- Pob. B/C: contacto de facturación
-    'contractor',     -- Pob. B: contratista externo
-    'partner',        -- Pob. B: partner/socio
-    'advisor'         -- Pob. B: asesor
-  ));
+-- Enum ya vigente en schema/runtime:
+-- team_member, client_contact, client_user, contact,
+-- billing, contractor, partner, advisor
 ```
 
 Agregar helpers TypeScript:
 
 ```typescript
 const EFEONCE_ASSIGNMENT_TYPES = ['team_member'] as const
-const ORG_NATIVE_TYPES = ['contact', 'client_user', 'billing', 'contractor', 'partner', 'advisor'] as const
+const ORG_NATIVE_TYPES = ['client_contact', 'contact', 'client_user', 'billing', 'contractor', 'partner', 'advisor'] as const
 
 export const isEfeonceAssignment = (type: string) => EFEONCE_ASSIGNMENT_TYPES.includes(type as any)
 export const isOrgNative = (type: string) => ORG_NATIVE_TYPES.includes(type as any)
@@ -174,7 +172,11 @@ export const isOrgNative = (type: string) => ORG_NATIVE_TYPES.includes(type as a
 
 #### 0b. Membership de colaboradores en el operating entity
 
-Crear memberships `team_member` vinculando cada `member` activo al operating entity (Efeonce org):
+**Prerequisito real:** hoy no existe ninguna org marcada `is_operating_entity = TRUE` en la base real. Antes de backfillear memberships internos, esta task debe:
+- identificar/sembrar la organización canónica de Efeonce, o
+- dejar explícitamente delegado ese seed a `TASK-081` si no se va a resolver en este slice
+
+Una vez exista ese anchor, crear memberships `team_member` vinculando cada `member` activo al operating entity (Efeonce org):
 - Backfill: para todos los `members` con `identity_profile_id` NOT NULL y `active = TRUE`, crear `person_membership` en la org con `is_operating_entity = TRUE`
 - Forward: hook/proyección que cuando se crea un nuevo member, cree su membership en Efeonce
 - Esto cierra la pregunta "quiénes son los empleados de Efeonce" desde el grafo de memberships
@@ -185,15 +187,15 @@ Crear memberships `team_member` vinculando cada `member` activo al operating ent
 
 **Objetivo:** Que `organizationId` en session esté siempre poblado y que CanonicalPersonRecord incluya contexto org.
 
-#### 1a. Poblar `organizationId` en `session_360`
+#### 1a. Poblar `organizationId` en `session_360` para internos
 
-El campo ya existe en `TenantAccessRecord` pero está vacío. Completar la resolución en la serving view `session_360`:
+El campo ya existe en `TenantAccessRecord`. Para usuarios `client` el bridge `client_id -> spaces -> organization` ya funciona; el gap real es completar la resolución para `efeonce_internal`:
 
-- Para Pob. A (`tenant_type = 'efeonce_internal'`): `organizationId` = operating entity (`is_operating_entity = TRUE`). Es estático para todos los internos.
-- Para Pob. B (`tenant_type = 'client'`): resolver desde `spaces` WHERE `client_id` = user's `client_id` → `spaces.organization_id`. Si no hay space bridge, fallback a `person_memberships` WHERE `is_primary = TRUE`.
+- Para Pob. A (`tenant_type = 'efeonce_internal'`): `organizationId` = operating entity (`is_operating_entity = TRUE`) una vez exista ese anchor.
+- Para Pob. B (`tenant_type = 'client'`): mantener resolución desde `spaces` WHERE `client_id` = user's `client_id` → `spaces.organization_id`. Si no hay space bridge, fallback a `person_memberships` WHERE `is_primary = TRUE`.
 
 **Archivos a modificar:**
-- `scripts/setup-postgres-session-360.sql` (o equivalente) — agregar JOIN a spaces/organizations
+- `scripts/setup-postgres-identity-v2.sql` (owner real de `session_360`) — completar fallback interno/por membership
 - `src/lib/tenant/identity-store.ts` — remover el comment "nullable until M1 migration"
 
 #### 1b. Enriquecer CanonicalPersonRecord con org context
@@ -206,7 +208,7 @@ organizationMembershipType: string | null
 isEfeonceCollaborator: boolean  // shorthand: hasMemberFacet && member is active
 ```
 
-- Para Pob. A: `primaryOrganization` = Efeonce (operating entity), porque es su empleador real. Las orgs cliente son assignments, no pertenencia.
+- Para Pob. A: `primaryOrganization` = Efeonce (operating entity), porque es su empleador real. Esto queda bloqueado hasta definir/sembrar ese anchor en runtime real.
 - Para Pob. B: `primaryOrganization` = su org nativa (de `person_memberships` con `is_primary = TRUE`)
 - Query: LEFT JOIN a `person_memberships` WHERE `is_primary = TRUE`, o derivar de la membership en operating entity (Pob. A) / primera membership nativa (Pob. B)
 
@@ -286,6 +288,7 @@ Extender `assignment_membership_sync` o agregar metadata a la membership:
 - `TASK-181` (Finance Clients org-canonical source) — completado
 - `TASK-191` (Finance org-first downstream cutover) — en progreso, cierra consumption patterns que esta task extiende
 - `TASK-141` (Canonical Person Identity Consumption) — completado, base de `CanonicalPersonRecord`
+- `TASK-081` (Organization Legal Entity Canonicalization) — si esta lane no siembra directamente la org `is_operating_entity`, queda como dependencia explícita para cerrar G4/G2 internos
 
 ### Impacta a
 - `TASK-167` (Operational P&L Organization Scope) — Fase 3 enriquece el input de personas para P&L org-scoped
@@ -318,13 +321,14 @@ Extender `assignment_membership_sync` o agregar metadata a la membership:
 ## Criterios de cierre
 
 ### Fase 0
-- [ ] CHECK constraint en `person_memberships.membership_type`
+- [ ] Helpers `isEfeonceAssignment()` / `isOrgNative()` alineados al enum real (`client_contact` incluido)
 - [ ] Helpers `isEfeonceAssignment()` / `isOrgNative()` en TypeScript
+- [ ] Operating entity definido/sembrado o dependencia explicitada
 - [ ] Backfill de memberships de members activos en operating entity
 - [ ] Proyección forward: nuevo member → membership en operating entity
 
 ### Fase 1
-- [ ] `session_360` resuelve `organization_id` para todos los usuarios (internos y clientes)
+- [ ] `session_360` mantiene cobertura para `client` y resuelve `organization_id` para `efeonce_internal`
 - [ ] `CanonicalPersonRecord` incluye `primaryOrganizationId`, `primaryOrganizationName`, `isEfeonceCollaborator`
 - [ ] Tests unitarios para resolución de org en canonical person y session
 

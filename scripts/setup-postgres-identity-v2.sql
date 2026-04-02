@@ -181,8 +181,18 @@ WHERE role_code = 'efeonce_admin'
 -- Fast-path session resolution for login
 -- ────────────────────────────────────────────────────────────
 
-DROP VIEW IF EXISTS greenhouse_serving.session_360;
 CREATE OR REPLACE VIEW greenhouse_serving.session_360 AS
+WITH operating_entity AS (
+  SELECT
+    o.organization_id,
+    o.public_id AS organization_public_id,
+    o.organization_name
+  FROM greenhouse_core.organizations o
+  WHERE o.is_operating_entity = TRUE
+    AND o.active = TRUE
+  ORDER BY o.updated_at DESC NULLS LAST, o.created_at DESC NULLS LAST, o.organization_id ASC
+  LIMIT 1
+)
 SELECT
   u.user_id,
   u.public_id,
@@ -208,13 +218,26 @@ SELECT
   u.default_portal_home_path,
   u.last_login_at,
   u.last_login_provider,
-  -- Account 360: space + organization context (nullable until M1 migration runs)
-  spc.space_id,
-  spc.public_id AS space_public_id,
-  org.organization_id,
-  org.public_id AS organization_public_id,
-  org.organization_name,
-  -- Active role codes (temporal filter)
+  CASE
+    WHEN u.tenant_type = 'client' THEN COALESCE(bridge_space.space_id, membership_context.space_id)
+    ELSE NULL::TEXT
+  END AS space_id,
+  CASE
+    WHEN u.tenant_type = 'client' THEN COALESCE(bridge_space.space_public_id, membership_context.space_public_id)
+    ELSE NULL::TEXT
+  END AS space_public_id,
+  CASE
+    WHEN u.tenant_type = 'efeonce_internal' THEN COALESCE(op.organization_id, membership_context.organization_id, bridge_org.organization_id)
+    ELSE COALESCE(bridge_org.organization_id, membership_context.organization_id)
+  END AS organization_id,
+  CASE
+    WHEN u.tenant_type = 'efeonce_internal' THEN COALESCE(op.organization_public_id, membership_context.organization_public_id, bridge_org.public_id)
+    ELSE COALESCE(bridge_org.public_id, membership_context.organization_public_id)
+  END AS organization_public_id,
+  CASE
+    WHEN u.tenant_type = 'efeonce_internal' THEN COALESCE(op.organization_name, membership_context.organization_name, bridge_org.organization_name)
+    ELSE COALESCE(bridge_org.organization_name, membership_context.organization_name)
+  END AS organization_name,
   COALESCE(
     ARRAY_AGG(DISTINCT ura.role_code) FILTER (
       WHERE ura.active
@@ -223,12 +246,10 @@ SELECT
     ),
     ARRAY[]::TEXT[]
   ) AS role_codes,
-  -- Route groups derived from roles
   COALESCE(
-    ARRAY_AGG(DISTINCT rg) FILTER (WHERE rg IS NOT NULL),
+    ARRAY_AGG(DISTINCT rg.rg) FILTER (WHERE rg.rg IS NOT NULL),
     ARRAY[]::TEXT[]
   ) AS route_groups,
-  -- Feature flags for tenant
   COALESCE(
     ARRAY_AGG(DISTINCT cff.flag_code) FILTER (WHERE cff.enabled),
     ARRAY[]::TEXT[]
@@ -236,15 +257,50 @@ SELECT
 FROM greenhouse_core.client_users AS u
 LEFT JOIN greenhouse_core.clients AS c
   ON c.client_id = u.client_id
-LEFT JOIN greenhouse_core.spaces AS spc
-  ON spc.client_id = u.client_id AND spc.active = TRUE
-LEFT JOIN greenhouse_core.organizations AS org
-  ON org.organization_id = spc.organization_id AND org.active = TRUE
+LEFT JOIN LATERAL (
+  SELECT
+    s.space_id,
+    s.public_id AS space_public_id,
+    s.organization_id
+  FROM greenhouse_core.spaces s
+  WHERE s.client_id = u.client_id
+    AND s.active = TRUE
+  ORDER BY s.updated_at DESC NULLS LAST, s.created_at DESC NULLS LAST, s.space_id ASC
+  LIMIT 1
+) AS bridge_space ON TRUE
+LEFT JOIN greenhouse_core.organizations AS bridge_org
+  ON bridge_org.organization_id = bridge_space.organization_id
+ AND bridge_org.active = TRUE
+LEFT JOIN LATERAL (
+  SELECT
+    pm.space_id,
+    s.public_id AS space_public_id,
+    pm.organization_id,
+    o.public_id AS organization_public_id,
+    o.organization_name
+  FROM greenhouse_core.person_memberships pm
+  LEFT JOIN greenhouse_core.spaces s
+    ON s.space_id = pm.space_id
+  LEFT JOIN greenhouse_core.organizations o
+    ON o.organization_id = pm.organization_id
+   AND o.active = TRUE
+  WHERE pm.profile_id = u.identity_profile_id
+    AND pm.active = TRUE
+  ORDER BY
+    pm.is_primary DESC,
+    pm.updated_at DESC NULLS LAST,
+    pm.created_at DESC NULLS LAST,
+    pm.membership_id ASC
+  LIMIT 1
+) AS membership_context ON TRUE
+LEFT JOIN operating_entity AS op
+  ON TRUE
 LEFT JOIN greenhouse_core.user_role_assignments AS ura
   ON ura.user_id = u.user_id
 LEFT JOIN greenhouse_core.roles AS r
   ON r.role_code = ura.role_code
-LEFT JOIN LATERAL UNNEST(r.route_group_scope) AS rg ON TRUE
+LEFT JOIN LATERAL UNNEST(r.route_group_scope) AS rg(rg)
+  ON TRUE
 LEFT JOIN greenhouse_core.client_feature_flags AS cff
   ON cff.client_id = u.client_id
 GROUP BY
@@ -256,8 +312,11 @@ GROUP BY
   u.password_hash, u.password_hash_algorithm,
   u.timezone, u.default_portal_home_path,
   u.last_login_at, u.last_login_provider,
-  spc.space_id, spc.public_id,
-  org.organization_id, org.public_id, org.organization_name;
+  bridge_space.space_id, bridge_space.space_public_id,
+  membership_context.space_id, membership_context.space_public_id,
+  bridge_org.organization_id, bridge_org.public_id, bridge_org.organization_name,
+  membership_context.organization_id, membership_context.organization_public_id, membership_context.organization_name,
+  op.organization_id, op.organization_public_id, op.organization_name;
 
 -- Update user_360 to include new columns
 DROP VIEW IF EXISTS greenhouse_serving.user_360;
