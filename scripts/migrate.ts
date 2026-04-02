@@ -34,6 +34,28 @@ const buildDatabaseUrl = () => {
   const isLocalProxy = host === '127.0.0.1' || host === 'localhost'
   const sslEnv = process.env.GREENHOUSE_POSTGRES_SSL?.trim()?.toLowerCase() === 'true'
 
+  // ── Fail-fast: Cloud SQL public IP is NOT reachable via TCP ────────
+  // No authorized networks are configured. Connecting to the public IP
+  // will hang for 30+ seconds before ETIMEDOUT. Detect and abort early.
+  if (host && !isLocalProxy && !host.endsWith('.internal')) {
+    console.error(`
+┌─────────────────────────────────────────────────────────────────┐
+│  GREENHOUSE_POSTGRES_HOST="${host}" is not reachable   │
+│  via direct TCP. Cloud SQL has no authorized networks.          │
+│                                                                 │
+│  Start the Cloud SQL Auth Proxy first:                          │
+│    cloud-sql-proxy "efeonce-group:us-east4:greenhouse-pg-dev"   │
+│      --port 15432                                               │
+│                                                                 │
+│  Then set in .env.local:                                        │
+│    GREENHOUSE_POSTGRES_HOST="127.0.0.1"                         │
+│    GREENHOUSE_POSTGRES_PORT="15432"                              │
+│    GREENHOUSE_POSTGRES_SSL="false"                               │
+└─────────────────────────────────────────────────────────────────┘
+`)
+    process.exit(1)
+  }
+
   // Cloud SQL Proxy handles encryption — SSL on top of the tunnel causes a handshake deadlock.
   // Auto-disable SSL when connecting through the local proxy, regardless of env var.
   const ssl = sslEnv && !isLocalProxy

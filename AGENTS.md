@@ -226,19 +226,20 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - **La IP pública de Cloud SQL (`34.86.135.144`) NO es accesible por TCP directo** — no hay authorized networks configuradas. Intentar conectar da `ETIMEDOUT`.
 - **Prioridad en `src/lib/postgres/client.ts`**: si `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` está definida, el Connector toma prioridad sobre `GREENHOUSE_POSTGRES_HOST`. Ambas pueden coexistir en `.env.local`.
 - **Prerequisito**: credenciales GCP válidas — `GOOGLE_APPLICATION_CREDENTIALS_JSON` en env, o ADC local (`gcloud auth application-default login`), o WIF (Vercel). El service account necesita `roles/cloudsql.client`.
-- **Todos los scripts Node.js** (`pnpm migrate:up`, `pnpm db:generate-types`, `pnpm setup:postgres:*`, `pnpm pg:doctor`, scripts de backfill) usan el Connector automáticamente cuando `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` está definida.
-- **Fallback para binarios standalone** (`pg_dump`, `psql`) que NO pasan por Node.js: Cloud SQL Auth Proxy como tunnel local:
+- **Scripts Node.js de runtime** (`pnpm pg:doctor`, `pnpm setup:postgres:*`, scripts de backfill) usan el Connector automáticamente cuando `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` está definida.
+- **Migraciones y binarios standalone** (`pnpm migrate:up`, `pnpm migrate:down`, `pnpm db:generate-types`, `pg_dump`, `psql`) requieren **Cloud SQL Auth Proxy** corriendo como tunnel local:
   ```bash
   cloud-sql-proxy "efeonce-group:us-east4:greenhouse-pg-dev" --port 15432
   ```
-  Luego en `.env.local` (solo para binarios standalone):
+  `.env.local` debe tener:
   ```
   GREENHOUSE_POSTGRES_HOST="127.0.0.1"
   GREENHOUSE_POSTGRES_PORT="15432"
   GREENHOUSE_POSTGRES_SSL="false"
   ```
-- **Si no tienes `cloud-sql-proxy`** (solo necesario para `pg_dump`/`psql`): `gcloud components install cloud-sql-proxy`.
-- **Regla**: si un script Node.js falla con `ETIMEDOUT`, verificar que `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` esté definida y que las credenciales GCP sean válidas. Si un binario standalone falla, verificar que el Cloud SQL Auth Proxy esté corriendo.
+- **Guardia fail-fast**: `scripts/migrate.ts` detecta si `GREENHOUSE_POSTGRES_HOST` apunta a una IP pública (ej. `34.86.135.144`) y aborta inmediatamente con instrucciones claras en vez de esperar timeout. **No intentar conectar a la IP pública de Cloud SQL — no hay authorized networks.**
+- **Si no tienes `cloud-sql-proxy`**: `gcloud components install cloud-sql-proxy`.
+- **Regla**: si un script Node.js de runtime falla con `ETIMEDOUT`, verificar que `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` esté definida y que las credenciales GCP sean válidas. Si una migración o binario standalone falla, verificar que el Cloud SQL Auth Proxy esté corriendo en `127.0.0.1:15432`.
 
 ### Acceso PostgreSQL
 - Greenhouse usa cuatro perfiles de acceso para PostgreSQL:
@@ -317,7 +318,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   3. `pnpm migrate:up` — aplica contra la base de datos (auto-regenera tipos Kysely)
   4. Commit migración + `db.d.ts` actualizado **juntos** en el mismo commit
   5. `pnpm build` para verificar que los tipos son consistentes
-- Conexión local: usa Cloud SQL Connector automáticamente si `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` está definida en `.env.local`. No requiere proxy ni IP directa.
+- Conexión local: requiere Cloud SQL Auth Proxy corriendo en `127.0.0.1:15432`. El script tiene guardia fail-fast que aborta si detecta IP pública como host — no esperar timeout, leer el mensaje de error.
 - Spec completa: `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`
 
 ## Task Lifecycle Protocol
