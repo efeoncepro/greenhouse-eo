@@ -34,7 +34,7 @@ vi.mock('./get-organization-operational-serving', () => ({
   getOrganizationOperationalServing: vi.fn()
 }))
 
-const { getOrganizationMemberships } = await import('./organization-store')
+const { getOrganizationMemberships, ensureOrganizationContactMembership } = await import('./organization-store')
 
 describe('getOrganizationMemberships', () => {
   beforeEach(() => {
@@ -123,5 +123,36 @@ describe('getOrganizationMemberships', () => {
         employmentType: null
       }
     ])
+  })
+})
+
+describe('ensureOrganizationContactMembership', () => {
+  beforeEach(() => {
+    mockQuery.mockReset()
+  })
+
+  it('creates a supplier contact membership even when the contact has no email yet', async () => {
+    mockQuery
+      .mockResolvedValueOnce([]) // identity profile upsert
+      .mockResolvedValueOnce([]) // membershipExists
+      .mockResolvedValueOnce([]) // createMembership insert
+
+    const profileId = await ensureOrganizationContactMembership({
+      organizationId: 'org-supplier-1',
+      sourceSystem: 'finance_supplier',
+      sourceObjectType: 'primary_contact',
+      sourceObjectId: 'supplier-1',
+      fullName: 'Accounts Payable',
+      canonicalEmail: null,
+      membershipType: 'contact',
+      roleLabel: 'Supplier primary contact',
+      isPrimary: true
+    })
+
+    expect(profileId).toBe('identity-finance-supplier-primary-contact-supplier-1')
+    expect(mockQuery).toHaveBeenCalledTimes(3)
+    expect(String(mockQuery.mock.calls[0][0])).toContain('INSERT INTO greenhouse_core.identity_profiles')
+    expect(mockQuery.mock.calls[0][1][2]).toBeNull()
+    expect(String(mockQuery.mock.calls[2][0])).toContain('INSERT INTO greenhouse_core.person_memberships')
   })
 })

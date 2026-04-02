@@ -51,6 +51,13 @@ interface Supplier {
   defaultPaymentTerms: number
   primaryContactName: string | null
   primaryContactEmail: string | null
+  organizationContactsCount: number
+  contactSummary: {
+    name: string | null
+    email: string | null
+    role: string | null
+    source: 'organization_membership' | 'primary_contact_legacy'
+  } | null
   isActive: boolean
 }
 
@@ -137,8 +144,37 @@ const supColumns: ColumnDef<Supplier, any>[] = [
     header: 'Contacto',
     cell: ({ row }) => row.original.primaryContactName ? (
       <Box>
-        <Typography variant='body2' fontSize='0.8rem'>{row.original.primaryContactName}</Typography>
-        {row.original.primaryContactEmail && <Typography variant='caption' color='text.secondary'>{row.original.primaryContactEmail}</Typography>}
+        <Typography variant='body2' fontSize='0.8rem'>
+          {row.original.contactSummary?.name || row.original.primaryContactName}
+        </Typography>
+        {(row.original.contactSummary?.email || row.original.primaryContactEmail) && (
+          <Typography variant='caption' color='text.secondary'>
+            {row.original.contactSummary?.email || row.original.primaryContactEmail}
+          </Typography>
+        )}
+        <Box sx={{ mt: 1, display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
+          {row.original.contactSummary?.source ? (
+            <CustomChip
+              round='true'
+              size='small'
+              variant='tonal'
+              color={row.original.contactSummary.source === 'organization_membership' ? 'info' : 'secondary'}
+              label={row.original.contactSummary.source === 'organization_membership' ? 'Org' : 'Legacy'}
+            />
+          ) : null}
+          {row.original.organizationContactsCount > 1 ? (
+            <Typography variant='caption' color='text.secondary'>
+              +{row.original.organizationContactsCount - 1} más
+            </Typography>
+          ) : null}
+        </Box>
+      </Box>
+    ) : row.original.contactSummary ? (
+      <Box>
+        <Typography variant='body2' fontSize='0.8rem'>{row.original.contactSummary.name || 'Sin nombre'}</Typography>
+        {row.original.contactSummary.email && (
+          <Typography variant='caption' color='text.secondary'>{row.original.contactSummary.email}</Typography>
+        )}
       </Box>
     ) : <Typography variant='caption' color='text.secondary'>—</Typography>
   }),

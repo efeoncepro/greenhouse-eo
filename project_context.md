@@ -8,6 +8,18 @@
   - `efeonce_internal` por operating entity
 - `greenhouse_serving.person_360` ya expone org primaria, aliases `eo_id` / `member_id` / `user_id` y `is_efeonce_collaborator`; consumers canónicos como `CanonicalPersonRecord` deben preferir este backbone antes de recomponer contexto org ad hoc.
 - `Organization memberships` ya distinguen `internal` vs `staff_augmentation` como contexto operativo del vínculo cliente sobre `team_member`; la distinción vive en `assignmentType`/`assignedFte`, no en un `membership_type` nuevo.
+- `People` ya consume `organizationId` compartido en los readers visibles para tenant `client`:
+  - `finance`
+  - `delivery`
+  - `ico-profile`
+  - `ico`
+  - aggregate `GET /api/people/[memberId]`
+- `HR` e `intelligence` siguen sin serving org-aware seguro; por ahora quedan cerrados con `403` para tenant `client` en vez de filtrar member-first.
+- `Suppliers` ya puede sembrar contactos mínimos en Account 360:
+  - `organizations/[id]/memberships` acepta crear `identity_profile` ad hoc con nombre + email
+  - `finance/suppliers` create/update ya intenta sembrar `person_memberships(contact)` cuando el supplier tiene `organization_id`
+  - `Finance Suppliers` detail/list ya prioriza esos contactos vía `organizationContacts` / `contactSummary`
+  - `primary_contact_*` se mantiene como cache transicional para fallback BigQuery y suppliers sin memberships
 - Operación DB validada nuevamente:
   - `pnpm migrate:up` sigue requiriendo Cloud SQL Proxy local (`127.0.0.1:15432`) cuando el wrapper deriva a TCP directo; la IP pública de Cloud SQL continúa no accesible.
 

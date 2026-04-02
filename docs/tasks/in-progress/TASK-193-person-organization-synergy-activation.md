@@ -15,6 +15,18 @@
 - La base real **no** tiene ninguna organización con `is_operating_entity = TRUE`; por lo tanto, la parte de la task que asume un operating entity listo para poblar sesión interna y memberships de Efeonce requiere primero definir/sembrar ese anchor canónico.
 - La data activa hoy en memberships está concentrada en `client_contact` y `team_member`; la spec no puede asumir que `contact`, `client_user` o `billing` ya son el contrato operativo predominante.
 
+## Delta 2026-04-02 — org-scoping residual y supplier contacts mínimos
+
+- `delivery`, `ico-profile`, `ico` y el aggregate `GET /api/people/[memberId]` ya consumen `organizationId` cuando el request llega org-scoped desde `People`.
+- El helper shared `resolvePeopleOrganizationScope()` pasó a ser el carril canónico para `People` routes; además se endureció `assertMemberInPeopleOrganizationScope()` para evitar leer personas fuera de la org del tenant `client`.
+- Los facets sin versión org-aware segura (`HR` e `intelligence`) ahora devuelven `403` para tenant `client` en lugar de exponer data member-first.
+- `organizations/[id]/memberships` y `AddMembershipDrawer` ya pueden crear un `identity_profile` ad hoc con nombre + email antes de sembrar la membership, habilitando contactos mínimos para orgs `supplier` y `both`.
+- `finance/suppliers` create/update ahora siembran `organization contact memberships` cuando existe `organization_id` y contacto primario usable, manteniendo `primary_contact_*` como cache/compatibilidad.
+- `Finance Suppliers` detail/list ya leen `organization contacts` cuando el supplier está vinculado a una org canónica:
+  - detail expone `organizationContacts`
+  - list expone `contactSummary` + `organizationContactsCount`
+  - `primary_contact_*` se mantiene como fallback legacy para el carril BigQuery y orgs sin memberships
+
 ## Objetivo
 
 Cablear las sinergias reales entre Person (`identity_profiles`) y Organization (`organizations`) que hoy existen a nivel de schema pero no están siendo consumidas por los módulos downstream. La infraestructura Account 360 (`person_memberships`, serving views, assignment sync) está construida; lo que falta es que finance, payroll, delivery, session y resolución canónica la aprovechen — con claridad sobre las dos poblaciones distintas que conviven en el modelo.
@@ -135,9 +147,9 @@ El sistema tiene dos formas de vincular colaboradores Efeonce a clientes:
 | G0 | **Membership types sin contrato institucionalizado** — el `CHECK constraint` ya existe, pero no hay helper shared para distinguir "persona de Efeonce asignada" vs "persona nativa de la org", y el runtime sigue mezclando `client_contact` legacy con los tipos nuevos. Las queries usan `= 'team_member'` hardcodeado. | A + B | Arquitectural | `greenhouse_core.person_memberships` |
 | G1 | **CanonicalPersonRecord no tiene contexto de org** — resuelve identity/member/user pero nunca toca `person_memberships` ni `organizations`. A pesar de que assignment_membership_sync mantiene memberships al día, ningún consumer de CanonicalPerson las lee. | A + B | Bloqueante para G3-G4 | `src/lib/identity/canonical-person.ts` |
 | G2 | **Session interna sin `organizationId`** — Los campos existen en `TenantAccessRecord` y ya se resuelven bien para `tenant_type = 'client'`, pero siguen vacíos para `efeonce_internal`. Sin un anchor organizacional interno, las rutas no pueden hacer org-scoping homogéneo. | A | Bloqueante para org-scoping interno | `src/lib/tenant/identity-store.ts:165`, `greenhouse_serving.session_360` |
-| G3 | **Person-360 facets ignoran contexto org** — delivery, HR, finance, ICO muestran toda la data del colaborador sin filtro por org/cliente. Dato sensible para multi-tenancy cuando Pob. B accede. | A + B | Seguridad y multi-tenancy | `src/lib/person-360/get-person-*.ts` |
+| G3 | **Person-360 facets con org-scoping todavía incompleto** — `finance`, `delivery`, `ico-profile`, `ico` y el aggregate `people/[memberId]` ya aceptan `organizationId`; el residual sigue en serving member-first sin versión org-aware para `intelligence`/`HR`, que por ahora quedan cerrados para tenant `client`. | A + B | Seguridad y multi-tenancy | `src/lib/person-360/get-person-*.ts` |
 | G4 | **No existe anchor operativo de Efeonce en la base real** — no hay ninguna `organization` con `is_operating_entity = TRUE`, y por lo tanto tampoco existe `person_membership` que vincule members a Efeonce como organización. Esto bloquea responder "quiénes son los empleados de Efeonce" desde el grafo de memberships. | A | Modelo incompleto / prerrequisito | `greenhouse_core.organizations`, `greenhouse_core.person_memberships` |
-| G5 | **Proveedores sin modelo de personas (Pob. C)** — Las orgs tipo `supplier` reciben gastos, POs y HES, pero no tienen `person_memberships`. No se puede saber quién es el contacto de un proveedor. Finance referencia `supplier_name` como string libre, no como org+persona. | C | Moderado (crece con escala) | `src/lib/finance/`, `greenhouse_core.organizations` |
+| G5 | **Proveedores con read-path híbrido y sin directorio canónico completo** — create/update de suppliers ya pueden sembrar `identity_profiles` + `person_memberships(contact)` cuando existe `organization_id`, y `Finance Suppliers` detail/list ya prioriza esos contactos; el residual queda en readers legacy/fallback BigQuery y en la ausencia de un directorio org-first completo para proveedores. | C | Moderado (crece con escala) | `src/lib/finance/`, `greenhouse_core.organizations` |
 | G6 | **Orgs duales (`both`) sin distinción de facets** — Una org que es cliente Y proveedor usa el mismo set de memberships. No hay forma de saber si un contacto lo es "como cliente" o "como proveedor" de esa org. | B + C | Edge case hoy, escala después | `greenhouse_core.person_memberships` |
 | G7 | **Staff augmentation con distinción solo parcial en consumers** — `client_team_assignments` tiene `assignment_type = 'staff_augmentation'` para colaboradores colocados en el cliente como pseudo-empleados. La decisión vigente es mantener `team_member` como `membership_type` y distinguir `internal` vs `staff_augmentation` como contexto operativo del vínculo cliente. El gap residual ya no es de modelo base, sino de propagación consistente en readers/UI downstream. | A | Relevante para Agency | `src/lib/sync/projections/assignment-membership-sync.ts` |
 | G8 | **Payroll es 100% member-centric** — no existe vista "equipo de esta org con su payroll/costo". Para Pob. A falta la pregunta "cuánto nos cuesta el equipo asignado a este cliente" como vista org-scoped. | A | Moderado | `src/lib/payroll/` |
@@ -249,6 +261,11 @@ Agregar parámetro `organizationId?: string` a:
 
 Para Pob. B estos facets no aplican (no tienen finance/delivery/ICO propios).
 
+Estado:
+- `finance` ya estaba cerrado
+- `delivery`, `ico-profile`, `ico` y el aggregate `people/[memberId]` ya consumen `organizationId`
+- `HR` e `intelligence` quedan explícitamente cerrados para tenant `client` hasta tener serving org-aware real
+
 #### 3b. Staff augmentation membership refinement
 
 Decisión aplicada:
@@ -265,6 +282,12 @@ Decisión aplicada:
 - Extender `AddMembershipDrawer` para orgs tipo `supplier` y `both`
 - En Finance, vincular `supplier_name` de gastos/POs a una org + contacto cuando exista
 - **No bloquear esta task por Pob. C** — es un follow-on natural, pero el foundation de membership ya lo soporta
+
+Estado:
+- `AddMembershipDrawer` ya permite crear un contacto nuevo con nombre + email si el profile no existe
+- `organizations/[id]/memberships` ya crea `identity_profile` manual antes de sembrar la membership
+- `finance/suppliers` create/update ya siembra membership de contacto primario cuando el supplier tiene `organization_id`
+- `Finance Suppliers` detail/list ya prioriza `organization contacts` cuando existen; el directorio org-first completo y el fallback BigQuery rico siguen como follow-on
 
 #### 4b. Org dual facet distinction (G6)
 
@@ -338,10 +361,10 @@ Decisión aplicada:
 - [ ] `organization_360` people aggregate incluye `memberId`, `assignedFte`, `assignmentType` para Pob. A
 
 ### Fase 3
-- [ ] Al menos un facet de person-360 soporta filtro por `organizationId`
+- [x] `finance`, `delivery`, `ico-profile`, `ico` y `people/[memberId]` soportan `organizationId`
 - [x] Staff aug assignments exponen metadata distinguible en org memberships sin crear `membership_type` nuevo
 
 ### Fase 4
 - [ ] `createIdentityProfile` en org-store pasa por dedup check
-- [ ] Orgs supplier pueden tener `person_memberships` tipo `contact`/`billing`
+- [x] Orgs supplier ya pueden sembrar `person_memberships` tipo `contact`/`billing` por drawer/manual create y por supplier primary contact
 - [ ] Query de auditoría: assignments sin membership correspondiente y viceversa

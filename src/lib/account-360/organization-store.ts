@@ -692,12 +692,16 @@ export const createIdentityProfile = async (data: {
   sourceObjectType: string
   sourceObjectId: string
   fullName: string
-  canonicalEmail: string
+  canonicalEmail?: string | null
 }): Promise<string> => {
-  const existing = await findProfileByEmail(data.canonicalEmail)
+  const canonicalEmail = data.canonicalEmail?.trim().toLowerCase() || null
 
-  if (existing?.profileId) {
-    return existing.profileId
+  if (canonicalEmail) {
+    const existing = await findProfileByEmail(canonicalEmail)
+
+    if (existing?.profileId) {
+      return existing.profileId
+    }
   }
 
   const profileId = buildIdentityProfileId(data)
@@ -707,15 +711,60 @@ export const createIdentityProfile = async (data: {
       profile_id, full_name, canonical_email, source_system,
       source_object_type, source_object_id, active, created_at, updated_at
     ) VALUES ($1, $2, $3, $4, $5, $6, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-    ON CONFLICT (profile_id) DO NOTHING
+    ON CONFLICT (profile_id) DO UPDATE
+    SET
+      full_name = EXCLUDED.full_name,
+      canonical_email = COALESCE(EXCLUDED.canonical_email, greenhouse_core.identity_profiles.canonical_email),
+      updated_at = CURRENT_TIMESTAMP,
+      active = TRUE
   `, [
     profileId,
     data.fullName,
-    data.canonicalEmail.toLowerCase(),
+    canonicalEmail,
     data.sourceSystem,
     data.sourceObjectType,
     data.sourceObjectId
   ])
+
+  return profileId
+}
+
+export const ensureOrganizationContactMembership = async (data: {
+  organizationId: string
+  sourceSystem: string
+  sourceObjectType: string
+  sourceObjectId: string
+  fullName: string
+  canonicalEmail?: string | null
+  membershipType?: string
+  roleLabel?: string | null
+  isPrimary?: boolean
+}): Promise<string | null> => {
+  const fullName = data.fullName.trim()
+
+  if (!fullName) {
+    return null
+  }
+
+  const profileId = await createIdentityProfile({
+    sourceSystem: data.sourceSystem,
+    sourceObjectType: data.sourceObjectType,
+    sourceObjectId: data.sourceObjectId,
+    fullName,
+    canonicalEmail: data.canonicalEmail ?? null
+  })
+
+  const exists = await membershipExists(profileId, data.organizationId)
+
+  if (!exists) {
+    await createMembership({
+      profileId,
+      organizationId: data.organizationId,
+      membershipType: data.membershipType ?? 'contact',
+      roleLabel: data.roleLabel ?? undefined,
+      isPrimary: data.isPrimary ?? true
+    })
+  }
 
   return profileId
 }
@@ -748,6 +797,10 @@ interface OrgSearchRow extends Record<string, unknown> {
   public_id: string
 }
 
+interface SpaceClientIdRow extends Record<string, unknown> {
+  client_id: string | null
+}
+
 export const searchOrganizations = async (query: string): Promise<Array<{ organizationId: string; organizationName: string; publicId: string }>> => {
   const pattern = `%${query}%`
 
@@ -764,6 +817,21 @@ export const searchOrganizations = async (query: string): Promise<Array<{ organi
     organizationName: r.organization_name,
     publicId: r.public_id
   }))
+}
+
+export const getOrganizationClientIds = async (organizationId: string): Promise<string[]> => {
+  const rows = await runGreenhousePostgresQuery<SpaceClientIdRow>(`
+    SELECT DISTINCT s.client_id
+    FROM greenhouse_core.spaces s
+    WHERE s.organization_id = $1
+      AND s.active = TRUE
+      AND s.client_id IS NOT NULL
+    ORDER BY s.client_id
+  `, [organizationId])
+
+  return rows
+    .map(row => (typeof row.client_id === 'string' ? row.client_id.trim() : ''))
+    .filter(Boolean)
 }
 
 // ── Person memberships ─────────────────────────────────────────────────

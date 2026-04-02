@@ -11,6 +11,7 @@ const mockRunFinanceQuery = vi.fn()
 const mockGetFinanceProjectId = vi.fn()
 const mockSyncProviderFromFinanceSupplier = vi.fn()
 const mockResolveCanonicalProviderId = vi.fn()
+const mockGetOrganizationMemberships = vi.fn()
 
 vi.mock('@/lib/tenant/authorization', () => ({
   requireFinanceTenantContext: () => mockRequireFinanceTenantContext()
@@ -26,6 +27,11 @@ vi.mock('@/lib/providers/postgres', () => ({
 
 vi.mock('@/lib/providers/provider-tooling-snapshots', () => ({
   getLatestProviderToolingSnapshot: (...args: unknown[]) => mockGetLatestProviderToolingSnapshot(...args)
+}))
+
+vi.mock('@/lib/account-360/organization-store', () => ({
+  getOrganizationMemberships: (...args: unknown[]) => mockGetOrganizationMemberships(...args),
+  ensureOrganizationContactMembership: vi.fn()
 }))
 
 vi.mock('@/lib/finance/schema', () => ({
@@ -77,6 +83,7 @@ describe('GET /api/finance/suppliers/[id]', () => {
     mockShouldFallbackFromFinancePostgres.mockReturnValue(false)
     mockListFinanceExpensesFromPostgres.mockResolvedValue({ items: [], total: 0, page: 1, pageSize: 20 })
     mockGetLatestProviderToolingSnapshot.mockResolvedValue(null)
+    mockGetOrganizationMemberships.mockResolvedValue([])
     mockRunFinanceQuery.mockResolvedValue([])
     mockEnsureFinanceInfrastructure.mockResolvedValue(undefined)
     mockSyncProviderFromFinanceSupplier.mockResolvedValue(null)
@@ -91,6 +98,7 @@ describe('GET /api/finance/suppliers/[id]', () => {
     mockGetFinanceSupplierFromPostgres.mockResolvedValue({
       supplierId: 'supplier-1',
       providerId: 'anthropic',
+      organizationId: 'org-anthropic',
       legalName: 'Anthropic PBC',
       tradeName: 'Anthropic',
       taxId: '123',
@@ -160,6 +168,26 @@ describe('GET /api/finance/suppliers/[id]', () => {
       snapshotStatus: 'complete',
       materializedAt: '2026-03-30T12:00:00.000Z'
     })
+    mockGetOrganizationMemberships.mockResolvedValue([
+      {
+        membershipId: 'mbr-1',
+        profileId: 'profile-1',
+        fullName: 'Paula Contact',
+        canonicalEmail: 'paula@anthropic.com',
+        membershipType: 'contact',
+        roleLabel: 'Finance Ops',
+        isPrimary: true
+      },
+      {
+        membershipId: 'mbr-2',
+        profileId: 'profile-2',
+        fullName: 'Ignored Team Member',
+        canonicalEmail: 'internal@anthropic.com',
+        membershipType: 'team_member',
+        roleLabel: null,
+        isPrimary: false
+      }
+    ])
 
     const response = await GET(new Request('http://localhost/api/finance/suppliers/supplier-1'), {
       params: Promise.resolve({ id: 'supplier-1' })
@@ -179,6 +207,15 @@ describe('GET /api/finance/suppliers/[id]', () => {
         activeLicenseCount: 3,
         totalProviderCostClp: 3368400
       }),
+      organizationContacts: [
+        {
+          fullName: 'Paula Contact',
+          canonicalEmail: 'paula@anthropic.com',
+          membershipType: 'contact',
+          roleLabel: 'Finance Ops',
+          isPrimary: true
+        }
+      ],
       paymentHistory: [
         {
           expenseId: 'exp-1',
@@ -191,12 +228,15 @@ describe('GET /api/finance/suppliers/[id]', () => {
         }
       ]
     })
+
+    expect(mockGetOrganizationMemberships).toHaveBeenCalledWith('org-anthropic')
   })
 
   it('omits providerTooling when the supplier is not linked to a provider', async () => {
     mockGetFinanceSupplierFromPostgres.mockResolvedValue({
       supplierId: 'supplier-2',
       providerId: null,
+      organizationId: null,
       legalName: 'Local Studio',
       tradeName: null,
       taxId: null,
@@ -234,6 +274,7 @@ describe('GET /api/finance/suppliers/[id]', () => {
     const body = await response.json()
 
     expect(body.providerTooling).toBeNull()
+    expect(body.organizationContacts).toEqual([])
   })
 
   it('auto-links a supplier to a derived canonical provider id through PUT', async () => {

@@ -126,6 +126,10 @@ export async function GET(
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  if (tenant.tenantType === 'client') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
   const { memberId } = await params
   const { searchParams } = new URL(request.url)
   const trendMonths = Math.min(24, Math.max(1, Number(searchParams.get('trend') || '6')))

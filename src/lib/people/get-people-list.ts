@@ -5,7 +5,7 @@ import type { PeopleListPayload, PersonListItem } from '@/types/people'
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { readMemberCapacityEconomicsBatch } from '@/lib/member-capacity-economics/store'
-import { getPeopleTableColumns, pickMemberEmails, roundToTenths, runPeopleQuery, toNumber, toStringArray } from '@/lib/people/shared'
+import { PeopleValidationError, getPeopleTableColumns, pickMemberEmails, roundToTenths, runPeopleQuery, toNumber, toStringArray } from '@/lib/people/shared'
 import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 
 type PeopleListRow = {
@@ -165,7 +165,16 @@ const buildPayload = async (
 // Postgres-first path — roster + pay_regime only; capacity from snapshot
 // ---------------------------------------------------------------------------
 
-const getPeopleListFromPostgres = async (): Promise<PeopleListPayload> => {
+const getPeopleListFromPostgres = async (organizationId?: string | null): Promise<PeopleListPayload> => {
+  const organizationFilterJoin = organizationId
+    ? `
+    JOIN greenhouse_core.person_memberships pm
+      ON pm.profile_id = m.identity_profile_id
+     AND pm.active = TRUE
+     AND pm.organization_id = $1
+     AND pm.membership_type = 'team_member'`
+    : ''
+
   const rows = await runGreenhousePostgresQuery<PeopleListRow>(`
     WITH current_comp AS (
       SELECT DISTINCT ON (member_id)
@@ -188,6 +197,7 @@ const getPeopleListFromPostgres = async (): Promise<PeopleListPayload> => {
       c.pay_regime
     FROM greenhouse_core.members m
     LEFT JOIN current_comp c ON c.member_id = m.member_id
+    ${organizationFilterJoin}
     ORDER BY
       CASE m.role_category
         WHEN 'account' THEN 1
@@ -199,20 +209,26 @@ const getPeopleListFromPostgres = async (): Promise<PeopleListPayload> => {
         ELSE 7
       END,
       m.display_name
-  `)
+  `, organizationId ? [organizationId] : [])
 
   const items = rows.map(normalizePersonListItem)
 
-  return buildPayload(items, getCoveredClientsCountFromPostgres)
+  return buildPayload(items, () => getCoveredClientsCountFromPostgres(organizationId))
 }
 
-const getCoveredClientsCountFromPostgres = async () => {
+const getCoveredClientsCountFromPostgres = async (organizationId?: string | null) => {
   const [row] = await runGreenhousePostgresQuery<{ covered_clients: string | number | null }>(`
-    SELECT COUNT(DISTINCT client_id) AS covered_clients
-    FROM greenhouse_core.client_team_assignments
-    WHERE active = TRUE
-      AND (end_date IS NULL OR end_date >= CURRENT_DATE)
-  `)
+    SELECT COUNT(DISTINCT a.client_id) AS covered_clients
+    FROM greenhouse_core.client_team_assignments a
+    ${organizationId
+      ? `JOIN greenhouse_core.spaces s
+          ON s.client_id = a.client_id
+         AND s.active = TRUE
+         AND s.organization_id = $1`
+      : ''}
+    WHERE a.active = TRUE
+      AND (a.end_date IS NULL OR a.end_date >= CURRENT_DATE)
+  `, organizationId ? [organizationId] : [])
 
   return toNumber(row?.covered_clients)
 }
@@ -324,14 +340,20 @@ const shouldFallbackToLegacy = (error: unknown) => {
   )
 }
 
-export const getPeopleList = async (): Promise<PeopleListPayload> => {
+export const getPeopleList = async (options: { organizationId?: string | null } = {}): Promise<PeopleListPayload> => {
+  const organizationId = options.organizationId?.trim() || null
+
   if (isGreenhousePostgresConfigured()) {
     try {
-      return await getPeopleListFromPostgres()
+      return await getPeopleListFromPostgres(organizationId)
     } catch (error) {
       if (!shouldFallbackToLegacy(error)) throw error
       console.warn('[people/list] Postgres failed, falling back to BigQuery:', error instanceof Error ? error.message : error)
     }
+  }
+
+  if (organizationId) {
+    throw new PeopleValidationError('Organization-scoped people list requires PostgreSQL runtime.', 503)
   }
 
   return getPeopleListFromBigQuery()

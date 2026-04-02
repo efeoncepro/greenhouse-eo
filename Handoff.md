@@ -35,6 +35,16 @@
 - `Organization > People` y `getOrganizationMemberships()` ya distinguen `internal` vs `staff_augmentation` como contexto operativo del vínculo cliente sobre `team_member`, exponiendo `assignmentType` y `assignedFte` sin crear un `membership_type` nuevo
 - se agregó proyección `operating_entity_membership` para mantener el vínculo forward en `member.created` / `member.updated` / `member.deactivated`
 - `createIdentityProfile()` en Account 360 ahora deduplica por email antes de insertar un `identity_profile`
+- Follow-on de cierre ejecutado sobre la misma lane:
+  - `People` ya usa `resolvePeopleOrganizationScope()` como helper compartido para propagar `organizationId` hacia `finance`, `delivery`, `ico-profile`, `ico` y el aggregate `GET /api/people/[memberId]`
+  - `getPersonDeliveryContext()` y `getPersonIcoProfile()` ya soportan org scope real filtrando por los `client_id` activos de la organización, sin recalcular métricas inline fuera del contrato ICO Engine / serving
+  - `HR` e `intelligence` quedaron explícitamente cerrados con `403` para tenant `client` mientras no exista una versión org-aware segura
+  - `organizations/[id]/memberships` y `AddMembershipDrawer` ya permiten crear `identity_profiles` ad hoc con nombre + email antes de sembrar la membership, abriendo la foundation mínima para contactos de suppliers / orgs `both`
+  - `finance/suppliers` create/update ahora intenta sembrar `organization contact memberships` cuando existe `organization_id` y contacto primario usable, manteniendo `primary_contact_*` como compatibilidad transicional
+  - `Finance Suppliers` ya consume esa foundation en lectura:
+    - detail `GET /api/finance/suppliers/[id]` expone `organizationContacts`
+    - list `GET /api/finance/suppliers` expone `contactSummary` + `organizationContactsCount`
+    - `SupplierDetailView` y `SuppliersListView` priorizan contactos org-first y dejan `primary_contact_*` como fallback
 
 ### Validación
 
@@ -43,6 +53,8 @@
 - Queries ad hoc via `tsx` sobre `session_360`, `person_memberships`, `organizations.is_operating_entity` y `members` ✅
 - `GREENHOUSE_POSTGRES_HOST=127.0.0.1 GREENHOUSE_POSTGRES_PORT=15432 GREENHOUSE_POSTGRES_SSL=false pnpm migrate:up` ✅
 - `NEXTAUTH_SECRET=test-secret pnpm exec vitest run src/lib/identity/canonical-person.test.ts src/lib/person-360/get-person-finance.test.ts src/lib/sync/projections/assignment-membership-sync.test.ts src/lib/sync/projections/operating-entity-membership.test.ts` ✅
+- `pnpm exec vitest run src/lib/person-360/get-person-delivery.test.ts src/lib/person-360/get-person-ico-profile.test.ts src/lib/account-360/organization-store.test.ts src/views/greenhouse/organizations/tabs/OrganizationPeopleTab.test.tsx` ✅
+- `pnpm exec vitest run src/app/api/finance/suppliers/[id]/route.test.ts` ✅
 - `pnpm lint` ✅
 - `pnpm build` ✅
 - `rg -n "new Pool\\(" src` → solo `src/lib/postgres/client.ts` ✅

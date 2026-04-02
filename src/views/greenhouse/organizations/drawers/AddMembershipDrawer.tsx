@@ -47,6 +47,8 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [searching, setSearching] = useState(false)
   const [selectedProfile, setSelectedProfile] = useState<SearchResult | null>(null)
+  const [fullName, setFullName] = useState('')
+  const [canonicalEmail, setCanonicalEmail] = useState('')
   const [membershipType, setMembershipType] = useState('contact')
   const [roleLabel, setRoleLabel] = useState('')
   const [department, setDepartment] = useState('')
@@ -60,6 +62,8 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
     setSearchQuery('')
     setSearchResults([])
     setSelectedProfile(null)
+    setFullName('')
+    setCanonicalEmail('')
     setMembershipType('contact')
     setRoleLabel('')
     setDepartment('')
@@ -106,12 +110,14 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
   const handleSelectProfile = (profile: SearchResult) => {
     setSelectedProfile(profile)
     setSearchQuery(profile.fullName ?? profile.canonicalEmail ?? profile.profileId)
+    setFullName(profile.fullName ?? '')
+    setCanonicalEmail(profile.canonicalEmail ?? '')
     setSearchResults([])
   }
 
   const handleSubmit = async () => {
-    if (!selectedProfile) {
-      setError('Selecciona una persona de la lista.')
+    if (!selectedProfile && (!fullName.trim() || !canonicalEmail.trim())) {
+      setError('Selecciona una persona existente o completa nombre y email para crearla.')
 
       return
     }
@@ -124,7 +130,9 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          profileId: selectedProfile.profileId,
+          profileId: selectedProfile?.profileId,
+          fullName: selectedProfile ? undefined : fullName.trim(),
+          canonicalEmail: selectedProfile ? undefined : canonicalEmail.trim(),
           membershipType,
           roleLabel: roleLabel.trim() || undefined,
           department: department.trim() || undefined,
@@ -215,6 +223,31 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
           )}
         </Box>
 
+        {!selectedProfile && (
+          <Stack spacing={2}>
+            <Typography variant='caption' color='text.secondary'>
+              Si la persona todavía no existe en Greenhouse, puedes crear un contacto nuevo para esta organización.
+            </Typography>
+            <CustomTextField
+              fullWidth
+              size='small'
+              label='Nombre completo'
+              placeholder='ej. Ana Pérez'
+              value={fullName}
+              onChange={e => setFullName(e.target.value)}
+            />
+            <CustomTextField
+              fullWidth
+              size='small'
+              type='email'
+              label='Email'
+              placeholder='contacto@empresa.com'
+              value={canonicalEmail}
+              onChange={e => setCanonicalEmail(e.target.value)}
+            />
+          </Stack>
+        )}
+
         {selectedProfile && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 1.5, bgcolor: 'action.hover', borderRadius: 1 }}>
             <i className='tabler-user-check' style={{ fontSize: 18, color: 'var(--mui-palette-success-main)' }} />
@@ -281,7 +314,12 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
         <Button variant='tonal' color='secondary' onClick={onClose} fullWidth>
           Cancelar
         </Button>
-        <Button variant='contained' onClick={handleSubmit} disabled={saving || !selectedProfile} fullWidth>
+        <Button
+          variant='contained'
+          onClick={handleSubmit}
+          disabled={saving || (!selectedProfile && (!fullName.trim() || !canonicalEmail.trim()))}
+          fullWidth
+        >
           {saving ? 'Guardando...' : 'Agregar persona'}
         </Button>
       </Box>

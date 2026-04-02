@@ -35,6 +35,22 @@ Gaps identificados están catalogados en `TASK-193` (`docs/tasks/in-progress/TAS
 - `CanonicalPersonRecord` ya consume contexto organizacional primario y `Finance` ya acepta `organizationId` opcional para scoping downstream.
 - `Organization memberships` ahora exponen la distinción operativa `internal` vs `staff_augmentation` como contexto del vínculo cliente sobre `team_member`; no se creó un `membership_type` nuevo.
 
+## Delta 2026-04-02 — org-scoping de People y contactos mínimos de supplier
+
+- `People` ya tiene un carril shared de scope organizacional vía `resolvePeopleOrganizationScope()`:
+  - `finance`
+  - `delivery`
+  - `ico-profile`
+  - `ico`
+  - `GET /api/people/[memberId]`
+- Cuando el request viene org-scoped desde tenant `client`, esos readers consumen `organizationId` y reducen el universo visible al set de `client_id` asociados a esa organización.
+- Los facets que siguen siendo member-first sin una versión org-aware segura (`HR` e `intelligence`) ahora quedan cerrados con `403` para tenant `client` en lugar de exponer datos fuera del boundary organizacional.
+- La foundation mínima de Población C dejó de ser completamente nula:
+  - `organizations/[id]/memberships` ya puede sembrar `identity_profiles` ad hoc con nombre + email
+  - `finance/suppliers` create/update ya intentan vincular `organization contact memberships` cuando el supplier tiene `organization_id` y contacto usable
+  - `Finance Suppliers` detail/list ya prioriza esos contactos vía `organizationContacts` / `contactSummary`
+  - `primary_contact_*` se mantiene como cache/compatibilidad mientras el fallback BigQuery y el directorio completo de proveedores siguen migrando
+
 ---
 
 ## Core Thesis: Efeonce como agencia
@@ -108,11 +124,11 @@ Contactos de organizaciones tipo `supplier`. Reciben gastos, POs, HES.
 
 | Capa | Estado | Nota |
 |------|--------|------|
-| Identidad | Puede no existir | Muchos proveedores solo tienen nombre comercial como string en Finance |
+| Identidad | Puede no existir | Muchos proveedores legacy solo tienen nombre comercial como string en Finance; create/update nuevos ya pueden sembrar `identity_profiles` mínimos |
 | Org proveedor | `organizations` WHERE `organization_type IN ('supplier', 'both')` | Entidad a la que se emiten POs y gastos |
-| Membership | **No se usa hoy** | Contactos de proveedores no están modelados en `person_memberships` |
+| Membership | Foundation mínima + read-path híbrido | Ya se pueden sembrar `person_memberships(contact)` para contactos primarios de supplier y `Finance Suppliers` ya los prioriza en detail/list; sigue faltando un directorio canónico completo |
 
-Gap catalogado en `TASK-193` (G5).
+Gap residual catalogado en `TASK-193` (G5).
 
 ### Tabla resumen de poblaciones
 

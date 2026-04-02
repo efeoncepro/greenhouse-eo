@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { getPersonFinanceOverview } from '@/lib/people/get-person-finance-overview'
+import { assertMemberInPeopleOrganizationScope, resolvePeopleOrganizationScope } from '@/lib/people/organization-scope'
 import { toPeopleErrorResponse } from '@/lib/people/shared'
 import { requirePeopleTenantContext } from '@/lib/tenant/authorization'
 
@@ -15,21 +16,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ memb
 
   try {
     const { memberId } = await params
-    const { searchParams } = new URL(request.url)
-    const requestedOrganizationId = searchParams.get('organizationId')?.trim() || null
+    const organizationId = resolvePeopleOrganizationScope(request, tenant)
 
-    if (
-      tenant.tenantType === 'client' &&
-      requestedOrganizationId &&
-      tenant.organizationId &&
-      requestedOrganizationId !== tenant.organizationId
-    ) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-    }
-
-    const organizationId = tenant.tenantType === 'client'
-      ? tenant.organizationId
-      : requestedOrganizationId
+    await assertMemberInPeopleOrganizationScope(memberId, organizationId)
 
     const detail = await getPersonFinanceOverview(memberId, { organizationId })
 

@@ -67,6 +67,10 @@ type PostgresFinanceSupplierRow = {
   requires_po: boolean
   is_active: boolean
   notes: string | null
+  organization_contacts_count?: unknown
+  organization_contact_name?: string | null
+  organization_contact_email?: string | null
+  organization_contact_role?: string | null
   created_by_user_id: string | null
   created_at: string | Date | null
   updated_at: string | Date | null
@@ -138,6 +142,13 @@ export type FinanceSupplierRecord = {
   requiresPo: boolean
   isActive: boolean
   notes: string | null
+  organizationContactsCount: number
+  contactSummary: {
+    name: string | null
+    email: string | null
+    role: string | null
+    source: 'organization_membership' | 'primary_contact_legacy'
+  } | null
   createdBy: string | null
   createdAt: string | null
   updatedAt: string | null
@@ -212,6 +223,36 @@ const mapAccount = (row: PostgresFinanceAccountRow): FinanceAccountRecord => ({
 })
 
 const mapSupplier = (row: PostgresFinanceSupplierRow): FinanceSupplierRecord => ({
+  ...(() => {
+    const organizationContactsCount = toNumber(row.organization_contacts_count)
+    const organizationContactName = row.organization_contact_name ? normalizeString(row.organization_contact_name) : null
+    const organizationContactEmail = row.organization_contact_email ? normalizeString(row.organization_contact_email) : null
+    const organizationContactRole = row.organization_contact_role ? normalizeString(row.organization_contact_role) : null
+    const legacyContactName = row.primary_contact_name ? normalizeString(row.primary_contact_name) : null
+    const legacyContactEmail = row.primary_contact_email ? normalizeString(row.primary_contact_email) : null
+
+    const contactSummary =
+      organizationContactName || organizationContactEmail
+        ? {
+            name: organizationContactName,
+            email: organizationContactEmail,
+            role: organizationContactRole,
+            source: 'organization_membership' as const
+          }
+        : legacyContactName || legacyContactEmail
+          ? {
+              name: legacyContactName,
+              email: legacyContactEmail,
+              role: null,
+              source: 'primary_contact_legacy' as const
+            }
+          : null
+
+    return {
+      organizationContactsCount,
+      contactSummary
+    }
+  })(),
   supplierId: normalizeString(row.supplier_id),
   providerId: row.provider_id ? normalizeString(row.provider_id) : null,
   organizationId: row.organization_id ? normalizeString(row.organization_id) : null,
@@ -724,10 +765,26 @@ export const listFinanceSuppliersFromPostgres = async ({
         requires_po,
         is_active,
         notes,
+        organization_contacts.organization_contacts_count,
+        organization_contacts.organization_contact_name,
+        organization_contacts.organization_contact_email,
+        organization_contacts.organization_contact_role,
         created_by_user_id,
         created_at,
         updated_at
       FROM greenhouse_finance.suppliers
+      LEFT JOIN LATERAL (
+        SELECT
+          COUNT(*)::int AS organization_contacts_count,
+          ARRAY_AGG(ip.full_name ORDER BY pm.is_primary DESC, ip.full_name NULLS LAST)[1] AS organization_contact_name,
+          ARRAY_AGG(ip.canonical_email ORDER BY pm.is_primary DESC, ip.full_name NULLS LAST)[1] AS organization_contact_email,
+          ARRAY_AGG(pm.role_label ORDER BY pm.is_primary DESC, ip.full_name NULLS LAST)[1] AS organization_contact_role
+        FROM greenhouse_core.person_memberships pm
+        JOIN greenhouse_core.identity_profiles ip ON ip.profile_id = pm.profile_id
+        WHERE pm.organization_id = greenhouse_finance.suppliers.organization_id
+          AND pm.active = TRUE
+          AND pm.membership_type = ANY(ARRAY['contact', 'billing', 'client_contact']::text[])
+      ) organization_contacts ON TRUE
       ${filterClause}
       ORDER BY COALESCE(trade_name, legal_name) ASC
       LIMIT $5 OFFSET $6
@@ -769,10 +826,26 @@ export const getFinanceSupplierFromPostgres = async (supplierId: string) => {
         requires_po,
         is_active,
         notes,
+        organization_contacts.organization_contacts_count,
+        organization_contacts.organization_contact_name,
+        organization_contacts.organization_contact_email,
+        organization_contacts.organization_contact_role,
         created_by_user_id,
         created_at,
         updated_at
       FROM greenhouse_finance.suppliers
+      LEFT JOIN LATERAL (
+        SELECT
+          COUNT(*)::int AS organization_contacts_count,
+          ARRAY_AGG(ip.full_name ORDER BY pm.is_primary DESC, ip.full_name NULLS LAST)[1] AS organization_contact_name,
+          ARRAY_AGG(ip.canonical_email ORDER BY pm.is_primary DESC, ip.full_name NULLS LAST)[1] AS organization_contact_email,
+          ARRAY_AGG(pm.role_label ORDER BY pm.is_primary DESC, ip.full_name NULLS LAST)[1] AS organization_contact_role
+        FROM greenhouse_core.person_memberships pm
+        JOIN greenhouse_core.identity_profiles ip ON ip.profile_id = pm.profile_id
+        WHERE pm.organization_id = greenhouse_finance.suppliers.organization_id
+          AND pm.active = TRUE
+          AND pm.membership_type = ANY(ARRAY['contact', 'billing', 'client_contact']::text[])
+      ) organization_contacts ON TRUE
       WHERE supplier_id = $1
       LIMIT 1
     `,

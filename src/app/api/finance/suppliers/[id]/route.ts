@@ -5,6 +5,8 @@ import { syncProviderFromFinanceSupplier } from '@/lib/providers/canonical'
 import { resolveCanonicalProviderId } from '@/lib/providers/postgres'
 import { getLatestProviderToolingSnapshot } from '@/lib/providers/provider-tooling-snapshots'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
+import { ensureOrganizationForSupplier } from '@/lib/account-360/organization-identity'
+import { ensureOrganizationContactMembership, getOrganizationMemberships } from '@/lib/account-360/organization-store'
 import {
   runFinanceQuery,
   getFinanceProjectId,
@@ -73,6 +75,34 @@ interface ExpenseHistoryRow {
   description: string
 }
 
+type SupplierOrganizationContact = {
+  fullName: string | null
+  canonicalEmail: string | null
+  membershipType: string
+  roleLabel: string | null
+  isPrimary: boolean
+}
+
+const SUPPLIER_CONTACT_MEMBERSHIP_TYPES = new Set(['contact', 'billing', 'client_contact'])
+
+const toSupplierOrganizationContacts = async (organizationId: string | null | undefined): Promise<SupplierOrganizationContact[]> => {
+  if (!organizationId) {
+    return []
+  }
+
+  const memberships = await getOrganizationMemberships(organizationId)
+
+  return memberships
+    .filter(membership => SUPPLIER_CONTACT_MEMBERSHIP_TYPES.has(membership.membershipType))
+    .map(membership => ({
+      fullName: membership.fullName,
+      canonicalEmail: membership.canonicalEmail,
+      membershipType: membership.membershipType,
+      roleLabel: membership.roleLabel,
+      isPrimary: membership.isPrimary
+    }))
+}
+
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { tenant, errorResponse } = await requireFinanceTenantContext()
 
@@ -87,7 +117,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     const supplier = await getFinanceSupplierFromPostgres(supplierId)
 
     if (supplier) {
-      const [expenses, providerTooling] = await Promise.all([
+      const [expenses, providerTooling, organizationContacts] = await Promise.all([
         listFinanceExpensesFromPostgres({
           supplierId,
           page: 1,
@@ -95,11 +125,13 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
         }),
         supplier.providerId
           ? getLatestProviderToolingSnapshot(supplier.providerId).catch(() => null)
-          : Promise.resolve(null)
+          : Promise.resolve(null),
+        toSupplierOrganizationContacts(supplier.organizationId).catch(() => [])
       ])
 
       return NextResponse.json({
         ...supplier,
+        organizationContacts,
         providerTooling,
         paymentHistory: expenses.items.map(expense => ({
           expenseId: expense.expenseId,
@@ -178,6 +210,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     createdBy: row.created_by ? normalizeString(row.created_by) : null,
     createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
     updatedAt: toTimestampString(row.updated_at as string | { value?: string } | null),
+    organizationContacts: [],
     providerTooling,
     paymentHistory: expenses.map(e => ({
       expenseId: normalizeString(e.expense_id),
@@ -223,25 +256,46 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
           })
         : null
 
+      const legalName = body.legalName !== undefined ? assertNonEmptyString(body.legalName, 'legalName') : existing.legalName
+      const tradeName = body.tradeName !== undefined ? (body.tradeName ? normalizeString(body.tradeName) : null) : existing.tradeName
+      const taxId = body.taxId !== undefined ? (body.taxId ? normalizeString(body.taxId) : null) : existing.taxId
+      const taxIdType = body.taxIdType !== undefined ? (body.taxIdType ? normalizeString(body.taxIdType) : null) : existing.taxIdType
+      const country = body.country !== undefined ? (normalizeString(body.country) || 'CL') : existing.country
+      const primaryContactName = body.primaryContactName !== undefined ? (body.primaryContactName ? normalizeString(body.primaryContactName) : null) : existing.primaryContactName
+      const primaryContactEmail = body.primaryContactEmail !== undefined ? (body.primaryContactEmail ? normalizeString(body.primaryContactEmail) : null) : existing.primaryContactEmail
+      const primaryContactPhone = body.primaryContactPhone !== undefined ? (body.primaryContactPhone ? normalizeString(body.primaryContactPhone) : null) : existing.primaryContactPhone
+
+      const organizationId = existing.organizationId || (
+        taxId
+          ? await ensureOrganizationForSupplier({
+              taxId,
+              taxIdType: taxIdType ?? undefined,
+              legalName,
+              tradeName,
+              country
+            })
+          : null
+      )
+
       const updatedSupplier = await seedFinanceSupplierInPostgres({
         supplierId,
         providerId:
           autoLinkedProviderId ||
           (body.providerId !== undefined ? (body.providerId ? normalizeString(body.providerId) : null) : existing.providerId),
-        organizationId: existing.organizationId,
-        legalName: body.legalName !== undefined ? assertNonEmptyString(body.legalName, 'legalName') : existing.legalName,
-        tradeName: body.tradeName !== undefined ? (body.tradeName ? normalizeString(body.tradeName) : null) : existing.tradeName,
-        taxId: body.taxId !== undefined ? (body.taxId ? normalizeString(body.taxId) : null) : existing.taxId,
-        taxIdType: body.taxIdType !== undefined ? (body.taxIdType ? normalizeString(body.taxIdType) : null) : existing.taxIdType,
-        country: body.country !== undefined ? (normalizeString(body.country) || 'CL') : existing.country,
+        organizationId,
+        legalName,
+        tradeName,
+        taxId,
+        taxIdType,
+        country,
         category: body.category !== undefined
           ? (SUPPLIER_CATEGORIES.includes(body.category) ? body.category as SupplierCategory : 'other')
           : existing.category,
         serviceType: body.serviceType !== undefined ? (body.serviceType ? normalizeString(body.serviceType) : null) : existing.serviceType,
         isInternational: body.isInternational !== undefined ? Boolean(body.isInternational) : existing.isInternational,
-        primaryContactName: body.primaryContactName !== undefined ? (body.primaryContactName ? normalizeString(body.primaryContactName) : null) : existing.primaryContactName,
-        primaryContactEmail: body.primaryContactEmail !== undefined ? (body.primaryContactEmail ? normalizeString(body.primaryContactEmail) : null) : existing.primaryContactEmail,
-        primaryContactPhone: body.primaryContactPhone !== undefined ? (body.primaryContactPhone ? normalizeString(body.primaryContactPhone) : null) : existing.primaryContactPhone,
+        primaryContactName,
+        primaryContactEmail,
+        primaryContactPhone,
         website: body.website !== undefined ? (body.website ? normalizeString(body.website) : null) : existing.website,
         bankName: body.bankName !== undefined ? (body.bankName ? normalizeString(body.bankName) : null) : existing.bankName,
         bankAccountNumber: body.bankAccountNumber !== undefined ? (body.bankAccountNumber ? normalizeString(body.bankAccountNumber) : null) : existing.bankAccountNumber,
@@ -257,6 +311,20 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         notes: body.notes !== undefined ? (body.notes ? normalizeString(body.notes) : null) : existing.notes,
         createdBy: existing.createdBy
       })
+
+      if (organizationId) {
+        await ensureOrganizationContactMembership({
+          organizationId,
+          sourceSystem: 'finance_supplier',
+          sourceObjectType: 'primary_contact',
+          sourceObjectId: supplierId,
+          fullName: primaryContactName ?? '',
+          canonicalEmail: primaryContactEmail,
+          membershipType: 'contact',
+          roleLabel: 'Supplier primary contact',
+          isPrimary: true
+        })
+      }
 
 
       await syncProviderFromFinanceSupplier({

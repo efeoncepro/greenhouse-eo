@@ -48,6 +48,14 @@ interface PaymentRecord {
   description: string
 }
 
+interface SupplierContact {
+  fullName: string | null
+  canonicalEmail: string | null
+  membershipType: string
+  roleLabel: string | null
+  isPrimary: boolean
+}
+
 interface SupplierDetail {
   supplierId: string
   providerId: string | null
@@ -76,6 +84,7 @@ interface SupplierDetail {
   createdBy: string
   createdAt: string
   updatedAt: string
+  organizationContacts: SupplierContact[]
   providerTooling: SupplierProviderToolingSnapshot | null
   paymentHistory: PaymentRecord[]
 }
@@ -106,6 +115,12 @@ const PAYMENT_METHOD_LABELS: Record<string, string> = {
   cash: 'Efectivo',
   credit_card: 'Tarjeta de crédito',
   other: 'Otro'
+}
+
+const CONTACT_TYPE_LABELS: Record<string, string> = {
+  contact: 'Contacto',
+  billing: 'Facturación',
+  client_contact: 'Contacto cliente'
 }
 
 // ---------------------------------------------------------------------------
@@ -277,6 +292,7 @@ const SupplierDetailView = () => {
   // -------------------------------------------------------------------------
 
   const categoryLabel = CATEGORY_LABELS[supplier.category] ?? supplier.category
+  const hasCanonicalContacts = supplier.organizationContacts.length > 0
 
   return (
     <Box sx={{ p: { xs: 2, md: 4 } }}>
@@ -441,7 +457,7 @@ const SupplierDetailView = () => {
               </Card>
             </Grid>
 
-            {/* Contacto principal */}
+            {/* Contactos */}
             <Grid size={{ xs: 12 }}>
               <Card elevation={0} sx={{ border: t => '1px solid ' + t.palette.divider }}>
                 <CardHeader
@@ -450,24 +466,85 @@ const SupplierDetailView = () => {
                       <i className='tabler-user' />
                     </Avatar>
                   }
-                  title='Contacto principal'
+                  title={hasCanonicalContacts ? 'Contactos canónicos' : 'Contacto principal'}
                   titleTypographyProps={{ variant: 'h6' }}
                 />
                 <CardContent>
-                  <Grid container spacing={3}>
-                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                      <FieldRow label='Nombre' value={supplier.primaryContactName} />
+                  {hasCanonicalContacts ? (
+                    <Stack spacing={3}>
+                      <Alert severity='info' variant='outlined'>
+                        Este proveedor ya tiene contactos vinculados desde `Account 360` sobre su organización canónica.
+                      </Alert>
+
+                      <Grid container spacing={3}>
+                        {supplier.organizationContacts.map((contact, index) => (
+                          <Grid key={`${contact.canonicalEmail || contact.fullName || 'contact'}-${index}`} size={{ xs: 12, md: 6 }}>
+                            <Box
+                              sx={{
+                                p: 3,
+                                border: t => `1px solid ${t.palette.divider}`,
+                                borderRadius: 2,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 2
+                              }}
+                            >
+                              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                                <CustomChip
+                                  round='true'
+                                  size='small'
+                                  variant='tonal'
+                                  color={contact.isPrimary ? 'success' : 'secondary'}
+                                  label={contact.isPrimary ? 'Primario' : 'Secundario'}
+                                />
+                                <CustomChip
+                                  round='true'
+                                  size='small'
+                                  variant='tonal'
+                                  color='info'
+                                  label={CONTACT_TYPE_LABELS[contact.membershipType] ?? contact.membershipType}
+                                />
+                              </Stack>
+
+                              <Grid container spacing={3}>
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                  <FieldRow label='Nombre' value={contact.fullName} />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                  <FieldRow label='Correo electrónico' value={contact.canonicalEmail} />
+                                </Grid>
+                                <Grid size={{ xs: 12 }}>
+                                  <FieldRow label='Rol' value={contact.roleLabel} />
+                                </Grid>
+                              </Grid>
+                            </Box>
+                          </Grid>
+                        ))}
+
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                          <FieldRow label='Sitio web' value={supplier.website} />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                          <FieldRow label='Contacto legacy' value={supplier.primaryContactName || supplier.primaryContactEmail || supplier.primaryContactPhone} />
+                        </Grid>
+                      </Grid>
+                    </Stack>
+                  ) : (
+                    <Grid container spacing={3}>
+                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                        <FieldRow label='Nombre' value={supplier.primaryContactName} />
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                        <FieldRow label='Correo electrónico' value={supplier.primaryContactEmail} />
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                        <FieldRow label='Teléfono' value={supplier.primaryContactPhone} />
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                        <FieldRow label='Sitio web' value={supplier.website} />
+                      </Grid>
                     </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                      <FieldRow label='Correo electrónico' value={supplier.primaryContactEmail} />
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                      <FieldRow label='Teléfono' value={supplier.primaryContactPhone} />
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                      <FieldRow label='Sitio web' value={supplier.website} />
-                    </Grid>
-                  </Grid>
+                  )}
                 </CardContent>
               </Card>
             </Grid>
