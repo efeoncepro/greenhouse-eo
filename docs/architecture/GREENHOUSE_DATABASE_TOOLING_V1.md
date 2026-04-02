@@ -168,13 +168,26 @@ const members = await db
 
 ## 5. Connectivity & Credentials
 
-### Critical: Cloud SQL is NOT directly accessible
+### Critical: Cloud SQL is NOT directly accessible via TCP
 
-The Cloud SQL public IP (`34.86.135.144`) has **authorized networks** configured. Most developer machines and CI environments are NOT in that list. Connecting directly will fail with `ETIMEDOUT` or `connection timeout`.
+The Cloud SQL public IP (`34.86.135.144`) has **no authorized networks** configured. Connecting directly via TCP will fail with `ETIMEDOUT` or `connection timeout`.
 
-**This affects ALL CLI tools**: `pnpm migrate:*`, `pnpm db:generate-types`, `pnpm setup:postgres:*`, `pnpm pg:doctor`, `pg_dump`, and any direct query script.
+### Preferred method: Cloud SQL Connector (all environments)
 
-### Solution: Cloud SQL Auth Proxy
+The `@google-cloud/cloud-sql-connector` npm library connects **without TCP** — it negotiates a secure tunnel via the Cloud SQL Admin API. This is the preferred method for **all environments**: Vercel runtime, local development, AI agents, and CI.
+
+When `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` is set, `src/lib/postgres/client.ts` (line 133) uses the Connector automatically, taking priority over `GREENHOUSE_POSTGRES_HOST`.
+
+**Prerequisites:**
+- `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=efeonce-group:us-east4:greenhouse-pg-dev`
+- Valid GCP credentials: `GOOGLE_APPLICATION_CREDENTIALS_JSON` in env, ADC (`gcloud auth application-default login`), or WIF (Vercel)
+- Service account needs `roles/cloudsql.client`
+
+**This covers ALL Node.js tools**: `pnpm migrate:*`, `pnpm db:generate-types`, `pnpm setup:postgres:*`, `pnpm pg:doctor`, backfill scripts, and the portal runtime.
+
+### Fallback: Cloud SQL Auth Proxy (standalone binaries only)
+
+Standalone binaries like `pg_dump` and `psql` cannot use the Node.js Connector. For these, use Cloud SQL Auth Proxy:
 
 ```bash
 # Install (once)
@@ -183,7 +196,7 @@ gcloud components install cloud-sql-proxy
 # Start proxy (each session)
 cloud-sql-proxy "efeonce-group:us-east4:greenhouse-pg-dev" --port 15432
 
-# Configure .env.local for proxy
+# Configure .env.local for standalone binaries
 GREENHOUSE_POSTGRES_HOST="127.0.0.1"
 GREENHOUSE_POSTGRES_PORT="15432"
 GREENHOUSE_POSTGRES_SSL="false"
@@ -195,10 +208,10 @@ The proxy authenticates via Application Default Credentials (`gcloud auth applic
 
 | Path | Used by | How |
 |------|---------|-----|
-| **Cloud SQL Connector** | Portal runtime (Vercel) | `@google-cloud/cloud-sql-connector` + IAM auth, via `src/lib/postgres/client.ts` |
-| **Cloud SQL Auth Proxy** | All CLI tools (local/CI) | TCP tunnel via `cloud-sql-proxy`, connects to `127.0.0.1:15432` |
+| **Cloud SQL Connector** | All Node.js contexts (Vercel, local, agents, CI) | `@google-cloud/cloud-sql-connector` + IAM auth, via `src/lib/postgres/client.ts`. Preferred. |
+| **Cloud SQL Auth Proxy** | Standalone binaries (`pg_dump`, `psql`) | TCP tunnel via `cloud-sql-proxy`, connects to `127.0.0.1:15432`. Fallback only. |
 
-These are two different mechanisms for the same database. The Connector is embedded in the Node.js runtime; the Proxy is a standalone binary that creates a local TCP tunnel.
+These are two different mechanisms for the same database. The Connector is embedded in the Node.js runtime; the Proxy is a standalone binary that creates a local TCP tunnel. Both authenticate via GCP IAM.
 
 ### Runtime (portal application)
 
@@ -206,7 +219,7 @@ Uses Cloud SQL Connector + Secret Manager. No changes needed. Connection is mana
 
 ### CLI tools (migrations, setup, codegen)
 
-Require Cloud SQL Auth Proxy running locally.
+Use Cloud SQL Connector automatically when `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` is set. No proxy needed.
 
 | Variable | Required | Value with proxy |
 |----------|----------|-----------------|

@@ -222,23 +222,23 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - No asumir que Vercel tiene variables cargadas.
 
 ### Conectividad PostgreSQL (leer ANTES de cualquier operación DB)
-- **El runtime del portal** (Vercel) conecta via Cloud SQL Connector + IAM. No necesita IP directa ni proxy.
-- **Scripts CLI locales** (migraciones, setup, codegen, pg_dump) **NO pueden usar el Connector**. Necesitan conexión TCP directa.
-- **La IP pública de Cloud SQL (`34.86.135.144`) NO es accesible directamente** desde máquinas que no estén en la lista de authorized networks de Cloud SQL. Intentar conectar da `ETIMEDOUT`.
-- **Solución obligatoria para CLI**: usar Cloud SQL Auth Proxy como tunnel local:
+- **Método preferido (todos los entornos)**: Cloud SQL Connector vía `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`. Conecta sin TCP directo — negocia un túnel seguro por la Cloud SQL Admin API. Funciona en Vercel (WIF + OIDC), local, y agentes AI.
+- **La IP pública de Cloud SQL (`34.86.135.144`) NO es accesible por TCP directo** — no hay authorized networks configuradas. Intentar conectar da `ETIMEDOUT`.
+- **Prioridad en `src/lib/postgres/client.ts`**: si `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` está definida, el Connector toma prioridad sobre `GREENHOUSE_POSTGRES_HOST`. Ambas pueden coexistir en `.env.local`.
+- **Prerequisito**: credenciales GCP válidas — `GOOGLE_APPLICATION_CREDENTIALS_JSON` en env, o ADC local (`gcloud auth application-default login`), o WIF (Vercel). El service account necesita `roles/cloudsql.client`.
+- **Todos los scripts Node.js** (`pnpm migrate:up`, `pnpm db:generate-types`, `pnpm setup:postgres:*`, `pnpm pg:doctor`, scripts de backfill) usan el Connector automáticamente cuando `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` está definida.
+- **Fallback para binarios standalone** (`pg_dump`, `psql`) que NO pasan por Node.js: Cloud SQL Auth Proxy como tunnel local:
   ```bash
   cloud-sql-proxy "efeonce-group:us-east4:greenhouse-pg-dev" --port 15432
   ```
-  Luego en `.env.local`:
+  Luego en `.env.local` (solo para binarios standalone):
   ```
   GREENHOUSE_POSTGRES_HOST="127.0.0.1"
   GREENHOUSE_POSTGRES_PORT="15432"
   GREENHOUSE_POSTGRES_SSL="false"
   ```
-- **Esto aplica a TODO lo que conecte por TCP**: `pnpm migrate:up`, `pnpm db:generate-types`, `pnpm setup:postgres:*`, `pnpm pg:doctor`, scripts de backfill, `pg_dump`, y cualquier query directo.
-- **Prerequisito**: `gcloud auth application-default login` y acceso al proyecto `efeonce-group`.
-- **Si no tienes `cloud-sql-proxy`**: `gcloud components install cloud-sql-proxy` o descargarlo de https://cloud.google.com/sql/docs/postgres/sql-proxy.
-- **Regla**: si un script falla con `ETIMEDOUT`, `connection refused`, o `connection timeout`, el problema es la conectividad, no las credenciales. Verificar que el proxy esté corriendo.
+- **Si no tienes `cloud-sql-proxy`** (solo necesario para `pg_dump`/`psql`): `gcloud components install cloud-sql-proxy`.
+- **Regla**: si un script Node.js falla con `ETIMEDOUT`, verificar que `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` esté definida y que las credenciales GCP sean válidas. Si un binario standalone falla, verificar que el Cloud SQL Auth Proxy esté corriendo.
 
 ### Acceso PostgreSQL
 - Greenhouse usa cuatro perfiles de acceso para PostgreSQL:
@@ -317,7 +317,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   3. `pnpm migrate:up` — aplica contra la base de datos (auto-regenera tipos Kysely)
   4. Commit migración + `db.d.ts` actualizado **juntos** en el mismo commit
   5. `pnpm build` para verificar que los tipos son consistentes
-- Conexión local: requiere Cloud SQL Proxy (`cloud-sql-proxy "efeonce-group:us-east4:greenhouse-pg-dev" --port 15432`) y `GREENHOUSE_POSTGRES_HOST=127.0.0.1`, `PORT=15432` en `.env.local`.
+- Conexión local: usa Cloud SQL Connector automáticamente si `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` está definida en `.env.local`. No requiere proxy ni IP directa.
 - Spec completa: `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`
 
 ## Task Lifecycle Protocol

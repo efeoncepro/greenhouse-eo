@@ -176,10 +176,8 @@ Operational rule:
 - app code only uses `runtime`
 - setup scripts use `migrator`
 - access bootstrap uses `admin`
-- para runtime Vercel, `runtime` puede viajar por:
-  - host directo temporal (`GREENHOUSE_POSTGRES_HOST`)
-  - Cloud SQL Connector preferido (`GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`)
-    la dirección objetivo es converger en connector, no mantener ambos paths indefinidamente
+- todos los entornos Node.js (Vercel, local, agentes AI, CI) usan Cloud SQL Connector vía `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`. El Connector toma prioridad sobre `GREENHOUSE_POSTGRES_HOST` en `src/lib/postgres/client.ts`.
+  - TCP directo (`GREENHOUSE_POSTGRES_HOST`) queda solo como fallback para binarios standalone (`pg_dump`, `psql`) via Cloud SQL Auth Proxy
 
 ## Required Tooling
 
