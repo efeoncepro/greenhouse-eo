@@ -1,5 +1,174 @@
 # Handoff.md
 
+## Sesión 2026-04-02 — TASK-196 delivery performance report parity lane
+
+### Objetivo
+
+- Abrir la lane canónica para que el `Performance Report` mensual de Delivery pueda calcularse completo en Greenhouse con paridad frente a Notion y usar luego Notion como capa de consumo.
+
+### Delta de ejecución
+
+- Se creó la task formal:
+  - `docs/tasks/in-progress/TASK-196-delivery-performance-report-parity-greenhouse-notion.md`
+- Se crearon los documentos canónicos de esta lane:
+  - `docs/architecture/GREENHOUSE_DELIVERY_PERFORMANCE_REPORT_PARITY_V1.md`
+  - `docs/operations/GREENHOUSE_PERFORMANCE_REPORT_OPERATING_MODEL_V1.md`
+- La nueva lane quedó posicionada explícitamente como follow-on de:
+  - `TASK-186` para trust/paridad de métricas
+  - `TASK-187` para governance de schema y readiness de Notion
+- Alcance fijado para esta fase:
+  - congelar el contrato semántico del reporte
+  - cerrar la matriz de paridad `Notion -> conformed -> Greenhouse`
+  - recalibrar `Marzo 2026` como baseline
+  - definir `Abril 2026` como primer período operativo Greenhouse-first
+- Índices actualizados:
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+  - `docs/README.md`
+- Consistencia documental corregida:
+  - `TASK-187` quedó alineada como `complete` también en `TASK_ID_REGISTRY.md`
+
+### Validación
+
+- No hubo cambios de runtime ni schema en esta sesión.
+- Validación documental/manual:
+  - nuevos archivos creados y enlazados desde índices principales
+  - `TASK-196` registrada como `in-progress`
+
+### Follow-on inmediato
+
+- Se auditó adicionalmente el schema real de `Efeonce` vía Notion MCP para separar fórmulas y rollups de `Proyectos`/`Tareas`.
+- La ruta de portabilidad quedó documentada en:
+  - `docs/architecture/GREENHOUSE_DELIVERY_PERFORMANCE_REPORT_PARITY_V1.md`
+- Se documentó también el modelo recomendado para replicar la conexión `Proyecto -> Tareas` de Notion en Greenhouse:
+  - `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
+- Se agregó baseline de reconciliación real en `TASK-196` para `Daniela / Marzo 2026`:
+  - Notion reporta `86.3% OT` y `102 tareas`
+  - Greenhouse hoy reporta `82.4%` y `34 total_tasks`
+  - en `delivery_tasks` con `due_date` marzo 2026 solo aparecen `18` tareas para Daniela, todas en `Efeonce` interno y ninguna en `Sky`
+  - `performance_report_monthly` y `agency_performance_reports` no tienen snapshot `agency` para `2026-03`
+  - `metrics_by_member` tiene `on_time_count` / `late_drop_count` nulos en `2026-03`
+- Se agregó baseline de identidad/atribución en `TASK-196`:
+  - `greenhouse_conformed.delivery_tasks` tiene `304` tareas de marzo 2026; `116` con match a miembro y `188` sin match
+  - por `space`: `Efeonce` mapea `116/116`, `Sky Airline` mapea `0/188`
+  - corrección del audit:
+    - `Sky Airline` no llega vacío; usa `Responsable` en singular
+    - en `notion_ops.tareas`, `Sky Airline` trae `responsable_ids` en `187/190` tareas del período y `3` quedan `Sin asignar`
+    - `sync-notion-conformed.ts` ya hace `COALESCE(responsables_ids, responsable_ids)`, así que el hueco no es el nombre de la propiedad
+    - aun así, en `greenhouse_conformed.delivery_tasks`, `Sky Airline` queda con `0/188` `assignee_source_id`
+    - `Sky Airline` tiene `5` `notion_user_id` distintos en marzo 2026; solo `3` existen en `greenhouse.team_members`
+    - faltan por resolver `constanza rojas` y `Adriana`
+    - `Efeonce` sí trae tareas ya mapeadas a `daniela-ferreira`, `melkin-hernandez`, `andres-carlosama`, `luis-reyes`
+- Criterio fijado:
+  - portar a Greenhouse las primitivas faltantes
+  - recomputar derivaciones determinísticas en `conformed`
+  - dejar KPI/report logic en `ICO` o marts mensuales
+  - dejar helpers visuales para serving o publicación a Notion
+- Se descompuso `TASK-196` en subtasks ejecutables para evitar mezclar lanes:
+  - `TASK-197` source sync parity de responsables y proyecto
+  - `TASK-198` coverage de identidad `notion_user_id -> member_id`
+  - `TASK-199` contrato de owner attribution
+  - `TASK-200` contrato semántico de métricas
+  - `TASK-201` reconciliación y materialización histórica de `Marzo 2026`
+  - `TASK-202` cutover de publicación/consumo en Notion
+
+## Sesión 2026-04-02 — TASK-197 source sync assignee/project parity
+
+### Objetivo
+
+- Implementar `TASK-197` con enfoque en paridad de responsables y relación `Proyecto -> Tareas` entre `notion_ops`, `greenhouse_conformed` y `greenhouse_delivery`, sin romper consumers actuales.
+
+### Delta de descubrimiento
+
+- `TASK-197` pasó a `in-progress` tras auditoría formal.
+- La spec quedó corregida para reflejar la realidad del repo:
+  - no existe un solo sync path; conviven el cron moderno `sync-notion-conformed.ts` y el carril legacy/manual `sync-source-runtime-projections.ts`
+  - el sospechoso principal para la pérdida de `Sky` es hoy el carril legacy/manual, no el cron moderno
+  - PostgreSQL runtime todavía no tiene columnas para `assignee_source_id`, `assignee_member_ids` ni `project_source_ids`
+- Evidencia verificada:
+  - en `notion_ops.tareas`, `Sky` mantiene `responsable_ids`
+  - en `greenhouse_conformed.delivery_tasks`, `Sky` mantiene `project_source_id` pero cae a `0` `assignee_source_id`
+  - `ICO` depende de `assignee_member_ids`
+  - `Person 360` sigue dependiendo de `greenhouse_delivery.tasks.assignee_member_id`
+  - `team-queries` todavía solo mira `responsables_ids`
+
+### Delta de implementación
+
+- `src/lib/sync/sync-notion-conformed.ts`
+  - preserva `project_source_ids`
+  - endurece validación de assignee por `space_id`
+- `scripts/sync-source-runtime-projections.ts`
+  - ya soporta `responsable_ids` además de `responsables_ids`
+  - proyecta `assignee_source_id`, `assignee_member_ids` y `project_source_ids` a PostgreSQL runtime
+  - agrega validación por `space_id` antes de persistir `delivery_tasks`
+- `scripts/setup-bigquery-source-sync.sql`
+  - agrega `project_source_ids ARRAY<STRING>` a `greenhouse_conformed.delivery_tasks`
+- `scripts/setup-postgres-source-sync.sql`
+  - agrega `assignee_source_id`, `assignee_member_ids TEXT[]` y `project_source_ids TEXT[]` a `greenhouse_delivery.tasks`
+- `src/lib/team-queries.ts`
+  - deja de quedar ciego para spaces que usan `responsable_ids`
+- `src/lib/projects/get-project-detail.ts`
+  - ya considera `proyecto_ids` además del proyecto primario
+- migración creada:
+  - `migrations/20260402220356569_delivery-source-sync-assignee-project-parity.sql`
+
+### Verificación y bloqueo
+
+- verificación lograda:
+  - targeted `eslint` de archivos tocados
+  - `pnpm lint`
+  - `rg -n "new Pool\\(" src scripts`
+- bloqueo preexistente detectado:
+  - `pnpm migrate:up` falla por drift del historial de migraciones
+  - PostgreSQL reporta aplicada `20260402120737013_notion-space-governance-registry`
+  - en el repo local existe `migrations/20260402120604104_notion-space-governance-registry.sql`
+  - no se corrigió ese drift renombrando timestamps manualmente
+- efecto del bloqueo:
+  - la nueva migración quedó versionada pero no aplicada
+  - `src/types/db.d.ts` no se regeneró en este turno porque depende de destrabar primero `migrate:up`
+
+### Riesgos abiertos
+
+- cualquier cambio debe ser aditivo y backward-compatible para no romper `ICO`, `Person 360`, `Project Detail` ni `team-queries`
+- la task probablemente requerirá ensanchar PostgreSQL runtime, no solo corregir BigQuery/source sync
+
+## Sesión 2026-04-02 — RESEARCH-004 space identity consolidation
+
+### Objetivo
+
+- Capturar como research brief previo a task la ambigüedad actual entre `tenant`, `client`, `organization` y `space`, para ordenar futuras decisiones sobre onboarding, admin y surfaces operativas.
+
+### Delta de ejecución
+
+- Se creó el brief:
+  - `docs/research/RESEARCH-004-space-identity-consolidation.md`
+- El brief documenta:
+  - baseline real del repo donde `admin/tenants` sigue siendo `client-first`
+  - formalización de `space` como unidad operativa más robusta que el `tenant` legacy
+  - recomendación de `Organization` como entrypoint admin principal, con `Spaces` como child objects operativos
+  - aclaración de que `Space 360` debe tratarse como vista del objeto `Space`, no como entidad paralela
+  - conflicto actual entre `/admin/tenants/[id]` y `Space 360`
+  - recomendación de separar onboarding de `space` fuera de la surface legacy
+  - breakdown sugerido en futuras tasks:
+    - formalización de identidad `space`
+    - onboarding surface
+    - decomposición del admin tenant legacy
+    - alineación de navegación/naming
+- Índices actualizados:
+  - `docs/research/README.md`
+  - `docs/README.md`
+- No hubo cambios de runtime, rutas ni comportamiento del producto en esta sesión.
+
+### Follow-on
+
+- Se creó la task formal derivada:
+  - `docs/tasks/to-do/TASK-195-space-identity-consolidation-organization-first-admin.md`
+- `TASK-195` fija como decisiones base:
+  - `Organization` como entrypoint admin principal
+  - `Space` como child object operativo de la cuenta
+  - onboarding dedicado de `space`
+  - `Space 360` como vista del objeto `Space`, no como entidad paralela
+
 ## Sesión 2026-04-02 — TASK-187 Notion integration formalization
 
 ### Objetivo

@@ -1,5 +1,126 @@
 # Greenhouse Source Sync Pipelines V1
 
+## Delta 2026-04-02 — Project to Tasks association model for Notion parity
+
+La relación `Proyecto -> Tareas` de Notion ya tiene un espejo parcial en Greenhouse, pero hoy no está modelada con fidelidad completa.
+
+Estado actual confirmado en runtime:
+
+- `greenhouse_conformed.delivery_tasks` preserva `project_source_id` singular
+- `greenhouse_delivery.tasks` preserva `project_record_id` y `notion_project_id` singular
+- el sync actual toma la primera relación disponible desde `proyecto_ids?.[0]`
+- la lectura `Proyecto -> Tareas` ya puede reconstruirse por join, pero se pierde fidelidad si una tarea trae más de una relación o si queremos auditar exactamente el array de relaciones de Notion
+
+Decisión arquitectónica:
+
+- Greenhouse debe tratar la relación canónica operativa como `task belongs to primary project`
+- pero debe preservar además la fidelidad del array de relaciones de Notion para auditoría y paridad
+
+Modelo objetivo:
+
+### 1. Raw fidelity
+
+En `notion_ops` y `greenhouse_conformed` debemos preservar:
+
+- `project_source_ids ARRAY<STRING>` en tareas
+- `task_source_ids ARRAY<STRING>` en proyectos cuando la fuente lo permita
+
+Regla:
+
+- el array preserva la relación exacta de Notion
+- no debe degradarse a solo la primera relación sin guardar el resto
+
+### 2. Canonical operational relation
+
+Para runtime y joins rápidos, Greenhouse debe exponer:
+
+- `primary_project_source_id` en tareas de conformed
+- `project_record_id` en PostgreSQL runtime
+
+Regla:
+
+- la relación operativa principal se usa para APIs, readers y scorecards
+- si una tarea viene con más de un proyecto relacionado, Greenhouse debe escoger una relación primaria explícita y además conservar el resto en el carril de fidelidad
+
+### 3. Bridge for future many-to-many fidelity
+
+Si el workspace empieza a usar relaciones `task <-> project` genuinamente many-to-many, el patrón recomendado es un bridge explícito:
+
+- `greenhouse_conformed.delivery_task_project_links`
+- `greenhouse_delivery.task_project_links`
+
+Campos mínimos sugeridos:
+
+- `task_source_id`
+- `project_source_id`
+- `is_primary`
+- `source_relation_count`
+- `sync_run_id`
+- `synced_at`
+
+Regla:
+
+- no crear el bridge solo por teoría
+- activarlo cuando la auditoría detecte tareas con múltiples proyectos reales o cuando un módulo necesite esa fidelidad explícita
+
+### 4. Project 360 read model
+
+La lectura correcta de un proyecto con sus asociaciones no debe depender de una columna rollup tipo Notion.
+
+Debe resolverse por join desde tareas y exponer:
+
+- metadatos del proyecto
+- lista de tareas asociadas
+- counts por estado
+- overdue, on-time, late drops, carry-over
+- responsables
+- bloqueos
+- fechas relevantes
+- KPIs agregados del conjunto de tareas
+
+Regla:
+
+- `Proyecto -> Tareas` en Greenhouse debe ser un read-model calculado, no un string o label precalculado opaco
+
+### 5. Publishing back to Notion
+
+Si Greenhouse publica de vuelta a Notion:
+
+- Notion puede consumir rollups o scorecards derivados de Greenhouse
+- pero la verdad operativa del vínculo `project -> tasks` debe seguir viviendo en Greenhouse como join auditable
+
+Vía recomendada de implementación:
+
+1. ampliar `greenhouse_conformed.delivery_tasks` para preservar `project_source_ids`
+2. mantener `project_source_id` actual como `primary_project_source_id`
+3. evaluar si `delivery_projects` necesita también `task_source_ids` o si el join desde tasks es suficiente
+4. construir un reader `Project 360` sobre `delivery_projects + delivery_tasks`
+5. si aparecen casos reales many-to-many, introducir el bridge `task_project_links`
+
+## Delta 2026-04-02 — TASK-197 source sync parity implemented
+
+Se implementó un primer slice técnico de paridad para responsables y relación `Proyecto -> Tareas`.
+
+Cambios aplicados:
+
+- `greenhouse_conformed.delivery_tasks` ahora preserva `project_source_ids ARRAY<STRING>` además de `project_source_id`
+- `sync-notion-conformed.ts` ahora valida cobertura de assignee por `space_id`, no solo globalmente
+- `scripts/sync-source-runtime-projections.ts` ya normaliza `responsables_ids` y `responsable_ids` en el mismo carril
+- `greenhouse_delivery.tasks` queda preparado para persistir:
+  - `assignee_source_id`
+  - `assignee_member_ids`
+  - `project_source_ids`
+
+Compatibilidad:
+
+- `project_source_id` y `assignee_member_id` siguen existiendo como contrato backward-compatible
+- `ICO` puede seguir leyendo `project_source_id` y `assignee_member_ids`
+- `Person 360` puede seguir leyendo `assignee_member_id` mientras runtime empieza a cerrar la brecha de fidelidad
+
+Nota operativa:
+
+- la aplicación de la nueva migración quedó bloqueada por drift preexistente en `public.pgmigrations` contra el repo local para una migración anterior de Notion governance; no se debe resolver renombrando timestamps manualmente sin corregir antes esa discrepancia
+
 ## Delta 2026-04-01 — Notion DB IDs canónicos para Delivery / ICO
 
 Los teamspaces y databases de Notion que hoy alimentan el baseline operativo de Delivery e `ICO` deben tratarse como referencia arquitectónica viva, no solo como contexto de una task.
@@ -262,6 +383,7 @@ Recommended business fields for tasks:
 - `assignee_source_id`
 - `assignee_member_id` — first Notion responsable resolved to Greenhouse member ID (backward compat)
 - `assignee_member_ids` — `ARRAY<STRING>` all Notion responsables resolved to Greenhouse member IDs (enables person-level ICO metrics via UNNEST; added 2026-03-18)
+- `project_source_ids` — `ARRAY<STRING>` exact Notion project relations preserved for auditability and richer project readers (added 2026-04-02)
 - `due_date`
 - `completed_at`
 - `last_edited_time`
@@ -281,6 +403,7 @@ Multi-assignee enrichment:
 
 Guardrails added after payroll/ICO remediation (2026-03-27):
 - the conformed sync must fail loudly if source tasks with `responsables_ids` are read but `greenhouse_conformed.delivery_tasks` persists `0` rows with `assignee_source_id`
+- as of `TASK-197`, this validation must also hold per `space_id`, so a healthy space like `Efeonce` cannot mask attribution loss in another space like `Sky`
 - sync results should expose validation counters at runtime:
   - `sourceTasksWithResponsables`
   - `conformedTasksWithAssigneeSource`

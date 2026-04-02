@@ -328,11 +328,14 @@ Normalized external entities.
 
 Current tables:
 - `delivery_projects`
-- `delivery_tasks` — includes `assignee_member_id STRING` (first Notion responsable resolved to Greenhouse member ID) and `assignee_member_ids ARRAY<STRING>` (all Notion responsables resolved; enables person-level ICO metrics via UNNEST)
+- `delivery_tasks` — includes `project_source_id STRING`, `project_source_ids ARRAY<STRING>`, `assignee_member_id STRING` (first Notion responsable resolved to Greenhouse member ID) and `assignee_member_ids ARRAY<STRING>` (all Notion responsables resolved; enables person-level ICO metrics via UNNEST)
 - `delivery_sprints`
 - `crm_companies`
 - `crm_deals`
 - `crm_contacts`
+
+Runtime parity note:
+- `greenhouse_delivery.tasks` is being extended additively to preserve `assignee_source_id`, `assignee_member_ids TEXT[]`, and `project_source_ids TEXT[]`, while keeping `assignee_member_id` and `notion_project_id` for backward compatibility with existing runtime readers.
 
 Required next slice:
 - if needed, `crm_company_contacts`

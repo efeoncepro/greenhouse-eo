@@ -236,7 +236,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-184` | `in-progress` | Database Migration Framework (node-pg-migrate) | `docs/tasks/in-progress/TASK-184-database-migration-framework.md` |
 | `TASK-185` | `in-progress` | Database Tooling Foundation (db.ts + Kysely + Migrations) | `docs/tasks/in-progress/TASK-185_Database_Tooling_Foundation.md` |
 | `TASK-186` | `complete` | Delivery Metrics Trust: Notion Property Audit & Conformed Contract Hardening | `docs/tasks/complete/TASK-186-delivery-metrics-trust-notion-property-audit-contract.md` |
-| `TASK-187` | `to-do` | Notion Integration Formalization: Space Onboarding, Schema Governance & KPI Readiness | `docs/tasks/to-do/TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md` |
+| `TASK-187` | `complete` | Notion Integration Formalization: Space Onboarding, Schema Governance & KPI Readiness | `docs/tasks/complete/TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md` |
 | `TASK-188` | `to-do` | Native Integrations Layer: Platform Governance, Runtime Contracts & Shared Operating Model | `docs/tasks/to-do/TASK-188-native-integrations-layer-platform-governance.md` |
 | `TASK-189` | `complete` | ICO Period Filter: Due-Date Anchor & Carry-Over Logic | `docs/tasks/complete/TASK-189-ico-period-filter-due-date-anchor.md` |
 | `TASK-190` | `to-do` | Platform Temporal Scope Contract & Cross-Module Time Semantics | `docs/tasks/to-do/TASK-190-platform-temporal-scope-contract-cross-module-parity.md` |
@@ -244,3 +244,11 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-192` | `complete` | Finance Org-First Materialized Serving Cutover | `docs/tasks/complete/TASK-192-finance-org-first-materialized-serving-cutover.md` |
 | `TASK-193` | `in-progress` | Person ↔ Organization Synergy Activation | `docs/tasks/in-progress/TASK-193-person-organization-synergy-activation.md` |
 | `TASK-194` | `to-do` | Expense Payment Ledger Separation | `docs/tasks/to-do/TASK-194-expense-payment-ledger-separation.md` |
+| `TASK-195` | `to-do` | Space Identity Consolidation: Organization-First Admin Entry & Space Onboarding | `docs/tasks/to-do/TASK-195-space-identity-consolidation-organization-first-admin.md` |
+| `TASK-196` | `in-progress` | Delivery Performance Report Parity: Greenhouse Canonical Report & Notion Consumption | `docs/tasks/in-progress/TASK-196-delivery-performance-report-parity-greenhouse-notion.md` |
+| `TASK-197` | `in-progress` | Delivery Source Sync Assignee & Project Relation Parity | `docs/tasks/in-progress/TASK-197-delivery-source-sync-assignee-project-parity.md` |
+| `TASK-198` | `to-do` | Delivery Notion Assignee Identity Coverage | `docs/tasks/to-do/TASK-198-delivery-notion-assignee-identity-coverage.md` |
+| `TASK-199` | `to-do` | Delivery Performance Owner Attribution Contract | `docs/tasks/to-do/TASK-199-delivery-performance-owner-attribution-contract.md` |
+| `TASK-200` | `to-do` | Delivery Performance Metric Semantic Contract | `docs/tasks/to-do/TASK-200-delivery-performance-metric-semantic-contract.md` |
+| `TASK-201` | `to-do` | Delivery Performance Historical Materialization Reconciliation | `docs/tasks/to-do/TASK-201-delivery-performance-historical-materialization-reconciliation.md` |
+| `TASK-202` | `to-do` | Delivery Performance Report Publication & Notion Consumption Cutover | `docs/tasks/to-do/TASK-202-delivery-performance-notion-publication-cutover.md` |

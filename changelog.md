@@ -2,6 +2,16 @@
 
 ## 2026-04-02
 
+- **TASK-197 delivery source sync assignee/project parity**:
+  - `greenhouse_conformed.delivery_tasks` ahora preserva `project_source_ids` además de `project_source_id`
+  - `sync-notion-conformed.ts` ahora valida cobertura de responsables por `space_id`, evitando que un space sano masque otro roto
+  - `scripts/sync-source-runtime-projections.ts` ya normaliza `responsables_ids` y `responsable_ids`, y proyecta `assignee_source_id`, `assignee_member_ids` y `project_source_ids` a `greenhouse_delivery.tasks`
+  - `team-queries` ya soporta spaces que usen `responsable_ids`
+  - `Project Detail` ya considera `proyecto_ids` además del proyecto primario
+  - quedó versionada la migración `20260402220356569_delivery-source-sync-assignee-project-parity.sql`
+  - validación ejecutada: targeted `eslint`, `pnpm lint`, `rg -n "new Pool\\(" src scripts`
+  - bloqueo abierto: `pnpm migrate:up` no puede correr todavía por drift preexistente entre `public.pgmigrations` y una migración local anterior de Notion governance
+
 - **TASK-187 notion governance formalization**:
   - nueva governance lane tenant-scoped para Notion sobre `space_notion_sources`, con snapshots, drift y KPI readiness persistidos en `greenhouse_sync.notion_space_*`
   - nuevas APIs admin: `GET /api/admin/tenants/[id]/notion-governance` y `POST /api/admin/tenants/[id]/notion-governance/refresh`
