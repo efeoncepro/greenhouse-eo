@@ -14,7 +14,9 @@
   - `ico-profile`
   - `ico`
   - aggregate `GET /api/people/[memberId]`
-- `HR` e `intelligence` siguen sin serving org-aware seguro; por ahora quedan cerrados con `403` para tenant `client` en vez de filtrar member-first.
+- `HR` e `intelligence` quedan declarados como surfaces internas, no como follow-on client-facing del scope org-aware:
+  - para tenant `client` responden `403`
+  - exponen contrato, leave, compensación, costo y capacidad interna, por lo que no deben abrirse tal cual al carril cliente
 - `Suppliers` ya puede sembrar contactos mínimos en Account 360:
   - `organizations/[id]/memberships` acepta crear `identity_profile` ad hoc con nombre + email
   - `finance/suppliers` create/update ya intenta sembrar `person_memberships(contact)` cuando el supplier tiene `organization_id`

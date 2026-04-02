@@ -1,12 +1,26 @@
 # TASK-193 — Person ↔ Organization Synergy Activation
 
-> **Status:** in-progress
+> **Status:** complete
 > **Priority:** P1
 > **Impact:** Alto — desbloquea org-scoping transversal para todos los módulos downstream
 > **Effort:** Alto
 > **Created:** 2026-04-02
 
 **Architecture doc:** `docs/architecture/GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md`
+
+## Delta 2026-04-02 — cierre formal
+
+- `TASK-193` queda cerrada para el alcance vigente del producto:
+  - operating entity de Efeonce activa y consumida en sesión/canon
+  - `People` org-scoped en `finance`, `delivery`, `ico-profile`, `ico` y detail aggregate
+  - `Suppliers` ya escribe y lee contactos org-first cuando existe `organization_id`
+  - `staff_augmentation` queda visible como contexto operativo sin crear un `membership_type` nuevo
+- `HR` e `intelligence` no se consideran deuda client-facing de esta task:
+  - quedan declaradas como surfaces internas por contrato
+  - para tenant `client` responden `403`
+- Residual no bloqueante movido a follow-ons futuros:
+  - directorio supplier fully canonical sin fallback legacy
+  - modelado fino de `organization_type = 'both'`
 
 ## Delta 2026-04-02 — auditoría inicial del runtime real
 
@@ -147,7 +161,7 @@ El sistema tiene dos formas de vincular colaboradores Efeonce a clientes:
 | G0 | **Membership types sin contrato institucionalizado** — el `CHECK constraint` ya existe, pero no hay helper shared para distinguir "persona de Efeonce asignada" vs "persona nativa de la org", y el runtime sigue mezclando `client_contact` legacy con los tipos nuevos. Las queries usan `= 'team_member'` hardcodeado. | A + B | Arquitectural | `greenhouse_core.person_memberships` |
 | G1 | **CanonicalPersonRecord no tiene contexto de org** — resuelve identity/member/user pero nunca toca `person_memberships` ni `organizations`. A pesar de que assignment_membership_sync mantiene memberships al día, ningún consumer de CanonicalPerson las lee. | A + B | Bloqueante para G3-G4 | `src/lib/identity/canonical-person.ts` |
 | G2 | **Session interna sin `organizationId`** — Los campos existen en `TenantAccessRecord` y ya se resuelven bien para `tenant_type = 'client'`, pero siguen vacíos para `efeonce_internal`. Sin un anchor organizacional interno, las rutas no pueden hacer org-scoping homogéneo. | A | Bloqueante para org-scoping interno | `src/lib/tenant/identity-store.ts:165`, `greenhouse_serving.session_360` |
-| G3 | **Person-360 facets con org-scoping todavía incompleto** — `finance`, `delivery`, `ico-profile`, `ico` y el aggregate `people/[memberId]` ya aceptan `organizationId`; el residual sigue en serving member-first sin versión org-aware para `intelligence`/`HR`, que por ahora quedan cerrados para tenant `client`. | A + B | Seguridad y multi-tenancy | `src/lib/person-360/get-person-*.ts` |
+| G3 | **Person-360 client-safe boundary aclarado** — `finance`, `delivery`, `ico-profile`, `ico` y el aggregate `people/[memberId]` ya aceptan `organizationId`. `HR` y `intelligence` dejan de tratarse como “pendiente client-facing”: por contrato siguen siendo superficies internas, porque exponen contrato, leave, compensación, costo y capacidad de Efeonce. El follow-on, si existiera, sería otra surface client-safe, no abrir estos readers tal cual. | A + B | Seguridad y multi-tenancy | `src/lib/person-360/get-person-*.ts` |
 | G4 | **No existe anchor operativo de Efeonce en la base real** — no hay ninguna `organization` con `is_operating_entity = TRUE`, y por lo tanto tampoco existe `person_membership` que vincule members a Efeonce como organización. Esto bloquea responder "quiénes son los empleados de Efeonce" desde el grafo de memberships. | A | Modelo incompleto / prerrequisito | `greenhouse_core.organizations`, `greenhouse_core.person_memberships` |
 | G5 | **Proveedores con read-path híbrido y sin directorio canónico completo** — create/update de suppliers ya pueden sembrar `identity_profiles` + `person_memberships(contact)` cuando existe `organization_id`, y `Finance Suppliers` detail/list ya prioriza esos contactos; el residual queda en readers legacy/fallback BigQuery y en la ausencia de un directorio org-first completo para proveedores. | C | Moderado (crece con escala) | `src/lib/finance/`, `greenhouse_core.organizations` |
 | G6 | **Orgs duales (`both`) sin distinción de facets** — Una org que es cliente Y proveedor usa el mismo set de memberships. No hay forma de saber si un contacto lo es "como cliente" o "como proveedor" de esa org. | B + C | Edge case hoy, escala después | `greenhouse_core.person_memberships` |

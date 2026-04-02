@@ -19,7 +19,7 @@ Contrato vigente desde 2026-04-02.
 
 Este documento describe el estado real del sistema y formaliza decisiones que estaban implícitas en el código. No introduce cambios — documenta lo que ya es.
 
-Gaps identificados están catalogados en `TASK-193` (`docs/tasks/in-progress/TASK-193-person-organization-synergy-activation.md`).
+Gaps identificados y cierre operativo quedan catalogados en `TASK-193` (`docs/tasks/complete/TASK-193-person-organization-synergy-activation.md`).
 
 ## Delta 2026-04-02 — TASK-193 activation slice aplicado
 
@@ -44,7 +44,10 @@ Gaps identificados están catalogados en `TASK-193` (`docs/tasks/in-progress/TAS
   - `ico`
   - `GET /api/people/[memberId]`
 - Cuando el request viene org-scoped desde tenant `client`, esos readers consumen `organizationId` y reducen el universo visible al set de `client_id` asociados a esa organización.
-- Los facets que siguen siendo member-first sin una versión org-aware segura (`HR` e `intelligence`) ahora quedan cerrados con `403` para tenant `client` en lugar de exponer datos fuera del boundary organizacional.
+- `HR` e `intelligence` quedan explícitamente fuera de ese scope client-facing:
+  - siguen siendo surfaces internas
+  - para tenant `client` responden `403`
+  - no deben tratarse como “faltó org-scoping”, porque exponen contrato, leave, compensación, costo y capacidad interna de Efeonce
 - La foundation mínima de Población C dejó de ser completamente nula:
   - `organizations/[id]/memberships` ya puede sembrar `identity_profiles` ad hoc con nombre + email
   - `finance/suppliers` create/update ya intentan vincular `organization contact memberships` cuando el supplier tiene `organization_id` y contacto usable
@@ -360,18 +363,18 @@ client_team_assignments (FTE per member per client)
 
 ---
 
-## Known Gaps (TASK-193)
+## Known Follow-ons (post TASK-193)
 
 | # | Gap | Poblaciones | Referencia |
 |---|-----|-------------|-----------|
 | G0 | Helpers/shared typing de `membership_type` todavía parciales; el CHECK ya estaba resuelto | A + B | `TASK-193` Fase 0 |
 | G1 | `CanonicalPersonRecord` ya tiene contexto org; queda extender consumers residuales | A + B | `TASK-193` Fase 1 |
 | G2 | `session_360` ya resuelve `organizationId` para ambos tenant types; quedan consumers legacy client-first | A + B | `TASK-193` Fase 1 |
-| G3 | Person-360 facets sin org-scoping | A + B | `TASK-193` Fase 3 |
+| G3 | `HR` e `intelligence` quedan explícitamente como surfaces internas; cualquier versión client-safe futura requerirá otro contrato | A + B | `TASK-193` Fase 3 |
 | G4 | Cerrado en runtime: colaboradores Efeonce ya tienen membership en operating entity | A | `TASK-193` Fase 0 |
-| G5 | Proveedores sin modelo de personas (Pob. C) | C | `TASK-193` Fase 4 |
+| G5 | Proveedores con read-path híbrido; falta directorio fully canonical | C | `TASK-193` Fase 4 |
 | G6 | Orgs duales (`both`) sin distinción de facets | B + C | `TASK-193` Fase 4 |
-| G7 | Staff aug sin distinción de membership | A | `TASK-193` Fase 3 |
+| G7 | Staff aug con distinción operativa base cerrada; queda propagación downstream adicional si hiciera falta | A | `TASK-193` Fase 3 |
 | G8 | Payroll 100% member-centric, sin vista org-scoped | A | `TASK-193` Fase 4 |
 | G9 | `createIdentityProfile` ahora deduplica por email, pero sigue fuera del reconciliation engine completo | B | `TASK-193` Fase 4 |
 | G10 | Serving views ya cruzan org↔person en el slice base; quedan enrichments posteriores por facet | A + B | `TASK-193` Fase 2 |

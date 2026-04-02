@@ -40,11 +40,15 @@
   - `getPersonDeliveryContext()` y `getPersonIcoProfile()` ya soportan org scope real filtrando por los `client_id` activos de la organización, sin recalcular métricas inline fuera del contrato ICO Engine / serving
   - `HR` e `intelligence` quedaron explícitamente cerrados con `403` para tenant `client` mientras no exista una versión org-aware segura
   - `organizations/[id]/memberships` y `AddMembershipDrawer` ya permiten crear `identity_profiles` ad hoc con nombre + email antes de sembrar la membership, abriendo la foundation mínima para contactos de suppliers / orgs `both`
-  - `finance/suppliers` create/update ahora intenta sembrar `organization contact memberships` cuando existe `organization_id` y contacto primario usable, manteniendo `primary_contact_*` como compatibilidad transicional
-  - `Finance Suppliers` ya consume esa foundation en lectura:
-    - detail `GET /api/finance/suppliers/[id]` expone `organizationContacts`
-    - list `GET /api/finance/suppliers` expone `contactSummary` + `organizationContactsCount`
-    - `SupplierDetailView` y `SuppliersListView` priorizan contactos org-first y dejan `primary_contact_*` como fallback
+- `finance/suppliers` create/update ahora intenta sembrar `organization contact memberships` cuando existe `organization_id` y contacto primario usable, manteniendo `primary_contact_*` como compatibilidad transicional
+- `Finance Suppliers` ya consume esa foundation en lectura:
+  - detail `GET /api/finance/suppliers/[id]` expone `organizationContacts`
+  - list `GET /api/finance/suppliers` expone `contactSummary` + `organizationContactsCount`
+  - `SupplierDetailView` y `SuppliersListView` priorizan contactos org-first y dejan `primary_contact_*` como fallback
+- Cierre administrativo:
+  - `TASK-193` se movió de `in-progress/` a `complete/`
+  - el residual `HR`/`intelligence` ya no se trata como deuda client-facing; queda explicitado como surface interna por contrato
+  - los residuals no bloqueantes pasan a follow-ons futuros: directorio supplier fully canonical y modelado fino de orgs `both`
 
 ### Validación
 
@@ -55,6 +59,7 @@
 - `NEXTAUTH_SECRET=test-secret pnpm exec vitest run src/lib/identity/canonical-person.test.ts src/lib/person-360/get-person-finance.test.ts src/lib/sync/projections/assignment-membership-sync.test.ts src/lib/sync/projections/operating-entity-membership.test.ts` ✅
 - `pnpm exec vitest run src/lib/person-360/get-person-delivery.test.ts src/lib/person-360/get-person-ico-profile.test.ts src/lib/account-360/organization-store.test.ts src/views/greenhouse/organizations/tabs/OrganizationPeopleTab.test.tsx` ✅
 - `pnpm exec vitest run src/app/api/finance/suppliers/[id]/route.test.ts` ✅
+- `pnpm exec vitest run src/app/api/people/[memberId]/hr/route.test.ts src/app/api/people/[memberId]/intelligence/route.test.ts src/lib/people/permissions.test.ts` ✅
 - `pnpm lint` ✅
 - `pnpm build` ✅
 - `rg -n "new Pool\\(" src` → solo `src/lib/postgres/client.ts` ✅

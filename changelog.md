@@ -11,7 +11,7 @@
   - `Organization > People` y el reader `/api/organizations/[id]/memberships` ya hacen visible la distinción `internal` vs `staff_augmentation` como contexto operativo del vínculo cliente, sin crear un `membership_type` nuevo
   - `People > Finance` ya acepta `organizationId` opcional y fuerza tenant isolation para usuarios `client`
   - `People > Delivery`, `People > ICO Profile`, `People > ICO` y el aggregate `GET /api/people/[memberId]` ya consumen `organizationId` cuando el request viene org-scoped desde tenant `client`
-  - `HR` e `intelligence` quedan temporalmente cerrados con `403` para tenant `client` mientras no exista una versión org-aware segura de esos facets
+  - `HR` e `intelligence` quedan declarados como surfaces internas; para tenant `client` responden `403` y dejan de considerarse deuda client-facing de esta lane
   - `Organization memberships` ahora también puede sembrar contactos mínimos ad hoc con nombre + email, y `finance/suppliers` create/update intenta persistir `organization contact memberships` cuando el supplier ya tiene `organization_id`
   - `Finance Suppliers` detail/list ya consume esos contactos org-first cuando existen, exponiendo `organizationContacts`, `contactSummary` y `organizationContactsCount` sin romper el fallback legacy `primary_contact_*`
   - validación ejecutada: `GREENHOUSE_POSTGRES_HOST=127.0.0.1 GREENHOUSE_POSTGRES_PORT=15432 GREENHOUSE_POSTGRES_SSL=false pnpm migrate:up`, targeted `vitest`, `pnpm lint`, `pnpm build`, `rg -n "new Pool\\(" src`
