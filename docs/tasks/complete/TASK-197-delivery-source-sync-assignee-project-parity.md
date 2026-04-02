@@ -3,10 +3,11 @@
 ## Status
 
 - Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio`
-- Status real: `Implementación parcial`
+- Status real: `Cerrada`
 - Rank: `53`
 - Domain: `data`
 - GitHub Project: `[pending]`
@@ -38,6 +39,36 @@ Esta task aísla el problema más mecánico de la lane: hoy `Sky` sí trae `resp
   - se creó migración aditiva para `greenhouse_delivery.tasks`
 - Bloqueo encontrado:
   - `pnpm migrate:up` no puede avanzar hasta reconciliar un drift preexistente entre `public.pgmigrations` y el archivo local de una migración anterior de Notion governance
+
+## Delta 2026-04-02 (follow-up)
+
+- El supuesto del bloqueo de migraciones quedó desactualizado:
+  - `public.pgmigrations` ya estaba reconciliado
+  - `pnpm migrate:up` sí pudo avanzar y aplicó `20260402222438783_delivery-runtime-space-fk-canonicalization.sql`
+- La causa raíz del gap de `Sky` en `greenhouse_conformed` era más específica:
+  - `sync-notion-conformed.ts` usaba `COALESCE(responsables_ids, responsable_ids)`
+  - en BigQuery, `[]` no cae al fallback, así que `responsable_ids` de `Sky` se perdía cuando `responsables_ids` venía vacío
+  - se corrigió con un `CASE` que prioriza arrays no vacíos
+- Verificación real en `greenhouse_conformed.delivery_tasks` para marzo 2026:
+  - `Sky`: `190/190` con `project_source_ids`
+  - `Sky`: `187/190` con `assignee_source_id`
+  - `Sky`: `151/190` con `assignee_member_ids`
+  - `Efeonce`: `116/116` con `assignee_source_id`
+- La proyección runtime arrastraba drift estructural adicional:
+  - `greenhouse_delivery.{projects,sprints,tasks}.space_id` seguía con FK a `greenhouse_core.notion_workspaces`
+  - el DDL base de `scripts/setup-postgres-source-sync.sql` también seguía referenciando `notion_workspaces`
+  - se canonicalizó todo hacia `greenhouse_core.spaces(space_id)` y la migración backfillea `space_id` legacy (`space-efeonce`, `hubspot-company-*`, `greenhouse-demo-client`) a `spc-*`
+- `scripts/sync-source-runtime-projections.ts` también quedó endurecido:
+  - ya no pierde `responsable_ids` cuando `responsables_ids = []`
+  - ya no intenta persistir `NULL` en `assignee_member_ids` o `project_source_ids`
+  - ya resuelve `client_id` desde `space_notion_sources -> spaces`, en vez de asumir que `space_id` canónico también es `client_id`
+- Estado real al cierre de este turno:
+  - `conformed` quedó reparado y verificado
+  - `runtime PostgreSQL` quedó reparado y reseedeado por completo
+  - verificación final marzo 2026 en `greenhouse_delivery.tasks`:
+    - `Sky`: `190/190` con `project_record_id`, `190/190` con `project_source_ids`, `187/190` con `assignee_source_id`, `151/190` con `assignee_member_ids`
+    - `Efeonce`: `116/116` con `project_record_id`, `116/116` con `project_source_ids`, `116/116` con `assignee_source_id`, `116/116` con `assignee_member_ids`
+  - `greenhouse_delivery.{projects,sprints,tasks}.space_id` ya quedó canónico con FK a `greenhouse_core.spaces(space_id)`
 
 ## Why This Task Exists
 
@@ -105,7 +136,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/in-progress/TASK-197-delivery-source-sync-assignee-project-parity.md`
+- `docs/tasks/complete/TASK-197-delivery-source-sync-assignee-project-parity.md`
 - `src/lib/sync/sync-notion-conformed.ts`
 - `scripts/sync-source-runtime-projections.ts`
 - `scripts/setup-bigquery-source-sync.sql`
@@ -169,12 +200,24 @@ Reglas obligatorias:
 - [ ] `Sky Airline` preserva `assignee_source_id` en `greenhouse_conformed.delivery_tasks` para las tareas con responsable en origen.
 - [ ] `delivery_tasks` preserva el array de proyecto además del proyecto primario.
 - [ ] Existe verificación documentada por `space` para `responsables_ids/responsable_ids -> assignee_source_id`.
-- [ ] BigQuery y PostgreSQL runtime projections mantienen la misma fidelidad mínima de responsables y proyecto.
-- [ ] El carril legacy/manual deja de divergir del sync moderno para variantes `Responsables/Responsable`.
-- [ ] `ICO`, `Person 360`, `Project Detail` y `team-queries` siguen funcionando con contrato aditivo y compatible.
+- [x] BigQuery y PostgreSQL runtime projections mantienen la misma fidelidad mínima de responsables y proyecto.
+- [x] El carril legacy/manual deja de divergir del sync moderno para variantes `Responsables/Responsable`.
+- [x] `ICO`, `Person 360`, `Project Detail` y `team-queries` siguen funcionando con contrato aditivo y compatible.
+
+### Estado de aceptación al 2026-04-02
+
+- [x] `Sky Airline` preserva `assignee_source_id` en `greenhouse_conformed.delivery_tasks` para las tareas con responsable en origen.
+- [x] `delivery_tasks` preserva el array de proyecto además del proyecto primario en `greenhouse_conformed` y en el contrato runtime.
+- [x] Existe verificación documentada por `space` para `responsables_ids/responsable_ids -> assignee_source_id`.
+- [x] BigQuery y PostgreSQL runtime projections mantienen la misma fidelidad mínima de responsables y proyecto.
+- [x] El carril legacy/manual deja de divergir del sync moderno para variantes `Responsables/Responsable`.
+- [x] `ICO`, `Person 360`, `Project Detail` y `team-queries` siguen funcionando con contrato aditivo y compatible.
 
 ## Verification
 
 - query de cobertura por `space` en `notion_ops.tareas`
 - query de cobertura por `space` en `greenhouse_conformed.delivery_tasks`
 - query de cobertura en runtime PostgreSQL para tareas materializadas
+- `pnpm migrate:up`
+- `pnpm build`
+- `pnpm lint`

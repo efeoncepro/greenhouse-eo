@@ -5,12 +5,21 @@
 - **TASK-197 delivery source sync assignee/project parity**:
   - `greenhouse_conformed.delivery_tasks` ahora preserva `project_source_ids` además de `project_source_id`
   - `sync-notion-conformed.ts` ahora valida cobertura de responsables por `space_id`, evitando que un space sano masque otro roto
+  - `sync-notion-conformed.ts` dejó de perder `Sky` cuando `responsables_ids = []` y `responsable_ids` sí trae owner; ahora prioriza arrays no vacíos
   - `scripts/sync-source-runtime-projections.ts` ya normaliza `responsables_ids` y `responsable_ids`, y proyecta `assignee_source_id`, `assignee_member_ids` y `project_source_ids` a `greenhouse_delivery.tasks`
+  - `scripts/sync-source-runtime-projections.ts` ahora también fuerza arrays no nulos para PostgreSQL y resuelve `client_id` desde `space_notion_sources -> spaces`
   - `team-queries` ya soporta spaces que usen `responsable_ids`
   - `Project Detail` ya considera `proyecto_ids` además del proyecto primario
+  - se aplicó la migración `20260402222438783_delivery-runtime-space-fk-canonicalization.sql` para mover `greenhouse_delivery.{projects,sprints,tasks}.space_id` a FK canónica sobre `greenhouse_core.spaces(space_id)` con backfill de IDs legacy a `spc-*`
+  - `scripts/setup-postgres-source-sync.sql` quedó alineado con esa FK canónica
   - quedó versionada la migración `20260402220356569_delivery-source-sync-assignee-project-parity.sql`
-  - validación ejecutada: targeted `eslint`, `pnpm lint`, `rg -n "new Pool\\(" src scripts`
-  - bloqueo abierto: `pnpm migrate:up` no puede correr todavía por drift preexistente entre `public.pgmigrations` y una migración local anterior de Notion governance
+  - verificación real en `greenhouse_conformed` para marzo 2026:
+    - `Sky`: `190/190` con `project_source_ids`
+    - `Sky`: `187/190` con `assignee_source_id`
+    - `Sky`: `151/190` con `assignee_member_ids`
+    - `Efeonce`: `116/116` con `assignee_source_id`
+  - validación ejecutada: targeted `eslint`, `pnpm lint`, `pnpm migrate:up`, `rg -n "new Pool\\(" src scripts`
+  - seguimiento abierto: el reseed completo de `scripts/sync-source-runtime-projections.ts` sigue corriendo lento y la paridad total de marzo en PostgreSQL runtime todavía no debe considerarse cerrada
 
 - **TASK-187 notion governance formalization**:
   - nueva governance lane tenant-scoped para Notion sobre `space_notion_sources`, con snapshots, drift y KPI readiness persistidos en `greenhouse_sync.notion_space_*`

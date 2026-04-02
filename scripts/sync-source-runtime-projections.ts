@@ -1,5 +1,8 @@
 import process from 'node:process'
 import { randomUUID, createHash } from 'node:crypto'
+import { mkdtemp, rm, writeFile } from 'node:fs/promises'
+import os from 'node:os'
+import path from 'node:path'
 
 import { BigQuery } from '@google-cloud/bigquery'
 
@@ -298,6 +301,21 @@ const parseCsvValues = (value: string | null) => {
   )
 }
 
+const mergeNotionRelationIds = (
+  primary: string[] | null | undefined,
+  fallback: string[] | null | undefined
+) => {
+  if (primary && primary.length > 0) {
+    return primary
+  }
+
+  if (fallback && fallback.length > 0) {
+    return fallback
+  }
+
+  return []
+}
+
 const buildPayloadHash = (payload: unknown) =>
   createHash('sha256').update(JSON.stringify(payload)).digest('hex')
 
@@ -557,6 +575,56 @@ const insertBigQueryRows = async (dataset: string, table: string, rows: Record<s
     await bigQuery.dataset(dataset).table(table).insert(rows)
   } catch (error) {
     throw describeBigQueryInsertError(`${dataset}.${table}`, error)
+  }
+}
+
+const replaceBigQueryTableWithLoadJob = async (
+  dataset: string,
+  table: string,
+  rows: Record<string, unknown>[]
+) => {
+  if (rows.length === 0) {
+    await bigQuery.query({
+      query: `DELETE FROM \`${projectId}.${dataset}.${table}\` WHERE TRUE`,
+      location: bigQueryLocation
+    })
+
+    return
+  }
+
+  const tempDir = await mkdtemp(path.join(os.tmpdir(), `greenhouse-bq-${table}-`))
+  const tempFilePath = path.join(tempDir, `${table}.jsonl`)
+
+  try {
+    const jsonLines = rows.map(row => JSON.stringify(row)).join('\n')
+
+    await writeFile(tempFilePath, `${jsonLines}\n`, 'utf8')
+    await bigQuery.dataset(dataset).table(table).load(tempFilePath, {
+      sourceFormat: 'NEWLINE_DELIMITED_JSON',
+      writeDisposition: 'WRITE_TRUNCATE'
+    })
+  } finally {
+    await rm(tempDir, { recursive: true, force: true })
+  }
+}
+
+const ensureDeliveryTaskColumns = async () => {
+  const queries = [
+    `ALTER TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\` ADD COLUMN IF NOT EXISTS assignee_member_ids ARRAY<STRING>`,
+    `ALTER TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\` ADD COLUMN IF NOT EXISTS project_source_ids ARRAY<STRING>`,
+    `ALTER TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\` ADD COLUMN IF NOT EXISTS created_at TIMESTAMP`
+  ]
+
+  for (const sql of queries) {
+    try {
+      await bigQuery.query({
+        query: sql,
+        location: bigQueryLocation
+      })
+    } catch {
+      // Column may already exist or ALTER permissions may be restricted.
+      // Insert path remains the source of truth for whether the schema is ready.
+    }
   }
 }
 
@@ -824,10 +892,12 @@ const syncNotion = async (): Promise<SyncSummary> => {
     // Map database_id → space_id (each project reports _source_database_id)
     const databaseSpaceMap = new Map<string, string>()
     const databaseClientMap = new Map<string, string | null>()
+    const spaceClientMap = new Map<string, string | null>()
 
     for (const src of spaceNotionSources) {
       databaseSpaceMap.set(src.notion_db_proyectos, src.space_id)
       databaseClientMap.set(src.notion_db_proyectos, src.client_id)
+      spaceClientMap.set(src.space_id, src.client_id)
     }
 
     // Fallback: legacy clients.notion_project_ids (if no space_notion_sources configured)
@@ -921,7 +991,8 @@ const syncNotion = async (): Promise<SyncSummary> => {
         : (preferredSpaceMap?.get(projectSourceId!) || null)
 
       const clientId = spaceId
-        ? (databaseClientMap.get(projectDatabaseSourceId!) || (!isInternalSpaceId(spaceId) ? spaceId : null))
+        ? (projectDatabaseSourceId ? (databaseClientMap.get(projectDatabaseSourceId) ?? null) : null) ||
+          (spaceClientMap.get(spaceId) ?? null)
         : null
 
       return {
@@ -1001,7 +1072,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
 
     const deliveryTasks = tasks.map(row => {
       const assigneeSourceIds = Array.from(
-        new Set((row.responsables_ids || row.responsable_ids || []).map(id => toNullableString(id)).filter((id): id is string => !!id))
+        new Set(mergeNotionRelationIds(row.responsables_ids, row.responsable_ids).map(id => toNullableString(id)).filter((id): id is string => !!id))
       )
 
       const assigneeSourceId = assigneeSourceIds[0] || null
@@ -1025,13 +1096,13 @@ const syncNotion = async (): Promise<SyncSummary> => {
 
       const clientId =
         (projectSourceId ? projectClientMap.get(projectSourceId) || null : null) ||
-        (spaceId && !isInternalSpaceId(spaceId) ? spaceId : null)
+        (spaceId ? (spaceClientMap.get(spaceId) ?? null) : null)
 
       // Default mapping (hardcoded — works for Efeonce and spaces with identical property names)
       const result = {
         task_source_id: toNullableString(row.notion_page_id),
         project_source_id: projectSourceId,
-        project_source_ids: projectSourceIds.length > 0 ? projectSourceIds : null,
+        project_source_ids: projectSourceIds,
         sprint_source_id: sprintSourceId,
         project_database_source_id: projectDatabaseSourceId,
         space_id: spaceId,
@@ -1045,7 +1116,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
         task_priority: toNullableString(row.prioridad),
         assignee_source_id: assigneeSourceId,
         assignee_member_id: assigneeSourceId ? notionMemberMap.get(assigneeSourceId) || null : null,
-        assignee_member_ids: assigneeMemberIds.length > 0 ? assigneeMemberIds : null,
+        assignee_member_ids: assigneeMemberIds,
         completion_label: toNullableString(row.completitud),
         delivery_compliance: toNullableString(row.cumplimiento),
         days_late: toNumber(row['días_de_retraso']),
@@ -1148,7 +1219,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
 
     for (const row of tasks) {
       const spaceId = toNullableString(row.space_id) || '__NULL__'
-      const assigneeIds = row.responsables_ids || row.responsable_ids || []
+      const assigneeIds = mergeNotionRelationIds(row.responsables_ids, row.responsable_ids)
 
       if (assigneeIds.length > 0) {
         sourceAssigneeCountsBySpace.set(spaceId, (sourceAssigneeCountsBySpace.get(spaceId) ?? 0) + 1)
@@ -1196,9 +1267,17 @@ const syncNotion = async (): Promise<SyncSummary> => {
         })
       ])
 
-      await insertBigQueryRows('greenhouse_conformed', 'delivery_projects', deliveryProjects)
-      await insertBigQueryRows('greenhouse_conformed', 'delivery_tasks', deliveryTasks)
-      await insertBigQueryRows('greenhouse_conformed', 'delivery_sprints', deliverySprints)
+      await ensureDeliveryTaskColumns()
+
+      const normalizedDeliveryTasks = deliveryTasks.map(task => ({
+        ...task,
+        project_source_ids: task.project_source_ids ?? [],
+        assignee_member_ids: task.assignee_member_ids ?? []
+      }))
+
+      await replaceBigQueryTableWithLoadJob('greenhouse_conformed', 'delivery_projects', deliveryProjects)
+      await replaceBigQueryTableWithLoadJob('greenhouse_conformed', 'delivery_tasks', normalizedDeliveryTasks)
+      await replaceBigQueryTableWithLoadJob('greenhouse_conformed', 'delivery_sprints', deliverySprints)
     }
 
     let projected = 0

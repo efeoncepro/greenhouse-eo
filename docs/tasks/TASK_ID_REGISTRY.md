@@ -246,7 +246,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-194` | `to-do` | Expense Payment Ledger Separation | `docs/tasks/to-do/TASK-194-expense-payment-ledger-separation.md` |
 | `TASK-195` | `to-do` | Space Identity Consolidation: Organization-First Admin Entry & Space Onboarding | `docs/tasks/to-do/TASK-195-space-identity-consolidation-organization-first-admin.md` |
 | `TASK-196` | `in-progress` | Delivery Performance Report Parity: Greenhouse Canonical Report & Notion Consumption | `docs/tasks/in-progress/TASK-196-delivery-performance-report-parity-greenhouse-notion.md` |
-| `TASK-197` | `in-progress` | Delivery Source Sync Assignee & Project Relation Parity | `docs/tasks/in-progress/TASK-197-delivery-source-sync-assignee-project-parity.md` |
+| `TASK-197` | `complete` | Delivery Source Sync Assignee & Project Relation Parity | `docs/tasks/complete/TASK-197-delivery-source-sync-assignee-project-parity.md` |
 | `TASK-198` | `to-do` | Delivery Notion Assignee Identity Coverage | `docs/tasks/to-do/TASK-198-delivery-notion-assignee-identity-coverage.md` |
 | `TASK-199` | `to-do` | Delivery Performance Owner Attribution Contract | `docs/tasks/to-do/TASK-199-delivery-performance-owner-attribution-contract.md` |
 | `TASK-200` | `to-do` | Delivery Performance Metric Semantic Contract | `docs/tasks/to-do/TASK-200-delivery-performance-metric-semantic-contract.md` |

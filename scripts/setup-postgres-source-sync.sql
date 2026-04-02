@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_crm.contacts (
 
 CREATE TABLE IF NOT EXISTS greenhouse_delivery.projects (
   project_record_id TEXT PRIMARY KEY,
-  space_id TEXT REFERENCES greenhouse_core.notion_workspaces(space_id) ON DELETE SET NULL,
+  space_id TEXT REFERENCES greenhouse_core.spaces(space_id) ON DELETE SET NULL,
   client_id TEXT REFERENCES greenhouse_core.clients(client_id) ON DELETE SET NULL,
   module_id TEXT REFERENCES greenhouse_core.service_modules(module_id) ON DELETE SET NULL,
   project_database_source_id TEXT,
@@ -158,7 +158,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_delivery.projects (
 CREATE TABLE IF NOT EXISTS greenhouse_delivery.sprints (
   sprint_record_id TEXT PRIMARY KEY,
   project_record_id TEXT REFERENCES greenhouse_delivery.projects(project_record_id) ON DELETE SET NULL,
-  space_id TEXT REFERENCES greenhouse_core.notion_workspaces(space_id) ON DELETE SET NULL,
+  space_id TEXT REFERENCES greenhouse_core.spaces(space_id) ON DELETE SET NULL,
   project_database_source_id TEXT,
   notion_sprint_id TEXT NOT NULL UNIQUE,
   sprint_name TEXT NOT NULL,
@@ -182,7 +182,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_delivery.tasks (
   task_record_id TEXT PRIMARY KEY,
   project_record_id TEXT REFERENCES greenhouse_delivery.projects(project_record_id) ON DELETE SET NULL,
   sprint_record_id TEXT REFERENCES greenhouse_delivery.sprints(sprint_record_id) ON DELETE SET NULL,
-  space_id TEXT REFERENCES greenhouse_core.notion_workspaces(space_id) ON DELETE SET NULL,
+  space_id TEXT REFERENCES greenhouse_core.spaces(space_id) ON DELETE SET NULL,
   client_id TEXT REFERENCES greenhouse_core.clients(client_id) ON DELETE SET NULL,
   module_id TEXT REFERENCES greenhouse_core.service_modules(module_id) ON DELETE SET NULL,
   assignee_member_id TEXT REFERENCES greenhouse_core.members(member_id) ON DELETE SET NULL,
@@ -284,7 +284,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA greenhouse_sync
 GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER ON TABLES TO greenhouse_migrator;
 
 ALTER TABLE greenhouse_delivery.projects
-  ADD COLUMN IF NOT EXISTS space_id TEXT REFERENCES greenhouse_core.notion_workspaces(space_id) ON DELETE SET NULL;
+  ADD COLUMN IF NOT EXISTS space_id TEXT REFERENCES greenhouse_core.spaces(space_id) ON DELETE SET NULL;
 
 ALTER TABLE greenhouse_delivery.projects
   ADD COLUMN IF NOT EXISTS project_database_source_id TEXT;
@@ -305,7 +305,7 @@ ALTER TABLE greenhouse_delivery.projects
   ADD COLUMN IF NOT EXISTS page_url TEXT;
 
 ALTER TABLE greenhouse_delivery.sprints
-  ADD COLUMN IF NOT EXISTS space_id TEXT REFERENCES greenhouse_core.notion_workspaces(space_id) ON DELETE SET NULL;
+  ADD COLUMN IF NOT EXISTS space_id TEXT REFERENCES greenhouse_core.spaces(space_id) ON DELETE SET NULL;
 
 ALTER TABLE greenhouse_delivery.sprints
   ADD COLUMN IF NOT EXISTS project_database_source_id TEXT;
@@ -323,7 +323,7 @@ ALTER TABLE greenhouse_delivery.sprints
   ADD COLUMN IF NOT EXISTS page_url TEXT;
 
 ALTER TABLE greenhouse_delivery.tasks
-  ADD COLUMN IF NOT EXISTS space_id TEXT REFERENCES greenhouse_core.notion_workspaces(space_id) ON DELETE SET NULL;
+  ADD COLUMN IF NOT EXISTS space_id TEXT REFERENCES greenhouse_core.spaces(space_id) ON DELETE SET NULL;
 
 ALTER TABLE greenhouse_delivery.tasks
   ADD COLUMN IF NOT EXISTS project_database_source_id TEXT;

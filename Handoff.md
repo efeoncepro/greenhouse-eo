@@ -71,6 +71,7 @@
   - `TASK-200` contrato semántico de métricas
   - `TASK-201` reconciliación y materialización histórica de `Marzo 2026`
   - `TASK-202` cutover de publicación/consumo en Notion
+  - `TASK-197` ya quedó cerrada como slice de source sync/runtime parity
 
 ## Sesión 2026-04-02 — TASK-197 source sync assignee/project parity
 
@@ -118,19 +119,44 @@
   - targeted `eslint` de archivos tocados
   - `pnpm lint`
   - `rg -n "new Pool\\(" src scripts`
-- bloqueo preexistente detectado:
-  - `pnpm migrate:up` falla por drift del historial de migraciones
-  - PostgreSQL reporta aplicada `20260402120737013_notion-space-governance-registry`
-  - en el repo local existe `migrations/20260402120604104_notion-space-governance-registry.sql`
-  - no se corrigió ese drift renombrando timestamps manualmente
-- efecto del bloqueo:
-  - la nueva migración quedó versionada pero no aplicada
-  - `src/types/db.d.ts` no se regeneró en este turno porque depende de destrabar primero `migrate:up`
+- follow-up del mismo día:
+  - el bloqueo de migraciones quedó resuelto en la práctica; `pnpm migrate:up` sí aplicó `20260402222438783_delivery-runtime-space-fk-canonicalization.sql`
+  - `src/types/db.d.ts` se regeneró correctamente
+  - `greenhouse_delivery.{projects,sprints,tasks}.space_id` ya referencia `greenhouse_core.spaces(space_id)` en vez de `greenhouse_core.notion_workspaces`
+  - la migración también backfillea `space_id` legacy (`space-efeonce`, `greenhouse-demo-client`, `hubspot-company-*`) a `spc-*`
+  - `scripts/setup-postgres-source-sync.sql` quedó alineado con esa FK canónica
+  - `sync-notion-conformed.ts` dejó de perder `Sky` por el falso fallback `COALESCE([] , responsable_ids)` y ahora usa un `CASE` de arrays no vacíos
+  - verificación real en `greenhouse_conformed.delivery_tasks` para marzo 2026:
+    - `Sky`: `190/190` con `project_source_ids`
+    - `Sky`: `187/190` con `assignee_source_id`
+    - `Sky`: `151/190` con `assignee_member_ids`
+    - `Efeonce`: `116/116` con `assignee_source_id`
+  - `scripts/sync-source-runtime-projections.ts` también quedó endurecido:
+    - merge correcto de `responsables_ids` y `responsable_ids`
+    - arrays `assignee_member_ids` / `project_source_ids` siempre no nulos para PostgreSQL
+    - resolución de `client_id` por `space_notion_sources -> spaces`, no por asumir que `space_id` canónico es cliente
+  - reseed runtime en curso:
+    - PostgreSQL ya empezó a poblar `Sky` con `space_id = spc-ae463d9f-b404-438b-bd5c-bd117d45c3b9`
+    - corte intermedio observado para marzo 2026: `161` tareas `Sky`, `158` con `assignee_source_id`, `150` con `assignee_member_ids`, `161` con `project_source_ids`
+    - el seed completo de `scripts/sync-source-runtime-projections.ts` sigue corriendo/lento y la paridad total runtime todavía no debe considerarse cerrada
 
 ### Riesgos abiertos
 
 - cualquier cambio debe ser aditivo y backward-compatible para no romper `ICO`, `Person 360`, `Project Detail` ni `team-queries`
 - la task probablemente requerirá ensanchar PostgreSQL runtime, no solo corregir BigQuery/source sync
+
+### Cierre real
+
+- `TASK-197` quedó cerrada.
+- Validación final marzo 2026:
+  - `greenhouse_delivery.tasks`
+    - `Sky`: `190` tareas, `190` con `project_record_id`, `190` con `project_source_ids`, `187` con `assignee_source_id`, `151` con `assignee_member_ids`
+    - `Efeonce`: `116` tareas, `116` con `project_record_id`, `116` con `project_source_ids`, `116` con `assignee_source_id`, `116` con `assignee_member_ids`
+  - `greenhouse_delivery.{projects,sprints,tasks}` ya referencia `greenhouse_core.spaces(space_id)` en sus FKs de `space_id`
+  - `scripts/sync-source-runtime-projections.ts` terminó exitosamente:
+    - `notion.recordsProjectedPostgres = 4421`
+    - `hubspot.recordsProjectedPostgres = 97`
+- El siguiente carril natural es `TASK-198`, porque ya no estamos perdiendo tasks/responsables por el pipeline sino por coverage de identidad restante.
 
 ## Sesión 2026-04-02 — RESEARCH-004 space identity consolidation
 

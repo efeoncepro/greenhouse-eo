@@ -2,6 +2,17 @@
 
 ## Delta 2026-04-02
 
+- `TASK-197` quedó cerrada como slice de paridad de source sync/runtime.
+- Resultado útil para esta epic:
+  - `greenhouse_conformed.delivery_tasks` y `greenhouse_delivery.tasks` ya preservan `project_source_ids`
+  - marzo 2026 quedó alineado por `space` en runtime para el baseline mínimo:
+    - `Sky`: `190` tareas, `187` con `assignee_source_id`
+    - `Efeonce`: `116` tareas, `116` con `assignee_source_id`
+- A partir de este punto, el cuello de botella del `Performance Report` ya no es pérdida mecánica del carril `Notion -> conformed -> runtime`, sino:
+  - coverage de identidad (`TASK-198`)
+  - contrato de owner attribution (`TASK-199`)
+  - semántica de métricas (`TASK-200`)
+
 - La lane se descompone explícitamente en subtasks ejecutables para evitar mezclar sync, identidad, semántica, materialización y publicación:
   - `TASK-197 - Delivery Source Sync Assignee & Project Relation Parity`
   - `TASK-198 - Delivery Notion Assignee Identity Coverage`

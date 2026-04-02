@@ -119,7 +119,11 @@ Compatibilidad:
 
 Nota operativa:
 
-- la aplicación de la nueva migración quedó bloqueada por drift preexistente en `public.pgmigrations` contra el repo local para una migración anterior de Notion governance; no se debe resolver renombrando timestamps manualmente sin corregir antes esa discrepancia
+- update 2026-04-02:
+  - el bloqueo de migraciones quedó superado y se aplicó `20260402222438783_delivery-runtime-space-fk-canonicalization.sql`
+  - `greenhouse_delivery.{projects,sprints,tasks}.space_id` ya referencia `greenhouse_core.spaces(space_id)`
+  - el setup base `scripts/setup-postgres-source-sync.sql` quedó alineado con esa FK canónica
+  - el cron moderno también corrigió el falso fallback `COALESCE(responsables_ids, responsable_ids)` mediante una selección de arrays no vacíos, lo que restauró la atribución de `Sky` en `greenhouse_conformed`
 
 ## Delta 2026-04-01 — Notion DB IDs canónicos para Delivery / ICO
 

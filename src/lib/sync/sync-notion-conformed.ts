@@ -283,7 +283,11 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
              frame_versions, frame_comments, open_frame_comments,
              client_review_open, workflow_review_open, bloqueado_por_ids,
              last_frame_comment, proyecto_ids, sprint_ids,
-             COALESCE(responsables_ids, responsable_ids) AS responsables_ids,
+             CASE
+               WHEN responsables_ids IS NOT NULL AND ARRAY_LENGTH(responsables_ids) > 0 THEN responsables_ids
+               WHEN responsable_ids IS NOT NULL AND ARRAY_LENGTH(responsable_ids) > 0 THEN responsable_ids
+               ELSE ARRAY<STRING>[]
+             END AS responsables_ids,
              \`fecha_límite\`, \`fecha_límite_end\`, \`fecha_límite_original\`,
              \`fecha_límite_original_end\`, fecha_de_completado,
              \`tiempo_de_ejecución\`, \`tiempo_en_cambios\`, \`tiempo_en_revisión\`,
