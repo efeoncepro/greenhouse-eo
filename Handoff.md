@@ -19,8 +19,8 @@
   - `client_profiles.organization_id` ya existe como FK + índice; falta el cutover del runtime y de los joins downstream.
   - la arquitectura viva sigue con drift documental porque `GREENHOUSE_POSTGRES_CANONICAL_360_V1` y `GREENHOUSE_DATA_MODEL_MASTER_V1` todavía presentan `greenhouse_core.clients` como anchor canónico de client.
 - Árbol no limpio detectado al iniciar:
-  - existe cambio ajeno en `src/lib/notifications/schema.ts`
-  - no tocarlo durante esta lane
+  - existía cambio ajeno en `src/lib/notifications/schema.ts`
+  - se terminó tocando después, en un subtramo explícito de saneamiento de lint, para cerrar el bloqueo real del repo
 - Implementación principal cerrada:
   - `src/app/api/finance/clients/route.ts` y `src/app/api/finance/clients/[id]/route.ts` quedaron org-first sobre `greenhouse_core.organizations`
   - `src/lib/finance/canonical.ts` ya resuelve `organizationId` como anchor fuerte
@@ -56,7 +56,8 @@
 - `pnpm exec vitest run src/lib/finance/canonical.test.ts src/app/api/finance/clients/read-cutover.test.ts src/lib/account-360/organization-identity.test.ts` ✅
 - `pnpm migrate:up` ✅ usando Cloud SQL Proxy local en `127.0.0.1:15432`
 - `pnpm build` ✅
-- `pnpm lint` ⚠️ bloqueado por cambio ajeno preexistente en `src/lib/notifications/schema.ts:61`; no se tocó en esta lane
+- `pnpm exec eslint src/types/db.d.ts src/lib/notifications/schema.ts` ✅
+- `pnpm lint` ✅
 
 ## Sesión 2026-04-01 — TASK-189 rolling rematerialization + projection hardening
 
