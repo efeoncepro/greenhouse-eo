@@ -377,13 +377,161 @@ Toda integración nativa debe operar con:
 - [`Greenhouse_ICO_Engine_v1.md`](./Greenhouse_ICO_Engine_v1.md)
   consumer relevante para readiness y trust downstream
 
+## Implementation Status (2026-04-01)
+
+`TASK-188` implementó Layer 1 (Integration Registry) y las governance surfaces compartidas. Esta sección documenta lo que existe en el repo y cómo opera.
+
+### Integration Registry — Schema
+
+```sql
+greenhouse_sync.integration_registry
+├── integration_key    TEXT  PK        -- e.g. 'notion', 'hubspot', 'nubox', 'frame_io'
+├── display_name       TEXT  NOT NULL  -- nombre visible en UI
+├── integration_type   TEXT  NOT NULL  -- taxonomía: system_upstream | event_provider | batch_file | api_connector | hybrid
+├── source_system      TEXT  NOT NULL  -- clave para cruzar con source_sync_runs
+├── description        TEXT           -- descripción operativa
+├── owner              TEXT           -- equipo o persona responsable
+├── consumer_domains   TEXT[]         -- dominios downstream: ['delivery', 'ico', 'crm', 'finance', 'agency']
+├── auth_mode          TEXT           -- oauth2 | api_key | token | iam | none
+├── sync_cadence       TEXT           -- 15min | hourly | daily | passive | manual
+├── environment        TEXT           -- production (default)
+├── contract_version   TEXT           -- semver del contrato vigente (futuro: OpenAPI/AsyncAPI)
+├── readiness_status   TEXT           -- ready | warning | blocked | unknown
+├── active             BOOLEAN        -- filtro principal de UI y API
+├── metadata           JSONB          -- extensiones controladas por integración
+├── created_at         TIMESTAMPTZ
+└── updated_at         TIMESTAMPTZ
+```
+
+Constraint: `integration_type` y `readiness_status` tienen `CHECK` constraints sobre sus valores válidos.
+
+### Seed Data
+
+| `integration_key` | `integration_type` | `sync_cadence` | `consumer_domains` | `readiness_status` |
+|---|---|---|---|---|
+| `notion` | `hybrid` | `15min` | delivery, ico, agency | `ready` |
+| `hubspot` | `system_upstream` | `hourly` | crm, finance, agency | `ready` |
+| `nubox` | `api_connector` | `daily` | finance | `ready` |
+| `frame_io` | `event_provider` | `passive` | delivery | `warning` |
+
+### Health Aggregation
+
+`src/lib/integrations/health.ts` cruza el registry con señales reales del runtime:
+
+```
+integration_registry.source_system
+    ↓ JOIN
+source_sync_runs                → runs y failures últimas 24h, último sync exitoso
+    ↓ ENRICH (por integration_key)
+space_notion_sources            → MAX(last_synced_at) para Notion
+services.hubspot_last_synced_at → MAX para HubSpot
+```
+
+El resultado es un `IntegrationHealthSnapshot` por integración:
+
+- **health**: `healthy` | `degraded` | `down` | `idle`
+  - `idle`: sin señales históricas
+  - `healthy`: sync reciente, sin fallos
+  - `degraded`: fallos recientes o sync > 36h atrás
+  - `down`: fallos + última señal > 72h
+- **freshness**: porcentaje 0-100% que decae linealmente hasta 0% a las 48h sin señal
+- **syncRunsLast24h** / **syncFailuresLast24h**: volumetría cruda
+
+### Shared Types
+
+`src/types/integrations.ts` exporta:
+
+| Type | Uso |
+|---|---|
+| `IntegrationType` | Taxonomía (`system_upstream`, `event_provider`, `batch_file`, `api_connector`, `hybrid`) |
+| `IntegrationReadiness` | Readiness downstream (`ready`, `warning`, `blocked`, `unknown`) |
+| `IntegrationHealth` | Health derivado (`healthy`, `degraded`, `down`, `idle`, `not_configured`) |
+| `IntegrationRegistryEntry` | Fila completa del registry |
+| `IntegrationHealthSnapshot` | Health + freshness por integración |
+| `IntegrationWithHealth` | Registry entry + health snapshot (para API y UI) |
+
+### API Routes
+
+| Method | Path | Auth | Descripción |
+|---|---|---|---|
+| `GET` | `/api/admin/integrations` | `requireAdminTenantContext` | Lista todas las integraciones activas con health snapshot |
+| `GET` | `/api/admin/integrations/[integrationKey]/health` | `requireAdminTenantContext` | Detalle de health para una integración |
+
+Ambas rutas requieren `routeGroup: admin` + `roleCode: efeonce_admin`.
+
+### Helpers
+
+| Archivo | Exports | Patrón |
+|---|---|---|
+| `src/lib/integrations/registry.ts` | `getIntegrationRegistry()`, `getIntegrationByKey(key)` | Kysely (`getDb()`) |
+| `src/lib/integrations/health.ts` | `getIntegrationHealthSnapshots(keys)` | `runGreenhousePostgresQuery` (raw SQL para aggregations complejas) |
+
+### Governance Surface
+
+**Page**: `/admin/integrations` (view code: `administracion.cloud_integrations`)
+
+La vista tiene 4 secciones:
+
+1. **KPI cards**: integraciones activas, ready count, attention count, dominios downstream cubiertos
+2. **Registry table**: taxonomía, owner, cadencia, auth, dominios, readiness por integración
+3. **Health & freshness**: health chip, freshness bar (0-100%), última señal, syncs/fallos 24h
+4. **Consumer domain map**: card por integración con descripción y dominios dependientes
+
+**Links cruzados**:
+- Admin Center tiene card de "Integration Governance" que lleva a `/admin/integrations`
+- Cloud & Integrations (`/admin/cloud-integrations`) tiene botón que lleva a governance
+
+### Data Flow — End to End
+
+```
+Fuente externa (Notion API, HubSpot API, Nubox API)
+    │
+    ▼
+Sibling repos (notion-bigquery, hubspot-bigquery)
+    │  ingestion → BigQuery raw → BigQuery conformed
+    ▼
+greenhouse-eo sync pipelines
+    │  projection → PostgreSQL (greenhouse_delivery, greenhouse_crm, greenhouse_finance)
+    │  emit → greenhouse_sync.outbox_events
+    │  track → greenhouse_sync.source_sync_runs ←─── señal de health
+    ▼
+integration_registry ←─── Layer 1: registro formal de integraciones nativas
+    │
+    ▼
+health.ts ←─── cruce registry × sync_runs × source-specific freshness
+    │
+    ▼
+/api/admin/integrations ←─── API JSON
+    │
+    ▼
+/admin/integrations ←─── governance surface visible
+```
+
+La capa **no reemplaza** pipelines, outbox ni webhooks existentes. Pone un registro formal encima que gobierna qué integraciones existen, quién es responsable, qué dominios dependen, y cuál es el estado operativo real.
+
+### Extension Points
+
+Cuando se registre una nueva integración:
+
+1. **INSERT** en `integration_registry` (migration o seed)
+2. Si el `source_system` ya emite a `source_sync_runs`, el health se calcula automáticamente
+3. Si no, agregar enriquecimiento específico en `health.ts` (como el de Notion/HubSpot)
+4. La UI muestra la nueva integración sin cambios de frontend
+
+Cuando TASK-187 formalice Notion:
+
+1. Actualizar `contract_version` en el registry (semver del contrato OpenAPI/AsyncAPI)
+2. Agregar `readiness_rules` en `metadata` JSONB para reglas de readiness más finas
+3. Drift detection escribe a `metadata.last_drift_at` o tabla dedicada
+4. Todo visible en la misma governance surface
+
 ## Follow-on Work
 
-- formalizar `Notion` como primer consumer fuerte de esta architecture layer
-- definir inventory y health shared en Admin/Ops
-- definir contract registry operativo
-- definir readiness shared por integración y por consumer
-- extender el modelo a `HubSpot`, `Nubox` y `Frame.io`
+- `TASK-187`: formalizar Notion como primer consumer fuerte — contract version, schema registry, drift detection, readiness rules
+- contract registry operativo: versionado machine-readable de contratos por integración (OpenAPI/AsyncAPI)
+- readiness automática: derivar `readiness_status` de reglas declarativas en vez de manual
+- integration inventory en API v1: exponer el registry para consumo externo con token auth
+- extender enriquecimiento de health a Nubox (via `source_sync_runs` de cron) y Frame.io (cuando tenga señal propia)
 
 ## External References
 
