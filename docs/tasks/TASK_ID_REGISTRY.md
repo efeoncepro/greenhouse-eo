@@ -239,3 +239,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-187` | `to-do` | Notion Integration Formalization: Space Onboarding, Schema Governance & KPI Readiness | `docs/tasks/to-do/TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md` |
 | `TASK-188` | `to-do` | Native Integrations Layer: Platform Governance, Runtime Contracts & Shared Operating Model | `docs/tasks/to-do/TASK-188-native-integrations-layer-platform-governance.md` |
 | `TASK-189` | `complete` | ICO Period Filter: Due-Date Anchor & Carry-Over Logic | `docs/tasks/complete/TASK-189-ico-period-filter-due-date-anchor.md` |
+| `TASK-190` | `to-do` | Platform Temporal Scope Contract & Cross-Module Time Semantics | `docs/tasks/to-do/TASK-190-platform-temporal-scope-contract-cross-module-parity.md` |
