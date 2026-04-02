@@ -10,7 +10,7 @@
   - `ico_engine.metrics_by_member` para `Top Performer`
 - contenido actual del snapshot:
   - resumen mensual (`On-Time %`, `Late Drops`, `Overdue`, `Carry-Over`, totales)
-  - `task_mix_json` con distribución por segmento/space-cliente
+  - `task_mix_json` con distribución por segmento, agrupada por `client_id` y con fallback a `space_id`
   - `Top Performer` MVP y sus supuestos operativos
 - regla vigente:
   - el `Performance Report` no debe abrir un carril de cálculo paralelo al engine

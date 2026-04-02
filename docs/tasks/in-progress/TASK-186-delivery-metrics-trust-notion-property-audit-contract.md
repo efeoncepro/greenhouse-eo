@@ -10,6 +10,10 @@
   - `taskMix` ordenado por volumen
   - `alertText`
   - `executiveSummary`
+- La segmentación del scorecard ya no usa el nombre derivado como clave:
+  - ahora agrupa por `client_id` cuando existe
+  - hace fallback a `space_id` cuando no existe vínculo de cliente
+  - `client_name` / `space_id` quedan solo como label visible
 - La UI Agency ICO ya muestra esas piezas del reporte sin recalcular métricas en el cliente:
   - alerta
   - resumen ejecutivo

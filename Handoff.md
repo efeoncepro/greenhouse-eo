@@ -69,6 +69,10 @@
     - `taskMix` por segmento dominante del período
     - `alertText`
     - `executiveSummary`
+  - la segmentación quedó endurecida para no depender del nombre como clave:
+    - agrupa por `client_id` cuando existe
+    - si no existe, cae a `space_id`
+    - el nombre queda solo como label visible del segmento
   - `AgencyIcoEngineView` ya expone esas piezas del reporte como cards y texto ejecutivo
   - supuestos MVP actuales del ranking:
     - elegibilidad `throughput_count >= 5`
@@ -99,7 +103,6 @@
 - Falta decidir si el siguiente slice baja `carry_over_count` también a serving/Postgres o si se mantiene solo como contexto de `ICO`.
 - El scope más amplio de `TASK-186` sigue abierto: paridad completa del `Performance Report`, revisión de FTR drift y matriz completa `propiedad -> contrato -> prioridad`.
 - Prioridad correcta de `TASK-186` para los siguientes slices:
-  - validar si la segmentación por nombre de `space/client` es suficiente o si necesita contrato explícito `Efeonce` / `Sky`
   - decidir si el scorecard mensual también debe proyectarse a `greenhouse_serving`
   - revisar si `alertText` / `executiveSummary` deben seguir siendo determinísticos o pasar luego por capa narrativa separada
 

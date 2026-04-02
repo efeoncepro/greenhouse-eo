@@ -622,13 +622,45 @@ const materializePerformanceReports = async (
       (report_scope, period_year, period_month,
        on_time_count, late_drop_count, on_time_pct,
        overdue_count, carry_over_count,
-       total_tasks, completed_tasks, active_tasks, task_mix_json,
+       total_tasks, completed_tasks, active_tasks,
+       efeonce_tasks_count, sky_tasks_count, task_mix_json,
        top_performer_member_id, top_performer_member_name,
        top_performer_otd_pct, top_performer_throughput_count,
        top_performer_rpa_avg, top_performer_ftr_pct,
        top_performer_min_throughput, trend_stable_band_pp, multi_assignee_policy,
        materialized_at, engine_version)
-    WITH agency_summary AS (
+    WITH classified_snapshots AS (
+      SELECT
+        ms.*,
+        CASE
+          WHEN LOWER(TRIM(COALESCE(ms.client_id, ms.space_id, ''))) IN ('efeonce_internal', 'client_internal', 'space-efeonce')
+            OR LOWER(TRIM(COALESCE(c1.client_name, c2.client_name, ms.space_id, ''))) IN ('efeonce internal', 'efeonce')
+            THEN 'efeonce'
+          WHEN LOWER(TRIM(COALESCE(c1.client_name, c2.client_name, ms.space_id, ''))) LIKE '%sky%'
+            OR LOWER(TRIM(COALESCE(ms.client_id, ms.space_id, ''))) LIKE '%sky%'
+            THEN 'sky'
+          WHEN ms.client_id IS NOT NULL AND TRIM(ms.client_id) != ''
+            THEN CONCAT('client:', ms.client_id)
+          ELSE CONCAT('space:', ms.space_id)
+        END AS segment_key,
+        CASE
+          WHEN LOWER(TRIM(COALESCE(ms.client_id, ms.space_id, ''))) IN ('efeonce_internal', 'client_internal', 'space-efeonce')
+            OR LOWER(TRIM(COALESCE(c1.client_name, c2.client_name, ms.space_id, ''))) IN ('efeonce internal', 'efeonce')
+            THEN 'Efeonce'
+          WHEN LOWER(TRIM(COALESCE(c1.client_name, c2.client_name, ms.space_id, ''))) LIKE '%sky%'
+            OR LOWER(TRIM(COALESCE(ms.client_id, ms.space_id, ''))) LIKE '%sky%'
+            THEN 'Sky'
+          ELSE COALESCE(NULLIF(TRIM(COALESCE(c1.client_name, c2.client_name, ms.space_id)), ''), ms.space_id)
+        END AS segment_label
+      FROM \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\` ms
+      LEFT JOIN \`${projectId}.greenhouse.clients\` c1
+        ON c1.client_id = ms.client_id
+      LEFT JOIN \`${projectId}.greenhouse.clients\` c2
+        ON c2.client_id = ms.space_id
+      WHERE ms.period_year = @periodYear
+        AND ms.period_month = @periodMonth
+    ),
+    agency_summary AS (
       SELECT
         'agency' AS report_scope,
         @periodYear AS period_year,
@@ -646,10 +678,10 @@ const materializePerformanceReports = async (
         SUM(carry_over_count) AS carry_over_count,
         SUM(total_tasks) AS total_tasks,
         SUM(completed_tasks) AS completed_tasks,
-        SUM(active_tasks) AS active_tasks
-      FROM \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\`
-      WHERE period_year = @periodYear
-        AND period_month = @periodMonth
+        SUM(active_tasks) AS active_tasks,
+        SUM(CASE WHEN segment_key = 'efeonce' THEN total_tasks ELSE 0 END) AS efeonce_tasks_count,
+        SUM(CASE WHEN segment_key = 'sky' THEN total_tasks ELSE 0 END) AS sky_tasks_count
+      FROM classified_snapshots
     ),
     task_mix AS (
       SELECT
@@ -661,16 +693,10 @@ const materializePerformanceReports = async (
         ) AS task_mix_json
       FROM (
         SELECT
-          LOWER(REGEXP_REPLACE(COALESCE(NULLIF(TRIM(COALESCE(c1.client_name, c2.client_name, ms.space_id)), ''), ms.space_id), r'[^A-Za-z0-9]+', '_')) AS segment_key,
-          COALESCE(NULLIF(TRIM(COALESCE(c1.client_name, c2.client_name, ms.space_id)), ''), ms.space_id) AS segment_label,
-          SUM(ms.total_tasks) AS total_tasks
-        FROM \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\` ms
-        LEFT JOIN \`${projectId}.greenhouse.clients\` c1
-          ON c1.client_id = ms.client_id
-        LEFT JOIN \`${projectId}.greenhouse.clients\` c2
-          ON c2.client_id = ms.space_id
-        WHERE ms.period_year = @periodYear
-          AND ms.period_month = @periodMonth
+          segment_key,
+          segment_label,
+          SUM(total_tasks) AS total_tasks
+        FROM classified_snapshots
         GROUP BY segment_key, segment_label
       )
     ),
@@ -708,6 +734,8 @@ const materializePerformanceReports = async (
       summary.total_tasks,
       summary.completed_tasks,
       summary.active_tasks,
+      summary.efeonce_tasks_count,
+      summary.sky_tasks_count,
       mix.task_mix_json,
       top.member_id,
       top.member_name,

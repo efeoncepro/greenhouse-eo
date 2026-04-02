@@ -170,6 +170,24 @@ const AgencyIcoEngineView = ({ data, onComputeLive, computingLive }: Props) => {
                     subtitle='Carga arrastrada desde períodos previos'
                   />
                 </Grid>
+                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+                  <HorizontalWithSubtitle
+                    title='Tareas Efeonce'
+                    stats={formatCount(data.report.summary.efeonceTasks)}
+                    avatarIcon='tabler-building-factory'
+                    avatarColor='info'
+                    subtitle='Carga segmentada como operación interna'
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+                  <HorizontalWithSubtitle
+                    title='Tareas Sky'
+                    stats={formatCount(data.report.summary.skyTasks)}
+                    avatarIcon='tabler-plane'
+                    avatarColor='primary'
+                    subtitle='Carga segmentada como Sky / client team'
+                  />
+                </Grid>
                 <Grid size={{ xs: 12 }}>
                   <Card
                     elevation={0}
@@ -195,7 +213,10 @@ const AgencyIcoEngineView = ({ data, onComputeLive, computingLive }: Props) => {
                     </Stack>
                   </Card>
                 </Grid>
-                {data.report.taskMix.slice(0, 3).map(segment => (
+                {data.report.taskMix
+                  .filter(segment => !['efeonce', 'sky'].includes(segment.segmentKey))
+                  .slice(0, 3)
+                  .map(segment => (
                   <Grid key={segment.segmentKey} size={{ xs: 12, sm: 6, lg: 4 }}>
                     <HorizontalWithSubtitle
                       title={`Tareas ${segment.segmentLabel}`}

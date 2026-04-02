@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { isInternalCommercialAssignment } from '@/lib/commercial-cost-attribution/assignment-classification'
 import { getIcoEngineProjectId, normalizeString, runIcoEngineQuery, toNullableNumber, toNumber } from './shared'
 import { readAgencyMetrics, type SpaceMetricSnapshot } from './read-metrics'
 import { ICO_DATASET } from './schema'
@@ -16,6 +17,8 @@ export interface PerformanceReportTopPerformer {
 }
 
 export interface PerformanceReportTaskMixEntry {
+  segmentType: 'client' | 'space'
+  segmentId: string
   segmentKey: string
   segmentLabel: string
   totalTasks: number
@@ -37,6 +40,8 @@ export interface AgencyPerformanceReport {
     totalTasks: number
     completedTasks: number
     activeTasks: number
+    efeonceTasks: number
+    skyTasks: number
   }
   taskMix: PerformanceReportTaskMixEntry[]
   alertText: string
@@ -70,6 +75,8 @@ interface MaterializedPerformanceReportRow {
   total_tasks: unknown
   completed_tasks: unknown
   active_tasks: unknown
+  efeonce_tasks_count: unknown
+  sky_tasks_count: unknown
   task_mix_json: unknown
   top_performer_member_id: unknown
   top_performer_member_name: unknown
@@ -121,27 +128,53 @@ const summarizeSpaces = (spaces: SpaceMetricSnapshot[]) => ({
   carryOver: spaces.reduce((sum, space) => sum + space.context.carryOverTasks, 0),
   totalTasks: spaces.reduce((sum, space) => sum + space.context.totalTasks, 0),
   completedTasks: spaces.reduce((sum, space) => sum + space.context.completedTasks, 0),
-  activeTasks: spaces.reduce((sum, space) => sum + space.context.activeTasks, 0)
+  activeTasks: spaces.reduce((sum, space) => sum + space.context.activeTasks, 0),
+  efeonceTasks: spaces
+    .filter(space => isInternalCommercialAssignment({ clientId: space.clientId, clientName: space.clientName }))
+    .reduce((sum, space) => sum + space.context.totalTasks, 0),
+  skyTasks: spaces
+    .filter(space => {
+      const label = `${space.clientId ?? ''} ${space.clientName ?? ''} ${space.spaceId ?? ''}`.toLowerCase()
+
+      return label.includes('sky')
+    })
+    .reduce((sum, space) => sum + space.context.totalTasks, 0)
 })
 
 const buildTaskMixFromSpaces = (spaces: SpaceMetricSnapshot[]): PerformanceReportTaskMixEntry[] => {
-  return spaces
-    .map(space => {
-      const rawLabel = normalizeString(space.clientName) || normalizeString(space.spaceId)
-      const label = rawLabel || 'Sin etiqueta'
+  const segments = new Map<string, PerformanceReportTaskMixEntry>()
 
-      return {
-        segmentKey: label.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, ''),
-        segmentLabel: label,
-        totalTasks: space.context.totalTasks
-      }
-    })
-    .filter(entry => entry.totalTasks > 0)
-    .sort((a, b) => {
-      if (b.totalTasks !== a.totalTasks) return b.totalTasks - a.totalTasks
+  for (const space of spaces) {
+    const segmentType: PerformanceReportTaskMixEntry['segmentType'] = space.clientId ? 'client' : 'space'
+    const segmentId = normalizeString(space.clientId) || normalizeString(space.spaceId)
 
-      return a.segmentLabel.localeCompare(b.segmentLabel, 'es')
+    if (!segmentId || space.context.totalTasks <= 0) {
+      continue
+    }
+
+    const segmentLabel = normalizeString(space.clientName) || normalizeString(space.spaceId) || 'Sin etiqueta'
+    const segmentKey = `${segmentType}:${segmentId}`
+    const existing = segments.get(segmentKey)
+
+    if (existing) {
+      existing.totalTasks += space.context.totalTasks
+      continue
+    }
+
+    segments.set(segmentKey, {
+      segmentType,
+      segmentId,
+      segmentKey,
+      segmentLabel,
+      totalTasks: space.context.totalTasks
     })
+  }
+
+  return Array.from(segments.values()).sort((a, b) => {
+    if (b.totalTasks !== a.totalTasks) return b.totalTasks - a.totalTasks
+
+    return a.segmentLabel.localeCompare(b.segmentLabel, 'es')
+  })
 }
 
 const parseTaskMix = (raw: unknown): PerformanceReportTaskMixEntry[] => {
@@ -149,6 +182,8 @@ const parseTaskMix = (raw: unknown): PerformanceReportTaskMixEntry[] => {
 
   try {
     const parsed = JSON.parse(raw) as Array<{
+      segment_type?: unknown
+      segment_id?: unknown
       segment_key?: unknown
       segment_label?: unknown
       total_tasks?: unknown
@@ -156,6 +191,8 @@ const parseTaskMix = (raw: unknown): PerformanceReportTaskMixEntry[] => {
 
     return parsed
       .map(entry => ({
+        segmentType: normalizeString(entry.segment_type) === 'client' ? 'client' : 'space',
+        segmentId: normalizeString(entry.segment_id) || normalizeString(entry.segment_key) || 'segment',
         segmentKey: normalizeString(entry.segment_key) || 'segment',
         segmentLabel: normalizeString(entry.segment_label) || normalizeString(entry.segment_key) || 'Sin etiqueta',
         totalTasks: toNumber(entry.total_tasks)
@@ -347,7 +384,9 @@ const readMaterializedAgencyPerformanceReport = async (
     carryOver: toNumber(current.carry_over_count),
     totalTasks: toNumber(current.total_tasks),
     completedTasks: toNumber(current.completed_tasks),
-    activeTasks: toNumber(current.active_tasks)
+    activeTasks: toNumber(current.active_tasks),
+    efeonceTasks: toNumber(current.efeonce_tasks_count),
+    skyTasks: toNumber(current.sky_tasks_count)
   }
 
   const topPerformer = buildTopPerformerFromMaterializedRow(current)
@@ -410,7 +449,9 @@ export const readAgencyPerformanceReport = async (
     carryOver: currentSummary.carryOver,
     totalTasks: currentSummary.totalTasks,
     completedTasks: currentSummary.completedTasks,
-    activeTasks: currentSummary.activeTasks
+    activeTasks: currentSummary.activeTasks,
+    efeonceTasks: currentSummary.efeonceTasks,
+    skyTasks: currentSummary.skyTasks
   }
 
   return {
