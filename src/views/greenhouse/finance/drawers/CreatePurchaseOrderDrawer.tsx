@@ -21,7 +21,7 @@ import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/gre
 // ── Types ──
 
 interface ClientOption {
-  clientId: string
+  clientId: string | null
   clientProfileId: string
   companyName: string | null
   greenhouseClientName: string | null
@@ -36,7 +36,7 @@ interface ActivePOSummary {
 }
 
 const getClientLabel = (c: ClientOption) =>
-  c.legalName || c.companyName || c.greenhouseClientName || c.clientId
+  c.legalName || c.companyName || c.greenhouseClientName || c.clientId || c.clientProfileId
 
 const CURRENCIES = ['CLP', 'USD']
 
@@ -70,6 +70,8 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
   const [activePOs, setActivePOs] = useState<ActivePOSummary | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const selectableClients = clients.filter((client): client is ClientOption & { clientId: string } => Boolean(client.clientId))
 
   // ── Fetch clients ──
 
@@ -124,7 +126,7 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
     setSelectedClientId(value)
     fetchActivePOs(value)
 
-    const client = clients.find(c => c.clientId === value)
+    const client = selectableClients.find(c => c.clientId === value)
 
     if (client?.paymentCurrency && !currency) {
       setCurrency(client.paymentCurrency)
@@ -171,7 +173,7 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
     setSaving(true)
     setError(null)
 
-    const client = clients.find(c => c.clientId === selectedClientId)
+    const client = selectableClients.find(c => c.clientId === selectedClientId)
 
     try {
       const res = await fetch('/api/finance/purchase-orders', {
@@ -260,16 +262,16 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
           disabled={loadingClients}
         >
           <MenuItem value=''>
-            {loadingClients ? 'Cargando...' : clients.length === 0 ? 'No hay clientes' : '— Seleccionar cliente —'}
+            {loadingClients ? 'Cargando...' : selectableClients.length === 0 ? 'No hay clientes disponibles para OC' : '— Seleccionar cliente —'}
           </MenuItem>
-          {clients.map(c => (
+          {selectableClients.map(c => (
             <MenuItem key={c.clientId} value={c.clientId}>{getClientLabel(c)}</MenuItem>
           ))}
         </CustomTextField>
 
         {activePOs && activePOs.count > 0 && (
           <Alert severity='info' icon={<i className='tabler-file-check' />}>
-            {getClientLabel(clients.find(c => c.clientId === selectedClientId)!)} tiene {activePOs.count} OC activa{activePOs.count > 1 ? 's' : ''}.
+            {getClientLabel(selectableClients.find(c => c.clientId === selectedClientId)!)} tiene {activePOs.count} OC activa{activePOs.count > 1 ? 's' : ''}.
             Saldo disponible: {formatCLP(activePOs.totalRemaining)}
           </Alert>
         )}

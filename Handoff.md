@@ -1,5 +1,63 @@
 # Handoff.md
 
+## Sesión 2026-04-01 — TASK-181 finance clients canonical source migration
+
+### Objetivo
+
+- Reconciliar `Finance Clients` con el modelo B2B canónico antes de implementar: cortar el anchor principal de `greenhouse_core.clients` hacia `greenhouse_core.organizations WHERE organization_type IN ('client','both')` sin romper consumers existentes.
+
+### Delta de ejecución
+
+- `TASK-181` se movió de `to-do/` a `in-progress/`.
+- La spec de `TASK-181` se corrigió tras auditoría de runtime/schema:
+  - `Finance Clients` ya opera `Postgres-first`; el drift real es el anchor en `greenhouse_core.clients`, no una dependencia primaria de BigQuery.
+  - `resolveOrganizationForClient()` vive en `src/lib/account-360/organization-identity.ts`, no en `canonical.ts`.
+  - El blast radius real incluye también:
+    - `src/lib/finance/postgres-store-slice2.ts`
+    - consumers de `resolveFinanceClientContext()` como `src/app/api/finance/income/route.ts`
+    - readers organization-first que todavía unen `client_economics` por `cp.client_id`
+  - `client_profiles.organization_id` ya existe como FK + índice; falta el cutover del runtime y de los joins downstream.
+  - la arquitectura viva sigue con drift documental porque `GREENHOUSE_POSTGRES_CANONICAL_360_V1` y `GREENHOUSE_DATA_MODEL_MASTER_V1` todavía presentan `greenhouse_core.clients` como anchor canónico de client.
+- Árbol no limpio detectado al iniciar:
+  - existe cambio ajeno en `src/lib/notifications/schema.ts`
+  - no tocarlo durante esta lane
+- Implementación principal cerrada:
+  - `src/app/api/finance/clients/route.ts` y `src/app/api/finance/clients/[id]/route.ts` quedaron org-first sobre `greenhouse_core.organizations`
+  - `src/lib/finance/canonical.ts` ya resuelve `organizationId` como anchor fuerte
+  - `src/lib/finance/postgres-store-slice2.ts` ya sincroniza y upsertea `client_profiles` con `organization_id` como FK principal
+  - `src/lib/account-360/organization-store.ts`, `src/lib/account-360/organization-economics.ts` y `src/lib/finance/postgres-store-intelligence.ts` quedaron endurecidos para no perder snapshots cuando el runtime financiero venga identificado por organización
+  - drawers Finance alineados: `CreateIncomeDrawer` soporta `organizationId`; `CreatePurchaseOrderDrawer` y `CreateHesDrawer` restringen selección a clientes con `clientId` legado disponible
+- Backfill runtime:
+  - migración `20260402020611201_finance-clients-organization-canonical-backfill.sql` quedó aplicada pero fue `no-op`
+  - se corrigió con `20260402022518358_finance-clients-organization-canonical-backfill-followup.sql`, ya aplicada en `greenhouse-pg-dev`
+  - resultado real: los legacy clients `nubox-client-76438378-8` y `nubox-client-91947000-3` ahora tienen `client_profile_id = client_id` y `organization_id` poblado
+- Drift documental reconciliado en:
+  - `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
+  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+
+### Validación
+
+- Discovery y auditoría manual de:
+  - `docs/tasks/in-progress/TASK-181-finance-clients-organization-canonical-source.md`
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+  - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+  - `docs/architecture/schema-snapshot-baseline.sql`
+  - `src/app/api/finance/clients/*.ts`
+  - `src/lib/finance/canonical.ts`
+  - `src/lib/finance/postgres-store-slice2.ts`
+  - `src/lib/account-360/*.ts`
+- Sin `build/lint/test` todavía en este tramo: solo discovery + corrección documental previa a implementación.
+- `pnpm pg:doctor --profile=ops` ✅ usando `GREENHOUSE_POSTGRES_HOST=127.0.0.1`, `GREENHOUSE_POSTGRES_PORT=15432`, `GREENHOUSE_POSTGRES_SSL=false`
+- `pnpm exec vitest run src/lib/finance/canonical.test.ts src/app/api/finance/clients/read-cutover.test.ts src/lib/account-360/organization-identity.test.ts` ✅
+- `pnpm migrate:up` ✅ usando Cloud SQL Proxy local en `127.0.0.1:15432`
+- `pnpm build` ✅
+- `pnpm lint` ⚠️ bloqueado por cambio ajeno preexistente en `src/lib/notifications/schema.ts:61`; no se tocó en esta lane
+
 ## Sesión 2026-04-01 — TASK-189 rolling rematerialization + projection hardening
 
 ### Objetivo

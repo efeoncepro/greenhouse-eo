@@ -4,72 +4,67 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 let ensurePromise: Promise<void> | null = null
 
-const DDL_STATEMENTS = [
-  `CREATE SCHEMA IF NOT EXISTS greenhouse_notifications`,
+const REQUIRED_TABLES = [
+  'notifications',
+  'notification_preferences',
+  'notification_log'
+] as const
 
-  `CREATE TABLE IF NOT EXISTS greenhouse_notifications.notifications (
-    notification_id   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id           TEXT NOT NULL,
-    space_id          TEXT,
-    category          TEXT NOT NULL,
-    title             TEXT NOT NULL,
-    body              TEXT,
-    action_url        TEXT,
-    icon              TEXT,
-    metadata          JSONB DEFAULT '{}',
-    read_at           TIMESTAMPTZ,
-    archived_at       TIMESTAMPTZ,
-    created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
-  )`,
+const REQUIRED_COLUMNS = [
+  { table: 'notifications', column: 'metadata' },
+  { table: 'notification_log', column: 'metadata' }
+] as const
 
-  `CREATE INDEX IF NOT EXISTS idx_notifications_user_unread
-   ON greenhouse_notifications.notifications (user_id, created_at DESC)
-   WHERE read_at IS NULL AND archived_at IS NULL`,
+const NOTIFICATIONS_SETUP_HINT =
+  'greenhouse_notifications baseline is missing. Run scripts/setup-postgres-notifications.sql before enabling notifications runtime.'
 
-  `CREATE INDEX IF NOT EXISTS idx_notifications_user_unread_count
-   ON greenhouse_notifications.notifications (user_id)
-   WHERE read_at IS NULL AND archived_at IS NULL`,
+type ExistingTableRow = Record<string, unknown> & {
+  table_name: string
+}
 
-  `CREATE INDEX IF NOT EXISTS idx_notifications_user_category
-   ON greenhouse_notifications.notifications (user_id, category, created_at DESC)`,
-
-  `CREATE TABLE IF NOT EXISTS greenhouse_notifications.notification_preferences (
-    preference_id     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id           TEXT NOT NULL,
-    category          TEXT NOT NULL,
-    in_app_enabled    BOOLEAN NOT NULL DEFAULT true,
-    email_enabled     BOOLEAN NOT NULL DEFAULT true,
-    muted_until       TIMESTAMPTZ,
-    updated_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT uq_notif_pref_user_category UNIQUE (user_id, category)
-  )`,
-
-  `CREATE TABLE IF NOT EXISTS greenhouse_notifications.notification_log (
-    log_id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    notification_id   UUID,
-    user_id           TEXT NOT NULL,
-    category          TEXT NOT NULL,
-    channel           TEXT NOT NULL CHECK (channel IN ('in_app', 'email')),
-    status            TEXT NOT NULL CHECK (status IN ('sent', 'skipped', 'failed')),
-    skip_reason       TEXT,
-    metadata          JSONB DEFAULT '{}',
-    error_message     TEXT,
-    created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
-  )`,
-
-  `ALTER TABLE greenhouse_notifications.notification_log
-   ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}'`,
-
-  `CREATE INDEX IF NOT EXISTS idx_notification_log_user_category_event
-   ON greenhouse_notifications.notification_log (user_id, category, created_at DESC)`
-]
+type ExistingColumnRow = Record<string, unknown> & {
+  table_name: string
+  column_name: string
+}
 
 export const ensureNotificationSchema = async (): Promise<void> => {
   if (ensurePromise) return ensurePromise
 
   ensurePromise = (async () => {
-    for (const sql of DDL_STATEMENTS) {
-      await runGreenhousePostgresQuery(sql)
+    const tables = await runGreenhousePostgresQuery<ExistingTableRow>(
+      `SELECT table_name
+       FROM information_schema.tables
+       WHERE table_schema = 'greenhouse_notifications'
+         AND table_name = ANY($1::text[])`,
+      [[...REQUIRED_TABLES]]
+    )
+
+    const existingTables = new Set(tables.map(row => row.table_name))
+    const missingTables = REQUIRED_TABLES.filter(table => !existingTables.has(table))
+
+    if (missingTables.length > 0) {
+      throw new Error(`${NOTIFICATIONS_SETUP_HINT} Missing tables: ${missingTables.join(', ')}`)
+    }
+
+    const columns = await runGreenhousePostgresQuery<ExistingColumnRow>(
+      `SELECT table_name, column_name
+       FROM information_schema.columns
+       WHERE table_schema = 'greenhouse_notifications'
+         AND (
+           (table_name = 'notifications' AND column_name = 'metadata')
+           OR
+           (table_name = 'notification_log' AND column_name = 'metadata')
+         )`
+    )
+
+    const existingColumns = new Set(columns.map(row => `${row.table_name}.${row.column_name}`))
+
+    const missingColumns = REQUIRED_COLUMNS
+      .map(({ table, column }) => `${table}.${column}`)
+      .filter(key => !existingColumns.has(key))
+
+    if (missingColumns.length > 0) {
+      throw new Error(`${NOTIFICATIONS_SETUP_HINT} Missing columns: ${missingColumns.join(', ')}`)
     }
   })().catch(err => {
     ensurePromise = null

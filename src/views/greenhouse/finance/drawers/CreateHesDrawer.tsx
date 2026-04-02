@@ -24,7 +24,7 @@ import CustomTextField from '@core/components/mui/TextField'
 // ── Types ──
 
 interface ClientOption {
-  clientId: string
+  clientId: string | null
   clientProfileId: string
   companyName: string | null
   greenhouseClientName: string | null
@@ -41,7 +41,7 @@ interface POOption {
 }
 
 const getClientLabel = (c: ClientOption) =>
-  c.legalName || c.companyName || c.greenhouseClientName || c.clientId
+  c.legalName || c.companyName || c.greenhouseClientName || c.clientId || c.clientProfileId
 
 const formatCLP = (n: number) =>
   new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(n)
@@ -104,6 +104,8 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const selectableClients = clients.filter((client): client is ClientOption & { clientId: string } => Boolean(client.clientId))
+
   // ── Populate form when editing ──
 
   useEffect(() => {
@@ -148,9 +150,11 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
   // ── Fetch active POs for client ──
 
   const fetchPOs = useCallback(async (clientId: string) => {
-    if (!clientId) { setActivePOs([]); 
+    if (!clientId) {
+      setActivePOs([])
 
-return }
+      return
+    }
 
     try {
       const res = await fetch(`/api/finance/purchase-orders?clientId=${clientId}&status=active`)
@@ -391,9 +395,9 @@ return }
           value={selectedClientId} onChange={e => handleClientChange(e.target.value)}
         >
           <MenuItem value=''>
-            {loadingClients ? 'Cargando...' : '— Seleccionar cliente —'}
+            {loadingClients ? 'Cargando...' : selectableClients.length === 0 ? 'No hay clientes disponibles para HES' : '— Seleccionar cliente —'}
           </MenuItem>
-          {clients.map(c => (
+          {selectableClients.map(c => (
             <MenuItem key={c.clientId} value={c.clientId}>{getClientLabel(c)}</MenuItem>
           ))}
         </CustomTextField>

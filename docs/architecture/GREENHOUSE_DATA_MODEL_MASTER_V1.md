@@ -122,7 +122,7 @@ Mutable finance runtime. Owns all transactional financial data.
 - `income_payments` — individual collection records per invoice (replaces JSON array in BigQuery)
 - `factoring_operations` — invoice factoring/assignment operations (NEW — not in BigQuery)
 - `expenses` — operational expenditures (payroll, suppliers, taxes, financial costs)
-- `client_profiles` — billing profile per client (compat layer, eventually absorbable into `clients`)
+- `client_profiles` — billing profile per client organization; canonical FK is `organization_id`, while `client_id` remains as compat bridge for legacy commercial/runtime consumers
 - `reconciliation_periods` — monthly bank reconciliation periods per account
 - `bank_statement_rows` — imported bank statement lines matched against income/expenses
 
@@ -155,7 +155,8 @@ Key rules:
 
 #### Anchors
 
-- `client_id -> greenhouse_core.clients`
+- `organization_id -> greenhouse_core.organizations` (canonical B2B anchor for finance clients)
+- `client_id -> greenhouse_core.clients` (compat/commercial bridge while downstream consumers still depend on it)
 - `member_id -> greenhouse_core.members`
 - `provider_id -> greenhouse_core.providers` (for suppliers AND factoring providers)
 - `user_id references -> greenhouse_core.client_users`

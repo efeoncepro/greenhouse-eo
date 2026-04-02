@@ -80,8 +80,8 @@ const CreateClientDrawer = ({ open, onClose, onSuccess }: Props) => {
   }
 
   const handleSubmit = async () => {
-    if (!clientProfileId.trim() || !legalName.trim()) {
-      setError('ID del perfil y razón social son obligatorios.')
+    if (!legalName.trim()) {
+      setError('La razón social es obligatoria.')
 
       return
     }
@@ -90,8 +90,8 @@ const CreateClientDrawer = ({ open, onClose, onSuccess }: Props) => {
     setError(null)
 
     const body = {
-      clientProfileId: clientProfileId.trim(),
       legalName: legalName.trim(),
+      ...(clientProfileId.trim() && { clientProfileId: clientProfileId.trim() }),
       ...(hubspotCompanyId.trim() && { hubspotCompanyId: hubspotCompanyId.trim() }),
       ...(taxId.trim() && { taxId: taxId.trim() }),
       ...(taxIdType && { taxIdType }),
@@ -156,9 +156,9 @@ const CreateClientDrawer = ({ open, onClose, onSuccess }: Props) => {
           fullWidth
           size='small'
           label='ID del perfil'
+          helperText='Opcional. Si lo dejas vacío, el sistema usará el identificador canónico disponible.'
           value={clientProfileId}
           onChange={e => setClientProfileId(e.target.value)}
-          required
         />
 
         <CustomTextField

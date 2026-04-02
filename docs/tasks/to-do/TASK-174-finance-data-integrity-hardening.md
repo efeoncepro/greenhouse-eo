@@ -1,5 +1,6 @@
 ## Delta 2026-04-01
 - TASK-184/TASK-185 (Database Tooling Foundation) ahora disponible: todo DDL futuro debe ir como migración versionada via `pnpm migrate:create`. Usar `src/lib/db.ts` para queries (re-export del singleton existente + Kysely para módulos nuevos).
+- TASK-181 ya dejó el write path de `Finance Clients` envuelto en transacciones compartidas entre `organizations` y `client_profiles`; esta task ya no necesita diseñar ese tramo desde cero y debe enfocarse en bulk/idempotency/concurrency sobre el resto del dominio Finance.
 
 ## Delta 2026-03-31
 - TASK-181 (Finance Clients → Organizations canonical source) impacta los endpoints de client creates/updates que esta task protege con transacciones e idempotency. Coordinar: si TASK-181 se ejecuta primero, los writes de clientes operan sobre `organizations` y `client_profiles` — las transacciones envolventes deben cubrir ambas tablas.

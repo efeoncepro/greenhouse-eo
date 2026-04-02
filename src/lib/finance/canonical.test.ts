@@ -51,8 +51,19 @@ describe('resolveFinanceClientContext', () => {
         {
           client_profile_id: 'profile-1',
           client_id: 'client-1',
+          organization_id: 'org-1',
           hubspot_company_id: 'hubspot-1',
           legal_name: 'Sky Airline SA'
+        }
+      ])
+      .mockResolvedValueOnce([
+        {
+          organization_id: 'org-1',
+          organization_name: 'Sky Airline',
+          legal_name: 'Sky Airline SA',
+          hubspot_company_id: 'hubspot-1',
+          client_id: 'client-1',
+          space_id: 'space-1'
         }
       ])
 
@@ -88,6 +99,7 @@ describe('resolveFinanceClientContext', () => {
         {
           client_profile_id: 'profile-1',
           client_id: 'client-1',
+          organization_id: null,
           hubspot_company_id: 'hubspot-1',
           legal_name: 'Sky Airline SA'
         }

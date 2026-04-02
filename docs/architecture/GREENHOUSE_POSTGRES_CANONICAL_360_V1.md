@@ -138,18 +138,25 @@ Rule:
 ### Client
 
 Anchor:
-- `greenhouse_core.clients.client_id`
+- `greenhouse_core.organizations.organization_id` when `organization_type IN ('client', 'both')`
 
 Important fields:
 - `public_id`
-- `client_name`
+- `organization_name`
 - `legal_name`
-- `tenant_type`
+- `tax_id`
+- `country`
+- `organization_type`
 - `hubspot_company_id`
-- `timezone`
-- `billing_currency`
 - `status`
 - `active`
+
+Compatibility bridge:
+- `public_id`
+- `greenhouse_core.clients.client_id` remains the commercial/runtime alias while downstream consumers still depend on it
+- `greenhouse_core.spaces.client_id` is the active bridge from operational spaces to the legacy commercial key
+- `greenhouse_finance.client_profiles.organization_id` is the strong finance-side foreign key; `client_id` stays as transitional compat
+- `greenhouse_core.v_client_active_modules` and several finance/cost projections still emit `client_id`, so the cutover is org-first, not `client_id` deletion
 
 ### Space
 
@@ -168,12 +175,13 @@ Bridge:
 - `greenhouse_core.space_source_bindings`
 
 Rules:
-- `client` is the commercial boundary
+- `organization` is the canonical B2B boundary
+- `client_id` is still the commercial runtime alias while cross-module consumers finish the compat cutover
 - `space` is the operational workspace boundary
 - client-facing workspaces are `client_space`
 - internal agency workspaces like `Efeonce` are `internal_space`
 - a space may exist without `client_id`
-- delivery objects should resolve to `space_id` first, then optionally to `client_id`
+- delivery/finance objects should resolve to `space_id` first, then bridge to `organization_id`, and only then fall back to `client_id` where legacy consumers still require it
 
 ### Identity Profile
 

@@ -2,6 +2,13 @@
 
 ## 2026-04-01
 
+- **TASK-181 finance clients canonical source cutover**:
+  - `Finance Clients` deja de anclarse en `greenhouse_core.clients` y pasa a leer/escribir org-first sobre `greenhouse_core.organizations WHERE organization_type IN ('client', 'both')`
+  - `client_profiles.organization_id` queda como FK fuerte del dominio; `client_id` se preserva como bridge operativo para módulos y projections legacy
+  - `resolveFinanceClientContext()` ya soporta `organizationId` como anchor canónico además de `clientId`, `clientProfileId` y `hubspotCompanyId`
+  - readers downstream de `Organization 360` y `client_economics` quedaron reconciliados para no perder snapshots cuando el contexto financiero venga identificado por organización
+  - se aplicó backfill real de dos legacy clients huérfanos (`nubox-client-76438378-8`, `nubox-client-91947000-3`) para poblar `client_profiles.organization_id`
+
 - **TASK-189 rolling rematerialization hardening**:
   - `/api/cron/ico-materialize` ahora rematerializa por defecto una ventana rolling de `3` meses (`monthsBack`, configurable hasta `6`)
   - la proyección `ico_member_metrics` ahora refresca el período explícito informado por el payload de materialización, evitando asumir siempre el mes actual

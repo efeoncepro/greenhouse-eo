@@ -20,6 +20,7 @@ import {
   toTimestampString
 } from '@/lib/finance/shared'
 import { resolveAutoAllocation, type AutoAllocationInput } from '@/lib/finance/auto-allocation-rules'
+import { ensureOrganizationForClient } from '@/lib/account-360/organization-identity'
 
 type QueryableClient = Pick<PoolClient, 'query'>
 
@@ -880,6 +881,7 @@ export const getFinanceClientProfileFromPostgres = async (clientProfileId: strin
 export const upsertFinanceClientProfileInPostgres = async ({
   clientProfileId,
   clientId,
+  organizationId,
   hubspotCompanyId,
   taxId,
   taxIdType,
@@ -894,10 +896,12 @@ export const upsertFinanceClientProfileInPostgres = async ({
   currentHesNumber,
   financeContacts,
   specialConditions,
-  createdByUserId
+  createdByUserId,
+  client
 }: {
   clientProfileId: string
   clientId?: string | null
+  organizationId?: string | null
   hubspotCompanyId?: string | null
   taxId?: string | null
   taxIdType?: string | null
@@ -913,13 +917,15 @@ export const upsertFinanceClientProfileInPostgres = async ({
   financeContacts?: unknown[]
   specialConditions?: string | null
   createdByUserId?: string | null
+  client?: QueryableClient
 }) => {
   await assertFinanceSlice2PostgresReady()
 
-  return withGreenhousePostgresTransaction(async client => {
-    let organizationId: string | null = null
+  const runUpsert = async (txClient: QueryableClient) => {
+    let resolvedOrganizationId = organizationId ?? null
+    let resolvedClientId = clientId ?? null
 
-    if (clientId) {
+    if (!resolvedOrganizationId && resolvedClientId) {
       const organizationRows = await queryRows<{ organization_id: string }>(
         `
           SELECT organization_id
@@ -929,11 +935,44 @@ export const upsertFinanceClientProfileInPostgres = async ({
             AND active = TRUE
           LIMIT 1
         `,
-        [clientId],
-        client
+        [resolvedClientId],
+        txClient
       )
 
-      organizationId = organizationRows[0]?.organization_id ?? null
+      resolvedOrganizationId = organizationRows[0]?.organization_id ?? null
+    }
+
+    if (!resolvedOrganizationId && legalName) {
+      resolvedOrganizationId = await ensureOrganizationForClient(
+        {
+          clientId: clientId ?? null,
+          hubspotCompanyId: hubspotCompanyId ?? null,
+          taxId: taxId ?? null,
+          taxIdType: taxIdType ?? null,
+          legalName,
+          organizationName: legalName,
+          country: billingCountry ?? 'CL'
+        },
+        txClient
+      )
+    }
+
+    if (resolvedOrganizationId && !resolvedClientId) {
+      const clientRows = await queryRows<{ client_id: string | null }>(
+        `
+          SELECT client_id
+          FROM greenhouse_core.spaces
+          WHERE organization_id = $1
+            AND client_id IS NOT NULL
+            AND active = TRUE
+          ORDER BY updated_at DESC NULLS LAST, created_at DESC NULLS LAST, space_id ASC
+          LIMIT 1
+        `,
+        [resolvedOrganizationId],
+        txClient
+      )
+
+      resolvedClientId = clientRows[0]?.client_id ?? null
     }
 
     const rows = await queryRows<PostgresClientProfileRow>(
@@ -1008,8 +1047,8 @@ export const upsertFinanceClientProfileInPostgres = async ({
       `,
       [
         clientProfileId,
-        clientId ?? null,
-        organizationId,
+        resolvedClientId,
+        resolvedOrganizationId,
         hubspotCompanyId ?? null,
         taxId ?? null,
         taxIdType ?? null,
@@ -1026,11 +1065,17 @@ export const upsertFinanceClientProfileInPostgres = async ({
         specialConditions ?? null,
         createdByUserId ?? null
       ],
-      client
+      txClient
     )
 
     return mapClientProfile(rows[0])
-  })
+  }
+
+  if (client) {
+    return runUpsert(client)
+  }
+
+  return withGreenhousePostgresTransaction(runUpsert)
 }
 
 export const syncFinanceClientProfilesFromPostgres = async ({
@@ -1042,6 +1087,29 @@ export const syncFinanceClientProfilesFromPostgres = async ({
 
   await runGreenhousePostgresQuery(
     `
+      WITH latest_profiles AS (
+        SELECT DISTINCT ON (COALESCE(cp.organization_id, cp.client_profile_id))
+          cp.client_profile_id,
+          cp.client_id,
+          cp.organization_id,
+          cp.hubspot_company_id,
+          cp.legal_name,
+          cp.created_at,
+          cp.updated_at
+        FROM greenhouse_finance.client_profiles cp
+        WHERE cp.organization_id IS NOT NULL
+        ORDER BY COALESCE(cp.organization_id, cp.client_profile_id), cp.updated_at DESC, cp.created_at DESC, cp.client_profile_id
+      ),
+      space_bridge AS (
+        SELECT DISTINCT ON (organization_id)
+          organization_id,
+          client_id
+        FROM greenhouse_core.spaces
+        WHERE organization_id IS NOT NULL
+          AND client_id IS NOT NULL
+          AND active = TRUE
+        ORDER BY organization_id, updated_at DESC NULLS LAST, created_at DESC NULLS LAST, space_id ASC
+      )
       INSERT INTO greenhouse_finance.client_profiles (
         client_profile_id,
         client_id,
@@ -1058,19 +1126,12 @@ export const syncFinanceClientProfilesFromPostgres = async ({
         updated_at
       )
       SELECT
-        c.client_id,
-        c.client_id,
-        (
-          SELECT s.organization_id
-          FROM greenhouse_core.spaces s
-          WHERE s.client_id = c.client_id
-            AND s.organization_id IS NOT NULL
-            AND s.active = TRUE
-          LIMIT 1
-        ),
-        COALESCE(c.hubspot_company_id, c.client_id),
-        c.client_name,
-        'CL',
+        COALESCE(lp.client_profile_id, sb.client_id, o.hubspot_company_id, o.organization_id),
+        COALESCE(lp.client_id, sb.client_id),
+        o.organization_id,
+        COALESCE(lp.hubspot_company_id, o.hubspot_company_id, sb.client_id, o.organization_id),
+        COALESCE(lp.legal_name, o.legal_name, o.organization_name),
+        COALESCE(o.country, 'CL'),
         30,
         'CLP',
         FALSE,
@@ -1078,14 +1139,18 @@ export const syncFinanceClientProfilesFromPostgres = async ({
         $1,
         CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP
-      FROM greenhouse_core.clients c
-      WHERE c.active = TRUE
+      FROM greenhouse_core.organizations o
+      LEFT JOIN latest_profiles lp ON lp.organization_id = o.organization_id
+      LEFT JOIN space_bridge sb ON sb.organization_id = o.organization_id
+      WHERE o.active = TRUE
+        AND COALESCE(o.organization_type, 'other') IN ('client', 'both')
       ON CONFLICT (client_profile_id) DO UPDATE
       SET
         client_id = COALESCE(greenhouse_finance.client_profiles.client_id, EXCLUDED.client_id),
         organization_id = COALESCE(greenhouse_finance.client_profiles.organization_id, EXCLUDED.organization_id),
         hubspot_company_id = COALESCE(greenhouse_finance.client_profiles.hubspot_company_id, EXCLUDED.hubspot_company_id),
         legal_name = COALESCE(greenhouse_finance.client_profiles.legal_name, EXCLUDED.legal_name),
+        billing_country = COALESCE(greenhouse_finance.client_profiles.billing_country, EXCLUDED.billing_country),
         updated_at = CURRENT_TIMESTAMP
     `,
     [createdByUserId ?? 'sync']

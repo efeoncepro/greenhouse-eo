@@ -8,6 +8,8 @@ const mockGetHubspotTableColumns = vi.fn()
 const mockGetHubspotCompaniesExpressions = vi.fn()
 const mockGetHubspotDealsExpressions = vi.fn()
 const mockRunGreenhousePostgresQuery = vi.fn()
+const mockWithGreenhousePostgresTransaction = vi.fn()
+const mockGetGreenhousePostgresPool = vi.fn()
 
 vi.mock('@/lib/tenant/authorization', () => ({
   requireFinanceTenantContext: (...args: unknown[]) => mockRequireFinanceTenantContext(...args)
@@ -28,7 +30,10 @@ vi.mock('@/lib/finance/postgres-store', () => ({
 }))
 
 vi.mock('@/lib/postgres/client', () => ({
-  runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
+  runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args),
+  withGreenhousePostgresTransaction: (...args: unknown[]) => mockWithGreenhousePostgresTransaction(...args),
+  getGreenhousePostgresPool: (...args: unknown[]) => mockGetGreenhousePostgresPool(...args),
+  closeGreenhousePostgres: vi.fn()
 }))
 
 vi.mock('@/lib/finance/postgres-store-slice2', () => ({

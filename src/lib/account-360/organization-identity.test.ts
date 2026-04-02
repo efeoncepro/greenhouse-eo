@@ -17,7 +17,13 @@ vi.mock('@/lib/account-360/id-generation', () => ({
 }))
 
 // Import AFTER mocks are registered
-const { findOrganizationByTaxId, ensureOrganizationForSupplier, resolveOrganizationForClient } =
+const {
+  findOrganizationByTaxId,
+  ensureOrganizationForSupplier,
+  ensureOrganizationForClient,
+  resolveOrganizationForClient,
+  resolvePrimarySpaceForOrganization
+} =
   await import('./organization-identity')
 
 describe('findOrganizationByTaxId', () => {
@@ -164,5 +170,91 @@ describe('resolveOrganizationForClient', () => {
     const result = await resolveOrganizationForClient('client-orphan')
 
     expect(result).toBeNull()
+  })
+})
+
+describe('ensureOrganizationForClient', () => {
+  beforeEach(() => {
+    mockQuery.mockReset()
+  })
+
+  it('returns existing org found via tax_id and upgrades type when needed', async () => {
+    mockQuery
+      .mockResolvedValueOnce([
+        { organization_id: 'org-existing', organization_type: 'other' }
+      ])
+      .mockResolvedValueOnce([])
+
+    const result = await ensureOrganizationForClient({
+      taxId: '76.123.456-7',
+      taxIdType: 'RUT',
+      legalName: 'Sky Airline SA',
+      organizationName: 'Sky Airline',
+      country: 'CL'
+    })
+
+    expect(result).toBe('org-existing')
+    expect(mockQuery).toHaveBeenCalledTimes(2)
+    expect(mockQuery.mock.calls[1][1]).toEqual([
+      'org-existing',
+      'client',
+      'Sky Airline',
+      'Sky Airline SA',
+      null,
+      '76.123.456-7',
+      'RUT',
+      'CL'
+    ])
+  })
+
+  it('creates a new client organization when nothing matches', async () => {
+    mockQuery
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+
+    const result = await ensureOrganizationForClient({
+      hubspotCompanyId: 'hubspot-1',
+      legalName: 'New Client LLC',
+      organizationName: 'New Client',
+      country: 'US'
+    })
+
+    expect(result).toBe('org-test-123')
+    expect(mockQuery).toHaveBeenCalledTimes(2)
+    expect(mockQuery.mock.calls[1][1]).toEqual([
+      'org-test-123',
+      'EO-ORG-0001',
+      'New Client',
+      'New Client LLC',
+      null,
+      null,
+      'US',
+      'hubspot-1'
+    ])
+  })
+})
+
+describe('resolvePrimarySpaceForOrganization', () => {
+  beforeEach(() => {
+    mockQuery.mockReset()
+  })
+
+  it('returns the latest active bridged space and client info', async () => {
+    mockQuery.mockResolvedValueOnce([
+      {
+        space_id: 'space-1',
+        client_id: 'client-1',
+        client_name: 'Sky Airline'
+      }
+    ])
+
+    const result = await resolvePrimarySpaceForOrganization('org-1')
+
+    expect(result).toEqual({
+      spaceId: 'space-1',
+      clientId: 'client-1',
+      clientName: 'Sky Airline'
+    })
   })
 })

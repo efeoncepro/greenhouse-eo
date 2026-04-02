@@ -30,7 +30,8 @@ const SERVICE_LINE_LABELS: Record<string, string> = {
 const SERVICE_LINES = Object.keys(SERVICE_LINE_LABELS)
 
 interface ClientOption {
-  clientId: string
+  organizationId: string | null
+  clientId: string | null
   clientProfileId: string
   hubspotCompanyId: string | null
   companyName: string | null
@@ -40,10 +41,16 @@ interface ClientOption {
 }
 
 const getClientOptionLabel = (client: ClientOption) =>
-  client.legalName || client.companyName || client.greenhouseClientName || client.clientProfileId || client.clientId
+  client.legalName || client.companyName || client.greenhouseClientName || client.clientProfileId || client.clientId || client.organizationId
 
-const getIncomeClientName = (client: ClientOption) =>
-  client.greenhouseClientName || client.companyName || client.legalName || client.clientProfileId || client.clientId
+const getIncomeClientName = (client: ClientOption): string =>
+  client.greenhouseClientName
+  || client.companyName
+  || client.legalName
+  || client.clientProfileId
+  || client.clientId
+  || client.organizationId
+  || 'Cliente'
 
 type Props = {
   open: boolean
@@ -107,7 +114,7 @@ const CreateIncomeDrawer = ({ open, onClose, onSuccess }: Props) => {
   const handleClientChange = (selectedValue: string) => {
     setSelectedClientId(selectedValue)
 
-    const client = clients.find(c => (c.clientId || c.clientProfileId) === selectedValue)
+    const client = clients.find(c => (c.clientId || c.organizationId || c.clientProfileId) === selectedValue)
 
     if (client) {
       setClientName(getIncomeClientName(client))
@@ -159,12 +166,13 @@ const CreateIncomeDrawer = ({ open, onClose, onSuccess }: Props) => {
     setError(null)
 
     const amount = Number(totalAmount)
-    const selectedClient = clients.find(c => (c.clientId || c.clientProfileId) === selectedClientId)
+    const selectedClient = clients.find(c => (c.clientId || c.organizationId || c.clientProfileId) === selectedClientId)
 
     const body = {
       description: description.trim(),
       clientName: clientName.trim(),
       ...(selectedClient?.clientId && { clientId: selectedClient.clientId }),
+      ...(selectedClient?.organizationId && { organizationId: selectedClient.organizationId }),
       ...(selectedClient?.clientProfileId && { clientProfileId: selectedClient.clientProfileId }),
       currency,
       subtotal: amount,
@@ -250,7 +258,7 @@ const CreateIncomeDrawer = ({ open, onClose, onSuccess }: Props) => {
                 : '— Seleccionar cliente —'}
           </MenuItem>
           {clients.map(c => (
-            <MenuItem key={c.clientId || c.clientProfileId} value={c.clientId || c.clientProfileId}>
+            <MenuItem key={c.clientId || c.organizationId || c.clientProfileId} value={c.clientId || c.organizationId || c.clientProfileId}>
               {getClientOptionLabel(c)}
             </MenuItem>
           ))}

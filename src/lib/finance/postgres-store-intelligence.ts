@@ -375,13 +375,14 @@ export const computeClientEconomicsSnapshots = async (
     total_revenue_clp: string
   }>(
     `SELECT
-       COALESCE(i.client_id, cp.client_id) AS client_id,
+       COALESCE(i.client_id, cp.client_id, i.organization_id, cp.organization_id) AS client_id,
        MAX(
          COALESCE(
            NULLIF(TRIM(i.client_name), ''),
            NULLIF(TRIM(c.client_name), ''),
            NULLIF(TRIM(cp.legal_name), ''),
-           COALESCE(i.client_id, cp.client_id)
+           NULLIF(TRIM(o.organization_name), ''),
+           COALESCE(i.client_id, cp.client_id, i.organization_id, cp.organization_id)
          )
        ) AS client_name,
        COALESCE(SUM(total_amount_clp), 0) AS total_revenue_clp
@@ -390,9 +391,11 @@ export const computeClientEconomicsSnapshots = async (
        ON cp.client_profile_id = i.client_profile_id
      LEFT JOIN greenhouse_core.clients c
        ON c.client_id = COALESCE(i.client_id, cp.client_id)
+     LEFT JOIN greenhouse_core.organizations o
+       ON o.organization_id = COALESCE(i.organization_id, cp.organization_id)
      WHERE invoice_date >= $1::date AND invoice_date <= $2::date
-       AND COALESCE(i.client_id, cp.client_id) IS NOT NULL
-     GROUP BY COALESCE(i.client_id, cp.client_id)`,
+       AND COALESCE(i.client_id, cp.client_id, i.organization_id, cp.organization_id) IS NOT NULL
+     GROUP BY COALESCE(i.client_id, cp.client_id, i.organization_id, cp.organization_id)`,
     [periodStart, periodEnd]
   )
 
