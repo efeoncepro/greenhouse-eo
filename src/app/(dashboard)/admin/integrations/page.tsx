@@ -29,21 +29,27 @@ export default async function Page() {
     redirect(tenant.portalHomePath || '/dashboard')
   }
 
-  const registry = await getIntegrationRegistry()
-  const healthMap = await getIntegrationHealthSnapshots(registry.map(r => r.integrationKey))
+  let integrations: IntegrationWithHealth[] = []
 
-  const integrations: IntegrationWithHealth[] = registry.map(entry => ({
-    ...entry,
-    healthSnapshot: healthMap.get(entry.integrationKey) ?? {
-      integrationKey: entry.integrationKey,
-      health: 'idle',
-      lastSyncAt: null,
-      syncRunsLast24h: 0,
-      syncFailuresLast24h: 0,
-      freshnessPercent: 0,
-      freshnessLabel: 'Sin seal'
-    }
-  }))
+  try {
+    const registry = await getIntegrationRegistry()
+    const healthMap = await getIntegrationHealthSnapshots(registry.map(r => r.integrationKey))
+
+    integrations = registry.map(entry => ({
+      ...entry,
+      healthSnapshot: healthMap.get(entry.integrationKey) ?? {
+        integrationKey: entry.integrationKey,
+        health: 'idle' as const,
+        lastSyncAt: null,
+        syncRunsLast24h: 0,
+        syncFailuresLast24h: 0,
+        freshnessPercent: 0,
+        freshnessLabel: 'Sin señal'
+      }
+    }))
+  } catch (error) {
+    console.error('[admin/integrations] Failed to load integration registry:', error)
+  }
 
   return <AdminIntegrationGovernanceView integrations={integrations} />
 }

@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 
+import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
@@ -125,8 +126,15 @@ const AdminIntegrationGovernanceView = ({ integrations }: Props) => {
         </CardContent>
       </Card>
 
+      {integrations.length === 0 && (
+        <Alert severity='info' variant='outlined'>
+          No se encontraron integraciones en el registry. La tabla <code>greenhouse_sync.integration_registry</code> puede
+          estar vacia o la consulta fallo. Verifica que la migracion se haya aplicado correctamente.
+        </Alert>
+      )}
+
       {/* KPIs */}
-      <Box
+      {integrations.length > 0 && <Box
         sx={{
           display: 'grid',
           gap: 3,
@@ -165,7 +173,7 @@ const AdminIntegrationGovernanceView = ({ integrations }: Props) => {
           detail={domains.join(', ') || 'Sin dominios registrados.'}
           icon='tabler-topology-ring-3'
         />
-      </Box>
+      </Box>}
 
       {/* Registry Table */}
       <ExecutiveCardShell

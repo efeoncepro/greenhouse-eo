@@ -19,7 +19,7 @@ interface ServicesFreshnessRow extends Record<string, unknown> {
 }
 
 const computeFreshness = (lastRun: string | null): { percent: number; label: string } => {
-  if (!lastRun) return { percent: 0, label: 'Sin seal' }
+  if (!lastRun) return { percent: 0, label: 'Sin señal' }
 
   const hoursAgo = (Date.now() - new Date(lastRun).getTime()) / 3_600_000
   const percent = Math.max(0, Math.min(100, Math.round(100 - (hoursAgo / 48) * 100)))
@@ -63,7 +63,7 @@ export const getIntegrationHealthSnapshots = async (
       syncRunsLast24h: 0,
       syncFailuresLast24h: 0,
       freshnessPercent: 0,
-      freshnessLabel: 'Sin seal'
+      freshnessLabel: 'Sin señal'
     })
   }
 
