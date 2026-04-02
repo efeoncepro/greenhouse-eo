@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
+import { checkIntegrationReadiness } from '@/lib/integrations/readiness'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
@@ -46,6 +47,19 @@ export async function GET(request: Request) {
 
   if (!authorized) {
     return errorResponse
+  }
+
+  // ── Readiness gate: ICO depends on Notion upstream ──
+  try {
+    const readiness = await checkIntegrationReadiness('notion')
+
+    if (!readiness.ready) {
+      console.log(`[ico-member-sync] Skipped: Notion upstream not ready — ${readiness.reason}`)
+
+      return NextResponse.json({ skipped: true, reason: readiness.reason })
+    }
+  } catch (error) {
+    console.warn('[ico-member-sync] Readiness check failed, proceeding anyway:', error)
   }
 
   try {

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
+import { checkIntegrationReadiness } from '@/lib/integrations/readiness'
 
 import { syncAllOrganizationServices } from '@/lib/services/service-sync'
 
@@ -11,6 +12,19 @@ export async function GET(request: Request) {
 
   if (!authorized) {
     return errorResponse
+  }
+
+  // ── Readiness gate: check HubSpot integration status ──
+  try {
+    const readiness = await checkIntegrationReadiness('hubspot')
+
+    if (!readiness.ready) {
+      console.log(`[services-sync] Skipped: HubSpot upstream not ready — ${readiness.reason}`)
+
+      return NextResponse.json({ skipped: true, reason: readiness.reason })
+    }
+  } catch (error) {
+    console.warn('[services-sync] Readiness check failed, proceeding anyway:', error)
   }
 
   try {
