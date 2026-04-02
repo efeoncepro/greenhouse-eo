@@ -7,6 +7,7 @@
   - `client` por bridge `spaces.client_id -> organization_id` con fallback a primary membership
   - `efeonce_internal` por operating entity
 - `greenhouse_serving.person_360` ya expone org primaria, aliases `eo_id` / `member_id` / `user_id` y `is_efeonce_collaborator`; consumers canónicos como `CanonicalPersonRecord` deben preferir este backbone antes de recomponer contexto org ad hoc.
+- `Organization memberships` ya distinguen `internal` vs `staff_augmentation` como contexto operativo del vínculo cliente sobre `team_member`; la distinción vive en `assignmentType`/`assignedFte`, no en un `membership_type` nuevo.
 - Operación DB validada nuevamente:
   - `pnpm migrate:up` sigue requiriendo Cloud SQL Proxy local (`127.0.0.1:15432`) cuando el wrapper deriva a TCP directo; la IP pública de Cloud SQL continúa no accesible.
 

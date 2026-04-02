@@ -8,6 +8,7 @@
   - `session_360` ahora resuelve `organization_id` para usuarios internos vía operating entity y mantiene fallback de primary membership para carriles client
   - `person_360` ahora publica org primaria, aliases `eo_id`/`member_id`/`user_id` y `is_efeonce_collaborator`, lo que habilita a `CanonicalPersonRecord` a consumir contexto organizacional canónico
   - `organization_360` enriqueció el aggregate `people` con `memberId`, `assignedFte`, `assignmentType`, `jobLevel` y `employmentType` para memberships `team_member`
+  - `Organization > People` y el reader `/api/organizations/[id]/memberships` ya hacen visible la distinción `internal` vs `staff_augmentation` como contexto operativo del vínculo cliente, sin crear un `membership_type` nuevo
   - `People > Finance` ya acepta `organizationId` opcional y fuerza tenant isolation para usuarios `client`
   - validación ejecutada: `GREENHOUSE_POSTGRES_HOST=127.0.0.1 GREENHOUSE_POSTGRES_PORT=15432 GREENHOUSE_POSTGRES_SSL=false pnpm migrate:up`, targeted `vitest`, `pnpm lint`, `pnpm build`, `rg -n "new Pool\\(" src`
 

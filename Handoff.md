@@ -29,11 +29,12 @@
   - `session_360` ya resuelve `organization_id` para internos vía operating entity; coverage real post-migración:
     - `client`: `31/31` con `organization_id`
     - `efeonce_internal`: `8/8` con `organization_id`
-  - `person_360` ahora publica `primary_organization_*`, `primary_membership_type`, aliases `eo_id` / `member_id` / `user_id` y `is_efeonce_collaborator`
-  - `CanonicalPersonRecord` consume ya el contexto org primario
-  - `People > Finance` acepta `organizationId` opcional y fuerza tenant isolation para usuarios `client`
-  - se agregó proyección `operating_entity_membership` para mantener el vínculo forward en `member.created` / `member.updated` / `member.deactivated`
-  - `createIdentityProfile()` en Account 360 ahora deduplica por email antes de insertar un `identity_profile`
+- `person_360` ahora publica `primary_organization_*`, `primary_membership_type`, aliases `eo_id` / `member_id` / `user_id` y `is_efeonce_collaborator`
+- `CanonicalPersonRecord` consume ya el contexto org primario
+- `People > Finance` acepta `organizationId` opcional y fuerza tenant isolation para usuarios `client`
+- `Organization > People` y `getOrganizationMemberships()` ya distinguen `internal` vs `staff_augmentation` como contexto operativo del vínculo cliente sobre `team_member`, exponiendo `assignmentType` y `assignedFte` sin crear un `membership_type` nuevo
+- se agregó proyección `operating_entity_membership` para mantener el vínculo forward en `member.created` / `member.updated` / `member.deactivated`
+- `createIdentityProfile()` en Account 360 ahora deduplica por email antes de insertar un `identity_profile`
 
 ### Validación
 

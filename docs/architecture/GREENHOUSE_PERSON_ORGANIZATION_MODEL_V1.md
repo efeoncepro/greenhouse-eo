@@ -33,6 +33,7 @@ Gaps identificados están catalogados en `TASK-193` (`docs/tasks/in-progress/TAS
   - `efeonce_internal` vía operating entity con fallback a membership
 - `greenhouse_serving.person_360` ya publica `primary_organization_id`, `primary_organization_name`, `primary_membership_type`, `organization_membership_count`, aliases canónicos (`eo_id`, `member_id`, `user_id`) y `is_efeonce_collaborator`.
 - `CanonicalPersonRecord` ya consume contexto organizacional primario y `Finance` ya acepta `organizationId` opcional para scoping downstream.
+- `Organization memberships` ahora exponen la distinción operativa `internal` vs `staff_augmentation` como contexto del vínculo cliente sobre `team_member`; no se creó un `membership_type` nuevo.
 
 ---
 
@@ -306,9 +307,14 @@ Hoy está vacío para la mayoría de usuarios. Catalogado en `TASK-193` (G2).
 - `'internal'` — colaborador Efeonce trabaja desde Efeonce para el cliente
 - `'staff_augmentation'` — colaborador Efeonce colocado ON-SITE como pseudo-empleado del cliente
 
-Ambos tipos generan la misma membership `team_member` vía `assignment_membership_sync`. No hay distinción en el grafo estructural.
+Ambos tipos generan la misma membership `team_member` vía `assignment_membership_sync`.
 
-**Implicación:** Un staff aug es operativamente distinto (trabaja como si fuera del cliente, billing model diferente), pero el modelo de personas no lo refleja. Gap catalogado en `TASK-193` (G7).
+Decisión vigente:
+- `staff_augmentation` no crea una nueva clase de persona ni un `membership_type` adicional
+- la persona sigue siendo colaborador Efeonce con membership primaria en la operating entity
+- la relación con la org cliente sigue siendo `team_member`, enriquecida con `assignmentType`, `assignedFte` y metadata laboral cuando existe faceta `member`
+
+Esto permite que readers y UI distingan `internal` vs `staff_augmentation` sin deformar el grafo estructural. El gap residual de `TASK-193` (G7) queda acotado a seguir propagando ese contexto en consumers downstream adicionales, no a cambiar el modelo base.
 
 ---
 

@@ -127,6 +127,11 @@ interface MembershipRow extends Record<string, unknown> {
   role_label: string | null
   department: string | null
   is_primary: boolean
+  member_id: string | null
+  assigned_fte: string | number | null
+  assignment_type: string | null
+  job_level: string | null
+  employment_type: string | null
 }
 
 interface CountRow extends Record<string, unknown> {
@@ -147,6 +152,20 @@ const toTs = (v: unknown): string => {
   if (typeof v === 'string') return v
 
   return ''
+}
+
+const toNullableNum = (v: unknown): number | null => {
+  if (v === null || v === undefined || v === '') return null
+
+  if (typeof v === 'number') return Number.isFinite(v) ? v : null
+
+  if (typeof v === 'string') {
+    const parsed = Number(v)
+
+    return Number.isFinite(parsed) ? parsed : null
+  }
+
+  return null
 }
 
 const normalizeListItem = (r: OrgListRow): OrganizationListItem => ({
@@ -173,7 +192,10 @@ const normalizeDetail = (r: OrgDetailRow): OrganizationDetail => ({
   taxIdType: r.tax_id_type,
   notes: r.notes,
   spaces: Array.isArray(r.spaces) ? r.spaces as OrganizationSpace[] : null,
-  people: Array.isArray(r.people) ? r.people as OrganizationPerson[] : null
+  people: Array.isArray(r.people) ? (r.people as OrganizationPerson[]).map(person => ({
+    ...person,
+    assignedFte: toNullableNum(person.assignedFte)
+  })) : null
 })
 
 const normalizeMembership = (r: MembershipRow): OrganizationPerson => ({
@@ -186,7 +208,12 @@ const normalizeMembership = (r: MembershipRow): OrganizationPerson => ({
   roleLabel: r.role_label,
   department: r.department,
   isPrimary: r.is_primary,
-  spaceId: r.space_id
+  spaceId: r.space_id,
+  memberId: r.member_id,
+  assignedFte: toNullableNum(r.assigned_fte),
+  assignmentType: r.assignment_type,
+  jobLevel: r.job_level,
+  employmentType: r.employment_type
 })
 
 const normalizePersonMembership = (r: MembershipRow): PersonMembership => ({
@@ -363,10 +390,35 @@ export const getOrganizationMemberships = async (orgId: string): Promise<Organiz
       o.organization_name,
       pm.space_id,
       ip.full_name, ip.canonical_email,
-      pm.membership_type, pm.role_label, pm.department, pm.is_primary
+      pm.membership_type, pm.role_label, pm.department, pm.is_primary,
+      m.member_id,
+      assignment_summary.assigned_fte,
+      assignment_summary.assignment_type,
+      m.job_level,
+      m.employment_type
     FROM greenhouse_core.person_memberships pm
     JOIN greenhouse_core.identity_profiles ip ON ip.profile_id = pm.profile_id
     LEFT JOIN greenhouse_core.organizations o ON o.organization_id = pm.organization_id
+    LEFT JOIN greenhouse_core.members m
+      ON m.identity_profile_id = pm.profile_id
+     AND m.active = TRUE
+    LEFT JOIN LATERAL (
+      SELECT
+        COALESCE(SUM(a.fte_allocation), 0)::numeric AS assigned_fte,
+        CASE
+          WHEN COUNT(*) = 0 THEN NULL
+          WHEN COUNT(DISTINCT a.assignment_type) = 1 THEN MIN(a.assignment_type)
+          ELSE 'mixed'
+        END AS assignment_type
+      FROM greenhouse_core.client_team_assignments a
+      JOIN greenhouse_core.spaces s
+        ON s.client_id = a.client_id
+       AND s.active = TRUE
+      WHERE a.member_id = m.member_id
+        AND a.active = TRUE
+        AND (a.end_date IS NULL OR a.end_date >= CURRENT_DATE)
+        AND s.organization_id = pm.organization_id
+    ) assignment_summary ON TRUE
     WHERE pm.organization_id = $1 AND pm.active = TRUE
     ORDER BY pm.is_primary DESC, ip.full_name NULLS LAST
   `, [orgId])

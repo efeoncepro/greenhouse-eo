@@ -139,7 +139,7 @@ El sistema tiene dos formas de vincular colaboradores Efeonce a clientes:
 | G4 | **No existe anchor operativo de Efeonce en la base real** — no hay ninguna `organization` con `is_operating_entity = TRUE`, y por lo tanto tampoco existe `person_membership` que vincule members a Efeonce como organización. Esto bloquea responder "quiénes son los empleados de Efeonce" desde el grafo de memberships. | A | Modelo incompleto / prerrequisito | `greenhouse_core.organizations`, `greenhouse_core.person_memberships` |
 | G5 | **Proveedores sin modelo de personas (Pob. C)** — Las orgs tipo `supplier` reciben gastos, POs y HES, pero no tienen `person_memberships`. No se puede saber quién es el contacto de un proveedor. Finance referencia `supplier_name` como string libre, no como org+persona. | C | Moderado (crece con escala) | `src/lib/finance/`, `greenhouse_core.organizations` |
 | G6 | **Orgs duales (`both`) sin distinción de facets** — Una org que es cliente Y proveedor usa el mismo set de memberships. No hay forma de saber si un contacto lo es "como cliente" o "como proveedor" de esa org. | B + C | Edge case hoy, escala después | `greenhouse_core.person_memberships` |
-| G7 | **Staff augmentation sin distinción de membership** — `client_team_assignments` tiene `assignment_type = 'staff_augmentation'` para colaboradores colocados en el cliente como pseudo-empleados. Pero la membership sync los trata igual que `internal` — ambos generan `team_member`. Un staff aug es operativamente distinto (trabaja ON-SITE como si fuera del cliente). | A | Relevante para Agency | `src/lib/sync/projections/assignment-membership-sync.ts` |
+| G7 | **Staff augmentation con distinción solo parcial en consumers** — `client_team_assignments` tiene `assignment_type = 'staff_augmentation'` para colaboradores colocados en el cliente como pseudo-empleados. La decisión vigente es mantener `team_member` como `membership_type` y distinguir `internal` vs `staff_augmentation` como contexto operativo del vínculo cliente. El gap residual ya no es de modelo base, sino de propagación consistente en readers/UI downstream. | A | Relevante para Agency | `src/lib/sync/projections/assignment-membership-sync.ts` |
 | G8 | **Payroll es 100% member-centric** — no existe vista "equipo de esta org con su payroll/costo". Para Pob. A falta la pregunta "cuánto nos cuesta el equipo asignado a este cliente" como vista org-scoped. | A | Moderado | `src/lib/payroll/` |
 | G9 | **Account 360 crea identity_profiles fuera del reconciliation engine** — `organization-store.ts:createIdentityProfile()` inserta directo sin pasar por matching engine. Riesgo de duplicados al agregar contactos Pob. B manualmente. | B | Integridad de datos | `src/lib/account-360/organization-store.ts:643` |
 | G10 | **No hay serving cruzado org↔person con datos operativos** — `person_360` no tiene org data; `organization_360` tiene people pero solo identity-level. Falta: "personas de esta org con FTE asignado, costo, ICO" (Pob. A) y "personas de esta org con rol y acceso" (Pob. B). | A + B | UX y analytics | `greenhouse_serving.person_360`, `greenhouse_serving.organization_360` |
@@ -251,10 +251,11 @@ Para Pob. B estos facets no aplican (no tienen finance/delivery/ICO propios).
 
 #### 3b. Staff augmentation membership refinement
 
-Extender `assignment_membership_sync` o agregar metadata a la membership:
-- Cuando `assignment_type = 'staff_augmentation'`, la membership podría tener un `role_label` que incluya el indicador (e.g., "Staff Aug — Senior Designer")
-- O agregar campo a `person_memberships` para distinguir (futuro: `assignment_context` o similar)
-- Esto permite que la org vea "cuántos de mis asignados son staff aug vs internos"
+Decisión aplicada:
+- no se agrega `membership_type` nuevo ni se deforma `person_memberships`
+- `team_member` sigue siendo la relación estructural con la org cliente
+- la distinción `internal` vs `staff_augmentation` se expone como metadata operativa (`assignmentType`, `assignedFte`, `memberId`, `jobLevel`, `employmentType`) en serving/readers/UI
+- esto permite que la org vea "cuántos de mis asignados son staff aug vs internos" sin duplicar identidades ni memberships
 
 ### Fase 4 — Hardening (G5 + G6 + G8 + G9)
 
@@ -338,7 +339,7 @@ Extender `assignment_membership_sync` o agregar metadata a la membership:
 
 ### Fase 3
 - [ ] Al menos un facet de person-360 soporta filtro por `organizationId`
-- [ ] Staff aug assignments generan memberships con metadata distinguible
+- [x] Staff aug assignments exponen metadata distinguible en org memberships sin crear `membership_type` nuevo
 
 ### Fase 4
 - [ ] `createIdentityProfile` en org-store pasa por dedup check
