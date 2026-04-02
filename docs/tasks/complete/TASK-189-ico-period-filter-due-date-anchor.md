@@ -1,14 +1,16 @@
 # TASK-189 — ICO Period Filter: Due-Date Anchor & Carry-Over Logic
 
-## Delta 2026-04-01 — Cierre del stale materialized-first por miembro
+## Delta 2026-04-01 — Reader hardened + rolling rematerialization
 
-- Se implementó el hardening faltante de `TASK-189`:
-  - `readMemberMetrics()` y `readMemberMetricsBatch()` ya no confían ciegamente en filas legacy de `ico_engine.metrics_by_member` cuando vienen con buckets/contexto críticos en `null`
-  - si detectan materialización incompleta con `total_tasks > 0`, hacen fallback live a `computeMetricsByContext('member', ...)`
-- Se ajustó `PersonActivityTab` para que, cuando de verdad haya trabajo comprometido pero todavía no haya cierres, los KPIs de calidad muestren `Sin cierres` en vez de `—`.
-- Esto cierra la brecha entre:
-  - el engine ya endurecido por `due_date anchor` + `carry-over`
-  - y la experiencia visible que todavía podía parecer vacía por snapshots materializados antiguos
+- Se implementó el hardening faltante de `TASK-189` sin reescribir `ICO`:
+  - la proyección [`ico_member_metrics`](../../../../src/lib/sync/projections/ico-member-metrics.ts) ahora respeta `periodYear` / `periodMonth` cuando el engine publica `ico.materialization.completed`
+  - el cron [`/api/cron/ico-materialize`](../../../../src/app/api/cron/ico-materialize/route.ts) ahora rematerializa por defecto una ventana rolling de `3` meses (`monthsBack`, configurable hasta `6`)
+- Esto fortalece el ecosistema alrededor del engine:
+  - cambios semánticos del período ya no quedan atrapados tan fácilmente en snapshots viejos
+  - la resincronización a PostgreSQL deja de asumir siempre “mes actual” cuando el evento viene de una rematerialización/backfill
+- El gap operativo restante ya no es de código base sino de ejecución:
+  - desplegar este cambio
+  - disparar la rematerialización del período afectado para sanar snapshots ya existentes
 
 ## Delta 2026-04-01 — Hallazgo de auditoría sobre snapshots stale
 
@@ -51,11 +53,11 @@
 
 ## Status
 
-- Lifecycle: `complete`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Bajo`
-- Status real: `Cerrada`
+- Status real: `Reabierta`
 - Rank: `1`
 - Domain: `delivery / ico-engine`
 

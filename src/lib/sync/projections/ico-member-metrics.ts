@@ -40,7 +40,7 @@ export const icoMemberProjection: ProjectionDefinition = {
     return null
   },
 
-  refresh: async (scope) => {
+  refresh: async (scope, payload) => {
     // Targeted refresh: pull this member's latest metrics from BigQuery → Postgres
     const memberId = scope.entityId
 
@@ -48,9 +48,29 @@ export const icoMemberProjection: ProjectionDefinition = {
       const projectId = getBigQueryProjectId()
       const bigQuery = getBigQueryClient()
 
+      const payloadYear =
+        typeof payload.periodYear === 'number'
+          ? payload.periodYear
+          : typeof payload.periodYear === 'string'
+            ? Number(payload.periodYear)
+            : null
+
+      const payloadMonth =
+        typeof payload.periodMonth === 'number'
+          ? payload.periodMonth
+          : typeof payload.periodMonth === 'string'
+            ? Number(payload.periodMonth)
+            : null
+
       const now = new Date()
-      const year = now.getFullYear()
-      const month = now.getMonth() + 1
+
+      const year = Number.isInteger(payloadYear) && payloadYear! >= 2024 && payloadYear! <= 2030
+        ? payloadYear!
+        : now.getFullYear()
+
+      const month = Number.isInteger(payloadMonth) && payloadMonth! >= 1 && payloadMonth! <= 12
+        ? payloadMonth!
+        : now.getMonth() + 1
 
       const [rows] = await bigQuery.query({
         query: `SELECT *

@@ -2854,6 +2854,7 @@ CREATE TABLE greenhouse_serving.ico_member_metrics (
     total_tasks integer,
     completed_tasks integer,
     active_tasks integer,
+    carry_over_count integer,
     materialized_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -8633,4 +8634,3 @@ ALTER TABLE ONLY greenhouse_sync.webhook_inbox_events
 --
 
 \unrestrict bs3NERE9Z8mfcsVKfRwiXdjgVtodi58paZxqi9QdWLTXKokz7wrRmHe97p5Sq8P
-

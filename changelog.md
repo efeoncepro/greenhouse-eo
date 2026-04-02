@@ -2,6 +2,13 @@
 
 ## 2026-04-01
 
+- **TASK-189 rolling rematerialization hardening**:
+  - `/api/cron/ico-materialize` ahora rematerializa por defecto una ventana rolling de `3` meses (`monthsBack`, configurable hasta `6`)
+  - la proyección `ico_member_metrics` ahora refresca el período explícito informado por el payload de materialización, evitando asumir siempre el mes actual
+  - `schema-snapshot-baseline.sql` quedó reconciliado con `carry_over_count` en `greenhouse_serving.ico_member_metrics`
+
+## 2026-04-01
+
 - **TASK-189 hardening de member metrics materialized-first**:
   - `readMemberMetrics()` y `readMemberMetricsBatch()` ahora hacen fallback live por miembro si `metrics_by_member` trae buckets/contexto críticos en `null` con `total_tasks > 0`
   - esto evita que consumers como `People` o `Payroll` sigan mostrando snapshots legacy incompletos tras el cambio de semántica por `due_date`

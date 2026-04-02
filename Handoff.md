@@ -1,5 +1,23 @@
 # Handoff.md
 
+## Sesión 2026-04-01 — TASK-189 rolling rematerialization + projection hardening
+
+### Objetivo
+
+- Cerrar el saneamiento operativo de `TASK-189` para que cambios de semántica por período no queden atrapados en snapshots viejos.
+
+### Delta de ejecución
+
+- `/api/cron/ico-materialize` ahora rematerializa por defecto una ventana rolling de `3` meses y acepta `monthsBack` hasta `6`.
+- La proyección `ico_member_metrics` ahora respeta `periodYear` / `periodMonth` cuando el payload de materialización los informa, en vez de asumir siempre el mes actual.
+- `schema-snapshot-baseline.sql` quedó reconciliado con `carry_over_count` en `greenhouse_serving.ico_member_metrics`.
+- Esto fortalece la recuperación de snapshots stale después de cambios semánticos en el engine sin abrir un carril paralelo a `ICO`.
+
+### Validación
+
+- No hubo cambios de contrato UI en este sub-slice.
+- Validación pendiente de repo completo antes del commit final del lote: `lint` y `build`.
+
 ## Sesión 2026-04-01 — TASK-189 cierre del hardening materialized-first por miembro
 
 ### Objetivo
