@@ -49,13 +49,14 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-003`
+`ISSUE-004`
 
 ## Open
 
 | ID | Título | Ambiente | Detectado | Estado |
 |----|--------|----------|-----------|--------|
 | `ISSUE-002` | [Nubox sync conformed: data integrity (period mixing, identity loss)](open/ISSUE-002-nubox-sync-conformed-data-integrity.md) | staging + production | 2026-03-30 | open |
+| `ISSUE-003` | [Permission denied for schema greenhouse_notifications](open/ISSUE-003-notification-schema-permission-denied.md) | preview | 2026-04-01 | resolved |
 
 ## Resolved
 
