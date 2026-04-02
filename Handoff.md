@@ -1,5 +1,49 @@
 # Handoff.md
 
+## Sesión 2026-04-02 — TASK-192 finance org-first materialized serving cutover
+
+### Objetivo
+
+- Cerrar la deuda residual post `TASK-191`, donde Finance ya acepta input org-first pero `allocations`, `client_economics`, `commercial_cost_attribution`, `operational_pl` y varios consumers seguían materializando o resolviendo boundaries sobre `client_id`.
+
+### Delta de ejecución
+
+- `TASK-192` se movió de `to-do/` a `in-progress/` y quedó cerrada en `complete/`.
+- La spec se corrigió antes de implementar:
+  - `operational_pl scope_type='organization'` ya existía en repo y schema; `TASK-167` quedó marcada como desactualizada
+  - el gap real no era recrear organization scope, sino persistir y servir contexto `organization_id` / `space_id` en layers materiales que seguían client-first
+- Se agregó la migración `20260402085449701_finance-org-first-materialized-serving-keys.sql` para:
+  - `greenhouse_finance.cost_allocations.organization_id`
+  - `greenhouse_finance.cost_allocations.space_id`
+  - `greenhouse_finance.client_economics.organization_id`
+  - `greenhouse_serving.commercial_cost_attribution.organization_id`
+  - índices y backfill compatibles
+- `src/lib/finance/postgres-store-intelligence.ts` quedó endurecido para persistir y leer allocations/economics con contexto org-first, incluyendo readers por organización.
+- `src/lib/commercial-cost-attribution/member-period-attribution.ts` y `src/lib/commercial-cost-attribution/store.ts` ahora materializan `organization_id` explícito como bridge downstream desde el grano canónico `member + client`.
+- `src/lib/cost-intelligence/compute-operational-pl.ts` dejó de depender ciegamente del bridge `client -> space` y ahora arrastra `organizationId` persistido desde ingresos, allocations, expenses y attribution.
+- Consumers downstream alineados:
+  - `src/lib/account-360/organization-economics.ts`
+  - `src/lib/agency/agency-finance-metrics.ts`
+  - `src/lib/agency/space-360.ts`
+  - `src/views/agency/AgencySpacesView.tsx`
+  - `src/app/api/finance/intelligence/allocations/route.ts`
+  - `src/app/api/finance/intelligence/client-economics/route.ts`
+- Impacto cruzado documentado:
+  - `TASK-167` marcada como desactualizada porque organization scope ya existía
+  - `TASK-177` recibió delta para dejar explícito que `TASK-192` cerró la base materialized-first org-aware sobre la que podrá vivir `business_unit`
+- Arquitectura actualizada:
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`
+  - `docs/architecture/GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md`
+
+### Validación
+
+- `GREENHOUSE_POSTGRES_HOST=127.0.0.1 GREENHOUSE_POSTGRES_PORT=15432 GREENHOUSE_POSTGRES_SSL=false pnpm migrate:up` ✅
+- `pnpm exec vitest run src/lib/finance/postgres-store-intelligence.test.ts src/lib/commercial-cost-attribution/store.test.ts src/lib/commercial-cost-attribution/member-period-attribution.test.ts src/lib/cost-intelligence/compute-operational-pl.test.ts src/lib/agency/agency-finance-metrics.test.ts src/lib/agency/space-360.test.ts src/app/api/finance/intelligence/allocations/route.test.ts src/app/api/finance/intelligence/client-economics/route.test.ts` ✅
+- `pnpm lint` ✅
+- `pnpm build` ✅
+- `rg -n "new Pool\\(" src` → solo `src/lib/postgres/client.ts` ✅
+
 ## Sesión 2026-04-02 — TASK-191 finance downstream organization-first cutover
 
 ### Objetivo
@@ -57,6 +101,13 @@
 - `pnpm lint` ✅
 - `pnpm build` ✅
 - Smoke manual todavía pendiente.
+
+### Follow-on creado
+
+- Se creó `TASK-192` para capturar la deuda residual post `TASK-191`:
+  - el input contract downstream ya es org-first
+  - la materialización/serving de `allocations`, `client_economics`, `commercial_cost_attribution` y `operational_pl` sigue teniendo boundaries client-first
+  - esto evita mezclar esa evolución estructural con `TASK-177` o reabrir `TASK-191`
 
 ## Sesión 2026-04-01 — TASK-181 finance clients canonical source migration
 

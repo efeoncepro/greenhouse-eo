@@ -352,6 +352,8 @@ export type CostAllocationRecord = {
   allocationId: string
   expenseId: string
   clientId: string
+  organizationId: string | null
+  spaceId: string | null
   clientName: string
   allocationPercent: number
   allocatedAmountClp: number
@@ -367,6 +369,7 @@ export type CostAllocationRecord = {
 export type ClientEconomicsRecord = {
   snapshotId: string
   clientId: string
+  organizationId: string | null
   clientName: string
   periodYear: number
   periodMonth: number

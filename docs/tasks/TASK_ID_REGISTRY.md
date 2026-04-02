@@ -241,3 +241,5 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-189` | `complete` | ICO Period Filter: Due-Date Anchor & Carry-Over Logic | `docs/tasks/complete/TASK-189-ico-period-filter-due-date-anchor.md` |
 | `TASK-190` | `to-do` | Platform Temporal Scope Contract & Cross-Module Time Semantics | `docs/tasks/to-do/TASK-190-platform-temporal-scope-contract-cross-module-parity.md` |
 | `TASK-191` | `in-progress` | Finance Organization-First Downstream Consumers Cutover | `docs/tasks/in-progress/TASK-191-finance-organization-first-downstream-consumers-cutover.md` |
+| `TASK-192` | `complete` | Finance Org-First Materialized Serving Cutover | `docs/tasks/complete/TASK-192-finance-org-first-materialized-serving-cutover.md` |
+| `TASK-193` | `to-do` | Person ↔ Organization Synergy Activation | `docs/tasks/to-do/TASK-193-person-organization-synergy-activation.md` |

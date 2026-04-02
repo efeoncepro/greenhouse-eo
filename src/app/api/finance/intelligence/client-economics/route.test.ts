@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockRequireFinanceTenantContext = vi.fn()
+const mockResolveFinanceDownstreamScope = vi.fn()
 const mockGetClientEconomics = vi.fn()
+const mockListClientEconomicsByOrganization = vi.fn()
 const mockListClientEconomicsByPeriod = vi.fn()
 const mockComputeClientEconomicsSnapshots = vi.fn()
 const mockIsFinanceSlice2PostgresEnabled = vi.fn()
@@ -11,8 +13,13 @@ vi.mock('@/lib/tenant/authorization', () => ({
   requireFinanceTenantContext: (...args: unknown[]) => mockRequireFinanceTenantContext(...args)
 }))
 
+vi.mock('@/lib/finance/canonical', () => ({
+  resolveFinanceDownstreamScope: (...args: unknown[]) => mockResolveFinanceDownstreamScope(...args)
+}))
+
 vi.mock('@/lib/finance/postgres-store-intelligence', () => ({
   getClientEconomics: (...args: unknown[]) => mockGetClientEconomics(...args),
+  listClientEconomicsByOrganization: (...args: unknown[]) => mockListClientEconomicsByOrganization(...args),
   listClientEconomicsByPeriod: (...args: unknown[]) => mockListClientEconomicsByPeriod(...args),
   computeClientEconomicsSnapshots: (...args: unknown[]) => mockComputeClientEconomicsSnapshots(...args)
 }))
@@ -30,6 +37,15 @@ describe('GET /api/finance/intelligence/client-economics', () => {
     mockRequireFinanceTenantContext.mockResolvedValue({
       tenant: { tenantType: 'efeonce_internal', routeGroups: ['internal'] },
       errorResponse: null
+    })
+    mockResolveFinanceDownstreamScope.mockResolvedValue({
+      clientId: null,
+      clientProfileId: 'profile-1',
+      hubspotCompanyId: 'hubspot-1',
+      clientName: 'Sky Airline',
+      legalName: 'Sky Airline SA',
+      organizationId: 'org-1',
+      spaceId: 'space-1'
     })
   })
 
@@ -67,5 +83,53 @@ describe('GET /api/finance/intelligence/client-economics', () => {
       grossMarginPercent: null,
       netMarginPercent: null
     })
+  })
+
+  it('returns organization-scoped snapshots when no legacy client bridge is available', async () => {
+    mockListClientEconomicsByOrganization.mockResolvedValue([
+      {
+        snapshotId: 'snap-org-1',
+        clientId: 'org-1',
+        organizationId: 'org-1',
+        clientName: 'Sky Airline SA',
+        periodYear: 2026,
+        periodMonth: 3,
+        totalRevenueClp: 13804000,
+        directCostsClp: 7200000,
+        indirectCostsClp: 900000,
+        grossMarginClp: 6604000,
+        grossMarginPercent: 0.4784,
+        netMarginClp: 5704000,
+        netMarginPercent: 0.4132,
+        headcountFte: 3,
+        revenuePerFte: 4601333.33,
+        costPerFte: 2700000,
+        acquisitionCostClp: null,
+        ltvToCacRatio: null,
+        notes: null,
+        computedAt: '2026-03-20T19:42:48.185Z',
+        createdAt: '2026-03-20T19:41:44.207Z',
+        updatedAt: '2026-03-20T19:42:48.185Z'
+      }
+    ])
+
+    const response = await GET(
+      new Request('http://localhost/api/finance/intelligence/client-economics?organizationId=org-1&year=2026&month=3')
+    )
+
+    const body = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(mockResolveFinanceDownstreamScope).toHaveBeenCalledWith({
+      clientId: null,
+      organizationId: 'org-1',
+      clientProfileId: null,
+      hubspotCompanyId: null,
+      requestedSpaceId: null,
+      requireLegacyClientBridge: false
+    })
+    expect(mockListClientEconomicsByOrganization).toHaveBeenCalledWith('org-1', 2026, 3)
+    expect(body.snapshot).toBeNull()
+    expect(body.snapshots).toHaveLength(1)
   })
 })

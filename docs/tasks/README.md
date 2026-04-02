@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-192`
+- siguiente ID disponible: `TASK-194`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -106,6 +106,8 @@ Primer bloque operativo asignado:
 - **Top ROI ahora:** `TASK-100` → `TASK-101` → `TASK-072` → `TASK-098` → `TASK-109` → `TASK-030` → `TASK-027`.
 - **Finance Enterprise Hardening:** `TASK-174` (P0 data integrity) → `TASK-175` (test coverage) → `TASK-179` (reconciliation cutover) → `TASK-176` (labor provisions) → `TASK-177` (BU P&L) → `TASK-178` (budget engine).
 - **Finance canonical cutover follow-on:** `TASK-181` cerró `Finance Clients` org-first; `TASK-191` toma los consumers downstream que todavía exigen `clientId` y encapsula el bridge legado en PO/HES/expenses/allocations/economics.
+- **Finance serving/materialization follow-on:** `TASK-192` ya cerró la persistencia org-aware base para `allocations`, `client_economics`, `commercial_cost_attribution` y `operational_pl`; el follow-on natural pasa a ser cleanup físico y nuevas extensiones como `business_unit`.
+- **Person ↔ Organization synergy activation:** `TASK-193` cablea las sinergias entre Person y Organization que existen a nivel de schema pero no están siendo consumidas por downstream: CanonicalPerson sin org context, session sin `organization_id`, economics sin grafo de personas, person-360 facets sin org-scoping. Depende de `TASK-181`/`TASK-191`; impacta `TASK-167`, `TASK-177`, `TASK-143`, `TASK-192`.
 - **Siguiente ola:** `TASK-173` → `TASK-027` → `TASK-028` → `TASK-116` → `TASK-070` → `TASK-071` → `TASK-011`.
 - **Estratégicas pero caras:** `TASK-008` → `TASK-005` → `TASK-071` → `TASK-118` → `TASK-018`.
 - **Later / oportunistas:** `TASK-029` → `TASK-031` → `TASK-015` → `TASK-016` → `TASK-020` → `TASK-115` → `TASK-107` → `TASK-103` → `TASK-021` → `TASK-032` → `TASK-053` → `TASK-054` → `TASK-055` → `TASK-058` → `TASK-071`.
@@ -257,6 +259,7 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 
 ## Complete
 
+| [TASK-192-finance-org-first-materialized-serving-cutover.md](complete/TASK-192-finance-org-first-materialized-serving-cutover.md) | `TASK-192` ya cerró el serving/materialized cutover org-first de Finance: `cost_allocations`, `client_economics` y `commercial_cost_attribution` persisten `organization_id` y `space_id` donde corresponde, `operational_pl` consume esos bridges explícitos sin reintroducir client-first ad hoc, y Agency/Organization 360 ya leen el scope material correcto. |
 | [TASK-189-ico-period-filter-due-date-anchor.md](complete/TASK-189-ico-period-filter-due-date-anchor.md) | `TASK-189` ya cubre el período canónico por `due_date`, `carry_over_count` materializado, fallback live cuando `metrics_by_member` trae buckets/contexto incompletos, y una UI más explícita para períodos con trabajo comprometido pero sin cierres. |
 | [TASK-186-delivery-metrics-trust-notion-property-audit-contract.md](complete/TASK-186-delivery-metrics-trust-notion-property-audit-contract.md) | Delivery Metrics Trust MVP ya cerró paridad visible del `Performance Report`: buckets canónicos y `FTR` endurecidos sobre `ICO`, snapshot mensual `performance_report_monthly`, serving formal `greenhouse_serving.agency_performance_reports`, comparativo mensual, `Top Performer`, `alertText`, `executiveSummary` y segmentación explícita `Tareas Efeonce` / `Tareas Sky`. |
 | [TASK-026-hris-contract-type-consolidation.md](complete/TASK-026-hris-contract-type-consolidation.md) | HRIS ya consolidó el contrato canónico en `greenhouse_core.members` con `contract_type`, `pay_regime`, `payroll_via` y `deel_contract_id`; `payroll` consume ramas Chile, `honorarios` y Deel sin cálculo inline para métricas, `daily_required` queda como backing flag de `schedule_required`, y la migración quedó aplicada en Cloud SQL con tipos Kysely regenerados. |

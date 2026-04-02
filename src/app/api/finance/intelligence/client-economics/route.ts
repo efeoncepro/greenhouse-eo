@@ -11,6 +11,7 @@ import {
 import {
   computeClientEconomicsSnapshots,
   getClientEconomics,
+  listClientEconomicsByOrganization,
   listClientEconomicsByPeriod
 } from '@/lib/finance/postgres-store-intelligence'
 import { getFinanceCurrentPeriod } from '@/lib/finance/reporting'
@@ -42,12 +43,21 @@ export async function GET(request: Request) {
         clientProfileId,
         hubspotCompanyId,
         requestedSpaceId: spaceId,
-        requireLegacyClientBridge: true
+        requireLegacyClientBridge: false
       })
 
-      const snapshot = await getClientEconomics(resolvedScope.clientId!, year, month)
+      const snapshot = resolvedScope.clientId
+        ? await getClientEconomics(resolvedScope.clientId, year, month)
+        : null
 
-      return NextResponse.json({ snapshot: snapshot ? sanitizeSnapshotForPresentation(snapshot) : null })
+      const snapshots = !snapshot && resolvedScope.organizationId
+        ? await listClientEconomicsByOrganization(resolvedScope.organizationId, year, month)
+        : []
+
+      return NextResponse.json({
+        snapshot: snapshot ? sanitizeSnapshotForPresentation(snapshot) : null,
+        snapshots: snapshots.map(sanitizeSnapshotForPresentation)
+      })
     }
 
     const snapshots = await listClientEconomicsByPeriod(year, month)

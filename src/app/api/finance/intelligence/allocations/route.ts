@@ -7,6 +7,7 @@ import {
   createCostAllocation,
   getCostAllocationsByExpense,
   getCostAllocationsByClient,
+  getCostAllocationsByOrganization,
   listCostAllocationsByPeriod,
   deleteCostAllocation
 } from '@/lib/finance/postgres-store-intelligence'
@@ -45,12 +46,14 @@ export async function GET(request: Request) {
             clientProfileId,
             hubspotCompanyId,
             requestedSpaceId: spaceId,
-            requireLegacyClientBridge: true
+            requireLegacyClientBridge: false
           })
         : null
 
       const allocations = resolvedScope?.clientId
         ? await getCostAllocationsByClient(resolvedScope.clientId, year, month)
+        : resolvedScope?.organizationId
+          ? await getCostAllocationsByOrganization(resolvedScope.organizationId, year, month)
         : await listCostAllocationsByPeriod(year, month)
 
       return NextResponse.json({ allocations, items: allocations, total: allocations.length })
@@ -110,10 +113,10 @@ export async function POST(request: Request) {
       clientProfileId: body.clientProfileId,
       hubspotCompanyId: body.hubspotCompanyId,
       requestedSpaceId: body.spaceId,
-      requireLegacyClientBridge: true
+      requireLegacyClientBridge: false
     })
 
-    const clientId = assertNonEmptyString(resolvedScope.clientId, 'clientId')
+    const clientId = assertNonEmptyString(resolvedScope.clientId || resolvedScope.organizationId, 'clientId')
 
     const clientName = assertNonEmptyString(
       body.clientName || resolvedScope.legalName || resolvedScope.clientName || resolvedScope.organizationId || clientId,
@@ -123,6 +126,8 @@ export async function POST(request: Request) {
     const allocation = await createCostAllocation({
       expenseId,
       clientId,
+      organizationId: resolvedScope.organizationId,
+      spaceId: resolvedScope.spaceId,
       clientName,
       allocationPercent,
       allocatedAmountClp,

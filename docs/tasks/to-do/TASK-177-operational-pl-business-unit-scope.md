@@ -2,7 +2,10 @@
 - TASK-182 (Expense Drawer Agency Taxonomy) agrega `cost_category` granular a cada expense. El P&L por BU que esta task materializa puede desagregar costos por categoria (operational, infrastructure, tax_social) en vez de solo por expense_type generico.
 - TASK-182 + TASK-183 tambien dejan `space_id`, `source_type`, `payment_provider` y `payment_rail` en el contrato del ledger, además de nuevos tipos `bank_fee`, `gateway_fee` y `financial_cost`; esta task puede apoyarse en ese slicing en vez de depender solo de `service_line`.
 
-# TASK-177 — Operational P&L: Business Unit Scope Materialization
+## Delta 2026-04-02
+- `TASK-192` endureció la base materializada previa: `cost_allocations`, `client_economics` y `commercial_cost_attribution` ya persisten contexto org-first y `agency-finance-metrics` consume `scope_type = 'space'`. Esta task sigue abierta, pero ya no debe asumir que `organization` falta en `operational_pl`.
+
+# TASK-177 - Operational P&L: Business Unit Scope Materialization
 
 ## Status
 

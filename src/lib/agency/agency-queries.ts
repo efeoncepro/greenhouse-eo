@@ -5,6 +5,7 @@ import type { TeamRoleCategory } from '@/types/team'
 
 export interface AgencySpaceHealth {
   clientId: string
+  spaceId?: string | null
   clientName: string
   businessLines: string[]
   rpaAvg: number | null
@@ -372,6 +373,7 @@ export const getAgencySpacesHealth = async (): Promise<AgencySpaceHealth[]> => {
 
     return {
       clientId,
+      spaceId: null,
       clientName,
       businessLines: normalizeStringArray(row.business_lines),
       rpaAvg: toNullableNumber(row.rpa_avg),

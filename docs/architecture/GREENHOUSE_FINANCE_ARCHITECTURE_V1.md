@@ -79,6 +79,26 @@ Regla de persistencia:
 - No se debe prometer eliminación física de `client_id` hasta una lane explícita de schema evolution.
 - Los readers/materializers que siguen materializando por `client_id` deben documentarse como compat boundary, no como contrato de entrada.
 
+## Delta 2026-04-02 — materialized serving org-first compatibility keys
+
+`TASK-192` endurece la capa materializada de Finance sin eliminar todavía el bridge legado:
+
+- `greenhouse_finance.cost_allocations` ahora persiste `organization_id` y `space_id` además de `client_id`.
+- `greenhouse_finance.client_economics` ahora persiste `organization_id` junto al snapshot mensual.
+- `greenhouse_serving.commercial_cost_attribution` ahora persiste `organization_id` como contexto compartido de attribution.
+- `client_id` sigue vivo como compat boundary para storage/readers legacy, pero ya no es la única llave persistida disponible en serving financiero.
+- `GET /api/finance/intelligence/allocations` y `GET /api/finance/intelligence/client-economics` ya pueden resolver lectura org-first sin exigir siempre un bridge legacy previo.
+
+Matiz importante de schema:
+
+- estas columnas nuevas dejan el modelo `org-aware`, pero todavía no `org-enforced`
+- en esta lane se agregaron columnas, índices y backfill, pero no `FK` ni `NOT NULL` nuevos sobre `organization_id` / `space_id`
+- el bridge canónico real sigue combinando:
+  - `greenhouse_finance.client_profiles`
+  - `greenhouse_core.spaces`
+  - y, para allocations, `greenhouse_finance.expenses.space_id`
+- una lane futura de schema cleanup podrá endurecer constraints físicos cuando desaparezcan los consumers legacy que todavía exigen flexibilidad de bridge
+
 ## Delta 2026-03-30 — Cost Intelligence ya opera como layer de management accounting
 
 Finance sigue siendo el owner del motor financiero central, pero ya no es la única surface que expone semántica de rentabilidad.
@@ -134,12 +154,15 @@ Finance es el módulo más grande del portal: 49 API routes, 13 páginas, 28 arc
 | `suppliers` | Postgres | `fin_suppliers` (fallback) | Migrado |
 | `exchange_rates` | Postgres | `fin_exchange_rates` (fallback) | Migrado |
 | `economic_indicators` | Postgres | `fin_economic_indicators` (fallback) | Migrado |
-| `cost_allocations` | Postgres only | No existe en BQ | Nativo Postgres |
-| `client_economics` | Postgres (`greenhouse_finance`) | No | Nativo |
+| `cost_allocations` | Postgres only | No existe en BQ | Nativo Postgres; persiste `organization_id`/`space_id` + `client_id` compat |
+| `client_economics` | Postgres (`greenhouse_finance`) | No | Nativo; persiste `organization_id` + `client_id` compat |
 | `reconciliation_periods` | Postgres | `fin_reconciliation_periods` (fallback) | Migrado |
 | `bank_statement_rows` | Postgres | `fin_bank_statement_rows` (fallback) | Migrado |
 | `dte_emission_queue` | Postgres only | No | TASK-139 |
-| `commercial_cost_attribution` | Serving Postgres (`greenhouse_serving`) | No | Canónico materializado |
+| `commercial_cost_attribution` | Serving Postgres (`greenhouse_serving`) | No | Canónico materializado; persiste `organization_id` + `client_id` compat |
+
+Nota operativa:
+- `commercial_cost_attribution` existe en el schema snapshot y ya es contrato vigente del sistema, pero su DDL base sigue asegurado por runtime/store code además de las migraciones incrementales; todavía no vive como create-table canónico separado dentro de `scripts/` o una migración histórica dedicada.
 
 ### BigQuery Cutover Plan
 
@@ -405,7 +428,7 @@ Finance genera 5 tipos de notificación via webhook bus:
 | Bridge | Dirección | Mecanismo |
 |--------|-----------|-----------|
 | Space revenue/margin | Finance → Agency | `getSpaceFinanceMetrics()` + `GET /api/agency/finance-metrics` |
-| Org economics | Finance → Agency | `client_economics` snapshots → org economics |
+| Org economics | Finance → Agency | `operational_pl_snapshots` org-first, con fallback a `client_economics.organization_id` |
 
 ## Cost Allocation System
 

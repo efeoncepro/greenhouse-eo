@@ -682,11 +682,14 @@ const queryOrgFinanceRows = async (
       ce.headcount_fte
     FROM greenhouse_finance.client_economics ce
     WHERE ce.period_year = $2 AND ce.period_month = $3
-      AND EXISTS (
-        SELECT 1
-        FROM greenhouse_finance.client_profiles cp
-        WHERE cp.organization_id = $1
-          AND (cp.client_id = ce.client_id OR cp.organization_id = ce.client_id)
+      AND (
+        ce.organization_id = $1
+        OR EXISTS (
+          SELECT 1
+          FROM greenhouse_finance.client_profiles cp
+          WHERE cp.organization_id = $1
+            AND (cp.client_id = ce.client_id OR cp.organization_id = ce.client_id)
+        )
       )
     ORDER BY ce.total_revenue_clp DESC
   `, [orgId, year, month])
@@ -701,11 +704,14 @@ const queryOrgFinanceRows = async (
         ce.headcount_fte
       FROM greenhouse_finance.client_economics ce
       WHERE ce.period_year = $2 AND ce.period_month = $3
-        AND EXISTS (
-          SELECT 1
-          FROM greenhouse_finance.client_profiles cp
-          WHERE cp.organization_id = $1
-            AND (cp.client_id = ce.client_id OR cp.organization_id = ce.client_id)
+        AND (
+          ce.organization_id = $1
+          OR EXISTS (
+            SELECT 1
+            FROM greenhouse_finance.client_profiles cp
+            WHERE cp.organization_id = $1
+              AND (cp.client_id = ce.client_id OR cp.organization_id = ce.client_id)
+          )
         )
       ORDER BY ce.total_revenue_clp DESC
     `, [orgId, year, month])

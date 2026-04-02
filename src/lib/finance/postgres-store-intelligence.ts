@@ -29,6 +29,8 @@ type CostAllocationRow = {
   allocation_id: string
   expense_id: string
   client_id: string
+  organization_id: string | null
+  space_id: string | null
   client_name: string
   allocation_percent: unknown
   allocated_amount_clp: unknown
@@ -44,6 +46,7 @@ type CostAllocationRow = {
 type ClientEconomicsRow = {
   snapshot_id: string
   client_id: string
+  organization_id: string | null
   client_name: string
   period_year: unknown
   period_month: unknown
@@ -76,6 +79,8 @@ const mapCostAllocation = (row: CostAllocationRow): CostAllocationRecord => ({
   allocationId: normalizeString(row.allocation_id),
   expenseId: normalizeString(row.expense_id),
   clientId: normalizeString(row.client_id),
+  organizationId: str(row.organization_id),
+  spaceId: str(row.space_id),
   clientName: normalizeString(row.client_name),
   allocationPercent: toNumber(row.allocation_percent),
   allocatedAmountClp: toNumber(row.allocated_amount_clp),
@@ -91,6 +96,7 @@ const mapCostAllocation = (row: CostAllocationRow): CostAllocationRecord => ({
 const mapClientEconomics = (row: ClientEconomicsRow): ClientEconomicsRecord => ({
   snapshotId: normalizeString(row.snapshot_id),
   clientId: normalizeString(row.client_id),
+  organizationId: str(row.organization_id),
   clientName: normalizeString(row.client_name),
   periodYear: toNumber(row.period_year),
   periodMonth: toNumber(row.period_month),
@@ -117,6 +123,8 @@ const mapClientEconomics = (row: ClientEconomicsRow): ClientEconomicsRecord => (
 export const createCostAllocation = async ({
   expenseId,
   clientId,
+  organizationId,
+  spaceId,
   clientName,
   allocationPercent,
   allocatedAmountClp,
@@ -128,6 +136,8 @@ export const createCostAllocation = async ({
 }: {
   expenseId: string
   clientId: string
+  organizationId: string | null
+  spaceId: string | null
   clientName: string
   allocationPercent: number
   allocatedAmountClp: number
@@ -145,23 +155,23 @@ export const createCostAllocation = async ({
     const result = await client.query<CostAllocationRow>(
       `
         INSERT INTO greenhouse_finance.cost_allocations (
-          allocation_id, expense_id, client_id, client_name,
+          allocation_id, expense_id, client_id, organization_id, space_id, client_name,
           allocation_percent, allocated_amount_clp,
           period_year, period_month, allocation_method,
           notes, created_by_user_id,
           created_at, updated_at
         )
         VALUES (
-          $1, $2, $3, $4,
-          $5, $6,
-          $7, $8, $9,
-          $10, $11,
+          $1, $2, $3, $4, $5, $6,
+          $7, $8,
+          $9, $10, $11,
+          $12, $13,
           CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
         RETURNING *
       `,
       [
-        allocationId, expenseId, clientId, clientName,
+        allocationId, expenseId, clientId, organizationId, spaceId, clientName,
         allocationPercent, roundCurrency(allocatedAmountClp),
         periodYear, periodMonth, allocationMethod,
         notes, actorUserId
@@ -178,6 +188,8 @@ export const createCostAllocation = async ({
         allocationId,
         expenseId,
         clientId,
+        organizationId,
+        spaceId,
         clientName,
         periodYear,
         periodMonth,
@@ -196,7 +208,7 @@ export const getCostAllocationsByExpense = async (expenseId: string): Promise<Co
   const rows = await runGreenhousePostgresQuery<CostAllocationRow>(
     `
       SELECT
-        allocation_id, expense_id, client_id, client_name,
+        allocation_id, expense_id, client_id, organization_id, space_id, client_name,
         allocation_percent, allocated_amount_clp,
         period_year, period_month, allocation_method,
         notes, created_by_user_id, created_at, updated_at
@@ -220,7 +232,7 @@ export const getCostAllocationsByClient = async (
   const rows = await runGreenhousePostgresQuery<CostAllocationRow>(
     `
       SELECT
-        allocation_id, expense_id, client_id, client_name,
+        allocation_id, expense_id, client_id, organization_id, space_id, client_name,
         allocation_percent, allocated_amount_clp,
         period_year, period_month, allocation_method,
         notes, created_by_user_id, created_at, updated_at
@@ -229,6 +241,30 @@ export const getCostAllocationsByClient = async (
       ORDER BY allocated_amount_clp DESC
     `,
     [clientId, year, month]
+  )
+
+  return rows.map(mapCostAllocation)
+}
+
+export const getCostAllocationsByOrganization = async (
+  organizationId: string,
+  year: number,
+  month: number
+): Promise<CostAllocationRecord[]> => {
+  await assertFinanceSlice2PostgresReady()
+
+  const rows = await runGreenhousePostgresQuery<CostAllocationRow>(
+    `
+      SELECT
+        allocation_id, expense_id, client_id, organization_id, space_id, client_name,
+        allocation_percent, allocated_amount_clp,
+        period_year, period_month, allocation_method,
+        notes, created_by_user_id, created_at, updated_at
+      FROM greenhouse_finance.cost_allocations
+      WHERE organization_id = $1 AND period_year = $2 AND period_month = $3
+      ORDER BY allocated_amount_clp DESC, created_at DESC
+    `,
+    [organizationId, year, month]
   )
 
   return rows.map(mapCostAllocation)
@@ -243,7 +279,7 @@ export const listCostAllocationsByPeriod = async (
   const rows = await runGreenhousePostgresQuery<CostAllocationRow>(
     `
       SELECT
-        allocation_id, expense_id, client_id, client_name,
+        allocation_id, expense_id, client_id, organization_id, space_id, client_name,
         allocation_percent, allocated_amount_clp,
         period_year, period_month, allocation_method,
         notes, created_by_user_id, created_at, updated_at
@@ -282,6 +318,8 @@ export const deleteCostAllocation = async (allocationId: string): Promise<void> 
         allocationId: deleted.allocation_id,
         expenseId: deleted.expense_id,
         clientId: deleted.client_id,
+        organizationId: deleted.organization_id,
+        spaceId: deleted.space_id,
         clientName: deleted.client_name,
         periodYear: toNumber(deleted.period_year),
         periodMonth: toNumber(deleted.period_month),
@@ -296,6 +334,7 @@ export const deleteCostAllocation = async (allocationId: string): Promise<void> 
 
 export const upsertClientEconomicsSnapshot = async ({
   clientId,
+  organizationId,
   clientName,
   periodYear,
   periodMonth,
@@ -312,6 +351,7 @@ export const upsertClientEconomicsSnapshot = async ({
   notes
 }: {
   clientId: string
+  organizationId: string | null
   clientName: string
   periodYear: number
   periodMonth: number
@@ -334,7 +374,7 @@ export const upsertClientEconomicsSnapshot = async ({
   const rows = await runGreenhousePostgresQuery<ClientEconomicsRow>(
     `
       INSERT INTO greenhouse_finance.client_economics (
-        snapshot_id, client_id, client_name,
+        snapshot_id, client_id, organization_id, client_name,
         period_year, period_month,
         total_revenue_clp, direct_costs_clp, indirect_costs_clp,
         gross_margin_clp, gross_margin_percent,
@@ -343,16 +383,17 @@ export const upsertClientEconomicsSnapshot = async ({
         notes, computed_at, created_at, updated_at
       )
       VALUES (
-        $1, $2, $3,
-        $4, $5,
-        $6, $7, $8,
-        $9, $10,
-        $11, $12,
-        $13, $14, $15,
-        $16, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+        $1, $2, $3, $4,
+        $5, $6,
+        $7, $8, $9,
+        $10, $11,
+        $12, $13,
+        $14, $15, $16,
+        $17, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
       )
       ON CONFLICT (client_id, period_year, period_month)
       DO UPDATE SET
+        organization_id = EXCLUDED.organization_id,
         client_name = EXCLUDED.client_name,
         total_revenue_clp = EXCLUDED.total_revenue_clp,
         direct_costs_clp = EXCLUDED.direct_costs_clp,
@@ -370,7 +411,7 @@ export const upsertClientEconomicsSnapshot = async ({
       RETURNING *
     `,
     [
-      snapshotId, clientId, clientName,
+      snapshotId, clientId, organizationId, clientName,
       periodYear, periodMonth,
       roundCurrency(totalRevenueClp), roundCurrency(directCostsClp), roundCurrency(indirectCostsClp),
       roundCurrency(grossMarginClp), grossMarginPercent,
@@ -394,11 +435,23 @@ export const computeClientEconomicsSnapshots = async (
 
   const revenueRows = await runGreenhousePostgresQuery<{
     client_id: string
+    organization_id: string | null
     client_name: string
     total_revenue_clp: string
   }>(
-    `SELECT
+    `WITH client_bridge AS (
+       SELECT DISTINCT ON (s.client_id)
+         s.client_id,
+         s.organization_id
+       FROM greenhouse_core.spaces s
+       WHERE s.client_id IS NOT NULL
+         AND s.organization_id IS NOT NULL
+         AND s.active = TRUE
+       ORDER BY s.client_id, s.updated_at DESC NULLS LAST, s.created_at DESC NULLS LAST, s.space_id ASC
+     )
+     SELECT
        COALESCE(i.client_id, cp.client_id, i.organization_id, cp.organization_id) AS client_id,
+       COALESCE(i.organization_id, cp.organization_id, cb.organization_id) AS organization_id,
        MAX(
          COALESCE(
            NULLIF(TRIM(i.client_name), ''),
@@ -412,43 +465,65 @@ export const computeClientEconomicsSnapshots = async (
      FROM greenhouse_finance.income i
      LEFT JOIN greenhouse_finance.client_profiles cp
        ON cp.client_profile_id = i.client_profile_id
+     LEFT JOIN client_bridge cb
+       ON cb.client_id = COALESCE(i.client_id, cp.client_id)
      LEFT JOIN greenhouse_core.clients c
        ON c.client_id = COALESCE(i.client_id, cp.client_id)
      LEFT JOIN greenhouse_core.organizations o
        ON o.organization_id = COALESCE(i.organization_id, cp.organization_id)
      WHERE invoice_date >= $1::date AND invoice_date <= $2::date
        AND COALESCE(i.client_id, cp.client_id, i.organization_id, cp.organization_id) IS NOT NULL
-     GROUP BY COALESCE(i.client_id, cp.client_id, i.organization_id, cp.organization_id)`,
+     GROUP BY
+       COALESCE(i.client_id, cp.client_id, i.organization_id, cp.organization_id),
+       COALESCE(i.organization_id, cp.organization_id, cb.organization_id)`,
     [periodStart, periodEnd]
   )
 
   const allocationRows = await runGreenhousePostgresQuery<{
     client_id: string
+    organization_id: string | null
     client_name: string
     total_allocated_clp: string
   }>(
     `SELECT
        client_id,
+       organization_id,
        client_name,
        COALESCE(SUM(allocated_amount_clp), 0) AS total_allocated_clp
      FROM greenhouse_finance.cost_allocations
      WHERE period_year = $1 AND period_month = $2
-     GROUP BY client_id, client_name`,
+     GROUP BY client_id, organization_id, client_name`,
     [year, month]
   )
 
   const directExpenseRows = await runGreenhousePostgresQuery<{
     allocated_client_id: string
+    organization_id: string | null
     total_direct_clp: string
   }>(
-    `SELECT
+    `WITH client_bridge AS (
+       SELECT DISTINCT ON (s.client_id)
+         s.client_id,
+         s.organization_id
+       FROM greenhouse_core.spaces s
+       WHERE s.client_id IS NOT NULL
+         AND s.organization_id IS NOT NULL
+         AND s.active = TRUE
+       ORDER BY s.client_id, s.updated_at DESC NULLS LAST, s.created_at DESC NULLS LAST, s.space_id ASC
+     )
+     SELECT
        allocated_client_id,
+       COALESCE(es.organization_id, cb.organization_id) AS organization_id,
        COALESCE(SUM(total_amount_clp), 0) AS total_direct_clp
      FROM greenhouse_finance.expenses
+     LEFT JOIN greenhouse_core.spaces es
+       ON es.space_id = greenhouse_finance.expenses.space_id
+     LEFT JOIN client_bridge cb
+       ON cb.client_id = greenhouse_finance.expenses.allocated_client_id
      WHERE allocated_client_id IS NOT NULL
        AND COALESCE(document_date, payment_date) >= $1::date
        AND COALESCE(document_date, payment_date) <= $2::date
-     GROUP BY allocated_client_id`,
+     GROUP BY allocated_client_id, COALESCE(es.organization_id, cb.organization_id)`,
     [periodStart, periodEnd]
   )
 
@@ -465,6 +540,7 @@ export const computeClientEconomicsSnapshots = async (
   )
 
   const clientMap = new Map<string, {
+    organizationId: string | null
     clientName: string
     revenue: number
     directCosts: number
@@ -473,6 +549,7 @@ export const computeClientEconomicsSnapshots = async (
 
   for (const row of revenueRows) {
     clientMap.set(row.client_id, {
+      organizationId: str(row.organization_id),
       clientName: row.client_name,
       revenue: toNumber(row.total_revenue_clp),
       directCosts: 0,
@@ -482,12 +559,14 @@ export const computeClientEconomicsSnapshots = async (
 
   for (const row of allocationRows) {
     const existing = clientMap.get(row.client_id) || {
+      organizationId: str(row.organization_id),
       clientName: row.client_name,
       revenue: 0,
       directCosts: 0,
       indirectCosts: 0
     }
 
+    existing.organizationId = existing.organizationId || str(row.organization_id)
     existing.directCosts += toNumber(row.total_allocated_clp)
     clientMap.set(row.client_id, existing)
   }
@@ -496,18 +575,29 @@ export const computeClientEconomicsSnapshots = async (
     const existing = clientMap.get(row.allocated_client_id)
 
     if (existing) {
+      existing.organizationId = existing.organizationId || str(row.organization_id)
       existing.directCosts += toNumber(row.total_direct_clp)
+    } else {
+      clientMap.set(row.allocated_client_id, {
+        organizationId: str(row.organization_id),
+        clientName: row.allocated_client_id,
+        revenue: 0,
+        directCosts: toNumber(row.total_direct_clp),
+        indirectCosts: 0
+      })
     }
   }
 
   for (const row of commercialCostRows) {
     const existing = clientMap.get(row.clientId) || {
+      organizationId: row.organizationId,
       clientName: row.clientName,
       revenue: 0,
       directCosts: 0,
       indirectCosts: 0
     }
 
+    existing.organizationId = existing.organizationId || row.organizationId
     existing.directCosts += row.laborCostClp
     clientMap.set(row.clientId, existing)
   }
@@ -558,6 +648,7 @@ export const computeClientEconomicsSnapshots = async (
 
     const snapshot = await upsertClientEconomicsSnapshot({
       clientId,
+      organizationId: data.organizationId,
       clientName: data.clientName,
       periodYear: year,
       periodMonth: month,
@@ -599,7 +690,7 @@ export const getClientEconomics = async (
   const rows = await runGreenhousePostgresQuery<ClientEconomicsRow>(
     `
       SELECT
-        snapshot_id, client_id, client_name,
+        snapshot_id, client_id, organization_id, client_name,
         period_year, period_month,
         total_revenue_clp, direct_costs_clp, indirect_costs_clp,
         gross_margin_clp, gross_margin_percent,
@@ -625,7 +716,7 @@ export const listClientEconomicsByPeriod = async (
   const rows = await runGreenhousePostgresQuery<ClientEconomicsRow>(
     `
       SELECT
-        snapshot_id, client_id, client_name,
+        snapshot_id, client_id, organization_id, client_name,
         period_year, period_month,
         total_revenue_clp, direct_costs_clp, indirect_costs_clp,
         gross_margin_clp, gross_margin_percent,
@@ -637,6 +728,33 @@ export const listClientEconomicsByPeriod = async (
       ORDER BY total_revenue_clp DESC
     `,
     [year, month]
+  )
+
+  return rows.map(mapClientEconomics)
+}
+
+export const listClientEconomicsByOrganization = async (
+  organizationId: string,
+  year: number,
+  month: number
+): Promise<ClientEconomicsRecord[]> => {
+  await assertFinanceSlice2PostgresReady()
+
+  const rows = await runGreenhousePostgresQuery<ClientEconomicsRow>(
+    `
+      SELECT
+        snapshot_id, client_id, organization_id, client_name,
+        period_year, period_month,
+        total_revenue_clp, direct_costs_clp, indirect_costs_clp,
+        gross_margin_clp, gross_margin_percent,
+        net_margin_clp, net_margin_percent,
+        headcount_fte, revenue_per_fte, cost_per_fte,
+        notes, computed_at, created_at, updated_at
+      FROM greenhouse_finance.client_economics
+      WHERE organization_id = $1 AND period_year = $2 AND period_month = $3
+      ORDER BY total_revenue_clp DESC, client_name ASC
+    `,
+    [organizationId, year, month]
   )
 
   return rows.map(mapClientEconomics)
@@ -670,7 +788,7 @@ export const listClientEconomicsTrend = async (
     const rows = await runGreenhousePostgresQuery<ClientEconomicsRow>(
       `
         SELECT
-          snapshot_id, client_id, client_name,
+          snapshot_id, client_id, organization_id, client_name,
           period_year, period_month,
           total_revenue_clp, direct_costs_clp, indirect_costs_clp,
           gross_margin_clp, gross_margin_percent,
@@ -692,7 +810,7 @@ export const listClientEconomicsTrend = async (
   const rows = await runGreenhousePostgresQuery<ClientEconomicsRow>(
     `
       SELECT
-        snapshot_id, client_id, client_name,
+        snapshot_id, client_id, organization_id, client_name,
         period_year, period_month,
         total_revenue_clp, direct_costs_clp, indirect_costs_clp,
         gross_margin_clp, gross_margin_percent,

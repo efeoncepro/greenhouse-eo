@@ -2,6 +2,14 @@
 
 ## 2026-04-02
 
+- **TASK-192 finance org-first materialized serving cutover**:
+  - `cost_allocations`, `client_economics` y `commercial_cost_attribution` ahora persisten contexto `organization_id` y, donde aplica, `space_id`, manteniendo `client_id` solo como bridge explícito de compatibilidad
+  - `operational_pl` quedó reconciliado para propagar organización desde ingresos, allocations, expenses y commercial attribution sin depender solo del bridge legacy `client -> space`
+  - `allocations` y `client_economics` ya pueden leer serving org-first incluso cuando no exista `clientId` legacy materializado para el request
+  - `Agency` y `Organization 360` quedaron alineados al scope material correcto: space-first para Agency y organization-first para economics
+  - se aplicó la migración `20260402085449701_finance-org-first-materialized-serving-keys.sql` con backfill compatible y regeneración de `src/types/db.d.ts`
+  - validación ejecutada en este tramo: `pnpm migrate:up` por Cloud SQL Proxy, targeted `vitest`, `pnpm lint` y `pnpm build`
+
 - **TASK-191 finance organization-first downstream consumers cutover**:
   - `purchase-orders` y `hes` quedaron alineados para aceptar contexto org-first además de `clientId`, manteniendo `client_id` solo como bridge legacy donde el storage todavía lo necesita
   - `expenses`, `expenses/bulk`, `cost allocations` y `client_economics` pasaron a resolver scope downstream desde un helper compartido, reduciendo la dependencia de que la UI empuje `clientId` manualmente

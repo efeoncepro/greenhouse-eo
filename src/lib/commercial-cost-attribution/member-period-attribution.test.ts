@@ -48,6 +48,7 @@ describe('readCommercialCostAttributionForPeriod', () => {
         {
           member_id: 'member-1',
           client_id: 'client-1',
+          organization_id: 'org-1',
           client_name: 'Acme',
           period_year: 2026,
           period_month: 3,
@@ -72,6 +73,7 @@ describe('readCommercialCostAttributionForPeriod', () => {
         allocations: [
           expect.objectContaining({
             clientId: 'client-1',
+            organizationId: 'org-1',
             commercialLaborCostTarget: 800,
             commercialDirectOverheadTarget: 100,
             commercialSharedOverheadTarget: 50,
@@ -89,6 +91,7 @@ describe('readCommercialCostAttributionForPeriod', () => {
         {
           member_id: 'member-2',
           client_id: 'client-2',
+          organization_id: null,
           client_name: 'Sky',
           period_year: 2026,
           period_month: 3,
@@ -115,6 +118,7 @@ describe('readCommercialCostAttributionForPeriod', () => {
       {
         memberId: 'member-1',
         clientId: 'client-1',
+        organizationId: 'org-1',
         clientName: 'Acme',
         periodYear: 2026,
         periodMonth: 3,
@@ -164,6 +168,7 @@ describe('readCommercialCostAttributionForPeriod', () => {
           {
             memberId: 'member-1',
             clientId: 'client-1',
+            organizationId: 'org-1',
             clientName: 'Acme',
             periodYear: 2026,
             periodMonth: 3,
@@ -183,6 +188,7 @@ describe('readCommercialCostAttributionForPeriod', () => {
     expect(summary).toEqual([
       {
         clientId: 'client-1',
+        organizationId: 'org-1',
         clientName: 'Acme',
         laborCostClp: 800,
         overheadCostClp: 150,
@@ -209,6 +215,7 @@ describe('readCommercialCostAttributionForPeriod', () => {
         {
           member_id: 'member-1',
           client_id: 'client-1',
+          organization_id: 'org-1',
           client_name: 'Sky',
           period_year: 2026,
           period_month: 3,
@@ -246,6 +253,7 @@ describe('readCommercialCostAttributionForPeriod', () => {
         {
           member_id: 'member-2',
           client_id: 'client-a',
+          organization_id: 'org-1',
           client_name: 'Acme',
           period_year: 2026,
           period_month: 4,
@@ -256,6 +264,7 @@ describe('readCommercialCostAttributionForPeriod', () => {
         {
           member_id: 'member-2',
           client_id: 'client-b',
+          organization_id: 'org-1',
           client_name: 'Beta',
           period_year: 2026,
           period_month: 4,
@@ -301,6 +310,7 @@ describe('readCommercialCostAttributionForPeriod', () => {
         {
           member_id: 'member-3',
           client_id: 'client-usd',
+          organization_id: 'org-usd',
           client_name: 'US Client',
           period_year: 2026,
           period_month: 5,
@@ -337,6 +347,7 @@ describe('readCommercialCostAttributionForPeriod', () => {
         {
           member_id: 'member-1',
           client_id: 'client-1',
+          organization_id: 'org-1',
           client_name: 'Acme',
           period_year: 2026,
           period_month: 3,
@@ -349,6 +360,7 @@ describe('readCommercialCostAttributionForPeriod', () => {
     await expect(readCommercialCostAttributionByClientForPeriod(2026, 3)).resolves.toEqual([
       {
         clientId: 'client-1',
+        organizationId: 'org-1',
         clientName: 'Acme',
         laborCostClp: 800,
         overheadCostClp: 150,
@@ -375,6 +387,7 @@ describe('readCommercialCostAttributionForPeriod', () => {
         {
           member_id: 'member-1',
           client_id: 'client-1',
+          organization_id: 'org-1',
           client_name: 'Acme',
           period_year: 2026,
           period_month: 3,
@@ -391,6 +404,7 @@ describe('readCommercialCostAttributionForPeriod', () => {
       expect.objectContaining({
         memberId: 'member-1',
         clientId: 'client-1',
+        organizationId: 'org-1',
         materializationReason: 'test-materialization'
       })
     ])

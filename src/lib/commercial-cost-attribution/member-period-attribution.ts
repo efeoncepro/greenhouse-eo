@@ -21,6 +21,7 @@ type MemberEconomicsRow = {
 type LaborAllocationRow = {
   member_id: string
   client_id: string
+  organization_id: string | null
   client_name: string | null
   period_year: number | string
   period_month: number | string
@@ -32,6 +33,7 @@ type LaborAllocationRow = {
 export interface CommercialCostAllocationRow {
   memberId: string
   clientId: string
+  organizationId: string | null
   clientName: string
   periodYear: number
   periodMonth: number
@@ -62,6 +64,7 @@ export interface MemberPeriodCommercialCostAttribution {
 
 export interface ClientPeriodCommercialCostSummary {
   clientId: string
+  organizationId: string | null
   clientName: string
   laborCostClp: number
   overheadCostClp: number
@@ -126,6 +129,7 @@ const buildMemberAttribution = ({
     return {
       memberId,
       clientId: row.client_id,
+      organizationId: row.organization_id,
       clientName: row.client_name?.trim() || row.client_id,
       periodYear,
       periodMonth,
@@ -187,18 +191,31 @@ export const computeCommercialCostAttributionForPeriod = async (
     ).catch(() => []),
     runGreenhousePostgresQuery<LaborAllocationRow>(
       `
-        SELECT
-          member_id,
-          client_id,
-          client_name,
-          period_year,
-          period_month,
-          total_fte,
-          fte_contribution,
-          allocated_labor_clp
-        FROM greenhouse_serving.client_labor_cost_allocation
-        WHERE period_year = $1 AND period_month = $2
-          AND allocated_labor_clp IS NOT NULL
+      WITH client_bridge AS (
+        SELECT DISTINCT ON (s.client_id)
+          s.client_id,
+          s.organization_id
+        FROM greenhouse_core.spaces s
+        WHERE s.client_id IS NOT NULL
+          AND s.organization_id IS NOT NULL
+          AND s.active = TRUE
+        ORDER BY s.client_id, s.updated_at DESC NULLS LAST, s.created_at DESC NULLS LAST, s.space_id ASC
+      )
+      SELECT
+        member_id,
+        client_id,
+        cb.organization_id,
+        client_name,
+        period_year,
+        period_month,
+        total_fte,
+        fte_contribution,
+        allocated_labor_clp
+      FROM greenhouse_serving.client_labor_cost_allocation
+      LEFT JOIN client_bridge cb
+        ON cb.client_id = greenhouse_serving.client_labor_cost_allocation.client_id
+      WHERE period_year = $1 AND period_month = $2
+        AND allocated_labor_clp IS NOT NULL
       `,
       [year, month]
     ).catch(() => [])
@@ -261,6 +278,7 @@ const buildMemberAttributionFromStoredRows = (
     existing.allocations.push({
       memberId: row.memberId,
       clientId: row.clientId,
+      organizationId: row.organizationId,
       clientName: row.clientName,
       periodYear: row.periodYear,
       periodMonth: row.periodMonth,
@@ -307,6 +325,7 @@ export const summarizeCommercialCostAttributionByClient = (
     for (const allocation of row.allocations) {
       const existing = clientMap.get(allocation.clientId) || {
         clientId: allocation.clientId,
+        organizationId: allocation.organizationId,
         clientName: allocation.clientName,
         laborCostClp: 0,
         overheadCostClp: 0,
@@ -334,6 +353,7 @@ export const summarizeCommercialCostAttributionByClient = (
 
       return {
         ...row,
+        organizationId: row.organizationId,
         laborCostClp: roundCurrency(row.laborCostClp),
         overheadCostClp: roundCurrency(row.overheadCostClp),
         loadedCostClp: roundCurrency(row.loadedCostClp),
@@ -362,6 +382,7 @@ export const materializeCommercialCostAttributionForPeriod = async (
       row.allocations.map(allocation => ({
         memberId: allocation.memberId,
         clientId: allocation.clientId,
+        organizationId: allocation.organizationId,
         clientName: allocation.clientName,
         periodYear: allocation.periodYear,
         periodMonth: allocation.periodMonth,

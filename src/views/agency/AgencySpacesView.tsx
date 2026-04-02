@@ -52,7 +52,9 @@ const AgencySpacesView = ({ spaces }: Props) => {
           const map = new Map<string, SpaceFinanceMetrics>()
 
           for (const item of data) {
-            if (item.clientId) map.set(item.clientId, item)
+            const metricsKey = item.spaceId || item.clientId
+
+            if (metricsKey) map.set(metricsKey, item)
           }
 
           setFinanceMetrics(map)
@@ -196,7 +198,11 @@ const AgencySpacesView = ({ spaces }: Props) => {
             }}
           >
             {filtered.map(space => (
-              <SpaceCard key={space.clientId} space={space} financeMetrics={financeMetrics.get(space.clientId) ?? null} />
+              <SpaceCard
+                key={space.spaceId || space.clientId}
+                space={space}
+                financeMetrics={financeMetrics.get(space.spaceId || space.clientId) ?? null}
+              />
             ))}
           </Box>
         )}

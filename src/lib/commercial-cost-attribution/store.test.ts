@@ -35,6 +35,7 @@ describe('commercial cost attribution store', () => {
       {
         memberId: 'member-1',
         clientId: 'client-1',
+        organizationId: 'org-1',
         clientName: 'Acme',
         periodYear: 2026,
         periodMonth: 3,
@@ -57,7 +58,7 @@ describe('commercial cost attribution store', () => {
 
     expect(mockRunGreenhousePostgresQuery).toHaveBeenLastCalledWith(
       expect.stringContaining('INSERT INTO greenhouse_serving.commercial_cost_attribution'),
-      expect.arrayContaining(['member-1', 'client-1', 'Acme', 2026, 3])
+      expect.arrayContaining(['member-1', 'client-1', 'org-1', 'Acme', 2026, 3])
     )
   })
 
@@ -67,6 +68,7 @@ describe('commercial cost attribution store', () => {
         {
           member_id: 'member-1',
           client_id: 'client-1',
+          organization_id: 'org-1',
           client_name: 'Acme',
           period_year: 2026,
           period_month: 3,
@@ -93,6 +95,7 @@ describe('commercial cost attribution store', () => {
       expect.objectContaining({
         memberId: 'member-1',
         clientId: 'client-1',
+        organizationId: 'org-1',
         commercialLoadedCostTarget: 950
       })
     ])
