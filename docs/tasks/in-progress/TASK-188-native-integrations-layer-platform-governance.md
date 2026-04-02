@@ -11,6 +11,18 @@
 - Admin Center card added for Integration Governance
 - Architecture docs updated: GREENHOUSE_ARCHITECTURE_V1, SOURCE_SYNC_PIPELINES, DATA_MODEL_MASTER
 - El `MVP` previo de confianza de métricas ya quedó cerrado en `TASK-189` + `TASK-186`, así que esta lane ya no compite con el scorecard mensual de Delivery; ahora puede enfocarse en la capability estructural de plataforma.
+- El registry ya tiene una primera capa de control operativo:
+  - campos `sync_endpoint`, `paused_at`, `paused_reason`, `last_health_check_at`
+  - helpers `pauseIntegration()`, `resumeIntegration()`, `registerIntegration()`
+  - readiness helpers para consumers downstream
+  - trigger interno de sync on-demand por integración
+- Nuevas rutas operativas:
+  - `POST /api/admin/integrations/[integrationKey]/pause`
+  - `POST /api/admin/integrations/[integrationKey]/resume`
+  - `POST /api/admin/integrations/[integrationKey]/sync`
+  - `GET /api/integrations/v1/readiness`
+  - `POST /api/integrations/v1/register`
+- `/admin/integrations` ahora expone una sección `Control plane` con acciones visibles por integración.
 
 ## Status
 
@@ -126,11 +138,18 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-188-native-integrations-layer-platform-governance.md`
+- `docs/tasks/in-progress/TASK-188-native-integrations-layer-platform-governance.md`
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
 - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
 - `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`
+- `src/lib/integrations/registry.ts`
+- `src/lib/integrations/health.ts`
+- `src/lib/integrations/readiness.ts`
+- `src/lib/integrations/sync-trigger.ts`
+- `src/app/api/admin/integrations/**`
+- `src/app/api/integrations/v1/**`
+- `src/views/greenhouse/admin/AdminIntegrationGovernanceView.tsx`
 
 ## Current Repo State
 
@@ -141,6 +160,11 @@ Reglas obligatorias:
 - syncs con raw/conformed/projection layering
 - health/freshness parcial en algunos dominios
 - primeros endpoints/admin surfaces para registrar o auditar integraciones
+- registry central con primeras capacidades de control plane:
+  - register
+  - readiness checks
+  - pause / resume
+  - trigger manual de sync
 
 ### Gap actual
 
@@ -148,6 +172,8 @@ Reglas obligatorias:
 - cada integración resuelve con patrones parciales distintos
 - no hay taxonomía institucional común para source binding, discovery, schema drift, readiness y health
 - Notion ya exige gobernanza propia, pero el problema no es solo de Notion
+- la readiness todavía mezcla estado manual (`readiness_status`) con health derivado; falta motor declarativo de reglas
+- el registry ya controla sync/pause para integraciones conocidas, pero todavía no versiona contratos ni schema drift
 
 ## Scope
 
@@ -180,6 +206,11 @@ Reglas obligatorias:
   - drift
   - replay/resync
   - ownership
+- baseline ya implementado:
+  - inventory + status
+  - pause/resume
+  - trigger sync
+  - readiness endpoint para consumers externos
 
 ### Slice 4 - Notion as first reference implementation
 
@@ -193,6 +224,15 @@ Reglas obligatorias:
   - `Nubox`
   - `Frame.io`
   - otros conectores futuros
+
+### Slice 6 - Runtime control plane hardening
+
+- separar explícitamente:
+  - inventory del registry
+  - controls operativos (`pause`, `resume`, `sync`)
+  - readiness para consumers
+- endurecer reglas de seguridad y autorización del control plane
+- definir cuándo un sync on-demand debe usar ruta interna, outbox o workflow durable
 
 ## Out of Scope
 
@@ -249,12 +289,12 @@ Esta task debe concentrarse en:
 
 ## Acceptance Criteria
 
-- [ ] Existe una definición clara de `Native Integrations Layer` para Greenhouse.
-- [ ] Queda definido un modelo común para integraciones críticas.
-- [ ] Queda claro por qué Notion es un consumer/follow-on fuerte, pero no el único caso.
-- [ ] La task deja follow-ups concretos para arquitectura, backend y admin surfaces.
-- [ ] Se establece relación explícita entre `TASK-188` y `TASK-187`.
-- [ ] La task queda alineada con `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md` como fuente canónica.
+- [x] Existe una definición clara de `Native Integrations Layer` para Greenhouse.
+- [x] Queda definido un modelo común para integraciones críticas.
+- [x] Queda claro por qué Notion es un consumer/follow-on fuerte, pero no el único caso.
+- [x] La task deja follow-ups concretos para arquitectura, backend y admin surfaces.
+- [x] Se establece relación explícita entre `TASK-188` y `TASK-187`.
+- [x] La task queda alineada con `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md` como fuente canónica.
 
 ## Verification
 

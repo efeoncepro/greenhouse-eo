@@ -394,10 +394,14 @@ greenhouse_sync.integration_registry
 ├── consumer_domains   TEXT[]         -- dominios downstream: ['delivery', 'ico', 'crm', 'finance', 'agency']
 ├── auth_mode          TEXT           -- oauth2 | api_key | token | iam | none
 ├── sync_cadence       TEXT           -- 15min | hourly | daily | passive | manual
+├── sync_endpoint      TEXT           -- internal route for on-demand sync trigger
 ├── environment        TEXT           -- production (default)
 ├── contract_version   TEXT           -- semver del contrato vigente (futuro: OpenAPI/AsyncAPI)
 ├── readiness_status   TEXT           -- ready | warning | blocked | unknown
 ├── active             BOOLEAN        -- filtro principal de UI y API
+├── paused_at          TIMESTAMPTZ    -- control plane: integración pausada
+├── paused_reason      TEXT           -- razón visible/auditable de pausa
+├── last_health_check_at TIMESTAMPTZ  -- último chequeo explícito del platform layer
 ├── metadata           JSONB          -- extensiones controladas por integración
 ├── created_at         TIMESTAMPTZ
 └── updated_at         TIMESTAMPTZ
@@ -449,6 +453,8 @@ El resultado es un `IntegrationHealthSnapshot` por integración:
 | `IntegrationRegistryEntry` | Fila completa del registry |
 | `IntegrationHealthSnapshot` | Health + freshness por integración |
 | `IntegrationWithHealth` | Registry entry + health snapshot (para API y UI) |
+| `SyncTriggerResult` | Resultado de trigger manual de sync |
+| `ReadinessCheckResult` | Resultado de readiness por integración |
 
 ### API Routes
 
@@ -456,26 +462,34 @@ El resultado es un `IntegrationHealthSnapshot` por integración:
 |---|---|---|---|
 | `GET` | `/api/admin/integrations` | `requireAdminTenantContext` | Lista todas las integraciones activas con health snapshot |
 | `GET` | `/api/admin/integrations/[integrationKey]/health` | `requireAdminTenantContext` | Detalle de health para una integración |
+| `POST` | `/api/admin/integrations/[integrationKey]/pause` | `requireAdminTenantContext` | Pausa la integración y la marca como `blocked` para consumers |
+| `POST` | `/api/admin/integrations/[integrationKey]/resume` | `requireAdminTenantContext` | Reanuda una integración pausada |
+| `POST` | `/api/admin/integrations/[integrationKey]/sync` | `requireAdminTenantContext` | Dispara un sync on-demand vía `sync_endpoint` |
+| `GET` | `/api/integrations/v1/readiness?keys=...` | `requireIntegrationRequest` | Expone readiness shared para consumers externos/internos |
+| `POST` | `/api/integrations/v1/register` | `requireIntegrationRequest` | Registra una nueva integración en el registry |
 
-Ambas rutas requieren `routeGroup: admin` + `roleCode: efeonce_admin`.
+Las rutas `admin` requieren `routeGroup: admin` + `roleCode: efeonce_admin`.
 
 ### Helpers
 
 | Archivo | Exports | Patrón |
 |---|---|---|
-| `src/lib/integrations/registry.ts` | `getIntegrationRegistry()`, `getIntegrationByKey(key)` | Kysely (`getDb()`) |
+| `src/lib/integrations/registry.ts` | `getIntegrationRegistry()`, `getIntegrationByKey(key)`, `pauseIntegration()`, `resumeIntegration()`, `registerIntegration()` | Kysely (`getDb()`) |
 | `src/lib/integrations/health.ts` | `getIntegrationHealthSnapshots(keys)` | `runGreenhousePostgresQuery` (raw SQL para aggregations complejas) |
+| `src/lib/integrations/readiness.ts` | `checkIntegrationReadiness()`, `checkMultipleReadiness()` | registry + health combinados |
+| `src/lib/integrations/sync-trigger.ts` | `triggerSync()` | fetch interno autenticado con `CRON_SECRET` |
 
 ### Governance Surface
 
 **Page**: `/admin/integrations` (view code: `administracion.cloud_integrations`)
 
-La vista tiene 4 secciones:
+La vista tiene 5 secciones:
 
 1. **KPI cards**: integraciones activas, ready count, attention count, dominios downstream cubiertos
 2. **Registry table**: taxonomía, owner, cadencia, auth, dominios, readiness por integración
 3. **Health & freshness**: health chip, freshness bar (0-100%), última señal, syncs/fallos 24h
-4. **Consumer domain map**: card por integración con descripción y dominios dependientes
+4. **Control plane**: acciones visibles para `pause`, `resume` y `sync` por integración
+5. **Consumer domain map**: card por integración con descripción y dominios dependientes
 
 **Links cruzados**:
 - Admin Center tiene card de "Integration Governance" que lleva a `/admin/integrations`
@@ -516,7 +530,8 @@ Cuando se registre una nueva integración:
 1. **INSERT** en `integration_registry` (migration o seed)
 2. Si el `source_system` ya emite a `source_sync_runs`, el health se calcula automáticamente
 3. Si no, agregar enriquecimiento específico en `health.ts` (como el de Notion/HubSpot)
-4. La UI muestra la nueva integración sin cambios de frontend
+4. Si tiene sync on-demand, declarar `sync_endpoint`
+5. La UI muestra la nueva integración sin cambios de frontend
 
 Cuando TASK-187 formalice Notion:
 

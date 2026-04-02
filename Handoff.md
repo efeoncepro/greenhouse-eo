@@ -17,18 +17,32 @@
 - Admin Center card added linking to governance page
 - Cloud & Integrations view links to governance page
 - Architecture docs updated: GREENHOUSE_ARCHITECTURE_V1, SOURCE_SYNC_PIPELINES, DATA_MODEL_MASTER
+- Slice adicional del control plane ya implementado:
+  - `integration_registry` ahora contempla `sync_endpoint`, `paused_at`, `paused_reason`, `last_health_check_at`
+  - nuevos helpers: `pauseIntegration()`, `resumeIntegration()`, `registerIntegration()`
+  - nuevos helpers shared: `checkIntegrationReadiness()` y `triggerSync()`
+  - nuevas rutas:
+    - `POST /api/admin/integrations/[integrationKey]/pause`
+    - `POST /api/admin/integrations/[integrationKey]/resume`
+    - `POST /api/admin/integrations/[integrationKey]/sync`
+    - `GET /api/integrations/v1/readiness`
+    - `POST /api/integrations/v1/register`
+  - `/admin/integrations` ahora muestra una sección `Control plane` con acciones operativas visibles
 
 ### Validación
 
-- Pendiente: `pnpm build`, `pnpm lint`
-- Pendiente: `pnpm migrate:up` (requiere Cloud SQL Proxy)
+- `pnpm lint` ✅
+- `pnpm exec tsc --noEmit --pretty false` ✅
+- `pnpm build` ✅
+- `pnpm migrate:up` ✅ usando `GREENHOUSE_POSTGRES_HOST=127.0.0.1`, `GREENHOUSE_POSTGRES_PORT=15432`, `GREENHOUSE_POSTGRES_SSL=false`
+- `pnpm db:generate-types` ✅ usando el mismo carril local por proxy
 
 ### Riesgos / próximos pasos
 
-- Migration requiere `pnpm migrate:up` + `pnpm db:generate-types` para que Kysely tenga los types de `integration_registry`
 - Follow-up: `TASK-187` formaliza Notion como primer consumer fuerte del registry
-- Follow-up: contract registry (OpenAPI/AsyncAPI) y readiness automática son fases posteriores
+- Follow-up: contract registry (OpenAPI/AsyncAPI) y readiness automática declarativa son fases posteriores
 - Follow-up: integration inventory en el v1 integration API para acceso externo
+- Follow-up: endurecer el trigger manual para decidir cuándo conviene `fetch` interno vs workflow/outbox durable
 
 ## Sesión 2026-04-01 — Implementación MVP para TASK-189 + TASK-186
 

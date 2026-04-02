@@ -9,7 +9,10 @@
   - shared types en `src/types/integrations.ts` para registry, health y readiness
   - helpers Kysely en `src/lib/integrations/registry.ts` y health aggregation en `src/lib/integrations/health.ts`
   - API admin: `GET /api/admin/integrations`, `GET /api/admin/integrations/[key]/health`
-  - admin governance page en `/admin/integrations` con registry table, health/freshness bars y consumer domain map
+  - se extendió el control plane del registry con `sync_endpoint`, `paused_at`, `paused_reason` y `last_health_check_at`
+  - nuevas acciones admin: `pause`, `resume` y `sync on-demand` por integración
+  - nueva API v1 shared: `GET /api/integrations/v1/readiness` y `POST /api/integrations/v1/register`
+  - admin governance page en `/admin/integrations` con registry table, health/freshness bars, consumer domain map y sección `Control plane`
   - architecture docs actualizados: GREENHOUSE_ARCHITECTURE_V1, SOURCE_SYNC_PIPELINES, DATA_MODEL_MASTER
 
 ## 2026-04-01

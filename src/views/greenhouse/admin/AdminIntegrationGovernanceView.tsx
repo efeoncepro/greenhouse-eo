@@ -21,6 +21,7 @@ import Typography from '@mui/material/Typography'
 import { ExecutiveCardShell, ExecutiveMiniStatCard } from '@/components/greenhouse'
 import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import type { IntegrationHealth, IntegrationReadiness, IntegrationType, IntegrationWithHealth } from '@/types/integrations'
+import AdminOpsActionButton from './AdminOpsActionButton'
 
 type Props = {
   integrations: IntegrationWithHealth[]
@@ -83,9 +84,10 @@ const formatDateTime = (value: string | null) => {
 
 const AdminIntegrationGovernanceView = ({ integrations }: Props) => {
   const activeCount = integrations.filter(i => i.active).length
-  const readyCount = integrations.filter(i => i.readinessStatus === 'ready').length
-  const warningCount = integrations.filter(i => i.readinessStatus === 'warning' || i.readinessStatus === 'blocked').length
+  const readyCount = integrations.filter(i => i.readinessStatus === 'ready' && !i.pausedAt).length
+  const pausedCount = integrations.filter(i => i.pausedAt).length
   const domains = [...new Set(integrations.flatMap(i => i.consumerDomains))]
+  const syncableCount = integrations.filter(i => i.syncEndpoint && !i.pausedAt).length
 
   return (
     <Stack spacing={6}>
@@ -148,12 +150,12 @@ const AdminIntegrationGovernanceView = ({ integrations }: Props) => {
           icon='tabler-circle-check'
         />
         <ExecutiveMiniStatCard
-          eyebrow='Attention'
-          tone={warningCount > 0 ? 'warning' : 'success'}
-          title='Requieren atencion'
-          value={String(warningCount)}
-          detail={warningCount > 0 ? 'Integraciones con readiness degradada.' : 'Todas las integraciones operativas.'}
-          icon='tabler-alert-triangle'
+          eyebrow='Control'
+          tone={pausedCount > 0 ? 'error' : 'success'}
+          title={pausedCount > 0 ? 'Pausadas' : 'Sincronizables'}
+          value={pausedCount > 0 ? String(pausedCount) : String(syncableCount)}
+          detail={pausedCount > 0 ? 'Integraciones bloqueadas para downstream.' : 'Integraciones con sync endpoint activo.'}
+          icon={pausedCount > 0 ? 'tabler-player-pause' : 'tabler-refresh'}
         />
         <ExecutiveMiniStatCard
           eyebrow='Coverage'
@@ -318,6 +320,69 @@ const AdminIntegrationGovernanceView = ({ integrations }: Props) => {
             </TableBody>
           </Table>
         </TableContainer>
+      </ExecutiveCardShell>
+
+      {/* Control Plane — Sync & Pause/Resume */}
+      <ExecutiveCardShell
+        title='Control plane'
+        subtitle='Acciones operativas por integracion. Trigger sync on-demand, pausar o reanudar integraciones desde el registry.'
+      >
+        <Stack spacing={3}>
+          {integrations.map(entry => (
+            <Card key={entry.integrationKey} variant='outlined'>
+              <CardContent>
+                <Stack spacing={2}>
+                  <Stack direction='row' justifyContent='space-between' alignItems='center' gap={2}>
+                    <Stack direction='row' spacing={1.5} alignItems='center'>
+                      <Typography variant='h6'>{entry.displayName}</Typography>
+                      {entry.pausedAt ? (
+                        <Chip size='small' variant='tonal' color='error' label='Pausada' />
+                      ) : (
+                        <Chip size='small' variant='tonal' color='success' label='Activa' />
+                      )}
+                    </Stack>
+                    {entry.syncEndpoint ? (
+                      <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
+                        {entry.syncEndpoint}
+                      </Typography>
+                    ) : (
+                      <Typography variant='caption' color='text.secondary'>Sin sync endpoint (pasiva)</Typography>
+                    )}
+                  </Stack>
+
+                  {entry.pausedAt && (
+                    <Typography variant='body2' color='error.main'>
+                      Pausada desde {formatDateTime(entry.pausedAt)}{entry.pausedReason ? ` — ${entry.pausedReason}` : ''}
+                    </Typography>
+                  )}
+
+                  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                    {entry.syncEndpoint && !entry.pausedAt && (
+                      <AdminOpsActionButton
+                        endpoint={`/api/admin/integrations/${entry.integrationKey}/sync`}
+                        label={`Sincronizar ${entry.displayName}`}
+                        helper='Trigger on-demand del pipeline de sync.'
+                      />
+                    )}
+                    {entry.pausedAt ? (
+                      <AdminOpsActionButton
+                        endpoint={`/api/admin/integrations/${entry.integrationKey}/resume`}
+                        label={`Reanudar ${entry.displayName}`}
+                        helper='Desbloquea la integracion y vuelve a ready.'
+                      />
+                    ) : (
+                      <AdminOpsActionButton
+                        endpoint={`/api/admin/integrations/${entry.integrationKey}/pause`}
+                        label={`Pausar ${entry.displayName}`}
+                        helper='Bloquea la integracion. Downstream no consumira datos.'
+                      />
+                    )}
+                  </Stack>
+                </Stack>
+              </CardContent>
+            </Card>
+          ))}
+        </Stack>
       </ExecutiveCardShell>
 
       {/* Consumer Domain Map */}

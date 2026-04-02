@@ -8,6 +8,17 @@
   - serving OLTP formal en `greenhouse_serving.agency_performance_reports`
   - segmentación explícita `Tareas Efeonce` / `Tareas Sky`
 - Esta task ya no bloquea visibilidad operativa del scorecard; su foco queda más claramente en onboarding, schema registry, drift y readiness estructural.
+- `TASK-188` ya dejó además una foundation operativa reusable para Notion:
+  - registry central de integraciones nativas
+  - control plane básico (`pause`, `resume`, `sync`)
+  - readiness endpoint compartido
+  - self-service register API para nuevas integraciones
+- Por lo mismo, `TASK-187` puede enfocarse en lo realmente específico de Notion:
+  - source binding por `space`
+  - discovery de DBs
+  - schema registry
+  - drift detection
+  - KPI readiness por contrato
 
 ## Status
 

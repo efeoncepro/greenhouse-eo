@@ -25,13 +25,35 @@ export interface IntegrationRegistryEntry {
   consumerDomains: string[]
   authMode: string | null
   syncCadence: string | null
+  syncEndpoint: string | null
   environment: string
   contractVersion: string | null
   readinessStatus: IntegrationReadiness
   active: boolean
+  pausedAt: string | null
+  pausedReason: string | null
+  lastHealthCheckAt: string | null
   metadata: Record<string, unknown>
   createdAt: string
   updatedAt: string
+}
+
+/** Result of a sync trigger operation */
+export interface SyncTriggerResult {
+  integrationKey: string
+  triggered: boolean
+  message: string
+  syncEndpoint: string | null
+}
+
+/** Result of a readiness check for downstream consumers */
+export interface ReadinessCheckResult {
+  integrationKey: string
+  ready: boolean
+  reason: string
+  health: IntegrationHealth
+  readinessStatus: IntegrationReadiness
+  paused: boolean
 }
 
 /** Health snapshot aggregated from sync runs + freshness signals */
