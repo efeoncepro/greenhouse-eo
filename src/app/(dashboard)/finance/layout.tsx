@@ -19,7 +19,14 @@ export default async function FinanceLayout({ children }: { children: ReactNode 
       'finanzas.resumen',
       'finanzas.ingresos',
       'finanzas.egresos',
-      'finanzas.conciliacion'
+      'finanzas.conciliacion',
+      'finanzas.clientes',
+      'finanzas.proveedores',
+      'finanzas.inteligencia',
+      'finanzas.asignaciones_costos',
+      'finanzas.cotizaciones',
+      'finanzas.ordenes_compra',
+      'finanzas.hes'
     ],
     fallback: tenant.routeGroups.includes('finance') || tenant.roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)
   })
