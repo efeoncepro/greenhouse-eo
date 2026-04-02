@@ -21,6 +21,7 @@ import { operationalPlProjection } from './operational-pl'
 import { providerToolingProjection } from './provider-tooling'
 import { staffAugPlacementProjection } from './staff-augmentation'
 import { financeExpenseReactiveIntakeProjection } from './finance-expense-reactive-intake'
+import { agencyPerformanceReportProjection } from './agency-performance-report'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
 // DEPRECATED: icoMemberProjection kept for backward compat (BQ → Postgres sync) but person_intelligence
@@ -52,4 +53,5 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(staffAugPlacementProjection)
   registerProjection(commercialCostAttributionProjection)
   registerProjection(operationalPlProjection)
+  registerProjection(agencyPerformanceReportProjection)
 }

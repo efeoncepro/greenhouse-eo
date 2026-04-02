@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { isInternalCommercialAssignment } from '@/lib/commercial-cost-attribution/assignment-classification'
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getIcoEngineProjectId, normalizeString, runIcoEngineQuery, toNullableNumber, toNumber } from './shared'
 import { readAgencyMetrics, type SpaceMetricSnapshot } from './read-metrics'
 import { ICO_DATASET } from './schema'
@@ -64,6 +65,32 @@ interface TopPerformerRow {
 }
 
 interface MaterializedPerformanceReportRow {
+  report_scope: string
+  period_year: unknown
+  period_month: unknown
+  on_time_count: unknown
+  late_drop_count: unknown
+  on_time_pct: unknown
+  overdue_count: unknown
+  carry_over_count: unknown
+  total_tasks: unknown
+  completed_tasks: unknown
+  active_tasks: unknown
+  efeonce_tasks_count: unknown
+  sky_tasks_count: unknown
+  task_mix_json: unknown
+  top_performer_member_id: unknown
+  top_performer_member_name: unknown
+  top_performer_otd_pct: unknown
+  top_performer_throughput_count: unknown
+  top_performer_rpa_avg: unknown
+  top_performer_ftr_pct: unknown
+  top_performer_min_throughput: unknown
+  trend_stable_band_pp: unknown
+  multi_assignee_policy: unknown
+}
+
+type ServingPerformanceReportRow = Record<string, unknown> & {
   report_scope: string
   period_year: unknown
   period_month: unknown
@@ -190,13 +217,26 @@ const parseTaskMix = (raw: unknown): PerformanceReportTaskMixEntry[] => {
     }>
 
     return parsed
-      .map(entry => ({
-        segmentType: normalizeString(entry.segment_type) === 'client' ? 'client' : 'space',
-        segmentId: normalizeString(entry.segment_id) || normalizeString(entry.segment_key) || 'segment',
-        segmentKey: normalizeString(entry.segment_key) || 'segment',
-        segmentLabel: normalizeString(entry.segment_label) || normalizeString(entry.segment_key) || 'Sin etiqueta',
-        totalTasks: toNumber(entry.total_tasks)
-      }))
+      .map((entry): PerformanceReportTaskMixEntry => {
+        const segmentKey = normalizeString(entry.segment_key) || 'segment'
+        const explicitType = normalizeString(entry.segment_type)
+
+        const segmentType: PerformanceReportTaskMixEntry['segmentType'] =
+          explicitType === 'client' || segmentKey.startsWith('client:') ? 'client' : 'space'
+
+        const segmentId =
+          normalizeString(entry.segment_id) ||
+          (segmentKey.includes(':') ? segmentKey.split(':').slice(1).join(':') : segmentKey) ||
+          'segment'
+
+        return {
+          segmentType,
+          segmentId,
+          segmentKey,
+          segmentLabel: normalizeString(entry.segment_label) || segmentKey || 'Sin etiqueta',
+          totalTasks: toNumber(entry.total_tasks)
+        }
+      })
       .filter(entry => entry.totalTasks > 0)
   } catch {
     return []
@@ -315,7 +355,7 @@ const readTopPerformer = async (periodYear: number, periodMonth: number): Promis
 }
 
 const buildTopPerformerFromMaterializedRow = (
-  row: MaterializedPerformanceReportRow
+  row: MaterializedPerformanceReportRow | ServingPerformanceReportRow
 ): PerformanceReportTopPerformer | null => {
   const memberId = normalizeString(row.top_performer_member_id)
 
@@ -328,6 +368,105 @@ const buildTopPerformerFromMaterializedRow = (
     throughputCount: toNumber(row.top_performer_throughput_count),
     rpaAvg: toNullableNumber(row.top_performer_rpa_avg),
     ftrPct: toNullableNumber(row.top_performer_ftr_pct)
+  }
+}
+
+const buildReportFromMaterializedRows = (
+  current: MaterializedPerformanceReportRow | ServingPerformanceReportRow,
+  previous: MaterializedPerformanceReportRow | ServingPerformanceReportRow | null,
+  periodYear: number,
+  periodMonth: number,
+  previousPeriodYear: number,
+  previousPeriodMonth: number
+): AgencyPerformanceReport => {
+  const currentOnTimePct = toNullableNumber(current.on_time_pct)
+  const previousOnTimePct = previous ? toNullableNumber(previous.on_time_pct) : null
+
+  const onTimeDeltaPp =
+    currentOnTimePct !== null && previousOnTimePct !== null
+      ? Math.round((currentOnTimePct - previousOnTimePct) * 10) / 10
+      : null
+
+  const summary = {
+    onTimePct: currentOnTimePct,
+    previousOnTimePct,
+    onTimeDeltaPp,
+    trend: computeTrend(currentOnTimePct, previousOnTimePct),
+    lateDrops: toNumber(current.late_drop_count),
+    overdue: toNumber(current.overdue_count),
+    carryOver: toNumber(current.carry_over_count),
+    totalTasks: toNumber(current.total_tasks),
+    completedTasks: toNumber(current.completed_tasks),
+    activeTasks: toNumber(current.active_tasks),
+    efeonceTasks: toNumber(current.efeonce_tasks_count),
+    skyTasks: toNumber(current.sky_tasks_count)
+  }
+
+  const topPerformer = buildTopPerformerFromMaterializedRow(current)
+  const taskMix = parseTaskMix(current.task_mix_json)
+
+  return {
+    periodYear,
+    periodMonth,
+    previousPeriodYear,
+    previousPeriodMonth,
+    summary,
+    taskMix,
+    alertText: buildAlertText(summary, topPerformer),
+    executiveSummary: buildExecutiveSummary(summary, taskMix, topPerformer),
+    topPerformer,
+    assumptions: {
+      topPerformerMinThroughput: toNumber(current.top_performer_min_throughput) || TOP_PERFORMER_MIN_THROUGHPUT,
+      multiAssigneePolicy: normalizeString(current.multi_assignee_policy) || TOP_PERFORMER_MULTI_ASSIGNEE_POLICY,
+      trendStableBandPp: toNumber(current.trend_stable_band_pp) || TREND_STABLE_BAND_PP
+    }
+  }
+}
+
+const readServingAgencyPerformanceReport = async (
+  periodYear: number,
+  periodMonth: number
+): Promise<AgencyPerformanceReport | null> => {
+  const previous = getPreviousPeriod(periodYear, periodMonth)
+
+  try {
+    const rows = await runGreenhousePostgresQuery<ServingPerformanceReportRow>(
+      `SELECT
+        report_scope, period_year, period_month,
+        on_time_count, late_drop_count, on_time_pct,
+        overdue_count, carry_over_count,
+        total_tasks, completed_tasks, active_tasks,
+        efeonce_tasks_count, sky_tasks_count,
+        task_mix_json::text AS task_mix_json,
+        top_performer_member_id, top_performer_member_name,
+        top_performer_otd_pct, top_performer_throughput_count,
+        top_performer_rpa_avg, top_performer_ftr_pct,
+        top_performer_min_throughput, trend_stable_band_pp, multi_assignee_policy
+       FROM greenhouse_serving.agency_performance_reports
+       WHERE report_scope = 'agency'
+         AND (
+           (period_year = $1 AND period_month = $2)
+           OR
+           (period_year = $3 AND period_month = $4)
+         )`,
+      [periodYear, periodMonth, previous.year, previous.month]
+    )
+
+    const current = rows.find(row =>
+      toNumber(row.period_year) === periodYear &&
+      toNumber(row.period_month) === periodMonth
+    )
+
+    if (!current) return null
+
+    const previousRow = rows.find(row =>
+      toNumber(row.period_year) === previous.year &&
+      toNumber(row.period_month) === previous.month
+    ) ?? null
+
+    return buildReportFromMaterializedRows(current, previousRow, periodYear, periodMonth, previous.year, previous.month)
+  } catch {
+    return null
   }
 }
 
@@ -366,54 +505,19 @@ const readMaterializedAgencyPerformanceReport = async (
     toNumber(row.period_month) === previous.month
   )
 
-  const currentOnTimePct = toNullableNumber(current.on_time_pct)
-  const previousOnTimePct = previousRow ? toNullableNumber(previousRow.on_time_pct) : null
-
-  const onTimeDeltaPp =
-    currentOnTimePct !== null && previousOnTimePct !== null
-      ? Math.round((currentOnTimePct - previousOnTimePct) * 10) / 10
-      : null
-
-  const summary = {
-    onTimePct: currentOnTimePct,
-    previousOnTimePct,
-    onTimeDeltaPp,
-    trend: computeTrend(currentOnTimePct, previousOnTimePct),
-    lateDrops: toNumber(current.late_drop_count),
-    overdue: toNumber(current.overdue_count),
-    carryOver: toNumber(current.carry_over_count),
-    totalTasks: toNumber(current.total_tasks),
-    completedTasks: toNumber(current.completed_tasks),
-    activeTasks: toNumber(current.active_tasks),
-    efeonceTasks: toNumber(current.efeonce_tasks_count),
-    skyTasks: toNumber(current.sky_tasks_count)
-  }
-
-  const topPerformer = buildTopPerformerFromMaterializedRow(current)
-  const taskMix = parseTaskMix(current.task_mix_json)
-
-  return {
-    periodYear,
-    periodMonth,
-    previousPeriodYear: previous.year,
-    previousPeriodMonth: previous.month,
-    summary,
-    taskMix,
-    alertText: buildAlertText(summary, topPerformer),
-    executiveSummary: buildExecutiveSummary(summary, taskMix, topPerformer),
-    topPerformer,
-    assumptions: {
-      topPerformerMinThroughput: toNumber(current.top_performer_min_throughput) || TOP_PERFORMER_MIN_THROUGHPUT,
-      multiAssigneePolicy: normalizeString(current.multi_assignee_policy) || TOP_PERFORMER_MULTI_ASSIGNEE_POLICY,
-      trendStableBandPp: toNumber(current.trend_stable_band_pp) || TREND_STABLE_BAND_PP
-    }
-  }
+  return buildReportFromMaterializedRows(current, previousRow ?? null, periodYear, periodMonth, previous.year, previous.month)
 }
 
 export const readAgencyPerformanceReport = async (
   periodYear: number,
   periodMonth: number
 ): Promise<AgencyPerformanceReport> => {
+  const serving = await readServingAgencyPerformanceReport(periodYear, periodMonth)
+
+  if (serving) {
+    return serving
+  }
+
   const materialized = await readMaterializedAgencyPerformanceReport(periodYear, periodMonth)
 
   if (materialized) {

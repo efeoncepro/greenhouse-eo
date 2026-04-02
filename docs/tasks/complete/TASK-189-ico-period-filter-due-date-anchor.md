@@ -6,14 +6,20 @@
 - Se corrigió la spec para dejar explícito que `carry-over` debe ser **relativo al período consultado/materializado**, no calculado contra `CURRENT_DATE()`.
 - Se corrigió el alcance: no basta con “filtro SQL + vista”; también hay contrato de snapshot, serving y compatibilidad con `readMemberMetrics()` / `readMemberMetricsBatch()`.
 - Se dejó explícito que cualquier ajuste debe alinear o desactivar el carril legacy paralelo en `scripts/materialize-member-metrics.ts`.
+- Implementación cerrada:
+  - `buildPeriodFilterSQL()` y `buildMetricSelectSQL()` ya usan ancla canónica por `due_date` con `carry-over` relativo al período consultado.
+  - `metric_snapshots_monthly` y `metrics_by_*` ya persisten `carry_over_count` de forma aditiva.
+  - `greenhouse_serving.ico_member_metrics` ya replica `carry_over_count` para consumers OLTP protegidos.
+  - `PersonActivityTab` ya expone chip de `carry-over` y banner cuando todavía no hay completaciones del período.
+  - `readMemberMetrics()` ya corrige el path materialized-first para reconstruir `cscDistribution`.
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Bajo`
-- Status real: `Implementación parcial`
+- Status real: `Cerrada`
 - Rank: `1`
 - Domain: `delivery / ico-engine`
 

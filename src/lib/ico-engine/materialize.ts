@@ -239,6 +239,28 @@ export const materializeMonthlySnapshots = async (
   // Step 11: Materialize auditable monthly Performance Report read model
   const performanceReportsWritten = await materializePerformanceReports(projectId, periodYear, periodMonth)
 
+  if (performanceReportsWritten > 0) {
+    try {
+      const { publishOutboxEvent } = await import('@/lib/sync/publish-event')
+
+      await publishOutboxEvent({
+        aggregateType: 'ico_performance_report',
+        aggregateId: `ico-perf-agency-${periodYear}-${periodMonth}`,
+        eventType: 'ico.performance_report.materialized',
+        payload: {
+          reportScope: 'agency',
+          periodYear,
+          periodMonth,
+          performanceReportsWritten
+        }
+      }).catch(() => {
+        // Non-blocking
+      })
+    } catch {
+      // Non-blocking
+    }
+  }
+
   // Step 9b: Publish ico.materialization.completed for each affected organization
   if (organizationMetricsWritten > 0) {
     try {

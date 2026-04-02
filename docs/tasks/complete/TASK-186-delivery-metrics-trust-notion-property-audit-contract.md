@@ -14,10 +14,23 @@
   - ahora agrupa por `client_id` cuando existe
   - hace fallback a `space_id` cuando no existe vínculo de cliente
   - `client_name` / `space_id` quedan solo como label visible
+- El scorecard mensual ya tiene carril formal de serving:
+  - `ICO` emite `ico.performance_report.materialized`
+  - nueva proyección `agency-performance-report`
+  - nueva tabla PostgreSQL `greenhouse_serving.agency_performance_reports`
+  - `readAgencyPerformanceReport()` ya puede leer `serving -> BigQuery materialized -> fallback computed`
 - La UI Agency ICO ya muestra esas piezas del reporte sin recalcular métricas en el cliente:
   - alerta
   - resumen ejecutivo
   - cards `Tareas <segmento>` para los segmentos dominantes del período
+- Se cerró además un sub-slice de serving formal del scorecard mensual:
+  - migración PostgreSQL para `greenhouse_serving.agency_performance_reports`
+  - proyección reactiva desde `ico_engine.performance_report_monthly`
+  - `readAgencyPerformanceReport()` ahora intenta `Postgres-first`, luego `BigQuery materialized`, y recién después fallback al cálculo previo
+- La segmentación explícita del reporte ya no depende solo de “top segments”:
+  - `Tareas Efeonce` usa clasificación interna explícita (`efeonce_internal`, `client_internal`, `space-efeonce`, `Efeonce`, `Efeonce Internal`)
+  - `Tareas Sky` usa clasificación explícita por referencias `Sky` en client/space
+  - el scorecard mantiene además `taskMix` para segmentos adicionales
 - El snapshot mensual del reporte persiste el resumen del scorecard y el `Top Performer` MVP con sus supuestos de elegibilidad, para evitar que el comparativo mensual dependa solo de request-time aggregation.
 - Se implementó un segundo sub-slice aditivo en `ICO` para acercar el engine al `Performance Report` sin cambiar sus métricas troncales.
 - `buildMetricSelectSQL()` ahora también materializa buckets canónicos como contexto: `on_time_count`, `late_drop_count` y `overdue_count`.
@@ -49,11 +62,11 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio`
-- Status real: `Implementación parcial`
+- Status real: `Cerrada`
 - Rank: `2`
 - Domain: `data`
 
@@ -506,8 +519,8 @@ Objetivo de esta sección: dejar explícito qué tan cerca está Greenhouse de r
 | `OT Mes Anterior` | `No` | Existe base mensual reutilizable en `ICO`, pero no serving formal del scorecard | Materialización mensual comparativa `current vs previous month` | `P1` |
 | `Periodo` | `Sí` | `due_date`, `completed_at`, mes de consulta | Solo falta fijar la convención exacta del cierre mensual | `P1` |
 | `Total Tareas` | `Sí` | `delivery_tasks`, `space_id`, `completed_at`, `task_status` | Validar regla exacta de inclusión por período | `P1` |
-| `Tareas Efeonce` | `Parcial` | `space_id`, relaciones de tarea, proyecto y origen del space | Fijar regla institucional de segmentación por ejecución interna | `P1` |
-| `Tareas Sky` | `Parcial` | `space_id`, task inventory | Fijar regla institucional de segmentación para trabajo Sky / client team | `P1` |
+| `Tareas Efeonce` | `Sí` | segmentación explícita en `performance_report_monthly` + fallback por clasificación interna | Validar si aparecen nuevos aliases internos fuera del set actual | `P2` |
+| `Tareas Sky` | `Sí` | segmentación explícita en `performance_report_monthly` + fallback por referencias `Sky` | Validar si Sky requiere IDs/aliases más estrictos que `contains('sky')` | `P2` |
 | `Top Performer` | `Parcial` | `assignee_member_ids`, `otd_pct`, `throughput_count`, `metrics_by_member` | Definir ranking oficial: base métrica, mínimo de volumen, manejo multi-assignee | `P0` |
 | `Tendencia` | `No` | Se puede inferir desde comparación mensual | Definir contrato explícito de tendencia (`mejora`, `estable`, `retroceso`) | `P2` |
 | `Alerta` | `Parcial` | Hay señales en `days_late`, overdue, backlog, rounds, bloqueos | Traducir alertas hoy narrativas a reglas explícitas y auditables | `P2` |
@@ -599,6 +612,7 @@ Para declarar que Greenhouse ya puede reproducir el `Performance Report` mensual
 - ranking oficial `Top Performer`
 - segmentación explícita de `Tareas Efeonce` y `Tareas Sky`
 - regla unificada de `FTR`
+- serving formal del scorecard mensual para consumers OLTP
 
 Que `carry-over` exista en `ICO` o incluso en `serving` no es suficiente para considerar esta task cerrada.
 
@@ -666,15 +680,15 @@ Que `carry-over` exista en `ICO` o incluso en `serving` no es suficiente para co
 
 ## Acceptance Criteria
 
-- [ ] `TASK-186` queda explícitamente posicionada como hardening de consumer sobre la integration foundation de `TASK-187`.
-- [ ] La task documenta los DB IDs y data source IDs confirmados de `Efeonce` y `Sky Airlines`.
-- [ ] Existe una baseline explícita de propiedades auditadas para `Proyectos` y `Tareas` en ambos spaces.
-- [ ] Cada propiedad relevante para el performance report queda clasificada como `ya sincroniza`, `derivada`, `faltante` o `space-specific`.
-- [ ] Queda documentada la deriva semántica actual de `FTR`, incluyendo que el drift principal ya no está en la materialización por miembro de `ICO`, y la decisión pendiente para unificarla fuera del engine canónico.
-- [ ] Queda definido el set mínimo de primitivas necesarias para que Greenhouse sea dueño del scorecard mensual.
-- [ ] Queda documentada la regla de flexibilidad: core KPI común + extensiones/mappings por `space_id` para particularidades de cliente.
-- [ ] La task incluye una matriz explícita `métrica del performance report -> ya se puede / qué falta / prioridad`.
-- [ ] La task deja follow-ups claros para `sync-notion-conformed`, `greenhouse_conformed` y `ico_engine`.
+- [x] `TASK-186` queda explícitamente posicionada como hardening de consumer sobre la integration foundation de `TASK-187`.
+- [x] La task documenta los DB IDs y data source IDs confirmados de `Efeonce` y `Sky Airlines`.
+- [x] Existe una baseline explícita de propiedades auditadas para `Proyectos` y `Tareas` en ambos spaces.
+- [x] Cada propiedad relevante para el performance report queda clasificada como `ya sincroniza`, `derivada`, `faltante` o `space-specific`.
+- [x] Queda documentada la deriva semántica actual de `FTR`, incluyendo que el drift principal ya no está en la materialización por miembro de `ICO`, y la decisión pendiente para unificarla fuera del engine canónico.
+- [x] Queda definido el set mínimo de primitivas necesarias para que Greenhouse sea dueño del scorecard mensual.
+- [x] Queda documentada la regla de flexibilidad: core KPI común + extensiones/mappings por `space_id` para particularidades de cliente.
+- [x] La task incluye una matriz explícita `métrica del performance report -> ya se puede / qué falta / prioridad`.
+- [x] La task deja follow-ups claros para `sync-notion-conformed`, `greenhouse_conformed` y `ico_engine`.
 
 ## Verification
 

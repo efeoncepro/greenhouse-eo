@@ -2019,6 +2019,34 @@ export interface GreenhousePayrollProjectedPayrollPromotions {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseServingAgencyPerformanceReports {
+  active_tasks: number | null;
+  carry_over_count: number | null;
+  completed_tasks: number | null;
+  efeonce_tasks_count: number | null;
+  late_drop_count: number | null;
+  materialized_at: Generated<Timestamp>;
+  multi_assignee_policy: string | null;
+  on_time_count: number | null;
+  on_time_pct: Numeric | null;
+  overdue_count: number | null;
+  period_month: number;
+  period_year: number;
+  report_scope: Generated<string>;
+  sky_tasks_count: number | null;
+  source: Generated<string>;
+  task_mix_json: Generated<Json>;
+  top_performer_ftr_pct: Numeric | null;
+  top_performer_member_id: string | null;
+  top_performer_member_name: string | null;
+  top_performer_min_throughput: number | null;
+  top_performer_otd_pct: Numeric | null;
+  top_performer_rpa_avg: Numeric | null;
+  top_performer_throughput_count: number | null;
+  total_tasks: number | null;
+  trend_stable_band_pp: Numeric | null;
+}
+
 export interface GreenhouseServingClient360 {
   active: boolean | null;
   active_module_codes: string[] | null;
@@ -2775,11 +2803,15 @@ export interface GreenhouseSyncIntegrationRegistry {
   environment: Generated<string>;
   integration_key: string;
   integration_type: string;
+  last_health_check_at: Timestamp | null;
   metadata: Generated<Json>;
   owner: string | null;
+  paused_at: Timestamp | null;
+  paused_reason: string | null;
   readiness_status: Generated<string>;
   source_system: string;
   sync_cadence: string | null;
+  sync_endpoint: string | null;
   updated_at: Generated<Timestamp>;
 }
 
@@ -3055,6 +3087,7 @@ export interface DB {
   "greenhouse_payroll.previred_afp_rates": GreenhousePayrollPreviredAfpRates;
   "greenhouse_payroll.previred_period_indicators": GreenhousePayrollPreviredPeriodIndicators;
   "greenhouse_payroll.projected_payroll_promotions": GreenhousePayrollProjectedPayrollPromotions;
+  "greenhouse_serving.agency_performance_reports": GreenhouseServingAgencyPerformanceReports;
   "greenhouse_serving.client_360": GreenhouseServingClient360;
   "greenhouse_serving.client_capability_360": GreenhouseServingClientCapability360;
   "greenhouse_serving.client_labor_cost_allocation": GreenhouseServingClientLaborCostAllocation;

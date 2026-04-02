@@ -10,6 +10,7 @@
 - Admin governance page: `/admin/integrations` with registry table, health/freshness, consumer domain map
 - Admin Center card added for Integration Governance
 - Architecture docs updated: GREENHOUSE_ARCHITECTURE_V1, SOURCE_SYNC_PIPELINES, DATA_MODEL_MASTER
+- El `MVP` previo de confianza de métricas ya quedó cerrado en `TASK-189` + `TASK-186`, así que esta lane ya no compite con el scorecard mensual de Delivery; ahora puede enfocarse en la capability estructural de plataforma.
 
 ## Status
 

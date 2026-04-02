@@ -48,8 +48,6 @@ Primer bloque operativo asignado:
 | `TASK-137` | [TASK-137-ui-foundation-activation.md](in-progress/TASK-137-ui-foundation-activation.md)                                                        | P1        | Alto     | Medio    | Parcial                 | Foundation UI ya activada con RHF en auth, `GreenhouseCalendar`, `GreenhouseDatePicker`, `GreenhouseDragList` y primer calendario operativo en `/admin/operational-calendar` |
 | `TASK-184` | [TASK-184-database-migration-framework.md](complete/TASK-184-database-migration-framework.md)                                                   | P1        | Alto     | Bajo     | Cerrada                 | node-pg-migrate + wrapper TS + baseline migration + scripts pnpm. Arch doc: `GREENHOUSE_DATABASE_TOOLING_V1.md`                                                              |
 | `TASK-185` | [TASK-185_Database_Tooling_Foundation.md](complete/TASK-185_Database_Tooling_Foundation.md)                                                      | P1        | Alto     | Bajo     | Cerrada                 | `src/lib/db.ts` centralizado + Kysely + kysely-codegen + type placeholder. Arch doc: `GREENHOUSE_DATABASE_TOOLING_V1.md`                                                     |
-| `TASK-189` | [TASK-189-ico-period-filter-due-date-anchor.md](in-progress/TASK-189-ico-period-filter-due-date-anchor.md)                                      | P0        | Muy alto | Bajo     | Implementación parcial  | Fix quirúrgico al filtro de período ICO con ancla por `due_date`, carry-over relativo al período y compatibilidad explícita con payroll/serving                              |
-| `TASK-186` | [TASK-186-delivery-metrics-trust-notion-property-audit-contract.md](in-progress/TASK-186-delivery-metrics-trust-notion-property-audit-contract.md) | P0        | Muy alto | Medio    | Implementación parcial  | Hardening del contrato Delivery Metrics sobre Notion + conformed + ICO + serving Postgres + payroll/person intelligence                                                       |
 | `TASK-170` | [TASK-170-leave-request-approval-flow.md](complete/TASK-170-leave-request-approval-flow.md)                                                     | P1        | Alto     | Alto     | Cerrada                 | Leave quedó alineado al calendario operativo, `leave_policies`, outbox granular, recálculo reactivo de payroll y setup real aplicado en `greenhouse-pg-dev`                  |
 
 ## To Do
@@ -112,10 +110,10 @@ Primer bloque operativo asignado:
 - Criterio: priorizar guardrails baratos, tareas que desbloquean módulos enteros, hardening sobre foundations ya implementadas y lanes con valor operativo inmediato; postergar briefs históricos, addenda dependientes y apuestas estratégicas de alto costo que todavía no desbloquean runtime cercano.
 
 Nota de secuencia para la lane de integraciones + métricas Delivery:
-- `Fase 1 MVP`: `TASK-189` -> `TASK-186`
+- `Fase 1 MVP` cerrada: `TASK-189` -> `TASK-186`
 - `Fase 2 hardening estructural`: `TASK-188` -> `TASK-187`
-- `TASK-189` es el fix quirúrgico al filtro de período (due-date anchor + carry-over); no requiere cambios al sync ni a la capa conformed
-- `TASK-186` debe entregar confianza visible en métricas y scorecards sobre la foundation actual
+- `TASK-189` ya cerró el fix quirúrgico del filtro de período (`due_date anchor` + `carry-over`) sin abrir un carril paralelo a `ICO`
+- `TASK-186` ya cerró el `MVP` de confianza visible para métricas y scorecards sobre la foundation actual
 - `TASK-188` y `TASK-187` quedan como el carril enterprise para institucionalizar la capa nativa de integraciones después del MVP
 - `TASK-187` implementa la `Native Integrations Layer` para `Notion`
 - `TASK-186` endurece el consumer de métricas sobre esa foundation
@@ -254,6 +252,8 @@ Se consumen como arquitectura o diseño de apoyo según la lane activa.
 
 ## Complete
 
+| [TASK-189-ico-period-filter-due-date-anchor.md](complete/TASK-189-ico-period-filter-due-date-anchor.md) | `ICO` ya usa período canónico anclado en `due_date`, `carry_over_count` materializado y replicado a serving por miembro, `cscDistribution` corregido en el path materialized-first y `PersonActivityTab` enriquecida con contexto real de arrastre. |
+| [TASK-186-delivery-metrics-trust-notion-property-audit-contract.md](complete/TASK-186-delivery-metrics-trust-notion-property-audit-contract.md) | Delivery Metrics Trust MVP ya cerró paridad visible del `Performance Report`: buckets canónicos y `FTR` endurecidos sobre `ICO`, snapshot mensual `performance_report_monthly`, serving formal `greenhouse_serving.agency_performance_reports`, comparativo mensual, `Top Performer`, `alertText`, `executiveSummary` y segmentación explícita `Tareas Efeonce` / `Tareas Sky`. |
 | [TASK-026-hris-contract-type-consolidation.md](complete/TASK-026-hris-contract-type-consolidation.md) | HRIS ya consolidó el contrato canónico en `greenhouse_core.members` con `contract_type`, `pay_regime`, `payroll_via` y `deel_contract_id`; `payroll` consume ramas Chile, `honorarios` y Deel sin cálculo inline para métricas, `daily_required` queda como backing flag de `schedule_required`, y la migración quedó aplicada en Cloud SQL con tipos Kysely regenerados. |
 | [TASK-180-hr-departments-postgres-runtime-cutover.md](complete/TASK-180-hr-departments-postgres-runtime-cutover.md) | `HR > Departments` ya quedó Postgres-first: list/detail/create/update y asignación `member.department_id` corren sobre `greenhouse_core.departments`, BigQuery sale del write path operativo y la integridad de `head_member_id` quedó endurecida con migración versionada ya aplicada por proxy junto con regeneración de tipos. |
 | [TASK-182-finance-expense-drawer-agency-taxonomy.md](complete/TASK-182-finance-expense-drawer-agency-taxonomy.md) | Drawer de `Finance > Expenses` cerrado con taxonomía `Operacional / Tooling / Impuesto / Otro`, categorías contextuales, imputación por `member/space/shared`, recurrencia y metadata reusable para AI Tools/Provider 360 sin romper compatibilidad legacy. |

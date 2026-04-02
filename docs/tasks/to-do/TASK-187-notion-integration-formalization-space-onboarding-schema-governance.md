@@ -1,5 +1,14 @@
 # TASK-187 - Notion Integration Formalization: Space Onboarding, Schema Governance & KPI Readiness
 
+## Delta 2026-04-01
+
+- El `MVP` previo de confianza de métricas ya quedó resuelto en `TASK-189` + `TASK-186`:
+  - período canónico `ICO` anclado por `due_date`
+  - `Performance Report` mensual materializado en `ico_engine.performance_report_monthly`
+  - serving OLTP formal en `greenhouse_serving.agency_performance_reports`
+  - segmentación explícita `Tareas Efeonce` / `Tareas Sky`
+- Esta task ya no bloquea visibilidad operativa del scorecard; su foco queda más claramente en onboarding, schema registry, drift y readiness estructural.
+
 ## Status
 
 - Lifecycle: `to-do`

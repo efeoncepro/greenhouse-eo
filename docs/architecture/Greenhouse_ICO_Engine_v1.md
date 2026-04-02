@@ -10,14 +10,32 @@
   - `ico_engine.metrics_by_member` para `Top Performer`
 - contenido actual del snapshot:
   - resumen mensual (`On-Time %`, `Late Drops`, `Overdue`, `Carry-Over`, totales)
-  - `task_mix_json` con distribución por segmento, agrupada por `client_id` y con fallback a `space_id`
+  - segmentación explícita `Tareas Efeonce` / `Tareas Sky`
+  - `task_mix_json` con distribución por segmento adicional, agrupada sobre `client_id` / `space_id`
   - `Top Performer` MVP y sus supuestos operativos
+- consumer formal:
+  - `greenhouse_serving.agency_performance_reports` como cache OLTP del scorecard mensual
+  - refrescado por la proyección reactiva `agency_performance_reports`
 - regla vigente:
   - el `Performance Report` no debe abrir un carril de cálculo paralelo al engine
   - debe construirse sobre materializaciones ya consolidadas del propio `ICO`
-  - el reader sigue usando fallback computado si el snapshot materializado aún no existe
+  - el reader usa `Postgres-first`, luego `BigQuery materialized`, y recién después fallback computado si el snapshot aún no existe
 
 Esto fortalece la auditabilidad del reporte mensual sin redefinir los KPIs troncales (`otd_pct`, `ftr_pct`, `rpa_avg`, `throughput_count`) ni romper consumers existentes.
+
+## Delta 2026-04-01 — El Performance Report mensual ya tiene serving formal en PostgreSQL
+
+El read-model mensual de Agency ya no depende solo de BigQuery para consumo runtime:
+
+- `materializeMonthlySnapshots()` publica `ico.performance_report.materialized`
+- la proyección `agency-performance-report` refleja el snapshot en:
+  - `greenhouse_serving.agency_performance_reports`
+- prioridad de lectura vigente del helper:
+  - `greenhouse_serving.agency_performance_reports`
+  - `ico_engine.performance_report_monthly`
+  - fallback computado desde snapshots / métricas por miembro
+
+Esto no reemplaza el engine; solo agrega una capa de serving estable para consumers runtime y futuras superficies cross-module.
 
 ## Delta 2026-04-01 — Bases de Notion que actúan como insumo principal del ICO actual
 

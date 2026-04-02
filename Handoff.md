@@ -69,11 +69,15 @@
     - `taskMix` por segmento dominante del período
     - `alertText`
     - `executiveSummary`
-  - la segmentación quedó endurecida para no depender del nombre como clave:
-    - agrupa por `client_id` cuando existe
-    - si no existe, cae a `space_id`
-    - el nombre queda solo como label visible del segmento
+  - la segmentación del scorecard ahora expone explícitamente:
+    - `Tareas Efeonce`
+    - `Tareas Sky`
+    - `taskMix` para segmentos adicionales
   - `AgencyIcoEngineView` ya expone esas piezas del reporte como cards y texto ejecutivo
+  - se agregó serving formal del scorecard mensual:
+    - migración PostgreSQL para `greenhouse_serving.agency_performance_reports`
+    - proyección reactiva `agency_performance_reports`
+    - `readAgencyPerformanceReport()` ahora intenta `Postgres-first`, luego `BigQuery materialized`, luego fallback computado
   - supuestos MVP actuales del ranking:
     - elegibilidad `throughput_count >= 5`
     - ranking por `OTD` del período
@@ -81,7 +85,7 @@
     - multi-assignee usa el modelo actual de `metrics_by_member`
   - `Space 360 > ICO` ya muestra esos buckets como contexto visible del snapshot para auditoría operativa
   - `scripts/materialize-member-metrics.ts` dejó de duplicar SQL y pasó a usar `materializeMonthlySnapshots()` como wrapper canónico
-  - este tramo debe leerse como un hardening técnico de contrato/runtime y buckets del scorecard, no como cierre del problema principal de `TASK-186`
+  - el cierre de la lane debe leerse como `MVP` de confianza de métricas y scorecard sobre `ICO`, no como sustituto de `TASK-187` / `TASK-188`
 - Documentación actualizada:
   - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
   - `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
@@ -91,20 +95,19 @@
 ### Validación
 
 - `pnpm lint` ✅
-- `pnpm build` volvió a quedar colgado después de `Compiled successfully` / `Running TypeScript`; no devolvió error explícito
+- `pnpm build` se reintentó con limpieza del lock de `.next`; vuelve a quedar colgado después de `Compiled successfully` / `Running TypeScript` sin devolver error explícito
 - `pnpm exec tsc --noEmit --pretty false` también quedó colgado sin emitir errores
-- `pnpm migrate:up` y `pnpm db:generate-types` se intentaron de nuevo, pero quedaron bloqueados por conectividad local de PostgreSQL; el carril sigue requiriendo Cloud SQL Proxy en `127.0.0.1:15432`
+- `pnpm migrate:up` ✅ usando `GREENHOUSE_POSTGRES_HOST=127.0.0.1`, `GREENHOUSE_POSTGRES_PORT=15432`, `GREENHOUSE_POSTGRES_SSL=false`
+- `pnpm db:generate-types` ✅ usando el mismo carril local por proxy
 - No se crearon `new Pool()` nuevos fuera de `src/lib/postgres/client.ts`
-- Sí hay una migración PostgreSQL versionada para `greenhouse_serving.ico_member_metrics.carry_over_count`, pero no se pudo aplicar en este turno por el bloqueo de conectividad local
+- El proxy de Cloud SQL ya estaba corriendo en `127.0.0.1:15432`; el bloqueo previo venía de no forzar el host local en los comandos
+- `TASK-189` y `TASK-186` ya se movieron a `complete`; el siguiente carril natural pasa a `TASK-187` / `TASK-188`
 
 ### Riesgos / próximos pasos
 
-- `greenhouse_serving.ico_member_metrics` aún no replica `carry_over_count`; por ahora el nuevo contexto vive en BigQuery/live/materialized-read path, no en serving Postgres.
-- Falta decidir si el siguiente slice baja `carry_over_count` también a serving/Postgres o si se mantiene solo como contexto de `ICO`.
-- El scope más amplio de `TASK-186` sigue abierto: paridad completa del `Performance Report`, revisión de FTR drift y matriz completa `propiedad -> contrato -> prioridad`.
-- Prioridad correcta de `TASK-186` para los siguientes slices:
-  - decidir si el scorecard mensual también debe proyectarse a `greenhouse_serving`
-  - revisar si `alertText` / `executiveSummary` deben seguir siendo determinísticos o pasar luego por capa narrativa separada
+- follow-up natural para `TASK-187` / `TASK-188`:
+  - formalizar aliases/IDs de segmentación `Sky` si `contains('sky')` resulta demasiado laxo
+  - decidir si `alertText` / `executiveSummary` deben mantenerse determinísticos o moverse después a una capa narrativa separada
 
 ## Sesión 2026-04-01 — TASK-189 y TASK-186 activadas para MVP de trust de métricas
 
