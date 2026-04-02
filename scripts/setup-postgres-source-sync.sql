@@ -186,9 +186,12 @@ CREATE TABLE IF NOT EXISTS greenhouse_delivery.tasks (
   client_id TEXT REFERENCES greenhouse_core.clients(client_id) ON DELETE SET NULL,
   module_id TEXT REFERENCES greenhouse_core.service_modules(module_id) ON DELETE SET NULL,
   assignee_member_id TEXT REFERENCES greenhouse_core.members(member_id) ON DELETE SET NULL,
+  assignee_source_id TEXT,
+  assignee_member_ids TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
   project_database_source_id TEXT,
   notion_task_id TEXT NOT NULL UNIQUE,
   notion_project_id TEXT,
+  project_source_ids TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
   notion_sprint_id TEXT,
   task_name TEXT NOT NULL,
   task_status TEXT,
@@ -324,6 +327,15 @@ ALTER TABLE greenhouse_delivery.tasks
 
 ALTER TABLE greenhouse_delivery.tasks
   ADD COLUMN IF NOT EXISTS project_database_source_id TEXT;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS assignee_source_id TEXT;
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS assignee_member_ids TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[];
+
+ALTER TABLE greenhouse_delivery.tasks
+  ADD COLUMN IF NOT EXISTS project_source_ids TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[];
 
 ALTER TABLE greenhouse_delivery.tasks
   ADD COLUMN IF NOT EXISTS completion_label TEXT;

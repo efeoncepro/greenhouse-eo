@@ -254,6 +254,7 @@ OPTIONS(description = "Current-state conformed delivery projects derived from No
 CREATE TABLE IF NOT EXISTS `__PROJECT_ID__.greenhouse_conformed.delivery_tasks` (
   task_source_id STRING NOT NULL,
   project_source_id STRING,
+  project_source_ids ARRAY<STRING>,
   sprint_source_id STRING,
   project_database_source_id STRING,
   space_id STRING,
@@ -436,6 +437,9 @@ ADD COLUMN IF NOT EXISTS space_id STRING;
 
 ALTER TABLE `__PROJECT_ID__.greenhouse_conformed.delivery_tasks`
 ADD COLUMN IF NOT EXISTS project_database_source_id STRING;
+
+ALTER TABLE `__PROJECT_ID__.greenhouse_conformed.delivery_tasks`
+ADD COLUMN IF NOT EXISTS project_source_ids ARRAY<STRING>;
 
 ALTER TABLE `__PROJECT_ID__.greenhouse_conformed.delivery_tasks`
 ADD COLUMN IF NOT EXISTS completion_label STRING;

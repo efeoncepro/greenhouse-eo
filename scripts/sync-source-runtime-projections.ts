@@ -40,6 +40,7 @@ type NotionProjectRow = {
 type NotionTaskRow = {
   notion_page_id: string | null
   _source_database_id: string | null
+  space_id: string | null
   created_time: { value?: string } | string | null
   last_edited_time: { value?: string } | string | null
   nombre_de_tarea: string | null
@@ -65,6 +66,7 @@ type NotionTaskRow = {
   last_frame_comment: string | null
   proyecto_ids: string[] | null
   sprint_ids: string[] | null
+  responsable_ids: string[] | null
   responsables_ids: string[] | null
   fecha_límite: string | null
   fecha_límite_end: string | null
@@ -745,6 +747,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
           SELECT
             notion_page_id,
             _source_database_id,
+            space_id,
             created_time,
             last_edited_time,
             nombre_de_tarea,
@@ -770,6 +773,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
             last_frame_comment,
             proyecto_ids,
             sprint_ids,
+            responsable_ids,
             responsables_ids,
             \`fecha_límite\`,
             \`fecha_límite_end\`,
@@ -996,21 +1000,38 @@ const syncNotion = async (): Promise<SyncSummary> => {
     }
 
     const deliveryTasks = tasks.map(row => {
-      const assigneeSourceId = row.responsables_ids?.[0] || null
-      const projectSourceId = row.proyecto_ids?.[0] || null
+      const assigneeSourceIds = Array.from(
+        new Set((row.responsables_ids || row.responsable_ids || []).map(id => toNullableString(id)).filter((id): id is string => !!id))
+      )
+
+      const assigneeSourceId = assigneeSourceIds[0] || null
+
+      const assigneeMemberIds = assigneeSourceIds
+        .map(id => notionMemberMap.get(id))
+        .filter((memberId): memberId is string => !!memberId)
+
+      const projectSourceIds = Array.from(
+        new Set((row.proyecto_ids || []).map(id => toNullableString(id)).filter((id): id is string => !!id))
+      )
+
+      const projectSourceId = projectSourceIds[0] || null
       const sprintSourceId = row.sprint_ids?.[0] || null
 
       const projectDatabaseSourceId =
         (projectSourceId ? projectDatabaseSourceMap.get(projectSourceId) || null : null) ||
         toNullableString(row._source_database_id)
 
-      const spaceId = projectSourceId ? projectSpaceMap.get(projectSourceId) || null : null
-      const clientId = projectSourceId ? projectClientMap.get(projectSourceId) || null : null
+      const spaceId = (projectSourceId ? projectSpaceMap.get(projectSourceId) || null : null) || toNullableString(row.space_id)
+
+      const clientId =
+        (projectSourceId ? projectClientMap.get(projectSourceId) || null : null) ||
+        (spaceId && !isInternalSpaceId(spaceId) ? spaceId : null)
 
       // Default mapping (hardcoded — works for Efeonce and spaces with identical property names)
       const result = {
         task_source_id: toNullableString(row.notion_page_id),
         project_source_id: projectSourceId,
+        project_source_ids: projectSourceIds.length > 0 ? projectSourceIds : null,
         sprint_source_id: sprintSourceId,
         project_database_source_id: projectDatabaseSourceId,
         space_id: spaceId,
@@ -1024,6 +1045,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
         task_priority: toNullableString(row.prioridad),
         assignee_source_id: assigneeSourceId,
         assignee_member_id: assigneeSourceId ? notionMemberMap.get(assigneeSourceId) || null : null,
+        assignee_member_ids: assigneeMemberIds.length > 0 ? assigneeMemberIds : null,
         completion_label: toNullableString(row.completitud),
         delivery_compliance: toNullableString(row.cumplimiento),
         days_late: toNumber(row['días_de_retraso']),
@@ -1121,6 +1143,37 @@ const syncNotion = async (): Promise<SyncSummary> => {
         synced_at: nowIso
       }
     })
+
+    const sourceAssigneeCountsBySpace = new Map<string, number>()
+
+    for (const row of tasks) {
+      const spaceId = toNullableString(row.space_id) || '__NULL__'
+      const assigneeIds = row.responsables_ids || row.responsable_ids || []
+
+      if (assigneeIds.length > 0) {
+        sourceAssigneeCountsBySpace.set(spaceId, (sourceAssigneeCountsBySpace.get(spaceId) ?? 0) + 1)
+      }
+    }
+
+    const conformedAssigneeCountsBySpace = new Map<string, number>()
+
+    for (const task of deliveryTasks) {
+      const spaceId = toNullableString(task.space_id) || '__NULL__'
+
+      if (task.assignee_source_id) {
+        conformedAssigneeCountsBySpace.set(spaceId, (conformedAssigneeCountsBySpace.get(spaceId) ?? 0) + 1)
+      }
+    }
+
+    for (const [spaceId, sourceCount] of sourceAssigneeCountsBySpace.entries()) {
+      const conformedCount = conformedAssigneeCountsBySpace.get(spaceId) ?? 0
+
+      if (sourceCount !== conformedCount) {
+        throw new Error(
+          `Runtime projection lost task assignee attribution for space ${spaceId}: source has ${sourceCount} tasks with responsables but transformed delivery_tasks persisted ${conformedCount} assignee_source_id rows`
+        )
+      }
+    }
 
     // Safe DELETE pattern: only delete if we have data to replace.
     // Uses DELETE WHERE TRUE (DML) instead of TRUNCATE (DDL) for BigQuery snapshot safety.
@@ -1311,9 +1364,12 @@ const syncNotion = async (): Promise<SyncSummary> => {
             client_id,
             module_id,
             assignee_member_id,
+            assignee_source_id,
+            assignee_member_ids,
             project_database_source_id,
             notion_task_id,
             notion_project_id,
+            project_source_ids,
             notion_sprint_id,
             task_name,
             task_status,
@@ -1351,7 +1407,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
             sync_run_id,
             payload_hash
           )
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34::date, $35, $36, $37, $38, $39::date, $40::timestamptz, $41, $42, $43::timestamptz, $44::timestamptz, $45, $46)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::text[], $10, $11, $12, $13::text[], $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37::date, $38, $39, $40, $41, $42::date, $43::timestamptz, $44, $45, $46::timestamptz, $47::timestamptz, $48, $49)
           ON CONFLICT (notion_task_id) DO UPDATE
           SET
             project_record_id = EXCLUDED.project_record_id,
@@ -1360,8 +1416,11 @@ const syncNotion = async (): Promise<SyncSummary> => {
             client_id = EXCLUDED.client_id,
             module_id = EXCLUDED.module_id,
             assignee_member_id = EXCLUDED.assignee_member_id,
+            assignee_source_id = EXCLUDED.assignee_source_id,
+            assignee_member_ids = EXCLUDED.assignee_member_ids,
             project_database_source_id = EXCLUDED.project_database_source_id,
             notion_project_id = EXCLUDED.notion_project_id,
+            project_source_ids = EXCLUDED.project_source_ids,
             notion_sprint_id = EXCLUDED.notion_sprint_id,
             task_name = EXCLUDED.task_name,
             task_status = EXCLUDED.task_status,
@@ -1408,9 +1467,12 @@ const syncNotion = async (): Promise<SyncSummary> => {
           task.client_id,
           task.module_id,
           task.assignee_member_id,
+          task.assignee_source_id,
+          task.assignee_member_ids,
           task.project_database_source_id,
           task.task_source_id,
           task.project_source_id,
+          task.project_source_ids,
           task.sprint_source_id,
           task.task_name,
           task.task_status,
