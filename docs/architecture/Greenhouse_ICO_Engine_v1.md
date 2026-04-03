@@ -2103,6 +2103,230 @@ Cuando exista tensión entre documentos:
 
 La arquitectura y el código deben mantenerse alineados; si una fórmula cambia en `shared.ts`, este inventario debe actualizarse en el mismo lote.
 
+### A.5.5 Benchmarks externos y estándar recomendado para Greenhouse (Delta 2026-04-03)
+
+No todas las métricas de `ICO` tienen un estándar externo maduro.
+
+- algunas sí tienen benchmarks cross-industry relativamente estables (`OTD`, `FTR` / `First-Time-Right` vía `FPY` o `first-time error-free`)
+- otras tienen solo referencias parciales en creative operations (`RpA`, approval rounds, approval cycle time)
+- otras son esencialmente internas y deben tratarse como métricas de gobierno operativo, no como KPIs “de mercado” (`pipeline_velocity`, `carry_over`, `overdue_carried_forward`, `stuck_assets`)
+
+La regla para Greenhouse debe ser:
+
+1. adoptar estándares externos cuando exista una definición madura y comparable
+2. declarar explícitamente cuándo un benchmark es solo un análogo
+3. no presentar como “estándar de industria” lo que en realidad es una policy interna del engine
+
+#### A.5.5.1 First Time Right (FTR)
+
+**Análogo externo más cercano**
+
+- `First Pass Yield (FPY)` / `Right First Time`
+- `first-time error-free`
+
+**Qué dicen las referencias externas**
+
+- `APQC` define una actividad `first-time error-free` como una actividad finalizada sin ningún esfuerzo posterior para ajustes o correcciones.
+- `APQC` expone además una mediana de `90%` para `% of annual sales orders processed first time error free`.
+- `IndustryWeek` reporta para manufactura:
+  - mediana de `95.5%` en `current first-pass yield`
+  - `97.0%` en `world-class manufacturers`
+  - `99.0%` en `top performers`
+
+**Interpretación para Greenhouse**
+
+`FTR` en Greenhouse no es idéntico a `FPY` industrial:
+
+- el output creativo es más subjetivo
+- hay más variación por stakeholder
+- el retrabajo puede ser estratégicamente legítimo, no solo defecto
+
+Por eso los benchmarks manufactureros sirven como **techo aspiracional**, no como target literal.
+
+**Estándar recomendado Greenhouse**
+
+| Banda | FTR recomendado | Lectura |
+|---|---|---|
+| `world-class` | `>= 85%` | operación creativa excepcionalmente clara y bien alineada |
+| `strong` | `70% - 84.9%` | buen estándar de trabajo para creative ops maduras |
+| `attention` | `60% - 69.9%` | exceso de retrabajo o definición débil |
+| `critical` | `< 60%` | retrabajo estructuralmente alto |
+
+**Decisión**
+
+- la banda actual del engine (`80/60`) es exigente pero razonable para Greenhouse
+- no conviene subirla a `95%+` porque eso importaría un estándar industrial que no refleja bien trabajo creativo iterativo
+
+#### A.5.5.2 RpA (Rounds per Asset)
+
+**Estándar externo**
+
+- no existe un estándar cross-industry maduro y universal equivalente a `SCOR` o `APQC`
+
+**Mejor referencia disponible**
+
+- benchmarks de creative review / approval workflows
+- `visualloop` analizó `523` proyectos en `47` equipos
+- para `marketing campaigns`, reporta:
+  - `top quartile`: `1-2` rounds
+  - `median`: `3` rounds
+  - `bottom quartile`: `5+` rounds
+- el mismo estudio muestra que agencias promedian `25%` más rounds que equipos in-house comparables
+
+**Interpretación para Greenhouse**
+
+`RpA` en Greenhouse es un proxy de retrabajo por activo terminado.
+
+- es cercano al problema de “revision rounds”
+- pero no es idéntico a todos los estudios externos, porque depende de cómo se modelen `client_change_round_final`, `workflow_change_round` y `rpa_value`
+
+**Estándar recomendado Greenhouse**
+
+| Banda | RpA recomendado | Lectura |
+|---|---|---|
+| `world-class` | `<= 2.0` | retrabajo bajo, dirección clara |
+| `strong` | `> 2.0 y <= 3.0` | nivel aceptable / cercano al benchmark creativo medio |
+| `attention` | `> 3.0 y <= 4.0` | demasiadas idas y vueltas |
+| `critical` | `> 4.0` | proceso roto o brief/approval governance débil |
+
+**Decisión**
+
+- el threshold actual del engine (`<=1.5` óptimo, `<=2.5` atención, `>2.5` crítico) es más estricto que el benchmark externo disponible
+- si Greenhouse quiere una postura premium, esa severidad es defendible
+- si quiere alinearse más al benchmark creativo observado, la frontera roja debería moverse más cerca de `> 3.0`
+
+#### A.5.5.3 On-Time Delivery (OTD)
+
+**Estándar externo más cercano**
+
+- `SCOR`: `Delivery Performance to Customer Commit Date`
+- `% orders delivered on the customer’s originally committed date`
+
+**Qué dicen las referencias externas**
+
+- `SCOR` define `on-time` contra la fecha compromiso acordada con el cliente
+- `IndustryWeek` reporta para manufactura una mediana de `96%` de on-time delivery
+- `IndustryWeek` usa `98%+` on-time delivery como umbral de top performers
+- `APQC` reporta `88%` de mediana para `Perfect Order Performance`, que es una métrica más dura que incluye on-time + completeness + damage-free + accurate documentation
+
+**Interpretación para Greenhouse**
+
+`OTD` sí tiene una familia de benchmarks mucho más madura que `RpA`.
+
+Pero Greenhouse debe recordar que:
+
+- el `OTD` actual no es `perfect order`
+- no incluye documentación, condition ni completeness tipo supply-chain
+- además hoy excluye `carry_over` y `overdue_carried_forward` del denominador
+
+**Estándar recomendado Greenhouse**
+
+| Banda | OTD recomendado | Lectura |
+|---|---|---|
+| `world-class` | `>= 98%` | cumplimiento excepcional |
+| `strong` | `95% - 97.9%` | buen estándar enterprise |
+| `attention` | `90% - 94.9%` | promesa bajo presión |
+| `critical` | `< 90%` | incumplimiento material |
+
+**Decisión**
+
+- la banda actual del engine (`>= 90%` como óptimo) es laxa frente a referencias de delivery maduras
+- cuando la confianza del insumo esté saneada, Greenhouse debería endurecer sus thresholds de `OTD`
+
+#### A.5.5.4 Cycle Time
+
+**Estándar externo**
+
+- no existe un benchmark universal útil sin segmentar por tipo de asset/proyecto
+
+**Referencia parcial disponible**
+
+- `visualloop` reporta `time to approval` por tipo de trabajo:
+  - `marketing campaign`: mediana `8 días`, top quartile `4 días`
+  - `landing page`: mediana `10 días`, top quartile `5 días`
+  - `product UI feature`: mediana `2 semanas`, top quartile `1 semana`
+
+**Interpretación para Greenhouse**
+
+`Cycle Time` debe benchmarkearse:
+
+- por asset type
+- por service line
+- por complejidad
+
+No conviene publicar un único estándar universal del portal.
+
+**Estándar recomendado Greenhouse**
+
+- mantenerlo como benchmark interno segmentado por `service` / `asset family`
+- usar percentiles internos y deltas históricos, no un solo número global
+
+#### A.5.5.5 Throughput y Pipeline Velocity
+
+**Estándar externo**
+
+- no existe un benchmark externo fuerte y portable sin normalizar por:
+  - team size
+  - asset complexity
+  - mix de servicios
+  - ventana temporal
+
+**Estándar recomendado Greenhouse**
+
+- tratarlos como métricas internas de capacidad/flujo
+- compararlos por:
+  - `space`
+  - `service`
+  - `squad`
+  - trailing 3-month baseline
+
+No deben documentarse como “estándar de industria”.
+
+#### A.5.5.6 Stuck Assets, Carry-Over y Overdue Carried Forward
+
+**Estándar externo**
+
+- no existe benchmark cross-industry robusto y portable para estas métricas tal como Greenhouse las define
+
+**Estándar recomendado Greenhouse**
+
+- tratarlas como métricas internas de control operacional
+- el estándar debe ser policy-driven:
+  - `Stuck Assets`: ideal cercano a `0`; tolerancia depende de volumen y fase
+  - `Carry-Over`: no es necesariamente malo; debe interpretarse junto con capacidad y planning
+  - `Overdue Carried Forward`: sí debe tender a `0` y usarse como deuda estructural
+
+#### A.5.5.7 Síntesis ejecutiva
+
+| Métrica | ¿Existe estándar externo maduro? | Tipo de estándar recomendado |
+|---|---|---|
+| `FTR` | `Sí, por análogo (FPY / first-time error-free)` | externo adaptado a creative ops |
+| `RpA` | `No universal; sí benchmark parcial creativo` | benchmark creativo adaptado + policy interna |
+| `OTD` | `Sí` | benchmark externo fuerte |
+| `Cycle Time` | `Parcial` | benchmark segmentado por asset/service |
+| `Throughput` | `No portable` | estándar interno relativo |
+| `Pipeline Velocity` | `No portable` | estándar interno relativo |
+| `Stuck Assets` | `No` | estándar interno de control |
+| `Carry-Over` | `No` | estándar interno de planning |
+| `Overdue Carried Forward` | `No` | estándar interno de deuda operacional |
+
+#### A.5.5.8 Fuentes externas usadas
+
+- SCOR Supply Chain Council / APICS — `Perfect Order Fulfillment` y `Delivery Performance to Customer Commit Date`  
+  https://economia.uniroma2.it/public/ba/files/SCOR11PDF_%281%29.pdf
+- APQC — `Percentage of annual sales orders processed first time error free`  
+  https://www.apqc.org/what-we-do/benchmarking/open-standards-benchmarking/measures/percentage-annual-sales-orders
+- APQC — `Perfect order performance`  
+  https://www.apqc.org/resources/benchmarking/open-standards-benchmarking/measures/perfect-order-performance
+- APQC Open Standards Benchmarking Glossary — definiciones de `Finished First-Pass Quality Yield` y `first-time error-free`  
+  https://www.apqc.org/sites/default/files/files/Glossary_5-13.pdf
+- IndustryWeek 2023 Statistical Profile — benchmarks de `first-pass yield` y `on-time delivery`  
+  https://img.industryweek.com/files/base/ebm/industryweek/document/2023/12/6581e0cffdf988001e28684c-2023statprofilefinal.pdf
+- IndustryWeek Quality Tables — world-class / top performer thresholds para `first-pass yield` y delivery  
+  https://www.industryweek.com/leadership/companies-executives/article/21956429/quality-tables
+- visualloop — creative feedback benchmarks (`47` teams, `523` projects)  
+  https://visualloop.io/blog/design-feedback-benchmarks/
+
 ### A.6 TypeScript: Sin `any`
 
 **Spec original:** Usaba `formulaConfig: Record<string, any>`.

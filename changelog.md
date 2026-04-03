@@ -2,6 +2,11 @@
 
 ## 2026-04-03
 
+- **ICO Engine external benchmarks documented**:
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md` ahora incluye una sección específica de benchmarks externos y estándar recomendado para Greenhouse (`A.5.5`)
+  - el documento distingue qué métricas sí tienen benchmark externo portable (`OTD`), cuáles solo tienen análogo razonable (`FTR`), cuáles tienen benchmark parcial creativo (`RpA`, `cycle time`) y cuáles deben seguir tratándose como policy interna (`throughput`, `pipeline velocity`, `stuck assets`, `carry-over`, `overdue carried forward`)
+  - se documentaron referencias externas explícitas a `SCOR`, `APQC`, `IndustryWeek` y `visualloop` para evitar que los thresholds del engine se presenten como “estándares de industria” cuando en realidad son políticas internas o adaptaciones al contexto creativo
+
 - **ICO Engine metrics architecture inventory consolidated**:
   - `docs/architecture/Greenhouse_ICO_Engine_v1.md` ahora consolida en una sola sección el inventario canónico de señales y métricas del engine
   - incorpora además las categorías funcionales de métricas ICO para ordenar hardening, lectura de negocio y diseño de readers

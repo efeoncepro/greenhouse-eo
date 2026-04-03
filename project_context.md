@@ -1,5 +1,19 @@
 # project_context.md
 
+## Delta 2026-04-03 ICO Engine external benchmarks documented
+
+- La arquitectura de `ICO Engine` ya documenta un bloque específico de benchmarks externos y estándar recomendado para Greenhouse.
+- La fuente canónica ahora vive en:
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md` § `A.5.5 Benchmarks externos y estándar recomendado para Greenhouse`
+- Ese bloque separa explícitamente:
+  - métricas con benchmark externo fuerte (`OTD`)
+  - métricas con benchmark por análogo (`FTR` vía `FPY` / `first-time error-free`)
+  - métricas con benchmark parcial creativo (`RpA`, `cycle time`)
+  - métricas que deben seguir tratándose como policy interna (`throughput`, `pipeline_velocity`, `stuck_assets`, `carry_over`, `overdue_carried_forward`)
+- Regla operativa:
+  - Greenhouse no debe presentar como “estándar de industria” una métrica que solo tenga benchmark parcial o interno
+  - cualquier ajuste de thresholds productivos debe citar ese bloque de arquitectura y declarar si el criterio proviene de benchmark externo, análogo o policy interna
+
 ## Delta 2026-04-03 ICO Engine metrics inventory consolidated in architecture
 
 - La arquitectura de `ICO Engine` ya documenta en un solo bloque el inventario canónico de señales y métricas.

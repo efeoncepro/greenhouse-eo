@@ -1,5 +1,48 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — ICO Engine external benchmarks documented
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+  - `project_context.md`
+  - `Handoff.md`
+  - `changelog.md`
+
+### Resultado
+
+- `Greenhouse_ICO_Engine_v1.md` ahora documenta benchmarks externos y estándar recomendado para Greenhouse en `A.5.5`
+- el bloque distingue entre:
+  - benchmark externo fuerte
+  - benchmark por análogo
+  - benchmark parcial creativo
+  - policy interna sin benchmark portable
+- quedaron aterrizados criterios recomendados para:
+  - `FTR`
+  - `RpA`
+  - `OTD`
+  - `cycle time`
+  - `throughput`
+  - `pipeline velocity`
+  - `stuck assets`
+  - `carry-over`
+  - `overdue carried forward`
+- el documento también deja explícito qué referencias sí son comparables cross-industry y cuáles no deben venderse como estándar de mercado
+
+### Fuentes externas usadas
+
+- `SCOR / APICS`
+- `APQC`
+- `IndustryWeek`
+- `visualloop`
+
+### Verificación
+
+- investigación web manual contra fuentes externas primarias o de benchmarking reconocido
+- revisión manual de consistencia documental con las métricas ya inventariadas en `A.5.4`
+
 ## Sesión 2026-04-03 — ICO Engine metrics inventory consolidated in architecture
 
 ### Rama / alcance
