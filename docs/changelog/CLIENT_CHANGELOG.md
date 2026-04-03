@@ -61,6 +61,7 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 - Se corrigió un desvío visible donde algunos Spaces podían aparecer con `OTD` irrealmente bajo al leer un snapshot abierto del mes actual.
 - La vista mantiene la semántica operativa de `mes en curso`, pero ahora con métricas reales recalculadas desde la base enriquecida de Delivery.
+- Los KPIs de Delivery dejan además de tratar tareas en estados no terminales como si ya estuvieran completadas cuando venían con timestamps inconsistentes.
 
 ### Notas
 

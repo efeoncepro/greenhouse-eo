@@ -1,5 +1,17 @@
 # project_context.md
 
+## Delta 2026-04-03 ICO completion semantics now require terminal task status
+
+- `ICO Engine` ya no trata `completed_at` como suficiente para considerar una tarea completada.
+- Regla vigente:
+  - una tarea solo cuenta como `completed` para `OTD`, `RpA`, `FTR`, `cycle time` y `throughput` si tiene:
+    - `completed_at IS NOT NULL`
+    - `task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')`
+  - `performance_indicator_code = 'on_time'` o `late_drop` ya no puede forzar completitud si el estado sigue abierto o intermedio
+- Motivación:
+  - se detectaron filas reales en `ico_engine.v_tasks_enriched` con `completed_at` poblado pero `task_status = 'Sin empezar'` o `Listo para revisión`
+  - esas filas contaminaban `Agency > Delivery` y cualquier consumer del motor con `OTD 100%` y volumen completado artificial
+
 ## Delta 2026-04-03 Agency Delivery current-month KPIs now read live ICO data
 
 - `Agency > Delivery` volvió a leer el mes en curso para `OTD` / `RpA`, pero ya no desde snapshots mensuales parciales.

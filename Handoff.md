@@ -40,9 +40,12 @@
 
 ### Verificación
 
-- pendiente ejecutar:
-  - `pnpm exec vitest run src/lib/ico-engine/shared.test.ts`
-  - `pnpm exec eslint src/lib/ico-engine/shared.ts src/lib/ico-engine/shared.test.ts`
+- `pnpm exec vitest run src/lib/ico-engine/shared.test.ts src/lib/agency/agency-queries.test.ts`
+- `pnpm exec eslint src/lib/ico-engine/shared.ts src/lib/ico-engine/shared.test.ts src/lib/agency/agency-queries.ts src/lib/agency/agency-queries.test.ts`
+- validación manual BigQuery:
+  - `Sky` abril 2026 tenía `81` `on_time` bajo la semántica vieja
+  - con estado terminal obligatorio, cae a `7` `on_time` reales
+  - `RpA` sigue `null` porque esas tareas terminales no traen `rpa_value > 0`
 
 ## Sesión 2026-04-03 — Agency Delivery vuelve a mes en curso con cálculo live real
 
