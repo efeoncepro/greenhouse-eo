@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 export interface DeliveryCoverageAuditInput {
   spaceId: string
@@ -8,10 +9,23 @@ export interface DeliveryCoverageAuditInput {
   month: number
 }
 
+export type DeliveryCoverageSourceClassification =
+  | 'member'
+  | 'client_user'
+  | 'external_contact'
+  | 'linked_profile_only'
+  | 'unclassified'
+
 export interface DeliveryCoverageUnresolvedSource {
   sourceId: string
   taskCount: number
   occurrenceCount: number
+  classification: DeliveryCoverageSourceClassification
+  identityProfileId: string | null
+  userId: string | null
+  memberId: string | null
+  displayName: string | null
+  email: string | null
 }
 
 export interface DeliveryCoverageAuditResult {
@@ -30,6 +44,10 @@ export interface DeliveryCoverageAuditResult {
   tasksWithoutAssigneeMemberId: number
   coveragePct: number | null
   coveragePctWithMemberIds: number | null
+  collaboratorScopedTaskCount: number
+  collaboratorResolvedTaskCount: number
+  collaboratorCoveragePct: number | null
+  classifiedExternalTaskCount: number
   unresolvedSourceIds: DeliveryCoverageUnresolvedSource[]
 }
 
@@ -38,6 +56,17 @@ interface DeliveryCoverageRow {
   assignee_source_id: string | null
   assignee_member_id: string | null
   assignee_member_ids: string[] | null
+}
+
+interface LinkedIdentityRow extends Record<string, unknown> {
+  source_object_id: string
+  identity_profile_id: string | null
+  user_id: string | null
+  member_id: string | null
+  display_name: string | null
+  email: string | null
+  tenant_type: string | null
+  profile_type: string | null
 }
 
 const toMonthWindow = (year: number, month: number) => {
@@ -59,6 +88,16 @@ const toMonthWindow = (year: number, month: number) => {
 }
 
 const isNonEmpty = (value: string | null | undefined) => Boolean(value && value.trim())
+
+const classifyLinkedIdentity = (row: LinkedIdentityRow | undefined): DeliveryCoverageSourceClassification => {
+  if (!row) return 'unclassified'
+  if (isNonEmpty(row.member_id)) return 'member'
+  if ((row.tenant_type || '').trim() === 'client' && isNonEmpty(row.user_id)) return 'client_user'
+  if ((row.profile_type || '').trim() === 'external_contact') return 'external_contact'
+  if (isNonEmpty(row.identity_profile_id)) return 'linked_profile_only'
+
+  return 'unclassified'
+}
 
 export const auditDeliveryIdentityCoverage = async (
   input: DeliveryCoverageAuditInput
@@ -127,7 +166,6 @@ export const auditDeliveryIdentityCoverage = async (
       taskCount: counts.taskCount,
       occurrenceCount: counts.occurrenceCount
     }))
-    .sort((a, b) => b.taskCount - a.taskCount || a.sourceId.localeCompare(b.sourceId))
 
   const denominator = tasksWithAssigneeSourceId
 
@@ -137,6 +175,68 @@ export const auditDeliveryIdentityCoverage = async (
 
   const coveragePctWithMemberIds = denominator > 0
     ? Number(((tasksWithAssigneeMemberIds / denominator) * 100).toFixed(1))
+    : null
+
+  let linkedIdentityRowsBySource = new Map<string, LinkedIdentityRow>()
+
+  if (unresolvedSourceIds.length > 0 && isGreenhousePostgresConfigured()) {
+    try {
+      const linkedRows = await runGreenhousePostgresQuery<LinkedIdentityRow>(
+        `SELECT
+           sl.source_object_id,
+           sl.profile_id AS identity_profile_id,
+           cu.user_id,
+           cu.member_id,
+           COALESCE(cu.full_name, ip.full_name, sl.source_display_name) AS display_name,
+           COALESCE(cu.email, ip.canonical_email, sl.source_email) AS email,
+           cu.tenant_type,
+           ip.profile_type
+         FROM greenhouse_core.identity_profile_source_links sl
+         LEFT JOIN greenhouse_core.identity_profiles ip
+           ON ip.profile_id = sl.profile_id
+         LEFT JOIN greenhouse_core.client_users cu
+           ON cu.identity_profile_id = sl.profile_id
+         WHERE sl.active = TRUE
+           AND sl.source_system = 'notion'
+           AND sl.source_object_id = ANY($1)`,
+        [unresolvedSourceIds.map(item => item.sourceId)]
+      )
+
+      linkedIdentityRowsBySource = new Map(
+        linkedRows
+          .filter(row => isNonEmpty(row.source_object_id))
+          .map(row => [row.source_object_id.trim(), row] as const)
+      )
+    } catch {
+      // Coverage audit can still run in raw mode when PostgreSQL is unavailable.
+    }
+  }
+
+  const classifiedUnresolved = unresolvedSourceIds
+    .map(item => {
+      const linked = linkedIdentityRowsBySource.get(item.sourceId)
+
+      return {
+        ...item,
+        classification: classifyLinkedIdentity(linked),
+        identityProfileId: linked?.identity_profile_id?.trim() || null,
+        userId: linked?.user_id?.trim() || null,
+        memberId: linked?.member_id?.trim() || null,
+        displayName: linked?.display_name?.trim() || null,
+        email: linked?.email?.trim() || null
+      }
+    })
+    .sort((a, b) => b.taskCount - a.taskCount || a.sourceId.localeCompare(b.sourceId))
+
+  const classifiedExternalTaskCount = classifiedUnresolved
+    .filter(item => item.classification === 'client_user' || item.classification === 'external_contact' || item.classification === 'linked_profile_only')
+    .reduce((sum, item) => sum + item.taskCount, 0)
+
+  const collaboratorScopedTaskCount = Math.max(tasksWithAssigneeSourceId - classifiedExternalTaskCount, 0)
+  const collaboratorResolvedTaskCount = tasksWithAssigneeMemberId
+
+  const collaboratorCoveragePct = collaboratorScopedTaskCount > 0
+    ? Number(((collaboratorResolvedTaskCount / collaboratorScopedTaskCount) * 100).toFixed(1))
     : null
 
   return {
@@ -155,6 +255,10 @@ export const auditDeliveryIdentityCoverage = async (
     tasksWithoutAssigneeMemberId: rows.length - tasksWithAssigneeMemberId,
     coveragePct,
     coveragePctWithMemberIds,
-    unresolvedSourceIds
+    collaboratorScopedTaskCount,
+    collaboratorResolvedTaskCount,
+    collaboratorCoveragePct,
+    classifiedExternalTaskCount,
+    unresolvedSourceIds: classifiedUnresolved
   }
 }

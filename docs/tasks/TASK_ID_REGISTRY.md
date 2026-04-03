@@ -247,7 +247,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-195` | `to-do` | Space Identity Consolidation: Organization-First Admin Entry & Space Onboarding | `docs/tasks/to-do/TASK-195-space-identity-consolidation-organization-first-admin.md` |
 | `TASK-196` | `in-progress` | Delivery Performance Report Parity: Greenhouse Canonical Report & Notion Consumption | `docs/tasks/in-progress/TASK-196-delivery-performance-report-parity-greenhouse-notion.md` |
 | `TASK-197` | `complete` | Delivery Source Sync Assignee & Project Relation Parity | `docs/tasks/complete/TASK-197-delivery-source-sync-assignee-project-parity.md` |
-| `TASK-198` | `in-progress` | Delivery Notion Assignee Identity Coverage | `docs/tasks/in-progress/TASK-198-delivery-notion-assignee-identity-coverage.md` |
+| `TASK-198` | `complete` | Delivery Notion Assignee Identity Coverage | `docs/tasks/complete/TASK-198-delivery-notion-assignee-identity-coverage.md` |
 | `TASK-199` | `to-do` | Delivery Performance Owner Attribution Contract | `docs/tasks/to-do/TASK-199-delivery-performance-owner-attribution-contract.md` |
 | `TASK-200` | `to-do` | Delivery Performance Metric Semantic Contract | `docs/tasks/to-do/TASK-200-delivery-performance-metric-semantic-contract.md` |
 | `TASK-201` | `to-do` | Delivery Performance Historical Materialization Reconciliation | `docs/tasks/to-do/TASK-201-delivery-performance-historical-materialization-reconciliation.md` |

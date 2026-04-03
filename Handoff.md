@@ -189,6 +189,31 @@
 
 - Fase 3 del trabajo: documentar el mapa de conexiones completo entre identity reconciliation, delivery sync, `ICO`, `Person 360`, `Project Detail`, `Team` y el grafo canónico `greenhouse_core.*` antes de definir el plan de implementación.
 
+### Cierre real
+
+- `TASK-198` quedó cerrada.
+- La lane de identidad Delivery ya no asume que toda persona asignada en el teamspace debe resolverse a `member`.
+- Política cerrada para `Sky / Marzo 2026`:
+  - `Constanza Rojas` y `Adriana Velarde` pertenecen a `Sky`, no a `Efeonce`
+  - conviven en el mismo teamspace como diseñadoras in-house del cliente
+  - por eso se resuelven como `client_user + identity_profile`, no como `member`
+- Implementación cerrada:
+  - `delivery-coverage.ts` ahora clasifica `member`, `client_user`, `external_contact`, `linked_profile_only` y `unclassified`
+  - se versionó `scripts/backfill-delivery-notion-client-assignee-links.ts` para sembrar source links cliente en BigQuery y PostgreSQL
+  - quedaron sembrados los links Notion para:
+    - `242d872b-594c-8178-9f19-0002c0cda59c` -> `Constanza Rojas`
+    - `242d872b-594c-819c-b0fe-0002083f5da7` -> `Adriana Velarde`
+- Verificación final marzo 2026:
+  - `Efeonce`: `116/116` tareas con `assignee_member_id`
+  - `Sky`: `187` tareas con `assignee_source_id`
+  - `Sky`: `145` tareas con `assignee_member_id`
+  - `Sky`: `42` tareas clasificadas correctamente como contactos cliente (`Constanza` `29`, `Adriana` `13`)
+  - `Sky collaborator coverage`: `145/145 = 100%`
+- Residual intencional:
+  - `Sin asignar` queda fuera del denominador de coverage colaborador
+  - la semántica final de owner principal / co-asignados / no asignadas se cierra en `TASK-199`
+- El siguiente carril natural pasa a ser `TASK-199`, porque el hueco principal ya no es identidad sino atribución semántica.
+
 ## Sesión 2026-04-02 — RESEARCH-004 space identity consolidation
 
 ### Objetivo

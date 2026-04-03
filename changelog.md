@@ -2,6 +2,19 @@
 
 ## 2026-04-02
 
+- **TASK-198 delivery notion assignee identity coverage**:
+  - `discovery-notion.ts` ya excluye IDs Notion enlazados tanto en BigQuery como en PostgreSQL y dejó de depender solo de `greenhouse.team_members`
+  - `reconciliation-service.ts` ahora prioriza `greenhouse_core.members` como fuente canónica de candidates y usa BigQuery solo como fallback
+  - `apply-link.ts` ahora persiste también `identity_profile_source_links` en PostgreSQL y puede completar `client_users.member_id` cuando el perfil ya tiene principal
+  - `delivery-coverage.ts` ahora distingue cobertura raw vs cobertura colaborador y clasifica responsables Delivery como `member`, `client_user`, `external_contact`, `linked_profile_only` o `unclassified`
+  - se agregó `scripts/backfill-delivery-notion-client-assignee-links.ts` para sembrar source links de responsables cliente en BigQuery y PostgreSQL
+  - `Constanza Rojas` y `Adriana Velarde` quedaron resueltas explícitamente como diseñadoras in-house de `Sky`, modeladas como `client_user + identity_profile` y no como `member`
+  - verificación real marzo 2026:
+    - `Efeonce`: `116/116` tareas con `assignee_member_id`
+    - `Sky`: `42` tareas clasificadas como contactos cliente (`Constanza` `29`, `Adriana` `13`)
+    - `Sky collaborator coverage`: `145/145 = 100%`
+  - residual explícito: `Sin asignar` y la semántica final de owner principal/co-asignados quedan abiertos para `TASK-199`
+
 - **TASK-197 delivery source sync assignee/project parity**:
   - `greenhouse_conformed.delivery_tasks` ahora preserva `project_source_ids` además de `project_source_id`
   - `sync-notion-conformed.ts` ahora valida cobertura de responsables por `space_id`, evitando que un space sano masque otro roto

@@ -2,11 +2,11 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio`
-- Status real: `Auditoría`
+- Status real: `Complete`
 - Rank: `54`
 - Domain: `identity`
 - GitHub Project: `[pending]`
@@ -88,7 +88,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/in-progress/TASK-198-delivery-notion-assignee-identity-coverage.md`
+- `docs/tasks/complete/TASK-198-delivery-notion-assignee-identity-coverage.md`
 - `src/lib/identity/reconciliation/discovery-notion.ts`
 - `src/lib/identity/reconciliation/reconciliation-service.ts`
 - `src/lib/identity/reconciliation/apply-link.ts`
@@ -107,12 +107,9 @@ Reglas obligatorias:
 
 ### Gap actual
 
-- sigue existiendo dualidad de autoridad entre BigQuery `greenhouse.team_members` y PostgreSQL `greenhouse_core.*`
-- la reconciliación actual sigue leyendo candidatos desde BigQuery, no desde el grafo canónico de PostgreSQL
-- no existe todavía una política cerrada para responsables cliente/externos dentro del reporte mensual
-- no existe un check visible de cobertura de identidad para Delivery por período y por `space`
-- no todo `assignee_source_id` sin `member_id` entra de forma visible a la cola de reconciliación
+- la reconciliación actual sigue siendo híbrida entre BigQuery y PostgreSQL, aunque esta task ya endureció la exclusión de IDs enlazados en ambos carriles
 - varios consumers runtime siguen leyendo `assignee_member_id` singular mientras `ICO` acredita por `assignee_member_ids`
+- la semántica final de atribución para tareas compartidas, `Sin asignar` y responsables cliente sigue perteneciendo a `TASK-199`
 
 ## Scope
 
@@ -142,11 +139,11 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Existe inventario documentado de `notion_user_id` de Delivery para el scope de calibración.
-- [ ] Los IDs faltantes críticos del caso `Efeonce + Sky / Marzo 2026` quedan resueltos o explícitamente clasificados por faceta canónica.
-- [ ] Existe una política documentada para responsables cliente, externos y `Sin asignar`.
-- [ ] La cobertura de identidad queda verificable antes de recalcular el reporte mensual por `space` y período.
-- [ ] La spec deja explícita la dualidad actual BigQuery/PostgreSQL y el camino de cierre de esa brecha.
+- [x] Existe inventario documentado de `notion_user_id` de Delivery para el scope de calibración.
+- [x] Los IDs faltantes críticos del caso `Efeonce + Sky / Marzo 2026` quedan resueltos o explícitamente clasificados por faceta canónica.
+- [x] Existe una política documentada para responsables cliente, externos y `Sin asignar`.
+- [x] La cobertura de identidad queda verificable antes de recalcular el reporte mensual por `space` y período.
+- [x] La spec deja explícita la dualidad actual BigQuery/PostgreSQL y el camino de cierre de esa brecha.
 
 ## Verification
 
@@ -158,3 +155,20 @@ Reglas obligatorias:
 
 - La auditoría formal mostró que `TASK-197` ya cerró el problema de source sync; `TASK-198` pasa a enfocarse en autoridad canónica de identidad, policy de facetas y coverage audit por `space` y período.
 - La spec ya no trata `greenhouse.team_members` y `greenhouse_core.members` como equivalentes y explicita la dualidad actual entre BigQuery y PostgreSQL.
+- `discovery-notion.ts` dejó de depender solo de `greenhouse.team_members` y ahora excluye IDs ya enlazados tanto en BigQuery como en PostgreSQL, además de corregir la normalización `responsables_ids` vs `responsable_ids`.
+- `reconciliation-service.ts` ahora carga candidates desde `greenhouse_core.members` primero y cae a BigQuery solo como fallback.
+- `apply-link.ts` ahora persiste también en `greenhouse_core.identity_profile_source_links` y completa `client_users.member_id` cuando el perfil ya tiene principal.
+- Se agregó el guardrail reusable `delivery-coverage.ts` + `GET /api/admin/identity/reconciliation/coverage` para medir cobertura por `space_id` y mes de `due_date`.
+- Se clasificaron explícitamente los dos IDs abiertos de `Sky / Marzo 2026` como colaboradoras in-house del cliente, no miembros de Efeonce:
+  - `242d872b-594c-8178-9f19-0002c0cda59c` → `Constanza Rojas` → `client_user + identity_profile`, sin `member`
+  - `242d872b-594c-819c-b0fe-0002083f5da7` → `Adriana Velarde` → `client_user + identity_profile`, sin `member`
+- Se versionó y ejecutó `scripts/backfill-delivery-notion-client-assignee-links.ts` para sembrar esos `notion source links` en BigQuery y PostgreSQL.
+- Verificación final marzo 2026:
+  - `Efeonce`: `116/116` tareas con `assignee_member_id`
+  - `Sky` raw coverage: `145/187` con `assignee_member_id`, `151/187` con `assignee_member_ids`
+  - `Sky` contact classification: `42` tareas quedan correctamente clasificadas como contactos cliente (`Constanza` `29`, `Adriana` `13`)
+  - `Sky` collaborator coverage: `145/145 = 100%`
+- Política fijada para esta lane:
+  - responsables Efeonce internos se resuelven a `member`
+  - diseñadores in-house del cliente que conviven en el mismo teamspace se resuelven a `client_user + identity_profile`, no a `member`
+  - `Sin asignar` queda fuera del denominador de coverage colaborador y su semántica final de atribución se cierra en `TASK-199`
