@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-224`
+- siguiente ID disponible: `TASK-225`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -51,6 +51,7 @@ Primer bloque operativo asignado:
 | `TASK-170` | [TASK-170-leave-request-approval-flow.md](complete/TASK-170-leave-request-approval-flow.md)                                                     | P1        | Alto     | Alto     | Cerrada                 | Leave quedó alineado al calendario operativo, `leave_policies`, outbox granular, recálculo reactivo de payroll y setup real aplicado en `greenhouse-pg-dev`                  |
 | `TASK-181` | [TASK-181-finance-clients-organization-canonical-source.md](in-progress/TASK-181-finance-clients-organization-canonical-source.md)             | P1        | Alto     | Medio    | Implementación validada | Finance Clients ya corta list/detail/write a `greenhouse_core.organizations`, preservando `client_id` como bridge operativo y cerrando el backfill de perfiles legacy         |
 | `TASK-191` | [TASK-191-finance-organization-first-downstream-consumers-cutover.md](in-progress/TASK-191-finance-organization-first-downstream-consumers-cutover.md) | P1        | Alto     | Alto     | Implementación          | Follow-on de `TASK-181`: cerrar el cutover downstream org-first en `purchase-orders`, `hes`, `expenses`, `allocations` y readers analíticos sin repropagar `clientId` como input obligatorio |
+| `TASK-224` | [TASK-224-finance-document-vs-cash-semantic-contract.md](in-progress/TASK-224-finance-document-vs-cash-semantic-contract.md) | P1 | Alto | Medio | Parcial | Formalizar el contrato `documento/devengo vs caja` en Finance para que ventas/compras de Nubox no se presenten como cobros/pagos automáticos |
 | `TASK-187` | [TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md](complete/TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md) | P0        | Muy alto | Alto     | Cerrada                | Notion ya tiene governance tenant-scoped formal: snapshots, drift, KPI readiness, admin APIs y panel reutilizado sobre el binding canónico por `space` |
 | `TASK-196` | [TASK-196-delivery-performance-report-parity-greenhouse-notion.md](complete/TASK-196-delivery-performance-report-parity-greenhouse-notion.md) | P0        | Muy alto | Alto     | Cerrada                | Lane completa de paridad Delivery: source sync, identidad, owner attribution, semántica, freeze histórico y cutover outbound `Greenhouse -> Notion` sobre `Performance Reports` |
 ## Complete

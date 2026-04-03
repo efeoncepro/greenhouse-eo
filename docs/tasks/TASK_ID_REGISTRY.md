@@ -273,3 +273,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-221` | `to-do` | Revenue Enabled Measurement Model & Attribution Policy | `docs/tasks/to-do/TASK-221-revenue-enabled-measurement-model-attribution-policy.md` |
 | `TASK-222` | `to-do` | Creative Velocity Review, Tiered Metric Surfacing & Client Narrative | `docs/tasks/to-do/TASK-222-creative-velocity-review-tiered-metric-surfacing.md` |
 | `TASK-223` | `to-do` | ICO Methodological Accelerators Instrumentation | `docs/tasks/to-do/TASK-223-ico-methodological-accelerators-instrumentation.md` |
+| `TASK-224` | `in-progress` | Finance Document vs Cash Semantic Contract | `docs/tasks/in-progress/TASK-224-finance-document-vs-cash-semantic-contract.md` |

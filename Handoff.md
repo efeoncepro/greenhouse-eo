@@ -1,5 +1,35 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — TASK-224 creada para institucionalizar documento vs caja en Finance
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `docs/tasks/in-progress/TASK-224-finance-document-vs-cash-semantic-contract.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+
+### Resultado
+
+- se creó `TASK-224 - Finance Document vs Cash Semantic Contract`
+- la task deja explícito que:
+  - `Nubox sales/purchases` deben leerse primero como documentos
+  - `income` / `expenses` operan como ledgers de devengo
+  - caja real debe apoyarse en `income_payments`, `payment_date` y follow-ons como `TASK-194`
+- la lane quedó en `in-progress` porque ya existe un primer slice visible aplicado en el repo, pero el runtime y consumers downstream siguen parcialmente abiertos
+- guardrail adicional ya documentado en la task:
+  - esta lane no puede dejar huérfanos los cálculos actuales de `Finance` / `Cost Intelligence`
+  - debe preservar explícitamente la realidad de facturas cobradas y compras pagadas mientras corrige la semántica visible y contractual
+
+### Verificación
+
+- revisión manual de consistencia contra:
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `project_context.md`
+  - `docs/tasks/TASK_TEMPLATE.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+
 ## Sesión 2026-04-03 — Finance visible semantics aligned: Nubox documents vs cash
 
 ### Rama / alcance
