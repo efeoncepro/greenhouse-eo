@@ -54,6 +54,7 @@ export interface ReadinessCheckResult {
   health: IntegrationHealth
   readinessStatus: IntegrationReadiness
   paused: boolean
+  details?: Record<string, unknown> | null
 }
 
 /** Health snapshot aggregated from sync runs + freshness signals */

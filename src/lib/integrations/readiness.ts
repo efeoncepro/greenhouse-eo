@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { getIntegrationHealthSnapshots } from '@/lib/integrations/health'
+import { getNotionRawFreshnessGate } from '@/lib/integrations/notion-readiness'
 import { getIntegrationByKey } from '@/lib/integrations/registry'
 import type { ReadinessCheckResult } from '@/types/integrations'
 
@@ -16,7 +17,10 @@ import type { ReadinessCheckResult } from '@/types/integrations'
  * - Integration doesn't exist
  */
 export const checkIntegrationReadiness = async (
-  integrationKey: string
+  integrationKey: string,
+  options?: {
+    requireRawFreshness?: boolean
+  }
 ): Promise<ReadinessCheckResult> => {
   const entry = await getIntegrationByKey(integrationKey)
 
@@ -27,7 +31,8 @@ export const checkIntegrationReadiness = async (
       reason: 'Integration not registered',
       health: 'not_configured',
       readinessStatus: 'unknown',
-      paused: false
+      paused: false,
+      details: null
     }
   }
 
@@ -38,7 +43,8 @@ export const checkIntegrationReadiness = async (
       reason: `Integration paused: ${entry.pausedReason ?? 'no reason given'}`,
       health: 'idle',
       readinessStatus: entry.readinessStatus,
-      paused: true
+      paused: true,
+      details: null
     }
   }
 
@@ -49,7 +55,8 @@ export const checkIntegrationReadiness = async (
       reason: 'Integration readiness is blocked',
       health: 'down',
       readinessStatus: 'blocked',
-      paused: false
+      paused: false,
+      details: null
     }
   }
 
@@ -63,7 +70,34 @@ export const checkIntegrationReadiness = async (
       reason: `Integration health is down (${snapshot.syncFailuresLast24h} failures, last sync: ${snapshot.freshnessLabel})`,
       health: 'down',
       readinessStatus: entry.readinessStatus,
-      paused: false
+      paused: false,
+      details: null
+    }
+  }
+
+  if (integrationKey === 'notion' && options?.requireRawFreshness) {
+    const freshnessGate = await getNotionRawFreshnessGate()
+
+    if (!freshnessGate.ready) {
+      return {
+        integrationKey,
+        ready: false,
+        reason: freshnessGate.reason,
+        health: 'degraded',
+        readinessStatus: entry.readinessStatus,
+        paused: false,
+        details: {
+          boundaryStartAt: freshnessGate.boundaryStartAt,
+          freshestRawSyncedAt: freshnessGate.freshestRawSyncedAt,
+          activeSpaceCount: freshnessGate.activeSpaceCount,
+          staleSpaces: freshnessGate.staleSpaces.map(space => ({
+            spaceId: space.spaceId,
+            maxTaskSyncedAt: space.maxTaskSyncedAt,
+            maxProjectSyncedAt: space.maxProjectSyncedAt,
+            reasons: space.reasons
+          }))
+        }
+      }
     }
   }
 
@@ -73,7 +107,8 @@ export const checkIntegrationReadiness = async (
     reason: 'Integration is ready',
     health: snapshot?.health ?? 'idle',
     readinessStatus: entry.readinessStatus,
-    paused: false
+    paused: false,
+    details: null
   }
 }
 

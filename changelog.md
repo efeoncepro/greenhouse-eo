@@ -2,6 +2,15 @@
 
 ## 2026-04-03
 
+- **TASK-207 delivery notion sync pipeline hardening**:
+  - `sync-conformed` ahora exige readiness con frescura real de `notion_ops.tareas` y `notion_ops.proyectos`
+  - el writer canónico `src/lib/sync/sync-notion-conformed.ts` ahora salta runs stale con trazabilidad explícita en `greenhouse_sync.source_sync_runs`
+  - `greenhouse_conformed.delivery_tasks` y `greenhouse_delivery.tasks` ahora preservan jerarquía con `tarea_principal_ids` y `subtareas_ids`
+  - se agregó validación persisted raw→conformed por `space_id` para totales, status, cobertura de assignee, due date y jerarquía
+  - el script legacy `scripts/sync-source-runtime-projections.ts` mantiene la proyección/manual seed, pero deja el overwrite de conformed detrás del guardrail `GREENHOUSE_ENABLE_LEGACY_CONFORMED_OVERWRITE=true`
+  - se agregaron pruebas unitarias para los gates de frescura Notion y la validación de paridad de tareas
+  - el lane quedó alineado al control plane existente (`/api/cron/sync-conformed`, `/api/admin/integrations/[integrationKey]/sync`, `integration_registry`, `source_sync_runs`) sin crear una surface paralela
+
 - **TASK-205 delivery notion origin parity audit**:
   - `TASK-205` queda cerrada como lane de auditoría reusable para comparar `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`
   - se agregó el helper `src/lib/space-notion/notion-parity-audit.ts`, la route admin `GET /api/admin/tenants/[id]/notion-parity-audit` y el script `pnpm audit:notion-delivery-parity`

@@ -57,6 +57,7 @@ Primer bloque operativo asignado:
 ## Complete
 
 - [TASK-205-delivery-notion-origin-parity-audit.md](complete/TASK-205-delivery-notion-origin-parity-audit.md) — Lane cerrada como auditoría reusable `Notion/raw/conformed`: helper server-side, route admin tenant-scoped, script CLI y evidencia real para `Daniela` y `Andrés / Abril 2026`; el hardening estructural queda explicitamente derivado a `TASK-207`.
+- [TASK-207-delivery-notion-sync-pipeline-hardening.md](complete/TASK-207-delivery-notion-sync-pipeline-hardening.md) — Hardening runtime cerrado del sync `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`: gate real de frescura por `space`, preservación de jerarquía, validación `raw -> transformed -> persisted`, runs cancelados/fallidos auditables y convergencia a writer canónico al desactivar el overwrite legacy por defecto.
 
 ## To Do
 
@@ -133,23 +134,19 @@ Primer bloque operativo asignado:
 - `TASK-204` queda abierta como follow-on semántico:
   - `Carry-Over` pasa a definirse como tarea creada en el mes con `due_date` en el siguiente mes o después
   - la deuda vencida que cruza de mes se separa como `Overdue Carried Forward`
-- `TASK-205` ya está en curso como lane de paridad contra origen:
-  - `Notion` ya mostró más tareas de `Daniela / Abril 2026` que `Greenhouse` (`80` vs `73`)
-  - esa reconciliación debe cerrarse antes de seguir afinando scorecards sobre un universo incompleto
-  - esta lane ya queda explícitamente enmarcada dentro de la integración nativa de `Notion`, no como carril lateral de Delivery
-  - corrección de repositorio:
-    - `sync-conformed` es el writer runtime activo
-    - `sync-source-runtime-projections.ts` sigue existiendo como carril legacy/manual con capacidad de reescribir `delivery_tasks`
-    - la jerarquía `task/subtask` todavía no forma parte del contrato versionado local de `greenhouse_conformed.delivery_tasks`
+- `TASK-205` ya quedó cerrada como lane de paridad contra origen:
+  - dejó helper reusable, route admin tenant-scoped, script CLI y evidencia real de drift para `Daniela` y `Andrés / Abril 2026`
+  - esa evidencia ahora debe consumirse como baseline de regresión para el hardening estructural
 - `TASK-206` queda abierta como lane de atribución operativa:
   - `identity_profile_source_links` se confirma como backbone de identidad, no como contrato suficiente de atribución
   - falta una capa reusable para traducir identidad en `primary owner`, `co-assignees`, `member credit` y `client collaboration`
-- `TASK-207` queda abierta como lane de hardening del sync:
-  - el problema principal ya no apunta a `Estado` vs `Estado 1`, sino al tramo `raw -> conformed`
-  - el pipeline necesita gates reales de frescura, convergencia a un solo writer y validaciones automáticas de paridad
-  - esta lane ya queda explícitamente enmarcada como hardening runtime de la integración nativa de `Notion`
+- `TASK-207` ya quedó cerrada como lane de hardening del sync:
+  - el writer canónico ahora exige frescura real de `notion_ops` antes de materializar
+  - `delivery_tasks` preserva jerarquía `tarea_principal_ids` / `subtareas_ids`
+  - el runtime valida paridad `raw -> transformed -> persisted` antes de declararse sano
+  - el carril legacy/manual ya no sobreescribe `greenhouse_conformed.*` por defecto
 - `TASK-208` queda abierta como lane de monitoreo continuo:
-  - Greenhouse necesita un auditor recurrente de data quality para no volver a quedar ciego frente al drift
+  - Greenhouse necesita convertir esos guardrails ya implementados en monitoreo recurrente e histórico para no volver a quedar ciego frente al drift
   - el objetivo es medir salud real del pipeline y alertar cuando `Notion`, raw y conformed dejen de cuadrar
   - esta lane ya queda explícitamente enmarcada como observabilidad nativa de la integración `Notion`
 - **Siguiente ola:** `TASK-173` → `TASK-027` → `TASK-028` → `TASK-116` → `TASK-070` → `TASK-071` → `TASK-011`.

@@ -215,6 +215,8 @@ CREATE TABLE IF NOT EXISTS greenhouse_delivery.tasks (
   workflow_review_open BOOLEAN NOT NULL DEFAULT FALSE,
   blocker_count INTEGER,
   last_frame_comment TEXT,
+  tarea_principal_ids TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  subtareas_ids TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
   original_due_date DATE,
   execution_time_label TEXT,
   changes_time_label TEXT,
@@ -513,6 +515,12 @@ CREATE INDEX IF NOT EXISTS delivery_tasks_module_idx
 
 CREATE INDEX IF NOT EXISTS delivery_tasks_assignee_idx
   ON greenhouse_delivery.tasks (assignee_member_id);
+
+CREATE INDEX IF NOT EXISTS delivery_tasks_parent_ids_gin
+  ON greenhouse_delivery.tasks USING GIN (tarea_principal_ids);
+
+CREATE INDEX IF NOT EXISTS delivery_tasks_subtask_ids_gin
+  ON greenhouse_delivery.tasks USING GIN (subtareas_ids);
 
 CREATE INDEX IF NOT EXISTS delivery_spm_space_idx
   ON greenhouse_delivery.space_property_mappings (space_id);

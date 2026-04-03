@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/db'
+import { getNotionRawFreshnessGate } from '@/lib/integrations/notion-readiness'
 import type { IntegrationHealth, IntegrationHealthSnapshot } from '@/types/integrations'
 
 interface SyncRunRow extends Record<string, unknown> {
@@ -126,6 +127,32 @@ export const getIntegrationHealthSnapshots = async (
     }
   } catch {
     // table may not exist
+  }
+
+  try {
+    const rawFreshness = await getNotionRawFreshnessGate()
+
+    if (result.has('notion') && rawFreshness.freshestRawSyncedAt) {
+      const existing = result.get('notion')!
+      const bestSync = laterOf(existing.lastSyncAt, rawFreshness.freshestRawSyncedAt)
+      const freshness = computeFreshness(bestSync)
+
+      result.set('notion', {
+        ...existing,
+        lastSyncAt: bestSync,
+        freshnessPercent: freshness.percent,
+        freshnessLabel: freshness.label,
+        health: rawFreshness.ready
+          ? existing.health === 'idle'
+            ? deriveHealth(1, 0, bestSync)
+            : existing.health
+          : existing.health === 'down'
+            ? 'down'
+            : 'degraded'
+      })
+    }
+  } catch {
+    // BigQuery signal may be unavailable; keep existing health
   }
 
   // Enrich HubSpot with services freshness

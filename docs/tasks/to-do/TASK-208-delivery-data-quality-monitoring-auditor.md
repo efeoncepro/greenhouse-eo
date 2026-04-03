@@ -1,5 +1,16 @@
 # TASK-208 - Delivery Data Quality Monitoring & Drift Auditor
 
+## Delta 2026-04-03 — Impact after TASK-207 closure
+
+- `TASK-207` ya cerró el hardening estructural base:
+  - gate real de frescura por `space_id` sobre `notion_ops`
+  - preservación de `tarea_principal_ids` / `subtareas_ids` en `greenhouse_conformed.delivery_tasks`
+  - validación runtime `raw -> transformed -> persisted`
+  - convergencia práctica a writer canónico porque el carril legacy ya no sobreescribe conformed por defecto
+- Implicación:
+  - esta lane ya no necesita inventar el contrato mínimo de salud del pipeline
+  - debe reutilizar esos guardrails y convertirlos en monitoreo recurrente, scoring histórico y alerting
+
 ## Delta 2026-04-03 — Impact after TASK-205 closure
 
 - `TASK-205` ya cerró el primer auditor reusable manual/on-demand:
@@ -141,6 +152,8 @@ Reglas obligatorias:
 - evidencia concreta de drift `Notion -> raw -> conformed`
 - timestamps suficientes para detectar stale data en varios casos
 - infraestructura de cron y health básica
+- guard de frescura real y control-plane de runs cancelados/fallidos cerrados por `TASK-207`
+- validación de paridad e invariantes de jerarquía ya integrada al writer canónico
 
 ### Gap actual
 

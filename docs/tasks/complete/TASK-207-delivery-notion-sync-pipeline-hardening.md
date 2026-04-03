@@ -1,5 +1,39 @@
 # TASK-207 - Delivery Notion Sync Pipeline Hardening & Freshness Gates
 
+## Delta 2026-04-03 — Implementación cerrada
+
+- El hardening runtime quedó implementado sobre el carril canónico actual:
+  - `src/lib/integrations/notion-readiness.ts` agrega gate real de frescura por `space_id` contra `notion_ops.tareas` y `notion_ops.proyectos`
+  - `src/lib/integrations/readiness.ts` ahora puede exigir `requireRawFreshness` para `notion`
+  - `src/app/api/cron/sync-conformed/route.ts` cancela y registra el run si el raw no está listo
+  - `src/lib/sync/sync-notion-conformed.ts` preserva `tarea_principal_ids` / `subtareas_ids`, valida paridad `raw -> transformed -> persisted` y escribe estado en `greenhouse_sync.source_sync_runs`
+  - `scripts/sync-source-runtime-projections.ts` deja de sobreescribir `greenhouse_conformed.*` salvo que `GREENHOUSE_ENABLE_LEGACY_CONFORMED_OVERWRITE=true`
+- Validación cerrada:
+  - `pnpm exec vitest run src/lib/integrations/notion-readiness.test.ts src/lib/sync/notion-task-parity.test.ts`
+  - `pnpm build`
+  - `pnpm lint`
+  - `rg -n "new Pool\\(" src scripts`
+- Implicación para follow-ons:
+  - `TASK-208` ya no tiene que diseñar el contrato base de hardening
+  - debe construir monitoreo y alerting sobre gates, snapshots de paridad y control plane ya disponibles
+
+## Delta 2026-04-03 — Audit correction after repo discovery
+
+- La spec no debe asumir que `docs/architecture/schema-snapshot-baseline.sql` refleja por sí sola toda la superficie vigente de este dominio.
+  - el snapshot baseline no incluye `greenhouse_sync.integration_registry`
+  - las columnas additive más recientes de `greenhouse_delivery.tasks` y `greenhouse_conformed.delivery_tasks` deben leerse junto con:
+    - `scripts/setup-postgres-source-sync.sql`
+    - `scripts/setup-bigquery-source-sync.sql`
+    - `migrations/20260402001400000_integration-registry.sql`
+    - `migrations/20260402002007694_integration-registry-platform.sql`
+- Corrección de contrato actual:
+  - `src/lib/sync/sync-notion-conformed.ts` es el writer runtime activo
+  - `scripts/sync-source-runtime-projections.ts` sigue existiendo como carril legacy/manual y todavía puede reescribir `greenhouse_conformed.delivery_tasks` y `greenhouse_delivery.tasks`
+  - `greenhouse_delivery.space_property_mappings` no es hoy la source of truth principal del writer activo; sigue siendo dependencia del carril legacy/manual
+- Implicación:
+  - la convergencia a writer canónico debe cerrarse sobre el carril runtime actual
+  - y el hardening de frescura debe validar `notion_ops` real, no la documentación/snapshot por sí solos
+
 ## Delta 2026-04-03 — Impact after TASK-205 closure
 
 - `TASK-205` ya dejó evidencia reusable ejecutable:
@@ -35,11 +69,11 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Diseño`
+- Status real: `Implementado y validado`
 - Rank: `60`
 - Domain: `data`
 - GitHub Project: `[pending]`
@@ -69,11 +103,12 @@ La auditoría reciente dejó varias evidencias fuertes:
 - el drift nace después, entre raw y conformed
 - `greenhouse_delivery.space_property_mappings` no está causando el problema actual porque hoy tiene `0` filas
 - `sync-conformed` corre a las `03:45 UTC`, pero el raw auditado de Notion llega con `_synced_at ~ 06:01 UTC`
+- `checkIntegrationReadiness('notion')` ya cruza registry + `source_sync_runs` + `space_notion_sources.last_synced_at`, pero todavía no valida frescura real de `notion_ops.*`
 
 Eso deja una lectura fuerte:
 
 - `greenhouse_conformed.delivery_tasks` puede estar construyéndose antes de que el raw de Notion termine de refrescarse
-- además existen dos carriles capaces de escribir o redefinir la semántica de `delivery_tasks`
+- existe un writer automatizado (`/api/cron/sync-conformed`) y un carril legacy/manual (`scripts/sync-source-runtime-projections.ts`) con capacidad de overwrite sobre la misma tabla
 - y la jerarquía `subtareas / tarea_principal` se pierde entre raw y conformed
 
 Sin endurecer esta capa, cualquier métrica downstream seguirá siendo vulnerable aunque el engine calcule bien.
@@ -145,7 +180,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-207-delivery-notion-sync-pipeline-hardening.md`
+- `docs/tasks/complete/TASK-207-delivery-notion-sync-pipeline-hardening.md`
 - `src/lib/sync/sync-notion-conformed.ts`
 - `scripts/sync-source-runtime-projections.ts`
 - `src/app/api/cron/sync-conformed/route.ts`
@@ -160,12 +195,15 @@ Reglas obligatorias:
 - `sync-source-runtime-projections.ts` sigue existiendo como carril legacy/manual con lógica propia
 - `delivery_tasks` ya preserva campos operativos útiles como `assignee_source_id`, `assignee_member_ids`, `project_source_ids`
 - `notion_ops.tareas` ya preserva `subtareas_ids` y `tarea_principal_ids`
+- `checkIntegrationReadiness('notion')` ya combina `integration_registry`, `source_sync_runs` y enriquecimiento de frescura desde `space_notion_sources.last_synced_at`
+- el carril runtime y el script legacy actuales ya resuelven `space_id` vía `greenhouse_core.space_notion_sources`
+- `schema-snapshot-baseline.sql` sirve como referencia base, pero no refleja por sí solo todo el estado actual del dominio
 
 ### Gap actual
 
 - no existe gate fuerte de frescura sobre `notion_ops`
-- `checkIntegrationReadiness('notion')` no valida que el batch fresco del raw ya esté disponible
-- existen dos writers/transform paths con semántica no totalmente convergida
+- `checkIntegrationReadiness('notion')` todavía no valida que el batch fresco del raw ya esté disponible en `notion_ops.*`
+- existe un writer cron canónico y un script manual legacy con semántica no totalmente convergida
 - `delivery_tasks` pierde jerarquía parent/subtask
 - no existen validaciones automáticas de paridad `raw -> conformed`
 - no existe alerta explícita cuando conformed corre contra raw stale o incompleto
@@ -220,12 +258,12 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] `sync-conformed` ya no corre contra raw stale o incompleto sin detectarlo.
-- [ ] Existe una única semántica canónica de construcción para `greenhouse_conformed.delivery_tasks`.
-- [ ] `delivery_tasks` preserva explícitamente la jerarquía `tarea_principal_ids` / `subtareas_ids`.
-- [ ] El pipeline valida automáticamente la paridad básica `raw -> conformed` antes de declararse sano.
-- [ ] La lane deja observabilidad suficiente para detectar pérdida de filas o drift de status sin auditoría manual ad hoc.
-- [ ] El endurecimiento es backward-compatible y no rompe los consumers que hoy ya funcionan.
+- [x] `sync-conformed` ya no corre contra raw stale o incompleto sin detectarlo.
+- [x] Existe una única semántica canónica de construcción para `greenhouse_conformed.delivery_tasks`.
+- [x] `delivery_tasks` preserva explícitamente la jerarquía `tarea_principal_ids` / `subtareas_ids`.
+- [x] El pipeline valida automáticamente la paridad básica `raw -> conformed` antes de declararse sano.
+- [x] La lane deja observabilidad suficiente para detectar pérdida de filas o drift de status sin auditoría manual ad hoc.
+- [x] El endurecimiento es backward-compatible y no rompe los consumers que hoy ya funcionan.
 
 ## Verification
 

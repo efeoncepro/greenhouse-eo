@@ -1,5 +1,69 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — TASK-207 cerrada con hardening runtime y convergencia a writer canónico
+
+### Rama / alcance
+
+- rama actual: `feature/codex-task-207-notion-sync-hardening`
+- task cerrada: `TASK-207`
+- scope implementado:
+  - `migrations/20260403103800741_delivery-task-hierarchy-runtime.sql`
+  - `src/lib/integrations/notion-readiness.ts`
+  - `src/lib/integrations/notion-readiness.test.ts`
+  - `src/lib/integrations/readiness.ts`
+  - `src/lib/integrations/health.ts`
+  - `src/lib/sync/notion-task-parity.ts`
+  - `src/lib/sync/notion-task-parity.test.ts`
+  - `src/lib/sync/sync-notion-conformed.ts`
+  - `src/app/api/cron/sync-conformed/route.ts`
+  - `scripts/setup-postgres-source-sync.sql`
+  - `scripts/sync-source-runtime-projections.ts`
+  - `scripts/setup-bigquery-source-sync.sql`
+  - `src/types/db.d.ts`
+  - `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
+
+### Resultado
+
+- el cron `sync-conformed` ya no debe materializar contra raw stale o incompleto
+- el writer canónico preserva jerarquía `task/subtask` en `greenhouse_conformed.delivery_tasks`
+- la paridad runtime ahora se valida en dos tramos:
+  - `raw -> transformed`
+  - `transformed -> persisted`
+- el carril legacy/manual ya no sobreescribe `greenhouse_conformed.*` salvo flag explícito `GREENHOUSE_ENABLE_LEGACY_CONFORMED_OVERWRITE=true`
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/integrations/notion-readiness.test.ts src/lib/sync/notion-task-parity.test.ts`
+- `pnpm build`
+- `pnpm lint`
+- `rg -n "new Pool\\(" src scripts`
+
+### Follow-on
+
+- `TASK-208` debe reutilizar estos gates y snapshots para monitoreo recurrente, scoring histórico y alerting
+- quedaron cambios ajenos en el árbol de trabajo; no fueron tocados ni deben mezclarse con el cierre de `TASK-207`
+
+## Sesión 2026-04-03 — TASK-207 entra a descubrimiento con spec corregida
+
+### Rama / objetivo
+
+- rama actual: `feature/codex-task-207-notion-sync-hardening`
+- task activa: `TASK-207`
+- objetivo inmediato:
+  - auditar el tramo `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`
+  - validar writer activo vs carril legacy
+  - corregir supuestos documentales antes de implementar freshness gates, paridad runtime y preservación de jerarquía
+
+### Corrección documental aplicada
+
+- `TASK-207` se confirmó en `in-progress`
+- se corrigieron supuestos del brief para reflejar el estado real del repo:
+  - `schema-snapshot-baseline.sql` no refleja por sí solo toda la superficie vigente del dominio
+  - `integration_registry` y parte del control plane actual viven en migraciones posteriores al baseline
+  - `sync-notion-conformed.ts` es el writer runtime activo
+  - `sync-source-runtime-projections.ts` sigue siendo un carril legacy/manual todavía ejecutable
+  - `space_property_mappings` no es hoy la source of truth principal del writer activo
+
 ## Sesión 2026-04-03 — TASK-205 cerrada con auditoría executable y evidencia real
 
 ### Rama / alcance
@@ -42,6 +106,26 @@
 
 - `TASK-205` queda registrada como lane de auditoría reusable de paridad `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`
 - el hardening estructural del pipeline sigue fuera de esta lane y permanece en `TASK-207`
+
+## Sesión 2026-04-03 — TASK-207 entra a descubrimiento con spec corregida
+
+### Rama / objetivo
+
+- rama actual: `feature/codex-task-205-parity-audit`
+- task activa: `TASK-207`
+- objetivo inmediato:
+  - endurecer el runtime `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`
+  - corregir la spec sobre el estado real del control plane y del writer legacy antes de implementar
+
+### Correcciones de descubrimiento ya confirmadas
+
+- `GET /api/cron/sync-conformed` es el único writer automatizado encontrado para `delivery_tasks`
+- `scripts/sync-source-runtime-projections.ts` sigue como carril manual/legacy con capacidad de overwrite
+- `checkIntegrationReadiness('notion')` ya cruza:
+  - `integration_registry`
+  - `greenhouse_sync.source_sync_runs`
+  - `greenhouse_core.space_notion_sources.last_synced_at`
+- el gap abierto no es health genérico, sino frescura real de `notion_ops.*` y preservación de jerarquía `tarea_principal_ids` / `subtareas_ids`
 
 ### Nota documental
 
@@ -94,7 +178,7 @@
 
 - se actualizaron:
   - `docs/tasks/to-do/TASK-205-delivery-notion-origin-parity-audit.md`
-  - `docs/tasks/to-do/TASK-207-delivery-notion-sync-pipeline-hardening.md`
+  - `docs/tasks/in-progress/TASK-207-delivery-notion-sync-pipeline-hardening.md`
   - `docs/tasks/to-do/TASK-208-delivery-data-quality-monitoring-auditor.md`
 
 ## Sesión 2026-04-03 — Re-encuadre de lanes Notion/Delivery dentro de la integración nativa
@@ -119,7 +203,7 @@
 
 - se actualizaron:
   - `docs/tasks/to-do/TASK-205-delivery-notion-origin-parity-audit.md`
-  - `docs/tasks/to-do/TASK-207-delivery-notion-sync-pipeline-hardening.md`
+  - `docs/tasks/in-progress/TASK-207-delivery-notion-sync-pipeline-hardening.md`
   - `docs/tasks/to-do/TASK-208-delivery-data-quality-monitoring-auditor.md`
   - `docs/tasks/in-progress/TASK-188-native-integrations-layer-platform-governance.md`
   - `docs/tasks/README.md`
@@ -165,7 +249,7 @@
 ### Delta documental
 
 - se creó:
-  - `docs/tasks/to-do/TASK-207-delivery-notion-sync-pipeline-hardening.md`
+  - `docs/tasks/in-progress/TASK-207-delivery-notion-sync-pipeline-hardening.md`
 - se actualizó:
   - `docs/tasks/TASK_ID_REGISTRY.md`
   - `docs/tasks/README.md`
