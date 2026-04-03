@@ -23,7 +23,6 @@ import classnames from 'classnames'
 
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
-import StatsWithAreaChart from '@components/card-statistics/StatsWithAreaChart'
 
 import tableStyles from '@core/styles/table.module.css'
 
@@ -86,7 +85,12 @@ const pctSemaphore = (v: number | null | undefined): { color: SemaphoreColor; la
 const fmtRpa = (v: number | null | undefined) => v != null ? v.toFixed(1) : '—'
 const fmtPct = (v: number | null | undefined) => v != null ? `${Math.round(v)}%` : '—'
 
-const trendDelta = (trend: TrendMonth[], field: 'otdPct' | 'rpaAvg' | 'ftrPct'): string | null => {
+const trendDelta = (trend: TrendMonth[], field: 'otdPct' | 'rpaAvg' | 'ftrPct'): {
+  text: string
+  number: string
+  direction: 'positive' | 'negative' | 'neutral'
+  prevLabel: string
+} | null => {
   if (trend.length < 2) return null
 
   const current = trend[trend.length - 1][field]
@@ -94,11 +98,19 @@ const trendDelta = (trend: TrendMonth[], field: 'otdPct' | 'rpaAvg' | 'ftrPct'):
 
   if (current == null || previous == null) return null
 
-  const delta = Math.round(current - previous)
-  const sign = delta >= 0 ? '+' : ''
+  const delta = Math.round((current - previous) * 10) / 10
   const prevLabel = MONTH_ABBR[(trend[trend.length - 2].month - 1) % 12]
 
-  return `${sign}${delta}pp vs ${prevLabel}`
+  // For RPA, lower is better — invert direction
+  const isInverted = field === 'rpaAvg'
+  const direction = delta === 0 ? 'neutral' as const : isInverted ? (delta < 0 ? 'positive' as const : 'negative' as const) : (delta > 0 ? 'positive' as const : 'negative' as const)
+
+  return {
+    text: `${delta >= 0 ? '+' : ''}${delta}pp vs ${prevLabel}`,
+    number: `${Math.abs(delta)}pp`,
+    direction,
+    prevLabel
+  }
 }
 
 // ── Table columns ──
@@ -272,42 +284,105 @@ const AgencyDeliveryView = () => {
         <Typography variant='body2' color='text.secondary'>Salud global de la operación Delivery</Typography>
       </Grid>
 
+      {/* OTD Hero — bar chart + KPI + trend chip (BarChartRevenueGrowth pattern) */}
+      <Grid size={{ xs: 12, md: 6 }}>
+        <Card sx={{ height: '100%' }}>
+          <CardContent className='flex justify-between gap-4'>
+            <div className='flex flex-col justify-between'>
+              <div className='flex flex-col gap-y-1'>
+                <Typography variant='body2' color='text.secondary'>Entrega a tiempo</Typography>
+                <Typography variant='h5'>OTD</Typography>
+              </div>
+              <div className='flex flex-col gap-y-2 items-start'>
+                <Typography variant='h3'>{fmtPct(otd)}</Typography>
+                {(() => {
+                  const d = trendDelta(trend, 'otdPct')
+
+                  return d ? (
+                    <CustomChip round='true' variant='tonal' size='small' color={d.direction === 'positive' ? 'success' : d.direction === 'negative' ? 'error' : 'secondary'} label={d.text} />
+                  ) : (
+                    <CustomChip round='true' variant='tonal' size='small' color={otdS.color} label={otdS.label} />
+                  )
+                })()}
+              </div>
+            </div>
+            {otdSparkline.length > 0 && (
+              <AppReactApexCharts
+                type='bar'
+                width={200}
+                height={172}
+                series={[{ data: otdSparkline }]}
+                options={{
+                  chart: { parentHeightOffset: 0, toolbar: { show: false } },
+                  plotOptions: { bar: { borderRadius: 4, distributed: true, columnWidth: '48%' } },
+                  legend: { show: false },
+                  tooltip: { enabled: false },
+                  dataLabels: { enabled: false },
+                  colors: otdSparkline.map((v, i) =>
+                    i === otdSparkline.length - 1
+                      ? `var(--mui-palette-${otdS.color}-main)`
+                      : `var(--mui-palette-${otdS.color}-lightOpacity)`
+                  ),
+                  states: { hover: { filter: { type: 'none' } }, active: { filter: { type: 'none' } } },
+                  grid: { show: false, padding: { top: -15, left: 0, right: 0, bottom: -5 } },
+                  xaxis: {
+                    categories: trend.map(t => MONTH_ABBR[(t.month - 1) % 12]),
+                    axisTicks: { show: false },
+                    axisBorder: { show: false },
+                    labels: { style: { colors: 'var(--mui-palette-text-disabled)', fontFamily: theme.typography.fontFamily, fontSize: theme.typography.body2.fontSize as string } }
+                  },
+                  yaxis: { show: false }
+                }}
+              />
+            )}
+          </CardContent>
+        </Card>
+      </Grid>
+
+      {/* RpA + FTR — rich HorizontalWithSubtitle with trend/status/footer */}
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <HorizontalWithSubtitle
-          title='OTD'
-          stats={fmtPct(otd)}
-          avatarIcon='tabler-clock-check'
-          avatarColor={otdS.color}
-          subtitle={trendDelta(trend, 'otdPct') ?? otdS.label}
-        />
+        {(() => {
+          const d = trendDelta(trend, 'rpaAvg')
+
+          return (
+            <HorizontalWithSubtitle
+              title='RpA promedio'
+              stats={fmtRpa(rpa)}
+              avatarIcon='tabler-chart-line'
+              avatarColor={rpaS.color}
+              trend={d?.direction}
+              trendNumber={d?.number}
+              subtitle={rpaS.label}
+              statusLabel={rpaS.label}
+              statusColor={rpaS.color}
+              statusIcon={rpaS.color === 'success' ? 'tabler-circle-check' : rpaS.color === 'error' ? 'tabler-alert-circle' : 'tabler-alert-triangle'}
+              footer='Revisiones promedio por activo. Menos es mejor.'
+            />
+          )
+        })()}
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <HorizontalWithSubtitle
-          title='RpA promedio'
-          stats={fmtRpa(rpa)}
-          avatarIcon='tabler-chart-line'
-          avatarColor={rpaS.color}
-          subtitle={rpaS.label}
-        />
-      </Grid>
-      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <HorizontalWithSubtitle
-          title='FTR'
-          stats={fmtPct(trend.length > 0 ? trend[trend.length - 1].ftrPct : null)}
-          avatarIcon='tabler-target-arrow'
-          avatarColor={pctSemaphore(trend.length > 0 ? trend[trend.length - 1].ftrPct : null).color}
-          subtitle={trendDelta(trend, 'ftrPct') ?? pctSemaphore(trend.length > 0 ? trend[trend.length - 1].ftrPct : null).label}
-        />
-      </Grid>
-      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <StatsWithAreaChart
-          title='Tendencia OTD'
-          stats={fmtPct(otd)}
-          avatarIcon='tabler-trending-up'
-          avatarColor={otdS.color}
-          chartColor={otdS.color}
-          chartSeries={[{ data: otdSparkline }]}
-        />
+        {(() => {
+          const ftrVal = trend.length > 0 ? trend[trend.length - 1].ftrPct : null
+          const ftrS = pctSemaphore(ftrVal)
+          const d = trendDelta(trend, 'ftrPct')
+
+          return (
+            <HorizontalWithSubtitle
+              title='FTR'
+              stats={fmtPct(ftrVal)}
+              avatarIcon='tabler-target-arrow'
+              avatarColor={ftrS.color}
+              trend={d?.direction}
+              trendNumber={d?.number}
+              subtitle={ftrS.label}
+              statusLabel={ftrS.label}
+              statusColor={ftrS.color}
+              statusIcon={ftrS.color === 'success' ? 'tabler-circle-check' : ftrS.color === 'error' ? 'tabler-alert-circle' : 'tabler-alert-triangle'}
+              footer='Primera entrega correcta sin rondas de cambio.'
+            />
+          )
+        })()}
       </Grid>
 
       {/* ─── SECTION 2: Atención Requerida ─── */}

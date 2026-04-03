@@ -10,6 +10,28 @@
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
 
+## Delta 2026-04-03 — Trend delta helper + rich KPI card patterns
+
+El Delivery hub introduce un helper reutilizable para comparativas mes-a-mes: `trendDelta()` en `AgencyDeliveryView.tsx`.
+
+Patrón canónico para KPIs con tendencia:
+
+```typescript
+// trendDelta(trend, field) → { text, number, direction, prevLabel } | null
+// - text: "+3pp vs Mar" (formatted for display)
+// - number: "3pp" (absolute delta for HorizontalWithSubtitle.trendNumber)
+// - direction: 'positive' | 'negative' | 'neutral' (for HorizontalWithSubtitle.trend)
+// - For RPA (lower is better), direction is INVERTED: decrease = positive
+```
+
+Patrones de cards Vuexy confirmados para data storytelling:
+
+1. **Hero KPI** (BarChartRevenueGrowth pattern): `Card` con KPI grande + `CustomChip` trend + mini bar chart ApexCharts. Usar para la métrica principal de cada vista.
+2. **Rich KPI** (`HorizontalWithSubtitle` con todas las props): `trend` + `trendNumber` + `statusLabel`/`statusColor`/`statusIcon` + `footer`. Usar para métricas secundarias con comparativa.
+3. **Attention card** (accent left border): `Card` con `borderLeft: 4px solid` color semáforo. Usar para items que requieren acción.
+
+Regla: toda vista que muestre métricas operativas debe incluir comparativa vs período anterior. No mostrar números aislados.
+
 ## Delta 2026-03-31 — Shared uploader pattern
 
 `TASK-173` ya deja un patrón canónico de upload para el portal:
