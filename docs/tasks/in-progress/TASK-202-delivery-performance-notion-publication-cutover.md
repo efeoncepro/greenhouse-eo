@@ -8,14 +8,18 @@
 - Consecuencia para esta task:
   - la publicación mensual a Notion debe salir desde el snapshot congelado del período
   - el runbook de `Abril 2026` debe incluir explícitamente `freeze:delivery-performance-period` antes de publicar
+- Delta de auditoría:
+  - el output canónico base ya existe en Greenhouse como combinación de `ico_engine.delivery_task_monthly_snapshots`, `ico_engine.performance_report_monthly` y `greenhouse_serving.agency_performance_reports`
+  - el gap principal ya no es “definir el reporte desde cero”, sino formalizar e implementar el `publication contract` `Greenhouse -> Notion`
+  - el cutover debe reutilizar el control plane de integraciones y no vivir como script aislado
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
-- Status real: `Diseño`
+- Status real: `Auditoría`
 - Rank: `58`
 - Domain: `ops`
 - GitHub Project: `[pending]`
@@ -25,7 +29,7 @@
 
 Cerrar el carril operativo para que Greenhouse calcule el `Performance Report` mensual y Notion lo consuma como resultado canónico, en vez de recalcularlo por separado.
 
-Esta task toma la paridad ya cerrada en datos, semántica y materialización, y la convierte en un flujo operativo mensual reproducible.
+Esta task toma la base canónica ya cerrada en cálculo, semántica y congelamiento mensual, y la convierte en un flujo operativo reproducible de publicación `Greenhouse -> Notion`.
 
 ## Why This Task Exists
 
@@ -39,7 +43,7 @@ Sin este cutover, la organización seguiría expuesta a drift semántico aunque 
 
 ## Goal
 
-- Definir el output canónico del `Performance Report` desde Greenhouse.
+- Formalizar el `publication payload` canónico del `Performance Report` desde Greenhouse.
 - Definir cómo se publica o sincroniza a Notion.
 - Dejar el operating model mensual para producir el reporte de `Abril 2026` desde Greenhouse.
 
@@ -65,6 +69,7 @@ Reglas obligatorias:
 - `TASK-201 - Delivery Performance Historical Materialization Reconciliation`
 - `TASK-196 - Delivery Performance Report Parity: Greenhouse Canonical Report & Notion Consumption`
 - `docs/operations/GREENHOUSE_PERFORMANCE_REPORT_OPERATING_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md`
 - integraciones Notion necesarias para publicación o consumo
 
 ### Impacts to
@@ -75,29 +80,36 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-202-delivery-performance-notion-publication-cutover.md`
+- `docs/tasks/in-progress/TASK-202-delivery-performance-notion-publication-cutover.md`
 - `docs/operations/GREENHOUSE_PERFORMANCE_REPORT_OPERATING_MODEL_V1.md`
+- `src/lib/space-notion/**` que se creen para publicación
+- `src/app/api/admin/integrations/**` que se creen para publicación
 - scripts, jobs o readers de publicación que se creen para esta lane
 
 ## Current Repo State
 
 ### Ya existe
 
+- snapshots task-level congelados en `ico_engine.delivery_task_monthly_snapshots`
+- output mensual canónico en `ico_engine.performance_report_monthly`
+- serving cache mensual en `greenhouse_serving.agency_performance_reports`
 - documentación inicial del operating model
 - baseline real de reporte en Notion
 - epic `TASK-196` como paraguas de la lane
+- control plane de integraciones con `integration_registry`, triggers y readiness
 
 ### Gap actual
 
-- no existe todavía un output mensual Greenhouse-first listo para Notion
+- no existe un `publication payload contract` formalizado para Notion
 - no existe una ruta operativa cerrada de publicación
-- no existe checklist formal de readiness mensual antes de publicar
+- no existe writer saliente a Notion para este reporte
+- no existe trazabilidad runtime específica para publication runs de Delivery hacia Notion
 
 ## Scope
 
 ### Slice 1 - Output canónico
 
-- definir el dataset o payload mensual canónico
+- formalizar el dataset o payload mensual canónico ya calculado por Greenhouse
 - definir qué números y hallazgos se publican
 - definir el grano mínimo necesario para trazabilidad
 
@@ -105,13 +117,14 @@ Reglas obligatorias:
 
 - definir si la salida va a una base, página o ambas
 - definir qué parte es dato canónico y qué parte es narrativa
-- dejar el mecanismo de actualización mensual
+- dejar el mecanismo de actualización mensual con idempotencia y trazabilidad
 
 ### Slice 3 - Operating model mensual
 
 - dejar runbook para cierre y publicación
 - definir validaciones previas y owner operativo
 - dejar criterio para declarar `Abril 2026` como primer período Greenhouse-first
+- colgar la operación del control plane de integraciones nativas
 
 ## Out of Scope
 
@@ -121,8 +134,9 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Existe definición del output canónico mensual desde Greenhouse.
+- [ ] Existe definición del `publication payload` canónico mensual desde Greenhouse.
 - [ ] Existe plan claro de consumo/publicación en Notion.
+- [ ] Existe un mecanismo técnico implementado para publicar el reporte desde Greenhouse a Notion.
 - [ ] Existe runbook mensual para cierre, validación y publicación.
 - [ ] `Abril 2026` queda en condiciones de operarse como primer período Greenhouse-first.
 

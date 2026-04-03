@@ -1,5 +1,33 @@
 # TASK-203 — SCIM Provisioning Activation: Entra Config, Identity Reconciliation & Observability
 
+## Delta 2026-04-02
+
+Completed activation work:
+- SCIM server deployed to production, test connection from Entra validated
+- New Enterprise App "GH SCIM" created in Azure Portal (non-gallery) — the original "Greenhouse" app had a ghost provisioning job that blocked CLI/portal setup
+- GH SCIM App ID: `4d89f061-eeb0-4aa8-ac94-df57d37e8c2a`, SP ID: `fe7a54ef-844f-4cbc-acee-3349d914f1ce`
+- Job ID: `scim.a80bf6c17c454d70b04351389622a0e4.4d89f061-eeb0-4aa8-ac94-df57d37e8c2a`
+- Group "Efeonce Group" assigned to GH SCIM app scope
+- Provisioning job started — awaiting initial sync cycle (~40 min)
+- SCIM bearer token stored in GCP Secret Manager (`scim-bearer-token`) with IAM for `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`
+- Direct token also set as `SCIM_BEARER_TOKEN` in Vercel production as fallback
+- `SCIM_BEARER_TOKEN_SECRET_REF` set in Vercel production/staging/preview
+- OID backfill: 10 users linked (7 internal Efeonce + 3 Sky guests)
+- `auth_mode=both` enabled for 6 internal users (SSO ready)
+- Identity source links (`azure-ad`) created for all 10 users with OID
+- `efeonce.cl` added to SCIM tenant mapping allowed domains
+- Integration registered in `greenhouse_sync.integration_registry` as `scim-entra-provisioning`
+- Staging redirect URI added to Azure app registration
+- `User.Read.All` application permission granted for Graph API client credentials
+- Entra profile sync cron implemented (`/api/cron/entra-profile-sync`, daily 08:00 UTC)
+- Job titles, country, city, phone synced from Entra to members + identity_profiles
+- `requireScimAuth()` updated to resolve token from GCP Secret Manager
+
+Remaining:
+- Verify initial sync reconciliation after Entra completes first cycle
+- Test SSO login with an internal user (not Julio)
+- Consider cleaning up the old "Greenhouse" Enterprise App's ghost provisioning job
+
 ## Resumen
 
 Activación end-to-end del server SCIM 2.0 implementado en TASK-037/TASK-018. Incluye configuración de Entra ID, generación y despliegue de credenciales, reconciliación con `identity_profiles`, y observabilidad operativa.
