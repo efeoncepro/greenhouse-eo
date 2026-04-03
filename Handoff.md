@@ -1,5 +1,43 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — ICO metrics hardening tasks package created
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/to-do/TASK-213-ico-metrics-hardening-trust-model.md`
+  - `docs/tasks/to-do/TASK-214-ico-completion-semantics-bucket-normalization.md`
+  - `docs/tasks/to-do/TASK-215-ico-rpa-reliability-source-policy-fallbacks.md`
+  - `docs/tasks/to-do/TASK-216-ico-metric-trust-model-benchmark-quality-gates.md`
+  - `docs/tasks/to-do/TASK-217-agency-kpi-trust-propagation-serving-semantics.md`
+  - `Handoff.md`
+
+### Resultado
+
+- se creó el paquete institucional de tasks para robustecer `ICO Engine` como sistema de métricas confiables
+- `TASK-213` queda como paraguas de coordinación
+- orden recomendado de ejecución:
+  - `TASK-214`
+  - `TASK-216`
+  - `TASK-215`
+  - `TASK-217`
+- foco de cada lane:
+  - `TASK-214`: semántica canónica de completitud y buckets
+  - `TASK-216`: benchmark registry, quality gates y confidence metadata
+  - `TASK-215`: source policy y fallbacks específicos de `RpA`
+  - `TASK-217`: serving y propagación a `Agency`
+
+### Verificación
+
+- revisión manual de consistencia contra:
+  - `docs/tasks/TASK_TEMPLATE.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+
 ## Sesión 2026-04-03 — ICO Engine external benchmarks documented
 
 ### Rama / alcance
