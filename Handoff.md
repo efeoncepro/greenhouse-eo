@@ -158,6 +158,37 @@
     - `hubspot.recordsProjectedPostgres = 97`
 - El siguiente carril natural es `TASK-198`, porque ya no estamos perdiendo tasks/responsables por el pipeline sino por coverage de identidad restante.
 
+## Sesión 2026-04-02 — TASK-198 delivery notion assignee identity coverage
+
+### Objetivo
+
+- Implementar `TASK-198` para cerrar la cobertura de identidad humana entre responsables Notion de Delivery y el grafo canónico de Greenhouse, sin degradar `ICO`, `Person 360`, `Project Detail` ni readers de team.
+
+### Delta de descubrimiento
+
+- `TASK-198` pasó a `in-progress` tras auditoría formal.
+- La spec quedó corregida para reflejar que `TASK-197` ya cerró source sync parity y que el cuello actual es identidad canónica, no ingestión de tareas.
+- La auditoría confirmó que la lane no es solo `notion_user_id -> member_id`; el contrato correcto es `notion_user_id -> identity_profile -> member/client_user` según faceta.
+- Sigue existiendo dualidad de autoridad:
+  - discovery/matching actuales leen BigQuery `greenhouse.team_members`
+  - la arquitectura canónica y varios readers consumen PostgreSQL `greenhouse_core.*`
+- En marzo 2026 el gap verificable sigue concentrado en `Sky`:
+  - `greenhouse_conformed.delivery_tasks` mantiene `2` `assignee_source_id` sin `assignee_member_id`
+  - esos IDs concentran `29` y `13` tareas
+- La cola de reconciliación existente ya tiene foundation fuerte:
+  - discovery
+  - matching
+  - proposals
+  - admin resolve
+  - cron
+- Quedó identificado un supuesto desactualizado potencial en `src/lib/identity/reconciliation/discovery-notion.ts`:
+  - usa `COALESCE(responsables_ids, responsable_ids, ARRAY<STRING>[])`
+  - eso puede seguir ocultando casos donde `responsables_ids = []` y `responsable_ids` sí tiene valor
+
+### Próximo paso recomendado
+
+- Fase 3 del trabajo: documentar el mapa de conexiones completo entre identity reconciliation, delivery sync, `ICO`, `Person 360`, `Project Detail`, `Team` y el grafo canónico `greenhouse_core.*` antes de definir el plan de implementación.
+
 ## Sesión 2026-04-02 — RESEARCH-004 space identity consolidation
 
 ### Objetivo

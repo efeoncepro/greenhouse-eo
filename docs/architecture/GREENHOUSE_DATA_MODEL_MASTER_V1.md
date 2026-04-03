@@ -337,6 +337,18 @@ Current tables:
 Runtime parity note:
 - `greenhouse_delivery.tasks` is being extended additively to preserve `assignee_source_id`, `assignee_member_ids TEXT[]`, and `project_source_ids TEXT[]`, while keeping `assignee_member_id` and `notion_project_id` for backward compatibility with existing runtime readers.
 
+Delta 2026-04-02:
+- `TASK-198` adds an explicit Delivery identity coverage audit lane over `greenhouse_conformed.delivery_tasks`
+- the audit is scoped by `space_id` and monthly `due_date` window, because that is the reporting anchor ratified for `Performance Report`
+- recommended outputs are:
+  - `totalTaskCount`
+  - `tasksWithAssigneeSourceId`
+  - `tasksWithAssigneeMemberId`
+  - `tasksWithAssigneeMemberIds`
+  - `coveragePct`
+  - `coveragePctWithMemberIds`
+  - unresolved `assignee_source_id` breakdown
+
 Required next slice:
 - if needed, `crm_company_contacts`
 

@@ -15,8 +15,10 @@ import { SOURCE_MEMBER_COLUMN } from './types'
  * Persist an identity link for a reconciliation proposal:
  *   1. Update team_members.<source_column> in BigQuery
  *   2. MERGE identity_profile_source_links in BigQuery
- *   3. Update greenhouse_core.members.<source_column> in Postgres (if available)
- *   4. Update proposal status in Postgres
+ *   3. Upsert greenhouse_core.identity_profile_source_links in Postgres (if available)
+ *   4. Update greenhouse_core.members.<source_column> in Postgres (if available)
+ *   5. Backfill greenhouse_core.client_users.member_id from the same identity profile (if available)
+ *   6. Update proposal status in Postgres
  */
 export async function applyIdentityLink(proposal: ReconciliationProposal): Promise<void> {
   if (!proposal.candidateMemberId) {
@@ -61,6 +63,8 @@ export async function applyIdentityLink(proposal: ReconciliationProposal): Promi
             @sourceSystem AS source_system,
             @sourceObjectType AS source_object_type,
             @sourceObjectId AS source_object_id,
+            @sourceUserId AS source_user_id,
+            @sourceEmail AS source_email,
             @sourceDisplayName AS source_display_name
         ) AS source
         ON target.profile_id = source.profile_id
@@ -69,11 +73,19 @@ export async function applyIdentityLink(proposal: ReconciliationProposal): Promi
            AND COALESCE(target.source_object_id, '') = COALESCE(source.source_object_id, '')
         WHEN MATCHED THEN
           UPDATE SET
+            source_user_id = source.source_user_id,
+            source_email = source.source_email,
             source_display_name = source.source_display_name,
             active = TRUE
         WHEN NOT MATCHED THEN
-          INSERT (link_id, profile_id, source_system, source_object_type, source_object_id, source_display_name, active)
-          VALUES (source.link_id, source.profile_id, source.source_system, source.source_object_type, source.source_object_id, source.source_display_name, TRUE)
+          INSERT (
+            link_id, profile_id, source_system, source_object_type, source_object_id,
+            source_user_id, source_email, source_display_name, active
+          )
+          VALUES (
+            source.link_id, source.profile_id, source.source_system, source.source_object_type, source.source_object_id,
+            source.source_user_id, source.source_email, source.source_display_name, TRUE
+          )
       `,
       params: {
         linkId,
@@ -81,6 +93,8 @@ export async function applyIdentityLink(proposal: ReconciliationProposal): Promi
         sourceSystem: proposal.sourceSystem,
         sourceObjectType: proposal.sourceObjectType,
         sourceObjectId: proposal.sourceObjectId,
+        sourceUserId: proposal.sourceObjectId,
+        sourceEmail: proposal.sourceEmail,
         sourceDisplayName: proposal.sourceDisplayName
       },
       types: {
@@ -89,6 +103,8 @@ export async function applyIdentityLink(proposal: ReconciliationProposal): Promi
         sourceSystem: 'STRING',
         sourceObjectType: 'STRING',
         sourceObjectId: 'STRING',
+        sourceUserId: 'STRING',
+        sourceEmail: 'STRING',
         sourceDisplayName: 'STRING'
       }
     })
@@ -108,12 +124,59 @@ export async function applyIdentityLink(proposal: ReconciliationProposal): Promi
     }
   })
 
-  // 4. Update Postgres members table (if available)
+  // 4-5. Update canonical Postgres identity state (if available)
   if (isGreenhousePostgresConfigured()) {
     try {
+      if (proposal.candidateProfileId) {
+        await runGreenhousePostgresQuery(
+          `INSERT INTO greenhouse_core.identity_profile_source_links (
+             link_id, profile_id, source_system, source_object_type, source_object_id,
+             source_user_id, source_email, source_display_name, active
+           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TRUE)
+           ON CONFLICT (profile_id, source_system, source_object_type, source_object_id)
+           DO UPDATE SET
+             source_user_id = EXCLUDED.source_user_id,
+             source_email = EXCLUDED.source_email,
+             source_display_name = EXCLUDED.source_display_name,
+             active = TRUE,
+             updated_at = NOW()`,
+          [
+            buildIdentitySourceLinkId({
+              profileId: proposal.candidateProfileId,
+              sourceSystem: proposal.sourceSystem,
+              sourceObjectType: proposal.sourceObjectType,
+              sourceObjectId: proposal.sourceObjectId
+            }),
+            proposal.candidateProfileId,
+            proposal.sourceSystem,
+            proposal.sourceObjectType,
+            proposal.sourceObjectId,
+            proposal.sourceObjectId,
+            proposal.sourceEmail,
+            proposal.sourceDisplayName
+          ]
+        )
+
+        await runGreenhousePostgresQuery(
+          `UPDATE greenhouse_core.client_users
+           SET member_id = $1, updated_at = NOW()
+           WHERE identity_profile_id = $2
+             AND (member_id IS NULL OR TRIM(member_id) = '')`,
+          [proposal.candidateMemberId, proposal.candidateProfileId]
+        )
+      }
+
       await runGreenhousePostgresQuery(
-        `UPDATE greenhouse_core.members SET ${memberColumn} = $1, updated_at = NOW() WHERE member_id = $2 AND (${memberColumn} IS NULL OR TRIM(${memberColumn}) = '')`,
-        [proposal.sourceObjectId, proposal.candidateMemberId]
+        `UPDATE greenhouse_core.members
+         SET ${memberColumn} = $1,
+             notion_display_name = CASE
+               WHEN $4 = 'notion' THEN COALESCE(notion_display_name, $2)
+               ELSE notion_display_name
+             END,
+             updated_at = NOW()
+         WHERE member_id = $3
+           AND (${memberColumn} IS NULL OR TRIM(${memberColumn}) = '')`,
+        [proposal.sourceObjectId, proposal.sourceDisplayName, proposal.candidateMemberId, proposal.sourceSystem]
       )
     } catch {
       // Postgres may not have this member yet — non-critical

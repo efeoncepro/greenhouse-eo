@@ -3,6 +3,7 @@ import 'server-only'
 import { randomUUID } from 'node:crypto'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import type { MemberCandidate, ReconciliationRunResult } from './types'
 import { AUTO_LINK_THRESHOLD } from './types'
@@ -12,7 +13,7 @@ import { applyIdentityLink, insertProposal } from './apply-link'
 
 // ── Load member candidates from BigQuery ──────────────────────────────
 
-async function loadMemberCandidates(): Promise<MemberCandidate[]> {
+async function loadMemberCandidatesFromBigQuery(): Promise<MemberCandidate[]> {
   const bq = getBigQueryClient()
   const projectId = getBigQueryProjectId()
 
@@ -50,6 +51,70 @@ async function loadMemberCandidates(): Promise<MemberCandidate[]> {
     azureOid: r.azure_oid || null,
     emailAliases: r.email_aliases ? JSON.parse(r.email_aliases) : []
   }))
+}
+
+async function loadMemberCandidatesFromPostgres(): Promise<MemberCandidate[]> {
+  if (!isGreenhousePostgresConfigured()) {
+    return []
+  }
+
+  type PostgresMemberRow = {
+    member_id: string
+    display_name: string
+    email: string | null
+    identity_profile_id: string | null
+    notion_user_id: string | null
+    notion_display_name: string | null
+    hubspot_owner_id: string | null
+    azure_oid: string | null
+    email_aliases: string[] | null
+  }
+
+  const rows = await runGreenhousePostgresQuery<PostgresMemberRow>(
+    `SELECT
+       m.member_id,
+       m.display_name,
+       COALESCE(m.primary_email, ip.canonical_email) AS email,
+       m.identity_profile_id,
+       m.notion_user_id,
+       m.notion_display_name,
+       m.hubspot_owner_id,
+       m.azure_oid,
+       m.email_aliases
+     FROM greenhouse_core.members m
+     LEFT JOIN greenhouse_core.identity_profiles ip
+       ON ip.profile_id = m.identity_profile_id
+     WHERE m.active = TRUE`
+  )
+
+  return rows.map(row => ({
+    memberId: row.member_id,
+    displayName: row.display_name,
+    email: row.email || null,
+    identityProfileId: row.identity_profile_id || null,
+    notionUserId: row.notion_user_id || null,
+    notionDisplayName: row.notion_display_name || null,
+    hubspotOwnerId: row.hubspot_owner_id || null,
+    azureOid: row.azure_oid || null,
+    emailAliases: Array.isArray(row.email_aliases) ? row.email_aliases.filter(Boolean) : []
+  }))
+}
+
+async function loadMemberCandidates(): Promise<MemberCandidate[]> {
+  const postgresCandidates = await loadMemberCandidatesFromPostgres().catch(error => {
+    console.warn(
+      '[identity-reconciliation] Postgres member candidate load failed, falling back to BigQuery:',
+      error instanceof Error ? error.message : error
+    )
+
+    return [] as MemberCandidate[]
+  })
+
+  if (postgresCandidates.length > 0) {
+    return postgresCandidates
+  }
+
+  return loadMemberCandidatesFromBigQuery()
 }
 
 // ── Orchestrator ──────────────────────────────────────────────────────
