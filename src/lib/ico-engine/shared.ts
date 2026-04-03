@@ -249,6 +249,10 @@ export const PERIOD_START_SQL = 'DATE(@periodYear, @periodMonth, 1)'
 export const PERIOD_END_SQL = `DATE_SUB(DATE_ADD(${PERIOD_START_SQL}, INTERVAL 1 MONTH), INTERVAL 1 DAY)`
 export const REPORT_CUTOFF_DATE_SQL = `DATE_ADD(${PERIOD_END_SQL}, INTERVAL 1 DAY)`
 export const PERIOD_ANCHOR_SQL = 'COALESCE(period_anchor_date, due_date, DATE(created_at), DATE(synced_at))'
+export const CANONICAL_COMPLETED_TASK_SQL = `(
+  completed_at IS NOT NULL
+  AND task_status IN (${DONE_STATUSES_SQL})
+)`
 export const REPORT_PERIOD_SCOPE_SQL = `(
   due_date IS NOT NULL
   AND due_date >= ${PERIOD_START_SQL}
@@ -260,12 +264,12 @@ export const CANONICAL_OPEN_TASK_SQL = `(
 )`
 export const DERIVED_ON_TIME_SQL = `(
   ${REPORT_PERIOD_SCOPE_SQL}
-  AND completed_at IS NOT NULL
+  AND ${CANONICAL_COMPLETED_TASK_SQL}
   AND DATE(completed_at) <= due_date
 )`
 export const DERIVED_LATE_DROP_SQL = `(
   ${REPORT_PERIOD_SCOPE_SQL}
-  AND completed_at IS NOT NULL
+  AND ${CANONICAL_COMPLETED_TASK_SQL}
   AND DATE(completed_at) > due_date
 )`
 
@@ -294,11 +298,11 @@ export const OVERDUE_CARRIED_FORWARD_SQL = `(
   AND ${CANONICAL_OPEN_TASK_SQL}
 )`
 export const CANONICAL_ON_TIME_SQL = `(
-  performance_indicator_code = 'on_time'
+  (performance_indicator_code = 'on_time' AND ${CANONICAL_COMPLETED_TASK_SQL})
   OR (performance_indicator_code IS NULL AND ${DERIVED_ON_TIME_SQL})
 )`
 export const CANONICAL_LATE_DROP_SQL = `(
-  performance_indicator_code = 'late_drop'
+  (performance_indicator_code = 'late_drop' AND ${CANONICAL_COMPLETED_TASK_SQL})
   OR (performance_indicator_code IS NULL AND ${DERIVED_LATE_DROP_SQL})
 )`
 export const CANONICAL_OVERDUE_SQL = `(
@@ -328,9 +332,9 @@ export const OTD_DENOMINATOR_SQL = `(
   OR ${CANONICAL_LATE_DROP_SQL}
   OR ${CANONICAL_OVERDUE_SQL}
 )`
-export const CANONICAL_FTR_ELIGIBLE_SQL = '(completed_at IS NOT NULL)'
+export const CANONICAL_FTR_ELIGIBLE_SQL = `(${CANONICAL_COMPLETED_TASK_SQL})`
 export const CANONICAL_FTR_PASSED_SQL = `(
-  completed_at IS NOT NULL
+  ${CANONICAL_COMPLETED_TASK_SQL}
   AND client_change_round_final = 0
 )`
 
@@ -343,13 +347,13 @@ export const CANONICAL_FTR_PASSED_SQL = `(
 export const buildMetricSelectSQL = () => `
     -- RPA: average of non-zero rpa_value for completed tasks in period
     ROUND(AVG(CASE
-      WHEN completed_at IS NOT NULL AND rpa_value > 0
+      WHEN ${CANONICAL_COMPLETED_TASK_SQL} AND rpa_value > 0
       THEN SAFE_CAST(rpa_value AS FLOAT64)
     END), 2) AS rpa_avg,
 
     -- RPA median
     ROUND(APPROX_QUANTILES(
-      CASE WHEN completed_at IS NOT NULL AND rpa_value > 0
+      CASE WHEN ${CANONICAL_COMPLETED_TASK_SQL} AND rpa_value > 0
       THEN SAFE_CAST(rpa_value AS FLOAT64) END, 100
     )[SAFE_OFFSET(50)], 2) AS rpa_median,
 
@@ -367,15 +371,15 @@ export const buildMetricSelectSQL = () => `
     ) * 100, 1) AS ftr_pct,
 
     -- Cycle time avg (completed only)
-    ROUND(AVG(CASE WHEN completed_at IS NOT NULL THEN cycle_time_days END), 1) AS cycle_time_avg_days,
+    ROUND(AVG(CASE WHEN ${CANONICAL_COMPLETED_TASK_SQL} THEN cycle_time_days END), 1) AS cycle_time_avg_days,
 
     -- Cycle time P50
     ROUND(APPROX_QUANTILES(
-      CASE WHEN completed_at IS NOT NULL THEN cycle_time_days END, 100
+      CASE WHEN ${CANONICAL_COMPLETED_TASK_SQL} THEN cycle_time_days END, 100
     )[SAFE_OFFSET(50)], 1) AS cycle_time_p50_days,
 
     -- Cycle time variance (stddev)
-    ROUND(STDDEV(CASE WHEN completed_at IS NOT NULL THEN cycle_time_days END), 1) AS cycle_time_variance,
+    ROUND(STDDEV(CASE WHEN ${CANONICAL_COMPLETED_TASK_SQL} THEN cycle_time_days END), 1) AS cycle_time_variance,
 
     -- Throughput (completed count in report scope)
     COUNTIF(${CANONICAL_ON_TIME_SQL} OR ${CANONICAL_LATE_DROP_SQL}) AS throughput_count,

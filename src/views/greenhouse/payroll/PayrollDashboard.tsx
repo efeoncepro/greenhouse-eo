@@ -30,7 +30,7 @@ import PayrollCompensationTab from './PayrollCompensationTab'
 import PayrollHistoryTab from './PayrollHistoryTab'
 import PayrollPeriodTab from './PayrollPeriodTab'
 import PayrollPersonnelExpenseTab from './PayrollPersonnelExpenseTab'
-import { buildPayrollCurrencySummary, formatPeriodLabel, periodStatusConfig } from './helpers'
+import { buildPayrollCurrencySummary, formatCurrency, formatPeriodLabel, periodStatusConfig } from './helpers'
 
 const PayrollDashboard = () => {
   const [tab, setTab] = useState('period')
@@ -40,6 +40,12 @@ const PayrollDashboard = () => {
   const [periods, setPeriods] = useState<PayrollPeriod[]>([])
   const [activePeriod, setActivePeriod] = useState<PayrollPeriod | null>(null)
   const [activeEntries, setActiveEntries] = useState<PayrollEntry[]>([])
+
+  const [currencyEquivalents, setCurrencyEquivalents] = useState<{
+    clpEquivalent: { grossClp: number; netClp: number; fxRate: number } | null
+    usdEquivalent: { grossUsd: number; netUsd: number; fxRate: number } | null
+  }>({ clpEquivalent: null, usdEquivalent: null })
+
   const [selectedPeriodId, setSelectedPeriodId] = useState<string | null>(null)
   const [selectedEntries, setSelectedEntries] = useState<PayrollEntry[]>([])
   const selectedPeriodIdRef = useRef<string | null>(null)
@@ -107,6 +113,10 @@ const PayrollDashboard = () => {
             const eData = await entriesRes.json()
 
             setActiveEntries(eData.entries || [])
+            setCurrencyEquivalents({
+              clpEquivalent: eData.summary?.clpEquivalent ?? null,
+              usdEquivalent: eData.summary?.usdEquivalent ?? null
+            })
 
             if (nextSelectedPeriodId === kpiTargetPeriod.periodId) {
               setSelectedEntries(eData.entries || [])
@@ -311,19 +321,35 @@ const PayrollDashboard = () => {
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
               title='Costo bruto'
-              stats={grossSummary.hasMixedCurrency ? 'Mixto' : grossSummary.summaryLabel}
+              stats={
+                currencyEquivalents.clpEquivalent
+                  ? formatCurrency(currencyEquivalents.clpEquivalent.grossClp, 'CLP')
+                  : grossSummary.summaryLabel
+              }
               avatarIcon='tabler-currency-dollar'
               avatarColor='warning'
-              subtitle={grossSummary.hasMixedCurrency ? grossSummary.summaryLabel : 'Total bruto del período'}
+              subtitle={
+                currencyEquivalents.usdEquivalent
+                  ? `USD ${formatCurrency(currencyEquivalents.usdEquivalent.grossUsd, 'USD')}`
+                  : 'Total bruto del período'
+              }
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
               title='Neto total'
-              stats={netSummary.hasMixedCurrency ? 'Mixto' : netSummary.summaryLabel}
+              stats={
+                currencyEquivalents.clpEquivalent
+                  ? formatCurrency(currencyEquivalents.clpEquivalent.netClp, 'CLP')
+                  : netSummary.summaryLabel
+              }
               avatarIcon='tabler-wallet'
               avatarColor='success'
-              subtitle={netSummary.hasMixedCurrency ? netSummary.summaryLabel : 'Total neto a pagar'}
+              subtitle={
+                currencyEquivalents.usdEquivalent
+                  ? `USD ${formatCurrency(currencyEquivalents.usdEquivalent.netUsd, 'USD')}`
+                  : 'Total neto a pagar'
+              }
             />
           </Grid>
         </Grid>
@@ -365,6 +391,7 @@ const PayrollDashboard = () => {
               onCreatePeriod={openNewPeriodDialog}
               createPeriodLabel={createPeriodLabel}
               isHistoricalSelection={isHistoricalSelection}
+              currencyEquivalents={!isHistoricalSelection ? currencyEquivalents : undefined}
             />
           </TabPanel>
 

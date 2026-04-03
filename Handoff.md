@@ -1,5 +1,49 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — ICO completed semantics hardened against non-terminal statuses
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `src/lib/ico-engine/shared.ts`
+  - `src/lib/ico-engine/shared.test.ts`
+  - `project_context.md`
+  - `Handoff.md`
+  - `changelog.md`
+  - `docs/changelog/CLIENT_CHANGELOG.md`
+
+### Resultado
+
+- el motor ICO ya no considera una tarea como `completed` solo porque `completed_at` venga poblado
+- nuevo contrato canónico:
+  - `completed_at IS NOT NULL`
+  - `task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')`
+- esto endurece de una vez:
+  - `OTD`
+  - `RpA`
+  - `FTR`
+  - `cycle time`
+  - `throughput`
+- además, `performance_indicator_code = 'on_time'` / `late_drop` ya no puede saltarse la validación de estado terminal
+
+### Evidencia
+
+- en `Sky Airline`, abril 2026 mostraba filas con:
+  - `completed_at = 2026-04-02`
+  - `task_status = 'Sin empezar'`
+  - `task_status = 'Listo para revisión'`
+- distribución confirmada para `Sky` en abril 2026:
+  - `135` filas con `completed_at`
+  - `101` de esas filas estaban en estados no terminales
+  - `81` filas contaban como `on_time`, pero solo `7` estaban realmente en `Aprobado`
+
+### Verificación
+
+- pendiente ejecutar:
+  - `pnpm exec vitest run src/lib/ico-engine/shared.test.ts`
+  - `pnpm exec eslint src/lib/ico-engine/shared.ts src/lib/ico-engine/shared.test.ts`
+
 ## Sesión 2026-04-03 — Agency Delivery vuelve a mes en curso con cálculo live real
 
 ### Rama / alcance

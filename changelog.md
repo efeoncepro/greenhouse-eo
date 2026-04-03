@@ -2,6 +2,11 @@
 
 ## 2026-04-03
 
+- **ICO completed-status hardening for delivery KPIs**:
+  - el engine ICO ya no considera una tarea como completada solo por `completed_at`
+  - `OTD`, `RpA`, `FTR`, `cycle time` y `throughput` ahora requieren además estado terminal real (`Listo`, `Done`, `Finalizado`, `Completado`, `Aprobado`)
+  - esto evita que filas incoherentes como `Sin empezar` o `Listo para revisión` con `completed_at` poblado contaminen los KPIs visibles en `Agency > Delivery` y otros consumers del engine
+
 - **Agency Delivery current-month live KPI correction**:
   - `Agency > Delivery` vuelve a leer `OTD` / `RpA` del mes en curso, no del último período cerrado
   - los readers `/api/agency/pulse` y `/api/agency/spaces` ya no dependen de `ico_engine.metric_snapshots_monthly` para esos KPIs
