@@ -14,10 +14,13 @@ import classnames from 'classnames'
 import type { ApexOptions } from 'apexcharts'
 
 // Type Imports
+import Chip from '@mui/material/Chip'
+
 import type { ThemeColor } from '@core/types'
 import type { CustomAvatarProps } from '@core/components/mui/Avatar'
 
 // Component Imports
+
 import CustomAvatar from '@core/components/mui/Avatar'
 
 // Styled Component Imports
@@ -32,10 +35,15 @@ export type StatsWithAreaChartProps = {
   avatarSize?: number
   avatarColor?: ThemeColor
   avatarSkin?: CustomAvatarProps['skin']
+  trend?: 'positive' | 'negative' | 'neutral'
+  trendNumber?: string
+  subtitle?: string
 }
 
+const trendColorMap = { positive: 'success', negative: 'error', neutral: 'default' } as const
+
 const StatsWithAreaChart = (props: StatsWithAreaChartProps) => {
-  const { stats, title, avatarIcon, chartSeries, avatarSize, chartColor = 'primary', avatarColor, avatarSkin } = props
+  const { stats, title, avatarIcon, chartSeries, avatarSize, chartColor = 'primary', avatarColor, avatarSkin, trend, trendNumber, subtitle } = props
 
   const theme = useTheme()
 
@@ -102,10 +110,14 @@ const StatsWithAreaChart = (props: StatsWithAreaChartProps) => {
         <CustomAvatar variant='rounded' skin={avatarSkin} color={avatarColor} size={avatarSize}>
           <i className={classnames(avatarIcon, 'text-[26px]')} />
         </CustomAvatar>
-        <div>
+        <div className='flex items-center gap-2 flex-wrap'>
           <Typography variant='h5'>{stats}</Typography>
-          <Typography variant='body2'>{title}</Typography>
+          {trend && trendNumber ? (
+            <Chip size='small' variant='outlined' color={trendColorMap[trend]} label={`${trend === 'negative' ? '-' : trend === 'positive' ? '+' : ''}${trendNumber}`} />
+          ) : null}
         </div>
+        <Typography variant='body2'>{title}</Typography>
+        {subtitle ? <Typography variant='caption' color='text.secondary'>{subtitle}</Typography> : null}
       </CardContent>
       <AppReactApexCharts type='area' height={100} width='100%' options={options} series={chartSeries} />
     </Card>

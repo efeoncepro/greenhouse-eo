@@ -43,6 +43,7 @@ import Chip from '@mui/material/Chip'
 import classnames from 'classnames'
 
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import StatsWithAreaChart from '@components/card-statistics/StatsWithAreaChart'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import CustomTextField from '@core/components/mui/TextField'
 import { fuzzyFilter } from '@/components/tableUtils'
@@ -644,74 +645,68 @@ const FinanceDashboardView = () => {
         </Alert>
       )}
 
-      {/* Financial KPIs with period comparison */}
+      {/* Financial KPIs — sparkline charts + trend comparison */}
       <Grid container spacing={6}>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           {(() => {
-            // Balance comparison: current vs previous month end balance from monthly series
-            const balanceMonthly = incomeMonthly.slice(-6).map(d => d.totalAmountClp)
-            const prevBalance = balanceMonthly.length >= 2 ? balanceMonthly[balanceMonthly.length - 2] : null
+            const prevBalance = incomeMonthly.length >= 2 ? incomeMonthly[incomeMonthly.length - 2].totalAmountClp : null
 
-            const balanceDeltaPct = totalBalance != null && prevBalance && prevBalance > 0
+            const deltaPct = totalBalance != null && prevBalance && prevBalance > 0
               ? Math.round(((totalBalance - prevBalance) / prevBalance) * 100)
               : null
 
             return (
-              <HorizontalWithSubtitle
+              <StatsWithAreaChart
                 title='Saldo total'
                 stats={totalBalance === null ? 'Sin datos' : formatCLP(totalBalance)}
                 avatarIcon='tabler-wallet'
                 avatarColor='primary'
-                trend={balanceDeltaPct != null ? (balanceDeltaPct >= 0 ? 'positive' : 'negative') : undefined}
-                trendNumber={balanceDeltaPct != null ? `${Math.abs(balanceDeltaPct)}% vs mes anterior` : undefined}
-                subtitle='Posición consolidada'
-                footer={prevBalance ? `Anterior: ${formatCLP(prevBalance)}` : undefined}
+                avatarSkin='light'
+                chartColor='primary'
+                chartSeries={[{ data: incomeMonthly.slice(-6).map(d => Math.round(d.totalAmountClp / 1000)) }]}
+                trend={deltaPct != null ? (deltaPct >= 0 ? 'positive' : 'negative') : undefined}
+                trendNumber={deltaPct != null ? `${Math.abs(deltaPct)}%` : undefined}
+                subtitle='Posición consolidada vs mes anterior'
               />
             )
           })()}
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           {(() => {
-            const incomeTrend = incomeSummary?.accrualCurrentMonth ?? incomeSummary?.currentMonth
-            const changePct = incomeTrend?.changePercent
-
-            const prevIncomeClp = changePct != null && accrualIncomeClp > 0
-              ? Math.round(accrualIncomeClp / (1 + changePct / 100))
-              : null
+            const changePct = (incomeSummary?.accrualCurrentMonth ?? incomeSummary?.currentMonth)?.changePercent
 
             return (
-              <HorizontalWithSubtitle
+              <StatsWithAreaChart
                 title='Facturación del mes'
                 stats={formatCLP(accrualIncomeClp)}
                 avatarIcon='tabler-file-invoice'
                 avatarColor='success'
+                avatarSkin='light'
+                chartColor='success'
+                chartSeries={[{ data: incomeMonthly.slice(-6).map(d => Math.round(d.totalAmountClp / 1000)) }]}
                 trend={changePct != null ? (changePct >= 0 ? 'positive' : 'negative') : undefined}
-                trendNumber={changePct != null ? `${Math.abs(Math.round(changePct))}% vs mes anterior` : undefined}
-                subtitle={accrualIncomeClp > 0 ? 'Ingresos devengados' : 'Sin facturación este mes'}
-                footer={prevIncomeClp ? `Anterior: ${formatCLP(prevIncomeClp)}` : undefined}
+                trendNumber={changePct != null ? `${Math.abs(Math.round(changePct))}%` : undefined}
+                subtitle='Ingresos devengados vs mes anterior'
               />
             )
           })()}
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           {(() => {
-            const expenseTrend = expenseSummary?.accrualCurrentMonth ?? expenseSummary?.currentMonth
-            const changePct = expenseTrend?.changePercent
-
-            const prevExpenseClp = changePct != null && expenseWithPayroll > 0
-              ? Math.round(expenseWithPayroll / (1 + changePct / 100))
-              : null
+            const changePct = (expenseSummary?.accrualCurrentMonth ?? expenseSummary?.currentMonth)?.changePercent
 
             return (
-              <HorizontalWithSubtitle
+              <StatsWithAreaChart
                 title='Costos del mes'
                 stats={formatCLP(expenseWithPayroll)}
                 avatarIcon='tabler-credit-card'
                 avatarColor='error'
+                avatarSkin='light'
+                chartColor='error'
+                chartSeries={[{ data: expenseMonthly.slice(-6).map(d => Math.round(d.totalAmountClp / 1000)) }]}
                 trend={changePct != null ? (changePct >= 0 ? 'negative' : 'positive') : undefined}
-                trendNumber={changePct != null ? `${Math.abs(Math.round(changePct))}% vs mes anterior` : undefined}
-                subtitle={expenseWithPayroll > 0 ? 'Egresos + nómina' : 'Sin egresos este mes'}
-                footer={prevExpenseClp ? `Anterior: ${formatCLP(prevExpenseClp)}` : undefined}
+                trendNumber={changePct != null ? `${Math.abs(Math.round(changePct))}%` : undefined}
+                subtitle='Egresos + nómina vs mes anterior'
               />
             )
           })()}
