@@ -1,8 +1,8 @@
 # Greenhouse Portal — Integraciones Externas
 
-> Versión: 2.0
-> Fecha: 2026-03-22
-> Actualizado: Nubox (pipeline completo), Space-Notion mapping formalizado, HubSpot bidireccional vía Organizations
+> Versión: 2.1
+> Fecha: 2026-04-02
+> Actualizado: Pipeline completo Nubox (3 fases), Webhooks bidireccionales con HMAC, Microsoft Teams attendance, Sentry error tracking, Nexa AI agent, Governance engine Notion
 
 ---
 
@@ -16,12 +16,12 @@
                                                    │
 ┌─────────────┐                                    │
 │  Notion     │──── BigQuery sync ────────────────▶│
-│  (Proyectos)│                                    │
+│  (Proyectos)│     Governance engine              │
 └─────────────┘                                    │
                                                    │
 ┌─────────────┐                                    │
 │  Microsoft  │──── OAuth 2.0 + Teams webhook ───▶│
-│  Entra ID   │                                    │
+│  Entra ID   │     SCIM provisioning              │
 └─────────────┘                                    │
                                                    │
 ┌─────────────┐                                    │
@@ -32,6 +32,21 @@
 ┌─────────────┐                                    │
 │  Vertex AI  │──── GenAI API ───────────────────▶│
 │  (Google)   │                                    │
+└─────────────┘                                    │
+                                                   │
+┌─────────────┐                                    │
+│  Nubox      │──── 3-phase sync ────────────────▶│
+│  (Contab.)  │     Raw→Conformed→Postgres       │
+└─────────────┘                                    │
+                                                   │
+┌─────────────┐                                    │
+│  Previred   │──── Sync Chilean social sec. ────▶│
+│  (Chile)    │                                    │
+└─────────────┘                                    │
+                                                   │
+┌─────────────┐                                    │
+│  Sentry     │──── Error tracking ───────────────▶│
+│             │     Performance monitoring         │
 └─────────────┘
 ```
 
@@ -41,7 +56,7 @@
 
 ### Rol
 
-HubSpot es la fuente de verdad para empresas (Companies), contactos (Contacts), y deals (Deals). Greenhouse sincroniza capabilities y contratos de servicio desde HubSpot.
+HubSpot es la fuente de verdad para empresas (Companies), contactos (Contacts), y deals (Deals). Greenhouse sincroniza capabilities, contratos de servicio y organización desde HubSpot.
 
 ### Arquitectura de integración
 
@@ -81,6 +96,13 @@ Dos mecanismos:
 1. **Admin manual**: `/api/admin/tenants/[id]/capabilities/sync` — Sync desde admin UI
 2. **Integration API**: `/api/integrations/v1/tenants/capabilities/sync` — Sync programático desde HubSpot
 
+### Bidireccional vía Organizations
+
+Además del flujo original (HubSpot → Greenhouse):
+- **`POST /api/organizations/[id]/hubspot-sync`** — Trigger manual de sync desde la UI de Organizations
+- El sync puede actualizar datos de la organización desde HubSpot Company
+- `ensureOrganizationForSupplier()` puede crear organizaciones nuevas y vincularlas con HubSpot Companies existentes
+
 ---
 
 ## 2. Notion (vía BigQuery)
@@ -110,13 +132,28 @@ Notion es el sistema de gestión de proyectos y tareas. Greenhouse NO consulta l
 | Team | Asignaciones de miembros a proyectos/tareas |
 | People | Métricas operativas de delivery por persona |
 
+### Notion Governance Engine *(nuevo)*
+
+Validación de contratos de datos de Notion:
+- **Schema validation** — Verifica que la estructura de Notion DB coincide con el contrato esperado
+- **Readiness scoring** — Calcula la calidad y completitud de los datos
+- **Drift detection** — Detecta cambios no autorizados en la estructura
+- **Snapshots** — Registra governance snapshots en `space_notion_sources.governance_snapshots`
+
+### Notion Performance Report Publication *(nuevo)*
+
+Publicación automática de reportes de ICO a Notion:
+- **Endpoint**: `/api/cron/notion-publish-ico-reports`
+- **Destino**: Database de Notion especificado en `space_notion_sources`
+- **Datos**: Métricas de delivery, ICO scores, trends
+
 ---
 
 ## 3. Microsoft Entra ID (Azure AD)
 
 ### Rol
 
-Proveedor de SSO para login con cuentas Microsoft. También provee identidad para integraciones con Teams.
+Proveedor de SSO para login con cuentas Microsoft. También provee identidad para integraciones con Teams y SCIM provisioning.
 
 ### Integración OAuth
 
@@ -134,14 +171,24 @@ Cuando un usuario con cuenta Microsoft hace login:
 4. Fallback a dominio permitido (auto-provisioning)
 5. Si se encuentra match, se vincula el OID al registro
 
-### Microsoft Teams — Webhook de Attendance
+### Microsoft Teams — Webhook de Attendance *(nuevo)*
 
 Greenhouse recibe webhooks de Microsoft Teams para registrar asistencia automática:
 
 - **Endpoint**: `/api/hr/core/attendance/webhook/teams`
-- **Auth**: Verificación vía `HR_CORE_TEAMS_WEBHOOK_SECRET`
-- **Datos**: Eventos de presencia de Teams
+- **Auth**: Verificación vía `HR_CORE_TEAMS_WEBHOOK_SECRET` (HMAC signature)
+- **Datos**: Eventos de presencia de Teams (in-meeting, available, away, busy, do-not-disturb, offline)
 - **Destino**: `greenhouse_hr.attendance_records` con `source_system='teams_webhook'`
+- **Frecuencia**: Real-time webhook delivery
+
+### Microsoft Entra SCIM Provisioning *(nuevo)*
+
+Provisioning automático de usuarios desde Azure AD:
+- **Endpoint**: `/api/admin/scim/` (compliant con SCIM 2.0)
+- **Ubicación**: `src/lib/scim/`
+- **Operaciones**: CREATE, READ, UPDATE, DELETE para usuarios y grupos
+- **Mapeo**: `scim-tenant-mappings` para vincular Azure AD tenants con Greenhouse workspaces
+- **Tabla**: `greenhouse_core.scim_tenant_mappings` con auditoría de cambios
 
 ---
 
@@ -159,7 +206,7 @@ Greenhouse recibe webhooks de Microsoft Teams para registrar asistencia automát
 - **SDK**: `@google-cloud/bigquery` v8.1.1
 - **Autenticación**: Service Account vía `GOOGLE_APPLICATION_CREDENTIALS_JSON`
 - **Proyecto**: `GCP_PROJECT`
-- **Datasets**: `greenhouse`, `notion_ops`, `greenhouse_raw`, `greenhouse_conformed`
+- **Datasets**: `greenhouse`, `notion_ops`, `greenhouse_raw`, `greenhouse_conformed`, `nubox_raw_snapshots`, `nubox_conformed`
 - **Uso**: Lectura analítica server-side (el browser nunca consulta BigQuery)
 
 ### Cloud SQL (PostgreSQL)
@@ -272,7 +319,162 @@ Verificación con `CRON_SECRET`.
 
 ---
 
-## 7. Integration API (para sistemas externos)
+## 7. Webhook Infrastructure *(nuevo)*
+
+### Arquitectura bidireccional
+
+Greenhouse implementa webhooks entrantes (inbound) y salientes (outbound) con HMAC signing y retry policy.
+
+### Webhooks entrantes
+
+| Fuente | Endpoint | Propósito |
+|--------|----------|----------|
+| Microsoft Teams | `/api/hr/core/attendance/webhook/teams` | Attendance real-time |
+| HubSpot (futuro) | `/api/integrations/webhooks/hubspot` | Cambios en empresas/contactos |
+| Nubox (futuro) | `/api/integrations/webhooks/nubox` | Cambios en documentos |
+
+### Webhooks salientes
+
+Greenhouse puede enviar webhooks a sistemas externos cuando ciertos eventos ocurren:
+- **Event types**: organization.created, organization.updated, person.joined, income.created, expense.created, etc.
+- **Retry policy**: Exponential backoff (3, 30 min, 5h)
+- **Dead-letter**: Eventos que fallan después de 3 reintentos se registran en `webhook_dead_letter_queue`
+
+### Firma HMAC
+
+```typescript
+signature = HMAC-SHA256(body, webhook_secret)
+header: x-greenhouse-signature = signature
+```
+
+### Tabla de registro
+
+`greenhouse_sync.webhook_deliveries` registra:
+- `webhook_id`, `event_type`, `payload`, `http_status`, `response_body`, `delivered_at`, `retry_count`
+
+---
+
+## 8. Nubox — Contabilidad Chile *(nuevo)*
+
+### Rol
+
+Nubox es la plataforma contable para operaciones Chile. Greenhouse sincroniza documentos tributarios electrónicos (DTEs) y movimientos bancarios desde Nubox para alimentar el módulo financiero.
+
+### Arquitectura de integración
+
+Pipeline de 3 fases gestionado por `src/lib/nubox/`:
+
+```
+Nubox API → Fase A (Raw) → BigQuery → Fase B (Conformed) → BigQuery → Fase C → PostgreSQL
+```
+
+### Fase A — Raw Sync
+
+- **Endpoint interno**: `sync-nubox-raw.ts` vía `/api/cron/nubox-sync`
+- **Datos**: ventas (DTEs emitidos), compras (DTEs recibidos), egresos bancarios, ingresos bancarios
+- **Destino**: BigQuery `nubox_raw_snapshots` (archivo JSON crudo por sync run)
+- **Auth**: Bearer token + API key dual header (`NUBOX_API_TOKEN`, `NUBOX_API_KEY`)
+- **Paginación**: Automática (cursor-based)
+- **Retry**: Automático en HTTP 429 y 5xx
+
+### Fase B — Conformed
+
+- **Endpoint interno**: `sync-nubox-conformed.ts`
+- **Transform**: Normalización de campos, resolución de identidad (supplier → `organization_id` vía tax ID match)
+- **Destino**: BigQuery `nubox_conformed` (ventas y compras conformadas con FKs canónicos)
+- **Datos normalizados**: Monedas, decimales, estados estandarizados
+
+### Fase C — Postgres Projection
+
+- **Endpoint interno**: `sync-nubox-to-postgres.ts`
+- **Destino**: Tablas operativas de `greenhouse_finance` en PostgreSQL
+- **Mapeo**: Income records, Expense records, Supplier records
+
+### Cliente HTTP Nubox
+
+| Config | Valor |
+|--------|-------|
+| Auth | Bearer token + API key (dual header) |
+| Retry | Automático en HTTP 429 y 5xx |
+| Paginación | Automática (cursor-based) |
+| Timeout | Configurable por request |
+
+### Tipos de documento Nubox
+
+| Tipo | Descripción | Campos clave |
+|------|-------------|-------------|
+| Sale | DTE emitido (factura, boleta, NC, ND) | folio, dte_type, net/exempt/tax/total amounts, emission_date, client RUT |
+| Purchase | DTE recibido | folio, dte_type, amounts, emission_date, supplier RUT |
+| Expense | Egreso bancario | folio, bank, payment_method, supplier, total_amount, payment_date |
+| Income | Ingreso bancario | folio, bank, payment_method, client, total_amount, payment_date |
+
+### Emisión de documentos
+
+`emission.ts` — Generación de documentos tributarios a través de la API de Nubox (facturación electrónica):
+- **Endpoint**: `POST /api/cron/nubox-emit`
+- **Propósito**: Emitir DTEs para ventas registradas en Greenhouse
+- **Auth**: Bearer token + API key
+
+---
+
+## 9. Previred Sync *(nuevo)*
+
+### Rol
+
+Sincronización con Previred (previsión social chilena) para reporting de afiliación de empleados.
+
+### Endpoint
+
+`/api/cron/previred-sync`
+
+### Datos sincronizados
+
+- Afiliaciones de empleados
+- Cambios de estado (entrada, salida, suspensión)
+- Datos de compensación
+
+### Destino
+
+`greenhouse_hr.previred_submissions` en PostgreSQL.
+
+---
+
+## 10. Space-Notion Mapping *(nuevo)*
+
+### Rol
+
+Formaliza la relación entre Spaces (tenants operativos) y workspaces/databases de Notion. Reemplaza el campo legacy `notionProjectIds` de `clients` con un modelo relacional.
+
+### Store
+
+`src/lib/space-notion/space-notion-store.ts`
+
+### Datos mapeados por Space
+
+| Campo | Descripción |
+|-------|-------------|
+| `notion_db_proyectos` | Notion database ID de proyectos |
+| `notion_db_tareas` | Notion database ID de tareas |
+| `notion_db_sprints` | Notion database ID de sprints |
+| `notion_db_revisiones` | Notion database ID de revisiones |
+| `notion_workspace_id` | Workspace ID de Notion |
+| `sync_enabled` | Flag de sincronización |
+| `sync_frequency` | `daily`, `weekly`, `monthly` |
+| `last_synced_at` | Última sincronización |
+| `governance_snapshots` | Snapshots de validación de schema |
+| `publication_metadata` | Metadata de publicación de reportes |
+
+### Funciones
+
+- `getSpaceNotionSource(spaceId)` — Obtener mapping de un espacio
+- `getSpaceNotionSourceByClientId(clientId)` — Resolver vía bridge legacy `client_id → space_id → notion_source`
+- `getActiveSpaceNotionSources()` — Todos los mappings habilitados
+- `recordGovernanceSnapshot()` — Registrar validación de schema
+- `recordPublicationMetadata()` — Registrar publicación de reporte
+
+---
+
+## 11. Integration API (para sistemas externos)
 
 ### Propósito
 
@@ -301,7 +503,7 @@ Usa `requireIntegrationRequest()` — autenticación separada del sistema de usu
 
 ```json
 {
-  "exportedAt": "2026-03-15T00:00:00Z",
+  "exportedAt": "2026-04-02T00:00:00Z",
   "count": 42,
   "items": [...]
 }
@@ -309,100 +511,63 @@ Usa `requireIntegrationRequest()` — autenticación separada del sistema de usu
 
 ---
 
-## 8. Nubox — Contabilidad Chile *(nuevo)*
+## 12. Sentry Error Tracking *(nuevo)*
 
 ### Rol
 
-Nubox es la plataforma contable para operaciones Chile. Greenhouse sincroniza documentos tributarios electrónicos (DTEs) y movimientos bancarios desde Nubox para alimentar el módulo financiero.
+Monitoreo de errores en producción, performance tracking, y release management.
 
-### Arquitectura de integración
+### Configuración
 
-Pipeline de 3 fases gestionado por `src/lib/nubox/`:
+- **SDK**: `@sentry/nextjs`
+- **Init**: `sentry.config.ts` y `sentry.server.config.ts`
+- **DSN**: Vía `SENTRY_DSN`
 
+### Características
+
+- **Error capturing**: Excepciones no capturadas en frontend y backend
+- **Performance monitoring**: Transacciones de API, carga de página, query time
+- **Release tracking**: Versiones de deploy via `SENTRY_AUTH_TOKEN`
+- **Source maps**: Automático desde Vercel
+- **Breadcrumbs**: Registro de acciones previas a errores
+
+### Integración en Next.js
+
+```typescript
+// App Router instrumentation
+import * as Sentry from "@sentry/nextjs"
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  environment: process.env.NODE_ENV,
+  tracesSampleRate: 1.0,
+})
 ```
-Nubox API → Fase A (Raw) → BigQuery → Fase B (Conformed) → BigQuery → Fase C → PostgreSQL
-```
-
-### Fase A — Raw Sync
-
-- **Endpoint interno**: `sync-nubox-raw.ts`
-- **Datos**: ventas (DTEs emitidos), compras (DTEs recibidos), egresos bancarios, ingresos bancarios
-- **Destino**: BigQuery `nubox_raw_snapshots` (archivo JSON crudo por sync run)
-- **Auth**: Bearer token + API key (`NUBOX_API_TOKEN`, `NUBOX_API_KEY`)
-
-### Fase B — Conformed
-
-- **Endpoint interno**: `sync-nubox-conformed.ts`
-- **Transform**: Normalización de campos, resolución de identidad (supplier → `organization_id` vía tax ID match)
-- **Destino**: BigQuery `nubox_conformed` (ventas y compras conformadas con FKs canónicos)
-
-### Fase C — Postgres Projection
-
-- **Endpoint interno**: `sync-nubox-to-postgres.ts`
-- **Destino**: Tablas operativas de `greenhouse_finance` en PostgreSQL
-
-### Cliente HTTP
-
-| Config | Valor |
-|--------|-------|
-| Auth | Bearer token + API key (dual header) |
-| Retry | Automático en HTTP 429 y 5xx |
-| Paginación | Automática (cursor-based) |
-| Timeout | Configurable por request |
-
-### Tipos de documento Nubox
-
-| Tipo | Descripción | Campos clave |
-|------|-------------|-------------|
-| Sale | DTE emitido (factura, boleta, NC, ND) | folio, dte_type, net/exempt/tax/total amounts, emission_date, client RUT |
-| Purchase | DTE recibido | folio, dte_type, amounts, emission_date, supplier RUT |
-| Expense | Egreso bancario | folio, bank, payment_method, supplier, total_amount, payment_date |
-| Income | Ingreso bancario | folio, bank, payment_method, client, total_amount, payment_date |
-
-### Emisión de documentos
-
-`emission.ts` — Generación de documentos tributarios a través de la API de Nubox (facturación electrónica).
 
 ---
 
-## 9. Space-Notion Mapping *(nuevo)*
+## 13. Nexa AI Agent Framework *(nuevo)*
 
 ### Rol
 
-Formaliza la relación entre Spaces (tenants operativos) y workspaces/databases de Notion. Reemplaza el campo legacy `notionProjectIds` de `clients` con un modelo relacional.
+Integración con Nexa, framework de agentes GenAI interno de Greenhouse.
 
-### Store
+### Ubicación
 
-`src/lib/space-notion/space-notion-store.ts`
+`src/lib/nexa/` con componentes:
+- `NeXA Chat Adapter` — Custom adapter para `@assistant-ui/react`
+- `NeXA Model Config` — Configuración de modelos (gemini-2.5-flash, etc.)
+- `NeXA Tools Registry` — Herramientas disponibles para el agente
 
-### Datos mapeados por Space
+### Endpoint
 
-| Campo | Descripción |
-|-------|-------------|
-| `notion_db_proyectos` | Notion database ID de proyectos |
-| `notion_db_tareas` | Notion database ID de tareas |
-| `notion_db_sprints` | Notion database ID de sprints |
-| `notion_db_revisiones` | Notion database ID de revisiones |
-| `notion_workspace_id` | Workspace ID de Notion |
-| `sync_enabled` | Flag de sincronización |
-| `sync_frequency` | `daily`, `weekly`, `monthly` |
-| `last_synced_at` | Última sincronización |
+`POST /api/ai-tools/chat` — Chat bidireccional con streaming
 
-### Funciones
+### Modelos soportados
 
-- `getSpaceNotionSource(spaceId)` — Obtener mapping de un espacio
-- `getSpaceNotionSourceByClientId(clientId)` — Resolver vía bridge legacy `client_id → space_id → notion_source`
-- `getActiveSpaceNotionSources()` — Todos los mappings habilitados
-
----
-
-## 10. HubSpot — Bidireccional vía Organizations *(actualización)*
-
-Además del flujo original (HubSpot → Greenhouse), ahora existe sincronización bidireccional a través del módulo Organizations:
-
-- **`POST /api/organizations/[id]/hubspot-sync`** — Trigger manual de sync desde la UI de Organizations
-- El sync puede actualizar datos de la organización desde HubSpot Company y viceversa
-- La resolución de identidad `ensureOrganizationForSupplier()` puede crear organizaciones nuevas y vincularlas con HubSpot Companies existentes
+- `gemini-2.5-flash` (default)
+- `gemini-2.0-pro`
+- Otros según `GREENHOUSE_AGENT_MODEL`
 
 ---
 
@@ -412,12 +577,16 @@ Además del flujo original (HubSpot → Greenhouse), ahora existe sincronizació
 |--------|---|---------|-----------|-----------|
 | HubSpot | ↔ | BigQuery + PostgreSQL | Bootstrap SQL + Integration API + Org sync | On-demand / sync |
 | Notion | → | BigQuery | Pipeline externo + Space-Notion mapping | Continuo |
-| Nubox | → | BigQuery → PostgreSQL | 3-phase sync (raw→conformed→postgres) | On-demand / cron |
+| Notion (gov) | → | PostgreSQL | Governance snapshots + validation | On-demand |
+| Nubox | → | BigQuery → PostgreSQL | 3-phase sync (raw→conformed→postgres) | Cron 02:00 UTC |
+| Previred | → | PostgreSQL | Sync de afiliaciones | Cron |
 | BigQuery | → | Portal (browser) | API routes server-side | Request-time |
 | BigQuery | → | BigQuery (ICO) | ICO Engine materialization | Cron periódico |
 | Portal | → | PostgreSQL | API routes (write) | Request-time |
 | PostgreSQL | → | BigQuery | Outbox consumer | Cada 5 min |
+| PostgreSQL | → | Notion | Report publication | On-demand / cron |
 | Exchange Rate service | → | PostgreSQL | Cron sync | Diario 23:05 UTC |
 | Microsoft Teams | → | PostgreSQL | Webhook | Real-time |
-| Microsoft Entra | → | PostgreSQL/BigQuery | OAuth callback (identity link) | On login |
+| Microsoft Entra | → | PostgreSQL/BigQuery | OAuth callback + SCIM | On login / provisioning |
 | Google OAuth | → | PostgreSQL/BigQuery | OAuth callback (identity link) | On login |
+| Sentry | ← | Error tracking | Exception capture + perf monitoring | Real-time |

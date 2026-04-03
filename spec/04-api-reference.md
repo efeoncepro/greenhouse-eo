@@ -1,15 +1,15 @@
 # Greenhouse Portal — Referencia de API Routes
 
-> Versión: 2.0
-> Fecha: 2026-03-22
-> Actualizado: Organizations, ICO Engine, Finance Intelligence, Nubox, Services, Identity Reconciliation routes
+> Versión: 2.1
+> Fecha: 2026-04-02
+> Actualizado: 324 routes en 16 categorías, SCIM 2.0, Integration auth, Cron auth, Finance Intelligence, Nubox Sync, Organizations CRUD, ICO Engine metrics
 
 ---
 
 ## Convenciones generales
 
 - Todas las rutas usan `export const dynamic = 'force-dynamic'` para evitar caching
-- Autenticación vía `getServerSession(authOptions)` en cada request
+- Autenticación vía `getServerSession(authOptions)` en cada request (excepto SCIM y Integration que usan bearer tokens)
 - Respuestas en JSON con `NextResponse.json()`
 - Errores estándar: 400 (bad request), 401 (no auth), 403 (forbidden), 404 (not found), 500 (server error)
 - Formato de error: `{ "error": "mensaje descriptivo" }`
@@ -17,7 +17,7 @@
 
 ---
 
-## 1. Autenticación
+## 1. Autenticación y Cuentas (5 routes)
 
 ### `POST/GET /api/auth/[...nextauth]`
 
@@ -26,9 +26,35 @@ Handler de NextAuth.js. Gestiona OAuth flows, callbacks, sesión y tokens.
 - **Auth**: No (es el propio endpoint de auth)
 - **Proveedores**: Credentials, Azure AD, Google OAuth
 
+### `POST /api/auth/logout`
+
+Cerrar sesión.
+
+- **Auth**: Sesión válida requerida
+
+### `GET /api/auth/session`
+
+Obtener sesión actual.
+
+- **Auth**: Sesión válida requerida
+- **Response**: `{ user: { email, name, roleCodes, [...] } }`
+
+### `PUT /api/auth/profile`
+
+Actualizar perfil de usuario (name, avatar).
+
+- **Auth**: Sesión válida requerida
+
+### `POST /api/auth/change-password`
+
+Cambiar contraseña (solo credentials).
+
+- **Auth**: Sesión válida requerida
+- **Body**: `{ currentPassword, newPassword }`
+
 ---
 
-## 2. Dashboard
+## 2. Dashboard (4 routes)
 
 ### `GET /api/dashboard/summary`
 
@@ -60,14 +86,15 @@ Proyectos en riesgo con attention score.
 
 ---
 
-## 3. Proyectos
+## 3. Proyectos y Sprints (8 routes)
 
 ### `GET /api/projects`
 
 Lista de proyectos del tenant.
 
 - **Auth**: `requireClientTenantContext()`
-- **Response**: `{ items: GreenhouseProjectListItem[], scope }`
+- **Query**: `page?`, `pageSize?`, `search?`, `status?`
+- **Response**: `{ items: GreenhouseProjectListItem[], total, page, pageSize, scope }`
 
 ### `GET /api/projects/[id]`
 
@@ -83,24 +110,60 @@ Tareas de un proyecto.
 
 - **Auth**: `requireClientTenantContext()` + `canAccessProject(tenant, id)`
 - **Params**: `id` (string) — ID del proyecto
+- **Query**: `status?`, `assignee?`, `page?`, `pageSize?`
 - **Response**: `{ tasks: GreenhouseProjectTaskItem[], projectId, projectName }`
+
+### `GET /api/sprints`
+
+Lista de sprints.
+
+- **Auth**: `requireClientTenantContext()`
+- **Response**: `{ items: SprintListItem[], total }`
+
+### `GET /api/sprints/[id]`
+
+Detalle de sprint.
+
+- **Auth**: `requireClientTenantContext()`
+- **Response**: `SprintDetail`
+
+### `POST /api/projects`
+
+Crear proyecto (admin only).
+
+- **Auth**: `requireAdminTenantContext()`
+- **Body**: `{ name, clientId, startDate, endDate }`
+
+### `PUT /api/projects/[id]`
+
+Actualizar proyecto.
+
+- **Auth**: `requireAdminTenantContext()`
+
+### `DELETE /api/projects/[id]`
+
+Archivar proyecto.
+
+- **Auth**: `requireAdminTenantContext()`
 
 ---
 
-## 4. Team
+## 4. Team & Capacity (8 routes)
 
 ### `GET /api/team/members`
 
 Miembros del equipo asignado al tenant.
 
 - **Auth**: `requireClientTenantContext()`
-- **Response**: `{ members: TeamMemberResponse[], totalFte, serviceLines[] }`
+- **Query**: `role?`, `capacity?`, `page?`, `pageSize?`
+- **Response**: `{ members: TeamMemberResponse[], totalFte, serviceLines[], totalMembers }`
 
 ### `GET /api/team/capacity`
 
 Capacidad y utilización del equipo.
 
 - **Auth**: `requireClientTenantContext()`
+- **Query**: `year?`, `month?`
 - **Response**: `TeamCapacityPayload` con summary, members, roleBreakdown, healthBuckets
 
 ### `GET /api/team/by-project/[projectId]`
@@ -119,16 +182,43 @@ Equipo activo en un sprint.
 - **Params**: `sprintId` (string)
 - **Response**: `TeamBySprintPayload`
 
+### `POST /api/admin/team/members`
+
+Crear miembro del equipo.
+
+- **Auth**: `requireAdminTenantContext()`
+- **Body**: `{ firstName, lastName, email, roleTitle, roleCategory, location }`
+
+### `PUT /api/admin/team/members/[memberId]`
+
+Actualizar miembro.
+
+- **Auth**: `requireAdminTenantContext()`
+
+### `POST /api/admin/team/members/[memberId]/deactivate`
+
+Desactivar miembro.
+
+- **Auth**: `requireAdminTenantContext()`
+
+### `POST /api/admin/team/assignments`
+
+Crear asignación de miembro a proyecto.
+
+- **Auth**: `requireAdminTenantContext()`
+- **Body**: `{ memberId, projectId, role, startDate, endDate }`
+
 ---
 
-## 5. People
+## 5. People & Organizations (34 routes)
 
 ### `GET /api/people`
 
 Directorio de personas del equipo.
 
 - **Auth**: `requirePeopleTenantContext()`
-- **Response**: `{ items: PersonListItem[], meta }`
+- **Query**: `search?`, `role?`, `location?`, `page?`, `pageSize?`
+- **Response**: `{ items: PersonListItem[], total, page, pageSize, meta }`
 
 ### `GET /api/people/meta`
 
@@ -169,9 +259,152 @@ Resumen financiero de una persona.
 - **Params**: `memberId` (string)
 - **Response**: `PersonFinanceOverview`
 
+### `GET /api/organizations`
+
+Lista de organizaciones con paginación y filtros.
+
+- **Auth**: `requireInternalTenantContext()`
+- **Query**: `search?`, `type?`, `country?`, `status?`, `page?`, `pageSize?`
+- **Response**: `{ items: OrganizationListItem[], total, page, pageSize }`
+
+### `POST /api/organizations`
+
+Crear organización.
+
+- **Auth**: `requireInternalTenantContext()`
+- **Body**: `{ name, taxId, type, country, industry? }`
+
+### `GET /api/organizations/[id]`
+
+Detalle de organización con spaces y people.
+
+- **Auth**: `requireInternalTenantContext()`
+- **Response**: `OrganizationDetail` (incluye spaces[], people[], finance, ico)
+
+### `PATCH /api/organizations/[id]`
+
+Actualizar datos de organización.
+
+- **Auth**: `requireInternalTenantContext()`
+- **Body**: Campos parciales de organización
+
+### `DELETE /api/organizations/[id]`
+
+Archivar organización.
+
+- **Auth**: `requireInternalTenantContext()`
+
+### `GET /api/organizations/[id]/memberships`
+
+Listar membresías de personas en la organización.
+
+- **Auth**: `requireInternalTenantContext()`
+- **Response**: `PersonMembership[]`
+
+### `POST /api/organizations/[id]/memberships`
+
+Crear membresía de persona en la organización.
+
+- **Auth**: `requireInternalTenantContext()`
+- **Body**: `{ profileId, membershipType, roleLabel?, department?, spaceId?, isPrimary? }`
+
+### `PUT /api/organizations/[id]/memberships/[membershipId]`
+
+Actualizar membresía.
+
+- **Auth**: `requireInternalTenantContext()`
+
+### `DELETE /api/organizations/[id]/memberships/[membershipId]`
+
+Remover membresía.
+
+- **Auth**: `requireInternalTenantContext()`
+
+### `GET /api/organizations/[id]/ico`
+
+Métricas ICO de la organización.
+
+- **Auth**: `requireInternalTenantContext()`
+
+### `GET /api/organizations/[id]/finance`
+
+Datos financieros de la organización.
+
+- **Auth**: `requireInternalTenantContext()`
+
+### `GET /api/organizations/[id]/economics`
+
+Análisis económico de la organización.
+
+- **Auth**: `requireInternalTenantContext()`
+
+### `GET /api/organizations/[id]/executive`
+
+Datos ejecutivos de la organización.
+
+- **Auth**: `requireInternalTenantContext()`
+
+### `GET /api/organizations/[id]/projects`
+
+Proyectos de la organización.
+
+- **Auth**: `requireInternalTenantContext()`
+
+### `POST /api/organizations/[id]/hubspot-sync`
+
+Trigger de sincronización HubSpot para la organización.
+
+- **Auth**: `requireInternalTenantContext()`
+
+### `GET /api/organizations/org-search`
+
+Búsqueda de organizaciones con autocomplete.
+
+- **Auth**: `requireInternalTenantContext()`
+- **Query**: `q` (string, min 2 chars)
+
+### `GET /api/organizations/people-search`
+
+Búsqueda de personas a través de organizaciones.
+
+- **Auth**: `requireInternalTenantContext()`
+- **Query**: `q` (string)
+
+### `GET /api/organizations/[id]/spaces`
+
+Espacios operativos de la organización.
+
+- **Auth**: `requireInternalTenantContext()`
+
+### `POST /api/organizations/[id]/spaces`
+
+Crear espacio operativo.
+
+- **Auth**: `requireInternalTenantContext()`
+
+### `GET /api/organizations/[id]/contacts`
+
+Contactos de la organización.
+
+- **Auth**: `requireInternalTenantContext()`
+
+### `GET /api/person-360/identity`
+
+Perfil de identidad de una persona (360).
+
+- **Auth**: `requireInternalTenantContext()`
+- **Query**: `profileId` (required)
+
+### `GET /api/person-360/intelligence`
+
+Inteligencia agregada sobre una persona.
+
+- **Auth**: `requireInternalTenantContext()`
+- **Query**: `profileId` (required)
+
 ---
 
-## 6. HR Core
+## 6. HR Core (15 routes)
 
 ### `GET /api/hr/core/meta`
 
@@ -187,12 +420,18 @@ Perfil HR de un miembro.
 - **Auth**: `requireHrTenantContext()`
 - **Params**: `memberId` (string)
 
-### `GET/PUT /api/hr/core/members/[memberId]/profile`
+### `GET /api/hr/core/members/[memberId]/profile`
 
-Leer o actualizar perfil HR extendido.
+Perfil HR extendido de un miembro.
 
 - **Auth**: `requireHrTenantContext()`
-- **PUT Body**: Campos de perfil (skills, tools, job_level, etc.)
+
+### `PUT /api/hr/core/members/[memberId]/profile`
+
+Actualizar perfil HR extendido.
+
+- **Auth**: `requireHrTenantContext()`
+- **Body**: Campos de perfil (skills, tools, job_level, etc.)
 
 ### `GET /api/hr/core/departments`
 
@@ -201,19 +440,43 @@ Lista de departamentos.
 - **Auth**: `requireHrTenantContext()`
 - **Response**: `HrDepartment[]`
 
-### `GET/PUT/DELETE /api/hr/core/departments/[departmentId]`
+### `POST /api/hr/core/departments`
 
-CRUD de departamento.
+Crear departamento.
+
+- **Auth**: `requireHrTenantContext()`
+
+### `GET /api/hr/core/departments/[departmentId]`
+
+Detalle de departamento.
 
 - **Auth**: `requireHrTenantContext()`
 
-### `GET/POST /api/hr/core/attendance`
+### `PUT /api/hr/core/departments/[departmentId]`
 
-Listar o registrar asistencia.
+Actualizar departamento.
 
 - **Auth**: `requireHrTenantContext()`
-- **Query**: `memberId?`, `dateFrom?`, `dateTo?`, `status?`
-- **POST Body**: `{ memberId, attendanceDate, status, sourceSystem?, minutesPresent? }`
+
+### `DELETE /api/hr/core/departments/[departmentId]`
+
+Eliminar departamento.
+
+- **Auth**: `requireHrTenantContext()`
+
+### `GET /api/hr/core/attendance`
+
+Listar asistencia.
+
+- **Auth**: `requireHrTenantContext()`
+- **Query**: `memberId?`, `dateFrom?`, `dateTo?`, `status?`, `page?`, `pageSize?`
+
+### `POST /api/hr/core/attendance`
+
+Registrar asistencia.
+
+- **Auth**: `requireHrTenantContext()`
+- **Body**: `{ memberId, attendanceDate, status, sourceSystem?, minutesPresent? }`
 
 ### `POST /api/hr/core/attendance/webhook/teams`
 
@@ -226,45 +489,50 @@ Webhook para integración con Microsoft Teams (attendance automática).
 Saldos de permisos.
 
 - **Auth**: `requireHrTenantContext()`
-- **Query**: `memberId?`, `year?`
-- **Response**: `HrLeaveBalance[]`
+- **Query**: `memberId?`, `year?`, `page?`, `pageSize?`
 
-### `GET/POST /api/hr/core/leave/requests`
+### `GET /api/hr/core/leave/requests`
 
-Listar o crear solicitudes de permiso.
-
-- **Auth**: `requireHrTenantContext()`
-- **Query**: `memberId?`, `status?`, `dateFrom?`, `dateTo?`
-- **POST Body**: `{ memberId, leaveTypeCode, startDate, endDate, notes? }`
-
-### `GET/PUT/DELETE /api/hr/core/leave/requests/[requestId]`
-
-CRUD de solicitud de permiso.
+Listar solicitudes de permiso.
 
 - **Auth**: `requireHrTenantContext()`
+- **Query**: `memberId?`, `status?`, `dateFrom?`, `dateTo?`, `page?`, `pageSize?`
 
-### `POST /api/hr/core/leave/requests/[requestId]/review`
+### `POST /api/hr/core/leave/requests`
 
-Aprobar o rechazar una solicitud.
+Crear solicitud de permiso.
 
 - **Auth**: `requireHrTenantContext()`
-- **Body**: `{ action: 'approve' | 'reject', notes? }`
+- **Body**: `{ memberId, leaveTypeCode, startDate, endDate, notes? }`
 
 ---
 
-## 7. HR Payroll
+## 7. HR Payroll (22 routes)
 
-### `GET/POST /api/hr/payroll/periods`
+### `GET /api/hr/payroll/periods`
 
-Listar o crear períodos de nómina.
+Listar períodos de nómina.
 
 - **Auth**: `requireHrTenantContext()`
-- **POST Body**: `{ year, month }`
+- **Query**: `year?`, `month?`, `status?`, `page?`, `pageSize?`
 - **Response**: `PayrollPeriod[]`
 
-### `GET/PUT /api/hr/payroll/periods/[periodId]`
+### `POST /api/hr/payroll/periods`
 
-Detalle o actualización de período.
+Crear período de nómina.
+
+- **Auth**: `requireHrTenantContext()`
+- **Body**: `{ year, month }`
+
+### `GET /api/hr/payroll/periods/[periodId]`
+
+Detalle de período.
+
+- **Auth**: `requireHrTenantContext()`
+
+### `PUT /api/hr/payroll/periods/[periodId]`
+
+Actualización de período.
 
 - **Auth**: `requireHrTenantContext()`
 
@@ -278,6 +546,12 @@ Calcular nómina del período.
 ### `POST /api/hr/payroll/periods/[periodId]/approve`
 
 Aprobar período de nómina.
+
+- **Auth**: `requireHrTenantContext()`
+
+### `POST /api/hr/payroll/periods/[periodId]/reject`
+
+Rechazar período.
 
 - **Auth**: `requireHrTenantContext()`
 
@@ -308,15 +582,28 @@ Exportar período (formato genérico).
 
 - **Auth**: `requireHrTenantContext()`
 
-### `GET/POST /api/hr/payroll/entries`
+### `GET /api/hr/payroll/entries`
 
-Listar entries o crear entry manual.
+Listar entries.
+
+- **Auth**: `requireHrTenantContext()`
+- **Query**: `periodId?`, `memberId?`, `page?`, `pageSize?`
+
+### `POST /api/hr/payroll/entries`
+
+Crear entry manual.
 
 - **Auth**: `requireHrTenantContext()`
 
-### `GET/PUT /api/hr/payroll/entries/[entryId]`
+### `GET /api/hr/payroll/entries/[entryId]`
 
-Detalle o actualización de entry.
+Detalle de entry.
+
+- **Auth**: `requireHrTenantContext()`
+
+### `PUT /api/hr/payroll/entries/[entryId]`
+
+Actualización de entry.
 
 - **Auth**: `requireHrTenantContext()`
 
@@ -326,9 +613,15 @@ Generar recibo de pago individual.
 
 - **Auth**: `requireHrTenantContext()`
 
-### `GET/POST /api/hr/payroll/compensation`
+### `GET /api/hr/payroll/compensation`
 
-Listar o crear versiones de compensación.
+Listar versiones de compensación.
+
+- **Auth**: `requireHrTenantContext()`
+
+### `POST /api/hr/payroll/compensation`
+
+Crear versión de compensación.
 
 - **Auth**: `requireHrTenantContext()`
 
@@ -358,179 +651,79 @@ Historial de payroll de un miembro.
 
 ---
 
-## 8. Finance
+## 8. Finance (52 routes)
 
-### `GET/POST /api/finance/accounts`
+### Accounts
 
-Listar o crear cuentas financieras.
-
-- **Auth**: `requireFinanceTenantContext()`
-
-### `GET/PUT /api/finance/accounts/[id]`
-
-Detalle o actualización de cuenta.
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/finance/accounts` | GET, POST | Listar/crear cuentas |
+| `/api/finance/accounts/[id]` | GET, PUT, DELETE | CRUD |
 
 - **Auth**: `requireFinanceTenantContext()`
 
-### `GET/POST /api/finance/income`
+### Income
 
-Listar o crear registros de ingreso.
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/finance/income` | GET, POST | Listar/crear ingresos |
+| `/api/finance/income/[id]` | GET, PUT, DELETE | CRUD |
+| `/api/finance/income/[id]/payment` | POST | Registrar pago |
+| `/api/finance/income/summary` | GET | Resumen |
+| `/api/finance/income/meta` | GET | Metadata |
 
-- **Auth**: `requireFinanceTenantContext()`
-- **Query**: `clientId?`, `status?`, `serviceLine?`, `fromDate?`, `toDate?`, `page?`, `pageSize?`
-- **Response**: `{ items: IncomeRecord[], total, page, pageSize }`
-
-### `GET/PUT /api/finance/income/[id]`
-
-Detalle o actualización de ingreso.
-
-- **Auth**: `requireFinanceTenantContext()`
-
-### `POST /api/finance/income/[id]/payment`
-
-Registrar pago de un ingreso.
-
-- **Auth**: `requireFinanceTenantContext()`
-- **Body**: `{ paidDate, amount?, notes? }`
-
-### `GET /api/finance/income/summary`
-
-Resumen de ingresos.
+**Queries** (GET /income): `clientId?`, `status?`, `serviceLine?`, `fromDate?`, `toDate?`, `page?`, `pageSize?`
 
 - **Auth**: `requireFinanceTenantContext()`
 
-### `GET/POST /api/finance/expenses`
+### Expenses
 
-Listar o crear gastos.
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/finance/expenses` | GET, POST | Listar/crear gastos |
+| `/api/finance/expenses/[id]` | GET, PUT, DELETE | CRUD |
+| `/api/finance/expenses/bulk` | POST | Carga masiva |
+| `/api/finance/expenses/summary` | GET | Resumen |
+| `/api/finance/expenses/meta` | GET | Metadata |
+| `/api/finance/expenses/payroll-candidates` | GET | Candidatos para payroll |
 
-- **Auth**: `requireFinanceTenantContext()`
-- **Query**: `expenseType?`, `status?`, `clientId?`, `memberId?`, `supplierId?`, `serviceLine?`, `fromDate?`, `toDate?`, `page?`, `pageSize?`
-
-### `GET/PUT /api/finance/expenses/[id]`
-
-Detalle o actualización de gasto.
-
-- **Auth**: `requireFinanceTenantContext()`
-
-### `POST /api/finance/expenses/bulk`
-
-Carga masiva de gastos.
+**Queries**: `expenseType?`, `status?`, `clientId?`, `memberId?`, `supplierId?`, `serviceLine?`, `fromDate?`, `toDate?`, `page?`, `pageSize?`
 
 - **Auth**: `requireFinanceTenantContext()`
 
-### `GET /api/finance/expenses/summary`
+### Suppliers
 
-Resumen de gastos.
-
-- **Auth**: `requireFinanceTenantContext()`
-
-### `GET /api/finance/expenses/meta`
-
-Metadata de gastos (categorías, tipos).
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/finance/suppliers` | GET, POST | Listar/crear |
+| `/api/finance/suppliers/[id]` | GET, PUT, DELETE | CRUD |
 
 - **Auth**: `requireFinanceTenantContext()`
 
-### `GET /api/finance/expenses/payroll-candidates`
+### Exchange Rates
 
-Gastos candidatos para asociar a payroll.
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/finance/exchange-rates` | GET | Listar |
+| `/api/finance/exchange-rates/latest` | GET | Último |
+| `/api/finance/exchange-rates/sync` | POST | Sincronizar (cron) |
 
-- **Auth**: `requireFinanceTenantContext()`
+**Queries**: `fromDate?`, `toDate?`, `fromCurrency?`, `toCurrency?`
 
-### `GET/POST /api/finance/suppliers`
+- **Auth**: `requireFinanceTenantContext()` o `requireCronAuth()`
 
-Listar o crear proveedores.
+### Reconciliation
 
-- **Auth**: `requireFinanceTenantContext()`
-
-### `GET/PUT/DELETE /api/finance/suppliers/[id]`
-
-CRUD de proveedor.
-
-- **Auth**: `requireFinanceTenantContext()`
-
-### `GET/POST /api/finance/clients`
-
-Clientes financieros.
-
-- **Auth**: `requireFinanceTenantContext()`
-
-### `GET/PUT /api/finance/clients/[id]`
-
-Detalle de cliente financiero.
-
-- **Auth**: `requireFinanceTenantContext()`
-
-### `POST /api/finance/clients/sync`
-
-Sincronizar clientes desde HubSpot.
-
-- **Auth**: `requireFinanceTenantContext()`
-
-### `GET /api/finance/exchange-rates`
-
-Tipos de cambio.
-
-- **Auth**: `requireFinanceTenantContext()`
-- **Query**: `fromDate?`, `toDate?`
-
-### `GET /api/finance/exchange-rates/latest`
-
-Último tipo de cambio.
-
-- **Auth**: `requireFinanceTenantContext()`
-- **Query**: `fromCurrency`, `toCurrency`
-
-### `POST /api/finance/exchange-rates/sync`
-
-Sincronizar tipos de cambio (cron).
-
-- **Auth**: Cron secret verification
-
-### `GET/POST /api/finance/reconciliation`
-
-Sesiones de reconciliación.
-
-- **Auth**: `requireFinanceTenantContext()`
-
-### `GET/PUT/DELETE /api/finance/reconciliation/[id]`
-
-Gestión de sesión de reconciliación.
-
-- **Auth**: `requireFinanceTenantContext()`
-
-### `GET /api/finance/reconciliation/[id]/statements`
-
-Statements de una reconciliación.
-
-- **Auth**: `requireFinanceTenantContext()`
-
-### `GET /api/finance/reconciliation/[id]/candidates`
-
-Candidatos para matching.
-
-- **Auth**: `requireFinanceTenantContext()`
-
-### `POST /api/finance/reconciliation/[id]/match`
-
-Matchear items.
-
-- **Auth**: `requireFinanceTenantContext()`
-
-### `POST /api/finance/reconciliation/[id]/unmatch`
-
-Remover match.
-
-- **Auth**: `requireFinanceTenantContext()`
-
-### `POST /api/finance/reconciliation/[id]/auto-match`
-
-Auto-matching automático.
-
-- **Auth**: `requireFinanceTenantContext()`
-
-### `POST /api/finance/reconciliation/[id]/exclude`
-
-Excluir item de reconciliación.
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/finance/reconciliation` | GET, POST | Sesiones |
+| `/api/finance/reconciliation/[id]` | GET, PUT, DELETE | CRUD |
+| `/api/finance/reconciliation/[id]/statements` | GET | Statements |
+| `/api/finance/reconciliation/[id]/candidates` | GET | Candidatos |
+| `/api/finance/reconciliation/[id]/match` | POST | Match manual |
+| `/api/finance/reconciliation/[id]/unmatch` | POST | Remover match |
+| `/api/finance/reconciliation/[id]/auto-match` | POST | Auto-matching |
+| `/api/finance/reconciliation/[id]/exclude` | POST | Excluir |
 
 - **Auth**: `requireFinanceTenantContext()`
 
@@ -540,101 +733,33 @@ Excluir item de reconciliación.
 |------|--------|-------------|
 | `/api/finance/dashboard/summary` | GET | Resumen financiero |
 | `/api/finance/dashboard/cashflow` | GET | Flujo de caja |
-| `/api/finance/dashboard/aging` | GET | Aging de cuentas por cobrar |
-| `/api/finance/dashboard/by-service-line` | GET | Breakdown por línea de servicio |
+| `/api/finance/dashboard/aging` | GET | Aging de CxC |
+| `/api/finance/dashboard/by-service-line` | GET | Breakdown por línea |
 
-### Finance Intelligence *(nuevo)*
+- **Auth**: `requireFinanceTenantContext()`
+
+### Finance Intelligence
 
 | Ruta | Método | Descripción |
 |------|--------|-------------|
-| `/api/finance/intelligence/client-economics` | GET | Métricas de rentabilidad por cliente |
-| `/api/finance/intelligence/client-economics/trend` | GET | Tendencia de rentabilidad en el tiempo |
+| `/api/finance/intelligence/client-economics` | GET | Rentabilidad por cliente |
+| `/api/finance/intelligence/client-economics/trend` | GET | Tendencia en el tiempo |
 | `/api/finance/intelligence/allocations` | GET | Allocaciones de costos |
 
 - **Auth**: `requireFinanceTenantContext()`
 
-### Nubox Sync *(nuevo)*
+### Nubox Sync
 
-### `POST /api/finance/nubox/sync`
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/finance/nubox/sync` | POST | Orquestar sincronización |
+| `/api/finance/nubox/sync-status` | GET | Status del último sync |
 
-Orquestar sincronización de 3 fases (raw → conformed → postgres).
-
-- **Auth**: `requireFinanceTenantContext()`
-- **Body**: `{ periods?: string[] }` (opcional, para backfill histórico)
-- **Max Duration**: 120s
-- **Response**: `{ phase, status, rawCount, conformedCount, postgresCount, errors[] }`
-
-### `GET /api/finance/nubox/sync-status`
-
-Status del último sync run.
-
-- **Auth**: `requireFinanceTenantContext()`
+- **Auth**: `requireFinanceTenantContext()` o `requireCronAuth()`
 
 ---
 
-## 9. Organizations (Account 360) *(nuevo)*
-
-### `GET /api/organizations`
-
-Lista de organizaciones con paginación y filtros.
-
-- **Auth**: `requireInternalTenantContext()`
-- **Query**: `search?`, `type?`, `country?`, `page?`, `pageSize?`
-- **Response**: `{ items: OrganizationListItem[], total, page, pageSize }`
-
-### `GET /api/organizations/[id]`
-
-Detalle de organización con spaces y people.
-
-- **Auth**: `requireInternalTenantContext()`
-- **Response**: `OrganizationDetail` (incluye spaces[], people[])
-
-### `PATCH /api/organizations/[id]`
-
-Actualizar datos de organización.
-
-- **Auth**: `requireInternalTenantContext()`
-
-### `GET/POST /api/organizations/[id]/memberships`
-
-Listar o crear membresías de personas en la organización.
-
-- **Auth**: `requireInternalTenantContext()`
-- **POST Body**: `{ profileId, membershipType, roleLabel?, department?, spaceId?, isPrimary? }`
-
-### `GET /api/organizations/[id]/ico`
-
-Métricas ICO de la organización.
-
-- **Auth**: `requireInternalTenantContext()`
-
-### `GET /api/organizations/[id]/finance`
-
-Datos financieros de la organización.
-
-- **Auth**: `requireInternalTenantContext()`
-
-### `POST /api/organizations/[id]/hubspot-sync`
-
-Trigger de sincronización HubSpot para la organización.
-
-- **Auth**: `requireInternalTenantContext()`
-
-### `GET /api/organizations/org-search`
-
-Búsqueda de organizaciones.
-
-- **Auth**: `requireInternalTenantContext()`
-
-### `GET /api/organizations/people-search`
-
-Búsqueda de personas a través de organizaciones.
-
-- **Auth**: `requireInternalTenantContext()`
-
----
-
-## 10. ICO Engine *(nuevo)*
+## 9. ICO Engine (8 routes)
 
 ### `GET /api/ico-engine/metrics`
 
@@ -684,7 +809,7 @@ Contexto de espacio/proyecto.
 Lista de tareas estancadas (72h+ sin movimiento).
 
 - **Auth**: `requireAgencyTenantContext()`
-- **Query**: `spaceId` (required)
+- **Query**: `spaceId` (required), `severity?`, `page?`, `pageSize?`
 - **Response**: `StuckAssetDetail[]`
 
 ### `GET /api/ico-engine/trends/rpa`
@@ -696,7 +821,7 @@ Tendencia de RPA últimos 12 meses.
 
 ---
 
-## 11. Services *(nuevo)*
+## 10. Services (4 routes)
 
 ### `GET /api/agency/services`
 
@@ -717,6 +842,7 @@ Detalle de servicio con historial.
 Crear servicio.
 
 - **Auth**: `requireAgencyTenantContext()`
+- **Body**: `{ spaceId, organizationId, name, serviceLine, ... }`
 - **Response**: `{ serviceId, publicId, created }`
 
 ### `PUT /api/agency/services/[id]`
@@ -724,10 +850,11 @@ Crear servicio.
 Actualizar servicio (field-level history tracking).
 
 - **Auth**: `requireAgencyTenantContext()`
+- **Body**: Campos parciales de servicio
 
 ---
 
-## 12. Capabilities
+## 11. Capabilities (3 routes)
 
 ### `GET /api/capabilities/resolve`
 
@@ -744,9 +871,15 @@ Datos de un módulo de capability específico.
 - **Params**: `moduleId` (string)
 - **Response**: `CapabilityModuleData`
 
+### `GET /api/capabilities/meta`
+
+Metadata de capabilities (módulos disponibles).
+
+- **Auth**: `requireClientTenantContext()`
+
 ---
 
-## 13. Agency
+## 12. Agency (7 routes)
 
 ### `GET /api/agency/pulse`
 
@@ -760,6 +893,7 @@ Health pulse de la agencia.
 Lista de espacios/cuentas con indicadores de salud.
 
 - **Auth**: `requireAgencyTenantContext()`
+- **Query**: `search?`, `status?`, `page?`, `pageSize?`
 - **Response**: `AgencySpaceHealth[]`
 
 ### `GET /api/agency/capacity`
@@ -769,188 +903,364 @@ Capacidad de la agencia.
 - **Auth**: `requireAgencyTenantContext()`
 - **Response**: `AgencyCapacityOverview`
 
----
+### `GET /api/agency/performance`
 
-## 14. AI Credits
+Métricas de desempeño agregadas.
 
-### `GET /api/ai-credits/wallets`
+- **Auth**: `requireAgencyTenantContext()`
 
-Wallets de créditos AI.
+### `GET /api/agency/projects`
 
-- **Auth**: `requireAiToolingTenantContext()` (read)
-- **Query**: `clientId?`, `toolId?`
+Proyectos de la agencia.
 
-### `GET /api/ai-credits/summary`
+- **Auth**: `requireAgencyTenantContext()`
+- **Query**: `spaceId?`, `status?`, `page?`, `pageSize?`
 
-Resumen de wallets.
+### `GET /api/agency/teams`
 
-- **Auth**: `requireAiToolingTenantContext()` (read)
+Equipos de la agencia.
 
-### `GET /api/ai-credits/ledger`
+- **Auth**: `requireAgencyTenantContext()`
 
-Movimientos del ledger.
+### `GET /api/agency/operations`
 
-- **Auth**: `requireAiToolingTenantContext()` (read)
-- **Query**: `walletId` (required), `entryType?`, `dateFrom?`, `dateTo?`, `memberId?`, `limit?`, `offset?`
+Datos operativos agregados.
 
-### `POST /api/ai-credits/consume`
-
-Consumir créditos.
-
-- **Auth**: `requireAiToolingTenantContext()` (operator)
-
-### `POST /api/ai-credits/reload`
-
-Recargar créditos.
-
-- **Auth**: `requireAiToolingTenantContext()` (operator)
+- **Auth**: `requireAgencyTenantContext()`
 
 ---
 
-## 15. AI Tools (user-facing)
+## 13. AI Credits & Tools (13 routes)
 
-### `GET /api/ai-tools/catalog`
-
-Catálogo de herramientas AI.
-
-- **Auth**: `requireAiToolingTenantContext()`
-
-### `GET /api/ai-tools/licenses`
-
-Licencias de herramientas AI.
-
-- **Auth**: `requireAiToolingTenantContext()`
-
----
-
-## 16. Admin
-
-### Admin — Tenants
+### Credits
 
 | Ruta | Método | Descripción |
 |------|--------|-------------|
-| `/api/admin/tenants/[id]/capabilities` | GET | Capabilities del tenant |
-| `/api/admin/tenants/[id]/capabilities` | PUT | Actualizar capabilities |
-| `/api/admin/tenants/[id]/capabilities/sync` | POST | Sincronizar desde fuente |
+| `/api/ai-credits/wallets` | GET | Listar wallets |
+| `/api/ai-credits/summary` | GET | Resumen |
+| `/api/ai-credits/ledger` | GET | Movimientos |
+| `/api/ai-credits/consume` | POST | Consumir |
+| `/api/ai-credits/reload` | POST | Recargar |
+
+**Queries** (GET /ledger): `walletId` (required), `entryType?`, `dateFrom?`, `dateTo?`, `memberId?`, `limit?`, `offset?`
+
+- **Auth**: `requireAiToolingTenantContext()`
+
+### Tools Catalog
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/ai-tools/catalog` | GET | Catálogo |
+| `/api/ai-tools/licenses` | GET | Licencias |
+| `/api/ai-tools/meta` | GET | Metadata |
+
+- **Auth**: `requireAiToolingTenantContext()`
+
+### Admin AI Tools
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/admin/ai-tools/catalog` | GET, POST | Listar/crear |
+| `/api/admin/ai-tools/catalog/[toolId]` | GET, PUT, DELETE | CRUD |
+| `/api/admin/ai-tools/licenses` | GET, POST | Listar/crear |
+| `/api/admin/ai-tools/licenses/[licenseId]` | GET, PUT, DELETE | CRUD |
+| `/api/admin/ai-tools/wallets` | GET, POST | Listar/crear |
+| `/api/admin/ai-tools/wallets/[walletId]` | GET, PUT, DELETE | CRUD |
+
+- **Auth**: `requireAdminTenantContext()`
+
+---
+
+## 14. Admin (79 routes)
+
+### Tenants Management
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/admin/tenants` | GET, POST | Listar/crear |
+| `/api/admin/tenants/[id]` | GET, PUT, DELETE | CRUD |
+| `/api/admin/tenants/[id]/capabilities` | GET, PUT | CRUD capabilities |
+| `/api/admin/tenants/[id]/capabilities/sync` | POST | Sync desde HubSpot |
 | `/api/admin/tenants/[id]/contacts/provision` | POST | Provisionar contactos |
 | `/api/admin/tenants/[id]/logo` | POST | Subir logo |
+| `/api/admin/tenants/[id]/business-lines` | GET | Líneas de negocio |
+| `/api/admin/tenants/[id]/operational-calendar` | GET, PUT | Calendario operativo |
 
-- **Auth**: `requireAdminTenantContext()`
-
-### Admin — Users
+### Users Management
 
 | Ruta | Método | Descripción |
 |------|--------|-------------|
-| `/api/admin/users/[id]/roles` | GET | Roles del usuario |
-| `/api/admin/users/[id]/roles` | PUT | Actualizar roles |
+| `/api/admin/users` | GET | Listar usuarios |
+| `/api/admin/users/[id]` | GET, PUT | Leer/actualizar |
+| `/api/admin/users/[id]/roles` | GET, PUT | Gestión de roles |
 | `/api/admin/users/[id]/avatar` | POST | Subir avatar |
+| `/api/admin/users/[id]/deactivate` | POST | Desactivar |
 
-- **Auth**: `requireAdminTenantContext()`
-
-### Admin — AI Tools
-
-| Ruta | Método | Descripción |
-|------|--------|-------------|
-| `/api/admin/ai-tools/catalog` | GET | Catálogo admin |
-| `/api/admin/ai-tools/catalog/[toolId]` | GET, PUT, DELETE | CRUD tool |
-| `/api/admin/ai-tools/licenses` | GET, POST | Listar/crear licencias |
-| `/api/admin/ai-tools/licenses/[licenseId]` | GET, PUT, DELETE | CRUD licencia |
-| `/api/admin/ai-tools/wallets` | GET, POST | Listar/crear wallets |
-| `/api/admin/ai-tools/wallets/[walletId]` | GET, PUT, DELETE | CRUD wallet |
-| `/api/admin/ai-tools/meta` | GET | Metadata |
-
-- **Auth**: `requireAdminTenantContext()`
-
-### Admin — Team
+### Roles Management
 
 | Ruta | Método | Descripción |
 |------|--------|-------------|
-| `/api/admin/team/members` | GET, POST | Listar/crear miembros |
-| `/api/admin/team/members/[memberId]` | GET, PUT, DELETE | CRUD miembro |
-| `/api/admin/team/members/[memberId]/deactivate` | POST | Desactivar miembro |
-| `/api/admin/team/assignments` | GET, POST | Listar/crear asignaciones |
-| `/api/admin/team/assignments/[assignmentId]` | GET, PUT, DELETE | CRUD asignación |
+| `/api/admin/roles` | GET | Catálogo de roles |
+| `/api/admin/roles/[roleId]` | GET | Detalle de rol |
+
+### Team Admin
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/admin/team/members` | GET, POST | Listar/crear |
+| `/api/admin/team/members/[memberId]` | GET, PUT, DELETE | CRUD |
+| `/api/admin/team/members/[memberId]/deactivate` | POST | Desactivar |
+| `/api/admin/team/assignments` | GET, POST | Listar/crear |
+| `/api/admin/team/assignments/[assignmentId]` | GET, PUT, DELETE | CRUD |
 | `/api/admin/team/meta` | GET | Metadata |
 
+### Cloud Integrations
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/admin/cloud-integrations` | GET | Estado de integraciones |
+| `/api/admin/cloud-integrations/[id]/sync` | POST | Trigger sync |
+
+### Email Delivery & Notifications
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/admin/email/templates` | GET, POST | Listar/crear |
+| `/api/admin/email/templates/[id]` | GET, PUT, DELETE | CRUD |
+| `/api/admin/email/subscriptions` | GET, PUT | Gestión |
+| `/api/admin/notifications/channels` | GET, POST | Canales |
+
+### Operational Calendar
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/admin/operational-calendar/holidays` | GET, POST | Gestión feriados |
+| `/api/admin/operational-calendar/business-days` | GET | Días de negocio |
+
+### SCIM Tenant Mappings
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/admin/scim-tenant-mappings` | GET, POST | Listar/crear |
+| `/api/admin/scim-tenant-mappings/[id]` | GET, PUT, DELETE | CRUD |
+
+### Ops Health & Monitoring
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/admin/ops-health/status` | GET | Status general |
+| `/api/admin/ops-health/alerts` | GET | Alertas activas |
+| `/api/admin/ops-health/logs` | GET | Logs operativos |
+
+### Views Registry
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/admin/views` | GET | Registro de vistas |
+| `/api/admin/views/[viewPath]/access` | GET | Control de acceso |
+
 - **Auth**: `requireAdminTenantContext()`
 
 ---
 
-## 17. Integrations
+## 15. SCIM 2.0 (6 routes)
 
-### `GET /api/integrations/v1/tenants`
+### `/api/scim/v2/Users`
 
-Lista de tenants para integración externa.
+- **GET** — Listar usuarios (con paginación y filtros)
+- **POST** — Crear usuario
+- **Auth**: `requireScimTenantAuth()` (Bearer token)
 
-- **Auth**: `requireIntegrationRequest()`
-- **Query**: `clientId?`, `publicId?`, `sourceSystem?`, `sourceObjectType?`, `sourceObjectId?`, `updatedSince?`, `limit?`
-- **Response**: `{ exportedAt, count, items[] }`
+### `/api/scim/v2/Users/[id]`
 
-### `GET /api/integrations/v1/catalog/capabilities`
+- **GET** — Obtener usuario
+- **PUT** — Actualizar usuario (reemplazo)
+- **PATCH** — Actualizar parcial
+- **DELETE** — Eliminar usuario
+- **Auth**: `requireScimTenantAuth()`
 
-Catálogo de capabilities disponibles.
+### `/api/scim/v2/Groups`
 
-- **Auth**: `requireIntegrationRequest()`
+- **GET** — Listar grupos
+- **POST** — Crear grupo
+- **Auth**: `requireScimTenantAuth()`
 
-### `POST /api/integrations/v1/tenants/capabilities/sync`
+### `/api/scim/v2/Groups/[id]`
 
-Sincronizar capabilities de un tenant desde integración.
+- **GET** — Obtener grupo
+- **PUT** — Actualizar grupo
+- **PATCH** — Actualizar parcial
+- **DELETE** — Eliminar grupo
+- **Auth**: `requireScimTenantAuth()`
 
-- **Auth**: `requireIntegrationRequest()`
+### `/api/scim/v2/Schemas`
+
+- **GET** — Definiciones de schemas SCIM
+- **Auth**: `requireScimTenantAuth()`
+
+### `/api/scim/v2/ServiceProviderConfig`
+
+- **GET** — Configuración del proveedor SCIM
+- **Auth**: `requireScimTenantAuth()`
 
 ---
 
-## 18. Internal
+## 16. Integrations & Webhooks (17 routes)
 
-### `GET/POST /api/internal/greenhouse-agent`
+### Integration API (External)
 
-Agente AI de Greenhouse (Vertex AI).
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/integrations/v1/tenants` | GET | Listar tenants |
+| `/api/integrations/v1/catalog/capabilities` | GET | Catálogo |
+| `/api/integrations/v1/tenants/capabilities/sync` | POST | Sync capabilities |
+| `/api/integrations/v1/health` | GET | Health check |
+
+- **Auth**: `requireIntegrationRequest()` (API key)
+
+### Webhooks Inbound (Handlers)
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/webhooks/inbound/hubspot` | POST | Inbound HubSpot |
+| `/api/webhooks/inbound/nubox` | POST | Inbound Nubox |
+| `/api/webhooks/inbound/notion` | POST | Inbound Notion |
+| `/api/webhooks/inbound/custom` | POST | Custom webhook |
+
+- **Auth**: Verificación de firma (HMAC)
+
+### Webhooks Internal (Dispatch)
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/webhooks/dispatch` | POST | Dispatch a suscriptores |
+
+- **Auth**: `requireInternalTenantContext()`
+
+### Notion Governance
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/integrations/notion/sync-governance` | POST | Sync governance |
+| `/api/integrations/notion/contract` | GET | Contrato |
+
+- **Auth**: `requireInternalTenantContext()`
+
+### HubSpot Sync
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/integrations/hubspot/sync` | POST | Trigger sync |
+| `/api/integrations/hubspot/status` | GET | Status |
+
+- **Auth**: `requireInternalTenantContext()`
+
+---
+
+## 17. Cron (25 routes)
+
+### Outbox & Events
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/cron/outbox-publish` | POST | Publicar eventos |
+| `/api/cron/outbox-status` | GET | Status |
+
+### Materialization
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/cron/ico-materialize` | POST | Materializar ICO |
+| `/api/cron/sync-conformed` | POST | Sync conformed |
+
+### Finance & Sync
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/finance/economic-indicators/sync` | POST | Sync indicadores |
+| `/api/finance/nubox/sync` | POST | Sync Nubox |
+| `/api/cron/exchange-rates/sync` | POST | Sync tipos cambio |
+
+### Webhook & Notification
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/cron/webhook-dispatch` | POST | Dispatch webhooks |
+| `/api/cron/notifications/send` | POST | Enviar notificaciones |
+
+### Jobs & Health
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/cron/jobs/status` | GET | Status de jobs |
+| `/api/cron/health` | GET | Health check cron |
+
+- **Auth**: `requireCronAuth()` (CRON_SECRET)
+
+---
+
+## 18. Internal & Misc (14 routes)
+
+### Internal Agent
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/internal/greenhouse-agent` | GET, POST | Agente AI |
 
 - **Auth**: `requireInternalTenantContext()` o `requireAdminTenantContext()`
-- **GET Response**: `{ mode, model, location, projectId }` (runtime config)
-- **POST Body**: `{ prompt: string, mode?: 'plan' | 'execute', surface?, routePath?, existingFiles?, notes? }`
-- **POST Response**: `{ mode, model, reply }`
+
+### Media Serving
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/media/tenants/[id]/logo` | GET | Servir logo |
+| `/api/media/users/[id]/avatar` | GET | Servir avatar |
+
+- **Auth**: Session requerida
+
+### Health & Analytics
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/health` | GET | Health check general |
+| `/api/health/postgres` | GET | Health PostgreSQL |
+| `/api/health/bigquery` | GET | Health BigQuery |
+| `/api/analytics/usage` | GET | Estadísticas de uso |
+| `/api/analytics/performance` | GET | Métricas de performance |
+
+- **Auth**: `requireInternalTenantContext()` (algunos sin auth)
+
+### Version & Config
+
+| Ruta | Método | Descripción |
+|------|--------|-------------|
+| `/api/version` | GET | Versión del portal |
+| `/api/config/features` | GET | Feature flags |
+
+- **Auth**: No requerida (public)
 
 ---
 
-## 19. Media
+## Resumen de categorías
 
-### `GET /api/media/tenants/[id]/logo`
-
-Servir logo del tenant.
-
-- **Auth**: Session requerida
-- **Response**: Image buffer
-
-### `GET /api/media/users/[id]/avatar`
-
-Servir avatar del usuario.
-
-- **Auth**: Session requerida
-- **Response**: Image buffer
-
----
-
-## 20. Cron
-
-### `POST /api/cron/outbox-publish`
-
-Publicar eventos del outbox PostgreSQL hacia BigQuery.
-
-- **Auth**: Cron secret verification (`CRON_SECRET`)
-- **Frecuencia**: Cada 5 minutos (Vercel cron)
-- **Response**: `{ eventsRead, eventsPublished, eventsFailed, durationMs }`
-
-### `POST /api/cron/ico-materialize` *(nuevo)*
-
-Materializar métricas ICO Engine (snapshots, stuck assets, trends).
-
-- **Auth**: Cron secret verification (`CRON_SECRET`)
-- **Frecuencia**: Periódica (configurable)
-- **Response**: `{ spacesProcessed, snapshotsCreated, stuckAssetsRefreshed, durationMs }`
-
-### `POST /api/cron/sync-conformed` *(nuevo)*
-
-Sincronizar datos conformados desde fuentes externas.
-
-- **Auth**: Cron secret verification (`CRON_SECRET`)
+| Categoría | Routes | Auth |
+|-----------|--------|------|
+| Autenticación | 5 | NextAuth / Public |
+| Dashboard | 4 | Client tenant |
+| Proyectos | 8 | Client tenant |
+| Team & Capacity | 8 | Client/Internal/Admin |
+| People & Orgs | 34 | Internal/People viewer |
+| HR Core | 15 | HR tenant |
+| HR Payroll | 22 | HR tenant |
+| Finance | 52 | Finance tenant |
+| ICO Engine | 8 | Agency tenant |
+| Services | 4 | Agency tenant |
+| Capabilities | 3 | Client tenant |
+| Agency | 7 | Agency tenant |
+| AI Tools | 13 | AI tooling/Admin |
+| Admin | 79 | Admin tenant |
+| SCIM | 6 | SCIM bearer token |
+| Integrations | 17 | Integration API key / Internal |
+| Cron | 25 | CRON_SECRET |
+| Misc | 14 | Varies |
+| **TOTAL** | **324** | — |

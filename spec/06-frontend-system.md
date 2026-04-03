@@ -1,8 +1,8 @@
 # Greenhouse Portal — Sistema de UI / Frontend
 
-> Versión: 2.0
-> Fecha: 2026-03-22
-> Actualizado: Nuevas dependencias (Tiptap, React Email, PDF renderer, ExcelJS), Organizations UI, dynamic tabs pattern
+> Versión: 2.1
+> Fecha: 2026-04-02
+> Actualizado: Rutas completadas (55+ páginas), vistas de módulos (25+ directorios), componentes compartidos (40+), patrones AI con AssistantUI, PDF/Excel export, Rich text editor Tiptap
 
 ---
 
@@ -26,11 +26,144 @@
 | keen-slider | 6.8.6 | Carouseles |
 | cmdk | 1.1.1 | Command palette |
 | react-toastify | 11.0.5 | Notificaciones toast |
-| Tiptap | 3.14.0 | Rich text editing (editor extensible) |
+| Tiptap | 3.14.0 | Rich text editing (editor extensible, con color, list, placeholder, text-align, text-style, underline) |
 | React Email | — | Templates de email transaccional |
 | Resend | — | Envío de emails transaccionales |
 | @react-pdf/renderer | — | Generación de PDFs en React |
 | ExcelJS | — | Generación de archivos Excel |
+| @assistant-ui/react | — | AI Chat UI framework |
+
+---
+
+## Rutas de la aplicación
+
+### Grupos de rutas (Route Groups)
+
+#### Dashboard y navegación principal
+
+**`(dashboard)/`** — Layout compartido con navegación
+
+| Ruta | Componente | Descripción |
+|------|-----------|-------------|
+| `/dashboard` | `GreenhouseDashboard` | Dashboard ejecutivo |
+| `/settings` | `SettingsView` | Configuración del usuario |
+| `/notifications` | `NotificationsView` | Centro de notificaciones |
+| `/updates` | `UpdatesView` | Cambios y updates |
+| `/reviews` | `ReviewsView` | Reviews del sistema |
+| `/about` | `AboutView` | Acerca de |
+
+#### Mi área personal (`my/*`)
+
+| Ruta | Propósito |
+|------|----------|
+| `/my/assignments` | Asignaciones personales |
+| `/my/delivery` | Mi delivery/proyectos |
+| `/my/leave` | Solicitudes y saldo de licencias |
+| `/my/organization` | Mi contexto organizacional |
+| `/my/payroll` | Mi nómina y compensación |
+| `/my/performance` | Mi desempeño |
+| `/my/profile` | Mi perfil personal |
+
+#### Proyectos y campañas
+
+| Ruta | Propósito |
+|------|----------|
+| `/projects/[id]` | Detalle de proyecto |
+| `/sprints/[id]` | Detalle de sprint |
+| `/campaigns/[campaignId]` | Detalle de campaña |
+| `/proyectos/[id]` | Proyectos (versión ES) |
+| `/campanas/[campaignId]` | Campañas (versión ES) |
+
+#### Finanzas (12 páginas)
+
+| Ruta | Propósito |
+|------|----------|
+| `/finance/dashboard` | Dashboard financiero |
+| `/finance/income` | Ingresos |
+| `/finance/expenses` | Gastos |
+| `/finance/suppliers` | Proveedores |
+| `/finance/reconciliation` | Reconciliación |
+| `/finance/intelligence` | Intelligence y reporting |
+| `/finance/quotes` | Cotizaciones |
+| `/finance/purchase-orders` | Órdenes de compra |
+| `/finance/hes` | Hojas de especificación |
+| `/finance/clients` | Análisis de clientes |
+| `/finance/cost-allocations` | Asignación de costos |
+| `/finance/economics` | Economía y análisis |
+
+#### Recursos Humanos (4 páginas)
+
+| Ruta | Propósito |
+|------|----------|
+| `/hr/payroll` | Nómina y períodos |
+| `/hr/departments` | Departamentos |
+| `/hr/leave` | Gestión de licencias |
+| `/hr/attendance` | Asistencia |
+
+#### Agencia (10 páginas)
+
+| Ruta | Propósito |
+|------|----------|
+| `/agency/campaigns` | Campañas agencia |
+| `/agency/capacity` | Capacidad de equipo |
+| `/agency/delivery` | Delivery operativo |
+| `/agency/economics` | Economía agencia |
+| `/agency/operations` | Operaciones |
+| `/agency/organizations` | Organizaciones |
+| `/agency/services` | Servicios |
+| `/agency/spaces` | Espacios/cuentas |
+| `/agency/staff-augmentation` | Personal augmentation |
+| `/agency/team` | Equipo agencia |
+
+#### Admin (14 páginas)
+
+| Ruta | Propósito |
+|------|----------|
+| `/admin/ai-tools` | Herramientas de IA |
+| `/admin/business-lines` | Líneas de negocio |
+| `/admin/cloud-integrations` | Integraciones cloud |
+| `/admin/email-delivery` | Entrega de email |
+| `/admin/integrations` | Integraciones externas |
+| `/admin/notifications` | Configuración de notificaciones |
+| `/admin/operational-calendar` | Calendario operativo |
+| `/admin/ops-health` | Salud operacional |
+| `/admin/roles` | Roles y permisos |
+| `/admin/scim-tenant-mappings` | Mappings SCIM |
+| `/admin/team` | Gestión de equipo |
+| `/admin/tenants` | Configuración de tenants |
+| `/admin/users` | Gestión de usuarios |
+| `/admin/views` | Configuración de vistas |
+
+#### Personas y equipo
+
+| Ruta | Propósito |
+|------|----------|
+| `/people/[memberId]` | Perfil de persona |
+| `/capabilities/[moduleId]` | Detalle de capability |
+| `/equipo` | Lista de equipo (ES) |
+| `/analytics` | Analytics de personas |
+
+#### Interno
+
+| Ruta | Propósito |
+|------|----------|
+| `/internal/dashboard` | Dashboard interno |
+
+#### Desarrolladores
+
+| Ruta | Propósito |
+|------|----------|
+| `/developers/api` | Documentación de API |
+
+### Rutas de autenticación
+
+| Ruta | Propósito |
+|------|----------|
+| `/login` | Login |
+| `/reset-password` | Reset de password |
+| `/forgot-password` | Recuperación de password |
+| `/accept-invite` | Aceptar invitación |
+| `/access-denied` | Acceso denegado |
 
 ---
 
@@ -68,7 +201,7 @@ Componentes heredados de Vuexy que forman el shell de la aplicación. Greenhouse
 
 Componentes específicos de Greenhouse construidos sobre MUI.
 
-#### `src/components/greenhouse/`
+#### `src/components/greenhouse/` (40+ archivos)
 
 **Cards y Layout:**
 
@@ -80,6 +213,8 @@ Componentes específicos de Greenhouse construidos sobre MUI.
 | `CapacityOverviewCard` | title, subtitle, summaryItems, members, variant, insightTitle/Subtitle/Items, coverageLabel/Tone | Card de capacidad con miembros |
 | `MetricStatCard` | chipLabel, chipTone, title, value, detail | Card de métrica individual |
 | `MetricList` | items: MetricListItem[] | Lista de métricas |
+| `SectionHeading` | title, subtitle, action | Heading de sección |
+| `SectionErrorBoundary` | children, fallback | Error boundary por sección |
 
 **Team:**
 
@@ -89,59 +224,82 @@ Componentes específicos de Greenhouse construidos sobre MUI.
 | `TeamMemberCard` | member: TeamMemberResponse | Card de miembro individual |
 | `TeamAvatar` | name, avatarUrl, roleCategory, size | Avatar con color por rol |
 | `TeamIdentityBadgeGroup` | providers, confidence | Badges de identity providers |
-| `TeamSignalChip` | — | Indicator chip |
-| `TeamProgressBar` | — | Barra de progreso |
-| `TeamLoadBar` | — | Barra de carga |
-| `TeamExpansionGhostCard` | — | Placeholder para expansión de equipo |
+| `TeamSignalChip` | signal: 'healthy' \| 'warning' \| 'critical' | Indicator chip de estado |
+| `TeamProgressBar` | current, total, label | Barra de progreso |
+| `TeamLoadBar` | items | Barra de carga por categoría |
 | `TeamCapacitySection` | — | Sección de capacidad |
 | `AccountTeamDossierSection` | — | Equipo de cuenta |
 | `ProjectTeamSection` | — | Equipo de proyecto |
 | `SprintTeamVelocitySection` | — | Velocidad de equipo en sprint |
 
+**Data Display:**
+
+| Componente | Props clave | Uso |
+|-----------|------------|-----|
+| `MetricStatCard` | chipLabel, chipTone, title, value, detail, trend | Card de métrica |
+| `ChipGroup` | items: ChipGroupItem[] | Grupo de chips |
+| `EmptyState` | icon, title, description, action, minHeight | Estado vacío |
+
 **Branding:**
 
 | Componente | Props clave | Uso |
 |-----------|------------|-----|
-| `BrandLogo` | — | Logo de Greenhouse |
-| `BrandWordmark` | — | Wordmark textual |
-| `BusinessLineBadge` | — | Badge de línea de negocio con color |
+| `BrandLogo` | size | Logo de Greenhouse |
+| `BrandWordmark` | size | Wordmark textual |
+| `BusinessLineBadge` | businessLine, size | Badge de línea de negocio con color |
+
+**Formularios:**
+
+| Componente | Props clave | Uso |
+|-----------|------------|-----|
+| `GreenhouseFileUploader` | accept, maxSize, onUpload | Upload de archivos |
+| `GreenhouseCalendar` | value, onChange, minDate, maxDate | Selector de calendario |
+| `GreenhouseDatePicker` | value, onChange, format | Date picker |
+| `GreenhouseDragList` | items, onReorder, renderItem | Lista reordenable |
+| `IdentityImageUploader` | onUpload, currentImage | Upload de avatar/logo |
+
+**AI:**
+
+| Componente | Props clave | Uso |
+|-----------|------------|-----|
+| `NexaFloatingButton` | — | Botón flotante para chat AI, usa `@assistant-ui/react` con `AssistantRuntimeProvider` y custom `ChatModelAdapter` para streaming |
 
 **Utilidades:**
 
 | Componente | Props clave | Uso |
 |-----------|------------|-----|
-| `SectionErrorBoundary` | — (class component) | Error boundary por sección |
-| `EmptyState` | icon, title, description, action, minHeight | Estado vacío |
-| `IdentityImageUploader` | — | Upload de avatar/logo |
-| `RequestDialog` | open, intent, onClose | Diálogo de solicitudes |
-| `UpsellBanner` | — | Banner de upsell |
-| `SectionHeading` | — | Heading de sección |
-| `ChipGroup` | items: ChipGroupItem[] | Grupo de chips |
+| `UpsellBanner` | message, action, onClose | Banner de upsell |
+| `RequestDialog` | open, intent, onClose, data | Diálogo de solicitudes |
 
-**Assets:**
-- `brand-assets.ts` — Mappings de brand assets y `getBrandDisplayLabel()`
+**Config:**
 
-#### `src/components/agency/`
+| Archivo | Rol |
+|---------|-----|
+| `brand-assets.ts` | Mappings de brand assets y `getBrandDisplayLabel()` (EN/ES) |
+| `greenhouse-nomenclature.ts` | Nomenclatura completa (66KB), nav taxonomy EN/ES, 200+ labels |
+| `capability-registry.ts` | Catálogo de capabilities |
+| `role-codes.ts` | Códigos de rol y mappings |
+| `nexa-models.ts` | Configuración de modelos AI para Nexa |
+
+#### `src/components/agency/` (3 archivos)
 
 | Componente | Props | Uso |
 |-----------|-------|-----|
 | `CapacityOverview` | capacity: AgencyCapacityOverview | KPIs de capacidad agencia |
 | `SpaceCard` | space: AgencySpaceHealth | Card de espacio/cuenta |
-| `SpaceFilters` | — | Filtros para lista de espacios |
-| `SpaceHealthTable` | — | Tabla de salud de espacios |
+| `SpaceHealthTable` | spaces: SpaceHealth[] | Tabla de salud de espacios |
 | `PulseGlobalCharts` | — | Charts globales de pulse |
 | `PulseGlobalHeader` | — | Header de pulse |
 | `PulseGlobalKpis` | — | KPIs globales con semáforo |
 
-#### `src/components/capabilities/`
+#### `src/components/capabilities/` (2 archivos)
 
 | Componente | Props | Uso |
 |-----------|-------|-----|
 | `CapabilityOverviewHero` | eyebrow, title, description, highlights, summary*, badges | Hero de capability |
 | `ModuleLayout` | — | Layout wrapper |
-| `CapabilityCard` | — | Card de capability |
 
-#### `src/components/auth/`
+#### `src/components/auth/` (1 archivo)
 
 | Componente | Props | Uso |
 |-----------|-------|-----|
@@ -149,40 +307,42 @@ Componentes específicos de Greenhouse construidos sobre MUI.
 
 ### Nivel 3: Vistas Compuestas (`src/views/greenhouse/`)
 
-Componentes de vista completa que componen componentes de Nivel 1 y 2 para formar páginas.
+Componentes de vista completa que componen componentes de Nivel 1 y 2 para formar páginas. 25+ directorios con 100+ archivos de vista.
 
-| Directorio | Vista principal | Descripción |
-|-----------|----------------|-------------|
-| `dashboard/` | `GreenhouseDashboard` | Dashboard ejecutivo completo |
-| `admin/tenants/` | `GreenhouseAdminTenants`, `GreenhouseAdminTenantDetail` | Admin de tenants |
-| `admin/users/` | `GreenhouseAdminUsers` | Admin de usuarios |
-| `finance/` | Finance views + `dialogs/`, `drawers/` | Módulo financiero |
-| `payroll/` | Payroll views | Módulo de nómina |
-| `people/` | `PeopleList`, `PersonView` + `components/`, `drawers/`, `tabs/` | Directorio de personas |
-| `hr-core/` | HR Core views | Módulo HR |
-| `internal/dashboard/` | Internal dashboard | Dashboard interno |
-| `ai-tools/` | AI Tools views + `tabs/` | Módulo AI Tools |
-| `organizations/` | `OrganizationListView`, `OrganizationView` + `tabs/`, `drawers/` | *(nuevo)* Account 360 — Organizations |
+#### Módulos y sus vistas
 
-#### `src/views/greenhouse/organizations/` *(nuevo)*
+| Módulo | Directorio | Archivos | Descripción |
+|--------|-----------|----------|-------------|
+| Admin | `admin/` | 20 | Vistas de administración |
+| Dashboard | `dashboard/` | 21 | Dashboard ejecutivo y home |
+| Finanzas | `finance/` | 25 | Módulo completo de finanzas |
+| Nómina | `payroll/` | 20 | Gestión de nómina |
+| HR Core | `hr-core/` | 6 | HR y licencias |
+| Personas | `people/` | 13 | Directorio de personas |
+| Agencia | `agency/` | 3 | Vistas de agencia |
+| IA Tools | `ai-tools/` | 3 | Herramientas de IA |
+| Campañas | `campaigns/` | 2 | Gestión de campañas |
+| Home | `home/` | 2 | Vistas home |
+| Mi área | `my/` | 9 | Área personal del usuario |
+| Notificaciones | `notifications/` | 2 | Centro de notificaciones |
+| Organizaciones | `organizations/` | 7 | Account 360 — Organizations |
+| Interno | `internal/` | 1 | Vistas internas |
+
+#### `src/views/greenhouse/organizations/` (7 componentes)
 
 | Componente | Props | Uso |
 |-----------|-------|-----|
 | `OrganizationListView` | — | Lista paginada de organizaciones |
-| `OrganizationView` | organizationId | Detalle con sidebar + tabs |
-| `OrganizationTabs` | — | Orquestador de tabs dinámicos |
-| `OrganizationLeftSidebar` | — | Sidebar con metadata de la org |
-| `OverviewTab` | — | Datos generales, spaces |
-| `PeopleTab` | — | Membresías y personas |
-| `FinanceTab` | — | Resumen financiero |
-| `IcoTab` | — | Métricas ICO Engine |
-| `IntegrationsTab` | — | Estado HubSpot sync |
-| `EditOrganizationDrawer` | — | Editar organización |
-| `AddMembershipDrawer` | — | Agregar persona |
-
-#### `src/views/agency/`
-
-Vistas de agency separadas del directorio greenhouse.
+| `OrganizationView` | organizationId: string | Detalle con sidebar + tabs dinámicos |
+| `OrganizationTabs` | organizationId, activeTab, onTabChange | Orquestador de tabs |
+| `OrganizationLeftSidebar` | organizationId | Sidebar con metadata |
+| `OverviewTab` | organizationId | Datos generales, spaces, relations |
+| `PeopleTab` | organizationId | Membresías y personas |
+| `FinanceTab` | organizationId | Resumen financiero |
+| `IcoTab` | organizationId | Métricas ICO Engine |
+| `IntegrationsTab` | organizationId | Estado HubSpot sync, webhook status |
+| `EditOrganizationDrawer` | organizationId, open, onClose | Editar organización |
+| `AddMembershipDrawer` | organizationId, open, onClose | Agregar persona |
 
 ---
 
@@ -200,6 +360,8 @@ Settings      → /settings       (icon: tabler-settings)
 Updates       → /updates        (icon: tabler-bell)
 ```
 
+Estructura adaptativa según roles y tenant.
+
 ### Menú horizontal
 
 Definido en `src/data/navigation/horizontalMenuData.tsx`. Estructura idéntica al vertical, optimizada para layout horizontal.
@@ -208,7 +370,7 @@ Definido en `src/data/navigation/horizontalMenuData.tsx`. Estructura idéntica a
 
 La navegación se adapta al contexto del tenant:
 - Clientes ven solo las rutas de superficie `client`
-- Usuarios internos ven rutas según sus route groups
+- Usuarios internos ven rutas según sus capabilities
 - Admins ven todas las rutas incluyendo admin
 
 ---
@@ -227,6 +389,7 @@ Archivo: `src/configs/themeConfig.ts`
 
 Archivo: `src/configs/primaryColorConfig.ts`
 - Primary: `#0375DB` (main), `#3691E3` (light), `#024C8F` (dark)
+- Accent: Verde, Naranja, Rojo para semáforo
 
 ### Colores semáforo
 
@@ -296,7 +459,7 @@ useEffect(() => {
 }, [])
 ```
 
-### Patrón de tabs dinámicos por rol *(nuevo)*
+### Patrón de tabs dinámicos por rol
 
 Algunas vistas resuelven qué tabs mostrar según el rol del usuario. El módulo People usa `/api/people/meta` para determinar tabs visibles:
 
@@ -307,7 +470,31 @@ const meta = await fetch('/api/people/meta')
 // Cada tab se renderiza condicionalmente
 ```
 
-Este patrón permite que un `people_viewer` vea solo overview y assignments, mientras que un `efeonce_admin` ve todos los tabs incluyendo compensación y payroll.
+### Patrón de AI Chat con AssistantUI
+
+```tsx
+<AssistantRuntimeProvider runtime={customRuntime}>
+  <NexaFloatingButton />
+</AssistantRuntimeProvider>
+```
+
+La integración usa `@assistant-ui/react` con un custom `ChatModelAdapter` que consume el endpoint `/api/ai-tools/chat` con streaming.
+
+### Patrón de PDF generation
+
+Endpoints que generan PDFs bajo demanda:
+- `/api/hr/payroll/periods/[periodId]/pdf` — Nómina
+- `/api/finance/income/[id]/dte-pdf` — Documento tributario
+- `/api/my/payroll/entries/[entryId]/receipt` — Recibo de nómina
+
+Usa `@react-pdf/renderer` y `React Email` para templates.
+
+### Patrón de Excel export
+
+Endpoints que generan archivos Excel:
+- `/api/hr/payroll/periods/[periodId]/excel` — Nómina completa
+
+Usa `ExcelJS` para creación de workbooks.
 
 ### Patrón de error boundary
 
@@ -345,6 +532,7 @@ Los componentes de Greenhouse implementan patrones de accesibilidad:
 - `aria-hidden="true"` para elementos decorativos
 - Color no como único diferenciador de estado (texto + icono acompaña al color)
 - Form inputs con labels asociados
+- Rich text editor Tiptap con soporte para accesibilidad
 
 ---
 
@@ -359,3 +547,6 @@ Los componentes de Greenhouse implementan patrones de accesibilidad:
 7. **Error boundaries por sección** — No dejar que un error en una sección rompa toda la página
 8. **`useTheme()` para colores** — No hardcodear colores; usar el tema
 9. **`alpha()` para opacidades** — Función de MUI para colores translúcidos
+10. **Rich text con Tiptap** — Para campos que requieran formato: usar extensiones de Tiptap (color, list, placeholder, text-align, text-style, underline)
+11. **AI chat via AssistantUI** — Integración de chat con NexaFloatingButton, streaming via custom adapter
+12. **PDF/Excel export** — Usar endpoints dedicados, nunca generar en browser
