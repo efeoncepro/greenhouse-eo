@@ -4,9 +4,11 @@
 
 Define the automated user provisioning and profile synchronization architecture between Microsoft Entra ID and Greenhouse. This document covers:
 
-1. **SCIM 2.0 server** for lifecycle provisioning (create, update, deactivate) driven by Entra
+1. **SCIM 2.0 server** for lifecycle provisioning (Users + Groups) driven by Entra
 2. **Entra profile sync cron** for enrichment data not covered by the SCIM standard
-3. **Security model** for machine-to-machine auth between Entra and Greenhouse
+3. **Microsoft Graph webhook** for real-time change notifications
+4. **Admin UI** for tenant mapping governance
+5. **Security model** for machine-to-machine auth between Entra and Greenhouse
 
 Use together with:
 - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md` — role model and enforcement
@@ -85,15 +87,66 @@ Diff-based update logic:
 - Only writes when values actually differ (uses `IS DISTINCT FROM` in SQL)
 - Cleans Entra display names by removing organizational suffixes (e.g., " | Efeonce")
 
+#### 7. SCIM Groups (`src/lib/scim/groups.ts`)
+
+Full SCIM 2.0 Groups support for syncing Entra groups with Greenhouse.
+
+| Endpoint | Method | Auth | Purpose |
+|----------|--------|------|---------|
+| `/api/scim/v2/Groups` | GET | Bearer | List and filter groups |
+| `/api/scim/v2/Groups` | POST | Bearer | Create a group from Entra |
+| `/api/scim/v2/Groups/[id]` | GET | Bearer | Retrieve a single group |
+| `/api/scim/v2/Groups/[id]` | PATCH | Bearer | Update group attributes or members (add/remove) |
+| `/api/scim/v2/Groups/[id]` | DELETE | Bearer | Soft-delete a group |
+
+Groups map Entra security/M365 groups to Greenhouse. Each group can optionally be mapped to a `role_code` or `client_id` for automatic role governance.
+
+#### 8. Microsoft Graph Webhook (`src/app/api/webhooks/entra-user-change/`)
+
+Real-time change notification endpoint. When a user profile changes in Entra, Microsoft Graph pushes a notification within seconds.
+
+- **Validation:** Microsoft sends a GET with `?validationToken=xxx` during subscription creation; the endpoint echoes it as plain text
+- **Notifications:** POST with `clientState` validation against the SCIM bearer token (first 16 chars)
+- **Processing:** On notification, fetches all Entra profiles via Graph API and runs the same diff-sync as the daily cron
+- **Trade-off:** Fetches all users on each notification (simple, consistent) vs. fetching only the changed user (more efficient but fragile)
+
+#### 9. Webhook Subscription Manager (`src/lib/entra/webhook-subscription.ts`)
+
+Manages the Microsoft Graph subscription lifecycle:
+
+- **Create:** Subscribes to `/users` resource with `changeType: 'updated'` and 3-day expiration
+- **Renew:** Extends the subscription before it expires
+- **Persist:** Stores the subscription ID in `greenhouse_sync.integration_registry` metadata for renewal continuity
+
+#### 10. Webhook Subscription Renewal Cron (`src/app/api/cron/entra-webhook-renew/`)
+
+- **Schedule:** `0 6 */2 * *` (06:00 UTC every 2 days — within the 3-day max lifetime)
+- **Logic:** Calls `createOrRenewSubscription()` which renews if a subscription exists, or creates a new one
+
+#### 11. Admin Center — Tenant Mappings UI (`src/app/(dashboard)/admin/scim-tenant-mappings/`)
+
+Server-rendered page + client-side view for managing SCIM tenant mappings without SQL.
+
+- **View component:** `src/views/greenhouse/admin/ScimTenantMappingsView.tsx`
+- **Features:** Table with all mappings, toggle switches for auto-provision and active status, create dialog
+- **API:** `/api/admin/scim-tenant-mappings` (GET/POST), `/api/admin/scim-tenant-mappings/[id]` (PATCH/DELETE)
+- **Auth:** `requireAdminTenantContext()` — only `efeonce_admin` role
+
 ### Data Flow
 
 ```
-Provisioning (SCIM):
+Provisioning (SCIM — ~40 min cycle):
   [Entra ID] --SCIM POST/PATCH/DELETE--> [SCIM Server] --> [PostgreSQL: client_users, user_role_assignments]
   [Entra ID] <--SCIM GET/filter-------- [SCIM Server] <-- [PostgreSQL: client_users]
 
-Enrichment (Graph API cron):
+Real-time (Graph Webhook — seconds):
+  [Entra ID] --user change--> [Graph] --POST notification--> [Webhook Endpoint] --> [Profile Sync] --> [PostgreSQL]
+
+Enrichment (Graph API cron — daily safety net):
   [Graph API] --daily fetch-----------> [Profile Sync] --> [PostgreSQL: identity_profiles, members, client_users]
+
+Admin governance:
+  [Admin Center] --/admin/scim-tenant-mappings--> [API] --> [PostgreSQL: scim_tenant_mappings]
 ```
 
 ## Schema
@@ -135,6 +188,35 @@ Immutable audit trail for all SCIM operations.
 | `error_message` | text | Error detail if operation failed |
 | `created_at` | timestamptz | Timestamp of the operation |
 
+#### `greenhouse_core.scim_groups`
+
+Mirrors Entra groups in Greenhouse for SCIM group provisioning.
+
+| Column | Type | Purpose |
+|--------|------|---------|
+| `scim_group_id` | text | Primary key |
+| `microsoft_group_id` | text | Entra group ID (unique) |
+| `display_name` | text | Group name |
+| `description` | text | Group description |
+| `group_type` | text | `security`, `unified` |
+| `mapped_role_code` | text | Optional: auto-assign this role to members |
+| `mapped_client_id` | text | Optional: associate group with a client |
+| `active` | boolean | Soft-disable |
+| `synced_at` | timestamptz | Last sync timestamp |
+
+#### `greenhouse_core.scim_group_memberships`
+
+Tracks which users belong to which SCIM groups.
+
+| Column | Type | Purpose |
+|--------|------|---------|
+| `membership_id` | text | Primary key |
+| `scim_group_id` | text | FK to `scim_groups` |
+| `user_id` | text | FK to `client_users` |
+| `microsoft_oid` | text | Entra OID for cross-reference |
+| `active` | boolean | Soft membership status |
+| Constraint | | Unique on `(scim_group_id, user_id)` |
+
 ### Modified Tables
 
 #### `greenhouse_core.client_users`
@@ -148,9 +230,12 @@ New columns added to support SCIM lifecycle tracking:
 | `provisioned_at` | timestamptz | null | When SCIM originally created this user |
 | `deactivated_at` | timestamptz | null | When SCIM deactivated this user |
 
-### Migration
+### Migrations
 
-File: `migrations/20260403002621463_scim-provisioning-tables.sql`
+| File | Purpose |
+|------|---------|
+| `migrations/20260403002621463_scim-provisioning-tables.sql` | Users: `scim_tenant_mappings`, `scim_sync_log`, `client_users` columns |
+| `migrations/20260403023326254_scim-groups.sql` | Groups: `scim_groups`, `scim_group_memberships` |
 
 ## Identity Graph Integration
 
@@ -231,14 +316,12 @@ The separation exists because the original Greenhouse app accumulated a ghost pr
 
 ## Vercel Cron Registration
 
-```json
-{
-  "path": "/api/cron/entra-profile-sync",
-  "schedule": "0 8 * * *"
-}
-```
+| Cron | Schedule | Purpose |
+|------|----------|---------|
+| `/api/cron/entra-profile-sync` | `0 8 * * *` (daily 08:00 UTC) | Full profile sync from Graph API — safety net |
+| `/api/cron/entra-webhook-renew` | `0 6 */2 * *` (every 2 days 06:00 UTC) | Renew Microsoft Graph webhook subscription |
 
-Registered in `vercel.json`. Runs daily at 08:00 UTC (05:00 Chile time).
+Both registered in `vercel.json`.
 
 ## Core Design Decisions
 
@@ -270,14 +353,30 @@ Although only the Efeonce Group tenant is configured today, the `scim_tenant_map
 
 | File | Purpose |
 |------|---------|
+| **SCIM Server** | |
 | `src/app/api/scim/v2/ServiceProviderConfig/route.ts` | SCIM discovery endpoint |
 | `src/app/api/scim/v2/Schemas/route.ts` | SCIM schema definition |
 | `src/app/api/scim/v2/Users/route.ts` | User list and create endpoints |
 | `src/app/api/scim/v2/Users/[id]/route.ts` | User get, update, delete endpoints |
-| `src/lib/scim/auth.ts` | Bearer token auth helper |
-| `src/lib/scim/formatters.ts` | SCIM response formatters |
-| `src/lib/scim/provisioning.ts` | Provisioning engine (CRUD, events, audit) |
-| `src/lib/entra/graph-client.ts` | Graph API OAuth2 client |
+| `src/app/api/scim/v2/Groups/route.ts` | Group list and create endpoints |
+| `src/app/api/scim/v2/Groups/[id]/route.ts` | Group get, update, delete, member management |
+| `src/lib/scim/auth.ts` | Bearer token auth helper (Secret Manager) |
+| `src/lib/scim/formatters.ts` | SCIM response formatters (Users + Groups) |
+| `src/lib/scim/provisioning.ts` | User provisioning engine (CRUD, events, audit) |
+| `src/lib/scim/groups.ts` | Group provisioning engine (CRUD, memberships) |
+| `src/types/scim.ts` | SCIM 2.0 protocol TypeScript types |
+| **Entra Sync** | |
+| `src/lib/entra/graph-client.ts` | Graph API OAuth2 client with token caching |
 | `src/lib/entra/profile-sync.ts` | Diff-based profile sync engine |
-| `src/app/api/cron/entra-profile-sync/route.ts` | Daily enrichment cron |
-| `migrations/20260403002621463_scim-provisioning-tables.sql` | Schema migration |
+| `src/lib/entra/webhook-subscription.ts` | Graph webhook subscription manager |
+| `src/app/api/cron/entra-profile-sync/route.ts` | Daily enrichment cron (safety net) |
+| `src/app/api/cron/entra-webhook-renew/route.ts` | Webhook subscription renewal cron |
+| `src/app/api/webhooks/entra-user-change/route.ts` | Real-time Graph webhook receiver |
+| **Admin UI** | |
+| `src/app/(dashboard)/admin/scim-tenant-mappings/page.tsx` | Admin Center page |
+| `src/app/api/admin/scim-tenant-mappings/route.ts` | Tenant mappings API (GET/POST) |
+| `src/app/api/admin/scim-tenant-mappings/[id]/route.ts` | Tenant mapping API (PATCH/DELETE) |
+| `src/views/greenhouse/admin/ScimTenantMappingsView.tsx` | Client-side view component |
+| **Migrations** | |
+| `migrations/20260403002621463_scim-provisioning-tables.sql` | Users: tenant mappings, sync log, client_users columns |
+| `migrations/20260403023326254_scim-groups.sql` | Groups: scim_groups, scim_group_memberships |
