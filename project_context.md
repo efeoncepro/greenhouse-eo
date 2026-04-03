@@ -1,5 +1,15 @@
 # project_context.md
 
+## Delta 2026-04-03 Agency Delivery now reads latest closed monthly ICO snapshot
+
+- `Agency > Delivery` ya no debe leer el mes abierto más reciente de `ico_engine.metric_snapshots_monthly` para `OTD` / `RpA`.
+- Regla vigente:
+  - los KPIs mensuales de esa vista (`RPA promedio`, `OTD`, tabla por Space) leen el último período mensual cerrado disponible
+  - los contadores operativos como proyectos, feedback y stuck assets siguen saliendo del estado actual
+- Motivación:
+  - el mes abierto podía exponer snapshots parciales o inestables en `metric_snapshots_monthly`
+  - eso produjo síntomas visibles como `Sky Airline` con `OTD 9.5%` y `RpA null` en abril 2026, aunque el período cerrado previo mostraba métricas sanas
+
 ## Delta 2026-04-03 Deel contractors projected payroll KPI bonuses
 
 - `Payroll` y `Projected Payroll` ya no deben tratar a `payroll_via = 'deel'` como carril de bono KPI discrecional por defecto.

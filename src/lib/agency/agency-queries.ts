@@ -110,6 +110,24 @@ const normalizeStringArray = (value: unknown): string[] => {
   return value.map(item => (typeof item === 'string' ? item.trim() : '')).filter(Boolean)
 }
 
+const getLatestClosedDeliveryPeriod = () => {
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Santiago',
+    year: 'numeric',
+    month: '2-digit'
+  })
+
+  const parts = formatter.formatToParts(new Date())
+  const year = Number(parts.find(part => part.type === 'year')?.value ?? new Date().getUTCFullYear())
+  const month = Number(parts.find(part => part.type === 'month')?.value ?? new Date().getUTCMonth() + 1)
+
+  if (month === 1) {
+    return { year: year - 1, month: 12, key: (year - 1) * 100 + 12 }
+  }
+
+  return { year, month: month - 1, key: year * 100 + (month - 1) }
+}
+
 const normalizeMatchValue = (value: string | null | undefined) =>
   (value || '')
     .toLowerCase()
@@ -204,6 +222,7 @@ const getAgencyClientScopeCtes = (projectId: string) => `
 export const getAgencyPulseKpis = async (): Promise<AgencyPulseKpis> => {
   const projectId = getBigQueryProjectId()
   const bq = getBigQueryClient()
+  const latestClosedPeriod = getLatestClosedDeliveryPeriod()
 
   const [rows] = await bq.query({
     query: `
@@ -224,6 +243,7 @@ export const getAgencyPulseKpis = async (): Promise<AgencyPulseKpis> => {
             ) AS row_num
           FROM \`${projectId}.ico_engine.metric_snapshots_monthly\` ms
           WHERE ms.space_id IN (SELECT space_id FROM client_spaces)
+            AND (ms.period_year * 100 + ms.period_month) <= @latestClosedPeriodKey
         ) latest
         WHERE latest.row_num = 1
       ),
@@ -258,6 +278,10 @@ export const getAgencyPulseKpis = async (): Promise<AgencyPulseKpis> => {
       CROSS JOIN ico_global ig
       CROSS JOIN project_agg pa
     `
+    ,
+    params: {
+      latestClosedPeriodKey: latestClosedPeriod.key
+    }
   })
 
   const row = rows?.[0] as Record<string, unknown> | undefined
@@ -276,6 +300,7 @@ export const getAgencyPulseKpis = async (): Promise<AgencyPulseKpis> => {
 export const getAgencySpacesHealth = async (): Promise<AgencySpaceHealth[]> => {
   const projectId = getBigQueryProjectId()
   const bq = getBigQueryClient()
+  const latestClosedPeriod = getLatestClosedDeliveryPeriod()
 
   const [rows] = await bq.query({
     query: `
@@ -296,6 +321,7 @@ export const getAgencySpacesHealth = async (): Promise<AgencySpaceHealth[]> => {
             ) AS row_num
           FROM \`${projectId}.ico_engine.metric_snapshots_monthly\` ms
           WHERE ms.space_id IN (SELECT space_id FROM client_spaces)
+            AND (ms.period_year * 100 + ms.period_month) <= @latestClosedPeriodKey
         ) latest
         WHERE latest.row_num = 1
       ),
@@ -364,6 +390,10 @@ export const getAgencySpacesHealth = async (): Promise<AgencySpaceHealth[]> => {
         COALESCE(asg.allocated_fte, 0) DESC,
         ac.client_name ASC
     `
+    ,
+    params: {
+      latestClosedPeriodKey: latestClosedPeriod.key
+    }
   })
 
   return (rows as Record<string, unknown>[]).map(row => {

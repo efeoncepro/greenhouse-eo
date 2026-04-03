@@ -1,5 +1,33 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — Agency Delivery KPI reader pinned to latest closed month
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `src/lib/agency/agency-queries.ts`
+  - `src/lib/agency/agency-queries.test.ts`
+  - `project_context.md`
+  - `Handoff.md`
+  - `changelog.md`
+
+### Resultado
+
+- `Agency > Delivery` deja de usar el snapshot del mes abierto más reciente para `OTD` / `RpA`
+- el reader ahora limita `ico_engine.metric_snapshots_monthly` al último período mensual cerrado disponible
+- esto corrige el caso visible de `Sky Airline` donde abril 2026 mostraba `OTD 9.5%` y `RpA null` por leer un snapshot abierto/inestable
+- la evidencia contrastada en BigQuery fue:
+  - snapshot leído por la vista: `2026-04`, `rpa_avg = null`, `otd_pct = 9.5`, `carry_over_count = 67`
+  - período cerrado previo: `2026-03`, `rpa_avg = 1.15`, `otd_pct = 95.8`
+
+### Verificación
+
+- pendiente ejecutar:
+  - `pnpm exec vitest run src/lib/agency/agency-queries.test.ts`
+  - `pnpm exec eslint src/lib/agency/agency-queries.ts src/lib/agency/agency-queries.test.ts`
+
+
 ## Sesión 2026-04-03 — Hotfix Deel KPI bonuses in projected/offical payroll
 
 ### Rama / alcance

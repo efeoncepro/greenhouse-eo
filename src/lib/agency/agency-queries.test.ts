@@ -38,9 +38,12 @@ describe('agency-queries', () => {
 
     const result = await getAgencySpacesHealth()
     const query = String(mockBigQueryQuery.mock.calls[0]?.[0]?.query ?? '')
+    const params = mockBigQueryQuery.mock.calls[0]?.[0]?.params ?? {}
 
     expect(query).toContain('ico_engine.metric_snapshots_monthly')
     expect(query).not.toContain('AVG(SAFE_CAST(t.rpa AS FLOAT64))')
+    expect(query).toContain('<= @latestClosedPeriodKey')
+    expect(params).toHaveProperty('latestClosedPeriodKey')
     expect(result).toEqual([
       expect.objectContaining({
         clientId: 'client-1',
@@ -68,9 +71,12 @@ describe('agency-queries', () => {
 
     const result = await getAgencyPulseKpis()
     const query = String(mockBigQueryQuery.mock.calls[0]?.[0]?.query ?? '')
+    const params = mockBigQueryQuery.mock.calls[0]?.[0]?.params ?? {}
 
     expect(query).toContain('ico_engine.metric_snapshots_monthly')
     expect(query).not.toContain('AVG(SAFE_CAST(t.rpa AS FLOAT64))')
+    expect(query).toContain('<= @latestClosedPeriodKey')
+    expect(params).toHaveProperty('latestClosedPeriodKey')
     expect(result).toEqual({
       rpaGlobal: 1.8,
       assetsActivos: 12,
