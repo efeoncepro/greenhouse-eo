@@ -2,6 +2,12 @@
 
 ## 2026-04-03
 
+- **Notion Delivery data quality null-param fix**:
+  - el monitor de `TASK-208` ya no envía `assigneeSourceId: null` a BigQuery cuando el sweep corre sin filtro por responsable
+  - se corrigió el helper `src/lib/space-notion/notion-parity-audit.ts` para omitir ese parámetro opcional y evitar el crash runtime `Parameter types must be provided for null values`
+  - se agregó la regresión `src/lib/space-notion/notion-parity-audit-query.test.ts` para cubrir el contrato de params sin assignee
+  - esto ataca el `degraded` falso-negativo en staging, donde el cron fallaba antes de persistir `integration_data_quality_runs`
+
 - **TASK-109 projected payroll runtime hardening**:
   - `projected-payroll-store.ts` ya no ejecuta `CREATE TABLE IF NOT EXISTS` en runtime; reemplazado por `verifyInfrastructure()` con fail-fast y error accionable si la tabla no existe
   - los cuatro eventos `payroll.projected_*` quedan formalizados como audit-only en el Event Catalog; `payroll.projected_snapshot.refreshed` marcado como deprecated (definido pero sin publisher activo)

@@ -1,5 +1,35 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — Fix monitor Notion Delivery degraded por null param en BigQuery
+
+### Rama / alcance
+
+- rama actual: `fix/codex-notion-data-quality-null-param`
+- scope:
+  - `src/lib/space-notion/notion-parity-audit.ts`
+  - `src/lib/space-notion/notion-parity-audit-query.test.ts`
+
+### Resultado
+
+- el `degraded` visible en staging no venía primero por drift real, sino porque `GET /api/cron/notion-delivery-data-quality` fallaba antes de persistir runs
+- evidencia runtime confirmada en Vercel:
+  - `Error: Parameter types must be provided for null values via the 'types' field in query options`
+  - la falla ocurría al correr el parity audit sin filtro de assignee
+- fix aplicado:
+  - `notion-parity-audit.ts` ya no manda `assigneeSourceId: null` a BigQuery cuando el filtro no aplica
+  - se agregó regresión para asegurar que los params del query omiten el campo opcional en ese caso
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/space-notion/notion-parity-audit.test.ts src/lib/space-notion/notion-parity-audit-query.test.ts`
+- `pnpm exec eslint src/lib/space-notion/notion-parity-audit.ts src/lib/space-notion/notion-parity-audit-query.test.ts`
+- `pnpm build`
+
+### Nota operativa
+
+- quedó un cambio ajeno sin tocar en `src/config/greenhouse-nomenclature.ts`; no mezclarlo con este fix
+- siguiente paso esperado: push de esta rama, merge a `develop`, redeploy de staging y rerun del cron para confirmar si el estado resultante pasa a `healthy` o expone findings reales
+
 ## Sesión 2026-04-03 — TASK-109 Projected Payroll Runtime Hardening
 
 ### Rama / alcance

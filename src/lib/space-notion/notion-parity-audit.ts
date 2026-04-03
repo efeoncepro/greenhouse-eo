@@ -422,6 +422,22 @@ const ensureRequiredColumn = (columns: Set<string>, column: string, label: strin
   }
 }
 
+const buildParityQueryParams = ({
+  spaceId,
+  startDate,
+  endDate,
+  assigneeSourceId
+}: {
+  spaceId: string
+  startDate: string
+  endDate: string
+  assigneeSourceId: string | null
+}) => (
+  assigneeSourceId
+    ? { spaceId, startDate, endDate, assigneeSourceId }
+    : { spaceId, startDate, endDate }
+)
+
 const buildRawAssigneeIdsExpression = (columns: Set<string>) => {
   const hasResponsablesIds = columns.has('responsables_ids')
   const hasResponsableIds = columns.has('responsable_ids')
@@ -551,12 +567,12 @@ const readRawParityRows = async ({
         AND ${rawPeriodExpression} BETWEEN @startDate AND @endDate
         ${assigneeFilterClause}
     `,
-    params: {
+    params: buildParityQueryParams({
       spaceId,
       startDate,
       endDate,
       assigneeSourceId
-    }
+    })
   }) as [Array<Record<string, unknown>>, unknown]
 
   return rows.map(normalizeAuditRow)
@@ -619,12 +635,12 @@ const readConformedParityRows = async ({
         AND ${conformedPeriodExpression} BETWEEN @startDate AND @endDate
         ${assigneeFilterClause}
     `,
-    params: {
+    params: buildParityQueryParams({
       spaceId,
       startDate,
       endDate,
       assigneeSourceId
-    }
+    })
   }) as [Array<Record<string, unknown>>, unknown]
 
   return rows.map(normalizeAuditRow)
