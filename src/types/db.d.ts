@@ -3097,6 +3097,30 @@ export interface GreenhouseSyncNotionSpaceSchemaSnapshots {
   space_id: string;
 }
 
+export interface GreenhouseSyncNotionSyncOrchestrationRuns {
+  completed_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  integration_key: string;
+  latest_raw_synced_at: Timestamp | null;
+  max_retry_attempts: Generated<number>;
+  metadata: Generated<Json>;
+  next_retry_at: Timestamp | null;
+  orchestration_run_id: string;
+
+  /**
+   * Operational lifecycle for each space while raw freshness blocks or retries the canonical sync.
+   */
+  orchestration_status: Generated<string>;
+  pipeline_key: Generated<string>;
+  raw_boundary_start_at: Timestamp | null;
+  retry_attempt: Generated<number>;
+  source_sync_run_id: string | null;
+  space_id: string;
+  trigger_source: Generated<string>;
+  updated_at: Generated<Timestamp>;
+  waiting_reason: string | null;
+}
+
 export interface GreenhouseSyncOutboxEvents {
   aggregate_id: string;
   aggregate_type: string;
@@ -3415,6 +3439,7 @@ export interface DB {
   "greenhouse_sync.notion_space_kpi_readiness": GreenhouseSyncNotionSpaceKpiReadiness;
   "greenhouse_sync.notion_space_schema_drift_events": GreenhouseSyncNotionSpaceSchemaDriftEvents;
   "greenhouse_sync.notion_space_schema_snapshots": GreenhouseSyncNotionSpaceSchemaSnapshots;
+  "greenhouse_sync.notion_sync_orchestration_runs": GreenhouseSyncNotionSyncOrchestrationRuns;
   "greenhouse_sync.outbox_events": GreenhouseSyncOutboxEvents;
   "greenhouse_sync.outbox_reactive_log": GreenhouseSyncOutboxReactiveLog;
   "greenhouse_sync.projection_refresh_queue": GreenhouseSyncProjectionRefreshQueue;

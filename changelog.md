@@ -2,6 +2,13 @@
 
 ## 2026-04-03
 
+- **TASK-209 Notion sync orchestration closure**:
+  - se agregó la tabla `greenhouse_sync.notion_sync_orchestration_runs` como control plane tenant-scoped para el cierre `raw -> conformed` por `space`
+  - `GET /api/cron/sync-conformed` ahora registra explícitamente `waiting_for_raw` y deja de depender de reruns manuales para recuperar paridad después del refresh raw
+  - se agregó `GET /api/cron/sync-conformed-recovery` como carril de retry auditado para converger automáticamente dentro de la ventana diaria
+  - `/admin/integrations` y `TenantNotionPanel` ahora muestran estado de orquestación junto al monitor de data quality para distinguir `esperando raw`, `retry`, `completed` y `failed`
+  - `vercel.json` queda alineado al scheduler upstream real de `../notion-bigquery`: conformed principal a `20 6 * * *`, recovery cada `30` minutos y monitor de data quality después de la ventana de recuperación
+
 - **TASK-130 login auth flow UX**:
   - botón de credenciales ahora usa `LoadingButton` de MUI Lab con spinner integrado durante submit
   - botones SSO (Microsoft, Google) muestran `CircularProgress` individual + texto "Redirigiendo a {provider}..." y se deshabilitan mutuamente con `isAnyLoading`

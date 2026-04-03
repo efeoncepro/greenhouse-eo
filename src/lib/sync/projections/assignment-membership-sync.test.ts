@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+process.env.NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET || 'test-nextauth-secret'
+
 const mockRunGreenhousePostgresQuery = vi.fn()
 const mockPublishOutboxEvent = vi.fn()
 const mockGenerateMembershipId = vi.fn(() => 'mbr-test-001')
@@ -9,6 +11,10 @@ const mockNextPublicId = vi.fn((_prefix?: string) => {
 
   return Promise.resolve('EO-MBR-0042')
 })
+
+vi.mock('@/lib/auth', () => ({
+  authOptions: {}
+}))
 
 vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args),

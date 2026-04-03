@@ -12,6 +12,8 @@ const mockSavePayrollReceipt = vi.fn()
 const mockUploadGreenhouseStorageObject = vi.fn()
 const mockDownloadGreenhouseMediaAsset = vi.fn()
 const mockSendEmail = vi.fn()
+const mockGetGreenhousePrivateAssetsBucket = vi.fn()
+const mockUpsertSystemGeneratedAsset = vi.fn()
 
 vi.mock('@/lib/payroll/postgres-store', () => ({
   assertPayrollReceiptsReady: (...args: unknown[]) => mockAssertPayrollReceiptsReady(...args)
@@ -42,6 +44,11 @@ vi.mock('@/lib/payroll/payroll-receipts-store', () => ({
 vi.mock('@/lib/storage/greenhouse-media', () => ({
   uploadGreenhouseStorageObject: (...args: unknown[]) => mockUploadGreenhouseStorageObject(...args),
   downloadGreenhouseMediaAsset: (...args: unknown[]) => mockDownloadGreenhouseMediaAsset(...args)
+}))
+
+vi.mock('@/lib/storage/greenhouse-assets', () => ({
+  getGreenhousePrivateAssetsBucket: (...args: unknown[]) => mockGetGreenhousePrivateAssetsBucket(...args),
+  upsertSystemGeneratedAsset: (...args: unknown[]) => mockUpsertSystemGeneratedAsset(...args)
 }))
 
 vi.mock('@/lib/email/delivery', () => ({
@@ -76,7 +83,9 @@ describe('generate payroll receipts', () => {
     mockGetLatestPayrollReceiptRevision.mockResolvedValue(1)
     mockGetPayrollReceiptRowsBySourceEvent.mockResolvedValue([])
     mockGeneratePayrollReceiptPdf.mockResolvedValue(Buffer.from('pdf'))
+    mockGetGreenhousePrivateAssetsBucket.mockReturnValue('test-private-assets')
     mockUploadGreenhouseStorageObject.mockResolvedValue('gs://bucket/payroll-receipts/2026-03/member-1-r1.pdf')
+    mockUpsertSystemGeneratedAsset.mockResolvedValue({ assetId: 'asset-1' })
     mockSendEmail.mockResolvedValue({ deliveryId: 'delivery-123', resendId: 'resend-123', status: 'sent' })
     mockSavePayrollReceipt.mockResolvedValue(undefined)
     mockAssertPayrollReceiptsReady.mockResolvedValue(undefined)

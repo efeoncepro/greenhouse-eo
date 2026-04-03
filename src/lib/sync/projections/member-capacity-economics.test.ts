@@ -1,10 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+process.env.NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET || 'test-nextauth-secret'
+
 const mockRunGreenhousePostgresQuery = vi.fn()
 const mockUpsertMemberCapacityEconomicsSnapshot = vi.fn()
 
+vi.mock('@/lib/auth', () => ({
+  authOptions: {}
+}))
+
 vi.mock('@/lib/postgres/client', () => ({
-  runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
+  runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args),
+  withGreenhousePostgresTransaction: vi.fn(),
+  getGreenhousePostgresPool: vi.fn(),
+  closeGreenhousePostgres: vi.fn()
 }))
 
 vi.mock('@/lib/member-capacity-economics/store', () => ({

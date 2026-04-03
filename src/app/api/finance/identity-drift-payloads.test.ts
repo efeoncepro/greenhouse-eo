@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockRequireFinanceTenantContext = vi.fn()
 const mockResolveFinanceClientContext = vi.fn()
+const mockResolveFinanceDownstreamScope = vi.fn()
 const mockResolveFinanceMemberContext = vi.fn()
 const mockCreateFinanceIncomeInPostgres = vi.fn()
 const mockUpdateFinanceIncomeInPostgres = vi.fn()
@@ -18,6 +19,7 @@ vi.mock('@/lib/tenant/authorization', () => ({
 
 vi.mock('@/lib/finance/canonical', () => ({
   resolveFinanceClientContext: (...args: unknown[]) => mockResolveFinanceClientContext(...args),
+  resolveFinanceDownstreamScope: (...args: unknown[]) => mockResolveFinanceDownstreamScope(...args),
   resolveFinanceMemberContext: (...args: unknown[]) => mockResolveFinanceMemberContext(...args)
 }))
 
@@ -79,6 +81,15 @@ describe('Finance identity drift payload propagation', () => {
       legalName: 'Sky Airline SA',
       organizationId: 'org-1'
     })
+    mockResolveFinanceDownstreamScope.mockResolvedValue({
+      clientId: 'client-1',
+      clientProfileId: 'profile-1',
+      hubspotCompanyId: 'hub-1',
+      clientName: 'Sky Airline',
+      legalName: 'Sky Airline SA',
+      organizationId: 'org-1',
+      spaceId: 'space-1'
+    })
 
     mockResolveFinanceMemberContext.mockResolvedValue({
       memberId: 'member-1',
@@ -123,10 +134,12 @@ describe('Finance identity drift payload propagation', () => {
     )
 
     expect(response.status).toBe(200)
-    expect(mockResolveFinanceClientContext).toHaveBeenCalledWith({
+    expect(mockResolveFinanceDownstreamScope).toHaveBeenCalledWith({
       clientId: null,
+      organizationId: null,
       clientProfileId: null,
-      hubspotCompanyId: 'hub-1'
+      hubspotCompanyId: 'hub-1',
+      requestedSpaceId: null
     })
     expect(mockListFinanceExpensesFromPostgres).toHaveBeenCalledWith(
       expect.objectContaining({

@@ -4,10 +4,12 @@ import type { Metadata } from 'next'
 
 import { getIntegrationHealthSnapshots } from '@/lib/integrations/health'
 import { getNotionDeliveryDataQualityOverview } from '@/lib/integrations/notion-delivery-data-quality'
+import { getNotionSyncOrchestrationOverview } from '@/lib/integrations/notion-sync-orchestration'
 import { getIntegrationRegistry } from '@/lib/integrations/registry'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 import type { IntegrationDataQualityOverview } from '@/types/integration-data-quality'
+import type { NotionSyncOrchestrationOverview } from '@/types/notion-sync-orchestration'
 import type { IntegrationWithHealth } from '@/types/integrations'
 import AdminIntegrationGovernanceView from '@/views/greenhouse/admin/AdminIntegrationGovernanceView'
 
@@ -33,12 +35,17 @@ export default async function Page() {
 
   let integrations: IntegrationWithHealth[] = []
   let notionDataQualityOverview: IntegrationDataQualityOverview | null = null
+  let notionOrchestrationOverview: NotionSyncOrchestrationOverview | null = null
 
   try {
     const registry = await getIntegrationRegistry()
+
     const healthMap = await getIntegrationHealthSnapshots(registry.map(r => r.integrationKey))
 
-    notionDataQualityOverview = await getNotionDeliveryDataQualityOverview({ limit: 12 })
+    ;[notionDataQualityOverview, notionOrchestrationOverview] = await Promise.all([
+      getNotionDeliveryDataQualityOverview({ limit: 12 }),
+      getNotionSyncOrchestrationOverview({ limit: 12 })
+    ])
 
     integrations = registry.map(entry => ({
       ...entry,
@@ -60,6 +67,7 @@ export default async function Page() {
     <AdminIntegrationGovernanceView
       integrations={integrations}
       notionDataQualityOverview={notionDataQualityOverview}
+      notionOrchestrationOverview={notionOrchestrationOverview}
     />
   )
 }

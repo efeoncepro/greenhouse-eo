@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('server-only', () => ({}))
 
+process.env.NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET || 'test-nextauth-secret'
+
 const mockGetPayrollPeriod = vi.fn()
 const mockGetPayrollEntries = vi.fn()
 const mockGetPayrollExportPackageByPeriodId = vi.fn()
@@ -12,6 +14,8 @@ const mockUploadGreenhouseStorageObject = vi.fn()
 const mockUpsertPayrollExportPackageArtifacts = vi.fn()
 const mockRecordPayrollExportPackageDelivery = vi.fn()
 const mockSendEmail = vi.fn()
+const mockGetGreenhousePrivateAssetsBucket = vi.fn()
+const mockUpsertSystemGeneratedAsset = vi.fn()
 
 vi.mock('@/lib/payroll/get-payroll-periods', () => ({
   getPayrollPeriod: (...args: unknown[]) => mockGetPayrollPeriod(...args)
@@ -38,6 +42,11 @@ vi.mock('@/lib/storage/greenhouse-media', () => ({
   getGreenhouseMediaBucket: () => 'test-bucket'
 }))
 
+vi.mock('@/lib/storage/greenhouse-assets', () => ({
+  getGreenhousePrivateAssetsBucket: (...args: unknown[]) => mockGetGreenhousePrivateAssetsBucket(...args),
+  upsertSystemGeneratedAsset: (...args: unknown[]) => mockUpsertSystemGeneratedAsset(...args)
+}))
+
 vi.mock('@/lib/payroll/generate-payroll-pdf', () => ({
   generatePayrollPeriodPdf: (...args: unknown[]) => mockGeneratePayrollPeriodPdf(...args)
 }))
@@ -58,6 +67,10 @@ const {
 describe('payroll export packages', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockGetGreenhousePrivateAssetsBucket.mockReturnValue('test-bucket')
+    mockUpsertSystemGeneratedAsset
+      .mockResolvedValueOnce({ assetId: 'asset-pdf-1' })
+      .mockResolvedValueOnce({ assetId: 'asset-csv-1' })
     mockSendEmail.mockResolvedValue({
       deliveryId: 'delivery_123',
       resendId: 'email_123',

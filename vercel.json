@@ -10,19 +10,23 @@
     },
     {
       "path": "/api/cron/sync-conformed",
-      "schedule": "45 3 * * *"
+      "schedule": "20 7 * * *"
+    },
+    {
+      "path": "/api/cron/sync-conformed-recovery",
+      "schedule": "*/30 7-9 * * *"
     },
     {
       "path": "/api/cron/notion-delivery-data-quality",
-      "schedule": "15 4 * * *"
+      "schedule": "0 10 * * *"
     },
     {
       "path": "/api/cron/ico-materialize",
-      "schedule": "15 6 * * *"
+      "schedule": "15 10 * * *"
     },
     {
       "path": "/api/cron/ico-member-sync",
-      "schedule": "30 6 * * *"
+      "schedule": "30 10 * * *"
     },
     {
       "path": "/api/cron/nubox-sync",
