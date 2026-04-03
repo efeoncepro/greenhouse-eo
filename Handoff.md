@@ -1,5 +1,36 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — Hotfix GCP auth preference para runtime production
+
+### Rama / alcance
+
+- rama actual: `develop`
+- scope:
+  - `src/lib/google-credentials.ts`
+  - `src/lib/google-credentials.test.ts`
+  - `.env.example`
+  - `project_context.md`
+
+### Resultado
+
+- se agregó `GCP_AUTH_PREFERENCE` como switch explícito para seleccionar la fuente de credenciales GCP en runtime:
+  - `auto`
+  - `wif`
+  - `service_account_key`
+  - `ambient_adc`
+- el comportamiento default no cambia: Greenhouse sigue prefiriendo `WIF` cuando no existe override
+- se añadió cobertura de tests para el caso crítico donde un runtime Vercel con WIF configurado necesita degradar de forma controlada a `service_account_key`
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/google-credentials.test.ts`
+- `pnpm exec eslint src/lib/google-credentials.ts src/lib/google-credentials.test.ts`
+
+### Nota operativa
+
+- este cambio existe para destrabar incidentes de runtime Cloud SQL / BigQuery en production sin desmontar WIF en todos los entornos
+- si `production` fija `GCP_AUTH_PREFERENCE=service_account_key`, debe existir también `GOOGLE_APPLICATION_CREDENTIALS_JSON` o `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64`
+
 ## Sesión 2026-04-03 — TASK-209 cerrada con orquestación explícita raw -> conformed para Notion Delivery
 
 ### Rama / alcance

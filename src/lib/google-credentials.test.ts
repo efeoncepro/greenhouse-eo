@@ -99,6 +99,26 @@ describe('google credentials helpers', () => {
     expect(authOptions.credentials).toBeUndefined()
   })
 
+  it('allows an explicit service account key preference to override lazy vercel wif selection', () => {
+    const env = asEnv({
+      GCP_WORKLOAD_IDENTITY_PROVIDER: 'projects/123/locations/global/workloadIdentityPools/pool/providers/vercel',
+      GCP_SERVICE_ACCOUNT_EMAIL: 'greenhouse-runtime@efeonce-group.iam.gserviceaccount.com',
+      GOOGLE_APPLICATION_CREDENTIALS_JSON: '{"project_id":"efeonce-group","client_email":"runtime@example.com","private_key":"key"}',
+      GCP_PROJECT: 'efeonce-group',
+      GCP_AUTH_PREFERENCE: 'service_account_key',
+      VERCEL: '1',
+      VERCEL_ENV: 'production'
+    })
+
+    expect(shouldUseWorkloadIdentity(env)).toBe(false)
+    expect(getGoogleCredentialSource(env)).toBe('service_account_key')
+
+    const authOptions = getGoogleAuthOptions({ env })
+
+    expect(authOptions.credentials).toBeDefined()
+    expect(authOptions.authClient).toBeUndefined()
+  })
+
   it('falls back to ambient adc when no explicit wif or key is available', () => {
     const authOptions = getGoogleAuthOptions({
       env: asEnv({
