@@ -17,6 +17,23 @@ Regla nueva:
 
 - una vez congelado el período, el `Performance Report` ya no debe volver a leerse desde el estado vivo actual de Notion
 
+## Delta 2026-04-02 — Publicación outbound a Notion queda operativa
+
+`TASK-202` cierra el cutover `Greenhouse -> Notion`:
+
+- el target canónico quedó formalizado en `greenhouse_core.space_notion_publication_targets`
+- la trazabilidad runtime quedó formalizada en `greenhouse_sync.notion_publication_runs`
+- la integración outbound se registra como `notion_delivery_performance_reports`
+- la route operativa queda en:
+  - `GET /api/cron/notion-delivery-performance-publish`
+- la route soporta:
+  - `year`
+  - `month`
+  - `spaceId`
+  - `force=true`
+  - `dryRun=true`
+- el target base actual es la base Notion `Performance Reports`
+
 ## Objetivo
 
 Definir cómo debe operarse el `Performance Report` mensual de Delivery cuando Greenhouse es el motor canónico y Notion consume el resultado.
@@ -85,6 +102,7 @@ Antes de publicar un período, Greenhouse debe asumir estas reglas mínimas:
 - escribir el snapshot mensual en la base de `Performance Reports`
 - actualizar propiedades calculadas y resumen
 - dejar trazabilidad del run que publicó el reporte
+- ejecutar primero `dryRun=true` si el período aún no fue publicado o si se está validando un recálculo
 
 ## Calibración inicial obligatoria
 
@@ -123,7 +141,7 @@ La arquitectura del reporte vive en:
 
 La lane ejecutable vive en:
 
-- `docs/tasks/in-progress/TASK-196-delivery-performance-report-parity-greenhouse-notion.md`
+- `docs/tasks/complete/TASK-196-delivery-performance-report-parity-greenhouse-notion.md`
 
 Los deltas de ejecución y validación viven en:
 

@@ -12,14 +12,25 @@
   - el output canónico base ya existe en Greenhouse como combinación de `ico_engine.delivery_task_monthly_snapshots`, `ico_engine.performance_report_monthly` y `greenhouse_serving.agency_performance_reports`
   - el gap principal ya no es “definir el reporte desde cero”, sino formalizar e implementar el `publication contract` `Greenhouse -> Notion`
   - el cutover debe reutilizar el control plane de integraciones y no vivir como script aislado
+- Delta de implementación:
+  - se creó el target canónico de salida en `greenhouse_core.space_notion_publication_targets`
+  - se creó el ledger `greenhouse_sync.notion_publication_runs`
+  - se registró la integración outbound `notion_delivery_performance_reports`
+  - se implementó la route cron `GET /api/cron/notion-delivery-performance-publish`
+  - se implementó writer real a la base Notion `Performance Reports`
+  - la validación `dryRun` de `Marzo 2026` resolvió correctamente:
+    - `space_id = spc-c0cf6478-1bf1-4804-8e04-db7bc73655ad`
+    - `target_database_id = 935718d8e8ec4a79b0261be1ce300f73`
+    - `target_page_id = 4504bd15-76da-4cef-8404-c2d8b0769b30`
+    - `payloadHash = 5a7c586865bd7d5e745da78a046ac9edc7344e40939afe4f5a0e59a98a188ad4`
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
-- Status real: `Auditoría`
+- Status real: `Cerrada`
 - Rank: `58`
 - Domain: `ops`
 - GitHub Project: `[pending]`
@@ -53,7 +64,7 @@ Revisar y respetar:
 
 - `docs/architecture/GREENHOUSE_DELIVERY_PERFORMANCE_REPORT_PARITY_V1.md`
 - `docs/operations/GREENHOUSE_PERFORMANCE_REPORT_OPERATING_MODEL_V1.md`
-- `docs/tasks/in-progress/TASK-196-delivery-performance-report-parity-greenhouse-notion.md`
+- `docs/tasks/complete/TASK-196-delivery-performance-report-parity-greenhouse-notion.md`
 
 Reglas obligatorias:
 
@@ -80,7 +91,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/in-progress/TASK-202-delivery-performance-notion-publication-cutover.md`
+- `docs/tasks/complete/TASK-202-delivery-performance-notion-publication-cutover.md`
 - `docs/operations/GREENHOUSE_PERFORMANCE_REPORT_OPERATING_MODEL_V1.md`
 - `src/lib/space-notion/**` que se creen para publicación
 - `src/app/api/admin/integrations/**` que se creen para publicación
@@ -100,10 +111,8 @@ Reglas obligatorias:
 
 ### Gap actual
 
-- no existe un `publication payload contract` formalizado para Notion
-- no existe una ruta operativa cerrada de publicación
-- no existe writer saliente a Notion para este reporte
-- no existe trazabilidad runtime específica para publication runs de Delivery hacia Notion
+- no quedan gaps estructurales en el carril de publicación
+- queda pendiente únicamente la operación mensual del período real siguiente (`Abril 2026`)
 
 ## Scope
 
@@ -134,14 +143,15 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Existe definición del `publication payload` canónico mensual desde Greenhouse.
-- [ ] Existe plan claro de consumo/publicación en Notion.
-- [ ] Existe un mecanismo técnico implementado para publicar el reporte desde Greenhouse a Notion.
-- [ ] Existe runbook mensual para cierre, validación y publicación.
-- [ ] `Abril 2026` queda en condiciones de operarse como primer período Greenhouse-first.
+- [x] Existe definición del `publication payload` canónico mensual desde Greenhouse.
+- [x] Existe plan claro de consumo/publicación en Notion.
+- [x] Existe un mecanismo técnico implementado para publicar el reporte desde Greenhouse a Notion.
+- [x] Existe runbook mensual para cierre, validación y publicación.
+- [x] `Abril 2026` queda en condiciones de operarse como primer período Greenhouse-first.
 
 ## Verification
 
-- revisión del operating model resultante
-- validación de un flujo de publicación o simulación documentada
-- checklist de readiness mensual
+- `pnpm migrate:up`
+- `pnpm lint`
+- `pnpm build`
+- `GET /api/cron/notion-delivery-performance-publish?year=2026&month=3&dryRun=true`

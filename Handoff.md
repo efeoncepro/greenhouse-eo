@@ -62,7 +62,7 @@
 ### Delta de ejecución
 
 - Se creó la task formal:
-  - `docs/tasks/in-progress/TASK-196-delivery-performance-report-parity-greenhouse-notion.md`
+  - `docs/tasks/complete/TASK-196-delivery-performance-report-parity-greenhouse-notion.md`
 - Se crearon los documentos canónicos de esta lane:
   - `docs/architecture/GREENHOUSE_DELIVERY_PERFORMANCE_REPORT_PARITY_V1.md`
   - `docs/operations/GREENHOUSE_PERFORMANCE_REPORT_OPERATING_MODEL_V1.md`
@@ -125,6 +125,46 @@
   - `TASK-201` reconciliación y materialización histórica de `Marzo 2026`
   - `TASK-202` cutover de publicación/consumo en Notion
   - `TASK-197` ya quedó cerrada como slice de source sync/runtime parity
+
+## Sesión 2026-04-02 — TASK-202 publication cutover Greenhouse -> Notion
+
+### Objetivo
+
+- Implementar `TASK-202` para publicar el `Performance Report` mensual desde Greenhouse hacia Notion usando el período congelado como source of truth.
+
+### Delta de descubrimiento
+
+- `TASK-202` pasó a `in-progress` tras auditoría formal.
+- La spec quedó corregida para reflejar la realidad actual:
+  - el output canónico base ya existe en `ico_engine.delivery_task_monthly_snapshots`, `ico_engine.performance_report_monthly` y `greenhouse_serving.agency_performance_reports`
+  - el gap principal ya no es “definir el reporte desde cero”, sino formalizar e implementar el `publication contract` hacia Notion
+  - el cutover debe colgarse del control plane de integraciones existente y no nacer como script aislado
+- Hallazgo central:
+  - hoy el repo ya tiene discovery/register/governance de Notion, pero no tiene writer saliente para publicar el reporte mensual
+
+### Delta de implementación
+
+- `TASK-202` quedó cerrada.
+- Se aplicó la migración `20260403022246213_notion-delivery-performance-publication-cutover.sql`.
+- Nuevos objetos:
+  - `greenhouse_core.space_notion_publication_targets`
+  - `greenhouse_sync.notion_publication_runs`
+- Nueva integración registrada:
+  - `notion_delivery_performance_reports`
+- Nuevo endpoint cron:
+  - `GET /api/cron/notion-delivery-performance-publish`
+- Nuevos módulos:
+  - `src/lib/space-notion/notion-client.ts`
+  - `src/lib/space-notion/notion-publication-store.ts`
+  - `src/lib/space-notion/notion-performance-report-publication.ts`
+  - `src/types/notion-publication.ts`
+- Validación funcional:
+  - `dryRun` contra `Marzo 2026` resolvió correctamente el target Notion existente:
+    - `space_id = spc-c0cf6478-1bf1-4804-8e04-db7bc73655ad`
+    - `target_database_id = 935718d8e8ec4a79b0261be1ce300f73`
+    - `target_page_id = 4504bd15-76da-4cef-8404-c2d8b0769b30`
+    - `payloadHash = 5a7c586865bd7d5e745da78a046ac9edc7344e40939afe4f5a0e59a98a188ad4`
+- La epic `TASK-196` también quedó cerrada con este slice.
 
 ## Sesión 2026-04-02 — TASK-197 source sync assignee/project parity
 

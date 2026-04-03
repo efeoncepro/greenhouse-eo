@@ -128,7 +128,7 @@ Usar junto con:
 - `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
 - `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md`
 - `docs/operations/GREENHOUSE_PERFORMANCE_REPORT_OPERATING_MODEL_V1.md`
-- `docs/tasks/in-progress/TASK-196-delivery-performance-report-parity-greenhouse-notion.md`
+- `docs/tasks/complete/TASK-196-delivery-performance-report-parity-greenhouse-notion.md`
 
 ## Core Decision
 
@@ -142,6 +142,27 @@ Regla operativa:
 2. Greenhouse ingesta y normaliza las propiedades necesarias.
 3. Greenhouse materializa el reporte mensual con reglas versionadas.
 4. Notion consume y publica ese mismo resultado para narrativa, visualización o cálculos complementarios.
+
+## Publication Cutover
+
+`TASK-202` deja la salida canónica implementada:
+
+- source canónica:
+  - `ico_engine.delivery_task_monthly_snapshots`
+  - `ico_engine.performance_report_monthly`
+  - `greenhouse_serving.agency_performance_reports`
+- target/config:
+  - `greenhouse_core.space_notion_publication_targets`
+- audit trail:
+  - `greenhouse_sync.notion_publication_runs`
+- integration key:
+  - `notion_delivery_performance_reports`
+- runtime endpoint:
+  - `GET /api/cron/notion-delivery-performance-publish`
+
+Regla nueva:
+
+- la publicación mensual de Notion no debe reconstruir el reporte; debe hacer upsert del payload ya canonizado por Greenhouse
 
 ## Reporting Parity Model
 
