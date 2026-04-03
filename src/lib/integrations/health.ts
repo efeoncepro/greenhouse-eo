@@ -40,13 +40,15 @@ const deriveHealth = (runs: number, failures: number, lastRun: string | null): I
   if (lastRun) {
     const hoursAgo = (Date.now() - new Date(lastRun).getTime()) / 3_600_000
 
-    if (failures > 0 && hoursAgo > 72) return 'down'
-    if (failures > 0 || hoursAgo > 36) return 'degraded'
+    if (hoursAgo > 72) return failures > 0 ? 'down' : 'degraded'
+    if (hoursAgo > 36) return 'degraded'
+
+    return 'healthy'
   } else if (failures > 0) {
     return 'down'
   }
 
-  return 'healthy'
+  return 'idle'
 }
 
 /** Build health snapshots for all registered integrations */

@@ -335,7 +335,7 @@ const AdminIntegrationGovernanceView = ({
       {/* Health & Freshness */}
       <ExecutiveCardShell
         title='Health & Freshness'
-        subtitle='Estado operativo derivado de sync runs, freshness y senales de cada integracion. Verde < 6h, amarillo 6-24h, rojo > 24h.'
+        subtitle='Health refleja el estado actual segun la ultima senal valida y su frescura. Los fallos 24h se muestran aparte como contexto operativo, sin degradar por si solos una integracion ya recuperada.'
       >
         <TableContainer>
           <Table size='small'>
@@ -361,12 +361,19 @@ const AdminIntegrationGovernanceView = ({
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Chip
-                        size='small'
-                        variant='tonal'
-                        color={healthColor[h.health]}
-                        label={h.health}
-                      />
+                      <Stack spacing={0.75} alignItems='flex-start'>
+                        <Chip
+                          size='small'
+                          variant='tonal'
+                          color={healthColor[h.health]}
+                          label={h.health}
+                        />
+                        {h.syncFailuresLast24h > 0 && (
+                          <Typography variant='caption' color='warning.main'>
+                            {h.syncFailuresLast24h} incidente(s) en 24h
+                          </Typography>
+                        )}
+                      </Stack>
                     </TableCell>
                     <TableCell>
                       <Tooltip title={h.freshnessLabel} arrow>
