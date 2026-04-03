@@ -1,5 +1,39 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — TASK-209 production hardening del writer conformed de Notion
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `src/lib/sync/sync-notion-conformed.ts`
+
+### Resultado
+
+- el writer `raw -> greenhouse_conformed` ya no hace `WRITE_TRUNCATE` secuencial directo sobre las tablas canónicas
+- ahora carga primero a tablas staging efímeras y luego hace un swap transaccional sobre:
+  - `greenhouse_conformed.delivery_projects`
+  - `greenhouse_conformed.delivery_tasks`
+  - `greenhouse_conformed.delivery_sprints`
+- esto elimina el failure mode observado hoy en production donde `delivery_projects` quedaba adelantada mientras `delivery_tasks` / `delivery_sprints` fallaban por quota
+- además se agregó una gate de frescura por tabla:
+  - si `notion_ops.{proyectos,tareas,sprints}` no es más nueva que `greenhouse_conformed.{delivery_projects,delivery_tasks,delivery_sprints}`, la corrida se marca `succeeded` sin volver a escribir
+- con eso el callback determinístico hacia Greenhouse deja de quemar operaciones de tabla innecesarias cuando el conformed ya está al día
+
+### Verificación
+
+- `pnpm exec eslint src/lib/sync/sync-notion-conformed.ts`
+- `npx next build`
+  - compiló y llegó a `Running TypeScript`, pero el proceso quedó demasiado largo para esta sesión CLI y terminó cortado sin emitir error de código concreto
+
+### Nota operativa
+
+- evidencia previa del incidente:
+  - `delivery_projects.max(synced_at)` quedó en `2026-04-03T15:43:08Z`
+  - `delivery_tasks.max(synced_at)` y `delivery_sprints.max(synced_at)` seguían en `2026-04-03T12:02:05Z`
+  - eso confirma que el writer anterior podía dejar el conformed en estado parcial
+- siguiente paso esperado en esta misma lane: deploy productivo, rerun de `/api/cron/sync-conformed` y luego rerun full de `notion-bigquery`
+
 ## Sesión 2026-04-03 — Hotfix GCP auth preference para runtime production
 
 ### Rama / alcance

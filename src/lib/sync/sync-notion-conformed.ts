@@ -60,6 +60,10 @@ type PersistedStatusCountsRow = {
   total_tasks: number | string | null
 }
 
+type BigQueryTimestampRow = {
+  max_synced_at: { value?: string } | string | null
+}
+
 type NotionProjectRow = {
   notion_page_id: string | null
   _source_database_id: string | null
@@ -372,22 +376,46 @@ const runBigQuery = async <T extends Record<string, unknown>>(query: string) => 
   return rows as T[]
 }
 
-const replaceBigQueryTableWithLoadJob = async (
-  projectId: string,
-  dataset: string,
-  table: string,
-  rows: Record<string, unknown>[]
-) => {
+const buildStagingTableName = (table: string) =>
+  `${table}__stage_${randomUUID().replace(/-/g, '_').toLowerCase()}`
+
+const createEmptyStagingTable = async ({
+  projectId,
+  dataset,
+  targetTable,
+  stagingTable
+}: {
+  projectId: string
+  dataset: string
+  targetTable: string
+  stagingTable: string
+}) => {
   const bq = getBigQueryClient()
 
-  if (rows.length === 0) {
-    await bq.query({
-      query: `DELETE FROM \`${projectId}.${dataset}.${table}\` WHERE TRUE`
-    })
+  await bq.query({
+    query: `
+      CREATE TABLE \`${projectId}.${dataset}.${stagingTable}\`
+      AS SELECT *
+      FROM \`${projectId}.${dataset}.${targetTable}\`
+      WHERE FALSE
+    `
+  })
+}
 
+const loadRowsIntoBigQueryTable = async ({
+  dataset,
+  table,
+  rows
+}: {
+  dataset: string
+  table: string
+  rows: Record<string, unknown>[]
+}) => {
+  if (rows.length === 0) {
     return
   }
 
+  const bq = getBigQueryClient()
   const tempDir = await mkdtemp(path.join(os.tmpdir(), `greenhouse-bq-${table}-`))
   const tempFilePath = path.join(tempDir, `${table}.jsonl`)
 
@@ -397,55 +425,203 @@ const replaceBigQueryTableWithLoadJob = async (
     await writeFile(tempFilePath, `${jsonLines}\n`, 'utf8')
     await bq.dataset(dataset).table(table).load(tempFilePath, {
       sourceFormat: 'NEWLINE_DELIMITED_JSON',
-      writeDisposition: 'WRITE_TRUNCATE'
+      writeDisposition: 'WRITE_APPEND'
     })
   } finally {
     await rm(tempDir, { recursive: true, force: true })
   }
 }
 
+const dropBigQueryTable = async ({
+  projectId,
+  dataset,
+  table
+}: {
+  projectId: string
+  dataset: string
+  table: string
+}) => {
+  const bq = getBigQueryClient()
+
+  await bq.query({
+    query: `DROP TABLE IF EXISTS \`${projectId}.${dataset}.${table}\``
+  })
+}
+
+const replaceBigQueryTablesWithStagedSwap = async ({
+  projectId,
+  dataset,
+  replacements
+}: {
+  projectId: string
+  dataset: string
+  replacements: Array<{
+    table: string
+    rows: Record<string, unknown>[]
+  }>
+}) => {
+  const bq = getBigQueryClient()
+  const stagedTables: Array<{ targetTable: string; stagingTable: string }> = []
+
+  try {
+    for (const replacement of replacements) {
+      const stagingTable = buildStagingTableName(replacement.table)
+
+      await createEmptyStagingTable({
+        projectId,
+        dataset,
+        targetTable: replacement.table,
+        stagingTable
+      })
+      await loadRowsIntoBigQueryTable({
+        dataset,
+        table: stagingTable,
+        rows: replacement.rows
+      })
+
+      stagedTables.push({
+        targetTable: replacement.table,
+        stagingTable
+      })
+    }
+
+    const script = [
+      'BEGIN TRANSACTION;',
+      ...stagedTables.flatMap(({ targetTable, stagingTable }) => [
+        `DELETE FROM \`${projectId}.${dataset}.${targetTable}\` WHERE TRUE;`,
+        `INSERT INTO \`${projectId}.${dataset}.${targetTable}\` SELECT * FROM \`${projectId}.${dataset}.${stagingTable}\`;`
+      ]),
+      'COMMIT TRANSACTION;'
+    ].join('\n')
+
+    await bq.query({
+      query: script
+    })
+  } finally {
+    for (const stagedTable of stagedTables) {
+      await dropBigQueryTable({
+        projectId,
+        dataset,
+        table: stagedTable.stagingTable
+      }).catch(() => {})
+    }
+  }
+}
+
+const readRawConformedFreshness = async (projectId: string) => {
+  const bq = getBigQueryClient()
+
+  const [[rawRows], [conformedRows]] = await Promise.all([
+    bq.query({
+      query: `
+        SELECT MAX(_synced_at) AS max_synced_at
+        FROM \`${projectId}.notion_ops.tareas\`
+      `
+    }) as Promise<[BigQueryTimestampRow[], unknown]>,
+    bq.query({
+      query: `
+        SELECT MAX(synced_at) AS max_synced_at
+        FROM \`${projectId}.greenhouse_conformed.delivery_tasks\`
+      `
+    }) as Promise<[BigQueryTimestampRow[], unknown]>
+  ])
+
+  const [[rawProjectRows], [conformedProjectRows]] = await Promise.all([
+    bq.query({
+      query: `
+        SELECT MAX(_synced_at) AS max_synced_at
+        FROM \`${projectId}.notion_ops.proyectos\`
+      `
+    }) as Promise<[BigQueryTimestampRow[], unknown]>,
+    bq.query({
+      query: `
+        SELECT MAX(synced_at) AS max_synced_at
+        FROM \`${projectId}.greenhouse_conformed.delivery_projects\`
+      `
+    }) as Promise<[BigQueryTimestampRow[], unknown]>
+  ])
+
+  const [[rawSprintRows], [conformedSprintRows]] = await Promise.all([
+    bq.query({
+      query: `
+        SELECT MAX(_synced_at) AS max_synced_at
+        FROM \`${projectId}.notion_ops.sprints\`
+      `
+    }) as Promise<[BigQueryTimestampRow[], unknown]>,
+    bq.query({
+      query: `
+        SELECT MAX(synced_at) AS max_synced_at
+        FROM \`${projectId}.greenhouse_conformed.delivery_sprints\`
+      `
+    }) as Promise<[BigQueryTimestampRow[], unknown]>
+  ])
+
+  return {
+    raw: {
+      tasks: toTimestampValue(rawRows[0]?.max_synced_at),
+      projects: toTimestampValue(rawProjectRows[0]?.max_synced_at),
+      sprints: toTimestampValue(rawSprintRows[0]?.max_synced_at)
+    },
+    conformed: {
+      tasks: toTimestampValue(conformedRows[0]?.max_synced_at),
+      projects: toTimestampValue(conformedProjectRows[0]?.max_synced_at),
+      sprints: toTimestampValue(conformedSprintRows[0]?.max_synced_at)
+    }
+  }
+}
+
+const isConformedTableFreshEnough = (rawSyncedAt: string | null, conformedSyncedAt: string | null) => {
+  if (!rawSyncedAt) return true
+  if (!conformedSyncedAt) return false
+
+  return new Date(conformedSyncedAt).getTime() >= new Date(rawSyncedAt).getTime()
+}
+
+const isConformedFreshEnough = (freshness: Awaited<ReturnType<typeof readRawConformedFreshness>>) =>
+  isConformedTableFreshEnough(freshness.raw.tasks, freshness.conformed.tasks) &&
+  isConformedTableFreshEnough(freshness.raw.projects, freshness.conformed.projects) &&
+  isConformedTableFreshEnough(freshness.raw.sprints, freshness.conformed.sprints)
+
+const formatFreshnessSnapshot = (freshness: Awaited<ReturnType<typeof readRawConformedFreshness>>) =>
+  JSON.stringify({
+    raw: freshness.raw,
+    conformed: freshness.conformed
+  })
+
 /** Ensure delivery_tasks has additive columns required by the sync runtime. */
 const ensureDeliveryTaskColumns = async (projectId: string) => {
   const bq = getBigQueryClient()
+  const existingColumns = await readTableColumns('greenhouse_conformed', 'delivery_tasks')
+  const missingColumns: Array<{ name: string; type: string }> = []
 
-  try {
-    await bq.query({
-      query: `ALTER TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\` ADD COLUMN IF NOT EXISTS assignee_member_ids ARRAY<STRING>`
-    })
-  } catch {
-    // Column may already exist or service account lacks ALTER permissions — safe to continue
+  if (!existingColumns.has('assignee_member_ids')) {
+    missingColumns.push({ name: 'assignee_member_ids', type: 'ARRAY<STRING>' })
   }
 
-  try {
-    await bq.query({
-      query: `ALTER TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\` ADD COLUMN IF NOT EXISTS project_source_ids ARRAY<STRING>`
-    })
-  } catch {
-    // Column may already exist or service account lacks ALTER permissions — safe to continue
+  if (!existingColumns.has('project_source_ids')) {
+    missingColumns.push({ name: 'project_source_ids', type: 'ARRAY<STRING>' })
   }
 
-  try {
-    await bq.query({
-      query: `ALTER TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\` ADD COLUMN IF NOT EXISTS created_at TIMESTAMP`
-    })
-  } catch {
-    // Column may already exist or service account lacks ALTER permissions — safe to continue
+  if (!existingColumns.has('created_at')) {
+    missingColumns.push({ name: 'created_at', type: 'TIMESTAMP' })
   }
 
-  try {
-    await bq.query({
-      query: `ALTER TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\` ADD COLUMN IF NOT EXISTS tarea_principal_ids ARRAY<STRING>`
-    })
-  } catch {
-    // Column may already exist or service account lacks ALTER permissions — safe to continue
+  if (!existingColumns.has('tarea_principal_ids')) {
+    missingColumns.push({ name: 'tarea_principal_ids', type: 'ARRAY<STRING>' })
   }
 
-  try {
-    await bq.query({
-      query: `ALTER TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\` ADD COLUMN IF NOT EXISTS subtareas_ids ARRAY<STRING>`
-    })
-  } catch {
-    // Column may already exist or service account lacks ALTER permissions — safe to continue
+  if (!existingColumns.has('subtareas_ids')) {
+    missingColumns.push({ name: 'subtareas_ids', type: 'ARRAY<STRING>' })
+  }
+
+  for (const column of missingColumns) {
+    try {
+      await bq.query({
+        query: `ALTER TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\` ADD COLUMN ${column.name} ${column.type}`
+      })
+    } catch {
+      // Column may have been added concurrently or service account lacks ALTER permissions — safe to continue
+    }
   }
 }
 
@@ -524,6 +700,35 @@ export const syncNotionToConformed = async (input?: {
         durationMs: Date.now() - start,
         skipped: true,
         skipReason: rawFreshness.reason,
+        rawFreshness
+      }
+    }
+
+    const freshnessSnapshot = await readRawConformedFreshness(projectId)
+
+    if (isConformedFreshEnough(freshnessSnapshot)) {
+      const notes =
+        `Conformed sync already current for raw snapshot; write skipped. freshness=${formatFreshnessSnapshot(freshnessSnapshot)}`
+
+      await writeSyncConformedRunRecord({
+        syncRunId,
+        status: 'succeeded',
+        notes,
+        recordsRead: 0,
+        recordsWrittenConformed: 0
+      })
+
+      return {
+        syncRunId,
+        projectsRead: 0,
+        tasksRead: 0,
+        sprintsRead: 0,
+        conformedRowsWritten: 0,
+        sourceTasksWithResponsables: 0,
+        conformedTasksWithAssigneeSource: 0,
+        conformedTasksWithAssigneeMember: 0,
+        conformedTasksWithAssigneeMemberIds: 0,
+        durationMs: Date.now() - start,
         rawFreshness
       }
     }
@@ -869,11 +1074,18 @@ export const syncNotionToConformed = async (input?: {
 
   await ensureDeliveryTaskColumns(projectId)
 
-  // Use load jobs instead of streaming inserts so future runs can replace the
-  // same tables without hitting BigQuery streaming buffer DELETE restrictions.
-  await replaceBigQueryTableWithLoadJob(projectId, 'greenhouse_conformed', 'delivery_projects', deliveryProjects)
-  await replaceBigQueryTableWithLoadJob(projectId, 'greenhouse_conformed', 'delivery_tasks', deliveryTasks)
-  await replaceBigQueryTableWithLoadJob(projectId, 'greenhouse_conformed', 'delivery_sprints', deliverySprints)
+  // Stage into unique tables, then atomically swap into the canonical tables.
+  // This avoids partial writes if one replacement fails mid-run and reduces
+  // repeated table-update pressure on the canonical targets.
+  await replaceBigQueryTablesWithStagedSwap({
+    projectId,
+    dataset: 'greenhouse_conformed',
+    replacements: [
+      { table: 'delivery_projects', rows: deliveryProjects },
+      { table: 'delivery_tasks', rows: deliveryTasks },
+      { table: 'delivery_sprints', rows: deliverySprints }
+    ]
+  })
 
   const conformedRowsWritten = deliveryProjects.length + deliveryTasks.length + deliverySprints.length
 
