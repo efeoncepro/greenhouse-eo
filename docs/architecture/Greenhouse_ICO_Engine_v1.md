@@ -1,5 +1,24 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-03 — `Carry-Over` deja de ser bucket de cumplimiento mensual
+
+Aclaración funcional posterior a la auditoría de Delivery:
+
+- `Carry-Over` ya no debe leerse como bucket del scorecard `due_date in period`
+- `Carry-Over` pasa a significar:
+  - tarea creada dentro del período
+  - con `due_date` posterior al cierre de ese período
+- la deuda vencida que cruza de mes pasa a modelarse aparte como `Overdue Carried Forward`
+
+Consecuencia:
+
+- el scorecard mensual de cumplimiento debe quedarse con:
+  - `On-Time`
+  - `Late Drop`
+  - `Overdue`
+- `Carry-Over` y `Overdue Carried Forward` se leen como métricas complementarias de carga/flujo
+- la implementación explícita del split queda trazada como follow-on de `TASK-204`
+
 ## Delta 2026-04-02 — Historical Delivery periods now support frozen task snapshots
 
 `TASK-201` agrega una nueva pieza canónica al runtime de `ICO`:

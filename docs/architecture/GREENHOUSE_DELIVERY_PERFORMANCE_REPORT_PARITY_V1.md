@@ -47,6 +47,44 @@ Consecuencia:
 - `materialize.ts`, `read-metrics.ts` y `performance-report.ts` deben leer exactamente esa misma semántica
 - la reconciliación histórica de `Marzo 2026` queda como follow-on de `TASK-201`, no como precondición para cerrar el contrato
 
+## Delta 2026-04-03 — Canonical read path now prefers materialized report tables
+
+Auditoría posterior al cutover detectó que el `Performance Report` podía leerse desde `greenhouse_serving.agency_performance_reports` antes que desde `ico_engine.performance_report_monthly`.
+
+Corrección vigente:
+
+- `readAgencyPerformanceReport()` debe preferir la materialización canónica de BigQuery (`ico_engine.performance_report_monthly`)
+- `greenhouse_serving.agency_performance_reports` queda como cache/proyección de consumo, no como fuente preferida del cálculo
+
+Hallazgo adicional de la auditoría:
+
+- intentar reintroducir semántica de `carry-over` de períodos anteriores directamente en el filtro compartido del engine disparó totales no defendibles para el scorecard mensual
+- por lo tanto, el contrato del `Performance Report` se mantiene anclado a `due_date in period`
+- cualquier definición más amplia de `carry-over` deberá abrirse como contrato separado y no entrar a ciegas en el scorecard mensual
+
+## Delta 2026-04-03 — `Carry-Over` se redefine y se separa de deuda vencida
+
+Aclaración funcional posterior a la auditoría:
+
+- `Carry-Over` no debe significar “tarea vencida de períodos anteriores que sigue abierta”
+- `Carry-Over` debe significar:
+  - tarea creada dentro del período
+  - con `due_date` posterior al cierre de ese período
+- la deuda vencida que cruza de mes queda como métrica distinta:
+  - `Overdue Carried Forward`
+  - tareas con `due_date <= period_end` que siguen abiertas al comenzar el mes siguiente
+
+Consecuencia canónica:
+
+- el scorecard de cumplimiento mensual queda anclado al universo `due_date in period`
+- sus buckets canónicos son:
+  - `On-Time`
+  - `Late Drop`
+  - `Overdue`
+- `Carry-Over` y `Overdue Carried Forward` pasan a ser métricas complementarias de carga/flujo
+- `OTD` no debe usar `Carry-Over` ni `Overdue Carried Forward` en su denominador
+- la implementación del split semántico queda como follow-on explícito de `TASK-204`
+
 ## Delta 2026-04-02 — Owner attribution contract moves to primary-owner credit
 
 `TASK-199` fija que la atribución canónica del `Performance Report` ya no debe seguir acreditando member-level metrics a todos los assignees resueltos.
@@ -188,11 +226,20 @@ Cada versión del reporte mensual debe fijar explícitamente:
 - reglas para `Late Drop`
 - reglas para `Overdue`
 - reglas para `Carry-Over`
+- reglas para `Overdue Carried Forward`
 - reglas para `RpA`
 - reglas para `FTR`
 - elegibilidad de `Top Performer`
 - criterios de alertas y hallazgos
 - reglas de comparativo versus mes anterior
+
+Contrato funcional actualizado:
+
+- `On-Time`: tarea con `due_date` dentro del período y completada en o antes de su `due_date`
+- `Late Drop`: tarea con `due_date` dentro del período y completada después de su `due_date`, pero antes del cierre
+- `Overdue`: tarea con `due_date` dentro del período y abierta al cierre
+- `Carry-Over`: tarea creada dentro del período cuyo `due_date` cae después del cierre del período
+- `Overdue Carried Forward`: tarea con `due_date` en o antes del cierre que sigue abierta al comenzar el mes siguiente
 
 ## Canonical Data Chain
 

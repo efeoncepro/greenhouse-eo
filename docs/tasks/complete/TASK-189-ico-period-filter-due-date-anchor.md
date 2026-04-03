@@ -1,5 +1,16 @@
 # TASK-189 — ICO Period Filter: Due-Date Anchor & Carry-Over Logic
 
+## Delta 2026-04-03 — Semántica original de `carry-over` queda supersedida
+
+- Aclaración de negocio posterior:
+  - la definición implementada originalmente en `TASK-189` para `carry-over` como tarea vencida de períodos anteriores aún abierta ya no debe considerarse canónica para Delivery
+- Contrato vigente ahora:
+  - `Carry-Over` = tarea creada en el mes con `due_date` en el mes siguiente o después
+  - la deuda vencida que cruza de mes pasa a medirse por separado como `Overdue Carried Forward`
+- Lectura correcta del legado de `TASK-189`:
+  - sigue siendo válida la decisión de anclar el período por `due_date`
+  - pero la semántica específica de `carry-over` quedó superada por la clarificación contractual posterior documentada en `TASK-200`, `TASK-204` y la arquitectura viva de Delivery
+
 ## Delta 2026-04-01 — Reader hardened + rolling rematerialization
 
 - Se implementó el hardening faltante de `TASK-189` sin reescribir `ICO`:

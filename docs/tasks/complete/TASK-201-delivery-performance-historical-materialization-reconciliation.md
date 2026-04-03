@@ -167,6 +167,17 @@ Reglas obligatorias:
   - `Marzo 2026` queda como baseline calibrado con drift explicado
   - `Abril 2026` en adelante debe operar con snapshot mensual congelado al cierre y no recalcularse desde el estado vivo de Notion
 
+## Delta 2026-04-03
+
+- Auditoría task-level posterior confirmó que marzo 2026 estaba internamente consistente entre snapshot congelado y serving.
+- También detectó un límite semántico vigente:
+  - `carry_over_count` queda prácticamente apagado bajo el contrato actual del `Performance Report`, porque el scorecard mensual sigue anclado a `due_date in period`
+- Corrección aplicada después del cierre:
+  - la lectura del reporte mensual prioriza `performance_report_monthly` como fuente canónica antes de serving
+- Consecuencia:
+  - marzo 2026 permanece estable
+  - el residual de `carry-over` queda explícitamente identificado como una decisión semántica pendiente y no como inconsistencia entre snapshot y serving
+
 ## Verification
 
 - queries sobre `ico_engine.performance_report_monthly`

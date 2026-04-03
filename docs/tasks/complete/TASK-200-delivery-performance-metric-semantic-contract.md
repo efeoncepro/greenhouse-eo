@@ -195,3 +195,33 @@ Reglas obligatorias:
     - `On-Time % = On-Time / Total Tareas`
     - tareas compartidas atribuidas al responsable principal
   - el histórico Greenhouse de marzo 2026 sigue con drift y buckets nulos en materializaciones legacy; eso queda explícitamente delegado a `TASK-201`
+
+## Delta 2026-04-03
+
+- Auditoría posterior confirmó que el scorecard mensual vigente sigue siendo internamente consistente cuando se ancla a `due_date in period`.
+- También confirmó que intentar reintroducir `carry-over` de períodos anteriores directamente en el filtro compartido del engine infla el scorecard mensual con trabajo histórico abierto y vuelve inestable la semántica del reporte.
+- Corrección vigente:
+  - el contrato del `Performance Report` se mantiene anclado a `due_date in period`
+  - `readAgencyPerformanceReport()` pasa a preferir `ico_engine.performance_report_monthly` por encima de `greenhouse_serving.agency_performance_reports` para leer la fuente canónica del cálculo
+
+## Delta 2026-04-03 — Corrección funcional de `Carry-Over`
+
+- Aclaración de negocio posterior al cierre de esta task:
+  - `Carry-Over` **no** debe significar “tarea vencida de meses anteriores aún abierta”
+  - `Carry-Over` debe significar: **tarea creada dentro del mes cuyo `due_date` cae en el mes siguiente o después**
+- Consecuencia contractual:
+  - el scorecard de cumplimiento mensual ya no debe tratar `Carry-Over` como bucket del mismo universo `due_date in period`
+  - los buckets de cumplimiento del mes quedan reducidos a:
+    - `On-Time`
+    - `Late Drop`
+    - `Overdue`
+  - `OTD` debe leerse sobre ese universo de cumplimiento del período, sin meter `Carry-Over` en el denominador
+- Se incorpora además una métrica separada para deuda operativa:
+  - `Overdue Carried Forward`
+  - definición: tareas con `due_date` en o antes del cierre del mes que siguen abiertas al comenzar el mes siguiente
+- Lectura correcta:
+  - `Carry-Over` mide carga sembrada en el mes para períodos futuros
+  - `Overdue Carried Forward` mide vencidos reales que se cargan al mes siguiente
+- Estado de implementación:
+  - esta aclaración corrige el contrato funcional/documental
+  - la adaptación explícita del engine queda delegada a `TASK-204` para no mezclar esta redefinición con los hardenings ya cerrados de `TASK-200` y `TASK-201`

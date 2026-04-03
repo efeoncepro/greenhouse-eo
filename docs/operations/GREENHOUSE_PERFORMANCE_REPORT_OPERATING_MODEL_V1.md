@@ -63,13 +63,24 @@ Antes de publicar un período, Greenhouse debe asumir estas reglas mínimas:
 - grano canónico: tareas con `due_date` dentro del período
 - fecha de corte canónica del cierre mensual: `último día del período + 1 día`
 - exclusiones mínimas: `Archivada`, `Cancelada`, `Tomado`
-- buckets mutuamente excluyentes del scorecard:
+- buckets mutuamente excluyentes del scorecard de cumplimiento:
   - `On-Time`
   - `Late Drop`
   - `Overdue`
-  - `Carry-Over`
-- `OTD` del reporte = `On-Time / total de tareas clasificadas`
+- `OTD` del reporte = `On-Time / total de tareas clasificadas del universo due-in-period`
 - `Top Performer` usa ese mismo `OTD` y requiere volumen mínimo medido sobre total de tareas del período
+
+Métricas complementarias fuera del denominador de `OTD`:
+
+- `Carry-Over`
+  - tareas creadas dentro del período con `due_date` posterior al cierre del período
+- `Overdue Carried Forward`
+  - tareas con `due_date` en o antes del cierre que siguen abiertas al comenzar el mes siguiente
+
+Regla nueva:
+
+- `Carry-Over` no mide atraso
+- `Overdue Carried Forward` sí mide deuda vencida que cruza de mes
 
 ## Cadencia mensual
 

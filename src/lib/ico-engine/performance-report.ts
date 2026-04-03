@@ -538,16 +538,16 @@ export const readAgencyPerformanceReport = async (
   periodYear: number,
   periodMonth: number
 ): Promise<AgencyPerformanceReport> => {
-  const serving = await readServingAgencyPerformanceReport(periodYear, periodMonth)
-
-  if (serving) {
-    return serving
-  }
-
   const materialized = await readMaterializedAgencyPerformanceReport(periodYear, periodMonth)
 
   if (materialized) {
     return materialized
+  }
+
+  const serving = await readServingAgencyPerformanceReport(periodYear, periodMonth)
+
+  if (serving) {
+    return serving
   }
 
   const previous = getPreviousPeriod(periodYear, periodMonth)
