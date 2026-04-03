@@ -1,5 +1,80 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — Contrato_Metricas_ICO_v1 aligned to benchmark-informed thresholds
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+  - `project_context.md`
+  - `Handoff.md`
+  - `changelog.md`
+
+### Resultado
+
+- `Contrato_Metricas_ICO_v1.md` ya no deja mezclados en una sola tabla thresholds benchmark-informed e internos
+- el contrato ahora adopta explícitamente las bandas investigadas y documentadas antes en `Greenhouse_ICO_Engine_v1.md` para:
+  - `OTD%`
+  - `FTR%`
+  - `RpA`
+- además separa como métricas de calibración interna:
+  - `Cycle Time`
+  - `Cycle Time Variance`
+  - `BCS`
+- esto corrige la contradicción donde el contrato seguía usando:
+  - `OTD >= 90`
+  - `FTR >= 70`
+  - `RpA <= 1.5`
+  como si fueran thresholds equivalentes en respaldo metodológico
+
+### Verificación
+
+- revisión manual de consistencia entre:
+  - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md` § `A.5.5`
+
+## Sesión 2026-04-03 — ICO north-star task wave aligned to Contrato_Metricas_ICO_v1
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `docs/tasks/to-do/TASK-213-ico-metrics-hardening-trust-model.md`
+  - `docs/tasks/to-do/TASK-218-ico-time-to-market-activation-evidence-contract.md`
+  - `docs/tasks/to-do/TASK-219-ico-iteration-velocity-experimentation-signal-contract.md`
+  - `docs/tasks/to-do/TASK-220-ico-brief-clarity-score-intake-governance.md`
+  - `docs/tasks/to-do/TASK-221-revenue-enabled-measurement-model-attribution-policy.md`
+  - `docs/tasks/to-do/TASK-222-creative-velocity-review-tiered-metric-surfacing.md`
+  - `docs/tasks/to-do/TASK-223-ico-methodological-accelerators-instrumentation.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+  - `Handoff.md`
+
+### Resultado
+
+- la ola `TASK-213` a `TASK-217` ya no queda limitada solo a trust de KPIs operativos
+- ahora queda explícitamente alineada al norte de `Contrato_Metricas_ICO_v1`
+- se abrió una segunda ola de tasks para llegar al norte real:
+  - `TASK-218` — `TTM` + evidencia de activación
+  - `TASK-220` — `BCS` + intake governance
+  - `TASK-219` — `Iteration Velocity` + señal de experimentación
+  - `TASK-221` — `Revenue Enabled` como measurement model defendible
+  - `TASK-222` — `CVR` + tiers + narrativa client-facing
+  - `TASK-223` — aceleradores metodológicos internos
+- orden recomendado total:
+  - trust foundation: `TASK-214` → `TASK-216` → `TASK-215` → `TASK-217`
+  - north-star enablement: `TASK-218` → `TASK-220` → `TASK-219` → `TASK-221` → `TASK-222` → `TASK-223`
+
+### Verificación
+
+- revisión manual de consistencia contra:
+  - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+  - `docs/tasks/TASK_TEMPLATE.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+
 ## Sesión 2026-04-03 — ICO metrics hardening tasks package created
 
 ### Rama / alcance

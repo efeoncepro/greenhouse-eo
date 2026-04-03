@@ -2,6 +2,11 @@
 
 ## 2026-04-03
 
+- **Contrato de métricas ICO alineado a thresholds benchmark-informed**:
+  - `docs/architecture/Contrato_Metricas_ICO_v1.md` ya no usa la tabla legacy de tres bandas para `OTD`, `FTR` y `RpA`
+  - el contrato ahora adopta explícitamente las bandas benchmark-informed documentadas en `Greenhouse_ICO_Engine_v1.md`
+  - además separa `Cycle Time`, `Cycle Time Variance` y `BCS` como métricas de calibración interna, evitando presentarlas con el mismo nivel de respaldo externo que `OTD`, `FTR` y `RpA`
+
 - **ICO Engine external benchmarks documented**:
   - `docs/architecture/Greenhouse_ICO_Engine_v1.md` ahora incluye una sección específica de benchmarks externos y estándar recomendado para Greenhouse (`A.5.5`)
   - el documento distingue qué métricas sí tienen benchmark externo portable (`OTD`), cuáles solo tienen análogo razonable (`FTR`), cuáles tienen benchmark parcial creativo (`RpA`, `cycle time`) y cuáles deben seguir tratándose como policy interna (`throughput`, `pipeline velocity`, `stuck assets`, `carry-over`, `overdue carried forward`)

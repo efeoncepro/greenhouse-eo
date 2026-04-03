@@ -1,5 +1,15 @@
 # project_context.md
 
+## Delta 2026-04-03 Contrato_Metricas_ICO_v1 aligned to benchmark-informed thresholds
+
+- `docs/architecture/Contrato_Metricas_ICO_v1.md` ya no usa los thresholds legacy `OTD >= 90`, `FTR >= 70`, `RpA <= 1.5` como si todos tuvieran el mismo respaldo.
+- El contrato ahora separa explícitamente:
+  - métricas con benchmark informado por referencias externas o análogos (`OTD`, `FTR`, `RpA`)
+  - métricas con calibración interna por cuenta/tipo de pieza (`Cycle Time`, `Cycle Time Variance`, `BCS`)
+- Regla operativa:
+  - para `OTD`, `FTR` y `RpA` prevalecen las bandas documentadas en `docs/architecture/Greenhouse_ICO_Engine_v1.md` § `A.5.5`
+  - para `Cycle Time`, `CTV` y `BCS` se mantiene calibración interna según baseline operativo por cuenta
+
 ## Delta 2026-04-03 ICO Engine external benchmarks documented
 
 - La arquitectura de `ICO Engine` ya documenta un bloque específico de benchmarks externos y estándar recomendado para Greenhouse.
