@@ -1,5 +1,22 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-02 — Monthly Delivery report semantics now use due-date scope
+
+`TASK-200` fija un cambio semántico para los KPIs mensuales que alimentan el `Performance Report`:
+
+- el período canónico del scorecard se define por `due_date in month`, no por `period_anchor_date`
+- el cierre mensual usa `period_end + 1 day` como fecha de corte canónica
+- `OTD` del reporte ya no es `on_time / (on_time + late_drop)`
+- `OTD` del reporte pasa a ser `on_time / total_classified_tasks`
+- `Overdue` y `Carry-Over` pasan a leerse como buckets mutuamente excluyentes del scorecard mensual
+- `Top Performer` ya debe evaluarse con volumen total de tareas del período, no solo `throughput_count` de completadas
+
+Regla vigente:
+
+- la fuente ejecutable del contrato vive en `src/lib/ico-engine/shared.ts`
+- `metric_snapshots_monthly`, `metrics_by_member`, `metrics_by_project` y `performance_report_monthly` deben materializarse desde esa misma semántica
+- la reconciliación de históricos previos al contrato queda a cargo de `TASK-201`
+
 ## Delta 2026-04-02 — Member dimension now follows primary-owner attribution
 
 `TASK-199` fija un cambio semántico para la dimensión `member`:

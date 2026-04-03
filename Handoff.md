@@ -270,6 +270,85 @@
   - `rg -n "new Pool\\(" src scripts` ✅
 - El siguiente carril natural pasa a ser `TASK-200`, porque ya no queda ambiguo quién recibe el crédito; ahora toca congelar la fórmula semántica de las métricas.
 
+## Sesión 2026-04-02 — TASK-200 delivery performance metric semantic contract
+
+### Objetivo
+
+- Congelar el contrato semántico de `OTD`, `Late Drop`, `Overdue`, `Carry-Over`, `FTR`, `RpA` y comparativos mensuales para que Greenhouse y Notion hablen exactamente del mismo reporte.
+
+### Delta de descubrimiento
+
+- `TASK-200` pasó a `in-progress` tras auditoría formal.
+- La spec original quedó corregida:
+  - el problema real no es solo la fórmula de `OTD`
+  - ya existe una semántica canónica parcial en `src/lib/ico-engine/shared.ts`
+  - el hueco principal ahora es cerrar contrato completo + alinear materializaciones + consumers legacy
+- Hallazgos verificados en runtime:
+  - `src/lib/ico-engine/shared.ts` ya define:
+    - `CANONICAL_ON_TIME_SQL`
+    - `CANONICAL_LATE_DROP_SQL`
+    - `CANONICAL_OVERDUE_SQL`
+    - `CANONICAL_CARRY_OVER_SQL`
+    - `CANONICAL_FTR_*`
+  - `src/lib/ico-engine/materialize.ts` ya usa ese contrato parcial para:
+    - `metric_snapshots_monthly`
+    - `metrics_by_member`
+    - `metrics_by_project`
+    - `performance_report_monthly`
+  - todavía conviven consumers legacy fuera del contrato:
+    - `src/lib/projects/get-project-detail.ts`
+    - `src/lib/capability-queries/shared.ts`
+    - surfaces que siguen leyendo `% On-Time` de proyecto o infiriendo `delivery_signal` desde `cumplimiento/completitud`
+- Baseline real `Marzo 2026` al momento de abrir la task:
+  - `metrics_by_member` para `daniela-ferreira`:
+    - `otd_pct = 82.4`
+    - `total_tasks = 34`
+    - `completed_tasks = 17`
+    - `active_tasks = 17`
+    - `on_time_count = NULL`
+    - `late_drop_count = NULL`
+    - `overdue_count = NULL`
+    - `carry_over_count = NULL`
+  - `metric_snapshots_monthly` mantiene buckets nulos en varias filas de marzo 2026
+  - `performance_report_monthly` no tiene fila `agency` para `2026-03`
+- Lectura operativa:
+  - `TASK-200` no requiere migración DDL obligatoria hoy
+  - primero hay que fijar la semántica y luego `TASK-201` recalcula y reconcilia el histórico
+
+### Cierre real
+
+- `TASK-200` quedó cerrada.
+- Contrato semántico fijado:
+  - grano mensual = `tasks con due_date dentro del período`
+  - fecha de corte canónica = `period_end + 1 day`
+  - exclusiones mínimas = `Archivada`, `Cancelada`, `Tomado`
+  - buckets del scorecard = `On-Time`, `Late Drop`, `Overdue`, `Carry-Over`
+  - `OTD` del scorecard mensual = `On-Time / total_classified_tasks`
+  - `Top Performer` usa `OTD` canónico y volumen total de tareas del período, no solo completadas
+- Implementación cerrada:
+  - `src/lib/ico-engine/shared.ts`
+    - cambia el período canónico a `due_date`
+    - agrega helpers explícitos del contrato: `REPORT_CUTOFF_DATE_SQL`, `REPORT_PERIOD_SCOPE_SQL`, `CANONICAL_OPEN_TASK_SQL`, `CANONICAL_CLASSIFIED_TASK_SQL`
+    - alinea `OTD`, `Overdue`, `Carry-Over`, `completed_tasks` y `active_tasks` al scorecard mensual
+  - `src/lib/ico-engine/metric-registry.ts`
+    - alinea la definición declarativa de `OTD` y `FTR`
+  - `src/lib/ico-engine/materialize.ts`
+    - `performance_report_monthly` ya materializa `on_time_pct` con denominador `total_tasks`
+    - `Top Performer` ya usa `total_tasks` como elegibilidad/desempate
+  - `src/lib/ico-engine/performance-report.ts`
+    - fallback live y reader materialized quedan alineados al mismo contrato
+- Validación:
+  - `pnpm lint` ✅
+  - `pnpm build` ✅
+  - Notion `Performance Report — Marzo 2026` confirma explícitamente que:
+    - el scorecard usa tareas con fecha límite en marzo
+    - los indicadores son mutuamente excluyentes
+    - `On-Time % = On-Time / Total Tareas`
+    - tareas compartidas se atribuyen al responsable principal
+- Residual intencional:
+  - el histórico `Marzo 2026` en Greenhouse sigue con drift material y buckets nulos legacy
+  - esa reconciliación queda correctamente movida a `TASK-201`
+
 ## Sesión 2026-04-02 — RESEARCH-004 space identity consolidation
 
 ### Objetivo

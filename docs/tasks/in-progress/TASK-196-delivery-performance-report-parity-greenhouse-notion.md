@@ -3,6 +3,7 @@
 ## Delta 2026-04-02
 
 - `TASK-197` quedó cerrada como slice de paridad de source sync/runtime.
+- `TASK-200` quedó cerrada como slice de contrato semántico de métricas.
 - Resultado útil para esta epic:
   - `greenhouse_conformed.delivery_tasks` y `greenhouse_delivery.tasks` ya preservan `project_source_ids`
   - marzo 2026 quedó alineado por `space` en runtime para el baseline mínimo:
@@ -12,6 +13,7 @@
   - coverage de identidad (`TASK-198`)
   - contrato de owner attribution (`TASK-199`)
   - semántica de métricas (`TASK-200`)
+  - reconciliación/materialización histórica (`TASK-201`)
 
 - La lane se descompone explícitamente en subtasks ejecutables para evitar mezclar sync, identidad, semántica, materialización y publicación:
   - `TASK-197 - Delivery Source Sync Assignee & Project Relation Parity`
@@ -63,6 +65,11 @@
 - Se confirmó drift semántico en la fórmula actual de Greenhouse:
   - `shared.ts` calcula `otd_pct = on_time / (on_time + late_drop)`
   - el reporte de Notion para Daniela parece usar `on_time / total_tasks`
+- `TASK-200` ya congeló el contrato mensual correcto:
+  - grano = `tasks con due_date en el período`
+  - corte = `period_end + 1 day`
+  - `OTD = On-Time / total_classified_tasks`
+  - `Top Performer` usa volumen total de tareas del período
 - Se confirmó además drift de scope/población:
   - en `greenhouse_conformed.delivery_tasks`, para Daniela y `due_date` en marzo 2026, hoy solo aparecen `18` tareas
   - esas `18` tareas pertenecen al `space-efeonce` interno

@@ -691,7 +691,7 @@ const materializePerformanceReports = async (
         ROUND(
           SAFE_DIVIDE(
             SUM(on_time_count),
-            NULLIF(SUM(on_time_count) + SUM(late_drop_count), 0)
+            NULLIF(SUM(total_tasks), 0)
           ) * 100,
           1
         ) AS on_time_pct,
@@ -726,7 +726,7 @@ const materializePerformanceReports = async (
         mb.member_id,
         COALESCE(tm.display_name, mb.member_id) AS member_name,
         mb.otd_pct,
-        mb.throughput_count,
+        mb.total_tasks AS throughput_count,
         mb.rpa_avg,
         mb.ftr_pct
       FROM \`${projectId}.${ICO_DATASET}.metrics_by_member\` mb
@@ -734,11 +734,11 @@ const materializePerformanceReports = async (
         ON tm.member_id = mb.member_id
       WHERE mb.period_year = @periodYear
         AND mb.period_month = @periodMonth
-        AND mb.throughput_count >= @minThroughput
+        AND mb.total_tasks >= @minThroughput
         AND mb.otd_pct IS NOT NULL
       ORDER BY
         mb.otd_pct DESC,
-        mb.throughput_count DESC,
+        mb.total_tasks DESC,
         mb.rpa_avg ASC NULLS LAST,
         mb.member_id ASC
       LIMIT 1

@@ -130,12 +130,11 @@ const getPreviousPeriod = (year: number, month: number) => {
 
 const computeOnTimePctFromSpaces = (spaces: SpaceMetricSnapshot[]): number | null => {
   const onTime = spaces.reduce((sum, space) => sum + space.context.onTimeTasks, 0)
-  const lateDrops = spaces.reduce((sum, space) => sum + space.context.lateDropTasks, 0)
-  const denominator = onTime + lateDrops
+  const totalTasks = spaces.reduce((sum, space) => sum + space.context.totalTasks, 0)
 
-  if (denominator <= 0) return null
+  if (totalTasks <= 0) return null
 
-  return Math.round((onTime / denominator) * 1000) / 10
+  return Math.round((onTime / totalTasks) * 1000) / 10
 }
 
 const computeTrend = (current: number | null, previous: number | null): PerformanceReportTrend => {
@@ -318,7 +317,7 @@ const readTopPerformer = async (periodYear: number, periodMonth: number): Promis
       mb.member_id,
       COALESCE(tm.display_name, mb.member_id) AS member_name,
       mb.otd_pct,
-      mb.throughput_count,
+      mb.total_tasks AS throughput_count,
       mb.rpa_avg,
       mb.ftr_pct
     FROM \`${projectId}.${ICO_DATASET}.metrics_by_member\` mb
@@ -326,11 +325,11 @@ const readTopPerformer = async (periodYear: number, periodMonth: number): Promis
       ON tm.member_id = mb.member_id
     WHERE mb.period_year = @periodYear
       AND mb.period_month = @periodMonth
-      AND mb.throughput_count >= @minThroughput
+      AND mb.total_tasks >= @minThroughput
       AND mb.otd_pct IS NOT NULL
     ORDER BY
       mb.otd_pct DESC,
-      mb.throughput_count DESC,
+      mb.total_tasks DESC,
       mb.rpa_avg ASC NULLS LAST,
       mb.member_id ASC
     LIMIT 1

@@ -1,5 +1,34 @@
 # Greenhouse Delivery Performance Report Parity V1
 
+## Delta 2026-04-02 — Metric semantic contract now freezes due-date report logic
+
+`TASK-200` fija la semántica canónica del `Performance Report` mensual para Delivery.
+
+Regla vigente del scorecard mensual:
+
+- el grano del reporte es `task with due_date in period`
+- la fecha de corte canónica del cierre mensual es `period_end + 1 day`
+- las exclusiones mínimas del scorecard son:
+  - `Archivada`
+  - `Cancelada`
+  - `Tomado`
+- las tareas del período deben caer en un bucket mutuamente excluyente:
+  - `On-Time`
+  - `Late Drop`
+  - `Overdue`
+  - `Carry-Over`
+- `OTD` ya no significa `on_time / (on_time + late_drop)` para el reporte mensual
+- `OTD` canónico del reporte = `on_time / total_classified_tasks`
+- `FTR` sigue calculándose sobre tareas completadas del período
+- `RpA` sigue calculándose sobre tareas completadas del período con `rpa_value > 0`
+- `Top Performer` debe ordenar por `otd_pct` canónico y usar volumen total de tareas del período como criterio de elegibilidad/desempate, no solo completadas
+
+Consecuencia:
+
+- `shared.ts` es la fuente ejecutable del contrato
+- `materialize.ts`, `read-metrics.ts` y `performance-report.ts` deben leer exactamente esa misma semántica
+- la reconciliación histórica de `Marzo 2026` queda como follow-on de `TASK-201`, no como precondición para cerrar el contrato
+
 ## Delta 2026-04-02 — Owner attribution contract moves to primary-owner credit
 
 `TASK-199` fija que la atribución canónica del `Performance Report` ya no debe seguir acreditando member-level metrics a todos los assignees resueltos.

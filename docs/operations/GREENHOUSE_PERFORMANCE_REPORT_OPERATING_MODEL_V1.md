@@ -22,6 +22,21 @@ Debe pasar por:
 - `Greenhouse conformed / marts / serving`: source of truth del cálculo
 - `Notion Performance Reports`: surface de consumo y comunicación
 
+## Contrato semántico base
+
+Antes de publicar un período, Greenhouse debe asumir estas reglas mínimas:
+
+- grano canónico: tareas con `due_date` dentro del período
+- fecha de corte canónica del cierre mensual: `último día del período + 1 día`
+- exclusiones mínimas: `Archivada`, `Cancelada`, `Tomado`
+- buckets mutuamente excluyentes del scorecard:
+  - `On-Time`
+  - `Late Drop`
+  - `Overdue`
+  - `Carry-Over`
+- `OTD` del reporte = `On-Time / total de tareas clasificadas`
+- `Top Performer` usa ese mismo `OTD` y requiere volumen mínimo medido sobre total de tareas del período
+
 ## Cadencia mensual
 
 ### 1. Cierre de período

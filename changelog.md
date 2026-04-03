@@ -2,6 +2,13 @@
 
 ## 2026-04-02
 
+- **TASK-200 delivery performance metric semantic contract**:
+  - el contrato mensual del `Performance Report` queda fijado sobre `due_date in period`
+  - la fecha de corte canónica pasa a ser `period_end + 1 day`
+  - `OTD` del scorecard mensual deja de usar `on_time / (on_time + late_drop)` y pasa a `on_time / total_classified_tasks`
+  - `Top Performer` ya usa `OTD` canónico y volumen total de tareas del período como elegibilidad/desempate
+  - `shared.ts`, `materialize.ts`, `performance-report.ts` y `metric-registry.ts` quedaron alineados a ese contrato
+
 - **TASK-199 delivery performance owner attribution contract**:
   - `ICO` member-level deja de acreditar tareas por `UNNEST(assignee_member_ids)` y pasa a acreditar solo al owner principal miembro
   - `v_tasks_enriched` ahora expone aliases explícitos `primary_owner_source_id`, `primary_owner_member_id`, `primary_owner_type` y `has_co_assignees`
