@@ -6,6 +6,16 @@
 
 ---
 
+## Delta 2026-04-03 — Currency comparison helpers como módulo compartido de Finance
+
+`src/lib/finance/currency-comparison.ts` es un módulo de funciones puras (sin `'server-only'`) que vive en Finance pero es importable desde cualquier módulo client o server:
+
+- `consolidateCurrencyEquivalents(totals, usdToClp)` — consolida `{ USD, CLP }` → totales CLP y USD usando la tasa canónica
+- `computeCurrencyDelta(current, compare, rate, label)` — delta % entre períodos con referencia CLP
+- `payrollTrendDirection(deltaPct)` / `formatDeltaLabel(deltaPct, label)` — formateo para `HorizontalWithSubtitle` props
+
+Regla: las conversiones multi-currency deben pasar por estos helpers, no math inline. La tasa se resuelve server-side vía `resolveExchangeRateToClp()` y se pasa como `fxRate` al client.
+
 ## Delta 2026-03-30 — Commercial cost attribution ya es contrato operativo de plataforma
 
 Finance ya no debe tratar la atribución comercial como una recomposición local entre bridges de payroll, assignments y overhead.

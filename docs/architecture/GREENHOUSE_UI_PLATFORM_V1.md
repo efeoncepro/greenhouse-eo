@@ -10,27 +10,72 @@
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
 
-## Delta 2026-04-03 — Trend delta helper + rich KPI card patterns
+## Delta 2026-04-03 — Helpers canónicos de comparativa + patrones de KPI cards
 
-El Delivery hub introduce un helper reutilizable para comparativas mes-a-mes: `trendDelta()` en `AgencyDeliveryView.tsx`.
+### Helpers reutilizables de comparativa
 
-Patrón canónico para KPIs con tendencia:
+Dos archivos canónicos para cualquier vista que necesite mostrar deltas entre períodos o monedas:
+
+**`src/lib/finance/currency-comparison.ts`** — funciones puras, importable desde client Y server:
+
+| Función | Propósito | Ejemplo de uso |
+|---------|-----------|----------------|
+| `consolidateCurrencyEquivalents(totals, usdToClp)` | Convierte multi-currency `{ USD, CLP }` a totales consolidados CLP y USD | Cards de Nómina, Finance |
+| `computeCurrencyDelta(current, compare, rate, label)` | Computa `grossDeltaPct`, `netDeltaPct`, `compareLabel`, `grossReference`, `netReference` | Cards con "vs oficial" o "vs 2026-03" |
+| `payrollTrendDirection(deltaPct)` | Para costos: subir = `'negative'`, bajar = `'positive'` | Prop `trend` de `HorizontalWithSubtitle` |
+| `formatDeltaLabel(deltaPct, label)` | `"5% vs 2026-03"` | Prop `trendNumber` de `HorizontalWithSubtitle` |
+
+**`src/lib/payroll/period-comparison.ts`** — server-only, queries PostgreSQL:
+
+| Función | Propósito |
+|---------|-----------|
+| `getPreviousOfficialPeriodTotals(beforePeriodId)` | Último período oficial (`approved`/`exported`) anterior al dado |
+| `getOfficialPeriodTotals(periodId)` | Oficial del mismo período |
+
+Patrón de uso en API routes:
+```typescript
+import { consolidateCurrencyEquivalents } from '@/lib/finance/currency-comparison'
+import { getPreviousOfficialPeriodTotals } from '@/lib/payroll/period-comparison'
+
+const previousOfficial = await getPreviousOfficialPeriodTotals(periodId)
+const consolidated = consolidateCurrencyEquivalents(totals, usdToClp)
+```
+
+Patrón de uso en views (client):
+```typescript
+import { computeCurrencyDelta, payrollTrendDirection, formatDeltaLabel } from '@/lib/finance/currency-comparison'
+
+const delta = computeCurrencyDelta(current, compareSource, fxRate, 'vs 2026-03')
+// → { grossDeltaPct: 5, netDeltaPct: 3, compareLabel: 'vs 2026-03', grossReference: 3120000, netReference: 2800000 }
+
+<HorizontalWithSubtitle
+  trend={payrollTrendDirection(delta.grossDeltaPct)}      // 'negative' (costo subió)
+  trendNumber={formatDeltaLabel(delta.grossDeltaPct, delta.compareLabel)}  // "5% vs 2026-03"
+  footer={`Anterior: ${formatCurrency(delta.grossReference, 'CLP')}`}
+/>
+```
+
+### Helpers de tendencia para ICO/Delivery
+
+**`trendDelta()`** en `AgencyDeliveryView.tsx` — helper local para comparativas mes-a-mes en trend arrays:
 
 ```typescript
 // trendDelta(trend, field) → { text, number, direction, prevLabel } | null
 // - text: "+3pp vs Mar" (formatted for display)
 // - number: "3pp" (absolute delta for HorizontalWithSubtitle.trendNumber)
-// - direction: 'positive' | 'negative' | 'neutral' (for HorizontalWithSubtitle.trend)
-// - For RPA (lower is better), direction is INVERTED: decrease = positive
+// - direction: 'positive' | 'negative' | 'neutral'
+// - Para RPA (lower is better), direction is INVERTED: decrease = positive
 ```
 
-Patrones de cards Vuexy confirmados para data storytelling:
+### Patrones de cards Vuexy para data storytelling
 
-1. **Hero KPI** (BarChartRevenueGrowth pattern): `Card` con KPI grande + `CustomChip` trend + mini bar chart ApexCharts. Usar para la métrica principal de cada vista.
+1. **Hero KPI** (BarChartRevenueGrowth pattern): `Card` con KPI `h3` grande + `CustomChip` trend + mini bar chart ApexCharts. Usar para la métrica principal de cada vista.
 2. **Rich KPI** (`HorizontalWithSubtitle` con todas las props): `trend` + `trendNumber` + `statusLabel`/`statusColor`/`statusIcon` + `footer`. Usar para métricas secundarias con comparativa.
 3. **Attention card** (accent left border): `Card` con `borderLeft: 4px solid` color semáforo. Usar para items que requieren acción.
 
-Regla: toda vista que muestre métricas operativas debe incluir comparativa vs período anterior. No mostrar números aislados.
+### Regla
+
+Toda vista que muestre métricas operativas debe incluir comparativa vs período anterior. No mostrar números aislados sin contexto.
 
 ## Delta 2026-03-31 — Shared uploader pattern
 
