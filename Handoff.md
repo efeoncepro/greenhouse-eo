@@ -54,6 +54,41 @@
 - quedó un cambio ajeno sin tocar en `src/config/greenhouse-nomenclature.ts`; no mezclarlo con este fix
 - siguiente paso esperado: push de esta rama, merge a `develop`, redeploy de staging y rerun del cron para confirmar si el estado resultante pasa a `healthy` o expone findings reales
 
+## Sesión 2026-04-03 — Fix residual de data quality por jerarquía falsa en conformed
+
+### Rama / alcance
+
+- rama actual: `develop`
+- scope:
+  - `src/lib/space-notion/notion-parity-audit.ts`
+  - `src/lib/space-notion/notion-parity-audit-query.test.ts`
+
+### Resultado
+
+- después del fix de `assigneeSourceId`, el rerun manual de `sync-conformed` confirmó que el pipeline real ya resolvía:
+  - `missing_in_conformed`
+  - `fresh_raw_after_conformed_sync`
+  - mismatches de status / due date / assignee
+- el estado residual `degraded` quedó acotado a `hierarchy_gap_candidate`
+- causa raíz:
+  - el auditor de paridad leía jerarquía real desde `notion_ops.tareas`
+  - pero en `readConformedParityRows()` devolvía `ARRAY<STRING>[]` para `tarea_principal_ids` y `subtareas_ids` aunque las columnas sí existían en `greenhouse_conformed.delivery_tasks`
+  - eso inflaba falsamente el warning de jerarquía en todos los rows con parent/subtask
+- fix aplicado:
+  - el auditor ahora selecciona `IFNULL(tarea_principal_ids, ARRAY<STRING>[])` y `IFNULL(subtareas_ids, ARRAY<STRING>[])` desde conformed cuando esas columnas existen
+  - la regresión nueva verifica que el query de conformed usa las columnas persistidas reales
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/space-notion/notion-parity-audit.test.ts src/lib/space-notion/notion-parity-audit-query.test.ts`
+- `pnpm exec eslint src/lib/space-notion/notion-parity-audit.ts src/lib/space-notion/notion-parity-audit-query.test.ts`
+- `pnpm build`
+
+### Estado esperado después de deploy
+
+- rerun de `GET /api/cron/notion-delivery-data-quality` o del `post_sync` de `sync-conformed`
+- si no aparecen nuevas mutaciones en raw entre medio, el monitor debería pasar a `healthy`
+
 ## Sesión 2026-04-03 — TASK-109 Projected Payroll Runtime Hardening
 
 ### Rama / alcance

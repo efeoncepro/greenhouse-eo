@@ -607,6 +607,14 @@ const readConformedParityRows = async ({
     ? 'due_date'
     : 'DATE(created_at)'
 
+  const conformedParentIdsExpression = columns.has('tarea_principal_ids')
+    ? 'IFNULL(tarea_principal_ids, ARRAY<STRING>[])'
+    : 'ARRAY<STRING>[]'
+
+  const conformedChildIdsExpression = columns.has('subtareas_ids')
+    ? 'IFNULL(subtareas_ids, ARRAY<STRING>[])'
+    : 'ARRAY<STRING>[]'
+
   const assigneeFilterClause = assigneeSourceId
     ? 'AND assignee_source_id = @assigneeSourceId'
     : ''
@@ -623,8 +631,8 @@ const readConformedParityRows = async ({
         task_status,
         due_date,
         assignee_source_id,
-        ARRAY<STRING>[] AS tarea_principal_ids,
-        ARRAY<STRING>[] AS subtareas_ids,
+        ${conformedParentIdsExpression} AS tarea_principal_ids,
+        ${conformedChildIdsExpression} AS subtareas_ids,
         synced_at AS _synced_at,
         synced_at,
         created_at,

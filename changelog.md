@@ -17,6 +17,10 @@
   - se corrigió el helper `src/lib/space-notion/notion-parity-audit.ts` para omitir ese parámetro opcional y evitar el crash runtime `Parameter types must be provided for null values`
   - se agregó la regresión `src/lib/space-notion/notion-parity-audit-query.test.ts` para cubrir el contrato de params sin assignee
   - esto ataca el `degraded` falso-negativo en staging, donde el cron fallaba antes de persistir `integration_data_quality_runs`
+  - seguimiento adicional del mismo incidente:
+    - tras rerun de `sync-conformed`, el estado real pasó de `broken` a `degraded`
+    - el residual provenía de otro falso positivo: el auditor estaba leyendo `tarea_principal_ids` / `subtareas_ids` del raw pero forzando arrays vacíos en `greenhouse_conformed.delivery_tasks`
+    - el helper ahora lee la jerarquía persistida real cuando esas columnas existen en conformed, evitando degradar por `hierarchy_gap_candidate` cuando el writer ya preservó la relación task/subtask
 
 - **TASK-109 projected payroll runtime hardening**:
   - `projected-payroll-store.ts` ya no ejecuta `CREATE TABLE IF NOT EXISTS` en runtime; reemplazado por `verifyInfrastructure()` con fail-fast y error accionable si la tabla no existe

@@ -63,4 +63,47 @@ describe('auditDeliveryNotionParity BigQuery params', () => {
       endDate: '2026-04-30'
     })
   })
+
+  it('reads persisted hierarchy arrays from conformed when the columns exist', async () => {
+    queryMock
+      .mockResolvedValueOnce([[
+        { column_name: 'notion_page_id' },
+        { column_name: 'space_id' },
+        { column_name: 'nombre_de_tarea' },
+        { column_name: 'created_time' },
+        { column_name: '_synced_at' },
+        { column_name: 'estado' },
+        { column_name: 'fecha_límite' },
+        { column_name: 'tarea_principal_ids' },
+        { column_name: 'subtareas_ids' }
+      ], undefined])
+      .mockResolvedValueOnce([[
+        { column_name: 'task_source_id' },
+        { column_name: 'space_id' },
+        { column_name: 'task_name' },
+        { column_name: 'task_status' },
+        { column_name: 'due_date' },
+        { column_name: 'assignee_source_id' },
+        { column_name: 'synced_at' },
+        { column_name: 'is_deleted' },
+        { column_name: 'created_at' },
+        { column_name: 'tarea_principal_ids' },
+        { column_name: 'subtareas_ids' }
+      ], undefined])
+      .mockResolvedValueOnce([[{ synced_at: '2026-04-03T03:45:21.802Z' }], undefined])
+      .mockResolvedValueOnce([[], undefined])
+      .mockResolvedValueOnce([[], undefined])
+
+    const { auditDeliveryNotionParity } = await import('@/lib/space-notion/notion-parity-audit')
+
+    await auditDeliveryNotionParity({
+      spaceId: 'space-1',
+      year: 2026,
+      month: 4,
+      periodField: 'due_date'
+    })
+
+    expect(queryMock.mock.calls[4]?.[0]?.query).toContain('IFNULL(tarea_principal_ids, ARRAY<STRING>[]) AS tarea_principal_ids')
+    expect(queryMock.mock.calls[4]?.[0]?.query).toContain('IFNULL(subtareas_ids, ARRAY<STRING>[]) AS subtareas_ids')
+  })
 })
