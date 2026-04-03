@@ -21,6 +21,7 @@ import type { TimelineProps } from '@mui/lab/Timeline'
 import { ExecutiveCardShell, ExecutiveMiniStatCard } from '@/components/greenhouse'
 import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import type { OperationsHealthStatus, OperationsOverview, OperationsSubsystem } from '@/lib/operations/get-operations-overview'
+import type { IntegrationDataQualityRunResult, IntegrationDataQualityStatus } from '@/types/integration-data-quality'
 import AdminOperationalActionsPanel from './AdminOperationalActionsPanel'
 import AdminOpsActionButton from './AdminOpsActionButton'
 
@@ -89,7 +90,58 @@ const sentryLevelColor = (level: string): 'success' | 'warning' | 'error' | 'sec
 }
 
 const healthSubsystems = (subsystems: OperationsSubsystem[]) =>
-  subsystems.filter(subsystem => ['Outbox', 'Proyecciones', 'Notificaciones', 'Finance Data Quality'].includes(subsystem.name))
+  subsystems.filter(subsystem =>
+    ['Outbox', 'Proyecciones', 'Notificaciones', 'Finance Data Quality', 'Notion Delivery Data Quality'].includes(subsystem.name)
+  )
+
+const dataQualityColor = (
+  status: IntegrationDataQualityStatus
+): 'success' | 'warning' | 'error' | 'secondary' => {
+  if (status === 'healthy') return 'success'
+  if (status === 'degraded') return 'warning'
+  if (status === 'broken') return 'error'
+
+  return 'secondary'
+}
+
+const toNumber = (value: unknown) => {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : 0
+
+  if (typeof value === 'string') {
+    const parsed = Number(value)
+
+    return Number.isFinite(parsed) ? parsed : 0
+  }
+
+  if (typeof value === 'object' && value !== null && 'value' in value) {
+    return toNumber((value as { value?: unknown }).value)
+  }
+
+  return 0
+}
+
+const getDataQualityFindings = (runs: IntegrationDataQualityRunResult[]) => {
+  const totals = new Map<string, number>()
+
+  for (const run of runs.slice(0, 6)) {
+    const bucketCounts = typeof run.summary.bucketCounts === 'object' && run.summary.bucketCounts !== null
+      ? run.summary.bucketCounts as Record<string, unknown>
+      : {}
+
+    for (const [bucket, count] of Object.entries(bucketCounts)) {
+      const normalizedCount = toNumber(count)
+
+      if (normalizedCount > 0) {
+        totals.set(bucket, (totals.get(bucket) ?? 0) + normalizedCount)
+      }
+    }
+  }
+
+  return [...totals.entries()]
+    .map(([bucket, count]) => ({ bucket, count }))
+    .sort((left, right) => right.count - left.count)
+    .slice(0, 4)
+}
 
 /* ── TASK-113: Styled Timeline (Vuexy pattern) ── */
 const Timeline = styled(MuiTimeline)<TimelineProps>({
@@ -146,6 +198,8 @@ const AdminOpsHealthView = ({ data }: Props) => {
   const auditEvents = buildAuditEvents(data)
   const cloudAlerts = data.cloud.posture.controls.filter(control => control.status !== 'ok')
   const sentryIncidents = data.cloud.observability.incidents
+  const notionDataQuality = data.notionDeliveryDataQuality
+  const notionDataQualityFindings = notionDataQuality ? getDataQualityFindings(notionDataQuality.recentRuns) : []
 
   return (
     <Stack spacing={6}>
@@ -258,6 +312,123 @@ const AdminOpsHealthView = ({ data }: Props) => {
             )
           })}
         </Box>
+      </ExecutiveCardShell>
+
+      <ExecutiveCardShell
+        title='Notion Delivery monitor'
+        subtitle='Separa data quality real del pipeline de la health técnica general. Aquí vive el latest status, findings y la historia corta del monitor persistido.'
+      >
+        {!notionDataQuality || notionDataQuality.totals.totalSpaces === 0 ? (
+          <Typography variant='body2' color='text.secondary'>
+            Aún no hay corridas persistidas del monitor de data quality para Notion Delivery.
+          </Typography>
+        ) : (
+          <Stack spacing={3}>
+            <Box
+              sx={{
+                display: 'grid',
+                gap: 3,
+                gridTemplateColumns: { xs: '1fr', md: 'repeat(3, minmax(0, 1fr))' }
+              }}
+            >
+              <ExecutiveMiniStatCard
+                eyebrow='Coverage'
+                tone='info'
+                title='Spaces monitoreados'
+                value={String(notionDataQuality.totals.totalSpaces)}
+                detail='Spaces activos que ya tienen una última corrida persistida.'
+                icon='tabler-radar-2'
+              />
+              <ExecutiveMiniStatCard
+                eyebrow='Attention'
+                tone={notionDataQuality.totals.degradedSpaces > 0 ? 'warning' : 'success'}
+                title='Degraded'
+                value={String(notionDataQuality.totals.degradedSpaces)}
+                detail='Spaces con warnings activos en la última validación.'
+                icon='tabler-alert-circle'
+              />
+              <ExecutiveMiniStatCard
+                eyebrow='Critical'
+                tone={notionDataQuality.totals.brokenSpaces > 0 ? 'error' : 'success'}
+                title='Broken'
+                value={String(notionDataQuality.totals.brokenSpaces)}
+                detail='Spaces con errores activos que comprometen la confianza downstream.'
+                icon='tabler-bug'
+              />
+            </Box>
+
+            <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', xl: 'repeat(2, minmax(0, 1fr))' } }}>
+              <Card variant='outlined'>
+                <CardContent>
+                  <Stack spacing={2}>
+                    <Typography variant='h6'>Latest status por space</Typography>
+                    {notionDataQuality.latestBySpace.map(space => (
+                      <Stack key={space.spaceId} direction='row' justifyContent='space-between' alignItems='center' gap={2}>
+                        <Stack spacing={0.5}>
+                          <Typography variant='body2' sx={{ fontWeight: 500 }}>
+                            {space.spaceName ?? space.spaceId}
+                          </Typography>
+                          <Typography variant='caption' color='text.secondary'>
+                            Diff {space.diffCount} · {formatDateTime(space.checkedAt)}
+                          </Typography>
+                        </Stack>
+                        <Chip
+                          size='small'
+                          variant='tonal'
+                          color={dataQualityColor(space.qualityStatus)}
+                          label={space.qualityStatus}
+                        />
+                      </Stack>
+                    ))}
+                  </Stack>
+                </CardContent>
+              </Card>
+
+              <Card variant='outlined'>
+                <CardContent>
+                  <Stack spacing={2}>
+                    <Typography variant='h6'>Findings e historia corta</Typography>
+                    {notionDataQualityFindings.length > 0 ? (
+                      notionDataQualityFindings.map(finding => (
+                        <Stack key={finding.bucket} direction='row' justifyContent='space-between' alignItems='center' gap={2}>
+                          <Typography variant='body2' color='text.secondary'>
+                            {finding.bucket}
+                          </Typography>
+                          <Chip size='small' variant='outlined' color='warning' label={`${finding.count} caso(s)`} />
+                        </Stack>
+                      ))
+                    ) : (
+                      <Typography variant='body2' color='text.secondary'>
+                        Sin findings activos en las corridas recientes.
+                      </Typography>
+                    )}
+
+                    <Stack spacing={1}>
+                      {notionDataQuality.recentRuns.slice(0, 4).map(run => (
+                        <Stack key={run.dataQualityRunId} direction='row' justifyContent='space-between' alignItems='center' gap={2}>
+                          <Stack spacing={0.25}>
+                            <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8125rem' }}>
+                              {run.spaceId}
+                            </Typography>
+                            <Typography variant='caption' color='text.secondary'>
+                              Diff {toNumber(run.summary.diffCount)} · {formatDateTime(run.checkedAt)}
+                            </Typography>
+                          </Stack>
+                          <Chip
+                            size='small'
+                            variant='tonal'
+                            color={dataQualityColor(run.qualityStatus)}
+                            label={run.qualityStatus}
+                          />
+                        </Stack>
+                      ))}
+                    </Stack>
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Box>
+          </Stack>
+        )}
       </ExecutiveCardShell>
 
       <ExecutiveCardShell

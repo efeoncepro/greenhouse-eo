@@ -13,6 +13,10 @@
       "schedule": "45 3 * * *"
     },
     {
+      "path": "/api/cron/notion-delivery-data-quality",
+      "schedule": "15 4 * * *"
+    },
+    {
       "path": "/api/cron/ico-materialize",
       "schedule": "15 6 * * *"
     },

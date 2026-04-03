@@ -2,6 +2,13 @@
 
 ## 2026-04-03
 
+- **TASK-208 delivery notion data quality monitor**:
+  - se agregaron las tablas `greenhouse_sync.integration_data_quality_runs` y `greenhouse_sync.integration_data_quality_checks` para persistir scoring y findings históricos del pipeline `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`
+  - se agregó el helper `src/lib/integrations/notion-delivery-data-quality.ts` para ejecutar el auditor por `space`, clasificar `healthy / degraded / broken`, persistir evidencia y alertar por Slack en estados degradados o rotos
+  - `GET /api/cron/notion-delivery-data-quality` corre el monitor en forma recurrente y `GET /api/cron/sync-conformed` ahora dispara un sweep post-sync sin bloquear el writer canónico si el monitor falla
+  - `/admin/integrations`, `/admin/ops-health` y `TenantNotionPanel` ya exponen el estado operativo, findings recientes e historial corto del monitor
+  - `TASK-208` queda cerrada como capa continua de observabilidad y data quality sobre los contratos ya definidos por `TASK-205` y `TASK-207`
+
 - **TASK-207 delivery notion sync pipeline hardening**:
   - `sync-conformed` ahora exige readiness con frescura real de `notion_ops.tareas` y `notion_ops.proyectos`
   - el writer canónico `src/lib/sync/sync-notion-conformed.ts` ahora salta runs stale con trazabilidad explícita en `greenhouse_sync.source_sync_runs`

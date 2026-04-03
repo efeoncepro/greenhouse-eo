@@ -1,5 +1,12 @@
 # TASK-053 — TanStack React Table Migration (Remaining 25 Tables)
 
+## Delta 2026-04-03
+
+- `TASK-208` amplió `src/views/greenhouse/admin/tenants/TenantNotionPanel.tsx` con una nueva sección de `Calidad de datos del pipeline` que incluye tablas embebidas de checks e historial.
+- Implicación:
+  - cuando esta task migre ese archivo a TanStack debe preservar esa nueva sección y sus estados operativos
+  - el archivo sigue pendiente de migración; este cambio no cierra la lane
+
 ## Estado
 
 In Progress. 23 of 48 tables migrated by Claude Opus session. This task covers the remaining ~25 low-impact tables.

@@ -257,4 +257,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-205` | `complete` | Delivery Notion Origin Parity Audit | `docs/tasks/complete/TASK-205-delivery-notion-origin-parity-audit.md` |
 | `TASK-206` | `to-do` | Delivery Operational Attribution Model | `docs/tasks/to-do/TASK-206-delivery-operational-attribution-model.md` |
 | `TASK-207` | `complete` | Delivery Notion Sync Pipeline Hardening & Freshness Gates | `docs/tasks/complete/TASK-207-delivery-notion-sync-pipeline-hardening.md` |
-| `TASK-208` | `to-do` | Delivery Data Quality Monitoring & Drift Auditor | `docs/tasks/to-do/TASK-208-delivery-data-quality-monitoring-auditor.md` |
+| `TASK-208` | `complete` | Delivery Data Quality Monitoring & Drift Auditor | `docs/tasks/complete/TASK-208-delivery-data-quality-monitoring-auditor.md` |

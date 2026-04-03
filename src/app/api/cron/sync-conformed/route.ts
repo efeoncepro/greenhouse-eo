@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto'
 import { NextResponse } from 'next/server'
 
 import { alertCronFailure } from '@/lib/alerts/slack-notify'
+import { runNotionDeliveryDataQualitySweep } from '@/lib/integrations/notion-delivery-data-quality'
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
 import { checkIntegrationReadiness } from '@/lib/integrations/readiness'
 
@@ -55,8 +56,51 @@ export async function GET(request: Request) {
 
   try {
     const result = await syncNotionToConformed()
+    let dataQualityMonitor: {
+      executed: boolean
+      healthySpaces: number
+      degradedSpaces: number
+      brokenSpaces: number
+      failedSpaces: number
+      error?: string
+    } | null = null
 
-    return NextResponse.json(result)
+    try {
+      const sweep = await runNotionDeliveryDataQualitySweep({
+        executionSource: 'post_sync',
+        sourceSyncRunId: result.syncRunId,
+        periodField: 'due_date'
+      })
+
+      dataQualityMonitor = {
+        executed: true,
+        healthySpaces: sweep.healthySpaces,
+        degradedSpaces: sweep.degradedSpaces,
+        brokenSpaces: sweep.brokenSpaces,
+        failedSpaces: sweep.failedSpaces
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown data quality monitor error'
+
+      console.error('[sync-conformed] Post-sync data quality monitor failed:', error)
+      await alertCronFailure('notion-delivery-data-quality-post-sync', error, {
+        syncRunId: result.syncRunId
+      })
+
+      dataQualityMonitor = {
+        executed: false,
+        healthySpaces: 0,
+        degradedSpaces: 0,
+        brokenSpaces: 0,
+        failedSpaces: 0,
+        error: message
+      }
+    }
+
+    return NextResponse.json({
+      ...result,
+      dataQualityMonitor
+    })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
 

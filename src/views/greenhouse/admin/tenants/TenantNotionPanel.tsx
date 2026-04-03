@@ -30,6 +30,10 @@ import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
+import type {
+  IntegrationDataQualityCheckResult,
+  IntegrationDataQualityRunResult
+} from '@/types/integration-data-quality'
 import type { NotionGovernanceSummary } from '@/types/notion-governance'
 
 // ---------------------------------------------------------------------------
@@ -66,6 +70,17 @@ interface NotionStatusResponse {
   space: SpaceInfo | null
   notionMapping: NotionMapping | null
   message?: string
+}
+
+interface TenantNotionDataQualityResponse {
+  clientId: string
+  space: {
+    spaceId: string
+    spaceName: string
+  }
+  latestRun: IntegrationDataQualityRunResult | null
+  latestChecks: IntegrationDataQualityCheckResult[]
+  recentRuns: IntegrationDataQualityRunResult[]
 }
 
 interface DiscoveryDatabase {
@@ -139,6 +154,34 @@ const getReadinessChipColor = (status: string | null | undefined): 'success' | '
   return 'secondary'
 }
 
+const getDataQualityChipColor = (status: string | null | undefined): 'success' | 'warning' | 'error' | 'secondary' => {
+  if (status === 'healthy') return 'success'
+  if (status === 'degraded') return 'warning'
+  if (status === 'broken') return 'error'
+
+  return 'secondary'
+}
+
+const getDataQualityAlertSeverity = (status: string | null | undefined): 'success' | 'warning' | 'error' | 'info' => {
+  if (status === 'healthy') return 'success'
+  if (status === 'degraded') return 'warning'
+  if (status === 'broken') return 'error'
+
+  return 'info'
+}
+
+const toInteger = (value: unknown) => {
+  if (typeof value === 'number') return Number.isFinite(value) ? Math.trunc(value) : 0
+
+  if (typeof value === 'string') {
+    const parsed = Number(value)
+
+    return Number.isFinite(parsed) ? Math.trunc(parsed) : 0
+  }
+
+  return 0
+}
+
 const formatDatabaseKind = (databaseKind: string) =>
   DB_LABELS[databaseKind]?.label || databaseKind
 
@@ -158,6 +201,8 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
   const [governanceLoading, setGovernanceLoading] = useState(false)
   const [governanceRefreshing, setGovernanceRefreshing] = useState(false)
   const [governance, setGovernance] = useState<NotionGovernanceSummary | null>(null)
+  const [dataQualityLoading, setDataQualityLoading] = useState(false)
+  const [dataQuality, setDataQuality] = useState<TenantNotionDataQualityResponse | null>(null)
 
   // State — wizard
   const [wizardOpen, setWizardOpen] = useState(false)
@@ -210,6 +255,30 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
     }
   }, [clientId])
 
+  const fetchDataQuality = useCallback(async () => {
+    setDataQualityLoading(true)
+
+    try {
+      const res = await fetch(`/api/admin/tenants/${clientId}/notion-data-quality?limit=6`)
+
+      if (!res.ok) {
+        if (res.status === 404) {
+          setDataQuality(null)
+        }
+
+        return
+      }
+
+      const data = await res.json() as TenantNotionDataQualityResponse
+
+      setDataQuality(data)
+    } catch {
+      // Non-blocking
+    } finally {
+      setDataQualityLoading(false)
+    }
+  }, [clientId])
+
   useEffect(() => {
     void fetchStatus()
   }, [fetchStatus])
@@ -217,12 +286,14 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
   useEffect(() => {
     if (!status?.space?.spaceId) {
       setGovernance(null)
+      setDataQuality(null)
 
       return
     }
 
     void fetchGovernance()
-  }, [fetchGovernance, status?.space?.spaceId])
+    void fetchDataQuality()
+  }, [fetchDataQuality, fetchGovernance, status?.space?.spaceId])
 
   // ---------------------------------------------------------------------------
   // Space creation
@@ -478,6 +549,10 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
     const readiness = governance?.readiness
     const driftEvents = governance?.driftEvents ?? []
     const snapshots = governance?.snapshots ?? []
+    const latestDataQualityRun = dataQuality?.latestRun
+    const latestDataQualityChecks = (dataQuality?.latestChecks ?? []).filter(check => check.severity !== 'ok')
+    const recentDataQualityRuns = dataQuality?.recentRuns ?? []
+    const latestDiffCount = toInteger(latestDataQualityRun?.summary.diffCount)
 
     return (
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
@@ -611,6 +686,184 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
 
             <Grid size={{ xs: 12 }}>
               <Divider sx={{ my: 1 }} />
+            </Grid>
+
+            <Grid size={{ xs: 12 }}>
+                <Stack spacing={1.5}>
+                  <Stack direction='row' spacing={1} alignItems='center' justifyContent='space-between'>
+                    <Typography variant='subtitle1'>Calidad de datos del pipeline</Typography>
+                    <Stack direction='row' spacing={1} alignItems='center'>
+                      {latestDataQualityRun ? (
+                        <CustomChip
+                          round='true'
+                          size='small'
+                          color={getDataQualityChipColor(latestDataQualityRun.qualityStatus)}
+                          variant='tonal'
+                          label={latestDataQualityRun.qualityStatus}
+                        />
+                      ) : null}
+                      <Button
+                        size='small'
+                        variant='tonal'
+                        color='secondary'
+                        startIcon={dataQualityLoading ? <CircularProgress size={16} /> : <i className='tabler-refresh' />}
+                        onClick={() => void fetchDataQuality()}
+                        disabled={dataQualityLoading}
+                      >
+                        {dataQualityLoading ? 'Actualizando…' : 'Actualizar monitor'}
+                      </Button>
+                    </Stack>
+                  </Stack>
+
+                {dataQualityLoading ? (
+                  <Skeleton variant='rounded' height={120} />
+                ) : !latestDataQualityRun ? (
+                  <Alert severity='info'>
+                    El monitor todavía no tiene corridas persistidas para este Space. El cron corre después de `sync-conformed` y el post-sync hook deja la primera señal apenas materializa.
+                  </Alert>
+                ) : (
+                  <Stack spacing={2}>
+                    <Alert severity={getDataQualityAlertSeverity(latestDataQualityRun.qualityStatus)}>
+                      {latestDataQualityRun.qualityStatus === 'healthy'
+                        ? 'La última corrida no detectó drift duro entre Notion, raw y conformed.'
+                        : latestDataQualityRun.qualityStatus === 'degraded'
+                          ? 'La última corrida detectó mismatches blandos. Revisa warnings y confirma si el drift es esperado o si requiere corrección.'
+                          : 'La última corrida detectó una ruptura del contrato. Revisa findings y ejecuta una intervención operativa antes de confiar en los readers downstream.'}
+                    </Alert>
+
+                    <Grid container spacing={2}>
+                      <Grid size={{ xs: 6, md: 3 }}>
+                        <Stack spacing={0.5}>
+                          <Typography variant='caption' color='text.secondary'>Última corrida</Typography>
+                          <Typography variant='body2'>{formatDatetime(latestDataQualityRun.checkedAt)}</Typography>
+                        </Stack>
+                      </Grid>
+                      <Grid size={{ xs: 6, md: 3 }}>
+                        <Stack spacing={0.5}>
+                          <Typography variant='caption' color='text.secondary'>Warnings</Typography>
+                          <Typography variant='h6'>{latestDataQualityRun.warningChecks}</Typography>
+                        </Stack>
+                      </Grid>
+                      <Grid size={{ xs: 6, md: 3 }}>
+                        <Stack spacing={0.5}>
+                          <Typography variant='caption' color='text.secondary'>Errores</Typography>
+                          <Typography variant='h6'>{latestDataQualityRun.errorChecks}</Typography>
+                        </Stack>
+                      </Grid>
+                      <Grid size={{ xs: 6, md: 3 }}>
+                        <Stack spacing={0.5}>
+                          <Typography variant='caption' color='text.secondary'>Diff</Typography>
+                          <Typography variant='h6'>{latestDiffCount}</Typography>
+                        </Stack>
+                      </Grid>
+                    </Grid>
+
+                    {latestDataQualityChecks.length > 0 ? (
+                      <TableContainer>
+                        <Table size='small'>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell component='th' scope='col'>Finding</TableCell>
+                              <TableCell component='th' scope='col'>Severidad</TableCell>
+                              <TableCell component='th' scope='col'>Detalle</TableCell>
+                              <TableCell component='th' scope='col'>Valor</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {latestDataQualityChecks.map(check => (
+                              <TableRow key={check.dataQualityCheckId} hover>
+                                <TableCell>
+                                  <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                                    {check.checkKey}
+                                  </Typography>
+                                </TableCell>
+                                <TableCell>
+                                  <CustomChip
+                                    round='true'
+                                    size='small'
+                                    color={check.severity === 'error' ? 'error' : 'warning'}
+                                    variant='tonal'
+                                    label={check.severity}
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Typography variant='body2' color='text.secondary'>
+                                    {check.summary}
+                                  </Typography>
+                                </TableCell>
+                                <TableCell>
+                                  <Typography variant='caption' color='text.secondary'>
+                                    {check.observedValue ?? '—'}
+                                  </Typography>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    ) : (
+                      <Alert severity='success'>
+                        La última corrida no dejó findings activos. El contrato entre origen, raw y conformed quedó sano para este corte.
+                      </Alert>
+                    )}
+
+                    {recentDataQualityRuns.length > 1 && (
+                      <TableContainer>
+                        <Table size='small'>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell component='th' scope='col'>Corrida</TableCell>
+                              <TableCell component='th' scope='col'>Estado</TableCell>
+                              <TableCell component='th' scope='col'>Periodo</TableCell>
+                              <TableCell align='right'>Warnings</TableCell>
+                              <TableCell align='right'>Errores</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {recentDataQualityRuns.slice(0, 5).map(run => (
+                              <TableRow key={run.dataQualityRunId} hover>
+                                <TableCell>
+                                  <Stack spacing={0.25}>
+                                    <Typography variant='body2'>{formatDatetime(run.checkedAt)}</Typography>
+                                    <Typography variant='caption' color='text.disabled' sx={{ fontFamily: 'monospace' }}>
+                                      {run.dataQualityRunId}
+                                    </Typography>
+                                  </Stack>
+                                </TableCell>
+                                <TableCell>
+                                  <CustomChip
+                                    round='true'
+                                    size='small'
+                                    color={getDataQualityChipColor(run.qualityStatus)}
+                                    variant='tonal'
+                                    label={run.qualityStatus}
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Typography variant='caption' color='text.secondary'>
+                                    {run.periodField} · {run.periodYear}-{String(run.periodMonth).padStart(2, '0')}
+                                  </Typography>
+                                </TableCell>
+                                <TableCell align='right'>
+                                  <Typography variant='body2'>{run.warningChecks}</Typography>
+                                </TableCell>
+                                <TableCell align='right'>
+                                  <Typography
+                                    variant='body2'
+                                    color={run.errorChecks > 0 ? 'error.main' : 'text.secondary'}
+                                  >
+                                    {run.errorChecks}
+                                  </Typography>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    )}
+                  </Stack>
+                )}
+              </Stack>
             </Grid>
 
             <Grid size={{ xs: 12, md: 6 }}>

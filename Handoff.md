@@ -1,5 +1,56 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — TASK-208 cerrada con monitor recurrente de data quality para Notion Delivery
+
+### Rama / alcance
+
+- rama actual: `feature/codex-task-208-data-quality-monitor`
+- task cerrada: `TASK-208`
+- scope implementado:
+  - `migrations/20260403110709982_integration-data-quality-monitoring.sql`
+  - `src/lib/integrations/notion-delivery-data-quality.ts`
+  - `src/lib/integrations/notion-delivery-data-quality-core.ts`
+  - `src/lib/integrations/notion-delivery-data-quality-core.test.ts`
+  - `src/types/integration-data-quality.ts`
+  - `src/app/api/cron/notion-delivery-data-quality/route.ts`
+  - `src/app/api/admin/integrations/[integrationKey]/data-quality/route.ts`
+  - `src/app/api/admin/tenants/[id]/notion-data-quality/route.ts`
+  - `src/app/api/cron/sync-conformed/route.ts`
+  - `src/app/(dashboard)/admin/integrations/page.tsx`
+  - `src/views/greenhouse/admin/AdminIntegrationGovernanceView.tsx`
+  - `src/views/greenhouse/admin/AdminOpsHealthView.tsx`
+  - `src/views/greenhouse/admin/tenants/TenantNotionPanel.tsx`
+  - `src/lib/operations/get-operations-overview.ts`
+  - `vercel.json`
+  - `src/types/db.d.ts`
+  - cierre documental/lifecycle de `TASK-208`
+
+### Resultado
+
+- Greenhouse ya tiene monitoreo recurrente de calidad para el pipeline `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`
+- la salud del pipeline ahora se clasifica y persiste como `healthy`, `degraded` o `broken` por `space`
+- la evidencia histórica y los findings viven en:
+  - `greenhouse_sync.integration_data_quality_runs`
+  - `greenhouse_sync.integration_data_quality_checks`
+- el monitor corre:
+  - por cron dedicado `GET /api/cron/notion-delivery-data-quality`
+  - como hook post-sync después de `GET /api/cron/sync-conformed`
+- `/admin/integrations`, `/admin/ops-health` y `TenantNotionPanel` ya exponen la señal operativa resultante
+
+### Verificación
+
+- `pnpm pg:doctor --profile=migrator`
+- `pnpm migrate:up`
+- `pnpm exec vitest run src/lib/integrations/notion-delivery-data-quality-core.test.ts`
+- `pnpm build`
+- `pnpm lint`
+- `rg -n "new Pool\\(" src scripts`
+
+### Follow-on
+
+- el patrón `integration_data_quality_*` queda listo para generalizarse a otros upstreams dentro de `TASK-188`
+- `TASK-195` debe considerar que `TenantNotionPanel` ya concentra también la señal operativa de calidad del pipeline mientras siga existiendo como surface legacy
+
 ## Sesión 2026-04-03 — TASK-207 cerrada con hardening runtime y convergencia a writer canónico
 
 ### Rama / alcance
@@ -179,7 +230,7 @@
 - se actualizaron:
   - `docs/tasks/to-do/TASK-205-delivery-notion-origin-parity-audit.md`
   - `docs/tasks/in-progress/TASK-207-delivery-notion-sync-pipeline-hardening.md`
-  - `docs/tasks/to-do/TASK-208-delivery-data-quality-monitoring-auditor.md`
+  - `docs/tasks/in-progress/TASK-208-delivery-data-quality-monitoring-auditor.md`
 
 ## Sesión 2026-04-03 — Re-encuadre de lanes Notion/Delivery dentro de la integración nativa
 
@@ -204,11 +255,25 @@
 - se actualizaron:
   - `docs/tasks/to-do/TASK-205-delivery-notion-origin-parity-audit.md`
   - `docs/tasks/in-progress/TASK-207-delivery-notion-sync-pipeline-hardening.md`
-  - `docs/tasks/to-do/TASK-208-delivery-data-quality-monitoring-auditor.md`
+  - `docs/tasks/in-progress/TASK-208-delivery-data-quality-monitoring-auditor.md`
   - `docs/tasks/in-progress/TASK-188-native-integrations-layer-platform-governance.md`
   - `docs/tasks/README.md`
 
 ## Sesión 2026-04-03 — Nueva lane TASK-208 para monitoreo continuo de data quality
+
+### Delta 2026-04-03 — Ejecución iniciada
+
+- `TASK-208` se movió a `in-progress` para ejecución activa.
+- Auditoría inicial confirmada:
+  - el helper reusable ya existe en `src/lib/space-notion/notion-parity-audit.ts`
+  - el baseline `schema-snapshot-baseline.sql` no refleja por sí solo el estado actual de este dominio
+  - faltan tablas especializadas para histórico del monitor; `source_sync_runs` no alcanza como storage de score/checks/evidencia
+- Superficies reutilizables ya confirmadas para esta lane:
+  - `/admin/integrations`
+  - `/admin/ops-health`
+  - `TenantNotionPanel`
+- Archivo activo:
+  - `docs/tasks/in-progress/TASK-208-delivery-data-quality-monitoring-auditor.md`
 
 ### Objetivo
 
@@ -225,7 +290,7 @@
 ### Delta documental
 
 - se creó:
-  - `docs/tasks/to-do/TASK-208-delivery-data-quality-monitoring-auditor.md`
+  - `docs/tasks/in-progress/TASK-208-delivery-data-quality-monitoring-auditor.md`
 - se actualizó:
   - `docs/tasks/TASK_ID_REGISTRY.md`
   - `docs/tasks/README.md`

@@ -53,11 +53,11 @@ Primer bloque operativo asignado:
 | `TASK-191` | [TASK-191-finance-organization-first-downstream-consumers-cutover.md](in-progress/TASK-191-finance-organization-first-downstream-consumers-cutover.md) | P1        | Alto     | Alto     | Implementación          | Follow-on de `TASK-181`: cerrar el cutover downstream org-first en `purchase-orders`, `hes`, `expenses`, `allocations` y readers analíticos sin repropagar `clientId` como input obligatorio |
 | `TASK-187` | [TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md](complete/TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md) | P0        | Muy alto | Alto     | Cerrada                | Notion ya tiene governance tenant-scoped formal: snapshots, drift, KPI readiness, admin APIs y panel reutilizado sobre el binding canónico por `space` |
 | `TASK-196` | [TASK-196-delivery-performance-report-parity-greenhouse-notion.md](complete/TASK-196-delivery-performance-report-parity-greenhouse-notion.md) | P0        | Muy alto | Alto     | Cerrada                | Lane completa de paridad Delivery: source sync, identidad, owner attribution, semántica, freeze histórico y cutover outbound `Greenhouse -> Notion` sobre `Performance Reports` |
-
 ## Complete
 
 - [TASK-205-delivery-notion-origin-parity-audit.md](complete/TASK-205-delivery-notion-origin-parity-audit.md) — Lane cerrada como auditoría reusable `Notion/raw/conformed`: helper server-side, route admin tenant-scoped, script CLI y evidencia real para `Daniela` y `Andrés / Abril 2026`; el hardening estructural queda explicitamente derivado a `TASK-207`.
 - [TASK-207-delivery-notion-sync-pipeline-hardening.md](complete/TASK-207-delivery-notion-sync-pipeline-hardening.md) — Hardening runtime cerrado del sync `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`: gate real de frescura por `space`, preservación de jerarquía, validación `raw -> transformed -> persisted`, runs cancelados/fallidos auditables y convergencia a writer canónico al desactivar el overwrite legacy por defecto.
+- [TASK-208-delivery-data-quality-monitoring-auditor.md](complete/TASK-208-delivery-data-quality-monitoring-auditor.md) — Monitor recurrente cerrado para `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`: tablas históricas `integration_data_quality_*`, scoring `healthy / degraded / broken`, cron dedicado, hook post-sync, alerting Slack y visibilidad reutilizada en `/admin/integrations`, `/admin/ops-health` y `TenantNotionPanel`.
 
 ## To Do
 
@@ -145,10 +145,10 @@ Primer bloque operativo asignado:
   - `delivery_tasks` preserva jerarquía `tarea_principal_ids` / `subtareas_ids`
   - el runtime valida paridad `raw -> transformed -> persisted` antes de declararse sano
   - el carril legacy/manual ya no sobreescribe `greenhouse_conformed.*` por defecto
-- `TASK-208` queda abierta como lane de monitoreo continuo:
-  - Greenhouse necesita convertir esos guardrails ya implementados en monitoreo recurrente e histórico para no volver a quedar ciego frente al drift
-  - el objetivo es medir salud real del pipeline y alertar cuando `Notion`, raw y conformed dejen de cuadrar
-  - esta lane ya queda explícitamente enmarcada como observabilidad nativa de la integración `Notion`
+- `TASK-208` ya quedó cerrada como lane de monitoreo continuo:
+  - Greenhouse ya persiste runs/checks históricos y clasifica el pipeline como `healthy`, `degraded` o `broken`
+  - el monitoreo corre por cron dedicado y también como hook post-sync para no volver a quedar ciego frente al drift
+  - la observabilidad ya quedó integrada como capability nativa de la integración `Notion`
 - **Siguiente ola:** `TASK-173` → `TASK-027` → `TASK-028` → `TASK-116` → `TASK-070` → `TASK-071` → `TASK-011`.
 - **Estratégicas pero caras:** `TASK-008` → `TASK-005` → `TASK-071` → `TASK-118` → `TASK-018`.
 - **Later / oportunistas:** `TASK-029` → `TASK-031` → `TASK-015` → `TASK-016` → `TASK-020` → `TASK-115` → `TASK-107` → `TASK-103` → `TASK-021` → `TASK-032` → `TASK-053` → `TASK-054` → `TASK-055` → `TASK-058` → `TASK-071`.

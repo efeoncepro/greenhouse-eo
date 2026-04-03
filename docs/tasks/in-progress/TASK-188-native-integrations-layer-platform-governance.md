@@ -1,5 +1,17 @@
 # TASK-188 - Native Integrations Layer: Platform Governance, Runtime Contracts & Shared Operating Model
 
+## Delta 2026-04-03
+
+- `TASK-208` ya cerró un follow-on operativo sobre esta foundation shared para `Notion`:
+  - tablas históricas `greenhouse_sync.integration_data_quality_runs` y `greenhouse_sync.integration_data_quality_checks`
+  - helper reusable `src/lib/integrations/notion-delivery-data-quality.ts`
+  - cron recurrente `GET /api/cron/notion-delivery-data-quality`
+  - surfaces conectadas en `/admin/integrations`, `/admin/ops-health` y `TenantNotionPanel`
+- Implicación:
+  - la Native Integrations Layer ya no expone solo inventory, readiness y trigger de sync
+  - ahora también soporta monitoreo persistido de calidad de datos por integración y por `space`
+  - el gap restante de `TASK-188` se concentra más en generalizar este patrón a otros upstreams y endurecer contratos multi-integración
+
 ## Delta 2026-04-02
 
 - `TASK-187` ya consumió y endureció esta foundation shared para `Notion`:

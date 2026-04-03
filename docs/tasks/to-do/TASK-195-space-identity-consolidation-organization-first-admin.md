@@ -1,5 +1,16 @@
 # TASK-195 - Space Identity Consolidation: Organization-First Admin Entry & Space Onboarding
 
+## Delta 2026-04-03
+
+- `TASK-208` agregó señal operativa adicional dentro de `src/views/greenhouse/admin/tenants/TenantNotionPanel.tsx`:
+  - estado `healthy / degraded / broken`
+  - findings recientes
+  - historial corto del monitor recurrente de data quality
+- Implicación:
+  - `/admin/tenants/[id]` sigue acumulando governance residual útil para la transición
+  - esta task debe considerar explícitamente ese panel de calidad al reubicar ownership hacia surfaces `organization-first` y `space-first`
+  - el objetivo no cambia: esa surface legacy no debe seguir siendo el home conceptual del onboarding de Notion
+
 ## Status
 
 - Lifecycle: `to-do`

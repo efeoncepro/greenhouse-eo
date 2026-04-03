@@ -1,5 +1,48 @@
 # TASK-208 - Delivery Data Quality Monitoring & Drift Auditor
 
+## Delta 2026-04-03 — Implementation closed
+
+- `TASK-208` queda implementada y cerrada como monitor recurrente de calidad para `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`
+- se agregaron tablas históricas especializadas en `greenhouse_sync`:
+  - `integration_data_quality_runs`
+  - `integration_data_quality_checks`
+- se agregó el helper operativo `src/lib/integrations/notion-delivery-data-quality.ts` para:
+  - correr el auditor por `space_id`
+  - persistir score, checks y evidencia
+  - emitir alertas Slack en estados `degraded` y `broken`
+  - exponer overview para admin e historial tenant-scoped
+- la ejecución recurrente quedó cerrada en dos carriles:
+  - cron dedicado `GET /api/cron/notion-delivery-data-quality`
+  - hook post-sync dentro de `GET /api/cron/sync-conformed`
+- las surfaces reutilizadas quedaron conectadas al monitor:
+  - `/admin/integrations`
+  - `/admin/ops-health`
+  - `TenantNotionPanel`
+- el contrato operativo ya no depende de una auditoría manual aislada:
+  - ahora existe scoring persistido `healthy / degraded / broken`
+  - historial corto de runs
+  - findings accionables por `space`
+
+## Delta 2026-04-03 — Audit correction after repo discovery
+
+- La spec queda corregida para reflejar el estado real del repo antes de implementar:
+  - el helper reusable ya existe en `src/lib/space-notion/notion-parity-audit.ts`
+  - la route admin tenant-scoped ya existe en `GET /api/admin/tenants/[id]/notion-parity-audit`
+  - el gap real no es “crear el auditor desde cero”, sino convertirlo en monitoreo recurrente, scoring histórico, persistencia especializada y visibilidad operativa
+- El baseline `docs/architecture/schema-snapshot-baseline.sql` no es suficiente como source of truth de este dominio:
+  - no incluye `greenhouse_sync.integration_registry`
+  - no incluye `greenhouse_sync.notion_publication_runs`
+  - no incluye `greenhouse_sync.notion_space_schema_snapshots`
+  - no incluye `greenhouse_sync.notion_space_schema_drift_events`
+  - no incluye `greenhouse_sync.notion_space_kpi_readiness`
+- La implementación debe leer el estado actual combinando:
+  - migraciones en `migrations/`
+  - setup scripts en `scripts/`
+  - contratos efectivos en `src/types/db.d.ts`
+- La spec también queda corregida en cuanto a surfaces existentes:
+  - ya existen `/admin/integrations`, `/admin/ops-health` y `TenantNotionPanel` como capas reutilizables para exponer el monitor
+  - el gap es la señal específica de data quality para `Notion -> raw -> conformed`, no la ausencia total de UI/admin
+
 ## Delta 2026-04-03 — Impact after TASK-207 closure
 
 - `TASK-207` ya cerró el hardening estructural base:
@@ -40,11 +83,11 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio`
-- Status real: `Diseño`
+- Status real: `Cerrada`
 - Rank: `61`
 - Domain: `data`
 - GitHub Project: `[pending]`
@@ -113,7 +156,7 @@ Reglas obligatorias:
 - debe comparar capas reales del pipeline, no solo health general
 - debe producir resultados auditables y accionables
 - no debe romper el runtime actual para existir
-- debe poder correr aunque todavía existan gaps abiertos en `TASK-205` y `TASK-207`
+- debe construirse sobre el helper de paridad y guardrails ya cerrados por `TASK-205` y `TASK-207`, no duplicarlos
 
 ## Dependencies & Impact
 
@@ -138,7 +181,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-208-delivery-data-quality-monitoring-auditor.md`
+- `docs/tasks/complete/TASK-208-delivery-data-quality-monitoring-auditor.md`
 - `src/lib/sync/**`
 - `src/lib/integrations/**`
 - `src/app/api/cron/**`
@@ -154,14 +197,15 @@ Reglas obligatorias:
 - infraestructura de cron y health básica
 - guard de frescura real y control-plane de runs cancelados/fallidos cerrados por `TASK-207`
 - validación de paridad e invariantes de jerarquía ya integrada al writer canónico
+- monitor recurrente persistido en `greenhouse_sync.integration_data_quality_runs`
+- checks históricos persistidos en `greenhouse_sync.integration_data_quality_checks`
+- cron dedicado y hook post-sync para recalcular salud del pipeline
+- visibilidad admin/ops/tenant reutilizando surfaces existentes
 
 ### Gap actual
 
-- no existe monitor recurrente de calidad de datos
-- no existe score o estado operativo del pipeline Delivery
-- no existen alertas automáticas por drift de filas o campos críticos
-- el helper reusable ya existe, pero todavía no hay ejecución recurrente ni persistencia histórica de resultados
-- no hay un dashboard o reporte operativo que diga “estamos bien / estamos mal”
+- follow-on futuro: endurecer alert routing multi-canal más allá de Slack si el operating model lo exige
+- follow-on futuro: extender el patrón de `integration_data_quality_*` a otros upstreams más allá de `Notion`
 
 ## Scope
 
@@ -218,17 +262,21 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Existe un contrato explícito de data quality para Delivery sync.
-- [ ] Existe un auditor/helper reusable que compare capas del pipeline.
-- [ ] El auditor puede clasificar el estado del pipeline como sano, degradado o roto.
-- [ ] Existe una estrategia explícita de ejecución recurrente y almacenamiento de resultados.
-- [ ] La lane deja claro cómo alertar y cómo actuar cuando se detecta drift.
+- [x] Existe un contrato explícito de data quality para Delivery sync.
+- [x] Existe un auditor/helper reusable que compare capas del pipeline.
+- [x] El auditor puede clasificar el estado del pipeline como sano, degradado o roto.
+- [x] Existe una estrategia explícita de ejecución recurrente y almacenamiento de resultados.
+- [x] La lane deja claro cómo alertar y cómo actuar cuando se detecta drift.
 
 ## Verification
 
-- ejecución manual del auditor sobre `Efeonce` y `Sky Airline`
-- validación contra casos reales:
-  - `Daniela / Abril 2026`
-  - `Andrés / Abril 2026`
-- comparación `raw vs conformed`
-- revisión de timestamps de frescura
+- `pnpm pg:doctor --profile=migrator`
+- `pnpm migrate:up`
+- `pnpm exec vitest run src/lib/integrations/notion-delivery-data-quality-core.test.ts`
+- `pnpm build`
+- `pnpm lint`
+- `rg -n "new Pool\\(" src scripts`
+- validación funcional sobre surfaces reutilizadas:
+  - `/admin/integrations`
+  - `/admin/ops-health`
+  - `TenantNotionPanel`

@@ -1,5 +1,32 @@
 # Greenhouse Source Sync Pipelines V1
 
+## Delta 2026-04-03 — TASK-208 recurrent data quality monitor for Notion delivery
+
+El tramo endurecido `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks` ya tiene monitoreo recurrente persistido.
+
+Contrato operativo vigente:
+
+- `src/lib/integrations/notion-delivery-data-quality.ts` ejecuta el auditor por `space_id`, persiste runs/checks y clasifica el estado como `healthy`, `degraded` o `broken`
+- el storage histórico vive en:
+  - `greenhouse_sync.integration_data_quality_runs`
+  - `greenhouse_sync.integration_data_quality_checks`
+- el monitor corre en dos momentos:
+  - cron dedicado `GET /api/cron/notion-delivery-data-quality`
+  - hook post-sync después de `GET /api/cron/sync-conformed`
+- el monitor reutiliza:
+  - el auditor de paridad de `TASK-205`
+  - las freshness gates y validaciones runtime de `TASK-207`
+- la visibilidad operativa ya existe en:
+  - `/admin/integrations`
+  - `/admin/ops-health`
+  - `TenantNotionPanel`
+
+Implicación arquitectónica:
+
+- `source_sync_runs` sigue siendo el control plane de ejecución del sync
+- pero la salud histórica de calidad del dato ya no depende de inferencias ad hoc sobre esos runs
+- Greenhouse ahora conserva evidencia explícita de drift y severidad por `space`
+
 ## Delta 2026-04-03 — TASK-207 runtime hardening for Notion delivery sync
 
 Se cerró el hardening estructural del tramo `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`.

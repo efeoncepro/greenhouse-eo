@@ -8,7 +8,9 @@ import { getCloudGcpAuthPosture } from '@/lib/cloud/gcp-auth'
 import { buildCloudHealthSnapshot, getCloudPlatformHealthSnapshot } from '@/lib/cloud/health'
 import { getCloudObservabilityPosture, getCloudSentryIncidents } from '@/lib/cloud/observability'
 import { getCloudPostgresPosture } from '@/lib/cloud/postgres'
+import { getNotionDeliveryDataQualityOverview } from '@/lib/integrations/notion-delivery-data-quality'
 import { getGreenhousePostgresConfig, isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import type { IntegrationDataQualityOverview } from '@/types/integration-data-quality'
 
 export interface OperationsKpis {
   outboxEvents24h: number
@@ -78,6 +80,7 @@ export interface OperationsOverview {
   failedProjections: OperationsFailedProjection[]
   failedHandlers: OperationsFailedHandler[]
   webhooks: OperationsWebhookOverview
+  notionDeliveryDataQuality?: IntegrationDataQualityOverview | null
   cloud: CloudPlatformOverview
 }
 
@@ -222,6 +225,38 @@ const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubsystem> 
   }
 }
 
+const buildNotionDeliveryDataQualitySubsystem = (
+  overview: IntegrationDataQualityOverview | null
+): OperationsSubsystem => {
+  if (!overview || overview.totals.totalSpaces === 0) {
+    return {
+      name: 'Notion Delivery Data Quality',
+      status: 'idle',
+      processed: 0,
+      failed: 0,
+      lastRun: null
+    }
+  }
+
+  const latestRun = overview.recentRuns[0]?.checkedAt ?? null
+  const failed = overview.totals.brokenSpaces + overview.totals.degradedSpaces
+
+  const status: OperationsHealthStatus =
+    overview.totals.brokenSpaces > 0
+      ? 'down'
+      : overview.totals.degradedSpaces > 0 || overview.totals.unknownSpaces > 0
+        ? 'degraded'
+        : 'healthy'
+
+  return {
+    name: 'Notion Delivery Data Quality',
+    status,
+    processed: overview.totals.totalSpaces,
+    failed,
+    lastRun: latestRun
+  }
+}
+
 export const getOperationsOverview = async (): Promise<OperationsOverview> => {
   const [hasOutbox, hasProjections, hasReactiveLog, hasNotifications, hasServices, hasIcoMetrics, hasWebhookEndpoints, hasWebhookInbox, hasWebhookDeliveries, hasWebhookSubscriptions] =
     await Promise.all([
@@ -350,6 +385,14 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
     ? await safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_serving.ico_member_metrics`)
     : 0
 
+  let notionDeliveryDataQuality: IntegrationDataQualityOverview | null = null
+
+  try {
+    notionDeliveryDataQuality = await getNotionDeliveryDataQualityOverview({ limit: 10 })
+  } catch {
+    notionDeliveryDataQuality = null
+  }
+
   const subsystems: OperationsSubsystem[] = [
     {
       name: 'Outbox',
@@ -393,7 +436,8 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       failed: 0,
       lastRun: icoLastSync
     },
-    await buildFinanceDataQualitySubsystem()
+    await buildFinanceDataQualitySubsystem(),
+    buildNotionDeliveryDataQualitySubsystem(notionDeliveryDataQuality)
   ]
 
   interface EventRow extends Record<string, unknown> {
@@ -659,6 +703,7 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       lastDeliveryAt: webhookLastDeliveryAt,
       schemaReady: hasWebhookEndpoints && hasWebhookInbox && hasWebhookDeliveries && hasWebhookSubscriptions
     },
+    notionDeliveryDataQuality,
     cloud: {
       health: cloudHealth,
       posture: {
