@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { getAgencyPulseKpis, getAgencyStatusMix, getAgencyWeeklyActivity } from '@/lib/agency/agency-queries'
+import { getAgencyPulseKpis, getAgencyStatusMix, getAgencyWeeklyActivity, getAgencyDeliveryTrend } from '@/lib/agency/agency-queries'
 import { requireAgencyTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -12,11 +12,12 @@ export async function GET() {
     return errorResponse ?? NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const [kpis, statusMix, weeklyActivity] = await Promise.all([
+  const [kpis, statusMix, weeklyActivity, deliveryTrend] = await Promise.all([
     getAgencyPulseKpis(),
     getAgencyStatusMix(),
-    getAgencyWeeklyActivity()
+    getAgencyWeeklyActivity(),
+    getAgencyDeliveryTrend(6)
   ])
 
-  return NextResponse.json({ kpis, statusMix, weeklyActivity })
+  return NextResponse.json({ kpis, statusMix, weeklyActivity, deliveryTrend })
 }

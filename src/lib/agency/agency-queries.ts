@@ -23,6 +23,17 @@ export interface AgencySpaceHealth {
   isInternal: boolean
 }
 
+export interface AgencyDeliveryTrendMonth {
+  year: number
+  month: number
+  otdPct: number | null
+  rpaAvg: number | null
+  ftrPct: number | null
+  totalTasks: number
+  completedTasks: number
+  stuckAssetCount: number
+}
+
 export interface AgencyPulseKpis {
   rpaGlobal: number | null
   assetsActivos: number
@@ -557,5 +568,47 @@ export const getAgencyCapacity = async (): Promise<AgencyCapacityOverview> => {
       monthlyHours: 0,
       members: []
     }
+  }
+}
+
+export const getAgencyDeliveryTrend = async (months = 6): Promise<AgencyDeliveryTrendMonth[]> => {
+  const projectId = getBigQueryProjectId()
+  const bq = getBigQueryClient()
+
+  try {
+    const [rows] = await bq.query({
+      query: `
+        SELECT
+          period_year, period_month,
+          on_time_pct AS otd_pct,
+          SAFE_DIVIDE(
+            SUM(on_time_count) + SUM(late_drop_count),
+            NULLIF(SUM(total_tasks), 0)
+          ) AS ftr_pct,
+          SUM(total_tasks) AS total_tasks,
+          SUM(completed_tasks) AS completed_tasks,
+          SUM(overdue_count) AS stuck_asset_count
+        FROM \`${projectId}.ico_engine.metric_snapshots_monthly\`
+        GROUP BY period_year, period_month, on_time_pct
+        ORDER BY period_year DESC, period_month DESC
+        LIMIT @months
+      `,
+      params: { months }
+    })
+
+    return (rows as Record<string, unknown>[])
+      .map(r => ({
+        year: toNumber(r.period_year),
+        month: toNumber(r.period_month),
+        otdPct: toNullableNumber(r.otd_pct),
+        rpaAvg: null,
+        ftrPct: toNullableNumber(r.ftr_pct),
+        totalTasks: toNumber(r.total_tasks),
+        completedTasks: toNumber(r.completed_tasks),
+        stuckAssetCount: toNumber(r.stuck_asset_count)
+      }))
+      .reverse()
+  } catch {
+    return []
   }
 }
