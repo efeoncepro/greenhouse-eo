@@ -1,5 +1,41 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — TASK-204 Carry-Over & Overdue Carried Forward Semantic Split
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `src/lib/ico-engine/shared.ts` — bucket SQL, OTD formula, period filter
+  - `src/lib/ico-engine/schema.ts` — BQ DDL + column migrations
+  - `src/lib/ico-engine/materialize.ts` — all INSERT statements + agency OTD denominator
+  - `src/lib/ico-engine/read-metrics.ts` — types, normalizers, validation
+  - `src/lib/ico-engine/performance-report.ts` — report payload, OTD compute, alerts
+  - `src/lib/ico-engine/metric-registry.ts` — OTD denominator + new OCF metric
+  - `src/lib/ico-engine/historical-reconciliation.ts` — baseline + comparisons
+  - `src/lib/sync/projections/agency-performance-report.ts` — PG upsert
+  - `src/lib/sync/projections/ico-member-metrics.ts` — PG upsert
+  - `src/lib/space-notion/notion-performance-report-publication.ts` — Notion outbound
+  - `src/views/agency/AgencyIcoEngineView.tsx` — agency scorecard UI
+  - `src/views/greenhouse/agency/space-360/tabs/IcoTab.tsx` — space context UI
+  - `src/views/greenhouse/people/tabs/PersonHrProfileTab.tsx` — fallback context
+  - `migrations/20260403175430107_delivery-semantic-split-overdue-carried-forward.sql`
+  - 4 architecture/operations docs
+
+### Resultado
+
+- 5 buckets mutuamente excluyentes: On-Time, Late Drop, Overdue, Carry-Over, Overdue Carried Forward
+- Carry-Over ahora exige `created_at in period` (antes era dead metric — period filter lo excluía)
+- OTD = On-Time / (On-Time + Late Drop + Overdue) — carry-over y OCF fuera del denominador
+- overdue_carried_forward_count materializado en todas las tablas BQ y PG serving
+- UI y Notion publication incluyen la nueva métrica
+
+### Verificación
+
+- `pnpm build` sin errores
+- `pnpm lint` sin errores
+- Migración PG lista para `pnpm migrate:up` (requiere Cloud SQL Proxy)
+
 ## Sesión 2026-04-03 — TASK-206 Delivery Operational Attribution Model
 
 ### Rama / alcance

@@ -26,6 +26,7 @@ type AgencyReportRow = {
   on_time_pct: unknown
   overdue_count: unknown
   carry_over_count: unknown
+  overdue_carried_forward_count: unknown
   total_tasks: unknown
   completed_tasks: unknown
   active_tasks: unknown
@@ -45,6 +46,7 @@ type MemberMetricRow = {
   late_drop_count: unknown
   overdue_count: unknown
   carry_over_count: unknown
+  overdue_carried_forward_count: unknown
 }
 
 type ColumnRow = {
@@ -59,6 +61,7 @@ type BaselineMemberExpectation = {
   lateDropCount: number
   overdueCount: number
   carryOverCount: number
+  overdueCarriedForwardCount: number
   otdPct: number
 }
 
@@ -70,6 +73,7 @@ type BaselineExpectation = {
     lateDropCount: number
     overdueCount: number
     carryOverCount: number
+    overdueCarriedForwardCount: number
     onTimePct: number
     efeonceTasks: number
     skyTasks: number
@@ -111,6 +115,7 @@ export interface HistoricalReconciliationResult {
     lateDropCount: number
     overdueCount: number
     carryOverCount: number
+    overdueCarriedForwardCount: number
     efeonceTasks: number
     skyTasks: number
     topPerformerMemberId: string | null
@@ -125,6 +130,7 @@ export interface HistoricalReconciliationResult {
     lateDropCount: number
     overdueCount: number
     carryOverCount: number
+    overdueCarriedForwardCount: number
   } | null
   baselineComparison: {
     sourcePageUrl: string
@@ -134,6 +140,7 @@ export interface HistoricalReconciliationResult {
       lateDropCount: NumericComparison
       overdueCount: NumericComparison
       carryOverCount: NumericComparison
+      overdueCarriedForwardCount: NumericComparison
       onTimePct: NumericComparison
       efeonceTasks: NumericComparison
       skyTasks: NumericComparison
@@ -153,6 +160,7 @@ export interface HistoricalReconciliationResult {
       lateDropCount: NumericComparison
       overdueCount: NumericComparison
       carryOverCount: NumericComparison
+      overdueCarriedForwardCount: NumericComparison
       otdPct: NumericComparison
     }>
   } | null
@@ -168,6 +176,7 @@ const KNOWN_NOTION_BASELINES: Record<string, BaselineExpectation> = {
       lateDropCount: 75,
       overdueCount: 17,
       carryOverCount: 0,
+      overdueCarriedForwardCount: 0,
       onTimePct: 67.5,
       efeonceTasks: 95,
       skyTasks: 188,
@@ -184,6 +193,7 @@ const KNOWN_NOTION_BASELINES: Record<string, BaselineExpectation> = {
         lateDropCount: 13,
         overdueCount: 1,
         carryOverCount: 0,
+        overdueCarriedForwardCount: 0,
         otdPct: 86.3
       },
       {
@@ -194,6 +204,7 @@ const KNOWN_NOTION_BASELINES: Record<string, BaselineExpectation> = {
         lateDropCount: 3,
         overdueCount: 2,
         carryOverCount: 0,
+        overdueCarriedForwardCount: 0,
         otdPct: 77.3
       },
       {
@@ -204,6 +215,7 @@ const KNOWN_NOTION_BASELINES: Record<string, BaselineExpectation> = {
         lateDropCount: 26,
         overdueCount: 1,
         carryOverCount: 0,
+        overdueCarriedForwardCount: 0,
         otdPct: 49.1
       },
       {
@@ -214,6 +226,7 @@ const KNOWN_NOTION_BASELINES: Record<string, BaselineExpectation> = {
         lateDropCount: 25,
         overdueCount: 13,
         carryOverCount: 0,
+        overdueCarriedForwardCount: 0,
         otdPct: 43.3
       }
     ]
@@ -267,7 +280,7 @@ const readServingAgencyReportRow = async (
     `SELECT
        report_scope, period_year, period_month,
        on_time_count, late_drop_count, on_time_pct,
-       overdue_count, carry_over_count,
+       overdue_count, carry_over_count, overdue_carried_forward_count,
        total_tasks, completed_tasks, active_tasks,
        efeonce_tasks_count, sky_tasks_count,
        top_performer_member_id, top_performer_member_name,
@@ -300,7 +313,8 @@ const readMemberRows = async (
       on_time_count,
       late_drop_count,
       overdue_count,
-      carry_over_count
+      carry_over_count,
+      overdue_carried_forward_count
     FROM \`${projectId}.${ICO_DATASET}.metrics_by_member\`
     WHERE period_year = @periodYear
       AND period_month = @periodMonth
@@ -319,6 +333,7 @@ const mapAgencyReport = (row: AgencyReportRow | null) => {
     lateDropCount: toNumber(row.late_drop_count),
     overdueCount: toNumber(row.overdue_count),
     carryOverCount: toNumber(row.carry_over_count),
+    overdueCarriedForwardCount: toNumber(row.overdue_carried_forward_count),
     efeonceTasks: toNumber(row.efeonce_tasks_count),
     skyTasks: toNumber(row.sky_tasks_count),
     topPerformerMemberId: normalizeString(row.top_performer_member_id) || null,
@@ -391,6 +406,7 @@ export const reconcileHistoricalPerformancePeriod = async (
       lateDropCount: buildNumericComparison(baseline.agency.lateDropCount, bigQueryReport.lateDropCount),
       overdueCount: buildNumericComparison(baseline.agency.overdueCount, bigQueryReport.overdueCount),
       carryOverCount: buildNumericComparison(baseline.agency.carryOverCount, bigQueryReport.carryOverCount),
+      overdueCarriedForwardCount: buildNumericComparison(baseline.agency.overdueCarriedForwardCount, bigQueryReport.overdueCarriedForwardCount),
       onTimePct: buildNumericComparison(baseline.agency.onTimePct, bigQueryReport.onTimePct),
       efeonceTasks: buildNumericComparison(baseline.agency.efeonceTasks, bigQueryReport.efeonceTasks),
       skyTasks: buildNumericComparison(baseline.agency.skyTasks, bigQueryReport.skyTasks),
@@ -413,6 +429,7 @@ export const reconcileHistoricalPerformancePeriod = async (
         lateDropCount: buildNumericComparison(member.lateDropCount, actual ? toNumber(actual.late_drop_count) : null),
         overdueCount: buildNumericComparison(member.overdueCount, actual ? toNumber(actual.overdue_count) : null),
         carryOverCount: buildNumericComparison(member.carryOverCount, actual ? toNumber(actual.carry_over_count) : null),
+        overdueCarriedForwardCount: buildNumericComparison(member.overdueCarriedForwardCount, actual ? toNumber(actual.overdue_carried_forward_count) : null),
         otdPct: buildNumericComparison(member.otdPct, actual ? toNullableNumber(actual.otd_pct) : null)
       }
     })
@@ -454,6 +471,7 @@ export const reconcileHistoricalPerformancePeriod = async (
       member.lateDropCount,
       member.overdueCount,
       member.carryOverCount,
+      member.overdueCarriedForwardCount,
       member.otdPct
     ]
 

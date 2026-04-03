@@ -1,5 +1,16 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-03 — Carry-Over & Overdue Carried Forward semantic split
+
+`TASK-204` separa semánticamente carry-over de deuda vencida arrastrada en el engine y materialización:
+
+- `Carry-Over` = tarea creada en el período con `due_date` posterior al cierre (carga futura, no penaliza OTD)
+- `Overdue Carried Forward` = tarea con `due_date < period_start` y abierta al cierre (deuda arrastrada, no penaliza OTD)
+- `OTD` = `On-Time / (On-Time + Late Drop + Overdue)` — carry-over y OCF excluidos del denominador
+- `buildPeriodFilterSQL()` ahora incluye los 3 universos de tareas (due_date in period + carry-over + OCF)
+- `overdue_carried_forward_count` materializado en todos los metrics tables (BQ) y serving tables (PG)
+- migración: `greenhouse_serving.agency_performance_reports` y `greenhouse_serving.ico_member_metrics`
+
 ## Delta 2026-04-02 — Historical Delivery periods now support frozen task snapshots
 
 `TASK-201` agrega una nueva pieza canónica al runtime de `ICO`:

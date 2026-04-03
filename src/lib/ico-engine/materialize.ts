@@ -211,7 +211,7 @@ export const materializeMonthlySnapshots = async (
        stuck_asset_count, stuck_asset_pct,
        csc_distribution,
        total_tasks, completed_tasks, active_tasks,
-       on_time_count, late_drop_count, overdue_count, carry_over_count,
+       on_time_count, late_drop_count, overdue_count, carry_over_count, overdue_carried_forward_count,
        computed_at, engine_version)
     SELECT
       source.snapshot_id,
@@ -237,6 +237,7 @@ export const materializeMonthlySnapshots = async (
       source.late_drop_count,
       source.overdue_count,
       source.carry_over_count,
+      source.overdue_carried_forward_count,
       source.computed_at,
       source.engine_version
     FROM (
@@ -557,7 +558,7 @@ const materializeProjectMetrics = async (
        throughput_count, pipeline_velocity,
        stuck_asset_count, stuck_asset_pct,
        total_tasks, completed_tasks, active_tasks,
-       on_time_count, late_drop_count, overdue_count, carry_over_count,
+       on_time_count, late_drop_count, overdue_count, carry_over_count, overdue_carried_forward_count,
        materialized_at)
     SELECT
       project_source_id,
@@ -606,7 +607,7 @@ const materializeMemberMetrics = async (
        throughput_count, pipeline_velocity,
        stuck_asset_count, stuck_asset_pct,
        total_tasks, completed_tasks, active_tasks,
-       on_time_count, late_drop_count, overdue_count, carry_over_count,
+       on_time_count, late_drop_count, overdue_count, carry_over_count, overdue_carried_forward_count,
        materialized_at)
     SELECT
       te.primary_owner_member_id AS member_id,
@@ -652,7 +653,7 @@ const materializeSprintMetrics = async (
        throughput_count, pipeline_velocity,
        stuck_asset_count, stuck_asset_pct,
        total_tasks, completed_tasks, active_tasks,
-       on_time_count, late_drop_count, overdue_count, carry_over_count,
+       on_time_count, late_drop_count, overdue_count, carry_over_count, overdue_carried_forward_count,
        materialized_at)
     SELECT
       sprint_source_id,
@@ -699,7 +700,7 @@ const materializeOrganizationMetrics = async (
        throughput_count, pipeline_velocity,
        stuck_asset_count, stuck_asset_pct,
        total_tasks, completed_tasks, active_tasks,
-       on_time_count, late_drop_count, overdue_count, carry_over_count,
+       on_time_count, late_drop_count, overdue_count, carry_over_count, overdue_carried_forward_count,
        materialized_at)
     SELECT
       client_id AS organization_id,
@@ -745,7 +746,7 @@ const materializeBusinessUnitMetrics = async (
        throughput_count, pipeline_velocity,
        stuck_asset_count, stuck_asset_pct,
        total_tasks, completed_tasks, active_tasks,
-       on_time_count, late_drop_count, overdue_count, carry_over_count,
+       on_time_count, late_drop_count, overdue_count, carry_over_count, overdue_carried_forward_count,
        materialized_at)
     SELECT
       operating_business_unit AS business_unit,
@@ -789,7 +790,7 @@ const materializePerformanceReports = async (
     INSERT INTO \`${projectId}.${ICO_DATASET}.performance_report_monthly\`
       (report_scope, period_year, period_month,
        on_time_count, late_drop_count, on_time_pct,
-       overdue_count, carry_over_count,
+       overdue_count, carry_over_count, overdue_carried_forward_count,
        total_tasks, completed_tasks, active_tasks,
        efeonce_tasks_count, sky_tasks_count, task_mix_json,
        top_performer_member_id, top_performer_member_name,
@@ -843,12 +844,13 @@ const materializePerformanceReports = async (
         ROUND(
           SAFE_DIVIDE(
             SUM(on_time_count),
-            NULLIF(SUM(total_tasks), 0)
+            NULLIF(SUM(on_time_count) + SUM(late_drop_count) + SUM(overdue_count), 0)
           ) * 100,
           1
         ) AS on_time_pct,
         SUM(overdue_count) AS overdue_count,
         SUM(carry_over_count) AS carry_over_count,
+        SUM(overdue_carried_forward_count) AS overdue_carried_forward_count,
         SUM(total_tasks) AS total_tasks,
         SUM(completed_tasks) AS completed_tasks,
         SUM(active_tasks) AS active_tasks,
@@ -921,6 +923,7 @@ const materializePerformanceReports = async (
       summary.on_time_pct,
       summary.overdue_count,
       summary.carry_over_count,
+      summary.overdue_carried_forward_count,
       summary.total_tasks,
       summary.completed_tasks,
       summary.active_tasks,

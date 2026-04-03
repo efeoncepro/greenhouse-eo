@@ -116,6 +116,7 @@ const buildBlocks = (report: AgencyPerformanceReport, title: string) => {
     bulletBlock(`Late Drops: ${report.summary.lateDrops}`),
     bulletBlock(`Overdue: ${report.summary.overdue}`),
     bulletBlock(`Carry-Over: ${report.summary.carryOver}`),
+    bulletBlock(`Overdue Carried Forward: ${report.summary.overdueCarriedForward}`),
     bulletBlock(`Total tareas: ${report.summary.totalTasks}`),
     bulletBlock(`Tareas Efeonce: ${report.summary.efeonceTasks}`),
     bulletBlock(`Tareas Sky: ${report.summary.skyTasks}`),
@@ -164,6 +165,9 @@ const buildProperties = (report: AgencyPerformanceReport, title: string) => ({
   },
   'Carry-Over': {
     number: report.summary.carryOver
+  },
+  'Overdue Carried Forward': {
+    number: report.summary.overdueCarriedForward
   },
   'Top Performer': {
     rich_text: richText(

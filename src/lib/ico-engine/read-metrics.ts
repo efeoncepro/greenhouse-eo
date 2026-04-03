@@ -48,6 +48,7 @@ interface SnapshotRow {
   late_drop_count: unknown
   overdue_count: unknown
   carry_over_count: unknown
+  overdue_carried_forward_count: unknown
   computed_at: unknown
   engine_version: unknown
   client_name?: unknown
@@ -72,6 +73,7 @@ interface LiveMetricRow {
   late_drop_count: unknown
   overdue_count: unknown
   carry_over_count: unknown
+  overdue_carried_forward_count: unknown
 }
 
 interface CscDistributionRow {
@@ -111,6 +113,7 @@ export interface SpaceMetricSnapshot {
     lateDropTasks: number
     overdueTasks: number
     carryOverTasks: number
+    overdueCarriedForwardTasks: number
   }
   computedAt: string | null
   engineVersion: string
@@ -137,6 +140,7 @@ export interface IcoMetricSnapshot {
     lateDropTasks: number
     overdueTasks: number
     carryOverTasks: number
+    overdueCarriedForwardTasks: number
   }
   computedAt: string | null
   engineVersion: string
@@ -204,7 +208,8 @@ const normalizeSnapshot = (
       onTimeTasks: toNumber(row.on_time_count),
       lateDropTasks: toNumber(row.late_drop_count),
       overdueTasks: toNumber(row.overdue_count),
-      carryOverTasks: toNumber(row.carry_over_count)
+      carryOverTasks: toNumber(row.carry_over_count),
+      overdueCarriedForwardTasks: toNumber(row.overdue_carried_forward_count)
     },
     computedAt: toTimestampString(row.computed_at as string | { value?: string } | null),
     engineVersion: normalizeString(row.engine_version) || ENGINE_VERSION,
@@ -349,7 +354,8 @@ export const computeSpaceMetricsLive = async (
       onTimeTasks: toNumber(row.on_time_count),
       lateDropTasks: toNumber(row.late_drop_count),
       overdueTasks: toNumber(row.overdue_count),
-      carryOverTasks: toNumber(row.carry_over_count)
+      carryOverTasks: toNumber(row.carry_over_count),
+      overdueCarriedForwardTasks: toNumber(row.overdue_carried_forward_count)
     },
     computedAt: new Date().toISOString(),
     engineVersion: ENGINE_VERSION,
@@ -379,6 +385,7 @@ interface GenericMetricRow {
   late_drop_count: unknown
   overdue_count: unknown
   carry_over_count: unknown
+  overdue_carried_forward_count: unknown
 }
 
 /**
@@ -464,7 +471,8 @@ export const computeMetricsByContext = async (
       onTimeTasks: toNumber(row.on_time_count),
       lateDropTasks: toNumber(row.late_drop_count),
       overdueTasks: toNumber(row.overdue_count),
-      carryOverTasks: toNumber(row.carry_over_count)
+      carryOverTasks: toNumber(row.carry_over_count),
+      overdueCarriedForwardTasks: toNumber(row.overdue_carried_forward_count)
     },
     computedAt: new Date().toISOString(),
     engineVersion: ENGINE_VERSION,
@@ -497,6 +505,7 @@ interface ProjectMetricRow {
   late_drop_count: unknown
   overdue_count: unknown
   carry_over_count: unknown
+  overdue_carried_forward_count: unknown
 }
 
 export interface ProjectMetricSnapshot {
@@ -513,6 +522,7 @@ export interface ProjectMetricSnapshot {
     lateDropTasks: number
     overdueTasks: number
     carryOverTasks: number
+    overdueCarriedForwardTasks: number
   }
 }
 
@@ -555,7 +565,8 @@ export const readProjectMetrics = async (
       onTimeTasks: toNumber(row.on_time_count),
       lateDropTasks: toNumber(row.late_drop_count),
       overdueTasks: toNumber(row.overdue_count),
-      carryOverTasks: toNumber(row.carry_over_count)
+      carryOverTasks: toNumber(row.carry_over_count),
+      overdueCarriedForwardTasks: toNumber(row.overdue_carried_forward_count)
     }
   }))
 }
@@ -584,6 +595,7 @@ interface MemberMetricRow {
   late_drop_count: unknown
   overdue_count: unknown
   carry_over_count: unknown
+  overdue_carried_forward_count: unknown
   materialized_at: unknown
 }
 
@@ -594,7 +606,7 @@ const hasIncompleteMemberMaterialization = (row: MemberMetricRow): boolean => {
     return false
   }
 
-  return [row.on_time_count, row.late_drop_count, row.overdue_count, row.carry_over_count].some(
+  return [row.on_time_count, row.late_drop_count, row.overdue_count, row.carry_over_count, row.overdue_carried_forward_count].some(
     value => value === null || value === undefined
   )
 }
@@ -677,7 +689,8 @@ export const readMemberMetrics = async (
       onTimeTasks: toNumber(row.on_time_count),
       lateDropTasks: toNumber(row.late_drop_count),
       overdueTasks: toNumber(row.overdue_count),
-      carryOverTasks: toNumber(row.carry_over_count)
+      carryOverTasks: toNumber(row.carry_over_count),
+      overdueCarriedForwardTasks: toNumber(row.overdue_carried_forward_count)
     },
     computedAt: toTimestampString(row.materialized_at as string | { value?: string } | null),
     engineVersion: ENGINE_VERSION,
@@ -748,7 +761,8 @@ export const readMemberMetricsBatch = async (
         onTimeTasks: toNumber(row.on_time_count),
         lateDropTasks: toNumber(row.late_drop_count),
         overdueTasks: toNumber(row.overdue_count),
-        carryOverTasks: toNumber(row.carry_over_count)
+        carryOverTasks: toNumber(row.carry_over_count),
+        overdueCarriedForwardTasks: toNumber(row.overdue_carried_forward_count)
       },
       computedAt: toTimestampString(row.materialized_at as string | { value?: string } | null),
       engineVersion: ENGINE_VERSION,

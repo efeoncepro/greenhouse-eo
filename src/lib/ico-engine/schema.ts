@@ -176,6 +176,7 @@ const buildMonthlySnapshotTable = (projectId: string) => `
     late_drop_count INT64,
     overdue_count INT64,
     carry_over_count INT64,
+    overdue_carried_forward_count INT64,
     computed_at TIMESTAMP,
     engine_version STRING
   )
@@ -293,6 +294,7 @@ const buildMetricsByProjectTable = (projectId: string) => `
     late_drop_count INT64,
     overdue_count INT64,
     carry_over_count INT64,
+    overdue_carried_forward_count INT64,
     materialized_at TIMESTAMP
   )
   CLUSTER BY space_id, project_source_id
@@ -325,6 +327,7 @@ const buildMetricsByMemberTable = (projectId: string) => `
     late_drop_count INT64,
     overdue_count INT64,
     carry_over_count INT64,
+    overdue_carried_forward_count INT64,
     materialized_at TIMESTAMP
   )
   CLUSTER BY member_id
@@ -357,6 +360,7 @@ const buildMetricsBySprintTable = (projectId: string) => `
     late_drop_count INT64,
     overdue_count INT64,
     carry_over_count INT64,
+    overdue_carried_forward_count INT64,
     materialized_at TIMESTAMP
   )
   CLUSTER BY space_id, sprint_source_id
@@ -388,6 +392,7 @@ const buildMetricsByOrganizationTable = (projectId: string) => `
     late_drop_count INT64,
     overdue_count INT64,
     carry_over_count INT64,
+    overdue_carried_forward_count INT64,
     materialized_at TIMESTAMP
   )
   CLUSTER BY organization_id
@@ -420,6 +425,7 @@ const buildMetricsByBusinessUnitTable = (projectId: string) => `
     late_drop_count INT64,
     overdue_count INT64,
     carry_over_count INT64,
+    overdue_carried_forward_count INT64,
     materialized_at TIMESTAMP
   )
   CLUSTER BY business_unit
@@ -502,6 +508,7 @@ const buildPerformanceReportMonthlyTable = (projectId: string) => `
     on_time_pct FLOAT64,
     overdue_count INT64,
     carry_over_count INT64,
+    overdue_carried_forward_count INT64,
     total_tasks INT64,
     completed_tasks INT64,
     active_tasks INT64,
@@ -549,6 +556,7 @@ const REQUIRED_COLUMN_MIGRATIONS: Record<string, TableColumnSpec> = {
     late_drop_count: 'INT64',
     overdue_count: 'INT64',
     carry_over_count: 'INT64',
+    overdue_carried_forward_count: 'INT64',
     computed_at: 'TIMESTAMP',
     engine_version: 'STRING'
   },
@@ -564,7 +572,8 @@ const REQUIRED_COLUMN_MIGRATIONS: Record<string, TableColumnSpec> = {
     on_time_count: 'INT64',
     late_drop_count: 'INT64',
     overdue_count: 'INT64',
-    carry_over_count: 'INT64'
+    carry_over_count: 'INT64',
+    overdue_carried_forward_count: 'INT64'
   },
   metrics_by_member: {
     otd_pct: 'FLOAT64',
@@ -578,7 +587,8 @@ const REQUIRED_COLUMN_MIGRATIONS: Record<string, TableColumnSpec> = {
     on_time_count: 'INT64',
     late_drop_count: 'INT64',
     overdue_count: 'INT64',
-    carry_over_count: 'INT64'
+    carry_over_count: 'INT64',
+    overdue_carried_forward_count: 'INT64'
   },
   metrics_by_sprint: {
     otd_pct: 'FLOAT64',
@@ -592,7 +602,8 @@ const REQUIRED_COLUMN_MIGRATIONS: Record<string, TableColumnSpec> = {
     on_time_count: 'INT64',
     late_drop_count: 'INT64',
     overdue_count: 'INT64',
-    carry_over_count: 'INT64'
+    carry_over_count: 'INT64',
+    overdue_carried_forward_count: 'INT64'
   },
   metrics_by_organization: {
     otd_pct: 'FLOAT64',
@@ -606,7 +617,8 @@ const REQUIRED_COLUMN_MIGRATIONS: Record<string, TableColumnSpec> = {
     on_time_count: 'INT64',
     late_drop_count: 'INT64',
     overdue_count: 'INT64',
-    carry_over_count: 'INT64'
+    carry_over_count: 'INT64',
+    overdue_carried_forward_count: 'INT64'
   },
   metrics_by_business_unit: {
     otd_pct: 'FLOAT64',
@@ -620,7 +632,8 @@ const REQUIRED_COLUMN_MIGRATIONS: Record<string, TableColumnSpec> = {
     on_time_count: 'INT64',
     late_drop_count: 'INT64',
     overdue_count: 'INT64',
-    carry_over_count: 'INT64'
+    carry_over_count: 'INT64',
+    overdue_carried_forward_count: 'INT64'
   },
   performance_report_monthly: {
     on_time_count: 'INT64',
@@ -628,6 +641,7 @@ const REQUIRED_COLUMN_MIGRATIONS: Record<string, TableColumnSpec> = {
     on_time_pct: 'FLOAT64',
     overdue_count: 'INT64',
     carry_over_count: 'INT64',
+    overdue_carried_forward_count: 'INT64',
     total_tasks: 'INT64',
     completed_tasks: 'INT64',
     active_tasks: 'INT64',

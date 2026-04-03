@@ -1,5 +1,22 @@
 # Greenhouse Delivery Performance Report Parity V1
 
+## Delta 2026-04-03 — Carry-Over & Overdue Carried Forward semantic split
+
+`TASK-204` implementa el split semántico canónico entre carga futura y deuda vencida arrastrada:
+
+- `Carry-Over` ahora exige `created_at in period` + `due_date > period_end` (carga creada este mes para el siguiente)
+- `Overdue Carried Forward` es métrica nueva: `due_date < period_start` + abierta al cierre (deuda de períodos previos)
+- `OTD` ya no incluye carry-over ni OCF en el denominador: `OTD = On-Time / (On-Time + Late Drop + Overdue)`
+- `buildPeriodFilterSQL()` ahora incluye 3 universos: tareas con `due_date` en período, carry-over, y OCF
+- `overdue_carried_forward_count` materializado en todas las tablas de métricas (BQ + PG serving)
+
+Contrato canónico de buckets (5 mutuamente excluyentes):
+1. `On-Time` — due_date in M, completed_at <= due_date
+2. `Late Drop` — due_date in M, completed_at > due_date
+3. `Overdue` — due_date in M, abierta al cierre
+4. `Carry-Over` — created_at in M, due_date > period_end, abierta
+5. `Overdue Carried Forward` — due_date < period_start, abierta al cierre
+
 ## Delta 2026-04-03 — Attribution model formalized as standalone spec
 
 `TASK-206` extrae el modelo de atribución operativa a su propia spec canónica: `GREENHOUSE_OPERATIONAL_ATTRIBUTION_MODEL_V1.md`.

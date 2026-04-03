@@ -79,7 +79,7 @@ export const agencyPerformanceReportProjection: ProjectionDefinition = {
         `INSERT INTO greenhouse_serving.agency_performance_reports (
           report_scope, period_year, period_month,
           on_time_count, late_drop_count, on_time_pct,
-          overdue_count, carry_over_count,
+          overdue_count, carry_over_count, overdue_carried_forward_count,
           total_tasks, completed_tasks, active_tasks,
           efeonce_tasks_count, sky_tasks_count, task_mix_json,
           top_performer_member_id, top_performer_member_name,
@@ -90,13 +90,13 @@ export const agencyPerformanceReportProjection: ProjectionDefinition = {
         ) VALUES (
           $1, $2, $3,
           $4, $5, $6,
-          $7, $8,
-          $9, $10, $11,
-          $12, $13, $14::jsonb,
-          $15, $16,
-          $17, $18,
-          $19, $20,
-          $21, $22, $23,
+          $7, $8, $9,
+          $10, $11, $12,
+          $13, $14, $15::jsonb,
+          $16, $17,
+          $18, $19,
+          $20, $21,
+          $22, $23, $24,
           'ico_engine.performance_report_monthly', NOW()
         )
         ON CONFLICT (report_scope, period_year, period_month) DO UPDATE SET
@@ -105,6 +105,7 @@ export const agencyPerformanceReportProjection: ProjectionDefinition = {
           on_time_pct = EXCLUDED.on_time_pct,
           overdue_count = EXCLUDED.overdue_count,
           carry_over_count = EXCLUDED.carry_over_count,
+          overdue_carried_forward_count = EXCLUDED.overdue_carried_forward_count,
           total_tasks = EXCLUDED.total_tasks,
           completed_tasks = EXCLUDED.completed_tasks,
           active_tasks = EXCLUDED.active_tasks,
@@ -125,7 +126,7 @@ export const agencyPerformanceReportProjection: ProjectionDefinition = {
         [
           reportScope, periodYear, periodMonth,
           toNum(row.on_time_count), toNum(row.late_drop_count), toNum(row.on_time_pct),
-          toNum(row.overdue_count), toNum(row.carry_over_count),
+          toNum(row.overdue_count), toNum(row.carry_over_count), toNum(row.overdue_carried_forward_count),
           toNum(row.total_tasks), toNum(row.completed_tasks), toNum(row.active_tasks),
           toNum(row.efeonce_tasks_count), toNum(row.sky_tasks_count), taskMixJson,
           toText(row.top_performer_member_id), toText(row.top_performer_member_name),

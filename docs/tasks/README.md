@@ -62,6 +62,7 @@ Primer bloque operativo asignado:
 - [TASK-209-delivery-notion-sync-recurrence-prevention.md](complete/TASK-209-delivery-notion-sync-recurrence-prevention.md) — Cierre de recurrencia operativa del sync Delivery: control plane `waiting_for_raw`, retries auditados por `space`, recovery cron, surfaces admin y callback upstream para evitar reruns manuales después del refresh de Notion.
 - [TASK-208-delivery-data-quality-monitoring-auditor.md](complete/TASK-208-delivery-data-quality-monitoring-auditor.md) — Monitor recurrente cerrado para `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`: tablas históricas `integration_data_quality_*`, scoring `healthy / degraded / broken`, cron dedicado, hook post-sync, alerting Slack y visibilidad reutilizada en `/admin/integrations`, `/admin/ops-health` y `TenantNotionPanel`.
 - [TASK-206-delivery-operational-attribution-model.md](complete/TASK-206-delivery-operational-attribution-model.md) — Modelo canónico de atribución operativa formalizado como spec: 4 capas (source identity → identity profile → operational actor → attribution role), contrato de campos, política `primary_owner_first_assignee`, matriz de consumo por reader, reglas de borde y guía prescriptiva para nuevos consumers. Arch doc: `GREENHOUSE_OPERATIONAL_ATTRIBUTION_MODEL_V1.md`.
+- [TASK-204-delivery-carry-over-backlog-semantic-split.md](complete/TASK-204-delivery-carry-over-backlog-semantic-split.md) — Split semántico Carry-Over vs Overdue Carried Forward: carry-over ahora exige `created_at in period`, OCF como métrica nueva de deuda arrastrada, OTD excluye ambos del denominador, `overdue_carried_forward_count` materializado en BQ + PG, UI y Notion actualizados.
 
 ## To Do
 
@@ -135,9 +136,10 @@ Primer bloque operativo asignado:
   - el contrato mensual del reporte ya queda congelado sobre `due_date in period`, corte `period_end + 1 day` y buckets mutuamente excluyentes
   - `OTD` ya no significa `on_time / (on_time + late_drop)` para el scorecard mensual; pasa a `on_time / total_classified_tasks`
   - `Top Performer` ya queda definido por `OTD` canónico y volumen total de tareas del período
-- `TASK-204` queda abierta como follow-on semántico:
-  - `Carry-Over` pasa a definirse como tarea creada en el mes con `due_date` en el siguiente mes o después
-  - la deuda vencida que cruza de mes se separa como `Overdue Carried Forward`
+- `TASK-204` cerrada: split semántico Carry-Over vs Overdue Carried Forward implementado end-to-end
+  - `Carry-Over` = created_at in period + due_date > period_end (carga futura)
+  - `Overdue Carried Forward` = due_date < period_start + abierta (deuda arrastrada)
+  - `OTD = On-Time / (On-Time + Late Drop + Overdue)` — carry-over y OCF excluidos
 - `TASK-205` ya quedó cerrada como lane de paridad contra origen:
   - dejó helper reusable, route admin tenant-scoped, script CLI y evidencia real de drift para `Daniela` y `Andrés / Abril 2026`
   - esa evidencia ahora debe consumirse como baseline de regresión para el hardening estructural

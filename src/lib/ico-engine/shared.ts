@@ -259,23 +259,38 @@ export const CANONICAL_OPEN_TASK_SQL = `(
   AND (task_status IS NULL OR task_status NOT IN (${EXCLUDED_STATUSES_SQL}))
 )`
 export const DERIVED_ON_TIME_SQL = `(
-  completed_at IS NOT NULL
-  AND due_date IS NOT NULL
+  ${REPORT_PERIOD_SCOPE_SQL}
+  AND completed_at IS NOT NULL
   AND DATE(completed_at) <= due_date
 )`
 export const DERIVED_LATE_DROP_SQL = `(
-  completed_at IS NOT NULL
-  AND due_date IS NOT NULL
+  ${REPORT_PERIOD_SCOPE_SQL}
+  AND completed_at IS NOT NULL
   AND DATE(completed_at) > due_date
 )`
+
+// Carry-Over: tasks CREATED in the period with due_date AFTER the period end.
+// Represents forward-looking workload, not overdue debt.
 export const CARRY_OVER_SQL = `(
-  due_date IS NOT NULL
-  AND due_date >= ${REPORT_CUTOFF_DATE_SQL}
+  created_at IS NOT NULL
+  AND DATE(created_at) >= ${PERIOD_START_SQL}
+  AND DATE(created_at) <= ${PERIOD_END_SQL}
+  AND due_date IS NOT NULL
+  AND due_date > ${PERIOD_END_SQL}
   AND ${CANONICAL_OPEN_TASK_SQL}
 )`
+
+// Overdue: tasks with due_date IN the period that are still open at cutoff.
 export const DERIVED_OVERDUE_SQL = `(
+  ${REPORT_PERIOD_SCOPE_SQL}
+  AND ${CANONICAL_OPEN_TASK_SQL}
+)`
+
+// Overdue Carried Forward: past-due tasks from PRIOR periods still open at cutoff.
+// Represents backward-looking debt that crossed into this period unresolved.
+export const OVERDUE_CARRIED_FORWARD_SQL = `(
   due_date IS NOT NULL
-  AND due_date < ${REPORT_CUTOFF_DATE_SQL}
+  AND due_date < ${PERIOD_START_SQL}
   AND ${CANONICAL_OPEN_TASK_SQL}
 )`
 export const CANONICAL_ON_TIME_SQL = `(
@@ -294,11 +309,24 @@ export const CANONICAL_CARRY_OVER_SQL = `(
   performance_indicator_code = 'carry_over'
   OR (performance_indicator_code IS NULL AND ${CARRY_OVER_SQL})
 )`
+export const CANONICAL_OVERDUE_CARRIED_FORWARD_SQL = `(
+  performance_indicator_code = 'overdue_carried_forward'
+  OR (performance_indicator_code IS NULL AND ${OVERDUE_CARRIED_FORWARD_SQL})
+)`
 export const CANONICAL_CLASSIFIED_TASK_SQL = `(
   ${CANONICAL_ON_TIME_SQL}
   OR ${CANONICAL_LATE_DROP_SQL}
   OR ${CANONICAL_OVERDUE_SQL}
   OR ${CANONICAL_CARRY_OVER_SQL}
+  OR ${CANONICAL_OVERDUE_CARRIED_FORWARD_SQL}
+)`
+
+// OTD denominator: only tasks due THIS period (on-time + late-drop + overdue).
+// Carry-Over and Overdue Carried Forward do NOT penalize OTD.
+export const OTD_DENOMINATOR_SQL = `(
+  ${CANONICAL_ON_TIME_SQL}
+  OR ${CANONICAL_LATE_DROP_SQL}
+  OR ${CANONICAL_OVERDUE_SQL}
 )`
 export const CANONICAL_FTR_ELIGIBLE_SQL = '(completed_at IS NOT NULL)'
 export const CANONICAL_FTR_PASSED_SQL = `(
@@ -325,10 +353,10 @@ export const buildMetricSelectSQL = () => `
       THEN SAFE_CAST(rpa_value AS FLOAT64) END, 100
     )[SAFE_OFFSET(50)], 2) AS rpa_median,
 
-    -- OTD: on-time / total classified tasks in the report period
+    -- OTD: on-time / (on-time + late-drop + overdue). Carry-Over and OCF excluded.
     ROUND(SAFE_DIVIDE(
       COUNTIF(${CANONICAL_ON_TIME_SQL}),
-      COUNTIF(${CANONICAL_CLASSIFIED_TASK_SQL})
+      COUNTIF(${OTD_DENOMINATOR_SQL})
     ) * 100, 1) AS otd_pct,
 
     -- FTR: completed tasks with zero final client change rounds.
@@ -368,20 +396,30 @@ export const buildMetricSelectSQL = () => `
     -- Context
     COUNTIF(${CANONICAL_CLASSIFIED_TASK_SQL}) AS total_tasks,
     COUNTIF(${CANONICAL_ON_TIME_SQL} OR ${CANONICAL_LATE_DROP_SQL}) AS completed_tasks,
-    COUNTIF(${CANONICAL_OVERDUE_SQL} OR ${CANONICAL_CARRY_OVER_SQL}) AS active_tasks,
+    COUNTIF(${CANONICAL_OVERDUE_SQL} OR ${CANONICAL_CARRY_OVER_SQL} OR ${CANONICAL_OVERDUE_CARRIED_FORWARD_SQL}) AS active_tasks,
     COUNTIF(${CANONICAL_ON_TIME_SQL}) AS on_time_count,
     COUNTIF(${CANONICAL_LATE_DROP_SQL}) AS late_drop_count,
     COUNTIF(${CANONICAL_OVERDUE_SQL}) AS overdue_count,
 
-    -- Carry-over count (open tasks whose due date lands after the report cutoff)
-    COUNTIF(${CANONICAL_CARRY_OVER_SQL}) AS carry_over_count`
+    -- Carry-over: tasks created in the period with due date after period end
+    COUNTIF(${CANONICAL_CARRY_OVER_SQL}) AS carry_over_count,
+
+    -- Overdue Carried Forward: past-due tasks from prior periods still open
+    COUNTIF(${CANONICAL_OVERDUE_CARRIED_FORWARD_SQL}) AS overdue_carried_forward_count`
 
 /**
  * Canonical report-period WHERE filter.
  * Uses @periodYear and @periodMonth query parameters.
+ * Includes three universes:
+ * 1. Tasks with due_date in period (On-Time, Late Drop, Overdue)
+ * 2. Tasks created in period with future due_date (Carry-Over)
+ * 3. Past-due tasks from prior periods still open (Overdue Carried Forward)
  */
-export const buildPeriodFilterSQL = () => `
-    ${REPORT_PERIOD_SCOPE_SQL}`
+export const buildPeriodFilterSQL = () => `(
+    ${REPORT_PERIOD_SCOPE_SQL}
+    OR (${CARRY_OVER_SQL})
+    OR (${OVERDUE_CARRIED_FORWARD_SQL})
+  )`
 
 // ─── Query Runner ───────────────────────────────────────────────────────────
 

@@ -2,6 +2,16 @@
 
 ## 2026-04-03
 
+- **TASK-204 Carry-Over & Overdue Carried Forward Semantic Split**:
+  - se implementó el split semántico canónico entre `Carry-Over` (carga creada en el período con entrega futura) y `Overdue Carried Forward` (deuda vencida de períodos previos aún abierta)
+  - `OTD` ya no incluye carry-over ni OCF en el denominador: `OTD = On-Time / (On-Time + Late Drop + Overdue)`
+  - `buildPeriodFilterSQL()` ahora incluye 3 universos de tareas: due_date en período + carry-over + OCF
+  - `overdue_carried_forward_count` materializado en todas las tablas BQ (7 tablas) y PG serving (2 tablas)
+  - migración PG: `greenhouse_serving.agency_performance_reports` + `greenhouse_serving.ico_member_metrics`
+  - UI: card "Overdue Carried Forward" en Agency ICO y línea en IcoTab
+  - publicación Notion: bullet + property para OCF
+  - docs actualizados: ICO Engine, Performance Report Parity, Data Model Master, Operating Model
+
 - **TASK-206 Delivery Operational Attribution Model**:
   - se formalizó el modelo canónico de atribución operativa como spec standalone: `docs/architecture/GREENHOUSE_OPERATIONAL_ATTRIBUTION_MODEL_V1.md`
   - el modelo separa explícitamente 4 capas: source identity → identity profile → operational actor → attribution role

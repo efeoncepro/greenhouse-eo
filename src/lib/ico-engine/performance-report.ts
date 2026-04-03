@@ -48,6 +48,7 @@ export interface AgencyPerformanceReport {
     lateDrops: number
     overdue: number
     carryOver: number
+    overdueCarriedForward: number
     totalTasks: number
     completedTasks: number
     activeTasks: number
@@ -83,6 +84,7 @@ interface MaterializedPerformanceReportRow {
   on_time_pct: unknown
   overdue_count: unknown
   carry_over_count: unknown
+  overdue_carried_forward_count: unknown
   total_tasks: unknown
   completed_tasks: unknown
   active_tasks: unknown
@@ -109,6 +111,7 @@ type ServingPerformanceReportRow = Record<string, unknown> & {
   on_time_pct: unknown
   overdue_count: unknown
   carry_over_count: unknown
+  overdue_carried_forward_count: unknown
   total_tasks: unknown
   completed_tasks: unknown
   active_tasks: unknown
@@ -140,11 +143,13 @@ const getPreviousPeriod = (year: number, month: number) => {
 
 const computeOnTimePctFromSpaces = (spaces: SpaceMetricSnapshot[]): number | null => {
   const onTime = spaces.reduce((sum, space) => sum + space.context.onTimeTasks, 0)
-  const totalTasks = spaces.reduce((sum, space) => sum + space.context.totalTasks, 0)
+  const lateDrops = spaces.reduce((sum, space) => sum + space.context.lateDropTasks, 0)
+  const overdue = spaces.reduce((sum, space) => sum + space.context.overdueTasks, 0)
+  const otdDenominator = onTime + lateDrops + overdue
 
-  if (totalTasks <= 0) return null
+  if (otdDenominator <= 0) return null
 
-  return Math.round((onTime / totalTasks) * 1000) / 10
+  return Math.round((onTime / otdDenominator) * 1000) / 10
 }
 
 const computeTrend = (current: number | null, previous: number | null): PerformanceReportTrend => {
@@ -162,6 +167,7 @@ const summarizeSpaces = (spaces: SpaceMetricSnapshot[]) => ({
   lateDrops: spaces.reduce((sum, space) => sum + space.context.lateDropTasks, 0),
   overdue: spaces.reduce((sum, space) => sum + space.context.overdueTasks, 0),
   carryOver: spaces.reduce((sum, space) => sum + space.context.carryOverTasks, 0),
+  overdueCarriedForward: spaces.reduce((sum, space) => sum + space.context.overdueCarriedForwardTasks, 0),
   totalTasks: spaces.reduce((sum, space) => sum + space.context.totalTasks, 0),
   completedTasks: spaces.reduce((sum, space) => sum + space.context.completedTasks, 0),
   activeTasks: spaces.reduce((sum, space) => sum + space.context.activeTasks, 0),
@@ -274,6 +280,10 @@ const buildAlertText = (
     alerts.push(`${summary.carryOver} carry-over`)
   }
 
+  if (summary.overdueCarriedForward > 0) {
+    alerts.push(`${summary.overdueCarriedForward} overdue carried forward`)
+  }
+
   if (topPerformer?.memberName && topPerformer.otdPct !== null) {
     alerts.push(`Top performer ${topPerformer.memberName} ${topPerformer.otdPct.toFixed(1)}% OT`)
   }
@@ -302,8 +312,8 @@ const buildExecutiveSummary = (
 
   parts.push(`${summary.totalTasks} tareas totales, ${summary.completedTasks} completadas y ${summary.activeTasks} activas`)
 
-  if (summary.overdue > 0 || summary.lateDrops > 0 || summary.carryOver > 0) {
-    parts.push(`${summary.overdue} overdue, ${summary.lateDrops} late drops y ${summary.carryOver} carry-over`)
+  if (summary.overdue > 0 || summary.lateDrops > 0 || summary.carryOver > 0 || summary.overdueCarriedForward > 0) {
+    parts.push(`${summary.overdue} overdue, ${summary.lateDrops} late drops, ${summary.carryOver} carry-over y ${summary.overdueCarriedForward} overdue carried forward`)
   }
 
   const dominantSegment = taskMix[0]
@@ -421,6 +431,7 @@ const buildReportFromMaterializedRows = (
     lateDrops: toNumber(current.late_drop_count),
     overdue: toNumber(current.overdue_count),
     carryOver: toNumber(current.carry_over_count),
+    overdueCarriedForward: toNumber(current.overdue_carried_forward_count),
     totalTasks: toNumber(current.total_tasks),
     completedTasks: toNumber(current.completed_tasks),
     activeTasks: toNumber(current.active_tasks),
@@ -460,7 +471,7 @@ const readServingAgencyPerformanceReport = async (
       `SELECT
         report_scope, period_year, period_month,
         on_time_count, late_drop_count, on_time_pct,
-        overdue_count, carry_over_count,
+        overdue_count, carry_over_count, overdue_carried_forward_count,
         total_tasks, completed_tasks, active_tasks,
         efeonce_tasks_count, sky_tasks_count,
         task_mix_json::text AS task_mix_json,
@@ -589,6 +600,7 @@ export const readAgencyPerformanceReport = async (
     lateDrops: currentSummary.lateDrops,
     overdue: currentSummary.overdue,
     carryOver: currentSummary.carryOver,
+    overdueCarriedForward: currentSummary.overdueCarriedForward,
     totalTasks: currentSummary.totalTasks,
     completedTasks: currentSummary.completedTasks,
     activeTasks: currentSummary.activeTasks,

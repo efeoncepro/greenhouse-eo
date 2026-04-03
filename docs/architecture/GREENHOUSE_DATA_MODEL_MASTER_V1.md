@@ -1,5 +1,15 @@
 # Greenhouse Data Model Master V1
 
+## Delta 2026-04-03 — Carry-Over & Overdue Carried Forward semantic split in ICO
+
+`TASK-204` introduce `overdue_carried_forward_count` como columna materializada en todas las tablas de métricas ICO (BQ) y serving (PG).
+
+Tablas impactadas:
+- BQ: `metric_snapshots_monthly`, `metrics_by_member`, `metrics_by_project`, `metrics_by_sprint`, `metrics_by_organization`, `metrics_by_business_unit`, `performance_report_monthly`
+- PG: `greenhouse_serving.agency_performance_reports`, `greenhouse_serving.ico_member_metrics`
+
+Carry-Over ahora exige `created_at` dentro del período. OTD ya no incluye carry-over ni OCF en el denominador.
+
 ## Delta 2026-04-03 — Operational attribution model formalized as canonical spec
 
 `TASK-206` formaliza la capa de atribución operativa como spec canónica en `GREENHOUSE_OPERATIONAL_ATTRIBUTION_MODEL_V1.md`.

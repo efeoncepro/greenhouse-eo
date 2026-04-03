@@ -1,5 +1,21 @@
 # Greenhouse Performance Report Operating Model V1
 
+## Delta 2026-04-03 — Carry-Over & Overdue Carried Forward split
+
+`TASK-204` separa los conceptos:
+
+- `Carry-Over` = tareas creadas en el período con entrega futura (no penaliza OTD)
+- `Overdue Carried Forward` = deuda vencida de períodos previos que sigue abierta (no penaliza OTD)
+
+Contrato canónico de buckets (5 mutuamente excluyentes):
+1. `On-Time` — due_date in M, completed_at <= due_date
+2. `Late Drop` — due_date in M, completed_at > due_date
+3. `Overdue` — due_date in M, abierta al cierre
+4. `Carry-Over` — created_at in M, due_date > period_end, abierta
+5. `Overdue Carried Forward` — due_date < period_start, abierta al cierre
+
+OTD canónico: `On-Time / (On-Time + Late Drop + Overdue)`
+
 ## Delta 2026-04-02 — Freeze mensual por tarea queda operativo
 
 `TASK-201` cierra el criterio operativo para períodos históricos de Delivery:
