@@ -3,6 +3,8 @@ import { ExternalAccountClient, GoogleAuth, type AuthClient, type GoogleAuthOpti
 
 export type GoogleCredentialSource = 'wif' | 'service_account_key' | 'ambient_adc'
 
+type GoogleCredentialPreference = GoogleCredentialSource | 'auto'
+
 const stripWrappingQuotes = (value: string) => {
   const trimmed = value.trim()
   const hasDoubleQuotes = trimmed.startsWith('"') && trimmed.endsWith('"')
@@ -129,6 +131,21 @@ const normalizeParsedCredentials = (value: unknown) => {
 }
 
 const hasValue = (value: string | undefined) => Boolean(value?.trim())
+
+const getGoogleCredentialPreference = (env: NodeJS.ProcessEnv = process.env): GoogleCredentialPreference => {
+  const value = env.GCP_AUTH_PREFERENCE?.trim().toLowerCase()
+
+  switch (value) {
+    case 'wif':
+      return 'wif'
+    case 'service_account_key':
+      return 'service_account_key'
+    case 'ambient_adc':
+      return 'ambient_adc'
+    default:
+      return 'auto'
+  }
+}
 
 const isVercelRuntime = (env: NodeJS.ProcessEnv = process.env) => hasValue(env.VERCEL) || hasValue(env.VERCEL_ENV)
 
@@ -269,6 +286,16 @@ const getWorkloadIdentityAuthClient = ({
 }
 
 export const shouldUseWorkloadIdentity = (env: NodeJS.ProcessEnv = process.env) => {
+  const preference = getGoogleCredentialPreference(env)
+
+  if (preference === 'service_account_key' || preference === 'ambient_adc') {
+    return false
+  }
+
+  if (preference === 'wif') {
+    return isWorkloadIdentityConfigured(env)
+  }
+
   if (!isWorkloadIdentityConfigured(env)) {
     return false
   }
@@ -281,11 +308,22 @@ export const shouldUseWorkloadIdentity = (env: NodeJS.ProcessEnv = process.env) 
 }
 
 export const getGoogleCredentialSource = (env: NodeJS.ProcessEnv = process.env): GoogleCredentialSource => {
+  const preference = getGoogleCredentialPreference(env)
+  const serviceAccountCredentials = getServiceAccountKeyCredentials(env)
+
+  if (preference === 'service_account_key' && serviceAccountCredentials) {
+    return 'service_account_key'
+  }
+
+  if (preference === 'ambient_adc') {
+    return 'ambient_adc'
+  }
+
   if (shouldUseWorkloadIdentity(env)) {
     return 'wif'
   }
 
-  if (getServiceAccountKeyCredentials(env)) {
+  if (serviceAccountCredentials) {
     return 'service_account_key'
   }
 

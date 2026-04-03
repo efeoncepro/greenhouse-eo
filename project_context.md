@@ -1,5 +1,23 @@
 # project_context.md
 
+## Delta 2026-04-03 Production GCP auth fallback for Cloud SQL / BigQuery runtime
+
+- Greenhouse runtime ya soporta una preferencia explícita de credenciales GCP vía `GCP_AUTH_PREFERENCE`.
+- Valores soportados:
+  - `auto` (default)
+  - `wif`
+  - `service_account_key`
+  - `ambient_adc`
+- Regla operativa nueva:
+  - el baseline preferido sigue siendo `WIF`
+  - pero un entorno puede forzar `service_account_key` cuando el runtime serverless no mantenga estable el carril OIDC/WIF
+- Uso inmediato:
+  - `production` puede fijar `GCP_AUTH_PREFERENCE=service_account_key` junto con `GOOGLE_APPLICATION_CREDENTIALS_JSON` para un fallback controlado de Cloud SQL Connector, BigQuery y Secret Manager
+  - esto no cambia el default de `staging`, `preview` ni `development` mientras no se configure el override
+- Motivación:
+  - cerrar un incidente de `ERR_SSL_SSL/TLS_ALERT_BAD_CERTIFICATE` en Vercel production donde el runtime Postgres fallaba aunque el connector y la configuración WIF estuvieran presentes
+  - mantener un switch explícito, reversible y documentado sin desmontar la postura WIF del resto de entornos
+
 ## Delta 2026-04-02 TASK-187 Notion governance formalization
 
 - Notion ya tiene una lane formal de governance por `space` encima del binding existente `greenhouse_core.space_notion_sources`.

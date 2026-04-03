@@ -2,6 +2,11 @@
 
 ## 2026-04-03
 
+- **Production GCP auth fallback switch**:
+  - se agregó `GCP_AUTH_PREFERENCE` como override explícito para seleccionar la fuente de credenciales GCP en runtime (`auto`, `wif`, `service_account_key`, `ambient_adc`)
+  - el default sigue prefiriendo `WIF`; el override solo se activa cuando el entorno lo fija
+  - esto habilita un fallback controlado para Cloud SQL Connector, BigQuery y Secret Manager en Vercel production sin desmontar la postura WIF del resto de entornos
+
 - **TASK-209 Notion sync orchestration closure**:
   - se agregó la tabla `greenhouse_sync.notion_sync_orchestration_runs` como control plane tenant-scoped para el cierre `raw -> conformed` por `space`
   - `GET /api/cron/sync-conformed` ahora registra explícitamente `waiting_for_raw` y deja de depender de reruns manuales para recuperar paridad después del refresh raw
