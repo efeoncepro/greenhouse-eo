@@ -1,5 +1,29 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — Fix rápido de navegación Cloud & Integrations
+
+### Rama / alcance
+
+- rama actual: `fix/codex-cloud-integrations-route`
+- scope:
+  - `src/app/(dashboard)/admin/cloud-integrations/page.tsx`
+  - `src/components/layout/vertical/VerticalMenu.tsx`
+  - `src/views/greenhouse/admin/AdminCenterView.tsx`
+  - `src/views/greenhouse/admin/AdminOpsHealthView.tsx`
+  - `src/views/greenhouse/admin/AdminIntegrationGovernanceView.tsx`
+  - `src/lib/admin/view-access-catalog.ts`
+
+### Resultado
+
+- `Cloud & Integrations` ya usa `/admin/integrations` como route canónica
+- `/admin/cloud-integrations` queda como alias server-side con redirect para compatibilidad
+- se alinearon menú, CTA del Admin Center, CTA de Ops Health y metadata de acceso para evitar drift de navegación
+
+### Verificación
+
+- `pnpm exec eslint 'src/app/(dashboard)/admin/cloud-integrations/page.tsx' src/components/layout/vertical/VerticalMenu.tsx src/views/greenhouse/admin/AdminCenterView.tsx src/views/greenhouse/admin/AdminOpsHealthView.tsx src/views/greenhouse/admin/AdminIntegrationGovernanceView.tsx src/lib/admin/view-access-catalog.ts`
+- `pnpm build`
+
 ## Sesión 2026-04-03 — TASK-208 cerrada con monitor recurrente de data quality para Notion Delivery
 
 ### Rama / alcance

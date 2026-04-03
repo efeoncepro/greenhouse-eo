@@ -199,9 +199,9 @@ const buildDomainCards = ({ access, tenants, operations }: Pick<Props, 'access' 
       label: cloudStatusLabel(operations),
       color: cloudStatusColor(operations)
     },
-    href: '/admin/cloud-integrations',
+    href: '/admin/integrations',
     primaryAction: 'Abrir cloud & integrations',
-    routes: ['/admin/cloud-integrations'],
+    routes: ['/admin/integrations', '/admin/cloud-integrations'],
     points: [
       `${operations.kpis.activeSyncs} fuentes activas de sincronizacion`,
       operations.cloud.cron.secretConfigured ? 'Cron control plane autenticado' : 'CRON_SECRET pendiente',
@@ -440,7 +440,7 @@ const AdminCenterView = ({ access, tenants, controlTower, operations }: Props) =
             </Typography>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <Button component={Link} href='/admin/tenants' variant='contained'>Abrir Spaces</Button>
-              <Button component={Link} href='/admin/cloud-integrations' variant='outlined'>Ver Cloud & Integrations</Button>
+              <Button component={Link} href='/admin/integrations' variant='outlined'>Ver Cloud & Integrations</Button>
             </Stack>
           </Stack>
         </CardContent>

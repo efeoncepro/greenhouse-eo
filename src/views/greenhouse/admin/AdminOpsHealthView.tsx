@@ -223,7 +223,7 @@ const AdminOpsHealthView = ({ data }: Props) => {
               <Button component={Link} href='/agency/operations' variant='contained'>
                 Abrir operaciones extendidas
               </Button>
-              <Button component={Link} href='/admin/cloud-integrations' variant='outlined'>
+              <Button component={Link} href='/admin/integrations' variant='outlined'>
                 Ver Cloud & Integrations
               </Button>
             </Stack>

@@ -174,7 +174,7 @@ const AdminIntegrationGovernanceView = ({ integrations, notionDataQualityOvervie
               La fuente canonica es <code>greenhouse_sync.integration_registry</code>.
             </Typography>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <Button component={Link} href='/admin/cloud-integrations' variant='contained'>
+              <Button component={Link} href='/admin/integrations' variant='contained'>
                 Cloud & Integrations
               </Button>
               <Button component={Link} href='/admin' variant='outlined'>

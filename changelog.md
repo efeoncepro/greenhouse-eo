@@ -2,6 +2,11 @@
 
 ## 2026-04-03
 
+- **Admin Cloud & Integrations route fix**:
+  - la navegación principal de `Cloud & Integrations` ahora apunta a la surface canónica `/admin/integrations`
+  - `/admin/cloud-integrations` queda como alias compatible con redirect server-side para evitar clicks muertos o drift entre menú, cards y governance surface
+  - `Admin Center`, `Ops Health`, el menú vertical y el catálogo de vistas quedaron alineados al mismo destino
+
 - **TASK-208 delivery notion data quality monitor**:
   - se agregaron las tablas `greenhouse_sync.integration_data_quality_runs` y `greenhouse_sync.integration_data_quality_checks` para persistir scoring y findings históricos del pipeline `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`
   - se agregó el helper `src/lib/integrations/notion-delivery-data-quality.ts` para ejecutar el auditor por `space`, clasificar `healthy / degraded / broken`, persistir evidencia y alertar por Slack en estados degradados o rotos

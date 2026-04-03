@@ -356,7 +356,7 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     section: 'administracion',
     label: 'Cloud & Integrations',
     description: 'Estado operativo de cloud, observability e integraciones críticas.',
-    routePath: '/admin/cloud-integrations',
+    routePath: '/admin/integrations',
     routeGroup: 'admin'
   },
   {
