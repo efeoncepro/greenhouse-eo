@@ -1950,6 +1950,135 @@ El ICO Engine debe usar `space_id` directo, no el array `notion_project_ids`.
   - `overdue` y `carry-over` no se leen desde labels de Notion; permanecen como reglas propias de `ICO` relativas al período consultado/materializado
   - `FTR` se define por `client_change_round_final = 0` en tareas completadas; `client_review_open` es estado de workflow y no fuente de verdad para esta métrica
 
+### A.5.4 Inventario canónico de métricas y señales del ICO Engine (Delta 2026-04-03)
+
+Para evitar drift entre arquitectura, registry y SQL runtime, este inventario consolida qué señales:
+
+1. ya vienen calculadas o normalizadas desde la capa base
+2. calcula el engine a nivel tarea
+3. agrega/materializa el engine como métricas canónicas
+4. expone como contexto operativo o scorecard auditable
+
+#### A.5.4.1 Señales base que ICO ya recibe calculadas o normalizadas
+
+Estas señales viven en `greenhouse_conformed.delivery_tasks` y llegan al engine sin que `ICO` tenga que inventarlas:
+
+| Señal | Tipo | Uso principal |
+|---|---|---|
+| `rpa_value` | score por tarea | base de `rpa_avg`, `rpa_median`, FTR compuesto |
+| `client_change_round_final` | count | calidad / FTR |
+| `workflow_change_round` | count | calidad / FTR |
+| `open_frame_comments` | count | guardrail de revisión abierta |
+| `client_review_open` | bool | guardrail de revisión cliente |
+| `workflow_review_open` | bool | guardrail de revisión workflow |
+| `blocker_count` | count | contexto operativo / blocked workload |
+| `completion_label` | label | lectura humana del estado de entrega |
+| `delivery_compliance` | label | semántica operacional upstream |
+| `days_late` | duration | soporte de compliance / análisis de atraso |
+| `is_rescheduled` | bool | contexto de promesa movida |
+| `performance_indicator_code` | enum | preferencia upstream para `on_time`, `late_drop`, `carry_over`, `overdue_carried_forward` |
+| `performance_indicator_label` | label | lectura humana del bucket |
+| `task_status` | enum | estado canónico de tarea |
+| `due_date` | date | ancla primaria del período |
+| `original_due_date` | date | auditoría de reschedules |
+| `completed_at` | timestamp | cierre real de tarea |
+| `created_at` | timestamp | inicio / carry-over / cycle time |
+| `last_edited_time` | timestamp | frescura / stuck detection |
+| `synced_at` | timestamp | fallback temporal y auditoría |
+
+#### A.5.4.2 Señales derivadas por el engine a nivel tarea
+
+Estas señales se derivan en `ico_engine.v_tasks_enriched` antes de cualquier agregado:
+
+| Señal derivada | Cómo se calcula | Para qué se usa |
+|---|---|---|
+| `period_anchor_date` | `COALESCE(due_date, DATE(created_at), DATE(synced_at))` | pertenencia temporal / fallback |
+| `fase_csc` | mapping `task_status -> CSC` configurable por `space` con fallback default | distribución CSC y contexto de pipeline |
+| `cycle_time_days` | días entre creación y completion/now | `cycle_time_*`, variabilidad |
+| `hours_since_update` | horas desde `last_edited_time` | stuck detection / health |
+| `is_stuck` | 72h+ sin movimiento en estado activo | `stuck_asset_count`, `stuck_asset_pct` |
+| `delivery_signal` | `on_time`, `late`, `unknown` según `completed_at` vs `due_date` | contexto operacional auxiliar |
+| `has_co_assignees` | cardinalidad de `assignee_member_ids` | contexto de ownership / colaboración |
+
+#### A.5.4.3 Métricas agregadas canónicas calculadas por `buildMetricSelectSQL()`
+
+Estas son las métricas que el engine calcula/materializa como contrato troncal reusable:
+
+| Métrica | Fórmula resumida | Columnas expuestas |
+|---|---|---|
+| `RpA` | promedio de `rpa_value > 0` en tareas completadas terminales del período | `rpa_avg`, `rpa_median` |
+| `OTD` | `on_time / (on_time + late_drop + overdue)` | `otd_pct` |
+| `FTR` | completadas terminales con `client_change_round_final = 0` | `ftr_pct` |
+| `Cycle Time` | promedio / P50 / stddev de `cycle_time_days` en tareas completadas terminales | `cycle_time_avg_days`, `cycle_time_p50_days`, `cycle_time_variance` |
+| `Throughput` | conteo de tareas `on_time + late_drop` | `throughput_count` |
+| `Pipeline Velocity` | `throughput / active_tasks` | `pipeline_velocity` |
+| `Stuck Assets` | conteo y porcentaje de `is_stuck = TRUE` | `stuck_asset_count`, `stuck_asset_pct` |
+
+Regla vigente de completitud:
+
+- una tarea solo cuenta como completada para `RpA`, `FTR`, `cycle time`, `throughput`, `on_time` y `late_drop` si:
+  - `completed_at IS NOT NULL`
+  - `task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')`
+
+#### A.5.4.4 Buckets y contexto operativo aditivo
+
+Además de los KPIs troncales, el engine materializa buckets auditables para scorecards y readers:
+
+| Bucket / contexto | Significado |
+|---|---|
+| `total_tasks` | total de tareas clasificadas en el período consultado |
+| `completed_tasks` | total de tareas completadas del scorecard (`on_time + late_drop`) |
+| `active_tasks` | total de tareas activas del período (`overdue + carry_over + overdue_carried_forward`) |
+| `on_time_count` | tareas entregadas a tiempo |
+| `late_drop_count` | tareas completadas tarde |
+| `overdue_count` | tareas vencidas del período aún abiertas |
+| `carry_over_count` | tareas creadas en el período con vencimiento futuro |
+| `overdue_carried_forward_count` | deuda vencida de períodos previos aún abierta |
+
+#### A.5.4.5 Métricas registradas en el catálogo del engine
+
+El `metric-registry.ts` expone hoy estas métricas como catálogo activo del producto:
+
+| ID / code | Label |
+|---|---|
+| `rpa` | Rendimiento por Activo |
+| `otd_pct` | Entrega a tiempo |
+| `ftr_pct` | Primera entrega correcta |
+| `cycle_time` | Tiempo de ciclo |
+| `cycle_time_variance` | Varianza del ciclo |
+| `throughput` | Throughput |
+| `pipeline_velocity` | Velocidad del pipeline |
+| `csc_distribution` | Distribución CSC |
+| `stuck_assets` | Activos estancados |
+| `stuck_asset_pct` | Porcentaje estancado |
+| `overdue_carried_forward` | Overdue Carried Forward |
+
+#### A.5.4.6 Métricas y rollups adicionales de reportes materializados
+
+Estas no reemplazan el contrato troncal del engine, pero sí forman parte del serving/reporting construido sobre él:
+
+| Rollup | Dónde vive | Uso |
+|---|---|---|
+| `on_time_pct` | `ico_engine.performance_report_monthly` | scorecard/report mensual agency-level |
+| `efeonce_tasks_count` | `ico_engine.performance_report_monthly` | mix por portfolio |
+| `sky_tasks_count` | `ico_engine.performance_report_monthly` | mix por portfolio |
+| `task_mix_json` | `ico_engine.performance_report_monthly` | breakdown operativo |
+| `top_performer_otd_pct` | `ico_engine.performance_report_monthly` | top performer mensual |
+| `top_performer_throughput_count` | `ico_engine.performance_report_monthly` | top performer mensual |
+| `top_performer_rpa_avg` | `ico_engine.performance_report_monthly` | top performer mensual |
+| `top_performer_ftr_pct` | `ico_engine.performance_report_monthly` | top performer mensual |
+
+#### A.5.4.7 Fuente de verdad operativa
+
+Cuando exista tensión entre documentos:
+
+1. la semántica contractual vive en este documento
+2. el catálogo expuesto vive en `src/lib/ico-engine/metric-registry.ts`
+3. la fórmula efectiva runtime vive en `src/lib/ico-engine/shared.ts`
+4. los campos base y derivados por tarea viven en `src/lib/ico-engine/schema.ts`
+
+La arquitectura y el código deben mantenerse alineados; si una fórmula cambia en `shared.ts`, este inventario debe actualizarse en el mismo lote.
+
 ### A.6 TypeScript: Sin `any`
 
 **Spec original:** Usaba `formulaConfig: Record<string, any>`.

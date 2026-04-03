@@ -1,5 +1,38 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — ICO Engine metrics inventory consolidated in architecture
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+  - `project_context.md`
+  - `Handoff.md`
+  - `changelog.md`
+
+### Resultado
+
+- `Greenhouse_ICO_Engine_v1.md` ahora tiene un inventario consolidado y explícito de:
+  - señales base que ya llegan calculadas/normalizadas
+  - derivados por tarea en `v_tasks_enriched`
+  - métricas agregadas canónicas del engine
+  - buckets/contexto operativo
+  - rollups adicionales de `performance_report_monthly`
+- esto reduce el drift entre:
+  - arquitectura
+  - `metric-registry.ts`
+  - `shared.ts`
+  - `schema.ts`
+
+### Verificación
+
+- revisión manual de consistencia documental contra:
+  - `src/lib/ico-engine/metric-registry.ts`
+  - `src/lib/ico-engine/shared.ts`
+  - `src/lib/ico-engine/schema.ts`
+  - `src/lib/ico-engine/read-metrics.ts`
+
 ## Sesión 2026-04-03 — ICO completed semantics hardened against non-terminal statuses
 
 ### Rama / alcance

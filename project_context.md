@@ -1,5 +1,19 @@
 # project_context.md
 
+## Delta 2026-04-03 ICO Engine metrics inventory consolidated in architecture
+
+- La arquitectura de `ICO Engine` ya documenta en un solo bloque el inventario canónico de señales y métricas.
+- La fuente consolidada ahora vive en:
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md` § `A.5.4 Inventario canónico de métricas y señales del ICO Engine`
+- Ese inventario separa explícitamente:
+  - señales base que ya vienen calculadas o normalizadas
+  - señales derivadas a nivel tarea por `v_tasks_enriched`
+  - métricas agregadas canónicas calculadas por `buildMetricSelectSQL()`
+  - buckets/contexto operativo aditivo
+  - rollups adicionales del `performance_report_monthly`
+- Regla operativa:
+  - si cambia una fórmula en `src/lib/ico-engine/shared.ts` o el catálogo en `src/lib/ico-engine/metric-registry.ts`, este bloque de arquitectura debe actualizarse en el mismo lote
+
 ## Delta 2026-04-03 ICO completion semantics now require terminal task status
 
 - `ICO Engine` ya no trata `completed_at` como suficiente para considerar una tarea completada.

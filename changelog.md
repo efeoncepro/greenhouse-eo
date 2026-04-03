@@ -2,6 +2,11 @@
 
 ## 2026-04-03
 
+- **ICO Engine metrics architecture inventory consolidated**:
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md` ahora consolida en una sola sección el inventario canónico de señales y métricas del engine
+  - separa explícitamente qué señales ya llegan calculadas, qué derivados construye `v_tasks_enriched`, qué KPIs calcula `buildMetricSelectSQL()`, qué buckets/contexto expone y qué rollups adicionales viven en `performance_report_monthly`
+  - esto deja una referencia única para alinear arquitectura, `metric-registry.ts`, `shared.ts` y `schema.ts`
+
 - **ICO completed-status hardening for delivery KPIs**:
   - el engine ICO ya no considera una tarea como completada solo por `completed_at`
   - `OTD`, `RpA`, `FTR`, `cycle time` y `throughput` ahora requieren además estado terminal real (`Listo`, `Done`, `Finalizado`, `Completado`, `Aprobado`)
