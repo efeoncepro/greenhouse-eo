@@ -579,17 +579,16 @@ export const getAgencyDeliveryTrend = async (months = 6): Promise<AgencyDelivery
     const [rows] = await bq.query({
       query: `
         SELECT
-          period_year, period_month,
-          on_time_pct AS otd_pct,
-          SAFE_DIVIDE(
-            SUM(on_time_count) + SUM(late_drop_count),
-            NULLIF(SUM(total_tasks), 0)
-          ) AS ftr_pct,
+          period_year,
+          period_month,
+          ROUND(SAFE_DIVIDE(SUM(on_time_count), NULLIF(SUM(on_time_count) + SUM(late_drop_count) + SUM(overdue_count), 0)) * 100, 1) AS otd_pct,
+          AVG(rpa_avg) AS rpa_avg,
+          AVG(ftr_pct) AS ftr_pct,
           SUM(total_tasks) AS total_tasks,
           SUM(completed_tasks) AS completed_tasks,
-          SUM(overdue_count) AS stuck_asset_count
+          SUM(stuck_asset_count) AS stuck_asset_count
         FROM \`${projectId}.ico_engine.metric_snapshots_monthly\`
-        GROUP BY period_year, period_month, on_time_pct
+        GROUP BY period_year, period_month
         ORDER BY period_year DESC, period_month DESC
         LIMIT @months
       `,
@@ -601,7 +600,7 @@ export const getAgencyDeliveryTrend = async (months = 6): Promise<AgencyDelivery
         year: toNumber(r.period_year),
         month: toNumber(r.period_month),
         otdPct: toNullableNumber(r.otd_pct),
-        rpaAvg: null,
+        rpaAvg: toNullableNumber(r.rpa_avg),
         ftrPct: toNullableNumber(r.ftr_pct),
         totalTasks: toNumber(r.total_tasks),
         completedTasks: toNumber(r.completed_tasks),

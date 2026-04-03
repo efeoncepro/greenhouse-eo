@@ -235,12 +235,12 @@ const AgencyDeliveryView = () => {
 
   const rpa = kpis?.rpaGlobal ?? null
   const otd = kpis?.otdPctGlobal ?? null
-  const stuck = kpis?.assetsActivos ?? 0
+  const activeAssets = kpis?.assetsActivos ?? 0
   const feedback = kpis?.feedbackPendiente ?? 0
   const totalProjects = kpis?.totalProjects ?? 0
   const otdS = pctSemaphore(otd)
   const rpaS = rpaColor(rpa)
-  const spacesWithStuck = spaces.filter(s => s.assetsActivos > 0).length
+  const spacesWithActiveAssets = spaces.filter(s => s.assetsActivos > 0).length
   const latestCompleted = trend.length > 0 ? trend[trend.length - 1].completedTasks : 0
 
   // Donut chart config
@@ -352,11 +352,11 @@ const AgencyDeliveryView = () => {
               avatarColor={rpaS.color}
               trend={d?.direction}
               trendNumber={d?.number}
-              subtitle={rpaS.label}
+              subtitle={d ? `${d.text}` : 'Revisiones por activo'}
               statusLabel={rpaS.label}
               statusColor={rpaS.color}
               statusIcon={rpaS.color === 'success' ? 'tabler-circle-check' : rpaS.color === 'error' ? 'tabler-alert-circle' : 'tabler-alert-triangle'}
-              footer='Revisiones promedio por activo. Menos es mejor.'
+              footer='Menos es mejor. Meta: ≤1.5'
             />
           )
         })()}
@@ -375,11 +375,11 @@ const AgencyDeliveryView = () => {
               avatarColor={ftrS.color}
               trend={d?.direction}
               trendNumber={d?.number}
-              subtitle={ftrS.label}
+              subtitle={d ? `${d.text}` : 'Primera entrega correcta'}
               statusLabel={ftrS.label}
               statusColor={ftrS.color}
               statusIcon={ftrS.color === 'success' ? 'tabler-circle-check' : ftrS.color === 'error' ? 'tabler-alert-circle' : 'tabler-alert-triangle'}
-              footer='Primera entrega correcta sin rondas de cambio.'
+              footer='Sin rondas de cambio. Meta: ≥80%'
             />
           )
         })()}
@@ -396,20 +396,20 @@ const AgencyDeliveryView = () => {
           elevation={0}
           sx={{
             borderLeft: '4px solid',
-            borderLeftColor: stuck > 0 ? 'error.main' : 'success.main',
+            borderLeftColor: activeAssets > 0 ? 'warning.main' : 'success.main',
             border: t => `1px solid ${t.palette.divider}`,
             borderLeftWidth: '4px'
           }}
         >
           <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 3, py: 3 }}>
-            <Avatar variant='rounded' sx={{ bgcolor: stuck > 0 ? 'error.lightOpacity' : 'success.lightOpacity' }}>
-              <i className='tabler-alert-triangle' style={{ fontSize: 22, color: stuck > 0 ? theme.palette.error.main : theme.palette.success.main }} />
+            <Avatar variant='rounded' sx={{ bgcolor: activeAssets > 0 ? 'warning.lightOpacity' : 'success.lightOpacity' }}>
+              <i className='tabler-list-check' style={{ fontSize: 22, color: activeAssets > 0 ? theme.palette.warning.main : theme.palette.success.main }} />
             </Avatar>
             <Box>
-              <Typography variant='h5' fontWeight={600}>{stuck}</Typography>
-              <Typography variant='body2' color='text.secondary'>Stuck assets</Typography>
+              <Typography variant='h5' fontWeight={600}>{activeAssets}</Typography>
+              <Typography variant='body2' color='text.secondary'>Assets activos</Typography>
               <Typography variant='caption' color='text.secondary'>
-                {stuck > 0 ? `${spacesWithStuck} spaces afectados` : 'Sin bloqueos'}
+                {`${spacesWithActiveAssets} spaces con tareas activas`}
               </Typography>
             </Box>
           </CardContent>
