@@ -1,5 +1,10 @@
 # TASK-204 - Delivery Carry-Over & Overdue Carried Forward Semantic Split
 
+## Delta 2026-04-03
+
+- `TASK-209` ya quedó cerrada con control plane de orquestación `raw -> conformed`, retry auditado por `space` y evidencia visible en admin
+- el prerequisito operativo de convergencia del pipeline Delivery ya no bloquea este trabajo
+
 ## Status
 
 - Lifecycle: `to-do`

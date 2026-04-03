@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { getTenantNotionDeliveryDataQuality } from '@/lib/integrations/notion-delivery-data-quality'
+import { getTenantNotionSyncOrchestrationDetail } from '@/lib/integrations/notion-sync-orchestration'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -29,14 +30,23 @@ export async function GET(
   const { id: clientId } = await params
   const limit = parsePositiveInteger(searchParams.get('limit'), 10)
 
-  const data = await getTenantNotionDeliveryDataQuality({
-    clientId,
-    limit
-  })
+  const [data, orchestration] = await Promise.all([
+    getTenantNotionDeliveryDataQuality({
+      clientId,
+      limit
+    }),
+    getTenantNotionSyncOrchestrationDetail({
+      clientId,
+      limit
+    })
+  ])
 
   if (!data) {
     return NextResponse.json({ error: 'No active space found for this client' }, { status: 404 })
   }
 
-  return NextResponse.json(data)
+  return NextResponse.json({
+    ...data,
+    orchestration
+  })
 }

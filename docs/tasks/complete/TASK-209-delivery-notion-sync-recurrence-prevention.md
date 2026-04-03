@@ -1,12 +1,27 @@
 # TASK-209 - Delivery Notion Sync Recurrence Prevention & Orchestration Closure
 
+## Delta 2026-04-03
+
+- la lane queda cerrada con implementación validada en el repo:
+  - control plane nuevo `greenhouse_sync.notion_sync_orchestration_runs`
+  - helper canónico `src/lib/integrations/notion-sync-orchestration.ts`
+  - recovery route `GET /api/cron/sync-conformed-recovery`
+  - visibilidad operativa en `/admin/integrations` y `TenantNotionPanel`
+- la solución final no depende de callback upstream desde `../notion-bigquery`; cierra la recurrencia localmente con freshness polling y retry auditado por `space_id`
+- `vercel.json` queda alineado a la realidad del scheduler upstream: `sync-conformed` principal a `20 6 * * *`, recovery cada `30` minutos y monitor de data quality después de la ventana de recuperación
+- validación ejecutada:
+  - `pnpm exec vitest run src/lib/integrations/notion-sync-orchestration.test.ts`
+  - `pnpm lint`
+  - `pnpm build`
+  - `pnpm migrate:up`
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio`
-- Status real: `Diseño`
+- Status real: `Cerrada`
 - Rank: `5`
 - Domain: `data`
 - GitHub Project: `[pending]`
@@ -98,11 +113,14 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-209-delivery-notion-sync-recurrence-prevention.md`
+- `docs/tasks/complete/TASK-209-delivery-notion-sync-recurrence-prevention.md`
 - `src/app/api/cron/sync-conformed/route.ts`
+- `src/app/api/cron/sync-conformed-recovery/route.ts`
 - `src/lib/sync/sync-notion-conformed.ts`
 - `src/lib/integrations/notion-readiness.ts`
 - `src/lib/integrations/notion-delivery-data-quality.ts`
+- `src/lib/integrations/notion-sync-orchestration.ts`
+- `src/types/notion-sync-orchestration.ts`
 - `vercel.json`
 - `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
 

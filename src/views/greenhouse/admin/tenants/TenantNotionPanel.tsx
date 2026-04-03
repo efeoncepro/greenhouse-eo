@@ -35,6 +35,10 @@ import type {
   IntegrationDataQualityRunResult
 } from '@/types/integration-data-quality'
 import type { NotionGovernanceSummary } from '@/types/notion-governance'
+import type {
+  NotionSyncOrchestrationRunRecord,
+  TenantNotionSyncOrchestrationDetail
+} from '@/types/notion-sync-orchestration'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -81,6 +85,7 @@ interface TenantNotionDataQualityResponse {
   latestRun: IntegrationDataQualityRunResult | null
   latestChecks: IntegrationDataQualityCheckResult[]
   recentRuns: IntegrationDataQualityRunResult[]
+  orchestration: TenantNotionSyncOrchestrationDetail | null
 }
 
 interface DiscoveryDatabase {
@@ -166,6 +171,28 @@ const getDataQualityAlertSeverity = (status: string | null | undefined): 'succes
   if (status === 'healthy') return 'success'
   if (status === 'degraded') return 'warning'
   if (status === 'broken') return 'error'
+
+  return 'info'
+}
+
+const getOrchestrationChipColor = (
+  status: NotionSyncOrchestrationRunRecord['orchestrationStatus'] | null | undefined
+): 'success' | 'warning' | 'error' | 'secondary' | 'info' => {
+  if (status === 'sync_completed') return 'success'
+  if (status === 'waiting_for_raw' || status === 'retry_scheduled') return 'warning'
+  if (status === 'retry_running') return 'info'
+  if (status === 'sync_failed' || status === 'cancelled') return 'error'
+
+  return 'secondary'
+}
+
+const getOrchestrationAlertSeverity = (
+  status: NotionSyncOrchestrationRunRecord['orchestrationStatus'] | null | undefined
+): 'success' | 'warning' | 'error' | 'info' => {
+  if (status === 'sync_completed') return 'success'
+  if (status === 'waiting_for_raw' || status === 'retry_scheduled') return 'warning'
+  if (status === 'retry_running') return 'info'
+  if (status === 'sync_failed' || status === 'cancelled') return 'error'
 
   return 'info'
 }
@@ -553,6 +580,10 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
     const latestDataQualityChecks = (dataQuality?.latestChecks ?? []).filter(check => check.severity !== 'ok')
     const recentDataQualityRuns = dataQuality?.recentRuns ?? []
     const latestDiffCount = toInteger(latestDataQualityRun?.summary.diffCount)
+    const orchestration = dataQuality?.orchestration
+    const latestOrchestrationRun = orchestration?.latestRun ?? null
+    const openOrchestrationRun = orchestration?.openRun ?? null
+    const recentOrchestrationRuns = orchestration?.recentRuns ?? []
 
     return (
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
@@ -686,6 +717,130 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
 
             <Grid size={{ xs: 12 }}>
               <Divider sx={{ my: 1 }} />
+            </Grid>
+
+            <Grid size={{ xs: 12 }}>
+              <Stack spacing={1.5}>
+                <Stack direction='row' spacing={1} alignItems='center' justifyContent='space-between'>
+                  <Typography variant='subtitle1'>Orquestación de sync</Typography>
+                  <Stack direction='row' spacing={1} alignItems='center'>
+                    {openOrchestrationRun ? (
+                      <CustomChip
+                        round='true'
+                        size='small'
+                        color={getOrchestrationChipColor(openOrchestrationRun.orchestrationStatus)}
+                        variant='tonal'
+                        label={openOrchestrationRun.orchestrationStatus}
+                      />
+                    ) : latestOrchestrationRun ? (
+                      <CustomChip
+                        round='true'
+                        size='small'
+                        color={getOrchestrationChipColor(latestOrchestrationRun.orchestrationStatus)}
+                        variant='tonal'
+                        label={latestOrchestrationRun.orchestrationStatus}
+                      />
+                    ) : null}
+                  </Stack>
+                </Stack>
+
+                {!latestOrchestrationRun ? (
+                  <Alert severity='info'>
+                    Todavía no hay señal persistida de orquestación para este Space. La primera ejecución bloqueada o el primer retry dejarán evidencia aquí.
+                  </Alert>
+                ) : (
+                  <Stack spacing={2}>
+                    <Alert severity={getOrchestrationAlertSeverity((openOrchestrationRun ?? latestOrchestrationRun).orchestrationStatus)}>
+                      {openOrchestrationRun
+                        ? openOrchestrationRun.orchestrationStatus === 'waiting_for_raw'
+                          ? 'El writer canónico quedó esperando que el raw termine de refrescar. Aún no conviene leer este pipeline como cerrado.'
+                          : openOrchestrationRun.orchestrationStatus === 'retry_scheduled'
+                            ? 'El retry ya quedó programado dentro de la ventana diaria. Puedes revisar la próxima ejecución sin forzar reruns manuales todavía.'
+                            : 'Hay un retry ejecutándose para cerrar el desfase raw -> conformed. Espera esta corrida antes de evaluar data quality como final.'
+                        : latestOrchestrationRun.orchestrationStatus === 'sync_completed'
+                          ? 'La última ventana de orquestación convergió y dejó el writer canónico alineado para este Space.'
+                          : 'La última ventana de orquestación cerró con error o cancelación. Revisa la razón antes de confiar en downstream.'}
+                    </Alert>
+
+                    <Grid container spacing={2}>
+                      <Grid size={{ xs: 6, md: 3 }}>
+                        <Stack spacing={0.5}>
+                          <Typography variant='caption' color='text.secondary'>Última señal</Typography>
+                          <Typography variant='body2'>{formatDatetime(latestOrchestrationRun.updatedAt)}</Typography>
+                        </Stack>
+                      </Grid>
+                      <Grid size={{ xs: 6, md: 3 }}>
+                        <Stack spacing={0.5}>
+                          <Typography variant='caption' color='text.secondary'>Retry actual</Typography>
+                          <Typography variant='h6'>{openOrchestrationRun?.retryAttempt ?? latestOrchestrationRun.retryAttempt}</Typography>
+                        </Stack>
+                      </Grid>
+                      <Grid size={{ xs: 6, md: 3 }}>
+                        <Stack spacing={0.5}>
+                          <Typography variant='caption' color='text.secondary'>Próxima ventana</Typography>
+                          <Typography variant='body2'>{formatDatetime(openOrchestrationRun?.nextRetryAt ?? latestOrchestrationRun.nextRetryAt)}</Typography>
+                        </Stack>
+                      </Grid>
+                      <Grid size={{ xs: 6, md: 3 }}>
+                        <Stack spacing={0.5}>
+                          <Typography variant='caption' color='text.secondary'>Trigger</Typography>
+                          <Typography variant='body2'>{openOrchestrationRun?.triggerSource ?? latestOrchestrationRun.triggerSource}</Typography>
+                        </Stack>
+                      </Grid>
+                    </Grid>
+
+                    <Alert severity='info' variant='outlined'>
+                      {openOrchestrationRun?.waitingReason ?? latestOrchestrationRun.waitingReason ?? 'Sin razón adicional registrada para este Space.'}
+                    </Alert>
+
+                    {recentOrchestrationRuns.length > 1 && (
+                      <TableContainer>
+                        <Table size='small'>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell component='th' scope='col'>Señal</TableCell>
+                              <TableCell component='th' scope='col'>Estado</TableCell>
+                              <TableCell align='right'>Retry</TableCell>
+                              <TableCell component='th' scope='col'>Próxima ventana</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {recentOrchestrationRuns.slice(0, 5).map(run => (
+                              <TableRow key={run.orchestrationRunId} hover>
+                                <TableCell>
+                                  <Stack spacing={0.25}>
+                                    <Typography variant='body2'>{formatDatetime(run.updatedAt)}</Typography>
+                                    <Typography variant='caption' color='text.disabled' sx={{ fontFamily: 'monospace' }}>
+                                      {run.orchestrationRunId}
+                                    </Typography>
+                                  </Stack>
+                                </TableCell>
+                                <TableCell>
+                                  <CustomChip
+                                    round='true'
+                                    size='small'
+                                    color={getOrchestrationChipColor(run.orchestrationStatus)}
+                                    variant='tonal'
+                                    label={run.orchestrationStatus}
+                                  />
+                                </TableCell>
+                                <TableCell align='right'>
+                                  <Typography variant='body2'>{run.retryAttempt}</Typography>
+                                </TableCell>
+                                <TableCell>
+                                  <Typography variant='caption' color='text.secondary'>
+                                    {formatDatetime(run.nextRetryAt)}
+                                  </Typography>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    )}
+                  </Stack>
+                )}
+              </Stack>
             </Grid>
 
             <Grid size={{ xs: 12 }}>
