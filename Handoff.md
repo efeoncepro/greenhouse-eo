@@ -1,5 +1,30 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — TASK-109 Projected Payroll Runtime Hardening
+
+### Rama / alcance
+
+- rama actual: `develop`
+- task: `TASK-109`
+- scope implementado:
+  - `src/lib/payroll/projected-payroll-store.ts`
+  - `src/lib/payroll/projected-payroll-store.test.ts`
+  - `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md`
+  - `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`
+
+### Resultado
+
+- **Slice 1 — Runtime DDL removal**: `projected-payroll-store.ts` ya no ejecuta `CREATE TABLE IF NOT EXISTS`. Reemplazado por `verifyInfrastructure()` que hace fail-fast con error accionable si la tabla no existe.
+- **Slice 2 — Projection health**: La observabilidad ya existía vía `GET /api/internal/projections`. Se documentaron señales específicas de `projected_payroll` en el Reactive Projections Playbook.
+- **Slice 3 — Event contract hardening**: Los cuatro eventos `payroll.projected_*` quedan formalizados como audit-only en el Event Catalog. `payroll.projected_snapshot.refreshed` marcado como deprecated/no usado.
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/payroll/projected-payroll-store.test.ts`
+- `pnpm exec eslint src/lib/payroll/projected-payroll-store.ts`
+- `pnpm build`
+
 ## Sesión 2026-04-03 — Fix rápido de navegación Cloud & Integrations
 
 ### Rama / alcance

@@ -88,7 +88,12 @@ Notas:
 - La introducción futura de un evento base tipo `delivery.task_assignment.upserted` puede complementar refresh dirigido de `ico_member_metrics`, pero no reemplaza el contrato de `ico.materialization.completed` para consumers derivados.
 - `payroll_period.exported` sigue siendo el cierre canónico de nómina; tanto Postgres-first como BigQuery fallback deben emitirlo solo si la mutación realmente avanzó el período.
 - `payroll_period.exported` ya quedó smoke-validado como disparador de `payroll_receipts_delivery`: primero se publica el outbox y luego el reactor materializa la entrega de recibos, sin depender de cron separado ni de un consumer bloqueado por otro handler del mismo evento.
-- Los eventos `payroll.projected_snapshot.refreshed`, `payroll.projected_period.refreshed`, `payroll.projected_promoted_to_official_draft` y `payroll_period.recalculated_from_projection` existen como trazas de promoción/proyección, pero deben tratarse explícitamente como audit trail hasta que un consumer real los reclame; `projected_payroll_snapshots` es serving cache, no transaccional source of truth.
+- Contrato de eventos `payroll.projected_*` (hardened en TASK-109):
+  - `payroll.projected_period.refreshed` — audit trail; se emite tras cada refresh exitoso del snapshot serving. Sin consumer de negocio activo.
+  - `payroll.projected_snapshot.refreshed` — **deprecated / no usado en runtime**. Definido en catálogo pero ningún publisher lo emite. Mantener solo por backward-compat del catálogo; no crear consumers.
+  - `payroll.projected_promoted_to_official_draft` — audit trail; registra que un snapshot proyectado fue promovido a borrador oficial. Sin consumer downstream.
+  - `payroll_period.recalculated_from_projection` — audit trail; señal interna post-promoción. Sin consumer downstream.
+  - Regla: estos cuatro eventos son **audit-only** hasta que un consumer real con contrato de negocio explícito los reclame. `projected_payroll_snapshots` es serving cache, no transactional source of truth.
 
 Notas:
 - `payroll_period.exported` es el evento canónico de cierre mensual de nómina.

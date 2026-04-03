@@ -2,6 +2,13 @@
 
 ## 2026-04-03
 
+- **TASK-109 projected payroll runtime hardening**:
+  - `projected-payroll-store.ts` ya no ejecuta `CREATE TABLE IF NOT EXISTS` en runtime; reemplazado por `verifyInfrastructure()` con fail-fast y error accionable si la tabla no existe
+  - los cuatro eventos `payroll.projected_*` quedan formalizados como audit-only en el Event Catalog; `payroll.projected_snapshot.refreshed` marcado como deprecated (definido pero sin publisher activo)
+  - se documentaron señales de health específicas de `projected_payroll` en el Reactive Projections Playbook
+  - se actualizó el contrato de Projected Payroll en `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md` con la nota de DDL eliminado
+  - tests actualizados: fail-fast, no-DDL verification, null deductions normalization
+
 - **Admin Cloud & Integrations route fix**:
   - la navegación principal de `Cloud & Integrations` ahora apunta a la surface canónica `/admin/integrations`
   - `/admin/cloud-integrations` queda como alias compatible con redirect server-side para evitar clicks muertos o drift entre menú, cards y governance surface
