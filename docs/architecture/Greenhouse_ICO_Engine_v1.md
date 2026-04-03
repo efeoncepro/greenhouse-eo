@@ -165,6 +165,10 @@ Estado real ya absorbido en la arquitectura viva:
 - el `ICO Engine` ya se documenta como servicio de metricas agnostico a dimension
 - ya existen `metrics_by_member`, `GET /api/ico-engine/context`, multi-assignee support y `GET /api/ico-engine/health`
 - el pipeline operativo ya se documenta como `notion-bq-sync -> /api/cron/sync-conformed -> /api/cron/ico-materialize`
+- update `2026-04-03`:
+  - `TASK-209` cerró el loop `notion-bq-sync -> sync-conformed` también en producción
+  - `delivery_projects`, `delivery_tasks` y `delivery_sprints` ya no deben quedar desalineadas por reemplazos secuenciales parciales
+  - la mejora no cambia las fórmulas ICO; mejora la consistencia del snapshot `greenhouse_conformed.delivery_*` que alimenta los cálculos
 
 Lectura correcta de este documento:
 - usarlo para entender la intencion funcional, el registro de metricas y extensiones futuras
