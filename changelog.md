@@ -2,6 +2,12 @@
 
 ## 2026-04-03
 
+- **TASK-209 conformed writer staged swap + freshness gate**:
+  - `sync-notion-conformed` deja de hacer reemplazos secuenciales directos sobre `greenhouse_conformed.delivery_*`
+  - ahora stagea en tablas efímeras y aplica un swap transaccional para `delivery_projects`, `delivery_tasks` y `delivery_sprints`
+  - se agregó una gate de frescura por tabla para evitar reescrituras cuando `greenhouse_conformed` ya está al día respecto de `notion_ops`
+  - esto corrige el failure mode observado en production donde `delivery_projects` podía avanzar sola y dejar `delivery_tasks` / `delivery_sprints` atrás cuando BigQuery devolvía `too many table update operations for this table`
+
 - **Production GCP auth fallback switch**:
   - se agregó `GCP_AUTH_PREFERENCE` como override explícito para seleccionar la fuente de credenciales GCP en runtime (`auto`, `wif`, `service_account_key`, `ambient_adc`)
   - el default sigue prefiriendo `WIF`; el override solo se activa cuando el entorno lo fija

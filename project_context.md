@@ -1,5 +1,21 @@
 # project_context.md
 
+## Delta 2026-04-03 TASK-209 conformed writer staged swap + freshness gate
+
+- El writer `Notion raw -> greenhouse_conformed` ya no reemplaza `delivery_projects`, `delivery_tasks` y `delivery_sprints` con `WRITE_TRUNCATE` secuencial directo.
+- Nuevo contrato runtime:
+  - cada corrida stagea primero en tablas efímeras derivadas del schema canónico
+  - luego hace swap transaccional sobre las tres tablas canónicas
+  - si el conformed ya está tan fresco como `notion_ops` por tabla, la corrida se considera `succeeded` sin reescribir
+- Motivación:
+  - evitar el incidente observado en production donde `delivery_projects` avanzó pero `delivery_tasks` y `delivery_sprints` quedaron atrás por `Exceeded rate limits: too many table update operations for this table`
+  - reducir consumo de quota de operaciones de tabla cuando el callback upstream re-dispara el cierre sobre un snapshot raw ya convergido
+- Decisión operativa:
+  - `greenhouse_conformed.delivery_*` sigue siendo la capa canónica de consumo
+  - el staging efímero es solo carril técnico de swap atómico, no un nuevo contrato analítico visible
+- Implicación:
+  - la salud del conformed ya no debe evaluarse solo por `MAX(synced_at)` global; el baseline correcto es frescura por tabla (`projects/tasks/sprints`)
+
 ## Delta 2026-04-03 Production GCP auth fallback for Cloud SQL / BigQuery runtime
 
 - Greenhouse runtime ya soporta una preferencia explícita de credenciales GCP vía `GCP_AUTH_PREFERENCE`.
