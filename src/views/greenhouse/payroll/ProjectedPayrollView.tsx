@@ -184,6 +184,16 @@ const currencySummaryLabel = (byCurrency: Record<string, number>) => {
   return parts.join(' + ') || '—'
 }
 
+const currencyBreakdownLabel = (byCurrency: Record<string, number>) => {
+  const parts: string[] = []
+
+  for (const [cur, amount] of Object.entries(byCurrency)) {
+    if (amount > 0) parts.push(`${cur} ${formatCurrency(amount, cur as 'CLP' | 'USD')}`)
+  }
+
+  return parts.join(' · ') || ''
+}
+
 const readNonTaxableAllowances = (entry: ProjectedEntry) => {
   const colacion =
     entry.chileColacionAmount ??
@@ -458,12 +468,16 @@ const ProjectedPayrollView = () => {
           <Grid size={{ xs: 12, sm: 6, md: data.official ? 3 : 4 }}>
             <HorizontalWithSubtitle
               title='Bruto total'
-              stats={currencySummaryLabel(data.totals.grossByCurrency)}
+              stats={
+                data.clpEquivalent
+                  ? formatCurrency(data.clpEquivalent.grossClp, 'CLP')
+                  : currencySummaryLabel(data.totals.grossByCurrency)
+              }
               avatarIcon='tabler-cash'
               avatarColor='info'
               subtitle={
-                data.clpEquivalent
-                  ? `~${formatCurrency(data.clpEquivalent.grossClp, 'CLP')} CLP total`
+                data.clpEquivalent && Object.keys(data.totals.grossByCurrency).length > 1
+                  ? currencyBreakdownLabel(data.totals.grossByCurrency)
                   : mode === 'actual_to_date' ? 'Devengado al corte' : 'Proyectado al cierre'
               }
             />
@@ -471,12 +485,16 @@ const ProjectedPayrollView = () => {
           <Grid size={{ xs: 12, sm: 6, md: data.official ? 3 : 4 }}>
             <HorizontalWithSubtitle
               title='Neto total'
-              stats={currencySummaryLabel(data.totals.netByCurrency)}
+              stats={
+                data.clpEquivalent
+                  ? formatCurrency(data.clpEquivalent.netClp, 'CLP')
+                  : currencySummaryLabel(data.totals.netByCurrency)
+              }
               avatarIcon='tabler-wallet'
               avatarColor='success'
               subtitle={
-                data.clpEquivalent
-                  ? `~${formatCurrency(data.clpEquivalent.netClp, 'CLP')} CLP total`
+                data.clpEquivalent && Object.keys(data.totals.netByCurrency).length > 1
+                  ? currencyBreakdownLabel(data.totals.netByCurrency)
                   : 'Líquido a pagar'
               }
             />
