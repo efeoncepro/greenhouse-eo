@@ -1,5 +1,31 @@
 # Greenhouse Source Sync Pipelines V1
 
+## Delta 2026-04-03 — TASK-209 final closure in production
+
+La lane `TASK-209` quedó cerrada también a nivel de arquitectura runtime, no solo como control plane local.
+
+Contrato operativo final:
+
+- el upstream `../notion-bigquery` ya dispara callback determinístico a `GET /api/cron/sync-conformed` cuando una corrida `full` multi-tenant termina bien
+- Greenhouse mantiene de todos modos su control plane local (`waiting_for_raw`, `retry_scheduled`, `retry_running`, `sync_completed`, `sync_failed`) y el recovery cron como safety net
+- `src/lib/sync/sync-notion-conformed.ts` sigue siendo el único writer canónico de `greenhouse_conformed.delivery_*`
+- el writer canónico ya no expone un failure mode de actualización parcial entre `delivery_projects`, `delivery_tasks` y `delivery_sprints`:
+  - stagea primero en tablas efímeras
+  - luego hace swap sobre el carril canónico
+  - si `notion_ops` no es más nueva que `greenhouse_conformed`, devuelve éxito sin volver a escribir
+
+Regla vigente para métricas:
+
+- `ICO`, `Delivery Performance` y demás consumers downstream deben seguir leyendo `greenhouse_conformed.delivery_*`
+- `raw_pages_snapshot`, `notion_ops.*` y `stg_*` son carriles de ingestión / compatibilidad / auditoría, no la capa canónica de cálculo
+- la mejora de `TASK-209` fortalece la calidad del snapshot para cálculo; no redefine las fórmulas del negocio
+
+Estado operativo validado el `2026-04-03`:
+
+- el callback upstream `notion-bq-sync -> greenhouse.efeoncepro.com/api/cron/sync-conformed` ya respondió `200`
+- el cron `sync-conformed` convergió con `healthySpaces: 2`, `brokenSpaces: 0`
+- ambos `space_id` activos volvieron a refrescar `notion_ops.tareas` y `greenhouse.space_notion_sources.last_synced_at`
+
 ## Delta 2026-04-03 — TASK-209 Notion sync orchestration closure
 
 Greenhouse ya tiene un control plane explícito para cerrar la recurrencia `raw -> conformed` del pipeline de Delivery sobre Notion.
@@ -33,8 +59,8 @@ Scheduling operativo actualizado:
 
 Implicación arquitectónica:
 
-- `greenhouse-eo` sigue sin tener callback determinístico desde `../notion-bigquery`
-- por eso el cierre de recurrencia se resuelve localmente con polling de frescura + retry auditado por `space_id`
+- el callback upstream ya existe y es parte del cierre nominal del loop
+- el polling de frescura + retry auditado por `space_id` se conserva como resiliencia local, no como sustituto del callback
 - la salud del pipeline ya no depende de recordar un rerun manual; el estado pendiente queda visible y recuperable dentro del operating model normal
 
 ## Delta 2026-04-03 — TASK-208 recurrent data quality monitor for Notion delivery

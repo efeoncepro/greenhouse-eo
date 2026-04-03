@@ -428,6 +428,53 @@ export const completeOpenNotionSyncRuns = async ({
     .execute()
 }
 
+export const recordNotionSyncCompletedSnapshots = async ({
+  sourceSyncRunId,
+  triggerSource,
+  rawFreshness,
+  metadata = {}
+}: {
+  sourceSyncRunId: string
+  triggerSource: NotionSyncOrchestrationTriggerSource
+  rawFreshness: NotionRawFreshnessGateResult
+  metadata?: Record<string, unknown>
+}) => {
+  if (rawFreshness.spaces.length === 0) {
+    return
+  }
+
+  const db = await getDb()
+  const nowIso = new Date().toISOString()
+
+  await db
+    .insertInto('greenhouse_sync.notion_sync_orchestration_runs')
+    .values(
+      rawFreshness.spaces.map(space => ({
+        orchestration_run_id: buildOrchestrationRunId(),
+        integration_key: INTEGRATION_KEY,
+        pipeline_key: PIPELINE_KEY,
+        space_id: space.spaceId,
+        source_sync_run_id: sourceSyncRunId,
+        orchestration_status: 'sync_completed' as const,
+        trigger_source: triggerSource,
+        retry_attempt: 0,
+        max_retry_attempts: MAX_RETRY_ATTEMPTS,
+        raw_boundary_start_at: rawFreshness.boundaryStartAt,
+        latest_raw_synced_at: getSpaceFreshestRawSyncedAt(space),
+        waiting_reason: null,
+        next_retry_at: null,
+        completed_at: nowIso,
+        metadata: {
+          boundaryStartAt: rawFreshness.boundaryStartAt,
+          freshestRawSyncedAt: rawFreshness.freshestRawSyncedAt,
+          completedViaSnapshot: true,
+          ...metadata
+        } as unknown as Json
+      }))
+    )
+    .execute()
+}
+
 export const failOpenNotionSyncRuns = async ({
   sourceSyncRunId = null,
   triggerSource,
@@ -588,18 +635,32 @@ export const runNotionSyncRecovery = async (): Promise<NotionSyncRecoveryResult>
       triggerSource: 'cron_recovery',
       metadata: {
         completedBy: 'cron_recovery',
-        dataQualityMonitor: cycle.dataQualityMonitor
+        dataQualityMonitor: cycle.dataQualityMonitor,
+        skipped: Boolean(cycle.sync.skipped),
+        skipReason: cycle.sync.skipReason ?? null
+      }
+    })
+
+    await recordNotionSyncCompletedSnapshots({
+      sourceSyncRunId: cycle.sync.syncRunId,
+      triggerSource: 'cron_recovery',
+      rawFreshness,
+      metadata: {
+        completedBy: 'cron_recovery',
+        dataQualityMonitor: cycle.dataQualityMonitor,
+        skipped: Boolean(cycle.sync.skipped),
+        skipReason: cycle.sync.skipReason ?? null
       }
     })
 
     return {
-      triggered: true,
+      triggered: !cycle.sync.skipped,
       pendingSpaces: dueRuns.length,
       retriedSpaces: dueRuns.length,
       blockedSpaces: 0,
       completedSpaces: dueRuns.length,
       failedSpaces: 0,
-      reason: 'Retry converged successfully',
+      reason: cycle.sync.skipReason ?? 'Retry converged successfully',
       nextRetryAt: null,
       syncRunId: cycle.sync.syncRunId,
       dataQualityMonitor: cycle.dataQualityMonitor
@@ -688,12 +749,35 @@ export const runNotionSyncOrchestration = async ({
         }
       }
 
+      await completeOpenNotionSyncRuns({
+        sourceSyncRunId: cycle.sync.syncRunId,
+        triggerSource,
+        metadata: {
+          completedBy: executionSource,
+          dataQualityMonitor: cycle.dataQualityMonitor,
+          skipped: true,
+          skipReason: cycle.sync.skipReason ?? 'Sync skipped'
+        }
+      })
+
+      await recordNotionSyncCompletedSnapshots({
+        sourceSyncRunId: cycle.sync.syncRunId,
+        triggerSource,
+        rawFreshness,
+        metadata: {
+          completedBy: executionSource,
+          dataQualityMonitor: cycle.dataQualityMonitor,
+          skipped: true,
+          skipReason: cycle.sync.skipReason ?? 'Sync skipped'
+        }
+      })
+
       return {
         triggered: false,
-        pendingSpaces: openRuns.length,
+        pendingSpaces: 0,
         retriedSpaces: 0,
         blockedSpaces: 0,
-        completedSpaces: 0,
+        completedSpaces: rawFreshness.activeSpaceCount,
         failedSpaces: 0,
         reason: cycle.sync.skipReason ?? 'Sync skipped',
         nextRetryAt: null,
@@ -711,12 +795,22 @@ export const runNotionSyncOrchestration = async ({
       }
     })
 
+    await recordNotionSyncCompletedSnapshots({
+      sourceSyncRunId: cycle.sync.syncRunId,
+      triggerSource,
+      rawFreshness,
+      metadata: {
+        completedBy: executionSource,
+        dataQualityMonitor: cycle.dataQualityMonitor
+      }
+    })
+
     return {
       triggered: true,
-      pendingSpaces: openRuns.length,
+      pendingSpaces: 0,
       retriedSpaces: 0,
       blockedSpaces: 0,
-      completedSpaces: openRuns.length,
+      completedSpaces: rawFreshness.activeSpaceCount,
       failedSpaces: 0,
       reason: 'Conformed sync converged successfully',
       nextRetryAt: null,

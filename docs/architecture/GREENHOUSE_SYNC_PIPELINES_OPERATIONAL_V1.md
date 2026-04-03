@@ -3,15 +3,43 @@
 ## Overview
 Greenhouse uses a multi-layer sync architecture to move data between external sources (Notion, HubSpot, Frame.io), BigQuery (warehouse), PostgreSQL (operational store), and the Next.js application.
 
+## Delta 2026-04-03 — TASK-209 production closure
+
+El carril `Notion -> notion_ops -> greenhouse_conformed -> ICO` quedó cerrado con el contrato runtime real de producción.
+
+Decisiones vigentes:
+
+- `notion-bq-sync` es el writer canónico de raw/staging para Notion:
+  - escribe `notion_ops.{tareas,proyectos,sprints,revisiones}`
+  - actualiza `greenhouse.space_notion_sources.last_synced_at`
+  - al terminar una corrida `full` multi-tenant exitosa, dispara callback a `GET /api/cron/sync-conformed`
+- `GET /api/cron/sync-conformed` sigue siendo el único writer canónico de:
+  - `greenhouse_conformed.delivery_tasks`
+  - `greenhouse_conformed.delivery_projects`
+  - `greenhouse_conformed.delivery_sprints`
+- el writer conformed ya no hace reemplazos secuenciales directos sobre las tablas canónicas:
+  - primero carga staging efímero derivado del schema actual
+  - luego aplica swap controlado sobre las tablas `delivery_*`
+  - además salta la reescritura si el conformed ya está tan fresco como `notion_ops` por tabla
+
+Implicación para métricas:
+
+- `ICO`, `Delivery` y cualquier consumer downstream siguen calculando sobre `greenhouse_conformed.delivery_*`
+- la mejora de `TASK-209` no cambia las fórmulas de métricas; mejora la consistencia del snapshot que las alimenta
+- el failure mode anterior donde una tabla avanzaba y otra quedaba atrás por quota de BigQuery debe considerarse cerrado
+
 ## Pipeline Inventory
 
 ### 1. Notion → BigQuery (notion-bq-sync)
 - Type: Custom Cloud Run service
 - URL: https://notion-bq-sync-y6egnifl6a-uc.a.run.app
 - Schedule: Daily 3:00 AM Chile (Cloud Scheduler: notion-bq-daily-sync)
-- Function: Multi-tenant Notion database sync. Reads configured Notion databases per space, writes to greenhouse_raw (notion_*_snapshots) and greenhouse_conformed (delivery_*)
+- Function: Multi-tenant Notion database sync. Reads configured Notion databases per space, writes `notion_ops` raw + staging tables (`tareas`, `proyectos`, `sprints`, `revisiones`, `stg_*`, `raw_pages_snapshot`, `sync_log`) and updates `greenhouse.space_notion_sources.last_synced_at`
 - Config: Space-to-Notion bindings in PostgreSQL (greenhouse_core.notion_workspaces + greenhouse_delivery.space_property_mappings)
 - Onboarding: Run notion-schema-discovery.ts → seed mappings → execute sync
+- Callback contract:
+  - on successful `full` multi-tenant sync, calls `GET https://greenhouse.efeoncepro.com/api/cron/sync-conformed`
+  - partial runs by `space_id` or `table` do not need to close the downstream callback contract
 
 ### 2. HubSpot → BigQuery (hubspot-bq-sync)
 - Type: Cloud Function (Python 3.12)
@@ -68,7 +96,12 @@ Greenhouse uses a multi-layer sync architecture to move data between external so
 ### 9. Conformed Data Layer Sync (Vercel Cron)
 - Path: /api/cron/sync-conformed
 - Schedule: Daily 3:45 AM UTC
-- Function: Reads notion_ops.* (raw Notion data), transforms to normalized conformed layer. Writes greenhouse_conformed.delivery_tasks/projects/sprints. Uses safe DELETE pattern (no TRUNCATE). Resolves space_id via space_notion_sources (canonical, multi-tenant).
+- Function: Reads `notion_ops.*` (raw Notion data), transforms to normalized conformed layer and writes `greenhouse_conformed.delivery_tasks/projects/sprints`
+- Runtime guarantees:
+  - canonical single writer for `delivery_*`
+  - per-table freshness gate: skips rewrite when `greenhouse_conformed` is already current vs `notion_ops`
+  - staging + swap pattern avoids partial visible updates across `delivery_projects`, `delivery_tasks` and `delivery_sprints`
+  - local orchestration and recovery remain active as safety net if the upstream callback does not close the loop on first attempt
 - Source: src/lib/sync/sync-notion-conformed.ts
 - Dependency: Runs after notion-bq-sync Cloud Run (3:00 AM) and before ico-materialize (6:15 AM)
 

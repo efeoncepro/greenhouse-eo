@@ -15,6 +15,20 @@
   - `pnpm build`
   - `pnpm migrate:up`
 
+## Delta 2026-04-03 — cierre productivo final
+
+- el cierre final ya también existe aguas arriba:
+  - `../notion-bigquery` ahora dispara callback determinístico a `GET /api/cron/sync-conformed` en corridas `full` multi-tenant exitosas
+- Greenhouse mantiene igual la orquestación local y el recovery cron:
+  - siguen siendo la red de seguridad si el callback upstream no cierra el loop en el primer intento
+- además el writer canónico `src/lib/sync/sync-notion-conformed.ts` quedó endurecido para evitar actualizaciones parciales visibles en:
+  - `greenhouse_conformed.delivery_projects`
+  - `greenhouse_conformed.delivery_tasks`
+  - `greenhouse_conformed.delivery_sprints`
+- resultado operativo validado:
+  - callback upstream `200`
+  - `sync-conformed` convergido con `healthySpaces: 2`, `brokenSpaces: 0`
+
 ## Status
 
 - Lifecycle: `complete`

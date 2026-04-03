@@ -1,5 +1,50 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — Fix trustable state for Notion Sync Orchestration UI
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `src/lib/integrations/notion-sync-orchestration.ts`
+  - `src/lib/integrations/notion-sync-orchestration.test.ts`
+
+### Resultado
+
+- el control plane ya persiste una señal nueva de `sync_completed` por `space` cuando el ciclo raw -> conformed converge correctamente
+- eso aplica tanto cuando:
+  - hubo runs abiertos y se completaron
+  - como cuando el sync terminó `skipped` porque el conformed ya estaba fresco
+- con este cambio, la UI de `/admin/integrations` deja de quedar pegada al último `sync_failed` histórico si el pipeline ya se resolvió
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/integrations/notion-sync-orchestration.test.ts`
+- `pnpm exec eslint src/lib/integrations/notion-sync-orchestration.ts src/lib/integrations/notion-sync-orchestration.test.ts`
+
+## Sesión 2026-04-03 — Documentación de arquitectura alineada al cierre real de TASK-209
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `docs/architecture/GREENHOUSE_SYNC_PIPELINES_OPERATIONAL_V1.md`
+  - `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+
+### Resultado
+
+- la arquitectura ya refleja el estado real post-cierre de `TASK-209`
+- quedó documentado que:
+  - `notion-bq-sync` escribe `notion_ops` y hace callback a `sync-conformed` en corridas full exitosas
+  - `sync-conformed` sigue siendo el único writer canónico de `greenhouse_conformed.delivery_*`
+  - el writer conformed ahora usa staging + swap y gate de frescura por tabla
+  - la mejora fortalece la consistencia del snapshot para métricas, sin cambiar sus fórmulas
+
+### Verificación
+
+- revisión manual de consistencia documental contra runtime ya validado hoy en production
+
 ## Sesión 2026-04-03 — TASK-209 production hardening del writer conformed de Notion
 
 ### Rama / alcance
@@ -105,8 +150,10 @@
 
 ### Nota operativa
 
-- el upstream `../notion-bigquery` sigue sin callback determinístico hacia `greenhouse-eo`; esta lane cierra la recurrencia localmente con polling de frescura + retry auditado
-- si se busca chaining determinístico cross-repo, el follow-on debe tocar `../notion-bigquery`
+- esta lane nació cerrando la recurrencia localmente con polling de frescura + retry auditado
+- update `2026-04-03`:
+  - el upstream `../notion-bigquery` ya quedó alineado con callback determinístico hacia `GET /api/cron/sync-conformed`
+  - el control plane local y el recovery cron se mantienen como resiliencia, no como sustituto del callback
 
 ## Sesión 2026-04-03 — Nueva lane TASK-209 para prevenir recurrencia del drift Notion raw -> conformed
 
