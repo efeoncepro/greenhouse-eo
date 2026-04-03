@@ -347,6 +347,7 @@ const onSubmit = handleSubmit(async (data) => { /* ... */ })
 
 - `src/views/Login.tsx`
   - migrado a `react-hook-form` como referencia canónica para credenciales
+  - **TASK-130**: loading states enterprise-grade, transición post-auth, errores categorizados
 - `src/app/(blank-layout-pages)/auth/forgot-password/page.tsx`
   - migrado a `react-hook-form` como segundo ejemplo liviano de auth form
 - Helper canónico inicial:
@@ -354,6 +355,35 @@ const onSubmit = handleSubmit(async (data) => { /* ... */ })
 - Regla práctica vigente:
   - wrappers MUI/Vuexy + helpers reutilizables primero
   - no introducir schemas pesados mientras no exista una necesidad real de Zod/Yup
+
+### Auth form loading states & transitions (TASK-130)
+
+Login.tsx implementa un flujo de estados completo para auth:
+
+| Estado | UI | Interacción |
+|--------|-----|-------------|
+| **Idle** | Form activo, botones habilitados | Usuario puede interactuar |
+| **Validating** | `LoadingButton` con spinner, `LinearProgress` top, inputs deshabilitados | Todo deshabilitado |
+| **SSO Loading** | Botón SSO con `CircularProgress` + "Redirigiendo a {provider}...", `LinearProgress` | Todo deshabilitado |
+| **Transitioning** | Logo + spinner + "Preparando tu espacio de trabajo...", form oculto | Sin interacción |
+| **Error** | `Alert` con severity categorizada + botón cerrar, form re-habilitado | Reintentar |
+
+Componentes MUI usados:
+- `LoadingButton` (`@mui/lab`) — botón credenciales con spinner integrado
+- `CircularProgress` (`@mui/material`) — loading individual por SSO provider
+- `LinearProgress` (`@mui/material`) — señal global indeterminada en top del card
+- `Alert` con `onClose` — errores categorizados con severity warning/error
+
+Error categorization (`mapAuthError`):
+- `CredentialsSignin` → `login_error_credentials` (severity: error)
+- `AccessDenied` → `login_error_account_disabled` (severity: error)
+- `SessionRequired` → `login_error_session_expired` (severity: error)
+- fetch/network errors → `login_error_network` (severity: warning)
+- provider timeout → `login_error_provider_unavailable` (severity: warning)
+
+Loading skeleton para resolución de sesión:
+- `src/app/auth/landing/loading.tsx` — Next.js loading convention, logo + spinner + "Preparando tu espacio de trabajo..."
+- Elimina pantalla en blanco entre login exitoso y dashboard
 
 ### Reglas de adopción
 
