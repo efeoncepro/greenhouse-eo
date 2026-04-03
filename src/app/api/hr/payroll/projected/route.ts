@@ -52,7 +52,7 @@ export async function GET(request: Request) {
     // Fetch projection + official entries in parallel
     const periodId = `${year}-${String(month).padStart(2, '0')}`
 
-    const [result, officialRows, latestPromotion] = await Promise.all([
+    const [result, officialRows, previousOfficialRows, latestPromotion] = await Promise.all([
       projectPayrollForPeriod({ year, month, mode }),
       runGreenhousePostgresQuery<OfficialEntryRow>(
         `SELECT e.member_id, e.currency, e.gross_total, e.net_total,
@@ -64,8 +64,22 @@ export async function GET(request: Request) {
          WHERE p.period_id = $1
            AND p.status IN ('calculated', 'approved', 'exported')`,
         [periodId]
-      ).catch(() => [] as OfficialEntryRow[])
-      ,
+      ).catch(() => [] as OfficialEntryRow[]),
+
+      // Previous official period for comparison (latest exported before current)
+      runGreenhousePostgresQuery<OfficialEntryRow & { period_id: string }>(
+        `SELECT e.member_id, e.currency, e.gross_total, e.net_total,
+                e.kpi_otd_percent, e.kpi_rpa_avg, e.kpi_tasks_completed,
+                e.working_days_in_period, e.days_present, e.days_absent, e.days_on_leave,
+                e.chile_uf_value, e.base_salary, p.period_id
+         FROM greenhouse_payroll.payroll_entries e
+         INNER JOIN greenhouse_payroll.payroll_periods p ON p.period_id = e.period_id
+         WHERE p.period_id < $1
+           AND p.status IN ('approved', 'exported')
+         ORDER BY p.period_id DESC`,
+        [periodId]
+      ).catch(() => [] as (OfficialEntryRow & { period_id: string })[]),
+
       isPayrollPostgresEnabled()
         ? pgGetLatestProjectedPayrollPromotion({ year, month, mode }).catch(() => null)
         : Promise.resolve(null)
@@ -117,6 +131,23 @@ export async function GET(request: Request) {
     }
 
     const hasOfficial = officialRows.length > 0
+
+    // Previous official period for trend comparison
+    const prevGrossByCurrency: Record<string, number> = {}
+    const prevNetByCurrency: Record<string, number> = {}
+    let previousPeriodId: string | null = null
+
+    for (const row of previousOfficialRows) {
+      if (!previousPeriodId) previousPeriodId = (row as { period_id?: string }).period_id ?? null
+
+      // Only aggregate the most recent previous period
+      if ((row as { period_id?: string }).period_id !== previousPeriodId) break
+
+      prevGrossByCurrency[row.currency] = (prevGrossByCurrency[row.currency] ?? 0) + Number(row.gross_total)
+      prevNetByCurrency[row.currency] = (prevNetByCurrency[row.currency] ?? 0) + Number(row.net_total)
+    }
+
+    const hasPreviousOfficial = previousPeriodId != null
 
     // Enrich entries with output delta + input variance
     const entriesWithDelta = result.entries.map(entry => {
@@ -196,7 +227,13 @@ export async function GET(request: Request) {
         latestPromotion,
         clpEquivalent,
         usdEquivalent,
-        prorationFactor: result.entries.length > 0 ? result.entries[0].prorationFactor : 1
+        prorationFactor: result.entries.length > 0 ? result.entries[0].prorationFactor : 1,
+        previousOfficial: hasPreviousOfficial ? {
+          periodId: previousPeriodId,
+          grossByCurrency: prevGrossByCurrency,
+          netByCurrency: prevNetByCurrency,
+          entryCount: previousOfficialRows.filter(r => (r as { period_id?: string }).period_id === previousPeriodId).length
+        } : null
       },
       { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } }
     )

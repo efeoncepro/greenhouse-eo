@@ -146,6 +146,12 @@ interface ProjectedData {
     fxRate: number
   } | null
   prorationFactor: number
+  previousOfficial: {
+    periodId: string
+    grossByCurrency: Record<string, number>
+    netByCurrency: Record<string, number>
+    entryCount: number
+  } | null
 }
 
 // ── Helpers ──
@@ -469,22 +475,26 @@ const ProjectedPayrollView = () => {
             const grossClp = data.clpEquivalent?.grossClp
             const netClp = data.clpEquivalent?.netClp
 
-            const officialGrossClp = data.official
-              ? Object.entries(data.official.grossByCurrency).reduce((sum, [cur, amt]) =>
-                  sum + (cur === 'USD' && data.clpEquivalent ? amt * data.clpEquivalent.fxRate : amt), 0)
+            // Use current-period official, or fallback to previous period for comparison
+            const compareSource = data.official ?? data.previousOfficial
+            const compareLabel = data.official ? 'vs oficial' : data.previousOfficial ? `vs ${data.previousOfficial.periodId}` : null
+
+            const compareGrossClp = compareSource && data.clpEquivalent
+              ? Object.entries(compareSource.grossByCurrency).reduce((sum, [cur, amt]) =>
+                  sum + (cur === 'USD' ? amt * data.clpEquivalent!.fxRate : amt), 0)
               : null
 
-            const officialNetClp = data.official
-              ? Object.entries(data.official.netByCurrency).reduce((sum, [cur, amt]) =>
-                  sum + (cur === 'USD' && data.clpEquivalent ? amt * data.clpEquivalent.fxRate : amt), 0)
+            const compareNetClp = compareSource && data.clpEquivalent
+              ? Object.entries(compareSource.netByCurrency).reduce((sum, [cur, amt]) =>
+                  sum + (cur === 'USD' ? amt * data.clpEquivalent!.fxRate : amt), 0)
               : null
 
-            const grossDeltaPct = grossClp && officialGrossClp && officialGrossClp > 0
-              ? Math.round(((grossClp - officialGrossClp) / officialGrossClp) * 100)
+            const grossDeltaPct = grossClp && compareGrossClp && compareGrossClp > 0
+              ? Math.round(((grossClp - compareGrossClp) / compareGrossClp) * 100)
               : null
 
-            const netDeltaPct = netClp && officialNetClp && officialNetClp > 0
-              ? Math.round(((netClp - officialNetClp) / officialNetClp) * 100)
+            const netDeltaPct = netClp && compareNetClp && compareNetClp > 0
+              ? Math.round(((netClp - compareNetClp) / compareNetClp) * 100)
               : null
 
             const prorateLabel = data.prorationFactor < 1
@@ -504,7 +514,7 @@ const ProjectedPayrollView = () => {
                     avatarIcon='tabler-cash'
                     avatarColor='info'
                     trend={grossDeltaPct != null ? (grossDeltaPct >= 0 ? 'negative' : 'positive') : undefined}
-                    trendNumber={grossDeltaPct != null ? `${Math.abs(grossDeltaPct)}% vs oficial` : undefined}
+                    trendNumber={grossDeltaPct != null && compareLabel ? `${Math.abs(grossDeltaPct)}% ${compareLabel}` : undefined}
                     subtitle={
                       data.usdEquivalent
                         ? `USD ${formatCurrency(data.usdEquivalent.grossUsd, 'USD')}${prorateLabel}`
@@ -514,7 +524,7 @@ const ProjectedPayrollView = () => {
                     }
                     statusLabel={mode === 'actual_to_date' ? 'Corte actual' : 'Cierre proyectado'}
                     statusColor={mode === 'actual_to_date' ? 'info' : 'primary'}
-                    footer={data.official ? `Oficial: ${formatCurrency(Math.round(officialGrossClp ?? 0), 'CLP')}` : undefined}
+                    footer={compareSource ? `${data.official ? 'Oficial' : data.previousOfficial?.periodId ?? 'Anterior'}: ${formatCurrency(Math.round(compareGrossClp ?? 0), 'CLP')}` : undefined}
                   />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -528,7 +538,7 @@ const ProjectedPayrollView = () => {
                     avatarIcon='tabler-wallet'
                     avatarColor='success'
                     trend={netDeltaPct != null ? (netDeltaPct >= 0 ? 'negative' : 'positive') : undefined}
-                    trendNumber={netDeltaPct != null ? `${Math.abs(netDeltaPct)}% vs oficial` : undefined}
+                    trendNumber={netDeltaPct != null && compareLabel ? `${Math.abs(netDeltaPct)}% ${compareLabel}` : undefined}
                     subtitle={
                       data.usdEquivalent
                         ? `USD ${formatCurrency(data.usdEquivalent.netUsd, 'USD')}${prorateLabel}`
@@ -538,7 +548,7 @@ const ProjectedPayrollView = () => {
                     }
                     statusLabel={mode === 'actual_to_date' ? 'Corte actual' : 'Cierre proyectado'}
                     statusColor={mode === 'actual_to_date' ? 'info' : 'primary'}
-                    footer={data.official ? `Oficial: ${formatCurrency(Math.round(officialNetClp ?? 0), 'CLP')}` : undefined}
+                    footer={compareSource ? `${data.official ? 'Oficial' : data.previousOfficial?.periodId ?? 'Anterior'}: ${formatCurrency(Math.round(compareNetClp ?? 0), 'CLP')}` : undefined}
                   />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -548,7 +558,7 @@ const ProjectedPayrollView = () => {
                     avatarIcon='tabler-users'
                     avatarColor='primary'
                     subtitle={`Corte: ${data.asOfDate}`}
-                    statusLabel={data.official ? `Oficial: ${data.official.entryCount}` : undefined}
+                    statusLabel={compareSource ? `${data.official ? 'Oficial' : data.previousOfficial?.periodId ?? 'Anterior'}: ${compareSource.entryCount}` : undefined}
                     statusColor='default'
                   />
                 </Grid>
