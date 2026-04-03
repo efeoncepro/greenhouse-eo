@@ -6,6 +6,7 @@
 - La fuente consolidada ahora vive en:
   - `docs/architecture/Greenhouse_ICO_Engine_v1.md` § `A.5.4 Inventario canónico de métricas y señales del ICO Engine`
 - Ese inventario separa explícitamente:
+  - categorías funcionales de métricas ICO
   - señales base que ya vienen calculadas o normalizadas
   - señales derivadas a nivel tarea por `v_tasks_enriched`
   - métricas agregadas canónicas calculadas por `buildMetricSelectSQL()`

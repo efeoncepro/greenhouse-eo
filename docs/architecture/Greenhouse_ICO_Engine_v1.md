@@ -1959,6 +1959,30 @@ Para evitar drift entre arquitectura, registry y SQL runtime, este inventario co
 3. agrega/materializa el engine como métricas canónicas
 4. expone como contexto operativo o scorecard auditable
 
+#### A.5.4.0 Categorías funcionales de métricas ICO
+
+Para diseño de readers, priorización de hardening y lectura de negocio, las métricas de `ICO` deben agruparse en estas categorías funcionales:
+
+| Categoría | Qué cubre | Métricas / señales principales | Pregunta de negocio troncal |
+|---|---|---|---|
+| Calidad de entrega | retrabajo, correcciones y calidad del cierre | `rpa_avg`, `rpa_median`, `ftr_pct`, `rpa_value`, `client_change_round_final`, `workflow_change_round` | ¿Qué tan buena fue la entrega realmente cerrada? |
+| Cumplimiento de promesa | cumplimiento del compromiso del período | `otd_pct`, `on_time_count`, `late_drop_count`, `overdue_count` | ¿Estamos cumpliendo la promesa operativa del período? |
+| Flujo operativo | velocidad de producción y capacidad real de cierre | `throughput_count`, `pipeline_velocity`, `cycle_time_avg_days`, `cycle_time_p50_days`, `cycle_time_variance` | ¿Qué tan rápido y predecible convierte el equipo trabajo en output cerrado? |
+| Carga abierta y deuda | trabajo abierto, compromiso futuro y arrastre histórico | `active_tasks`, `carry_over_count`, `overdue_carried_forward_count`, `total_tasks`, `completed_tasks` | ¿Cuánta carga sigue abierta y cuánta deuda vieja arrastramos? |
+| Riesgo de ejecución | bloqueo o inmovilidad operativa | `stuck_asset_count`, `stuck_asset_pct`, `hours_since_update`, `is_stuck` | ¿Qué parte de la operación está detenida o en riesgo de atasco? |
+| Distribución del pipeline | ubicación del trabajo dentro de la CSC | `csc_distribution`, `fase_csc` | ¿En qué fase del pipeline se está acumulando la carga? |
+| Contexto de auditoría | señales explicativas que ayudan a entender el resultado del KPI | `performance_indicator_code`, `performance_indicator_label`, `delivery_signal`, `completion_label`, `delivery_compliance`, `days_late`, `is_rescheduled`, `period_anchor_date` | ¿Por qué esta tarea o este scorecard cayó en este bucket o resultado? |
+| Confianza de dato | salud del insumo y capacidad real de confiar en la métrica | cobertura de `due_date`, `completed_at`, `rpa_value`, rounds/review fields, `% fase_csc = otros`, `completed_at` en estados no terminales | ¿Esta métrica hoy merece confianza operativa o necesita warning/fallback? |
+
+Regla operativa:
+
+- las tasks de hardening deben priorizar al menos estas 4 categorías:
+  - `Calidad de entrega`
+  - `Cumplimiento de promesa`
+  - `Flujo operativo`
+  - `Confianza de dato`
+- los readers client-facing no deben mezclar categorías sin hacerlo explícito; por ejemplo, `OTD` no reemplaza por sí solo a la categoría `Carga abierta y deuda`
+
 #### A.5.4.1 Señales base que ICO ya recibe calculadas o normalizadas
 
 Estas señales viven en `greenhouse_conformed.delivery_tasks` y llegan al engine sin que `ICO` tenga que inventarlas:

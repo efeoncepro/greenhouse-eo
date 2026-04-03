@@ -14,6 +14,7 @@
 ### Resultado
 
 - `Greenhouse_ICO_Engine_v1.md` ahora tiene un inventario consolidado y explícito de:
+  - categorías funcionales de métricas ICO
   - señales base que ya llegan calculadas/normalizadas
   - derivados por tarea en `v_tasks_enriched`
   - métricas agregadas canónicas del engine
