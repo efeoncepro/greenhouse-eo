@@ -7,6 +7,7 @@ vi.mock('server-only', () => ({}))
 const mockDispatch = vi.fn()
 const mockEnsureNotificationSchema = vi.fn()
 const mockRunGreenhousePostgresQuery = vi.fn()
+const mockGetCanonicalPersonsByMemberIds = vi.fn()
 
 vi.mock('@/lib/notifications/notification-service', () => ({
   buildNotificationRecipientKey: (recipient: {
@@ -32,6 +33,12 @@ vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
 }))
 
+vi.mock('@/lib/identity/canonical-person', () => ({
+  getCanonicalPersonsByMemberIds: (...args: unknown[]) => mockGetCanonicalPersonsByMemberIds(...args),
+  getCanonicalPersonByUserId: vi.fn().mockResolvedValue(null),
+  getCanonicalPersonsByIdentityProfileIds: vi.fn().mockResolvedValue(new Map())
+}))
+
 const { dispatchNotificationWebhook } = await import('./notification-dispatch')
 
 const makeEnvelope = (overrides: Partial<WebhookEnvelope> = {}): WebhookEnvelope => ({
@@ -54,6 +61,7 @@ describe('dispatchNotificationWebhook', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockEnsureNotificationSchema.mockResolvedValue(undefined)
+    mockGetCanonicalPersonsByMemberIds.mockResolvedValue(new Map())
   })
 
   it('returns unmapped when the event type is not supported', async () => {
@@ -70,20 +78,21 @@ describe('dispatchNotificationWebhook', () => {
   })
 
   it('dispatches with metadata for a mapped event', async () => {
-    mockRunGreenhousePostgresQuery
-      .mockResolvedValueOnce([
-        {
-          member_id: 'member-1',
-          identity_profile_id: 'profile-1',
-          display_name: 'User One',
-          primary_email: 'user1@example.com',
-          canonical_email: 'user1@example.com',
-          profile_full_name: 'User One Canonical',
-          user_id: 'user-1',
-          client_user_email: 'user1@example.com',
-          client_user_full_name: 'User One'
-        }
+    mockGetCanonicalPersonsByMemberIds.mockResolvedValueOnce(
+      new Map([
+        ['member-1', {
+          memberId: 'member-1',
+          identityProfileId: 'profile-1',
+          userId: 'user-1',
+          portalEmail: 'user1@example.com',
+          canonicalEmail: 'user1@example.com',
+          memberEmail: 'user1@example.com',
+          portalDisplayName: 'User One',
+          displayName: 'User One Canonical'
+        }]
       ])
+    )
+    mockRunGreenhousePostgresQuery
       .mockResolvedValueOnce([])
 
     mockDispatch.mockResolvedValueOnce({
@@ -118,20 +127,21 @@ describe('dispatchNotificationWebhook', () => {
   })
 
   it('does not redispatch a deduped notification', async () => {
-    mockRunGreenhousePostgresQuery
-      .mockResolvedValueOnce([
-        {
-          member_id: 'member-1',
-          identity_profile_id: 'profile-1',
-          display_name: 'User One',
-          primary_email: 'user1@example.com',
-          canonical_email: 'user1@example.com',
-          profile_full_name: 'User One Canonical',
-          user_id: 'user-1',
-          client_user_email: 'user1@example.com',
-          client_user_full_name: 'User One'
-        }
+    mockGetCanonicalPersonsByMemberIds.mockResolvedValueOnce(
+      new Map([
+        ['member-1', {
+          memberId: 'member-1',
+          identityProfileId: 'profile-1',
+          userId: 'user-1',
+          portalEmail: 'user1@example.com',
+          canonicalEmail: 'user1@example.com',
+          memberEmail: 'user1@example.com',
+          portalDisplayName: 'User One',
+          displayName: 'User One Canonical'
+        }]
       ])
+    )
+    mockRunGreenhousePostgresQuery
       .mockResolvedValueOnce([{ user_id: 'user-1' }])
 
     const result = await dispatchNotificationWebhook(makeEnvelope())
@@ -172,31 +182,41 @@ describe('dispatchNotificationWebhook', () => {
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
-  it('dedupes email-only recipients by external recipient key', async () => {
+  it('dispatches canonical recipients without portal user ids', async () => {
+    mockGetCanonicalPersonsByMemberIds.mockResolvedValueOnce(
+      new Map([
+        ['member-1', {
+          memberId: 'member-1',
+          identityProfileId: 'profile-1',
+          userId: null,
+          portalEmail: null,
+          canonicalEmail: 'member.one@efeonce.org',
+          memberEmail: 'member.one@efeonce.org',
+          portalDisplayName: null,
+          displayName: 'Member One Canonical'
+        }]
+      ])
+    )
     mockRunGreenhousePostgresQuery
       .mockResolvedValueOnce([
-        {
-          member_id: 'member-1',
-          identity_profile_id: 'profile-1',
-          display_name: 'Member One',
-          primary_email: 'member.one@efeonce.org',
-          canonical_email: 'member.one@efeonce.org',
-          profile_full_name: 'Member One Canonical',
-          user_id: null,
-          client_user_email: null,
-          client_user_full_name: null
-        }
+        { user_id: 'person:profile-1' },
+        { user_id: 'member:member-1' },
+        { user_id: 'external:member.one@efeonce.org' }
       ])
-      .mockResolvedValueOnce([{ user_id: 'person:profile-1' }])
+    mockDispatch.mockResolvedValueOnce({
+      sent: [{ userId: 'person:profile-1', channels: ['email'] }],
+      skipped: [],
+      failed: []
+    })
 
     const result = await dispatchNotificationWebhook(makeEnvelope())
 
     expect(result).toMatchObject({
       mapped: true,
       recipientsResolved: 1,
-      deduped: 1,
-      sent: 0
+      deduped: 0,
+      sent: 1
     })
-    expect(mockDispatch).not.toHaveBeenCalled()
+    expect(mockDispatch).toHaveBeenCalledTimes(1)
   })
 })
