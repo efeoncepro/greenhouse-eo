@@ -4,8 +4,10 @@ import type { ProjectionMode } from '@/types/payroll'
 
 import { requireHrTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { resolveExchangeRateToClp, roundCurrency, invertExchangeRate } from '@/lib/finance/shared'
+import { resolveExchangeRateToClp } from '@/lib/finance/shared'
+import { consolidateCurrencyEquivalents } from '@/lib/finance/currency-comparison'
 import { projectPayrollForPeriod } from '@/lib/payroll/project-payroll'
+import { getPreviousOfficialPeriodTotals } from '@/lib/payroll/period-comparison'
 import {
   pgGetLatestProjectedPayrollPromotion
 } from '@/lib/payroll/projected-payroll-promotion-store'
@@ -52,7 +54,7 @@ export async function GET(request: Request) {
     // Fetch projection + official entries in parallel
     const periodId = `${year}-${String(month).padStart(2, '0')}`
 
-    const [result, officialRows, previousOfficialRows, latestPromotion] = await Promise.all([
+    const [result, officialRows, previousOfficial, latestPromotion] = await Promise.all([
       projectPayrollForPeriod({ year, month, mode }),
       runGreenhousePostgresQuery<OfficialEntryRow>(
         `SELECT e.member_id, e.currency, e.gross_total, e.net_total,
@@ -65,21 +67,7 @@ export async function GET(request: Request) {
            AND p.status IN ('calculated', 'approved', 'exported')`,
         [periodId]
       ).catch(() => [] as OfficialEntryRow[]),
-
-      // Previous official period for comparison (latest exported before current)
-      runGreenhousePostgresQuery<OfficialEntryRow & { period_id: string }>(
-        `SELECT e.member_id, e.currency, e.gross_total, e.net_total,
-                e.kpi_otd_percent, e.kpi_rpa_avg, e.kpi_tasks_completed,
-                e.working_days_in_period, e.days_present, e.days_absent, e.days_on_leave,
-                e.chile_uf_value, e.base_salary, p.period_id
-         FROM greenhouse_payroll.payroll_entries e
-         INNER JOIN greenhouse_payroll.payroll_periods p ON p.period_id = e.period_id
-         WHERE p.period_id < $1
-           AND p.status IN ('approved', 'exported')
-         ORDER BY p.period_id DESC`,
-        [periodId]
-      ).catch(() => [] as (OfficialEntryRow & { period_id: string })[]),
-
+      getPreviousOfficialPeriodTotals(periodId),
       isPayrollPostgresEnabled()
         ? pgGetLatestProjectedPayrollPromotion({ year, month, mode }).catch(() => null)
         : Promise.resolve(null)
@@ -132,23 +120,6 @@ export async function GET(request: Request) {
 
     const hasOfficial = officialRows.length > 0
 
-    // Previous official period for trend comparison
-    const prevGrossByCurrency: Record<string, number> = {}
-    const prevNetByCurrency: Record<string, number> = {}
-    let previousPeriodId: string | null = null
-
-    for (const row of previousOfficialRows) {
-      if (!previousPeriodId) previousPeriodId = (row as { period_id?: string }).period_id ?? null
-
-      // Only aggregate the most recent previous period
-      if ((row as { period_id?: string }).period_id !== previousPeriodId) break
-
-      prevGrossByCurrency[row.currency] = (prevGrossByCurrency[row.currency] ?? 0) + Number(row.gross_total)
-      prevNetByCurrency[row.currency] = (prevNetByCurrency[row.currency] ?? 0) + Number(row.net_total)
-    }
-
-    const hasPreviousOfficial = previousPeriodId != null
-
     // Enrich entries with output delta + input variance
     const entriesWithDelta = result.entries.map(entry => {
       const official = officialByMember.get(entry.memberId)
@@ -180,40 +151,25 @@ export async function GET(request: Request) {
     })
 
     // Consolidated currency equivalents via canonical finance helpers
-    let clpEquivalent: { grossClp: number; netClp: number; fxRate: number } | null = null
-    let usdEquivalent: { grossUsd: number; netUsd: number; fxRate: number } | null = null
+    let consolidated: {
+      grossClp: number; netClp: number; grossUsd: number; netUsd: number; fxRate: number
+    } | null = null
 
     const hasUsd = (result.totals.grossByCurrency.USD ?? 0) > 0
-    const hasClp = (result.totals.grossByCurrency.CLP ?? 0) > 0
-    const isMultiCurrency = hasUsd && hasClp
 
     if (hasUsd) {
       try {
         const usdToClp = await resolveExchangeRateToClp({ currency: 'USD' })
-        const clpToUsd = invertExchangeRate({ rate: usdToClp })
 
-        const grossUsd = result.totals.grossByCurrency.USD ?? 0
-        const grossClp = result.totals.grossByCurrency.CLP ?? 0
-        const netUsd = result.totals.netByCurrency.USD ?? 0
-        const netClp = result.totals.netByCurrency.CLP ?? 0
-
-        clpEquivalent = {
-          grossClp: Math.round(grossUsd * usdToClp + grossClp),
-          netClp: Math.round(netUsd * usdToClp + netClp),
-          fxRate: usdToClp
-        }
-
-        if (isMultiCurrency) {
-          usdEquivalent = {
-            grossUsd: roundCurrency(grossUsd + grossClp * clpToUsd),
-            netUsd: roundCurrency(netUsd + netClp * clpToUsd),
-            fxRate: usdToClp
-          }
-        }
+        consolidated = consolidateCurrencyEquivalents(result.totals, usdToClp)
       } catch {
         // FX not available — skip equivalents
       }
     }
+
+    const hasMultiCurrency = hasUsd && (result.totals.grossByCurrency.CLP ?? 0) > 0
+    const clpEquivalent = consolidated ? { grossClp: consolidated.grossClp, netClp: consolidated.netClp, fxRate: consolidated.fxRate } : null
+    const usdEquivalent = consolidated && hasMultiCurrency ? { grossUsd: consolidated.grossUsd, netUsd: consolidated.netUsd, fxRate: consolidated.fxRate } : null
 
     return NextResponse.json(
       {
@@ -228,12 +184,7 @@ export async function GET(request: Request) {
         clpEquivalent,
         usdEquivalent,
         prorationFactor: result.entries.length > 0 ? result.entries[0].prorationFactor : 1,
-        previousOfficial: hasPreviousOfficial ? {
-          periodId: previousPeriodId,
-          grossByCurrency: prevGrossByCurrency,
-          netByCurrency: prevNetByCurrency,
-          entryCount: previousOfficialRows.filter(r => (r as { period_id?: string }).period_id === previousPeriodId).length
-        } : null
+        previousOfficial
       },
       { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } }
     )

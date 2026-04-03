@@ -41,6 +41,7 @@ import CustomTabList from '@core/components/mui/TabList'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
+import { computeCurrencyDelta, formatDeltaLabel, payrollTrendDirection } from '@/lib/finance/currency-comparison'
 import { formatCurrency } from './helpers'
 
 import tableStyles from '@core/styles/table.module.css'
@@ -472,29 +473,17 @@ const ProjectedPayrollView = () => {
         <>
           {(() => {
             // Compute % change vs official for trend indicators
-            const grossClp = data.clpEquivalent?.grossClp
-            const netClp = data.clpEquivalent?.netClp
-
             // Use current-period official, or fallback to previous period for comparison
             const compareSource = data.official ?? data.previousOfficial
-            const compareLabel = data.official ? 'vs oficial' : data.previousOfficial ? `vs ${data.previousOfficial.periodId}` : null
+            const compareLabel = data.official ? 'vs oficial' : data.previousOfficial ? `vs ${data.previousOfficial.periodId}` : ''
 
-            const compareGrossClp = compareSource && data.clpEquivalent
-              ? Object.entries(compareSource.grossByCurrency).reduce((sum, [cur, amt]) =>
-                  sum + (cur === 'USD' ? amt * data.clpEquivalent!.fxRate : amt), 0)
-              : null
-
-            const compareNetClp = compareSource && data.clpEquivalent
-              ? Object.entries(compareSource.netByCurrency).reduce((sum, [cur, amt]) =>
-                  sum + (cur === 'USD' ? amt * data.clpEquivalent!.fxRate : amt), 0)
-              : null
-
-            const grossDeltaPct = grossClp && compareGrossClp && compareGrossClp > 0
-              ? Math.round(((grossClp - compareGrossClp) / compareGrossClp) * 100)
-              : null
-
-            const netDeltaPct = netClp && compareNetClp && compareNetClp > 0
-              ? Math.round(((netClp - compareNetClp) / compareNetClp) * 100)
+            const delta = compareSource && data.clpEquivalent
+              ? computeCurrencyDelta(
+                  { grossClp: data.clpEquivalent.grossClp, netClp: data.clpEquivalent.netClp },
+                  compareSource,
+                  data.clpEquivalent.fxRate,
+                  compareLabel
+                )
               : null
 
             const prorateLabel = data.prorationFactor < 1
@@ -513,8 +502,8 @@ const ProjectedPayrollView = () => {
                     }
                     avatarIcon='tabler-cash'
                     avatarColor='info'
-                    trend={grossDeltaPct != null ? (grossDeltaPct >= 0 ? 'negative' : 'positive') : undefined}
-                    trendNumber={grossDeltaPct != null && compareLabel ? `${Math.abs(grossDeltaPct)}% ${compareLabel}` : undefined}
+                    trend={payrollTrendDirection(delta?.grossDeltaPct)}
+                    trendNumber={formatDeltaLabel(delta?.grossDeltaPct, delta?.compareLabel ?? '')}
                     subtitle={
                       data.usdEquivalent
                         ? `USD ${formatCurrency(data.usdEquivalent.grossUsd, 'USD')}${prorateLabel}`
@@ -524,7 +513,7 @@ const ProjectedPayrollView = () => {
                     }
                     statusLabel={mode === 'actual_to_date' ? 'Corte actual' : 'Cierre proyectado'}
                     statusColor={mode === 'actual_to_date' ? 'info' : 'primary'}
-                    footer={compareSource ? `${data.official ? 'Oficial' : data.previousOfficial?.periodId ?? 'Anterior'}: ${formatCurrency(Math.round(compareGrossClp ?? 0), 'CLP')}` : undefined}
+                    footer={delta?.grossReference ? `${data.official ? 'Oficial' : data.previousOfficial?.periodId ?? 'Anterior'}: ${formatCurrency(delta.grossReference, 'CLP')}` : undefined}
                   />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -537,8 +526,8 @@ const ProjectedPayrollView = () => {
                     }
                     avatarIcon='tabler-wallet'
                     avatarColor='success'
-                    trend={netDeltaPct != null ? (netDeltaPct >= 0 ? 'negative' : 'positive') : undefined}
-                    trendNumber={netDeltaPct != null && compareLabel ? `${Math.abs(netDeltaPct)}% ${compareLabel}` : undefined}
+                    trend={payrollTrendDirection(delta?.netDeltaPct)}
+                    trendNumber={formatDeltaLabel(delta?.netDeltaPct, delta?.compareLabel ?? '')}
                     subtitle={
                       data.usdEquivalent
                         ? `USD ${formatCurrency(data.usdEquivalent.netUsd, 'USD')}${prorateLabel}`
@@ -548,7 +537,7 @@ const ProjectedPayrollView = () => {
                     }
                     statusLabel={mode === 'actual_to_date' ? 'Corte actual' : 'Cierre proyectado'}
                     statusColor={mode === 'actual_to_date' ? 'info' : 'primary'}
-                    footer={compareSource ? `${data.official ? 'Oficial' : data.previousOfficial?.periodId ?? 'Anterior'}: ${formatCurrency(Math.round(compareNetClp ?? 0), 'CLP')}` : undefined}
+                    footer={delta?.netReference ? `${data.official ? 'Oficial' : data.previousOfficial?.periodId ?? 'Anterior'}: ${formatCurrency(delta.netReference, 'CLP')}` : undefined}
                   />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
