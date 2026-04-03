@@ -10,6 +10,66 @@
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
 
+## Delta 2026-04-03 — GreenhouseFunnelCard: componente reutilizable de embudo
+
+**Archivo**: `src/components/greenhouse/GreenhouseFunnelCard.tsx`
+
+Componente de visualización de embudo/funnel para procesos secuenciales con etapas. Usa Recharts `FunnelChart` + `Funnel` (ya instalado, v3.6).
+
+### Props
+
+```typescript
+interface FunnelStage {
+  name: string
+  value: number
+  color?: string                                    // Override de color por etapa
+  status?: 'success' | 'warning' | 'error'          // Semáforo override
+}
+
+interface GreenhouseFunnelCardProps {
+  title: string
+  subtitle?: string
+  avatarIcon?: string                               // Default: 'tabler-filter'
+  avatarColor?: ThemeColor                          // Default: 'primary'
+  data: FunnelStage[]
+  height?: number                                   // Default: 280
+  showConversionBadges?: boolean                    // Default: true
+  showFooterSummary?: boolean                       // Default: true
+  onStageClick?: (stage: FunnelStage, index: number) => void
+}
+```
+
+### Paleta secuencial por defecto (cuando no hay semáforo)
+
+| Posición | Token | Hex | Razón |
+|----------|-------|-----|-------|
+| Etapa 1 (tope) | `primary` | `#7367F0` | Punto de entrada |
+| Etapa 2 | `info` | `#00BAD1` | Calificación |
+| Etapa 3 | `warning` | `#ff6500` | Punto de decisión |
+| Etapa 4 | `error` | `#bb1954` | Punto crítico de conversión |
+| Etapa 5+ (fondo) | `success` | `#6ec207` | Completación |
+
+### Footer inteligente
+
+Auto-genera dos insights:
+1. **Conversión total**: `lastStage.value / firstStage.value × 100`
+2. **Etapa crítica**: la etapa con mayor caída % vs anterior. Si todas ≥ 80% → "Flujo saludable"
+
+### Accesibilidad
+
+- `<figure role="img" aria-label="...">` con `<figcaption class="sr-only">` detallando cada etapa
+- Respeta `prefers-reduced-motion` desactivando animaciones
+- Cada trapezoide tiene 24px mínimo de altura (target de interacción)
+- Labels de texto en cada etapa (no depende solo de color)
+- Si `onStageClick` presente: etapas focusables con `tabIndex={0}` y `role="button"`
+
+### Casos de uso
+
+- Pipeline CSC (Delivery): Briefing → Producción → Revisión → Cambios → Entrega
+- Pipeline CRM: Leads → Calificados → Propuesta → Negociación → Cierre
+- Onboarding: Contacto → Propuesta → Contrato → Setup → Activo
+- Cualquier proceso secuencial con `FunnelStage[]`
+
 ## Delta 2026-04-03 — Helpers canónicos de comparativa + patrones de KPI cards
 
 ### Helpers reutilizables de comparativa
