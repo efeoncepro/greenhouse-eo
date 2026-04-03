@@ -1,5 +1,14 @@
 # TASK-215 - ICO RpA Reliability, Source Policy & Fallbacks
 
+## Delta 2026-04-03
+
+- `TASK-214` ya cerró la base semántica de completitud y buckets sobre la que esta lane debe apoyarse.
+- Supuestos nuevos obligatorios:
+  - `metric-registry.ts`, `read-metrics.ts`, `materialize.ts` y `schema.ts` ya comparten completitud canónica endurecida
+  - `greenhouse_serving.ico_member_metrics` ya incluye `on_time_count`, `late_drop_count`, `overdue_count`, `carry_over_count` y `overdue_carried_forward_count`
+  - `Person 360` ya expone `overdue_carried_forward`
+- Esta task no debe reabrir discusión de completitud; debe enfocarse solo en la policy de `RpA` (`null`, `0`, suppression, fallback, confidence).
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -125,4 +134,3 @@ Reglas obligatorias:
 - `pnpm exec vitest run src/lib/ico-engine/*.test.ts`
 - `pnpm exec eslint src/lib/ico-engine/shared.ts src/lib/ico-engine/read-metrics.ts`
 - validación manual contra BigQuery con meses y spaces problemáticos
-

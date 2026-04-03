@@ -9,7 +9,7 @@ import {
   toTimestampString,
   buildMetricSelectSQL,
   buildPeriodFilterSQL,
-  DONE_STATUSES_SQL,
+  CANONICAL_ACTIVE_CSC_TASK_SQL,
   ICO_DIMENSIONS,
   type IcoDimensionKey
 } from './shared'
@@ -307,10 +307,8 @@ export const computeSpaceMetricsLive = async (
         COUNT(*) AS task_count
       FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\`
       WHERE space_id = @spaceId
-        AND completed_at IS NULL
-        AND task_status NOT IN (${DONE_STATUSES_SQL})
+        AND ${CANONICAL_ACTIVE_CSC_TASK_SQL}
         AND (${buildPeriodFilterSQL()})
-        AND fase_csc != 'otros'
       GROUP BY space_id, fase_csc
       ORDER BY fase_csc
     `, { spaceId, periodYear, periodMonth })
@@ -425,10 +423,8 @@ export const computeMetricsByContext = async (
         COUNT(*) AS task_count
       FROM ${baseTable}
       WHERE ${column} = @dimensionValue
-        AND completed_at IS NULL
-        AND task_status NOT IN (${DONE_STATUSES_SQL})
+        AND ${CANONICAL_ACTIVE_CSC_TASK_SQL}
         AND (${buildPeriodFilterSQL()})
-        AND fase_csc != 'otros'
       GROUP BY space_id, fase_csc
       ORDER BY fase_csc
     `, { dimensionValue, periodYear, periodMonth })
@@ -635,10 +631,8 @@ export const readMemberMetrics = async (
         COUNT(*) AS task_count
       FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\` te
       WHERE te.primary_owner_member_id = @memberId
-        AND completed_at IS NULL
-        AND task_status NOT IN (${DONE_STATUSES_SQL})
+        AND ${CANONICAL_ACTIVE_CSC_TASK_SQL}
         AND (${buildPeriodFilterSQL()})
-        AND fase_csc != 'otros'
       GROUP BY space_id, fase_csc
       ORDER BY fase_csc
     `, { memberId, periodYear, periodMonth })

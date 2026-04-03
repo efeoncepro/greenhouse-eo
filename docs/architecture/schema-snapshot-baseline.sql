@@ -2854,7 +2854,11 @@ CREATE TABLE greenhouse_serving.ico_member_metrics (
     total_tasks integer,
     completed_tasks integer,
     active_tasks integer,
+    on_time_count integer,
+    late_drop_count integer,
+    overdue_count integer,
     carry_over_count integer,
+    overdue_carried_forward_count integer,
     materialized_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -7015,6 +7019,13 @@ CREATE INDEX projected_payroll_promotions_period_idx ON greenhouse_payroll.proje
 --
 
 CREATE INDEX idx_ico_member_period ON greenhouse_serving.ico_member_metrics USING btree (period_year, period_month);
+
+
+--
+-- Name: idx_ico_member_metrics_member_period; Type: INDEX; Schema: greenhouse_serving; Owner: -
+--
+
+CREATE INDEX idx_ico_member_metrics_member_period ON greenhouse_serving.ico_member_metrics USING btree (member_id, period_year DESC, period_month DESC);
 
 
 --

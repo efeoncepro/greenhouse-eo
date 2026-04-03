@@ -1,5 +1,13 @@
 # TASK-217 - Agency KPI Trust Propagation & Serving Semantics
 
+## Delta 2026-04-03
+
+- `TASK-214` ya cerró la semántica base que `Agency` debe consumir:
+  - completitud endurecida y compartida por todos los KPIs troncales del engine
+  - buckets member-level y serving `ico_member_metrics` ya alineados con el contrato canónico
+  - `Person 360` ya expone `overdue_carried_forward`, evitando consumers parciales del contexto de deuda
+- Esta task debe tratar `TASK-214` como dependencia cerrada y enfocarse en propagación de trust metadata + estados UI, no en recalcular fórmulas o buckets.
+
 ## Status
 
 - Lifecycle: `to-do`

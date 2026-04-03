@@ -31,6 +31,7 @@ interface IcoMetricsRow extends Record<string, unknown> {
   late_drop_count: string | number | null
   overdue_count: string | number | null
   carry_over_count: string | number | null
+  overdue_carried_forward_count: string | number | null
 }
 
 interface PeriodRow {
@@ -58,6 +59,7 @@ export interface IcoMetricPeriod {
   lateDropCount: number | null
   overdueCount: number | null
   carryOverCount: number | null
+  overdueCarriedForwardCount: number | null
 }
 
 export interface PersonIcoProfile {
@@ -103,7 +105,8 @@ const mapRow = (row: IcoMetricsRow): IcoMetricPeriod => ({
   onTimeCount: toNum(row.on_time_count),
   lateDropCount: toNum(row.late_drop_count),
   overdueCount: toNum(row.overdue_count),
-  carryOverCount: toNum(row.carry_over_count)
+  carryOverCount: toNum(row.carry_over_count),
+  overdueCarriedForwardCount: toNum(row.overdue_carried_forward_count)
 })
 
 const computeHealth = (m: IcoMetricPeriod): 'green' | 'yellow' | 'red' => {

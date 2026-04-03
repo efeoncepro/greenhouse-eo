@@ -70,7 +70,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ memb
           onTimeTasks: scoped.onTimeCount ?? 0,
           lateDropTasks: scoped.lateDropCount ?? 0,
           overdueTasks: scoped.overdueCount ?? 0,
-          carryOverTasks: scoped.carryOverCount ?? 0
+          carryOverTasks: scoped.carryOverCount ?? 0,
+          overdueCarriedForwardTasks: scoped.overdueCarriedForwardCount ?? 0
         },
         computedAt: null,
         engineVersion: 'v2.0.0-person-intelligence',

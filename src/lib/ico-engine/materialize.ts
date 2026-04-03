@@ -8,7 +8,8 @@ import {
   buildDeliveryPeriodSourceSql,
   buildMetricSelectSQL,
   buildPeriodFilterSQL,
-  DONE_STATUSES_SQL
+  CANONICAL_ACTIVE_CSC_TASK_SQL,
+  CANONICAL_COMPLETED_TASK_SQL
 } from './shared'
 import { ensureIcoEngineInfrastructure, ICO_DATASET, ENGINE_VERSION } from './schema'
 import {
@@ -269,9 +270,7 @@ export const materializeMonthlySnapshots = async (
       COUNT(*) AS task_count
     FROM ${buildDeliveryPeriodSourceSql(projectId)}
     WHERE space_id IS NOT NULL
-      AND completed_at IS NULL
-      AND task_status NOT IN (${DONE_STATUSES_SQL})
-      AND fase_csc != 'otros'
+      AND ${CANONICAL_ACTIVE_CSC_TASK_SQL}
     GROUP BY space_id, fase_csc
     ORDER BY space_id, fase_csc
   `, { periodYear, periodMonth })
@@ -523,7 +522,7 @@ const materializeRpaTrend = async (projectId: string): Promise<number> => {
       CURRENT_TIMESTAMP() AS materialized_at
     FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\`
     WHERE space_id IS NOT NULL
-      AND completed_at IS NOT NULL
+      AND ${CANONICAL_COMPLETED_TASK_SQL}
       AND completed_at >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 365 DAY)
     GROUP BY space_id, period_year, period_month
     HAVING tasks_completed > 0

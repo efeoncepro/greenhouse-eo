@@ -1,5 +1,26 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-03 — TASK-214 closed completion semantics drift and serving member parity
+
+`TASK-214` cerró el drift residual entre helpers, readers, materializaciones y serving member-level:
+
+- `completed_at` solo cuenta como cierre cuando además existe estado terminal canónico:
+  - `Listo`
+  - `Done`
+  - `Finalizado`
+  - `Completado`
+  - `Aprobado`
+- `delivery_signal` ya no debe inferirse desde `completed_at` solo; requiere `completed_at + terminal status + due_date`
+- `overdue`, `carry_over` y `overdue_carried_forward` deben exigir explícitamente semántica de tarea abierta, incluso si el upstream trae `performance_indicator_code`
+- el carril activo de CSC se endurece con la misma regla de tarea abierta para no contaminar distribución de pipeline con filas cerradas
+- `greenhouse_serving.ico_member_metrics` ya no puede quedar como subconjunto silencioso de `metrics_by_member`; debe incluir:
+  - `on_time_count`
+  - `late_drop_count`
+  - `overdue_count`
+  - `carry_over_count`
+  - `overdue_carried_forward_count`
+- `Person 360` y consumers member-level deben leer estos buckets desde el contrato canónico o desde serving alineado, no recalcular reglas locales
+
 ## Delta 2026-04-03 — Carry-Over & Overdue Carried Forward semantic split
 
 `TASK-204` separa semánticamente carry-over de deuda vencida arrastrada en el engine y materialización:

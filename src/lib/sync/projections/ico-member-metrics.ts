@@ -91,9 +91,10 @@ export const icoMemberProjection: ProjectionDefinition = {
           rpa_avg, rpa_median, otd_pct, ftr_pct,
           cycle_time_avg_days, throughput_count, pipeline_velocity,
           stuck_asset_count, stuck_asset_pct,
-          total_tasks, completed_tasks, active_tasks, carry_over_count, overdue_carried_forward_count,
+          total_tasks, completed_tasks, active_tasks,
+          on_time_count, late_drop_count, overdue_count, carry_over_count, overdue_carried_forward_count,
           materialized_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, NOW())
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, NOW())
         ON CONFLICT (member_id, period_year, period_month) DO UPDATE SET
           rpa_avg = EXCLUDED.rpa_avg,
           rpa_median = EXCLUDED.rpa_median,
@@ -107,6 +108,9 @@ export const icoMemberProjection: ProjectionDefinition = {
           total_tasks = EXCLUDED.total_tasks,
           completed_tasks = EXCLUDED.completed_tasks,
           active_tasks = EXCLUDED.active_tasks,
+          on_time_count = EXCLUDED.on_time_count,
+          late_drop_count = EXCLUDED.late_drop_count,
+          overdue_count = EXCLUDED.overdue_count,
           carry_over_count = EXCLUDED.carry_over_count,
           overdue_carried_forward_count = EXCLUDED.overdue_carried_forward_count,
           materialized_at = NOW()`,
@@ -115,8 +119,9 @@ export const icoMemberProjection: ProjectionDefinition = {
           toNum(r.rpa_avg), toNum(r.rpa_median), toNum(r.otd_pct), toNum(r.ftr_pct),
           toNum(r.cycle_time_avg_days), toNum(r.throughput_count), toNum(r.pipeline_velocity),
           toNum(r.stuck_asset_count), toNum(r.stuck_asset_pct),
-          toNum(r.total_tasks), toNum(r.completed_tasks), toNum(r.active_tasks), toNum(r.carry_over_count),
-          toNum(r.overdue_carried_forward_count)
+          toNum(r.total_tasks), toNum(r.completed_tasks), toNum(r.active_tasks),
+          toNum(r.on_time_count), toNum(r.late_drop_count), toNum(r.overdue_count),
+          toNum(r.carry_over_count), toNum(r.overdue_carried_forward_count)
         ]
       )
 
