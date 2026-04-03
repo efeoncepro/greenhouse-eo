@@ -4,6 +4,11 @@
 
 - La investigación de benchmarks externos ya documentada en `docs/architecture/Greenhouse_ICO_Engine_v1.md` § `A.5.5` cambia el contexto de esta task.
 - `Agency` no debe endurecer solo contratos, observabilidad y serving; también debe prepararse para consumir KPIs `ICO` con semántica explícita de benchmark y confianza.
+- Además, `Agency` debe alinearse al marco completo de `docs/architecture/Contrato_Metricas_ICO_v1.md`:
+  - drivers operativos
+  - métricas puente
+  - `Revenue Enabled`
+  - cadencias y tiers
 - Implicación:
   - `OTD` debe tratarse como métrica con benchmark externo fuerte
   - `FTR` debe tratarse como benchmark por análogo (`FPY` / `first-time error-free`)
@@ -13,6 +18,7 @@
   - `benchmark_type = external | analog | internal`
   - `confidence_level = high | medium | low`
   - `quality_gate_status = healthy | degraded | broken`
+- y que no comunique `TTM`, `Iteration Velocity`, `BCS` o `Revenue Enabled` como si ya fueran surfaces maduras mientras no cierren sus lanes dedicadas (`TASK-218` a `TASK-222`).
 
 ## Status
 

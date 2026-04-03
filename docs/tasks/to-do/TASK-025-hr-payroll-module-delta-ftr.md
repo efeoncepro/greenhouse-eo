@@ -1,5 +1,16 @@
 # DELTA — HR Payroll Module v2: Reemplazo de Bono RpA por Bono FTR%
 
+## Delta 2026-04-03 — FTR health benchmark != payroll bonus threshold
+
+- El contrato maestro `docs/architecture/Contrato_Metricas_ICO_v1.md` ya adopta bandas benchmark-informed para `FTR` (`world-class >= 85%`, `strong >= 70%`, etc.).
+- Regla obligatoria si esta lane se reactiva:
+  - no reutilizar automáticamente los thresholds legacy del body (`65%`, `70%`, etc.) como si fueran benchmark canónico de `ICO`
+  - distinguir explícitamente entre:
+    - salud del KPI `FTR` en el contrato de métricas
+    - policy de compensación variable en payroll
+- Implicación:
+  - un umbral de bono futuro puede existir, pero debe decidirse como policy de compensación aparte y no contradecir ni reemplazar la semántica benchmark del contrato.
+
 ## Status
 
 | Campo | Valor |

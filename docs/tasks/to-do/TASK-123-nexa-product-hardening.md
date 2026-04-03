@@ -1,5 +1,13 @@
 # TASK-123 — Nexa Product Hardening: Streaming, Rich Tools, UX Polish
 
+## Delta 2026-04-03 — Rich KPI cards must respect the ICO metric contract
+
+- Los tool results ricos que muestren `OTD`, `FTR`, `RpA` u otras métricas `ICO` deben alinearse a `docs/architecture/Contrato_Metricas_ICO_v1.md`.
+- Regla nueva:
+  - las cards no deben mostrar solo el valor; deben poder incorporar benchmark/trust semantics cuando el payload lo soporte
+  - Nexa no debe presentar como madura ninguna métrica puente o estratégica (`TTM`, `Iteration Velocity`, `Revenue Enabled`) antes de las tasks `TASK-218` a `TASK-221`
+- Esta task mejora la experiencia, pero no redefine el contrato semántico de métricas.
+
 ## Status
 
 - Lifecycle: `to-do`

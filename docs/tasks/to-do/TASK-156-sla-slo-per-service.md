@@ -1,5 +1,16 @@
 # TASK-156 — SLA/SLO Contractual per Service
 
+## Delta 2026-04-03
+
+- Esta lane debe alinearse a `docs/architecture/Contrato_Metricas_ICO_v1.md`, pero sin confundir benchmark operativo con SLA contractual.
+- Regla nueva:
+  - targets contractuales por servicio (`OTD target`, `RPA target`, etc.) son compromisos negociados con cliente, no sinónimos del benchmark canónico del engine
+  - el compliance report debe distinguir entre:
+    - `benchmark/reference health`
+    - `service SLA target`
+    - `metric confidence`
+- Ningún target de SLA debe sobrescribir la semántica canónica de `OTD`, `FTR`, `RpA`, `TTM` o métricas relacionadas.
+
 ## Status
 
 | Campo | Valor |

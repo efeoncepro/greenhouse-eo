@@ -1,5 +1,13 @@
 # TASK-161 — Agency Permissions, Data Retention & Operational Onboarding
 
+## Delta 2026-04-03
+
+- El glosario operativo y los playbooks de esta lane deben alinearse a `docs/architecture/Contrato_Metricas_ICO_v1.md`.
+- Regla nueva:
+  - términos como `OTD`, `FTR`, `RpA`, `TTM`, `Iteration Velocity`, `Revenue Enabled`, `Cycle Time` y `BCS` deben definirse según el contrato maestro, no por microcopy heurística
+  - los playbooks de anomalías no deben recomendar acciones como si una métrica de baja confianza fuera una verdad operativa cerrada
+- Esta task no redefine el significado de métricas `ICO`; solo las traduce a onboarding, permisos y operación diaria.
+
 ## Status
 
 | Campo | Valor |

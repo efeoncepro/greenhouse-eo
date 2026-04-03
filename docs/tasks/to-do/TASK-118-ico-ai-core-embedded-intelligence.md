@@ -1,5 +1,14 @@
 # TASK-118 — ICO AI Core: Embedded Intelligence Layer
 
+## Delta 2026-04-03 — AI layer must follow metric trust foundation and north-star contract
+
+- El body de esta task fue escrito antes de cerrar la ola de trust foundation y antes de alinear el backlog con `docs/architecture/Contrato_Metricas_ICO_v1.md`.
+- Lectura correcta desde hoy:
+  - cualquier señal, predicción o recomendación de IA debe consumir métricas `ICO` ya normalizadas por semántica, benchmark y confianza
+  - los thresholds legacy o stage-specific ejemplos dentro del body no deben asumirse como contrato vigente si contradicen `Contrato_Metricas_ICO_v1.md` o `TASK-216`
+  - `Revenue Enabled`, `TTM`, `Iteration Velocity` y `BCS` no deben tratarse como inputs maduros hasta que cierren `TASK-218` a `TASK-221`
+- Esta lane sigue vigente, pero debe leerse como consumer avanzado del sistema de métricas ya endurecido, no como lugar donde se decide la semántica de los KPIs.
+
 ## Status
 
 - Lifecycle: `to-do`

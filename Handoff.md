@@ -1,5 +1,46 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — Backlog ICO consumers aligned to Contrato_Metricas_ICO_v1
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - tasks `Agency`, `Nexa`, `HR`, `Frame.io`, `AI core`, `SLA`, `Scope`, `Temporal contract` y `Integrations` que consumen o podrían consumir métricas `ICO`
+  - `Handoff.md`
+
+### Resultado
+
+- se dejó delta explícito en las tasks activas o de backlog que podrían contradecir el contrato de métricas si consumen `ICO`
+- patrón aplicado:
+  - no redefinir localmente `OTD`, `FTR`, `RpA`, `TTM`, `Iteration Velocity`, `BCS` o `Revenue Enabled`
+  - distinguir benchmark canónico, policy local y confidence/trust metadata
+  - impedir que consumers usen thresholds legacy como si fueran contrato vigente
+- tasks alineadas en esta pasada:
+  - `TASK-188`
+  - `TASK-110`
+  - `TASK-020`
+  - `TASK-025`
+  - `TASK-029`
+  - `TASK-031`
+  - `TASK-058`
+  - `TASK-118`
+  - `TASK-123`
+  - `TASK-150`
+  - `TASK-151`
+  - `TASK-152`
+  - `TASK-155`
+  - `TASK-156`
+  - `TASK-160`
+  - `TASK-161`
+  - `TASK-190`
+
+### Verificación
+
+- revisión manual de consistencia con:
+  - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+
 ## Sesión 2026-04-03 — Contrato_Metricas_ICO_v1 aligned to benchmark-informed thresholds
 
 ### Rama / alcance

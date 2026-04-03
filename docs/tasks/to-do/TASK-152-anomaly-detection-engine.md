@@ -1,5 +1,13 @@
 # TASK-152 — Anomaly Detection Engine: Rule-Based
 
+## Delta 2026-04-03
+
+- Cualquier regla basada en KPIs `ICO` debe respetar `docs/architecture/Contrato_Metricas_ICO_v1.md` y `TASK-216`.
+- Regla nueva:
+  - una anomalía no debe dispararse solo por cambio de valor bruto si la métrica subyacente está `degraded` o `broken`
+  - reglas sobre `OTD`, `FTR`, `RpA`, `cycle time`, `TTM` u otras métricas deben consumir semántica y confianza canónicas del engine
+- Esta task define detección, no benchmark policy ni fórmulas de KPI.
+
 ## Status
 
 | Campo | Valor |

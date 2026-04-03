@@ -1,5 +1,13 @@
 # TASK-058 — Organization Metrics: Activate BQ Materialization (Scale Path)
 
+## Delta 2026-04-03 — Organization materialization must inherit the ICO metric contract
+
+- Si esta lane se activa, la materialización por organización debe respetar `docs/architecture/Contrato_Metricas_ICO_v1.md` y el trust model de `ICO`.
+- Regla nueva:
+  - no basta con agregar valores brutos por organización; la materialización debe preservar semántica canónica, temporalidad correcta y metadata de confianza cuando corresponda
+  - métricas puente o estratégicas como `TTM`, `Iteration Velocity` o `Revenue Enabled` no deben inferirse por organización hasta que sus lanes dedicadas estén cerradas
+- Esta task queda limitada a serving/materiazación de métricas maduras del engine, no a inventar un score ejecutivo paralelo.
+
 ## Estado
 
 Pendiente. No urgente — on-read compute funciona para el volumen actual (2 orgs, 2-3 spaces).

@@ -1,5 +1,13 @@
 # CODEX TASK — HRIS Fase 2B: Goals y OKRs
 
+## Delta 2026-04-03 — Metric-linked goals must follow the ICO contract
+
+- Si esta lane usa métricas `ICO` como contexto o ejemplo de goal, debe alinearse a `docs/architecture/Contrato_Metricas_ICO_v1.md`.
+- Regla nueva:
+  - los ejemplos de objetivos basados en `RpA`, `FTR`, `OTD`, `throughput` o métricas afines no deben leerse como thresholds canónicos de salud si contradicen el contrato actualizado
+  - goals estratégicos pueden usar targets propios, pero deben distinguirse de benchmark/trust del engine
+  - no auto-derivar goals desde métricas `ICO` inmaduras sin respetar `confidence_level` y `quality_gate_status`
+
 ## Delta 2026-04-01 — TASK-026 ya resuelta
 
 - Esta lane ya no depende de una migración futura de contratos: `greenhouse_core.members` expone `contract_type`, `pay_regime`, `payroll_via` y `deel_contract_id` como canon vigente.

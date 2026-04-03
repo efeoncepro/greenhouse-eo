@@ -1,5 +1,13 @@
 # CODEX TASK -- Frame.io Analytics Pipeline v2: enrichment canonico de delivery e ICO sobre source sync existente
 
+## Delta 2026-04-03
+
+- Esta lane debe alinearse explícitamente a `docs/architecture/Contrato_Metricas_ICO_v1.md`.
+- Regla nueva:
+  - Frame.io puede enriquecer evidencia y granularidad para `RpA`, `FTR`, `Cycle Time`, `Cycle Time Variance` e incluso futuros contratos de `Iteration Velocity`
+  - pero no debe redefinir localmente las fórmulas canónicas del engine ni crear thresholds alternativos
+- Cualquier señal nueva de versiones, comments o review activity debe entrar como insumo auditable para `ICO`, sujeto a source policy, trust model y benchmark semantics institucionales.
+
 ## Estado
 
 Baseline canonica de implementacion al 2026-03-19.

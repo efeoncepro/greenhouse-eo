@@ -1,5 +1,13 @@
 # CODEX TASK — HRIS Fase 3: Evaluaciones de Desempeño 360°
 
+## Delta 2026-04-03 — Evaluation consumers must respect ICO contract and trust
+
+- Este módulo debe leer métricas `ICO` alineadas a `docs/architecture/Contrato_Metricas_ICO_v1.md`.
+- Regla nueva:
+  - evaluaciones no deben tratar cualquier valor bruto de `OTD`, `FTR`, `RpA`, `cycle time` o `throughput` como señal equivalente si el engine lo marca con baja confianza
+  - benchmarks de salud del contrato y targets de evaluación de desempeño no son sinónimos; si RR.HH. define umbrales propios, deben declararse como policy de performance, no como contrato canónico del engine
+- Los ejemplos o resúmenes futuros deben diferenciar métricas operativas confiables, métricas en observación y objetivos de desarrollo individual.
+
 ## Delta 2026-04-01 — TASK-026 ya resuelta
 
 - La elegibilidad por contrato ya debe evaluarse sobre `greenhouse_core.members.contract_type` y `greenhouse_core.members.payroll_via`.

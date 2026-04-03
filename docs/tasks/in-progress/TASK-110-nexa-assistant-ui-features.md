@@ -1,5 +1,13 @@
 # TASK-110 — Nexa: assistant-ui Feature Adoption
 
+## Delta 2026-04-03 — Nexa must not expose ICO metrics without trust semantics
+
+- Cualquier tool o renderer que exponga KPIs `ICO` en Nexa debe alinearse a `docs/architecture/Contrato_Metricas_ICO_v1.md` y al trust model de `TASK-216`.
+- Regla operativa:
+  - Nexa puede mostrar `OTD`, `FTR`, `RpA` y métricas afines solo si el payload incluye semántica canónica y metadata de confianza
+  - Nexa no debe presentar `Revenue Enabled`, `TTM`, `Iteration Velocity` o `BCS` como si ya fueran métricas maduras del runtime mientras no cierren `TASK-218` a `TASK-221`
+- Los tool cards y textos de assistant no deben inventar thresholds legacy ni omitir `benchmark_type` / `confidence_level` cuando aplique.
+
 ## Delta 2026-03-28 — Lane B UI polish (Slice 1)
 
 - `NexaThread.tsx` reescrito con primitivos assistant-ui reales:

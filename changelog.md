@@ -2,6 +2,14 @@
 
 ## 2026-04-03
 
+- **Backlog ICO consumers aligned to the metric contract**:
+  - se actualizaron tasks de `Agency`, `Nexa`, `HR`, `Frame.io`, `AI core`, `SLA`, `Scope`, `Temporal contract` e `Integrations` para que no contradigan `docs/architecture/Contrato_Metricas_ICO_v1.md`
+  - las tasks afectadas ahora dejan explícito que no deben:
+    - redefinir localmente métricas `ICO`
+    - reutilizar thresholds legacy como si fueran contrato vigente
+    - exponer `Revenue Enabled`, `TTM`, `Iteration Velocity` o métricas afines como maduras si todavía dependen de lanes abiertas
+  - esto reduce el riesgo de que el backlog vuelva a introducir semánticas paralelas para `OTD`, `FTR`, `RpA` y consumers futuros
+
 - **Contrato de métricas ICO alineado a thresholds benchmark-informed**:
   - `docs/architecture/Contrato_Metricas_ICO_v1.md` ya no usa la tabla legacy de tres bandas para `OTD`, `FTR` y `RpA`
   - el contrato ahora adopta explícitamente las bandas benchmark-informed documentadas en `Greenhouse_ICO_Engine_v1.md`
