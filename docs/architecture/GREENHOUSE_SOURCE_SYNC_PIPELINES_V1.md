@@ -1,5 +1,42 @@
 # Greenhouse Source Sync Pipelines V1
 
+## Delta 2026-04-03 — TASK-209 Notion sync orchestration closure
+
+Greenhouse ya tiene un control plane explícito para cerrar la recurrencia `raw -> conformed` del pipeline de Delivery sobre Notion.
+
+Contrato operativo vigente:
+
+- `GET /api/cron/sync-conformed` deja de ser un intento aislado y pasa a registrar explícitamente `waiting_for_raw` cuando el upstream todavía no está listo
+- existe un carril de recuperación `GET /api/cron/sync-conformed-recovery` agendado cada `30` minutos para reintentar dentro de la ventana operativa sin depender de reruns manuales
+- el storage canónico del cierre de orquestación vive en:
+  - `greenhouse_sync.notion_sync_orchestration_runs`
+- los estados tipados del control plane son:
+  - `waiting_for_raw`
+  - `retry_scheduled`
+  - `retry_running`
+  - `sync_completed`
+  - `sync_failed`
+  - `cancelled`
+- el writer canónico sigue siendo único:
+  - `src/lib/sync/sync-notion-conformed.ts`
+- la orquestación se apoya en la freshness gate existente y no calcula métricas inline
+- las surfaces admin ya exponen esta señal junto al monitor de data quality en:
+  - `/admin/integrations`
+  - `TenantNotionPanel`
+
+Scheduling operativo actualizado:
+
+- upstream raw (`../notion-bigquery`) mantiene su scheduler diario a `03:00 America/Santiago`
+- `GET /api/cron/sync-conformed` corre a `20 6 * * *`
+- `GET /api/cron/sync-conformed-recovery` corre cada `30` minutos
+- `GET /api/cron/notion-delivery-data-quality` queda después de esa ventana para reducir falsos `broken/degraded` por simple desfase temporal
+
+Implicación arquitectónica:
+
+- `greenhouse-eo` sigue sin tener callback determinístico desde `../notion-bigquery`
+- por eso el cierre de recurrencia se resuelve localmente con polling de frescura + retry auditado por `space_id`
+- la salud del pipeline ya no depende de recordar un rerun manual; el estado pendiente queda visible y recuperable dentro del operating model normal
+
 ## Delta 2026-04-03 — TASK-208 recurrent data quality monitor for Notion delivery
 
 El tramo endurecido `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks` ya tiene monitoreo recurrente persistido.

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { getNotionDeliveryDataQualityOverview } from '@/lib/integrations/notion-delivery-data-quality'
+import { getNotionSyncOrchestrationOverview } from '@/lib/integrations/notion-sync-orchestration'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -36,10 +37,15 @@ export async function GET(
 
   const { searchParams } = new URL(request.url)
   const limit = parsePositiveInteger(searchParams.get('limit'), 20)
-  const overview = await getNotionDeliveryDataQualityOverview({ limit })
+
+  const [overview, orchestrationOverview] = await Promise.all([
+    getNotionDeliveryDataQualityOverview({ limit }),
+    getNotionSyncOrchestrationOverview({ limit })
+  ])
 
   return NextResponse.json({
     integrationKey,
-    overview
+    overview,
+    orchestrationOverview
   })
 }

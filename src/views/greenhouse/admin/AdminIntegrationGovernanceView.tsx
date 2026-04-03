@@ -26,12 +26,17 @@ import type {
   IntegrationDataQualityRunResult,
   IntegrationDataQualityStatus
 } from '@/types/integration-data-quality'
+import type {
+  NotionSyncOrchestrationOverview,
+  NotionSyncOrchestrationStatus
+} from '@/types/notion-sync-orchestration'
 import type { IntegrationHealth, IntegrationReadiness, IntegrationType, IntegrationWithHealth } from '@/types/integrations'
 import AdminOpsActionButton from './AdminOpsActionButton'
 
 type Props = {
   integrations: IntegrationWithHealth[]
   notionDataQualityOverview: IntegrationDataQualityOverview | null
+  notionOrchestrationOverview: NotionSyncOrchestrationOverview | null
 }
 
 const typeLabel: Record<IntegrationType, string> = {
@@ -99,6 +104,17 @@ const dataQualityColor = (
   return 'secondary'
 }
 
+const orchestrationColor = (
+  status: NotionSyncOrchestrationStatus | 'unknown'
+): 'success' | 'warning' | 'error' | 'secondary' | 'info' => {
+  if (status === 'sync_completed') return 'success'
+  if (status === 'waiting_for_raw' || status === 'retry_scheduled') return 'warning'
+  if (status === 'retry_running') return 'info'
+  if (status === 'sync_failed' || status === 'cancelled') return 'error'
+
+  return 'secondary'
+}
+
 const toNumber = (value: unknown) => {
   if (typeof value === 'number') return Number.isFinite(value) ? value : 0
 
@@ -138,7 +154,11 @@ const getTopFindings = (runs: IntegrationDataQualityRunResult[]) => {
     .slice(0, 4)
 }
 
-const AdminIntegrationGovernanceView = ({ integrations, notionDataQualityOverview }: Props) => {
+const AdminIntegrationGovernanceView = ({
+  integrations,
+  notionDataQualityOverview,
+  notionOrchestrationOverview
+}: Props) => {
   const activeCount = integrations.filter(i => i.active).length
   const readyCount = integrations.filter(i => i.readinessStatus === 'ready' && !i.pausedAt).length
   const pausedCount = integrations.filter(i => i.pausedAt).length
@@ -148,6 +168,8 @@ const AdminIntegrationGovernanceView = ({ integrations, notionDataQualityOvervie
   const notionStatusTotals = notionDataQualityOverview?.totals ?? null
   const notionRecentRuns = notionDataQualityOverview?.recentRuns ?? []
   const notionTopFindings = getTopFindings(notionRecentRuns)
+  const notionOrchestrationTotals = notionOrchestrationOverview?.totals ?? null
+  const notionOrchestrationLatest = notionOrchestrationOverview?.latestBySpace ?? []
 
   return (
     <Stack spacing={6}>
@@ -387,6 +409,129 @@ const AdminIntegrationGovernanceView = ({ integrations, notionDataQualityOvervie
             </TableBody>
           </Table>
         </TableContainer>
+      </ExecutiveCardShell>
+
+      <ExecutiveCardShell
+        title='Notion Sync Orchestration'
+        subtitle='Cierre operativo del tramo raw -> conformed. Muestra qué spaces siguen esperando raw, cuáles están en retry y dónde conviene intervenir antes de declarar el pipeline sano.'
+      >
+        {!notionOrchestrationTotals ? (
+          <Alert severity='info' variant='outlined'>
+            La orquestación todavía no tiene evidencia persistida. El primer bloqueo por frescura o el primer retry materializarán esta vista.
+          </Alert>
+        ) : (
+          <Stack spacing={3}>
+            <Box
+              sx={{
+                display: 'grid',
+                gap: 3,
+                gridTemplateColumns: { xs: '1fr', md: 'repeat(4, minmax(0, 1fr))' }
+              }}
+            >
+              <ExecutiveMiniStatCard
+                eyebrow='Open'
+                tone={notionOrchestrationTotals.openSpaces > 0 ? 'warning' : 'success'}
+                title='Spaces abiertos'
+                value={String(notionOrchestrationTotals.openSpaces)}
+                detail='Spaces que todavía no convergen al writer canónico.'
+                icon='tabler-loader-2'
+              />
+              <ExecutiveMiniStatCard
+                eyebrow='Waiting Raw'
+                tone={notionOrchestrationTotals.waitingForRaw > 0 ? 'warning' : 'success'}
+                title='Esperando raw'
+                value={String(notionOrchestrationTotals.waitingForRaw)}
+                detail='Spaces bloqueados por frescura upstream en Notion/BigQuery.'
+                icon='tabler-hourglass'
+              />
+              <ExecutiveMiniStatCard
+                eyebrow='Retry'
+                tone={
+                  notionOrchestrationTotals.retryScheduled + notionOrchestrationTotals.retryRunning > 0
+                    ? 'warning'
+                    : 'success'
+                }
+                title='Reintentos activos'
+                value={String(notionOrchestrationTotals.retryScheduled + notionOrchestrationTotals.retryRunning)}
+                detail='Retries ya planificados o ejecutándose dentro de la ventana diaria.'
+                icon='tabler-refresh'
+              />
+              <ExecutiveMiniStatCard
+                eyebrow='Failed'
+                tone={notionOrchestrationTotals.syncFailed > 0 ? 'error' : 'success'}
+                title='Fallidos'
+                value={String(notionOrchestrationTotals.syncFailed)}
+                detail='Spaces que agotaron la ventana de retry o cerraron en error.'
+                icon='tabler-alert-octagon'
+              />
+            </Box>
+
+            {(notionOrchestrationTotals.syncFailed > 0 || notionOrchestrationTotals.unknownSpaces > 0) && (
+              <Alert severity={notionOrchestrationTotals.syncFailed > 0 ? 'error' : 'warning'} variant='outlined'>
+                {notionOrchestrationTotals.syncFailed > 0
+                  ? 'Hay spaces que no convergieron dentro del presupuesto de retry. Revisa razón y próxima intervención antes de confiar en downstream.'
+                  : 'Hay spaces activos sin evidencia de orquestación todavía. Eso suele indicar que el día aún no abrió corrida o que el control plane no ha materializado señal.'}
+              </Alert>
+            )}
+
+            <TableContainer>
+              <Table size='small'>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Space</TableCell>
+                    <TableCell>Estado</TableCell>
+                    <TableCell align='right'>Retry</TableCell>
+                    <TableCell>Próxima ventana</TableCell>
+                    <TableCell>Última señal</TableCell>
+                    <TableCell>Razón</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {notionOrchestrationLatest.map(space => (
+                    <TableRow key={space.spaceId} hover>
+                      <TableCell>
+                        <Stack spacing={0.25}>
+                          <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                            {space.spaceName ?? space.spaceId}
+                          </Typography>
+                          <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
+                            {space.spaceId}
+                          </Typography>
+                        </Stack>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          size='small'
+                          variant='tonal'
+                          color={orchestrationColor(space.orchestrationStatus)}
+                          label={space.orchestrationStatus}
+                        />
+                      </TableCell>
+                      <TableCell align='right'>
+                        <Typography variant='body2'>{space.retryAttempt}</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant='caption' color='text.secondary'>
+                          {formatDateTime(space.nextRetryAt)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant='caption' color='text.secondary'>
+                          {formatDateTime(space.updatedAt)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant='caption' color='text.secondary'>
+                          {space.waitingReason ?? 'Sin observaciones'}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Stack>
+        )}
       </ExecutiveCardShell>
 
       <ExecutiveCardShell

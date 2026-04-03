@@ -485,9 +485,12 @@ export const writeSyncConformedRunRecord = async ({
 
 // ─── Main Sync Function ─────────────────────────────────────────────────────
 
-export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
+export const syncNotionToConformed = async (input?: {
+  rawFreshness?: NotionRawFreshnessGateResult
+  syncRunId?: string
+}): Promise<SyncConformedResult> => {
   const start = Date.now()
-  const syncRunId = `sync-cron-${randomUUID()}`
+  const syncRunId = input?.syncRunId ?? `sync-cron-${randomUUID()}`
   const projectId = getBigQueryProjectId()
   const nowIso = new Date().toISOString()
   const { year: auditYear, month: auditMonth } = currentUtcPeriod()
@@ -499,7 +502,7 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
   })
 
   try {
-    const rawFreshness = await getNotionRawFreshnessGate()
+    const rawFreshness = input?.rawFreshness ?? await getNotionRawFreshnessGate()
 
     if (!rawFreshness.ready) {
       await writeSyncConformedRunRecord({

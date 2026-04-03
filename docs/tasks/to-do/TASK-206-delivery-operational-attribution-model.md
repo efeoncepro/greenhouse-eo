@@ -1,5 +1,10 @@
 # TASK-206 - Delivery Operational Attribution Model
 
+## Delta 2026-04-03
+
+- `TASK-209` ya quedó cerrada con orquestación explícita y retry auditado para el pipeline `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`
+- la atribución operativa ya puede diseñarse sobre una base de sincronización más estable, sin asumir reruns manuales del writer canónico
+
 ## Status
 
 - Lifecycle: `to-do`

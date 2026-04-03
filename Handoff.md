@@ -1,5 +1,48 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — TASK-209 cerrada con orquestación explícita raw -> conformed para Notion Delivery
+
+### Rama / alcance
+
+- rama actual: `feature/codex-task-209-sync-orchestration`
+- task cerrada: `TASK-209`
+- scope implementado:
+  - `migrations/20260403124323269_notion-sync-orchestration-retry-control-plane.sql`
+  - `src/lib/integrations/notion-sync-orchestration.ts`
+  - `src/lib/integrations/notion-sync-orchestration.test.ts`
+  - `src/types/notion-sync-orchestration.ts`
+  - `src/app/api/cron/sync-conformed/route.ts`
+  - `src/app/api/cron/sync-conformed-recovery/route.ts`
+  - `src/app/api/admin/integrations/[integrationKey]/data-quality/route.ts`
+  - `src/app/api/admin/tenants/[id]/notion-data-quality/route.ts`
+  - `src/app/(dashboard)/admin/integrations/page.tsx`
+  - `src/views/greenhouse/admin/AdminIntegrationGovernanceView.tsx`
+  - `src/views/greenhouse/admin/tenants/TenantNotionPanel.tsx`
+  - `src/types/db.d.ts`
+  - `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
+  - lifecycle/documentación de `TASK-209`
+
+### Resultado
+
+- Greenhouse ya no depende de reruns manuales de `sync-conformed` para cerrar el drift operativo observado entre `notion_ops` y `greenhouse_conformed.delivery_tasks`
+- el control plane nuevo persiste evidencia por `space_id` en `greenhouse_sync.notion_sync_orchestration_runs`
+- `/api/cron/sync-conformed` deja evidencia `waiting_for_raw` cuando el upstream todavía no está fresco
+- `/api/cron/sync-conformed-recovery` reintenta automáticamente dentro de la ventana diaria
+- admin global y tenant detail ya distinguen `waiting_for_raw`, `retry_scheduled`, `retry_running`, `sync_completed` y `sync_failed`
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/integrations/notion-sync-orchestration.test.ts`
+- `pnpm lint`
+- `pnpm build`
+- `pnpm migrate:up`
+- `rg -n "new Pool\\(" src scripts`
+
+### Nota operativa
+
+- el upstream `../notion-bigquery` sigue sin callback determinístico hacia `greenhouse-eo`; esta lane cierra la recurrencia localmente con polling de frescura + retry auditado
+- si se busca chaining determinístico cross-repo, el follow-on debe tocar `../notion-bigquery`
+
 ## Sesión 2026-04-03 — Nueva lane TASK-209 para prevenir recurrencia del drift Notion raw -> conformed
 
 ### Rama / alcance
