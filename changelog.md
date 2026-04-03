@@ -2,11 +2,12 @@
 
 ## 2026-04-03
 
-- **Agency Delivery latest closed-month KPI fix**:
-  - `Agency > Delivery` ya no usa el snapshot del mes abierto más reciente para `OTD` / `RpA`
-  - los readers `/api/agency/pulse` y `/api/agency/spaces` ahora limitan `ico_engine.metric_snapshots_monthly` al último período mensual cerrado disponible
-  - esto corrige el caso visible donde `Sky Airline` aparecía con `OTD 9.5%` y `RpA null` en abril 2026 por leer un snapshot parcial/inestable del mes abierto
-  - la cobertura de `agency-queries.test.ts` ahora valida explícitamente el filtro `latestClosedPeriodKey`
+- **Agency Delivery current-month live KPI correction**:
+  - `Agency > Delivery` vuelve a leer `OTD` / `RpA` del mes en curso, no del último período cerrado
+  - los readers `/api/agency/pulse` y `/api/agency/spaces` ya no dependen de `ico_engine.metric_snapshots_monthly` para esos KPIs
+  - ahora calculan live contra `ico_engine.v_tasks_enriched` con el filtro canónico del período actual en `America/Santiago`
+  - esto preserva la semántica operativa de la vista (`mes en curso`) sin heredar snapshots mensuales abiertos e inestables
+  - la cobertura de `agency-queries.test.ts` ahora fija explícitamente `periodYear` / `periodMonth` como contrato temporal
 
 - **Deel contractors KPI bonus hotfix**:
   - `Payroll` y `Projected Payroll` ya no fuerzan `bonusOtdAmount` y `bonusRpaAmount` a `0` para `payroll_via = 'deel'`

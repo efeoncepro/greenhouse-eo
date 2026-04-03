@@ -42,6 +42,30 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.1
+
+**Canal:** Beta
+**Fecha:** 2026-04-03
+**Disponible para:** internal
+**Módulos:** Agencia / Delivery
+
+### Novedades
+
+- No aplica como capacidad nueva.
+
+### Mejoras
+
+- `Agency > Delivery` vuelve a mostrar `OTD` y `RpA` del mes en curso con cálculo live real del `ICO Engine`, en vez de depender de snapshots mensuales parciales o de cerrar la vista al último mes disponible.
+
+### Correcciones
+
+- Se corrigió un desvío visible donde algunos Spaces podían aparecer con `OTD` irrealmente bajo al leer un snapshot abierto del mes actual.
+- La vista mantiene la semántica operativa de `mes en curso`, pero ahora con métricas reales recalculadas desde la base enriquecida de Delivery.
+
+### Notas
+
+- Si un `RpA` del mes actual sigue sin mostrarse para un Space específico, eso ya responde al dato real disponible en el período en curso y no a una lectura incorrecta del snapshot mensual.
+
 ## 2026.03-beta.3
 
 **Canal:** Beta

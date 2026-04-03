@@ -1,6 +1,23 @@
 # project_context.md
 
+## Delta 2026-04-03 Agency Delivery current-month KPIs now read live ICO data
+
+- `Agency > Delivery` volvió a leer el mes en curso para `OTD` / `RpA`, pero ya no desde snapshots mensuales parciales.
+- Regla vigente:
+  - los KPIs de esa vista (`RPA promedio`, `OTD`, tabla por Space) se calculan live contra `ico_engine.v_tasks_enriched`
+  - el período efectivo sigue siendo el mes calendario actual en timezone `America/Santiago`
+  - el cálculo live reutiliza el filtro canónico `buildPeriodFilterSQL()` y las fórmulas canónicas de `ICO Engine`
+  - los contadores operativos como proyectos, feedback y stuck assets siguen saliendo del estado actual
+- Motivación:
+  - el hotfix previo hacia `último mes cerrado` corregía números absurdos del snapshot abierto, pero cambiaba la semántica temporal visible de la surface
+  - la decisión correcta para esta vista es `mes en curso + datos reales`, no `mes cerrado`
+- Nota operativa:
+  - esto deja explícito que `Agency > Delivery` consume live compute del mes actual
+  - el carril `metric_snapshots_monthly` sigue siendo válido para surfaces mensuales cerradas y reportes históricos, no para este overview operativo
+
 ## Delta 2026-04-03 Agency Delivery now reads latest closed monthly ICO snapshot
+
+> Superseded el mismo día por el delta `Agency Delivery current-month KPIs now read live ICO data`.
 
 - `Agency > Delivery` ya no debe leer el mes abierto más reciente de `ico_engine.metric_snapshots_monthly` para `OTD` / `RpA`.
 - Regla vigente:

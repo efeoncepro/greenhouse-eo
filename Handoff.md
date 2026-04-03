@@ -1,6 +1,47 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — Agency Delivery vuelve a mes en curso con cálculo live real
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `src/lib/agency/agency-queries.ts`
+  - `src/lib/agency/agency-queries.test.ts`
+  - `project_context.md`
+  - `Handoff.md`
+  - `changelog.md`
+  - `docs/changelog/CLIENT_CHANGELOG.md`
+
+### Resultado
+
+- `Agency > Delivery` ya no queda anclado al último mes cerrado
+- `RPA promedio`, `OTD` y la tabla por Space vuelven a usar el mes calendario en curso (`America/Santiago`)
+- la lectura ahora sale de live compute sobre `ico_engine.v_tasks_enriched`, reutilizando:
+  - `buildMetricSelectSQL()`
+  - `buildPeriodFilterSQL()`
+- esto corrige el drift introducido por el hotfix anterior:
+  - el snapshot abierto podía mostrar números absurdos
+  - pero el cambio a `mes cerrado` rompía la semántica esperada por negocio para la vista operativa
+
+### Evidencia
+
+- para `Sky Airline`, abril 2026 en snapshot mensual abierto mostraba `otd_pct = 9.5` y `rpa_avg = null`
+- contrastado contra live compute del mismo mes sobre `v_tasks_enriched`, `Sky Airline` devuelve:
+  - `otd_pct = 100.0`
+  - `rpa_avg = null`
+- esto confirma que el `9.5%` era un artefacto del snapshot mensual parcial y no del dato real del mes en curso
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/agency/agency-queries.test.ts`
+- `pnpm exec eslint src/lib/agency/agency-queries.ts src/lib/agency/agency-queries.test.ts`
+- validación manual BigQuery con `bq query --use_legacy_sql=false` sobre abril 2026:
+  - `Sky Airline` → `otd_pct = 100.0`, `rpa_avg = null`
+
 ## Sesión 2026-04-03 — Agency Delivery KPI reader pinned to latest closed month
+
+> Superseded el mismo día por la sesión `Agency Delivery vuelve a mes en curso con cálculo live real`.
 
 ### Rama / alcance
 
