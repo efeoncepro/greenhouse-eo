@@ -80,11 +80,13 @@ export const toTimestampString = (value: { value?: string } | string | null): st
 export const ICO_DIMENSIONS = {
   space:         { column: 'space_id' },
   project:       { column: 'project_source_id' },
-  member:        { column: 'assignee_member_id' },
+  member:        { column: 'primary_owner_member_id' },
   client:        { column: 'client_id' },
   sprint:        { column: 'sprint_source_id' },
   business_unit: { column: 'operating_business_unit' }
 } as const
+
+export const OWNER_ATTRIBUTION_POLICY = 'primary_owner_first_assignee'
 
 export type IcoDimensionKey = keyof typeof ICO_DIMENSIONS
 

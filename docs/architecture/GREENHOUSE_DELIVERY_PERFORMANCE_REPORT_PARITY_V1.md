@@ -1,5 +1,25 @@
 # Greenhouse Delivery Performance Report Parity V1
 
+## Delta 2026-04-02 — Owner attribution contract moves to primary-owner credit
+
+`TASK-199` fija que la atribución canónica del `Performance Report` ya no debe seguir acreditando member-level metrics a todos los assignees resueltos.
+
+Regla vigente:
+
+- el owner principal del reporte es el primer assignee de Notion preservado por Greenhouse
+- en runtime eso queda expresado por `assignee_source_id` / `assignee_member_id`
+- `assignee_member_ids` se conserva para trazabilidad y contexto operativo, no para co-crédito en `ICO` member-level
+- si el owner principal no resuelve a `member` sino a `client_user` o contacto externo, la tarea sigue contando para métricas de `space` / `agency`, pero no acredita a un miembro interno
+- `Sin asignar` queda fuera de member attribution y debe tratarse explícitamente como borde del contrato
+
+Consecuencia:
+
+- `metrics_by_member`
+- `Person ICO`
+- `Top Performer`
+
+deben alinearse a `primary owner credit`, mientras `Project Detail`, `Reviews Queue` y readers operativos pueden seguir usando el responsable singular ya preservado por el sync.
+
 ## Delta 2026-04-02 — Audit of calculated properties in `Efeonce`
 
 Baseline auditado vía Notion MCP sobre `Efeonce`:

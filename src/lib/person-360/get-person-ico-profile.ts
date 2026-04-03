@@ -140,9 +140,8 @@ const readScopedPeriods = async (memberId: string, clientIds: string[], limit: n
     `SELECT
        EXTRACT(YEAR FROM COALESCE(period_anchor_date, due_date, DATE(created_at), DATE(synced_at))) AS period_year,
        EXTRACT(MONTH FROM COALESCE(period_anchor_date, due_date, DATE(created_at), DATE(synced_at))) AS period_month
-     FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\` te,
-          UNNEST(te.assignee_member_ids) AS assignee_member_id
-     WHERE assignee_member_id = @memberId
+     FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\` te
+     WHERE te.primary_owner_member_id = @memberId
        AND client_id IN UNNEST(@clientIds)
        AND COALESCE(period_anchor_date, due_date, DATE(created_at), DATE(synced_at)) IS NOT NULL
      GROUP BY period_year, period_month
@@ -166,9 +165,8 @@ const readScopedSnapshot = async (
        @periodYear AS period_year,
        @periodMonth AS period_month,
        ${buildMetricSelectSQL()}
-     FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\` te,
-          UNNEST(te.assignee_member_ids) AS assignee_member_id
-     WHERE assignee_member_id = @memberId
+     FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\` te
+     WHERE te.primary_owner_member_id = @memberId
        AND client_id IN UNNEST(@clientIds)
        AND (${buildPeriodFilterSQL()})
      GROUP BY member_id, period_year, period_month`,

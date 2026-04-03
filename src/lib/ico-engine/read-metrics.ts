@@ -400,22 +400,13 @@ export const computeMetricsByContext = async (
   const column = dimConfig.column
   const baseTable = `\`${projectId}.${ICO_DATASET}.v_tasks_enriched\``
 
-  // Member dimension uses UNNEST on assignee_member_ids to credit all assignees
-  const isMember = dimensionKey === 'member'
-
-  const fromClause = isMember
-    ? `${baseTable} te, UNNEST(te.assignee_member_ids) AS member_id`
-    : baseTable
-
-  const whereColumn = isMember ? 'member_id' : column
-
   const [metricRows, cscRows] = await Promise.all([
     runIcoEngineQuery<GenericMetricRow>(`
       SELECT
         @dimensionValue AS dimension_value,
         ${buildMetricSelectSQL()}
-      FROM ${fromClause}
-      WHERE ${whereColumn} = @dimensionValue
+      FROM ${baseTable}
+      WHERE ${column} = @dimensionValue
         AND (${buildPeriodFilterSQL()})
       GROUP BY dimension_value
     `, { dimensionValue, periodYear, periodMonth }),
@@ -425,8 +416,8 @@ export const computeMetricsByContext = async (
         @dimensionValue AS space_id,
         fase_csc,
         COUNT(*) AS task_count
-      FROM ${fromClause}
-      WHERE ${whereColumn} = @dimensionValue
+      FROM ${baseTable}
+      WHERE ${column} = @dimensionValue
         AND completed_at IS NULL
         AND task_status NOT IN (${DONE_STATUSES_SQL})
         AND (${buildPeriodFilterSQL()})
@@ -630,9 +621,8 @@ export const readMemberMetrics = async (
         @memberId AS space_id,
         fase_csc,
         COUNT(*) AS task_count
-      FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\` te,
-           UNNEST(te.assignee_member_ids) AS assignee_member_id
-      WHERE assignee_member_id = @memberId
+      FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\` te
+      WHERE te.primary_owner_member_id = @memberId
         AND completed_at IS NULL
         AND task_status NOT IN (${DONE_STATUSES_SQL})
         AND (${buildPeriodFilterSQL()})

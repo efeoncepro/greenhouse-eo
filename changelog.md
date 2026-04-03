@@ -2,6 +2,17 @@
 
 ## 2026-04-02
 
+- **TASK-199 delivery performance owner attribution contract**:
+  - `ICO` member-level deja de acreditar tareas por `UNNEST(assignee_member_ids)` y pasa a acreditar solo al owner principal miembro
+  - `v_tasks_enriched` ahora expone aliases explícitos `primary_owner_source_id`, `primary_owner_member_id`, `primary_owner_type` y `has_co_assignees`
+  - la dimensión `member` de `ICO` ya apunta a `primary_owner_member_id`
+  - `Person ICO` quedó alineado al mismo contrato y ya no usa co-crédito
+  - `Top Performer` ahora publica explícitamente que co-asignados y owners cliente no reciben member credit
+  - verificación de negocio marzo 2026:
+    - `Daniela` pasa de `104` tareas por co-crédito a `98` por owner principal
+    - `multi_member_tasks`: `4`
+    - `Sky` conserva `39` tareas con owner primario no-miembro sin credit a `member`
+
 - **TASK-198 delivery notion assignee identity coverage**:
   - `discovery-notion.ts` ya excluye IDs Notion enlazados tanto en BigQuery como en PostgreSQL y dejó de depender solo de `greenhouse.team_members`
   - `reconciliation-service.ts` ahora prioriza `greenhouse_core.members` como fuente canónica de candidates y usa BigQuery solo como fallback

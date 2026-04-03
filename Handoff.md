@@ -214,6 +214,62 @@
   - la semántica final de owner principal / co-asignados / no asignadas se cierra en `TASK-199`
 - El siguiente carril natural pasa a ser `TASK-199`, porque el hueco principal ya no es identidad sino atribución semántica.
 
+## Sesión 2026-04-02 — TASK-199 delivery performance owner attribution contract
+
+### Objetivo
+
+- Congelar el contrato canónico de `owner principal` para Delivery y alinear `ICO`, readers operativos y scorecards con una misma regla de atribución.
+
+### Delta de descubrimiento
+
+- `TASK-199` pasó a `in-progress` tras auditoría formal.
+- El runtime actual ya preserva un owner técnico implícito:
+  - `sync-notion-conformed.ts` y `sync-source-runtime-projections.ts` bajan el primer assignee de Notion como `assignee_source_id` / `assignee_member_id`
+  - al mismo tiempo preservan `assignee_member_ids` como array completo para co-crédito potencial
+- El drift vigente queda localizado:
+  - `ICO` acredita a todos los assignees con `UNNEST(te.assignee_member_ids)`
+  - readers como `Project Detail`, `Reviews Queue`, `Team queries` y métricas operativas ya tratan el assignee singular como principal de facto
+- Evidencia real marzo 2026:
+  - `Sky`: `190` tareas, `0` multi-assignee resueltas a más de un `member`, `42` owners primarios cliente sin `member`
+  - `Efeonce`: `116` tareas, `4` multi-assignee
+  - caso borde crítico verificado: `Adriana, Daniela` llega con owner primario cliente no-miembro y co-asignada interna sí resoluble
+- Riesgo arquitectónico confirmado:
+  - hoy no existe helper ni campo explícito `primary_owner_*`
+  - distintos consumers ya aplican reglas distintas sobre el mismo dato base
+
+### Cierre real
+
+- `TASK-199` quedó cerrada.
+- Contrato canónico fijado:
+  - owner principal = primer assignee de Notion preservado por Greenhouse
+  - `member` attribution = solo `primary_owner_member_id`
+  - co-asignados quedan para trazabilidad, no para co-crédito en `ICO`
+  - owner primario cliente o externo sigue contando para métricas de `space` / `agency`, pero no acredita a un miembro interno
+  - `Sin asignar` queda fuera de member attribution y explícitamente tratada como borde
+- Implementación cerrada:
+  - `src/lib/ico-engine/schema.ts`
+    - `v_tasks_enriched` ahora expone `primary_owner_source_id`, `primary_owner_member_id`, `primary_owner_type` y `has_co_assignees`
+  - `src/lib/ico-engine/shared.ts`
+    - la dimensión `member` ya apunta a `primary_owner_member_id`
+  - `src/lib/ico-engine/materialize.ts`
+    - `metrics_by_member` deja de usar `UNNEST(te.assignee_member_ids)` y acredita solo al owner principal miembro
+  - `src/lib/ico-engine/read-metrics.ts`
+    - live compute y member snapshots quedan alineados al mismo contrato
+  - `src/lib/person-360/get-person-ico-profile.ts`
+    - `Person ICO` ya no usa co-crédito
+  - `src/lib/ico-engine/performance-report.ts`
+    - la policy publicada para `Top Performer` ya explicita primary-owner credit
+- Verificación de negocio marzo 2026:
+  - `Daniela` por co-crédito amplio: `104` tareas
+  - `Daniela` por owner principal: `98` tareas
+  - `multi_member_tasks`: `4`
+  - `Sky` con owner primario no-miembro: `39` tareas
+- Validación técnica:
+  - `pnpm build` ✅
+  - `pnpm lint` ✅
+  - `rg -n "new Pool\\(" src scripts` ✅
+- El siguiente carril natural pasa a ser `TASK-200`, porque ya no queda ambiguo quién recibe el crédito; ahora toca congelar la fórmula semántica de las métricas.
+
 ## Sesión 2026-04-02 — RESEARCH-004 space identity consolidation
 
 ### Objetivo

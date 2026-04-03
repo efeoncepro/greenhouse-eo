@@ -1,5 +1,19 @@
 # Greenhouse Data Model Master V1
 
+## Delta 2026-04-02 — Delivery member attribution is no longer multi-credit by default
+
+`TASK-199` cambia la lectura canónica de atribución member-level para Delivery:
+
+- `assignee_member_id` sigue representando el primer responsable de Notion resuelto a `member`
+- `assignee_member_ids` sigue preservando todos los responsables resueltos para trazabilidad y contexto
+- pero `ICO` member-level y el `Performance Report` ya no deben asumir co-crédito automático por `UNNEST(assignee_member_ids)`
+
+Regla vigente:
+
+- member attribution canónica = `primary owner member`
+- `assignee_member_ids` queda como fidelidad del source sync, no como contrato único de reporting
+- si el owner principal no resuelve a `member`, la tarea puede seguir entrando a agregados de `space` / `agency` sin acreditar a un miembro interno
+
 ## Delta 2026-03-31 — Shared assets registry en PostgreSQL + bytes en GCS
 
 `TASK-173` deja fijado el patrón canónico de archivos del portal:

@@ -1,5 +1,18 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-02 — Member dimension now follows primary-owner attribution
+
+`TASK-199` fija un cambio semántico para la dimensión `member`:
+
+- antes: `metrics_by_member` acreditaba todas las tareas vía `UNNEST(assignee_member_ids)`
+- ahora: `metrics_by_member`, `Top Performer` y los readers member-level deben acreditar solo al `primary owner member`
+
+Regla vigente:
+
+- `assignee_member_ids` sigue existiendo para trazabilidad y consumers operativos
+- `v_tasks_enriched` debe exponer aliases explícitos de owner principal
+- la dimensión `member` ya no debe expandir el array completo para scorecards canónicos
+
 ## Delta 2026-04-01 — Guardrail para snapshots por miembro materialized-first
 
 El carril `materialized-first` por miembro quedó endurecido para `TASK-189`:

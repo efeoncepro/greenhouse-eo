@@ -458,7 +458,7 @@ const materializeMemberMetrics = async (
        on_time_count, late_drop_count, overdue_count, carry_over_count,
        materialized_at)
     SELECT
-      member_id,
+      te.primary_owner_member_id AS member_id,
       @periodYear AS period_year,
       @periodMonth AS period_month,
 
@@ -466,10 +466,9 @@ const materializeMemberMetrics = async (
 
       CURRENT_TIMESTAMP() AS materialized_at
 
-    FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\` te,
-         UNNEST(te.assignee_member_ids) AS member_id
-    WHERE member_id IS NOT NULL
-      AND member_id != ''
+    FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\` te
+    WHERE te.primary_owner_member_id IS NOT NULL
+      AND te.primary_owner_member_id != ''
       AND (${buildPeriodFilterSQL()})
     GROUP BY member_id
   `, { periodYear, periodMonth })

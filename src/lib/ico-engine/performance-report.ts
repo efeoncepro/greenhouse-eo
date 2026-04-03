@@ -118,7 +118,7 @@ type ServingPerformanceReportRow = Record<string, unknown> & {
 
 export const TOP_PERFORMER_MIN_THROUGHPUT = 5
 export const TREND_STABLE_BAND_PP = 1
-export const TOP_PERFORMER_MULTI_ASSIGNEE_POLICY = 'uses current ICO member crediting from metrics_by_member'
+export const TOP_PERFORMER_MULTI_ASSIGNEE_POLICY = 'credits only the primary owner member; co-assignees and client owners receive no member credit'
 
 const getPreviousPeriod = (year: number, month: number) => {
   if (month === 1) {

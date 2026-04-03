@@ -16,7 +16,8 @@ const buildDatasetDDL = (projectId: string) =>
 
 /**
  * View layered on greenhouse_conformed.delivery_tasks — adds derived fields:
- *   fase_csc, cycle_time_days, hours_since_update, is_stuck, delivery_signal
+ *   fase_csc, cycle_time_days, hours_since_update, is_stuck, delivery_signal,
+ *   primary owner attribution aliases
  *
  * Column names are English (from the conformed layer) but task_status VALUES
  * remain in Spanish as synced from Notion.
@@ -34,6 +35,7 @@ const buildTasksEnrichedView = (projectId: string) => `
     dt.task_name,
     dt.task_status,
     dt.assignee_member_id,
+    dt.assignee_source_id,
     -- Multi-assignee resolution: prefer explicit array, fall back to single ID.
     -- When notion-bq-sync populates responsables_member_ids (future), this will
     -- automatically pick up multi-assignee data. Until then, single-ID fallback.
@@ -44,6 +46,24 @@ const buildTasksEnrichedView = (projectId: string) => `
         THEN [dt.assignee_member_id]
       ELSE []
     END AS assignee_member_ids,
+    -- Canonical owner attribution contract for reporting and member-level ICO:
+    -- the first Notion assignee remains the primary owner when present.
+    dt.assignee_source_id AS primary_owner_source_id,
+    dt.assignee_member_id AS primary_owner_member_id,
+    CASE
+      WHEN dt.assignee_source_id IS NULL THEN 'unassigned'
+      WHEN dt.assignee_member_id IS NOT NULL THEN 'member'
+      ELSE 'non_member'
+    END AS primary_owner_type,
+    ARRAY_LENGTH(
+      CASE
+        WHEN dt.assignee_member_ids IS NOT NULL AND ARRAY_LENGTH(dt.assignee_member_ids) > 0
+          THEN dt.assignee_member_ids
+        WHEN dt.assignee_member_id IS NOT NULL
+          THEN [dt.assignee_member_id]
+        ELSE []
+      END
+    ) > 1 AS has_co_assignees,
     dt.completion_label,
     dt.delivery_compliance,
     dt.days_late,
@@ -278,7 +298,7 @@ const buildMetricsByProjectTable = (projectId: string) => `
 
 /**
  * Member-level metrics. Same structure as metrics_by_project but keyed by member_id.
- * Uses UNNEST(assignee_member_ids) to credit tasks to all assignees.
+ * Uses primary owner attribution to credit tasks to one accountable member.
  */
 const buildMetricsByMemberTable = (projectId: string) => `
   CREATE TABLE IF NOT EXISTS \`${projectId}.${ICO_DATASET}.metrics_by_member\` (
