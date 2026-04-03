@@ -408,7 +408,7 @@ const PayrollEntryTable = ({ entries, period, periodStatus, onEntryUpdate }: Pro
                                     Registro Deel
                                   </Typography>
                                   <Typography variant='body2' color='text.secondary'>
-                                    Greenhouse registra el monto y los bonos discrecionales, pero Deel gestiona cumplimiento y pago final.
+                                    Greenhouse registra el monto y calcula los bonos KPI desde OTD y RpA; Deel sigue gestionando compliance y pago final.
                                   </Typography>
                                   {entry.deelContractId && (
                                     <Typography variant='caption' sx={{ display: 'block', mt: 1.5, fontFamily: 'monospace' }}>

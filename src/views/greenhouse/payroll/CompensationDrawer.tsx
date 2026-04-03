@@ -482,7 +482,9 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
               <Stack spacing={2} sx={{ mt: 1 }}>
                 {(isHonorarios || isDeel) && (
                   <Alert severity='info' variant='outlined' sx={{ py: 0.5 }}>
-                    Para {isHonorarios ? 'honorarios' : 'Deel'} los bonos KPI son discrecionales y parten en $0.
+                    {isHonorarios
+                      ? 'Para honorarios los bonos KPI son discrecionales y parten en $0.'
+                      : 'Para Deel los bonos KPI sí se calculan desde OTD y RpA; Greenhouse no calcula descuentos previsionales locales.'}
                   </Alert>
                 )}
                 {!isHonorarios && !isDeel && (

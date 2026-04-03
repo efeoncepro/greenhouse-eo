@@ -2,6 +2,13 @@
 
 ## 2026-04-03
 
+- **Deel contractors KPI bonus hotfix**:
+  - `Payroll` y `Projected Payroll` ya no fuerzan `bonusOtdAmount` y `bonusRpaAmount` a `0` para `payroll_via = 'deel'`
+  - los colaboradores `contractor` / `eor` vía Deel ahora calculan payout automático de `OTD` y `RpA` con la policy vigente de `payroll_bonus_config`
+  - se preserva el contrato de Deel sin descuentos previsionales locales ni cálculo de compliance Chile dentro de Greenhouse
+  - la UI de compensación y el detalle de payroll dejan de decir que los bonos KPI de Deel son discrecionales por defecto
+  - se agregó cobertura en `src/lib/payroll/project-payroll.test.ts` para asegurar que un contractor Deel con KPIs válidos proyecte bonos reales
+
 - **TASK-204 Carry-Over & Overdue Carried Forward Semantic Split**:
   - se implementó el split semántico canónico entre `Carry-Over` (carga creada en el período con entrega futura) y `Overdue Carried Forward` (deuda vencida de períodos previos aún abierta)
   - `OTD` ya no incluye carry-over ni OCF en el denominador: `OTD = On-Time / (On-Time + Late Drop + Overdue)`

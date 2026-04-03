@@ -1,5 +1,16 @@
 # project_context.md
 
+## Delta 2026-04-03 Deel contractors projected payroll KPI bonuses
+
+- `Payroll` y `Projected Payroll` ya no deben tratar a `payroll_via = 'deel'` como carril de bono KPI discrecional por defecto.
+- Regla vigente:
+  - `honorarios` sigue siendo discrecional para `OTD` / `RpA`
+  - `Deel` sí calcula `bonusOtdAmount` y `bonusRpaAmount` automáticamente con la policy vigente de `payroll_bonus_config`
+  - `Deel` sigue sin calcular descuentos previsionales locales ni prorrateos de compliance Chile dentro de Greenhouse
+- Implicación runtime:
+  - los contractors / EOR `international` pueden mostrar `OTD` y `RpA` visibles con payout real en payroll proyectado y oficial
+  - la fuente `kpiDataSource` para Deel debe reflejar el origen real del KPI (`ico` cuando existe snapshot), no marcarse como `external` por default
+
 ## Delta 2026-04-03 TASK-209 conformed writer staged swap + freshness gate
 
 - El writer `Notion raw -> greenhouse_conformed` ya no reemplaza `delivery_projects`, `delivery_tasks` y `delivery_sprints` con `WRITE_TRUNCATE` secuencial directo.

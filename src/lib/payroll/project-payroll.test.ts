@@ -163,6 +163,49 @@ describe('projectPayrollForPeriod', () => {
     expect(result.totals.grossByCurrency.USD).toBeGreaterThan(0)
   })
 
+  it('calculates KPI bonuses automatically for Deel contractors without Chile deductions', async () => {
+    const deelComp = {
+      ...baseCompensation,
+      versionId: 'cv-2',
+      memberId: 'member-2',
+      memberName: 'Melkin Contractor',
+      currency: 'USD',
+      baseSalary: 2000,
+      remoteAllowance: 100,
+      fixedBonusAmount: 120,
+      bonusOtdMax: 500,
+      bonusRpaMax: 300,
+      payRegime: 'international',
+      payrollVia: 'deel',
+      contractType: 'contractor',
+      gratificacionLegalMode: 'ninguna'
+    }
+
+    mockGetApplicableCompensationVersionsForPeriod.mockResolvedValue([deelComp])
+    mockFetchKpisForPeriod.mockResolvedValue({
+      snapshots: new Map([
+        ['member-2', { memberId: 'member-2', otdPercent: 96, rpaAvg: 1.6, tasksCompleted: 22, dataSource: 'ico', sourceMode: 'materialized' }]
+      ])
+    })
+    mockFetchAttendanceForAllMembers.mockResolvedValue(
+      new Map([['member-2', { workingDaysInPeriod: 20, daysPresent: 18, daysAbsent: 2, daysOnLeave: 0, daysOnUnpaidLeave: 0 }]])
+    )
+
+    const result = await projectPayrollForPeriod({ year: 2026, month: 3, mode: 'projected_month_end' })
+    const entry = result.entries[0]
+
+    expect(entry.payrollVia).toBe('deel')
+    expect(entry.kpiDataSource).toBe('ico')
+    expect(entry.kpiOtdQualifies).toBe(true)
+    expect(entry.kpiRpaQualifies).toBe(true)
+    expect(entry.bonusOtdAmount).toBe(500)
+    expect(entry.bonusRpaAmount).toBe(300)
+    expect(entry.grossTotal).toBe(2920)
+    expect(entry.netTotal).toBe(2920)
+    expect(entry.chileTotalDeductions).toBe(0)
+    expect(entry.workingDaysInPeriod).toBeNull()
+  })
+
   it('degrades gracefully when KPIs or attendance fail', async () => {
     mockGetApplicableCompensationVersionsForPeriod.mockResolvedValue([baseCompensation])
     mockFetchKpisForPeriod.mockRejectedValue(new Error('ICO unavailable'))

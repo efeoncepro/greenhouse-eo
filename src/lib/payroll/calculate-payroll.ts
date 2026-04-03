@@ -157,7 +157,8 @@ export const buildPayrollEntry = async ({
 }): Promise<PayrollEntry> => {
   const kpiOtdPercent = kpi?.otdPercent ?? null
   const kpiRpaAvg = kpi?.rpaAvg ?? null
-  const usesDiscretionaryBonuses = compensation.contractType === 'honorarios' || compensation.payrollVia === 'deel'
+  const usesDiscretionaryBonuses = compensation.contractType === 'honorarios'
+  const skipsAttendanceAdjustments = compensation.contractType === 'honorarios' || compensation.payrollVia === 'deel'
 
   const otdResult = usesDiscretionaryBonuses
     ? { amount: 0, qualifies: true, prorationFactor: null }
@@ -171,8 +172,8 @@ export const buildPayrollEntry = async ({
   const bonusRpaAmount = rpaResult.amount
 
   // Attendance-based adjustments
-  const deductibleDays = usesDiscretionaryBonuses ? 0 : attendance ? attendance.daysAbsent + attendance.daysOnUnpaidLeave : 0
-  const workingDays = usesDiscretionaryBonuses ? 22 : attendance?.workingDaysInPeriod ?? 22
+  const deductibleDays = skipsAttendanceAdjustments ? 0 : attendance ? attendance.daysAbsent + attendance.daysOnUnpaidLeave : 0
+  const workingDays = skipsAttendanceAdjustments ? 22 : attendance?.workingDaysInPeriod ?? 22
   const attendanceRatio = workingDays > 0 ? Math.max(0, (workingDays - deductibleDays) / workingDays) : 1
 
   const adjustedBaseSalary = deductibleDays > 0
@@ -316,7 +317,7 @@ export const buildPayrollEntry = async ({
     kpiOtdQualifies: otdResult.qualifies,
     kpiRpaQualifies: rpaResult.qualifies,
     kpiTasksCompleted: kpi ? kpi.tasksCompleted : null,
-    kpiDataSource: compensation.payrollVia === 'deel' ? 'external' : kpi ? kpi.dataSource : 'manual',
+    kpiDataSource: kpi ? kpi.dataSource : compensation.payrollVia === 'deel' ? 'external' : 'manual',
     bonusOtdAmount,
     bonusRpaAmount,
     bonusOtherAmount: 0,
@@ -359,11 +360,11 @@ export const buildPayrollEntry = async ({
     manualOverrideNote: null,
     bonusOtdProrationFactor: otdResult.prorationFactor,
     bonusRpaProrationFactor: rpaResult.prorationFactor,
-    workingDaysInPeriod: usesDiscretionaryBonuses ? null : attendance?.workingDaysInPeriod ?? null,
-    daysPresent: usesDiscretionaryBonuses ? null : attendance?.daysPresent ?? null,
-    daysAbsent: usesDiscretionaryBonuses ? null : attendance?.daysAbsent ?? null,
-    daysOnLeave: usesDiscretionaryBonuses ? null : attendance?.daysOnLeave ?? null,
-    daysOnUnpaidLeave: usesDiscretionaryBonuses ? null : attendance?.daysOnUnpaidLeave ?? null,
+    workingDaysInPeriod: skipsAttendanceAdjustments ? null : attendance?.workingDaysInPeriod ?? null,
+    daysPresent: skipsAttendanceAdjustments ? null : attendance?.daysPresent ?? null,
+    daysAbsent: skipsAttendanceAdjustments ? null : attendance?.daysAbsent ?? null,
+    daysOnLeave: skipsAttendanceAdjustments ? null : attendance?.daysOnLeave ?? null,
+    daysOnUnpaidLeave: skipsAttendanceAdjustments ? null : attendance?.daysOnUnpaidLeave ?? null,
     adjustedBaseSalary: deductibleDays > 0 ? adjustedBaseSalary : null,
     adjustedRemoteAllowance: deductibleDays > 0 ? adjustedRemoteAllowance : null,
     adjustedColacionAmount: deductibleDays > 0 ? adjustedColacionAmount : null,

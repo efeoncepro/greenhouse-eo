@@ -1,5 +1,39 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — Hotfix Deel KPI bonuses in projected/offical payroll
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `src/lib/payroll/calculate-payroll.ts`
+  - `src/lib/payroll/project-payroll.test.ts`
+  - `src/views/greenhouse/payroll/CompensationDrawer.tsx`
+  - `src/views/greenhouse/payroll/PayrollEntryTable.tsx`
+  - `docs/architecture/Greenhouse_HRIS_Architecture_v1.md`
+  - `project_context.md`
+  - `changelog.md`
+
+### Resultado
+
+- `payroll_via = 'deel'` ya no cae en la rama que fuerza `bonusOtdAmount` / `bonusRpaAmount` a `0`
+- `Deel` ahora calcula bonos KPI automáticos desde `OTD` y `RpA` con la policy vigente
+- se preserva el contrato operativo de Deel sin descuentos previsionales locales ni attendance proration dentro de Greenhouse
+- la UI de compensación/payroll deja de afirmar que Deel parte con bonos discrecionales en `0`
+- `kpiDataSource` para Deel ahora refleja `ico` cuando el snapshot real vino de ICO
+
+### Verificación
+
+- pendiente ejecutar:
+  - `pnpm exec vitest run src/lib/payroll/project-payroll.test.ts`
+  - `pnpm exec eslint src/lib/payroll/calculate-payroll.ts src/lib/payroll/project-payroll.test.ts src/views/greenhouse/payroll/CompensationDrawer.tsx src/views/greenhouse/payroll/PayrollEntryTable.tsx`
+
+### Nota operativa
+
+- la separación explícita ahora es:
+  - `honorarios` = bonos KPI discrecionales
+  - `deel` = bonos KPI automáticos, pero settlement/compliance final fuera de Greenhouse
+
 ## Sesión 2026-04-03 — TASK-204 Carry-Over & Overdue Carried Forward Semantic Split
 
 ### Rama / alcance
