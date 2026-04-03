@@ -37,6 +37,18 @@ El contrato documental ya quedó corregido, pero el engine todavía necesita un 
 - Introducir `Overdue Carried Forward` como métrica separada para deuda vencida que cruza de mes.
 - Mantener `OTD` y el scorecard mensual de cumplimiento limpios y auditables.
 
+## Recommended Execution Order
+
+1. Ejecutar `TASK-209` primero.
+2. Ejecutar `TASK-206` después.
+3. Ejecutar `TASK-204` en tercer lugar.
+
+Razonamiento:
+
+- esta lane no debe redefinir semántica mensual sobre una base que todavía pueda desalinearse entre `raw` y `conformed`
+- tampoco conviene cerrarla antes de fijar la capa canónica de atribución operativa en `TASK-206`
+- una vez estabilizados pipeline y ownership, el split `Carry-Over` vs `Overdue Carried Forward` puede implementarse sin mezclar causas distintas en el scorecard
+
 ## Canonical Metric Contract
 
 Para un período mensual `M`:

@@ -40,6 +40,18 @@ Eso significa que el incidente actual quedó resuelto, pero la prevención de re
 - Cerrar el desfase entre raw freshness y el momento en que corre el writer canónico.
 - Dejar evidencia operativa explícita para distinguir `esperando raw`, `reintentando`, `sincronizado` y `desalineado`.
 
+## Recommended Execution Order
+
+1. Ejecutar `TASK-209` primero.
+2. Ejecutar `TASK-206` después.
+3. Ejecutar `TASK-204` al final.
+
+Razonamiento:
+
+- esta lane estabiliza la base operativa del pipeline y evita que reaparezca drift `raw -> conformed`
+- la atribución operativa de `TASK-206` no debe cerrarse sobre una sincronización que todavía pueda desalinearse por orquestación
+- el split semántico de `TASK-204` debe correr sobre datos frescos y sobre una capa de ownership ya endurecida
+
 ## Architecture Alignment
 
 Revisar y respetar:

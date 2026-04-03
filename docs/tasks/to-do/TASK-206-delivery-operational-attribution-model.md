@@ -57,6 +57,18 @@ Pero sigue faltando una capa reusable y transversal de atribución operativa que
 - Separar de forma explícita identidad, ownership, colaboración y crédito analítico.
 - Dejar contrato reusable para tareas, proyectos y consumers cross-module.
 
+## Recommended Execution Order
+
+1. Ejecutar `TASK-209` primero.
+2. Ejecutar `TASK-206` en segundo lugar.
+3. Ejecutar `TASK-204` después.
+
+Razonamiento:
+
+- esta lane necesita apoyarse sobre un pipeline `Notion -> raw -> conformed` ya estable y sin recurrencia de drift
+- una vez cerrada esa base, `TASK-206` debe congelar la capa reusable de `primary owner`, `co-assignees`, `member credit` y `client collaboration`
+- `TASK-204` consume después esta definición para evitar que el engine o los readers mezclen semántica de métricas con ambigüedad de ownership
+
 ## Architecture Alignment
 
 Revisar y respetar:
