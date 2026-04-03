@@ -47,6 +47,10 @@
     {
       "path": "/api/cron/entra-profile-sync",
       "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/entra-webhook-renew",
+      "schedule": "0 6 */2 * *"
     }
   ]
 }
