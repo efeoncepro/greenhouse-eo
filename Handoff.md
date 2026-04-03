@@ -19,6 +19,9 @@
   - métricas agregadas canónicas del engine
   - buckets/contexto operativo
   - rollups adicionales de `performance_report_monthly`
+- cada métrica y rollup relevante ya declara además:
+  - en qué consiste su cálculo
+  - qué pregunta de negocio responde
 - esto reduce el drift entre:
   - arquitectura
   - `metric-registry.ts`

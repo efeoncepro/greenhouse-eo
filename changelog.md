@@ -5,6 +5,7 @@
 - **ICO Engine metrics architecture inventory consolidated**:
   - `docs/architecture/Greenhouse_ICO_Engine_v1.md` ahora consolida en una sola sección el inventario canónico de señales y métricas del engine
   - separa explícitamente qué señales ya llegan calculadas, qué derivados construye `v_tasks_enriched`, qué KPIs calcula `buildMetricSelectSQL()`, qué buckets/contexto expone y qué rollups adicionales viven en `performance_report_monthly`
+  - la misma sección ya documenta también, por métrica, en qué consiste el cálculo y qué pregunta de negocio responde
   - esto deja una referencia única para alinear arquitectura, `metric-registry.ts`, `shared.ts` y `schema.ts`
 
 - **ICO completed-status hardening for delivery KPIs**:

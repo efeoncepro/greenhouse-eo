@@ -11,6 +11,9 @@
   - métricas agregadas canónicas calculadas por `buildMetricSelectSQL()`
   - buckets/contexto operativo aditivo
   - rollups adicionales del `performance_report_monthly`
+- además, cada métrica/rollup ya documenta:
+  - en qué consiste el cálculo
+  - qué pregunta de negocio responde
 - Regla operativa:
   - si cambia una fórmula en `src/lib/ico-engine/shared.ts` o el catálogo en `src/lib/ico-engine/metric-registry.ts`, este bloque de arquitectura debe actualizarse en el mismo lote
 

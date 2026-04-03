@@ -2004,15 +2004,15 @@ Estas señales se derivan en `ico_engine.v_tasks_enriched` antes de cualquier ag
 
 Estas son las métricas que el engine calcula/materializa como contrato troncal reusable:
 
-| Métrica | Fórmula resumida | Columnas expuestas |
-|---|---|---|
-| `RpA` | promedio de `rpa_value > 0` en tareas completadas terminales del período | `rpa_avg`, `rpa_median` |
-| `OTD` | `on_time / (on_time + late_drop + overdue)` | `otd_pct` |
-| `FTR` | completadas terminales con `client_change_round_final = 0` | `ftr_pct` |
-| `Cycle Time` | promedio / P50 / stddev de `cycle_time_days` en tareas completadas terminales | `cycle_time_avg_days`, `cycle_time_p50_days`, `cycle_time_variance` |
-| `Throughput` | conteo de tareas `on_time + late_drop` | `throughput_count` |
-| `Pipeline Velocity` | `throughput / active_tasks` | `pipeline_velocity` |
-| `Stuck Assets` | conteo y porcentaje de `is_stuck = TRUE` | `stuck_asset_count`, `stuck_asset_pct` |
+| Métrica | En qué consiste el cálculo | Qué pregunta responde | Columnas expuestas |
+|---|---|---|---|
+| `RpA` | promedio y mediana de `rpa_value > 0` en tareas completadas terminales del período | ¿Cuántas rondas de revisión estamos necesitando por activo realmente terminado? | `rpa_avg`, `rpa_median` |
+| `OTD` | `on_time / (on_time + late_drop + overdue)`; excluye `carry_over` y `overdue_carried_forward` del denominador | ¿Qué porcentaje de la promesa del período se entregó a tiempo? | `otd_pct` |
+| `FTR` | porcentaje de tareas completadas terminales con `client_change_round_final = 0` | ¿Qué proporción de activos salió bien a la primera, sin cambios finales del cliente? | `ftr_pct` |
+| `Cycle Time` | promedio, P50 y desviación de `cycle_time_days` en tareas completadas terminales | ¿Cuánto tarda realmente el flujo de producción en cerrar un activo y cuán predecible es ese tiempo? | `cycle_time_avg_days`, `cycle_time_p50_days`, `cycle_time_variance` |
+| `Throughput` | conteo absoluto de tareas clasificadas como `on_time` o `late_drop` | ¿Cuántos activos logró cerrar el equipo en el período? | `throughput_count` |
+| `Pipeline Velocity` | `throughput / active_tasks` | ¿Con qué velocidad el equipo convierte trabajo activo en trabajo efectivamente cerrado? | `pipeline_velocity` |
+| `Stuck Assets` | conteo absoluto y porcentaje de `is_stuck = TRUE` sobre tareas activas | ¿Cuánta carga operativa está detenida o sin movimiento anormalmente largo? | `stuck_asset_count`, `stuck_asset_pct` |
 
 Regla vigente de completitud:
 
@@ -2024,49 +2024,49 @@ Regla vigente de completitud:
 
 Además de los KPIs troncales, el engine materializa buckets auditables para scorecards y readers:
 
-| Bucket / contexto | Significado |
-|---|---|
-| `total_tasks` | total de tareas clasificadas en el período consultado |
-| `completed_tasks` | total de tareas completadas del scorecard (`on_time + late_drop`) |
-| `active_tasks` | total de tareas activas del período (`overdue + carry_over + overdue_carried_forward`) |
-| `on_time_count` | tareas entregadas a tiempo |
-| `late_drop_count` | tareas completadas tarde |
-| `overdue_count` | tareas vencidas del período aún abiertas |
-| `carry_over_count` | tareas creadas en el período con vencimiento futuro |
-| `overdue_carried_forward_count` | deuda vencida de períodos previos aún abierta |
+| Bucket / contexto | En qué consiste el cálculo | Qué pregunta responde |
+|---|---|---|
+| `total_tasks` | total de tareas clasificadas por el filtro canónico del período | ¿Cuál es el universo total de trabajo que este scorecard está leyendo? |
+| `completed_tasks` | `on_time + late_drop` | ¿Cuánto trabajo del período ya se cerró efectivamente? |
+| `active_tasks` | `overdue + carry_over + overdue_carried_forward` | ¿Cuánto trabajo sigue abierto o pendiente dentro del scope del período? |
+| `on_time_count` | tareas completadas terminales a tiempo | ¿Cuántos entregables cumplieron la promesa del período? |
+| `late_drop_count` | tareas completadas terminales fuera de plazo | ¿Cuántos entregables sí cerraron, pero tarde? |
+| `overdue_count` | tareas del período ya vencidas y aún abiertas | ¿Cuánta promesa del período ya está incumplida hoy? |
+| `carry_over_count` | tareas creadas en el período con `due_date` posterior al cierre del período | ¿Cuánta carga nueva ya quedó comprometida hacia adelante? |
+| `overdue_carried_forward_count` | tareas vencidas de períodos previos que siguen abiertas | ¿Cuánta deuda vieja está contaminando la operación actual? |
 
 #### A.5.4.5 Métricas registradas en el catálogo del engine
 
 El `metric-registry.ts` expone hoy estas métricas como catálogo activo del producto:
 
-| ID / code | Label |
-|---|---|
-| `rpa` | Rendimiento por Activo |
-| `otd_pct` | Entrega a tiempo |
-| `ftr_pct` | Primera entrega correcta |
-| `cycle_time` | Tiempo de ciclo |
-| `cycle_time_variance` | Varianza del ciclo |
-| `throughput` | Throughput |
-| `pipeline_velocity` | Velocidad del pipeline |
-| `csc_distribution` | Distribución CSC |
-| `stuck_assets` | Activos estancados |
-| `stuck_asset_pct` | Porcentaje estancado |
-| `overdue_carried_forward` | Overdue Carried Forward |
+| ID / code | Label | Qué pregunta responde |
+|---|---|---|
+| `rpa` | Rendimiento por Activo | ¿Qué tan costosa en revisiones está siendo la producción cerrada? |
+| `otd_pct` | Entrega a tiempo | ¿Estamos cumpliendo la promesa operativa del período? |
+| `ftr_pct` | Primera entrega correcta | ¿Qué tanto sale bien a la primera sin retrabajo del cliente? |
+| `cycle_time` | Tiempo de ciclo | ¿Cuánto tarda un activo en recorrer el flujo completo? |
+| `cycle_time_variance` | Varianza del ciclo | ¿Qué tan predecible o caótico es ese tiempo de ciclo? |
+| `throughput` | Throughput | ¿Cuánto output real produjo el equipo en el período? |
+| `pipeline_velocity` | Velocidad del pipeline | ¿Qué tan rápido convierte backlog activo en output cerrado? |
+| `csc_distribution` | Distribución CSC | ¿En qué fase de la cadena creativa se está acumulando la carga? |
+| `stuck_assets` | Activos estancados | ¿Cuántos activos llevan demasiado tiempo sin movimiento? |
+| `stuck_asset_pct` | Porcentaje estancado | ¿Qué proporción de la carga activa está estancada? |
+| `overdue_carried_forward` | Overdue Carried Forward | ¿Cuánta deuda vencida heredada seguimos cargando al período actual? |
 
 #### A.5.4.6 Métricas y rollups adicionales de reportes materializados
 
 Estas no reemplazan el contrato troncal del engine, pero sí forman parte del serving/reporting construido sobre él:
 
-| Rollup | Dónde vive | Uso |
-|---|---|---|
-| `on_time_pct` | `ico_engine.performance_report_monthly` | scorecard/report mensual agency-level |
-| `efeonce_tasks_count` | `ico_engine.performance_report_monthly` | mix por portfolio |
-| `sky_tasks_count` | `ico_engine.performance_report_monthly` | mix por portfolio |
-| `task_mix_json` | `ico_engine.performance_report_monthly` | breakdown operativo |
-| `top_performer_otd_pct` | `ico_engine.performance_report_monthly` | top performer mensual |
-| `top_performer_throughput_count` | `ico_engine.performance_report_monthly` | top performer mensual |
-| `top_performer_rpa_avg` | `ico_engine.performance_report_monthly` | top performer mensual |
-| `top_performer_ftr_pct` | `ico_engine.performance_report_monthly` | top performer mensual |
+| Rollup | Dónde vive | En qué consiste el cálculo | Qué pregunta responde |
+|---|---|---|---|
+| `on_time_pct` | `ico_engine.performance_report_monthly` | porcentaje agregado de cumplimiento agency-level | ¿Cuál es el cumplimiento global del portfolio en el período? |
+| `efeonce_tasks_count` | `ico_engine.performance_report_monthly` | conteo del mix perteneciente a Efeonce | ¿Qué peso tiene Efeonce dentro del portfolio medido? |
+| `sky_tasks_count` | `ico_engine.performance_report_monthly` | conteo del mix perteneciente a Sky | ¿Qué peso tiene Sky dentro del portfolio medido? |
+| `task_mix_json` | `ico_engine.performance_report_monthly` | breakdown materializado del mix operativo | ¿Cómo se compone el volumen del período por segmento o fuente? |
+| `top_performer_otd_pct` | `ico_engine.performance_report_monthly` | OTD del top performer del período | ¿Quién lideró el cumplimiento de promesa? |
+| `top_performer_throughput_count` | `ico_engine.performance_report_monthly` | throughput del top performer | ¿Quién cerró mayor volumen real? |
+| `top_performer_rpa_avg` | `ico_engine.performance_report_monthly` | RpA del top performer | ¿Quién sostuvo mejor calidad/retrabajo dentro del top de ejecución? |
+| `top_performer_ftr_pct` | `ico_engine.performance_report_monthly` | FTR del top performer | ¿Quién logró mayor calidad a la primera entre los performers elegibles? |
 
 #### A.5.4.7 Fuente de verdad operativa
 
