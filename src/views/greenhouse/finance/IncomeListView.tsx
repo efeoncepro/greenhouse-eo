@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
+import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -285,7 +286,7 @@ const IncomeListView = () => {
           checked={eligibleForDte.length > 0 && selectedEligible.length === eligibleForDte.length}
           indeterminate={selectedEligible.length > 0 && selectedEligible.length < eligibleForDte.length}
           onChange={toggleSelectAll}
-          inputProps={{ 'aria-label': 'Seleccionar todos los ingresos sin DTE' }}
+          inputProps={{ 'aria-label': 'Seleccionar todos los documentos sin DTE' }}
         />
       ),
       cell: ({ row }) => (
@@ -426,10 +427,10 @@ const IncomeListView = () => {
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <Box>
           <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>
-            Ingresos
+            Ventas
           </Typography>
           <Typography variant='body2' color='text.secondary'>
-            Facturación, cobros y cuentas por cobrar
+            Documentos de venta, notas y cuentas por cobrar
           </Typography>
         </Box>
         <Grid container spacing={6}>
@@ -454,10 +455,10 @@ const IncomeListView = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
         <Box>
           <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>
-            Ingresos
+            Ventas
           </Typography>
           <Typography variant='body2' color='text.secondary'>
-            Facturación, cobros y cuentas por cobrar
+            Documentos de venta, notas y cuentas por cobrar
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
@@ -472,18 +473,28 @@ const IncomeListView = () => {
             </Button>
           )}
           <Button variant='contained' color='success' startIcon={<i className='tabler-plus' />} onClick={() => setDrawerOpen(true)}>
-            Registrar ingreso
+            Registrar documento
           </Button>
         </Box>
       </Box>
+
+      <Alert severity='info' variant='tonal'>
+        Nubox sincroniza aquí documentos de venta y ajustes tributarios. No equivalen por sí solos a caja: los cobros reales viven en
+        {' '}
+        <strong>cobros</strong>
+        {' '}
+        e
+        {' '}
+        <strong>ingresos conciliados</strong>.
+      </Alert>
 
       {/* KPIs */}
       <Grid container spacing={6}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <HorizontalWithSubtitle
-            title='Total facturado'
+            title='Total documentado'
             stats={formatCLP(totalIncome)}
-            subtitle={`${total} facturas`}
+            subtitle={`${total} documentos`}
             avatarIcon='tabler-file-invoice'
             avatarColor='primary'
           />
@@ -499,9 +510,9 @@ const IncomeListView = () => {
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <HorizontalWithSubtitle
-            title='Cobrados'
+            title='Con cobro'
             stats={String(paidCount)}
-            subtitle='Facturas pagadas'
+            subtitle='Cobros registrados'
             avatarIcon='tabler-check'
             avatarColor='success'
           />
@@ -520,7 +531,7 @@ const IncomeListView = () => {
       {/* Table */}
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
         <CardHeader
-          title='Registro de ingresos'
+          title='Registro de documentos de venta'
           avatar={
             <Avatar variant='rounded' sx={{ bgcolor: 'success.lightOpacity' }}>
               <i className='tabler-cash' style={{ fontSize: 22, color: 'var(--mui-palette-success-main)' }} />

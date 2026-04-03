@@ -1,5 +1,38 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — Finance visible semantics aligned: Nubox documents vs cash
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `src/config/greenhouse-nomenclature.ts`
+  - `src/views/greenhouse/finance/IncomeListView.tsx`
+  - `src/views/greenhouse/finance/ExpensesListView.tsx`
+  - `src/app/(dashboard)/finance/income/page.tsx`
+  - `src/app/(dashboard)/finance/expenses/page.tsx`
+  - `src/components/layout/{vertical,horizontal}/NavbarContent.tsx`
+  - `src/components/layout/shared/search/DefaultSuggestions.tsx`
+  - `src/data/searchData.ts`
+  - `src/lib/admin/view-access-catalog.ts`
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `project_context.md`
+  - `changelog.md`
+
+### Resultado
+
+- `Finance > income` y `Finance > expenses` ya no quedan presentados solo como `Ingresos/Egresos` en la capa visible principal.
+- La semántica visible ahora deja más claro que:
+  - `income` funciona como ledger de documentos de venta/devengo
+  - `expenses` funciona como ledger de compras/obligaciones/devengo
+  - caja real sigue viviendo en cobros, `payment_date` y conciliación
+- Se agregaron alerts contextuales en ambas vistas para evitar confundir documentos Nubox con eventos de caja.
+- No se cambió el schema ni el runtime de P&L en esta pasada; el objetivo fue corregir contrato visible y arquitectura viva con cambio mínimo y reversible.
+
+### Verificación
+
+- pendiente ejecutar `pnpm lint`
+
 ## Sesión 2026-04-03 — Backlog ICO consumers aligned to Contrato_Metricas_ICO_v1
 
 ### Rama / alcance

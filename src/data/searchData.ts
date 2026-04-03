@@ -13,8 +13,8 @@ const data: SearchData[] = [
   { id: '2', name: 'Dashboard financiero', url: '/finance', icon: 'tabler-chart-bar', section: 'Dashboards' },
 
   // Finanzas
-  { id: '10', name: 'Ingresos', url: '/finance/income', icon: 'tabler-cash', section: 'Finanzas' },
-  { id: '11', name: 'Egresos', url: '/finance/expenses', icon: 'tabler-receipt', section: 'Finanzas' },
+  { id: '10', name: 'Ventas', url: '/finance/income', icon: 'tabler-cash', section: 'Finanzas' },
+  { id: '11', name: 'Compras', url: '/finance/expenses', icon: 'tabler-receipt', section: 'Finanzas' },
   { id: '12', name: 'Clientes', url: '/finance/clients', icon: 'tabler-address-book', section: 'Finanzas' },
   { id: '13', name: 'Proveedores', url: '/finance/suppliers', icon: 'tabler-truck', section: 'Finanzas' },
   { id: '14', name: 'Cuentas', url: '/finance/accounts', icon: 'tabler-building-bank', section: 'Finanzas' },

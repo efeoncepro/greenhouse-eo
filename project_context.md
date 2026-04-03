@@ -1,5 +1,18 @@
 # project_context.md
 
+## Delta 2026-04-03 Finance visible semantics: Nubox documents are not cash events
+
+- Las surfaces visibles `Finance > income` y `Finance > expenses` deben leerse como ledgers de documento/devengo, no como caja pura.
+- Regla vigente:
+  - `Nubox sales` se muestran como documentos de venta en `greenhouse_finance.income`
+  - `Nubox purchases` se muestran como documentos de compra/obligación en `greenhouse_finance.expenses`
+  - los cobros reales viven en `greenhouse_finance.income_payments`
+  - los pagos reales viven en `expenses.payment_date` + conciliación bancaria
+- Implicación UX:
+  - la navegación y copy visible de Finance debe evitar sugerir que una factura de venta ya es un cobro
+  - o que una factura de compra ya es un pago
+  - el P&L puede seguir leyendo devengo, pero la semántica visible debe distinguir documento vs caja
+
 ## Delta 2026-04-03 Contrato_Metricas_ICO_v1 aligned to benchmark-informed thresholds
 
 - `docs/architecture/Contrato_Metricas_ICO_v1.md` ya no usa los thresholds legacy `OTD >= 90`, `FTR >= 70`, `RpA <= 1.5` como si todos tuvieran el mismo respaldo.
