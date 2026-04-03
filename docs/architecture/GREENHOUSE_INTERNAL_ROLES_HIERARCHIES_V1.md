@@ -161,7 +161,7 @@ Pero el contrato base debe partir por esta matriz y no por excepciones implícit
 
 | Nombre visible | `role_code` | `routeGroups` base | Bloques visibles base |
 |----------------|-------------|--------------------|------------------------|
-| `Superadministrador` | `efeonce_admin` | `internal`, `admin` | `Gestión`, `Administración` |
+| `Superadministrador` | `efeonce_admin` | `internal`, `admin`, `client`, `finance`, `hr`, `employee`, `people`, `my`, `ai_tooling` | `Gestión`, `Administración`, `Portal cliente`, `Finanzas`, `Equipo/HR`, `Personas`, `Mi Ficha`, `IA` |
 | `Líder de Cuenta` | `efeonce_account` | `internal` | `Gestión` |
 | `Operaciones` | `efeonce_operations` | `internal` | `Gestión` |
 | `Nómina` | `hr_payroll` | `internal`, `hr` | `Gestión`, `Equipo/HR` |
@@ -192,21 +192,16 @@ Pero el contrato base debe partir por esta matriz y no por excepciones implícit
 
 ### Drift actual
 
-#### 1. `Superadministrador` no tiene `my` por mapping base
+#### 1. El fallback hardcoded de gobernanza amplía accesos
 
-Conceptualmente es el perfil más amplio del sistema, pero el mapping técnico base no le agrega hoy `my`.
+Hoy el fallback de gobernanza mantiene reglas adicionales para:
 
-#### 2. El fallback hardcoded de gobernanza amplía accesos
-
-Hoy el fallback de gobernanza permite adicionalmente:
-
-- `admin`, `finance`, `hr`, `people`, `ai_tooling`, `internal` para `efeonce_admin`
 - `people` para `efeonce_operations`
 - `people` para `hr_payroll`
 
-Eso significa que el fallback de gobernanza y el mapping base no son exactamente equivalentes.
+Para `efeonce_admin`, el mapping base ya debe considerarse total.
 
-#### 3. El catálogo cliente tiene duplicados
+#### 2. El catálogo cliente tiene duplicados
 
 El registry actual repite algunos `view_code` client-facing:
 
@@ -218,7 +213,7 @@ El registry actual repite algunos `view_code` client-facing:
 
 La arquitectura target debe converger a un catálogo sin duplicados antes de tratarlo como contrato UI definitivo.
 
-#### 4. `employee` sigue existiendo, pero sin bloque propio de vistas
+#### 3. `employee` sigue existiendo, pero sin bloque propio de vistas
 
 `employee` todavía deriva `internal`, pero no tiene una semántica limpia como familia de vistas. Debe tratarse como legacy hasta converger a `collaborator`.
 
@@ -228,7 +223,7 @@ La arquitectura futura debe converger a:
 
 1. una sola matriz base `role_code -> routeGroups`
 2. un catálogo de vistas sin duplicados
-3. un contrato explícito de si `Superadministrador` incluye o no `my`
+3. mantener a `Superadministrador` como acceso total efectivo a todas las vistas posibles del portal
 4. overrides persistidos solo como excepción documentada, no como sustituto del contrato base
 
 ## 2. Plano de Reporting Hierarchy

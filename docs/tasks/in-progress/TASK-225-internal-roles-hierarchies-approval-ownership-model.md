@@ -13,7 +13,7 @@
     - overrides persistidos por vista
     - fallback hardcoded de gobernanza
 - Gap explícito a cerrar:
-  - hoy `Superadministrador` no hereda automáticamente `my`
+  - `Superadministrador` debe consolidarse como acceso efectivo a todas las vistas posibles del portal
   - el catálogo cliente tiene duplicados
   - el fallback de gobernanza expande permisos más allá del mapping base para algunos roles
 
@@ -148,7 +148,7 @@ Fuente canónica vigente:
 
 | Nombre visible | `role_code` | `routeGroups` base | Bloques del catálogo visibles al login |
 | --- | --- | --- | --- |
-| `Superadministrador` | `efeonce_admin` | `internal`, `admin` | `Gestión`, `Administración` |
+| `Superadministrador` | `efeonce_admin` | `internal`, `admin`, `client`, `finance`, `hr`, `employee`, `people`, `my`, `ai_tooling` | `Gestión`, `Administración`, `Portal cliente`, `Finanzas`, `Equipo/HR`, `Personas`, `Mi Ficha`, `IA` |
 | `Líder de Cuenta` | `efeonce_account` | `internal` | `Gestión` |
 | `Operaciones` | `efeonce_operations` | `internal` | `Gestión` |
 | `Nómina` | `hr_payroll` | `internal`, `hr` | `Gestión`, `Equipo/HR` |
@@ -179,8 +179,7 @@ Fuente canónica vigente:
 
 ### Drift actual a corregir
 
-- `Superadministrador` no recibe `my` por mapping base, aunque conceptualmente es el perfil más amplio.
-- el fallback hardcoded de gobernanza amplía `efeonce_admin` a `admin`, `finance`, `hr`, `people`, `ai_tooling` e `internal`, aunque ese alcance no está completamente reflejado en `ROLE_ROUTE_GROUPS`.
+- `Superadministrador` debe tratarse como acceso total efectivo a todas las vistas posibles del portal.
 - el fallback hardcoded también permite `people` para `efeonce_operations` y `hr_payroll`.
 - el catálogo de vistas cliente tiene duplicados y debe consolidarse antes de usarse como contrato UI definitivo.
 - `employee` sigue proyectando `internal`, pero no existe un bloque de catálogo propio para `employee`; hoy queda como rol legacy semánticamente ambiguo.
@@ -223,9 +222,8 @@ Fuente canónica vigente:
 - identificar drift actual:
   - `employee`
   - `finance_manager`
-  - `efeonce_admin` sin `my`
-  - fallback de gobernanza más amplio que el mapping base
   - duplicados en el catálogo `client`
+  - reglas fallback especiales de `people` para `efeonce_operations` y `hr_payroll`
   - route-group overrides
 - proponer ruta de convergencia sin renombrados destructivos inmediatos
 - recomendar registry scoped de responsabilidades operativas

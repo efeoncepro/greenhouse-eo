@@ -11,6 +11,7 @@
     - ownership operativo por cuenta/space/proyecto
   - se deja explícito que `departments` no debe funcionar como jerarquía universal para approvals y ownership comercial
   - el rol visible más amplio del sistema queda nombrado como `Superadministrador`, manteniendo `efeonce_admin` como código técnico actual
+  - el mapping runtime de `efeonce_admin` ya quedó alineado para heredar todos los `routeGroups` del portal, incluyendo `client`, `finance`, `hr`, `people`, `my`, `ai_tooling`, `internal` y `admin`
   - además se formaliza una jerarquía visible de personas separada de RBAC: `Superadministrador`, `Responsable de Área`, `Supervisor`, `Colaborador`
   - se abrió `TASK-225` para cerrar la convergencia de naming, jerarquías y responsabilidades operativas scoped
 

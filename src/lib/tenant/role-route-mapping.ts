@@ -9,7 +9,7 @@ export type RouteGroup = 'internal' | 'admin' | 'client' | 'finance' | 'hr' | 'e
  * (governance resolution) MUST import from here — never duplicate.
  */
 export const ROLE_ROUTE_GROUPS: Record<string, RouteGroup[]> = {
-  [ROLE_CODES.EFEONCE_ADMIN]: ['internal', 'admin'],
+  [ROLE_CODES.EFEONCE_ADMIN]: ['internal', 'admin', 'client', 'finance', 'hr', 'employee', 'people', 'my', 'ai_tooling'],
   [ROLE_CODES.EFEONCE_OPERATIONS]: ['internal'],
   [ROLE_CODES.EFEONCE_ACCOUNT]: ['internal'],
   [ROLE_CODES.HR_PAYROLL]: ['internal', 'hr'],

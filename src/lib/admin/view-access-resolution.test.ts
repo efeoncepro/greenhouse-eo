@@ -7,8 +7,15 @@ describe('role-route-mapping', () => {
   it('derives correct route groups for efeonce_admin', () => {
     const groups = deriveRouteGroupsForSingleRole(ROLE_CODES.EFEONCE_ADMIN, 'efeonce_internal')
 
+    expect(groups).toContain('client')
+    expect(groups).toContain('finance')
+    expect(groups).toContain('hr')
     expect(groups).toContain('internal')
+    expect(groups).toContain('my')
+    expect(groups).toContain('people')
+    expect(groups).toContain('ai_tooling')
     expect(groups).toContain('admin')
+    expect(groups).toContain('employee')
   })
 
   it('derives correct route groups for hr_payroll', () => {
@@ -62,9 +69,16 @@ describe('additive view access contract', () => {
     // Verify: admin still has all its route groups (not just finance).
     const adminGroups = deriveRouteGroupsForSingleRole(ROLE_CODES.EFEONCE_ADMIN, 'efeonce_internal')
 
-    // Admin should have internal + admin regardless of any persisted view assignments
+    // Admin should retain every route group regardless of any persisted view assignments
+    expect(adminGroups).toContain('client')
+    expect(adminGroups).toContain('finance')
+    expect(adminGroups).toContain('hr')
     expect(adminGroups).toContain('internal')
+    expect(adminGroups).toContain('my')
+    expect(adminGroups).toContain('people')
+    expect(adminGroups).toContain('ai_tooling')
     expect(adminGroups).toContain('admin')
+    expect(adminGroups).toContain('employee')
 
     // The route group derivation is independent of view persistence
     // This is the "additive" guarantee: deriveRouteGroups never changes

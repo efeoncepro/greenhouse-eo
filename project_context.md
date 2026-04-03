@@ -25,6 +25,7 @@
 - rol visible más amplio:
   - `Superadministrador`
   - código técnico actual: `efeonce_admin`
+  - el runtime canónico ya debe resolverlo con acceso a todos los `routeGroups` y, por extensión, a todas las vistas posibles del portal
 - Drift reconocido:
   - `employee` y `finance_manager` siguen existiendo como contracts legacy en partes del runtime y deben leerse como carriles de convergencia, no como taxonomía target
 

@@ -32,6 +32,7 @@
   - `departments` no debe usarse como jerarquía universal para approvals u ownership comercial
   - el ownership operativo de cuentas/spaces/proyectos debe converger a relaciones scoped explícitas
 - se dejó además explícito que el rol visible más amplio del sistema debe llamarse `Superadministrador`, manteniendo `efeonce_admin` como código técnico actual
+- el mapping runtime de `efeonce_admin` quedó alineado para incluir todos los `routeGroups` del portal, de modo que `Superadministrador` herede todas las vistas posibles
 - se formalizó además una jerarquía visible de personas separada de RBAC:
   - `Superadministrador`
   - `Responsable de Área`
@@ -41,6 +42,7 @@
   - acceso derivado al login
   - fallback hardcoded de gobernanza
   - overrides persistidos por vista
+- se creó `TASK-226` como follow-on específico para formalizar la policy de bootstrap y asignación del `Superadministrador` owner/founder
 - se dejó delta de alineación en `TASK-161` para que Agency Permissions no reinvente una jerarquía paralela
 
 ### Verificación

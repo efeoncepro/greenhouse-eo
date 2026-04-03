@@ -10,6 +10,17 @@
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
 
+## Delta 2026-04-03 — Cost Intelligence Dashboard (cost-allocations redesign)
+
+La vista `/finance/cost-allocations` fue rediseñada de un CRUD vacío a un dashboard de inteligencia de costos:
+
+- Tab 1 "Atribución comercial" (default): KPIs con comparativa vs mes anterior + tabla de clientes con drill-down + donut de composición
+- Tab 2 "Ajustes manuales": CRUD original preservado para overrides
+
+Patrón aplicado: fetch paralelo de health actual + health período anterior para computar deltas. Las 4 KPI cards usan `HorizontalWithSubtitle` con `trend`/`trendNumber`/`statusLabel`/`footer` siguiendo el patrón canónico documentado abajo.
+
+Para costos: aumento = `'negative'` (rojo), disminución = `'positive'` (verde). Para conteos (clientes, personas): aumento = `'positive'`.
+
 ## Delta 2026-04-03 — GreenhouseFunnelCard: componente reutilizable de embudo
 
 **Archivo**: `src/components/greenhouse/GreenhouseFunnelCard.tsx`

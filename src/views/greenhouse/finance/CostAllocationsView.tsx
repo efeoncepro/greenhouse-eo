@@ -245,6 +245,7 @@ const CostAllocationsView = () => {
 
   // Tab 1 — Attribution state
   const [healthData, setHealthData] = useState<CommercialCostAttributionHealthSummary | null>(null)
+  const [prevHealthData, setPrevHealthData] = useState<CommercialCostAttributionHealthSummary | null>(null)
   const [clientRows, setClientRows] = useState<ClientRow[]>([])
   const [attributionLoading, setAttributionLoading] = useState(false)
   const [expandedClientId, setExpandedClientId] = useState<string | null>(null)
@@ -279,13 +280,23 @@ const CostAllocationsView = () => {
     setClientExplainCache({})
 
     try {
-      const [healthRes, clientsRes] = await Promise.all([
+      const prevMonth = month === 1 ? 12 : month - 1
+      const prevYear = month === 1 ? year - 1 : year
+
+      const [healthRes, clientsRes, prevHealthRes] = await Promise.all([
         fetch(`/api/cost-intelligence/commercial-cost-attribution/health?year=${year}&month=${month}`),
-        fetch(`/api/cost-intelligence/commercial-cost-attribution/by-client?year=${year}&month=${month}`)
+        fetch(`/api/cost-intelligence/commercial-cost-attribution/by-client?year=${year}&month=${month}`),
+        fetch(`/api/cost-intelligence/commercial-cost-attribution/health?year=${prevYear}&month=${prevMonth}`)
       ])
 
       if (healthRes.ok) {
         setHealthData(await healthRes.json())
+      }
+
+      if (prevHealthRes.ok) {
+        setPrevHealthData(await prevHealthRes.json())
+      } else {
+        setPrevHealthData(null)
       }
 
       if (clientsRes.ok) {
@@ -596,6 +607,42 @@ const CostAllocationsView = () => {
   }
 
   // ---------------------------------------------------------------------------
+  // Period-over-period deltas for KPI cards
+  // ---------------------------------------------------------------------------
+
+  const MONTH_ABBR = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+  const prevLabel = prevHealthData ? MONTH_ABBR[(prevHealthData.periodMonth - 1) % 12] : null
+
+  const costDelta = (current: number, previous: number | undefined | null): { pct: number; direction: 'positive' | 'negative' | 'neutral'; label: string } | null => {
+    if (previous == null || previous <= 0 || current === 0) return null
+
+    const pct = Math.round(((current - previous) / previous) * 100)
+
+    return {
+      pct,
+      direction: pct === 0 ? 'neutral' : pct > 0 ? 'negative' : 'positive', // cost increase = negative
+      label: `${Math.abs(pct)}% vs ${prevLabel}`
+    }
+  }
+
+  const countDelta = (current: number, previous: number | undefined | null): { pct: number; direction: 'positive' | 'negative' | 'neutral'; label: string } | null => {
+    if (previous == null || previous <= 0 || current === 0) return null
+
+    const pct = Math.round(((current - previous) / previous) * 100)
+
+    return {
+      pct,
+      direction: pct === 0 ? 'neutral' : pct > 0 ? 'positive' : 'negative', // more clients/members = positive
+      label: `${Math.abs(pct)}% vs ${prevLabel}`
+    }
+  }
+
+  const clientsDelta = countDelta(healthData?.clientCount ?? 0, prevHealthData?.clientCount)
+  const membersDelta = countDelta(healthData?.membersWithCommercialAttribution ?? 0, prevHealthData?.membersWithCommercialAttribution)
+  const laborDelta = costDelta(healthData?.totalCommercialLaborCostTarget ?? totalLabor, prevHealthData?.totalCommercialLaborCostTarget)
+  const loadedDelta = costDelta(totalLoaded, prevHealthData?.totalCommercialLoadedCostTarget)
+
+  // ---------------------------------------------------------------------------
   // Render
   // ---------------------------------------------------------------------------
 
@@ -680,7 +727,10 @@ const CostAllocationsView = () => {
                       stats={String(healthData?.clientCount ?? clientRows.length)}
                       avatarIcon='tabler-building-store'
                       avatarColor='primary'
+                      trend={clientsDelta?.direction}
+                      trendNumber={clientsDelta?.label}
                       subtitle='Con atribucion activa'
+                      footer={prevHealthData ? `${prevLabel}: ${prevHealthData.clientCount}` : undefined}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -689,7 +739,10 @@ const CostAllocationsView = () => {
                       stats={String(healthData?.membersWithCommercialAttribution ?? 0)}
                       avatarIcon='tabler-users'
                       avatarColor='info'
+                      trend={membersDelta?.direction}
+                      trendNumber={membersDelta?.label}
                       subtitle={`de ${healthData?.memberCount ?? 0} miembros`}
+                      footer={prevHealthData ? `${prevLabel}: ${prevHealthData.membersWithCommercialAttribution}` : undefined}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -698,7 +751,13 @@ const CostAllocationsView = () => {
                       stats={formatClp(healthData?.totalCommercialLaborCostTarget ?? totalLabor)}
                       avatarIcon='tabler-coin'
                       avatarColor='warning'
+                      trend={laborDelta?.direction}
+                      trendNumber={laborDelta?.label}
                       subtitle='Atribuido a clientes'
+                      statusLabel={healthData?.healthy ? 'Atribuido' : 'Incompleto'}
+                      statusColor={healthData?.healthy ? 'success' : 'warning'}
+                      statusIcon={healthData?.healthy ? 'tabler-circle-check' : 'tabler-alert-triangle'}
+                      footer={prevHealthData ? `${prevLabel}: ${formatClp(prevHealthData.totalCommercialLaborCostTarget)}` : undefined}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -707,7 +766,10 @@ const CostAllocationsView = () => {
                       stats={formatClp(totalLoaded)}
                       avatarIcon='tabler-chart-arrows-vertical'
                       avatarColor='success'
+                      trend={loadedDelta?.direction}
+                      trendNumber={loadedDelta?.label}
                       subtitle='Labor + overhead'
+                      footer={prevHealthData ? `${prevLabel}: ${formatClp(prevHealthData.totalCommercialLoadedCostTarget)}` : undefined}
                     />
                   </Grid>
 
