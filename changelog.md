@@ -2,6 +2,20 @@
 
 ## 2026-04-02
 
+- **TASK-201 delivery performance historical materialization reconciliation**:
+  - `sync-notion-conformed` se reejecutó y confirmó que `Sky` sí tenía status operativo en origen; el contrato ahora acepta `Estado 1` como alias de `task_status`
+  - `ICO` ahora soporta snapshots congelados por tarea en `ico_engine.delivery_task_monthly_snapshots`
+  - se agregó `pnpm freeze:delivery-performance-period <year> <month>` para congelar un período, rematerializar `ICO` y refrescar `agency_performance_reports`
+  - `pnpm reconcile:delivery-performance-history 2026 3` ahora congela el período antes de reconciliarlo contra Notion
+  - verificación real de marzo 2026:
+    - `294` filas `locked` en el snapshot task-level
+    - `293` tareas clasificadas en `performance_report_monthly`
+    - scorecard Greenhouse congelado: `84.3% OT`, `247 on-time`, `25 late drops`, `21 overdue`
+  - conclusión operativa:
+    - marzo 2026 queda calibrado pero no con paridad exacta retroactiva
+    - el residual se documenta como historia mutable en Notion posterior al cierre
+    - abril 2026 en adelante debe operar con freeze mensual y no recalcularse desde el estado vivo del workspace
+
 - **TASK-200 delivery performance metric semantic contract**:
   - el contrato mensual del `Performance Report` queda fijado sobre `due_date in period`
   - la fecha de corte canónica pasa a ser `period_end + 1 day`
@@ -4032,3 +4046,8 @@
   - `/api/hr/core/meta` devuelve `currentMemberId` resuelto para superficies HR/My
   - `/api/assets/private` hace fallback server-side para `leave_request_draft` cuando la sesión no expone `tenant.memberId`
   - Esto corrige el error visible `ownerMemberId is required for leave drafts.` en `greenhouse.efeoncepro.com/hr/leave`
+# 2026-04-02
+
+- Delivery performance parity lane cerrada end-to-end: `TASK-202` implementó el cutover outbound `Greenhouse -> Notion` con target formal `Performance Reports`, integración `notion_delivery_performance_reports`, route cron `GET /api/cron/notion-delivery-performance-publish`, writer Notion real y ledger `greenhouse_sync.notion_publication_runs`.
+- Se agregó configuración canónica de destino en `greenhouse_core.space_notion_publication_targets`, seeded para `space-efeonce` hacia la base Notion `Performance Reports`.
+- La validación funcional quedó cubierta con `dryRun` real para `Marzo 2026`, resolviendo el target page existente sin sobrescribir el contenido histórico durante la verificación.

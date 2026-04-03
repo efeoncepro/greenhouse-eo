@@ -69,6 +69,7 @@ const buildTasksEnrichedView = (projectId: string) => `
     dt.days_late,
     dt.is_rescheduled,
     dt.performance_indicator_code,
+    dt.performance_indicator_label,
     dt.client_change_round_final,
     dt.workflow_change_round,
     dt.rpa_value,
@@ -77,6 +78,7 @@ const buildTasksEnrichedView = (projectId: string) => `
     dt.workflow_review_open,
     dt.blocker_count,
     dt.due_date,
+    dt.original_due_date,
     dt.completed_at,
     dt.last_edited_time,
     dt.synced_at,
@@ -141,7 +143,7 @@ const buildTasksEnrichedView = (projectId: string) => `
   LEFT JOIN \`${projectId}.${ICO_DATASET}.status_phase_config\` spc
     ON spc.space_id = dt.space_id AND spc.task_status = dt.task_status
   WHERE dt.is_deleted = FALSE
-    AND dt.task_status NOT IN ('Archivadas', 'Archivada', 'Cancelada', 'Canceled', 'Cancelled')
+    AND (dt.task_status IS NULL OR dt.task_status NOT IN ('Archivadas', 'Archivada', 'Cancelada', 'Canceled', 'Cancelled'))
 `
 
 /**
@@ -424,6 +426,68 @@ const buildMetricsByBusinessUnitTable = (projectId: string) => `
 `
 
 /**
+ * Immutable-at-close task-level snapshot for a delivery reporting period.
+ * While the period is still open, rows can be refreshed with snapshot_status='working'.
+ * Once the period is closed, the snapshot is rewritten one last time with
+ * snapshot_status='locked' and becomes the canonical source for historical reports.
+ */
+const buildDeliveryTaskMonthlySnapshotsTable = (projectId: string) => `
+  CREATE TABLE IF NOT EXISTS \`${projectId}.${ICO_DATASET}.delivery_task_monthly_snapshots\` (
+    snapshot_id STRING NOT NULL,
+    period_year INT64 NOT NULL,
+    period_month INT64 NOT NULL,
+    task_source_id STRING NOT NULL,
+    project_source_id STRING,
+    sprint_source_id STRING,
+    space_id STRING,
+    client_id STRING,
+    module_code STRING,
+    module_id STRING,
+    task_name STRING,
+    task_status STRING,
+    assignee_member_id STRING,
+    assignee_source_id STRING,
+    assignee_member_ids ARRAY<STRING>,
+    primary_owner_source_id STRING,
+    primary_owner_member_id STRING,
+    primary_owner_type STRING,
+    has_co_assignees BOOL,
+    completion_label STRING,
+    delivery_compliance STRING,
+    days_late INT64,
+    is_rescheduled BOOL,
+    performance_indicator_code STRING,
+    performance_indicator_label STRING,
+    client_change_round_final INT64,
+    workflow_change_round INT64,
+    rpa_value FLOAT64,
+    open_frame_comments INT64,
+    client_review_open BOOL,
+    workflow_review_open BOOL,
+    blocker_count INT64,
+    due_date DATE,
+    original_due_date DATE,
+    completed_at TIMESTAMP,
+    last_edited_time TIMESTAMP,
+    synced_at TIMESTAMP,
+    created_at TIMESTAMP,
+    period_anchor_date DATE,
+    fase_csc STRING,
+    cycle_time_days INT64,
+    hours_since_update INT64,
+    is_stuck BOOL,
+    delivery_signal STRING,
+    operating_business_unit STRING,
+    snapshot_status STRING,
+    locked_at TIMESTAMP,
+    materialized_at TIMESTAMP,
+    engine_version STRING
+  )
+  PARTITION BY RANGE_BUCKET(period_year, GENERATE_ARRAY(2024, 2030, 1))
+  CLUSTER BY period_month, space_id, task_source_id
+`
+
+/**
  * Agency-level monthly performance report snapshot.
  * This is an auditable read model built from existing ICO materializations,
  * not a replacement for the core engine metrics contract.
@@ -581,6 +645,14 @@ const REQUIRED_COLUMN_MIGRATIONS: Record<string, TableColumnSpec> = {
     multi_assignee_policy: 'STRING',
     materialized_at: 'TIMESTAMP',
     engine_version: 'STRING'
+  },
+  delivery_task_monthly_snapshots: {
+    performance_indicator_label: 'STRING',
+    original_due_date: 'DATE',
+    snapshot_status: 'STRING',
+    locked_at: 'TIMESTAMP',
+    materialized_at: 'TIMESTAMP',
+    engine_version: 'STRING'
   }
 }
 
@@ -621,6 +693,7 @@ export const ensureIcoEngineInfrastructure = async () => {
             'stuck_assets_detail', 'rpa_trend', 'metrics_by_project',
             'metrics_by_member', 'metrics_by_sprint', 'metrics_by_organization',
             'metrics_by_business_unit', 'performance_report_monthly',
+            'delivery_task_monthly_snapshots',
             'status_phase_config'
           )
         `
@@ -641,6 +714,7 @@ export const ensureIcoEngineInfrastructure = async () => {
         ['metrics_by_organization', buildMetricsByOrganizationTable(projectId)],
         ['metrics_by_business_unit', buildMetricsByBusinessUnitTable(projectId)],
         ['performance_report_monthly', buildPerformanceReportMonthlyTable(projectId)],
+        ['delivery_task_monthly_snapshots', buildDeliveryTaskMonthlySnapshotsTable(projectId)],
         ['status_phase_config', buildStatusPhaseConfigTable(projectId)]
       ]
 

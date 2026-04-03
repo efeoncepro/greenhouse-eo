@@ -312,7 +312,6 @@ export interface GreenhouseCoreClientTeamAssignments {
   assignment_id: string;
   assignment_type: Generated<string>;
   client_id: string;
-
   /**
    * Baseline contractual hours per month for this assignment. If NULL, computed as fte_allocation * 160. Used for capacity planning: available = contracted - used.
    */
@@ -581,6 +580,29 @@ export interface GreenhouseCoreRoleViewAssignments {
   view_code: string;
 }
 
+export interface GreenhouseCoreScimGroupMemberships {
+  active: Generated<boolean>;
+  created_at: Generated<Timestamp>;
+  membership_id: Generated<string>;
+  microsoft_oid: string | null;
+  scim_group_id: string;
+  user_id: string;
+}
+
+export interface GreenhouseCoreScimGroups {
+  active: Generated<boolean>;
+  created_at: Generated<Timestamp>;
+  description: string | null;
+  display_name: string;
+  group_type: Generated<string | null>;
+  mapped_client_id: string | null;
+  mapped_role_code: string | null;
+  microsoft_group_id: string;
+  scim_group_id: string;
+  synced_at: Timestamp | null;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCoreScimSyncLog {
   created_at: Generated<Timestamp>;
   email: string | null;
@@ -663,11 +685,25 @@ export interface GreenhouseCoreServices {
   updated_by: string | null;
 }
 
+export interface GreenhouseCoreSpaceNotionPublicationTargets {
+  active: Generated<boolean>;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  metadata: Generated<Json>;
+  notion_data_source_id: string | null;
+  notion_database_id: string | null;
+  notion_parent_page_id: string | null;
+  notion_workspace_id: string | null;
+  publication_key: string;
+  space_id: string;
+  target_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCoreSpaceNotionSources {
   created_at: Generated<Timestamp>;
   created_by: string | null;
   last_synced_at: Timestamp | null;
-
   /**
    * Database ID of the client's Proyectos base in Notion. Conceptual root — tasks, sprints, and reviews derive from projects via Notion relations.
    */
@@ -677,7 +713,6 @@ export interface GreenhouseCoreSpaceNotionSources {
   notion_db_tareas: string;
   notion_workspace_id: string | null;
   source_id: string;
-
   /**
    * FK to greenhouse_core.spaces(space_id). One Space = one tenant boundary = one set of Notion databases.
    */
@@ -1219,19 +1254,16 @@ export interface GreenhouseFinanceExchangeRates {
 }
 
 export interface GreenhouseFinanceExpenses {
-
   /**
    * FK to greenhouse_core.client_profiles when expense is directly allocated
    */
   allocated_client_id: string | null;
   balance_nubox: Numeric | null;
   client_id: string | null;
-
   /**
    * direct_labor | indirect_labor | operational | infrastructure | tax_social
    */
   cost_category: Generated<string | null>;
-
   /**
    * Whether expense is directly attributable to client delivery
    */
@@ -1271,12 +1303,10 @@ export interface GreenhouseFinanceExpenses {
   payment_account_id: string | null;
   payment_date: Timestamp | null;
   payment_method: string | null;
-
   /**
    * Named payment provider or operator when payment_method is insufficient (bank, stripe, webpay, previred, etc.).
    */
   payment_provider: string | null;
-
   /**
    * Operational rail for the payment (bank_transfer, card, gateway, payroll_file, previred, etc.).
    */
@@ -1296,12 +1326,10 @@ export interface GreenhouseFinanceExpenses {
   social_security_institution: string | null;
   social_security_period: string | null;
   social_security_type: string | null;
-
   /**
    * manual | payroll_generated | bank_statement_detected | reconciliation_suggested | gateway_sync | system_adjustment
    */
   source_type: string | null;
-
   /**
    * Canonical tenant scope for the expense; resolves to greenhouse_core.spaces.
    */
@@ -1372,7 +1400,6 @@ export interface GreenhouseFinanceIncome {
   invoice_number: string | null;
   is_annulled: Generated<boolean | null>;
   is_reconciled: Generated<boolean>;
-
   /**
    * total_amount minus partner_share_amount
    */
@@ -1390,14 +1417,12 @@ export interface GreenhouseFinanceIncome {
   organization_id: string | null;
   origin: string | null;
   other_taxes_amount: Numeric | null;
-
   /**
    * External partner identifier (e.g. HubSpot referral partner)
    */
   partner_id: string | null;
   partner_name: string | null;
   partner_share_amount: Numeric | null;
-
   /**
    * Partner revenue share as decimal (0.0000–1.0000)
    */
@@ -2001,7 +2026,6 @@ export interface GreenhousePayrollPayrollReceipts {
   status: Generated<string>;
   storage_bucket: string | null;
   storage_path: string | null;
-
   /**
    * PDF template version that generated this receipt. NULL = pre-versioning (stale). Compared against RECEIPT_TEMPLATE_VERSION at serve time; mismatch triggers lazy regeneration.
    */
@@ -2948,6 +2972,28 @@ export interface GreenhouseSyncIntegrationSpaceReadiness {
   warning_issues_json: Generated<Json>;
 }
 
+export interface GreenhouseSyncNotionPublicationRuns {
+  completed_at: Timestamp | null;
+  created_by: string | null;
+  error_message: string | null;
+  integration_key: string;
+  metadata: Generated<Json>;
+  payload_hash: string | null;
+  period_month: number;
+  period_year: number;
+  publication_key: string;
+  publication_run_id: string;
+  report_scope: string;
+  result_summary: string | null;
+  source: Generated<string>;
+  space_id: string;
+  started_at: Generated<Timestamp>;
+  status: Generated<string>;
+  target_database_id: string | null;
+  target_id: string;
+  target_page_id: string | null;
+}
+
 export interface GreenhouseSyncNotionSpaceKpiReadiness {
   blocking_issues: Generated<Json>;
   contract_version: Generated<string>;
@@ -3200,11 +3246,14 @@ export interface DB {
   "greenhouse_core.providers": GreenhouseCoreProviders;
   "greenhouse_core.role_view_assignments": GreenhouseCoreRoleViewAssignments;
   "greenhouse_core.roles": GreenhouseCoreRoles;
+  "greenhouse_core.scim_group_memberships": GreenhouseCoreScimGroupMemberships;
+  "greenhouse_core.scim_groups": GreenhouseCoreScimGroups;
   "greenhouse_core.scim_sync_log": GreenhouseCoreScimSyncLog;
   "greenhouse_core.scim_tenant_mappings": GreenhouseCoreScimTenantMappings;
   "greenhouse_core.service_history": GreenhouseCoreServiceHistory;
   "greenhouse_core.service_modules": GreenhouseCoreServiceModules;
   "greenhouse_core.services": GreenhouseCoreServices;
+  "greenhouse_core.space_notion_publication_targets": GreenhouseCoreSpaceNotionPublicationTargets;
   "greenhouse_core.space_notion_sources": GreenhouseCoreSpaceNotionSources;
   "greenhouse_core.spaces": GreenhouseCoreSpaces;
   "greenhouse_core.user_campaign_scopes": GreenhouseCoreUserCampaignScopes;
@@ -3303,6 +3352,7 @@ export interface DB {
   "greenhouse_sync.integration_schema_drifts": GreenhouseSyncIntegrationSchemaDrifts;
   "greenhouse_sync.integration_schema_snapshots": GreenhouseSyncIntegrationSchemaSnapshots;
   "greenhouse_sync.integration_space_readiness": GreenhouseSyncIntegrationSpaceReadiness;
+  "greenhouse_sync.notion_publication_runs": GreenhouseSyncNotionPublicationRuns;
   "greenhouse_sync.notion_space_kpi_readiness": GreenhouseSyncNotionSpaceKpiReadiness;
   "greenhouse_sync.notion_space_schema_drift_events": GreenhouseSyncNotionSpaceSchemaDriftEvents;
   "greenhouse_sync.notion_space_schema_snapshots": GreenhouseSyncNotionSpaceSchemaSnapshots;

@@ -245,6 +245,7 @@ Current tables:
 - `sprints`
 - `tasks`
 - `space_property_mappings` — config table for per-Space Notion property → conformed field mappings
+- `space_notion_publication_targets` — config table for per-Space outbound Notion publication targets, starting with `delivery_performance_reports`
 
 Important fields:
 - `notion_project_id`
@@ -275,6 +276,7 @@ Current objects:
 - `source_sync_watermarks`
 - `source_sync_failures`
 - `integration_registry` — central registry of native integrations (`TASK-188`). Stores taxonomy (`system_upstream`, `event_provider`, `batch_file`, `api_connector`, `hybrid`), ownership, readiness status, consumer domains, auth mode and sync cadence per upstream.
+- `notion_publication_runs` — audit trail for outbound `Greenhouse -> Notion` publication runs (`TASK-202`)
 - `notion_space_schema_snapshots` — versioned schema snapshots per `space_id` and Notion DB role (`TASK-187`)
 - `notion_space_schema_drift_events` — persisted additive/warning/breaking drift records for Notion per `space_id`
 - `notion_space_kpi_readiness` — per-space KPI contract readiness for Notion-backed Delivery/ICO consumers
@@ -373,7 +375,8 @@ Analytical materialization layer for ICO metrics. BigQuery-native (correct per a
 Current tables:
 - `metric_snapshots_monthly` — space-level monthly aggregates (partitioned by year, clustered by space_id)
 - `metrics_by_project` — project-level monthly aggregates (clustered by space_id, project_source_id)
-- `metrics_by_member` — person-level monthly aggregates via UNNEST(assignee_member_ids) (clustered by member_id)
+- `metrics_by_member` — person-level monthly aggregates por `primary_owner_member_id` (clustered by member_id)
+- `delivery_task_monthly_snapshots` — snapshot task-level por período para congelar cierres históricos Delivery (`working` / `locked`)
 - `rpa_trend` — 12-month rolling RPA by space and month
 - `stuck_assets_detail` — currently stuck assets (severity: warning 72h / danger 96h)
 - `ai_metric_scores` — reserved for future AI-driven metric scoring (empty)

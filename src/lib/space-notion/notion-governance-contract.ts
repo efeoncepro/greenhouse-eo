@@ -180,7 +180,7 @@ export const CORE_KPI_CONTRACT: CoreKpiContractField[] = [
 ]
 
 const NAME_PATTERNS: Record<string, string[]> = {
-  task_status: ['estado', 'status', 'state', 'estatus', 'estado_tarea', 'task_status'],
+  task_status: ['estado', 'estado_1', 'status', 'state', 'estatus', 'estado_tarea', 'task_status'],
   task_name: ['nombre_de_tarea', 'nombre', 'name', 'titulo', 'task_name', 'tarea'],
   task_phase: ['priorizacion', 'fase', 'phase'],
   task_priority: ['prioridad', 'priority', 'urgencia'],

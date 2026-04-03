@@ -51,12 +51,12 @@ export const toScimError = (detail: string, status: number): ScimErrorResponse =
   status
 })
 
-export const toScimListResponse = (
-  resources: ScimUser[],
+export const toScimListResponse = <T>(
+  resources: T[],
   startIndex: number,
   itemsPerPage: number,
   totalResults: number
-): ScimListResponse<ScimUser> => ({
+): ScimListResponse<T> => ({
   schemas: ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
   totalResults,
   startIndex,

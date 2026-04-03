@@ -2,8 +2,23 @@
 
 ## Delta 2026-04-02
 
+- `TASK-201` quedó cerrada como slice de reconciliación histórica y snapshot freezing.
+- Resultado clave de la calibración:
+  - Greenhouse ya puede congelar un período mensual de Delivery en `ico_engine.delivery_task_monthly_snapshots`
+  - `Marzo 2026` quedó materializado con `294` tareas `locked` y `293` tareas clasificadas en el scorecard agency
+  - el drift residual frente al `Performance Report` de Notion ya no apunta principalmente a fórmula ni source sync, sino a historia mutable en Notion posterior al cierre
+- Decisión operativa nueva:
+  - `Abril 2026` en adelante debe operar con snapshot mensual congelado al cierre
+  - marzo queda como baseline calibrado con residual explicado, no como período donde debamos exigir paridad exacta retroactiva contra el estado vivo actual
 - `TASK-197` quedó cerrada como slice de paridad de source sync/runtime.
 - `TASK-200` quedó cerrada como slice de contrato semántico de métricas.
+- `TASK-202` quedó cerrada como slice de publication cutover `Greenhouse -> Notion`.
+- Resultado final de la lane:
+  - Greenhouse ya calcula el `Performance Report` mensual desde snapshots congelados
+  - `greenhouse_serving.agency_performance_reports` ya actúa como serving cache canónico
+  - Notion ya tiene carril outbound formal para consumir el reporte vía base `Performance Reports`
+  - el control plane de integraciones ya registra este lane como `notion_delivery_performance_reports`
+  - el período siguiente puede operarse como `Greenhouse-first`
 - Resultado útil para esta epic:
   - `greenhouse_conformed.delivery_tasks` y `greenhouse_delivery.tasks` ya preservan `project_source_ids`
   - marzo 2026 quedó alineado por `space` en runtime para el baseline mínimo:
@@ -110,12 +125,11 @@
   - `Efeonce` marzo 2026: tareas como `Actualizar Evergreen`, `Brandear Docs Nuevos Berel`, `Banner Blog — Artículo Berel…` ya llegan mapeadas a `daniela-ferreira`, `melkin-hernandez`, `andres-carlosama`, `luis-reyes`
 
 ## Status
-
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Diseño`
+- Status real: `Cerrada`
 - Rank: `3`
 - Domain: `data`
 
@@ -189,7 +203,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/in-progress/TASK-196-delivery-performance-report-parity-greenhouse-notion.md`
+- `docs/tasks/complete/TASK-196-delivery-performance-report-parity-greenhouse-notion.md`
 - `docs/architecture/GREENHOUSE_DELIVERY_PERFORMANCE_REPORT_PARITY_V1.md`
 - `docs/operations/GREENHOUSE_PERFORMANCE_REPORT_OPERATING_MODEL_V1.md`
 - `src/lib/sync/sync-notion-conformed.ts`

@@ -36,6 +36,7 @@ Indice maestro de la documentacion no operativa del repo.
 - [FINANCE_CANONICAL_360_V1.md](architecture/FINANCE_CANONICAL_360_V1.md)
 - [Greenhouse_Capabilities_Architecture_v1.md](architecture/Greenhouse_Capabilities_Architecture_v1.md)
 - [Greenhouse_Nomenclatura_Portal_v3.md](architecture/Greenhouse_Nomenclatura_Portal_v3.md)
+- [GREENHOUSE_SCIM_ENTRA_INTEGRATION_V1.md](architecture/GREENHOUSE_SCIM_ENTRA_INTEGRATION_V1.md)
 
 ### API
 

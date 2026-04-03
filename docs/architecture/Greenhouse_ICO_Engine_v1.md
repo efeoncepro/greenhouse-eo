@@ -1,5 +1,27 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-02 — Historical Delivery periods now support frozen task snapshots
+
+`TASK-201` agrega una nueva pieza canónica al runtime de `ICO`:
+
+- `ico_engine.delivery_task_monthly_snapshots`
+
+Semántica:
+
+- snapshot task-level por `period_year` + `period_month`
+- `snapshot_status = 'working'` mientras el período sigue abierto
+- `snapshot_status = 'locked'` al congelar el cierre mensual
+
+Regla de lectura:
+
+- si existe snapshot `locked`, las materializaciones mensuales Delivery deben leer desde esa tabla y no desde `v_tasks_enriched`
+- `v_tasks_enriched` queda como source vivo para períodos abiertos y como fallback cuando todavía no existe snapshot congelado
+
+Motivo:
+
+- la calibración de `Marzo 2026` mostró que Notion puede reescribir historia después del cierre del período
+- para evitar drift retroactivo, `ICO` necesita una foto congelada del universo task-level antes de publicar el scorecard mensual
+
 ## Delta 2026-04-02 — Monthly Delivery report semantics now use due-date scope
 
 `TASK-200` fija un cambio semántico para los KPIs mensuales que alimentan el `Performance Report`:
