@@ -4,7 +4,7 @@ import type { ProjectionMode } from '@/types/payroll'
 
 import { requireHrTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { resolveExchangeRateToClp } from '@/lib/finance/shared'
+import { resolveExchangeRateToClp, roundCurrency, invertExchangeRate } from '@/lib/finance/shared'
 import { projectPayrollForPeriod } from '@/lib/payroll/project-payroll'
 import {
   pgGetLatestProjectedPayrollPromotion
@@ -148,24 +148,36 @@ export async function GET(request: Request) {
       }
     })
 
-    // Consolidated currency equivalents (CLP total + USD total)
+    // Consolidated currency equivalents via canonical finance helpers
     let clpEquivalent: { grossClp: number; netClp: number; fxRate: number } | null = null
     let usdEquivalent: { grossUsd: number; netUsd: number; fxRate: number } | null = null
 
-    if (result.totals.grossByCurrency.USD && result.totals.grossByCurrency.USD > 0) {
+    const hasUsd = (result.totals.grossByCurrency.USD ?? 0) > 0
+    const hasClp = (result.totals.grossByCurrency.CLP ?? 0) > 0
+    const isMultiCurrency = hasUsd && hasClp
+
+    if (hasUsd) {
       try {
-        const fxRate = await resolveExchangeRateToClp({ currency: 'USD' })
+        const usdToClp = await resolveExchangeRateToClp({ currency: 'USD' })
+        const clpToUsd = invertExchangeRate({ rate: usdToClp })
+
+        const grossUsd = result.totals.grossByCurrency.USD ?? 0
+        const grossClp = result.totals.grossByCurrency.CLP ?? 0
+        const netUsd = result.totals.netByCurrency.USD ?? 0
+        const netClp = result.totals.netByCurrency.CLP ?? 0
 
         clpEquivalent = {
-          grossClp: round2(result.totals.grossByCurrency.USD * fxRate + (result.totals.grossByCurrency.CLP ?? 0)),
-          netClp: round2(result.totals.netByCurrency.USD * fxRate + (result.totals.netByCurrency.CLP ?? 0)),
-          fxRate
+          grossClp: Math.round(grossUsd * usdToClp + grossClp),
+          netClp: Math.round(netUsd * usdToClp + netClp),
+          fxRate: usdToClp
         }
 
-        usdEquivalent = {
-          grossUsd: round2(result.totals.grossByCurrency.USD + (result.totals.grossByCurrency.CLP ?? 0) / fxRate),
-          netUsd: round2(result.totals.netByCurrency.USD + (result.totals.netByCurrency.CLP ?? 0) / fxRate),
-          fxRate
+        if (isMultiCurrency) {
+          usdEquivalent = {
+            grossUsd: roundCurrency(grossUsd + grossClp * clpToUsd),
+            netUsd: roundCurrency(netUsd + netClp * clpToUsd),
+            fxRate: usdToClp
+          }
         }
       } catch {
         // FX not available — skip equivalents
