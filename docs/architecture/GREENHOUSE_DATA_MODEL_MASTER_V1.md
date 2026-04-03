@@ -1,5 +1,18 @@
 # Greenhouse Data Model Master V1
 
+## Delta 2026-04-03 — Notion delivery data quality monitor persists historical runs
+
+`TASK-208` agrega una capa persistida de monitoreo de calidad para la integración nativa de `Notion` en Delivery:
+
+- `greenhouse_sync.integration_data_quality_runs`
+- `greenhouse_sync.integration_data_quality_checks`
+
+Regla vigente:
+
+- el hardening runtime del sync vive en `source_sync_runs` y en el writer canónico
+- pero la clasificación operativa `healthy / degraded / broken` y la evidencia histórica de drift viven ahora en estas tablas especializadas de data quality
+- el patrón queda abierto para que otros upstreams reutilicen el mismo contrato sin sobrecargar `source_sync_runs`
+
 ## Delta 2026-04-02 — Delivery member attribution is no longer multi-credit by default
 
 `TASK-199` cambia la lectura canónica de atribución member-level para Delivery:
@@ -276,6 +289,8 @@ Current objects:
 - `source_sync_watermarks`
 - `source_sync_failures`
 - `integration_registry` — central registry of native integrations (`TASK-188`). Stores taxonomy (`system_upstream`, `event_provider`, `batch_file`, `api_connector`, `hybrid`), ownership, readiness status, consumer domains, auth mode and sync cadence per upstream.
+- `integration_data_quality_runs` — persisted historical status per integration/domain/space. Stores `healthy / degraded / broken`, evidence summary and optional link to upstream `source_sync_runs` (`TASK-208`)
+- `integration_data_quality_checks` — persisted check-level findings attached to each `integration_data_quality_run`, including severity, result code and evidence JSON
 - `notion_publication_runs` — audit trail for outbound `Greenhouse -> Notion` publication runs (`TASK-202`)
 - `notion_space_schema_snapshots` — versioned schema snapshots per `space_id` and Notion DB role (`TASK-187`)
 - `notion_space_schema_drift_events` — persisted additive/warning/breaking drift records for Notion per `space_id`

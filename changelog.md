@@ -1,5 +1,86 @@
 # changelog.md
 
+## 2026-04-03
+
+- **TASK-209 Notion sync orchestration closure**:
+  - se agregó la tabla `greenhouse_sync.notion_sync_orchestration_runs` como control plane tenant-scoped para el cierre `raw -> conformed` por `space`
+  - `GET /api/cron/sync-conformed` ahora registra explícitamente `waiting_for_raw` y deja de depender de reruns manuales para recuperar paridad después del refresh raw
+  - se agregó `GET /api/cron/sync-conformed-recovery` como carril de retry auditado para converger automáticamente dentro de la ventana diaria
+  - `/admin/integrations` y `TenantNotionPanel` ahora muestran estado de orquestación junto al monitor de data quality para distinguir `esperando raw`, `retry`, `completed` y `failed`
+  - `vercel.json` queda alineado al scheduler upstream real de `../notion-bigquery`: conformed principal a `20 6 * * *`, recovery cada `30` minutos y monitor de data quality después de la ventana de recuperación
+
+- **TASK-130 login auth flow UX**:
+  - botón de credenciales ahora usa `LoadingButton` de MUI Lab con spinner integrado durante submit
+  - botones SSO (Microsoft, Google) muestran `CircularProgress` individual + texto "Redirigiendo a {provider}..." y se deshabilitan mutuamente con `isAnyLoading`
+  - `LinearProgress` indeterminado aparece en el top del card durante cualquier loading
+  - pantalla de transición post-auth con logo + spinner + "Preparando tu espacio de trabajo..." reemplaza el formulario tras auth exitosa
+  - nuevo `loading.tsx` en `auth/landing` muestra skeleton durante resolución de sesión server-side (elimina pantalla blanca)
+  - errores categorizados: credentials, account disabled, session expired, network, provider unavailable — con `Alert` severity diferenciada (error/warning) y botón de cerrar
+  - 8 nuevos textos en `GH_MESSAGES` para loading states y errores categorizados
+  - todo el formulario (inputs, botones, links) se deshabilita durante cualquier operación de auth
+
+- **Notion Delivery data quality null-param fix**:
+  - el monitor de `TASK-208` ya no envía `assigneeSourceId: null` a BigQuery cuando el sweep corre sin filtro por responsable
+  - se corrigió el helper `src/lib/space-notion/notion-parity-audit.ts` para omitir ese parámetro opcional y evitar el crash runtime `Parameter types must be provided for null values`
+  - se agregó la regresión `src/lib/space-notion/notion-parity-audit-query.test.ts` para cubrir el contrato de params sin assignee
+  - esto ataca el `degraded` falso-negativo en staging, donde el cron fallaba antes de persistir `integration_data_quality_runs`
+  - seguimiento adicional del mismo incidente:
+    - tras rerun de `sync-conformed`, el estado real pasó de `broken` a `degraded`
+    - el residual provenía de otro falso positivo: el auditor estaba leyendo `tarea_principal_ids` / `subtareas_ids` del raw pero forzando arrays vacíos en `greenhouse_conformed.delivery_tasks`
+    - el helper ahora lee la jerarquía persistida real cuando esas columnas existen en conformed, evitando degradar por `hierarchy_gap_candidate` cuando el writer ya preservó la relación task/subtask
+
+- **TASK-109 projected payroll runtime hardening**:
+  - `projected-payroll-store.ts` ya no ejecuta `CREATE TABLE IF NOT EXISTS` en runtime; reemplazado por `verifyInfrastructure()` con fail-fast y error accionable si la tabla no existe
+  - los cuatro eventos `payroll.projected_*` quedan formalizados como audit-only en el Event Catalog; `payroll.projected_snapshot.refreshed` marcado como deprecated (definido pero sin publisher activo)
+  - se documentaron señales de health específicas de `projected_payroll` en el Reactive Projections Playbook
+  - se actualizó el contrato de Projected Payroll en `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md` con la nota de DDL eliminado
+  - tests actualizados: fail-fast, no-DDL verification, null deductions normalization
+
+- **Admin Cloud & Integrations route fix**:
+  - la navegación principal de `Cloud & Integrations` ahora apunta a la surface canónica `/admin/integrations`
+  - `/admin/cloud-integrations` queda como alias compatible con redirect server-side para evitar clicks muertos o drift entre menú, cards y governance surface
+  - `Admin Center`, `Ops Health`, el menú vertical y el catálogo de vistas quedaron alineados al mismo destino
+
+- **TASK-208 delivery notion data quality monitor**:
+  - se agregaron las tablas `greenhouse_sync.integration_data_quality_runs` y `greenhouse_sync.integration_data_quality_checks` para persistir scoring y findings históricos del pipeline `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`
+  - se agregó el helper `src/lib/integrations/notion-delivery-data-quality.ts` para ejecutar el auditor por `space`, clasificar `healthy / degraded / broken`, persistir evidencia y alertar por Slack en estados degradados o rotos
+  - `GET /api/cron/notion-delivery-data-quality` corre el monitor en forma recurrente y `GET /api/cron/sync-conformed` ahora dispara un sweep post-sync sin bloquear el writer canónico si el monitor falla
+  - `/admin/integrations`, `/admin/ops-health` y `TenantNotionPanel` ya exponen el estado operativo, findings recientes e historial corto del monitor
+  - `TASK-208` queda cerrada como capa continua de observabilidad y data quality sobre los contratos ya definidos por `TASK-205` y `TASK-207`
+
+- **TASK-207 delivery notion sync pipeline hardening**:
+  - `sync-conformed` ahora exige readiness con frescura real de `notion_ops.tareas` y `notion_ops.proyectos`
+  - el writer canónico `src/lib/sync/sync-notion-conformed.ts` ahora salta runs stale con trazabilidad explícita en `greenhouse_sync.source_sync_runs`
+  - `greenhouse_conformed.delivery_tasks` y `greenhouse_delivery.tasks` ahora preservan jerarquía con `tarea_principal_ids` y `subtareas_ids`
+  - se agregó validación persisted raw→conformed por `space_id` para totales, status, cobertura de assignee, due date y jerarquía
+  - el script legacy `scripts/sync-source-runtime-projections.ts` mantiene la proyección/manual seed, pero deja el overwrite de conformed detrás del guardrail `GREENHOUSE_ENABLE_LEGACY_CONFORMED_OVERWRITE=true`
+  - se agregaron pruebas unitarias para los gates de frescura Notion y la validación de paridad de tareas
+  - el lane quedó alineado al control plane existente (`/api/cron/sync-conformed`, `/api/admin/integrations/[integrationKey]/sync`, `integration_registry`, `source_sync_runs`) sin crear una surface paralela
+
+- **TASK-205 delivery notion origin parity audit**:
+  - `TASK-205` queda cerrada como lane de auditoría reusable para comparar `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`
+  - se agregó el helper `src/lib/space-notion/notion-parity-audit.ts`, la route admin `GET /api/admin/tenants/[id]/notion-parity-audit` y el script `pnpm audit:notion-delivery-parity`
+  - la verificación real de abril 2026 quedó reproducible:
+    - `Daniela / due_date`: `Sky 56 -> 50`, `Efeonce 24 -> 23`
+    - `Andrés / due_date`: total `13 -> 10`
+    - `Andrés / created_at`: total `9 -> 1`
+  - los buckets reusable ya confirman `missing_in_conformed`, `status_mismatch`, `due_date_mismatch`, `fresh_raw_after_conformed_sync` y `hierarchy_gap_candidate`
+  - el hardening estructural del pipeline y las freshness gates siguen asignados a `TASK-207`
+
+- **Delivery carry-over semantic correction**:
+  - `Carry-Over` deja de interpretarse como tarea vencida de períodos anteriores aún abierta
+  - la definición canónica pasa a ser: tarea creada dentro del período con `due_date` posterior al cierre del período
+  - se incorpora `Overdue Carried Forward` como métrica separada para deuda vencida que cruza de mes
+  - `OTD` queda explícitamente separado de ambas métricas complementarias
+  - se abrió `TASK-204` para implementar el split semántico en el engine y las materializaciones
+
+- **Delivery performance metric audit follow-on**:
+  - `readAgencyPerformanceReport()` ahora prioriza `ico_engine.performance_report_monthly` antes que `greenhouse_serving.agency_performance_reports`
+  - `greenhouse_serving` queda explícitamente como cache/fallback y no como fuente preferida del cálculo
+  - se agregó la prueba `src/lib/ico-engine/performance-report.test.ts` para cubrir el orden `materialized-first`
+  - la auditoría task-level confirmó que `Marzo 2026` sigue consistente entre snapshot congelado y serving bajo el contrato actual
+  - también dejó explícito que `carry-over` sigue siendo una decisión semántica separada y no un bug de lectura de fuente
+
 ## 2026-04-02
 
 - **TASK-201 delivery performance historical materialization reconciliation**:

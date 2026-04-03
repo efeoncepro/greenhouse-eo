@@ -21,11 +21,22 @@ import Typography from '@mui/material/Typography'
 
 import { ExecutiveCardShell, ExecutiveMiniStatCard } from '@/components/greenhouse'
 import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
+import type {
+  IntegrationDataQualityOverview,
+  IntegrationDataQualityRunResult,
+  IntegrationDataQualityStatus
+} from '@/types/integration-data-quality'
+import type {
+  NotionSyncOrchestrationOverview,
+  NotionSyncOrchestrationStatus
+} from '@/types/notion-sync-orchestration'
 import type { IntegrationHealth, IntegrationReadiness, IntegrationType, IntegrationWithHealth } from '@/types/integrations'
 import AdminOpsActionButton from './AdminOpsActionButton'
 
 type Props = {
   integrations: IntegrationWithHealth[]
+  notionDataQualityOverview: IntegrationDataQualityOverview | null
+  notionOrchestrationOverview: NotionSyncOrchestrationOverview | null
 }
 
 const typeLabel: Record<IntegrationType, string> = {
@@ -83,12 +94,82 @@ const formatDateTime = (value: string | null) => {
   }).format(new Date(value))
 }
 
-const AdminIntegrationGovernanceView = ({ integrations }: Props) => {
+const dataQualityColor = (
+  status: IntegrationDataQualityStatus
+): 'success' | 'warning' | 'error' | 'secondary' => {
+  if (status === 'healthy') return 'success'
+  if (status === 'degraded') return 'warning'
+  if (status === 'broken') return 'error'
+
+  return 'secondary'
+}
+
+const orchestrationColor = (
+  status: NotionSyncOrchestrationStatus | 'unknown'
+): 'success' | 'warning' | 'error' | 'secondary' | 'info' => {
+  if (status === 'sync_completed') return 'success'
+  if (status === 'waiting_for_raw' || status === 'retry_scheduled') return 'warning'
+  if (status === 'retry_running') return 'info'
+  if (status === 'sync_failed' || status === 'cancelled') return 'error'
+
+  return 'secondary'
+}
+
+const toNumber = (value: unknown) => {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : 0
+
+  if (typeof value === 'string') {
+    const parsed = Number(value)
+
+    return Number.isFinite(parsed) ? parsed : 0
+  }
+
+  if (typeof value === 'object' && value !== null && 'value' in value) {
+    return toNumber((value as { value?: unknown }).value)
+  }
+
+  return 0
+}
+
+const getTopFindings = (runs: IntegrationDataQualityRunResult[]) => {
+  const totals = new Map<string, number>()
+
+  for (const run of runs.slice(0, 6)) {
+    const bucketCounts = typeof run.summary.bucketCounts === 'object' && run.summary.bucketCounts !== null
+      ? run.summary.bucketCounts as Record<string, unknown>
+      : {}
+
+    for (const [bucket, count] of Object.entries(bucketCounts)) {
+      const normalizedCount = toNumber(count)
+
+      if (normalizedCount > 0) {
+        totals.set(bucket, (totals.get(bucket) ?? 0) + normalizedCount)
+      }
+    }
+  }
+
+  return [...totals.entries()]
+    .map(([bucket, count]) => ({ bucket, count }))
+    .sort((left, right) => right.count - left.count)
+    .slice(0, 4)
+}
+
+const AdminIntegrationGovernanceView = ({
+  integrations,
+  notionDataQualityOverview,
+  notionOrchestrationOverview
+}: Props) => {
   const activeCount = integrations.filter(i => i.active).length
   const readyCount = integrations.filter(i => i.readinessStatus === 'ready' && !i.pausedAt).length
   const pausedCount = integrations.filter(i => i.pausedAt).length
   const domains = [...new Set(integrations.flatMap(i => i.consumerDomains))]
   const syncableCount = integrations.filter(i => i.syncEndpoint && !i.pausedAt).length
+  const notionLatestBySpace = notionDataQualityOverview?.latestBySpace ?? []
+  const notionStatusTotals = notionDataQualityOverview?.totals ?? null
+  const notionRecentRuns = notionDataQualityOverview?.recentRuns ?? []
+  const notionTopFindings = getTopFindings(notionRecentRuns)
+  const notionOrchestrationTotals = notionOrchestrationOverview?.totals ?? null
+  const notionOrchestrationLatest = notionOrchestrationOverview?.latestBySpace ?? []
 
   return (
     <Stack spacing={6}>
@@ -115,7 +196,7 @@ const AdminIntegrationGovernanceView = ({ integrations }: Props) => {
               La fuente canonica es <code>greenhouse_sync.integration_registry</code>.
             </Typography>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <Button component={Link} href='/admin/cloud-integrations' variant='contained'>
+              <Button component={Link} href='/admin/integrations' variant='contained'>
                 Cloud & Integrations
               </Button>
               <Button component={Link} href='/admin' variant='outlined'>
@@ -328,6 +409,328 @@ const AdminIntegrationGovernanceView = ({ integrations }: Props) => {
             </TableBody>
           </Table>
         </TableContainer>
+      </ExecutiveCardShell>
+
+      <ExecutiveCardShell
+        title='Notion Sync Orchestration'
+        subtitle='Cierre operativo del tramo raw -> conformed. Muestra qué spaces siguen esperando raw, cuáles están en retry y dónde conviene intervenir antes de declarar el pipeline sano.'
+      >
+        {!notionOrchestrationTotals ? (
+          <Alert severity='info' variant='outlined'>
+            La orquestación todavía no tiene evidencia persistida. El primer bloqueo por frescura o el primer retry materializarán esta vista.
+          </Alert>
+        ) : (
+          <Stack spacing={3}>
+            <Box
+              sx={{
+                display: 'grid',
+                gap: 3,
+                gridTemplateColumns: { xs: '1fr', md: 'repeat(4, minmax(0, 1fr))' }
+              }}
+            >
+              <ExecutiveMiniStatCard
+                eyebrow='Open'
+                tone={notionOrchestrationTotals.openSpaces > 0 ? 'warning' : 'success'}
+                title='Spaces abiertos'
+                value={String(notionOrchestrationTotals.openSpaces)}
+                detail='Spaces que todavía no convergen al writer canónico.'
+                icon='tabler-loader-2'
+              />
+              <ExecutiveMiniStatCard
+                eyebrow='Waiting Raw'
+                tone={notionOrchestrationTotals.waitingForRaw > 0 ? 'warning' : 'success'}
+                title='Esperando raw'
+                value={String(notionOrchestrationTotals.waitingForRaw)}
+                detail='Spaces bloqueados por frescura upstream en Notion/BigQuery.'
+                icon='tabler-hourglass'
+              />
+              <ExecutiveMiniStatCard
+                eyebrow='Retry'
+                tone={
+                  notionOrchestrationTotals.retryScheduled + notionOrchestrationTotals.retryRunning > 0
+                    ? 'warning'
+                    : 'success'
+                }
+                title='Reintentos activos'
+                value={String(notionOrchestrationTotals.retryScheduled + notionOrchestrationTotals.retryRunning)}
+                detail='Retries ya planificados o ejecutándose dentro de la ventana diaria.'
+                icon='tabler-refresh'
+              />
+              <ExecutiveMiniStatCard
+                eyebrow='Failed'
+                tone={notionOrchestrationTotals.syncFailed > 0 ? 'error' : 'success'}
+                title='Fallidos'
+                value={String(notionOrchestrationTotals.syncFailed)}
+                detail='Spaces que agotaron la ventana de retry o cerraron en error.'
+                icon='tabler-alert-octagon'
+              />
+            </Box>
+
+            {(notionOrchestrationTotals.syncFailed > 0 || notionOrchestrationTotals.unknownSpaces > 0) && (
+              <Alert severity={notionOrchestrationTotals.syncFailed > 0 ? 'error' : 'warning'} variant='outlined'>
+                {notionOrchestrationTotals.syncFailed > 0
+                  ? 'Hay spaces que no convergieron dentro del presupuesto de retry. Revisa razón y próxima intervención antes de confiar en downstream.'
+                  : 'Hay spaces activos sin evidencia de orquestación todavía. Eso suele indicar que el día aún no abrió corrida o que el control plane no ha materializado señal.'}
+              </Alert>
+            )}
+
+            <TableContainer>
+              <Table size='small'>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Space</TableCell>
+                    <TableCell>Estado</TableCell>
+                    <TableCell align='right'>Retry</TableCell>
+                    <TableCell>Próxima ventana</TableCell>
+                    <TableCell>Última señal</TableCell>
+                    <TableCell>Razón</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {notionOrchestrationLatest.map(space => (
+                    <TableRow key={space.spaceId} hover>
+                      <TableCell>
+                        <Stack spacing={0.25}>
+                          <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                            {space.spaceName ?? space.spaceId}
+                          </Typography>
+                          <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
+                            {space.spaceId}
+                          </Typography>
+                        </Stack>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          size='small'
+                          variant='tonal'
+                          color={orchestrationColor(space.orchestrationStatus)}
+                          label={space.orchestrationStatus}
+                        />
+                      </TableCell>
+                      <TableCell align='right'>
+                        <Typography variant='body2'>{space.retryAttempt}</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant='caption' color='text.secondary'>
+                          {formatDateTime(space.nextRetryAt)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant='caption' color='text.secondary'>
+                          {formatDateTime(space.updatedAt)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant='caption' color='text.secondary'>
+                          {space.waitingReason ?? 'Sin observaciones'}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Stack>
+        )}
+      </ExecutiveCardShell>
+
+      <ExecutiveCardShell
+        title='Notion Delivery Data Quality'
+        subtitle='Monitor recurrente del contrato `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`. Señal separada de la health genérica de la integración.'
+      >
+        {!notionStatusTotals ? (
+          <Alert severity='info' variant='outlined'>
+            El monitor todavía no tiene corridas materializadas. Ejecuta el cron o espera el siguiente ciclo después de `sync-conformed`.
+          </Alert>
+        ) : (
+          <Stack spacing={3}>
+            <Box
+              sx={{
+                display: 'grid',
+                gap: 3,
+                gridTemplateColumns: { xs: '1fr', md: 'repeat(4, minmax(0, 1fr))' }
+              }}
+            >
+              <ExecutiveMiniStatCard
+                eyebrow='Spaces'
+                tone='info'
+                title='Cobertura auditada'
+                value={String(notionStatusTotals.totalSpaces)}
+                detail='Spaces activos con binding Notion incluidos en el monitor.'
+                icon='tabler-building-community'
+              />
+              <ExecutiveMiniStatCard
+                eyebrow='Healthy'
+                tone='success'
+                title='Sanos'
+                value={String(notionStatusTotals.healthySpaces)}
+                detail='Spaces sin drift ni findings duros en la última corrida.'
+                icon='tabler-shield-check'
+              />
+              <ExecutiveMiniStatCard
+                eyebrow='Degraded'
+                tone={notionStatusTotals.degradedSpaces > 0 ? 'warning' : 'success'}
+                title='Degradados'
+                value={String(notionStatusTotals.degradedSpaces)}
+                detail='Mismatchs o hallazgos blandos que requieren seguimiento.'
+                icon='tabler-alert-circle'
+              />
+              <ExecutiveMiniStatCard
+                eyebrow='Broken'
+                tone={notionStatusTotals.brokenSpaces > 0 ? 'error' : 'success'}
+                title='Rotos'
+                value={String(notionStatusTotals.brokenSpaces)}
+                detail='Frescura o paridad rota; requiere intervención operativa.'
+                icon='tabler-activity-heartbeat'
+              />
+            </Box>
+
+            <TableContainer>
+              <Table size='small'>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Space</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Última corrida</TableCell>
+                    <TableCell align='right'>Warnings</TableCell>
+                    <TableCell align='right'>Errores</TableCell>
+                    <TableCell align='right'>Diff</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {notionLatestBySpace.map(space => (
+                    <TableRow key={space.spaceId} hover>
+                      <TableCell>
+                        <Stack spacing={0.25}>
+                          <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                            {space.spaceName ?? space.spaceId}
+                          </Typography>
+                          <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
+                            {space.spaceId}
+                          </Typography>
+                        </Stack>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          size='small'
+                          variant='tonal'
+                          color={dataQualityColor(space.qualityStatus)}
+                          label={space.qualityStatus}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant='caption' color='text.secondary'>
+                          {formatDateTime(space.checkedAt)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align='right'>
+                        <Typography variant='body2'>{space.warningChecks}</Typography>
+                      </TableCell>
+                      <TableCell align='right'>
+                        <Typography
+                          variant='body2'
+                          color={space.errorChecks > 0 ? 'error.main' : 'text.secondary'}
+                        >
+                          {space.errorChecks}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align='right'>
+                        <Typography
+                          variant='body2'
+                          color={space.diffCount > 0 ? 'warning.main' : 'text.secondary'}
+                        >
+                          {space.diffCount}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            <Box
+              sx={{
+                display: 'grid',
+                gap: 3,
+                gridTemplateColumns: { xs: '1fr', xl: 'repeat(2, minmax(0, 1fr))' }
+              }}
+            >
+              <Card variant='outlined'>
+                <CardContent>
+                  <Stack spacing={1.5}>
+                    <Typography variant='h6'>Findings recurrentes</Typography>
+                    {notionTopFindings.length > 0 ? (
+                      notionTopFindings.map(finding => (
+                        <Stack key={finding.bucket} direction='row' justifyContent='space-between' alignItems='center' gap={2}>
+                          <Typography variant='body2' color='text.secondary'>
+                            {finding.bucket}
+                          </Typography>
+                          <Chip size='small' variant='outlined' color='warning' label={`${finding.count} caso(s)`} />
+                        </Stack>
+                      ))
+                    ) : (
+                      <Typography variant='body2' color='text.secondary'>
+                        Sin findings activos en las corridas recientes.
+                      </Typography>
+                    )}
+                  </Stack>
+                </CardContent>
+              </Card>
+
+              <Card variant='outlined'>
+                <CardContent>
+                  <Stack spacing={2}>
+                    <Typography variant='h6'>Historia corta</Typography>
+                    <TableContainer>
+                      <Table size='small'>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Space</TableCell>
+                            <TableCell>Status</TableCell>
+                            <TableCell align='right'>Diff</TableCell>
+                            <TableCell>Corrida</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {notionRecentRuns.slice(0, 6).map(run => (
+                            <TableRow key={run.dataQualityRunId} hover>
+                              <TableCell>
+                                <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8125rem' }}>
+                                  {run.spaceId}
+                                </Typography>
+                              </TableCell>
+                              <TableCell>
+                                <Chip
+                                  size='small'
+                                  variant='tonal'
+                                  color={dataQualityColor(run.qualityStatus)}
+                                  label={run.qualityStatus}
+                                />
+                              </TableCell>
+                              <TableCell align='right'>
+                                <Typography
+                                  variant='body2'
+                                  color={toNumber(run.summary.diffCount) > 0 ? 'warning.main' : 'text.secondary'}
+                                >
+                                  {toNumber(run.summary.diffCount)}
+                                </Typography>
+                              </TableCell>
+                              <TableCell>
+                                <Typography variant='caption' color='text.secondary'>
+                                  {formatDateTime(run.checkedAt)}
+                                </Typography>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Stack>
+                </CardContent>
+              </Card>
+            </Box>
+          </Stack>
+        )}
       </ExecutiveCardShell>
 
       {/* Control Plane — Sync & Pause/Resume */}

@@ -4,41 +4,24 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import type { ProjectedPayrollEntry } from './project-payroll'
 
-// ── Schema ──
+// ── Infrastructure check (fail-fast, no DDL) ──
 
-let ensured = false
+let verified = false
 
-const ensureSchema = async () => {
-  if (ensured) return
+const verifyInfrastructure = async () => {
+  if (verified) return
 
-  await runGreenhousePostgresQuery(`
-    CREATE TABLE IF NOT EXISTS greenhouse_serving.projected_payroll_snapshots (
-      member_id TEXT NOT NULL,
-      period_year INT NOT NULL,
-      period_month INT NOT NULL,
-      projection_mode TEXT NOT NULL CHECK (projection_mode IN ('actual_to_date', 'projected_month_end')),
-      as_of_date DATE NOT NULL,
-      currency TEXT NOT NULL,
-      base_salary NUMERIC(14,2) NOT NULL DEFAULT 0,
-      remote_allowance NUMERIC(14,2) NOT NULL DEFAULT 0,
-      fixed_bonus_amount NUMERIC(14,2) NOT NULL DEFAULT 0,
-      bonus_otd_amount NUMERIC(14,2) NOT NULL DEFAULT 0,
-      bonus_rpa_amount NUMERIC(14,2) NOT NULL DEFAULT 0,
-      gross_total NUMERIC(14,2) NOT NULL DEFAULT 0,
-      total_deductions NUMERIC(14,2) NOT NULL DEFAULT 0,
-      net_total NUMERIC(14,2) NOT NULL DEFAULT 0,
-      kpi_otd_percent NUMERIC(5,2),
-      kpi_rpa_avg NUMERIC(5,2),
-      working_days_cut INT,
-      working_days_total INT,
-      days_absent INT DEFAULT 0,
-      days_on_leave INT DEFAULT 0,
-      uf_value NUMERIC(10,2),
-      snapshot_status TEXT NOT NULL DEFAULT 'projected',
-      materialized_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      PRIMARY KEY (member_id, period_year, period_month, projection_mode)
+  try {
+    await runGreenhousePostgresQuery(
+      `SELECT 1 FROM greenhouse_serving.projected_payroll_snapshots LIMIT 0`
     )
-  `).then(() => { ensured = true }).catch(() => {})
+    verified = true
+  } catch {
+    throw new Error(
+      '[projected-payroll-store] Table greenhouse_serving.projected_payroll_snapshots does not exist. ' +
+      'Provision it via migration: scripts/migrations/add-projected-payroll-snapshots.sql'
+    )
+  }
 }
 
 // ── Write ──
@@ -47,7 +30,7 @@ export const upsertProjectedPayrollSnapshot = async (
   entry: ProjectedPayrollEntry,
   period: { year: number; month: number }
 ) => {
-  await ensureSchema()
+  await verifyInfrastructure()
 
   await runGreenhousePostgresQuery(
     `INSERT INTO greenhouse_serving.projected_payroll_snapshots (
@@ -111,7 +94,7 @@ export const readProjectedPayrollSnapshots = async (
   month: number,
   mode: string
 ): Promise<Map<string, { grossTotal: number; netTotal: number; asOfDate: string }>> => {
-  await ensureSchema()
+  await verifyInfrastructure()
 
   const rows = await runGreenhousePostgresQuery<SnapshotRow>(
     `SELECT member_id, currency, gross_total, net_total, as_of_date::text

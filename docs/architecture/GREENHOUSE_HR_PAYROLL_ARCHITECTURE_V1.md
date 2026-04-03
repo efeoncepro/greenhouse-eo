@@ -166,6 +166,7 @@ Regla arquitectónica:
 - la promoción a oficial es una acción explícita, separada y reversible en términos de tracking, pero no en lifecycle transaccional
 - la capa de promoción debe fallar por schema o datos reales de nómina, no por infraestructura analítica no relacionada con el período
 - la surface `/api/hr/payroll/projected` sigue resolviendo cálculo vivo + `latestPromotion`; `projected_payroll_snapshots` es una materialización serving interna para acelerar el read, no la source of truth transaccional
+- **Runtime DDL eliminado (TASK-109):** `projected-payroll-store.ts` ya no ejecuta `CREATE TABLE IF NOT EXISTS` en runtime. La tabla `greenhouse_serving.projected_payroll_snapshots` se provisiona exclusivamente vía migración (`scripts/migrations/add-projected-payroll-snapshots.sql`). Si la tabla no existe, el store falla con error accionable inmediato (fail-fast), sin intentar DDL defensivo
 
 ## 2.6. Operational cut-off and close window
 

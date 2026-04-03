@@ -6,7 +6,17 @@ import os from 'node:os'
 import path from 'node:path'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import {
+  getNotionRawFreshnessGate,
+  type NotionRawFreshnessGateResult
+} from '@/lib/integrations/notion-readiness'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { auditDeliveryNotionParity } from '@/lib/space-notion/notion-parity-audit'
+import {
+  buildNotionTaskParitySnapshot,
+  compareNotionTaskParitySnapshots,
+  validateRawToConformedTaskParity
+} from '@/lib/sync/notion-task-parity'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -21,6 +31,33 @@ export interface SyncConformedResult {
   conformedTasksWithAssigneeMember: number
   conformedTasksWithAssigneeMemberIds: number
   durationMs: number
+  skipped?: boolean
+  skipReason?: string | null
+  rawFreshness?: NotionRawFreshnessGateResult | null
+}
+
+type SyncConformedRunStatus = 'running' | 'succeeded' | 'failed' | 'partial' | 'cancelled'
+
+type InformationSchemaRow = {
+  column_name: string
+}
+
+type PersistedDistinctTaskCountRow = {
+  distinct_task_count: number | string | null
+}
+
+type PersistedSpaceTotalsRow = {
+  space_id: string | null
+  total_tasks: number | string | null
+  with_assignee_source: number | string | null
+  with_due_date: number | string | null
+  with_hierarchy: number | string | null
+}
+
+type PersistedStatusCountsRow = {
+  space_id: string | null
+  task_status: string | null
+  total_tasks: number | string | null
 }
 
 type NotionProjectRow = {
@@ -73,6 +110,8 @@ type NotionTaskRow = {
   proyecto_ids: string[] | null
   sprint_ids: string[] | null
   responsables_ids: string[] | null
+  tarea_principal_ids: string[] | null
+  subtareas_ids: string[] | null
   'fecha_límite': string | null
   'fecha_límite_end': string | null
   'fecha_límite_original': string | null
@@ -182,6 +221,148 @@ const normalizePerformanceIndicatorCode = (value: unknown) => {
 const buildPayloadHash = (payload: unknown) =>
   createHash('sha256').update(JSON.stringify(payload)).digest('hex')
 
+const toStringArray = (value: unknown) => {
+  if (!Array.isArray(value)) return []
+
+  return Array.from(
+    new Set(value.map(item => toNullableString(item)).filter((item): item is string => Boolean(item)))
+  )
+}
+
+const buildRawAssigneeIdsExpression = (columns: Set<string>) => {
+  const hasResponsablesIds = columns.has('responsables_ids')
+  const hasResponsableIds = columns.has('responsable_ids')
+
+  if (hasResponsablesIds && hasResponsableIds) {
+    return `CASE
+      WHEN responsables_ids IS NOT NULL AND ARRAY_LENGTH(responsables_ids) > 0 THEN responsables_ids
+      WHEN responsable_ids IS NOT NULL AND ARRAY_LENGTH(responsable_ids) > 0 THEN responsable_ids
+      ELSE ARRAY<STRING>[]
+    END`
+  }
+
+  if (hasResponsablesIds) return 'IFNULL(responsables_ids, ARRAY<STRING>[])'
+  if (hasResponsableIds) return 'IFNULL(responsable_ids, ARRAY<STRING>[])'
+
+  return 'ARRAY<STRING>[]'
+}
+
+const buildRawStatusExpression = (columns: Set<string>) => {
+  const hasEstado = columns.has('estado')
+  const hasEstado1 = columns.has('estado_1')
+
+  if (hasEstado && hasEstado1) return 'COALESCE(estado, estado_1)'
+  if (hasEstado) return 'estado'
+  if (hasEstado1) return 'estado_1'
+
+  return 'CAST(NULL AS STRING)'
+}
+
+const buildRawTaskNameExpression = (columns: Set<string>) => {
+  const hasNombreDeTarea = columns.has('nombre_de_tarea')
+  const hasNombreDeLaTarea = columns.has('nombre_de_la_tarea')
+
+  if (hasNombreDeTarea && hasNombreDeLaTarea) return 'COALESCE(nombre_de_tarea, nombre_de_la_tarea)'
+  if (hasNombreDeTarea) return 'nombre_de_tarea'
+  if (hasNombreDeLaTarea) return 'nombre_de_la_tarea'
+
+  return 'CAST(NULL AS STRING)'
+}
+
+const readTableColumns = async (dataset: string, table: string) => {
+  const projectId = getBigQueryProjectId()
+  const bq = getBigQueryClient()
+
+  const [rows] = await bq.query({
+    query: `
+      SELECT column_name
+      FROM \`${projectId}.${dataset}.INFORMATION_SCHEMA.COLUMNS\`
+      WHERE table_name = @table
+    `,
+    params: { table }
+  }) as [InformationSchemaRow[], unknown]
+
+  return new Set(rows.map(row => row.column_name))
+}
+
+const currentUtcPeriod = () => {
+  const now = new Date()
+
+  return {
+    year: now.getUTCFullYear(),
+    month: now.getUTCMonth() + 1
+  }
+}
+
+const readPersistedNotionTaskParitySnapshot = async (projectId: string) => {
+  const bq = getBigQueryClient()
+
+  const [distinctRows, spaceRows, statusRows] = await Promise.all([
+    bq.query({
+      query: `
+        SELECT COUNT(DISTINCT task_source_id) AS distinct_task_count
+        FROM \`${projectId}.greenhouse_conformed.delivery_tasks\`
+      `
+    }) as Promise<[PersistedDistinctTaskCountRow[], unknown]>,
+    bq.query({
+      query: `
+        SELECT
+          COALESCE(space_id, '__NULL__') AS space_id,
+          COUNT(*) AS total_tasks,
+          COUNTIF(assignee_source_id IS NOT NULL) AS with_assignee_source,
+          COUNTIF(due_date IS NOT NULL) AS with_due_date,
+          COUNTIF(
+            (tarea_principal_ids IS NOT NULL AND ARRAY_LENGTH(tarea_principal_ids) > 0) OR
+            (subtareas_ids IS NOT NULL AND ARRAY_LENGTH(subtareas_ids) > 0)
+          ) AS with_hierarchy
+        FROM \`${projectId}.greenhouse_conformed.delivery_tasks\`
+        GROUP BY COALESCE(space_id, '__NULL__')
+      `
+    }) as Promise<[PersistedSpaceTotalsRow[], unknown]>,
+    bq.query({
+      query: `
+        SELECT
+          COALESCE(space_id, '__NULL__') AS space_id,
+          COALESCE(task_status, '__NULL__') AS task_status,
+          COUNT(*) AS total_tasks
+        FROM \`${projectId}.greenhouse_conformed.delivery_tasks\`
+        GROUP BY COALESCE(space_id, '__NULL__'), COALESCE(task_status, '__NULL__')
+      `
+    }) as Promise<[PersistedStatusCountsRow[], unknown]>
+  ])
+
+  const [distinctTaskCountRows] = distinctRows
+  const [persistedSpaceRows] = spaceRows
+  const [persistedStatusRows] = statusRows
+
+  return {
+    distinctTaskCount: toNumber(distinctTaskCountRows[0]?.distinct_task_count ?? 0) ?? 0,
+    spaceTotals: Object.fromEntries(
+      persistedSpaceRows.map(row => [
+        row.space_id ?? '__NULL__',
+        {
+          totalTasks: toNumber(row.total_tasks) ?? 0,
+          withAssigneeSource: toNumber(row.with_assignee_source) ?? 0,
+          withDueDate: toNumber(row.with_due_date) ?? 0,
+          withHierarchy: toNumber(row.with_hierarchy) ?? 0
+        }
+      ])
+    ),
+    statusCounts: persistedStatusRows.reduce<Record<string, Record<string, number>>>((acc, row) => {
+      const spaceKey = row.space_id ?? '__NULL__'
+      const statusKey = row.task_status ?? '__NULL__'
+
+      if (!acc[spaceKey]) {
+        acc[spaceKey] = {}
+      }
+
+      acc[spaceKey][statusKey] = toNumber(row.total_tasks) ?? 0
+
+      return acc
+    }, {})
+  }
+}
+
 // ─── BigQuery Runners ───────────────────────────────────────────────────────
 
 const runBigQuery = async <T extends Record<string, unknown>>(query: string) => {
@@ -250,18 +431,118 @@ const ensureDeliveryTaskColumns = async (projectId: string) => {
   } catch {
     // Column may already exist or service account lacks ALTER permissions — safe to continue
   }
+
+  try {
+    await bq.query({
+      query: `ALTER TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\` ADD COLUMN IF NOT EXISTS tarea_principal_ids ARRAY<STRING>`
+    })
+  } catch {
+    // Column may already exist or service account lacks ALTER permissions — safe to continue
+  }
+
+  try {
+    await bq.query({
+      query: `ALTER TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\` ADD COLUMN IF NOT EXISTS subtareas_ids ARRAY<STRING>`
+    })
+  } catch {
+    // Column may already exist or service account lacks ALTER permissions — safe to continue
+  }
+}
+
+export const writeSyncConformedRunRecord = async ({
+  syncRunId,
+  status,
+  notes,
+  recordsRead = 0,
+  recordsWrittenConformed = 0
+}: {
+  syncRunId: string
+  status: SyncConformedRunStatus
+  notes?: string | null
+  recordsRead?: number
+  recordsWrittenConformed?: number
+}) => {
+  try {
+    await runGreenhousePostgresQuery(
+      `INSERT INTO greenhouse_sync.source_sync_runs
+        (sync_run_id, source_system, source_object_type, sync_mode, status,
+         records_read, records_written_conformed, triggered_by, notes, finished_at)
+       VALUES ($1, 'notion', 'cron_conformed', 'incremental', $2,
+               $3, $4, 'vercel_cron', $5, CASE WHEN $2 = 'running' THEN NULL ELSE CURRENT_TIMESTAMP END)
+       ON CONFLICT (sync_run_id) DO UPDATE
+       SET
+         status = EXCLUDED.status,
+         records_read = EXCLUDED.records_read,
+         records_written_conformed = EXCLUDED.records_written_conformed,
+         notes = EXCLUDED.notes,
+         finished_at = EXCLUDED.finished_at`,
+      [syncRunId, status, recordsRead, recordsWrittenConformed, notes ?? null]
+    )
+  } catch {
+    // Non-critical control-plane write
+  }
 }
 
 // ─── Main Sync Function ─────────────────────────────────────────────────────
 
-export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
+export const syncNotionToConformed = async (input?: {
+  rawFreshness?: NotionRawFreshnessGateResult
+  syncRunId?: string
+}): Promise<SyncConformedResult> => {
   const start = Date.now()
-  const syncRunId = `sync-cron-${randomUUID()}`
+  const syncRunId = input?.syncRunId ?? `sync-cron-${randomUUID()}`
   const projectId = getBigQueryProjectId()
   const nowIso = new Date().toISOString()
+  const { year: auditYear, month: auditMonth } = currentUtcPeriod()
 
-  // 1. Read from notion_ops (populated by external notion-bq-sync Cloud Run)
-  const [projects, tasks, sprints] = await Promise.all([
+  await writeSyncConformedRunRecord({
+    syncRunId,
+    status: 'running',
+    notes: 'Conformed sync started.'
+  })
+
+  try {
+    const rawFreshness = input?.rawFreshness ?? await getNotionRawFreshnessGate()
+
+    if (!rawFreshness.ready) {
+      await writeSyncConformedRunRecord({
+        syncRunId,
+        status: 'cancelled',
+        notes: `Conformed sync skipped: ${rawFreshness.reason}`
+      })
+
+      return {
+        syncRunId,
+        projectsRead: 0,
+        tasksRead: 0,
+        sprintsRead: 0,
+        conformedRowsWritten: 0,
+        sourceTasksWithResponsables: 0,
+        conformedTasksWithAssigneeSource: 0,
+        conformedTasksWithAssigneeMember: 0,
+        conformedTasksWithAssigneeMemberIds: 0,
+        durationMs: Date.now() - start,
+        skipped: true,
+        skipReason: rawFreshness.reason,
+        rawFreshness
+      }
+    }
+
+    const taskColumns = await readTableColumns('notion_ops', 'tareas')
+    const rawTaskNameExpression = buildRawTaskNameExpression(taskColumns)
+    const rawTaskStatusExpression = buildRawStatusExpression(taskColumns)
+    const rawAssigneeIdsExpression = buildRawAssigneeIdsExpression(taskColumns)
+
+    const parentIdsExpression = taskColumns.has('tarea_principal_ids')
+      ? 'IFNULL(tarea_principal_ids, ARRAY<STRING>[])'
+      : 'ARRAY<STRING>[]'
+
+    const childIdsExpression = taskColumns.has('subtareas_ids')
+      ? 'IFNULL(subtareas_ids, ARRAY<STRING>[])'
+      : 'ARRAY<STRING>[]'
+
+    // 1. Read from notion_ops (populated by external notion-bq-sync Cloud Run)
+    const [projects, tasks, sprints] = await Promise.all([
     runBigQuery<NotionProjectRow>(`
       SELECT notion_page_id, _source_database_id, space_id, created_time, last_edited_time,
              nombre_del_proyecto, resumen, estado, \`finalización\`, pct_on_time,
@@ -272,8 +553,8 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
     `),
     runBigQuery<NotionTaskRow>(`
       SELECT notion_page_id, _source_database_id, space_id, created_time, last_edited_time,
-             COALESCE(nombre_de_tarea, nombre_de_la_tarea) AS nombre_de_tarea,
-             COALESCE(estado, estado_1) AS estado,
+             ${rawTaskNameExpression} AS nombre_de_tarea,
+             ${rawTaskStatusExpression} AS estado,
              prioridad, \`priorización\`, completitud,
              cumplimiento, \`días_de_retraso\`, \`días_reprogramados\`, reprogramada,
              indicador_de_performance, client_change_round,
@@ -283,11 +564,9 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
              frame_versions, frame_comments, open_frame_comments,
              client_review_open, workflow_review_open, bloqueado_por_ids,
              last_frame_comment, proyecto_ids, sprint_ids,
-             CASE
-               WHEN responsables_ids IS NOT NULL AND ARRAY_LENGTH(responsables_ids) > 0 THEN responsables_ids
-               WHEN responsable_ids IS NOT NULL AND ARRAY_LENGTH(responsable_ids) > 0 THEN responsable_ids
-               ELSE ARRAY<STRING>[]
-             END AS responsables_ids,
+             ${rawAssigneeIdsExpression} AS responsables_ids,
+             ${parentIdsExpression} AS tarea_principal_ids,
+             ${childIdsExpression} AS subtareas_ids,
              \`fecha_límite\`, \`fecha_límite_end\`, \`fecha_límite_original\`,
              \`fecha_límite_original_end\`, fecha_de_completado,
              \`tiempo_de_ejecución\`, \`tiempo_en_cambios\`, \`tiempo_en_revisión\`,
@@ -302,7 +581,7 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
       FROM \`${projectId}.notion_ops.sprints\`
       WHERE notion_page_id IS NOT NULL
     `)
-  ])
+    ])
 
   const sourceTasksWithResponsables = tasks.reduce((count, row) => (
     count + ((row.responsables_ids?.length ?? 0) > 0 ? 1 : 0)
@@ -414,6 +693,8 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
 
     const spaceId = (projectSourceId ? (projectSpaceMap.get(projectSourceId) || null) : null) || toNullableString(row.space_id)
     const clientId = spaceId ? (projectSourceId ? (projectClientMap.get(projectSourceId) || null) : null) || (spaceClientMap.get(spaceId) ?? null) : null
+    const parentTaskSourceIds = toStringArray(row.tarea_principal_ids)
+    const subtaskSourceIds = toStringArray(row.subtareas_ids)
 
     return {
       task_source_id: toNullableString(row.notion_page_id),
@@ -451,6 +732,8 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
       workflow_review_open: Boolean(row.workflow_review_open),
       blocker_count: row.bloqueado_por_ids?.length || 0,
       last_frame_comment: toNullableString(row.last_frame_comment),
+      tarea_principal_ids: parentTaskSourceIds.length > 0 ? parentTaskSourceIds : null,
+      subtareas_ids: subtaskSourceIds.length > 0 ? subtaskSourceIds : null,
       original_due_date: toDateValue(row['fecha_límite_original_end']) || toDateValue(row['fecha_límite_original']),
       execution_time_label: toNullableString(row['tiempo_de_ejecución']),
       changes_time_label: toNullableString(row['tiempo_en_cambios']),
@@ -467,6 +750,57 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
       created_at: toTimestampValue(row.created_time)
     }
   })
+
+  const parityValidation = validateRawToConformedTaskParity({
+    rawRows: tasks.map(row => ({
+      task_source_id: toNullableString(row.notion_page_id),
+      space_id: toNullableString(row.space_id),
+      task_status: toNullableString(row.estado),
+      due_date: toDateValue(row['fecha_límite_end']) || toDateValue(row['fecha_límite']),
+      assignee_source_id: row.responsables_ids?.[0] ?? null,
+      tarea_principal_ids: toStringArray(row.tarea_principal_ids),
+      subtareas_ids: toStringArray(row.subtareas_ids)
+    })),
+    conformedRows: deliveryTasks.map(row => ({
+      task_source_id: row.task_source_id,
+      space_id: row.space_id,
+      task_status: row.task_status,
+      due_date: row.due_date,
+      assignee_source_id: row.assignee_source_id,
+      tarea_principal_ids: row.tarea_principal_ids,
+      subtareas_ids: row.subtareas_ids
+    }))
+  })
+
+  if (!parityValidation.ok) {
+    const firstFailingSpace = parityValidation.failingSpaces[0]
+    let auditHint = ''
+
+    if (firstFailingSpace?.spaceId) {
+      try {
+        const audit = await auditDeliveryNotionParity({
+          spaceId: firstFailingSpace.spaceId,
+          year: auditYear,
+          month: auditMonth,
+          periodField: 'due_date',
+          sampleLimit: 5
+        })
+
+        auditHint = ` runtime_audit=${JSON.stringify({
+          spaceId: firstFailingSpace.spaceId,
+          rawCount: audit.summary.rawCount,
+          conformedCount: audit.summary.conformedCount,
+          bucketCounts: audit.summary.bucketCounts
+        })}`
+      } catch (auditError) {
+        auditHint = ` runtime_audit_error=${auditError instanceof Error ? auditError.message : 'unknown'}`
+      }
+    }
+
+    throw new Error(
+      `Conformed sync parity validation failed: ${JSON.stringify(parityValidation.failingSpaces)}${auditHint}`
+    )
+  }
 
   // 5. Transform sprints
   const sprintProjectMap = new Map(
@@ -508,6 +842,14 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
   if (deliveryTasks.length === 0) {
     console.warn('[sync-cron] No delivery tasks found — skipping conformed write to preserve existing data')
 
+    await writeSyncConformedRunRecord({
+      syncRunId,
+      status: 'cancelled',
+      notes: 'No delivery tasks found in notion_ops.tareas; conformed write skipped.',
+      recordsRead: tasks.length,
+      recordsWrittenConformed: 0
+    })
+
     return {
       syncRunId,
       projectsRead: projects.length,
@@ -518,7 +860,10 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
       conformedTasksWithAssigneeSource: 0,
       conformedTasksWithAssigneeMember: 0,
       conformedTasksWithAssigneeMemberIds: 0,
-      durationMs: Date.now() - start
+      durationMs: Date.now() - start,
+      skipped: true,
+      skipReason: 'No delivery tasks found in notion_ops.tareas; conformed write skipped.',
+      rawFreshness
     }
   }
 
@@ -586,20 +931,36 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
     )
   }
 
-  // 7. Record sync run in PostgreSQL
-  try {
-    await runGreenhousePostgresQuery(
-      `INSERT INTO greenhouse_sync.source_sync_runs
-        (sync_run_id, source_system, source_object_type, sync_mode, status,
-         records_read, records_written_conformed, triggered_by, finished_at)
-       VALUES ($1, 'notion', 'cron_conformed', 'incremental', 'succeeded',
-               $2, $3, 'vercel_cron', CURRENT_TIMESTAMP)
-       ON CONFLICT (sync_run_id) DO NOTHING`,
-      [syncRunId, tasks.length, conformedRowsWritten]
+  const persistedParitySnapshot = await readPersistedNotionTaskParitySnapshot(projectId)
+
+  const expectedPersistedParitySnapshot = buildNotionTaskParitySnapshot(
+    deliveryTasks.map(task => ({
+      task_source_id: task.task_source_id,
+      space_id: task.space_id,
+      task_status: task.task_status,
+      due_date: task.due_date,
+      assignee_source_id: task.assignee_source_id,
+      tarea_principal_ids: task.tarea_principal_ids,
+      subtareas_ids: task.subtareas_ids
+    }))
+  )
+
+  const persistedParityDiff = compareNotionTaskParitySnapshots(expectedPersistedParitySnapshot, persistedParitySnapshot)
+
+  if (persistedParityDiff.length > 0) {
+    throw new Error(
+      `Persisted conformed parity mismatch: ${persistedParityDiff.slice(0, 8).join('; ')}`
     )
-  } catch {
-    // Non-critical — sync succeeded even if audit record fails
   }
+
+  // 7. Record sync run in PostgreSQL
+  await writeSyncConformedRunRecord({
+    syncRunId,
+    status: 'succeeded',
+    notes: `Conformed sync completed with raw freshness + parity validation. raw_signal=${rawFreshness.freshestRawSyncedAt ?? 'unknown'}`,
+    recordsRead: projects.length + tasks.length + sprints.length,
+    recordsWrittenConformed: conformedRowsWritten
+  })
 
   // Identity reconciliation — non-blocking tail step
   try {
@@ -613,16 +974,28 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
     console.warn('[sync-conformed] Identity reconciliation failed (non-critical):', err)
   }
 
-  return {
-    syncRunId,
-    projectsRead: projects.length,
-    tasksRead: tasks.length,
-    sprintsRead: sprints.length,
-    conformedRowsWritten,
-    sourceTasksWithResponsables,
-    conformedTasksWithAssigneeSource,
-    conformedTasksWithAssigneeMember,
-    conformedTasksWithAssigneeMemberIds,
-    durationMs: Date.now() - start
+    return {
+      syncRunId,
+      projectsRead: projects.length,
+      tasksRead: tasks.length,
+      sprintsRead: sprints.length,
+      conformedRowsWritten,
+      sourceTasksWithResponsables,
+      conformedTasksWithAssigneeSource,
+      conformedTasksWithAssigneeMember,
+      conformedTasksWithAssigneeMemberIds,
+      durationMs: Date.now() - start,
+      skipped: false,
+      skipReason: null,
+      rawFreshness
+    }
+  } catch (error) {
+    await writeSyncConformedRunRecord({
+      syncRunId,
+      status: 'failed',
+      notes: `Conformed sync failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    })
+
+    throw error
   }
 }

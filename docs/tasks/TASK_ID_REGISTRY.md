@@ -253,3 +253,12 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-201` | `complete` | Delivery Performance Historical Materialization Reconciliation | `docs/tasks/complete/TASK-201-delivery-performance-historical-materialization-reconciliation.md` |
 | `TASK-202` | `complete` | Delivery Performance Report Publication & Notion Consumption Cutover | `docs/tasks/complete/TASK-202-delivery-performance-notion-publication-cutover.md` |
 | `TASK-203` | `complete` | SCIM Provisioning Activation: Entra Config, Identity Reconciliation & Observability | `docs/tasks/complete/TASK-203-scim-provisioning-activation-entra-reconciliation.md` |
+| `TASK-204` | `to-do` | Delivery Carry-Over & Overdue Carried Forward Semantic Split | `docs/tasks/to-do/TASK-204-delivery-carry-over-backlog-semantic-split.md` |
+| `TASK-205` | `complete` | Delivery Notion Origin Parity Audit | `docs/tasks/complete/TASK-205-delivery-notion-origin-parity-audit.md` |
+| `TASK-206` | `to-do` | Delivery Operational Attribution Model | `docs/tasks/to-do/TASK-206-delivery-operational-attribution-model.md` |
+| `TASK-207` | `complete` | Delivery Notion Sync Pipeline Hardening & Freshness Gates | `docs/tasks/complete/TASK-207-delivery-notion-sync-pipeline-hardening.md` |
+| `TASK-208` | `complete` | Delivery Data Quality Monitoring & Drift Auditor | `docs/tasks/complete/TASK-208-delivery-data-quality-monitoring-auditor.md` |
+| `TASK-209` | `in-progress` | Delivery Notion Sync Recurrence Prevention & Orchestration Closure | `docs/tasks/in-progress/TASK-209-delivery-notion-sync-recurrence-prevention.md` |
+| `TASK-210` | `to-do` | HubSpot Quotes Bidirectional Integration | `docs/tasks/to-do/TASK-210-hubspot-quotes-integration.md` |
+| `TASK-211` | `to-do` | HubSpot Products & Line Items Bidirectional Integration | `docs/tasks/to-do/TASK-211-hubspot-products-line-items-integration.md` |
+| `TASK-212` | `to-do` | Nubox Line Items Sync & Multi-Line Emission | `docs/tasks/to-do/TASK-212-nubox-line-items-sync-multiline-emission.md` |

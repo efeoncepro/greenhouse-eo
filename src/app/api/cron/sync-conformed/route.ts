@@ -2,9 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { alertCronFailure } from '@/lib/alerts/slack-notify'
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
-import { checkIntegrationReadiness } from '@/lib/integrations/readiness'
-
-import { syncNotionToConformed } from '@/lib/sync/sync-notion-conformed'
+import { runNotionSyncOrchestration } from '@/lib/integrations/notion-sync-orchestration'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 120
@@ -16,21 +14,18 @@ export async function GET(request: Request) {
     return errorResponse
   }
 
-  // ── Readiness gate: check Notion integration status ──
   try {
-    const readiness = await checkIntegrationReadiness('notion')
+    const result = await runNotionSyncOrchestration({
+      executionSource: 'scheduled_primary'
+    })
 
-    if (!readiness.ready) {
-      console.log(`[sync-conformed] Skipped: Notion upstream not ready — ${readiness.reason}`)
-
-      return NextResponse.json({ skipped: true, reason: readiness.reason })
+    if (result.dataQualityMonitor?.executed === false) {
+      await alertCronFailure(
+        'notion-delivery-data-quality-post-sync',
+        result.dataQualityMonitor.error ?? 'Unknown post-sync data quality error',
+        { syncRunId: result.syncRunId ?? 'unknown' }
+      ).catch(() => {})
     }
-  } catch (error) {
-    console.warn('[sync-conformed] Readiness check failed, proceeding anyway:', error)
-  }
-
-  try {
-    const result = await syncNotionToConformed()
 
     return NextResponse.json(result)
   } catch (error) {

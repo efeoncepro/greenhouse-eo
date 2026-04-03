@@ -336,6 +336,25 @@ interface GreenhouseSession {
 7. Load tenant feature flags
 8. Determine `portalHomePath` based on highest-priority route group
 
+#### Auth flow UX states (TASK-130)
+
+Durante la resolución de sesión, la UI pasa por estados explícitos con feedback visual:
+
+- **Steps 1**: `Login.tsx` muestra `LoadingButton` (credenciales) o `CircularProgress` (SSO) + `LinearProgress` global. Todo el formulario se deshabilita (`isAnyLoading`).
+- **Step 1 error**: `mapAuthError()` categoriza el error NextAuth y muestra `Alert` con severity diferenciada — `error` para credenciales/acceso, `warning` para red/provider.
+- **Steps 2-8**: Tras auth exitosa, `Login.tsx` entra en estado `isTransitioning` — logo + spinner + "Preparando tu espacio de trabajo...". El formulario se oculta.
+- **Redirect**: `router.replace('/auth/landing')` redirige a server component que resuelve `portalHomePath`. `auth/landing/loading.tsx` muestra skeleton durante la resolución.
+
+Errores categorizados por NextAuth error code:
+
+| Error code | Mensaje UX | Severity |
+|------------|-----------|----------|
+| `CredentialsSignin` | Email o contraseña incorrectos | error |
+| `AccessDenied` | Cuenta sin acceso al portal | error |
+| `SessionRequired` | Sesión expirada | error |
+| fetch/network | No se pudo conectar con el servidor | warning |
+| provider timeout | Proveedor no respondió | warning |
+
 ### Portal home path resolution
 
 | Highest Priority Role | Home Path |

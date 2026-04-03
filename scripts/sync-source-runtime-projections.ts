@@ -71,6 +71,8 @@ type NotionTaskRow = {
   sprint_ids: string[] | null
   responsable_ids: string[] | null
   responsables_ids: string[] | null
+  tarea_principal_ids: string[] | null
+  subtareas_ids: string[] | null
   fecha_límite: string | null
   fecha_límite_end: string | null
   fecha_límite_original: string | null
@@ -152,6 +154,7 @@ type HubspotContactRow = {
 
 const projectId = process.env.GCP_PROJECT || process.env.GOOGLE_CLOUD_PROJECT || 'efeonce-group'
 const bigQueryLocation = process.env.GREENHOUSE_BIGQUERY_LOCATION || 'US'
+const allowLegacyConformedOverwrite = process.env.GREENHOUSE_ENABLE_LEGACY_CONFORMED_OVERWRITE === 'true'
 
 const bigQuery = new BigQuery({ projectId })
 
@@ -612,7 +615,9 @@ const ensureDeliveryTaskColumns = async () => {
   const queries = [
     `ALTER TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\` ADD COLUMN IF NOT EXISTS assignee_member_ids ARRAY<STRING>`,
     `ALTER TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\` ADD COLUMN IF NOT EXISTS project_source_ids ARRAY<STRING>`,
-    `ALTER TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\` ADD COLUMN IF NOT EXISTS created_at TIMESTAMP`
+    `ALTER TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\` ADD COLUMN IF NOT EXISTS created_at TIMESTAMP`,
+    `ALTER TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\` ADD COLUMN IF NOT EXISTS tarea_principal_ids ARRAY<STRING>`,
+    `ALTER TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\` ADD COLUMN IF NOT EXISTS subtareas_ids ARRAY<STRING>`
   ]
 
   for (const sql of queries) {
@@ -843,6 +848,8 @@ const syncNotion = async (): Promise<SyncSummary> => {
             sprint_ids,
             responsable_ids,
             responsables_ids,
+            tarea_principal_ids,
+            subtareas_ids,
             \`fecha_límite\`,
             \`fecha_límite_end\`,
             \`fecha_límite_original\`,
@@ -1135,6 +1142,8 @@ const syncNotion = async (): Promise<SyncSummary> => {
         workflow_review_open: Boolean(row.workflow_review_open),
         blocker_count: row.bloqueado_por_ids?.length || 0,
         last_frame_comment: toNullableString(row.last_frame_comment),
+        tarea_principal_ids: row.tarea_principal_ids ?? [],
+        subtareas_ids: row.subtareas_ids ?? [],
         original_due_date: toDateValue(row['fecha_límite_original_end']) || toDateValue(row['fecha_límite_original']),
         execution_time_label: toNullableString(row['tiempo_de_ejecución']),
         changes_time_label: toNullableString(row['tiempo_en_cambios']),
@@ -1251,6 +1260,8 @@ const syncNotion = async (): Promise<SyncSummary> => {
     // If notion_ops returned zero tasks, skip the delete to preserve existing conformed data.
     if (deliveryTasks.length === 0) {
       console.warn('[sync] No delivery tasks found — skipping conformed write to preserve existing data')
+    } else if (!allowLegacyConformedOverwrite) {
+      console.warn('[sync] Skipping conformed overwrite — canonical writer is src/lib/sync/sync-notion-conformed.ts')
     } else {
       await Promise.all([
         bigQuery.query({
@@ -1272,7 +1283,9 @@ const syncNotion = async (): Promise<SyncSummary> => {
       const normalizedDeliveryTasks = deliveryTasks.map(task => ({
         ...task,
         project_source_ids: task.project_source_ids ?? [],
-        assignee_member_ids: task.assignee_member_ids ?? []
+        assignee_member_ids: task.assignee_member_ids ?? [],
+        tarea_principal_ids: task.tarea_principal_ids ?? [],
+        subtareas_ids: task.subtareas_ids ?? []
       }))
 
       await replaceBigQueryTableWithLoadJob('greenhouse_conformed', 'delivery_projects', deliveryProjects)
@@ -1472,6 +1485,8 @@ const syncNotion = async (): Promise<SyncSummary> => {
             workflow_review_open,
             blocker_count,
             last_frame_comment,
+            tarea_principal_ids,
+            subtareas_ids,
             original_due_date,
             execution_time_label,
             changes_time_label,
@@ -1486,7 +1501,7 @@ const syncNotion = async (): Promise<SyncSummary> => {
             sync_run_id,
             payload_hash
           )
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::text[], $10, $11, $12, $13::text[], $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37::date, $38, $39, $40, $41, $42::date, $43::timestamptz, $44, $45, $46::timestamptz, $47::timestamptz, $48, $49)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::text[], $10, $11, $12, $13::text[], $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37::text[], $38::text[], $39::date, $40, $41, $42, $43, $44::date, $45::timestamptz, $46, $47, $48::timestamptz, $49::timestamptz, $50, $51)
           ON CONFLICT (notion_task_id) DO UPDATE
           SET
             project_record_id = EXCLUDED.project_record_id,
@@ -1523,6 +1538,8 @@ const syncNotion = async (): Promise<SyncSummary> => {
             workflow_review_open = EXCLUDED.workflow_review_open,
             blocker_count = EXCLUDED.blocker_count,
             last_frame_comment = EXCLUDED.last_frame_comment,
+            tarea_principal_ids = EXCLUDED.tarea_principal_ids,
+            subtareas_ids = EXCLUDED.subtareas_ids,
             original_due_date = EXCLUDED.original_due_date,
             execution_time_label = EXCLUDED.execution_time_label,
             changes_time_label = EXCLUDED.changes_time_label,
@@ -1575,6 +1592,8 @@ const syncNotion = async (): Promise<SyncSummary> => {
           task.workflow_review_open,
           task.blocker_count,
           task.last_frame_comment,
+          task.tarea_principal_ids,
+          task.subtareas_ids,
           task.original_due_date,
           task.execution_time_label,
           task.changes_time_label,
@@ -1613,17 +1632,23 @@ const syncNotion = async (): Promise<SyncSummary> => {
       status: 'succeeded',
       recordsRead: projects.length + tasks.length + sprints.length,
       recordsWrittenRaw: rawProjectRows.length + rawTaskRows.length + rawSprintRows.length,
-      recordsWrittenConformed: deliveryProjects.length + deliveryTasks.length + deliverySprints.length,
+      recordsWrittenConformed: allowLegacyConformedOverwrite
+        ? deliveryProjects.length + deliveryTasks.length + deliverySprints.length
+        : 0,
       recordsProjectedPostgres: projected,
       watermarkEndValue: notionWatermark,
-      notes: 'Seeded runtime projections from notion_ops.'
+      notes: allowLegacyConformedOverwrite
+        ? 'Seeded runtime projections from notion_ops.'
+        : 'Seeded raw/runtime projections from notion_ops. Conformed overwrite skipped because sync-notion-conformed is canonical.'
     })
 
     return {
       syncRunId,
       recordsRead: projects.length + tasks.length + sprints.length,
       recordsWrittenRaw: rawProjectRows.length + rawTaskRows.length + rawSprintRows.length,
-      recordsWrittenConformed: deliveryProjects.length + deliveryTasks.length + deliverySprints.length,
+      recordsWrittenConformed: allowLegacyConformedOverwrite
+        ? deliveryProjects.length + deliveryTasks.length + deliverySprints.length
+        : 0,
       recordsProjectedPostgres: projected,
       watermarkEndValue: notionWatermark
     }

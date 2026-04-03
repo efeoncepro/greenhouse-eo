@@ -1,5 +1,91 @@
 # Greenhouse Source Sync Pipelines V1
 
+## Delta 2026-04-03 — TASK-209 Notion sync orchestration closure
+
+Greenhouse ya tiene un control plane explícito para cerrar la recurrencia `raw -> conformed` del pipeline de Delivery sobre Notion.
+
+Contrato operativo vigente:
+
+- `GET /api/cron/sync-conformed` deja de ser un intento aislado y pasa a registrar explícitamente `waiting_for_raw` cuando el upstream todavía no está listo
+- existe un carril de recuperación `GET /api/cron/sync-conformed-recovery` agendado cada `30` minutos para reintentar dentro de la ventana operativa sin depender de reruns manuales
+- el storage canónico del cierre de orquestación vive en:
+  - `greenhouse_sync.notion_sync_orchestration_runs`
+- los estados tipados del control plane son:
+  - `waiting_for_raw`
+  - `retry_scheduled`
+  - `retry_running`
+  - `sync_completed`
+  - `sync_failed`
+  - `cancelled`
+- el writer canónico sigue siendo único:
+  - `src/lib/sync/sync-notion-conformed.ts`
+- la orquestación se apoya en la freshness gate existente y no calcula métricas inline
+- las surfaces admin ya exponen esta señal junto al monitor de data quality en:
+  - `/admin/integrations`
+  - `TenantNotionPanel`
+
+Scheduling operativo actualizado:
+
+- upstream raw (`../notion-bigquery`) mantiene su scheduler diario a `03:00 America/Santiago`
+- `GET /api/cron/sync-conformed` corre a `20 6 * * *`
+- `GET /api/cron/sync-conformed-recovery` corre cada `30` minutos
+- `GET /api/cron/notion-delivery-data-quality` queda después de esa ventana para reducir falsos `broken/degraded` por simple desfase temporal
+
+Implicación arquitectónica:
+
+- `greenhouse-eo` sigue sin tener callback determinístico desde `../notion-bigquery`
+- por eso el cierre de recurrencia se resuelve localmente con polling de frescura + retry auditado por `space_id`
+- la salud del pipeline ya no depende de recordar un rerun manual; el estado pendiente queda visible y recuperable dentro del operating model normal
+
+## Delta 2026-04-03 — TASK-208 recurrent data quality monitor for Notion delivery
+
+El tramo endurecido `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks` ya tiene monitoreo recurrente persistido.
+
+Contrato operativo vigente:
+
+- `src/lib/integrations/notion-delivery-data-quality.ts` ejecuta el auditor por `space_id`, persiste runs/checks y clasifica el estado como `healthy`, `degraded` o `broken`
+- el storage histórico vive en:
+  - `greenhouse_sync.integration_data_quality_runs`
+  - `greenhouse_sync.integration_data_quality_checks`
+- el monitor corre en dos momentos:
+  - cron dedicado `GET /api/cron/notion-delivery-data-quality`
+  - hook post-sync después de `GET /api/cron/sync-conformed`
+- el monitor reutiliza:
+  - el auditor de paridad de `TASK-205`
+  - las freshness gates y validaciones runtime de `TASK-207`
+- la visibilidad operativa ya existe en:
+  - `/admin/integrations`
+  - `/admin/ops-health`
+  - `TenantNotionPanel`
+
+Implicación arquitectónica:
+
+- `source_sync_runs` sigue siendo el control plane de ejecución del sync
+- pero la salud histórica de calidad del dato ya no depende de inferencias ad hoc sobre esos runs
+- Greenhouse ahora conserva evidencia explícita de drift y severidad por `space`
+
+## Delta 2026-04-03 — TASK-207 runtime hardening for Notion delivery sync
+
+Se cerró el hardening estructural del tramo `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`.
+
+Contrato operativo vigente:
+
+- el writer canónico de `greenhouse_conformed.delivery_tasks` es `src/lib/sync/sync-notion-conformed.ts`
+- `/api/cron/sync-conformed` ya exige frescura real de `notion_ops` vía `checkIntegrationReadiness('notion', { requireRawFreshness: true })`
+- la frescura real se evalúa por `space_id` activo en `greenhouse_core.space_notion_sources`, contra `notion_ops.tareas` y `notion_ops.proyectos`
+- si el raw no está listo, el cron no materializa y registra el run como `cancelled` o `failed` en `greenhouse_sync.source_sync_runs`
+- el writer canónico ya preserva `tarea_principal_ids` y `subtareas_ids` en `greenhouse_conformed.delivery_tasks`
+- antes de declararse exitoso, el writer valida:
+  - paridad `raw -> transformed`
+  - paridad `transformed -> persisted`
+  - cobertura de `assignee_source_id`
+- `scripts/sync-source-runtime-projections.ts` sigue existiendo para seeds/runtime PostgreSQL, pero ya no debe sobreescribir `greenhouse_conformed.*` salvo que `GREENHOUSE_ENABLE_LEGACY_CONFORMED_OVERWRITE=true`
+
+Implicación arquitectónica:
+
+- la convergencia práctica a single writer ya está cerrada para la capa conformed de Delivery
+- el siguiente paso natural es monitoreo recurrente y alerting sobre este contrato endurecido, no otro hardening paralelo
+
 ## Delta 2026-04-02 — Project to Tasks association model for Notion parity
 
 La relación `Proyecto -> Tareas` de Notion ya tiene un espejo parcial en Greenhouse, pero hoy no está modelada con fidelidad completa.
@@ -714,23 +800,26 @@ notion-bq-sync (Python, Cloud Run)
   • Writes raw to notion_ops.tareas (Spanish names)
         │
         ▼
-sync-source-runtime-projections.ts (TypeScript)
+src/lib/sync/sync-notion-conformed.ts (TypeScript, writer canónico automatizado)
   │
   ├── 1. Reads notion_ops.tareas from BigQuery (raw)
-  ├── 2. Assigns space_id via preferredSpaceMap (client_notion_bindings)
-  ├── 3. Loads property mappings from Postgres (cached per space_id)
-  │      └── greenhouse_delivery.space_property_mappings
-  ├── 4. For each task:
-  │      ├── Builds result with hardcoded default mapping (always)
-  │      ├── If space has config mappings → applies overrides via applyPropertyMappings()
-  │      │   ├── normalizeNotionKey() matches raw property names
-  │      │   ├── applyCoercion() converts types (16 rules)
-  │      │   └── Overwrites default result fields with config-driven values
-  │      └── If no mappings → uses default result (backward compatible)
-  ├── 5. Writes to greenhouse_raw.tasks_snapshots (BQ, immutable)
+  ├── 2. Resolves tenant context from raw `space_id` + `greenhouse_core.space_notion_sources`
+  ├── 3. Applies default/runtime mapping (governance mappings remain advisory, not primary runtime source)
+  ├── 4. Preserves assignee arrays + hierarchy arrays:
+  │      ├── `assignee_member_ids`
+  │      ├── `project_source_ids`
+  │      ├── `tarea_principal_ids`
+  │      └── `subtareas_ids`
+  ├── 5. Runs raw freshness gate before writing conformed
   ├── 6. Writes to greenhouse_conformed.delivery_tasks (BQ, normalized)
-  │      └── validates that assignee attribution was not lost during persistence
-  └── 7. Writes to greenhouse_delivery.tasks (Postgres, projection)
+  │      └── validates assignee parity + persisted raw→conformed parity by `space_id`
+  └── 7. Records control-plane status in `greenhouse_sync.source_sync_runs`
+
+scripts/sync-source-runtime-projections.ts (TypeScript, carril legacy/manual)
+  │
+  ├── sigue existiendo para seed/manual recovery y proyección PostgreSQL
+  ├── por defecto NO reescribe `greenhouse_conformed.delivery_*`
+  └── solo puede sobrescribir conformed si `GREENHOUSE_ENABLE_LEGACY_CONFORMED_OVERWRITE=true`
 ```
 
 ### Configuration table
@@ -819,6 +908,20 @@ The script reads Space configurations from `greenhouse_core.space_notion_sources
 8. Verify data in `greenhouse_conformed.delivery_tasks` filtered by `space_id`
 9. Run ICO materialization: `npx tsx scripts/materialize-ico.ts`
 
+### Runtime hardening after `TASK-207`
+
+- `GET /api/cron/sync-conformed` now calls `checkIntegrationReadiness('notion', { requireRawFreshness: true })`
+- readiness for Notion now requires fresh rows in:
+  - `notion_ops.tareas`
+  - `notion_ops.proyectos`
+  - `notion_ops.sprints`
+- the cron lane still performs a second in-process guard before writing conformed, so admin/manual triggers do not bypass raw freshness accidentally
+- `greenhouse_conformed.delivery_tasks` now preserves hierarchy arrays:
+  - `tarea_principal_ids`
+  - `subtareas_ids`
+- `greenhouse_delivery.tasks` now mirrors those hierarchy arrays in PostgreSQL runtime
+- the legacy script remains available, but conformed overwrite is opt-in to avoid `last writer wins` drift against the cron writer
+
 ### Operational remediation runbook
 
 When payroll or person-level `ICO` metrics show missing KPI despite real completed work:
@@ -828,12 +931,15 @@ When payroll or person-level `ICO` metrics show missing KPI despite real complet
    - `assignee_source_id`
    - `assignee_member_id`
    - `assignee_member_ids`
+   - o usar el auditor reusable `pnpm audit:notion-delivery-parity --space-id=<SPACE_ID> --assignee-source-id=<NOTION_USER_ID> --year=<YYYY> --month=<MM> --period-field=due_date|created_at`
 3. If attribution was lost, run the canonical remediation:
    - `pnpm exec tsx scripts/remediate-ico-assignee-attribution.ts <year> <month>`
 4. Re-verify:
    - `greenhouse_conformed.delivery_tasks` attribution counters
    - `ico_engine.metrics_by_member` for the affected period
    - downstream consumers such as projected payroll
+
+`TASK-205` leaves that parity audit as an on-demand diagnostic. Structural runtime hardening and freshness gates were closed by `TASK-207`; monitoreo recurrente y alerting quedan como follow-on de `TASK-208`.
 
 This remediation is safe to rerun and is the canonical recovery path for attribution-driven KPI gaps.
 

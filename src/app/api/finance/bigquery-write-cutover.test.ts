@@ -50,6 +50,15 @@ vi.mock('@/lib/providers/canonical', () => ({
 
 vi.mock('@/lib/finance/canonical', () => ({
   resolveFinanceClientContext: vi.fn().mockResolvedValue({ clientId: 'client-1' }),
+  resolveFinanceDownstreamScope: vi.fn().mockResolvedValue({
+    clientId: 'client-1',
+    clientProfileId: 'profile-1',
+    hubspotCompanyId: 'hub-1',
+    clientName: 'Sky Airline',
+    legalName: 'Sky Airline SA',
+    organizationId: 'org-1',
+    spaceId: 'space-1'
+  }),
   resolveFinanceMemberContext: vi.fn().mockResolvedValue({
     memberId: 'member-1',
     memberName: 'Jane Doe',

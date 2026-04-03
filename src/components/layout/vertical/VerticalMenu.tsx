@@ -310,14 +310,14 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               { label: nl(GH_INTERNAL_NAV.adminCorreos), href: '/admin/email-delivery' },
               { label: nl(GH_INTERNAL_NAV.adminNotifications), href: '/admin/notifications' },
               { label: nl(GH_INTERNAL_NAV.adminAiTools), href: '/admin/ai-tools' },
-              { label: nl(GH_INTERNAL_NAV.adminCloudIntegrations), href: '/admin/cloud-integrations' },
+              { label: nl(GH_INTERNAL_NAV.adminCloudIntegrations), href: '/admin/integrations' },
               { label: nl(GH_INTERNAL_NAV.adminOpsHealth), href: '/admin/ops-health' }
             ].filter(item => {
               if (item.href === '/admin/operational-calendar') return canSeeView('administracion.calendario_operativo', true)
               if (item.href === '/admin/email-delivery') return canSeeView('administracion.email_delivery', true)
               if (item.href === '/admin/notifications') return canSeeView('administracion.notifications', true)
               if (item.href === '/admin/ai-tools') return canSeeView('ia.herramientas', true)
-              if (item.href === '/admin/cloud-integrations') return canSeeView('administracion.cloud_integrations', true)
+              if (item.href === '/admin/integrations') return canSeeView('administracion.cloud_integrations', true)
               if (item.href === '/admin/ops-health') return canSeeView('administracion.ops_health', true)
 
               return true

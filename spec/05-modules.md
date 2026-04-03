@@ -1,635 +1,734 @@
 # Greenhouse Portal — Módulos Funcionales
 
-> Versión: 2.0
-> Fecha: 2026-03-22
-> Actualizado: ICO Engine, Account 360 / Organizations, Services, Finance Intelligence, Nubox Integration
+> Versión: 2.1
+> Fecha: 2026-04-02
+> Actualizado: 55 módulos funcionales, SCIM, Identity reconciliation, Google Secret Manager, Vercel OIDC, View access governance, Integration auth, Cron auth
 
 ---
 
 ## Visión general
 
-Greenhouse organiza su funcionalidad en módulos de dominio, cada uno con su propia capa de datos, lógica de negocio, API routes y vistas. Este documento describe cada módulo en detalle.
+Greenhouse organiza su funcionalidad en 55 módulos de dominio en `src/lib/`, cada uno con su propia capa de datos, lógica de negocio, API routes y vistas.
 
 ---
 
-## 1. Dashboard Cliente
+## 1. Dashboard & Home
 
-**Superficie**: `/dashboard`
-**Lib**: `src/lib/dashboard/`
-**API**: `/api/dashboard/*`
-**Vista**: `src/views/greenhouse/dashboard/`
-**Fuente de datos**: BigQuery (notion_ops)
+### `dashboard`
 
-### Propósito
+**Ubicación**: `src/lib/dashboard/`
 
-Vista ejecutiva para clientes mostrando el estado de salud de sus proyectos, entregas, equipo y herramientas.
+Resumen ejecutivo del cliente: KPIs (RpA, Completed, OTD, Feedback), charts (status distribution, delivery cadence, RpA by project, OTD trend), team capacity, ecosystem tooling, AI credits, portfolio health, attention projects.
 
-### Componentes del dashboard
+**Fuente**: BigQuery (`notion_ops`)
 
-1. **Hero Card** — Banner principal con nombre del cliente, período de actividad y highlights
-2. **KPI Grid** — 4 métricas clave:
-   - RpA (Rounds per Approval) — Calidad de entregas
-   - Completed — Tareas completadas
-   - OTD (On-Time Delivery) — Cumplimiento de plazos
-   - Feedback — Items pendientes de revisión
-3. **Charts** (grid 2x2):
-   - Status Distribution (donut) — Distribución de estados de tareas
-   - Weekly Delivery Cadence (bar) — Cadencia semanal de entregas
-   - Project RpA (bar) — RpA por proyecto
-   - OTD Trend (line) — Tendencia de on-time delivery
-4. **Team Capacity** — Utilización del equipo con health indicators
-5. **Client Ecosystem** — Herramientas y plataformas del ecosistema
-6. **AI Credits** — Estado de créditos AI del tenant
-7. **Portfolio Health** — Acordeón con salud por proyecto
-8. **Attention Projects** — Proyectos que requieren atención
+**API**: `/api/dashboard/*` (summary, kpis, charts, risks)
 
-### Lógica de negocio clave
+---
 
-**Mapeo de estados de tarea:**
-- `active` — En progreso
-- `review` — En revisión
-- `changes` — Con cambios de cliente
-- `blocked` — Bloqueada
-- `queued` — En cola
-- `completed` — Completada
-- `closed` — Cerrada
-- `other` — Otro
+### `home`
 
-**Cálculo de risk score por proyecto:**
-```
-risk_score = (100 - on_time_pct) + (active_items × 1.5) + (review_items × 4) + (blocked × 8)
-```
+**Ubicación**: `src/lib/home/`
 
-**Semáforo de RPA:**
-- Verde: ≤ 1.5
-- Amarillo: ≤ 2.5
-- Rojo: > 2.5
+Página de bienvenida post-login. Redirección a `portalHomePath` según tenant.
+
+---
+
+### `internal`
+
+**Ubicación**: `src/lib/internal/`
+
+Dashboard interno para equipo Efeonce. Métricas transversales, operaciones globales, Greenhouse Agent.
+
+**API**: `/api/internal/greenhouse-agent`
 
 ---
 
 ## 2. Proyectos y Sprints
 
-**Superficie**: `/proyectos`, `/proyectos/[id]`, `/sprints`, `/sprints/[id]`
-**Lib**: `src/lib/projects/`
+### `projects`
+
+**Ubicación**: `src/lib/projects/`
+
+Lista y detalle de proyectos. Metadata, sprint context, review pressure, performance indicators, tasks.
+
+**Fuente**: BigQuery (`greenhouse_conformed`, `notion_ops`)
+
 **API**: `/api/projects/*`
-**Fuente de datos**: BigQuery (greenhouse_conformed, notion_ops)
 
-### Propósito
-
-Visibilidad sobre proyectos activos, su progreso, tareas y contexto de sprint.
-
-### Lista de proyectos
-
-Para cada proyecto muestra: nombre, rango de fechas, status con tone, total/active/completed tasks, avgRpa, open review items, review load, progress bar.
-
-**Review load classification:**
-- High: ≥ 5 items en revisión
-- Medium: ≥ 1 item
-- Low: 0 items
-
-### Detalle de proyecto
-
-- Metadata del proyecto (status, fechas, resumen)
-- Sprint context (prioriza: Actual > Siguiente > Último)
-- Review pressure (tasks con reviews abiertos, ready for review, en cambios, bloqueadas)
-- Lista de tareas con: nombre, status, RPA, compliance, rounds de cambio, días late
-- Performance indicators: on-time, late-drop, overdue, carry-over
-
-### Sprint context
-
-Cada sprint incluye: id, name, status, dates, totalTasks, completedTasks, progress (clamped 0-100).
+**Vistas**: `src/views/greenhouse/projects/`
 
 ---
 
-## 3. People (Directorio y Person 360)
+### `sprints`
 
-**Superficie**: `/people`, `/people/[memberId]`
-**Lib**: `src/lib/people/`, `src/lib/person-360/`
-**API**: `/api/people/*`
-**Fuente de datos**: BigQuery + PostgreSQL
+**Ubicación**: `src/lib/sprints/`
 
-### Propósito
+Contexto de sprint. ID, name, status, dates, task counts, progress.
 
-Directorio unificado de miembros del equipo con vista 360 que consolida información de HR, delivery, finance e identidad.
+**Fuente**: BigQuery
 
-### Directorio (lista)
-
-Para cada persona: memberId, displayName, emails (public/internal), roleTitle, roleCategory, location, active, totalAssignments, totalFte, payRegime.
-
-**Categorías de rol (por orden):**
-1. account
-2. operations
-3. strategy
-4. design
-5. development
-6. media
-7. unknown
-
-### Person 360 (detalle)
-
-Vista completa con secciones:
-- **Member** — Perfil base, rol, ubicación
-- **Access** — Permisos del visor (canViewAssignments, canViewCompensation, canViewPayroll, canEditProfile, canViewIntegrations, canViewDelivery)
-- **Summary** — Resumen ejecutivo
-- **Integrations** — Proveedores de identidad vinculados
-- **Capacity** — Horas asignadas, assets activos, utilización
-- **Finance** — Resumen financiero (si autorizado)
-- **Assignments** — Asignaciones a proyectos/clientes
-- **Compensation** — Versión actual de compensación
-- **Payroll** — Historial de payroll reciente
-- **HR Context** — Leave balances, attendance
-- **Delivery Context** — Métricas de entrega
-
-### Identity Confidence
-
-- **strong** — 3+ source links activos con email coincidente
-- **partial** — 2 source links
-- **basic** — 1 source link
+**API**: Via `/api/projects/[id]/sprints`
 
 ---
 
-## 4. HR Core
+## 3. Team & Capacity
 
-**Superficie**: `/hr/attendance`, `/hr/departments`, `/hr/leave`
-**Lib**: `src/lib/hr-core/`
+### `team-admin`
+
+**Ubicación**: `src/lib/team-admin/`
+
+CRUD de miembros y asignaciones del equipo. Admin only.
+
+**Fuente**: PostgreSQL (`greenhouse_core`)
+
+**API**: `/api/admin/team/*`
+
+---
+
+### `team-capacity`
+
+**Ubicación**: `src/lib/team-capacity/`
+
+Cálculos de capacidad y utilización. FTE allocation, assigned hours, utilization %, health buckets (idle, balanced, high, overloaded).
+
+**Métricas**:
+- idle: < 30% utilización
+- balanced: 30-85%
+- high: 85-100%
+- overloaded: > 100%
+
+**Dimensiones**: por rol, proyecto, sprint, agencia.
+
+---
+
+### `member-capacity-economics`
+
+**Ubicación**: `src/lib/member-capacity-economics/`
+
+Datos financieros por persona: ingresos, costos, margen. Attribution por asignación y período.
+
+**Fuente**: PostgreSQL + BigQuery
+
+---
+
+## 4. People & Identity
+
+### `people`
+
+**Ubicación**: `src/lib/people/`
+
+Directorio de personas. Lista con búsqueda, filtros (rol, ubicación, estado).
+
+**Fuente**: BigQuery + PostgreSQL
+
+**API**: `/api/people` (list, meta)
+
+**Vistas**: `src/views/greenhouse/people/`
+
+---
+
+### `person-360`
+
+**Ubicación**: `src/lib/person-360/`
+
+Vista 360 de una persona: member, access, summary, integrations, capacity, finance, assignments, compensation, payroll, hrContext, deliveryContext.
+
+**Materialización**: `greenhouse_serving.person_360`
+
+**API**: `/api/people/[memberId]`, `/api/people/[memberId]/{hr,delivery,finance}`
+
+---
+
+### `person-intelligence`
+
+**Ubicación**: `src/lib/person-intelligence/`
+
+Inteligencia agregada sobre una persona: tendencias, habilidades, performance, proyecciones.
+
+---
+
+### `identity`
+
+**Ubicación**: `src/lib/identity/`
+
+Motor de identidad canónica. Consolidación de `client_users`, `team_members`, `identity_profiles`. Resolución de acceso.
+
+**Subfolder**: `reconciliation/` — Motor de reconciliación de identidades (Notion + HubSpot + Azure AD + SCIM).
+
+**Subfolder**: `state-machine/` — Estados canónicos (active, missing_principal, degraded_link, inactive).
+
+**API**: Indirect vía auth routes
+
+---
+
+## 5. HR Core
+
+### `hr-core`
+
+**Ubicación**: `src/lib/hr-core/`
+
+Operaciones de RRHH: departments, leave management, attendance.
+
+**Subfolder**: `departments/` — CRUD jerárquico
+
+**Subfolder**: `leave/` — Workflow de permisos, balances, requests
+
+**Subfolder**: `attendance/` — Registro diario, fuentes (manual, Teams webhook)
+
+**Fuente**: PostgreSQL (`greenhouse_core`, `greenhouse_hr`)
+
 **API**: `/api/hr/core/*`
-**Fuente de datos**: PostgreSQL (greenhouse_core, greenhouse_hr)
 
-### Sub-módulos
-
-#### Departments
-
-Gestión jerárquica de departamentos con head member y business unit.
-
-#### Leave Management
-
-- **Tipos de permiso** — Catálogo configurable (vacaciones, enfermedad, personal, etc.)
-- **Balances** — Cálculo de días disponibles: allowance + carried_over - used - reserved
-- **Solicitudes** — Workflow: `pending_supervisor → pending_hr → approved/rejected/cancelled`
-- **Review** — Supervisores y HR pueden aprobar/rechazar con notas
-
-#### Attendance
-
-- **Registro** — Por día con status: present, late, absent, excused, holiday
-- **Fuentes** — Manual o Microsoft Teams webhook
-- **Minutos** — Tracking de minutos de presencia
+**Vistas**: `src/views/greenhouse/hr/`
 
 ---
 
-## 5. HR Payroll
+## 6. Payroll
 
-**Superficie**: `/hr/payroll`, `/hr/payroll/member/[memberId]`
-**Lib**: `src/lib/payroll/`
-**API**: `/api/hr/payroll/*`
-**Fuente de datos**: PostgreSQL (greenhouse_payroll)
+### `payroll`
 
-### Propósito
+**Ubicación**: `src/lib/payroll/`
 
-Gestión completa de nómina con soporte para régimen Chile e internacional.
+Gestión completa de nómina Chile. Períodos, cálculo de bonos (OTD, RPA), deducciones (AFP, FONASA, ISAPRE, impuesto), exports (Excel, PDF).
 
-### Workflow de período
+**Subfolder**: `auto-calculate/` — Motor de auto-cálculo con reglas Chile-specific
 
-```
-draft → calculated → approved → exported
-```
+**Subfolder**: `compensation/` — Versionado temporal, vigencia
 
-### Compensación
+**API**: `/api/hr/payroll/*` (periods, entries, compensation, members)
 
-Versiones de compensación con vigencia temporal. Una persona puede tener múltiples versiones históricas pero solo una `is_current`.
-
-Campos principales: base_salary, remote_allowance, bonus ranges (OTD/RPA), AFP, health system, contract type, APV.
-
-### Cálculo de nómina (Chile)
-
-1. **Base** — Salario base + remote allowance
-2. **Bonos** — Basados en KPIs del período:
-   - Bono OTD: Si `kpi_otd >= otd_threshold` (89%), se calcula dentro del rango min-max
-   - Bono RPA: Si `kpi_rpa <= rpa_threshold` (2.0), se calcula dentro del rango min-max
-3. **Deducciones Chile:**
-   - AFP: ~10% sobre base (varía por administradora)
-   - Salud: FONASA (7%) o ISAPRE (plan variable)
-   - Seguro de Cesantía: % según contrato
-   - Impuesto: Según tabla de tramos impositivos
-   - APV: Monto fijo voluntario
-4. **Net Total** = Base + Bonos - Deducciones
-
-### Exportación
-
-- **Excel** — Spreadsheet con todas las entries del período
-- **PDF** — Documento formal del período
-- **Receipt** — Recibo individual por miembro
+**Vistas**: `src/views/greenhouse/payroll/`
 
 ---
 
-## 6. Finance
+## 7. Finance
 
-**Superficie**: `/finance`, `/finance/clients/[id]`, `/finance/income/[id]`, `/finance/expenses/[id]`, `/finance/suppliers/[id]`, `/finance/reconciliation/[id]`
-**Lib**: `src/lib/finance/`
+### `finance`
+
+**Ubicación**: `src/lib/finance/`
+
+Gestión financiera integral: accounts, income, expenses, suppliers, reconciliation, exchange rates.
+
+**Subfolder**: `accounts/` — Cuentas bancarias multi-currency
+
+**Subfolder**: `income/` — Ingresos, pagos, status workflow
+
+**Subfolder**: `expenses/` — Gastos, bulk upload, candidates para payroll
+
+**Subfolder**: `suppliers/` — Proveedor CRUD
+
+**Subfolder**: `reconciliation/` — Sesiones, matching, auto-match
+
+**Subfolder**: `exchange-rates/` — Tipos de cambio, sync diario
+
+**Fuente**: PostgreSQL (`greenhouse_finance`)
+
 **API**: `/api/finance/*`
-**Fuente de datos**: PostgreSQL (greenhouse_finance)
 
-### Sub-módulos
-
-#### Accounts
-
-Cuentas bancarias y financieras: checking, savings, credit_card, investment. Multi-currency.
-
-#### Income
-
-Registros de ingreso vinculados a clientes y líneas de servicio. Status workflow: pending → paid/overdue/cancelled. Soporte para registro de pagos.
-
-#### Expenses
-
-Gastos vinculados a proveedores, miembros, cuentas y líneas de servicio. Soporte para carga bulk y candidatos de payroll.
-
-#### Suppliers
-
-Proveedores con tax ID, categoría, método de pago, términos y flag de PO.
-
-#### Exchange Rates
-
-Tipos de cambio con tracking de fuente y fecha. Sincronización diaria automática (cron 23:05 UTC).
-
-#### Reconciliation
-
-Flujo completo de reconciliación bancaria:
-1. Crear sesión de reconciliación para una cuenta
-2. Cargar statements bancarios
-3. Buscar candidatos de matching (income/expense vs statement)
-4. Match manual o auto-match
-5. Unmatch si es necesario
-6. Excluir items irrelevantes
-
-#### Finance Dashboard
-
-- **Summary** — Totales de ingreso/egreso, balance, cuentas activas
-- **Cashflow** — Flujo de caja por período
-- **Aging** — Aging de cuentas por cobrar
-- **By Service Line** — Breakdown financiero por línea de servicio
+**Vistas**: `src/views/greenhouse/finance/`
 
 ---
 
-## 7. Capabilities
+## 8. Cost Intelligence
 
-**Superficie**: `/capabilities/[moduleId]`
-**Lib**: `src/lib/capabilities/`
+### `cost-intelligence`
+
+**Ubicación**: `src/lib/cost-intelligence/`
+
+P&L operacional, cierre de período, cost attribution. Análisis de rentabilidad.
+
+**Subfolder**: `operational-pl/` — P&L por espacio, proyecto, miembro
+
+**Subfolder**: `period-closure/` — Workflow de cierre
+
+**Subfolder**: `cost-attribution/` — Member-period attribution con classification rules
+
+---
+
+## 9. Commercial Cost Attribution
+
+### `member-period-attribution`
+
+**Ubicación**: `src/lib/member-period-attribution/`
+
+Atribución de costos de miembro por período y asignación. Classification de horas (billable, internal, overhead).
+
+---
+
+## 10. Agency
+
+### `agency`
+
+**Ubicación**: `src/lib/agency/`
+
+Vista transversal de agencia: pulse, spaces, capacity, performance.
+
+**Subfolder**: `finance/` — Métricas financieras agregadas
+
+**Subfolder**: `queries/` — Queries complejas de agencia
+
+**Subfolder**: `space-360/` — Detalle de espacio con salud integral
+
+**Fuente**: BigQuery
+
+**API**: `/api/agency/*`
+
+**Vistas**: `src/views/greenhouse/agency/`
+
+---
+
+## 11. Account 360 / Organizations
+
+### `account-360`
+
+**Ubicación**: `src/lib/account-360/`
+
+Vista B2B unificada: organizations (entidades jurídicas), spaces (operativos), person memberships, relationships.
+
+**Subfolder**: `org-store/` — CRUD de organizaciones
+
+**Subfolder**: `identity/` — Resolution por tax ID, creación automática para suppliers
+
+**Subfolder**: `economics/` — Análisis económico por org
+
+**Subfolder**: `executive/` — Datos ejecutivos
+
+**Subfolder**: `projects/` — Proyectos asociados
+
+**Fuente**: PostgreSQL (`greenhouse_core`)
+
+**API**: `/api/organizations/*`
+
+**Vistas**: `src/views/greenhouse/organizations/`
+
+---
+
+## 12. Services
+
+### `services`
+
+**Ubicación**: `src/lib/services/`
+
+CRUD de servicios de Efeonce. Vinculación a espacios, organizaciones, HubSpot deals, Notion projects. History tracking field-level.
+
+**Subfolder**: `crud/` — Create, read, update, delete
+
+**Subfolder**: `history/` — Audit trail
+
+**Fuente**: PostgreSQL (`greenhouse_core`)
+
+**API**: `/api/agency/services/*`
+
+---
+
+## 13. Campaigns
+
+### `campaigns`
+
+**Ubicación**: `src/lib/campaigns/`
+
+CRUD de campañas. Metrics, extended data, backfill heuristics.
+
+**Subfolder**: `store/` — CRUD
+
+**Subfolder**: `metrics/` — Cálculos de métricas
+
+**Subfolder**: `extended/` — Datos enriquecidos
+
+**Subfolder**: `backfill-heuristics/` — Inferencia de datos históricos
+
+**Fuente**: BigQuery
+
+---
+
+## 14. Staff Augmentation
+
+### `staff-augmentation`
+
+**Ubicación**: `src/lib/staff-augmentation/`
+
+Gestión de placements y SLA. Snapshots de capacidad, tracking de servicios.
+
+**Subfolder**: `placements/` — CRUD
+
+**Subfolder**: `snapshots/` — Histórico de estado
+
+**Subfolder**: `sla-tracking/` — Cumplimiento de SLA
+
+---
+
+## 15. ICO Engine (Delivery Intelligence)
+
+### `ico-engine`
+
+**Ubicación**: `src/lib/ico-engine/`
+
+Motor de inteligencia de delivery. Materialización de métricas (RPA, OTD, FTR, cycle time, stuck assets) desde datos Notion.
+
+**Subfolder**: `materialization/` — Cálculo y persistencia de snapshots
+
+**Subfolder**: `metrics/` — Registry de 10 métricas con umbrales (optimal, attention, critical)
+
+**Subfolder**: `performance-reports/` — Reportes históricos
+
+**Subfolder**: `historical-reconciliation/` — Validación de datos históricos
+
+**Subfolder**: `stuck-assets/` — Tareas estancadas 72h+
+
+**Fuente**: BigQuery (`greenhouse_ico`, `greenhouse_conformed`)
+
+**API**: `/api/ico-engine/*`
+
+**Cron**: `/api/cron/ico-materialize`
+
+---
+
+## 16. Nubox Integration
+
+### `nubox`
+
+**Ubicación**: `src/lib/nubox/`
+
+Integración con Nubox (contabilidad chilena). Sincronización de DTEs: ventas, compras, egresos, ingresos bancarios.
+
+**Pipeline de 3 fases**:
+1. **Raw** — Fetch API Nubox → BigQuery `nubox_raw_snapshots`
+2. **Conformed** — Transform + identity resolution → BigQuery `nubox_conformed`
+3. **Postgres** — Project → PostgreSQL `greenhouse_finance`
+
+**Subfolder**: `client/` — Cliente HTTP con retry, paginación
+
+**Subfolder**: `mappers/` — Transformaciones Sale/Purchase/Expense/Income
+
+**Subfolder**: `emission/` — Lógica de emisión de DTEs
+
+**API**: `/api/finance/nubox/*`, `/api/cron` (sync job)
+
+---
+
+## 17. AI & GenAI
+
+### `ai`
+
+**Ubicación**: `src/lib/ai/`
+
+Cliente GenAI para integración con Vertex AI. Modos: plan, pair, review, implement.
+
+**Subfolder**: `vertex-ai-client/` — SDK Vertex AI
+
+**Subfolder**: `agent/` — Agente Greenhouse con context
+
+---
+
+### `ai-tools`
+
+**Ubicación**: `src/lib/ai-tools/`
+
+Catálogo de herramientas AI. Vendors, categorías, modelos de costo.
+
+**API**: `/api/ai-tools/*`, `/api/admin/ai-tools/*`
+
+---
+
+### `nexa`
+
+**Ubicación**: `src/lib/nexa/`
+
+Integración con Nexa (proveedor externo AI). Service, tools, contracts.
+
+---
+
+## 18. Notifications
+
+### `notifications`
+
+**Ubicación**: `src/lib/notifications/`
+
+Sistema de notificaciones. Service, recipient resolver, schema.
+
+**Subfolder**: `service/` — Dispatcher de notificaciones
+
+**Subfolder**: `recipient-resolver/` — Resolución de destinatarios
+
+**Subfolder**: `schema/` — Definiciones de eventos notificables
+
+**API**: `/api/admin/notifications/*`, `/api/cron/notifications/send`
+
+---
+
+### `alerts`
+
+**Ubicación**: `src/lib/alerts/`
+
+Alertas y escalaciones. Integración Slack, webhooks.
+
+**Subfolder**: `slack/` — Formatter y dispatcher Slack
+
+---
+
+## 19. Email
+
+### `email`
+
+**Ubicación**: `src/lib/email/`
+
+Entrega de emails, templates, subscriptions.
+
+**Subfolder**: `delivery/` — Envío via SES/SendGrid
+
+**Subfolder**: `templates/` — Template engine
+
+**Subfolder**: `subscriptions/` — Gestión de suscripciones
+
+**API**: `/api/admin/email/*`
+
+---
+
+## 20. Webhooks
+
+### `webhooks`
+
+**Ubicación**: `src/lib/webhooks/`
+
+Infraestructura de webhooks inbound/outbound, signing, retry policy.
+
+**Subfolder**: `dispatcher/` — Orquestación de dispatch
+
+**Subfolder**: `inbound/` — Handlers: HubSpot, Nubox, Notion, custom
+
+**Subfolder**: `outbound/` — Suscriptores, suscripciones
+
+**Subfolder**: `signing/` — HMAC para validación
+
+**Subfolder**: `retry-policy/` — Reintentos exponenciales
+
+**Subfolder**: `consumers/` — Consumidores registrados
+
+**Subfolder**: `handlers/` — Handlers por sistema
+
+**API**: `/api/webhooks/inbound/*`, `/api/webhooks/dispatch`, `/api/cron/webhook-dispatch`
+
+---
+
+## 21. Sync & Events
+
+### `sync`
+
+**Ubicación**: `src/lib/sync/`
+
+Event catalog (50+ tipos agregados), outbox consumer, publish, projection registry.
+
+**Subfolder**: `event-catalog/` — Definiciones: `identity.*`, `organization.*`, `member.*`, `payroll.*`, `finance.*`, `campaign.*`, `service.*`, etc.
+
+**Subfolder**: `outbox/` — Tabla PostgreSQL de eventos sin procesar
+
+**Subfolder**: `publish/` — Publisher hacia BigQuery + webhooks
+
+**Subfolder**: `projection-registry/` — Registro de proyecciones reactivas
+
+**API**: `/api/cron/outbox-publish`
+
+---
+
+## 22. Space-Notion
+
+### `space-notion`
+
+**Ubicación**: `src/lib/space-notion/`
+
+Sincronización con Notion. Governance, contract reconciliation, performance report publication.
+
+**Subfolder**: `governance/` — Reglas y contratos
+
+**Subfolder**: `contract/` — Validación de estructura
+
+**Subfolder**: `performance-report-publication/` — Publicación de reportes en Notion
+
+**Subfolder**: `notion-client/` — SDK Notion
+
+---
+
+## 23. Capabilities
+
+### `capabilities`
+
+**Ubicación**: `src/lib/capabilities/`
+
+Sistema modular de capabilities. Resolución, verificación, contenido del módulo.
+
+**Subfolder**: `resolve/` — Resolver módulos por tenant
+
+**Subfolder**: `verify/` — Verificación de acceso
+
+**Subfolder**: `module-content/` — Datos específicos del módulo
+
 **API**: `/api/capabilities/*`
 
-### Propósito
+---
 
-Sistema de módulos de capacidad que muestra a cada tenant las capabilities que ha contratado, con datos específicos de cada módulo.
+## 24. SCIM
 
-### Resolución de capabilities
+### `scim`
 
-1. Se obtienen las `businessLines` y `serviceModules` del tenant
-2. Se comparan contra el `CAPABILITY_REGISTRY` (in-memory)
-3. Se resuelven los módulos que matchean con `requiredBusinessLines` o `requiredServiceModules`
-4. Se ordenan por prioridad
+**Ubicación**: `src/lib/scim/`
 
-### Estructura de módulo
+Provisioning SCIM 2.0. Auth, users, groups, formatters.
 
-Cada capability tiene:
-- **Definition** — id, label, description, icon, route, priority, theme
-- **Theme** — creative, crm, onboarding, web
-- **Cards** — Layout flexible con 10 tipos de card
-- **Data Sources** — Fuentes de datos requeridas para el módulo
+**Subfolder**: `auth/` — Validación de bearer tokens
 
-### Card types
+**Subfolder**: `provisioning/` — Lógica de provisioning (create, update, delete)
 
-| Tipo | Descripción |
-|------|-------------|
-| `metric` | Métrica individual |
-| `project-list` | Lista de proyectos |
-| `tooling-list` | Lista de herramientas |
-| `quality-list` | Lista de métricas de calidad |
-| `metric-list` | Lista de métricas |
-| `chart-bar` | Gráfico de barras |
-| `section-header` | Encabezado de sección |
-| `pipeline` | Vista de pipeline |
-| `metrics-row` | Fila de métricas |
-| `alert-list` | Lista de alertas |
+**Subfolder**: `groups/` — Gestión de grupos
+
+**Subfolder**: `formatters/` — Conversión SCIM ↔ Greenhouse
+
+**API**: `/api/scim/v2/*`
 
 ---
 
-## 8. Agency
+## 25. Calendar
 
-**Superficie**: `/agency`, `/agency/spaces`, `/agency/capacity`
-**Lib**: `src/lib/agency/`
-**API**: `/api/agency/*`
-**Fuente de datos**: BigQuery
+### `calendar`
 
-### Propósito
+**Ubicación**: `src/lib/calendar/`
 
-Vista transversal de la agencia para leadership y operations. Muestra salud de todas las cuentas, capacidad global y métricas de rendimiento.
+Calendario operativo, feriados, días de negocio. Timezone canónica: `America/Santiago`.
 
-### Pulse
+**Subfolder**: `operational-calendar/` — Calendario canónico (fechas, feriados)
 
-Métricas globales de la agencia: RpA promedio, total assets, OTD global, feedback pending. Usa lógica de semáforo con umbrales configurables.
+**Subfolder**: `nager-date-holidays/` — Integración con Nager.Date API
 
-### Spaces
-
-Lista de espacios/cuentas con health indicators: RpA, OTD, proyectos activos, miembros, FTE, usuarios, assets, feedback pending.
-
-### Capacity
-
-Vista de capacidad de la agencia: total FTE, utilización, horas mensuales, distribución per-person.
+**Subfolder**: `business-days/` — Cálculo de días de negocio
 
 ---
 
-## 9. Admin
+## 26. Tenant & Authorization
 
-**Superficie**: `/admin`, `/admin/users/[id]`, `/admin/roles`, `/admin/tenants/[id]`, `/admin/team`, `/admin/ai-tools`
-**Lib**: `src/lib/admin/`
-**API**: `/api/admin/*`
+### `tenant`
 
-### Sub-módulos
+**Ubicación**: `src/lib/tenant/`
 
-#### Tenant Management
+Contexto de tenant, autorización, acceso.
 
-- Lista de tenants con overview
-- Detalle de tenant con capabilities, contactos, configuración
-- Capability assignment (manual o sync desde HubSpot)
-- Logo upload
-- View-as mode (ver dashboard como si fuera el cliente)
+**Subfolder**: `context/` — Resolución de contexto
 
-#### User Management
+**Subfolder**: `authorization/` — Predicados de autorización
 
-- Detalle de usuario con roles asignados
-- Asignación/revocación de roles
-- Avatar upload
-
-#### Role Management
-
-- Catálogo de roles del sistema
-- Vista de asignaciones
-
-#### Team Admin
-
-- CRUD de miembros del equipo
-- CRUD de asignaciones
-- Desactivación de miembros
-
-#### AI Tools Admin
-
-- Catálogo de herramientas AI (CRUD)
-- Gestión de licencias (CRUD)
-- Gestión de wallets de créditos (CRUD)
-- Metadata para dropdowns y filtros
+**Subfolder**: `access/` — Helpers de acceso (requireClientTenantContext, etc.)
 
 ---
 
-## 10. AI Tools & Credits
+### `my`
 
-**Superficie**: Integrado en admin y dashboard
-**Lib**: `src/lib/ai-tools/`, `src/lib/ai/`
-**API**: `/api/ai-credits/*`, `/api/ai-tools/*`, `/api/admin/ai-tools/*`
+**Ubicación**: `src/lib/my/`
 
-### AI Tools Catalog
-
-Catálogo de herramientas AI con:
-- Proveedor (ai_vendor, software_suite, identity_provider, delivery_platform, financial_vendor)
-- Categoría (gen_visual, gen_video, gen_text, gen_audio, ai_suite, creative_production, etc.)
-- Modelo de costo (subscription, per_credit, hybrid, free_tier, included)
-
-### AI Credits
-
-- **Wallets** — Por scope (client o pool), con limits mensuales
-- **Balance health** — healthy, warning, critical, depleted
-- **Ledger** — Registro de consumos, recargas, reservas, liberaciones, ajustes
-- **Summary** — Vista agregada admin y por cliente
-
-### Greenhouse Agent
-
-Agente GenAI interno usando Vertex AI:
-- Modos: `plan` (arquitectura), `pair` (next steps), `review` (análisis crítico), `implement` (código)
-- Modelo configurable via `GREENHOUSE_AGENT_MODEL`
+Recursos personales. Membresía, perfil, preferencias.
 
 ---
 
-## 11. Integrations
+## 27. Storage
 
-**Lib**: `src/lib/integrations/`
-**API**: `/api/integrations/v1/*`
+### `storage`
 
-### HubSpot Integration
+**Ubicación**: `src/lib/storage/`
 
-Microservicio de integración que expone:
-- **Service Contract** — Contratos de servicio activos
-- **Company Profile** — Perfil de empresa con lifecycle stage, owner, business lines
-- **Company Contacts** — Contactos asociados a la empresa
-- **Live Context** — Contexto en tiempo real para el portal
-- **Company Owner** — Owner de la cuenta en HubSpot
+Assets y media. Upload, serving, cleanup.
 
-Timeout: 4000ms. Endpoint configurable via `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`.
+**Subfolder**: `assets/` — Gestión de assets
 
-### Integration API
+**Subfolder**: `media/` — Serving de imágenes (logos, avatars)
 
-APIs externas para que sistemas como HubSpot sincronicen datos:
-- Listar tenants con filtros
-- Catálogo de capabilities
-- Sincronizar capabilities de un tenant
+**API**: `/api/media/*`
 
 ---
 
-## 12. Internal Dashboard
+## 28. Cloud & Infrastructure
 
-**Superficie**: `/internal/dashboard`
-**Vista**: `src/views/greenhouse/internal/dashboard/`
+### `cloud`
 
-### Propósito
+**Ubicación**: `src/lib/cloud/`
 
-Dashboard interno para equipo Efeonce con métricas operativas transversales a todas las cuentas.
+Integración con Google Cloud. BigQuery, cron contracts.
 
----
+**Subfolder**: `bigquery/` — Cliente BigQuery, queries, materialization
 
-## 13. Team Capacity
-
-**Lib**: `src/lib/team-capacity/`
-**API**: Via `/api/team/*`
-
-### Propósito
-
-Cálculos de capacidad y utilización del equipo.
-
-### Métricas clave
-
-- **FTE Allocation** — Porcentaje de dedicación (1.0 = full time = 160 hrs/mes)
-- **Assigned Hours** — Horas asignadas en el mes
-- **Utilization Percent** — Horas asignadas / horas disponibles
-- **Capacity Health**:
-  - `idle`: < 30% utilización
-  - `balanced`: 30-85%
-  - `high`: 85-100%
-  - `overloaded`: > 100%
-
-### Breakdown
-
-- Por rol (account, operations, strategy, design, development, media)
-- Por proyecto
-- Por sprint
-- Health buckets (idle, balanced, high, overloaded)
+**Subfolder**: `cron/` — Contratos y helpers de cron
 
 ---
 
-## 14. ICO Engine (Delivery Intelligence) *(nuevo)*
+### `postgres`
 
-**Lib**: `src/lib/ico-engine/`
-**API**: `/api/ico-engine/*`
-**Fuente de datos**: BigQuery (`greenhouse_ico`, `greenhouse_conformed`)
-**Materialización**: Cron periódico `/api/cron/ico-materialize`
+**Ubicación**: `src/lib/postgres/`
 
-### Propósito
+Cliente PostgreSQL centralizado. Cloud SQL Connector, pooling, perfiles.
 
-Motor de inteligencia de delivery que materializa métricas operativas (RPA, OTD, FTR, cycle time, stuck assets) a partir de datos de Notion conformados. Provee tanto métricas materializadas como cálculo live bajo demanda.
+**Subfolder**: `client/` — Inicialización y management de pool
 
-### Metric Registry
-
-10 métricas definidas con umbrales de zona (optimal, attention, critical):
-
-| Métrica | Kind | Optimal | Attention | Critical |
-|---------|------|---------|-----------|----------|
-| `rpa` | average | 0–1.5 | 1.5–2.5 | >2.5 |
-| `otd_pct` | percentage | 90–100% | 70–90% | <70% |
-| `ftr_pct` | percentage | 80–100% | 60–80% | <60% |
-| `cycle_time` | duration | 0–7 días | 7–14 | >14 |
-| `throughput` | count | 20+ | 10–20 | <10 |
-| `pipeline_velocity` | ratio | 0.8+ | 0.5–0.8 | <0.5 |
-| `stuck_assets` | count | 0–2 | 2–5 | >5 |
-| `stuck_asset_pct` | percentage | 0–10% | 10–25% | >25% |
-
-### Fases CSC
-
-Pipeline creativo-operativo: `briefing` → `produccion` → `revision_interna` → `cambios_cliente` → `entrega`. Mapeo configurable por espacio vía `status_phase_config`.
-
-### Dimensiones de análisis
-
-- **Por espacio** — `readSpaceMetrics()`, `readLatestSpaceMetrics()`
-- **Por proyecto** — `readProjectMetrics()`
-- **Por miembro** — `readMemberMetrics()`, `readMemberMetricsBatch()`
-- **Agencia completa** — `readAgencyMetrics()` (rollup de todos los espacios)
-- **Live vs materializado** — `computeSpaceMetricsLive()` para cálculo on-demand
-
-### Stuck Assets
-
-Tareas con 72h+ sin movimiento. Detalle completo: tarea, fase CSC, horas/días estancado, severidad, RPA, review status.
-
-### Infrastructure
-
-`ensureIcoEngineInfrastructure()` — provisioning idempotente del schema BigQuery con migraciones resilientes. Si las tablas/vistas ya existen, no se recrean.
+**Subfolder**: `access-control/` — Perfiles (runtime, migrator, admin, ops)
 
 ---
 
-## 15. Account 360 / Organizations *(nuevo)*
+### `db`
 
-**Superficie**: `/agency/organizations`, `/agency/organizations/[id]`
-**Lib**: `src/lib/account-360/`
-**API**: `/api/organizations/*`
-**Vista**: `src/views/greenhouse/organizations/`
-**Fuente de datos**: PostgreSQL (`greenhouse_core`)
+**Ubicación**: `src/lib/db/`
 
-### Propósito
+Kysely ORM tipado. Query builder, migrations.
 
-Vista unificada B2B que modela organizaciones (entidades jurídicas), espacios operativos (tenants), y membresías de personas. Reemplaza la relación plana `clients` con un modelo jerárquico.
-
-### Modelo de objetos
-
-- **Organization** (`EO-ORG-*`) — Entidad jurídica (cliente, proveedor, o ambos). VK a HubSpot Company.
-- **Space** (`EO-SPC-*`) — Espacio operativo 1:N por organización. Puente a `clients` legacy vía `client_id`.
-- **Person Membership** (`EO-MBR-*`) — Membresía de `identity_profile` en una organización, opcionalmente scoped a un espacio.
-
-### UI — Tabs
-
-| Tab | Contenido |
-|-----|-----------|
-| Overview | Datos de la organización, spaces, metadata |
-| People | Membresías y personas vinculadas |
-| Finance | Resumen financiero de la organización |
-| ICO | Métricas de delivery (ICO Engine) |
-| Integrations | Estado de sync con HubSpot |
-
-### Drawers
-
-- **EditOrganizationDrawer** — Editar datos de la organización
-- **AddMembershipDrawer** — Agregar persona a la organización
-
-### Identity Resolution
-
-- `findOrganizationByTaxId()` — Lookup por tax ID (RUT, RFC, EIN, VAT)
-- `ensureOrganizationForSupplier()` — Find-or-create para proveedores; upgrade a `both` si existe como client
-- `resolveOrganizationForClient()` — Resolver `organization_id` para income records vía `client_id → spaces` bridge
+**Subfolder**: `types/` — Tipos generados (`db.d.ts`, 140 tablas)
 
 ---
 
-## 16. Services *(nuevo)*
+### `secrets`
 
-**Lib**: `src/lib/services/`
-**API**: `/api/agency/services/*`
-**Fuente de datos**: PostgreSQL (`greenhouse_core`)
+**Ubicación**: `src/lib/secrets/`
 
-### Propósito
+Google Secret Manager. Resolución centralizada de credenciales.
 
-CRUD de servicios de Efeonce vinculados a espacios, organizaciones, y sistemas externos (HubSpot deals, Notion projects).
+**Subfolder**: `client/` — SecretClient API
 
-### Campos clave
-
-Nombre, espacio, organización, línea de servicio, servicio específico, modalidad, billing frequency, montos (total_cost, amount_paid), currency, pipeline stage, fechas, links a HubSpot/Notion.
-
-### History tracking
-
-Cada actualización registra un `service_history` entry con field_name, old_value, new_value, actor y timestamp.
-
-### IDs
-
-IDs públicos secuenciales `EO-SVC-{NNNN}` generados por secuencia PostgreSQL.
+**Subfolder**: `caching/` — In-memory cache con TTL
 
 ---
 
-## 17. Finance Intelligence *(nuevo)*
+### `cron`
 
-**API**: `/api/finance/intelligence/*`
-**Fuente de datos**: PostgreSQL (`greenhouse_finance`)
+**Ubicación**: `src/lib/cron/`
 
-### Propósito
+Autenticación y helpers de Vercel Cron.
 
-Capa analítica sobre el módulo financiero que expone métricas de rentabilidad por cliente, tendencias en el tiempo, y allocaciones de costos.
-
-### Endpoints
-
-- **Client Economics** — Rentabilidad por cliente: ingresos, gastos directos, margen
-- **Client Economics Trend** — Evolución temporal de la rentabilidad
-- **Allocations** — Distribución de costos por categoría/servicio
+**Subfolder**: `auth/` — Validación de CRON_SECRET
 
 ---
 
-## 18. Nubox Integration *(nuevo)*
+## Dependencias entre módulos
 
-**Lib**: `src/lib/nubox/`
-**API**: `/api/finance/nubox/*`
-**Fuente de datos**: Nubox API → BigQuery → PostgreSQL
+**Orden de inicialización**:
 
-### Propósito
+1. **Infrastructure**: `postgres`, `cloud`, `secrets`, `cron`
+2. **Core Identity**: `identity`, `tenant`, `access`
+3. **Data**: `sync`, `finance`, `hr-core`, `payroll`
+4. **Business Logic**: `projects`, `team-capacity`, `ico-engine`, `agencies`, `services`
+5. **Integration**: `webhooks`, `nubox`, `space-notion`, `scim`
+6. **UI/Presentation**: `dashboard`, `capabilities`, `people`, `organizations`
+7. **Support**: `notifications`, `email`, `alerts`, `storage`
 
-Integración con Nubox (plataforma contable chilena) para sincronizar documentos tributarios electrónicos (DTEs): ventas, compras, egresos bancarios, ingresos bancarios.
+---
 
-### Pipeline de 3 fases
+## Resumen estadístico
 
-| Fase | Descripción | Destino |
-|------|-------------|---------|
-| A — Raw | Fetch de API Nubox, archive JSON crudo | BigQuery `nubox_raw_snapshots` |
-| B — Conformed | Transform + identity resolution (supplier → organization) | BigQuery `nubox_conformed` |
-| C — Postgres | Project a tablas operativas | PostgreSQL `greenhouse_finance` |
-
-### Cliente HTTP
-
-- Auth: Bearer token + API key
-- Retry automático en 429 (rate limit) y 5xx
-- Paginación automática
-- Timeout configurable
-
-### Mappers
-
-Transformaciones: `Sale → RawRow`, `Purchase → RawRow`, `Expense → RawRow`, `Income → RawRow` para normalización de esquemas entre Nubox y modelo interno.
-
-### Emisión
-
-`emission.ts` — Lógica para emisión (generación) de documentos tributarios a través de Nubox API.
+| Categoría | Módulos |
+|-----------|---------|
+| Gestión de Personas | 4 |
+| HR & Payroll | 2 |
+| Finance | 2 |
+| Delivery & ICO | 2 |
+| Inteligencia de Negocio | 3 |
+| Integraciones | 7 |
+| Notificaciones & Comunicación | 3 |
+| Autenticación & Seguridad | 4 |
+| Almacenamiento & Media | 1 |
+| Cloud & Infraestructura | 5 |
+| Operaciones & Admin | 3 |
+| Calendarios & Utilidades | 1 |
+| **TOTAL** | **55** |

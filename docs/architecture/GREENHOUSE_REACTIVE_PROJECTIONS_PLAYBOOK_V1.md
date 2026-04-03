@@ -239,6 +239,18 @@ Returns staleness checks for all materialized data sources (ICO, economics, memb
 | Lag hours | < 2h | > 6h | Check if crons are running |
 | Orphans recovered | 0 | > 0 frequently | Indicates inline processing is failing — investigate root cause |
 
+### Projected payroll health (TASK-109)
+
+`projected_payroll` es un consumidor de referencia del control plane reactivo. Su salud es observable vía `GET /api/internal/projections` filtrando por `name: 'projected_payroll'`. Señales específicas:
+
+| Signal | Healthy | Degraded | Action |
+|--------|---------|----------|--------|
+| `lagHours` | ≤ 2h | > 6h | Verificar que crons `outbox-react-people` ejecutan correctamente |
+| `deadLetters` (24h) | 0 | > 0 | Revisar `last_error` en `outbox_reactive_log` para handler `projected_payroll` |
+| Store fail-fast | N/A | Error al upsert | Tabla `greenhouse_serving.projected_payroll_snapshots` no provisionada — ejecutar migración |
+
+El store ya no ejecuta DDL defensivo en runtime (TASK-109). Si la tabla falta, el error es inmediato y accionable.
+
 ### Recovery cron
 
 ```

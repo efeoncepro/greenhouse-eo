@@ -287,6 +287,8 @@ CREATE TABLE IF NOT EXISTS `__PROJECT_ID__.greenhouse_conformed.delivery_tasks` 
   workflow_review_open BOOL,
   blocker_count INT64,
   last_frame_comment STRING,
+  tarea_principal_ids ARRAY<STRING>,
+  subtareas_ids ARRAY<STRING>,
   original_due_date DATE,
   execution_time_label STRING,
   changes_time_label STRING,
@@ -494,6 +496,12 @@ ADD COLUMN IF NOT EXISTS blocker_count INT64;
 
 ALTER TABLE `__PROJECT_ID__.greenhouse_conformed.delivery_tasks`
 ADD COLUMN IF NOT EXISTS last_frame_comment STRING;
+
+ALTER TABLE `__PROJECT_ID__.greenhouse_conformed.delivery_tasks`
+ADD COLUMN IF NOT EXISTS tarea_principal_ids ARRAY<STRING>;
+
+ALTER TABLE `__PROJECT_ID__.greenhouse_conformed.delivery_tasks`
+ADD COLUMN IF NOT EXISTS subtareas_ids ARRAY<STRING>;
 
 ALTER TABLE `__PROJECT_ID__.greenhouse_conformed.delivery_tasks`
 ADD COLUMN IF NOT EXISTS original_due_date DATE;
