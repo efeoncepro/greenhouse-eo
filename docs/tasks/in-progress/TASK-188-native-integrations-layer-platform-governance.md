@@ -1,5 +1,16 @@
 # TASK-188 - Native Integrations Layer: Platform Governance, Runtime Contracts & Shared Operating Model
 
+## Delta 2026-04-03
+
+- Las lanes `TASK-205`, `TASK-207` y `TASK-208` quedan explícitamente re-encuadradas dentro de la integración nativa de `Notion`, no como un carril separado de Delivery.
+- Implicación:
+  - `TASK-205` pasa a representar la auditoría de paridad contra origen del contrato nativo `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`
+  - `TASK-207` pasa a representar el hardening runtime de ese mismo contrato
+  - `TASK-208` pasa a representar su observabilidad y data quality recurrente
+- Decisión de arquitectura:
+  - cualquier fix de paridad, frescura, jerarquía o drift para `Notion` debe quedar enmarcado bajo la `Native Integrations Layer`
+  - no abrir un control plane paralelo específico de Delivery cuando el problema real pertenece al integration layer de `Notion`
+
 ## Delta 2026-04-02
 
 - `TASK-187` ya consumió y endureció esta foundation shared para `Notion`:
@@ -93,6 +104,7 @@ Sin una capa nativa de integraciones:
   - sync execution
   - health/freshness
   - downstream readiness
+- absorber dentro de este marco los follow-ons de `Notion` que hoy aparecen como paridad de origen, hardening de pipeline y monitoreo continuo
 - Dejar una arquitectura donde `TASK-187` sea el primer slice fuerte sobre Notion, pero dentro de un marco reusable para otras integraciones.
 
 ## Iteration Principle
