@@ -2,6 +2,12 @@
 
 ## 2026-04-03
 
+- **Admin integrations health semantics clarified**:
+  - `Health & Freshness` ya separa estado actual de incidentes recientes en `/admin/integrations`
+  - el badge `Health` ahora refleja la ultima senal valida y su frescura, en vez de degradarse automaticamente por cualquier fallo dentro de 24h
+  - los incidentes recientes siguen visibles como contexto operativo separado bajo el badge, para no ocultar recuperaciones reales ni perder trazabilidad
+  - se agrego regresion en `src/lib/integrations/health.test.ts` para cubrir integraciones recuperadas con fallos historicos recientes y senales realmente stale
+
 - **TASK-209 conformed writer staged swap + freshness gate**:
   - `sync-notion-conformed` deja de hacer reemplazos secuenciales directos sobre `greenhouse_conformed.delivery_*`
   - ahora stagea en tablas efímeras y aplica un swap transaccional para `delivery_projects`, `delivery_tasks` y `delivery_sprints`

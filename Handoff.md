@@ -1,5 +1,29 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — Health & Freshness separa estado actual de incidentes recientes
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `src/lib/integrations/health.ts`
+  - `src/lib/integrations/health.test.ts`
+  - `src/views/greenhouse/admin/AdminIntegrationGovernanceView.tsx`
+
+### Resultado
+
+- el badge `Health` del overview ya no cae a `degraded` solo porque existan fallos en las ultimas 24 horas
+- el contrato nuevo es:
+  - `Health` refleja el estado actual segun la ultima senal valida y su frescura
+  - `Fallos 24h` permanece visible como contexto operativo separado
+- con esto, una integracion recuperada vuelve a verse sana de inmediato, sin perder trazabilidad de incidentes recientes
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/integrations/health.test.ts`
+- `pnpm exec eslint src/lib/integrations/health.ts src/lib/integrations/health.test.ts src/views/greenhouse/admin/AdminIntegrationGovernanceView.tsx`
+- `pnpm exec next build --webpack`
+
 ## Sesión 2026-04-03 — Fix trustable state for Notion Sync Orchestration UI
 
 ### Rama / alcance
