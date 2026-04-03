@@ -83,17 +83,49 @@ export const syncEntraProfiles = async (
         result.usersUpdated++
       }
 
-      // 2. Update identity_profiles.job_title
-      if (gh.identity_profile_id && entra.jobTitle) {
-        const ipResult = await query<{ [key: string]: unknown }>(
-          `UPDATE greenhouse_core.identity_profiles
-           SET job_title = $1, updated_at = CURRENT_TIMESTAMP
-           WHERE profile_id = $2 AND (job_title IS DISTINCT FROM $1)
-           RETURNING profile_id`,
-          [entra.jobTitle, gh.identity_profile_id]
-        )
+      // 2. Update identity_profiles (job_title, full_name, canonical_email)
+      if (gh.identity_profile_id) {
+        const ipSets: string[] = []
+        const ipVals: unknown[] = []
+        const ipConds: string[] = []
+        let ipIdx = 1
 
-        if (ipResult.length > 0) result.profilesUpdated++
+        if (entra.jobTitle) {
+          ipSets.push(`job_title = $${ipIdx}`)
+          ipConds.push(`job_title IS DISTINCT FROM $${ipIdx}`)
+          ipVals.push(entra.jobTitle)
+          ipIdx++
+        }
+
+        const entraName = cleanDisplayName(entra.displayName)
+
+        if (entraName) {
+          ipSets.push(`full_name = $${ipIdx}`)
+          ipConds.push(`full_name IS DISTINCT FROM $${ipIdx}`)
+          ipVals.push(entraName)
+          ipIdx++
+        }
+
+        if (entra.mail) {
+          ipSets.push(`canonical_email = $${ipIdx}`)
+          ipConds.push(`canonical_email IS DISTINCT FROM $${ipIdx}`)
+          ipVals.push(entra.mail.toLowerCase())
+          ipIdx++
+        }
+
+        if (ipSets.length > 0) {
+          ipVals.push(gh.identity_profile_id)
+
+          const ipResult = await query<{ [key: string]: unknown }>(
+            `UPDATE greenhouse_core.identity_profiles
+             SET ${ipSets.join(', ')}, updated_at = CURRENT_TIMESTAMP
+             WHERE profile_id = $${ipIdx} AND (${ipConds.join(' OR ')})
+             RETURNING profile_id`,
+            ipVals
+          )
+
+          if (ipResult.length > 0) result.profilesUpdated++
+        }
       }
 
       // 3. Update members
