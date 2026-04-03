@@ -2,6 +2,18 @@
 
 ## 2026-04-03
 
+- **Internal roles and hierarchies architecture formalized**:
+  - se creó la spec canónica `docs/architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md`
+  - el contrato ahora separa explícitamente:
+    - roles de acceso
+    - supervisoría (`reports_to_member_id`)
+    - estructura departamental (`departments`)
+    - ownership operativo por cuenta/space/proyecto
+  - se deja explícito que `departments` no debe funcionar como jerarquía universal para approvals y ownership comercial
+  - el rol visible más amplio del sistema queda nombrado como `Superadministrador`, manteniendo `efeonce_admin` como código técnico actual
+  - además se formaliza una jerarquía visible de personas separada de RBAC: `Superadministrador`, `Responsable de Área`, `Supervisor`, `Colaborador`
+  - se abrió `TASK-225` para cerrar la convergencia de naming, jerarquías y responsabilidades operativas scoped
+
 - **Backlog ICO consumers aligned to the metric contract**:
   - se actualizaron tasks de `Agency`, `Nexa`, `HR`, `Frame.io`, `AI core`, `SLA`, `Scope`, `Temporal contract` e `Integrations` para que no contradigan `docs/architecture/Contrato_Metricas_ICO_v1.md`
   - las tasks afectadas ahora dejan explícito que no deben:

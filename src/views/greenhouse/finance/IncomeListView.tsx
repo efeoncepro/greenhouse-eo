@@ -478,7 +478,7 @@ const IncomeListView = () => {
         </Box>
       </Box>
 
-      <Alert severity='info' variant='tonal'>
+      <Alert severity='info' variant='outlined'>
         Nubox sincroniza aquí documentos de venta y ajustes tributarios. No equivalen por sí solos a caja: los cobros reales viven en
         {' '}
         <strong>cobros</strong>

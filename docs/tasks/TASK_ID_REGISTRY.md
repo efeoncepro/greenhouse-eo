@@ -274,3 +274,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-222` | `to-do` | Creative Velocity Review, Tiered Metric Surfacing & Client Narrative | `docs/tasks/to-do/TASK-222-creative-velocity-review-tiered-metric-surfacing.md` |
 | `TASK-223` | `to-do` | ICO Methodological Accelerators Instrumentation | `docs/tasks/to-do/TASK-223-ico-methodological-accelerators-instrumentation.md` |
 | `TASK-224` | `in-progress` | Finance Document vs Cash Semantic Contract | `docs/tasks/in-progress/TASK-224-finance-document-vs-cash-semantic-contract.md` |
+| `TASK-225` | `in-progress` | Internal Roles, Hierarchies & Approval Ownership Model | `docs/tasks/in-progress/TASK-225-internal-roles-hierarchies-approval-ownership-model.md` |

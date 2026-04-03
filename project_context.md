@@ -1,5 +1,33 @@
 # project_context.md
 
+## Delta 2026-04-03 Internal roles and hierarchies canonical architecture
+
+- Greenhouse ya distingue formalmente cuatro planos internos que antes aparecían mezclados entre HR, Identity y Agency:
+  - `Access Role`
+  - `Reporting Hierarchy`
+  - `Structural Hierarchy`
+  - `Operational Responsibility`
+- La fuente canónica nueva vive en:
+  - `docs/architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md`
+- Regla operativa:
+  - `departments` no debe leerse como jerarquía universal de approvals ni de ownership comercial
+  - `supervisor` sigue siendo una relación entre miembros vía `reports_to_member_id`
+  - ownership de cuenta/space/proyecto debe converger a relaciones explícitas scoped, no inferirse desde el departamento del colaborador
+- jerarquía visible recomendada para personas:
+  - `Superadministrador`
+  - `Responsable de Área`
+  - `Supervisor`
+  - `Colaborador`
+  - esta jerarquía es de lectura humana y no reemplaza `role_code` ni ownership operativo
+- Naming guidance:
+  - `role_code` técnico estable en `snake_case`
+  - nombre visible amigable y legible para UI/admin
+- rol visible más amplio:
+  - `Superadministrador`
+  - código técnico actual: `efeonce_admin`
+- Drift reconocido:
+  - `employee` y `finance_manager` siguen existiendo como contracts legacy en partes del runtime y deben leerse como carriles de convergencia, no como taxonomía target
+
 ## Delta 2026-04-03 Finance visible semantics: Nubox documents are not cash events
 
 - Las surfaces visibles `Finance > income` y `Finance > expenses` deben leerse como ledgers de documento/devengo, no como caja pura.

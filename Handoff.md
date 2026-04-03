@@ -1,5 +1,56 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — Roles internos y jerarquías formalizados como lane + spec canónica
+
+### Rama / alcance
+
+- rama actual: `develop`
+- scope:
+  - `docs/tasks/in-progress/TASK-225-internal-roles-hierarchies-approval-ownership-model.md`
+  - `docs/architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md`
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/to-do/TASK-161-agency-permissions-retention-onboarding.md`
+  - `docs/README.md`
+  - `project_context.md`
+  - `changelog.md`
+
+### Resultado
+
+- se abrió `TASK-225` para institucionalizar el modelo interno de roles y jerarquías
+- `TASK-225` quedó movida a `in-progress`
+- se creó la spec canónica `GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md`
+- el contrato nuevo separa explícitamente 4 planos:
+  - `Access Role`
+  - `Reporting Hierarchy`
+  - `Structural Hierarchy`
+  - `Operational Responsibility`
+- se dejó explícito que:
+  - `supervisor` no es un role code, sino una relación vía `reports_to_member_id`
+  - `departments` no debe usarse como jerarquía universal para approvals u ownership comercial
+  - el ownership operativo de cuentas/spaces/proyectos debe converger a relaciones scoped explícitas
+- se dejó además explícito que el rol visible más amplio del sistema debe llamarse `Superadministrador`, manteniendo `efeonce_admin` como código técnico actual
+- se formalizó además una jerarquía visible de personas separada de RBAC:
+  - `Superadministrador`
+  - `Responsable de Área`
+  - `Supervisor`
+  - `Colaborador`
+- se documentó además en la task la matriz base actual `rol -> route groups -> catálogo de vistas` para que la convergencia futura no mezcle:
+  - acceso derivado al login
+  - fallback hardcoded de gobernanza
+  - overrides persistidos por vista
+- se dejó delta de alineación en `TASK-161` para que Agency Permissions no reinvente una jerarquía paralela
+
+### Verificación
+
+- revisión manual de consistencia contra:
+  - `GREENHOUSE_IDENTITY_ACCESS_V2.md`
+  - `Greenhouse_HRIS_Architecture_v1.md`
+  - `GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md`
+  - `schema-snapshot-baseline.sql`
+
 ## Sesión 2026-04-03 — TASK-224 creada para institucionalizar documento vs caja en Finance
 
 ### Rama / alcance

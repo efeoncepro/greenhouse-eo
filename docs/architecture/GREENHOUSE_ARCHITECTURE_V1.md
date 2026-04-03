@@ -1,5 +1,26 @@
 # Greenhouse Architecture V1
 
+## Delta 2026-04-03 — Internal roles and hierarchies now have a canonical spec
+
+La semántica interna de:
+
+- `role_code` vs nombre visible
+- supervisoría
+- estructura departamental
+- ownership operativo por cuenta/space/proyecto
+
+ya no debe inferirse desde documentos separados ni desde `departments` como catch-all.
+
+Fuente canónica nueva:
+
+- `docs/architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md`
+
+Regla arquitectónica nueva:
+
+- `Access Role`, `Reporting Hierarchy`, `Structural Hierarchy` y `Operational Responsibility` deben tratarse como planos distintos
+- `departments` no debe usarse como jerarquía universal de approvals u ownership comercial
+- `supervisor` debe seguir leyéndose como relación entre miembros, no como role code global
+
 ## Delta 2026-04-01 — Native Integrations Layer ya tiene arquitectura canónica propia
 
 La `Native Integrations Layer` ya no debe leerse solo como task o intuición de plataforma.

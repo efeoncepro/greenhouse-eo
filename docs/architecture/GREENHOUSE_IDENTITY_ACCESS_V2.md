@@ -1,5 +1,33 @@
 # Greenhouse Identity & Access Architecture V2
 
+## Delta 2026-04-03 — internal roles and hierarchies separated into their own canonical spec
+
+Este documento sigue siendo la fuente canónica para:
+
+- auth principal
+- sesión
+- RBAC
+- route groups
+- access runtime
+
+Pero la semántica de:
+
+- taxonomía interna de roles
+- nombres visibles amigables
+- supervisoría
+- estructura departamental
+- ownership operativo por scope
+
+ya debe leerse en:
+
+- `docs/architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md`
+
+Regla operativa:
+
+- `supervisor` no es un role code; es una relación derivada de `reports_to_member_id`
+- `departments` no reemplaza ownership operativo ni aprobaciones por sí solo
+- la matriz base `role_code -> routeGroups -> catálogo de vistas` debe leerse en `docs/architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md`
+
 ## Purpose
 
 Define the unified permissions, roles, and access model for Greenhouse as a single Next.js application serving three distinct audiences through route-group separation:
@@ -137,7 +165,7 @@ Roles for Efeonce team members accessing their personal self-service.
 
 | role_code | role_name | Description | Route Groups |
 |-----------|-----------|-------------|--------------|
-| `collaborator` | Collaborator | Base role for every Efeonce internal user. Personal leave, attendance, expenses, tools. | `my` |
+| `collaborator` | Colaborador | Rol base de toda persona interna de Efeonce. Acceso a permisos, asistencia, nómina, perfil y herramientas. | `my` |
 
 #### Family: Agency Operations
 
@@ -145,8 +173,8 @@ Roles for Efeonce team members with cross-tenant operational visibility.
 
 | role_code | role_name | Description | Route Groups |
 |-----------|-----------|-------------|--------------|
-| `efeonce_account` | Account Lead | Owns client relationships. Sees client health, delivery context, risks for assigned clients. | `internal` |
-| `efeonce_operations` | Operations Lead | Cross-tenant operational visibility. Capacity, blocked work, utilization, review backlog. | `internal` |
+| `efeonce_account` | Líder de Cuenta | Responde por relaciones con clientes, salud de cuentas y contexto operativo/comercial de sus clientes asignados. | `internal` |
+| `efeonce_operations` | Operaciones | Visibilidad operativa cross-tenant: capacidad, bloqueos, utilización y backlog de revisión. | `internal` |
 
 #### Family: Domain Operators
 
@@ -154,18 +182,18 @@ Roles for Efeonce team members managing specific internal domains.
 
 | role_code | role_name | Description | Route Groups |
 |-----------|-----------|-------------|--------------|
-| `hr_manager` | HR Manager | HR Business Partner. Manages leave requests, attendance, org structure, catalogs. | `hr` |
-| `hr_payroll` | Payroll Operator | Processes payroll periods, entries, compensation. | `hr` |
-| `finance_analyst` | Finance Analyst | Manages income, expenses, reconciliation, suppliers. Read-only on some admin areas. | `finance` |
-| `finance_admin` | Finance Admin | Full finance write access including bank accounts, exchange rates, reconciliation. | `finance` |
-| `people_viewer` | People Viewer | Read access to collaborator profiles, assignments, capacity. Used by account leads. | `people` |
-| `ai_tooling_admin` | AI Tooling Admin | Manages tool catalog, licenses, wallets, credit allocations. | `ai_tooling` |
+| `hr_manager` | Gestión HR | Administra personas, permisos, asistencia, estructura organizacional y catálogos HR. | `hr` |
+| `hr_payroll` | Nómina | Procesa períodos, entradas y compensaciones de payroll. | `hr` |
+| `finance_analyst` | Analista de Finanzas | Opera ingresos, egresos, conciliación y suppliers; lectura ampliada sobre finanzas. | `finance` |
+| `finance_admin` | Administrador de Finanzas | Acceso completo de escritura financiera, incluyendo cuentas, tipos de cambio y conciliación. | `finance` |
+| `people_viewer` | Lectura de Personas | Acceso de lectura a perfiles de colaboradores, assignments y capacidad. | `people` |
+| `ai_tooling_admin` | Administrador de Herramientas AI | Gestiona catálogo de herramientas, licencias, wallets y créditos. | `ai_tooling` |
 
 #### Family: Platform Admin
 
 | role_code | role_name | Description | Route Groups |
 |-----------|-----------|-------------|--------------|
-| `efeonce_admin` | Platform Admin | Universal override. All route groups. Tenant management, user management, feature flags, role assignments. | `*` (all) |
+| `efeonce_admin` | Superadministrador | Universal override. Todos los route groups. Gestión de tenants, usuarios, roles, feature flags y acceso total a Greenhouse. | `*` (all) |
 
 ### Role Composition Examples
 
@@ -173,12 +201,12 @@ Real-world role assignments for typical Efeonce personas:
 
 | Persona | Assigned Roles | What They See |
 |---------|---------------|---------------|
-| Julio (founder) | `collaborator`, `efeonce_admin` | Everything: personal leave + full admin + all internal + all domains |
-| Account Lead | `collaborator`, `efeonce_account`, `people_viewer` | Personal self-service + client health views + people read |
-| Operations Lead | `collaborator`, `efeonce_operations`, `people_viewer` | Personal self-service + cross-tenant ops + people read |
-| HR Business Partner | `collaborator`, `hr_manager`, `hr_payroll` | Personal self-service + full HR admin + payroll |
-| Finance Lead | `collaborator`, `finance_admin` | Personal self-service + full finance |
-| Junior Designer | `collaborator` | Only personal self-service: leave, attendance, expenses, tools |
+| Julio (founder) | `collaborator`, `efeonce_admin` | Self-service personal + `Superadministrador` con acceso total |
+| Account Lead | `collaborator`, `efeonce_account`, `people_viewer` | Self-service + cuentas + lectura de personas |
+| Operations Lead | `collaborator`, `efeonce_operations`, `people_viewer` | Self-service + operación transversal + lectura de personas |
+| HR Business Partner | `collaborator`, `hr_manager`, `hr_payroll` | Self-service + gestión HR + nómina |
+| Finance Lead | `collaborator`, `finance_admin` | Self-service + administración financiera |
+| Junior Designer | `collaborator` | Solo experiencia personal: permisos, asistencia, nómina, perfil y herramientas |
 | External CMO (Sky) | `client_executive` | Client dashboard, projects, team, capabilities for their tenant only |
 | External Marketing Mgr | `client_manager` | Deeper client operational context, sprint drilldowns |
 | External Coordinator | `client_specialist` | Scoped to specific projects/campaigns within their tenant |

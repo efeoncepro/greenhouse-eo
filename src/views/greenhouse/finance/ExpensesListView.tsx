@@ -347,7 +347,7 @@ const ExpensesListView = () => {
         </Button>
       </Box>
 
-      <Alert severity='info' variant='tonal'>
+      <Alert severity='info' variant='outlined'>
         Las compras traídas desde Nubox respaldan obligaciones y devengo. El pago real se reconoce recién en
         {' '}
         <strong>payment_date</strong>
