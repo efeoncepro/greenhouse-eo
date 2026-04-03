@@ -148,8 +148,9 @@ export async function GET(request: Request) {
       }
     })
 
-    // CLP equivalent for USD totals
+    // Consolidated currency equivalents (CLP total + USD total)
     let clpEquivalent: { grossClp: number; netClp: number; fxRate: number } | null = null
+    let usdEquivalent: { grossUsd: number; netUsd: number; fxRate: number } | null = null
 
     if (result.totals.grossByCurrency.USD && result.totals.grossByCurrency.USD > 0) {
       try {
@@ -160,8 +161,14 @@ export async function GET(request: Request) {
           netClp: round2(result.totals.netByCurrency.USD * fxRate + (result.totals.netByCurrency.CLP ?? 0)),
           fxRate
         }
+
+        usdEquivalent = {
+          grossUsd: round2(result.totals.grossByCurrency.USD + (result.totals.grossByCurrency.CLP ?? 0) / fxRate),
+          netUsd: round2(result.totals.netByCurrency.USD + (result.totals.netByCurrency.CLP ?? 0) / fxRate),
+          fxRate
+        }
       } catch {
-        // FX not available — skip CLP equivalent
+        // FX not available — skip equivalents
       }
     }
 
@@ -175,7 +182,8 @@ export async function GET(request: Request) {
           entryCount: officialRows.length
         } : null,
         latestPromotion,
-        clpEquivalent
+        clpEquivalent,
+        usdEquivalent
       },
       { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } }
     )

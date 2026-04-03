@@ -139,6 +139,11 @@ interface ProjectedData {
     netClp: number
     fxRate: number
   } | null
+  usdEquivalent: {
+    grossUsd: number
+    netUsd: number
+    fxRate: number
+  } | null
 }
 
 // ── Helpers ──
@@ -184,15 +189,7 @@ const currencySummaryLabel = (byCurrency: Record<string, number>) => {
   return parts.join(' + ') || '—'
 }
 
-const currencyBreakdownLabel = (byCurrency: Record<string, number>) => {
-  const parts: string[] = []
 
-  for (const [cur, amount] of Object.entries(byCurrency)) {
-    if (amount > 0) parts.push(`${cur} ${formatCurrency(amount, cur as 'CLP' | 'USD')}`)
-  }
-
-  return parts.join(' · ') || ''
-}
 
 const readNonTaxableAllowances = (entry: ProjectedEntry) => {
   const colacion =
@@ -476,8 +473,8 @@ const ProjectedPayrollView = () => {
               avatarIcon='tabler-cash'
               avatarColor='info'
               subtitle={
-                data.clpEquivalent && Object.keys(data.totals.grossByCurrency).length > 1
-                  ? currencyBreakdownLabel(data.totals.grossByCurrency)
+                data.usdEquivalent
+                  ? `USD ${formatCurrency(data.usdEquivalent.grossUsd, 'USD')}`
                   : mode === 'actual_to_date' ? 'Devengado al corte' : 'Proyectado al cierre'
               }
             />
@@ -493,8 +490,8 @@ const ProjectedPayrollView = () => {
               avatarIcon='tabler-wallet'
               avatarColor='success'
               subtitle={
-                data.clpEquivalent && Object.keys(data.totals.netByCurrency).length > 1
-                  ? currencyBreakdownLabel(data.totals.netByCurrency)
+                data.usdEquivalent
+                  ? `USD ${formatCurrency(data.usdEquivalent.netUsd, 'USD')}`
                   : 'Líquido a pagar'
               }
             />
