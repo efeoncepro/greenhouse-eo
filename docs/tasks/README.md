@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-211`
+- siguiente ID disponible: `TASK-213`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -59,6 +59,7 @@ Primer bloque operativo asignado:
 - [TASK-130-login-auth-flow-ux-feedback.md](complete/TASK-130-login-auth-flow-ux-feedback.md) — Login con LoadingButton, loading individual por SSO provider, LinearProgress global, transición post-auth con skeleton, errores categorizados (credentials, network, access, session), loading.tsx en auth/landing.
 - [TASK-205-delivery-notion-origin-parity-audit.md](complete/TASK-205-delivery-notion-origin-parity-audit.md) — Lane cerrada como auditoría reusable `Notion/raw/conformed`: helper server-side, route admin tenant-scoped, script CLI y evidencia real para `Daniela` y `Andrés / Abril 2026`; el hardening estructural queda explicitamente derivado a `TASK-207`.
 - [TASK-207-delivery-notion-sync-pipeline-hardening.md](complete/TASK-207-delivery-notion-sync-pipeline-hardening.md) — Hardening runtime cerrado del sync `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`: gate real de frescura por `space`, preservación de jerarquía, validación `raw -> transformed -> persisted`, runs cancelados/fallidos auditables y convergencia a writer canónico al desactivar el overwrite legacy por defecto.
+- [TASK-209-delivery-notion-sync-recurrence-prevention.md](complete/TASK-209-delivery-notion-sync-recurrence-prevention.md) — Cierre de recurrencia operativa del sync Delivery: control plane `waiting_for_raw`, retries auditados por `space`, recovery cron, surfaces admin y callback upstream para evitar reruns manuales después del refresh de Notion.
 - [TASK-208-delivery-data-quality-monitoring-auditor.md](complete/TASK-208-delivery-data-quality-monitoring-auditor.md) — Monitor recurrente cerrado para `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`: tablas históricas `integration_data_quality_*`, scoring `healthy / degraded / broken`, cron dedicado, hook post-sync, alerting Slack y visibilidad reutilizada en `/admin/integrations`, `/admin/ops-health` y `TenantNotionPanel`.
 
 ## To Do
@@ -151,9 +152,9 @@ Primer bloque operativo asignado:
   - Greenhouse ya persiste runs/checks históricos y clasifica el pipeline como `healthy`, `degraded` o `broken`
   - el monitoreo corre por cron dedicado y también como hook post-sync para no volver a quedar ciego frente al drift
   - la observabilidad ya quedó integrada como capability nativa de la integración `Notion`
-- `TASK-209` queda abierta como cierre de recurrencia operativa:
-  - el incidente actual ya quedó resuelto y observable, pero el estado saludable todavía dependió de un rerun manual de `sync-conformed`
-  - falta institucionalizar el chaining / retry / scheduling final para que raw y conformed converjan sin intervención manual
+- `TASK-209` ya quedó cerrada como cierre de recurrencia operativa:
+  - Greenhouse ya institucionalizó el chaining / retry / scheduling final para que `raw` y `conformed` converjan sin reruns manuales
+  - la observabilidad y el recovery quedaron visibles desde Admin y auditados por `space`
 - **Siguiente ola:** `TASK-173` → `TASK-027` → `TASK-028` → `TASK-116` → `TASK-070` → `TASK-071` → `TASK-011`.
 - **Estratégicas pero caras:** `TASK-008` → `TASK-005` → `TASK-071` → `TASK-118` → `TASK-018`.
 - **Later / oportunistas:** `TASK-029` → `TASK-031` → `TASK-015` → `TASK-016` → `TASK-020` → `TASK-115` → `TASK-107` → `TASK-103` → `TASK-021` → `TASK-032` → `TASK-053` → `TASK-054` → `TASK-055` → `TASK-058` → `TASK-071`.
@@ -171,7 +172,7 @@ Nota de secuencia para la lane de integraciones + métricas Delivery:
 - `TASK-187` implementa la `Native Integrations Layer` para `Notion`
 - `TASK-186` endurece el consumer de métricas sobre esa foundation
 - `TASK-205`, `TASK-207` y `TASK-208` ya no deben leerse como backlog paralelo de Delivery; quedan absorbidas como follow-ons operativos de esa integración nativa de `Notion`
-- `TASK-209` pasa a ser el follow-on explícito para cerrar la prevención de reaparición después del incidente real observado en `staging`
+- `TASK-209` ya cerró el follow-on explícito que prevenía la reaparición después del incidente real observado en `staging`
 - criterio: fortalecer lo existente, institucionalizarlo y recién después endurecer la paridad de métricas sobre esa base, evitando `rip-and-replace`
 
 ### Backlog Priorizado
@@ -208,6 +209,8 @@ Nota de secuencia para la lane de integraciones + métricas Delivery:
 | 25   | ~~`TASK-019`~~                                                                                           | [TASK-019-staff-augmentation-module.md](complete/TASK-019-staff-augmentation-module.md)                                              | P2        | Alto       | Alto              | **Cerrada**                                                                                                          | Baseline runtime de Staff Augmentation sobre assignments, Finance, Payroll, providers y tooling                                                                                         |
 | 26   | `TASK-020`                                                                                               | [TASK-020-frameio-bigquery-analytics-pipeline.md](to-do/TASK-020-frameio-bigquery-analytics-pipeline.md)                             | P2        | Medio      | Alto              | Diseño                                                                                                               | Enrichment de delivery e ICO con metadata de Frame.io para Creative Hub                                                                                                                 |
 | 27   | `TASK-210`                                                                                               | [TASK-210-hubspot-quotes-integration.md](to-do/TASK-210-hubspot-quotes-integration.md)                                               | P2        | Alto       | Alto              | Diseño                                                                                                               | HubSpot Quotes bidireccional: inbound sync + outbound creation via Cloud Run middleware, identity resolution, cron sync, UI multi-source + formulario de creacion |
+| 28   | `TASK-211`                                                                                               | [TASK-211-hubspot-products-line-items-integration.md](to-do/TASK-211-hubspot-products-line-items-integration.md)                     | P2        | Alto       | Alto              | Diseño                                                                                                               | HubSpot Products catalogo + Line Items bidireccional: sync catalogo, line items de quotes/deals, product picker para quotes outbound (TASK-210) |
+| 29   | `TASK-212`                                                                                               | [TASK-212-nubox-line-items-sync-multiline-emission.md](to-do/TASK-212-nubox-line-items-sync-multiline-emission.md)                   | P2        | Alto       | Medio             | Diseño                                                                                                               | Nubox line items inbound (ventas + compras) + emision DTE multi-linea outbound; paridad cross-source con HubSpot line items |
 | Rank | Task ID                                                                                                  | Task                                                                                                                                 | Prioridad | Impacto    | Esfuerzo          | Estado real                                                                                                          | Foco                                                                                                                                                                                    |
 | ---  | ---                                                                                                      | ---                                                                                                                                  | ---       | ---        | ---               | ---                                                                                                                  | ---                                                                                                                                                                                     |
 | 1    | `TASK-002`                                                                                               | [TASK-002-tenant-notion-mapping.md](to-do/TASK-002-tenant-notion-mapping.md)                                                         | P0        | Alto       | Medio             | Parcial                                                                                                              | Corte del legado `notion_project_ids` y convergencia canónica `Space -> Notion`                                                                                                         |
