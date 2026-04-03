@@ -1,5 +1,29 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — TASK-130 Login Auth Flow UX
+
+### Rama / alcance
+
+- rama actual: `develop`
+- task: `TASK-130`
+- scope implementado:
+  - `src/views/Login.tsx`
+  - `src/app/auth/landing/loading.tsx` (nuevo)
+  - `src/config/greenhouse-nomenclature.ts`
+
+### Resultado
+
+- **Slice 1 — Loading states**: LoadingButton con spinner para credenciales, CircularProgress individual por SSO provider, `isAnyLoading` deshabilita todo el formulario
+- **Slice 2 — LinearProgress**: Barra indeterminada en top del form card durante cualquier loading
+- **Slice 3 — Transición post-auth**: Pantalla con logo + spinner + "Preparando tu espacio de trabajo..." reemplaza el formulario tras auth exitosa. `loading.tsx` en `auth/landing` cubre la resolución de sesión
+- **Slice 4 — Error categorization**: Errores mapeados desde NextAuth con severity diferenciada
+- **Slice 5 — Nomenclatura**: 8 nuevos textos en GH_MESSAGES
+
+### Verificación
+
+- `pnpm build`
+- `pnpm lint`
+
 ## Sesión 2026-04-03 — Fix monitor Notion Delivery degraded por null param en BigQuery
 
 ### Rama / alcance

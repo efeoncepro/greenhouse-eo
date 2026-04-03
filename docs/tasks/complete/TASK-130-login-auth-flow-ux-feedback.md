@@ -4,11 +4,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Bajo` |
-| Status real | `Diseño` |
+| Status real | `Cerrada` |
 | Rank | — |
 | Domain | UX / Auth |
 | Sequence | Independiente, sin dependencias |

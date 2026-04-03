@@ -376,11 +376,20 @@ export const GH_MESSAGES = {
   login_with_google: 'Entrar con Google',
   login_with_email: 'Entrar con email',
   login_validating: 'Validando acceso...',
+  login_redirecting_microsoft: 'Redirigiendo a Microsoft...',
+  login_redirecting_google: 'Redirigiendo a Google...',
+  login_preparing_workspace: 'Preparando tu espacio de trabajo...',
   login_email_placeholder: 'Tu email corporativo',
   login_password_placeholder: 'Password',
   login_forgot_password: '\u00bfOlvidaste tu contrase\u00f1a?',
   login_error_credentials:
-    'Las credenciales no coinciden. Intenta de nuevo o contacta a tu equipo de cuenta.',
+    'Email o contraseña incorrectos. Verifica tus datos e intenta de nuevo.',
+  login_error_provider_unavailable:
+    'El proveedor de autenticación no respondió. Intenta de nuevo en unos segundos.',
+  login_error_account_disabled:
+    'Tu cuenta no tiene acceso al portal. Contacta a tu administrador.',
+  login_error_session_expired: 'Tu sesión expiró. Ingresa tus credenciales nuevamente.',
+  login_error_network: 'No se pudo conectar con el servidor. Verifica tu conexión a internet.',
   login_access_note:
     'El acceso se provisiona internamente. \u00bfNo tienes cuenta? Contacta a tu administrador.',
   login_hero_title: 'Todo tu ecosistema.\nUn solo lugar.',

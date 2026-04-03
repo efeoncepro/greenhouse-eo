@@ -2,6 +2,16 @@
 
 ## 2026-04-03
 
+- **TASK-130 login auth flow UX**:
+  - botón de credenciales ahora usa `LoadingButton` de MUI Lab con spinner integrado durante submit
+  - botones SSO (Microsoft, Google) muestran `CircularProgress` individual + texto "Redirigiendo a {provider}..." y se deshabilitan mutuamente con `isAnyLoading`
+  - `LinearProgress` indeterminado aparece en el top del card durante cualquier loading
+  - pantalla de transición post-auth con logo + spinner + "Preparando tu espacio de trabajo..." reemplaza el formulario tras auth exitosa
+  - nuevo `loading.tsx` en `auth/landing` muestra skeleton durante resolución de sesión server-side (elimina pantalla blanca)
+  - errores categorizados: credentials, account disabled, session expired, network, provider unavailable — con `Alert` severity diferenciada (error/warning) y botón de cerrar
+  - 8 nuevos textos en `GH_MESSAGES` para loading states y errores categorizados
+  - todo el formulario (inputs, botones, links) se deshabilita durante cualquier operación de auth
+
 - **Notion Delivery data quality null-param fix**:
   - el monitor de `TASK-208` ya no envía `assigneeSourceId: null` a BigQuery cuando el sweep corre sin filtro por responsable
   - se corrigió el helper `src/lib/space-notion/notion-parity-audit.ts` para omitir ese parámetro opcional y evitar el crash runtime `Parameter types must be provided for null values`
