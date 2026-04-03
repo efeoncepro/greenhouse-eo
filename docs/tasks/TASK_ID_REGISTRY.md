@@ -252,3 +252,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-200` | `to-do` | Delivery Performance Metric Semantic Contract | `docs/tasks/to-do/TASK-200-delivery-performance-metric-semantic-contract.md` |
 | `TASK-201` | `to-do` | Delivery Performance Historical Materialization Reconciliation | `docs/tasks/to-do/TASK-201-delivery-performance-historical-materialization-reconciliation.md` |
 | `TASK-202` | `to-do` | Delivery Performance Report Publication & Notion Consumption Cutover | `docs/tasks/to-do/TASK-202-delivery-performance-notion-publication-cutover.md` |
+| `TASK-203` | `to-do` | SCIM Provisioning Activation: Entra Config, Identity Reconciliation & Observability | `docs/tasks/to-do/TASK-203-scim-provisioning-activation-entra-reconciliation.md` |
