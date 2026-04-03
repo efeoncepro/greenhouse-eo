@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-209`
+- siguiente ID disponible: `TASK-210`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -151,6 +151,9 @@ Primer bloque operativo asignado:
   - Greenhouse ya persiste runs/checks históricos y clasifica el pipeline como `healthy`, `degraded` o `broken`
   - el monitoreo corre por cron dedicado y también como hook post-sync para no volver a quedar ciego frente al drift
   - la observabilidad ya quedó integrada como capability nativa de la integración `Notion`
+- `TASK-209` queda abierta como cierre de recurrencia operativa:
+  - el incidente actual ya quedó resuelto y observable, pero el estado saludable todavía dependió de un rerun manual de `sync-conformed`
+  - falta institucionalizar el chaining / retry / scheduling final para que raw y conformed converjan sin intervención manual
 - **Siguiente ola:** `TASK-173` → `TASK-027` → `TASK-028` → `TASK-116` → `TASK-070` → `TASK-071` → `TASK-011`.
 - **Estratégicas pero caras:** `TASK-008` → `TASK-005` → `TASK-071` → `TASK-118` → `TASK-018`.
 - **Later / oportunistas:** `TASK-029` → `TASK-031` → `TASK-015` → `TASK-016` → `TASK-020` → `TASK-115` → `TASK-107` → `TASK-103` → `TASK-021` → `TASK-032` → `TASK-053` → `TASK-054` → `TASK-055` → `TASK-058` → `TASK-071`.
@@ -168,6 +171,7 @@ Nota de secuencia para la lane de integraciones + métricas Delivery:
 - `TASK-187` implementa la `Native Integrations Layer` para `Notion`
 - `TASK-186` endurece el consumer de métricas sobre esa foundation
 - `TASK-205`, `TASK-207` y `TASK-208` ya no deben leerse como backlog paralelo de Delivery; quedan absorbidas como follow-ons operativos de esa integración nativa de `Notion`
+- `TASK-209` pasa a ser el follow-on explícito para cerrar la prevención de reaparición después del incidente real observado en `staging`
 - criterio: fortalecer lo existente, institucionalizarlo y recién después endurecer la paridad de métricas sobre esa base, evitando `rip-and-replace`
 
 ### Backlog Priorizado
@@ -177,6 +181,7 @@ Nota de secuencia para la lane de integraciones + métricas Delivery:
 | 1    | `TASK-002`                                                                                               | [TASK-002-tenant-notion-mapping.md](to-do/TASK-002-tenant-notion-mapping.md)                                                         | P0        | Alto       | Medio             | Parcial                                                                                                              | Corte del legado `notion_project_ids` y convergencia canónica `Space -> Notion`                                                                                                         |
 | 3    | ~~`TASK-187`~~                                                                                            | [TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md](complete/TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md) | P0        | Muy alto   | Alto              | **Cerrada**                                                                                                          | Notion governance tenant-scoped cerrada: snapshots, drift, KPI readiness, admin APIs y panel de onboarding/gobernanza unificado |
 | 4    | `TASK-188`                                                                                               | [TASK-188-native-integrations-layer-platform-governance.md](in-progress/TASK-188-native-integrations-layer-platform-governance.md) | P0        | Muy alto   | Alto              | Implementación                                                                                                       | Institucionalizar una `Native Integrations Layer` para Greenhouse: registry, control plane, readiness shared, sync governance y surfaces admin para conectores críticos |
+| 5    | `TASK-209`                                                                                               | [TASK-209-delivery-notion-sync-recurrence-prevention.md](to-do/TASK-209-delivery-notion-sync-recurrence-prevention.md)             | P0        | Muy alto   | Medio             | Diseño                                                                                                               | Cerrar la reaparición del drift `raw -> conformed`: chaining/retry/scheduling para que `sync-conformed` converja sin reruns manuales después del refresh de Notion |
 | 2    | `TASK-072`                                                                                               | [TASK-072-compensation-versioning-ux-clarity.md](to-do/TASK-072-compensation-versioning-ux-clarity.md)                               | P1        | Alto       | Bajo              | Diseño                                                                                                               | Alinear la UX de People y Payroll para dejar explícito que la compensación es versionada por vigencia, no una carga mensual                                                             |
 | 5    | ~~`TASK-063`~~                                                                                           | [TASK-063-payroll-projected-payroll-runtime.md](complete/TASK-063-payroll-projected-payroll-runtime.md)                              | P1        | Alto       | Alto              | **Cerrada**                                                                                                          | Baseline de nómina proyectada implementado; follow-up de hardening movido a `TASK-109`                                                                                                  |
 | 3    | ~~TASK-003~~                                                                                             | —                                                                                                                                    | —         | —          | —                 | **Cerrada**                                                                                                          | Nubox bank movements ahora crean `income_payments` con deduplicación. `amount_paid` derivado de SUM(payments). Backfill script incluido.                                                |

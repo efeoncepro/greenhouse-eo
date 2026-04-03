@@ -1,5 +1,32 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — Nueva lane TASK-209 para prevenir recurrencia del drift Notion raw -> conformed
+
+### Rama / alcance
+
+- rama actual: `develop`
+- task nueva: `TASK-209`
+- scope documental:
+  - `docs/tasks/to-do/TASK-209-delivery-notion-sync-recurrence-prevention.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+
+### Resultado
+
+- se formalizó una lane nueva para cerrar el hueco operativo que quedó después del incidente de `Notion Delivery Data Quality`
+- el problema actual ya quedó resuelto y visible, pero la recuperación final todavía dependió de un rerun manual de `sync-conformed`
+- `TASK-209` define el follow-on correcto:
+  - chaining / retry / scheduling entre refresh raw y writer canónico
+  - evidencia explícita en control plane para distinguir `waiting for raw` vs `sync completed`
+  - validación de que staging permanezca `healthy` sin intervención manual
+
+### Verificación
+
+- consistencia documental revisada en:
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/to-do/TASK-209-delivery-notion-sync-recurrence-prevention.md`
+
 ## Sesión 2026-04-03 — TASK-130 Login Auth Flow UX
 
 ### Rama / alcance
