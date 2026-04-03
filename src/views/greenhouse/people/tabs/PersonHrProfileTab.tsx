@@ -155,7 +155,8 @@ const PersonHrProfileTab = ({ memberId, hrContext = null, defaultOperationalMetr
                 onTimeTasks: 0,
                 lateDropTasks: 0,
                 overdueTasks: 0,
-                carryOverTasks: 0
+                carryOverTasks: 0,
+                overdueCarriedForwardTasks: 0
               },
               computedAt: intel.current.materializedAt,
               engineVersion: intel.current.engineVersion,

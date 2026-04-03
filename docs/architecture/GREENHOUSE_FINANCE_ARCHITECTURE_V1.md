@@ -6,6 +6,48 @@
 
 ---
 
+## Delta 2026-04-03 — Currency comparison helpers como módulo compartido de Finance
+
+`src/lib/finance/currency-comparison.ts` es un módulo de funciones puras (sin `'server-only'`) que vive en Finance pero es importable desde cualquier módulo client o server:
+
+- `consolidateCurrencyEquivalents(totals, usdToClp)` — consolida `{ USD, CLP }` → totales CLP y USD usando la tasa canónica
+- `computeCurrencyDelta(current, compare, rate, label)` — delta % entre períodos con referencia CLP
+- `payrollTrendDirection(deltaPct)` / `formatDeltaLabel(deltaPct, label)` — formateo para `HorizontalWithSubtitle` props
+
+Regla: las conversiones multi-currency deben pasar por estos helpers, no math inline. La tasa se resuelve server-side vía `resolveExchangeRateToClp()` y se pasa como `fxRate` al client.
+
+## Delta 2026-04-03 — Nubox sales/purchases are document ledgers, not pure cash events
+
+Se formaliza una aclaración semántica importante para Finance:
+
+- `greenhouse_finance.income` y `greenhouse_finance.expenses` son ledgers operativos de **devengo/documento**
+- cuando el source es `Nubox`, los registros representan primero:
+  - documentos de venta
+  - documentos de compra
+  - notas/ajustes tributarios asociados
+- esos registros **no deben leerse como equivalentes directos a cobro/pago**
+
+Carriles correctos:
+
+- venta emitida / documento de venta:
+  - `greenhouse_finance.income`
+  - fecha relevante: `invoice_date`
+- compra / obligación documentada:
+  - `greenhouse_finance.expenses`
+  - fecha relevante: `document_date`
+- cobro real:
+  - `greenhouse_finance.income_payments`
+  - fecha relevante: `payment_date`
+- pago real:
+  - `greenhouse_finance.expenses.payment_date`
+  - más conciliación y bank movements cuando aplique
+
+Regla operativa:
+
+- las surfaces Finance no deben presentar una factura de Nubox como si fuera por sí misma un cobro
+- ni una compra de Nubox como si fuera por sí misma un pago
+- el módulo puede seguir usando `income` / `expenses` para P&L devengado, pero debe distinguir visualmente documento/devengo vs caja
+
 ## Delta 2026-03-30 — Commercial cost attribution ya es contrato operativo de plataforma
 
 Finance ya no debe tratar la atribución comercial como una recomposición local entre bridges de payroll, assignments y overhead.

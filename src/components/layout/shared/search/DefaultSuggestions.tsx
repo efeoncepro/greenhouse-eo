@@ -48,12 +48,12 @@ const defaultSuggestions: DefaultSuggestionsType[] = [
         icon: 'tabler-chart-bar'
       },
       {
-        label: 'Ingresos',
+        label: 'Ventas',
         href: '/finance/income',
         icon: 'tabler-cash'
       },
       {
-        label: 'Egresos',
+        label: 'Compras',
         href: '/finance/expenses',
         icon: 'tabler-receipt'
       },

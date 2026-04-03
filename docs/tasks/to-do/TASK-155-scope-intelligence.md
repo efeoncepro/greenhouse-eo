@@ -1,5 +1,13 @@
 # TASK-155 — Scope Intelligence: Automatic Scope Creep Detection
 
+## Delta 2026-04-03
+
+- Si esta lane usa señales `ICO` como `RPA degradation trend` o métricas de delivery, debe alinearse a `docs/architecture/Contrato_Metricas_ICO_v1.md`.
+- Regla nueva:
+  - el scope creep score no debe asumir thresholds legacy de `RpA`, `OTD` o throughput como si fueran benchmark universal
+  - cualquier señal `ICO` usada en el score debe venir con semántica canónica y suficiente confianza para no confundir drift de dato con creep real
+- La task puede usar señales operativas de `ICO`, pero no reinterpretar localmente su contrato.
+
 ## Status
 
 | Campo | Valor |

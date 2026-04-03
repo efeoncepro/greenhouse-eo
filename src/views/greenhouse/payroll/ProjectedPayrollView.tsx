@@ -41,6 +41,7 @@ import CustomTabList from '@core/components/mui/TabList'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 
+import { computeCurrencyDelta, formatDeltaLabel, payrollTrendDirection } from '@/lib/finance/currency-comparison'
 import { formatCurrency } from './helpers'
 
 import tableStyles from '@core/styles/table.module.css'
@@ -90,6 +91,7 @@ interface ProjectedEntry {
   projectionMode: ProjectionMode
   projectedWorkingDays: number
   projectedWorkingDaysTotal: number
+  prorationFactor: number
   officialGrossTotal: number | null
   officialNetTotal: number | null
   deltaGross: number | null
@@ -139,6 +141,18 @@ interface ProjectedData {
     netClp: number
     fxRate: number
   } | null
+  usdEquivalent: {
+    grossUsd: number
+    netUsd: number
+    fxRate: number
+  } | null
+  prorationFactor: number
+  previousOfficial: {
+    periodId: string
+    grossByCurrency: Record<string, number>
+    netByCurrency: Record<string, number>
+    entryCount: number
+  } | null
 }
 
 // ── Helpers ──
@@ -183,6 +197,8 @@ const currencySummaryLabel = (byCurrency: Record<string, number>) => {
 
   return parts.join(' + ') || '—'
 }
+
+
 
 const readNonTaxableAllowances = (entry: ProjectedEntry) => {
   const colacion =
@@ -455,60 +471,103 @@ const ProjectedPayrollView = () => {
       {/* KPI cards */}
       {data && (
         <>
-          <Grid size={{ xs: 12, sm: 6, md: data.official ? 3 : 4 }}>
-            <HorizontalWithSubtitle
-              title='Bruto total'
-              stats={currencySummaryLabel(data.totals.grossByCurrency)}
-              avatarIcon='tabler-cash'
-              avatarColor='info'
-              subtitle={
-                data.clpEquivalent
-                  ? `~${formatCurrency(data.clpEquivalent.grossClp, 'CLP')} CLP total`
-                  : mode === 'actual_to_date' ? 'Devengado al corte' : 'Proyectado al cierre'
-              }
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: data.official ? 3 : 4 }}>
-            <HorizontalWithSubtitle
-              title='Neto total'
-              stats={currencySummaryLabel(data.totals.netByCurrency)}
-              avatarIcon='tabler-wallet'
-              avatarColor='success'
-              subtitle={
-                data.clpEquivalent
-                  ? `~${formatCurrency(data.clpEquivalent.netClp, 'CLP')} CLP total`
-                  : 'Líquido a pagar'
-              }
-            />
-          </Grid>
-          {data.official && (
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <HorizontalWithSubtitle
-                title='Δ vs Oficial'
-                stats={currencySummaryLabel(
-                  Object.fromEntries(
-                    Object.entries(data.totals.netByCurrency).map(([cur, projected]) => {
-                      const official = data.official?.netByCurrency[cur] ?? 0
+          {(() => {
+            // Compute % change vs official for trend indicators
+            // Use current-period official, or fallback to previous period for comparison
+            const compareSource = data.official ?? data.previousOfficial
+            const compareLabel = data.official ? 'vs oficial' : data.previousOfficial ? `vs ${data.previousOfficial.periodId}` : ''
 
-                      return [cur, Math.round((projected - official) * 100) / 100]
-                    })
-                  )
-                )}
-                avatarIcon='tabler-arrows-diff'
-                avatarColor='warning'
-                subtitle='Proyectado − oficial'
-              />
-            </Grid>
-          )}
-          <Grid size={{ xs: 12, sm: 6, md: data.official ? 3 : 4 }}>
-            <HorizontalWithSubtitle
-              title='Personas'
-              stats={String(data.totals.memberCount)}
-              avatarIcon='tabler-users'
-              avatarColor='primary'
-              subtitle={`Corte: ${data.asOfDate}`}
-            />
-          </Grid>
+            const delta = compareSource && data.clpEquivalent
+              ? computeCurrencyDelta(
+                  { grossClp: data.clpEquivalent.grossClp, netClp: data.clpEquivalent.netClp },
+                  compareSource,
+                  data.clpEquivalent.fxRate,
+                  compareLabel
+                )
+              : null
+
+            const prorateLabel = data.prorationFactor < 1
+              ? ` · ${Math.round(data.prorationFactor * 100)}% del mes`
+              : ''
+
+            return (
+              <>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <HorizontalWithSubtitle
+                    title='Bruto total'
+                    stats={
+                      data.clpEquivalent
+                        ? formatCurrency(data.clpEquivalent.grossClp, 'CLP')
+                        : currencySummaryLabel(data.totals.grossByCurrency)
+                    }
+                    avatarIcon='tabler-cash'
+                    avatarColor='info'
+                    trend={payrollTrendDirection(delta?.grossDeltaPct)}
+                    trendNumber={formatDeltaLabel(delta?.grossDeltaPct, delta?.compareLabel ?? '')}
+                    subtitle={
+                      data.usdEquivalent
+                        ? `USD ${formatCurrency(data.usdEquivalent.grossUsd, 'USD')}${prorateLabel}`
+                        : mode === 'actual_to_date'
+                          ? `Devengado al corte${prorateLabel}`
+                          : 'Proyectado al cierre'
+                    }
+                    statusLabel={mode === 'actual_to_date' ? 'Corte actual' : 'Cierre proyectado'}
+                    statusColor={mode === 'actual_to_date' ? 'info' : 'primary'}
+                    footer={delta?.grossReference ? `${data.official ? 'Oficial' : data.previousOfficial?.periodId ?? 'Anterior'}: ${formatCurrency(delta.grossReference, 'CLP')}` : undefined}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <HorizontalWithSubtitle
+                    title='Neto total'
+                    stats={
+                      data.clpEquivalent
+                        ? formatCurrency(data.clpEquivalent.netClp, 'CLP')
+                        : currencySummaryLabel(data.totals.netByCurrency)
+                    }
+                    avatarIcon='tabler-wallet'
+                    avatarColor='success'
+                    trend={payrollTrendDirection(delta?.netDeltaPct)}
+                    trendNumber={formatDeltaLabel(delta?.netDeltaPct, delta?.compareLabel ?? '')}
+                    subtitle={
+                      data.usdEquivalent
+                        ? `USD ${formatCurrency(data.usdEquivalent.netUsd, 'USD')}${prorateLabel}`
+                        : data.prorationFactor < 1
+                          ? `Líquido al corte${prorateLabel}`
+                          : 'Líquido a pagar'
+                    }
+                    statusLabel={mode === 'actual_to_date' ? 'Corte actual' : 'Cierre proyectado'}
+                    statusColor={mode === 'actual_to_date' ? 'info' : 'primary'}
+                    footer={delta?.netReference ? `${data.official ? 'Oficial' : data.previousOfficial?.periodId ?? 'Anterior'}: ${formatCurrency(delta.netReference, 'CLP')}` : undefined}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <HorizontalWithSubtitle
+                    title='Personas'
+                    stats={String(data.totals.memberCount)}
+                    avatarIcon='tabler-users'
+                    avatarColor='primary'
+                    subtitle={`Corte: ${data.asOfDate}`}
+                    statusLabel={compareSource ? `${data.official ? 'Oficial' : data.previousOfficial?.periodId ?? 'Anterior'}: ${compareSource.entryCount}` : undefined}
+                    statusColor='default'
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                  <HorizontalWithSubtitle
+                    title={mode === 'actual_to_date' ? 'Días transcurridos' : 'Días hábiles'}
+                    stats={mode === 'actual_to_date' && data.entries[0]
+                      ? `${data.entries[0].projectedWorkingDays} / ${data.entries[0].projectedWorkingDaysTotal}`
+                      : data.entries[0]
+                        ? String(data.entries[0].projectedWorkingDaysTotal)
+                        : '—'
+                    }
+                    avatarIcon='tabler-calendar'
+                    avatarColor={mode === 'actual_to_date' ? 'warning' : 'secondary'}
+                    subtitle={mode === 'actual_to_date' ? `${Math.round(data.prorationFactor * 100)}% del mes` : 'Mes completo'}
+                  />
+                </Grid>
+              </>
+            )
+          })()}
         </>
       )}
 

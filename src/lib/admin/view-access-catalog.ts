@@ -170,16 +170,16 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
   {
     viewCode: 'finanzas.ingresos',
     section: 'finanzas',
-    label: 'Ingresos',
-    description: 'Facturación y cobros.',
+    label: 'Ventas',
+    description: 'Documentos de venta, devengo y cobros.',
     routePath: '/finance/income',
     routeGroup: 'finance'
   },
   {
     viewCode: 'finanzas.egresos',
     section: 'finanzas',
-    label: 'Egresos',
-    description: 'Pagos, costos y obligaciones.',
+    label: 'Compras',
+    description: 'Documentos de compra, obligaciones y pagos.',
     routePath: '/finance/expenses',
     routeGroup: 'finance'
   },

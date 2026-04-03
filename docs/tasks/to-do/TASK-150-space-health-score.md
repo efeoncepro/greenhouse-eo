@@ -2,6 +2,15 @@
 - `TASK-142` ya expone badges `Health` y breakdown operativo heurístico en `Space 360`.
 - Esta task ya no debe recrear la shell de UI; debe reemplazar la heurística transicional por un score materializado y reutilizar la superficie ya implementada en `src/views/greenhouse/agency/space-360/tabs/OverviewTab.tsx`.
 
+## Delta 2026-04-03
+
+- Esta lane no puede hardcodear interpretación de métricas `ICO` por fuera del contrato maestro `docs/architecture/Contrato_Metricas_ICO_v1.md` y de `TASK-216`.
+- Regla nueva:
+  - Delivery dimension debe consumir métricas `ICO` con `confidence_level` y `quality_gate_status`
+  - el score no debe asumir que `OTD`, `FTR`, `RpA` y otras señales tienen el mismo tipo de benchmark ni la misma madurez
+  - una dimensión faltante o degradada no debe transformarse silenciosamente en score normal
+- Cualquier normalizador de `OTD` o `RPA_inverse` debe quedar alineado a las bandas benchmark-informed vigentes, no a thresholds legacy del body o de heurísticas previas.
+
 # TASK-150 — Space Health Score: Composite Indicator
 
 ## Status

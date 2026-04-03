@@ -124,7 +124,7 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     formula: {
       kind: 'percentage',
       numeratorCondition: "report_bucket = 'on_time'",
-      denominatorCondition: "report_bucket IN ('on_time', 'late_drop', 'overdue', 'carry_over')"
+      denominatorCondition: "report_bucket IN ('on_time', 'late_drop', 'overdue')"
     },
     thresholds: {
       optimal: { min: 90, max: 100 },
@@ -284,6 +284,23 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     },
     higherIsBetter: false,
     icon: 'tabler-percentage',
+    color: 'error'
+  },
+  {
+    id: 'overdue_carried_forward',
+    code: 'overdue_carried_forward',
+    label: 'Overdue Carried Forward',
+    description: 'Past-due tasks from prior periods still open at cutoff',
+    unit: 'tasks',
+    granularities: ['monthly'],
+    formula: { kind: 'count' },
+    thresholds: {
+      optimal: { min: 0, max: 2 },
+      attention: { min: 2, max: 5 },
+      critical: { min: 5, max: 999 }
+    },
+    higherIsBetter: false,
+    icon: 'tabler-clock-exclamation',
     color: 'error'
   }
 ]

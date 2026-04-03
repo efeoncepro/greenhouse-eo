@@ -2,6 +2,14 @@
 - `TASK-142` ya expone badge `Risk` heurístico en `Space 360`.
 - Esta task queda enfocada en materializar el score/factor breakdown canónico y enchufarlo al `OverviewTab` existente, no en crear una surface nueva.
 
+## Delta 2026-04-03
+
+- Los factores de riesgo basados en `ICO` deben alinearse a `docs/architecture/Contrato_Metricas_ICO_v1.md` y al trust model de `TASK-216`.
+- Regla nueva:
+  - thresholds como `OTD below 70%` o degradación de `RPA` dentro del body deben tratarse como heurísticas iniciales de diseño, no como contrato canónico ya aprobado
+  - el risk engine debe distinguir riesgo real de dato degradado; no puede disparar churn logic sobre métricas de baja confianza
+- Si se mantienen thresholds específicos por lifecycle o cohort, deben documentarse como policy de risk modeling, no como benchmark universal de `ICO`.
+
 # TASK-151 — Space Risk Score & Churn Prediction
 
 ## Status

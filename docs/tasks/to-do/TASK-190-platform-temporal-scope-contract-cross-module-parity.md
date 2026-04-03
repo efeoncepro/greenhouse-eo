@@ -1,5 +1,16 @@
 # TASK-190 - Platform Temporal Scope Contract & Cross-Module Time Semantics
 
+## Delta 2026-04-03
+
+- Esta lane impacta directamente métricas `ICO` y debe alinearse al contrato maestro `docs/architecture/Contrato_Metricas_ICO_v1.md`.
+- Regla nueva:
+  - cualquier definición de `today`, `month`, `period`, `current month`, `latest available`, `from/to`, `operational month` o snapshots debe preservar la cadencia y semántica temporal que necesitarán `OTD`, `TTM`, `Cycle Time`, `Iteration Velocity`, `Revenue Enabled` y `CVR`
+  - el contrato temporal no puede romper la coherencia entre:
+    - tiempo real operacional
+    - lectura mensual táctica
+    - lectura trimestral estratégica
+- Esta task es un habilitador temporal de `ICO`, no un lugar para redefinir métricas por fuera del contrato.
+
 ## Status
 
 - Lifecycle: `to-do`

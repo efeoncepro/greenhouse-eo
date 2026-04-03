@@ -17,7 +17,7 @@ import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
 // Shortcuts data
 const shortcuts = [
   { url: '/finance', icon: 'tabler-chart-bar', title: 'Finanzas', subtitle: 'Dashboard' },
-  { url: '/finance/income', icon: 'tabler-cash', title: 'Ingresos', subtitle: 'Facturación' },
+  { url: '/finance/income', icon: 'tabler-cash', title: 'Ventas', subtitle: 'Documentos de venta' },
   { url: '/admin/users', icon: 'tabler-users', title: 'Usuarios', subtitle: 'Gestión' },
   { url: '/admin/roles', icon: 'tabler-lock', title: 'Roles', subtitle: 'Permisos' },
   { url: '/hr/payroll', icon: 'tabler-report-money', title: 'Nómina', subtitle: 'People' },

@@ -5,7 +5,7 @@ import ExpensesListView from '@views/greenhouse/finance/ExpensesListView'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Egresos — Greenhouse'
+  title: 'Compras — Greenhouse'
 }
 
 const ExpensesPage = () => {

@@ -5,7 +5,7 @@ import IncomeListView from '@views/greenhouse/finance/IncomeListView'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Ingresos — Greenhouse'
+  title: 'Ventas — Greenhouse'
 }
 
 const IncomePage = () => {

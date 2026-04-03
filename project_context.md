@@ -1,5 +1,110 @@
 # project_context.md
 
+## Delta 2026-04-03 Finance visible semantics: Nubox documents are not cash events
+
+- Las surfaces visibles `Finance > income` y `Finance > expenses` deben leerse como ledgers de documento/devengo, no como caja pura.
+- Regla vigente:
+  - `Nubox sales` se muestran como documentos de venta en `greenhouse_finance.income`
+  - `Nubox purchases` se muestran como documentos de compra/obligación en `greenhouse_finance.expenses`
+  - los cobros reales viven en `greenhouse_finance.income_payments`
+  - los pagos reales viven en `expenses.payment_date` + conciliación bancaria
+- Implicación UX:
+  - la navegación y copy visible de Finance debe evitar sugerir que una factura de venta ya es un cobro
+  - o que una factura de compra ya es un pago
+  - el P&L puede seguir leyendo devengo, pero la semántica visible debe distinguir documento vs caja
+
+## Delta 2026-04-03 Contrato_Metricas_ICO_v1 aligned to benchmark-informed thresholds
+
+- `docs/architecture/Contrato_Metricas_ICO_v1.md` ya no usa los thresholds legacy `OTD >= 90`, `FTR >= 70`, `RpA <= 1.5` como si todos tuvieran el mismo respaldo.
+- El contrato ahora separa explícitamente:
+  - métricas con benchmark informado por referencias externas o análogos (`OTD`, `FTR`, `RpA`)
+  - métricas con calibración interna por cuenta/tipo de pieza (`Cycle Time`, `Cycle Time Variance`, `BCS`)
+- Regla operativa:
+  - para `OTD`, `FTR` y `RpA` prevalecen las bandas documentadas en `docs/architecture/Greenhouse_ICO_Engine_v1.md` § `A.5.5`
+  - para `Cycle Time`, `CTV` y `BCS` se mantiene calibración interna según baseline operativo por cuenta
+
+## Delta 2026-04-03 ICO Engine external benchmarks documented
+
+- La arquitectura de `ICO Engine` ya documenta un bloque específico de benchmarks externos y estándar recomendado para Greenhouse.
+- La fuente canónica ahora vive en:
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md` § `A.5.5 Benchmarks externos y estándar recomendado para Greenhouse`
+- Ese bloque separa explícitamente:
+  - métricas con benchmark externo fuerte (`OTD`)
+  - métricas con benchmark por análogo (`FTR` vía `FPY` / `first-time error-free`)
+  - métricas con benchmark parcial creativo (`RpA`, `cycle time`)
+  - métricas que deben seguir tratándose como policy interna (`throughput`, `pipeline_velocity`, `stuck_assets`, `carry_over`, `overdue_carried_forward`)
+- Regla operativa:
+  - Greenhouse no debe presentar como “estándar de industria” una métrica que solo tenga benchmark parcial o interno
+  - cualquier ajuste de thresholds productivos debe citar ese bloque de arquitectura y declarar si el criterio proviene de benchmark externo, análogo o policy interna
+
+## Delta 2026-04-03 ICO Engine metrics inventory consolidated in architecture
+
+- La arquitectura de `ICO Engine` ya documenta en un solo bloque el inventario canónico de señales y métricas.
+- La fuente consolidada ahora vive en:
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md` § `A.5.4 Inventario canónico de métricas y señales del ICO Engine`
+- Ese inventario separa explícitamente:
+  - categorías funcionales de métricas ICO
+  - señales base que ya vienen calculadas o normalizadas
+  - señales derivadas a nivel tarea por `v_tasks_enriched`
+  - métricas agregadas canónicas calculadas por `buildMetricSelectSQL()`
+  - buckets/contexto operativo aditivo
+  - rollups adicionales del `performance_report_monthly`
+- además, cada métrica/rollup ya documenta:
+  - en qué consiste el cálculo
+  - qué pregunta de negocio responde
+- Regla operativa:
+  - si cambia una fórmula en `src/lib/ico-engine/shared.ts` o el catálogo en `src/lib/ico-engine/metric-registry.ts`, este bloque de arquitectura debe actualizarse en el mismo lote
+
+## Delta 2026-04-03 ICO completion semantics now require terminal task status
+
+- `ICO Engine` ya no trata `completed_at` como suficiente para considerar una tarea completada.
+- Regla vigente:
+  - una tarea solo cuenta como `completed` para `OTD`, `RpA`, `FTR`, `cycle time` y `throughput` si tiene:
+    - `completed_at IS NOT NULL`
+    - `task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')`
+  - `performance_indicator_code = 'on_time'` o `late_drop` ya no puede forzar completitud si el estado sigue abierto o intermedio
+- Motivación:
+  - se detectaron filas reales en `ico_engine.v_tasks_enriched` con `completed_at` poblado pero `task_status = 'Sin empezar'` o `Listo para revisión`
+  - esas filas contaminaban `Agency > Delivery` y cualquier consumer del motor con `OTD 100%` y volumen completado artificial
+
+## Delta 2026-04-03 Agency Delivery current-month KPIs now read live ICO data
+
+- `Agency > Delivery` volvió a leer el mes en curso para `OTD` / `RpA`, pero ya no desde snapshots mensuales parciales.
+- Regla vigente:
+  - los KPIs de esa vista (`RPA promedio`, `OTD`, tabla por Space) se calculan live contra `ico_engine.v_tasks_enriched`
+  - el período efectivo sigue siendo el mes calendario actual en timezone `America/Santiago`
+  - el cálculo live reutiliza el filtro canónico `buildPeriodFilterSQL()` y las fórmulas canónicas de `ICO Engine`
+  - los contadores operativos como proyectos, feedback y stuck assets siguen saliendo del estado actual
+- Motivación:
+  - el hotfix previo hacia `último mes cerrado` corregía números absurdos del snapshot abierto, pero cambiaba la semántica temporal visible de la surface
+  - la decisión correcta para esta vista es `mes en curso + datos reales`, no `mes cerrado`
+- Nota operativa:
+  - esto deja explícito que `Agency > Delivery` consume live compute del mes actual
+  - el carril `metric_snapshots_monthly` sigue siendo válido para surfaces mensuales cerradas y reportes históricos, no para este overview operativo
+
+## Delta 2026-04-03 Agency Delivery now reads latest closed monthly ICO snapshot
+
+> Superseded el mismo día por el delta `Agency Delivery current-month KPIs now read live ICO data`.
+
+- `Agency > Delivery` ya no debe leer el mes abierto más reciente de `ico_engine.metric_snapshots_monthly` para `OTD` / `RpA`.
+- Regla vigente:
+  - los KPIs mensuales de esa vista (`RPA promedio`, `OTD`, tabla por Space) leen el último período mensual cerrado disponible
+  - los contadores operativos como proyectos, feedback y stuck assets siguen saliendo del estado actual
+- Motivación:
+  - el mes abierto podía exponer snapshots parciales o inestables en `metric_snapshots_monthly`
+  - eso produjo síntomas visibles como `Sky Airline` con `OTD 9.5%` y `RpA null` en abril 2026, aunque el período cerrado previo mostraba métricas sanas
+
+## Delta 2026-04-03 Deel contractors projected payroll KPI bonuses
+
+- `Payroll` y `Projected Payroll` ya no deben tratar a `payroll_via = 'deel'` como carril de bono KPI discrecional por defecto.
+- Regla vigente:
+  - `honorarios` sigue siendo discrecional para `OTD` / `RpA`
+  - `Deel` sí calcula `bonusOtdAmount` y `bonusRpaAmount` automáticamente con la policy vigente de `payroll_bonus_config`
+  - `Deel` sigue sin calcular descuentos previsionales locales ni prorrateos de compliance Chile dentro de Greenhouse
+- Implicación runtime:
+  - los contractors / EOR `international` pueden mostrar `OTD` y `RpA` visibles con payout real en payroll proyectado y oficial
+  - la fuente `kpiDataSource` para Deel debe reflejar el origen real del KPI (`ico` cuando existe snapshot), no marcarse como `external` por default
+
 ## Delta 2026-04-03 TASK-209 conformed writer staged swap + freshness gate
 
 - El writer `Notion raw -> greenhouse_conformed` ya no reemplaza `delivery_projects`, `delivery_tasks` y `delivery_sprints` con `WRITE_TRUNCATE` secuencial directo.

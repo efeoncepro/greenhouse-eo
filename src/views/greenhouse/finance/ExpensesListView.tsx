@@ -308,10 +308,10 @@ const ExpensesListView = () => {
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <Box>
           <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>
-            Egresos
+            Compras
           </Typography>
           <Typography variant='body2' color='text.secondary'>
-            Pagos, obligaciones y cuentas por pagar
+            Documentos de compra, gastos y cuentas por pagar
           </Typography>
         </Box>
         <Grid container spacing={6}>
@@ -336,16 +336,24 @@ const ExpensesListView = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
         <Box>
           <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>
-            Egresos
+            Compras
           </Typography>
           <Typography variant='body2' color='text.secondary'>
-            Pagos, obligaciones y cuentas por pagar
+            Documentos de compra, gastos y cuentas por pagar
           </Typography>
         </Box>
         <Button variant='contained' color='error' startIcon={<i className='tabler-plus' />} onClick={() => setDrawerOpen(true)}>
-          Registrar egreso
+          Registrar obligación
         </Button>
       </Box>
+
+      <Alert severity='info' variant='tonal'>
+        Las compras traídas desde Nubox respaldan obligaciones y devengo. El pago real se reconoce recién en
+        {' '}
+        <strong>payment_date</strong>
+        {' '}
+        y conciliación bancaria.
+      </Alert>
 
       {fetchError && <Alert severity='error'>{fetchError}</Alert>}
 
@@ -353,9 +361,9 @@ const ExpensesListView = () => {
       <Grid container spacing={6}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <HorizontalWithSubtitle
-            title='Total egresos'
+            title='Total comprometido'
             stats={formatCLP(totalExpenses)}
-            subtitle={`${total} registros`}
+            subtitle={`${total} documentos y gastos`}
             avatarIcon='tabler-credit-card'
             avatarColor='error'
           />
@@ -373,7 +381,7 @@ const ExpensesListView = () => {
           <HorizontalWithSubtitle
             title='Pagados'
             stats={String(paidCount)}
-            subtitle='Egresos ejecutados'
+            subtitle='Pagos ejecutados'
             avatarIcon='tabler-check'
             avatarColor='success'
           />
@@ -392,7 +400,7 @@ const ExpensesListView = () => {
       {/* Table */}
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
         <CardHeader
-          title='Registro de egresos'
+          title='Registro de compras y obligaciones'
           avatar={
             <Avatar variant='rounded' sx={{ bgcolor: 'error.lightOpacity' }}>
               <i className='tabler-credit-card' style={{ fontSize: 22, color: 'var(--mui-palette-error-main)' }} />
@@ -441,7 +449,7 @@ const ExpensesListView = () => {
             </thead>
             <tbody>
               {expTable.getRowModel().rows.length === 0 ? (
-                <tr><td colSpan={expColumns.length} style={{ textAlign: 'center', padding: '3rem' }}><Typography variant='body2' color='text.secondary'>No hay egresos registrados aún</Typography></td></tr>
+                <tr><td colSpan={expColumns.length} style={{ textAlign: 'center', padding: '3rem' }}><Typography variant='body2' color='text.secondary'>No hay compras u obligaciones registradas aún</Typography></td></tr>
               ) : expTable.getRowModel().rows.map(row => (
                 <tr key={row.id} className='cursor-pointer' onClick={() => router.push(`/finance/expenses/${row.original.expenseId}`)}>
                   {row.getVisibleCells().map(cell => (

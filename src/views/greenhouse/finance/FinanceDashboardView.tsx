@@ -645,40 +645,71 @@ const FinanceDashboardView = () => {
         </Alert>
       )}
 
-      {/* Financial KPIs with sparklines */}
+      {/* Financial KPIs — sparkline charts + trend comparison */}
       <Grid container spacing={6}>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <StatsWithAreaChart
-            title='Saldo total'
-            stats={totalBalance === null ? 'Sin datos' : formatCLP(totalBalance)}
-            avatarIcon='tabler-wallet'
-            avatarColor='primary'
-            avatarSkin='light'
-            chartColor='primary'
-            chartSeries={[{ data: incomeMonthly.slice(-6).map(d => Math.round(d.totalAmountClp / 1000)) }]}
-          />
+          {(() => {
+            const prevBalance = incomeMonthly.length >= 2 ? incomeMonthly[incomeMonthly.length - 2].totalAmountClp : null
+
+            const deltaPct = totalBalance != null && prevBalance && prevBalance > 0
+              ? Math.round(((totalBalance - prevBalance) / prevBalance) * 100)
+              : null
+
+            return (
+              <StatsWithAreaChart
+                title='Saldo total'
+                stats={totalBalance === null ? 'Sin datos' : formatCLP(totalBalance)}
+                avatarIcon='tabler-wallet'
+                avatarColor='primary'
+                avatarSkin='light'
+                chartColor='primary'
+                chartSeries={[{ data: incomeMonthly.slice(-6).map(d => Math.round(d.totalAmountClp / 1000)) }]}
+                trend={deltaPct != null ? (deltaPct >= 0 ? 'positive' : 'negative') : undefined}
+                trendNumber={deltaPct != null ? `${Math.abs(deltaPct)}%` : undefined}
+                subtitle='Posición consolidada vs mes anterior'
+              />
+            )
+          })()}
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <StatsWithAreaChart
-            title='Facturación del mes'
-            stats={formatCLP(accrualIncomeClp)}
-            avatarIcon='tabler-file-invoice'
-            avatarColor='success'
-            avatarSkin='light'
-            chartColor='success'
-            chartSeries={[{ data: incomeMonthly.slice(-6).map(d => Math.round(d.totalAmountClp / 1000)) }]}
-          />
+          {(() => {
+            const changePct = (incomeSummary?.accrualCurrentMonth ?? incomeSummary?.currentMonth)?.changePercent
+
+            return (
+              <StatsWithAreaChart
+                title='Facturación del mes'
+                stats={formatCLP(accrualIncomeClp)}
+                avatarIcon='tabler-file-invoice'
+                avatarColor='success'
+                avatarSkin='light'
+                chartColor='success'
+                chartSeries={[{ data: incomeMonthly.slice(-6).map(d => Math.round(d.totalAmountClp / 1000)) }]}
+                trend={changePct != null ? (changePct >= 0 ? 'positive' : 'negative') : undefined}
+                trendNumber={changePct != null ? `${Math.abs(Math.round(changePct))}%` : undefined}
+                subtitle='Ingresos devengados vs mes anterior'
+              />
+            )
+          })()}
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <StatsWithAreaChart
-            title='Costos del mes'
-            stats={formatCLP(expenseWithPayroll)}
-            avatarIcon='tabler-credit-card'
-            avatarColor='error'
-            avatarSkin='light'
-            chartColor='error'
-            chartSeries={[{ data: expenseMonthly.slice(-6).map(d => Math.round(d.totalAmountClp / 1000)) }]}
-          />
+          {(() => {
+            const changePct = (expenseSummary?.accrualCurrentMonth ?? expenseSummary?.currentMonth)?.changePercent
+
+            return (
+              <StatsWithAreaChart
+                title='Costos del mes'
+                stats={formatCLP(expenseWithPayroll)}
+                avatarIcon='tabler-credit-card'
+                avatarColor='error'
+                avatarSkin='light'
+                chartColor='error'
+                chartSeries={[{ data: expenseMonthly.slice(-6).map(d => Math.round(d.totalAmountClp / 1000)) }]}
+                trend={changePct != null ? (changePct >= 0 ? 'negative' : 'positive') : undefined}
+                trendNumber={changePct != null ? `${Math.abs(Math.round(changePct))}%` : undefined}
+                subtitle='Egresos + nómina vs mes anterior'
+              />
+            )
+          })()}
         </Grid>
       </Grid>
 

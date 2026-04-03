@@ -1,5 +1,36 @@
 # Greenhouse Delivery Performance Report Parity V1
 
+## Delta 2026-04-03 — Carry-Over & Overdue Carried Forward semantic split
+
+`TASK-204` implementa el split semántico canónico entre carga futura y deuda vencida arrastrada:
+
+- `Carry-Over` ahora exige `created_at in period` + `due_date > period_end` (carga creada este mes para el siguiente)
+- `Overdue Carried Forward` es métrica nueva: `due_date < period_start` + abierta al cierre (deuda de períodos previos)
+- `OTD` ya no incluye carry-over ni OCF en el denominador: `OTD = On-Time / (On-Time + Late Drop + Overdue)`
+- `buildPeriodFilterSQL()` ahora incluye 3 universos: tareas con `due_date` en período, carry-over, y OCF
+- `overdue_carried_forward_count` materializado en todas las tablas de métricas (BQ + PG serving)
+
+Contrato canónico de buckets (5 mutuamente excluyentes):
+1. `On-Time` — due_date in M, completed_at <= due_date
+2. `Late Drop` — due_date in M, completed_at > due_date
+3. `Overdue` — due_date in M, abierta al cierre
+4. `Carry-Over` — created_at in M, due_date > period_end, abierta
+5. `Overdue Carried Forward` — due_date < period_start, abierta al cierre
+
+## Delta 2026-04-03 — Attribution model formalized as standalone spec
+
+`TASK-206` extrae el modelo de atribución operativa a su propia spec canónica: `GREENHOUSE_OPERATIONAL_ATTRIBUTION_MODEL_V1.md`.
+
+Las reglas de owner attribution que este documento ya declara (Delta 2026-04-02, TASK-199) siguen vigentes sin cambio. La spec nueva las complementa con:
+
+- separación formal en 4 capas (source identity → identity profile → operational actor → attribution role)
+- taxonomía de actor types con prioridad de clasificación
+- matriz de consumo por reader (ICO, Person 360, Project 360, Performance Report)
+- reglas de borde documentadas (sin asignar, client_user owner, co-assignees)
+- guía prescriptiva para nuevos consumers
+
+Regla: si un consumer necesita una regla de atribución distinta a `primary_owner_first_assignee`, debe proponer un delta a `GREENHOUSE_OPERATIONAL_ATTRIBUTION_MODEL_V1.md` antes de implementar.
+
 ## Delta 2026-04-02 — Historical parity now uses frozen task snapshots
 
 `TASK-201` cierra una decisión clave para la paridad histórica:

@@ -1,5 +1,32 @@
 # Greenhouse Data Model Master V1
 
+## Delta 2026-04-03 — Carry-Over & Overdue Carried Forward semantic split in ICO
+
+`TASK-204` introduce `overdue_carried_forward_count` como columna materializada en todas las tablas de métricas ICO (BQ) y serving (PG).
+
+Tablas impactadas:
+- BQ: `metric_snapshots_monthly`, `metrics_by_member`, `metrics_by_project`, `metrics_by_sprint`, `metrics_by_organization`, `metrics_by_business_unit`, `performance_report_monthly`
+- PG: `greenhouse_serving.agency_performance_reports`, `greenhouse_serving.ico_member_metrics`
+
+Carry-Over ahora exige `created_at` dentro del período. OTD ya no incluye carry-over ni OCF en el denominador.
+
+## Delta 2026-04-03 — Operational attribution model formalized as canonical spec
+
+`TASK-206` formaliza la capa de atribución operativa como spec canónica en `GREENHOUSE_OPERATIONAL_ATTRIBUTION_MODEL_V1.md`.
+
+El modelo separa explícitamente 4 capas:
+
+1. **Source Identity** — IDs de sistemas externos (Notion, HubSpot, Azure)
+2. **Identity Profile** — persona canónica (`identity_profiles.profile_id`)
+3. **Operational Actor** — faceta operativa: `member`, `client_user`, `external_contact`
+4. **Attribution Role** — crédito: `primary_owner`, `co_assignee`, `member_credit`, `space_credit`
+
+Regla vigente:
+
+- identity profile NO decide por sí mismo cómo se acredita el trabajo — esa decisión pertenece a Layer 3 + Layer 4
+- los consumers downstream deben consultar `GREENHOUSE_OPERATIONAL_ATTRIBUTION_MODEL_V1.md` antes de implementar reglas de crédito
+- este delta no cambia comportamiento runtime — formaliza decisiones ya implementadas por TASK-199
+
 ## Delta 2026-04-03 — Notion delivery data quality monitor persists historical runs
 
 `TASK-208` agrega una capa persistida de monitoreo de calidad para la integración nativa de `Notion` en Delivery:

@@ -5,7 +5,9 @@ import type { ProjectionMode } from '@/types/payroll'
 import { requireHrTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { resolveExchangeRateToClp } from '@/lib/finance/shared'
+import { consolidateCurrencyEquivalents } from '@/lib/finance/currency-comparison'
 import { projectPayrollForPeriod } from '@/lib/payroll/project-payroll'
+import { getPreviousOfficialPeriodTotals } from '@/lib/payroll/period-comparison'
 import {
   pgGetLatestProjectedPayrollPromotion
 } from '@/lib/payroll/projected-payroll-promotion-store'
@@ -52,7 +54,7 @@ export async function GET(request: Request) {
     // Fetch projection + official entries in parallel
     const periodId = `${year}-${String(month).padStart(2, '0')}`
 
-    const [result, officialRows, latestPromotion] = await Promise.all([
+    const [result, officialRows, previousOfficial, latestPromotion] = await Promise.all([
       projectPayrollForPeriod({ year, month, mode }),
       runGreenhousePostgresQuery<OfficialEntryRow>(
         `SELECT e.member_id, e.currency, e.gross_total, e.net_total,
@@ -64,8 +66,8 @@ export async function GET(request: Request) {
          WHERE p.period_id = $1
            AND p.status IN ('calculated', 'approved', 'exported')`,
         [periodId]
-      ).catch(() => [] as OfficialEntryRow[])
-      ,
+      ).catch(() => [] as OfficialEntryRow[]),
+      getPreviousOfficialPeriodTotals(periodId),
       isPayrollPostgresEnabled()
         ? pgGetLatestProjectedPayrollPromotion({ year, month, mode }).catch(() => null)
         : Promise.resolve(null)
@@ -148,22 +150,26 @@ export async function GET(request: Request) {
       }
     })
 
-    // CLP equivalent for USD totals
-    let clpEquivalent: { grossClp: number; netClp: number; fxRate: number } | null = null
+    // Consolidated currency equivalents via canonical finance helpers
+    let consolidated: {
+      grossClp: number; netClp: number; grossUsd: number; netUsd: number; fxRate: number
+    } | null = null
 
-    if (result.totals.grossByCurrency.USD && result.totals.grossByCurrency.USD > 0) {
+    const hasUsd = (result.totals.grossByCurrency.USD ?? 0) > 0
+
+    if (hasUsd) {
       try {
-        const fxRate = await resolveExchangeRateToClp({ currency: 'USD' })
+        const usdToClp = await resolveExchangeRateToClp({ currency: 'USD' })
 
-        clpEquivalent = {
-          grossClp: round2(result.totals.grossByCurrency.USD * fxRate + (result.totals.grossByCurrency.CLP ?? 0)),
-          netClp: round2(result.totals.netByCurrency.USD * fxRate + (result.totals.netByCurrency.CLP ?? 0)),
-          fxRate
-        }
+        consolidated = consolidateCurrencyEquivalents(result.totals, usdToClp)
       } catch {
-        // FX not available — skip CLP equivalent
+        // FX not available — skip equivalents
       }
     }
+
+    const hasMultiCurrency = hasUsd && (result.totals.grossByCurrency.CLP ?? 0) > 0
+    const clpEquivalent = consolidated ? { grossClp: consolidated.grossClp, netClp: consolidated.netClp, fxRate: consolidated.fxRate } : null
+    const usdEquivalent = consolidated && hasMultiCurrency ? { grossUsd: consolidated.grossUsd, netUsd: consolidated.netUsd, fxRate: consolidated.fxRate } : null
 
     return NextResponse.json(
       {
@@ -175,7 +181,10 @@ export async function GET(request: Request) {
           entryCount: officialRows.length
         } : null,
         latestPromotion,
-        clpEquivalent
+        clpEquivalent,
+        usdEquivalent,
+        prorationFactor: result.entries.length > 0 ? result.entries[0].prorationFactor : 1,
+        previousOfficial
       },
       { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } }
     )

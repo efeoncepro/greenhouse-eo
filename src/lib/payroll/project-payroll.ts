@@ -17,6 +17,7 @@ export type ProjectedPayrollEntry = PayrollEntry & {
   asOfDate: string
   projectedWorkingDays: number
   projectedWorkingDaysTotal: number
+  prorationFactor: number
 }
 
 export type ProjectedPayrollResult = {
@@ -56,6 +57,57 @@ const getBonusConfig = async (periodEnd: string): Promise<BonusProrationConfig> 
 }
 
 const roundCurrency = (n: number) => Math.round(n * 100) / 100
+
+/**
+ * Scale all monetary fields of a payroll entry by a proration factor.
+ * Used for actual_to_date mode to show devengado proportional to elapsed working days.
+ * Rates, IDs, KPIs, booleans, and bonus ceilings are NOT scaled.
+ */
+const prorateEntry = (entry: PayrollEntry, factor: number): PayrollEntry => {
+  if (factor >= 1) return entry
+
+  const s = (v: number) => roundCurrency(v * factor)
+  const sn = (v: number | null) => v != null ? roundCurrency(v * factor) : null
+
+  return {
+    ...entry,
+    baseSalary: s(entry.baseSalary),
+    remoteAllowance: s(entry.remoteAllowance),
+    colacionAmount: s(entry.colacionAmount),
+    movilizacionAmount: s(entry.movilizacionAmount),
+    fixedBonusAmount: s(entry.fixedBonusAmount),
+    bonusOtdAmount: s(entry.bonusOtdAmount),
+    bonusRpaAmount: s(entry.bonusRpaAmount),
+    bonusOtherAmount: s(entry.bonusOtherAmount),
+    grossTotal: s(entry.grossTotal),
+    netTotal: s(entry.netTotal),
+    netTotalCalculated: sn(entry.netTotalCalculated),
+    adjustedBaseSalary: sn(entry.adjustedBaseSalary),
+    adjustedRemoteAllowance: sn(entry.adjustedRemoteAllowance),
+    adjustedColacionAmount: sn(entry.adjustedColacionAmount),
+    adjustedMovilizacionAmount: sn(entry.adjustedMovilizacionAmount),
+    adjustedFixedBonusAmount: sn(entry.adjustedFixedBonusAmount),
+    chileGratificacionLegalAmount: sn(entry.chileGratificacionLegalAmount),
+    chileColacionAmount: sn(entry.chileColacionAmount),
+    chileMovilizacionAmount: sn(entry.chileMovilizacionAmount),
+    chileAfpAmount: sn(entry.chileAfpAmount),
+    chileAfpCotizacionAmount: sn(entry.chileAfpCotizacionAmount),
+    chileAfpComisionAmount: sn(entry.chileAfpComisionAmount),
+    chileHealthAmount: sn(entry.chileHealthAmount),
+    chileHealthObligatoriaAmount: sn(entry.chileHealthObligatoriaAmount),
+    chileHealthVoluntariaAmount: sn(entry.chileHealthVoluntariaAmount),
+    chileUnemploymentAmount: sn(entry.chileUnemploymentAmount),
+    chileTaxAmount: sn(entry.chileTaxAmount),
+    chileApvAmount: sn(entry.chileApvAmount),
+    chileTotalDeductions: sn(entry.chileTotalDeductions),
+    chileTaxableBase: sn(entry.chileTaxableBase),
+    chileEmployerSisAmount: sn(entry.chileEmployerSisAmount),
+    chileEmployerCesantiaAmount: sn(entry.chileEmployerCesantiaAmount),
+    chileEmployerMutualAmount: sn(entry.chileEmployerMutualAmount),
+    chileEmployerTotalCost: sn(entry.chileEmployerTotalCost),
+    siiRetentionAmount: entry.siiRetentionAmount != null ? roundCurrency(entry.siiRetentionAmount * factor) : null
+  }
+}
 
 // ── Core ──
 
@@ -118,28 +170,35 @@ export const projectPayrollForPeriod = async ({
   const workingDaysTotal = countWeekdays(periodStart, periodEnd)
 
   // 3. Build projected entry for each member
+  const prorationFactor = mode === 'actual_to_date' && workingDaysTotal > 0
+    ? workingDaysCut / workingDaysTotal
+    : 1
+
   const entries: ProjectedPayrollEntry[] = []
 
   for (const compensation of compensations) {
     const kpi = kpiMap.get(compensation.memberId) ?? null
     const attendance = attendanceResult.get(compensation.memberId) ?? null
 
-    const entry = await buildPayrollEntry({
+    const fullEntry = await buildPayrollEntry({
       periodId,
       periodDate: periodEnd,
-        compensation,
-        ufValue,
-        bonusConfig,
-        kpi,
-        attendance
-      })
+      compensation,
+      ufValue,
+      bonusConfig,
+      kpi,
+      attendance
+    })
+
+    const entry = prorateEntry(fullEntry, prorationFactor)
 
     entries.push({
       ...entry,
       projectionMode: mode,
       asOfDate,
       projectedWorkingDays: workingDaysCut,
-      projectedWorkingDaysTotal: workingDaysTotal
+      projectedWorkingDaysTotal: workingDaysTotal,
+      prorationFactor
     })
   }
 

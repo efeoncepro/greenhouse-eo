@@ -475,6 +475,10 @@ Phase 4: Remove legacy fields
 9. External client users can never hold internal roles (`collaborator`, `hr_manager`, `finance_analyst`, etc.).
 10. Internal Efeonce users always have `collaborator` as a base role in addition to any domain roles.
 
+## Cross-References
+
+- `GREENHOUSE_OPERATIONAL_ATTRIBUTION_MODEL_V1.md` — modelo canónico de atribución operativa (4 capas: source identity → identity profile → operational actor → attribution role). Este documento define cómo la identidad resuelta por el sistema de identity access se traduce a crédito operativo en Delivery, ICO y Performance Report.
+
 ## Operational Note
 
 If a future agent changes:

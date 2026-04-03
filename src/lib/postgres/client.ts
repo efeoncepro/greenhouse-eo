@@ -254,15 +254,21 @@ export const withGreenhousePostgresTransaction = async <T>(callback: (client: Po
 }
 
 export const closeGreenhousePostgres = async () => {
-  if (globalThis.__greenhousePostgresPoolPromise) {
-    const pool = await globalThis.__greenhousePostgresPoolPromise
+  // Clear references BEFORE closing to prevent concurrent requests from
+  // acquiring a pool/connector that is being shut down (race condition fix).
+  const poolPromise = globalThis.__greenhousePostgresPoolPromise
+  const connector = globalThis.__greenhousePostgresConnector
+
+  globalThis.__greenhousePostgresPoolPromise = undefined
+  globalThis.__greenhousePostgresConnector = undefined
+
+  if (poolPromise) {
+    const pool = await poolPromise
 
     await pool.end()
-    globalThis.__greenhousePostgresPoolPromise = undefined
   }
 
-  if (globalThis.__greenhousePostgresConnector) {
-    globalThis.__greenhousePostgresConnector.close()
-    globalThis.__greenhousePostgresConnector = undefined
+  if (connector) {
+    connector.close()
   }
 }

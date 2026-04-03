@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { buildMetricSelectSQL, buildPeriodFilterSQL } from '@/lib/ico-engine/shared'
 import type { TeamRoleCategory } from '@/types/team'
 
 export interface AgencySpaceHealth {
@@ -20,6 +21,17 @@ export interface AgencySpaceHealth {
   totalUsers: number
   activeUsers: number
   isInternal: boolean
+}
+
+export interface AgencyDeliveryTrendMonth {
+  year: number
+  month: number
+  otdPct: number | null
+  rpaAvg: number | null
+  ftrPct: number | null
+  totalTasks: number
+  completedTasks: number
+  stuckAssetCount: number
 }
 
 export interface AgencyPulseKpis {
@@ -108,6 +120,20 @@ const normalizeStringArray = (value: unknown): string[] => {
   if (!Array.isArray(value)) return []
 
   return value.map(item => (typeof item === 'string' ? item.trim() : '')).filter(Boolean)
+}
+
+const getCurrentDeliveryPeriod = () => {
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Santiago',
+    year: 'numeric',
+    month: '2-digit'
+  })
+
+  const parts = formatter.formatToParts(new Date())
+  const year = Number(parts.find(part => part.type === 'year')?.value ?? new Date().getUTCFullYear())
+  const month = Number(parts.find(part => part.type === 'month')?.value ?? new Date().getUTCMonth() + 1)
+
+  return { year, month }
 }
 
 const normalizeMatchValue = (value: string | null | undefined) =>
@@ -204,34 +230,25 @@ const getAgencyClientScopeCtes = (projectId: string) => `
 export const getAgencyPulseKpis = async (): Promise<AgencyPulseKpis> => {
   const projectId = getBigQueryProjectId()
   const bq = getBigQueryClient()
+  const currentPeriod = getCurrentDeliveryPeriod()
 
   const [rows] = await bq.query({
     query: `
       ${getAgencyClientScopeCtes(projectId)},
-      ico_latest_by_space AS (
+      ico_live_by_space AS (
         SELECT
-          latest.space_id,
-          latest.rpa_avg,
-          latest.otd_pct
-        FROM (
-          SELECT
-            ms.space_id,
-            ms.rpa_avg,
-            ms.otd_pct,
-            ROW_NUMBER() OVER (
-              PARTITION BY ms.space_id
-              ORDER BY ms.period_year DESC, ms.period_month DESC, ms.computed_at DESC
-            ) AS row_num
-          FROM \`${projectId}.ico_engine.metric_snapshots_monthly\` ms
-          WHERE ms.space_id IN (SELECT space_id FROM client_spaces)
-        ) latest
-        WHERE latest.row_num = 1
+          te.space_id,
+          ${buildMetricSelectSQL()}
+        FROM \`${projectId}.ico_engine.v_tasks_enriched\` te
+        WHERE te.space_id IN (SELECT space_id FROM client_spaces)
+          AND (${buildPeriodFilterSQL()})
+        GROUP BY te.space_id
       ),
       ico_global AS (
         SELECT
           AVG(ils.rpa_avg) AS rpa_global,
           AVG(ils.otd_pct) AS otd_pct_global
-        FROM ico_latest_by_space ils
+        FROM ico_live_by_space ils
       ),
       task_agg AS (
         SELECT
@@ -258,6 +275,11 @@ export const getAgencyPulseKpis = async (): Promise<AgencyPulseKpis> => {
       CROSS JOIN ico_global ig
       CROSS JOIN project_agg pa
     `
+    ,
+    params: {
+      periodYear: currentPeriod.year,
+      periodMonth: currentPeriod.month
+    }
   })
 
   const row = rows?.[0] as Record<string, unknown> | undefined
@@ -276,28 +298,19 @@ export const getAgencyPulseKpis = async (): Promise<AgencyPulseKpis> => {
 export const getAgencySpacesHealth = async (): Promise<AgencySpaceHealth[]> => {
   const projectId = getBigQueryProjectId()
   const bq = getBigQueryClient()
+  const currentPeriod = getCurrentDeliveryPeriod()
 
   const [rows] = await bq.query({
     query: `
       ${getAgencyClientScopeCtes(projectId)},
-      ico_latest_by_space AS (
+      ico_live_by_space AS (
         SELECT
-          latest.space_id,
-          latest.rpa_avg,
-          latest.otd_pct
-        FROM (
-          SELECT
-            ms.space_id,
-            ms.rpa_avg,
-            ms.otd_pct,
-            ROW_NUMBER() OVER (
-              PARTITION BY ms.space_id
-              ORDER BY ms.period_year DESC, ms.period_month DESC, ms.computed_at DESC
-            ) AS row_num
-          FROM \`${projectId}.ico_engine.metric_snapshots_monthly\` ms
-          WHERE ms.space_id IN (SELECT space_id FROM client_spaces)
-        ) latest
-        WHERE latest.row_num = 1
+          te.space_id,
+          ${buildMetricSelectSQL()}
+        FROM \`${projectId}.ico_engine.v_tasks_enriched\` te
+        WHERE te.space_id IN (SELECT space_id FROM client_spaces)
+          AND (${buildPeriodFilterSQL()})
+        GROUP BY te.space_id
       ),
       ico_health AS (
         SELECT
@@ -305,7 +318,7 @@ export const getAgencySpacesHealth = async (): Promise<AgencySpaceHealth[]> => {
           AVG(ils.rpa_avg) AS rpa_avg,
           AVG(ils.otd_pct) AS otd_pct
         FROM client_spaces cs
-        LEFT JOIN ico_latest_by_space ils
+        LEFT JOIN ico_live_by_space ils
           ON ils.space_id = cs.space_id
         GROUP BY cs.client_id
       ),
@@ -364,6 +377,11 @@ export const getAgencySpacesHealth = async (): Promise<AgencySpaceHealth[]> => {
         COALESCE(asg.allocated_fte, 0) DESC,
         ac.client_name ASC
     `
+    ,
+    params: {
+      periodYear: currentPeriod.year,
+      periodMonth: currentPeriod.month
+    }
   })
 
   return (rows as Record<string, unknown>[]).map(row => {
@@ -550,5 +568,46 @@ export const getAgencyCapacity = async (): Promise<AgencyCapacityOverview> => {
       monthlyHours: 0,
       members: []
     }
+  }
+}
+
+export const getAgencyDeliveryTrend = async (months = 6): Promise<AgencyDeliveryTrendMonth[]> => {
+  const projectId = getBigQueryProjectId()
+  const bq = getBigQueryClient()
+
+  try {
+    const [rows] = await bq.query({
+      query: `
+        SELECT
+          period_year,
+          period_month,
+          ROUND(SAFE_DIVIDE(SUM(on_time_count), NULLIF(SUM(on_time_count) + SUM(late_drop_count) + SUM(overdue_count), 0)) * 100, 1) AS otd_pct,
+          AVG(rpa_avg) AS rpa_avg,
+          AVG(ftr_pct) AS ftr_pct,
+          SUM(total_tasks) AS total_tasks,
+          SUM(completed_tasks) AS completed_tasks,
+          SUM(stuck_asset_count) AS stuck_asset_count
+        FROM \`${projectId}.ico_engine.metric_snapshots_monthly\`
+        GROUP BY period_year, period_month
+        ORDER BY period_year DESC, period_month DESC
+        LIMIT @months
+      `,
+      params: { months }
+    })
+
+    return (rows as Record<string, unknown>[])
+      .map(r => ({
+        year: toNumber(r.period_year),
+        month: toNumber(r.period_month),
+        otdPct: toNullableNumber(r.otd_pct),
+        rpaAvg: toNullableNumber(r.rpa_avg),
+        ftrPct: toNullableNumber(r.ftr_pct),
+        totalTasks: toNumber(r.total_tasks),
+        completedTasks: toNumber(r.completed_tasks),
+        stuckAssetCount: toNumber(r.stuck_asset_count)
+      }))
+      .reverse()
+  } catch {
+    return []
   }
 }

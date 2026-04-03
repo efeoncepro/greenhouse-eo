@@ -2,6 +2,67 @@
 
 ## 2026-04-03
 
+- **Backlog ICO consumers aligned to the metric contract**:
+  - se actualizaron tasks de `Agency`, `Nexa`, `HR`, `Frame.io`, `AI core`, `SLA`, `Scope`, `Temporal contract` e `Integrations` para que no contradigan `docs/architecture/Contrato_Metricas_ICO_v1.md`
+  - las tasks afectadas ahora dejan explícito que no deben:
+    - redefinir localmente métricas `ICO`
+    - reutilizar thresholds legacy como si fueran contrato vigente
+    - exponer `Revenue Enabled`, `TTM`, `Iteration Velocity` o métricas afines como maduras si todavía dependen de lanes abiertas
+  - esto reduce el riesgo de que el backlog vuelva a introducir semánticas paralelas para `OTD`, `FTR`, `RpA` y consumers futuros
+
+- **Contrato de métricas ICO alineado a thresholds benchmark-informed**:
+  - `docs/architecture/Contrato_Metricas_ICO_v1.md` ya no usa la tabla legacy de tres bandas para `OTD`, `FTR` y `RpA`
+  - el contrato ahora adopta explícitamente las bandas benchmark-informed documentadas en `Greenhouse_ICO_Engine_v1.md`
+  - además separa `Cycle Time`, `Cycle Time Variance` y `BCS` como métricas de calibración interna, evitando presentarlas con el mismo nivel de respaldo externo que `OTD`, `FTR` y `RpA`
+
+- **ICO Engine external benchmarks documented**:
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md` ahora incluye una sección específica de benchmarks externos y estándar recomendado para Greenhouse (`A.5.5`)
+  - el documento distingue qué métricas sí tienen benchmark externo portable (`OTD`), cuáles solo tienen análogo razonable (`FTR`), cuáles tienen benchmark parcial creativo (`RpA`, `cycle time`) y cuáles deben seguir tratándose como policy interna (`throughput`, `pipeline velocity`, `stuck assets`, `carry-over`, `overdue carried forward`)
+  - se documentaron referencias externas explícitas a `SCOR`, `APQC`, `IndustryWeek` y `visualloop` para evitar que los thresholds del engine se presenten como “estándares de industria” cuando en realidad son políticas internas o adaptaciones al contexto creativo
+
+- **ICO Engine metrics architecture inventory consolidated**:
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md` ahora consolida en una sola sección el inventario canónico de señales y métricas del engine
+  - incorpora además las categorías funcionales de métricas ICO para ordenar hardening, lectura de negocio y diseño de readers
+  - separa explícitamente qué señales ya llegan calculadas, qué derivados construye `v_tasks_enriched`, qué KPIs calcula `buildMetricSelectSQL()`, qué buckets/contexto expone y qué rollups adicionales viven en `performance_report_monthly`
+  - la misma sección ya documenta también, por métrica, en qué consiste el cálculo y qué pregunta de negocio responde
+  - esto deja una referencia única para alinear arquitectura, `metric-registry.ts`, `shared.ts` y `schema.ts`
+
+- **ICO completed-status hardening for delivery KPIs**:
+  - el engine ICO ya no considera una tarea como completada solo por `completed_at`
+  - `OTD`, `RpA`, `FTR`, `cycle time` y `throughput` ahora requieren además estado terminal real (`Listo`, `Done`, `Finalizado`, `Completado`, `Aprobado`)
+  - esto evita que filas incoherentes como `Sin empezar` o `Listo para revisión` con `completed_at` poblado contaminen los KPIs visibles en `Agency > Delivery` y otros consumers del engine
+
+- **Agency Delivery current-month live KPI correction**:
+  - `Agency > Delivery` vuelve a leer `OTD` / `RpA` del mes en curso, no del último período cerrado
+  - los readers `/api/agency/pulse` y `/api/agency/spaces` ya no dependen de `ico_engine.metric_snapshots_monthly` para esos KPIs
+  - ahora calculan live contra `ico_engine.v_tasks_enriched` con el filtro canónico del período actual en `America/Santiago`
+  - esto preserva la semántica operativa de la vista (`mes en curso`) sin heredar snapshots mensuales abiertos e inestables
+  - la cobertura de `agency-queries.test.ts` ahora fija explícitamente `periodYear` / `periodMonth` como contrato temporal
+
+- **Deel contractors KPI bonus hotfix**:
+  - `Payroll` y `Projected Payroll` ya no fuerzan `bonusOtdAmount` y `bonusRpaAmount` a `0` para `payroll_via = 'deel'`
+  - los colaboradores `contractor` / `eor` vía Deel ahora calculan payout automático de `OTD` y `RpA` con la policy vigente de `payroll_bonus_config`
+  - se preserva el contrato de Deel sin descuentos previsionales locales ni cálculo de compliance Chile dentro de Greenhouse
+  - la UI de compensación y el detalle de payroll dejan de decir que los bonos KPI de Deel son discrecionales por defecto
+  - se agregó cobertura en `src/lib/payroll/project-payroll.test.ts` para asegurar que un contractor Deel con KPIs válidos proyecte bonos reales
+
+- **TASK-204 Carry-Over & Overdue Carried Forward Semantic Split**:
+  - se implementó el split semántico canónico entre `Carry-Over` (carga creada en el período con entrega futura) y `Overdue Carried Forward` (deuda vencida de períodos previos aún abierta)
+  - `OTD` ya no incluye carry-over ni OCF en el denominador: `OTD = On-Time / (On-Time + Late Drop + Overdue)`
+  - `buildPeriodFilterSQL()` ahora incluye 3 universos de tareas: due_date en período + carry-over + OCF
+  - `overdue_carried_forward_count` materializado en todas las tablas BQ (7 tablas) y PG serving (2 tablas)
+  - migración PG: `greenhouse_serving.agency_performance_reports` + `greenhouse_serving.ico_member_metrics`
+  - UI: card "Overdue Carried Forward" en Agency ICO y línea en IcoTab
+  - publicación Notion: bullet + property para OCF
+  - docs actualizados: ICO Engine, Performance Report Parity, Data Model Master, Operating Model
+
+- **TASK-206 Delivery Operational Attribution Model**:
+  - se formalizó el modelo canónico de atribución operativa como spec standalone: `docs/architecture/GREENHOUSE_OPERATIONAL_ATTRIBUTION_MODEL_V1.md`
+  - el modelo separa explícitamente 4 capas: source identity → identity profile → operational actor → attribution role
+  - documenta contrato de campos para `tasks` y `projects`, política `primary_owner_first_assignee`, actor type taxonomy, reglas de borde y guía prescriptiva para nuevos consumers
+  - se actualizaron cross-references en `GREENHOUSE_IDENTITY_ACCESS_V2.md`, `GREENHOUSE_DATA_MODEL_MASTER_V1.md` y `GREENHOUSE_DELIVERY_PERFORMANCE_REPORT_PARITY_V1.md`
+  - no hay cambios de runtime — formaliza decisiones ya implementadas por TASK-199
+
 - **Admin integrations health semantics clarified**:
   - `Health & Freshness` ya separa estado actual de incidentes recientes en `/admin/integrations`
   - el badge `Health` ahora refleja la ultima senal valida y su frescura, en vez de degradarse automaticamente por cualquier fallo dentro de 24h
@@ -4149,3 +4210,8 @@
 - Delivery performance parity lane cerrada end-to-end: `TASK-202` implementó el cutover outbound `Greenhouse -> Notion` con target formal `Performance Reports`, integración `notion_delivery_performance_reports`, route cron `GET /api/cron/notion-delivery-performance-publish`, writer Notion real y ledger `greenhouse_sync.notion_publication_runs`.
 - Se agregó configuración canónica de destino en `greenhouse_core.space_notion_publication_targets`, seeded para `space-efeonce` hacia la base Notion `Performance Reports`.
 - La validación funcional quedó cubierta con `dryRun` real para `Marzo 2026`, resolviendo el target page existente sin sobrescribir el contenido histórico durante la verificación.
+# Changelog
+
+## 2026-04-03
+
+- Finance: se corrigió la semántica visible de `income` / `expenses` para dejar explícito que los documentos sincronizados desde Nubox son ledgers de venta/compra y devengo, no equivalentes directos a cobros/pagos. La navegación, títulos y copy de Finance ahora distinguen mejor documento vs caja.

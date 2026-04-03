@@ -10,6 +10,133 @@
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
 
+## Delta 2026-04-03 — GreenhouseFunnelCard: componente reutilizable de embudo
+
+**Archivo**: `src/components/greenhouse/GreenhouseFunnelCard.tsx`
+
+Componente de visualización de embudo/funnel para procesos secuenciales con etapas. Usa Recharts `FunnelChart` + `Funnel` (ya instalado, v3.6).
+
+### Props
+
+```typescript
+interface FunnelStage {
+  name: string
+  value: number
+  color?: string                                    // Override de color por etapa
+  status?: 'success' | 'warning' | 'error'          // Semáforo override
+}
+
+interface GreenhouseFunnelCardProps {
+  title: string
+  subtitle?: string
+  avatarIcon?: string                               // Default: 'tabler-filter'
+  avatarColor?: ThemeColor                          // Default: 'primary'
+  data: FunnelStage[]
+  height?: number                                   // Default: 280
+  showConversionBadges?: boolean                    // Default: true
+  showFooterSummary?: boolean                       // Default: true
+  onStageClick?: (stage: FunnelStage, index: number) => void
+}
+```
+
+### Paleta secuencial por defecto (cuando no hay semáforo)
+
+| Posición | Token | Hex | Razón |
+|----------|-------|-----|-------|
+| Etapa 1 (tope) | `primary` | `#7367F0` | Punto de entrada |
+| Etapa 2 | `info` | `#00BAD1` | Calificación |
+| Etapa 3 | `warning` | `#ff6500` | Punto de decisión |
+| Etapa 4 | `error` | `#bb1954` | Punto crítico de conversión |
+| Etapa 5+ (fondo) | `success` | `#6ec207` | Completación |
+
+### Footer inteligente
+
+Auto-genera dos insights:
+1. **Conversión total**: `lastStage.value / firstStage.value × 100`
+2. **Etapa crítica**: la etapa con mayor caída % vs anterior. Si todas ≥ 80% → "Flujo saludable"
+
+### Accesibilidad
+
+- `<figure role="img" aria-label="...">` con `<figcaption class="sr-only">` detallando cada etapa
+- Respeta `prefers-reduced-motion` desactivando animaciones
+- Cada trapezoide tiene 24px mínimo de altura (target de interacción)
+- Labels de texto en cada etapa (no depende solo de color)
+- Si `onStageClick` presente: etapas focusables con `tabIndex={0}` y `role="button"`
+
+### Casos de uso
+
+- Pipeline CSC (Delivery): Briefing → Producción → Revisión → Cambios → Entrega
+- Pipeline CRM: Leads → Calificados → Propuesta → Negociación → Cierre
+- Onboarding: Contacto → Propuesta → Contrato → Setup → Activo
+- Cualquier proceso secuencial con `FunnelStage[]`
+
+## Delta 2026-04-03 — Helpers canónicos de comparativa + patrones de KPI cards
+
+### Helpers reutilizables de comparativa
+
+Dos archivos canónicos para cualquier vista que necesite mostrar deltas entre períodos o monedas:
+
+**`src/lib/finance/currency-comparison.ts`** — funciones puras, importable desde client Y server:
+
+| Función | Propósito | Ejemplo de uso |
+|---------|-----------|----------------|
+| `consolidateCurrencyEquivalents(totals, usdToClp)` | Convierte multi-currency `{ USD, CLP }` a totales consolidados CLP y USD | Cards de Nómina, Finance |
+| `computeCurrencyDelta(current, compare, rate, label)` | Computa `grossDeltaPct`, `netDeltaPct`, `compareLabel`, `grossReference`, `netReference` | Cards con "vs oficial" o "vs 2026-03" |
+| `payrollTrendDirection(deltaPct)` | Para costos: subir = `'negative'`, bajar = `'positive'` | Prop `trend` de `HorizontalWithSubtitle` |
+| `formatDeltaLabel(deltaPct, label)` | `"5% vs 2026-03"` | Prop `trendNumber` de `HorizontalWithSubtitle` |
+
+**`src/lib/payroll/period-comparison.ts`** — server-only, queries PostgreSQL:
+
+| Función | Propósito |
+|---------|-----------|
+| `getPreviousOfficialPeriodTotals(beforePeriodId)` | Último período oficial (`approved`/`exported`) anterior al dado |
+| `getOfficialPeriodTotals(periodId)` | Oficial del mismo período |
+
+Patrón de uso en API routes:
+```typescript
+import { consolidateCurrencyEquivalents } from '@/lib/finance/currency-comparison'
+import { getPreviousOfficialPeriodTotals } from '@/lib/payroll/period-comparison'
+
+const previousOfficial = await getPreviousOfficialPeriodTotals(periodId)
+const consolidated = consolidateCurrencyEquivalents(totals, usdToClp)
+```
+
+Patrón de uso en views (client):
+```typescript
+import { computeCurrencyDelta, payrollTrendDirection, formatDeltaLabel } from '@/lib/finance/currency-comparison'
+
+const delta = computeCurrencyDelta(current, compareSource, fxRate, 'vs 2026-03')
+// → { grossDeltaPct: 5, netDeltaPct: 3, compareLabel: 'vs 2026-03', grossReference: 3120000, netReference: 2800000 }
+
+<HorizontalWithSubtitle
+  trend={payrollTrendDirection(delta.grossDeltaPct)}      // 'negative' (costo subió)
+  trendNumber={formatDeltaLabel(delta.grossDeltaPct, delta.compareLabel)}  // "5% vs 2026-03"
+  footer={`Anterior: ${formatCurrency(delta.grossReference, 'CLP')}`}
+/>
+```
+
+### Helpers de tendencia para ICO/Delivery
+
+**`trendDelta()`** en `AgencyDeliveryView.tsx` — helper local para comparativas mes-a-mes en trend arrays:
+
+```typescript
+// trendDelta(trend, field) → { text, number, direction, prevLabel } | null
+// - text: "+3pp vs Mar" (formatted for display)
+// - number: "3pp" (absolute delta for HorizontalWithSubtitle.trendNumber)
+// - direction: 'positive' | 'negative' | 'neutral'
+// - Para RPA (lower is better), direction is INVERTED: decrease = positive
+```
+
+### Patrones de cards Vuexy para data storytelling
+
+1. **Hero KPI** (BarChartRevenueGrowth pattern): `Card` con KPI `h3` grande + `CustomChip` trend + mini bar chart ApexCharts. Usar para la métrica principal de cada vista.
+2. **Rich KPI** (`HorizontalWithSubtitle` con todas las props): `trend` + `trendNumber` + `statusLabel`/`statusColor`/`statusIcon` + `footer`. Usar para métricas secundarias con comparativa.
+3. **Attention card** (accent left border): `Card` con `borderLeft: 4px solid` color semáforo. Usar para items que requieren acción.
+
+### Regla
+
+Toda vista que muestre métricas operativas debe incluir comparativa vs período anterior. No mostrar números aislados sin contexto.
+
 ## Delta 2026-03-31 — Shared uploader pattern
 
 `TASK-173` ya deja un patrón canónico de upload para el portal:

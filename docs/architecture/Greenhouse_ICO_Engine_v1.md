@@ -1,5 +1,16 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-03 — Carry-Over & Overdue Carried Forward semantic split
+
+`TASK-204` separa semánticamente carry-over de deuda vencida arrastrada en el engine y materialización:
+
+- `Carry-Over` = tarea creada en el período con `due_date` posterior al cierre (carga futura, no penaliza OTD)
+- `Overdue Carried Forward` = tarea con `due_date < period_start` y abierta al cierre (deuda arrastrada, no penaliza OTD)
+- `OTD` = `On-Time / (On-Time + Late Drop + Overdue)` — carry-over y OCF excluidos del denominador
+- `buildPeriodFilterSQL()` ahora incluye los 3 universos de tareas (due_date in period + carry-over + OCF)
+- `overdue_carried_forward_count` materializado en todos los metrics tables (BQ) y serving tables (PG)
+- migración: `greenhouse_serving.agency_performance_reports` y `greenhouse_serving.ico_member_metrics`
+
 ## Delta 2026-04-02 — Historical Delivery periods now support frozen task snapshots
 
 `TASK-201` agrega una nueva pieza canónica al runtime de `ICO`:
@@ -1938,6 +1949,383 @@ El ICO Engine debe usar `space_id` directo, no el array `notion_project_ids`.
   - `on_time` y `late_drop` prefieren `performance_indicator_code` si el upstream ya lo trae normalizado; si no existe, el engine cae a derivación por `completed_at` vs `due_date`
   - `overdue` y `carry-over` no se leen desde labels de Notion; permanecen como reglas propias de `ICO` relativas al período consultado/materializado
   - `FTR` se define por `client_change_round_final = 0` en tareas completadas; `client_review_open` es estado de workflow y no fuente de verdad para esta métrica
+
+### A.5.4 Inventario canónico de métricas y señales del ICO Engine (Delta 2026-04-03)
+
+Para evitar drift entre arquitectura, registry y SQL runtime, este inventario consolida qué señales:
+
+1. ya vienen calculadas o normalizadas desde la capa base
+2. calcula el engine a nivel tarea
+3. agrega/materializa el engine como métricas canónicas
+4. expone como contexto operativo o scorecard auditable
+
+#### A.5.4.0 Categorías funcionales de métricas ICO
+
+Para diseño de readers, priorización de hardening y lectura de negocio, las métricas de `ICO` deben agruparse en estas categorías funcionales:
+
+| Categoría | Qué cubre | Métricas / señales principales | Pregunta de negocio troncal |
+|---|---|---|---|
+| Calidad de entrega | retrabajo, correcciones y calidad del cierre | `rpa_avg`, `rpa_median`, `ftr_pct`, `rpa_value`, `client_change_round_final`, `workflow_change_round` | ¿Qué tan buena fue la entrega realmente cerrada? |
+| Cumplimiento de promesa | cumplimiento del compromiso del período | `otd_pct`, `on_time_count`, `late_drop_count`, `overdue_count` | ¿Estamos cumpliendo la promesa operativa del período? |
+| Flujo operativo | velocidad de producción y capacidad real de cierre | `throughput_count`, `pipeline_velocity`, `cycle_time_avg_days`, `cycle_time_p50_days`, `cycle_time_variance` | ¿Qué tan rápido y predecible convierte el equipo trabajo en output cerrado? |
+| Carga abierta y deuda | trabajo abierto, compromiso futuro y arrastre histórico | `active_tasks`, `carry_over_count`, `overdue_carried_forward_count`, `total_tasks`, `completed_tasks` | ¿Cuánta carga sigue abierta y cuánta deuda vieja arrastramos? |
+| Riesgo de ejecución | bloqueo o inmovilidad operativa | `stuck_asset_count`, `stuck_asset_pct`, `hours_since_update`, `is_stuck` | ¿Qué parte de la operación está detenida o en riesgo de atasco? |
+| Distribución del pipeline | ubicación del trabajo dentro de la CSC | `csc_distribution`, `fase_csc` | ¿En qué fase del pipeline se está acumulando la carga? |
+| Contexto de auditoría | señales explicativas que ayudan a entender el resultado del KPI | `performance_indicator_code`, `performance_indicator_label`, `delivery_signal`, `completion_label`, `delivery_compliance`, `days_late`, `is_rescheduled`, `period_anchor_date` | ¿Por qué esta tarea o este scorecard cayó en este bucket o resultado? |
+| Confianza de dato | salud del insumo y capacidad real de confiar en la métrica | cobertura de `due_date`, `completed_at`, `rpa_value`, rounds/review fields, `% fase_csc = otros`, `completed_at` en estados no terminales | ¿Esta métrica hoy merece confianza operativa o necesita warning/fallback? |
+
+Regla operativa:
+
+- las tasks de hardening deben priorizar al menos estas 4 categorías:
+  - `Calidad de entrega`
+  - `Cumplimiento de promesa`
+  - `Flujo operativo`
+  - `Confianza de dato`
+- los readers client-facing no deben mezclar categorías sin hacerlo explícito; por ejemplo, `OTD` no reemplaza por sí solo a la categoría `Carga abierta y deuda`
+
+#### A.5.4.1 Señales base que ICO ya recibe calculadas o normalizadas
+
+Estas señales viven en `greenhouse_conformed.delivery_tasks` y llegan al engine sin que `ICO` tenga que inventarlas:
+
+| Señal | Tipo | Uso principal |
+|---|---|---|
+| `rpa_value` | score por tarea | base de `rpa_avg`, `rpa_median`, FTR compuesto |
+| `client_change_round_final` | count | calidad / FTR |
+| `workflow_change_round` | count | calidad / FTR |
+| `open_frame_comments` | count | guardrail de revisión abierta |
+| `client_review_open` | bool | guardrail de revisión cliente |
+| `workflow_review_open` | bool | guardrail de revisión workflow |
+| `blocker_count` | count | contexto operativo / blocked workload |
+| `completion_label` | label | lectura humana del estado de entrega |
+| `delivery_compliance` | label | semántica operacional upstream |
+| `days_late` | duration | soporte de compliance / análisis de atraso |
+| `is_rescheduled` | bool | contexto de promesa movida |
+| `performance_indicator_code` | enum | preferencia upstream para `on_time`, `late_drop`, `carry_over`, `overdue_carried_forward` |
+| `performance_indicator_label` | label | lectura humana del bucket |
+| `task_status` | enum | estado canónico de tarea |
+| `due_date` | date | ancla primaria del período |
+| `original_due_date` | date | auditoría de reschedules |
+| `completed_at` | timestamp | cierre real de tarea |
+| `created_at` | timestamp | inicio / carry-over / cycle time |
+| `last_edited_time` | timestamp | frescura / stuck detection |
+| `synced_at` | timestamp | fallback temporal y auditoría |
+
+#### A.5.4.2 Señales derivadas por el engine a nivel tarea
+
+Estas señales se derivan en `ico_engine.v_tasks_enriched` antes de cualquier agregado:
+
+| Señal derivada | Cómo se calcula | Para qué se usa |
+|---|---|---|
+| `period_anchor_date` | `COALESCE(due_date, DATE(created_at), DATE(synced_at))` | pertenencia temporal / fallback |
+| `fase_csc` | mapping `task_status -> CSC` configurable por `space` con fallback default | distribución CSC y contexto de pipeline |
+| `cycle_time_days` | días entre creación y completion/now | `cycle_time_*`, variabilidad |
+| `hours_since_update` | horas desde `last_edited_time` | stuck detection / health |
+| `is_stuck` | 72h+ sin movimiento en estado activo | `stuck_asset_count`, `stuck_asset_pct` |
+| `delivery_signal` | `on_time`, `late`, `unknown` según `completed_at` vs `due_date` | contexto operacional auxiliar |
+| `has_co_assignees` | cardinalidad de `assignee_member_ids` | contexto de ownership / colaboración |
+
+#### A.5.4.3 Métricas agregadas canónicas calculadas por `buildMetricSelectSQL()`
+
+Estas son las métricas que el engine calcula/materializa como contrato troncal reusable:
+
+| Métrica | En qué consiste el cálculo | Qué pregunta responde | Columnas expuestas |
+|---|---|---|---|
+| `RpA` | promedio y mediana de `rpa_value > 0` en tareas completadas terminales del período | ¿Cuántas rondas de revisión estamos necesitando por activo realmente terminado? | `rpa_avg`, `rpa_median` |
+| `OTD` | `on_time / (on_time + late_drop + overdue)`; excluye `carry_over` y `overdue_carried_forward` del denominador | ¿Qué porcentaje de la promesa del período se entregó a tiempo? | `otd_pct` |
+| `FTR` | porcentaje de tareas completadas terminales con `client_change_round_final = 0` | ¿Qué proporción de activos salió bien a la primera, sin cambios finales del cliente? | `ftr_pct` |
+| `Cycle Time` | promedio, P50 y desviación de `cycle_time_days` en tareas completadas terminales | ¿Cuánto tarda realmente el flujo de producción en cerrar un activo y cuán predecible es ese tiempo? | `cycle_time_avg_days`, `cycle_time_p50_days`, `cycle_time_variance` |
+| `Throughput` | conteo absoluto de tareas clasificadas como `on_time` o `late_drop` | ¿Cuántos activos logró cerrar el equipo en el período? | `throughput_count` |
+| `Pipeline Velocity` | `throughput / active_tasks` | ¿Con qué velocidad el equipo convierte trabajo activo en trabajo efectivamente cerrado? | `pipeline_velocity` |
+| `Stuck Assets` | conteo absoluto y porcentaje de `is_stuck = TRUE` sobre tareas activas | ¿Cuánta carga operativa está detenida o sin movimiento anormalmente largo? | `stuck_asset_count`, `stuck_asset_pct` |
+
+Regla vigente de completitud:
+
+- una tarea solo cuenta como completada para `RpA`, `FTR`, `cycle time`, `throughput`, `on_time` y `late_drop` si:
+  - `completed_at IS NOT NULL`
+  - `task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')`
+
+#### A.5.4.4 Buckets y contexto operativo aditivo
+
+Además de los KPIs troncales, el engine materializa buckets auditables para scorecards y readers:
+
+| Bucket / contexto | En qué consiste el cálculo | Qué pregunta responde |
+|---|---|---|
+| `total_tasks` | total de tareas clasificadas por el filtro canónico del período | ¿Cuál es el universo total de trabajo que este scorecard está leyendo? |
+| `completed_tasks` | `on_time + late_drop` | ¿Cuánto trabajo del período ya se cerró efectivamente? |
+| `active_tasks` | `overdue + carry_over + overdue_carried_forward` | ¿Cuánto trabajo sigue abierto o pendiente dentro del scope del período? |
+| `on_time_count` | tareas completadas terminales a tiempo | ¿Cuántos entregables cumplieron la promesa del período? |
+| `late_drop_count` | tareas completadas terminales fuera de plazo | ¿Cuántos entregables sí cerraron, pero tarde? |
+| `overdue_count` | tareas del período ya vencidas y aún abiertas | ¿Cuánta promesa del período ya está incumplida hoy? |
+| `carry_over_count` | tareas creadas en el período con `due_date` posterior al cierre del período | ¿Cuánta carga nueva ya quedó comprometida hacia adelante? |
+| `overdue_carried_forward_count` | tareas vencidas de períodos previos que siguen abiertas | ¿Cuánta deuda vieja está contaminando la operación actual? |
+
+#### A.5.4.5 Métricas registradas en el catálogo del engine
+
+El `metric-registry.ts` expone hoy estas métricas como catálogo activo del producto:
+
+| ID / code | Label | Qué pregunta responde |
+|---|---|---|
+| `rpa` | Rendimiento por Activo | ¿Qué tan costosa en revisiones está siendo la producción cerrada? |
+| `otd_pct` | Entrega a tiempo | ¿Estamos cumpliendo la promesa operativa del período? |
+| `ftr_pct` | Primera entrega correcta | ¿Qué tanto sale bien a la primera sin retrabajo del cliente? |
+| `cycle_time` | Tiempo de ciclo | ¿Cuánto tarda un activo en recorrer el flujo completo? |
+| `cycle_time_variance` | Varianza del ciclo | ¿Qué tan predecible o caótico es ese tiempo de ciclo? |
+| `throughput` | Throughput | ¿Cuánto output real produjo el equipo en el período? |
+| `pipeline_velocity` | Velocidad del pipeline | ¿Qué tan rápido convierte backlog activo en output cerrado? |
+| `csc_distribution` | Distribución CSC | ¿En qué fase de la cadena creativa se está acumulando la carga? |
+| `stuck_assets` | Activos estancados | ¿Cuántos activos llevan demasiado tiempo sin movimiento? |
+| `stuck_asset_pct` | Porcentaje estancado | ¿Qué proporción de la carga activa está estancada? |
+| `overdue_carried_forward` | Overdue Carried Forward | ¿Cuánta deuda vencida heredada seguimos cargando al período actual? |
+
+#### A.5.4.6 Métricas y rollups adicionales de reportes materializados
+
+Estas no reemplazan el contrato troncal del engine, pero sí forman parte del serving/reporting construido sobre él:
+
+| Rollup | Dónde vive | En qué consiste el cálculo | Qué pregunta responde |
+|---|---|---|---|
+| `on_time_pct` | `ico_engine.performance_report_monthly` | porcentaje agregado de cumplimiento agency-level | ¿Cuál es el cumplimiento global del portfolio en el período? |
+| `efeonce_tasks_count` | `ico_engine.performance_report_monthly` | conteo del mix perteneciente a Efeonce | ¿Qué peso tiene Efeonce dentro del portfolio medido? |
+| `sky_tasks_count` | `ico_engine.performance_report_monthly` | conteo del mix perteneciente a Sky | ¿Qué peso tiene Sky dentro del portfolio medido? |
+| `task_mix_json` | `ico_engine.performance_report_monthly` | breakdown materializado del mix operativo | ¿Cómo se compone el volumen del período por segmento o fuente? |
+| `top_performer_otd_pct` | `ico_engine.performance_report_monthly` | OTD del top performer del período | ¿Quién lideró el cumplimiento de promesa? |
+| `top_performer_throughput_count` | `ico_engine.performance_report_monthly` | throughput del top performer | ¿Quién cerró mayor volumen real? |
+| `top_performer_rpa_avg` | `ico_engine.performance_report_monthly` | RpA del top performer | ¿Quién sostuvo mejor calidad/retrabajo dentro del top de ejecución? |
+| `top_performer_ftr_pct` | `ico_engine.performance_report_monthly` | FTR del top performer | ¿Quién logró mayor calidad a la primera entre los performers elegibles? |
+
+#### A.5.4.7 Fuente de verdad operativa
+
+Cuando exista tensión entre documentos:
+
+1. la semántica contractual vive en este documento
+2. el catálogo expuesto vive en `src/lib/ico-engine/metric-registry.ts`
+3. la fórmula efectiva runtime vive en `src/lib/ico-engine/shared.ts`
+4. los campos base y derivados por tarea viven en `src/lib/ico-engine/schema.ts`
+
+La arquitectura y el código deben mantenerse alineados; si una fórmula cambia en `shared.ts`, este inventario debe actualizarse en el mismo lote.
+
+### A.5.5 Benchmarks externos y estándar recomendado para Greenhouse (Delta 2026-04-03)
+
+No todas las métricas de `ICO` tienen un estándar externo maduro.
+
+- algunas sí tienen benchmarks cross-industry relativamente estables (`OTD`, `FTR` / `First-Time-Right` vía `FPY` o `first-time error-free`)
+- otras tienen solo referencias parciales en creative operations (`RpA`, approval rounds, approval cycle time)
+- otras son esencialmente internas y deben tratarse como métricas de gobierno operativo, no como KPIs “de mercado” (`pipeline_velocity`, `carry_over`, `overdue_carried_forward`, `stuck_assets`)
+
+La regla para Greenhouse debe ser:
+
+1. adoptar estándares externos cuando exista una definición madura y comparable
+2. declarar explícitamente cuándo un benchmark es solo un análogo
+3. no presentar como “estándar de industria” lo que en realidad es una policy interna del engine
+
+#### A.5.5.1 First Time Right (FTR)
+
+**Análogo externo más cercano**
+
+- `First Pass Yield (FPY)` / `Right First Time`
+- `first-time error-free`
+
+**Qué dicen las referencias externas**
+
+- `APQC` define una actividad `first-time error-free` como una actividad finalizada sin ningún esfuerzo posterior para ajustes o correcciones.
+- `APQC` expone además una mediana de `90%` para `% of annual sales orders processed first time error free`.
+- `IndustryWeek` reporta para manufactura:
+  - mediana de `95.5%` en `current first-pass yield`
+  - `97.0%` en `world-class manufacturers`
+  - `99.0%` en `top performers`
+
+**Interpretación para Greenhouse**
+
+`FTR` en Greenhouse no es idéntico a `FPY` industrial:
+
+- el output creativo es más subjetivo
+- hay más variación por stakeholder
+- el retrabajo puede ser estratégicamente legítimo, no solo defecto
+
+Por eso los benchmarks manufactureros sirven como **techo aspiracional**, no como target literal.
+
+**Estándar recomendado Greenhouse**
+
+| Banda | FTR recomendado | Lectura |
+|---|---|---|
+| `world-class` | `>= 85%` | operación creativa excepcionalmente clara y bien alineada |
+| `strong` | `70% - 84.9%` | buen estándar de trabajo para creative ops maduras |
+| `attention` | `60% - 69.9%` | exceso de retrabajo o definición débil |
+| `critical` | `< 60%` | retrabajo estructuralmente alto |
+
+**Decisión**
+
+- la banda actual del engine (`80/60`) es exigente pero razonable para Greenhouse
+- no conviene subirla a `95%+` porque eso importaría un estándar industrial que no refleja bien trabajo creativo iterativo
+
+#### A.5.5.2 RpA (Rounds per Asset)
+
+**Estándar externo**
+
+- no existe un estándar cross-industry maduro y universal equivalente a `SCOR` o `APQC`
+
+**Mejor referencia disponible**
+
+- benchmarks de creative review / approval workflows
+- `visualloop` analizó `523` proyectos en `47` equipos
+- para `marketing campaigns`, reporta:
+  - `top quartile`: `1-2` rounds
+  - `median`: `3` rounds
+  - `bottom quartile`: `5+` rounds
+- el mismo estudio muestra que agencias promedian `25%` más rounds que equipos in-house comparables
+
+**Interpretación para Greenhouse**
+
+`RpA` en Greenhouse es un proxy de retrabajo por activo terminado.
+
+- es cercano al problema de “revision rounds”
+- pero no es idéntico a todos los estudios externos, porque depende de cómo se modelen `client_change_round_final`, `workflow_change_round` y `rpa_value`
+
+**Estándar recomendado Greenhouse**
+
+| Banda | RpA recomendado | Lectura |
+|---|---|---|
+| `world-class` | `<= 2.0` | retrabajo bajo, dirección clara |
+| `strong` | `> 2.0 y <= 3.0` | nivel aceptable / cercano al benchmark creativo medio |
+| `attention` | `> 3.0 y <= 4.0` | demasiadas idas y vueltas |
+| `critical` | `> 4.0` | proceso roto o brief/approval governance débil |
+
+**Decisión**
+
+- el threshold actual del engine (`<=1.5` óptimo, `<=2.5` atención, `>2.5` crítico) es más estricto que el benchmark externo disponible
+- si Greenhouse quiere una postura premium, esa severidad es defendible
+- si quiere alinearse más al benchmark creativo observado, la frontera roja debería moverse más cerca de `> 3.0`
+
+#### A.5.5.3 On-Time Delivery (OTD)
+
+**Estándar externo más cercano**
+
+- `SCOR`: `Delivery Performance to Customer Commit Date`
+- `% orders delivered on the customer’s originally committed date`
+
+**Qué dicen las referencias externas**
+
+- `SCOR` define `on-time` contra la fecha compromiso acordada con el cliente
+- `IndustryWeek` reporta para manufactura una mediana de `96%` de on-time delivery
+- `IndustryWeek` usa `98%+` on-time delivery como umbral de top performers
+- `APQC` reporta `88%` de mediana para `Perfect Order Performance`, que es una métrica más dura que incluye on-time + completeness + damage-free + accurate documentation
+
+**Interpretación para Greenhouse**
+
+`OTD` sí tiene una familia de benchmarks mucho más madura que `RpA`.
+
+Pero Greenhouse debe recordar que:
+
+- el `OTD` actual no es `perfect order`
+- no incluye documentación, condition ni completeness tipo supply-chain
+- además hoy excluye `carry_over` y `overdue_carried_forward` del denominador
+
+**Estándar recomendado Greenhouse**
+
+| Banda | OTD recomendado | Lectura |
+|---|---|---|
+| `world-class` | `>= 98%` | cumplimiento excepcional |
+| `strong` | `95% - 97.9%` | buen estándar enterprise |
+| `attention` | `90% - 94.9%` | promesa bajo presión |
+| `critical` | `< 90%` | incumplimiento material |
+
+**Decisión**
+
+- la banda actual del engine (`>= 90%` como óptimo) es laxa frente a referencias de delivery maduras
+- cuando la confianza del insumo esté saneada, Greenhouse debería endurecer sus thresholds de `OTD`
+
+#### A.5.5.4 Cycle Time
+
+**Estándar externo**
+
+- no existe un benchmark universal útil sin segmentar por tipo de asset/proyecto
+
+**Referencia parcial disponible**
+
+- `visualloop` reporta `time to approval` por tipo de trabajo:
+  - `marketing campaign`: mediana `8 días`, top quartile `4 días`
+  - `landing page`: mediana `10 días`, top quartile `5 días`
+  - `product UI feature`: mediana `2 semanas`, top quartile `1 semana`
+
+**Interpretación para Greenhouse**
+
+`Cycle Time` debe benchmarkearse:
+
+- por asset type
+- por service line
+- por complejidad
+
+No conviene publicar un único estándar universal del portal.
+
+**Estándar recomendado Greenhouse**
+
+- mantenerlo como benchmark interno segmentado por `service` / `asset family`
+- usar percentiles internos y deltas históricos, no un solo número global
+
+#### A.5.5.5 Throughput y Pipeline Velocity
+
+**Estándar externo**
+
+- no existe un benchmark externo fuerte y portable sin normalizar por:
+  - team size
+  - asset complexity
+  - mix de servicios
+  - ventana temporal
+
+**Estándar recomendado Greenhouse**
+
+- tratarlos como métricas internas de capacidad/flujo
+- compararlos por:
+  - `space`
+  - `service`
+  - `squad`
+  - trailing 3-month baseline
+
+No deben documentarse como “estándar de industria”.
+
+#### A.5.5.6 Stuck Assets, Carry-Over y Overdue Carried Forward
+
+**Estándar externo**
+
+- no existe benchmark cross-industry robusto y portable para estas métricas tal como Greenhouse las define
+
+**Estándar recomendado Greenhouse**
+
+- tratarlas como métricas internas de control operacional
+- el estándar debe ser policy-driven:
+  - `Stuck Assets`: ideal cercano a `0`; tolerancia depende de volumen y fase
+  - `Carry-Over`: no es necesariamente malo; debe interpretarse junto con capacidad y planning
+  - `Overdue Carried Forward`: sí debe tender a `0` y usarse como deuda estructural
+
+#### A.5.5.7 Síntesis ejecutiva
+
+| Métrica | ¿Existe estándar externo maduro? | Tipo de estándar recomendado |
+|---|---|---|
+| `FTR` | `Sí, por análogo (FPY / first-time error-free)` | externo adaptado a creative ops |
+| `RpA` | `No universal; sí benchmark parcial creativo` | benchmark creativo adaptado + policy interna |
+| `OTD` | `Sí` | benchmark externo fuerte |
+| `Cycle Time` | `Parcial` | benchmark segmentado por asset/service |
+| `Throughput` | `No portable` | estándar interno relativo |
+| `Pipeline Velocity` | `No portable` | estándar interno relativo |
+| `Stuck Assets` | `No` | estándar interno de control |
+| `Carry-Over` | `No` | estándar interno de planning |
+| `Overdue Carried Forward` | `No` | estándar interno de deuda operacional |
+
+#### A.5.5.8 Fuentes externas usadas
+
+- SCOR Supply Chain Council / APICS — `Perfect Order Fulfillment` y `Delivery Performance to Customer Commit Date`  
+  https://economia.uniroma2.it/public/ba/files/SCOR11PDF_%281%29.pdf
+- APQC — `Percentage of annual sales orders processed first time error free`  
+  https://www.apqc.org/what-we-do/benchmarking/open-standards-benchmarking/measures/percentage-annual-sales-orders
+- APQC — `Perfect order performance`  
+  https://www.apqc.org/resources/benchmarking/open-standards-benchmarking/measures/perfect-order-performance
+- APQC Open Standards Benchmarking Glossary — definiciones de `Finished First-Pass Quality Yield` y `first-time error-free`  
+  https://www.apqc.org/sites/default/files/files/Glossary_5-13.pdf
+- IndustryWeek 2023 Statistical Profile — benchmarks de `first-pass yield` y `on-time delivery`  
+  https://img.industryweek.com/files/base/ebm/industryweek/document/2023/12/6581e0cffdf988001e28684c-2023statprofilefinal.pdf
+- IndustryWeek Quality Tables — world-class / top performer thresholds para `first-pass yield` y delivery  
+  https://www.industryweek.com/leadership/companies-executives/article/21956429/quality-tables
+- visualloop — creative feedback benchmarks (`47` teams, `523` projects)  
+  https://visualloop.io/blog/design-feedback-benchmarks/
 
 ### A.6 TypeScript: Sin `any`
 

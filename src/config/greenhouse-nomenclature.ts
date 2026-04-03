@@ -54,8 +54,8 @@ export const GH_AGENCY_NAV = {
 
 export const GH_FINANCE_NAV = {
   dashboard: { label: 'Resumen', subtitle: 'Vista consolidada' },
-  income: { label: 'Ingresos', subtitle: 'Facturación y cobros' },
-  expenses: { label: 'Egresos', subtitle: 'Pagos y obligaciones' },
+  income: { label: 'Ventas', subtitle: 'Documentos de venta, devengo y cobros' },
+  expenses: { label: 'Compras', subtitle: 'Documentos de compra, obligaciones y pagos' },
   suppliers: { label: 'Proveedores', subtitle: 'Directorio de proveedores' },
   reconciliation: { label: 'Conciliación', subtitle: 'Conciliación bancaria' },
   intelligence: { label: 'Economía', subtitle: 'Cierre de período y P&L operativo' },
@@ -64,7 +64,7 @@ export const GH_FINANCE_NAV = {
   hes: { label: 'HES', subtitle: 'Hojas de entrada de servicio' },
   clients: { label: 'Clientes', subtitle: 'Maestro de clientes y coberturas' },
   costAllocations: { label: 'Asignaciones', subtitle: 'Reparto e imputación de costos' },
-  flow: { label: 'Flujo', subtitle: 'Ingresos, egresos y cuentas' },
+  flow: { label: 'Caja', subtitle: 'Cobros, pagos y cuentas' },
   documents: { label: 'Documentos', subtitle: 'Cotizaciones, OC, HES y conciliación' },
   analytics: { label: 'Inteligencia', subtitle: 'Economía y asignaciones de costos' }
 } as const

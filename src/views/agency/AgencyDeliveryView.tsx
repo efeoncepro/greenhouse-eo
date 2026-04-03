@@ -1,6 +1,8 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+
+import dynamic from 'next/dynamic'
 
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
@@ -11,6 +13,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
+import { useTheme } from '@mui/material/styles'
 
 import {
   createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, useReactTable
@@ -20,9 +23,10 @@ import classnames from 'classnames'
 
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
-import CustomerStats from '@components/card-statistics/CustomerStats'
 
 import tableStyles from '@core/styles/table.module.css'
+
+const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
 // ── Types ──
 
@@ -33,6 +37,7 @@ interface SpaceHealth {
   otdPct: number | null
   assetsActivos: number
   projectCount: number
+  totalTasks?: number
 }
 
 interface PulseKpis {
@@ -44,11 +49,23 @@ interface PulseKpis {
   totalProjects: number
 }
 
+interface TrendMonth {
+  year: number
+  month: number
+  otdPct: number | null
+  rpaAvg: number | null
+  ftrPct: number | null
+  totalTasks: number
+  completedTasks: number
+  stuckAssetCount: number
+}
+
 // ── Helpers ──
 
 type SemaphoreColor = 'success' | 'warning' | 'error'
 
-// RPA is a ratio (1.0-3.0+), lower is better. NOT a percentage.
+const MONTH_ABBR = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+
 const rpaColor = (v: number | null | undefined): { color: SemaphoreColor; label: string } => {
   if (v == null) return { color: 'secondary' as SemaphoreColor, label: '—' }
   if (v <= 1.5) return { color: 'success', label: 'Óptimo' }
@@ -57,7 +74,6 @@ const rpaColor = (v: number | null | undefined): { color: SemaphoreColor; label:
   return { color: 'error', label: 'Crítico' }
 }
 
-// OTD/FTR are percentages (0-100), higher is better
 const pctSemaphore = (v: number | null | undefined): { color: SemaphoreColor; label: string } => {
   if (v == null) return { color: 'secondary' as SemaphoreColor, label: '—' }
   if (v >= 80) return { color: 'success', label: 'Óptimo' }
@@ -69,7 +85,35 @@ const pctSemaphore = (v: number | null | undefined): { color: SemaphoreColor; la
 const fmtRpa = (v: number | null | undefined) => v != null ? v.toFixed(1) : '—'
 const fmtPct = (v: number | null | undefined) => v != null ? `${Math.round(v)}%` : '—'
 
-// ── Delivery table columns ──
+const trendDelta = (trend: TrendMonth[], field: 'otdPct' | 'rpaAvg' | 'ftrPct'): {
+  text: string
+  number: string
+  direction: 'positive' | 'negative' | 'neutral'
+  prevLabel: string
+} | null => {
+  if (trend.length < 2) return null
+
+  const current = trend[trend.length - 1][field]
+  const previous = trend[trend.length - 2][field]
+
+  if (current == null || previous == null) return null
+
+  const delta = Math.round((current - previous) * 10) / 10
+  const prevLabel = MONTH_ABBR[(trend[trend.length - 2].month - 1) % 12]
+
+  // For RPA, lower is better — invert direction
+  const isInverted = field === 'rpaAvg'
+  const direction = delta === 0 ? 'neutral' as const : isInverted ? (delta < 0 ? 'positive' as const : 'negative' as const) : (delta > 0 ? 'positive' as const : 'negative' as const)
+
+  return {
+    text: `${delta >= 0 ? '+' : ''}${delta}pp vs ${prevLabel}`,
+    number: `${Math.abs(delta)}pp`,
+    direction,
+    prevLabel
+  }
+}
+
+// ── Table columns ──
 
 const spaceColumnHelper = createColumnHelper<SpaceHealth>()
 
@@ -77,16 +121,22 @@ const spaceColumnHelper = createColumnHelper<SpaceHealth>()
 const spaceColumns: ColumnDef<SpaceHealth, any>[] = [
   spaceColumnHelper.accessor('clientName', {
     header: 'Space',
-    cell: ({ getValue }) => <Typography variant='body2' fontWeight={600}>{getValue()}</Typography>
-  }),
-  spaceColumnHelper.accessor('rpaAvg', {
-    header: 'RPA',
-    cell: ({ getValue }) => <CustomChip round='true' size='small' variant='tonal' color={rpaColor(getValue()).color} label={fmtRpa(getValue())} />,
-    meta: { align: 'center' }
+    cell: ({ getValue }) => (
+      <Typography variant='body2' fontWeight={600}>{getValue()}</Typography>
+    )
   }),
   spaceColumnHelper.accessor('otdPct', {
     header: 'OTD',
-    cell: ({ getValue }) => <CustomChip round='true' size='small' variant='tonal' color={pctSemaphore(getValue()).color} label={fmtPct(getValue())} />,
+    cell: ({ getValue }) => (
+      <CustomChip round='true' size='small' variant='tonal' color={pctSemaphore(getValue()).color} label={fmtPct(getValue())} />
+    ),
+    meta: { align: 'center' }
+  }),
+  spaceColumnHelper.accessor('rpaAvg', {
+    header: 'RpA',
+    cell: ({ getValue }) => (
+      <CustomChip round='true' size='small' variant='tonal' color={rpaColor(getValue()).color} label={fmtRpa(getValue())} />
+    ),
     meta: { align: 'center' }
   }),
   spaceColumnHelper.accessor('projectCount', {
@@ -97,15 +147,15 @@ const spaceColumns: ColumnDef<SpaceHealth, any>[] = [
     header: 'Stuck',
     cell: ({ getValue }) => getValue() > 0
       ? <CustomChip round='true' size='small' variant='tonal' color='error' label={String(getValue())} />
-      : '0',
+      : <Typography variant='body2' color='text.secondary'>0</Typography>,
     meta: { align: 'right' }
   }),
   {
     id: 'health',
     header: 'Health',
-    accessorFn: (row: SpaceHealth) => row.rpaAvg,
+    accessorFn: (row: SpaceHealth) => row.otdPct,
     cell: ({ row }: { row: { original: SpaceHealth } }) => {
-      const h = rpaColor(row.original.rpaAvg)
+      const h = row.original.otdPct != null ? pctSemaphore(row.original.otdPct) : rpaColor(row.original.rpaAvg)
 
       return <CustomChip round='true' size='small' variant='tonal' color={h.color} label={h.label} />
     },
@@ -116,10 +166,12 @@ const spaceColumns: ColumnDef<SpaceHealth, any>[] = [
 // ── Component ──
 
 const AgencyDeliveryView = () => {
+  const theme = useTheme()
   const [kpis, setKpis] = useState<PulseKpis | null>(null)
   const [spaces, setSpaces] = useState<SpaceHealth[]>([])
+  const [trend, setTrend] = useState<TrendMonth[]>([])
   const [loading, setLoading] = useState(true)
-  const [spaceSorting, setSpaceSorting] = useState<SortingState>([{ id: 'rpaAvg', desc: false }])
+  const [spaceSorting, setSpaceSorting] = useState<SortingState>([{ id: 'otdPct', desc: false }])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -134,12 +186,12 @@ const AgencyDeliveryView = () => {
         const d = await pulseRes.value.json()
 
         setKpis(d.kpis ?? null)
+        setTrend(d.deliveryTrend ?? [])
       }
 
       if (spacesRes.status === 'fulfilled' && spacesRes.value.ok) {
         const d = await spacesRes.value.json()
 
-        // Filter out internal spaces for delivery view
         const deliverySpaces = (d.spaces ?? []).filter((s: SpaceHealth & { isInternal?: boolean }) => !s.isInternal)
 
         setSpaces(deliverySpaces)
@@ -160,61 +212,270 @@ const AgencyDeliveryView = () => {
     getSortedRowModel: getSortedRowModel()
   })
 
+  // Health distribution for donut chart
+  const healthDistribution = useMemo(() => {
+    let optimo = 0, atencion = 0, critico = 0, sinDatos = 0
+
+    for (const s of spaces) {
+      const h = s.otdPct != null ? pctSemaphore(s.otdPct) : rpaColor(s.rpaAvg)
+
+      if (h.color === 'success') optimo++
+      else if (h.color === 'warning') atencion++
+      else if (h.color === 'error') critico++
+      else sinDatos++
+    }
+
+    return { optimo, atencion, critico, sinDatos }
+  }, [spaces])
+
+  // OTD sparkline data
+  const otdSparkline = useMemo(() => trend.map(t => t.otdPct ?? 0), [trend])
+
   if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress /></Box>
 
   const rpa = kpis?.rpaGlobal ?? null
   const otd = kpis?.otdPctGlobal ?? null
-  const stuck = kpis?.assetsActivos ?? 0
-  const totalProjects = kpis?.totalProjects ?? 0
+  const activeAssets = kpis?.assetsActivos ?? 0
   const feedback = kpis?.feedbackPendiente ?? 0
-  const rpaS = rpaColor(rpa)
+  const totalProjects = kpis?.totalProjects ?? 0
   const otdS = pctSemaphore(otd)
+  const rpaS = rpaColor(rpa)
+  const spacesWithActiveAssets = spaces.filter(s => s.assetsActivos > 0).length
+  const latestCompleted = trend.length > 0 ? trend[trend.length - 1].completedTasks : 0
 
-  // Spaces count for display
-  const spaceCount = spaces.length
+  // Donut chart config
+  const donutSeries = [healthDistribution.optimo, healthDistribution.atencion, healthDistribution.critico, healthDistribution.sinDatos]
+  const donutColors = [theme.palette.success.main, theme.palette.warning.main, theme.palette.error.main, theme.palette.secondary.main]
+  const donutLabels = ['Óptimo', 'Atención', 'Crítico', 'Sin datos']
+
+  const donutOptions = {
+    chart: { sparkline: { enabled: true } },
+    labels: donutLabels,
+    colors: donutColors,
+    stroke: { width: 0 },
+    legend: { show: false },
+    dataLabels: { enabled: false },
+    plotOptions: {
+      pie: {
+        donut: {
+          size: '70%',
+          labels: {
+            show: true,
+            name: { fontSize: '0.875rem' },
+            value: { fontSize: '1.25rem', fontWeight: 600 },
+            total: {
+              show: true,
+              label: 'Spaces',
+              fontSize: '0.8rem',
+              formatter: () => String(spaces.length)
+            }
+          }
+        }
+      }
+    }
+  }
 
   return (
     <Grid container spacing={6}>
-      {/* Header */}
+
+      {/* ─── SECTION 1: Pulso Operativo ─── */}
       <Grid size={{ xs: 12 }}>
-        <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-          <CardHeader
-            title='Delivery'
-            subheader='ICO, sprints y producción cross-space'
-            avatar={<Avatar variant='rounded' sx={{ bgcolor: 'success.lightOpacity' }}><i className='tabler-list-check' style={{ fontSize: 22, color: 'var(--mui-palette-success-main)' }} /></Avatar>}
-          />
+        <Typography variant='h5' fontWeight={600}>Pulso Operativo</Typography>
+        <Typography variant='body2' color='text.secondary'>Salud global de la operación Delivery</Typography>
+      </Grid>
+
+      {/* OTD Hero — bar chart + KPI + trend chip (BarChartRevenueGrowth pattern) */}
+      <Grid size={{ xs: 12, md: 6 }}>
+        <Card sx={{ height: '100%' }}>
+          <CardContent className='flex justify-between gap-4'>
+            <div className='flex flex-col justify-between'>
+              <div className='flex flex-col gap-y-1'>
+                <Typography variant='body2' color='text.secondary'>Entrega a tiempo</Typography>
+                <Typography variant='h5'>OTD</Typography>
+              </div>
+              <div className='flex flex-col gap-y-2 items-start'>
+                <Typography variant='h3'>{fmtPct(otd)}</Typography>
+                {(() => {
+                  const d = trendDelta(trend, 'otdPct')
+
+                  return d ? (
+                    <CustomChip round='true' variant='tonal' size='small' color={d.direction === 'positive' ? 'success' : d.direction === 'negative' ? 'error' : 'secondary'} label={d.text} />
+                  ) : (
+                    <CustomChip round='true' variant='tonal' size='small' color={otdS.color} label={otdS.label} />
+                  )
+                })()}
+              </div>
+            </div>
+            {otdSparkline.length > 0 && (
+              <AppReactApexCharts
+                type='bar'
+                width={200}
+                height={172}
+                series={[{ data: otdSparkline }]}
+                options={{
+                  chart: { parentHeightOffset: 0, toolbar: { show: false } },
+                  plotOptions: { bar: { borderRadius: 4, distributed: true, columnWidth: '48%' } },
+                  legend: { show: false },
+                  tooltip: { enabled: false },
+                  dataLabels: { enabled: false },
+                  colors: otdSparkline.map((v, i) =>
+                    i === otdSparkline.length - 1
+                      ? `var(--mui-palette-${otdS.color}-main)`
+                      : `var(--mui-palette-${otdS.color}-lightOpacity)`
+                  ),
+                  states: { hover: { filter: { type: 'none' } }, active: { filter: { type: 'none' } } },
+                  grid: { show: false, padding: { top: -15, left: 0, right: 0, bottom: -5 } },
+                  xaxis: {
+                    categories: trend.map(t => MONTH_ABBR[(t.month - 1) % 12]),
+                    axisTicks: { show: false },
+                    axisBorder: { show: false },
+                    labels: { style: { colors: 'var(--mui-palette-text-disabled)', fontFamily: theme.typography.fontFamily, fontSize: theme.typography.body2.fontSize as string } }
+                  },
+                  yaxis: { show: false }
+                }}
+              />
+            )}
+          </CardContent>
         </Card>
       </Grid>
 
-      {/* KPI Row 1 */}
+      {/* RpA + FTR — rich HorizontalWithSubtitle with trend/status/footer */}
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <HorizontalWithSubtitle title='Proyectos activos' stats={String(totalProjects)} avatarIcon='tabler-folders' avatarColor='success' subtitle={`${spaceCount} Spaces`} />
+        {(() => {
+          const d = trendDelta(trend, 'rpaAvg')
+
+          return (
+            <HorizontalWithSubtitle
+              title='RpA promedio'
+              stats={fmtRpa(rpa)}
+              avatarIcon='tabler-chart-line'
+              avatarColor={rpaS.color}
+              trend={d?.direction}
+              trendNumber={d?.number}
+              subtitle={d ? `${d.text}` : 'Revisiones por activo'}
+              statusLabel={rpaS.label}
+              statusColor={rpaS.color}
+              statusIcon={rpaS.color === 'success' ? 'tabler-circle-check' : rpaS.color === 'error' ? 'tabler-alert-circle' : 'tabler-alert-triangle'}
+              footer='Menos es mejor. Meta: ≤1.5'
+            />
+          )
+        })()}
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <HorizontalWithSubtitle title='Feedback pendiente' stats={String(feedback)} avatarIcon='tabler-message-dots' avatarColor='info' subtitle='Revisiones abiertas' />
-      </Grid>
-      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <HorizontalWithSubtitle title='RPA promedio' stats={fmtRpa(rpa)} avatarIcon='tabler-chart-line' avatarColor={rpaS.color} subtitle={rpaS.label} />
-      </Grid>
-      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <HorizontalWithSubtitle title='OTD' stats={fmtPct(otd)} avatarIcon='tabler-clock-check' avatarColor={otdS.color} subtitle={otdS.label} />
+        {(() => {
+          const ftrVal = trend.length > 0 ? trend[trend.length - 1].ftrPct : null
+          const ftrS = pctSemaphore(ftrVal)
+          const d = trendDelta(trend, 'ftrPct')
+
+          return (
+            <HorizontalWithSubtitle
+              title='FTR'
+              stats={fmtPct(ftrVal)}
+              avatarIcon='tabler-target-arrow'
+              avatarColor={ftrS.color}
+              trend={d?.direction}
+              trendNumber={d?.number}
+              subtitle={d ? `${d.text}` : 'Primera entrega correcta'}
+              statusLabel={ftrS.label}
+              statusColor={ftrS.color}
+              statusIcon={ftrS.color === 'success' ? 'tabler-circle-check' : ftrS.color === 'error' ? 'tabler-alert-circle' : 'tabler-alert-triangle'}
+              footer='Sin rondas de cambio. Meta: ≥80%'
+            />
+          )
+        })()}
       </Grid>
 
-      {/* KPI Row 2 */}
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <HorizontalWithSubtitle title='Stuck assets' stats={String(stuck)} avatarIcon='tabler-alert-triangle' avatarColor={stuck > 0 ? 'error' : 'success'} subtitle={stuck > 0 ? 'Requieren atención' : 'Sin bloqueos'} />
-      </Grid>
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <HorizontalWithSubtitle title='Spaces totales' stats={String(spaces.length)} avatarIcon='tabler-building' avatarColor='primary' subtitle='Con delivery activo' />
+      {/* ─── SECTION 2: Atención Requerida ─── */}
+      <Grid size={{ xs: 12 }}>
+        <Typography variant='h5' fontWeight={600} sx={{ mt: 2 }}>Atención Requerida</Typography>
+        <Typography variant='body2' color='text.secondary'>Items que necesitan acción inmediata</Typography>
       </Grid>
 
-      {/* Projects Table + Sprint Status */}
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+        <Card
+          elevation={0}
+          sx={{
+            borderLeft: '4px solid',
+            borderLeftColor: activeAssets > 0 ? 'warning.main' : 'success.main',
+            border: t => `1px solid ${t.palette.divider}`,
+            borderLeftWidth: '4px'
+          }}
+        >
+          <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 3, py: 3 }}>
+            <Avatar variant='rounded' sx={{ bgcolor: activeAssets > 0 ? 'warning.lightOpacity' : 'success.lightOpacity' }}>
+              <i className='tabler-list-check' style={{ fontSize: 22, color: activeAssets > 0 ? theme.palette.warning.main : theme.palette.success.main }} />
+            </Avatar>
+            <Box>
+              <Typography variant='h5' fontWeight={600}>{activeAssets}</Typography>
+              <Typography variant='body2' color='text.secondary'>Assets activos</Typography>
+              <Typography variant='caption' color='text.secondary'>
+                {`${spacesWithActiveAssets} spaces con tareas activas`}
+              </Typography>
+            </Box>
+          </CardContent>
+        </Card>
+      </Grid>
+
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+        <Card
+          elevation={0}
+          sx={{
+            borderLeft: '4px solid',
+            borderLeftColor: feedback > 0 ? 'warning.main' : 'success.main',
+            border: t => `1px solid ${t.palette.divider}`,
+            borderLeftWidth: '4px'
+          }}
+        >
+          <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 3, py: 3 }}>
+            <Avatar variant='rounded' sx={{ bgcolor: feedback > 0 ? 'warning.lightOpacity' : 'success.lightOpacity' }}>
+              <i className='tabler-message-dots' style={{ fontSize: 22, color: feedback > 0 ? theme.palette.warning.main : theme.palette.success.main }} />
+            </Avatar>
+            <Box>
+              <Typography variant='h5' fontWeight={600}>{feedback}</Typography>
+              <Typography variant='body2' color='text.secondary'>Feedback pendiente</Typography>
+              <Typography variant='caption' color='text.secondary'>Revisiones abiertas</Typography>
+            </Box>
+          </CardContent>
+        </Card>
+      </Grid>
+
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+        <Card
+          elevation={0}
+          sx={{
+            borderLeft: '4px solid',
+            borderLeftColor: 'info.main',
+            border: t => `1px solid ${t.palette.divider}`,
+            borderLeftWidth: '4px'
+          }}
+        >
+          <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 3, py: 3 }}>
+            <Avatar variant='rounded' sx={{ bgcolor: 'info.lightOpacity' }}>
+              <i className='tabler-folders' style={{ fontSize: 22, color: theme.palette.info.main }} />
+            </Avatar>
+            <Box>
+              <Typography variant='h5' fontWeight={600}>{totalProjects}</Typography>
+              <Typography variant='body2' color='text.secondary'>Proyectos activos</Typography>
+              <Typography variant='caption' color='text.secondary'>
+                {`${spaces.length} spaces · ${latestCompleted} completados este mes`}
+              </Typography>
+            </Box>
+          </CardContent>
+        </Card>
+      </Grid>
+
+      {/* ─── SECTION 3: Salud por Space ─── */}
+      <Grid size={{ xs: 12 }}>
+        <Typography variant='h5' fontWeight={600} sx={{ mt: 2 }}>Salud por Space</Typography>
+        <Typography variant='body2' color='text.secondary'>Ordenados por OTD para identificar dónde intervenir</Typography>
+      </Grid>
+
       <Grid size={{ xs: 12, md: 8 }}>
         <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
           <CardHeader
-            title='Proyectos por Space'
-            subheader={`${spaces.length} Spaces con delivery activo`}
-            avatar={<Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}><i className='tabler-folder' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} /></Avatar>}
+            title='Spaces'
+            subheader={`${spaces.length} con delivery activo`}
+            avatar={<Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}><i className='tabler-building' style={{ fontSize: 22, color: theme.palette.primary.main }} /></Avatar>}
           />
           <Divider />
           {spaces.length === 0 ? (
@@ -228,7 +489,12 @@ const AgencyDeliveryView = () => {
                   {spaceTable.getHeaderGroups().map(hg => (
                     <tr key={hg.id}>
                       {hg.headers.map(header => (
-                        <th key={header.id} onClick={header.column.getToggleSortingHandler()} className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })} style={{ textAlign: (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
+                        <th
+                          key={header.id}
+                          onClick={header.column.getToggleSortingHandler()}
+                          className={classnames({ 'cursor-pointer select-none': header.column.getCanSort() })}
+                          style={{ textAlign: (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : (header.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}
+                        >
                           {flexRender(header.column.columnDef.header, header.getContext())}
                           {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
                         </th>
@@ -240,7 +506,10 @@ const AgencyDeliveryView = () => {
                   {spaceTable.getRowModel().rows.map(row => (
                     <tr key={row.id}>
                       {row.getVisibleCells().map(cell => (
-                        <td key={cell.id} style={{ textAlign: (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}>
+                        <td
+                          key={cell.id}
+                          style={{ textAlign: (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'right' ? 'right' : (cell.column.columnDef.meta as { align?: string } | undefined)?.align === 'center' ? 'center' : 'left' }}
+                        >
                           {flexRender(cell.column.columnDef.cell, cell.getContext())}
                         </td>
                       ))}
@@ -254,32 +523,34 @@ const AgencyDeliveryView = () => {
       </Grid>
 
       <Grid size={{ xs: 12, md: 4 }}>
-        <Grid container spacing={6}>
-          <Grid size={{ xs: 12 }}>
-            <CustomerStats title='Spaces activos' avatarIcon='tabler-building' color='primary' description='Con delivery y proyectos configurados' stats={String(spaces.length)} content='Spaces' />
-          </Grid>
-          <Grid size={{ xs: 12 }}>
-            <CustomerStats title='Feedback pendiente' avatarIcon='tabler-message-dots' color={feedback > 0 ? 'warning' : 'success'} description={feedback > 0 ? 'Revisiones que necesitan respuesta' : 'Todo al día'} stats={String(feedback)} content='items' />
-          </Grid>
-          <Grid size={{ xs: 12 }}>
-            <CustomerStats title='RPA global' avatarIcon='tabler-chart-line' color={rpaS.color} description='Rendimiento promedio de la agencia' chipLabel={rpaS.label} />
-          </Grid>
-        </Grid>
+        <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+          <CardHeader title='Distribución Health' />
+          <Divider />
+          <CardContent sx={{ display: 'flex', justifyContent: 'center' }}>
+            {spaces.length > 0 ? (
+              <AppReactApexCharts type='donut' height={230} width={230} options={donutOptions} series={donutSeries} />
+            ) : (
+              <Typography variant='body2' color='text.secondary'>Sin datos</Typography>
+            )}
+          </CardContent>
+          <CardContent sx={{ pt: 0 }}>
+            {[
+              { label: 'Óptimo', count: healthDistribution.optimo, color: 'success' as const },
+              { label: 'Atención', count: healthDistribution.atencion, color: 'warning' as const },
+              { label: 'Crítico', count: healthDistribution.critico, color: 'error' as const },
+              { label: 'Sin datos', count: healthDistribution.sinDatos, color: 'secondary' as const }
+            ].filter(d => d.count > 0).map(d => (
+              <Box key={d.label} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                  <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: `${d.color}.main` }} />
+                  <Typography variant='body2'>{d.label}</Typography>
+                </Box>
+                <Typography variant='body2' fontWeight={600}>{d.count}</Typography>
+              </Box>
+            ))}
+          </CardContent>
+        </Card>
       </Grid>
-
-      {/* Stuck Assets Alert */}
-      {stuck > 0 && (
-        <Grid size={{ xs: 12 }}>
-          <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}`, borderLeft: '4px solid', borderLeftColor: 'error.main' }}>
-            <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <i className='tabler-alert-triangle' style={{ fontSize: 24, color: 'var(--mui-palette-error-main)' }} />
-              <Typography variant='body1'>
-                <strong>{stuck} assets atascados</strong> requieren atención — revisa los Spaces marcados en rojo
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      )}
     </Grid>
   )
 }

@@ -1,5 +1,15 @@
 # TASK-188 - Native Integrations Layer: Platform Governance, Runtime Contracts & Shared Operating Model
 
+## Delta 2026-04-03 — Integrations feeding ICO must preserve the metric contract
+
+- Cualquier upstream que alimente `ICO` bajo esta lane debe alinearse al contrato maestro `docs/architecture/Contrato_Metricas_ICO_v1.md`.
+- Regla nueva:
+  - la layer de integraciones no puede introducir semánticas locales que redefinan `OTD`, `FTR`, `RpA`, `TTM`, `Iteration Velocity` o `BCS`
+  - si una integración aporta señales nuevas para `ICO`, debe hacerlo como insumo auditable sujeto a source policy y trust model, no como cálculo paralelo
+- Implicación:
+  - esta task fortalece upstreams y evidencias para `ICO`
+  - no autoriza desalinear el engine de su contrato de métricas ni de las tasks `TASK-214` a `TASK-223`
+
 ## Delta 2026-04-03
 
 - `TASK-208` ya cerró un follow-on operativo sobre esta foundation shared para `Notion`:

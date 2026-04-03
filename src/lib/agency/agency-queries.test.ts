@@ -16,7 +16,7 @@ beforeEach(() => {
 })
 
 describe('agency-queries', () => {
-  it('reads Agency > Spaces RpA and OTD from ICO snapshots instead of notion task fields', async () => {
+  it('reads Agency > Spaces RpA and OTD live from ICO enriched tasks for the current month', async () => {
     mockBigQueryQuery.mockResolvedValueOnce([[
       {
         client_id: 'client-1',
@@ -38,9 +38,14 @@ describe('agency-queries', () => {
 
     const result = await getAgencySpacesHealth()
     const query = String(mockBigQueryQuery.mock.calls[0]?.[0]?.query ?? '')
+    const params = mockBigQueryQuery.mock.calls[0]?.[0]?.params ?? {}
 
-    expect(query).toContain('ico_engine.metric_snapshots_monthly')
+    expect(query).toContain('ico_engine.v_tasks_enriched')
     expect(query).not.toContain('AVG(SAFE_CAST(t.rpa AS FLOAT64))')
+    expect(query).toContain('@periodYear')
+    expect(query).toContain('@periodMonth')
+    expect(params).toHaveProperty('periodYear')
+    expect(params).toHaveProperty('periodMonth')
     expect(result).toEqual([
       expect.objectContaining({
         clientId: 'client-1',
@@ -53,7 +58,7 @@ describe('agency-queries', () => {
     ])
   })
 
-  it('reads Agency pulse global RpA and OTD from ICO snapshots', async () => {
+  it('reads Agency pulse global RpA and OTD live from ICO enriched tasks for the current month', async () => {
     mockBigQueryQuery.mockResolvedValueOnce([[
       {
         rpa_global: 1.8,
@@ -68,9 +73,14 @@ describe('agency-queries', () => {
 
     const result = await getAgencyPulseKpis()
     const query = String(mockBigQueryQuery.mock.calls[0]?.[0]?.query ?? '')
+    const params = mockBigQueryQuery.mock.calls[0]?.[0]?.params ?? {}
 
-    expect(query).toContain('ico_engine.metric_snapshots_monthly')
+    expect(query).toContain('ico_engine.v_tasks_enriched')
     expect(query).not.toContain('AVG(SAFE_CAST(t.rpa AS FLOAT64))')
+    expect(query).toContain('@periodYear')
+    expect(query).toContain('@periodMonth')
+    expect(params).toHaveProperty('periodYear')
+    expect(params).toHaveProperty('periodMonth')
     expect(result).toEqual({
       rpaGlobal: 1.8,
       assetsActivos: 12,

@@ -31,7 +31,7 @@ import {
   doesPayrollPeriodUpdateRequireReset
 } from '@/lib/payroll/period-lifecycle'
 import PayrollEntryTable from './PayrollEntryTable'
-import { buildPayrollCurrencySummary, formatPeriodLabel, formatTimestamp, periodStatusConfig } from './helpers'
+import { buildPayrollCurrencySummary, formatCurrency, formatPeriodLabel, formatTimestamp, periodStatusConfig } from './helpers'
 
 type Props = {
   period: PayrollPeriod | null
@@ -40,6 +40,10 @@ type Props = {
   onCreatePeriod: () => void
   createPeriodLabel: string
   isHistoricalSelection?: boolean
+  currencyEquivalents?: {
+    clpEquivalent: { grossClp: number; netClp: number; fxRate: number } | null
+    usdEquivalent: { grossUsd: number; netUsd: number; fxRate: number } | null
+  }
 }
 
 const GOVERNANCE_ATTENDANCE_NOTES = new Set([
@@ -47,7 +51,7 @@ const GOVERNANCE_ATTENDANCE_NOTES = new Set([
   'La integración futura objetivo para asistencia es Microsoft Teams.'
 ])
 
-const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPeriodLabel, isHistoricalSelection }: Props) => {
+const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPeriodLabel, isHistoricalSelection, currencyEquivalents }: Props) => {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
@@ -388,10 +392,18 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
               title='Bruto total'
-              stats={grossSummary.hasMixedCurrency ? 'Mixto' : grossSummary.summaryLabel}
+              stats={
+                currencyEquivalents?.clpEquivalent
+                  ? formatCurrency(currencyEquivalents.clpEquivalent.grossClp, 'CLP')
+                  : grossSummary.hasMixedCurrency ? 'Mixto' : grossSummary.summaryLabel
+              }
               avatarIcon='tabler-coins'
               avatarColor='warning'
-              subtitle={grossSummary.hasMixedCurrency ? grossSummary.summaryLabel : `${entries.length} colaborador${entries.length !== 1 ? 'es' : ''}`}
+              subtitle={
+                currencyEquivalents?.usdEquivalent
+                  ? `USD ${formatCurrency(currencyEquivalents.usdEquivalent.grossUsd, 'USD')}`
+                  : grossSummary.hasMixedCurrency ? grossSummary.summaryLabel : `${entries.length} colaborador${entries.length !== 1 ? 'es' : ''}`
+              }
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -406,10 +418,18 @@ const PayrollPeriodTab = ({ period, entries, onRefresh, onCreatePeriod, createPe
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <HorizontalWithSubtitle
               title='Neto total'
-              stats={netSummary.hasMixedCurrency ? 'Mixto' : netSummary.summaryLabel}
+              stats={
+                currencyEquivalents?.clpEquivalent
+                  ? formatCurrency(currencyEquivalents.clpEquivalent.netClp, 'CLP')
+                  : netSummary.hasMixedCurrency ? 'Mixto' : netSummary.summaryLabel
+              }
               avatarIcon='tabler-wallet'
               avatarColor='success'
-              subtitle={netSummary.hasMixedCurrency ? netSummary.summaryLabel : 'A pagar'}
+              subtitle={
+                currencyEquivalents?.usdEquivalent
+                  ? `USD ${formatCurrency(currencyEquivalents.usdEquivalent.netUsd, 'USD')}`
+                  : netSummary.hasMixedCurrency ? netSummary.summaryLabel : 'A pagar'
+              }
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>

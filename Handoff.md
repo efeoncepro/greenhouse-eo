@@ -1,5 +1,484 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — Finance visible semantics aligned: Nubox documents vs cash
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `src/config/greenhouse-nomenclature.ts`
+  - `src/views/greenhouse/finance/IncomeListView.tsx`
+  - `src/views/greenhouse/finance/ExpensesListView.tsx`
+  - `src/app/(dashboard)/finance/income/page.tsx`
+  - `src/app/(dashboard)/finance/expenses/page.tsx`
+  - `src/components/layout/{vertical,horizontal}/NavbarContent.tsx`
+  - `src/components/layout/shared/search/DefaultSuggestions.tsx`
+  - `src/data/searchData.ts`
+  - `src/lib/admin/view-access-catalog.ts`
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `project_context.md`
+  - `changelog.md`
+
+### Resultado
+
+- `Finance > income` y `Finance > expenses` ya no quedan presentados solo como `Ingresos/Egresos` en la capa visible principal.
+- La semántica visible ahora deja más claro que:
+  - `income` funciona como ledger de documentos de venta/devengo
+  - `expenses` funciona como ledger de compras/obligaciones/devengo
+  - caja real sigue viviendo en cobros, `payment_date` y conciliación
+- Se agregaron alerts contextuales en ambas vistas para evitar confundir documentos Nubox con eventos de caja.
+- No se cambió el schema ni el runtime de P&L en esta pasada; el objetivo fue corregir contrato visible y arquitectura viva con cambio mínimo y reversible.
+
+### Verificación
+
+- pendiente ejecutar `pnpm lint`
+
+## Sesión 2026-04-03 — Backlog ICO consumers aligned to Contrato_Metricas_ICO_v1
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - tasks `Agency`, `Nexa`, `HR`, `Frame.io`, `AI core`, `SLA`, `Scope`, `Temporal contract` y `Integrations` que consumen o podrían consumir métricas `ICO`
+  - `Handoff.md`
+
+### Resultado
+
+- se dejó delta explícito en las tasks activas o de backlog que podrían contradecir el contrato de métricas si consumen `ICO`
+- patrón aplicado:
+  - no redefinir localmente `OTD`, `FTR`, `RpA`, `TTM`, `Iteration Velocity`, `BCS` o `Revenue Enabled`
+  - distinguir benchmark canónico, policy local y confidence/trust metadata
+  - impedir que consumers usen thresholds legacy como si fueran contrato vigente
+- tasks alineadas en esta pasada:
+  - `TASK-188`
+  - `TASK-110`
+  - `TASK-020`
+  - `TASK-025`
+  - `TASK-029`
+  - `TASK-031`
+  - `TASK-058`
+  - `TASK-118`
+  - `TASK-123`
+  - `TASK-150`
+  - `TASK-151`
+  - `TASK-152`
+  - `TASK-155`
+  - `TASK-156`
+  - `TASK-160`
+  - `TASK-161`
+  - `TASK-190`
+
+### Verificación
+
+- revisión manual de consistencia con:
+  - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+
+## Sesión 2026-04-03 — Contrato_Metricas_ICO_v1 aligned to benchmark-informed thresholds
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+  - `project_context.md`
+  - `Handoff.md`
+  - `changelog.md`
+
+### Resultado
+
+- `Contrato_Metricas_ICO_v1.md` ya no deja mezclados en una sola tabla thresholds benchmark-informed e internos
+- el contrato ahora adopta explícitamente las bandas investigadas y documentadas antes en `Greenhouse_ICO_Engine_v1.md` para:
+  - `OTD%`
+  - `FTR%`
+  - `RpA`
+- además separa como métricas de calibración interna:
+  - `Cycle Time`
+  - `Cycle Time Variance`
+  - `BCS`
+- esto corrige la contradicción donde el contrato seguía usando:
+  - `OTD >= 90`
+  - `FTR >= 70`
+  - `RpA <= 1.5`
+  como si fueran thresholds equivalentes en respaldo metodológico
+
+### Verificación
+
+- revisión manual de consistencia entre:
+  - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md` § `A.5.5`
+
+## Sesión 2026-04-03 — ICO north-star task wave aligned to Contrato_Metricas_ICO_v1
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `docs/tasks/to-do/TASK-213-ico-metrics-hardening-trust-model.md`
+  - `docs/tasks/to-do/TASK-218-ico-time-to-market-activation-evidence-contract.md`
+  - `docs/tasks/to-do/TASK-219-ico-iteration-velocity-experimentation-signal-contract.md`
+  - `docs/tasks/to-do/TASK-220-ico-brief-clarity-score-intake-governance.md`
+  - `docs/tasks/to-do/TASK-221-revenue-enabled-measurement-model-attribution-policy.md`
+  - `docs/tasks/to-do/TASK-222-creative-velocity-review-tiered-metric-surfacing.md`
+  - `docs/tasks/to-do/TASK-223-ico-methodological-accelerators-instrumentation.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+  - `Handoff.md`
+
+### Resultado
+
+- la ola `TASK-213` a `TASK-217` ya no queda limitada solo a trust de KPIs operativos
+- ahora queda explícitamente alineada al norte de `Contrato_Metricas_ICO_v1`
+- se abrió una segunda ola de tasks para llegar al norte real:
+  - `TASK-218` — `TTM` + evidencia de activación
+  - `TASK-220` — `BCS` + intake governance
+  - `TASK-219` — `Iteration Velocity` + señal de experimentación
+  - `TASK-221` — `Revenue Enabled` como measurement model defendible
+  - `TASK-222` — `CVR` + tiers + narrativa client-facing
+  - `TASK-223` — aceleradores metodológicos internos
+- orden recomendado total:
+  - trust foundation: `TASK-214` → `TASK-216` → `TASK-215` → `TASK-217`
+  - north-star enablement: `TASK-218` → `TASK-220` → `TASK-219` → `TASK-221` → `TASK-222` → `TASK-223`
+
+### Verificación
+
+- revisión manual de consistencia contra:
+  - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+  - `docs/tasks/TASK_TEMPLATE.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+
+## Sesión 2026-04-03 — ICO metrics hardening tasks package created
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/to-do/TASK-213-ico-metrics-hardening-trust-model.md`
+  - `docs/tasks/to-do/TASK-214-ico-completion-semantics-bucket-normalization.md`
+  - `docs/tasks/to-do/TASK-215-ico-rpa-reliability-source-policy-fallbacks.md`
+  - `docs/tasks/to-do/TASK-216-ico-metric-trust-model-benchmark-quality-gates.md`
+  - `docs/tasks/to-do/TASK-217-agency-kpi-trust-propagation-serving-semantics.md`
+  - `Handoff.md`
+
+### Resultado
+
+- se creó el paquete institucional de tasks para robustecer `ICO Engine` como sistema de métricas confiables
+- `TASK-213` queda como paraguas de coordinación
+- orden recomendado de ejecución:
+  - `TASK-214`
+  - `TASK-216`
+  - `TASK-215`
+  - `TASK-217`
+- foco de cada lane:
+  - `TASK-214`: semántica canónica de completitud y buckets
+  - `TASK-216`: benchmark registry, quality gates y confidence metadata
+  - `TASK-215`: source policy y fallbacks específicos de `RpA`
+  - `TASK-217`: serving y propagación a `Agency`
+
+### Verificación
+
+- revisión manual de consistencia contra:
+  - `docs/tasks/TASK_TEMPLATE.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+
+## Sesión 2026-04-03 — ICO Engine external benchmarks documented
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+  - `project_context.md`
+  - `Handoff.md`
+  - `changelog.md`
+
+### Resultado
+
+- `Greenhouse_ICO_Engine_v1.md` ahora documenta benchmarks externos y estándar recomendado para Greenhouse en `A.5.5`
+- el bloque distingue entre:
+  - benchmark externo fuerte
+  - benchmark por análogo
+  - benchmark parcial creativo
+  - policy interna sin benchmark portable
+- quedaron aterrizados criterios recomendados para:
+  - `FTR`
+  - `RpA`
+  - `OTD`
+  - `cycle time`
+  - `throughput`
+  - `pipeline velocity`
+  - `stuck assets`
+  - `carry-over`
+  - `overdue carried forward`
+- el documento también deja explícito qué referencias sí son comparables cross-industry y cuáles no deben venderse como estándar de mercado
+
+### Fuentes externas usadas
+
+- `SCOR / APICS`
+- `APQC`
+- `IndustryWeek`
+- `visualloop`
+
+### Verificación
+
+- investigación web manual contra fuentes externas primarias o de benchmarking reconocido
+- revisión manual de consistencia documental con las métricas ya inventariadas en `A.5.4`
+
+## Sesión 2026-04-03 — ICO Engine metrics inventory consolidated in architecture
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+  - `project_context.md`
+  - `Handoff.md`
+  - `changelog.md`
+
+### Resultado
+
+- `Greenhouse_ICO_Engine_v1.md` ahora tiene un inventario consolidado y explícito de:
+  - categorías funcionales de métricas ICO
+  - señales base que ya llegan calculadas/normalizadas
+  - derivados por tarea en `v_tasks_enriched`
+  - métricas agregadas canónicas del engine
+  - buckets/contexto operativo
+  - rollups adicionales de `performance_report_monthly`
+- cada métrica y rollup relevante ya declara además:
+  - en qué consiste su cálculo
+  - qué pregunta de negocio responde
+- esto reduce el drift entre:
+  - arquitectura
+  - `metric-registry.ts`
+  - `shared.ts`
+  - `schema.ts`
+
+### Verificación
+
+- revisión manual de consistencia documental contra:
+  - `src/lib/ico-engine/metric-registry.ts`
+  - `src/lib/ico-engine/shared.ts`
+  - `src/lib/ico-engine/schema.ts`
+  - `src/lib/ico-engine/read-metrics.ts`
+
+## Sesión 2026-04-03 — ICO completed semantics hardened against non-terminal statuses
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `src/lib/ico-engine/shared.ts`
+  - `src/lib/ico-engine/shared.test.ts`
+  - `project_context.md`
+  - `Handoff.md`
+  - `changelog.md`
+  - `docs/changelog/CLIENT_CHANGELOG.md`
+
+### Resultado
+
+- el motor ICO ya no considera una tarea como `completed` solo porque `completed_at` venga poblado
+- nuevo contrato canónico:
+  - `completed_at IS NOT NULL`
+  - `task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')`
+- esto endurece de una vez:
+  - `OTD`
+  - `RpA`
+  - `FTR`
+  - `cycle time`
+  - `throughput`
+- además, `performance_indicator_code = 'on_time'` / `late_drop` ya no puede saltarse la validación de estado terminal
+
+### Evidencia
+
+- en `Sky Airline`, abril 2026 mostraba filas con:
+  - `completed_at = 2026-04-02`
+  - `task_status = 'Sin empezar'`
+  - `task_status = 'Listo para revisión'`
+- distribución confirmada para `Sky` en abril 2026:
+  - `135` filas con `completed_at`
+  - `101` de esas filas estaban en estados no terminales
+  - `81` filas contaban como `on_time`, pero solo `7` estaban realmente en `Aprobado`
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/ico-engine/shared.test.ts src/lib/agency/agency-queries.test.ts`
+- `pnpm exec eslint src/lib/ico-engine/shared.ts src/lib/ico-engine/shared.test.ts src/lib/agency/agency-queries.ts src/lib/agency/agency-queries.test.ts`
+- validación manual BigQuery:
+  - `Sky` abril 2026 tenía `81` `on_time` bajo la semántica vieja
+  - con estado terminal obligatorio, cae a `7` `on_time` reales
+  - `RpA` sigue `null` porque esas tareas terminales no traen `rpa_value > 0`
+
+## Sesión 2026-04-03 — Agency Delivery vuelve a mes en curso con cálculo live real
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `src/lib/agency/agency-queries.ts`
+  - `src/lib/agency/agency-queries.test.ts`
+  - `project_context.md`
+  - `Handoff.md`
+  - `changelog.md`
+  - `docs/changelog/CLIENT_CHANGELOG.md`
+
+### Resultado
+
+- `Agency > Delivery` ya no queda anclado al último mes cerrado
+- `RPA promedio`, `OTD` y la tabla por Space vuelven a usar el mes calendario en curso (`America/Santiago`)
+- la lectura ahora sale de live compute sobre `ico_engine.v_tasks_enriched`, reutilizando:
+  - `buildMetricSelectSQL()`
+  - `buildPeriodFilterSQL()`
+- esto corrige el drift introducido por el hotfix anterior:
+  - el snapshot abierto podía mostrar números absurdos
+  - pero el cambio a `mes cerrado` rompía la semántica esperada por negocio para la vista operativa
+
+### Evidencia
+
+- para `Sky Airline`, abril 2026 en snapshot mensual abierto mostraba `otd_pct = 9.5` y `rpa_avg = null`
+- contrastado contra live compute del mismo mes sobre `v_tasks_enriched`, `Sky Airline` devuelve:
+  - `otd_pct = 100.0`
+  - `rpa_avg = null`
+- esto confirma que el `9.5%` era un artefacto del snapshot mensual parcial y no del dato real del mes en curso
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/agency/agency-queries.test.ts`
+- `pnpm exec eslint src/lib/agency/agency-queries.ts src/lib/agency/agency-queries.test.ts`
+- validación manual BigQuery con `bq query --use_legacy_sql=false` sobre abril 2026:
+  - `Sky Airline` → `otd_pct = 100.0`, `rpa_avg = null`
+
+## Sesión 2026-04-03 — Agency Delivery KPI reader pinned to latest closed month
+
+> Superseded el mismo día por la sesión `Agency Delivery vuelve a mes en curso con cálculo live real`.
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `src/lib/agency/agency-queries.ts`
+  - `src/lib/agency/agency-queries.test.ts`
+  - `project_context.md`
+  - `Handoff.md`
+  - `changelog.md`
+
+### Resultado
+
+- `Agency > Delivery` deja de usar el snapshot del mes abierto más reciente para `OTD` / `RpA`
+- el reader ahora limita `ico_engine.metric_snapshots_monthly` al último período mensual cerrado disponible
+- esto corrige el caso visible de `Sky Airline` donde abril 2026 mostraba `OTD 9.5%` y `RpA null` por leer un snapshot abierto/inestable
+- la evidencia contrastada en BigQuery fue:
+  - snapshot leído por la vista: `2026-04`, `rpa_avg = null`, `otd_pct = 9.5`, `carry_over_count = 67`
+  - período cerrado previo: `2026-03`, `rpa_avg = 1.15`, `otd_pct = 95.8`
+
+### Verificación
+
+- pendiente ejecutar:
+  - `pnpm exec vitest run src/lib/agency/agency-queries.test.ts`
+  - `pnpm exec eslint src/lib/agency/agency-queries.ts src/lib/agency/agency-queries.test.ts`
+
+
+## Sesión 2026-04-03 — Hotfix Deel KPI bonuses in projected/offical payroll
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `src/lib/payroll/calculate-payroll.ts`
+  - `src/lib/payroll/project-payroll.test.ts`
+  - `src/views/greenhouse/payroll/CompensationDrawer.tsx`
+  - `src/views/greenhouse/payroll/PayrollEntryTable.tsx`
+  - `docs/architecture/Greenhouse_HRIS_Architecture_v1.md`
+  - `project_context.md`
+  - `changelog.md`
+
+### Resultado
+
+- `payroll_via = 'deel'` ya no cae en la rama que fuerza `bonusOtdAmount` / `bonusRpaAmount` a `0`
+- `Deel` ahora calcula bonos KPI automáticos desde `OTD` y `RpA` con la policy vigente
+- se preserva el contrato operativo de Deel sin descuentos previsionales locales ni attendance proration dentro de Greenhouse
+- la UI de compensación/payroll deja de afirmar que Deel parte con bonos discrecionales en `0`
+- `kpiDataSource` para Deel ahora refleja `ico` cuando el snapshot real vino de ICO
+
+### Verificación
+
+- pendiente ejecutar:
+  - `pnpm exec vitest run src/lib/payroll/project-payroll.test.ts`
+  - `pnpm exec eslint src/lib/payroll/calculate-payroll.ts src/lib/payroll/project-payroll.test.ts src/views/greenhouse/payroll/CompensationDrawer.tsx src/views/greenhouse/payroll/PayrollEntryTable.tsx`
+
+### Nota operativa
+
+- la separación explícita ahora es:
+  - `honorarios` = bonos KPI discrecionales
+  - `deel` = bonos KPI automáticos, pero settlement/compliance final fuera de Greenhouse
+
+## Sesión 2026-04-03 — TASK-204 Carry-Over & Overdue Carried Forward Semantic Split
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `src/lib/ico-engine/shared.ts` — bucket SQL, OTD formula, period filter
+  - `src/lib/ico-engine/schema.ts` — BQ DDL + column migrations
+  - `src/lib/ico-engine/materialize.ts` — all INSERT statements + agency OTD denominator
+  - `src/lib/ico-engine/read-metrics.ts` — types, normalizers, validation
+  - `src/lib/ico-engine/performance-report.ts` — report payload, OTD compute, alerts
+  - `src/lib/ico-engine/metric-registry.ts` — OTD denominator + new OCF metric
+  - `src/lib/ico-engine/historical-reconciliation.ts` — baseline + comparisons
+  - `src/lib/sync/projections/agency-performance-report.ts` — PG upsert
+  - `src/lib/sync/projections/ico-member-metrics.ts` — PG upsert
+  - `src/lib/space-notion/notion-performance-report-publication.ts` — Notion outbound
+  - `src/views/agency/AgencyIcoEngineView.tsx` — agency scorecard UI
+  - `src/views/greenhouse/agency/space-360/tabs/IcoTab.tsx` — space context UI
+  - `src/views/greenhouse/people/tabs/PersonHrProfileTab.tsx` — fallback context
+  - `migrations/20260403175430107_delivery-semantic-split-overdue-carried-forward.sql`
+  - 4 architecture/operations docs
+
+### Resultado
+
+- 5 buckets mutuamente excluyentes: On-Time, Late Drop, Overdue, Carry-Over, Overdue Carried Forward
+- Carry-Over ahora exige `created_at in period` (antes era dead metric — period filter lo excluía)
+- OTD = On-Time / (On-Time + Late Drop + Overdue) — carry-over y OCF fuera del denominador
+- overdue_carried_forward_count materializado en todas las tablas BQ y PG serving
+- UI y Notion publication incluyen la nueva métrica
+
+### Verificación
+
+- `pnpm build` sin errores
+- `pnpm lint` sin errores
+- Migración PG lista para `pnpm migrate:up` (requiere Cloud SQL Proxy)
+
+## Sesión 2026-04-03 — TASK-206 Delivery Operational Attribution Model
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `docs/architecture/GREENHOUSE_OPERATIONAL_ATTRIBUTION_MODEL_V1.md` (NEW)
+  - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md` (cross-reference)
+  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md` (delta)
+  - `docs/architecture/GREENHOUSE_DELIVERY_PERFORMANCE_REPORT_PARITY_V1.md` (delta)
+
+### Resultado
+
+- Modelo canónico de atribución operativa formalizado como spec standalone
+- Separa 4 capas: source identity → identity profile → operational actor → attribution role
+- Documenta contrato de campos, política `primary_owner_first_assignee`, matriz de consumo por reader
+- Cross-references actualizados en 3 docs de arquitectura existentes
+- No hay cambios de runtime — este trabajo formaliza decisiones ya implementadas por TASK-199
+
+### Verificación
+
+- `pnpm build` sin errores
+- `pnpm lint` sin errores
+- Revisión cruzada contra TASK-198, TASK-199, TASK-205
+- Validación conceptual con casos reales (Daniela, Constanza, Adriana)
+
 ## Sesión 2026-04-03 — Health & Freshness separa estado actual de incidentes recientes
 
 ### Rama / alcance

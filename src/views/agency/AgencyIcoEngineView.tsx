@@ -167,7 +167,16 @@ const AgencyIcoEngineView = ({ data, onComputeLive, computingLive }: Props) => {
                     stats={formatCount(data.report.summary.carryOver)}
                     avatarIcon='tabler-arrow-back-up'
                     avatarColor='secondary'
-                    subtitle='Carga arrastrada desde períodos previos'
+                    subtitle='Carga creada este mes con entrega futura'
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+                  <HorizontalWithSubtitle
+                    title='Overdue Carried Forward'
+                    stats={formatCount(data.report.summary.overdueCarriedForward)}
+                    avatarIcon='tabler-clock-exclamation'
+                    avatarColor='warning'
+                    subtitle='Deuda vencida de períodos anteriores'
                   />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, lg: 3 }}>

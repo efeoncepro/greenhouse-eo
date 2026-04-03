@@ -1,17 +1,29 @@
 # TASK-204 - Delivery Carry-Over & Overdue Carried Forward Semantic Split
 
-## Delta 2026-04-03
+## Delta 2026-04-03 — Implementación completa del split semántico
 
-- `TASK-209` ya quedó cerrada con control plane de orquestación `raw -> conformed`, retry auditado por `space` y evidencia visible en admin
-- el prerequisito operativo de convergencia del pipeline Delivery ya no bloquea este trabajo
+- Split semántico implementado end-to-end:
+  - `Carry-Over` = created_at in period + due_date > period_end (carga futura)
+  - `Overdue Carried Forward` = due_date < period_start + abierta (deuda arrastrada)
+  - `OTD = On-Time / (On-Time + Late Drop + Overdue)` — carry-over y OCF excluidos
+- `buildPeriodFilterSQL()` ahora incluye 3 universos de tareas
+- `overdue_carried_forward_count` materializado en todas las tablas (BQ + PG)
+- Migración PG: `agency_performance_reports` + `ico_member_metrics`
+- UI: cards en Agency ICO y IcoTab, publicación Notion
+- Docs actualizados: ICO Engine, Performance Report Parity, Data Model Master, Operating Model
+
+## Delta 2026-04-03 (previo)
+
+- `TASK-206` cerrada: modelo canónico de atribución operativa formalizado en `GREENHOUSE_OPERATIONAL_ATTRIBUTION_MODEL_V1.md`
+- `TASK-209` cerrada con control plane de orquestación y retry auditado
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio`
-- Status real: `Diseño`
+- Status real: `Cerrada`
 - Rank: `57`
 - Domain: `data`
 - GitHub Project: `[pending]`

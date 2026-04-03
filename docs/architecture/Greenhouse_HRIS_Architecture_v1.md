@@ -190,9 +190,9 @@ The payroll calculator (`calculate-payroll.ts`) has three branches:
 - No vacaciones legales, no indemnización
 
 **Branch 3: International via Deel** (`payroll_via = 'deel'`)
-- Greenhouse records: agreed USD amount, bonus (if any)
+- Greenhouse records: agreed USD amount and the KPI bonus amounts derived from `OTD` + `RpA` when those metrics exist
 - No deduction calculation — Deel handles compliance
-- Entry created with `kpi_data_source: 'external'` if KPIs are tracked
+- KPI source should reflect the real upstream (`ICO` when the snapshot came from ICO; manual only when HR overrides it)
 - `deel_contract_id` links to Deel for reference
 
 ### 2.7 TypeScript types (updated)

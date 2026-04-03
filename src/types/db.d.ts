@@ -2108,6 +2108,7 @@ export interface GreenhouseServingAgencyPerformanceReports {
   multi_assignee_policy: string | null;
   on_time_count: number | null;
   on_time_pct: Numeric | null;
+  overdue_carried_forward_count: number | null;
   overdue_count: number | null;
   period_month: number;
   period_year: number;
@@ -2217,6 +2218,7 @@ export interface GreenhouseServingIcoMemberMetrics {
   materialized_at: Generated<Timestamp | null>;
   member_id: string;
   otd_pct: Numeric | null;
+  overdue_carried_forward_count: number | null;
   period_month: number;
   period_year: number;
   pipeline_velocity: Numeric | null;
