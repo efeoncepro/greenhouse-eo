@@ -4,6 +4,8 @@ import { timingSafeEqual } from 'node:crypto'
 
 import { NextResponse } from 'next/server'
 
+import { resolveSecret } from '@/lib/secrets/secret-manager'
+
 import type { ScimErrorResponse } from '@/types/scim'
 
 // ── Types ──
@@ -39,16 +41,23 @@ const safeEquals = (left: string, right: string): boolean => {
   }
 }
 
+const getScimSecret = async (): Promise<string | null> => {
+  const resolution = await resolveSecret({ envVarName: 'SCIM_BEARER_TOKEN' })
+
+  return resolution.value
+}
+
 // ── Public API ──
 
 /**
  * Validate SCIM bearer token from the Authorization header.
  *
+ * Resolves the token from GCP Secret Manager (via SCIM_BEARER_TOKEN_SECRET_REF),
+ * with fallback to the SCIM_BEARER_TOKEN env var.
  * Uses constant-time comparison to prevent timing attacks.
- * The token is read from the `SCIM_BEARER_TOKEN` environment variable.
  */
-export const requireScimAuth = (request: Request): ScimAuthResult => {
-  const secret = process.env.SCIM_BEARER_TOKEN?.trim()
+export const requireScimAuth = async (request: Request): Promise<ScimAuthResult> => {
+  const secret = await getScimSecret()
 
   if (!secret) {
     console.error('[scim-auth] SCIM_BEARER_TOKEN not configured; rejecting request')

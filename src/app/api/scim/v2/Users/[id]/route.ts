@@ -14,7 +14,7 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = requireScimAuth(request)
+  const auth = await requireScimAuth(request)
 
   if (!auth.authorized) return auth.errorResponse
 
@@ -44,7 +44,7 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = requireScimAuth(request)
+  const auth = await requireScimAuth(request)
 
   if (!auth.authorized) return auth.errorResponse
 
@@ -129,7 +129,7 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = requireScimAuth(request)
+  const auth = await requireScimAuth(request)
 
   if (!auth.authorized) return auth.errorResponse
 

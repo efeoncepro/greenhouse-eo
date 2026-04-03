@@ -20,7 +20,7 @@ export const dynamic = 'force-dynamic'
 // ── GET /api/scim/v2/Users — List or filter users ──
 
 export async function GET(request: Request) {
-  const auth = requireScimAuth(request)
+  const auth = await requireScimAuth(request)
 
   if (!auth.authorized) return auth.errorResponse
 
@@ -73,7 +73,7 @@ export async function GET(request: Request) {
 // ── POST /api/scim/v2/Users — Create user ──
 
 export async function POST(request: Request) {
-  const auth = requireScimAuth(request)
+  const auth = await requireScimAuth(request)
 
   if (!auth.authorized) return auth.errorResponse
 
