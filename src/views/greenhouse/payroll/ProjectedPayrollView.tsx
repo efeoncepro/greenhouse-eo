@@ -90,6 +90,7 @@ interface ProjectedEntry {
   projectionMode: ProjectionMode
   projectedWorkingDays: number
   projectedWorkingDaysTotal: number
+  prorationFactor: number
   officialGrossTotal: number | null
   officialNetTotal: number | null
   deltaGross: number | null
@@ -144,6 +145,7 @@ interface ProjectedData {
     netUsd: number
     fxRate: number
   } | null
+  prorationFactor: number
 }
 
 // ── Helpers ──
@@ -474,8 +476,10 @@ const ProjectedPayrollView = () => {
               avatarColor='info'
               subtitle={
                 data.usdEquivalent
-                  ? `USD ${formatCurrency(data.usdEquivalent.grossUsd, 'USD')}`
-                  : mode === 'actual_to_date' ? 'Devengado al corte' : 'Proyectado al cierre'
+                  ? `USD ${formatCurrency(data.usdEquivalent.grossUsd, 'USD')}${data.prorationFactor < 1 ? ` · ${Math.round(data.prorationFactor * 100)}% del mes` : ''}`
+                  : mode === 'actual_to_date'
+                    ? `Devengado al corte${data.prorationFactor < 1 ? ` (${Math.round(data.prorationFactor * 100)}% del mes)` : ''}`
+                    : 'Proyectado al cierre'
               }
             />
           </Grid>
@@ -491,8 +495,10 @@ const ProjectedPayrollView = () => {
               avatarColor='success'
               subtitle={
                 data.usdEquivalent
-                  ? `USD ${formatCurrency(data.usdEquivalent.netUsd, 'USD')}`
-                  : 'Líquido a pagar'
+                  ? `USD ${formatCurrency(data.usdEquivalent.netUsd, 'USD')}${data.prorationFactor < 1 ? ` · ${Math.round(data.prorationFactor * 100)}% del mes` : ''}`
+                  : data.prorationFactor < 1
+                    ? `Líquido al corte (${Math.round(data.prorationFactor * 100)}% del mes)`
+                    : 'Líquido a pagar'
               }
             />
           </Grid>

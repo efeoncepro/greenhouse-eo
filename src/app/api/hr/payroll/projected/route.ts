@@ -195,7 +195,8 @@ export async function GET(request: Request) {
         } : null,
         latestPromotion,
         clpEquivalent,
-        usdEquivalent
+        usdEquivalent,
+        prorationFactor: result.entries.length > 0 ? result.entries[0].prorationFactor : 1
       },
       { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } }
     )
