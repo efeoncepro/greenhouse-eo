@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { DONE_STATUSES_SQL } from '@/lib/ico-engine/shared'
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
@@ -98,7 +99,7 @@ const buildTasksEnrichedView = (projectId: string) => `
           THEN 'revision_interna'
         WHEN dt.task_status = 'Cambios Solicitados'
           THEN 'cambios_cliente'
-        WHEN dt.task_status IN ('Listo', 'Done', 'Finalizado', 'Completado')
+        WHEN dt.task_status IN ('Listo', 'Done', 'Finalizado', 'Completado', 'Aprobado')
           THEN 'entrega'
         ELSE 'otros'
       END
@@ -117,7 +118,7 @@ const buildTasksEnrichedView = (projectId: string) => `
     -- Derived: Is stuck (no movement in 72+ hours while in an active state)
     (
       dt.task_status NOT IN (
-        'Listo', 'Done', 'Finalizado', 'Completado',
+        'Listo', 'Done', 'Finalizado', 'Completado', 'Aprobado',
         'Archivadas', 'Archivada', 'Cancelada', 'Canceled', 'Cancelled',
         'Sin empezar', 'Backlog', 'Pendiente'
       )
@@ -127,9 +128,13 @@ const buildTasksEnrichedView = (projectId: string) => `
 
     -- Derived: Delivery signal (on_time / late / unknown)
     CASE
-      WHEN dt.completed_at IS NOT NULL AND dt.due_date IS NOT NULL
+      WHEN dt.completed_at IS NOT NULL
+        AND dt.task_status IN (${DONE_STATUSES_SQL})
+        AND dt.due_date IS NOT NULL
         AND DATE(dt.completed_at) <= dt.due_date THEN 'on_time'
-      WHEN dt.completed_at IS NOT NULL AND dt.due_date IS NOT NULL
+      WHEN dt.completed_at IS NOT NULL
+        AND dt.task_status IN (${DONE_STATUSES_SQL})
+        AND dt.due_date IS NOT NULL
         AND DATE(dt.completed_at) > dt.due_date THEN 'late'
       ELSE 'unknown'
     END AS delivery_signal,

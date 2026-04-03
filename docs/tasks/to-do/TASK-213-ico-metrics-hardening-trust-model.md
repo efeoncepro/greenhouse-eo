@@ -78,7 +78,7 @@ Reglas obligatorias:
 ### Files owned
 
 - `docs/tasks/to-do/TASK-213-ico-metrics-hardening-trust-model.md`
-- `docs/tasks/to-do/TASK-214-ico-completion-semantics-bucket-normalization.md`
+- `docs/tasks/complete/TASK-214-ico-completion-semantics-bucket-normalization.md`
 - `docs/tasks/to-do/TASK-215-ico-rpa-reliability-source-policy-fallbacks.md`
 - `docs/tasks/to-do/TASK-216-ico-metric-trust-model-benchmark-quality-gates.md`
 - `docs/tasks/to-do/TASK-217-agency-kpi-trust-propagation-serving-semantics.md`

@@ -2215,10 +2215,13 @@ export interface GreenhouseServingIcoMemberMetrics {
   completed_tasks: number | null;
   cycle_time_avg_days: Numeric | null;
   ftr_pct: Numeric | null;
+  late_drop_count: number | null;
   materialized_at: Generated<Timestamp | null>;
   member_id: string;
+  on_time_count: number | null;
   otd_pct: Numeric | null;
   overdue_carried_forward_count: number | null;
+  overdue_count: number | null;
   period_month: number;
   period_year: number;
   pipeline_velocity: Numeric | null;

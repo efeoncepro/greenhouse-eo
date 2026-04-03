@@ -2,6 +2,13 @@
 
 ## 2026-04-03
 
+- **TASK-214 ICO completion semantics and serving parity closed**:
+  - `ICO` ya comparte una sola regla de completitud para `OTD`, `FTR`, `RpA`, `throughput` y `cycle time`: `completed_at` solo vale con estado terminal real
+  - `delivery_signal` y los buckets abiertos (`overdue`, `carry_over`, `overdue_carried_forward`) quedaron endurecidos para no mezclar filas cerradas o inconsistentes
+  - `greenhouse_serving.ico_member_metrics` ya quedó a par con `metrics_by_member` y ahora incluye `on_time_count`, `late_drop_count`, `overdue_count` y `overdue_carried_forward_count`
+  - `Person 360` ya expone `overdue_carried_forward` en el contexto member-level
+  - verificado con migración aplicada, tests puntuales de `ICO` + `Payroll`, `pnpm lint` y `pnpm build`
+
 - **Internal roles and hierarchies architecture formalized**:
   - se creó la spec canónica `docs/architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md`
   - el contrato ahora separa explícitamente:

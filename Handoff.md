@@ -1,5 +1,94 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — TASK-214 implementada y verificada end-to-end
+
+### Rama / alcance
+
+- rama actual: `develop`
+- scope:
+  - `migrations/20260403234122383_ico-member-metrics-bucket-parity.sql`
+  - `src/lib/ico-engine/shared.ts`
+  - `src/lib/ico-engine/shared.test.ts`
+  - `src/lib/ico-engine/read-metrics.ts`
+  - `src/lib/ico-engine/materialize.ts`
+  - `src/lib/ico-engine/schema.ts`
+  - `src/lib/ico-engine/metric-registry.ts`
+  - `src/lib/sync/projections/ico-member-metrics.ts`
+  - `src/app/api/cron/ico-member-sync/route.ts`
+  - `src/lib/person-360/get-person-ico-profile.ts`
+  - `src/app/api/people/[memberId]/ico/route.ts`
+  - `scripts/backfill-ico-to-postgres.ts`
+  - `scripts/setup-postgres-ico-member-metrics.sql`
+  - `src/types/db.d.ts`
+  - docs de arquitectura/task impactadas por la lane
+
+### Resultado
+
+- `TASK-214` queda cerrada.
+- La semántica de completitud se endureció en todo el carril ICO:
+  - cierre válido = `completed_at + terminal status`
+  - `delivery_signal` ya no depende solo de `completed_at`
+  - `overdue`, `carry_over` y `overdue_carried_forward` requieren tarea abierta de forma explícita
+- `greenhouse_serving.ico_member_metrics` quedó alineado a `metrics_by_member` con buckets member-level completos:
+  - `on_time_count`
+  - `late_drop_count`
+  - `overdue_count`
+  - `carry_over_count`
+  - `overdue_carried_forward_count`
+- `Person 360` ya expone `overdue_carried_forward` y el cron legacy/backfill/projection de member serving quedó a par con el contrato actual.
+- Guardrail importante:
+  - Payroll no cambió de source policy
+  - el carril `BQ materialized-first + live fallback` sigue intacto; esta lane solo endurece semántica y serving aditivo
+
+### Verificación
+
+- `pnpm pg:doctor --profile=migrator`
+- `pnpm migrate:up`
+- `pnpm exec vitest run src/lib/ico-engine/shared.test.ts src/lib/payroll/fetch-kpis-for-period.test.ts`
+- `pnpm lint`
+- `pnpm build`
+- chequeo manual:
+  - sin `new Pool()` nuevos fuera del cliente canónico
+  - docs dependientes (`TASK-215`, `TASK-216`, `TASK-217`) actualizadas con delta de foundation cerrada
+
+## Sesión 2026-04-03 — TASK-214 auditada y corregida antes de implementación
+
+### Rama / alcance
+
+- rama actual: `develop`
+- scope:
+  - `docs/tasks/in-progress/TASK-214-ico-completion-semantics-bucket-normalization.md`
+  - `docs/tasks/README.md`
+  - `Handoff.md`
+  - auditoría runtime sobre:
+    - `src/lib/ico-engine/shared.ts`
+    - `src/lib/ico-engine/metric-registry.ts`
+    - `src/lib/ico-engine/read-metrics.ts`
+    - `src/lib/ico-engine/materialize.ts`
+    - `src/lib/ico-engine/schema.ts`
+    - `src/lib/sync/projections/ico-member-metrics.ts`
+    - `src/app/api/cron/ico-member-sync/route.ts`
+    - `src/lib/person-360/get-person-ico-profile.ts`
+
+### Resultado
+
+- `TASK-214` quedó movida a `in-progress` tras discovery/auditoría real del repo.
+- La spec se corrigió para dejar explícito que:
+  - la semántica canónica base ya existe en `src/lib/ico-engine/shared.ts`
+  - el gap real incluye drift interno del engine (`metric-registry`, `schema`, queries auxiliares)
+  - el serving `greenhouse_serving.ico_member_metrics` sigue incompleto frente a `metrics_by_member`
+  - `Person 360` todavía expone una versión parcial del contexto de buckets
+- No se implementó código todavía en esta pasada; solo se corrigió el contrato operativo para evitar construir sobre supuestos rotos.
+
+### Verificación
+
+- revisión manual de consistencia contra:
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+  - `docs/architecture/GREENHOUSE_DELIVERY_PERFORMANCE_REPORT_PARITY_V1.md`
+  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+  - `docs/architecture/schema-snapshot-baseline.sql`
+  - runtime actual en `src/lib/ico-engine/**` y consumers downstream
+
 ## Sesión 2026-04-03 — Roles internos y jerarquías formalizados como lane + spec canónica
 
 ### Rama / alcance

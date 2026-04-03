@@ -25,7 +25,8 @@ const main = async () => {
              rpa_avg, rpa_median, otd_pct, ftr_pct,
              cycle_time_avg_days, throughput_count, pipeline_velocity,
              stuck_asset_count, stuck_asset_pct,
-             total_tasks, completed_tasks, active_tasks, carry_over_count
+             total_tasks, completed_tasks, active_tasks,
+             on_time_count, late_drop_count, overdue_count, carry_over_count, overdue_carried_forward_count
            FROM \`${projectId}.ico_engine.metrics_by_member\`
            ORDER BY period_year DESC, period_month DESC`
   })
@@ -49,8 +50,10 @@ const main = async () => {
           rpa_avg, rpa_median, otd_pct, ftr_pct,
           cycle_time_avg_days, throughput_count, pipeline_velocity,
           stuck_asset_count, stuck_asset_pct,
-          total_tasks, completed_tasks, active_tasks, carry_over_count, materialized_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, NOW())
+          total_tasks, completed_tasks, active_tasks,
+          on_time_count, late_drop_count, overdue_count, carry_over_count, overdue_carried_forward_count,
+          materialized_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, NOW())
         ON CONFLICT (member_id, period_year, period_month) DO UPDATE SET
           rpa_avg=EXCLUDED.rpa_avg, rpa_median=EXCLUDED.rpa_median,
           otd_pct=EXCLUDED.otd_pct, ftr_pct=EXCLUDED.ftr_pct,
@@ -58,7 +61,10 @@ const main = async () => {
           throughput_count=EXCLUDED.throughput_count, pipeline_velocity=EXCLUDED.pipeline_velocity,
           stuck_asset_count=EXCLUDED.stuck_asset_count, stuck_asset_pct=EXCLUDED.stuck_asset_pct,
           total_tasks=EXCLUDED.total_tasks, completed_tasks=EXCLUDED.completed_tasks,
-          active_tasks=EXCLUDED.active_tasks, carry_over_count=EXCLUDED.carry_over_count, materialized_at=NOW()
+          active_tasks=EXCLUDED.active_tasks,
+          on_time_count=EXCLUDED.on_time_count, late_drop_count=EXCLUDED.late_drop_count,
+          overdue_count=EXCLUDED.overdue_count, carry_over_count=EXCLUDED.carry_over_count,
+          overdue_carried_forward_count=EXCLUDED.overdue_carried_forward_count, materialized_at=NOW()
       `, [
         String(r.member_id), Number(r.period_year), Number(r.period_month),
         r.rpa_avg != null ? Number(r.rpa_avg) : null,
@@ -73,7 +79,11 @@ const main = async () => {
         r.total_tasks != null ? Number(r.total_tasks) : null,
         r.completed_tasks != null ? Number(r.completed_tasks) : null,
         r.active_tasks != null ? Number(r.active_tasks) : null,
-        r.carry_over_count != null ? Number(r.carry_over_count) : null
+        r.on_time_count != null ? Number(r.on_time_count) : null,
+        r.late_drop_count != null ? Number(r.late_drop_count) : null,
+        r.overdue_count != null ? Number(r.overdue_count) : null,
+        r.carry_over_count != null ? Number(r.carry_over_count) : null,
+        r.overdue_carried_forward_count != null ? Number(r.overdue_carried_forward_count) : null
       ])
 
       inserted++

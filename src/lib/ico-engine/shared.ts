@@ -306,16 +306,20 @@ export const CANONICAL_LATE_DROP_SQL = `(
   OR (performance_indicator_code IS NULL AND ${DERIVED_LATE_DROP_SQL})
 )`
 export const CANONICAL_OVERDUE_SQL = `(
-  performance_indicator_code = 'overdue'
+  (performance_indicator_code = 'overdue' AND ${CANONICAL_OPEN_TASK_SQL})
   OR (performance_indicator_code IS NULL AND ${DERIVED_OVERDUE_SQL})
 )`
 export const CANONICAL_CARRY_OVER_SQL = `(
-  performance_indicator_code = 'carry_over'
+  (performance_indicator_code = 'carry_over' AND ${CANONICAL_OPEN_TASK_SQL})
   OR (performance_indicator_code IS NULL AND ${CARRY_OVER_SQL})
 )`
 export const CANONICAL_OVERDUE_CARRIED_FORWARD_SQL = `(
-  performance_indicator_code = 'overdue_carried_forward'
+  (performance_indicator_code = 'overdue_carried_forward' AND ${CANONICAL_OPEN_TASK_SQL})
   OR (performance_indicator_code IS NULL AND ${OVERDUE_CARRIED_FORWARD_SQL})
+)`
+export const CANONICAL_ACTIVE_CSC_TASK_SQL = `(
+  ${CANONICAL_OPEN_TASK_SQL}
+  AND fase_csc != 'otros'
 )`
 export const CANONICAL_CLASSIFIED_TASK_SQL = `(
   ${CANONICAL_ON_TIME_SQL}

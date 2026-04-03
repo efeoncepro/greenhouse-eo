@@ -90,6 +90,41 @@ export const DONE_STATUSES = ['Listo', 'Done', 'Finalizado', 'Completado', 'Apro
 export const EXCLUDED_STATUSES = ['Archivadas', 'Archivada', 'Cancelada', 'Canceled', 'Cancelled', 'Archivado'] as const
 export const BLOCKED_STATUSES = ['Bloqueado', 'Detenido'] as const
 
+const DONE_STATUSES_SQL = DONE_STATUSES.map(status => `'${status}'`).join(',')
+const EXCLUDED_STATUSES_SQL = EXCLUDED_STATUSES.map(status => `'${status}'`).join(',')
+
+const CANONICAL_COMPLETED_TASK_SQL = `(
+  completed_at IS NOT NULL
+  AND task_status IN (${DONE_STATUSES_SQL})
+)`
+
+const CANONICAL_OPEN_TASK_SQL = `(
+  completed_at IS NULL
+  AND (task_status IS NULL OR task_status NOT IN (${EXCLUDED_STATUSES_SQL}))
+)`
+
+const CANONICAL_ON_TIME_SQL = `(
+  report_bucket = 'on_time'
+  OR (performance_indicator_code = 'on_time' AND ${CANONICAL_COMPLETED_TASK_SQL})
+)`
+
+const CANONICAL_LATE_DROP_SQL = `(
+  report_bucket = 'late_drop'
+  OR (performance_indicator_code = 'late_drop' AND ${CANONICAL_COMPLETED_TASK_SQL})
+)`
+
+const CANONICAL_OVERDUE_SQL = `(
+  report_bucket = 'overdue'
+  OR (performance_indicator_code = 'overdue' AND ${CANONICAL_OPEN_TASK_SQL})
+)`
+
+const CANONICAL_FTR_ELIGIBLE_SQL = `(${CANONICAL_COMPLETED_TASK_SQL})`
+
+const CANONICAL_FTR_PASSED_SQL = `(
+  ${CANONICAL_COMPLETED_TASK_SQL}
+  AND client_change_round_final = 0
+)`
+
 // ─── Stuck Threshold (hours without edit while in an active state) ──────────
 
 export const STUCK_THRESHOLD_HOURS = 72
@@ -123,8 +158,8 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     granularities: ['monthly', 'weekly'],
     formula: {
       kind: 'percentage',
-      numeratorCondition: "report_bucket = 'on_time'",
-      denominatorCondition: "report_bucket IN ('on_time', 'late_drop', 'overdue')"
+      numeratorCondition: CANONICAL_ON_TIME_SQL,
+      denominatorCondition: `(${CANONICAL_ON_TIME_SQL} OR ${CANONICAL_LATE_DROP_SQL} OR ${CANONICAL_OVERDUE_SQL})`
     },
     thresholds: {
       optimal: { min: 90, max: 100 },
@@ -144,8 +179,8 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     granularities: ['monthly'],
     formula: {
       kind: 'percentage',
-      numeratorCondition: 'client_change_round_final = 0',
-      denominatorCondition: 'completed_at IS NOT NULL'
+      numeratorCondition: CANONICAL_FTR_PASSED_SQL,
+      denominatorCondition: CANONICAL_FTR_ELIGIBLE_SQL
     },
     thresholds: {
       optimal: { min: 80, max: 100 },
@@ -197,7 +232,7 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     description: 'Cantidad de activos completados en el período.',
     unit: 'activos',
     granularities: ['monthly', 'weekly'],
-    formula: { kind: 'count', numeratorCondition: 'completed_at IS NOT NULL' },
+    formula: { kind: 'count', numeratorCondition: `(${CANONICAL_ON_TIME_SQL} OR ${CANONICAL_LATE_DROP_SQL})` },
     thresholds: {
       optimal: { min: 20, max: 999 },
       attention: { min: 10, max: 20 },
@@ -216,8 +251,8 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     granularities: ['monthly', 'weekly'],
     formula: {
       kind: 'ratio',
-      numeratorCondition: 'completed_at IS NOT NULL',
-      denominatorCondition: "task_status NOT IN ('Listo','Done','Finalizado','Completado','Archivadas','Cancelada')"
+      numeratorCondition: `(${CANONICAL_ON_TIME_SQL} OR ${CANONICAL_LATE_DROP_SQL})`,
+      denominatorCondition: CANONICAL_OPEN_TASK_SQL
     },
     thresholds: {
       optimal: { min: 0.8, max: 999 },
@@ -275,7 +310,7 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     formula: {
       kind: 'percentage',
       numeratorCondition: 'is_stuck = TRUE',
-      denominatorCondition: "task_status NOT IN ('Listo','Done','Finalizado','Completado','Archivadas','Cancelada')"
+      denominatorCondition: CANONICAL_OPEN_TASK_SQL
     },
     thresholds: {
       optimal: { min: 0, max: 10 },

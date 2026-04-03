@@ -1,5 +1,15 @@
 # TASK-216 - ICO Metric Trust Model: Benchmark Registry, Quality Gates & Confidence Metadata
 
+## Delta 2026-04-03
+
+- `TASK-214` ya dejó congelada la semántica base que esta lane debe tratar como foundation cerrada:
+  - completitud canónica = `completed_at + terminal status`
+  - buckets canónicos iguales en live, materialización y serving
+  - `greenhouse_serving.ico_member_metrics` ya quedó alineado a `metrics_by_member` para buckets member-level
+- Implicación:
+  - esta task no necesita volver a tocar fórmulas base en `shared.ts`
+  - debe construir trust metadata encima del contrato ya estabilizado, no volver a discutir qué cuenta como `on_time`, `late_drop`, `overdue`, `carry_over` u `overdue_carried_forward`
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -120,4 +130,3 @@ Reglas obligatorias:
 - `pnpm exec vitest run src/lib/ico-engine/*.test.ts`
 - `pnpm exec eslint src/lib/ico-engine/metric-registry.ts src/lib/ico-engine/read-metrics.ts`
 - revisión manual de outputs en readers o fixtures representativos
-
