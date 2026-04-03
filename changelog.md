@@ -2,6 +2,13 @@
 
 ## 2026-04-03
 
+- **TASK-206 Delivery Operational Attribution Model**:
+  - se formalizó el modelo canónico de atribución operativa como spec standalone: `docs/architecture/GREENHOUSE_OPERATIONAL_ATTRIBUTION_MODEL_V1.md`
+  - el modelo separa explícitamente 4 capas: source identity → identity profile → operational actor → attribution role
+  - documenta contrato de campos para `tasks` y `projects`, política `primary_owner_first_assignee`, actor type taxonomy, reglas de borde y guía prescriptiva para nuevos consumers
+  - se actualizaron cross-references en `GREENHOUSE_IDENTITY_ACCESS_V2.md`, `GREENHOUSE_DATA_MODEL_MASTER_V1.md` y `GREENHOUSE_DELIVERY_PERFORMANCE_REPORT_PARITY_V1.md`
+  - no hay cambios de runtime — formaliza decisiones ya implementadas por TASK-199
+
 - **Admin integrations health semantics clarified**:
   - `Health & Freshness` ya separa estado actual de incidentes recientes en `/admin/integrations`
   - el badge `Health` ahora refleja la ultima senal valida y su frescura, en vez de degradarse automaticamente por cualquier fallo dentro de 24h

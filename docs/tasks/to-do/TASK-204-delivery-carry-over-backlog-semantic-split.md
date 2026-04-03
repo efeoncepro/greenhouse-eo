@@ -2,6 +2,9 @@
 
 ## Delta 2026-04-03
 
+- `TASK-206` cerrada: modelo canónico de atribución operativa formalizado en `GREENHOUSE_OPERATIONAL_ATTRIBUTION_MODEL_V1.md`
+  - la capa de `primary_owner`, `co_assignees`, `member_credit` y `space/agency credit` ya está definida
+  - TASK-204 puede proceder sin redefinir ownership ni identity resolution — eso ya está congelado
 - `TASK-209` ya quedó cerrada con control plane de orquestación `raw -> conformed`, retry auditado por `space` y evidencia visible en admin
 - el prerequisito operativo de convergencia del pipeline Delivery ya no bloquea este trabajo
 

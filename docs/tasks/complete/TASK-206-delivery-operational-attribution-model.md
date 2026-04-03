@@ -1,17 +1,26 @@
 # TASK-206 - Delivery Operational Attribution Model
 
-## Delta 2026-04-03
+## Delta 2026-04-03 — Modelo canónico formalizado como spec standalone
+
+- `TASK-206` cerrada: modelo canónico de atribución operativa formalizado como `GREENHOUSE_OPERATIONAL_ATTRIBUTION_MODEL_V1.md`
+- 4 capas: source identity → identity profile → operational actor → attribution role
+- contrato de campos para tasks y projects, política `primary_owner_first_assignee`
+- matriz de consumo por reader, reglas de borde, guía prescriptiva para nuevos consumers
+- cross-references actualizados en `GREENHOUSE_IDENTITY_ACCESS_V2.md`, `GREENHOUSE_DATA_MODEL_MASTER_V1.md`, `GREENHOUSE_DELIVERY_PERFORMANCE_REPORT_PARITY_V1.md`
+- no hay cambios de runtime — formaliza decisiones ya implementadas por TASK-199
+
+## Delta 2026-04-03 (previo)
 
 - `TASK-209` ya quedó cerrada con orquestación explícita y retry auditado para el pipeline `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`
 - la atribución operativa ya puede diseñarse sobre una base de sincronización más estable, sin asumir reruns manuales del writer canónico
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio`
-- Status real: `Diseño`
+- Status real: `Cerrada`
 - Rank: `59`
 - Domain: `identity`
 - GitHub Project: `[pending]`

@@ -1,5 +1,31 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — TASK-206 Delivery Operational Attribution Model
+
+### Rama / alcance
+
+- rama actual: `main`
+- scope:
+  - `docs/architecture/GREENHOUSE_OPERATIONAL_ATTRIBUTION_MODEL_V1.md` (NEW)
+  - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md` (cross-reference)
+  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md` (delta)
+  - `docs/architecture/GREENHOUSE_DELIVERY_PERFORMANCE_REPORT_PARITY_V1.md` (delta)
+
+### Resultado
+
+- Modelo canónico de atribución operativa formalizado como spec standalone
+- Separa 4 capas: source identity → identity profile → operational actor → attribution role
+- Documenta contrato de campos, política `primary_owner_first_assignee`, matriz de consumo por reader
+- Cross-references actualizados en 3 docs de arquitectura existentes
+- No hay cambios de runtime — este trabajo formaliza decisiones ya implementadas por TASK-199
+
+### Verificación
+
+- `pnpm build` sin errores
+- `pnpm lint` sin errores
+- Revisión cruzada contra TASK-198, TASK-199, TASK-205
+- Validación conceptual con casos reales (Daniela, Constanza, Adriana)
+
 ## Sesión 2026-04-03 — Health & Freshness separa estado actual de incidentes recientes
 
 ### Rama / alcance

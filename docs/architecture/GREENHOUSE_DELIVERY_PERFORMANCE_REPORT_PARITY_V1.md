@@ -1,5 +1,19 @@
 # Greenhouse Delivery Performance Report Parity V1
 
+## Delta 2026-04-03 — Attribution model formalized as standalone spec
+
+`TASK-206` extrae el modelo de atribución operativa a su propia spec canónica: `GREENHOUSE_OPERATIONAL_ATTRIBUTION_MODEL_V1.md`.
+
+Las reglas de owner attribution que este documento ya declara (Delta 2026-04-02, TASK-199) siguen vigentes sin cambio. La spec nueva las complementa con:
+
+- separación formal en 4 capas (source identity → identity profile → operational actor → attribution role)
+- taxonomía de actor types con prioridad de clasificación
+- matriz de consumo por reader (ICO, Person 360, Project 360, Performance Report)
+- reglas de borde documentadas (sin asignar, client_user owner, co-assignees)
+- guía prescriptiva para nuevos consumers
+
+Regla: si un consumer necesita una regla de atribución distinta a `primary_owner_first_assignee`, debe proponer un delta a `GREENHOUSE_OPERATIONAL_ATTRIBUTION_MODEL_V1.md` antes de implementar.
+
 ## Delta 2026-04-02 — Historical parity now uses frozen task snapshots
 
 `TASK-201` cierra una decisión clave para la paridad histórica:

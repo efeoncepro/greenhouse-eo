@@ -61,6 +61,7 @@ Primer bloque operativo asignado:
 - [TASK-207-delivery-notion-sync-pipeline-hardening.md](complete/TASK-207-delivery-notion-sync-pipeline-hardening.md) — Hardening runtime cerrado del sync `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`: gate real de frescura por `space`, preservación de jerarquía, validación `raw -> transformed -> persisted`, runs cancelados/fallidos auditables y convergencia a writer canónico al desactivar el overwrite legacy por defecto.
 - [TASK-209-delivery-notion-sync-recurrence-prevention.md](complete/TASK-209-delivery-notion-sync-recurrence-prevention.md) — Cierre de recurrencia operativa del sync Delivery: control plane `waiting_for_raw`, retries auditados por `space`, recovery cron, surfaces admin y callback upstream para evitar reruns manuales después del refresh de Notion.
 - [TASK-208-delivery-data-quality-monitoring-auditor.md](complete/TASK-208-delivery-data-quality-monitoring-auditor.md) — Monitor recurrente cerrado para `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`: tablas históricas `integration_data_quality_*`, scoring `healthy / degraded / broken`, cron dedicado, hook post-sync, alerting Slack y visibilidad reutilizada en `/admin/integrations`, `/admin/ops-health` y `TenantNotionPanel`.
+- [TASK-206-delivery-operational-attribution-model.md](complete/TASK-206-delivery-operational-attribution-model.md) — Modelo canónico de atribución operativa formalizado como spec: 4 capas (source identity → identity profile → operational actor → attribution role), contrato de campos, política `primary_owner_first_assignee`, matriz de consumo por reader, reglas de borde y guía prescriptiva para nuevos consumers. Arch doc: `GREENHOUSE_OPERATIONAL_ATTRIBUTION_MODEL_V1.md`.
 
 ## To Do
 
@@ -140,9 +141,9 @@ Primer bloque operativo asignado:
 - `TASK-205` ya quedó cerrada como lane de paridad contra origen:
   - dejó helper reusable, route admin tenant-scoped, script CLI y evidencia real de drift para `Daniela` y `Andrés / Abril 2026`
   - esa evidencia ahora debe consumirse como baseline de regresión para el hardening estructural
-- `TASK-206` queda abierta como lane de atribución operativa:
-  - `identity_profile_source_links` se confirma como backbone de identidad, no como contrato suficiente de atribución
-  - falta una capa reusable para traducir identidad en `primary owner`, `co-assignees`, `member credit` y `client collaboration`
+- `TASK-206` cerrada: modelo canónico de atribución operativa formalizado como `GREENHOUSE_OPERATIONAL_ATTRIBUTION_MODEL_V1.md`
+  - separa explícitamente identidad (Layer 2) de atribución (Layer 4) con capas intermedias de actor type y role
+  - deja contrato reusable para ICO, Person 360, Project 360, Performance Report y futuros consumers
 - `TASK-207` ya quedó cerrada como lane de hardening del sync:
   - el writer canónico ahora exige frescura real de `notion_ops` antes de materializar
   - `delivery_tasks` preserva jerarquía `tarea_principal_ids` / `subtareas_ids`
