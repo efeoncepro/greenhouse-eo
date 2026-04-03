@@ -259,3 +259,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-207` | `complete` | Delivery Notion Sync Pipeline Hardening & Freshness Gates | `docs/tasks/complete/TASK-207-delivery-notion-sync-pipeline-hardening.md` |
 | `TASK-208` | `complete` | Delivery Data Quality Monitoring & Drift Auditor | `docs/tasks/complete/TASK-208-delivery-data-quality-monitoring-auditor.md` |
 | `TASK-209` | `to-do` | Delivery Notion Sync Recurrence Prevention & Orchestration Closure | `docs/tasks/to-do/TASK-209-delivery-notion-sync-recurrence-prevention.md` |
+| `TASK-210` | `to-do` | HubSpot Quotes Bidirectional Integration | `docs/tasks/to-do/TASK-210-hubspot-quotes-integration.md` |
