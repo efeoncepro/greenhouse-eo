@@ -18,7 +18,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-203`
+- siguiente ID disponible: `TASK-209`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 
 ## Estados
@@ -53,6 +53,10 @@ Primer bloque operativo asignado:
 | `TASK-191` | [TASK-191-finance-organization-first-downstream-consumers-cutover.md](in-progress/TASK-191-finance-organization-first-downstream-consumers-cutover.md) | P1        | Alto     | Alto     | Implementación          | Follow-on de `TASK-181`: cerrar el cutover downstream org-first en `purchase-orders`, `hes`, `expenses`, `allocations` y readers analíticos sin repropagar `clientId` como input obligatorio |
 | `TASK-187` | [TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md](complete/TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md) | P0        | Muy alto | Alto     | Cerrada                | Notion ya tiene governance tenant-scoped formal: snapshots, drift, KPI readiness, admin APIs y panel reutilizado sobre el binding canónico por `space` |
 | `TASK-196` | [TASK-196-delivery-performance-report-parity-greenhouse-notion.md](complete/TASK-196-delivery-performance-report-parity-greenhouse-notion.md) | P0        | Muy alto | Alto     | Cerrada                | Lane completa de paridad Delivery: source sync, identidad, owner attribution, semántica, freeze histórico y cutover outbound `Greenhouse -> Notion` sobre `Performance Reports` |
+
+## Complete
+
+- [TASK-205-delivery-notion-origin-parity-audit.md](complete/TASK-205-delivery-notion-origin-parity-audit.md) — Lane cerrada como auditoría reusable `Notion/raw/conformed`: helper server-side, route admin tenant-scoped, script CLI y evidencia real para `Daniela` y `Andrés / Abril 2026`; el hardening estructural queda explicitamente derivado a `TASK-207`.
 
 ## To Do
 
@@ -126,6 +130,28 @@ Primer bloque operativo asignado:
   - el contrato mensual del reporte ya queda congelado sobre `due_date in period`, corte `period_end + 1 day` y buckets mutuamente excluyentes
   - `OTD` ya no significa `on_time / (on_time + late_drop)` para el scorecard mensual; pasa a `on_time / total_classified_tasks`
   - `Top Performer` ya queda definido por `OTD` canónico y volumen total de tareas del período
+- `TASK-204` queda abierta como follow-on semántico:
+  - `Carry-Over` pasa a definirse como tarea creada en el mes con `due_date` en el siguiente mes o después
+  - la deuda vencida que cruza de mes se separa como `Overdue Carried Forward`
+- `TASK-205` ya está en curso como lane de paridad contra origen:
+  - `Notion` ya mostró más tareas de `Daniela / Abril 2026` que `Greenhouse` (`80` vs `73`)
+  - esa reconciliación debe cerrarse antes de seguir afinando scorecards sobre un universo incompleto
+  - esta lane ya queda explícitamente enmarcada dentro de la integración nativa de `Notion`, no como carril lateral de Delivery
+  - corrección de repositorio:
+    - `sync-conformed` es el writer runtime activo
+    - `sync-source-runtime-projections.ts` sigue existiendo como carril legacy/manual con capacidad de reescribir `delivery_tasks`
+    - la jerarquía `task/subtask` todavía no forma parte del contrato versionado local de `greenhouse_conformed.delivery_tasks`
+- `TASK-206` queda abierta como lane de atribución operativa:
+  - `identity_profile_source_links` se confirma como backbone de identidad, no como contrato suficiente de atribución
+  - falta una capa reusable para traducir identidad en `primary owner`, `co-assignees`, `member credit` y `client collaboration`
+- `TASK-207` queda abierta como lane de hardening del sync:
+  - el problema principal ya no apunta a `Estado` vs `Estado 1`, sino al tramo `raw -> conformed`
+  - el pipeline necesita gates reales de frescura, convergencia a un solo writer y validaciones automáticas de paridad
+  - esta lane ya queda explícitamente enmarcada como hardening runtime de la integración nativa de `Notion`
+- `TASK-208` queda abierta como lane de monitoreo continuo:
+  - Greenhouse necesita un auditor recurrente de data quality para no volver a quedar ciego frente al drift
+  - el objetivo es medir salud real del pipeline y alertar cuando `Notion`, raw y conformed dejen de cuadrar
+  - esta lane ya queda explícitamente enmarcada como observabilidad nativa de la integración `Notion`
 - **Siguiente ola:** `TASK-173` → `TASK-027` → `TASK-028` → `TASK-116` → `TASK-070` → `TASK-071` → `TASK-011`.
 - **Estratégicas pero caras:** `TASK-008` → `TASK-005` → `TASK-071` → `TASK-118` → `TASK-018`.
 - **Later / oportunistas:** `TASK-029` → `TASK-031` → `TASK-015` → `TASK-016` → `TASK-020` → `TASK-115` → `TASK-107` → `TASK-103` → `TASK-021` → `TASK-032` → `TASK-053` → `TASK-054` → `TASK-055` → `TASK-058` → `TASK-071`.
@@ -142,6 +168,7 @@ Nota de secuencia para la lane de integraciones + métricas Delivery:
 - `TASK-188` y `TASK-187` quedan como el carril enterprise para institucionalizar la capa nativa de integraciones después del MVP
 - `TASK-187` implementa la `Native Integrations Layer` para `Notion`
 - `TASK-186` endurece el consumer de métricas sobre esa foundation
+- `TASK-205`, `TASK-207` y `TASK-208` ya no deben leerse como backlog paralelo de Delivery; quedan absorbidas como follow-ons operativos de esa integración nativa de `Notion`
 - criterio: fortalecer lo existente, institucionalizarlo y recién después endurecer la paridad de métricas sobre esa base, evitando `rip-and-replace`
 
 ### Backlog Priorizado

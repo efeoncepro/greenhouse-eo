@@ -828,12 +828,15 @@ When payroll or person-level `ICO` metrics show missing KPI despite real complet
    - `assignee_source_id`
    - `assignee_member_id`
    - `assignee_member_ids`
+   - o usar el auditor reusable `pnpm audit:notion-delivery-parity --space-id=<SPACE_ID> --assignee-source-id=<NOTION_USER_ID> --year=<YYYY> --month=<MM> --period-field=due_date|created_at`
 3. If attribution was lost, run the canonical remediation:
    - `pnpm exec tsx scripts/remediate-ico-assignee-attribution.ts <year> <month>`
 4. Re-verify:
    - `greenhouse_conformed.delivery_tasks` attribution counters
    - `ico_engine.metrics_by_member` for the affected period
    - downstream consumers such as projected payroll
+
+`TASK-205` leaves that parity audit as an on-demand diagnostic. Structural runtime hardening and freshness gates remain owned by `TASK-207`.
 
 This remediation is safe to rerun and is the canonical recovery path for attribution-driven KPI gaps.
 

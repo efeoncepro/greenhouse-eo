@@ -29,6 +29,7 @@
     "backfill:postgres:client-assignments": "tsx scripts/backfill-postgres-client-assignments.ts",
     "freeze:delivery-performance-period": "tsx scripts/freeze-delivery-performance-period.ts",
     "reconcile:delivery-performance-history": "tsx scripts/reconcile-delivery-performance-history.ts",
+    "audit:notion-delivery-parity": "tsx scripts/audit-notion-delivery-parity.ts",
     "audit:person-360": "tsx scripts/audit-person-360-coverage.ts",
     "pg:doctor": "tsx scripts/pg-doctor.ts",
     "sync:outbox": "tsx scripts/run-outbox-consumer.ts",

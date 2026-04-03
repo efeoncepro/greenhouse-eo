@@ -1,5 +1,31 @@
 # changelog.md
 
+## 2026-04-03
+
+- **TASK-205 delivery notion origin parity audit**:
+  - `TASK-205` queda cerrada como lane de auditoría reusable para comparar `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`
+  - se agregó el helper `src/lib/space-notion/notion-parity-audit.ts`, la route admin `GET /api/admin/tenants/[id]/notion-parity-audit` y el script `pnpm audit:notion-delivery-parity`
+  - la verificación real de abril 2026 quedó reproducible:
+    - `Daniela / due_date`: `Sky 56 -> 50`, `Efeonce 24 -> 23`
+    - `Andrés / due_date`: total `13 -> 10`
+    - `Andrés / created_at`: total `9 -> 1`
+  - los buckets reusable ya confirman `missing_in_conformed`, `status_mismatch`, `due_date_mismatch`, `fresh_raw_after_conformed_sync` y `hierarchy_gap_candidate`
+  - el hardening estructural del pipeline y las freshness gates siguen asignados a `TASK-207`
+
+- **Delivery carry-over semantic correction**:
+  - `Carry-Over` deja de interpretarse como tarea vencida de períodos anteriores aún abierta
+  - la definición canónica pasa a ser: tarea creada dentro del período con `due_date` posterior al cierre del período
+  - se incorpora `Overdue Carried Forward` como métrica separada para deuda vencida que cruza de mes
+  - `OTD` queda explícitamente separado de ambas métricas complementarias
+  - se abrió `TASK-204` para implementar el split semántico en el engine y las materializaciones
+
+- **Delivery performance metric audit follow-on**:
+  - `readAgencyPerformanceReport()` ahora prioriza `ico_engine.performance_report_monthly` antes que `greenhouse_serving.agency_performance_reports`
+  - `greenhouse_serving` queda explícitamente como cache/fallback y no como fuente preferida del cálculo
+  - se agregó la prueba `src/lib/ico-engine/performance-report.test.ts` para cubrir el orden `materialized-first`
+  - la auditoría task-level confirmó que `Marzo 2026` sigue consistente entre snapshot congelado y serving bajo el contrato actual
+  - también dejó explícito que `carry-over` sigue siendo una decisión semántica separada y no un bug de lectura de fuente
+
 ## 2026-04-02
 
 - **TASK-201 delivery performance historical materialization reconciliation**:

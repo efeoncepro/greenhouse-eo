@@ -1,5 +1,431 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — TASK-205 cerrada con auditoría executable y evidencia real
+
+### Rama / alcance
+
+- rama actual: `feature/codex-task-205-parity-audit`
+- scope implementado:
+  - `src/lib/space-notion/notion-parity-audit.ts`
+  - `src/app/api/admin/tenants/[id]/notion-parity-audit/route.ts`
+  - `scripts/audit-notion-delivery-parity.ts`
+  - `src/lib/space-notion/notion-parity-audit.test.ts`
+  - cierre documental/lifecycle de `TASK-205`
+
+### Verificación cerrada
+
+- `pnpm exec vitest run src/lib/space-notion/notion-parity-audit.test.ts`
+- `pnpm build`
+- `pnpm lint`
+- auditorías reales ejecutadas:
+  - `Daniela / due_date / Abril 2026`
+    - `Sky Airline`: `56 -> 50`
+    - `Efeonce`: `24 -> 23`
+  - `Andrés / due_date / Abril 2026`
+    - `Sky Airline`: `6 -> 4`
+    - `Efeonce`: `7 -> 6`
+  - `Andrés / created_at / Abril 2026`
+    - `Sky Airline`: `8 -> 0`
+    - `Efeonce`: `1 -> 1`
+
+### Decisión / follow-on
+
+- `TASK-205` queda cerrada como auditoría reusable y evidencia base
+- `TASK-207` debe consumir este auditor para hardening runtime y freshness gates
+- `TASK-208` debe convertir este auditor en monitoreo recurrente y alerting
+- nota colateral de validación:
+  - se corrigieron errores de lint preexistentes y triviales en `src/types/db.d.ts` y `src/views/greenhouse/admin/ScimTenantMappingsView.tsx` para dejar `pnpm lint` verde en la rama
+
+## Sesión 2026-04-03 — TASK-205 deja auditoría reusable y delega hardening a TASK-207
+
+### Estado
+
+- `TASK-205` queda registrada como lane de auditoría reusable de paridad `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`
+- el hardening estructural del pipeline sigue fuera de esta lane y permanece en `TASK-207`
+
+### Nota documental
+
+- se dejó constancia mínima en:
+  - `changelog.md`
+- no se tocaron docs técnicos adicionales para no invadir el scope de `TASK-207`
+
+## Sesión 2026-04-03 — TASK-205 entra a ejecución con spec corregida
+
+### Rama / objetivo
+
+- rama actual: `develop`
+- task activa: `TASK-205`
+- objetivo inmediato:
+  - cerrar auditoría reusable del tramo `Notion -> notion_ops -> greenhouse_conformed.delivery_tasks`
+  - separar claramente auditoría/paridad (`TASK-205`) de hardening estructural (`TASK-207`) antes de implementar cambios funcionales
+
+### Corrección documental aplicada
+
+- `TASK-205` pasó de `to-do` a `in-progress`
+- se corrigieron supuestos del brief para reflejar el estado real del repo:
+  - el writer runtime activo hoy es `src/lib/sync/sync-notion-conformed.ts` vía `GET /api/cron/sync-conformed`
+  - `scripts/sync-source-runtime-projections.ts` sigue existiendo como carril legacy/manual, todavía ejecutable y con capacidad de reescribir `greenhouse_conformed.delivery_tasks`
+  - la jerarquía `tarea_principal_ids` / `subtareas_ids` aún no forma parte del contrato versionado local de `greenhouse_conformed.delivery_tasks`
+  - parte de la documentación viva sigue describiendo la capa conformed como `config-driven`, pero el cron runtime actual no usa `space_property_mappings` como source of truth principal
+
+### Delta documental
+
+- se actualizaron:
+  - `docs/tasks/in-progress/TASK-205-delivery-notion-origin-parity-audit.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+
+## Sesión 2026-04-03 — Orden explícito para las lanes Notion parity/hardening/monitoring
+
+### Decisión
+
+- el orden recomendado de implementación queda formalizado dentro de cada task:
+  1. `TASK-205`
+  2. `TASK-207`
+  3. `TASK-208`
+
+### Motivo
+
+- `TASK-205` define el diff real contra origen
+- `TASK-207` corrige estructuralmente la tubería usando esa evidencia
+- `TASK-208` deja guardrails permanentes una vez que el contrato ya está entendido y endurecido
+
+### Delta documental
+
+- se actualizaron:
+  - `docs/tasks/to-do/TASK-205-delivery-notion-origin-parity-audit.md`
+  - `docs/tasks/to-do/TASK-207-delivery-notion-sync-pipeline-hardening.md`
+  - `docs/tasks/to-do/TASK-208-delivery-data-quality-monitoring-auditor.md`
+
+## Sesión 2026-04-03 — Re-encuadre de lanes Notion/Delivery dentro de la integración nativa
+
+### Objetivo
+
+- Dejar explícito que las lanes abiertas de paridad, hardening y monitoreo (`TASK-205`, `TASK-207`, `TASK-208`) no deben ejecutarse como un carril separado de Delivery.
+
+### Decisión
+
+- estas lanes quedan formalmente absorbidas dentro de la integración nativa de `Notion` en Greenhouse
+- su marco shared/control plane sigue siendo `TASK-188`
+- su referencia específica de implementación para `Notion` sigue siendo `TASK-187`
+- cualquier fix de:
+  - paridad contra origen
+  - frescura del sync
+  - preservación de jerarquía
+  - observabilidad y data quality
+  debe nacer dentro de ese integration layer, no como solución paralela
+
+### Delta documental
+
+- se actualizaron:
+  - `docs/tasks/to-do/TASK-205-delivery-notion-origin-parity-audit.md`
+  - `docs/tasks/to-do/TASK-207-delivery-notion-sync-pipeline-hardening.md`
+  - `docs/tasks/to-do/TASK-208-delivery-data-quality-monitoring-auditor.md`
+  - `docs/tasks/in-progress/TASK-188-native-integrations-layer-platform-governance.md`
+  - `docs/tasks/README.md`
+
+## Sesión 2026-04-03 — Nueva lane TASK-208 para monitoreo continuo de data quality
+
+### Objetivo
+
+- Abrir una task separada para construir un auditor/monitor recurrente de calidad de datos en Delivery, de modo que Greenhouse detecte automáticamente drift entre `Notion`, raw y conformed.
+
+### Motivo
+
+- la auditoría actual confirmó que el equipo estaba ciego ante el drift del pipeline
+- aunque `TASK-205` y `TASK-207` cierren el problema actual, hace falta una capa continua que diga si el pipeline está:
+  - sano
+  - degradado
+  - roto
+
+### Delta documental
+
+- se creó:
+  - `docs/tasks/to-do/TASK-208-delivery-data-quality-monitoring-auditor.md`
+- se actualizó:
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+
+## Sesión 2026-04-03 — Nueva lane TASK-207 para hardening del sync Delivery
+
+### Objetivo
+
+- Separar en una task propia el trabajo estructural de endurecimiento del pipeline `Notion -> notion_ops -> delivery_tasks`, distinto de la auditoría de paridad de `TASK-205`.
+
+### Motivo
+
+- la auditoría ya confirmó que el problema principal no es `Estado` vs `Estado 1`
+- tampoco viene hoy de `space_property_mappings`, porque la tabla está vacía
+- la lectura más fuerte apunta a:
+  - gates insuficientes de frescura del raw
+  - riesgo estructural por doble writer
+  - pérdida de jerarquía `task/subtask`
+  - ausencia de validaciones automáticas `raw -> conformed`
+
+### Delta documental
+
+- se creó:
+  - `docs/tasks/to-do/TASK-207-delivery-notion-sync-pipeline-hardening.md`
+- se actualizó:
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+
+## Sesión 2026-04-03 — Verificación de estatus `Estado` vs `Estado 1` en TASK-205
+
+### Objetivo
+
+- Confirmar si Greenhouse está trayendo correctamente el campo de estatus desde Notion para `Efeonce` y `Sky Airline`, y medir qué tan similar queda entre `Notion`, raw y conformed.
+
+### Hallazgos
+
+- `Efeonce` usa `Estado` tipo `status`
+- `Sky Airline` usa `Estado 1` tipo `status`
+- `sync-notion-conformed.ts` sí contempla ambas variantes con `COALESCE(estado, estado_1)`
+- `Notion directo` y `notion_ops.tareas` coinciden exactamente en distribución de estatus para ambos spaces
+- por lo tanto, el problema no está en la lectura de `Estado` / `Estado 1`
+- el drift nace después, entre `notion_ops.tareas` y `greenhouse_conformed.delivery_tasks`
+- `Efeonce` queda casi en paridad total por status
+- `Sky Airline` sí muestra drift material de status, concentrado sobre todo en:
+  - `Sin empezar`
+  - `Aprobado`
+  - `Listo para revisión`
+- corte más fino sobre `Sky / Sin empezar`:
+  - `428` tareas en raw
+  - `348` match exacto en conformed
+  - `62` missing en conformed
+  - `18` mutadas a `Aprobado`
+- patrón observado:
+  - las `62` faltantes son mayormente filas creadas el `2026-04-02T11:44:00.000Z` con fuerte presencia de jerarquía `parent/subtask`
+  - las `18` mutadas a `Aprobado` son principalmente tareas antiguas de enero 2026
+  - `space_property_mappings` no es la causa: la tabla hoy tiene `0` filas
+  - evidencia de orden/frescura:
+    - raw `_synced_at = 2026-04-03T06:01:53.473592Z`
+    - conformed `synced_at = 2026-04-03T03:45:21.802Z`
+  - lectura actual:
+    - `sync-conformed` está corriendo antes de que `notion-bq-sync` termine de refrescar el raw del día
+    - la readiness gate actual no alcanza a detectar ese lag porque no valida frescura real de `notion_ops.tareas`
+
+### Implicación operativa
+
+- la hipótesis `Sky usa Estado 1 y por eso no entra bien` queda debilitada
+- la hipótesis fuerte ahora es:
+  - filas que se pierden en la proyección raw -> conformed
+  - filas que cambian de `task_status` en esa misma proyección
+
+### Delta documental
+
+- se actualizó:
+  - `docs/tasks/to-do/TASK-205-delivery-notion-origin-parity-audit.md`
+
+## Sesión 2026-04-03 — Auditoría de pipeline sync y estrategia de resolución para TASK-205
+
+### Objetivo
+
+- Auditar exclusivamente el pipeline de sync de Delivery para encontrar dónde nace la inconsistencia `Notion -> Greenhouse`, sin tocar runtime, y dejar explícita la estrategia correcta de resolución.
+
+### Hallazgos
+
+- las tareas auditadas sí existen en `notion_ops.tareas`
+- el problema principal nace después del raw ingest, entre `notion_ops.tareas` y `greenhouse_conformed.delivery_tasks`
+- hoy existen dos writers distintos hacia `greenhouse_conformed.delivery_tasks`:
+  - `src/lib/sync/sync-notion-conformed.ts`
+  - `scripts/sync-source-runtime-projections.ts`
+- `notion_ops.tareas` ya preserva jerarquía de Notion:
+  - `subtareas`
+  - `subtareas_ids`
+  - `tarea_principal`
+  - `tarea_principal_ids`
+- ninguno de los dos writers proyecta hoy esa jerarquía hacia `delivery_tasks`
+- el drift actual se parte en tres buckets reales:
+  - filas presentes en raw pero ausentes en conformed
+  - tareas presentes en ambos lados pero con drift de `assignee`, `due_date` o `task_status`
+  - pérdida de jerarquía `task/subtask`, especialmente relevante en `Sky Airline`
+
+### Decisión operativa
+
+- no atacar primero métricas ni publicación
+- resolver primero la paridad del sync en este orden:
+  - congelar un solo writer canónico a `delivery_tasks`
+  - preservar jerarquía `tarea principal / subtareas`
+  - cerrar integridad fila por fila `raw vs conformed`
+  - atacar el patrón repetido de `Sky` con tareas creadas en abril y `due_date = null`
+
+### Delta documental
+
+- se actualizó:
+  - `docs/tasks/to-do/TASK-205-delivery-notion-origin-parity-audit.md`
+    - ahora incluye la estrategia de resolución basada en la auditoría real del pipeline
+
+## Sesión 2026-04-03 — TASK-205 paridad origen: segundo caso y sospecha de subitems
+
+### Objetivo
+
+- Extender la evidencia de paridad `Notion -> Greenhouse` más allá de `Daniela` y dejar explícita la nueva hipótesis de `subitems` / subtareas en Notion como posible fuente del drift.
+
+### Hallazgos
+
+- `Andrés Carlosama / Abril 2026` también queda desalineado:
+  - `due_april`: `Notion 13` vs `Greenhouse 10`
+  - `created_april`: `Notion 9` vs `Greenhouse 1`
+- `Notion only` para `due_april`:
+  - `Generar Banco de poses + expresiones`
+  - `HM Argentina - Diseños Nuevos`
+  - `Shopping Story`
+- `Notion only` para `created_april`:
+  - `8` tareas de `Sky Airline`
+  - todas creadas el `2026-04-02T11:44:00.000Z`
+  - varias con `due_date = null`
+- Insight nuevo:
+  - Notion maneja `subitems` / subtareas además de tareas principales
+  - queda abierta la hipótesis de que Greenhouse esté filtrando, colapsando o perdiendo parte de esos subitems en el sync
+  - la verificación posterior ya confirmó que:
+    - `notion_ops.tareas` sí trae `subtareas_ids` y `tarea_principal_ids`
+    - `sync-notion-conformed.ts` no los proyecta hoy a `delivery_tasks`
+    - en `Sky` varios faltantes auditados sí son subtareas reales
+    - en `Efeonce` los casos faltantes auditados no se explican por subtareas
+  - además, parte del drift no es solo “fila ausente”; también hay drift de `assignee` y `due_date` en tareas que sí existen en `delivery_tasks`
+
+### Delta documental
+
+- `docs/tasks/to-do/TASK-205-delivery-notion-origin-parity-audit.md`
+  - ya incluye el caso `Andrés / Abril 2026`
+  - ya incluye la hipótesis de `subitems` como causa a verificar
+
+## Sesión 2026-04-03 — Nueva lane TASK-206 para atribución operativa Delivery
+
+### Objetivo
+
+- Formalizar una lane separada para modelar la atribución operativa de trabajo encima del backbone de identidad, evitando seguir mezclando `identity resolution` con `owner attribution`.
+
+### Delta documental
+
+- Se creó:
+  - `docs/tasks/to-do/TASK-206-delivery-operational-attribution-model.md`
+- Se actualizó:
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+
+### Estado resultante
+
+- `identity_profile_source_links` queda reafirmado como fuente de enlaces de identidad, no como solución completa de atribución operativa.
+- La reconciliación de Delivery queda ahora separada en tres lanes distintas:
+  - identidad (`TASK-198`)
+  - atribución de performance (`TASK-199`)
+  - modelo reusable de atribución operativa (`TASK-206`)
+
+## Sesión 2026-04-03 — Corrección contractual de Carry-Over vs Overdue Carried Forward
+
+### Objetivo
+
+- Corregir la semántica funcional de `Carry-Over` después de la auditoría, para separar carga futura de deuda vencida arrastrada.
+
+### Delta documental
+
+- Se corrigió el contrato funcional en:
+  - `docs/tasks/complete/TASK-200-delivery-performance-metric-semantic-contract.md`
+  - `docs/architecture/GREENHOUSE_DELIVERY_PERFORMANCE_REPORT_PARITY_V1.md`
+  - `docs/operations/GREENHOUSE_PERFORMANCE_REPORT_OPERATING_MODEL_V1.md`
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+  - `docs/tasks/complete/TASK-189-ico-period-filter-due-date-anchor.md`
+- La definición canónica queda así:
+  - `Carry-Over` = tarea creada dentro del período con `due_date` posterior al cierre del período
+  - `Overdue Carried Forward` = tarea con `due_date` en o antes del cierre que sigue abierta al comenzar el mes siguiente
+  - el scorecard mensual de cumplimiento queda con `On-Time`, `Late Drop` y `Overdue`
+  - `OTD` no debe usar `Carry-Over` ni `Overdue Carried Forward` en el denominador
+- Se abrió la follow-on task:
+  - `docs/tasks/to-do/TASK-204-delivery-carry-over-backlog-semantic-split.md`
+
+### Estado resultante
+
+- La corrección en esta sesión es contractual/documental, no de runtime.
+- El engine sigue con la semántica previa hasta implementar `TASK-204`.
+- La parte estable del sistema sigue siendo:
+  - `due_date` como ancla del período
+  - snapshots congelados
+  - read path `materialized-first` para el reporte
+
+## Sesión 2026-04-03 — Nueva lane TASK-205 para paridad `Notion -> Greenhouse`
+
+### Objetivo
+
+- Formalizar el gap de universo detectado entre `Notion` origen y `Greenhouse` para Delivery, usando `Daniela / Abril 2026` como primer caso de reconciliación fila por fila.
+
+### Evidencia inicial
+
+- `Notion` directo:
+  - `due_april`: `80` (`24` Efeonce, `56` Sky Airline)
+  - `created_april`: `22` (`2` Efeonce, `20` Sky Airline)
+- `Greenhouse`:
+  - `due_april`: `73` (`23` Efeonce, `50` Sky Airline)
+  - `created_april`: `1` (`1` Efeonce, `0` Sky Airline)
+
+### Delta documental
+
+- Se creó:
+  - `docs/tasks/to-do/TASK-205-delivery-notion-origin-parity-audit.md`
+
+### Estado resultante
+
+- El problema ya no se trata como observación suelta dentro de la lane de métricas.
+- Queda formalizado como task separada de paridad de origen, previa a seguir confiando en cualquier scorecard downstream.
+
+## Sesión 2026-04-03 — Auditoría de métricas Delivery y hardening del read path canónico
+
+### Objetivo
+
+- Auditar las métricas del `Performance Report` después del cutover a Notion y corregir cualquier inconsistencia real en el cálculo, priorizando el source of truth canónico.
+
+### Delta de auditoría
+
+- Se auditó `Marzo 2026` task-level sobre `ico_engine.delivery_task_monthly_snapshots`:
+  - `294` filas `locked`
+  - `293` tareas clasificadas
+  - `247 on_time`
+  - `25 late_drop`
+  - `21 overdue`
+  - `0 carry_over`
+  - `1 unclassified` (`Archivado` en `Sky`)
+- La fila de `greenhouse_serving.agency_performance_reports` para `2026-03` coincide exactamente con el snapshot congelado:
+  - `84.3% OTD`
+  - `293 total_tasks`
+  - `247/25/21/0`
+- Hallazgo fuerte:
+  - la inconsistencia principal ya no estaba entre snapshot y serving para marzo
+  - el riesgo real era que `readAgencyPerformanceReport()` seguía leyendo `serving` antes que `performance_report_monthly`
+- Se auditó también un intento de reintroducir `carry-over` de períodos anteriores directamente en el filtro compartido:
+  - en `2026-04` disparó `carry_over_count = 509` y `total_tasks = 530`
+  - conclusión: esa semántica no debe entrar a ciegas en el scorecard mensual del reporte
+
+### Delta de implementación
+
+- `src/lib/ico-engine/performance-report.ts`
+  - `readAgencyPerformanceReport()` ahora prioriza `ico_engine.performance_report_monthly`
+  - `greenhouse_serving.agency_performance_reports` queda como fallback/cache y no como fuente preferida
+- nueva prueba unitaria:
+  - `src/lib/ico-engine/performance-report.test.ts`
+  - verifica preferencia `materialized-first`
+  - verifica fallback a `serving` cuando BigQuery no tiene fila materializada
+- documentación actualizada:
+  - `docs/architecture/GREENHOUSE_DELIVERY_PERFORMANCE_REPORT_PARITY_V1.md`
+  - `docs/operations/GREENHOUSE_PERFORMANCE_REPORT_OPERATING_MODEL_V1.md`
+  - `docs/tasks/complete/TASK-200-delivery-performance-metric-semantic-contract.md`
+  - `docs/tasks/complete/TASK-201-delivery-performance-historical-materialization-reconciliation.md`
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/ico-engine/performance-report.test.ts`
+- `pnpm build`
+- `pnpm lint`
+  - sigue fallando por issues preexistentes ajenos a este cambio:
+    - `src/types/db.d.ts`
+    - `src/views/greenhouse/admin/ScimTenantMappingsView.tsx`
+
+### Estado resultante
+
+- El read path del reporte ya quedó endurecido hacia la fuente canónica correcta.
+- `Marzo 2026` sigue estable bajo el contrato actual.
+- `carry-over` sigue siendo la principal decisión semántica pendiente, pero ya no está mezclada con un bug de fuente ni con drift entre snapshot y serving.
+
 ## Sesión 2026-04-02 — TASK-201 historical reconciliation + frozen monthly snapshots
 
 ### Objetivo

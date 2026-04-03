@@ -12,7 +12,6 @@ import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
-import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Switch from '@mui/material/Switch'
 import Table from '@mui/material/Table'
@@ -55,6 +54,7 @@ export default function ScimTenantMappingsView({ mappings: initialMappings }: Pr
   const [mappings, setMappings] = useState(initialMappings)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [saving, setSaving] = useState(false)
+
   const [form, setForm] = useState({
     microsoftTenantId: '',
     tenantName: '',

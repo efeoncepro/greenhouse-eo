@@ -253,3 +253,8 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-201` | `complete` | Delivery Performance Historical Materialization Reconciliation | `docs/tasks/complete/TASK-201-delivery-performance-historical-materialization-reconciliation.md` |
 | `TASK-202` | `complete` | Delivery Performance Report Publication & Notion Consumption Cutover | `docs/tasks/complete/TASK-202-delivery-performance-notion-publication-cutover.md` |
 | `TASK-203` | `complete` | SCIM Provisioning Activation: Entra Config, Identity Reconciliation & Observability | `docs/tasks/complete/TASK-203-scim-provisioning-activation-entra-reconciliation.md` |
+| `TASK-204` | `to-do` | Delivery Carry-Over & Overdue Carried Forward Semantic Split | `docs/tasks/to-do/TASK-204-delivery-carry-over-backlog-semantic-split.md` |
+| `TASK-205` | `complete` | Delivery Notion Origin Parity Audit | `docs/tasks/complete/TASK-205-delivery-notion-origin-parity-audit.md` |
+| `TASK-206` | `to-do` | Delivery Operational Attribution Model | `docs/tasks/to-do/TASK-206-delivery-operational-attribution-model.md` |
+| `TASK-207` | `to-do` | Delivery Notion Sync Pipeline Hardening & Freshness Gates | `docs/tasks/to-do/TASK-207-delivery-notion-sync-pipeline-hardening.md` |
+| `TASK-208` | `to-do` | Delivery Data Quality Monitoring & Drift Auditor | `docs/tasks/to-do/TASK-208-delivery-data-quality-monitoring-auditor.md` |
