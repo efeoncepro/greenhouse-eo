@@ -250,6 +250,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-198` | `complete` | Delivery Notion Assignee Identity Coverage | `docs/tasks/complete/TASK-198-delivery-notion-assignee-identity-coverage.md` |
 | `TASK-199` | `complete` | Delivery Performance Owner Attribution Contract | `docs/tasks/complete/TASK-199-delivery-performance-owner-attribution-contract.md` |
 | `TASK-200` | `complete` | Delivery Performance Metric Semantic Contract | `docs/tasks/complete/TASK-200-delivery-performance-metric-semantic-contract.md` |
-| `TASK-201` | `to-do` | Delivery Performance Historical Materialization Reconciliation | `docs/tasks/to-do/TASK-201-delivery-performance-historical-materialization-reconciliation.md` |
+| `TASK-201` | `complete` | Delivery Performance Historical Materialization Reconciliation | `docs/tasks/complete/TASK-201-delivery-performance-historical-materialization-reconciliation.md` |
 | `TASK-202` | `to-do` | Delivery Performance Report Publication & Notion Consumption Cutover | `docs/tasks/to-do/TASK-202-delivery-performance-notion-publication-cutover.md` |
 | `TASK-203` | `to-do` | SCIM Provisioning Activation: Entra Config, Identity Reconciliation & Observability | `docs/tasks/to-do/TASK-203-scim-provisioning-activation-entra-reconciliation.md` |

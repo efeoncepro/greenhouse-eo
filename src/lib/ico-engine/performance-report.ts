@@ -2,7 +2,17 @@ import 'server-only'
 
 import { isInternalCommercialAssignment } from '@/lib/commercial-cost-attribution/assignment-classification'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { getIcoEngineProjectId, normalizeString, runIcoEngineQuery, toNullableNumber, toNumber } from './shared'
+import {
+  buildAgencyReportScopeSql,
+  buildDeliveryPeriodSourceSql,
+  buildMetricSelectSQL,
+  getIcoEngineProjectId,
+  isAgencyReportIncludedSpace,
+  normalizeString,
+  runIcoEngineQuery,
+  toNullableNumber,
+  toNumber
+} from './shared'
 import { readAgencyMetrics, type SpaceMetricSnapshot } from './read-metrics'
 import { ICO_DATASET } from './schema'
 
@@ -314,24 +324,41 @@ const readTopPerformer = async (periodYear: number, periodMonth: number): Promis
 
   const rows = await runIcoEngineQuery<TopPerformerRow>(`
     SELECT
-      mb.member_id,
-      COALESCE(tm.display_name, mb.member_id) AS member_name,
-      mb.otd_pct,
-      mb.total_tasks AS throughput_count,
-      mb.rpa_avg,
-      mb.ftr_pct
-    FROM \`${projectId}.${ICO_DATASET}.metrics_by_member\` mb
-    LEFT JOIN \`${projectId}.greenhouse.team_members\` tm
-      ON tm.member_id = mb.member_id
-    WHERE mb.period_year = @periodYear
-      AND mb.period_month = @periodMonth
-      AND mb.total_tasks >= @minThroughput
-      AND mb.otd_pct IS NOT NULL
+      scoped.member_id,
+      scoped.member_name,
+      scoped.otd_pct,
+      scoped.total_tasks AS throughput_count,
+      scoped.rpa_avg,
+      scoped.ftr_pct
+    FROM (
+      SELECT
+        te.primary_owner_member_id AS member_id,
+        COALESCE(tm.display_name, te.primary_owner_member_id) AS member_name,
+        ${buildMetricSelectSQL()}
+      FROM ${buildDeliveryPeriodSourceSql(projectId)} te
+      LEFT JOIN \`${projectId}.greenhouse.team_members\` tm
+        ON tm.member_id = te.primary_owner_member_id
+      LEFT JOIN \`${projectId}.greenhouse.clients\` c1
+        ON c1.client_id = te.client_id
+      LEFT JOIN \`${projectId}.greenhouse.clients\` c2
+        ON c2.client_id = te.space_id
+      WHERE te.primary_owner_member_id IS NOT NULL
+        AND te.primary_owner_member_id != ''
+        AND ${buildAgencyReportScopeSql({
+          spaceIdExpression: 'te.space_id',
+          clientIdExpression: 'te.client_id',
+          primaryNameExpression: 'c1.client_name',
+          secondaryNameExpression: 'c2.client_name'
+        })}
+      GROUP BY member_id, member_name
+    ) scoped
+    WHERE scoped.total_tasks >= @minThroughput
+      AND scoped.otd_pct IS NOT NULL
     ORDER BY
-      mb.otd_pct DESC,
-      mb.total_tasks DESC,
-      mb.rpa_avg ASC NULLS LAST,
-      mb.member_id ASC
+      scoped.otd_pct DESC,
+      scoped.total_tasks DESC,
+      scoped.rpa_avg ASC NULLS LAST,
+      scoped.member_id ASC
     LIMIT 1
   `, {
     periodYear,
@@ -531,16 +558,28 @@ export const readAgencyPerformanceReport = async (
     readTopPerformer(periodYear, periodMonth)
   ])
 
-  const currentOnTimePct = computeOnTimePctFromSpaces(currentSpaces)
-  const previousOnTimePct = computeOnTimePctFromSpaces(previousSpaces)
+  const currentScopedSpaces = currentSpaces.filter(space => isAgencyReportIncludedSpace({
+    spaceId: space.spaceId,
+    clientId: space.clientId,
+    clientName: space.clientName
+  }))
+
+  const previousScopedSpaces = previousSpaces.filter(space => isAgencyReportIncludedSpace({
+    spaceId: space.spaceId,
+    clientId: space.clientId,
+    clientName: space.clientName
+  }))
+
+  const currentOnTimePct = computeOnTimePctFromSpaces(currentScopedSpaces)
+  const previousOnTimePct = computeOnTimePctFromSpaces(previousScopedSpaces)
 
   const onTimeDeltaPp =
     currentOnTimePct !== null && previousOnTimePct !== null
       ? Math.round((currentOnTimePct - previousOnTimePct) * 10) / 10
       : null
 
-  const currentSummary = summarizeSpaces(currentSpaces)
-  const taskMix = buildTaskMixFromSpaces(currentSpaces)
+  const currentSummary = summarizeSpaces(currentScopedSpaces)
+  const taskMix = buildTaskMixFromSpaces(currentScopedSpaces)
 
   const summary = {
     onTimePct: currentOnTimePct,

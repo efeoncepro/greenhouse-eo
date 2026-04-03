@@ -90,6 +90,157 @@ export const OWNER_ATTRIBUTION_POLICY = 'primary_owner_first_assignee'
 
 export type IcoDimensionKey = keyof typeof ICO_DIMENSIONS
 
+export const AGENCY_REPORT_SCOPE_SPACE_IDS = [
+  'spc-c0cf6478-1bf1-4804-8e04-db7bc73655ad',
+  'spc-ae463d9f-b404-438b-bd5c-bd117d45c3b9',
+  'space-efeonce'
+] as const
+
+export const AGENCY_REPORT_SCOPE_CLIENT_IDS = [
+  'efeonce_internal',
+  'client_internal'
+] as const
+
+const AGENCY_REPORT_SCOPE_SPACE_IDS_SQL = AGENCY_REPORT_SCOPE_SPACE_IDS.map(id => `'${id}'`).join(', ')
+const AGENCY_REPORT_SCOPE_CLIENT_IDS_SQL = AGENCY_REPORT_SCOPE_CLIENT_IDS.map(id => `'${id}'`).join(', ')
+
+const normalizeAgencyScopeValue = (value: string | null | undefined) => normalizeString(value).toLowerCase()
+
+export const isAgencyReportIncludedSpace = (context: {
+  spaceId?: string | null
+  clientId?: string | null
+  clientName?: string | null
+}): boolean => {
+  const spaceId = normalizeAgencyScopeValue(context.spaceId)
+  const clientId = normalizeAgencyScopeValue(context.clientId)
+  const clientName = normalizeAgencyScopeValue(context.clientName)
+  const combined = [spaceId, clientId, clientName].filter(Boolean).join(' ')
+
+  if (AGENCY_REPORT_SCOPE_SPACE_IDS.includes(spaceId as (typeof AGENCY_REPORT_SCOPE_SPACE_IDS)[number])) {
+    return true
+  }
+
+  if (AGENCY_REPORT_SCOPE_CLIENT_IDS.includes(clientId as (typeof AGENCY_REPORT_SCOPE_CLIENT_IDS)[number])) {
+    return true
+  }
+
+  return (
+    clientName === 'efeonce' ||
+    clientName === 'efeonce internal' ||
+    combined.includes(' sky') ||
+    combined.startsWith('sky') ||
+    combined.includes('sky ')
+  )
+}
+
+export const buildAgencyReportScopeSql = ({
+  spaceIdExpression,
+  clientIdExpression,
+  primaryNameExpression,
+  secondaryNameExpression
+}: {
+  spaceIdExpression: string
+  clientIdExpression: string
+  primaryNameExpression?: string
+  secondaryNameExpression?: string
+}) => {
+  const primaryName = primaryNameExpression ?? "''"
+  const secondaryName = secondaryNameExpression ?? "''"
+
+  return `(
+    LOWER(TRIM(COALESCE(${spaceIdExpression}, ''))) IN (${AGENCY_REPORT_SCOPE_SPACE_IDS_SQL})
+    OR LOWER(TRIM(COALESCE(${clientIdExpression}, ''))) IN (${AGENCY_REPORT_SCOPE_CLIENT_IDS_SQL})
+    OR LOWER(TRIM(COALESCE(${primaryName}, ${secondaryName}, ''))) IN ('efeonce', 'efeonce internal')
+    OR LOWER(TRIM(COALESCE(${primaryName}, ${secondaryName}, ${clientIdExpression}, ${spaceIdExpression}, ''))) LIKE '%sky%'
+  )`
+}
+
+const DELIVERY_PERIOD_SOURCE_COLUMNS = `
+  task_source_id,
+  project_source_id,
+  sprint_source_id,
+  space_id,
+  client_id,
+  module_code,
+  module_id,
+  task_name,
+  task_status,
+  assignee_member_id,
+  assignee_source_id,
+  assignee_member_ids,
+  primary_owner_source_id,
+  primary_owner_member_id,
+  primary_owner_type,
+  has_co_assignees,
+  completion_label,
+  delivery_compliance,
+  days_late,
+  is_rescheduled,
+  performance_indicator_code,
+  performance_indicator_label,
+  client_change_round_final,
+  workflow_change_round,
+  rpa_value,
+  open_frame_comments,
+  client_review_open,
+  workflow_review_open,
+  blocker_count,
+  due_date,
+  original_due_date,
+  completed_at,
+  last_edited_time,
+  synced_at,
+  created_at,
+  period_anchor_date,
+  fase_csc,
+  cycle_time_days,
+  hours_since_update,
+  is_stuck,
+  delivery_signal,
+  operating_business_unit
+`
+
+export const buildDeliveryPeriodSourceSql = (projectId: string) => `(
+  WITH period_snapshots AS (
+    SELECT
+      ${DELIVERY_PERIOD_SOURCE_COLUMNS}
+    FROM \`${projectId}.ico_engine.delivery_task_monthly_snapshots\`
+    WHERE period_year = @periodYear
+      AND period_month = @periodMonth
+  ),
+  preferred_snapshot_status AS (
+    SELECT
+      CASE
+        WHEN COUNTIF(snapshot_status = 'locked') > 0 THEN 'locked'
+        WHEN COUNT(*) > 0 THEN 'working'
+        ELSE NULL
+      END AS snapshot_status
+    FROM \`${projectId}.ico_engine.delivery_task_monthly_snapshots\`
+    WHERE period_year = @periodYear
+      AND period_month = @periodMonth
+  ),
+  preferred_period_snapshots AS (
+    SELECT
+      ${DELIVERY_PERIOD_SOURCE_COLUMNS}
+    FROM \`${projectId}.ico_engine.delivery_task_monthly_snapshots\`
+    WHERE period_year = @periodYear
+      AND period_month = @periodMonth
+      AND snapshot_status = (SELECT snapshot_status FROM preferred_snapshot_status)
+  )
+  SELECT
+    ${DELIVERY_PERIOD_SOURCE_COLUMNS}
+  FROM preferred_period_snapshots
+  UNION ALL
+  SELECT
+    ${DELIVERY_PERIOD_SOURCE_COLUMNS}
+  FROM \`${projectId}.ico_engine.v_tasks_enriched\`
+  WHERE NOT EXISTS (
+    SELECT 1
+    FROM preferred_period_snapshots
+  )
+    AND (${buildPeriodFilterSQL()})
+)`
+
 // ─── Canonical Status Lists ────────────────────────────────────────────────
 
 export const DONE_STATUSES_SQL = `'Listo','Done','Finalizado','Completado','Aprobado'`

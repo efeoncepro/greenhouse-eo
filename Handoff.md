@@ -1,5 +1,58 @@
 # Handoff.md
 
+## Sesión 2026-04-02 — TASK-201 historical reconciliation + frozen monthly snapshots
+
+### Objetivo
+
+- Cerrar `TASK-201` dejando `Marzo 2026` recalculable en Greenhouse con materialización histórica auditable y una estrategia operativa para evitar reescritura retroactiva del `Performance Report`.
+
+### Delta de implementación
+
+- `sync-notion-conformed` se reejecutó y confirmó que `Sky` sí tenía status operativo en origen; el gap era stale conformed.
+- `src/lib/space-notion/notion-governance-contract.ts`
+  - `task_status` ahora acepta también alias `estado_1`
+- `src/lib/ico-engine/schema.ts`
+  - `v_tasks_enriched` ahora expone `performance_indicator_label` y `original_due_date`
+  - nuevo objeto BigQuery `ico_engine.delivery_task_monthly_snapshots`
+- `src/lib/ico-engine/shared.ts`
+  - nuevo `buildDeliveryPeriodSourceSql()` para preferir snapshot task-level congelado y usar view vivo solo como fallback
+- `src/lib/ico-engine/materialize.ts`
+  - nuevo `materializeDeliveryTaskMonthlySnapshot()`
+  - nuevo `freezeDeliveryTaskMonthlySnapshot()`
+  - las materializaciones mensuales Delivery ahora leen desde `buildDeliveryPeriodSourceSql()`
+- `src/lib/ico-engine/historical-reconciliation.ts`
+  - la reconciliación ahora congela el período antes de rematerializar y comparar
+- nuevos scripts operativos:
+  - `scripts/freeze-delivery-performance-period.ts`
+  - `scripts/reconcile-delivery-performance-history.ts`
+- `package.json`
+  - nuevo comando `pnpm freeze:delivery-performance-period`
+
+### Verificación
+
+- `pnpm build`
+- `pnpm lint`
+- `rg -n "new Pool\\(" src scripts`
+- `pnpm freeze:delivery-performance-period 2026 3`
+  - `294` filas `locked`
+  - `293` tareas clasificadas
+  - `agency_performance_reports` refrescado para `2026-03`
+- `pnpm reconcile:delivery-performance-history 2026 3`
+  - Greenhouse congelado: `84.3% OT`, `293` tareas, `247 on-time`, `25 late drops`, `21 overdue`
+  - baseline Notion: `67.5% OT`, `283` tareas, `191 on-time`, `75 late drops`, `17 overdue`
+
+### Conclusión operativa
+
+- `TASK-201` queda cerrada.
+- El residual de marzo ya no apunta principalmente a fórmula, sync ni owner attribution.
+- La evidencia más fuerte apunta a historia mutable en Notion posterior al cierre:
+  - `Sky` hoy aparece casi completo como `Aprobado`
+  - múltiples tareas muestran `completed_at <= due_date` en el estado actual
+  - el reporte histórico parece haber sido calculado antes de ediciones posteriores sobre fechas/cierre
+- Regla nueva:
+  - `Abril 2026` en adelante debe operarse con snapshot mensual congelado
+  - los períodos cerrados ya no deben recalcularse desde el estado vivo mutable de Notion
+
 ## Sesión 2026-04-02 — TASK-196 delivery performance report parity lane
 
 ### Objetivo
@@ -348,6 +401,30 @@
 - Residual intencional:
   - el histórico `Marzo 2026` en Greenhouse sigue con drift material y buckets nulos legacy
   - esa reconciliación queda correctamente movida a `TASK-201`
+
+## Sesión 2026-04-02 — TASK-201 delivery performance historical materialization reconciliation
+
+### Objetivo
+
+- Rehidratar la infraestructura ejecutable del `ICO Engine` y reconciliar `Marzo 2026` para dejar el baseline histórico materializado y auditable en Greenhouse.
+
+### Delta de descubrimiento
+
+- `TASK-201` pasó a `in-progress` tras auditoría formal.
+- La spec quedó corregida para reflejar que el problema ya no es solo “faltan snapshots”:
+  - `ico_engine.performance_report_monthly` sigue sin fila `agency` para `2026-03`
+  - `greenhouse_serving.agency_performance_reports` sigue vacío para `2026-03`
+  - `ico_engine.metrics_by_member` y `metric_snapshots_monthly` mantienen buckets nulos legacy para `2026-03`
+  - `ico_engine.v_tasks_enriched` sigue viejo en BigQuery y no expone todavía:
+    - `primary_owner_source_id`
+    - `primary_owner_member_id`
+    - `primary_owner_type`
+    - `has_co_assignees`
+- Verificación directa:
+  - `INFORMATION_SCHEMA.COLUMNS` de `ico_engine.v_tasks_enriched` no incluye esos campos
+  - una query directa a `primary_owner_member_id` en el view falla hoy con `Unrecognized name`
+- Implicación operativa:
+  - la task debe empezar rehidratando la infraestructura del engine en BigQuery antes de intentar rematerializar marzo con el contrato de `TASK-199` y `TASK-200`
 
 ## Sesión 2026-04-02 — RESEARCH-004 space identity consolidation
 

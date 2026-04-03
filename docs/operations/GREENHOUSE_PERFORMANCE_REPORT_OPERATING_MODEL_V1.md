@@ -1,5 +1,22 @@
 # Greenhouse Performance Report Operating Model V1
 
+## Delta 2026-04-02 — Freeze mensual por tarea queda operativo
+
+`TASK-201` cierra el criterio operativo para períodos históricos de Delivery:
+
+- el cierre mensual debe congelar un snapshot task-level del período antes de rematerializar scorecards
+- el comando operativo queda explícito:
+  - `pnpm freeze:delivery-performance-period <year> <month>`
+- ese freeze:
+  - escribe `ico_engine.delivery_task_monthly_snapshots`
+  - marca el período como `locked`
+  - rematerializa `ICO`
+  - refresca `greenhouse_serving.agency_performance_reports`
+
+Regla nueva:
+
+- una vez congelado el período, el `Performance Report` ya no debe volver a leerse desde el estado vivo actual de Notion
+
 ## Objetivo
 
 Definir cómo debe operarse el `Performance Report` mensual de Delivery cuando Greenhouse es el motor canónico y Notion consume el resultado.

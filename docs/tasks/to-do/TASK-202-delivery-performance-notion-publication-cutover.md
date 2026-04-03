@@ -1,5 +1,14 @@
 # TASK-202 - Delivery Performance Report Publication & Notion Consumption Cutover
 
+## Delta 2026-04-02
+
+- `TASK-201` ya quedó cerrada.
+- Marzo 2026 ya no es solo un “caso por reconciliar”; ahora existe congelado en Greenhouse con snapshot task-level `locked`.
+- El residual frente al reporte histórico de Notion quedó documentado como historia mutable posterior al cierre.
+- Consecuencia para esta task:
+  - la publicación mensual a Notion debe salir desde el snapshot congelado del período
+  - el runbook de `Abril 2026` debe incluir explícitamente `freeze:delivery-performance-period` antes de publicar
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -122,4 +131,3 @@ Reglas obligatorias:
 - revisión del operating model resultante
 - validación de un flujo de publicación o simulación documentada
 - checklist de readiness mensual
-

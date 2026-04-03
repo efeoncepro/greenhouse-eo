@@ -373,7 +373,8 @@ Analytical materialization layer for ICO metrics. BigQuery-native (correct per a
 Current tables:
 - `metric_snapshots_monthly` — space-level monthly aggregates (partitioned by year, clustered by space_id)
 - `metrics_by_project` — project-level monthly aggregates (clustered by space_id, project_source_id)
-- `metrics_by_member` — person-level monthly aggregates via UNNEST(assignee_member_ids) (clustered by member_id)
+- `metrics_by_member` — person-level monthly aggregates por `primary_owner_member_id` (clustered by member_id)
+- `delivery_task_monthly_snapshots` — snapshot task-level por período para congelar cierres históricos Delivery (`working` / `locked`)
 - `rpa_trend` — 12-month rolling RPA by space and month
 - `stuck_assets_detail` — currently stuck assets (severity: warning 72h / danger 96h)
 - `ai_metric_scores` — reserved for future AI-driven metric scoring (empty)

@@ -1,6 +1,15 @@
 import 'server-only'
 
-import { runIcoEngineQuery, getIcoEngineProjectId, toNumber, buildMetricSelectSQL, buildPeriodFilterSQL, DONE_STATUSES_SQL } from './shared'
+import {
+  runIcoEngineQuery,
+  getIcoEngineProjectId,
+  toNumber,
+  buildAgencyReportScopeSql,
+  buildDeliveryPeriodSourceSql,
+  buildMetricSelectSQL,
+  buildPeriodFilterSQL,
+  DONE_STATUSES_SQL
+} from './shared'
 import { ensureIcoEngineInfrastructure, ICO_DATASET, ENGINE_VERSION } from './schema'
 import {
   TOP_PERFORMER_MIN_THROUGHPUT,
@@ -10,9 +19,10 @@ import {
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
-interface MaterializationResult {
+export interface MaterializationResult {
   spacesProcessed: number
   snapshotsWritten: number
+  taskSnapshotsWritten: number
   stuckAssetsWritten: number
   rpaTrendRowsWritten: number
   projectMetricsWritten: number
@@ -32,6 +42,141 @@ interface CscDistributionRow {
   task_count: unknown
 }
 
+interface DeliveryTaskSnapshotResult {
+  rowsWritten: number
+  snapshotStatus: 'working' | 'locked'
+  reusedLockedSnapshot: boolean
+}
+
+const materializeDeliveryTaskMonthlySnapshot = async (
+  projectId: string,
+  periodYear: number,
+  periodMonth: number,
+  options: {
+    lockSnapshot?: boolean
+    force?: boolean
+  } = {}
+): Promise<DeliveryTaskSnapshotResult> => {
+  const lockSnapshot = options.lockSnapshot === true
+  const force = options.force === true
+  const snapshotStatus = lockSnapshot ? 'locked' : 'working'
+
+  const lockRows = await runIcoEngineQuery<{ cnt: unknown }>(`
+    SELECT COUNT(*) AS cnt
+    FROM \`${projectId}.${ICO_DATASET}.delivery_task_monthly_snapshots\`
+    WHERE period_year = @periodYear
+      AND period_month = @periodMonth
+      AND snapshot_status = 'locked'
+  `, { periodYear, periodMonth })
+
+  const lockedSnapshotCount = toNumber(lockRows[0]?.cnt)
+
+  if (lockedSnapshotCount > 0 && !force) {
+    return {
+      rowsWritten: lockedSnapshotCount,
+      snapshotStatus: 'locked',
+      reusedLockedSnapshot: true
+    }
+  }
+
+  await runIcoEngineQuery(`
+    DELETE FROM \`${projectId}.${ICO_DATASET}.delivery_task_monthly_snapshots\`
+    WHERE period_year = @periodYear
+      AND period_month = @periodMonth
+  `, { periodYear, periodMonth })
+
+  await runIcoEngineQuery(`
+    INSERT INTO \`${projectId}.${ICO_DATASET}.delivery_task_monthly_snapshots\`
+      (snapshot_id, period_year, period_month,
+       task_source_id, project_source_id, sprint_source_id,
+       space_id, client_id, module_code, module_id,
+       task_name, task_status, assignee_member_id, assignee_source_id, assignee_member_ids,
+       primary_owner_source_id, primary_owner_member_id, primary_owner_type, has_co_assignees,
+       completion_label, delivery_compliance, days_late, is_rescheduled,
+       performance_indicator_code, performance_indicator_label,
+       client_change_round_final, workflow_change_round,
+       rpa_value, open_frame_comments, client_review_open, workflow_review_open, blocker_count,
+       due_date, original_due_date, completed_at, last_edited_time, synced_at, created_at,
+       period_anchor_date, fase_csc, cycle_time_days, hours_since_update, is_stuck, delivery_signal,
+       operating_business_unit, snapshot_status, locked_at, materialized_at, engine_version)
+    SELECT
+      CONCAT(
+        CAST(@periodYear AS STRING), '-',
+        LPAD(CAST(@periodMonth AS STRING), 2, '0'), ':',
+        task_source_id
+      ) AS snapshot_id,
+      @periodYear AS period_year,
+      @periodMonth AS period_month,
+      task_source_id,
+      project_source_id,
+      sprint_source_id,
+      space_id,
+      client_id,
+      module_code,
+      module_id,
+      task_name,
+      task_status,
+      assignee_member_id,
+      assignee_source_id,
+      assignee_member_ids,
+      primary_owner_source_id,
+      primary_owner_member_id,
+      primary_owner_type,
+      has_co_assignees,
+      completion_label,
+      delivery_compliance,
+      days_late,
+      is_rescheduled,
+      performance_indicator_code,
+      performance_indicator_label,
+      client_change_round_final,
+      workflow_change_round,
+      rpa_value,
+      open_frame_comments,
+      client_review_open,
+      workflow_review_open,
+      blocker_count,
+      due_date,
+      original_due_date,
+      completed_at,
+      last_edited_time,
+      synced_at,
+      created_at,
+      period_anchor_date,
+      fase_csc,
+      cycle_time_days,
+      hours_since_update,
+      is_stuck,
+      delivery_signal,
+      operating_business_unit,
+      @snapshotStatus AS snapshot_status,
+      CASE WHEN @snapshotStatus = 'locked' THEN CURRENT_TIMESTAMP() ELSE NULL END AS locked_at,
+      CURRENT_TIMESTAMP() AS materialized_at,
+      @engineVersion AS engine_version
+    FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\`
+    WHERE (${buildPeriodFilterSQL()})
+  `, {
+    periodYear,
+    periodMonth,
+    snapshotStatus,
+    engineVersion: ENGINE_VERSION
+  })
+
+  const snapshotRows = await runIcoEngineQuery<{ cnt: unknown }>(`
+    SELECT COUNT(*) AS cnt
+    FROM \`${projectId}.${ICO_DATASET}.delivery_task_monthly_snapshots\`
+    WHERE period_year = @periodYear
+      AND period_month = @periodMonth
+      AND snapshot_status = @snapshotStatus
+  `, { periodYear, periodMonth, snapshotStatus })
+
+  return {
+    rowsWritten: toNumber(snapshotRows[0]?.cnt),
+    snapshotStatus,
+    reusedLockedSnapshot: false
+  }
+}
+
 // ─── Materialization ────────────────────────────────────────────────────────
 
 export const materializeMonthlySnapshots = async (
@@ -46,12 +191,55 @@ export const materializeMonthlySnapshots = async (
   const now = new Date()
   const periodYear = year ?? now.getFullYear()
   const periodMonth = month ?? (now.getMonth() + 1)
+  const taskSnapshotResult = await materializeDeliveryTaskMonthlySnapshot(projectId, periodYear, periodMonth)
 
-  // Step 1: MERGE metric aggregation across all spaces in a single query.
-  // This computes all metrics per space and upserts into metric_snapshots_monthly.
+  // Step 1: Replace the entire monthly snapshot set for the target period.
+  // Historical reconciliation must not leave stale space rows from previous contracts.
   await runIcoEngineQuery(`
-    MERGE \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\` AS target
-    USING (
+    DELETE FROM \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\`
+    WHERE period_year = @periodYear
+      AND period_month = @periodMonth
+  `, { periodYear, periodMonth })
+
+  await runIcoEngineQuery(`
+    INSERT INTO \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\`
+      (snapshot_id, space_id, client_id,
+       period_year, period_month,
+       rpa_avg, otd_pct, ftr_pct,
+       cycle_time_avg_days, cycle_time_p50_days, cycle_time_variance,
+       throughput_count, pipeline_velocity,
+       stuck_asset_count, stuck_asset_pct,
+       csc_distribution,
+       total_tasks, completed_tasks, active_tasks,
+       on_time_count, late_drop_count, overdue_count, carry_over_count,
+       computed_at, engine_version)
+    SELECT
+      source.snapshot_id,
+      source.space_id,
+      source.client_id,
+      source.period_year,
+      source.period_month,
+      source.rpa_avg,
+      source.otd_pct,
+      source.ftr_pct,
+      source.cycle_time_avg_days,
+      source.cycle_time_p50_days,
+      source.cycle_time_variance,
+      source.throughput_count,
+      source.pipeline_velocity,
+      source.stuck_asset_count,
+      source.stuck_asset_pct,
+      source.csc_distribution,
+      source.total_tasks,
+      source.completed_tasks,
+      source.active_tasks,
+      source.on_time_count,
+      source.late_drop_count,
+      source.overdue_count,
+      source.carry_over_count,
+      source.computed_at,
+      source.engine_version
+    FROM (
       SELECT
         CONCAT(space_id, '-', CAST(@periodYear AS STRING), '-', LPAD(CAST(@periodMonth AS STRING), 2, '0')) AS snapshot_id,
         space_id,
@@ -61,64 +249,14 @@ export const materializeMonthlySnapshots = async (
 
         ${buildMetricSelectSQL()},
 
-        -- Will be populated in step 2
         CAST(NULL AS STRING) AS csc_distribution,
-
         CURRENT_TIMESTAMP() AS computed_at,
         @engineVersion AS engine_version
 
-      FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\`
+      FROM ${buildDeliveryPeriodSourceSql(projectId)}
       WHERE space_id IS NOT NULL
-        AND (${buildPeriodFilterSQL()})
       GROUP BY space_id
-    ) AS source
-    ON target.snapshot_id = source.snapshot_id
-    WHEN MATCHED THEN UPDATE SET
-      client_id = source.client_id,
-      period_year = source.period_year,
-      period_month = source.period_month,
-      rpa_avg = source.rpa_avg,
-      otd_pct = source.otd_pct,
-      ftr_pct = source.ftr_pct,
-      cycle_time_avg_days = source.cycle_time_avg_days,
-      cycle_time_p50_days = source.cycle_time_p50_days,
-      cycle_time_variance = source.cycle_time_variance,
-      throughput_count = source.throughput_count,
-      pipeline_velocity = source.pipeline_velocity,
-      stuck_asset_count = source.stuck_asset_count,
-      stuck_asset_pct = source.stuck_asset_pct,
-      total_tasks = source.total_tasks,
-      completed_tasks = source.completed_tasks,
-      active_tasks = source.active_tasks,
-      on_time_count = source.on_time_count,
-      late_drop_count = source.late_drop_count,
-      overdue_count = source.overdue_count,
-      carry_over_count = source.carry_over_count,
-      computed_at = source.computed_at,
-      engine_version = source.engine_version
-    WHEN NOT MATCHED THEN INSERT (
-      snapshot_id, space_id, client_id,
-      period_year, period_month,
-      rpa_avg, otd_pct, ftr_pct,
-      cycle_time_avg_days, cycle_time_p50_days, cycle_time_variance,
-      throughput_count, pipeline_velocity,
-      stuck_asset_count, stuck_asset_pct,
-      csc_distribution,
-      total_tasks, completed_tasks, active_tasks,
-      on_time_count, late_drop_count, overdue_count, carry_over_count,
-      computed_at, engine_version
-    ) VALUES (
-      source.snapshot_id, source.space_id, source.client_id,
-      source.period_year, source.period_month,
-      source.rpa_avg, source.otd_pct, source.ftr_pct,
-      source.cycle_time_avg_days, source.cycle_time_p50_days, source.cycle_time_variance,
-      source.throughput_count, source.pipeline_velocity,
-      source.stuck_asset_count, source.stuck_asset_pct,
-      source.csc_distribution,
-      source.total_tasks, source.completed_tasks, source.active_tasks,
-      source.on_time_count, source.late_drop_count, source.overdue_count, source.carry_over_count,
-      source.computed_at, source.engine_version
-    )
+    ) source
   `, { periodYear, periodMonth, engineVersion: ENGINE_VERSION })
 
   // Step 2: Compute CSC distribution per space and update the snapshots.
@@ -128,11 +266,10 @@ export const materializeMonthlySnapshots = async (
       space_id,
       fase_csc,
       COUNT(*) AS task_count
-    FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\`
+    FROM ${buildDeliveryPeriodSourceSql(projectId)}
     WHERE space_id IS NOT NULL
       AND completed_at IS NULL
       AND task_status NOT IN (${DONE_STATUSES_SQL})
-      AND (${buildPeriodFilterSQL()})
       AND fase_csc != 'otros'
     GROUP BY space_id, fase_csc
     ORDER BY space_id, fase_csc
@@ -293,6 +430,7 @@ export const materializeMonthlySnapshots = async (
   return {
     spacesProcessed: totalSnapshots,
     snapshotsWritten: totalSnapshots,
+    taskSnapshotsWritten: taskSnapshotResult.rowsWritten,
     stuckAssetsWritten,
     rpaTrendRowsWritten,
     projectMetricsWritten,
@@ -306,6 +444,20 @@ export const materializeMonthlySnapshots = async (
     periodMonth,
     engineVersion: ENGINE_VERSION
   }
+}
+
+export const freezeDeliveryTaskMonthlySnapshot = async (
+  year: number,
+  month: number
+): Promise<DeliveryTaskSnapshotResult> => {
+  const projectId = getIcoEngineProjectId()
+
+  await ensureIcoEngineInfrastructure()
+
+  return materializeDeliveryTaskMonthlySnapshot(projectId, year, month, {
+    lockSnapshot: true,
+    force: true
+  })
 }
 
 // ─── Stuck Assets Detail Materialization ─────────────────────────────────────
@@ -417,11 +569,10 @@ const materializeProjectMetrics = async (
 
       CURRENT_TIMESTAMP() AS materialized_at
 
-    FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\`
+    FROM ${buildDeliveryPeriodSourceSql(projectId)}
     WHERE space_id IS NOT NULL
       AND project_source_id IS NOT NULL
       AND project_source_id != ''
-      AND (${buildPeriodFilterSQL()})
     GROUP BY project_source_id, space_id
   `, { periodYear, periodMonth })
 
@@ -466,10 +617,9 @@ const materializeMemberMetrics = async (
 
       CURRENT_TIMESTAMP() AS materialized_at
 
-    FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\` te
+    FROM ${buildDeliveryPeriodSourceSql(projectId)} te
     WHERE te.primary_owner_member_id IS NOT NULL
       AND te.primary_owner_member_id != ''
-      AND (${buildPeriodFilterSQL()})
     GROUP BY member_id
   `, { periodYear, periodMonth })
 
@@ -514,11 +664,10 @@ const materializeSprintMetrics = async (
 
       CURRENT_TIMESTAMP() AS materialized_at
 
-    FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\`
+    FROM ${buildDeliveryPeriodSourceSql(projectId)}
     WHERE space_id IS NOT NULL
       AND sprint_source_id IS NOT NULL
       AND sprint_source_id != ''
-      AND (${buildPeriodFilterSQL()})
     GROUP BY sprint_source_id, space_id
   `, { periodYear, periodMonth })
 
@@ -561,10 +710,9 @@ const materializeOrganizationMetrics = async (
 
       CURRENT_TIMESTAMP() AS materialized_at
 
-    FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\`
+    FROM ${buildDeliveryPeriodSourceSql(projectId)}
     WHERE client_id IS NOT NULL
       AND client_id != ''
-      AND (${buildPeriodFilterSQL()})
     GROUP BY client_id
   `, { periodYear, periodMonth })
 
@@ -608,10 +756,9 @@ const materializeBusinessUnitMetrics = async (
 
       CURRENT_TIMESTAMP() AS materialized_at
 
-    FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\`
+    FROM ${buildDeliveryPeriodSourceSql(projectId)}
     WHERE operating_business_unit IS NOT NULL
       AND operating_business_unit != ''
-      AND (${buildPeriodFilterSQL()})
     GROUP BY operating_business_unit
   `, { periodYear, periodMonth })
 
@@ -681,6 +828,11 @@ const materializePerformanceReports = async (
       WHERE ms.period_year = @periodYear
         AND ms.period_month = @periodMonth
     ),
+    scoped_report_snapshots AS (
+      SELECT *
+      FROM classified_snapshots
+      WHERE segment_key IN ('efeonce', 'sky')
+    ),
     agency_summary AS (
       SELECT
         'agency' AS report_scope,
@@ -702,7 +854,7 @@ const materializePerformanceReports = async (
         SUM(active_tasks) AS active_tasks,
         SUM(CASE WHEN segment_key = 'efeonce' THEN total_tasks ELSE 0 END) AS efeonce_tasks_count,
         SUM(CASE WHEN segment_key = 'sky' THEN total_tasks ELSE 0 END) AS sky_tasks_count
-      FROM classified_snapshots
+      FROM scoped_report_snapshots
     ),
     task_mix AS (
       SELECT
@@ -717,30 +869,47 @@ const materializePerformanceReports = async (
           segment_key,
           segment_label,
           SUM(total_tasks) AS total_tasks
-        FROM classified_snapshots
+        FROM scoped_report_snapshots
         GROUP BY segment_key, segment_label
       )
     ),
     top_performer AS (
       SELECT
-        mb.member_id,
-        COALESCE(tm.display_name, mb.member_id) AS member_name,
-        mb.otd_pct,
-        mb.total_tasks AS throughput_count,
-        mb.rpa_avg,
-        mb.ftr_pct
-      FROM \`${projectId}.${ICO_DATASET}.metrics_by_member\` mb
-      LEFT JOIN \`${projectId}.greenhouse.team_members\` tm
-        ON tm.member_id = mb.member_id
-      WHERE mb.period_year = @periodYear
-        AND mb.period_month = @periodMonth
-        AND mb.total_tasks >= @minThroughput
-        AND mb.otd_pct IS NOT NULL
+        scoped.member_id,
+        scoped.member_name,
+        scoped.otd_pct,
+        scoped.total_tasks AS throughput_count,
+        scoped.rpa_avg,
+        scoped.ftr_pct
+      FROM (
+        SELECT
+          te.primary_owner_member_id AS member_id,
+          COALESCE(tm.display_name, te.primary_owner_member_id) AS member_name,
+          ${buildMetricSelectSQL()}
+        FROM ${buildDeliveryPeriodSourceSql(projectId)} te
+        LEFT JOIN \`${projectId}.greenhouse.team_members\` tm
+          ON tm.member_id = te.primary_owner_member_id
+        LEFT JOIN \`${projectId}.greenhouse.clients\` c1
+          ON c1.client_id = te.client_id
+        LEFT JOIN \`${projectId}.greenhouse.clients\` c2
+          ON c2.client_id = te.space_id
+        WHERE te.primary_owner_member_id IS NOT NULL
+          AND te.primary_owner_member_id != ''
+          AND ${buildAgencyReportScopeSql({
+            spaceIdExpression: 'te.space_id',
+            clientIdExpression: 'te.client_id',
+            primaryNameExpression: 'c1.client_name',
+            secondaryNameExpression: 'c2.client_name'
+          })}
+        GROUP BY member_id, member_name
+      ) scoped
+      WHERE scoped.total_tasks >= @minThroughput
+        AND scoped.otd_pct IS NOT NULL
       ORDER BY
-        mb.otd_pct DESC,
-        mb.total_tasks DESC,
-        mb.rpa_avg ASC NULLS LAST,
-        mb.member_id ASC
+        scoped.otd_pct DESC,
+        scoped.total_tasks DESC,
+        scoped.rpa_avg ASC NULLS LAST,
+        scoped.member_id ASC
       LIMIT 1
     )
     SELECT

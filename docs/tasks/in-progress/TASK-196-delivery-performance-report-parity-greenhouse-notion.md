@@ -2,6 +2,14 @@
 
 ## Delta 2026-04-02
 
+- `TASK-201` quedó cerrada como slice de reconciliación histórica y snapshot freezing.
+- Resultado clave de la calibración:
+  - Greenhouse ya puede congelar un período mensual de Delivery en `ico_engine.delivery_task_monthly_snapshots`
+  - `Marzo 2026` quedó materializado con `294` tareas `locked` y `293` tareas clasificadas en el scorecard agency
+  - el drift residual frente al `Performance Report` de Notion ya no apunta principalmente a fórmula ni source sync, sino a historia mutable en Notion posterior al cierre
+- Decisión operativa nueva:
+  - `Abril 2026` en adelante debe operar con snapshot mensual congelado al cierre
+  - marzo queda como baseline calibrado con residual explicado, no como período donde debamos exigir paridad exacta retroactiva contra el estado vivo actual
 - `TASK-197` quedó cerrada como slice de paridad de source sync/runtime.
 - `TASK-200` quedó cerrada como slice de contrato semántico de métricas.
 - Resultado útil para esta epic:

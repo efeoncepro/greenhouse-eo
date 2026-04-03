@@ -1,5 +1,23 @@
 # Greenhouse Delivery Performance Report Parity V1
 
+## Delta 2026-04-02 — Historical parity now uses frozen task snapshots
+
+`TASK-201` cierra una decisión clave para la paridad histórica:
+
+- Greenhouse ya no debe recalcular períodos históricos del `Performance Report` desde el estado vivo actual de Notion cuando ese período ya cerró
+- el source canónico para períodos cerrados pasa a ser `ico_engine.delivery_task_monthly_snapshots`
+- cada período puede existir como:
+  - `working`
+  - `locked`
+- cuando existe snapshot `locked`, `metric_snapshots_monthly`, `metrics_by_member`, `performance_report_monthly` y serving deben leer desde ese snapshot congelado
+- el fallback al view vivo `v_tasks_enriched` solo aplica para períodos todavía abiertos o no congelados
+
+Consecuencia de calibración:
+
+- `Marzo 2026` pudo recalcularse y materializarse en Greenhouse, pero siguió mostrando drift fuerte frente al reporte histórico de Notion
+- la evidencia apunta a historia mutable en Notion posterior al cierre del período, no a drift principal del contrato Greenhouse vigente
+- por eso la paridad exigible en adelante debe definirse contra snapshots congelados al cierre, no contra el estado vivo mutable del workspace
+
 ## Delta 2026-04-02 — Metric semantic contract now freezes due-date report logic
 
 `TASK-200` fija la semántica canónica del `Performance Report` mensual para Delivery.

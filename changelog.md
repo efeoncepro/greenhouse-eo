@@ -2,6 +2,20 @@
 
 ## 2026-04-02
 
+- **TASK-201 delivery performance historical materialization reconciliation**:
+  - `sync-notion-conformed` se reejecutó y confirmó que `Sky` sí tenía status operativo en origen; el contrato ahora acepta `Estado 1` como alias de `task_status`
+  - `ICO` ahora soporta snapshots congelados por tarea en `ico_engine.delivery_task_monthly_snapshots`
+  - se agregó `pnpm freeze:delivery-performance-period <year> <month>` para congelar un período, rematerializar `ICO` y refrescar `agency_performance_reports`
+  - `pnpm reconcile:delivery-performance-history 2026 3` ahora congela el período antes de reconciliarlo contra Notion
+  - verificación real de marzo 2026:
+    - `294` filas `locked` en el snapshot task-level
+    - `293` tareas clasificadas en `performance_report_monthly`
+    - scorecard Greenhouse congelado: `84.3% OT`, `247 on-time`, `25 late drops`, `21 overdue`
+  - conclusión operativa:
+    - marzo 2026 queda calibrado pero no con paridad exacta retroactiva
+    - el residual se documenta como historia mutable en Notion posterior al cierre
+    - abril 2026 en adelante debe operar con freeze mensual y no recalcularse desde el estado vivo del workspace
+
 - **TASK-200 delivery performance metric semantic contract**:
   - el contrato mensual del `Performance Report` queda fijado sobre `due_date in period`
   - la fecha de corte canónica pasa a ser `period_end + 1 day`
