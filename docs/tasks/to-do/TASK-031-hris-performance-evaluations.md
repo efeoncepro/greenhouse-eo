@@ -1,5 +1,16 @@
 # CODEX TASK — HRIS Fase 3: Evaluaciones de Desempeño 360°
 
+## Delta 2026-04-01 — TASK-026 ya resuelta
+
+- La elegibilidad por contrato ya debe evaluarse sobre `greenhouse_core.members.contract_type` y `greenhouse_core.members.payroll_via`.
+- No usar `compensation_versions.contract_type` para cohortes, tenure policies o visibilidad; ese campo queda como snapshot histórico de payroll.
+- Si la evaluación necesita distinguir participación operativa sostenida, usar `daily_required` como backing field o `schedule_required` como alias de lectura, sin introducir una segunda columna física.
+
+## Delta 2026-04-01
+
+- `greenhouse_core.departments` ya quedó operacional en PostgreSQL por cierre de `TASK-180`.
+- Los filtros, cohorts y vistas por departamento de esta lane deben consumir el carril Postgres canónico y no asumir ninguna dependencia runtime de BigQuery para estructura organizacional.
+
 ## Delta 2026-03-27 — Alineación arquitectónica
 
 - **Fuente ICO corregida**: métricas ICO (RpA, OTD%, FTR%, throughput, cycle time) deben leerse de `greenhouse_serving.ico_member_metrics` (PostgreSQL). NUNCA leer de BigQuery directamente en este módulo. El pipeline BQ→PG ya está manejado por `src/lib/sync/projections/ico-member-metrics.ts`.
@@ -53,10 +64,10 @@ Implementar el **módulo de evaluaciones de desempeño** del HRIS en Greenhouse.
 
 | Dependencia | Estado | Impacto si no está |
 |---|---|---|
-| Fase 0.5 (contract types) | Prerequisito | Elegibilidad por `contract_type` y tenure |
+| Fase 0.5 (contract types) | Cerrada | Elegibilidad por `contract_type` / `payroll_via` ya disponible desde `greenhouse_core.members` |
 | Fase 2B (Goals) | Prerequisito | Goal completion se muestra en eval summary |
 | `greenhouse_hr` schema | Existe | Tablas van aquí |
-| `member_performance_snapshots` (BigQuery) | Existe | ICO metrics para eval summary |
+| `greenhouse_serving.ico_member_metrics` | Existe | ICO metrics para eval summary |
 | `greenhouse_core.members` | Existe | `reports_to_member_id` para auto-assign evaluators |
 | `greenhouse_core.departments` | Existe | Para filtrar por departamento |
 

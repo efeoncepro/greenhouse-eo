@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { syncProviderFromFinanceSupplier } from '@/lib/providers/canonical'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
+import { ensureOrganizationForSupplier } from '@/lib/account-360/organization-identity'
+import { ensureOrganizationContactMembership } from '@/lib/account-360/organization-store'
 import {
   runFinanceQuery,
   getFinanceProjectId,
@@ -83,6 +85,16 @@ const normalizeSupplier = (row: SupplierRow) => ({
   requiresPo: normalizeBoolean(row.requires_po),
   isActive: normalizeBoolean(row.is_active),
   notes: row.notes ? normalizeString(row.notes) : null,
+  organizationContactsCount: 0,
+  contactSummary:
+    row.primary_contact_name || row.primary_contact_email
+      ? {
+          name: row.primary_contact_name ? normalizeString(row.primary_contact_name) : null,
+          email: row.primary_contact_email ? normalizeString(row.primary_contact_email) : null,
+          role: null,
+          source: 'primary_contact_legacy' as const
+        }
+      : null,
   createdBy: row.created_by ? normalizeString(row.created_by) : null,
   createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
   updatedAt: toTimestampString(row.updated_at as string | { value?: string } | null)
@@ -213,21 +225,40 @@ export async function POST(request: Request) {
       ? (body.defaultPaymentMethod as PaymentMethod)
       : 'transfer'
 
+    const tradeName = body.tradeName ? normalizeString(body.tradeName) : null
+    const taxId = body.taxId ? normalizeString(body.taxId) : null
+    const taxIdType = body.taxIdType ? assertValidTaxIdType(body.taxIdType) : 'RUT'
+    const country = normalizeString(body.country) || 'CL'
+    const primaryContactName = body.primaryContactName ? normalizeString(body.primaryContactName) : null
+    const primaryContactEmail = body.primaryContactEmail ? normalizeString(body.primaryContactEmail) : null
+    const primaryContactPhone = body.primaryContactPhone ? normalizeString(body.primaryContactPhone) : null
+
+    const organizationId = taxId
+      ? await ensureOrganizationForSupplier({
+          taxId,
+          taxIdType,
+          legalName,
+          tradeName,
+          country
+        })
+      : null
+
     try {
       await seedFinanceSupplierInPostgres({
         supplierId,
         providerId: normalizedProviderId || null,
+        organizationId,
         legalName,
-        tradeName: body.tradeName ? normalizeString(body.tradeName) : null,
-        taxId: body.taxId ? normalizeString(body.taxId) : null,
-        taxIdType: body.taxIdType ? assertValidTaxIdType(body.taxIdType) : 'RUT',
-        country: normalizeString(body.country) || 'CL',
+        tradeName,
+        taxId,
+        taxIdType,
+        country,
         category,
         serviceType: body.serviceType ? normalizeString(body.serviceType) : null,
         isInternational: Boolean(body.isInternational),
-        primaryContactName: body.primaryContactName ? normalizeString(body.primaryContactName) : null,
-        primaryContactEmail: body.primaryContactEmail ? normalizeString(body.primaryContactEmail) : null,
-        primaryContactPhone: body.primaryContactPhone ? normalizeString(body.primaryContactPhone) : null,
+        primaryContactName,
+        primaryContactEmail,
+        primaryContactPhone,
         website: body.website ? normalizeString(body.website) : null,
         bankName: body.bankName ? normalizeString(body.bankName) : null,
         bankAccountNumber: body.bankAccountNumber ? normalizeString(body.bankAccountNumber) : null,
@@ -241,6 +272,20 @@ export async function POST(request: Request) {
         notes: body.notes ? normalizeString(body.notes) : null,
         createdBy: tenant.userId || null
       })
+
+      if (organizationId) {
+        await ensureOrganizationContactMembership({
+          organizationId,
+          sourceSystem: 'finance_supplier',
+          sourceObjectType: 'primary_contact',
+          sourceObjectId: supplierId,
+          fullName: primaryContactName ?? '',
+          canonicalEmail: primaryContactEmail,
+          membershipType: 'contact',
+          roleLabel: 'Supplier primary contact',
+          isPrimary: true
+        })
+      }
     } catch (error) {
       if (!shouldFallbackFromFinancePostgres(error)) {
         throw error

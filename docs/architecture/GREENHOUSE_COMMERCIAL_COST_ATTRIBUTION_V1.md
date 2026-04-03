@@ -151,6 +151,16 @@ Regla:
 - `client_labor_cost_allocation` sigue existiendo, pero pasa a ser bridge/input interno
 - la capa consumible por Finance y Cost Intelligence ya es `commercial_cost_attribution`
 
+## Delta 2026-04-02 — persisted organization context
+
+`TASK-192` deja explícita la compatibilidad org-first en la serving table:
+
+- `greenhouse_serving.commercial_cost_attribution` persiste `organization_id` además de `member_id + client_id + período`.
+- los readers compartidos siguen pudiendo resumir por cliente para compatibilidad, pero ya cargan contexto organizacional en memoria.
+- `client_labor_cost_allocation` sigue siendo el bridge laboral histórico; el serving nuevo no vuelve a exponerse como contrato directo para consumers nuevos.
+- el cambio deja la tabla `org-aware`, no `org-enforced`: la lane agrega columna e índice, pero no introduce todavía `FK` ni `NOT NULL` sobre `organization_id`.
+- el create table base sigue estando garantizado por el runtime en `src/lib/commercial-cost-attribution/store.ts`; no existe aún una migración histórica dedicada que institucionalice todo el DDL inicial de esta serving table.
+
 ## Estrategia de Cutover
 
 ### Regla general
@@ -177,6 +187,7 @@ La política correcta es:
 - Cost Intelligence / `operational_pl`
   - debe consumir `commercial_cost_attribution`
   - no debe recomponer labor + overhead por queries divergentes
+  - puede usar `organization_id` persistido como fallback semántico cuando el bridge `client -> space -> organization` no alcance
 - Agency / economics por space
   - debe seguir leyendo `operational_pl_snapshots`
   - no debe saltarse la capa a `commercial_cost_attribution` salvo para surfaces de auditoría futura

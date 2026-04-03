@@ -226,7 +226,13 @@ export const requirePeopleTenantContext = async () => {
     }
   }
 
-  if (!canAccessPeopleModule(tenant)) {
+  const hasPeopleAccess = hasAuthorizedViewCode({
+    tenant,
+    viewCode: 'equipo.personas',
+    fallback: canAccessPeopleModule(tenant)
+  })
+
+  if (!hasPeopleAccess) {
     return {
       tenant: null,
       errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })

@@ -98,7 +98,24 @@ export const dispatchNotificationWebhook = async (envelope: WebhookEnvelope): Pr
     }
   }
 
-  await ensureNotificationSchema()
+  try {
+    await ensureNotificationSchema()
+  } catch (schemaError) {
+    console.error(
+      `[webhook-notifications] schema check failed event=${envelope.eventType} error=${schemaError instanceof Error ? schemaError.message : 'unknown'}`
+    )
+
+    return {
+      eventType: envelope.eventType,
+      mapped: true,
+      recipientsResolved: 0,
+      unresolvedRecipients: 0,
+      deduped: 0,
+      sent: 0,
+      skipped: 0,
+      failed: 1
+    }
+  }
 
   const resolution = await mapping.resolveRecipients(envelope)
 

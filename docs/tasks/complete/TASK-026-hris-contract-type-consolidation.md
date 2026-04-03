@@ -1,8 +1,61 @@
 # CODEX TASK — HRIS: Consolidación del Modelo de Tipos de Contrato
 
+## Delta 2026-04-01 — Implementación cerrada
+
+- La lane quedó implementada y validada end-to-end en el repo y en Cloud SQL `greenhouse-pg-dev`.
+- Migración aplicada: `migrations/20260402001100000_hris-contract-types.sql`.
+- Canon consolidado:
+  - `greenhouse_core.members` ahora persiste `contract_type`, `pay_regime`, `payroll_via` y `deel_contract_id`
+  - `greenhouse_payroll.compensation_versions` mantiene `contract_type` como snapshot histórico de compensación
+  - `greenhouse_payroll.payroll_entries` ahora persiste `payroll_via`, `deel_contract_id`, `sii_retention_rate` y `sii_retention_amount`
+- La semántica de `schedule_required` se resolvió sin crear una segunda columna física:
+  - `daily_required` sigue siendo el backing field canónico
+  - `schedule_required` se expone como alias de lectura en serving/UI/helpers
+- Se actualizaron `member_360`, `member_payroll_360` y `person_hr_360` para exponer el canon de HRIS y separar explícitamente los aliases de snapshot histórico.
+- El calculator de payroll ya distingue:
+  - branch laboral Chile (`indefinido` / `plazo_fijo`)
+  - branch `honorarios` con retención SII
+  - branch Deel (`contractor` / `eor`) como registro externo sin cálculo inline
+- Verificación cerrada:
+  - `pnpm migrate:up` ✅
+  - `pnpm db:generate-types` ✅
+  - `pnpm lint` ✅
+  - `pnpm build` ✅
+- Nota operativa:
+  - el carril CLI requirió Cloud SQL Proxy en `127.0.0.1:15432`
+  - el timestamp inicial generado para la migración quedó detrás de migraciones ya aplicadas; se regeneró con `node-pg-migrate create` hasta quedar posterior al tracking real
+  - el DDL cross-schema solo pudo aplicar con `greenhouse_ops` como owner efectivo, no con `migrator` ni `postgres`
+
+## Delta 2026-04-01
+
+- `greenhouse_core.departments` ya quedó como source of truth operativo del módulo `HR > Departments` por cierre de `TASK-180`.
+- Cualquier join o filtro auxiliar `members -> departments` en esta lane debe asumir PostgreSQL runtime, no `greenhouse.departments` en BigQuery.
+
+## Delta 2026-04-01 — Descubrimiento runtime real
+
+- La spec externa `../Greenhouse_Portal_Spec_v1.md` no existe en este workspace. La fuente canónica para esta lane queda en esta task + arquitectura local bajo `docs/architecture/`.
+- El schema live de `greenhouse_core.members` no tiene todavía `contract_type`, `pay_regime`, `payroll_via`, `schedule_required` ni `deel_contract_id`. Sí tiene `daily_required`, y hoy ese campo ya alimenta HR/People/Attendance.
+- Decisión operativa para esta lane:
+  - no introducir dos flags paralelos (`daily_required` y `schedule_required`) sin compatibilidad explícita
+  - tratar `daily_required` como backing field vigente de las semánticas de asistencia/schedule hasta que exista un rename/cutover completo
+- `greenhouse_payroll.compensation_versions.contract_type` sigue restringido por CHECK a `indefinido | plazo_fijo`, por lo que la expansión a `honorarios | contractor | eor` requiere migración de schema y actualización de validaciones/runtime.
+- Los datos live actuales no alcanzan para distinguir automáticamente `contractor` vs `eor` en todos los colaboradores internacionales:
+  - hoy existen `members` con `pay_regime = 'international'` y `contract_type` legacy `indefinido`
+  - si no hay señal adicional confiable, la migración inicial debe defaultear esos casos a `contractor` y dejar explícito que HR puede reclasificarlos a `eor`
+- Las vistas live `greenhouse_serving.member_360`, `greenhouse_serving.member_payroll_360` y `greenhouse_serving.person_hr_360` todavía consumen `daily_required` y toman `pay_regime` / `contract_type` desde `compensation_versions`, no desde `members`.
+- Las rutas documentadas en esta task se corrigen al patrón real del repo:
+  - HR member surfaces viven bajo `/api/hr/core/members/*`
+  - Payroll compensation vive bajo `/api/hr/payroll/compensation*`
+  - hoy no existe `GET /api/hr/payroll/members`; el read model vigente se resuelve desde `src/lib/payroll/get-payroll-members.ts` y `GET /api/hr/payroll/compensation`
+- `PayrollEntryExpanded.tsx` no existe como componente separado; el desglose expandido vive hoy dentro de `src/views/greenhouse/payroll/PayrollEntryTable.tsx`.
+- Tenant isolation:
+  - `greenhouse_core.members`, `greenhouse_payroll.compensation_versions` y `greenhouse_payroll.payroll_entries` no tienen `space_id`
+  - en este dominio el boundary runtime vigente es el tenant interno `efeonce` + route group `hr`
+  - `space_id` aplica downstream en consumers como `staff_aug_placements`, assignments y serving económico, no como FK directa en el core HR/payroll actual
+
 ## Resumen
 
-Consolidar el modelo de tipos de contrato en Greenhouse para soportar los 5 tipos reales de vinculación que maneja Efeonce Group: indefinido, plazo fijo, honorarios (Chile), contractor (Deel) y EOR (Deel). Agregar los campos canónicos `contract_type`, `payroll_via`, `schedule_required` y `deel_contract_id` a `greenhouse_core.members`, crear la rama de cálculo de honorarios en el payroll calculator, y agregar la rama de registro Deel.
+Consolidar el modelo de tipos de contrato en Greenhouse para soportar los 5 tipos reales de vinculación que maneja Efeonce Group: indefinido, plazo fijo, honorarios (Chile), contractor (Deel) y EOR (Deel). Consolidar el contrato canónico en `greenhouse_core.members`, crear la rama de cálculo de honorarios en el payroll calculator, y agregar la rama de registro Deel.
 
 **El problema hoy:** El modelo actual tiene dos campos separados que no capturan la realidad:
 - `employment_type` en `members` (`full_time | part_time | contractor`) — describe jornada, no tipo de contrato
@@ -11,7 +64,7 @@ Consolidar el modelo de tipos de contrato en Greenhouse para soportar los 5 tipo
 - No existe `schedule_required` — no se puede distinguir entre un contractor que participa en dailies y uno que entrega puntual
 - No existe `deel_contract_id` — no hay referencia al contrato en Deel
 
-**La solución:** Agregar 4 campos nuevos a `greenhouse_core.members`, migrar datos existentes, actualizar el payroll calculator con dos ramas nuevas (honorarios Chile y registro Deel), y actualizar la UI del CompensationDrawer para reflejar el nuevo modelo.
+**La solución:** Agregar los campos canónicos faltantes a `greenhouse_core.members`, migrar datos existentes, actualizar el payroll calculator con dos ramas nuevas (honorarios Chile y registro Deel), y actualizar la UI del CompensationDrawer para reflejar el nuevo modelo. En runtime actual esto implica agregar `contract_type`, `pay_regime`, `payroll_via` y `deel_contract_id`, y resolver la semántica `schedule_required` sobre el flag operativo existente `daily_required` o mediante una migración backward-compatible explícita.
 
 **Este task es prerequisito de todas las fases futuras del HRIS** (Document Vault, Onboarding, Expenses, Goals, Evaluaciones) **y del módulo de Staff Augmentation** porque la elegibilidad de cada módulo y el modelo de placement se resuelven por `contract_type`, `payroll_via` y `deel_contract_id`.
 
@@ -340,9 +393,16 @@ export interface PayrollEntry {
 
 ## PARTE D: API Changes
 
-### D1. `PATCH /api/hr/members/[memberId]/contract`
+### D1. Contract mutation surface
 
-Nuevo endpoint para actualizar contract info de un member.
+La surface debe alinearse al namespace real de HR Core:
+
+- preferencia 1: extender `PATCH /api/hr/core/members/[memberId]/profile` con contract info
+- preferencia 2: crear `PATCH /api/hr/core/members/[memberId]/contract` si la separación mejora claridad sin duplicar validaciones
+
+No crear endpoints bajo `/api/hr/members/*`, porque ese prefijo no existe hoy en el repo.
+
+Surface para actualizar contract info de un member.
 
 **Request body:**
 ```typescript
@@ -371,9 +431,11 @@ The existing calculate endpoint reads members and routes to the correct branch. 
 - Route to Branch 1 (Chile laboral), Branch 2 (Honorarios), or Branch 3 (Deel registration)
 - For Deel members, entry creation is optional — HR can choose to include or exclude them from the period (toggle in UI)
 
-### D3. Update `GET /api/hr/payroll/members`
+### D3. Update payroll member read model
 
-Return `contract_type`, `pay_regime`, `payroll_via` as part of the member list response. Used by the PayrollEntryTable to show badges per member.
+No existe hoy `GET /api/hr/payroll/members` como route dedicada.
+
+La implementación debe extender el read model vigente (`src/lib/payroll/get-payroll-members.ts` y/o `GET /api/hr/payroll/compensation`) para que la UI de nómina pueda recibir `contract_type`, `pay_regime`, `payroll_via` y el flag operativo de asistencia.
 
 ---
 
@@ -462,24 +524,26 @@ src/
 ├── app/
 │   └── api/
 │       └── hr/
-│           ├── members/
-│           │   └── [memberId]/
-│           │       └── contract/
-│           │           └── route.ts              # NEW: PATCH contract type
+│           ├── core/
+│           │   └── members/
+│           │       └── [memberId]/
+│           │           ├── profile/
+│           │           │   └── route.ts          # MODIFIED if reusing existing PATCH surface
+│           │           └── contract/
+│           │               └── route.ts          # OPTIONAL NEW if split is justified
 │           └── payroll/
 │               ├── periods/
 │               │   └── [periodId]/
 │               │       └── calculate/
 │               │           └── route.ts          # MODIFIED: uses new routing logic
-│               └── members/
-│                   └── route.ts                  # MODIFIED: return contract fields
+│               └── compensation/
+│                   └── route.ts                  # MODIFIED: return/propagate contract fields for payroll surfaces
 │
 ├── views/
 │   └── greenhouse/
 │       └── payroll/
 │           ├── CompensationDrawer.tsx             # MODIFIED: contract type section at top
-│           ├── PayrollEntryTable.tsx              # MODIFIED: contract type badges
-│           └── PayrollEntryExpanded.tsx           # MODIFIED: honorarios and Deel desgloses
+│           └── PayrollEntryTable.tsx              # MODIFIED: contract badges + expanded honorarios/Deel breakdowns
 │
 └── scripts/
     └── migrate-contract-types.ts                 # ONE-TIME: migration script for existing data
@@ -500,7 +564,7 @@ src/
 
 ### Fase 2: Infraestructura
 
-7. ALTER TABLE `greenhouse_core.members` — agregar 4 columnas nuevas (A1)
+7. ALTER TABLE `greenhouse_core.members` — agregar columnas canónicas faltantes y resolver compatibilidad del flag de asistencia (`daily_required` vs `schedule_required`)
 8. Ejecutar migración de datos (A2)
 9. Recrear serving views (A3)
 10. Crear TypeScript types (`hr-contracts.ts`) (C1)
@@ -515,14 +579,14 @@ src/
 
 ### Fase 4: API
 
-16. Crear `PATCH /api/hr/members/[memberId]/contract` (D1)
-17. Actualizar `GET /api/hr/payroll/members` (D3)
+16. Extender surface de contrato en HR Core siguiendo el namespace real (`/api/hr/core/...`) (D1)
+17. Actualizar el read model vigente de payroll members/compensation para retornar contract fields (D3)
 
 ### Fase 5: UI
 
 18. Actualizar `CompensationDrawer.tsx` — contract type section (E1)
 19. Actualizar `PayrollEntryTable.tsx` — badges (E2)
-20. Actualizar `PayrollEntryExpanded.tsx` — desgloses honorarios y Deel (E3)
+20. Actualizar el desglose expandido en la surface real que hoy vive dentro de `PayrollEntryTable.tsx` (E3)
 
 ---
 
@@ -530,7 +594,8 @@ src/
 
 ### Schema
 
-- [ ] `greenhouse_core.members` tiene columnas `contract_type`, `pay_regime`, `payroll_via`, `schedule_required`, `deel_contract_id`
+- [ ] `greenhouse_core.members` expone el contrato canónico (`contract_type`, `pay_regime`, `payroll_via`, `deel_contract_id`)
+- [ ] La semántica de asistencia queda resuelta de forma backward-compatible sobre `daily_required` o un alias/migración equivalente documentada
 - [ ] Datos existentes migrados correctamente (members con `pay_regime = 'international'` en compensations → `payroll_via = 'deel'`)
 - [ ] Serving views `member_360` y `member_payroll_360` exponen los nuevos campos
 - [ ] Migration script es idempotente (puede correr múltiples veces sin efecto)
@@ -546,11 +611,11 @@ src/
 
 ### API
 
-- [ ] `PATCH /api/hr/members/[memberId]/contract` valida derivations (contractor → international + deel)
+- [ ] La surface de contrato en HR Core valida derivations (contractor → international + deel)
 - [ ] `PATCH` rechaza `schedule_required = false` para indefinido y plazo_fijo
 - [ ] `PATCH` requiere `contract_end_date` para plazo_fijo
 - [ ] `PATCH` requiere `deel_contract_id` para contractor y eor
-- [ ] `GET /api/hr/payroll/members` retorna `contract_type`, `pay_regime`, `payroll_via`
+- [ ] El read model vigente de payroll members/compensation retorna `contract_type`, `pay_regime`, `payroll_via`
 
 ### UI
 

@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server'
 
+import { resolveFinanceDownstreamScope } from '@/lib/finance/canonical'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { FinanceValidationError, assertNonEmptyString, assertPositiveAmount, toNumber, ALLOCATION_METHODS } from '@/lib/finance/shared'
 import {
   createCostAllocation,
   getCostAllocationsByExpense,
   getCostAllocationsByClient,
+  getCostAllocationsByOrganization,
+  listCostAllocationsByPeriod,
   deleteCostAllocation
 } from '@/lib/finance/postgres-store-intelligence'
 
@@ -21,25 +24,52 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const expenseId = searchParams.get('expenseId')
   const clientId = searchParams.get('clientId')
+  const organizationId = searchParams.get('organizationId')
+  const clientProfileId = searchParams.get('clientProfileId')
+  const hubspotCompanyId = searchParams.get('hubspotCompanyId')
+  const spaceId = searchParams.get('spaceId')
   const year = Number(searchParams.get('year'))
   const month = Number(searchParams.get('month'))
 
-  if (expenseId) {
-    const allocations = await getCostAllocationsByExpense(expenseId)
+  try {
+    if (expenseId) {
+      const allocations = await getCostAllocationsByExpense(expenseId)
 
-    return NextResponse.json({ allocations })
+      return NextResponse.json({ allocations, items: allocations, total: allocations.length })
+    }
+
+    if (year && month) {
+      const resolvedScope = (clientId || organizationId || clientProfileId || hubspotCompanyId || spaceId)
+        ? await resolveFinanceDownstreamScope({
+            clientId,
+            organizationId,
+            clientProfileId,
+            hubspotCompanyId,
+            requestedSpaceId: spaceId,
+            requireLegacyClientBridge: false
+          })
+        : null
+
+      const allocations = resolvedScope?.clientId
+        ? await getCostAllocationsByClient(resolvedScope.clientId, year, month)
+        : resolvedScope?.organizationId
+          ? await getCostAllocationsByOrganization(resolvedScope.organizationId, year, month)
+        : await listCostAllocationsByPeriod(year, month)
+
+      return NextResponse.json({ allocations, items: allocations, total: allocations.length })
+    }
+
+    return NextResponse.json(
+      { error: 'Provide expenseId or year+month query params. Add organization/client selectors only when you want to narrow the period.' },
+      { status: 400 }
+    )
+  } catch (error) {
+    if (error instanceof FinanceValidationError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
+
+    throw error
   }
-
-  if (clientId && year && month) {
-    const allocations = await getCostAllocationsByClient(clientId, year, month)
-
-    return NextResponse.json({ allocations })
-  }
-
-  return NextResponse.json(
-    { error: 'Provide expenseId or clientId+year+month query params' },
-    { status: 400 }
-  )
 }
 
 export async function POST(request: Request) {
@@ -53,8 +83,6 @@ export async function POST(request: Request) {
     const body = await request.json()
 
     const expenseId = assertNonEmptyString(body.expenseId, 'expenseId')
-    const clientId = assertNonEmptyString(body.clientId, 'clientId')
-    const clientName = assertNonEmptyString(body.clientName, 'clientName')
     const allocationPercent = toNumber(body.allocationPercent)
 
     if (allocationPercent <= 0 || allocationPercent > 1) {
@@ -79,9 +107,27 @@ export async function POST(request: Request) {
       throw new FinanceValidationError(`allocationMethod must be one of: ${ALLOCATION_METHODS.join(', ')}`)
     }
 
+    const resolvedScope = await resolveFinanceDownstreamScope({
+      organizationId: body.organizationId,
+      clientId: body.clientId,
+      clientProfileId: body.clientProfileId,
+      hubspotCompanyId: body.hubspotCompanyId,
+      requestedSpaceId: body.spaceId,
+      requireLegacyClientBridge: false
+    })
+
+    const clientId = assertNonEmptyString(resolvedScope.clientId || resolvedScope.organizationId, 'clientId')
+
+    const clientName = assertNonEmptyString(
+      body.clientName || resolvedScope.legalName || resolvedScope.clientName || resolvedScope.organizationId || clientId,
+      'clientName'
+    )
+
     const allocation = await createCostAllocation({
       expenseId,
       clientId,
+      organizationId: resolvedScope.organizationId,
+      spaceId: resolvedScope.spaceId,
       clientName,
       allocationPercent,
       allocatedAmountClp,

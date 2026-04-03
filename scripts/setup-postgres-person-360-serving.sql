@@ -1,4 +1,3 @@
-DROP VIEW IF EXISTS greenhouse_serving.person_360;
 CREATE OR REPLACE VIEW greenhouse_serving.person_360 AS
 WITH member_rollup AS (
   SELECT
@@ -53,8 +52,9 @@ membership_rollup AS (
   SELECT
     pm.profile_id AS identity_profile_id,
     COUNT(*)::int AS membership_count,
+    COUNT(DISTINCT pm.organization_id)::int AS organization_membership_count,
     (
-      SELECT json_agg(json_build_object(
+      SELECT JSON_AGG(JSON_BUILD_OBJECT(
         'membershipId', sub.membership_id,
         'organizationId', sub.organization_id,
         'organizationName', o.organization_name,
@@ -64,11 +64,18 @@ membership_rollup AS (
         'isPrimary', sub.is_primary
       ) ORDER BY sub.is_primary DESC, o.organization_name NULLS LAST)
       FROM greenhouse_core.person_memberships sub
-      LEFT JOIN greenhouse_core.organizations o ON o.organization_id = sub.organization_id
-      WHERE sub.profile_id = pm.profile_id AND sub.active = TRUE
+      LEFT JOIN greenhouse_core.organizations o
+        ON o.organization_id = sub.organization_id
+      WHERE sub.profile_id = pm.profile_id
+        AND sub.active = TRUE
     ) AS memberships_json,
-    ARRAY_REMOVE(ARRAY_AGG(DISTINCT pm.organization_id), NULL) AS organization_ids
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT pm.organization_id), NULL) AS organization_ids,
+    (ARRAY_AGG(pm.organization_id ORDER BY pm.is_primary DESC, pm.updated_at DESC NULLS LAST, pm.created_at DESC NULLS LAST, pm.membership_id ASC))[1] AS primary_organization_id,
+    (ARRAY_AGG(o.organization_name ORDER BY pm.is_primary DESC, pm.updated_at DESC NULLS LAST, pm.created_at DESC NULLS LAST, pm.membership_id ASC))[1] AS primary_organization_name,
+    (ARRAY_AGG(pm.membership_type ORDER BY pm.is_primary DESC, pm.updated_at DESC NULLS LAST, pm.created_at DESC NULLS LAST, pm.membership_id ASC))[1] AS primary_membership_type
   FROM greenhouse_core.person_memberships pm
+  LEFT JOIN greenhouse_core.organizations o
+    ON o.organization_id = pm.organization_id
   WHERE pm.active = TRUE
   GROUP BY pm.profile_id
 )
@@ -132,12 +139,38 @@ SELECT
     ]::text[],
     NULL
   ) AS person_facets,
-  -- Account 360: memberships
   COALESCE(mbr.membership_count, 0) AS membership_count,
   mbr.memberships_json AS memberships,
   COALESCE(mbr.organization_ids, ARRAY[]::text[]) AS organization_ids,
   p.created_at,
-  p.updated_at
+  p.updated_at,
+  p.public_id AS eo_id,
+  m.primary_member_id AS member_id,
+  u.primary_user_id AS user_id,
+  COALESCE(
+    NULLIF(TRIM(p.full_name), ''),
+    NULLIF(TRIM(m.member_display_name), ''),
+    NULLIF(TRIM(u.primary_user_name), ''),
+    NULLIF(TRIM(c.primary_contact_name), '')
+  ) AS resolved_display_name,
+  u.primary_user_email AS user_email,
+  u.primary_user_name AS user_full_name,
+  CASE
+    WHEN COALESCE(u.internal_user_count, 0) > 0 AND COALESCE(u.client_user_count, 0) = 0 THEN 'efeonce_internal'
+    WHEN COALESCE(u.client_user_count, 0) > 0 AND COALESCE(u.internal_user_count, 0) = 0 THEN 'client'
+    ELSE NULL::text
+  END AS tenant_type,
+  CASE
+    WHEN COALESCE(u.active_user_count, 0) > 0 THEN 'active'
+    WHEN COALESCE(u.user_count, 0) > 0 THEN 'inactive'
+    ELSE NULL::text
+  END AS user_status,
+  (COALESCE(u.active_user_count, 0) > 0) AS user_active,
+  mbr.primary_organization_id,
+  mbr.primary_organization_name,
+  mbr.primary_membership_type,
+  COALESCE(mbr.organization_membership_count, 0) AS organization_membership_count,
+  COALESCE(m.has_active_member, FALSE) AS is_efeonce_collaborator
 FROM greenhouse_core.identity_profiles p
 LEFT JOIN member_rollup m
   ON m.identity_profile_id = p.profile_id

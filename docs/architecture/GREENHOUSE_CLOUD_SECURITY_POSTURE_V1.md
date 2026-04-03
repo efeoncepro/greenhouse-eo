@@ -8,6 +8,24 @@
 
 ---
 
+## Delta 2026-03-31 — Dedicated bucket security posture applied
+
+- La postura `public vs private` ya no es solo normativa; quedó aplicada en GCP.
+- Buckets públicos:
+  - legibles anónimamente solo para serving de logos, avatars y assets visuales no sensibles
+  - `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` conserva `roles/storage.objectAdmin` bucket-level para escritura/rotación
+- Buckets privados:
+  - `uniform bucket-level access=true`
+  - `publicAccessPrevention=enforced`
+  - sin lectura anónima
+  - `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` con `roles/storage.objectAdmin` bucket-level
+- Regla de seguridad vigente:
+  - ningún documento privado del portal debe depender de lectura directa desde bucket
+  - todo acceso privado sigue pasando por autorización Greenhouse y audit trail en `greenhouse_core.asset_access_log`
+- Compatibilidad legacy controlada:
+  - `GREENHOUSE_MEDIA_BUCKET` puede seguir existiendo para consumers públicos viejos
+  - no debe reutilizarse para nuevos adjuntos privados ni como baseline de capacidades documentales nuevas
+
 ## Delta 2026-03-29 — TASK-131 cierra la separación runtime vs tooling
 
 - `TASK-131` implementó la corrección pendiente en la capa `cloud/*`.
@@ -45,11 +63,13 @@
 ## Delta 2026-03-31 — Runtime security implementation for private assets
 
 La postura ya tiene primera materialización en repo:
+
 - upload autenticado vía `POST /api/assets/private`
 - download/delete autenticado vía `/api/assets/private/[assetId]`
 - access logging en `greenhouse_core.asset_access_log`
 
 Regla vigente:
+
 - el portal valida acceso por aggregate owner antes de entregar el asset
 - los consumers nuevos deben extender el access model shared, no bypassarlo con URLs directas persistidas
 
@@ -151,7 +171,7 @@ Regla vigente:
   - `NEXTAUTH_SECRET`
   - `AZURE_AD_CLIENT_SECRET`
   - `GOOGLE_CLIENT_SECRET`
-  ahora resuelven vía `src/lib/auth-secrets.ts`
+    ahora resuelven vía `src/lib/auth-secrets.ts`
 - Estado remanente de la fase:
   - validación real en `staging` y `production` con al menos un secreto servido desde Secret Manager
 
@@ -167,43 +187,43 @@ It is **not** a task execution plan — each task has its own detailed spec unde
 
 ### 2.1 Platform Profile
 
-| Dimension | Value |
-|-----------|-------|
-| GCP Project | `efeonce-group` |
-| Vercel Team | Efeonce Group |
-| API Routes | 238 |
-| Cron Jobs | 18 (Vercel) + 4 (Cloud Scheduler) |
-| Cloud Run/Functions | 10 services |
-| PostgreSQL schemas | 9 |
-| BigQuery datasets | 13 (200+ tables) |
-| Secrets | 18 total (6 critical) |
-| Active developers | 1 |
-| Data sensitivity | High — payroll, compensation, identity, tax documents (SII/Nubox) |
+| Dimension           | Value                                                             |
+| ------------------- | ----------------------------------------------------------------- |
+| GCP Project         | `efeonce-group`                                                   |
+| Vercel Team         | Efeonce Group                                                     |
+| API Routes          | 238                                                               |
+| Cron Jobs           | 18 (Vercel) + 4 (Cloud Scheduler)                                 |
+| Cloud Run/Functions | 10 services                                                       |
+| PostgreSQL schemas  | 9                                                                 |
+| BigQuery datasets   | 13 (200+ tables)                                                  |
+| Secrets             | 18 total (6 critical)                                             |
+| Active developers   | 1                                                                 |
+| Data sensitivity    | High — payroll, compensation, identity, tax documents (SII/Nubox) |
 
 ### 2.2 Security Scorecard (Pre-Hardening)
 
-| Dimension | Score | Key Gap |
-|-----------|-------|---------|
-| Secret Management | 5/10 | El rollout WIF ya existe y quedó validado en preview real, pero la SA key sigue como fallback transicional y falta alinear el entorno compartido + retirar la key |
-| Network Security | 1/10 | Cloud SQL open to `0.0.0.0/0`, optional SSL |
-| Security Headers | 1/10 | No middleware.ts, no CSP/HSTS/X-Frame |
-| Observability | 1/10 | `console.error()` only, zero external alerting |
-| CI/CD Validation | 3/10 | Lint + build only, 86 test files not in CI |
-| API Auth Consistency | 4/10 | 2 inconsistent cron auth patterns, no timing-safe |
-| Database Resilience | 8/10 | PITR, WAL retention, slow query logging, pool `15` y restore test manual ya quedaron verificados |
-| Cost Visibility | 0/10 | No budget alerts, no BigQuery cost guards |
+| Dimension            | Score | Key Gap                                                                                                                                                           |
+| -------------------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Secret Management    | 5/10  | El rollout WIF ya existe y quedó validado en preview real, pero la SA key sigue como fallback transicional y falta alinear el entorno compartido + retirar la key |
+| Network Security     | 1/10  | Cloud SQL open to `0.0.0.0/0`, optional SSL                                                                                                                       |
+| Security Headers     | 1/10  | No middleware.ts, no CSP/HSTS/X-Frame                                                                                                                             |
+| Observability        | 1/10  | `console.error()` only, zero external alerting                                                                                                                    |
+| CI/CD Validation     | 3/10  | Lint + build only, 86 test files not in CI                                                                                                                        |
+| API Auth Consistency | 4/10  | 2 inconsistent cron auth patterns, no timing-safe                                                                                                                 |
+| Database Resilience  | 8/10  | PITR, WAL retention, slow query logging, pool `15` y restore test manual ya quedaron verificados                                                                  |
+| Cost Visibility      | 0/10  | No budget alerts, no BigQuery cost guards                                                                                                                         |
 
 ### 2.3 Threat Model
 
-| Threat | Current Exposure | Impact |
-|--------|-----------------|--------|
-| SA key leak (env var exfiltration) | **High** — la SA key sigue existiendo como fallback aunque el repo ya soporte WIF | Full GCP compromise |
-| Cloud SQL brute force | **High** — `0.0.0.0/0` + optional SSL + password runtime en env var | Database compromise (payroll, identity, finance) |
-| XSS / Clickjacking | **Medium** — no CSP, no X-Frame-Options | Session hijacking, data exfiltration |
-| Cron route spoofing | **Medium** — loose auth (Pattern A accepts x-vercel-cron without secret) | Unauthorized data mutation |
-| BigQuery cost bomb | **Medium** — no `maximumBytesBilled` | $5-50 per accidental full-scan |
-| Silent production failure | **High** — zero alerting on cron/webhook/projection failures | Data inconsistency, delayed detection |
-| Backup unusable | **Low** — PITR ya existe y el restore test manual quedó verificado con clone efímero | Unable to recover from corruption |
+| Threat                             | Current Exposure                                                                     | Impact                                           |
+| ---------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------ |
+| SA key leak (env var exfiltration) | **High** — la SA key sigue existiendo como fallback aunque el repo ya soporte WIF    | Full GCP compromise                              |
+| Cloud SQL brute force              | **High** — `0.0.0.0/0` + optional SSL + password runtime en env var                  | Database compromise (payroll, identity, finance) |
+| XSS / Clickjacking                 | **Medium** — no CSP, no X-Frame-Options                                              | Session hijacking, data exfiltration             |
+| Cron route spoofing                | **Medium** — loose auth (Pattern A accepts x-vercel-cron without secret)             | Unauthorized data mutation                       |
+| BigQuery cost bomb                 | **Medium** — no `maximumBytesBilled`                                                 | $5-50 per accidental full-scan                   |
+| Silent production failure          | **High** — zero alerting on cron/webhook/projection failures                         | Data inconsistency, delayed detection            |
+| Backup unusable                    | **Low** — PITR ya existe y el restore test manual quedó verificado con clone efímero | Unable to recover from corruption                |
 
 ---
 
@@ -253,19 +273,21 @@ The goal is **not** to move all 18 env vars to Secret Manager — that's overhea
 ```
 
 **Key decisions:**
+
 - Vercel OIDC token → WIF → SA impersonation (no static key in runtime)
 - SA key retained as **transitional fallback** for local dev, scripts, and any runtime shared todavía no verificado con WIF
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON` remains legacy until Production/Staging complete the real rollout and validation window
 
 #### Secret Classification
 
-| Tier | Criteria | Storage | Rotation | Audit | Count |
-|------|----------|---------|----------|-------|-------|
-| **Critical** | Compromise = financial/legal/identity damage | GCP Secret Manager | Future: automated | Cloud Audit Logs | 6 |
-| **Standard** | Compromise = limited blast radius | Vercel env vars (encrypted) | Manual | Vercel audit log | 10 |
-| **Target elimination** | Replaced by keyless auth after rollout | N/A | N/A | N/A | 2 (SA key + base64 variant) |
+| Tier                   | Criteria                                     | Storage                     | Rotation          | Audit            | Count                       |
+| ---------------------- | -------------------------------------------- | --------------------------- | ----------------- | ---------------- | --------------------------- |
+| **Critical**           | Compromise = financial/legal/identity damage | GCP Secret Manager          | Future: automated | Cloud Audit Logs | 6                           |
+| **Standard**           | Compromise = limited blast radius            | Vercel env vars (encrypted) | Manual            | Vercel audit log | 10                          |
+| **Target elimination** | Replaced by keyless auth after rollout       | N/A                         | N/A               | N/A              | 2 (SA key + base64 variant) |
 
 **Critical secrets (Secret Manager):**
+
 1. `GREENHOUSE_POSTGRES_PASSWORD` (runtime)
 2. `GREENHOUSE_POSTGRES_MIGRATOR_PASSWORD`
 3. `GREENHOUSE_POSTGRES_ADMIN_PASSWORD`
@@ -274,9 +296,11 @@ The goal is **not** to move all 18 env vars to Secret Manager — that's overhea
 6. `NUBOX_BEARER_TOKEN`
 
 **Standard secrets (Vercel env vars):**
+
 - `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `GREENHOUSE_INTEGRATION_API_TOKEN`, `CRON_SECRET`, `HR_CORE_TEAMS_WEBHOOK_SECRET`, `NUBOX_X_API_KEY`, `SLACK_ALERTS_WEBHOOK_URL`, `SENTRY_DSN`, `SENTRY_AUTH_TOKEN`
 
 **Target elimination once rollout is verified:**
+
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON` (replaced by WIF)
 - `GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64` (replaced by WIF)
 - `GCP_ACCESS_TOKEN` (deprecated legacy)
@@ -304,6 +328,7 @@ Error occurs
 ```
 
 **What we intentionally skip:**
+
 - APM (Datadog/New Relic) — cost + complexity > value for 1 developer
 - Distributed tracing (OpenTelemetry) — monolith, not microservices
 - Structured logging library — Sentry captures what matters; console.error is fine for debug
@@ -318,11 +343,11 @@ Before:  0.0.0.0/0 → Cloud SQL (any IP, optional SSL)
 After:   Vercel IPs + Cloud Run NAT + Dev VPN → Cloud SQL (restricted, SSL enforced)
 ```
 
-| Control | Before | After |
-|---------|--------|-------|
-| Authorized networks | `0.0.0.0/0` | Vercel egress CIDRs + Cloud Run NAT IP + dev VPN |
-| SSL mode | `ALLOW_UNENCRYPTED_AND_ENCRYPTED` | `ENCRYPTED_ONLY` |
-| Cloud SQL Connector | Available, not mandatory | Preferred for all runtime connections |
+| Control             | Before                            | After                                            |
+| ------------------- | --------------------------------- | ------------------------------------------------ |
+| Authorized networks | `0.0.0.0/0`                       | Vercel egress CIDRs + Cloud Run NAT IP + dev VPN |
+| SSL mode            | `ALLOW_UNENCRYPTED_AND_ENCRYPTED` | `ENCRYPTED_ONLY`                                 |
+| Cloud SQL Connector | Available, not mandatory          | Preferred for all runtime connections            |
 
 #### Security Headers
 
@@ -351,22 +376,22 @@ requireCronAuth(request)
 
 ### 3.4 Database Resilience
 
-| Control | Before | After |
-|---------|--------|-------|
-| Backup | Daily 07:00 UTC, 7 days | Daily + **PITR enabled** (7 days WAL retention) |
-| Slow queries | Invisible | `log_min_duration_statement=1000` → Cloud Logging |
-| DDL audit | None | `log_statement=ddl` → Cloud Logging |
-| Connection pool | 5 | 15 (Vercel serverless headroom) |
-| Restore tested | Never | Tested once, documented |
+| Control         | Before                  | After                                             |
+| --------------- | ----------------------- | ------------------------------------------------- |
+| Backup          | Daily 07:00 UTC, 7 days | Daily + **PITR enabled** (7 days WAL retention)   |
+| Slow queries    | Invisible               | `log_min_duration_statement=1000` → Cloud Logging |
+| DDL audit       | None                    | `log_statement=ddl` → Cloud Logging               |
+| Connection pool | 5                       | 15 (Vercel serverless headroom)                   |
+| Restore tested  | Never                   | Tested once, documented                           |
 
 ### 3.5 Cost Management
 
-| Control | Before | After |
-|---------|--------|-------|
-| GCP budget alerts | None | Monthly budget $200 (50/80/100% thresholds) |
-| BigQuery budget | None | Monthly budget $50 |
-| Query cost guard | None | `maximumBytesBilled: 1GB` default in bigquery.ts |
-| Backfill override | N/A | Explicit `10GB` override for known-large queries |
+| Control           | Before | After                                            |
+| ----------------- | ------ | ------------------------------------------------ |
+| GCP budget alerts | None   | Monthly budget $200 (50/80/100% thresholds)      |
+| BigQuery budget   | None   | Monthly budget $50                               |
+| Query cost guard  | None   | `maximumBytesBilled: 1GB` default in bigquery.ts |
+| Backfill override | N/A    | Explicit `10GB` override for known-large queries |
 
 ---
 
@@ -411,24 +436,24 @@ requireCronAuth(request)
 
 ### Execution Timeline
 
-| Week | Tasks | Parallelizable | Gate |
-|------|-------|---------------|------|
-| **1** | TASK-100 (CI tests), TASK-099 (headers), TASK-096 Fase 1 (Cloud SQL), TASK-103 (budgets) | All four in parallel | Cloud SQL must stay accessible from Vercel post-restriction |
-| **2-3** | TASK-096 Fase 2 (WIF), TASK-098 (Sentry + health + Slack) | Parallel | WIF must work in staging before touching production |
-| **3** | TASK-101 (cron auth standardization) | After TASK-098 (uses Slack alerting) | All 18 crons must pass auth after migration |
-| **4** | TASK-096 Fase 3 (Secret Manager), TASK-102 (DB resilience) | Parallel | Restore test succeeded; lane closed for baseline scope |
+| Week    | Tasks                                                                                    | Parallelizable                       | Gate                                                        |
+| ------- | ---------------------------------------------------------------------------------------- | ------------------------------------ | ----------------------------------------------------------- |
+| **1**   | TASK-100 (CI tests), TASK-099 (headers), TASK-096 Fase 1 (Cloud SQL), TASK-103 (budgets) | All four in parallel                 | Cloud SQL must stay accessible from Vercel post-restriction |
+| **2-3** | TASK-096 Fase 2 (WIF), TASK-098 (Sentry + health + Slack)                                | Parallel                             | WIF must work in staging before touching production         |
+| **3**   | TASK-101 (cron auth standardization)                                                     | After TASK-098 (uses Slack alerting) | All 18 crons must pass auth after migration                 |
+| **4**   | TASK-096 Fase 3 (Secret Manager), TASK-102 (DB resilience)                               | Parallel                             | Restore test succeeded; lane closed for baseline scope      |
 
 ### Task Cross-Reference
 
-| Task | ID | Sequence | Effort | Dependencies |
-|------|----|----------|--------|-------------|
-| CI Pipeline Test Step | TASK-100 | **1 of 7** | 1h | None |
-| Security Headers Middleware | TASK-099 | **2 of 7** | 3h | None |
-| GCP Secret Management (3 phases) | TASK-096 | **3 of 7** | 2w | Fase 2 needs Fase 1 complete |
-| Observability MVP | TASK-098 | **4 of 7** | 1d | TASK-096 Fase 1 (health check validates post-hardening) |
-| Cron Auth Standardization | TASK-101 | **5 of 7** | 2h | TASK-098 (integrates Slack alerting) |
-| Database Resilience Baseline | TASK-102 | **Closed** | 0.5d | TASK-096 Fase 1 (no concurrent Cloud SQL changes) |
-| GCP Budget Alerts | TASK-103 | **7 of 7** | 30m | None (independent) |
+| Task                             | ID       | Sequence   | Effort | Dependencies                                            |
+| -------------------------------- | -------- | ---------- | ------ | ------------------------------------------------------- |
+| CI Pipeline Test Step            | TASK-100 | **1 of 7** | 1h     | None                                                    |
+| Security Headers Middleware      | TASK-099 | **2 of 7** | 3h     | None                                                    |
+| GCP Secret Management (3 phases) | TASK-096 | **3 of 7** | 2w     | Fase 2 needs Fase 1 complete                            |
+| Observability MVP                | TASK-098 | **4 of 7** | 1d     | TASK-096 Fase 1 (health check validates post-hardening) |
+| Cron Auth Standardization        | TASK-101 | **5 of 7** | 2h     | TASK-098 (integrates Slack alerting)                    |
+| Database Resilience Baseline     | TASK-102 | **Closed** | 0.5d   | TASK-096 Fase 1 (no concurrent Cloud SQL changes)       |
+| GCP Budget Alerts                | TASK-103 | **7 of 7** | 30m    | None (independent)                                      |
 
 ---
 
@@ -436,20 +461,20 @@ requireCronAuth(request)
 
 These are common cloud strategy recommendations that we explicitly choose **not** to implement given the current team size (1 developer) and project maturity.
 
-| Recommendation | Why Not Now | Trigger to Reconsider |
-|---------------|------------|----------------------|
-| **Terraform / Pulumi (IaC)** | ~10 GCP resources, manual provisioning is tractable. IaC overhead > value for 1 developer | Second developer joins, or >25 GCP resources |
-| **Kubernetes / GKE** | Vercel + Cloud Run solve compute. K8s is a full-time job | Need for long-running background workers or custom networking |
-| **Multiple service accounts per domain** | WIF eliminates the static key problem. Least-privilege SA separation is overhead | Security audit requires it, or second team/service |
-| **Cloud Armor WAF** | Vercel Edge provides basic DDoS. Cloud Armor needs a GCP load balancer | Regulatory requirement, or DDoS incident |
-| **Multi-region DR** | Audience is Chile + internal team. Latency doesn't justify dual-region | SLA commitment >99.9%, or international expansion |
-| **Redis / external cache** | Next.js `unstable_cache` + ISR sufficient. Redis is another service to manage | Cache invalidation becomes a bottleneck at scale |
-| **OpenTelemetry tracing** | Monolith → no service-to-service traces needed. Sentry covers errors | Decompose into microservices |
-| **Automated secret rotation** | Manual rotation is acceptable at 6 critical secrets | Compliance requirement (SOC 2, ISO 27001) |
-| **E2E tests (Playwright)** | 86 unit tests don't even run in CI yet. Fix that first | Unit tests stable in CI + high regression rate on UI flows |
-| **GitOps / ArgoCD** | No Kubernetes → no GitOps target | Kubernetes adoption |
-| **PgBouncer** | Pool of 15 is sufficient for current load. PgBouncer is ops overhead | Connection pool exhaustion under sustained load |
-| **Global rate limiting** | Only auth tokens are rate-limited. API abuse risk is low (internal + authenticated users) | Public API exposure, or abuse incident |
+| Recommendation                           | Why Not Now                                                                               | Trigger to Reconsider                                         |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| **Terraform / Pulumi (IaC)**             | ~10 GCP resources, manual provisioning is tractable. IaC overhead > value for 1 developer | Second developer joins, or >25 GCP resources                  |
+| **Kubernetes / GKE**                     | Vercel + Cloud Run solve compute. K8s is a full-time job                                  | Need for long-running background workers or custom networking |
+| **Multiple service accounts per domain** | WIF eliminates the static key problem. Least-privilege SA separation is overhead          | Security audit requires it, or second team/service            |
+| **Cloud Armor WAF**                      | Vercel Edge provides basic DDoS. Cloud Armor needs a GCP load balancer                    | Regulatory requirement, or DDoS incident                      |
+| **Multi-region DR**                      | Audience is Chile + internal team. Latency doesn't justify dual-region                    | SLA commitment >99.9%, or international expansion             |
+| **Redis / external cache**               | Next.js `unstable_cache` + ISR sufficient. Redis is another service to manage             | Cache invalidation becomes a bottleneck at scale              |
+| **OpenTelemetry tracing**                | Monolith → no service-to-service traces needed. Sentry covers errors                      | Decompose into microservices                                  |
+| **Automated secret rotation**            | Manual rotation is acceptable at 6 critical secrets                                       | Compliance requirement (SOC 2, ISO 27001)                     |
+| **E2E tests (Playwright)**               | 86 unit tests don't even run in CI yet. Fix that first                                    | Unit tests stable in CI + high regression rate on UI flows    |
+| **GitOps / ArgoCD**                      | No Kubernetes → no GitOps target                                                          | Kubernetes adoption                                           |
+| **PgBouncer**                            | Pool of 15 is sufficient for current load. PgBouncer is ops overhead                      | Connection pool exhaustion under sustained load               |
+| **Global rate limiting**                 | Only auth tokens are rate-limited. API abuse risk is low (internal + authenticated users) | Public API exposure, or abuse incident                        |
 
 ---
 
@@ -473,26 +498,26 @@ These principles govern security decisions across the hardening track and future
 
 ## 7. Success Criteria (Post-Hardening)
 
-| Dimension | Target | Measurement |
-|-----------|--------|-------------|
-| Secret Management | No static SA keys in production/staging | Verify `GOOGLE_APPLICATION_CREDENTIALS_JSON` absent from Vercel Production env |
-| Network Security | Cloud SQL inaccessible from arbitrary IPs | `nmap 34.86.135.144` from non-authorized IP returns filtered |
-| Observability | Cron failures detected in <5 minutes | Force a cron failure → verify Sentry alert + Slack message |
-| CI Validation | No merge without passing tests | Push a broken test → verify CI blocks the PR |
-| Auth Consistency | All 18 crons use single helper | `grep -r "requireCronAuth" src/app/api/cron/` returns 18 matches |
-| DB Resilience | PITR enabled, restore tested | `gcloud sql instances describe` shows PITR = true + restore doc exists |
-| Cost Visibility | Budget alerts configured | GCP Billing shows 2 active budgets |
+| Dimension         | Target                                    | Measurement                                                                    |
+| ----------------- | ----------------------------------------- | ------------------------------------------------------------------------------ |
+| Secret Management | No static SA keys in production/staging   | Verify `GOOGLE_APPLICATION_CREDENTIALS_JSON` absent from Vercel Production env |
+| Network Security  | Cloud SQL inaccessible from arbitrary IPs | `nmap 34.86.135.144` from non-authorized IP returns filtered                   |
+| Observability     | Cron failures detected in <5 minutes      | Force a cron failure → verify Sentry alert + Slack message                     |
+| CI Validation     | No merge without passing tests            | Push a broken test → verify CI blocks the PR                                   |
+| Auth Consistency  | All 18 crons use single helper            | `grep -r "requireCronAuth" src/app/api/cron/` returns 18 matches               |
+| DB Resilience     | PITR enabled, restore tested              | `gcloud sql instances describe` shows PITR = true + restore doc exists         |
+| Cost Visibility   | Budget alerts configured                  | GCP Billing shows 2 active budgets                                             |
 
 ---
 
 ## 8. Revision History
 
-| Date | Version | Author | Changes |
-|------|---------|--------|---------|
-| 2026-03-28 | 1.0 | Architecture review | Initial document — pre-hardening assessment + target architecture |
+| Date       | Version | Author              | Changes                                                           |
+| ---------- | ------- | ------------------- | ----------------------------------------------------------------- |
+| 2026-03-28 | 1.0     | Architecture review | Initial document — pre-hardening assessment + target architecture |
 
 ---
 
-*This document supersedes the Security Notes section in `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` for secret management and security posture decisions. The infrastructure doc remains the authoritative source for resource inventory and service configuration.*
+_This document supersedes the Security Notes section in `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` for secret management and security posture decisions. The infrastructure doc remains the authoritative source for resource inventory and service configuration._
 
-*End of document.*
+_End of document._

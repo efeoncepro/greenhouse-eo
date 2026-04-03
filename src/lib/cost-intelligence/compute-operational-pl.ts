@@ -40,6 +40,8 @@ type SnapshotRow = {
 
 type RevenueRow = {
   client_id: string
+  organization_id: string | null
+  organization_name: string | null
   client_name: string | null
   total_revenue_clp: number | string
   partner_share_clp: number | string
@@ -47,6 +49,8 @@ type RevenueRow = {
 
 type ExpenseRow = {
   client_id: string
+  organization_id: string | null
+  organization_name: string | null
   client_name: string | null
   total_direct_expense_clp: number | string
 }
@@ -68,6 +72,8 @@ type PeriodClosureRow = {
 type ClientAccumulator = {
   scopeId: string
   scopeName: string
+  organizationId: string | null
+  organizationName: string | null
   revenueClp: number
   laborCostClp: number
   directExpenseClp: number
@@ -208,6 +214,8 @@ const aggregateSnapshots = ({
     const existing = aggregateMap.get(key.scopeId) || {
       scopeId: key.scopeId,
       scopeName: key.scopeName,
+      organizationId: null,
+      organizationName: null,
       revenueClp: 0,
       laborCostClp: 0,
       directExpenseClp: 0,
@@ -277,14 +285,27 @@ export const computeOperationalPl = async (
       getPeriodClosureMetadata(year, month),
       runGreenhousePostgresQuery<RevenueRow>(
         `
+          WITH client_bridge AS (
+            SELECT DISTINCT ON (s.client_id)
+              s.client_id,
+              s.organization_id
+            FROM greenhouse_core.spaces s
+            WHERE s.client_id IS NOT NULL
+              AND s.organization_id IS NOT NULL
+              AND s.active = TRUE
+            ORDER BY s.client_id, s.updated_at DESC NULLS LAST, s.created_at DESC NULLS LAST, s.space_id ASC
+          )
           SELECT
-            COALESCE(i.client_id, cp.client_id) AS client_id,
+            COALESCE(i.client_id, cp.client_id, i.organization_id, cp.organization_id) AS client_id,
+            COALESCE(i.organization_id, cp.organization_id, cb.organization_id) AS organization_id,
+            MAX(COALESCE(o.organization_name, o.legal_name, cp.legal_name)) AS organization_name,
             MAX(
               COALESCE(
                 NULLIF(TRIM(i.client_name), ''),
                 NULLIF(TRIM(c.client_name), ''),
                 NULLIF(TRIM(cp.legal_name), ''),
-                COALESCE(i.client_id, cp.client_id)
+                NULLIF(TRIM(o.organization_name), ''),
+                COALESCE(i.client_id, cp.client_id, i.organization_id, cp.organization_id)
               )
             ) AS client_name,
             COALESCE(SUM(i.total_amount_clp), 0) AS total_revenue_clp,
@@ -292,35 +313,57 @@ export const computeOperationalPl = async (
           FROM greenhouse_finance.income i
           LEFT JOIN greenhouse_finance.client_profiles cp
             ON cp.client_profile_id = i.client_profile_id
+          LEFT JOIN client_bridge cb
+            ON cb.client_id = COALESCE(i.client_id, cp.client_id)
           LEFT JOIN greenhouse_core.clients c
             ON c.client_id = COALESCE(i.client_id, cp.client_id)
+          LEFT JOIN greenhouse_core.organizations o
+            ON o.organization_id = COALESCE(i.organization_id, cp.organization_id, cb.organization_id)
           WHERE i.invoice_date >= $1::date
             AND i.invoice_date <= $2::date
-            AND COALESCE(i.client_id, cp.client_id) IS NOT NULL
-            AND COALESCE(NULLIF(LOWER(TRIM(COALESCE(i.client_id, cp.client_id))), ''), '__missing__') <> ALL($3::text[])
+            AND COALESCE(i.client_id, cp.client_id, i.organization_id, cp.organization_id) IS NOT NULL
+            AND COALESCE(NULLIF(LOWER(TRIM(COALESCE(i.client_id, cp.client_id, i.organization_id, cp.organization_id))), ''), '__missing__') <> ALL($3::text[])
             AND COALESCE(
-              NULLIF(LOWER(TRIM(COALESCE(i.client_name, c.client_name, cp.legal_name))), ''),
+              NULLIF(LOWER(TRIM(COALESCE(i.client_name, c.client_name, cp.legal_name, o.organization_name))), ''),
               '__missing__'
             ) <> ALL($4::text[])
-          GROUP BY COALESCE(i.client_id, cp.client_id)
+          GROUP BY
+            COALESCE(i.client_id, cp.client_id, i.organization_id, cp.organization_id),
+            COALESCE(i.organization_id, cp.organization_id, cb.organization_id)
         `,
         [periodStart, periodEnd, INTERNAL_COMMERCIAL_CLIENT_IDS, INTERNAL_COMMERCIAL_CLIENT_NAMES]
       ),
       runGreenhousePostgresQuery<ExpenseRow>(
         `
+          WITH client_bridge AS (
+            SELECT DISTINCT ON (s.client_id)
+              s.client_id,
+              s.organization_id
+            FROM greenhouse_core.spaces s
+            WHERE s.client_id IS NOT NULL
+              AND s.organization_id IS NOT NULL
+              AND s.active = TRUE
+            ORDER BY s.client_id, s.updated_at DESC NULLS LAST, s.created_at DESC NULLS LAST, s.space_id ASC
+          )
           SELECT
             e.allocated_client_id AS client_id,
+            COALESCE(es.organization_id, cb.organization_id) AS organization_id,
+            MAX(o.organization_name) AS organization_name,
             MAX(c.client_name) AS client_name,
             COALESCE(SUM(e.total_amount_clp), 0) AS total_direct_expense_clp
           FROM greenhouse_finance.expenses e
           LEFT JOIN greenhouse_core.clients c ON c.client_id = e.allocated_client_id
+          LEFT JOIN greenhouse_core.spaces es ON es.space_id = e.space_id
+          LEFT JOIN client_bridge cb ON cb.client_id = e.allocated_client_id
+          LEFT JOIN greenhouse_core.organizations o
+            ON o.organization_id = COALESCE(es.organization_id, cb.organization_id)
           WHERE e.allocated_client_id IS NOT NULL
             AND e.payroll_entry_id IS NULL
             AND COALESCE(e.document_date, e.payment_date) >= $1::date
             AND COALESCE(e.document_date, e.payment_date) <= $2::date
             AND COALESCE(NULLIF(LOWER(TRIM(e.allocated_client_id)), ''), '__missing__') <> ALL($3::text[])
             AND COALESCE(NULLIF(LOWER(TRIM(c.client_name)), ''), '__missing__') <> ALL($4::text[])
-          GROUP BY e.allocated_client_id
+          GROUP BY e.allocated_client_id, COALESCE(es.organization_id, cb.organization_id)
         `,
         [periodStart, periodEnd, INTERNAL_COMMERCIAL_CLIENT_IDS, INTERNAL_COMMERCIAL_CLIENT_NAMES]
       ),
@@ -328,33 +371,37 @@ export const computeOperationalPl = async (
         `
           SELECT
             ca.client_id,
+            ca.organization_id,
+            MAX(o.organization_name) AS organization_name,
             MAX(ca.client_name) AS client_name,
             COALESCE(SUM(ca.allocated_amount_clp), 0) AS total_direct_expense_clp
           FROM greenhouse_finance.cost_allocations ca
           INNER JOIN greenhouse_finance.expenses e ON e.expense_id = ca.expense_id
+          LEFT JOIN greenhouse_core.organizations o ON o.organization_id = ca.organization_id
           WHERE ca.period_year = $1
             AND ca.period_month = $2
             AND e.payroll_entry_id IS NULL
             AND COALESCE(NULLIF(LOWER(TRIM(ca.client_id)), ''), '__missing__') <> ALL($3::text[])
             AND COALESCE(NULLIF(LOWER(TRIM(ca.client_name)), ''), '__missing__') <> ALL($4::text[])
-          GROUP BY ca.client_id
+          GROUP BY ca.client_id, ca.organization_id
         `,
         [year, month, INTERNAL_COMMERCIAL_CLIENT_IDS, INTERNAL_COMMERCIAL_CLIENT_NAMES]
       ),
       runGreenhousePostgresQuery<ScopeBridgeRow>(
         `
-          SELECT
+          SELECT DISTINCT ON (s.client_id)
             s.client_id,
-            MAX(c.client_name) AS client_name,
+            c.client_name,
             s.space_id,
-            MAX(s.space_name) AS space_name,
+            s.space_name,
             s.organization_id,
-            MAX(o.name) AS organization_name
+            o.organization_name
           FROM greenhouse_core.spaces s
           LEFT JOIN greenhouse_core.clients c ON c.client_id = s.client_id
           LEFT JOIN greenhouse_core.organizations o ON o.organization_id = s.organization_id
           WHERE s.active = TRUE
-          GROUP BY s.client_id, s.space_id, s.organization_id
+            AND s.client_id IS NOT NULL
+          ORDER BY s.client_id, s.updated_at DESC NULLS LAST, s.created_at DESC NULLS LAST, s.space_id ASC
         `
       ).catch(() => []),
       readCommercialCostAttributionByClientForPeriod(year, month).catch(() => [])
@@ -363,15 +410,24 @@ export const computeOperationalPl = async (
   const scopeBridgeByClient = new Map<string, ScopeBridgeRow>(scopeBridgeRows.map(row => [row.client_id, row]))
   const clientMap = new Map<string, ClientAccumulator>()
 
-  const ensureClient = (clientId: string, clientName: string | null) => {
+  const ensureClient = (
+    clientId: string,
+    clientName: string | null,
+    organizationId: string | null = null,
+    organizationName: string | null = null
+  ) => {
+    const bridge = scopeBridgeByClient.get(clientId)
+
     const normalizedName =
       clientName?.trim() ||
-      scopeBridgeByClient.get(clientId)?.client_name?.trim() ||
+      bridge?.client_name?.trim() ||
       clientId
 
     const existing = clientMap.get(clientId) || {
       scopeId: clientId,
       scopeName: normalizedName,
+      organizationId: organizationId || bridge?.organization_id || null,
+      organizationName: organizationName?.trim() || bridge?.organization_name?.trim() || null,
       revenueClp: 0,
       laborCostClp: 0,
       directExpenseClp: 0,
@@ -379,13 +435,15 @@ export const computeOperationalPl = async (
       headcountFte: 0
     }
 
+    existing.organizationId = existing.organizationId || organizationId || bridge?.organization_id || null
+    existing.organizationName = existing.organizationName || organizationName?.trim() || bridge?.organization_name?.trim() || null
     clientMap.set(clientId, existing)
 
     return existing
   }
 
   for (const row of revenueRows) {
-    const client = ensureClient(row.client_id, row.client_name)
+    const client = ensureClient(row.client_id, row.client_name, row.organization_id, row.organization_name)
     const totalRevenueClp = toNumber(row.total_revenue_clp)
     const partnerShareClp = toNumber(row.partner_share_clp)
 
@@ -393,19 +451,19 @@ export const computeOperationalPl = async (
   }
 
   for (const row of directExpenseRows) {
-    const client = ensureClient(row.client_id, row.client_name)
+    const client = ensureClient(row.client_id, row.client_name, row.organization_id, row.organization_name)
 
     client.directExpenseClp += toNumber(row.total_direct_expense_clp)
   }
 
   for (const row of allocationRows) {
-    const client = ensureClient(row.client_id, row.client_name)
+    const client = ensureClient(row.client_id, row.client_name, row.organization_id, row.organization_name)
 
     client.directExpenseClp += toNumber(row.total_direct_expense_clp)
   }
 
   for (const row of commercialCostRows) {
-    const client = ensureClient(row.clientId, row.clientName)
+    const client = ensureClient(row.clientId, row.clientName, row.organizationId, null)
 
     client.laborCostClp += row.laborCostClp
     client.overheadClp += row.overheadCostClp
@@ -459,9 +517,18 @@ export const computeOperationalPl = async (
     baseSnapshots: clientSnapshots,
     keyFor: snapshot => {
       const bridge = scopeBridgeByClient.get(snapshot.scopeId)
+      const fallback = clientMap.get(snapshot.scopeId)
 
-      return bridge?.organization_id
-        ? { scopeId: bridge.organization_id, scopeName: bridge.organization_name?.trim() || bridge.organization_id }
+      return bridge?.organization_id || fallback?.organizationId
+        ? {
+            scopeId: bridge?.organization_id || fallback?.organizationId || snapshot.scopeId,
+            scopeName:
+              bridge?.organization_name?.trim() ||
+              fallback?.organizationName?.trim() ||
+              bridge?.organization_id ||
+              fallback?.organizationId ||
+              snapshot.scopeId
+          }
         : null
     }
   })

@@ -681,8 +681,16 @@ const queryOrgFinanceRows = async (
       ce.total_revenue_clp, ce.direct_costs_clp, ce.indirect_costs_clp,
       ce.headcount_fte
     FROM greenhouse_finance.client_economics ce
-    JOIN greenhouse_finance.client_profiles cp ON cp.client_id = ce.client_id
-    WHERE cp.organization_id = $1 AND ce.period_year = $2 AND ce.period_month = $3
+    WHERE ce.period_year = $2 AND ce.period_month = $3
+      AND (
+        ce.organization_id = $1
+        OR EXISTS (
+          SELECT 1
+          FROM greenhouse_finance.client_profiles cp
+          WHERE cp.organization_id = $1
+            AND (cp.client_id = ce.client_id OR cp.organization_id = ce.client_id)
+        )
+      )
     ORDER BY ce.total_revenue_clp DESC
   `, [orgId, year, month])
 
@@ -695,8 +703,16 @@ const queryOrgFinanceRows = async (
         ce.total_revenue_clp, ce.direct_costs_clp, ce.indirect_costs_clp,
         ce.headcount_fte
       FROM greenhouse_finance.client_economics ce
-      JOIN greenhouse_finance.client_profiles cp ON cp.client_id = ce.client_id
-      WHERE cp.organization_id = $1 AND ce.period_year = $2 AND ce.period_month = $3
+      WHERE ce.period_year = $2 AND ce.period_month = $3
+        AND (
+          ce.organization_id = $1
+          OR EXISTS (
+            SELECT 1
+            FROM greenhouse_finance.client_profiles cp
+            WHERE cp.organization_id = $1
+              AND (cp.client_id = ce.client_id OR cp.organization_id = ce.client_id)
+          )
+        )
       ORDER BY ce.total_revenue_clp DESC
     `, [orgId, year, month])
   }

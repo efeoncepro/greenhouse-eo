@@ -11,6 +11,7 @@ import { getBigQueryProjectId } from '@/lib/bigquery'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { deleteGreenhouseStorageObject, downloadGreenhouseStorageObject, uploadGreenhouseStorageObject } from './greenhouse-media'
+import { normalizeGreenhouseAssetOwnershipScope } from './greenhouse-assets-shared'
 import type {
   GreenhouseAssetContext,
   GreenhouseAssetRecord,
@@ -321,6 +322,12 @@ export const createPrivatePendingAsset = async ({
   ownerMemberId?: string | null
   metadata?: Record<string, unknown>
 }) => {
+  const ownershipScope = normalizeGreenhouseAssetOwnershipScope({
+    ownerClientId,
+    ownerSpaceId,
+    ownerMemberId
+  })
+
   const sizeBytes = bytes instanceof ArrayBuffer ? bytes.byteLength : bytes.byteLength
 
   assertPrivateAssetUpload({
@@ -387,9 +394,9 @@ export const createPrivatePendingAsset = async ({
       sizeBytes,
       CONTEXT_RETENTION_CLASS[contextType],
       contextType,
-      ownerClientId ?? null,
-      ownerSpaceId ?? null,
-      ownerMemberId ?? null,
+      ownershipScope.ownerClientId,
+      ownershipScope.ownerSpaceId,
+      ownershipScope.ownerMemberId,
       uploadedByUserId,
       JSON.stringify(buildMetadataJson({ originalFileName: fileName, extra: metadata }))
     ]
@@ -449,6 +456,12 @@ export const attachAssetToAggregate = async ({
   metadata?: Record<string, unknown>
   client?: QueryableClient
 }) => {
+  const ownershipScope = normalizeGreenhouseAssetOwnershipScope({
+    ownerClientId,
+    ownerSpaceId,
+    ownerMemberId
+  })
+
   const rows = await queryAssetRows<AssetRow>(
     `
       UPDATE greenhouse_core.assets
@@ -470,9 +483,9 @@ export const attachAssetToAggregate = async ({
       assetId,
       ownerAggregateType,
       ownerAggregateId,
-      ownerClientId ?? null,
-      ownerSpaceId ?? null,
-      ownerMemberId ?? null,
+      ownershipScope.ownerClientId,
+      ownershipScope.ownerSpaceId,
+      ownershipScope.ownerMemberId,
       actorUserId,
       JSON.stringify(metadata || {})
     ],
@@ -546,6 +559,12 @@ export const upsertSystemGeneratedAsset = async ({
   actorUserId?: string | null
   metadata?: Record<string, unknown>
 }) => {
+  const ownershipScope = normalizeGreenhouseAssetOwnershipScope({
+    ownerClientId,
+    ownerSpaceId,
+    ownerMemberId
+  })
+
   if (!SYSTEM_ALLOWED_MIME_TYPES.has(mimeType)) {
     throw new Error('unsupported_system_asset_type')
   }
@@ -612,9 +631,9 @@ export const upsertSystemGeneratedAsset = async ({
       CONTEXT_RETENTION_CLASS[ownerAggregateType],
       ownerAggregateType,
       ownerAggregateId,
-      ownerClientId ?? null,
-      ownerSpaceId ?? null,
-      ownerMemberId ?? null,
+      ownershipScope.ownerClientId,
+      ownershipScope.ownerSpaceId,
+      ownershipScope.ownerMemberId,
       actorUserId ?? null,
       JSON.stringify(buildMetadataJson({ originalFileName: fileName, extra: metadata }))
     ]

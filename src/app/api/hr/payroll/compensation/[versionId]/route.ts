@@ -7,6 +7,7 @@ import { toPayrollErrorResponse } from '@/lib/payroll/api-response'
 import { updateCompensationVersion } from '@/lib/payroll/get-compensation'
 import { assertPayrollDateString, parsePayrollNumber } from '@/lib/payroll/shared'
 import { requireHrTenantContext } from '@/lib/tenant/authorization'
+import { normalizeContractType } from '@/types/hr-contracts'
 
 export const dynamic = 'force-dynamic'
 
@@ -55,7 +56,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ve
           min: 0,
           max: 1
         }),
-        contractType: body.contractType === 'plazo_fijo' ? 'plazo_fijo' : 'indefinido',
+        contractType: normalizeContractType(typeof body.contractType === 'string' ? body.contractType : null),
+        scheduleRequired: typeof body.scheduleRequired === 'boolean' ? body.scheduleRequired : undefined,
+        deelContractId: typeof body.deelContractId === 'string' ? body.deelContractId : null,
         hasApv: Boolean(body.hasApv),
         apvAmount: parsePayrollNumber(body.apvAmount ?? 0, 'apvAmount', { min: 0 }) ?? 0,
         desiredNetClp: parsePayrollNumber(body.desiredNetClp, 'desiredNetClp', { allowNull: true, min: 0 }),

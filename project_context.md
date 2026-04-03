@@ -1,5 +1,133 @@
 # project_context.md
 
+## Delta 2026-04-02 TASK-187 Notion governance formalization
+
+- Notion ya tiene una lane formal de governance por `space` encima del binding existente `greenhouse_core.space_notion_sources`.
+- Nuevos objetos de control plane en PostgreSQL:
+  - `greenhouse_sync.notion_space_schema_snapshots`
+  - `greenhouse_sync.notion_space_schema_drift_events`
+  - `greenhouse_sync.notion_space_kpi_readiness`
+- Nuevas APIs admin tenant-scoped:
+  - `GET /api/admin/tenants/[id]/notion-governance`
+  - `POST /api/admin/tenants/[id]/notion-governance/refresh`
+- `POST /api/integrations/notion/register` ya no deja un `nextStep` roto:
+  - apunta al control plane real `POST /api/admin/integrations/notion/sync`
+  - intenta además refrescar governance best-effort tras persistir el binding
+- `TenantNotionPanel` ya muestra:
+  - KPI readiness por `space`
+  - snapshots de schema por base
+  - drift abierto por DB role
+  - CTA admin para refrescar governance
+- `scripts/notion-schema-discovery.ts` quedó reconciliado con el schema canónico actual:
+  - lee `greenhouse_core.space_notion_sources`
+  - ya no depende del join legacy roto a `sns.notion_database_ids` / `sns.client_id`
+- Regla vigente:
+  - el portal sigue usando `NOTION_PIPELINE_URL` para discovery UI/admin sample y verificación de DB access
+  - el refresh de governance usa `NOTION_TOKEN` server-side para leer schema de Notion y persistir snapshots/drift/readiness
+  - si `NOTION_TOKEN` no está disponible, el onboarding puede registrar bindings igual, pero governance queda pendiente de refresh explícito en un entorno con credenciales
+  - el cron runtime `sync-notion-conformed` todavía no usa `space_property_mappings` como carril principal; la tabla permanece como fuente de overrides explícitos y contract governance, no como source of truth runtime definitivo
+
+## Delta 2026-04-02 Finance Clients financial contacts org-first UI
+
+- `Finance > Clients > Contactos` dejó de ser una pestaña read-only basada solo en `greenhouse_finance.client_profiles.finance_contacts`.
+- La ficha ahora puede abrir el drawer shared de `organization memberships` directamente desde la pestaña de contactos, restringido a tipos `billing` / `contact`.
+- `GET /api/finance/clients/[id]` ahora prioriza `person_memberships` de la organización canónica (`billing`, `contact`, `client_contact`) cuando existe `organization_id`; `finance_contacts` queda como fallback legacy.
+- Regla vigente:
+  - los contactos financieros de clientes deben converger al backbone `Person ↔ Organization`
+  - el JSON embebido `finance_contacts` se mantiene solo como compatibilidad transicional y fallback cuando no exista org canónica o memberships
+
+## Delta 2026-04-02 TASK-193 person-organization synergy activation
+
+- `Efeonce` ya existe como `operating entity` persistida en `greenhouse_core.organizations` usando el flag `is_operating_entity = TRUE`; la org canónica quedó regularizada sobre el registro existente `Efeonce`.
+- `greenhouse_serving.session_360` ya resuelve `organization_id` para ambos tenant types:
+  - `client` por bridge `spaces.client_id -> organization_id` con fallback a primary membership
+  - `efeonce_internal` por operating entity
+- `greenhouse_serving.person_360` ya expone org primaria, aliases `eo_id` / `member_id` / `user_id` y `is_efeonce_collaborator`; consumers canónicos como `CanonicalPersonRecord` deben preferir este backbone antes de recomponer contexto org ad hoc.
+- `Organization memberships` ya distinguen `internal` vs `staff_augmentation` como contexto operativo del vínculo cliente sobre `team_member`; la distinción vive en `assignmentType`/`assignedFte`, no en un `membership_type` nuevo.
+- `People` ya consume `organizationId` compartido en los readers visibles para tenant `client`:
+  - `finance`
+  - `delivery`
+  - `ico-profile`
+  - `ico`
+  - aggregate `GET /api/people/[memberId]`
+- `HR` e `intelligence` quedan declarados como surfaces internas, no como follow-on client-facing del scope org-aware:
+  - para tenant `client` responden `403`
+  - exponen contrato, leave, compensación, costo y capacidad interna, por lo que no deben abrirse tal cual al carril cliente
+- `Suppliers` ya puede sembrar contactos mínimos en Account 360:
+  - `organizations/[id]/memberships` acepta crear `identity_profile` ad hoc con nombre + email
+  - `finance/suppliers` create/update ya intenta sembrar `person_memberships(contact)` cuando el supplier tiene `organization_id`
+  - `Finance Suppliers` detail/list ya prioriza esos contactos vía `organizationContacts` / `contactSummary`
+  - `primary_contact_*` se mantiene como cache transicional para fallback BigQuery y suppliers sin memberships
+- Operación DB validada nuevamente:
+  - `pnpm migrate:up` sigue requiriendo Cloud SQL Proxy local (`127.0.0.1:15432`) cuando el wrapper deriva a TCP directo; la IP pública de Cloud SQL continúa no accesible.
+
+## Delta 2026-04-01 Native Integrations Layer como arquitectura viva
+
+- La `Native Integrations Layer` ya no vive solo en `TASK-188`; su fuente canónica ahora es:
+  - `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md`
+- Regla vigente:
+  - integraciones críticas como `Notion`, `HubSpot`, `Nubox` y `Frame.io` deben evolucionar bajo un marco común de plataforma
+  - el patrón objetivo combina `API-led connectivity`, `event-driven architecture`, `contract-first governance` y `canonical core`
+  - Greenhouse debe fortalecer foundations existentes antes de reemplazarlas
+- Relación operativa:
+  - `TASK-188` queda como lane/backlog paraguas
+  - `TASK-187` es la primera implementación fuerte sobre `Notion`
+  - `TASK-186` consume esa foundation para trust y paridad de métricas Delivery
+
+## Delta 2026-04-01 HR departments head selector desacoplado de People
+
+- El selector `Responsable` en `HR > Departments` ya no depende de `GET /api/people`.
+- La vista ahora consume `GET /api/hr/core/members/options`, autorizado por `requireHrCoreManageTenantContext`.
+- La fuente del dropdown es `greenhouse_core.members` vía reader liviano del módulo HR.
+- Regla vigente:
+  - selectors operativos de HR no deben depender del route group `people` para resolver miembros activos
+  - cuando el write target sea `members.member_id`, preferir un reader HR liviano y local antes que el listado full de People
+
+## Delta 2026-04-01 Vitest tooling coverage
+
+- `Vitest` ya descubre también tests de `scripts/**`, no solo `src/**`.
+- La fuente de verdad sigue siendo `vitest.config.ts`; el setup compartido continúa en `src/test/setup.ts`.
+- Regla vigente:
+  - tests unitarios de tooling/CLI local pueden vivir en `scripts/**/*.test.ts` o `scripts/**/*.spec.ts`
+  - `pnpm test` y `pnpm exec vitest run <archivo>` ya deben encontrarlos sin workarounds
+  - esto cubre carriles de DB/tooling como `pg:doctor`, migraciones y generación de tipos cuando tengan lógica testeable
+- El helper `scripts/lib/load-greenhouse-tool-env.ts` ahora normaliza passwords vacías (`''`) como no definidas cuando un profile usa `*_PASSWORD_SECRET_REF`, para no contaminar `GREENHOUSE_POSTGRES_PASSWORD` con un valor vacío.
+
+## Delta 2026-04-01 TASK-026 contract canonicalization
+
+- `greenhouse_core.members` ya es el ancla canonica de contrato para HRIS:
+  - `contract_type`
+  - `pay_regime`
+  - `payroll_via`
+  - `deel_contract_id`
+- `greenhouse_payroll.compensation_versions` conserva snapshot historico de contrato y regimen; no reemplaza el canon colaborador.
+- `greenhouse_payroll.payroll_entries` ya publica `payroll_via`, `deel_contract_id`, `sii_retention_rate` y `sii_retention_amount`.
+- `daily_required` sigue siendo el flag almacenado en Postgres; `schedule_required` solo debe tratarse como alias de lectura en views, UI y helpers.
+- Las vistas `member_360`, `member_payroll_360` y `person_hr_360` quedaron alineadas para que HR, Payroll, People y cualquier consumer cross-module lean el mismo contrato base.
+- Nota operativa: la migracion de TASK-026 requirio Cloud SQL Proxy local para CLI; la primera corrida detecto un timestamp anterior al baseline de `node-pg-migrate`, por lo que el archivo se regenero con un timestamp valido generado por la herramienta; `pnpm lint` y `pnpm build` quedaron verdes y `pnpm migrate:up` / `pnpm db:generate-types` siguen como cierre operativo pendiente del agente principal.
+
+## Delta 2026-03-31 Operación GCP: cuenta preferida y carril ADC
+
+- Preferencia operativa explícita del owner/admin del proyecto:
+  - usar `gcloud` primero para operaciones GCP/Cloud SQL/BigQuery
+  - la cuenta humana preferida es `julio.reyes@efeonce.org`
+  - asumir que ese usuario es admin/owner salvo evidencia contraria del entorno
+- Carril recomendado:
+  - priorizar `Application Default Credentials (ADC)` para scripts y tooling local antes de depender de `.env` remotos o pulls de Vercel
+  - validar al inicio:
+    - `gcloud auth list`
+    - `gcloud config get-value account`
+    - `gcloud auth application-default print-access-token`
+- Fallback operativo:
+  - si `ADC` no está inicializado o no tiene alcance suficiente, documentarlo explícitamente
+  - recién después usar env remoto (`vercel env pull` u otra vía equivalente) como workaround
+- Regla de coordinación:
+  - no asumir que el mejor carril para ejecutar backfills o scripts operativos es Vercel
+  - intentar primero el carril `gcloud + ADC` y dejar nota en `Handoff.md` si no estuvo disponible
+- Estado observado en esta máquina durante esta sesión:
+  - `gcloud` sí estaba autenticado con `julio.reyes@efeonce.org` como cuenta activa
+  - `ADC` no estaba inicializado, por lo que algunas operaciones terminaron requiriendo fallback temporal
+  - esta situación debe corregirse antes de normalizar nuevos flujos operativos sobre GCP
 ## Delta 2026-03-31 Shared attachments and GCP bucket topology
 
 - Alineación operativa de entorno:
@@ -3112,6 +3240,10 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - MUI 7.x
 - App Router en `src/app`
 - PNPM lockfile presente
+- PostgreSQL via `pg` (Cloud SQL Connector + Secret Manager), conexión centralizada en `src/lib/db.ts`
+- Kysely query builder tipado para módulos nuevos (`getDb()` de `@/lib/db`)
+- node-pg-migrate para migraciones versionadas (`pnpm migrate:up/down/create/status`)
+- kysely-codegen para generar tipos de DB (`pnpm db:generate-types`)
 - `apexcharts` + `react-apexcharts` activos para charts ejecutivos
 - El portal ya tiene un `space-efeonce` sembrado en BigQuery para validar el MVP del dashboard cliente sobre el portfolio interno con mayor densidad de datos.
 - En producto, la label visible debe migrar a `space`; `tenant` se mantiene solo como termino interno de runtime y datos.
@@ -3140,6 +3272,18 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Greenhouse tambien debe componer vistas y charts segun linea de negocio y servicios contratados del cliente.
 - Proyectos, tareas y sprints existen como drilldown explicativo, no como centro del producto.
 - El centro actual del producto ya es `/dashboard`; las siguientes capas objetivo son `/equipo` y `/campanas`.
+
+## Database Connection
+
+- **Import `query` from `@/lib/db`** para raw SQL queries.
+- **Import `getDb` from `@/lib/db`** para Kysely typed queries en módulos nuevos.
+- **Import `withTransaction` from `@/lib/db`** para transacciones.
+- **NUNCA** crear `new Pool()` fuera de `src/lib/postgres/client.ts`.
+- **NUNCA** leer `GREENHOUSE_POSTGRES_*` directamente fuera de `client.ts`.
+- Módulos existentes usando `runGreenhousePostgresQuery` de `@/lib/postgres/client` están bien — no migrar retroactivamente.
+- Todo cambio de schema DDL debe ir como migración versionada: `pnpm migrate:create <nombre>`.
+- Después de aplicar migraciones: `pnpm db:generate-types` para regenerar tipos Kysely.
+- Spec completa: `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`.
 
 ## Comandos Utiles
 

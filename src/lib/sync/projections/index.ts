@@ -11,6 +11,7 @@ import { icoOrganizationProjection } from './ico-organization-metrics'
 import { organizationOperationalProjection } from './organization-operational'
 import { memberCapacityEconomicsProjection } from './member-capacity-economics'
 import { assignmentMembershipSyncProjection } from './assignment-membership-sync'
+import { operatingEntityMembershipProjection } from './operating-entity-membership'
 import { projectedPayrollProjection } from './projected-payroll'
 import { leavePayrollRecalculationProjection } from './leave-payroll-recalculation'
 import { payrollReceiptsProjection } from './payroll-receipts'
@@ -20,6 +21,8 @@ import { commercialCostAttributionProjection } from './commercial-cost-attributi
 import { operationalPlProjection } from './operational-pl'
 import { providerToolingProjection } from './provider-tooling'
 import { staffAugPlacementProjection } from './staff-augmentation'
+import { financeExpenseReactiveIntakeProjection } from './finance-expense-reactive-intake'
+import { agencyPerformanceReportProjection } from './agency-performance-report'
 
 // DEPRECATED: personOperationalProjection removed — replaced by personIntelligenceProjection
 // DEPRECATED: icoMemberProjection kept for backward compat (BQ → Postgres sync) but person_intelligence
@@ -41,13 +44,16 @@ export const ensureProjectionsRegistered = () => {
   registerProjection(organizationOperationalProjection)
   registerProjection(memberCapacityEconomicsProjection)
   registerProjection(assignmentMembershipSyncProjection)
+  registerProjection(operatingEntityMembershipProjection)
   registerProjection(projectedPayrollProjection)
   registerProjection(leavePayrollRecalculationProjection)
   registerProjection(payrollReceiptsProjection)
   registerProjection(payrollExportReadyProjection)
   registerProjection(periodClosureStatusProjection)
   registerProjection(providerToolingProjection)
+  registerProjection(financeExpenseReactiveIntakeProjection)
   registerProjection(staffAugPlacementProjection)
   registerProjection(commercialCostAttributionProjection)
   registerProjection(operationalPlProjection)
+  registerProjection(agencyPerformanceReportProjection)
 }

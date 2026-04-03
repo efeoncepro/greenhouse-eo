@@ -237,6 +237,14 @@ const ensureDeliveryTaskColumns = async (projectId: string) => {
 
   try {
     await bq.query({
+      query: `ALTER TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\` ADD COLUMN IF NOT EXISTS project_source_ids ARRAY<STRING>`
+    })
+  } catch {
+    // Column may already exist or service account lacks ALTER permissions — safe to continue
+  }
+
+  try {
+    await bq.query({
       query: `ALTER TABLE \`${projectId}.greenhouse_conformed.delivery_tasks\` ADD COLUMN IF NOT EXISTS created_at TIMESTAMP`
     })
   } catch {
@@ -275,7 +283,11 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
              frame_versions, frame_comments, open_frame_comments,
              client_review_open, workflow_review_open, bloqueado_por_ids,
              last_frame_comment, proyecto_ids, sprint_ids,
-             COALESCE(responsables_ids, responsable_ids) AS responsables_ids,
+             CASE
+               WHEN responsables_ids IS NOT NULL AND ARRAY_LENGTH(responsables_ids) > 0 THEN responsables_ids
+               WHEN responsable_ids IS NOT NULL AND ARRAY_LENGTH(responsable_ids) > 0 THEN responsable_ids
+               ELSE ARRAY<STRING>[]
+             END AS responsables_ids,
              \`fecha_límite\`, \`fecha_límite_end\`, \`fecha_límite_original\`,
              \`fecha_límite_original_end\`, fecha_de_completado,
              \`tiempo_de_ejecución\`, \`tiempo_en_cambios\`, \`tiempo_en_revisión\`,
@@ -384,7 +396,11 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
 
   // 4. Transform tasks
   const deliveryTasks = tasks.map(row => {
-    const projectSourceId = row.proyecto_ids?.[0] || null
+    const projectSourceIds = Array.from(
+      new Set((row.proyecto_ids || []).map(id => toNullableString(id)).filter((id): id is string => !!id))
+    )
+
+    const projectSourceId = projectSourceIds[0] || null
     const sprintSourceId = row.sprint_ids?.[0] || null
     const assigneeSourceId = row.responsables_ids?.[0] || null
 
@@ -402,6 +418,7 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
     return {
       task_source_id: toNullableString(row.notion_page_id),
       project_source_id: projectSourceId,
+      project_source_ids: projectSourceIds.length > 0 ? projectSourceIds : null,
       sprint_source_id: sprintSourceId,
       project_database_source_id: projectDatabaseSourceId,
       space_id: spaceId,
@@ -520,16 +537,48 @@ export const syncNotionToConformed = async (): Promise<SyncConformedResult> => {
   const [validationRows] = await bq.query({
     query: `
       SELECT
+        COALESCE(space_id, '__NULL__') AS space_id,
         COUNTIF(assignee_source_id IS NOT NULL) AS with_assignee_source,
         COUNTIF(assignee_member_id IS NOT NULL) AS with_assignee_member,
         COUNTIF(assignee_member_ids IS NOT NULL AND ARRAY_LENGTH(assignee_member_ids) > 0) AS with_assignee_member_ids
       FROM \`${projectId}.greenhouse_conformed.delivery_tasks\`
+      GROUP BY COALESCE(space_id, '__NULL__')
+      ORDER BY space_id
     `
   })
 
-  const conformedTasksWithAssigneeSource = toNumber(validationRows[0]?.with_assignee_source) ?? 0
-  const conformedTasksWithAssigneeMember = toNumber(validationRows[0]?.with_assignee_member) ?? 0
-  const conformedTasksWithAssigneeMemberIds = toNumber(validationRows[0]?.with_assignee_member_ids) ?? 0
+  const conformedTasksWithAssigneeSource = toNumber(validationRows.reduce((sum, row) => sum + (toNumber(row.with_assignee_source) ?? 0), 0)) ?? 0
+  const conformedTasksWithAssigneeMember = toNumber(validationRows.reduce((sum, row) => sum + (toNumber(row.with_assignee_member) ?? 0), 0)) ?? 0
+  const conformedTasksWithAssigneeMemberIds = toNumber(validationRows.reduce((sum, row) => sum + (toNumber(row.with_assignee_member_ids) ?? 0), 0)) ?? 0
+
+  const sourceAssigneeCountsBySpace = new Map<string, number>()
+
+  for (const row of tasks) {
+    const spaceId = toNullableString(row.space_id) || '__NULL__'
+    const hasResponsables = (row.responsables_ids?.length ?? 0) > 0
+
+    if (hasResponsables) {
+      sourceAssigneeCountsBySpace.set(spaceId, (sourceAssigneeCountsBySpace.get(spaceId) ?? 0) + 1)
+    }
+  }
+
+  const conformedAssigneeCountsBySpace = new Map<string, number>()
+
+  for (const row of validationRows) {
+    const spaceId = toNullableString(row.space_id) || '__NULL__'
+
+    conformedAssigneeCountsBySpace.set(spaceId, toNumber(row.with_assignee_source) ?? 0)
+  }
+
+  for (const [spaceId, sourceCount] of sourceAssigneeCountsBySpace.entries()) {
+    const conformedCount = conformedAssigneeCountsBySpace.get(spaceId) ?? 0
+
+    if (sourceCount > 0 && conformedCount !== sourceCount) {
+      throw new Error(
+        `Conformed sync lost task assignee attribution for space ${spaceId}: source has ${sourceCount} tasks with responsables but delivery_tasks persisted ${conformedCount} assignee_source_id rows`
+      )
+    }
+  }
 
   if (sourceTasksWithResponsables > 0 && conformedTasksWithAssigneeSource === 0) {
     throw new Error(

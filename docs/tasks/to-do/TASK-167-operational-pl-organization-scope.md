@@ -1,4 +1,7 @@
-# TASK-167 — Operational P&L: Organization Scope Materialization
+## Delta 2026-04-02
+- `scope_type = 'organization'` ya existe en el repo real y quedó reforzado por `TASK-192` con inputs/materializers org-aware y consumers organization-first. Esta task debe tratarse como desactualizada y candidata a cierre/reclasificación.
+
+# TASK-167 - Operational P&L: Organization Scope Materialization
 
 ## Status
 

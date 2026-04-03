@@ -5,7 +5,7 @@ import type { PersonAccess, PersonDetail, PersonDetailAssignment, PersonDetailMe
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { getPersonMemberships } from '@/lib/account-360/organization-store'
+import { getOrganizationClientIds, getPersonMemberships } from '@/lib/account-360/organization-store'
 import { getPersonDeliveryContext } from '@/lib/person-360/get-person-delivery'
 import { getPersonHrContext } from '@/lib/person-360/get-person-hr'
 import { resolvePersonIdentifier } from '@/lib/person-360/resolve-eo-id'
@@ -632,14 +632,17 @@ const getIdentityProvidersByProfile = async (identityProfileId: string | null): 
 
 export const getPersonDetail = async ({
   memberId: memberIdOrEoId,
-  access
+  access,
+  organizationId
 }: {
   memberId: string
   access: PersonAccess
+  organizationId?: string | null
 }): Promise<PersonDetail> => {
   // Resolve identifier via person_360 — works with EO-ID or legacy memberId
   const resolved = await resolvePersonIdentifier(memberIdOrEoId)
   const memberId = resolved?.memberId ?? memberIdOrEoId
+  const scopedOrganizationId = organizationId?.trim() || null
 
   const memberRow = await getMemberById(memberId)
 
@@ -700,8 +703,17 @@ export const getPersonDetail = async ({
   // Canonical capacity snapshot — single source of truth per GREENHOUSE_TEAM_CAPACITY_ARCHITECTURE_V1
   let capacitySnapshot: MemberCapacityEconomicsSnapshot | null = null
   let intelligence: PersonIntelligenceSnapshot | null = null
+  let scopedClientIds: Set<string> | null = null
 
-  if (isGreenhousePostgresConfigured()) {
+  if (scopedOrganizationId) {
+    try {
+      scopedClientIds = new Set(await getOrganizationClientIds(scopedOrganizationId))
+    } catch (error) {
+      console.warn(`[people/${memberId}] organization client scope failed:`, error instanceof Error ? error.message : error)
+    }
+  }
+
+  if (isGreenhousePostgresConfigured() && !scopedOrganizationId) {
     tasks.push(
       readLatestMemberCapacityEconomicsSnapshot(memberId).then(snap => {
         capacitySnapshot = snap
@@ -740,34 +752,38 @@ export const getPersonDetail = async ({
 
       // If no capacity snapshot was loaded, fall back to assignment-derived summary
       if (!capacitySnapshot) {
-        let membershipClientIds: Set<string> | null = null
+        let summaryClientIds = scopedClientIds
 
-        if (member.identityProfileId) {
+        if (!summaryClientIds && member.identityProfileId) {
           try {
             const memberships = await getPersonMemberships(member.identityProfileId)
 
-            membershipClientIds = new Set(memberships.map(m => m.clientId).filter(Boolean) as string[])
+            summaryClientIds = new Set(memberships.map(m => m.clientId).filter(Boolean) as string[])
           } catch {
             // If memberships lookup fails, fall back to all assignments
           }
         }
 
-        const summaryRows = membershipClientIds
-          ? rows.filter(r => membershipClientIds!.has(String(r.client_id || '')))
+        const summaryRows = summaryClientIds
+          ? rows.filter(r => summaryClientIds.has(String(r.client_id || '')))
           : rows
 
         detail.summary = buildAssignmentsSummary(summaryRows)
       }
 
       if (access.canViewAssignments) {
-        detail.assignments = normalizeAssignments(rows)
+        const visibleRows = scopedClientIds
+          ? rows.filter(r => scopedClientIds!.has(String(r.client_id || '')))
+          : rows
+
+        detail.assignments = normalizeAssignments(visibleRows)
       }
     })().catch(error => {
       console.warn(`[people/${memberId}] assignments failed:`, error instanceof Error ? error.message : error)
     })
   )
 
-  if (access.canViewActivity) {
+  if (access.canViewActivity && !scopedOrganizationId) {
     // Operational metrics: prefer person_intelligence serving, raw from notion_ops as fallback.
     // The intelligence snapshot is loaded above in a parallel task; raw only fires if serving unavailable.
     tasks.push(
@@ -806,7 +822,7 @@ export const getPersonDetail = async ({
 
   if (access.canViewFinance) {
     tasks.push(
-      getPersonFinanceOverview(memberId).then(finance => {
+      getPersonFinanceOverview(memberId, { organizationId: scopedOrganizationId }).then(finance => {
         detail.financeSummary = finance.summary
       }).catch(error => {
         console.warn(`[people/${memberId}] finance overview failed:`, error instanceof Error ? error.message : error)
@@ -836,13 +852,15 @@ export const getPersonDetail = async ({
       )
     }
 
-    tasks.push(
-      getPersonDeliveryContext(memberId).then(ctx => {
-        detail.deliveryContext = ctx
-      }).catch(error => {
-        console.warn(`[people/${memberId}] delivery context failed:`, error instanceof Error ? error.message : error)
-      })
-    )
+    if (access.canViewActivity) {
+      tasks.push(
+        getPersonDeliveryContext(memberId, { organizationId: scopedOrganizationId }).then(ctx => {
+          detail.deliveryContext = ctx
+        }).catch(error => {
+          console.warn(`[people/${memberId}] delivery context failed:`, error instanceof Error ? error.message : error)
+        })
+      )
+    }
 
     if (access.canViewHrProfile) {
       tasks.push(

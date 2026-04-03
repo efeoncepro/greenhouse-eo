@@ -42,6 +42,7 @@ import {
   pgGetCompensationOverview
 } from '@/lib/payroll/postgres-store'
 import { resolveChileAfpSplitRates } from '@/lib/payroll/chile-previsional-helpers'
+import { normalizeContractType } from '@/types/hr-contracts'
 
 const COMPENSATION_MUTATION_TYPES = {
   afpName: 'STRING',
@@ -193,6 +194,7 @@ const normalizeCompensationVersion = (row: CompensationRow): CompensationVersion
   const effectiveFrom = toDateString(row.effective_from) || ''
   const effectiveTo = toDateString(row.effective_to)
   const payRegime = row.pay_regime === 'international' ? 'international' : 'chile'
+  const contractType = normalizeContractType(row.contract_type)
 
   return {
     versionId: String(row.version_id || ''),
@@ -226,7 +228,10 @@ const normalizeCompensationVersion = (row: CompensationRow): CompensationVersion
     healthSystem: row.health_system === 'isapre' ? 'isapre' : row.health_system === 'fonasa' ? 'fonasa' : null,
     healthPlanUf: toNullableNumber(row.health_plan_uf),
     unemploymentRate: toNumber(row.unemployment_rate),
-    contractType: row.contract_type === 'plazo_fijo' ? 'plazo_fijo' : 'indefinido',
+    contractType,
+    payrollVia: payRegime === 'international' ? 'deel' : 'internal',
+    scheduleRequired: contractType === 'indefinido' || contractType === 'plazo_fijo',
+    deelContractId: null,
     hasApv: normalizeBoolean(row.has_apv),
     apvAmount: toNumber(row.apv_amount),
     effectiveFrom,

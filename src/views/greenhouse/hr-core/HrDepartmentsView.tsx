@@ -1,10 +1,13 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import Link from 'next/link'
 
+import { useForm, Controller } from 'react-hook-form'
+
 import Alert from '@mui/material/Alert'
+import Autocomplete from '@mui/material/Autocomplete'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -16,9 +19,12 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import Divider from '@mui/material/Divider'
+import FormControlLabel from '@mui/material/FormControlLabel'
 import Grid from '@mui/material/Grid'
+import MenuItem from '@mui/material/MenuItem'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
+import Switch from '@mui/material/Switch'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -27,11 +33,36 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
+import { toast } from 'react-toastify'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
-import type { HrDepartment, HrDepartmentsResponse } from '@/types/hr-core'
+import type { BusinessLineMetadata } from '@/types/business-line'
+import type { HrDepartment, HrDepartmentsResponse, HrMemberOption, HrMemberOptionsResponse } from '@/types/hr-core'
+
+// ── Form types ──
+
+interface DepartmentFormValues {
+  name: string
+  businessUnit: string
+  description: string
+  parentDepartmentId: string
+  headMemberId: string
+  sortOrder: number
+  active: boolean
+}
+
+const FORM_DEFAULTS: DepartmentFormValues = {
+  name: '',
+  businessUnit: '',
+  description: '',
+  parentDepartmentId: '',
+  headMemberId: '',
+  sortOrder: 0,
+  active: true
+}
 
 type Props = {
   isAdmin?: boolean
@@ -45,12 +76,18 @@ const HrDepartmentsView = ({ isAdmin }: Props) => {
   const [editDept, setEditDept] = useState<HrDepartment | null>(null)
   const [saving, setSaving] = useState(false)
 
-  // Form state
-  const [formName, setFormName] = useState('')
-  const [formBU, setFormBU] = useState('')
-  const [formDesc, setFormDesc] = useState('')
-  const [formHead, setFormHead] = useState('')
-  const [formSort, setFormSort] = useState<number | ''>(0)
+  // Reference data for selects
+  const [businessLines, setBusinessLines] = useState<BusinessLineMetadata[]>([])
+  const [members, setMembers] = useState<HrMemberOption[]>([])
+  const [loadingBL, setLoadingBL] = useState(false)
+  const [loadingMembers, setLoadingMembers] = useState(false)
+
+  const { control, handleSubmit, reset, formState: { isValid } } = useForm<DepartmentFormValues>({
+    defaultValues: FORM_DEFAULTS,
+    mode: 'onChange'
+  })
+
+  // ── Data fetching ──
 
   const fetchDepts = useCallback(async () => {
     const res = await fetch('/api/hr/core/departments')
@@ -62,37 +99,98 @@ const HrDepartmentsView = ({ isAdmin }: Props) => {
 
   useEffect(() => { fetchDepts() }, [fetchDepts])
 
+  const fetchBusinessLines = useCallback(async () => {
+    if (businessLines.length > 0) return
+    setLoadingBL(true)
+
+    try {
+      const res = await fetch('/api/admin/business-lines', { signal: AbortSignal.timeout(5000) })
+
+      if (res.ok) {
+        const payload = await res.json()
+
+        setBusinessLines(payload.businessLines ?? [])
+      }
+    } catch {
+      // silently fail — field remains usable with existing values
+    } finally {
+      setLoadingBL(false)
+    }
+  }, [businessLines.length])
+
+  const fetchMembers = useCallback(async () => {
+    if (members.length > 0) return
+    setLoadingMembers(true)
+
+    try {
+      const res = await fetch('/api/hr/core/members/options', { signal: AbortSignal.timeout(5000) })
+
+      if (res.ok) {
+        const payload = (await res.json()) as HrMemberOptionsResponse
+
+        setMembers(payload.members ?? [])
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setLoadingMembers(false)
+    }
+  }, [members.length])
+
+  // ── Computed ──
+
+  const departments = useMemo(() => data?.departments ?? [], [data?.departments])
+  const uniqueBUs = new Set(departments.map(d => d.businessUnit))
+
+  const nextSortOrder = useMemo(() => {
+    if (departments.length === 0) return 1
+
+    return Math.max(...departments.map(d => d.sortOrder)) + 1
+  }, [departments])
+
+  // ── Dialog helpers ──
+
   const openCreate = () => {
     setEditDept(null)
-    setFormName('')
-    setFormBU('')
-    setFormDesc('')
-    setFormHead('')
-    setFormSort(0)
+    reset({ ...FORM_DEFAULTS, sortOrder: nextSortOrder })
     setDialogOpen(true)
+    void fetchBusinessLines()
+    void fetchMembers()
   }
 
   const openEdit = (dept: HrDepartment) => {
     setEditDept(dept)
-    setFormName(dept.name)
-    setFormBU(dept.businessUnit)
-    setFormDesc(dept.description ?? '')
-    setFormHead(dept.headMemberId ?? '')
-    setFormSort(dept.sortOrder)
+    reset({
+      name: dept.name,
+      businessUnit: dept.businessUnit,
+      description: dept.description ?? '',
+      parentDepartmentId: dept.parentDepartmentId ?? '',
+      headMemberId: dept.headMemberId ?? '',
+      sortOrder: dept.sortOrder,
+      active: dept.active
+    })
     setDialogOpen(true)
+    void fetchBusinessLines()
+    void fetchMembers()
   }
 
-  const handleSave = async () => {
+  const handleClose = () => {
+    if (!saving) setDialogOpen(false)
+  }
+
+  const onSubmit = async (values: DepartmentFormValues) => {
     setSaving(true)
     setError(null)
 
     try {
       const body = {
-        name: formName,
-        businessUnit: formBU,
-        description: formDesc || null,
-        headMemberId: formHead || null,
-        sortOrder: formSort === '' ? 0 : formSort
+        name: values.name,
+        businessUnit: values.businessUnit,
+        description: values.description || null,
+        parentDepartmentId: values.parentDepartmentId || null,
+        headMemberId: values.headMemberId || null,
+        sortOrder: values.sortOrder,
+        active: values.active
       }
 
       const url = editDept ? `/api/hr/core/departments/${editDept.departmentId}` : '/api/hr/core/departments'
@@ -113,11 +211,29 @@ const HrDepartmentsView = ({ isAdmin }: Props) => {
       }
 
       setDialogOpen(false)
+      toast.success(editDept ? 'Departamento actualizado' : 'Departamento creado')
       fetchDepts()
     } finally {
       setSaving(false)
     }
   }
+
+  // ── Autocomplete selected value ──
+
+  const selectedMember = useCallback(
+    (memberId: string) => members.find(m => m.memberId === memberId) ?? null,
+    [members]
+  )
+
+  // ── Parent department options (filter self in edit mode) ──
+
+  const parentDeptOptions = useMemo(() => {
+    if (!editDept) return departments
+
+    return departments.filter(d => d.departmentId !== editDept.departmentId)
+  }, [departments, editDept])
+
+  // ── Render ──
 
   if (loading) {
     return (
@@ -134,9 +250,6 @@ const HrDepartmentsView = ({ isAdmin }: Props) => {
       </Stack>
     )
   }
-
-  const departments = data?.departments ?? []
-  const uniqueBUs = new Set(departments.map(d => d.businessUnit))
 
   return (
     <Stack spacing={6}>
@@ -210,9 +323,9 @@ const HrDepartmentsView = ({ isAdmin }: Props) => {
               <TableHead>
                 <TableRow>
                   <TableCell>Nombre</TableCell>
-                  <TableCell>Unidad de negocio</TableCell>
+                  <TableCell>Línea de negocio</TableCell>
                   <TableCell>Responsable</TableCell>
-                  <TableCell align='center'>Orden</TableCell>
+                  <TableCell align='center'>Posición</TableCell>
                   <TableCell align='center'>Estado</TableCell>
                   {isAdmin && <TableCell />}
                 </TableRow>
@@ -279,65 +392,202 @@ const HrDepartmentsView = ({ isAdmin }: Props) => {
       {/* Create/Edit Dialog */}
       <Dialog
         open={dialogOpen}
-        onClose={() => !saving && setDialogOpen(false)}
+        onClose={handleClose}
         maxWidth='sm'
         fullWidth
         closeAfterTransition={false}
+        aria-labelledby='dept-dialog-title'
       >
-        <DialogTitle>{editDept ? 'Editar departamento' : 'Nuevo departamento'}</DialogTitle>
+        <DialogTitle id='dept-dialog-title'>
+          {editDept ? 'Editar departamento' : 'Nuevo departamento'}
+        </DialogTitle>
         <Divider />
         <DialogContent>
-          <Stack spacing={3} sx={{ mt: 1 }}>
-            <CustomTextField
-              fullWidth
-              size='small'
-              label='Nombre'
-              value={formName}
-              onChange={e => setFormName(e.target.value)}
-              required
-            />
-            <CustomTextField
-              fullWidth
-              size='small'
-              label='Unidad de negocio'
-              value={formBU}
-              onChange={e => setFormBU(e.target.value)}
-              required
-              helperText='Ej: globe, efeonce_digital, reach, wave'
-            />
-            <CustomTextField
-              fullWidth
-              size='small'
-              label='Descripción'
-              value={formDesc}
-              onChange={e => setFormDesc(e.target.value)}
-              multiline
-              rows={2}
-            />
-            <CustomTextField
-              fullWidth
-              size='small'
-              label='ID responsable (member_id)'
-              value={formHead}
-              onChange={e => setFormHead(e.target.value)}
-              helperText='Opcional. ID del miembro que lidera este departamento.'
-            />
-            <CustomTextField
-              fullWidth
-              size='small'
-              label='Orden de visualización'
-              type='number'
-              value={formSort}
-              onChange={e => setFormSort(e.target.value === '' ? '' : Number(e.target.value))}
-            />
-          </Stack>
+          <form id='dept-form' onSubmit={handleSubmit(onSubmit)}>
+            <Stack spacing={3} sx={{ mt: 1 }}>
+              {/* ── Identidad ── */}
+              <Typography variant='overline' color='text.secondary'>Identidad</Typography>
+
+              <Controller
+                name='name'
+                control={control}
+                rules={{ required: 'El nombre es obligatorio', minLength: { value: 2, message: 'Mínimo 2 caracteres' } }}
+                render={({ field, fieldState }) => (
+                  <CustomTextField
+                    {...field}
+                    fullWidth
+                    size='small'
+                    label='Nombre'
+                    required
+                    inputProps={{ 'aria-required': true }}
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                    FormHelperTextProps={fieldState.error ? { role: 'alert' } : undefined}
+                  />
+                )}
+              />
+
+              <Controller
+                name='businessUnit'
+                control={control}
+                rules={{ required: 'La línea de negocio es obligatoria' }}
+                render={({ field, fieldState }) => (
+                  <CustomTextField
+                    {...field}
+                    select
+                    fullWidth
+                    size='small'
+                    label='Línea de negocio'
+                    required
+                    inputProps={{ 'aria-required': true }}
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
+                    FormHelperTextProps={fieldState.error ? { role: 'alert' } : undefined}
+                    disabled={loadingBL}
+                  >
+                    {businessLines.filter(bl => bl.isActive).map(bl => (
+                      <MenuItem key={bl.moduleCode} value={bl.moduleCode}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                          <Box
+                            sx={{
+                              width: 10,
+                              height: 10,
+                              borderRadius: '50%',
+                              bgcolor: bl.colorHex,
+                              flexShrink: 0
+                            }}
+                          />
+                          {bl.label}
+                        </Box>
+                      </MenuItem>
+                    ))}
+                  </CustomTextField>
+                )}
+              />
+
+              <Controller
+                name='description'
+                control={control}
+                render={({ field }) => (
+                  <CustomTextField
+                    {...field}
+                    fullWidth
+                    size='small'
+                    label='Descripción'
+                    multiline
+                    rows={2}
+                    placeholder='Propósito y alcance del departamento'
+                  />
+                )}
+              />
+
+              {/* ── Organización ── */}
+              <Typography variant='overline' color='text.secondary' sx={{ pt: 1 }}>Organización</Typography>
+
+              <Controller
+                name='parentDepartmentId'
+                control={control}
+                render={({ field }) => (
+                  <CustomTextField
+                    {...field}
+                    select
+                    fullWidth
+                    size='small'
+                    label='Departamento padre'
+                    helperText='Dejar vacío para departamento raíz'
+                  >
+                    <MenuItem value=''>
+                      <Typography color='text.secondary' variant='body2'>Ninguno (raíz)</Typography>
+                    </MenuItem>
+                    {parentDeptOptions.map(d => (
+                      <MenuItem key={d.departmentId} value={d.departmentId}>
+                        {d.name}
+                      </MenuItem>
+                    ))}
+                  </CustomTextField>
+                )}
+              />
+
+              <Controller
+                name='headMemberId'
+                control={control}
+                render={({ field: { onChange, value, ...field } }) => (
+                  <Autocomplete
+                    {...field}
+                    options={members}
+                    value={selectedMember(value)}
+                    onChange={(_, option) => onChange(option?.memberId ?? '')}
+                    getOptionLabel={o => o.displayName}
+                    isOptionEqualToValue={(opt, val) => opt.memberId === val.memberId}
+                    loading={loadingMembers}
+                    renderOption={(props, option) => (
+                      <li {...props} key={option.memberId}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                          <Typography variant='body2' fontWeight={500}>{option.displayName}</Typography>
+                          <Typography variant='caption' color='text.secondary'>{option.roleTitle}</Typography>
+                        </Box>
+                      </li>
+                    )}
+                    renderInput={params => (
+                      <CustomTextField
+                        {...params}
+                        size='small'
+                        label='Responsable'
+                        placeholder='Buscar por nombre…'
+                        helperText='Persona que lidera este departamento'
+                      />
+                    )}
+                  />
+                )}
+              />
+
+              {/* ── Configuración (solo en edición) ── */}
+              {editDept && (
+                <>
+                  <Typography variant='overline' color='text.secondary' sx={{ pt: 1 }}>Configuración</Typography>
+
+                  <Controller
+                    name='sortOrder'
+                    control={control}
+                    render={({ field }) => (
+                      <CustomTextField
+                        {...field}
+                        onChange={e => field.onChange(e.target.value === '' ? 0 : Number(e.target.value))}
+                        fullWidth
+                        size='small'
+                        label='Posición'
+                        type='number'
+                        helperText={`Valor actual: ${editDept.sortOrder}`}
+                      />
+                    )}
+                  />
+
+                  <Controller
+                    name='active'
+                    control={control}
+                    render={({ field }) => (
+                      <FormControlLabel
+                        control={<Switch checked={field.value} onChange={field.onChange} />}
+                        label='Departamento activo'
+                      />
+                    )}
+                  />
+                </>
+              )}
+            </Stack>
+          </form>
         </DialogContent>
         <DialogActions>
-          <Button variant='tonal' color='secondary' onClick={() => setDialogOpen(false)} disabled={saving}>
+          <Button variant='tonal' color='secondary' onClick={handleClose} disabled={saving}>
             Cancelar
           </Button>
-          <Button variant='contained' onClick={handleSave} disabled={saving || !formName || !formBU}>
-            {saving ? 'Guardando...' : editDept ? 'Guardar cambios' : 'Crear'}
+          <Button
+            type='submit'
+            form='dept-form'
+            variant='contained'
+            disabled={saving || !isValid}
+          >
+            {saving ? 'Guardando...' : editDept ? 'Guardar cambios' : 'Crear departamento'}
           </Button>
         </DialogActions>
       </Dialog>

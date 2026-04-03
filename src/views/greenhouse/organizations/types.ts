@@ -45,6 +45,11 @@ export interface OrganizationPerson {
   department: string | null
   isPrimary: boolean
   spaceId: string | null
+  memberId?: string | null
+  assignedFte?: number | null
+  assignmentType?: string | null
+  jobLevel?: string | null
+  employmentType?: string | null
 }
 
 export interface OrganizationDetailData {

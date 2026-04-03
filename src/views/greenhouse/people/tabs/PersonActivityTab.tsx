@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 
 import dynamic from 'next/dynamic'
 
+import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
@@ -70,6 +71,11 @@ const normalizeForRadar = (metricId: string, value: number | null): number => {
 const getZoneColor = (zone: ThresholdZone | null) =>
   zone ? THRESHOLD_ZONE_COLOR[zone] : ('secondary' as const)
 
+const QUALITY_PENDING_METRIC_IDS = new Set(['rpa', 'otd_pct', 'ftr_pct', 'cycle_time'])
+
+const shouldShowPendingClosures = (snapshot: IcoMetricSnapshot | null) =>
+  Boolean(snapshot && snapshot.context.totalTasks > 0 && snapshot.context.completedTasks === 0)
+
 // ── KPI Config ────────────────────────────────────────────────────────
 
 const KPI_CONFIG: Array<{ id: string; label: string; icon: string; format: (v: number | null) => string }> = [
@@ -118,6 +124,7 @@ const PersonActivityTab = ({ memberId }: Props) => {
 
   const hasData = data !== null
   const years = Array.from({ length: 3 }, (_, i) => now.getFullYear() - i)
+  const showPendingClosuresState = shouldShowPendingClosures(data)
 
   // ── CSC Donut ───────────────────────────────────────────────────────
 
@@ -373,11 +380,16 @@ const PersonActivityTab = ({ memberId }: Props) => {
               const value = metric?.value ?? null
               const zoneColor = getZoneColor(metric?.zone ?? null)
 
+              const stats =
+                value === null && showPendingClosuresState && QUALITY_PENDING_METRIC_IDS.has(kpi.id)
+                  ? 'Sin cierres'
+                  : kpi.format(value)
+
               return (
                 <Grid size={{ xs: 6, sm: 4, md: 4 }} key={kpi.id}>
                   <HorizontalWithSubtitle
                     title={kpi.label}
-                    stats={kpi.format(value)}
+                    stats={stats}
                     avatarIcon={kpi.icon}
                     avatarColor={zoneColor}
                     subtitle={`${MONTH_SHORT[month]} ${year}`}
@@ -390,50 +402,66 @@ const PersonActivityTab = ({ memberId }: Props) => {
           {/* Task summary chips + inline velocity */}
           <Grid size={{ xs: 12 }}>
             <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}`, px: 4, py: 3 }}>
-              <Stack direction='row' alignItems='center' justifyContent='space-between' flexWrap='wrap' gap={2}>
-                <Stack direction='row' spacing={2} flexWrap='wrap'>
-                  <CustomChip
-                    round='true'
-                    size='small'
-                    variant='tonal'
-                    color='secondary'
-                    icon={<i className='tabler-subtask' />}
-                    label={`${data.context.totalTasks} tareas`}
-                  />
-                  <CustomChip
-                    round='true'
-                    size='small'
-                    variant='tonal'
-                    color='success'
-                    icon={<i className='tabler-check' />}
-                    label={`${data.context.completedTasks} completadas`}
-                  />
-                  <CustomChip
-                    round='true'
-                    size='small'
-                    variant='tonal'
-                    color='info'
-                    icon={<i className='tabler-progress' />}
-                    label={`${data.context.activeTasks} activas`}
-                  />
+              <Stack spacing={3}>
+                <Stack direction='row' alignItems='center' justifyContent='space-between' flexWrap='wrap' gap={2}>
+                  <Stack direction='row' spacing={2} flexWrap='wrap'>
+                    <CustomChip
+                      round='true'
+                      size='small'
+                      variant='tonal'
+                      color='secondary'
+                      icon={<i className='tabler-subtask' />}
+                      label={`${data.context.totalTasks} tareas`}
+                    />
+                    <CustomChip
+                      round='true'
+                      size='small'
+                      variant='tonal'
+                      color='success'
+                      icon={<i className='tabler-check' />}
+                      label={`${data.context.completedTasks} completadas`}
+                    />
+                    <CustomChip
+                      round='true'
+                      size='small'
+                      variant='tonal'
+                      color='info'
+                      icon={<i className='tabler-progress' />}
+                      label={`${data.context.activeTasks} activas`}
+                    />
+                    <CustomChip
+                      round='true'
+                      size='small'
+                      variant='tonal'
+                      color='warning'
+                      icon={<i className='tabler-history' />}
+                      label={`${data.context.carryOverTasks} carry-over`}
+                    />
+                  </Stack>
+
+                  {showVelocityInline && (
+                    <Stack direction='row' alignItems='center' spacing={1}>
+                      <Box sx={{ width: 64, height: 64 }}>
+                        <AppReactApexCharts
+                          type='radialBar'
+                          height={64}
+                          width={64}
+                          series={[velocityPct]}
+                          options={velocityInlineOptions}
+                        />
+                      </Box>
+                      <Box>
+                        <Box sx={{ fontSize: '0.7rem', color: 'text.secondary', lineHeight: 1.2 }}>Pipeline</Box>
+                        <Box sx={{ fontSize: '0.85rem', fontWeight: 600 }}>{velocityPct}%</Box>
+                      </Box>
+                    </Stack>
+                  )}
                 </Stack>
 
-                {showVelocityInline && (
-                  <Stack direction='row' alignItems='center' spacing={1}>
-                    <Box sx={{ width: 64, height: 64 }}>
-                      <AppReactApexCharts
-                        type='radialBar'
-                        height={64}
-                        width={64}
-                        series={[velocityPct]}
-                        options={velocityInlineOptions}
-                      />
-                    </Box>
-                    <Box>
-                      <Box sx={{ fontSize: '0.7rem', color: 'text.secondary', lineHeight: 1.2 }}>Pipeline</Box>
-                      <Box sx={{ fontSize: '0.85rem', fontWeight: 600 }}>{velocityPct}%</Box>
-                    </Box>
-                  </Stack>
+                {showPendingClosuresState && (
+                  <Alert severity='info' variant='outlined'>
+                    Este período tiene trabajo comprometido, pero todavía no hay tareas completadas. Las métricas de calidad se irán poblando a medida que entren cierres.
+                  </Alert>
                 )}
               </Stack>
             </Card>

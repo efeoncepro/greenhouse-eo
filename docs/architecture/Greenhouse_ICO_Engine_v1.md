@@ -1,5 +1,127 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-02 — Monthly Delivery report semantics now use due-date scope
+
+`TASK-200` fija un cambio semántico para los KPIs mensuales que alimentan el `Performance Report`:
+
+- el período canónico del scorecard se define por `due_date in month`, no por `period_anchor_date`
+- el cierre mensual usa `period_end + 1 day` como fecha de corte canónica
+- `OTD` del reporte ya no es `on_time / (on_time + late_drop)`
+- `OTD` del reporte pasa a ser `on_time / total_classified_tasks`
+- `Overdue` y `Carry-Over` pasan a leerse como buckets mutuamente excluyentes del scorecard mensual
+- `Top Performer` ya debe evaluarse con volumen total de tareas del período, no solo `throughput_count` de completadas
+
+Regla vigente:
+
+- la fuente ejecutable del contrato vive en `src/lib/ico-engine/shared.ts`
+- `metric_snapshots_monthly`, `metrics_by_member`, `metrics_by_project` y `performance_report_monthly` deben materializarse desde esa misma semántica
+- la reconciliación de históricos previos al contrato queda a cargo de `TASK-201`
+
+## Delta 2026-04-02 — Member dimension now follows primary-owner attribution
+
+`TASK-199` fija un cambio semántico para la dimensión `member`:
+
+- antes: `metrics_by_member` acreditaba todas las tareas vía `UNNEST(assignee_member_ids)`
+- ahora: `metrics_by_member`, `Top Performer` y los readers member-level deben acreditar solo al `primary owner member`
+
+Regla vigente:
+
+- `assignee_member_ids` sigue existiendo para trazabilidad y consumers operativos
+- `v_tasks_enriched` debe exponer aliases explícitos de owner principal
+- la dimensión `member` ya no debe expandir el array completo para scorecards canónicos
+
+## Delta 2026-04-01 — Guardrail para snapshots por miembro materialized-first
+
+El carril `materialized-first` por miembro quedó endurecido para `TASK-189`:
+
+- `readMemberMetrics()` y `readMemberMetricsBatch()` ya no asumen que cualquier fila existente en `ico_engine.metrics_by_member` es válida para consumo
+- si detectan buckets/contexto críticos en `null` (`on_time_count`, `late_drop_count`, `overdue_count`, `carry_over_count`) con `total_tasks > 0`, hacen fallback live al engine
+- esto protege a:
+  - `People > Activity`
+  - `Payroll`
+  - cualquier consumer runtime o batch basado en member metrics
+
+Regla vigente:
+
+- `metrics_by_member` sigue siendo el carril preferido
+- pero un snapshot materializado legacy o parcial no debe ocultar trabajo comprometido real del período ni borrar el `carry-over` visible
+
+## Delta 2026-04-01 — Performance Report mensual ya materializado dentro de ICO
+
+`ICO` ya no solo expone snapshots por `space` y por dimensión; ahora también materializa un read-model mensual auditable para el scorecard Agency:
+
+- tabla nueva: `ico_engine.performance_report_monthly`
+- fuente del read-model:
+  - `ico_engine.metric_snapshots_monthly` para resumen agregado del período
+  - `ico_engine.metrics_by_member` para `Top Performer`
+- contenido actual del snapshot:
+  - resumen mensual (`On-Time %`, `Late Drops`, `Overdue`, `Carry-Over`, totales)
+  - segmentación explícita `Tareas Efeonce` / `Tareas Sky`
+  - `task_mix_json` con distribución por segmento adicional, agrupada sobre `client_id` / `space_id`
+  - `Top Performer` MVP y sus supuestos operativos
+- consumer formal:
+  - `greenhouse_serving.agency_performance_reports` como cache OLTP del scorecard mensual
+  - refrescado por la proyección reactiva `agency_performance_reports`
+- regla vigente:
+  - el `Performance Report` no debe abrir un carril de cálculo paralelo al engine
+  - debe construirse sobre materializaciones ya consolidadas del propio `ICO`
+  - el reader usa `Postgres-first`, luego `BigQuery materialized`, y recién después fallback computado si el snapshot aún no existe
+
+Esto fortalece la auditabilidad del reporte mensual sin redefinir los KPIs troncales (`otd_pct`, `ftr_pct`, `rpa_avg`, `throughput_count`) ni romper consumers existentes.
+
+## Delta 2026-04-01 — El Performance Report mensual ya tiene serving formal en PostgreSQL
+
+El read-model mensual de Agency ya no depende solo de BigQuery para consumo runtime:
+
+- `materializeMonthlySnapshots()` publica `ico.performance_report.materialized`
+- la proyección `agency-performance-report` refleja el snapshot en:
+  - `greenhouse_serving.agency_performance_reports`
+- prioridad de lectura vigente del helper:
+  - `greenhouse_serving.agency_performance_reports`
+  - `ico_engine.performance_report_monthly`
+  - fallback computado desde snapshots / métricas por miembro
+
+Esto no reemplaza el engine; solo agrega una capa de serving estable para consumers runtime y futuras superficies cross-module.
+
+## Delta 2026-04-01 — Bases de Notion que actúan como insumo principal del ICO actual
+
+Aunque `ICO` consume su capa base desde `greenhouse_conformed.delivery_tasks` y no directamente desde Notion, los upstreams principales auditados hoy siguen siendo estas DBs de Notion:
+
+- `Efeonce`
+  - `Proyectos`: `15288d9b-1459-4052-9acc-75439bbd5470`
+  - `Tareas`: `3a54f090-4be1-4158-8335-33ba96557a73`
+- `Sky Airlines`
+  - `Proyectos`: `23039c2f-efe7-817a-8272-ffe6be1a696a`
+  - `Tareas`: `23039c2f-efe7-8138-9d1e-c8238fc40523`
+- `ANAM`
+  - `Proyectos`: `32539c2f-efe7-8053-94f7-c06eb3bbf530`
+  - `Tareas`: `32539c2f-efe7-81a4-92f4-f4725309935c`
+
+Lectura correcta:
+
+- estos IDs no reemplazan el contrato `space_id -> space_notion_sources -> greenhouse_conformed`
+- sí son la referencia práctica para auditar de dónde viene la señal que luego entra a `v_tasks_enriched` y a las materializaciones de `ICO`
+- si una métrica de `ICO` deja de cuadrar con Notion, primero validar que el sync sigue apuntando a estas DBs antes de revisar fórmulas o materializaciones
+
+Referencia cruzada:
+
+- `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
+- `docs/tasks/to-do/TASK-186-delivery-metrics-trust-notion-property-audit-contract.md`
+
+## Delta 2026-04-01 — ICO es consumer protegido frente a nuevas lanes de integraciones
+
+`ICO` ya entrega valor operativo real y no debe tratarse como un target libre para refactors amplios desde `TASK-186`, `TASK-187`, `TASK-188` o `TASK-189`.
+
+Regla operativa:
+
+- cambios para confianza de métricas o formalización de integraciones deben fortalecer el engine vigente
+- no deben romper readers, materializaciones ni contratos existentes salvo corrección puntual y validada
+- cualquier cambio al engine debe ser:
+  - incremental
+  - compatible hacia atrás cuando sea posible
+  - verificable contra métricas existentes
+  - reversible si degrada el comportamiento actual
+
 ## Especificación Técnica v1.0
 
 **Efeonce Group — Marzo 2026 — CONFIDENCIAL**
@@ -1753,6 +1875,43 @@ El ICO Engine debe usar `space_id` directo, no el array `notion_project_ids`.
 - `client_change_round_final` (mismo nombre)
 - `blocker_count` (derivado de `bloqueado_por_ids`)
 - `last_edited_time`, `synced_at`, `space_id`, `client_id`
+
+### A.5.1 Período operativo canónico (Delta 2026-04-01)
+
+- El período operativo de `ICO` ya no debe leerse como “mes de `completed_at`”.
+- La pertenencia de una tarea al período se ancla en `due_date`, con fallback a `created_at` / `synced_at` cuando falte fecha límite.
+- `carry-over` se define relativo al período consultado/materializado:
+  - `period_anchor_date < first_day(period)`
+  - tarea aún activa
+- Este cambio endurece la paridad con los `Performance Reports` operativos sin reescribir el engine ni cambiar el upstream Notion.
+
+### A.5.2 Buckets canónicos del scorecard (Delta 2026-04-01)
+
+- `ICO` mantiene sus métricas troncales (`otd_pct`, `ftr_pct`, `rpa_avg`, `throughput_count`, etc.) sin redefinirlas.
+- Encima de ese contrato, el engine ahora materializa buckets operativos aditivos para acercarse al `Performance Report`:
+  - `on_time_count`
+  - `late_drop_count`
+  - `overdue_count`
+  - `carry_over_count`
+- Estos buckets se exponen como `context` en los snapshots (`SpaceMetricSnapshot`, `IcoMetricSnapshot`, métricas por proyecto y por miembro) para que consumers UI puedan mostrar scorecards más auditables sin recalcular inline.
+- La regla es de compatibilidad: los buckets fortalecen `ICO`, pero no reemplazan ni renombran métricas existentes consumidas por payroll, serving o inteligencia de personas.
+
+### A.5.3 FTR canónico compuesto (Delta 2026-04-01)
+
+- `FTR` no debe leerse como alias de una sola propiedad (`client_change_round_final`).
+- La definición canónica del engine queda compuesta por señales ya disponibles en `greenhouse_conformed.delivery_tasks`:
+  - tarea completada
+  - `rpa_value <= 1` cuando exista
+  - si `rpa_value` falta, fallback a `client_change_round_final = 0` y `workflow_change_round = 0`
+  - sin `client_review_open`
+  - sin `workflow_review_open`
+  - sin `open_frame_comments`
+- Esta semántica busca aproximar mejor “asset aprobado a la primera” usando correcciones, `RpA` y estado real de revisión al cierre.
+- `client_review_open` y `workflow_review_open` se usan como guardrails de cierre, no como reemplazo del núcleo de calidad.
+- Regla semántica actual:
+  - `on_time` y `late_drop` prefieren `performance_indicator_code` si el upstream ya lo trae normalizado; si no existe, el engine cae a derivación por `completed_at` vs `due_date`
+  - `overdue` y `carry-over` no se leen desde labels de Notion; permanecen como reglas propias de `ICO` relativas al período consultado/materializado
+  - `FTR` se define por `client_change_round_final = 0` en tareas completadas; `client_review_open` es estado de workflow y no fuente de verdad para esta métrica
 
 ### A.6 TypeScript: Sin `any`
 

@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
-import { resolveFinanceClientContext, resolveFinanceMemberContext } from '@/lib/finance/canonical'
+import { resolveFinanceDownstreamScope, resolveFinanceMemberContext } from '@/lib/finance/canonical'
+import { EXPENSE_SOURCE_TYPES, PAYMENT_PROVIDERS, PAYMENT_RAILS } from '@/lib/finance/expense-taxonomy'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
   getFinanceExpenseFromPostgres,
@@ -34,7 +35,9 @@ export const dynamic = 'force-dynamic'
 interface ExpenseDetailRow {
   expense_id: string
   client_id: string | null
+  space_id: string | null
   expense_type: string
+  source_type: string | null
   description: string
   currency: string
   subtotal: unknown
@@ -46,6 +49,8 @@ interface ExpenseDetailRow {
   payment_date: unknown
   payment_status: string
   payment_method: string | null
+  payment_provider: string | null
+  payment_rail: string | null
   payment_account_id: string | null
   payment_reference: string | null
   document_number: string | null
@@ -79,7 +84,9 @@ interface ExpenseDetailRow {
 const normalizeExpenseDetail = (row: ExpenseDetailRow) => ({
   expenseId: normalizeString(row.expense_id),
   clientId: row.client_id ? normalizeString(row.client_id) : null,
+  spaceId: row.space_id ? normalizeString(row.space_id) : null,
   expenseType: normalizeString(row.expense_type),
+  sourceType: row.source_type ? normalizeString(row.source_type) : null,
   description: normalizeString(row.description),
   currency: normalizeString(row.currency),
   subtotal: toNumber(row.subtotal),
@@ -91,6 +98,8 @@ const normalizeExpenseDetail = (row: ExpenseDetailRow) => ({
   paymentDate: toDateString(row.payment_date as string | { value?: string } | null),
   paymentStatus: normalizeString(row.payment_status),
   paymentMethod: row.payment_method ? normalizeString(row.payment_method) : null,
+  paymentProvider: row.payment_provider ? normalizeString(row.payment_provider) : null,
+  paymentRail: row.payment_rail ? normalizeString(row.payment_rail) : null,
   paymentAccountId: row.payment_account_id ? normalizeString(row.payment_account_id) : null,
   paymentReference: row.payment_reference ? normalizeString(row.payment_reference) : null,
   documentNumber: row.document_number ? normalizeString(row.document_number) : null,
@@ -178,14 +187,25 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const pgUpdates: Record<string, unknown> = {}
 
     // Client context resolution
-    if (body.clientId !== undefined || body.clientProfileId !== undefined || body.hubspotCompanyId !== undefined) {
-      const resolvedClient = await resolveFinanceClientContext({
+    if (
+      body.clientId !== undefined
+      || body.organizationId !== undefined
+      || body.clientProfileId !== undefined
+      || body.hubspotCompanyId !== undefined
+      || body.spaceId !== undefined
+      || body.allocatedClientId !== undefined
+    ) {
+      const resolvedScope = await resolveFinanceDownstreamScope({
+        organizationId: body.organizationId,
         clientId: body.clientId,
         clientProfileId: body.clientProfileId,
-        hubspotCompanyId: body.hubspotCompanyId
+        hubspotCompanyId: body.hubspotCompanyId,
+        requestedSpaceId: body.spaceId,
+        allocatedClientId: body.allocatedClientId
       })
 
-      pgUpdates.clientId = resolvedClient.clientId
+      pgUpdates.clientId = resolvedScope.clientId
+      pgUpdates.spaceId = resolvedScope.spaceId
     }
 
     // Member context resolution
@@ -217,6 +237,12 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         ? (body.expenseType as ExpenseType) : 'supplier'
     }
 
+    if (body.sourceType !== undefined) {
+      pgUpdates.sourceType = body.sourceType && EXPENSE_SOURCE_TYPES.includes(body.sourceType)
+        ? normalizeString(body.sourceType)
+        : null
+    }
+
     if (body.currency !== undefined) {
       pgUpdates.currency = assertValidCurrency(body.currency)
     }
@@ -241,6 +267,18 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         ? (body.paymentMethod as PaymentMethod) : null
     }
 
+    if (body.paymentProvider !== undefined) {
+      pgUpdates.paymentProvider = body.paymentProvider && PAYMENT_PROVIDERS.includes(body.paymentProvider)
+        ? normalizeString(body.paymentProvider)
+        : null
+    }
+
+    if (body.paymentRail !== undefined) {
+      pgUpdates.paymentRail = body.paymentRail && PAYMENT_RAILS.includes(body.paymentRail)
+        ? normalizeString(body.paymentRail)
+        : null
+    }
+
     if (body.serviceLine !== undefined) {
       pgUpdates.serviceLine = body.serviceLine && SERVICE_LINES.includes(body.serviceLine)
         ? (body.serviceLine as ServiceLine) : null
@@ -263,6 +301,30 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
     if (body.recurrenceFrequency !== undefined) {
       pgUpdates.recurrenceFrequency = body.recurrenceFrequency ? normalizeString(body.recurrenceFrequency) : null
+    }
+
+    if (body.costCategory !== undefined) {
+      pgUpdates.costCategory = body.costCategory ? normalizeString(body.costCategory) : null
+    }
+
+    if (body.costIsDirect !== undefined) {
+      pgUpdates.costIsDirect = Boolean(body.costIsDirect)
+    }
+
+    if (body.allocatedClientId !== undefined) {
+      pgUpdates.allocatedClientId = body.allocatedClientId ? normalizeString(body.allocatedClientId) : null
+    }
+
+    if (body.directOverheadScope !== undefined) {
+      pgUpdates.directOverheadScope = body.directOverheadScope ? normalizeString(body.directOverheadScope) : null
+    }
+
+    if (body.directOverheadKind !== undefined) {
+      pgUpdates.directOverheadKind = body.directOverheadKind ? normalizeString(body.directOverheadKind) : null
+    }
+
+    if (body.directOverheadMemberId !== undefined) {
+      pgUpdates.directOverheadMemberId = body.directOverheadMemberId ? normalizeString(body.directOverheadMemberId) : null
     }
 
     if (Object.keys(pgUpdates).length === 0) {
@@ -312,7 +374,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const bqParams: Record<string, unknown> = { expenseId }
 
     const colMap: Record<string, string> = {
-      clientId: 'client_id', expenseType: 'expense_type', description: 'description',
+      clientId: 'client_id', spaceId: 'space_id', expenseType: 'expense_type', description: 'description',
       currency: 'currency', subtotal: 'subtotal', taxRate: 'tax_rate', taxAmount: 'tax_amount',
       totalAmount: 'total_amount', exchangeRateToClp: 'exchange_rate_to_clp',
       totalAmountClp: 'total_amount_clp', paymentDate: 'payment_date',

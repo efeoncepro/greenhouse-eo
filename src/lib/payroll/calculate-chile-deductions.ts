@@ -197,10 +197,12 @@ export const calculatePayrollTotals = async ({
     ? resolvedSplitRates.cotizacionRate + resolvedSplitRates.comisionRate
     : normalizedAfpRate
 
+  const chileContractType = contractType === 'plazo_fijo' ? 'plazo_fijo' : 'indefinido'
+
   const derivedUnemploymentRate =
     typeof unemploymentRate === 'number' && Number.isFinite(unemploymentRate)
       ? unemploymentRate
-      : await getUnemploymentRateForPeriod(fallbackPeriodDate, contractType)
+      : await getUnemploymentRateForPeriod(fallbackPeriodDate, chileContractType)
 
   const afpCotizacionAmount = roundCurrency(imponibleBase * resolvedSplitRates.cotizacionRate)
   const afpComisionAmount = roundCurrency(imponibleBase * resolvedSplitRates.comisionRate)
@@ -227,7 +229,7 @@ export const calculatePayrollTotals = async ({
 
   const employerCosts = await resolveChileEmployerCostAmounts({
     payRegime,
-    contractType,
+    contractType: chileContractType,
     imponibleBase,
     periodDate: fallbackPeriodDate
   })

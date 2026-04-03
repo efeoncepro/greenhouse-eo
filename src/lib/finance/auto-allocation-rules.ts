@@ -67,7 +67,7 @@ const allocatePayrollByFte = async (
 
       return {
         clientId: String(a.client_id),
-        allocationPercent: Math.round(fteWeight * 1000) / 10,
+        allocationPercent: Math.round(fteWeight * 10000) / 10000,
         allocatedAmountClp: allocatedAmount,
         method: 'fte_weighted'
       }
@@ -117,7 +117,7 @@ const allocateInfraByRevenue = async (
 
       return {
         clientId: String(c.client_id),
-        allocationPercent: Math.round(revenueWeight * 1000) / 10,
+        allocationPercent: Math.round(revenueWeight * 10000) / 10000,
         allocatedAmountClp: allocatedAmount,
         method: 'revenue_weighted'
       }

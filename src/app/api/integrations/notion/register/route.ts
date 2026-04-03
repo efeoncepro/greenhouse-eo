@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { refreshSpaceNotionGovernance } from '@/lib/space-notion/notion-governance'
 
 export const dynamic = 'force-dynamic'
 
@@ -173,6 +174,18 @@ export async function POST(request: Request) {
       }
     })
 
+    let governanceRefresh: { refreshed: boolean; error?: string } | undefined
+
+    try {
+      await refreshSpaceNotionGovernance(spaceId, tenant.userId)
+      governanceRefresh = { refreshed: true }
+    } catch (error) {
+      governanceRefresh = {
+        refreshed: false,
+        error: error instanceof Error ? error.message : 'Notion governance refresh failed'
+      }
+    }
+
     return NextResponse.json({
       registered: true,
       sourceId,
@@ -185,8 +198,9 @@ export async function POST(request: Request) {
         revisiones: notionDbRevisiones
       },
       verification: verify ? verification : undefined,
+      governanceRefresh,
       syncEnabled: true,
-      nextStep: `Trigger sync: POST /api/integrations/notion/sync?spaceId=${spaceId}`
+      nextStep: 'Trigger shared sync: POST /api/admin/integrations/notion/sync'
     }, { status: 201 })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Registration failed'

@@ -43,6 +43,10 @@
     {
       "path": "/api/cron/nubox-balance-sync",
       "schedule": "0 */4 * * *"
+    },
+    {
+      "path": "/api/cron/entra-profile-sync",
+      "schedule": "0 8 * * *"
     }
   ]
 }

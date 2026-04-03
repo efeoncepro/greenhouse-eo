@@ -27,6 +27,7 @@ interface IcoData {
     ftrPct: number | null
     cycleTimeAvgDays: number | null
     throughputCount: number | null
+    carryOverCount: number | null
     periodYear: number
     periodMonth: number
   } | null
@@ -166,6 +167,7 @@ const MyPerformanceView = () => {
             <CardContent sx={{ display: 'flex', gap: 4 }}>
               <Box><Typography variant='h4'>{ops.current.tasksCompleted}</Typography><Typography variant='caption' color='text.secondary'>Completadas</Typography></Box>
               <Box><Typography variant='h4'>{ops.current.tasksActive}</Typography><Typography variant='caption' color='text.secondary'>Activas</Typography></Box>
+              <Box><Typography variant='h4' color={(current?.carryOverCount ?? 0) > 0 ? 'warning.main' : 'text.primary'}>{num(current?.carryOverCount ?? null)}</Typography><Typography variant='caption' color='text.secondary'>Carry-over</Typography></Box>
               <Box><Typography variant='h4' color={ops.current.stuckAssetCount > 0 ? 'error.main' : 'text.primary'}>{ops.current.stuckAssetCount}</Typography><Typography variant='caption' color='text.secondary'>Bloqueadas</Typography></Box>
             </CardContent>
           </Card>

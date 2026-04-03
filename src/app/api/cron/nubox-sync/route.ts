@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { alertCronFailure } from '@/lib/alerts/slack-notify'
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
+import { checkIntegrationReadiness } from '@/lib/integrations/readiness'
 
 import { syncNuboxToRaw } from '@/lib/nubox/sync-nubox-raw'
 import { syncNuboxToConformed } from '@/lib/nubox/sync-nubox-conformed'
@@ -15,6 +16,19 @@ export async function GET(request: Request) {
 
   if (!authorized) {
     return errorResponse
+  }
+
+  // ── Readiness gate: check Nubox integration status ──
+  try {
+    const readiness = await checkIntegrationReadiness('nubox')
+
+    if (!readiness.ready) {
+      console.log(`[nubox-sync] Skipped: Nubox upstream not ready — ${readiness.reason}`)
+
+      return NextResponse.json({ skipped: true, reason: readiness.reason })
+    }
+  } catch (error) {
+    console.warn('[nubox-sync] Readiness check failed, proceeding anyway:', error)
   }
 
   const results: Record<string, unknown> = {}

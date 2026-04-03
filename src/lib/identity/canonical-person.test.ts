@@ -38,7 +38,11 @@ describe('canonical person resolver', () => {
         { column_name: 'user_active' },
         { column_name: 'has_member_facet' },
         { column_name: 'has_user_facet' },
-        { column_name: 'active_role_codes' }
+        { column_name: 'active_role_codes' },
+        { column_name: 'primary_organization_id' },
+        { column_name: 'primary_organization_name' },
+        { column_name: 'primary_membership_type' },
+        { column_name: 'is_efeonce_collaborator' }
       ])
       .mockResolvedValueOnce([
       {
@@ -58,7 +62,11 @@ describe('canonical person resolver', () => {
         has_member_facet: true,
         has_user_facet: true,
         active_role_codes: ['collaborator'],
-        route_groups: ['my']
+        route_groups: ['my'],
+        primary_organization_id: 'org-efeonce',
+        primary_organization_name: 'Efeonce',
+        primary_membership_type: 'team_member',
+        is_efeonce_collaborator: true
       }
     ])
 
@@ -69,6 +77,10 @@ describe('canonical person resolver', () => {
           memberId: 'member-1',
           userId: 'user-1',
           eoId: 'EO-ID0001',
+          primaryOrganizationId: 'org-efeonce',
+          primaryOrganizationName: 'Efeonce',
+          organizationMembershipType: 'team_member',
+          isEfeonceCollaborator: true,
           displayName: 'Person One',
           canonicalEmail: 'person.one@efeoncepro.com',
           portalEmail: 'user.one@efeoncepro.com',
@@ -136,6 +148,10 @@ describe('canonical person resolver', () => {
       memberId: 'member-2',
       userId: null,
       eoId: null,
+      primaryOrganizationId: null,
+      primaryOrganizationName: null,
+      organizationMembershipType: null,
+      isEfeonceCollaborator: true,
       displayName: 'Member Two',
       canonicalEmail: 'member.two@efeoncepro.com',
       portalEmail: null,
@@ -198,6 +214,10 @@ describe('canonical person resolver', () => {
       identityProfileId: null,
       memberId: null,
       userId: 'user-3',
+      primaryOrganizationId: null,
+      primaryOrganizationName: null,
+      organizationMembershipType: null,
+      isEfeonceCollaborator: false,
       portalAccessState: 'degraded_link',
       resolutionSource: 'direct_user',
       tenantType: 'client',
@@ -273,7 +293,11 @@ describe('canonical person resolver', () => {
         { column_name: 'member_email' },
         { column_name: 'has_member_facet' },
         { column_name: 'has_user_facet' },
-        { column_name: 'active_user_count' }
+        { column_name: 'active_user_count' },
+        { column_name: 'primary_organization_id' },
+        { column_name: 'primary_organization_name' },
+        { column_name: 'primary_membership_type' },
+        { column_name: 'is_efeonce_collaborator' }
       ])
       .mockResolvedValueOnce([
         {
@@ -293,7 +317,11 @@ describe('canonical person resolver', () => {
           has_member_facet: true,
           has_user_facet: true,
           active_role_codes: [],
-          route_groups: []
+          route_groups: [],
+          primary_organization_id: 'org-efeonce',
+          primary_organization_name: 'Efeonce',
+          primary_membership_type: 'team_member',
+          is_efeonce_collaborator: true
         }
       ])
 
@@ -302,6 +330,10 @@ describe('canonical person resolver', () => {
       memberId: 'member-prod',
       userId: 'user-prod',
       eoId: 'EO-ID-PROD',
+      primaryOrganizationId: 'org-efeonce',
+      primaryOrganizationName: 'Efeonce',
+      organizationMembershipType: 'team_member',
+      isEfeonceCollaborator: true,
       displayName: 'Prod Person',
       portalEmail: 'prod.user@efeoncepro.com',
       portalDisplayName: 'Prod User',

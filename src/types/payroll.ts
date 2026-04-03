@@ -1,10 +1,12 @@
-export type PayRegime = 'chile' | 'international'
+import type { ContractType, PayrollVia, PayRegime } from '@/types/hr-contracts'
+
+export type { ContractType, PayrollVia, PayRegime } from '@/types/hr-contracts'
+
 export type PayrollCurrency = 'CLP' | 'USD'
 export type PeriodStatus = 'draft' | 'calculated' | 'approved' | 'exported'
 export type HealthSystem = 'fonasa' | 'isapre'
-export type ContractType = 'indefinido' | 'plazo_fijo'
 export type GratificacionLegalMode = 'mensual_25pct' | 'anual_proporcional' | 'ninguna'
-export type PayrollKpiDataSource = 'ico' | 'notion_ops' | 'manual'
+export type PayrollKpiDataSource = 'ico' | 'notion_ops' | 'manual' | 'external'
 export type PayrollAttendanceSource = 'legacy_attendance_daily_plus_hr_leave' | 'microsoft_teams'
 export type ProjectionMode = 'actual_to_date' | 'projected_month_end'
 
@@ -32,7 +34,12 @@ export interface PayrollCompensationMember extends PayrollMemberSummary {
   compensationVersionCount: number
   currentCompensationVersionId: string | null
   currentCompensationEffectiveFrom: string | null
+  currentContractType?: ContractType | null
   currentPayRegime: PayRegime | null
+  currentPayrollVia?: PayrollVia | null
+  currentScheduleRequired?: boolean | null
+  currentDeelContractId?: string | null
+  currentContractEndDate?: string | null
   currentCurrency: PayrollCurrency | null
 }
 
@@ -65,11 +72,16 @@ export interface CompensationVersion {
   healthPlanUf: number | null
   unemploymentRate: number
   contractType: ContractType
+  payrollVia?: PayrollVia
+  scheduleRequired?: boolean
+  deelContractId?: string | null
   hasApv: boolean
   apvAmount: number
   effectiveFrom: string
   effectiveTo: string | null
   isCurrent: boolean
+  siiRetentionRate?: number | null
+  siiRetentionAmount?: number | null
   desiredNetClp: number | null
   changeReason: string | null
   createdBy: string | null
@@ -99,6 +111,8 @@ export interface CreateCompensationVersionInput {
   healthPlanUf?: number | null
   unemploymentRate?: number | null
   contractType?: ContractType
+  scheduleRequired?: boolean
+  deelContractId?: string | null
   hasApv?: boolean
   apvAmount?: number
   desiredNetClp?: number | null
@@ -128,6 +142,8 @@ export interface UpdateCompensationVersionInput {
   healthPlanUf?: number | null
   unemploymentRate?: number | null
   contractType?: ContractType
+  scheduleRequired?: boolean
+  deelContractId?: string | null
   hasApv?: boolean
   apvAmount?: number
   desiredNetClp?: number | null
@@ -176,6 +192,7 @@ export interface PayrollEntry {
   memberAvatarUrl: string | null
   compensationVersionId: string
   payRegime: PayRegime
+  payrollVia?: PayrollVia
   currency: PayrollCurrency
   baseSalary: number
   remoteAllowance: number
@@ -218,9 +235,12 @@ export interface PayrollEntry {
   chileUnemploymentAmount: number | null
   chileTaxableBase: number | null
   chileTaxAmount: number | null
+  siiRetentionRate?: number | null
+  siiRetentionAmount?: number | null
   chileApvAmount: number | null
   chileUfValue: number | null
   chileTotalDeductions: number | null
+  deelContractId?: string | null
   netTotalCalculated: number | null
   netTotalOverride: number | null
   netTotal: number

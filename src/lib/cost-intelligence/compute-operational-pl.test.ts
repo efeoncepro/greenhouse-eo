@@ -23,13 +23,32 @@ describe('computeOperationalPl', () => {
     mockRunGreenhousePostgresQuery
       .mockResolvedValueOnce([{ closure_status: 'closed', snapshot_revision: 3 }])
       .mockResolvedValueOnce([
-        { client_id: 'client-1', client_name: 'Acme', total_revenue_clp: 1000, partner_share_clp: 200 }
+        {
+          client_id: 'client-1',
+          organization_id: 'org-1',
+          organization_name: 'Org One',
+          client_name: 'Acme',
+          total_revenue_clp: 1000,
+          partner_share_clp: 200
+        }
       ])
       .mockResolvedValueOnce([
-        { client_id: 'client-1', client_name: 'Acme', total_direct_expense_clp: 50 }
+        {
+          client_id: 'client-1',
+          organization_id: 'org-1',
+          organization_name: 'Org One',
+          client_name: 'Acme',
+          total_direct_expense_clp: 50
+        }
       ])
       .mockResolvedValueOnce([
-        { client_id: 'client-1', client_name: 'Acme', total_direct_expense_clp: 25 }
+        {
+          client_id: 'client-1',
+          organization_id: 'org-1',
+          organization_name: 'Org One',
+          client_name: 'Acme',
+          total_direct_expense_clp: 25
+        }
       ])
       .mockResolvedValueOnce([
         {
@@ -45,6 +64,7 @@ describe('computeOperationalPl', () => {
     mockReadCommercialCostAttributionByClientForPeriod.mockResolvedValue([
       {
         clientId: 'client-1',
+        organizationId: 'org-1',
         clientName: 'Acme',
         laborCostClp: 300,
         overheadCostClp: 75,
@@ -87,7 +107,13 @@ describe('computeOperationalPl', () => {
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([
-        { client_id: 'client-2', client_name: 'No Revenue Co', total_direct_expense_clp: 40 }
+        {
+          client_id: 'client-2',
+          organization_id: null,
+          organization_name: null,
+          client_name: 'No Revenue Co',
+          total_direct_expense_clp: 40
+        }
       ])
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([])
@@ -95,6 +121,7 @@ describe('computeOperationalPl', () => {
     mockReadCommercialCostAttributionByClientForPeriod.mockResolvedValue([
       {
         clientId: 'client-2',
+        organizationId: null,
         clientName: 'No Revenue Co',
         laborCostClp: 60,
         overheadCostClp: 0,
@@ -122,7 +149,14 @@ describe('computeOperationalPl', () => {
     mockRunGreenhousePostgresQuery
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([
-        { client_id: 'client-1', client_name: 'Acme', total_revenue_clp: 1000, partner_share_clp: 0 }
+        {
+          client_id: 'client-1',
+          organization_id: 'org-1',
+          organization_name: 'Org One',
+          client_name: 'Acme',
+          total_revenue_clp: 1000,
+          partner_share_clp: 0
+        }
       ])
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([])
@@ -135,7 +169,7 @@ describe('computeOperationalPl', () => {
     const revenueQuery = mockRunGreenhousePostgresQuery.mock.calls[1]?.[0] as string
 
     expect(revenueQuery).toContain('LEFT JOIN greenhouse_finance.client_profiles cp')
-    expect(revenueQuery).toContain('COALESCE(i.client_id, cp.client_id) AS client_id')
-    expect(revenueQuery).not.toContain('COALESCE(i.client_id, i.client_profile_id) AS client_id')
+    expect(revenueQuery).toContain('COALESCE(i.client_id, cp.client_id, i.organization_id, cp.organization_id) AS client_id')
+    expect(revenueQuery).toContain('COALESCE(i.organization_id, cp.organization_id, cb.organization_id) AS organization_id')
   })
 })

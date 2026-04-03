@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { assertMemberInPeopleOrganizationScope, resolvePeopleOrganizationScope } from '@/lib/people/organization-scope'
 import { requirePeopleTenantContext } from '@/lib/tenant/authorization'
 import { getPersonIcoProfile } from '@/lib/person-360/get-person-ico-profile'
 
@@ -19,8 +20,11 @@ export async function GET(
     const { memberId } = await params
     const { searchParams } = new URL(request.url)
     const trend = Math.min(24, Math.max(1, Number(searchParams.get('trend') || '6')))
+    const organizationId = resolvePeopleOrganizationScope(request, tenant)
 
-    const profile = await getPersonIcoProfile(memberId, trend)
+    await assertMemberInPeopleOrganizationScope(memberId, organizationId)
+
+    const profile = await getPersonIcoProfile(memberId, trend, { organizationId })
 
     return NextResponse.json(profile)
   } catch (error) {

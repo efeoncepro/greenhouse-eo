@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireInternalTenantContext, requireAdminTenantContext } from '@/lib/tenant/authorization'
-import { getOrganizationMemberships, createMembership } from '@/lib/account-360/organization-store'
+import { getOrganizationMemberships, createIdentityProfile, createMembership } from '@/lib/account-360/organization-store'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,13 +23,24 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
   const { id } = await params
   const body = await request.json()
+  const profileId = typeof body.profileId === 'string' ? body.profileId.trim() : ''
+  const fullName = typeof body.fullName === 'string' ? body.fullName.trim() : ''
+  const canonicalEmail = typeof body.canonicalEmail === 'string' ? body.canonicalEmail.trim().toLowerCase() : ''
 
-  if (!body.profileId) {
-    return NextResponse.json({ error: 'profileId is required' }, { status: 400 })
+  if (!profileId && (!fullName || !canonicalEmail)) {
+    return NextResponse.json({ error: 'profileId o fullName + canonicalEmail son requeridos' }, { status: 400 })
   }
 
+  const resolvedProfileId = profileId || await createIdentityProfile({
+    sourceSystem: 'greenhouse_manual',
+    sourceObjectType: 'organization_contact',
+    sourceObjectId: `${id}:${canonicalEmail}`,
+    fullName,
+    canonicalEmail
+  })
+
   const result = await createMembership({
-    profileId: body.profileId,
+    profileId: resolvedProfileId,
     organizationId: id,
     spaceId: body.spaceId,
     membershipType: body.membershipType || 'team_member',

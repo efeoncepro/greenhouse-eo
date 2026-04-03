@@ -221,11 +221,32 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Mantener `.env.example` alineado con cualquier variable requerida por el proyecto.
 - No asumir que Vercel tiene variables cargadas.
 
+### Conectividad PostgreSQL (leer ANTES de cualquier operación DB)
+- **Método preferido (todos los entornos)**: Cloud SQL Connector vía `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`. Conecta sin TCP directo — negocia un túnel seguro por la Cloud SQL Admin API. Funciona en Vercel (WIF + OIDC), local, y agentes AI.
+- **La IP pública de Cloud SQL (`34.86.135.144`) NO es accesible por TCP directo** — no hay authorized networks configuradas. Intentar conectar da `ETIMEDOUT`.
+- **Prioridad en `src/lib/postgres/client.ts`**: si `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` está definida, el Connector toma prioridad sobre `GREENHOUSE_POSTGRES_HOST`. Ambas pueden coexistir en `.env.local`.
+- **Prerequisito**: credenciales GCP válidas — `GOOGLE_APPLICATION_CREDENTIALS_JSON` en env, o ADC local (`gcloud auth application-default login`), o WIF (Vercel). El service account necesita `roles/cloudsql.client`.
+- **Scripts Node.js de runtime** (`pnpm pg:doctor`, `pnpm setup:postgres:*`, scripts de backfill) usan el Connector automáticamente cuando `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` está definida.
+- **Migraciones y binarios standalone** (`pnpm migrate:up`, `pnpm migrate:down`, `pnpm db:generate-types`, `pg_dump`, `psql`) requieren **Cloud SQL Auth Proxy** corriendo como tunnel local:
+  ```bash
+  cloud-sql-proxy "efeonce-group:us-east4:greenhouse-pg-dev" --port 15432
+  ```
+  `.env.local` debe tener:
+  ```
+  GREENHOUSE_POSTGRES_HOST="127.0.0.1"
+  GREENHOUSE_POSTGRES_PORT="15432"
+  GREENHOUSE_POSTGRES_SSL="false"
+  ```
+- **Guardia fail-fast**: `scripts/migrate.ts` detecta si `GREENHOUSE_POSTGRES_HOST` apunta a una IP pública (ej. `34.86.135.144`) y aborta inmediatamente con instrucciones claras en vez de esperar timeout. **No intentar conectar a la IP pública de Cloud SQL — no hay authorized networks.**
+- **Si no tienes `cloud-sql-proxy`**: `gcloud components install cloud-sql-proxy`.
+- **Regla**: si un script Node.js de runtime falla con `ETIMEDOUT`, verificar que `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` esté definida y que las credenciales GCP sean válidas. Si una migración o binario standalone falla, verificar que el Cloud SQL Auth Proxy esté corriendo en `127.0.0.1:15432`.
+
 ### Acceso PostgreSQL
-- Greenhouse usa tres perfiles de acceso para PostgreSQL:
-  - `runtime`
-  - `migrator`
-  - `admin`
+- Greenhouse usa cuatro perfiles de acceso para PostgreSQL:
+  - `runtime` — portal app (DML, via Cloud SQL Connector en Vercel)
+  - `migrator` — migraciones DDL (`pnpm migrate:up`, `pnpm setup:postgres:*`)
+  - `admin` — bootstrap y ownership (`postgres` user)
+  - `ops` — canonical owner de todos los objetos (`greenhouse_ops`, break-glass)
 - Variables por perfil:
   - `runtime`:
     - `GREENHOUSE_POSTGRES_USER`
@@ -240,25 +261,65 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` o `GREENHOUSE_POSTGRES_HOST`
   - `GREENHOUSE_POSTGRES_DATABASE`
   - `GREENHOUSE_POSTGRES_PORT`
+- Ownership:
+  - **`greenhouse_ops`** es el canonical owner de todos los objetos (122 tablas, 11 schemas, 17 views)
+  - Consolidado en migración `20260402000000000_consolidate-ownership-to-greenhouse-ops.sql`
+  - Password en Secret Manager: `greenhouse-pg-dev-ops-password`
+  - Default privileges configurados: objetos nuevos de `greenhouse_ops` otorgan grants automáticos a `greenhouse_runtime` y `greenhouse_migrator`
 - Regla operativa:
   - runtime del portal usa solo credenciales `runtime`
-  - setup y migraciones usan `migrator`
-  - bootstrap de acceso usa `admin`
+  - migraciones DDL usan `migrator` (via `pnpm migrate:up`)
+  - bootstrap y ownership usan `admin` o `greenhouse_ops`
   - no hacer DDL con el usuario runtime salvo que exista una razon excepcional y quede documentada
+  - no crear objetos con users distintos a `greenhouse_ops` — si una migración corre como `migrator`, los DEFAULT PRIVILEGES otorgan acceso automáticamente
 - Comandos canonicos:
-  - `pnpm setup:postgres:access`
   - `pnpm pg:doctor`
-  - `pnpm setup:postgres:canonical-360`
-  - `pnpm setup:postgres:hr-leave`
-  - `pnpm setup:postgres:payroll`
-  - `pnpm setup:postgres:finance`
-  - `pnpm setup:postgres:source-sync`
+  - `pnpm migrate:create <nombre>` — crear migración nueva
+  - `pnpm migrate:up` — aplicar migraciones pendientes
+  - `pnpm migrate:down` — revertir última migración
+  - `pnpm migrate:status` — estado de migraciones
+  - `pnpm db:generate-types` — regenerar tipos Kysely
+  - `pnpm setup:postgres:access` — setup de roles y grants (legacy)
 - Antes de cortar cualquier dominio nuevo a PostgreSQL:
   - correr `pnpm pg:doctor --profile=runtime`
   - correr `pnpm pg:doctor --profile=migrator`
   - confirmar en `Handoff.md` si el dominio ya fue tocado por otro agente
 - Fuente canonica del modelo:
   - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
+
+### Database Connection
+- **Import `query` from `@/lib/db`** for raw SQL queries (convenience alias for `runGreenhousePostgresQuery`).
+- **Import `getDb` from `@/lib/db`** for Kysely typed queries in new modules.
+- **Import `withTransaction` from `@/lib/db`** for transactions.
+- **NEVER** create new `Pool` instances — the singleton lives in `src/lib/postgres/client.ts`.
+- **NEVER** read `GREENHOUSE_POSTGRES_*` directly outside `src/lib/postgres/client.ts`.
+- **NEVER** import `Pool` from `pg` directly — always go through `@/lib/db` or `@/lib/postgres/client`.
+- Importing `type PoolClient` from `pg` for function signatures is fine.
+- Existing modules using `runGreenhousePostgresQuery` from `@/lib/postgres/client` are fine — no need to migrate retroactively.
+- New modules SHOULD use Kysely (`getDb()`) for type safety.
+
+### Database Migrations
+- Todo cambio de schema PostgreSQL (DDL) debe hacerse via migración versionada, nunca con ALTER/CREATE manual.
+- Framework: `node-pg-migrate` — wrapper en `scripts/migrate.ts`, migraciones en `migrations/`.
+- Tabla de tracking: `public.pgmigrations`
+- Credenciales: usa perfil `migrator` de `.env.local` automáticamente. Override con `MIGRATE_PROFILE=admin`.
+- Convención de nombres: `YYYYMMDDHHMMSS_descripcion-kebab-case.sql`
+- Cada migración DEBE incluir `SET search_path = <target_schema>, greenhouse_core, public;` al inicio.
+- Regla de orden: **migración ANTES del deploy, siempre** (Vercel no ejecuta migraciones en deploy time).
+- Regla de backward-compatibility: columnas nullable primero, deploy código, backfill, luego constraint.
+- Reglas de timestamps:
+  - **SIEMPRE** usar `pnpm migrate:create <nombre>` para generar el archivo — genera el timestamp UTC correcto automáticamente.
+  - **NUNCA** renombrar manualmente el timestamp de un archivo de migración. `node-pg-migrate` ordena por timestamp y rechaza ejecutar migraciones cuyo timestamp sea anterior a la última aplicada.
+  - **NUNCA** crear archivos de migración a mano con timestamps inventados. Si el timestamp cae antes del baseline (`20260401120000000`), la migración será ignorada silenciosamente o causará error.
+  - Si necesitas que una migración corra antes que otra pendiente, la solución es reordenar el contenido dentro de un solo archivo, no manipular timestamps.
+- Flujo obligatorio al modificar schema:
+  1. `pnpm migrate:create <nombre>` — crea archivo SQL con timestamp UTC correcto
+  2. Editar el archivo con el DDL necesario
+  3. `pnpm migrate:up` — aplica contra la base de datos (auto-regenera tipos Kysely)
+  4. Commit migración + `db.d.ts` actualizado **juntos** en el mismo commit
+  5. `pnpm build` para verificar que los tipos son consistentes
+- Conexión local: requiere Cloud SQL Auth Proxy corriendo en `127.0.0.1:15432`. El script tiene guardia fail-fast que aborta si detecta IP pública como host — no esperar timeout, leer el mensaje de error.
+- Spec completa: `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`
 
 ## Task Lifecycle Protocol
 

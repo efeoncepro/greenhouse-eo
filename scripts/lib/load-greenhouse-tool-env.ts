@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 
-type PostgresProfile = 'runtime' | 'migrator' | 'admin'
+type PostgresProfile = 'runtime' | 'migrator' | 'admin' | 'ops'
 
 const DEFAULT_ENV_FILES = [
   '.env.local',
@@ -63,7 +63,7 @@ export const loadGreenhouseToolEnv = (envFiles = DEFAULT_ENV_FILES) => {
 }
 
 const assignOrDeleteEnv = (key: string, value: string | undefined) => {
-  if (value === undefined) {
+  if (value === undefined || value.trim() === '') {
     delete process.env[key]
 
     return
@@ -87,6 +87,11 @@ const PROFILE_KEY_MAP: Record<PostgresProfile, { user: string; password: string;
     user: 'GREENHOUSE_POSTGRES_ADMIN_USER',
     password: 'GREENHOUSE_POSTGRES_ADMIN_PASSWORD',
     passwordSecretRef: 'GREENHOUSE_POSTGRES_ADMIN_PASSWORD_SECRET_REF'
+  },
+  ops: {
+    user: 'GREENHOUSE_POSTGRES_OPS_USER',
+    password: 'GREENHOUSE_POSTGRES_OPS_PASSWORD',
+    passwordSecretRef: 'GREENHOUSE_POSTGRES_OPS_PASSWORD_SECRET_REF'
   }
 }
 

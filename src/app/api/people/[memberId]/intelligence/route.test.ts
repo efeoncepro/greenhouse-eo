@@ -125,4 +125,20 @@ describe('GET /api/people/[memberId]/intelligence', () => {
     expect(body.current.derivedMetrics.find((metric: { metricId: string }) => metric.metricId === 'cost_per_hour')?.value).toBe(13500)
     expect(body.current.derivedMetrics.find((metric: { metricId: string }) => metric.metricId === 'utilization_pct')?.value).toBe(82)
   })
+
+  it('returns 403 for client tenants because person intelligence is internal-only', async () => {
+    mockRequirePeopleTenantContext.mockResolvedValue({
+      tenant: { tenantType: 'client', routeGroups: ['client'] },
+      errorResponse: null
+    })
+
+    const response = await GET(
+      new Request('http://localhost/api/people/member-1/intelligence?trend=6'),
+      { params: Promise.resolve({ memberId: 'member-1' }) }
+    )
+
+    expect(response.status).toBe(403)
+    expect(mockReadPersonIntelligence).not.toHaveBeenCalled()
+    expect(mockReadMemberCapacityEconomicsSnapshot).not.toHaveBeenCalled()
+  })
 })

@@ -26,6 +26,9 @@ const hasAttendanceSignal = (attendance: AttendanceSnapshot | null | undefined) 
   )
 }
 
+const isChileLaborCompensation = (row: ApplicableCompensation) =>
+  row.payRegime === 'chile' && row.contractType !== 'honorarios'
+
 export const buildPayrollPeriodReadiness = ({
   period,
   compensationRows,
@@ -51,7 +54,7 @@ export const buildPayrollPeriodReadiness = ({
     row => row.payRegime === 'chile' && row.healthSystem === 'isapre' && (row.healthPlanUf || 0) > 0
   )
 
-  const includesChilePayroll = includedCompensations.some(row => row.payRegime === 'chile')
+  const includesChilePayroll = includedCompensations.some(isChileLaborCompensation)
 
   const blockingIssues: PayrollReadinessIssue[] = []
   const warnings: PayrollReadinessIssue[] = []
@@ -173,7 +176,7 @@ export const getPayrollPeriodReadiness = async (periodId: string): Promise<Payro
 
   const compensationRows = await getApplicableCompensationVersionsForPeriod(range.periodStart, range.periodEnd)
   const includedCompensations = compensationRows.filter(row => row.hasCompensationVersion)
-  const includesChilePayroll = includedCompensations.some(row => row.payRegime === 'chile')
+  const includesChilePayroll = includedCompensations.some(isChileLaborCompensation)
 
   const resolvedUtmValue = includesChilePayroll && period.taxTableVersion
     ? (await getHistoricalEconomicIndicatorForPeriod({

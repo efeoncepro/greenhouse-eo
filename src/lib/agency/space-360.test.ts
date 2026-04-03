@@ -145,6 +145,8 @@ describe('getAgencySpace360', () => {
     mockGetSpaceFinanceMetrics.mockResolvedValue([
       {
         clientId: 'client-1',
+        organizationId: null,
+        spaceId: null,
         revenueCurrentMonth: 1800000,
         revenuePreviousMonth: 1600000,
         revenueTrend: 12,

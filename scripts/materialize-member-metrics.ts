@@ -1,12 +1,14 @@
 /**
- * Materialize ICO member-level metrics from v_tasks_enriched.
- * This runs the same SQL as Step 7 of materializeMonthlySnapshots.
+ * Materialize ICO member-level metrics using the canonical ICO engine.
+ * This script is a thin wrapper over materializeMonthlySnapshots + Postgres sync
+ * so it does not drift from the engine contract.
  *
  * Usage: npx tsx scripts/materialize-member-metrics.ts
  */
 import { BigQuery } from '@google-cloud/bigquery'
 
 import { getGoogleAuthOptions, getGoogleProjectId } from '@/lib/google-credentials'
+import { materializeMonthlySnapshots } from '@/lib/ico-engine/materialize'
 import { loadGreenhouseToolEnv } from './lib/load-greenhouse-tool-env'
 
 const main = async () => {
@@ -21,100 +23,10 @@ const main = async () => {
 
   console.log(`=== Materialize member metrics for ${year}-${String(month).padStart(2, '0')} ===\n`)
 
-  // Delete existing member metrics for current period
-  try {
-    await bq.query({
-      query: `DELETE FROM \`${projectId}.ico_engine.metrics_by_member\`
-              WHERE period_year = @year AND period_month = @month`,
-      params: { year, month }
-    })
+  console.log('Running canonical ICO materialization...')
+  const result = await materializeMonthlySnapshots(year, month)
 
-    console.log('Cleared existing member metrics for current period')
-  } catch (e) {
-    console.log('No existing metrics to clear:', (e as Error).message?.slice(0, 60))
-  }
-
-  // Materialize member-level metrics using UNNEST on assignee_member_ids
-  const query = `
-    INSERT INTO \`${projectId}.ico_engine.metrics_by_member\`
-    (member_id, period_year, period_month,
-     rpa_avg, rpa_median, otd_pct, ftr_pct,
-     cycle_time_avg_days, throughput_count, pipeline_velocity,
-     stuck_asset_count, stuck_asset_pct,
-     total_tasks, completed_tasks, active_tasks,
-     materialized_at)
-
-    SELECT
-      member_id,
-      @year AS period_year,
-      @month AS period_month,
-
-      ROUND(AVG(CASE
-        WHEN te.task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')
-          AND SAFE_CAST(te.rpa_value AS FLOAT64) > 0
-        THEN SAFE_CAST(te.rpa_value AS FLOAT64)
-      END), 2) AS rpa_avg,
-
-      ROUND(APPROX_QUANTILES(
-        CASE
-          WHEN te.task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')
-            AND SAFE_CAST(te.rpa_value AS FLOAT64) > 0
-          THEN SAFE_CAST(te.rpa_value AS FLOAT64)
-        END, 100
-      )[SAFE_OFFSET(50)], 2) AS rpa_median,
-
-      ROUND(SAFE_DIVIDE(
-        COUNTIF(te.delivery_signal = 'on_time' AND te.task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')),
-        NULLIF(COUNTIF(te.task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')), 0)
-      ) * 100, 1) AS otd_pct,
-
-      ROUND(SAFE_DIVIDE(
-        COUNTIF(te.task_status IN ('Listo','Done','Finalizado','Completado','Aprobado') AND COALESCE(te.client_review_open, FALSE) = FALSE),
-        NULLIF(COUNTIF(te.task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')), 0)
-      ) * 100, 1) AS ftr_pct,
-
-      ROUND(AVG(CASE WHEN te.cycle_time_days > 0 THEN te.cycle_time_days END), 1) AS cycle_time_avg_days,
-
-      COUNTIF(te.task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')) AS throughput_count,
-
-      ROUND(SAFE_DIVIDE(
-        COUNTIF(te.task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')),
-        NULLIF(COUNTIF(te.task_status NOT IN ('Listo','Done','Finalizado','Completado','Aprobado','Archivadas','Archivada','Cancelada','Canceled','Cancelled','Archivado')), 0)
-      ), 2) AS pipeline_velocity,
-
-      COUNTIF(te.is_stuck = TRUE) AS stuck_asset_count,
-
-      ROUND(SAFE_DIVIDE(
-        COUNTIF(te.is_stuck = TRUE),
-        NULLIF(COUNTIF(te.task_status NOT IN ('Listo','Done','Finalizado','Completado','Aprobado','Archivadas','Archivada','Cancelada','Canceled','Cancelled','Archivado')), 0)
-      ) * 100, 1) AS stuck_asset_pct,
-
-      COUNT(*) AS total_tasks,
-      COUNTIF(te.task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')) AS completed_tasks,
-      COUNTIF(te.task_status NOT IN ('Listo','Done','Finalizado','Completado','Aprobado','Archivadas','Archivada','Cancelada','Canceled','Cancelled','Archivado')) AS active_tasks,
-
-      CURRENT_TIMESTAMP() AS materialized_at
-
-    FROM \`${projectId}.ico_engine.v_tasks_enriched\` te,
-    UNNEST(IFNULL(te.assignee_member_ids, [])) AS member_id
-
-    WHERE member_id IS NOT NULL AND member_id != ''
-      AND (
-        (te.task_status IN ('Listo','Done','Finalizado','Completado','Aprobado')
-         AND EXTRACT(YEAR FROM te.completed_at) = @year
-         AND EXTRACT(MONTH FROM te.completed_at) = @month)
-        OR
-        te.task_status NOT IN ('Listo','Done','Finalizado','Completado','Aprobado','Archivadas','Archivada','Cancelada','Canceled','Cancelled','Archivado')
-      )
-
-    GROUP BY member_id
-  `
-
-  console.log('Running member metrics materialization...')
-
-  const [result] = await bq.query({ query, params: { year, month } })
-
-  console.log(`Materialized ${result.length ?? 'N/A'} rows`)
+  console.log(`Materialized ${result.memberMetricsWritten} member rows via canonical engine`)
 
   // Verify
   const [countRows] = await bq.query({
@@ -133,7 +45,7 @@ const main = async () => {
              rpa_avg, rpa_median, otd_pct, ftr_pct,
              cycle_time_avg_days, throughput_count, pipeline_velocity,
              stuck_asset_count, stuck_asset_pct,
-             total_tasks, completed_tasks, active_tasks
+             total_tasks, completed_tasks, active_tasks, carry_over_count
            FROM \`${projectId}.ico_engine.metrics_by_member\`
            WHERE period_year = @year AND period_month = @month`,
     params: { year, month }
@@ -158,8 +70,8 @@ const main = async () => {
             rpa_avg, rpa_median, otd_pct, ftr_pct,
             cycle_time_avg_days, throughput_count, pipeline_velocity,
             stuck_asset_count, stuck_asset_pct,
-            total_tasks, completed_tasks, active_tasks, materialized_at
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, NOW())
+            total_tasks, completed_tasks, active_tasks, carry_over_count, materialized_at
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, NOW())
           ON CONFLICT (member_id, period_year, period_month) DO UPDATE SET
             rpa_avg=EXCLUDED.rpa_avg, rpa_median=EXCLUDED.rpa_median,
             otd_pct=EXCLUDED.otd_pct, ftr_pct=EXCLUDED.ftr_pct,
@@ -167,7 +79,7 @@ const main = async () => {
             throughput_count=EXCLUDED.throughput_count, pipeline_velocity=EXCLUDED.pipeline_velocity,
             stuck_asset_count=EXCLUDED.stuck_asset_count, stuck_asset_pct=EXCLUDED.stuck_asset_pct,
             total_tasks=EXCLUDED.total_tasks, completed_tasks=EXCLUDED.completed_tasks,
-            active_tasks=EXCLUDED.active_tasks, materialized_at=NOW()
+            active_tasks=EXCLUDED.active_tasks, carry_over_count=EXCLUDED.carry_over_count, materialized_at=NOW()
         `, [
           String(r.member_id), Number(r.period_year), Number(r.period_month),
           r.rpa_avg != null ? Number(r.rpa_avg) : null,
@@ -181,7 +93,8 @@ const main = async () => {
           r.stuck_asset_pct != null ? Number(r.stuck_asset_pct) : null,
           r.total_tasks != null ? Number(r.total_tasks) : null,
           r.completed_tasks != null ? Number(r.completed_tasks) : null,
-          r.active_tasks != null ? Number(r.active_tasks) : null
+          r.active_tasks != null ? Number(r.active_tasks) : null,
+          r.carry_over_count != null ? Number(r.carry_over_count) : null
         ])
 
         synced++

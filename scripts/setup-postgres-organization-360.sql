@@ -8,7 +8,6 @@
 --   - Finance summary (via client bridge)
 -- ════════════════════════════════════════════════════════════════════════════
 
-DROP VIEW IF EXISTS greenhouse_serving.organization_360;
 CREATE OR REPLACE VIEW greenhouse_serving.organization_360 AS
 SELECT
   o.organization_id,
@@ -52,10 +51,34 @@ SELECT
       'roleLabel', pm.role_label,
       'department', pm.department,
       'isPrimary', pm.is_primary,
-      'spaceId', pm.space_id
+      'spaceId', pm.space_id,
+      'memberId', m.member_id,
+      'assignedFte', assignment_summary.assigned_fte,
+      'assignmentType', assignment_summary.assignment_type,
+      'jobLevel', m.job_level,
+      'employmentType', m.employment_type
     ) ORDER BY pm.is_primary DESC, ip.full_name)
     FROM greenhouse_core.person_memberships pm
     JOIN greenhouse_core.identity_profiles ip ON ip.profile_id = pm.profile_id
+    LEFT JOIN greenhouse_core.members m ON m.identity_profile_id = pm.profile_id
+    LEFT JOIN LATERAL (
+      SELECT
+        COALESCE(SUM(a.fte_allocation), 0)::numeric AS assigned_fte,
+        CASE
+          WHEN COUNT(*) = 0 THEN NULL::text
+          WHEN COUNT(DISTINCT a.assignment_type) = 1 THEN MIN(a.assignment_type)
+          ELSE 'mixed'
+        END AS assignment_type
+      FROM greenhouse_core.client_team_assignments a
+      JOIN greenhouse_core.spaces s
+        ON s.client_id = a.client_id
+       AND s.organization_id = o.organization_id
+       AND s.active = TRUE
+      WHERE m.member_id IS NOT NULL
+        AND a.member_id = m.member_id
+        AND a.active = TRUE
+        AND (a.end_date IS NULL OR a.end_date >= CURRENT_DATE)
+    ) assignment_summary ON TRUE
     WHERE pm.organization_id = o.organization_id
       AND pm.active = TRUE
   ) AS people,

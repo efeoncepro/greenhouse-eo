@@ -108,7 +108,7 @@ const CostAllocationsView = () => {
           expenseId: formExpenseId,
           clientId: formClientId,
           clientName: formClientName,
-          allocationPercent: Number(formPercent),
+          allocationPercent: Number(formPercent) / 100,
           allocatedAmountClp: Number(formAmount),
           periodYear: year,
           periodMonth: month,
@@ -145,7 +145,7 @@ const CostAllocationsView = () => {
     allocColumnHelper.accessor('clientName', { header: 'Cliente', cell: ({ getValue }) => <Typography variant='body2' fontWeight={600}>{getValue()}</Typography> }),
     allocColumnHelper.accessor('expenseId', { header: 'Expense ID', cell: ({ getValue }) => <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>{getValue().slice(0, 12)}…</Typography> }),
     allocColumnHelper.accessor('allocationMethod', { header: 'Método', cell: ({ getValue }) => <CustomChip round='true' size='small' variant='tonal' color='info' label={METHOD_LABELS[getValue()] || getValue()} />, meta: { align: 'center' } }),
-    allocColumnHelper.accessor('allocationPercent', { header: '%', cell: ({ getValue }) => `${getValue()}%`, meta: { align: 'right' } }),
+    allocColumnHelper.accessor('allocationPercent', { header: '%', cell: ({ getValue }) => `${(getValue() * 100).toFixed(1)}%`, meta: { align: 'right' } }),
     allocColumnHelper.accessor('allocatedAmountClp', { header: 'Monto CLP', cell: ({ getValue }) => formatClp(getValue()), meta: { align: 'right' } }),
     allocColumnHelper.accessor('notes', { header: 'Notas', cell: ({ getValue }) => <Typography variant='caption' color='text.secondary'>{getValue() || '—'}</Typography> }),
     { id: 'actions', header: 'Acciones', cell: ({ row }: { row: { original: Allocation } }) => <Button size='small' color='error' onClick={() => handleDelete(row.original.allocationId)}><i className='tabler-trash' /></Button>, enableSorting: false, meta: { align: 'center' } }

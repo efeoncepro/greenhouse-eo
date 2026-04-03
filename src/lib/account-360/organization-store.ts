@@ -56,6 +56,11 @@ export interface OrganizationPerson {
   department: string | null
   isPrimary: boolean
   spaceId: string | null
+  memberId?: string | null
+  assignedFte?: number | null
+  assignmentType?: string | null
+  jobLevel?: string | null
+  employmentType?: string | null
 }
 
 export interface PersonMembership {
@@ -122,6 +127,11 @@ interface MembershipRow extends Record<string, unknown> {
   role_label: string | null
   department: string | null
   is_primary: boolean
+  member_id: string | null
+  assigned_fte: string | number | null
+  assignment_type: string | null
+  job_level: string | null
+  employment_type: string | null
 }
 
 interface CountRow extends Record<string, unknown> {
@@ -142,6 +152,20 @@ const toTs = (v: unknown): string => {
   if (typeof v === 'string') return v
 
   return ''
+}
+
+const toNullableNum = (v: unknown): number | null => {
+  if (v === null || v === undefined || v === '') return null
+
+  if (typeof v === 'number') return Number.isFinite(v) ? v : null
+
+  if (typeof v === 'string') {
+    const parsed = Number(v)
+
+    return Number.isFinite(parsed) ? parsed : null
+  }
+
+  return null
 }
 
 const normalizeListItem = (r: OrgListRow): OrganizationListItem => ({
@@ -168,7 +192,10 @@ const normalizeDetail = (r: OrgDetailRow): OrganizationDetail => ({
   taxIdType: r.tax_id_type,
   notes: r.notes,
   spaces: Array.isArray(r.spaces) ? r.spaces as OrganizationSpace[] : null,
-  people: Array.isArray(r.people) ? r.people as OrganizationPerson[] : null
+  people: Array.isArray(r.people) ? (r.people as OrganizationPerson[]).map(person => ({
+    ...person,
+    assignedFte: toNullableNum(person.assignedFte)
+  })) : null
 })
 
 const normalizeMembership = (r: MembershipRow): OrganizationPerson => ({
@@ -181,7 +208,12 @@ const normalizeMembership = (r: MembershipRow): OrganizationPerson => ({
   roleLabel: r.role_label,
   department: r.department,
   isPrimary: r.is_primary,
-  spaceId: r.space_id
+  spaceId: r.space_id,
+  memberId: r.member_id,
+  assignedFte: toNullableNum(r.assigned_fte),
+  assignmentType: r.assignment_type,
+  jobLevel: r.job_level,
+  employmentType: r.employment_type
 })
 
 const normalizePersonMembership = (r: MembershipRow): PersonMembership => ({
@@ -358,10 +390,35 @@ export const getOrganizationMemberships = async (orgId: string): Promise<Organiz
       o.organization_name,
       pm.space_id,
       ip.full_name, ip.canonical_email,
-      pm.membership_type, pm.role_label, pm.department, pm.is_primary
+      pm.membership_type, pm.role_label, pm.department, pm.is_primary,
+      m.member_id,
+      assignment_summary.assigned_fte,
+      assignment_summary.assignment_type,
+      m.job_level,
+      m.employment_type
     FROM greenhouse_core.person_memberships pm
     JOIN greenhouse_core.identity_profiles ip ON ip.profile_id = pm.profile_id
     LEFT JOIN greenhouse_core.organizations o ON o.organization_id = pm.organization_id
+    LEFT JOIN greenhouse_core.members m
+      ON m.identity_profile_id = pm.profile_id
+     AND m.active = TRUE
+    LEFT JOIN LATERAL (
+      SELECT
+        COALESCE(SUM(a.fte_allocation), 0)::numeric AS assigned_fte,
+        CASE
+          WHEN COUNT(*) = 0 THEN NULL
+          WHEN COUNT(DISTINCT a.assignment_type) = 1 THEN MIN(a.assignment_type)
+          ELSE 'mixed'
+        END AS assignment_type
+      FROM greenhouse_core.client_team_assignments a
+      JOIN greenhouse_core.spaces s
+        ON s.client_id = a.client_id
+       AND s.active = TRUE
+      WHERE a.member_id = m.member_id
+        AND a.active = TRUE
+        AND (a.end_date IS NULL OR a.end_date >= CURRENT_DATE)
+        AND s.organization_id = pm.organization_id
+    ) assignment_summary ON TRUE
     WHERE pm.organization_id = $1 AND pm.active = TRUE
     ORDER BY pm.is_primary DESC, ip.full_name NULLS LAST
   `, [orgId])
@@ -522,8 +579,13 @@ export const getOrganizationFinanceSummary = async (
         ce.gross_margin_percent, ce.net_margin_percent,
         ce.headcount_fte
       FROM greenhouse_finance.client_economics ce
-      JOIN greenhouse_finance.client_profiles cp ON cp.client_id = ce.client_id
-      WHERE cp.organization_id = $1 AND ce.period_year = $2 AND ce.period_month = $3
+      WHERE ce.period_year = $2 AND ce.period_month = $3
+        AND EXISTS (
+          SELECT 1
+          FROM greenhouse_finance.client_profiles cp
+          WHERE cp.organization_id = $1
+            AND (cp.client_id = ce.client_id OR cp.organization_id = ce.client_id)
+        )
       ORDER BY ce.total_revenue_clp DESC
     `, [orgId, year, month])
 
@@ -630,8 +692,18 @@ export const createIdentityProfile = async (data: {
   sourceObjectType: string
   sourceObjectId: string
   fullName: string
-  canonicalEmail: string
+  canonicalEmail?: string | null
 }): Promise<string> => {
+  const canonicalEmail = data.canonicalEmail?.trim().toLowerCase() || null
+
+  if (canonicalEmail) {
+    const existing = await findProfileByEmail(canonicalEmail)
+
+    if (existing?.profileId) {
+      return existing.profileId
+    }
+  }
+
   const profileId = buildIdentityProfileId(data)
 
   await runGreenhousePostgresQuery(`
@@ -639,15 +711,60 @@ export const createIdentityProfile = async (data: {
       profile_id, full_name, canonical_email, source_system,
       source_object_type, source_object_id, active, created_at, updated_at
     ) VALUES ($1, $2, $3, $4, $5, $6, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-    ON CONFLICT (profile_id) DO NOTHING
+    ON CONFLICT (profile_id) DO UPDATE
+    SET
+      full_name = EXCLUDED.full_name,
+      canonical_email = COALESCE(EXCLUDED.canonical_email, greenhouse_core.identity_profiles.canonical_email),
+      updated_at = CURRENT_TIMESTAMP,
+      active = TRUE
   `, [
     profileId,
     data.fullName,
-    data.canonicalEmail.toLowerCase(),
+    canonicalEmail,
     data.sourceSystem,
     data.sourceObjectType,
     data.sourceObjectId
   ])
+
+  return profileId
+}
+
+export const ensureOrganizationContactMembership = async (data: {
+  organizationId: string
+  sourceSystem: string
+  sourceObjectType: string
+  sourceObjectId: string
+  fullName: string
+  canonicalEmail?: string | null
+  membershipType?: string
+  roleLabel?: string | null
+  isPrimary?: boolean
+}): Promise<string | null> => {
+  const fullName = data.fullName.trim()
+
+  if (!fullName) {
+    return null
+  }
+
+  const profileId = await createIdentityProfile({
+    sourceSystem: data.sourceSystem,
+    sourceObjectType: data.sourceObjectType,
+    sourceObjectId: data.sourceObjectId,
+    fullName,
+    canonicalEmail: data.canonicalEmail ?? null
+  })
+
+  const exists = await membershipExists(profileId, data.organizationId)
+
+  if (!exists) {
+    await createMembership({
+      profileId,
+      organizationId: data.organizationId,
+      membershipType: data.membershipType ?? 'contact',
+      roleLabel: data.roleLabel ?? undefined,
+      isPrimary: data.isPrimary ?? true
+    })
+  }
 
   return profileId
 }
@@ -680,6 +797,10 @@ interface OrgSearchRow extends Record<string, unknown> {
   public_id: string
 }
 
+interface SpaceClientIdRow extends Record<string, unknown> {
+  client_id: string | null
+}
+
 export const searchOrganizations = async (query: string): Promise<Array<{ organizationId: string; organizationName: string; publicId: string }>> => {
   const pattern = `%${query}%`
 
@@ -696,6 +817,21 @@ export const searchOrganizations = async (query: string): Promise<Array<{ organi
     organizationName: r.organization_name,
     publicId: r.public_id
   }))
+}
+
+export const getOrganizationClientIds = async (organizationId: string): Promise<string[]> => {
+  const rows = await runGreenhousePostgresQuery<SpaceClientIdRow>(`
+    SELECT DISTINCT s.client_id
+    FROM greenhouse_core.spaces s
+    WHERE s.organization_id = $1
+      AND s.active = TRUE
+      AND s.client_id IS NOT NULL
+    ORDER BY s.client_id
+  `, [organizationId])
+
+  return rows
+    .map(row => (typeof row.client_id === 'string' ? row.client_id.trim() : ''))
+    .filter(Boolean)
 }
 
 // ── Person memberships ─────────────────────────────────────────────────

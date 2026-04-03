@@ -1,10 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 
+import { toast } from 'react-toastify'
+
+import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -45,6 +48,14 @@ interface PaymentRecord {
   description: string
 }
 
+interface SupplierContact {
+  fullName: string | null
+  canonicalEmail: string | null
+  membershipType: string
+  roleLabel: string | null
+  isPrimary: boolean
+}
+
 interface SupplierDetail {
   supplierId: string
   providerId: string | null
@@ -73,6 +84,7 @@ interface SupplierDetail {
   createdBy: string
   createdAt: string
   updatedAt: string
+  organizationContacts: SupplierContact[]
   providerTooling: SupplierProviderToolingSnapshot | null
   paymentHistory: PaymentRecord[]
 }
@@ -103,6 +115,12 @@ const PAYMENT_METHOD_LABELS: Record<string, string> = {
   cash: 'Efectivo',
   credit_card: 'Tarjeta de crédito',
   other: 'Otro'
+}
+
+const CONTACT_TYPE_LABELS: Record<string, string> = {
+  contact: 'Contacto',
+  billing: 'Facturación',
+  client_contact: 'Contacto cliente'
 }
 
 // ---------------------------------------------------------------------------
@@ -173,17 +191,18 @@ const SupplierDetailView = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState('info')
+  const [isLinkingProvider, setIsLinkingProvider] = useState(false)
+  const [linkProviderError, setLinkProviderError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const controller = new AbortController()
-
-    const loadSupplier = async () => {
+  const loadSupplier = useCallback(
+    async (signal?: AbortSignal) => {
       try {
         setIsLoading(true)
+        setError(null)
 
         const response = await fetch(`/api/finance/suppliers/${supplierId}`, {
           cache: 'no-store',
-          signal: controller.signal
+          signal
         })
 
         if (!response.ok) {
@@ -200,12 +219,45 @@ const SupplierDetailView = () => {
       } finally {
         setIsLoading(false)
       }
-    }
+    },
+    [supplierId]
+  )
 
-    loadSupplier()
+  useEffect(() => {
+    const controller = new AbortController()
+
+    loadSupplier(controller.signal)
 
     return () => controller.abort()
-  }, [supplierId])
+  }, [loadSupplier])
+
+  const handleLinkProvider = useCallback(async () => {
+    setIsLinkingProvider(true)
+    setLinkProviderError(null)
+
+    try {
+      const response = await fetch(`/api/finance/suppliers/${supplierId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ autoLinkProvider: true })
+      })
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+
+        throw new Error(data.error || 'No pudimos crear el vínculo canónico.')
+      }
+
+      await loadSupplier()
+      setActiveTab('provider')
+      toast.success('Provider 360 vinculado')
+    } catch (err: unknown) {
+      setLinkProviderError((err as Error).message ?? 'No pudimos crear el vínculo canónico.')
+      throw err
+    } finally {
+      setIsLinkingProvider(false)
+    }
+  }, [loadSupplier, supplierId])
 
   // -------------------------------------------------------------------------
   // Loading state
@@ -240,6 +292,7 @@ const SupplierDetailView = () => {
   // -------------------------------------------------------------------------
 
   const categoryLabel = CATEGORY_LABELS[supplier.category] ?? supplier.category
+  const hasCanonicalContacts = supplier.organizationContacts.length > 0
 
   return (
     <Box sx={{ p: { xs: 2, md: 4 } }}>
@@ -269,6 +322,11 @@ const SupplierDetailView = () => {
               variant='tonal'
               color={supplier.isActive ? 'success' : 'error'}
             />
+            {!supplier.providerId ? (
+              <Button variant='outlined' size='small' onClick={handleLinkProvider} disabled={isLinkingProvider}>
+                {isLinkingProvider ? 'Vinculando...' : 'Crear vínculo canónico'}
+              </Button>
+            ) : null}
           </Stack>
           {supplier.tradeName && (
             <Typography variant='body2' color='text.secondary'>
@@ -277,6 +335,12 @@ const SupplierDetailView = () => {
           )}
         </Box>
       </Stack>
+
+      {linkProviderError ? (
+        <Alert severity='error' sx={{ mb: 3 }}>
+          {linkProviderError}
+        </Alert>
+      ) : null}
 
       {/* Tabs */}
       <TabContext value={activeTab}>
@@ -393,7 +457,7 @@ const SupplierDetailView = () => {
               </Card>
             </Grid>
 
-            {/* Contacto principal */}
+            {/* Contactos */}
             <Grid size={{ xs: 12 }}>
               <Card elevation={0} sx={{ border: t => '1px solid ' + t.palette.divider }}>
                 <CardHeader
@@ -402,24 +466,85 @@ const SupplierDetailView = () => {
                       <i className='tabler-user' />
                     </Avatar>
                   }
-                  title='Contacto principal'
+                  title={hasCanonicalContacts ? 'Contactos canónicos' : 'Contacto principal'}
                   titleTypographyProps={{ variant: 'h6' }}
                 />
                 <CardContent>
-                  <Grid container spacing={3}>
-                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                      <FieldRow label='Nombre' value={supplier.primaryContactName} />
+                  {hasCanonicalContacts ? (
+                    <Stack spacing={3}>
+                      <Alert severity='info' variant='outlined'>
+                        Este proveedor ya tiene contactos vinculados desde `Account 360` sobre su organización canónica.
+                      </Alert>
+
+                      <Grid container spacing={3}>
+                        {supplier.organizationContacts.map((contact, index) => (
+                          <Grid key={`${contact.canonicalEmail || contact.fullName || 'contact'}-${index}`} size={{ xs: 12, md: 6 }}>
+                            <Box
+                              sx={{
+                                p: 3,
+                                border: t => `1px solid ${t.palette.divider}`,
+                                borderRadius: 2,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 2
+                              }}
+                            >
+                              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                                <CustomChip
+                                  round='true'
+                                  size='small'
+                                  variant='tonal'
+                                  color={contact.isPrimary ? 'success' : 'secondary'}
+                                  label={contact.isPrimary ? 'Primario' : 'Secundario'}
+                                />
+                                <CustomChip
+                                  round='true'
+                                  size='small'
+                                  variant='tonal'
+                                  color='info'
+                                  label={CONTACT_TYPE_LABELS[contact.membershipType] ?? contact.membershipType}
+                                />
+                              </Stack>
+
+                              <Grid container spacing={3}>
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                  <FieldRow label='Nombre' value={contact.fullName} />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 6 }}>
+                                  <FieldRow label='Correo electrónico' value={contact.canonicalEmail} />
+                                </Grid>
+                                <Grid size={{ xs: 12 }}>
+                                  <FieldRow label='Rol' value={contact.roleLabel} />
+                                </Grid>
+                              </Grid>
+                            </Box>
+                          </Grid>
+                        ))}
+
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                          <FieldRow label='Sitio web' value={supplier.website} />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                          <FieldRow label='Contacto legacy' value={supplier.primaryContactName || supplier.primaryContactEmail || supplier.primaryContactPhone} />
+                        </Grid>
+                      </Grid>
+                    </Stack>
+                  ) : (
+                    <Grid container spacing={3}>
+                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                        <FieldRow label='Nombre' value={supplier.primaryContactName} />
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                        <FieldRow label='Correo electrónico' value={supplier.primaryContactEmail} />
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                        <FieldRow label='Teléfono' value={supplier.primaryContactPhone} />
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                        <FieldRow label='Sitio web' value={supplier.website} />
+                      </Grid>
                     </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                      <FieldRow label='Correo electrónico' value={supplier.primaryContactEmail} />
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                      <FieldRow label='Teléfono' value={supplier.primaryContactPhone} />
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                      <FieldRow label='Sitio web' value={supplier.website} />
-                    </Grid>
-                  </Grid>
+                  )}
                 </CardContent>
               </Card>
             </Grid>
@@ -516,16 +641,18 @@ const SupplierDetailView = () => {
           </Card>
         </TabPanel>
 
-        <TabPanel value='provider' sx={{ p: 0 }}>
-          <SupplierProviderToolingTab
-            supplierId={supplier.supplierId}
-            supplierName={supplier.tradeName || supplier.legalName}
-            providerId={supplier.providerId}
-            providerTooling={supplier.providerTooling}
-          />
-        </TabPanel>
-      </TabContext>
-    </Box>
+          <TabPanel value='provider' sx={{ p: 0 }}>
+            <SupplierProviderToolingTab
+              supplierId={supplier.supplierId}
+              supplierName={supplier.tradeName || supplier.legalName}
+              providerId={supplier.providerId}
+              providerTooling={supplier.providerTooling}
+              onLinkProvider={handleLinkProvider}
+              linkingProvider={isLinkingProvider}
+            />
+          </TabPanel>
+        </TabContext>
+      </Box>
   )
 }
 

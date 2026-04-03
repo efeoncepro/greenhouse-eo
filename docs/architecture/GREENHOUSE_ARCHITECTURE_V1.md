@@ -1,10 +1,52 @@
 # Greenhouse Architecture V1
 
+## Delta 2026-04-01 — Native Integrations Layer ya tiene arquitectura canónica propia
+
+La `Native Integrations Layer` ya no debe leerse solo como task o intuición de plataforma.
+
+Fuente canónica nueva:
+
+- `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md`
+
+Regla arquitectónica nueva:
+
+- las integraciones críticas (`Notion`, `HubSpot`, `Nubox`, `Frame.io` y futuras equivalentes) deben diseñarse y evolucionar bajo un marco común de:
+  - registry
+  - contract governance
+  - adapters por source
+  - canonical mapping layer
+  - event/workflow backbone
+  - runtime governance
+  - readiness downstream
+
+La primera implementación fuerte de este marco sigue siendo `Notion`, pero la arquitectura ya queda definida como capability reusable de plataforma.
+
+## Delta 2026-03-31 — TASK-173 ya tiene infraestructura dedicada además de foundation runtime
+
+`TASK-173` ya no debe leerse como “shared assets en código, pero infra pendiente”.
+
+Estado arquitectónico vigente:
+
+- la foundation shared existe en runtime y en infraestructura
+- Greenhouse ya tiene buckets dedicados por entorno para:
+  - `public media`
+  - `private assets`
+- Vercel ya quedó cortado a esos buckets por entorno
+- `staging` y `production` ya están desplegados sobre ese baseline
+
+Regla de consumo actual:
+
+- nuevos módulos deben usar la capability shared de assets/attachments
+- media pública debe resolver contra `GREENHOUSE_PUBLIC_MEDIA_BUCKET`
+- adjuntos privados deben resolver contra `GREENHOUSE_PRIVATE_ASSETS_BUCKET`
+- `GREENHOUSE_MEDIA_BUCKET` queda solo como fallback transicional para superficies públicas legacy
+
 ## Delta 2026-03-31 — Shared attachments platform ya tiene foundation runtime en repo
 
 `TASK-173` ya no debe leerse solo como decisión documental.
 
 Estado vigente en el repo:
+
 - existe una capability shared de assets/attachments para el portal
 - su capa base vive en:
   - `src/lib/storage/greenhouse-assets.ts`
@@ -18,6 +60,7 @@ Estado vigente en el repo:
   - `payroll export packages`
 
 Regla arquitectónica nueva:
+
 - nuevos módulos compatibles no deben crear storage helpers, buckets lógicos o uploaders paralelos si pueden consumir esta capability shared
 - las associations documentales se resuelven por aggregate del dominio, no creando identidades documentales duplicadas
 - la metadata y autorización del asset son cross-module; la semántica del documento sigue siendo ownership del dominio consumidor
@@ -27,6 +70,7 @@ Regla arquitectónica nueva:
 La decisión de `commercial cost attribution` ya no debe leerse solo como framing.
 
 Estado arquitectónico vigente:
+
 - la truth layer ya existe como capa explícita y materializada:
   - `greenhouse_serving.commercial_cost_attribution`
 - la capa ya tiene:
@@ -38,6 +82,7 @@ Estado arquitectónico vigente:
 - `operational_pl` ya consume esta capa en vez de recomponer labor + overhead desde bridges divergentes
 
 Política de consumo vigente:
+
 - `commercial_cost_attribution`
   - truth layer canónica de costo comercial
 - `operational_pl_snapshots`
@@ -49,6 +94,7 @@ Política de consumo vigente:
   - ya no debe tratarse como contrato directo para consumers nuevos
 
 Consecuencia arquitectónica:
+
 - el cutover no significa que todo el portal lea la tabla nueva directamente
 - Agency, Home, Nexa y surfaces resumidas deben seguir privilegiando serving derivado
 - Finance base, Cost Intelligence y explain surfaces sí deben apoyarse en la capa canónica/shared
@@ -58,6 +104,7 @@ Consecuencia arquitectónica:
 Greenhouse ya no tiene solo un contrato documental para la migración `person-first`.
 
 Slice operativo nuevo:
+
 - resolver shared:
   - `src/lib/identity/canonical-person.ts`
 - adopción inicial:
@@ -65,6 +112,7 @@ Slice operativo nuevo:
   - webhook notification recipient resolution
 
 Regla de este slice:
+
 - el consumer se enriquece con `identityProfileId`, `memberId`, `userId`, `portalAccessState` y `resolutionSource`
 - el carril sigue siendo `userId`-scoped para inbox, preferencias, overrides y auditoría
 - no se tocan recipient keys, payloads de outbox ni serving member-scoped
@@ -74,6 +122,7 @@ Regla de este slice:
 Greenhouse ya no debe leer Cost Intelligence como una lane experimental de Finance.
 
 Estado canónico vigente:
+
 - `TASK-067` dejó la fundación técnica del dominio `cost_intelligence`.
 - `TASK-068` cerró `period_closure_status` como serving canónico de readiness y cierre.
 - `TASK-069` cerró `operational_pl_snapshots` como serving canónico de P&L operativo.
@@ -86,6 +135,7 @@ Estado canónico vigente:
   - Nexa
 
 Regla arquitectónica:
+
 - Finance sigue siendo owner del motor financiero central.
 - Cost Intelligence es el layer operativo de management accounting y closure awareness.
 - Los consumers que necesiten margen, costo total, closure status o snapshot de período deberían preferir serving materializado antes de recomputar on-read.
@@ -95,17 +145,19 @@ Regla arquitectónica:
 Greenhouse ya no debe resolver la atribución comercial de costos solo como una suma implícita de Payroll + Team Capacity + Finance bridges dentro de cada consumer.
 
 Decisión arquitectónica:
+
 - existe una capa canónica nueva de `commercial cost attribution`
 - esta capa se ubica entre:
   - Payroll
   - Team Capacity
   - Finance base
-  y:
+    y:
   - Cost Intelligence
   - Finance consumers
   - Agency / Organization 360 / People / Home / Nexa
 
 Responsabilidad de la nueva capa:
+
 - resolver la verdad única de costo comercial atribuible por período
 - separar explícitamente:
   - labor cost comercial
@@ -115,10 +167,12 @@ Responsabilidad de la nueva capa:
 - publicar una semántica reusable para serving, projections y consumers
 
 Regla de consumo:
+
 - Finance y Cost Intelligence deben consumir esta capa, no reinventar localmente la atribución
 - los demás módulos deben consumirla directa o indirectamente a través de serving materializado
 
 Módulos que deberían alimentarse desde esta capa:
+
 - Finance
 - Cost Intelligence
 - Agency
@@ -148,6 +202,7 @@ vive en:
 Greenhouse ya no debe leerse solo como `role -> route_groups`.
 
 Estado canónico vigente:
+
 - `routeGroups` siguen existiendo como capa broad/fallback
 - la gobernanza fina de superficies visibles ya vive en `view_code`
 - la sesión ya carga `authorizedViews` resueltos desde PostgreSQL cuando la capa persistida existe
@@ -159,12 +214,14 @@ Estado canónico vigente:
   - preview efectivo
 
 Modelo persistido en `greenhouse_core`:
+
 - `view_registry`
 - `role_view_assignments`
 - `user_view_overrides`
 - `view_access_log`
 
 Regla arquitectónica:
+
 - nuevas superficies visibles del portal deberían nacer con `view_code` explícito cuando sea razonable gobernarlas
 - `routeGroups` no deben seguir creciendo como mecanismo principal de autorización fina
 - cuando falte modelado explícito, el fallback puede existir, pero debe tratarse como estado transicional
@@ -174,11 +231,13 @@ Regla arquitectónica:
 Greenhouse debe institucionalizar el consumo `person-first` sin romper los carriles reactivos ya operativos.
 
 Regla canónica:
+
 - cuando una surface, recipient resolver o preview represente a un humano, la raíz conceptual es la persona canónica (`identity_profile`)
 - `member` sigue siendo la faceta operativa fuerte para HR, payroll, capacity, ICO y People
 - `client_user` sigue siendo el principal de acceso para sesión, inbox, preferencias, auditoría de login y overrides user-scoped
 
 Guardrails obligatorios para la migración:
+
 - no cambiar de forma silenciosa la semántica de `event_id`, `aggregate_id`, `member_id`, `identity_profile_id` o `user_id` en outbox, projections o webhook envelopes
 - no reemplazar recipients `userId`-scoped en notificaciones cuando la operación sigue dependiendo de inbox o preferencias por usuario
 - consumers reactivos de `finance`, `people`, `ICO` y `notifications` deben seguir pudiendo resolver:
@@ -188,6 +247,7 @@ Guardrails obligatorios para la migración:
 - toda adopción `person-first` debe ser gradual, observable y con fallback explícito, no por cutover implícito
 
 Piezas especialmente sensibles para esta regla:
+
 - `src/lib/notifications/person-recipient-resolver.ts`
 - `src/lib/notifications/notification-service.ts`
 - `src/lib/webhooks/consumers/notification-recipients.ts`
@@ -198,6 +258,7 @@ Piezas especialmente sensibles para esta regla:
 - `src/lib/webhooks/dispatcher.ts`
 
 Consecuencia arquitectónica:
+
 - `TASK-141` no debe ejecutarse como “swap `client_user` por persona en todas partes”
 - debe implementarse como un contrato shared que expone la identidad humana canónica sin degradar los consumers que todavía necesitan `userId` o `memberId` como claves operativas
 
@@ -208,11 +269,13 @@ This document is the master architecture reference for Greenhouse EO.
 It describes the product, data model, module inventory, route structure, access model, deployment topology, and architectural principles as they exist in production as of March 2026.
 
 Any agent, engineer, or contributor entering this repo should:
+
 - read this document before changing architecture, auth, routes, or data models
 - treat this document as the authoritative source when it conflicts with older design docs or template defaults
 - update this document when architecture-changing work lands
 
 Use together with:
+
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_ID_STRATEGY_V1.md`
 - `docs/architecture/GREENHOUSE_INTERNAL_IDENTITY_V1.md`
@@ -225,6 +288,7 @@ Use together with:
 Greenhouse EO is a multi-tenant executive operations portal for Efeonce Group.
 
 It serves three roles:
+
 1. **Executive visibility layer** — lets clients and internal stakeholders understand operational performance without entering Notion or any system of work.
 2. **Operational context system** — provides delivery, finance, HR, and capacity context for decision-making.
 3. **Internal governance platform** — supports tenant management, access control, AI tooling administration, and cross-client operational oversight.
@@ -241,6 +305,7 @@ Notion remains the system of work. Greenhouse consumes operational truth from so
 ### Product boundaries
 
 Greenhouse must:
+
 - show executive dashboards and tenant-scoped operational context
 - show projects, deliverables, sprints, and team capacity as drilldown context
 - support finance, HR/payroll, and people 360 for internal operations
@@ -250,6 +315,7 @@ Greenhouse must:
 - provide AI tooling administration and credit metering
 
 Greenhouse must not become:
+
 - a second Notion or task editing workspace
 - a full CRUD project management app
 - a workflow board where daily work is performed
@@ -257,21 +323,23 @@ Greenhouse must not become:
 
 ## Technology Stack
 
-| Layer | Technology | Version |
-|---|---|---|
-| Framework | Next.js | 16.1.1 |
-| UI Library | React | 19.2.3 |
-| Language | TypeScript | 5.9.3 |
-| Component Library | MUI | 7.3.6 |
-| CSS | Tailwind CSS | 4.1 |
-| Design System | Vuexy patterns | — |
-| OLTP Database | PostgreSQL 16 | Cloud SQL (us-east4) |
-| OLAP Warehouse | BigQuery | US multi-region |
-| Auth | NextAuth.js | 4.24 |
-| AI | Google Vertex AI (Gemini) | — |
-| Hosting | Vercel | — |
-| Sync Runtime | Cloud Functions (Python 3.12) + Cloud Run | — |
-| Orchestration | Cloud Scheduler | — |
+| Layer             | Technology                                | Version              |
+| ----------------- | ----------------------------------------- | -------------------- |
+| Framework         | Next.js                                   | 16.1.1               |
+| UI Library        | React                                     | 19.2.3               |
+| Language          | TypeScript                                | 5.9.3                |
+| Component Library | MUI                                       | 7.3.6                |
+| CSS               | Tailwind CSS                              | 4.1                  |
+| Design System     | Vuexy patterns                            | —                    |
+| OLTP Database     | PostgreSQL 16                             | Cloud SQL (us-east4) |
+| OLAP Warehouse    | BigQuery                                  | US multi-region      |
+| Auth              | NextAuth.js                               | 4.24                 |
+| AI                | Google Vertex AI (Gemini)                 | —                    |
+| Hosting           | Vercel                                    | —                    |
+| Sync Runtime      | Cloud Functions (Python 3.12) + Cloud Run | —                    |
+| Orchestration     | Cloud Scheduler                           | —                    |
+| DB Migrations     | node-pg-migrate                           | 8.x                  |
+| DB Query Builder  | Kysely + kysely-codegen                   | 0.28.x               |
 
 ## Architecture Principles
 
@@ -300,6 +368,7 @@ NextAuth.js with three providers: Azure AD, Google OAuth, and Credentials.
 Auth guards are enforced at the layout level using route group wrappers plus `view_code` checks — there is no `middleware.ts`.
 
 Current access model:
+
 - broad boundary:
   - `client`, `admin`, `internal`, `finance`, `hr`, `people`, `agency`, `my`, `ai_tooling`
 - fine-grained boundary:
@@ -311,6 +380,7 @@ Route groups still define the high-level access boundary, but they are no longer
 Roles are composable (not hierarchical). `efeonce_admin` serves as the universal override role.
 
 The `TenantContext` carries:
+
 - `userId`
 - `clientId`
 - `roleCodes`
@@ -320,6 +390,7 @@ The `TenantContext` carries:
 - `organizationId`
 
 Tables live in `greenhouse_core`:
+
 - `client_users`
 - `roles`
 - `user_role_assignments`
@@ -330,12 +401,14 @@ Tables live in `greenhouse_core`:
 - `view_access_log`
 
 Operational rule:
+
 - role baseline still seeds default visibility
 - persisted role assignments can override that baseline by `view_code`
 - user overrides apply after role baseline
 - expired overrides should degrade automatically and register audit history
 
 Explicit exception:
+
 - `/home` remains a base internal landing surface driven by `portalHomePath`
 - it is not currently modeled as a governed `view_code`
 - rationale:
@@ -346,6 +419,7 @@ Explicit exception:
   - if `/home` ever becomes a privilege-sensitive module instead of a transversal landing surface, that decision should be made explicitly and documented before introducing a `view_code`
 
 Primary admin surface:
+
 - `/admin/views`
 
 ### Executive Dashboard
@@ -355,6 +429,7 @@ Route: `/dashboard`
 Client-facing executive home with hero card, KPI strip, charts, team section, and capacity overview. Composition is data-driven — widgets appear based on capability availability, not hardcoded per tenant.
 
 Built on the reusable Executive UI System:
+
 - `ExecutiveCardShell`, `ExecutiveHeroCard`, `ExecutiveMiniStatCard`, `MetricStatCard`
 - 32 shared Greenhouse primitives in `src/components/greenhouse/`
 
@@ -369,6 +444,7 @@ Project list and detail, sprint list and detail, and activity feed. Source data 
 Context-agnostic metrics service. 10 deterministic metrics (RPA, OTD, FTR, cycle time, throughput, stuck assets, and related indicators) computed from a single canonical SQL definition (`buildMetricSelectSQL()`) and queryable by **any dimension**: Space, Project, Member (person), Client, Sprint — and extensible to future objects (Service, Campaign) without formula duplication.
 
 Infrastructure:
+
 - BigQuery dataset `ico_engine` (7 tables + 2 views)
   - `metric_snapshots_monthly` — space-level monthly aggregates
   - `metrics_by_project` — project-level monthly aggregates
@@ -404,6 +480,7 @@ Routes: `/finance` (dashboard, P&L, cash flow, aging), `/finance/clients`, `/fin
 Finance intelligence includes client economics, cost allocation, and trend analysis.
 
 Dual-store architecture:
+
 - Income/expenses: Postgres-first with BigQuery fallback
 - Accounts/suppliers/reconciliation: still BigQuery-primary
 - Reconciliation engine with auto-match
@@ -417,6 +494,7 @@ Routes: `/hr` (dashboard, departments, leave, attendance), `/hr/payroll`, `/hr/p
 Payroll with full period lifecycle: draft → calculated → approved → exported. `approved` remains editable until export; `exported` is the final lock. Chilean payroll calculations including AFP, health, unemployment, and tax. KPI-driven bonuses (OTD%, RPA) sourced from ICO. Teams attendance and HR leave context are applied to the monthly snapshot.
 
 Data stores:
+
 - Payroll and leave: Postgres-first
 - HR core tables: BigQuery
 - 25+ API routes
@@ -466,6 +544,7 @@ Routes: `/agency/organizations`, `/agency/organizations/[id]`
 Organization list with KPIs and detail view with overview, people, and finance tabs.
 
 Entity hierarchy:
+
 - Organization (EO-ORG) → Space (EO-SPC) → Client
 - Person memberships (EO-MBR) with type coding
 
@@ -496,6 +575,7 @@ Access governed by `verifyCapabilityModuleAccess()` for tenant-level gating.
 ### Integrations & Event Delivery
 
 Greenhouse currently combines:
+
 - a token-based integrations API
 - one inbound Teams attendance webhook
 - an outbox-driven publication path from PostgreSQL to BigQuery
@@ -503,8 +583,11 @@ Greenhouse currently combines:
 Reusable inbound and outbound webhook infrastructure is now standardized separately in `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`.
 
 Rule:
+
 - do not keep adding one-off webhook routes as permanent integration strategy
 - new webhook or callback work should align with the shared webhook architecture and the existing outbox model
+
+The **Native Integrations Layer** (`TASK-188`) institutionalizes integration governance as a platform capability. The central registry lives in `greenhouse_sync.integration_registry` and tracks taxonomy, ownership, readiness, health and consumer domains for each upstream (Notion, HubSpot, Nubox, Frame.io). Architecture details in `GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md`. Admin surface at `/admin/integrations`.
 
 ### Admin & Governance
 
@@ -526,6 +609,7 @@ Instance: `greenhouse-pg-dev` (Cloud SQL, us-east4)
 Database: `greenhouse_app`
 
 Schemas:
+
 - `greenhouse_core` — identity, roles, organizations, spaces, memberships
 - `greenhouse_serving` — materialized read models
 - `greenhouse_sync` — sync state and outbox
@@ -540,17 +624,17 @@ Schemas:
 
 Project: `efeonce-group` (US multi-region)
 
-| Dataset | Tables/Views | Purpose |
-|---|---|---|
-| `greenhouse` | 41 tables | Core platform data |
-| `greenhouse_raw` | 11 tables | Immutable source snapshots |
-| `greenhouse_conformed` | 6 tables | Normalized delivery + CRM via config-driven property maps |
-| `greenhouse_marts` | 5 views | Outbox-derived analytical marts |
-| `ico_engine` | 7 tables/views | ICO metrics materialization |
-| `hubspot_crm` | 35 tables | HubSpot CRM mirror (legacy) |
-| `notion_ops` | 10 tables | Notion operational mirror (legacy) |
-| `analytics_486264460` | — | GA4 export |
-| `searchconsole` | — | Search Console data |
+| Dataset                | Tables/Views   | Purpose                                                   |
+| ---------------------- | -------------- | --------------------------------------------------------- |
+| `greenhouse`           | 41 tables      | Core platform data                                        |
+| `greenhouse_raw`       | 11 tables      | Immutable source snapshots                                |
+| `greenhouse_conformed` | 6 tables       | Normalized delivery + CRM via config-driven property maps |
+| `greenhouse_marts`     | 5 views        | Outbox-derived analytical marts                           |
+| `ico_engine`           | 7 tables/views | ICO metrics materialization                               |
+| `hubspot_crm`          | 35 tables      | HubSpot CRM mirror (legacy)                               |
+| `notion_ops`           | 10 tables      | Notion operational mirror (legacy)                        |
+| `analytics_486264460`  | —              | GA4 export                                                |
+| `searchconsole`        | —              | Search Console data                                       |
 
 ### Data Flow Layers
 
@@ -566,32 +650,32 @@ Project: `efeonce-group` (US multi-region)
 
 Cloud Functions (Python 3.12) + Cloud Run services, orchestrated by Cloud Scheduler:
 
-| Pipeline | Direction | Schedule |
-|---|---|---|
-| `notion-bq-sync` | Notion → BigQuery | Daily 3:00 AM CL |
-| `hubspot-bq-sync` | HubSpot → BigQuery | Daily 3:30 AM CL |
-| `hubspot-notion-deal-sync` | HubSpot deals → Notion | Every 15 min |
-| `notion-hubspot-reverse-sync` | Notion → HubSpot | Every 15 min |
-| `notion-frameio-sync` | Frame.io ↔ Notion reviews | Event-driven |
-| `notion-teams-notify` | Notion → MS Teams | Event-driven |
-| `hubspot-greenhouse-integration` | HubSpot ↔ Greenhouse | Bidirectional |
-| Outbox consumer | Postgres → BigQuery | Vercel cron every 5 min |
+| Pipeline                         | Direction                  | Schedule                |
+| -------------------------------- | -------------------------- | ----------------------- |
+| `notion-bq-sync`                 | Notion → BigQuery          | Daily 3:00 AM CL        |
+| `hubspot-bq-sync`                | HubSpot → BigQuery         | Daily 3:30 AM CL        |
+| `hubspot-notion-deal-sync`       | HubSpot deals → Notion     | Every 15 min            |
+| `notion-hubspot-reverse-sync`    | Notion → HubSpot           | Every 15 min            |
+| `notion-frameio-sync`            | Frame.io ↔ Notion reviews | Event-driven            |
+| `notion-teams-notify`            | Notion → MS Teams          | Event-driven            |
+| `hubspot-greenhouse-integration` | HubSpot ↔ Greenhouse      | Bidirectional           |
+| Outbox consumer                  | Postgres → BigQuery        | Vercel cron every 5 min |
 
 ## Canonical Object Graph
 
 Greenhouse is modeled around canonical enriched objects. Each object has one canonical identity; modules may contribute attributes, transactions, and extensions but must not create parallel identities.
 
-| Object | Canonical Anchor | ID Pattern | Primary Store |
-|---|---|---|---|
-| Client | `greenhouse_core.clients` | UUID | PostgreSQL |
-| Person 360 | `greenhouse_core.identity_profiles` | UUID | PostgreSQL |
-| Organization | `greenhouse_core.organizations` | EO-ORG-### | PostgreSQL |
-| Space | `greenhouse_core.spaces` | EO-SPC-### | PostgreSQL |
-| Person Membership | `greenhouse_core.person_memberships` | EO-MBR-### | PostgreSQL |
-| Service Module | `greenhouse.service_modules` | slug | BigQuery |
-| Project | `greenhouse_conformed.projects` | source ID | BigQuery |
-| Sprint | `greenhouse_conformed.sprints` | source ID | BigQuery |
-| Provider | `greenhouse_core.providers` | UUID | PostgreSQL |
+| Object            | Canonical Anchor                     | ID Pattern | Primary Store |
+| ----------------- | ------------------------------------ | ---------- | ------------- |
+| Client            | `greenhouse_core.clients`            | UUID       | PostgreSQL    |
+| Person 360        | `greenhouse_core.identity_profiles`  | UUID       | PostgreSQL    |
+| Organization      | `greenhouse_core.organizations`      | EO-ORG-### | PostgreSQL    |
+| Space             | `greenhouse_core.spaces`             | EO-SPC-### | PostgreSQL    |
+| Person Membership | `greenhouse_core.person_memberships` | EO-MBR-### | PostgreSQL    |
+| Service Module    | `greenhouse.service_modules`         | slug       | BigQuery      |
+| Project           | `greenhouse_conformed.projects`      | source ID  | BigQuery      |
+| Sprint            | `greenhouse_conformed.sprints`       | source ID  | BigQuery      |
+| Provider          | `greenhouse_core.providers`          | UUID       | PostgreSQL    |
 
 Cross-module 360 views (Person 360, Account 360) are assembled by composing data from multiple domain schemas through read-model joins, not by duplicating master records.
 
@@ -602,6 +686,7 @@ Reference: `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 ### Authentication
 
 NextAuth.js 4.24 with three providers:
+
 - Azure AD (SSO for enterprise clients)
 - Google OAuth (Efeonce internal)
 - Credentials (fallback with bcrypt-hashed passwords)
@@ -630,28 +715,31 @@ NextAuth.js 4.24 with three providers:
 The **operating entity** is the legal organization that owns and operates Greenhouse — the employer that signs payroll documents, emits DTEs, and appears on formal HR/Finance surfaces.
 
 **Resolution:**
+
 - Server-side: `getOperatingEntityIdentity()` in `src/lib/account-360/organization-identity.ts` queries `greenhouse_core.organizations WHERE is_operating_entity = TRUE`. Result is cached in memory (the operating entity does not change between requests).
 - Client-side: `OperatingEntityProvider` in `src/context/OperatingEntityContext.tsx` hydrates the data from the server layout into React context. Components consume via `useOperatingEntity()` hook — zero additional fetch.
 - API fallback: `GET /api/admin/operating-entity` returns the entity as JSON for non-React consumers (webhooks, external integrations, cron jobs). Requires authenticated session (`requireTenantContext`).
 
 **Shape:**
 
-| Field | Type | Example |
-|---|---|---|
-| `organizationId` | `string` | UUID |
-| `legalName` | `string` | `Efeonce Group SpA` |
-| `taxId` | `string` | `77.357.182-1` |
-| `taxIdType` | `string \| null` | `RUT` |
-| `legalAddress` | `string \| null` | `Dr. Manuel Barros Borgoño 71 of 05, Providencia, Chile` |
-| `country` | `string` | `CL` |
+| Field            | Type             | Example                                                  |
+| ---------------- | ---------------- | -------------------------------------------------------- |
+| `organizationId` | `string`         | UUID                                                     |
+| `legalName`      | `string`         | `Efeonce Group SpA`                                      |
+| `taxId`          | `string`         | `77.357.182-1`                                           |
+| `taxIdType`      | `string \| null` | `RUT`                                                    |
+| `legalAddress`   | `string \| null` | `Dr. Manuel Barros Borgoño 71 of 05, Providencia, Chile` |
+| `country`        | `string`         | `CL`                                                     |
 
 **Hydration flow:**
+
 ```
 Layout (server) → getOperatingEntityIdentity() → Providers.tsx (server)
   → OperatingEntityProvider (client) → useOperatingEntity() in any component
 ```
 
 **Consumers:**
+
 - Payroll receipt card + PDF (employer header)
 - Payroll period report PDF (employer header + footer)
 - Future: Finance DTEs, HR contracts, Agency proposals, email templates
@@ -668,107 +756,108 @@ Layout (server) → getOperatingEntityIdentity() → Providers.tsx (server)
 
 ### Client routes
 
-| Route | Purpose |
-|---|---|
-| `/dashboard` | Executive dashboard |
-| `/proyectos` | Project list |
-| `/proyectos/[id]` | Project detail |
-| `/sprints` | Sprint list |
-| `/sprints/[id]` | Sprint detail |
-| `/updates` | Activity feed |
-| `/settings` | User preferences |
+| Route             | Purpose             |
+| ----------------- | ------------------- |
+| `/dashboard`      | Executive dashboard |
+| `/proyectos`      | Project list        |
+| `/proyectos/[id]` | Project detail      |
+| `/sprints`        | Sprint list         |
+| `/sprints/[id]`   | Sprint detail       |
+| `/updates`        | Activity feed       |
+| `/settings`       | User preferences    |
 
 ### Finance routes
 
-| Route | Purpose |
-|---|---|
-| `/finance` | Finance dashboard (P&L, cash flow, aging) |
-| `/finance/clients` | Client accounts |
-| `/finance/clients/[id]` | Client account detail |
-| `/finance/income` | Income records |
-| `/finance/income/[id]` | Income detail |
-| `/finance/expenses` | Expense records |
-| `/finance/expenses/[id]` | Expense detail |
-| `/finance/suppliers` | Supplier directory |
-| `/finance/suppliers/[id]` | Supplier detail |
-| `/finance/reconciliation` | Reconciliation queue |
-| `/finance/reconciliation/[id]` | Reconciliation detail |
-| `/finance/intelligence` | Client economics and trends |
+| Route                          | Purpose                                   |
+| ------------------------------ | ----------------------------------------- |
+| `/finance`                     | Finance dashboard (P&L, cash flow, aging) |
+| `/finance/clients`             | Client accounts                           |
+| `/finance/clients/[id]`        | Client account detail                     |
+| `/finance/income`              | Income records                            |
+| `/finance/income/[id]`         | Income detail                             |
+| `/finance/expenses`            | Expense records                           |
+| `/finance/expenses/[id]`       | Expense detail                            |
+| `/finance/suppliers`           | Supplier directory                        |
+| `/finance/suppliers/[id]`      | Supplier detail                           |
+| `/finance/reconciliation`      | Reconciliation queue                      |
+| `/finance/reconciliation/[id]` | Reconciliation detail                     |
+| `/finance/intelligence`        | Client economics and trends               |
 
 ### HR routes
 
-| Route | Purpose |
-|---|---|
-| `/hr` | HR dashboard |
-| `/hr/departments` | Department list |
-| `/hr/leave` | Leave management |
-| `/hr/attendance` | Attendance tracking |
-| `/hr/payroll` | Payroll periods |
+| Route                           | Purpose               |
+| ------------------------------- | --------------------- |
+| `/hr`                           | HR dashboard          |
+| `/hr/departments`               | Department list       |
+| `/hr/leave`                     | Leave management      |
+| `/hr/attendance`                | Attendance tracking   |
+| `/hr/payroll`                   | Payroll periods       |
 | `/hr/payroll/member/[memberId]` | Member payroll detail |
 
 ### People routes
 
-| Route | Purpose |
-|---|---|
-| `/people` | Unified team directory |
-| `/people/[memberId]` | Person 360 (tabbed) |
+| Route                | Purpose                |
+| -------------------- | ---------------------- |
+| `/people`            | Unified team directory |
+| `/people/[memberId]` | Person 360 (tabbed)    |
 
 ### Agency routes
 
-| Route | Purpose |
-|---|---|
-| `/agency` | Agency operational dashboard |
-| `/agency/organizations` | Organization list with KPIs |
-| `/agency/organizations/[id]` | Organization detail (overview, people, finance) |
-| `/agency/spaces` | Space management |
-| `/agency/capacity` | Capacity overview |
-| `/agency/services` | Service catalog |
-| `/agency/services/[serviceId]` | Service detail |
+| Route                          | Purpose                                         |
+| ------------------------------ | ----------------------------------------------- |
+| `/agency`                      | Agency operational dashboard                    |
+| `/agency/organizations`        | Organization list with KPIs                     |
+| `/agency/organizations/[id]`   | Organization detail (overview, people, finance) |
+| `/agency/spaces`               | Space management                                |
+| `/agency/capacity`             | Capacity overview                               |
+| `/agency/services`             | Service catalog                                 |
+| `/agency/services/[serviceId]` | Service detail                                  |
 
 ### Admin routes
 
-| Route | Purpose |
-|---|---|
-| `/admin` | Admin landing |
-| `/admin/tenants` | Tenant list |
-| `/admin/tenants/[id]` | Tenant detail with capabilities |
-| `/admin/tenants/[id]/capability-preview/[moduleId]` | Capability preview |
-| `/admin/tenants/[id]/view-as/dashboard` | Admin impersonation |
-| `/admin/users` | User list |
-| `/admin/users/[id]` | User detail |
-| `/admin/roles` | Role management |
-| `/admin/ai-tools` | AI tools administration |
-| `/admin/team` | Team roster |
-| `GET /api/admin/operating-entity` | Operating entity identity (legal name, RUT, address) |
+| Route                                               | Purpose                                              |
+| --------------------------------------------------- | ---------------------------------------------------- |
+| `/admin`                                            | Admin landing                                        |
+| `/admin/tenants`                                    | Tenant list                                          |
+| `/admin/tenants/[id]`                               | Tenant detail with capabilities                      |
+| `/admin/tenants/[id]/capability-preview/[moduleId]` | Capability preview                                   |
+| `/admin/tenants/[id]/view-as/dashboard`             | Admin impersonation                                  |
+| `/admin/users`                                      | User list                                            |
+| `/admin/users/[id]`                                 | User detail                                          |
+| `/admin/roles`                                      | Role management                                      |
+| `/admin/ai-tools`                                   | AI tools administration                              |
+| `/admin/team`                                       | Team roster                                          |
+| `GET /api/admin/operating-entity`                   | Operating entity identity (legal name, RUT, address) |
 
 ### Internal routes
 
-| Route | Purpose |
-|---|---|
+| Route                 | Purpose       |
+| --------------------- | ------------- |
 | `/internal/dashboard` | Control tower |
 
 ### Capability routes
 
-| Route | Purpose |
-|---|---|
+| Route                      | Purpose                         |
+| -------------------------- | ------------------------------- |
 | `/capabilities/[moduleId]` | Dynamic capability module pages |
 
 ### Other routes
 
-| Route | Purpose |
-|---|---|
-| `/home` | Landing redirect |
-| `/about` | About page |
-| `/auth/landing` | Auth landing |
-| `/login` | Login page |
-| `/auth/access-denied` | Access denied |
-| `/developers/api` | Developer API docs |
+| Route                 | Purpose            |
+| --------------------- | ------------------ |
+| `/home`               | Landing redirect   |
+| `/about`              | About page         |
+| `/auth/landing`       | Auth landing       |
+| `/login`              | Login page         |
+| `/auth/access-denied` | Access denied      |
+| `/developers/api`     | Developer API docs |
 
 ## Service Module Capability Layer
 
 Greenhouse adapts product surfaces to the services a client has contracted. This avoids hardcoding dashboard variants by tenant name and keeps CRM, creative, and web experiences composable.
 
 Architecture:
+
 - Capability catalog lives in `src/config/capability-registry.ts`
 - Module assignments are tenant-level configuration
 - Navigation is filtered by `routeGroups` plus capability availability
@@ -781,6 +870,7 @@ Current capability modules: CRM Command Center, Creative Hub, Web Delivery Lab, 
 ### Executive UI System
 
 Dashboard and executive surfaces converge on a stable visual hierarchy:
+
 - One dominant hero card (`ExecutiveHeroCard`)
 - Compact summary cards (`ExecutiveMiniStatCard`, `MetricStatCard`)
 - Medium analysis cards with `CardHeader` framing (`ExecutiveCardShell`)
@@ -811,12 +901,12 @@ Reference: `docs/ui/GREENHOUSE_EXECUTIVE_UI_SYSTEM_V1.md`
 
 ### Google Cloud
 
-| Service | Region | Purpose |
-|---|---|---|
-| Cloud SQL (`greenhouse-pg-dev`) | us-east4 | PostgreSQL 16 OLTP |
-| BigQuery (`efeonce-group`) | US | OLAP warehouse |
-| Cloud Run (10 services) | us-central1 | Sync pipelines and integrations |
-| Cloud Scheduler (6 jobs) | — | 4 active, 2 paused (staging) |
+| Service                         | Region      | Purpose                         |
+| ------------------------------- | ----------- | ------------------------------- |
+| Cloud SQL (`greenhouse-pg-dev`) | us-east4    | PostgreSQL 16 OLTP              |
+| BigQuery (`efeonce-group`)      | US          | OLAP warehouse                  |
+| Cloud Run (10 services)         | us-central1 | Sync pipelines and integrations |
+| Cloud Scheduler (6 jobs)        | —           | 4 active, 2 paused (staging)    |
 
 ## Testing
 
@@ -836,10 +926,10 @@ Vitest con `@testing-library/react` para unit tests de funciones puras.
 
 ### Cobertura actual
 
-| Suite | Módulo | Qué valida |
-|-------|--------|------------|
-| `bonus-proration.test.ts` | `src/lib/payroll/` | Prorrateo OTD% y RPA para cálculo de bonos |
-| `fetch-attendance-for-period.test.ts` | `src/lib/payroll/` | Conteo de días hábiles |
+| Suite                                 | Módulo             | Qué valida                                 |
+| ------------------------------------- | ------------------ | ------------------------------------------ |
+| `bonus-proration.test.ts`             | `src/lib/payroll/` | Prorrateo OTD% y RPA para cálculo de bonos |
+| `fetch-attendance-for-period.test.ts` | `src/lib/payroll/` | Conteo de días hábiles                     |
 
 ### Ejecución
 

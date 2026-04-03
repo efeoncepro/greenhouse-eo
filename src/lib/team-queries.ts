@@ -977,8 +977,14 @@ const buildResponsableSignals = (columns: Set<string>) => {
 
   const responsableEmailSelect = 'CAST(NULL AS STRING) AS responsable_email,'
 
-  const responsableNotionIdSelect = columns.has('responsables_ids')
-    ? 't.responsables_ids[SAFE_OFFSET(0)] AS responsable_notion_id,'
+  const hasResponsableIds = columns.has('responsables_ids') || columns.has('responsable_ids')
+
+  const responsableNotionIdSelect = hasResponsableIds
+    ? columns.has('responsables_ids') && columns.has('responsable_ids')
+      ? 'COALESCE(t.responsables_ids[SAFE_OFFSET(0)], t.responsable_ids[SAFE_OFFSET(0)]) AS responsable_notion_id,'
+      : columns.has('responsables_ids')
+        ? 't.responsables_ids[SAFE_OFFSET(0)] AS responsable_notion_id,'
+        : 't.responsable_ids[SAFE_OFFSET(0)] AS responsable_notion_id,'
     : 'CAST(NULL AS STRING) AS responsable_notion_id,'
 
   return {

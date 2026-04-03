@@ -108,6 +108,26 @@ describe('getPeopleList', () => {
       expect(result.summary.coveredClients).toBe(5)
     })
 
+    it('keeps the people roster available when capacity snapshot access is denied', async () => {
+      mockIsConfigured.mockReturnValue(true)
+      mockPgQuery
+        .mockResolvedValueOnce([makePgRow()])
+        .mockResolvedValueOnce([{ covered_clients: 5 }])
+      mockCapacityBatch.mockRejectedValueOnce(new Error('permission denied for table member_capacity_economics'))
+
+      const result = await getPeopleList()
+
+      expect(result.items).toHaveLength(1)
+      expect(result.items[0]).toMatchObject({
+        memberId: 'member-1',
+        displayName: 'Test Person',
+        contractedFte: 1,
+        assignedFte: 0,
+        totalAssignments: 0
+      })
+      expect(result.summary.coveredClients).toBe(5)
+    })
+
     it('computes summary from capacity snapshots', async () => {
       mockIsConfigured.mockReturnValue(true)
       mockPgQuery

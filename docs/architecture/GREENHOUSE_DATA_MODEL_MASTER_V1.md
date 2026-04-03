@@ -1,5 +1,19 @@
 # Greenhouse Data Model Master V1
 
+## Delta 2026-04-02 — Delivery member attribution is no longer multi-credit by default
+
+`TASK-199` cambia la lectura canónica de atribución member-level para Delivery:
+
+- `assignee_member_id` sigue representando el primer responsable de Notion resuelto a `member`
+- `assignee_member_ids` sigue preservando todos los responsables resueltos para trazabilidad y contexto
+- pero `ICO` member-level y el `Performance Report` ya no deben asumir co-crédito automático por `UNNEST(assignee_member_ids)`
+
+Regla vigente:
+
+- member attribution canónica = `primary owner member`
+- `assignee_member_ids` queda como fidelidad del source sync, no como contrato único de reporting
+- si el owner principal no resuelve a `member`, la tarea puede seguir entrando a agregados de `space` / `agency` sin acreditar a un miembro interno
+
 ## Delta 2026-03-31 — Shared assets registry en PostgreSQL + bytes en GCS
 
 `TASK-173` deja fijado el patrón canónico de archivos del portal:
@@ -122,7 +136,7 @@ Mutable finance runtime. Owns all transactional financial data.
 - `income_payments` — individual collection records per invoice (replaces JSON array in BigQuery)
 - `factoring_operations` — invoice factoring/assignment operations (NEW — not in BigQuery)
 - `expenses` — operational expenditures (payroll, suppliers, taxes, financial costs)
-- `client_profiles` — billing profile per client (compat layer, eventually absorbable into `clients`)
+- `client_profiles` — billing profile per client organization; canonical FK is `organization_id`, while `client_id` remains as compat bridge for legacy commercial/runtime consumers
 - `reconciliation_periods` — monthly bank reconciliation periods per account
 - `bank_statement_rows` — imported bank statement lines matched against income/expenses
 
@@ -155,7 +169,8 @@ Key rules:
 
 #### Anchors
 
-- `client_id -> greenhouse_core.clients`
+- `organization_id -> greenhouse_core.organizations` (canonical B2B anchor for finance clients)
+- `client_id -> greenhouse_core.clients` (compat/commercial bridge while downstream consumers still depend on it)
 - `member_id -> greenhouse_core.members`
 - `provider_id -> greenhouse_core.providers` (for suppliers AND factoring providers)
 - `user_id references -> greenhouse_core.client_users`
@@ -247,6 +262,7 @@ Core rule:
 - includes type coercion rules (16 built-in rules for handling Notion type heterogeneity)
 - Spaces without entries use hardcoded default mapping (backward compatible)
 - populated via `scripts/notion-schema-discovery.ts` during Space onboarding
+- after `TASK-187`, explicit governance/readiness can exist even when this table is still empty; the current runtime cron still falls back to default mappings unless an override lane consumes this table
 
 ### `greenhouse_sync`
 
@@ -258,9 +274,14 @@ Current objects:
 - `source_sync_runs`
 - `source_sync_watermarks`
 - `source_sync_failures`
+- `integration_registry` — central registry of native integrations (`TASK-188`). Stores taxonomy (`system_upstream`, `event_provider`, `batch_file`, `api_connector`, `hybrid`), ownership, readiness status, consumer domains, auth mode and sync cadence per upstream.
+- `notion_space_schema_snapshots` — versioned schema snapshots per `space_id` and Notion DB role (`TASK-187`)
+- `notion_space_schema_drift_events` — persisted additive/warning/breaking drift records for Notion per `space_id`
+- `notion_space_kpi_readiness` — per-space KPI contract readiness for Notion-backed Delivery/ICO consumers
 
 Rule:
 - every cross-system sync must register control-plane state here
+- every native integration must be registered in `integration_registry` with explicit taxonomy, ownership and readiness
 
 ### `greenhouse_serving`
 
@@ -321,11 +342,26 @@ Normalized external entities.
 
 Current tables:
 - `delivery_projects`
-- `delivery_tasks` — includes `assignee_member_id STRING` (first Notion responsable resolved to Greenhouse member ID) and `assignee_member_ids ARRAY<STRING>` (all Notion responsables resolved; enables person-level ICO metrics via UNNEST)
+- `delivery_tasks` — includes `project_source_id STRING`, `project_source_ids ARRAY<STRING>`, `assignee_member_id STRING` (first Notion responsable resolved to Greenhouse member ID) and `assignee_member_ids ARRAY<STRING>` (all Notion responsables resolved; enables person-level ICO metrics via UNNEST)
 - `delivery_sprints`
 - `crm_companies`
 - `crm_deals`
 - `crm_contacts`
+
+Runtime parity note:
+- `greenhouse_delivery.tasks` is being extended additively to preserve `assignee_source_id`, `assignee_member_ids TEXT[]`, and `project_source_ids TEXT[]`, while keeping `assignee_member_id` and `notion_project_id` for backward compatibility with existing runtime readers.
+
+Delta 2026-04-02:
+- `TASK-198` adds an explicit Delivery identity coverage audit lane over `greenhouse_conformed.delivery_tasks`
+- the audit is scoped by `space_id` and monthly `due_date` window, because that is the reporting anchor ratified for `Performance Report`
+- recommended outputs are:
+  - `totalTaskCount`
+  - `tasksWithAssigneeSourceId`
+  - `tasksWithAssigneeMemberId`
+  - `tasksWithAssigneeMemberIds`
+  - `coveragePct`
+  - `coveragePctWithMemberIds`
+  - unresolved `assignee_source_id` breakdown
 
 Required next slice:
 - if needed, `crm_company_contacts`

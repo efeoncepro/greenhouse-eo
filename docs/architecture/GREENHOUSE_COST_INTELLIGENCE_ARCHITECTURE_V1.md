@@ -1,5 +1,18 @@
 # GREENHOUSE_COST_INTELLIGENCE_ARCHITECTURE_V1.md
 
+## Delta 2026-03-31 — Finance ledger más expresivo para consumers downstream
+- `TASK-182` + `TASK-183` dejan explícito que Cost Intelligence ya no debe inferir parte de la semántica fina de gastos desde surfaces ambiguas.
+- El ledger `greenhouse_finance.expenses` ahora expone mejor contexto operativo para consumers:
+  - `space_id`
+  - `source_type`
+  - `payment_provider`
+  - `payment_rail`
+  - `cost_category`
+- Implicancia:
+  - Cost Intelligence sigue consumiendo `finance.expense.created|updated`
+  - pero puede distinguir mejor gasto manual vs system-generated, tenant scope y fees financieros sin reinventar clasificación local
+- La regla anti-doble-conteo de payroll se mantiene: los expenses derivados desde `payroll_period.exported` deben convivir con `member_capacity_economics` y `operational_pl` sin sumar dos veces el mismo costo laboral.
+
 ## Delta 2026-03-30 — Consumers distribuidos ya iniciaron cutover
 - `TASK-071` ya no está solo en diseño.
 - Consumers que ya leen serving materializado:
@@ -16,6 +29,14 @@
   - validación visual
   - cierre semántico de fallbacks
   - cierre formal de `TASK-070` y `TASK-071`
+
+## Delta 2026-04-02 — Agency reads space serving first
+
+`TASK-192` endurece el serving-first de Cost Intelligence para consumers downstream:
+
+- `agency-finance-metrics.ts` ya no lee snapshots `scope_type='client'` como fuente primaria; ahora prioriza `scope_type='space'` y devuelve `clientId` solo como compat para Agency UI actual.
+- `operational_pl` mantiene `scope_type='organization'` como serving vigente y ahora también aprovecha contexto organizacional persistido desde sus truth layers cuando el bridge por cliente no basta.
+- el baseline real de `greenhouse_serving.operational_pl_snapshots` ya era multi-scope (`client`, `space`, `organization`); la lane no crea esos scopes, sino que endurece los inputs materializados para que el serving organization/space no dependa de bridges client-first implícitos.
 
 ## Delta 2026-03-30 — La atribución comercial excluye assignments internos
 - Se formaliza una regla canónica compartida con Team Capacity y Finance:

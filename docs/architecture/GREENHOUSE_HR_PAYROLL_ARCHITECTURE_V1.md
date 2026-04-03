@@ -1,5 +1,21 @@
 # GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md
 
+## Delta 2026-03-31 — Exported también alimenta el ledger de Finance
+
+El cierre `payroll_period.exported` ya no solo dispara recibos/notificaciones downstream.
+
+Estado vigente:
+- `payroll_period.exported` sigue siendo el evento canónico de cierre/exportación
+- ese mismo hito ahora también alimenta el intake reactivo de `Finance > Expenses`
+- la materialización downstream genera expenses system-generated para:
+  - `payroll`
+  - `social_security`
+
+Regla:
+- Payroll sigue siendo owner del cálculo y lifecycle del período
+- Finance sigue siendo owner del ledger `expenses`
+- el bridge entre ambos dominios debe salir de `payroll_period.exported`, no de `approved` ni de acciones manuales en el drawer
+
 ## Delta 2026-03-31 — Leave draft uploads resuelven ownerMemberId de forma robusta
 
 `leave` ya no debe depender exclusivamente de `tenant.memberId` en sesión para ownership documental de borradores.

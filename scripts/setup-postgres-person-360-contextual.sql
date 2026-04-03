@@ -143,9 +143,14 @@ SELECT
   -- ─── Member profile ───
   m.job_level,
   m.employment_type,
+  m.contract_type,
+  m.pay_regime,
+  m.payroll_via,
   m.hire_date,
   m.contract_end_date,
   m.daily_required,
+  m.daily_required            AS schedule_required,
+  m.deel_contract_id,
   m.reports_to_member_id,
   mgr.display_name            AS supervisor_name,
 
@@ -169,10 +174,10 @@ SELECT
   COALESCE(req.total_approved_days, 0)  AS total_approved_days_this_year,
 
   -- ─── Compensation snapshot (for HR context) ───
-  cv.pay_regime,
+  cv.pay_regime               AS compensation_pay_regime,
   cv.currency                 AS comp_currency,
   cv.base_salary,
-  cv.contract_type
+  cv.contract_type            AS compensation_contract_type
 
 FROM greenhouse_core.identity_profiles AS ip
 
@@ -214,7 +219,11 @@ LEFT JOIN LATERAL (
 
 -- Compensation snapshot (lightweight, for HR context)
 LEFT JOIN LATERAL (
-  SELECT cv_inner.pay_regime, cv_inner.currency, cv_inner.base_salary, cv_inner.contract_type
+  SELECT
+    cv_inner.pay_regime,
+    cv_inner.currency,
+    cv_inner.base_salary,
+    cv_inner.contract_type
   FROM greenhouse_payroll.compensation_versions cv_inner
   WHERE cv_inner.member_id = m.member_id
     AND cv_inner.effective_from <= CURRENT_DATE

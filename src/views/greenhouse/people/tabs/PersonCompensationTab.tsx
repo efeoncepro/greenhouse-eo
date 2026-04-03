@@ -12,6 +12,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import type { CompensationVersion } from '@/types/payroll'
+import { contractTypeLabel, payrollViaLabel } from '@views/greenhouse/hr-core/helpers'
 import { formatCurrency, regimeLabel } from '@views/greenhouse/payroll/helpers'
 
 type Props = {
@@ -67,16 +68,31 @@ const PersonCompensationTab = ({ compensation, onEdit }: Props) => {
         }
       />
       <CardContent>
-        <DetailRow label='Salario base' value={formatCurrency(c.baseSalary, currency)} />
-        <DetailRow label='Bono conectividad' value={formatCurrency(c.remoteAllowance, currency)} />
+        <DetailRow label={c.payrollVia === 'deel' ? 'Monto registrado' : 'Salario base'} value={formatCurrency(c.baseSalary, currency)} />
+        {c.payrollVia !== 'deel' && (
+          <DetailRow label='Bono conectividad' value={formatCurrency(c.remoteAllowance, currency)} />
+        )}
         <DetailRow label='Régimen' value={`${regimeLabel[c.payRegime]} (${currency})`} />
+        <DetailRow label='Pago vía' value={c.payrollVia ? payrollViaLabel[c.payrollVia] ?? c.payrollVia : '—'} />
+        <DetailRow label='Contrato' value={c.contractType ? contractTypeLabel[c.contractType] ?? c.contractType : '—'} />
+        {c.deelContractId && <DetailRow label='Contrato Deel' value={c.deelContractId} />}
 
         <Divider sx={{ my: 2 }} />
         <Typography variant='subtitle2' sx={{ mb: 1 }}>Bonos variables</Typography>
         <DetailRow label='Bono On-Time' value={formatCurrency(c.bonusOtdMax, currency)} />
         <DetailRow label='Bono RpA' value={formatCurrency(c.bonusRpaMax, currency)} />
 
-        {c.payRegime === 'chile' && (
+        {c.contractType === 'honorarios' ? (
+          <>
+            <Divider sx={{ my: 2 }} />
+            <Typography variant='subtitle2' sx={{ mb: 1 }}>Retención honorarios</Typography>
+            <DetailRow
+              label='Tasa SII'
+              value={c.siiRetentionRate != null ? `${(c.siiRetentionRate * 100).toFixed(2)}%` : '—'}
+            />
+            <DetailRow label='Retención estimada' value={formatCurrency(c.siiRetentionAmount, 'CLP')} />
+          </>
+        ) : c.payRegime === 'chile' && c.payrollVia === 'internal' ? (
           <>
             <Divider sx={{ my: 2 }} />
             <Typography variant='subtitle2' sx={{ mb: 1 }}>Previsión Chile</Typography>
@@ -88,10 +104,6 @@ const PersonCompensationTab = ({ compensation, onEdit }: Props) => {
               value={c.healthSystem === 'fonasa' ? 'Fonasa (7%)' : `Isapre (${c.healthPlanUf ?? '—'} UF)`}
             />
             <DetailRow
-              label='Contrato'
-              value={c.contractType === 'indefinido' ? 'Indefinido' : 'Plazo fijo'}
-            />
-            <DetailRow
               label='Cesantía'
               value={`${((c.unemploymentRate ?? 0) * 100).toFixed(1)}%`}
             />
@@ -99,7 +111,7 @@ const PersonCompensationTab = ({ compensation, onEdit }: Props) => {
               <DetailRow label='APV' value='Sí' />
             )}
           </>
-        )}
+        ) : null}
       </CardContent>
     </Card>
   )

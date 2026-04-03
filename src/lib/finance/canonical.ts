@@ -8,18 +8,33 @@ import {
 } from '@/lib/finance/shared'
 import { resolveOrganizationForClient } from '@/lib/account-360/organization-identity'
 import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
+import { resolveExpenseSpaceScope } from '@/lib/finance/expense-scope'
 
 type ClientRow = {
-  client_id: string
+  client_id: string | null
   client_name: string
   hubspot_company_id: string | null
+}
+
+type SpaceRow = {
+  space_id: string
 }
 
 type ClientProfileRow = {
   client_profile_id: string
   client_id: string | null
+  organization_id: string | null
   hubspot_company_id: string | null
   legal_name: string | null
+}
+
+type OrganizationRow = {
+  organization_id: string
+  organization_name: string
+  legal_name: string | null
+  hubspot_company_id: string | null
+  client_id: string | null
+  space_id: string | null
 }
 
 type PayrollEntryRow = {
@@ -40,6 +55,7 @@ export type ResolvedFinanceClientContext = {
   clientName: string | null
   legalName: string | null
   organizationId: string | null
+  spaceId: string | null
 }
 
 export type ResolvedFinanceMemberContext = {
@@ -48,6 +64,8 @@ export type ResolvedFinanceMemberContext = {
   payrollEntryId: string | null
   payrollPeriodId: string | null
 }
+
+export type ResolvedFinanceDownstreamScope = ResolvedFinanceClientContext
 
 const preferClientRow = ({
   clientRows,
@@ -122,56 +140,123 @@ const preferClientProfileRow = ({
 }
 
 export const resolveFinanceClientContext = async ({
+  organizationId,
   clientId,
   clientProfileId,
   hubspotCompanyId
 }: {
+  organizationId?: unknown
   clientId?: unknown
   clientProfileId?: unknown
   hubspotCompanyId?: unknown
 }): Promise<ResolvedFinanceClientContext> => {
+  const normalizedOrganizationId = normalizeString(organizationId)
   const normalizedClientId = normalizeString(clientId)
   const normalizedClientProfileId = normalizeString(clientProfileId)
   const normalizedHubspotCompanyId = normalizeString(hubspotCompanyId)
 
-  if (!normalizedClientId && !normalizedClientProfileId && !normalizedHubspotCompanyId) {
+  if (!normalizedOrganizationId && !normalizedClientId && !normalizedClientProfileId && !normalizedHubspotCompanyId) {
     return {
       clientId: null,
       clientProfileId: null,
       hubspotCompanyId: null,
       clientName: null,
       legalName: null,
-      organizationId: null
+      organizationId: null,
+      spaceId: null
     }
   }
 
-  // Postgres-first: resolve from greenhouse_core.clients and greenhouse_finance.client_profiles
+  // Postgres-first: resolve from greenhouse_core.organizations and greenhouse_finance.client_profiles
   const { runGreenhousePostgresQuery } = await import('@/lib/postgres/client')
 
-  let clientRows: ClientRow[] = []
+    let clientRows: ClientRow[] = []
   let profileRows: ClientProfileRow[] = []
+  let organizationRows: OrganizationRow[] = []
 
   try {
     clientRows = await runGreenhousePostgresQuery<ClientRow>(
-      `SELECT client_id, client_name, hubspot_company_id
-       FROM greenhouse_core.clients
-       WHERE active = TRUE
+      `WITH client_bridge AS (
+         SELECT DISTINCT ON (organization_id)
+           organization_id,
+           client_id
+         FROM greenhouse_core.spaces
+         WHERE organization_id IS NOT NULL
+           AND client_id IS NOT NULL
+           AND active = TRUE
+         ORDER BY organization_id, updated_at DESC NULLS LAST, created_at DESC NULLS LAST, space_id ASC
+       )
+       SELECT DISTINCT ON (COALESCE(cp.client_id, cb.client_id, o.organization_id))
+         COALESCE(cp.client_id, cb.client_id) AS client_id,
+         COALESCE(o.organization_name, o.legal_name, cp.legal_name, 'Organization') AS client_name,
+         COALESCE(cp.hubspot_company_id, o.hubspot_company_id) AS hubspot_company_id
+       FROM greenhouse_core.organizations o
+       LEFT JOIN greenhouse_finance.client_profiles cp ON cp.organization_id = o.organization_id
+       LEFT JOIN client_bridge cb ON cb.organization_id = o.organization_id
+       WHERE o.active = TRUE
+         AND COALESCE(o.organization_type, 'other') IN ('client', 'both')
          AND (
-           ($1 != '' AND client_id = $1)
-           OR ($2 != '' AND hubspot_company_id = $2)
-         )`,
-      [normalizedClientId, normalizedHubspotCompanyId]
+           ($1 != '' AND COALESCE(cp.client_id, cb.client_id) = $1)
+           OR ($2 != '' AND COALESCE(cp.hubspot_company_id, o.hubspot_company_id) = $2)
+           OR ($3 != '' AND o.organization_id = $3)
+           OR ($4 != '' AND cp.client_profile_id = $4)
+         )
+       ORDER BY COALESCE(cp.client_id, cb.client_id, o.organization_id), cp.updated_at DESC NULLS LAST, cp.created_at DESC NULLS LAST, o.updated_at DESC NULLS LAST`,
+      [normalizedClientId, normalizedHubspotCompanyId, normalizedOrganizationId, normalizedClientProfileId]
     )
 
     profileRows = await runGreenhousePostgresQuery<ClientProfileRow>(
-      `SELECT client_profile_id, client_id, hubspot_company_id, legal_name
-       FROM greenhouse_finance.client_profiles
+      `SELECT
+         cp.client_profile_id,
+         cp.client_id,
+         COALESCE(cp.organization_id, s.organization_id) AS organization_id,
+         cp.hubspot_company_id,
+         cp.legal_name
+       FROM greenhouse_finance.client_profiles cp
+       LEFT JOIN greenhouse_core.spaces s
+         ON s.client_id = cp.client_id
+        AND s.organization_id IS NOT NULL
+        AND s.active = TRUE
        WHERE (
          ($1 != '' AND client_profile_id = $1)
          OR ($2 != '' AND (client_id = $2 OR client_profile_id = $2))
          OR ($3 != '' AND hubspot_company_id = $3)
+         OR ($4 != '' AND COALESCE(cp.organization_id, s.organization_id) = $4)
        )`,
-      [normalizedClientProfileId, normalizedClientId, normalizedHubspotCompanyId]
+      [normalizedClientProfileId, normalizedClientId, normalizedHubspotCompanyId, normalizedOrganizationId]
+    )
+
+    organizationRows = await runGreenhousePostgresQuery<OrganizationRow>(
+      `SELECT DISTINCT ON (o.organization_id)
+         o.organization_id,
+         o.organization_name,
+         o.legal_name,
+         o.hubspot_company_id,
+         s.client_id,
+         s.space_id
+       FROM greenhouse_core.organizations o
+       LEFT JOIN greenhouse_core.spaces s
+         ON s.organization_id = o.organization_id
+        AND s.active = TRUE
+       WHERE o.active = TRUE
+         AND COALESCE(o.organization_type, 'other') IN ('client', 'both')
+         AND (
+           ($1 != '' AND o.organization_id = $1)
+           OR ($2 != '' AND o.hubspot_company_id = $2)
+           OR ($3 != '' AND s.client_id = $3)
+           OR ($4 != '' AND EXISTS (
+             SELECT 1
+             FROM greenhouse_finance.client_profiles cp2
+             LEFT JOIN greenhouse_core.spaces s2
+               ON s2.client_id = cp2.client_id
+              AND s2.organization_id IS NOT NULL
+              AND s2.active = TRUE
+             WHERE cp2.client_profile_id = $4
+               AND COALESCE(cp2.organization_id, s2.organization_id) = o.organization_id
+           ))
+         )
+       ORDER BY o.organization_id, s.updated_at DESC NULLS LAST, s.created_at DESC NULLS LAST, s.space_id ASC`,
+      [normalizedOrganizationId, normalizedHubspotCompanyId, normalizedClientId, normalizedClientProfileId]
     )
   } catch (error) {
     if (!shouldFallbackFromFinancePostgres(error)) {
@@ -193,7 +278,7 @@ export const resolveFinanceClientContext = async ({
     `, { clientId: normalizedClientId, hubspotCompanyId: normalizedHubspotCompanyId })
 
     profileRows = await runFinanceQuery<ClientProfileRow>(`
-      SELECT client_profile_id, client_id, hubspot_company_id, legal_name
+      SELECT client_profile_id, client_id, NULL AS organization_id, hubspot_company_id, legal_name
       FROM \`${projectId}.greenhouse.fin_client_profiles\`
       WHERE (
         (@clientProfileId != '' AND client_profile_id = @clientProfileId)
@@ -215,6 +300,13 @@ export const resolveFinanceClientContext = async ({
     normalizedClientId,
     normalizedHubspotCompanyId
   })
+
+  const preferredOrganization = organizationRows[0] ?? null
+
+  const resolvedOrganizationId = normalizedOrganizationId
+    || normalizeString(preferredProfile?.organization_id)
+    || normalizeString(preferredOrganization?.organization_id)
+    || ''
 
   if (
     normalizedClientId
@@ -238,18 +330,29 @@ export const resolveFinanceClientContext = async ({
     normalizedHubspotCompanyId
     && !clientRows.some(row => normalizeString(row.hubspot_company_id) === normalizedHubspotCompanyId)
     && !profileRows.some(row => normalizeString(row.hubspot_company_id) === normalizedHubspotCompanyId)
+    && !organizationRows.some(row => normalizeString(row.hubspot_company_id) === normalizedHubspotCompanyId)
   ) {
     throw new FinanceValidationError('hubspotCompanyId does not exist in the finance client context.', 409)
+  }
+
+  if (
+    normalizedOrganizationId
+    && !profileRows.some(row => normalizeString(row.organization_id) === normalizedOrganizationId)
+    && !organizationRows.some(row => normalizeString(row.organization_id) === normalizedOrganizationId)
+  ) {
+    throw new FinanceValidationError('organizationId does not exist in the finance client context.', 409)
   }
 
   const canonicalClientId = normalizedClientId
     || normalizeString(preferredProfile?.client_id)
     || normalizeString(preferredClient?.client_id)
+    || normalizeString(preferredOrganization?.client_id)
     || ''
 
   const canonicalHubspotCompanyId = normalizedHubspotCompanyId
     || normalizeString(preferredProfile?.hubspot_company_id)
     || normalizeString(preferredClient?.hubspot_company_id)
+    || normalizeString(preferredOrganization?.hubspot_company_id)
     || ''
 
   if (normalizedClientId && preferredClient && normalizeString(preferredClient.client_id) !== normalizedClientId) {
@@ -283,18 +386,93 @@ export const resolveFinanceClientContext = async ({
     throw new FinanceValidationError('clientProfileId points to a different HubSpot company than hubspotCompanyId.', 409)
   }
 
-  // Resolve organization_id via spaces bridge (PostgreSQL)
-  const organizationId = canonicalClientId
-    ? await resolveOrganizationForClient(canonicalClientId)
-    : null
+  let spaceId: string | null = normalizeString(preferredOrganization?.space_id) || null
+
+  if (!spaceId && canonicalClientId) {
+    const { runGreenhousePostgresQuery } = await import('@/lib/postgres/client')
+
+    const pgSpaceRows = await runGreenhousePostgresQuery<SpaceRow>(
+      `SELECT space_id
+       FROM greenhouse_core.spaces
+       WHERE client_id = $1
+         AND active = TRUE
+       ORDER BY updated_at DESC NULLS LAST, created_at DESC NULLS LAST, space_id ASC
+       LIMIT 1`,
+      [canonicalClientId]
+    ).catch(() => [])
+
+    spaceId = normalizeString(pgSpaceRows[0]?.space_id) || null
+  }
+
+  const organizationIdFromBridge =
+    canonicalClientId && !resolvedOrganizationId
+      ? await resolveOrganizationForClient(canonicalClientId)
+      : null
 
   return {
     clientId: canonicalClientId || null,
     clientProfileId: normalizeString(preferredProfile?.client_profile_id) || null,
     hubspotCompanyId: canonicalHubspotCompanyId || null,
-    clientName: normalizeString(preferredClient?.client_name) || null,
-    legalName: normalizeString(preferredProfile?.legal_name) || null,
-    organizationId
+    clientName:
+      normalizeString(preferredClient?.client_name)
+      || normalizeString(preferredOrganization?.organization_name)
+      || null,
+    legalName:
+      normalizeString(preferredProfile?.legal_name)
+      || normalizeString(preferredOrganization?.legal_name)
+      || null,
+    organizationId: resolvedOrganizationId || organizationIdFromBridge || null,
+    spaceId
+  }
+}
+
+export const resolveFinanceDownstreamScope = async ({
+  organizationId,
+  clientId,
+  clientProfileId,
+  hubspotCompanyId,
+  requestedSpaceId,
+  allocatedClientId,
+  requireLegacyClientBridge = false
+}: {
+  organizationId?: unknown
+  clientId?: unknown
+  clientProfileId?: unknown
+  hubspotCompanyId?: unknown
+  requestedSpaceId?: unknown
+  allocatedClientId?: unknown
+  requireLegacyClientBridge?: boolean
+}): Promise<ResolvedFinanceDownstreamScope> => {
+  const resolvedClient = await resolveFinanceClientContext({
+    organizationId,
+    clientId,
+    clientProfileId,
+    hubspotCompanyId
+  })
+
+  const resolvedScope = await resolveExpenseSpaceScope({
+    requestedSpaceId: normalizeString(requestedSpaceId) || resolvedClient.spaceId,
+    requestedOrganizationId: normalizeString(organizationId) || resolvedClient.organizationId,
+    requestedClientId: resolvedClient.clientId,
+    allocatedClientId: normalizeString(allocatedClientId)
+  })
+
+  const effectiveClientId = resolvedScope.clientId || resolvedClient.clientId || null
+  const effectiveOrganizationId = resolvedScope.organizationId || resolvedClient.organizationId || null
+  const effectiveSpaceId = resolvedScope.spaceId || resolvedClient.spaceId || null
+
+  if (requireLegacyClientBridge && !effectiveClientId) {
+    throw new FinanceValidationError(
+      'This flow still requires a legacy clientId bridge. Provide a spaceId tied to the organization or complete the client bridge in Finance Clients.',
+      422
+    )
+  }
+
+  return {
+    ...resolvedClient,
+    clientId: effectiveClientId,
+    organizationId: effectiveOrganizationId,
+    spaceId: effectiveSpaceId
   }
 }
 

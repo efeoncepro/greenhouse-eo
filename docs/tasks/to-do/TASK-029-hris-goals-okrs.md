@@ -1,5 +1,16 @@
 # CODEX TASK — HRIS Fase 2B: Goals y OKRs
 
+## Delta 2026-04-01 — TASK-026 ya resuelta
+
+- Esta lane ya no depende de una migración futura de contratos: `greenhouse_core.members` expone `contract_type`, `pay_regime`, `payroll_via` y `deel_contract_id` como canon vigente.
+- Las reglas de acceso y elegibilidad deben leer esos campos desde `members.*`, no desde `compensation_versions` ni desde `employment_type`.
+- `daily_required` sigue siendo el backing field almacenado; si Goals necesita distinguir participación operativa/schedule, debe consumir `daily_required` o el alias de lectura `schedule_required`, pero no proponer una segunda columna.
+
+## Delta 2026-04-01
+
+- `greenhouse_core.departments` ya es runtime operacional Postgres-first por cierre de `TASK-180`.
+- Los futuros owners por departamento de esta lane no deben introducir reads o writes contra `greenhouse.departments` en BigQuery.
+
 ## Delta 2026-03-27 — Alineación arquitectónica
 
 - **Fuente ICO corregida**: las métricas ICO como contexto operativo (RpA, OTD%, throughput) deben leerse de `greenhouse_serving.ico_member_metrics` (PostgreSQL serving view, materializada por `src/lib/sync/projections/ico-member-metrics.ts`). NO leer de BigQuery `member_performance_snapshots` ni de `notion_ops` directo.
@@ -46,11 +57,11 @@ Implementar el **módulo de objetivos y OKRs** del HRIS en Greenhouse. Permite d
 
 | Dependencia | Estado | Impacto si no está |
 |---|---|---|
-| Fase 0.5 (contract types) | Prerequisito | Elegibilidad por `contract_type` |
+| Fase 0.5 (contract types) | Cerrada | Ya existe canon en `greenhouse_core.members` para elegibilidad por `contract_type` / `payroll_via` |
 | `greenhouse_hr` schema | Existe | Tablas van aquí |
 | `greenhouse_core.members` | Existe | FK para owner_member_id |
 | `greenhouse_core.departments` | Existe | FK para owner_department_id |
-| ICO Engine (`member_performance_snapshots`) | Existe (BigQuery) | Opcional — goals no consumen ICO directamente, pero la UI puede mostrar ICO metrics como contexto |
+| ICO Engine (`greenhouse_serving.ico_member_metrics`) | Existe | Opcional — goals no consumen ICO directamente, pero la UI puede mostrar métricas ICO como contexto |
 
 ---
 

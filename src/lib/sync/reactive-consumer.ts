@@ -32,8 +32,24 @@ type ReactiveEventRow = {
   occurred_at: string | Date
 }
 
+type ReactiveLogStateRow = {
+  handler: string
+  result: string | null
+  last_error: string | null
+}
+
 export const buildReactiveHandlerKey = (projectionName: string, eventType: string) =>
   `${projectionName}:${eventType}`
+
+const isReactiveHandlerTerminal = (state?: Pick<ReactiveLogStateRow, 'result' | 'last_error'>) => {
+  if (!state) return false
+
+  if (state.result === 'dead-letter') {
+    return true
+  }
+
+  return state.last_error === null
+}
 
 // ── Schema provisioning ──
 
@@ -83,17 +99,62 @@ export const processReactiveEvents = async (options?: {
     return { runId, eventsProcessed: 0, eventsFailed: 0, projectionsTriggered: 0, actions: [], durationMs: Date.now() - startMs }
   }
 
-  // Read published events. Projection-level dedupe happens per handler below so
-  // one successful projection does not suppress the others for the same event.
-  const events = await runGreenhousePostgresQuery<ReactiveEventRow>(
-    `SELECT event_id, aggregate_type, aggregate_id, event_type, payload_json, occurred_at
-     FROM greenhouse_sync.outbox_events
-     WHERE status = 'published'
-       AND event_type = ANY($1)
-     ORDER BY occurred_at ASC
-     LIMIT $2`,
-    [triggerEventTypes, batchSize]
-  )
+  const events: ReactiveEventRow[] = []
+  let offset = 0
+  const scanChunkSize = Math.max(batchSize * 5, 100)
+
+  // Read published events in chunks and keep only the ones that still have at
+  // least one actionable projection for this domain. This avoids starvation
+  // when the oldest published events are already terminal for every handler.
+  while (events.length < batchSize) {
+    const candidateRows = await runGreenhousePostgresQuery<ReactiveEventRow>(
+      `SELECT event_id, aggregate_type, aggregate_id, event_type, payload_json, occurred_at
+       FROM greenhouse_sync.outbox_events
+       WHERE status = 'published'
+         AND event_type = ANY($1)
+       ORDER BY occurred_at ASC
+       LIMIT $2 OFFSET $3`,
+      [triggerEventTypes, scanChunkSize, offset]
+    )
+
+    if (candidateRows.length === 0) {
+      break
+    }
+
+    offset += candidateRows.length
+
+    for (const event of candidateRows) {
+      const projections = getProjectionsForEvent(event.event_type, domain)
+
+      if (projections.length === 0) {
+        continue
+      }
+
+      const handlerKeys = projections.map(projection => buildReactiveHandlerKey(projection.name, event.event_type))
+
+      const handlerStates = await runGreenhousePostgresQuery<ReactiveLogStateRow>(
+        `SELECT handler, result, last_error
+         FROM greenhouse_sync.outbox_reactive_log
+         WHERE event_id = $1
+           AND handler = ANY($2)`,
+        [event.event_id, handlerKeys]
+      )
+
+      const stateByHandler = new Map(handlerStates.map(state => [state.handler, state]))
+      const hasActionableProjection = handlerKeys.some(handlerKey => !isReactiveHandlerTerminal(stateByHandler.get(handlerKey)))
+
+      if (!hasActionableProjection) {
+        continue
+      }
+
+      events.push(event)
+
+      if (events.length >= batchSize) {
+        break
+      }
+
+    }
+  }
 
   if (events.length === 0) {
     return { runId, eventsProcessed: 0, eventsFailed: 0, projectionsTriggered: 0, actions: [], durationMs: Date.now() - startMs }
@@ -122,7 +183,7 @@ export const processReactiveEvents = async (options?: {
              FROM greenhouse_sync.outbox_reactive_log
              WHERE event_id = $1
                AND handler = $2
-               AND last_error IS NULL
+               AND (last_error IS NULL OR result = 'dead-letter')
            ) AS exists`,
           [event.event_id, handlerKey]
         )

@@ -39,7 +39,7 @@ describe('computeClientEconomicsSnapshots', () => {
   it('resolves revenue aggregation through canonical client_id when income only has client_profile_id', async () => {
     mockRunGreenhousePostgresQuery
       .mockResolvedValueOnce([
-        { client_id: 'client-1', client_name: 'Acme', total_revenue_clp: '1000' }
+        { client_id: 'client-1', organization_id: 'org-1', client_name: 'Acme', total_revenue_clp: '1000' }
       ])
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([])
@@ -49,6 +49,7 @@ describe('computeClientEconomicsSnapshots', () => {
         {
           snapshot_id: 'snap-1',
           client_id: 'client-1',
+          organization_id: 'org-1',
           client_name: 'Acme',
           period_year: 2026,
           period_month: 3,
@@ -75,7 +76,7 @@ describe('computeClientEconomicsSnapshots', () => {
     const revenueQuery = mockRunGreenhousePostgresQuery.mock.calls[0]?.[0] as string
 
     expect(revenueQuery).toContain('LEFT JOIN greenhouse_finance.client_profiles cp')
-    expect(revenueQuery).toContain('COALESCE(i.client_id, cp.client_id) AS client_id')
-    expect(revenueQuery).not.toContain('COALESCE(client_id, client_profile_id) AS client_id')
+    expect(revenueQuery).toContain('COALESCE(i.client_id, cp.client_id, i.organization_id, cp.organization_id) AS client_id')
+    expect(revenueQuery).toContain('COALESCE(i.organization_id, cp.organization_id, cb.organization_id) AS organization_id')
   })
 })

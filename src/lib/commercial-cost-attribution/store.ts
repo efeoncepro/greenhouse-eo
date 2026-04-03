@@ -6,6 +6,7 @@ import { toTimestampString } from '@/lib/finance/shared'
 export type CommercialCostAttributionRow = {
   member_id: string
   client_id: string
+  organization_id: string | null
   client_name: string
   period_year: number | string
   period_month: number | string
@@ -28,6 +29,7 @@ export type CommercialCostAttributionRow = {
 export interface CommercialCostAttributionStoredAllocation {
   memberId: string
   clientId: string
+  organizationId: string | null
   clientName: string
   periodYear: number
   periodMonth: number
@@ -68,6 +70,7 @@ export const ensureCommercialCostAttributionSchema = async () => {
     CREATE TABLE IF NOT EXISTS greenhouse_serving.commercial_cost_attribution (
       member_id TEXT NOT NULL,
       client_id TEXT NOT NULL,
+      organization_id TEXT,
       client_name TEXT NOT NULL,
       period_year INT NOT NULL,
       period_month INT NOT NULL,
@@ -119,6 +122,7 @@ export const upsertCommercialCostAttributionAllocations = async (
         INSERT INTO greenhouse_serving.commercial_cost_attribution (
           member_id,
           client_id,
+          organization_id,
           client_name,
           period_year,
           period_month,
@@ -138,12 +142,13 @@ export const upsertCommercialCostAttributionAllocations = async (
           materialized_at
         )
         VALUES (
-          $1, $2, $3, $4, $5,
-          $6, $7, $8, $9, $10,
-          $11, $12, $13, $14, $15,
-          $16, $17, $18, $19::timestamptz
+          $1, $2, $3, $4, $5, $6,
+          $7, $8, $9, $10, $11,
+          $12, $13, $14, $15, $16,
+          $17, $18, $19, $20::timestamptz
         )
         ON CONFLICT (member_id, client_id, period_year, period_month) DO UPDATE SET
+          organization_id = EXCLUDED.organization_id,
           client_name = EXCLUDED.client_name,
           base_labor_cost_target = EXCLUDED.base_labor_cost_target,
           internal_operational_cost_target = EXCLUDED.internal_operational_cost_target,
@@ -163,6 +168,7 @@ export const upsertCommercialCostAttributionAllocations = async (
       [
         row.memberId,
         row.clientId,
+        row.organizationId,
         row.clientName,
         row.periodYear,
         row.periodMonth,
@@ -205,6 +211,7 @@ export const readCommercialCostAttributionAllocationsForPeriod = async (
   return rows.map(row => ({
     memberId: row.member_id,
     clientId: row.client_id,
+    organizationId: row.organization_id,
     clientName: row.client_name,
     periodYear: toNumber(row.period_year),
     periodMonth: toNumber(row.period_month),

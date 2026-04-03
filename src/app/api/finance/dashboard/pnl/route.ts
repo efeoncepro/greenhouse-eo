@@ -7,6 +7,7 @@ import {
   isFinanceSlice2PostgresEnabled
 } from '@/lib/finance/postgres-store-slice2'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { getFinanceCurrentPeriod } from '@/lib/finance/reporting'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,8 +21,9 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url)
-  const year = Number(searchParams.get('year')) || new Date().getFullYear()
-  const month = Number(searchParams.get('month')) || new Date().getMonth() + 1
+  const currentPeriod = getFinanceCurrentPeriod()
+  const year = Number(searchParams.get('year')) || currentPeriod.year
+  const month = Number(searchParams.get('month')) || currentPeriod.month
 
   if (!isFinanceSlice2PostgresEnabled()) {
     return NextResponse.json({ error: 'Finance Postgres not configured' }, { status: 503 })

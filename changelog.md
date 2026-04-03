@@ -1,7 +1,262 @@
 # changelog.md
 
+## 2026-04-02
+
+- **TASK-200 delivery performance metric semantic contract**:
+  - el contrato mensual del `Performance Report` queda fijado sobre `due_date in period`
+  - la fecha de corte canónica pasa a ser `period_end + 1 day`
+  - `OTD` del scorecard mensual deja de usar `on_time / (on_time + late_drop)` y pasa a `on_time / total_classified_tasks`
+  - `Top Performer` ya usa `OTD` canónico y volumen total de tareas del período como elegibilidad/desempate
+  - `shared.ts`, `materialize.ts`, `performance-report.ts` y `metric-registry.ts` quedaron alineados a ese contrato
+
+- **TASK-199 delivery performance owner attribution contract**:
+  - `ICO` member-level deja de acreditar tareas por `UNNEST(assignee_member_ids)` y pasa a acreditar solo al owner principal miembro
+  - `v_tasks_enriched` ahora expone aliases explícitos `primary_owner_source_id`, `primary_owner_member_id`, `primary_owner_type` y `has_co_assignees`
+  - la dimensión `member` de `ICO` ya apunta a `primary_owner_member_id`
+  - `Person ICO` quedó alineado al mismo contrato y ya no usa co-crédito
+  - `Top Performer` ahora publica explícitamente que co-asignados y owners cliente no reciben member credit
+  - verificación de negocio marzo 2026:
+    - `Daniela` pasa de `104` tareas por co-crédito a `98` por owner principal
+    - `multi_member_tasks`: `4`
+    - `Sky` conserva `39` tareas con owner primario no-miembro sin credit a `member`
+
+- **TASK-198 delivery notion assignee identity coverage**:
+  - `discovery-notion.ts` ya excluye IDs Notion enlazados tanto en BigQuery como en PostgreSQL y dejó de depender solo de `greenhouse.team_members`
+  - `reconciliation-service.ts` ahora prioriza `greenhouse_core.members` como fuente canónica de candidates y usa BigQuery solo como fallback
+  - `apply-link.ts` ahora persiste también `identity_profile_source_links` en PostgreSQL y puede completar `client_users.member_id` cuando el perfil ya tiene principal
+  - `delivery-coverage.ts` ahora distingue cobertura raw vs cobertura colaborador y clasifica responsables Delivery como `member`, `client_user`, `external_contact`, `linked_profile_only` o `unclassified`
+  - se agregó `scripts/backfill-delivery-notion-client-assignee-links.ts` para sembrar source links de responsables cliente en BigQuery y PostgreSQL
+  - `Constanza Rojas` y `Adriana Velarde` quedaron resueltas explícitamente como diseñadoras in-house de `Sky`, modeladas como `client_user + identity_profile` y no como `member`
+  - verificación real marzo 2026:
+    - `Efeonce`: `116/116` tareas con `assignee_member_id`
+    - `Sky`: `42` tareas clasificadas como contactos cliente (`Constanza` `29`, `Adriana` `13`)
+    - `Sky collaborator coverage`: `145/145 = 100%`
+  - residual explícito: `Sin asignar` y la semántica final de owner principal/co-asignados quedan abiertos para `TASK-199`
+
+- **TASK-197 delivery source sync assignee/project parity**:
+  - `greenhouse_conformed.delivery_tasks` ahora preserva `project_source_ids` además de `project_source_id`
+  - `sync-notion-conformed.ts` ahora valida cobertura de responsables por `space_id`, evitando que un space sano masque otro roto
+  - `sync-notion-conformed.ts` dejó de perder `Sky` cuando `responsables_ids = []` y `responsable_ids` sí trae owner; ahora prioriza arrays no vacíos
+  - `scripts/sync-source-runtime-projections.ts` ya normaliza `responsables_ids` y `responsable_ids`, y proyecta `assignee_source_id`, `assignee_member_ids` y `project_source_ids` a `greenhouse_delivery.tasks`
+  - `scripts/sync-source-runtime-projections.ts` ahora también fuerza arrays no nulos para PostgreSQL y resuelve `client_id` desde `space_notion_sources -> spaces`
+  - `team-queries` ya soporta spaces que usen `responsable_ids`
+  - `Project Detail` ya considera `proyecto_ids` además del proyecto primario
+  - se aplicó la migración `20260402222438783_delivery-runtime-space-fk-canonicalization.sql` para mover `greenhouse_delivery.{projects,sprints,tasks}.space_id` a FK canónica sobre `greenhouse_core.spaces(space_id)` con backfill de IDs legacy a `spc-*`
+  - `scripts/setup-postgres-source-sync.sql` quedó alineado con esa FK canónica
+  - quedó versionada la migración `20260402220356569_delivery-source-sync-assignee-project-parity.sql`
+  - verificación real en `greenhouse_conformed` para marzo 2026:
+    - `Sky`: `190/190` con `project_source_ids`
+    - `Sky`: `187/190` con `assignee_source_id`
+    - `Sky`: `151/190` con `assignee_member_ids`
+    - `Efeonce`: `116/116` con `assignee_source_id`
+  - validación ejecutada: targeted `eslint`, `pnpm lint`, `pnpm migrate:up`, `rg -n "new Pool\\(" src scripts`
+  - seguimiento abierto: el reseed completo de `scripts/sync-source-runtime-projections.ts` sigue corriendo lento y la paridad total de marzo en PostgreSQL runtime todavía no debe considerarse cerrada
+
+- **TASK-187 notion governance formalization**:
+  - nueva governance lane tenant-scoped para Notion sobre `space_notion_sources`, con snapshots, drift y KPI readiness persistidos en `greenhouse_sync.notion_space_*`
+  - nuevas APIs admin: `GET /api/admin/tenants/[id]/notion-governance` y `POST /api/admin/tenants/[id]/notion-governance/refresh`
+  - `TenantNotionPanel` ahora muestra readiness por `space`, snapshots por base, drift abierto y CTA admin para refrescar schema governance
+  - `POST /api/integrations/notion/register` ahora intenta refrescar governance best-effort y su `nextStep` quedó alineado con el control plane real `POST /api/admin/integrations/notion/sync`
+  - `scripts/notion-schema-discovery.ts` quedó reconciliado con el binding canónico actual `greenhouse_core.space_notion_sources`
+  - `.env.example` y `project_context.md` ahora documentan `NOTION_PIPELINE_URL` y el uso server-side de `NOTION_TOKEN` para el refresh administrativo de schema
+  - validación ejecutada: `pnpm migrate:up`, `pnpm lint`, `pnpm build`, `rg -n "new Pool\\(" src`
+
+- **Finance Clients financial contacts org-first UI follow-on**:
+  - `Finance > Clients > Contactos` ya permite agregar contactos financieros desde la propia ficha del cliente cuando existe `organization_id`
+  - la vista reutiliza `AddMembershipDrawer` del dominio `Organization` restringido a memberships `billing` / `contact`, en vez de abrir otro flujo paralelo
+  - `GET /api/finance/clients/[id]` ahora prioriza `person_memberships` de la organización canónica para poblar contactos; `finance_contacts` queda como fallback legacy
+  - validación ejecutada: targeted `vitest`, `pnpm lint`, `pnpm build`
+
+- **TASK-193 person-organization synergy activation**:
+  - `Efeonce` quedó regularizada como operating entity real en `greenhouse_core.organizations` con razón social, RUT y dirección legal canónicos
+  - se aplicó la migración `20260402094316652_task-193-operating-entity-session-canonical-person.sql`, incluyendo backfill de `person_memberships(team_member)` para los `members` activos y regeneración de `src/types/db.d.ts`
+  - `session_360` ahora resuelve `organization_id` para usuarios internos vía operating entity y mantiene fallback de primary membership para carriles client
+  - `person_360` ahora publica org primaria, aliases `eo_id`/`member_id`/`user_id` y `is_efeonce_collaborator`, lo que habilita a `CanonicalPersonRecord` a consumir contexto organizacional canónico
+  - `organization_360` enriqueció el aggregate `people` con `memberId`, `assignedFte`, `assignmentType`, `jobLevel` y `employmentType` para memberships `team_member`
+  - `Organization > People` y el reader `/api/organizations/[id]/memberships` ya hacen visible la distinción `internal` vs `staff_augmentation` como contexto operativo del vínculo cliente, sin crear un `membership_type` nuevo
+  - `People > Finance` ya acepta `organizationId` opcional y fuerza tenant isolation para usuarios `client`
+  - `People > Delivery`, `People > ICO Profile`, `People > ICO` y el aggregate `GET /api/people/[memberId]` ya consumen `organizationId` cuando el request viene org-scoped desde tenant `client`
+  - `HR` e `intelligence` quedan declarados como surfaces internas; para tenant `client` responden `403` y dejan de considerarse deuda client-facing de esta lane
+  - `Organization memberships` ahora también puede sembrar contactos mínimos ad hoc con nombre + email, y `finance/suppliers` create/update intenta persistir `organization contact memberships` cuando el supplier ya tiene `organization_id`
+  - `Finance Suppliers` detail/list ya consume esos contactos org-first cuando existen, exponiendo `organizationContacts`, `contactSummary` y `organizationContactsCount` sin romper el fallback legacy `primary_contact_*`
+  - validación ejecutada: `GREENHOUSE_POSTGRES_HOST=127.0.0.1 GREENHOUSE_POSTGRES_PORT=15432 GREENHOUSE_POSTGRES_SSL=false pnpm migrate:up`, targeted `vitest`, `pnpm lint`, `pnpm build`, `rg -n "new Pool\\(" src`
+
+- **TASK-192 finance org-first materialized serving cutover**:
+  - `cost_allocations`, `client_economics` y `commercial_cost_attribution` ahora persisten contexto `organization_id` y, donde aplica, `space_id`, manteniendo `client_id` solo como bridge explícito de compatibilidad
+  - `operational_pl` quedó reconciliado para propagar organización desde ingresos, allocations, expenses y commercial attribution sin depender solo del bridge legacy `client -> space`
+  - `allocations` y `client_economics` ya pueden leer serving org-first incluso cuando no exista `clientId` legacy materializado para el request
+  - `Agency` y `Organization 360` quedaron alineados al scope material correcto: space-first para Agency y organization-first para economics
+  - se aplicó la migración `20260402085449701_finance-org-first-materialized-serving-keys.sql` con backfill compatible y regeneración de `src/types/db.d.ts`
+  - validación ejecutada en este tramo: `pnpm migrate:up` por Cloud SQL Proxy, targeted `vitest`, `pnpm lint` y `pnpm build`
+
+- **TASK-191 finance organization-first downstream consumers cutover**:
+  - `purchase-orders` y `hes` quedaron alineados para aceptar contexto org-first además de `clientId`, manteniendo `client_id` solo como bridge legacy donde el storage todavía lo necesita
+  - `expenses`, `expenses/bulk`, `cost allocations` y `client_economics` pasaron a resolver scope downstream desde un helper compartido, reduciendo la dependencia de que la UI empuje `clientId` manualmente
+  - los drawers de Finance se documentaron para operar con selección org-first y mostrar el bridge legado solo cuando exista
+  - residual legacy visible:
+    - `client_id` sigue siendo la llave materializada en varias tablas y readers financieros
+    - `cost_allocations` y parte del serving analítico todavía no migran físicamente a `organization_id`
+  - validación ejecutada en este tramo: `pnpm exec vitest run src/lib/finance/canonical.test.ts src/app/api/finance/purchase-orders/route.test.ts src/app/api/finance/intelligence/allocations/route.test.ts`, `pnpm lint` y `pnpm build`
+  - queda pendiente solo el smoke manual de OC/HES/expenses/allocations con cliente org-first
+
+## 2026-04-01
+
+- **TASK-181 finance clients canonical source cutover**:
+  - `Finance Clients` deja de anclarse en `greenhouse_core.clients` y pasa a leer/escribir org-first sobre `greenhouse_core.organizations WHERE organization_type IN ('client', 'both')`
+  - `client_profiles.organization_id` queda como FK fuerte del dominio; `client_id` se preserva como bridge operativo para módulos y projections legacy
+  - `resolveFinanceClientContext()` ya soporta `organizationId` como anchor canónico además de `clientId`, `clientProfileId` y `hubspotCompanyId`
+  - readers downstream de `Organization 360` y `client_economics` quedaron reconciliados para no perder snapshots cuando el contexto financiero venga identificado por organización
+  - se aplicó backfill real de dos legacy clients huérfanos (`nubox-client-76438378-8`, `nubox-client-91947000-3`) para poblar `client_profiles.organization_id`
+
+- **TASK-189 rolling rematerialization hardening**:
+  - `/api/cron/ico-materialize` ahora rematerializa por defecto una ventana rolling de `3` meses (`monthsBack`, configurable hasta `6`)
+  - la proyección `ico_member_metrics` ahora refresca el período explícito informado por el payload de materialización, evitando asumir siempre el mes actual
+  - `schema-snapshot-baseline.sql` quedó reconciliado con `carry_over_count` en `greenhouse_serving.ico_member_metrics`
+
+## 2026-04-01
+
+- **TASK-189 hardening de member metrics materialized-first**:
+  - `readMemberMetrics()` y `readMemberMetricsBatch()` ahora hacen fallback live por miembro si `metrics_by_member` trae buckets/contexto críticos en `null` con `total_tasks > 0`
+  - esto evita que consumers como `People` o `Payroll` sigan mostrando snapshots legacy incompletos tras el cambio de semántica por `due_date`
+  - `People > Activity` ahora muestra `Sin cierres` en KPIs de calidad cuando el período está abierto y todavía no existen completaciones reales
+
+## 2026-04-01
+
+- **TASK-188: Native Integrations Layer — Platform Governance**:
+  - nueva tabla `greenhouse_sync.integration_registry` como Layer 1 del registry central de integraciones nativas
+  - seeded con 4 integraciones: Notion (hybrid), HubSpot (system_upstream), Nubox (api_connector), Frame.io (event_provider)
+  - taxonomia formal: `system_upstream`, `event_provider`, `batch_file`, `api_connector`, `hybrid`
+  - shared types en `src/types/integrations.ts` para registry, health y readiness
+  - helpers Kysely en `src/lib/integrations/registry.ts` y health aggregation en `src/lib/integrations/health.ts`
+  - API admin: `GET /api/admin/integrations`, `GET /api/admin/integrations/[key]/health`
+  - se extendió el control plane del registry con `sync_endpoint`, `paused_at`, `paused_reason` y `last_health_check_at`
+  - nuevas acciones admin: `pause`, `resume` y `sync on-demand` por integración
+  - nueva API v1 shared: `GET /api/integrations/v1/readiness` y `POST /api/integrations/v1/register`
+  - admin governance page en `/admin/integrations` con registry table, health/freshness bars, consumer domain map y sección `Control plane`
+  - architecture docs actualizados: GREENHOUSE_ARCHITECTURE_V1, SOURCE_SYNC_PIPELINES, DATA_MODEL_MASTER
+
+## 2026-04-01
+
+- **ICO period hardening + Delivery metrics trust MVP**:
+  - `ICO` ahora ancla el período operativo en `due_date` con fallback a `created_at` / `synced_at`, dejando atrás el criterio exclusivo por `completed_at`
+  - se agregó `carry_over_count` al contrato canónico del engine y a las materializaciones BigQuery principales (`metric_snapshots_monthly`, `metrics_by_member`, `metrics_by_project`, `metrics_by_sprint`, `metrics_by_organization`, `metrics_by_business_unit`)
+  - el engine ahora también materializa buckets canónicos aditivos (`on_time_count`, `late_drop_count`, `overdue_count`) y los expone como contexto de snapshot sin redefinir los KPIs existentes
+  - se cerró la semántica canónica actual: `on_time` / `late_drop` prefieren `performance_indicator_code` con fallback por fechas; `overdue` / `carry-over` siguen siendo período-relativos; `FTR` ahora usa una señal compuesta sobre `RpA`, rounds cliente/workflow y cierre real de revisión/comentarios
+  - `readMemberMetrics()` ya no pierde `CSC distribution` en el path materializado y el `PersonActivityTab` ahora muestra `carry-over` + banner cuando aún no hay cierres en el período
+  - `Space 360 > ICO` ahora deja visibles esos buckets para auditoría operativa del snapshot
+  - Agency `ICO Engine` ahora muestra un `Performance Report` mensual MVP con comparativo vs mes anterior y `Top Performer`
+  - ese `Performance Report` ya no vive solo como helper de lectura: ahora también se materializa en `ico_engine.performance_report_monthly`, construido desde `metric_snapshots_monthly` + `metrics_by_member` con fallback seguro al cálculo previo si el snapshot todavía no existe
+  - el reporte mensual ahora también entrega mezcla por segmento (`taskMix`), `Alerta` y `Resumen Ejecutivo` determinísticos sobre el snapshot materializado
+  - el scorecard ahora expone segmentación explícita `Tareas Efeonce` y `Tareas Sky`, manteniendo `taskMix` para segmentos adicionales
+  - se agregó `greenhouse_serving.agency_performance_reports` como cache OLTP del scorecard mensual, alimentado por la proyección reactiva `agency_performance_reports`
+  - `scripts/materialize-member-metrics.ts` quedó alineado como wrapper del motor canónico para evitar deriva semántica
+  - arquitectura viva actualizada en `Greenhouse_ICO_Engine_v1.md` y `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md`
+
+## 2026-04-01
+
+- **Native Integrations Layer architecture**:
+  - se agregó `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md` como fuente canónica para la capability shared de integraciones enterprise; `TASK-188` queda como lane operativa y `Notion` como primera implementación fuerte del modelo
+
+## 2026-04-01
+
+- **PostgreSQL runtime grant reconciliation**:
+  - staging recuperó acceso real a `greenhouse_notifications` y a tablas serving como `member_capacity_economics` e `ico_member_metrics`; además se alinearon los scripts de setup y `pg:doctor` para que el drift no reaparezca en futuros bootstrap
+
+- **People + Notifications staging fallback**:
+  - `/people` ya no cae si el overlay `member_capacity_economics` no tiene permisos en staging, y el contador de notificaciones ahora degrada a `0` si `greenhouse_notifications` no es accesible
+
+- **Vitest tooling coverage**:
+  - `pnpm test` ya descubre también tests unitarios versionados en `scripts/**`, cerrando el hueco que dejaba fuera el carril de tooling/CLI
+
+## 2026-04-01
+
+- **TASK-026 HRIS contract canonicalization**:
+  - `greenhouse_core.members` pasó a ser el canon de `contract_type`, `pay_regime`, `payroll_via` y `deel_contract_id`
+  - `greenhouse_payroll.compensation_versions` conserva el snapshot historico del contrato para payroll, pero ya no es la fuente de verdad del colaborador
+  - `greenhouse_payroll.payroll_entries` ahora guarda `payroll_via`, `deel_contract_id`, `sii_retention_rate` y `sii_retention_amount`
+  - `member_360`, `member_payroll_360` y `person_hr_360` quedaron alineadas para exponer canon + aliases de snapshot sin duplicar semantica
+  - `daily_required` sigue siendo el flag canónico; `schedule_required` queda solo como alias semantico de lectura
+  - la migración aplicada quedó versionada como `20260402001100000_hris-contract-types.sql`
+  - validacion cerrada del branch: `pnpm migrate:up` ✅, `pnpm db:generate-types` ✅, `pnpm lint` ✅, `pnpm build` ✅
+  - nota operativa: la corrida de migracion detecto `ETIMEDOUT` contra la IP publica de Cloud SQL hasta levantar Cloud SQL Proxy local; luego aparecio un conflicto de orden por timestamps anteriores a migraciones ya aplicadas, y finalmente el DDL cross-schema solo pudo ejecutar con `greenhouse_ops` como owner efectivo
+
+## 2026-04-01
+
+- **HR Departments Postgres runtime cutover** (`TASK-180`):
+  - `HR > Departments` deja de leer/escribir `greenhouse.departments` en BigQuery y pasa a operar sobre `greenhouse_core.departments` en PostgreSQL
+  - nuevo store `src/lib/hr-core/postgres-departments-store.ts` para list/detail/create/update y para alinear la asignación `members.department_id`
+  - `getMemberHrProfile()` ya resuelve `departmentId`/`departmentName` desde PostgreSQL y el update de perfil HR deja de mutar `team_members.department_id` en BigQuery
+  - se agregó backfill idempotente `scripts/backfill-hr-departments-to-postgres.ts` para otros entornos aunque `dev` no tenía drift real (`0` departamentos en BigQuery y Postgres)
+  - nueva migración `20260402001000000_hr-departments-head-member-fk.sql` para endurecer FK `head_member_id -> greenhouse_core.members(member_id)` e índices de apoyo
+  - validación cerrada end-to-end: `vitest`, `lint`, `build`, `tsc`, `pg:doctor` (`runtime` y `migrator`), `pnpm migrate:up` y `pnpm db:generate-types`
+  - el bloqueo inicial de `ETIMEDOUT` se resolvió usando Cloud SQL Auth Proxy en `127.0.0.1:15432` como ya exigía `AGENTS.md`
+
+- **Database Tooling Foundation** (TASK-184 + TASK-185):
+  - Instalado `node-pg-migrate` para migraciones SQL versionadas — wrapper TypeScript en `scripts/migrate.ts`, migraciones en `migrations/`
+  - Creado `src/lib/db.ts` como conexión centralizada: re-exporta `postgres/client.ts` + agrega Kysely lazy via `getDb()`
+  - Instalado `kysely` + `kysely-codegen` — tipos generados desde DB live: 140 tablas, 3042 líneas en `src/types/db.d.ts`
+  - `pnpm migrate:up` ahora auto-regenera tipos Kysely después de aplicar migraciones (saltar con `MIGRATE_SKIP_TYPES=true`)
+  - Baseline migration aplicada en `greenhouse-pg-dev`
+  - CI check de migraciones agregado a `.github/workflows/ci.yml`
+- **Ownership consolidation** — 122 tablas, 11 schemas, 17 views consolidados bajo `greenhouse_ops`:
+  - Antes: 5 owners distintos (`greenhouse_migrator` 41, `greenhouse_migrator_user` 39, `postgres` 32, `greenhouse_app` 9, `greenhouse_ops` 1)
+  - Después: `greenhouse_ops` 122/122
+  - Default privileges configurados para grants automáticos en objetos futuros
+  - Password de `greenhouse_ops` almacenada en Secret Manager (`greenhouse-pg-dev-ops-password`)
+  - `pg_dump` ahora funciona correctamente — schema snapshot baseline generado (8636 líneas)
+- **Documentación**:
+  - Creado `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md` — spec completa de tooling
+  - Actualizado `CLAUDE.md`, `AGENTS.md`, `project_context.md`, `Handoff.md`
+  - Actualizado 3 docs de arquitectura existentes (Architecture, Cloud Infrastructure, Data Platform)
+  - Actualizado Access Model con delta de ownership consolidation
+  - Delta notes en TASK-172, TASK-174, TASK-180
+
 ## 2026-03-31
 
+- `Finance > Egresos` ya materializa correctamente las nóminas exportadas atrasadas de febrero/marzo:
+  - se corrigió starvation en el consumer reactivo para que el dominio `finance` pueda saltarse eventos `published` ya terminales para todos sus handlers
+  - se corrigió el `INSERT` canónico de `createFinanceExpenseInPostgres()` que podía fallar por desalineación entre columnas y `VALUES`
+  - se agregó `scripts/backfill-payroll-expenses-reactive.ts` y se ejecutó backfill real en `greenhouse-pg-dev`
+  - resultado materializado:
+    - `2026-02` → `2` expenses `payroll`
+    - `2026-03` → `4` expenses `payroll` + `1` `social_security`
+  - gaps operativos detectados en el mismo carril:
+    - `greenhouse_serving.provider_tooling_snapshots` y `provider_tooling_360` no existen aún en `staging`
+    - `commercial_cost_attribution` existe pero sigue con `permission denied` para el reactor de Finance
+    - Vercel sigue scheduleando solo `/api/cron/outbox-react`, no las domain routes documentadas
+- `TASK-182` y `TASK-183` quedaron documentadas en conjunto con su contrato final de Finance Expenses:
+  - el drawer ahora usa la taxonomía visible `Operacional / Tooling / Impuesto / Otro`
+  - el ledger quedó endurecido con `space_id`, `source_type`, `payment_provider` y `payment_rail`
+  - `payroll_period.exported` quedó formalizado como trigger reactivo para materializar expenses de `payroll` y `social_security`
+  - `Finance` sigue como owner del ledger y `Cost Intelligence` como consumer/attributor
+  - la validación runtime no se re-ejecutó en este turno documental; el cierre se apoya en la implementación ya validada en la lane anterior
+- `Finance > Suppliers` ya no deja huérfano el estado `Sin vínculo canónico`:
+  - el detalle del supplier ahora permite `Crear vínculo canónico`
+  - el tab `Provider 360` también ofrece ese CTA en el empty state
+  - se agregó soporte server-side para `autoLinkProvider` en `PUT /api/finance/suppliers/[id]`
+  - se agregó backfill batch `POST /api/finance/suppliers/backfill-provider-links`
+  - el listado ahora muestra cuántos proveedores siguen sin vínculo canónico y permite correr `Backfill Provider 360` desde UI
+- `HR > Departments` ya no falla al crear departamentos raíz por parámetros `null` en el write path legacy de BigQuery:
+  - `runHrCoreQuery()` ahora acepta `types` explícitos para queries tipadas
+  - create/update de departamentos declaran `STRING` en campos opcionales como `description`, `parentDepartmentId` y `headMemberId`
+  - se agregó regresión para el caso de creación de departamento sin padre
+  - esto es un hotfix transicional; el cutover estructural del módulo quedó abierto en `TASK-180`
+- `TASK-173` quedó cerrada formalmente:
+  - movida a `docs/tasks/complete/`
+  - índice de tasks reconciliado
+  - el pendiente residual de smoke autenticado ya no aplica después de validar `leave` end-to-end en la surface HR real
+- `HR > Permisos` ahora muestra el respaldo adjunto dentro del modal `Revisar solicitud`:
+  - el backend ya guardaba `attachment_asset_id`, pero la UI no lo exponía
+  - se agregó CTA `Abrir respaldo` directo en la revisión HR
+  - queda cubierta con test de vista para evitar regresiones
+- Se endureció la foundation shared de adjuntos para evitar fallos al adjuntar respaldos de `leave` después de un upload exitoso:
+  - `ownerClientId`, `ownerSpaceId` y `ownerMemberId` ahora se normalizan en la capa shared antes de tocar FKs
+  - esto corrige el caso de usuarios internos cuyo `tenant.clientId` llega como cadena vacía `''`
+  - el hardening aplica a:
+    - `createPrivatePendingAsset`
+    - `attachAssetToAggregate`
+    - `upsertSystemGeneratedAsset`
+  - se agregó test unitario de regresión para ownership scope vacío
 - Se provisionó la topología definitiva de buckets GCP para assets compartidos:
   - `efeonce-group-greenhouse-public-media-dev`
   - `efeonce-group-greenhouse-public-media-staging`
@@ -3719,6 +3974,7 @@
 
 # 2026-03-31
 
+- fix: `Finance > Expenses > Registrar egreso` ahora carga el selector de `Proveedor` desde el mismo source of truth Postgres-first que `Finance > Suppliers`; se elimina el drift donde el drawer seguía leyendo `greenhouse.fin_suppliers` en BigQuery y mostraba un catálogo distinto al del directorio principal.
 - fix: `HR > Permisos` en staging dejó de caerse por schema drift después de `TASK-173`; se aplicó en Cloud SQL la foundation shared mínima para `leave` (`greenhouse_core.assets`, `greenhouse_core.asset_access_log` y `greenhouse_hr.leave_requests.attachment_asset_id`), restaurando la carga de solicitudes en `dev-greenhouse.efeoncepro.com/hr/leave`.
 - fix: `src/lib/hr-core/service.ts` ahora considera `undefined_column` / `relation does not exist` (`42703` / `42P01`) como fallback recuperable a BigQuery para que `leave requests` no derribe toda la vista si un deploy llega antes que el bootstrap de Postgres.
 - fix: `purchase orders` y `payroll receipts` ya conviven con schemas legacy durante el rollout de `TASK-173`; ambos stores detectan si existen `attachment_asset_id` / `asset_id` antes de escribir, evitando que staging dependa de cerrar el DDL remoto sobre tablas todavía owned por `postgres`.

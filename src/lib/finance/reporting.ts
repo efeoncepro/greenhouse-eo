@@ -2,10 +2,27 @@ import 'server-only'
 
 import { roundCurrency } from '@/lib/finance/shared'
 
+const FINANCE_TIMEZONE = 'America/Santiago'
+
 export type MonthlyAmountEntry = {
   period: string
   amountClp: number
   count?: number
+}
+
+/** Returns { year, month } based on the business timezone (America/Santiago). */
+export const getFinanceCurrentPeriod = () => {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: FINANCE_TIMEZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).formatToParts(new Date())
+
+  const year = Number(parts.find(p => p.type === 'year')!.value)
+  const month = Number(parts.find(p => p.type === 'month')!.value)
+
+  return { year, month }
 }
 
 export const getMonthKey = (date: string | null) => (date ? date.slice(0, 7) : null)
@@ -13,17 +30,17 @@ export const getMonthKey = (date: string | null) => (date ? date.slice(0, 7) : n
 export const getRecentMonthKeys = (months: number) => {
   const totalMonths = Math.max(1, months)
   const keys: string[] = []
-  const cursor = new Date()
+  const { year, month } = getFinanceCurrentPeriod()
 
-  cursor.setUTCDate(1)
-  cursor.setUTCHours(0, 0, 0, 0)
+  const cursor = new Date(Date.UTC(year, month - 1, 1))
+
   cursor.setUTCMonth(cursor.getUTCMonth() - (totalMonths - 1))
 
   for (let index = 0; index < totalMonths; index += 1) {
-    const year = cursor.getUTCFullYear()
-    const month = String(cursor.getUTCMonth() + 1).padStart(2, '0')
+    const y = cursor.getUTCFullYear()
+    const m = String(cursor.getUTCMonth() + 1).padStart(2, '0')
 
-    keys.push(`${year}-${month}`)
+    keys.push(`${y}-${m}`)
     cursor.setUTCMonth(cursor.getUTCMonth() + 1)
   }
 

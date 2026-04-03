@@ -80,18 +80,80 @@ export const toTimestampString = (value: { value?: string } | string | null): st
 export const ICO_DIMENSIONS = {
   space:         { column: 'space_id' },
   project:       { column: 'project_source_id' },
-  member:        { column: 'assignee_member_id' },
+  member:        { column: 'primary_owner_member_id' },
   client:        { column: 'client_id' },
   sprint:        { column: 'sprint_source_id' },
   business_unit: { column: 'operating_business_unit' }
 } as const
+
+export const OWNER_ATTRIBUTION_POLICY = 'primary_owner_first_assignee'
 
 export type IcoDimensionKey = keyof typeof ICO_DIMENSIONS
 
 // ─── Canonical Status Lists ────────────────────────────────────────────────
 
 export const DONE_STATUSES_SQL = `'Listo','Done','Finalizado','Completado','Aprobado'`
-export const EXCLUDED_STATUSES_SQL = `'Listo','Done','Finalizado','Completado','Aprobado','Archivadas','Archivada','Cancelada','Canceled','Cancelled','Archivado'`
+export const EXCLUDED_STATUSES_SQL = `'Listo','Done','Finalizado','Completado','Aprobado','Archivadas','Archivada','Cancelada','Canceled','Cancelled','Archivado','Tomado'`
+export const PERIOD_START_SQL = 'DATE(@periodYear, @periodMonth, 1)'
+export const PERIOD_END_SQL = `DATE_SUB(DATE_ADD(${PERIOD_START_SQL}, INTERVAL 1 MONTH), INTERVAL 1 DAY)`
+export const REPORT_CUTOFF_DATE_SQL = `DATE_ADD(${PERIOD_END_SQL}, INTERVAL 1 DAY)`
+export const PERIOD_ANCHOR_SQL = 'COALESCE(period_anchor_date, due_date, DATE(created_at), DATE(synced_at))'
+export const REPORT_PERIOD_SCOPE_SQL = `(
+  due_date IS NOT NULL
+  AND due_date >= ${PERIOD_START_SQL}
+  AND due_date <= ${PERIOD_END_SQL}
+)`
+export const CANONICAL_OPEN_TASK_SQL = `(
+  completed_at IS NULL
+  AND (task_status IS NULL OR task_status NOT IN (${EXCLUDED_STATUSES_SQL}))
+)`
+export const DERIVED_ON_TIME_SQL = `(
+  completed_at IS NOT NULL
+  AND due_date IS NOT NULL
+  AND DATE(completed_at) <= due_date
+)`
+export const DERIVED_LATE_DROP_SQL = `(
+  completed_at IS NOT NULL
+  AND due_date IS NOT NULL
+  AND DATE(completed_at) > due_date
+)`
+export const CARRY_OVER_SQL = `(
+  due_date IS NOT NULL
+  AND due_date >= ${REPORT_CUTOFF_DATE_SQL}
+  AND ${CANONICAL_OPEN_TASK_SQL}
+)`
+export const DERIVED_OVERDUE_SQL = `(
+  due_date IS NOT NULL
+  AND due_date < ${REPORT_CUTOFF_DATE_SQL}
+  AND ${CANONICAL_OPEN_TASK_SQL}
+)`
+export const CANONICAL_ON_TIME_SQL = `(
+  performance_indicator_code = 'on_time'
+  OR (performance_indicator_code IS NULL AND ${DERIVED_ON_TIME_SQL})
+)`
+export const CANONICAL_LATE_DROP_SQL = `(
+  performance_indicator_code = 'late_drop'
+  OR (performance_indicator_code IS NULL AND ${DERIVED_LATE_DROP_SQL})
+)`
+export const CANONICAL_OVERDUE_SQL = `(
+  performance_indicator_code = 'overdue'
+  OR (performance_indicator_code IS NULL AND ${DERIVED_OVERDUE_SQL})
+)`
+export const CANONICAL_CARRY_OVER_SQL = `(
+  performance_indicator_code = 'carry_over'
+  OR (performance_indicator_code IS NULL AND ${CARRY_OVER_SQL})
+)`
+export const CANONICAL_CLASSIFIED_TASK_SQL = `(
+  ${CANONICAL_ON_TIME_SQL}
+  OR ${CANONICAL_LATE_DROP_SQL}
+  OR ${CANONICAL_OVERDUE_SQL}
+  OR ${CANONICAL_CARRY_OVER_SQL}
+)`
+export const CANONICAL_FTR_ELIGIBLE_SQL = '(completed_at IS NOT NULL)'
+export const CANONICAL_FTR_PASSED_SQL = `(
+  completed_at IS NOT NULL
+  AND client_change_round_final = 0
+)`
 
 // ─── Shared Metric SQL Builders ────────────────────────────────────────────
 
@@ -112,16 +174,17 @@ export const buildMetricSelectSQL = () => `
       THEN SAFE_CAST(rpa_value AS FLOAT64) END, 100
     )[SAFE_OFFSET(50)], 2) AS rpa_median,
 
-    -- OTD: on-time / (on-time + late)
+    -- OTD: on-time / total classified tasks in the report period
     ROUND(SAFE_DIVIDE(
-      COUNTIF(delivery_signal = 'on_time'),
-      COUNTIF(delivery_signal IN ('on_time', 'late'))
+      COUNTIF(${CANONICAL_ON_TIME_SQL}),
+      COUNTIF(${CANONICAL_CLASSIFIED_TASK_SQL})
     ) * 100, 1) AS otd_pct,
 
-    -- FTR: no client changes / total completed
+    -- FTR: completed tasks with zero final client change rounds.
+    -- client_review_open is workflow state, not the source of truth for FTR.
     ROUND(SAFE_DIVIDE(
-      COUNTIF(completed_at IS NOT NULL AND client_change_round_final = 0),
-      COUNTIF(completed_at IS NOT NULL)
+      COUNTIF(${CANONICAL_FTR_PASSED_SQL}),
+      COUNTIF(${CANONICAL_FTR_ELIGIBLE_SQL})
     ) * 100, 1) AS ftr_pct,
 
     -- Cycle time avg (completed only)
@@ -135,38 +198,39 @@ export const buildMetricSelectSQL = () => `
     -- Cycle time variance (stddev)
     ROUND(STDDEV(CASE WHEN completed_at IS NOT NULL THEN cycle_time_days END), 1) AS cycle_time_variance,
 
-    -- Throughput (completed count)
-    COUNTIF(completed_at IS NOT NULL) AS throughput_count,
+    -- Throughput (completed count in report scope)
+    COUNTIF(${CANONICAL_ON_TIME_SQL} OR ${CANONICAL_LATE_DROP_SQL}) AS throughput_count,
 
     -- Pipeline velocity (completed / active)
     ROUND(SAFE_DIVIDE(
-      COUNTIF(completed_at IS NOT NULL),
-      COUNTIF(task_status NOT IN (${EXCLUDED_STATUSES_SQL}))
+      COUNTIF(${CANONICAL_ON_TIME_SQL} OR ${CANONICAL_LATE_DROP_SQL}),
+      NULLIF(COUNTIF(${CANONICAL_OPEN_TASK_SQL}), 0)
     ), 2) AS pipeline_velocity,
 
     -- Stuck assets
     COUNTIF(is_stuck = TRUE) AS stuck_asset_count,
     ROUND(SAFE_DIVIDE(
       COUNTIF(is_stuck = TRUE),
-      COUNTIF(task_status NOT IN (${EXCLUDED_STATUSES_SQL}))
+      NULLIF(COUNTIF(${CANONICAL_OPEN_TASK_SQL}), 0)
     ) * 100, 1) AS stuck_asset_pct,
 
     -- Context
-    COUNT(*) AS total_tasks,
-    COUNTIF(completed_at IS NOT NULL) AS completed_tasks,
-    COUNTIF(task_status NOT IN (${EXCLUDED_STATUSES_SQL})) AS active_tasks`
+    COUNTIF(${CANONICAL_CLASSIFIED_TASK_SQL}) AS total_tasks,
+    COUNTIF(${CANONICAL_ON_TIME_SQL} OR ${CANONICAL_LATE_DROP_SQL}) AS completed_tasks,
+    COUNTIF(${CANONICAL_OVERDUE_SQL} OR ${CANONICAL_CARRY_OVER_SQL}) AS active_tasks,
+    COUNTIF(${CANONICAL_ON_TIME_SQL}) AS on_time_count,
+    COUNTIF(${CANONICAL_LATE_DROP_SQL}) AS late_drop_count,
+    COUNTIF(${CANONICAL_OVERDUE_SQL}) AS overdue_count,
+
+    -- Carry-over count (open tasks whose due date lands after the report cutoff)
+    COUNTIF(${CANONICAL_CARRY_OVER_SQL}) AS carry_over_count`
 
 /**
- * Canonical period + active tasks WHERE filter.
+ * Canonical report-period WHERE filter.
  * Uses @periodYear and @periodMonth query parameters.
  */
 export const buildPeriodFilterSQL = () => `
-    (completed_at IS NOT NULL
-      AND EXTRACT(YEAR FROM completed_at) = @periodYear
-      AND EXTRACT(MONTH FROM completed_at) = @periodMonth)
-    OR
-    (completed_at IS NULL
-      AND task_status NOT IN (${DONE_STATUSES_SQL}))`
+    ${REPORT_PERIOD_SCOPE_SQL}`
 
 // ─── Query Runner ───────────────────────────────────────────────────────────
 

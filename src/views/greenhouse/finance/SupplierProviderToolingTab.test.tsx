@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react'
 
-import { cleanup, screen } from '@testing-library/react'
+import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithTheme } from '@/test/render'
@@ -29,11 +29,33 @@ describe('SupplierProviderToolingTab', () => {
         supplierName='Local Studio'
         providerId={null}
         providerTooling={null}
+        onLinkProvider={vi.fn().mockResolvedValue(undefined)}
       />
     )
 
     expect(screen.getByText('Sin vínculo canónico de provider')).toBeInTheDocument()
     expect(screen.getByText(/todavía no está enlazado al objeto provider canónico/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Crear vínculo canónico' })).toBeInTheDocument()
+  })
+
+  it('calls the link action when requested from the empty state', async () => {
+    const onLinkProvider = vi.fn().mockResolvedValue(undefined)
+
+    renderWithTheme(
+      <SupplierProviderToolingTab
+        supplierId='supplier-1'
+        supplierName='Local Studio'
+        providerId={null}
+        providerTooling={null}
+        onLinkProvider={onLinkProvider}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Crear vínculo canónico' }))
+
+    await waitFor(() => {
+      expect(onLinkProvider).toHaveBeenCalledTimes(1)
+    })
   })
 
   it('renders provider 360 KPIs and provenance when a snapshot exists', () => {

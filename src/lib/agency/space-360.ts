@@ -670,7 +670,11 @@ export const getAgencySpace360 = async (requestedId: string): Promise<Space360De
     recentActivity
   ] = await Promise.all([
     readLatestFinanceSnapshot({ clientId: context.client_id, spaceId: context.space_id }),
-    getSpaceFinanceMetrics().then(items => items.find(item => item.clientId === context.client_id) ?? null).catch(() => null),
+    getSpaceFinanceMetrics().then(items =>
+      items.find(item => item.spaceId === context.space_id) ??
+      items.find(item => item.clientId === context.client_id) ??
+      null
+    ).catch(() => null),
     readFinanceExposure(context.client_id),
     readRecentIncome(context.client_id),
     readRecentExpenses(context.client_id),

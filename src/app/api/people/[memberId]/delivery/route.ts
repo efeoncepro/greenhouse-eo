@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server'
 
 import { getPersonDeliveryContext } from '@/lib/person-360/get-person-delivery'
+import { assertMemberInPeopleOrganizationScope, resolvePeopleOrganizationScope } from '@/lib/people/organization-scope'
 import { toPeopleErrorResponse } from '@/lib/people/shared'
 import { requirePeopleTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(_: Request, { params }: { params: Promise<{ memberId: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ memberId: string }> }) {
   const { tenant, errorResponse } = await requirePeopleTenantContext()
 
   if (!tenant) {
@@ -15,8 +16,11 @@ export async function GET(_: Request, { params }: { params: Promise<{ memberId: 
 
   try {
     const { memberId } = await params
+    const organizationId = resolvePeopleOrganizationScope(request, tenant)
 
-    const result = await getPersonDeliveryContext(memberId)
+    await assertMemberInPeopleOrganizationScope(memberId, organizationId)
+
+    const result = await getPersonDeliveryContext(memberId, { organizationId })
 
     if (!result) {
       return NextResponse.json({ error: 'Person not found.' }, { status: 404 })

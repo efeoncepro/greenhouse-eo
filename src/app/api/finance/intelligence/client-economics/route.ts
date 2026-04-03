@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { resolveFinanceDownstreamScope } from '@/lib/finance/canonical'
 import { sanitizeSnapshotForPresentation } from '@/lib/finance/client-economics-presentation'
 import { FinanceValidationError, toNumber } from '@/lib/finance/shared'
 import {
@@ -10,8 +11,10 @@ import {
 import {
   computeClientEconomicsSnapshots,
   getClientEconomics,
+  listClientEconomicsByOrganization,
   listClientEconomicsByPeriod
 } from '@/lib/finance/postgres-store-intelligence'
+import { getFinanceCurrentPeriod } from '@/lib/finance/reporting'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,18 +27,49 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url)
   const clientId = searchParams.get('clientId')
-  const year = Number(searchParams.get('year')) || new Date().getFullYear()
-  const month = Number(searchParams.get('month')) || new Date().getMonth() + 1
+  const organizationId = searchParams.get('organizationId')
+  const clientProfileId = searchParams.get('clientProfileId')
+  const hubspotCompanyId = searchParams.get('hubspotCompanyId')
+  const spaceId = searchParams.get('spaceId')
+  const currentPeriod = getFinanceCurrentPeriod()
+  const year = Number(searchParams.get('year')) || currentPeriod.year
+  const month = Number(searchParams.get('month')) || currentPeriod.month
 
-  if (clientId) {
-    const snapshot = await getClientEconomics(clientId, year, month)
+  try {
+    if (clientId || organizationId || clientProfileId || hubspotCompanyId || spaceId) {
+      const resolvedScope = await resolveFinanceDownstreamScope({
+        clientId,
+        organizationId,
+        clientProfileId,
+        hubspotCompanyId,
+        requestedSpaceId: spaceId,
+        requireLegacyClientBridge: false
+      })
 
-    return NextResponse.json({ snapshot: snapshot ? sanitizeSnapshotForPresentation(snapshot) : null })
+      const snapshot = resolvedScope.clientId
+        ? await getClientEconomics(resolvedScope.clientId, year, month)
+        : null
+
+      const snapshots = !snapshot && resolvedScope.organizationId
+        ? await listClientEconomicsByOrganization(resolvedScope.organizationId, year, month)
+        : []
+
+      return NextResponse.json({
+        snapshot: snapshot ? sanitizeSnapshotForPresentation(snapshot) : null,
+        snapshots: snapshots.map(sanitizeSnapshotForPresentation)
+      })
+    }
+
+    const snapshots = await listClientEconomicsByPeriod(year, month)
+
+    return NextResponse.json({ snapshots: snapshots.map(sanitizeSnapshotForPresentation), year, month })
+  } catch (error) {
+    if (error instanceof FinanceValidationError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
+
+    throw error
   }
-
-  const snapshots = await listClientEconomicsByPeriod(year, month)
-
-  return NextResponse.json({ snapshots: snapshots.map(sanitizeSnapshotForPresentation), year, month })
 }
 
 // POST /api/finance/intelligence/client-economics?action=compute
@@ -55,8 +89,9 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json()
-    const year = toNumber(body.year) || new Date().getFullYear()
-    const month = toNumber(body.month) || new Date().getMonth() + 1
+    const postPeriod = getFinanceCurrentPeriod()
+    const year = toNumber(body.year) || postPeriod.year
+    const month = toNumber(body.month) || postPeriod.month
 
     if (month < 1 || month > 12) {
       throw new FinanceValidationError('month must be between 1 and 12')

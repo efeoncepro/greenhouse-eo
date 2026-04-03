@@ -86,10 +86,15 @@ const toTimestampString = (value: unknown) => {
   return null
 }
 
-export const getPersonFinanceOverview = async (memberId: string): Promise<PersonFinanceOverview> => {
+export const getPersonFinanceOverview = async (
+  memberId: string,
+  options: {
+    organizationId?: string | null
+  } = {}
+): Promise<PersonFinanceOverview> => {
   // Postgres-first: use person_finance_360 view when Postgres is configured
   if (isGreenhousePostgresConfigured()) {
-    return getPersonFinanceOverviewFromPostgres(memberId)
+    return getPersonFinanceOverviewFromPostgres(memberId, options)
   }
 
   // BigQuery fallback

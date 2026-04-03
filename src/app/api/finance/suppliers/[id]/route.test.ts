@@ -2,12 +2,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockRequireFinanceTenantContext = vi.fn()
 const mockGetFinanceSupplierFromPostgres = vi.fn()
+const mockSeedFinanceSupplierInPostgres = vi.fn()
+const mockShouldFallbackFromFinancePostgres = vi.fn()
 const mockListFinanceExpensesFromPostgres = vi.fn()
 const mockGetLatestProviderToolingSnapshot = vi.fn()
 const mockEnsureFinanceInfrastructure = vi.fn()
 const mockRunFinanceQuery = vi.fn()
 const mockGetFinanceProjectId = vi.fn()
 const mockSyncProviderFromFinanceSupplier = vi.fn()
+const mockResolveCanonicalProviderId = vi.fn()
+const mockGetOrganizationMemberships = vi.fn()
 
 vi.mock('@/lib/tenant/authorization', () => ({
   requireFinanceTenantContext: () => mockRequireFinanceTenantContext()
@@ -17,8 +21,17 @@ vi.mock('@/lib/providers/canonical', () => ({
   syncProviderFromFinanceSupplier: (...args: unknown[]) => mockSyncProviderFromFinanceSupplier(...args)
 }))
 
+vi.mock('@/lib/providers/postgres', () => ({
+  resolveCanonicalProviderId: (...args: unknown[]) => mockResolveCanonicalProviderId(...args)
+}))
+
 vi.mock('@/lib/providers/provider-tooling-snapshots', () => ({
   getLatestProviderToolingSnapshot: (...args: unknown[]) => mockGetLatestProviderToolingSnapshot(...args)
+}))
+
+vi.mock('@/lib/account-360/organization-store', () => ({
+  getOrganizationMemberships: (...args: unknown[]) => mockGetOrganizationMemberships(...args),
+  ensureOrganizationContactMembership: vi.fn()
 }))
 
 vi.mock('@/lib/finance/schema', () => ({
@@ -27,8 +40,8 @@ vi.mock('@/lib/finance/schema', () => ({
 
 vi.mock('@/lib/finance/postgres-store', () => ({
   getFinanceSupplierFromPostgres: (...args: unknown[]) => mockGetFinanceSupplierFromPostgres(...args),
-  seedFinanceSupplierInPostgres: vi.fn(),
-  shouldFallbackFromFinancePostgres: vi.fn()
+  seedFinanceSupplierInPostgres: (...args: unknown[]) => mockSeedFinanceSupplierInPostgres(...args),
+  shouldFallbackFromFinancePostgres: (...args: unknown[]) => mockShouldFallbackFromFinancePostgres(...args)
 }))
 
 vi.mock('@/lib/finance/postgres-store-slice2', () => ({
@@ -54,7 +67,7 @@ vi.mock('@/lib/finance/shared', () => ({
   PAYMENT_METHODS: ['transfer', 'check', 'cash', 'credit_card', 'other']
 }))
 
-import { GET } from './route'
+import { GET, PUT } from './route'
 
 describe('GET /api/finance/suppliers/[id]', () => {
   beforeEach(() => {
@@ -66,11 +79,15 @@ describe('GET /api/finance/suppliers/[id]', () => {
     })
     mockGetFinanceProjectId.mockReturnValue('greenhouse-test')
     mockGetFinanceSupplierFromPostgres.mockResolvedValue(null)
+    mockSeedFinanceSupplierInPostgres.mockResolvedValue(null)
+    mockShouldFallbackFromFinancePostgres.mockReturnValue(false)
     mockListFinanceExpensesFromPostgres.mockResolvedValue({ items: [], total: 0, page: 1, pageSize: 20 })
     mockGetLatestProviderToolingSnapshot.mockResolvedValue(null)
+    mockGetOrganizationMemberships.mockResolvedValue([])
     mockRunFinanceQuery.mockResolvedValue([])
     mockEnsureFinanceInfrastructure.mockResolvedValue(undefined)
     mockSyncProviderFromFinanceSupplier.mockResolvedValue(null)
+    mockResolveCanonicalProviderId.mockReturnValue('local-studio')
   })
 
   afterEach(() => {
@@ -81,6 +98,7 @@ describe('GET /api/finance/suppliers/[id]', () => {
     mockGetFinanceSupplierFromPostgres.mockResolvedValue({
       supplierId: 'supplier-1',
       providerId: 'anthropic',
+      organizationId: 'org-anthropic',
       legalName: 'Anthropic PBC',
       tradeName: 'Anthropic',
       taxId: '123',
@@ -150,6 +168,26 @@ describe('GET /api/finance/suppliers/[id]', () => {
       snapshotStatus: 'complete',
       materializedAt: '2026-03-30T12:00:00.000Z'
     })
+    mockGetOrganizationMemberships.mockResolvedValue([
+      {
+        membershipId: 'mbr-1',
+        profileId: 'profile-1',
+        fullName: 'Paula Contact',
+        canonicalEmail: 'paula@anthropic.com',
+        membershipType: 'contact',
+        roleLabel: 'Finance Ops',
+        isPrimary: true
+      },
+      {
+        membershipId: 'mbr-2',
+        profileId: 'profile-2',
+        fullName: 'Ignored Team Member',
+        canonicalEmail: 'internal@anthropic.com',
+        membershipType: 'team_member',
+        roleLabel: null,
+        isPrimary: false
+      }
+    ])
 
     const response = await GET(new Request('http://localhost/api/finance/suppliers/supplier-1'), {
       params: Promise.resolve({ id: 'supplier-1' })
@@ -169,6 +207,15 @@ describe('GET /api/finance/suppliers/[id]', () => {
         activeLicenseCount: 3,
         totalProviderCostClp: 3368400
       }),
+      organizationContacts: [
+        {
+          fullName: 'Paula Contact',
+          canonicalEmail: 'paula@anthropic.com',
+          membershipType: 'contact',
+          roleLabel: 'Finance Ops',
+          isPrimary: true
+        }
+      ],
       paymentHistory: [
         {
           expenseId: 'exp-1',
@@ -181,12 +228,15 @@ describe('GET /api/finance/suppliers/[id]', () => {
         }
       ]
     })
+
+    expect(mockGetOrganizationMemberships).toHaveBeenCalledWith('org-anthropic')
   })
 
   it('omits providerTooling when the supplier is not linked to a provider', async () => {
     mockGetFinanceSupplierFromPostgres.mockResolvedValue({
       supplierId: 'supplier-2',
       providerId: null,
+      organizationId: null,
       legalName: 'Local Studio',
       tradeName: null,
       taxId: null,
@@ -224,5 +274,110 @@ describe('GET /api/finance/suppliers/[id]', () => {
     const body = await response.json()
 
     expect(body.providerTooling).toBeNull()
+    expect(body.organizationContacts).toEqual([])
+  })
+
+  it('auto-links a supplier to a derived canonical provider id through PUT', async () => {
+    mockGetFinanceSupplierFromPostgres.mockResolvedValue({
+      supplierId: 'supplier-2',
+      providerId: null,
+      organizationId: null,
+      legalName: 'Local Studio SPA',
+      tradeName: 'Local Studio',
+      taxId: null,
+      taxIdType: 'RUT',
+      country: 'CL',
+      category: 'creative',
+      serviceType: null,
+      isInternational: false,
+      primaryContactName: null,
+      primaryContactEmail: null,
+      primaryContactPhone: null,
+      website: 'https://localstudio.test',
+      bankName: null,
+      bankAccountNumber: null,
+      bankAccountType: null,
+      bankRouting: null,
+      paymentCurrency: 'CLP',
+      defaultPaymentTerms: 30,
+      defaultPaymentMethod: 'transfer',
+      requiresPo: false,
+      isActive: true,
+      notes: null,
+      createdBy: 'user-1',
+      createdAt: '2026-03-01T10:00:00.000Z',
+      updatedAt: '2026-03-02T10:00:00.000Z'
+    })
+
+    mockSeedFinanceSupplierInPostgres.mockResolvedValue({
+      supplierId: 'supplier-2',
+      providerId: 'local-studio',
+      organizationId: null,
+      legalName: 'Local Studio SPA',
+      tradeName: 'Local Studio',
+      taxId: null,
+      taxIdType: 'RUT',
+      country: 'CL',
+      category: 'creative',
+      serviceType: null,
+      isInternational: false,
+      primaryContactName: null,
+      primaryContactEmail: null,
+      primaryContactPhone: null,
+      website: 'https://localstudio.test',
+      bankName: null,
+      bankAccountNumber: null,
+      bankAccountType: null,
+      bankRouting: null,
+      paymentCurrency: 'CLP',
+      defaultPaymentTerms: 30,
+      defaultPaymentMethod: 'transfer',
+      requiresPo: false,
+      isActive: true,
+      notes: null,
+      createdBy: 'user-1',
+      createdAt: '2026-03-01T10:00:00.000Z',
+      updatedAt: '2026-03-02T10:00:00.000Z'
+    })
+
+    const response = await PUT(
+      new Request('http://localhost/api/finance/suppliers/supplier-2', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ autoLinkProvider: true })
+      }),
+      {
+        params: Promise.resolve({ id: 'supplier-2' })
+      }
+    )
+
+    expect(response.status).toBe(200)
+    expect(mockResolveCanonicalProviderId).toHaveBeenCalledWith(
+      expect.objectContaining({
+        supplierId: 'supplier-2',
+        legalName: 'Local Studio SPA',
+        tradeName: 'Local Studio'
+      })
+    )
+    expect(mockSeedFinanceSupplierInPostgres).toHaveBeenCalledWith(
+      expect.objectContaining({
+        supplierId: 'supplier-2',
+        providerId: 'local-studio'
+      })
+    )
+    expect(mockSyncProviderFromFinanceSupplier).toHaveBeenCalledWith(
+      expect.objectContaining({
+        supplierId: 'supplier-2',
+        providerId: 'local-studio'
+      })
+    )
+
+    const body = await response.json()
+
+    expect(body).toMatchObject({
+      supplierId: 'supplier-2',
+      providerId: 'local-studio',
+      updated: true
+    })
   })
 })

@@ -1,5 +1,15 @@
 # CODEX TASK — HRIS Fase 1B: Onboarding y Offboarding Checklists
 
+## Delta 2026-04-01 — TASK-026 ya resuelta
+
+- `greenhouse_core.members` ya publica `contract_type`, `pay_regime`, `payroll_via` y `deel_contract_id` como canon de contratación.
+- Esta lane debe usar esos campos para elegir templates y no inferir onboarding desde `employment_type` ni desde snapshots de compensación.
+- Lectura operativa sugerida:
+  - `contract_type` decide la plantilla base (`laboral`, `honorarios`, `contractor`, `eor`)
+  - `payroll_via` distingue carriles internos vs. Deel para pasos administrativos y de payroll
+  - `deel_contract_id` puede usarse como evidencia de linkage externo cuando aplique
+  - `daily_required` sigue siendo el backing field si una checklist futura necesita distinguir participación de schedule; `schedule_required` es alias de lectura, no columna nueva
+
 ## Delta 2026-03-27 — Alineación arquitectónica
 
 - **Trigger de auto-creación**: NO hookear directamente en el PATCH endpoint de members. Usar el sistema de outbox events + reactive projections:
@@ -54,7 +64,7 @@ Implementar el **módulo de onboarding y offboarding** del HRIS en Greenhouse. P
 
 | Dependencia | Estado | Impacto si no está |
 |---|---|---|
-| Fase 0.5 (contract types) | Prerequisito | `applicable_contract_types` no funciona sin el campo canónico |
+| Fase 0.5 (contract types) | Cerrada | `applicable_contract_types` ya puede resolverse sobre el canon de `greenhouse_core.members` |
 | `greenhouse_hr` schema | Existe | Tablas van aquí |
 | `greenhouse_core.members.status` | Existe | Trigger de auto-creación depende de cambios de status |
 | SCIM provisioning | Especificado | El trigger de auto-creación puede engancharse al mismo flujo |

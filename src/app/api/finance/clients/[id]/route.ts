@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { withTransaction } from '@/lib/db'
+import { ensureOrganizationForClient } from '@/lib/account-360/organization-identity'
+import { getOrganizationMemberships } from '@/lib/account-360/organization-store'
 import {
   getHubspotCompaniesExpressions,
   getHubspotDealsExpressions,
@@ -31,6 +34,7 @@ import {
 export const dynamic = 'force-dynamic'
 
 type ClientProfileRow = Record<string, unknown> & {
+  organization_id: string | null
   client_id: string | null
   greenhouse_client_name: string | null
   client_profile_id: string
@@ -78,6 +82,15 @@ type DealRow = Record<string, unknown> & {
   close_date: unknown
 }
 
+type FinanceOrganizationContact = {
+  name: string
+  email: string
+  phone: string
+  role: string
+}
+
+const FINANCE_CLIENT_CONTACT_MEMBERSHIP_TYPES = new Set(['billing', 'contact', 'client_contact'])
+
 const parseFinanceContacts = (value: unknown) => {
   try {
     if (!value) {
@@ -97,6 +110,25 @@ const parseServiceModules = (value: string | null) =>
     .split(';')
     .map(item => item.trim())
     .filter(Boolean)
+
+const toFinanceOrganizationContacts = async (organizationId: string | null): Promise<FinanceOrganizationContact[]> => {
+  if (!organizationId) {
+    return []
+  }
+
+  const memberships = await getOrganizationMemberships(organizationId)
+
+  return memberships
+    .filter(membership => FINANCE_CLIENT_CONTACT_MEMBERSHIP_TYPES.has(membership.membershipType))
+    .map(membership => ({
+      name: membership.fullName?.trim() || membership.canonicalEmail?.trim() || 'Sin nombre',
+      email: membership.canonicalEmail?.trim() || '',
+      phone: '',
+      role: membership.membershipType === 'billing'
+        ? 'billing'
+        : membership.roleLabel?.trim() || membership.membershipType
+    }))
+}
 
 const shouldFallbackFromFinanceClientDetailReads = (error: unknown) => {
   if (shouldFallbackFromFinancePostgres(error)) {
@@ -118,9 +150,10 @@ const readFinanceClientDetailFromPostgres = async (id: string) => {
   const rows = await runGreenhousePostgresQuery<ClientProfileRow>(
     `
       WITH latest_profiles AS (
-        SELECT DISTINCT ON (cp.client_profile_id)
+        SELECT DISTINCT ON (COALESCE(cp.organization_id, s.organization_id, cp.client_profile_id))
           cp.client_profile_id,
           cp.client_id,
+          COALESCE(cp.organization_id, s.organization_id) AS organization_id,
           cp.hubspot_company_id,
           cp.tax_id,
           cp.tax_id_type,
@@ -139,7 +172,34 @@ const readFinanceClientDetailFromPostgres = async (id: string) => {
           cp.created_at,
           cp.updated_at
         FROM greenhouse_finance.client_profiles cp
-        ORDER BY cp.client_profile_id, cp.updated_at DESC, cp.created_at DESC
+        LEFT JOIN greenhouse_core.spaces s
+          ON s.client_id = cp.client_id
+         AND s.organization_id IS NOT NULL
+         AND s.active = TRUE
+        WHERE COALESCE(cp.organization_id, s.organization_id) IS NOT NULL
+        ORDER BY COALESCE(cp.organization_id, s.organization_id, cp.client_profile_id), cp.updated_at DESC, cp.created_at DESC, cp.client_profile_id
+      ),
+      space_bridge AS (
+        SELECT DISTINCT ON (organization_id)
+          organization_id,
+          client_id,
+          space_id
+        FROM greenhouse_core.spaces
+        WHERE organization_id IS NOT NULL
+          AND client_id IS NOT NULL
+          AND active = TRUE
+        ORDER BY organization_id, updated_at DESC NULLS LAST, created_at DESC NULLS LAST, space_id ASC
+      ),
+      legacy_client AS (
+        SELECT
+          c.client_id,
+          c.client_name,
+          c.hubspot_company_id,
+          c.country_code,
+          c.created_at,
+          c.updated_at
+        FROM greenhouse_core.clients c
+        WHERE c.active = TRUE
       ),
       crm_company_by_client AS (
         SELECT DISTINCT ON (client_id)
@@ -176,20 +236,21 @@ const readFinanceClientDetailFromPostgres = async (id: string) => {
         GROUP BY vam.client_id
       )
       SELECT
-        c.client_id,
-        c.client_name AS greenhouse_client_name,
-        COALESCE(cp.client_profile_id, c.client_id, c.hubspot_company_id) AS client_profile_id,
-        COALESCE(cp.hubspot_company_id, c.hubspot_company_id, cch.hubspot_company_id) AS hubspot_company_id,
+        o.organization_id,
+        COALESCE(cp.client_id, sb.client_id) AS client_id,
+        legacy.client_name AS greenhouse_client_name,
+        COALESCE(cp.client_profile_id, cp.client_id, sb.client_id, COALESCE(cp.hubspot_company_id, o.hubspot_company_id), o.organization_id) AS client_profile_id,
+        COALESCE(cp.hubspot_company_id, o.hubspot_company_id, legacy.hubspot_company_id, cch.hubspot_company_id) AS hubspot_company_id,
         COALESCE(cc.company_name, cch.company_name) AS company_name,
         NULLIF(REGEXP_REPLACE(COALESCE(cc.website_url, cch.website_url, ''), '^https?://(www\\.)?', ''), '') AS company_domain,
-        COALESCE(cc.country_code, cch.country_code) AS company_country,
+        COALESCE(cc.country_code, cch.country_code, o.country, legacy.country_code) AS company_country,
         ms.business_line,
         ms.service_modules_raw,
-        COALESCE(cp.tax_id, NULL) AS tax_id,
-        COALESCE(cp.tax_id_type, NULL) AS tax_id_type,
-        COALESCE(cp.legal_name, cc.legal_name, cch.legal_name, cc.company_name, cch.company_name, c.client_name) AS legal_name,
+        COALESCE(cp.tax_id, o.tax_id) AS tax_id,
+        COALESCE(cp.tax_id_type, o.tax_id_type) AS tax_id_type,
+        COALESCE(cp.legal_name, o.legal_name, cc.legal_name, cch.legal_name, cc.company_name, cch.company_name, o.organization_name, legacy.client_name) AS legal_name,
         cp.billing_address,
-        COALESCE(cp.billing_country, 'CL') AS billing_country,
+        COALESCE(cp.billing_country, o.country, 'CL') AS billing_country,
         COALESCE(cp.payment_terms_days, 30) AS payment_terms_days,
         COALESCE(cp.payment_currency, 'CLP') AS payment_currency,
         COALESCE(cp.requires_po, FALSE) AS requires_po,
@@ -201,17 +262,22 @@ const readFinanceClientDetailFromPostgres = async (id: string) => {
         cp.created_by_user_id AS created_by,
         cp.created_at,
         cp.updated_at
-      FROM greenhouse_core.clients c
-      LEFT JOIN latest_profiles cp ON cp.client_id = c.client_id
-      LEFT JOIN crm_company_by_client cc ON cc.client_id = c.client_id
-      LEFT JOIN crm_company_by_hubspot cch ON cch.hubspot_company_id = COALESCE(cp.hubspot_company_id, c.hubspot_company_id)
-      LEFT JOIN module_summary_by_client ms ON ms.client_id = c.client_id
-      WHERE c.active = TRUE
+      FROM greenhouse_core.organizations o
+      LEFT JOIN latest_profiles cp ON cp.organization_id = o.organization_id
+      LEFT JOIN space_bridge sb ON sb.organization_id = o.organization_id
+      LEFT JOIN legacy_client legacy ON legacy.client_id = COALESCE(cp.client_id, sb.client_id)
+      LEFT JOIN crm_company_by_client cc ON cc.client_id = COALESCE(cp.client_id, sb.client_id)
+      LEFT JOIN crm_company_by_hubspot cch
+        ON cch.hubspot_company_id = COALESCE(cp.hubspot_company_id, o.hubspot_company_id, legacy.hubspot_company_id)
+      LEFT JOIN module_summary_by_client ms ON ms.client_id = COALESCE(cp.client_id, sb.client_id)
+      WHERE o.active = TRUE
+        AND COALESCE(o.organization_type, 'other') IN ('client', 'both')
         AND (
-          c.client_id = $1
-          OR c.hubspot_company_id = $1
+          o.organization_id = $1
+          OR o.public_id = $1
+          OR COALESCE(cp.client_id, sb.client_id) = $1
           OR cp.client_profile_id = $1
-          OR cp.hubspot_company_id = $1
+          OR COALESCE(cp.hubspot_company_id, o.hubspot_company_id, legacy.hubspot_company_id) = $1
         )
       LIMIT 1
     `,
@@ -245,6 +311,7 @@ const readFinanceClientDetailFromPostgres = async (id: string) => {
           GROUP BY vam.client_id
         )
         SELECT
+          cp.organization_id,
           cp.client_id,
           c.client_name AS greenhouse_client_name,
           cp.client_profile_id,
@@ -272,9 +339,10 @@ const readFinanceClientDetailFromPostgres = async (id: string) => {
           cp.updated_at
         FROM greenhouse_finance.client_profiles cp
         LEFT JOIN greenhouse_core.clients c ON c.client_id = cp.client_id
+        LEFT JOIN greenhouse_core.organizations o ON o.organization_id = cp.organization_id
         LEFT JOIN crm_company_by_hubspot cch ON cch.hubspot_company_id = cp.hubspot_company_id
         LEFT JOIN module_summary_by_client ms ON ms.client_id = cp.client_id
-        WHERE cp.client_profile_id = $1 OR cp.hubspot_company_id = $1
+        WHERE cp.client_profile_id = $1 OR cp.hubspot_company_id = $1 OR o.organization_id = $1
         LIMIT 1
       `,
       [id]
@@ -287,76 +355,82 @@ const readFinanceClientDetailFromPostgres = async (id: string) => {
     return null
   }
 
-  const financeContacts = parseFinanceContacts(row.finance_contacts)
+  const legacyFinanceContacts = parseFinanceContacts(row.finance_contacts)
+  const organizationId = row.organization_id ? normalizeString(row.organization_id) : null
   const hubspotCompanyId = row.hubspot_company_id ? normalizeString(row.hubspot_company_id) : null
   const clientProfileId = normalizeString(row.client_profile_id)
   const clientId = row.client_id ? normalizeString(row.client_id) : null
 
-  const invoices = await runGreenhousePostgresQuery<InvoiceRow>(
-    `
-      SELECT income_id, invoice_number, invoice_date, due_date, total_amount, currency, payment_status, amount_paid
-      FROM greenhouse_finance.income i
-      LEFT JOIN greenhouse_finance.client_profiles cp_income
-        ON cp_income.client_profile_id = i.client_profile_id
-      WHERE ($1::text IS NOT NULL AND COALESCE(i.client_id, cp_income.client_id) = $1)
-         OR ($2::text IS NOT NULL AND i.hubspot_company_id = $2)
-      ORDER BY invoice_date DESC
-      LIMIT 50
-    `,
-    [clientId, hubspotCompanyId]
-  )
-
-  const summaryRows = await runGreenhousePostgresQuery<{
-    total_receivable: unknown
-    active_invoices_count: unknown
-    overdue_invoices_count: unknown
-  }>(
-    `
-      SELECT
-        COALESCE(
-          SUM(
-            COALESCE(i.total_amount_clp, 0) * CASE
-              WHEN COALESCE(i.total_amount, 0) = 0 THEN 0
-              ELSE GREATEST(COALESCE(i.total_amount, 0) - COALESCE(i.amount_paid, 0), 0) / NULLIF(COALESCE(i.total_amount, 0), 0)
-            END
-          ),
-          0
-        ) AS total_receivable,
-        COUNT(*) FILTER (WHERE i.payment_status IN ('pending', 'overdue', 'partial')) AS active_invoices_count,
-        COUNT(*) FILTER (WHERE i.payment_status = 'overdue') AS overdue_invoices_count
-      FROM greenhouse_finance.income i
-      LEFT JOIN greenhouse_finance.client_profiles cp_income
-        ON cp_income.client_profile_id = i.client_profile_id
-      WHERE ($1::text IS NOT NULL AND COALESCE(i.client_id, cp_income.client_id) = $1)
-         OR ($2::text IS NOT NULL AND i.hubspot_company_id = $2)
-    `,
-    [clientId, hubspotCompanyId]
-  )
-
-  const deals = hubspotCompanyId
-    ? await runGreenhousePostgresQuery<DealRow>(
+  const [invoices, summaryRows, deals, organizationFinanceContacts] = await Promise.all([
+    runGreenhousePostgresQuery<InvoiceRow>(
+      `
+        SELECT income_id, invoice_number, invoice_date, due_date, total_amount, currency, payment_status, amount_paid
+        FROM greenhouse_finance.income i
+        LEFT JOIN greenhouse_finance.client_profiles cp_income
+          ON cp_income.client_profile_id = i.client_profile_id
+        WHERE ($1::text IS NOT NULL AND COALESCE(i.organization_id, cp_income.organization_id) = $1)
+           OR ($2::text IS NOT NULL AND COALESCE(i.client_id, cp_income.client_id) = $2)
+           OR ($3::text IS NOT NULL AND i.hubspot_company_id = $3)
+        ORDER BY invoice_date DESC
+        LIMIT 50
+      `,
+      [organizationId, clientId, hubspotCompanyId]
+    ),
+    runGreenhousePostgresQuery<{
+      total_receivable: unknown
+      active_invoices_count: unknown
+      overdue_invoices_count: unknown
+    }>(
       `
         SELECT
-          hubspot_deal_id AS deal_id,
-          deal_name,
-          stage_name AS deal_stage,
-          pipeline_id AS pipeline,
-          amount,
-          close_date
-        FROM greenhouse_crm.deals
-        WHERE hubspot_company_id = $1
-          AND is_deleted = FALSE
-        ORDER BY close_date DESC NULLS LAST, hubspot_deal_id DESC
-        LIMIT 25
+          COALESCE(
+            SUM(
+              COALESCE(i.total_amount_clp, 0) * CASE
+                WHEN COALESCE(i.total_amount, 0) = 0 THEN 0
+                ELSE GREATEST(COALESCE(i.total_amount, 0) - COALESCE(i.amount_paid, 0), 0) / NULLIF(COALESCE(i.total_amount, 0), 0)
+              END
+            ),
+            0
+          ) AS total_receivable,
+          COUNT(*) FILTER (WHERE i.payment_status IN ('pending', 'overdue', 'partial')) AS active_invoices_count,
+          COUNT(*) FILTER (WHERE i.payment_status = 'overdue') AS overdue_invoices_count
+        FROM greenhouse_finance.income i
+        LEFT JOIN greenhouse_finance.client_profiles cp_income
+          ON cp_income.client_profile_id = i.client_profile_id
+        WHERE ($1::text IS NOT NULL AND COALESCE(i.organization_id, cp_income.organization_id) = $1)
+           OR ($2::text IS NOT NULL AND COALESCE(i.client_id, cp_income.client_id) = $2)
+           OR ($3::text IS NOT NULL AND i.hubspot_company_id = $3)
       `,
-      [hubspotCompanyId]
-    )
-    : []
+      [organizationId, clientId, hubspotCompanyId]
+    ),
+    hubspotCompanyId
+      ? runGreenhousePostgresQuery<DealRow>(
+        `
+          SELECT
+            hubspot_deal_id AS deal_id,
+            deal_name,
+            stage_name AS deal_stage,
+            pipeline_id AS pipeline,
+            amount,
+            close_date
+          FROM greenhouse_crm.deals
+          WHERE hubspot_company_id = $1
+            AND is_deleted = FALSE
+          ORDER BY close_date DESC NULLS LAST, hubspot_deal_id DESC
+          LIMIT 25
+        `,
+        [hubspotCompanyId]
+      )
+      : Promise.resolve([]),
+    toFinanceOrganizationContacts(organizationId).catch(() => [])
+  ])
 
   const summary = summaryRows[0]
+  const financeContacts = organizationFinanceContacts.length > 0 ? organizationFinanceContacts : legacyFinanceContacts
 
   return {
     company: {
+      organizationId,
       clientId,
       greenhouseClientName: row.greenhouse_client_name ? normalizeString(row.greenhouse_client_name) : null,
       hubspotCompanyId,
@@ -367,6 +441,7 @@ const readFinanceClientDetailFromPostgres = async (id: string) => {
       serviceModules: parseServiceModules(row.service_modules_raw)
     },
     financialProfile: {
+      organizationId,
       clientId,
       clientProfileId,
       hubspotCompanyId,
@@ -863,40 +938,68 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         })
         : null
 
-      await upsertFinanceClientProfileInPostgres({
-        clientProfileId,
-        clientId: resolvedClient?.clientId ?? existing.clientId,
-        hubspotCompanyId: resolvedClient?.hubspotCompanyId ?? existing.hubspotCompanyId,
-        taxId: body.taxId !== undefined ? (body.taxId ? normalizeString(body.taxId) : null) : existing.taxId,
-        taxIdType: body.taxIdType !== undefined
-          ? (body.taxIdType ? assertValidTaxIdType(body.taxIdType) : null)
-          : existing.taxIdType,
-        legalName: body.legalName !== undefined ? (body.legalName ? normalizeString(body.legalName) : null) : existing.legalName,
-        billingAddress: body.billingAddress !== undefined
-          ? (body.billingAddress ? normalizeString(body.billingAddress) : null)
-          : existing.billingAddress,
-        billingCountry: body.billingCountry !== undefined
-          ? (body.billingCountry ? normalizeString(body.billingCountry) : null)
-          : existing.billingCountry,
-        paymentTermsDays: body.paymentTermsDays !== undefined ? (toNumber(body.paymentTermsDays) || 30) : existing.paymentTermsDays,
-        paymentCurrency: body.paymentCurrency !== undefined
-          ? (body.paymentCurrency ? assertValidCurrency(body.paymentCurrency) : null)
-          : existing.paymentCurrency,
-        requiresPo: body.requiresPo !== undefined ? Boolean(body.requiresPo) : existing.requiresPo,
-        requiresHes: body.requiresHes !== undefined ? Boolean(body.requiresHes) : existing.requiresHes,
-        currentPoNumber: body.currentPoNumber !== undefined
-          ? (body.currentPoNumber ? normalizeString(body.currentPoNumber) : null)
-          : existing.currentPoNumber,
-        currentHesNumber: body.currentHesNumber !== undefined
-          ? (body.currentHesNumber ? normalizeString(body.currentHesNumber) : null)
-          : existing.currentHesNumber,
-        financeContacts: body.financeContacts !== undefined
-          ? (Array.isArray(body.financeContacts) ? body.financeContacts : [])
-          : existing.financeContacts,
-        specialConditions: body.specialConditions !== undefined
-          ? (body.specialConditions ? normalizeString(body.specialConditions) : null)
-          : existing.specialConditions,
-        createdByUserId: existing.createdByUserId ?? tenant.userId ?? null
+      const legalName = body.legalName !== undefined
+        ? (body.legalName ? normalizeString(body.legalName) : null)
+        : existing.legalName
+
+      const taxId = body.taxId !== undefined ? (body.taxId ? normalizeString(body.taxId) : null) : existing.taxId
+
+      const taxIdType = body.taxIdType !== undefined
+        ? (body.taxIdType ? assertValidTaxIdType(body.taxIdType) : null)
+        : existing.taxIdType
+
+      const billingCountry = body.billingCountry !== undefined
+        ? (body.billingCountry ? normalizeString(body.billingCountry) : null)
+        : existing.billingCountry
+
+      await withTransaction(async client => {
+        const organizationId = await ensureOrganizationForClient(
+          {
+            organizationId: resolvedClient?.organizationId ?? existing.organizationId,
+            clientId: resolvedClient?.clientId ?? existing.clientId,
+            hubspotCompanyId: resolvedClient?.hubspotCompanyId ?? existing.hubspotCompanyId,
+            taxId,
+            taxIdType,
+            legalName: legalName || existing.legalName || existing.clientProfileId,
+            organizationName: legalName || existing.legalName || existing.clientProfileId,
+            country: billingCountry || existing.billingCountry || 'CL'
+          },
+          client
+        )
+
+        await upsertFinanceClientProfileInPostgres({
+          clientProfileId,
+          clientId: resolvedClient?.clientId ?? existing.clientId,
+          organizationId,
+          hubspotCompanyId: resolvedClient?.hubspotCompanyId ?? existing.hubspotCompanyId,
+          taxId,
+          taxIdType,
+          legalName,
+          billingAddress: body.billingAddress !== undefined
+            ? (body.billingAddress ? normalizeString(body.billingAddress) : null)
+            : existing.billingAddress,
+          billingCountry,
+          paymentTermsDays: body.paymentTermsDays !== undefined ? (toNumber(body.paymentTermsDays) || 30) : existing.paymentTermsDays,
+          paymentCurrency: body.paymentCurrency !== undefined
+            ? (body.paymentCurrency ? assertValidCurrency(body.paymentCurrency) : null)
+            : existing.paymentCurrency,
+          requiresPo: body.requiresPo !== undefined ? Boolean(body.requiresPo) : existing.requiresPo,
+          requiresHes: body.requiresHes !== undefined ? Boolean(body.requiresHes) : existing.requiresHes,
+          currentPoNumber: body.currentPoNumber !== undefined
+            ? (body.currentPoNumber ? normalizeString(body.currentPoNumber) : null)
+            : existing.currentPoNumber,
+          currentHesNumber: body.currentHesNumber !== undefined
+            ? (body.currentHesNumber ? normalizeString(body.currentHesNumber) : null)
+            : existing.currentHesNumber,
+          financeContacts: body.financeContacts !== undefined
+            ? (Array.isArray(body.financeContacts) ? body.financeContacts : [])
+            : existing.financeContacts,
+          specialConditions: body.specialConditions !== undefined
+            ? (body.specialConditions ? normalizeString(body.specialConditions) : null)
+            : existing.specialConditions,
+          createdByUserId: existing.createdByUserId ?? tenant.userId ?? null,
+          client
+        })
       })
     } catch (error) {
       if (!shouldFallbackFromFinancePostgres(error)) {

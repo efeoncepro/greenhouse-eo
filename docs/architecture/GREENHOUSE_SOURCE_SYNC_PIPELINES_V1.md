@@ -1,5 +1,157 @@
 # Greenhouse Source Sync Pipelines V1
 
+## Delta 2026-04-02 — Project to Tasks association model for Notion parity
+
+La relación `Proyecto -> Tareas` de Notion ya tiene un espejo parcial en Greenhouse, pero hoy no está modelada con fidelidad completa.
+
+Estado actual confirmado en runtime:
+
+- `greenhouse_conformed.delivery_tasks` preserva `project_source_id` singular
+- `greenhouse_delivery.tasks` preserva `project_record_id` y `notion_project_id` singular
+- el sync actual toma la primera relación disponible desde `proyecto_ids?.[0]`
+- la lectura `Proyecto -> Tareas` ya puede reconstruirse por join, pero se pierde fidelidad si una tarea trae más de una relación o si queremos auditar exactamente el array de relaciones de Notion
+
+Decisión arquitectónica:
+
+- Greenhouse debe tratar la relación canónica operativa como `task belongs to primary project`
+- pero debe preservar además la fidelidad del array de relaciones de Notion para auditoría y paridad
+
+Modelo objetivo:
+
+### 1. Raw fidelity
+
+En `notion_ops` y `greenhouse_conformed` debemos preservar:
+
+- `project_source_ids ARRAY<STRING>` en tareas
+- `task_source_ids ARRAY<STRING>` en proyectos cuando la fuente lo permita
+
+Regla:
+
+- el array preserva la relación exacta de Notion
+- no debe degradarse a solo la primera relación sin guardar el resto
+
+### 2. Canonical operational relation
+
+Para runtime y joins rápidos, Greenhouse debe exponer:
+
+- `primary_project_source_id` en tareas de conformed
+- `project_record_id` en PostgreSQL runtime
+
+Regla:
+
+- la relación operativa principal se usa para APIs, readers y scorecards
+- si una tarea viene con más de un proyecto relacionado, Greenhouse debe escoger una relación primaria explícita y además conservar el resto en el carril de fidelidad
+
+### 3. Bridge for future many-to-many fidelity
+
+Si el workspace empieza a usar relaciones `task <-> project` genuinamente many-to-many, el patrón recomendado es un bridge explícito:
+
+- `greenhouse_conformed.delivery_task_project_links`
+- `greenhouse_delivery.task_project_links`
+
+Campos mínimos sugeridos:
+
+- `task_source_id`
+- `project_source_id`
+- `is_primary`
+- `source_relation_count`
+- `sync_run_id`
+- `synced_at`
+
+Regla:
+
+- no crear el bridge solo por teoría
+- activarlo cuando la auditoría detecte tareas con múltiples proyectos reales o cuando un módulo necesite esa fidelidad explícita
+
+### 4. Project 360 read model
+
+La lectura correcta de un proyecto con sus asociaciones no debe depender de una columna rollup tipo Notion.
+
+Debe resolverse por join desde tareas y exponer:
+
+- metadatos del proyecto
+- lista de tareas asociadas
+- counts por estado
+- overdue, on-time, late drops, carry-over
+- responsables
+- bloqueos
+- fechas relevantes
+- KPIs agregados del conjunto de tareas
+
+Regla:
+
+- `Proyecto -> Tareas` en Greenhouse debe ser un read-model calculado, no un string o label precalculado opaco
+
+### 5. Publishing back to Notion
+
+Si Greenhouse publica de vuelta a Notion:
+
+- Notion puede consumir rollups o scorecards derivados de Greenhouse
+- pero la verdad operativa del vínculo `project -> tasks` debe seguir viviendo en Greenhouse como join auditable
+
+Vía recomendada de implementación:
+
+1. ampliar `greenhouse_conformed.delivery_tasks` para preservar `project_source_ids`
+2. mantener `project_source_id` actual como `primary_project_source_id`
+3. evaluar si `delivery_projects` necesita también `task_source_ids` o si el join desde tasks es suficiente
+4. construir un reader `Project 360` sobre `delivery_projects + delivery_tasks`
+5. si aparecen casos reales many-to-many, introducir el bridge `task_project_links`
+
+## Delta 2026-04-02 — TASK-197 source sync parity implemented
+
+Se implementó un primer slice técnico de paridad para responsables y relación `Proyecto -> Tareas`.
+
+Cambios aplicados:
+
+- `greenhouse_conformed.delivery_tasks` ahora preserva `project_source_ids ARRAY<STRING>` además de `project_source_id`
+- `sync-notion-conformed.ts` ahora valida cobertura de assignee por `space_id`, no solo globalmente
+- `scripts/sync-source-runtime-projections.ts` ya normaliza `responsables_ids` y `responsable_ids` en el mismo carril
+- `greenhouse_delivery.tasks` queda preparado para persistir:
+  - `assignee_source_id`
+  - `assignee_member_ids`
+  - `project_source_ids`
+
+Compatibilidad:
+
+- `project_source_id` y `assignee_member_id` siguen existiendo como contrato backward-compatible
+- `ICO` puede seguir leyendo `project_source_id` y `assignee_member_ids`
+- `Person 360` puede seguir leyendo `assignee_member_id` mientras runtime empieza a cerrar la brecha de fidelidad
+
+Nota operativa:
+
+- update 2026-04-02:
+  - el bloqueo de migraciones quedó superado y se aplicó `20260402222438783_delivery-runtime-space-fk-canonicalization.sql`
+  - `greenhouse_delivery.{projects,sprints,tasks}.space_id` ya referencia `greenhouse_core.spaces(space_id)`
+  - el setup base `scripts/setup-postgres-source-sync.sql` quedó alineado con esa FK canónica
+  - el cron moderno también corrigió el falso fallback `COALESCE(responsables_ids, responsable_ids)` mediante una selección de arrays no vacíos, lo que restauró la atribución de `Sky` en `greenhouse_conformed`
+
+## Delta 2026-04-01 — Notion DB IDs canónicos para Delivery / ICO
+
+Los teamspaces y databases de Notion que hoy alimentan el baseline operativo de Delivery e `ICO` deben tratarse como referencia arquitectónica viva, no solo como contexto de una task.
+
+Baseline auditado vía MCP:
+
+- `Efeonce`
+  - `Proyectos`: `15288d9b-1459-4052-9acc-75439bbd5470`
+  - `Tareas`: `3a54f090-4be1-4158-8335-33ba96557a73`
+- `Sky Airlines`
+  - `Proyectos`: `23039c2f-efe7-817a-8272-ffe6be1a696a`
+  - `Tareas`: `23039c2f-efe7-8138-9d1e-c8238fc40523`
+- `ANAM`
+  - `Proyectos`: `32539c2f-efe7-8053-94f7-c06eb3bbf530`
+  - `Tareas`: `32539c2f-efe7-81a4-92f4-f4725309935c`
+
+Uso correcto de estos IDs:
+
+- son `source ids` de Notion, no identidades canónicas de Greenhouse
+- son el ancla operativa para auditar `space_notion_sources`, `notion_ops.*`, `greenhouse_conformed.delivery_projects` y `greenhouse_conformed.delivery_tasks`
+- si cambian en Notion o se agrega un nuevo Space relevante para `ICO`, actualizar este documento y `TASK-186` en el mismo cambio
+
+Regla operativa:
+
+- para auditorías de métricas Delivery, primero verificar que el sync sigue leyendo estas DBs correctas antes de asumir que el problema está en `ICO` o en el serving layer
+- no confiar en memoria conversacional para redescubrir estos IDs; este documento es la referencia viva
+
 ## Purpose
 
 Define how Greenhouse should ingest, back up, normalize, and serve data that currently comes from external operational systems such as Notion and HubSpot.
@@ -235,11 +387,17 @@ Recommended business fields for tasks:
 - `assignee_source_id`
 - `assignee_member_id` — first Notion responsable resolved to Greenhouse member ID (backward compat)
 - `assignee_member_ids` — `ARRAY<STRING>` all Notion responsables resolved to Greenhouse member IDs (enables person-level ICO metrics via UNNEST; added 2026-03-18)
+- `project_source_ids` — `ARRAY<STRING>` exact Notion project relations preserved for auditability and richer project readers (added 2026-04-02)
 - `due_date`
 - `completed_at`
 - `last_edited_time`
 - `is_deleted`
 - `sync_run_id`
+
+Delta 2026-04-01:
+- `due_date` quedó ratificado como ancla operativa principal del período para `ICO` / `Performance Report`.
+- `completed_at` sigue siendo señal de cierre y calidad, pero ya no debe usarse como único criterio de pertenencia mensual.
+- El sync no necesita recalcular métricas; su responsabilidad sigue siendo preservar primitivas suficientes para que `ICO` derive período, carry-over y scorecards de forma auditable.
 
 Multi-assignee enrichment:
 - `responsables_ids` (Notion array) is mapped through `team_members.notion_user_id` → `member_id`
@@ -249,6 +407,7 @@ Multi-assignee enrichment:
 
 Guardrails added after payroll/ICO remediation (2026-03-27):
 - the conformed sync must fail loudly if source tasks with `responsables_ids` are read but `greenhouse_conformed.delivery_tasks` persists `0` rows with `assignee_source_id`
+- as of `TASK-197`, this validation must also hold per `space_id`, so a healthy space like `Efeonce` cannot mask attribution loss in another space like `Sky`
 - sync results should expose validation counters at runtime:
   - `sourceTasksWithResponsables`
   - `conformedTasksWithAssigneeSource`
@@ -395,6 +554,7 @@ Recommended tables under `greenhouse_sync`:
 - `source_sync_runs`
 - `source_sync_watermarks`
 - `source_sync_failures`
+- `integration_registry` — central registry of native integrations with taxonomy, ownership, readiness status, consumer domains and sync cadence. Introduced by `TASK-188` as Layer 1 of the Native Integrations Layer (`GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md`).
 
 ### `source_sync_runs`
 
@@ -530,6 +690,16 @@ If the incoming `payload_hash` did not change, projection to Postgres can be ski
 
 The conformed data layer now supports **config-driven property mappings** via a Postgres configuration table. This enables onboarding new Spaces (clients) with different Notion property names or types without modifying the sync script.
 
+Design rule reinforced after auditing `Efeonce`, `Sky Airlines`, and `ANAM`:
+
+- Spaces may share a broad operational shape (`Proyectos`, `Tareas`, similar KPI intent), but they do not have identical schemas.
+- Greenhouse must preserve a **common KPI core contract** for Delivery/ICO while allowing **space-specific extensions** for client, vertical, or project-type particularities.
+- The right answer is not a rigid one-size-fits-all schema, nor uncontrolled per-client hardcoding.
+- The right answer is:
+  - stable core fields for cross-space KPIs
+  - config-driven mapping for property name/type drift
+  - explicit classification of `space-specific` fields that enrich explanation, workflow, or client context without redefining the KPI core
+
 ### Architecture
 
 ```
@@ -603,7 +773,25 @@ Constraints:
 
 Spaces without entries in `space_property_mappings` use the hardcoded default mapping. This is the permanent fallback for Efeonce and any Space whose Notion properties match the default schema.
 
+Important nuance:
+
+- “matches the default schema” does not mean “is identical to Efeonce”
+- a Space can share the KPI core and still require additional fields or different semantics for project-specific use cases
+- when that happens, prefer extending mappings and downstream contracts explicitly instead of silently overfitting the default schema
+
 If the Postgres query for mappings fails (connection error, table missing), the pipeline logs a warning and continues with the default mapping. The sync never blocks on a configuration error.
+
+Current nuance after `TASK-187`:
+
+- the active cron lane `src/lib/sync/sync-notion-conformed.ts` still consumes default/runtime mappings and does not yet read `space_property_mappings` as its primary contract source
+- `space_property_mappings` remains the governance/config table for explicit overrides, discovery output and future runtime convergence
+- per-space Notion governance is now persisted in:
+  - `greenhouse_sync.notion_space_schema_snapshots`
+  - `greenhouse_sync.notion_space_schema_drift_events`
+  - `greenhouse_sync.notion_space_kpi_readiness`
+- admin surfaces for that governance live under:
+  - `GET /api/admin/tenants/[id]/notion-governance`
+  - `POST /api/admin/tenants/[id]/notion-governance/refresh`
 
 ### Discovery script
 
@@ -617,17 +805,19 @@ Output:
 1. `discovery_report.md` — property catalog, suggested mappings with confidence levels, type conflicts, seed SQL
 2. `discovery_raw.json` — full raw schema data
 
-The script reads Space configurations from `greenhouse_core.space_notion_sources` (with fallback to `greenhouse_core.clients`), calls the Notion API to enumerate database properties, and matches them against the conformed schema using name patterns and type compatibility.
+The script reads Space configurations from `greenhouse_core.space_notion_sources`, calls the Notion API to enumerate database properties, and matches them against the conformed schema using name patterns and type compatibility.
 
 ### New Space onboarding workflow
 
 1. Register Space in Greenhouse (API: `POST /api/admin/spaces`)
-2. Run discovery: `npx tsx scripts/notion-schema-discovery.ts --space-id <SPACE_ID>`
-3. Review `discovery_report.md` — adjust mappings as needed
-4. Execute seed SQL in Postgres (from the report)
-5. Run sync: `npx tsx scripts/sync-source-runtime-projections.ts`
-6. Verify data in `greenhouse_conformed.delivery_tasks` filtered by `space_id`
-7. Run ICO materialization: `npx tsx scripts/materialize-ico.ts`
+2. Register Notion DB bindings (UI `TenantNotionPanel` or `POST /api/integrations/notion/register`)
+3. Refresh/persist governance snapshots (best-effort from register or explicit `POST /api/admin/tenants/[id]/notion-governance/refresh`)
+4. Run discovery script when a human needs a richer audit/export: `npx tsx scripts/notion-schema-discovery.ts --space-id <SPACE_ID>`
+5. Review `discovery_report.md` — adjust mappings as needed
+6. Execute seed SQL in Postgres (from the report) when explicit overrides are required
+7. Run sync: shared control plane `POST /api/admin/integrations/notion/sync` or cron `GET /api/cron/sync-conformed`
+8. Verify data in `greenhouse_conformed.delivery_tasks` filtered by `space_id`
+9. Run ICO materialization: `npx tsx scripts/materialize-ico.ts`
 
 ### Operational remediation runbook
 

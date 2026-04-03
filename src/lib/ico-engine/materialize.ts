@@ -2,6 +2,11 @@ import 'server-only'
 
 import { runIcoEngineQuery, getIcoEngineProjectId, toNumber, buildMetricSelectSQL, buildPeriodFilterSQL, DONE_STATUSES_SQL } from './shared'
 import { ensureIcoEngineInfrastructure, ICO_DATASET, ENGINE_VERSION } from './schema'
+import {
+  TOP_PERFORMER_MIN_THROUGHPUT,
+  TOP_PERFORMER_MULTI_ASSIGNEE_POLICY,
+  TREND_STABLE_BAND_PP
+} from './performance-report'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -15,6 +20,7 @@ interface MaterializationResult {
   sprintMetricsWritten: number
   organizationMetricsWritten: number
   businessUnitMetricsWritten: number
+  performanceReportsWritten: number
   durationMs: number
   periodYear: number
   periodMonth: number
@@ -84,6 +90,10 @@ export const materializeMonthlySnapshots = async (
       total_tasks = source.total_tasks,
       completed_tasks = source.completed_tasks,
       active_tasks = source.active_tasks,
+      on_time_count = source.on_time_count,
+      late_drop_count = source.late_drop_count,
+      overdue_count = source.overdue_count,
+      carry_over_count = source.carry_over_count,
       computed_at = source.computed_at,
       engine_version = source.engine_version
     WHEN NOT MATCHED THEN INSERT (
@@ -95,6 +105,7 @@ export const materializeMonthlySnapshots = async (
       stuck_asset_count, stuck_asset_pct,
       csc_distribution,
       total_tasks, completed_tasks, active_tasks,
+      on_time_count, late_drop_count, overdue_count, carry_over_count,
       computed_at, engine_version
     ) VALUES (
       source.snapshot_id, source.space_id, source.client_id,
@@ -105,6 +116,7 @@ export const materializeMonthlySnapshots = async (
       source.stuck_asset_count, source.stuck_asset_pct,
       source.csc_distribution,
       source.total_tasks, source.completed_tasks, source.active_tasks,
+      source.on_time_count, source.late_drop_count, source.overdue_count, source.carry_over_count,
       source.computed_at, source.engine_version
     )
   `, { periodYear, periodMonth, engineVersion: ENGINE_VERSION })
@@ -120,10 +132,11 @@ export const materializeMonthlySnapshots = async (
     WHERE space_id IS NOT NULL
       AND completed_at IS NULL
       AND task_status NOT IN (${DONE_STATUSES_SQL})
+      AND (${buildPeriodFilterSQL()})
       AND fase_csc != 'otros'
     GROUP BY space_id, fase_csc
     ORDER BY space_id, fase_csc
-  `)
+  `, { periodYear, periodMonth })
 
   // Group CSC rows by space_id → JSON string
   const cscBySpace = new Map<string, Record<string, number>>()
@@ -223,6 +236,31 @@ export const materializeMonthlySnapshots = async (
   // Step 10: Materialize business-unit-level metrics (operating BU from Notion projects)
   const businessUnitMetricsWritten = await materializeBusinessUnitMetrics(projectId, periodYear, periodMonth)
 
+  // Step 11: Materialize auditable monthly Performance Report read model
+  const performanceReportsWritten = await materializePerformanceReports(projectId, periodYear, periodMonth)
+
+  if (performanceReportsWritten > 0) {
+    try {
+      const { publishOutboxEvent } = await import('@/lib/sync/publish-event')
+
+      await publishOutboxEvent({
+        aggregateType: 'ico_performance_report',
+        aggregateId: `ico-perf-agency-${periodYear}-${periodMonth}`,
+        eventType: 'ico.performance_report.materialized',
+        payload: {
+          reportScope: 'agency',
+          periodYear,
+          periodMonth,
+          performanceReportsWritten
+        }
+      }).catch(() => {
+        // Non-blocking
+      })
+    } catch {
+      // Non-blocking
+    }
+  }
+
   // Step 9b: Publish ico.materialization.completed for each affected organization
   if (organizationMetricsWritten > 0) {
     try {
@@ -262,6 +300,7 @@ export const materializeMonthlySnapshots = async (
     sprintMetricsWritten,
     organizationMetricsWritten,
     businessUnitMetricsWritten,
+    performanceReportsWritten,
     durationMs: Date.now() - start,
     periodYear,
     periodMonth,
@@ -366,6 +405,7 @@ const materializeProjectMetrics = async (
        throughput_count, pipeline_velocity,
        stuck_asset_count, stuck_asset_pct,
        total_tasks, completed_tasks, active_tasks,
+       on_time_count, late_drop_count, overdue_count, carry_over_count,
        materialized_at)
     SELECT
       project_source_id,
@@ -415,9 +455,10 @@ const materializeMemberMetrics = async (
        throughput_count, pipeline_velocity,
        stuck_asset_count, stuck_asset_pct,
        total_tasks, completed_tasks, active_tasks,
+       on_time_count, late_drop_count, overdue_count, carry_over_count,
        materialized_at)
     SELECT
-      member_id,
+      te.primary_owner_member_id AS member_id,
       @periodYear AS period_year,
       @periodMonth AS period_month,
 
@@ -425,10 +466,9 @@ const materializeMemberMetrics = async (
 
       CURRENT_TIMESTAMP() AS materialized_at
 
-    FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\` te,
-         UNNEST(te.assignee_member_ids) AS member_id
-    WHERE member_id IS NOT NULL
-      AND member_id != ''
+    FROM \`${projectId}.${ICO_DATASET}.v_tasks_enriched\` te
+    WHERE te.primary_owner_member_id IS NOT NULL
+      AND te.primary_owner_member_id != ''
       AND (${buildPeriodFilterSQL()})
     GROUP BY member_id
   `, { periodYear, periodMonth })
@@ -462,6 +502,7 @@ const materializeSprintMetrics = async (
        throughput_count, pipeline_velocity,
        stuck_asset_count, stuck_asset_pct,
        total_tasks, completed_tasks, active_tasks,
+       on_time_count, late_drop_count, overdue_count, carry_over_count,
        materialized_at)
     SELECT
       sprint_source_id,
@@ -509,6 +550,7 @@ const materializeOrganizationMetrics = async (
        throughput_count, pipeline_velocity,
        stuck_asset_count, stuck_asset_pct,
        total_tasks, completed_tasks, active_tasks,
+       on_time_count, late_drop_count, overdue_count, carry_over_count,
        materialized_at)
     SELECT
       client_id AS organization_id,
@@ -555,6 +597,7 @@ const materializeBusinessUnitMetrics = async (
        throughput_count, pipeline_velocity,
        stuck_asset_count, stuck_asset_pct,
        total_tasks, completed_tasks, active_tasks,
+       on_time_count, late_drop_count, overdue_count, carry_over_count,
        materialized_at)
     SELECT
       operating_business_unit AS business_unit,
@@ -579,4 +622,173 @@ const materializeBusinessUnitMetrics = async (
   `, { periodYear, periodMonth })
 
   return toNumber(buCountRows[0]?.cnt)
+}
+
+// ─── Performance Report Materialization ────────────────────────────────────
+
+const materializePerformanceReports = async (
+  projectId: string,
+  periodYear: number,
+  periodMonth: number
+): Promise<number> => {
+  await runIcoEngineQuery(`
+    DELETE FROM \`${projectId}.${ICO_DATASET}.performance_report_monthly\`
+    WHERE report_scope = 'agency'
+      AND period_year = @periodYear
+      AND period_month = @periodMonth
+  `, { periodYear, periodMonth })
+
+  await runIcoEngineQuery(`
+    INSERT INTO \`${projectId}.${ICO_DATASET}.performance_report_monthly\`
+      (report_scope, period_year, period_month,
+       on_time_count, late_drop_count, on_time_pct,
+       overdue_count, carry_over_count,
+       total_tasks, completed_tasks, active_tasks,
+       efeonce_tasks_count, sky_tasks_count, task_mix_json,
+       top_performer_member_id, top_performer_member_name,
+       top_performer_otd_pct, top_performer_throughput_count,
+       top_performer_rpa_avg, top_performer_ftr_pct,
+       top_performer_min_throughput, trend_stable_band_pp, multi_assignee_policy,
+       materialized_at, engine_version)
+    WITH classified_snapshots AS (
+      SELECT
+        ms.*,
+        CASE
+          WHEN LOWER(TRIM(COALESCE(ms.client_id, ms.space_id, ''))) IN ('efeonce_internal', 'client_internal', 'space-efeonce')
+            OR LOWER(TRIM(COALESCE(c1.client_name, c2.client_name, ms.space_id, ''))) IN ('efeonce internal', 'efeonce')
+            THEN 'efeonce'
+          WHEN LOWER(TRIM(COALESCE(c1.client_name, c2.client_name, ms.space_id, ''))) LIKE '%sky%'
+            OR LOWER(TRIM(COALESCE(ms.client_id, ms.space_id, ''))) LIKE '%sky%'
+            THEN 'sky'
+          WHEN ms.client_id IS NOT NULL AND TRIM(ms.client_id) != ''
+            THEN CONCAT('client:', ms.client_id)
+          ELSE CONCAT('space:', ms.space_id)
+        END AS segment_key,
+        CASE
+          WHEN LOWER(TRIM(COALESCE(ms.client_id, ms.space_id, ''))) IN ('efeonce_internal', 'client_internal', 'space-efeonce')
+            OR LOWER(TRIM(COALESCE(c1.client_name, c2.client_name, ms.space_id, ''))) IN ('efeonce internal', 'efeonce')
+            THEN 'Efeonce'
+          WHEN LOWER(TRIM(COALESCE(c1.client_name, c2.client_name, ms.space_id, ''))) LIKE '%sky%'
+            OR LOWER(TRIM(COALESCE(ms.client_id, ms.space_id, ''))) LIKE '%sky%'
+            THEN 'Sky'
+          ELSE COALESCE(NULLIF(TRIM(COALESCE(c1.client_name, c2.client_name, ms.space_id)), ''), ms.space_id)
+        END AS segment_label
+      FROM \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\` ms
+      LEFT JOIN \`${projectId}.greenhouse.clients\` c1
+        ON c1.client_id = ms.client_id
+      LEFT JOIN \`${projectId}.greenhouse.clients\` c2
+        ON c2.client_id = ms.space_id
+      WHERE ms.period_year = @periodYear
+        AND ms.period_month = @periodMonth
+    ),
+    agency_summary AS (
+      SELECT
+        'agency' AS report_scope,
+        @periodYear AS period_year,
+        @periodMonth AS period_month,
+        SUM(on_time_count) AS on_time_count,
+        SUM(late_drop_count) AS late_drop_count,
+        ROUND(
+          SAFE_DIVIDE(
+            SUM(on_time_count),
+            NULLIF(SUM(total_tasks), 0)
+          ) * 100,
+          1
+        ) AS on_time_pct,
+        SUM(overdue_count) AS overdue_count,
+        SUM(carry_over_count) AS carry_over_count,
+        SUM(total_tasks) AS total_tasks,
+        SUM(completed_tasks) AS completed_tasks,
+        SUM(active_tasks) AS active_tasks,
+        SUM(CASE WHEN segment_key = 'efeonce' THEN total_tasks ELSE 0 END) AS efeonce_tasks_count,
+        SUM(CASE WHEN segment_key = 'sky' THEN total_tasks ELSE 0 END) AS sky_tasks_count
+      FROM classified_snapshots
+    ),
+    task_mix AS (
+      SELECT
+        TO_JSON_STRING(
+          ARRAY_AGG(
+            STRUCT(segment_key, segment_label, total_tasks)
+            ORDER BY total_tasks DESC, segment_label ASC
+          )
+        ) AS task_mix_json
+      FROM (
+        SELECT
+          segment_key,
+          segment_label,
+          SUM(total_tasks) AS total_tasks
+        FROM classified_snapshots
+        GROUP BY segment_key, segment_label
+      )
+    ),
+    top_performer AS (
+      SELECT
+        mb.member_id,
+        COALESCE(tm.display_name, mb.member_id) AS member_name,
+        mb.otd_pct,
+        mb.total_tasks AS throughput_count,
+        mb.rpa_avg,
+        mb.ftr_pct
+      FROM \`${projectId}.${ICO_DATASET}.metrics_by_member\` mb
+      LEFT JOIN \`${projectId}.greenhouse.team_members\` tm
+        ON tm.member_id = mb.member_id
+      WHERE mb.period_year = @periodYear
+        AND mb.period_month = @periodMonth
+        AND mb.total_tasks >= @minThroughput
+        AND mb.otd_pct IS NOT NULL
+      ORDER BY
+        mb.otd_pct DESC,
+        mb.total_tasks DESC,
+        mb.rpa_avg ASC NULLS LAST,
+        mb.member_id ASC
+      LIMIT 1
+    )
+    SELECT
+      summary.report_scope,
+      summary.period_year,
+      summary.period_month,
+      summary.on_time_count,
+      summary.late_drop_count,
+      summary.on_time_pct,
+      summary.overdue_count,
+      summary.carry_over_count,
+      summary.total_tasks,
+      summary.completed_tasks,
+      summary.active_tasks,
+      summary.efeonce_tasks_count,
+      summary.sky_tasks_count,
+      mix.task_mix_json,
+      top.member_id,
+      top.member_name,
+      top.otd_pct,
+      top.throughput_count,
+      top.rpa_avg,
+      top.ftr_pct,
+      @minThroughput,
+      @trendStableBandPp,
+      @multiAssigneePolicy,
+      CURRENT_TIMESTAMP(),
+      @engineVersion
+    FROM agency_summary summary
+    LEFT JOIN task_mix mix ON TRUE
+    LEFT JOIN top_performer top ON TRUE
+    WHERE COALESCE(summary.total_tasks, 0) > 0
+  `, {
+    periodYear,
+    periodMonth,
+    minThroughput: TOP_PERFORMER_MIN_THROUGHPUT,
+    trendStableBandPp: TREND_STABLE_BAND_PP,
+    multiAssigneePolicy: TOP_PERFORMER_MULTI_ASSIGNEE_POLICY,
+    engineVersion: ENGINE_VERSION
+  })
+
+  const countRows = await runIcoEngineQuery<{ cnt: unknown }>(`
+    SELECT COUNT(*) AS cnt
+    FROM \`${projectId}.${ICO_DATASET}.performance_report_monthly\`
+    WHERE report_scope = 'agency'
+      AND period_year = @periodYear
+      AND period_month = @periodMonth
+  `, { periodYear, periodMonth })
+
+  return toNumber(countRows[0]?.cnt)
 }

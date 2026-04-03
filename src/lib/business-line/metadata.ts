@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { query } from '@/lib/db'
 import type { BusinessLineMetadata, BusinessLineMetadataSummary } from '@/types/business-line'
 
 // ── Row shape from PG ───────────────────────────────────────────────
@@ -47,7 +47,7 @@ const toBusinessLineMetadata = (row: MetadataRow): BusinessLineMetadata => ({
 
 /** Load all active business line metadata, ordered by sort_order. */
 export const loadBusinessLineMetadata = async (): Promise<BusinessLineMetadata[]> => {
-  const rows = await runGreenhousePostgresQuery<MetadataRow>(
+  const rows = await query<MetadataRow>(
     `SELECT * FROM greenhouse_core.business_line_metadata
      WHERE is_active = TRUE
      ORDER BY sort_order`
@@ -58,7 +58,7 @@ export const loadBusinessLineMetadata = async (): Promise<BusinessLineMetadata[]
 
 /** Load a single business line's metadata by module_code. */
 export const loadBusinessLineMetadataByCode = async (moduleCode: string): Promise<BusinessLineMetadata | null> => {
-  const rows = await runGreenhousePostgresQuery<MetadataRow>(
+  const rows = await query<MetadataRow>(
     `SELECT * FROM greenhouse_core.business_line_metadata WHERE module_code = $1`,
     [moduleCode]
   )
@@ -102,7 +102,7 @@ export const updateBusinessLineMetadata = async (
   setClauses.push(`updated_at = NOW()`)
   params.push(moduleCode)
 
-  const rows = await runGreenhousePostgresQuery<MetadataRow>(
+  const rows = await query<MetadataRow>(
     `UPDATE greenhouse_core.business_line_metadata
      SET ${setClauses.join(', ')}
      WHERE module_code = $${idx}

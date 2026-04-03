@@ -40,14 +40,46 @@ type Props = {
   spaces: OrganizationSpace[] | null
   onClose: () => void
   onSuccess: () => void
+  title?: string
+  submitLabel?: string
+  allowedMembershipTypes?: string[]
+  initialMembershipType?: string
 }
 
-const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess }: Props) => {
+const getAllowedMembershipOptions = (allowedMembershipTypes?: string[]) => {
+  if (!allowedMembershipTypes || allowedMembershipTypes.length === 0) {
+    return MEMBERSHIP_TYPES
+  }
+
+  const allowed = new Set(allowedMembershipTypes)
+
+  return MEMBERSHIP_TYPES.filter(type => allowed.has(type.value))
+}
+
+const AddMembershipDrawer = ({
+  open,
+  organizationId,
+  spaces,
+  onClose,
+  onSuccess,
+  title = 'Agregar persona',
+  submitLabel = 'Agregar persona',
+  allowedMembershipTypes,
+  initialMembershipType = 'contact'
+}: Props) => {
+  const membershipTypeOptions = getAllowedMembershipOptions(allowedMembershipTypes)
+
+  const defaultMembershipType = membershipTypeOptions.some(type => type.value === initialMembershipType)
+    ? initialMembershipType
+    : (membershipTypeOptions[0]?.value ?? 'contact')
+
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [searching, setSearching] = useState(false)
   const [selectedProfile, setSelectedProfile] = useState<SearchResult | null>(null)
-  const [membershipType, setMembershipType] = useState('contact')
+  const [fullName, setFullName] = useState('')
+  const [canonicalEmail, setCanonicalEmail] = useState('')
+  const [membershipType, setMembershipType] = useState(defaultMembershipType)
   const [roleLabel, setRoleLabel] = useState('')
   const [department, setDepartment] = useState('')
   const [spaceId, setSpaceId] = useState('')
@@ -60,17 +92,25 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
     setSearchQuery('')
     setSearchResults([])
     setSelectedProfile(null)
-    setMembershipType('contact')
+    setFullName('')
+    setCanonicalEmail('')
+    setMembershipType(defaultMembershipType)
     setRoleLabel('')
     setDepartment('')
     setSpaceId('')
     setIsPrimary(false)
     setError(null)
-  }, [])
+  }, [defaultMembershipType])
 
   useEffect(() => {
     if (open) resetForm()
   }, [open, resetForm])
+
+  useEffect(() => {
+    if (!membershipTypeOptions.some(type => type.value === membershipType)) {
+      setMembershipType(defaultMembershipType)
+    }
+  }, [defaultMembershipType, membershipType, membershipTypeOptions])
 
   const handleSearch = (query: string) => {
     setSearchQuery(query)
@@ -106,12 +146,14 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
   const handleSelectProfile = (profile: SearchResult) => {
     setSelectedProfile(profile)
     setSearchQuery(profile.fullName ?? profile.canonicalEmail ?? profile.profileId)
+    setFullName(profile.fullName ?? '')
+    setCanonicalEmail(profile.canonicalEmail ?? '')
     setSearchResults([])
   }
 
   const handleSubmit = async () => {
-    if (!selectedProfile) {
-      setError('Selecciona una persona de la lista.')
+    if (!selectedProfile && (!fullName.trim() || !canonicalEmail.trim())) {
+      setError('Selecciona una persona existente o completa nombre y email para crearla.')
 
       return
     }
@@ -124,7 +166,9 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          profileId: selectedProfile.profileId,
+          profileId: selectedProfile?.profileId,
+          fullName: selectedProfile ? undefined : fullName.trim(),
+          canonicalEmail: selectedProfile ? undefined : canonicalEmail.trim(),
           membershipType,
           roleLabel: roleLabel.trim() || undefined,
           department: department.trim() || undefined,
@@ -159,7 +203,7 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
       PaperProps={{ sx: { width: { xs: '100%', sm: 480 } } }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 4 }}>
-        <Typography variant='h6'>Agregar persona</Typography>
+        <Typography variant='h6'>{title}</Typography>
         <IconButton onClick={onClose} size='small' aria-label='Cerrar'>
           <i className='tabler-x' />
         </IconButton>
@@ -215,6 +259,31 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
           )}
         </Box>
 
+        {!selectedProfile && (
+          <Stack spacing={2}>
+            <Typography variant='caption' color='text.secondary'>
+              Si la persona todavía no existe en Greenhouse, puedes crear un contacto nuevo para esta organización.
+            </Typography>
+            <CustomTextField
+              fullWidth
+              size='small'
+              label='Nombre completo'
+              placeholder='ej. Ana Pérez'
+              value={fullName}
+              onChange={e => setFullName(e.target.value)}
+            />
+            <CustomTextField
+              fullWidth
+              size='small'
+              type='email'
+              label='Email'
+              placeholder='contacto@empresa.com'
+              value={canonicalEmail}
+              onChange={e => setCanonicalEmail(e.target.value)}
+            />
+          </Stack>
+        )}
+
         {selectedProfile && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 1.5, bgcolor: 'action.hover', borderRadius: 1 }}>
             <i className='tabler-user-check' style={{ fontSize: 18, color: 'var(--mui-palette-success-main)' }} />
@@ -232,7 +301,7 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
           value={membershipType}
           onChange={e => setMembershipType(e.target.value)}
         >
-          {MEMBERSHIP_TYPES.map(t => (
+          {membershipTypeOptions.map(t => (
             <MenuItem key={t.value} value={t.value}>{t.label}</MenuItem>
           ))}
         </CustomTextField>
@@ -281,8 +350,13 @@ const AddMembershipDrawer = ({ open, organizationId, spaces, onClose, onSuccess 
         <Button variant='tonal' color='secondary' onClick={onClose} fullWidth>
           Cancelar
         </Button>
-        <Button variant='contained' onClick={handleSubmit} disabled={saving || !selectedProfile} fullWidth>
-          {saving ? 'Guardando...' : 'Agregar persona'}
+        <Button
+          variant='contained'
+          onClick={handleSubmit}
+          disabled={saving || (!selectedProfile && (!fullName.trim() || !canonicalEmail.trim()))}
+          fullWidth
+        >
+          {saving ? 'Guardando...' : submitLabel}
         </Button>
       </Box>
     </Drawer>

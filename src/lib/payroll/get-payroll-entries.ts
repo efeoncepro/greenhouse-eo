@@ -33,6 +33,8 @@ type PayrollEntryRow = {
   avatar_url: string | null
   compensation_version_id: string | null
   pay_regime: string | null
+  payroll_via: string | null
+  deel_contract_id: string | null
   currency: string | null
   base_salary: number | string | null
   remote_allowance: number | string | null
@@ -75,6 +77,8 @@ type PayrollEntryRow = {
   chile_unemployment_amount: number | string | null
   chile_taxable_base: number | string | null
   chile_tax_amount: number | string | null
+  sii_retention_rate: number | string | null
+  sii_retention_amount: number | string | null
   chile_apv_amount: number | string | null
   chile_uf_value: number | string | null
   chile_total_deductions: number | string | null
@@ -104,6 +108,7 @@ const getProjectId = () => getBigQueryProjectId()
 const normalizePayrollKpiDataSource = (value: string | null) => {
   if (value === 'manual') return 'manual'
   if (value === 'ico') return 'ico'
+  if (value === 'external') return 'external'
 
   return 'notion_ops'
 }
@@ -117,6 +122,7 @@ const normalizePayrollEntry = (row: PayrollEntryRow): PayrollEntry => ({
   memberAvatarUrl: normalizeNullableString(row.avatar_url) || resolveAvatarPath({ name: row.display_name, email: row.email }),
   compensationVersionId: String(row.compensation_version_id || ''),
   payRegime: row.pay_regime === 'international' ? 'international' : 'chile',
+  payrollVia: row.payroll_via === 'deel' ? 'deel' : 'internal',
   currency: row.currency === 'USD' ? 'USD' : 'CLP',
   baseSalary: toNumber(row.base_salary),
   remoteAllowance: toNumber(row.remote_allowance),
@@ -159,9 +165,12 @@ const normalizePayrollEntry = (row: PayrollEntryRow): PayrollEntry => ({
   chileUnemploymentAmount: toNullableNumber(row.chile_unemployment_amount),
   chileTaxableBase: toNullableNumber(row.chile_taxable_base),
   chileTaxAmount: toNullableNumber(row.chile_tax_amount),
+  siiRetentionRate: toNullableNumber(row.sii_retention_rate),
+  siiRetentionAmount: toNullableNumber(row.sii_retention_amount),
   chileApvAmount: toNullableNumber(row.chile_apv_amount),
   chileUfValue: toNullableNumber(row.chile_uf_value),
   chileTotalDeductions: toNullableNumber(row.chile_total_deductions),
+  deelContractId: normalizeNullableString(row.deel_contract_id),
   netTotalCalculated: toNullableNumber(row.net_total_calculated),
   netTotalOverride: toNullableNumber(row.net_total_override),
   netTotal: toNumber(row.net_total),

@@ -23,6 +23,8 @@ export type PersonHrProfileViewModel = {
     contractEndDate: string | null
     dailyRequired: boolean | null
     payRegime: string | null
+    payrollVia: string | null
+    deelContractId: string | null
     currency: string | null
     baseSalary: number | null
     contractType: string | null
@@ -219,10 +221,12 @@ export const buildPersonHrProfileViewModel = ({
     hireDate: hrContext?.hireDate ?? supplementalProfile?.hireDate ?? null,
     contractEndDate: hrContext?.contractEndDate ?? supplementalProfile?.contractEndDate ?? null,
     dailyRequired: hrContext ? hrContext.dailyRequired : (supplementalProfile?.dailyRequired ?? null),
-    payRegime: hrContext?.compensation.payRegime ?? null,
+    payRegime: hrContext?.payRegime ?? hrContext?.compensation.payRegime ?? null,
+    payrollVia: hrContext?.payrollVia ?? null,
+    deelContractId: hrContext?.deelContractId ?? null,
     currency: hrContext?.compensation.currency ?? null,
     baseSalary: hrContext?.compensation.baseSalary ?? null,
-    contractType: hrContext?.compensation.contractType ?? null
+    contractType: hrContext?.contractType ?? hrContext?.compensation.contractType ?? null
   }
 
   const hasEmploymentData = Boolean(
@@ -233,9 +237,11 @@ export const buildPersonHrProfileViewModel = ({
       employment.hireDate ||
       employment.contractEndDate ||
       employment.payRegime ||
+      employment.payrollVia ||
       employment.currency ||
       employment.baseSalary !== null ||
       employment.contractType ||
+      employment.deelContractId ||
       employment.dailyRequired !== null
   )
 

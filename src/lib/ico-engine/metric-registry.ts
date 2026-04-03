@@ -118,13 +118,13 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     id: 'otd_pct',
     code: 'otd_pct',
     label: 'Entrega a tiempo',
-    description: 'Porcentaje de activos completados dentro del plazo original.',
+    description: 'Porcentaje de tareas del período clasificadas como On-Time dentro del scorecard mensual.',
     unit: '%',
     granularities: ['monthly', 'weekly'],
     formula: {
       kind: 'percentage',
-      numeratorCondition: "delivery_signal = 'on_time'",
-      denominatorCondition: "delivery_signal IN ('on_time', 'late')"
+      numeratorCondition: "report_bucket = 'on_time'",
+      denominatorCondition: "report_bucket IN ('on_time', 'late_drop', 'overdue', 'carry_over')"
     },
     thresholds: {
       optimal: { min: 90, max: 100 },
@@ -139,7 +139,7 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     id: 'ftr_pct',
     code: 'ftr_pct',
     label: 'Primera entrega correcta',
-    description: 'Porcentaje de activos entregados sin rondas de cambio del cliente.',
+    description: 'Porcentaje de tareas completadas del período sin rondas finales de cambio del cliente.',
     unit: '%',
     granularities: ['monthly'],
     formula: {

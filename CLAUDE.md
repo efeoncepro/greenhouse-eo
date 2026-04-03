@@ -44,6 +44,8 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - **Test:** `pnpm test` (Vitest)
 - **Type check:** `npx tsc --noEmit`
 - **PostgreSQL health:** `pnpm pg:doctor`
+- **Migrations:** `pnpm migrate:up`, `pnpm migrate:down`, `pnpm migrate:create <nombre>`, `pnpm migrate:status`
+- **DB types:** `pnpm db:generate-types` (regenerar después de cada migración)
 
 ## Key Docs
 
@@ -72,6 +74,8 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md` — infraestructura de webhooks inbound/outbound
 - `GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md` — playbook de proyecciones reactivas + recovery
 - `GREENHOUSE_BUSINESS_LINES_ARCHITECTURE_V1.md` — business lines canónicas, BU comercial vs operativa, ICO by BU
+- `GREENHOUSE_DATABASE_TOOLING_V1.md` — node-pg-migrate, Kysely, conexión centralizada, ownership model
+- `GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md` — modelo person↔org: poblaciones A/B/C, grafos operativo vs estructural, assignment sync, session org context
 
 ## Issue Lifecycle Protocol
 
@@ -155,10 +159,34 @@ Si un archivo en `docs/tasks/` no es una task sino una spec de arquitectura o re
 - Cron: `/api/cron/**`, `/api/finance/economic-indicators/sync`
 
 ### PostgreSQL Access
-- **Runtime** del portal: solo credenciales `runtime` (`GREENHOUSE_POSTGRES_USER`)
-- **Migraciones**: `migrator` (`GREENHOUSE_POSTGRES_MIGRATOR_USER`)
-- **Bootstrap**: `admin` (`GREENHOUSE_POSTGRES_ADMIN_USER`)
+- **Método preferido (todos los entornos)**: Cloud SQL Connector vía `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`. Conecta sin TCP directo — negocia túnel seguro por la Cloud SQL Admin API. Funciona en Vercel (WIF + OIDC), local, y agentes AI.
+- **La IP pública de Cloud SQL NO es accesible por TCP directo** — no hay authorized networks configuradas. Intentar conectar a `34.86.135.144` da `ETIMEDOUT`.
+- **Migraciones y binarios standalone** (`pnpm migrate:up`, `pg_dump`, `psql`): requieren Cloud SQL Auth Proxy como túnel local:
+  ```bash
+  cloud-sql-proxy "efeonce-group:us-east4:greenhouse-pg-dev" --port 15432
+  # .env.local: GREENHOUSE_POSTGRES_HOST="127.0.0.1", PORT="15432", SSL="false"
+  ```
+- **Guardia fail-fast**: `scripts/migrate.ts` aborta inmediatamente si `GREENHOUSE_POSTGRES_HOST` apunta a una IP pública. No esperar timeout.
+- **Regla de prioridad** (runtime): si `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` está definida, el Connector toma prioridad sobre `GREENHOUSE_POSTGRES_HOST`. Ver `src/lib/postgres/client.ts:133`.
+- **Perfiles**: `runtime` (DML), `migrator` (DDL), `admin` (bootstrap), `ops` (canonical owner)
+- **Canonical owner**: `greenhouse_ops` es dueño de todos los objetos (122 tablas, 11 schemas)
 - Health check: `pnpm pg:doctor`
+
+### Database Connection
+- **Archivo centralizado**: `src/lib/db.ts` — único punto de entrada para toda conexión PostgreSQL
+- **Import `query`** para raw SQL, **`getDb()`** para Kysely tipado, **`withTransaction`** para transacciones
+- **NUNCA** crear `new Pool()` fuera de `src/lib/postgres/client.ts`
+- Módulos existentes usando `runGreenhousePostgresQuery` de `@/lib/postgres/client` están OK
+- Módulos nuevos deben usar Kysely (`getDb()`) para type safety
+- Tipos generados: `src/types/db.d.ts` (140 tablas, generado por `kysely-codegen`)
+
+### Database Migrations
+- **Framework**: `node-pg-migrate` — SQL-first, versionado en `migrations/`
+- **Comandos**: `pnpm migrate:create <nombre>`, `pnpm migrate:up`, `pnpm migrate:down`, `pnpm migrate:status`
+- **Flujo obligatorio**: `migrate:create` → editar SQL → `migrate:up` (auto-regenera tipos) → commit todo junto
+- **Regla**: migración ANTES del deploy, siempre. Columnas nullable primero, constraints después.
+- **Timestamps**: SIEMPRE usar `pnpm migrate:create` para generar archivos. NUNCA renombrar timestamps manualmente ni crear archivos a mano — `node-pg-migrate` rechaza migraciones con timestamp anterior a la última aplicada.
+- **Spec completa**: `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`
 
 ### Tests y validación
 - Tests unitarios: Vitest + Testing Library + jsdom

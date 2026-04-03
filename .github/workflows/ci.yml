@@ -49,6 +49,24 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Check migrations
+        run: |
+          echo "=== Migration files ==="
+          ls -la migrations/ 2>/dev/null || echo "No migrations directory"
+          echo ""
+          echo "=== Validating SQL syntax (basic) ==="
+          for f in migrations/*.sql; do
+            [ -f "$f" ] || continue
+            if head -1 "$f" | grep -qiE "^(--|SELECT|SET|CREATE|ALTER|DROP|INSERT|UPDATE|DELETE|DO|BEGIN)"; then
+              echo "  ✓ $f"
+            else
+              echo "  ✗ $f — unexpected first line: $(head -1 "$f")"
+              exit 1
+            fi
+          done
+          echo ""
+          echo "=== Migration count: $(ls migrations/*.sql 2>/dev/null | wc -l | tr -d ' ') ==="
+
       - name: Lint
         run: pnpm lint
 

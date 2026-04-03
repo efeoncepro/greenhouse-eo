@@ -2,6 +2,10 @@ import 'server-only'
 
 import { NextResponse } from 'next/server'
 
+import type { Query } from '@google-cloud/bigquery'
+
+import type { ContractType } from '@/types/hr-contracts'
+
 import { ROLE_CODES } from '@/config/role-codes'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { hasRoleCode, requireTenantContext } from '@/lib/tenant/authorization'
@@ -45,11 +49,22 @@ export const HR_BANK_ACCOUNT_TYPES = ['corriente', 'vista', 'ahorro', 'rut'] as 
 export const HR_LEAVE_REQUEST_STATUSES = ['pending_supervisor', 'pending_hr', 'approved', 'rejected', 'cancelled'] as const
 export const HR_APPROVAL_ACTIONS = ['approve', 'reject', 'cancel'] as const
 export const HR_ATTENDANCE_STATUSES = ['present', 'late', 'absent', 'excused', 'holiday'] as const
+export const HR_CONTRACT_TYPES: readonly ContractType[] = ['indefinido', 'plazo_fijo', 'honorarios', 'contractor', 'eor']
 
 export const getHrCoreProjectId = () => getBigQueryProjectId()
 
-export const runHrCoreQuery = async <T>(query: string, params: Record<string, unknown> = {}) => {
-  const [rows] = await getBigQueryClient().query({ query, params })
+export const runHrCoreQuery = async <T>(
+  query: string,
+  params: Record<string, unknown> = {},
+  types?: Query['types']
+) => {
+  const queryOptions: Query = {
+    query,
+    params,
+    ...(types ? { types } : {})
+  }
+
+  const [rows] = await getBigQueryClient().query(queryOptions)
 
   return rows as T[]
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
-import { resolveFinanceClientContext, resolveFinanceMemberContext } from '@/lib/finance/canonical'
+import { resolveFinanceDownstreamScope, resolveFinanceMemberContext } from '@/lib/finance/canonical'
+import { EXPENSE_SOURCE_TYPES, PAYMENT_PROVIDERS, PAYMENT_RAILS } from '@/lib/finance/expense-taxonomy'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import {
@@ -43,7 +44,9 @@ export const dynamic = 'force-dynamic'
 interface ExpenseRow {
   expense_id: string
   client_id: string | null
+  space_id: string | null
   expense_type: string
+  source_type: string | null
   description: string
   currency: string
   subtotal: unknown
@@ -55,6 +58,8 @@ interface ExpenseRow {
   payment_date: unknown
   payment_status: string
   payment_method: string | null
+  payment_provider: string | null
+  payment_rail: string | null
   payment_account_id: string | null
   payment_reference: string | null
   document_number: string | null
@@ -87,7 +92,9 @@ interface ExpenseRow {
 const normalizeExpense = (row: ExpenseRow) => ({
   expenseId: normalizeString(row.expense_id),
   clientId: row.client_id ? normalizeString(row.client_id) : null,
+  spaceId: row.space_id ? normalizeString(row.space_id) : null,
   expenseType: normalizeString(row.expense_type),
+  sourceType: row.source_type ? normalizeString(row.source_type) : null,
   description: normalizeString(row.description),
   currency: normalizeString(row.currency),
   subtotal: toNumber(row.subtotal),
@@ -99,6 +106,8 @@ const normalizeExpense = (row: ExpenseRow) => ({
   paymentDate: toDateString(row.payment_date as string | { value?: string } | null),
   paymentStatus: normalizeString(row.payment_status),
   paymentMethod: row.payment_method ? normalizeString(row.payment_method) : null,
+  paymentProvider: row.payment_provider ? normalizeString(row.payment_provider) : null,
+  paymentRail: row.payment_rail ? normalizeString(row.payment_rail) : null,
   paymentAccountId: row.payment_account_id ? normalizeString(row.payment_account_id) : null,
   paymentReference: row.payment_reference ? normalizeString(row.payment_reference) : null,
   documentNumber: row.document_number ? normalizeString(row.document_number) : null,
@@ -139,6 +148,8 @@ export async function GET(request: Request) {
   const expenseType = searchParams.get('expenseType')
   const status = searchParams.get('status')
   const clientId = searchParams.get('clientId')
+  const organizationId = searchParams.get('organizationId')
+  const spaceId = searchParams.get('spaceId')
   const clientProfileId = searchParams.get('clientProfileId')
   const hubspotCompanyId = searchParams.get('hubspotCompanyId')
   const memberId = searchParams.get('memberId')
@@ -149,8 +160,14 @@ export async function GET(request: Request) {
   const page = Math.max(1, toNumber(searchParams.get('page') || '1'))
   const pageSize = Math.min(200, Math.max(1, toNumber(searchParams.get('pageSize') || '50')))
 
-  const resolvedClient = (clientId || clientProfileId || hubspotCompanyId)
-    ? await resolveFinanceClientContext({ clientId, clientProfileId, hubspotCompanyId })
+  const resolvedScope = (clientId || organizationId || clientProfileId || hubspotCompanyId || spaceId)
+    ? await resolveFinanceDownstreamScope({
+        clientId,
+        organizationId,
+        clientProfileId,
+        hubspotCompanyId,
+        requestedSpaceId: spaceId
+      })
     : null
 
   // ── Postgres-first path ──
@@ -158,7 +175,8 @@ export async function GET(request: Request) {
     const result = await listFinanceExpensesFromPostgres({
       expenseType,
       status,
-      clientId: resolvedClient?.clientId ?? clientId,
+      clientId: resolvedScope?.clientId ?? clientId,
+      spaceId: resolvedScope?.spaceId ?? spaceId ?? null,
       memberId,
       supplierId,
       serviceLine,
@@ -194,9 +212,14 @@ export async function GET(request: Request) {
       params.status = status
     }
 
-    if (resolvedClient?.clientId ?? clientId) {
+    if (resolvedScope?.clientId ?? clientId) {
       filters += ' AND client_id = @clientId'
-      params.clientId = resolvedClient?.clientId ?? clientId
+      params.clientId = resolvedScope?.clientId ?? clientId
+    }
+
+    if (spaceId || resolvedScope?.spaceId) {
+      filters += ' AND space_id = @spaceId'
+      params.spaceId = resolvedScope?.spaceId ?? spaceId
     }
 
     if (memberId) {
@@ -268,10 +291,13 @@ export async function POST(request: Request) {
     const currency = assertValidCurrency(body.currency)
     const subtotal = assertPositiveAmount(toNumber(body.subtotal), 'subtotal')
 
-    const resolvedClient = await resolveFinanceClientContext({
+    const resolvedScope = await resolveFinanceDownstreamScope({
+      organizationId: body.organizationId,
       clientId: body.clientId,
       clientProfileId: body.clientProfileId,
-      hubspotCompanyId: body.hubspotCompanyId
+      hubspotCompanyId: body.hubspotCompanyId,
+      requestedSpaceId: body.spaceId,
+      allocatedClientId: body.allocatedClientId
     })
 
     const resolvedMember = await resolveFinanceMemberContext({
@@ -281,6 +307,10 @@ export async function POST(request: Request) {
 
     const expenseType = body.expenseType && EXPENSE_TYPES.includes(body.expenseType)
       ? (body.expenseType as ExpenseType) : 'supplier'
+
+    const sourceType = body.sourceType && EXPENSE_SOURCE_TYPES.includes(body.sourceType)
+      ? normalizeString(body.sourceType)
+      : 'manual'
 
     const taxRate = toNumber(body.taxRate ?? 0)
     const taxAmount = toNumber(body.taxAmount) || subtotal * taxRate
@@ -296,6 +326,14 @@ export async function POST(request: Request) {
 
     const paymentMethod = body.paymentMethod && PAYMENT_METHODS.includes(body.paymentMethod)
       ? (body.paymentMethod as PaymentMethod) : null
+
+    const paymentProvider = body.paymentProvider && PAYMENT_PROVIDERS.includes(body.paymentProvider)
+      ? normalizeString(body.paymentProvider)
+      : null
+
+    const paymentRail = body.paymentRail && PAYMENT_RAILS.includes(body.paymentRail)
+      ? normalizeString(body.paymentRail)
+      : null
 
     const serviceLine = body.serviceLine && SERVICE_LINES.includes(body.serviceLine)
       ? (body.serviceLine as ServiceLine) : null
@@ -321,8 +359,10 @@ export async function POST(request: Request) {
 
       await createFinanceExpenseInPostgres({
         expenseId,
-        clientId: resolvedClient.clientId,
+        clientId: resolvedScope.clientId,
+        spaceId: resolvedScope.spaceId,
         expenseType,
+        sourceType,
         description,
         currency,
         subtotal,
@@ -334,6 +374,8 @@ export async function POST(request: Request) {
         paymentDate: body.paymentDate ? normalizeString(body.paymentDate) : null,
         paymentStatus,
         paymentMethod,
+        paymentProvider,
+        paymentRail,
         paymentAccountId: body.paymentAccountId ? normalizeString(body.paymentAccountId) : null,
         paymentReference: body.paymentReference ? normalizeString(body.paymentReference) : null,
         documentNumber: body.documentNumber ? normalizeString(body.documentNumber) : null,
@@ -400,7 +442,7 @@ export async function POST(request: Request) {
 
     await runFinanceQuery(`
       INSERT INTO \`${projectId}.greenhouse.fin_expenses\` (
-        expense_id, client_id, expense_type, description, currency,
+        expense_id, client_id, space_id, expense_type, description, currency,
         subtotal, tax_rate, tax_amount, total_amount,
         exchange_rate_to_clp, total_amount_clp,
         payment_date, payment_status, payment_method,
@@ -414,7 +456,7 @@ export async function POST(request: Request) {
         is_reconciled, notes, created_by,
         created_at, updated_at
       ) VALUES (
-        @expenseId, @clientId, @expenseType, @description, @currency,
+        @expenseId, @clientId, @spaceId, @expenseType, @description, @currency,
         CAST(@subtotal AS NUMERIC), CAST(@taxRate AS NUMERIC), CAST(@taxAmount AS NUMERIC), CAST(@totalAmount AS NUMERIC),
         CAST(@exchangeRateToClp AS NUMERIC), CAST(@totalAmountClp AS NUMERIC),
         IF(@paymentDate = '', NULL, CAST(@paymentDate AS DATE)), @paymentStatus, @paymentMethod,
@@ -430,7 +472,8 @@ export async function POST(request: Request) {
       )
     `, {
       expenseId,
-      clientId: resolvedClient.clientId,
+      clientId: resolvedScope.clientId,
+      spaceId: resolvedScope.spaceId,
       expenseType,
       description,
       currency,

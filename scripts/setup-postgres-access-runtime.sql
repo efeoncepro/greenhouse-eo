@@ -8,7 +8,11 @@ BEGIN
     'greenhouse_hr',
     'greenhouse_payroll',
     'greenhouse_finance',
-    'greenhouse_ai'
+    'greenhouse_ai',
+    'greenhouse_delivery',
+    'greenhouse_crm',
+    'greenhouse_notifications',
+    'greenhouse_cost_intelligence'
   ]
   LOOP
     IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = schema_name) THEN
@@ -43,12 +47,23 @@ BEGIN
         EXECUTE format('GRANT SELECT ON TABLE %s TO greenhouse_migrator', view_record.qualified_name);
       END LOOP;
 
+      EXECUTE format('GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA %I TO greenhouse_runtime', schema_name);
+      EXECUTE format('GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA %I TO greenhouse_migrator', schema_name);
+
       EXECUTE format(
-        'ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_runtime',
+        'ALTER DEFAULT PRIVILEGES FOR ROLE greenhouse_ops IN SCHEMA %I GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_runtime',
         schema_name
       );
       EXECUTE format(
-        'ALTER DEFAULT PRIVILEGES IN SCHEMA %I GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER ON TABLES TO greenhouse_migrator',
+        'ALTER DEFAULT PRIVILEGES FOR ROLE greenhouse_ops IN SCHEMA %I GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER ON TABLES TO greenhouse_migrator',
+        schema_name
+      );
+      EXECUTE format(
+        'ALTER DEFAULT PRIVILEGES FOR ROLE greenhouse_ops IN SCHEMA %I GRANT USAGE, SELECT ON SEQUENCES TO greenhouse_runtime',
+        schema_name
+      );
+      EXECUTE format(
+        'ALTER DEFAULT PRIVILEGES FOR ROLE greenhouse_ops IN SCHEMA %I GRANT ALL PRIVILEGES ON SEQUENCES TO greenhouse_migrator',
         schema_name
       );
     END IF;

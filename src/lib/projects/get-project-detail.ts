@@ -202,6 +202,7 @@ const getSprintContext = async (scope: ProjectDetailScope): Promise<GreenhousePr
       FROM \`${projectId}.notion_ops.tareas\`,
       UNNEST(IFNULL(sprint_ids, ARRAY<STRING>[])) AS sprint_id
       WHERE proyecto = @projectDetailId
+        OR @projectDetailId IN UNNEST(IFNULL(proyecto_ids, ARRAY<STRING>[]))
       GROUP BY sprint_id
     )
     SELECT
@@ -295,6 +296,7 @@ export const getProjectDetail = async (scope: ProjectDetailScope): Promise<Green
         COALESCE(ARRAY_LENGTH(bloqueado_por_ids), 0) AS blocker_count
       FROM \`${projectId}.notion_ops.tareas\`
       WHERE proyecto = @projectDetailId
+        OR @projectDetailId IN UNNEST(IFNULL(proyecto_ids, ARRAY<STRING>[]))
     ),
     task_summary AS (
       SELECT
@@ -463,6 +465,7 @@ export const getProjectTasks = async (scope: ProjectDetailScope): Promise<Greenh
     LEFT JOIN \`${projectId}.greenhouse.team_members\` tm
       ON tm.member_id = dt.assignee_member_id
     WHERE t.proyecto = @projectDetailId
+      OR @projectDetailId IN UNNEST(IFNULL(t.proyecto_ids, ARRAY<STRING>[]))
     ORDER BY t.last_edited_time DESC, t.created_time DESC
   `
 

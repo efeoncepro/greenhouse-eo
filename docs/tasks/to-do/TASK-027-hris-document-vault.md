@@ -1,5 +1,13 @@
 # CODEX TASK — HRIS Fase 1A: Document Vault (Bóveda de Documentos)
 
+## Delta 2026-04-01
+
+- `TASK-026` ya quedó cerrada:
+  - `greenhouse_core.members` ya expone `contract_type`, `pay_regime`, `payroll_via` y `deel_contract_id` como campos canónicos
+  - `daily_required` sigue como backing field de las semánticas de schedule; `schedule_required` se consume como alias de lectura
+- La dependencia con `TASK-026` deja de ser blocker/soft dependency abierta para elegibilidad.
+- Esta lane ya puede modelar reglas de elegibilidad sobre el canon real de `members.*` sin esperar otra migración base de contratos.
+
 ## Delta 2026-03-31
 
 - La foundation compartida de uploader, registry de assets y gobernanza de buckets GCP se separa a `TASK-173`.
@@ -19,7 +27,7 @@
 
 ## Delta 2026-03-27 — Alineación arquitectónica
 
-- **TASK-026 es soft dependency**: el Document Vault puede avanzar sin contract type consolidation, pero las reglas de elegibilidad por `contract_type` no funcionarán hasta que TASK-026 agregue el campo canónico en `greenhouse_core.members`.
+- **TASK-026 era soft dependency**: el bloqueo de elegibilidad por `contract_type` ya quedó resuelto el 2026-04-01 con la consolidación canónica en `greenhouse_core.members`.
 - **GCS pattern**: reutilizar el patrón de signed URLs de `src/lib/storage/greenhouse-media.ts` (ya operativo para logos/avatars). No duplicar el client de `@google-cloud/storage`.
 - **Outbox events obligatorios**: registrar en `src/lib/sync/event-catalog.ts`:
   - Aggregate type: `memberDocument`

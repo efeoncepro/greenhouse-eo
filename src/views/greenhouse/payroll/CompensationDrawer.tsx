@@ -35,6 +35,7 @@ import type {
   GratificacionLegalMode
 } from '@/types/payroll'
 import { getCompensationSaveMode } from '@/lib/payroll/compensation-versioning'
+import { CONTRACT_DERIVATIONS, CONTRACT_LABELS } from '@/types/hr-contracts'
 
 export type CompensationSavePayload = {
   mode: 'create' | 'update'
@@ -117,6 +118,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
   const [healthPlanUf, setHealthPlanUf] = useState(ev?.healthPlanUf ?? 0)
   const [unemploymentRate, setUnemploymentRate] = useState(ev?.unemploymentRate ?? 0.006)
   const [contractType, setContractType] = useState<ContractType>(ev?.contractType ?? 'indefinido')
+  const [deelContractId, setDeelContractId] = useState(ev?.deelContractId ?? '')
   const [hasApv, setHasApv] = useState(ev?.hasApv ?? false)
   const [apvAmount, setApvAmount] = useState(ev?.apvAmount ?? 0)
   const [effectiveFrom, setEffectiveFrom] = useState(ev?.effectiveFrom ?? new Date().toISOString().slice(0, 10))
@@ -128,7 +130,11 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
   const [reverseLoading, setReverseLoading] = useState(false)
   const reverseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  const payrollVia = CONTRACT_DERIVATIONS[contractType].payrollVia
   const isChile = payRegime === 'chile'
+  const isChileEmployee = payRegime === 'chile' && contractType !== 'honorarios'
+  const isHonorarios = contractType === 'honorarios'
+  const isDeel = payrollVia === 'deel'
   const saveMode = getCompensationSaveMode({ existingVersion: ev, effectiveFrom })
 
   useEffect(() => {
@@ -151,6 +157,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
     setHealthPlanUf(ev?.healthPlanUf ?? 0)
     setUnemploymentRate(ev?.unemploymentRate ?? 0.006)
     setContractType(ev?.contractType ?? 'indefinido')
+    setDeelContractId(ev?.deelContractId ?? '')
     setHasApv(ev?.hasApv ?? false)
     setApvAmount(ev?.apvAmount ?? 0)
     setEffectiveFrom(ev?.effectiveFrom ?? new Date().toISOString().slice(0, 10))
@@ -163,7 +170,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
   }, [open, ev, memberId])
 
   useEffect(() => {
-    if (!isChile || desiredNet <= 0) return
+    if (!isChileEmployee || desiredNet <= 0) return
 
     if (reverseTimerRef.current) clearTimeout(reverseTimerRef.current)
 
@@ -209,7 +216,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
 
     return () => { if (reverseTimerRef.current) clearTimeout(reverseTimerRef.current) }
   }, [
-    isChile, desiredNet, effectiveFrom,
+    isChileEmployee, desiredNet, effectiveFrom,
     remoteAllowance, colacionAmount, movilizacionAmount, fixedBonusAmount,
     gratificacionLegalMode, afpName, afpRate,
     healthSystem, healthPlanUf, contractType,
@@ -232,7 +239,28 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
 
   const handleContractChange = (ct: ContractType) => {
     setContractType(ct)
-    setUnemploymentRate(ct === 'indefinido' ? 0.006 : 0.03)
+    const derivation = CONTRACT_DERIVATIONS[ct]
+
+    setPayRegime(derivation.payRegime)
+    setCurrency(derivation.payRegime === 'chile' ? 'CLP' : 'USD')
+    setDesiredNet(0)
+    setReverseResult(null)
+
+    if (ct === 'indefinido') {
+      setUnemploymentRate(0.006)
+      setGratificacionLegalMode('mensual_25pct')
+    } else if (ct === 'plazo_fijo') {
+      setUnemploymentRate(0.03)
+      setGratificacionLegalMode('mensual_25pct')
+    } else {
+      setUnemploymentRate(0)
+      setGratificacionLegalMode('ninguna')
+      setRemoteAllowance(0)
+      setColacionAmount(0)
+      setMovilizacionAmount(0)
+      setHasApv(false)
+      setApvAmount(0)
+    }
   }
 
   const handleSubmit = async () => {
@@ -246,25 +274,27 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
     setError(null)
 
     try {
-      const resolvedChangeReason = isChile && desiredNet > 0 && !changeReason.includes('líquido')
+      const resolvedChangeReason = isChileEmployee && desiredNet > 0 && !changeReason.includes('líquido')
         ? `${changeReason.trim()} [Líquido deseado: $${desiredNet.toLocaleString('es-CL')}]`
         : changeReason.trim()
 
       const input: CreateCompensationVersionInput = {
         memberId, payRegime, currency, baseSalary,
-        desiredNetClp: isChile && desiredNet > 0 ? desiredNet : null,
-        remoteAllowance,
-        colacionAmount: isChile ? colacionAmount : 0,
-        movilizacionAmount: isChile ? movilizacionAmount : 0,
+        desiredNetClp: isChileEmployee && desiredNet > 0 ? desiredNet : null,
+        remoteAllowance: isChileEmployee ? remoteAllowance : 0,
+        colacionAmount: isChileEmployee ? colacionAmount : 0,
+        movilizacionAmount: isChileEmployee ? movilizacionAmount : 0,
         fixedBonusLabel: fixedBonusLabel.trim() || null, fixedBonusAmount,
-        gratificacionLegalMode: isChile ? gratificacionLegalMode : 'ninguna',
+        gratificacionLegalMode: isChileEmployee ? gratificacionLegalMode : 'ninguna',
         bonusOtdMin: 0, bonusOtdMax: bonusOtd,
         bonusRpaMin: 0, bonusRpaMax: bonusRpa,
+        contractType,
+        deelContractId: isDeel ? deelContractId.trim() || null : null,
         effectiveFrom, changeReason: resolvedChangeReason,
-        ...(isChile && {
+        ...(isChileEmployee && {
           afpName: afpName || null, afpRate, healthSystem,
           healthPlanUf: healthSystem === 'isapre' ? healthPlanUf : null,
-          unemploymentRate, contractType, hasApv,
+          unemploymentRate, hasApv,
           apvAmount: hasApv ? apvAmount : 0
         })
       }
@@ -279,12 +309,12 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
   }
 
   const r = reverseResult
-  const previewReady = isChile && r && r.converged
+  const previewReady = isChileEmployee && r && r.converged
 
   const previsionSummary = [
     afpName ? `AFP ${afpName}` : null,
     healthSystem === 'isapre' ? 'Isapre' : 'Fonasa',
-    contractType === 'indefinido' ? 'Indefinido' : 'Plazo fijo'
+    CONTRACT_LABELS[contractType].label
   ].filter(Boolean).join(' · ')
 
   return (
@@ -305,17 +335,39 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
         <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
           <Stack spacing={2.5}>
 
+            <FormControl fullWidth size='small'>
+              <InputLabel>Contrato</InputLabel>
+              <Select value={contractType} label='Contrato' onChange={e => handleContractChange(e.target.value as ContractType)}>
+                <MenuItem value='indefinido'>Indefinido</MenuItem>
+                <MenuItem value='plazo_fijo'>Plazo fijo</MenuItem>
+                <MenuItem value='honorarios'>Honorarios</MenuItem>
+                <MenuItem value='contractor'>Contractor (Deel)</MenuItem>
+                <MenuItem value='eor'>EOR (Deel)</MenuItem>
+              </Select>
+            </FormControl>
+
             {/* ── Régimen ── */}
             <FormControl fullWidth size='small'>
               <InputLabel>Régimen</InputLabel>
-              <Select value={payRegime} label='Régimen' onChange={e => handleRegimeChange(e.target.value as PayRegime)}>
+              <Select value={payRegime} label='Régimen' onChange={e => handleRegimeChange(e.target.value as PayRegime)} disabled>
                 <MenuItem value='chile'>Chile (CLP)</MenuItem>
                 <MenuItem value='international'>Internacional (USD)</MenuItem>
               </Select>
             </FormControl>
 
+            {isDeel && (
+              <CustomTextField
+                fullWidth
+                size='small'
+                label='Contrato Deel'
+                value={deelContractId}
+                onChange={e => setDeelContractId(e.target.value)}
+                helperText='Referencia manual del contrato gestionado en Deel'
+              />
+            )}
+
             {/* ── Input: líquido deseado (Chile) or salary base (internacional) ── */}
-            {isChile ? (
+            {isChileEmployee ? (
               <CustomTextField
                 fullWidth size='small'
                 label='Líquido deseado (CLP)'
@@ -340,7 +392,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
             )}
 
             {/* ── Preview (with skeleton while loading) ── */}
-            {isChile && reverseLoading && !previewReady && desiredNet > 0 && (
+            {isChileEmployee && reverseLoading && !previewReady && desiredNet > 0 && (
               <Box sx={{ borderRadius: 2, overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
                 <Box sx={{ p: 2 }}>
                   <Skeleton variant='text' width='40%' height={16} sx={{ mb: 1 }} />
@@ -402,15 +454,15 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
               </Box>
             )}
 
-            {isChile && r && !r.converged && (
+            {isChileEmployee && r && !r.converged && (
               <Alert severity='warning' variant='outlined' sx={{ py: 0.5 }}>No convergió. Diferencia: {fmt(r.netDifferenceCLP)}</Alert>
             )}
-            {isChile && r && r.clampedAtFloor && (
+            {isChileEmployee && r && r.clampedAtFloor && (
               <Alert severity='info' variant='outlined' sx={{ py: 0.5 }}>Base ajustada al IMM ({fmt(r.immValue)}). Líquido mínimo: {fmt(r.netTotalWithTax)}.</Alert>
             )}
 
             {/* ── Haberes no imponibles (Chile) ── */}
-            {isChile && (
+            {isChileEmployee && (
               <Box sx={sectionSx}>
                 <Typography variant='overline' color='text.secondary' fontSize={10}>Haberes no imponibles</Typography>
                 <Grid container spacing={2} sx={{ mt: 0.5 }}>
@@ -428,7 +480,14 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
             <Box sx={sectionSx}>
               <Typography variant='overline' color='text.secondary' fontSize={10}>Bonos y haberes</Typography>
               <Stack spacing={2} sx={{ mt: 1 }}>
-                <CustomTextField fullWidth size='small' label='Bono conectividad' type='number' value={remoteAllowance || ''} onChange={e => setRemoteAllowance(Number(e.target.value))} slotProps={{ input: { startAdornment: isChile ? clpAdornment : undefined } }} />
+                {(isHonorarios || isDeel) && (
+                  <Alert severity='info' variant='outlined' sx={{ py: 0.5 }}>
+                    Para {isHonorarios ? 'honorarios' : 'Deel'} los bonos KPI son discrecionales y parten en $0.
+                  </Alert>
+                )}
+                {!isHonorarios && !isDeel && (
+                  <CustomTextField fullWidth size='small' label='Bono conectividad' type='number' value={remoteAllowance || ''} onChange={e => setRemoteAllowance(Number(e.target.value))} slotProps={{ input: { startAdornment: isChile ? clpAdornment : undefined } }} />
+                )}
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 7 }}>
                     <CustomTextField fullWidth size='small' label='Nombre bono fijo' value={fixedBonusLabel} onChange={e => setFixedBonusLabel(e.target.value)} />
@@ -437,7 +496,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                     <CustomTextField fullWidth size='small' label='Monto' type='number' value={fixedBonusAmount || ''} onChange={e => setFixedBonusAmount(Number(e.target.value))} slotProps={{ input: { startAdornment: isChile ? clpAdornment : undefined } }} />
                   </Grid>
                 </Grid>
-                {isChile && (
+                {isChileEmployee && (
                   <FormControl fullWidth size='small'>
                     <InputLabel>Gratificación legal</InputLabel>
                     <Select value={gratificacionLegalMode} label='Gratificación legal' onChange={e => setGratificacionLegalMode(e.target.value as GratificacionLegalMode)}>
@@ -459,7 +518,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
             </Box>
 
             {/* ── Previsión Chile (accordion) ── */}
-            {isChile && (
+            {isChileEmployee && (
               <Accordion disableGutters elevation={0} sx={accordionSx}>
                 <AccordionSummary expandIcon={<i className='tabler-chevron-down' />}>
                   <Stack>
@@ -493,9 +552,8 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                       <Grid size={{ xs: 6 }}>
                         <FormControl fullWidth size='small'>
                           <InputLabel>Contrato</InputLabel>
-                          <Select value={contractType} label='Contrato' onChange={e => handleContractChange(e.target.value as ContractType)}>
-                            <MenuItem value='indefinido'>Indefinido</MenuItem>
-                            <MenuItem value='plazo_fijo'>Plazo fijo</MenuItem>
+                          <Select value={contractType} label='Contrato' disabled>
+                            <MenuItem value={contractType}>{CONTRACT_LABELS[contractType].label}</MenuItem>
                           </Select>
                         </FormControl>
                       </Grid>

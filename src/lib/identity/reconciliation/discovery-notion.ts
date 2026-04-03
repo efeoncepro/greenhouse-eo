@@ -15,6 +15,10 @@ interface RawNotionUser {
   occurrence_count: number
 }
 
+interface LinkedNotionIdRow extends Record<string, unknown> {
+  source_object_id: string
+}
+
 // ── Discovery ─────────────────────────────────────────────────────────
 
 /**
@@ -43,9 +47,21 @@ export async function discoverUnlinkedNotionUsers(): Promise<DiscoveredIdentity[
             THEN TRIM(SPLIT(t.responsable_texto, ',')[SAFE_OFFSET(idx)])
             ELSE NULL
           END AS text_display_name
-        FROM \`${projectId}.notion_ops.tareas\` t,
-             UNNEST(COALESCE(t.responsables_ids, t.responsable_ids, ARRAY<STRING>[])) AS rid WITH OFFSET idx
-        LEFT JOIN UNNEST(COALESCE(t.responsables_names, t.responsable_names, ARRAY<STRING>[])) AS rname WITH OFFSET nidx
+        FROM (
+          SELECT
+            *,
+            CASE
+              WHEN ARRAY_LENGTH(IFNULL(responsables_ids, ARRAY<STRING>[])) > 0 THEN IFNULL(responsables_ids, ARRAY<STRING>[])
+              ELSE IFNULL(responsable_ids, ARRAY<STRING>[])
+            END AS normalized_assignee_ids,
+            CASE
+              WHEN ARRAY_LENGTH(IFNULL(responsables_names, ARRAY<STRING>[])) > 0 THEN IFNULL(responsables_names, ARRAY<STRING>[])
+              ELSE IFNULL(responsable_names, ARRAY<STRING>[])
+            END AS normalized_assignee_names
+          FROM \`${projectId}.notion_ops.tareas\`
+        ) t,
+             UNNEST(t.normalized_assignee_ids) AS rid WITH OFFSET idx
+        LEFT JOIN UNNEST(t.normalized_assignee_names) AS rname WITH OFFSET nidx
           ON idx = nidx
         WHERE rid IS NOT NULL AND TRIM(rid) != ''
       )
@@ -64,13 +80,63 @@ export async function discoverUnlinkedNotionUsers(): Promise<DiscoveredIdentity[
   // 2. Already-linked Notion IDs in team_members
   const [linkedRows] = await bq.query({
     query: `
-      SELECT DISTINCT notion_user_id
+      SELECT DISTINCT notion_user_id AS source_object_id
       FROM \`${projectId}.greenhouse.team_members\`
       WHERE notion_user_id IS NOT NULL AND TRIM(notion_user_id) != ''
     `
-  }) as [{ notion_user_id: string }[], unknown]
+  }) as [LinkedNotionIdRow[], unknown]
 
-  const linkedIds = new Set(linkedRows.map(r => r.notion_user_id))
+  const linkedIds = new Set(linkedRows.map(r => r.source_object_id))
+
+  try {
+    const [identityLinkRows] = await bq.query({
+      query: `
+        SELECT DISTINCT source_object_id
+        FROM \`${projectId}.greenhouse.identity_profile_source_links\`
+        WHERE active = TRUE
+          AND source_system = 'notion'
+          AND source_object_id IS NOT NULL
+          AND TRIM(source_object_id) != ''
+      `
+    }) as [LinkedNotionIdRow[], unknown]
+
+    for (const row of identityLinkRows) {
+      if (row.source_object_id) {
+        linkedIds.add(row.source_object_id)
+      }
+    }
+  } catch {
+    // BigQuery identity links may not exist yet in all environments.
+  }
+
+  try {
+    const postgresLinkedRows = await runGreenhousePostgresQuery<LinkedNotionIdRow>(
+      `SELECT DISTINCT source_object_id
+       FROM (
+         SELECT notion_user_id AS source_object_id
+         FROM greenhouse_core.members
+         WHERE notion_user_id IS NOT NULL
+           AND TRIM(notion_user_id) != ''
+
+         UNION
+
+         SELECT source_object_id
+         FROM greenhouse_core.identity_profile_source_links
+         WHERE active = TRUE
+           AND source_system = 'notion'
+           AND source_object_id IS NOT NULL
+           AND TRIM(source_object_id) != ''
+       ) linked`
+    )
+
+    for (const row of postgresLinkedRows) {
+      if (row.source_object_id) {
+        linkedIds.add(row.source_object_id)
+      }
+    }
+  } catch {
+    // Postgres may not be available; BigQuery-linked IDs remain the fallback.
+  }
 
   // 3. Already-active proposals in Postgres (skip re-proposing)
   let activeProposalIds = new Set<string>()
@@ -106,7 +172,7 @@ export async function discoverUnlinkedNotionUsers(): Promise<DiscoveredIdentity[
         sourceObjectId: r.source_object_id,
         sourceDisplayName: displayName || null,
         sourceEmail: null,
-        discoveredIn: 'notion_ops.tareas.responsables_ids',
+        discoveredIn: 'notion_ops.tareas.assignee_ids',
         occurrenceCount: Number(r.occurrence_count)
       }
     })

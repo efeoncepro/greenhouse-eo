@@ -23,6 +23,7 @@ import classnames from 'classnames'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import { fuzzyFilter } from '@/components/tableUtils'
+import { formatFte } from '@/views/greenhouse/people/helpers'
 
 import tableStyles from '@core/styles/table.module.css'
 
@@ -45,6 +46,18 @@ const TYPE_CONFIG: Record<string, { label: string; color: 'info' | 'secondary' |
   advisor: { label: 'Asesor', color: 'secondary' }
 }
 
+const ASSIGNMENT_TYPE_CONFIG: Record<string, { label: string; color: 'default' | 'info' | 'warning' }> = {
+  internal: { label: 'Interno', color: 'default' },
+  staff_augmentation: { label: 'Staff Aug', color: 'info' },
+  mixed: { label: 'Mixto', color: 'warning' }
+}
+
+const formatEmploymentContext = (person: OrganizationPerson) => {
+  const tokens = [person.jobLevel, person.employmentType].filter(Boolean)
+
+  return tokens.length > 0 ? tokens.join(' · ') : null
+}
+
 // ── Columns ──
 
 const colHelper = createColumnHelper<OrganizationPerson>()
@@ -62,19 +75,45 @@ const columns: ColumnDef<OrganizationPerson, any>[] = [
   }),
   colHelper.accessor('membershipType', {
     header: 'Tipo',
-    cell: ({ getValue }) => {
+    cell: ({ row, getValue }) => {
       const cfg = TYPE_CONFIG[getValue()]
+      const assignmentCfg = row.original.assignmentType ? ASSIGNMENT_TYPE_CONFIG[row.original.assignmentType] : null
 
-      return <CustomChip round='true' size='small' variant='tonal' color={cfg?.color ?? 'secondary'} label={cfg?.label ?? getValue()} />
+      return (
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+          <CustomChip round='true' size='small' variant='tonal' color={cfg?.color ?? 'secondary'} label={cfg?.label ?? getValue()} />
+          {assignmentCfg ? (
+            <CustomChip round='true' size='small' variant='tonal' color={assignmentCfg.color} label={assignmentCfg.label} />
+          ) : null}
+        </Box>
+      )
     }
   }),
   colHelper.accessor('roleLabel', {
     header: 'Rol',
-    cell: ({ getValue }) => <Typography variant='body2' color='text.secondary'>{getValue() ?? '—'}</Typography>
+    cell: ({ row, getValue }) => (
+      <Box>
+        <Typography variant='body2' color='text.secondary'>{getValue() ?? '—'}</Typography>
+        {formatEmploymentContext(row.original) ? (
+          <Typography variant='caption' color='text.secondary'>
+            {formatEmploymentContext(row.original)}
+          </Typography>
+        ) : null}
+      </Box>
+    )
   }),
   colHelper.accessor('department', {
     header: 'Departamento',
     cell: ({ getValue }) => <Typography variant='body2' color='text.secondary'>{getValue() ?? '—'}</Typography>
+  }),
+  colHelper.accessor('assignedFte', {
+    header: 'FTE',
+    cell: ({ getValue }) => (
+      <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>
+        {typeof getValue() === 'number' ? formatFte(getValue()) : '—'}
+      </Typography>
+    ),
+    meta: { align: 'right' }
   }),
   colHelper.accessor('isPrimary', {
     header: 'Principal',
@@ -139,7 +178,7 @@ const OrganizationPeopleTab = ({ organizationId, isAdmin, onAddMembership }: Pro
         <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
           <CardHeader
             title={`Personas (${memberships.length})`}
-            subheader='Membresías de personas vinculadas a esta organización'
+            subheader='Membresías y contexto operativo de personas vinculadas a esta organización'
             avatar={
               <Avatar variant='rounded' sx={{ bgcolor: 'success.lightOpacity' }}>
                 <i className='tabler-users' style={{ fontSize: 22, color: 'var(--mui-palette-success-main)' }} />

@@ -1,5 +1,34 @@
 # Greenhouse PostgreSQL Canonical 360 V1
 
+## Delta 2026-04-01 — TASK-026 contract canonicalization
+
+El modelo 360 ya debe leerse con el contrato HRIS consolidado.
+
+Estado vigente:
+- `greenhouse_core.members` publica el canon de contrato colaborador
+- `greenhouse_payroll.compensation_versions` mantiene snapshot historico de la version de compensacion
+- `greenhouse_payroll.payroll_entries` ya conserva `payroll_via`, `deel_contract_id` y retencion SII para honorarios
+- `member_360`, `member_payroll_360` y `person_hr_360` exponen el canon actual mas aliases de snapshot para que HR, Payroll, People y Finance consuman una sola lectura coherente
+- `daily_required` sigue siendo el flag almacenado; `schedule_required` solo aparece como alias de lectura
+
+Nota operativa:
+- para ejecutar migraciones y regenerar tipos desde esta base se requiere Cloud SQL Proxy local, no acceso directo a la IP publica de Cloud SQL
+- durante la corrida inicial se detecto que la migracion nueva quedo con timestamp anterior al baseline de `node-pg-migrate`; el archivo fue regenerado con un timestamp valido generado por la herramienta
+
+## Delta 2026-04-01 — HR Departments runtime cutover
+
+`HR > Departments` ya debe leerse como un consumer operativo de `greenhouse_core.departments`, no como un módulo BigQuery-first.
+
+Estado vigente:
+- `/api/hr/core/departments` y `/hr/departments` leen/escriben contra PostgreSQL
+- `greenhouse_core.members.department_id` y `greenhouse_core.departments.head_member_id` se validan dentro del mismo store operacional
+- BigQuery `greenhouse.departments` deja de ser write path del módulo y queda como carril legacy/downstream si algún consumer analítico todavía lo requiere
+- la integridad de `head_member_id` se endurece con FK versionada en migración SQL
+
+Regla nueva:
+- cualquier módulo que necesite estructura organizacional interna debe consumir `greenhouse_core.departments` como source of truth runtime
+- si BigQuery necesita la estructura para analytics, debe recibirla por proyección explícita desde Postgres y no por dual-write silencioso
+
 ## Purpose
 
 Define the first canonical PostgreSQL model that will support Greenhouse as:
@@ -109,18 +138,25 @@ Rule:
 ### Client
 
 Anchor:
-- `greenhouse_core.clients.client_id`
+- `greenhouse_core.organizations.organization_id` when `organization_type IN ('client', 'both')`
 
 Important fields:
 - `public_id`
-- `client_name`
+- `organization_name`
 - `legal_name`
-- `tenant_type`
+- `tax_id`
+- `country`
+- `organization_type`
 - `hubspot_company_id`
-- `timezone`
-- `billing_currency`
 - `status`
 - `active`
+
+Compatibility bridge:
+- `public_id`
+- `greenhouse_core.clients.client_id` remains the commercial/runtime alias while downstream consumers still depend on it
+- `greenhouse_core.spaces.client_id` is the active bridge from operational spaces to the legacy commercial key
+- `greenhouse_finance.client_profiles.organization_id` is the strong finance-side foreign key; `client_id` stays as transitional compat
+- `greenhouse_core.v_client_active_modules` and several finance/cost projections still emit `client_id`, so the cutover is org-first, not `client_id` deletion
 
 ### Space
 
@@ -139,12 +175,13 @@ Bridge:
 - `greenhouse_core.space_source_bindings`
 
 Rules:
-- `client` is the commercial boundary
+- `organization` is the canonical B2B boundary
+- `client_id` is still the commercial runtime alias while cross-module consumers finish the compat cutover
 - `space` is the operational workspace boundary
 - client-facing workspaces are `client_space`
 - internal agency workspaces like `Efeonce` are `internal_space`
 - a space may exist without `client_id`
-- delivery objects should resolve to `space_id` first, then optionally to `client_id`
+- delivery/finance objects should resolve to `space_id` first, then bridge to `organization_id`, and only then fall back to `client_id` where legacy consumers still require it
 
 ### Identity Profile
 
@@ -275,7 +312,8 @@ Purpose:
 Includes:
 - core member fields (display_name, primary_email, job_level, employment_type, status)
 - department name
-- current compensation version (pay_regime, currency, base_salary, remote_allowance, contract_type)
+- current compensation version snapshot (`compensation_pay_regime`, `currency`, `base_salary`, `remote_allowance`, `compensation_contract_type`)
+- canonical contract fields from `greenhouse_core.members` (`contract_type`, `pay_regime`, `payroll_via`, `deel_contract_id`)
 - total compensation versions count
 - total payroll entries count
 
@@ -311,6 +349,8 @@ Includes:
 - identity profile data
 - department
 - manager
+- canonical contract fields from `greenhouse_core.members`
+- `daily_required` plus the read-model alias `schedule_required`
 - linked auth principal count
 
 ### `greenhouse_serving.provider_360`

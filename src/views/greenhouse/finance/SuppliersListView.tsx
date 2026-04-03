@@ -4,6 +4,9 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
+import { toast } from 'react-toastify'
+
+import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -48,6 +51,13 @@ interface Supplier {
   defaultPaymentTerms: number
   primaryContactName: string | null
   primaryContactEmail: string | null
+  organizationContactsCount: number
+  contactSummary: {
+    name: string | null
+    email: string | null
+    role: string | null
+    source: 'organization_membership' | 'primary_contact_legacy'
+  } | null
   isActive: boolean
 }
 
@@ -134,8 +144,37 @@ const supColumns: ColumnDef<Supplier, any>[] = [
     header: 'Contacto',
     cell: ({ row }) => row.original.primaryContactName ? (
       <Box>
-        <Typography variant='body2' fontSize='0.8rem'>{row.original.primaryContactName}</Typography>
-        {row.original.primaryContactEmail && <Typography variant='caption' color='text.secondary'>{row.original.primaryContactEmail}</Typography>}
+        <Typography variant='body2' fontSize='0.8rem'>
+          {row.original.contactSummary?.name || row.original.primaryContactName}
+        </Typography>
+        {(row.original.contactSummary?.email || row.original.primaryContactEmail) && (
+          <Typography variant='caption' color='text.secondary'>
+            {row.original.contactSummary?.email || row.original.primaryContactEmail}
+          </Typography>
+        )}
+        <Box sx={{ mt: 1, display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
+          {row.original.contactSummary?.source ? (
+            <CustomChip
+              round='true'
+              size='small'
+              variant='tonal'
+              color={row.original.contactSummary.source === 'organization_membership' ? 'info' : 'secondary'}
+              label={row.original.contactSummary.source === 'organization_membership' ? 'Org' : 'Legacy'}
+            />
+          ) : null}
+          {row.original.organizationContactsCount > 1 ? (
+            <Typography variant='caption' color='text.secondary'>
+              +{row.original.organizationContactsCount - 1} más
+            </Typography>
+          ) : null}
+        </Box>
+      </Box>
+    ) : row.original.contactSummary ? (
+      <Box>
+        <Typography variant='body2' fontSize='0.8rem'>{row.original.contactSummary.name || 'Sin nombre'}</Typography>
+        {row.original.contactSummary.email && (
+          <Typography variant='caption' color='text.secondary'>{row.original.contactSummary.email}</Typography>
+        )}
       </Box>
     ) : <Typography variant='caption' color='text.secondary'>—</Typography>
   }),
@@ -156,6 +195,8 @@ const SuppliersListView = () => {
   const [categoryFilter, setCategoryFilter] = useState('')
   const [internationalFilter, setInternationalFilter] = useState('')
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [backfillingProviders, setBackfillingProviders] = useState(false)
+  const [backfillError, setBackfillError] = useState<string | null>(null)
 
   const fetchSuppliers = useCallback(async () => {
     setLoading(true)
@@ -183,6 +224,34 @@ const SuppliersListView = () => {
     fetchSuppliers()
   }, [fetchSuppliers])
 
+  const handleBackfillProviders = useCallback(async () => {
+    setBackfillingProviders(true)
+    setBackfillError(null)
+
+    try {
+      const response = await fetch('/api/finance/suppliers/backfill-provider-links', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ limit: 500 })
+      })
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+
+        throw new Error(data.error || 'No pudimos ejecutar el backfill de Provider 360.')
+      }
+
+      const result = await response.json()
+
+      await fetchSuppliers()
+      toast.success(`Backfill ejecutado: ${result.linked ?? 0} vínculos canónicos creados`)
+    } catch (error) {
+      setBackfillError(error instanceof Error ? error.message : 'No pudimos ejecutar el backfill de Provider 360.')
+    } finally {
+      setBackfillingProviders(false)
+    }
+  }, [fetchSuppliers])
+
   const supTable = useReactTable({
     data: suppliers,
     columns: supColumns,
@@ -200,6 +269,7 @@ const SuppliersListView = () => {
   const activeCount = suppliers.filter(s => s.isActive).length
   const internationalCount = suppliers.filter(s => s.isInternational).length
   const linkedProviderCount = suppliers.filter(s => Boolean(s.providerId)).length
+  const unresolvedProviderCount = total - linkedProviderCount
 
   const categoryCounts = suppliers.reduce<Record<string, number>>((acc, s) => {
     acc[s.category] = (acc[s.category] || 0) + 1
@@ -262,6 +332,12 @@ const SuppliersListView = () => {
         </Button>
       </Box>
 
+      {backfillError ? (
+        <Alert severity='error' onClose={() => setBackfillError(null)}>
+          {backfillError}
+        </Alert>
+      ) : null}
+
       {/* KPIs */}
       <Grid container spacing={6}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
@@ -308,6 +384,18 @@ const SuppliersListView = () => {
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
         <CardHeader
           title='Directorio de proveedores'
+          subheader={
+            unresolvedProviderCount > 0
+              ? `${unresolvedProviderCount} proveedor${unresolvedProviderCount === 1 ? '' : 'es'} todavía sin vínculo canónico`
+              : 'Todos los suppliers listados ya tienen vínculo canónico'
+          }
+          action={
+            unresolvedProviderCount > 0 ? (
+              <Button variant='outlined' size='small' onClick={handleBackfillProviders} disabled={backfillingProviders}>
+                {backfillingProviders ? 'Backfill en curso...' : 'Backfill Provider 360'}
+              </Button>
+            ) : null
+          }
           avatar={
             <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}>
               <i className='tabler-building-store' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} />

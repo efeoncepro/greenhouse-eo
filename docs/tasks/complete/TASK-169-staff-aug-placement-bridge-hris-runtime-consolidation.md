@@ -1,5 +1,11 @@
 # TASK-169 - Staff Aug Placement Bridge & HRIS Runtime Consolidation
 
+## Delta 2026-04-01
+
+- `TASK-026` ya cerró y la consolidación canónica de `members.contract_type`, `members.payroll_via`, `members.pay_regime` y `deel_contract_id` quedó disponible para futuros snapshots/joins de placement.
+- La referencia operativa de esa dependency pasa a:
+  - [TASK-026-hris-contract-type-consolidation.md](/Users/jreye/Documents/greenhouse-eo/docs/tasks/complete/TASK-026-hris-contract-type-consolidation.md)
+
 ## Status
 
 - Lifecycle: `complete`
@@ -60,7 +66,7 @@ Reglas obligatorias:
 - [TASK-060-team-assignment-admin.md](/Users/jreye/Documents/greenhouse-eo/docs/tasks/complete/TASK-060-team-assignment-admin.md)
 - [TASK-073-people-canonical-capacity-cutover.md](/Users/jreye/Documents/greenhouse-eo/docs/tasks/to-do/TASK-073-people-canonical-capacity-cutover.md)
 - [TASK-162-canonical-commercial-cost-attribution.md](/Users/jreye/Documents/greenhouse-eo/docs/tasks/complete/TASK-162-canonical-commercial-cost-attribution.md)
-- [TASK-026-hris-contract-type-consolidation.md](/Users/jreye/Documents/greenhouse-eo/docs/tasks/to-do/TASK-026-hris-contract-type-consolidation.md) como dependencia parcial para futuros campos HRIS canónicos en `members.*`
+- [TASK-026-hris-contract-type-consolidation.md](/Users/jreye/Documents/greenhouse-eo/docs/tasks/complete/TASK-026-hris-contract-type-consolidation.md) como dependencia ya resuelta para futuros campos HRIS canónicos en `members.*`
 
 ### Impacts to
 
@@ -130,7 +136,7 @@ Reglas obligatorias:
 
 - Rehacer `Staff Augmentation` como módulo nuevo.
 - Promover `person_membership` a identidad canónica del placement.
-- Completar la consolidación HRIS de `members.contract_type`, `members.payroll_via` y similares; eso sigue en `TASK-026`.
+- Reabrir o extender el contrato HRIS canónico más allá de `TASK-026`; la consolidación base ya quedó cerrada.
 - Reemplazar el baseline económico mensual de `TASK-019`.
 
 ## Acceptance Criteria
@@ -151,4 +157,4 @@ Reglas obligatorias:
 
 - Llevar el mismo bridge a `People 360` con una surface Staff Aug más explícita si el producto la necesita.
 - Evaluar un CTA hacia assignment creation desde `People` sin depender del drawer de edición de membresía.
-- Cuando `TASK-026` cierre, revisar si algún snapshot de placement debe tomar nuevos campos canónicos de HRIS en vez de derivados runtime.
+- Revisar si algún snapshot de placement debe tomar los campos canónicos de HRIS (`contract_type`, `payroll_via`, `deel_contract_id`) en vez de derivados runtime.

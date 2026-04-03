@@ -96,7 +96,11 @@ const icoSnapshot: IcoMetricSnapshot = {
   context: {
     totalTasks: 24,
     completedTasks: 18,
-    activeTasks: 6
+    activeTasks: 6,
+    onTimeTasks: 16,
+    lateDropTasks: 2,
+    overdueTasks: 1,
+    carryOverTasks: 2
   },
   computedAt: '2026-03-21T00:00:00.000Z',
   engineVersion: 'v1',

@@ -477,9 +477,14 @@ SELECT
   m.phone,
   m.job_level,
   m.employment_type,
+  m.contract_type,
+  m.pay_regime,
+  m.payroll_via,
+  m.daily_required,
+  m.daily_required AS schedule_required,
+  m.deel_contract_id,
   m.hire_date,
   m.contract_end_date,
-  m.daily_required,
   m.status,
   m.active,
   m.identity_profile_id,
@@ -511,9 +516,13 @@ GROUP BY
   m.phone,
   m.job_level,
   m.employment_type,
+  m.contract_type,
+  m.pay_regime,
+  m.payroll_via,
   m.hire_date,
   m.contract_end_date,
   m.daily_required,
+  m.deel_contract_id,
   m.status,
   m.active,
   m.identity_profile_id,
@@ -726,6 +735,11 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_serving.provider_tooling_snap
 -- ════════════════════════════════════════════════════════════
 DO $$
 BEGIN
+  -- Contract canon (TASK-026)
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS contract_type TEXT NOT NULL DEFAULT 'indefinido';
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS pay_regime TEXT NOT NULL DEFAULT 'chile';
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS payroll_via TEXT NOT NULL DEFAULT 'internal';
+  ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS deel_contract_id TEXT;
   -- Profile
   ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS first_name TEXT;
   ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS last_name TEXT;
@@ -760,4 +774,40 @@ BEGIN
   ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS years_experience NUMERIC(4,1);
   ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS efeonce_start_date DATE;
   ALTER TABLE greenhouse_core.members ADD COLUMN IF NOT EXISTS languages TEXT[];
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'members_contract_type_check'
+      AND conrelid = 'greenhouse_core.members'::regclass
+  ) THEN
+    ALTER TABLE greenhouse_core.members
+      ADD CONSTRAINT members_contract_type_check
+      CHECK (contract_type IN ('indefinido', 'plazo_fijo', 'honorarios', 'contractor', 'eor'));
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'members_pay_regime_check'
+      AND conrelid = 'greenhouse_core.members'::regclass
+  ) THEN
+    ALTER TABLE greenhouse_core.members
+      ADD CONSTRAINT members_pay_regime_check
+      CHECK (pay_regime IN ('chile', 'international'));
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'members_payroll_via_check'
+      AND conrelid = 'greenhouse_core.members'::regclass
+  ) THEN
+    ALTER TABLE greenhouse_core.members
+      ADD CONSTRAINT members_payroll_via_check
+      CHECK (payroll_via IN ('internal', 'deel'));
+  END IF;
 END $$;

@@ -73,6 +73,8 @@ const mapRow = (r: HesRow): HesRecord => ({
 
 export const listHes = async (filters?: {
   clientId?: string
+  organizationId?: string
+  spaceId?: string
   status?: string
   purchaseOrderId?: string
 }): Promise<HesRecord[]> => {
@@ -80,7 +82,14 @@ export const listHes = async (filters?: {
   const values: unknown[] = []
   let idx = 0
 
-  if (filters?.clientId) { idx++; conditions.push(`client_id = $${idx}`); values.push(filters.clientId) }
+  const identityConditions: string[] = []
+
+  if (filters?.clientId) { idx++; identityConditions.push(`client_id = $${idx}`); values.push(filters.clientId) }
+  if (filters?.organizationId) { idx++; identityConditions.push(`organization_id = $${idx}`); values.push(filters.organizationId) }
+  if (filters?.spaceId) { idx++; identityConditions.push(`space_id = $${idx}`); values.push(filters.spaceId) }
+
+  if (identityConditions.length === 1) conditions.push(identityConditions[0])
+  if (identityConditions.length > 1) conditions.push(`(${identityConditions.join(' OR ')})`)
   if (filters?.status) { idx++; conditions.push(`status = $${idx}`); values.push(filters.status) }
   if (filters?.purchaseOrderId) { idx++; conditions.push(`purchase_order_id = $${idx}`); values.push(filters.purchaseOrderId) }
 

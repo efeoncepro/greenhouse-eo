@@ -6,6 +6,16 @@ import { ensureNotificationSchema } from '@/lib/notifications/schema'
 
 export const dynamic = 'force-dynamic'
 
+const shouldFallbackUnreadCount = (error: unknown) => {
+  const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase()
+
+  return (
+    message.includes('permission denied') ||
+    message.includes('not authorized') ||
+    message.includes('greenhouse_notifications')
+  )
+}
+
 export async function GET() {
   const { tenant, unauthorizedResponse: errorResponse } = await requireTenantContext()
 
@@ -19,6 +29,12 @@ export async function GET() {
 
     return NextResponse.json({ unreadCount: count })
   } catch (error) {
+    if (shouldFallbackUnreadCount(error)) {
+      console.warn('GET /api/notifications/unread-count fallback to 0 due to notifications store access issue:', error)
+
+      return NextResponse.json({ unreadCount: 0 })
+    }
+
     console.error('GET /api/notifications/unread-count failed:', error)
 
     return NextResponse.json(

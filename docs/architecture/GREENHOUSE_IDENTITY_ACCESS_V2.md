@@ -34,6 +34,16 @@ Regla operativa:
 - consumers de preview, recipients y admin read surfaces deben enriquecer la sesión con `identity_profile_id` y `member_id` cuando corresponda
 - migraciones futuras no deben romper compatibilidad con tablas o logs que hoy son `userId`-scoped por diseño
 
+## Delta 2026-04-02 — Delivery identity coverage closes on the canonical graph
+
+Para Delivery y `ICO`, el contrato operativo ya no debe asumirse como solo `notion_user_id -> member_id`.
+
+Regla operativa:
+- reconciliación de responsables Notion debe cerrar sobre el grafo canónico `identity_profile -> member/client_user`
+- `greenhouse.team_members` puede seguir existiendo como carril BigQuery de sync, pero no debe convertirse en autoridad silenciosa por encima de `greenhouse_core.*`
+- cuando un link de identidad se aprueba, la persistencia canónica debe vivir también en `greenhouse_core.identity_profile_source_links`
+- los controles de coverage para Delivery deben poder auditarse por `space_id` y período antes de recalcular un reporte mensual
+
 ## Core Design Decisions
 
 ### Decision 1: Single app, three audiences

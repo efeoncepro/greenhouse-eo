@@ -1,5 +1,6 @@
 import type { ThemeColor } from '@core/types'
 import type { HrLeaveRequestStatus, HrAttendanceStatus } from '@/types/hr-core'
+import { CONTRACT_LABELS } from '@/types/hr-contracts'
 
 // ── Leave request status ────────────────────────────────────────────
 
@@ -56,6 +57,15 @@ export const employmentTypeLabel: Record<string, string> = {
   full_time: 'Tiempo completo',
   part_time: 'Medio tiempo',
   contractor: 'Contratista'
+}
+
+export const contractTypeLabel: Record<string, string> = Object.fromEntries(
+  Object.entries(CONTRACT_LABELS).map(([key, value]) => [key, value.label])
+)
+
+export const payrollViaLabel: Record<string, string> = {
+  internal: 'Greenhouse',
+  deel: 'Deel'
 }
 
 // ── Health system labels ────────────────────────────────────────────

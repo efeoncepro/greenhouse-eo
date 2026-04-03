@@ -13,6 +13,10 @@ export async function GET(_: Request, { params }: { params: Promise<{ memberId: 
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  if (tenant.tenantType === 'client') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
   try {
     const { memberId } = await params
 

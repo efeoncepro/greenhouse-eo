@@ -2,6 +2,7 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { generateMembershipId, nextPublicId } from '@/lib/account-360/id-generation'
+import { TEAM_MEMBER_MEMBERSHIP_TYPE } from '@/lib/account-360/membership-types'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import type { ProjectionDefinition } from '../projection-registry'
@@ -63,9 +64,9 @@ const syncAssignmentToMembership = async (memberId: string, clientId: string): P
      FROM greenhouse_core.person_memberships
      WHERE profile_id = $1
        AND organization_id = $2
-       AND membership_type = 'team_member'
+       AND membership_type = $3
      LIMIT 1`,
-    [member.identity_profile_id, space.organization_id]
+    [member.identity_profile_id, space.organization_id, TEAM_MEMBER_MEMBERSHIP_TYPE]
   )
 
   if (existing?.active) {
@@ -94,7 +95,7 @@ const syncAssignmentToMembership = async (memberId: string, clientId: string): P
        membership_type, role_label, department, is_primary,
        status, active, created_at, updated_at
      )
-     VALUES ($1, $2, $3, $4, $5, 'team_member', $6, NULL, FALSE,
+     VALUES ($1, $2, $3, $4, $5, $6, $7, NULL, FALSE,
              'active', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
      ON CONFLICT (membership_id) DO NOTHING`,
     [
@@ -103,6 +104,7 @@ const syncAssignmentToMembership = async (memberId: string, clientId: string): P
       member.identity_profile_id,
       space.organization_id,
       space.space_id,
+      TEAM_MEMBER_MEMBERSHIP_TYPE,
       member.role_title
     ]
   )
@@ -168,10 +170,10 @@ const handleAssignmentRemoved = async (memberId: string, clientId: string): Prom
      SET active = FALSE, status = 'inactive', updated_at = CURRENT_TIMESTAMP
      WHERE profile_id = $1
        AND organization_id = $2
-       AND membership_type = 'team_member'
+       AND membership_type = $3
        AND active = TRUE
      RETURNING membership_id`,
-    [member.identity_profile_id, space.organization_id]
+    [member.identity_profile_id, space.organization_id, TEAM_MEMBER_MEMBERSHIP_TYPE]
   )
 
   return existing?.membership_id ?? null

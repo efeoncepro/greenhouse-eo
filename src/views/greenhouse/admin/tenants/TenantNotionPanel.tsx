@@ -30,6 +30,7 @@ import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
+import type { NotionGovernanceSummary } from '@/types/notion-governance'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -130,6 +131,17 @@ const formatDatetime = (iso: string | null) => {
   }
 }
 
+const getReadinessChipColor = (status: string | null | undefined): 'success' | 'warning' | 'error' | 'secondary' => {
+  if (status === 'ready') return 'success'
+  if (status === 'warning') return 'warning'
+  if (status === 'blocked') return 'error'
+
+  return 'secondary'
+}
+
+const formatDatabaseKind = (databaseKind: string) =>
+  DB_LABELS[databaseKind]?.label || databaseKind
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -143,6 +155,9 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
   // State — status
   const [loading, setLoading] = useState(true)
   const [status, setStatus] = useState<NotionStatusResponse | null>(null)
+  const [governanceLoading, setGovernanceLoading] = useState(false)
+  const [governanceRefreshing, setGovernanceRefreshing] = useState(false)
+  const [governance, setGovernance] = useState<NotionGovernanceSummary | null>(null)
 
   // State — wizard
   const [wizardOpen, setWizardOpen] = useState(false)
@@ -177,9 +192,37 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
     }
   }, [clientId])
 
+  const fetchGovernance = useCallback(async () => {
+    setGovernanceLoading(true)
+
+    try {
+      const res = await fetch(`/api/admin/tenants/${clientId}/notion-governance`)
+
+      if (!res.ok) return
+
+      const data = await res.json() as { governance: NotionGovernanceSummary | null }
+
+      setGovernance(data.governance)
+    } catch {
+      // Non-blocking
+    } finally {
+      setGovernanceLoading(false)
+    }
+  }, [clientId])
+
   useEffect(() => {
     void fetchStatus()
   }, [fetchStatus])
+
+  useEffect(() => {
+    if (!status?.space?.spaceId) {
+      setGovernance(null)
+
+      return
+    }
+
+    void fetchGovernance()
+  }, [fetchGovernance, status?.space?.spaceId])
 
   // ---------------------------------------------------------------------------
   // Space creation
@@ -322,10 +365,37 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
       // Refresh status
       setLoading(true)
       await fetchStatus()
+      await fetchGovernance()
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Error de conexión')
     } finally {
       setRegistering(false)
+    }
+  }
+
+  const handleRefreshGovernance = async () => {
+    setGovernanceRefreshing(true)
+    setError('')
+
+    try {
+      const res = await fetch(`/api/admin/tenants/${clientId}/notion-governance/refresh`, {
+        method: 'POST'
+      })
+
+      const data = await res.json().catch(() => ({}))
+
+      if (!res.ok) {
+        setError(data.error || 'No se pudo refrescar la gobernanza de Notion.')
+
+        return
+      }
+
+      setGovernance(data.governance as NotionGovernanceSummary)
+      toast.success('Schema governance de Notion actualizado.')
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Error de conexión')
+    } finally {
+      setGovernanceRefreshing(false)
     }
   }
 
@@ -405,6 +475,9 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
 
   if (mapping && !wizardOpen) {
     const dbEntries = Object.entries(mapping.databases) as Array<[string, string | null]>
+    const readiness = governance?.readiness
+    const driftEvents = governance?.driftEvents ?? []
+    const snapshots = governance?.snapshots ?? []
 
     return (
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
@@ -534,6 +607,168 @@ const TenantNotionPanel = ({ clientId, clientName }: Props) => {
                   </TableBody>
                 </Table>
               </TableContainer>
+            </Grid>
+
+            <Grid size={{ xs: 12 }}>
+              <Divider sx={{ my: 1 }} />
+            </Grid>
+
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Stack spacing={1.5}>
+                <Stack direction='row' spacing={1} alignItems='center' justifyContent='space-between'>
+                  <Typography variant='subtitle1'>Gobernanza de schema</Typography>
+                  <Button
+                    size='small'
+                    variant='tonal'
+                    color='secondary'
+                    startIcon={governanceRefreshing ? <CircularProgress size={16} /> : <i className='tabler-refresh' />}
+                    onClick={handleRefreshGovernance}
+                    disabled={governanceRefreshing || governanceLoading || !governance?.canRefreshSchema}
+                  >
+                    {governanceRefreshing ? 'Actualizando…' : 'Refrescar schema'}
+                  </Button>
+                </Stack>
+
+                {governanceLoading ? (
+                  <Skeleton variant='rounded' height={88} />
+                ) : !governance ? (
+                  <Alert severity='info'>
+                    Aún no hay governance materializada para este Space.
+                  </Alert>
+                ) : !governance.canRefreshSchema ? (
+                  <Alert severity='warning'>
+                    `NOTION_TOKEN` no está disponible en este entorno. El refresh administrativo de schema está deshabilitado.
+                  </Alert>
+                ) : null}
+
+                {readiness ? (
+                  <Stack spacing={1.5}>
+                    <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap'>
+                      <Typography variant='body2' color='text.secondary'>KPI readiness</Typography>
+                      <CustomChip
+                        round='true'
+                        size='small'
+                        color={getReadinessChipColor(readiness.readinessStatus)}
+                        variant='tonal'
+                        label={readiness.readinessStatus}
+                      />
+                      <Typography variant='caption' color='text.disabled'>
+                        Evaluado: {formatDatetime(readiness.evaluatedAt)}
+                      </Typography>
+                    </Stack>
+
+                    <Grid container spacing={2}>
+                      <Grid size={{ xs: 6, md: 3 }}>
+                        <Stack spacing={0.5}>
+                          <Typography variant='caption' color='text.secondary'>Mappings persistidos</Typography>
+                          <Typography variant='h6'>{readiness.mappingSummary.persistedMappings}</Typography>
+                        </Stack>
+                      </Grid>
+                      <Grid size={{ xs: 6, md: 3 }}>
+                        <Stack spacing={0.5}>
+                          <Typography variant='caption' color='text.secondary'>Core mapped</Typography>
+                          <Typography variant='h6'>{readiness.mappingSummary.mappedCoreFields}</Typography>
+                        </Stack>
+                      </Grid>
+                      <Grid size={{ xs: 6, md: 3 }}>
+                        <Stack spacing={0.5}>
+                          <Typography variant='caption' color='text.secondary'>Core sugerido</Typography>
+                          <Typography variant='h6'>{readiness.mappingSummary.suggestedCoreFields}</Typography>
+                        </Stack>
+                      </Grid>
+                      <Grid size={{ xs: 6, md: 3 }}>
+                        <Stack spacing={0.5}>
+                          <Typography variant='caption' color='text.secondary'>Core missing</Typography>
+                          <Typography variant='h6'>{readiness.mappingSummary.missingCoreFields}</Typography>
+                        </Stack>
+                      </Grid>
+                    </Grid>
+
+                    {readiness.blockingIssues.length > 0 && (
+                      <Alert severity='error'>
+                        {readiness.blockingIssues.map(issue => issue.message).join(' ')}
+                      </Alert>
+                    )}
+
+                    {readiness.warnings.length > 0 && (
+                      <Alert severity='warning'>
+                        {readiness.warnings.slice(0, 3).map(issue => issue.message).join(' ')}
+                      </Alert>
+                    )}
+                  </Stack>
+                ) : null}
+              </Stack>
+            </Grid>
+
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Stack spacing={1.5}>
+                <Typography variant='subtitle1'>Snapshots por base</Typography>
+
+                {governanceLoading ? (
+                  <Skeleton variant='rounded' height={160} />
+                ) : snapshots.length === 0 ? (
+                  <Alert severity='info'>
+                    No hay snapshots activos todavía. Refresca el schema para generar la primera versión.
+                  </Alert>
+                ) : (
+                  <TableContainer>
+                    <Table size='small'>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell component='th' scope='col'>Base</TableCell>
+                          <TableCell component='th' scope='col'>Snapshot</TableCell>
+                          <TableCell component='th' scope='col'>Drift</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {snapshots.map(snapshot => {
+                          const driftEvent = driftEvents.find(event => event.databaseKind === snapshot.databaseKind)
+
+                          return (
+                            <TableRow key={snapshot.snapshotId} hover>
+                              <TableCell>
+                                <Stack spacing={0.5}>
+                                  <Typography variant='body2'>{formatDatabaseKind(snapshot.databaseKind)}</Typography>
+                                  <Typography variant='caption' color='text.disabled'>
+                                    {snapshot.databaseTitle}
+                                  </Typography>
+                                </Stack>
+                              </TableCell>
+                              <TableCell>
+                                <Stack spacing={0.5}>
+                                  <Typography variant='body2'>v{snapshot.schemaVersion}</Typography>
+                                  <Typography variant='caption' color='text.disabled'>
+                                    {snapshot.propertyCount} props · {formatDatetime(snapshot.discoveredAt)}
+                                  </Typography>
+                                </Stack>
+                              </TableCell>
+                              <TableCell>
+                                {driftEvent ? (
+                                  <CustomChip
+                                    round='true'
+                                    size='small'
+                                    color={getReadinessChipColor(driftEvent.driftStatus)}
+                                    variant='tonal'
+                                    label={driftEvent.driftStatus}
+                                  />
+                                ) : (
+                                  <CustomChip
+                                    round='true'
+                                    size='small'
+                                    color='success'
+                                    variant='tonal'
+                                    label='Sin drift'
+                                  />
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          )
+                        })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                )}
+              </Stack>
             </Grid>
           </Grid>
         </CardContent>

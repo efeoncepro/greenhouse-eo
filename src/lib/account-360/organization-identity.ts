@@ -1,5 +1,7 @@
 import 'server-only'
 
+import type { PoolClient } from 'pg'
+
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { generateOrganizationId, nextPublicId } from '@/lib/account-360/id-generation'
 
@@ -12,6 +14,33 @@ type OrgByTaxIdRow = {
 
 type SpaceOrgRow = {
   organization_id: string
+}
+
+type SpaceClientRow = {
+  space_id: string
+  client_id: string | null
+  client_name: string | null
+}
+
+type OrgByHubspotRow = {
+  organization_id: string
+  organization_type: string
+}
+
+type QueryableClient = Pick<PoolClient, 'query'>
+
+const queryRows = async <T extends Record<string, unknown>>(
+  text: string,
+  values: unknown[] = [],
+  client?: QueryableClient
+) => {
+  if (client) {
+    const result = await client.query<T>(text, values)
+
+    return result.rows
+  }
+
+  return runGreenhousePostgresQuery<T>(text, values)
 }
 
 // ─── Operating Entity Identity ──────────────────────────────────────────
@@ -76,14 +105,16 @@ export const getOperatingEntityIdentity = async (): Promise<OperatingEntityIdent
  * Returns null if no match found.
  */
 export const findOrganizationByTaxId = async (
-  taxId: string
+  taxId: string,
+  client?: QueryableClient
 ): Promise<{ organizationId: string; organizationType: string } | null> => {
-  const rows = await runGreenhousePostgresQuery<OrgByTaxIdRow>(
+  const rows = await queryRows<OrgByTaxIdRow>(
     `SELECT organization_id, COALESCE(organization_type, 'other') AS organization_type
      FROM greenhouse_core.organizations
      WHERE tax_id = $1 AND active = TRUE
      LIMIT 1`,
-    [taxId]
+    [taxId],
+    client
   )
 
   if (rows.length === 0) return null
@@ -91,6 +122,38 @@ export const findOrganizationByTaxId = async (
   return {
     organizationId: rows[0].organization_id,
     organizationType: rows[0].organization_type
+  }
+}
+
+const findOrganizationByHubspotCompanyId = async (
+  hubspotCompanyId: string,
+  client?: QueryableClient
+): Promise<{ organizationId: string; organizationType: string } | null> => {
+  const rows = await queryRows<OrgByHubspotRow>(
+    `SELECT organization_id, COALESCE(organization_type, 'other') AS organization_type
+     FROM greenhouse_core.organizations
+     WHERE hubspot_company_id = $1 AND active = TRUE
+     LIMIT 1`,
+    [hubspotCompanyId],
+    client
+  )
+
+  if (rows.length === 0) return null
+
+  return {
+    organizationId: rows[0].organization_id,
+    organizationType: rows[0].organization_type
+  }
+}
+
+const promoteToClientCapableType = (organizationType: string) => {
+  switch (organizationType) {
+    case 'supplier':
+      return 'both'
+    case 'other':
+      return 'client'
+    default:
+      return organizationType
   }
 }
 
@@ -157,6 +220,139 @@ export const ensureOrganizationForSupplier = async (params: {
   return organizationId
 }
 
+// ─── Ensure Organization for Client ─────────────────────────────────────
+
+export const ensureOrganizationForClient = async (
+  params: {
+    organizationId?: string | null
+    clientId?: string | null
+    hubspotCompanyId?: string | null
+    taxId?: string | null
+    taxIdType?: string | null
+    legalName: string
+    organizationName?: string | null
+    country?: string | null
+  },
+  client?: QueryableClient
+): Promise<string> => {
+  const {
+    organizationId,
+    clientId,
+    hubspotCompanyId,
+    taxId,
+    taxIdType,
+    legalName,
+    organizationName,
+    country
+  } = params
+
+  const normalizedLegalName = legalName.trim()
+  const normalizedOrganizationName = organizationName?.trim() || normalizedLegalName
+  const normalizedCountry = country?.trim() || 'CL'
+
+  let existing: { organizationId: string; organizationType: string } | null = null
+
+  if (organizationId?.trim()) {
+    const rows = await queryRows<OrgByTaxIdRow>(
+      `SELECT organization_id, COALESCE(organization_type, 'other') AS organization_type
+       FROM greenhouse_core.organizations
+       WHERE organization_id = $1 AND active = TRUE
+       LIMIT 1`,
+      [organizationId.trim()],
+      client
+    )
+
+    if (rows.length > 0) {
+      existing = {
+        organizationId: rows[0].organization_id,
+        organizationType: rows[0].organization_type
+      }
+    }
+  }
+
+  if (!existing && clientId?.trim()) {
+    const rows = await queryRows<SpaceOrgRow>(
+      `SELECT organization_id
+       FROM greenhouse_core.spaces
+       WHERE client_id = $1
+         AND organization_id IS NOT NULL
+         AND active = TRUE
+       LIMIT 1`,
+      [clientId.trim()],
+      client
+    )
+
+    if (rows.length > 0) {
+      existing = {
+        organizationId: rows[0].organization_id,
+        organizationType: 'client'
+      }
+    }
+  }
+
+  if (!existing && taxId?.trim()) {
+    existing = await findOrganizationByTaxId(taxId.trim(), client)
+  }
+
+  if (!existing && hubspotCompanyId?.trim()) {
+    existing = await findOrganizationByHubspotCompanyId(hubspotCompanyId.trim(), client)
+  }
+
+  if (existing) {
+    const targetType = promoteToClientCapableType(existing.organizationType)
+
+    await queryRows(
+      `UPDATE greenhouse_core.organizations
+       SET organization_type = $2,
+           organization_name = COALESCE(NULLIF(organization_name, ''), $3),
+           legal_name = COALESCE(NULLIF(legal_name, ''), $4),
+           hubspot_company_id = COALESCE(hubspot_company_id, $5),
+           tax_id = COALESCE(tax_id, $6),
+           tax_id_type = COALESCE(tax_id_type, $7),
+           country = COALESCE(NULLIF(country, ''), $8),
+           updated_at = NOW()
+       WHERE organization_id = $1`,
+      [
+        existing.organizationId,
+        targetType,
+        normalizedOrganizationName,
+        normalizedLegalName,
+        hubspotCompanyId?.trim() || null,
+        taxId?.trim() || null,
+        taxIdType?.trim() || null,
+        normalizedCountry
+      ],
+      client
+    )
+
+    return existing.organizationId
+  }
+
+  const newOrganizationId = generateOrganizationId()
+  const publicId = await nextPublicId('EO-ORG')
+
+  await queryRows(
+    `INSERT INTO greenhouse_core.organizations (
+      organization_id, public_id, organization_name, legal_name,
+      tax_id, tax_id_type, country, hubspot_company_id, organization_type,
+      status, active, created_at, updated_at
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'client', 'active', TRUE, NOW(), NOW())`,
+    [
+      newOrganizationId,
+      publicId,
+      normalizedOrganizationName,
+      normalizedLegalName,
+      taxId?.trim() || null,
+      taxIdType?.trim() || null,
+      normalizedCountry,
+      hubspotCompanyId?.trim() || null
+    ],
+    client
+  )
+
+  return newOrganizationId
+}
+
 // ─── Resolve Organization for Client ────────────────────────────────────
 
 /**
@@ -177,4 +373,25 @@ export const resolveOrganizationForClient = async (
   )
 
   return rows.length > 0 ? rows[0].organization_id : null
+}
+
+export const resolvePrimarySpaceForOrganization = async (
+  organizationId: string
+): Promise<{ spaceId: string | null; clientId: string | null; clientName: string | null }> => {
+  const rows = await runGreenhousePostgresQuery<SpaceClientRow>(
+    `SELECT s.space_id, s.client_id, c.client_name
+     FROM greenhouse_core.spaces s
+     LEFT JOIN greenhouse_core.clients c ON c.client_id = s.client_id
+     WHERE s.organization_id = $1
+       AND s.active = TRUE
+     ORDER BY s.updated_at DESC NULLS LAST, s.created_at DESC NULLS LAST, s.space_id ASC
+     LIMIT 1`,
+    [organizationId]
+  )
+
+  return {
+    spaceId: rows[0]?.space_id ?? null,
+    clientId: rows[0]?.client_id ?? null,
+    clientName: rows[0]?.client_name ?? null
+  }
 }
