@@ -563,6 +563,7 @@ const FinancePeriodClosureDashboardView = ({ canManageClosure, canReopen }: Prop
           ) : filteredPeriods.length === 0 ? (
             <EmptyState
               icon='tabler-calendar-off'
+              animatedIcon='/animations/empty-inbox.json'
               title='No hay períodos para este filtro'
               description='Cambia el enfoque para revisar meses listos, cerrados o con atención pendiente.'
               minHeight={260}
@@ -728,6 +729,7 @@ const FinancePeriodClosureDashboardView = ({ canManageClosure, canReopen }: Prop
                                 ) : !snapshotState || snapshotState.snapshots.length === 0 ? (
                                   <EmptyState
                                     icon='tabler-chart-bar-off'
+                                    animatedIcon='/animations/empty-chart.json'
                                     title='Todavía no hay snapshots materializados'
                                     description='El período existe en readiness, pero aún no encontramos P&L materializado por cliente para este mes.'
                                     minHeight={220}

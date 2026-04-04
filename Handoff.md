@@ -1,5 +1,88 @@
 # Handoff.md
 
+## Sesión 2026-04-04 — TASK-230 Animation Library Integration
+
+### Rama / alcance
+
+- rama: `task/TASK-230-portal-animation-library`
+- scope: integración de `lottie-react` + `framer-motion` al portal
+
+### Qué se hizo
+
+- Instaladas dependencias: `lottie-react@2.4.1`, `framer-motion@12.38.0`
+- Creados wrappers: `src/libs/Lottie.tsx` (dynamic import), `src/libs/FramerMotion.tsx` (client re-export)
+- Creado hook `src/hooks/useReducedMotion.ts` para `prefers-reduced-motion`
+- Creado `src/components/greenhouse/AnimatedCounter.tsx` con Framer Motion `useSpring`
+- Extendido `EmptyState.tsx` con prop `animatedIcon` (backward-compatible, 37 consumers)
+- Ampliado tipo `stats` en `HorizontalWithSubtitle` a `string | ReactNode`
+- Piloto en Finance: 3 AnimatedCounter (DSO, DPO, Payroll Ratio) + 2 animated EmptyState (Period Closure)
+- Assets Lottie: `public/animations/empty-inbox.json`, `public/animations/empty-chart.json`
+
+### Verificación
+
+- `pnpm build` — OK
+- `pnpm lint` — OK
+- `npx tsc --noEmit` — OK
+- `pnpm test` — 218 files, 914 tests pass
+
+### Pendiente para cierre
+
+- Preview visual en navegador (manual)
+- Validación `prefers-reduced-motion` en OS (manual)
+
+---
+
+## Sesión 2026-04-04 — TASK-232 auditada, movida a in-progress y rebaselinada
+
+### Rama / alcance
+
+- rama actual: `feature/codex-task-232-ico-llm-pipeline`
+- scope inicial:
+  - `docs/tasks/in-progress/TASK-232-ico-llm-quality-scoring-explanation-pipeline.md`
+  - `docs/tasks/README.md`
+  - `Handoff.md`
+  - auditoría runtime/documental sobre:
+    - `src/lib/ico-engine/materialize.ts`
+    - `src/lib/ico-engine/schema.ts`
+    - `src/lib/ico-engine/ai/materialize-ai-signals.ts`
+    - `src/lib/ico-engine/ai/read-signals.ts`
+    - `src/lib/ico-engine/brief-clarity.ts`
+    - `src/lib/ico-engine/methodological-accelerators.ts`
+    - `src/lib/sync/event-catalog.ts`
+    - `src/lib/sync/reactive-consumer.ts`
+    - `src/lib/sync/refresh-queue.ts`
+    - `src/lib/sync/projections/ico-ai-signals.ts`
+    - `src/lib/ai/google-genai.ts`
+    - `src/config/nexa-models.ts`
+    - `src/lib/nexa/nexa-service.ts`
+    - `src/lib/nexa/nexa-tools.ts`
+    - `src/lib/operations/get-operations-overview.ts`
+    - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+    - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+    - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+    - `docs/architecture/GREENHOUSE_NEXA_ARCHITECTURE_V1.md`
+    - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
+    - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+    - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+    - `docs/architecture/schema-snapshot-baseline.sql`
+
+### Resultado
+
+- `TASK-232` quedó movida a `in-progress` y la spec ya refleja el baseline real del repo.
+- La auditoría confirmó:
+  - `TASK-118` ya está cerrada y no debe seguir tratándose como prerequisito abierto
+  - `ai_metric_scores` ya tiene consumers runtime reales (`BCS` y `Brand Consistency`)
+  - la lane correcta para `TASK-232` cuelga de `ico.ai_signals.materialized` usando `outbox` + `reactive-consumer`
+  - el baseline operativo del provider en repo es `Vertex AI` + `@google/genai` + `Gemini`
+  - `ai_metric_scores` no alcanza por sí sola para esta lane porque faltan `signal_id`, `status`, `tokens_in`, `tokens_out` y storage de explanations/run audit
+- `docs/tasks/README.md` ya quedó alineado con el nuevo estado `in-progress`.
+
+### Riesgos / siguientes pasos
+
+- La arquitectura histórica de `Greenhouse_ICO_Engine_v1.md` todavía mezcla diseño viejo con `Claude via Vertex`; en esta lane debe prevalecer el baseline Gemini ya operativo del repo.
+- `docs/architecture/schema-snapshot-baseline.sql` quedó atrasado para este dominio tras `TASK-118`; para `TASK-232` prevalecen `src/lib/ico-engine/schema.ts`, la migración PG de `ico_ai_signals` y `src/types/db.d.ts`.
+- La implementación debería crear storage complementario para explanations y run audit antes de abrir consumers downstream nuevos.
+
 ## Sesión 2026-04-04 — TASK-118 cerrada y TASK-232 desbloqueada
 
 ### Rama / alcance

@@ -23,7 +23,7 @@ Primer bloque operativo asignado:
 - siguiente ID disponible: `TASK-234`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 - `TASK-231` quedó cerrada como tooling repo/global para la skill `greenhouse-task-planner` de Codex.
-- `TASK-232` queda reservada para activar la lane async de `ICO` basada en LLM (`quality scoring + explanations`) sin mezclarla con chat.
+- `TASK-232` ya está en `in-progress` para activar la lane async de `ICO` basada en LLM (`quality scoring + explanations`) sin mezclarla con chat.
 - `TASK-233` queda reservada para `Three.js 3D Logo Animation` como lane visual específica separada de `TASK-230`.
 
 ## Estados
@@ -58,6 +58,8 @@ Primer bloque operativo asignado:
 | `TASK-191` | [TASK-191-finance-organization-first-downstream-consumers-cutover.md](in-progress/TASK-191-finance-organization-first-downstream-consumers-cutover.md) | P1        | Alto     | Alto     | Implementación          | Follow-on de `TASK-181`: cerrar el cutover downstream org-first en `purchase-orders`, `hes`, `expenses`, `allocations` y readers analíticos sin repropagar `clientId` como input obligatorio |
 | `TASK-224` | [TASK-224-finance-document-vs-cash-semantic-contract.md](in-progress/TASK-224-finance-document-vs-cash-semantic-contract.md) | P1 | Alto | Medio | Parcial | Formalizar el contrato `documento/devengo vs caja` en Finance para que ventas/compras de Nubox no se presenten como cobros/pagos automáticos |
 | `TASK-225` | [TASK-225-internal-roles-hierarchies-approval-ownership-model.md](in-progress/TASK-225-internal-roles-hierarchies-approval-ownership-model.md) | P1 | Alto | Medio | Diseño activo | Formalizar roles internos, jerarquías y la matriz base `rol -> route groups -> vistas` para approvals, team visibility y ownership operativo sin sobrecargar `departments` |
+| `TASK-232` | [TASK-232-ico-llm-quality-scoring-explanation-pipeline.md](in-progress/TASK-232-ico-llm-quality-scoring-explanation-pipeline.md) | P1 | Muy alto | Alto | Discovery auditada | Lane async LLM del `ICO Engine` en ejecución sobre `ico.ai_signals.materialized`, baseline `Gemini` y storage complementario para explanations + run audit |
+| `TASK-230` | [TASK-230-portal-animation-library-integration.md](in-progress/TASK-230-portal-animation-library-integration.md) | P2 | Medio | Medio | Implementación | `lottie-react` + `framer-motion` integrados, EmptyState con `animatedIcon`, AnimatedCounter para KPIs, piloto Finance |
 | `TASK-221` | [TASK-221-revenue-enabled-measurement-model-attribution-policy.md](complete/TASK-221-revenue-enabled-measurement-model-attribution-policy.md) | P0 | Muy alto | Alto | Cerrada | `Revenue Enabled` ya tiene measurement model canónico inicial, policy explícita de atribución y cutover del consumer heurístico de `Creative Hub` |
 | `TASK-226` | [TASK-226-superadministrador-bootstrap-assignment-policy.md](to-do/TASK-226-superadministrador-bootstrap-assignment-policy.md) | P1 | Alto | Medio | Diseño | Formalizar el perfil owner/founder como `Superadministrador` + `Colaborador`, con bootstrap, asignación y auditoría explícitos |
 | `TASK-187` | [TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md](complete/TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md) | P0        | Muy alto | Alto     | Cerrada                | Notion ya tiene governance tenant-scoped formal: snapshots, drift, KPI readiness, admin APIs y panel reutilizado sobre el binding canónico por `space` |

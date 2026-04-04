@@ -7,7 +7,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -190,35 +190,100 @@ Usa Framer Motion `useSpring` + `useTransform` para interpolar el valor visible.
 
 ## Acceptance Criteria
 
-- [ ] `lottie-react`, `@lordicon/react` y `framer-motion` instalados y el build pasa sin errores
-- [ ] Wrappers con dynamic import creados en `src/libs/`
-- [ ] EmptyState acepta un prop `animatedIcon` sin romper los 8+ consumers existentes que usan `icon` string
-- [ ] AnimatedCounter renderiza transiciones numericas para currency, percentage e integer
-- [ ] Todas las animaciones nuevas respetan `prefers-reduced-motion: reduce`
-- [ ] Al menos un dashboard piloto usa 2+ empty states animados y 2+ AnimatedCounter
-- [ ] `pnpm build` y `pnpm lint` pasan sin errores nuevos
+- [x] `lottie-react` y `framer-motion` instalados y el build pasa sin errores
+- [x] Wrappers con dynamic import creados en `src/libs/`
+- [x] EmptyState acepta un prop `animatedIcon` sin romper los 37 consumers existentes que usan `icon` string
+- [x] AnimatedCounter renderiza transiciones numericas para currency, percentage e integer
+- [x] Todas las animaciones nuevas respetan `prefers-reduced-motion: reduce`
+- [x] Dashboard piloto Finance usa 2 empty states animados y 3 AnimatedCounter
+- [x] `pnpm build`, `pnpm lint` y `pnpm test` pasan sin errores nuevos
 
 ## Verification
 
-- `pnpm build`
-- `pnpm lint`
-- `pnpm tsc --noEmit`
-- Preview manual del dashboard piloto con animaciones activas
-- Preview manual con `prefers-reduced-motion: reduce` activado en el OS — confirmar que animaciones se desactivan
+- [x] `pnpm build` — OK
+- [x] `pnpm lint` — OK
+- [x] `npx tsc --noEmit` — OK
+- [x] `pnpm test` — 218 test files, 914 tests pass
+- [ ] Preview manual del dashboard piloto con animaciones activas
+- [ ] Preview manual con `prefers-reduced-motion: reduce` activado en el OS — confirmar que animaciones se desactivan
 
 ## Closing Protocol
 
-- [ ] Documentar en Detailed Spec el patron final de uso para que otros views adopten las animaciones
-- [ ] Listar en Follow-ups que views son candidatos prioritarios para adopcion
+- [x] Documentar en Detailed Spec el patron final de uso para que otros views adopten las animaciones
+- [x] Listar en Follow-ups que views son candidatos prioritarios para adopcion
+
+## Implementation Notes (2026-04-04)
+
+### Decisions taken
+
+- **Lordicon dropped**: `@lordicon/react` requires web component runtime, has poor SSR/React 19 compat. Lottie JSON covers the same icon use case. Any Lordicon asset can be exported as Lottie JSON.
+- **Stack final**: `lottie-react` (animated illustrations) + `framer-motion` (micro-interactions). Two libraries instead of three.
+- **Pilot dashboard**: Finance (FinanceDashboardView + FinancePeriodClosureDashboardView) — has both prominent KPI cards and empty states.
+
+### Usage patterns for adoption
+
+**Animated EmptyState:**
+```tsx
+<EmptyState
+  icon='tabler-calendar-off'            // static fallback
+  animatedIcon='/animations/empty-inbox.json'  // Lottie JSON path
+  title='No hay períodos'
+  description='...'
+/>
+```
+- `animatedIcon` takes priority over `icon`
+- Falls back to `icon` on load error
+- Automatically static when `prefers-reduced-motion: reduce`
+
+**AnimatedCounter in KPI cards:**
+```tsx
+<HorizontalWithSubtitle
+  title='DSO'
+  stats={<><AnimatedCounter value={42} format='integer' /> días</>}
+  subtitle='...'
+/>
+```
+- `format`: `'currency'` | `'percentage'` | `'integer'`
+- `currency`: defaults to `'CLP'`
+- Animates on scroll into view (once)
+- Instant render when `prefers-reduced-motion: reduce`
+
+**useReducedMotion hook:**
+```tsx
+import useReducedMotion from '@/hooks/useReducedMotion'
+const prefersReduced = useReducedMotion()
+```
+
+### Files created/modified
+
+| File | Action |
+|------|--------|
+| `src/libs/Lottie.tsx` | Created — dynamic import wrapper |
+| `src/libs/FramerMotion.tsx` | Created — client re-export |
+| `src/hooks/useReducedMotion.ts` | Created — matchMedia hook |
+| `src/components/greenhouse/AnimatedCounter.tsx` | Created — KPI number transitions |
+| `src/components/greenhouse/EmptyState.tsx` | Modified — added `animatedIcon` prop |
+| `src/components/greenhouse/EmptyState.test.tsx` | Modified — added reduced motion test |
+| `src/components/greenhouse/index.ts` | Modified — export AnimatedCounter |
+| `src/components/card-statistics/HorizontalWithSubtitle.tsx` | Modified — stats type widened to `string \| ReactNode` |
+| `src/views/greenhouse/finance/FinanceDashboardView.tsx` | Modified — 3 AnimatedCounter instances |
+| `src/views/greenhouse/finance/FinancePeriodClosureDashboardView.tsx` | Modified — 2 animated EmptyState |
+| `public/animations/empty-inbox.json` | Created — Lottie asset |
+| `public/animations/empty-chart.json` | Created — Lottie asset |
 
 ## Follow-ups
 
-- Adopcion masiva: reemplazar empty states estaticos en los demas modulos del portal
+- **Adopcion masiva**: reemplazar empty states estaticos en los demas modulos — candidatos prioritarios:
+  - Agency Space 360 tabs (6 EmptyState instances across FinanceTab, TeamTab, DeliveryTab, ServicesTab, IcoTab)
+  - GreenhouseDashboard (4 EmptyState instances)
+  - GreenhouseSprints (4 EmptyState instances)
+  - CapabilityCard (9 EmptyState instances)
+- **AnimatedCounter expansion**: KPI cards in FinanceExpenseDetailView, IncomeDetailView, SuppliersListView, ClientsListView
 - Evaluar animaciones de entrada/salida para modals y drawers con Framer Motion
-- Evaluar animated icons para la navegacion lateral (Lordicon con trigger on hover)
-- Crear o curar un pack de assets Lottie/Lordicon alineados al branding Greenhouse
+- Crear o curar un pack de assets Lottie alineados al branding Greenhouse (colores GH_COLORS)
+- Considerar animated loading skeletons como reemplazo de MUI Skeleton en areas de alto impacto
 
 ## Open Questions
 
-- Lordicon free tier tiene ~1500 iconos. Si el portal necesita iconos custom, hay que evaluar el plan pago ($9/mo) o usar solo Lottie con assets de LottieFiles. Confirmar antes de Slice 2.
-- El dashboard piloto ideal: Finance (tiene KPI cards prominentes) o Agency (tiene empty states frecuentes). Definir antes de Slice 4.
+- (Resolved) Lordicon vs Lottie: se decidio usar solo Lottie. Lordicon assets exportables como JSON.
+- (Resolved) Dashboard piloto: Finance elegido por KPI cards prominentes + empty states disponibles.
