@@ -286,7 +286,20 @@ const PeriodNavigator = ({
                   ...fcLast,
                   px: 1.5,
                   fontWeight: 600,
-                  ...(isCurrentPeriod ? { bgcolor: 'action.selected' } : {})
+                  ...(isCurrentPeriod
+                    ? {
+                        bgcolor: 'primary.main',
+                        color: 'primary.contrastText',
+                        borderColor: 'primary.main',
+                        '&.Mui-disabled': {
+                          bgcolor: 'primary.main',
+                          color: 'primary.contrastText',
+                          borderColor: 'primary.main',
+                          opacity: 1
+                        }
+                      }
+                    : {}
+                  )
                 }}
               >
                 {!isCurrentPeriod && <PulseDot />}
@@ -304,7 +317,7 @@ const PeriodNavigator = ({
         role='status'
         aria-live='polite'
         aria-atomic='true'
-        sx={{ fontSize: isMobile ? '0.875rem' : '1.125rem', userSelect: 'none' }}
+        sx={{ fontSize: isMobile ? '0.875rem' : '1.125rem', userSelect: 'none', color: isCurrentPeriod ? 'text.primary' : 'text.secondary' }}
       >
         {periodLabel}
       </Typography>
