@@ -20,7 +20,9 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-240`
+- siguiente ID disponible: `TASK-241`
+- `TASK-239` enriquece el prompt LLM de Nexa Insights con glosario de métricas, cadena causal, doble capa narrativa y nombres de Space/miembros.
+- `TASK-240` agrega menciones interactivas (@mentions) de Spaces y miembros en los insights de Nexa — chips clickeables que navegan a perfiles. Depende de `TASK-239`.
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 - `TASK-231` quedó cerrada como tooling repo/global para la skill `greenhouse-task-planner` de Codex.
 - `TASK-232` ya quedó cerrada con lane async LLM operativa para `ICO`: trigger reactivo, storage BQ/PG, readers downstream y baseline `Gemini`.
