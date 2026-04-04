@@ -12,7 +12,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, `project_context.md`, `Handoff.md`, `Handoff.archive.md` y `changelog.md` quedan en raiz.
   - specs, tasks, roadmap y guias especializadas viven bajo `docs/`.
   - `docs/tasks/` se ordena operativamente en `in-progress/`, `to-do/` y `complete/`; el indice vigente es `docs/tasks/README.md`.
-  - las tasks nuevas deben nacer con ID estable `TASK-###` y usar `docs/tasks/TASK_TEMPLATE.md` como plantilla canonica.
+  - las tasks nuevas deben nacer con ID estable `TASK-###` y usar `docs/tasks/TASK_TEMPLATE.md` como plantilla copiable. El protocolo de ejecucion (Plan Mode, Skill, Subagent, Checkpoint/Mode) vive en `docs/tasks/TASK_PROCESS.md`.
   - los briefs `CODEX_TASK_*` existentes siguen vigentes como legacy hasta su migracion y deben vivir versionados dentro de `docs/tasks/**`; el patron ignorado en raiz queda solo para scratch local fuera de la taxonomia documental.
 
 ## Prioridades
@@ -327,7 +327,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 Todo agente que trabaje sobre una task del sistema debe gestionar su estado en el pipeline de tareas. Las tasks nuevas usan `TASK-###`; las `CODEX_TASK_*` existentes se consideran legacy hasta su migracion. Todas viven en `docs/tasks/{to-do,in-progress,complete}/` y su índice es `docs/tasks/README.md`.
 
 Antes de crear una task nueva:
-1. Revisar `docs/tasks/TASK_TEMPLATE.md`
+1. Revisar `docs/tasks/TASK_TEMPLATE.md` (plantilla copiable) y `docs/tasks/TASK_PROCESS.md` (protocolo)
 2. Revisar `docs/tasks/TASK_ID_REGISTRY.md`
 3. Asignar el siguiente `TASK-###` disponible sin renumerar tasks existentes
 4. Registrar el nuevo ID en `docs/tasks/TASK_ID_REGISTRY.md`

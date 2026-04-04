@@ -1817,7 +1817,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Regla operativa derivada:
   - toda task nueva debe usar un ID estable `TASK-###`
   - el numero no define prioridad mutable; el orden operativo vive en `Rank` y en `docs/tasks/README.md`
-  - la plantilla canonica para crear e interpretar tasks queda fijada en `docs/tasks/TASK_TEMPLATE.md`
+  - la plantilla copiable para crear tasks queda en `docs/tasks/TASK_TEMPLATE.md`; el protocolo completo de ejecucion (Plan Mode, Skill, Subagent, Checkpoint/Mode) queda en `docs/tasks/TASK_PROCESS.md`
   - la reserva de IDs bootstrap y el siguiente ID disponible quedan fijados en `docs/tasks/TASK_ID_REGISTRY.md`
   - la capa operativa de seguimiento para tasks activas queda definida en `docs/operations/GITHUB_PROJECT_OPERATING_MODEL_V1.md`
 - Compatibilidad:

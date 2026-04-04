@@ -89,7 +89,8 @@ Indice maestro de la documentacion no operativa del repo.
 ### Tasks
 
 - [Task Index](tasks/README.md)
-- [Task Template](tasks/TASK_TEMPLATE.md)
+- [Task Template](tasks/TASK_TEMPLATE.md) — plantilla copiable para tasks nuevas
+- [Task Process](tasks/TASK_PROCESS.md) — protocolo completo (Plan Mode, Skill, Subagent, Checkpoint/Mode)
 - [Task ID Registry](tasks/TASK_ID_REGISTRY.md)
 - Paneles activos bajo `docs/tasks/`:
   - `in-progress/`
@@ -97,5 +98,6 @@ Indice maestro de la documentacion no operativa del repo.
   - `complete/`
 - Regla obligatoria:
   - toda task nueva debe usar `TASK-###` y nacer desde `docs/tasks/TASK_TEMPLATE.md`
+  - las tasks legacy `CODEX_TASK_*` siguen vigentes en el backlog con su formato original
   - toda task del sistema (`TASK-###` nueva o `CODEX_TASK_*` legacy) debe revisarse contra `GREENHOUSE_ARCHITECTURE_V1.md`, `GREENHOUSE_360_OBJECT_MODEL_V1.md` y la arquitectura especializada aplicable antes de implementarse
   - si un trabajo cambia el canal o la disponibilidad de una capacidad visible, revisar tambien `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md` y evaluar si corresponde actualizar `docs/changelog/CLIENT_CHANGELOG.md`

@@ -280,7 +280,7 @@ Todo PR que ejecute una task debe incluir:
 
 ## Flujo operativo recomendado
 
-1. Crear o ajustar la task markdown desde `docs/tasks/TASK_TEMPLATE.md`
+1. Crear o ajustar la task markdown desde `docs/tasks/TASK_TEMPLATE.md` (protocolo en `docs/tasks/TASK_PROCESS.md`)
 2. Asignar `TASK-###`
 3. Crear issue con título `[TASK-###] ...`
 4. Agregar issue al Project
