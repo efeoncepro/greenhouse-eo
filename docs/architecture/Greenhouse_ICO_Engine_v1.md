@@ -1,5 +1,17 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-04 — TASK-213 closes the umbrella on real runtime convergence
+
+`TASK-213` deja de describir una foundation faltante y queda cerrada como umbrella de convergencia sobre el runtime ya implementado.
+
+- la task paraguas ya refleja que `TASK-214` a `TASK-223` están cerradas
+- `Creative Hub` ya no pierde la metadata trust de `throughput` al resumir `MetricsSummary` para `Revenue Enabled`
+- `People > Person Intelligence` ya usa el reader trust-aware existente para mostrar estado de confianza de KPIs delivery sin abrir schema nuevo en `person_operational_360`
+- `Agency > ICO Engine` ya expone una lectura compacta del `metricTrust` del `Performance Report` mensual
+- implicación:
+  - el residual real del programa ya no es “crear trust foundation”
+  - los siguientes gaps pertenecen a follow-ons específicos por consumer o persistencia, no a esta umbrella
+
 ## Delta 2026-04-04 — TASK-223 ships the first methodological-accelerators runtime lane
 
 `TASK-223` no crea una tabla nueva ni una materialización separada del engine, pero sí formaliza cómo se leen `Design System` y `Brand Voice para AI` sobre foundations ya existentes.

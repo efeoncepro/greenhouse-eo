@@ -2,6 +2,13 @@
 
 ## 2026-04-04
 
+- **TASK-213 umbrella trust convergence closed on real runtime**:
+  - `TASK-213` ya quedó cerrada como umbrella de rebaseline y convergencia sobre el runtime real
+  - `People > Person Intelligence` ahora muestra estado de confianza y soporte para KPIs delivery reutilizando el reader ICO trust-aware, sin abrir schema nuevo
+  - `Agency > ICO Engine` ahora expone una lectura compacta del `metricTrust` del `Performance Report` mensual
+  - `Creative Hub` ya preserva la metadata trust de `throughput` al componer `Revenue Enabled`, evitando que el summary pierda `qualityGateStatus` y `confidenceLevel`
+  - verificado con `pnpm exec vitest run src/views/greenhouse/people/tabs/PersonIntelligenceTab.test.tsx src/lib/capability-queries/creative-cvr.test.ts src/lib/ico-engine/creative-velocity-review.test.ts`, `pnpm exec tsc --noEmit --pretty false`, `pnpm lint`, `pnpm build` y `rg -n "new Pool\\(" src`
+
 - **TASK-223 Methodological accelerators runtime baseline implemented**:
   - `ICO` ya tiene un contrato runtime inicial para `Design System` y `Brand Voice para AI` en `src/lib/ico-engine/methodological-accelerators.ts`
   - `Creative Velocity Review` ahora compone también esa lane metodológica, sin abrir una surface paralela a `Creative Hub`

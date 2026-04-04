@@ -42,6 +42,31 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.9
+
+**Canal:** Beta
+**Fecha:** 2026-04-04
+**Disponible para:** internal
+**Módulos:** Agency / People / Capabilities / Creative Hub / ICO
+
+### Novedades
+
+- `Agency` y `People` ahora hacen más visible la confianza real detrás de varios KPIs `ICO`.
+
+### Mejoras
+
+- `People > Inteligencia` ahora muestra cuándo un KPI delivery está confiable, degradado o sin base suficiente.
+- `Agency > ICO Engine` ahora resume la confianza del `Performance Report` mensual sin obligar a inferirla desde el texto ejecutivo.
+- `Creative Hub` conserva mejor los límites de confianza de `throughput` al componer `Revenue Enabled`.
+
+### Correcciones
+
+- El portal deja de colapsar ciertas señales `ICO` a números “planos” cuando el engine ya traía metadata de confianza útil para evitar sobreinterpretación.
+
+### Notas
+
+- Esta entrega no crea entitlement nuevo ni schema nuevo; reusa los contratos trust-aware ya existentes del `ICO Engine`.
+
 ## 2026.04-beta.8
 
 **Canal:** Beta

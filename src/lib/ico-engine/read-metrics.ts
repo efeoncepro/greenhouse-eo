@@ -845,6 +845,7 @@ export interface MetricsSummary {
   otdPct: number | null
   ftrPct: number | null
   throughput: number | null
+  throughputMetric: MetricValue | null
   cycleTimeDays: number | null
   source: 'materialized'
 }
@@ -856,14 +857,16 @@ export const readLatestMetricsSummary = async (
 
   if (!snapshot) return null
 
-  const getVal = (id: string) => snapshot.metrics.find(m => m.metricId === id)?.value ?? null
+  const getMetric = (id: string) => snapshot.metrics.find(m => m.metricId === id) ?? null
+  const throughputMetric = getMetric('throughput')
 
   return {
-    rpaAvg: getVal('rpa'),
-    otdPct: getVal('otd_pct'),
-    ftrPct: getVal('ftr_pct'),
-    throughput: getVal('throughput'),
-    cycleTimeDays: getVal('cycle_time'),
+    rpaAvg: getMetric('rpa')?.value ?? null,
+    otdPct: getMetric('otd_pct')?.value ?? null,
+    ftrPct: getMetric('ftr_pct')?.value ?? null,
+    throughput: throughputMetric?.value ?? null,
+    throughputMetric,
+    cycleTimeDays: getMetric('cycle_time')?.value ?? null,
     source: 'materialized'
   }
 }
@@ -883,14 +886,16 @@ export const readMetricsSummaryByClientId = async (
   if (rows.length === 0) return null
 
   const snapshot = normalizeSnapshot(rows[0], 'materialized')
-  const getVal = (id: string) => snapshot.metrics.find(m => m.metricId === id)?.value ?? null
+  const getMetric = (id: string) => snapshot.metrics.find(m => m.metricId === id) ?? null
+  const throughputMetric = getMetric('throughput')
 
   return {
-    rpaAvg: getVal('rpa'),
-    otdPct: getVal('otd_pct'),
-    ftrPct: getVal('ftr_pct'),
-    throughput: getVal('throughput'),
-    cycleTimeDays: getVal('cycle_time'),
+    rpaAvg: getMetric('rpa')?.value ?? null,
+    otdPct: getMetric('otd_pct')?.value ?? null,
+    ftrPct: getMetric('ftr_pct')?.value ?? null,
+    throughput: throughputMetric?.value ?? null,
+    throughputMetric,
+    cycleTimeDays: getMetric('cycle_time')?.value ?? null,
     source: 'materialized'
   }
 }

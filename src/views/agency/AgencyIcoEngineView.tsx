@@ -17,9 +17,10 @@ import IcoGlobalKpis from '@/components/agency/IcoGlobalKpis'
 import IcoCharts from '@/components/agency/IcoCharts'
 import type { RpaTrendBySpace } from '@/components/agency/IcoCharts'
 import SpaceIcoScorecard from '@/components/agency/SpaceIcoScorecard'
+import { AgencyMetricTrustInline } from '@/components/agency/metric-trust'
 import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type { SpaceMetricSnapshot } from '@/lib/ico-engine/read-metrics'
-import type { AgencyPerformanceReport } from '@/lib/ico-engine/performance-report'
+import type { AgencyPerformanceReport, MetricTrustEntry } from '@/lib/ico-engine/performance-report'
 
 export type AgencyIcoData = {
   periodYear: number
@@ -39,11 +40,45 @@ const formatPct = (value: number | null) => (value === null ? '—' : `${Math.ro
 const formatCount = (value: number | null | undefined) => (value == null ? '—' : String(value))
 const formatDelta = (value: number | null) => (value === null ? '—' : `${Math.abs(value).toFixed(1)}pp`)
 
+const REPORT_TRUST_LABELS: Record<string, string> = {
+  on_time_pct: 'On-Time %',
+  late_drop_count: 'Late Drops',
+  overdue_count: 'Overdue',
+  carry_over_count: 'Carry-Over',
+  overdue_carried_forward_count: 'Overdue CF',
+  top_performer_rpa_avg: 'Top Performer RpA'
+}
+
 const toUiTrend = (trend: AgencyPerformanceReport['summary']['trend']) =>
   trend === 'improving' ? 'positive' : trend === 'degrading' ? 'negative' : 'neutral'
 
+const toTrustMetricLike = (entry: MetricTrustEntry) => ({
+  value: entry.qualityGateStatus === 'broken' ? null : 1,
+  benchmarkType: entry.benchmarkType,
+  qualityGateStatus: entry.qualityGateStatus,
+  qualityGateReasons: entry.reasons,
+  confidenceLevel: entry.confidenceLevel
+})
+
 const AgencyIcoEngineView = ({ data, onComputeLive, computingLive }: Props) => {
   const hasData = data !== null && data.spaces.length > 0
+
+  const reportTrustHighlights =
+    data?.report?.metricTrust
+      ? ['on_time_pct', 'late_drop_count', 'overdue_count', 'carry_over_count', 'top_performer_rpa_avg']
+          .map(metricId => {
+            const trustEntry = data.report?.metricTrust?.metrics[metricId]
+
+            if (!trustEntry) return null
+
+            return {
+              metricId,
+              label: REPORT_TRUST_LABELS[metricId] ?? metricId,
+              trustEntry
+            }
+          })
+          .filter((item): item is { metricId: string; label: string; trustEntry: MetricTrustEntry } => Boolean(item))
+      : []
 
   const [rpaTrend, setRpaTrend] = useState<RpaTrendBySpace[] | undefined>(undefined)
   const [rpaTrendLoading, setRpaTrendLoading] = useState(false)
@@ -219,6 +254,33 @@ const AgencyIcoEngineView = ({ data, onComputeLive, computingLive }: Props) => {
                           {data.report.executiveSummary}
                         </Typography>
                       </div>
+                      {reportTrustHighlights.length > 0 && (
+                        <div>
+                          <Typography variant='overline' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+                            Confianza del scorecard
+                          </Typography>
+                          <Grid container spacing={2} sx={{ mt: 0.5 }}>
+                            {reportTrustHighlights.map(item => (
+                              <Grid key={item.metricId} size={{ xs: 12, md: 6, xl: 4 }}>
+                                <Stack
+                                  spacing={0.75}
+                                  sx={{
+                                    p: 2,
+                                    border: `1px solid ${GH_COLORS.neutral.border}`,
+                                    borderRadius: 2,
+                                    bgcolor: GH_COLORS.neutral.bgSurface
+                                  }}
+                                >
+                                  <Typography variant='body2' sx={{ fontWeight: 600, color: GH_COLORS.neutral.textPrimary }}>
+                                    {item.label}
+                                  </Typography>
+                                  <AgencyMetricTrustInline metric={toTrustMetricLike(item.trustEntry)} dense />
+                                </Stack>
+                              </Grid>
+                            ))}
+                          </Grid>
+                        </div>
+                      )}
                     </Stack>
                   </Card>
                 </Grid>

@@ -7,8 +7,10 @@ Panel operativo de tasks del repo.
 - Las tasks nuevas deben usar `TASK-###` como ID estable.
 - Los `CODEX_TASK_*` existentes siguen vigentes como legacy hasta su migracion.
 - El numero de `TASK-###` no define prioridad mutable; el orden actual vive en `Rank` y en el backlog priorizado de este indice.
-- Plantilla canonica para crear y leer tasks:
+- Plantilla copiable para crear tasks:
   - [TASK_TEMPLATE.md](TASK_TEMPLATE.md)
+- Protocolo completo (Plan Mode, Skill, Subagent, derivacion de Checkpoint/Mode):
+  - [TASK_PROCESS.md](TASK_PROCESS.md)
 - Registro canonico de IDs bootstrap:
   - [TASK_ID_REGISTRY.md](TASK_ID_REGISTRY.md)
 
@@ -58,6 +60,8 @@ Primer bloque operativo asignado:
 | `TASK-187` | [TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md](complete/TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md) | P0        | Muy alto | Alto     | Cerrada                | Notion ya tiene governance tenant-scoped formal: snapshots, drift, KPI readiness, admin APIs y panel reutilizado sobre el binding canónico por `space` |
 | `TASK-196` | [TASK-196-delivery-performance-report-parity-greenhouse-notion.md](complete/TASK-196-delivery-performance-report-parity-greenhouse-notion.md) | P0        | Muy alto | Alto     | Cerrada                | Lane completa de paridad Delivery: source sync, identidad, owner attribution, semántica, freeze histórico y cutover outbound `Greenhouse -> Notion` sobre `Performance Reports` |
 ## Complete
+
+- [TASK-213-ico-metrics-hardening-trust-model.md](complete/TASK-213-ico-metrics-hardening-trust-model.md) — La umbrella ICO trust quedó cerrada sobre el runtime real: `TASK-214` a `TASK-223` ya no se leen como backlog base, `People` y `Agency` exponen mejor la metadata de confianza existente y `Creative Hub` preserva trust de `throughput` al componer `Revenue Enabled`.
 
 - [TASK-223-ico-methodological-accelerators-instrumentation.md](complete/TASK-223-ico-methodological-accelerators-instrumentation.md) — `ICO` ya tiene contrato runtime inicial para `Design System` y `Brand Voice para AI`, `CVR` ahora compone esa lane metodológica y `Creative Hub` dejó de reconstruir `Brand Consistency` con heurísticas locales cuando falta score auditado.
 
@@ -170,7 +174,7 @@ Primer bloque operativo asignado:
 - `TASK-209` ya quedó cerrada como cierre de recurrencia operativa:
   - Greenhouse ya institucionalizó el chaining / retry / scheduling final para que `raw` y `conformed` converjan sin reruns manuales
   - la observabilidad y el recovery quedaron visibles desde Admin y auditados por `space`
-- **ICO trust foundation wave:** `TASK-213` coordina la ola; `TASK-214`, `TASK-215`, `TASK-216` y `TASK-217` ya quedaron cerradas como foundation/cutover downstream del trust model en `Agency`.
+- **ICO trust foundation wave:** `TASK-213` ya quedó cerrada como umbrella de rebaseline/convergencia; `TASK-214`, `TASK-215`, `TASK-216` y `TASK-217` ya quedaron cerradas como foundation/cutover downstream del trust model en `Agency`.
   - `TASK-214`: ya cerró semántica canónica de completitud y buckets
   - `TASK-215`: cierra la fragilidad específica de `RpA`
   - `TASK-216`: institucionaliza benchmark registry, quality gates y confidence metadata, además de persistir `metric_trust_json` en serving
@@ -238,7 +242,7 @@ Nota de secuencia para la lane de integraciones + métricas Delivery:
 | 27   | `TASK-210`                                                                                               | [TASK-210-hubspot-quotes-integration.md](to-do/TASK-210-hubspot-quotes-integration.md)                                               | P2        | Alto       | Alto              | Diseño                                                                                                               | HubSpot Quotes bidireccional: inbound sync + outbound creation via Cloud Run middleware, identity resolution, cron sync, UI multi-source + formulario de creacion |
 | 28   | `TASK-211`                                                                                               | [TASK-211-hubspot-products-line-items-integration.md](to-do/TASK-211-hubspot-products-line-items-integration.md)                     | P2        | Alto       | Alto              | Diseño                                                                                                               | HubSpot Products catalogo + Line Items bidireccional: sync catalogo, line items de quotes/deals, product picker para quotes outbound (TASK-210) |
 | 29   | `TASK-212`                                                                                               | [TASK-212-nubox-line-items-sync-multiline-emission.md](to-do/TASK-212-nubox-line-items-sync-multiline-emission.md)                   | P2        | Alto       | Medio             | Diseño                                                                                                               | Nubox line items inbound (ventas + compras) + emision DTE multi-linea outbound; paridad cross-source con HubSpot line items |
-| 30   | `TASK-213`                                                                                               | [TASK-213-ico-metrics-hardening-trust-model.md](to-do/TASK-213-ico-metrics-hardening-trust-model.md)                                 | P1        | Muy alto   | Medio             | Diseño                                                                                                               | Lane paraguas para robustecer métricas ICO como sistema confiable: semántica, benchmark policy, confidence metadata y propagation sin fórmulas paralelas |
+| 30   | `TASK-213`                                                                                               | [TASK-213-ico-metrics-hardening-trust-model.md](complete/TASK-213-ico-metrics-hardening-trust-model.md)                             | P1        | Muy alto   | Medio             | Cerrada                                                                                                               | Umbrella ICO trust cerrada: rebaseline sobre runtime real, convergencia visible en `People` y `Agency`, y preservation de trust en `Creative Hub` |
 | 32   | `TASK-216`                                                                                               | [TASK-216-ico-metric-trust-model-benchmark-quality-gates.md](complete/TASK-216-ico-metric-trust-model-benchmark-quality-gates.md)     | P0        | Muy alto   | Alto              | **Cerrada**                                                                                                          | Benchmark registry + quality gates + confidence metadata para que `ICO` publique no solo el valor del KPI, sino también su interpretabilidad y confianza |
 | 34   | ~~`TASK-217`~~                                                                                            | [TASK-217-agency-kpi-trust-propagation-serving-semantics.md](complete/TASK-217-agency-kpi-trust-propagation-serving-semantics.md) | P1        | Alto       | Medio             | **Cerrada**                                                                                                          | `Agency` ya consume y muestra KPIs `ICO` con trust metadata (`benchmark`, `confidence`, `quality gate`) y estados UI explícitos sin duplicar fórmulas del engine |
 | 35   | `TASK-218`                                                                                               | [TASK-218-ico-time-to-market-activation-evidence-contract.md](complete/TASK-218-ico-time-to-market-activation-evidence-contract.md)        | P0        | Muy alto   | Alto              | Cerrada                                                                                                              | `TTM` ya tiene contrato runtime inicial, evidencia explícita y primer consumer visible en campañas |
@@ -588,7 +592,7 @@ Finance Dashboard Calculation Correction ←── Invoice Payment Ledger (cash 
 ## Regla operativa
 
 - Mantener todas las tasks del sistema dentro de `docs/tasks/` y sus subcarpetas de estado.
-- Toda task nueva debe nacer desde `docs/tasks/TASK_TEMPLATE.md` y usar `TASK-###` como ID estable.
+- Toda task nueva debe nacer desde `docs/tasks/TASK_TEMPLATE.md` (plantilla copiable) y usar `TASK-###` como ID estable. El protocolo de ejecucion vive en `docs/tasks/TASK_PROCESS.md`. Las tasks legacy `CODEX_TASK_*` siguen vigentes en el backlog con su formato original.
 - Los briefs vivos del proyecto deben quedar versionados dentro de `docs/tasks/**`; no usar archivos sueltos en raíz como source of truth.
 - No asumir que un task está vigente solo por existir; contrastar siempre con `project_context.md`, `Handoff.md` y `changelog.md`.
 - Toda task del sistema nueva, reactivada o retomada debe revisarse obligatoriamente contra la arquitectura antes de implementarse.

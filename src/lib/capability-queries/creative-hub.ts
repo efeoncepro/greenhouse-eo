@@ -63,7 +63,10 @@ export const getCreativeHubQuery: CapabilityQueryBuilder = async viewer => {
     metricsSummary: icoSummary,
     brandVoiceAiEvidence,
     throughput: {
-      value: icoSummary?.throughput ?? null
+      value: icoSummary?.throughput ?? null,
+      qualityGateStatus: icoSummary?.throughputMetric?.qualityGateStatus ?? null,
+      qualityGateReasons: icoSummary?.throughputMetric?.qualityGateReasons ?? [],
+      confidenceLevel: icoSummary?.throughputMetric?.confidenceLevel ?? null
     }
   })
 

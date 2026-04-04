@@ -1,5 +1,127 @@
 # Handoff.md
 
+## Sesion 2026-04-04 — Task template split: TASK_TEMPLATE.md + TASK_PROCESS.md
+
+### Que cambio
+
+El task template monolitico (`TASK_TEMPLATE.md`, ~683 lineas) se separo en dos documentos:
+
+- **`docs/tasks/TASK_TEMPLATE.md`** — plantilla copiable (~150 lineas). Solo lo que se copia al crear una task nueva.
+- **`docs/tasks/TASK_PROCESS.md`** — protocolo de referencia. Plan Mode, Skill Protocol, Subagent Protocol, matrices de Checkpoint/Mode, Lightweight Mode, migracion CODEX.
+
+### Cambios de modelo
+
+- Se agrego campo `Type: implementation | umbrella | policy` en Zone 0 para diferenciar tasks que producen codigo vs coordinacion vs documentacion.
+- `Checkpoint` y `Mode` ya no son campos manuales en Status — el agente los deriva automaticamente de Priority x Effort al tomar la task.
+- Zone 2 (Plan Mode) ya no se llena al crear la task — es responsabilidad del agente que la toma.
+- Lint + tsc baseline se movio de Discovery a Execution (no gastar tiempo en baseline antes de tener plan aprobado).
+- Closing Protocol en cada task solo lista items especificos; el protocolo generico sigue en `CLAUDE.md` § Task Lifecycle Protocol.
+
+### Compatibilidad
+
+Las tasks legacy (`CODEX_TASK_*`) y tasks `TASK-###` creadas con el formato anterior siguen vigentes en el backlog con su formato original. Solo las tasks nuevas usan la nueva estructura.
+
+### Docs actualizados
+
+- `CLAUDE.md` — Task Lifecycle Protocol actualizado
+- `AGENTS.md` — referencia a ambos archivos
+- `project_context.md` — delta de plantilla
+- `docs/tasks/README.md` — convencion vigente
+- `docs/README.md` — indice de tasks
+- `docs/operations/GITHUB_PROJECT_OPERATING_MODEL_V1.md` — flujo operativo
+
+---
+
+## Sesión 2026-04-04 — TASK-213 implementada y cerrada
+
+### Rama / alcance
+
+- rama actual: `develop`
+- scope principal:
+  - `src/lib/ico-engine/read-metrics.ts`
+  - `src/lib/capability-queries/creative-hub.ts`
+  - `src/views/greenhouse/people/tabs/PersonIntelligenceTab.tsx`
+  - `src/views/greenhouse/people/tabs/PersonIntelligenceTab.test.tsx`
+  - `src/views/agency/AgencyIcoEngineView.tsx`
+  - `src/lib/ico-engine/methodological-accelerators.test.ts`
+  - docs/lifecycle:
+    - `docs/tasks/complete/TASK-213-ico-metrics-hardening-trust-model.md`
+    - `docs/tasks/README.md`
+    - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+    - `docs/architecture/Greenhouse_Capabilities_Architecture_v1.md`
+    - `docs/changelog/CLIENT_CHANGELOG.md`
+    - `changelog.md`
+    - `Handoff.md`
+
+### Resultado
+
+- `TASK-213` quedó cerrada como umbrella de convergencia sobre el runtime real.
+- `Creative Hub` ya preserva trust metadata de `throughput` al componer `Revenue Enabled`.
+- `People > Person Intelligence` ahora muestra estados de confianza de KPIs delivery reutilizando el reader `/api/people/[memberId]/ico`.
+- `Agency > ICO Engine` ahora resume `metricTrust` del `Performance Report` mensual con componentes shared ya existentes.
+- No se creó migración ni route nueva.
+
+### Riesgos / siguientes pasos
+
+- `Payroll` sigue siendo el consumer más parcial: hoy la persistencia trust-aware visible sigue concentrada en la lane `RpA`.
+- Si se quiere cerrar esa brecha, el follow-on correcto ya no pertenece a la umbrella `TASK-213`, sino a una task específica de payroll trust propagation/persistence.
+
+### Verificación
+
+- `pnpm exec vitest run src/views/greenhouse/people/tabs/PersonIntelligenceTab.test.tsx src/lib/capability-queries/creative-cvr.test.ts src/lib/ico-engine/creative-velocity-review.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm lint`
+- `pnpm build`
+- `rg -n "new Pool\\(" src`
+
+## Sesión 2026-04-04 — TASK-213 auditada y movida a in-progress
+
+### Rama / alcance
+
+- rama actual: `develop`
+- scope inicial:
+  - `docs/tasks/in-progress/TASK-213-ico-metrics-hardening-trust-model.md`
+  - `docs/tasks/README.md`
+  - `Handoff.md`
+  - auditoría runtime y documental sobre:
+    - `src/lib/ico-engine/metric-registry.ts`
+    - `src/lib/ico-engine/metric-trust-policy.ts`
+    - `src/lib/ico-engine/read-metrics.ts`
+    - `src/lib/ico-engine/performance-report.ts`
+    - `src/lib/agency/agency-queries.ts`
+    - `src/components/agency/metric-trust.tsx`
+    - `src/lib/person-360/get-person-ico-profile.ts`
+    - `src/lib/sync/projections/ico-member-metrics.ts`
+    - `src/lib/sync/projections/agency-performance-report.ts`
+    - `src/lib/ico-engine/time-to-market.ts`
+    - `src/lib/ico-engine/iteration-velocity.ts`
+    - `src/lib/ico-engine/brief-clarity.ts`
+    - `src/lib/ico-engine/revenue-enabled.ts`
+    - `src/lib/ico-engine/creative-velocity-review.ts`
+    - `src/lib/ico-engine/methodological-accelerators.ts`
+    - `src/lib/capability-queries/creative-hub.ts`
+    - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+    - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+    - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+    - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+    - `docs/architecture/GREENHOUSE_AGENCY_LAYER_V2.md`
+    - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+    - `docs/architecture/GREENHOUSE_DELIVERY_PERFORMANCE_REPORT_PARITY_V1.md`
+    - `docs/architecture/schema-snapshot-baseline.sql`
+
+### Resultado
+
+- `TASK-213` quedó rebaselinada como umbrella activa, no como backlog aspiracional de lanes que ya existen.
+- La auditoría confirmó que `TASK-214` a `TASK-223` ya están cerradas y que el drift principal era documental:
+  - estados y paths de lifecycle desactualizados
+  - gap description que seguía presentando `TTM`, `Iteration Velocity`, `BCS`, `Revenue Enabled`, `CVR` y aceleradores metodológicos como pendientes base
+- No apareció un blocker de schema ni upstream para continuar; el siguiente paso es documentar el mapa de conexiones y decidir el residual técnico real.
+
+### Riesgos / siguientes pasos
+
+- `schema-snapshot-baseline.sql` sigue representando una foto anterior al agregado de `metric_trust_json`; para trust serving la fuente correcta hoy es combinar baseline + migraciones recientes.
+- La convergencia residual probable está en semántica compartida y no en “volver a implementar” lanes ya cerradas.
+
 ## Sesión 2026-04-04 — TASK-223 implementada y cerrada
 
 ### Rama / alcance

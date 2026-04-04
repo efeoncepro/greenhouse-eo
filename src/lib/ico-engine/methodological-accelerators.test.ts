@@ -10,6 +10,7 @@ describe('buildMethodologicalAcceleratorsContract', () => {
         rpaAvg: 1.9,
         otdPct: 92,
         throughput: 24,
+        throughputMetric: null,
         cycleTimeDays: 6.4,
         source: 'materialized'
       },

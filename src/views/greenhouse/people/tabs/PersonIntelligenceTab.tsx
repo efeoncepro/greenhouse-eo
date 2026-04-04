@@ -15,12 +15,21 @@ import { useTheme } from '@mui/material/styles'
 
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import { AgencyMetricStatusChip, getAgencyMetricFooterLabel } from '@/components/agency/metric-trust'
 import AppRecharts from '@/libs/styles/AppRecharts'
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from '@/libs/Recharts'
 
 // ── Types ──
 
 interface MetricValue { metricId: string; value: number | null; zone: string | null }
+interface TrustMetricValue extends MetricValue {
+  benchmarkType?: 'external' | 'analog' | 'adapted' | 'internal'
+  qualityGateStatus?: 'healthy' | 'degraded' | 'broken'
+  qualityGateReasons?: string[]
+  dataStatus?: 'valid' | 'low_confidence' | 'suppressed' | 'unavailable'
+  confidenceLevel?: 'high' | 'medium' | 'low' | 'none'
+  trustEvidence?: { sampleSize: number | null }
+}
 interface CapacityCtx { contractedHoursMonth: number; assignedHoursMonth: number; usedHoursMonth: number | null; availableHoursMonth: number; overcommitted: boolean; roleCategory: string | null; totalFteAllocation: number; expectedThroughput: number; capacityHealth: string; activeAssignmentCount: number; usageKind?: string; usagePercent?: number | null; commercialAvailabilityHours?: number; operationalAvailabilityHours?: number | null }
 interface CostCtx { currency: string | null; monthlyBaseSalary: number | null; monthlyTotalComp: number | null; compensationVersionId: string | null; targetCurrency?: string | null; loadedCostTarget?: number | null; costPerHourTarget?: number | null; suggestedBillRateTarget?: number | null }
 interface Snapshot { period: { year: number; month: number }; deliveryMetrics: MetricValue[]; derivedMetrics: MetricValue[]; capacity: CapacityCtx; cost: CostCtx; health: 'green' | 'yellow' | 'red'; materializedAt: string | null; engineVersion: string; source: string }
@@ -53,6 +62,9 @@ const zoneColor = (z: string | null): 'success' | 'warning' | 'error' | 'seconda
 
 const getMetric = (metrics: MetricValue[], id: string): MetricValue | undefined =>
   metrics.find(m => m.metricId === id)
+
+const getTrustMetric = (metrics: TrustMetricValue[] | null, id: string): TrustMetricValue | undefined =>
+  metrics?.find(metric => metric.metricId === id)
 
 const fmtNum = (v: number | null | undefined, suffix = ''): string =>
   v != null ? `${Math.round(v * 10) / 10}${suffix}` : '—'
@@ -112,16 +124,31 @@ type Props = { memberId: string }
 const PersonIntelligenceTab = ({ memberId }: Props) => {
   const theme = useTheme()
   const [data, setData] = useState<IntelligenceResponse | null>(null)
+  const [icoTrustMetrics, setIcoTrustMetrics] = useState<TrustMetricValue[] | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch(`/api/people/${memberId}/intelligence?trend=6`)
+        const [intelligenceRes, icoRes] = await Promise.allSettled([
+          fetch(`/api/people/${memberId}/intelligence?trend=6`),
+          fetch(`/api/people/${memberId}/ico`)
+        ])
 
-        if (res.ok) setData(await res.json())
+        if (intelligenceRes.status === 'fulfilled' && intelligenceRes.value.ok) {
+          setData(await intelligenceRes.value.json())
+        }
+
+        if (icoRes.status === 'fulfilled' && icoRes.value.ok) {
+          const payload = await icoRes.value.json()
+
+          setIcoTrustMetrics(Array.isArray(payload.metrics) ? payload.metrics : [])
+        } else {
+          setIcoTrustMetrics(null)
+        }
       } catch {
         // Non-blocking
+        setIcoTrustMetrics(null)
       } finally {
         setLoading(false)
       }
@@ -335,10 +362,12 @@ const PersonIntelligenceTab = ({ memberId }: Props) => {
             <Grid container spacing={3}>
               {DELIVERY_METRICS.map(dm => {
                 const m = getMetric(current.deliveryMetrics, dm.id)
+                const trustMetric = getTrustMetric(icoTrustMetrics, dm.id)
+                const trustFooter = trustMetric ? getAgencyMetricFooterLabel(trustMetric) : null
 
                 return (
                   <Grid size={{ xs: 6, sm: 4, md: 3 }} key={dm.id}>
-                    <Box>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
                       <Typography variant='caption' color='text.secondary'>{dm.label}</Typography>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
                         <Typography variant='h6'>{fmtNum(m?.value ?? null)}</Typography>
@@ -352,6 +381,12 @@ const PersonIntelligenceTab = ({ memberId }: Props) => {
                           />
                         )}
                       </Box>
+                      {trustMetric && <AgencyMetricStatusChip metric={trustMetric} />}
+                      {trustFooter && (
+                        <Typography variant='caption' color='text.secondary' sx={{ lineHeight: 1.4 }}>
+                          {trustFooter}
+                        </Typography>
+                      )}
                     </Box>
                   </Grid>
                 )

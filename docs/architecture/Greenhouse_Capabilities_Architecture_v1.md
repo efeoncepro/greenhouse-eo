@@ -1,5 +1,12 @@
 # EFEONCE GREENHOUSE™ — Capabilities Architecture
 
+## Delta 2026-04-04 — TASK-213 preserves trust metadata inside the Creative Hub revenue narrative
+
+- `Creative Hub` now keeps the trust semantics of `throughput` when composing `Revenue Enabled` inside `CVR`.
+- Architectural implication:
+  - the capability layer should not collapse canonical ICO signals into plain numbers if the engine already provides confidence and quality-gate context
+  - client-facing narrative can stay concise, but the contract feeding it must preserve the trust metadata needed to avoid false certainty
+
 ## Delta 2026-04-04 — TASK-222 closes the first CVR client-facing surface
 
 - `Creative Hub` now hosts the first client-facing `Creative Velocity Review` block over the existing capabilities runtime.
