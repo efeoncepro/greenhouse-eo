@@ -1,5 +1,20 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-03 — TASK-215 formalizes RpA runtime policy and evidence contract
+
+`TASK-215` no redefine la fórmula base de `RpA`; la formaliza como contrato runtime auditable sobre la policy implícita ya existente.
+
+- `RpA` sigue calculándose desde tareas completadas terminales con `rpa_value > 0`
+- el engine debe propagar además un estado de calidad para consumers downstream:
+  - `valid`
+  - `low_confidence`
+  - `suppressed`
+  - `unavailable`
+- la señal debe viajar con evidencia mínima de coverage para que readers y consumers no reinterpreten localmente `0`, `null` o ausencia de datos
+- `Payroll` debe seguir tratando la KPI surface con prudencia: la policy de negocio no se mueve al consumer, se propaga desde el engine
+
+La implementación asociada a esta delta usa los mismos contratos troncales del engine y no rompe la semántica endurecida por `TASK-214`.
+
 ## Delta 2026-04-03 — TASK-214 closed completion semantics drift and serving member parity
 
 `TASK-214` cerró el drift residual entre helpers, readers, materializaciones y serving member-level:
@@ -2051,13 +2066,34 @@ Estas son las métricas que el engine calcula/materializa como contrato troncal 
 
 | Métrica | En qué consiste el cálculo | Qué pregunta responde | Columnas expuestas |
 |---|---|---|---|
-| `RpA` | promedio y mediana de `rpa_value > 0` en tareas completadas terminales del período | ¿Cuántas rondas de revisión estamos necesitando por activo realmente terminado? | `rpa_avg`, `rpa_median` |
+| `RpA` | promedio y mediana de `rpa_value > 0` en tareas completadas terminales del período, con evidencia de coverage | ¿Cuántas rondas de revisión estamos necesitando por activo realmente terminado? | `rpa_avg`, `rpa_median`, `rpa_eligible_task_count`, `rpa_missing_task_count`, `rpa_non_positive_task_count` |
 | `OTD` | `on_time / (on_time + late_drop + overdue)`; excluye `carry_over` y `overdue_carried_forward` del denominador | ¿Qué porcentaje de la promesa del período se entregó a tiempo? | `otd_pct` |
 | `FTR` | porcentaje de tareas completadas terminales con `client_change_round_final = 0` | ¿Qué proporción de activos salió bien a la primera, sin cambios finales del cliente? | `ftr_pct` |
 | `Cycle Time` | promedio, P50 y desviación de `cycle_time_days` en tareas completadas terminales | ¿Cuánto tarda realmente el flujo de producción en cerrar un activo y cuán predecible es ese tiempo? | `cycle_time_avg_days`, `cycle_time_p50_days`, `cycle_time_variance` |
 | `Throughput` | conteo absoluto de tareas clasificadas como `on_time` o `late_drop` | ¿Cuántos activos logró cerrar el equipo en el período? | `throughput_count` |
 | `Pipeline Velocity` | `throughput / active_tasks` | ¿Con qué velocidad el equipo convierte trabajo activo en trabajo efectivamente cerrado? | `pipeline_velocity` |
 | `Stuck Assets` | conteo absoluto y porcentaje de `is_stuck = TRUE` sobre tareas activas | ¿Cuánta carga operativa está detenida o sin movimiento anormalmente largo? | `stuck_asset_count`, `stuck_asset_pct` |
+
+Contratos de lectura para `RpA`:
+
+| Estado | Lectura operativa | Uso downstream |
+|---|---|---|
+| `valid` | hay evidencia suficiente y el valor agregado es confiable | mostrar / consumir normalmente |
+| `low_confidence` | hay valor, pero la cobertura del insumo es parcial o degradada | mostrar con cautela y sin reinterpretación local |
+| `suppressed` | el período completado no tiene evidencia útil suficiente para un agregado sano | no tratar `0` como señal positiva |
+| `unavailable` | no existe universo completado suficiente para calcular `RpA` | propagar ausencia, no inferir score |
+
+Evidencia mínima esperada para el contrato:
+
+- `rpa_eligible_task_count`
+- `rpa_missing_task_count`
+- `rpa_non_positive_task_count`
+
+Regla operativa:
+
+- `null` representa ausencia, supresión o imposibilidad de cálculo
+- `0` no debe colapsarse automáticamente a `valid`
+- cualquier fallback visible debe ser explícito, documentado y auditable en el engine o en un read model derivado
 
 Regla vigente de completitud:
 

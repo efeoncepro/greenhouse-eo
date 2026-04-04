@@ -112,7 +112,18 @@ describe('projectPayrollForPeriod', () => {
   it('projects payroll for actual_to_date mode with real KPIs and attendance', async () => {
     mockGetApplicableCompensationVersionsForPeriod.mockResolvedValue([baseCompensation])
     mockFetchKpisForPeriod.mockResolvedValue({ snapshots:
-      new Map([['member-1', { memberId: 'member-1', otdPercent: 96, rpaAvg: 1.8, tasksCompleted: 15, dataSource: 'ico', sourceMode: 'materialized' }]])
+      new Map([['member-1', {
+        memberId: 'member-1',
+        otdPercent: 96,
+        rpaAvg: 1.8,
+        rpaDataStatus: 'valid',
+        rpaConfidenceLevel: 'high',
+        rpaSuppressionReason: null,
+        rpaEvidence: { completedTasks: 15, eligibleTasks: 15, missingTasks: 0, nonPositiveTasks: 0 },
+        tasksCompleted: 15,
+        dataSource: 'ico',
+        sourceMode: 'materialized'
+      }]])
     })
     mockFetchAttendanceForAllMembers.mockResolvedValue(
       new Map([['member-1', { workingDaysInPeriod: 18, daysPresent: 16, daysAbsent: 1, daysOnLeave: 1, daysOnUnpaidLeave: 0 }]])
@@ -184,7 +195,18 @@ describe('projectPayrollForPeriod', () => {
     mockGetApplicableCompensationVersionsForPeriod.mockResolvedValue([deelComp])
     mockFetchKpisForPeriod.mockResolvedValue({
       snapshots: new Map([
-        ['member-2', { memberId: 'member-2', otdPercent: 96, rpaAvg: 1.6, tasksCompleted: 22, dataSource: 'ico', sourceMode: 'materialized' }]
+        ['member-2', {
+          memberId: 'member-2',
+          otdPercent: 96,
+          rpaAvg: 1.6,
+          rpaDataStatus: 'valid',
+          rpaConfidenceLevel: 'high',
+          rpaSuppressionReason: null,
+          rpaEvidence: { completedTasks: 22, eligibleTasks: 22, missingTasks: 0, nonPositiveTasks: 0 },
+          tasksCompleted: 22,
+          dataSource: 'ico',
+          sourceMode: 'materialized'
+        }]
       ])
     })
     mockFetchAttendanceForAllMembers.mockResolvedValue(

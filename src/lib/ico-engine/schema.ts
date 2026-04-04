@@ -164,6 +164,9 @@ const buildMonthlySnapshotTable = (projectId: string) => `
     period_year INT64 NOT NULL,
     period_month INT64 NOT NULL,
     rpa_avg FLOAT64,
+    rpa_eligible_task_count INT64,
+    rpa_missing_task_count INT64,
+    rpa_non_positive_task_count INT64,
     otd_pct FLOAT64,
     ftr_pct FLOAT64,
     cycle_time_avg_days FLOAT64,
@@ -283,6 +286,9 @@ const buildMetricsByProjectTable = (projectId: string) => `
     period_month INT64 NOT NULL,
     rpa_avg FLOAT64,
     rpa_median FLOAT64,
+    rpa_eligible_task_count INT64,
+    rpa_missing_task_count INT64,
+    rpa_non_positive_task_count INT64,
     otd_pct FLOAT64,
     ftr_pct FLOAT64,
     cycle_time_avg_days FLOAT64,
@@ -316,6 +322,9 @@ const buildMetricsByMemberTable = (projectId: string) => `
     period_month INT64 NOT NULL,
     rpa_avg FLOAT64,
     rpa_median FLOAT64,
+    rpa_eligible_task_count INT64,
+    rpa_missing_task_count INT64,
+    rpa_non_positive_task_count INT64,
     otd_pct FLOAT64,
     ftr_pct FLOAT64,
     cycle_time_avg_days FLOAT64,
@@ -349,6 +358,9 @@ const buildMetricsBySprintTable = (projectId: string) => `
     period_month INT64 NOT NULL,
     rpa_avg FLOAT64,
     rpa_median FLOAT64,
+    rpa_eligible_task_count INT64,
+    rpa_missing_task_count INT64,
+    rpa_non_positive_task_count INT64,
     otd_pct FLOAT64,
     ftr_pct FLOAT64,
     cycle_time_avg_days FLOAT64,
@@ -381,6 +393,9 @@ const buildMetricsByOrganizationTable = (projectId: string) => `
     period_month INT64 NOT NULL,
     rpa_avg FLOAT64,
     rpa_median FLOAT64,
+    rpa_eligible_task_count INT64,
+    rpa_missing_task_count INT64,
+    rpa_non_positive_task_count INT64,
     otd_pct FLOAT64,
     ftr_pct FLOAT64,
     cycle_time_avg_days FLOAT64,
@@ -414,6 +429,9 @@ const buildMetricsByBusinessUnitTable = (projectId: string) => `
     period_month INT64 NOT NULL,
     rpa_avg FLOAT64,
     rpa_median FLOAT64,
+    rpa_eligible_task_count INT64,
+    rpa_missing_task_count INT64,
+    rpa_non_positive_task_count INT64,
     otd_pct FLOAT64,
     ftr_pct FLOAT64,
     cycle_time_avg_days FLOAT64,
@@ -552,6 +570,9 @@ type TableColumnSpec = Record<string, string>
 
 const REQUIRED_COLUMN_MIGRATIONS: Record<string, TableColumnSpec> = {
   metric_snapshots_monthly: {
+    rpa_eligible_task_count: 'INT64',
+    rpa_missing_task_count: 'INT64',
+    rpa_non_positive_task_count: 'INT64',
     pipeline_velocity: 'FLOAT64',
     stuck_asset_pct: 'FLOAT64',
     total_tasks: 'INT64',
@@ -566,6 +587,9 @@ const REQUIRED_COLUMN_MIGRATIONS: Record<string, TableColumnSpec> = {
     engine_version: 'STRING'
   },
   metrics_by_project: {
+    rpa_eligible_task_count: 'INT64',
+    rpa_missing_task_count: 'INT64',
+    rpa_non_positive_task_count: 'INT64',
     otd_pct: 'FLOAT64',
     throughput_count: 'INT64',
     pipeline_velocity: 'FLOAT64',
@@ -581,6 +605,9 @@ const REQUIRED_COLUMN_MIGRATIONS: Record<string, TableColumnSpec> = {
     overdue_carried_forward_count: 'INT64'
   },
   metrics_by_member: {
+    rpa_eligible_task_count: 'INT64',
+    rpa_missing_task_count: 'INT64',
+    rpa_non_positive_task_count: 'INT64',
     otd_pct: 'FLOAT64',
     throughput_count: 'INT64',
     pipeline_velocity: 'FLOAT64',
@@ -596,6 +623,9 @@ const REQUIRED_COLUMN_MIGRATIONS: Record<string, TableColumnSpec> = {
     overdue_carried_forward_count: 'INT64'
   },
   metrics_by_sprint: {
+    rpa_eligible_task_count: 'INT64',
+    rpa_missing_task_count: 'INT64',
+    rpa_non_positive_task_count: 'INT64',
     otd_pct: 'FLOAT64',
     throughput_count: 'INT64',
     pipeline_velocity: 'FLOAT64',
@@ -611,6 +641,9 @@ const REQUIRED_COLUMN_MIGRATIONS: Record<string, TableColumnSpec> = {
     overdue_carried_forward_count: 'INT64'
   },
   metrics_by_organization: {
+    rpa_eligible_task_count: 'INT64',
+    rpa_missing_task_count: 'INT64',
+    rpa_non_positive_task_count: 'INT64',
     otd_pct: 'FLOAT64',
     throughput_count: 'INT64',
     pipeline_velocity: 'FLOAT64',
@@ -626,6 +659,9 @@ const REQUIRED_COLUMN_MIGRATIONS: Record<string, TableColumnSpec> = {
     overdue_carried_forward_count: 'INT64'
   },
   metrics_by_business_unit: {
+    rpa_eligible_task_count: 'INT64',
+    rpa_missing_task_count: 'INT64',
+    rpa_non_positive_task_count: 'INT64',
     otd_pct: 'FLOAT64',
     throughput_count: 'INT64',
     pipeline_velocity: 'FLOAT64',

@@ -1,4 +1,10 @@
 import type { ContractType, PayrollVia, PayRegime } from '@/types/hr-contracts'
+import type {
+  RpaConfidenceLevel,
+  RpaDataStatus,
+  RpaEvidenceCounts,
+  RpaSuppressionReason
+} from '@/lib/ico-engine/rpa-policy'
 
 export type { ContractType, PayrollVia, PayRegime } from '@/types/hr-contracts'
 
@@ -281,6 +287,10 @@ export interface PayrollKpiSnapshot {
   memberId: string
   otdPercent: number | null
   rpaAvg: number | null
+  rpaDataStatus: RpaDataStatus | null
+  rpaConfidenceLevel: RpaConfidenceLevel | null
+  rpaSuppressionReason: RpaSuppressionReason | null
+  rpaEvidence: RpaEvidenceCounts | null
   tasksCompleted: number
   dataSource: 'ico'
   sourceMode: 'materialized' | 'live'

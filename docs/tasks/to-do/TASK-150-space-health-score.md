@@ -10,6 +10,7 @@
   - el score no debe asumir que `OTD`, `FTR`, `RpA` y otras señales tienen el mismo tipo de benchmark ni la misma madurez
   - una dimensión faltante o degradada no debe transformarse silenciosamente en score normal
 - Cualquier normalizador de `OTD` o `RPA_inverse` debe quedar alineado a las bandas benchmark-informed vigentes, no a thresholds legacy del body o de heurísticas previas.
+- `TASK-215` ya deja `RpA` con estados runtime `valid`, `low_confidence`, `suppressed` y `unavailable`; `TASK-150` debe tratar esa señal como input clasificado, no como `number | null`.
 
 # TASK-150 — Space Health Score: Composite Indicator
 

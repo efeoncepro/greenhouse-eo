@@ -20,6 +20,13 @@
   - `quality_gate_status = healthy | degraded | broken`
 - y que no comunique `TTM`, `Iteration Velocity`, `BCS` o `Revenue Enabled` como si ya fueran surfaces maduras mientras no cierren sus lanes dedicadas (`TASK-218` a `TASK-222`).
 
+## Delta 2026-04-03 — RpA runtime policy landed upstream
+
+- `TASK-215` ya formaliza la surface runtime de `RpA` con `valid`, `low_confidence`, `suppressed` y `unavailable`.
+- Esta task no debe asumir que `0` representa data saludable para `RpA`.
+- Cuando Agency consuma `RpA`, la policy de confianza y evidencia debe viajar desde `ICO`, no reconstruirse localmente en `agency-queries.ts`.
+- Esto no cambia el scope de hardening; solo evita que la lane reintroduzca semántica paralela sobre la métrica.
+
 ## Status
 
 | Campo | Valor |

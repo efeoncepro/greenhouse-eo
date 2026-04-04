@@ -26,13 +26,31 @@ const buildIcoSnapshot = ({
   rpa,
   otd,
   completedTasks,
-  source
+  source,
+  rpaDataStatus = rpa == null ? 'unavailable' : 'valid',
+  rpaConfidenceLevel = rpa == null ? 'none' : 'high',
+  rpaSuppressionReason = rpa == null ? 'no_completed_tasks' : null,
+  rpaEvidence = {
+    completedTasks,
+    eligibleTasks: rpa == null ? 0 : completedTasks,
+    missingTasks: 0,
+    nonPositiveTasks: 0
+  }
 }: {
   memberId: string
   rpa: number | null
   otd: number | null
   completedTasks: number
   source: 'materialized' | 'live'
+  rpaDataStatus?: 'valid' | 'low_confidence' | 'suppressed' | 'unavailable'
+  rpaConfidenceLevel?: 'high' | 'medium' | 'none'
+  rpaSuppressionReason?: string | null
+  rpaEvidence?: {
+    completedTasks: number
+    eligibleTasks: number
+    missingTasks: number
+    nonPositiveTasks: number
+  }
 }) => ({
   dimension: 'member' as const,
   dimensionValue: memberId,
@@ -40,7 +58,15 @@ const buildIcoSnapshot = ({
   periodYear: 2026,
   periodMonth: 3,
   metrics: [
-    { metricId: 'rpa', value: rpa, zone: null },
+    {
+      metricId: 'rpa',
+      value: rpa,
+      zone: null,
+      dataStatus: rpaDataStatus,
+      confidenceLevel: rpaConfidenceLevel,
+      suppressionReason: rpaSuppressionReason,
+      evidence: rpaEvidence
+    },
     { metricId: 'otd_pct', value: otd, zone: null }
   ],
   cscDistribution: [],
@@ -103,6 +129,15 @@ describe('fetchKpisForPeriod', () => {
       memberId: 'member-1',
       otdPercent: 96,
       rpaAvg: 1.4,
+      rpaDataStatus: 'valid',
+      rpaConfidenceLevel: 'high',
+      rpaSuppressionReason: null,
+      rpaEvidence: {
+        completedTasks: 12,
+        eligibleTasks: 12,
+        missingTasks: 0,
+        nonPositiveTasks: 0
+      },
       tasksCompleted: 12,
       dataSource: 'ico',
       sourceMode: 'materialized'
@@ -112,6 +147,15 @@ describe('fetchKpisForPeriod', () => {
       memberId: 'member-2',
       otdPercent: 88,
       rpaAvg: 2.1,
+      rpaDataStatus: 'valid',
+      rpaConfidenceLevel: 'high',
+      rpaSuppressionReason: null,
+      rpaEvidence: {
+        completedTasks: 7,
+        eligibleTasks: 7,
+        missingTasks: 0,
+        nonPositiveTasks: 0
+      },
       tasksCompleted: 7,
       dataSource: 'ico',
       sourceMode: 'live'
@@ -167,7 +211,58 @@ describe('fetchKpisForPeriod', () => {
 
     expect(readMemberMetricsBatch).toHaveBeenCalledWith(['member-1'], 2026, 3)
     expect(result.snapshots.get('member-1')?.otdPercent).toBe(91)
+    expect(result.snapshots.get('member-1')?.rpaDataStatus).toBe('valid')
     expect(result.diagnostics.materializedMembers).toBe(1)
     expect(result.diagnostics.missingMembers).toBe(0)
+  })
+
+  it('propagates suppressed RpA as null instead of rewarding an ambiguous zero', async () => {
+    readMemberMetricsBatch.mockResolvedValue(
+      new Map([
+        [
+          'member-4',
+          buildIcoSnapshot({
+            memberId: 'member-4',
+            rpa: null,
+            otd: 93,
+            completedTasks: 4,
+            source: 'materialized',
+            rpaDataStatus: 'suppressed',
+            rpaConfidenceLevel: 'none',
+            rpaSuppressionReason: 'non_positive_rpa_values_only',
+            rpaEvidence: {
+              completedTasks: 4,
+              eligibleTasks: 0,
+              missingTasks: 0,
+              nonPositiveTasks: 4
+            }
+          })
+        ]
+      ])
+    )
+
+    const result = await fetchKpisForPeriod({
+      memberIds: ['member-4'],
+      periodYear: 2026,
+      periodMonth: 3
+    })
+
+    expect(result.snapshots.get('member-4')).toEqual({
+      memberId: 'member-4',
+      otdPercent: 93,
+      rpaAvg: null,
+      rpaDataStatus: 'suppressed',
+      rpaConfidenceLevel: 'none',
+      rpaSuppressionReason: 'non_positive_rpa_values_only',
+      rpaEvidence: {
+        completedTasks: 4,
+        eligibleTasks: 0,
+        missingTasks: 0,
+        nonPositiveTasks: 4
+      },
+      tasksCompleted: 4,
+      dataSource: 'ico',
+      sourceMode: 'materialized'
+    })
   })
 })

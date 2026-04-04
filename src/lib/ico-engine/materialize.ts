@@ -206,7 +206,8 @@ export const materializeMonthlySnapshots = async (
     INSERT INTO \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\`
       (snapshot_id, space_id, client_id,
        period_year, period_month,
-       rpa_avg, otd_pct, ftr_pct,
+       rpa_avg, rpa_eligible_task_count, rpa_missing_task_count, rpa_non_positive_task_count,
+       otd_pct, ftr_pct,
        cycle_time_avg_days, cycle_time_p50_days, cycle_time_variance,
        throughput_count, pipeline_velocity,
        stuck_asset_count, stuck_asset_pct,
@@ -221,6 +222,9 @@ export const materializeMonthlySnapshots = async (
       source.period_year,
       source.period_month,
       source.rpa_avg,
+      source.rpa_eligible_task_count,
+      source.rpa_missing_task_count,
+      source.rpa_non_positive_task_count,
       source.otd_pct,
       source.ftr_pct,
       source.cycle_time_avg_days,
@@ -552,7 +556,8 @@ const materializeProjectMetrics = async (
   await runIcoEngineQuery(`
     INSERT INTO \`${projectId}.${ICO_DATASET}.metrics_by_project\`
       (project_source_id, space_id, period_year, period_month,
-       rpa_avg, rpa_median, otd_pct, ftr_pct,
+       rpa_avg, rpa_median, rpa_eligible_task_count, rpa_missing_task_count, rpa_non_positive_task_count,
+       otd_pct, ftr_pct,
        cycle_time_avg_days, cycle_time_p50_days, cycle_time_variance,
        throughput_count, pipeline_velocity,
        stuck_asset_count, stuck_asset_pct,
@@ -601,7 +606,8 @@ const materializeMemberMetrics = async (
   await runIcoEngineQuery(`
     INSERT INTO \`${projectId}.${ICO_DATASET}.metrics_by_member\`
       (member_id, period_year, period_month,
-       rpa_avg, rpa_median, otd_pct, ftr_pct,
+       rpa_avg, rpa_median, rpa_eligible_task_count, rpa_missing_task_count, rpa_non_positive_task_count,
+       otd_pct, ftr_pct,
        cycle_time_avg_days, cycle_time_p50_days, cycle_time_variance,
        throughput_count, pipeline_velocity,
        stuck_asset_count, stuck_asset_pct,
@@ -647,7 +653,8 @@ const materializeSprintMetrics = async (
   await runIcoEngineQuery(`
     INSERT INTO \`${projectId}.${ICO_DATASET}.metrics_by_sprint\`
       (sprint_source_id, space_id, period_year, period_month,
-       rpa_avg, rpa_median, otd_pct, ftr_pct,
+       rpa_avg, rpa_median, rpa_eligible_task_count, rpa_missing_task_count, rpa_non_positive_task_count,
+       otd_pct, ftr_pct,
        cycle_time_avg_days, cycle_time_p50_days, cycle_time_variance,
        throughput_count, pipeline_velocity,
        stuck_asset_count, stuck_asset_pct,
@@ -694,7 +701,8 @@ const materializeOrganizationMetrics = async (
   await runIcoEngineQuery(`
     INSERT INTO \`${projectId}.${ICO_DATASET}.metrics_by_organization\`
       (organization_id, period_year, period_month,
-       rpa_avg, rpa_median, otd_pct, ftr_pct,
+       rpa_avg, rpa_median, rpa_eligible_task_count, rpa_missing_task_count, rpa_non_positive_task_count,
+       otd_pct, ftr_pct,
        cycle_time_avg_days, cycle_time_p50_days, cycle_time_variance,
        throughput_count, pipeline_velocity,
        stuck_asset_count, stuck_asset_pct,
@@ -740,7 +748,8 @@ const materializeBusinessUnitMetrics = async (
   await runIcoEngineQuery(`
     INSERT INTO \`${projectId}.${ICO_DATASET}.metrics_by_business_unit\`
       (business_unit, period_year, period_month,
-       rpa_avg, rpa_median, otd_pct, ftr_pct,
+       rpa_avg, rpa_median, rpa_eligible_task_count, rpa_missing_task_count, rpa_non_positive_task_count,
+       otd_pct, ftr_pct,
        cycle_time_avg_days, cycle_time_p50_days, cycle_time_variance,
        throughput_count, pipeline_velocity,
        stuck_asset_count, stuck_asset_pct,

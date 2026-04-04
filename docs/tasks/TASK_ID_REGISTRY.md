@@ -264,7 +264,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-212` | `to-do` | Nubox Line Items Sync & Multi-Line Emission | `docs/tasks/to-do/TASK-212-nubox-line-items-sync-multiline-emission.md` |
 | `TASK-213` | `to-do` | ICO Metrics Hardening Program & Trust Model | `docs/tasks/to-do/TASK-213-ico-metrics-hardening-trust-model.md` |
 | `TASK-214` | `complete` | ICO Completion Semantics & Bucket Normalization | `docs/tasks/complete/TASK-214-ico-completion-semantics-bucket-normalization.md` |
-| `TASK-215` | `to-do` | ICO RpA Reliability, Source Policy & Fallbacks | `docs/tasks/to-do/TASK-215-ico-rpa-reliability-source-policy-fallbacks.md` |
+| `TASK-215` | `complete` | ICO RpA Reliability, Source Policy & Fallbacks | `docs/tasks/complete/TASK-215-ico-rpa-reliability-source-policy-fallbacks.md` |
 | `TASK-216` | `to-do` | ICO Metric Trust Model: Benchmark Registry, Quality Gates & Confidence Metadata | `docs/tasks/to-do/TASK-216-ico-metric-trust-model-benchmark-quality-gates.md` |
 | `TASK-217` | `to-do` | Agency KPI Trust Propagation & Serving Semantics | `docs/tasks/to-do/TASK-217-agency-kpi-trust-propagation-serving-semantics.md` |
 | `TASK-218` | `to-do` | ICO Time-to-Market & Activation Evidence Contract | `docs/tasks/to-do/TASK-218-ico-time-to-market-activation-evidence-contract.md` |

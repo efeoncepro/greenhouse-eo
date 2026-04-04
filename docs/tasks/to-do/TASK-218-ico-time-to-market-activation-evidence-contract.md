@@ -25,6 +25,15 @@ Hoy Greenhouse ya tiene drivers operativos relevantes (`OTD`, `FTR`, `RpA`, `cyc
 - la evidencia que respalda esa activación
 - la semántica para medir días ganados y soportar `Early Launch Advantage`
 
+`TASK-215` ya deja un patrón canónico de runtime para señales operativas sensibles:
+
+- `valid`
+- `low_confidence`
+- `suppressed`
+- `unavailable`
+
+Si `TTM` necesita estado de calidad o evidencia parecida, debe reusar esa disciplina y no inventar un vocabulario paralelo.
+
 Sin ese contrato, no se puede sostener `Revenue Enabled` más allá de narrativa.
 
 ## Goal
@@ -121,4 +130,3 @@ Reglas obligatorias:
 - `pnpm exec vitest run src/lib/ico-engine/*.test.ts`
 - `pnpm exec eslint src/lib/ico-engine src/lib/agency`
 - validación manual contra ejemplos de activación reales cuando exista data fuente
-

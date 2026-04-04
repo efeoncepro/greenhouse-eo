@@ -341,6 +341,19 @@ export const CANONICAL_FTR_PASSED_SQL = `(
   ${CANONICAL_COMPLETED_TASK_SQL}
   AND client_change_round_final = 0
 )`
+export const CANONICAL_RPA_ELIGIBLE_SQL = `(
+  ${CANONICAL_COMPLETED_TASK_SQL}
+  AND rpa_value > 0
+)`
+export const CANONICAL_RPA_MISSING_SQL = `(
+  ${CANONICAL_COMPLETED_TASK_SQL}
+  AND rpa_value IS NULL
+)`
+export const CANONICAL_RPA_NON_POSITIVE_SQL = `(
+  ${CANONICAL_COMPLETED_TASK_SQL}
+  AND rpa_value IS NOT NULL
+  AND SAFE_CAST(rpa_value AS FLOAT64) <= 0
+)`
 
 // ─── Shared Metric SQL Builders ────────────────────────────────────────────
 
@@ -351,15 +364,20 @@ export const CANONICAL_FTR_PASSED_SQL = `(
 export const buildMetricSelectSQL = () => `
     -- RPA: average of non-zero rpa_value for completed tasks in period
     ROUND(AVG(CASE
-      WHEN ${CANONICAL_COMPLETED_TASK_SQL} AND rpa_value > 0
+      WHEN ${CANONICAL_RPA_ELIGIBLE_SQL}
       THEN SAFE_CAST(rpa_value AS FLOAT64)
     END), 2) AS rpa_avg,
 
     -- RPA median
     ROUND(APPROX_QUANTILES(
-      CASE WHEN ${CANONICAL_COMPLETED_TASK_SQL} AND rpa_value > 0
+      CASE WHEN ${CANONICAL_RPA_ELIGIBLE_SQL}
       THEN SAFE_CAST(rpa_value AS FLOAT64) END, 100
     )[SAFE_OFFSET(50)], 2) AS rpa_median,
+
+    -- RPA data-quality evidence
+    COUNTIF(${CANONICAL_RPA_ELIGIBLE_SQL}) AS rpa_eligible_task_count,
+    COUNTIF(${CANONICAL_RPA_MISSING_SQL}) AS rpa_missing_task_count,
+    COUNTIF(${CANONICAL_RPA_NON_POSITIVE_SQL}) AS rpa_non_positive_task_count,
 
     -- OTD: on-time / (on-time + late-drop + overdue). Carry-Over and OCF excluded.
     ROUND(SAFE_DIVIDE(
