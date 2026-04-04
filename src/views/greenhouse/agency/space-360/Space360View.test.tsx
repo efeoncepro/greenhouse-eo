@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react'
 
 import { cleanup, screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithTheme } from '@/test/render'
 import type { Space360Detail } from '@/lib/agency/space-360'
@@ -25,6 +25,15 @@ vi.mock('next/navigation', () => ({
   usePathname: () => '/agency/spaces/client-1',
   useSearchParams: () => new URLSearchParams()
 }))
+
+// Mock IntersectionObserver for AnimatedCounter's useInView
+beforeAll(() => {
+  global.IntersectionObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  } as unknown as typeof IntersectionObserver
+})
 
 const detail: Space360Detail = {
   requestedId: 'client-1',
@@ -196,12 +205,12 @@ describe('Space360View', () => {
   it('renders the agency space 360 shell with honest partial-state messaging', () => {
     renderWithTheme(<Space360View detail={detail} requestedId='client-1' />)
 
-    expect(screen.getByText('Acme')).toBeInTheDocument()
+    expect(screen.getAllByText('Acme').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText('Health Atención')).toBeInTheDocument()
     expect(screen.getByText('Risk Medio')).toBeInTheDocument()
     expect(screen.getByText('Sin vínculo canónico a Space')).toBeInTheDocument()
     expect(screen.getByText(/sigue parcial en las zonas donde aún faltan vínculos canónicos/i)).toBeInTheDocument()
-    expect(screen.getByText('Revenue')).toBeInTheDocument()
+    expect(screen.getByText('Ingresos')).toBeInTheDocument()
     expect(screen.getByText('Margin')).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Resumen' })).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Equipo' })).toBeInTheDocument()

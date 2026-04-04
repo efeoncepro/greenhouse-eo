@@ -68,7 +68,7 @@ const ServicesTab = ({ detail }: Props) => (
 
     <Grid size={{ xs: 12 }}>
       <Card variant='outlined'>
-        <CardHeader title='Detalle de servicios' subheader='Esta task muestra costo y lifecycle; el P&L fino por servicio sigue en TASK-146.' />
+        <CardHeader title='Detalle de servicios' subheader='Costo, lifecycle y estado actual de cada servicio contratado.' />
         <CardContent>
           {detail.services.items.length === 0 ? (
             <EmptyState
@@ -84,7 +84,14 @@ const ServicesTab = ({ detail }: Props) => (
                   <CardContent sx={{ display: 'grid', gap: 2 }}>
                     <Stack direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'flex-start', md: 'center' }} justifyContent='space-between' gap={2}>
                       <div>
-                        <Typography variant='h6'>{service.name}</Typography>
+                        <Typography
+                          variant='h6'
+                          component={Link}
+                          href={`/agency/services/${service.serviceId}`}
+                          sx={{ textDecoration: 'none', color: 'inherit', '&:hover': { textDecoration: 'underline' } }}
+                        >
+                          {service.name}
+                        </Typography>
                         <Typography variant='body2' color='text.secondary'>
                           {titleize(service.lineaDeServicio)} · {titleize(service.servicioEspecifico)}
                         </Typography>
@@ -112,9 +119,6 @@ const ServicesTab = ({ detail }: Props) => (
                         <Typography variant='body2'>{service.targetEndDate || '—'}</Typography>
                       </Grid>
                     </Grid>
-                    <Button component={Link} href={`/agency/services/${service.serviceId}`} size='small' variant='text' sx={{ justifyContent: 'flex-start' }}>
-                      Abrir detalle del servicio
-                    </Button>
                   </CardContent>
                 </Card>
               ))}

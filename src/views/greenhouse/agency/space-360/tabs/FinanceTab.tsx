@@ -2,6 +2,8 @@
 
 import Link from 'next/link'
 
+import dynamic from 'next/dynamic'
+
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
@@ -9,17 +11,75 @@ import CardHeader from '@mui/material/CardHeader'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { useTheme } from '@mui/material/styles'
+import type { ApexOptions } from 'apexcharts'
 
 import type { Space360Detail } from '@/lib/agency/space-360'
 import { EmptyState } from '@/components/greenhouse'
 
 import { formatMoney, formatPct } from '../shared'
 
+const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'), { ssr: false })
+
 type Props = {
   detail: Space360Detail
 }
 
-const FinanceTab = ({ detail }: Props) => (
+const FinanceTab = ({ detail }: Props) => {
+  const theme = useTheme()
+  const mode = theme.palette.mode
+
+  // ── Cost composition donut ────────────────────────────────────────────────
+  const costEntries = [
+    { label: 'Payroll / loaded cost', value: detail.finance.payrollExposureClp, color: theme.palette.primary.main },
+    { label: 'Tooling expuesto', value: detail.finance.toolingExposureClp, color: theme.palette.warning.main },
+    { label: 'Cuentas por cobrar', value: detail.finance.receivablesClp, color: theme.palette.success.main },
+    { label: 'Cuentas por pagar', value: detail.finance.payablesClp, color: theme.palette.error.main }
+  ].filter(e => e.value != null && e.value > 0)
+
+  const donutSeries = costEntries.map(e => e.value as number)
+  const donutLabels = costEntries.map(e => e.label)
+  const donutColors = costEntries.map(e => e.color)
+  const donutTotal = donutSeries.reduce((acc, v) => acc + v, 0)
+
+  const donutOptions: ApexOptions = {
+    chart: { type: 'donut', toolbar: { show: false }, background: 'transparent' },
+    theme: { mode },
+    labels: donutLabels,
+    colors: donutColors,
+    legend: { position: 'bottom', labels: { colors: theme.palette.text.secondary } },
+    plotOptions: {
+      pie: {
+        donut: {
+          size: '65%',
+          labels: {
+            show: true,
+            name: { show: true, fontSize: '14px', color: theme.palette.text.secondary },
+            value: {
+              show: true,
+              fontSize: '18px',
+              fontWeight: 700,
+              formatter: (val: string) => formatMoney(Number(val))
+            },
+            total: {
+              show: true,
+              label: 'Total',
+              fontSize: '14px',
+              color: theme.palette.text.secondary,
+              formatter: () => formatMoney(donutTotal)
+            }
+          }
+        }
+      }
+    },
+    dataLabels: { enabled: false },
+    tooltip: {
+      theme: mode,
+      y: { formatter: (val: number) => formatMoney(val) }
+    }
+  }
+
+  return (
   <Grid container spacing={6}>
     <Grid size={{ xs: 12 }}>
       <Card variant='outlined'>
@@ -27,14 +87,9 @@ const FinanceTab = ({ detail }: Props) => (
           title='P&L y exposición financiera'
           subheader='Snapshot económico, cuentas por cobrar/pagar y exposición payroll/tooling.'
           action={
-            <Stack direction='row' gap={2}>
-              <Button component={Link} href='/finance/intelligence' variant='outlined' size='small'>
-                Economía
-              </Button>
-              <Button component={Link} href='/finance' variant='outlined' size='small'>
-                Abrir finanzas
-              </Button>
-            </Stack>
+            <Button component={Link} href='/finance' variant='outlined' size='small'>
+              Ver finanzas
+            </Button>
           }
         />
         <CardContent>
@@ -63,17 +118,30 @@ const FinanceTab = ({ detail }: Props) => (
     <Grid size={{ xs: 12, lg: 6 }}>
       <Card variant='outlined'>
         <CardHeader title='Composición de costo' subheader='Labor, tooling y costos directos visibles para este Space.' />
-        <CardContent sx={{ display: 'grid', gap: 2 }}>
-          <Typography variant='body2'><strong>Payroll / loaded cost:</strong> {formatMoney(detail.finance.payrollExposureClp)}</Typography>
-          <Typography variant='body2'><strong>Tooling expuesto:</strong> {formatMoney(detail.finance.toolingExposureClp)}</Typography>
-          <Typography variant='body2'><strong>Cuentas por cobrar:</strong> {formatMoney(detail.finance.receivablesClp)}</Typography>
-          <Typography variant='body2'><strong>Cuentas por pagar:</strong> {formatMoney(detail.finance.payablesClp)}</Typography>
+        <CardContent>
+          {costEntries.length > 0 ? (
+            <figure
+              role='img'
+              aria-label={`Composición de costo: ${costEntries.map(e => `${e.label} ${formatMoney(e.value)}`).join(', ')}`}
+              style={{ margin: 0 }}
+            >
+              <AppReactApexCharts
+                type='donut'
+                height={300}
+                width='100%'
+                series={donutSeries}
+                options={donutOptions}
+              />
+            </figure>
+          ) : (
+            <Typography variant='body2' color='text.secondary'>Sin costos registrados para este Space.</Typography>
+          )}
           {detail.finance.snapshot ? (
-            <Typography variant='caption' color='text.secondary'>
+            <Typography variant='caption' color='text.secondary' sx={{ mt: 2, display: 'block' }}>
               Snapshot {detail.finance.snapshot.scopeType} · {detail.finance.snapshot.periodYear}-{String(detail.finance.snapshot.periodMonth).padStart(2, '0')}
             </Typography>
           ) : (
-            <Typography variant='caption' color='text.secondary'>
+            <Typography variant='caption' color='text.secondary' sx={{ mt: 2, display: 'block' }}>
               Sin snapshot P&L detallado; la vista usa el summary Agency disponible.
             </Typography>
           )}
@@ -88,6 +156,7 @@ const FinanceTab = ({ detail }: Props) => (
           {detail.finance.recentIncome.length === 0 ? (
             <EmptyState
               icon='tabler-receipt-off'
+              animatedIcon='/animations/empty-chart.json'
               title='Sin ingresos recientes'
               description='No encontramos ingresos recientes vinculados a este clientId.'
               action={<Button component={Link} href='/finance/income' variant='contained'>Ir a ingresos</Button>}
@@ -119,6 +188,7 @@ const FinanceTab = ({ detail }: Props) => (
           {detail.finance.recentExpenses.length === 0 ? (
             <EmptyState
               icon='tabler-cash-off'
+              animatedIcon='/animations/empty-chart.json'
               title='Sin egresos recientes'
               description='No encontramos egresos recientes vinculados a este Space.'
               action={<Button component={Link} href='/finance/expenses' variant='contained'>Ir a egresos</Button>}
@@ -143,6 +213,7 @@ const FinanceTab = ({ detail }: Props) => (
       </Card>
     </Grid>
   </Grid>
-)
+  )
+}
 
 export default FinanceTab

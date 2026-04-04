@@ -82,7 +82,7 @@ const clientColumns: ColumnDef<ClientEcon, any>[] = [
     cell: ({ getValue }) => <Typography variant='body2' fontWeight={600}>{getValue()}</Typography>
   }),
   clientColumnHelper.accessor('totalRevenueClp', {
-    header: 'Revenue CLP',
+    header: 'Ingresos CLP',
     cell: ({ getValue }) => fmtClp(getValue()),
     meta: { align: 'right' }
   }),
@@ -225,7 +225,7 @@ const AgencyEconomicsView = () => {
       {/* P&L KPIs with period comparison */}
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
         <HorizontalWithSubtitle
-          title='Revenue'
+          title='Ingresos'
           stats={fmtClp(revenue)}
           avatarIcon='tabler-cash'
           avatarColor='success'
@@ -296,7 +296,7 @@ const AgencyEconomicsView = () => {
       {/* Top clients by revenue */}
       <Grid size={{ xs: 12 }}>
         <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-          <CardHeader title='Top clientes por revenue' subheader='Período actual' />
+          <CardHeader title='Top clientes por ingresos' subheader='Período actual' />
           <Divider />
           {clients.length === 0 ? (
             <CardContent sx={{ textAlign: 'center', py: 4 }}>

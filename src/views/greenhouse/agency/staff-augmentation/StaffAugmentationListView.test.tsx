@@ -74,7 +74,7 @@ describe('StaffAugmentationListView', () => {
     expect(screen.getByText('Sky Airline')).toBeInTheDocument()
     expect(screen.getByText('Anthropic')).toBeInTheDocument()
     expect(screen.getByText('Activo')).toBeInTheDocument()
-    expect(screen.getByText('360 listo')).toBeInTheDocument()
+    expect(screen.getByText('Snapshot activo')).toBeInTheDocument()
     expect(screen.getByText('Reach')).toBeInTheDocument()
   })
 

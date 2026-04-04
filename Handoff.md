@@ -1,5 +1,36 @@
 # Handoff.md
 
+## Sesión 2026-04-04 — TASK-238 Agency Workspace & Space 360 Data Storytelling UX
+
+### Rama / alcance
+
+- rama: `task/TASK-238-agency-data-storytelling`
+- scope: terminología, tooltips, breadcrumbs, KPIs, donut chart, team cleanup, animated empty states
+
+### Qué se hizo
+
+- "Revenue" → "Ingresos" en Space360View y AgencyEconomicsView (0 instancias restantes)
+- "360 listo" → "Snapshot activo" en StaffAugmentationListView
+- "Abrir economía"/"Economía"/"Abrir finanzas" → "Ver finanzas" (unificado)
+- Tooltips en RpA, OTD, FTR, Throughput, Cycle, Stuck (nomenclatura centralizada en GH_AGENCY)
+- Breadcrumbs en Space 360 (Agencia > Spaces > [Space Name]) — "Volver a Spaces" removido
+- Per-service "Abrir detalle" removido (nombre linkeable directo)
+- Space 360 KPIs: 5→4 (Cobertura removido), layout 4-columns con AnimatedCounter
+- Pulse KPIs: AnimatedCounter en RpA, OTD, Assets, Feedback
+- ExecutiveMiniStatCard: value type widened a `string | ReactNode`
+- Finance tab: donut chart ApexCharts para composición de costo (reemplaza lista plana)
+- Team tab: campos null ocultos (grid adaptativo)
+- Animated EmptyState en 5 puntos (Space not found, Delivery, Finance income/expenses, ICO)
+- TASK-146 reference limpiada de ServicesTab
+
+### Verificación
+
+- `pnpm build` — OK
+- `pnpm lint` — OK
+- `pnpm test` — 218 files, 917 tests pass
+
+---
+
 ## Sesión 2026-04-04 — TASK-234 Codex animation skill sync cerrada
 
 ### Rama / alcance

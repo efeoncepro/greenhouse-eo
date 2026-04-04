@@ -10,6 +10,7 @@ import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
+import Breadcrumbs from '@mui/material/Breadcrumbs'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
@@ -21,6 +22,7 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'
 
+import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
 import { EmptyState, ExecutiveMiniStatCard } from '@/components/greenhouse'
 import { visuallyHiddenSx } from '@/components/greenhouse/accessibility'
 import type { Space360Detail } from '@/lib/agency/space-360'
@@ -82,6 +84,7 @@ const Space360View = ({ detail, requestedId }: Props) => {
     return (
       <EmptyState
         icon='tabler-building-community-off'
+        animatedIcon='/animations/empty-inbox.json'
         title='Space no encontrado'
         description='No encontramos un Space o clientId operativo con ese identificador.'
         action={<Button component={Link} href='/agency?tab=spaces' variant='contained'>Volver a Spaces</Button>}
@@ -91,6 +94,18 @@ const Space360View = ({ detail, requestedId }: Props) => {
 
   return (
     <Stack spacing={6}>
+      <Breadcrumbs aria-label='breadcrumbs' sx={{ mb: 2 }}>
+        <Typography component={Link} href='/agency?tab=spaces' color='inherit' variant='body2' sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
+          Agencia
+        </Typography>
+        <Typography component={Link} href='/agency?tab=spaces' color='inherit' variant='body2' sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
+          Spaces
+        </Typography>
+        <Typography color='text.primary' variant='body2'>
+          {detail.clientName ?? detail.spaceId}
+        </Typography>
+      </Breadcrumbs>
+
       <Card elevation={0}>
         <CardContent sx={{ display: 'grid', gap: 3 }}>
           <Stack direction={{ xs: 'column', lg: 'row' }} alignItems={{ xs: 'flex-start', lg: 'center' }} justifyContent='space-between' gap={3}>
@@ -112,9 +127,8 @@ const Space360View = ({ detail, requestedId }: Props) => {
             </Box>
 
             <Stack direction='row' gap={2} flexWrap='wrap'>
-              <Button component={Link} href='/agency?tab=spaces' variant='outlined'>Volver a Spaces</Button>
               {detail.organizationId ? <Button component={Link} href={`/agency/organizations/${detail.organizationId}`} variant='outlined'>Ver organización</Button> : null}
-              <Button component={Link} href='/finance/intelligence' variant='contained'>Abrir economía</Button>
+              <Button component={Link} href='/finance/intelligence' variant='contained'>Ver finanzas</Button>
             </Stack>
           </Stack>
 
@@ -127,20 +141,17 @@ const Space360View = ({ detail, requestedId }: Props) => {
       </Card>
 
       <Grid container spacing={6}>
-        <Grid size={{ xs: 12, sm: 6, lg: 4, xl: 3 }}>
-          <ExecutiveMiniStatCard title='Revenue' value={formatMoney(detail.kpis.revenueClp)} detail='Último snapshot o summary disponible' icon='tabler-wallet' tone='success' />
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <ExecutiveMiniStatCard title='Ingresos' value={detail.kpis.revenueClp != null ? <AnimatedCounter value={detail.kpis.revenueClp} formatter={v => formatMoney(v)} /> : '—'} detail='Último snapshot o summary disponible' icon='tabler-wallet' tone='success' />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, lg: 4, xl: 3 }}>
-          <ExecutiveMiniStatCard title='Margin' value={formatPct(detail.kpis.marginPct)} detail={detail.finance.snapshot ? `P&L ${detail.finance.snapshot.scopeType}` : 'Summary Agency'} icon='tabler-chart-pie' tone={detail.kpis.marginPct != null && detail.kpis.marginPct < 15 ? 'error' : detail.kpis.marginPct != null && detail.kpis.marginPct < 30 ? 'warning' : 'success'} />
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <ExecutiveMiniStatCard title='Margin' value={detail.kpis.marginPct != null ? <AnimatedCounter value={detail.kpis.marginPct} formatter={v => formatPct(v)} /> : '—'} detail={detail.finance.snapshot ? `P&L ${detail.finance.snapshot.scopeType}` : 'Summary Agency'} icon='tabler-chart-pie' tone={detail.kpis.marginPct != null && detail.kpis.marginPct < 15 ? 'error' : detail.kpis.marginPct != null && detail.kpis.marginPct < 30 ? 'warning' : 'success'} />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, lg: 4, xl: 3 }}>
-          <ExecutiveMiniStatCard title='OTD' value={formatPct(detail.kpis.otdPct)} detail='ICO latest snapshot' icon='tabler-clock-check' tone={detail.kpis.otdPct != null && detail.kpis.otdPct < 70 ? 'error' : detail.kpis.otdPct != null && detail.kpis.otdPct < 90 ? 'warning' : 'success'} />
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <ExecutiveMiniStatCard title='OTD' value={detail.kpis.otdPct != null ? <AnimatedCounter value={detail.kpis.otdPct} formatter={v => formatPct(v)} /> : '—'} detail='ICO latest snapshot' icon='tabler-clock-check' tone={detail.kpis.otdPct != null && detail.kpis.otdPct < 70 ? 'error' : detail.kpis.otdPct != null && detail.kpis.otdPct < 90 ? 'warning' : 'success'} />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, lg: 4, xl: 3 }}>
-          <ExecutiveMiniStatCard title='RpA' value={formatRatio(detail.kpis.rpaAvg)} detail='ICO latest snapshot' icon='tabler-chart-line' tone={detail.kpis.rpaAvg != null && detail.kpis.rpaAvg > 2.5 ? 'error' : detail.kpis.rpaAvg != null && detail.kpis.rpaAvg > 1.5 ? 'warning' : 'success'} />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, lg: 4, xl: 3 }}>
-          <ExecutiveMiniStatCard title='Cobertura' value={`${detail.kpis.assignedMembers}`} detail={`${detail.kpis.activeServices} servicios · ${detail.kpis.activePlacements} placements`} icon='tabler-users-group' tone='info' />
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <ExecutiveMiniStatCard title='RpA' value={detail.kpis.rpaAvg != null ? <AnimatedCounter value={detail.kpis.rpaAvg} formatter={v => formatRatio(v)} /> : '—'} detail='ICO latest snapshot' icon='tabler-chart-line' tone={detail.kpis.rpaAvg != null && detail.kpis.rpaAvg > 2.5 ? 'error' : detail.kpis.rpaAvg != null && detail.kpis.rpaAvg > 1.5 ? 'warning' : 'success'} />
         </Grid>
       </Grid>
 

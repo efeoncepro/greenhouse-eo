@@ -3,6 +3,7 @@
 import Link from 'next/link'
 
 import Button from '@mui/material/Button'
+import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
@@ -75,7 +76,15 @@ const TeamTab = ({ detail }: Props) => (
             />
           ) : (
             <Stack spacing={3}>
-              {detail.team.members.map(member => (
+              {detail.team.members.map(member => {
+                const memberDetails = [
+                  member.contractedHoursMonth != null && { label: 'Horas contratadas', value: String(member.contractedHoursMonth) },
+                  member.usagePercent != null && { label: 'Uso operativo', value: `${Math.round(member.usagePercent)}%` },
+                  member.costPerHourTarget != null && { label: 'Costo / hora', value: new Intl.NumberFormat('es-CL', { style: 'currency', currency: member.targetCurrency || 'CLP', maximumFractionDigits: 0 }).format(member.costPerHourTarget) },
+                  member.placementProviderName && { label: 'Placement / provider', value: member.placementProviderName }
+                ].filter(Boolean) as Array<{ label: string; value: string }>
+
+                return (
                 <Card key={member.assignmentId} variant='outlined'>
                   <CardContent sx={{ display: 'grid', gap: 2 }}>
                     <Stack direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'flex-start', md: 'center' }} justifyContent='space-between' gap={2}>
@@ -96,24 +105,16 @@ const TeamTab = ({ detail }: Props) => (
                       </Stack>
                     </Stack>
 
-                    <Grid container spacing={3}>
-                      <Grid size={{ xs: 12, md: 3 }}>
-                        <Typography variant='caption' color='text.secondary'>Horas contratadas</Typography>
-                        <Typography variant='body2'>{member.contractedHoursMonth}</Typography>
-                      </Grid>
-                      <Grid size={{ xs: 12, md: 3 }}>
-                        <Typography variant='caption' color='text.secondary'>Uso operativo</Typography>
-                        <Typography variant='body2'>{member.usagePercent != null ? `${member.usagePercent}%` : '—'}</Typography>
-                      </Grid>
-                      <Grid size={{ xs: 12, md: 3 }}>
-                        <Typography variant='caption' color='text.secondary'>Costo / hora</Typography>
-                        <Typography variant='body2'>{member.costPerHourTarget != null ? new Intl.NumberFormat('es-CL', { style: 'currency', currency: member.targetCurrency || 'CLP', maximumFractionDigits: 0 }).format(member.costPerHourTarget) : '—'}</Typography>
-                      </Grid>
-                      <Grid size={{ xs: 12, md: 3 }}>
-                        <Typography variant='caption' color='text.secondary'>Placement / provider</Typography>
-                        <Typography variant='body2'>{member.placementProviderName || 'Directo / sin provider'}</Typography>
-                      </Grid>
-                    </Grid>
+                    {memberDetails.length > 0 && (
+                      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: `repeat(${Math.min(memberDetails.length, 4)}, 1fr)` }, gap: 2 }}>
+                        {memberDetails.map(d => (
+                          <Box key={d.label}>
+                            <Typography variant='caption' color='text.secondary'>{d.label}</Typography>
+                            <Typography variant='body2' fontWeight={500}>{d.value}</Typography>
+                          </Box>
+                        ))}
+                      </Box>
+                    )}
 
                     {member.placementId ? (
                       <Stack direction='row' gap={2} flexWrap='wrap'>
@@ -127,7 +128,8 @@ const TeamTab = ({ detail }: Props) => (
                     ) : null}
                   </CardContent>
                 </Card>
-              ))}
+                )
+              })}
             </Stack>
           )}
         </CardContent>

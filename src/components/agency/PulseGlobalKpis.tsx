@@ -3,6 +3,7 @@
 import Box from '@mui/material/Box'
 
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
 import { GH_AGENCY } from '@/config/greenhouse-nomenclature'
 import type { AgencyPulseKpis } from '@/lib/agency/agency-queries'
 import {
@@ -37,7 +38,8 @@ const PulseGlobalKpis = ({ kpis }: Props) => {
     >
       <HorizontalWithSubtitle
         title={GH_AGENCY.kpi_rpa}
-        stats={rpa !== null ? rpa.toFixed(2) : '—'}
+        titleTooltip={GH_AGENCY.tooltip_rpa}
+        stats={rpa !== null ? <AnimatedCounter value={rpa} formatter={v => v.toFixed(2)} /> : '—'}
         avatarIcon='tabler-git-pull-request'
         avatarColor={getAgencyMetricTone(rpaMetric)}
         subtitle={getAgencyMetricSupportLabel(rpaMetric)}
@@ -47,14 +49,15 @@ const PulseGlobalKpis = ({ kpis }: Props) => {
       />
       <HorizontalWithSubtitle
         title={GH_AGENCY.kpi_assets}
-        stats={String(kpis?.assetsActivos ?? 0)}
+        stats={<AnimatedCounter value={kpis?.assetsActivos ?? 0} format='integer' />}
         avatarIcon='tabler-layers-linked'
         avatarColor='primary'
         subtitle='Assets en movimiento'
       />
       <HorizontalWithSubtitle
         title={GH_AGENCY.kpi_otd}
-        stats={otd !== null ? `${Math.round(otd)}%` : '—'}
+        titleTooltip={GH_AGENCY.tooltip_otd}
+        stats={otd !== null ? <AnimatedCounter value={otd} format='percentage' /> : '—'}
         avatarIcon='tabler-clock-check'
         avatarColor={getAgencyMetricTone(otdMetric)}
         subtitle={getAgencyMetricSupportLabel(otdMetric)}
@@ -64,7 +67,7 @@ const PulseGlobalKpis = ({ kpis }: Props) => {
       />
       <HorizontalWithSubtitle
         title={GH_AGENCY.kpi_feedback}
-        stats={String(kpis?.feedbackPendiente ?? 0)}
+        stats={<AnimatedCounter value={kpis?.feedbackPendiente ?? 0} format='integer' />}
         avatarIcon='tabler-message-circle'
         avatarColor={(kpis?.feedbackPendiente ?? 0) > 0 ? 'warning' : 'secondary'}
         subtitle={(kpis?.feedbackPendiente ?? 0) > 0 ? 'Requiere atención' : 'Al día'}

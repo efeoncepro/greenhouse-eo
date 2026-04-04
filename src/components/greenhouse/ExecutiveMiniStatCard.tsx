@@ -28,7 +28,7 @@ type ExecutiveMiniStatCardProps = {
   eyebrow?: string
   tone?: GreenhouseKpiTone
   title: string
-  value: string
+  value: string | React.ReactNode
   detail: string
   icon?: string
   delta?: string

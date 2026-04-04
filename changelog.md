@@ -2,6 +2,17 @@
 
 ## 2026-04-04
 
+- **TASK-238 Agency Workspace & Space 360 Data Storytelling UX**:
+  - terminología unificada: "Revenue"→"Ingresos", "360 listo"→"Snapshot activo", finance navigation consolidada a "Ver finanzas"
+  - tooltips de contexto en RpA, OTD, FTR, Throughput, Cycle time, Stuck assets (centralizados en GH_AGENCY)
+  - breadcrumbs MUI en Space 360 (Agencia > Spaces > nombre), per-service buttons reducidos
+  - Space 360 KPIs reducidos de 5→4 con AnimatedCounter, layout 4-columns balanceado
+  - Pulse KPIs con AnimatedCounter, ExecutiveMiniStatCard value type widened a ReactNode
+  - Finance tab: donut chart ApexCharts para composición de costo (reemplaza lista plana)
+  - Team tab: campos null ocultos con grid adaptativo
+  - animated EmptyState en 5 puntos de Agency
+  - TASK-146 reference limpiada de ServicesTab
+
 - **TASK-234 Codex animation skill sync closed**:
   - las 5 skills de Codex (`greenhouse-agent`, `greenhouse-portal-ui-implementer`, `greenhouse-ui-orchestrator`, `greenhouse-vuexy-ui-expert`, `greenhouse-ux-content-accessibility`) ya quedaron alineadas con la arquitectura de animación de `TASK-230`
   - ahora conocen:
