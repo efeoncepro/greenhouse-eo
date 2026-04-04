@@ -25,7 +25,7 @@ Primer bloque operativo asignado:
 - `TASK-231` quedó cerrada como tooling repo/global para la skill `greenhouse-task-planner` de Codex.
 - `TASK-232` ya quedó cerrada con lane async LLM operativa para `ICO`: trigger reactivo, storage BQ/PG, readers downstream y baseline `Gemini`.
 - `TASK-233` queda reservada para `Three.js 3D Logo Animation` como lane visual específica separada de `TASK-230`.
-- `TASK-234` nace como follow-on de `TASK-230` para propagar conocimiento de animación a las 5 skills de Codex en `.codex/skills/`.
+- `TASK-234` ya quedó cerrada como follow-on de `TASK-230`: las 5 skills de Codex ya conocen wrappers, `useReducedMotion`, `AnimatedCounter`, `EmptyState.animatedIcon` y los guardrails de adopción.
 - `TASK-235` nace como follow-on visible de `TASK-232` para surfacing UI del bloque `aiLlm` dentro de `Agency > ICO Engine`.
 - `TASK-236`, `TASK-237` y `TASK-238` nacen de una auditoría UX completa de `/agency` y todas sus tabs. Orden sugerido: `236` (resilience) → `237` (ICO tab) → `238` (data storytelling). `237` puede ejecutarse en paralelo con `236`.
 
@@ -71,6 +71,8 @@ Primer bloque operativo asignado:
 ## Complete
 
 - [TASK-232-ico-llm-quality-scoring-explanation-pipeline.md](complete/TASK-232-ico-llm-quality-scoring-explanation-pipeline.md) — Lane async LLM del `ICO Engine` cerrada: provider policy `Gemini`, trigger reactivo sobre `ico.ai_signals.materialized`, storage complementario BQ/PG para explanations + run audit y readers downstream en `Agency`, `Ops Health` y `Nexa`.
+
+- [TASK-234-codex-skills-animation-library-sync.md](complete/TASK-234-codex-skills-animation-library-sync.md) — Las 5 skills de Codex ya quedaron alineadas con la arquitectura de animación de `TASK-230`: wrappers `Lottie` / `FramerMotion`, `useReducedMotion`, `AnimatedCounter`, `EmptyState.animatedIcon`, guardrails de assets y anti-patterns.
 
 - [TASK-213-ico-metrics-hardening-trust-model.md](complete/TASK-213-ico-metrics-hardening-trust-model.md) — La umbrella ICO trust quedó cerrada sobre el runtime real: `TASK-214` a `TASK-223` ya no se leen como backlog base, `People` y `Agency` exponen mejor la metadata de confianza existente y `Creative Hub` preserva trust de `throughput` al componer `Revenue Enabled`.
 

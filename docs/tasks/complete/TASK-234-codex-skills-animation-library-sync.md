@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Bajo`
 - Effort: `Bajo`
 - Type: `docs`
 - Domain: `tooling / skills`
-- Blocked by: `TASK-230` (completed)
+- Blocked by: `none` (`TASK-230` ya está implementada en repo; queda solo validación manual residual)
 - Branch: `—`
 
 ## Summary
@@ -27,11 +27,11 @@ Actualizar estas 5 skills de Codex con conocimiento de animacion:
 
 | Skill | Path | Que agregar |
 |-------|------|-------------|
-| `greenhouse-agent` | `.codex/skills/greenhouse-agent/skill.md` | Stack de animacion en tech stack, imports canonicos, regla de reduced motion |
-| `greenhouse-portal-ui-implementer` | `.codex/skills/greenhouse-portal-ui-implementer/skill.md` | AnimatedCounter y EmptyState.animatedIcon como componentes disponibles, patron de uso |
-| `greenhouse-ui-orchestrator` | `.codex/skills/greenhouse-ui-orchestrator/skill.md` | Decision framework: cuando recomendar AnimatedCounter vs KPI estatico, cuando recomendar animatedIcon |
-| `greenhouse-vuexy-ui-expert` | `.codex/skills/greenhouse-vuexy-ui-expert/skill.md` | Component catalog ampliado, reglas de accesibilidad para animacion |
-| `greenhouse-ux-content-accessibility` | `.codex/skills/greenhouse-ux-content-accessibility/skill.md` | Copy guidelines para empty states animados, AnimatedCounter null fallback, reduced motion copy |
+| `greenhouse-agent` | `.codex/skills/greenhouse-agent/SKILL.md` | Stack de animacion en tech stack, imports canonicos, regla de reduced motion |
+| `greenhouse-portal-ui-implementer` | `.codex/skills/greenhouse-portal-ui-implementer/SKILL.md` | AnimatedCounter y EmptyState.animatedIcon como componentes disponibles, patron de uso |
+| `greenhouse-ui-orchestrator` | `.codex/skills/greenhouse-ui-orchestrator/SKILL.md` | Decision framework: cuando recomendar AnimatedCounter vs KPI estatico, cuando recomendar animatedIcon |
+| `greenhouse-vuexy-ui-expert` | `.codex/skills/greenhouse-vuexy-ui-expert/SKILL.md` | Component catalog ampliado, reglas de accesibilidad para animacion |
+| `greenhouse-ux-content-accessibility` | `.codex/skills/greenhouse-ux-content-accessibility/SKILL.md` | Copy guidelines para empty states animados, AnimatedCounter null fallback, reduced motion copy |
 
 ### Conocimiento a propagar
 
@@ -51,14 +51,21 @@ Usar como fuente canonica:
 - **Assets**: `public/animations/` directorio, < 50KB, kebab-case
 - **Anti-patterns**: no GSAP, no Three.js para micro-interacciones, no animar error states, "Sin datos" siempre estatico
 
+### Nota de convergencia
+
+- La guidance de estas skills debe seguir la arquitectura canónica (`GREENHOUSE_UI_PLATFORM_V1.md`) y no propagar drifts locales de implementación.
+- En particular, si existe un import directo legacy de `framer-motion` en algún componente del repo, esa excepción no debe convertirse en guidance para agentes futuros.
+
 ## Acceptance Criteria
 
-- [ ] Las 5 skills de `.codex/skills/` actualizadas con conocimiento de animacion
-- [ ] Cada skill referencia los wrappers correctos, no importaciones directas
-- [ ] Cada skill menciona `useReducedMotion` como obligatorio
-- [ ] El contenido es coherente con lo documentado en `GREENHOUSE_UI_PLATFORM_V1.md`
+- [x] Las 5 skills de `.codex/skills/` actualizadas con conocimiento de animacion
+- [x] Cada skill referencia los wrappers correctos, no importaciones directas
+- [x] Cada skill menciona `useReducedMotion` como obligatorio
+- [x] El contenido es coherente con lo documentado en `GREENHOUSE_UI_PLATFORM_V1.md`
 
 ## Verification
 
 - Lectura cruzada entre las 5 skills y el doc de arquitectura
-- No requiere build, lint ni tests (solo docs)
+- `pnpm lint`
+- `pnpm build`
+- `rg -n "new Pool\\(" src`

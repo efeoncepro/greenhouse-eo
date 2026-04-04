@@ -2,6 +2,16 @@
 
 ## 2026-04-04
 
+- **TASK-234 Codex animation skill sync closed**:
+  - las 5 skills de Codex (`greenhouse-agent`, `greenhouse-portal-ui-implementer`, `greenhouse-ui-orchestrator`, `greenhouse-vuexy-ui-expert`, `greenhouse-ux-content-accessibility`) ya quedaron alineadas con la arquitectura de animación de `TASK-230`
+  - ahora conocen:
+    - wrappers `@/libs/Lottie` y `@/libs/FramerMotion`
+    - `useReducedMotion` como guardrail obligatorio
+    - `AnimatedCounter` para KPIs
+    - `EmptyState.animatedIcon` con fallback estático
+    - reglas de assets `public/animations/`, `kebab-case`, `< 50 KB`
+  - la guidance también deja explícito que no se debe propagar el drift local de imports directos de `framer-motion`
+
 - **Payroll PDF download backend fix**:
   - se corrigió un incidente real en `HR > Nómina > Descargar PDF` donde el endpoint respondía `500` con `Unable to generate payroll PDF report.`
   - la causa raíz no era el render del PDF ni la UI: `src/lib/payroll/payroll-export-packages-store.ts` ejecutaba DDL runtime (`CREATE SCHEMA/TABLE/INDEX IF NOT EXISTS`) sobre `greenhouse_payroll.payroll_export_packages`

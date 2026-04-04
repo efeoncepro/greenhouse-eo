@@ -32,6 +32,7 @@ Read only what the task needs, in this order:
 - `<repo>/project_context.md`
 - `<repo>/Handoff.md`
 - `<repo>/docs/architecture/Greenhouse_Nomenclatura_Portal_v3.md` when the UI is client-facing
+- `<repo>/docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
 - `<repo>/docs/ui/GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`
 - `<repo>/docs/ui/GREENHOUSE_MODERN_UI_UX_BASELINE_V1.md`
 
@@ -84,6 +85,14 @@ Use `GREENHOUSE_UI_ORCHESTRATION_V1.md` only if pattern selection is still unres
 - Do not use decorative optimism where the user needs operational clarity.
 - If data is partial, say it.
 - If the system depends on sync, imports, or overrides, do not imply real-time truth.
+
+## Animation copy rules
+
+- Animated empty states keep the same copy discipline as static ones: title, description, and CTA must stand on their own without mentioning the animation.
+- Use animated empty states for first-use or no-results moments; keep error-state copy calm and static.
+- When a KPI uses `AnimatedCounter`, keep any text suffix outside the counter, for example `<AnimatedCounter value={42} format='integer' /> días`.
+- Null KPI values must stay as static fallback text such as `Sin datos`; do not animate placeholder zeroes.
+- Reduced-motion users must receive equivalent meaning with no motion dependency; never put essential guidance only in animated affordances.
 
 ## Accessibility rules
 

@@ -1,5 +1,39 @@
 # Handoff.md
 
+## Sesión 2026-04-04 — TASK-234 Codex animation skill sync cerrada
+
+### Rama / alcance
+
+- rama actual: `develop`
+- scope:
+  - `docs/tasks/complete/TASK-234-codex-skills-animation-library-sync.md`
+  - `.codex/skills/greenhouse-agent/SKILL.md`
+  - `.codex/skills/greenhouse-portal-ui-implementer/SKILL.md`
+  - `.codex/skills/greenhouse-ui-orchestrator/SKILL.md`
+  - `.codex/skills/greenhouse-vuexy-ui-expert/SKILL.md`
+  - `.codex/skills/greenhouse-ux-content-accessibility/SKILL.md`
+
+### Qué se hizo
+
+- Se corrigió primero la spec de `TASK-234` para reflejar rutas y estado reales.
+- Se sincronizó el conocimiento de animación de `TASK-230` hacia las 5 skills de Codex:
+  - wrappers `Lottie` y `FramerMotion`
+  - `useReducedMotion`
+  - `AnimatedCounter`
+  - `EmptyState.animatedIcon`
+  - guardrails de assets y anti-patterns
+- La task quedó cerrada en `docs/tasks/complete/TASK-234-codex-skills-animation-library-sync.md`.
+
+### Verificación
+
+- `pnpm lint` — OK
+- `pnpm build` — OK
+- `rg -n "new Pool\\(" src` — solo `src/lib/postgres/client.ts`
+
+### Riesgo / coordinación
+
+- El worktree tiene cambios paralelos de Agency y `TASK-238`; no se deben mezclar ni revertir en este lote.
+
 ## Sesión 2026-04-04 — Payroll PDF download backend incident fixed
 
 ### Rama / alcance
