@@ -8,12 +8,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Implementada y verificada`
 - Rank: `TBD`
 - Domain: `agency`
 - Blocked by: `none`

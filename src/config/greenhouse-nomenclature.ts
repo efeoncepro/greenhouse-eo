@@ -205,7 +205,27 @@ export const GH_AGENCY = {
   tooltip_ftr: 'First Time Right — porcentaje de tareas aprobadas sin correcciones',
   tooltip_throughput: 'Tareas completadas en el período activo',
   tooltip_cycle_time: 'Días promedio desde inicio hasta entrega de cada activo',
-  tooltip_stuck: 'Activos detenidos que requieren atención inmediata'
+  tooltip_stuck: 'Activos detenidos que requieren atención inmediata',
+
+  // Advisory LLM block
+  advisory_title: 'Advisory AI',
+  advisory_subtitle: 'Enriquecimiento LLM sobre señales del ICO Engine',
+  advisory_kpi_enrichments: 'Enriquecimientos',
+  advisory_kpi_quality: 'Calidad promedio',
+  advisory_kpi_succeeded: 'Exitosos',
+  advisory_kpi_failed: 'Con error',
+  advisory_last_run: 'Último run',
+  advisory_run_status_succeeded: 'Completado',
+  advisory_run_status_partial: 'Parcial',
+  advisory_run_status_failed: 'Con error',
+  advisory_recent_title: 'Enriquecimientos recientes',
+  advisory_empty_title: 'Sin enriquecimientos advisory',
+  advisory_empty_description: 'El pipeline advisory se ejecuta automáticamente después de cada materialización de señales AI. Aparecerá aquí cuando haya señales procesadas.',
+  advisory_tooltip_quality: 'Puntaje promedio de calidad asignado por el modelo LLM (0–100)',
+  advisory_tooltip_enrichments: 'Señales AI enriquecidas con narrativa, causa raíz y acción recomendada',
+  advisory_last_processed: (label: string) => `Último procesamiento: ${label}`,
+  advisory_signals_seen: (n: number) => `${n} señal${n !== 1 ? 'es' : ''} detectada${n !== 1 ? 's' : ''}`,
+  advisory_signals_enriched: (n: number) => `${n} enriquecida${n !== 1 ? 's' : ''}`
 } as const
 
 export const GH_LABELS = {

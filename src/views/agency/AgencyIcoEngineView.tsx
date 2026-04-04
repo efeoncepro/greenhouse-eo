@@ -19,12 +19,14 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 import SectionErrorBoundary from '@/components/greenhouse/SectionErrorBoundary'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import IcoGlobalKpis from '@/components/agency/IcoGlobalKpis'
+import IcoAdvisoryBlock from '@/components/agency/IcoAdvisoryBlock'
 import IcoCharts from '@/components/agency/IcoCharts'
 import type { RpaTrendBySpace } from '@/components/agency/IcoCharts'
 import SpaceIcoScorecard from '@/components/agency/SpaceIcoScorecard'
 import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type { SpaceMetricSnapshot } from '@/lib/ico-engine/read-metrics'
 import type { AgencyPerformanceReport } from '@/lib/ico-engine/performance-report'
+import type { AgencyAiLlmSummary } from '@/lib/ico-engine/ai/llm-types'
 
 export type AgencyIcoData = {
   periodYear: number
@@ -32,6 +34,7 @@ export type AgencyIcoData = {
   spaces: SpaceMetricSnapshot[]
   totalSpaces: number
   report: AgencyPerformanceReport | null
+  aiLlm?: AgencyAiLlmSummary | null
 }
 
 type Props = {
@@ -348,6 +351,13 @@ const AgencyIcoEngineView = ({ data, onComputeLive, computingLive }: Props) => {
               </Stack>
             </SectionErrorBoundary>
           ) : null}
+
+          {/* Advisory AI Block — LLM enrichment surfacing */}
+          {data.aiLlm && (
+            <SectionErrorBoundary sectionName='ico-advisory' description='No pudimos cargar el bloque advisory AI.'>
+              <IcoAdvisoryBlock aiLlm={data.aiLlm} />
+            </SectionErrorBoundary>
+          )}
         </>
       )}
     </Stack>

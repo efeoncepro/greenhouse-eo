@@ -1,5 +1,19 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-04 — TASK-235 surfaces aiLlm advisory block in Agency ICO UI
+
+`TASK-235` cierra el gap entre la exposición API de `aiLlm` (cerrada en `TASK-232`) y su visibilidad real en la UI de `Agency > ICO Engine`.
+
+- `AgencyIcoEngineView` ahora renderiza un bloque advisory visible (`IcoAdvisoryBlock`) con:
+  - KPIs: total enrichments, calidad promedio, exitosos, con error
+  - estado del último run (succeeded / partial / failed)
+  - lista compacta de `recentEnrichments` con signal type, explanation y recommended action
+  - empty state honesto cuando la lane aún no tiene enrichments
+- el bloque vive como Accordion complementario debajo del Performance Report, no como tab separada
+- contrato `advisory-only` + `internal-only` se mantiene intacto: no desplaza KPIs determinísticos ni trust metadata
+- no se agregan endpoints, migraciones ni storage nuevos — solo surfacing del payload ya disponible
+- nomenclatura Spanish-first en `GH_AGENCY` (`greenhouse-nomenclature.ts`)
+
 ## Delta 2026-04-04 — TASK-213 closes the umbrella on real runtime convergence
 
 `TASK-213` deja de describir una foundation faltante y queda cerrada como umbrella de convergencia sobre el runtime ya implementado.
@@ -2893,7 +2907,7 @@ OTD: 84% ↓ — Anomalía detectada (z=2.3, ajustado por estacionalidad)
 | **Nexa** (TASK-114/115) | Consume `ico_ai_signals` como contexto enriquecido — no calcula, lee |
 | **Payroll** | Las señales son advisory; no modifican cálculos de bonos directamente |
 | **Person 360** | Slice 12 enriquece el perfil con trajectory y peer comparison |
-| **Agency Delivery** | Surface principal de consumo de todas las señales |
+| **Agency Delivery** | Surface principal de consumo de todas las señales. `TASK-235` cerró el gap de visibilidad UI para `aiLlm` en `Agency > ICO Engine` |
 | **Ops Health** | AI Core como subsystem en health check |
 | **Finance** | Slice 8 y 13 cruzan datos de revenue para ponderación |
 

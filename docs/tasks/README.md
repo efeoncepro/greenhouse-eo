@@ -26,7 +26,7 @@ Primer bloque operativo asignado:
 - `TASK-232` ya quedó cerrada con lane async LLM operativa para `ICO`: trigger reactivo, storage BQ/PG, readers downstream y baseline `Gemini`.
 - `TASK-233` queda reservada para `Three.js 3D Logo Animation` como lane visual específica separada de `TASK-230`.
 - `TASK-234` ya quedó cerrada como follow-on de `TASK-230`: las 5 skills de Codex ya conocen wrappers, `useReducedMotion`, `AnimatedCounter`, `EmptyState.animatedIcon` y los guardrails de adopción.
-- `TASK-235` nace como follow-on visible de `TASK-232` para surfacing UI del bloque `aiLlm` dentro de `Agency > ICO Engine`.
+- `TASK-235` ya quedó cerrada: `Agency > ICO Engine` ahora renderiza el bloque advisory AI con KPIs, estado del último run, enrichments recientes y empty state honesto. Surfacing puro — sin endpoints, migraciones ni storage nuevos.
 - `TASK-236`, `TASK-237` y `TASK-238` nacen de una auditoría UX completa de `/agency` y todas sus tabs. Orden sugerido: `236` (resilience) → `237` (ICO tab) → `238` (data storytelling). `237` puede ejecutarse en paralelo con `236`.
 
 ## Estados
@@ -70,6 +70,8 @@ Primer bloque operativo asignado:
 | `TASK-187` | [TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md](complete/TASK-187-notion-integration-formalization-space-onboarding-schema-governance.md) | P0        | Muy alto | Alto     | Cerrada                | Notion ya tiene governance tenant-scoped formal: snapshots, drift, KPI readiness, admin APIs y panel reutilizado sobre el binding canónico por `space` |
 | `TASK-196` | [TASK-196-delivery-performance-report-parity-greenhouse-notion.md](complete/TASK-196-delivery-performance-report-parity-greenhouse-notion.md) | P0        | Muy alto | Alto     | Cerrada                | Lane completa de paridad Delivery: source sync, identidad, owner attribution, semántica, freeze histórico y cutover outbound `Greenhouse -> Notion` sobre `Performance Reports` |
 ## Complete
+
+- [TASK-235-agency-ico-llm-insights-ui.md](complete/TASK-235-agency-ico-llm-insights-ui.md) — `Agency > ICO Engine` ahora renderiza el bloque advisory AI (`IcoAdvisoryBlock`) con KPIs de enrichments, calidad promedio, estado del último run y lista compacta de enrichments recientes. Empty state honesto cuando la lane no tiene datos. Surfacing puro del payload `aiLlm` ya disponible desde `TASK-232`.
 
 - [TASK-232-ico-llm-quality-scoring-explanation-pipeline.md](complete/TASK-232-ico-llm-quality-scoring-explanation-pipeline.md) — Lane async LLM del `ICO Engine` cerrada: provider policy `Gemini`, trigger reactivo sobre `ico.ai_signals.materialized`, storage complementario BQ/PG para explanations + run audit y readers downstream en `Agency`, `Ops Health` y `Nexa`.
 
