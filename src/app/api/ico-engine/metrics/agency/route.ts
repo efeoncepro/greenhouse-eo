@@ -5,6 +5,7 @@ import { ensureIcoEngineInfrastructure, ICO_DATASET } from '@/lib/ico-engine/sch
 import { readAgencyMetrics, computeSpaceMetricsLive } from '@/lib/ico-engine/read-metrics'
 import { readAgencyPerformanceReport } from '@/lib/ico-engine/performance-report'
 import { readAgencyAiSignalsSummary } from '@/lib/ico-engine/ai/read-signals'
+import { readAgencyAiLlmSummary } from '@/lib/ico-engine/ai/llm-enrichment-reader'
 import { toIcoEngineErrorResponse, runIcoEngineQuery, getIcoEngineProjectId } from '@/lib/ico-engine/shared'
 
 export const dynamic = 'force-dynamic'
@@ -34,6 +35,18 @@ export async function GET(request: Request) {
     }
 
     const aiCoreSummaryPromise = readAgencyAiSignalsSummary(periodYear, periodMonth).catch(() => null)
+
+    const aiLlmSummaryPromise = readAgencyAiLlmSummary(periodYear, periodMonth).catch(() => ({
+      totals: {
+        total: 0,
+        succeeded: 0,
+        failed: 0,
+        avgQualityScore: null
+      },
+      latestRun: null,
+      recentEnrichments: [],
+      lastProcessedAt: null
+    }))
 
     if (live) {
       // Live compute: get all distinct space_ids, compute each in parallel (batched)
@@ -76,7 +89,7 @@ export async function GET(request: Request) {
         snap.clientName = nameMap.get(snap.spaceId) || null
       }
 
-      const aiCore = await aiCoreSummaryPromise
+      const [aiCore, aiLlm] = await Promise.all([aiCoreSummaryPromise, aiLlmSummaryPromise])
 
       return NextResponse.json({
         periodYear,
@@ -84,14 +97,16 @@ export async function GET(request: Request) {
         spaces: snapshots,
         totalSpaces: snapshots.length,
         report: null,
-        aiCore
+        aiCore,
+        aiLlm
       })
     }
 
-    const [snapshots, report, aiCore] = await Promise.all([
+    const [snapshots, report, aiCore, aiLlm] = await Promise.all([
       readAgencyMetrics(periodYear, periodMonth),
       readAgencyPerformanceReport(periodYear, periodMonth),
-      aiCoreSummaryPromise
+      aiCoreSummaryPromise,
+      aiLlmSummaryPromise
     ])
 
     return NextResponse.json({
@@ -100,7 +115,8 @@ export async function GET(request: Request) {
       spaces: snapshots,
       totalSpaces: snapshots.length,
       report,
-      aiCore
+      aiCore,
+      aiLlm
     })
   } catch (error) {
     return toIcoEngineErrorResponse(error, 'Failed to read agency ICO metrics')

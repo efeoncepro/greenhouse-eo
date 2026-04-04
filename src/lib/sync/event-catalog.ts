@@ -58,6 +58,7 @@ export const AGGREGATE_TYPES = {
   compensation: 'compensation',
   icoMaterialization: 'ico_materialization',
   icoAiSignals: 'ico_ai_signals',
+  icoAiLlmEnrichments: 'ico_ai_llm_enrichments',
 
   // Email Verification
   emailVerification: 'email_verification',
@@ -167,6 +168,7 @@ export const EVENT_TYPES = {
   compensationUpdated: 'compensation.updated',
   icoMaterializationCompleted: 'ico.materialization.completed',
   icoAiSignalsMaterialized: 'ico.ai_signals.materialized',
+  icoAiLlmEnrichmentsMaterialized: 'ico.ai_llm_enrichments.materialized',
 
   // Projected Payroll
   projectedPayrollSnapshotRefreshed: 'payroll.projected_snapshot.refreshed',
@@ -280,6 +282,7 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.compensationUpdated,
   EVENT_TYPES.icoMaterializationCompleted,
   EVENT_TYPES.icoAiSignalsMaterialized,
+  EVENT_TYPES.icoAiLlmEnrichmentsMaterialized,
   EVENT_TYPES.memberCreated,
   EVENT_TYPES.memberUpdated,
 

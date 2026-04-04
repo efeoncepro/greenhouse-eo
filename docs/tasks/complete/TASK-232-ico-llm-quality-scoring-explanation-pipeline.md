@@ -1,5 +1,45 @@
 # TASK-232 — ICO LLM Quality Scoring & Explanation Pipeline
 
+## Delta 2026-04-04 — Implementación cerrada
+
+- La lane async ya quedó operativa end-to-end sobre `ico.ai_signals.materialized`.
+- Provider/runtime efectivo:
+  - `Vertex AI`
+  - `@google/genai`
+  - `Gemini`
+  - baseline activo: `google/gemini-2.5-flash@default`
+- Storage complementario ya implementado:
+  - `ico_engine.ai_signal_enrichments` (BQ)
+  - `ico_engine.ai_enrichment_runs` (BQ)
+  - `greenhouse_serving.ico_ai_signal_enrichments` (PG)
+  - `greenhouse_serving.ico_ai_enrichment_runs` (PG)
+- Consumers downstream ya leen salida persistida:
+  - `Agency > ICO Engine` expone `aiLlm`
+  - `Ops Health` agrega subsystem `AI LLM Enrichment`
+  - `Nexa > get_otd` adjunta resumen de enriquecimientos recientes
+- El contrato sigue siendo `advisory-only`, `internal-only` y fuera del request path del materializer principal.
+
+## Delta 2026-04-04 — Discovery corrige baseline y fija storage complementario
+
+- `TASK-118` ya no es prerequisito abierto; quedó cerrada en `docs/tasks/complete/TASK-118-ico-ai-core-embedded-intelligence.md`.
+- `ico_engine.ai_metric_scores` ya tiene consumers runtime reales:
+  - `Brief Clarity Score`
+  - `Brand Consistency Score`
+- La lane de `TASK-232` no puede vivir solo en `ai_metric_scores`:
+  - falta `signal_id`
+  - falta `status`
+  - faltan `tokens_in` / `tokens_out`
+  - falta storage de explanations y run audit
+- El trigger baseline queda corregido al backbone async ya vigente del repo:
+  - `materialize.ts` publica `ico.ai_signals.materialized`
+  - el consumo async debe colgarse del carril reactivo (`outbox` + `reactive-consumer`)
+- La policy baseline del provider queda alineada al runtime real del repo:
+  - `Vertex AI`
+  - `@google/genai`
+  - `Gemini`
+  - default inicial recomendado: `google/gemini-2.5-flash@default`
+- `docs/architecture/schema-snapshot-baseline.sql` quedó desfasado para este dominio tras `TASK-118`; durante esta lane prevalecen el DDL runtime de `src/lib/ico-engine/schema.ts`, la migración PG de `ico_ai_signals` y `src/types/db.d.ts`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -8,16 +48,17 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Implementada y verificada`
 - Rank: `TBD`
 - Domain: `ico-engine / ai`
 - Blocked by: `none`
-- Branch: `task/TASK-232-ico-llm-quality-scoring-explanation-pipeline`
+- Branch: `task/TASK-230-portal-animation-library`
 - GitHub Issue: `[pending]`
 
 ## Summary
@@ -67,7 +108,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/in-progress/TASK-118-ico-ai-core-embedded-intelligence.md`
+- `docs/tasks/complete/TASK-118-ico-ai-core-embedded-intelligence.md`
 - `docs/tasks/complete/TASK-220-ico-brief-clarity-score-intake-governance.md`
 - `docs/tasks/complete/TASK-223-ico-methodological-accelerators-instrumentation.md`
 - `docs/tasks/TASK_PROCESS.md`
@@ -76,12 +117,15 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `docs/tasks/in-progress/TASK-118-ico-ai-core-embedded-intelligence.md`
+- `docs/tasks/complete/TASK-118-ico-ai-core-embedded-intelligence.md`
 - `src/lib/ico-engine/ai/materialize-ai-signals.ts`
 - `src/lib/ico-engine/ai/read-signals.ts`
 - `src/lib/ico-engine/materialize.ts`
 - `src/lib/sync/projections/ico-ai-signals.ts`
 - `src/lib/sync/event-catalog.ts`
+- `src/lib/sync/reactive-consumer.ts`
+- `src/lib/sync/refresh-queue.ts`
+- `src/lib/ai/google-genai.ts`
 - `src/config/nexa-models.ts`
 - `src/lib/nexa/nexa-service.ts`
 
@@ -100,9 +144,10 @@ Reglas obligatorias:
 - `src/lib/ico-engine/materialize.ts`
 - `src/lib/sync/event-catalog.ts`
 - `src/lib/sync/projections/`
-- `[verificar] src/lib/ico-engine/ai/llm-quality-scoring.ts`
-- `[verificar] src/lib/ico-engine/ai/llm-explanation-worker.ts`
-- `[verificar] src/lib/ico-engine/ai/llm-provider.ts`
+- `[nuevo] src/lib/ico-engine/ai/llm-enrichment-worker.ts`
+- `[nuevo] src/lib/ico-engine/ai/llm-enrichment-reader.ts`
+- `[nuevo] src/lib/ico-engine/ai/llm-provider.ts`
+- `[nuevo] src/lib/sync/projections/ico-llm-enrichments.ts`
 - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
 
 ## Current Repo State
@@ -113,14 +158,18 @@ Reglas obligatorias:
 - `src/lib/ico-engine/ai/read-signals.ts` ya entrega señales recientes para consumers downstream
 - `src/lib/sync/projections/ico-ai-signals.ts` ya proyecta `ai_signals` hacia `greenhouse_serving`
 - `src/lib/sync/event-catalog.ts` ya define `ico.ai_signals.materialized`
+- `src/lib/sync/reactive-consumer.ts` y `src/lib/sync/refresh-queue.ts` ya resuelven retries, dead-letter y persistencia del trabajo async fuera del request path
+- `src/lib/ai/google-genai.ts` ya expone el baseline operativo de `Vertex AI` + `Gemini`
 - `src/config/nexa-models.ts` y `src/lib/nexa/nexa-service.ts` ya prueban baseline operativo con modelos `google/gemini-*`
-- `docs/architecture/Greenhouse_ICO_Engine_v1.md` ya reserva `ai_metric_scores` como carril auditable y explicita un Slice 6 de `Quality Scoring` con LLM
+- `src/lib/ico-engine/brief-clarity.ts` ya consume `brief_clarity_score` desde `ico_engine.ai_metric_scores`
+- `src/lib/ico-engine/methodological-accelerators.ts` ya consume `brand_consistency_score` desde `ico_engine.ai_metric_scores`
+- `docs/architecture/Greenhouse_ICO_Engine_v1.md` ya reserva `ai_metric_scores` como carril auditable y explicita un Slice 6 de `Quality Scoring` con LLM, aunque parte de esa narrativa quedó desfasada frente al runtime real
 
 ### Gap
 
 - No existe un worker async del `ICO Engine` para consumir `ai_signals` y producir scoring o explicación generativa auditable
 - No existe contrato runtime para versionar prompts, provider policy, costos y fallback de esta lane
-- No existe persistencia operativa clara para explanations/recommendations LLM desacopladas del chat
+- No existe persistencia operativa clara para explanations/recommendations LLM desacopladas del chat ni para run audit signal-scoped
 - Los consumers downstream siguen limitados a señales determinísticas o surfaces conversacionales, sin una capa generativa materialized-first propia del engine
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -142,11 +191,11 @@ Reglas obligatorias:
 
 - Definir el trigger async que nace desde `ico.ai_signals.materialized` o desde un carril batch equivalente sin bloquear `materialize.ts`
 - Formalizar el contrato de ejecución: idempotencia, retries, dead-letter/manual retry, status de run y metadata auditable por generación
-- Elegir durante Discovery si el output vive solo en `ico_engine.ai_metric_scores` o si requiere una tabla auditada complementaria bajo `ico_engine`
+- La Discovery ya resolvió que el output requiere tabla auditada complementaria bajo `ico_engine`; `ai_metric_scores` se reutiliza solo cuando el deliverable siga siendo score task-level y quepa en su contrato existente
 
 ### Slice 2 — Provider/model policy
 
-- Implementar una capa provider-aware para esta lane reutilizando `Vertex AI` y el baseline `Gemini` ya existente en el repo
+- Implementar una capa provider-aware para esta lane reutilizando `Vertex AI` + `@google/genai` + el baseline `Gemini` ya existente en el repo
 - Versionar prompts y definir guardrails de costo, timeout y fallback no bloqueante
 - Dejar explícito que `NexaService` es consumidor opcional posterior, no el runtime de esta pipeline
 
@@ -183,8 +232,10 @@ Reglas obligatorias:
   - `ico_engine.metric_snapshots_monthly`
   - `ico_engine.ai_metric_scores`
 - Provider baseline recomendado:
-  - `Vertex AI` con modelos `google/gemini-*` ya soportados en el repo
-  - la Discovery debe decidir si la policy queda fija a `Gemini 2.5 Flash` o si se define una matriz por métrica
+  - `Vertex AI` con `@google/genai`
+  - modelos `google/gemini-*` ya soportados en el repo
+  - baseline inicial: `google/gemini-2.5-flash@default`
+  - matriz por métrica solo si un follow-on la documenta explícitamente
 - Metadata mínima por run:
   - `space_id`
   - `signal_id` o entidad equivalente
@@ -200,6 +251,7 @@ Reglas obligatorias:
 - Policy de consumo:
   - `Agency`, `Ops Health` y `Nexa` consumen salida persistida
   - ninguna surface puede depender de una llamada LLM síncrona para renderizar su dato base
+  - `ai_metric_scores` mantiene su semántica task-level actual; las explanations signal-scoped y el run audit viven en storage complementario
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -210,12 +262,12 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Existe un trigger async documentado e implementado para la lane LLM del `ICO Engine`
-- [ ] La ejecución LLM no bloquea `materializeMonthlySnapshots()` ni rompe `TASK-118`
-- [ ] Cada output persistido incluye metadata auditable de modelo, prompt, confidence y costo/latencia
-- [ ] `ai_metric_scores` y/o el storage elegido queda integrado al runtime con tenant isolation por `space_id`
-- [ ] `Agency`, `Ops Health` o `Nexa` pueden consumir esta salida sin usar `NexaService` como backend del pipeline
-- [ ] La arquitectura `Greenhouse_ICO_Engine_v1.md` queda actualizada con provider policy, storage y fallback rules
+- [x] Existe un trigger async documentado e implementado para la lane LLM del `ICO Engine`
+- [x] La ejecución LLM no bloquea `materializeMonthlySnapshots()` ni rompe `TASK-118`
+- [x] Cada output persistido incluye metadata auditable de modelo, prompt, confidence y costo/latencia
+- [x] `ai_metric_scores` y/o el storage elegido queda integrado al runtime con tenant isolation por `space_id`
+- [x] `Agency`, `Ops Health` o `Nexa` pueden consumir esta salida sin usar `NexaService` como backend del pipeline
+- [x] La arquitectura `Greenhouse_ICO_Engine_v1.md` queda actualizada con provider policy, storage y fallback rules
 
 ## Verification
 
@@ -224,13 +276,19 @@ Reglas obligatorias:
 - `pnpm test`
 - Validación manual del flujo `materialize -> trigger async -> persistencia -> reader`
 
+### Evidencia ejecutada
+
+- `pnpm lint` — OK
+- `pnpm clean && pnpm build` — OK
+- `pnpm test` — OK
+- `pnpm migrate:up` — OK, migración aplicada y `src/types/db.d.ts` regenerado
+
 ## Closing Protocol
 
-- [ ] Actualizar `docs/tasks/to-do/TASK-150-space-health-score.md` a `docs/tasks/to-do/TASK-159-nexa-agency-tools.md` si alguno de sus supuestos cambia con esta lane
-- [ ] Documentar en `Handoff.md` qué provider/model policy quedó activa para el AI Core async
+- [x] Actualizar `docs/tasks/to-do/TASK-150-space-health-score.md` a `docs/tasks/to-do/TASK-159-nexa-agency-tools.md` si alguno de sus supuestos cambia con esta lane
+- [x] Documentar en `Handoff.md` qué provider/model policy quedó activa para el AI Core async
 
 ## Follow-ups
 
 - Conectar esta lane con scoring compuesto en `TASK-150` y `TASK-151` cuando exista calibración suficiente
-- Evaluar si las explicaciones LLM requieren una projection PG dedicada o si basta con lectura directa desde BigQuery
 - Evaluar provider-per-metric solo después de tener baseline y costos reales con `Gemini`

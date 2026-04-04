@@ -1,5 +1,81 @@
 # Handoff.md
 
+## Sesión 2026-04-04 — TASK-232 implementada end-to-end y cerrada
+
+### Rama / alcance
+
+- rama actual: `task/TASK-230-portal-animation-library`
+- scope final:
+  - lane async LLM del `ICO Engine`
+  - storage complementario BQ/PG para explanations + run audit
+  - proyección reactiva y readers downstream en `Agency`, `Ops Health` y `Nexa`
+
+### Qué se hizo
+
+- Se creó la lane generativa async colgada de `ico.ai_signals.materialized` sin tocar el request path crítico del materializer.
+- Provider/model policy activa:
+  - `Vertex AI`
+  - `@google/genai`
+  - `Gemini`
+  - baseline: `google/gemini-2.5-flash@default`
+- Nuevos artefactos principales:
+  - `src/lib/ico-engine/ai/llm-provider.ts`
+  - `src/lib/ico-engine/ai/llm-enrichment-worker.ts`
+  - `src/lib/ico-engine/ai/llm-enrichment-reader.ts`
+  - `src/lib/ico-engine/ai/llm-types.ts`
+  - `src/lib/sync/projections/ico-llm-enrichments.ts`
+  - migración `20260404123559856_task-232-ico-llm-enrichments.sql`
+- Se agregaron tablas/contratos:
+  - BQ: `ai_signal_enrichments`, `ai_enrichment_runs`
+  - PG serving: `ico_ai_signal_enrichments`, `ico_ai_enrichment_runs`
+- Downstream:
+  - `Agency > ICO Engine` ahora expone `aiLlm`
+  - `Ops Health` ahora muestra `AI LLM Enrichment`
+  - `Nexa > get_otd` agrega resumen breve de enriquecimientos recientes
+- Documentación cruzada actualizada:
+  - `docs/tasks/README.md`
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+  - deltas en `TASK-150`, `TASK-151`, `TASK-152`, `TASK-154`, `TASK-155`, `TASK-159`
+
+### Verificación
+
+- `pnpm lint` — OK
+- `pnpm clean && pnpm build` — OK
+- `pnpm test` — OK
+- `pnpm migrate:up` — OK
+  - migración aplicada
+  - `src/types/db.d.ts` regenerado
+
+### Pendiente / follow-up real
+
+- Calibrar umbrales y uso downstream del `qualityScore` antes de convertirlo en input fuerte de scoring compuesto (`TASK-150`, `TASK-151`)
+- Evaluar provider-per-metric solo después de observar costos/latencia reales con el baseline Gemini
+
+## Sesión 2026-04-04 — TASK-232 downstream wiring integrado
+
+### Rama / alcance
+
+- rama actual: `task/TASK-230-portal-animation-library`
+- scope: consumo downstream del carril LLM de `TASK-232` sin tocar worker, migraciones ni el pipeline reactivo base
+
+### Qué se hizo
+
+- Se consolidó el reader reusable `src/lib/ico-engine/ai/llm-enrichment-reader.ts` para resumir enriquecimientos LLM y el snapshot operativo del carril
+- `src/app/api/ico-engine/metrics/agency/route.ts` ahora devuelve `aiLlm` además de `aiCore`
+- `src/lib/operations/get-operations-overview.ts` suma el subsystem `AI LLM Enrichment` con fallback `not_configured` si faltan tablas
+- `src/lib/nexa/nexa-tools.ts` ahora adjunta un resumen breve de enriquecimientos LLM recientes al tool `get_otd` para organizaciones
+
+### Verificación
+
+- `pnpm exec eslint src/app/api/ico-engine/metrics/agency/route.ts src/lib/operations/get-operations-overview.ts src/lib/nexa/nexa-tools.ts src/lib/ico-engine/ai/llm-enrichment-reader.ts src/lib/ico-engine/ai/llm-types.ts` — OK
+- `pnpm build` — OK
+- `pnpm lint` global — bloqueado por `src/lib/ico-engine/ai/llm-enrichment-worker.ts` en trabajo paralelo fuera de este alcance
+
+### Pendiente para cierre
+
+- Validar el worker LLM cuando su autor lo tome o cuando se autorice tocar ese archivo
+- Si cambia el contrato de `AiSignalEnrichmentRecord`, revisar de nuevo el worker para mantener compatibilidad
+
 ## Sesión 2026-04-04 — TASK-230 Animation Library Integration
 
 ### Rama / alcance

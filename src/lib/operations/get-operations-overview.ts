@@ -8,6 +8,7 @@ import { getCloudGcpAuthPosture } from '@/lib/cloud/gcp-auth'
 import { buildCloudHealthSnapshot, getCloudPlatformHealthSnapshot } from '@/lib/cloud/health'
 import { getCloudObservabilityPosture, getCloudSentryIncidents } from '@/lib/cloud/observability'
 import { getCloudPostgresPosture } from '@/lib/cloud/postgres'
+import { readAiLlmOperationsSnapshot } from '@/lib/ico-engine/ai/llm-enrichment-reader'
 import { getNotionDeliveryDataQualityOverview } from '@/lib/integrations/notion-delivery-data-quality'
 import { getGreenhousePostgresConfig, isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import type { IntegrationDataQualityOverview } from '@/types/integration-data-quality'
@@ -273,6 +274,15 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       tableExists('greenhouse_sync', 'webhook_subscriptions')
     ])
 
+  const aiLlmSnapshot = await readAiLlmOperationsSnapshot().catch(() => ({
+    tablesReady: false,
+    processed: 0,
+    failed: 0,
+    lastRun: null,
+    latestRun: null,
+    lastProcessedAt: null
+  }))
+
   const [outboxEvents24h, pendingProjections, notificationsSent24h, activeSyncs, failedHandlers] = await Promise.all([
     safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.outbox_events WHERE occurred_at > NOW() - INTERVAL '24 hours'`),
     safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.projection_refresh_queue WHERE status = 'pending'`),
@@ -418,6 +428,13 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       processed: projCompleted,
       failed: projFailed,
       lastRun: projLastRun
+    },
+    {
+      name: 'AI LLM Enrichment',
+      status: aiLlmSnapshot.tablesReady ? deriveHealth(aiLlmSnapshot.processed, aiLlmSnapshot.failed, aiLlmSnapshot.lastRun, aiLlmSnapshot.tablesReady) : 'not_configured',
+      processed: aiLlmSnapshot.processed,
+      failed: aiLlmSnapshot.failed,
+      lastRun: aiLlmSnapshot.lastRun
     },
     {
       name: 'Notificaciones',

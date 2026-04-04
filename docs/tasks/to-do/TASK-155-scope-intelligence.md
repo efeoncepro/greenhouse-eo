@@ -12,7 +12,9 @@
 
 - `TASK-118` ya cerró el carril base de `ai_signals` y predicción determinística en `ICO`.
 - Si esta task necesita anomalías delivery-side o recomendaciones operativas, debe leerlas desde `ICO AI Core` y no abrir un detector paralelo ad hoc dentro de `Agency`.
-- El enrichment generativo/explicativo futuro queda en `TASK-232`.
+- `TASK-232` ya cerró el enrichment generativo/explicativo base:
+  - usar `greenhouse_serving.ico_ai_signal_enrichments` si se requiere contexto advisory
+  - no reabrir storage ni runtime LLM local dentro de esta task
 
 ## Status
 

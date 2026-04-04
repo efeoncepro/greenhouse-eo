@@ -10,6 +10,8 @@
 
 ## Delta 2026-04-04
 
+- `TASK-232` ya agregó explanations/recommendations persistidas sobre las señales `ICO` base.
+- Esta task puede reutilizar `greenhouse_serving.ico_ai_signal_enrichments` para títulos, suggestions o contexto de respuesta, pero no debe convertir la lane LLM en runtime owner del detector.
 - `TASK-118` ya cerró la foundation determinística del `ICO AI Core`:
   - `ico_engine.ai_signals`
   - `greenhouse_serving.ico_ai_signals`

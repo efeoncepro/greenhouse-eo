@@ -1,3 +1,7 @@
+## Delta 2026-04-04
+- `TASK-232` ya dejó disponible una capa persistida de explicaciones y recomendaciones LLM sobre señales `ICO`.
+- Esta task puede reutilizar ese output como evidencia advisory para factor breakdown o copy operativo, pero el risk score canónico debe seguir modelado en reglas explícitas y no depender de una llamada LLM síncrona.
+
 ## Delta 2026-03-30
 - `TASK-142` ya expone badge `Risk` heurístico en `Space 360`.
 - Esta task queda enfocada en materializar el score/factor breakdown canónico y enchufarlo al `OverviewTab` existente, no en crear una surface nueva.
