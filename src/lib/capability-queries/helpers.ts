@@ -13,6 +13,7 @@ import type {
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type { CreativeHubTask } from '@/lib/capability-queries/creative-hub-runtime'
 import { resolveIterationVelocityMetric } from '@/lib/ico-engine/iteration-velocity'
+import { buildRevenueEnabledMeasurementModel } from '@/lib/ico-engine/revenue-enabled'
 import type { CapabilityModuleSnapshot, CapabilitySnapshotProject } from '@/lib/capability-queries/shared'
 import type { MetricsSummary } from '@/lib/ico-engine/read-metrics'
 
@@ -227,9 +228,7 @@ const buildCreativeReviewHotspotCard = (snapshot: CapabilityModuleSnapshot): Cap
   }
 }
 
-const INDUSTRY_RPA = 3.5
 const INDUSTRY_CYCLE_DAYS = 14.2
-const INDUSTRY_OTD = 0.7
 
 const average = (values: number[]) => {
   if (values.length === 0) {
@@ -255,6 +254,37 @@ const buildIterationVelocityDescription = (
     metric.evidence.candidateTasks
   )} assets completados; ${formatInteger(metric.evidence.correctiveReworkTasks)} quedaron dominados por correccion.`
 }
+
+const formatRevenueEnabledClass = (value: ReturnType<typeof buildRevenueEnabledMeasurementModel>['attributionClass']) => {
+  switch (value) {
+    case 'observed':
+      return 'Observado'
+    case 'range':
+      return 'Rango'
+    case 'estimated':
+      return 'Estimado'
+    default:
+      return 'No disponible'
+  }
+}
+
+const toneByRevenueEnabledClass = (
+  value: ReturnType<typeof buildRevenueEnabledMeasurementModel>['attributionClass']
+): CapabilityMetricsRowItem['tone'] => {
+  switch (value) {
+    case 'observed':
+      return 'success'
+    case 'range':
+      return 'warning'
+    case 'estimated':
+      return 'info'
+    default:
+      return 'error'
+  }
+}
+
+const summarizeRevenueEnabledReasons = (reasons: string[]) =>
+  reasons.slice(0, 2).join(' ')
 
 const buildCreativeBrandConsistency = (tasks: CreativeHubTask[]) => {
   const completedTasks = tasks.filter(task => task.cscPhase === 'Completado')
@@ -283,40 +313,10 @@ const buildCreativeBrandConsistency = (tasks: CreativeHubTask[]) => {
 }
 
 export const buildCreativeRevenueCardData = (
-  snapshot: CapabilityModuleSnapshot,
+  _snapshot: CapabilityModuleSnapshot,
   tasks: CreativeHubTask[],
   icoSummary?: MetricsSummary | null
 ): CapabilityCardData => {
-  const completedTasks = tasks.filter(task => task.cscPhase === 'Completado')
-  const firstTimeRightBase = completedTasks.filter(task => task.clientChangeRounds !== null)
-
-  const avgRpa = icoSummary?.rpaAvg ?? average(
-    completedTasks
-      .map(task => task.rpaValue)
-      .filter((value): value is number => value !== null && value > 0)
-  )
-
-  const ftrPct = icoSummary?.ftrPct ??
-    (firstTimeRightBase.length > 0
-      ? Math.round((firstTimeRightBase.filter(task => task.clientChangeRounds === 0).length / firstTimeRightBase.length) * 100)
-      : null)
-
-  const otdBase = completedTasks.filter(task => task.completedAt && task.deadlineAt)
-
-  const otdPct = icoSummary?.otdPct ??
-    (otdBase.length > 0
-      ? Math.round(
-          (otdBase.filter(task => new Date(task.completedAt || '').getTime() <= new Date(task.deadlineAt || '').getTime()).length /
-            otdBase.length) *
-            100
-        )
-      : snapshot.summary.avgOnTimePct)
-
-  const daysGained =
-    otdPct > INDUSTRY_OTD * 100
-      ? Math.round((otdPct / 100 - INDUSTRY_OTD) * INDUSTRY_CYCLE_DAYS * 10) / 10
-      : 0
-
   const iterationVelocity =
     resolveIterationVelocityMetric({
       tasks: tasks.map(task => ({
@@ -330,44 +330,48 @@ export const buildCreativeRevenueCardData = (
       }))
     })
 
-  const throughputGain =
-    avgRpa !== null && avgRpa > 0 ? Math.round(((INDUSTRY_RPA / avgRpa) - 1) * 100) : null
+  const revenueEnabled = buildRevenueEnabledMeasurementModel({
+    iterationVelocity,
+    throughput: {
+      value: icoSummary?.throughput ?? null
+    }
+  })
+
+  const earlyLaunch = revenueEnabled.levers.earlyLaunch
+  const iteration = revenueEnabled.levers.iteration
+  const throughput = revenueEnabled.levers.throughput
 
   const items: CapabilityMetricsRowItem[] = [
     {
       id: 'early-launch',
       label: 'Early Launch Advantage',
-      value: daysGained > 0 ? `+${daysGained} dias` : '0 dias',
-      description: `Dias de mercado ganados vs industria (OTD ${formatPercent(otdPct)} vs ${formatPercent(INDUSTRY_OTD * 100)} std)`,
-      tone: daysGained > 0 ? 'success' : otdPct >= 55 ? 'warning' : 'error'
+      value: earlyLaunch.supportingValue !== null ? `TTM ${formatInteger(earlyLaunch.supportingValue)}d` : 'Sin TTM',
+      description: summarizeRevenueEnabledReasons(earlyLaunch.qualityGateReasons),
+      tone: toneByRevenueEnabledClass(earlyLaunch.attributionClass)
     },
     {
-      id: 'iteration-velocity',
-      label: 'Iteration Velocity',
+      id: 'iteration',
+      label: 'Iteration Velocity Impact',
       value: formatIterationCadence(iterationVelocity.value, iterationVelocity.cadenceWindowDays),
-      description: buildIterationVelocityDescription(iterationVelocity),
-      tone:
-        iterationVelocity.dataStatus === 'unavailable'
-          ? 'info'
-          : (iterationVelocity.value ?? 0) >= 3
-            ? 'success'
-            : (iterationVelocity.value ?? 0) >= 1
-              ? 'warning'
-              : 'error'
+      description: summarizeRevenueEnabledReasons(iteration.qualityGateReasons) || buildIterationVelocityDescription(iterationVelocity),
+      tone: toneByRevenueEnabledClass(iteration.attributionClass)
     },
     {
-      id: 'creative-throughput',
-      label: 'Creative Throughput',
-      value: throughputGain !== null ? `+${throughputGain}%` : null,
-      description: 'Mas assets producidos con la misma capacidad vs RpA de industria (3.5x)',
-      tone: throughputGain !== null && throughputGain > 0 ? 'success' : 'info'
+      id: 'throughput',
+      label: 'Throughput Expandido',
+      value: throughput.supportingValue !== null ? formatInteger(Math.round(throughput.supportingValue)) : null,
+      description: summarizeRevenueEnabledReasons(throughput.qualityGateReasons),
+      tone: toneByRevenueEnabledClass(throughput.attributionClass)
     },
     {
-      id: 'ftr',
-      label: 'First Time Right',
-      value: ftrPct !== null ? formatPercent(ftrPct) : null,
-      description: 'Piezas aprobadas sin rondas de cambio en el ultimo periodo',
-      tone: ftrPct !== null && ftrPct >= 70 ? 'success' : ftrPct !== null && ftrPct >= 50 ? 'warning' : 'error'
+      id: 'attribution-policy',
+      label: 'Attribution Policy',
+      value: formatRevenueEnabledClass(revenueEnabled.attributionClass),
+      description:
+        revenueEnabled.attributionClass === 'unavailable'
+          ? 'Observed exige linkage directo a revenue. Range exige baseline comparable. Estimated usa solo evidencia operativa.'
+          : `Policy ${formatRevenueEnabledClass(revenueEnabled.attributionClass).toLowerCase()}: no se presenta revenue total canónico mientras falte atribucion defendible por palanca.`,
+      tone: toneByRevenueEnabledClass(revenueEnabled.attributionClass)
     }
   ]
 

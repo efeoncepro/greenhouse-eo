@@ -93,7 +93,7 @@ export const CAPABILITY_REGISTRY: CapabilityModuleDefinition[] = [
         title: 'Revenue metrics',
         type: 'metrics-row',
         size: 'full',
-        description: 'Early Launch Advantage, Iteration Velocity, Creative Throughput y First Time Right.'
+        description: 'Early Launch, Iteration, Throughput y policy de atribucion con evidencia explicita.'
       },
 
       // ── Brand Intelligence ─────────────────────────────────────────

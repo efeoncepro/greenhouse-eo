@@ -2,6 +2,14 @@
 
 ## Delta 2026-04-04
 
+- `TASK-221` ya cerró la policy inicial de `Revenue Enabled` y su distinción explícita entre `observed`, `range`, `estimated` y `unavailable`.
+- Regla nueva para `TASK-223`:
+  - ninguna hipótesis metodológica puede presentarse como impacto directo en `Revenue Enabled` sin respetar esa policy de atribución
+  - si la cadena causal termina en `Iteration` proxy o en `Throughput` operativo, el outcome económico debe seguir leyéndose como `estimated`
+  - cualquier futura correlación con `Revenue Enabled` debe reutilizar el helper canónico y no reconstruir montos o uplift con heurísticas locales
+
+## Delta 2026-04-04
+
 - `TASK-220` ya dejó un contrato runtime inicial para `Brief Clarity Score`, con `intakePolicyStatus`, `qualityGateReasons` y `brief efectivo` observable cuando existe score válido.
 - Regla nueva para `TASK-223`:
   - cualquier hipótesis causal sobre aceleradores metodológicos que impacten la calidad upstream debe correlacionarse contra `BCS` y no contra proxies locales de briefing

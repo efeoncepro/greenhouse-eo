@@ -2,6 +2,13 @@
 
 ## 2026-04-04
 
+- **TASK-221 Revenue Enabled measurement model implemented**:
+  - `ICO` ya tiene un helper canónico inicial para `Revenue Enabled` en `src/lib/ico-engine/revenue-enabled.ts`
+  - el contrato compone las palancas sobre foundations reales (`TTM`, `Iteration Velocity`, `throughput`) y ya distingue `observed`, `range`, `estimated` y `unavailable`
+  - `Creative Hub` dejó de inferir `Revenue Enabled` desde heurísticas locales de `OTD`, `RpA` y benchmarks de industria como si fueran revenue observado
+  - la surface ahora comunica límites explícitos de atribución por palanca y una policy visible en vez de vender una cifra heroica sin linkage defendible
+  - se actualizaron `Contrato_Metricas_ICO_v1.md` y `Greenhouse_ICO_Engine_v1.md` para fijar la policy inicial y dejar explícito que `throughput_count` todavía no equivale a iniciativas incrementales atribuibles
+
 - **TASK-220 Brief Clarity Score contract implemented**:
   - `ICO` ya tiene un helper canónico inicial para `BCS` en `src/lib/ico-engine/brief-clarity.ts`
   - el contrato lee el último `brief_clarity_score` disponible en `ico_engine.ai_metric_scores` y lo combina con `governance` de Notion por `space`

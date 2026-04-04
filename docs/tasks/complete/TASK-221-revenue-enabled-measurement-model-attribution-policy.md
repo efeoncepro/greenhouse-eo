@@ -1,6 +1,38 @@
 # TASK-221 - Revenue Enabled Measurement Model & Attribution Policy
 
+## Delta 2026-04-04 — Implementación cerrada
+
+- `Revenue Enabled` ya tiene helper canónico inicial en `src/lib/ico-engine/revenue-enabled.ts`.
+- El contrato runtime ya distingue:
+  - `observed`
+  - `range`
+  - `estimated`
+  - `unavailable`
+- `Creative Hub` dejó de reconstruir `Revenue Enabled` con heurísticas locales (`OTD`, `RpA`, benchmarks de industria`) y ahora consume el measurement model canónico.
+- La policy quedó formalizada en:
+  - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+- No se creó migración ni materialización nueva:
+  - esta entrega cierra el contrato `on-read`
+  - la atribución monetaria total por tenant/campaña sigue pendiente de lanes futuras
+
 ## Delta 2026-04-04
+
+- Discovery/auditoría del repo corrigió supuestos operativos antes de implementación:
+  - `Revenue Enabled` todavía no existe como contrato canónico propio, pero la lane ya no parte desde cero
+  - ya existen foundations runtime reutilizables para:
+    - `TTM` en `src/lib/ico-engine/time-to-market.ts`
+    - `Iteration Velocity` en `src/lib/ico-engine/iteration-velocity.ts`
+    - `Brief Clarity Score` + `effectiveBriefAt` en `src/lib/ico-engine/brief-clarity.ts`
+  - ya existe un consumer visible `Revenue Enabled` en `Creative Hub`, pero hoy usa heurísticas locales y no un modelo canónico de `RE`
+  - la dependencia `TASK-213` debe leerse como paraguas programático y no como blocker técnico duro para esta task
+  - el repo no tiene todavía:
+    - tipo/helper canónico de `Revenue Enabled`
+    - policy runtime formal de `observed` / `estimated` / `range`
+    - materialización o read model específico de `RE`
+    - attribution layer de revenue incremental por campaña/palanca
+- Regla operativa nueva:
+  - esta task debe reutilizar los contratos ya existentes de `TTM`, `Iteration Velocity` y `BCS`, y cortar consumers heurísticos a un modelo de atribución explícito en vez de recalcular supuestos locales
 
 - `TASK-220` ya dejó un contrato runtime inicial para `Brief Clarity Score` y `brief efectivo`.
 - Para esta task cambia un supuesto importante:
@@ -17,11 +49,11 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Diseño`
+- Status real: `Cerrada`
 - Rank: `8`
 - Domain: `delivery / ico / business`
 
@@ -68,7 +100,7 @@ Reglas obligatorias:
 - `TASK-219`
 - `TASK-220`
 - `TASK-216`
-- `TASK-213`
+- `TASK-213` como paraguas de alineación, no como blocker técnico duro
 
 ### Impacts to
 
@@ -91,12 +123,20 @@ Reglas obligatorias:
 - definición estratégica fuerte de `Revenue Enabled`
 - 3 palancas bien definidas en el contrato maestro
 - narrativa comercial consistente
+- contrato runtime inicial de `TTM` con evidencia explícita y consumer en campañas
+- contrato runtime inicial de `Iteration Velocity` con distinción `observed/proxy`
+- contrato runtime inicial de `Brief Clarity Score` y `effectiveBriefAt`
+- summary materializado reutilizable de métricas ICO para consumers
+- consumer visible heurístico de `Revenue Enabled` en `Creative Hub`
 
 ### Gap actual
 
-- no existe measurement model canónico productivo
-- no existe policy de observed vs estimated vs range
-- no existe attribution policy suficientemente explícita
+- no existe measurement model canónico productivo de `Revenue Enabled`
+- no existe policy runtime formal de `observed` vs `estimated` vs `range`
+- no existe attribution policy suficientemente explícita para revenue incremental
+- no existe read model/materialización específica para `RE` ni sus tres palancas
+- `Throughput` canónico hoy es conteo de tareas completadas, no todavía `campañas adicionales` o capacidad liberada atribuible
+- el consumer actual de `Creative Hub` sigue mezclando heurísticas locales (`industry benchmarks`, `RpA`, `OTD`) con narrativa de `Revenue Enabled`
 
 ## Scope
 
@@ -114,6 +154,7 @@ Reglas obligatorias:
 
 - dejar modelo reusable para reporting estratégico
 - preparar surfaces futuras sin prometer exactitud inexistente
+- cortar o encapsular heurísticas locales existentes para que futuros consumers no dupliquen lógica
 
 ## Out of Scope
 
@@ -123,12 +164,16 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Existe un measurement model canónico de `Revenue Enabled`
-- [ ] Las tres palancas tienen fórmula de alto nivel, supuestos y límites explícitos
-- [ ] Existe policy de `observed`, `estimated` y `range`
-- [ ] La narrativa de negocio queda respaldada por una política de medición defendible
+- [x] Existe un measurement model canónico de `Revenue Enabled`
+- [x] Las tres palancas tienen fórmula de alto nivel, supuestos y límites explícitos
+- [x] Existe policy de `observed`, `estimated` y `range`
+- [x] La narrativa de negocio queda respaldada por una política de medición defendible
+- [x] Queda explícito qué consumers existentes siguen heurísticos y cómo deben converger al contrato canónico
 
 ## Verification
 
-- revisión manual de consistencia contra `Contrato_Metricas_ICO_v1`
+- `pnpm exec vitest run src/lib/ico-engine/revenue-enabled.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm lint`
+- `pnpm build`
 - revisión documental cruzada con arquitectura `ICO`
