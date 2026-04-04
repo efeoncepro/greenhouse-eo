@@ -766,6 +766,8 @@ export const getAgencySpace360 = async (requestedId: string): Promise<Space360De
     businessLines,
     rpaAvg: effectiveRpa,
     otdPct: effectiveOtd,
+    rpaMetric: null,
+    otdMetric: null,
     assetsActivos: deliverySnapshot?.context.activeTasks ?? deliveryExtras.stuckAssets.length,
     feedbackPendiente: 0,
     projectCount: deliveryProjectMetrics.length,

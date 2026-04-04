@@ -42,6 +42,31 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.2
+
+**Canal:** Beta
+**Fecha:** 2026-04-04
+**Disponible para:** internal
+**Módulos:** Agencia / Delivery / Pulse
+
+### Novedades
+
+- No aplica como capacidad nueva.
+
+### Mejoras
+
+- `Agency > Delivery`, `Agency > Pulse` y el scorecard `Agency > ICO Engine` ahora muestran el estado de confianza de los KPIs junto al valor, en vez de dejar que el usuario asuma que todo número visible es igual de confiable.
+
+### Correcciones
+
+- `OTD`, `RpA` y `FTR` ya distinguen explícitamente entre `Dato confiable`, `Dato degradado` y `Sin dato confiable`.
+- Los KPIs de `Agency` dejan de apoyarse en semáforos locales que podían simplificar demasiado la señal cuando la muestra era parcial o insuficiente.
+- Se corrigió además la forma de agregar algunos KPIs Agency-level para evitar lecturas engañosas al promediar porcentajes o `RpA` sin el peso operativo correcto.
+
+### Notas
+
+- Si un KPI aparece como degradado o sin dato confiable, eso ahora refleja la calidad real del insumo del `ICO Engine` y no un fallback visual silencioso del módulo `Agency`.
+
 ## 2026.04-beta.1
 
 **Canal:** Beta

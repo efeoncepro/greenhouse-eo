@@ -5,30 +5,23 @@ import Box from '@mui/material/Box'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import { GH_AGENCY } from '@/config/greenhouse-nomenclature'
 import type { AgencyPulseKpis } from '@/lib/agency/agency-queries'
+import {
+  getAgencyMetricFooterLabel,
+  getAgencyMetricStatusColor,
+  getAgencyMetricStatusLabel,
+  getAgencyMetricSupportLabel,
+  getAgencyMetricTone
+} from './metric-trust'
 
 type Props = {
   kpis: AgencyPulseKpis | null
 }
 
-const getRpaTone = (rpa: number | null): 'success' | 'warning' | 'error' => {
-  if (rpa === null) return 'warning'
-  if (rpa <= 1.5) return 'success'
-  if (rpa <= 2.5) return 'warning'
-
-  return 'error'
-}
-
-const getOtdTone = (pct: number | null): 'success' | 'warning' | 'error' => {
-  if (pct === null) return 'warning'
-  if (pct >= 90) return 'success'
-  if (pct >= 70) return 'warning'
-
-  return 'error'
-}
-
 const PulseGlobalKpis = ({ kpis }: Props) => {
   const rpa = kpis?.rpaGlobal ?? null
   const otd = kpis?.otdPctGlobal ?? null
+  const rpaMetric = kpis?.rpaMetric ?? null
+  const otdMetric = kpis?.otdMetric ?? null
 
   return (
     <Box
@@ -46,8 +39,11 @@ const PulseGlobalKpis = ({ kpis }: Props) => {
         title={GH_AGENCY.kpi_rpa}
         stats={rpa !== null ? rpa.toFixed(2) : '—'}
         avatarIcon='tabler-git-pull-request'
-        avatarColor={getRpaTone(rpa)}
-        subtitle={GH_AGENCY.rpa_semaphore(rpa)}
+        avatarColor={getAgencyMetricTone(rpaMetric)}
+        subtitle={getAgencyMetricSupportLabel(rpaMetric)}
+        statusLabel={getAgencyMetricStatusLabel(rpaMetric)}
+        statusColor={getAgencyMetricStatusColor(rpaMetric)}
+        footer={getAgencyMetricFooterLabel(rpaMetric)}
       />
       <HorizontalWithSubtitle
         title={GH_AGENCY.kpi_assets}
@@ -60,8 +56,11 @@ const PulseGlobalKpis = ({ kpis }: Props) => {
         title={GH_AGENCY.kpi_otd}
         stats={otd !== null ? `${Math.round(otd)}%` : '—'}
         avatarIcon='tabler-clock-check'
-        avatarColor={getOtdTone(otd)}
-        subtitle={GH_AGENCY.otd_semaphore(otd)}
+        avatarColor={getAgencyMetricTone(otdMetric)}
+        subtitle={getAgencyMetricSupportLabel(otdMetric)}
+        statusLabel={getAgencyMetricStatusLabel(otdMetric)}
+        statusColor={getAgencyMetricStatusColor(otdMetric)}
+        footer={getAgencyMetricFooterLabel(otdMetric)}
       />
       <HorizontalWithSubtitle
         title={GH_AGENCY.kpi_feedback}

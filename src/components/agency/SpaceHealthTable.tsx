@@ -19,6 +19,10 @@ import CustomChip from '@core/components/mui/Chip'
 import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type { AgencySpaceHealth } from '@/lib/agency/agency-queries'
 import { getSpaceHealth, HEALTH_ZONE_LABEL, HEALTH_ZONE_COLOR, HEALTH_ZONE_ORDER } from './space-health'
+import {
+  AgencyMetricStatusChip,
+  getAgencyMetricTone
+} from './metric-trust'
 
 type Props = {
   spaces: AgencySpaceHealth[]
@@ -34,19 +38,18 @@ const getServiceColor = (lines: string[]) => {
   }
 }
 
-const SemaphoreDot = ({ value, type }: { value: number | null; type: 'rpa' | 'otd' }) => {
-  const isOptimal = type === 'rpa' ? (value !== null && value <= 1.5) : (value !== null && value >= 90)
-  const isWarning = type === 'rpa' ? (value !== null && value > 1.5 && value <= 2.5) : (value !== null && value >= 70 && value < 90)
+const SemaphoreDot = ({ color }: { color: string }) => {
+  const resolvedColor = color || GH_COLORS.neutral.border
 
-  const color = value === null
-    ? GH_COLORS.neutral.border
-    : isOptimal
-      ? GH_COLORS.semaphore.green.source
-      : isWarning
-        ? GH_COLORS.semaphore.yellow.source
-        : GH_COLORS.semaphore.red.source
+  return <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: resolvedColor, flexShrink: 0 }} />
+}
 
-  return <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: color, flexShrink: 0 }} />
+const resolveMetricDotColor = (tone: ReturnType<typeof getAgencyMetricTone>) => {
+  if (tone === 'success') return GH_COLORS.semaphore.green.source
+  if (tone === 'warning') return GH_COLORS.semaphore.yellow.source
+  if (tone === 'error') return GH_COLORS.semaphore.red.source
+
+  return GH_COLORS.neutral.border
 }
 
 const SpaceHealthTable = ({ spaces }: Props) => {
@@ -75,7 +78,7 @@ const SpaceHealthTable = ({ spaces }: Props) => {
 
   const COL = { color: GH_COLORS.neutral.textSecondary, fontSize: '0.7rem', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em' }
 
-  const GRID = '2fr 1fr 70px 70px 80px 90px 80px 36px'
+  const GRID = '2fr 1fr 110px 110px 80px 90px 80px 36px'
 
   return (
     <Box
@@ -192,19 +195,25 @@ const SpaceHealthTable = ({ spaces }: Props) => {
               </Box>
 
               {/* RpA */}
-              <Stack direction='row' spacing={0.75} alignItems='center'>
-                <SemaphoreDot value={space.rpaAvg} type='rpa' />
-                <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 500 }}>
-                  {space.rpaAvg !== null ? space.rpaAvg.toFixed(1) : '—'}
-                </Typography>
+              <Stack spacing={0.5} sx={{ minWidth: 0 }}>
+                <Stack direction='row' spacing={0.75} alignItems='center'>
+                  <SemaphoreDot color={resolveMetricDotColor(getAgencyMetricTone(space.rpaMetric))} />
+                  <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 500 }}>
+                    {space.rpaAvg !== null ? space.rpaAvg.toFixed(1) : '—'}
+                  </Typography>
+                </Stack>
+                <AgencyMetricStatusChip metric={space.rpaMetric} />
               </Stack>
 
               {/* OTD */}
-              <Stack direction='row' spacing={0.75} alignItems='center'>
-                <SemaphoreDot value={space.otdPct} type='otd' />
-                <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 500 }}>
-                  {space.otdPct !== null ? `${Math.round(space.otdPct)}%` : '—'}
-                </Typography>
+              <Stack spacing={0.5} sx={{ minWidth: 0 }}>
+                <Stack direction='row' spacing={0.75} alignItems='center'>
+                  <SemaphoreDot color={resolveMetricDotColor(getAgencyMetricTone(space.otdMetric))} />
+                  <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 500 }}>
+                    {space.otdPct !== null ? `${Math.round(space.otdPct)}%` : '—'}
+                  </Typography>
+                </Stack>
+                <AgencyMetricStatusChip metric={space.otdMetric} />
               </Stack>
 
               {/* Projects */}

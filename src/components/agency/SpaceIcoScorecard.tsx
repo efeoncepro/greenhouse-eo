@@ -14,6 +14,7 @@ import StuckAssetsDrawer from '@/components/agency/StuckAssetsDrawer'
 import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type { SpaceMetricSnapshot, MetricValue } from '@/lib/ico-engine/read-metrics'
 import { THRESHOLD_ZONE_COLOR, type ThresholdZone } from '@/lib/ico-engine/metric-registry'
+import { AgencyMetricStatusChip, getAgencyMetricUiState } from './metric-trust'
 
 type Props = {
   spaces: SpaceMetricSnapshot[]
@@ -58,6 +59,12 @@ const getOverallZone = (snapshot: SpaceMetricSnapshot): ThresholdZone => {
 
   return 'optimal'
 }
+
+const getTrustSummaryMetric = (snapshot: SpaceMetricSnapshot): MetricValue | null =>
+  snapshot.metrics.find(metric => getAgencyMetricUiState(metric) === 'unavailable')
+  ?? snapshot.metrics.find(metric => getAgencyMetricUiState(metric) === 'degraded')
+  ?? snapshot.metrics.find(metric => getAgencyMetricUiState(metric) === 'valid')
+  ?? null
 
 // ─── Component ──────────────────────────────────────────────────────────────
 
@@ -130,6 +137,7 @@ const SpaceIcoScorecard = ({ spaces }: Props) => {
             const stuck = getMetric(snapshot, 'stuck_assets')
             const overall = getOverallZone(snapshot)
             const stuckCount = stuck?.value ?? 0
+            const trustSummaryMetric = getTrustSummaryMetric(snapshot)
 
             return (
               <Box key={snapshot.spaceId}>
@@ -147,9 +155,12 @@ const SpaceIcoScorecard = ({ spaces }: Props) => {
                 >
                   {/* Space */}
                   <Stack sx={{ minWidth: 0 }}>
-                    <Typography variant='body2' noWrap sx={{ fontWeight: 600, color: GH_COLORS.neutral.textPrimary }}>
-                      {snapshot.clientName || snapshot.spaceId}
-                    </Typography>
+                    <Stack direction='row' spacing={0.75} alignItems='center' flexWrap='wrap'>
+                      <Typography variant='body2' noWrap sx={{ fontWeight: 600, color: GH_COLORS.neutral.textPrimary }}>
+                        {snapshot.clientName || snapshot.spaceId}
+                      </Typography>
+                      <AgencyMetricStatusChip metric={trustSummaryMetric} />
+                    </Stack>
                     <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
                       {snapshot.context.totalTasks} tareas · {snapshot.context.activeTasks} activas
                     </Typography>

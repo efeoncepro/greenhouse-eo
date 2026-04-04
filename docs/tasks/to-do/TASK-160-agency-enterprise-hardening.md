@@ -1,5 +1,17 @@
 # TASK-160 — Agency Enterprise Hardening: Contracts, Observability, Migration
 
+## Delta 2026-04-04
+
+- `TASK-217` ya quedó cerrada y debe tratarse como foundation activa, no como gap pendiente, para los consumers Agency trust-aware.
+- Estado downstream resuelto por `TASK-217`:
+  - `Agency > Pulse` ya recibe `rpaMetric` y `otdMetric` trust-aware
+  - `Agency > Delivery` ya distingue `Dato confiable`, `Dato degradado` y `Sin dato confiable`
+  - `Agency > ICO Engine` ya reutiliza el helper compartido `src/components/agency/metric-trust.tsx`
+- Implicación para esta task:
+  - no debe reabrir semántica base de benchmark/confianza ya cerrada
+  - debe concentrarse en hardening transversal: observabilidad, stores, idempotencia, registries y migración BigQuery -> Postgres
+  - cualquier nuevo consumer Agency debe reutilizar la capa shared de trust creada por `TASK-217` antes de inventar otro sistema de labels o semáforos
+
 ## Delta 2026-04-03
 
 - La investigación de benchmarks externos ya documentada en `docs/architecture/Greenhouse_ICO_Engine_v1.md` § `A.5.5` cambia el contexto de esta task.

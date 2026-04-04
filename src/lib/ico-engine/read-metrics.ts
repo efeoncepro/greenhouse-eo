@@ -180,7 +180,7 @@ export interface IcoMetricSnapshot {
 
 // ─── Normalizers ────────────────────────────────────────────────────────────
 
-interface MetricAggregateRowLike extends MetricTrustRowLike {
+export interface MetricAggregateRowLike extends MetricTrustRowLike {
   rpa_avg: unknown
   rpa_eligible_task_count: unknown
   rpa_missing_task_count: unknown
@@ -240,7 +240,7 @@ const metricValueFromRow = (
   }
 }
 
-const buildMetricValuesFromRow = (row: MetricAggregateRowLike): MetricValue[] => {
+export const buildMetricValuesFromRow = (row: MetricAggregateRowLike): MetricValue[] => {
   const trustMap = buildMetricTrustMapFromRow(row)
 
   return [
