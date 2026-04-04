@@ -4,6 +4,7 @@ import { requireAgencyTenantContext } from '@/lib/tenant/authorization'
 import { ensureIcoEngineInfrastructure, ICO_DATASET } from '@/lib/ico-engine/schema'
 import { readAgencyMetrics, computeSpaceMetricsLive } from '@/lib/ico-engine/read-metrics'
 import { readAgencyPerformanceReport } from '@/lib/ico-engine/performance-report'
+import { readAgencyAiSignalsSummary } from '@/lib/ico-engine/ai/read-signals'
 import { toIcoEngineErrorResponse, runIcoEngineQuery, getIcoEngineProjectId } from '@/lib/ico-engine/shared'
 
 export const dynamic = 'force-dynamic'
@@ -31,6 +32,8 @@ export async function GET(request: Request) {
     if (!Number.isInteger(periodMonth) || periodMonth < 1 || periodMonth > 12) {
       return NextResponse.json({ error: 'Invalid month' }, { status: 400 })
     }
+
+    const aiCoreSummaryPromise = readAgencyAiSignalsSummary(periodYear, periodMonth).catch(() => null)
 
     if (live) {
       // Live compute: get all distinct space_ids, compute each in parallel (batched)
@@ -73,24 +76,31 @@ export async function GET(request: Request) {
         snap.clientName = nameMap.get(snap.spaceId) || null
       }
 
+      const aiCore = await aiCoreSummaryPromise
+
       return NextResponse.json({
         periodYear,
         periodMonth,
         spaces: snapshots,
         totalSpaces: snapshots.length,
-        report: null
+        report: null,
+        aiCore
       })
     }
 
-    const snapshots = await readAgencyMetrics(periodYear, periodMonth)
-    const report = await readAgencyPerformanceReport(periodYear, periodMonth)
+    const [snapshots, report, aiCore] = await Promise.all([
+      readAgencyMetrics(periodYear, periodMonth),
+      readAgencyPerformanceReport(periodYear, periodMonth),
+      aiCoreSummaryPromise
+    ])
 
     return NextResponse.json({
       periodYear,
       periodMonth,
       spaces: snapshots,
       totalSpaces: snapshots.length,
-      report
+      report,
+      aiCore
     })
   } catch (error) {
     return toIcoEngineErrorResponse(error, 'Failed to read agency ICO metrics')

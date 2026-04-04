@@ -17,6 +17,7 @@ import {
   TOP_PERFORMER_MULTI_ASSIGNEE_POLICY,
   TREND_STABLE_BAND_PP
 } from './performance-report'
+import { materializeAiSignals } from './ai/materialize-ai-signals'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -32,6 +33,8 @@ export interface MaterializationResult {
   organizationMetricsWritten: number
   businessUnitMetricsWritten: number
   performanceReportsWritten: number
+  aiSignalsWritten: number
+  predictionLogsWritten: number
   durationMs: number
   periodYear: number
   periodMonth: number
@@ -380,6 +383,9 @@ export const materializeMonthlySnapshots = async (
   // Step 11: Materialize auditable monthly Performance Report read model
   const performanceReportsWritten = await materializePerformanceReports(projectId, periodYear, periodMonth)
 
+  // Step 12: Materialize AI Core signals and prediction logs from canonical ICO snapshots
+  const { aiSignalsWritten, predictionLogsWritten } = await materializeAiSignals(periodYear, periodMonth)
+
   if (performanceReportsWritten > 0) {
     try {
       const { publishOutboxEvent } = await import('@/lib/sync/publish-event')
@@ -393,6 +399,28 @@ export const materializeMonthlySnapshots = async (
           periodYear,
           periodMonth,
           performanceReportsWritten
+        }
+      }).catch(() => {
+        // Non-blocking
+      })
+    } catch {
+      // Non-blocking
+    }
+  }
+
+  if (aiSignalsWritten > 0) {
+    try {
+      const { publishOutboxEvent } = await import('@/lib/sync/publish-event')
+
+      await publishOutboxEvent({
+        aggregateType: 'ico_ai_signals',
+        aggregateId: `ico-ai-signals-${periodYear}-${periodMonth}`,
+        eventType: 'ico.ai_signals.materialized',
+        payload: {
+          periodYear,
+          periodMonth,
+          aiSignalsWritten,
+          predictionLogsWritten
         }
       }).catch(() => {
         // Non-blocking
@@ -443,6 +471,8 @@ export const materializeMonthlySnapshots = async (
     organizationMetricsWritten,
     businessUnitMetricsWritten,
     performanceReportsWritten,
+    aiSignalsWritten,
+    predictionLogsWritten,
     durationMs: Date.now() - start,
     periodYear,
     periodMonth,

@@ -2776,7 +2776,16 @@ No se requiere cambiar fórmulas de métricas, duplicar SQL, ni crear nuevos end
 
 ## 13. AI Core & Robustness Roadmap (TASK-118)
 
-> Agregado 2026-03-28. Spec completa: `docs/tasks/to-do/TASK-118-ico-ai-core-embedded-intelligence.md`
+> Agregado 2026-03-28. Actualizado 2026-04-04. Spec viva: `docs/tasks/in-progress/TASK-118-ico-ai-core-embedded-intelligence.md`
+
+### 13.0 Estado runtime actual
+
+- Ya existe foundation backend/pipeline para AI Core dentro del backbone canónico de `ICO`:
+  - `ico_engine.ai_signals` y `ico_engine.ai_prediction_log` se provisionan desde `ensureIcoEngineInfrastructure()`
+  - `materializeMonthlySnapshots()` ejecuta `materializeAiSignals()` como step aditivo posterior a las métricas base
+  - el runtime emite `ico.ai_signals.materialized`
+  - `greenhouse_serving.ico_ai_signals` funciona como cache serving y se refresca vía proyección reactiva BQ -> PG
+- El scope actual sigue siendo internal-only y advisory-only. Los follow-ons de scoring compuesto, riesgo, churn, forecast avanzado o surfaces client-facing permanecen en `TASK-150` a `TASK-159`.
 
 ### 13.1 Visión
 

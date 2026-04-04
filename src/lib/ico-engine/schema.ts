@@ -238,6 +238,66 @@ const buildAiMetricScoresTable = (projectId: string) => `
 `
 
 /**
+ * AI derived signals materialized from canonical ICO monthly snapshots.
+ * These rows feed downstream projections and tenant-scoped serving reads.
+ */
+const buildAiSignalsTable = (projectId: string) => `
+  CREATE TABLE IF NOT EXISTS \`${projectId}.${ICO_DATASET}.ai_signals\` (
+    signal_id STRING NOT NULL,
+    signal_type STRING NOT NULL,
+    space_id STRING NOT NULL,
+    member_id STRING,
+    project_id STRING,
+    metric_name STRING NOT NULL,
+    period_year INT64 NOT NULL,
+    period_month INT64 NOT NULL,
+    severity STRING,
+    current_value FLOAT64,
+    expected_value FLOAT64,
+    z_score FLOAT64,
+    predicted_value FLOAT64,
+    confidence FLOAT64,
+    prediction_horizon STRING,
+    contribution_pct FLOAT64,
+    dimension STRING,
+    dimension_id STRING,
+    action_type STRING,
+    action_summary STRING,
+    action_target_id STRING,
+    model_version STRING,
+    generated_at TIMESTAMP,
+    ai_eligible BOOL,
+    payload_json STRING,
+    _synced_at TIMESTAMP
+  )
+  PARTITION BY RANGE_BUCKET(period_year, GENERATE_ARRAY(2024, 2030, 1))
+  CLUSTER BY period_month, space_id, signal_type
+`
+
+/**
+ * Historical prediction audit log for AI signals.
+ * Predictions are written at generation time and hydrated with actuals later.
+ */
+const buildAiPredictionLogTable = (projectId: string) => `
+  CREATE TABLE IF NOT EXISTS \`${projectId}.${ICO_DATASET}.ai_prediction_log\` (
+    prediction_id STRING NOT NULL,
+    space_id STRING NOT NULL,
+    metric_name STRING NOT NULL,
+    period_year INT64 NOT NULL,
+    period_month INT64 NOT NULL,
+    predicted_value FLOAT64,
+    predicted_at TIMESTAMP,
+    confidence FLOAT64,
+    actual_value FLOAT64,
+    actual_recorded_at TIMESTAMP,
+    error_pct FLOAT64,
+    model_version STRING
+  )
+  PARTITION BY RANGE_BUCKET(period_year, GENERATE_ARRAY(2024, 2030, 1))
+  CLUSTER BY period_month, space_id, metric_name
+`
+
+/**
  * Detail table for stuck assets (spec §5.5). Full-refreshed daily by materialization.
  * 72h threshold aligns with v_tasks_enriched.is_stuck definition.
  */
@@ -744,7 +804,7 @@ export const ensureIcoEngineInfrastructure = async () => {
           SELECT table_name
           FROM \`${projectId}.${ICO_DATASET}.INFORMATION_SCHEMA.TABLES\`
           WHERE table_name IN (
-            'metric_snapshots_monthly', 'ai_metric_scores',
+            'metric_snapshots_monthly', 'ai_metric_scores', 'ai_signals', 'ai_prediction_log',
             'stuck_assets_detail', 'rpa_trend', 'metrics_by_project',
             'metrics_by_member', 'metrics_by_sprint', 'metrics_by_organization',
             'metrics_by_business_unit', 'performance_report_monthly',
@@ -761,6 +821,8 @@ export const ensureIcoEngineInfrastructure = async () => {
       const tableBuilders: Array<[string, string]> = [
         ['metric_snapshots_monthly', buildMonthlySnapshotTable(projectId)],
         ['ai_metric_scores', buildAiMetricScoresTable(projectId)],
+        ['ai_signals', buildAiSignalsTable(projectId)],
+        ['ai_prediction_log', buildAiPredictionLogTable(projectId)],
         ['stuck_assets_detail', buildStuckAssetsDetailTable(projectId)],
         ['rpa_trend', buildRpaTrendTable(projectId)],
         ['metrics_by_project', buildMetricsByProjectTable(projectId)],

@@ -258,7 +258,7 @@ const buildNotionDeliveryDataQualitySubsystem = (
 }
 
 export const getOperationsOverview = async (): Promise<OperationsOverview> => {
-  const [hasOutbox, hasProjections, hasReactiveLog, hasNotifications, hasServices, hasIcoMetrics, hasWebhookEndpoints, hasWebhookInbox, hasWebhookDeliveries, hasWebhookSubscriptions] =
+  const [hasOutbox, hasProjections, hasReactiveLog, hasNotifications, hasServices, hasIcoMetrics, hasIcoAiSignals, hasWebhookEndpoints, hasWebhookInbox, hasWebhookDeliveries, hasWebhookSubscriptions] =
     await Promise.all([
       tableExists('greenhouse_sync', 'outbox_events'),
       tableExists('greenhouse_sync', 'projection_refresh_queue'),
@@ -266,6 +266,7 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       tableExists('greenhouse_notifications', 'notifications'),
       tableExists('greenhouse_core', 'services'),
       tableExists('greenhouse_serving', 'ico_member_metrics'),
+      tableExists('greenhouse_serving', 'ico_ai_signals'),
       tableExists('greenhouse_sync', 'webhook_endpoints'),
       tableExists('greenhouse_sync', 'webhook_inbox_events'),
       tableExists('greenhouse_sync', 'webhook_deliveries'),
@@ -294,6 +295,7 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
     notionLastSync,
     servicesLastSync,
     icoLastSync,
+    icoAiSignalsLastSync,
     webhookEndpointsActive,
     webhookSubscriptionsActive,
     webhookInboxReceived24h,
@@ -331,6 +333,11 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
     runGreenhousePostgresQuery<Record<string, unknown> & { last_sync: string | null }>(
       `SELECT MAX(materialized_at)::text AS last_sync FROM greenhouse_serving.ico_member_metrics`
     ).then(rows => rows[0]?.last_sync ?? null).catch(() => null),
+    hasIcoAiSignals
+      ? runGreenhousePostgresQuery<Record<string, unknown> & { last_sync: string | null }>(
+          `SELECT MAX(generated_at)::text AS last_sync FROM greenhouse_serving.ico_ai_signals`
+        ).then(rows => rows[0]?.last_sync ?? null).catch(() => null)
+      : null,
 
     hasWebhookEndpoints
       ? safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.webhook_endpoints WHERE active = TRUE`)
@@ -385,6 +392,10 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
     ? await safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_serving.ico_member_metrics`)
     : 0
 
+  const icoAiSignalsCount = hasIcoAiSignals
+    ? await safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_serving.ico_ai_signals`)
+    : 0
+
   let notionDeliveryDataQuality: IntegrationDataQualityOverview | null = null
 
   try {
@@ -435,6 +446,13 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       processed: icoMetricsCount,
       failed: 0,
       lastRun: icoLastSync
+    },
+    {
+      name: 'AI Core',
+      status: deriveHealth(icoAiSignalsCount, 0, icoAiSignalsLastSync, hasIcoAiSignals),
+      processed: icoAiSignalsCount,
+      failed: 0,
+      lastRun: icoAiSignalsLastSync
     },
     await buildFinanceDataQualitySubsystem(),
     buildNotionDeliveryDataQualitySubsystem(notionDeliveryDataQuality)

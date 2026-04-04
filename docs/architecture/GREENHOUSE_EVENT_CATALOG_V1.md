@@ -81,9 +81,11 @@ Notas:
 | Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
 |---|---|---|---|---|
 | `ico_materialization` | `ico.materialization.completed` | `ico-engine/materialize.ts` | `{ memberId?, organizationId?, periodYear, periodMonth, memberMetricsWritten?, organizationMetricsWritten? }` | `person_intelligence`, `projected_payroll`, organization-level projections derivadas |
+| `ico_ai_signals` | `ico.ai_signals.materialized` | `ico-engine/materialize.ts` | `{ periodYear, periodMonth, aiSignalsWritten, predictionLogsWritten, spaceId? }` | `ico_ai_signals` projection hacia `greenhouse_serving.ico_ai_signals` y consumers internal-only (`Agency`, `Ops Health`, `Nexa`) |
 
 Notas:
 - `ico.materialization.completed` es hoy la señal reactiva canónica downstream cuando ya quedaron materializadas las métricas mensuales de `ICO`.
+- `ico.ai_signals.materialized` es aditivo sobre `ico.materialization.completed`: no reemplaza el contrato base de snapshots, solo publica la lane de señales AI persistidas.
 - `projected_payroll` y `person_intelligence` deben reaccionar a este evento derivado, no recalcular directamente desde cambios crudos de tareas.
 - La introducción futura de un evento base tipo `delivery.task_assignment.upserted` puede complementar refresh dirigido de `ico_member_metrics`, pero no reemplaza el contrato de `ico.materialization.completed` para consumers derivados.
 - `payroll_period.exported` sigue siendo el cierre canónico de nómina; tanto Postgres-first como BigQuery fallback deben emitirlo solo si la mutación realmente avanzó el período.

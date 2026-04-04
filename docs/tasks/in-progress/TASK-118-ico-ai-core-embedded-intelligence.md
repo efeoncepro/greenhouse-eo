@@ -1,21 +1,33 @@
 # TASK-118 — ICO AI Core: Embedded Intelligence Layer
 
+## Delta 2026-04-04 — Task rebaselined on the real ICO runtime and split-aware follow-ons
+
+- La auditoría del repo confirmó que el body original quedó desfasado frente al runtime actual de `ICO`.
+- Lectura correcta desde hoy:
+  - `TASK-118` ya no define la semántica base de `TTM`, `Iteration Velocity`, `BCS`, `Revenue Enabled` ni de los aceleradores metodológicos; esas lanes ya quedaron activadas por `TASK-218` a `TASK-223`
+  - `ico_engine.ai_metric_scores` ya no puede tratarse como placeholder vacío; el runtime actual ya lo consume para `brief_clarity_score` y `brand_consistency_score`
+  - el foco vigente de esta task pasa a ser la **foundation backend/pipeline** para señales AI persistidas (`ai_signals`, `ai_prediction_log`, cache PG, readers scope-aware, observabilidad y wiring downstream)
+  - los follow-ons de Agency Layer sobre `health score`, `risk score`, `anomaly registry`, `capacity forecast` y `Nexa agency tools` ya viven como tasks derivadas (`TASK-150` a `TASK-159`) y no deben duplicarse aquí
+- Regla operativa nueva:
+  - cualquier señal AI nueva debe consumir el contrato trust-aware vigente del engine (`TASK-214` a `TASK-216`) y colgarse del backbone canónico `materialize -> outbox/projection -> greenhouse_serving`
+  - no abrir crons o caches paralelos si el runtime ya ofrece un carril de materialización/proyección reutilizable
+
 ## Delta 2026-04-03 — AI layer must follow metric trust foundation and north-star contract
 
 - El body de esta task fue escrito antes de cerrar la ola de trust foundation y antes de alinear el backlog con `docs/architecture/Contrato_Metricas_ICO_v1.md`.
 - Lectura correcta desde hoy:
   - cualquier señal, predicción o recomendación de IA debe consumir métricas `ICO` ya normalizadas por semántica, benchmark y confianza
   - los thresholds legacy o stage-specific ejemplos dentro del body no deben asumirse como contrato vigente si contradicen `Contrato_Metricas_ICO_v1.md` o `TASK-216`
-  - `Revenue Enabled`, `TTM`, `Iteration Velocity` y `BCS` no deben tratarse como inputs maduros hasta que cierren `TASK-218` a `TASK-221`
+  - el body original ya no es fuente de verdad sobre la madurez de `Revenue Enabled`, `TTM`, `Iteration Velocity` o `BCS`; prevalece la arquitectura y las tasks cerradas más recientes
 - Esta lane sigue vigente, pero debe leerse como consumer avanzado del sistema de métricas ya endurecido, no como lugar donde se decide la semántica de los KPIs.
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Diseño completado, implementación pendiente`
+- Status real: `Auditoría cerrada, foundation backend/pipeline en implementación`
 - Rank: `44`
 - Domain: `ico-engine / ai`
 - Assigned to: **Codex (backend/pipeline)** + **Claude (UI signals)**
@@ -33,7 +45,7 @@ ICO hoy mide correctamente: OTD, RPA, FTR, cycle time, throughput, stuck assets.
 - No hay predicción de dónde va a terminar el mes
 - No hay diagnosis automática de por qué una métrica se degradó
 - No hay recomendaciones de qué hacer al respecto
-- La tabla `ai_metric_scores` existe vacía desde el spec original
+- El runtime no tiene todavía un carril canónico de `ai_signals` persistidas y sincronizadas a Postgres
 
 El ciclo de feedback es humano y lento. IA en el core lo acelera.
 
