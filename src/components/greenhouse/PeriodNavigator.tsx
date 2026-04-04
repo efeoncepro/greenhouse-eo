@@ -4,13 +4,9 @@ import { useCallback, useMemo } from 'react'
 
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
-import Divider from '@mui/material/Divider'
-import Fade from '@mui/material/Fade'
-import IconButton from '@mui/material/IconButton'
+import ButtonGroup from '@mui/material/ButtonGroup'
 import MenuItem from '@mui/material/MenuItem'
-import Paper from '@mui/material/Paper'
 import Tooltip from '@mui/material/Tooltip'
-import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { useTheme } from '@mui/material/styles'
 
@@ -77,7 +73,7 @@ const navigateMonth = (year: number, month: number, delta: -1 | 1): PeriodValue 
 const formatLong = (month: number, year: number) => `${MONTHS_LONG[month - 1]} de ${year}`
 const formatShort = (month: number, year: number) => `${MONTHS_SHORT[month - 1]} ${year}`
 
-// ── Dot indicator for non-current period ──
+// ── Dot indicator ──
 
 const PulseDot = () => (
   <Box
@@ -87,6 +83,7 @@ const PulseDot = () => (
       borderRadius: '50%',
       bgcolor: 'warning.main',
       flexShrink: 0,
+      mr: 0.5,
       '@keyframes periodDotPulse': {
         '0%, 100%': { opacity: 1 },
         '50%': { opacity: 0.4 }
@@ -98,6 +95,17 @@ const PulseDot = () => (
     }}
   />
 )
+
+// ── Shared button styles ──
+
+const arrowSx = { px: 1, minWidth: 36 }
+
+const labelDisabledSx = (isCurrentPeriod: boolean) => ({
+  '&.Mui-disabled': {
+    borderColor: 'divider',
+    color: isCurrentPeriod ? 'text.primary' : 'text.secondary'
+  }
+})
 
 // ── Component ──
 
@@ -149,49 +157,31 @@ const PeriodNavigator = ({
     if (!disabled) onChange({ year, month: value })
   }, [year, onChange, disabled])
 
-  const h = size === 'small' ? 36 : 40
-
   // ── Variant: dropdowns ──
 
   if (variant === 'dropdowns') {
     return (
-      <Paper
-        variant='outlined'
-        component='nav'
-        aria-label='Navegación de período'
-        sx={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          borderRadius: 2,
-          overflow: 'hidden',
-          height: h,
-          px: 1,
-          gap: 1,
-          bgcolor: 'action.hover',
-          borderColor: 'divider'
-        }}
-      >
+      <ButtonGroup variant='outlined' size={size} component='nav' aria-label='Navegación de período' sx={{ height: 38, borderColor: 'text.disabled' }}>
         <CustomTextField
           select
           size='small'
           value={year}
           onChange={e => handleYearChange(Number(e.target.value))}
           disabled={disabled}
-          slotProps={{ input: { sx: { fontSize: '0.8125rem' } } }}
+          slotProps={{ input: { sx: { fontSize: '0.8125rem', border: 'none' } } }}
           sx={{ minWidth: 80, '& .MuiOutlinedInput-notchedOutline': { border: 'none' } }}
         >
           {years.map(y => (
             <MenuItem key={y} value={y}>{y}</MenuItem>
           ))}
         </CustomTextField>
-        <Divider orientation='vertical' flexItem />
         <CustomTextField
           select
           size='small'
           value={month}
           onChange={e => handleMonthChange(Number(e.target.value))}
           disabled={disabled}
-          slotProps={{ input: { sx: { fontSize: '0.8125rem' } } }}
+          slotProps={{ input: { sx: { fontSize: '0.8125rem', border: 'none' } } }}
           sx={{ minWidth: 100, '& .MuiOutlinedInput-notchedOutline': { border: 'none' } }}
         >
           {MONTHS_SELECT.map((label, i) => (
@@ -199,21 +189,17 @@ const PeriodNavigator = ({
           ))}
         </CustomTextField>
         {showToday && !isCurrentPeriod && (
-          <>
-            <Divider orientation='vertical' flexItem />
-            <Button
-              size='small'
-              color='secondary'
-              onClick={goToToday}
-              disabled={disabled}
-              startIcon={<PulseDot />}
-              sx={{ minWidth: 'auto', px: 1.5, fontSize: '0.75rem', fontWeight: 600, textTransform: 'none', borderRadius: 0, height: '100%' }}
-            >
-              {todayLabel}
-            </Button>
-          </>
+          <Button
+            color='primary'
+            onClick={goToToday}
+            disabled={disabled}
+            sx={{ px: 1.5, minWidth: 'auto', fontSize: '0.8125rem', fontWeight: 600, textTransform: 'none' }}
+          >
+            <PulseDot />
+            {todayLabel}
+          </Button>
         )}
-      </Paper>
+      </ButtonGroup>
     )
   }
 
@@ -221,55 +207,37 @@ const PeriodNavigator = ({
 
   if (variant === 'compact') {
     return (
-      <Paper
-        variant='outlined'
-        component='nav'
-        aria-label='Navegación de período'
-        sx={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          borderRadius: 2,
-          overflow: 'hidden',
-          height: 28,
-          bgcolor: 'action.hover',
-          borderColor: 'divider'
-        }}
-      >
-        <IconButton
-          size='small'
+      <ButtonGroup variant='outlined' size='small' component='nav' aria-label='Navegación de período' sx={{ height: 28, borderColor: 'text.disabled' }}>
+        <Button
           onClick={goToPrev}
           disabled={disabled}
           aria-label={`Mes anterior: ${formatShort(prevPeriod.month, prevPeriod.year)}`}
-          sx={{ borderRadius: 0, px: 0.5, height: '100%' }}
+          sx={{ px: 0.5, minWidth: 28 }}
         >
           <i className='tabler-chevron-left' style={{ fontSize: 14 }} />
-        </IconButton>
-        <Typography
-          variant='caption'
-          fontWeight={600}
-          role='status'
-          aria-live='polite'
-          aria-atomic='true'
+        </Button>
+        <Button
+          disabled
           sx={{
             px: 1,
             minWidth: 65,
-            textAlign: 'center',
-            color: isCurrentPeriod ? 'text.primary' : 'text.secondary',
-            userSelect: 'none'
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            textTransform: 'none',
+            ...labelDisabledSx(isCurrentPeriod)
           }}
         >
           {formatShort(month, year)}
-        </Typography>
-        <IconButton
-          size='small'
+        </Button>
+        <Button
           onClick={goToNext}
           disabled={disabled}
           aria-label={`Mes siguiente: ${formatShort(nextPeriod.month, nextPeriod.year)}`}
-          sx={{ borderRadius: 0, px: 0.5, height: '100%' }}
+          sx={{ px: 0.5, minWidth: 28 }}
         >
           <i className='tabler-chevron-right' style={{ fontSize: 14 }} />
-        </IconButton>
-      </Paper>
+        </Button>
+      </ButtonGroup>
     )
   }
 
@@ -278,104 +246,85 @@ const PeriodNavigator = ({
   const periodLabel = isMobile ? formatShort(month, year) : formatLong(month, year)
 
   return (
-    <Paper
+    <ButtonGroup
       variant='outlined'
+      size={size}
       component='nav'
       aria-label='Navegación de período'
-      sx={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        borderRadius: 2,
-        overflow: 'hidden',
-        height: h,
-        bgcolor: 'action.hover',
-        borderColor: 'divider'
-      }}
+      sx={{ height: 38, borderColor: 'text.disabled' }}
     >
-      {/* Prev arrow */}
+      {/* Prev */}
       <Tooltip title={`Mes anterior: ${formatLong(prevPeriod.month, prevPeriod.year)}`}>
-        <IconButton
-          size='small'
+        <Button
           onClick={goToPrev}
           disabled={disabled}
           aria-label={`Mes anterior: ${formatLong(prevPeriod.month, prevPeriod.year)}`}
-          sx={{ borderRadius: 0, px: 1, height: '100%', '&:hover': { bgcolor: 'action.hover' } }}
+          sx={arrowSx}
         >
           <i className='tabler-chevron-left' style={{ fontSize: 18 }} />
-        </IconButton>
+        </Button>
       </Tooltip>
 
-      <Divider orientation='vertical' flexItem />
-
-      {/* Today button */}
+      {/* Today */}
       {showToday && (
-        <>
-          <Tooltip title={isCurrentPeriod ? 'Período actual' : `Ir a ${formatLong(today.month, today.year)}`}>
-            <span>
-              <Button
-                size='small'
-                variant={isCurrentPeriod ? 'contained' : 'text'}
-                color={isCurrentPeriod ? 'primary' : 'secondary'}
-                onClick={goToToday}
-                disabled={disabled || isCurrentPeriod}
-                startIcon={!isCurrentPeriod ? <PulseDot /> : undefined}
-                aria-label={isCurrentPeriod ? `Período actual: ${formatLong(month, year)}` : `Ir a ${formatLong(today.month, today.year)}`}
-                aria-current={isCurrentPeriod ? 'date' : undefined}
-                sx={{
-                  borderRadius: 0,
-                  px: 1.5,
-                  height: '100%',
-                  minWidth: 'auto',
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  boxShadow: 'none',
-                  '&:hover': { boxShadow: 'none' }
-                }}
-              >
-                {todayLabel}
-              </Button>
-            </span>
-          </Tooltip>
-          <Divider orientation='vertical' flexItem />
-        </>
+        <Tooltip title={isCurrentPeriod ? 'Período actual' : `Ir a ${formatLong(today.month, today.year)}`}>
+          <span>
+            <Button
+              variant={isCurrentPeriod ? 'contained' : 'outlined'}
+              color={isCurrentPeriod ? 'secondary' : 'primary'}
+              onClick={goToToday}
+              disabled={disabled || isCurrentPeriod}
+              aria-label={isCurrentPeriod ? `Período actual: ${formatLong(month, year)}` : `Ir a ${formatLong(today.month, today.year)}`}
+              aria-current={isCurrentPeriod ? 'date' : undefined}
+              sx={{
+                px: 1.5,
+                minWidth: 'auto',
+                fontSize: '0.8125rem',
+                fontWeight: 600,
+                textTransform: 'none',
+                boxShadow: 'none',
+                '&:hover': { boxShadow: 'none' }
+              }}
+            >
+              {!isCurrentPeriod && <PulseDot />}
+              {todayLabel}
+            </Button>
+          </span>
+        </Tooltip>
       )}
 
-      {/* Period label */}
-      <Fade in key={`${year}-${month}`} timeout={150}>
-        <Typography
-          variant='subtitle2'
-          fontWeight={600}
-          role='status'
-          aria-live='polite'
-          aria-atomic='true'
-          sx={{
-            px: 2,
-            minWidth: isMobile ? 80 : 140,
-            textAlign: 'center',
-            color: isCurrentPeriod ? 'text.primary' : 'text.secondary',
-            userSelect: 'none'
-          }}
-        >
-          {periodLabel}
-        </Typography>
-      </Fade>
+      {/* Period label (disabled button for layout participation) */}
+      <Button
+        disabled
+        sx={{
+          px: 2,
+          minWidth: isMobile ? 80 : 150,
+          fontSize: '0.875rem',
+          fontWeight: 600,
+          textTransform: 'none',
+          ...labelDisabledSx(isCurrentPeriod)
+        }}
+      >
+        {periodLabel}
+      </Button>
 
-      <Divider orientation='vertical' flexItem />
+      {/* Screen reader period announcement */}
+      <span role='status' aria-live='polite' aria-atomic='true' style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}>
+        {formatLong(month, year)}
+      </span>
 
-      {/* Next arrow */}
+      {/* Next */}
       <Tooltip title={`Mes siguiente: ${formatLong(nextPeriod.month, nextPeriod.year)}`}>
-        <IconButton
-          size='small'
+        <Button
           onClick={goToNext}
           disabled={disabled}
           aria-label={`Mes siguiente: ${formatLong(nextPeriod.month, nextPeriod.year)}`}
-          sx={{ borderRadius: 0, px: 1, height: '100%', '&:hover': { bgcolor: 'action.hover' } }}
+          sx={arrowSx}
         >
           <i className='tabler-chevron-right' style={{ fontSize: 18 }} />
-        </IconButton>
+        </Button>
       </Tooltip>
-    </Paper>
+    </ButtonGroup>
   )
 }
 
