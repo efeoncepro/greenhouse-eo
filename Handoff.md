@@ -1,5 +1,91 @@
 # Handoff.md
 
+## Sesión 2026-04-04 — TASK-219 implementada y verificada
+
+### Rama / alcance
+
+- rama actual: `feature/codex-task-219-iteration-velocity-contract`
+- scope principal:
+  - `src/lib/ico-engine/iteration-velocity.ts`
+  - `src/lib/ico-engine/iteration-velocity.test.ts`
+  - `src/app/api/projects/[id]/ico/route.ts`
+  - `src/lib/capability-queries/creative-hub-runtime.ts`
+  - `src/lib/capability-queries/helpers.ts`
+  - docs/lifecycle:
+    - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+    - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+    - `docs/tasks/complete/TASK-219-ico-iteration-velocity-experimentation-signal-contract.md`
+    - `docs/tasks/README.md`
+    - `docs/tasks/TASK_ID_REGISTRY.md`
+    - `docs/tasks/to-do/TASK-221-revenue-enabled-measurement-model-attribution-policy.md`
+    - `docs/tasks/to-do/TASK-222-creative-velocity-review-tiered-metric-surfacing.md`
+    - `docs/tasks/to-do/TASK-223-ico-methodological-accelerators-instrumentation.md`
+    - `docs/changelog/CLIENT_CHANGELOG.md`
+    - `changelog.md`
+
+### Resultado
+
+- `TASK-219` queda cerrada.
+- `ICO` ya tiene un helper canónico inicial para `Iteration Velocity` como iteraciones útiles cerradas en `30d`, con:
+  - `dataStatus`
+  - `confidenceLevel`
+  - `evidenceMode`
+  - `qualityGateReasons`
+  - evidencia cuantificada de iteración útil vs corrección
+- `Creative Hub` ya dejó de derivar `Iteration Velocity` desde `RpA` y ahora consume el contrato canónico con copy explícita de proxy operativo.
+- `GET /api/projects/[id]/ico` ya expone `iterationVelocity` y además refuerza tenant isolation con filtro por `space_id`.
+- La lane queda explícitamente separada de `pipeline_velocity`.
+- No se abrió migración nueva:
+  - esta slice cierra contrato + consumer + project reader
+  - la evidencia observada de mercado/ads-platform queda para follow-ons posteriores
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/ico-engine/iteration-velocity.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `rg -n "new Pool\\(" src`
+- `pnpm lint`
+- `pnpm build`
+
+## Sesión 2026-04-04 — TASK-219 auditada y corregida antes de implementación
+
+### Rama / alcance
+
+- rama actual: `feature/codex-task-219-iteration-velocity-contract`
+- scope:
+  - `docs/tasks/in-progress/TASK-219-ico-iteration-velocity-experimentation-signal-contract.md`
+  - `docs/tasks/README.md`
+  - `Handoff.md`
+  - auditoría runtime sobre:
+    - `src/lib/ico-engine/*`
+    - `src/lib/capability-queries/*`
+    - `src/lib/projects/get-project-detail.ts`
+    - `src/types/greenhouse-project-detail.ts`
+    - `src/app/api/projects/[id]/ico/route.ts`
+    - `docs/architecture/schema-snapshot-baseline.sql`
+    - `scripts/setup-postgres-source-sync.sql`
+    - `scripts/setup-bigquery-source-sync.sql`
+    - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+    - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+    - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+    - `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md`
+    - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+    - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+
+### Resultado
+
+- `TASK-219` queda movida a `in-progress` tras discovery y auditoría real del repo.
+- La spec se corrigió para dejar explícito que:
+  - `Iteration Velocity` significa capacidad habilitada para que el cliente testee más rápido en mercado a partir del proceso productivo medido con `ICO`
+  - `Creative Hub` ya tiene un consumer visible, pero hoy es heurístico y no canónico
+  - el repo sí tiene evidencia operativa reutilizable en `delivery tasks / projects` y `campaign_project_links`
+  - `pipeline_velocity` no puede reciclarse como sustituto de esta lane
+- No se implementó código todavía en esta pasada; solo se corrigió el contrato operativo para no construir sobre supuestos rotos.
+
+### Verificación
+
+- revisión manual de consistencia contra arquitectura, tasks vecinas y runtime actual en `ICO`, `Creative Hub`, `Projects` y `delivery`
+
 ## Sesión 2026-04-04 — TASK-218 implementada y verificada
 
 ### Rama / alcance

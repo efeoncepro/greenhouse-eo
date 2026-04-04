@@ -1,5 +1,21 @@
 # Contrato de métricas ICO
 
+## Delta 2026-04-04 — TASK-219 formaliza la source policy inicial de Iteration Velocity
+
+`TASK-219` no cambia el rol conceptual de `Iteration Velocity` dentro de `Revenue Enabled`, pero sí cierra su primer contrato runtime para que deje de depender de heurísticas locales.
+
+- `Iteration Velocity` significa capacidad habilitada por Greenhouse para que el cliente testee mas rapido en mercado; no equivale a `pipeline_velocity`, a conteo de comentarios ni a rondas de correccion
+- la source policy inicial usa evidencia operativa de `delivery_tasks`:
+  - `frame_versions`
+  - `workflow_change_round`
+  - `client_change_round_final`
+  - `client_review_open`
+  - `workflow_review_open`
+  - `open_frame_comments`
+- una iteracion util requiere evidencia de versionado / iteracion interna y ausencia de arrastre correctivo client-facing
+- mientras no exista evidencia observada de mercado o ads-platform ligada a la iteracion, la metrica debe servirse como `proxy operativo` y `degraded`
+- `Creative Hub` no puede volver a derivar `Iteration Velocity` desde `RpA`; cualquier consumer nuevo debe usar este contrato y no la heuristica legacy
+
 ## Delta 2026-04-04 — TASK-218 formaliza la source policy inicial de TTM
 
 `TASK-218` no cambia la definición conceptual de `TTM`, pero sí cierra la primera policy runtime para servir la métrica con evidencia y sin vender como canónico lo que todavía es proxy.
@@ -125,7 +141,7 @@ Estas métricas son el puente entre lo que Globe controla (drivers operativos) y
 |---|---|---|---|
 | **Time-to-Market (TTM)** | Días desde brief efectivo hasta asset activo en mercado. | Fecha de activación – Fecha de brief aprobado. Fuente: Notion + canal de activación. | TTM ↓ → Early Launch Advantage ↑ |
 | **Creative Throughput** | Cantidad de iniciativas (campañas / paquetes de assets) ejecutadas por período. | Conteo mensual de campañas completadas. Fuente: Notion. | Throughput ↑ → Throughput Expandido ↑ |
-| **Iteration Velocity** | Cuántas iteraciones útiles (tests/variantes) se ejecutan en un ciclo. | #Variantes testeadas / período. Fuente: Notion + plataforma de ads. | IV ↑ → Iteration Velocity Impact ↑ |
+| **Iteration Velocity** | Cuántas iteraciones útiles cerradas puede habilitar Globe para que el cliente testee más rápido en mercado. | Contrato inicial: iteraciones útiles cerradas / período (`30d`) usando `delivery_tasks.frame_versions`, `workflow_change_round`, `client_change_round_final` y señales de review. Ads-platform / mercado observado quedan como capa futura. | IV ↑ → Iteration Velocity Impact ↑ |
 | **On-Time Delivery (OTD)** | Puntualidad real para cumplir el calendario del negocio. | Piezas entregadas on-time / total piezas. Fuente: Notion automático. | OTD ↑ → Early Launch Advantage ↑ (prerequisito) |
 
 > *TTM y OTD son necesarias, pero el valor heroico está en adelantar, iterar y expandir throughput, no solo "cumplir". Cumplir es el baseline. Habilitar crecimiento es la promesa.*

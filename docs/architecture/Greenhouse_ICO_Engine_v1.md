@@ -1,5 +1,26 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-04 — TASK-219 ships the first Iteration Velocity evidence contract
+
+`TASK-219` deja operativo el primer contrato runtime de `Iteration Velocity`, aunque la metrica todavia no entra al carril materialized-first del engine.
+
+- `src/lib/ico-engine/iteration-velocity.ts` define el contrato inicial:
+  - valor base = iteraciones utiles cerradas en ventana de `30d`
+  - `available/degraded/unavailable`
+  - `confidenceLevel`
+  - `evidenceMode`
+  - `qualityGateReasons`
+- la source policy inicial se apoya en `greenhouse_conformed.delivery_tasks`:
+  - `frame_versions`
+  - `workflow_change_round`
+  - `client_change_round_final`
+  - `client_review_open`
+  - `workflow_review_open`
+  - `open_frame_comments`
+- `pipeline_velocity` sigue siendo una metrica de flujo operativo y no puede reutilizarse como sustituto semantico de `Iteration Velocity`
+- esta entrega expone el contrato en `GET /api/projects/[id]/ico` y corta `Creative Hub` a ese reader/helper canonico, reemplazando la heuristica legacy derivada de `RpA`
+- mientras no exista evidencia observada de mercado o ads-platform, la lane debe viajar como `proxy` y `degraded`
+
 ## Delta 2026-04-04 — TASK-218 ships the first TTM evidence contract
 
 `TASK-218` deja operativo el primer contrato runtime de `TTM` para campañas, aun cuando la métrica todavía no entra al carril materialized-first del engine.

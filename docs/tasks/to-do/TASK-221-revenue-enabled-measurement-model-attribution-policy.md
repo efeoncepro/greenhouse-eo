@@ -1,5 +1,15 @@
 # TASK-221 - Revenue Enabled Measurement Model & Attribution Policy
 
+## Delta 2026-04-04
+
+- `TASK-219` ya dejó un contrato runtime inicial para `Iteration Velocity`.
+- Para esta task cambia un supuesto importante:
+  - `RE Iteration` ya no debe partir de cero
+  - pero tampoco puede apoyarse en `pipeline_velocity` ni en la heurística legacy de `RpA` como sustituto de la palanca de iteración
+- Regla nueva para `TASK-221`:
+  - la palanca `Iteration` debe distinguir explícitamente entre evidencia `observed` y `proxy`
+  - mientras la iteración siga en proxy operativo, el modelo de `Revenue Enabled` debe presentarla con sus límites de confianza y no como uplift plenamente observado
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -117,4 +127,3 @@ Reglas obligatorias:
 
 - revisión manual de consistencia contra `Contrato_Metricas_ICO_v1`
 - revisión documental cruzada con arquitectura `ICO`
-

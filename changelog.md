@@ -2,6 +2,13 @@
 
 ## 2026-04-04
 
+- **TASK-219 Iteration Velocity evidence contract implemented**:
+  - `ICO` ya tiene un helper canónico inicial para `Iteration Velocity` en `src/lib/ico-engine/iteration-velocity.ts`
+  - el contrato mide iteraciones útiles cerradas en ventana de `30d`, distinguiendo `available`, `degraded` y `unavailable`, además de `confidenceLevel`, `evidenceMode` y `qualityGateReasons`
+  - `src/app/api/projects/[id]/ico/route.ts` ahora expone `iterationVelocity` y además refuerza tenant isolation con filtro por `space_id`
+  - `Creative Hub` dejó de derivar `Iteration Velocity` desde `RpA` y ahora consume el contrato canónico con descripción honesta de evidencia proxy
+  - se actualizaron `Contrato_Metricas_ICO_v1.md` y `Greenhouse_ICO_Engine_v1.md` para dejar explícito que `pipeline_velocity` no equivale a `Iteration Velocity` y que la lane sigue en proxy operativo mientras no haya evidencia observada de mercado
+
 - **TASK-218 Time-to-Market evidence contract implemented**:
   - `ICO` ya tiene un helper canónico inicial para `TTM` en `src/lib/ico-engine/time-to-market.ts`
   - el contrato distingue `available`, `degraded` y `unavailable`, además de `confidenceLevel` y `qualityGateReasons`

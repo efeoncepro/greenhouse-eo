@@ -20,6 +20,7 @@ type CreativeHubTaskRow = {
   explicit_csc_phase: string | null
   frame_versions: number | string | null
   client_change_rounds: number | string | null
+  workflow_change_rounds: number | string | null
   rpa_value: number | string | null
   client_review_open: boolean | string | null
   workflow_review_open: boolean | string | null
@@ -43,6 +44,7 @@ export type CreativeHubTask = {
   cscPhase: string
   frameVersions: number
   clientChangeRounds: number | null
+  workflowChangeRounds: number | null
   rpaValue: number | null
   clientReviewOpen: boolean
   workflowReviewOpen: boolean
@@ -246,6 +248,7 @@ const getCreativeHubTasksUncached = async (viewer: CapabilityViewerContext): Pro
   const explicitPhaseColumn = pickFirstExistingColumn(taskColumns, ['fase_csc'])
   const frameVersionsColumn = pickFirstExistingColumn(taskColumns, ['frame_versions'])
   const clientChangeRoundsColumn = pickFirstExistingColumn(taskColumns, ['client_change_round_final', 'client_change_round'])
+  const workflowChangeRoundsColumn = pickFirstExistingColumn(taskColumns, ['workflow_change_round'])
   const rpaColumn = pickFirstExistingColumn(taskColumns, ['rpa', 'frame_versions', 'client_change_round_final', 'client_change_round'])
   const clientReviewOpenColumn = pickFirstExistingColumn(taskColumns, ['client_review_open'])
   const workflowReviewOpenColumn = pickFirstExistingColumn(taskColumns, ['workflow_review_open'])
@@ -274,6 +277,7 @@ const getCreativeHubTasksUncached = async (viewer: CapabilityViewerContext): Pro
             ${getOptionalStringExpression('t', explicitPhaseColumn)} AS explicit_csc_phase,
             ${getOptionalIntExpression('t', frameVersionsColumn)} AS frame_versions,
             ${getOptionalIntExpression('t', clientChangeRoundsColumn, 'NULL')} AS client_change_rounds,
+            ${getOptionalIntExpression('t', workflowChangeRoundsColumn, 'NULL')} AS workflow_change_rounds,
             ${getOptionalFloatExpression('t', rpaColumn)} AS rpa_value,
             ${getOptionalBoolExpression('t', clientReviewOpenColumn)} AS client_review_open,
             ${getOptionalBoolExpression('t', workflowReviewOpenColumn)} AS workflow_review_open,
@@ -309,6 +313,7 @@ const getCreativeHubTasksUncached = async (viewer: CapabilityViewerContext): Pro
         scoped_tasks.explicit_csc_phase,
         scoped_tasks.frame_versions,
         scoped_tasks.client_change_rounds,
+        scoped_tasks.workflow_change_rounds,
         scoped_tasks.rpa_value,
         scoped_tasks.client_review_open,
         scoped_tasks.workflow_review_open,
@@ -334,6 +339,7 @@ const getCreativeHubTasksUncached = async (viewer: CapabilityViewerContext): Pro
     const deadlineAt = toIsoString(row.deadline_at)
     const frameVersions = toNumber(row.frame_versions)
     const clientChangeRounds = toNullableNumber(row.client_change_rounds)
+    const workflowChangeRounds = toNullableNumber(row.workflow_change_rounds)
     const clientReviewOpen = toBoolean(row.client_review_open)
     const workflowReviewOpen = toBoolean(row.workflow_review_open)
     const lastActivityAt = lastEditedAt || createdAt
@@ -363,6 +369,7 @@ const getCreativeHubTasksUncached = async (viewer: CapabilityViewerContext): Pro
       }),
       frameVersions,
       clientChangeRounds,
+      workflowChangeRounds,
       rpaValue: toNullableNumber(row.rpa_value),
       clientReviewOpen,
       workflowReviewOpen,
