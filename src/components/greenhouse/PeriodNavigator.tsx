@@ -166,7 +166,9 @@ const PeriodNavigator = ({
           overflow: 'hidden',
           height: h,
           px: 1,
-          gap: 1
+          gap: 1,
+          bgcolor: 'action.hover',
+          borderColor: 'divider'
         }}
       >
         <CustomTextField
@@ -228,7 +230,9 @@ const PeriodNavigator = ({
           alignItems: 'center',
           borderRadius: 2,
           overflow: 'hidden',
-          height: 28
+          height: 28,
+          bgcolor: 'action.hover',
+          borderColor: 'divider'
         }}
       >
         <IconButton
@@ -283,7 +287,9 @@ const PeriodNavigator = ({
         alignItems: 'center',
         borderRadius: 2,
         overflow: 'hidden',
-        height: h
+        height: h,
+        bgcolor: 'action.hover',
+        borderColor: 'divider'
       }}
     >
       {/* Prev arrow */}
