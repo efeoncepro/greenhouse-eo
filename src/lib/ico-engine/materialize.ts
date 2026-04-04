@@ -929,9 +929,9 @@ const materializePerformanceReports = async (
         FROM ${buildDeliveryPeriodSourceSql(projectId)} te
         LEFT JOIN \`${projectId}.greenhouse.team_members\` tm
           ON tm.member_id = te.primary_owner_member_id
-        LEFT JOIN \`${projectId}.greenhouse.clients\` c1
+        LEFT JOIN (SELECT client_id, client_name FROM \`${projectId}.greenhouse.clients\`) c1
           ON c1.client_id = te.client_id
-        LEFT JOIN \`${projectId}.greenhouse.clients\` c2
+        LEFT JOIN (SELECT client_id, client_name FROM \`${projectId}.greenhouse.clients\`) c2
           ON c2.client_id = te.space_id
         WHERE te.primary_owner_member_id IS NOT NULL
           AND te.primary_owner_member_id != ''
