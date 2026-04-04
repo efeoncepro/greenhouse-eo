@@ -45,6 +45,7 @@ export interface MetricDefinition {
   id: string
   code: string
   label: string
+  shortName: string
   description: string
   unit: string
   granularities: readonly MetricGranularity[]
@@ -158,6 +159,7 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     id: 'rpa',
     code: 'rpa',
     label: 'Rendimiento por Activo',
+    shortName: 'RpA',
     description: 'Promedio del score RPA en activos completados del período.',
     unit: 'score',
     granularities: ['monthly', 'weekly'],
@@ -184,6 +186,7 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     id: 'otd_pct',
     code: 'otd_pct',
     label: 'Entrega a tiempo',
+    shortName: 'OTD%',
     description: 'Porcentaje de tareas del período clasificadas como On-Time dentro del scorecard mensual.',
     unit: '%',
     granularities: ['monthly', 'weekly'],
@@ -214,6 +217,7 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     id: 'ftr_pct',
     code: 'ftr_pct',
     label: 'Primera entrega correcta',
+    shortName: 'FTR%',
     description: 'Porcentaje de tareas completadas del período sin rondas finales de cambio del cliente.',
     unit: '%',
     granularities: ['monthly'],
@@ -244,6 +248,7 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     id: 'cycle_time',
     code: 'cycle_time',
     label: 'Tiempo de ciclo',
+    shortName: 'Cycle Time',
     description: 'Promedio de días entre creación y entrega del activo.',
     unit: 'días',
     granularities: ['monthly', 'weekly'],
@@ -270,6 +275,7 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     id: 'cycle_time_variance',
     code: 'cycle_time_variance',
     label: 'Varianza del ciclo',
+    shortName: 'Cycle Time Variance',
     description: 'Desviación estándar del tiempo de ciclo — mide la previsibilidad.',
     unit: 'días',
     granularities: ['monthly'],
@@ -296,6 +302,7 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     id: 'throughput',
     code: 'throughput',
     label: 'Throughput',
+    shortName: 'Throughput',
     description: 'Cantidad de activos completados en el período.',
     unit: 'activos',
     granularities: ['monthly', 'weekly'],
@@ -322,6 +329,7 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     id: 'pipeline_velocity',
     code: 'pipeline_velocity',
     label: 'Velocidad del pipeline',
+    shortName: 'Pipeline Velocity',
     description: 'Ratio de activos completados sobre activos activos — velocidad de flujo.',
     unit: 'ratio',
     granularities: ['monthly', 'weekly'],
@@ -352,6 +360,7 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     id: 'csc_distribution',
     code: 'csc_distribution',
     label: 'Distribución CSC',
+    shortName: 'CSC Distribution',
     description: 'Distribución de activos activos por fase de la Cadena de Suministro Creativo.',
     unit: 'distribución',
     granularities: ['monthly', 'weekly'],
@@ -381,6 +390,7 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     id: 'stuck_assets',
     code: 'stuck_assets',
     label: 'Activos estancados',
+    shortName: 'Stuck Assets',
     description: `Activos sin movimiento en ${STUCK_THRESHOLD_HOURS}+ horas mientras están en estado activo.`,
     unit: 'activos',
     granularities: ['monthly', 'weekly'],
@@ -407,6 +417,7 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     id: 'stuck_asset_pct',
     code: 'stuck_asset_pct',
     label: 'Porcentaje estancado',
+    shortName: 'Stuck %',
     description: 'Porcentaje de activos activos que están estancados.',
     unit: '%',
     granularities: ['monthly', 'weekly'],
@@ -437,6 +448,7 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     id: 'overdue_carried_forward',
     code: 'overdue_carried_forward',
     label: 'Overdue Carried Forward',
+    shortName: 'OCF',
     description: 'Past-due tasks from prior periods still open at cutoff',
     unit: 'tasks',
     granularities: ['monthly'],

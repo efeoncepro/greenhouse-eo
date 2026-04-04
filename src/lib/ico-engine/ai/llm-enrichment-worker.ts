@@ -7,6 +7,7 @@ import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 
 import { generateAiSignalEnrichment } from './llm-provider'
+import { resolveSignalContext } from './resolve-signal-context'
 import type { AiSignalRecord } from './types'
 import {
   buildIcoLlmPromptHash,
@@ -515,6 +516,8 @@ export const materializeAiLlmEnrichments = async (
     .map(mapSignalRow)
     .filter((row): row is AiSignalRecord => Boolean(row))
 
+  const resolvedContext = await resolveSignalContext(signals)
+
   const records: AiSignalEnrichmentRecord[] = []
 
   for (const signalBatch of chunk(signals, 4)) {
@@ -533,7 +536,8 @@ export const materializeAiLlmEnrichments = async (
             signal,
             modelId,
             promptVersion: ICO_LLM_PROMPT_VERSION,
-            promptHash
+            promptHash,
+            resolvedContext
           })
 
           return {

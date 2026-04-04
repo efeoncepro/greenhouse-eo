@@ -2,7 +2,9 @@ import 'server-only'
 
 import { getGoogleGenAIClient, getGreenhouseAgentModel } from '@/lib/ai/google-genai'
 
+import { getMetricById } from '../metric-registry'
 import type { AiSignalRecord } from './types'
+import type { ResolvedSignalContext } from './resolve-signal-context'
 import {
   ICO_LLM_DEFAULT_MODEL_ID,
   ICO_LLM_PROMPT_TEMPLATE,
@@ -14,6 +16,7 @@ export interface GenerateAiSignalEnrichmentInput {
   promptVersion: string
   promptHash: string
   modelId?: string | null
+  resolvedContext?: ResolvedSignalContext | null
 }
 
 export interface GenerateAiSignalEnrichmentResult {
@@ -50,7 +53,22 @@ const parseStructuredJson = (text: string): AiSignalEnrichmentModelOutput => {
   }
 }
 
-const buildSignalPrompt = (signal: AiSignalRecord) =>
+const enrichSignalPayload = (signal: AiSignalRecord, context?: ResolvedSignalContext | null) => {
+  const metricDef = getMetricById(signal.metricName) ?? getMetricById(signal.metricName.replace('_avg', ''))
+
+  return {
+    ...signal,
+    metricDisplayName: metricDef?.shortName ?? signal.metricName,
+    metricDescription: metricDef?.description ?? null,
+    metricUnit: metricDef?.unit ?? null,
+    metricDirection: metricDef ? (metricDef.higherIsBetter ? 'higher is better' : 'lower is better') : null,
+    spaceName: context?.spaces.get(signal.spaceId) ?? signal.spaceId,
+    memberName: signal.memberId ? (context?.members.get(signal.memberId) ?? signal.memberId) : null,
+    projectName: signal.projectId ? (context?.projects.get(signal.projectId) ?? signal.projectId) : null
+  }
+}
+
+const buildSignalPrompt = (signal: AiSignalRecord, context?: ResolvedSignalContext | null) =>
   [
     ICO_LLM_PROMPT_TEMPLATE,
     '',
@@ -63,7 +81,7 @@ const buildSignalPrompt = (signal: AiSignalRecord) =>
     '- Si la señal tiene evidencia limitada, dilo en la explicación.',
     '',
     'Signal materializado:',
-    JSON.stringify(signal, null, 2)
+    JSON.stringify(enrichSignalPayload(signal, context), null, 2)
   ].join('\n')
 
 export const generateAiSignalEnrichment = async (
@@ -80,7 +98,7 @@ export const generateAiSignalEnrichment = async (
         role: 'user',
         parts: [
           {
-            text: buildSignalPrompt(input.signal)
+            text: buildSignalPrompt(input.signal, input.resolvedContext)
           }
         ]
       }

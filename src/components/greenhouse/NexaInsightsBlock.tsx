@@ -42,7 +42,7 @@ export type NexaInsightsBlockProps = {
 const getMetricDisplayName = (metricId: string): string => {
   const metric = getMetricById(metricId) ?? getMetricById(metricId.replace('_avg', '').replace('_pct', ''))
 
-  return metric?.label ?? metricId
+  return metric?.shortName ?? metric?.label ?? metricId
 }
 
 const formatTimestamp = (iso: string | null) => {

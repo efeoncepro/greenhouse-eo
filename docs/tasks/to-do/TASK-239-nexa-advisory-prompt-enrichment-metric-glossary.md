@@ -159,9 +159,9 @@ Reglas obligatorias:
 ### Slice 2 — Contexto humano de Space, miembros y proyectos en el prompt
 
 - Antes de enviar la señal al LLM, resolver nombres legibles para las entidades referenciadas:
-  - `spaceId` → nombre del Space/cliente desde `greenhouse_core.clients` o `greenhouse_core.spaces`
-  - `memberId` → `display_name` desde `greenhouse_core.team_members`
-  - `projectId` → nombre del proyecto desde `greenhouse_conformed.delivery_projects` o fuente equivalente
+  - `spaceId` → nombre del Space/cliente desde `greenhouse_core.spaces` (campo `space_name`)
+  - `memberId` → `display_name` desde `greenhouse_core.members`
+  - `projectId` → nombre del proyecto desde `greenhouse_delivery.projects` (PK `project_record_id`, campo `project_name`)
 - Agregar al JSON de la señal enriquecida: `spaceName`, `memberName`, `projectName`
 - Usar lookup batch (una query por tipo, no una por señal) para minimizar round trips — la función `buildSignalPrompt` recibe el contexto ya resuelto
 - Agregar instrucción al prompt: "Usa los nombres de Space, miembro y proyecto en la narrativa, nunca los IDs técnicos"

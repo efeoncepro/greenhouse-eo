@@ -1,5 +1,22 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-04 — TASK-239 enriches LLM prompt with metric glossary, causal chain, and entity names
+
+`TASK-239` mejora la calidad narrativa del carril advisory-only (LLM lane) sin cambiar storage, endpoints ni semántica.
+
+- **Prompt enrichment (v1 → v2):**
+  - Glosario dinámico de métricas ICO generado desde `ICO_METRIC_REGISTRY` con shortName, descripción, unidad y dirección
+  - Cadena causal formal del Contrato de Métricas §5 (BCS → FTR% → RpA → CT → TTM → RE)
+  - Instrucciones de doble capa narrativa: impacto técnico + bajada operativa en español con spanglish
+  - Alias conocidos incluidos (ej: `rpa_avg → RpA`)
+- **Entity resolution:** antes de llamar al LLM, el pipeline resuelve nombres legibles para spaceId, memberId y projectId desde PostgreSQL (batch lookup, una query por tipo)
+- **Signal enrichment:** cada señal enviada al LLM incluye `metricDisplayName`, `metricDescription`, `metricUnit`, `metricDirection`, `spaceName`, `memberName`, `projectName`
+- **`MetricDefinition.shortName`:** nuevo campo obligatorio con nombre operativo corto en inglés (ej: `FTR%`, `RpA`, `OTD%`, `Cycle Time`)
+- **UI update:** `NexaInsightsBlock` muestra `shortName` en chips de métrica en vez de `label` (español)
+- **Prompt version:** `ico_signal_enrichment_v1` → `ico_signal_enrichment_v2` — hash cambia automáticamente, auditable
+- Impacto en tokens: ~+370 tokens/señal (~$0.0008/run adicional con Flash)
+- Person Intelligence metrics (`PERSON_METRICS`) también reciben `shortName`
+
 ## Delta 2026-04-04 — TASK-235 surfaces aiLlm advisory block in Agency ICO UI
 
 `TASK-235` cierra el gap entre la exposición API de `aiLlm` (cerrada en `TASK-232`) y su visibilidad real en la UI de `Agency > ICO Engine`.
