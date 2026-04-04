@@ -2,6 +2,10 @@
 
 ## Delta 2026-04-04
 
+- `TASK-220` ya dejó un contrato runtime inicial para `Brief Clarity Score`, con `intakePolicyStatus`, `qualityGateReasons` y `brief efectivo` observable cuando existe score válido.
+- Regla nueva para `TASK-223`:
+  - cualquier hipótesis causal sobre aceleradores metodológicos que impacten la calidad upstream debe correlacionarse contra `BCS` y no contra proxies locales de briefing
+  - si una cuenta no tiene `BCS` auditado, la lane metodológica no puede inventar causalidad aguas arriba
 - `TASK-219` ya dejó un contrato runtime inicial para `Iteration Velocity` como iteraciones útiles cerradas en `30d`, con distinción explícita entre proxy operativo y evidencia observada.
 - Regla nueva para `TASK-223`:
   - cualquier hipótesis causal sobre `Design System` o `Brand Voice para AI` debe correlacionarse contra ese contrato canónico de `Iteration Velocity`

@@ -2,6 +2,7 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { getFirstEffectiveBriefDateForProjects } from '@/lib/ico-engine/brief-clarity'
 import {
   resolveTimeToMarketMetric,
   type TimeToMarketMetric
@@ -52,6 +53,7 @@ interface TimeToMarketEvidenceRow {
   first_task_created_date: string | null
   first_briefing_task_date: string | null
   first_activation_task_date: string | null
+  first_effective_brief_date: string | null
 }
 
 const toNum = (v: unknown): number => {
@@ -81,6 +83,12 @@ const buildTimeToMarketMetric = (
 ): TimeToMarketMetric =>
   resolveTimeToMarketMetric({
     startCandidates: [
+      {
+        date: evidence?.first_effective_brief_date ?? null,
+        label: 'Primer brief efectivo validado',
+        source: 'ico_engine.ai_metric_scores.processed_at',
+        mode: 'observed'
+      },
       {
         date: evidence?.first_briefing_task_date ?? null,
         label: 'Primera tarea en fase de briefing',
@@ -184,7 +192,7 @@ export const getCampaignMetrics = async (campaignId: string): Promise<CampaignMe
   const projectId = getBigQueryProjectId()
   const bigQuery = getBigQueryClient()
 
-  const [metricQueryResult, evidenceQueryResult] = await Promise.all([
+  const [metricQueryResult, evidenceQueryResult, firstEffectiveBriefDate] = await Promise.all([
     bigQuery.query({
       query: `
         WITH campaign_tasks AS (
@@ -261,13 +269,33 @@ export const getCampaignMetrics = async (campaignId: string): Promise<CampaignMe
           ) AS first_activation_task_date
       `,
       params: { spaceId: campaign.spaceId, projectSourceIds }
+    }),
+    getFirstEffectiveBriefDateForProjects({
+      spaceId: campaign.spaceId,
+      projectSourceIds
     })
   ])
 
   const metricRows = metricQueryResult[0] as MetricRow[]
   const evidenceRows = evidenceQueryResult[0] as TimeToMarketEvidenceRow[]
   const row = (metricRows[0] || {}) as MetricRow
-  const ttmEvidence = evidenceRows[0] || null
+
+  const ttmEvidence = evidenceRows[0]
+    ? {
+        ...evidenceRows[0],
+        first_effective_brief_date: firstEffectiveBriefDate
+      }
+    : firstEffectiveBriefDate
+      ? {
+          first_project_start_date: null,
+          last_project_end_date: null,
+          first_task_created_date: null,
+          first_briefing_task_date: null,
+          first_activation_task_date: null,
+          first_effective_brief_date: firstEffectiveBriefDate
+        }
+      : null
+
   const totalTasks = toNum(row.total_tasks)
   const completedTasks = toNum(row.completed_tasks)
 

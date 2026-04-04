@@ -42,6 +42,31 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.5
+
+**Canal:** Beta
+**Fecha:** 2026-04-04
+**Disponible para:** internal
+**Módulos:** Campañas / Projects / ICO
+
+### Novedades
+
+- `ICO` ya expone `Brief Clarity Score` como contrato inicial a nivel proyecto.
+
+### Mejoras
+
+- `Time-to-Market` ahora puede reconocer un `brief efectivo` observado cuando existe una evaluación auditada válida del brief, en vez de depender siempre de proxies operativos.
+- El reader de proyecto `ICO` ahora deja disponible `briefClarityScore` para consumers posteriores.
+
+### Correcciones
+
+- El sistema deja de tratar todo inicio de `TTM` como si tuviera la misma calidad de evidencia.
+- Cuando no existe un score auditado de brief, la señal se mantiene degradada o no disponible en vez de simular evidencia observada.
+
+### Notas
+
+- Esta es una source policy inicial: todavía puede haber proyectos sin `BCS` auditado, y en esos casos la evidencia de `brief efectivo` seguirá cayendo a proxy operativo.
+
 ## 2026.04-beta.4
 
 **Canal:** Beta

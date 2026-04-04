@@ -2,6 +2,14 @@
 
 ## 2026-04-04
 
+- **TASK-220 Brief Clarity Score contract implemented**:
+  - `ICO` ya tiene un helper canónico inicial para `BCS` en `src/lib/ico-engine/brief-clarity.ts`
+  - el contrato lee el último `brief_clarity_score` disponible en `ico_engine.ai_metric_scores` y lo combina con `governance` de Notion por `space`
+  - `src/app/api/projects/[id]/ico/route.ts` ahora expone `briefClarityScore`
+  - `src/lib/campaigns/campaign-metrics.ts` ahora puede usar `brief efectivo` observado para el start-side de `TTM`; si no hay score válido, degrada a proxy
+  - se actualizaron `Contrato_Metricas_ICO_v1.md` y `Greenhouse_ICO_Engine_v1.md` para dejar explícito que `BCS` ya tiene contrato runtime inicial y que el inicio de `TTM` ya no es siempre proxy
+  - verificado con `pnpm exec vitest run src/lib/ico-engine/brief-clarity.test.ts src/lib/ico-engine/time-to-market.test.ts`, `pnpm exec tsc --noEmit --pretty false`, `rg -n "new Pool\\(" src`, `pnpm lint` y `pnpm build`
+
 - **TASK-219 Iteration Velocity evidence contract implemented**:
   - `ICO` ya tiene un helper canónico inicial para `Iteration Velocity` en `src/lib/ico-engine/iteration-velocity.ts`
   - el contrato mide iteraciones útiles cerradas en ventana de `30d`, distinguiendo `available`, `degraded` y `unavailable`, además de `confidenceLevel`, `evidenceMode` y `qualityGateReasons`
