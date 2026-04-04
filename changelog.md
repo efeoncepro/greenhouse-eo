@@ -2,6 +2,13 @@
 
 ## 2026-04-04
 
+- **TASK-118 AI Core foundation backend/pipeline activated**:
+  - `ICO` ahora materializa `ai_signals` y `ai_prediction_log` como capas analíticas aditivas sobre el snapshot mensual canónico
+  - `materialize.ts` publica el nuevo evento reactivo `ico.ai_signals.materialized` y la proyección `ico-ai-signals` sincroniza las señales a `greenhouse_serving.ico_ai_signals`
+  - se aplicó la migración `20260404113502039_task-118-ico-ai-signals` y se regeneró `src/types/db.d.ts` en el mismo lote
+  - `/api/ico-engine/metrics/agency` ahora expone `aiCore`, `Ops Health` suma el subsystem `AI Core` y `Nexa` puede adjuntar señales AI recientes al tool `get_otd`
+  - verificado con `pnpm pg:doctor --profile=runtime`, `pnpm pg:doctor --profile=migrator`, `MIGRATE_PROFILE=migrator pnpm migrate:up`, `pnpm exec vitest run src/lib/ico-engine/ai/ai-signals.test.ts src/lib/sync/event-catalog.test.ts`, `pnpm build` y `pnpm lint`
+
 - **TASK-213 umbrella trust convergence closed on real runtime**:
   - `TASK-213` ya quedó cerrada como umbrella de rebaseline y convergencia sobre el runtime real
   - `People > Person Intelligence` ahora muestra estado de confianza y soporte para KPIs delivery reutilizando el reader ICO trust-aware, sin abrir schema nuevo

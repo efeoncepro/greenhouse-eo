@@ -57,6 +57,7 @@ export const AGGREGATE_TYPES = {
   // Person Intelligence
   compensation: 'compensation',
   icoMaterialization: 'ico_materialization',
+  icoAiSignals: 'ico_ai_signals',
 
   // Email Verification
   emailVerification: 'email_verification',
@@ -165,6 +166,7 @@ export const EVENT_TYPES = {
   // Person Intelligence
   compensationUpdated: 'compensation.updated',
   icoMaterializationCompleted: 'ico.materialization.completed',
+  icoAiSignalsMaterialized: 'ico.ai_signals.materialized',
 
   // Projected Payroll
   projectedPayrollSnapshotRefreshed: 'payroll.projected_snapshot.refreshed',
@@ -277,6 +279,7 @@ export const REACTIVE_EVENT_TYPES = [
   // Person Intelligence triggers
   EVENT_TYPES.compensationUpdated,
   EVENT_TYPES.icoMaterializationCompleted,
+  EVENT_TYPES.icoAiSignalsMaterialized,
   EVENT_TYPES.memberCreated,
   EVENT_TYPES.memberUpdated,
 

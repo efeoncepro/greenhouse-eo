@@ -5,6 +5,7 @@ import type { FunctionDeclaration } from '@google/genai'
 import { ROLE_CODES } from '@/config/role-codes'
 import { getOrganizationOperationalServing } from '@/lib/account-360/get-organization-operational-serving'
 import { getAgencyPulseKpis } from '@/lib/agency/agency-queries'
+import { readOrganizationAiSignals, type AiSignalListItem } from '@/lib/ico-engine/ai/read-signals'
 import { ensureEmailSchema } from '@/lib/email/schema'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import { getFinanceProjectId, roundCurrency, runFinanceQuery, toNumber as toFinanceNumber } from '@/lib/finance/shared'
@@ -123,6 +124,16 @@ const buildToolUnavailableResult = (toolName: NexaToolName, reason: string): Nex
   raw: { toolName }
 })
 
+const summarizeAiSignals = (signals: AiSignalListItem[]) => {
+  const critical = signals.filter(signal => signal.severity === 'critical').length
+  const warning = signals.filter(signal => signal.severity === 'warning').length
+
+  return {
+    critical,
+    warning
+  }
+}
+
 const checkPayrollTool: NexaToolDefinition = {
   declaration: {
     name: 'check_payroll',
@@ -227,17 +238,38 @@ const getOtdTool: NexaToolDefinition = {
         return buildToolUnavailableResult('get_otd', 'No encontré OTD materializado para la organización activa.')
       }
 
+      const aiSignals = await readOrganizationAiSignals(tenant.organizationId, 3).catch(() => [])
+      const aiSignalSummary = summarizeAiSignals(aiSignals)
+
+      const aiSignalNote =
+        aiSignals.length > 0
+          ? `Encontré ${aiSignals.length} señales AI recientes${aiSignalSummary.critical > 0 ? `, incluyendo ${aiSignalSummary.critical} críticas` : ''}.`
+          : null
+
+      const metrics: NexaToolResult['metrics'] = [
+        { label: 'OTD', value: formatPercent(serving.current.otdPct) || 'Sin datos', tone: serving.current.otdPct >= 90 ? 'success' : 'warning' },
+        { label: 'Activas', value: String(serving.current.tasksActive) },
+        { label: 'Completadas', value: String(serving.current.tasksCompleted) }
+      ]
+
+      if (aiSignals.length > 0) {
+        metrics.push({
+          label: 'Señales AI',
+          value: String(aiSignals.length),
+          tone: aiSignalSummary.critical > 0 ? 'error' : aiSignalSummary.warning > 0 ? 'warning' : 'info'
+        })
+      }
+
       return {
         available: true,
-        summary: `El OTD actual de ${tenant.organizationName || 'la organización'} es ${formatPercent(serving.current.otdPct)} en ${formatPeriodLabel(serving.current.periodYear, serving.current.periodMonth)}.`,
+        summary:
+          `El OTD actual de ${tenant.organizationName || 'la organización'} es ${formatPercent(serving.current.otdPct)} en ${formatPeriodLabel(serving.current.periodYear, serving.current.periodMonth)}.` +
+          (aiSignalNote ? ` ${aiSignalNote}` : ''),
         source: 'postgres',
         scopeLabel: tenant.organizationName || 'Organización activa',
         generatedAt: new Date().toISOString(),
-        metrics: [
-          { label: 'OTD', value: formatPercent(serving.current.otdPct) || 'Sin datos', tone: serving.current.otdPct >= 90 ? 'success' : 'warning' },
-          { label: 'Activas', value: String(serving.current.tasksActive) },
-          { label: 'Completadas', value: String(serving.current.tasksCompleted) }
-        ],
+        metrics,
+        notes: aiSignalNote ? [aiSignalNote] : undefined,
         raw: {
           scope: 'organization',
           organizationId: tenant.organizationId,
@@ -249,7 +281,19 @@ const getOtdTool: NexaToolDefinition = {
           tasksCompleted: serving.current.tasksCompleted,
           throughputCount: serving.current.throughputCount,
           stuckAssetCount: serving.current.stuckAssetCount,
-          materializedAt: serving.materializedAt
+          materializedAt: serving.materializedAt,
+          aiSignals: aiSignals.map(signal => ({
+            signalId: signal.signalId,
+            signalType: signal.signalType,
+            metricName: signal.metricName,
+            severity: signal.severity,
+            currentValue: signal.currentValue,
+            expectedValue: signal.expectedValue,
+            predictedValue: signal.predictedValue,
+            confidence: signal.confidence,
+            actionSummary: signal.actionSummary,
+            generatedAt: signal.generatedAt
+          }))
         }
       }
     }

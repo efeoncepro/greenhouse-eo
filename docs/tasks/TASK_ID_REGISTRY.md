@@ -279,3 +279,5 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-227` | `to-do` | Operational Responsibility Registry | `docs/tasks/to-do/TASK-227-operational-responsibility-registry.md` |
 | `TASK-228` | `to-do` | Employee Legacy Role Code Convergence | `docs/tasks/to-do/TASK-228-employee-legacy-role-convergence.md` |
 | `TASK-229` | `to-do` | Client View Catalog Deduplication | `docs/tasks/to-do/TASK-229-client-view-catalog-deduplication.md` |
+| `TASK-230` | `to-do` | Portal Animation Library Integration | `docs/tasks/to-do/TASK-230-portal-animation-library-integration.md` |
+| `TASK-231` | `to-do` | Codex Task Planner Skill | `docs/tasks/to-do/TASK-231-codex-task-planner-skill.md` |

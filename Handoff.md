@@ -1,5 +1,65 @@
 # Handoff.md
 
+## Sesión 2026-04-04 — TASK-118 auditada, corregida y movida a in-progress
+
+### Rama / alcance
+
+- rama actual: `task/TASK-118-ico-ai-core-embedded-intelligence`
+- scope inicial:
+  - `docs/tasks/in-progress/TASK-118-ico-ai-core-embedded-intelligence.md`
+  - `docs/tasks/README.md`
+  - `Handoff.md`
+  - auditoría runtime/documental sobre:
+    - `src/lib/ico-engine/schema.ts`
+    - `src/lib/ico-engine/materialize.ts`
+    - `src/lib/ico-engine/read-metrics.ts`
+    - `src/lib/ico-engine/brief-clarity.ts`
+    - `src/lib/ico-engine/methodological-accelerators.ts`
+    - `src/lib/operations/get-operations-overview.ts`
+    - `src/lib/nexa/nexa-tools.ts`
+    - `src/lib/person-360/get-person-ico-profile.ts`
+    - `src/lib/sync/projections/ico-member-metrics.ts`
+    - `src/lib/sync/projections/agency-performance-report.ts`
+    - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+    - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+    - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+    - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+    - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+    - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+    - `docs/architecture/GREENHOUSE_AGENCY_LAYER_V2.md`
+    - `docs/architecture/schema-snapshot-baseline.sql`
+
+### Resultado
+
+- `TASK-118` quedó rebaselinada sobre el runtime real de `ICO`.
+- La foundation backend/pipeline ya quedó implementada y validada:
+  - `src/lib/ico-engine/materialize.ts` ahora materializa `ai_signals` + `ai_prediction_log` y emite `ico.ai_signals.materialized`
+  - `src/lib/ico-engine/schema.ts` ahora provisiona las tablas BigQuery `ico_engine.ai_signals` y `ico_engine.ai_prediction_log`
+  - `greenhouse_serving.ico_ai_signals` quedó creada vía migración `20260404113502039_task-118-ico-ai-signals.sql` y reflejada en `src/types/db.d.ts`
+  - la proyección `src/lib/sync/projections/ico-ai-signals.ts` sincroniza BQ -> PG en el backbone canónico de eventos reactivos
+  - `Agency` expone `aiCore` en `/api/ico-engine/metrics/agency`, `Ops Health` suma el subsystem `AI Core` y `Nexa get_otd` puede adjuntar señales AI recientes por organización
+- La auditoría confirmó que:
+  - `TTM`, `Iteration Velocity`, `BCS`, `Revenue Enabled` y aceleradores metodológicos ya no son foundations pendientes de esta task
+  - `ai_metric_scores` ya se consume en runtime y no debe tratarse como placeholder vacío
+  - el gap real está en la foundation backend/pipeline para `ai_signals` persistidas, `ai_prediction_log`, cache PG, observabilidad AI Core y readers scope-aware
+  - los follow-ons de Agency/Nexa sobre health/risk/anomalies/capacity ya están modelados en `TASK-150` a `TASK-159`
+
+### Riesgos / siguientes pasos
+
+- El carril canónico nuevo ya quedó operativo; el siguiente paso es cerrar surfaces más profundas o modelos avanzados sin abrir crons paralelos ni romper el backbone `materialize -> outbox/projection -> greenhouse_serving`.
+- `People` requiere cuidado extra de scope: sin `organizationId`, el snapshot PG member-level puede exponer contexto cross-space si se agregan señales AI por miembro sin scoping consistente.
+- `Agency` es internal/cross-tenant; cualquier surfacing de señales AI debe seguir siendo estrictamente internal-only.
+- La task sigue `in-progress`: cualquier extensión LLM debe colgarse de `ai_metric_scores` o de un carril async auditado, no del materializer crítico síncrono.
+
+### Verificación
+
+- `pnpm pg:doctor --profile=runtime`
+- `pnpm pg:doctor --profile=migrator`
+- `MIGRATE_PROFILE=migrator pnpm migrate:up`
+- `pnpm exec vitest run src/lib/ico-engine/ai/ai-signals.test.ts src/lib/sync/event-catalog.test.ts`
+- `pnpm build`
+- `pnpm lint`
+
 ## Sesion 2026-04-04 — Task template split: TASK_TEMPLATE.md + TASK_PROCESS.md
 
 ### Que cambio

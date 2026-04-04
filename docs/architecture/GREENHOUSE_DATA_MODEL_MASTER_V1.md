@@ -1,5 +1,19 @@
 # Greenhouse Data Model Master V1
 
+## Delta 2026-04-04 — AI Core serving cache and prediction backbone
+
+`TASK-118` activa la foundation backend/pipeline de AI Core sobre el runtime real de `ICO`.
+
+- BQ:
+  - `ico_engine.ai_signals` como tabla analítica persistida para anomalías, predicciones, root cause y recomendaciones
+  - `ico_engine.ai_prediction_log` para calibración forecast vs actual
+- PG:
+  - `greenhouse_serving.ico_ai_signals` como cache serving tenant-aware consumida por `Agency`, `Ops Health` y `Nexa`
+- Regla operativa:
+  - la lane AI sigue siendo aditiva y advisory-only
+  - no reemplaza `metric_snapshots_monthly` ni `metrics_by_*`
+  - cualquier extensión LLM debe colgarse de este backbone o de `ai_metric_scores`, nunca recalcular inline en consumers
+
 ## Delta 2026-04-03 — Carry-Over & Overdue Carried Forward semantic split in ICO
 
 `TASK-204` introduce `overdue_carried_forward_count` como columna materializada en todas las tablas de métricas ICO (BQ) y serving (PG).

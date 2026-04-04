@@ -2210,6 +2210,36 @@ export interface GreenhouseServingCommercialCostAttribution {
   source_of_truth: string;
 }
 
+export interface GreenhouseServingIcoAiSignals {
+  action_summary: string | null;
+  action_target_id: string | null;
+  action_type: string | null;
+  ai_eligible: Generated<boolean>;
+  confidence: Numeric | null;
+  contribution_pct: Numeric | null;
+  current_value: Numeric | null;
+  dimension: string | null;
+  dimension_id: string | null;
+  expected_value: Numeric | null;
+  generated_at: Timestamp;
+  member_id: string | null;
+  metric_name: string;
+  model_version: string;
+  payload_json: Generated<Json>;
+  period_month: number;
+  period_year: number;
+  predicted_value: Numeric | null;
+  prediction_horizon: string | null;
+  project_id: string | null;
+  severity: string | null;
+  signal_id: string;
+  signal_type: string;
+  source: Generated<string>;
+  space_id: string;
+  synced_at: Generated<Timestamp>;
+  z_score: Numeric | null;
+}
+
 export interface GreenhouseServingIcoMemberMetrics {
   active_tasks: number | null;
   carry_over_count: number | null;
@@ -3410,6 +3440,7 @@ export interface DB {
   "greenhouse_serving.client_capability_360": GreenhouseServingClientCapability360;
   "greenhouse_serving.client_labor_cost_allocation": GreenhouseServingClientLaborCostAllocation;
   "greenhouse_serving.commercial_cost_attribution": GreenhouseServingCommercialCostAttribution;
+  "greenhouse_serving.ico_ai_signals": GreenhouseServingIcoAiSignals;
   "greenhouse_serving.ico_member_metrics": GreenhouseServingIcoMemberMetrics;
   "greenhouse_serving.ico_organization_metrics": GreenhouseServingIcoOrganizationMetrics;
   "greenhouse_serving.income_360": GreenhouseServingIncome360;
