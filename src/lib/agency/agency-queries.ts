@@ -2,7 +2,45 @@ import 'server-only'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { buildMetricSelectSQL, buildPeriodFilterSQL } from '@/lib/ico-engine/shared'
+import { buildMetricValuesFromRow, type MetricAggregateRowLike } from '@/lib/ico-engine/read-metrics'
+import type { ThresholdZone } from '@/lib/ico-engine/metric-registry'
 import type { TeamRoleCategory } from '@/types/team'
+
+export type AgencyMetricBenchmarkType = 'external' | 'analog' | 'adapted' | 'internal'
+export type AgencyMetricQualityGateStatus = 'healthy' | 'degraded' | 'broken'
+export type AgencyMetricConfidenceLevel = 'high' | 'medium' | 'low' | 'none'
+export type AgencyMetricDataStatus = 'valid' | 'low_confidence' | 'suppressed' | 'unavailable'
+
+export interface AgencyMetricTrustEvidence {
+  sampleBasis: string
+  sampleSize: number | null
+  totalTasks: number | null
+  completedTasks: number | null
+  activeTasks: number | null
+  deliveryClassifiedTasks: number | null
+}
+
+export interface AgencyRpaEvidence {
+  eligibleTasks: number
+  missingTasks: number
+  nonPositiveTasks: number
+}
+
+export interface AgencyMetricSignal {
+  metricId: string
+  value: number | null
+  zone: ThresholdZone | null
+  benchmarkType?: AgencyMetricBenchmarkType
+  benchmarkLabel?: string
+  benchmarkSource?: string
+  qualityGateStatus?: AgencyMetricQualityGateStatus
+  qualityGateReasons?: string[]
+  dataStatus?: AgencyMetricDataStatus
+  confidenceLevel?: AgencyMetricConfidenceLevel
+  suppressionReason?: string | null
+  evidence?: AgencyRpaEvidence
+  trustEvidence?: AgencyMetricTrustEvidence
+}
 
 export interface AgencySpaceHealth {
   clientId: string
@@ -11,6 +49,8 @@ export interface AgencySpaceHealth {
   businessLines: string[]
   rpaAvg: number | null
   otdPct: number | null
+  rpaMetric: AgencyMetricSignal | null
+  otdMetric: AgencyMetricSignal | null
   assetsActivos: number
   feedbackPendiente: number
   projectCount: number
@@ -29,6 +69,9 @@ export interface AgencyDeliveryTrendMonth {
   otdPct: number | null
   rpaAvg: number | null
   ftrPct: number | null
+  rpaMetric: AgencyMetricSignal | null
+  otdMetric: AgencyMetricSignal | null
+  ftrMetric: AgencyMetricSignal | null
   totalTasks: number
   completedTasks: number
   stuckAssetCount: number
@@ -36,8 +79,10 @@ export interface AgencyDeliveryTrendMonth {
 
 export interface AgencyPulseKpis {
   rpaGlobal: number | null
+  rpaMetric: AgencyMetricSignal | null
   assetsActivos: number
   otdPctGlobal: number | null
+  otdMetric: AgencyMetricSignal | null
   feedbackPendiente: number
   totalSpaces: number
   totalProjects: number
@@ -121,6 +166,40 @@ const normalizeStringArray = (value: unknown): string[] => {
 
   return value.map(item => (typeof item === 'string' ? item.trim() : '')).filter(Boolean)
 }
+
+const toAgencyMetricSignal = (
+  row: MetricAggregateRowLike,
+  metricId: 'rpa' | 'otd_pct' | 'ftr_pct'
+): AgencyMetricSignal | null => {
+  const metric = buildMetricValuesFromRow(row).find(item => item.metricId === metricId)
+
+  if (!metric) return null
+
+  return {
+    metricId: metric.metricId,
+    value: metric.value,
+    zone: metric.zone,
+    benchmarkType: metric.benchmarkType,
+    benchmarkLabel: metric.benchmarkLabel,
+    benchmarkSource: metric.benchmarkSource,
+    qualityGateStatus: metric.qualityGateStatus,
+    qualityGateReasons: metric.qualityGateReasons,
+    dataStatus: metric.dataStatus,
+    confidenceLevel: metric.confidenceLevel,
+    suppressionReason: metric.suppressionReason ?? null,
+    evidence: metric.evidence,
+    trustEvidence: metric.trustEvidence
+  }
+}
+
+const buildAgencyMetricAggregateRow = (
+  row: unknown,
+  overrides: Partial<MetricAggregateRowLike>
+): MetricAggregateRowLike =>
+  ({
+    ...(row as Record<string, unknown> | MetricAggregateRowLike),
+    ...overrides
+  }) as unknown as MetricAggregateRowLike
 
 const getCurrentDeliveryPeriod = () => {
   const formatter = new Intl.DateTimeFormat('en-CA', {
@@ -235,20 +314,12 @@ export const getAgencyPulseKpis = async (): Promise<AgencyPulseKpis> => {
   const [rows] = await bq.query({
     query: `
       ${getAgencyClientScopeCtes(projectId)},
-      ico_live_by_space AS (
+      ico_global AS (
         SELECT
-          te.space_id,
           ${buildMetricSelectSQL()}
         FROM \`${projectId}.ico_engine.v_tasks_enriched\` te
         WHERE te.space_id IN (SELECT space_id FROM client_spaces)
           AND (${buildPeriodFilterSQL()})
-        GROUP BY te.space_id
-      ),
-      ico_global AS (
-        SELECT
-          AVG(ils.rpa_avg) AS rpa_global,
-          AVG(ils.otd_pct) AS otd_pct_global
-        FROM ico_live_by_space ils
       ),
       task_agg AS (
         SELECT
@@ -264,12 +335,21 @@ export const getAgencyPulseKpis = async (): Promise<AgencyPulseKpis> => {
         FROM project_inventory pi
       )
       SELECT
-        ig.rpa_global,
+        ig.rpa_avg AS rpa_global,
         ta.assets_activos,
         ta.feedback_pendiente,
         ta.last_synced_at,
         pa.total_projects,
-        ig.otd_pct_global,
+        ig.otd_pct AS otd_pct_global,
+        ig.rpa_eligible_task_count,
+        ig.rpa_missing_task_count,
+        ig.rpa_non_positive_task_count,
+        ig.total_tasks,
+        ig.completed_tasks,
+        ig.active_tasks,
+        ig.on_time_count,
+        ig.late_drop_count,
+        ig.overdue_count,
         (SELECT COUNT(*) FROM active_clients) AS total_spaces
       FROM task_agg ta
       CROSS JOIN ico_global ig
@@ -283,11 +363,44 @@ export const getAgencyPulseKpis = async (): Promise<AgencyPulseKpis> => {
   })
 
   const row = rows?.[0] as Record<string, unknown> | undefined
+  const metricRow = row as MetricAggregateRowLike | undefined
 
   return {
     rpaGlobal: row ? toNullableNumber(row.rpa_global) : null,
+    rpaMetric: metricRow
+      ? toAgencyMetricSignal(
+          buildAgencyMetricAggregateRow(row ?? {}, {
+            rpa_avg: row?.rpa_global ?? null,
+            otd_pct: row?.otd_pct_global ?? null,
+            ftr_pct: null,
+            cycle_time_avg_days: null,
+            cycle_time_variance: null,
+            throughput_count: null,
+            pipeline_velocity: null,
+            stuck_asset_count: null,
+            stuck_asset_pct: null
+          }),
+          'rpa'
+        )
+      : null,
     assetsActivos: row ? toNumber(row.assets_activos) : 0,
     otdPctGlobal: row ? toNullableNumber(row.otd_pct_global) : null,
+    otdMetric: metricRow
+      ? toAgencyMetricSignal(
+          buildAgencyMetricAggregateRow(row ?? {}, {
+            rpa_avg: row?.rpa_global ?? null,
+            otd_pct: row?.otd_pct_global ?? null,
+            ftr_pct: null,
+            cycle_time_avg_days: null,
+            cycle_time_variance: null,
+            throughput_count: null,
+            pipeline_velocity: null,
+            stuck_asset_count: null,
+            stuck_asset_pct: null
+          }),
+          'otd_pct'
+        )
+      : null,
     feedbackPendiente: row ? toNumber(row.feedback_pendiente) : 0,
     totalSpaces: row ? toNumber(row.total_spaces) : 0,
     totalProjects: row ? toNumber(row.total_projects) : 0,
@@ -303,23 +416,14 @@ export const getAgencySpacesHealth = async (): Promise<AgencySpaceHealth[]> => {
   const [rows] = await bq.query({
     query: `
       ${getAgencyClientScopeCtes(projectId)},
-      ico_live_by_space AS (
-        SELECT
-          te.space_id,
-          ${buildMetricSelectSQL()}
-        FROM \`${projectId}.ico_engine.v_tasks_enriched\` te
-        WHERE te.space_id IN (SELECT space_id FROM client_spaces)
-          AND (${buildPeriodFilterSQL()})
-        GROUP BY te.space_id
-      ),
       ico_health AS (
         SELECT
           cs.client_id,
-          AVG(ils.rpa_avg) AS rpa_avg,
-          AVG(ils.otd_pct) AS otd_pct
+          ${buildMetricSelectSQL()}
         FROM client_spaces cs
-        LEFT JOIN ico_live_by_space ils
-          ON ils.space_id = cs.space_id
+        LEFT JOIN \`${projectId}.ico_engine.v_tasks_enriched\` te
+          ON te.space_id = cs.space_id
+         AND (${buildPeriodFilterSQL()})
         GROUP BY cs.client_id
       ),
       task_health AS (
@@ -396,6 +500,34 @@ export const getAgencySpacesHealth = async (): Promise<AgencySpaceHealth[]> => {
       businessLines: normalizeStringArray(row.business_lines),
       rpaAvg: toNullableNumber(row.rpa_avg),
       otdPct: toNullableNumber(row.otd_pct),
+      rpaMetric: toAgencyMetricSignal(
+        buildAgencyMetricAggregateRow(row, {
+          rpa_avg: row.rpa_avg,
+          otd_pct: row.otd_pct,
+          ftr_pct: null,
+          cycle_time_avg_days: null,
+          cycle_time_variance: null,
+          throughput_count: null,
+          pipeline_velocity: null,
+          stuck_asset_count: null,
+          stuck_asset_pct: null
+        }),
+        'rpa'
+      ),
+      otdMetric: toAgencyMetricSignal(
+        buildAgencyMetricAggregateRow(row, {
+          rpa_avg: row.rpa_avg,
+          otd_pct: row.otd_pct,
+          ftr_pct: null,
+          cycle_time_avg_days: null,
+          cycle_time_variance: null,
+          throughput_count: null,
+          pipeline_velocity: null,
+          stuck_asset_count: null,
+          stuck_asset_pct: null
+        }),
+        'otd_pct'
+      ),
       assetsActivos: toNumber(row.assets_activos),
       feedbackPendiente: toNumber(row.feedback_pendiente),
       projectCount: toNumber(row.project_count),
@@ -578,17 +710,24 @@ export const getAgencyDeliveryTrend = async (months = 6): Promise<AgencyDelivery
   try {
     const [rows] = await bq.query({
       query: `
-        SELECT
-          period_year,
-          period_month,
-          ROUND(SAFE_DIVIDE(SUM(on_time_count), NULLIF(SUM(on_time_count) + SUM(late_drop_count) + SUM(overdue_count), 0)) * 100, 1) AS otd_pct,
-          AVG(rpa_avg) AS rpa_avg,
-          AVG(ftr_pct) AS ftr_pct,
-          SUM(total_tasks) AS total_tasks,
-          SUM(completed_tasks) AS completed_tasks,
-          SUM(stuck_asset_count) AS stuck_asset_count
-        FROM \`${projectId}.ico_engine.metric_snapshots_monthly\`
-        GROUP BY period_year, period_month
+      SELECT
+        period_year,
+        period_month,
+        ROUND(SAFE_DIVIDE(SUM(on_time_count), NULLIF(SUM(on_time_count) + SUM(late_drop_count) + SUM(overdue_count), 0)) * 100, 1) AS otd_pct,
+        ROUND(SAFE_DIVIDE(SUM(COALESCE(rpa_avg, 0) * COALESCE(rpa_eligible_task_count, 0)), NULLIF(SUM(COALESCE(rpa_eligible_task_count, 0)), 0)), 2) AS rpa_avg,
+        ROUND(SAFE_DIVIDE(SUM(COALESCE(ftr_pct, 0) * COALESCE(completed_tasks, 0)), NULLIF(SUM(COALESCE(completed_tasks, 0)), 0)), 2) AS ftr_pct,
+        SUM(rpa_eligible_task_count) AS rpa_eligible_task_count,
+        SUM(rpa_missing_task_count) AS rpa_missing_task_count,
+        SUM(rpa_non_positive_task_count) AS rpa_non_positive_task_count,
+        SUM(total_tasks) AS total_tasks,
+        SUM(completed_tasks) AS completed_tasks,
+        SUM(active_tasks) AS active_tasks,
+        SUM(on_time_count) AS on_time_count,
+        SUM(late_drop_count) AS late_drop_count,
+        SUM(overdue_count) AS overdue_count,
+        SUM(stuck_asset_count) AS stuck_asset_count
+      FROM \`${projectId}.ico_engine.metric_snapshots_monthly\`
+      GROUP BY period_year, period_month
         ORDER BY period_year DESC, period_month DESC
         LIMIT @months
       `,
@@ -602,6 +741,48 @@ export const getAgencyDeliveryTrend = async (months = 6): Promise<AgencyDelivery
         otdPct: toNullableNumber(r.otd_pct),
         rpaAvg: toNullableNumber(r.rpa_avg),
         ftrPct: toNullableNumber(r.ftr_pct),
+        rpaMetric: toAgencyMetricSignal(
+          buildAgencyMetricAggregateRow(r, {
+            rpa_avg: r.rpa_avg,
+            otd_pct: r.otd_pct,
+            ftr_pct: r.ftr_pct,
+            cycle_time_avg_days: null,
+            cycle_time_variance: null,
+            throughput_count: null,
+            pipeline_velocity: null,
+            stuck_asset_count: r.stuck_asset_count,
+            stuck_asset_pct: null
+          }),
+          'rpa'
+        ),
+        otdMetric: toAgencyMetricSignal(
+          buildAgencyMetricAggregateRow(r, {
+            rpa_avg: r.rpa_avg,
+            otd_pct: r.otd_pct,
+            ftr_pct: r.ftr_pct,
+            cycle_time_avg_days: null,
+            cycle_time_variance: null,
+            throughput_count: null,
+            pipeline_velocity: null,
+            stuck_asset_count: r.stuck_asset_count,
+            stuck_asset_pct: null
+          }),
+          'otd_pct'
+        ),
+        ftrMetric: toAgencyMetricSignal(
+          buildAgencyMetricAggregateRow(r, {
+            rpa_avg: r.rpa_avg,
+            otd_pct: r.otd_pct,
+            ftr_pct: r.ftr_pct,
+            cycle_time_avg_days: null,
+            cycle_time_variance: null,
+            throughput_count: null,
+            pipeline_velocity: null,
+            stuck_asset_count: r.stuck_asset_count,
+            stuck_asset_pct: null
+          }),
+          'ftr_pct'
+        ),
         totalTasks: toNumber(r.total_tasks),
         completedTasks: toNumber(r.completed_tasks),
         stuckAssetCount: toNumber(r.stuck_asset_count)

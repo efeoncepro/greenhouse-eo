@@ -79,9 +79,9 @@ Reglas obligatorias:
 
 - `docs/tasks/to-do/TASK-213-ico-metrics-hardening-trust-model.md`
 - `docs/tasks/complete/TASK-214-ico-completion-semantics-bucket-normalization.md`
-- `docs/tasks/to-do/TASK-215-ico-rpa-reliability-source-policy-fallbacks.md`
-- `docs/tasks/to-do/TASK-216-ico-metric-trust-model-benchmark-quality-gates.md`
-- `docs/tasks/to-do/TASK-217-agency-kpi-trust-propagation-serving-semantics.md`
+- `docs/tasks/complete/TASK-215-ico-rpa-reliability-source-policy-fallbacks.md`
+- `docs/tasks/complete/TASK-216-ico-metric-trust-model-benchmark-quality-gates.md`
+- `docs/tasks/complete/TASK-217-agency-kpi-trust-propagation-serving-semantics.md`
 - `docs/tasks/to-do/TASK-218-ico-time-to-market-activation-evidence-contract.md`
 - `docs/tasks/to-do/TASK-219-ico-iteration-velocity-experimentation-signal-contract.md`
 - `docs/tasks/to-do/TASK-220-ico-brief-clarity-score-intake-governance.md`

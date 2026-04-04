@@ -1,5 +1,19 @@
 # changelog.md
 
+## 2026-04-04
+
+- **TASK-217 Agency trust propagation closed end-to-end**:
+  - `Agency > Pulse`, `Agency > Delivery` y `Agency > ICO Engine` ya consumen trust metadata del `ICO Engine` sin recalcular fórmulas ni reinterpretar KPIs localmente
+  - `src/lib/agency/agency-queries.ts` ahora publica `rpaMetric`, `otdMetric` y `ftrMetric` con `benchmarkType`, `qualityGateStatus`, `confidenceLevel`, `dataStatus` y evidencia resumida
+  - se creó `src/components/agency/metric-trust.tsx` como helper shared para estados `Dato confiable`, `Dato degradado` y `Sin dato confiable`
+  - `Agency > Delivery` y `Agency > Pulse` ya dejaron de depender de semáforos hardcodeados para `OTD` y `RpA`
+  - además se corrigió un bug semántico en los aggregates Agency-level:
+    - `OTD` ya no se promedia por `space` cuando corresponde agregar counts
+    - `RpA` mensual ahora pondera por `rpa_eligible_task_count`
+    - `FTR` mensual ahora pondera por `completed_tasks`
+  - `TASK-160` quedó actualizada para tratar esta lane como foundation downstream cerrada, no como gap pendiente
+  - verificado con `pnpm exec vitest run src/lib/agency/agency-queries.test.ts src/lib/agency/space-360.test.ts`, `pnpm exec eslint ...`, `pnpm exec tsc --noEmit --pretty false`, `rg -n "new Pool\\(" src`, `pnpm lint` y `pnpm build`
+
 ## 2026-04-03
 
 - **TASK-216 ICO trust model implemented end-to-end**:

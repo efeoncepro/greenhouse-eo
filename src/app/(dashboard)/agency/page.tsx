@@ -23,10 +23,12 @@ const deriveKpisFromSpaces = (spaces: AgencySpaceHealth[]): AgencyPulseKpis => {
     rpaGlobal: withRpa.length > 0
       ? withRpa.reduce((sum, s) => sum + (s.rpaAvg ?? 0), 0) / withRpa.length
       : null,
+    rpaMetric: null,
     assetsActivos: spaces.reduce((sum, s) => sum + s.assetsActivos, 0),
     otdPctGlobal: withOtd.length > 0
       ? withOtd.reduce((sum, s) => sum + (s.otdPct ?? 0), 0) / withOtd.length
       : null,
+    otdMetric: null,
     feedbackPendiente: spaces.reduce((sum, s) => sum + s.feedbackPendiente, 0),
     totalSpaces: spaces.length,
     totalProjects: spaces.reduce((sum, s) => sum + s.projectCount, 0),

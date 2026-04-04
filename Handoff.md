@@ -1,5 +1,103 @@
 # Handoff.md
 
+## Sesión 2026-04-04 — TASK-217 implementada y verificada
+
+### Rama / alcance
+
+- rama actual: `feature/codex-task-217-agency-trust-propagation`
+- scope principal:
+  - `src/lib/agency/agency-queries.ts`
+  - `src/lib/agency/agency-queries.test.ts`
+  - `src/lib/ico-engine/read-metrics.ts`
+  - `src/components/agency/metric-trust.tsx`
+  - `src/components/agency/PulseGlobalKpis.tsx`
+  - `src/components/agency/SpaceHealthTable.tsx`
+  - `src/components/agency/IcoGlobalKpis.tsx`
+  - `src/components/agency/SpaceIcoScorecard.tsx`
+  - `src/views/agency/AgencyDeliveryView.tsx`
+  - `src/app/(dashboard)/agency/page.tsx`
+  - `src/lib/agency/space-360.ts`
+  - lifecycle/docs:
+    - `docs/tasks/complete/TASK-217-agency-kpi-trust-propagation-serving-semantics.md`
+    - `docs/tasks/README.md`
+    - `docs/tasks/TASK_ID_REGISTRY.md`
+    - `docs/tasks/to-do/TASK-160-agency-enterprise-hardening.md`
+    - `docs/changelog/CLIENT_CHANGELOG.md`
+    - `changelog.md`
+
+### Resultado
+
+- `TASK-217` queda cerrada.
+- `Agency > Pulse`, `Agency > Delivery` y `Agency > ICO Engine` ya propagan trust metadata upstream (`benchmarkType`, `qualityGateStatus`, `confidenceLevel`, `dataStatus`, evidencia) en vez de depender de números crudos o semáforos locales.
+- Se creó `src/components/agency/metric-trust.tsx` como capa shared para:
+  - tono visual
+  - labels de estado
+  - chips con tooltip
+  - footers de benchmark/confianza/muestra
+- `src/lib/agency/agency-queries.ts` ya no agrega `OTD`/`RpA` de forma engañosa promediando por `space` cuando la semántica correcta requiere agregación o weighting.
+- `TASK-160` queda actualizada con delta para tratar esta lane como foundation cerrada de semántica trust-aware en consumers Agency.
+- No se abrió migración nueva:
+  - el trust model ya existía upstream por `TASK-216`
+  - el trabajo de `TASK-217` fue consumer cutover + response shaping + UI semantics
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/agency/agency-queries.test.ts src/lib/agency/space-360.test.ts`
+- `pnpm exec eslint src/lib/agency/agency-queries.ts src/components/agency/metric-trust.tsx src/components/agency/PulseGlobalKpis.tsx src/components/agency/SpaceHealthTable.tsx src/components/agency/IcoGlobalKpis.tsx src/components/agency/SpaceIcoScorecard.tsx src/views/agency/AgencyDeliveryView.tsx src/app/(dashboard)/agency/page.tsx src/lib/agency/space-360.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `rg -n "new Pool\\(" src`
+- `pnpm lint`
+- `pnpm build`
+
+### Riesgos / follow-on no bloqueantes
+
+- `src/app/api/ico-engine/metrics/agency/route.ts` con `live=true` sigue siendo un carril separado del consumer Agency directo y puede requerir alineación de scope/freshness en una lane posterior.
+- `src/lib/ico-engine/performance-report.ts` todavía usa un enum local de confidence con `low`, mientras el helper genérico Agency opera además con estados UI derivados; no bloquea `TASK-217`, pero conviene convergerlo después.
+
+## Sesión 2026-04-04 — TASK-217 auditada y corregida antes de implementación
+
+### Rama / alcance
+
+- rama actual: `develop`
+- scope:
+  - `docs/tasks/complete/TASK-217-agency-kpi-trust-propagation-serving-semantics.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `Handoff.md`
+  - auditoría runtime sobre:
+    - `src/lib/agency/agency-queries.ts`
+    - `src/views/agency/AgencyDeliveryView.tsx`
+    - `src/views/agency/AgencyPulseView.tsx`
+    - `src/components/agency/*`
+    - `src/lib/ico-engine/read-metrics.ts`
+    - `src/lib/ico-engine/metric-trust-policy.ts`
+    - `src/lib/ico-engine/performance-report.ts`
+    - `src/app/api/agency/pulse/route.ts`
+    - `src/app/api/agency/spaces/route.ts`
+    - `src/app/api/ico-engine/metrics/agency/route.ts`
+    - `docs/architecture/schema-snapshot-baseline.sql`
+    - `migrations/20260404011307094_ico-serving-trust-metadata.sql`
+
+### Resultado
+
+- `TASK-217` quedó movida a `in-progress` tras discovery/auditoría real del repo.
+- La spec se corrigió para dejar explícito que:
+  - el trust runtime ya existe en `ICO` y en serving (`metric_trust_json`)
+  - el gap real no es crear un contrato base nuevo, sino propagarlo en `Agency`
+  - `Pulse` y `Delivery` siguen en readers legacy con números crudos
+  - `Agency > ICO Engine` ya consume readers canónicos pero todavía no renderiza trust de forma explícita
+- No se implementó código todavía en esta pasada; solo se corrigió el contrato operativo para evitar construir sobre supuestos rotos.
+
+### Verificación
+
+- revisión manual de consistencia contra:
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_AGENCY_LAYER_V2.md`
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+  - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+  - `docs/architecture/schema-snapshot-baseline.sql`
+  - runtime actual en `Agency`, `ICO` y serving PostgreSQL
+
 ## Sesión 2026-04-03 — TASK-216 implementada y verificada
 
 ### Rama / alcance
@@ -474,7 +572,7 @@
   - `docs/tasks/to-do/TASK-214-ico-completion-semantics-bucket-normalization.md`
   - `docs/tasks/to-do/TASK-215-ico-rpa-reliability-source-policy-fallbacks.md`
   - `docs/tasks/to-do/TASK-216-ico-metric-trust-model-benchmark-quality-gates.md`
-  - `docs/tasks/to-do/TASK-217-agency-kpi-trust-propagation-serving-semantics.md`
+  - `docs/tasks/complete/TASK-217-agency-kpi-trust-propagation-serving-semantics.md`
   - `Handoff.md`
 
 ### Resultado

@@ -12,6 +12,7 @@ import CardHeader from '@mui/material/CardHeader'
 import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
+import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 
@@ -23,6 +24,15 @@ import classnames from 'classnames'
 
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import {
+  AgencyMetricStatusChip,
+  getAgencyMetricFooterLabel,
+  getAgencyMetricStatusColor,
+  getAgencyMetricStatusLabel,
+  getAgencyMetricSupportLabel,
+  getAgencyMetricTone
+} from '@/components/agency/metric-trust'
+import type { AgencyDeliveryTrendMonth, AgencyPulseKpis, AgencySpaceHealth } from '@/lib/agency/agency-queries'
 
 import tableStyles from '@core/styles/table.module.css'
 
@@ -30,35 +40,9 @@ const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexChart
 
 // ── Types ──
 
-interface SpaceHealth {
-  clientId: string
-  clientName: string
-  rpaAvg: number | null
-  otdPct: number | null
-  assetsActivos: number
-  projectCount: number
-  totalTasks?: number
-}
-
-interface PulseKpis {
-  rpaGlobal: number | null
-  otdPctGlobal: number | null
-  assetsActivos: number
-  feedbackPendiente: number
-  totalSpaces: number
-  totalProjects: number
-}
-
-interface TrendMonth {
-  year: number
-  month: number
-  otdPct: number | null
-  rpaAvg: number | null
-  ftrPct: number | null
-  totalTasks: number
-  completedTasks: number
-  stuckAssetCount: number
-}
+type SpaceHealth = AgencySpaceHealth
+type PulseKpis = AgencyPulseKpis
+type TrendMonth = AgencyDeliveryTrendMonth
 
 // ── Helpers ──
 
@@ -127,15 +111,21 @@ const spaceColumns: ColumnDef<SpaceHealth, any>[] = [
   }),
   spaceColumnHelper.accessor('otdPct', {
     header: 'OTD',
-    cell: ({ getValue }) => (
-      <CustomChip round='true' size='small' variant='tonal' color={pctSemaphore(getValue()).color} label={fmtPct(getValue())} />
+    cell: ({ getValue, row }) => (
+      <Stack spacing={0.5} alignItems='flex-start'>
+        <CustomChip round='true' size='small' variant='tonal' color={getAgencyMetricTone(row.original.otdMetric)} label={fmtPct(getValue())} />
+        <AgencyMetricStatusChip metric={row.original.otdMetric} />
+      </Stack>
     ),
     meta: { align: 'center' }
   }),
   spaceColumnHelper.accessor('rpaAvg', {
     header: 'RpA',
-    cell: ({ getValue }) => (
-      <CustomChip round='true' size='small' variant='tonal' color={rpaColor(getValue()).color} label={fmtRpa(getValue())} />
+    cell: ({ getValue, row }) => (
+      <Stack spacing={0.5} alignItems='flex-start'>
+        <CustomChip round='true' size='small' variant='tonal' color={getAgencyMetricTone(row.original.rpaMetric)} label={fmtRpa(getValue())} />
+        <AgencyMetricStatusChip metric={row.original.rpaMetric} />
+      </Stack>
     ),
     meta: { align: 'center' }
   }),
@@ -235,11 +225,12 @@ const AgencyDeliveryView = () => {
 
   const rpa = kpis?.rpaGlobal ?? null
   const otd = kpis?.otdPctGlobal ?? null
+  const rpaMetric = kpis?.rpaMetric ?? null
+  const otdMetric = kpis?.otdMetric ?? null
   const activeAssets = kpis?.assetsActivos ?? 0
   const feedback = kpis?.feedbackPendiente ?? 0
   const totalProjects = kpis?.totalProjects ?? 0
   const otdS = pctSemaphore(otd)
-  const rpaS = rpaColor(rpa)
   const spacesWithActiveAssets = spaces.filter(s => s.assetsActivos > 0).length
   const latestCompleted = trend.length > 0 ? trend[trend.length - 1].completedTasks : 0
 
@@ -301,7 +292,7 @@ const AgencyDeliveryView = () => {
                   return d ? (
                     <CustomChip round='true' variant='tonal' size='small' color={d.direction === 'positive' ? 'success' : d.direction === 'negative' ? 'error' : 'secondary'} label={d.text} />
                   ) : (
-                    <CustomChip round='true' variant='tonal' size='small' color={otdS.color} label={otdS.label} />
+                    <CustomChip round='true' variant='tonal' size='small' color={getAgencyMetricStatusColor(otdMetric)} label={getAgencyMetricStatusLabel(otdMetric)} />
                   )
                 })()}
               </div>
@@ -336,6 +327,13 @@ const AgencyDeliveryView = () => {
               />
             )}
           </CardContent>
+          <Divider />
+          <Box sx={{ px: 6, py: 3, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
+            <AgencyMetricStatusChip metric={otdMetric} />
+            <Typography variant='caption' color='text.secondary'>
+              {getAgencyMetricFooterLabel(otdMetric)}
+            </Typography>
+          </Box>
         </Card>
       </Grid>
 
@@ -349,22 +347,23 @@ const AgencyDeliveryView = () => {
               title='RpA promedio'
               stats={fmtRpa(rpa)}
               avatarIcon='tabler-chart-line'
-              avatarColor={rpaS.color}
+              avatarColor={getAgencyMetricTone(rpaMetric)}
               trend={d?.direction}
               trendNumber={d?.number}
-              subtitle={d ? `${d.text}` : 'Revisiones por activo'}
-              statusLabel={rpaS.label}
-              statusColor={rpaS.color}
-              statusIcon={rpaS.color === 'success' ? 'tabler-circle-check' : rpaS.color === 'error' ? 'tabler-alert-circle' : 'tabler-alert-triangle'}
-              footer='Menos es mejor. Meta: ≤1.5'
+              subtitle={d ? `${d.text}` : getAgencyMetricSupportLabel(rpaMetric)}
+              statusLabel={getAgencyMetricStatusLabel(rpaMetric)}
+              statusColor={getAgencyMetricStatusColor(rpaMetric)}
+              statusIcon={getAgencyMetricStatusColor(rpaMetric) === 'success' ? 'tabler-circle-check' : getAgencyMetricStatusColor(rpaMetric) === 'warning' ? 'tabler-alert-triangle' : 'tabler-info-circle'}
+              footer={getAgencyMetricFooterLabel(rpaMetric)}
             />
           )
         })()}
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
         {(() => {
-          const ftrVal = trend.length > 0 ? trend[trend.length - 1].ftrPct : null
-          const ftrS = pctSemaphore(ftrVal)
+          const latestTrend = trend.length > 0 ? trend[trend.length - 1] : null
+          const ftrVal = latestTrend?.ftrPct ?? null
+          const ftrMetric = latestTrend?.ftrMetric ?? null
           const d = trendDelta(trend, 'ftrPct')
 
           return (
@@ -372,14 +371,14 @@ const AgencyDeliveryView = () => {
               title='FTR'
               stats={fmtPct(ftrVal)}
               avatarIcon='tabler-target-arrow'
-              avatarColor={ftrS.color}
+              avatarColor={getAgencyMetricTone(ftrMetric)}
               trend={d?.direction}
               trendNumber={d?.number}
-              subtitle={d ? `${d.text}` : 'Primera entrega correcta'}
-              statusLabel={ftrS.label}
-              statusColor={ftrS.color}
-              statusIcon={ftrS.color === 'success' ? 'tabler-circle-check' : ftrS.color === 'error' ? 'tabler-alert-circle' : 'tabler-alert-triangle'}
-              footer='Sin rondas de cambio. Meta: ≥80%'
+              subtitle={d ? `${d.text}` : getAgencyMetricSupportLabel(ftrMetric)}
+              statusLabel={getAgencyMetricStatusLabel(ftrMetric)}
+              statusColor={getAgencyMetricStatusColor(ftrMetric)}
+              statusIcon={getAgencyMetricStatusColor(ftrMetric) === 'success' ? 'tabler-circle-check' : getAgencyMetricStatusColor(ftrMetric) === 'warning' ? 'tabler-alert-triangle' : 'tabler-info-circle'}
+              footer={getAgencyMetricFooterLabel(ftrMetric)}
             />
           )
         })()}
