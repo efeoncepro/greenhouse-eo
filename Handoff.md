@@ -1,5 +1,38 @@
 # Handoff.md
 
+## Sesión 2026-04-04 — TASK-241 ICO Batch Worker Cloud Run Service
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: Cloud Run service para batch processing ICO, Dockerfile, deploy script, Cloud Scheduler
+
+### Qué se hizo
+
+- Creado `services/ico-batch/server.ts` — HTTP server standalone con Node.js nativo
+- Endpoints: `GET /health`, `POST /ico/materialize`, `POST /ico/llm-enrich`
+- `services/ico-batch/Dockerfile` — Node.js 22-slim, tsx runtime, `--conditions=react-server` para shim server-only
+- `services/ico-batch/deploy.sh` — gcloud run deploy + Cloud Scheduler jobs (IAM OIDC)
+- Documentado en §4 y §5 de `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
+- Delta en `Greenhouse_ICO_Engine_v1.md`
+- Eliminado endpoint temporal `ico-llm-rematerialize`
+- Política §1.1 Workload Placement formalizada (sesión anterior)
+
+### Pendiente operacional
+
+- Ejecutar `bash services/ico-batch/deploy.sh` para deploy real en GCP
+- Verificar health check y primer run manual
+- Re-materializar TASK-239 Slice 4 (Feb/Mar/Abr 2026) vía el nuevo servicio
+- Tras período de transición (2 semanas), deshabilitar crons redundantes en `vercel.json`
+
+### Verificación
+
+- `pnpm tsc --noEmit` — OK
+- `pnpm lint` — OK
+- `pnpm build` — OK
+
+---
+
 ## Sesión 2026-04-04 — TASK-239 Nexa Insights Prompt Enrichment
 
 ### Rama / alcance

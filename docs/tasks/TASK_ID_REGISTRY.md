@@ -290,4 +290,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-238` | `to-do` | Agency Workspace & Space 360: Data Storytelling UX | `docs/tasks/to-do/TASK-238-agency-workspace-data-storytelling-ux.md` |
 | `TASK-239` | `to-do` | Nexa Insights: Prompt Enrichment con Glosario de Métricas y Cadena Causal | `docs/tasks/to-do/TASK-239-nexa-advisory-prompt-enrichment-metric-glossary.md` |
 | `TASK-240` | `to-do` | Nexa Insights: Menciones Interactivas de Spaces y Miembros | `docs/tasks/to-do/TASK-240-nexa-insights-entity-mentions.md` |
-| `TASK-241` | `to-do` | Migrar procesos batch pesados a Cloud Run | `docs/tasks/to-do/TASK-241-batch-processes-cloud-run-migration.md` |
+| `TASK-241` | `in-progress` | Migrar procesos batch pesados a Cloud Run | `docs/tasks/in-progress/TASK-241-batch-processes-cloud-run-migration.md` |
