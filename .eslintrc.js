@@ -2,6 +2,7 @@ module.exports = {
   extends: ['next/core-web-vitals', 'plugin:@typescript-eslint/recommended', 'plugin:import/recommended', 'prettier'],
   ignorePatterns: [
     'next-env.d.ts',
+    'src/types/db.d.ts',
     '.next/**',
     'node_modules/**',
     'full-version/**',
