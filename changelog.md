@@ -2,6 +2,16 @@
 
 ## 2026-04-04
 
+- **TASK-222 Creative Velocity Review runtime contract implemented**:
+  - `ICO` ya tiene un contrato runtime inicial de `CVR` en `src/lib/ico-engine/creative-velocity-review.ts`
+  - el contrato compone `TTM`, `Iteration Velocity`, `Revenue Enabled`, estructura del review, matriz `Basic / Pro / Enterprise` y guardrails de narrativa
+  - `Creative Hub` ahora hidrata ese contrato en su surface client-facing con `CVR structure`, `Tier visibility` y `Narrative guardrails`
+  - la hero narrative del módulo deja de ser solo operacional y ahora explicita la separación entre drivers, métricas puente y `Revenue Enabled`
+  - no se creó migración nueva:
+    - la matriz por tier sigue siendo editorial
+    - todavía no existe entitlement runtime persistido para `Basic`, `Pro` o `Enterprise`
+  - verificado con `pnpm exec vitest run src/lib/capability-queries/creative-cvr.test.ts src/lib/ico-engine/creative-velocity-review.test.ts`, `pnpm exec tsc --noEmit --pretty false`, `pnpm lint` y `pnpm build`
+
 - **TASK-221 Revenue Enabled measurement model implemented**:
   - `ICO` ya tiene un helper canónico inicial para `Revenue Enabled` en `src/lib/ico-engine/revenue-enabled.ts`
   - el contrato compone las palancas sobre foundations reales (`TTM`, `Iteration Velocity`, `throughput`) y ya distingue `observed`, `range`, `estimated` y `unavailable`

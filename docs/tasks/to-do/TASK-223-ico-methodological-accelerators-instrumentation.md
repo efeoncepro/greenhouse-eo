@@ -1,5 +1,13 @@
 # TASK-223 - ICO Methodological Accelerators Instrumentation
 
+## Delta 2026-04-04 — TASK-222 cerró el primer host visible de CVR
+
+- `TASK-222` ya dejó el primer contrato runtime de `CVR` y su host client-facing real en `Creative Hub`.
+- Regla nueva para `TASK-223`:
+  - cualquier futura instrumentación metodológica debe enchufarse a ese bloque `CVR` y no abrir otra surface paralela para narrativa enterprise
+  - la matriz `Basic / Pro / Enterprise` sigue siendo editorial; no se puede asumir entitlement runtime por tier al proponer nuevas señales
+  - si una hipótesis metodológica impacta `Revenue Enabled`, debe convivir con los guardrails ya visibles de `CVR` y no degradarlos
+
 ## Delta 2026-04-04
 
 - `TASK-221` ya cerró la policy inicial de `Revenue Enabled` y su distinción explícita entre `observed`, `range`, `estimated` y `unavailable`.

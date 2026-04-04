@@ -42,14 +42,14 @@ type ModuleContent = {
 const buildCreativeContent = ({ snapshot }: BuilderArgs): ModuleContent => ({
   hero: {
     eyebrow: 'Creative capability',
-    title: 'Creative delivery, revision y salida visibles en una sola superficie.',
+    title: 'Creative delivery, growth signal y guardrails visibles en una sola superficie.',
     description:
-      'Este modulo condensa la lectura ejecutiva para cuentas creativas sin abrir una pared de tablas. Prioriza revision, volumen de salida y friccion del portfolio.',
-    summaryLabel: 'Piezas entregadas',
+      'Este modulo prepara la conversacion tipo Creative Velocity Review para cuentas creativas. Separa drivers operativos, metricas puente y Revenue Enabled sin vender precision falsa.',
+    summaryLabel: 'Output visible',
     summaryValue: formatInteger(snapshot.summary.completedLast30Days),
     summaryDetail: `${formatInteger(snapshot.summary.reviewPressureTasks)} items esperan revision y ${formatInteger(
       snapshot.summary.openFrameComments
-    )} comentarios siguen abiertos.`,
+    )} comentarios siguen abiertos. El resto del review baja esa senal a narrativa trimestral y policy visible.`,
     highlights: [
       { label: 'Portfolio visible', value: formatInteger(snapshot.scope.projectCount) },
       { label: 'En revision', value: formatInteger(snapshot.summary.reviewPressureTasks) },

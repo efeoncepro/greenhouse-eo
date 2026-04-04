@@ -7,6 +7,7 @@ export type CapabilityModuleCardType =
   | 'tooling-list'
   | 'quality-list'
   | 'metric-list'
+  | 'tier-matrix'
   | 'chart-bar'
   | 'section-header'
   | 'pipeline'
@@ -98,6 +99,21 @@ export interface CapabilityMetricListItem {
   detail: string
 }
 
+export interface CapabilityTierMatrixCell {
+  label: string
+  tone: 'success' | 'warning' | 'info' | 'default'
+  detail?: string
+}
+
+export interface CapabilityTierMatrixRow {
+  id: string
+  metric: string
+  basic: CapabilityTierMatrixCell
+  pro: CapabilityTierMatrixCell
+  enterprise: CapabilityTierMatrixCell
+  note?: string
+}
+
 export interface CapabilityBarChartSeries {
   name: string
   data: number[]
@@ -144,6 +160,7 @@ export type CapabilityCardData =
   | { type: 'tooling-list'; items: CapabilityToolItem[] }
   | { type: 'quality-list'; items: CapabilityQualityItem[] }
   | { type: 'metric-list'; items: CapabilityMetricListItem[] }
+  | { type: 'tier-matrix'; intro: string; rows: CapabilityTierMatrixRow[]; footnote?: string }
   | { type: 'chart-bar'; chart: CapabilityBarChartData }
   | { type: 'section-header'; subtitle: string; icon: string }
   | { type: 'pipeline'; phases: CapabilityPipelinePhase[]; total: number }

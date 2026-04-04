@@ -1,5 +1,22 @@
 # Contrato de métricas ICO
 
+## Delta 2026-04-04 — TASK-222 formaliza el contrato inicial de Creative Velocity Review
+
+`TASK-222` deja el primer contrato runtime de `CVR` y lo baja a una surface client-facing real dentro de `Creative Hub`.
+
+- el `CVR` ya no vive solo como doctrina documental:
+  - existe contrato runtime inicial
+  - existe matriz visible `Basic / Pro / Enterprise`
+  - existen guardrails explícitos para narrativa client-facing
+- regla vigente:
+  - la visibilidad por tier sigue siendo un contrato editorial de comunicación
+  - todavía no existe un entitlement runtime persistido para `Basic`, `Pro` o `Enterprise`
+  - por lo tanto, el portal hoy puede mostrar la matriz y sus límites, pero no hacer hard-gating comercial real por tier
+- implicaciones inmediatas:
+  - `Creative Hub` pasa a separar explícitamente drivers operativos, métricas puente y `Revenue Enabled`
+  - `Early Launch` sigue controlado por el contrato de `TTM`; si la scope no trae evidencia suficiente, debe quedar `unavailable`
+  - `Iteration` y `Throughput` ya no pueden venderse como revenue observado cuando la evidencia siga en `proxy` o `estimated`
+
 ## Delta 2026-04-04 — TASK-221 formaliza el measurement model inicial de Revenue Enabled
 
 `TASK-221` no convierte todavía `Revenue Enabled` en un KPI universal con monto total por tenant, pero sí cierra su primer contrato defendible de medición y atribución.
@@ -374,6 +391,8 @@ La **Creative Velocity Review** es el rito trimestral donde Globe presenta al cl
 - Supuestos explícitos cuando la atribución no es directa.
 - RE presentado como "observado" + "estimado (rango)".
 - El CVR es también el momento para detectar oportunidades de cross-sell hacia otras unidades del ecosistema Efeonce.
+- En runtime Greenhouse, el primer host visible del `CVR` es `Creative Hub`; hoy funciona como surface client-facing y no como publicación trimestral persistida independiente.
+- La matriz `Basic / Pro / Enterprise` se trata hoy como contrato editorial de visibilidad. No existe todavía un hard-gating canónico por tier comercial en sesión, tenant context ni base de datos.
 
 > *El CVR eleva la relación de proveedor a partnership de crecimiento. Es lo que diferencia a Globe de una agencia que manda un informe mensual de vanity metrics.*
 

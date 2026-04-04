@@ -4,7 +4,7 @@ export const CAPABILITY_REGISTRY: CapabilityModuleDefinition[] = [
   {
     id: 'creative-hub',
     label: 'Creative Hub',
-    description: 'Lectura ejecutiva para cuentas creativas con foco en revision, salida y friccion del portfolio.',
+    description: 'Lectura ejecutiva para cuentas creativas con CVR, guardrails de narrativa y foco en revision, salida y friccion del portfolio.',
     icon: 'tabler-palette',
     route: '/capabilities/creative-hub',
     priority: 10,
@@ -94,6 +94,34 @@ export const CAPABILITY_REGISTRY: CapabilityModuleDefinition[] = [
         type: 'metrics-row',
         size: 'full',
         description: 'Early Launch, Iteration, Throughput y policy de atribucion con evidencia explicita.'
+      },
+      {
+        id: 'cvr-header',
+        title: 'Creative Velocity Review',
+        type: 'section-header',
+        size: 'full',
+        description: 'El rito trimestral donde la operacion creativa se traduce a una conversacion de crecimiento.'
+      },
+      {
+        id: 'creative-cvr-structure',
+        title: 'CVR structure',
+        type: 'metric-list',
+        size: 'lg',
+        description: 'La secuencia recomendada para sostener un review trimestral con signal, contexto y siguiente paso.'
+      },
+      {
+        id: 'creative-tier-visibility',
+        title: 'Tier visibility',
+        type: 'tier-matrix',
+        size: 'full',
+        description: 'Que puede comunicarse por tier sin mezclar drivers, metricas puente y Revenue Enabled.'
+      },
+      {
+        id: 'creative-narrative-guardrails',
+        title: 'Narrative guardrails',
+        type: 'metric-list',
+        size: 'md',
+        description: 'Reglas para no vender datos inmaduros como si fueran promesas fuertes.'
       },
 
       // ── Brand Intelligence ─────────────────────────────────────────

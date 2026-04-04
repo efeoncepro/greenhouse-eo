@@ -42,6 +42,32 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.7
+
+**Canal:** Beta
+**Fecha:** 2026-04-04
+**Disponible para:** internal
+**Módulos:** Capabilities / Creative Hub / ICO
+
+### Novedades
+
+- `Creative Hub` ahora expone el primer bloque visible de `Creative Velocity Review (CVR)` dentro del portal.
+
+### Mejoras
+
+- La vista separa mejor drivers operativos, métricas puente y `Revenue Enabled`.
+- La surface ya incluye una matriz visible de `Basic / Pro / Enterprise` y guardrails de narrativa para explicar qué puede comunicarse sin vender humo.
+- `Revenue Enabled` ahora se alimenta desde un contrato `CVR` único, en vez de repartir semántica entre cards sueltas.
+
+### Correcciones
+
+- `Creative Hub` deja de tratar `CVR` como copy aspiracional sin wiring real.
+- `Early Launch` ya no se sugiere como señal fuerte cuando la scope actual no trae evidencia suficiente de `TTM`.
+
+### Notas
+
+- La matriz por tier sigue siendo editorial: todavía no existe hard-gating comercial persistido para `Basic`, `Pro` o `Enterprise` dentro del runtime del portal.
+
 ## 2026.04-beta.6
 
 **Canal:** Beta

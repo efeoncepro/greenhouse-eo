@@ -1,5 +1,18 @@
 # EFEONCE GREENHOUSE™ — Capabilities Architecture
 
+## Delta 2026-04-04 — TASK-222 closes the first CVR client-facing surface
+
+- `Creative Hub` now hosts the first client-facing `Creative Velocity Review` block over the existing capabilities runtime.
+- The surface includes:
+  - `Creative Velocity Review` section header
+  - `CVR structure`
+  - `Tier visibility`
+  - `Narrative guardrails`
+- Important architectural rule:
+  - this does **not** introduce runtime commercial-tier entitlements
+  - capability activation still resolves through `businessLines` + `serviceModules`
+  - the `Basic / Pro / Enterprise` matrix is currently an editorial communication contract, not hard-gating in auth/session
+
 ## Especificación Técnica v1.0
 
 **Efeonce Group — Marzo 2026 — CONFIDENCIAL**

@@ -12,8 +12,7 @@ import type {
 } from '@/types/capabilities'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type { CreativeHubTask } from '@/lib/capability-queries/creative-hub-runtime'
-import { resolveIterationVelocityMetric } from '@/lib/ico-engine/iteration-velocity'
-import { buildRevenueEnabledMeasurementModel } from '@/lib/ico-engine/revenue-enabled'
+import type { CreativeVelocityReviewContract } from '@/lib/ico-engine/creative-velocity-review'
 import type { CapabilityModuleSnapshot, CapabilitySnapshotProject } from '@/lib/capability-queries/shared'
 import type { MetricsSummary } from '@/lib/ico-engine/read-metrics'
 
@@ -242,7 +241,7 @@ const formatDays = (value: number | null) => (value !== null ? `${Math.round(val
 const formatRatio = (value: number | null, suffix = 'x') => (value !== null ? `${Math.round(value * 10) / 10}${suffix}` : null)
 
 const buildIterationVelocityDescription = (
-  metric: ReturnType<typeof resolveIterationVelocityMetric>
+  metric: CreativeVelocityReviewContract['iterationVelocity']
 ) => {
   if (metric.dataStatus === 'unavailable') {
     return 'Sin evidencia suficiente para estimar iteraciones utiles cerradas en los ultimos 30 dias.'
@@ -255,7 +254,7 @@ const buildIterationVelocityDescription = (
   )} assets completados; ${formatInteger(metric.evidence.correctiveReworkTasks)} quedaron dominados por correccion.`
 }
 
-const formatRevenueEnabledClass = (value: ReturnType<typeof buildRevenueEnabledMeasurementModel>['attributionClass']) => {
+const formatRevenueEnabledClass = (value: CreativeVelocityReviewContract['revenueEnabled']['attributionClass']) => {
   switch (value) {
     case 'observed':
       return 'Observado'
@@ -269,7 +268,7 @@ const formatRevenueEnabledClass = (value: ReturnType<typeof buildRevenueEnabledM
 }
 
 const toneByRevenueEnabledClass = (
-  value: ReturnType<typeof buildRevenueEnabledMeasurementModel>['attributionClass']
+  value: CreativeVelocityReviewContract['revenueEnabled']['attributionClass']
 ): CapabilityMetricsRowItem['tone'] => {
   switch (value) {
     case 'observed':
@@ -313,29 +312,10 @@ const buildCreativeBrandConsistency = (tasks: CreativeHubTask[]) => {
 }
 
 export const buildCreativeRevenueCardData = (
-  _snapshot: CapabilityModuleSnapshot,
-  tasks: CreativeHubTask[],
-  icoSummary?: MetricsSummary | null
+  creativeVelocityReview: CreativeVelocityReviewContract
 ): CapabilityCardData => {
-  const iterationVelocity =
-    resolveIterationVelocityMetric({
-      tasks: tasks.map(task => ({
-        completedAt: task.completedAt,
-        frameVersions: task.frameVersions,
-        clientChangeRounds: task.clientChangeRounds,
-        workflowChangeRounds: task.workflowChangeRounds,
-        clientReviewOpen: task.clientReviewOpen,
-        workflowReviewOpen: task.workflowReviewOpen,
-        openFrameComments: task.openFrameComments
-      }))
-    })
-
-  const revenueEnabled = buildRevenueEnabledMeasurementModel({
-    iterationVelocity,
-    throughput: {
-      value: icoSummary?.throughput ?? null
-    }
-  })
+  const iterationVelocity = creativeVelocityReview.iterationVelocity
+  const revenueEnabled = creativeVelocityReview.revenueEnabled
 
   const earlyLaunch = revenueEnabled.levers.earlyLaunch
   const iteration = revenueEnabled.levers.iteration

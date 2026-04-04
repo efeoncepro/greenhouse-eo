@@ -1,5 +1,39 @@
 # TASK-222 - Creative Velocity Review, Tiered Metric Surfacing & Client Narrative
 
+## Delta 2026-04-04 — Implementación cerrada
+
+- `CVR` ya tiene contrato runtime inicial en `src/lib/ico-engine/creative-velocity-review.ts`.
+- `Creative Hub` ya hidrata ese contrato dentro de la surface existente de capabilities:
+  - `Creative Velocity Review`
+  - `CVR structure`
+  - `Tier visibility`
+  - `Narrative guardrails`
+- `Revenue Enabled` dentro de `Creative Hub` ahora cuelga del mismo contrato `CVR`, en vez de repartir semántica y guardrails entre helpers desconectados.
+- El hero/copy visible de `Creative Hub` ya separa drivers operativos, métricas puente y `Revenue Enabled`.
+- No se creó migración ni publication trimestral nueva:
+  - la matriz `Basic / Pro / Enterprise` queda formalizada como contrato editorial de visibilidad
+  - sigue pendiente una source policy/entitlement runtime real si se quiere hard-gating comercial por tier
+
+## Delta 2026-04-04 — Auditoría corregida antes de implementación
+
+- Discovery del repo corrigió supuestos operativos importantes:
+  - la lane client-facing no parte desde cero
+  - ya existe una surface real de capabilities en `/capabilities/[moduleId]`
+  - `Creative Hub` ya es un consumer visible y ya consume `Revenue Enabled` con policy canónica de `TASK-221`
+  - ya existe cadena de reporting/publication mensual:
+    - `ico_engine.performance_report_monthly`
+    - `greenhouse_serving.agency_performance_reports`
+    - `greenhouse_core.space_notion_publication_targets`
+    - `greenhouse_sync.notion_publication_runs`
+- Regla nueva para `TASK-222`:
+  - esta task debe reutilizar la infraestructura client-facing existente de capabilities y los readers canónicos de `ICO`
+  - no debe reabrir `Revenue Enabled`
+  - no debe recalcular métricas inline en UI/client consumers
+- Gap estructural confirmado:
+  - no existe hoy un modelo runtime persistido de tier comercial `Basic / Pro / Enterprise`
+  - el gating visible actual se resuelve por `businessLines` + `serviceModules`
+  - por lo tanto, si esta lane quiere gating real por tier, primero debe formalizar una source policy o mapping defendible
+
 ## Delta 2026-04-04
 
 - `TASK-221` ya cerró el primer measurement model canónico de `Revenue Enabled`.
@@ -26,11 +60,11 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
-- Status real: `Diseño`
+- Status real: `Cerrada`
 - Rank: `9`
 - Domain: `agency / ico / client-experience`
 
@@ -62,6 +96,8 @@ Revisar y respetar:
 - `docs/architecture/Contrato_Metricas_ICO_v1.md`
 - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
 - `docs/architecture/GREENHOUSE_AGENCY_LAYER_V2.md`
+- `docs/architecture/Greenhouse_Capabilities_Architecture_v1.md`
+- `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md`
 
 Reglas obligatorias:
@@ -89,9 +125,15 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `src/views/agency/*`
-- `src/lib/agency/*`
+- `src/config/capability-registry.ts`
+- `src/types/capabilities.ts`
+- `src/lib/capabilities/*`
+- `src/lib/capability-queries/*`
+- `src/components/capabilities/*`
+- `src/views/greenhouse/GreenhouseCapabilityModule.tsx`
+- `src/views/agency/*` como referencia internal, no como surface cliente por defecto
 - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+- `docs/architecture/Greenhouse_Capabilities_Architecture_v1.md`
 - `docs/changelog/CLIENT_CHANGELOG.md`
 
 ## Current Repo State
@@ -100,11 +142,16 @@ Reglas obligatorias:
 
 - el contrato maestro ya define el rito y los tiers
 - `Agency` ya tiene surfaces operativas de métricas
+- ya existe una surface client-facing real de capabilities tenant-scoped
+- `Creative Hub` ya expone una sección visible de `Revenue Enabled`
+- campañas ya exponen `TTM` como consumer client-facing controlado
 
 ### Gap actual
 
 - no existe CVR formalizado como contract de producto
 - no existe tiered surfacing alineado a confianza de dato
+- no existe contrato runtime explícito para `Basic / Pro / Enterprise`
+- el hero/copy visible de `Creative Hub` sigue siendo operacional y no un `CVR`
 - la narrativa client-facing aún no está pegada al serving real del portal
 
 ## Scope
@@ -131,10 +178,10 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Existe contrato formal de `CVR`
-- [ ] Existe matriz de visibilidad por tier alineada con madurez/confianza
-- [ ] La narrativa client-facing distingue claramente drivers, métricas puente y `Revenue Enabled`
-- [ ] La lane deja guardrails explícitos para no exponer métricas inmaduras como promesas fuertes
+- [x] Existe contrato formal de `CVR`
+- [x] Existe matriz de visibilidad por tier alineada con madurez/confianza
+- [x] La narrativa client-facing distingue claramente drivers, métricas puente y `Revenue Enabled`
+- [x] La lane deja guardrails explícitos para no exponer métricas inmaduras como promesas fuertes
 
 ## Verification
 

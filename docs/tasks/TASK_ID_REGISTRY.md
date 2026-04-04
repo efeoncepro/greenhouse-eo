@@ -271,7 +271,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-219` | `complete` | ICO Iteration Velocity & Experimentation Signal Contract | `docs/tasks/complete/TASK-219-ico-iteration-velocity-experimentation-signal-contract.md` |
 | `TASK-220` | `complete` | ICO Brief Clarity Score & Intake Governance | `docs/tasks/complete/TASK-220-ico-brief-clarity-score-intake-governance.md` |
 | `TASK-221` | `to-do` | Revenue Enabled Measurement Model & Attribution Policy | `docs/tasks/to-do/TASK-221-revenue-enabled-measurement-model-attribution-policy.md` |
-| `TASK-222` | `to-do` | Creative Velocity Review, Tiered Metric Surfacing & Client Narrative | `docs/tasks/to-do/TASK-222-creative-velocity-review-tiered-metric-surfacing.md` |
+| `TASK-222` | `complete` | Creative Velocity Review, Tiered Metric Surfacing & Client Narrative | `docs/tasks/complete/TASK-222-creative-velocity-review-tiered-metric-surfacing.md` |
 | `TASK-223` | `to-do` | ICO Methodological Accelerators Instrumentation | `docs/tasks/to-do/TASK-223-ico-methodological-accelerators-instrumentation.md` |
 | `TASK-224` | `in-progress` | Finance Document vs Cash Semantic Contract | `docs/tasks/in-progress/TASK-224-finance-document-vs-cash-semantic-contract.md` |
 | `TASK-225` | `in-progress` | Internal Roles, Hierarchies & Approval Ownership Model | `docs/tasks/in-progress/TASK-225-internal-roles-hierarchies-approval-ownership-model.md` |

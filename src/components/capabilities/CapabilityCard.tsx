@@ -7,6 +7,11 @@ import Button from '@mui/material/Button'
 import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
@@ -18,7 +23,13 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 import { EmptyState, ExecutiveCardShell } from '@/components/greenhouse'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
-import type { CapabilityCardData, CapabilityMetricsRowItem, CapabilityModuleCard, CapabilityModuleData } from '@/types/capabilities'
+import type {
+  CapabilityCardData,
+  CapabilityMetricsRowItem,
+  CapabilityModuleCard,
+  CapabilityModuleData,
+  CapabilityTierMatrixCell
+} from '@/types/capabilities'
 
 type CapabilityCardProps = {
   card: CapabilityModuleCard
@@ -485,6 +496,91 @@ const BarChartCard = ({ card, cardData }: TypedCapabilityCardProps<'chart-bar'>)
   )
 }
 
+const tierCellToneToMuiColor: Record<CapabilityTierMatrixCell['tone'], ThemeColor> = {
+  success: 'success',
+  warning: 'warning',
+  info: 'info',
+  default: 'secondary'
+}
+
+const TierMatrixCard = ({ card, cardData }: TypedCapabilityCardProps<'tier-matrix'>) => (
+  <ExecutiveCardShell title={card.title} subtitle={card.description} contentSx={{ pt: 3.5 }}>
+    {cardData.rows.length > 0 ? (
+      <Stack spacing={3}>
+        <Typography variant='body2' color='text.secondary'>
+          {cardData.intro}
+        </Typography>
+
+        <Box
+          sx={{
+            borderRadius: 3,
+            border: theme => `1px solid ${theme.palette.divider}`,
+            overflow: 'hidden'
+          }}
+        >
+          <Table size='small' aria-label='Matriz de visibilidad por tier para Creative Velocity Review'>
+            <TableHead>
+              <TableRow sx={{ bgcolor: theme => alpha(theme.palette.action.hover, 0.72) }}>
+                <TableCell sx={{ fontWeight: 700 }}>Metrica</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>Basic</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>Pro</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>Enterprise</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {cardData.rows.map(row => (
+                <TableRow key={row.id} hover>
+                  <TableCell sx={{ minWidth: 180 }}>
+                    <Stack spacing={0.5}>
+                      <Typography variant='subtitle2'>{row.metric}</Typography>
+                      {row.note ? (
+                        <Typography variant='caption' color='text.secondary'>
+                          {row.note}
+                        </Typography>
+                      ) : null}
+                    </Stack>
+                  </TableCell>
+                  {[row.basic, row.pro, row.enterprise].map((cell, index) => (
+                    <TableCell key={`${row.id}-${index}`} sx={{ verticalAlign: 'top', minWidth: 170 }}>
+                      <Stack spacing={0.75} alignItems='flex-start'>
+                        <Chip
+                          label={cell.label}
+                          size='small'
+                          variant='tonal'
+                          color={tierCellToneToMuiColor[cell.tone]}
+                          sx={{ fontWeight: 600 }}
+                        />
+                        {cell.detail ? (
+                          <Typography variant='caption' color='text.secondary'>
+                            {cell.detail}
+                          </Typography>
+                        ) : null}
+                      </Stack>
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Box>
+
+        {cardData.footnote ? (
+          <Typography variant='caption' color='text.secondary'>
+            {cardData.footnote}
+          </Typography>
+        ) : null}
+      </Stack>
+    ) : (
+      <EmptyState
+        icon='tabler-layout-grid'
+        title='Sin matriz de visibilidad'
+        description='Todavia no hay una policy visible por tier para este modulo.'
+        minHeight={180}
+      />
+    )}
+  </ExecutiveCardShell>
+)
+
 const toneToMuiColor: Record<CapabilityMetricsRowItem['tone'], ThemeColor> = {
   success: 'success',
   warning: 'warning',
@@ -694,6 +790,8 @@ const CapabilityCard = (props: CapabilityCardProps) => {
       return <QualityListCard {...props} cardData={cardData} />
     case 'metric-list':
       return <MetricListCard {...props} cardData={cardData} />
+    case 'tier-matrix':
+      return <TierMatrixCard {...props} cardData={cardData} />
     case 'chart-bar':
       return <BarChartCard {...props} cardData={cardData} />
     case 'section-header':

@@ -1,5 +1,62 @@
 # Handoff.md
 
+## Sesión 2026-04-04 — TASK-222 implementada y cerrada
+
+### Rama / alcance
+
+- rama actual: `feature/codex-task-222-cvr-tiered-surfacing`
+- scope principal:
+  - `src/lib/ico-engine/creative-velocity-review.ts`
+  - `src/lib/ico-engine/creative-velocity-review.test.ts`
+  - `src/lib/capability-queries/creative-cvr.ts`
+  - `src/lib/capability-queries/creative-cvr.test.ts`
+  - `src/lib/capability-queries/creative-hub.ts`
+  - `src/lib/capability-queries/helpers.ts`
+  - `src/lib/capabilities/module-content-builders.ts`
+  - `src/components/capabilities/CapabilityCard.tsx`
+  - `src/types/capabilities.ts`
+  - `src/config/capability-registry.ts`
+  - docs/lifecycle:
+    - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+    - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+    - `docs/architecture/Greenhouse_Capabilities_Architecture_v1.md`
+    - `docs/changelog/CLIENT_CHANGELOG.md`
+    - `changelog.md`
+    - `docs/tasks/complete/TASK-222-creative-velocity-review-tiered-metric-surfacing.md`
+    - `docs/tasks/to-do/TASK-223-ico-methodological-accelerators-instrumentation.md`
+    - `docs/tasks/README.md`
+    - `docs/tasks/TASK_ID_REGISTRY.md`
+    - `Handoff.md`
+
+### Resultado
+
+- `CVR` ya tiene contrato runtime inicial y surface client-facing real en `Creative Hub`.
+- `Creative Hub` ahora muestra:
+  - `Creative Velocity Review`
+  - `CVR structure`
+  - `Tier visibility`
+  - `Narrative guardrails`
+- `Revenue Enabled` en la capability ahora cuelga del mismo contrato `CVR`, dejando una sola fuente para `TTM`, `Iteration Velocity`, policy de atribución y guardrails.
+- La matriz `Basic / Pro / Enterprise` quedó formalizada como contrato editorial de comunicación visible para el portal.
+- No se creó migración nueva ni publication trimestral persistida:
+  - la lane sigue siendo `read-only / on-read`
+  - el hard-gating comercial por tier sigue pendiente de una source policy runtime canónica
+
+### Riesgos / siguientes pasos
+
+- `Early Launch` seguirá apareciendo controlado o `unavailable` en scopes sin evidencia suficiente de `TTM`; eso es correcto y evita precisión falsa.
+- La matriz por tier sigue siendo visible, pero no hace enforcement real sobre sesión/auth ni sobre tenant context.
+- Si una lane futura quiere publication formal de `CVR`, primero necesita un objeto trimestral propio en serving/publication en vez de seguir componiéndolo on-read.
+- `TASK-223` debe reutilizar este bloque `CVR` para conectar aceleradores metodológicos, no inventar otra narrativa paralela.
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/capability-queries/creative-cvr.test.ts src/lib/ico-engine/creative-velocity-review.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm lint`
+- `pnpm build`
+- `rg -n "new Pool\\(" src`
+
 ## Sesión 2026-04-04 — TASK-221 implementada y cerrada
 
 ### Rama / alcance

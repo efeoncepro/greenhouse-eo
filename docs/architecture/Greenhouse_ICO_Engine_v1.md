@@ -1,5 +1,21 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-04 — TASK-222 ships the first Creative Velocity Review runtime contract
+
+`TASK-222` no agrega una materialización trimestral nueva del engine, pero sí deja un contrato runtime explícito para `CVR` y lo conecta a la surface client-facing de `Creative Hub`.
+
+- el nuevo contrato compone:
+  - `TTM`
+  - `Iteration Velocity`
+  - `Revenue Enabled`
+  - estructura del review
+  - matriz de visibilidad por tier
+  - guardrails de narrativa
+- implicaciones inmediatas:
+  - `Creative Hub` ya no debe tratar `CVR` como copy estático o aspiracional; la surface ahora baja de un contrato único
+  - `Early Launch` sigue cayendo a `unavailable` cuando la scope no trae evidencia suficiente de `TTM`
+  - la matriz `Basic / Pro / Enterprise` sigue siendo editorial y no entitlement runtime persistido
+
 ## Delta 2026-04-04 — TASK-221 ships the first Revenue Enabled measurement-model contract
 
 `TASK-221` no agrega todavía una materialización nueva del engine para `Revenue Enabled`, pero sí deja un contrato runtime explícito para que los consumers dejen de inventar atribución local.
