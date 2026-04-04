@@ -1,5 +1,100 @@
 # Handoff.md
 
+## Sesión 2026-04-04 — TASK-223 implementada y cerrada
+
+### Rama / alcance
+
+- rama actual: `feature/codex-task-223-methodological-accelerators`
+- scope principal:
+  - `src/lib/ico-engine/methodological-accelerators.ts`
+  - `src/lib/ico-engine/methodological-accelerators.test.ts`
+  - `src/lib/ico-engine/creative-velocity-review.ts`
+  - `src/lib/ico-engine/creative-velocity-review.test.ts`
+  - `src/lib/capability-queries/creative-cvr.ts`
+  - `src/lib/capability-queries/creative-cvr.test.ts`
+  - `src/lib/capability-queries/creative-hub.ts`
+  - `src/lib/capability-queries/creative-hub-runtime.ts`
+  - `src/lib/capability-queries/helpers.ts`
+  - `src/config/capability-registry.ts`
+  - docs/lifecycle:
+    - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+    - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+    - `docs/architecture/Greenhouse_Capabilities_Architecture_v1.md`
+    - `docs/changelog/CLIENT_CHANGELOG.md`
+    - `changelog.md`
+    - `docs/tasks/complete/TASK-223-ico-methodological-accelerators-instrumentation.md`
+    - `docs/tasks/README.md`
+    - `docs/tasks/TASK_ID_REGISTRY.md`
+    - `docs/tasks/to-do/TASK-213-ico-metrics-hardening-trust-model.md`
+    - `Handoff.md`
+
+### Resultado
+
+- `ICO` ya tiene un contrato runtime inicial para `Design System` y `Brand Voice para AI`.
+- `CVR` ahora compone esa lane metodológica sin abrir una surface paralela a `Creative Hub`.
+- `Creative Hub` agrega `Methodological accelerators` y mantiene `Brand Consistency` alineado al carril auditado de `ico_engine.ai_metric_scores`.
+- Policy visible:
+  - `Design System` queda como acelerador `proxy` sobre outcomes canónicos.
+  - `Brand Voice para AI` solo sube a señal `observed` cuando existe `brand_consistency_score` auditado.
+- No se creó migración nueva ni route nueva.
+
+### Riesgos / siguientes pasos
+
+- `Design System` sigue siendo lectura `proxy` hasta que exista writer metodológico específico.
+- `Brand Voice para AI` seguirá apareciendo parcial o sin evidencia en cuentas sin `brand_consistency_score` auditado; eso es intencional y evita precisión falsa.
+- Si una lane futura quiere publication formal de aceleradores metodológicos, primero necesita decidir si seguirá `on-read` dentro de `CVR` o si merece objeto/persistencia propia.
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/ico-engine/methodological-accelerators.test.ts src/lib/ico-engine/creative-velocity-review.test.ts src/lib/capability-queries/creative-cvr.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm lint`
+- `pnpm build`
+- `rg -n "new Pool\\(" src`
+
+## Sesión 2026-04-04 — TASK-223 auditada, corregida y movida a in-progress
+
+### Rama / alcance
+
+- rama actual: `develop`
+- scope inicial:
+  - `docs/tasks/in-progress/TASK-223-ico-methodological-accelerators-instrumentation.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `Handoff.md`
+  - auditoría runtime sobre:
+    - `src/lib/ico-engine/schema.ts`
+    - `src/lib/ico-engine/brief-clarity.ts`
+    - `src/lib/ico-engine/iteration-velocity.ts`
+    - `src/lib/ico-engine/revenue-enabled.ts`
+    - `src/lib/ico-engine/creative-velocity-review.ts`
+    - `src/lib/ico-engine/read-metrics.ts`
+    - `src/lib/capability-queries/creative-hub.ts`
+    - `src/lib/capability-queries/creative-cvr.ts`
+    - `src/lib/capability-queries/helpers.ts`
+    - `src/config/capability-registry.ts`
+    - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+    - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+    - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+    - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+    - `docs/architecture/Greenhouse_Capabilities_Architecture_v1.md`
+    - `docs/architecture/schema-snapshot-baseline.sql`
+
+### Resultado
+
+- `TASK-223` quedó movida a `in-progress` antes de implementación.
+- La auditoría corrigió la spec para dejar explícito que:
+  - la lane reutiliza la capa outcome ya existente (`BCS`, `Iteration Velocity`, `Revenue Enabled`, `read-metrics`)
+  - cualquier surfacing visible debe colgar del `CVR` ya visible en `Creative Hub`
+  - el carril inicial correcto para señales metodológicas debe ser auditable y compatible con `ico_engine.ai_metric_scores`
+- Gap confirmado:
+  - no existe aún helper/runtime canónico para `Design System`
+  - no existe aún helper/runtime canónico para `Brand Voice para AI`
+
+### Verificación
+
+- revisión manual de consistencia entre spec, arquitectura, runtime ICO y host visible de `CVR`
+
 ## Sesión 2026-04-04 — TASK-222 implementada y cerrada
 
 ### Rama / alcance

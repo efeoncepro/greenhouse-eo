@@ -1,5 +1,14 @@
 # TASK-213 - ICO Metrics Hardening Program & Trust Model
 
+## Delta 2026-04-04
+
+- La ola north-star cambió de estado real:
+  - `TASK-218`, `TASK-219`, `TASK-220`, `TASK-221` y `TASK-222` ya están cerradas.
+  - `TASK-223` ya está en `in-progress` y formaliza la lane runtime inicial de aceleradores metodológicos.
+- Impacto para esta task:
+  - la base doctrinal ya no es solo documental; existe runtime para `TTM`, `Iteration Velocity`, `BCS`, `Revenue Enabled`, `CVR` y ahora aceleradores metodológicos.
+  - cualquier hardening residual debe asumir esos contratos existentes y no volver a tratarlos como backlog aspiracional.
+
 ## Status
 
 - Lifecycle: `to-do`

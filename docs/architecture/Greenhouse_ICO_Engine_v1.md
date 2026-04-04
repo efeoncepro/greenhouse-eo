@@ -1,5 +1,18 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-04 — TASK-223 ships the first methodological-accelerators runtime lane
+
+`TASK-223` no crea una tabla nueva ni una materialización separada del engine, pero sí formaliza cómo se leen `Design System` y `Brand Voice para AI` sobre foundations ya existentes.
+
+- baseline runtime nuevo:
+  - contrato `methodological accelerators` dentro del `CVR`
+  - lectura `proxy` de `Design System` apoyada en outcomes canónicos ya materializados
+  - lectura `observed` de `Brand Voice para AI` solo cuando exista `brand_consistency_score` auditado en `ico_engine.ai_metric_scores`
+- implicaciones inmediatas:
+  - `Creative Hub` consume esta lane dentro del mismo host visible de `CVR`
+  - `Brand Consistency` visible ya no debe reconstruirse con heurísticas locales cuando falte score auditado
+  - la conexión a `Revenue Enabled` sigue siendo narrativa y policy-aware, no salto directo a revenue observado
+
 ## Delta 2026-04-04 — TASK-222 ships the first Creative Velocity Review runtime contract
 
 `TASK-222` no agrega una materialización trimestral nueva del engine, pero sí deja un contrato runtime explícito para `CVR` y lo conecta a la surface client-facing de `Creative Hub`.
@@ -1950,7 +1963,7 @@ La Intelligence Layer usa el mismo stack definido para Kortex (`Kortex_Arquitect
 |---|---|---|
 | Tabla `ico_engine.ai_metric_scores` (DDL) | **Crear vacía** | La infraestructura existe lista para cuando los agents escriban |
 | Tipo `AIMetricConfig` en TypeScript | **Crear como tipo exportado** | El registry ya lo importa aunque ninguna métrica lo use aún |
-| Métricas `brief_clarity_score` y `brand_consistency_score` en el registry | **Ya creadas** con `active: false, comingSoon: true` | La UI sabe que existen y muestra placeholders |
+| Métricas `brief_clarity_score` y `brand_consistency_score` en el registry | **Ya creadas** con `active: false, comingSoon: true` | `BCS` ya tiene reader runtime; `brand_consistency_score` ahora también puede alimentar la lane runtime inicial de `Brand Voice para AI` cuando exista data auditada |
 | LEFT JOINs en `v_tareas_enriched` | **No crear aún** | Se agregan cuando la tabla tenga data, para no degradar performance de la view con JOINs a tablas vacías |
 | Cloud Functions de AI Agents | **No crear** | Se implementan cuando los prompts estén diseñados y validados |
 | Prompts | **No crear** | Requieren diseño deliberado con datos reales de briefs/assets |

@@ -2,6 +2,7 @@ import 'server-only'
 
 import { buildCapabilityModuleContent } from '@/lib/capabilities/module-content-builders'
 import {
+  buildCreativeMethodologicalAcceleratorsCardData,
   buildCreativeCvrStructureCardData,
   buildCreativeCvrTierMatrixCardData,
   buildCreativeNarrativeGuardrailsCardData
@@ -21,6 +22,7 @@ import {
   buildToolItems
 } from '@/lib/capability-queries/helpers'
 import { buildCreativeVelocityReviewContract } from '@/lib/ico-engine/creative-velocity-review'
+import { readPortfolioBrandVoiceAiEvidence } from '@/lib/ico-engine/methodological-accelerators'
 import { getCapabilityModuleSnapshot } from '@/lib/capability-queries/shared'
 import { readMetricsSummaryByClientId } from '@/lib/ico-engine/read-metrics'
 import type { CapabilityQueryBuilder } from '@/lib/capability-queries/types'
@@ -41,6 +43,12 @@ export const getCreativeHubQuery: CapabilityQueryBuilder = async viewer => {
   const projects = buildProjectItemsForLens(snapshot, 'creative')
   const tools = buildToolItems(snapshot)
   const quality = buildQualityItems(snapshot)
+  const spaceIds = [...new Set(tasks.map(task => task.spaceId).filter((value): value is string => Boolean(value)))]
+
+  const brandVoiceAiEvidence = await readPortfolioBrandVoiceAiEvidence({
+    spaceIds,
+    projectSourceIds: viewer.projectIds
+  }).catch(() => null)
 
   const creativeVelocityReview = buildCreativeVelocityReviewContract({
     tasks: tasks.map(task => ({
@@ -52,6 +60,8 @@ export const getCreativeHubQuery: CapabilityQueryBuilder = async viewer => {
       workflowReviewOpen: task.workflowReviewOpen,
       openFrameComments: task.openFrameComments
     })),
+    metricsSummary: icoSummary,
+    brandVoiceAiEvidence,
     throughput: {
       value: icoSummary?.throughput ?? null
     }
@@ -69,10 +79,11 @@ export const getCreativeHubQuery: CapabilityQueryBuilder = async viewer => {
       'creative-revenue-kpis': buildCreativeRevenueCardData(creativeVelocityReview),
       'cvr-header':            { type: 'section-header', subtitle: 'La lectura trimestral que conecta operacion creativa con growth sin precision falsa.', icon: 'tabler-presentation-analytics' },
       'creative-cvr-structure': buildCreativeCvrStructureCardData(creativeVelocityReview),
+      'creative-methodology-accelerators': buildCreativeMethodologicalAcceleratorsCardData(creativeVelocityReview),
       'creative-tier-visibility': buildCreativeCvrTierMatrixCardData(creativeVelocityReview),
       'creative-narrative-guardrails': buildCreativeNarrativeGuardrailsCardData(creativeVelocityReview),
       'brand-header':          { type: 'section-header', subtitle: 'Gobernanza y proteccion de marca sobre el flujo creativo', icon: 'tabler-shield-check' },
-      'creative-brand-kpis':   buildCreativeBrandMetricsCardData(tasks, icoSummary),
+      'creative-brand-kpis':   buildCreativeBrandMetricsCardData(tasks, icoSummary, creativeVelocityReview.methodologicalAccelerators.brandVoiceAi),
       'creative-rpa-trend':    buildCreativeRpaTrendCardData(tasks),
       'pipeline-header':       { type: 'section-header', subtitle: 'El pipeline completo de tu produccion creativa', icon: 'tabler-git-branch' },
       'csc-pipeline':          buildCreativePipelineCardData(tasks),

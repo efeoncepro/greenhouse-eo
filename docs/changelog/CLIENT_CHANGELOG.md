@@ -42,6 +42,31 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.8
+
+**Canal:** Beta
+**Fecha:** 2026-04-04
+**Disponible para:** internal
+**Módulos:** Capabilities / Creative Hub / ICO
+
+### Novedades
+
+- `Creative Hub` ahora muestra una lectura inicial de `Design System` y `Brand Voice para AI` dentro del mismo bloque `CVR`.
+
+### Mejoras
+
+- La vista conecta esos aceleradores metodológicos con outcomes canónicos del engine en vez de abrir una narrativa paralela enterprise.
+- `Brand Consistency` visible ahora prioriza el score auditado de `ico_engine.ai_metric_scores` cuando existe evidencia real.
+
+### Correcciones
+
+- El portal deja de reconstruir `Brand Consistency` con una heurística local cuando todavía no hay score auditado suficiente.
+
+### Notas
+
+- `Design System` sigue comunicado como acelerador `proxy`.
+- `Brand Voice para AI` solo sube a señal `observed` cuando el carril auditado ya trae `brand_consistency_score`.
+
 ## 2026.04-beta.7
 
 **Canal:** Beta

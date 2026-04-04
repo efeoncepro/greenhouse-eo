@@ -13,6 +13,7 @@ import type {
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type { CreativeHubTask } from '@/lib/capability-queries/creative-hub-runtime'
 import type { CreativeVelocityReviewContract } from '@/lib/ico-engine/creative-velocity-review'
+import type { MethodologicalAcceleratorSignal } from '@/lib/ico-engine/methodological-accelerators'
 import type { CapabilityModuleSnapshot, CapabilitySnapshotProject } from '@/lib/capability-queries/shared'
 import type { MetricsSummary } from '@/lib/ico-engine/read-metrics'
 
@@ -285,32 +286,6 @@ const toneByRevenueEnabledClass = (
 const summarizeRevenueEnabledReasons = (reasons: string[]) =>
   reasons.slice(0, 2).join(' ')
 
-const buildCreativeBrandConsistency = (tasks: CreativeHubTask[]) => {
-  const completedTasks = tasks.filter(task => task.cscPhase === 'Completado')
-  const firstTimeRightBase = completedTasks.filter(task => task.clientChangeRounds !== null)
-
-  if (completedTasks.length === 0 || firstTimeRightBase.length === 0) {
-    return null
-  }
-
-  const firstTimeRightPct = Math.round(
-    (firstTimeRightBase.filter(task => task.clientChangeRounds === 0).length / firstTimeRightBase.length) * 100
-  )
-
-  const lowFrictionBase = completedTasks.filter(task => task.rpaValue !== null)
-
-  const lowFrictionPct =
-    lowFrictionBase.length > 0
-      ? Math.round((lowFrictionBase.filter(task => (task.rpaValue || 0) <= 2).length / lowFrictionBase.length) * 100)
-      : null
-
-  if (lowFrictionPct === null) {
-    return firstTimeRightPct
-  }
-
-  return Math.round((firstTimeRightPct + lowFrictionPct) / 2)
-}
-
 export const buildCreativeRevenueCardData = (
   creativeVelocityReview: CreativeVelocityReviewContract
 ): CapabilityCardData => {
@@ -360,7 +335,8 @@ export const buildCreativeRevenueCardData = (
 
 export const buildCreativeBrandMetricsCardData = (
   tasks: CreativeHubTask[],
-  icoSummary?: MetricsSummary | null
+  icoSummary?: MetricsSummary | null,
+  brandVoiceAi?: MethodologicalAcceleratorSignal | null
 ): CapabilityCardData => {
   const completedTasks = tasks.filter(task => task.cscPhase === 'Completado')
   const firstTimeRightBase = completedTasks.filter(task => task.clientChangeRounds !== null)
@@ -377,7 +353,13 @@ export const buildCreativeBrandMetricsCardData = (
   )
 
   const reviewOpenCount = tasks.filter(task => task.cscPhase === 'Aprobacion').length
-  const brandConsistency = buildCreativeBrandConsistency(tasks)
+  const observedBrandConsistency = brandVoiceAi?.evidence.brandVoiceAi?.averageScore ?? null
+  const brandConsistency = observedBrandConsistency
+
+  const brandConsistencyDescription =
+    observedBrandConsistency !== null
+      ? 'Score auditado de Brand Consistency desde `ico_engine.ai_metric_scores`, sin reconstruir heurísticas locales.'
+      : 'Sin score auditado de Brand Consistency; la lectura visible queda parcial hasta activar el carril observacional.'
 
   const items: CapabilityMetricsRowItem[] = [
     {
@@ -396,7 +378,7 @@ export const buildCreativeBrandMetricsCardData = (
       id: 'brand-consistency',
       label: 'Brand Consistency',
       value: brandConsistency !== null ? formatPercent(brandConsistency) : null,
-      description: 'Indice derivado de First Time Right y friccion de revision del portfolio creativo.',
+      description: brandConsistencyDescription,
       tone:
         brandConsistency !== null && brandConsistency >= 80
           ? 'success'

@@ -1,5 +1,15 @@
 # TASK-223 - ICO Methodological Accelerators Instrumentation
 
+## Delta 2026-04-04 — auditoría runtime corrige el alcance inicial
+
+- La lane no parte desde cero:
+  - `BCS`, `Iteration Velocity`, `Revenue Enabled` y `CVR` ya existen como contratos runtime reutilizables.
+  - `Creative Hub` ya es el host client-facing correcto para cualquier lectura metodológica ligada a `CVR`.
+- Regla nueva para `TASK-223`:
+  - el alcance inicial debe crear contrato runtime y wiring editorial sobre `CVR`, no prometer causalidad madura ya observada
+  - la correlación con outcomes debe reutilizar readers canónicos (`BCS`, `Iteration Velocity`, `read-metrics`, `Revenue Enabled`) y no recalcular métricas inline
+  - la señal metodológica debe viajar por un carril auditable compatible con `ico_engine.ai_metric_scores`
+
 ## Delta 2026-04-04 — TASK-222 cerró el primer host visible de CVR
 
 - `TASK-222` ya dejó el primer contrato runtime de `CVR` y su host client-facing real en `Creative Hub`.
@@ -29,11 +39,11 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
-- Status real: `Diseño`
+- Status real: `Cerrada`
 - Rank: `10`
 - Domain: `ico / methodology / internal`
 
@@ -90,25 +100,34 @@ Reglas obligatorias:
 ### Ya existe
 
 - la doctrina metodológica está bien descrita en el contrato maestro
+- ya existe capa outcome canónica reutilizable para correlación:
+  - `BCS`
+  - `Iteration Velocity`
+  - `Revenue Enabled`
+  - `read-metrics`
+- `Creative Hub` ya hospeda el primer bloque visible de `CVR`
+- `ico_engine.ai_metric_scores` ya existe como carril auditado reusable para scoring probabilístico
 
 ### Gap actual
 
 - no existe instrumentación productiva del efecto de estas capas
-- no existe manera canónica de relacionarlas con mejora de métricas operativas
+- no existe reader canónico para `Design System` ni para `Brand Voice para AI`
+- no existe todavía una capa canónica que enchufe esas señales al contrato runtime de `CVR`
 
 ## Scope
 
 ### Slice 1 - Design System instrumentation
 
-- definir señales observables y trazables
+- definir señales observables, trazables y auditables compatibles con el carril AI score existente
 
 ### Slice 2 - Brand Voice instrumentation
 
-- definir señales observables y trazables
+- definir señales observables, trazables y auditables compatibles con el carril AI score existente
 
 ### Slice 3 - Effect analysis model
 
-- preparar modelo de correlación con drivers operativos
+- conectar esas señales contra outcomes canónicos existentes sin recalcular métricas inline
+- enchufar la lectura editorial al bloque `CVR` ya visible en `Creative Hub`
 
 ## Out of Scope
 
@@ -118,10 +137,15 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Existe contrato documental de instrumentación para `Design System`
-- [ ] Existe contrato documental de instrumentación para `Brand Voice para AI`
-- [ ] La lane define cómo conectar estas señales con métricas operativas sin exponer IP interna
+- [ ] Existe contrato runtime inicial de instrumentación para `Design System`
+- [ ] Existe contrato runtime inicial de instrumentación para `Brand Voice para AI`
+- [ ] La lane define cómo conectar estas señales con outcomes canónicos (`BCS`, `Iteration Velocity`, `read-metrics`, `Revenue Enabled`) sin exponer IP interna
+- [ ] Si hay surfacing visible, cuelga del bloque `CVR` ya existente en `Creative Hub`
 
 ## Verification
 
-- revisión manual de consistencia documental
+- `pnpm exec vitest run src/lib/ico-engine/methodological-accelerators.test.ts src/lib/ico-engine/creative-velocity-review.test.ts src/lib/capability-queries/creative-cvr.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm lint`
+- `pnpm build`
+- `rg -n "new Pool\\(" src`

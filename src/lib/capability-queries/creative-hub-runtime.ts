@@ -9,6 +9,7 @@ type BigQueryScalar = { value?: string } | string | null
 
 type CreativeHubTaskRow = {
   task_id: string | null
+  space_id: string | null
   task_name: string | null
   project_id: string | null
   project_name: string | null
@@ -33,6 +34,7 @@ type CreativeHubTaskRow = {
 
 export type CreativeHubTask = {
   id: string
+  spaceId: string | null
   name: string
   projectId: string
   projectName: string
@@ -241,6 +243,7 @@ const getCreativeHubTasksUncached = async (viewer: CapabilityViewerContext): Pro
 
   const taskTitleColumn = pickFirstExistingColumn(taskColumns, ['titulo', 'name', 'nombre'])
   const statusColumn = pickFirstExistingColumn(taskColumns, ['estado', 'status'])
+  const spaceIdColumn = pickFirstExistingColumn(taskColumns, ['space_id'])
   const createdAtColumn = pickFirstExistingColumn(taskColumns, ['created_time', 'created_at'])
   const lastEditedAtColumn = pickFirstExistingColumn(taskColumns, ['last_edited_time', 'updated_at', 'created_time'])
   const completedAtColumn = pickFirstExistingColumn(taskColumns, ['fecha_de_completado', 'fecha_entrega', 'completed_at', 'done_at'])
@@ -267,6 +270,7 @@ const getCreativeHubTasksUncached = async (viewer: CapabilityViewerContext): Pro
         FROM (
           SELECT
             t.notion_page_id AS task_id,
+            ${getOptionalStringExpression('t', spaceIdColumn)} AS space_id,
             scoped_project_id AS project_id,
             ${getOptionalStringExpression('t', taskTitleColumn, 'CAST(t.notion_page_id AS STRING)')} AS task_name,
             ${getOptionalStringExpression('t', statusColumn, "'Sin estado'")} AS task_status,
@@ -302,6 +306,7 @@ const getCreativeHubTasksUncached = async (viewer: CapabilityViewerContext): Pro
       )
       SELECT
         scoped_tasks.task_id,
+        scoped_tasks.space_id,
         scoped_tasks.task_name,
         scoped_tasks.project_id,
         COALESCE(scoped_projects.project_name, scoped_tasks.project_id) AS project_name,
@@ -351,6 +356,7 @@ const getCreativeHubTasksUncached = async (viewer: CapabilityViewerContext): Pro
 
     return {
       id: row.task_id || 'unknown-task',
+      spaceId: row.space_id || null,
       name: row.task_name || row.task_id || 'Tarea sin nombre',
       projectId: row.project_id || 'unknown-project',
       projectName: row.project_name || row.project_id || 'Proyecto sin nombre',
