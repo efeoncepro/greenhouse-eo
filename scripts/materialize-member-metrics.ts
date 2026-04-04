@@ -9,6 +9,7 @@ import { BigQuery } from '@google-cloud/bigquery'
 
 import { getGoogleAuthOptions, getGoogleProjectId } from '@/lib/google-credentials'
 import { materializeMonthlySnapshots } from '@/lib/ico-engine/materialize'
+import { buildMetricTrustMapFromRow, serializeMetricTrustMap } from '@/lib/ico-engine/metric-trust-policy'
 import { loadGreenhouseToolEnv } from './lib/load-greenhouse-tool-env'
 
 const main = async () => {
@@ -45,7 +46,8 @@ const main = async () => {
              rpa_avg, rpa_median, otd_pct, ftr_pct,
              cycle_time_avg_days, throughput_count, pipeline_velocity,
              stuck_asset_count, stuck_asset_pct,
-             total_tasks, completed_tasks, active_tasks, carry_over_count
+             total_tasks, completed_tasks, active_tasks, carry_over_count,
+             rpa_eligible_task_count, rpa_missing_task_count, rpa_non_positive_task_count
            FROM \`${projectId}.ico_engine.metrics_by_member\`
            WHERE period_year = @year AND period_month = @month`,
     params: { year, month }
@@ -70,8 +72,10 @@ const main = async () => {
             rpa_avg, rpa_median, otd_pct, ftr_pct,
             cycle_time_avg_days, throughput_count, pipeline_velocity,
             stuck_asset_count, stuck_asset_pct,
-            total_tasks, completed_tasks, active_tasks, carry_over_count, materialized_at
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, NOW())
+            total_tasks, completed_tasks, active_tasks, carry_over_count,
+            metric_trust_json,
+            materialized_at
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, NOW())
           ON CONFLICT (member_id, period_year, period_month) DO UPDATE SET
             rpa_avg=EXCLUDED.rpa_avg, rpa_median=EXCLUDED.rpa_median,
             otd_pct=EXCLUDED.otd_pct, ftr_pct=EXCLUDED.ftr_pct,
@@ -79,7 +83,8 @@ const main = async () => {
             throughput_count=EXCLUDED.throughput_count, pipeline_velocity=EXCLUDED.pipeline_velocity,
             stuck_asset_count=EXCLUDED.stuck_asset_count, stuck_asset_pct=EXCLUDED.stuck_asset_pct,
             total_tasks=EXCLUDED.total_tasks, completed_tasks=EXCLUDED.completed_tasks,
-            active_tasks=EXCLUDED.active_tasks, carry_over_count=EXCLUDED.carry_over_count, materialized_at=NOW()
+            active_tasks=EXCLUDED.active_tasks, carry_over_count=EXCLUDED.carry_over_count,
+            metric_trust_json=EXCLUDED.metric_trust_json, materialized_at=NOW()
         `, [
           String(r.member_id), Number(r.period_year), Number(r.period_month),
           r.rpa_avg != null ? Number(r.rpa_avg) : null,
@@ -94,7 +99,8 @@ const main = async () => {
           r.total_tasks != null ? Number(r.total_tasks) : null,
           r.completed_tasks != null ? Number(r.completed_tasks) : null,
           r.active_tasks != null ? Number(r.active_tasks) : null,
-          r.carry_over_count != null ? Number(r.carry_over_count) : null
+          r.carry_over_count != null ? Number(r.carry_over_count) : null,
+          serializeMetricTrustMap(buildMetricTrustMapFromRow(r as unknown as Parameters<typeof buildMetricTrustMapFromRow>[0]))
         ])
 
         synced++

@@ -4,6 +4,7 @@ import { requireCronAuth } from '@/lib/cron/require-cron-auth'
 import { checkIntegrationReadiness } from '@/lib/integrations/readiness'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { buildMetricTrustMapFromRow, serializeMetricTrustMap } from '@/lib/ico-engine/metric-trust-policy'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 export const dynamic = 'force-dynamic'
@@ -17,6 +18,7 @@ interface BqRow {
   otd_pct: number | null
   ftr_pct: number | null
   cycle_time_avg_days: number | null
+  cycle_time_variance?: number | null
   throughput_count: number | null
   pipeline_velocity: number | null
   stuck_asset_count: number | null
@@ -29,6 +31,9 @@ interface BqRow {
   overdue_count: number | null
   carry_over_count: number | null
   overdue_carried_forward_count: number | null
+  rpa_eligible_task_count?: number | null
+  rpa_missing_task_count?: number | null
+  rpa_non_positive_task_count?: number | null
 }
 
 const toNum = (v: unknown): number | null => {
@@ -92,6 +97,10 @@ export async function GET(request: Request) {
       })
 
       for (const raw of rows as BqRow[]) {
+        const metricTrustJson = serializeMetricTrustMap(
+          buildMetricTrustMapFromRow(raw as unknown as Parameters<typeof buildMetricTrustMapFromRow>[0])
+        )
+
         await runGreenhousePostgresQuery(
           `INSERT INTO greenhouse_serving.ico_member_metrics (
             member_id, period_year, period_month,
@@ -100,8 +109,9 @@ export async function GET(request: Request) {
             stuck_asset_count, stuck_asset_pct,
             total_tasks, completed_tasks, active_tasks,
             on_time_count, late_drop_count, overdue_count, carry_over_count, overdue_carried_forward_count,
+            metric_trust_json,
             materialized_at
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, NOW())
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21::jsonb, NOW())
           ON CONFLICT (member_id, period_year, period_month) DO UPDATE SET
             rpa_avg = EXCLUDED.rpa_avg,
             rpa_median = EXCLUDED.rpa_median,
@@ -120,6 +130,7 @@ export async function GET(request: Request) {
             overdue_count = EXCLUDED.overdue_count,
             carry_over_count = EXCLUDED.carry_over_count,
             overdue_carried_forward_count = EXCLUDED.overdue_carried_forward_count,
+            metric_trust_json = EXCLUDED.metric_trust_json,
             materialized_at = NOW()`,
           [
             raw.member_id, raw.period_year, raw.period_month,
@@ -128,7 +139,8 @@ export async function GET(request: Request) {
             toNum(raw.stuck_asset_count), toNum(raw.stuck_asset_pct),
             toNum(raw.total_tasks), toNum(raw.completed_tasks), toNum(raw.active_tasks),
             toNum(raw.on_time_count), toNum(raw.late_drop_count), toNum(raw.overdue_count),
-            toNum(raw.carry_over_count), toNum(raw.overdue_carried_forward_count)
+            toNum(raw.carry_over_count), toNum(raw.overdue_carried_forward_count),
+            metricTrustJson
           ]
         )
         totalUpserted++

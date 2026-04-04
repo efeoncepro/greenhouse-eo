@@ -1,5 +1,40 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — TASK-216 implementada y verificada
+
+### Rama / alcance
+
+- rama actual: `feature/codex-task-216-ico-trust-model`
+- scope principal:
+  - `src/lib/ico-engine/metric-registry.ts`
+  - `src/lib/ico-engine/metric-trust-policy.ts`
+  - `src/lib/ico-engine/read-metrics.ts`
+  - `src/lib/person-360/get-person-ico-profile.ts`
+  - `src/lib/ico-engine/performance-report.ts`
+  - `src/lib/sync/projections/ico-member-metrics.ts`
+  - `src/lib/sync/projections/agency-performance-report.ts`
+  - `src/app/api/cron/ico-member-sync/route.ts`
+  - migración `20260404011307094_ico-serving-trust-metadata.sql`
+  - docs de arquitectura / lifecycle de `TASK-216`
+
+### Resultado
+
+- `ICO Engine` ya publica trust metadata genérica por métrica (`benchmarkType`, `qualityGateStatus`, `confidenceLevel`, evidencia)
+- `metric-registry.ts` ya modela benchmark semantics y trust config por KPI sin reabrir fórmulas base
+- `greenhouse_serving.ico_member_metrics` y `greenhouse_serving.agency_performance_reports` ahora persisten `metric_trust_json`
+- `People` y `Agency Performance Report` leen trust desde serving con fallback runtime para rows legacy
+- `Payroll` quedó intacto y siguió verde consumiendo el carril `materialized_first_with_live_fallback`
+- `TASK-216` queda lista para moverse a `docs/tasks/complete/`
+
+### Verificación
+
+- `pnpm pg:doctor --profile=migrator`
+- `pnpm migrate:up`
+- `pnpm exec vitest run src/lib/ico-engine/*.test.ts src/lib/payroll/fetch-kpis-for-period.test.ts src/lib/person-360/get-person-ico-profile.test.ts`
+- `rg -n "new Pool\\(" src`
+- `pnpm lint`
+- `pnpm build`
+
 ## Sesión 2026-04-03 — TASK-215 implementada y verificada
 
 ### Rama / alcance

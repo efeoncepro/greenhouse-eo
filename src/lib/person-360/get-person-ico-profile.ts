@@ -8,6 +8,7 @@ import {
   getIcoEngineProjectId,
   runIcoEngineQuery
 } from '@/lib/ico-engine/shared'
+import { buildMetricTrustMapFromRow, parseMetricTrustMap, type MetricTrustMap } from '@/lib/ico-engine/metric-trust-policy'
 import { ICO_DATASET } from '@/lib/ico-engine/schema'
 
 interface IcoMetricsRow extends Record<string, unknown> {
@@ -32,6 +33,10 @@ interface IcoMetricsRow extends Record<string, unknown> {
   overdue_count: string | number | null
   carry_over_count: string | number | null
   overdue_carried_forward_count: string | number | null
+  rpa_eligible_task_count?: string | number | null
+  rpa_missing_task_count?: string | number | null
+  rpa_non_positive_task_count?: string | number | null
+  metric_trust_json?: unknown
 }
 
 interface PeriodRow {
@@ -60,6 +65,7 @@ export interface IcoMetricPeriod {
   overdueCount: number | null
   carryOverCount: number | null
   overdueCarriedForwardCount: number | null
+  metricTrust: MetricTrustMap | null
 }
 
 export interface PersonIcoProfile {
@@ -86,28 +92,34 @@ const toNum = (v: unknown): number | null => {
 const str = (v: string | null | undefined): string | null =>
   v ? v.trim() || null : null
 
-const mapRow = (row: IcoMetricsRow): IcoMetricPeriod => ({
-  periodYear: Number(row.period_year),
-  periodMonth: Number(row.period_month),
-  rpaAvg: toNum(row.rpa_avg),
-  rpaMedian: toNum(row.rpa_median),
-  otdPct: toNum(row.otd_pct),
-  ftrPct: toNum(row.ftr_pct),
-  cycleTimeAvgDays: toNum(row.cycle_time_avg_days),
-  cycleTimeVariance: toNum(row.cycle_time_variance),
-  throughputCount: toNum(row.throughput_count),
-  pipelineVelocity: toNum(row.pipeline_velocity),
-  stuckAssetCount: toNum(row.stuck_asset_count),
-  stuckAssetPct: toNum(row.stuck_asset_pct),
-  totalTasks: toNum(row.total_tasks),
-  completedTasks: toNum(row.completed_tasks),
-  activeTasks: toNum(row.active_tasks),
-  onTimeCount: toNum(row.on_time_count),
-  lateDropCount: toNum(row.late_drop_count),
-  overdueCount: toNum(row.overdue_count),
-  carryOverCount: toNum(row.carry_over_count),
-  overdueCarriedForwardCount: toNum(row.overdue_carried_forward_count)
-})
+const mapRow = (row: IcoMetricsRow): IcoMetricPeriod => {
+  const parsedTrust = parseMetricTrustMap(row.metric_trust_json)
+  const metricTrust = Object.keys(parsedTrust).length > 0 ? parsedTrust : buildMetricTrustMapFromRow(row)
+
+  return {
+    periodYear: Number(row.period_year),
+    periodMonth: Number(row.period_month),
+    rpaAvg: toNum(row.rpa_avg),
+    rpaMedian: toNum(row.rpa_median),
+    otdPct: toNum(row.otd_pct),
+    ftrPct: toNum(row.ftr_pct),
+    cycleTimeAvgDays: toNum(row.cycle_time_avg_days),
+    cycleTimeVariance: toNum(row.cycle_time_variance),
+    throughputCount: toNum(row.throughput_count),
+    pipelineVelocity: toNum(row.pipeline_velocity),
+    stuckAssetCount: toNum(row.stuck_asset_count),
+    stuckAssetPct: toNum(row.stuck_asset_pct),
+    totalTasks: toNum(row.total_tasks),
+    completedTasks: toNum(row.completed_tasks),
+    activeTasks: toNum(row.active_tasks),
+    onTimeCount: toNum(row.on_time_count),
+    lateDropCount: toNum(row.late_drop_count),
+    overdueCount: toNum(row.overdue_count),
+    carryOverCount: toNum(row.carry_over_count),
+    overdueCarriedForwardCount: toNum(row.overdue_carried_forward_count),
+    metricTrust
+  }
+}
 
 const computeHealth = (m: IcoMetricPeriod): 'green' | 'yellow' | 'red' => {
   const rpa = m.rpaAvg ?? 0

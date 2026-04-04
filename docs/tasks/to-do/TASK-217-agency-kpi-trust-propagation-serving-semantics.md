@@ -2,6 +2,12 @@
 
 ## Delta 2026-04-03
 
+- `TASK-216` ya quedó implementada:
+  - el engine expone `benchmarkType`, `qualityGateStatus`, `confidenceLevel` y evidencia reusable por métrica
+  - `greenhouse_serving.ico_member_metrics` y `greenhouse_serving.agency_performance_reports` ya persisten `metric_trust_json`
+  - `People` y `Agency Performance Report` ya tienen contract/fallback de trust en serving
+- Implicación:
+  - esta task ya no debe abrir el contrato base de trust; debe enfocarse en `Agency` query surfaces, response shaping y estados UI sobre el metadata ya disponible
 - `TASK-214` ya cerró la semántica base que `Agency` debe consumir:
   - completitud endurecida y compartida por todos los KPIs troncales del engine
   - buckets member-level y serving `ico_member_metrics` ya alineados con el contrato canónico

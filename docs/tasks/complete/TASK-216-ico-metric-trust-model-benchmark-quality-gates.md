@@ -2,6 +2,12 @@
 
 ## Delta 2026-04-03
 
+- Implementación cerrada:
+  - `metric-registry.ts` ahora modela benchmark semantics y trust config por métrica
+  - `src/lib/ico-engine/metric-trust-policy.ts` centraliza `benchmarkType`, `qualityGateStatus`, `confidenceLevel` y evidencia reusable
+  - `read-metrics.ts` ya expone trust metadata genérica para `RpA`, `OTD`, `FTR`, `cycle time`, `throughput`, `pipeline velocity` y métricas de stuck
+  - `greenhouse_serving.ico_member_metrics` y `greenhouse_serving.agency_performance_reports` ahora persisten `metric_trust_json`
+  - `People` y `Agency Performance Report` ya leen trust metadata desde serving con fallback runtime si el JSON todavía no existe
 - `TASK-214` ya dejó congelada la semántica base que esta lane debe tratar como foundation cerrada:
   - completitud canónica = `completed_at + terminal status`
   - buckets canónicos iguales en live, materialización y serving
@@ -9,14 +15,20 @@
 - Implicación:
   - esta task no necesita volver a tocar fórmulas base en `shared.ts`
   - debe construir trust metadata encima del contrato ya estabilizado, no volver a discutir qué cuenta como `on_time`, `late_drop`, `overdue`, `carry_over` u `overdue_carried_forward`
+- Corrección de auditoría:
+  - `RpA` ya tiene contrato canónico de confianza en runtime (`dataStatus`, `confidenceLevel`, `suppressionReason`, `evidence`) vía `rpa-policy.ts` + `read-metrics.ts`
+  - el gap real no es "no existe confianza en absoluto", sino "no existe trust model genérico y homogéneo para el resto de las métricas"
+  - la taxonomía `healthy / degraded / broken` sí existe en el ecosistema para data quality de integraciones, pero no está aplicada todavía a KPI rows de `ICO`
+  - no existe hoy ningún archivo `src/lib/ico-engine/*trust*`; el patrón implementado actual es `src/lib/ico-engine/rpa-policy.ts`
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Diseño`
+- Status real: `Implementada y verificada`
 - Rank: `2`
 - Domain: `delivery / ico / serving`
 
@@ -34,6 +46,7 @@ La investigación externa ya dejó claro que no todas las métricas tienen el mi
 - otras métricas son policy interna
 
 Hoy esa distinción vive en documentos, pero no en el runtime. Tampoco existe una capa estándar para decir si el valor viene con insumo `healthy`, `degraded` o `broken`.
+Hoy esa distinción vive en documentos y solo `RpA` ya tiene un contrato runtime parcial; el resto de las métricas todavía no publica semantics homogéneas de benchmark, quality gates y confianza.
 
 ## Goal
 
@@ -91,9 +104,9 @@ Reglas obligatorias:
 
 ### Gap actual
 
-- no existe `benchmark_type` en runtime
-- no existe `confidence_level` canónico por métrica
-- no existe `quality_gate_status` propagable a serving y consumers
+- resuelto en `metric-registry.ts` + `metric-trust-policy.ts` + `read-metrics.ts`
+- serving member-level y report-level ya persisten `metric_trust_json`
+- consumers scoped y serving-first ya tienen fallback para no romper rows legacy
 
 ## Scope
 
@@ -120,13 +133,17 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Existe un registry canónico de benchmark semantics por métrica
-- [ ] Existe quality gate policy por métrica con estados `healthy / degraded / broken`
-- [ ] El engine expone confidence metadata reusable por consumers
-- [ ] `OTD`, `FTR`, `RpA` pueden distinguirse claramente como `external`, `analog`, `internal/adapted` según policy documentada
+- [x] Existe un registry canónico de benchmark semantics por métrica
+- [x] Existe quality gate policy por métrica con estados `healthy / degraded / broken`
+- [x] El engine expone confidence metadata reusable por consumers
+- [x] `OTD`, `FTR`, `RpA` pueden distinguirse claramente como `external`, `analog`, `internal/adapted` según policy documentada
 
 ## Verification
 
 - `pnpm exec vitest run src/lib/ico-engine/*.test.ts`
 - `pnpm exec eslint src/lib/ico-engine/metric-registry.ts src/lib/ico-engine/read-metrics.ts`
 - revisión manual de outputs en readers o fixtures representativos
+- `pnpm pg:doctor --profile=migrator`
+- `pnpm migrate:up`
+- `pnpm lint`
+- `pnpm build`

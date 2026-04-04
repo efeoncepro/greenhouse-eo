@@ -121,7 +121,8 @@ describe('PersonHrProfileTab', () => {
         onTimeTasks: 16,
         lateDropTasks: 2,
         overdueTasks: 1,
-        carryOverTasks: 2
+        carryOverTasks: 2,
+        overdueCarriedForwardTasks: 1
       },
       computedAt: '2026-03-21T00:00:00.000Z',
       engineVersion: 'v1',

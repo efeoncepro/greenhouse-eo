@@ -4,6 +4,15 @@ export type MetricGranularity = 'monthly' | 'weekly'
 export type MetricKind = 'average' | 'percentage' | 'count' | 'duration' | 'distribution' | 'ratio' | 'composite'
 export type MetricScope = 'space' | 'project' | 'member' | 'sprint' | 'person'
 export type ThresholdZone = 'optimal' | 'attention' | 'critical'
+export type MetricBenchmarkType = 'external' | 'analog' | 'adapted' | 'internal'
+export type MetricConfidenceLevel = 'high' | 'medium' | 'none'
+export type MetricQualityGateStatus = 'healthy' | 'degraded' | 'broken'
+export type MetricTrustSampleBasis =
+  | 'rpa_policy'
+  | 'delivery_classified_tasks'
+  | 'completed_tasks'
+  | 'active_tasks'
+  | 'total_tasks'
 
 export interface MetricThreshold {
   optimal: { min: number; max: number }
@@ -21,6 +30,17 @@ export interface FormulaConfig {
   durationUnit?: 'days' | 'hours'
 }
 
+export interface MetricBenchmarkConfig {
+  type: MetricBenchmarkType
+  label: string
+  source: string
+}
+
+export interface MetricTrustConfig {
+  sampleBasis: MetricTrustSampleBasis
+  healthyMinSampleSize: number
+}
+
 export interface MetricDefinition {
   id: string
   code: string
@@ -33,6 +53,8 @@ export interface MetricDefinition {
   higherIsBetter: boolean
   icon: string
   color: 'success' | 'warning' | 'error' | 'primary' | 'info'
+  benchmark?: MetricBenchmarkConfig
+  trust?: MetricTrustConfig
 
   /** Scopes where this metric is available. Defaults to all if omitted. */
   scopes?: readonly MetricScope[]
@@ -147,7 +169,16 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     },
     higherIsBetter: false,
     icon: 'tabler-chart-dots-3',
-    color: 'primary'
+    color: 'primary',
+    benchmark: {
+      type: 'adapted',
+      label: 'Benchmark creativo adaptado',
+      source: 'Greenhouse ICO / TASK-215 runtime policy'
+    },
+    trust: {
+      sampleBasis: 'rpa_policy',
+      healthyMinSampleSize: 10
+    }
   },
   {
     id: 'otd_pct',
@@ -168,7 +199,16 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     },
     higherIsBetter: true,
     icon: 'tabler-clock-check',
-    color: 'success'
+    color: 'success',
+    benchmark: {
+      type: 'external',
+      label: 'Benchmark externo fuerte',
+      source: 'Contrato ICO / benchmark delivery externo'
+    },
+    trust: {
+      sampleBasis: 'delivery_classified_tasks',
+      healthyMinSampleSize: 10
+    }
   },
   {
     id: 'ftr_pct',
@@ -189,7 +229,16 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     },
     higherIsBetter: true,
     icon: 'tabler-target-arrow',
-    color: 'success'
+    color: 'success',
+    benchmark: {
+      type: 'analog',
+      label: 'Benchmark por análogo',
+      source: 'Contrato ICO / first-pass yield analog'
+    },
+    trust: {
+      sampleBasis: 'completed_tasks',
+      healthyMinSampleSize: 10
+    }
   },
   {
     id: 'cycle_time',
@@ -206,7 +255,16 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     },
     higherIsBetter: false,
     icon: 'tabler-hourglass',
-    color: 'info'
+    color: 'info',
+    benchmark: {
+      type: 'internal',
+      label: 'Policy interna',
+      source: 'Greenhouse operating policy'
+    },
+    trust: {
+      sampleBasis: 'completed_tasks',
+      healthyMinSampleSize: 10
+    }
   },
   {
     id: 'cycle_time_variance',
@@ -223,7 +281,16 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     },
     higherIsBetter: false,
     icon: 'tabler-chart-candle',
-    color: 'warning'
+    color: 'warning',
+    benchmark: {
+      type: 'internal',
+      label: 'Policy interna',
+      source: 'Greenhouse operating policy'
+    },
+    trust: {
+      sampleBasis: 'completed_tasks',
+      healthyMinSampleSize: 10
+    }
   },
   {
     id: 'throughput',
@@ -240,7 +307,16 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     },
     higherIsBetter: true,
     icon: 'tabler-rocket',
-    color: 'primary'
+    color: 'primary',
+    benchmark: {
+      type: 'internal',
+      label: 'Policy interna',
+      source: 'Greenhouse operating policy'
+    },
+    trust: {
+      sampleBasis: 'completed_tasks',
+      healthyMinSampleSize: 10
+    }
   },
   {
     id: 'pipeline_velocity',
@@ -261,7 +337,16 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     },
     higherIsBetter: true,
     icon: 'tabler-bolt',
-    color: 'warning'
+    color: 'warning',
+    benchmark: {
+      type: 'internal',
+      label: 'Policy interna',
+      source: 'Greenhouse operating policy'
+    },
+    trust: {
+      sampleBasis: 'active_tasks',
+      healthyMinSampleSize: 10
+    }
   },
   {
     id: 'csc_distribution',
@@ -281,7 +366,16 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     },
     higherIsBetter: true,
     icon: 'tabler-chart-pie',
-    color: 'info'
+    color: 'info',
+    benchmark: {
+      type: 'internal',
+      label: 'Policy interna',
+      source: 'Greenhouse operating policy'
+    },
+    trust: {
+      sampleBasis: 'active_tasks',
+      healthyMinSampleSize: 10
+    }
   },
   {
     id: 'stuck_assets',
@@ -298,7 +392,16 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     },
     higherIsBetter: false,
     icon: 'tabler-alert-triangle',
-    color: 'error'
+    color: 'error',
+    benchmark: {
+      type: 'internal',
+      label: 'Policy interna',
+      source: 'Greenhouse operating policy'
+    },
+    trust: {
+      sampleBasis: 'active_tasks',
+      healthyMinSampleSize: 10
+    }
   },
   {
     id: 'stuck_asset_pct',
@@ -319,7 +422,16 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     },
     higherIsBetter: false,
     icon: 'tabler-percentage',
-    color: 'error'
+    color: 'error',
+    benchmark: {
+      type: 'internal',
+      label: 'Policy interna',
+      source: 'Greenhouse operating policy'
+    },
+    trust: {
+      sampleBasis: 'active_tasks',
+      healthyMinSampleSize: 10
+    }
   },
   {
     id: 'overdue_carried_forward',
@@ -336,7 +448,16 @@ export const ICO_METRIC_REGISTRY: MetricDefinition[] = [
     },
     higherIsBetter: false,
     icon: 'tabler-clock-exclamation',
-    color: 'error'
+    color: 'error',
+    benchmark: {
+      type: 'internal',
+      label: 'Policy interna',
+      source: 'Greenhouse operating policy'
+    },
+    trust: {
+      sampleBasis: 'active_tasks',
+      healthyMinSampleSize: 10
+    }
   }
 ]
 

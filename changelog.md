@@ -2,6 +2,14 @@
 
 ## 2026-04-03
 
+- **TASK-216 ICO trust model implemented end-to-end**:
+  - `ICO Engine` ahora publica metadata genérica de trust por métrica: `benchmarkType`, `qualityGateStatus`, `confidenceLevel` y evidencia reusable
+  - `metric-registry.ts` ya distingue benchmarks `external`, `analog`, `adapted` e `internal` sin reabrir fórmulas base
+  - `read-metrics.ts` propaga trust metadata para `RpA`, `OTD`, `FTR`, `cycle time`, `throughput`, `pipeline velocity` y métricas de stuck
+  - `greenhouse_serving.ico_member_metrics` y `greenhouse_serving.agency_performance_reports` ya persisten `metric_trust_json`
+  - `People` y `Agency Performance Report` leen trust desde serving con fallback runtime para filas legacy
+  - verificado con `pnpm pg:doctor --profile=migrator`, `pnpm migrate:up`, `pnpm exec vitest run src/lib/ico-engine/*.test.ts src/lib/payroll/fetch-kpis-for-period.test.ts src/lib/person-360/get-person-ico-profile.test.ts`, `pnpm lint` y `pnpm build`
+
 - **TASK-215 ICO RpA reliability policy implemented**:
   - `ICO Engine` ahora publica `RpA` con evidencia de coverage (`rpa_eligible_task_count`, `rpa_missing_task_count`, `rpa_non_positive_task_count`)
   - `read-metrics` clasifica `RpA` como `valid`, `low_confidence`, `suppressed` o `unavailable` y propaga esa metadata junto al valor saneado

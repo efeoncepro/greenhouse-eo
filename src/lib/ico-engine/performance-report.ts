@@ -35,6 +35,22 @@ export interface PerformanceReportTaskMixEntry {
   totalTasks: number
 }
 
+export type MetricBenchmarkType = 'external' | 'analog' | 'adapted' | 'internal'
+export type MetricQualityGateStatus = 'healthy' | 'degraded' | 'broken'
+export type MetricConfidenceLevel = 'high' | 'medium' | 'low' | 'none'
+
+export interface MetricTrustEntry {
+  benchmarkType: MetricBenchmarkType
+  qualityGateStatus: MetricQualityGateStatus
+  confidenceLevel: MetricConfidenceLevel
+  reasons: string[]
+}
+
+export interface MetricTrustSnapshot {
+  version: 1
+  metrics: Record<string, MetricTrustEntry>
+}
+
 export interface AgencyPerformanceReport {
   periodYear: number
   periodMonth: number
@@ -56,6 +72,7 @@ export interface AgencyPerformanceReport {
     skyTasks: number
   }
   taskMix: PerformanceReportTaskMixEntry[]
+  metricTrust: MetricTrustSnapshot | null
   alertText: string
   executiveSummary: string
   topPerformer: PerformanceReportTopPerformer | null
@@ -100,6 +117,7 @@ interface MaterializedPerformanceReportRow {
   top_performer_min_throughput: unknown
   trend_stable_band_pp: unknown
   multi_assignee_policy: unknown
+  metric_trust_json?: unknown
 }
 
 type ServingPerformanceReportRow = Record<string, unknown> & {
@@ -127,6 +145,7 @@ type ServingPerformanceReportRow = Record<string, unknown> & {
   top_performer_min_throughput: unknown
   trend_stable_band_pp: unknown
   multi_assignee_policy: unknown
+  metric_trust_json?: unknown
 }
 
 export const TOP_PERFORMER_MIN_THROUGHPUT = 5
@@ -255,6 +274,157 @@ const parseTaskMix = (raw: unknown): PerformanceReportTaskMixEntry[] => {
       .filter(entry => entry.totalTasks > 0)
   } catch {
     return []
+  }
+}
+
+const BENCHMARK_TYPES: Record<string, MetricBenchmarkType> = {
+  on_time_pct: 'external',
+  late_drop_count: 'internal',
+  overdue_count: 'internal',
+  carry_over_count: 'internal',
+  overdue_carried_forward_count: 'internal',
+  total_tasks: 'internal',
+  completed_tasks: 'internal',
+  active_tasks: 'internal',
+  efeonce_tasks_count: 'internal',
+  sky_tasks_count: 'internal',
+  top_performer_otd_pct: 'external',
+  top_performer_throughput_count: 'internal',
+  top_performer_rpa_avg: 'adapted',
+  top_performer_ftr_pct: 'analog'
+}
+
+const metricConfidenceFromSupport = (support: {
+  benchmarkType: MetricBenchmarkType
+  valuePresent: boolean
+  strongSupport: boolean
+}): MetricConfidenceLevel => {
+  if (!support.valuePresent) return 'none'
+
+  if (support.benchmarkType === 'external' || support.benchmarkType === 'analog') {
+    return support.strongSupport ? 'high' : 'medium'
+  }
+
+  return support.strongSupport ? 'medium' : 'low'
+}
+
+const parseMetricTrustSnapshot = (raw: unknown): MetricTrustSnapshot | null => {
+  if (!raw) return null
+
+  const parsed = typeof raw === 'string'
+    ? (() => {
+        try {
+          return JSON.parse(raw) as unknown
+        } catch {
+          return null
+        }
+      })()
+    : raw
+
+  if (!parsed || typeof parsed !== 'object') return null
+
+  const metrics = 'metrics' in parsed && parsed.metrics && typeof parsed.metrics === 'object'
+    ? (parsed.metrics as Record<string, MetricTrustEntry>)
+    : null
+
+  if (!metrics) return null
+
+  return {
+    version: 1,
+    metrics
+  }
+}
+
+export const buildMetricTrustSnapshot = (
+  row: MaterializedPerformanceReportRow | ServingPerformanceReportRow
+): MetricTrustSnapshot => {
+  const totalTasks = toNumber(row.total_tasks)
+  const completedTasks = toNumber(row.completed_tasks)
+  const activeTasks = toNumber(row.active_tasks)
+  const throughputCount = toNumber(row.top_performer_throughput_count)
+
+  const buildEntry = (metricId: string, value: number | null, support?: number): MetricTrustEntry => {
+    const benchmarkType = BENCHMARK_TYPES[metricId] ?? 'internal'
+    const valuePresent = value !== null
+
+    const strongSupport =
+      benchmarkType === 'external'
+        ? (totalTasks > 0)
+        : benchmarkType === 'analog'
+          ? (throughputCount ?? completedTasks ?? 0) >= TOP_PERFORMER_MIN_THROUGHPUT
+          : (support ?? totalTasks ?? 0) > 0
+
+    if (!valuePresent) {
+      return {
+        benchmarkType,
+        qualityGateStatus: 'broken',
+        confidenceLevel: 'none',
+        reasons: ['missing_metric_value']
+      }
+    }
+
+    if ((metricId === 'on_time_pct' || metricId === 'top_performer_otd_pct') && (totalTasks ?? 0) <= 0) {
+      return {
+        benchmarkType,
+        qualityGateStatus: 'broken',
+        confidenceLevel: 'none',
+        reasons: ['no_tasks_in_period']
+      }
+    }
+
+    if ((metricId === 'top_performer_rpa_avg' || metricId === 'top_performer_ftr_pct') && (throughputCount ?? 0) < TOP_PERFORMER_MIN_THROUGHPUT) {
+      return {
+        benchmarkType,
+        qualityGateStatus: 'degraded',
+        confidenceLevel: 'medium',
+        reasons: ['low_throughput_sample']
+      }
+    }
+
+    if ((metricId === 'top_performer_throughput_count' || metricId === 'top_performer_rpa_avg' || metricId === 'top_performer_ftr_pct') && (throughputCount ?? 0) <= 0) {
+      return {
+        benchmarkType,
+        qualityGateStatus: 'broken',
+        confidenceLevel: 'none',
+        reasons: ['no_top_performer_sample']
+      }
+    }
+
+    if ((metricId === 'late_drop_count' || metricId === 'overdue_count' || metricId === 'carry_over_count' || metricId === 'overdue_carried_forward_count') && (activeTasks ?? 0) <= 0) {
+      return {
+        benchmarkType,
+        qualityGateStatus: 'broken',
+        confidenceLevel: 'none',
+        reasons: ['no_active_tasks']
+      }
+    }
+
+    return {
+      benchmarkType,
+      qualityGateStatus: strongSupport ? 'healthy' : 'degraded',
+      confidenceLevel: metricConfidenceFromSupport({ benchmarkType, valuePresent, strongSupport }),
+      reasons: []
+    }
+  }
+
+  return {
+    version: 1,
+    metrics: {
+      on_time_pct: buildEntry('on_time_pct', toNullableNumber(row.on_time_pct), totalTasks),
+      late_drop_count: buildEntry('late_drop_count', toNullableNumber(row.late_drop_count), totalTasks),
+      overdue_count: buildEntry('overdue_count', toNullableNumber(row.overdue_count), totalTasks),
+      carry_over_count: buildEntry('carry_over_count', toNullableNumber(row.carry_over_count), totalTasks),
+      overdue_carried_forward_count: buildEntry('overdue_carried_forward_count', toNullableNumber(row.overdue_carried_forward_count), totalTasks),
+      total_tasks: buildEntry('total_tasks', toNullableNumber(row.total_tasks), totalTasks),
+      completed_tasks: buildEntry('completed_tasks', toNullableNumber(row.completed_tasks), completedTasks),
+      active_tasks: buildEntry('active_tasks', toNullableNumber(row.active_tasks), activeTasks),
+      efeonce_tasks_count: buildEntry('efeonce_tasks_count', toNullableNumber(row.efeonce_tasks_count), totalTasks),
+      sky_tasks_count: buildEntry('sky_tasks_count', toNullableNumber(row.sky_tasks_count), totalTasks),
+      top_performer_otd_pct: buildEntry('top_performer_otd_pct', toNullableNumber(row.top_performer_otd_pct), throughputCount),
+      top_performer_throughput_count: buildEntry('top_performer_throughput_count', toNullableNumber(row.top_performer_throughput_count), throughputCount),
+      top_performer_rpa_avg: buildEntry('top_performer_rpa_avg', toNullableNumber(row.top_performer_rpa_avg), throughputCount),
+      top_performer_ftr_pct: buildEntry('top_performer_ftr_pct', toNullableNumber(row.top_performer_ftr_pct), throughputCount)
+    }
   }
 }
 
@@ -441,6 +611,7 @@ const buildReportFromMaterializedRows = (
 
   const topPerformer = buildTopPerformerFromMaterializedRow(current)
   const taskMix = parseTaskMix(current.task_mix_json)
+  const metricTrust = parseMetricTrustSnapshot(current.metric_trust_json) ?? buildMetricTrustSnapshot(current)
 
   return {
     periodYear,
@@ -449,6 +620,7 @@ const buildReportFromMaterializedRows = (
     previousPeriodMonth,
     summary,
     taskMix,
+    metricTrust,
     alertText: buildAlertText(summary, topPerformer),
     executiveSummary: buildExecutiveSummary(summary, taskMix, topPerformer),
     topPerformer,
@@ -478,7 +650,8 @@ const readServingAgencyPerformanceReport = async (
         top_performer_member_id, top_performer_member_name,
         top_performer_otd_pct, top_performer_throughput_count,
         top_performer_rpa_avg, top_performer_ftr_pct,
-        top_performer_min_throughput, trend_stable_band_pp, multi_assignee_policy
+        top_performer_min_throughput, trend_stable_band_pp, multi_assignee_policy,
+        metric_trust_json::text AS metric_trust_json
        FROM greenhouse_serving.agency_performance_reports
        WHERE report_scope = 'agency'
          AND (
@@ -592,6 +765,33 @@ export const readAgencyPerformanceReport = async (
   const currentSummary = summarizeSpaces(currentScopedSpaces)
   const taskMix = buildTaskMixFromSpaces(currentScopedSpaces)
 
+  const metricTrust = buildMetricTrustSnapshot({
+    report_scope: 'agency',
+    period_year: periodYear,
+    period_month: periodMonth,
+    on_time_count: currentSummary.totalTasks,
+    late_drop_count: currentSummary.lateDrops,
+    on_time_pct: currentOnTimePct,
+    overdue_count: currentSummary.overdue,
+    carry_over_count: currentSummary.carryOver,
+    overdue_carried_forward_count: currentSummary.overdueCarriedForward,
+    total_tasks: currentSummary.totalTasks,
+    completed_tasks: currentSummary.completedTasks,
+    active_tasks: currentSummary.activeTasks,
+    efeonce_tasks_count: currentSummary.efeonceTasks,
+    sky_tasks_count: currentSummary.skyTasks,
+    task_mix_json: JSON.stringify(taskMix),
+    top_performer_member_id: topPerformer?.memberId ?? null,
+    top_performer_member_name: topPerformer?.memberName ?? null,
+    top_performer_otd_pct: topPerformer?.otdPct ?? null,
+    top_performer_throughput_count: topPerformer?.throughputCount ?? null,
+    top_performer_rpa_avg: topPerformer?.rpaAvg ?? null,
+    top_performer_ftr_pct: topPerformer?.ftrPct ?? null,
+    top_performer_min_throughput: TOP_PERFORMER_MIN_THROUGHPUT,
+    trend_stable_band_pp: TREND_STABLE_BAND_PP,
+    multi_assignee_policy: TOP_PERFORMER_MULTI_ASSIGNEE_POLICY
+  } as MaterializedPerformanceReportRow)
+
   const summary = {
     onTimePct: currentOnTimePct,
     previousOnTimePct,
@@ -615,6 +815,7 @@ export const readAgencyPerformanceReport = async (
     previousPeriodMonth: previous.month,
     summary,
     taskMix,
+    metricTrust,
     alertText: buildAlertText(summary, topPerformer),
     executiveSummary: buildExecutiveSummary(summary, taskMix, topPerformer),
     topPerformer,

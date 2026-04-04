@@ -45,6 +45,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ memb
         )
       }
 
+      const metricTrust = scoped.metricTrust ?? {}
+
       return NextResponse.json({
         dimension: 'member',
         dimensionValue: memberId,
@@ -52,15 +54,15 @@ export async function GET(request: Request, { params }: { params: Promise<{ memb
         periodYear: scoped.periodYear,
         periodMonth: scoped.periodMonth,
         metrics: [
-          { metricId: 'rpa', value: scoped.rpaAvg, zone: null },
-          { metricId: 'otd_pct', value: scoped.otdPct, zone: null },
-          { metricId: 'ftr_pct', value: scoped.ftrPct, zone: null },
-          { metricId: 'cycle_time', value: scoped.cycleTimeAvgDays, zone: null },
-          { metricId: 'cycle_time_variance', value: scoped.cycleTimeVariance, zone: null },
-          { metricId: 'throughput', value: scoped.throughputCount, zone: null },
-          { metricId: 'pipeline_velocity', value: scoped.pipelineVelocity, zone: null },
-          { metricId: 'stuck_assets', value: scoped.stuckAssetCount, zone: null },
-          { metricId: 'stuck_asset_pct', value: scoped.stuckAssetPct, zone: null }
+          { metricId: 'rpa', value: scoped.rpaAvg, zone: null, ...metricTrust.rpa },
+          { metricId: 'otd_pct', value: scoped.otdPct, zone: null, ...metricTrust.otd_pct },
+          { metricId: 'ftr_pct', value: scoped.ftrPct, zone: null, ...metricTrust.ftr_pct },
+          { metricId: 'cycle_time', value: scoped.cycleTimeAvgDays, zone: null, ...metricTrust.cycle_time },
+          { metricId: 'cycle_time_variance', value: scoped.cycleTimeVariance, zone: null, ...metricTrust.cycle_time_variance },
+          { metricId: 'throughput', value: scoped.throughputCount, zone: null, ...metricTrust.throughput },
+          { metricId: 'pipeline_velocity', value: scoped.pipelineVelocity, zone: null, ...metricTrust.pipeline_velocity },
+          { metricId: 'stuck_assets', value: scoped.stuckAssetCount, zone: null, ...metricTrust.stuck_assets },
+          { metricId: 'stuck_asset_pct', value: scoped.stuckAssetPct, zone: null, ...metricTrust.stuck_asset_pct }
         ],
         cscDistribution: [],
         context: {
