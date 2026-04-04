@@ -907,6 +907,35 @@ Para agregar assets nuevos:
 | Finance Dashboard | `AnimatedCounter` | 3 (DSO, DPO, Ratio nómina/ingresos) |
 | Finance Period Closure | `EmptyState` + `animatedIcon` | 2 (períodos vacíos, snapshots vacíos) |
 
+## Progressive Disclosure Pattern (TASK-237)
+
+Para vistas data-dense con más de 10 tarjetas en scroll vertical, usar **Accordion colapsable** para agrupar secciones secundarias:
+
+```tsx
+<Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+  <Accordion disableGutters elevation={0}>
+    <AccordionSummary expandIcon={<i className='tabler-chevron-down' />}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <i className='tabler-heartbeat' style={{ fontSize: 20 }} />
+        <Typography variant='h6'>Salud de entrega</Typography>
+        <CustomChip size='small' round variant='tonal' color='success' label='Mejorando' />
+      </Box>
+    </AccordionSummary>
+    <AccordionDetails>
+      {/* contenido colapsable */}
+    </AccordionDetails>
+  </Accordion>
+</Card>
+```
+
+**Reglas:**
+- KPIs primarios siempre visibles (no colapsar)
+- Charts siempre visibles (no colapsar)
+- Scorecards/tablas siempre visibles
+- Reports detallados → Accordion colapsado por defecto
+- Cada Accordion summary muestra chip con estado/resumen para que el usuario sepa si vale la pena expandir
+- Implementado en: Agency ICO Engine tab (3 Accordions para performance report)
+
 ## Anti-Patterns
 
 - No usar MUI raw cuando existe wrapper Vuexy

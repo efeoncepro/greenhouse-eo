@@ -9,7 +9,7 @@ import type { ApexOptions } from 'apexcharts'
 import ExecutiveCardShell from '@/components/greenhouse/ExecutiveCardShell'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
-import type { SpaceMetricSnapshot, CscDistributionEntry, MetricValue } from '@/lib/ico-engine/read-metrics'
+import type { SpaceMetricSnapshot, CscDistributionEntry } from '@/lib/ico-engine/read-metrics'
 import { CSC_PHASE_LABELS, type CscPhase } from '@/lib/ico-engine/metric-registry'
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
@@ -41,7 +41,7 @@ const CSC_COLORS: Record<CscPhase, string> = {
   entrega: '#6ec207'
 }
 
-const TREND_LINE_COLORS = ['#7367F0', '#00BAD1', '#ff6500', '#bb1954', '#6ec207']
+const TREND_LINE_COLORS = ['#023c70', '#024c8f', '#633f93', '#0375db', '#ff6500']
 
 const MONTH_SHORT = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
 
@@ -49,6 +49,7 @@ const MONTH_SHORT = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Se
 
 const buildCscBarOptions = (
   categories: string[],
+  fullNames: string[],
   mode: 'light' | 'dark',
   borderColor: string,
   textSecondary: string
@@ -73,35 +74,18 @@ const buildCscBarOptions = (
     labels: { colors: textSecondary }
   },
   dataLabels: { enabled: false },
-  tooltip: { theme: mode }
-})
-
-const buildVelocityGaugeOptions = (
-  mode: 'light' | 'dark',
-  textSecondary: string
-): ApexOptions => ({
-  chart: { type: 'radialBar', toolbar: { show: false }, background: 'transparent' },
-  theme: { mode },
-  plotOptions: {
-    radialBar: {
-      startAngle: -135,
-      endAngle: 135,
-      hollow: { size: '60%' },
-      track: { background: 'var(--mui-palette-action-selected)' },
-      dataLabels: {
-        name: { fontSize: '14px', color: textSecondary, offsetY: -10 },
-        value: { fontSize: '28px', fontWeight: 700, offsetY: 5 }
-      }
+  tooltip: {
+    theme: mode,
+    x: {
+      formatter: (_val: number, opts: { dataPointIndex: number }) => fullNames[opts.dataPointIndex] || ''
     }
-  },
-  colors: [GH_COLORS.semaphore.yellow.source],
-  labels: ['Velocidad'],
-  tooltip: { enabled: false }
+  }
 })
 
 const buildRpaTrendOptions = (
   categories: string[],
   seriesCount: number,
+  fullNames: string[],
   mode: 'light' | 'dark',
   borderColor: string,
   textSecondary: string
@@ -137,7 +121,20 @@ const buildRpaTrendOptions = (
     labels: { colors: textSecondary }
   },
   dataLabels: { enabled: false },
-  tooltip: { theme: mode }
+  tooltip: {
+    theme: mode,
+    y: {
+      title: {
+        formatter: (seriesName: string) => {
+          const idx = fullNames.findIndex(n =>
+            n === seriesName || (n.length > 15 && seriesName === n.slice(0, 15) + '…')
+          )
+
+          return idx >= 0 ? fullNames[idx] + ':' : seriesName
+        }
+      }
+    }
+  }
 })
 
 // ─── Component ──────────────────────────────────────────────────────────────
@@ -152,11 +149,11 @@ const IcoCharts = ({ spaces, rpaTrend }: Props) => {
     .filter(s => s.cscDistribution.length > 0)
     .slice(0, 8)
 
-  const cscCategories = spacesWithCsc.map(s => {
-    const label = s.clientName || s.spaceId
+  const cscFullNames = spacesWithCsc.map(s => s.clientName || s.spaceId)
 
-    return label.length > 12 ? label.slice(0, 12) + '…' : label
-  })
+  const cscCategories = cscFullNames.map(label =>
+    label.length > 12 ? label.slice(0, 12) + '…' : label
+  )
 
   const cscPhases: CscPhase[] = ['briefing', 'produccion', 'revision_interna', 'cambios_cliente', 'entrega']
 
@@ -171,28 +168,11 @@ const IcoCharts = ({ spaces, rpaTrend }: Props) => {
 
   const cscOpts = buildCscBarOptions(
     cscCategories,
+    cscFullNames,
     mode,
     GH_COLORS.neutral.border,
     GH_COLORS.neutral.textSecondary
   )
-
-  // ── Pipeline Velocity ─────────────────────────────────────────────────────
-  const velocityValues = spaces
-    .map(s => {
-      const m = s.metrics.find((mv: MetricValue) => mv.metricId === 'pipeline_velocity')
-
-      return m?.value ?? null
-    })
-    .filter((v): v is number => v !== null)
-
-  const avgVelocity = velocityValues.length > 0
-    ? velocityValues.reduce((a, b) => a + b, 0) / velocityValues.length
-    : 0
-
-  // Convert ratio to percentage for radialBar (capped at 100)
-  const velocityPct = Math.min(100, Math.round(avgVelocity * 100))
-
-  const velocityOpts = buildVelocityGaugeOptions(mode, GH_COLORS.neutral.textSecondary)
 
   // ── RPA Trend ─────────────────────────────────────────────────────────────
   // Take top 5 spaces sorted by most recent RPA (highest first)
@@ -225,8 +205,10 @@ const IcoCharts = ({ spaces, rpaTrend }: Props) => {
     return `${MONTH_SHORT[Number(m) - 1]} ${y}`
   })
 
-  const trendSeries = trendSpaces.map(space => {
-    const label = space.clientName || space.spaceId
+  const trendFullNames = trendSpaces.map(space => space.clientName || space.spaceId)
+
+  const trendSeries = trendSpaces.map((space, idx) => {
+    const label = trendFullNames[idx]
 
     return {
       name: label.length > 15 ? label.slice(0, 15) + '…' : label,
@@ -242,6 +224,7 @@ const IcoCharts = ({ spaces, rpaTrend }: Props) => {
   const trendOpts = buildRpaTrendOptions(
     trendCategories,
     trendSeries.length,
+    trendFullNames,
     mode,
     GH_COLORS.neutral.border,
     GH_COLORS.neutral.textSecondary
@@ -250,7 +233,7 @@ const IcoCharts = ({ spaces, rpaTrend }: Props) => {
   return (
     <Grid container spacing={6} sx={{ overflow: 'hidden' }}>
       {/* CSC Distribution */}
-      <Grid size={{ xs: 12, md: 8 }}>
+      <Grid size={{ xs: 12 }}>
         <ExecutiveCardShell
           title='Distribución CSC'
           subtitle='Activos activos por fase de la Cadena de Suministro Creativo'
@@ -273,36 +256,6 @@ const IcoCharts = ({ spaces, rpaTrend }: Props) => {
                 width='100%'
                 series={cscSeries}
                 options={cscOpts}
-              />
-            </figure>
-          )}
-        </ExecutiveCardShell>
-      </Grid>
-
-      {/* Pipeline Velocity */}
-      <Grid size={{ xs: 12, md: 4 }}>
-        <ExecutiveCardShell
-          title='Velocidad pipeline'
-          subtitle='Ratio de completados sobre activos activos'
-        >
-          {velocityValues.length === 0 ? (
-            <EmptyState
-              icon='tabler-bolt'
-              title='Sin datos'
-              description='Se necesitan activos completados para calcular la velocidad.'
-            />
-          ) : (
-            <figure
-              role='img'
-              aria-label={`Velocidad del pipeline: ${velocityPct}%`}
-              style={{ margin: 0 }}
-            >
-              <AppReactApexCharts
-                type='radialBar'
-                height={280}
-                width='100%'
-                series={[velocityPct]}
-                options={velocityOpts}
               />
             </figure>
           )}

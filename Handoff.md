@@ -1,5 +1,28 @@
 # Handoff.md
 
+## Sesión 2026-04-04 — TASK-237 Agency ICO Engine Tab UX Redesign
+
+### Rama / alcance
+
+- rama: `task/TASK-237-agency-ico-tab-ux`
+- scope: rediseño UX completo del tab ICO Engine en Agency
+
+### Qué se hizo
+
+- IcoGlobalKpis: reducido de 6 a 4 KPIs (RpA, OTD%, FTR%, Throughput), AnimatedCounter, trust como tooltip
+- IcoCharts: paletas diferenciadas (CSC=fases, RPA=roles), tooltips en labels truncados, Pipeline Velocity gauge eliminado
+- SpaceIcoScorecard: migrado de CSS grid a TanStack React Table con sticky headers, sorting visible con aria-sort, tooltips en zone dots, stuck assets como chip clickeable
+- AgencyIcoEngineView: performance report reestructurado en 3 Accordions colapsables (Salud de entrega, Volumen y composición, Resumen ejecutivo), charts y scorecard movidos antes del report, trust highlights eliminados del report (ya en KPI tooltips)
+- Patrón de progressive disclosure documentado en GREENHOUSE_UI_PLATFORM_V1.md
+
+### Verificación
+
+- `pnpm build` — OK
+- `pnpm lint` — OK
+- `pnpm test` — 218 files, 917 tests pass
+
+---
+
 ## Sesión 2026-04-04 — TASK-232 implementada end-to-end y cerrada
 
 ### Rama / alcance

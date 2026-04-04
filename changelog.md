@@ -2,6 +2,13 @@
 
 ## 2026-04-04
 
+- **TASK-237 Agency ICO Engine Tab UX Redesign**:
+  - KPIs reducidos de 6 a 4 con AnimatedCounter y trust metadata como tooltip
+  - Charts: paletas diferenciadas CSC vs RPA trend, tooltips en labels truncados, Pipeline Velocity gauge eliminado
+  - Scorecard migrado a TanStack React Table con sticky headers, sorting aria-sort, tooltips en zone dots
+  - Performance report en 3 Accordions colapsables con chips de estado
+  - Patrón progressive disclosure documentado en `GREENHOUSE_UI_PLATFORM_V1.md`
+
 - **TASK-232 ICO LLM async lane implemented end-to-end**:
   - `ICO` ya tiene carril LLM async sobre `ico.ai_signals.materialized`, desacoplado del request path principal
   - provider/runtime efectivo: `Vertex AI` + `@google/genai` + `Gemini` con baseline `google/gemini-2.5-flash@default`
