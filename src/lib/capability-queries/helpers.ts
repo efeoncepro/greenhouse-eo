@@ -12,6 +12,7 @@ import type {
 } from '@/types/capabilities'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type { CreativeHubTask } from '@/lib/capability-queries/creative-hub-runtime'
+import { resolveIterationVelocityMetric } from '@/lib/ico-engine/iteration-velocity'
 import type { CapabilityModuleSnapshot, CapabilitySnapshotProject } from '@/lib/capability-queries/shared'
 import type { MetricsSummary } from '@/lib/ico-engine/read-metrics'
 
@@ -20,6 +21,9 @@ const percentFormatter = new Intl.NumberFormat('es-CL', { maximumFractionDigits:
 
 const formatInteger = (value: number) => integerFormatter.format(value)
 const formatPercent = (value: number | null) => `${percentFormatter.format(Math.max(0, value || 0))}%`
+
+const formatIterationCadence = (value: number | null, windowDays: number) =>
+  value !== null ? `${formatInteger(value)}/${windowDays}d` : null
 
 type ProjectLens = 'creative' | 'crm' | 'onboarding' | 'web'
 
@@ -238,6 +242,20 @@ const average = (values: number[]) => {
 const formatDays = (value: number | null) => (value !== null ? `${Math.round(value * 10) / 10} dias` : null)
 const formatRatio = (value: number | null, suffix = 'x') => (value !== null ? `${Math.round(value * 10) / 10}${suffix}` : null)
 
+const buildIterationVelocityDescription = (
+  metric: ReturnType<typeof resolveIterationVelocityMetric>
+) => {
+  if (metric.dataStatus === 'unavailable') {
+    return 'Sin evidencia suficiente para estimar iteraciones utiles cerradas en los ultimos 30 dias.'
+  }
+
+  const modeLabel = metric.evidenceMode === 'observed' ? 'Dato observado' : 'Proxy operativo'
+
+  return `${modeLabel}: ${formatInteger(metric.evidence.usefulIterationTasks)} iteraciones utiles cerradas sobre ${formatInteger(
+    metric.evidence.candidateTasks
+  )} assets completados; ${formatInteger(metric.evidence.correctiveReworkTasks)} quedaron dominados por correccion.`
+}
+
 const buildCreativeBrandConsistency = (tasks: CreativeHubTask[]) => {
   const completedTasks = tasks.filter(task => task.cscPhase === 'Completado')
   const firstTimeRightBase = completedTasks.filter(task => task.clientChangeRounds !== null)
@@ -300,7 +318,17 @@ export const buildCreativeRevenueCardData = (
       : 0
 
   const iterationVelocity =
-    avgRpa !== null && avgRpa > 0 ? Math.round((INDUSTRY_RPA / avgRpa) * 10) / 10 : null
+    resolveIterationVelocityMetric({
+      tasks: tasks.map(task => ({
+        completedAt: task.completedAt,
+        frameVersions: task.frameVersions,
+        clientChangeRounds: task.clientChangeRounds,
+        workflowChangeRounds: task.workflowChangeRounds,
+        clientReviewOpen: task.clientReviewOpen,
+        workflowReviewOpen: task.workflowReviewOpen,
+        openFrameComments: task.openFrameComments
+      }))
+    })
 
   const throughputGain =
     avgRpa !== null && avgRpa > 0 ? Math.round(((INDUSTRY_RPA / avgRpa) - 1) * 100) : null
@@ -316,9 +344,16 @@ export const buildCreativeRevenueCardData = (
     {
       id: 'iteration-velocity',
       label: 'Iteration Velocity',
-      value: iterationVelocity !== null ? `${iterationVelocity}x` : null,
-      description: 'Ciclos creativos posibles vs velocidad estandar de industria',
-      tone: iterationVelocity !== null && iterationVelocity > 1 ? 'success' : 'warning'
+      value: formatIterationCadence(iterationVelocity.value, iterationVelocity.cadenceWindowDays),
+      description: buildIterationVelocityDescription(iterationVelocity),
+      tone:
+        iterationVelocity.dataStatus === 'unavailable'
+          ? 'info'
+          : (iterationVelocity.value ?? 0) >= 3
+            ? 'success'
+            : (iterationVelocity.value ?? 0) >= 1
+              ? 'warning'
+              : 'error'
     },
     {
       id: 'creative-throughput',

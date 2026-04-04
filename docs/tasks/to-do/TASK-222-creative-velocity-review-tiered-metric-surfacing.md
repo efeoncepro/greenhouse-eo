@@ -3,12 +3,16 @@
 ## Delta 2026-04-04
 
 - `TASK-218` ya dejó un primer consumer visible de `TTM` en campañas con estados `available`, `degraded` y `unavailable`.
+- `TASK-219` ya dejó un primer contrato runtime de `Iteration Velocity` y reemplazó la heurística legacy de `Creative Hub` derivada de `RpA`.
 - Para esta task cambia un supuesto importante:
   - `TTM` ya no parte desde cero
+  - `Iteration Velocity` tampoco parte desde cero, pero hoy sigue siendo una lane controlada con evidencia proxy de delivery
   - pero tampoco está lista para presentarse como métrica madura en `CVR` agency-wide
 - Regla nueva para `TASK-222`:
   - cualquier surfacing client-facing de `TTM` debe consumir ese contrato de evidencia y no volver a caer en heurísticas locales de `Early Launch`
+  - cualquier surfacing client-facing de `Iteration Velocity` debe consumir el contrato canónico de iteraciones útiles y no volver a caer en `pipeline_velocity` ni en proxies de `RpA`
   - mientras `TTM` no entre al carril registry/materialization amplio del engine, su exposición debe tratarse como controlada y explícita en confianza
+  - mientras `Iteration Velocity` no tenga evidencia observada de mercado, su exposición debe tratarse como proxy y no como métrica madura de `RE Iteration`
 
 ## Status
 

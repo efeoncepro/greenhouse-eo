@@ -1,5 +1,12 @@
 # TASK-223 - ICO Methodological Accelerators Instrumentation
 
+## Delta 2026-04-04
+
+- `TASK-219` ya dejó un contrato runtime inicial para `Iteration Velocity` como iteraciones útiles cerradas en `30d`, con distinción explícita entre proxy operativo y evidencia observada.
+- Regla nueva para `TASK-223`:
+  - cualquier hipótesis causal sobre `Design System` o `Brand Voice para AI` debe correlacionarse contra ese contrato canónico de `Iteration Velocity`
+  - no se permite usar `pipeline_velocity` ni heurísticas derivadas de `RpA` como sustituto de iteración útil
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -98,4 +105,3 @@ Reglas obligatorias:
 ## Verification
 
 - revisión manual de consistencia documental
-

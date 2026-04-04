@@ -42,6 +42,31 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.4
+
+**Canal:** Beta
+**Fecha:** 2026-04-04
+**Disponible para:** internal
+**Módulos:** Capabilities / Creative Hub / Projects / ICO
+
+### Novedades
+
+- `Creative Hub` ahora muestra `Iteration Velocity` desde un contrato canónico de `ICO`, no desde una heurística derivada de `RpA`.
+
+### Mejoras
+
+- La métrica ahora comunica una cadencia operativa real de iteraciones útiles cerradas en los últimos `30d`.
+- El reader de proyecto `ICO` también expone `iterationVelocity`, dejando disponible el mismo contrato para consumers posteriores.
+
+### Correcciones
+
+- `Iteration Velocity` deja de reutilizar un proxy de `RpA` que podía confundir rework con capacidad real de iteración.
+- El sistema ahora explicita cuando la señal sigue siendo `Proxy operativo` por falta de evidencia observada de mercado.
+
+### Notas
+
+- Mientras esta lane no tenga evidencia ads-platform o de mercado observada, la lectura debe entenderse como capacidad proxy habilitada por delivery y no como uplift confirmado de performance.
+
 ## 2026.04-beta.3
 
 **Canal:** Beta
