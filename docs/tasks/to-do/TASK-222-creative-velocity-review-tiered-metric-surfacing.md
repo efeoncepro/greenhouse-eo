@@ -2,6 +2,16 @@
 
 ## Delta 2026-04-04
 
+- `TASK-221` ya cerró el primer measurement model canónico de `Revenue Enabled`.
+- Regla nueva para `TASK-222`:
+  - `CVR` y cualquier narrativa client-facing ya no pueden reutilizar heurísticas locales de `Revenue Enabled`
+  - `Early Launch` debe consumir `TTM` y respetar sus estados de evidencia
+  - `Iteration` debe heredar la clase de atribución del contrato canónico y no venderse como revenue observado mientras siga en `proxy`
+  - `Throughput` debe tratarse como palanca estimada hasta que exista un carril de iniciativas incrementales atribuibles
+  - la surface client-facing debe mostrar o resumir la policy `observed / range / estimated / unavailable` en vez de esconderla
+
+## Delta 2026-04-04
+
 - `TASK-218` ya dejó un primer consumer visible de `TTM` en campañas con estados `available`, `degraded` y `unavailable`.
 - `TASK-219` ya dejó un primer contrato runtime de `Iteration Velocity` y reemplazó la heurística legacy de `Creative Hub` derivada de `RpA`.
 - Para esta task cambia un supuesto importante:

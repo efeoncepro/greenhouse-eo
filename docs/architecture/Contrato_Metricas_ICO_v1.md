@@ -1,5 +1,23 @@
 # Contrato de métricas ICO
 
+## Delta 2026-04-04 — TASK-221 formaliza el measurement model inicial de Revenue Enabled
+
+`TASK-221` no convierte todavía `Revenue Enabled` en un KPI universal con monto total por tenant, pero sí cierra su primer contrato defendible de medición y atribución.
+
+- `Revenue Enabled` ya debe leerse como un modelo con clases explícitas:
+  - `observed`
+  - `range`
+  - `estimated`
+- regla vigente:
+  - `observed` exige linkage directo entre la palanca y un outcome real de revenue/performance
+  - `range` exige señal operativa suficientemente observada + baseline comparable de revenue
+  - `estimated` cubre señales operativas válidas que todavía no tienen baseline directo o que siguen en `proxy`
+- implicaciones inmediatas por palanca:
+  - `Early Launch` ya no puede inferirse desde `OTD`; depende de `TTM`
+  - `Iteration` ya no puede inferirse desde `RpA` ni `pipeline_velocity`; depende del contrato canónico de `Iteration Velocity`
+  - `Throughput` no puede vender el `throughput_count` actual como si ya fuera “campañas adicionales con revenue observado”; hoy esa palanca sigue estimada
+- `Creative Hub` ya no debe presentar revenue habilitado desde benchmarks heurísticos locales; debe explicitar la clase de atribución y los límites de cada palanca
+
 ## Delta 2026-04-04 — TASK-220 formaliza el contrato inicial de Brief Clarity Score
 
 `TASK-220` cierra el primer contrato runtime de `BCS` y de `brief efectivo` sin esperar al AI layer completo end-to-end.
@@ -140,6 +158,34 @@ Revenue habilitado por más iniciativas ejecutadas con la misma capacidad. Más 
 | **RE Throughput** | Campañas adicionales × revenue promedio por campaña | Baseline de campañas/mes antes de Globe. Revenue promedio histórico por campaña. |
 
 > *Regla de oro: Revenue Enabled se presenta en QBR como "RE observado" + "RE estimado (rango)" según disponibilidad de data. Supuestos siempre explícitos. Nunca se promete exactitud absoluta cuando la atribución no lo permite.*
+
+### 2.5 Policy de observed / range / estimated
+
+`Revenue Enabled` ya no debe viajar como una sola cifra sin clase de evidencia.
+
+| Clase | Cuándo aplica | Qué permite decir | Qué NO permite decir |
+|---|---|---|---|
+| **Observed** | Existe linkage directo entre la palanca y el outcome económico o de performance relevante. | “Hay evidencia observada de impacto habilitado por esta palanca.” | No autoriza extrapolar a todo el trimestre o tenant sin el mismo linkage. |
+| **Range** | Existe señal operativa suficientemente observada y un baseline comparable de revenue, pero no linkage causal directo completo. | “El impacto razonable cae dentro de este rango.” | No autoriza presentar una cifra puntual como verdad exacta. |
+| **Estimated** | Existe señal operativa útil, pero la palanca sigue en proxy, sin baseline comparable o sin attribution layer defendible. | “Hay evidencia operativa que sostiene la hipótesis, pero el impacto económico sigue siendo estimado.” | No autoriza hablar de revenue observado. |
+
+Aplicación vigente por palanca:
+
+- **Early Launch**
+  - usa `TTM` como señal puente obligatoria
+  - si `TTM` no existe para la scope, la palanca queda `unavailable`
+  - si `TTM` existe pero no hay linkage directo a revenue, la lectura es `range` o `estimated`, nunca `observed`
+- **Iteration**
+  - usa el contrato canónico de `Iteration Velocity`
+  - mientras la iteración siga en `proxy operativo`, la palanca no puede declararse `observed`
+- **Throughput**
+  - el `throughput_count` actual mide output operativo, no todavía campañas adicionales o revenue incremental capturado
+  - por lo tanto esta palanca debe leerse como `estimated` hasta que exista un carril de iniciativas incrementales atribuibles
+
+Regla de consumer:
+
+- ningún consumer debe volver a reconstruir `Revenue Enabled` desde benchmarks locales de industria, `OTD`, `RpA` o `pipeline_velocity`
+- si la scope no tiene la métrica puente correcta, el estado correcto es `unavailable`, no una heurística heroica
 
 ---
 

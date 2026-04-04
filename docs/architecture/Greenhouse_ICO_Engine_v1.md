@@ -1,5 +1,26 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-04 — TASK-221 ships the first Revenue Enabled measurement-model contract
+
+`TASK-221` no agrega todavía una materialización nueva del engine para `Revenue Enabled`, pero sí deja un contrato runtime explícito para que los consumers dejen de inventar atribución local.
+
+- `src/lib/ico-engine/revenue-enabled.ts` ya compone las palancas sobre foundations reales:
+  - `TTM`
+  - `Iteration Velocity`
+  - `throughput`
+- el contrato ya distingue clases de atribución:
+  - `observed`
+  - `range`
+  - `estimated`
+  - `unavailable`
+- regla vigente:
+  - `Creative Hub` ya no debe derivar `Revenue Enabled` desde `OTD`, `RpA` ni benchmarks locales como si fueran revenue observado
+  - `Throughput` actual sigue siendo output operativo y no debe presentarse todavía como “campañas adicionales con revenue observado”
+- esta entrega permanece `on-read`:
+  - no abre tabla nueva en `ico_engine`
+  - no publica evento nuevo
+  - deja el carril listo para futuros readers/materializaciones cuando exista attribution layer defendible
+
 ## Delta 2026-04-04 — TASK-220 ships the first BCS runtime contract
 
 `TASK-220` activa el primer contrato runtime de `Brief Clarity Score` sin introducir todavía un writer canónico único para el AI layer.

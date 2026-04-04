@@ -1,5 +1,97 @@
 # Handoff.md
 
+## Sesión 2026-04-04 — TASK-221 implementada y cerrada
+
+### Rama / alcance
+
+- rama actual: `feature/codex-task-221-revenue-enabled`
+- scope principal:
+  - `src/lib/ico-engine/revenue-enabled.ts`
+  - `src/lib/ico-engine/revenue-enabled.test.ts`
+  - `src/lib/capability-queries/helpers.ts`
+  - `src/config/capability-registry.ts`
+  - docs/lifecycle:
+    - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+    - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+    - `docs/changelog/CLIENT_CHANGELOG.md`
+    - `changelog.md`
+    - `docs/tasks/complete/TASK-221-revenue-enabled-measurement-model-attribution-policy.md`
+    - `docs/tasks/to-do/TASK-222-creative-velocity-review-tiered-metric-surfacing.md`
+    - `docs/tasks/to-do/TASK-223-ico-methodological-accelerators-instrumentation.md`
+    - `docs/tasks/README.md`
+    - `Handoff.md`
+
+### Resultado
+
+- `Revenue Enabled` ya tiene helper canónico inicial con clases explícitas `observed`, `range`, `estimated` y `unavailable`.
+- `Creative Hub` dejó de reconstruir la narrativa de `Revenue Enabled` desde `OTD`, `RpA` y benchmarks de industria; ahora consume el measurement model canónico.
+- La policy documental ya dejó explícito que:
+  - `Early Launch` depende de `TTM`
+  - `Iteration` depende del contrato canónico de `Iteration Velocity`
+  - `Throughput` actual sigue siendo output operativo y no revenue observado
+- No se creó migración ni materialización nueva; esta entrega cierra el carril `on-read` y deja pendiente una attribution layer monetaria futura.
+- `TASK-221` quedó movida a `complete`.
+- Se dejaron deltas cruzados en `TASK-222` y `TASK-223` para que no vuelvan a introducir heurísticas locales de `Revenue Enabled`.
+
+### Riesgos / siguientes pasos
+
+- `Early Launch` seguirá apareciendo como `unavailable` en scopes sin `TTM` suficiente; eso es correcto y evita precisión falsa.
+- `Throughput` sigue intencionalmente en `estimated` hasta que exista linkage defendible a iniciativas incrementales/revenue.
+- Si una lane futura quiere mostrar monto de `Revenue Enabled`, primero necesita attribution layer auditable por palanca/campaña.
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/ico-engine/revenue-enabled.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm lint`
+- `pnpm build`
+- `rg -n "new Pool\\(" src`
+
+## Sesión 2026-04-04 — TASK-221 auditada, corregida y movida a in-progress
+
+### Rama / alcance
+
+- rama actual: `feature/codex-task-220-brief-clarity-governance`
+- scope:
+  - `docs/tasks/in-progress/TASK-221-revenue-enabled-measurement-model-attribution-policy.md`
+  - `docs/tasks/README.md`
+  - `Handoff.md`
+  - auditoría runtime sobre:
+    - `src/lib/ico-engine/time-to-market.ts`
+    - `src/lib/ico-engine/iteration-velocity.ts`
+    - `src/lib/ico-engine/brief-clarity.ts`
+    - `src/lib/ico-engine/read-metrics.ts`
+    - `src/lib/campaigns/campaign-metrics.ts`
+    - `src/lib/campaigns/campaign-extended.ts`
+    - `src/lib/capability-queries/helpers.ts`
+    - `src/lib/capability-queries/creative-hub.ts`
+    - `src/app/api/projects/[id]/ico/route.ts`
+    - `src/app/api/campaigns/[campaignId]/metrics/route.ts`
+    - `src/app/api/campaigns/[campaignId]/360/route.ts`
+    - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+    - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+    - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+    - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+    - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+    - `docs/architecture/schema-snapshot-baseline.sql`
+
+### Resultado
+
+- `TASK-221` quedó movida a `in-progress` tras discovery/auditoría real del repo.
+- La spec se corrigió para dejar explícito que:
+  - la lane no parte desde cero
+  - `TTM`, `Iteration Velocity` y `BCS/effectiveBriefAt` ya existen como foundations runtime reutilizables
+  - `TASK-213` sigue siendo paraguas de alineación, no blocker técnico duro
+  - el consumer visible de `Revenue Enabled` en `Creative Hub` hoy sigue siendo heurístico y debe converger a contrato canónico
+  - no existe todavía read model, materialización ni attribution policy runtime específica para `Revenue Enabled`
+- Riesgo operativo detectado:
+  - `CampaignFinancials` agrega revenue a nivel cliente y no resuelve atribución incremental por campaña/palanca
+  - `Creative Hub` mezcla narrativa `Revenue Enabled` con heurísticas locales (`OTD`, `RpA`, benchmarks de industria)
+
+### Verificación
+
+- revisión manual de consistencia entre spec, arquitectura, runtime ICO, consumers visibles y schema snapshot
+
 ## Sesión 2026-04-04 — TASK-220 implementada y verificada
 
 ### Rama / alcance

@@ -42,6 +42,31 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.6
+
+**Canal:** Beta
+**Fecha:** 2026-04-04
+**Disponible para:** internal
+**Módulos:** Capabilities / Creative Hub / ICO
+
+### Novedades
+
+- `Creative Hub` ahora muestra `Revenue Enabled` como un modelo de medición con policy de atribución visible, no como una cifra inferida desde heurísticas locales.
+
+### Mejoras
+
+- El bloque distingue mejor qué palancas tienen evidencia utilizable y cuáles siguen en `Estimado` o `No disponible`.
+- `Revenue Enabled` deja explícito que `Iteration` y `Throughput` no equivalen automáticamente a revenue observado solo por tener buena señal operativa.
+
+### Correcciones
+
+- `Creative Hub` deja de presentar `OTD`, `RpA` y benchmarks de industria como si fueran evidencia suficiente de revenue incremental.
+- La vista ya no sugiere `Early Launch` cuando la scope todavía no trae `TTM` canónico.
+
+### Notas
+
+- Esta es una policy inicial de medición: `Revenue Enabled` todavía no publica un total universal por tenant y solo podrá graduar a `Observed` cuando exista linkage defendible entre palanca y outcome económico.
+
 ## 2026.04-beta.5
 
 **Canal:** Beta
