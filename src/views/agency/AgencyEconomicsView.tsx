@@ -25,6 +25,7 @@ import classnames from 'classnames'
 
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import PeriodNavigator from '@/components/greenhouse/PeriodNavigator'
 import AppRecharts from '@/libs/styles/AppRecharts'
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from '@/libs/Recharts'
 
@@ -101,7 +102,10 @@ const clientColumns: ColumnDef<ClientEcon, any>[] = [
 
 const AgencyEconomicsView = () => {
   const theme = useTheme()
+  const [year, setYear] = useState(() => new Date().getFullYear())
+  const [month, setMonth] = useState(() => new Date().getMonth() + 1)
   const [pnl, setPnl] = useState<PnlData | null>(null)
+  const [prevPnl, setPrevPnl] = useState<PnlData | null>(null)
   const [clients, setClients] = useState<ClientEcon[]>([])
   const [trends, setTrends] = useState<TrendPeriod[]>([])
   const [loading, setLoading] = useState(true)
@@ -111,17 +115,21 @@ const AgencyEconomicsView = () => {
     setLoading(true)
 
     try {
-      const now = new Date()
-      const year = now.getFullYear()
-      const month = now.getMonth() + 1
+      const prevMonth = month === 1 ? 12 : month - 1
+      const prevYear = month === 1 ? year - 1 : year
 
-      const [pnlRes, clientsRes, trendsRes] = await Promise.allSettled([
-        fetch('/api/finance/dashboard/pnl'),
+      const [pnlRes, prevPnlRes, clientsRes, trendsRes] = await Promise.allSettled([
+        fetch(`/api/finance/dashboard/pnl?year=${year}&month=${month}`),
+        fetch(`/api/finance/dashboard/pnl?year=${prevYear}&month=${prevMonth}`),
         fetch(`/api/finance/intelligence/operational-pl?year=${year}&month=${month}&scope=client`),
         fetch('/api/finance/analytics/trends?type=expenses&months=6')
       ])
 
       if (pnlRes.status === 'fulfilled' && pnlRes.value.ok) setPnl(await pnlRes.value.json())
+      else setPnl(null)
+
+      if (prevPnlRes.status === 'fulfilled' && prevPnlRes.value.ok) setPrevPnl(await prevPnlRes.value.json())
+      else setPrevPnl(null)
 
       if (clientsRes.status === 'fulfilled' && clientsRes.value.ok) {
         const d = await clientsRes.value.json()
@@ -144,7 +152,7 @@ const AgencyEconomicsView = () => {
     } catch (err) { console.error('[AgencyEconomics] load error:', err) } finally {
       setLoading(false)
     }
-  }, [])
+  }, [year, month])
 
   useEffect(() => { void load() }, [load])
 
@@ -167,6 +175,27 @@ const AgencyEconomicsView = () => {
   const ebitda = pnl?.margins?.ebitda ?? 0
   const ebitdaPct = pnl?.margins?.ebitdaPercent
 
+  // Deltas vs previous month
+  const prevRevenue = prevPnl?.revenue?.netRevenue ?? 0
+  const prevCosts = prevPnl?.costs?.totalExpenses ?? 0
+  const prevEbitda = prevPnl?.margins?.ebitda ?? 0
+
+  const prevLabel = MONTHS[month === 1 ? 12 : month - 1]
+
+  const valueDelta = (current: number, previous: number, invertTrend = false): { direction: 'positive' | 'negative' | 'neutral'; label: string; ref: string } | null => {
+    if (previous <= 0 && current <= 0) return null
+    if (previous <= 0) return null
+
+    const pctDelta = Math.round(((current - previous) / Math.abs(previous)) * 100)
+    const direction = pctDelta === 0 ? 'neutral' as const : invertTrend ? (pctDelta > 0 ? 'negative' as const : 'positive' as const) : (pctDelta > 0 ? 'positive' as const : 'negative' as const)
+
+    return { direction, label: `${Math.abs(pctDelta)}% vs ${prevLabel}`, ref: fmtClp(previous) }
+  }
+
+  const revenueDelta = valueDelta(revenue, prevRevenue)
+  const costsDelta = valueDelta(costs, prevCosts, true)
+  const ebitdaDelta = valueDelta(ebitda, prevEbitda)
+
   // Build expense trend chart data
   const trendChart = trends.map(t => ({
     label: `${MONTHS[t.month]} ${String(t.year).slice(2)}`,
@@ -175,29 +204,69 @@ const AgencyEconomicsView = () => {
 
   return (
     <Grid container spacing={6}>
-      {/* Header */}
+      {/* Header with PeriodNavigator */}
       <Grid size={{ xs: 12 }}>
         <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
           <CardHeader
             title='Economía'
             subheader='P&L, rentabilidad y clientes'
             avatar={<Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}><i className='tabler-chart-line' style={{ fontSize: 22, color: 'var(--mui-palette-primary-main)' }} /></Avatar>}
+            action={
+              <PeriodNavigator
+                year={year}
+                month={month}
+                onChange={({ year: y, month: m }) => { setYear(y); setMonth(m) }}
+              />
+            }
           />
         </Card>
       </Grid>
 
-      {/* P&L KPIs */}
+      {/* P&L KPIs with period comparison */}
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <HorizontalWithSubtitle title='Revenue' stats={fmtClp(revenue)} avatarIcon='tabler-cash' avatarColor='success' subtitle='Ingresos netos del mes' />
+        <HorizontalWithSubtitle
+          title='Revenue'
+          stats={fmtClp(revenue)}
+          avatarIcon='tabler-cash'
+          avatarColor='success'
+          trend={revenueDelta?.direction}
+          trendNumber={revenueDelta?.label}
+          subtitle='Ingresos netos del mes'
+          footer={revenueDelta ? `${prevLabel}: ${revenueDelta.ref}` : undefined}
+        />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <HorizontalWithSubtitle title='Costos' stats={fmtClp(costs)} avatarIcon='tabler-receipt' avatarColor='error' subtitle='Costos totales' />
+        <HorizontalWithSubtitle
+          title='Costos'
+          stats={fmtClp(costs)}
+          avatarIcon='tabler-receipt'
+          avatarColor='error'
+          trend={costsDelta?.direction}
+          trendNumber={costsDelta?.label}
+          subtitle='Costos totales'
+          footer={costsDelta ? `${prevLabel}: ${costsDelta.ref}` : undefined}
+        />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <HorizontalWithSubtitle title='Margen bruto' stats={fmtClp(grossMargin)} avatarIcon='tabler-trending-up' avatarColor={grossMargin >= 0 ? 'success' : 'error'} subtitle={pct(pnl?.margins?.grossMarginPercent)} />
+        <HorizontalWithSubtitle
+          title='Margen bruto'
+          stats={fmtClp(grossMargin)}
+          avatarIcon='tabler-trending-up'
+          avatarColor={grossMargin >= 0 ? 'success' : 'error'}
+          subtitle={pct(pnl?.margins?.grossMarginPercent)}
+        />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <HorizontalWithSubtitle title='EBITDA' stats={fmtClp(ebitda)} avatarIcon='tabler-report-money' avatarColor={ebitda >= 0 ? 'primary' : 'error'} subtitle={ebitdaPct != null ? `${Math.round(ebitdaPct)}%` : '—'} />
+        <HorizontalWithSubtitle
+          title='EBITDA'
+          stats={fmtClp(ebitda)}
+          avatarIcon='tabler-report-money'
+          avatarColor={ebitda >= 0 ? 'primary' : 'error'}
+          trend={ebitdaDelta?.direction}
+          trendNumber={ebitdaDelta?.label}
+          subtitle={ebitdaPct != null ? `${Math.round(ebitdaPct)}%` : '—'}
+          footer={ebitdaDelta ? `${prevLabel}: ${ebitdaDelta.ref}` : undefined}
+        />
       </Grid>
 
       {/* Expense trend */}

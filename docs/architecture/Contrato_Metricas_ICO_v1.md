@@ -1,5 +1,15 @@
 # Contrato de métricas ICO
 
+## Delta 2026-04-04 — TASK-218 formaliza la source policy inicial de TTM
+
+`TASK-218` no cambia la definición conceptual de `TTM`, pero sí cierra la primera policy runtime para servir la métrica con evidencia y sin vender como canónico lo que todavía es proxy.
+
+- el evento de inicio (`brief efectivo`) sigue siendo una señal **proxy** hasta cerrar `TASK-220`
+- la prioridad actual para inicio es: primera tarea en `briefing` -> `delivery_projects.start_date` -> `campaign.actual_start_date` -> primera tarea creada -> `campaign.planned_start_date`
+- la prioridad actual para activación es: `campaign.actual_launch_date` -> primera tarea con evidencia de activación/publicación -> `delivery_projects.end_date` -> `campaign.planned_launch_date`
+- `TTM` solo puede servirse como `available` cuando ambos extremos son observados; si usa `proxy` o `planned`, debe viajar como `degraded`, y si falta evidencia o hay inconsistencia temporal, como `unavailable`
+- `pipeline_activation` sigue siendo señal útil de pipeline, pero no equivale por sí sola a evidencia canónica de salida real a mercado
+
 ## Delta 2026-04-03 — TASK-215 adds runtime RpA confidence policy
 
 `TASK-215` no cambia la definición conceptual de `RpA`, pero sí formaliza que su lectura runtime debe viajar con policy de confianza y evidencia desde el `ICO Engine`.

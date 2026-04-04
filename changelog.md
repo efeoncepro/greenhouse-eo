@@ -2,6 +2,14 @@
 
 ## 2026-04-04
 
+- **TASK-218 Time-to-Market evidence contract implemented**:
+  - `ICO` ya tiene un helper canónico inicial para `TTM` en `src/lib/ico-engine/time-to-market.ts`
+  - el contrato distingue `available`, `degraded` y `unavailable`, además de `confidenceLevel` y `qualityGateReasons`
+  - `src/lib/campaigns/campaign-metrics.ts` ahora publica `timeToMarket` en el payload de campaña con source policy explícita y filtro por `space_id`
+  - `Campaign Detail` ya expone `TTM`, evidencia de inicio/activación y estado de confianza como primer consumer visible
+  - se actualizaron además `Contrato_Metricas_ICO_v1.md` y `Greenhouse_ICO_Engine_v1.md` para dejar explícito que el inicio sigue siendo proxy hasta cerrar `TASK-220`
+  - verificado con `pnpm exec vitest run src/lib/ico-engine/time-to-market.test.ts`, `pnpm exec tsc --noEmit --pretty false`, `rg -n "new Pool\\(" src`, `pnpm lint` y `pnpm build`
+
 - **TASK-217 Agency trust propagation closed end-to-end**:
   - `Agency > Pulse`, `Agency > Delivery` y `Agency > ICO Engine` ya consumen trust metadata del `ICO Engine` sin recalcular fórmulas ni reinterpretar KPIs localmente
   - `src/lib/agency/agency-queries.ts` ahora publica `rpaMetric`, `otdMetric` y `ftrMetric` con `benchmarkType`, `qualityGateStatus`, `confidenceLevel`, `dataStatus` y evidencia resumida
