@@ -26,6 +26,8 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 
+import EmptyState from '@/components/greenhouse/EmptyState'
+
 import tableStyles from '@core/styles/table.module.css'
 
 import CreatePlacementDialog from './CreatePlacementDialog'
@@ -159,6 +161,7 @@ const StaffAugmentationListView = ({ initialCreateOpen = false, initialAssignmen
   const router = useRouter()
   const [data, setData] = useState<PlacementListResponse | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(25)
   const [search, setSearch] = useState('')
@@ -175,6 +178,7 @@ const StaffAugmentationListView = ({ initialCreateOpen = false, initialAssignmen
 
   const loadData = useCallback(async () => {
     setLoading(true)
+    setError(null)
 
     try {
       const params = new URLSearchParams({
@@ -191,6 +195,7 @@ const StaffAugmentationListView = ({ initialCreateOpen = false, initialAssignmen
 
       setData(json)
     } catch {
+      setError('No pudimos cargar los placements. Verifica tu conexión e intenta de nuevo.')
       setData(null)
     } finally {
       setLoading(false)
@@ -267,9 +272,24 @@ const StaffAugmentationListView = ({ initialCreateOpen = false, initialAssignmen
             </Box>
 
             {loading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', py: 12 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, py: 12 }}>
                 <CircularProgress />
+                <Typography variant='body2' color='text.secondary'>Cargando placements...</Typography>
               </Box>
+            ) : error ? (
+              <EmptyState
+                icon='tabler-cloud-off'
+                title='No pudimos cargar los placements'
+                description={error}
+                action={<Button variant='outlined' onClick={() => loadData()}>Reintentar</Button>}
+              />
+            ) : items.length === 0 ? (
+              <EmptyState
+                icon='tabler-briefcase-off'
+                animatedIcon='/animations/empty-inbox.json'
+                title='Sin placements'
+                description='No se encontraron placements con los filtros seleccionados.'
+              />
             ) : (
               <>
                 <Box sx={{ overflowX: 'auto' }}>

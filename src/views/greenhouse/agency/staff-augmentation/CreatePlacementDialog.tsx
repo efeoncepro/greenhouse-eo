@@ -16,6 +16,8 @@ import MenuItem from '@mui/material/MenuItem'
 import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
 
+import { toast } from 'react-toastify'
+
 import CustomTextField from '@core/components/mui/TextField'
 
 type AssignmentOption = {
@@ -197,6 +199,7 @@ const CreatePlacementDialog = ({ open, onClose, onCreated, initialAssignmentId, 
       }
 
       if (typeof json?.placementId === 'string') {
+        toast.success('Placement creado')
         onCreated(json.placementId)
       }
 

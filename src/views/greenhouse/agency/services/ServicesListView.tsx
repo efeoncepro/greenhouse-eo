@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
@@ -26,6 +27,8 @@ import classnames from 'classnames'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+
+import EmptyState from '@/components/greenhouse/EmptyState'
 
 import tableStyles from '@core/styles/table.module.css'
 
@@ -147,6 +150,7 @@ const svcColumns: ColumnDef<ServiceListItem, any>[] = [
 const ServicesListView = () => {
   const [data, setData] = useState<ListResponse | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(25)
   const [search, setSearch] = useState('')
@@ -163,6 +167,7 @@ const ServicesListView = () => {
 
   const loadData = useCallback(async () => {
     setLoading(true)
+    setError(null)
 
     const params = new URLSearchParams({
       page: String(page + 1),
@@ -179,6 +184,7 @@ const ServicesListView = () => {
 
       setData(json)
     } catch {
+      setError('No pudimos cargar los servicios. Verifica tu conexión e intenta de nuevo.')
       setData(null)
     } finally {
       setLoading(false)
@@ -263,16 +269,24 @@ const ServicesListView = () => {
             </Box>
 
             {loading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, py: 8 }}>
                 <CircularProgress />
+                <Typography variant='body2' color='text.secondary'>Cargando servicios...</Typography>
               </Box>
+            ) : error ? (
+              <EmptyState
+                icon='tabler-cloud-off'
+                title='No pudimos cargar los servicios'
+                description={error}
+                action={<Button variant='outlined' onClick={() => loadData()}>Reintentar</Button>}
+              />
             ) : items.length === 0 ? (
-              <Box sx={{ py: 8, textAlign: 'center' }} role='status'>
-                <Typography variant='h6' sx={{ mb: 1 }}>No hay servicios</Typography>
-                <Typography variant='body2' color='text.secondary'>
-                  No se encontraron servicios con los filtros seleccionados.
-                </Typography>
-              </Box>
+              <EmptyState
+                icon='tabler-package-off'
+                animatedIcon='/animations/empty-inbox.json'
+                title='Sin servicios'
+                description='No se encontraron servicios con los filtros seleccionados.'
+              />
             ) : (
               <>
                 <div className='overflow-x-auto'>

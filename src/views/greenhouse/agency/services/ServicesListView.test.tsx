@@ -79,7 +79,7 @@ describe('ServicesListView', () => {
     renderWithTheme(<ServicesListView />)
 
     await waitFor(() => {
-      expect(screen.getByText('No hay servicios')).toBeInTheDocument()
+      expect(screen.getByText('Sin servicios')).toBeInTheDocument()
     })
 
     expect(screen.getByText('No se encontraron servicios con los filtros seleccionados.')).toBeInTheDocument()

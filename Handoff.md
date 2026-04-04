@@ -1,5 +1,85 @@
 # Handoff.md
 
+## Sesión 2026-04-04 — TASK-236 Agency Resilience & Feedback Patterns
+
+### Rama / alcance
+
+- rama: `task/TASK-236-agency-resilience-feedback`
+- scope: error states, empty states, toasts, loading text en todo el módulo Agency
+
+### Qué se hizo
+
+- 7 vistas Agency ahora muestran error accionable con "Reintentar" cuando un fetch falla (nunca más spinner infinito)
+- StaffAugmentationListView ahora tiene EmptyState animado cuando no hay placements
+- ServicesListView ahora usa EmptyState centralizado (antes era Typography plana)
+- PlacementDetailView.updateOnboardingItem ahora muestra toast success/error
+- CreatePlacementDialog ahora muestra toast "Placement creado" al crear exitosamente
+- AgencyWorkspace lazy tabs (Spaces, Capacity, ICO) tienen retry en error states
+- 4 vistas standalone muestran texto contextual junto al spinner ("Cargando servicios...", etc.)
+- Patrón documentado en GREENHOUSE_UI_PLATFORM_V1.md para adopción en otros módulos
+
+### Verificación
+
+- `pnpm build` — OK
+- `pnpm lint` — OK
+- `pnpm test` — 218 files, 917 tests pass
+
+---
+
+## Sesión 2026-04-04 — Notion delivery backend incident fixed per-space
+
+### Rama / alcance
+
+- rama actual: `develop`
+- scope:
+  - `src/lib/integrations/notion-sync-orchestration.ts`
+  - `src/lib/integrations/notion-sync-orchestration.test.ts`
+  - `src/lib/sync/sync-notion-conformed.ts`
+
+### Qué se hizo
+
+- Se investigó el incidente real de `Notion Delivery Data Quality` en `/admin/integrations`.
+- Hallazgo principal:
+  - el monitor no estaba mintiendo
+  - `Sky Airline` tenía raw fresco (`2026-04-04T06:02Z` / `06:08Z`) pero `greenhouse_conformed` seguía en `2026-04-03T16:14Z`
+  - la causa raíz era de orquestación:
+    - el gate de frescura seguía actuando como bloqueo global
+    - un `space` stale (`Efeonce`) impedía materializar otro `space` ya listo (`Sky Airline`)
+- Se corrigió el runtime para cerrar por `space`:
+  - la orquestación ya no deja retenido un tenant listo por otro tenant stale
+  - el writer conformed parcial preserva los `space_id` no listos y solo reescribe el scope elegible
+  - el control plane completa/falla snapshots por `space` en vez de cerrar todo en bloque
+- Remediación aplicada:
+  - se ejecutó una corrida manual `manual_admin`
+  - resultado real:
+    - `Sky Airline` pasó a `sync_completed`
+    - `Efeonce` quedó correctamente en `waiting_for_raw`
+    - el monitor post-sync quedó `healthy` para `Sky` y `broken` para `Efeonce` por raw stale real
+
+### Evidencia verificada
+
+- `pnpm audit:notion-delivery-parity --space-id=spc-ae463d9f-b404-438b-bd5c-bd117d45c3b9 --year=2026 --month=4 --period-field=due_date`
+  - antes: `diff=81`, bucket `fresh_raw_after_conformed_sync=81`
+  - después: `diff=0`, todos los buckets en `0`
+- overview actual de orquestación:
+  - `Sky Airline` → `sync_completed`
+  - `Efeonce` → `waiting_for_raw`
+- últimas corridas de data quality:
+  - `Sky Airline` → `healthy` (`post_sync`)
+  - `Efeonce` → `broken` por `rawFreshnessReady=false`
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/integrations/notion-sync-orchestration.test.ts src/lib/integrations/notion-readiness.test.ts src/lib/integrations/notion-delivery-data-quality-core.test.ts src/lib/sync/notion-task-parity.test.ts` — OK
+- `pnpm exec tsc --noEmit` — OK
+- `pnpm exec eslint src/lib/integrations/notion-sync-orchestration.ts src/lib/integrations/notion-sync-orchestration.test.ts src/lib/sync/sync-notion-conformed.ts` — OK
+- `pnpm build` — OK
+
+### Pendiente real
+
+- `Efeonce` sigue con raw stale en `notion_ops` y requiere que el upstream refresh del día termine o se rerunée.
+- El incidente backend de bloqueo cruzado quedó corregido; el fallo restante ya no es del portal sino del upstream raw de ese `space`.
+
 ## Sesión 2026-04-04 — TASK-232 implementada end-to-end y cerrada
 
 ### Rama / alcance
