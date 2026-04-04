@@ -2,6 +2,13 @@
 
 ## 2026-04-04
 
+- **TASK-237 Agency ICO Engine Tab UX Redesign**:
+  - KPIs reducidos de 6 a 4 con AnimatedCounter y trust metadata como tooltip
+  - Charts: paletas diferenciadas CSC vs RPA trend, tooltips en labels truncados, Pipeline Velocity gauge eliminado
+  - Scorecard migrado a TanStack React Table con sticky headers, sorting aria-sort, tooltips en zone dots
+  - Performance report en 3 Accordions colapsables con chips de estado
+  - Patrón progressive disclosure documentado en `GREENHOUSE_UI_PLATFORM_V1.md`
+
 - **TASK-236 Agency Resilience & Feedback Patterns**:
   - toda vista Agency muestra error con "Reintentar" cuando un fetch falla (nunca más spinner infinito)
   - StaffAugmentationListView y ServicesListView usan EmptyState centralizado para tablas vacías
@@ -13,14 +20,8 @@
 - **Notion Delivery per-space orchestration fix**:
   - se corrigió un incidente backend real donde `Notion Delivery Data Quality` marcaba `Sky Airline` como roto aunque el raw ya estaba fresco
   - la causa raíz era de orquestación: el gate de frescura bloqueaba globalmente `sync-conformed` cuando un solo `space` seguía stale
-  - el runtime ahora converge por `space`:
-    - un tenant listo ya no queda retenido por otro tenant atrasado
-    - el writer canónico preserva `space_id` no listos en el swap parcial y solo reescribe el scope elegible
-    - el control plane `waiting_for_raw` / `sync_completed` ya refleja cierre por `space`
-  - remediación verificada:
-    - `Sky Airline` volvió a `healthy`
-    - `Efeonce` quedó `broken` únicamente por raw stale real en `notion_ops`
-  - validado con `pnpm exec vitest`, `pnpm exec tsc --noEmit`, `pnpm exec eslint` y `pnpm build`
+  - el runtime ahora converge por `space`
+  - remediación verificada: `Sky Airline` volvió a `healthy`, `Efeonce` quedó `broken` por raw stale real
 
 - **TASK-232 ICO LLM async lane implemented end-to-end**:
   - `ICO` ya tiene carril LLM async sobre `ico.ai_signals.materialized`, desacoplado del request path principal

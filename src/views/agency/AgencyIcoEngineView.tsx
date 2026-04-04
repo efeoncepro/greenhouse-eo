@@ -2,11 +2,16 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
+import Accordion from '@mui/material/Accordion'
+import AccordionDetails from '@mui/material/AccordionDetails'
+import AccordionSummary from '@mui/material/AccordionSummary'
+import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import Grid from '@mui/material/Grid'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
@@ -17,10 +22,9 @@ import IcoGlobalKpis from '@/components/agency/IcoGlobalKpis'
 import IcoCharts from '@/components/agency/IcoCharts'
 import type { RpaTrendBySpace } from '@/components/agency/IcoCharts'
 import SpaceIcoScorecard from '@/components/agency/SpaceIcoScorecard'
-import { AgencyMetricTrustInline } from '@/components/agency/metric-trust'
 import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type { SpaceMetricSnapshot } from '@/lib/ico-engine/read-metrics'
-import type { AgencyPerformanceReport, MetricTrustEntry } from '@/lib/ico-engine/performance-report'
+import type { AgencyPerformanceReport } from '@/lib/ico-engine/performance-report'
 
 export type AgencyIcoData = {
   periodYear: number
@@ -40,45 +44,17 @@ const formatPct = (value: number | null) => (value === null ? '—' : `${Math.ro
 const formatCount = (value: number | null | undefined) => (value == null ? '—' : String(value))
 const formatDelta = (value: number | null) => (value === null ? '—' : `${Math.abs(value).toFixed(1)}pp`)
 
-const REPORT_TRUST_LABELS: Record<string, string> = {
-  on_time_pct: 'On-Time %',
-  late_drop_count: 'Late Drops',
-  overdue_count: 'Overdue',
-  carry_over_count: 'Carry-Over',
-  overdue_carried_forward_count: 'Overdue CF',
-  top_performer_rpa_avg: 'Top Performer RpA'
-}
-
 const toUiTrend = (trend: AgencyPerformanceReport['summary']['trend']) =>
   trend === 'improving' ? 'positive' : trend === 'degrading' ? 'negative' : 'neutral'
 
-const toTrustMetricLike = (entry: MetricTrustEntry) => ({
-  value: entry.qualityGateStatus === 'broken' ? null : 1,
-  benchmarkType: entry.benchmarkType,
-  qualityGateStatus: entry.qualityGateStatus,
-  qualityGateReasons: entry.reasons,
-  confidenceLevel: entry.confidenceLevel
-})
+const trendChipColor = (trend: AgencyPerformanceReport['summary']['trend']): 'success' | 'secondary' | 'error' =>
+  trend === 'improving' ? 'success' : trend === 'degrading' ? 'error' : 'secondary'
+
+const trendChipLabel = (trend: AgencyPerformanceReport['summary']['trend']): string =>
+  trend === 'improving' ? 'Mejorando' : trend === 'degrading' ? 'Retroceso' : 'Estable'
 
 const AgencyIcoEngineView = ({ data, onComputeLive, computingLive }: Props) => {
   const hasData = data !== null && data.spaces.length > 0
-
-  const reportTrustHighlights =
-    data?.report?.metricTrust
-      ? ['on_time_pct', 'late_drop_count', 'overdue_count', 'carry_over_count', 'top_performer_rpa_avg']
-          .map(metricId => {
-            const trustEntry = data.report?.metricTrust?.metrics[metricId]
-
-            if (!trustEntry) return null
-
-            return {
-              metricId,
-              label: REPORT_TRUST_LABELS[metricId] ?? metricId,
-              trustEntry
-            }
-          })
-          .filter((item): item is { metricId: string; label: string; trustEntry: MetricTrustEntry } => Boolean(item))
-      : []
 
   const [rpaTrend, setRpaTrend] = useState<RpaTrendBySpace[] | undefined>(undefined)
   const [rpaTrendLoading, setRpaTrendLoading] = useState(false)
@@ -163,178 +139,6 @@ const AgencyIcoEngineView = ({ data, onComputeLive, computingLive }: Props) => {
             <IcoGlobalKpis spaces={data.spaces} />
           </SectionErrorBoundary>
 
-          {data.report ? (
-            <SectionErrorBoundary sectionName='ico-performance-report' description='No pudimos construir el scorecard mensual de performance.'>
-              <Grid container spacing={6}>
-                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-                  <HorizontalWithSubtitle
-                    title='On-Time %'
-                    stats={formatPct(data.report.summary.onTimePct)}
-                    avatarIcon='tabler-clock-check'
-                    avatarColor='success'
-                    subtitle={`Mes anterior ${formatPct(data.report.summary.previousOnTimePct)}`}
-                    trend={toUiTrend(data.report.summary.trend)}
-                    trendNumber={formatDelta(data.report.summary.onTimeDeltaPp)}
-                    footer={`Tendencia ${data.report.summary.trend === 'improving' ? 'mejora' : data.report.summary.trend === 'degrading' ? 'retroceso' : 'estable'}`}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-                  <HorizontalWithSubtitle
-                    title='Late Drops'
-                    stats={formatCount(data.report.summary.lateDrops)}
-                    avatarIcon='tabler-arrow-down-bar'
-                    avatarColor='warning'
-                    subtitle='Activos completados fuera de fecha'
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-                  <HorizontalWithSubtitle
-                    title='Overdue'
-                    stats={formatCount(data.report.summary.overdue)}
-                    avatarIcon='tabler-alert-circle'
-                    avatarColor='error'
-                    subtitle='Activos vencidos al cierre del período'
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-                  <HorizontalWithSubtitle
-                    title='Carry-Over'
-                    stats={formatCount(data.report.summary.carryOver)}
-                    avatarIcon='tabler-arrow-back-up'
-                    avatarColor='secondary'
-                    subtitle='Carga creada este mes con entrega futura'
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-                  <HorizontalWithSubtitle
-                    title='Overdue Carried Forward'
-                    stats={formatCount(data.report.summary.overdueCarriedForward)}
-                    avatarIcon='tabler-clock-exclamation'
-                    avatarColor='warning'
-                    subtitle='Deuda vencida de períodos anteriores'
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-                  <HorizontalWithSubtitle
-                    title='Tareas Efeonce'
-                    stats={formatCount(data.report.summary.efeonceTasks)}
-                    avatarIcon='tabler-building-factory'
-                    avatarColor='info'
-                    subtitle='Carga segmentada como operación interna'
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-                  <HorizontalWithSubtitle
-                    title='Tareas Sky'
-                    stats={formatCount(data.report.summary.skyTasks)}
-                    avatarIcon='tabler-plane'
-                    avatarColor='primary'
-                    subtitle='Carga segmentada como Sky / client team'
-                  />
-                </Grid>
-                <Grid size={{ xs: 12 }}>
-                  <Card
-                    elevation={0}
-                    sx={{ p: 3, border: `1px solid ${GH_COLORS.neutral.border}`, borderRadius: 3, bgcolor: 'background.paper' }}
-                  >
-                    <Stack spacing={2.5}>
-                      <div>
-                        <Typography variant='overline' sx={{ color: GH_COLORS.neutral.textSecondary }}>
-                          Alerta
-                        </Typography>
-                        <Typography variant='body1' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 600 }}>
-                          {data.report.alertText}
-                        </Typography>
-                      </div>
-                      <div>
-                        <Typography variant='overline' sx={{ color: GH_COLORS.neutral.textSecondary }}>
-                          Resumen Ejecutivo
-                        </Typography>
-                        <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textSecondary }}>
-                          {data.report.executiveSummary}
-                        </Typography>
-                      </div>
-                      {reportTrustHighlights.length > 0 && (
-                        <div>
-                          <Typography variant='overline' sx={{ color: GH_COLORS.neutral.textSecondary }}>
-                            Confianza del scorecard
-                          </Typography>
-                          <Grid container spacing={2} sx={{ mt: 0.5 }}>
-                            {reportTrustHighlights.map(item => (
-                              <Grid key={item.metricId} size={{ xs: 12, md: 6, xl: 4 }}>
-                                <Stack
-                                  spacing={0.75}
-                                  sx={{
-                                    p: 2,
-                                    border: `1px solid ${GH_COLORS.neutral.border}`,
-                                    borderRadius: 2,
-                                    bgcolor: GH_COLORS.neutral.bgSurface
-                                  }}
-                                >
-                                  <Typography variant='body2' sx={{ fontWeight: 600, color: GH_COLORS.neutral.textPrimary }}>
-                                    {item.label}
-                                  </Typography>
-                                  <AgencyMetricTrustInline metric={toTrustMetricLike(item.trustEntry)} dense />
-                                </Stack>
-                              </Grid>
-                            ))}
-                          </Grid>
-                        </div>
-                      )}
-                    </Stack>
-                  </Card>
-                </Grid>
-                {data.report.taskMix
-                  .filter(segment => !['efeonce', 'sky'].includes(segment.segmentKey))
-                  .slice(0, 3)
-                  .map(segment => (
-                  <Grid key={segment.segmentKey} size={{ xs: 12, sm: 6, lg: 4 }}>
-                    <HorizontalWithSubtitle
-                      title={`Tareas ${segment.segmentLabel}`}
-                      stats={formatCount(segment.totalTasks)}
-                      avatarIcon='tabler-stack-2'
-                      avatarColor='info'
-                      subtitle='Carga total del período por segmento'
-                    />
-                  </Grid>
-                ))}
-                <Grid size={{ xs: 12 }}>
-                  <Card
-                    elevation={0}
-                    sx={{ p: 3, border: `1px solid ${GH_COLORS.neutral.border}`, borderRadius: 3, bgcolor: 'background.paper' }}
-                  >
-                    <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems={{ xs: 'flex-start', md: 'center' }} justifyContent='space-between'>
-                      <div>
-                        <Typography variant='overline' sx={{ color: GH_COLORS.neutral.textSecondary }}>
-                          Top Performer del período
-                        </Typography>
-                        <Typography variant='h5' sx={{ fontFamily: 'Poppins', fontWeight: 700, color: GH_COLORS.neutral.textPrimary }}>
-                          {data.report.topPerformer?.memberName ?? 'Sin ranking elegible'}
-                        </Typography>
-                        <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textSecondary }}>
-                          {data.report.topPerformer
-                            ? `${formatPct(data.report.topPerformer.otdPct)} OTD · ${data.report.topPerformer.throughputCount} completadas · RpA ${data.report.topPerformer.rpaAvg?.toFixed(2) ?? '—'}`
-                            : `Se requiere throughput >= ${data.report.assumptions.topPerformerMinThroughput} para entrar al ranking.`}
-                        </Typography>
-                      </div>
-                      <Stack spacing={0.5} sx={{ minWidth: { md: 260 } }}>
-                        <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
-                          Supuestos MVP
-                        </Typography>
-                        <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary }}>
-                          Ranking por OTD del período, con desempate por throughput y RpA.
-                        </Typography>
-                        <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
-                          Multi-assignee: {data.report.assumptions.multiAssigneePolicy}
-                        </Typography>
-                      </Stack>
-                    </Stack>
-                  </Card>
-                </Grid>
-              </Grid>
-            </SectionErrorBoundary>
-          ) : null}
-
           {/* Charts */}
           <SectionErrorBoundary sectionName='ico-charts' description='No pudimos cargar los gráficos del ICO Engine.'>
             {rpaTrendLoading ? (
@@ -348,6 +152,202 @@ const AgencyIcoEngineView = ({ data, onComputeLive, computingLive }: Props) => {
           <SectionErrorBoundary sectionName='ico-scorecard' description='No pudimos cargar el scorecard por Space.'>
             <SpaceIcoScorecard spaces={data.spaces} />
           </SectionErrorBoundary>
+
+          {/* Performance Report — Progressive Disclosure */}
+          {data.report ? (
+            <SectionErrorBoundary sectionName='ico-performance-report' description='No pudimos construir el scorecard mensual de performance.'>
+              <Stack spacing={3}>
+                {/* Accordion 1: Salud de entrega */}
+                <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+                  <Accordion disableGutters elevation={0}>
+                    <AccordionSummary expandIcon={<i className='tabler-chevron-down' />}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <i className='tabler-heartbeat' style={{ fontSize: 20 }} />
+                        <Typography variant='h6'>Salud de entrega</Typography>
+                        <CustomChip
+                          size='small'
+                          round='true'
+                          variant='tonal'
+                          color={trendChipColor(data.report.summary.trend)}
+                          label={trendChipLabel(data.report.summary.trend)}
+                        />
+                      </Box>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Grid container spacing={6}>
+                        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+                          <HorizontalWithSubtitle
+                            title='On-Time %'
+                            stats={formatPct(data.report.summary.onTimePct)}
+                            avatarIcon='tabler-clock-check'
+                            avatarColor='success'
+                            subtitle={`Mes anterior ${formatPct(data.report.summary.previousOnTimePct)}`}
+                            trend={toUiTrend(data.report.summary.trend)}
+                            trendNumber={formatDelta(data.report.summary.onTimeDeltaPp)}
+                            footer={`Tendencia ${data.report.summary.trend === 'improving' ? 'mejora' : data.report.summary.trend === 'degrading' ? 'retroceso' : 'estable'}`}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+                          <HorizontalWithSubtitle
+                            title='Late Drops'
+                            stats={formatCount(data.report.summary.lateDrops)}
+                            avatarIcon='tabler-arrow-down-bar'
+                            avatarColor='warning'
+                            subtitle='Activos completados fuera de fecha'
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+                          <HorizontalWithSubtitle
+                            title='Overdue'
+                            stats={formatCount(data.report.summary.overdue)}
+                            avatarIcon='tabler-alert-circle'
+                            avatarColor='error'
+                            subtitle='Activos vencidos al cierre del período'
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+                          <HorizontalWithSubtitle
+                            title='Carry-Over'
+                            stats={formatCount(data.report.summary.carryOver)}
+                            avatarIcon='tabler-arrow-back-up'
+                            avatarColor='secondary'
+                            subtitle='Carga creada este mes con entrega futura'
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+                          <HorizontalWithSubtitle
+                            title='Overdue Carried Forward'
+                            stats={formatCount(data.report.summary.overdueCarriedForward)}
+                            avatarIcon='tabler-clock-exclamation'
+                            avatarColor='warning'
+                            subtitle='Deuda vencida de períodos anteriores'
+                          />
+                        </Grid>
+                      </Grid>
+                    </AccordionDetails>
+                  </Accordion>
+                </Card>
+
+                {/* Accordion 2: Volumen y composicion */}
+                <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+                  <Accordion disableGutters elevation={0}>
+                    <AccordionSummary expandIcon={<i className='tabler-chevron-down' />}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <i className='tabler-chart-pie' style={{ fontSize: 20 }} />
+                        <Typography variant='h6'>Volumen y composición</Typography>
+                        <CustomChip
+                          size='small'
+                          round='true'
+                          variant='tonal'
+                          color='info'
+                          label={`${formatCount(data.report.summary.totalTasks)} tareas`}
+                        />
+                      </Box>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Grid container spacing={6}>
+                        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+                          <HorizontalWithSubtitle
+                            title='Tareas Efeonce'
+                            stats={formatCount(data.report.summary.efeonceTasks)}
+                            avatarIcon='tabler-building-factory'
+                            avatarColor='info'
+                            subtitle='Carga segmentada como operación interna'
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+                          <HorizontalWithSubtitle
+                            title='Tareas Sky'
+                            stats={formatCount(data.report.summary.skyTasks)}
+                            avatarIcon='tabler-plane'
+                            avatarColor='primary'
+                            subtitle='Carga segmentada como Sky / client team'
+                          />
+                        </Grid>
+                        {data.report.taskMix
+                          .filter(segment => !['efeonce', 'sky'].includes(segment.segmentKey))
+                          .slice(0, 3)
+                          .map(segment => (
+                            <Grid key={segment.segmentKey} size={{ xs: 12, sm: 6, lg: 4 }}>
+                              <HorizontalWithSubtitle
+                                title={`Tareas ${segment.segmentLabel}`}
+                                stats={formatCount(segment.totalTasks)}
+                                avatarIcon='tabler-stack-2'
+                                avatarColor='info'
+                                subtitle='Carga total del período por segmento'
+                              />
+                            </Grid>
+                          ))}
+                        <Grid size={{ xs: 12 }}>
+                          <Tooltip
+                            title={`Ranking por OTD del período, desempate por throughput y RpA. Multi-assignee: ${data.report.assumptions.multiAssigneePolicy}. Min throughput: ${data.report.assumptions.topPerformerMinThroughput}.`}
+                            arrow
+                            placement='top'
+                          >
+                            <Card
+                              elevation={0}
+                              sx={{ p: 3, border: `1px solid ${GH_COLORS.neutral.border}`, borderRadius: 3, bgcolor: 'background.paper' }}
+                            >
+                              <Stack direction='row' spacing={2} alignItems='center'>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 40, height: 40, borderRadius: '50%', bgcolor: GH_COLORS.neutral.bgSurface }}>
+                                  <i className='tabler-trophy' style={{ fontSize: 20 }} />
+                                </Box>
+                                <div>
+                                  <Typography variant='overline' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+                                    Top Performer del período
+                                  </Typography>
+                                  <Typography variant='h6' sx={{ fontFamily: 'Poppins', fontWeight: 700, color: GH_COLORS.neutral.textPrimary }}>
+                                    {data.report.topPerformer?.memberName ?? 'Sin ranking elegible'}
+                                  </Typography>
+                                  <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+                                    {data.report.topPerformer
+                                      ? `${formatPct(data.report.topPerformer.otdPct)} OTD · ${data.report.topPerformer.throughputCount} completadas · RpA ${data.report.topPerformer.rpaAvg?.toFixed(2) ?? '—'}`
+                                      : `Se requiere throughput >= ${data.report.assumptions.topPerformerMinThroughput} para entrar al ranking.`}
+                                  </Typography>
+                                </div>
+                              </Stack>
+                            </Card>
+                          </Tooltip>
+                        </Grid>
+                      </Grid>
+                    </AccordionDetails>
+                  </Accordion>
+                </Card>
+
+                {/* Accordion 3: Resumen ejecutivo */}
+                <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+                  <Accordion disableGutters elevation={0}>
+                    <AccordionSummary expandIcon={<i className='tabler-chevron-down' />}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <i className='tabler-report' style={{ fontSize: 20 }} />
+                        <Typography variant='h6'>Resumen ejecutivo</Typography>
+                      </Box>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Stack spacing={2.5}>
+                        <div>
+                          <Typography variant='overline' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+                            Alerta
+                          </Typography>
+                          <Typography variant='body1' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 600 }}>
+                            {data.report.alertText}
+                          </Typography>
+                        </div>
+                        <div>
+                          <Typography variant='overline' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+                            Resumen Ejecutivo
+                          </Typography>
+                          <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+                            {data.report.executiveSummary}
+                          </Typography>
+                        </div>
+                      </Stack>
+                    </AccordionDetails>
+                  </Accordion>
+                </Card>
+              </Stack>
+            </SectionErrorBoundary>
+          ) : null}
         </>
       )}
     </Stack>

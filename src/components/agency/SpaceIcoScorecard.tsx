@@ -3,9 +3,19 @@
 import { useMemo, useState } from 'react'
 
 import Box from '@mui/material/Box'
-import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
+
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  useReactTable
+} from '@tanstack/react-table'
+import type { SortingState } from '@tanstack/react-table'
+import classnames from 'classnames'
 
 import CustomChip from '@core/components/mui/Chip'
 import ExecutiveCardShell from '@/components/greenhouse/ExecutiveCardShell'
@@ -15,15 +25,33 @@ import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type { SpaceMetricSnapshot, MetricValue } from '@/lib/ico-engine/read-metrics'
 import { THRESHOLD_ZONE_COLOR, type ThresholdZone } from '@/lib/ico-engine/metric-registry'
 import { AgencyMetricStatusChip, getAgencyMetricUiState } from './metric-trust'
+import { getMetric } from './IcoGlobalKpis'
+
+import tableStyles from '@core/styles/table.module.css'
+
+// ─── Types ─────────────────────────────────────────────────────────────────
 
 type Props = {
   spaces: SpaceMetricSnapshot[]
 }
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
+/** Flat row model for TanStack table — one per space */
+type ScorecardRow = {
+  spaceId: string
+  clientName: string
+  totalTasks: number
+  activeTasks: number
+  trustSummaryMetric: MetricValue | null
+  rpa: MetricValue | undefined
+  otd: MetricValue | undefined
+  ftr: MetricValue | undefined
+  throughput: MetricValue | undefined
+  cycle: MetricValue | undefined
+  stuck: MetricValue | undefined
+  overallZone: ThresholdZone
+}
 
-const getMetric = (snapshot: SpaceMetricSnapshot, id: string): MetricValue | undefined =>
-  snapshot.metrics.find(m => m.metricId === id)
+// ─── Helpers ───────────────────────────────────────────────────────────────
 
 const formatMetric = (m: MetricValue | undefined, unit: 'number' | 'pct' | 'days'): string => {
   if (!m || m.value === null) return '—'
@@ -66,157 +94,359 @@ const getTrustSummaryMetric = (snapshot: SpaceMetricSnapshot): MetricValue | nul
   ?? snapshot.metrics.find(metric => getAgencyMetricUiState(metric) === 'valid')
   ?? null
 
-// ─── Component ──────────────────────────────────────────────────────────────
+/** Build a flat row from a SpaceMetricSnapshot */
+const toRow = (snapshot: SpaceMetricSnapshot): ScorecardRow => ({
+  spaceId: snapshot.spaceId,
+  clientName: snapshot.clientName || snapshot.spaceId,
+  totalTasks: snapshot.context.totalTasks,
+  activeTasks: snapshot.context.activeTasks,
+  trustSummaryMetric: getTrustSummaryMetric(snapshot),
+  rpa: getMetric(snapshot, 'rpa'),
+  otd: getMetric(snapshot, 'otd_pct'),
+  ftr: getMetric(snapshot, 'ftr_pct'),
+  throughput: getMetric(snapshot, 'throughput'),
+  cycle: getMetric(snapshot, 'cycle_time'),
+  stuck: getMetric(snapshot, 'stuck_assets'),
+  overallZone: getOverallZone(snapshot)
+})
 
-const SpaceIcoScorecard = ({ spaces }: Props) => {
-  const [drawerSpaceId, setDrawerSpaceId] = useState<string | null>(null)
+// ─── Zone Dot with Tooltip ─────────────────────────────────────────────────
 
-  const sorted = useMemo(() =>
-    [...spaces].sort((a, b) => {
-      const za = ZONE_ORDER[getOverallZone(a)]
-      const zb = ZONE_ORDER[getOverallZone(b)]
+const ZoneDot = ({ zone }: { zone: ThresholdZone | null }) => {
+  if (!zone) return null
+
+  const color =
+    zone === 'optimal'
+      ? GH_COLORS.semaphore.green.source
+      : zone === 'attention'
+        ? GH_COLORS.semaphore.yellow.source
+        : GH_COLORS.semaphore.red.source
+
+  return (
+    <Tooltip title={ZONE_LABEL[zone]} arrow placement='top'>
+      <Box
+        sx={{
+          width: 7,
+          height: 7,
+          borderRadius: '50%',
+          bgcolor: color,
+          flexShrink: 0
+        }}
+      />
+    </Tooltip>
+  )
+}
+
+// ─── Column definitions ────────────────────────────────────────────────────
+
+const columnHelper = createColumnHelper<ScorecardRow>()
+
+const buildColumns = (onStuckClick: (spaceId: string) => void) => [
+  // Space
+  columnHelper.accessor('clientName', {
+    header: GH_AGENCY.ico_col_space,
+    enableSorting: true,
+    cell: ({ row }) => (
+      <Stack sx={{ minWidth: 0 }}>
+        <Stack direction='row' spacing={0.75} alignItems='center' flexWrap='wrap'>
+          <Typography variant='body2' noWrap sx={{ fontWeight: 600, color: GH_COLORS.neutral.textPrimary }}>
+            {row.original.clientName}
+          </Typography>
+          <AgencyMetricStatusChip metric={row.original.trustSummaryMetric} />
+        </Stack>
+        <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+          {row.original.totalTasks} tareas · {row.original.activeTasks} activas
+        </Typography>
+      </Stack>
+    )
+  }),
+
+  // RpA
+  columnHelper.display({
+    id: 'rpa',
+    header: GH_AGENCY.ico_col_rpa,
+    enableSorting: true,
+    sortingFn: (a, b) => {
+      const va = a.original.rpa?.value ?? -Infinity
+      const vb = b.original.rpa?.value ?? -Infinity
+
+      return va - vb
+    },
+    cell: ({ row }) => (
+      <Stack direction='row' spacing={0.5} alignItems='center' justifyContent='flex-end'>
+        <ZoneDot zone={row.original.rpa?.zone ?? null} />
+        <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 500 }}>
+          {formatMetric(row.original.rpa, 'number')}
+        </Typography>
+      </Stack>
+    )
+  }),
+
+  // OTD%
+  columnHelper.display({
+    id: 'otd',
+    header: GH_AGENCY.ico_col_otd,
+    enableSorting: true,
+    sortingFn: (a, b) => {
+      const va = a.original.otd?.value ?? -Infinity
+      const vb = b.original.otd?.value ?? -Infinity
+
+      return va - vb
+    },
+    cell: ({ row }) => (
+      <Stack direction='row' spacing={0.5} alignItems='center' justifyContent='flex-end'>
+        <ZoneDot zone={row.original.otd?.zone ?? null} />
+        <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 500 }}>
+          {formatMetric(row.original.otd, 'pct')}
+        </Typography>
+      </Stack>
+    )
+  }),
+
+  // FTR%
+  columnHelper.display({
+    id: 'ftr',
+    header: GH_AGENCY.ico_col_ftr,
+    enableSorting: true,
+    sortingFn: (a, b) => {
+      const va = a.original.ftr?.value ?? -Infinity
+      const vb = b.original.ftr?.value ?? -Infinity
+
+      return va - vb
+    },
+    cell: ({ row }) => (
+      <Stack direction='row' spacing={0.5} alignItems='center' justifyContent='flex-end'>
+        <ZoneDot zone={row.original.ftr?.zone ?? null} />
+        <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 500 }}>
+          {formatMetric(row.original.ftr, 'pct')}
+        </Typography>
+      </Stack>
+    )
+  }),
+
+  // Throughput
+  columnHelper.display({
+    id: 'throughput',
+    header: GH_AGENCY.ico_col_throughput,
+    enableSorting: true,
+    sortingFn: (a, b) => {
+      const va = a.original.throughput?.value ?? -Infinity
+      const vb = b.original.throughput?.value ?? -Infinity
+
+      return va - vb
+    },
+    cell: ({ row }) => (
+      <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 500, textAlign: 'end' }}>
+        {formatMetric(row.original.throughput, 'number')}
+      </Typography>
+    )
+  }),
+
+  // Cycle (days)
+  columnHelper.display({
+    id: 'cycle',
+    header: GH_AGENCY.ico_col_cycle,
+    enableSorting: true,
+    sortingFn: (a, b) => {
+      const va = a.original.cycle?.value ?? -Infinity
+      const vb = b.original.cycle?.value ?? -Infinity
+
+      return va - vb
+    },
+    cell: ({ row }) => (
+      <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 500, textAlign: 'end' }}>
+        {formatMetric(row.original.cycle, 'days')}
+      </Typography>
+    )
+  }),
+
+  // Stuck
+  columnHelper.display({
+    id: 'stuck',
+    header: GH_AGENCY.ico_col_stuck,
+    enableSorting: true,
+    sortingFn: (a, b) => {
+      const va = a.original.stuck?.value ?? 0
+      const vb = b.original.stuck?.value ?? 0
+
+      return va - vb
+    },
+    cell: ({ row }) => {
+      const stuckCount = row.original.stuck?.value ?? 0
+
+      if (stuckCount > 0) {
+        return (
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <CustomChip
+              round='true'
+              size='small'
+              color='error'
+              variant='tonal'
+              label={String(stuckCount)}
+              onClick={() => onStuckClick(row.original.spaceId)}
+              aria-label={`Ver ${stuckCount} activos estancados de ${row.original.spaceId}`}
+              sx={{ height: 22, fontSize: '0.68rem', fontWeight: 600, cursor: 'pointer' }}
+            />
+          </Box>
+        )
+      }
+
+      return (
+        <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 500, textAlign: 'end' }}>
+          {formatMetric(row.original.stuck, 'number')}
+        </Typography>
+      )
+    }
+  }),
+
+  // Zone (overall)
+  columnHelper.accessor('overallZone', {
+    header: GH_AGENCY.ico_col_zone,
+    enableSorting: true,
+    sortingFn: (a, b) => {
+      const za = ZONE_ORDER[a.original.overallZone]
+      const zb = ZONE_ORDER[b.original.overallZone]
 
       if (za !== zb) return za - zb
 
-      return a.spaceId.localeCompare(b.spaceId)
-    }),
-    [spaces]
-  )
+      return a.original.clientName.localeCompare(b.original.clientName)
+    },
+    cell: ({ row }) => (
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <CustomChip
+          round='true'
+          size='small'
+          color={zoneColor(row.original.overallZone)}
+          variant='tonal'
+          label={ZONE_LABEL[row.original.overallZone]}
+          sx={{ height: 22, fontSize: '0.68rem', fontWeight: 600 }}
+        />
+      </Box>
+    )
+  })
+]
 
-  if (sorted.length === 0) return null
+// ─── Alignment map for header/body cells ───────────────────────────────────
 
-  const COL = {
-    color: GH_COLORS.neutral.textSecondary,
-    fontSize: '0.7rem',
-    fontWeight: 500,
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.08em'
-  }
+const COLUMN_ALIGN: Record<string, 'left' | 'right' | 'center'> = {
+  clientName: 'left',
+  rpa: 'right',
+  otd: 'right',
+  ftr: 'right',
+  throughput: 'right',
+  cycle: 'right',
+  stuck: 'right',
+  overallZone: 'center'
+}
 
-  const GRID = '1.5fr 65px 65px 65px 80px 70px 70px 80px'
+// ─── Component ─────────────────────────────────────────────────────────────
+
+const SpaceIcoScorecard = ({ spaces }: Props) => {
+  const [drawerSpaceId, setDrawerSpaceId] = useState<string | null>(null)
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'overallZone', desc: false }])
+
+  const rows = useMemo(() => spaces.map(toRow), [spaces])
+
+  const columns = useMemo(() => buildColumns(spaceId => setDrawerSpaceId(spaceId)), [])
+
+  const table = useReactTable({
+    data: rows,
+    columns,
+    state: { sorting },
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel()
+  })
+
+  if (spaces.length === 0) return null
 
   return (
     <>
       <ExecutiveCardShell title='Scorecard por Space' subtitle='Métricas ICO por Space, ordenadas por estado de salud'>
-        <Box sx={{ overflow: 'auto' }}>
-          {/* Header */}
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: GRID,
-              px: 2,
-              py: 1.25,
-              bgcolor: GH_COLORS.neutral.bgSurface,
-              borderRadius: '8px 8px 0 0',
-              minWidth: 680
-            }}
-          >
-            {[
-              GH_AGENCY.ico_col_space,
-              GH_AGENCY.ico_col_rpa,
-              GH_AGENCY.ico_col_otd,
-              GH_AGENCY.ico_col_ftr,
-              GH_AGENCY.ico_col_throughput,
-              GH_AGENCY.ico_col_cycle,
-              GH_AGENCY.ico_col_stuck,
-              GH_AGENCY.ico_col_zone
-            ].map((label, i) => (
-              <Typography key={i} sx={COL}>{label}</Typography>
-            ))}
-          </Box>
+        <div className='overflow-x-auto'>
+          <table className={tableStyles.table}>
+            <thead>
+              {table.getHeaderGroups().map(headerGroup => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map(header => {
+                    const sorted = header.column.getIsSorted()
+                    const align = COLUMN_ALIGN[header.id] ?? 'left'
 
-          <Divider />
+                    return (
+                      <th
+                        key={header.id}
+                        scope='col'
+                        align={align}
+                        aria-sort={
+                          sorted === 'asc'
+                            ? 'ascending'
+                            : sorted === 'desc'
+                              ? 'descending'
+                              : header.column.getCanSort()
+                                ? 'none'
+                                : undefined
+                        }
+                        style={{
+                          position: 'sticky',
+                          top: 0,
+                          zIndex: 1,
+                          backgroundColor: 'var(--mui-palette-background-paper)'
+                        }}
+                      >
+                        {header.isPlaceholder ? null : (
+                          <div
+                            className={classnames({
+                              'flex items-center gap-2': sorted,
+                              'cursor-pointer select-none': header.column.getCanSort()
+                            })}
+                            style={{
+                              justifyContent:
+                                align === 'right' ? 'flex-end' : align === 'center' ? 'center' : 'flex-start',
+                              display: 'flex',
+                              alignItems: 'center'
+                            }}
+                            onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
+                          >
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {{
+                              asc: <i className='tabler-chevron-up text-xl' aria-hidden='true' />,
+                              desc: <i className='tabler-chevron-down text-xl' aria-hidden='true' />
+                            }[sorted as 'asc' | 'desc'] ?? null}
+                          </div>
+                        )}
+                      </th>
+                    )
+                  })}
+                </tr>
+              ))}
+            </thead>
+            {table.getRowModel().rows.length === 0 ? (
+              <tbody>
+                <tr>
+                  <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
+                    Sin datos de Spaces
+                  </td>
+                </tr>
+              </tbody>
+            ) : (
+              <tbody>
+                {table.getRowModel().rows.map(row => (
+                  <tr key={row.id} style={{ cursor: 'default' }}>
+                    {row.getVisibleCells().map(cell => {
+                      const align = COLUMN_ALIGN[cell.column.id] ?? 'left'
 
-          {/* Rows */}
-          {sorted.map((snapshot, idx) => {
-            const rpa = getMetric(snapshot, 'rpa')
-            const otd = getMetric(snapshot, 'otd_pct')
-            const ftr = getMetric(snapshot, 'ftr_pct')
-            const throughput = getMetric(snapshot, 'throughput')
-            const cycle = getMetric(snapshot, 'cycle_time')
-            const stuck = getMetric(snapshot, 'stuck_assets')
-            const overall = getOverallZone(snapshot)
-            const stuckCount = stuck?.value ?? 0
-            const trustSummaryMetric = getTrustSummaryMetric(snapshot)
-
-            return (
-              <Box key={snapshot.spaceId}>
-                {idx > 0 && <Divider />}
-                <Box
-                  sx={{
-                    display: 'grid',
-                    gridTemplateColumns: GRID,
-                    alignItems: 'center',
-                    px: 2,
-                    py: 1.5,
-                    minWidth: 680,
-                    '&:hover': { bgcolor: GH_COLORS.neutral.bgSurface }
-                  }}
-                >
-                  {/* Space */}
-                  <Stack sx={{ minWidth: 0 }}>
-                    <Stack direction='row' spacing={0.75} alignItems='center' flexWrap='wrap'>
-                      <Typography variant='body2' noWrap sx={{ fontWeight: 600, color: GH_COLORS.neutral.textPrimary }}>
-                        {snapshot.clientName || snapshot.spaceId}
-                      </Typography>
-                      <AgencyMetricStatusChip metric={trustSummaryMetric} />
-                    </Stack>
-                    <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
-                      {snapshot.context.totalTasks} tareas · {snapshot.context.activeTasks} activas
-                    </Typography>
-                  </Stack>
-
-                  {/* RpA */}
-                  <MetricCell value={formatMetric(rpa, 'number')} zone={rpa?.zone ?? null} />
-
-                  {/* OTD */}
-                  <MetricCell value={formatMetric(otd, 'pct')} zone={otd?.zone ?? null} />
-
-                  {/* FTR */}
-                  <MetricCell value={formatMetric(ftr, 'pct')} zone={ftr?.zone ?? null} />
-
-                  {/* Throughput */}
-                  <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 500 }}>
-                    {formatMetric(throughput, 'number')}
-                  </Typography>
-
-                  {/* Cycle */}
-                  <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 500 }}>
-                    {formatMetric(cycle, 'days')}
-                  </Typography>
-
-                  {/* Stuck — clickable when > 0 */}
-                  {stuckCount > 0 ? (
-                    <Box
-                      component='button'
-                      onClick={() => setDrawerSpaceId(snapshot.spaceId)}
-                      aria-label={`Ver ${stuckCount} activos estancados de ${snapshot.spaceId}`}
-                      sx={{
-                        all: 'unset',
-                        cursor: 'pointer',
-                        '&:hover .stuck-text': { textDecoration: 'underline' }
-                      }}
-                    >
-                      <MetricCell value={formatMetric(stuck, 'number')} zone={stuck?.zone ?? null} className='stuck-text' />
-                    </Box>
-                  ) : (
-                    <MetricCell value={formatMetric(stuck, 'number')} zone={stuck?.zone ?? null} />
-                  )}
-
-                  {/* Overall */}
-                  <CustomChip
-                    round='true'
-                    size='small'
-                    color={zoneColor(overall)}
-                    variant='tonal'
-                    label={ZONE_LABEL[overall]}
-                    sx={{ height: 22, fontSize: '0.68rem', fontWeight: 600 }}
-                  />
-                </Box>
-              </Box>
-            )
-          })}
-        </Box>
+                      return (
+                        <td key={cell.id} align={align}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </td>
+                      )
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            )}
+          </table>
+        </div>
       </ExecutiveCardShell>
 
       {/* Stuck Assets Drawer */}
@@ -228,30 +458,5 @@ const SpaceIcoScorecard = ({ spaces }: Props) => {
     </>
   )
 }
-
-// ─── Metric Cell with zone indicator ────────────────────────────────────────
-
-const MetricCell = ({ value, zone, className }: { value: string; zone: ThresholdZone | null; className?: string }) => (
-  <Stack direction='row' spacing={0.5} alignItems='center'>
-    {zone && (
-      <Box
-        sx={{
-          width: 7,
-          height: 7,
-          borderRadius: '50%',
-          bgcolor: zone === 'optimal'
-            ? GH_COLORS.semaphore.green.source
-            : zone === 'attention'
-              ? GH_COLORS.semaphore.yellow.source
-              : GH_COLORS.semaphore.red.source,
-          flexShrink: 0
-        }}
-      />
-    )}
-    <Typography variant='body2' className={className} sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 500 }}>
-      {value}
-    </Typography>
-  </Stack>
-)
 
 export default SpaceIcoScorecard
