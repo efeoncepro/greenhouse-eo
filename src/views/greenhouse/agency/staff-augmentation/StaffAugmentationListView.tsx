@@ -153,7 +153,7 @@ const columns: ColumnDef<PlacementListItem, any>[] = [
   }),
   columnHelper.accessor('latestSnapshotId', {
     header: 'Snapshot',
-    cell: ({ getValue }) => <Typography variant='body2'>{getValue() ? '360 listo' : 'Pendiente'}</Typography>
+    cell: ({ getValue }) => <Typography variant='body2'>{getValue() ? 'Snapshot activo' : 'Sin snapshot'}</Typography>
   })
 ]
 

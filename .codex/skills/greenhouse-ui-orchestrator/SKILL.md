@@ -18,6 +18,7 @@ Read only what the task needs, in this order:
 - `<repo>/AGENTS.md`
 - `<repo>/project_context.md`
 - `<repo>/Handoff.md`
+- `<repo>/docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
 - `<repo>/docs/ui/GREENHOUSE_UI_ORCHESTRATION_V1.md`
 - `<repo>/docs/ui/GREENHOUSE_VUEXY_COMPONENT_CATALOG_V1.md`
 - `<repo>/docs/ui/GREENHOUSE_UI_REQUEST_BRIEF_TEMPLATE.md`
@@ -72,6 +73,14 @@ Normalize it into:
 - Do not choose patterns by aesthetics alone.
 - Do not render `seeded`, `override`, or partial data as authoritative without provenance.
 - If the request depends on a missing source of truth for team, capacity, or campaigns, stop and model first.
+
+## Animation decision rules
+
+- Recommend `AnimatedCounter` when the number change itself adds comprehension, especially in KPI cards and summary bands.
+- Keep KPIs static when the value is null, provisional, suppressed, or expressed mainly as narrative copy.
+- Recommend `EmptyState` with `animatedIcon` for first-use and no-results states when a calm loop helps orientation; keep error states static.
+- Any motion recommendation must include reduced-motion behavior: `useReducedMotion` for custom motion and static `icon` fallback for animated empty states.
+- Prefer the existing wrappers and primitives before proposing any new motion layer or third-party animation library.
 
 ## Output contract
 

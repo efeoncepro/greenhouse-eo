@@ -995,6 +995,37 @@ items.length === 0 ? (
 | Agency CreatePlacementDialog | Alert inline | — | Placement creado | — |
 | Agency Workspace (3 lazy tabs) | Retry button | — | — | Skeletons |
 
+## Breadcrumbs Pattern (TASK-238)
+
+Para vistas de detalle con jerarquía de navegación, usar **MUI Breadcrumbs** en vez de botones "Volver":
+
+```tsx
+import Breadcrumbs from '@mui/material/Breadcrumbs'
+import Link from 'next/link'
+
+<Breadcrumbs aria-label='breadcrumbs' sx={{ mb: 2 }}>
+  <Typography component={Link} href='/agency?tab=spaces' color='inherit' variant='body2'
+    sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
+    Agencia
+  </Typography>
+  <Typography component={Link} href='/agency?tab=spaces' color='inherit' variant='body2'
+    sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
+    Spaces
+  </Typography>
+  <Typography color='text.primary' variant='body2'>
+    {detail.clientName}
+  </Typography>
+</Breadcrumbs>
+```
+
+**Reglas:**
+- Breadcrumbs reemplazan botones "Volver a X" — no duplicar ambos
+- Cada nivel intermedio es un link, el último nivel es texto estático
+- `variant='body2'` para tamaño compacto
+- Links con `textDecoration: 'none'` y hover underline
+- `aria-label='breadcrumbs'` para accesibilidad
+- Implementado en: Agency Space 360, Greenhouse Project Detail, Sprint Detail
+
 ## Progressive Disclosure Pattern (TASK-237)
 
 Para vistas data-dense con más de 10 tarjetas en scroll vertical, usar **Accordion colapsable** para agrupar secciones secundarias:

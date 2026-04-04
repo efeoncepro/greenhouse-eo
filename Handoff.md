@@ -1,5 +1,70 @@
 # Handoff.md
 
+## Sesión 2026-04-04 — TASK-238 Agency Workspace & Space 360 Data Storytelling UX
+
+### Rama / alcance
+
+- rama: `task/TASK-238-agency-data-storytelling`
+- scope: terminología, tooltips, breadcrumbs, KPIs, donut chart, team cleanup, animated empty states
+
+### Qué se hizo
+
+- "Revenue" → "Ingresos" en Space360View y AgencyEconomicsView (0 instancias restantes)
+- "360 listo" → "Snapshot activo" en StaffAugmentationListView
+- "Abrir economía"/"Economía"/"Abrir finanzas" → "Ver finanzas" (unificado)
+- Tooltips en RpA, OTD, FTR, Throughput, Cycle, Stuck (nomenclatura centralizada en GH_AGENCY)
+- Breadcrumbs en Space 360 (Agencia > Spaces > [Space Name]) — "Volver a Spaces" removido
+- Per-service "Abrir detalle" removido (nombre linkeable directo)
+- Space 360 KPIs: 5→4 (Cobertura removido), layout 4-columns con AnimatedCounter
+- Pulse KPIs: AnimatedCounter en RpA, OTD, Assets, Feedback
+- ExecutiveMiniStatCard: value type widened a `string | ReactNode`
+- Finance tab: donut chart ApexCharts para composición de costo (reemplaza lista plana)
+- Team tab: campos null ocultos (grid adaptativo)
+- Animated EmptyState en 5 puntos (Space not found, Delivery, Finance income/expenses, ICO)
+- TASK-146 reference limpiada de ServicesTab
+
+### Verificación
+
+- `pnpm build` — OK
+- `pnpm lint` — OK
+- `pnpm test` — 218 files, 917 tests pass
+
+---
+
+## Sesión 2026-04-04 — TASK-234 Codex animation skill sync cerrada
+
+### Rama / alcance
+
+- rama actual: `develop`
+- scope:
+  - `docs/tasks/complete/TASK-234-codex-skills-animation-library-sync.md`
+  - `.codex/skills/greenhouse-agent/SKILL.md`
+  - `.codex/skills/greenhouse-portal-ui-implementer/SKILL.md`
+  - `.codex/skills/greenhouse-ui-orchestrator/SKILL.md`
+  - `.codex/skills/greenhouse-vuexy-ui-expert/SKILL.md`
+  - `.codex/skills/greenhouse-ux-content-accessibility/SKILL.md`
+
+### Qué se hizo
+
+- Se corrigió primero la spec de `TASK-234` para reflejar rutas y estado reales.
+- Se sincronizó el conocimiento de animación de `TASK-230` hacia las 5 skills de Codex:
+  - wrappers `Lottie` y `FramerMotion`
+  - `useReducedMotion`
+  - `AnimatedCounter`
+  - `EmptyState.animatedIcon`
+  - guardrails de assets y anti-patterns
+- La task quedó cerrada en `docs/tasks/complete/TASK-234-codex-skills-animation-library-sync.md`.
+
+### Verificación
+
+- `pnpm lint` — OK
+- `pnpm build` — OK
+- `rg -n "new Pool\\(" src` — solo `src/lib/postgres/client.ts`
+
+### Riesgo / coordinación
+
+- El worktree tiene cambios paralelos de Agency y `TASK-238`; no se deben mezclar ni revertir en este lote.
+
 ## Sesión 2026-04-04 — Payroll PDF download backend incident fixed
 
 ### Rama / alcance

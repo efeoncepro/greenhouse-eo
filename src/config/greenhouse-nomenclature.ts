@@ -197,7 +197,15 @@ export const GH_AGENCY = {
   // RPA trend
   ico_rpa_trend_title: 'Evolución RpA',
   ico_rpa_trend_subtitle: 'Promedio mensual de revisiones por activo por Space',
-  ico_rpa_trend_empty: 'Aún no hay suficiente historial para mostrar tendencias.'
+  ico_rpa_trend_empty: 'Aún no hay suficiente historial para mostrar tendencias.',
+
+  // Metric tooltips
+  tooltip_rpa: 'Revisiones por activo — promedio de ciclos de revisión por pieza entregada',
+  tooltip_otd: 'On-Time Delivery — porcentaje de tareas completadas dentro del plazo',
+  tooltip_ftr: 'First Time Right — porcentaje de tareas aprobadas sin correcciones',
+  tooltip_throughput: 'Tareas completadas en el período activo',
+  tooltip_cycle_time: 'Días promedio desde inicio hasta entrega de cada activo',
+  tooltip_stuck: 'Activos detenidos que requieren atención inmediata'
 } as const
 
 export const GH_LABELS = {

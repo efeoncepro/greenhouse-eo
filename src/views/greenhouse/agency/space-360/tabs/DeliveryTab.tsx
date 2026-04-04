@@ -60,6 +60,7 @@ const DeliveryTab = ({ detail }: Props) => {
             ) : (
               <EmptyState
                 icon='tabler-cpu-off'
+                animatedIcon='/animations/empty-chart.json'
                 title='Sin snapshot ICO'
                 description='Todavía no existe una materialización reciente del engine para este Space.'
                 action={<Button component={Link} href='/agency/delivery' variant='contained'>Ir a delivery</Button>}

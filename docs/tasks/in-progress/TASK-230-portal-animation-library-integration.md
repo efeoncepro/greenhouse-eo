@@ -1,5 +1,8 @@
 # TASK-230 — Portal Animation Library Integration
 
+## Delta 2026-04-04
+- La sync de conocimiento hacia las skills de Codex quedó cerrada por [TASK-234](../complete/TASK-234-codex-skills-animation-library-sync.md) — los agentes ya conocen wrappers, `useReducedMotion`, `AnimatedCounter`, `EmptyState.animatedIcon` y los guardrails canónicos de adopción.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

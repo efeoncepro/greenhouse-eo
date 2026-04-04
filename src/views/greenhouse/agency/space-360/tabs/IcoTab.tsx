@@ -25,6 +25,7 @@ const IcoTab = ({ detail }: Props) => {
     return (
       <EmptyState
         icon='tabler-cpu-off'
+        animatedIcon='/animations/empty-chart.json'
         title='Sin detalle ICO'
         description='La capa ICO todavía no tiene snapshot reciente para este Space.'
         action={<Button component={Link} href='/agency?tab=ico' variant='contained'>Abrir ICO Engine</Button>}
