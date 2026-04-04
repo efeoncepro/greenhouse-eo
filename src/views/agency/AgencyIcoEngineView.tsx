@@ -354,7 +354,7 @@ const AgencyIcoEngineView = ({ data, onComputeLive, computingLive }: Props) => {
 
           {/* Advisory AI Block — LLM enrichment surfacing */}
           {data.aiLlm && (
-            <SectionErrorBoundary sectionName='ico-advisory' description='No pudimos cargar el bloque advisory AI.'>
+            <SectionErrorBoundary sectionName='ico-advisory' description='No pudimos cargar las señales de Nexa Advisory.'>
               <IcoAdvisoryBlock aiLlm={data.aiLlm} />
             </SectionErrorBoundary>
           )}

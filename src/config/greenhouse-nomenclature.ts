@@ -207,25 +207,8 @@ export const GH_AGENCY = {
   tooltip_cycle_time: 'Días promedio desde inicio hasta entrega de cada activo',
   tooltip_stuck: 'Activos detenidos que requieren atención inmediata',
 
-  // Advisory LLM block
-  advisory_title: 'Advisory AI',
-  advisory_subtitle: 'Enriquecimiento LLM sobre señales del ICO Engine',
-  advisory_kpi_enrichments: 'Enriquecimientos',
-  advisory_kpi_quality: 'Calidad promedio',
-  advisory_kpi_succeeded: 'Exitosos',
-  advisory_kpi_failed: 'Con error',
-  advisory_last_run: 'Último run',
-  advisory_run_status_succeeded: 'Completado',
-  advisory_run_status_partial: 'Parcial',
-  advisory_run_status_failed: 'Con error',
-  advisory_recent_title: 'Enriquecimientos recientes',
-  advisory_empty_title: 'Sin enriquecimientos advisory',
-  advisory_empty_description: 'El pipeline advisory se ejecuta automáticamente después de cada materialización de señales AI. Aparecerá aquí cuando haya señales procesadas.',
-  advisory_tooltip_quality: 'Puntaje promedio de calidad asignado por el modelo LLM (0–100)',
-  advisory_tooltip_enrichments: 'Señales AI enriquecidas con narrativa, causa raíz y acción recomendada',
-  advisory_last_processed: (label: string) => `Último procesamiento: ${label}`,
-  advisory_signals_seen: (n: number) => `${n} señal${n !== 1 ? 'es' : ''} detectada${n !== 1 ? 's' : ''}`,
-  advisory_signals_enriched: (n: number) => `${n} enriquecida${n !== 1 ? 's' : ''}`
+  // Nexa Advisory (legacy alias — see GH_NEXA for the canonical namespace)
+  advisory_title: 'Nexa Advisory'
 } as const
 
 export const GH_LABELS = {
@@ -1250,4 +1233,64 @@ export const GH_COMPENSATION = {
   bonusOtd: { label: 'Bono On-Time' },
   bonusRpa: { label: 'Bono RpA' },
   bonusHelperText: 'Monto al 100% de cumplimiento'
+} as const
+
+// ─── Nexa Advisory Namespace ──────────────────────────────────────────────
+
+export const GH_NEXA = {
+  // Branding
+  brand: 'Nexa',
+  brand_full: 'Nexa Advisory',
+  disclaimer: 'Generado por Nexa con IA. Verifica la información antes de actuar.',
+
+  // Insights block
+  insights_title: 'Nexa Advisory',
+  insights_subtitle: 'Señales operativas analizadas por Nexa',
+  insights_chip_ready: 'Análisis listo',
+  insights_chip_partial: 'Análisis parcial',
+  insights_chip_failed: 'Sin análisis',
+  insights_chip_no_data: 'Sin datos',
+  insights_list_title: 'Señales recientes',
+  insights_action_label: 'Acción sugerida',
+  insights_last_analysis: (label: string) => `Último análisis: ${label}`,
+
+  // KPIs
+  kpi_analyzed: 'Señales analizadas',
+  kpi_analyzed_tooltip: 'Señales del ICO Engine que Nexa analizó este período',
+  kpi_analyzed_subtitle: (n: number) => `${n} señal${n !== 1 ? 'es' : ''} este período`,
+  kpi_actionable: 'Con acción sugerida',
+  kpi_actionable_tooltip: 'Señales donde Nexa identificó una acción concreta',
+  kpi_actionable_subtitle: (n: number, total: number) => `${n} de ${total} señales`,
+
+  // Signal types
+  signal_type: {
+    anomaly: 'Anomalía',
+    prediction: 'Predicción',
+    root_cause: 'Causa raíz',
+    recommendation: 'Recomendación'
+  } as Record<string, string>,
+
+  // Severity colors
+  severity_color: {
+    critical: 'error',
+    warning: 'warning',
+    info: 'info'
+  } as Record<string, 'error' | 'warning' | 'info' | 'secondary'>,
+
+  // Run status
+  run_status: {
+    succeeded: 'Análisis listo',
+    partial: 'Análisis parcial',
+    failed: 'Sin análisis'
+  } as Record<string, string>,
+
+  run_status_color: {
+    succeeded: 'success',
+    partial: 'warning',
+    failed: 'error'
+  } as Record<string, 'success' | 'warning' | 'error'>,
+
+  // Empty state
+  empty_title: 'Aún no hay señales analizadas',
+  empty_description: 'Nexa analiza automáticamente las señales del ICO Engine después de cada sincronización. Las señales aparecerán aquí cuando estén listas.'
 } as const
