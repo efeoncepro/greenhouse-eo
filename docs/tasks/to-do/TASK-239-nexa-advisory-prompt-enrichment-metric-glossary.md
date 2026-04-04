@@ -306,4 +306,4 @@ const enrichedSignal = {
 
 ## Open Questions
 
-- ¿Los nombres operativos propuestos (`RpA`, `OTD%`, `FTR%`, `Cycle Time`, `Throughput`, `Pipeline Velocity`, `Stuck Assets`, `Stuck %`, `OCF`, `CSC Distribution`) son correctos o el equipo usa variantes distintas?
+Ninguna — nombres operativos confirmados por el usuario (2026-04-04).
