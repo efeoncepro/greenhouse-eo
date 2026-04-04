@@ -2,6 +2,12 @@
 
 ## 2026-04-04
 
+- **TASK-231 Codex task planner skill closed**:
+  - el repo ya versiona la skill `greenhouse-task-planner` en `.codex/skills/greenhouse-task-planner/`
+  - la misma skill quedó instalada a nivel global en `/Users/jreye/.codex/skills/greenhouse-task-planner/`
+  - ambas instalaciones validaron con el `quick_validate.py` canónico de `skill-creator`
+  - `TASK-232` quedó creada como follow-on para la lane LLM async del `ICO Engine`
+
 - **TASK-118 AI Core foundation backend/pipeline activated**:
   - `ICO` ahora materializa `ai_signals` y `ai_prediction_log` como capas analíticas aditivas sobre el snapshot mensual canónico
   - `materialize.ts` publica el nuevo evento reactivo `ico.ai_signals.materialized` y la proyección `ico-ai-signals` sincroniza las señales a `greenhouse_serving.ico_ai_signals`

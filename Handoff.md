@@ -1,5 +1,44 @@
 # Handoff.md
 
+## Sesión 2026-04-04 — TASK-231 cerrada y TASK-232 creada
+
+### Rama / alcance
+
+- rama actual: `task/TASK-231-codex-task-planner-skill`
+- scope principal:
+  - `.codex/skills/greenhouse-task-planner/SKILL.md`
+  - `.codex/skills/greenhouse-task-planner/agents/openai.yaml`
+  - `/Users/jreye/.codex/skills/greenhouse-task-planner/SKILL.md`
+  - `/Users/jreye/.codex/skills/greenhouse-task-planner/agents/openai.yaml`
+  - `docs/tasks/complete/TASK-231-codex-task-planner-skill.md`
+  - `docs/tasks/to-do/TASK-232-ico-llm-quality-scoring-explanation-pipeline.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+  - `changelog.md`
+  - `Handoff.md`
+
+### Resultado
+
+- `TASK-231` quedó cerrada:
+  - existe la skill `greenhouse-task-planner` a nivel repo en `.codex/skills/greenhouse-task-planner/`
+  - existe la misma skill instalada a nivel global en `/Users/jreye/.codex/skills/greenhouse-task-planner/`
+  - ambas instalaciones validaron con `python3 /Users/jreye/.codex/skills/.system/skill-creator/scripts/quick_validate.py`
+- Se creó `TASK-232` como follow-on explícito de `TASK-118` para la lane LLM async del `ICO Engine`
+  - alcance: `quality scoring + explanations` auditable
+  - no es chat y no usa `NexaService` como runtime del pipeline
+  - baseline recomendado: `Vertex AI` con `Gemini`, alineado con el repo actual
+
+### Riesgos / siguientes pasos
+
+- La skill repo-level queda versionada; la copia global fuera del repo sigue siendo instalación local y puede requerir resync manual si el skill evoluciona.
+- `TASK-232` quedó bloqueada por `TASK-118`: debe tomar la foundation de `ai_signals` ya implementada y definir durante Discovery si alcanza con `ai_metric_scores` o si necesita storage complementario auditado.
+- El registry tenía drift mínimo en `TASK-118`; quedó corregido a `in-progress`.
+
+### Verificación
+
+- `python3 /Users/jreye/.codex/skills/.system/skill-creator/scripts/quick_validate.py .codex/skills/greenhouse-task-planner`
+- `python3 /Users/jreye/.codex/skills/.system/skill-creator/scripts/quick_validate.py /Users/jreye/.codex/skills/greenhouse-task-planner`
+
 ## Sesión 2026-04-04 — TASK-118 auditada, corregida y movida a in-progress
 
 ### Rama / alcance
