@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { requireCronAuth } from '@/lib/cron/require-cron-auth'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import { materializeAiLlmEnrichments } from '@/lib/ico-engine/ai/llm-enrichment-worker'
 
@@ -7,10 +8,14 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 120
 
 export async function POST(request: Request) {
-  const { tenant, errorResponse } = await requireAdminTenantContext()
+  const cronAuth = requireCronAuth(request)
 
-  if (!tenant) {
-    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!cronAuth.authorized) {
+    const { tenant, errorResponse } = await requireAdminTenantContext()
+
+    if (!tenant) {
+      return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
   }
 
   const body = (await request.json().catch(() => ({}))) as Record<string, unknown>
