@@ -26,6 +26,7 @@ import TabPanel from '@mui/lab/TabPanel'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import type { TimeToMarketMetric } from '@/lib/ico-engine/time-to-market'
 
 // ── Types ──
 
@@ -57,6 +58,7 @@ interface Campaign360Data {
     ftrPct: number | null
     stuckCount48h: number
     projectCount: number
+    timeToMarket: TimeToMarketMetric
   }
   financials: {
     budgetClp: number | null
@@ -105,6 +107,31 @@ const formatDate = (d: string | null) => {
 }
 
 const pctStr = (v: number | null) => v != null ? `${Math.round(v)}%` : '—'
+const ttmDaysStr = (v: number | null) => v != null ? `${v} días` : '—'
+
+const TTM_STATUS_LABELS = {
+  available: 'Canónico',
+  degraded: 'Proxy operativo',
+  unavailable: 'Sin evidencia'
+} as const
+
+const TTM_STATUS_COLORS = {
+  available: 'success',
+  degraded: 'warning',
+  unavailable: 'secondary'
+} as const
+
+const TTM_CONFIDENCE_LABELS = {
+  high: 'Alta',
+  medium: 'Media',
+  low: 'Baja'
+} as const
+
+const TTM_CONFIDENCE_COLORS = {
+  high: 'success',
+  medium: 'info',
+  low: 'warning'
+} as const
 
 // ── Component ──
 
@@ -140,6 +167,7 @@ const CampaignDetailView = ({ campaignId }: { campaignId: string }) => {
   const { campaign: c, metrics: m, financials: f, team } = data
 
   const marginColor = (f.marginPercent ?? 0) >= 30 ? 'success' : (f.marginPercent ?? 0) >= 15 ? 'warning' : 'error'
+  const ttm = m.timeToMarket
 
   return (
     <Grid container spacing={6}>
@@ -224,6 +252,10 @@ const CampaignDetailView = ({ campaignId }: { campaignId: string }) => {
                         <Typography variant='caption' color='text.secondary'>Lanzamiento planificado</Typography>
                         <Typography variant='body2'>{formatDate(c.plannedLaunchDate)}</Typography>
                       </Box>
+                      <Box>
+                        <Typography variant='caption' color='text.secondary'>Lanzamiento real</Typography>
+                        <Typography variant='body2'>{formatDate(c.actualLaunchDate)}</Typography>
+                      </Box>
                     </Box>
                     {c.channels.length > 0 && (
                       <Box>
@@ -246,35 +278,102 @@ const CampaignDetailView = ({ campaignId }: { campaignId: string }) => {
               </Grid>
 
               <Grid size={{ xs: 12, md: 4 }}>
-                <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-                  <CardHeader title='Presupuesto' />
-                  <Divider />
-                  <CardContent>
-                    {f.budgetClp ? (
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant='body2'>Presupuesto</Typography>
-                          <Typography variant='body2' fontWeight={600}>{formatClp(f.budgetClp)}</Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+                    <CardHeader title='Presupuesto' />
+                    <Divider />
+                    <CardContent>
+                      {f.budgetClp ? (
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <Typography variant='body2'>Presupuesto</Typography>
+                            <Typography variant='body2' fontWeight={600}>{formatClp(f.budgetClp)}</Typography>
+                          </Box>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <Typography variant='body2'>Costo real</Typography>
+                            <Typography variant='body2' fontWeight={600}>{formatClp(f.actualCostClp)}</Typography>
+                          </Box>
+                          <LinearProgress
+                            variant='determinate'
+                            value={Math.min(100, f.budgetUsedPercent ?? 0)}
+                            color={(f.budgetUsedPercent ?? 0) > 90 ? 'error' : (f.budgetUsedPercent ?? 0) > 70 ? 'warning' : 'success'}
+                            sx={{ height: 8, borderRadius: 4 }}
+                          />
+                          <Typography variant='caption' color='text.secondary' textAlign='center'>
+                            {pctStr(f.budgetUsedPercent)} del presupuesto utilizado
+                          </Typography>
                         </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <Typography variant='body2'>Costo real</Typography>
-                          <Typography variant='body2' fontWeight={600}>{formatClp(f.actualCostClp)}</Typography>
+                      ) : (
+                        <Typography variant='body2' color='text.secondary'>Sin presupuesto asignado</Typography>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+                    <CardHeader title='TTM y activación' subheader='Contrato inicial de evidencia para salida a mercado' />
+                    <Divider />
+                    <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 2, alignItems: 'flex-start' }}>
+                        <Box>
+                          <Typography variant='overline' color='text.secondary'>
+                            Time-to-Market
+                          </Typography>
+                          <Typography variant='h4'>{ttmDaysStr(ttm.valueDays)}</Typography>
+                          <Typography variant='body2' color='text.secondary'>
+                            Desde la mejor señal disponible de brief efectivo hasta la activación.
+                          </Typography>
                         </Box>
-                        <LinearProgress
-                          variant='determinate'
-                          value={Math.min(100, f.budgetUsedPercent ?? 0)}
-                          color={(f.budgetUsedPercent ?? 0) > 90 ? 'error' : (f.budgetUsedPercent ?? 0) > 70 ? 'warning' : 'success'}
-                          sx={{ height: 8, borderRadius: 4 }}
-                        />
-                        <Typography variant='caption' color='text.secondary' textAlign='center'>
-                          {pctStr(f.budgetUsedPercent)} del presupuesto utilizado
-                        </Typography>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'flex-end' }}>
+                          <CustomChip
+                            round='true'
+                            size='small'
+                            variant='tonal'
+                            color={TTM_STATUS_COLORS[ttm.dataStatus]}
+                            label={TTM_STATUS_LABELS[ttm.dataStatus]}
+                          />
+                          {ttm.confidenceLevel && (
+                            <CustomChip
+                              round='true'
+                              size='small'
+                              variant='tonal'
+                              color={TTM_CONFIDENCE_COLORS[ttm.confidenceLevel]}
+                              label={`Confianza ${TTM_CONFIDENCE_LABELS[ttm.confidenceLevel]}`}
+                            />
+                          )}
+                        </Box>
                       </Box>
-                    ) : (
-                      <Typography variant='body2' color='text.secondary'>Sin presupuesto asignado</Typography>
-                    )}
-                  </CardContent>
-                </Card>
+
+                      <Divider flexItem />
+
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <Box>
+                          <Typography variant='caption' color='text.secondary'>Inicio seleccionado</Typography>
+                          <Typography variant='body2' fontWeight={600}>
+                            {ttm.start.date ? formatDate(ttm.start.date) : 'Sin evidencia'}
+                          </Typography>
+                          <Typography variant='caption' color='text.secondary'>
+                            {ttm.start.label || 'Todavía no hay source policy suficiente para fijar el inicio.'}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography variant='caption' color='text.secondary'>Activación seleccionada</Typography>
+                          <Typography variant='body2' fontWeight={600}>
+                            {ttm.activation.date ? formatDate(ttm.activation.date) : 'Sin evidencia'}
+                          </Typography>
+                          <Typography variant='caption' color='text.secondary'>
+                            {ttm.activation.label || 'Todavía no hay evidence suficiente de salida a mercado.'}
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      {ttm.qualityGateReasons.length > 0 && (
+                        <Typography variant='caption' color='text.secondary'>
+                          {ttm.qualityGateReasons.join(' ')}
+                        </Typography>
+                      )}
+                    </CardContent>
+                  </Card>
+                </Box>
               </Grid>
             </Grid>
           </TabPanel>

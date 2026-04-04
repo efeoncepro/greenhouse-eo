@@ -267,7 +267,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-215` | `complete` | ICO RpA Reliability, Source Policy & Fallbacks | `docs/tasks/complete/TASK-215-ico-rpa-reliability-source-policy-fallbacks.md` |
 | `TASK-216` | `complete` | ICO Metric Trust Model: Benchmark Registry, Quality Gates & Confidence Metadata | `docs/tasks/complete/TASK-216-ico-metric-trust-model-benchmark-quality-gates.md` |
 | `TASK-217` | `complete` | Agency KPI Trust Propagation & Serving Semantics | `docs/tasks/complete/TASK-217-agency-kpi-trust-propagation-serving-semantics.md` |
-| `TASK-218` | `to-do` | ICO Time-to-Market & Activation Evidence Contract | `docs/tasks/to-do/TASK-218-ico-time-to-market-activation-evidence-contract.md` |
+| `TASK-218` | `complete` | ICO Time-to-Market & Activation Evidence Contract | `docs/tasks/complete/TASK-218-ico-time-to-market-activation-evidence-contract.md` |
 | `TASK-219` | `to-do` | ICO Iteration Velocity & Experimentation Signal Contract | `docs/tasks/to-do/TASK-219-ico-iteration-velocity-experimentation-signal-contract.md` |
 | `TASK-220` | `to-do` | ICO Brief Clarity Score & Intake Governance | `docs/tasks/to-do/TASK-220-ico-brief-clarity-score-intake-governance.md` |
 | `TASK-221` | `to-do` | Revenue Enabled Measurement Model & Attribution Policy | `docs/tasks/to-do/TASK-221-revenue-enabled-measurement-model-attribution-policy.md` |

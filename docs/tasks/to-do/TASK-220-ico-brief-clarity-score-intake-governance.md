@@ -1,5 +1,13 @@
 # TASK-220 - ICO Brief Clarity Score & Intake Governance
 
+## Delta 2026-04-04
+
+- `TASK-218` ya cerró el primer contrato runtime de `TTM` con inicio proxy y activación jerarquizada.
+- Implicación nueva:
+  - `TASK-220` ya no debe “habilitar el primer TTM”
+  - debe canonizar `brief efectivo` para que `TTM` pueda graduar de `degraded` a `available`
+- Mientras `TASK-220` siga abierta, cualquier consumer de `TTM` debe tratar el evento inicial como proxy operativo y no como evidencia plenamente observada.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -112,4 +120,3 @@ Reglas obligatorias:
 - `pnpm exec vitest run src/lib/ico-engine/*.test.ts`
 - `pnpm exec eslint src/lib/ico-engine src/lib/delivery`
 - revisión manual del contrato documental y fixtures de scoring
-

@@ -1,5 +1,15 @@
 # TASK-222 - Creative Velocity Review, Tiered Metric Surfacing & Client Narrative
 
+## Delta 2026-04-04
+
+- `TASK-218` ya dejó un primer consumer visible de `TTM` en campañas con estados `available`, `degraded` y `unavailable`.
+- Para esta task cambia un supuesto importante:
+  - `TTM` ya no parte desde cero
+  - pero tampoco está lista para presentarse como métrica madura en `CVR` agency-wide
+- Regla nueva para `TASK-222`:
+  - cualquier surfacing client-facing de `TTM` debe consumir ese contrato de evidencia y no volver a caer en heurísticas locales de `Early Launch`
+  - mientras `TTM` no entre al carril registry/materialization amplio del engine, su exposición debe tratarse como controlada y explícita en confianza
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -116,4 +126,3 @@ Reglas obligatorias:
 
 - revisión manual de consistencia documental
 - validación cruzada con arquitectura `ICO` y `Agency`
-

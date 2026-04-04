@@ -1,5 +1,14 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-04 — TASK-218 ships the first TTM evidence contract
+
+`TASK-218` deja operativo el primer contrato runtime de `TTM` para campañas, aun cuando la métrica todavía no entra al carril materialized-first del engine.
+
+- `src/lib/ico-engine/time-to-market.ts` define selección de evidencia, `available/degraded/unavailable` y `confidenceLevel`
+- el evento de inicio sigue siendo **proxy** hasta que `TASK-220` cierre la source policy de `brief efectivo`
+- la activación prioriza evidencia observada (`campaign.actual_launch_date` o publicación/activación detectada) y recién después cae a proxy o `planned`
+- esta entrega no incorpora todavía `TTM` al `metric-registry`, `metric_snapshots_monthly` ni `read-metrics.ts`; el consumer inicial vive en `campaign-metrics.ts` y `CampaignDetailView.tsx`
+
 ## Delta 2026-04-03 — TASK-216 institutionalizes metric trust metadata and serving parity
 
 `TASK-216` ya dejó operativo el trust model genérico del engine por encima de la semántica congelada en `TASK-214` y de la policy específica de `RpA` cerrada en `TASK-215`.

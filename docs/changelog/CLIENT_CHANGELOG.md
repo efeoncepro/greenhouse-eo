@@ -42,6 +42,29 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.3
+
+**Canal:** Beta
+**Fecha:** 2026-04-04
+**Disponible para:** internal
+**Módulos:** Campañas / ICO
+
+### Novedades
+
+- `Campaign Detail` ahora muestra `Time-to-Market (TTM)` con su evidencia operativa de inicio y activación.
+
+### Mejoras
+
+- La vista ya no presenta `TTM` como un número aislado: acompaña el valor con el estado real del dato (`Canónico`, `Proxy operativo` o `Sin evidencia`) y una señal de confianza.
+
+### Correcciones
+
+- `TTM` deja de depender de narrativa implícita y pasa a explicitar qué fecha se usó para iniciar el conteo y qué evidencia se usó para marcar activación.
+
+### Notas
+
+- Mientras el contrato de `brief efectivo` siga en evolución, algunos `TTM` pueden aparecer como `Proxy operativo`; eso refleja la madurez real del dato y no un error visual del módulo.
+
 ## 2026.04-beta.2
 
 **Canal:** Beta

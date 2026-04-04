@@ -1,5 +1,87 @@
 # Handoff.md
 
+## Sesión 2026-04-04 — TASK-218 implementada y verificada
+
+### Rama / alcance
+
+- rama actual: `feature/codex-task-218-ttm-activation-contract`
+- scope principal:
+  - `src/lib/ico-engine/time-to-market.ts`
+  - `src/lib/ico-engine/time-to-market.test.ts`
+  - `src/lib/campaigns/campaign-metrics.ts`
+  - `src/views/greenhouse/campaigns/CampaignDetailView.tsx`
+  - docs/lifecycle:
+    - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+    - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+    - `docs/tasks/complete/TASK-218-ico-time-to-market-activation-evidence-contract.md`
+    - `docs/tasks/README.md`
+    - `docs/tasks/TASK_ID_REGISTRY.md`
+    - `docs/tasks/to-do/TASK-220-ico-brief-clarity-score-intake-governance.md`
+    - `docs/tasks/to-do/TASK-222-creative-velocity-review-tiered-metric-surfacing.md`
+    - `docs/changelog/CLIENT_CHANGELOG.md`
+    - `changelog.md`
+
+### Resultado
+
+- `TASK-218` queda cerrada como primer contrato runtime de `TTM`.
+- Se creó `src/lib/ico-engine/time-to-market.ts` para formalizar:
+  - selección de evidencia de inicio/activación
+  - estados `available`, `degraded`, `unavailable`
+  - `confidenceLevel` y `qualityGateReasons`
+- `src/lib/campaigns/campaign-metrics.ts` ahora publica `timeToMarket` y filtra BigQuery por `space_id` para respetar tenant isolation.
+- `Campaign Detail` ya muestra `TTM` con evidencia seleccionada, estado de dato y confianza como primer consumer visible.
+- La policy vigente queda explícita:
+  - inicio = proxy operativo hasta que `TASK-220` cierre `brief efectivo`
+  - activación = evidencia observada preferente con fallbacks proxy/planned
+- No se abrió migración nueva:
+  - esta slice cierra contrato + consumer inicial
+  - registry/materialization/Agency-wide rollout quedan para follow-ons del engine
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/ico-engine/time-to-market.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `rg -n "new Pool\\(" src`
+- `pnpm lint`
+- `pnpm build`
+
+## Sesión 2026-04-04 — TASK-218 auditada y corregida antes de implementación
+
+### Rama / alcance
+
+- rama actual: `feature/codex-task-218-ttm-activation-contract`
+- scope:
+  - `docs/tasks/in-progress/TASK-218-ico-time-to-market-activation-evidence-contract.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `Handoff.md`
+  - auditoría runtime sobre:
+    - `src/lib/ico-engine/*`
+    - `src/lib/campaigns/*`
+    - `scripts/setup-postgres-source-sync.sql`
+    - `scripts/backfill-postgres-campaigns.ts`
+    - `docs/architecture/schema-snapshot-baseline.sql`
+    - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+    - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+    - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+    - `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md`
+    - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+    - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+
+### Resultado
+
+- `TASK-218` quedó movida a `in-progress` tras discovery/auditoría real del repo.
+- La spec se corrigió para dejar explícito que:
+  - `TTM` no parte desde cero
+  - ya existen foundations parciales en campañas (`planned_launch_date`, `actual_launch_date`), links campaña↔proyecto y pipeline `Activación`
+  - el gap real es cerrar el measurement model canónico y la policy de evidence para activación
+  - `TASK-220` sigue siendo dependencia real para la señal madura de `brief efectivo`
+- No se implementó código todavía en esta pasada; solo se corrigió el contrato operativo para evitar construir sobre supuestos incompletos.
+
+### Verificación
+
+- revisión manual de consistencia contra arquitectura, tasks vecinas y runtime actual en `campaigns`, `delivery` e `ICO`
+
 ## Sesión 2026-04-04 — TASK-217 implementada y verificada
 
 ### Rama / alcance
