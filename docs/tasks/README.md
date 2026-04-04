@@ -20,12 +20,14 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-235`
+- siguiente ID disponible: `TASK-236`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 - `TASK-231` quedó cerrada como tooling repo/global para la skill `greenhouse-task-planner` de Codex.
 - `TASK-232` ya quedó cerrada con lane async LLM operativa para `ICO`: trigger reactivo, storage BQ/PG, readers downstream y baseline `Gemini`.
 - `TASK-233` queda reservada para `Three.js 3D Logo Animation` como lane visual específica separada de `TASK-230`.
 - `TASK-234` nace como follow-on de `TASK-230` para propagar conocimiento de animación a las 5 skills de Codex en `.codex/skills/`.
+- `TASK-235` nace como follow-on visible de `TASK-232` para surfacing UI del bloque `aiLlm` dentro de `Agency > ICO Engine`.
+- `TASK-236`, `TASK-237` y `TASK-238` nacen de una auditoría UX completa de `/agency` y todas sus tabs. Orden sugerido: `236` (resilience) → `237` (ICO tab) → `238` (data storytelling). `237` puede ejecutarse en paralelo con `236`.
 
 ## Estados
 

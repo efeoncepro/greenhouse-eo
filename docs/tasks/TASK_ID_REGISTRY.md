@@ -284,3 +284,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-232` | `complete` | ICO LLM Quality Scoring & Explanation Pipeline | `docs/tasks/complete/TASK-232-ico-llm-quality-scoring-explanation-pipeline.md` |
 | `TASK-233` | `to-do` | Three.js 3D Logo Animation | `docs/tasks/to-do/TASK-233-threejs-3d-logo-animation.md` |
 | `TASK-234` | `to-do` | Codex Skills: Animation Library Knowledge Sync | `docs/tasks/to-do/TASK-234-codex-skills-animation-library-sync.md` |
+| `TASK-235` | `to-do` | Agency ICO LLM Insights UI Surfacing | `docs/tasks/to-do/TASK-235-agency-ico-llm-insights-ui.md` |
+| `TASK-236` | `to-do` | Agency: Resilience & Feedback Patterns | `docs/tasks/to-do/TASK-236-agency-resilience-feedback-patterns.md` |
+| `TASK-237` | `to-do` | Agency ICO Engine Tab: UX Redesign | `docs/tasks/to-do/TASK-237-agency-ico-engine-tab-ux-redesign.md` |
+| `TASK-238` | `to-do` | Agency Workspace & Space 360: Data Storytelling UX | `docs/tasks/to-do/TASK-238-agency-workspace-data-storytelling-ux.md` |
