@@ -1,5 +1,18 @@
 # Contrato de métricas ICO
 
+## Delta 2026-04-04 — TASK-223 formaliza la lane runtime inicial de aceleradores metodológicos
+
+`TASK-223` no convierte todavía `Design System` ni `Brand Voice para AI` en productos visibles independientes, pero sí deja su primera lectura runtime defendible dentro del contrato `CVR`.
+
+- regla vigente:
+  - `Design System` se lee primero como acelerador `proxy`, apoyado en outcomes canónicos (`FTR`, `RpA`, `Cycle Time`, `Throughput`, `Iteration Velocity`)
+  - `Brand Voice para AI` solo puede comunicarse como señal `observed` cuando exista `brand_consistency_score` auditado en `ico_engine.ai_metric_scores`
+  - si falta score auditado, la lectura correcta es parcial o sin evidencia; no se reemplaza con heurísticas heroicas de portfolio
+- implicaciones inmediatas:
+  - `Creative Hub` debe enchufar esta lane al bloque `CVR` ya existente y no abrir una segunda narrativa enterprise
+  - la conexión a `Revenue Enabled` sigue siendo policy-aware; estas capas no saltan directo a revenue observado
+  - `Brand Consistency` visible debe priorizar el carril auditado antes de cualquier proxy local
+
 ## Delta 2026-04-04 — TASK-222 formaliza el contrato inicial de Creative Velocity Review
 
 `TASK-222` deja el primer contrato runtime de `CVR` y lo baja a una surface client-facing real dentro de `Creative Hub`.
@@ -282,6 +295,8 @@ ICO opera dos capas metodológicas que aceleran la cadena causal. No son product
 
 Globe construye y opera un **Design System** para cada cliente como infraestructura visual que habilita consistencia, reutilización de componentes y velocidad de producción. No es un manual de marca en PDF. Es una biblioteca viva de componentes, tokens de diseño, templates y patrones que el equipo creativo usa para producir más rápido y con menos error.
 
+En runtime Greenhouse, la primera instrumentación válida de esta capa no expone componentes, tokens ni artefactos internos. La lectura inicial conecta su efecto a outcomes canónicos del engine y por eso arranca como señal `proxy`, no como score metodológico autónomo.
+
 **Impacto en métricas:**
 
 | Métrica impactada | Cómo impacta | Mecanismo |
@@ -298,6 +313,8 @@ Globe construye y opera un **Design System** para cada cliente como infraestruct
 ### 6.2 Brand Voice para AI
 
 Globe opera una metodología de **Brand Voice para AI** que codifica la voz, tono y estilo de cada cliente en un framework estructurado que permite que las herramientas de IA generativa repliquen esa voz de forma consistente y gobernada.
+
+En runtime Greenhouse, esta capa se considera `observed` solo cuando exista `brand_consistency_score` auditado en `ico_engine.ai_metric_scores`. Si el score todavía no existe para la cuenta, la narrativa correcta es `sin evidencia` o `parcial`, no una reconstrucción heurística de consistencia de marca.
 
 No es "usar ChatGPT para escribir". Es un proceso formal donde se audita la voz actual del cliente, se codifica en un framework de prompts estructurados, se testea contra los modelos del Multi-Model AI Studio, y se itera hasta lograr consistencia medible.
 
@@ -381,7 +398,7 @@ La **Creative Velocity Review** es el rito trimestral donde Globe presenta al cl
 1. **Resumen ejecutivo (5 min):** Revenue Enabled total del trimestre + tendencia vs. trimestre anterior.
 2. **Las 3 palancas (10 min):** Desglose por Early Launch, Iteration Velocity, Throughput Expandido. Con casos concretos de campañas.
 3. **Drivers operativos (10 min):** OTD%, FTR%, RpA, Cycle Time. Tendencias y mejoras implementadas.
-4. **Capas metodológicas (5 min):** Evolución del Design System y Brand Voice para AI. Qué se construyó, qué se mejoró.
+4. **Capas metodológicas (5 min):** Evolución del Design System y Brand Voice para AI. Qué se construyó, qué se mejoró y qué outcomes canónicos ya sostienen esa lectura sin exponer IP interna.
 5. **Plan de mejora continua (5 min):** 1-2 mejoras priorizadas para el próximo trimestre.
 6. **Oportunidades de expansión (5 min):** Nuevos carriles de producción, formatos o mercados donde la velocidad creativa puede habilitar más revenue.
 

@@ -13,6 +13,14 @@
   - capability activation still resolves through `businessLines` + `serviceModules`
   - the `Basic / Pro / Enterprise` matrix is currently an editorial communication contract, not hard-gating in auth/session
 
+## Delta 2026-04-04 — TASK-223 plugs methodological accelerators into the same CVR host
+
+- `Creative Hub` now extends the same `CVR` surface with a `Methodological accelerators` card.
+- The new block does not create a second enterprise narrative:
+  - `Design System` is read as a proxy accelerator over canonical ICO outcomes
+  - `Brand Voice para AI` is only shown as observed when `brand_consistency_score` exists in `ico_engine.ai_metric_scores`
+- `Brand Intelligence` keeps the visible `Brand Consistency` KPI aligned to that audited source policy instead of reconstructing a local heuristic when evidence is missing.
+
 ## Especificación Técnica v1.0
 
 **Efeonce Group — Marzo 2026 — CONFIDENCIAL**

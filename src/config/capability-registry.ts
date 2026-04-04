@@ -110,6 +110,13 @@ export const CAPABILITY_REGISTRY: CapabilityModuleDefinition[] = [
         description: 'La secuencia recomendada para sostener un review trimestral con signal, contexto y siguiente paso.'
       },
       {
+        id: 'creative-methodology-accelerators',
+        title: 'Methodological accelerators',
+        type: 'metric-list',
+        size: 'md',
+        description: 'Lectura inicial de Design System y Brand Voice para AI conectada a outcomes canónicos y sin exponer IP interna.'
+      },
+      {
         id: 'creative-tier-visibility',
         title: 'Tier visibility',
         type: 'tier-matrix',

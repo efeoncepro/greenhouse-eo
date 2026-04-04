@@ -70,6 +70,59 @@ export const buildCreativeCvrStructureCardData = (contract: CreativeVelocityRevi
   }))
 })
 
+const methodologyStatusLabelMap = {
+  available: 'Disponible',
+  degraded: 'Parcial',
+  unavailable: 'Sin evidencia'
+} as const
+
+const methodologyEvidenceLabelMap = {
+  observed: 'Observed',
+  proxy: 'Proxy',
+  missing: 'Missing'
+} as const
+
+const methodologyLinkLabel = (contract: CreativeVelocityReviewContract, signal: CreativeVelocityReviewContract['methodologicalAccelerators']['designSystem']) => {
+  const connected = signal.outcomeLinks.filter(link => link.status === 'connected').map(link => link.label)
+  const partial = signal.outcomeLinks.filter(link => link.status === 'partial').map(link => link.label)
+
+  const segments: string[] = []
+
+  if (connected.length > 0) {
+    segments.push(`Conecta con ${connected.join(', ')}.`)
+  }
+
+  if (partial.length > 0) {
+    segments.push(`Mantiene conexión parcial con ${partial.join(', ')}.`)
+  }
+
+  const primaryReason = signal.qualityGateReasons[0]
+
+  if (primaryReason) {
+    segments.push(primaryReason)
+  }
+
+  if (signal.id === 'brand_voice_ai' && contract.revenueEnabled.attributionClass !== 'unavailable') {
+    segments.push(`Revenue Enabled sigue comunicado como ${revenueEnabledClassLabelMap[contract.revenueEnabled.attributionClass]}.`)
+  }
+
+  return segments.join(' ')
+}
+
+export const buildCreativeMethodologicalAcceleratorsCardData = (
+  contract: CreativeVelocityReviewContract
+): CapabilityCardData => ({
+  type: 'metric-list',
+  items: [contract.methodologicalAccelerators.designSystem, contract.methodologicalAccelerators.brandVoiceAi].map(signal => ({
+    label: signal.label,
+    value:
+      signal.summaryValue
+        ? `${methodologyEvidenceLabelMap[signal.evidenceMode]} · ${signal.summaryValue}`
+        : methodologyStatusLabelMap[signal.dataStatus],
+    detail: methodologyLinkLabel(contract, signal)
+  }))
+})
+
 const buildTierRows = (contract: CreativeVelocityReviewContract): CapabilityTierMatrixRow[] =>
   contract.tierMatrix.map(row => ({
     id: row.id,

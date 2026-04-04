@@ -4,11 +4,17 @@ import {
   type RevenueEnabledThroughputInput
 } from './revenue-enabled'
 import {
+  buildMethodologicalAcceleratorsContract,
+  type BrandVoiceAiEvidence,
+  type MethodologicalAcceleratorsContract
+} from './methodological-accelerators'
+import {
   resolveIterationVelocityMetric,
   type IterationVelocityMetric,
   type IterationVelocityTaskEvidence
 } from './iteration-velocity'
 import { resolveTimeToMarketMetric, type TimeToMarketMetric } from './time-to-market'
+import type { MetricsSummary } from './read-metrics'
 
 export type CreativeVelocityReviewPolicyVersion = 'cvr_v1'
 export type CreativeVelocityReviewTier = 'basic' | 'pro' | 'enterprise'
@@ -58,12 +64,15 @@ export interface CreativeVelocityReviewContract {
   timeToMarket: TimeToMarketMetric
   iterationVelocity: IterationVelocityMetric
   revenueEnabled: RevenueEnabledMeasurementModel
+  methodologicalAccelerators: MethodologicalAcceleratorsContract
 }
 
 interface CreativeVelocityReviewInput {
   tasks: IterationVelocityTaskEvidence[]
   throughput?: RevenueEnabledThroughputInput | null
   timeToMarket?: TimeToMarketMetric | null
+  metricsSummary?: MetricsSummary | null
+  brandVoiceAiEvidence?: BrandVoiceAiEvidence | null
   hasDirectRevenueAttribution?: boolean
   hasComparableRevenueBaseline?: boolean
 }
@@ -225,6 +234,8 @@ export const buildCreativeVelocityReviewContract = ({
   tasks,
   throughput,
   timeToMarket,
+  metricsSummary,
+  brandVoiceAiEvidence,
   hasDirectRevenueAttribution = false,
   hasComparableRevenueBaseline = false
 }: CreativeVelocityReviewInput): CreativeVelocityReviewContract => {
@@ -239,6 +250,13 @@ export const buildCreativeVelocityReviewContract = ({
     hasComparableRevenueBaseline
   })
 
+  const methodologicalAccelerators = buildMethodologicalAcceleratorsContract({
+    metricsSummary,
+    iterationVelocity,
+    revenueEnabled,
+    brandVoiceAiEvidence
+  })
+
   return {
     policyVersion: 'cvr_v1',
     structure: CREATIVE_VELOCITY_REVIEW_STRUCTURE,
@@ -246,6 +264,7 @@ export const buildCreativeVelocityReviewContract = ({
     guardrails: CREATIVE_VELOCITY_REVIEW_GUARDRAILS,
     timeToMarket: resolvedTimeToMarket,
     iterationVelocity,
-    revenueEnabled
+    revenueEnabled,
+    methodologicalAccelerators
   }
 }

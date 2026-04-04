@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { buildCreativeVelocityReviewContract } from '@/lib/ico-engine/creative-velocity-review'
 import {
+  buildCreativeMethodologicalAcceleratorsCardData,
   buildCreativeCvrStructureCardData,
   buildCreativeCvrTierMatrixCardData,
   buildCreativeNarrativeGuardrailsCardData
@@ -67,5 +68,19 @@ describe('creative-cvr builders', () => {
 
     expect(proxyRule?.value).toBe('Nunca')
     expect(proxyRule?.detail).toContain('revenue observado')
+  })
+
+  it('builds a methodological accelerators card without opening a parallel enterprise surface', () => {
+    const card = buildCreativeMethodologicalAcceleratorsCardData(creativeVelocityReview)
+
+    expect(card.type).toBe('metric-list')
+
+    if (card.type !== 'metric-list') {
+      throw new Error('Unexpected card type')
+    }
+
+    expect(card.items).toHaveLength(2)
+    expect(card.items[0]?.label).toBe('Design System')
+    expect(card.items[1]?.label).toBe('Brand Voice para AI')
   })
 })

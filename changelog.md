@@ -2,6 +2,13 @@
 
 ## 2026-04-04
 
+- **TASK-223 Methodological accelerators runtime baseline implemented**:
+  - `ICO` ya tiene un contrato runtime inicial para `Design System` y `Brand Voice para AI` en `src/lib/ico-engine/methodological-accelerators.ts`
+  - `Creative Velocity Review` ahora compone también esa lane metodológica, sin abrir una surface paralela a `Creative Hub`
+  - `Design System` queda formalizado como acelerador `proxy` apoyado en outcomes canónicos (`FTR`, `RpA`, `Cycle Time`, `Throughput`, `Iteration Velocity`)
+  - `Brand Voice para AI` ahora puede leer `brand_consistency_score` auditado desde `ico_engine.ai_metric_scores` cuando exista data real
+  - `Creative Hub` agrega la card `Methodological accelerators` y deja de reconstruir `Brand Consistency` con heurísticas locales cuando falta score auditado
+
 - **TASK-222 Creative Velocity Review runtime contract implemented**:
   - `ICO` ya tiene un contrato runtime inicial de `CVR` en `src/lib/ico-engine/creative-velocity-review.ts`
   - el contrato compone `TTM`, `Iteration Velocity`, `Revenue Enabled`, estructura del review, matriz `Basic / Pro / Enterprise` y guardrails de narrativa

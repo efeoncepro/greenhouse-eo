@@ -25,6 +25,8 @@ describe('buildCreativeVelocityReviewContract', () => {
     expect(contract.timeToMarket.dataStatus).toBe('unavailable')
     expect(contract.revenueEnabled.levers.earlyLaunch.attributionClass).toBe('unavailable')
     expect(contract.revenueEnabled.levers.iteration.attributionClass).toBe('estimated')
+    expect(contract.methodologicalAccelerators.designSystem.evidenceMode).toBe('proxy')
+    expect(contract.methodologicalAccelerators.brandVoiceAi.dataStatus).toBe('unavailable')
     expect(contract.tierMatrix.find(row => row.id === 'revenue-enabled')?.byTier.basic.status).toBe('not_included')
     expect(contract.guardrails.find(rule => rule.id === 'do-not-inflate-proxies')?.detail).toContain('revenue observado')
   })
