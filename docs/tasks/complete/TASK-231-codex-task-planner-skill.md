@@ -7,12 +7,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `ops / platform`
 - Blocked by: `none`
@@ -63,7 +63,7 @@ No architectural impact — esta task es tooling de agente, no modifica codigo d
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-231-codex-task-planner-skill.md`
+- `docs/tasks/complete/TASK-231-codex-task-planner-skill.md`
 - Skill global de Codex (path segun mecanismo vigente de Codex)
 - Skill repo-level de Codex (path a definir — candidato: `.codex/skills/greenhouse-task-planner/SKILL.md` o equivalente)
 
@@ -115,12 +115,12 @@ No architectural impact — esta task es tooling de agente, no modifica codigo d
 
 ## Acceptance Criteria
 
-- [ ] Existe skill de task planner para Codex a nivel de repo, versionada en el proyecto
-- [ ] Existe skill de task planner para Codex a nivel global
-- [ ] La skill de Codex produce output que sigue exactamente `docs/tasks/TASK_TEMPLATE.md`
-- [ ] La skill de Codex respeta el proceso de 6 pasos (interpretar, descubrir, preguntar, producir, presentar, registrar)
-- [ ] La skill de Codex referencia `TASK_PROCESS.md` para reglas de Checkpoint/Mode y Lightweight Mode
-- [ ] La skill de Codex incluye las mismas reglas de calidad (paths reales, slices ejecutables, AC verificables, Out of Scope obligatorio)
+- [x] Existe skill de task planner para Codex a nivel de repo, versionada en el proyecto
+- [x] Existe skill de task planner para Codex a nivel global
+- [x] La skill de Codex produce output que sigue exactamente `docs/tasks/TASK_TEMPLATE.md`
+- [x] La skill de Codex respeta el proceso de 6 pasos (interpretar, descubrir, preguntar, producir, presentar, registrar)
+- [x] La skill de Codex referencia `TASK_PROCESS.md` para reglas de Checkpoint/Mode y Lightweight Mode
+- [x] La skill de Codex incluye las mismas reglas de calidad (paths reales, slices ejecutables, AC verificables, Out of Scope obligatorio)
 
 ## Verification
 
@@ -130,9 +130,16 @@ No architectural impact — esta task es tooling de agente, no modifica codigo d
 
 ## Closing Protocol
 
-- [ ] Documentar en Handoff.md que ambos agentes ya tienen skill de task planner
+- [x] Documentar en Handoff.md que ambos agentes ya tienen skill de task planner
 
 ## Follow-ups
 
 - Evaluar si conviene un mecanismo de sincronizacion entre skills de Claude Code y Codex (hoy son copias manuales)
 - Evaluar si otros agentes (Cursor, Windsurf) necesitan su propia version
+
+## Delta 2026-04-04
+
+- Se creó la skill repo-level en `.codex/skills/greenhouse-task-planner/` con `SKILL.md` y `agents/openai.yaml`.
+- Se instaló la misma skill a nivel global en `/Users/jreye/.codex/skills/greenhouse-task-planner/`.
+- Ambas instalaciones quedaron validadas con `python3 /Users/jreye/.codex/skills/.system/skill-creator/scripts/quick_validate.py`.
+- La task queda cerrada como tooling operativo: el repo ya tiene una fuente auditable y Codex local ya tiene la copia instalada para uso inmediato.

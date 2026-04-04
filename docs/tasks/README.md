@@ -20,8 +20,10 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-232`
+- siguiente ID disponible: `TASK-233`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
+- `TASK-231` quedó cerrada como tooling repo/global para la skill `greenhouse-task-planner` de Codex.
+- `TASK-232` queda reservada para activar la lane async de `ICO` basada en LLM (`quality scoring + explanations`) sin mezclarla con chat.
 
 ## Estados
 
