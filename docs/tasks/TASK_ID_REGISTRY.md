@@ -142,7 +142,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-115` | `to-do` | Nexa UI: Edit, Suggestions, Feedback, Floating & Thread History | `docs/tasks/to-do/TASK-115-nexa-ui-completion.md` |
 | `TASK-116` | `to-do` | Sidebar Navigation Audit & Remediation | `docs/tasks/to-do/TASK-116-sidebar-navigation-audit-remediation.md` |
 | `TASK-117` | `complete` | Payroll Last Business Day Auto-Calculation | `docs/tasks/complete/TASK-117-payroll-last-business-day-auto-calculation.md` |
-| `TASK-118` | `in-progress` | ICO AI Core: Embedded Intelligence Layer | `docs/tasks/in-progress/TASK-118-ico-ai-core-embedded-intelligence.md` |
+| `TASK-118` | `complete` | ICO AI Core: Embedded Intelligence Layer | `docs/tasks/complete/TASK-118-ico-ai-core-embedded-intelligence.md` |
 | `TASK-119` | `complete` | Home Landing Rollout and Navigation Cutover | `docs/tasks/complete/TASK-119-home-landing-rollout-navigation-cutover.md` |
 | `TASK-120` | `complete` | Admin Center Governance Follow-on Cutover | `docs/tasks/complete/TASK-120-admin-center-governance-follow-on-cutover.md` |
 | `TASK-121` | `complete` | Admin Center Hardening & Scalability | `docs/tasks/complete/TASK-121-admin-center-hardening.md` |
@@ -282,3 +282,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-230` | `to-do` | Portal Animation Library Integration | `docs/tasks/to-do/TASK-230-portal-animation-library-integration.md` |
 | `TASK-231` | `complete` | Codex Task Planner Skill | `docs/tasks/complete/TASK-231-codex-task-planner-skill.md` |
 | `TASK-232` | `to-do` | ICO LLM Quality Scoring & Explanation Pipeline | `docs/tasks/to-do/TASK-232-ico-llm-quality-scoring-explanation-pipeline.md` |
+| `TASK-233` | `to-do` | Three.js 3D Logo Animation | `docs/tasks/to-do/TASK-233-threejs-3d-logo-animation.md` |

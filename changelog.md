@@ -2,6 +2,11 @@
 
 ## 2026-04-04
 
+- **TASK-118 AI Core foundation formally closed**:
+  - la task queda cerrada sobre la foundation deterministic-first ya implementada: `ai_signals`, `ai_prediction_log`, `ico.ai_signals.materialized`, `greenhouse_serving.ico_ai_signals` y consumers base
+  - el carril LLM async deja de quedar como deuda implícita y pasa explícitamente a `TASK-232`
+  - `TASK-152`, `TASK-155` y `TASK-159` quedaron ajustadas para consumir esta foundation sin duplicar detector base ni confundir pipeline generativo con tooling/chat
+
 - **TASK-231 Codex task planner skill closed**:
   - el repo ya versiona la skill `greenhouse-task-planner` en `.codex/skills/greenhouse-task-planner/`
   - la misma skill quedó instalada a nivel global en `/Users/jreye/.codex/skills/greenhouse-task-planner/`

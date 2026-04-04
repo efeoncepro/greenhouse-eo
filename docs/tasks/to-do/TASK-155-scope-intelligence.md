@@ -8,6 +8,12 @@
   - cualquier señal `ICO` usada en el score debe venir con semántica canónica y suficiente confianza para no confundir drift de dato con creep real
 - La task puede usar señales operativas de `ICO`, pero no reinterpretar localmente su contrato.
 
+## Delta 2026-04-04
+
+- `TASK-118` ya cerró el carril base de `ai_signals` y predicción determinística en `ICO`.
+- Si esta task necesita anomalías delivery-side o recomendaciones operativas, debe leerlas desde `ICO AI Core` y no abrir un detector paralelo ad hoc dentro de `Agency`.
+- El enrichment generativo/explicativo futuro queda en `TASK-232`.
+
 ## Status
 
 | Campo | Valor |

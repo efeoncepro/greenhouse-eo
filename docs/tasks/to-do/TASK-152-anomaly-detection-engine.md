@@ -8,6 +8,18 @@
   - reglas sobre `OTD`, `FTR`, `RpA`, `cycle time`, `TTM` u otras métricas deben consumir semántica y confianza canónicas del engine
 - Esta task define detección, no benchmark policy ni fórmulas de KPI.
 
+## Delta 2026-04-04
+
+- `TASK-118` ya cerró la foundation determinística del `ICO AI Core`:
+  - `ico_engine.ai_signals`
+  - `greenhouse_serving.ico_ai_signals`
+  - evento `ico.ai_signals.materialized`
+- Esta task no debe recrear el detector base de anomalías por z-score/root cause que ya existe dentro de `ICO`.
+- Lectura correcta desde hoy:
+  - `TASK-152` queda como registry y workflow agency-level sobre señales ya persistidas
+  - agrega deduplicación, notificaciones, acknowledgement y reglas cross-domain por espacio
+  - consume `ICO` como source upstream en vez de recalcular la misma señal localmente
+
 ## Status
 
 | Campo | Valor |
