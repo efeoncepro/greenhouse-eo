@@ -28,34 +28,13 @@ export interface GenerateAiSignalEnrichmentResult {
 
 const ICO_SIGNAL_ENRICHMENT_JSON_SCHEMA = {
   type: 'object',
-  additionalProperties: false,
   required: ['qualityScore', 'explanationSummary', 'rootCauseNarrative', 'recommendedAction', 'confidence'],
   properties: {
-    qualityScore: {
-      type: 'number',
-      minimum: 0,
-      maximum: 100
-    },
-    explanationSummary: {
-      type: 'string',
-      minLength: 1,
-      maxLength: 400
-    },
-    rootCauseNarrative: {
-      type: 'string',
-      minLength: 1,
-      maxLength: 600
-    },
-    recommendedAction: {
-      type: 'string',
-      minLength: 1,
-      maxLength: 400
-    },
-    confidence: {
-      type: 'number',
-      minimum: 0,
-      maximum: 1
-    }
+    qualityScore: { type: 'number' },
+    explanationSummary: { type: 'string' },
+    rootCauseNarrative: { type: 'string' },
+    recommendedAction: { type: 'string' },
+    confidence: { type: 'number' }
   }
 } as const
 
@@ -120,9 +99,9 @@ export const generateAiSignalEnrichment = async (
     ] as any,
     config: {
       temperature: 0.2,
-      maxOutputTokens: 500,
-      responseMimeType: 'application/json',
-      responseJsonSchema: ICO_SIGNAL_ENRICHMENT_JSON_SCHEMA
+      maxOutputTokens: 2048,
+      thinkingConfig: { thinkingBudget: 0 },
+      responseMimeType: 'application/json'
     }
   })
 
