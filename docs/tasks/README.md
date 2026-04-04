@@ -592,7 +592,7 @@ Finance Dashboard Calculation Correction ←── Invoice Payment Ledger (cash 
 ## Regla operativa
 
 - Mantener todas las tasks del sistema dentro de `docs/tasks/` y sus subcarpetas de estado.
-- Toda task nueva debe nacer desde `docs/tasks/TASK_TEMPLATE.md` (plantilla copiable) y usar `TASK-###` como ID estable. El protocolo de ejecucion vive en `docs/tasks/TASK_PROCESS.md`. Las tasks legacy `CODEX_TASK_*` siguen vigentes en el backlog con su formato original.
+- Toda task nueva debe nacer desde `docs/tasks/TASK_TEMPLATE.md` (plantilla copiable) y usar `TASK-###` como ID estable. El protocolo de ejecucion vive en `docs/tasks/TASK_PROCESS.md`. Las tasks existentes en el backlog (`CODEX_TASK_*` y `TASK-###` ya creadas) siguen vigentes con su formato original.
 - Los briefs vivos del proyecto deben quedar versionados dentro de `docs/tasks/**`; no usar archivos sueltos en raíz como source of truth.
 - No asumir que un task está vigente solo por existir; contrastar siempre con `project_context.md`, `Handoff.md` y `changelog.md`.
 - Toda task del sistema nueva, reactivada o retomada debe revisarse obligatoriamente contra la arquitectura antes de implementarse.

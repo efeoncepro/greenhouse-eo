@@ -101,7 +101,7 @@ Los issues documentan incidentes operativos detectados en runtime. Viven en `doc
 Todo agente que trabaje sobre una task del sistema debe gestionar su estado en el pipeline de tareas. Las tareas viven en `docs/tasks/{to-do,in-progress,complete}/` y su índice es `docs/tasks/README.md`.
 
 - **Tasks nuevas** usan `TASK-###`, nacen desde `docs/tasks/TASK_TEMPLATE.md` (plantilla copiable) y siguen el protocolo de `docs/tasks/TASK_PROCESS.md`.
-- **Tasks legacy** (`CODEX_TASK_*`) siguen vigentes en el backlog con su formato original hasta su cierre o migración.
+- **Tasks existentes** — tanto `CODEX_TASK_*` como `TASK-###` ya creadas en el backlog — siguen vigentes con su formato original hasta su cierre.
 
 ### Al iniciar trabajo en una task
 1. Mover el archivo de la task de `to-do/` a `in-progress/`

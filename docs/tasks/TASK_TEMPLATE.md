@@ -2,7 +2,7 @@
 
 Plantilla copiable para crear tasks nuevas. Para el protocolo completo (Plan Mode, Skill, Subagent, derivacion de Checkpoint/Mode, Lightweight Mode), ver [`TASK_PROCESS.md`](TASK_PROCESS.md).
 
-> **Convivencia de formatos:** las tasks nuevas usan `TASK-###` y nacen desde esta plantilla. En el backlog existen tasks legacy creadas con el formato anterior (`CODEX_TASK_*`) que siguen vigentes hasta su cierre o migracion.
+> **Convivencia de formatos:** solo las tasks creadas a partir de ahora usan esta plantilla. En el backlog existen tasks con el formato anterior — tanto `CODEX_TASK_*` como `TASK-###` ya creadas — que siguen vigentes con su estructura original hasta su cierre.
 
 ---
 

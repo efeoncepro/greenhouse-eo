@@ -4,7 +4,7 @@ Documento de referencia para el protocolo completo de tasks del proyecto. Define
 
 Para la plantilla copiable, ver [`TASK_TEMPLATE.md`](TASK_TEMPLATE.md).
 
-> **Convivencia de formatos:** las tasks nuevas usan `TASK-###` y nacen desde `TASK_TEMPLATE.md`. En el backlog existen tasks legacy creadas con el formato anterior (`CODEX_TASK_*`) que siguen vigentes hasta su cierre o migracion.
+> **Convivencia de formatos:** solo las tasks creadas a partir de ahora usan esta estructura. En el backlog existen tasks con el formato anterior — tanto `CODEX_TASK_*` como `TASK-###` ya creadas — que siguen vigentes con su estructura original hasta su cierre.
 
 ---
 

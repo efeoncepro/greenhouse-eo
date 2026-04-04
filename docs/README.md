@@ -98,6 +98,6 @@ Indice maestro de la documentacion no operativa del repo.
   - `complete/`
 - Regla obligatoria:
   - toda task nueva debe usar `TASK-###` y nacer desde `docs/tasks/TASK_TEMPLATE.md`
-  - las tasks legacy `CODEX_TASK_*` siguen vigentes en el backlog con su formato original
+  - las tasks existentes en el backlog (`CODEX_TASK_*` y `TASK-###` ya creadas) siguen vigentes con su formato original
   - toda task del sistema (`TASK-###` nueva o `CODEX_TASK_*` legacy) debe revisarse contra `GREENHOUSE_ARCHITECTURE_V1.md`, `GREENHOUSE_360_OBJECT_MODEL_V1.md` y la arquitectura especializada aplicable antes de implementarse
   - si un trabajo cambia el canal o la disponibilidad de una capacidad visible, revisar tambien `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md` y evaluar si corresponde actualizar `docs/changelog/CLIENT_CHANGELOG.md`

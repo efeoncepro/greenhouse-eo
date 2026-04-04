@@ -19,7 +19,7 @@ El task template monolitico (`TASK_TEMPLATE.md`, ~683 lineas) se separo en dos d
 
 ### Compatibilidad
 
-Las tasks legacy (`CODEX_TASK_*`) y tasks `TASK-###` creadas con el formato anterior siguen vigentes en el backlog con su formato original. Solo las tasks nuevas usan la nueva estructura.
+Las tasks existentes en el backlog — tanto `CODEX_TASK_*` como `TASK-###` ya creadas — siguen vigentes con su formato original. Solo las tasks creadas a partir de ahora usan la nueva estructura.
 
 ### Docs actualizados
 
