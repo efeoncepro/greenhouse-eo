@@ -121,6 +121,7 @@ Reglas obligatorias:
 - La señal viaja con `metricName: "ftr_pct"` sin `metricDisplayName` — Gemini repite el código
 - La UI muestra "Primera entrega correcta" (label en español) en vez de "FTR%" en los chips
 - Mismatch de keys: las señales AI usan `rpa_avg` pero el registry usa `rpa` como id
+- La señal viaja con `spaceId: "spc-ae463d9f-..."`, `memberId` y `projectId` como UUIDs sin nombres legibles — Gemini los repite tal cual en las narrativas
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -155,7 +156,18 @@ Reglas obligatorias:
 - Actualizar `getMetricDisplayName()` en `NexaInsightsBlock.tsx` para usar `shortName` en vez de `label`
 - Mantener fallback robusto: `shortName ?? label ?? id` y manejar mismatch `rpa_avg` → `rpa`
 
-### Slice 2 — Prompt enrichment con glosario, cadena causal e instrucciones
+### Slice 2 — Contexto humano de Space, miembros y proyectos en el prompt
+
+- Antes de enviar la señal al LLM, resolver nombres legibles para las entidades referenciadas:
+  - `spaceId` → nombre del Space/cliente desde `greenhouse_core.clients` o `greenhouse_core.spaces`
+  - `memberId` → `display_name` desde `greenhouse_core.team_members`
+  - `projectId` → nombre del proyecto desde `greenhouse_conformed.delivery_projects` o fuente equivalente
+- Agregar al JSON de la señal enriquecida: `spaceName`, `memberName`, `projectName`
+- Usar lookup batch (una query por tipo, no una por señal) para minimizar round trips — la función `buildSignalPrompt` recibe el contexto ya resuelto
+- Agregar instrucción al prompt: "Usa los nombres de Space, miembro y proyecto en la narrativa, nunca los IDs técnicos"
+- Fallback: si no se resuelve un nombre, usar el ID tal cual (no fallar silenciosamente ni inventar)
+
+### Slice 3 — Prompt enrichment con glosario, cadena causal e instrucciones
 
 - Definir constante `ICO_METRIC_GLOSSARY_LINES` generada dinámicamente desde `ICO_METRIC_REGISTRY.map(m => ...)` con formato: `código / alias → shortName (description) [unit, dirección deseada]`
 - Incluir alias conocidos en el glosario (ej: `rpa_avg` también mapea a `RpA`)
@@ -171,7 +183,7 @@ Reglas obligatorias:
 - Actualizar `ICO_LLM_PROMPT_TEMPLATE` para incluir el glosario y la cadena causal
 - El prompt hash cambia automáticamente al cambiar el template (ya funciona así via `buildIcoLlmPromptHash()`)
 
-### Slice 3 — Re-materialización de enrichments
+### Slice 4 — Re-materialización de enrichments
 
 - Correr el pipeline LLM para los períodos con señales (Feb, Mar, Abr 2026) para regenerar narrativas con el prompt nuevo
 - Verificar que las nuevas narrativas usan nombres operativos y doble capa
@@ -238,10 +250,15 @@ Reglas de narrativa:
 const metricDef = getMetricById(signal.metricName) ?? getMetricById(signal.metricName.replace('_avg', ''))
 const enrichedSignal = {
   ...signal,
+  // Contexto de métrica
   metricDisplayName: metricDef?.shortName ?? signal.metricName,
   metricDescription: metricDef?.description ?? null,
   metricUnit: metricDef?.unit ?? null,
-  metricDirection: metricDef ? (metricDef.higherIsBetter ? 'higher is better' : 'lower is better') : null
+  metricDirection: metricDef ? (metricDef.higherIsBetter ? 'higher is better' : 'lower is better') : null,
+  // Contexto humano (resuelto por lookup batch previo)
+  spaceName: resolvedNames.spaces[signal.spaceId] ?? signal.spaceId,
+  memberName: signal.memberId ? (resolvedNames.members[signal.memberId] ?? signal.memberId) : null,
+  projectName: signal.projectId ? (resolvedNames.projects[signal.projectId] ?? signal.projectId) : null
 }
 ```
 
@@ -250,9 +267,9 @@ const enrichedSignal = {
 ```json
 {
   "qualityScore": 85,
-  "explanationSummary": "El FTR% cayó a 69.6% en marzo, significativamente por debajo del 98.2% esperado. Esto presiona RpA al alza porque más piezas requieren rondas adicionales de corrección, y puede impactar el Cycle Time y Throughput del período. En términos operativos, el equipo está dedicando más tiempo a correcciones que a producción nueva, lo que reduce la cantidad de iniciativas que pueden entregarse este mes.",
-  "rootCauseNarrative": "La caída del FTR% se concentra en el proyecto '31239c2f' donde el porcentaje bajó de 98% a 69.6%. El miembro 'andres-carlosama' contribuye significativamente con un 53.4% de la desviación. Esto indica un problema localizado de alineación con el brief o de complejidad del entregable, no una degradación sistémica.",
-  "recommendedAction": "Revisar los briefs y criterios de aprobación del proyecto afectado. Evaluar si la carga de andres-carlosama permite calidad en primera entrega o si requiere redistribución.",
+  "explanationSummary": "El FTR% de Sky Airlines cayó a 69.6% en marzo, significativamente por debajo del 98.2% esperado. Esto presiona RpA al alza porque más piezas requieren rondas adicionales de corrección, y puede impactar el Cycle Time y Throughput del período. En términos operativos, el equipo está dedicando más tiempo a correcciones que a producción nueva, lo que reduce la cantidad de iniciativas que pueden entregarse este mes.",
+  "rootCauseNarrative": "La caída del FTR% se concentra en el proyecto Campaña Q1 Digital donde el porcentaje bajó de 98% a 69.6%. Andrés Carlosama contribuye significativamente con un 53.4% de la desviación. Esto indica un problema localizado de alineación con el brief o de complejidad del entregable, no una degradación sistémica.",
+  "recommendedAction": "Revisar los briefs y criterios de aprobación de Campaña Q1 Digital. Evaluar si la carga de Andrés Carlosama permite calidad en primera entrega o si requiere redistribución.",
   "confidence": 0.85
 }
 ```
@@ -279,7 +296,9 @@ const enrichedSignal = {
 - [ ] El prompt incluye la cadena causal formal del contrato de métricas
 - [ ] El prompt instruye doble capa narrativa (técnica + bajada operativa)
 - [ ] La señal enviada al LLM incluye `metricDisplayName` derivado del registry
+- [ ] La señal enviada al LLM incluye `spaceName`, `memberName`, `projectName` resueltos desde PostgreSQL
 - [ ] Los enrichments regenerados usan nombres operativos (`FTR%`, `RpA`, `OTD%`) en vez de códigos (`ftr_pct`, `rpa_avg`)
+- [ ] Los enrichments regenerados usan nombres de Space, miembros y proyectos en vez de UUIDs
 - [ ] Los enrichments regenerados incluyen conexión causal y bajada operativa
 - [ ] La UI (`NexaInsightsBlock`) muestra `shortName` en el chip de métrica
 - [ ] `pnpm build` y `pnpm lint` sin errores
@@ -303,6 +322,9 @@ const enrichedSignal = {
 - Evaluar surfacing visual de la cadena causal en la UI (ej: tooltip que muestre `FTR% ↓ → RpA ↑ → CT ↑`)
 - Evaluar si el glosario debería incluir métricas de velocidad competitiva (TTM, Creative Throughput, Iteration Velocity) cuando el engine las materialice
 - Evaluar prompt tuning basado en feedback de operadores sobre la calidad de la doble capa narrativa
+- Paginación o "ver más" en la lista de insights (hoy limitada a 8 enrichments)
+- Filtro por período en la UI (hoy muestra solo el mes actual)
+- Feedback loop: operador marca insight como "útil" o "no relevante" para calibrar prompts futuros
 
 ## Open Questions
 
