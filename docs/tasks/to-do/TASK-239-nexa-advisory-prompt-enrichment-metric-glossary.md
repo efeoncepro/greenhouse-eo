@@ -1,4 +1,4 @@
-# TASK-239 — Nexa Advisory: Prompt Enrichment con Glosario de Métricas y Cadena Causal
+# TASK-239 — Nexa Insights: Prompt Enrichment con Glosario de Métricas y Cadena Causal
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -23,11 +23,11 @@
 
 ## Summary
 
-Enriquecer el prompt del LLM de Nexa Advisory con el glosario de métricas ICO, la cadena causal y la instrucción de doble capa narrativa (técnica + bajada operativa), para que Gemini genere insights con nombres reales de métricas en inglés, conecte impacto entre métricas, y traduzca a lenguaje operativo comprensible. También agregar `shortName` al metric registry para que la UI muestre nombres operativos (`RpA`, `OTD%`, `FTR%`) en vez de códigos técnicos.
+Enriquecer el prompt del LLM de Nexa Insights con el glosario de métricas ICO, la cadena causal y la instrucción de doble capa narrativa (técnica + bajada operativa), para que Gemini genere insights con nombres reales de métricas en inglés, conecte impacto entre métricas, y traduzca a lenguaje operativo comprensible. También agregar `shortName` al metric registry para que la UI muestre nombres operativos (`RpA`, `OTD%`, `FTR%`) en vez de códigos técnicos.
 
 ## Why This Task Exists
 
-TASK-232 implementó la lane LLM del ICO Engine y TASK-235 la conectó a la UI como Nexa Advisory. Pero el prompt actual le pasa la señal raw al LLM con `metricName: "ftr_pct"` y Gemini repite ese código técnico en las narrativas. El resultado:
+TASK-232 implementó la lane LLM del ICO Engine y TASK-235 la conectó a la UI como Nexa Insights. Pero el prompt actual le pasa la señal raw al LLM con `metricName: "ftr_pct"` y Gemini repite ese código técnico en las narrativas. El resultado:
 
 - Las explicaciones dicen "ftr_pct cayó a 69%" en vez de "FTR% cayó a 69%"
 - No hay conexión causal — el LLM no sabe que FTR% ↓ presiona RpA ↑ → Cycle Time ↑ → Throughput ↓
@@ -87,7 +87,7 @@ Reglas obligatorias:
 
 ### Blocks / Impacts
 
-- Todos los consumers de Nexa Advisory se benefician automáticamente (Agency ICO, future Space 360, Organization)
+- Todos los consumers de Nexa Insights se benefician automáticamente (Agency ICO, future Space 360, Organization)
 - El prompt hash cambia → los enrichments futuros tienen un prompt version distinto (auditable)
 - Los enrichments históricos no cambian — solo los nuevos runs generan narrativas mejoradas
 
@@ -291,7 +291,7 @@ const enrichedSignal = {
 - `pnpm tsc --noEmit`
 - `pnpm build`
 - Validación manual: correr el pipeline LLM para 1 señal y verificar que la narrativa usa nombres operativos, cadena causal y doble capa
-- Validación visual en staging: `/agency?tab=ico` → Nexa Advisory → chips de métrica muestran `FTR%` no `ftr_pct`
+- Validación visual en staging: `/agency?tab=ico` → Nexa Insights → chips de métrica muestran `FTR%` no `ftr_pct`
 
 ## Closing Protocol
 

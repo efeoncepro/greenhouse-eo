@@ -207,8 +207,8 @@ export const GH_AGENCY = {
   tooltip_cycle_time: 'Días promedio desde inicio hasta entrega de cada activo',
   tooltip_stuck: 'Activos detenidos que requieren atención inmediata',
 
-  // Nexa Advisory (legacy alias — see GH_NEXA for the canonical namespace)
-  advisory_title: 'Nexa Advisory'
+  // Nexa Insights (legacy alias — see GH_NEXA for the canonical namespace)
+  advisory_title: 'Nexa Insights'
 } as const
 
 export const GH_LABELS = {
@@ -1235,16 +1235,16 @@ export const GH_COMPENSATION = {
   bonusHelperText: 'Monto al 100% de cumplimiento'
 } as const
 
-// ─── Nexa Advisory Namespace ──────────────────────────────────────────────
+// ─── Nexa Insights Namespace ──────────────────────────────────────────────
 
 export const GH_NEXA = {
   // Branding
   brand: 'Nexa',
-  brand_full: 'Nexa Advisory',
+  brand_full: 'Nexa Insights',
   disclaimer: 'Generado por Nexa con IA. Verifica la información antes de actuar.',
 
   // Insights block
-  insights_title: 'Nexa Advisory',
+  insights_title: 'Nexa Insights',
   insights_subtitle: 'Señales operativas analizadas por Nexa',
   insights_chip_ready: 'Análisis listo',
   insights_chip_partial: 'Análisis parcial',
