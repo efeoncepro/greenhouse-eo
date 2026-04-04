@@ -482,6 +482,24 @@ notion_ops  (legacy)   ─┤──►  greenhouse_conformed (replacement target
 | Secrets       | `MS_CLIENT_SECRET`, `NOTION_TOKEN` (Secret Manager)                                                                         |
 | Purpose       | Sends Microsoft Teams channel notifications triggered by Notion task events (assignments, status changes, due-date alerts). |
 
+#### 8. ico-batch-worker (us-east4)
+
+| Property      | Value                                                                                                                                         |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Type          | Custom Cloud Run service                                                                                                                      |
+| Runtime       | Node.js 22 (via tsx)                                                                                                                          |
+| Region        | `us-east4` (co-located with Cloud SQL)                                                                                                        |
+| Memory        | 2 GiB                                                                                                                                         |
+| CPU           | 2                                                                                                                                             |
+| Timeout       | 900 s (15 min)                                                                                                                                |
+| Max instances | 2                                                                                                                                             |
+| Concurrency   | 1                                                                                                                                             |
+| Auth          | IAM (`--no-allow-unauthenticated`)                                                                                                            |
+| Source        | `services/ico-batch/` (monorepo, reuses `src/lib/`)                                                                                           |
+| Purpose       | Heavy ICO Engine batch processing: monthly materialization (12 steps) and LLM enrichment pipeline. Replaces Vercel cron that exceeded 120s timeout. |
+| Endpoints     | `GET /health`, `POST /ico/materialize`, `POST /ico/llm-enrich`                                                                               |
+| TASK          | TASK-241                                                                                                                                       |
+
 ### Staging Services
 
 | #   | Service                               | Mirrors                       |
@@ -504,8 +522,12 @@ Staging services share the same configuration as their production counterparts b
 | `hubspot-bq-daily-sync`       | `30 3 * * *` (daily at 3:30 AM)                      | `hubspot-bq-sync`             | America/Santiago |
 | `hubspot-notion-deal-poll`    | `*/15 * * * *` (every 15 min)                        | `hubspot-notion-deal-sync`    | America/Santiago |
 | `notion-hubspot-reverse-poll` | `7,22,37,52 * * * *` (every 15 min, offset by 7 min) | `notion-hubspot-reverse-sync` | America/Santiago |
+| `ico-materialize-daily`       | `15 3 * * *` (daily at 3:15 AM)                       | `ico-batch-worker` (us-east4) | America/Santiago |
+| `ico-llm-enrich-daily`        | `45 3 * * *` (daily at 3:45 AM)                       | `ico-batch-worker` (us-east4) | America/Santiago |
 
 The 7-minute offset on `notion-hubspot-reverse-poll` prevents overlap with the forward sync job, reducing contention on shared Notion API rate limits.
+
+The `ico-materialize-daily` and `ico-llm-enrich-daily` jobs replace the Vercel cron routes that exceeded the 120s timeout. The 30-minute gap between materialization and LLM enrichment ensures outbox events from materialization are published before enrichment reads the signals. Both jobs target the `ico-batch-worker` service in `us-east4` (co-located with Cloud SQL) via IAM OIDC authentication.
 
 ### Paused Jobs (Staging)
 

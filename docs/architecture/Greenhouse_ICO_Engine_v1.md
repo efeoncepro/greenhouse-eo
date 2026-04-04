@@ -1,5 +1,19 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-04 — TASK-241 migrates ICO batch processing to Cloud Run
+
+`TASK-241` mueve los procesos batch pesados del ICO Engine (materialización + LLM enrichment) de Vercel Functions a un servicio Cloud Run dedicado.
+
+- **Servicio:** `ico-batch-worker` en `us-east4` (co-located con Cloud SQL)
+- **Endpoints:** `POST /ico/materialize` (12 pasos de materialización), `POST /ico/llm-enrich` (pipeline LLM con prompt v2)
+- **Trigger:** Cloud Scheduler via IAM OIDC — reemplaza crons de Vercel que excedían 120s timeout
+- **Runtime:** Node.js 22 via `tsx`, reutiliza `src/lib/ico-engine/` del monorepo
+- **Source:** `services/ico-batch/` en greenhouse-eo (no es repo separado)
+- **Config:** 2 GiB RAM, 2 CPU, 900s timeout, concurrency=1
+- **Schedule:** materialización 3:15 AM Santiago, LLM enrichment 3:45 AM Santiago
+- La lógica de materialización y enrichment no cambia — solo el runtime que la ejecuta
+- Outbox events siguen publicándose a PostgreSQL → Vercel reactive consumer los procesa
+
 ## Delta 2026-04-04 — TASK-239 enriches LLM prompt with metric glossary, causal chain, and entity names
 
 `TASK-239` mejora la calidad narrativa del carril advisory-only (LLM lane) sin cambiar storage, endpoints ni semántica.
