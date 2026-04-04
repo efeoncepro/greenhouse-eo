@@ -276,3 +276,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-224` | `in-progress` | Finance Document vs Cash Semantic Contract | `docs/tasks/in-progress/TASK-224-finance-document-vs-cash-semantic-contract.md` |
 | `TASK-225` | `in-progress` | Internal Roles, Hierarchies & Approval Ownership Model | `docs/tasks/in-progress/TASK-225-internal-roles-hierarchies-approval-ownership-model.md` |
 | `TASK-226` | `to-do` | Superadministrador Bootstrap & Assignment Policy | `docs/tasks/to-do/TASK-226-superadministrador-bootstrap-assignment-policy.md` |
+| `TASK-227` | `to-do` | Operational Responsibility Registry | `docs/tasks/to-do/TASK-227-operational-responsibility-registry.md` |
+| `TASK-228` | `to-do` | Employee Legacy Role Code Convergence | `docs/tasks/to-do/TASK-228-employee-legacy-role-convergence.md` |
+| `TASK-229` | `to-do` | Client View Catalog Deduplication | `docs/tasks/to-do/TASK-229-client-view-catalog-deduplication.md` |
