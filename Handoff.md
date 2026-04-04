@@ -1,5 +1,37 @@
 # Handoff.md
 
+## Sesión 2026-04-04 — TASK-239 Nexa Insights Prompt Enrichment
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: prompt LLM v2 con glosario de métricas, cadena causal, doble capa narrativa, entity resolution, shortName en UI
+
+### Qué se hizo
+
+- `MetricDefinition.shortName` agregado a las 11 métricas ICO + 6 métricas Person Intelligence
+- Glosario dinámico generado desde `ICO_METRIC_REGISTRY` inyectado al prompt
+- Cadena causal formal (BCS → FTR% → RpA → CT → TTM → RE) inyectada al prompt
+- Instrucciones de doble capa narrativa (técnica + bajada operativa, spanglish)
+- `resolve-signal-context.ts` — batch entity resolution (spaces, members, projects vía Kysely)
+- `enrichSignalPayload()` agrega metricDisplayName, spaceName, memberName, projectName al JSON de la señal
+- `NexaInsightsBlock` muestra `shortName` (FTR%, RpA) en chips en vez de `label` (español)
+- Prompt version bumped: `ico_signal_enrichment_v1` → `ico_signal_enrichment_v2`
+- Delta documentado en `Greenhouse_ICO_Engine_v1.md`
+
+### Pendiente
+
+- Slice 4: re-materializar enrichments con el prompt nuevo (requiere trigger manual del pipeline en staging)
+- Mover TASK-239 a `complete/` después de validar re-materialización
+
+### Verificación
+
+- `pnpm tsc --noEmit` — OK
+- `pnpm lint` — OK
+- `pnpm build` — OK
+
+---
+
 ## Sesión 2026-04-04 — TASK-238 Agency Workspace & Space 360 Data Storytelling UX
 
 ### Rama / alcance

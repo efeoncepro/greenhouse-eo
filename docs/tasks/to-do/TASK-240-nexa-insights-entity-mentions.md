@@ -99,7 +99,7 @@ Reglas obligatorias:
 - `CustomChip` con `component={Link}` soportado por MUI — puede hacer chips clickeables
 - `GH_COLORS.roles.*` para colores de rol de miembros
 - `NexaInsightsBlock` con `InsightCard` que renderiza `explanation`, `recommendedAction` como texto plano
-- TASK-239 (pendiente) resolverá `memberName`, `spaceName`, `projectName` y los pasará al LLM junto con sus IDs
+- TASK-239 (implementada) ya resuelve `memberName`, `spaceName`, `projectName` y los pasa al LLM junto con sus IDs vía `resolve-signal-context.ts` y `enrichSignalPayload()` — prompt version `ico_signal_enrichment_v2`
 
 ### Gap
 
