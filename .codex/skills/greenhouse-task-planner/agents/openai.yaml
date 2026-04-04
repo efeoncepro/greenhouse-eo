@@ -1,0 +1,7 @@
+interface:
+  display_name: "Greenhouse Task Planner"
+  short_description: "Convert briefs into canonical Greenhouse tasks."
+  default_prompt: "Use $greenhouse-task-planner to turn this brief into a TASK-### draft that follows the repo template and process."
+
+policy:
+  allow_implicit_invocation: true
