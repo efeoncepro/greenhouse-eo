@@ -10,6 +10,64 @@
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
 
+## Delta 2026-04-04 — TanStack React Table: componentes avanzados extraídos de Vuexy full-version
+
+Se extrajeron los patrones avanzados de tabla del full-version de Vuexy como componentes reutilizables.
+
+### Componentes disponibles
+
+| Componente | Archivo | Propósito |
+|------------|---------|-----------|
+| `EditableCell` | `src/components/EditableCell.tsx` | Celda editable inline con `onBlur` → `table.options.meta.updateData()` |
+| `ColumnFilter` | `src/components/ColumnFilter.tsx` | Filtro por columna: texto (búsqueda) o numérico (min/max range) |
+| `DebouncedInput` | `src/components/DebouncedInput.tsx` | Input con debounce 500ms para búsqueda global |
+| `TablePaginationComponent` | `src/components/TablePaginationComponent.tsx` | Paginación MUI integrada con TanStack |
+| `fuzzyFilter` | `src/components/tableUtils.ts` | Fuzzy filter via `@tanstack/match-sorter-utils` |
+| `buildSelectionColumn` | `src/components/tableUtils.ts` | Column definition de checkbox para row selection |
+| `getToggleableColumns` | `src/components/tableUtils.ts` | Helper para obtener columnas que pueden ocultarse |
+| `getColumnFacetedRange` | `src/components/tableUtils.ts` | Helper para obtener min/max de una columna numérica |
+
+### Patrón de tabla full-featured
+
+```tsx
+import { fuzzyFilter, buildSelectionColumn, getToggleableColumns } from '@/components/tableUtils'
+import EditableCell from '@/components/EditableCell'
+import ColumnFilter from '@/components/ColumnFilter'
+import DebouncedInput from '@/components/DebouncedInput'
+import TablePaginationComponent from '@/components/TablePaginationComponent'
+
+const table = useReactTable({
+  data,
+  columns: [buildSelectionColumn<MyRow>(), ...myColumns],
+  filterFns: { fuzzy: fuzzyFilter },
+  globalFilterFn: fuzzyFilter,
+  enableRowSelection: true,
+  getCoreRowModel: getCoreRowModel(),
+  getSortedRowModel: getSortedRowModel(),
+  getFilteredRowModel: getFilteredRowModel(),
+  getFacetedRowModel: getFacetedRowModel(),
+  getFacetedUniqueValues: getFacetedUniqueValues(),
+  getFacetedMinMaxValues: getFacetedMinMaxValues(),
+  getPaginationRowModel: getPaginationRowModel(),
+  meta: {
+    updateData: (rowIndex, columnId, value) => {
+      setData(old => old.map((row, i) => i === rowIndex ? { ...row, [columnId]: value } : row))
+    }
+  }
+})
+```
+
+### TableMeta augmentation
+
+`tableUtils.ts` augmenta `TableMeta` con `updateData` para que `EditableCell` funcione sin type errors:
+```typescript
+declare module '@tanstack/table-core' {
+  interface TableMeta<TData extends RowData> {
+    updateData?: (rowIndex: number, columnId: string, value: unknown) => void
+  }
+}
+```
+
 ## Delta 2026-04-04 — PeriodNavigator: componente reutilizable de navegación de período
 
 **Archivo**: `src/components/greenhouse/PeriodNavigator.tsx`
