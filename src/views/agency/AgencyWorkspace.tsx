@@ -22,7 +22,6 @@ import EmptyState from '@/components/greenhouse/EmptyState'
 import SectionErrorBoundary from '@/components/greenhouse/SectionErrorBoundary'
 import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type {
-  AgencyCapacityOverview,
   AgencyChartStatusItem,
   AgencyChartWeeklyPoint,
   AgencyPulseKpis,
@@ -67,7 +66,8 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
 
   const [activeTab, setActiveTab] = useState<AgencyTab>(defaultTab)
   const [spacesData, setSpacesData] = useState<AgencySpaceHealth[] | null>(null)
-  const [capacityData, setCapacityData] = useState<AgencyCapacityOverview | null>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [capacityData, setCapacityData] = useState<any>(null)
   const [icoData, setIcoData] = useState<AgencyIcoData | null>(null)
   const [spacesLoading, setSpacesLoading] = useState(false)
   const [capacityLoading, setCapacityLoading] = useState(false)
@@ -125,7 +125,7 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
     setCapacityError(null)
 
     try {
-      const res = await fetch('/api/agency/capacity')
+      const res = await fetch('/api/team/capacity-breakdown')
 
       if (res.ok) {
         const data = await res.json()

@@ -7,10 +7,10 @@ import Typography from '@mui/material/Typography'
 import SectionErrorBoundary from '@/components/greenhouse/SectionErrorBoundary'
 import CapacityOverview from '@/components/agency/CapacityOverview'
 import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
-import type { AgencyCapacityOverview } from '@/lib/agency/agency-queries'
+import type { CapacityBreakdownData } from '@/components/agency/CapacityOverview'
 
 type Props = {
-  capacity: AgencyCapacityOverview | null
+  capacity: CapacityBreakdownData | null
 }
 
 const AgencyCapacityView = ({ capacity }: Props) => (

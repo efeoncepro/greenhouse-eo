@@ -3,30 +3,88 @@
 import Box from '@mui/material/Box'
 import LinearProgress from '@mui/material/LinearProgress'
 import Stack from '@mui/material/Stack'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
+import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import TeamAvatar from '@/components/greenhouse/TeamAvatar'
 import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
-import type { AgencyCapacityOverview } from '@/lib/agency/agency-queries'
+
+// ── Types matching /api/team/capacity-breakdown response ──
+
+interface CapacityBreakdown {
+  contractedHoursMonth: number
+  assignedHoursMonth: number
+  usedHoursMonth: number | null
+  availableHoursMonth: number
+  commercialAvailabilityHours?: number
+  operationalAvailabilityHours?: number | null
+  overcommitted: boolean
+}
+
+interface CapacityMember {
+  memberId: string
+  displayName: string
+  roleTitle: string | null
+  fteAllocation: number
+  usagePercent: number | null
+  capacityHealth: string
+  capacity: CapacityBreakdown
+  assignments?: Array<{
+    clientName: string | null
+    fteAllocation: number
+    hoursPerMonth: number
+  }>
+}
+
+export interface CapacityBreakdownData {
+  team: CapacityBreakdown & {
+    usageKind?: string
+    usagePercent?: number | null
+  }
+  members: CapacityMember[]
+  memberCount: number
+  hasOperationalMetrics: boolean
+  overcommittedCount: number
+}
 
 type Props = {
-  capacity: AgencyCapacityOverview | null
+  capacity: CapacityBreakdownData | null
 }
+
+// ── Helpers ──
+
+const HEALTH_COLORS: Record<string, 'secondary' | 'success' | 'warning' | 'error'> = {
+  idle: 'secondary',
+  balanced: 'success',
+  high: 'warning',
+  overloaded: 'error'
+}
+
+const HEALTH_LABELS: Record<string, string> = {
+  idle: 'Disponible',
+  balanced: 'Balanceado',
+  high: 'Dedicación completa',
+  overloaded: 'Sobrecomprometido'
+}
+
+const getUtilColor = (pct: number) =>
+  pct >= 90 ? GH_COLORS.semaphore.red.source : pct >= 71 ? GH_COLORS.semaphore.yellow.source : GH_COLORS.semaphore.green.source
 
 const getUtilTone = (pct: number): 'success' | 'warning' | 'error' =>
   pct >= 90 ? 'error' : pct >= 71 ? 'warning' : 'success'
 
-const getUtilColor = (pct: number) =>
-  pct >= 90 ? GH_COLORS.semaphore.red.source : pct >= 71 ? GH_COLORS.semaphore.yellow.source : GH_COLORS.semaphore.green.source
+// ── Component ──
 
 const CapacityOverview = ({ capacity }: Props) => {
   if (!capacity || capacity.members.length === 0) {
     return (
       <EmptyState
         icon='tabler-users-group'
+        animatedIcon='/animations/empty-inbox.json'
         title='Capacidad no disponible'
         description={GH_AGENCY.capacity_empty}
         minHeight={260}
@@ -34,7 +92,15 @@ const CapacityOverview = ({ capacity }: Props) => {
     )
   }
 
-  const utilColor = getUtilColor(capacity.utilizationPct)
+  const { team, members, overcommittedCount } = capacity
+
+  const utilizationPct = team.contractedHoursMonth > 0
+    ? Math.round((team.assignedHoursMonth / team.contractedHoursMonth) * 100)
+    : 0
+
+  const totalFte = Number((team.contractedHoursMonth / 160).toFixed(1))
+
+  const utilColor = getUtilColor(utilizationPct)
 
   return (
     <Stack spacing={4}>
@@ -48,24 +114,27 @@ const CapacityOverview = ({ capacity }: Props) => {
       >
         <HorizontalWithSubtitle
           title={GH_AGENCY.kpi_fte}
-          stats={capacity.totalFte.toFixed(1)}
+          stats={totalFte.toFixed(1)}
           avatarIcon='tabler-briefcase'
           avatarColor='primary'
-          subtitle={`${capacity.members.length} personas activas`}
+          subtitle={`${members.length} personas activas`}
+          titleTooltip='FTE total basado en horas contratadas del equipo'
         />
         <HorizontalWithSubtitle
           title={GH_AGENCY.kpi_utilization}
-          stats={`${capacity.utilizationPct}%`}
+          stats={`${utilizationPct}%`}
           avatarIcon='tabler-activity'
-          avatarColor={getUtilTone(capacity.utilizationPct)}
-          subtitle={capacity.utilizationPct >= 90 ? 'Capacidad al límite' : capacity.utilizationPct >= 71 ? 'Carga alta' : 'Capacidad óptima'}
+          avatarColor={getUtilTone(utilizationPct)}
+          subtitle={utilizationPct >= 90 ? 'Capacidad al límite' : utilizationPct >= 71 ? 'Carga alta' : 'Capacidad óptima'}
+          titleTooltip='Horas asignadas como porcentaje de horas contratadas'
         />
         <HorizontalWithSubtitle
           title={GH_AGENCY.kpi_hours}
-          stats={`${capacity.monthlyHours}h`}
+          stats={`${team.contractedHoursMonth}h`}
           avatarIcon='tabler-clock'
           avatarColor='info'
-          subtitle='Horas mensuales asignadas'
+          subtitle={`${team.assignedHoursMonth}h asignadas · ${Math.max(0, team.availableHoursMonth)}h disponibles`}
+          titleTooltip='Horas contratadas mensuales del equipo'
         />
       </Box>
 
@@ -75,13 +144,24 @@ const CapacityOverview = ({ capacity }: Props) => {
           <Typography variant='body2' sx={{ fontWeight: 600, color: GH_COLORS.neutral.textPrimary }}>
             Utilización global
           </Typography>
-          <Typography variant='body2' sx={{ color: utilColor, fontWeight: 600 }}>
-            {capacity.utilizationPct}%
-          </Typography>
+          <Stack direction='row' spacing={1} alignItems='center'>
+            {overcommittedCount > 0 && (
+              <CustomChip
+                size='small'
+                round='true'
+                variant='tonal'
+                color='error'
+                label={`${overcommittedCount} sobrecomprometido${overcommittedCount > 1 ? 's' : ''}`}
+              />
+            )}
+            <Typography variant='body2' sx={{ color: utilColor, fontWeight: 600 }}>
+              {utilizationPct}%
+            </Typography>
+          </Stack>
         </Stack>
         <LinearProgress
           variant='determinate'
-          value={Math.min(capacity.utilizationPct, 100)}
+          value={Math.min(utilizationPct, 100)}
           sx={{
             height: 8,
             borderRadius: 4,
@@ -106,38 +186,54 @@ const CapacityOverview = ({ capacity }: Props) => {
           </Typography>
         </Box>
 
-        {capacity.members.map((member, idx) => (
-          <Box
-            key={member.memberId}
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
-              px: 2.5,
-              py: 1.5,
-              borderTop: idx > 0 ? `1px solid ${alpha(GH_COLORS.neutral.border, 0.6)}` : 'none',
-              '&:hover': { bgcolor: GH_COLORS.neutral.bgSurface }
-            }}
-          >
-            <TeamAvatar name={member.displayName} avatarUrl={member.avatarUrl} roleCategory={member.roleCategory} size={36} />
-            <Box sx={{ flex: 1, minWidth: 0 }}>
-              <Typography variant='subtitle2' noWrap sx={{ color: GH_COLORS.neutral.textPrimary }}>
-                {member.displayName}
-              </Typography>
-              <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
-                {member.roleTitle}
-              </Typography>
+        {members.map((member, idx) => {
+          const memberFte = member.capacity.contractedHoursMonth / 160
+
+          const memberAssignedPct = member.capacity.contractedHoursMonth > 0
+            ? Math.round((member.capacity.assignedHoursMonth / member.capacity.contractedHoursMonth) * 100)
+            : 0
+
+          const healthColor = HEALTH_COLORS[member.capacityHealth] ?? 'secondary'
+          const healthLabel = HEALTH_LABELS[member.capacityHealth] ?? member.capacityHealth
+
+          return (
+            <Box
+              key={member.memberId}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                px: 2.5,
+                py: 1.5,
+                borderTop: idx > 0 ? `1px solid ${alpha(GH_COLORS.neutral.border, 0.6)}` : 'none',
+                '&:hover': { bgcolor: GH_COLORS.neutral.bgSurface }
+              }}
+            >
+              <TeamAvatar name={member.displayName} avatarUrl={null} roleCategory='unknown' size={36} />
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Typography variant='subtitle2' noWrap sx={{ color: GH_COLORS.neutral.textPrimary }}>
+                  {member.displayName}
+                </Typography>
+                <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+                  {member.roleTitle ?? 'Sin rol definido'}
+                </Typography>
+              </Box>
+              <Tooltip title={`Contratado: ${member.capacity.contractedHoursMonth}h · Asignado: ${member.capacity.assignedHoursMonth}h · ${healthLabel}`}>
+                <Box>
+                  <CustomChip size='small' round='true' variant='tonal' color={healthColor} label={healthLabel} />
+                </Box>
+              </Tooltip>
+              <Box sx={{ textAlign: 'right', flexShrink: 0, minWidth: 80 }}>
+                <Typography variant='body2' sx={{ fontWeight: 600, color: GH_COLORS.neutral.textPrimary }}>
+                  {memberFte.toFixed(1)} FTE
+                </Typography>
+                <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+                  {memberAssignedPct}% asignado
+                </Typography>
+              </Box>
             </Box>
-            <Box sx={{ textAlign: 'right', flexShrink: 0 }}>
-              <Typography variant='body2' sx={{ fontWeight: 600, color: GH_COLORS.neutral.textPrimary }}>
-                {member.fteAllocation.toFixed(1)} FTE
-              </Typography>
-              <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
-                {Math.round(member.fteAllocation * 160)}h/mes
-              </Typography>
-            </Box>
-          </Box>
-        ))}
+          )
+        })}
       </Box>
     </Stack>
   )
