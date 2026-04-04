@@ -10,6 +10,68 @@
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
 
+## Delta 2026-04-04 — PeriodNavigator: componente reutilizable de navegación de período
+
+**Archivo**: `src/components/greenhouse/PeriodNavigator.tsx`
+
+Componente compartido para navegación de período mensual (año + mes). Consolida 3 patrones que estaban duplicados en 7+ vistas.
+
+### Variantes
+
+| Variante | Render | Caso de uso |
+|----------|--------|-------------|
+| `arrows` (default) | `< [Hoy] Abril 2026 >` | Header de cards, vistas de detalle |
+| `dropdowns` | `[Año ▼] [Mes ▼] [Hoy]` | Filtros de período en dashboards |
+| `compact` | `< Abr 2026 >` | Inline en tablas o espacios reducidos |
+
+### Props
+
+```typescript
+interface PeriodNavigatorProps {
+  year: number
+  month: number
+  onChange: (period: { year: number; month: number }) => void
+  variant?: 'arrows' | 'dropdowns' | 'compact'  // default: 'arrows'
+  minYear?: number          // default: 2024
+  maxYear?: number          // default: currentYear + 1
+  showToday?: boolean       // default: true
+  todayLabel?: string       // default: 'Hoy'
+  size?: 'small' | 'medium' // default: 'small'
+  disabled?: boolean
+}
+```
+
+### Uso
+
+```tsx
+import PeriodNavigator from '@/components/greenhouse/PeriodNavigator'
+
+<PeriodNavigator
+  year={year}
+  month={month}
+  onChange={({ year, month }) => { setYear(year); setMonth(month) }}
+  variant='arrows'
+/>
+```
+
+### Vistas candidatas a migrar
+
+Las siguientes vistas usan selectores duplicados que deberían migrarse a `PeriodNavigator`:
+- `CostAllocationsView` (dropdowns inline)
+- `ProjectedPayrollView` (arrows inline)
+- `OrganizationEconomicsTab` (dropdowns inline)
+- `OrganizationFinanceTab` (dropdowns inline)
+- `OrganizationIcoTab` (dropdowns inline)
+- `ClientEconomicsView` (dropdowns inline)
+- `PersonActivityTab` (dropdowns inline)
+
+### Accesibilidad
+
+- Botones prev/next tienen `aria-label` ("Mes anterior" / "Mes siguiente")
+- Tooltips descriptivos en cada control
+- Botón "Hoy" indica si ya estás en el período actual
+- `disabled` prop deshabilita todos los controles
+
 ## Delta 2026-04-03 — Cost Intelligence Dashboard (cost-allocations redesign)
 
 La vista `/finance/cost-allocations` fue rediseñada de un CRUD vacío a un dashboard de inteligencia de costos:
