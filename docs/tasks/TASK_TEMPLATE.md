@@ -68,6 +68,7 @@ Usar estos campos dentro de `## Status`:
 - `Rank`: posición actual en backlog operativo
 - `Domain`: módulo o área principal
 - `Checkpoint`: `human` o `auto` — derivado de Priority × Effort (ver tabla abajo)
+- `Mode`: `standard` o `lightweight` — derivado de Priority × Effort (ver Lightweight Mode abajo)
 - `Blocked by`: lista de TASK-### que deben completarse antes, o `none`
 - `Branch`: `task/TASK-###-short-slug`
 
@@ -377,6 +378,7 @@ Toda task nueva debe incluir las secciones de Zone 0 a Zone 4. Las secciones opc
 - Rank: `TBD`
 - Domain: `[finance|hr|platform|identity|ui|data|ops|content|crm]`
 - Checkpoint: `human` | `auto`
+- Mode: `standard` | `lightweight`
 - Blocked by: `[TASK-XXX, or "none"]`
 - Branch: `task/TASK-###-short-slug`
 - Legacy ID: `[optional]`
@@ -569,7 +571,7 @@ no durante Discovery o Planning.]
 
 ---
 
-## Cómo derivar el campo Checkpoint
+## Cómo derivar Checkpoint y Mode
 
 El campo `Checkpoint` en Status se deriva así:
 
@@ -582,7 +584,73 @@ El campo `Checkpoint` en Status se deriva así:
 
 Regla simplificada: **`human` si Priority ≤ P1 o Effort = Alto. `auto` en cualquier otro caso.**
 
-Si hay duda, usar `human`. Es más barato revisar un plan que revertir código.
+El campo `Mode` se deriva así:
+
+| Priority | Effort Bajo | Effort Medio | Effort Alto |
+|---|---|---|---|
+| P0 | `standard` | `standard` | `standard` |
+| P1 | `standard` | `standard` | `standard` |
+| P2 | `lightweight` | `standard` | `standard` |
+| P3 | `lightweight` | `standard` | `standard` |
+
+Regla simplificada: **`lightweight` si Priority ≥ P2 y Effort = Bajo. `standard` en cualquier otro caso.**
+
+Si hay duda, usar `standard` y `human`. Es más barato revisar un plan que revertir código.
+
+---
+
+## Lightweight Mode
+
+### Cuándo aplica
+
+Lightweight Mode aplica cuando `Priority ≥ P2` **y** `Effort = Bajo`. Son tasks contenidas: un fix de cálculo, un ajuste de UI copy, un cambio de configuración, un hotfix de un bug reportado. La estructura completa del template sigue siendo válida, pero varias secciones se comprimen para que el overhead no supere al trabajo.
+
+### Qué cambia
+
+| Sección | Modo normal | Lightweight Mode |
+|---|---|---|
+| `Summary` | 2–4 líneas | 1–2 líneas |
+| `Why This Task Exists` | Párrafo con contexto | 1 línea — "bug", "deuda", "gap" basta |
+| `Architecture Alignment` | Docs + reglas | Solo si la task toca arquitectura. Si no, escribir: "No architectural impact" |
+| `Normative Docs` | Lista de docs | Omitir si no hay docs especializados |
+| `Current Repo State` | Already exists + Gap | Colapsar a 1–2 líneas por sección |
+| `Plan Mode > Discovery checklist` | 8+ items | Los pasos 1–6 siguen obligatorios. Paso 7 (skill scan): solo si el output lo requiere. Paso 8 (subagent): siempre `sequential`, no evaluar fork |
+| `Plan Mode > plan.md` | Documento completo | Puede ser inline en el commit message en vez de archivo separado. Formato: `docs: plan for TASK-### — [1-3 líneas de plan]` |
+| `Detailed Spec` | Sección expandible | Puede omitirse si el Scope ya es suficiente |
+| `Subagent strategy` | Evaluar fork vs sequential | Siempre `sequential` — no hay masa crítica para fork |
+| `Closing Protocol` | Checklist completo | Handoff.md solo si el cambio tiene impacto cross-task. changelog.md solo si toca arquitectura |
+
+### Qué NO cambia
+
+Estas secciones se mantienen completas incluso en Lightweight Mode:
+
+- `Status` (Zone 0 completo — siempre necesario para triage)
+- `Goal` (el agente necesita saber el resultado esperado)
+- `Dependencies & Impact` (un fix "pequeño" puede romper otra surface)
+- `Files owned` (siempre necesario para detectar colisiones)
+- `Scope` con slices (aunque sea un solo slice)
+- `Out of Scope` (evitar scope creep incluso en tasks chicas)
+- `Acceptance Criteria` (siempre verificable)
+- `Verification` (siempre correr lint + tsc + test)
+
+### Cómo marcarlo
+
+Agregar en `Status` de Zone 0:
+
+```
+- Mode: `lightweight`
+```
+
+Si el campo no está presente, el mode es `standard` (template completo).
+
+### Regla de escalación
+
+Si durante Discovery el agente descubre que la task es más compleja de lo que el `Effort = Bajo` sugiere (e.g., toca más archivos de los esperados, tiene dependencias no documentadas, requiere cambios de schema), debe:
+
+1. Actualizar `Effort` al valor correcto
+2. Re-derivar `Checkpoint` con la nueva combinación Priority × Effort
+3. Salir de Lightweight Mode si el nuevo Effort es Medio o Alto
+4. Documentar la escalación en el plan
 
 ---
 
@@ -597,6 +665,7 @@ Si hay duda, usar `human`. Es más barato revisar un plan que revertir código.
 - `Current Repo State` refleja el estado real, no el ideal
 - `Discovery checklist` incluye cualquier verificación específica de esta task
 - `Checkpoint` está derivado correctamente de Priority × Effort
+- `Mode` está derivado correctamente de Priority × Effort
 - Si la task contradice arquitectura, primero corregir la task o documentar la nueva decisión
 - La `Detailed Spec` está separada de la navegación rápida (Zones 0–2)
 
