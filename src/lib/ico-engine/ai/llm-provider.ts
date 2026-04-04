@@ -26,18 +26,6 @@ export interface GenerateAiSignalEnrichmentResult {
   latencyMs: number
 }
 
-const ICO_SIGNAL_ENRICHMENT_JSON_SCHEMA = {
-  type: 'object',
-  required: ['qualityScore', 'explanationSummary', 'rootCauseNarrative', 'recommendedAction', 'confidence'],
-  properties: {
-    qualityScore: { type: 'number' },
-    explanationSummary: { type: 'string' },
-    rootCauseNarrative: { type: 'string' },
-    recommendedAction: { type: 'string' },
-    confidence: { type: 'number' }
-  }
-} as const
-
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
 const parseStructuredJson = (text: string): AiSignalEnrichmentModelOutput => {

@@ -18,11 +18,17 @@ const toNum = (value: unknown): number | null => {
 }
 
 const toText = (value: unknown): string | null => {
-  if (typeof value !== 'string') return null
+  if (typeof value === 'string') {
+    const trimmed = value.trim()
 
-  const trimmed = value.trim()
+    return trimmed || null
+  }
 
-  return trimmed || null
+  if (value && typeof value === 'object' && 'value' in value) {
+    return toText((value as { value?: unknown }).value)
+  }
+
+  return null
 }
 
 const toBoolean = (value: unknown): boolean => {
