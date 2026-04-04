@@ -14,6 +14,7 @@ interface AnimatedCounterProps {
   currency?: string
   duration?: number
   locale?: string
+  formatter?: (n: number) => string
 }
 
 const formatNumber = (n: number, format: Format, currency: string, locale: string): string => {
@@ -39,11 +40,14 @@ const AnimatedCounter = ({
   format = 'integer',
   currency = 'CLP',
   duration = 0.8,
-  locale = 'es-CL'
+  locale = 'es-CL',
+  formatter
 }: AnimatedCounterProps) => {
   const ref = useRef<HTMLSpanElement>(null)
   const isInView = useInView(ref, { once: true })
   const prefersReduced = useReducedMotion()
+
+  const fmt = (n: number) => (formatter ? formatter(n) : formatNumber(n, format, currency, locale))
 
   const motionValue = useMotionValue(0)
   const spring = useSpring(motionValue, { duration: duration * 1000, bounce: 0 })
@@ -57,15 +61,15 @@ const AnimatedCounter = ({
   useEffect(() => {
     const unsubscribe = spring.on('change', (latest: number) => {
       if (ref.current) {
-        ref.current.textContent = formatNumber(latest, format, currency, locale)
+        ref.current.textContent = fmt(latest)
       }
     })
 
     return unsubscribe
-  }, [spring, format, currency, locale])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [spring, format, currency, locale, formatter])
 
-  // Render the final value immediately if reduced motion or not yet animated
-  return <span ref={ref}>{formatNumber(prefersReduced ? value : 0, format, currency, locale)}</span>
+  return <span ref={ref}>{fmt(prefersReduced ? value : 0)}</span>
 }
 
 export default AnimatedCounter

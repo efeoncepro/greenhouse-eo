@@ -719,7 +719,7 @@ const FinanceDashboardView = () => {
         <Grid size={{ xs: 12, sm: 4, md: 4 }}>
           <HorizontalWithSubtitle
             title='Dólar obs.'
-            stats={indicators.USD_CLP?.value ? formatIndicatorValue(indicators.USD_CLP.value, 'USD_CLP') : 'Sin datos'}
+            stats={indicators.USD_CLP?.value ? <AnimatedCounter value={indicators.USD_CLP.value} formatter={v => formatIndicatorValue(v, 'USD_CLP')} /> : 'Sin datos'}
             subtitle={indicators.USD_CLP
               ? `${indicators.USD_CLP.source ?? 'manual'} · ${indicators.USD_CLP.indicatorDate ? formatDate(indicators.USD_CLP.indicatorDate) : ''}`
               : 'Sin registros'}
@@ -730,7 +730,7 @@ const FinanceDashboardView = () => {
         <Grid size={{ xs: 12, sm: 4, md: 4 }}>
           <HorizontalWithSubtitle
             title='UF'
-            stats={indicators.UF?.value ? formatIndicatorValue(indicators.UF.value, 'UF') : 'Sin datos'}
+            stats={indicators.UF?.value ? <AnimatedCounter value={indicators.UF.value} formatter={v => formatIndicatorValue(v, 'UF')} /> : 'Sin datos'}
             subtitle={indicators.UF
               ? `${indicators.UF.source ?? 'manual'} · ${indicators.UF.indicatorDate ? formatDate(indicators.UF.indicatorDate) : ''}`
               : 'Sin registros'}
@@ -741,7 +741,7 @@ const FinanceDashboardView = () => {
         <Grid size={{ xs: 12, sm: 4, md: 4 }}>
           <HorizontalWithSubtitle
             title='UTM'
-            stats={indicators.UTM?.value ? formatIndicatorValue(indicators.UTM.value, 'UTM') : 'Sin datos'}
+            stats={indicators.UTM?.value ? <AnimatedCounter value={indicators.UTM.value} formatter={v => formatIndicatorValue(v, 'UTM')} /> : 'Sin datos'}
             subtitle={indicators.UTM
               ? `${indicators.UTM.source ?? 'manual'} · ${indicators.UTM.indicatorDate ? formatDate(indicators.UTM.indicatorDate) : ''}`
               : 'Sin registros'}
