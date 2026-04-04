@@ -1,5 +1,23 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-04 — TASK-220 ships the first BCS runtime contract
+
+`TASK-220` activa el primer contrato runtime de `Brief Clarity Score` sin introducir todavía un writer canónico único para el AI layer.
+
+- `src/lib/ico-engine/brief-clarity.ts` ya sirve `BCS` a nivel project con:
+  - `value`
+  - `passed`
+  - `available/degraded/unavailable`
+  - `confidenceLevel`
+  - `intakePolicyStatus`
+  - `effectiveBriefAt`
+  - `qualityGateReasons`
+- la source policy inicial lee el último `brief_clarity_score` disponible en `ico_engine.ai_metric_scores` y lo combina con `governance` de Notion por `space`
+- el umbral operativo inicial de `brief efectivo` queda fijado en `>= 80` o `passed = true`
+- `GET /api/projects/[id]/ico` ya expone `briefClarityScore`
+- `campaign-metrics.ts` ya puede usar `effectiveBriefAt` observado para el start-side de `TTM`; si no hay score válido, el consumer cae a la jerarquía proxy previa
+- la lane no asume cobertura universal: si el AI score no existe todavía, el contrato debe responder `unavailable` o `degraded`, no inventar evidencia
+
 ## Delta 2026-04-04 — TASK-219 ships the first Iteration Velocity evidence contract
 
 `TASK-219` deja operativo el primer contrato runtime de `Iteration Velocity`, aunque la metrica todavia no entra al carril materialized-first del engine.
@@ -26,7 +44,7 @@
 `TASK-218` deja operativo el primer contrato runtime de `TTM` para campañas, aun cuando la métrica todavía no entra al carril materialized-first del engine.
 
 - `src/lib/ico-engine/time-to-market.ts` define selección de evidencia, `available/degraded/unavailable` y `confidenceLevel`
-- el evento de inicio sigue siendo **proxy** hasta que `TASK-220` cierre la source policy de `brief efectivo`
+- el evento de inicio ya puede ser **observed** cuando `TASK-220` encuentra `BCS` válido; si no, conserva la jerarquía proxy anterior
 - la activación prioriza evidencia observada (`campaign.actual_launch_date` o publicación/activación detectada) y recién después cae a proxy o `planned`
 - esta entrega no incorpora todavía `TTM` al `metric-registry`, `metric_snapshots_monthly` ni `read-metrics.ts`; el consumer inicial vive en `campaign-metrics.ts` y `CampaignDetailView.tsx`
 
@@ -1742,7 +1760,7 @@ Desde el punto de vista del consumidor (módulos de UI, Data Node, Ops), una mé
 
 #### 12.5.3 Tabla de scores: `ico_engine.ai_metric_scores`
 
-Esta tabla se crea en la Fase 1 (vacía) para que la infraestructura esté lista. Se pobla cuando los AI Agents se implementen.
+Esta tabla se creó en la Fase 1 como carril auditado para métricas probabilísticas. `TASK-220` activa ya el primer reader runtime sobre `brief_clarity_score` cuando exista data, sin asumir todavía que todos los tenants tengan el AI writer operativo.
 
 ```sql
 CREATE TABLE IF NOT EXISTS `efeonce-group.ico_engine.ai_metric_scores` (
@@ -1778,9 +1796,16 @@ PARTITION BY DATE(processed_at)
 CLUSTER BY metric_id, task_id;
 ```
 
-#### 12.5.4 Integración con la view base
+#### 12.5.4 Integración con readers y futura view base
 
-Cuando `ai_metric_scores` tenga data, la view `v_tareas_enriched` se extiende con un LEFT JOIN:
+Lectura vigente de `TASK-220`:
+
+- `GET /api/projects/[id]/ico` lee el último `brief_clarity_score` por proyecto y lo combina con `Notion governance`
+- `campaign-metrics.ts` toma el primer `brief efectivo` observado desde `ai_metric_scores.processed_at` para mejorar el start-side de `TTM`
+
+Futuro deseado cuando la cobertura del AI layer sea estable:
+
+la view `v_tareas_enriched` se extiende con un LEFT JOIN:
 
 ```sql
 -- FUTURO: agregar a v_tareas_enriched cuando los AI Agents estén operativos

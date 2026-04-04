@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireTenantContext } from '@/lib/tenant/authorization'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { getProjectBriefClarityMetric } from '@/lib/ico-engine/brief-clarity'
 import { resolveIterationVelocityMetric } from '@/lib/ico-engine/iteration-velocity'
 
 export const dynamic = 'force-dynamic'
@@ -73,7 +74,7 @@ export async function GET(
     const spaceId = tenant.spaceId || tenant.clientId || null
 
     // Get latest materialized metrics for this project
-    const [metricRows, cscRows, iterationRows] = await Promise.all([
+    const [metricRows, cscRows, iterationRows, briefClarityScore] = await Promise.all([
       bigQuery.query({
         query: `
           SELECT *
@@ -119,7 +120,11 @@ export async function GET(
             `,
             params: { spaceId, projectSourceId }
           })
-        : Promise.resolve([[]] as [unknown[]])
+        : Promise.resolve([[]] as [unknown[]]),
+      getProjectBriefClarityMetric({
+        projectSourceId,
+        spaceId
+      })
     ])
 
     const metrics = metricRows[0][0] as Record<string, unknown> | undefined
@@ -157,6 +162,7 @@ export async function GET(
         completedTasks: toNum(metrics.completed_tasks),
         activeTasks: toNum(metrics.active_tasks)
       } : null,
+      briefClarityScore,
       iterationVelocity,
       cscDistribution
     })

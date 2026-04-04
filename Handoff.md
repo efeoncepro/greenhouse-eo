@@ -1,5 +1,103 @@
 # Handoff.md
 
+## Sesión 2026-04-04 — TASK-220 implementada y verificada
+
+### Rama / alcance
+
+- rama actual: `feature/codex-task-220-brief-clarity-governance`
+- scope principal:
+  - `src/lib/ico-engine/brief-clarity.ts`
+  - `src/lib/ico-engine/brief-clarity.test.ts`
+  - `src/app/api/projects/[id]/ico/route.ts`
+  - `src/lib/campaigns/campaign-metrics.ts`
+  - docs/lifecycle:
+    - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+    - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+    - `docs/tasks/complete/TASK-220-ico-brief-clarity-score-intake-governance.md`
+    - `docs/tasks/README.md`
+    - `docs/tasks/TASK_ID_REGISTRY.md`
+    - `docs/tasks/to-do/TASK-221-revenue-enabled-measurement-model-attribution-policy.md`
+    - `docs/tasks/to-do/TASK-223-ico-methodological-accelerators-instrumentation.md`
+    - `docs/changelog/CLIENT_CHANGELOG.md`
+    - `changelog.md`
+
+### Resultado
+
+- `TASK-220` queda cerrada.
+- `ICO` ya tiene un helper canónico inicial para `Brief Clarity Score` en `src/lib/ico-engine/brief-clarity.ts`, con:
+  - `value`
+  - `passed`
+  - `dataStatus`
+  - `confidenceLevel`
+  - `intakePolicyStatus`
+  - `effectiveBriefAt`
+  - `qualityGateReasons`
+- `GET /api/projects/[id]/ico` ya expone `briefClarityScore` sin romper tenant isolation.
+- `Campaign Metrics` ya puede usar `brief efectivo` observado desde `ico_engine.ai_metric_scores.processed_at`; cuando no existe score válido, conserva la jerarquía proxy previa.
+- La source policy inicial de `BCS` combina score auditado en BigQuery con `readiness` de Notion por `space`; la ausencia de score se sirve como `unavailable/degraded`, no como evidencia inventada.
+- No se abrió migración nueva:
+  - la slice reutiliza `ico_engine.ai_metric_scores`
+  - reutiliza también el carril existente de `Notion governance`
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/ico-engine/brief-clarity.test.ts src/lib/ico-engine/time-to-market.test.ts`
+- `pnpm exec tsc --noEmit --pretty false`
+- `rg -n "new Pool\\(" src`
+- `pnpm lint`
+- `pnpm build`
+
+## Sesión 2026-04-04 — TASK-220 auditada y movida a in-progress
+
+### Rama / alcance
+
+- rama actual: `feature/codex-task-220-brief-clarity-governance`
+- scope:
+  - `docs/tasks/in-progress/TASK-220-ico-brief-clarity-score-intake-governance.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `Handoff.md`
+  - auditoría de runtime y schema sobre:
+    - `src/lib/ico-engine/*`
+    - `src/lib/campaigns/*`
+    - `src/lib/projects/get-project-detail.ts`
+    - `src/lib/space-notion/*`
+    - `src/types/notion-governance.ts`
+    - `src/app/api/campaigns/[campaignId]/metrics/route.ts`
+    - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+    - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+    - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+    - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+    - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+    - `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md`
+    - `docs/architecture/schema-snapshot-baseline.sql`
+    - `scripts/setup-postgres-source-sync.sql`
+
+### Resultado
+
+- `TASK-220` quedó movida a `in-progress` antes de implementación.
+- La auditoría confirmó drift documental que ya quedó corregido en la spec:
+  - `TASK-213` se mantiene como paraguas programático, no como blocker técnico duro
+  - `TASK-223` pasa a ser impacto explícito de `TASK-220`
+  - `TASK-218` y `TASK-219` ya están cerradas y consumen fallback/proxy mientras `BCS` siga sin contrato canónico
+- Se confirmó foundation reutilizable real:
+  - `ico_engine.ai_metric_scores`
+  - fase `briefing` ya normalizada en runtime
+  - proxy start de `TTM` desde campañas/delivery
+  - readiness y governance de Notion por `space`
+- Riesgo operativo detectado:
+  - no existe hoy un contrato `BCS` servido en runtime ni una proyección `latest/effective`
+  - tampoco existe carril formal de `ready/degraded/blocked` con override humano para intake
+
+### Verificación
+
+- revisión manual de consistencia entre:
+  - `docs/tasks/in-progress/TASK-220-ico-brief-clarity-score-intake-governance.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+
 ## Sesión 2026-04-04 — TASK-219 implementada y verificada
 
 ### Rama / alcance

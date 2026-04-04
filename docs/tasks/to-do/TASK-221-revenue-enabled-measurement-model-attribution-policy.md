@@ -2,11 +2,16 @@
 
 ## Delta 2026-04-04
 
+- `TASK-220` ya dejó un contrato runtime inicial para `Brief Clarity Score` y `brief efectivo`.
+- Para esta task cambia un supuesto importante:
+  - la palanca `Early Launch` ya no depende siempre de un inicio proxy
+  - pero tampoco puede asumirse como `observed` universalmente; depende de que exista `BCS` válido y governance suficiente
 - `TASK-219` ya dejó un contrato runtime inicial para `Iteration Velocity`.
 - Para esta task cambia un supuesto importante:
   - `RE Iteration` ya no debe partir de cero
   - pero tampoco puede apoyarse en `pipeline_velocity` ni en la heurística legacy de `RpA` como sustituto de la palanca de iteración
 - Regla nueva para `TASK-221`:
+  - `Early Launch` debe distinguir explícitamente entre `TTM` con inicio observado por `brief efectivo` y `TTM` con inicio proxy operativo
   - la palanca `Iteration` debe distinguir explícitamente entre evidencia `observed` y `proxy`
   - mientras la iteración siga en proxy operativo, el modelo de `Revenue Enabled` debe presentarla con sus límites de confianza y no como uplift plenamente observado
 

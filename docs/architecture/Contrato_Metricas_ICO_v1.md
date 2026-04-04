@@ -1,5 +1,15 @@
 # Contrato de métricas ICO
 
+## Delta 2026-04-04 — TASK-220 formaliza el contrato inicial de Brief Clarity Score
+
+`TASK-220` cierra el primer contrato runtime de `BCS` y de `brief efectivo` sin esperar al AI layer completo end-to-end.
+
+- `Brief Clarity Score` ya puede servirse como contrato canónico project-level desde el score auditado más reciente en `ico_engine.ai_metric_scores`
+- la lectura se combina con `governance` de Notion por `space`, usando estados `ready`, `degraded` y `blocked`
+- el umbral operativo inicial de `brief efectivo` queda fijado en `>= 80/100` o `passed = true`
+- `TTM` ya no debe tratar siempre el inicio como `proxy`: cuando existe `BCS` válido y fecha procesada, el evento de inicio puede viajar como evidencia `observed`; si no existe ese score, el fallback proxy sigue vigente
+- la ausencia de score auditado no significa “brief malo”; significa que la lane sigue `unavailable` o `degraded` y no debe venderse como evidencia plenamente observada
+
 ## Delta 2026-04-04 — TASK-219 formaliza la source policy inicial de Iteration Velocity
 
 `TASK-219` no cambia el rol conceptual de `Iteration Velocity` dentro de `Revenue Enabled`, pero sí cierra su primer contrato runtime para que deje de depender de heurísticas locales.
@@ -20,7 +30,7 @@
 
 `TASK-218` no cambia la definición conceptual de `TTM`, pero sí cierra la primera policy runtime para servir la métrica con evidencia y sin vender como canónico lo que todavía es proxy.
 
-- el evento de inicio (`brief efectivo`) sigue siendo una señal **proxy** hasta cerrar `TASK-220`
+- el evento de inicio (`brief efectivo`) ahora puede ser **observed** cuando existe un `BCS` válido; si no existe, sigue degradando a la jerarquía proxy previa
 - la prioridad actual para inicio es: primera tarea en `briefing` -> `delivery_projects.start_date` -> `campaign.actual_start_date` -> primera tarea creada -> `campaign.planned_start_date`
 - la prioridad actual para activación es: `campaign.actual_launch_date` -> primera tarea con evidencia de activación/publicación -> `delivery_projects.end_date` -> `campaign.planned_launch_date`
 - `TTM` solo puede servirse como `available` cuando ambos extremos son observados; si usa `proxy` o `planned`, debe viajar como `degraded`, y si falta evidencia o hay inconsistencia temporal, como `unavailable`
@@ -139,7 +149,7 @@ Estas métricas son el puente entre lo que Globe controla (drivers operativos) y
 
 | Métrica | Definición | Fórmula / Fuente | Conexión con RE |
 |---|---|---|---|
-| **Time-to-Market (TTM)** | Días desde brief efectivo hasta asset activo en mercado. | Fecha de activación – Fecha de brief aprobado. Fuente: Notion + canal de activación. | TTM ↓ → Early Launch Advantage ↑ |
+| **Time-to-Market (TTM)** | Días desde brief efectivo hasta asset activo en mercado. | Fecha de activación – Fecha de brief aprobado. Fuente: activación observada + `brief efectivo` observado cuando exista `BCS` válido; si no, fallback proxy de delivery/campaign. | TTM ↓ → Early Launch Advantage ↑ |
 | **Creative Throughput** | Cantidad de iniciativas (campañas / paquetes de assets) ejecutadas por período. | Conteo mensual de campañas completadas. Fuente: Notion. | Throughput ↑ → Throughput Expandido ↑ |
 | **Iteration Velocity** | Cuántas iteraciones útiles cerradas puede habilitar Globe para que el cliente testee más rápido en mercado. | Contrato inicial: iteraciones útiles cerradas / período (`30d`) usando `delivery_tasks.frame_versions`, `workflow_change_round`, `client_change_round_final` y señales de review. Ads-platform / mercado observado quedan como capa futura. | IV ↑ → Iteration Velocity Impact ↑ |
 | **On-Time Delivery (OTD)** | Puntualidad real para cumplir el calendario del negocio. | Piezas entregadas on-time / total piezas. Fuente: Notion automático. | OTD ↑ → Early Launch Advantage ↑ (prerequisito) |
@@ -159,7 +169,7 @@ Estas son las palancas que el equipo de Globe controla directamente. Se miden en
 | **Cycle Time Variance** | Desviación del estándar. Detecta dónde está la fricción (interna vs. cliente). | Desviación estándar del CT por tipo de pieza. Fuente: Notion. | CTV alta → fricción no resuelta → oportunidad de mejora identificable. |
 | **Rounds per Asset (RpA)** | Número promedio de rondas de revisión por pieza. | Total rondas / Total piezas. Fuente: Frame.io + Notion. | RpA ↓ → menor fricción → menor costo de producción → Throughput ↑. |
 | **First Time Right % (FTR)** | % de assets aprobados en la primera ronda. | Piezas aprobadas en R1 / Total piezas × 100. Fuente: Frame.io + Notion. | FTR ↑ → RpA ↓ → CT ↓ → Throughput Expandido ↑. |
-| **Brief Clarity Score (BCS)** | Score de completitud del brief validado por AI Agent. | Checklist de campos obligatorios validados automáticamente. Fuente: Notion + AI Agent. | BCS ↑ → FTR ↑ → menos iteraciones desde el origen. |
+| **Brief Clarity Score (BCS)** | Score de completitud del brief validado de forma auditable. | Último score auditado en `ico_engine.ai_metric_scores` + governance por `space` desde Notion. Umbral operativo inicial: `>= 80/100` o `passed = true`. | BCS ↑ → FTR ↑ → menos iteraciones desde el origen. |
 
 ---
 
