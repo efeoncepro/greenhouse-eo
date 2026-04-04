@@ -288,3 +288,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-236` | `to-do` | Agency: Resilience & Feedback Patterns | `docs/tasks/to-do/TASK-236-agency-resilience-feedback-patterns.md` |
 | `TASK-237` | `to-do` | Agency ICO Engine Tab: UX Redesign | `docs/tasks/to-do/TASK-237-agency-ico-engine-tab-ux-redesign.md` |
 | `TASK-238` | `to-do` | Agency Workspace & Space 360: Data Storytelling UX | `docs/tasks/to-do/TASK-238-agency-workspace-data-storytelling-ux.md` |
+| `TASK-239` | `to-do` | Nexa Advisory: Prompt Enrichment con Glosario de Métricas y Cadena Causal | `docs/tasks/to-do/TASK-239-nexa-advisory-prompt-enrichment-metric-glossary.md` |

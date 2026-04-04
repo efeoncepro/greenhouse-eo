@@ -20,7 +20,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-236`
+- siguiente ID disponible: `TASK-240`
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 - `TASK-231` quedó cerrada como tooling repo/global para la skill `greenhouse-task-planner` de Codex.
 - `TASK-232` ya quedó cerrada con lane async LLM operativa para `ICO`: trigger reactivo, storage BQ/PG, readers downstream y baseline `Gemini`.
