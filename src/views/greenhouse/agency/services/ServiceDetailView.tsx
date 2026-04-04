@@ -25,6 +25,8 @@ import classnames from 'classnames'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'
 
+import EmptyState from '@/components/greenhouse/EmptyState'
+
 import tableStyles from '@core/styles/table.module.css'
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -176,17 +178,20 @@ interface Props {
 const ServiceDetailView = ({ serviceId }: Props) => {
   const [detail, setDetail] = useState<ServiceDetail | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [tab, setTab] = useState('overview')
   const [historySorting, setHistorySorting] = useState<SortingState>([{ id: 'changedAt', desc: true }])
 
   useEffect(() => {
     const load = async () => {
       setLoading(true)
+      setError(null)
 
       try {
         const res = await fetch(`/api/agency/services/${serviceId}`)
 
         if (!res.ok) {
+          setError('No pudimos cargar el detalle del servicio.')
           setDetail(null)
 
           return
@@ -196,6 +201,7 @@ const ServiceDetailView = ({ serviceId }: Props) => {
 
         setDetail(json)
       } catch {
+        setError('No pudimos cargar el detalle. Verifica tu conexión e intenta de nuevo.')
         setDetail(null)
       } finally {
         setLoading(false)
@@ -216,20 +222,25 @@ const ServiceDetailView = ({ serviceId }: Props) => {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', py: 12 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, py: 12 }}>
         <CircularProgress />
+        <Typography variant='body2' color='text.secondary'>Cargando detalle del servicio...</Typography>
       </Box>
     )
   }
 
   if (!detail) {
     return (
-      <Box sx={{ py: 12, textAlign: 'center' }} role='status'>
-        <Typography variant='h5' sx={{ mb: 2 }}>Servicio no encontrado</Typography>
-        <Button component={Link} href='/agency/services' variant='outlined'>
-          Volver a servicios
-        </Button>
-      </Box>
+      <EmptyState
+        icon={error ? 'tabler-cloud-off' : 'tabler-file-off'}
+        title={error ? 'No pudimos cargar el servicio' : 'Servicio no encontrado'}
+        description={error || 'No encontramos un servicio con ese identificador.'}
+        action={
+          error
+            ? <Button variant='outlined' onClick={() => window.location.reload()}>Reintentar</Button>
+            : <Button component={Link} href='/agency/services' variant='outlined'>Volver a servicios</Button>
+        }
+      />
     )
   }
 

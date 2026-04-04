@@ -2,6 +2,26 @@
 
 ## 2026-04-04
 
+- **TASK-236 Agency Resilience & Feedback Patterns**:
+  - toda vista Agency muestra error con "Reintentar" cuando un fetch falla (nunca más spinner infinito)
+  - StaffAugmentationListView y ServicesListView usan EmptyState centralizado para tablas vacías
+  - onboarding item update y placement create muestran toast de confirmación/error
+  - loading states con texto contextual en español ("Cargando servicios...", "Cargando placements...")
+  - AgencyWorkspace lazy tabs con retry en error states
+  - patrón documentado en `GREENHOUSE_UI_PLATFORM_V1.md` § Error Handling & Feedback Patterns
+
+- **Notion Delivery per-space orchestration fix**:
+  - se corrigió un incidente backend real donde `Notion Delivery Data Quality` marcaba `Sky Airline` como roto aunque el raw ya estaba fresco
+  - la causa raíz era de orquestación: el gate de frescura bloqueaba globalmente `sync-conformed` cuando un solo `space` seguía stale
+  - el runtime ahora converge por `space`:
+    - un tenant listo ya no queda retenido por otro tenant atrasado
+    - el writer canónico preserva `space_id` no listos en el swap parcial y solo reescribe el scope elegible
+    - el control plane `waiting_for_raw` / `sync_completed` ya refleja cierre por `space`
+  - remediación verificada:
+    - `Sky Airline` volvió a `healthy`
+    - `Efeonce` quedó `broken` únicamente por raw stale real en `notion_ops`
+  - validado con `pnpm exec vitest`, `pnpm exec tsc --noEmit`, `pnpm exec eslint` y `pnpm build`
+
 - **TASK-232 ICO LLM async lane implemented end-to-end**:
   - `ICO` ya tiene carril LLM async sobre `ico.ai_signals.materialized`, desacoplado del request path principal
   - provider/runtime efectivo: `Vertex AI` + `@google/genai` + `Gemini` con baseline `google/gemini-2.5-flash@default`

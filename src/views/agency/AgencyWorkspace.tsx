@@ -6,6 +6,7 @@ import type { SyntheticEvent } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
@@ -17,6 +18,7 @@ import TabPanel from '@mui/lab/TabPanel'
 import CustomTabList from '@core/components/mui/TabList'
 
 import { visuallyHiddenSx } from '@/components/greenhouse/accessibility'
+import EmptyState from '@/components/greenhouse/EmptyState'
 import SectionErrorBoundary from '@/components/greenhouse/SectionErrorBoundary'
 import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type {
@@ -70,6 +72,9 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
   const [spacesLoading, setSpacesLoading] = useState(false)
   const [capacityLoading, setCapacityLoading] = useState(false)
   const [icoLoading, setIcoLoading] = useState(false)
+  const [spacesError, setSpacesError] = useState<string | null>(null)
+  const [capacityError, setCapacityError] = useState<string | null>(null)
+  const [icoError, setIcoError] = useState<string | null>(null)
 
   const panelRef = useRef<HTMLDivElement>(null)
   const isInitialMount = useRef(true)
@@ -92,9 +97,10 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
 
   // Lazy fetch spaces data
   const fetchSpaces = useCallback(async () => {
-    if (spacesData !== null) return
+    if (spacesLoading) return
 
     setSpacesLoading(true)
+    setSpacesError(null)
 
     try {
       const res = await fetch('/api/agency/spaces')
@@ -105,17 +111,18 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
         setSpacesData(data.spaces ?? [])
       }
     } catch {
-      setSpacesData([])
+      setSpacesError('No pudimos cargar los Spaces. Intenta de nuevo.')
     } finally {
       setSpacesLoading(false)
     }
-  }, [spacesData])
+  }, [spacesLoading])
 
   // Lazy fetch capacity data
   const fetchCapacity = useCallback(async () => {
-    if (capacityData !== null) return
+    if (capacityLoading) return
 
     setCapacityLoading(true)
+    setCapacityError(null)
 
     try {
       const res = await fetch('/api/agency/capacity')
@@ -126,17 +133,18 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
         setCapacityData(data)
       }
     } catch {
-      setCapacityData(null)
+      setCapacityError('No pudimos cargar la capacidad. Intenta de nuevo.')
     } finally {
       setCapacityLoading(false)
     }
-  }, [capacityData])
+  }, [capacityLoading])
 
   // Lazy fetch ICO data
   const fetchIco = useCallback(async () => {
-    if (icoData !== null) return
+    if (icoLoading) return
 
     setIcoLoading(true)
+    setIcoError(null)
 
     try {
       const now = new Date()
@@ -148,11 +156,11 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
         setIcoData(data)
       }
     } catch {
-      setIcoData(null)
+      setIcoError('No pudimos cargar las métricas ICO. Intenta de nuevo.')
     } finally {
       setIcoLoading(false)
     }
-  }, [icoData])
+  }, [icoLoading])
 
   // Live compute for ICO (when no materialized data exists)
   const handleComputeLive = useCallback(async () => {
@@ -174,12 +182,12 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
     }
   }, [])
 
-  // Fetch data when switching to lazy tabs
+  // Fetch data when switching to lazy tabs (only on first visit — retry is manual)
   useEffect(() => {
-    if (activeTab === 'spaces') fetchSpaces()
-    if (activeTab === 'capacidad') fetchCapacity()
-    if (activeTab === 'ico') fetchIco()
-  }, [activeTab, fetchSpaces, fetchCapacity, fetchIco])
+    if (activeTab === 'spaces' && spacesData === null && !spacesError) fetchSpaces()
+    if (activeTab === 'capacidad' && capacityData === null && !capacityError) fetchCapacity()
+    if (activeTab === 'ico' && icoData === null && !icoError) fetchIco()
+  }, [activeTab, spacesData, spacesError, capacityData, capacityError, icoData, icoError, fetchSpaces, fetchCapacity, fetchIco])
 
   const handleChange = (_: SyntheticEvent, value: string) => {
     const newTab = value as AgencyTab
@@ -262,6 +270,13 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
                 <Skeleton variant='rounded' height={100} />
                 <Skeleton variant='rounded' height={300} />
               </Stack>
+            ) : spacesError ? (
+              <EmptyState
+                icon='tabler-cloud-off'
+                title='No pudimos cargar los Spaces'
+                description={spacesError}
+                action={<Button variant='outlined' onClick={() => { setSpacesError(null); fetchSpaces() }}>Reintentar</Button>}
+              />
             ) : spacesData ? (
               <SectionErrorBoundary sectionName='agency-spaces-tab' description='No pudimos cargar los Spaces.'>
                 <AgencySpacesView spaces={spacesData} />
@@ -275,6 +290,13 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
                 <Skeleton variant='rounded' height={80} />
                 <Skeleton variant='rounded' height={300} />
               </Stack>
+            ) : capacityError ? (
+              <EmptyState
+                icon='tabler-cloud-off'
+                title='No pudimos cargar la capacidad'
+                description={capacityError}
+                action={<Button variant='outlined' onClick={() => { setCapacityError(null); fetchCapacity() }}>Reintentar</Button>}
+              />
             ) : (
               <SectionErrorBoundary sectionName='agency-capacity-tab' description='No pudimos cargar la capacidad.'>
                 <AgencyCapacityView capacity={capacityData} />
@@ -290,6 +312,13 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
                 <Skeleton variant='rounded' height={300} />
                 <Skeleton variant='rounded' height={400} />
               </Stack>
+            ) : icoError ? (
+              <EmptyState
+                icon='tabler-cloud-off'
+                title='No pudimos cargar las métricas ICO'
+                description={icoError}
+                action={<Button variant='outlined' onClick={() => { setIcoError(null); fetchIco() }}>Reintentar</Button>}
+              />
             ) : (
               <SectionErrorBoundary sectionName='agency-ico-tab' description='No pudimos cargar las métricas ICO.'>
                 <AgencyIcoEngineView data={icoData} onComputeLive={handleComputeLive} computingLive={icoLoading} />

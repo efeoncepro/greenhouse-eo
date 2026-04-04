@@ -907,6 +907,94 @@ Para agregar assets nuevos:
 | Finance Dashboard | `AnimatedCounter` | 3 (DSO, DPO, Ratio nómina/ingresos) |
 | Finance Period Closure | `EmptyState` + `animatedIcon` | 2 (períodos vacíos, snapshots vacíos) |
 
+## Error Handling & Feedback Patterns (TASK-236)
+
+### Fetch error states
+
+Toda vista que hace `fetch()` client-side DEBE tener un estado `error` con feedback accionable. Nunca dejar un spinner girando indefinidamente.
+
+```tsx
+const [error, setError] = useState<string | null>(null)
+
+const loadData = useCallback(async () => {
+  setLoading(true)
+  setError(null)
+  try {
+    const res = await fetch('/api/...')
+    const json = await res.json()
+    setData(json)
+  } catch {
+    setError('No pudimos cargar los datos. Verifica tu conexión e intenta de nuevo.')
+    setData(null)
+  } finally {
+    setLoading(false)
+  }
+}, [...])
+
+// En el render:
+{loading ? (
+  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, py: 8 }}>
+    <CircularProgress />
+    <Typography variant='body2' color='text.secondary'>Cargando datos...</Typography>
+  </Box>
+) : error ? (
+  <EmptyState
+    icon='tabler-cloud-off'
+    title='No pudimos cargar los datos'
+    description={error}
+    action={<Button variant='outlined' onClick={() => loadData()}>Reintentar</Button>}
+  />
+) : /* render normal data */}
+```
+
+### Mutation feedback (toasts)
+
+Toda mutación (POST, PATCH, PUT, DELETE) debe mostrar feedback via toast:
+
+```tsx
+import { toast } from 'react-toastify'
+
+// Después de mutation exitosa:
+toast.success('Cambios guardados')
+
+// En catch de mutation fallida:
+toast.error('No se pudieron guardar los cambios. Intenta de nuevo.')
+```
+
+### Loading text contextual
+
+Los spinners standalone deben incluir texto descriptivo en español:
+
+- "Cargando servicios..." (no solo CircularProgress sin texto)
+- "Cargando detalle del servicio..."
+- "Calculando métricas ICO..."
+
+### Empty states para tablas vacías
+
+Toda tabla que puede estar vacía debe usar `EmptyState` (no tabla vacía silenciosa):
+
+```tsx
+items.length === 0 ? (
+  <EmptyState
+    icon='tabler-package-off'
+    animatedIcon='/animations/empty-inbox.json'
+    title='Sin servicios'
+    description='No se encontraron servicios con los filtros seleccionados.'
+  />
+) : /* render table */
+```
+
+### Vistas que ya implementan este patrón
+
+| Vista | Error state | Empty state | Toast | Loading text |
+|-------|------------|------------|-------|-------------|
+| Agency ServicesListView | Retry button | EmptyState animado | — | Contextual |
+| Agency ServiceDetailView | Error/not-found | EmptyState | — | Contextual |
+| Agency StaffAugmentationListView | Retry button | EmptyState animado | — | Contextual |
+| Agency PlacementDetailView | Error/not-found | EmptyState | Onboarding update | Contextual |
+| Agency CreatePlacementDialog | Alert inline | — | Placement creado | — |
+| Agency Workspace (3 lazy tabs) | Retry button | — | — | Skeletons |
+
 ## Anti-Patterns
 
 - No usar MUI raw cuando existe wrapper Vuexy

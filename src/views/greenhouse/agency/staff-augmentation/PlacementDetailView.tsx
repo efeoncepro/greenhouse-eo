@@ -18,8 +18,12 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 import Tab from '@mui/material/Tab'
 
+import { toast } from 'react-toastify'
+
 import CustomChip from '@core/components/mui/Chip'
 import CustomTabList from '@core/components/mui/TabList'
+
+import EmptyState from '@/components/greenhouse/EmptyState'
 
 type PlacementDetail = {
   placementId: string
@@ -108,16 +112,19 @@ interface Props {
 const PlacementDetailView = ({ placementId }: Props) => {
   const [detail, setDetail] = useState<PlacementDetail | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [tab, setTab] = useState('overview')
 
   useEffect(() => {
     const load = async () => {
       setLoading(true)
+      setError(null)
 
       try {
         const res = await fetch(`/api/agency/staff-augmentation/placements/${placementId}`, { cache: 'no-store' })
 
         if (!res.ok) {
+          setError('No pudimos cargar el detalle del placement.')
           setDetail(null)
 
           return
@@ -127,6 +134,7 @@ const PlacementDetailView = ({ placementId }: Props) => {
 
         setDetail(json)
       } catch {
+        setError('No pudimos cargar el placement. Verifica tu conexión e intenta de nuevo.')
         setDetail(null)
       } finally {
         setLoading(false)
@@ -147,28 +155,34 @@ const PlacementDetailView = ({ placementId }: Props) => {
 
       if (res.ok) {
         setDetail(await res.json())
+        toast.success('Item de onboarding actualizado')
       }
     } catch {
-      // best effort
+      toast.error('No se pudo actualizar el item. Intenta de nuevo.')
     }
   }
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', py: 12 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, py: 12 }}>
         <CircularProgress />
+        <Typography variant='body2' color='text.secondary'>Cargando detalle del placement...</Typography>
       </Box>
     )
   }
 
   if (!detail) {
     return (
-      <Box sx={{ py: 12, textAlign: 'center' }}>
-        <Typography variant='h5' sx={{ mb: 2 }}>Placement no encontrado</Typography>
-        <Button component={Link} href='/agency/staff-augmentation' variant='outlined'>
-          Volver a Staff Augmentation
-        </Button>
-      </Box>
+      <EmptyState
+        icon={error ? 'tabler-cloud-off' : 'tabler-file-off'}
+        title={error ? 'No pudimos cargar el placement' : 'Placement no encontrado'}
+        description={error || 'No encontramos un placement con ese identificador.'}
+        action={
+          error
+            ? <Button variant='outlined' onClick={() => window.location.reload()}>Reintentar</Button>
+            : <Button component={Link} href='/agency/staff-augmentation' variant='outlined'>Volver a Staff Augmentation</Button>
+        }
+      />
     )
   }
 
