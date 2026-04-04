@@ -24,6 +24,7 @@ Primer bloque operativo asignado:
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 - `TASK-231` quedó cerrada como tooling repo/global para la skill `greenhouse-task-planner` de Codex.
 - `TASK-232` queda reservada para activar la lane async de `ICO` basada en LLM (`quality scoring + explanations`) sin mezclarla con chat.
+- `TASK-233` queda reservada para `Three.js 3D Logo Animation` como lane visual específica separada de `TASK-230`.
 
 ## Estados
 
