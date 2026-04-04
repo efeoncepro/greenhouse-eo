@@ -22,14 +22,14 @@ describe('payroll export packages store', () => {
     })
   })
 
-  it('bootstraps the export packages table before reading', async () => {
+  it('reads export packages without attempting runtime DDL', async () => {
     await getPayrollExportPackageByPeriodId('2026-03')
 
     expect(
       mockRunGreenhousePostgresQuery.mock.calls.some(([sql]) =>
-        typeof sql === 'string' && sql.includes('CREATE TABLE IF NOT EXISTS greenhouse_payroll.payroll_export_packages')
+        typeof sql === 'string' && /CREATE\s+(SCHEMA|TABLE|INDEX)/i.test(sql)
       )
-    ).toBe(true)
+    ).toBe(false)
 
     expect(
       mockRunGreenhousePostgresQuery.mock.calls.some(([sql]) =>

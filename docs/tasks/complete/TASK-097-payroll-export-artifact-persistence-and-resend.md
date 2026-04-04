@@ -1,5 +1,20 @@
 # TASK-097 - Payroll Export Artifact Persistence and Resend
 
+## Delta 2026-04-04
+
+- Se corrigió un incidente backend real donde `Descargar PDF` en `HR > Nómina` respondía `500`.
+- La causa raíz no era el PDF ni el mail con adjuntos:
+  - `src/lib/payroll/payroll-export-packages-store.ts` seguía intentando `CREATE SCHEMA/TABLE/INDEX IF NOT EXISTS` en runtime
+  - como `greenhouse_payroll.payroll_export_packages` ya existe y el owner canónico es `greenhouse_ops`, el usuario runtime fallaba con `must be owner of table payroll_export_packages`
+- El fix fue estructural:
+  - se eliminó el DDL del path transaccional
+  - el store ahora asume infraestructura provisionada por migraciones
+  - se preservó intacto el flujo compartido del paquete de exportación para:
+    - descarga PDF
+    - descarga CSV
+    - `sendPayrollExportReadyNotification()` con PDF + CSV adjuntos
+- Issue relacionado: GitHub `#26`
+
 ## Status
 
 - Lifecycle: `complete`

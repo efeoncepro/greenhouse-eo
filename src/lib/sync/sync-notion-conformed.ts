@@ -60,10 +60,6 @@ type PersistedStatusCountsRow = {
   total_tasks: number | string | null
 }
 
-type BigQueryTimestampRow = {
-  max_synced_at: { value?: string } | string | null
-}
-
 type NotionProjectRow = {
   notion_page_id: string | null
   _source_database_id: string | null
@@ -298,14 +294,20 @@ const currentUtcPeriod = () => {
   }
 }
 
-const readPersistedNotionTaskParitySnapshot = async (projectId: string) => {
+const readPersistedNotionTaskParitySnapshot = async (projectId: string, spaceIds?: string[]) => {
   const bq = getBigQueryClient()
+
+  const spaceFilterSql = buildSpaceFilterSql({
+    columnName: 'space_id',
+    spaceIds
+  })
 
   const [distinctRows, spaceRows, statusRows] = await Promise.all([
     bq.query({
       query: `
         SELECT COUNT(DISTINCT task_source_id) AS distinct_task_count
         FROM \`${projectId}.greenhouse_conformed.delivery_tasks\`
+        WHERE TRUE${spaceFilterSql}
       `
     }) as Promise<[PersistedDistinctTaskCountRow[], unknown]>,
     bq.query({
@@ -320,6 +322,7 @@ const readPersistedNotionTaskParitySnapshot = async (projectId: string) => {
             (subtareas_ids IS NOT NULL AND ARRAY_LENGTH(subtareas_ids) > 0)
           ) AS with_hierarchy
         FROM \`${projectId}.greenhouse_conformed.delivery_tasks\`
+        WHERE TRUE${spaceFilterSql}
         GROUP BY COALESCE(space_id, '__NULL__')
       `
     }) as Promise<[PersistedSpaceTotalsRow[], unknown]>,
@@ -330,6 +333,7 @@ const readPersistedNotionTaskParitySnapshot = async (projectId: string) => {
           COALESCE(task_status, '__NULL__') AS task_status,
           COUNT(*) AS total_tasks
         FROM \`${projectId}.greenhouse_conformed.delivery_tasks\`
+        WHERE TRUE${spaceFilterSql}
         GROUP BY COALESCE(space_id, '__NULL__'), COALESCE(task_status, '__NULL__')
       `
     }) as Promise<[PersistedStatusCountsRow[], unknown]>
@@ -376,6 +380,30 @@ const runBigQuery = async <T extends Record<string, unknown>>(query: string) => 
   return rows as T[]
 }
 
+const toSqlStringLiteral = (value: string) => `'${value.replace(/'/g, "\\'")}'`
+
+const buildSpaceFilterSql = ({
+  columnName,
+  spaceIds
+}: {
+  columnName: string
+  spaceIds?: string[]
+}) => {
+  if (!spaceIds || spaceIds.length === 0) {
+    return ''
+  }
+
+  return ` AND ${columnName} IN (${spaceIds.map(toSqlStringLiteral).join(', ')})`
+}
+
+const buildPreserveNonReadySpaceSql = (spaceIds: string[]) => {
+  if (spaceIds.length === 0) {
+    return 'TRUE'
+  }
+
+  return `space_id IS NULL OR space_id NOT IN (${spaceIds.map(toSqlStringLiteral).join(', ')})`
+}
+
 const buildStagingTableName = (table: string) =>
   `${table}__stage_${randomUUID().replace(/-/g, '_').toLowerCase()}`
 
@@ -398,6 +426,31 @@ const createEmptyStagingTable = async ({
       AS SELECT *
       FROM \`${projectId}.${dataset}.${targetTable}\`
       WHERE FALSE
+    `
+  })
+}
+
+const createFilteredStagingTable = async ({
+  projectId,
+  dataset,
+  targetTable,
+  stagingTable,
+  whereSql
+}: {
+  projectId: string
+  dataset: string
+  targetTable: string
+  stagingTable: string
+  whereSql: string
+}) => {
+  const bq = getBigQueryClient()
+
+  await bq.query({
+    query: `
+      CREATE TABLE \`${projectId}.${dataset}.${stagingTable}\`
+      AS SELECT *
+      FROM \`${projectId}.${dataset}.${targetTable}\`
+      WHERE ${whereSql}
     `
   })
 }
@@ -458,14 +511,24 @@ const replaceBigQueryTablesWithStagedSwap = async ({
   replacements: Array<{
     table: string
     rows: Record<string, unknown>[]
+    preserveWhereSql?: string | null
   }>
 }) => {
   const bq = getBigQueryClient()
-  const stagedTables: Array<{ targetTable: string; stagingTable: string }> = []
+
+  const stagedTables: Array<{
+    targetTable: string
+    stagingTable: string
+    preservedStagingTable: string | null
+  }> = []
 
   try {
     for (const replacement of replacements) {
       const stagingTable = buildStagingTableName(replacement.table)
+
+      const preservedStagingTable = replacement.preserveWhereSql
+        ? buildStagingTableName(`${replacement.table}__preserved`)
+        : null
 
       await createEmptyStagingTable({
         projectId,
@@ -479,16 +542,30 @@ const replaceBigQueryTablesWithStagedSwap = async ({
         rows: replacement.rows
       })
 
+      if (preservedStagingTable && replacement.preserveWhereSql) {
+        await createFilteredStagingTable({
+          projectId,
+          dataset,
+          targetTable: replacement.table,
+          stagingTable: preservedStagingTable,
+          whereSql: replacement.preserveWhereSql
+        })
+      }
+
       stagedTables.push({
         targetTable: replacement.table,
-        stagingTable
+        stagingTable,
+        preservedStagingTable
       })
     }
 
     const script = [
       'BEGIN TRANSACTION;',
-      ...stagedTables.flatMap(({ targetTable, stagingTable }) => [
+      ...stagedTables.flatMap(({ targetTable, stagingTable, preservedStagingTable }) => [
         `DELETE FROM \`${projectId}.${dataset}.${targetTable}\` WHERE TRUE;`,
+        ...(preservedStagingTable
+          ? [`INSERT INTO \`${projectId}.${dataset}.${targetTable}\` SELECT * FROM \`${projectId}.${dataset}.${preservedStagingTable}\`;`]
+          : []),
         `INSERT INTO \`${projectId}.${dataset}.${targetTable}\` SELECT * FROM \`${projectId}.${dataset}.${stagingTable}\`;`
       ]),
       'COMMIT TRANSACTION;'
@@ -504,68 +581,14 @@ const replaceBigQueryTablesWithStagedSwap = async ({
         dataset,
         table: stagedTable.stagingTable
       }).catch(() => {})
-    }
-  }
-}
 
-const readRawConformedFreshness = async (projectId: string) => {
-  const bq = getBigQueryClient()
-
-  const [[rawRows], [conformedRows]] = await Promise.all([
-    bq.query({
-      query: `
-        SELECT MAX(_synced_at) AS max_synced_at
-        FROM \`${projectId}.notion_ops.tareas\`
-      `
-    }) as Promise<[BigQueryTimestampRow[], unknown]>,
-    bq.query({
-      query: `
-        SELECT MAX(synced_at) AS max_synced_at
-        FROM \`${projectId}.greenhouse_conformed.delivery_tasks\`
-      `
-    }) as Promise<[BigQueryTimestampRow[], unknown]>
-  ])
-
-  const [[rawProjectRows], [conformedProjectRows]] = await Promise.all([
-    bq.query({
-      query: `
-        SELECT MAX(_synced_at) AS max_synced_at
-        FROM \`${projectId}.notion_ops.proyectos\`
-      `
-    }) as Promise<[BigQueryTimestampRow[], unknown]>,
-    bq.query({
-      query: `
-        SELECT MAX(synced_at) AS max_synced_at
-        FROM \`${projectId}.greenhouse_conformed.delivery_projects\`
-      `
-    }) as Promise<[BigQueryTimestampRow[], unknown]>
-  ])
-
-  const [[rawSprintRows], [conformedSprintRows]] = await Promise.all([
-    bq.query({
-      query: `
-        SELECT MAX(_synced_at) AS max_synced_at
-        FROM \`${projectId}.notion_ops.sprints\`
-      `
-    }) as Promise<[BigQueryTimestampRow[], unknown]>,
-    bq.query({
-      query: `
-        SELECT MAX(synced_at) AS max_synced_at
-        FROM \`${projectId}.greenhouse_conformed.delivery_sprints\`
-      `
-    }) as Promise<[BigQueryTimestampRow[], unknown]>
-  ])
-
-  return {
-    raw: {
-      tasks: toTimestampValue(rawRows[0]?.max_synced_at),
-      projects: toTimestampValue(rawProjectRows[0]?.max_synced_at),
-      sprints: toTimestampValue(rawSprintRows[0]?.max_synced_at)
-    },
-    conformed: {
-      tasks: toTimestampValue(conformedRows[0]?.max_synced_at),
-      projects: toTimestampValue(conformedProjectRows[0]?.max_synced_at),
-      sprints: toTimestampValue(conformedSprintRows[0]?.max_synced_at)
+      if (stagedTable.preservedStagingTable) {
+        await dropBigQueryTable({
+          projectId,
+          dataset,
+          table: stagedTable.preservedStagingTable
+        }).catch(() => {})
+      }
     }
   }
 }
@@ -576,17 +599,6 @@ const isConformedTableFreshEnough = (rawSyncedAt: string | null, conformedSynced
 
   return new Date(conformedSyncedAt).getTime() >= new Date(rawSyncedAt).getTime()
 }
-
-const isConformedFreshEnough = (freshness: Awaited<ReturnType<typeof readRawConformedFreshness>>) =>
-  isConformedTableFreshEnough(freshness.raw.tasks, freshness.conformed.tasks) &&
-  isConformedTableFreshEnough(freshness.raw.projects, freshness.conformed.projects) &&
-  isConformedTableFreshEnough(freshness.raw.sprints, freshness.conformed.sprints)
-
-const formatFreshnessSnapshot = (freshness: Awaited<ReturnType<typeof readRawConformedFreshness>>) =>
-  JSON.stringify({
-    raw: freshness.raw,
-    conformed: freshness.conformed
-  })
 
 /** Ensure delivery_tasks has additive columns required by the sync runtime. */
 const ensureDeliveryTaskColumns = async (projectId: string) => {
@@ -659,11 +671,189 @@ export const writeSyncConformedRunRecord = async ({
   }
 }
 
+const uniqueSpaceIds = (spaceIds: Array<string | null | undefined>) =>
+  Array.from(new Set(spaceIds.filter((spaceId): spaceId is string => Boolean(spaceId))))
+
+const buildReadyTargetSpaceIds = ({
+  rawFreshness,
+  requestedSpaceIds
+}: {
+  rawFreshness: NotionRawFreshnessGateResult
+  requestedSpaceIds?: string[]
+}) => {
+  const readySpaceIds = new Set(
+    rawFreshness.spaces.filter(space => space.ready).map(space => space.spaceId)
+  )
+
+  if (!requestedSpaceIds || requestedSpaceIds.length === 0) {
+    return Array.from(readySpaceIds)
+  }
+
+  return uniqueSpaceIds(requestedSpaceIds).filter(spaceId => readySpaceIds.has(spaceId))
+}
+
+const readMaxSyncedAtBySpace = async ({
+  projectId,
+  dataset,
+  table,
+  spaceIds,
+  syncedAtColumn
+}: {
+  projectId: string
+  dataset: string
+  table: string
+  spaceIds: string[]
+  syncedAtColumn: string
+}) => {
+  if (spaceIds.length === 0) {
+    return new Map<string, string | null>()
+  }
+
+  const bq = getBigQueryClient()
+
+  const [rows] = await bq.query({
+    query: `
+      SELECT
+        space_id,
+        MAX(${syncedAtColumn}) AS max_synced_at
+      FROM \`${projectId}.${dataset}.${table}\`
+      WHERE space_id IN UNNEST(@spaceIds)
+      GROUP BY space_id
+    `,
+    params: { spaceIds }
+  }) as [FreshnessAggregateRow[], unknown]
+
+  return new Map(
+    rows.map(row => [
+      toNullableString(row.space_id) ?? '',
+      toTimestampValue(row.max_synced_at)
+    ] as const)
+  )
+}
+
+type FreshnessAggregateRow = {
+  space_id: string | null
+  max_synced_at: { value?: string } | string | null
+}
+
+type SpaceScopedFreshnessSnapshot = {
+  raw: {
+    tasks: string | null
+    projects: string | null
+    sprints: string | null
+  }
+  conformed: {
+    tasks: string | null
+    projects: string | null
+    sprints: string | null
+  }
+}
+
+const readRawConformedFreshnessBySpace = async ({
+  projectId,
+  spaceIds
+}: {
+  projectId: string
+  spaceIds: string[]
+}) => {
+  const [
+    rawTaskMap,
+    rawProjectMap,
+    rawSprintMap,
+    conformedTaskMap,
+    conformedProjectMap,
+    conformedSprintMap
+  ] = await Promise.all([
+    readMaxSyncedAtBySpace({
+      projectId,
+      dataset: 'notion_ops',
+      table: 'tareas',
+      spaceIds,
+      syncedAtColumn: '_synced_at'
+    }),
+    readMaxSyncedAtBySpace({
+      projectId,
+      dataset: 'notion_ops',
+      table: 'proyectos',
+      spaceIds,
+      syncedAtColumn: '_synced_at'
+    }),
+    readMaxSyncedAtBySpace({
+      projectId,
+      dataset: 'notion_ops',
+      table: 'sprints',
+      spaceIds,
+      syncedAtColumn: '_synced_at'
+    }),
+    readMaxSyncedAtBySpace({
+      projectId,
+      dataset: 'greenhouse_conformed',
+      table: 'delivery_tasks',
+      spaceIds,
+      syncedAtColumn: 'synced_at'
+    }),
+    readMaxSyncedAtBySpace({
+      projectId,
+      dataset: 'greenhouse_conformed',
+      table: 'delivery_projects',
+      spaceIds,
+      syncedAtColumn: 'synced_at'
+    }),
+    readMaxSyncedAtBySpace({
+      projectId,
+      dataset: 'greenhouse_conformed',
+      table: 'delivery_sprints',
+      spaceIds,
+      syncedAtColumn: 'synced_at'
+    })
+  ])
+
+  return new Map(
+    spaceIds.map(spaceId => [
+      spaceId,
+      {
+        raw: {
+          tasks: rawTaskMap.get(spaceId) ?? null,
+          projects: rawProjectMap.get(spaceId) ?? null,
+          sprints: rawSprintMap.get(spaceId) ?? null
+        },
+        conformed: {
+          tasks: conformedTaskMap.get(spaceId) ?? null,
+          projects: conformedProjectMap.get(spaceId) ?? null,
+          sprints: conformedSprintMap.get(spaceId) ?? null
+        }
+      } satisfies SpaceScopedFreshnessSnapshot
+    ] as const)
+  )
+}
+
+const isSpaceFreshEnough = (freshness: SpaceScopedFreshnessSnapshot) =>
+  isConformedTableFreshEnough(freshness.raw.tasks, freshness.conformed.tasks) &&
+  isConformedTableFreshEnough(freshness.raw.projects, freshness.conformed.projects) &&
+  isConformedTableFreshEnough(freshness.raw.sprints, freshness.conformed.sprints)
+
+const formatSpaceFreshnessSnapshot = (
+  freshnessBySpace: Map<string, SpaceScopedFreshnessSnapshot>,
+  spaceIds: string[]
+) =>
+  JSON.stringify(
+    Object.fromEntries(
+      spaceIds.map(spaceId => [
+        spaceId,
+        freshnessBySpace.get(spaceId) ?? {
+          raw: { tasks: null, projects: null, sprints: null },
+          conformed: { tasks: null, projects: null, sprints: null }
+        }
+      ])
+    )
+  )
+
 // ─── Main Sync Function ─────────────────────────────────────────────────────
 
 export const syncNotionToConformed = async (input?: {
   rawFreshness?: NotionRawFreshnessGateResult
   syncRunId?: string
+  spaceIds?: string[]
 }): Promise<SyncConformedResult> => {
   const start = Date.now()
   const syncRunId = input?.syncRunId ?? `sync-cron-${randomUUID()}`
@@ -680,11 +870,20 @@ export const syncNotionToConformed = async (input?: {
   try {
     const rawFreshness = input?.rawFreshness ?? await getNotionRawFreshnessGate()
 
-    if (!rawFreshness.ready) {
+    const readySpaceIds = buildReadyTargetSpaceIds({
+      rawFreshness,
+      requestedSpaceIds: input?.spaceIds
+    })
+
+    const isPartialSync = readySpaceIds.length > 0 && readySpaceIds.length < rawFreshness.activeSpaceCount
+
+    if (readySpaceIds.length === 0) {
       await writeSyncConformedRunRecord({
         syncRunId,
         status: 'cancelled',
-        notes: `Conformed sync skipped: ${rawFreshness.reason}`
+        notes: input?.spaceIds?.length
+          ? `Conformed sync skipped: no ready spaces inside requested scope. raw_reason=${rawFreshness.reason}`
+          : `Conformed sync skipped: ${rawFreshness.reason}`
       })
 
       return {
@@ -704,11 +903,20 @@ export const syncNotionToConformed = async (input?: {
       }
     }
 
-    const freshnessSnapshot = await readRawConformedFreshness(projectId)
+    const freshnessBySpace = await readRawConformedFreshnessBySpace({
+      projectId,
+      spaceIds: readySpaceIds
+    })
 
-    if (isConformedFreshEnough(freshnessSnapshot)) {
+    const writableSpaceIds = readySpaceIds.filter(spaceId => {
+      const freshness = freshnessBySpace.get(spaceId)
+
+      return freshness ? !isSpaceFreshEnough(freshness) : true
+    })
+
+    if (writableSpaceIds.length === 0) {
       const notes =
-        `Conformed sync already current for raw snapshot; write skipped. freshness=${formatFreshnessSnapshot(freshnessSnapshot)}`
+        `Conformed sync already current for requested spaces; write skipped. freshness=${formatSpaceFreshnessSnapshot(freshnessBySpace, readySpaceIds)}`
 
       await writeSyncConformedRunRecord({
         syncRunId,
@@ -733,6 +941,13 @@ export const syncNotionToConformed = async (input?: {
       }
     }
 
+    const targetSpaceIds = writableSpaceIds
+
+    const rawSourceSpaceFilterSql = buildSpaceFilterSql({
+      columnName: 'space_id',
+      spaceIds: targetSpaceIds
+    })
+
     const taskColumns = await readTableColumns('notion_ops', 'tareas')
     const rawTaskNameExpression = buildRawTaskNameExpression(taskColumns)
     const rawTaskStatusExpression = buildRawStatusExpression(taskColumns)
@@ -754,7 +969,7 @@ export const syncNotionToConformed = async (input?: {
              prioridad, rpa_promedio, fechas, fechas_end, page_url, propietario_ids,
              business_unit
       FROM \`${projectId}.notion_ops.proyectos\`
-      WHERE notion_page_id IS NOT NULL
+      WHERE notion_page_id IS NOT NULL${rawSourceSpaceFilterSql}
     `),
     runBigQuery<NotionTaskRow>(`
       SELECT notion_page_id, _source_database_id, space_id, created_time, last_edited_time,
@@ -777,14 +992,14 @@ export const syncNotionToConformed = async (input?: {
              \`tiempo_de_ejecución\`, \`tiempo_en_cambios\`, \`tiempo_en_revisión\`,
              workflow_change_round, page_url
       FROM \`${projectId}.notion_ops.tareas\`
-      WHERE notion_page_id IS NOT NULL
+      WHERE notion_page_id IS NOT NULL${rawSourceSpaceFilterSql}
     `),
     runBigQuery<NotionSprintRow>(`
       SELECT notion_page_id, _source_database_id, space_id, created_time, last_edited_time,
              nombre_del_sprint, estado_del_sprint, fechas, fechas_end,
              tareas_completadas, total_de_tareas, page_url
       FROM \`${projectId}.notion_ops.sprints\`
-      WHERE notion_page_id IS NOT NULL
+      WHERE notion_page_id IS NOT NULL${rawSourceSpaceFilterSql}
     `)
     ])
 
@@ -1081,9 +1296,21 @@ export const syncNotionToConformed = async (input?: {
     projectId,
     dataset: 'greenhouse_conformed',
     replacements: [
-      { table: 'delivery_projects', rows: deliveryProjects },
-      { table: 'delivery_tasks', rows: deliveryTasks },
-      { table: 'delivery_sprints', rows: deliverySprints }
+      {
+        table: 'delivery_projects',
+        rows: deliveryProjects,
+        preserveWhereSql: isPartialSync ? buildPreserveNonReadySpaceSql(targetSpaceIds) : null
+      },
+      {
+        table: 'delivery_tasks',
+        rows: deliveryTasks,
+        preserveWhereSql: isPartialSync ? buildPreserveNonReadySpaceSql(targetSpaceIds) : null
+      },
+      {
+        table: 'delivery_sprints',
+        rows: deliverySprints,
+        preserveWhereSql: isPartialSync ? buildPreserveNonReadySpaceSql(targetSpaceIds) : null
+      }
     ]
   })
 
@@ -1099,6 +1326,10 @@ export const syncNotionToConformed = async (input?: {
         COUNTIF(assignee_member_id IS NOT NULL) AS with_assignee_member,
         COUNTIF(assignee_member_ids IS NOT NULL AND ARRAY_LENGTH(assignee_member_ids) > 0) AS with_assignee_member_ids
       FROM \`${projectId}.greenhouse_conformed.delivery_tasks\`
+      WHERE TRUE${buildSpaceFilterSql({
+        columnName: 'space_id',
+        spaceIds: targetSpaceIds
+      })}
       GROUP BY COALESCE(space_id, '__NULL__')
       ORDER BY space_id
     `
@@ -1112,6 +1343,11 @@ export const syncNotionToConformed = async (input?: {
 
   for (const row of tasks) {
     const spaceId = toNullableString(row.space_id) || '__NULL__'
+
+    if (!targetSpaceIds.includes(spaceId)) {
+      continue
+    }
+
     const hasResponsables = (row.responsables_ids?.length ?? 0) > 0
 
     if (hasResponsables) {
@@ -1143,7 +1379,10 @@ export const syncNotionToConformed = async (input?: {
     )
   }
 
-  const persistedParitySnapshot = await readPersistedNotionTaskParitySnapshot(projectId)
+  const persistedParitySnapshot = await readPersistedNotionTaskParitySnapshot(
+    projectId,
+    targetSpaceIds
+  )
 
   const expectedPersistedParitySnapshot = buildNotionTaskParitySnapshot(
     deliveryTasks.map(task => ({

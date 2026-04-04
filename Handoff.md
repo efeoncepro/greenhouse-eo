@@ -1,5 +1,46 @@
 # Handoff.md
 
+## Sesión 2026-04-04 — Payroll PDF download backend incident fixed
+
+### Rama / alcance
+
+- rama actual: `develop`
+- scope:
+  - `src/lib/payroll/payroll-export-packages-store.ts`
+  - `src/lib/payroll/payroll-export-packages-store.test.ts`
+
+### Qué se hizo
+
+- Se investigó el fallo real de `HR > Nómina > Descargar PDF`.
+- Hallazgo principal:
+  - el PDF no estaba roto
+  - el store compartido de exportación (`payroll-export-packages-store`) ejecutaba DDL runtime sobre `greenhouse_payroll.payroll_export_packages`
+  - como la tabla ya existe y el owner canónico es `greenhouse_ops`, el usuario runtime fallaba con `must be owner of table payroll_export_packages`
+- Se corrigió la causa raíz:
+  - se eliminó el bootstrap DDL (`CREATE SCHEMA/TABLE/INDEX IF NOT EXISTS`) del path transaccional
+  - el store ahora asume la infraestructura migrada, alineado con el modelo Postgres del repo
+  - no se rompió el contrato shared del paquete de exportación:
+    - `Descargar PDF`
+    - `Descargar CSV`
+    - `sendPayrollExportReadyNotification()` con PDF + CSV adjuntos siguen usando el mismo paquete persistido
+- Issue documentado:
+  - GitHub issue `#26` — `Payroll PDF download fails because runtime export store performs DDL on payroll_export_packages`
+
+### Evidencia verificada
+
+- repro dirigido de `getOrCreatePayrollExportPackageAssets('2026-03')`:
+  - `wasGenerated: false`
+  - PDF persistido leído correctamente (`16550 bytes`)
+  - CSV persistido leído correctamente (`973 bytes`)
+  - metadata de delivery existente preservada (`deliveryStatus: sent`)
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/payroll/payroll-export-packages-store.test.ts src/lib/payroll/payroll-export-packages.test.ts --reporter=dot` — OK
+- `pnpm exec tsc --noEmit --pretty false` — OK
+
+---
+
 ## Sesión 2026-04-04 — TASK-237 Agency ICO Engine Tab UX Redesign
 
 ### Rama / alcance

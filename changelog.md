@@ -2,6 +2,17 @@
 
 ## 2026-04-04
 
+- **Payroll PDF download backend fix**:
+  - se corrigió un incidente real en `HR > Nómina > Descargar PDF` donde el endpoint respondía `500` con `Unable to generate payroll PDF report.`
+  - la causa raíz no era el render del PDF ni la UI: `src/lib/payroll/payroll-export-packages-store.ts` ejecutaba DDL runtime (`CREATE SCHEMA/TABLE/INDEX IF NOT EXISTS`) sobre `greenhouse_payroll.payroll_export_packages`
+  - como la tabla ya existe y su owner canónico es `greenhouse_ops`, el usuario runtime fallaba con `must be owner of table payroll_export_packages`
+  - el store ahora asume el schema migrado y ya no intenta bootstrap DDL en requests
+  - el flujo compartido se mantiene intacto para:
+    - descarga PDF
+    - descarga CSV
+    - `sendPayrollExportReadyNotification()` con PDF y CSV adjuntos
+  - issue documentado: `#26`
+
 - **TASK-237 Agency ICO Engine Tab UX Redesign**:
   - KPIs reducidos de 6 a 4 con AnimatedCounter y trust metadata como tooltip
   - Charts: paletas diferenciadas CSC vs RPA trend, tooltips en labels truncados, Pipeline Velocity gauge eliminado

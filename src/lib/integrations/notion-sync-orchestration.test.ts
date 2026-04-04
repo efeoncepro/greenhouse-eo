@@ -11,6 +11,7 @@ vi.mock('@/lib/db', () => ({
 import {
   buildRetrySchedule,
   computeRetryDelayMinutes,
+  getReadyNotionSpaceIds,
   recordNotionSyncCompletedSnapshots
 } from '@/lib/integrations/notion-sync-orchestration'
 
@@ -39,6 +40,54 @@ describe('notion sync orchestration', () => {
       delayMinutes: 30,
       nextRetryAt: '2026-04-03T06:50:00.000Z'
     })
+  })
+
+  it('extracts only ready spaces from a mixed raw freshness gate', () => {
+    expect(getReadyNotionSpaceIds({
+      ready: false,
+      reason: 'Raw Notion no está listo para 1/2 space(s)',
+      checkedAt: '2026-04-04T10:00:00.000Z',
+      boundaryStartAt: '2026-04-04T00:00:00.000Z',
+      freshestRawSyncedAt: '2026-04-04T06:08:02.697Z',
+      activeSpaceCount: 2,
+      staleSpaces: [
+        {
+          spaceId: 'spc-stale',
+          taskRowCount: 4,
+          projectRowCount: 1,
+          sprintRowCount: 1,
+          maxTaskSyncedAt: '2026-04-03T16:11:01.444Z',
+          maxProjectSyncedAt: '2026-04-03T16:11:36.005Z',
+          maxSprintSyncedAt: '2026-04-03T16:11:55.984Z',
+          ready: false,
+          reasons: ['tareas stale']
+        }
+      ],
+      spaces: [
+        {
+          spaceId: 'spc-ready',
+          taskRowCount: 10,
+          projectRowCount: 2,
+          sprintRowCount: 1,
+          maxTaskSyncedAt: '2026-04-04T06:02:27.418Z',
+          maxProjectSyncedAt: '2026-04-04T06:03:19.266Z',
+          maxSprintSyncedAt: '2026-04-04T06:08:02.697Z',
+          ready: true,
+          reasons: []
+        },
+        {
+          spaceId: 'spc-stale',
+          taskRowCount: 4,
+          projectRowCount: 1,
+          sprintRowCount: 1,
+          maxTaskSyncedAt: '2026-04-03T16:11:01.444Z',
+          maxProjectSyncedAt: '2026-04-03T16:11:36.005Z',
+          maxSprintSyncedAt: '2026-04-03T16:11:55.984Z',
+          ready: false,
+          reasons: ['tareas stale']
+        }
+      ]
+    })).toEqual(['spc-ready'])
   })
 
   it('persists a completed snapshot per active space so the latest UI state reflects current success', async () => {
@@ -121,6 +170,82 @@ describe('notion sync orchestration', () => {
       freshestRawSyncedAt: '2026-04-03T16:28:00.000Z',
       completedViaSnapshot: true,
       completedBy: 'scheduled_primary'
+    })
+  })
+
+  it('persists completed snapshots only for the spaces that were actually synced', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-04-04T07:20:00.000Z'))
+
+    const executeMock = vi.fn().mockResolvedValue(undefined)
+    const valuesMock = vi.fn().mockReturnValue({ execute: executeMock })
+    const insertIntoMock = vi.fn().mockReturnValue({ values: valuesMock })
+
+    getDbMock.mockResolvedValue({
+      insertInto: insertIntoMock
+    })
+
+    await recordNotionSyncCompletedSnapshots({
+      sourceSyncRunId: 'sync-cron-456',
+      triggerSource: 'cron_primary',
+      spaceIds: ['spc-ready'],
+      rawFreshness: {
+        ready: false,
+        reason: 'Raw Notion no está listo para 1/2 space(s)',
+        checkedAt: '2026-04-04T07:19:00.000Z',
+        boundaryStartAt: '2026-04-04T00:00:00.000Z',
+        freshestRawSyncedAt: '2026-04-04T06:08:02.697Z',
+        activeSpaceCount: 2,
+        staleSpaces: [
+          {
+            spaceId: 'spc-stale',
+            taskRowCount: 4,
+            projectRowCount: 1,
+            sprintRowCount: 1,
+            maxTaskSyncedAt: '2026-04-03T16:11:01.444Z',
+            maxProjectSyncedAt: '2026-04-03T16:11:36.005Z',
+            maxSprintSyncedAt: '2026-04-03T16:11:55.984Z',
+            ready: false,
+            reasons: ['tareas stale']
+          }
+        ],
+        spaces: [
+          {
+            spaceId: 'spc-ready',
+            taskRowCount: 10,
+            projectRowCount: 2,
+            sprintRowCount: 1,
+            maxTaskSyncedAt: '2026-04-04T06:02:27.418Z',
+            maxProjectSyncedAt: '2026-04-04T06:03:19.266Z',
+            maxSprintSyncedAt: '2026-04-04T06:08:02.697Z',
+            ready: true,
+            reasons: []
+          },
+          {
+            spaceId: 'spc-stale',
+            taskRowCount: 4,
+            projectRowCount: 1,
+            sprintRowCount: 1,
+            maxTaskSyncedAt: '2026-04-03T16:11:01.444Z',
+            maxProjectSyncedAt: '2026-04-03T16:11:36.005Z',
+            maxSprintSyncedAt: '2026-04-03T16:11:55.984Z',
+            ready: false,
+            reasons: ['tareas stale']
+          }
+        ]
+      },
+      metadata: {
+        completedBy: 'scheduled_primary_partial'
+      }
+    })
+
+    const insertedRows = valuesMock.mock.calls[0][0]
+
+    expect(insertedRows).toHaveLength(1)
+    expect(insertedRows[0]).toMatchObject({
+      space_id: 'spc-ready',
+      source_sync_run_id: 'sync-cron-456',
+      orchestration_status: 'sync_completed'
     })
   })
 })

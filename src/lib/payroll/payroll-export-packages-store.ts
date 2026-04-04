@@ -83,60 +83,6 @@ const mapPackage = (row: PayrollExportPackageRow): PayrollExportPackageRecord =>
 
 export const PAYROLL_EXPORT_PACKAGE_TEMPLATE_VERSION = '2026-03-28.v1'
 
-let ensureSchemaPromise: Promise<void> | null = null
-
-const ensureSchema = async () => {
-  if (ensureSchemaPromise) return ensureSchemaPromise
-
-  ensureSchemaPromise = (async () => {
-    await runGreenhousePostgresQuery(`
-      CREATE SCHEMA IF NOT EXISTS greenhouse_payroll
-    `)
-
-    await runGreenhousePostgresQuery(`
-      CREATE TABLE IF NOT EXISTS greenhouse_payroll.payroll_export_packages (
-        period_id TEXT PRIMARY KEY REFERENCES greenhouse_payroll.payroll_periods(period_id) ON DELETE CASCADE,
-        storage_bucket TEXT,
-        pdf_asset_id TEXT,
-        csv_asset_id TEXT,
-        pdf_storage_path TEXT,
-        csv_storage_path TEXT,
-        pdf_file_size_bytes INTEGER,
-        csv_file_size_bytes INTEGER,
-        pdf_template_version TEXT,
-        csv_template_version TEXT,
-        generated_at TIMESTAMPTZ,
-        generated_by TEXT,
-        delivery_status TEXT NOT NULL DEFAULT 'pending' CHECK (delivery_status IN ('pending', 'sent', 'failed')),
-        delivery_attempts INTEGER NOT NULL DEFAULT 0,
-        last_sent_at TIMESTAMPTZ,
-        last_sent_by TEXT,
-        last_email_delivery_id TEXT,
-        last_send_error TEXT,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-      )
-    `)
-
-    await runGreenhousePostgresQuery(`
-      CREATE INDEX IF NOT EXISTS payroll_export_packages_delivery_status_idx
-        ON greenhouse_payroll.payroll_export_packages (delivery_status, updated_at DESC)
-    `)
-
-    await runGreenhousePostgresQuery(`
-      CREATE INDEX IF NOT EXISTS payroll_export_packages_last_sent_idx
-        ON greenhouse_payroll.payroll_export_packages (last_sent_at DESC, updated_at DESC)
-    `)
-  })().catch(error => {
-    ensureSchemaPromise = null
-    throw error
-  })
-
-  return ensureSchemaPromise.finally(() => {
-    ensureSchemaPromise = null
-  })
-}
-
 export const buildPayrollExportPackageStoragePath = (periodId: string, kind: 'pdf' | 'csv') =>
   `payroll-export-packages/${periodId}/payroll-${periodId}.${kind}`
 
@@ -144,8 +90,6 @@ export const buildPayrollExportPackageDownloadFilename = (periodId: string, kind
   `payroll-${periodId}.${kind}`
 
 export const getPayrollExportPackageByPeriodId = async (periodId: string): Promise<PayrollExportPackageRecord | null> => {
-  await ensureSchema()
-
   const rows = await runGreenhousePostgresQuery<PayrollExportPackageRow>(
     `
       SELECT *
@@ -173,8 +117,6 @@ export const upsertPayrollExportPackageArtifacts = async (input: {
   generatedAt?: string | null
   generatedBy?: string | null
 }) => {
-  await ensureSchema()
-
   const rows = await runGreenhousePostgresQuery<PayrollExportPackageRow>(
     `
       INSERT INTO greenhouse_payroll.payroll_export_packages (
@@ -242,8 +184,6 @@ export const recordPayrollExportPackageDelivery = async (input: {
   lastEmailDeliveryId?: string | null
   lastSendError?: string | null
 }) => {
-  await ensureSchema()
-
   const rows = await runGreenhousePostgresQuery<PayrollExportPackageRow>(
     `
       UPDATE greenhouse_payroll.payroll_export_packages

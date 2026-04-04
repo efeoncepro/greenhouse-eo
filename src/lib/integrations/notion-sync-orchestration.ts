@@ -85,6 +85,38 @@ const getSpaceFreshestRawSyncedAt = (space: NotionRawFreshnessSpaceSnapshot) =>
     .sort()
     .at(-1) ?? null
 
+export const getReadyNotionSpaceIds = (rawFreshness: NotionRawFreshnessGateResult) =>
+  rawFreshness.spaces
+    .filter(space => space.ready)
+    .map(space => space.spaceId)
+
+const filterRawFreshnessBySpaceIds = (
+  rawFreshness: NotionRawFreshnessGateResult,
+  spaceIds: string[]
+): NotionRawFreshnessGateResult => {
+  const allowed = new Set(spaceIds)
+  const spaces = rawFreshness.spaces.filter(space => allowed.has(space.spaceId))
+  const staleSpaces = spaces.filter(space => !space.ready)
+
+  const freshestRawSyncedAt = spaces
+    .flatMap(space => [space.maxTaskSyncedAt, space.maxProjectSyncedAt, space.maxSprintSyncedAt])
+    .filter((value): value is string => Boolean(value))
+    .sort()
+    .at(-1) ?? null
+
+  return {
+    ...rawFreshness,
+    ready: staleSpaces.length === 0,
+    reason: staleSpaces.length === 0
+      ? `Raw Notion listo para materializar (${spaces.length} space(s))`
+      : `Raw Notion no está listo para ${staleSpaces.length}/${spaces.length} space(s)`,
+    freshestRawSyncedAt,
+    activeSpaceCount: spaces.length,
+    staleSpaces,
+    spaces
+  }
+}
+
 const mapExecutionSourceToTriggerSource = (
   executionSource: NotionSyncOrchestrationExecutionSource
 ): NotionSyncOrchestrationTriggerSource => {
@@ -402,16 +434,18 @@ export const markNotionSyncRecoveryRunning = async (runs: NotionSyncOrchestratio
 export const completeOpenNotionSyncRuns = async ({
   sourceSyncRunId,
   triggerSource,
-  metadata = {}
+  metadata = {},
+  spaceIds
 }: {
   sourceSyncRunId: string
   triggerSource: NotionSyncOrchestrationTriggerSource
   metadata?: Record<string, unknown>
+  spaceIds?: string[]
 }) => {
   const db = await getDb()
   const nowIso = new Date().toISOString()
 
-  await db
+  let query = db
     .updateTable('greenhouse_sync.notion_sync_orchestration_runs')
     .set({
       orchestration_status: 'sync_completed',
@@ -425,21 +459,32 @@ export const completeOpenNotionSyncRuns = async ({
     .where('integration_key', '=', INTEGRATION_KEY)
     .where('pipeline_key', '=', PIPELINE_KEY)
     .where('orchestration_status', 'in', [...OPEN_STATUSES])
-    .execute()
+
+  if (spaceIds && spaceIds.length > 0) {
+    query = query.where('space_id', 'in', spaceIds)
+  }
+
+  await query.execute()
 }
 
 export const recordNotionSyncCompletedSnapshots = async ({
   sourceSyncRunId,
   triggerSource,
   rawFreshness,
-  metadata = {}
+  metadata = {},
+  spaceIds
 }: {
   sourceSyncRunId: string
   triggerSource: NotionSyncOrchestrationTriggerSource
   rawFreshness: NotionRawFreshnessGateResult
   metadata?: Record<string, unknown>
+  spaceIds?: string[]
 }) => {
-  if (rawFreshness.spaces.length === 0) {
+  const scopedRawFreshness = spaceIds && spaceIds.length > 0
+    ? filterRawFreshnessBySpaceIds(rawFreshness, spaceIds)
+    : rawFreshness
+
+  if (scopedRawFreshness.spaces.length === 0) {
     return
   }
 
@@ -449,7 +494,7 @@ export const recordNotionSyncCompletedSnapshots = async ({
   await db
     .insertInto('greenhouse_sync.notion_sync_orchestration_runs')
     .values(
-      rawFreshness.spaces.map(space => ({
+      scopedRawFreshness.spaces.map(space => ({
         orchestration_run_id: buildOrchestrationRunId(),
         integration_key: INTEGRATION_KEY,
         pipeline_key: PIPELINE_KEY,
@@ -459,14 +504,14 @@ export const recordNotionSyncCompletedSnapshots = async ({
         trigger_source: triggerSource,
         retry_attempt: 0,
         max_retry_attempts: MAX_RETRY_ATTEMPTS,
-        raw_boundary_start_at: rawFreshness.boundaryStartAt,
+        raw_boundary_start_at: scopedRawFreshness.boundaryStartAt,
         latest_raw_synced_at: getSpaceFreshestRawSyncedAt(space),
         waiting_reason: null,
         next_retry_at: null,
         completed_at: nowIso,
         metadata: {
-          boundaryStartAt: rawFreshness.boundaryStartAt,
-          freshestRawSyncedAt: rawFreshness.freshestRawSyncedAt,
+          boundaryStartAt: scopedRawFreshness.boundaryStartAt,
+          freshestRawSyncedAt: scopedRawFreshness.freshestRawSyncedAt,
           completedViaSnapshot: true,
           ...metadata
         } as unknown as Json
@@ -479,17 +524,19 @@ export const failOpenNotionSyncRuns = async ({
   sourceSyncRunId = null,
   triggerSource,
   message,
-  metadata = {}
+  metadata = {},
+  spaceIds
 }: {
   sourceSyncRunId?: string | null
   triggerSource: NotionSyncOrchestrationTriggerSource
   message: string
   metadata?: Record<string, unknown>
+  spaceIds?: string[]
 }) => {
   const db = await getDb()
   const nowIso = new Date().toISOString()
 
-  await db
+  let query = db
     .updateTable('greenhouse_sync.notion_sync_orchestration_runs')
     .set({
       orchestration_status: 'sync_failed',
@@ -507,19 +554,28 @@ export const failOpenNotionSyncRuns = async ({
     .where('integration_key', '=', INTEGRATION_KEY)
     .where('pipeline_key', '=', PIPELINE_KEY)
     .where('orchestration_status', 'in', [...OPEN_STATUSES])
-    .execute()
+
+  if (spaceIds && spaceIds.length > 0) {
+    query = query.where('space_id', 'in', spaceIds)
+  }
+
+  await query.execute()
 }
 
 export const runNotionConformedCycle = async (
-  rawFreshness?: NotionRawFreshnessGateResult
+  rawFreshness?: NotionRawFreshnessGateResult,
+  options?: {
+    spaceIds?: string[]
+  }
 ): Promise<{
   sync: SyncConformedResult
   dataQualityMonitor: NotionSyncRecoveryResult['dataQualityMonitor']
 }> => {
   const sync = await syncNotionToConformed(
-    rawFreshness
+    rawFreshness || options?.spaceIds
       ? {
-          rawFreshness
+          rawFreshness,
+          spaceIds: options?.spaceIds
         }
       : undefined
   )
@@ -582,38 +638,60 @@ export const runNotionSyncRecovery = async (): Promise<NotionSyncRecoveryResult>
   }
 
   const rawFreshness = await getNotionRawFreshnessGate()
+  const readySpaceIds = new Set(getReadyNotionSpaceIds(rawFreshness))
+  const readyRuns = dueRuns.filter(run => readySpaceIds.has(run.spaceId))
+  const blockedRuns = dueRuns.filter(run => !readySpaceIds.has(run.spaceId))
 
-  if (!rawFreshness.ready) {
+  if (blockedRuns.length > 0) {
     const rescheduled = await rescheduleNotionSyncRecoveryRuns({
       rawFreshness,
       triggerSource: 'cron_recovery',
-      runs: dueRuns
+      runs: blockedRuns
     })
 
+    if (readyRuns.length === 0) {
+      return {
+        triggered: false,
+        pendingSpaces: dueRuns.length,
+        retriedSpaces: 0,
+        blockedSpaces: rescheduled.blockedSpaces,
+        completedSpaces: 0,
+        failedSpaces: rescheduled.failedSpaces,
+        reason: rawFreshness.reason,
+        nextRetryAt: rescheduled.nextRetryAt,
+        syncRunId: null,
+        dataQualityMonitor: null
+      }
+    }
+  }
+
+  if (readyRuns.length === 0) {
     return {
       triggered: false,
       pendingSpaces: dueRuns.length,
       retriedSpaces: 0,
-      blockedSpaces: rescheduled.blockedSpaces,
+      blockedSpaces: 0,
       completedSpaces: 0,
-      failedSpaces: rescheduled.failedSpaces,
-      reason: rawFreshness.reason,
-      nextRetryAt: rescheduled.nextRetryAt,
+      failedSpaces: 0,
+      reason: 'No due Notion conformed retries with fresh raw data',
+      nextRetryAt: null,
       syncRunId: null,
       dataQualityMonitor: null
     }
   }
 
-  await markNotionSyncRecoveryRunning(dueRuns)
+  await markNotionSyncRecoveryRunning(readyRuns)
 
   try {
-    const cycle = await runNotionConformedCycle(rawFreshness)
+    const cycle = await runNotionConformedCycle(rawFreshness, {
+      spaceIds: readyRuns.map(run => run.spaceId)
+    })
 
     if (cycle.sync.skipped && cycle.sync.rawFreshness && !cycle.sync.rawFreshness.ready) {
       const rescheduled = await rescheduleNotionSyncRecoveryRuns({
         rawFreshness: cycle.sync.rawFreshness,
         triggerSource: 'cron_recovery',
-        runs: dueRuns
+        runs: readyRuns
       })
 
       return {
@@ -633,6 +711,7 @@ export const runNotionSyncRecovery = async (): Promise<NotionSyncRecoveryResult>
     await completeOpenNotionSyncRuns({
       sourceSyncRunId: cycle.sync.syncRunId,
       triggerSource: 'cron_recovery',
+      spaceIds: readyRuns.map(run => run.spaceId),
       metadata: {
         completedBy: 'cron_recovery',
         dataQualityMonitor: cycle.dataQualityMonitor,
@@ -645,6 +724,7 @@ export const runNotionSyncRecovery = async (): Promise<NotionSyncRecoveryResult>
       sourceSyncRunId: cycle.sync.syncRunId,
       triggerSource: 'cron_recovery',
       rawFreshness,
+      spaceIds: readyRuns.map(run => run.spaceId),
       metadata: {
         completedBy: 'cron_recovery',
         dataQualityMonitor: cycle.dataQualityMonitor,
@@ -656,9 +736,9 @@ export const runNotionSyncRecovery = async (): Promise<NotionSyncRecoveryResult>
     return {
       triggered: !cycle.sync.skipped,
       pendingSpaces: dueRuns.length,
-      retriedSpaces: dueRuns.length,
-      blockedSpaces: 0,
-      completedSpaces: dueRuns.length,
+      retriedSpaces: readyRuns.length,
+      blockedSpaces: blockedRuns.length,
+      completedSpaces: readyRuns.length,
       failedSpaces: 0,
       reason: cycle.sync.skipReason ?? 'Retry converged successfully',
       nextRetryAt: null,
@@ -671,6 +751,7 @@ export const runNotionSyncRecovery = async (): Promise<NotionSyncRecoveryResult>
     await failOpenNotionSyncRuns({
       triggerSource: 'cron_recovery',
       message,
+      spaceIds: readyRuns.map(run => run.spaceId),
       metadata: {
         failedBy: 'cron_recovery'
       }
@@ -680,9 +761,9 @@ export const runNotionSyncRecovery = async (): Promise<NotionSyncRecoveryResult>
       triggered: false,
       pendingSpaces: dueRuns.length,
       retriedSpaces: 0,
-      blockedSpaces: 0,
+      blockedSpaces: blockedRuns.length,
       completedSpaces: 0,
-      failedSpaces: dueRuns.length,
+      failedSpaces: readyRuns.length,
       reason: message,
       nextRetryAt: null,
       syncRunId: null,
@@ -702,13 +783,20 @@ export const runNotionSyncOrchestration = async ({
 
   const triggerSource = mapExecutionSourceToTriggerSource(executionSource)
   const rawFreshness = await getNotionRawFreshnessGate()
+  const readySpaceIds = getReadyNotionSpaceIds(rawFreshness)
+  let blocked = {
+    pendingSpaces: 0,
+    nextRetryAt: null as string | null
+  }
 
-  if (!rawFreshness.ready) {
-    const blocked = await recordNotionSyncWaitingForRaw({
+  if (rawFreshness.staleSpaces.length > 0) {
+    blocked = await recordNotionSyncWaitingForRaw({
       rawFreshness,
       triggerSource
     })
+  }
 
+  if (readySpaceIds.length === 0) {
     return {
       triggered: false,
       pendingSpaces: blocked.pendingSpaces,
@@ -726,7 +814,9 @@ export const runNotionSyncOrchestration = async ({
   const openRuns = await listOpenRuns()
 
   try {
-    const cycle = await runNotionConformedCycle(rawFreshness)
+    const cycle = await runNotionConformedCycle(rawFreshness, {
+      spaceIds: readySpaceIds
+    })
 
     if (cycle.sync.skipped) {
       if (cycle.sync.rawFreshness && !cycle.sync.rawFreshness.ready) {
@@ -752,6 +842,7 @@ export const runNotionSyncOrchestration = async ({
       await completeOpenNotionSyncRuns({
         sourceSyncRunId: cycle.sync.syncRunId,
         triggerSource,
+        spaceIds: readySpaceIds,
         metadata: {
           completedBy: executionSource,
           dataQualityMonitor: cycle.dataQualityMonitor,
@@ -764,6 +855,7 @@ export const runNotionSyncOrchestration = async ({
         sourceSyncRunId: cycle.sync.syncRunId,
         triggerSource,
         rawFreshness,
+        spaceIds: readySpaceIds,
         metadata: {
           completedBy: executionSource,
           dataQualityMonitor: cycle.dataQualityMonitor,
@@ -774,10 +866,10 @@ export const runNotionSyncOrchestration = async ({
 
       return {
         triggered: false,
-        pendingSpaces: 0,
+        pendingSpaces: blocked.pendingSpaces,
         retriedSpaces: 0,
-        blockedSpaces: 0,
-        completedSpaces: rawFreshness.activeSpaceCount,
+        blockedSpaces: blocked.pendingSpaces,
+        completedSpaces: readySpaceIds.length,
         failedSpaces: 0,
         reason: cycle.sync.skipReason ?? 'Sync skipped',
         nextRetryAt: null,
@@ -789,6 +881,7 @@ export const runNotionSyncOrchestration = async ({
     await completeOpenNotionSyncRuns({
       sourceSyncRunId: cycle.sync.syncRunId,
       triggerSource,
+      spaceIds: readySpaceIds,
       metadata: {
         completedBy: executionSource,
         dataQualityMonitor: cycle.dataQualityMonitor
@@ -799,6 +892,7 @@ export const runNotionSyncOrchestration = async ({
       sourceSyncRunId: cycle.sync.syncRunId,
       triggerSource,
       rawFreshness,
+      spaceIds: readySpaceIds,
       metadata: {
         completedBy: executionSource,
         dataQualityMonitor: cycle.dataQualityMonitor
@@ -807,10 +901,10 @@ export const runNotionSyncOrchestration = async ({
 
     return {
       triggered: true,
-      pendingSpaces: 0,
+      pendingSpaces: blocked.pendingSpaces,
       retriedSpaces: 0,
-      blockedSpaces: 0,
-      completedSpaces: rawFreshness.activeSpaceCount,
+      blockedSpaces: blocked.pendingSpaces,
+      completedSpaces: readySpaceIds.length,
       failedSpaces: 0,
       reason: 'Conformed sync converged successfully',
       nextRetryAt: null,
@@ -823,6 +917,7 @@ export const runNotionSyncOrchestration = async ({
     await failOpenNotionSyncRuns({
       triggerSource,
       message,
+      spaceIds: readySpaceIds,
       metadata: {
         failedBy: executionSource
       }
@@ -830,11 +925,11 @@ export const runNotionSyncOrchestration = async ({
 
     return {
       triggered: false,
-      pendingSpaces: openRuns.length,
+      pendingSpaces: blocked.pendingSpaces || openRuns.length,
       retriedSpaces: 0,
-      blockedSpaces: 0,
+      blockedSpaces: blocked.pendingSpaces,
       completedSpaces: 0,
-      failedSpaces: openRuns.length,
+      failedSpaces: readySpaceIds.length || openRuns.length,
       reason: message,
       nextRetryAt: null,
       syncRunId: null,
