@@ -1,5 +1,53 @@
 # Handoff.md
 
+## Sesión 2026-04-04 — TASK-118 cerrada y TASK-232 desbloqueada
+
+### Rama / alcance
+
+- rama actual: `task/TASK-118-ico-ai-core-embedded-intelligence`
+- scope principal:
+  - `docs/tasks/complete/TASK-118-ico-ai-core-embedded-intelligence.md`
+  - `docs/tasks/to-do/TASK-232-ico-llm-quality-scoring-explanation-pipeline.md`
+  - `docs/tasks/to-do/TASK-152-anomaly-detection-engine.md`
+  - `docs/tasks/to-do/TASK-155-scope-intelligence.md`
+  - `docs/tasks/to-do/TASK-159-nexa-agency-tools.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+  - `Handoff.md`
+  - `changelog.md`
+
+### Resultado
+
+- `TASK-118` quedó cerrada sobre su alcance real:
+  - `ai_signals`
+  - `ai_prediction_log`
+  - serving PG `greenhouse_serving.ico_ai_signals`
+  - `ico.ai_signals.materialized`
+  - consumers base en `Agency`, `Ops Health` y `Nexa`
+- La task ya no deja remanente implícito:
+  - lane LLM async movida a `TASK-232`
+  - `TASK-232` quedó desbloqueada (`Blocked by: none`)
+- Se actualizó el impacto cruzado mínimo:
+  - `TASK-152` ahora se lee como anomaly registry/workflow sobre señales `ICO` persistidas, no como duplicado del detector base
+  - `TASK-155` y `TASK-159` ahora documentan que deben consumir la foundation de `TASK-118` y tratar `TASK-232` como follow-on generativo separado
+
+### Riesgos / siguientes pasos
+
+- `TASK-232` debe decidir durante Discovery si basta con `ai_metric_scores` o si necesita storage auditado adicional para explicaciones.
+- `TASK-152` sigue siendo una lane grande y debe cuidar no volver a abrir lógica duplicada de anomalías ya resuelta por `ICO`.
+- Los slices históricos 4-13 de `TASK-118` quedan como roadmap de referencia, no como deuda invisible dentro de una task “cerrada”.
+
+### Verificación
+
+- validación histórica preservada desde el cierre foundation:
+  - `pnpm pg:doctor --profile=runtime`
+  - `pnpm pg:doctor --profile=migrator`
+  - `MIGRATE_PROFILE=migrator pnpm migrate:up`
+  - `pnpm exec vitest run src/lib/ico-engine/ai/ai-signals.test.ts src/lib/sync/event-catalog.test.ts`
+  - `pnpm build`
+  - `pnpm lint`
+
 ## Sesión 2026-04-04 — TASK-231 cerrada y TASK-232 creada
 
 ### Rama / alcance

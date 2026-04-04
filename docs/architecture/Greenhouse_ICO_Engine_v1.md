@@ -2776,7 +2776,7 @@ No se requiere cambiar fórmulas de métricas, duplicar SQL, ni crear nuevos end
 
 ## 13. AI Core & Robustness Roadmap (TASK-118)
 
-> Agregado 2026-03-28. Actualizado 2026-04-04. Spec viva: `docs/tasks/in-progress/TASK-118-ico-ai-core-embedded-intelligence.md`
+> Agregado 2026-03-28. Actualizado 2026-04-04. Spec viva: `docs/tasks/complete/TASK-118-ico-ai-core-embedded-intelligence.md`
 
 ### 13.0 Estado runtime actual
 
@@ -2786,6 +2786,8 @@ No se requiere cambiar fórmulas de métricas, duplicar SQL, ni crear nuevos end
   - el runtime emite `ico.ai_signals.materialized`
   - `greenhouse_serving.ico_ai_signals` funciona como cache serving y se refresca vía proyección reactiva BQ -> PG
 - El scope actual sigue siendo internal-only y advisory-only. Los follow-ons de scoring compuesto, riesgo, churn, forecast avanzado o surfaces client-facing permanecen en `TASK-150` a `TASK-159`.
+- `TASK-118` queda cerrada sobre esta foundation determinística.
+- La lane LLM async de quality scoring / explanations continúa separada en `TASK-232`.
 
 ### 13.1 Visión
 
@@ -2825,7 +2827,7 @@ Step 11: Persist ai_signals    — BigQuery + sync a Postgres cache
 | `csc_dwell_times` | `ico_engine` (BQ) | Tiempo promedio por fase CSC |
 | `seasonal_indices` | `ico_engine` (BQ) | Index estacional por (Space, metric, month) |
 
-La tabla `ai_metric_scores` (§5.5, ya creada vacía) se activa en Slice 6 (Quality Scoring con LLM).
+La tabla `ai_metric_scores` (§5.5, ya creada vacía) se activa en `TASK-232` (Quality Scoring con LLM async).
 
 ### 13.5 Roadmap de ejecución
 

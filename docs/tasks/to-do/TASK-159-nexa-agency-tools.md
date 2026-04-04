@@ -4,6 +4,14 @@
   - route `GET /api/agency/spaces/[id]`
 - Esta task ya no debe asumir que `Space 360` es un placeholder; puede envolver el contrato existente y extenderlo con tools Nexa.
 
+## Delta 2026-04-04
+
+- `TASK-118` ya cerró la foundation backend/pipeline de `ICO AI Core`.
+- Los query tools de Agency pueden consumir `ico_ai_signals` y readers persistidos como contexto upstream cuando corresponda.
+- El carril LLM async no lo implementa esta task:
+  - queda en `TASK-232`
+  - `TASK-159` sigue siendo consumer/tooling, no runtime owner del pipeline generativo
+
 # TASK-159 — Nexa Agency Tools: Query, Recommend, Act
 
 ## Status

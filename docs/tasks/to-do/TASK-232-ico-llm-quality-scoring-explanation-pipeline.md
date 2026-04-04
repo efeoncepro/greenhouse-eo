@@ -16,7 +16,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ico-engine / ai`
-- Blocked by: `TASK-118`
+- Blocked by: `none`
 - Branch: `task/TASK-232-ico-llm-quality-scoring-explanation-pipeline`
 - GitHub Issue: `[pending]`
 

@@ -1,5 +1,19 @@
 # TASK-118 — ICO AI Core: Embedded Intelligence Layer
 
+## Delta 2026-04-04 — Task closed on deterministic foundation scope; LLM lane moved to TASK-232
+
+- `TASK-118` queda cerrada sobre el alcance que sí quedó implementado en runtime:
+  - foundation backend/pipeline para `ai_signals`
+  - tracking `ai_prediction_log`
+  - cache PG `greenhouse_serving.ico_ai_signals`
+  - evento `ico.ai_signals.materialized`
+  - readers y consumers base para `Agency`, `Ops Health` y `Nexa`
+- El carril LLM async de quality scoring/explanations ya no queda como remanente ambiguo de esta task:
+  - se movió explícitamente a `TASK-232`
+- Los follow-ons agency-level y de modelado compuesto siguen fuera de esta task:
+  - `TASK-150` a `TASK-159`
+- Los slices 4-13 del body original quedan como diseño histórico/referencia de roadmap; no son criterio de cierre de `TASK-118`.
+
 ## Delta 2026-04-04 — Task rebaselined on the real ICO runtime and split-aware follow-ons
 
 - La auditoría del repo confirmó que el body original quedó desfasado frente al runtime actual de `ICO`.
@@ -23,11 +37,11 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Auditoría cerrada, foundation backend/pipeline en implementación`
+- Status real: `Cerrada — foundation backend/pipeline activada`
 - Rank: `44`
 - Domain: `ico-engine / ai`
 - Assigned to: **Codex (backend/pipeline)** + **Claude (UI signals)**
@@ -755,89 +769,16 @@ Cada slice es desplegable independientemente. El pipeline degrada gracefully si 
 
 ## Acceptance Criteria
 
-### Slice 1 — Anomaly Detection
+- [x] `materialize.ts` ejecuta el carril AI Core como step aditivo sin romper Steps 1-7 del engine
+- [x] `ico_engine.ai_signals` persiste anomalías, predicciones, root causes y recomendaciones determinísticas
+- [x] `ico_engine.ai_prediction_log` registra predicciones y recalibra `actual_value` / `error_pct` al cierre de período
+- [x] Spaces con señal insuficiente degradan elegibilidad vía `ai_eligible = false`
+- [x] `greenhouse_serving.ico_ai_signals` queda sincronizada por el backbone reactivo BQ -> PG
+- [x] `Agency`, `Ops Health` y `Nexa` ya consumen la foundation AI Core sin recalcular métricas inline
+- [x] La lane LLM async quedó separada en `TASK-232` en vez de permanecer como scope implícito no implementado
+- [x] Verificación técnica ejecutada: migración aplicada, tests AI base, `pnpm build` y `pnpm lint`
 
-- [ ] Step 8 corre en `materialize.ts` sin afectar Steps 1-7
-- [ ] Anomalías con z-score >2 se persisten en `ai_signals`
-- [ ] Spaces con <30 tasks en 3 meses no generan señales (`ai_eligible = false`)
-- [ ] Graceful degradation: si Step 8 falla, materialización completa sin IA
+## Follow-ups
 
-### Slice 2 — Root Cause Analysis
-
-- [ ] Top 3 contributors por dimensión (member, project, phase) para cada anomalía
-- [ ] `contribution_pct` es correcto y suma ~100% por anomalía
-
-### Slice 3 — Predictive Metrics
-
-- [ ] Predicción de fin de mes para OTD, RPA, FTR por Space
-- [ ] `ai_prediction_log` registra cada predicción con confidence
-- [ ] Al cierre del período, `actual_value` se llena y `error_pct` se calcula
-
-### Slice 4 — Capacity Forecasting
-
-- [ ] Gap de capacidad proyectado por Space (FTE)
-- [ ] Señal solo se genera cuando gap > 0.5 FTE
-
-### Slice 5 — Resource Optimization
-
-- [ ] Recomendaciones rule-based basadas en señales de Slices 1-4
-- [ ] `action_summary` legible por un humano sin contexto técnico
-
-### Slice 6 — Quality Scoring
-
-- [ ] Job async que evalúa tasks completadas
-- [ ] Scores en `ai_metric_scores` (tabla existente)
-- [ ] Fallback: si LLM falla, task queda sin score (no bloquea)
-
-### Slice 7 — Data Quality Scoring
-
-- [ ] `data_quality` score (0-100%) calculado por Space en cada materialización
-- [ ] Per-metric confidence: `otd_confidence`, `rpa_confidence`, `ftr_confidence`
-- [ ] Señal `data_quality` cuando score < 70%
-- [ ] Slices 1-3 degradan confianza de señales cuando quality score es bajo
-
-### Slice 8 — Revenue-Weighted Metrics
-
-- [ ] `revenue_weighted_otd` calculado a nivel agency
-- [ ] `revenue_at_risk` calculado (sum revenue de Spaces degradados)
-- [ ] Señal `revenue_risk` cuando `revenue_at_risk > 20%` del total
-
-### Slice 9 — CSC Pipeline Analytics
-
-- [ ] Transition matrix calculada por Space (rolling 6 meses)
-- [ ] Dwell time promedio por fase por Space
-- [ ] Predicted delivery date por task activa basada en fase actual + Markov
-- [ ] Bottleneck identification (fase con mayor dwell time)
-
-### Slice 10 — Seasonality Model
-
-- [ ] Seasonal index por (Space, metric, month) con >=12 meses de data
-- [ ] Anomaly detector usa `seasonally_adjusted_value` cuando disponible
-- [ ] Spaces con <12 meses no reciben ajuste (fallback a z-score simple)
-
-### Slice 11 — Operational Maturity Model
-
-- [ ] Spaces clasificados en 4 etapas (Onboarding → Excelling)
-- [ ] Thresholds de semáforo ajustados por etapa
-- [ ] Señal de progresión cuando un Space cambia de etapa
-
-### Slice 12 — Member Growth Trajectory
-
-- [ ] `otd_trend`, `growth_signal`, `otd_percentile` por miembro
-- [ ] Early warning para declining trajectory (3+ meses consecutivos)
-- [ ] Peer comparison visible en Person 360
-
-### Slice 13 — Multi-Source Enrichment
-
-- [ ] Cost-per-delivery calculado (compensation / throughput)
-- [ ] Revenue-delivery correlation detectada
-- [ ] Dedication-performance mismatch flagged
-- [ ] Señales `cross_signal` persistidas en `ai_signals`
-
-### Transversal
-
-- [ ] Zero TS errors, lint clean
-- [ ] `pnpm build` pasa
-- [ ] Ops Health muestra AI Core como subsystem
-- [ ] Señales sincronizadas a `greenhouse_serving.ico_ai_signals` vía cron o reactive
-- [ ] Cada slice degrada gracefully si falla (no bloquea materialización ni otros slices)
+- `TASK-232` — `ICO LLM Quality Scoring & Explanation Pipeline`
+- `TASK-150` a `TASK-159` — scoring compuesto, riesgo, anomaly registry agency-level, forecast y tools downstream
