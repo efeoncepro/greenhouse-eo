@@ -45,6 +45,7 @@ import classnames from 'classnames'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import StatsWithAreaChart from '@components/card-statistics/StatsWithAreaChart'
 import TablePaginationComponent from '@components/TablePaginationComponent'
+import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
 import CustomTextField from '@core/components/mui/TextField'
 import { fuzzyFilter } from '@/components/tableUtils'
 
@@ -755,7 +756,7 @@ const FinanceDashboardView = () => {
         <Grid size={{ xs: 12, sm: 4, md: 4 }}>
           <HorizontalWithSubtitle
             title='DSO'
-            stats={workingCapital.dso !== null ? `${workingCapital.dso} días` : 'Sin datos'}
+            stats={workingCapital.dso !== null ? <><AnimatedCounter value={workingCapital.dso} format='integer' /> días</> : 'Sin datos'}
             subtitle='Days Sales Outstanding — días promedio de cobro'
             avatarIcon='tabler-clock-dollar'
             avatarColor={workingCapital.dso !== null && workingCapital.dso > 60 ? 'error' : workingCapital.dso !== null && workingCapital.dso > 30 ? 'warning' : 'success'}
@@ -764,7 +765,7 @@ const FinanceDashboardView = () => {
         <Grid size={{ xs: 12, sm: 4, md: 4 }}>
           <HorizontalWithSubtitle
             title='DPO'
-            stats={workingCapital.dpo !== null ? `${workingCapital.dpo} días` : 'Sin datos'}
+            stats={workingCapital.dpo !== null ? <><AnimatedCounter value={workingCapital.dpo} format='integer' /> días</> : 'Sin datos'}
             subtitle='Days Payable Outstanding — días promedio de pago'
             avatarIcon='tabler-clock-pause'
             avatarColor={workingCapital.dpo !== null && workingCapital.dpo > 90 ? 'error' : workingCapital.dpo !== null && workingCapital.dpo > 45 ? 'warning' : 'info'}
@@ -779,7 +780,7 @@ const FinanceDashboardView = () => {
             return (
               <HorizontalWithSubtitle
                 title='Ratio nómina / ingresos'
-                stats={ratio !== null ? `${ratio}%` : 'Sin datos'}
+                stats={ratio !== null ? <><AnimatedCounter value={ratio} format='percentage' /></> : 'Sin datos'}
                 subtitle='Costo bruto de nómina como porcentaje del ingreso neto'
                 avatarIcon='tabler-percentage'
                 avatarColor={ratio !== null && ratio > 70 ? 'error' : ratio !== null && ratio > 50 ? 'warning' : 'success'}

@@ -8,9 +8,10 @@
 
 - `TASK-118` ya cerró la foundation backend/pipeline de `ICO AI Core`.
 - Los query tools de Agency pueden consumir `ico_ai_signals` y readers persistidos como contexto upstream cuando corresponda.
-- El carril LLM async no lo implementa esta task:
-  - queda en `TASK-232`
-  - `TASK-159` sigue siendo consumer/tooling, no runtime owner del pipeline generativo
+- `TASK-232` ya cerró el carril LLM async:
+  - `TASK-159` debe tratarlo como dependency ya disponible
+  - reutilizar readers tipo `llm-enrichment-reader` para tools Agency/Nexa en vez de crear wiring nuevo
+  - esta task sigue siendo consumer/tooling, no runtime owner del pipeline generativo
 
 # TASK-159 — Nexa Agency Tools: Query, Recommend, Act
 

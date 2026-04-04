@@ -2785,9 +2785,15 @@ No se requiere cambiar fórmulas de métricas, duplicar SQL, ni crear nuevos end
   - `materializeMonthlySnapshots()` ejecuta `materializeAiSignals()` como step aditivo posterior a las métricas base
   - el runtime emite `ico.ai_signals.materialized`
   - `greenhouse_serving.ico_ai_signals` funciona como cache serving y se refresca vía proyección reactiva BQ -> PG
+- `TASK-232` ya agregó la lane generativa async sin romper el carril base:
+  - provider policy efectiva: `Vertex AI` + `@google/genai` + `Gemini`
+  - baseline activo: `google/gemini-2.5-flash@default`
+  - trigger: proyección reactiva colgada de `ico.ai_signals.materialized`
+  - storage: `ico_engine.ai_signal_enrichments`, `ico_engine.ai_enrichment_runs`, `greenhouse_serving.ico_ai_signal_enrichments`, `greenhouse_serving.ico_ai_enrichment_runs`
+  - consumers iniciales: `Agency`, `Ops Health` y `Nexa`
 - El scope actual sigue siendo internal-only y advisory-only. Los follow-ons de scoring compuesto, riesgo, churn, forecast avanzado o surfaces client-facing permanecen en `TASK-150` a `TASK-159`.
 - `TASK-118` queda cerrada sobre esta foundation determinística.
-- La lane LLM async de quality scoring / explanations continúa separada en `TASK-232`.
+- `TASK-232` queda cerrada sobre esta primera implementación de quality scoring + explanations persistidas.
 
 ### 13.1 Visión
 
@@ -2823,11 +2829,13 @@ Step 11: Persist ai_signals    — BigQuery + sync a Postgres cache
 |-------|--------|-----------|
 | `ai_signals` | `ico_engine` (BQ) + `greenhouse_serving` (PG) | Anomalías, predicciones, root cause, recomendaciones |
 | `ai_prediction_log` | `ico_engine` (BQ) | Tracking predicción vs resultado para calibración |
+| `ai_signal_enrichments` | `ico_engine` (BQ) + `greenhouse_serving` (PG) | Quality score, explanation summary, root-cause narrative y recommended action por `signal_id` |
+| `ai_enrichment_runs` | `ico_engine` (BQ) + `greenhouse_serving` (PG) | Run audit de la lane LLM: trigger, status, tokens, latencia y conteos |
 | `csc_transition_matrix` | `ico_engine` (BQ) | Probabilidades Markov por Space |
 | `csc_dwell_times` | `ico_engine` (BQ) | Tiempo promedio por fase CSC |
 | `seasonal_indices` | `ico_engine` (BQ) | Index estacional por (Space, metric, month) |
 
-La tabla `ai_metric_scores` (§5.5, ya creada vacía) se activa en `TASK-232` (Quality Scoring con LLM async).
+La tabla `ai_metric_scores` (§5.5) se mantiene para score task-level ya existentes (`TASK-220`, `TASK-223`), mientras que las explanations signal-scoped y el run audit de la lane LLM viven en el storage complementario anterior.
 
 ### 13.5 Roadmap de ejecución
 
@@ -2840,7 +2848,7 @@ La tabla `ai_metric_scores` (§5.5, ya creada vacía) se activa en `TASK-232` (Q
 | **3** | Predictive Metrics | Linear extrapolation + progress blending | ~4h |
 | **4** | Capacity Forecasting | Throughput × pipeline vs FTE contratado | ~3h |
 | **5** | Resource Optimization | Rule engine sobre señales 1-4 | ~3h |
-| **6** | Quality Scoring | LLM async sobre tasks completadas → `ai_metric_scores` | ~6h |
+| **6** | Quality Scoring | Cerrado en `TASK-232`: LLM async sobre `ai_signals` persistidas + storage complementario BQ/PG | Implementado |
 
 #### Phase 2 — Robustness
 

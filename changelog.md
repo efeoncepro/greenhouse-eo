@@ -2,6 +2,30 @@
 
 ## 2026-04-04
 
+- **TASK-232 ICO LLM async lane implemented end-to-end**:
+  - `ICO` ya tiene carril LLM async sobre `ico.ai_signals.materialized`, desacoplado del request path principal
+  - provider/runtime efectivo: `Vertex AI` + `@google/genai` + `Gemini` con baseline `google/gemini-2.5-flash@default`
+  - nuevo storage complementario para explanations + run audit:
+    - BQ: `ico_engine.ai_signal_enrichments`, `ico_engine.ai_enrichment_runs`
+    - PG serving: `greenhouse_serving.ico_ai_signal_enrichments`, `greenhouse_serving.ico_ai_enrichment_runs`
+  - nuevo worker/provider/readers:
+    - `src/lib/ico-engine/ai/llm-provider.ts`
+    - `src/lib/ico-engine/ai/llm-enrichment-worker.ts`
+    - `src/lib/ico-engine/ai/llm-enrichment-reader.ts`
+    - `src/lib/sync/projections/ico-llm-enrichments.ts`
+  - `Agency > ICO Engine` ahora expone `aiLlm`, `Operations Overview` agrega `AI LLM Enrichment` y `Nexa > get_otd` incorpora resumen breve de enriquecimientos recientes
+  - migración aplicada: `20260404123559856_task-232-ico-llm-enrichments`
+  - verificado con `pnpm lint`, `pnpm clean && pnpm build`, `pnpm test` y `pnpm migrate:up`
+
+- **TASK-230 Portal Animation Library Integration (pilot)**:
+  - instaladas `lottie-react` y `framer-motion` como stack de animación del portal
+  - creados wrappers `src/libs/Lottie.tsx` y `src/libs/FramerMotion.tsx` siguiendo patrón ApexCharts
+  - nuevo hook `useReducedMotion` para cumplir `prefers-reduced-motion` en toda animación
+  - `EmptyState` ahora acepta `animatedIcon` (Lottie JSON) sin romper los 37 consumers existentes
+  - nuevo componente `AnimatedCounter` para transiciones numéricas en KPIs (currency, percentage, integer)
+  - `HorizontalWithSubtitle.stats` ampliado a `string | ReactNode` para soportar AnimatedCounter inline
+  - piloto Finance: DSO, DPO, Payroll Ratio con AnimatedCounter + 2 EmptyState animados en Period Closure
+
 - **TASK-118 AI Core foundation formally closed**:
   - la task queda cerrada sobre la foundation deterministic-first ya implementada: `ai_signals`, `ai_prediction_log`, `ico.ai_signals.materialized`, `greenhouse_serving.ico_ai_signals` y consumers base
   - el carril LLM async deja de quedar como deuda implícita y pasa explícitamente a `TASK-232`

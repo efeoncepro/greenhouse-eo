@@ -6,6 +6,8 @@ import { ROLE_CODES } from '@/config/role-codes'
 import { getOrganizationOperationalServing } from '@/lib/account-360/get-organization-operational-serving'
 import { getAgencyPulseKpis } from '@/lib/agency/agency-queries'
 import { readOrganizationAiSignals, type AiSignalListItem } from '@/lib/ico-engine/ai/read-signals'
+import { readOrganizationAiLlmEnrichments } from '@/lib/ico-engine/ai/llm-enrichment-reader'
+import type { OrganizationAiLlmEnrichmentItem } from '@/lib/ico-engine/ai/llm-types'
 import { ensureEmailSchema } from '@/lib/email/schema'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import { getFinanceProjectId, roundCurrency, runFinanceQuery, toNumber as toFinanceNumber } from '@/lib/finance/shared'
@@ -134,6 +136,27 @@ const summarizeAiSignals = (signals: AiSignalListItem[]) => {
   }
 }
 
+const summarizeAiLlmEnrichments = (items: OrganizationAiLlmEnrichmentItem[]) => {
+  if (items.length === 0) {
+    return null
+  }
+
+  const latest = items[0]
+  const fragments = [`Encontré ${items.length} enriquecimientos LLM recientes`]
+
+  if (latest?.metricName) {
+    fragments.push(`el último cubre ${latest.metricName}`)
+  }
+
+  if (latest?.recommendedAction) {
+    fragments.push(`y recomienda ${latest.recommendedAction}`)
+  } else if (latest?.explanationSummary) {
+    fragments.push(`con foco en ${latest.explanationSummary}`)
+  }
+
+  return `${fragments.join('; ')}.`
+}
+
 const checkPayrollTool: NexaToolDefinition = {
   declaration: {
     name: 'check_payroll',
@@ -240,11 +263,15 @@ const getOtdTool: NexaToolDefinition = {
 
       const aiSignals = await readOrganizationAiSignals(tenant.organizationId, 3).catch(() => [])
       const aiSignalSummary = summarizeAiSignals(aiSignals)
+      const aiLlmEnrichments = await readOrganizationAiLlmEnrichments(tenant.organizationId, 3).catch(() => [])
+      const aiLlmNote = summarizeAiLlmEnrichments(aiLlmEnrichments)
 
       const aiSignalNote =
         aiSignals.length > 0
           ? `Encontré ${aiSignals.length} señales AI recientes${aiSignalSummary.critical > 0 ? `, incluyendo ${aiSignalSummary.critical} críticas` : ''}.`
           : null
+
+      const notes = [aiSignalNote, aiLlmNote].filter((note): note is string => Boolean(note))
 
       const metrics: NexaToolResult['metrics'] = [
         { label: 'OTD', value: formatPercent(serving.current.otdPct) || 'Sin datos', tone: serving.current.otdPct >= 90 ? 'success' : 'warning' },
@@ -260,16 +287,24 @@ const getOtdTool: NexaToolDefinition = {
         })
       }
 
+      if (aiLlmEnrichments.length > 0) {
+        metrics.push({
+          label: 'LLM',
+          value: String(aiLlmEnrichments.length),
+          tone: 'info'
+        })
+      }
+
       return {
         available: true,
         summary:
           `El OTD actual de ${tenant.organizationName || 'la organización'} es ${formatPercent(serving.current.otdPct)} en ${formatPeriodLabel(serving.current.periodYear, serving.current.periodMonth)}.` +
-          (aiSignalNote ? ` ${aiSignalNote}` : ''),
+          (notes.length > 0 ? ` ${notes.join(' ')}` : ''),
         source: 'postgres',
         scopeLabel: tenant.organizationName || 'Organización activa',
         generatedAt: new Date().toISOString(),
         metrics,
-        notes: aiSignalNote ? [aiSignalNote] : undefined,
+        notes: notes.length > 0 ? notes : undefined,
         raw: {
           scope: 'organization',
           organizationId: tenant.organizationId,
@@ -293,6 +328,18 @@ const getOtdTool: NexaToolDefinition = {
             confidence: signal.confidence,
             actionSummary: signal.actionSummary,
             generatedAt: signal.generatedAt
+          })),
+          aiLlmEnrichments: aiLlmEnrichments.map(item => ({
+            signalId: item.signalId,
+            spaceId: item.spaceId,
+            metricName: item.metricName,
+            signalType: item.signalType,
+            severity: item.severity,
+            qualityScore: item.qualityScore,
+            explanationSummary: item.explanationSummary,
+            recommendedAction: item.recommendedAction,
+            confidence: item.confidence,
+            processedAt: item.processedAt
           }))
         }
       }

@@ -15,7 +15,7 @@ import CustomAvatar from '@core/components/mui/Avatar'
 
 export type HorizontalWithSubtitleData = {
   title: string
-  stats: string
+  stats: string | React.ReactNode
   avatarIcon: string
   avatarColor?: ThemeColor
   trend?: 'positive' | 'negative' | 'neutral'

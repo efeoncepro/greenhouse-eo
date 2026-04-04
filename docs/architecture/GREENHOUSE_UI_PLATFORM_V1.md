@@ -398,6 +398,8 @@ Candidatos: Organization Detail, Space Detail, Client Detail, Provider Detail.
 | `@react-email/components` | 6+ | Templates de email transaccional |
 | `@assistant-ui/react` | 3+ | Nexa AI assistant UI |
 | `@sentry/nextjs` | 4 | Error tracking y observability |
+| `lottie-react` | 1+ | Animated illustrations en empty states (dynamic import, SSR-safe) |
+| `framer-motion` | 1+ | Micro-interacciones numéricas (AnimatedCounter en KPIs) |
 
 ### Instaladas pero NO usadas (oportunidad de activación)
 
@@ -797,6 +799,114 @@ import type { OperationsOverview } from '@/lib/operations/get-operations-overvie
 <StyledBox>
 ```
 
+## Animation Architecture (TASK-230)
+
+### Stack
+
+| Librería | Wrapper | Uso principal |
+|----------|---------|---------------|
+| `lottie-react` | `src/libs/Lottie.tsx` | Ilustraciones animadas (empty states, loading, onboarding) |
+| `framer-motion` | `src/libs/FramerMotion.tsx` | Micro-interacciones (counters, transitions, layout animations) |
+
+Ambas se cargan via dynamic import o `'use client'` re-export para evitar problemas SSR.
+
+### Accesibilidad — prefers-reduced-motion (obligatorio)
+
+Toda animación nueva DEBE respetar `prefers-reduced-motion: reduce`. El hook canónico:
+
+```tsx
+import useReducedMotion from '@/hooks/useReducedMotion'
+const prefersReduced = useReducedMotion()
+// Si true → renderizar estado final sin animación
+```
+
+Cuando `prefersReduced` es `true`:
+- `EmptyState` muestra el icono estático (fallback `icon`)
+- `AnimatedCounter` renderiza el valor final instantáneamente
+- Componentes futuros deben seguir el mismo contrato
+
+### Componentes
+
+#### AnimatedCounter
+
+Transición numérica para KPIs. Anima al entrar en viewport (una vez).
+
+```tsx
+import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
+
+<AnimatedCounter value={42} format='integer' />           // "42"
+<AnimatedCounter value={1250000} format='currency' />      // "$1.250.000"
+<AnimatedCounter value={94.5} format='percentage' />       // "94,5%"
+<AnimatedCounter value={42} format='integer' duration={1.2} />  // duración custom
+```
+
+| Prop | Tipo | Default | Descripción |
+|------|------|---------|-------------|
+| `value` | `number` | (requerido) | Valor numérico final |
+| `format` | `'currency' \| 'percentage' \| 'integer'` | `'integer'` | Formato de salida |
+| `currency` | `string` | `'CLP'` | Código ISO para formato currency |
+| `duration` | `number` | `0.8` | Duración en segundos |
+| `locale` | `string` | `'es-CL'` | Locale para Intl.NumberFormat |
+
+Para usar dentro de `HorizontalWithSubtitle` (el prop `stats` acepta `string | ReactNode`):
+
+```tsx
+<HorizontalWithSubtitle
+  title='DSO'
+  stats={<><AnimatedCounter value={42} format='integer' /> días</>}
+  subtitle='Days Sales Outstanding'
+  avatarIcon='tabler-clock-dollar'
+  avatarColor='success'
+/>
+```
+
+#### EmptyState — prop animatedIcon
+
+```tsx
+<EmptyState
+  icon='tabler-calendar-off'                    // fallback estático (siempre requerido)
+  animatedIcon='/animations/empty-inbox.json'   // Lottie JSON path (opcional)
+  title='No hay períodos'
+  description='Cambia el filtro para ver otros meses.'
+/>
+```
+
+- Si `animatedIcon` se pasa y carga correctamente → muestra animación Lottie (64×64px, loop)
+- Si falla la carga → fallback silencioso al `icon` estático
+- Si `prefers-reduced-motion` → siempre muestra `icon` estático
+
+### Assets Lottie
+
+Directorio: `public/animations/`
+
+| Archivo | Uso |
+|---------|-----|
+| `empty-inbox.json` | Empty states genéricos (sin datos, sin períodos) |
+| `empty-chart.json` | Empty states de charts/visualizaciones |
+
+Para agregar assets nuevos:
+1. Descargar JSON desde [LottieFiles](https://lottiefiles.com) (formato Bodymovin JSON, no dotLottie)
+2. Guardar en `public/animations/` con nombre descriptivo kebab-case
+3. Usar colores neutros o de la paleta Greenhouse (los assets se renderizan tal cual)
+4. Tamaño recomendado del canvas: 120×120px
+
+### Reglas de adopción
+
+- **Reutilizar `AnimatedCounter`** antes de crear otro componente de transición numérica
+- **Reutilizar `useReducedMotion`** para cualquier animación condicional
+- **No importar `framer-motion` directo** — usar `src/libs/FramerMotion.tsx` para re-exports centralizados
+- **No importar `lottie-react` directo** — usar `src/libs/Lottie.tsx` (dynamic import SSR-safe)
+- **Lottie JSON < 50KB** recomendado para cada asset individual
+- **No usar GSAP ni Three.js** para micro-interacciones — están fuera del scope de animación UI (Three.js se reserva para TASK-233 logo animation)
+- **El prop `animatedIcon` es opt-in** — no reemplazar empty states masivamente sin validación visual
+
+### Pilotos activos
+
+| Vista | Componente | Instancias |
+|-------|-----------|------------|
+| Finance Dashboard | `AnimatedCounter` | 3 (DSO, DPO, Ratio nómina/ingresos) |
+| Finance Period Closure | `EmptyState` + `animatedIcon` | 2 (períodos vacíos, snapshots vacíos) |
+
 ## Anti-Patterns
 
 - No usar MUI raw cuando existe wrapper Vuexy
@@ -807,3 +917,5 @@ import type { OperationsOverview } from '@/lib/operations/get-operations-overvie
 - No crear stat displays custom cuando un card-statistics component sirve
 - No usar Redux para estado local — `useState` o `react-hook-form`
 - No instalar librerías nuevas sin verificar si ya están disponibles en este inventario
+- No importar `lottie-react` o `framer-motion` directo — usar los wrappers en `src/libs/`
+- No crear animaciones que ignoren `prefers-reduced-motion` — usar `useReducedMotion` hook

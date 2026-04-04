@@ -1,3 +1,7 @@
+## Delta 2026-04-04
+- `TASK-232` ya cerró la lane LLM async del `ICO Engine`.
+- Si esta task necesita narrativa de riesgo comercial o acción sugerida, debe consumir salida persistida (`ico_ai_signal_enrichments`) como capa advisory y mantener el forecast base en reglas/probabilidades materializadas, nunca en inferencia LLM inline.
+
 # TASK-154 — Revenue Pipeline Intelligence (HubSpot to Forecast)
 
 ## Status

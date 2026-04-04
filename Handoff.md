@@ -1,5 +1,164 @@
 # Handoff.md
 
+## Sesión 2026-04-04 — TASK-232 implementada end-to-end y cerrada
+
+### Rama / alcance
+
+- rama actual: `task/TASK-230-portal-animation-library`
+- scope final:
+  - lane async LLM del `ICO Engine`
+  - storage complementario BQ/PG para explanations + run audit
+  - proyección reactiva y readers downstream en `Agency`, `Ops Health` y `Nexa`
+
+### Qué se hizo
+
+- Se creó la lane generativa async colgada de `ico.ai_signals.materialized` sin tocar el request path crítico del materializer.
+- Provider/model policy activa:
+  - `Vertex AI`
+  - `@google/genai`
+  - `Gemini`
+  - baseline: `google/gemini-2.5-flash@default`
+- Nuevos artefactos principales:
+  - `src/lib/ico-engine/ai/llm-provider.ts`
+  - `src/lib/ico-engine/ai/llm-enrichment-worker.ts`
+  - `src/lib/ico-engine/ai/llm-enrichment-reader.ts`
+  - `src/lib/ico-engine/ai/llm-types.ts`
+  - `src/lib/sync/projections/ico-llm-enrichments.ts`
+  - migración `20260404123559856_task-232-ico-llm-enrichments.sql`
+- Se agregaron tablas/contratos:
+  - BQ: `ai_signal_enrichments`, `ai_enrichment_runs`
+  - PG serving: `ico_ai_signal_enrichments`, `ico_ai_enrichment_runs`
+- Downstream:
+  - `Agency > ICO Engine` ahora expone `aiLlm`
+  - `Ops Health` ahora muestra `AI LLM Enrichment`
+  - `Nexa > get_otd` agrega resumen breve de enriquecimientos recientes
+- Documentación cruzada actualizada:
+  - `docs/tasks/README.md`
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+  - deltas en `TASK-150`, `TASK-151`, `TASK-152`, `TASK-154`, `TASK-155`, `TASK-159`
+
+### Verificación
+
+- `pnpm lint` — OK
+- `pnpm clean && pnpm build` — OK
+- `pnpm test` — OK
+- `pnpm migrate:up` — OK
+  - migración aplicada
+  - `src/types/db.d.ts` regenerado
+
+### Pendiente / follow-up real
+
+- Calibrar umbrales y uso downstream del `qualityScore` antes de convertirlo en input fuerte de scoring compuesto (`TASK-150`, `TASK-151`)
+- Evaluar provider-per-metric solo después de observar costos/latencia reales con el baseline Gemini
+
+## Sesión 2026-04-04 — TASK-232 downstream wiring integrado
+
+### Rama / alcance
+
+- rama actual: `task/TASK-230-portal-animation-library`
+- scope: consumo downstream del carril LLM de `TASK-232` sin tocar worker, migraciones ni el pipeline reactivo base
+
+### Qué se hizo
+
+- Se consolidó el reader reusable `src/lib/ico-engine/ai/llm-enrichment-reader.ts` para resumir enriquecimientos LLM y el snapshot operativo del carril
+- `src/app/api/ico-engine/metrics/agency/route.ts` ahora devuelve `aiLlm` además de `aiCore`
+- `src/lib/operations/get-operations-overview.ts` suma el subsystem `AI LLM Enrichment` con fallback `not_configured` si faltan tablas
+- `src/lib/nexa/nexa-tools.ts` ahora adjunta un resumen breve de enriquecimientos LLM recientes al tool `get_otd` para organizaciones
+
+### Verificación
+
+- `pnpm exec eslint src/app/api/ico-engine/metrics/agency/route.ts src/lib/operations/get-operations-overview.ts src/lib/nexa/nexa-tools.ts src/lib/ico-engine/ai/llm-enrichment-reader.ts src/lib/ico-engine/ai/llm-types.ts` — OK
+- `pnpm build` — OK
+- `pnpm lint` global — bloqueado por `src/lib/ico-engine/ai/llm-enrichment-worker.ts` en trabajo paralelo fuera de este alcance
+
+### Pendiente para cierre
+
+- Validar el worker LLM cuando su autor lo tome o cuando se autorice tocar ese archivo
+- Si cambia el contrato de `AiSignalEnrichmentRecord`, revisar de nuevo el worker para mantener compatibilidad
+
+## Sesión 2026-04-04 — TASK-230 Animation Library Integration
+
+### Rama / alcance
+
+- rama: `task/TASK-230-portal-animation-library`
+- scope: integración de `lottie-react` + `framer-motion` al portal
+
+### Qué se hizo
+
+- Instaladas dependencias: `lottie-react@2.4.1`, `framer-motion@12.38.0`
+- Creados wrappers: `src/libs/Lottie.tsx` (dynamic import), `src/libs/FramerMotion.tsx` (client re-export)
+- Creado hook `src/hooks/useReducedMotion.ts` para `prefers-reduced-motion`
+- Creado `src/components/greenhouse/AnimatedCounter.tsx` con Framer Motion `useSpring`
+- Extendido `EmptyState.tsx` con prop `animatedIcon` (backward-compatible, 37 consumers)
+- Ampliado tipo `stats` en `HorizontalWithSubtitle` a `string | ReactNode`
+- Piloto en Finance: 3 AnimatedCounter (DSO, DPO, Payroll Ratio) + 2 animated EmptyState (Period Closure)
+- Assets Lottie: `public/animations/empty-inbox.json`, `public/animations/empty-chart.json`
+
+### Verificación
+
+- `pnpm build` — OK
+- `pnpm lint` — OK
+- `npx tsc --noEmit` — OK
+- `pnpm test` — 218 files, 914 tests pass
+
+### Pendiente para cierre
+
+- Preview visual en navegador (manual)
+- Validación `prefers-reduced-motion` en OS (manual)
+
+---
+
+## Sesión 2026-04-04 — TASK-232 auditada, movida a in-progress y rebaselinada
+
+### Rama / alcance
+
+- rama actual: `feature/codex-task-232-ico-llm-pipeline`
+- scope inicial:
+  - `docs/tasks/in-progress/TASK-232-ico-llm-quality-scoring-explanation-pipeline.md`
+  - `docs/tasks/README.md`
+  - `Handoff.md`
+  - auditoría runtime/documental sobre:
+    - `src/lib/ico-engine/materialize.ts`
+    - `src/lib/ico-engine/schema.ts`
+    - `src/lib/ico-engine/ai/materialize-ai-signals.ts`
+    - `src/lib/ico-engine/ai/read-signals.ts`
+    - `src/lib/ico-engine/brief-clarity.ts`
+    - `src/lib/ico-engine/methodological-accelerators.ts`
+    - `src/lib/sync/event-catalog.ts`
+    - `src/lib/sync/reactive-consumer.ts`
+    - `src/lib/sync/refresh-queue.ts`
+    - `src/lib/sync/projections/ico-ai-signals.ts`
+    - `src/lib/ai/google-genai.ts`
+    - `src/config/nexa-models.ts`
+    - `src/lib/nexa/nexa-service.ts`
+    - `src/lib/nexa/nexa-tools.ts`
+    - `src/lib/operations/get-operations-overview.ts`
+    - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+    - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+    - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+    - `docs/architecture/GREENHOUSE_NEXA_ARCHITECTURE_V1.md`
+    - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
+    - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+    - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+    - `docs/architecture/schema-snapshot-baseline.sql`
+
+### Resultado
+
+- `TASK-232` quedó movida a `in-progress` y la spec ya refleja el baseline real del repo.
+- La auditoría confirmó:
+  - `TASK-118` ya está cerrada y no debe seguir tratándose como prerequisito abierto
+  - `ai_metric_scores` ya tiene consumers runtime reales (`BCS` y `Brand Consistency`)
+  - la lane correcta para `TASK-232` cuelga de `ico.ai_signals.materialized` usando `outbox` + `reactive-consumer`
+  - el baseline operativo del provider en repo es `Vertex AI` + `@google/genai` + `Gemini`
+  - `ai_metric_scores` no alcanza por sí sola para esta lane porque faltan `signal_id`, `status`, `tokens_in`, `tokens_out` y storage de explanations/run audit
+- `docs/tasks/README.md` ya quedó alineado con el nuevo estado `in-progress`.
+
+### Riesgos / siguientes pasos
+
+- La arquitectura histórica de `Greenhouse_ICO_Engine_v1.md` todavía mezcla diseño viejo con `Claude via Vertex`; en esta lane debe prevalecer el baseline Gemini ya operativo del repo.
+- `docs/architecture/schema-snapshot-baseline.sql` quedó atrasado para este dominio tras `TASK-118`; para `TASK-232` prevalecen `src/lib/ico-engine/schema.ts`, la migración PG de `ico_ai_signals` y `src/types/db.d.ts`.
+- La implementación debería crear storage complementario para explanations y run audit antes de abrir consumers downstream nuevos.
+
 ## Sesión 2026-04-04 — TASK-118 cerrada y TASK-232 desbloqueada
 
 ### Rama / alcance

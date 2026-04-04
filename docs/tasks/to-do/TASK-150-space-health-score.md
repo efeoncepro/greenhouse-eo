@@ -1,3 +1,7 @@
+## Delta 2026-04-04
+- `TASK-232` ya cerró la lane LLM async del `ICO Engine`.
+- Esta task puede consumir `greenhouse_serving.ico_ai_signal_enrichments` como señal advisory adicional para explicar o matizar el score, pero no debe reemplazar las dimensiones base ni convertir una explicación generativa en score primario.
+
 ## Delta 2026-03-30
 - `TASK-142` ya expone badges `Health` y breakdown operativo heurístico en `Space 360`.
 - Esta task ya no debe recrear la shell de UI; debe reemplazar la heurística transicional por un score materializado y reutilizar la superficie ya implementada en `src/views/greenhouse/agency/space-360/tabs/OverviewTab.tsx`.

@@ -298,6 +298,76 @@ const buildAiPredictionLogTable = (projectId: string) => `
 `
 
 /**
+ * LLM enrichments generated from persisted AI signals.
+ * Keeps signal-scoped explanation payloads and model metadata in BigQuery.
+ */
+const buildAiSignalEnrichmentsTable = (projectId: string) => `
+  CREATE TABLE IF NOT EXISTS \`${projectId}.${ICO_DATASET}.ai_signal_enrichments\` (
+    enrichment_id STRING NOT NULL,
+    run_id STRING NOT NULL,
+    signal_id STRING NOT NULL,
+    space_id STRING NOT NULL,
+    member_id STRING,
+    project_id STRING,
+    signal_type STRING NOT NULL,
+    metric_name STRING NOT NULL,
+    period_year INT64 NOT NULL,
+    period_month INT64 NOT NULL,
+    severity STRING,
+    quality_score FLOAT64,
+    explanation_summary STRING,
+    root_cause_narrative STRING,
+    recommended_action STRING,
+    explanation_json STRING,
+    model_id STRING NOT NULL,
+    prompt_version STRING NOT NULL,
+    prompt_hash STRING,
+    confidence FLOAT64,
+    tokens_in INT64,
+    tokens_out INT64,
+    latency_ms INT64,
+    status STRING NOT NULL,
+    error_message STRING,
+    input_signal_snapshot STRING,
+    processed_at TIMESTAMP,
+    _synced_at TIMESTAMP
+  )
+  PARTITION BY DATE(processed_at)
+  CLUSTER BY space_id, period_year, period_month, signal_id
+`
+
+/**
+ * Run-level audit trail for the async LLM lane.
+ * Tracks status, counters, prompt policy and aggregate token usage by run.
+ */
+const buildAiEnrichmentRunsTable = (projectId: string) => `
+  CREATE TABLE IF NOT EXISTS \`${projectId}.${ICO_DATASET}.ai_enrichment_runs\` (
+    run_id STRING NOT NULL,
+    trigger_event_id STRING,
+    space_id STRING,
+    period_year INT64 NOT NULL,
+    period_month INT64 NOT NULL,
+    trigger_type STRING NOT NULL,
+    status STRING NOT NULL,
+    signals_seen INT64,
+    signals_enriched INT64,
+    signals_failed INT64,
+    model_id STRING NOT NULL,
+    prompt_version STRING NOT NULL,
+    prompt_hash STRING,
+    tokens_in INT64,
+    tokens_out INT64,
+    latency_ms INT64,
+    error_message STRING,
+    started_at TIMESTAMP,
+    completed_at TIMESTAMP,
+    _synced_at TIMESTAMP
+  )
+  PARTITION BY DATE(started_at)
+  CLUSTER BY period_year, period_month, status
+`
+
+/**
  * Detail table for stuck assets (spec §5.5). Full-refreshed daily by materialization.
  * 72h threshold aligns with v_tasks_enriched.is_stuck definition.
  */
@@ -805,6 +875,7 @@ export const ensureIcoEngineInfrastructure = async () => {
           FROM \`${projectId}.${ICO_DATASET}.INFORMATION_SCHEMA.TABLES\`
           WHERE table_name IN (
             'metric_snapshots_monthly', 'ai_metric_scores', 'ai_signals', 'ai_prediction_log',
+            'ai_signal_enrichments', 'ai_enrichment_runs',
             'stuck_assets_detail', 'rpa_trend', 'metrics_by_project',
             'metrics_by_member', 'metrics_by_sprint', 'metrics_by_organization',
             'metrics_by_business_unit', 'performance_report_monthly',
@@ -823,6 +894,8 @@ export const ensureIcoEngineInfrastructure = async () => {
         ['ai_metric_scores', buildAiMetricScoresTable(projectId)],
         ['ai_signals', buildAiSignalsTable(projectId)],
         ['ai_prediction_log', buildAiPredictionLogTable(projectId)],
+        ['ai_signal_enrichments', buildAiSignalEnrichmentsTable(projectId)],
+        ['ai_enrichment_runs', buildAiEnrichmentRunsTable(projectId)],
         ['stuck_assets_detail', buildStuckAssetsDetailTable(projectId)],
         ['rpa_trend', buildRpaTrendTable(projectId)],
         ['metrics_by_project', buildMetricsByProjectTable(projectId)],

@@ -29,4 +29,34 @@ describe('EmptyState', () => {
 
     expect(container.querySelector('.tabler-bolt')).toBeInTheDocument()
   })
+
+  it('renders static icon when animatedIcon is provided but reduced motion is preferred', () => {
+    // With matchMedia mocked to prefer reduced motion, should fall back to static icon
+    const originalMatchMedia = window.matchMedia
+
+    window.matchMedia = (query: string) =>
+      ({
+        matches: query === '(prefers-reduced-motion: reduce)',
+        media: query,
+        onchange: null,
+        addListener: () => {},
+        removeListener: () => {},
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        dispatchEvent: () => false
+      }) as MediaQueryList
+
+    const { container } = renderWithTheme(
+      <EmptyState
+        icon='tabler-inbox'
+        animatedIcon='/animations/empty-inbox.json'
+        title='Sin datos'
+        description='No hay registros.'
+      />
+    )
+
+    // Should show the static icon fallback
+    expect(container.querySelector('.tabler-inbox')).toBeInTheDocument()
+    window.matchMedia = originalMatchMedia
+  })
 })
