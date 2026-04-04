@@ -23,11 +23,19 @@ import {
 } from './rpa-policy'
 import {
   ICO_METRIC_REGISTRY,
+  type MetricBenchmarkType,
+  type MetricQualityGateStatus,
   getThresholdZone,
   CSC_PHASE_LABELS,
   type CscPhase,
   type ThresholdZone
 } from './metric-registry'
+import {
+  buildMetricTrustMapFromRow,
+  type MetricTrustEvidence,
+  type MetricTrustMap,
+  type MetricTrustRowLike
+} from './metric-trust-policy'
 
 // ─── Row Types (match BigQuery columns) ─────────────────────────────────────
 
@@ -101,10 +109,16 @@ export interface MetricValue {
   metricId: string
   value: number | null
   zone: ThresholdZone | null
+  benchmarkType?: MetricBenchmarkType
+  benchmarkLabel?: string
+  benchmarkSource?: string
+  qualityGateStatus?: MetricQualityGateStatus
+  qualityGateReasons?: string[]
   dataStatus?: RpaDataStatus
   confidenceLevel?: RpaConfidenceLevel
   suppressionReason?: RpaSuppressionReason | null
   evidence?: RpaEvidenceCounts
+  trustEvidence?: MetricTrustEvidence
 }
 
 export interface CscDistributionEntry {
@@ -166,7 +180,7 @@ export interface IcoMetricSnapshot {
 
 // ─── Normalizers ────────────────────────────────────────────────────────────
 
-interface MetricAggregateRowLike {
+interface MetricAggregateRowLike extends MetricTrustRowLike {
   rpa_avg: unknown
   rpa_eligible_task_count: unknown
   rpa_missing_task_count: unknown
@@ -179,63 +193,68 @@ interface MetricAggregateRowLike {
   pipeline_velocity: unknown
   stuck_asset_count: unknown
   stuck_asset_pct: unknown
+  total_tasks: unknown
   completed_tasks: unknown
+  active_tasks: unknown
+  on_time_count: unknown
+  late_drop_count: unknown
+  overdue_count: unknown
 }
 
 const metricValueFromRow = (
   metricId: string,
   rawValue: unknown,
-  options?: {
-    completedTasks?: unknown
-    eligibleTaskCount?: unknown
-    missingTaskCount?: unknown
-    nonPositiveTaskCount?: unknown
-  }
+  trustMap: MetricTrustMap
 ): MetricValue => {
   const value = toNullableNumber(rawValue)
   const metric = ICO_METRIC_REGISTRY.find(m => m.id === metricId)
+  const trust = trustMap[metricId]
 
-  const rpaPolicy =
-    metricId === 'rpa' && options
+  const normalizedValue =
+    metricId === 'rpa'
       ? classifyRpaMetric({
           value,
-          completedTasks: toNullableNumber(options.completedTasks),
-          eligibleTaskCount: toNullableNumber(options.eligibleTaskCount),
-          missingTaskCount: toNullableNumber(options.missingTaskCount),
-          nonPositiveTaskCount: toNullableNumber(options.nonPositiveTaskCount)
-        })
-      : null
+          completedTasks: trust?.trustEvidence.completedTasks,
+          eligibleTaskCount: trust?.evidence?.eligibleTasks,
+          missingTaskCount: trust?.evidence?.missingTasks,
+          nonPositiveTaskCount: trust?.evidence?.nonPositiveTasks
+        }).value
+      : value
 
-  const normalizedValue = rpaPolicy?.value ?? value
   const zone = metric && normalizedValue !== null ? getThresholdZone(metric, normalizedValue) : null
 
   return {
     metricId,
     value: normalizedValue,
     zone,
-    dataStatus: rpaPolicy?.dataStatus,
-    confidenceLevel: rpaPolicy?.confidenceLevel,
-    suppressionReason: rpaPolicy?.suppressionReason,
-    evidence: rpaPolicy?.evidence
+    benchmarkType: trust?.benchmarkType,
+    benchmarkLabel: trust?.benchmarkLabel,
+    benchmarkSource: trust?.benchmarkSource,
+    qualityGateStatus: trust?.qualityGateStatus,
+    qualityGateReasons: trust?.qualityGateReasons,
+    dataStatus: trust?.dataStatus,
+    confidenceLevel: trust?.confidenceLevel,
+    suppressionReason: trust?.suppressionReason,
+    evidence: trust?.evidence,
+    trustEvidence: trust?.trustEvidence
   }
 }
 
-const buildMetricValuesFromRow = (row: MetricAggregateRowLike): MetricValue[] => [
-  metricValueFromRow('rpa', row.rpa_avg, {
-    completedTasks: row.completed_tasks,
-    eligibleTaskCount: row.rpa_eligible_task_count,
-    missingTaskCount: row.rpa_missing_task_count,
-    nonPositiveTaskCount: row.rpa_non_positive_task_count
-  }),
-  metricValueFromRow('otd_pct', row.otd_pct),
-  metricValueFromRow('ftr_pct', row.ftr_pct),
-  metricValueFromRow('cycle_time', row.cycle_time_avg_days),
-  metricValueFromRow('cycle_time_variance', row.cycle_time_variance),
-  metricValueFromRow('throughput', row.throughput_count),
-  metricValueFromRow('pipeline_velocity', row.pipeline_velocity),
-  metricValueFromRow('stuck_assets', row.stuck_asset_count),
-  metricValueFromRow('stuck_asset_pct', row.stuck_asset_pct)
-]
+const buildMetricValuesFromRow = (row: MetricAggregateRowLike): MetricValue[] => {
+  const trustMap = buildMetricTrustMapFromRow(row)
+
+  return [
+    metricValueFromRow('rpa', row.rpa_avg, trustMap),
+    metricValueFromRow('otd_pct', row.otd_pct, trustMap),
+    metricValueFromRow('ftr_pct', row.ftr_pct, trustMap),
+    metricValueFromRow('cycle_time', row.cycle_time_avg_days, trustMap),
+    metricValueFromRow('cycle_time_variance', row.cycle_time_variance, trustMap),
+    metricValueFromRow('throughput', row.throughput_count, trustMap),
+    metricValueFromRow('pipeline_velocity', row.pipeline_velocity, trustMap),
+    metricValueFromRow('stuck_assets', row.stuck_asset_count, trustMap),
+    metricValueFromRow('stuck_asset_pct', row.stuck_asset_pct, trustMap)
+  ]
+}
 
 const parseCscDistribution = (raw: unknown, totalActive: number): CscDistributionEntry[] => {
   if (!raw || typeof raw !== 'string') return []

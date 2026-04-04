@@ -2105,6 +2105,7 @@ export interface GreenhouseServingAgencyPerformanceReports {
   efeonce_tasks_count: number | null;
   late_drop_count: number | null;
   materialized_at: Generated<Timestamp>;
+  metric_trust_json: Generated<Json>;
   multi_assignee_policy: string | null;
   on_time_count: number | null;
   on_time_pct: Numeric | null;
@@ -2218,6 +2219,7 @@ export interface GreenhouseServingIcoMemberMetrics {
   late_drop_count: number | null;
   materialized_at: Generated<Timestamp | null>;
   member_id: string;
+  metric_trust_json: Generated<Json>;
   on_time_count: number | null;
   otd_pct: Numeric | null;
   overdue_carried_forward_count: number | null;

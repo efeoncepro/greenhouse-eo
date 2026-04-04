@@ -2,6 +2,7 @@ import 'server-only'
 
 import type { ProjectionDefinition } from '../projection-registry'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { buildMetricTrustMapFromRow, serializeMetricTrustMap } from '@/lib/ico-engine/metric-trust-policy'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 const toNum = (v: unknown): number | null => {
@@ -85,6 +86,27 @@ export const icoMemberProjection: ProjectionDefinition = {
 
       const r = rows[0] as Record<string, unknown>
 
+      const metricTrustJson = serializeMetricTrustMap(buildMetricTrustMapFromRow({
+        rpa_avg: r.rpa_avg,
+        rpa_eligible_task_count: r.rpa_eligible_task_count,
+        rpa_missing_task_count: r.rpa_missing_task_count,
+        rpa_non_positive_task_count: r.rpa_non_positive_task_count,
+        otd_pct: r.otd_pct,
+        ftr_pct: r.ftr_pct,
+        cycle_time_avg_days: r.cycle_time_avg_days,
+        cycle_time_variance: r.cycle_time_variance,
+        throughput_count: r.throughput_count,
+        pipeline_velocity: r.pipeline_velocity,
+        stuck_asset_count: r.stuck_asset_count,
+        stuck_asset_pct: r.stuck_asset_pct,
+        total_tasks: r.total_tasks,
+        completed_tasks: r.completed_tasks,
+        active_tasks: r.active_tasks,
+        on_time_count: r.on_time_count,
+        late_drop_count: r.late_drop_count,
+        overdue_count: r.overdue_count
+      }))
+
       await runGreenhousePostgresQuery(
         `INSERT INTO greenhouse_serving.ico_member_metrics (
           member_id, period_year, period_month,
@@ -93,8 +115,9 @@ export const icoMemberProjection: ProjectionDefinition = {
           stuck_asset_count, stuck_asset_pct,
           total_tasks, completed_tasks, active_tasks,
           on_time_count, late_drop_count, overdue_count, carry_over_count, overdue_carried_forward_count,
+          metric_trust_json,
           materialized_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, NOW())
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21::jsonb, NOW())
         ON CONFLICT (member_id, period_year, period_month) DO UPDATE SET
           rpa_avg = EXCLUDED.rpa_avg,
           rpa_median = EXCLUDED.rpa_median,
@@ -113,6 +136,7 @@ export const icoMemberProjection: ProjectionDefinition = {
           overdue_count = EXCLUDED.overdue_count,
           carry_over_count = EXCLUDED.carry_over_count,
           overdue_carried_forward_count = EXCLUDED.overdue_carried_forward_count,
+          metric_trust_json = EXCLUDED.metric_trust_json,
           materialized_at = NOW()`,
         [
           memberId, year, month,
@@ -121,7 +145,8 @@ export const icoMemberProjection: ProjectionDefinition = {
           toNum(r.stuck_asset_count), toNum(r.stuck_asset_pct),
           toNum(r.total_tasks), toNum(r.completed_tasks), toNum(r.active_tasks),
           toNum(r.on_time_count), toNum(r.late_drop_count), toNum(r.overdue_count),
-          toNum(r.carry_over_count), toNum(r.overdue_carried_forward_count)
+          toNum(r.carry_over_count), toNum(r.overdue_carried_forward_count),
+          metricTrustJson
         ]
       )
 

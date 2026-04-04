@@ -3,6 +3,7 @@ import 'server-only'
 import type { ProjectionDefinition } from '../projection-registry'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { buildMetricTrustSnapshot } from '@/lib/ico-engine/performance-report'
 
 const toNum = (v: unknown): number | null => {
   if (v === null || v === undefined) return null
@@ -74,6 +75,7 @@ export const agencyPerformanceReportProjection: ProjectionDefinition = {
 
       const row = rows[0] as Record<string, unknown>
       const taskMixJson = toText(row.task_mix_json) ?? '[]'
+      const metricTrustJson = JSON.stringify(buildMetricTrustSnapshot(row as Parameters<typeof buildMetricTrustSnapshot>[0]))
 
       await runGreenhousePostgresQuery(
         `INSERT INTO greenhouse_serving.agency_performance_reports (
@@ -86,6 +88,7 @@ export const agencyPerformanceReportProjection: ProjectionDefinition = {
           top_performer_otd_pct, top_performer_throughput_count,
           top_performer_rpa_avg, top_performer_ftr_pct,
           top_performer_min_throughput, trend_stable_band_pp, multi_assignee_policy,
+          metric_trust_json,
           source, materialized_at
         ) VALUES (
           $1, $2, $3,
@@ -96,7 +99,7 @@ export const agencyPerformanceReportProjection: ProjectionDefinition = {
           $16, $17,
           $18, $19,
           $20, $21,
-          $22, $23, $24,
+          $22, $23, $24, $25::jsonb,
           'ico_engine.performance_report_monthly', NOW()
         )
         ON CONFLICT (report_scope, period_year, period_month) DO UPDATE SET
@@ -121,6 +124,7 @@ export const agencyPerformanceReportProjection: ProjectionDefinition = {
           top_performer_min_throughput = EXCLUDED.top_performer_min_throughput,
           trend_stable_band_pp = EXCLUDED.trend_stable_band_pp,
           multi_assignee_policy = EXCLUDED.multi_assignee_policy,
+          metric_trust_json = EXCLUDED.metric_trust_json,
           source = 'ico_engine.performance_report_monthly',
           materialized_at = NOW()`,
         [
@@ -132,7 +136,8 @@ export const agencyPerformanceReportProjection: ProjectionDefinition = {
           toText(row.top_performer_member_id), toText(row.top_performer_member_name),
           toNum(row.top_performer_otd_pct), toNum(row.top_performer_throughput_count),
           toNum(row.top_performer_rpa_avg), toNum(row.top_performer_ftr_pct),
-          toNum(row.top_performer_min_throughput), toNum(row.trend_stable_band_pp), toText(row.multi_assignee_policy)
+          toNum(row.top_performer_min_throughput), toNum(row.trend_stable_band_pp), toText(row.multi_assignee_policy),
+          metricTrustJson
         ]
       )
 

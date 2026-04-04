@@ -1,5 +1,28 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-03 — TASK-216 institutionalizes metric trust metadata and serving parity
+
+`TASK-216` ya dejó operativo el trust model genérico del engine por encima de la semántica congelada en `TASK-214` y de la policy específica de `RpA` cerrada en `TASK-215`.
+
+- `metric-registry.ts` ahora modela benchmark semantics por métrica:
+  - `external`
+  - `analog`
+  - `adapted`
+  - `internal`
+- `read-metrics.ts` ya debe exponer por métrica:
+  - `benchmarkType`
+  - `qualityGateStatus`
+  - `confidenceLevel`
+  - evidencia reusable de soporte
+- `RpA` conserva su sub-policy especializada (`dataStatus`, `suppressionReason`, `evidence`) y se integra al trust contract general sin redefinir la fórmula base
+- `greenhouse_serving.ico_member_metrics` y `greenhouse_serving.agency_performance_reports` ya persisten `metric_trust_json`
+- los readers serving-first (`People`, `Agency Performance Report`) deben leer ese JSON cuando exista y, si no existe todavía, derivarlo en runtime sin romper compatibilidad con filas legacy
+
+Implicación:
+
+- los consumers downstream ya no deben inferir benchmark o confianza localmente si el engine/serving ya entrega la metadata
+- `Agency` puede enfocarse en response shaping y UI semantics (`TASK-217`), no en abrir un segundo contrato de trust
+
 ## Delta 2026-04-03 — TASK-215 formalizes RpA runtime policy and evidence contract
 
 `TASK-215` no redefine la fórmula base de `RpA`; la formaliza como contrato runtime auditable sobre la policy implícita ya existente.
