@@ -1,5 +1,16 @@
 # Contrato de métricas ICO
 
+## Delta 2026-04-03 — TASK-215 adds runtime RpA confidence policy
+
+`TASK-215` no cambia la definición conceptual de `RpA`, pero sí formaliza que su lectura runtime debe viajar con policy de confianza y evidencia desde el `ICO Engine`.
+
+- la métrica sigue significando `Rounds per Asset`
+- el engine es quien clasifica la lectura como `valid`, `low_confidence`, `suppressed` o `unavailable`
+- los consumers no deben reinventar localmente la interpretación de `0` o `null`
+- cualquier surface que presente `RpA` debe respetar la naturaleza benchmark adaptada de la métrica y su estado de confianza
+
+Esta delta no altera la tabla de benchmarks de la sección 7; solo aclara el contrato de consumo para no perder trazabilidad entre métrica y evidencia.
+
 **Sistema de medición que conecta operación creativa con Revenue Enabled**
 
 Documento ancla — Fuente de verdad del ecosistema de métricas

@@ -16,6 +16,20 @@ const getMetricValue = (
   metricId: string
 ) => snapshot.metrics.find(metric => metric.metricId === metricId)?.value ?? null
 
+const getMetric = (
+  snapshot: {
+    metrics: Array<{
+      metricId: string
+      value: number | null
+      dataStatus?: PayrollKpiSnapshot['rpaDataStatus']
+      confidenceLevel?: PayrollKpiSnapshot['rpaConfidenceLevel']
+      suppressionReason?: PayrollKpiSnapshot['rpaSuppressionReason']
+      evidence?: PayrollKpiSnapshot['rpaEvidence']
+    }>
+  },
+  metricId: string
+) => snapshot.metrics.find(metric => metric.metricId === metricId) ?? null
+
 export const fetchKpisForPeriod = async ({
   memberIds,
   periodYear,
@@ -55,10 +69,16 @@ export const fetchKpisForPeriod = async ({
   const snapshots = new Map<string, PayrollKpiSnapshot>()
 
   for (const [memberId, snapshot] of materializedSnapshots.entries()) {
+    const rpaMetric = getMetric(snapshot, 'rpa')
+
     snapshots.set(memberId, {
       memberId,
       otdPercent: getMetricValue(snapshot, 'otd_pct'),
-      rpaAvg: getMetricValue(snapshot, 'rpa'),
+      rpaAvg: rpaMetric?.value ?? null,
+      rpaDataStatus: rpaMetric?.dataStatus ?? null,
+      rpaConfidenceLevel: rpaMetric?.confidenceLevel ?? null,
+      rpaSuppressionReason: rpaMetric?.suppressionReason ?? null,
+      rpaEvidence: rpaMetric?.evidence ?? null,
       tasksCompleted: snapshot.context.completedTasks,
       dataSource: 'ico',
       sourceMode: 'materialized'
@@ -84,10 +104,16 @@ export const fetchKpisForPeriod = async ({
         continue
       }
 
+      const rpaMetric = getMetric(liveSnapshot, 'rpa')
+
       snapshots.set(memberId, {
         memberId,
         otdPercent: getMetricValue(liveSnapshot, 'otd_pct'),
-        rpaAvg: getMetricValue(liveSnapshot, 'rpa'),
+        rpaAvg: rpaMetric?.value ?? null,
+        rpaDataStatus: rpaMetric?.dataStatus ?? null,
+        rpaConfidenceLevel: rpaMetric?.confidenceLevel ?? null,
+        rpaSuppressionReason: rpaMetric?.suppressionReason ?? null,
+        rpaEvidence: rpaMetric?.evidence ?? null,
         tasksCompleted: liveSnapshot.context.completedTasks,
         dataSource: 'ico',
         sourceMode: 'live'

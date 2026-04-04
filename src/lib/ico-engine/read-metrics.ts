@@ -15,6 +15,13 @@ import {
 } from './shared'
 import { ICO_DATASET, ENGINE_VERSION } from './schema'
 import {
+  classifyRpaMetric,
+  type RpaConfidenceLevel,
+  type RpaDataStatus,
+  type RpaEvidenceCounts,
+  type RpaSuppressionReason
+} from './rpa-policy'
+import {
   ICO_METRIC_REGISTRY,
   getThresholdZone,
   CSC_PHASE_LABELS,
@@ -31,6 +38,9 @@ interface SnapshotRow {
   period_year: unknown
   period_month: unknown
   rpa_avg: unknown
+  rpa_eligible_task_count: unknown
+  rpa_missing_task_count: unknown
+  rpa_non_positive_task_count: unknown
   otd_pct: unknown
   ftr_pct: unknown
   cycle_time_avg_days: unknown
@@ -57,6 +67,9 @@ interface SnapshotRow {
 interface LiveMetricRow {
   space_id: string
   rpa_avg: unknown
+  rpa_eligible_task_count: unknown
+  rpa_missing_task_count: unknown
+  rpa_non_positive_task_count: unknown
   otd_pct: unknown
   ftr_pct: unknown
   cycle_time_avg_days: unknown
@@ -88,6 +101,10 @@ export interface MetricValue {
   metricId: string
   value: number | null
   zone: ThresholdZone | null
+  dataStatus?: RpaDataStatus
+  confidenceLevel?: RpaConfidenceLevel
+  suppressionReason?: RpaSuppressionReason | null
+  evidence?: RpaEvidenceCounts
 }
 
 export interface CscDistributionEntry {
@@ -149,16 +166,76 @@ export interface IcoMetricSnapshot {
 
 // ─── Normalizers ────────────────────────────────────────────────────────────
 
+interface MetricAggregateRowLike {
+  rpa_avg: unknown
+  rpa_eligible_task_count: unknown
+  rpa_missing_task_count: unknown
+  rpa_non_positive_task_count: unknown
+  otd_pct: unknown
+  ftr_pct: unknown
+  cycle_time_avg_days: unknown
+  cycle_time_variance: unknown
+  throughput_count: unknown
+  pipeline_velocity: unknown
+  stuck_asset_count: unknown
+  stuck_asset_pct: unknown
+  completed_tasks: unknown
+}
+
 const metricValueFromRow = (
   metricId: string,
-  rawValue: unknown
+  rawValue: unknown,
+  options?: {
+    completedTasks?: unknown
+    eligibleTaskCount?: unknown
+    missingTaskCount?: unknown
+    nonPositiveTaskCount?: unknown
+  }
 ): MetricValue => {
   const value = toNullableNumber(rawValue)
   const metric = ICO_METRIC_REGISTRY.find(m => m.id === metricId)
-  const zone = metric && value !== null ? getThresholdZone(metric, value) : null
 
-  return { metricId, value, zone }
+  const rpaPolicy =
+    metricId === 'rpa' && options
+      ? classifyRpaMetric({
+          value,
+          completedTasks: toNullableNumber(options.completedTasks),
+          eligibleTaskCount: toNullableNumber(options.eligibleTaskCount),
+          missingTaskCount: toNullableNumber(options.missingTaskCount),
+          nonPositiveTaskCount: toNullableNumber(options.nonPositiveTaskCount)
+        })
+      : null
+
+  const normalizedValue = rpaPolicy?.value ?? value
+  const zone = metric && normalizedValue !== null ? getThresholdZone(metric, normalizedValue) : null
+
+  return {
+    metricId,
+    value: normalizedValue,
+    zone,
+    dataStatus: rpaPolicy?.dataStatus,
+    confidenceLevel: rpaPolicy?.confidenceLevel,
+    suppressionReason: rpaPolicy?.suppressionReason,
+    evidence: rpaPolicy?.evidence
+  }
 }
+
+const buildMetricValuesFromRow = (row: MetricAggregateRowLike): MetricValue[] => [
+  metricValueFromRow('rpa', row.rpa_avg, {
+    completedTasks: row.completed_tasks,
+    eligibleTaskCount: row.rpa_eligible_task_count,
+    missingTaskCount: row.rpa_missing_task_count,
+    nonPositiveTaskCount: row.rpa_non_positive_task_count
+  }),
+  metricValueFromRow('otd_pct', row.otd_pct),
+  metricValueFromRow('ftr_pct', row.ftr_pct),
+  metricValueFromRow('cycle_time', row.cycle_time_avg_days),
+  metricValueFromRow('cycle_time_variance', row.cycle_time_variance),
+  metricValueFromRow('throughput', row.throughput_count),
+  metricValueFromRow('pipeline_velocity', row.pipeline_velocity),
+  metricValueFromRow('stuck_assets', row.stuck_asset_count),
+  metricValueFromRow('stuck_asset_pct', row.stuck_asset_pct)
+]
 
 const parseCscDistribution = (raw: unknown, totalActive: number): CscDistributionEntry[] => {
   if (!raw || typeof raw !== 'string') return []
@@ -189,17 +266,7 @@ const normalizeSnapshot = (
     clientName: row.client_name ? normalizeString(row.client_name) : null,
     periodYear: toNumber(row.period_year),
     periodMonth: toNumber(row.period_month),
-    metrics: [
-      metricValueFromRow('rpa', row.rpa_avg),
-      metricValueFromRow('otd_pct', row.otd_pct),
-      metricValueFromRow('ftr_pct', row.ftr_pct),
-      metricValueFromRow('cycle_time', row.cycle_time_avg_days),
-      metricValueFromRow('cycle_time_variance', row.cycle_time_variance),
-      metricValueFromRow('throughput', row.throughput_count),
-      metricValueFromRow('pipeline_velocity', row.pipeline_velocity),
-      metricValueFromRow('stuck_assets', row.stuck_asset_count),
-      metricValueFromRow('stuck_asset_pct', row.stuck_asset_pct)
-    ],
+    metrics: buildMetricValuesFromRow(row),
     cscDistribution: parseCscDistribution(row.csc_distribution, activeTasks),
     context: {
       totalTasks: toNumber(row.total_tasks),
@@ -333,17 +400,7 @@ export const computeSpaceMetricsLive = async (
     clientName: null,
     periodYear,
     periodMonth,
-    metrics: [
-      metricValueFromRow('rpa', row.rpa_avg),
-      metricValueFromRow('otd_pct', row.otd_pct),
-      metricValueFromRow('ftr_pct', row.ftr_pct),
-      metricValueFromRow('cycle_time', row.cycle_time_avg_days),
-      metricValueFromRow('cycle_time_variance', row.cycle_time_variance),
-      metricValueFromRow('throughput', row.throughput_count),
-      metricValueFromRow('pipeline_velocity', row.pipeline_velocity),
-      metricValueFromRow('stuck_assets', row.stuck_asset_count),
-      metricValueFromRow('stuck_asset_pct', row.stuck_asset_pct)
-    ],
+    metrics: buildMetricValuesFromRow(row),
     cscDistribution,
     context: {
       totalTasks: toNumber(row.total_tasks),
@@ -367,6 +424,9 @@ interface GenericMetricRow {
   dimension_value: string
   rpa_avg: unknown
   rpa_median: unknown
+  rpa_eligible_task_count: unknown
+  rpa_missing_task_count: unknown
+  rpa_non_positive_task_count: unknown
   otd_pct: unknown
   ftr_pct: unknown
   cycle_time_avg_days: unknown
@@ -448,17 +508,7 @@ export const computeMetricsByContext = async (
     dimensionLabel: null,
     periodYear,
     periodMonth,
-    metrics: [
-      metricValueFromRow('rpa', row.rpa_avg),
-      metricValueFromRow('otd_pct', row.otd_pct),
-      metricValueFromRow('ftr_pct', row.ftr_pct),
-      metricValueFromRow('cycle_time', row.cycle_time_avg_days),
-      metricValueFromRow('cycle_time_variance', row.cycle_time_variance),
-      metricValueFromRow('throughput', row.throughput_count),
-      metricValueFromRow('pipeline_velocity', row.pipeline_velocity),
-      metricValueFromRow('stuck_assets', row.stuck_asset_count),
-      metricValueFromRow('stuck_asset_pct', row.stuck_asset_pct)
-    ],
+    metrics: buildMetricValuesFromRow(row),
     cscDistribution,
     context: {
       totalTasks: toNumber(row.total_tasks),
@@ -485,6 +535,9 @@ interface ProjectMetricRow {
   period_month: unknown
   rpa_avg: unknown
   rpa_median: unknown
+  rpa_eligible_task_count: unknown
+  rpa_missing_task_count: unknown
+  rpa_non_positive_task_count: unknown
   otd_pct: unknown
   ftr_pct: unknown
   cycle_time_avg_days: unknown
@@ -543,17 +596,7 @@ export const readProjectMetrics = async (
     spaceId: normalizeString(row.space_id),
     periodYear: toNumber(row.period_year),
     periodMonth: toNumber(row.period_month),
-    metrics: [
-      metricValueFromRow('rpa', row.rpa_avg),
-      metricValueFromRow('otd_pct', row.otd_pct),
-      metricValueFromRow('ftr_pct', row.ftr_pct),
-      metricValueFromRow('cycle_time', row.cycle_time_avg_days),
-      metricValueFromRow('cycle_time_variance', row.cycle_time_variance),
-      metricValueFromRow('throughput', row.throughput_count),
-      metricValueFromRow('pipeline_velocity', row.pipeline_velocity),
-      metricValueFromRow('stuck_assets', row.stuck_asset_count),
-      metricValueFromRow('stuck_asset_pct', row.stuck_asset_pct)
-    ],
+    metrics: buildMetricValuesFromRow(row),
     context: {
       totalTasks: toNumber(row.total_tasks),
       completedTasks: toNumber(row.completed_tasks),
@@ -575,6 +618,9 @@ interface MemberMetricRow {
   period_month: unknown
   rpa_avg: unknown
   rpa_median: unknown
+  rpa_eligible_task_count: unknown
+  rpa_missing_task_count: unknown
+  rpa_non_positive_task_count: unknown
   otd_pct: unknown
   ftr_pct: unknown
   cycle_time_avg_days: unknown
@@ -597,12 +643,23 @@ interface MemberMetricRow {
 
 const hasIncompleteMemberMaterialization = (row: MemberMetricRow): boolean => {
   const totalTasks = toNumber(row.total_tasks)
+  const completedTasks = toNumber(row.completed_tasks)
 
   if (totalTasks <= 0) {
     return false
   }
 
-  return [row.on_time_count, row.late_drop_count, row.overdue_count, row.carry_over_count, row.overdue_carried_forward_count].some(
+  if ([row.on_time_count, row.late_drop_count, row.overdue_count, row.carry_over_count, row.overdue_carried_forward_count].some(
+    value => value === null || value === undefined
+  )) {
+    return true
+  }
+
+  if (completedTasks <= 0) {
+    return false
+  }
+
+  return [row.rpa_eligible_task_count, row.rpa_missing_task_count, row.rpa_non_positive_task_count].some(
     value => value === null || value === undefined
   )
 }
@@ -664,17 +721,7 @@ export const readMemberMetrics = async (
     dimensionLabel: null,
     periodYear: toNumber(row.period_year),
     periodMonth: toNumber(row.period_month),
-    metrics: [
-      metricValueFromRow('rpa', row.rpa_avg),
-      metricValueFromRow('otd_pct', row.otd_pct),
-      metricValueFromRow('ftr_pct', row.ftr_pct),
-      metricValueFromRow('cycle_time', row.cycle_time_avg_days),
-      metricValueFromRow('cycle_time_variance', row.cycle_time_variance),
-      metricValueFromRow('throughput', row.throughput_count),
-      metricValueFromRow('pipeline_velocity', row.pipeline_velocity),
-      metricValueFromRow('stuck_assets', row.stuck_asset_count),
-      metricValueFromRow('stuck_asset_pct', row.stuck_asset_pct)
-    ],
+    metrics: buildMetricValuesFromRow(row),
     cscDistribution,
     context: {
       totalTasks: toNumber(row.total_tasks),
@@ -736,17 +783,7 @@ export const readMemberMetricsBatch = async (
       dimensionLabel: null,
       periodYear: toNumber(row.period_year),
       periodMonth: toNumber(row.period_month),
-      metrics: [
-        metricValueFromRow('rpa', row.rpa_avg),
-        metricValueFromRow('otd_pct', row.otd_pct),
-        metricValueFromRow('ftr_pct', row.ftr_pct),
-        metricValueFromRow('cycle_time', row.cycle_time_avg_days),
-        metricValueFromRow('cycle_time_variance', row.cycle_time_variance),
-        metricValueFromRow('throughput', row.throughput_count),
-        metricValueFromRow('pipeline_velocity', row.pipeline_velocity),
-        metricValueFromRow('stuck_assets', row.stuck_asset_count),
-        metricValueFromRow('stuck_asset_pct', row.stuck_asset_pct)
-      ],
+      metrics: buildMetricValuesFromRow(row),
       cscDistribution: [],
       context: {
         totalTasks: toNumber(row.total_tasks),

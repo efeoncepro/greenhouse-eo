@@ -9,6 +9,9 @@ import {
   CANONICAL_LATE_DROP_SQL,
   CANONICAL_ON_TIME_SQL,
   CANONICAL_OPEN_TASK_SQL,
+  CANONICAL_RPA_ELIGIBLE_SQL,
+  CANONICAL_RPA_MISSING_SQL,
+  CANONICAL_RPA_NON_POSITIVE_SQL,
   CANONICAL_OVERDUE_CARRIED_FORWARD_SQL,
   CANONICAL_OVERDUE_SQL,
   DONE_STATUSES_SQL,
@@ -28,8 +31,11 @@ describe('ico-engine canonical completion semantics', () => {
   it('keeps RpA and cycle time gated by terminal completion', () => {
     const sql = buildMetricSelectSQL()
 
-    expect(sql).toContain(`WHEN ${CANONICAL_COMPLETED_TASK_SQL} AND rpa_value > 0`)
+    expect(sql).toContain(`WHEN ${CANONICAL_RPA_ELIGIBLE_SQL}`)
     expect(sql).toContain(`CASE WHEN ${CANONICAL_COMPLETED_TASK_SQL} THEN cycle_time_days END`)
+    expect(sql).toContain(`COUNTIF(${CANONICAL_RPA_ELIGIBLE_SQL}) AS rpa_eligible_task_count`)
+    expect(sql).toContain(`COUNTIF(${CANONICAL_RPA_MISSING_SQL}) AS rpa_missing_task_count`)
+    expect(sql).toContain(`COUNTIF(${CANONICAL_RPA_NON_POSITIVE_SQL}) AS rpa_non_positive_task_count`)
   })
 
   it('keeps open buckets and CSC distribution gated by canonical open-task semantics', () => {

@@ -2,6 +2,18 @@
 
 ## 2026-04-03
 
+- **TASK-215 ICO RpA reliability policy implemented**:
+  - `ICO Engine` ahora publica `RpA` con evidencia de coverage (`rpa_eligible_task_count`, `rpa_missing_task_count`, `rpa_non_positive_task_count`)
+  - `read-metrics` clasifica `RpA` como `valid`, `low_confidence`, `suppressed` o `unavailable` y propaga esa metadata junto al valor saneado
+  - `Payroll` ya consume el snapshot con `rpaDataStatus`, `rpaConfidenceLevel`, `rpaSuppressionReason` y `rpaEvidence`, evitando reinterpretaciones locales de `0` o `null`
+  - la task quedó cerrada en `docs/tasks/complete/TASK-215-ico-rpa-reliability-source-policy-fallbacks.md`
+
+- **TASK-215 RpA reliability policy documented and aligned**:
+  - se formalizó la policy runtime de `RpA` como contrato auditable con estados `valid`, `low_confidence`, `suppressed` y `unavailable`
+  - el engine debe propagar además evidencia mínima de coverage para no dejar que los consumers reinterpreten `0` o `null` por su cuenta
+  - se alinearon las tasks vecinas de Agency, Space Health y TTM para que no contradigan esta disciplina de confidence
+  - esta actualización es documental; la verificación runtime queda para la lane de implementación
+
 - **TASK-214 ICO completion semantics and serving parity closed**:
   - `ICO` ya comparte una sola regla de completitud para `OTD`, `FTR`, `RpA`, `throughput` y `cycle time`: `completed_at` solo vale con estado terminal real
   - `delivery_signal` y los buckets abiertos (`overdue`, `carry_over`, `overdue_carried_forward`) quedaron endurecidos para no mezclar filas cerradas o inconsistentes

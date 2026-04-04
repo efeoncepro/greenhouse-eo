@@ -1,5 +1,111 @@
 # Handoff.md
 
+## Sesión 2026-04-03 — TASK-215 implementada y verificada
+
+### Rama / alcance
+
+- rama actual: `feature/codex-task-215-rpa-reliability-policy`
+- scope principal:
+  - `src/lib/ico-engine/shared.ts`
+  - `src/lib/ico-engine/rpa-policy.ts`
+  - `src/lib/ico-engine/read-metrics.ts`
+  - `src/lib/ico-engine/materialize.ts`
+  - `src/lib/ico-engine/schema.ts`
+  - `src/lib/payroll/fetch-kpis-for-period.ts`
+  - `src/types/payroll.ts`
+  - tests del lane `ICO/Payroll`
+  - docs de arquitectura y lifecycle de `TASK-215`
+
+### Resultado
+
+- `TASK-215` quedó cerrada como contrato runtime de `RpA`
+- el engine ya materializa evidencia de coverage y clasifica `RpA` como `valid`, `low_confidence`, `suppressed` o `unavailable`
+- `read-metrics` propaga esa metadata junto al valor saneado
+- `Payroll` consume `rpaAvg` sin reinterpretar `0` o `null` localmente y recibe metadata de confianza/evidencia
+- no se creó migración PostgreSQL; el cambio quedó en schema/materialización BigQuery y contrato runtime
+- `TASK-215` quedó movida a `docs/tasks/complete/`
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/ico-engine/rpa-policy.test.ts src/lib/ico-engine/shared.test.ts src/lib/payroll/fetch-kpis-for-period.test.ts src/lib/payroll/project-payroll.test.ts src/lib/person-intelligence/compute.test.ts`
+- `pnpm exec vitest run src/lib/ico-engine/*.test.ts src/lib/payroll/fetch-kpis-for-period.test.ts`
+- `pnpm lint`
+- `pnpm build`
+- `rg -n "new Pool\\(" src`
+
+## Sesión 2026-04-03 — TASK-215 documentación de policy RpA alineada
+
+### Rama / alcance
+
+- rama actual: `feature/codex-task-215-rpa-reliability-policy`
+- scope:
+  - `docs/tasks/in-progress/TASK-215-ico-rpa-reliability-source-policy-fallbacks.md`
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+  - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+  - `docs/tasks/to-do/TASK-160-agency-enterprise-hardening.md`
+  - `docs/tasks/to-do/TASK-150-space-health-score.md`
+  - `docs/tasks/to-do/TASK-218-ico-time-to-market-activation-evidence-contract.md`
+  - `Handoff.md`
+  - `changelog.md`
+
+### Resultado
+
+- se dejó documentado el contrato runtime de `RpA` para `TASK-215` con estados `valid`, `low_confidence`, `suppressed` y `unavailable`
+- se agregó la evidencia mínima esperada para la lane:
+  - `rpa_eligible_task_count`
+  - `rpa_missing_task_count`
+  - `rpa_non_positive_task_count`
+- se alineó el `ICO Engine` para que la policy se lea desde el engine y no desde reinterpretaciones locales en consumers
+- se dejaron deltas mínimos en tareas vecinas para evitar drift de backlog sobre confidence / benchmark semantics
+
+### Verificación
+
+- no se ejecutó build / lint / test en esta pasada de documentación
+- no se tocaron archivos en `src/` ni `migrations/` durante esta sesión de docs
+
+## Sesión 2026-04-03 — TASK-215 auditada y corregida antes de implementación
+
+### Rama / alcance
+
+- rama actual: `feature/codex-task-215-rpa-reliability-policy`
+- scope:
+  - `docs/tasks/in-progress/TASK-215-ico-rpa-reliability-source-policy-fallbacks.md`
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `Handoff.md`
+  - auditoría runtime sobre:
+    - `src/lib/ico-engine/shared.ts`
+    - `src/lib/ico-engine/metric-registry.ts`
+    - `src/lib/ico-engine/read-metrics.ts`
+    - `src/lib/ico-engine/materialize.ts`
+    - `src/lib/ico-engine/schema.ts`
+    - `src/lib/sync/sync-notion-conformed.ts`
+    - `src/lib/payroll/fetch-kpis-for-period.ts`
+    - `src/lib/payroll/bonus-proration.ts`
+    - `src/lib/agency/agency-queries.ts`
+    - `src/lib/person-360/get-person-ico-profile.ts`
+    - `src/lib/ico-engine/performance-report.ts`
+
+### Resultado
+
+- `TASK-215` quedó movida a `in-progress` tras discovery/auditoría real del repo.
+- La spec se corrigió para dejar explícito que:
+  - `RpA` ya tiene una policy implícita ejecutable en el engine (`completed terminal + rpa_value > 0`)
+  - el gap real es la inconsistencia entre consumers sobre `null` vs `0` y la ausencia de trust/fallback policy explícita
+  - la fuente principal de `rpa_value` ya existe en `greenhouse_conformed.delivery_tasks`
+  - el impacto real incluye engine + sync + Agency + Payroll + People + Performance Report
+- No se implementó código todavía en esta pasada; solo se corrigió el contrato operativo para evitar construir sobre supuestos incompletos.
+
+### Verificación
+
+- revisión manual de consistencia contra:
+  - `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+  - `docs/architecture/GREENHOUSE_DELIVERY_PERFORMANCE_REPORT_PARITY_V1.md`
+  - `docs/architecture/GREENHOUSE_DATA_MODEL_MASTER_V1.md`
+  - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+  - `docs/architecture/schema-snapshot-baseline.sql`
+  - runtime actual en engine y consumers downstream
+
 ## Sesión 2026-04-03 — TASK-214 implementada y verificada end-to-end
 
 ### Rama / alcance
