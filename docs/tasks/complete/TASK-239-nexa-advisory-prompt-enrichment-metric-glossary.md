@@ -8,12 +8,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Bajo`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Implementada`
 - Rank: `TBD`
 - Domain: `agency`
 - Blocked by: `none`
@@ -291,18 +291,18 @@ const enrichedSignal = {
 
 ## Acceptance Criteria
 
-- [ ] `MetricDefinition` tiene campo `shortName` y las 11 métricas del registry lo tienen asignado
-- [ ] El prompt del LLM incluye glosario dinámico generado desde `ICO_METRIC_REGISTRY`
-- [ ] El prompt incluye la cadena causal formal del contrato de métricas
-- [ ] El prompt instruye doble capa narrativa (técnica + bajada operativa)
-- [ ] La señal enviada al LLM incluye `metricDisplayName` derivado del registry
-- [ ] La señal enviada al LLM incluye `spaceName`, `memberName`, `projectName` resueltos desde PostgreSQL
-- [ ] Los enrichments regenerados usan nombres operativos (`FTR%`, `RpA`, `OTD%`) en vez de códigos (`ftr_pct`, `rpa_avg`)
-- [ ] Los enrichments regenerados usan nombres de Space, miembros y proyectos en vez de UUIDs
-- [ ] Los enrichments regenerados incluyen conexión causal y bajada operativa
-- [ ] La UI (`NexaInsightsBlock`) muestra `shortName` en el chip de métrica
-- [ ] `pnpm build` y `pnpm lint` sin errores
-- [ ] Ningún `label` existente del registry se modifica (se mantienen en español)
+- [x] `MetricDefinition` tiene campo `shortName` y las 11 métricas del registry lo tienen asignado
+- [x] El prompt del LLM incluye glosario dinámico generado desde `ICO_METRIC_REGISTRY`
+- [x] El prompt incluye la cadena causal formal del contrato de métricas
+- [x] El prompt instruye doble capa narrativa (técnica + bajada operativa)
+- [x] La señal enviada al LLM incluye `metricDisplayName` derivado del registry
+- [x] La señal enviada al LLM incluye `spaceName`, `memberName`, `projectName` resueltos desde PostgreSQL
+- [ ] Los enrichments regenerados usan nombres operativos — pendiente re-materialización post-deploy
+- [ ] Los enrichments regenerados usan nombres de Space, miembros y proyectos — pendiente re-materialización post-deploy
+- [ ] Los enrichments regenerados incluyen conexión causal y bajada operativa — pendiente re-materialización post-deploy
+- [x] La UI (`NexaInsightsBlock`) muestra `shortName` en el chip de métrica
+- [x] `pnpm build` y `pnpm lint` sin errores
+- [x] Ningún `label` existente del registry se modifica (se mantienen en español)
 
 ## Verification
 
@@ -314,8 +314,8 @@ const enrichedSignal = {
 
 ## Closing Protocol
 
-- [ ] Actualizar `docs/architecture/Greenhouse_ICO_Engine_v1.md` — agregar delta documentando el enriquecimiento del prompt con glosario y cadena causal
-- [ ] Actualizar `docs/changelog/CLIENT_CHANGELOG.md` si las narrativas mejoradas son visibles en staging
+- [x] Actualizar `docs/architecture/Greenhouse_ICO_Engine_v1.md` — delta documentando prompt v2 con glosario y cadena causal
+- [ ] Actualizar `docs/changelog/CLIENT_CHANGELOG.md` — pendiente validación visual en staging post re-materialización
 
 ## Follow-ups
 
