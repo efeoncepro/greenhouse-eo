@@ -1,8 +1,42 @@
 # Greenhouse EO — Cloud Infrastructure Reference
 
-> **Version:** 1.0
-> **Last updated:** 2026-03-29
+> **Version:** 1.1
+> **Last updated:** 2026-04-04
 > **Audience:** Platform engineers, DevOps, on-call operators
+
+---
+
+## Delta 2026-04-04 — Workload placement policy: batch processing goes to GCP Cloud
+
+TASK-239 expuso que la materialización ICO completa excede el timeout de Vercel Functions (120s). La decisión de arquitectura es:
+
+**Todo proceso de datos que no sea request-response de portal debe ejecutarse en el servicio, artefacto o primitiva de GCP más idóneo — no en Vercel Functions.**
+
+Esto aplica a:
+- Materialización de snapshots y métricas (ICO Engine, conformed layer)
+- Pipelines de enriquecimiento AI/LLM (señales, enrichments, scoring)
+- Sync batch de fuentes externas (Notion, HubSpot, Nubox)
+- Transformaciones ETL, backfills y re-procesamientos
+- Cualquier proceso que exceda 30s o que no requiera contexto de sesión de usuario
+
+**Criterio de selección de artefacto GCP:**
+
+| Característica | Cloud Run | Cloud Functions (Gen 2) | Cloud Scheduler | Cloud Tasks |
+|---|---|---|---|---|
+| Proceso HTTP con timeout largo (>30s) | **Idóneo** | Alternativa | — | — |
+| Job periódico (cron) | — | — | **Idóneo** (trigger) | — |
+| Fan-out paralelo (N items) | — | — | — | **Idóneo** |
+| Sync con API externa (webhook/poll) | **Idóneo** (ya probado) | Alternativa | Trigger | — |
+| Pipeline AI/LLM (múltiples llamadas) | **Idóneo** (timeout configurable) | — | Trigger | — |
+
+**Vercel Functions** quedan reservados para:
+- API routes que sirven al portal (request-response < 30s)
+- Cron triggers livianos que disparan servicios GCP (fire-and-forget)
+- Reactive consumers del outbox (procesan eventos individualmente, < 30s cada uno)
+
+**Referencia de implementación:** TASK-241 materializa esta política con el primer servicio Cloud Run para ICO batch processing.
+
+Sección completa: §1.1 Workload Placement Policy.
 
 ---
 
@@ -229,6 +263,58 @@ Greenhouse EO runs on **Google Cloud Platform** under the project **`efeonce-gro
 | BigQuery                    | `US` (multi-region)            | Maximizes co-location with Cloud Functions and analytics exports |
 
 All inter-service communication stays within GCP, except for Vercel-originated calls to Cloud Run/Cloud SQL and external webhook traffic from Notion, HubSpot, and Frame.io.
+
+---
+
+## 1.1 Workload Placement Policy
+
+### Principio rector
+
+**El procesamiento de datos que no es interacción directa con el usuario del portal debe ejecutarse en GCP Cloud, no en Vercel Functions.**
+
+Vercel es la capa de presentación y API del portal. GCP Cloud es la capa de procesamiento, transformación y orquestación de datos. La frontera entre ambos está definida por la naturaleza del trabajo, no por conveniencia de implementación.
+
+### Reglas de colocación
+
+| Tipo de proceso | Dónde corre | Por qué |
+|---|---|---|
+| API route que sirve datos al portal (GET/POST < 30s) | Vercel Functions | Es request-response del portal, necesita sesión de usuario |
+| Materialización de métricas, snapshots, reports | **Cloud Run** | Excede 30s, no requiere sesión, accede a BigQuery + PostgreSQL |
+| Pipeline AI/LLM (scoring, enrichment, evaluación) | **Cloud Run** | Múltiples llamadas a LLM, timeout impredecible, no requiere sesión |
+| Sync batch de fuente externa (Notion, HubSpot, Nubox) | **Cloud Run / Cloud Functions** | Ya probado, volumen variable, timeout largo |
+| ETL, backfill, re-procesamiento | **Cloud Run** | Proceso pesado one-shot, timeout configurable hasta 60 min |
+| Trigger periódico (cron) | **Cloud Scheduler** → Cloud Run | Scheduler dispara, Cloud Run ejecuta |
+| Fan-out paralelo (procesar N items) | **Cloud Tasks** → Cloud Run/Functions | Distribuye carga, cada item es un HTTP call |
+| Reactive consumer del outbox (< 30s por evento) | Vercel Functions (cron) | Eventos individuales son livianos, cabe en Vercel |
+| Health checks y triggers fire-and-forget | Vercel Functions | Liviano, solo dispara y retorna |
+
+### Regla de decisión rápida
+
+```
+¿El proceso necesita sesión de usuario?
+  → Sí: Vercel Functions
+  → No: ¿Puede completar en < 30s de forma consistente?
+    → Sí: Vercel Functions (cron route) es aceptable
+    → No: Cloud Run + Cloud Scheduler
+```
+
+### Anti-patterns
+
+- **No fragmentar un proceso pesado en N endpoints Vercel para esquivar el timeout.** Si el proceso es pesado, va a Cloud Run como unidad.
+- **No crear Cloud Functions nuevas cuando Cloud Run sirve.** Cloud Run es más flexible (container, timeout configurable, concurrencia). Cloud Functions solo si el trigger nativo (Pub/Sub, Storage) lo justifica.
+- **No asumir que un proceso liviano hoy seguirá siéndolo.** Si un cron route de Vercel empieza a acercarse a 30s, planificar la migración antes de que falle.
+
+### Inventario de procesos por migrar (a 2026-04-04)
+
+| Proceso | Ubicación actual | Timeout típico | Acción |
+|---|---|---|---|
+| ICO materialización completa | Vercel `/api/cron/ico-materialize` | >120s (falla) | **Migrar a Cloud Run (TASK-241)** |
+| LLM enrichment pipeline | Vercel (trigger reactivo) | 60-90s (riesgo) | **Migrar a Cloud Run (TASK-241)** |
+| ICO member sync | Vercel `/api/cron/ico-member-sync` | ~45s | Monitorear, migrar si crece |
+| Sync conformed | Vercel `/api/cron/sync-conformed` | ~30-60s | Monitorear, migrar si crece |
+| Nubox sync | Vercel `/api/cron/nubox-sync` | ~15s | OK en Vercel por ahora |
+| Exchange rates / indicators | Vercel cron | ~5s | OK en Vercel |
+| Outbox publish / react | Vercel cron `*/5 min` | ~5-15s | OK en Vercel |
 
 ---
 
