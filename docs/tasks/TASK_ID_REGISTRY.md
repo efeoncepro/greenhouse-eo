@@ -283,3 +283,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-231` | `complete` | Codex Task Planner Skill | `docs/tasks/complete/TASK-231-codex-task-planner-skill.md` |
 | `TASK-232` | `to-do` | ICO LLM Quality Scoring & Explanation Pipeline | `docs/tasks/to-do/TASK-232-ico-llm-quality-scoring-explanation-pipeline.md` |
 | `TASK-233` | `to-do` | Three.js 3D Logo Animation | `docs/tasks/to-do/TASK-233-threejs-3d-logo-animation.md` |
+| `TASK-234` | `to-do` | Codex Skills: Animation Library Knowledge Sync | `docs/tasks/to-do/TASK-234-codex-skills-animation-library-sync.md` |
