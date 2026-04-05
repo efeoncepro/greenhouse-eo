@@ -1,5 +1,10 @@
 # TASK-228 - Employee Legacy Role Code Convergence
 
+## Delta 2026-04-05
+- Dependencia TASK-225 cerrada — `employee` y `finance_manager` formalmente marcados como deprecated en la spec canónica
+- Ruta de convergencia documentada en `GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md` §7
+- Esta task puede comenzar sin blockers
+
 ## Status
 
 - Lifecycle: `to-do`

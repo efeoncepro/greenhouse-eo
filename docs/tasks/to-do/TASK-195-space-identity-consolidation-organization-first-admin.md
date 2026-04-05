@@ -1,5 +1,12 @@
 # TASK-195 - Space Identity Consolidation: Organization-First Admin Entry & Space Onboarding
 
+## Delta 2026-04-05
+- TASK-225 cerrada — 4 planos de jerarquía interna formalizados; `Organization` y `Space` ya tienen separación arquitectónica canónica
+- TASK-227 implementada — `greenhouse_core.operational_responsibilities` ya disponible como registry de ownership por scope
+- Agency Space 360 ya muestra ownership badges (account_lead, delivery_lead, etc.) en OverviewTab
+- Implicación: la surface admin org-first (Slice 2) puede integrar el registry de responsabilidades desde el primer momento
+- Implicación: el onboarding de Space (Slice 3) puede asignar un `account_lead` como parte del flujo de creación
+
 ## Delta 2026-04-03
 
 - `TASK-208` agregó señal operativa adicional dentro de `src/views/greenhouse/admin/tenants/TenantNotionPanel.tsx`:

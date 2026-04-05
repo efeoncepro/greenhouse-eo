@@ -1,5 +1,18 @@
 # TASK-225 - Internal Roles, Hierarchies & Approval Ownership Model
 
+## Delta 2026-04-05 — task cerrada
+
+- Todos los acceptance criteria cumplidos:
+  - Spec canónica: `GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md` (474 líneas, 9 secciones)
+  - 4 planos separados: Access Role, Reporting Hierarchy, Structural Hierarchy, Operational Responsibility
+  - Jerarquía visible de personas definida (§2.5)
+  - Naming policy formalizada (§1)
+  - Matriz login `rol → routeGroups → vistas` documentada (§1.5)
+  - 3 drifts documentados (§1.5: fallback, catálogo duplicados, employee legacy)
+  - Referencias cruzadas en ARCHITECTURE_V1, IDENTITY_ACCESS_V2, project_context.md
+- Follow-ons spawned: TASK-226, TASK-227, TASK-228, TASK-229
+- TASK-227 ya implementado como primer follow-on
+
 ## Delta 2026-04-03 — matriz base de vistas por rol al login
 
 - Se documenta en esta task la matriz base `rol -> route groups -> catálogo de vistas` que hoy deriva el runtime al login.
@@ -19,11 +32,11 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
-- Status real: `Diseño activo`
+- Status real: `Completada 2026-04-05`
 - Rank: `41`
 - Domain: `identity / hr / agency / platform`
 

@@ -1,5 +1,42 @@
 # Handoff.md
 
+## Sesión 2026-04-05 — TASK-225 cierre + TASK-227 implementación
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: cierre de TASK-225 (roles y jerarquías) + implementación completa de TASK-227 (Operational Responsibility Registry)
+
+### Qué se hizo
+
+- **TASK-225 cerrada**: todos los acceptance criteria verificados, spec canónica de 474 líneas completada, follow-ons spawned (226/227/228/229)
+- **TASK-227 implementada**:
+  - Migración DDL: `greenhouse_core.operational_responsibilities` con unique constraints, indexes, ownership
+  - Config: `src/config/responsibility-codes.ts` (5 responsibility types, 4 scope types, labels español)
+  - Event catalog extendido: `responsibility.assigned/revoked/updated`
+  - Store CRUD: `src/lib/operational-responsibility/store.ts` (create, update, revoke + outbox + primary demotion)
+  - Readers: `src/lib/operational-responsibility/readers.ts` (list, getScopeOwnership, getMember, getSpace)
+  - API Admin: `GET/POST /api/admin/responsibilities`, `PATCH/DELETE /api/admin/responsibilities/[id]`
+  - UI Admin: `/admin/responsibilities` con tabla CRUD, diálogo de asignación, autocomplete de miembros
+  - Consumer Agency: Space 360 OverviewTab muestra ownership badges
+- **Cross-impact check**: deltas aplicados en TASK-226, TASK-228, TASK-229, TASK-195
+- Docs de arquitectura actualizados: INTERNAL_ROLES_HIERARCHIES_V1 + EVENT_CATALOG_V1
+- Task README actualizado
+
+### Pendiente operacional
+
+- `gcloud auth login` — tokens GCP expirados, bloquean Cloud SQL Proxy
+- `pnpm migrate:up` — ejecutar tras re-auth para crear la tabla en staging
+- `pnpm db:generate-types` — regenerar Kysely types post-migración
+- Commit del `db.d.ts` regenerado
+
+### Verificación
+
+- `pnpm build` — OK
+- `pnpm lint` — OK
+
+---
+
 ## Sesión 2026-04-04 — TASK-241 ICO Batch Worker Cloud Run Service
 
 ### Rama / alcance

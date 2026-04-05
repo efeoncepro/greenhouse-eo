@@ -1,5 +1,11 @@
 # TASK-226 - Superadministrador Bootstrap & Assignment Policy
 
+## Delta 2026-04-05
+- Dependencia TASK-225 cerrada — spec canónica de roles y jerarquías completada
+- `Superadministrador` ya formalizado como `efeonce_admin` + `collaborator` en `GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md`
+- El Plano 4 (Operational Responsibility) ya implementado por TASK-227 — ownership operativo separado de roles
+- Esta task puede comenzar sin blockers
+
 ## Status
 
 - Lifecycle: `to-do`

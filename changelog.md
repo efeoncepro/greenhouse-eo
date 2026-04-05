@@ -1,5 +1,25 @@
 # changelog.md
 
+## 2026-04-05
+
+- **TASK-225 Internal Roles & Hierarchies — cerrada**:
+  - spec canónica `GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md` completada (474 líneas, 9 secciones)
+  - 4 planos formalizados: Access Role, Reporting Hierarchy, Structural Hierarchy, Operational Responsibility
+  - matriz login `rol → routeGroups → vistas` documentada
+  - 3 drifts identificados: fallback de gobernanza, catálogo duplicados cliente, employee legacy
+  - follow-ons: TASK-226, TASK-227, TASK-228, TASK-229
+
+- **TASK-227 Operational Responsibility Registry — implementada**:
+  - migración: `greenhouse_core.operational_responsibilities` con unique primary constraint, scope/member indexes
+  - config: `responsibility-codes.ts` con 5 responsibility types y 4 scope types
+  - event catalog: `responsibility.assigned`, `responsibility.revoked`, `responsibility.updated`
+  - store CRUD + outbox + primary demotion logic
+  - readers: `listResponsibilities`, `getScopeOwnership`, `getMemberResponsibilities`
+  - API admin: `GET/POST /api/admin/responsibilities`, `PATCH/DELETE /[id]`
+  - UI admin: `/admin/responsibilities` con tabla CRUD y diálogo de asignación
+  - consumer Agency: Space 360 OverviewTab muestra ownership badges
+  - pendiente: `pnpm migrate:up` + `db:generate-types` en staging
+
 ## 2026-04-04
 
 - **TASK-238 Agency Workspace & Space 360 Data Storytelling UX**:

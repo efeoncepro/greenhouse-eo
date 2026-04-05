@@ -1,5 +1,10 @@
 # TASK-229 - Client View Catalog Deduplication
 
+## Delta 2026-04-05
+- Dependencia TASK-225 cerrada — duplicados del catálogo cliente documentados en `GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md` §1.5 Drift #2
+- Los 5 `viewCode` duplicados identificados: `cliente.equipo`, `cliente.revisiones`, `cliente.analytics`, `cliente.campanas`, `cliente.notificaciones`
+- Esta task puede comenzar sin blockers
+
 ## Status
 
 - Lifecycle: `to-do`
