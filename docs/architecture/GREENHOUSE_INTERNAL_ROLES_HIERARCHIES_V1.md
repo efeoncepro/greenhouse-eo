@@ -28,6 +28,13 @@ Usar junto con:
 - Origen: `TASK-225`
 - Estado: contrato arquitectónico nuevo; describe foundations ya existentes y formaliza la dirección target
 
+## Delta 2026-04-05 — Client view catalog deduplication (TASK-229)
+
+- 5 viewCodes duplicados eliminados del bloque `cliente`: `cliente.equipo`, `cliente.revisiones`, `cliente.analytics`, `cliente.campanas`, `cliente.notificaciones`
+- Entries con descripciones más ricas conservadas como canónicas
+- Validación build-time agregada: VIEW_REGISTRY lanza error si detecta viewCode duplicado
+- Drift #2 de §1.5 queda cerrado
+
 ## Delta 2026-04-05 — Employee & Finance Manager legacy role convergence (TASK-228)
 
 - `employee` marcado `@deprecated` en TypeScript — converge a `collaborator`

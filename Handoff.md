@@ -1,5 +1,27 @@
 # Handoff.md
 
+## Sesión 2026-04-05 — TASK-229 Client View Catalog Deduplication
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: eliminar 5 viewCodes duplicados del catálogo cliente, agregar validación build-time
+
+### Qué se hizo
+
+- **TASK-229 implementada y cerrada**:
+  - 5 entries duplicadas eliminadas de VIEW_REGISTRY (cliente.equipo, cliente.revisiones, cliente.analytics, cliente.campanas, cliente.notificaciones)
+  - Entries con descripciones más ricas conservadas como canónicas
+  - Validación build-time: throw si viewCode duplicado en VIEW_REGISTRY
+- **Bloque completo TASK-225→229 cerrado** (5/5 tasks del bloque de identidad/platform)
+
+### Verificación
+
+- `pnpm build` — OK
+- `pnpm lint` — OK
+
+---
+
 ## Sesión 2026-04-05 — TASK-228 Employee Legacy Role Code Convergence
 
 ### Rama / alcance

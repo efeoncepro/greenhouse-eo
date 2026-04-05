@@ -256,46 +256,6 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'hr'
   },
   {
-    viewCode: 'cliente.equipo',
-    section: 'cliente',
-    label: 'Mi Equipo',
-    description: 'Equipo asignado a la operación del cliente.',
-    routePath: '/equipo',
-    routeGroup: 'client'
-  },
-  {
-    viewCode: 'cliente.revisiones',
-    section: 'cliente',
-    label: 'Revisiones',
-    description: 'Queue de feedback y revisiones en curso.',
-    routePath: '/reviews',
-    routeGroup: 'client'
-  },
-  {
-    viewCode: 'cliente.analytics',
-    section: 'cliente',
-    label: 'Analytics',
-    description: 'Rendimiento y métricas del servicio.',
-    routePath: '/analytics',
-    routeGroup: 'client'
-  },
-  {
-    viewCode: 'cliente.campanas',
-    section: 'cliente',
-    label: 'Campañas',
-    description: 'Iniciativas y campañas activas del cliente.',
-    routePath: '/campanas',
-    routeGroup: 'client'
-  },
-  {
-    viewCode: 'cliente.notificaciones',
-    section: 'cliente',
-    label: 'Notificaciones',
-    description: 'Avisos y preferencias de notificación.',
-    routePath: '/notifications',
-    routeGroup: 'client'
-  },
-  {
     viewCode: 'ia.herramientas',
     section: 'ia',
     label: 'Herramientas IA',
@@ -544,3 +504,20 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'client'
   }
 ]
+
+// ── Build-time uniqueness validation (TASK-229) ──
+// Prevents duplicate viewCodes from being introduced silently.
+
+const viewCodeCounts = new Map<string, number>()
+
+for (const entry of VIEW_REGISTRY) {
+  viewCodeCounts.set(entry.viewCode, (viewCodeCounts.get(entry.viewCode) ?? 0) + 1)
+}
+
+const duplicates = [...viewCodeCounts.entries()].filter(([, count]) => count > 1)
+
+if (duplicates.length > 0) {
+  throw new Error(
+    `VIEW_REGISTRY has duplicate viewCodes: ${duplicates.map(([code]) => code).join(', ')}. Each viewCode must be unique.`
+  )
+}

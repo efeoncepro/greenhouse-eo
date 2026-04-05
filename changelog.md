@@ -2,6 +2,11 @@
 
 ## 2026-04-05
 
+- **TASK-229 Client View Catalog Deduplication — cerrada**:
+  - 5 viewCodes cliente duplicados eliminados de VIEW_REGISTRY
+  - validación build-time de unicidad de viewCodes agregada (throw si duplicado)
+  - bloque TASK-225→229 completado (5/5 tasks de identidad/platform)
+
 - **TASK-228 Employee Legacy Role Code Convergence — cerrada**:
   - `employee` y `finance_manager` marcados `@deprecated` en role-codes.ts
   - todos los consumers runtime actualizados para aceptar `finance_admin` como canonical (7 archivos)
