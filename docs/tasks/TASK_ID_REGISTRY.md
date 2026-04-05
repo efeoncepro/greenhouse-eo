@@ -305,3 +305,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-254` | `in-progress` | Operational Cron Durable Worker Migration | `docs/tasks/in-progress/TASK-254-operational-cron-durable-worker-migration.md` |
 | `TASK-253` | `complete` | Identity Spec Residual Gaps (Approval Snapshot + Audit Events) | `docs/tasks/complete/TASK-253-identity-spec-residual-gaps.md` |
 | `TASK-255` | `complete` | Mi Perfil: fix identity chain so profile never shows "Perfil no disponible" | `docs/tasks/complete/TASK-255-mi-perfil-identity-chain-fix.md` |
+| `TASK-256` | `to-do` | Entra Profile Completeness: avatar sync + identity link for all internal users | `docs/tasks/to-do/TASK-256-entra-profile-completeness-avatar-identity-link.md` |
