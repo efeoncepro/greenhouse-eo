@@ -7,19 +7,16 @@
 # Run:    docker run -p 8080:8080 --env-file .env.local ico-batch-worker
 # Deploy: see services/ico-batch/deploy.sh
 
-FROM node:22-slim AS base
+# ─── Builder stage: install deps + bundle ────────────────────────────────────
 
-# Install corepack for pnpm
-RUN corepack enable
+FROM node:22-slim AS builder
+
+RUN corepack enable && npm install -g esbuild
 
 WORKDIR /app
 
-# ─── Install dependencies ────────────────────────────────────────────────────
-
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
-
-# ─── Copy source code ────────────────────────────────────────────────────────
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 COPY tsconfig.json ./
 COPY src/lib/ ./src/lib/
@@ -27,12 +24,40 @@ COPY src/config/ ./src/config/
 COPY src/types/ ./src/types/
 COPY services/ico-batch/server.ts ./services/ico-batch/server.ts
 
-# ─── Runtime ─────────────────────────────────────────────────────────────────
+# Bundle: resolves @/ path aliases + TypeScript at build time.
+# server-only shimmed to empty module (Next.js convention).
+# --packages=external keeps npm packages as imports resolved from node_modules.
+RUN echo "" > /app/server-only-shim.js && \
+    echo "export class NextResponse { static json(d,o){return{body:d,...o}} }" > /app/next-server-shim.js && \
+    esbuild services/ico-batch/server.ts \
+      --bundle \
+      --platform=node \
+      --target=node22 \
+      --format=esm \
+      --outfile=dist/server.mjs \
+      --alias:server-only=./server-only-shim.js \
+      --alias:next/server=./next-server-shim.js \
+      --alias:next/headers=./server-only-shim.js \
+      --alias:@=./src \
+      --resolve-extensions=.ts,.tsx,.js,.json \
+      --packages=external \
+      --tsconfig=tsconfig.json
+
+# ─── Runtime stage: slim image with only what's needed ───────────────────────
+
+FROM node:22-slim AS runner
+
+RUN corepack enable
+
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile --ignore-scripts --prod
+
+COPY --from=builder /app/dist/server.mjs ./dist/server.mjs
 
 ENV NODE_ENV=production
 ENV PORT=8080
 EXPOSE 8080
 
-# --conditions=react-server resolves `import 'server-only'` to empty module
-# (Next.js convention — throws in browser, no-op with this flag in Node.js)
-CMD ["npx", "tsx", "--conditions=react-server", "services/ico-batch/server.ts"]
+CMD ["node", "dist/server.mjs"]

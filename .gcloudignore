@@ -1,0 +1,44 @@
+# Cloud Build ignore file — separate from .gitignore
+# gcloud uses this instead of .gitignore when present.
+
+# Build artifacts
+.next/
+out/
+dist/
+
+# Dependencies (installed in Docker)
+node_modules/
+
+# Vuexy reference (not needed for Cloud Run services)
+full-version/
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+
+# Git
+.git/
+.github/
+
+# Env files (secrets injected via Cloud Run env vars)
+.env*
+!.env.example
+
+# Documentation (not needed at build time)
+docs/
+
+# Tests
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+src/test/
+
+# Vercel
+.vercel/
+
+# Public assets
+public/
+
+# Temp files
+*.tmp
