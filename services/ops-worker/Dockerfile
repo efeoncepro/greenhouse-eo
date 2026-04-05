@@ -20,7 +20,7 @@ RUN pnpm install --frozen-lockfile --ignore-scripts
 
 COPY tsconfig.json ./
 COPY src/ ./src/
-COPY services/ops-worker/server.ts ./services/ops-worker/server.ts
+COPY services/ops-worker/server.ts services/ops-worker/auth.ts ./services/ops-worker/
 
 # Bundle: resolves @/ path aliases + TypeScript at build time.
 # server-only shimmed to empty module (Next.js convention).
