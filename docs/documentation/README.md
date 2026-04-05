@@ -1,6 +1,6 @@
-# Greenhouse EO — Documentacion de Plataforma
+# Greenhouse EO — Documentacion Funcional del Portal
 
-Documentacion funcional de Greenhouse en lenguaje simple. Cada documento explica como funciona un modulo o dominio del portal sin jerga tecnica, pero incluye enlaces a la documentacion de arquitectura para quien necesite el detalle tecnico.
+Documentacion oficial de la plataforma Greenhouse. Cada documento describe como opera un modulo o dominio del portal en terminos claros, orientados a entender el funcionamiento y las reglas de negocio. Para detalle tecnico (schemas, APIs, decisiones de diseno), cada seccion enlaza a su spec de arquitectura correspondiente.
 
 ## Indice por dominio
 
