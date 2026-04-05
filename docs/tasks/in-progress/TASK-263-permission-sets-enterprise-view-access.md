@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Implementacion completa — pendiente migracion + deploy`
 - Rank: `TBD`
 - Domain: `identity`, `admin`, `ui`
 - Blocked by: `none`

@@ -23,13 +23,14 @@ import Typography from '@mui/material/Typography'
 import { ExecutiveMiniStatCard } from '@/components/greenhouse'
 import type { AdminGovernanceOverview } from '@/lib/admin/get-admin-view-access-governance'
 import { ROLE_CODES } from '@/config/role-codes'
+import PermissionSetsTab from '@/views/greenhouse/admin/permission-sets/PermissionSetsTab'
 
 type Props = {
   data: AdminGovernanceOverview
 }
 
 type RoleFilter = 'all' | 'efeonce_internal' | 'client'
-type ActiveTab = 'permissions' | 'preview' | 'roadmap'
+type ActiveTab = 'permissions' | 'preview' | 'sets' | 'roadmap'
 type OverrideMode = 'inherit' | 'grant' | 'revoke'
 type PermissionsFocus = 'all' | 'changed' | 'fallback'
 type PreviewFocus = 'all' | 'visible' | 'overrides' | 'impact'
@@ -584,6 +585,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
             >
               <Tab value='permissions' label='Permisos' />
               <Tab value='preview' label='Preview' />
+              <Tab value='sets' label='Permission Sets' />
               <Tab value='roadmap' label='Siguiente slice' />
             </Tabs>
 
@@ -1298,6 +1300,8 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                 ) : null}
               </Stack>
             ) : null}
+
+            {activeTab === 'sets' ? <PermissionSetsTab /> : null}
 
             {activeTab === 'roadmap' ? (
               <Box

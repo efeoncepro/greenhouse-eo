@@ -2,6 +2,17 @@
 
 ## 2026-04-05
 
+- **TASK-263: Permission Sets — CRUD enterprise para asignacion de vistas por persona y perfil**:
+  - Nuevas tablas `greenhouse_core.permission_sets` y `user_permission_set_assignments` con 6 sets de sistema seeded
+  - `resolveAuthorizedViewsForUser()` extendido: resolucion ahora es Rol ∪ PermissionSets ∪ UserOverrides (3+1 capas)
+  - CRUD API completo: `GET/POST /api/admin/views/sets`, `GET/PUT/DELETE .../sets/:setId`, `GET/POST .../sets/:setId/users`, `DELETE .../users/:userId`
+  - Effective views API: `GET /api/admin/team/roles/:userId/effective-views` con source attribution (role, role_fallback, permission_set, user_override)
+  - UI: tab "Permission Sets" en Admin Views Governance (crear, editar, asignar usuarios, eliminar sets custom)
+  - UI: tab "Accesos" en Admin User Detail (roles, sets, overrides, effective views agrupados por seccion con fuente)
+  - Audit log: 5 nuevas acciones (`grant_set`, `revoke_set`, `create_set`, `update_set`, `delete_set`)
+  - Eventos outbox: `viewAccessSetAssigned`, `viewAccessSetRevoked`
+  - Permission Sets de sistema editables en vistas pero no eliminables; sets custom CRUD completo
+
 - **ISSUE-006 fix: Payroll ya no colapsa fallas de permisos a `daysOnUnpaidLeave = 0`**:
   - `fetchApprovedLeaveForPeriod()` ahora retorna `{ rows, degraded }` y marca degradación explícita cuando PostgreSQL no está disponible o la query falla
   - `fetchAttendanceForAllMembers()` propaga `leaveDataDegraded` y `fetchAttendanceForPayrollPeriod()` lo expone en `attendanceDiagnostics`
