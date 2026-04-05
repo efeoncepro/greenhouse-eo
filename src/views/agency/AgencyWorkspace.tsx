@@ -231,22 +231,24 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
       </Card>
 
       <TabContext value={activeTab}>
-        <CustomTabList
-          onChange={handleChange}
-          variant='scrollable'
-          aria-label='Secciones del workspace de agencia'
-        >
-          {TAB_CONFIG.map(tab => (
-            <Tab
-              key={tab.value}
-              value={tab.value}
-              label={tab.label}
-              icon={<i className={tab.icon} aria-hidden='true' />}
-              iconPosition='start'
-              aria-label={tab.ariaLabel}
-            />
-          ))}
-        </CustomTabList>
+        <Box sx={{ minWidth: 0, overflow: 'hidden' }}>
+          <CustomTabList
+            onChange={handleChange}
+            variant='scrollable'
+            aria-label='Secciones del workspace de agencia'
+          >
+            {TAB_CONFIG.map(tab => (
+              <Tab
+                key={tab.value}
+                value={tab.value}
+                label={tab.label}
+                icon={<i className={tab.icon} aria-hidden='true' />}
+                iconPosition='start'
+                aria-label={tab.ariaLabel}
+              />
+            ))}
+          </CustomTabList>
+        </Box>
 
         <div ref={panelRef} tabIndex={-1} style={{ outline: 'none', position: 'relative' }}>
           {/* aria-live region for screen reader announcements (visually hidden) */}
