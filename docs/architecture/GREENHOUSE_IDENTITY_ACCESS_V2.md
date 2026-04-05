@@ -32,12 +32,28 @@ Migracion: `20260405164846570_person-360-v2-enriched-view.sql`
 - Mi Perfil muestra avatar, cargo, telefono, departamento, y sistemas vinculados
 - 7/8 usuarios internos tienen avatar sincronizado desde Microsoft Graph
 
+### Normalizacion de source systems
+
+Funcion SQL `greenhouse_core.canonical_source_system(raw TEXT)` normaliza `source_system` values a nombres display-friendly en la VIEW `person_360`:
+
+| Raw DB values | Canonical | Mostrado en UI |
+|---|---|---|
+| `azure_ad`, `azure-ad`, `microsoft_sso`, `entra` | `microsoft` | Si |
+| `hubspot`, `hubspot_crm` | `hubspot` | Si |
+| `notion` | `notion` | Si |
+| `google`, `google_oauth`, `google_workspace` | `google` | Si |
+| `deel`, `deel_hr`, `deel_com` | `deel` | Si |
+| `greenhouse_auth`, `greenhouse_team` | `NULL` | No (filtrado) |
+
+Regla: nuevos source systems se agregan al CASE de la funcion SQL, no al frontend ni al TypeScript.
+
 ### Source files
 
 - `src/lib/entra/graph-client.ts` — `fetchEntraUserPhoto()`
 - `src/lib/entra/profile-sync.ts` — sync engine con avatar + identity link
 - `src/app/api/cron/entra-profile-sync/route.ts` — cron handler
 - `src/lib/tenant/internal-email-aliases.ts` — alias matching cross-domain
+- `greenhouse_core.canonical_source_system()` — funcion SQL de normalizacion
 
 ## Delta 2026-04-05 — Agent Auth (headless session for agents & E2E)
 

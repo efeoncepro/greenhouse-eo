@@ -1,5 +1,41 @@
 # Handoff.md
 
+## Sesión 2026-04-05 — Normalizacion de source systems en person_360
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: resolver que Mi Perfil mostraba Microsoft como desvinculado a pesar de que el Entra sync funciona correctamente
+
+### Diagnostico
+
+- Mi Perfil busca `'microsoft'` en `linkedSystems` pero la DB almacenaba `azure_ad` y `azure-ad`
+- Ya existia un normalizador TypeScript `mapIdentityProvider()` en `src/lib/people/shared.ts` pero no se usaba en Mi Perfil
+- El array crudo de `person_360.linked_systems` contenia 7 valores tecnicos: `azure_ad`, `azure-ad`, `greenhouse_auth`, `greenhouse_team`, `hubspot`, `hubspot_crm`, `notion`
+
+### Solucion
+
+- Funcion SQL `greenhouse_core.canonical_source_system(raw TEXT)` (`IMMUTABLE`) que normaliza valores tecnicos a display-friendly
+- La VIEW `person_360` ahora usa la funcion en el LATERAL join de `link_agg` para producir `linked_systems` limpio
+- Sistemas internos (`greenhouse_auth`, `greenhouse_team`) se filtran (retornan NULL → excluidos del array)
+- Resultado: `{hubspot,microsoft,notion}` — limpio, normalizado, deduplicado
+- No se toco TypeScript — la normalizacion vive en la unica fuente de verdad (la DB)
+
+### Verificacion
+
+- Query directa: 7/8 usuarios con `{hubspot,microsoft,notion}`, admin bootstrap con `{}`
+- `npx tsc --noEmit` — OK
+- Tipos regenerados por `kysely-codegen`
+
+### Archivos
+
+- `migrations/20260405180048252_canonical-source-system-function-person360.sql` (nuevo)
+- `src/types/db.d.ts` (regenerado)
+
+### Regla nueva
+
+Nuevos source systems se agregan al CASE de `canonical_source_system()`, no al frontend ni al TypeScript.
+
 ## Sesión 2026-04-05 — ISSUE-014: person_360 VIEW v2 + TASK-256 cierre
 
 ### Rama / alcance
