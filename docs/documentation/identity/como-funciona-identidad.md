@@ -1,4 +1,4 @@
-# Como funciona el sistema de identidades
+# Sistema de Identidad, Roles y Acceso
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
