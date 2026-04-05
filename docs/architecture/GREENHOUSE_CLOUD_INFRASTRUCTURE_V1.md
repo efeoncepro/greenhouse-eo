@@ -618,13 +618,13 @@ Defined in `vercel.json` at the repository root. Next.js API routes invoked by V
 
 ### Próximos candidatos a migración
 
-| Cron | Razón | Prioridad |
-|---|---|---|
-| `sync-conformed` | Orquestación compleja, 120s, semántica de retry, durabilidad | Alta |
-| `sync-conformed-recovery` | Recovery de backlog, durabilidad crítica, 120s | Alta |
-| `entra-profile-sync` | 300s (máximo Vercel), per-user upserts, sin retry | Media |
-| `nubox-sync` | ETL 3 fases, fallos parciales, observabilidad | Media |
-| `ico-member-sync` | Upserts BQ→PG por fila, sin alerting, latencia | Media |
+| Cron | Razón | Prioridad | Task |
+|---|---|---|---|
+| `sync-conformed` | Orquestación compleja, 120s, semántica de retry, durabilidad | Alta | TASK-258 |
+| `sync-conformed-recovery` | Recovery de backlog, durabilidad crítica, 120s | Alta | TASK-258 |
+| `entra-profile-sync` | 300s (máximo Vercel), per-user upserts, sin retry | Media | TASK-259 |
+| `nubox-sync` | ETL 3 fases, fallos parciales, observabilidad | Media | TASK-260 |
+| `ico-member-sync` | Upserts BQ→PG por fila, sin alerting, latencia | Media | TASK-260 |
 
 ### Placement decision criteria
 

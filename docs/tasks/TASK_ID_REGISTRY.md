@@ -307,3 +307,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-255` | `complete` | Mi Perfil: fix identity chain so profile never shows "Perfil no disponible" | `docs/tasks/complete/TASK-255-mi-perfil-identity-chain-fix.md` |
 | `TASK-256` | `complete` | Entra Profile Completeness: avatar sync + identity link for all internal users | `docs/tasks/complete/TASK-256-entra-profile-completeness-avatar-identity-link.md` |
 | `TASK-257` | `to-do` | Mi Perfil: enterprise redesign con patron Vuexy User View (sidebar + tabs) | `docs/tasks/to-do/TASK-257-mi-perfil-enterprise-redesign.md` |
+| `TASK-258` | `to-do` | Migrar sync-conformed + sync-conformed-recovery a ops-worker | `docs/tasks/to-do/TASK-258-migrate-sync-conformed-to-ops-worker.md` |
+| `TASK-259` | `to-do` | Migrar entra-profile-sync a ops-worker | `docs/tasks/to-do/TASK-259-migrate-entra-profile-sync-to-ops-worker.md` |
+| `TASK-260` | `to-do` | Migrar nubox-sync + ico-member-sync a ops-worker | `docs/tasks/to-do/TASK-260-migrate-nubox-sync-ico-member-sync-to-ops-worker.md` |
