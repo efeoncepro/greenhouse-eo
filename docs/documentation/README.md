@@ -34,7 +34,7 @@ _Pendiente de documentar._
 
 ### Delivery
 
-_Pendiente de documentar._
+- [ICO Engine — Como funciona](delivery/como-funciona-ico-engine.md) — metricas operativas, materializacion diaria, cadena de fallback (Postgres/BQ/live), diagnostico
 
 ### Herramientas IA
 
@@ -62,4 +62,6 @@ Para detalle tecnico, schemas, contratos y decisiones de diseno, ver `docs/archi
 | [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md)             | Finanzas           | P&L engine, dual-store, outbox, allocations                       |
 | [GREENHOUSE_UI_PLATFORM_V1.md](../architecture/GREENHOUSE_UI_PLATFORM_V1.md)                               | UI                 | Stack UI, librerias, patrones de componentes                      |
 | [GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md](../architecture/GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md)   | Identidad          | Modelo person-org: poblaciones, grafos, session context           |
+| [Greenhouse_ICO_Engine_v1.md](../architecture/Greenhouse_ICO_Engine_v1.md)                                 | Delivery           | ICO Engine: metricas, materializacion, Cloud Run, fallback chain  |
+| [Contrato_Metricas_ICO_v1.md](../architecture/Contrato_Metricas_ICO_v1.md)                                | Delivery           | Formulas canonicas de metricas ICO, umbrales, trust               |
 | [12-testing-development.md](../architecture/12-testing-development.md)                                     | Plataforma interna | Flujo actual de testing, observabilidad del suite, artifacts y CI |

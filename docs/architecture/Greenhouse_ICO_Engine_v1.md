@@ -1,5 +1,34 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-05 — ICO Engine performance fallback chain fix + delivery projection consumer
+
+Diagnóstico y resolución del error "Column name created_at is ambiguous" que impedía cargar el tab ICO Engine.
+
+### Causa raíz
+`readTopPerformer()` en `performance-report.ts` usaba LEFT JOINs directos a `greenhouse.clients` y `greenhouse.team_members`, trayendo todas sus columnas (incluyendo `created_at`). Los SQL constants `CARRY_OVER_SQL` y `PERIOD_ANCHOR_SQL` referencian `created_at` sin alias de tabla, causando ambiguedad con el `created_at` del CTE de delivery tasks.
+
+### Cambios realizados
+1. **`src/lib/ico-engine/performance-report.ts`** — `readTopPerformer()`: LEFT JOINs directos reemplazados por subqueries `(SELECT client_id, client_name FROM ...)` y `(SELECT member_id, display_name FROM ...)`. Patrón idéntico al ya aplicado en `readAgencyMetrics()` y `materializePerformanceReports()`.
+
+2. **`src/app/api/cron/outbox-react-delivery/route.ts`** — Nuevo consumer de dominio `delivery` registrado en `vercel.json` (cada 5 min). Resuelve starvation donde el consumer genérico `/outbox-react` nunca alcanzaba eventos delivery por backlog de otros dominios.
+
+3. **`src/app/api/internal/ico-diagnostics/route.ts`** — Endpoint de diagnóstico con 8 pasos de verificación:
+   - Infraestructura BQ, snapshot count, agency metrics, Postgres serving, BQ materializado, top performer query, full performance report, auto-seed Postgres si BQ tiene datos pero Postgres está vacío.
+
+4. **Cloud Run `ico-batch-worker`** — Re-desplegado (revisión 9) con el fix de SQL incluido.
+
+### Cadena de fallback (3 capas)
+```
+1. Postgres serving (greenhouse_serving.agency_performance_reports) — <200ms
+2. BigQuery materializado (ico_engine.performance_report_monthly) — ~2s
+3. Live compute (readAgencyMetrics + readTopPerformer) — ~8s
+```
+
+### Proyección reactiva
+- Evento: `ico.performance_report.materialized` (publicado por materialización)
+- Consumer: `/api/cron/outbox-react-delivery` (dominio `delivery`, cada 5 min)
+- Proyección: `agencyPerformanceReportProjection` (BQ → Postgres UPSERT)
+
 ## Delta 2026-04-04 — TASK-240 adds interactive @mentions in Nexa Insights narratives
 
 `TASK-240` hace clickeables las referencias a Spaces y miembros en las narrativas de Nexa Insights.
