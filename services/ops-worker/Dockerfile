@@ -19,16 +19,20 @@ COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile --ignore-scripts
 
 COPY tsconfig.json ./
-COPY src/lib/ ./src/lib/
-COPY src/config/ ./src/config/
-COPY src/types/ ./src/types/
+COPY src/ ./src/
 COPY services/ops-worker/server.ts ./services/ops-worker/server.ts
 
 # Bundle: resolves @/ path aliases + TypeScript at build time.
 # server-only shimmed to empty module (Next.js convention).
+# next-auth + providers shimmed because transitive imports pull auth.ts into the
+# bundle (projections → payroll → storage → tenant → auth) even though ops-worker
+# never uses authentication. Without shims, next-auth CJS default exports fail
+# under ESM format ("CredentialsProvider is not a function").
 # --packages=external keeps npm packages as imports resolved from node_modules.
 RUN echo "" > /app/server-only-shim.js && \
     echo "export class NextResponse { static json(d,o){return{body:d,...o}} }" > /app/next-server-shim.js && \
+    echo "export default function(){return{}} export function getServerSession(){return null}" > /app/next-auth-shim.js && \
+    echo "export default function(){return{}} export function compare(){return false}" > /app/bcryptjs-shim.js && \
     esbuild services/ops-worker/server.ts \
       --bundle \
       --platform=node \
@@ -38,6 +42,12 @@ RUN echo "" > /app/server-only-shim.js && \
       --alias:server-only=./server-only-shim.js \
       --alias:next/server=./next-server-shim.js \
       --alias:next/headers=./server-only-shim.js \
+      --alias:next-auth=./next-auth-shim.js \
+      --alias:next-auth/providers/credentials=./next-auth-shim.js \
+      --alias:next-auth/providers/azure-ad=./next-auth-shim.js \
+      --alias:next-auth/providers/google=./next-auth-shim.js \
+      --alias:next-auth/next=./next-auth-shim.js \
+      --alias:bcryptjs=./bcryptjs-shim.js \
       --alias:@=./src \
       --resolve-extensions=.ts,.tsx,.js,.json \
       --packages=external \

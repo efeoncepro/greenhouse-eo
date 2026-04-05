@@ -34,14 +34,39 @@ SCHEDULER_TZ="America/Santiago"
 
 # ─── Build & Deploy to Cloud Run ─────────────────────────────────────────────
 
-echo "=== Building and deploying ${SERVICE_NAME} to Cloud Run (${REGION}) ==="
+echo "=== Building ${SERVICE_NAME} image via Cloud Build ==="
 
-# Build from repo root using the Dockerfile in services/ops-worker/
+# Build using Cloud Build with inline config (--source --dockerfile is not supported;
+# --config and --tag are mutually exclusive, so we use inline cloudbuild.yaml)
+IMAGE="gcr.io/${PROJECT_ID}/${SERVICE_NAME}"
+
+gcloud builds submit . \
+  --project="${PROJECT_ID}" \
+  --config=/dev/stdin <<CLOUDBUILD_EOF
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', '${IMAGE}', '-f', 'services/ops-worker/Dockerfile', '.']
+images:
+  - '${IMAGE}'
+CLOUDBUILD_EOF
+
+echo "=== Deploying ${SERVICE_NAME} to Cloud Run (${REGION}) ==="
+
+# Environment variables (non-sensitive)
+ENV_VARS="NODE_ENV=production"
+ENV_VARS="${ENV_VARS},GCP_PROJECT=${PROJECT_ID}"
+ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=efeonce-group:us-east4:greenhouse-pg-dev"
+ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_DATABASE=greenhouse_app"
+ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_USER=greenhouse_app"
+
+# Secrets from Secret Manager (mounted as env vars)
+SECRETS="NEXTAUTH_SECRET=greenhouse-nextauth-secret-staging:latest"
+SECRETS="${SECRETS},GREENHOUSE_POSTGRES_PASSWORD=greenhouse-pg-dev-app-password:latest"
+
 gcloud run deploy "${SERVICE_NAME}" \
   --project="${PROJECT_ID}" \
   --region="${REGION}" \
-  --source=. \
-  --dockerfile=services/ops-worker/Dockerfile \
+  --image="${IMAGE}" \
   --service-account="${SERVICE_ACCOUNT}" \
   --memory="${MEMORY}" \
   --cpu="${CPU}" \
@@ -49,7 +74,8 @@ gcloud run deploy "${SERVICE_NAME}" \
   --max-instances="${MAX_INSTANCES}" \
   --concurrency="${CONCURRENCY}" \
   --no-allow-unauthenticated \
-  --set-env-vars="NODE_ENV=production" \
+  --set-env-vars="${ENV_VARS}" \
+  --update-secrets="${SECRETS}" \
   --quiet
 
 SERVICE_URL=$(gcloud run services describe "${SERVICE_NAME}" \
@@ -59,13 +85,33 @@ SERVICE_URL=$(gcloud run services describe "${SERVICE_NAME}" \
 
 echo "=== Service deployed at: ${SERVICE_URL} ==="
 
+# ─── IAM: Grant Invoker role to SA (idempotent) ─────────────────────────────
+
+echo "=== Ensuring ${SERVICE_ACCOUNT} has roles/run.invoker ==="
+gcloud run services add-iam-policy-binding "${SERVICE_NAME}" \
+  --project="${PROJECT_ID}" \
+  --region="${REGION}" \
+  --member="serviceAccount:${SERVICE_ACCOUNT}" \
+  --role="roles/run.invoker" \
+  --quiet
+
 # ─── Health Check ────────────────────────────────────────────────────────────
 
 echo "=== Running health check ==="
 
-HEALTH_TOKEN=$(gcloud auth print-identity-token --audiences="${SERVICE_URL}")
+# Use gcloud proxy to reach the authenticated service without impersonation
+HEALTH_PORT=19092
+gcloud run services proxy "${SERVICE_NAME}" \
+  --project="${PROJECT_ID}" \
+  --region="${REGION}" \
+  --port="${HEALTH_PORT}" &
+PROXY_PID=$!
+sleep 4
 
-curl -s -H "Authorization: Bearer ${HEALTH_TOKEN}" "${SERVICE_URL}/health" | python3 -m json.tool || true
+curl -sf "http://localhost:${HEALTH_PORT}/health" | python3 -m json.tool || echo "WARN: health check failed (service may still be starting)"
+
+kill "${PROXY_PID}" 2>/dev/null || true
+wait "${PROXY_PID}" 2>/dev/null || true
 
 # ─── Cloud Scheduler Jobs ────────────────────────────────────────────────────
 
@@ -174,10 +220,10 @@ echo ""
 echo "=== Deployment complete ==="
 echo ""
 echo "Next steps:"
-echo "  1. Verify health: curl -H \"Authorization: Bearer \$(gcloud auth print-identity-token --audiences=${SERVICE_URL})\" ${SERVICE_URL}/health"
-echo "  2. Run once manually to confirm:"
-echo "     curl -X POST -H \"Authorization: Bearer \$(gcloud auth print-identity-token --audiences=${SERVICE_URL})\" ${SERVICE_URL}/reactive/process"
-echo "  3. After dual-run verification, remove the 3 cron entries from vercel.json:"
+echo "  1. Verify health:  gcloud run services proxy ${SERVICE_NAME} --port=9092 & sleep 3 && curl -s http://localhost:9092/health"
+echo "  2. Run once manually:  gcloud scheduler jobs run ops-reactive-process --project=${PROJECT_ID} --location=${REGION}"
+echo "  3. Check logs:  gcloud logging read 'resource.labels.service_name=\"${SERVICE_NAME}\"' --project=${PROJECT_ID} --limit=10"
+echo "  4. After dual-run verification, remove the 3 cron entries from vercel.json:"
 echo "     - api/cron/outbox-react"
 echo "     - api/cron/outbox-react-delivery"
 echo "     - api/cron/projection-recovery"
