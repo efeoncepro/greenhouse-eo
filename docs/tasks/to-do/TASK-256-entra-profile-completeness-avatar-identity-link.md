@@ -198,7 +198,7 @@ La foto de Microsoft Graph NO tiene URL publica estable — requiere token de ac
 - Endpoint `/api/media/avatar/{oid}` que fetcha de Graph en cada request
 - Pro: siempre fresco. Con: latencia, dependencia de Graph API en runtime
 
-Recomendacion: evaluar en Discovery. Opcion A es la mas rapida de implementar; Opcion B es mejor a largo plazo.
+**Decision: Opcion B — Cloud Storage.** Usuario pidio siempre lo mas escalable. Subir a GCS bucket, guardar URL publica en `client_users.avatar_url`.
 
 ### Identity Profile Ensure Logic
 
@@ -250,9 +250,13 @@ Para cada usuario Entra:
 - Auditar otros modulos de Mi Ficha que dependan de `person_360` — con identity link cerrado, deberian funcionar
 - Considerar webhook de Microsoft Graph para cambios de perfil en tiempo real (en lugar de solo cron)
 
+## Resolved Questions
+
+- **Estrategia de almacenamiento de avatar**: Cloud Storage (GCS) — decision del usuario: siempre lo mas escalable. Subir foto a bucket, guardar URL publica en `client_users.avatar_url`.
+- **Usuarios internos no en Entra**: todos los internos estan en Entra. Los clientes externos son los que aun no estan — fuera del scope de esta task.
+- **Frecuencia del cron**: `vercel.json` configura `entra-profile-sync` a `0 8 * * *` (una vez al dia, 8:00 UTC).
+
 ## Open Questions
 
-- Estrategia de almacenamiento de avatar: data URI vs Cloud Storage vs proxy on-demand? Evaluar en Discovery
-- Hay usuarios internos que NO estan en Entra (e.g. cuentas de servicio, bots)? Si si, deben excluirse del ensure link
-- El cron actual de Entra sync corre cada cuanto? Verificar en `vercel.json`
 - Existen usuarios con identity_profile pero sin member record? Si si, person_360 tendra fila pero memberFacet sera null — verificar que Mi Perfil maneja esto gracefully (ya deberia por TASK-255)
+- Bucket GCS a usar: crear uno nuevo (`greenhouse-avatars`) o reutilizar uno existente? Verificar en Discovery
