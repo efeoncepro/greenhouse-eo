@@ -99,6 +99,7 @@ const healthSubsystems = (subsystems: OperationsSubsystem[]) =>
       'Outbox',
       'Proyecciones',
       'Reactive backlog',
+      'Reactive Worker',
       'Notificaciones',
       'Finance Data Quality',
       'Notion Delivery Data Quality'
@@ -116,6 +117,18 @@ const subsystemDetail = (subsystem: OperationsSubsystem) => {
     }
 
     return `${subsystem.processed} eventos antiguos siguen sin huella reactiva visible en el ledger.`
+  }
+
+  if (subsystem.name === 'Reactive Worker') {
+    if (subsystem.processed === 0 && subsystem.failed === 0) {
+      return 'Sin corridas recientes del worker reactivo en Cloud Run.'
+    }
+
+    if (subsystem.failed > 0) {
+      return `${subsystem.failed} fallos en las últimas corridas sobre ${subsystem.processed} eventos procesados por el worker.`
+    }
+
+    return `${subsystem.processed} eventos procesados por el worker reactivo sin fallos visibles.`
   }
 
   return subsystem.failed > 0

@@ -61,6 +61,7 @@
     "setup:postgres:staff-augmentation": "tsx scripts/setup-postgres-staff-augmentation.ts",
     "setup:postgres:transactional-email": "tsx scripts/setup-postgres-transactional-email.ts",
     "setup:postgres:view-access": "tsx scripts/setup-postgres-view-access.ts",
+    "staging:request": "node scripts/staging-request.mjs",
     "email:dev": "email dev --dir src/emails --port 3001",
     "postinstall": "npm run build:icons",
     "clean": "node scripts/clean-paths.mjs .next-local .next",

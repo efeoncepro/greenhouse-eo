@@ -88,6 +88,7 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - `GREENHOUSE_BUSINESS_LINES_ARCHITECTURE_V1.md` — business lines canónicas, BU comercial vs operativa, ICO by BU
 - `GREENHOUSE_DATABASE_TOOLING_V1.md` — node-pg-migrate, Kysely, conexión centralizada, ownership model
 - `GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md` — modelo person↔org: poblaciones A/B/C, grafos operativo vs estructural, assignment sync, session org context
+- `GREENHOUSE_STAGING_ACCESS_V1.md` — acceso programático a Staging: SSO bypass, agent auth, `staging-request.mjs`, troubleshooting
 
 ## Issue Lifecycle Protocol
 
@@ -306,10 +307,25 @@ AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs
 - Setup Playwright: `scripts/playwright-auth-setup.mjs`
 - Spec técnica: `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md` (sección Agent Auth)
 
+### Staging requests programáticas (agentes y CI)
+
+- Staging tiene **Vercel SSO Protection** activa — todo request sin bypass es redirigido a la SSO wall.
+- **Comando canónico**: `pnpm staging:request <path>` — maneja bypass + auth + request en un solo paso.
+- Ejemplos:
+  ```bash
+  pnpm staging:request /api/agency/operations
+  pnpm staging:request /api/agency/operations --grep reactive
+  pnpm staging:request POST /api/some/endpoint '{"key":"value"}'
+  pnpm staging:request /api/agency/operations --pretty
+  ```
+- El script `scripts/staging-request.mjs` auto-fetch del bypass secret desde la Vercel API si no existe en `.env.local`.
+- **NUNCA** hacer `curl` directo a la URL `.vercel.app` de staging sin bypass header.
+- **NUNCA** crear `VERCEL_AUTOMATION_BYPASS_SECRET` manualmente en Vercel — es auto-gestionada.
+
 ### Cloud Run ops-worker (crons reactivos)
 
 - Servicio Cloud Run dedicado (`ops-worker`) en `us-east4` para los crons reactivos del outbox.
-- 3 Cloud Scheduler jobs: `ops-reactive-process` (*/5), `ops-reactive-process-delivery` (2-59/5), `ops-reactive-recover` (*/15), timezone `America/Santiago`.
+- 3 Cloud Scheduler jobs: `ops-reactive-process` (_/5), `ops-reactive-process-delivery` (2-59/5), `ops-reactive-recover` (_/15), timezone `America/Santiago`.
 - SA: `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` con `roles/run.invoker`.
 - Si el cambio toca `src/lib/sync/`, `src/lib/operations/`, o `services/ops-worker/`, verificar build del worker.
 - **ESM/CJS**: servicios Cloud Run que reutilicen `src/lib/` sin NextAuth shimean `next-auth`, providers y `bcryptjs` via esbuild `--alias`. Patrón en `services/ops-worker/Dockerfile`.

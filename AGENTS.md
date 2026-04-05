@@ -299,10 +299,41 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Fuente canónica: `src/app/api/auth/agent-session/route.ts`
 - Spec técnica: `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md` (sección Agent Auth)
 
+### Staging requests programáticas (agentes y CI)
+
+- Staging tiene **Vercel SSO Protection** activa — todo request sin bypass es redirigido a la SSO wall de Vercel.
+- **Comando canónico**: `pnpm staging:request <path>` — maneja bypass + auth + request en un solo paso.
+- Ejemplos:
+
+  ```bash
+  # GET simple
+  pnpm staging:request /api/agency/operations
+
+  # GET con búsqueda
+  pnpm staging:request /api/agency/operations --grep reactive
+
+  # POST con body
+  pnpm staging:request POST /api/some/endpoint '{"key":"value"}'
+
+  # Pretty-print
+  pnpm staging:request /api/agency/operations --pretty
+  ```
+
+- El script `scripts/staging-request.mjs`:
+  1. Lee `VERCEL_AUTOMATION_BYPASS_SECRET` de `.env.local`
+  2. Si no existe, lo auto-fetch desde la Vercel API (requiere `vercel login` previo)
+  3. Autentica como agente vía `/api/auth/agent-session` con bypass header
+  4. Ejecuta el request real con bypass header + cookie de sesión
+  5. Persiste el bypass secret en `.env.local` para future runs
+- **NUNCA** intentar hacer `curl` directo a la URL `.vercel.app` de staging sin bypass header — siempre devuelve HTML de Vercel SSO.
+- **NUNCA** crear `VERCEL_AUTOMATION_BYPASS_SECRET` manualmente en el dashboard de Vercel — la variable es auto-gestionada por el sistema.
+- Si el bypass secret se vuelve stale, borrar `VERCEL_AUTOMATION_BYPASS_SECRET` de `.env.local` y correr el script de nuevo — auto-refetch.
+- Fuente: `scripts/staging-request.mjs`
+
 ### Cloud Run ops-worker (crons reactivos)
 
 - Greenhouse tiene un servicio Cloud Run dedicado (`ops-worker`) en `us-east4` que ejecuta los crons reactivos del outbox.
-- 3 Cloud Scheduler jobs disparan el servicio: `ops-reactive-process` (*/5), `ops-reactive-process-delivery` (2-59/5), `ops-reactive-recover` (*/15), timezone `America/Santiago`.
+- 3 Cloud Scheduler jobs disparan el servicio: `ops-reactive-process` (_/5), `ops-reactive-process-delivery` (2-59/5), `ops-reactive-recover` (_/15), timezone `America/Santiago`.
 - SA: `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` con `roles/run.invoker`.
 - **Si el cambio toca `src/lib/sync/`, `src/lib/operations/`, proyecciones reactivas, o `services/ops-worker/`**, verificar que el build del worker sigue compilando (`cd services/ops-worker && docker build .` o revisar esbuild aliases).
 - **Regla ESM/CJS para Cloud Run**: servicios que reutilicen `src/lib/` sin necesitar NextAuth deben shimear `next-auth`, sus providers y `bcryptjs` via esbuild `--alias`. El patrón canónico de shims está en `services/ops-worker/Dockerfile`.

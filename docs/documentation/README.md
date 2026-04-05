@@ -31,6 +31,7 @@ _Pendiente de documentar._
 ### Agencia y Operaciones
 
 - [Ops Worker — Crons Reactivos en Cloud Run](operations/ops-worker-reactive-crons.md) — servicio Cloud Run que procesa eventos reactivos del outbox, corridas scheduladas, ESM/CJS shim pattern, monitoreo en Ops Health
+- [Acceso Programatico a Staging](operations/acceso-programatico-staging.md) — como agentes y CI acceden a Staging, bypass de SSO, comando `staging:request`, troubleshooting
 
 ### Delivery
 
@@ -63,5 +64,6 @@ Para detalle tecnico, schemas, contratos y decisiones de diseno, ver `docs/archi
 | [GREENHOUSE_UI_PLATFORM_V1.md](../architecture/GREENHOUSE_UI_PLATFORM_V1.md)                               | UI                 | Stack UI, librerias, patrones de componentes                      |
 | [GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md](../architecture/GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md)   | Identidad          | Modelo person-org: poblaciones, grafos, session context           |
 | [Greenhouse_ICO_Engine_v1.md](../architecture/Greenhouse_ICO_Engine_v1.md)                                 | Delivery           | ICO Engine: metricas, materializacion, Cloud Run, fallback chain  |
-| [Contrato_Metricas_ICO_v1.md](../architecture/Contrato_Metricas_ICO_v1.md)                                | Delivery           | Formulas canonicas de metricas ICO, umbrales, trust               |
+| [Contrato_Metricas_ICO_v1.md](../architecture/Contrato_Metricas_ICO_v1.md)                                 | Delivery           | Formulas canonicas de metricas ICO, umbrales, trust               |
 | [12-testing-development.md](../architecture/12-testing-development.md)                                     | Plataforma interna | Flujo actual de testing, observabilidad del suite, artifacts y CI |
+| [GREENHOUSE_STAGING_ACCESS_V1.md](../architecture/GREENHOUSE_STAGING_ACCESS_V1.md)                         | Plataforma         | Acceso programatico a Staging: SSO bypass, agent auth, script     |
