@@ -98,7 +98,10 @@ export const AGGREGATE_TYPES = {
   authSession: 'auth_session',
 
   // User Lifecycle (TASK-253)
-  userLifecycle: 'user_lifecycle'
+  userLifecycle: 'user_lifecycle',
+
+  // Permission Sets (TASK-263)
+  permissionSet: 'permission_set'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -259,7 +262,11 @@ export const EVENT_TYPES = {
 
   // User Lifecycle (TASK-253)
   userDeactivated: 'user.deactivated',
-  userReactivated: 'user.reactivated'
+  userReactivated: 'user.reactivated',
+
+  // Permission Sets (TASK-263)
+  viewAccessSetAssigned: 'access.permission_set_assigned',
+  viewAccessSetRevoked: 'access.permission_set_revoked'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
@@ -361,7 +368,11 @@ export const REACTIVE_EVENT_TYPES = [
 
   // User Lifecycle (TASK-253)
   EVENT_TYPES.userDeactivated,
-  EVENT_TYPES.userReactivated
+  EVENT_TYPES.userReactivated,
+
+  // Permission Sets (TASK-263)
+  EVENT_TYPES.viewAccessSetAssigned,
+  EVENT_TYPES.viewAccessSetRevoked
 ] as const
 
 // ── Event Payload Types (TASK-247) ──

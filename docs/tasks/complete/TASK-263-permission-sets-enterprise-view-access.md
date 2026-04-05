@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Completada 2026-04-05`
 - Rank: `TBD`
 - Domain: `identity`, `admin`, `ui`
 - Blocked by: `none`

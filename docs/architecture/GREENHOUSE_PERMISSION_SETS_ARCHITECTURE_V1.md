@@ -1,9 +1,9 @@
 # GREENHOUSE_PERMISSION_SETS_ARCHITECTURE_V1
 
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-04-05 por Claude (investigacion) + Julio Reyes (brief)
-> **Ultima actualizacion:** 2026-04-05
-> **Estado:** Propuesta — pendiente implementacion (TASK-263)
+> **Ultima actualizacion:** 2026-04-05 — implementacion completada
+> **Estado:** Implementado (TASK-263 completado 2026-04-05)
 
 ## 1. Problema
 
@@ -81,11 +81,11 @@ Un Permission Set es un bundle nombrado y reutilizable de view codes. Se asigna 
 
 | Set ID | Nombre | View Codes |
 |---|---|---|
-| `pset-gestion-financiera` | Gestion Financiera | `finanzas.*` (9 vistas) |
+| `pset-gestion-financiera` | Gestion Financiera | `finanzas.*` (11 vistas) |
 | `pset-nomina-completa` | Nomina Completa | `equipo.nomina`, `equipo.nomina_proyectada`, `equipo.permisos` |
 | `pset-agencia-ops` | Agencia Operaciones | `gestion.agencia`, `gestion.spaces`, `gestion.equipo`, `gestion.delivery`, `gestion.campanas` |
 | `pset-solo-lectura-agencia` | Solo Lectura Agencia | `gestion.agencia`, `gestion.spaces`, `gestion.delivery` |
-| `pset-admin-plataforma` | Admin Plataforma | `administracion.*` (10 vistas) |
+| `pset-admin-plataforma` | Admin Plataforma | `administracion.*` (12 vistas) |
 | `pset-mi-ficha-completa` | Mi Ficha Completa | `mi_ficha.*` (8 vistas) |
 
 ### Capa 3 — User Overrides (excepciones puntuales, ya existe)

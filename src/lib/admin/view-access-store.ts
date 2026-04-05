@@ -6,6 +6,7 @@ import { GOVERNANCE_SECTIONS, VIEW_REGISTRY, type GovernanceViewRegistryEntry } 
 import { getAdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { resolvePermissionSetViews } from '@/lib/admin/permission-sets'
 
 type RoleAssignmentRow = {
   role_code: string
@@ -945,6 +946,11 @@ export const resolveAuthorizedViewsForUser = async ({
       )
       .map(view => view.viewCode)
 
+    // Layer 2 — Permission Sets (additive, TASK-263)
+    const permissionSetViews = userId
+      ? await resolvePermissionSetViews(userId).catch(() => [] as string[])
+      : []
+
     const overridesForUser = userId
       ? persistedUserOverrides.filter(override => override.user_id === userId)
       : []
@@ -958,7 +964,7 @@ export const resolveAuthorizedViewsForUser = async ({
         }
 
         return current
-      }, new Set(baseAuthorizedViews))
+      }, new Set([...baseAuthorizedViews, ...permissionSetViews]))
     )
 
     const routeGroups = Array.from(
