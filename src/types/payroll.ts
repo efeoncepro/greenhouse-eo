@@ -321,6 +321,7 @@ export type PayrollReadinessIssueCode =
   | 'missing_utm_value'
   | 'missing_tax_table_version'
   | 'period_not_calculated'
+  | 'leave_data_unavailable'
 
 export interface PayrollReadinessIssue {
   code: PayrollReadinessIssueCode
@@ -405,6 +406,7 @@ export interface PayrollAttendanceDiagnostics {
   source: PayrollAttendanceSource
   integrationTarget: 'microsoft_teams'
   blocking: boolean
+  leaveDataDegraded: boolean
   notes: string[]
 }
 

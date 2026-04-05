@@ -41,13 +41,21 @@ export const buildMemberLeaveSummary = (leaveRows: LeaveCountRow[]) => {
 
 const getProjectId = () => getBigQueryProjectId()
 
-export const getPayrollAttendanceDiagnostics = (): PayrollAttendanceDiagnostics => ({
+export const getPayrollAttendanceDiagnostics = ({
+  leaveDataDegraded = false
+}: { leaveDataDegraded?: boolean } = {}): PayrollAttendanceDiagnostics => ({
   source: 'legacy_attendance_daily_plus_hr_leave',
   integrationTarget: 'microsoft_teams',
-  blocking: false,
+  blocking: leaveDataDegraded,
+  leaveDataDegraded,
   notes: [
     'La asistencia aún se resume desde attendance_daily + leave_requests.',
-    'La integración futura objetivo para asistencia es Microsoft Teams.'
+    'La integración futura objetivo para asistencia es Microsoft Teams.',
+    ...(leaveDataDegraded
+      ? [
+          '⚠ Los datos de permisos (leave_requests) no pudieron leerse desde PostgreSQL. Los descuentos por licencia no remunerada pueden ser incorrectos.'
+        ]
+      : [])
   ]
 })
 
@@ -74,13 +82,18 @@ export const countWeekdays = (startDate: string, endDate: string): number => {
  * Fetch attendance summary for all members in a payroll period.
  * Combines BigQuery attendance_daily + Postgres leave_requests.
  */
+export type AttendanceResult = {
+  snapshots: Map<string, AttendanceSnapshot>
+  leaveDataDegraded: boolean
+}
+
 export const fetchAttendanceForAllMembers = async (
   memberIds: string[],
   periodStart: string,
   periodEnd: string
-): Promise<Map<string, AttendanceSnapshot>> => {
+): Promise<AttendanceResult> => {
   if (memberIds.length === 0) {
-    return new Map()
+    return { snapshots: new Map(), leaveDataDegraded: false }
   }
 
   const baseWeekdays = countWeekdays(periodStart, periodEnd)
@@ -88,7 +101,7 @@ export const fetchAttendanceForAllMembers = async (
   // Fetch attendance from BigQuery (present, absent, late, excused, holiday)
   const projectId = getProjectId()
 
-  const [attendanceRows, leaveRows, holidayCountRows] = await Promise.all([
+  const [attendanceRows, leaveResult, holidayCountRows] = await Promise.all([
     runPayrollQuery<AttendanceCountRow>(
       `
         SELECT
@@ -132,6 +145,7 @@ export const fetchAttendanceForAllMembers = async (
   }
 
   // Build per-member leave counts from Postgres
+  const { rows: leaveRows, degraded: leaveDataDegraded } = leaveResult
   const memberLeave = buildMemberLeaveSummary(leaveRows)
 
   // Assemble snapshots
@@ -155,19 +169,16 @@ export const fetchAttendanceForAllMembers = async (
     })
   }
 
-  return result
+  return { snapshots: result, leaveDataDegraded }
 }
 
-export const fetchAttendanceForPayrollPeriod = async (
-  memberIds: string[],
-  periodStart: string,
-  periodEnd: string
-) => {
-  const snapshots = await fetchAttendanceForAllMembers(memberIds, periodStart, periodEnd)
+export const fetchAttendanceForPayrollPeriod = async (memberIds: string[], periodStart: string, periodEnd: string) => {
+  const { snapshots, leaveDataDegraded } = await fetchAttendanceForAllMembers(memberIds, periodStart, periodEnd)
 
   return {
     snapshots,
-    diagnostics: getPayrollAttendanceDiagnostics()
+    leaveDataDegraded,
+    diagnostics: getPayrollAttendanceDiagnostics({ leaveDataDegraded })
   }
 }
 
@@ -175,17 +186,21 @@ export const fetchAttendanceForPayrollPeriod = async (
  * Query approved leave requests for the period from Postgres.
  * Falls back to empty if Postgres is not configured.
  */
+type LeaveQueryResult = { rows: LeaveCountRow[]; degraded: boolean }
+
 const fetchApprovedLeaveForPeriod = async (
   memberIds: string[],
   periodStart: string,
   periodEnd: string
-): Promise<LeaveCountRow[]> => {
+): Promise<LeaveQueryResult> => {
   if (!isGreenhousePostgresConfigured()) {
-    return []
+    console.warn('[payroll] PostgreSQL not configured — leave data unavailable, marking as degraded')
+
+    return { rows: [], degraded: true }
   }
 
   try {
-    return await runGreenhousePostgresQuery<LeaveCountRow>(
+    const rows = await runGreenhousePostgresQuery<LeaveCountRow>(
       `
         SELECT
           r.member_id,
@@ -203,9 +218,11 @@ const fetchApprovedLeaveForPeriod = async (
       `,
       [periodEnd, periodStart, memberIds]
     )
+
+    return { rows, degraded: false }
   } catch (error) {
     console.warn('[payroll] Failed to fetch leave data from Postgres:', error instanceof Error ? error.message : error)
 
-    return []
+    return { rows: [], degraded: true }
   }
 }

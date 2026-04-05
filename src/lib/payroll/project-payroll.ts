@@ -1,11 +1,22 @@
 import 'server-only'
 
-import type { BonusProrationConfig, PayrollEntry, PayrollKpiSnapshot, ProjectionMode } from '@/types/payroll'
+import type {
+  BonusProrationConfig,
+  PayrollAttendanceDiagnostics,
+  PayrollEntry,
+  PayrollKpiSnapshot,
+  ProjectionMode
+} from '@/types/payroll'
 
 import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
 import { DEFAULT_BONUS_PRORATION_CONFIG, normalizeBonusProrationConfig } from '@/lib/payroll/bonus-config'
 import { buildPayrollEntry } from '@/lib/payroll/calculate-payroll'
-import { countWeekdays, fetchAttendanceForAllMembers } from '@/lib/payroll/fetch-attendance-for-period'
+import {
+  type AttendanceResult,
+  countWeekdays,
+  fetchAttendanceForAllMembers,
+  getPayrollAttendanceDiagnostics
+} from '@/lib/payroll/fetch-attendance-for-period'
 import { fetchKpisForPeriod } from '@/lib/payroll/fetch-kpis-for-period'
 import { getApplicableCompensationVersionsForPeriod } from '@/lib/payroll/get-compensation'
 import { isPayrollPostgresEnabled, pgGetActiveBonusConfig } from '@/lib/payroll/postgres-store'
@@ -24,6 +35,7 @@ export type ProjectedPayrollResult = {
   period: { year: number; month: number }
   mode: ProjectionMode
   asOfDate: string
+  attendanceDiagnostics: PayrollAttendanceDiagnostics
   entries: ProjectedPayrollEntry[]
   totals: {
     grossByCurrency: Record<string, number>
@@ -67,7 +79,7 @@ const prorateEntry = (entry: PayrollEntry, factor: number): PayrollEntry => {
   if (factor >= 1) return entry
 
   const s = (v: number) => roundCurrency(v * factor)
-  const sn = (v: number | null) => v != null ? roundCurrency(v * factor) : null
+  const sn = (v: number | null) => (v != null ? roundCurrency(v * factor) : null)
 
   return {
     ...entry,
@@ -136,32 +148,42 @@ export const projectPayrollForPeriod = async ({
   const periodId = `projected_${year}-${pad2(month)}_${mode}`
 
   // Cut date for attendance: today for actual, period end for projected
-  const attendanceCutDate = mode === 'actual_to_date'
-    ? (today < periodEnd ? today : periodEnd)
-    : periodEnd
+  const attendanceCutDate = mode === 'actual_to_date' ? (today < periodEnd ? today : periodEnd) : periodEnd
 
   // 1. Fetch all active compensation versions for the period
   const compensationRows = await getApplicableCompensationVersionsForPeriod(periodStart, periodEnd)
   const compensations = compensationRows.filter(row => row.hasCompensationVersion)
 
   if (compensations.length === 0) {
-    return { period: { year, month }, mode, asOfDate, entries: [], totals: { grossByCurrency: {}, netByCurrency: {}, memberCount: 0 } }
+    return {
+      period: { year, month },
+      mode,
+      asOfDate,
+      attendanceDiagnostics: getPayrollAttendanceDiagnostics(),
+      entries: [],
+      totals: { grossByCurrency: {}, netByCurrency: {}, memberCount: 0 }
+    }
   }
 
-  const memberIds = compensations
-    .map(c => (typeof c.memberId === 'string' ? c.memberId.trim() : ''))
-    .filter(Boolean)
+  const memberIds = compensations.map(c => (typeof c.memberId === 'string' ? c.memberId.trim() : '')).filter(Boolean)
 
   // 2. Fetch inputs in parallel
   const [kpiMap, attendanceResult, bonusConfig, ufIndicator] = await Promise.all([
     fetchKpisForPeriod({ memberIds, periodYear: year, periodMonth: month })
       .then(r => r.snapshots)
       .catch(() => new Map<string, PayrollKpiSnapshot>()),
-    fetchAttendanceForAllMembers(memberIds, periodStart, attendanceCutDate)
-      .catch(() => new Map()),
+    fetchAttendanceForAllMembers(memberIds, periodStart, attendanceCutDate).catch(
+      (): AttendanceResult => ({ snapshots: new Map(), leaveDataDegraded: true })
+    ),
     getBonusConfig(periodEnd),
     getHistoricalEconomicIndicatorForPeriod({ indicatorCode: 'UF', periodDate: asOfDate }).catch(() => null)
   ])
+
+  const attendanceSnapshots = attendanceResult.snapshots
+
+  const attendanceDiagnostics = getPayrollAttendanceDiagnostics({
+    leaveDataDegraded: attendanceResult.leaveDataDegraded
+  })
 
   const ufValue = ufIndicator?.value ?? null
 
@@ -170,15 +192,13 @@ export const projectPayrollForPeriod = async ({
   const workingDaysTotal = countWeekdays(periodStart, periodEnd)
 
   // 3. Build projected entry for each member
-  const prorationFactor = mode === 'actual_to_date' && workingDaysTotal > 0
-    ? workingDaysCut / workingDaysTotal
-    : 1
+  const prorationFactor = mode === 'actual_to_date' && workingDaysTotal > 0 ? workingDaysCut / workingDaysTotal : 1
 
   const entries: ProjectedPayrollEntry[] = []
 
   for (const compensation of compensations) {
     const kpi = kpiMap.get(compensation.memberId) ?? null
-    const attendance = attendanceResult.get(compensation.memberId) ?? null
+    const attendance = attendanceSnapshots.get(compensation.memberId) ?? null
 
     const fullEntry = await buildPayrollEntry({
       periodId,
@@ -217,6 +237,7 @@ export const projectPayrollForPeriod = async ({
     period: { year, month },
     mode,
     asOfDate,
+    attendanceDiagnostics,
     entries,
     totals: {
       grossByCurrency,

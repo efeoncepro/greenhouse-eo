@@ -2,6 +2,13 @@
 
 ## 2026-04-05
 
+- **ISSUE-006 fix: Payroll ya no colapsa fallas de permisos a `daysOnUnpaidLeave = 0`**:
+  - `fetchApprovedLeaveForPeriod()` ahora retorna `{ rows, degraded }` y marca degradación explícita cuando PostgreSQL no está disponible o la query falla
+  - `fetchAttendanceForAllMembers()` propaga `leaveDataDegraded` y `fetchAttendanceForPayrollPeriod()` lo expone en `attendanceDiagnostics`
+  - `buildPayrollPeriodReadiness()` agrega blocker `leave_data_unavailable` cuando los permisos no pueden leerse
+  - `calculatePayroll()` falla explícitamente si la data de permisos está degradada, evitando cálculo oficial incorrecto
+  - `projectPayrollForPeriod()` mantiene la tolerancia del carril de proyección pero ahora expone `attendanceDiagnostics` para que la API/UI puedan mostrar el estado degradado
+
 - **ISSUE-005 fix: Payroll close route no longer drains global notification backlog**:
   - `dispatchPayrollExportNotifications()` reescrita como función scoped al `periodId` — ya no llama `publishPendingOutboxEvents()` ni `processReactiveEvents()` inline
   - La notificación del período exportado se procesará asincrónicamente por el ops-worker cron (cada ~5 min) a partir del evento `payroll_period.exported` ya emitido transaccionalmente por `closePayrollPeriod()`

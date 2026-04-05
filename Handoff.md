@@ -1,5 +1,32 @@
 # Handoff.md
 
+## Sesión 2026-04-05 — ISSUE-006: payroll leave fallback ya no permite cálculo oficial silenciosamente degradado
+
+### Rama / alcance
+
+- rama: `fix/ISSUE-006-silent-payroll-leave-zeroing`
+- scope: bloquear el cálculo oficial de Payroll cuando `leave_requests` no está disponible y exponer degradación explícita en proyección/readiness
+
+### Cambios
+
+- `src/lib/payroll/fetch-attendance-for-period.ts` — `fetchApprovedLeaveForPeriod()` ahora retorna `{ rows, degraded }`; el reader de asistencia propaga `leaveDataDegraded`
+- `src/types/payroll.ts` — nuevo code `leave_data_unavailable` + `leaveDataDegraded` en `PayrollAttendanceDiagnostics`
+- `src/lib/payroll/payroll-readiness.ts` — agrega blocker explícito si los permisos no pueden leerse
+- `src/lib/payroll/calculate-payroll.ts` — falla explícitamente si la data de permisos está degradada; ya no permite cálculo oficial con `daysOnUnpaidLeave = 0` implícito
+- `src/lib/payroll/project-payroll.ts` — mantiene tolerancia en proyección pero ahora expone `attendanceDiagnostics` para UI/API
+- tests actualizados en `payroll-readiness.test.ts` y `project-payroll.test.ts`
+
+### Verificación
+
+- `npx tsc --noEmit` — OK
+- `pnpm lint` — OK
+- `pnpm test` — OK
+- `pnpm build` — OK
+
+### Riesgo / siguiente paso
+
+- La API de proyección ahora expone `attendanceDiagnostics`; si alguna vista asume shape cerrada del payload, verificar en staging la lectura del nuevo campo
+
 ## Sesion 2026-04-05 — TASK-257: Mi Perfil enterprise redesign (sidebar + tabs)
 
 ### Rama / alcance
