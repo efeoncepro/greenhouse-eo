@@ -627,8 +627,9 @@ Defined in `vercel.json` at the repository root. Next.js API routes invoked by V
 | `ico-member-sync` | Upserts BQ→PG por fila, sin alerting, latencia | Media | TASK-260 |
 | `webhook-dispatch` | Cola con latencia externa, fallo silencioso, cada 2 min | Media | TASK-261 |
 
-**Flaggeado para evaluación futura:**
-- `outbox-publish` (3/5 criterios): fundamento del event bus, hoy ligero y funcional en Vercel. Si el volumen de eventos crece significativamente, considerar migración.
+| `outbox-publish` | Fundamento del event bus, alimenta al reactor ya en Cloud Run | Alta | TASK-262 |
+
+> **Nota**: con TASK-262, el pipeline completo (publish → react → projections) correrá íntegramente en Cloud Run. Ya no habrá dependencia de Vercel para el event bus.
 
 ### Placement decision criteria
 
