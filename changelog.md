@@ -2,6 +2,13 @@
 
 ## 2026-04-05
 
+- **Staging deploy failures — 3 problemas resueltos (ISSUE-013)**:
+  - **Proyecto Vercel duplicado eliminado**: existía `prj_5zqdjJOz6OUQy7hiPh8xHZJj8tA8` en scope personal con 0 env vars y sin framework, cada push fallaba en paralelo al build real — eliminado via API
+  - **Variables Agent Auth agregadas a Vercel**: `AGENT_AUTH_SECRET` y `AGENT_AUTH_EMAIL` no existían en staging/preview — agregadas; endpoint agent-session ahora funciona en staging (HTTP 200)
+  - **VERCEL_AUTOMATION_BYPASS_SECRET manual eliminada**: otro agente había creado la variable con un valor incorrecto que sombreaba el secret real del sistema — eliminada; bypass SSO funciona
+  - Documentado en AGENTS.md (sección Vercel Deployment Protection + Proyecto único), CLAUDE.md, project_context.md, Handoff.md
+  - Regla nueva: NUNCA crear manualmente `VERCEL_AUTOMATION_BYPASS_SECRET` en Vercel — es auto-gestionada por el sistema
+
 - **Agent Auth — endpoint headless para agentes y E2E**:
   - nuevo `POST /api/auth/agent-session` — genera JWT NextAuth válido dado un shared secret + email, sin login interactivo
   - nuevo `scripts/playwright-auth-setup.mjs` — genera `.auth/storageState.json` con la cookie de sesión (modo API o Credentials)

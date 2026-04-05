@@ -198,6 +198,37 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Si se define un dominio de staging, debe apuntar al `Custom Environment` de `develop`, no a ramas personales.
 - No usar Production como entorno de prueba manual.
 
+### Vercel Deployment Protection (SSO)
+
+- El proyecto tiene **Vercel Authentication (SSO)** habilitada con `deploymentType: "all_except_custom_domains"`.
+- Esto significa que **todos los deployments** (preview, staging, `.vercel.app`) requieren autenticación SSO de Vercel, **excepto** custom domains de Production (`greenhouse.efeoncepro.com`).
+- **El custom domain de staging** (`dev-greenhouse.efeoncepro.com`) **SÍ recibe protección SSO** — no es una excepción. La excepción es solo para custom domains de Production.
+- **Para acceder programáticamente** a staging o preview (agentes, Playwright, curl), se debe usar:
+  - La URL `.vercel.app` del deployment (no el custom domain)
+  - Header `x-vercel-protection-bypass` con el secret del sistema
+- **El secret de bypass** es gestionado automáticamente por Vercel como variable de entorno `VERCEL_AUTOMATION_BYPASS_SECRET`. Está en el objeto `protectionBypass` del proyecto con `scope: "automation-bypass"` e `isEnvVar: true`.
+- **REGLA CRÍTICA: NUNCA crear manualmente** una variable `VERCEL_AUTOMATION_BYPASS_SECRET` en Vercel. La variable del sistema es auto-gestionada. Si se crea manualmente con un valor distinto, **sombrea** el valor real del sistema y rompe el bypass silenciosamente.
+- Si el bypass no funciona, verificar:
+  1. Que NO exista una variable manual `VERCEL_AUTOMATION_BYPASS_SECRET` que sombree la del sistema
+  2. Que se está usando la URL `.vercel.app`, no el custom domain
+  3. Que el header es `x-vercel-protection-bypass` (no `x-vercel-bypass` ni otro nombre)
+- Ejemplo de request con bypass:
+  ```bash
+  curl -s -X POST "https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app/api/auth/agent-session" \
+    -H "Content-Type: application/json" \
+    -H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" \
+    -d '{"secret": "<AGENT_AUTH_SECRET>", "email": "agent@greenhouse.efeonce.org"}'
+  ```
+- URLs de staging:
+  - Custom domain (protegido por SSO, no usar para agentes): `dev-greenhouse.efeoncepro.com`
+  - Vercel app (usar con bypass header): `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`
+
+### Proyecto Vercel único
+
+- El proyecto canónico es `greenhouse-eo` (id: `prj_d9v6gihlDq4k1EXazPvzWhSU0qbl`) dentro del team `efeonce-7670142f`.
+- **NUNCA** debe existir un segundo proyecto Vercel vinculado al mismo repositorio GitHub. Si GitHub reporta failures constantes en deploys, verificar en `vercel.com` que no exista un proyecto duplicado en un scope personal u otro team.
+- **Incidente real (2026-04-05):** existía un proyecto duplicado en scope personal (`julioreyes-4376's projects`, id `prj_5zqdjJOz6OUQy7hiPh8xHZJj8tA8`) con 0 variables de entorno y sin framework — cada push disparaba builds en ambos proyectos, el duplicado siempre fallaba.
+
 ### Variables por ambiente
 
 - Separar variables en Vercel por entorno:

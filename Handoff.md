@@ -1,5 +1,46 @@
 # Handoff.md
 
+## Sesión 2026-04-05 — Staging deploy failures: diagnóstico y resolución (3 problemas)
+
+### Rama / alcance
+
+- rama: `develop` (sin cambios de código — solo infraestructura Vercel)
+- scope: resolver failures constantes reportados por GitHub en cada push
+
+### Qué se encontró y resolvió
+
+**Problema 1: Variables de Agent Auth no existían en Vercel**
+
+- `AGENT_AUTH_SECRET` y `AGENT_AUTH_EMAIL` no estaban configuradas en ningún entorno de Vercel
+- Se agregaron a Staging + Preview(develop) via `vercel env add`
+- Resultado: el endpoint `POST /api/auth/agent-session` ahora funciona en staging (HTTP 200, JWT válido para `user-agent-e2e-001`)
+
+**Problema 2: Proyecto Vercel duplicado en scope personal**
+
+- Existía un segundo proyecto (`prj_5zqdjJOz6OUQy7hiPh8xHZJj8tA8`) en scope personal (`julioreyes-4376's projects`) vinculado al mismo repo GitHub
+- Tenía 0 variables de entorno y sin framework configurado → cada push disparaba builds en AMBOS proyectos, el duplicado siempre fallaba con `NEXTAUTH_SECRET is not set`
+- Se eliminó el proyecto duplicado via Vercel API
+- Resultado: GitHub ya no reporta failures constantes
+
+**Problema 3: VERCEL_AUTOMATION_BYPASS_SECRET con valor incorrecto**
+
+- Otro agente había creado manualmente la variable `VERCEL_AUTOMATION_BYPASS_SECRET` en staging y preview(develop) con un valor que NO correspondía al secret real del sistema
+- El valor manual sombreaba el secret auto-gestionado por Vercel (`gNYWFfHSlny2FXL7CO7IBnZuuJaEkIPJ`)
+- Se eliminaron las variables manuales via `vercel env rm`
+- Resultado: el bypass de SSO funciona correctamente con el secret del sistema
+
+### Verificación
+
+- Agent auth en staging: `curl -s -X POST "https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app/api/auth/agent-session"` con bypass header → HTTP 200, JWT válido
+- GitHub deploy status: sin failures adicionales tras eliminar proyecto duplicado
+- Vercel dashboard: solo el proyecto canónico `greenhouse-eo` existe para el team
+
+### Riesgo / siguiente paso
+
+- **Documentación**: se actualizaron AGENTS.md, CLAUDE.md, project_context.md, changelog.md, GREENHOUSE_IDENTITY_ACCESS_V2.md, y se creó ISSUE-013
+- Si un agente necesita el valor real del bypass secret, debe leerlo desde la variable de entorno del sistema `VERCEL_AUTOMATION_BYPASS_SECRET`, NO hardcodearlo
+- No crear NUNCA manualmente esa variable en Vercel — el sistema la gestiona
+
 ## Sesión 2026-04-05 — TASK-255: Mi Perfil identity chain fix
 
 ### Rama / alcance

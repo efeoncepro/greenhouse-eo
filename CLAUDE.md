@@ -36,6 +36,17 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - **Staging** → `develop` (Custom Environment) → `dev-greenhouse.efeoncepro.com`
 - **Preview** → ramas `feature/*`, `fix/*`, `hotfix/*`
 
+### Vercel Deployment Protection
+
+- **SSO habilitada** (`deploymentType: "all_except_custom_domains"`) — protege TODO salvo custom domains de Production.
+- El custom domain de staging (`dev-greenhouse.efeoncepro.com`) **SÍ tiene SSO** — no es excepción.
+- Para acceso programático (agentes, Playwright, curl): usar la URL `.vercel.app` + header `x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET`.
+- **NUNCA crear manualmente** `VERCEL_AUTOMATION_BYPASS_SECRET` en Vercel — la variable es auto-gestionada por el sistema. Si se crea manualmente, sombrea el valor real y rompe el bypass.
+- URLs de staging:
+  - Custom domain (SSO, no para agentes): `dev-greenhouse.efeoncepro.com`
+  - `.vercel.app` (usar con bypass): `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`
+- Proyecto canónico: `greenhouse-eo` (id: `prj_d9v6gihlDq4k1EXazPvzWhSU0qbl`, team: `efeonce-7670142f`). NUNCA crear un segundo proyecto vinculado al mismo repo.
+
 ## Quick Reference
 
 - **Package manager:** `pnpm` (siempre usar `pnpm`, no `npm` ni `yarn`)

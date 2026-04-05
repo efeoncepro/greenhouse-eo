@@ -122,6 +122,19 @@
   - para `OTD`, `FTR` y `RpA` prevalecen las bandas documentadas en `docs/architecture/Greenhouse_ICO_Engine_v1.md` § `A.5.5`
   - para `Cycle Time`, `CTV` y `BCS` se mantiene calibración interna según baseline operativo por cuenta
 
+## Delta 2026-04-05 Vercel Deployment Protection, bypass SSO y proyecto único
+
+- **SSO habilitada** con `deploymentType: "all_except_custom_domains"` — protege todos los deployments excepto custom domains de Production.
+- El custom domain de staging (`dev-greenhouse.efeoncepro.com`) **SÍ recibe SSO** — no es excepción (la excepción solo aplica a custom domains de Production como `greenhouse.efeoncepro.com`).
+- Para acceso programático (agentes, Playwright, curl), usar:
+  - URL `.vercel.app` del deployment: `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`
+  - Header: `x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET`
+- **REGLA CRÍTICA**: `VERCEL_AUTOMATION_BYPASS_SECRET` es auto-gestionada por el sistema (está en `protectionBypass` del proyecto con `scope: "automation-bypass"` e `isEnvVar: true`). NUNCA crear manualmente esa variable en Vercel — si se crea con otro valor, sombrea el real y rompe el bypass silenciosamente.
+- Proyecto canónico: `greenhouse-eo` (`prj_d9v6gihlDq4k1EXazPvzWhSU0qbl`), team `efeonce-7670142f`. No debe existir un segundo proyecto vincualdo al mismo repo.
+- **Incidente real (2026-04-05)**: se eliminó un proyecto duplicado en scope personal (`prj_5zqdjJOz6OUQy7hiPh8xHZJj8tA8`) que causaba failures constantes en GitHub — tenía 0 variables y sin framework.
+- Variables de Agent Auth (`AGENT_AUTH_SECRET`, `AGENT_AUTH_EMAIL`) verificadas activas en Staging + Preview(develop).
+- Agent Auth verificado funcional en staging: `POST /api/auth/agent-session` → HTTP 200, JWT válido para `user-agent-e2e-001`.
+
 ## Delta 2026-04-03 ICO Engine external benchmarks documented
 
 - La arquitectura de `ICO Engine` ya documenta un bloque específico de benchmarks externos y estándar recomendado para Greenhouse.

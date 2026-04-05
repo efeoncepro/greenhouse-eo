@@ -111,6 +111,16 @@ POST /api/auth/agent-session { secret, email }
 | `AGENT_AUTH_PASSWORD`         | Only credentials mode | Password for login form                              | `Gh-Agent-2026!`               |
 | `AGENT_AUTH_MODE`             | No                    | `api` (default) or `credentials`                     | `api`                          |
 
+### Staging verification (2026-04-05)
+
+- Agent Auth verified working on staging: `POST /api/auth/agent-session` → HTTP 200, JWT for `user-agent-e2e-001`
+- `AGENT_AUTH_SECRET` and `AGENT_AUTH_EMAIL` are configured in Vercel for Staging + Preview(develop)
+- **Accessing staging programmatically** requires the Vercel SSO bypass header because `ssoProtection.deploymentType = "all_except_custom_domains"` protects all non-production-custom-domain deployments:
+  - Use the `.vercel.app` URL: `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`
+  - Add header: `x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET`
+  - Do NOT use the custom domain `dev-greenhouse.efeoncepro.com` (still protected by SSO, not exempt)
+- **NEVER manually create** `VERCEL_AUTOMATION_BYPASS_SECRET` in Vercel — it is system-managed. A manual variable shadows the real one and silently breaks bypass (see ISSUE-013).
+
 ## Delta 2026-04-05 — Mi Perfil identity chain fix (TASK-255)
 
 ### Problema
