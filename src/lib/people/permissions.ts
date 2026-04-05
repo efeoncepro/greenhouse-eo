@@ -8,7 +8,7 @@ export const getPersonAccess = (roleCodes: string[]): PersonAccess => {
   const isOps = roleCodes.includes(ROLE_CODES.EFEONCE_OPERATIONS)
   const isHrPayroll = roleCodes.includes(ROLE_CODES.HR_PAYROLL)
   const isHrManager = roleCodes.includes(ROLE_CODES.HR_MANAGER)
-  const isFinance = roleCodes.includes(ROLE_CODES.FINANCE_MANAGER)
+  const isFinance = roleCodes.includes(ROLE_CODES.FINANCE_ADMIN) || roleCodes.includes(ROLE_CODES.FINANCE_MANAGER)
   const isPeopleViewer = roleCodes.includes(ROLE_CODES.PEOPLE_VIEWER)
 
   const canViewMemberships = isAdmin || isOps

@@ -1,17 +1,26 @@
 # TASK-228 - Employee Legacy Role Code Convergence
 
-## Delta 2026-04-05
-- Dependencia TASK-225 cerrada — `employee` y `finance_manager` formalmente marcados como deprecated en la spec canónica
-- Ruta de convergencia documentada en `GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md` §7
-- Esta task puede comenzar sin blockers
+## Delta 2026-04-05 — Implementación completa
+
+- `employee` y `finance_manager` marcados `@deprecated` en TypeScript (role-codes.ts)
+- ROLE_ROUTE_GROUPS mantiene entries como aliases backwards-compat
+- Todos los consumers runtime ahora aceptan `finance_admin` además de `finance_manager`:
+  - authorization.ts: canCloseCostIntelligencePeriod, canAccessPeopleModule
+  - people/permissions.ts: isFinance
+  - people/helpers.ts: economy tab roles
+  - home/get-home-snapshot.ts: canSeeFinanceStatus
+  - notification-recipients.ts: getFinanceAdminRecipients
+  - notifications.ts (projections): getFinanceRecipients
+- BigQuery seeds (finance/schema.ts, hr-core/schema.ts) marcados como legacy
+- Delta en INTERNAL_ROLES_HIERARCHIES_V1
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
-- Status real: `Diseño`
+- Status real: `Completada 2026-04-05`
 - Rank: `[pending]`
 - Domain: `identity / platform`
 - GitHub Project: `[pending]`

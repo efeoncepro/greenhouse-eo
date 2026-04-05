@@ -1,5 +1,32 @@
 # Handoff.md
 
+## Sesión 2026-04-05 — TASK-228 Employee Legacy Role Code Convergence
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: deprecar employee y finance_manager, actualizar consumers a finance_admin
+
+### Qué se hizo
+
+- **TASK-228 implementada y cerrada**:
+  - `employee` y `finance_manager` marcados `@deprecated` en role-codes.ts
+  - ROLE_ROUTE_GROUPS mantiene aliases backwards-compat
+  - 7 archivos runtime actualizados para aceptar `finance_admin` como canonical
+  - BigQuery seeds actualizados con descripción legacy
+  - Delta en INTERNAL_ROLES_HIERARCHIES_V1
+
+### Pendiente operacional
+
+- Nada — convergencia TypeScript completa, migración de datos usuarios pendiente cuando se confirme inventario
+
+### Verificación
+
+- `pnpm build` — OK
+- `pnpm lint` — OK
+
+---
+
 ## Sesión 2026-04-05 — TASK-226 Superadministrador Bootstrap & Assignment Policy
 
 ### Rama / alcance

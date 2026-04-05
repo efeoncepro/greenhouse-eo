@@ -4,7 +4,11 @@
  */
 export const ROLE_CODES = {
   EFEONCE_ADMIN: 'efeonce_admin',
+
+  /** @deprecated Use COLLABORATOR instead. Legacy internal employee alias — converging to collaborator (TASK-228). */
   EMPLOYEE: 'employee',
+
+  /** @deprecated Use FINANCE_ADMIN or FINANCE_ANALYST instead. Legacy finance role — converging to finance_admin (TASK-228). */
   FINANCE_MANAGER: 'finance_manager',
   FINANCE_ADMIN: 'finance_admin',
   FINANCE_ANALYST: 'finance_analyst',

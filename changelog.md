@@ -2,6 +2,12 @@
 
 ## 2026-04-05
 
+- **TASK-228 Employee Legacy Role Code Convergence — cerrada**:
+  - `employee` y `finance_manager` marcados `@deprecated` en role-codes.ts
+  - todos los consumers runtime actualizados para aceptar `finance_admin` como canonical (7 archivos)
+  - ROLE_ROUTE_GROUPS mantiene aliases backwards-compat para usuarios existentes
+  - BigQuery seeds actualizados con descripción legacy
+
 - **TASK-226 Superadministrador Bootstrap & Assignment Policy — cerrada**:
   - `SUPERADMIN_PROFILE_ROLES` + `isSuperadmin()` como constantes canónicas en `role-codes.ts`
   - guardrails en `updateUserRoles()`: solo admin asigna/revoca admin, no revocar último superadmin, efeonce_admin siempre incluye collaborator

@@ -23,7 +23,7 @@ const MONTH_SHORT = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago',
 
 export const canSeeFinanceStatus = (input: Pick<HomeSnapshotInput, 'roleCodes' | 'routeGroups'>) =>
   (input.routeGroups || []).includes('finance') ||
-  (input.roleCodes || []).some(code => code === ROLE_CODES.FINANCE_MANAGER || code === ROLE_CODES.EFEONCE_ADMIN || code === ROLE_CODES.EFEONCE_OPERATIONS)
+  (input.roleCodes || []).some(code => code === ROLE_CODES.FINANCE_ADMIN || code === ROLE_CODES.FINANCE_MANAGER || code === ROLE_CODES.EFEONCE_ADMIN || code === ROLE_CODES.EFEONCE_OPERATIONS)
 
 export const getHomeFinanceStatus = async () => {
   const [currentPeriod, latestMargin] = await Promise.all([

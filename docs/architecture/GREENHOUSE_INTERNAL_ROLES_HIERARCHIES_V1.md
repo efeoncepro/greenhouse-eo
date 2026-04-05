@@ -28,6 +28,17 @@ Usar junto con:
 - Origen: `TASK-225`
 - Estado: contrato arquitectónico nuevo; describe foundations ya existentes y formaliza la dirección target
 
+## Delta 2026-04-05 — Employee & Finance Manager legacy role convergence (TASK-228)
+
+- `employee` marcado `@deprecated` en TypeScript — converge a `collaborator`
+- `finance_manager` marcado `@deprecated` en TypeScript — converge a `finance_admin`
+- Todos los consumers runtime ahora aceptan FINANCE_ADMIN además de FINANCE_MANAGER (backwards compat)
+- ROLE_ROUTE_GROUPS mantiene entries legacy como aliases para no romper usuarios existentes
+- Authorization guards actualizados: canCloseCostIntelligencePeriod, canAccessPeopleModule, isFinance
+- Notification recipients, projections, home snapshot, people helpers actualizados
+- BigQuery seeds marcados como legacy con descripción actualizada
+- Pendiente: migración de datos user_role_assignments cuando se confirme que no hay usuarios activos en legacy codes
+
 ## Delta 2026-04-05 — Superadministrador bootstrap & assignment policy (TASK-226)
 
 - Policy formalizada: perfil owner/founder = `efeonce_admin` + `collaborator`

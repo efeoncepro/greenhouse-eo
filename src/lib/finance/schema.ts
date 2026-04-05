@@ -255,6 +255,7 @@ const FINANCE_COLUMN_REQUIREMENTS: Record<string, Record<string, string>> = {
   }
 }
 
+/** @deprecated Seed kept for backwards compat. Canonical role is finance_admin (TASK-228). */
 const FINANCE_MANAGER_ROLE_INSERT = `
   INSERT INTO \`{projectId}.greenhouse.roles\` (
     role_code, role_name, role_family, description, tenant_type,
@@ -264,7 +265,7 @@ const FINANCE_MANAGER_ROLE_INSERT = `
     'finance_manager',
     'Finance Manager',
     'internal',
-    'Financial operations access for Efeonce finance team.',
+    'Legacy — converging to finance_admin (TASK-228).',
     'efeonce_internal',
     FALSE,
     TRUE,

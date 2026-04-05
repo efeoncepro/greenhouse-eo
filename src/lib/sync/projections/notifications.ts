@@ -20,7 +20,7 @@ const PAYROLL_OPS_RECIPIENTS = [
 
 const getAdminRecipients = async () => getRoleCodeNotificationRecipients([ROLE_CODES.EFEONCE_ADMIN])
 
-const getFinanceRecipients = async () => getRoleCodeNotificationRecipients([ROLE_CODES.FINANCE_MANAGER, ROLE_CODES.EFEONCE_ADMIN])
+const getFinanceRecipients = async () => getRoleCodeNotificationRecipients([ROLE_CODES.FINANCE_ADMIN, ROLE_CODES.FINANCE_MANAGER, ROLE_CODES.EFEONCE_ADMIN])
 
 const getHrReviewRecipients = async () =>
   getRoleCodeNotificationRecipients([ROLE_CODES.HR_MANAGER, ROLE_CODES.HR_PAYROLL, ROLE_CODES.EFEONCE_ADMIN])

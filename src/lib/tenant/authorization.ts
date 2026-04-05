@@ -51,7 +51,7 @@ export const canReadCostIntelligence = (tenant: TenantContext) =>
   hasRouteGroup(tenant, 'finance') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
 
 export const canCloseCostIntelligencePeriod = (tenant: TenantContext) =>
-  hasRoleCode(tenant, ROLE_CODES.FINANCE_MANAGER) || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+  hasRoleCode(tenant, ROLE_CODES.FINANCE_ADMIN) || hasRoleCode(tenant, ROLE_CODES.FINANCE_MANAGER) || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
 
 export const canReopenCostIntelligencePeriod = (tenant: TenantContext) =>
   hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
@@ -59,7 +59,7 @@ export const canReopenCostIntelligencePeriod = (tenant: TenantContext) =>
 export const canAccessPeopleModule = (tenant: TenantContext) =>
   hasRouteGroup(tenant, 'people') ||
   (hasRouteGroup(tenant, 'internal') &&
-    (hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN) || hasRoleCode(tenant, ROLE_CODES.EFEONCE_OPERATIONS) || hasRoleCode(tenant, ROLE_CODES.HR_PAYROLL) || hasRoleCode(tenant, ROLE_CODES.FINANCE_MANAGER)))
+    (hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN) || hasRoleCode(tenant, ROLE_CODES.EFEONCE_OPERATIONS) || hasRoleCode(tenant, ROLE_CODES.HR_PAYROLL) || hasRoleCode(tenant, ROLE_CODES.FINANCE_ADMIN) || hasRoleCode(tenant, ROLE_CODES.FINANCE_MANAGER)))
 
 export const requireMyTenantContext = async (): Promise<{
   tenant: TenantContext | null

@@ -170,7 +170,7 @@ export const buildHrCoreBootstrapStatements = (projectId: string) => [
         'employee' AS role_code,
         'Employee' AS role_name,
         'internal' AS role_family,
-        'Internal employee self-service access for HR core.' AS description,
+        'Legacy — converging to collaborator (TASK-228).' AS description,
         'efeonce_internal' AS tenant_type,
         FALSE AS is_admin,
         TRUE AS is_internal,
