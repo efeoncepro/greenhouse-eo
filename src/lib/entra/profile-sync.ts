@@ -23,6 +23,7 @@ interface SyncResult {
   skippedDetails?: string[]
   ghUserCount?: number
   ghMapInfo?: string
+  matchedDetails?: string[]
   errors: string[]
 }
 
@@ -104,6 +105,9 @@ export const syncEntraProfiles = async (
       result.skipped++
       continue
     }
+
+    result.matchedDetails = result.matchedDetails || []
+    result.matchedDetails.push(`${entra.mail} → ${gh.email} (oid:${gh.microsoft_oid ? 'yes' : 'NO'}, ip:${gh.identity_profile_id ? 'yes' : 'NO'})`)
 
     try {
       // 0. Backfill microsoft_oid if matched by email (so future syncs match by OID)
