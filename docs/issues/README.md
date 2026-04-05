@@ -70,7 +70,6 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 | ID          | Título                                                                                                                                         | Ambiente             | Detectado  | Estado   |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------- | -------- |
-| `ISSUE-010` | [Finance schema drift logger type mismatch](open/ISSUE-010-finance-schema-drift-logger-type-mismatch.md)                                       | staging + production | 2026-04-05 | open     |
 | `ISSUE-009` | [Reactive event backlog can accumulate without Ops visibility](open/ISSUE-009-reactive-event-backlog-can-accumulate-without-ops-visibility.md) | develop runtime      | 2026-04-05 | open     |
 | `ISSUE-005` | [Payroll close route drains global notification backlog](open/ISSUE-005-payroll-close-route-drains-global-notification-backlog.md)             | preview + production | 2026-04-05 | open     |
 | `ISSUE-006` | [Payroll leave fallback silently zeroes unpaid leave](open/ISSUE-006-payroll-leave-fallback-silently-zeroes-unpaid-leave.md)                   | preview + production | 2026-04-05 | open     |
@@ -82,6 +81,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 | ID          | Título                                                                                                                                       | Ambiente             | Detectado  | Resuelto   | Causa                                                       |
 | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------- | ---------- | ----------------------------------------------------------- |
+| `ISSUE-010` | [Finance schema drift logger type mismatch](resolved/ISSUE-010-finance-schema-drift-logger-type-mismatch.md)                                   | staging + production | 2026-04-05 | 2026-04-05 | `logFinanceSchemaDrift` tipaba `Error` pero catch da `unknown` |
 | `ISSUE-007` | [Finance fallback writes can duplicate income and expenses](resolved/ISSUE-007-finance-fallback-writes-can-duplicate-income-and-expenses.md) | preview + production | 2026-04-05 | 2026-04-05 | Fallback recalculaba un segundo ID en `income` y `expenses` |
 | `ISSUE-008` | [Finance routes mask schema drift as empty success](resolved/ISSUE-008-finance-routes-mask-schema-drift-as-empty-success.md)                 | preview + production | 2026-04-05 | 2026-04-05 | Routes devolvían vacío ambiguo ante drift de schema         |
 | `ISSUE-001` | [SSL bad certificate en webhook-dispatch](resolved/ISSUE-001-ssl-bad-certificate-production.md)                                              | production           | 2026-03-30 | 2026-03-30 | `GREENHOUSE_POSTGRES_IP_TYPE` faltante en production        |
