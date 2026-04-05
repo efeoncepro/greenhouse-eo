@@ -68,7 +68,7 @@
 - `src/components/greenhouse/AnimatedCounter.tsx` dejó de importar `framer-motion` directo y ahora usa `@/libs/FramerMotion`.
 - Nueva cobertura focalizada: `src/components/greenhouse/AnimatedCounter.test.tsx`.
 - Verificación del carril de animación:
-  - `pnpm lint` — OK
+  - `pnpm exec eslint src/components/greenhouse/AnimatedCounter.test.tsx` — OK
   - `pnpm build` — OK
   - `pnpm exec vitest run src/components/greenhouse/AnimatedCounter.test.tsx src/components/greenhouse/EmptyState.test.tsx src/views/greenhouse/finance/FinancePeriodClosureDashboardView.test.tsx` — OK
 - Intento de preview manual local ejecutado sobre `http://localhost:3000/finance` con `NEXTAUTH_SECRET` temporal:
@@ -81,6 +81,7 @@
 
 ### Limitaciones verificadas
 
+- `pnpm lint` completo del repo ya no está verde por errores ajenos a `TASK-230` en `src/config/role-codes.ts` y `src/lib/tenant/role-route-mapping.ts`.
 - `pnpm test` completo del repo sigue con fallas ajenas a `TASK-230` (`Space360View` / `space-360`).
 - `npx tsc --noEmit` también sigue contaminado por drift ajeno en tests; el `build` productivo sí completó TypeScript.
 
