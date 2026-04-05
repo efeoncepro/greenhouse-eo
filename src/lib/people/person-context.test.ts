@@ -111,7 +111,7 @@ describe('buildPersonAccessContext', () => {
       lastLoginAt: '2026-03-20T12:00:00.000Z',
       defaultPortalHomePath: '/internal/dashboard',
       roleCodes: ['ai_tooling_admin', 'efeonce_operations'],
-      routeGroups: ['ai_tooling', 'internal'],
+      routeGroups: ['ai_tooling', 'internal', 'people'],
       canOpenAdminUser: true
     })
   })

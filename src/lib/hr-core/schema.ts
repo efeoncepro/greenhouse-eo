@@ -170,11 +170,11 @@ export const buildHrCoreBootstrapStatements = (projectId: string) => [
         'employee' AS role_code,
         'Employee' AS role_name,
         'internal' AS role_family,
-        'Legacy — converging to collaborator (TASK-228).' AS description,
+        'Removed — migrated to collaborator (TASK-248). Retained in BigQuery for historical reference.' AS description,
         'efeonce_internal' AS tenant_type,
         FALSE AS is_admin,
         TRUE AS is_internal,
-        ['internal', 'employee'] AS route_group_scope,
+        ['internal'] AS route_group_scope,
         CURRENT_TIMESTAMP() AS created_at,
         CURRENT_TIMESTAMP() AS updated_at
     ) AS source

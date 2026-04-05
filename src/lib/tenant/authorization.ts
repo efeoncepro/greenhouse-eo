@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server'
 import { ROLE_CODES } from '@/config/role-codes'
 import { getTenantContext, type TenantContext } from '@/lib/tenant/get-tenant-context'
 
-export type TenantRouteGroup = 'client' | 'internal' | 'admin' | 'agency' | 'hr' | 'finance' | 'employee' | 'my' | 'people' | 'ai_tooling'
+export type TenantRouteGroup = 'client' | 'internal' | 'admin' | 'agency' | 'hr' | 'finance' | 'my' | 'people' | 'ai_tooling'
 
 export const hasAuthorizedViewCode = ({
   tenant,
@@ -51,15 +51,15 @@ export const canReadCostIntelligence = (tenant: TenantContext) =>
   hasRouteGroup(tenant, 'finance') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
 
 export const canCloseCostIntelligencePeriod = (tenant: TenantContext) =>
-  hasRoleCode(tenant, ROLE_CODES.FINANCE_ADMIN) || hasRoleCode(tenant, ROLE_CODES.FINANCE_MANAGER) || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+  hasRoleCode(tenant, ROLE_CODES.FINANCE_ADMIN) || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
 
 export const canReopenCostIntelligencePeriod = (tenant: TenantContext) =>
   hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
 
 export const canAccessPeopleModule = (tenant: TenantContext) =>
   hasRouteGroup(tenant, 'people') ||
-  (hasRouteGroup(tenant, 'internal') &&
-    (hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN) || hasRoleCode(tenant, ROLE_CODES.EFEONCE_OPERATIONS) || hasRoleCode(tenant, ROLE_CODES.HR_PAYROLL) || hasRoleCode(tenant, ROLE_CODES.FINANCE_ADMIN) || hasRoleCode(tenant, ROLE_CODES.FINANCE_MANAGER)))
+  hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN) ||
+  (hasRouteGroup(tenant, 'internal') && hasRoleCode(tenant, ROLE_CODES.FINANCE_ADMIN))
 
 export const requireMyTenantContext = async (): Promise<{
   tenant: TenantContext | null
@@ -203,7 +203,7 @@ export const requireEmployeeTenantContext = async () => {
     }
   }
 
-  if (!hasRouteGroup(tenant, 'employee') && !hasRouteGroup(tenant, 'hr') && !hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)) {
+  if (!hasRouteGroup(tenant, 'my') && !hasRouteGroup(tenant, 'hr') && !hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)) {
     return {
       tenant: null,
       errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })

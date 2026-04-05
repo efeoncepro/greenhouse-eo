@@ -111,7 +111,7 @@ export const getHrAdminRecipients = async (): Promise<RecipientResolutionResult>
 
 export const getFinanceAdminRecipients = async (): Promise<RecipientResolutionResult> => {
   return toResolutionResult(
-    (await getRoleCodeNotificationRecipients([ROLE_CODES.FINANCE_ADMIN, ROLE_CODES.FINANCE_MANAGER, ROLE_CODES.EFEONCE_ADMIN]))
+    (await getRoleCodeNotificationRecipients([ROLE_CODES.FINANCE_ADMIN, ROLE_CODES.EFEONCE_ADMIN]))
       .map(toNotificationRecipient)
       .filter((value): value is NotificationRecipient => value !== null)
   )

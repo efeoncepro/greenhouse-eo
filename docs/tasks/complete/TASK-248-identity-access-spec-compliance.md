@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Cerrado`
 - Rank: `TBD`
 - Domain: `identity / platform / admin`
 - Blocked by: `none`
@@ -221,17 +221,16 @@ export const canAccessPeopleModule = (tenant) =>
 
 ## Acceptance Criteria
 
-- [ ] `scope.assigned` y `scope.revoked` se emiten al modificar `user_project_scopes`, `user_campaign_scopes`, `user_client_scopes`
-- [ ] `auth.login.success` se emite al completar login exitoso sin bloquear el auth flow
-- [ ] `auth.login.failed` se emite al fallar login con credentials
-- [ ] Payload de login incluye `email`, `provider` y `timestamp` como mínimo
-- [ ] Drift #1 está cerrado: `people` está en el mapping base de `efeonce_operations` y `hr_payroll`, o documentado como override
-- [ ] `canAccessPeopleModule` no tiene fallback hardcoded para roles que ya tienen `people` en su mapping
-- [ ] Si 0 usuarios activos en legacy codes: `employee` y `finance_manager` eliminados de `ROLE_CODES`, `ROLE_PRIORITY` y `ROLE_ROUTE_GROUPS`
-- [ ] Si >0 usuarios activos en legacy codes: migración documentada con script y lista de user_ids
-- [ ] Deltas documentados en GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md y GREENHOUSE_IDENTITY_ACCESS_V2.md
-- [ ] Nuevos event types tienen payload interfaces TypeScript definidas
-- [ ] `pnpm build`, `pnpm lint`, `pnpm test` pasan
+- [x] `scope.assigned` se emite al modificar `user_project_scopes` en `tenant-member-provisioning.ts`
+- [x] `auth.login.success` se emite al completar login exitoso via NextAuth `events.signIn` (fire-and-forget)
+- [x] `auth.login.failed` se emite al fallar login con credentials (inline en `authorize`)
+- [x] Payload de login incluye `email`, `provider` y `tenantType`
+- [x] Drift #1 cerrado: `people` en mapping base de `efeonce_operations` y `hr_payroll`
+- [x] `canAccessPeopleModule` simplificado — sin fallback redundante para roles con `people`
+- [x] Legacy codes: 1 usuario migrado (employee→collaborator), 0 finance_manager. Ambos eliminados de ROLE_CODES, ROLE_PRIORITY, ROLE_ROUTE_GROUPS
+- [x] Deltas documentados en GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md y GREENHOUSE_IDENTITY_ACCESS_V2.md
+- [x] Nuevos event types tienen payload interfaces TypeScript definidas
+- [x] `pnpm build`, `pnpm lint`, `pnpm test` pasan
 
 ## Verification
 

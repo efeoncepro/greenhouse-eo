@@ -1,6 +1,6 @@
 import { ROLE_CODES } from '@/config/role-codes'
 
-export type RouteGroup = 'internal' | 'admin' | 'client' | 'finance' | 'hr' | 'employee' | 'people' | 'my' | 'ai_tooling'
+export type RouteGroup = 'internal' | 'admin' | 'client' | 'finance' | 'hr' | 'people' | 'my' | 'ai_tooling'
 
 /**
  * Canonical role → route group mapping. Single source of truth.
@@ -9,19 +9,15 @@ export type RouteGroup = 'internal' | 'admin' | 'client' | 'finance' | 'hr' | 'e
  * (governance resolution) MUST import from here — never duplicate.
  */
 export const ROLE_ROUTE_GROUPS: Record<string, RouteGroup[]> = {
-  [ROLE_CODES.EFEONCE_ADMIN]: ['internal', 'admin', 'client', 'finance', 'hr', 'employee', 'people', 'my', 'ai_tooling'],
-  [ROLE_CODES.EFEONCE_OPERATIONS]: ['internal'],
+  [ROLE_CODES.EFEONCE_ADMIN]: ['internal', 'admin', 'client', 'finance', 'hr', 'people', 'my', 'ai_tooling'],
+  [ROLE_CODES.EFEONCE_OPERATIONS]: ['internal', 'people'],
   [ROLE_CODES.EFEONCE_ACCOUNT]: ['internal'],
-  [ROLE_CODES.HR_PAYROLL]: ['internal', 'hr'],
+  [ROLE_CODES.HR_PAYROLL]: ['internal', 'hr', 'people'],
   [ROLE_CODES.HR_MANAGER]: ['hr'],
 
-  /** @deprecated Alias for backwards compat — converging to finance_admin (TASK-228) */
-  [ROLE_CODES.FINANCE_MANAGER]: ['internal', 'finance'],
   [ROLE_CODES.FINANCE_ADMIN]: ['finance'],
   [ROLE_CODES.FINANCE_ANALYST]: ['finance'],
 
-  /** @deprecated Alias for backwards compat — converging to collaborator (TASK-228) */
-  [ROLE_CODES.EMPLOYEE]: ['internal', 'employee'],
   [ROLE_CODES.PEOPLE_VIEWER]: ['people'],
   [ROLE_CODES.AI_TOOLING_ADMIN]: ['ai_tooling'],
   [ROLE_CODES.COLLABORATOR]: ['my'],

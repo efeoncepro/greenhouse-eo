@@ -219,7 +219,7 @@ export const requireHrCoreReadTenantContext = async () => {
     }
   }
 
-  if (!tenant.routeGroups.includes('employee') && !tenant.routeGroups.includes('hr') && !hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)) {
+  if (!tenant.routeGroups.includes('my') && !tenant.routeGroups.includes('hr') && !hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)) {
     return {
       tenant: null,
       errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })

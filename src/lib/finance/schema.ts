@@ -265,7 +265,7 @@ const FINANCE_MANAGER_ROLE_INSERT = `
     'finance_manager',
     'Finance Manager',
     'internal',
-    'Legacy — converging to finance_admin (TASK-228).',
+    'Removed — migrated to finance_admin (TASK-248). Retained in BigQuery for historical reference.',
     'efeonce_internal',
     FALSE,
     TRUE,

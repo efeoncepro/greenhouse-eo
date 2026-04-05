@@ -15,6 +15,8 @@ import {
 } from '@/lib/integrations/hubspot-greenhouse-service'
 import { resolveContactDisplayName } from '@/lib/contacts/contact-display'
 import { getSpaceNotionSourceByClientId } from '@/lib/space-notion/space-notion-store'
+import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 
 type TenantProvisioningContext = {
   clientId: string
@@ -495,6 +497,16 @@ const upsertProjectScopes = async ({
         clientId,
         projectId: scopedProjectId
       }
+    })
+
+    // Audit: emit scope.assigned event (TASK-248)
+    await publishOutboxEvent({
+      aggregateType: AGGREGATE_TYPES.userScope,
+      aggregateId: buildScopeId(userId, scopedProjectId),
+      eventType: EVENT_TYPES.scopeAssigned,
+      payload: { userId, scopeType: 'project', scopeId: scopedProjectId, clientId, accessLevel: 'executive_context' }
+    }).catch(err => {
+      console.warn('[tenant-member-provisioning] Failed to emit scope.assigned event:', err)
     })
   }
 }

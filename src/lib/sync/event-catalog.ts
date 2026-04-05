@@ -89,7 +89,13 @@ export const AGGREGATE_TYPES = {
   operationalResponsibility: 'operational_responsibility',
 
   // Role Governance
-  roleAssignment: 'role_assignment'
+  roleAssignment: 'role_assignment',
+
+  // Scope Governance (TASK-248)
+  userScope: 'user_scope',
+
+  // Auth Session (TASK-248)
+  authSession: 'auth_session'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -238,7 +244,15 @@ export const EVENT_TYPES = {
 
   // Role Governance
   roleAssigned: 'role.assigned',
-  roleRevoked: 'role.revoked'
+  roleRevoked: 'role.revoked',
+
+  // Scope Governance (TASK-248)
+  scopeAssigned: 'scope.assigned',
+  scopeRevoked: 'scope.revoked',
+
+  // Auth Session (TASK-248)
+  loginSuccess: 'auth.login.success',
+  loginFailed: 'auth.login.failed'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
@@ -330,7 +344,13 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.responsibilityRevoked,
   EVENT_TYPES.responsibilityUpdated,
   EVENT_TYPES.roleAssigned,
-  EVENT_TYPES.roleRevoked
+  EVENT_TYPES.roleRevoked,
+
+  // Scope Governance & Auth Session (TASK-248)
+  EVENT_TYPES.scopeAssigned,
+  EVENT_TYPES.scopeRevoked,
+  EVENT_TYPES.loginSuccess,
+  EVENT_TYPES.loginFailed
 ] as const
 
 // ── Event Payload Types (TASK-247) ──
@@ -372,4 +392,34 @@ export interface RoleRevokedPayload {
   userId: string
   roleCode: string
   revokedByUserId: string
+}
+
+// ── Event Payload Types (TASK-248) ──
+
+export interface ScopeAssignedPayload {
+  userId: string
+  scopeType: 'project' | 'campaign' | 'client'
+  scopeId: string
+  clientId: string
+  accessLevel?: string
+}
+
+export interface ScopeRevokedPayload {
+  userId: string
+  scopeType: 'project' | 'campaign' | 'client'
+  scopeId: string
+  clientId: string
+}
+
+export interface LoginSuccessPayload {
+  userId: string
+  email: string
+  provider: string
+  tenantType: string
+}
+
+export interface LoginFailedPayload {
+  email: string
+  provider: string
+  reason: string
 }

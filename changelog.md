@@ -2,6 +2,16 @@
 
 ## 2026-04-05
 
+- **TASK-248 Identity & Access Spec Compliance — cerrada**:
+  - Audit events: `scope.assigned`, `scope.revoked`, `auth.login.success`, `auth.login.failed` con payloads tipados
+  - Login success emitido via NextAuth `events.signIn` (fire-and-forget), login failed inline en `authorize()`
+  - Scope assigned emitido en `tenant-member-provisioning.ts` para project scopes
+  - People drift formalizado: `efeonce_operations` y `hr_payroll` ahora con `people` en mapping base
+  - `canAccessPeopleModule` simplificado sin fallback hardcoded redundante
+  - Legacy codes eliminados: `employee` (1 usuario migrado a `collaborator`) y `finance_manager` (0 activos)
+  - `ROLE_CODES`, `ROLE_PRIORITY`, `ROLE_ROUTE_GROUPS` limpios — 13 role codes canónicos (sin legacy)
+  - Route group `employee` eliminado del type system, 15 archivos actualizados
+
 - **TASK-247 Identity & Platform Block Hardening — cerrada**:
   - 2 race conditions críticas cerradas con `FOR UPDATE` locking (superadmin count, primary demotion)
   - `RoleGuardrailError` class: errores de negocio ahora retornan HTTP 400 (no 500)

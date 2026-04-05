@@ -1,5 +1,52 @@
 # Handoff.md
 
+## Sesión 2026-04-05 — TASK-248 Identity & Access Spec Compliance
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: cerrar 4 gaps de spec compliance post contraste arquitectura vs implementación
+
+### Qué se hizo
+
+- **TASK-248 implementada y cerrada** (4/4 slices):
+  - **Slice 1 — Scope audit**: `scope.assigned`/`scope.revoked` event types + payloads. Emission en `tenant-member-provisioning.ts` para project scopes (fire-and-forget)
+  - **Slice 2 — Login audit**: `auth.login.success`/`auth.login.failed` event types + payloads. Success via NextAuth `events.signIn`, failed inline en `authorize()` credentials
+  - **Slice 3 — People drift**: `people` agregado a mapping base de `efeonce_operations` y `hr_payroll`. `canAccessPeopleModule` simplificado. Drift #1 cerrado
+  - **Slice 4 — Legacy codes**: 1 usuario migrado (`employee` → `collaborator`), 0 `finance_manager` activos. Ambos eliminados de `ROLE_CODES`, `ROLE_PRIORITY`, `ROLE_ROUTE_GROUPS`. Route group `employee` eliminado del type system. 15 archivos actualizados
+
+### Verificación
+
+- `tsc --noEmit` — OK
+- `pnpm build` — OK
+- `pnpm lint` — OK
+- `pnpm test` — 220 files, 922 tests passing
+
+---
+
+## Sesión 2026-04-05 — TASK-249 Test Observability MVP
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: discovery + issue draft + plan de ejecución para la lane de observabilidad de tests sin backend admin
+
+### Qué se hizo
+
+- `TASK-249` quedó promovida a `in-progress`.
+- Priority ajustada a `P1` por impacto cross-repo sobre merge quality, CI ergonomics y promoción segura.
+- Se preparó el draft de issue GitHub con título canónico: `[TASK-249] Test Observability MVP`.
+- Se creó `docs/tasks/plans/TASK-249-plan.md` con discovery summary, estrategia secuencial, orden de ejecución, risk flags y checkpoint humano.
+- El alcance sigue explícitamente `artifacts-first`: sin tablas runtime, sin APIs nuevas y sin admin backend.
+
+### Pendiente operacional
+
+- Aprobación humana del plan antes de tocar `ci.yml`, `vitest.config.ts`, `package.json` y docs de testing.
+
+### Verificación
+
+- No aplica validación técnica todavía: esta sesión dejó solo planeamiento y documentación de la task.
+
 ## Sesión 2026-04-05 — TASK-247 Identity & Platform Block Hardening
 
 ### Rama / alcance

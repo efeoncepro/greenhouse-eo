@@ -1,5 +1,29 @@
 # Greenhouse Identity & Access Architecture V2
 
+## Delta 2026-04-05 — Identity & Access Spec Compliance (TASK-248)
+
+### Audit events implementados
+
+- `scope.assigned` / `scope.revoked` — emitidos al asignar/revocar project scopes via outbox
+- `auth.login.success` — emitido via NextAuth `events.signIn` (fire-and-forget, post-session)
+- `auth.login.failed` — emitido inline en `authorize()` al fallar password credentials
+- Payloads tipados: `ScopeAssignedPayload`, `ScopeRevokedPayload`, `LoginSuccessPayload`, `LoginFailedPayload`
+- Todos en `REACTIVE_EVENT_TYPES` para futuros consumers
+
+### Legacy role codes completamente eliminados
+
+- `employee` y `finance_manager` eliminados del runtime TypeScript
+- 1 usuario migrado: `employee` → `collaborator` (user-efeonce-internal-daniela-ferreira)
+- Route group `employee` eliminado del type system
+- BigQuery seeds conservan referencia histórica con descripción "Removed"
+- `efeonce_admin` ahora tiene 8 route groups (sin `employee`)
+
+### Route group mapping actualizado
+
+- `efeonce_operations` ahora incluye `people` (formaliza drift #1 de ROLES_HIERARCHIES §1.5)
+- `hr_payroll` ahora incluye `people` (formaliza drift #1)
+- `canAccessPeopleModule` simplificado sin fallback redundante
+
 ## Delta 2026-04-05 — Superadministrador bootstrap & assignment policy (TASK-226)
 
 ### Policy formalizada

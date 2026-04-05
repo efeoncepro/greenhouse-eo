@@ -13,14 +13,14 @@ const deriveRouteGroupsFromRoleCodes = (roleCodes: string[], tenantType: string)
     if (roleCode === ROLE_CODES.HR_PAYROLL) {
       routeGroups.add('internal')
       routeGroups.add('hr')
+      routeGroups.add('people')
     }
 
-    if (roleCode === ROLE_CODES.EMPLOYEE) {
-      routeGroups.add('internal')
-      routeGroups.add('employee')
+    if (roleCode === ROLE_CODES.EFEONCE_OPERATIONS) {
+      routeGroups.add('people')
     }
 
-    if (roleCode === ROLE_CODES.FINANCE_MANAGER || roleCode === ROLE_CODES.FINANCE_ANALYST || roleCode === ROLE_CODES.FINANCE_ADMIN) {
+    if (roleCode === ROLE_CODES.FINANCE_ANALYST || roleCode === ROLE_CODES.FINANCE_ADMIN) {
       routeGroups.add('internal')
       routeGroups.add('finance')
     }

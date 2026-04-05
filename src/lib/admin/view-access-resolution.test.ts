@@ -15,7 +15,6 @@ describe('role-route-mapping', () => {
     expect(groups).toContain('people')
     expect(groups).toContain('ai_tooling')
     expect(groups).toContain('admin')
-    expect(groups).toContain('employee')
   })
 
   it('derives correct route groups for hr_payroll', () => {
@@ -23,6 +22,7 @@ describe('role-route-mapping', () => {
 
     expect(groups).toContain('internal')
     expect(groups).toContain('hr')
+    expect(groups).toContain('people')
     expect(groups).not.toContain('admin')
   })
 
@@ -42,15 +42,16 @@ describe('role-route-mapping', () => {
 
   it('combines route groups from multiple roles', () => {
     const groups = deriveRouteGroupsFromRoles(
-      [ROLE_CODES.EFEONCE_OPERATIONS, ROLE_CODES.FINANCE_MANAGER],
+      [ROLE_CODES.EFEONCE_OPERATIONS, ROLE_CODES.FINANCE_ADMIN],
       'efeonce_internal'
     )
 
     expect(groups).toContain('internal')
     expect(groups).toContain('finance')
+    expect(groups).toContain('people')
   })
 
-  it('all 15 ROLE_CODES have a mapping in ROLE_ROUTE_GROUPS', () => {
+  it('all ROLE_CODES have a mapping in ROLE_ROUTE_GROUPS', () => {
     for (const roleCode of Object.values(ROLE_CODES)) {
       expect(ROLE_ROUTE_GROUPS[roleCode]).toBeDefined()
       expect(ROLE_ROUTE_GROUPS[roleCode].length).toBeGreaterThan(0)
@@ -78,18 +79,9 @@ describe('additive view access contract', () => {
     expect(adminGroups).toContain('people')
     expect(adminGroups).toContain('ai_tooling')
     expect(adminGroups).toContain('admin')
-    expect(adminGroups).toContain('employee')
 
     // The route group derivation is independent of view persistence
     // This is the "additive" guarantee: deriveRouteGroups never changes
     // based on what's persisted in role_view_assignments
-  })
-
-  it('finance_manager retains internal + finance groups unconditionally', () => {
-    const groups = deriveRouteGroupsForSingleRole(ROLE_CODES.FINANCE_MANAGER, 'efeonce_internal')
-
-    expect(groups).toContain('internal')
-    expect(groups).toContain('finance')
-    expect(groups).toHaveLength(2)
   })
 })

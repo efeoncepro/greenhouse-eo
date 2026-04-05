@@ -28,6 +28,29 @@ Usar junto con:
 - Origen: `TASK-225`
 - Estado: contrato arquitectónico nuevo; describe foundations ya existentes y formaliza la dirección target
 
+## Delta 2026-04-05 — Identity & Access Spec Compliance (TASK-248)
+
+### Drift #1 cerrado: people access formalizado
+- `efeonce_operations` ahora incluye `people` en su mapping base de route groups
+- `hr_payroll` ahora incluye `people` en su mapping base de route groups
+- `canAccessPeopleModule` simplificado: sin fallback hardcoded para roles que ya tienen `people`
+- Drift #1 de §1.5 queda cerrado
+
+### Legacy role codes eliminados
+- 1 usuario activo con `employee` (`user-efeonce-internal-daniela-ferreira`) migrado a `collaborator`
+- 0 usuarios activos con `finance_manager` confirmado
+- `employee` y `finance_manager` eliminados de `ROLE_CODES`, `ROLE_PRIORITY` y `ROLE_ROUTE_GROUPS`
+- Route group `employee` eliminado — convergido a `my` (collaborator)
+- BigQuery seeds actualizados con descripción "Removed" para preservar referencia histórica
+- §7 convergencia completada: ambos legacy codes migrados y eliminados del runtime
+
+### Audit events nuevos
+- `scope.assigned` / `scope.revoked` definidos en event catalog con payload tipado
+- `auth.login.success` / `auth.login.failed` definidos en event catalog con payload tipado
+- Login success emitido via NextAuth `events.signIn` (fire-and-forget)
+- Login failed emitido inline en `authorize()` para credentials provider
+- Scope assigned emitido en `tenant-member-provisioning.ts` para project scopes
+
 ## Delta 2026-04-05 — Client view catalog deduplication (TASK-229)
 
 - 5 viewCodes duplicados eliminados del bloque `cliente`: `cliente.equipo`, `cliente.revisiones`, `cliente.analytics`, `cliente.campanas`, `cliente.notificaciones`

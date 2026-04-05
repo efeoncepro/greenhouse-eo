@@ -24,6 +24,8 @@ import {
   verifyTenantPassword
 } from '@/lib/tenant/access'
 import { resolvePortalHomePath } from '@/lib/tenant/resolve-portal-home-path'
+import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 
 const microsoftClientId = process.env.AZURE_AD_CLIENT_ID
 const microsoftClientSecret = getAzureAdClientSecret()
@@ -205,6 +207,14 @@ export const authOptions: NextAuthOptions = {
             active: tenant.active,
             status: tenant.status
           })
+
+          // Audit: emit login.failed (TASK-248)
+          publishOutboxEvent({
+            aggregateType: AGGREGATE_TYPES.authSession,
+            aggregateId: tenant.userId,
+            eventType: EVENT_TYPES.loginFailed,
+            payload: { email: normalizedEmail, provider: 'credentials', reason: 'invalid_password' }
+          }).catch(() => {})
 
           return null
         }
@@ -563,6 +573,28 @@ export const authOptions: NextAuthOptions = {
       }
 
       return session
+    }
+  },
+  events: {
+    // Audit: emit login.success after successful sign-in (TASK-248)
+    async signIn({ user, account }) {
+      const userRecord = user as unknown as Record<string, unknown>
+      const userId = user?.id || userRecord?.userId
+      const email = user?.email
+
+      if (userId && email) {
+        publishOutboxEvent({
+          aggregateType: AGGREGATE_TYPES.authSession,
+          aggregateId: String(userId),
+          eventType: EVENT_TYPES.loginSuccess,
+          payload: {
+            userId: String(userId),
+            email: String(email),
+            provider: account?.provider ?? 'unknown',
+            tenantType: String(userRecord?.tenantType ?? 'unknown')
+          }
+        }).catch(() => {})
+      }
     }
   }
 }
