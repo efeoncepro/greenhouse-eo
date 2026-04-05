@@ -1,7 +1,7 @@
 # Greenhouse EO — Cloud Infrastructure Reference
 
-> **Version:** 1.2
-> **Last updated:** 2026-06-17
+> **Version:** 1.3
+> **Last updated:** 2026-04-05
 > **Audience:** Platform engineers, DevOps, on-call operators
 
 ---
@@ -584,22 +584,56 @@ The `ops-reactive-*` jobs replace 3 Vercel cron routes (`outbox-react`, `outbox-
 
 ---
 
-## 6. Vercel Crons
+## 6. Vercel Crons (canonical inventory)
 
-Defined in `vercel.json` at the repository root. These are Next.js API routes invoked by Vercel's built-in cron scheduler.
+Defined in `vercel.json` at the repository root. Next.js API routes invoked by Vercel's built-in cron scheduler. Timezone: UTC.
 
-| Path                             | Schedule (UTC)              | Purpose                                                                     |
-| -------------------------------- | --------------------------- | --------------------------------------------------------------------------- |
-| `/api/cron/outbox-publish`       | `*/5 * * * *` (every 5 min) | Consumes the Postgres transactional outbox and publishes events to BigQuery |
-| `/api/cron/webhook-dispatch`     | `*/2 * * * *` (every 2 min) | Dispatches pending outbound webhooks to subscribed endpoints                |
-| `/api/cron/email-delivery-retry` | `*/5 * * * *` (every 5 min) | Retries failed email deliveries                                             |
+### Active (13 entries in vercel.json)
 
-> **Migrated to Cloud Run (TASK-254):** `outbox-react`, `outbox-react-delivery`, and `projection-recovery` crons were removed from `vercel.json` and replaced by Cloud Scheduler → `ops-worker` (see §5). The API route handlers remain as manual fallback endpoints.
-> | `/api/cron/sync-conformed` | `45 3 * * *` (daily 3:45 AM) | Transforms raw Notion data (`notion_ops`) into normalized conformed layer (`greenhouse_conformed`) with PostgreSQL projections. Runs after `notion-bq-sync` (3:00 AM) and before ICO materialization |
-> | `/api/cron/ico-materialize` | `15 6 * * *` (daily 6:15 AM) | Materializes ICO Engine monthly metric snapshots from conformed and raw data |
-> | `/api/cron/nubox-sync` | `30 7 * * *` (daily 7:30 AM) | Syncs Nubox DTE and financial data |
-> | `/api/finance/exchange-rates/sync` | `5 23 * * *` (daily 11:05 PM) | Fetches latest currency exchange rates and persists to Postgres |
-> | `/api/finance/economic-indicators/sync` | `5 23 * * *` (daily 11:05 PM) | Fetches economic indicators (UF, UTM, IPC) |
+| Path | Schedule | maxDuration | Purpose | Placement review |
+|---|---|---|---|---|
+| `/api/cron/outbox-publish` | `*/5 * * * *` | 60s | Consume Postgres outbox → publish events to BigQuery | Keep — queue ligera, 60s suficiente |
+| `/api/cron/webhook-dispatch` | `*/2 * * * *` | 60s | Dispatch pending outbound webhooks | Keep — async dispatch estándar |
+| `/api/cron/email-delivery-retry` | `*/5 * * * *` | 60s | Retry failed email deliveries | Keep — retry queue estándar |
+| `/api/cron/sync-conformed` | `20 7 * * *` | 120s | Orquestar Notion sync conformed layer + data quality | **Migrar** — orquestación compleja, 120s, retry |
+| `/api/cron/sync-conformed-recovery` | `*/30 * * * *` | 120s | Recovery de sync conformed runs fallidos | **Migrar** — backlog-driven recovery, durabilidad crítica |
+| `/api/cron/ico-materialize` | `15 10 * * *` | 120s | Materializar snapshots ICO mensuales | Keep — determinístico, 120s suficiente. **Duplicado**: también en Cloud Run `ico-batch-worker` a las 3:15 AM |
+| `/api/cron/ico-member-sync` | `30 10 * * *` | — | Sync BQ→PG de métricas ICO por miembro | Evaluar — upserts por fila, sin alerting |
+| `/api/cron/notion-delivery-data-quality` | `0 10 * * *` | 120s | Validar paridad de datos Notion delivery | Keep — scan sin backlog |
+| `/api/cron/nubox-sync` | `30 7 * * *` | 120s | ETL 3 fases: Nubox API → raw BQ → conformed → PG | Evaluar — multi-fase, fallos parciales tolerados |
+| `/api/cron/nubox-balance-sync` | `0 */4 * * *` | 60s | Reconciliación de balances Nubox BQ→PG | Keep — ligero, rápido |
+| `/api/cron/entra-profile-sync` | `0 8 * * *` | 300s | Sync Entra: avatar, identity link, datos profesionales | Evaluar — 300s (máximo Vercel), sin retry |
+| `/api/cron/entra-webhook-renew` | `0 6 */2 * *` | 30s | Renovar suscripción webhook de Entra | Keep — trigger simple |
+| `/api/finance/economic-indicators/sync` | `5 23 * * *` | — | Fetch indicadores económicos (UF, UTM, IPC, exchange rates) | Keep — API call diario |
+
+### Migrated to Cloud Run
+
+| Ruta original (fallback manual) | Cloud Run service | Scheduler job | Desde |
+|---|---|---|---|
+| `/api/cron/outbox-react` | `ops-worker` | `ops-reactive-process` | TASK-254 |
+| `/api/cron/outbox-react-delivery` | `ops-worker` | `ops-reactive-process-delivery` | TASK-254 |
+| `/api/cron/projection-recovery` | `ops-worker` | `ops-reactive-recover` | TASK-254 |
+
+> Las rutas API siguen existiendo como endpoints de fallback manual pero ya no están en `vercel.json`.
+
+### Próximos candidatos a migración
+
+| Cron | Razón | Prioridad |
+|---|---|---|
+| `sync-conformed` | Orquestación compleja, 120s, semántica de retry, durabilidad | Alta |
+| `sync-conformed-recovery` | Recovery de backlog, durabilidad crítica, 120s | Alta |
+| `entra-profile-sync` | 300s (máximo Vercel), per-user upserts, sin retry | Media |
+| `nubox-sync` | ETL 3 fases, fallos parciales, observabilidad | Media |
+| `ico-member-sync` | Upserts BQ→PG por fila, sin alerting, latencia | Media |
+
+### Placement decision criteria
+
+Un cron debe migrar a Cloud Run cuando cumple **2 o más** de:
+1. Procesa una cola o backlog (no determinístico)
+2. Necesita >60s de forma habitual
+3. Tiene semántica de retry/recovery
+4. Fallo silencioso tiene impacto operativo
+5. Se beneficia de run tracking institucional (`source_sync_runs`)
 
 ---
 
