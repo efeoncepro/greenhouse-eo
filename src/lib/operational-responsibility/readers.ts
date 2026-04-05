@@ -36,58 +36,81 @@ export interface ScopeOwnership {
 /**
  * List all responsibilities, optionally filtered by scope, member, or type.
  */
+export interface ListResponsibilitiesResult {
+  items: ResponsibilityRecord[]
+  total: number
+  page: number
+  pageSize: number
+}
+
 export async function listResponsibilities(filters?: {
   scopeType?: ScopeType
   scopeId?: string
   memberId?: string
   responsibilityType?: ResponsibilityType
   activeOnly?: boolean
-}): Promise<ResponsibilityRecord[]> {
+  page?: number
+  pageSize?: number
+}): Promise<ListResponsibilitiesResult> {
   const db = await getDb()
+  const page = Math.max(1, filters?.page ?? 1)
+  const pageSize = Math.min(200, Math.max(1, filters?.pageSize ?? 50))
 
-  let q = db
-    .selectFrom('greenhouse_core.operational_responsibilities as r')
-    .innerJoin('greenhouse_core.members as m', 'm.member_id', 'r.member_id')
-    .select([
-      'r.responsibility_id',
-      'r.member_id',
-      'm.display_name',
-      'm.primary_email',
-      'r.scope_type',
-      'r.scope_id',
-      'r.responsibility_type',
-      'r.is_primary',
-      'r.effective_from',
-      'r.effective_to',
-      'r.active',
-      'r.created_at',
-      'r.updated_at'
-    ])
-    .orderBy('r.created_at', 'desc')
+  const baseQuery = () => {
+    let q = db
+      .selectFrom('greenhouse_core.operational_responsibilities as r')
+      .innerJoin('greenhouse_core.members as m', 'm.member_id', 'r.member_id')
 
-  if (filters?.scopeType) {
-    q = q.where('r.scope_type', '=', filters.scopeType)
+    if (filters?.scopeType) {
+      q = q.where('r.scope_type', '=', filters.scopeType)
+    }
+
+    if (filters?.scopeId) {
+      q = q.where('r.scope_id', '=', filters.scopeId)
+    }
+
+    if (filters?.memberId) {
+      q = q.where('r.member_id', '=', filters.memberId)
+    }
+
+    if (filters?.responsibilityType) {
+      q = q.where('r.responsibility_type', '=', filters.responsibilityType)
+    }
+
+    if (filters?.activeOnly !== false) {
+      q = q.where('r.active', '=', true)
+    }
+
+    return q
   }
 
-  if (filters?.scopeId) {
-    q = q.where('r.scope_id', '=', filters.scopeId)
-  }
+  const [countResult, rows] = await Promise.all([
+    baseQuery()
+      .select(db.fn.countAll<string>().as('total'))
+      .executeTakeFirstOrThrow(),
+    baseQuery()
+      .select([
+        'r.responsibility_id',
+        'r.member_id',
+        'm.display_name',
+        'm.primary_email',
+        'r.scope_type',
+        'r.scope_id',
+        'r.responsibility_type',
+        'r.is_primary',
+        'r.effective_from',
+        'r.effective_to',
+        'r.active',
+        'r.created_at',
+        'r.updated_at'
+      ])
+      .orderBy('r.created_at', 'desc')
+      .limit(pageSize)
+      .offset((page - 1) * pageSize)
+      .execute()
+  ])
 
-  if (filters?.memberId) {
-    q = q.where('r.member_id', '=', filters.memberId)
-  }
-
-  if (filters?.responsibilityType) {
-    q = q.where('r.responsibility_type', '=', filters.responsibilityType)
-  }
-
-  if (filters?.activeOnly !== false) {
-    q = q.where('r.active', '=', true)
-  }
-
-  const rows = await q.execute()
-
-  return rows.map((r) => ({
+  const items = rows.map((r) => ({
     responsibilityId: r.responsibility_id,
     memberId: r.member_id,
     memberName: String(r.display_name ?? ''),
@@ -104,6 +127,8 @@ export async function listResponsibilities(filters?: {
     createdAt: String(r.created_at),
     updatedAt: String(r.updated_at)
   }))
+
+  return { items, total: Number(countResult.total), page, pageSize }
 }
 
 /**
@@ -139,12 +164,16 @@ export async function getScopeOwnership(scopeType: ScopeType, scopeId: string): 
  * Get all responsibilities for a specific member.
  */
 export async function getMemberResponsibilities(memberId: string): Promise<ResponsibilityRecord[]> {
-  return listResponsibilities({ memberId, activeOnly: true })
+  const result = await listResponsibilities({ memberId, activeOnly: true })
+
+  return result.items
 }
 
 /**
  * Get all responsibilities for a space (used by Agency Space 360).
  */
 export async function getSpaceResponsibilities(spaceId: string): Promise<ResponsibilityRecord[]> {
-  return listResponsibilities({ scopeType: 'space', scopeId: spaceId, activeOnly: true })
+  const result = await listResponsibilities({ scopeType: 'space', scopeId: spaceId, activeOnly: true })
+
+  return result.items
 }

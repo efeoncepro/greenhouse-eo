@@ -24,17 +24,21 @@ export async function GET(request: Request) {
     const scopeId = searchParams.get('scopeId')
     const memberId = searchParams.get('memberId')
     const responsibilityType = searchParams.get('responsibilityType') as ResponsibilityType | null
+    const page = Number(searchParams.get('page') || '1')
+    const pageSize = Number(searchParams.get('pageSize') || '50')
 
-    const items = await listResponsibilities({
+    const result = await listResponsibilities({
       scopeType: scopeType && SCOPE_TYPES.includes(scopeType) ? scopeType : undefined,
       scopeId: scopeId || undefined,
       memberId: memberId || undefined,
       responsibilityType:
         responsibilityType && RESPONSIBILITY_TYPES.includes(responsibilityType) ? responsibilityType : undefined,
-      activeOnly: searchParams.get('includeInactive') !== 'true'
+      activeOnly: searchParams.get('includeInactive') !== 'true',
+      page,
+      pageSize
     })
 
-    return NextResponse.json({ items, total: items.length })
+    return NextResponse.json(result)
   } catch (error) {
     console.error('Failed to list responsibilities:', error)
 
@@ -50,6 +54,15 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json()
+
+    // Gap 11 — validate required strings before passing to store (TASK-247)
+    const requiredFields = ['memberId', 'scopeId', 'scopeType', 'responsibilityType'] as const
+
+    for (const field of requiredFields) {
+      if (!body[field] || typeof body[field] !== 'string' || !body[field].trim()) {
+        return NextResponse.json({ error: `${field} es requerido y debe ser un string no vacío.` }, { status: 400 })
+      }
+    }
 
     const responsibilityId = await createResponsibility({
       memberId: body.memberId,

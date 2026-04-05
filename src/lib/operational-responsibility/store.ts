@@ -147,6 +147,11 @@ export async function createResponsibility(input: CreateResponsibilityInput): Pr
   const effectiveFrom = input.effectiveFrom ?? new Date().toISOString()
   const effectiveTo = input.effectiveTo ?? null
 
+  // Gap 4 — validate date range (TASK-247)
+  if (effectiveTo && new Date(effectiveFrom) >= new Date(effectiveTo)) {
+    throw new ResponsibilityValidationError('effectiveFrom debe ser anterior a effectiveTo.')
+  }
+
   // Validate member exists
   const db = await getDb()
 
@@ -168,8 +173,18 @@ export async function createResponsibility(input: CreateResponsibilityInput): Pr
   const responsibilityId = `resp-${randomUUID()}`
 
   await withTransaction(async (client) => {
-    // If marking as primary, demote existing primary for same scope+type
+    // If marking as primary, lock + demote existing primary for same scope+type
+    // FOR UPDATE serializes concurrent requests to prevent two primaries (Gap 2 — TASK-247)
     if (isPrimary) {
+      await client.query(
+        `SELECT responsibility_id
+         FROM greenhouse_core.operational_responsibilities
+         WHERE scope_type = $1 AND scope_id = $2 AND responsibility_type = $3
+           AND is_primary = TRUE AND active = TRUE
+         FOR UPDATE`,
+        [scopeType, scopeId, responsibilityType]
+      )
+
       await client.query(
         `UPDATE greenhouse_core.operational_responsibilities
          SET is_primary = FALSE, updated_at = NOW()
@@ -254,8 +269,18 @@ export async function updateResponsibility(
   const eventType = isRevocation ? EVENT_TYPES.responsibilityRevoked : EVENT_TYPES.responsibilityUpdated
 
   await withTransaction(async (client) => {
-    // If promoting to primary, demote existing primary
+    // If promoting to primary, lock + demote existing primary
+    // FOR UPDATE serializes concurrent requests to prevent two primaries (Gap 2 — TASK-247)
     if (input.isPrimary === true) {
+      await client.query(
+        `SELECT responsibility_id
+         FROM greenhouse_core.operational_responsibilities
+         WHERE scope_type = $1 AND scope_id = $2 AND responsibility_type = $3
+           AND is_primary = TRUE AND active = TRUE AND responsibility_id != $4
+         FOR UPDATE`,
+        [existing.scope_type, existing.scope_id, existing.responsibility_type, responsibilityId]
+      )
+
       await client.query(
         `UPDATE greenhouse_core.operational_responsibilities
          SET is_primary = FALSE, updated_at = NOW()

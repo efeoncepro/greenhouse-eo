@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { getUserRoleState, updateUserRoles } from '@/lib/admin/role-management'
+import { getUserRoleState, updateUserRoles, RoleGuardrailError } from '@/lib/admin/role-management'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
@@ -58,6 +58,10 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
     return NextResponse.json({ userId: id, currentAssignments: updatedAssignments })
   } catch (error) {
+    if (error instanceof RoleGuardrailError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
+
     console.error('[admin/users/roles] PUT failed:', error instanceof Error ? error.message : error)
 
     return NextResponse.json({ error: 'Failed to update roles' }, { status: 500 })

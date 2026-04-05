@@ -9,7 +9,8 @@ const mockReadMemberCapacityEconomicsBatch = vi.fn()
 const mockGetServicesBySpace = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
-  runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
+  runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args),
+  withGreenhousePostgresTransaction: vi.fn()
 }))
 
 vi.mock('@/lib/agency/agency-finance-metrics', () => ({

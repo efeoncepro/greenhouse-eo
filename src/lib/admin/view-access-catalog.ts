@@ -272,6 +272,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'admin'
   },
   {
+    viewCode: 'administracion.cuentas',
+    section: 'administracion',
+    label: 'Cuentas',
+    description: 'Organizaciones, spaces y gobierno de identidad.',
+    routePath: '/admin/accounts',
+    routeGroup: 'admin'
+  },
+  {
     viewCode: 'administracion.spaces',
     section: 'administracion',
     label: 'Spaces',

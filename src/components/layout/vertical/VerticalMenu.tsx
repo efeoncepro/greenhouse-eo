@@ -291,7 +291,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               { label: nl(GH_INTERNAL_NAV.adminBusinessLines), href: '/admin/business-lines' }
             ].filter(item => {
               if (item.href === '/admin') return canSeeView('administracion.admin_center', true)
-              if (item.href === '/admin/accounts') return canSeeView('administracion.spaces', true)
+              if (item.href === '/admin/accounts') return canSeeView('administracion.cuentas', true)
               if (item.href === '/admin/tenants') return canSeeView('administracion.spaces', true)
               if (item.href === '/admin/users') return canSeeView('administracion.usuarios', true)
               if (item.href === '/admin/roles') return canSeeView('administracion.roles', true)

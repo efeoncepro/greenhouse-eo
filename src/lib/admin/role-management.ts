@@ -8,6 +8,18 @@ import {
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 
+// ── Error class for role guardrail violations ──
+
+export class RoleGuardrailError extends Error {
+  statusCode: number
+
+  constructor(message: string, statusCode = 400) {
+    super(message)
+    this.name = 'RoleGuardrailError'
+    this.statusCode = statusCode
+  }
+}
+
 export interface RoleCatalogEntry {
   roleCode: string
   roleName: string
@@ -169,21 +181,11 @@ export const updateUserRoles = async (params: {
   const willHaveAdmin = roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)
 
   if (hadAdmin !== willHaveAdmin) {
-    // Admin role is being added or removed — verify the actor is also admin
     const actorAssignments = await getUserRoleAssignments(assignedByUserId)
     const actorIsAdmin = actorAssignments.some(a => a.roleCode === ROLE_CODES.EFEONCE_ADMIN)
 
     if (!actorIsAdmin) {
-      throw new Error('Solo un Superadministrador puede asignar o revocar el rol Superadministrador.')
-    }
-  }
-
-  // ── Guardrail: cannot revoke the last superadmin ──
-  if (hadAdmin && !willHaveAdmin) {
-    const adminCount = await countActiveSuperadmins()
-
-    if (adminCount <= 1) {
-      throw new Error('No se puede revocar el último Superadministrador activo del sistema.')
+      throw new RoleGuardrailError('Solo un Superadministrador puede asignar o revocar el rol Superadministrador.')
     }
   }
 
@@ -192,7 +194,27 @@ export const updateUserRoles = async (params: {
     roleCodes.push(ROLE_CODES.COLLABORATOR)
   }
 
+  // ── Guardrail: assignedByUserId must be a valid user ID ──
+  if (!assignedByUserId || assignedByUserId.startsWith('spc-') || assignedByUserId.startsWith('org-')) {
+    throw new RoleGuardrailError('assignedByUserId debe ser un user ID válido, no un space o organization ID.')
+  }
+
   return withGreenhousePostgresTransaction(async client => {
+    // ── Guardrail: cannot revoke the last superadmin (inside tx with FOR UPDATE) ──
+    if (hadAdmin && !willHaveAdmin) {
+      const countResult = await client.query<{ cnt: number }>(
+        `SELECT COUNT(DISTINCT user_id)::int AS cnt
+         FROM greenhouse_core.user_role_assignments
+         WHERE role_code = $1 AND active = TRUE
+         FOR UPDATE`,
+        [ROLE_CODES.EFEONCE_ADMIN]
+      )
+
+      if ((countResult.rows[0]?.cnt ?? 0) <= 1) {
+        throw new RoleGuardrailError('No se puede revocar el último Superadministrador activo del sistema.')
+      }
+    }
+
     // 1. Find roles being revoked (for audit)
     const revokedRoles = currentAssignments
       .filter(a => !roleCodes.includes(a.roleCode))

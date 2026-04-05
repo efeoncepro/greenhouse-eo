@@ -323,5 +323,53 @@ export const REACTIVE_EVENT_TYPES = [
 
   // Payroll compensation (published by payroll store directly)
   EVENT_TYPES.compensationVersionCreated,
-  EVENT_TYPES.compensationVersionUpdated
+  EVENT_TYPES.compensationVersionUpdated,
+
+  // Operational Responsibility & Role Governance (TASK-247)
+  EVENT_TYPES.responsibilityAssigned,
+  EVENT_TYPES.responsibilityRevoked,
+  EVENT_TYPES.responsibilityUpdated,
+  EVENT_TYPES.roleAssigned,
+  EVENT_TYPES.roleRevoked
 ] as const
+
+// ── Event Payload Types (TASK-247) ──
+
+export interface ResponsibilityAssignedPayload {
+  responsibilityId: string
+  memberId: string
+  scopeType: string
+  scopeId: string
+  responsibilityType: string
+  isPrimary: boolean
+}
+
+export interface ResponsibilityRevokedPayload {
+  responsibilityId: string
+  memberId: string
+  scopeType: string
+  scopeId: string
+  responsibilityType: string
+  changes: { active: false; effectiveTo?: string }
+}
+
+export interface ResponsibilityUpdatedPayload {
+  responsibilityId: string
+  memberId: string
+  scopeType: string
+  scopeId: string
+  responsibilityType: string
+  changes: Record<string, unknown>
+}
+
+export interface RoleAssignedPayload {
+  userId: string
+  roleCode: string
+  assignedByUserId: string
+}
+
+export interface RoleRevokedPayload {
+  userId: string
+  roleCode: string
+  revokedByUserId: string
+}

@@ -4,7 +4,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
+import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
@@ -185,6 +187,7 @@ const AdminAccountsView = () => {
   const router = useRouter()
   const [data, setData] = useState<ListResponse | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(PAGE_SIZE)
   const [search, setSearch] = useState('')
@@ -211,9 +214,14 @@ const AdminAccountsView = () => {
     try {
       const res = await fetch(`/api/organizations?${params}`)
 
-      if (res.ok) setData(await res.json())
+      if (res.ok) {
+        setData(await res.json())
+        setError(null)
+      } else {
+        setError(`Error al cargar organizaciones (HTTP ${res.status}).`)
+      }
     } catch {
-      // Non-blocking — keep previous data visible
+      setError('No se pudo conectar al servidor. Verifica tu conexion.')
     } finally {
       setLoading(false)
     }
@@ -307,6 +315,22 @@ const AdminAccountsView = () => {
           </Grid>
         </Grid>
       </Grid>
+
+      {/* Error banner */}
+      {error && (
+        <Grid size={{ xs: 12 }}>
+          <Alert
+            severity='error'
+            action={
+              <Button color='inherit' size='small' onClick={() => void loadData()}>
+                Reintentar
+              </Button>
+            }
+          >
+            {error}
+          </Alert>
+        </Grid>
+      )}
 
       {/* Table card */}
       <Grid size={{ xs: 12 }}>

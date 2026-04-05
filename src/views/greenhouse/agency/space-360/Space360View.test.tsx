@@ -159,6 +159,12 @@ const detail: Space360Detail = {
     projectMetrics: [],
     stuckAssets: []
   },
+  ownership: {
+    accountLead: null,
+    deliveryLead: null,
+    financeReviewer: null,
+    operationsLead: null
+  },
   finance: {
     snapshot: null,
     receivablesClp: 1500000,

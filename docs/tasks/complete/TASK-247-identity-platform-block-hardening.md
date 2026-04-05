@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Cerrado`
 - Rank: `TBD`
 - Domain: `identity / platform / admin`
 - Blocked by: `none`
@@ -231,18 +231,18 @@ if (effectiveTo && new Date(effectiveFrom) >= new Date(effectiveTo)) {
 
 ## Acceptance Criteria
 
-- [ ] `countActiveSuperadmins()` se ejecuta DENTRO de la transaccion con `FOR UPDATE`
-- [ ] Primary demotion en `createResponsibility` usa locking que serializa acceso concurrente
-- [ ] `administracion.cuentas` existe en VIEW_REGISTRY con routePath `/admin/accounts`
-- [ ] VerticalMenu filtra `/admin/accounts` con viewCode `administracion.cuentas`
-- [ ] `effectiveFrom >= effectiveTo` lanza error 400 en la API de responsabilidades
-- [ ] Errores de guardrail de superadmin retornan HTTP 400 (no 500)
-- [ ] `listResponsibilities` acepta `page` y `pageSize` y aplica LIMIT/OFFSET
-- [ ] `AdminAccountsView` muestra error visible (no silencia) cuando la API falla
-- [ ] Eventos `responsibility.*` y `role.*` estan en REACTIVE_EVENT_TYPES
-- [ ] Payloads de eventos tienen interfaces TypeScript definidas
-- [ ] POST responsibilities valida strings no vacios antes de pasar al store
-- [ ] Validacion de unicidad de VIEW_REGISTRY tiene test unitario
+- [x] `countActiveSuperadmins()` se ejecuta DENTRO de la transaccion con `FOR UPDATE`
+- [x] Primary demotion en `createResponsibility` usa locking que serializa acceso concurrente
+- [x] `administracion.cuentas` existe en VIEW_REGISTRY con routePath `/admin/accounts`
+- [x] VerticalMenu filtra `/admin/accounts` con viewCode `administracion.cuentas`
+- [x] `effectiveFrom >= effectiveTo` lanza error 400 en la API de responsabilidades
+- [x] Errores de guardrail de superadmin retornan HTTP 400 (no 500)
+- [x] `listResponsibilities` acepta `page` y `pageSize` y aplica LIMIT/OFFSET
+- [x] `AdminAccountsView` muestra error visible (no silencia) cuando la API falla
+- [x] Eventos `responsibility.*` y `role.*` estan en REACTIVE_EVENT_TYPES
+- [x] Payloads de eventos tienen interfaces TypeScript definidas
+- [x] POST responsibilities valida strings no vacios antes de pasar al store
+- [x] Validacion de unicidad de VIEW_REGISTRY tiene test unitario
 
 ## Verification
 

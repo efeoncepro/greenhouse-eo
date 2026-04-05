@@ -1,5 +1,32 @@
 # Handoff.md
 
+## Sesión 2026-04-05 — TASK-247 Identity & Platform Block Hardening
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: cerrar 12 gaps de robustez post-auditoría del bloque TASK-225→229
+
+### Qué se hizo
+
+- **TASK-247 implementada y cerrada** (12/12 gaps):
+  - **Slice 1 — Race conditions críticas**: superadmin count movido dentro de transacción con `FOR UPDATE` en role-management.ts; primary demotion con `SELECT ... FOR UPDATE` en store.ts (create + update)
+  - **Slice 2 — Gaps altos**: `administracion.cuentas` viewCode en VIEW_REGISTRY; VerticalMenu filtra con viewCode correcto; date validation `effectiveFrom < effectiveTo` en store.ts; `RoleGuardrailError` class con statusCode para HTTP 400
+  - **Slice 3 — Paginación + UI**: `listResponsibilities()` con LIMIT/OFFSET y count paralelo; API retorna `{ items, total, page, pageSize }`; `AdminAccountsView` con Alert + "Reintentar" en error
+  - **Slice 4 — Eventos**: 5 event types agregados a REACTIVE_EVENT_TYPES; 6 payload interfaces definidas
+  - **Slice 5 — Menores**: input validation en POST responsibilities; Vitest test para VIEW_REGISTRY uniqueness; fix pre-existing mock en space-360.test.ts; fix ownership en Space360View.test.tsx fixture
+- **Archivos modificados**: role-management.ts, store.ts, readers.ts, view-access-catalog.ts, VerticalMenu.tsx, AdminAccountsView.tsx, event-catalog.ts, responsibilities/route.ts, users/[id]/roles/route.ts
+- **Archivos creados**: view-access-catalog.test.ts
+
+### Verificación
+
+- `tsc --noEmit` — OK
+- `pnpm build` — OK
+- `pnpm lint` — OK
+- `pnpm test` — 220 files, 923 tests passing
+
+---
+
 ## Sesión 2026-04-05 — TASK-229 Client View Catalog Deduplication
 
 ### Rama / alcance

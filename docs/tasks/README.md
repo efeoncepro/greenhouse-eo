@@ -20,7 +20,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-247`
+- siguiente ID disponible: `TASK-248`
 - `TASK-241` migra procesos batch pesados (ICO materialización, LLM enrichment) de Vercel Functions a Cloud Run. Formaliza política: batch > 30s → Cloud Run. Código listo, deploy operacional pendiente.
 - `TASK-239` enriquece el prompt LLM de Nexa Insights con glosario de métricas, cadena causal, doble capa narrativa y nombres de Space/miembros.
 - `TASK-240` agrega menciones interactivas (@mentions) de Spaces y miembros en los insights de Nexa — chips clickeables que navegan a perfiles. Depende de `TASK-239`.
@@ -82,9 +82,10 @@ Primer bloque operativo asignado:
 | `TASK-196` | [TASK-196-delivery-performance-report-parity-greenhouse-notion.md](complete/TASK-196-delivery-performance-report-parity-greenhouse-notion.md)                               | P0        | Muy alto | Alto     | Cerrada                 | Lane completa de paridad Delivery: source sync, identidad, owner attribution, semántica, freeze histórico y cutover outbound `Greenhouse -> Notion` sobre `Performance Reports`              |
 | `TASK-244` | [TASK-244-nexa-insights-home-dashboard.md](to-do/TASK-244-nexa-insights-home-dashboard.md)                                                                                  | P2        | Alto     | Bajo     | Diseño                  | Widget "Top Insights" en Home Dashboard con las 3 señales más críticas cross-Space del período actual vía `NexaInsightsBlock`                                                                |
 | `TASK-245` | [TASK-245-finance-signal-engine.md](to-do/TASK-245-finance-signal-engine.md)                                                                                                | P2        | Muy alto | Alto     | Diseño                  | Primer engine de señales fuera del ICO: detector de anomalías financieras, enrichment LLM domain-aware, surfacing en Finance Dashboard                                                       |
-| `TASK-247` | [TASK-247-identity-platform-block-hardening.md](to-do/TASK-247-identity-platform-block-hardening.md) | P1 | Alto | Medio | Diseno | Hardening post-auditoria del bloque TASK-225-229: 2 race conditions criticas, viewCode faltante, date validation, error classification, paginacion, eventos reactivos |
 
 ## Complete
+
+- [TASK-247-identity-platform-block-hardening.md](complete/TASK-247-identity-platform-block-hardening.md) — Hardening de 12 gaps del bloque TASK-225→229: race conditions en superadmin count y primary demotion (FOR UPDATE), viewCode `administracion.cuentas`, date validation, error classification HTTP 400, paginación en responsibilities, error handling UI en AdminAccountsView, eventos reactivos + payload typing, input validation en POST responsibilities, test unitario VIEW_REGISTRY.
 
 - [TASK-240-nexa-insights-entity-mentions.md](complete/TASK-240-nexa-insights-entity-mentions.md) — Menciones interactivas en Nexa Insights: `@[Nombre](type:ID)` en narrativas → MUI Chips clickeables con navegación a `/people/` y `/agency/spaces/`. Parser reutilizable `NexaMentionText`. Prompt v3.
 

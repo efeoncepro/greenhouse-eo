@@ -2,6 +2,17 @@
 
 ## 2026-04-05
 
+- **TASK-247 Identity & Platform Block Hardening — cerrada**:
+  - 2 race conditions críticas cerradas con `FOR UPDATE` locking (superadmin count, primary demotion)
+  - `RoleGuardrailError` class: errores de negocio ahora retornan HTTP 400 (no 500)
+  - `administracion.cuentas` viewCode registrado en VIEW_REGISTRY, VerticalMenu actualizado
+  - date range validation en responsabilidades operativas (`effectiveFrom < effectiveTo`)
+  - `listResponsibilities()` con paginación (LIMIT/OFFSET + count)
+  - `AdminAccountsView` con error state visible (Alert + Reintentar)
+  - 5 event types en REACTIVE_EVENT_TYPES + 6 payload interfaces
+  - input validation en POST responsibilities, test unitario VIEW_REGISTRY
+  - fix pre-existing: mock en space-360.test.ts, ownership en Space360View.test.tsx
+
 - **TASK-229 Client View Catalog Deduplication — cerrada**:
   - 5 viewCodes cliente duplicados eliminados de VIEW_REGISTRY
   - validación build-time de unicidad de viewCodes agregada (throw si duplicado)
