@@ -15,6 +15,13 @@
 
 set -euo pipefail
 
+# ─── Environment ─────────────────────────────────────────────────────────────
+# Usage:
+#   bash services/ops-worker/deploy.sh              # defaults to staging
+#   ENV=production bash services/ops-worker/deploy.sh
+
+ENV="${ENV:-staging}"
+
 # ─── Configuration ───────────────────────────────────────────────────────────
 
 PROJECT_ID="efeonce-group"
@@ -32,6 +39,19 @@ CONCURRENCY="1"        # One request at a time (serialized event processing)
 # Cloud Scheduler timezone
 SCHEDULER_TZ="America/Santiago"
 
+# Environment-specific secrets (Secret Manager references)
+if [ "${ENV}" = "production" ]; then
+  NEXTAUTH_SECRET_REF="greenhouse-nextauth-secret-production:latest"
+  PG_PASSWORD_REF="greenhouse-pg-prod-app-password:latest"
+  PG_INSTANCE="efeonce-group:us-east4:greenhouse-pg-prod"
+  echo "=== PRODUCTION deployment ==="
+else
+  NEXTAUTH_SECRET_REF="greenhouse-nextauth-secret-staging:latest"
+  PG_PASSWORD_REF="greenhouse-pg-dev-app-password:latest"
+  PG_INSTANCE="efeonce-group:us-east4:greenhouse-pg-dev"
+  echo "=== STAGING deployment ==="
+fi
+
 # ─── Build & Deploy to Cloud Run ─────────────────────────────────────────────
 
 echo "=== Building ${SERVICE_NAME} image via Cloud Build ==="
@@ -40,7 +60,7 @@ echo "=== Building ${SERVICE_NAME} image via Cloud Build ==="
 # --config and --tag are mutually exclusive, so we use inline cloudbuild.yaml)
 IMAGE="gcr.io/${PROJECT_ID}/${SERVICE_NAME}"
 
-gcloud builds submit . \
+if ! gcloud builds submit . \
   --project="${PROJECT_ID}" \
   --config=/dev/stdin <<CLOUDBUILD_EOF
 steps:
@@ -49,19 +69,23 @@ steps:
 images:
   - '${IMAGE}'
 CLOUDBUILD_EOF
+then
+  echo "ERROR: Cloud Build failed — aborting deployment."
+  exit 1
+fi
 
 echo "=== Deploying ${SERVICE_NAME} to Cloud Run (${REGION}) ==="
 
 # Environment variables (non-sensitive)
 ENV_VARS="NODE_ENV=production"
 ENV_VARS="${ENV_VARS},GCP_PROJECT=${PROJECT_ID}"
-ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=efeonce-group:us-east4:greenhouse-pg-dev"
+ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=${PG_INSTANCE}"
 ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_DATABASE=greenhouse_app"
 ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_USER=greenhouse_app"
 
 # Secrets from Secret Manager (mounted as env vars)
-SECRETS="NEXTAUTH_SECRET=greenhouse-nextauth-secret-staging:latest"
-SECRETS="${SECRETS},GREENHOUSE_POSTGRES_PASSWORD=greenhouse-pg-dev-app-password:latest"
+SECRETS="NEXTAUTH_SECRET=${NEXTAUTH_SECRET_REF}"
+SECRETS="${SECRETS},GREENHOUSE_POSTGRES_PASSWORD=${PG_PASSWORD_REF}"
 
 gcloud run deploy "${SERVICE_NAME}" \
   --project="${PROJECT_ID}" \
@@ -106,12 +130,23 @@ gcloud run services proxy "${SERVICE_NAME}" \
   --region="${REGION}" \
   --port="${HEALTH_PORT}" &
 PROXY_PID=$!
-sleep 4
 
-curl -sf "http://localhost:${HEALTH_PORT}/health" | python3 -m json.tool || echo "WARN: health check failed (service may still be starting)"
+HEALTH_OK=false
+for i in 1 2 3 4 5; do
+  sleep 3
+  if curl -sf "http://localhost:${HEALTH_PORT}/health" | python3 -m json.tool 2>/dev/null; then
+    HEALTH_OK=true
+    break
+  fi
+  echo "  health check attempt ${i}/5 — retrying..."
+done
 
 kill "${PROXY_PID}" 2>/dev/null || true
 wait "${PROXY_PID}" 2>/dev/null || true
+
+if [ "${HEALTH_OK}" = "false" ]; then
+  echo "WARN: health check failed after 5 attempts — service may need manual verification"
+fi
 
 # ─── Cloud Scheduler Jobs ────────────────────────────────────────────────────
 

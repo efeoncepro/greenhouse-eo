@@ -37,7 +37,7 @@ const CRON_SECRET = process.env.CRON_SECRET?.trim() || ''
 
 const isAuthorized = (req: IncomingMessage): boolean => {
   // Cloud Run IAM handles primary auth (--no-allow-unauthenticated).
-  // If CRON_SECRET is set, also accept Bearer token as fallback for manual invocations.
+  // When CRON_SECRET is not set, trust IAM exclusively.
   if (!CRON_SECRET) return true
 
   const authHeader = req.headers.authorization?.trim() || ''
@@ -45,12 +45,15 @@ const isAuthorized = (req: IncomingMessage): boolean => {
   if (authHeader.toLowerCase().startsWith('bearer ')) {
     const token = authHeader.slice('bearer '.length).trim()
 
-    if (token === CRON_SECRET) return true
+    return token === CRON_SECRET
   }
 
-  // Cloud Run strips Authorization header after IAM validation,
-  // so absence of header is not necessarily unauthorized.
-  return true
+  // Cloud Run strips the Authorization header after IAM validation,
+  // so absence of header means the request already passed IAM — allow it.
+  if (!authHeader) return true
+
+  // Header present but not a valid Bearer token — reject.
+  return false
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -210,12 +213,13 @@ const handleReactiveRecover = async (req: IncomingMessage, res: ServerResponse) 
   try {
     ensureProjectionsRegistered()
 
+    const recoverStartMs = Date.now()
     const orphans = await claimOrphanedRefreshItems(batchSize, staleMinutes)
 
     if (orphans.length === 0) {
       await writeReactiveRunComplete({
         runId,
-        result: { runId, eventsProcessed: 0, eventsFailed: 0, projectionsTriggered: 0, actions: [], durationMs: 0 }
+        result: { runId, eventsProcessed: 0, eventsFailed: 0, projectionsTriggered: 0, actions: [], durationMs: Date.now() - recoverStartMs }
       })
 
       json(res, 200, { runId, recovered: 0, failed: 0, message: 'No orphaned projections found' })
@@ -254,6 +258,8 @@ const handleReactiveRecover = async (req: IncomingMessage, res: ServerResponse) 
       }
     }
 
+    const recoverDurationMs = Date.now() - recoverStartMs
+
     await writeReactiveRunComplete({
       runId,
       result: {
@@ -262,7 +268,7 @@ const handleReactiveRecover = async (req: IncomingMessage, res: ServerResponse) 
         eventsFailed: failed,
         projectionsTriggered: orphans.length,
         actions: details.map(d => `${d.projectionName}:${d.status}`),
-        durationMs: 0
+        durationMs: recoverDurationMs
       },
       status: failed > 0 && recovered > 0 ? 'partial' : failed > 0 ? 'failed' : 'succeeded'
     })

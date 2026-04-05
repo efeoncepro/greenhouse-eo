@@ -502,9 +502,7 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
         : 'idle',
       processed: lastReactiveWorkerRun?.eventsProcessed ?? 0,
       failed: lastReactiveWorkerRun?.status === 'failed' ? 1 : 0,
-      lastRun: lastReactiveWorkerRun
-        ? new Date(Date.now() - (lastReactiveWorkerRun.durationMs || 0)).toISOString()
-        : null
+      lastRun: lastReactiveWorkerRun?.finishedAt ?? lastReactiveWorkerRun?.startedAt ?? null
     },
     {
       name: 'AI LLM Enrichment',

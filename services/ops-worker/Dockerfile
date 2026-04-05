@@ -32,7 +32,7 @@ COPY services/ops-worker/server.ts ./services/ops-worker/server.ts
 RUN echo "" > /app/server-only-shim.js && \
     echo "export class NextResponse { static json(d,o){return{body:d,...o}} }" > /app/next-server-shim.js && \
     echo "export default function(){return{}} export function getServerSession(){return null}" > /app/next-auth-shim.js && \
-    echo "export default function(){return{}} export function compare(){return false}" > /app/bcryptjs-shim.js && \
+    echo "export default function(){throw new Error('bcryptjs not available in ops-worker')} export function compare(){throw new Error('bcryptjs.compare not available in ops-worker')}" > /app/bcryptjs-shim.js && \
     esbuild services/ops-worker/server.ts \
       --bundle \
       --platform=node \

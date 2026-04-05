@@ -18,6 +18,8 @@ export interface ReactiveRunRecord {
   eventsProcessed: number
   projectionsTriggered: number
   durationMs: number
+  startedAt: string
+  finishedAt: string | null
   notes: string | null
 }
 
@@ -149,6 +151,8 @@ export const getLastSuccessfulReactiveRun = async (): Promise<ReactiveRunRecord 
     eventsProcessed: row.records_read,
     projectionsTriggered: row.records_written_raw,
     durationMs: finishedAt - startedAt,
+    startedAt: new Date(row.started_at).toISOString(),
+    finishedAt: row.finished_at ? new Date(row.finished_at).toISOString() : null,
     notes: row.notes
   }
 }
@@ -191,6 +195,8 @@ export const getLastReactiveRun = async (): Promise<ReactiveRunRecord | null> =>
     eventsProcessed: row.records_read,
     projectionsTriggered: row.records_written_raw,
     durationMs: finishedAt - startedAt,
+    startedAt: new Date(row.started_at).toISOString(),
+    finishedAt: row.finished_at ? new Date(row.finished_at).toISOString() : null,
     notes: row.notes
   }
 }
