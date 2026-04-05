@@ -154,6 +154,8 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
         const data = await res.json()
 
         setIcoData(data)
+      } else {
+        setIcoError(`Error al cargar metricas ICO (HTTP ${res.status}).`)
       }
     } catch {
       setIcoError('No pudimos cargar las métricas ICO. Intenta de nuevo.')
@@ -174,9 +176,11 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
         const data = await res.json()
 
         setIcoData(data)
+      } else {
+        setIcoError(`Error al computar metricas ICO en vivo (HTTP ${res.status}).`)
       }
     } catch {
-      // Keep existing data (or null) on error
+      setIcoError('No pudimos computar las metricas ICO en vivo. Intenta de nuevo.')
     } finally {
       setIcoLoading(false)
     }
