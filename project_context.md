@@ -1,5 +1,12 @@
 # project_context.md
 
+## Delta 2026-04-05 Session resolution: paridad PG ↔ BQ cerrada (TASK-255)
+
+- El contrato `TenantAccessRow` ahora tiene paridad completa entre el path PostgreSQL (`session_360`) y el path BigQuery (`getIdentityAccessRecord`): ambos retornan `member_id` e `identity_profile_id`.
+- Regla vigente: todo campo nuevo que se agregue a `session_360` debe ir tambien en el SELECT/GROUP BY de BigQuery en `src/lib/tenant/access.ts`.
+- La funcion `authorize()` de credentials en `src/lib/auth.ts` ahora incluye todos los campos de identidad en el user retornado (`memberId`, `identityProfileId`, `spaceId`, `organizationId`, `organizationName`). SSO ya los tenia porque lee `tenant.*` directamente.
+- `/api/my/profile` es resiliente: intenta `person_360`, fallback a session data. Un usuario autenticado nunca ve "Perfil no disponible".
+
 ## Delta 2026-04-05 Vercel Cron no depende de CRON_SECRET
 
 - Las routes protegidas con `requireCronAuth()` ya no deben bloquear corridas legítimas de Vercel Cron si `CRON_SECRET` falta en el entorno.

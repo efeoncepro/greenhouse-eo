@@ -2,6 +2,14 @@
 
 ## 2026-04-05
 
+- **TASK-255 Mi Perfil identity chain fix — completo**:
+  - `GET /api/my/profile` respondía 422 porque `memberId` no llegaba al JWT de sesión
+  - `src/lib/tenant/access.ts`: agregados `cu.member_id` y `cu.identity_profile_id` al SELECT y GROUP BY de BigQuery en `getIdentityAccessRecord()` — arregla credentials, Microsoft SSO y Google SSO
+  - `src/lib/auth.ts`: agregados `memberId`, `identityProfileId`, `spaceId`, `organizationId`, `organizationName` al return de credentials `authorize()`
+  - `src/app/api/my/profile/route.ts`: cambiado de `requireMyTenantContext` a `requireTenantContext` con fallback a session data
+  - nuevos: tipo `PersonProfileSummary`, proyecciones `toPersonProfileSummary()` y `toPersonProfileSummaryFromSession()` en `src/lib/person-360/get-person-profile.ts`
+  - validado con tsc, lint, 935 tests passing, y verificación manual en staging
+
 - **ISSUE-012 Reactive cron routes fail closed without CRON_SECRET — resuelto**:
   - `requireCronAuth()` ahora autoriza primero tráfico válido de Vercel Cron (`x-vercel-cron` / `user-agent` `vercel-cron/*`)
   - `CRON_SECRET` queda reservado para invocaciones bearer/manuales fuera de Vercel

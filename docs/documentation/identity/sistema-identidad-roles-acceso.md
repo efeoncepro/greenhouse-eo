@@ -1,9 +1,9 @@
 # Sistema de Identidad, Roles y Acceso
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-04-05 por Claude (TASK-248)
-> **Ultima actualizacion:** 2026-04-05 por Claude (TASK-248)
+> **Ultima actualizacion:** 2026-04-05 por Claude (TASK-255 Mi Perfil identity chain fix)
 > **Documentacion tecnica:** [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md), [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md)
 
 ---
@@ -20,26 +20,26 @@ Cada persona tiene uno o mas **roles** asignados. Piensa en ellos como sombreros
 
 ### Para el equipo interno de Efeonce
 
-| Rol | Que hace |
-|-----|----------|
-| **Colaborador** | El rol base. Ves tu perfil, tu nomina, tus permisos, tus herramientas. Todos los internos lo tienen |
-| **Operaciones** | Ves la operacion completa de la agencia: clientes, capacidad del equipo, delivery, personas |
-| **Lider de Cuenta** | Ves y gestionas las cuentas de clientes que tienes a cargo |
-| **Nomina** | Gestionas sueldos, compensaciones y periodos de pago. Tambien ves personas |
-| **Gestion HR** | Administras personas, estructura del equipo, permisos |
-| **Analista de Finanzas** | Operas ingresos, egresos, conciliacion — el dia a dia financiero |
-| **Administrador de Finanzas** | Todo lo del analista mas configuracion y acciones sensibles |
-| **Lectura de Personas** | Puedes ver perfiles y asignaciones del equipo, pero no modificar |
-| **Admin de Herramientas IA** | Gobiernas licencias, herramientas y creditos de IA |
-| **Superadministrador** | Ve y hace absolutamente todo. Es el dueno del portal |
+| Rol                           | Que hace                                                                                            |
+| ----------------------------- | --------------------------------------------------------------------------------------------------- |
+| **Colaborador**               | El rol base. Ves tu perfil, tu nomina, tus permisos, tus herramientas. Todos los internos lo tienen |
+| **Operaciones**               | Ves la operacion completa de la agencia: clientes, capacidad del equipo, delivery, personas         |
+| **Lider de Cuenta**           | Ves y gestionas las cuentas de clientes que tienes a cargo                                          |
+| **Nomina**                    | Gestionas sueldos, compensaciones y periodos de pago. Tambien ves personas                          |
+| **Gestion HR**                | Administras personas, estructura del equipo, permisos                                               |
+| **Analista de Finanzas**      | Operas ingresos, egresos, conciliacion — el dia a dia financiero                                    |
+| **Administrador de Finanzas** | Todo lo del analista mas configuracion y acciones sensibles                                         |
+| **Lectura de Personas**       | Puedes ver perfiles y asignaciones del equipo, pero no modificar                                    |
+| **Admin de Herramientas IA**  | Gobiernas licencias, herramientas y creditos de IA                                                  |
+| **Superadministrador**        | Ve y hace absolutamente todo. Es el dueno del portal                                                |
 
 ### Para clientes externos
 
-| Rol | Que hace |
-|-----|----------|
-| **Cliente Ejecutivo** | El CMO o VP — ve el dashboard ejecutivo, KPIs de alto nivel |
-| **Cliente Manager** | El marketing manager — ve mas detalle operativo, proyectos, sprints |
-| **Cliente Especialista** | Acceso limitado a proyectos o campanas especificas |
+| Rol                      | Que hace                                                            |
+| ------------------------ | ------------------------------------------------------------------- |
+| **Cliente Ejecutivo**    | El CMO o VP — ve el dashboard ejecutivo, KPIs de alto nivel         |
+| **Cliente Manager**      | El marketing manager — ve mas detalle operativo, proyectos, sprints |
+| **Cliente Especialista** | Acceso limitado a proyectos o campanas especificas                  |
 
 ### Combinaciones de roles
 
@@ -86,13 +86,13 @@ Se responde con asignaciones explicitas. Por ejemplo:
 
 Cada scope (organizacion, space, proyecto, departamento) puede tener un responsable primario por tipo. Los tipos de responsabilidad disponibles son:
 
-| Tipo | Que significa |
-|------|--------------|
-| Lider de Cuenta | Dueno comercial de una cuenta u organizacion |
-| Lider de Delivery | Responsable de la entrega operativa |
-| Revisor Financiero | Valida numeros y finanzas de un scope |
-| Delegado de Aprobacion | Aprueba en nombre de otro |
-| Lider de Operaciones | Gestiona operaciones de un scope |
+| Tipo                   | Que significa                                |
+| ---------------------- | -------------------------------------------- |
+| Lider de Cuenta        | Dueno comercial de una cuenta u organizacion |
+| Lider de Delivery      | Responsable de la entrega operativa          |
+| Revisor Financiero     | Valida numeros y finanzas de un scope        |
+| Delegado de Aprobacion | Aprueba en nombre de otro                    |
+| Lider de Operaciones   | Gestiona operaciones de un scope             |
 
 > **Detalle tecnico:** [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md §4](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md). Tabla: `greenhouse_core.operational_responsibilities`. API: `GET/POST /api/admin/responsibilities`.
 
@@ -102,17 +102,19 @@ Cada scope (organizacion, space, proyecto, departamento) puede tener un responsa
 
 Cuando alguien inicia sesion, el sistema calcula que secciones del menu mostrar basandose en sus roles:
 
-| Persona | Que ve en el menu |
-|---------|-------------------|
-| Colaborador (sin otros roles) | Solo "Mi Ficha": perfil, nomina, permisos |
-| Operaciones | "Gestion" (agencia, clientes, delivery) + "Personas" |
-| Nomina | "Gestion" + "Equipo/HR" + "Personas" |
-| Superadministrador | Todo: Gestion, Administracion, Finanzas, HR, Personas, IA, Mi Ficha, Portal cliente |
-| Cliente Ejecutivo | Solo su portal: dashboard, proyectos, ciclos, equipo |
+| Persona                       | Que ve en el menu                                                                   |
+| ----------------------------- | ----------------------------------------------------------------------------------- |
+| Colaborador (sin otros roles) | Solo "Mi Ficha": perfil, nomina, permisos                                           |
+| Operaciones                   | "Gestion" (agencia, clientes, delivery) + "Personas"                                |
+| Nomina                        | "Gestion" + "Equipo/HR" + "Personas"                                                |
+| Superadministrador            | Todo: Gestion, Administracion, Finanzas, HR, Personas, IA, Mi Ficha, Portal cliente |
+| Cliente Ejecutivo             | Solo su portal: dashboard, proyectos, ciclos, equipo                                |
 
 Cada vista individual del portal (53 en total) esta registrada en un catalogo. Si tu rol no te da acceso al grupo requerido, esa vista no aparece en tu menu.
 
-> **Detalle tecnico:** El catalogo de vistas esta en [`src/lib/admin/view-access-catalog.ts`](../../src/lib/admin/view-access-catalog.ts). La matriz completa rol-route groups esta en [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md §1.5](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md).
+**Mi Perfil** siempre muestra informacion basica del colaborador (nombre, email, avatar). Si el sistema tiene datos completos de identidad (cargo, departamento, fecha de ingreso, sistemas vinculados), los muestra tambien. Si aun no tiene datos completos (por ejemplo, un usuario recien creado), muestra la informacion disponible de la sesion sin mostrar un error.
+
+> **Detalle tecnico:** El catalogo de vistas esta en [`src/lib/admin/view-access-catalog.ts`](../../src/lib/admin/view-access-catalog.ts). La matriz completa rol-route groups esta en [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md §1.5](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md). El fallback de perfil usa `toPersonProfileSummaryFromSession()` en [`src/lib/person-360/get-person-profile.ts`](../../src/lib/person-360/get-person-profile.ts).
 
 ---
 
@@ -120,13 +122,13 @@ Cada vista individual del portal (53 en total) esta registrada en un catalogo. S
 
 El sistema tiene protecciones automaticas que no se pueden saltar:
 
-| Proteccion | Que previene |
-|-----------|-------------|
+| Proteccion                                 | Que previene                                                                                     |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------ |
 | **Siempre al menos un Superadministrador** | Si intentas quitarle el rol al ultimo, el sistema lo bloquea. Previene quedarse sin acceso admin |
-| **Solo un Super puede crear otro Super** | Un usuario con otro rol no puede asignar ni revocar el Superadministrador |
-| **Super siempre incluye Colaborador** | Un admin siempre tiene su experiencia personal (nomina, perfil, etc.) |
-| **Un solo responsable primario por tipo** | Si asignas un nuevo Lider de Cuenta para Acme, el anterior se desplaza automaticamente |
-| **Fechas validas en responsabilidades** | No puedes asignar una responsabilidad donde la fecha de inicio es posterior a la de fin |
+| **Solo un Super puede crear otro Super**   | Un usuario con otro rol no puede asignar ni revocar el Superadministrador                        |
+| **Super siempre incluye Colaborador**      | Un admin siempre tiene su experiencia personal (nomina, perfil, etc.)                            |
+| **Un solo responsable primario por tipo**  | Si asignas un nuevo Lider de Cuenta para Acme, el anterior se desplaza automaticamente           |
+| **Fechas validas en responsabilidades**    | No puedes asignar una responsabilidad donde la fecha de inicio es posterior a la de fin          |
 
 > **Detalle tecnico:** Los guardrails estan implementados en [`src/lib/admin/role-management.ts`](../../src/lib/admin/role-management.ts) con `RoleGuardrailError` y transacciones con `FOR UPDATE`. Documentado en [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md Delta TASK-247](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md).
 
@@ -136,19 +138,32 @@ El sistema tiene protecciones automaticas que no se pueden saltar:
 
 Todo cambio importante queda registrado automaticamente como evento de auditoria:
 
-| Que se registra | Cuando |
-|-----------------|--------|
-| Rol asignado | Cada vez que se le da un rol nuevo a alguien |
-| Rol revocado | Cada vez que se le quita un rol a alguien |
-| Responsabilidad asignada | Cuando alguien es nombrado responsable de un scope |
-| Responsabilidad revocada | Cuando se quita una responsabilidad |
-| Login exitoso | Cada vez que alguien entra al portal |
-| Login fallido | Cada intento fallido de entrada con credenciales |
-| Scope asignado | Cuando se le da acceso a un proyecto o campana especifica |
+| Que se registra          | Cuando                                                    |
+| ------------------------ | --------------------------------------------------------- |
+| Rol asignado             | Cada vez que se le da un rol nuevo a alguien              |
+| Rol revocado             | Cada vez que se le quita un rol a alguien                 |
+| Responsabilidad asignada | Cuando alguien es nombrado responsable de un scope        |
+| Responsabilidad revocada | Cuando se quita una responsabilidad                       |
+| Login exitoso            | Cada vez que alguien entra al portal                      |
+| Login fallido            | Cada intento fallido de entrada con credenciales          |
+| Scope asignado           | Cuando se le da acceso a un proyecto o campana especifica |
 
 Cada evento incluye: quien lo hizo, cuando, y los detalles del cambio.
 
 > **Detalle tecnico:** Los eventos se emiten via outbox pattern a `greenhouse_sync.outbox_events`. El catalogo completo esta en [GREENHOUSE_EVENT_CATALOG_V1.md](../../architecture/GREENHOUSE_EVENT_CATALOG_V1.md).
+
+---
+
+## Acceso para agentes y automatizaciones
+
+Greenhouse incluye un mecanismo especial para que agentes de IA y tests automatizados puedan entrar al portal sin pasar por el formulario de login. Esto se usa internamente para verificar que las paginas funcionan correctamente.
+
+- El agente proporciona un secreto compartido junto con un email de un usuario existente
+- El sistema genera una sesion valida automaticamente
+- El email debe corresponder a una persona activa en el portal — no se pueden crear usuarios nuevos por esta via
+- Este mecanismo esta desactivado en produccion por defecto
+
+> **Detalle tecnico:** El endpoint es `POST /api/auth/agent-session`, documentado en [GREENHOUSE_IDENTITY_ACCESS_V2.md — Agent Auth](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md). Script de setup: `scripts/playwright-auth-setup.mjs`.
 
 ---
 

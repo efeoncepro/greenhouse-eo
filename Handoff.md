@@ -1,5 +1,134 @@
 # Handoff.md
 
+## Sesión 2026-04-05 — TASK-255: Mi Perfil identity chain fix
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: cerrar TASK-255 — hacer que Mi Perfil nunca muestre "Perfil no disponible"
+
+### Qué se hizo
+
+- **Root cause:** `GET /api/my/profile` respondía 422 porque `requireMyTenantContext()` exigía `memberId` en la sesión, pero el JWT no lo tenía
+- **3 bugs encontrados y corregidos:**
+  1. `src/lib/tenant/access.ts` — BigQuery SELECT en `getIdentityAccessRecord()` no incluía `cu.member_id` ni `cu.identity_profile_id` → los 3 paths de login (credentials, Microsoft SSO, Google SSO) quedan corregidos
+  2. `src/lib/auth.ts` — `authorize()` de credentials no incluía `memberId`, `identityProfileId`, `spaceId`, `organizationId`, `organizationName` en el user retornado → el JWT callback leía `undefined`
+  3. `src/app/api/my/profile/route.ts` — usaba `requireMyTenantContext` (exige memberId) → cambiado a `requireTenantContext` con fallback a session data
+- **Tipos y proyecciones nuevos:** `PersonProfileSummary`, `toPersonProfileSummary()`, `toPersonProfileSummaryFromSession()` — siguen el patrón de Person360 contexts
+
+### Verificación
+
+- `npx tsc --noEmit` — OK
+- `pnpm lint` — OK (error pre-existente en ico-diagnostics, no relacionado)
+- `pnpm test` — 935 tests passed
+- Validación manual en staging: usuario hizo logout + login → `/my/profile` muestra datos
+
+### Riesgo / siguiente paso
+
+- Otros endpoints de "Mi Ficha" que usen `requireMyTenantContext` tienen el mismo gap potencial (Mi Nómina, Mis Permisos, Mi Delivery, Mi Desempeño) — documentado como follow-up en la task
+- Considerar migrar `password_hash` a PostgreSQL para eliminar el fallthrough a BigQuery en credentials login
+
+## Sesión 2026-04-05 — Agent Auth: endpoint headless + Playwright setup
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: habilitar autenticación headless para agentes AI y tests E2E
+
+### Qué se hizo
+
+- Se creó `POST /api/auth/agent-session` — endpoint que genera un JWT NextAuth válido dado un shared secret + email
+- Se creó `scripts/playwright-auth-setup.mjs` — script que obtiene la cookie y genera `.auth/storageState.json`
+- Se agregó `AGENT_AUTH_SECRET`, `AGENT_AUTH_EMAIL` a `.env.example`
+- Se agregó `/.auth/` a `.gitignore`
+- Se documentó en `AGENTS.md` (sección "Agent Auth"), `CLAUDE.md` (API Routes), `GREENHOUSE_IDENTITY_ACCESS_V2.md` (sección Agent Auth), y `docs/documentation/identity/sistema-identidad-roles-acceso.md`
+
+### Archivos modificados
+
+- `src/app/api/auth/agent-session/route.ts` (nuevo)
+- `scripts/playwright-auth-setup.mjs` (nuevo)
+- `.env.example` — variables de agent auth
+- `.gitignore` — excluir `.auth/`
+- `AGENTS.md` — sección Agent Auth completa
+- `CLAUDE.md` — API Routes actualizado
+- `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md` — delta Agent Auth
+- `docs/documentation/identity/sistema-identidad-roles-acceso.md` — sección agentes
+
+### Seguridad
+
+- Endpoint desactivado por defecto (requiere `AGENT_AUTH_SECRET`)
+- Bloqueado en production (`VERCEL_ENV === 'production'` → 403) salvo override explícito
+- Timing-safe comparison con `crypto.timingSafeEqual`
+- No crea usuarios — solo autentica emails que ya existen en la tabla de acceso
+
+### Uso rápido
+
+```bash
+# 1. Generar secret y agregarlo a .env.local
+openssl rand -hex 32
+# → AGENT_AUTH_SECRET=<valor>
+
+# 2. Con el dev server corriendo
+AGENT_AUTH_SECRET=<secret> AGENT_AUTH_EMAIL=<email> node scripts/playwright-auth-setup.mjs
+
+# 3. Usar storageState en Playwright
+# → .auth/storageState.json contiene la cookie de sesión
+```
+
+### Riesgo / siguiente paso
+
+- El endpoint está listo pero requiere que `AGENT_AUTH_SECRET` esté en `.env.local` para funcionar
+- Modo credentials requiere Playwright instalado como devDependency
+- No se tocó middleware ni rutas existentes — es puramente aditivo
+
+## Sesión 2026-04-05 — TASK-254 plan drafted, no runtime implementation
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: cerrar Plan Mode del worker migration sin tocar runtime
+
+### Qué se hizo
+
+- se detectó colisión documental: `TASK-253` ya existía como task cerrada en el registry
+- la lane urgente de cron durable worker migration se reasignó al siguiente ID libre: `TASK-254`
+- se movió la task a `docs/tasks/in-progress/TASK-254-operational-cron-durable-worker-migration.md`
+- se creó `docs/tasks/plans/TASK-254-plan.md`
+- el plan deja confirmados estos hallazgos:
+  - `outbox-react`, `outbox-react-delivery` y `projection-recovery` ya operan como workers sobre backlog/cola persistente
+  - el criterio actual basado solo en duración `<30s` ya no alcanza para decidir workload placement
+  - `services/ico-batch/` ya ofrece el patrón Cloud Run reusable para la primera ola
+
+### Riesgo / siguiente paso
+
+- **no se implementó runtime**
+- el siguiente paso correcto es checkpoint humano sobre `docs/tasks/plans/TASK-254-plan.md`
+- decisiones abiertas a resolver antes de código:
+  - si el worker nuevo vive como `services/ops-worker/` o extensión de `ico-batch`
+  - si `outbox-publish` entra en la misma ola o queda sólo clasificado para follow-up
+
+## Sesión 2026-04-05 — TASK-254 created: durable worker migration for operational crons
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: registrar task urgente para sacar del path primario de Vercel los cron que ya operan como workers durables
+
+### Qué se hizo
+
+- se creó `TASK-254` como lane de migración de cron operativos worker-like fuera de Vercel
+- la task nace como follow-on estructural de `ISSUE-009`, `ISSUE-012`, `TASK-241` y `TASK-251`
+- foco inicial explícito:
+  - `outbox-react`
+  - `outbox-react-delivery`
+  - `projection-recovery`
+- se dejó claro que esta lane no reemplaza `TASK-251`; la complementa resolviendo el execution plane del worker reactivo
+
+### Riesgo / siguiente paso
+
+- el siguiente agente debe ejecutar Discovery sobre `vercel.json`, `services/ico-batch/`, el consumer reactivo y la política cloud para decidir si se crea `services/ops-worker/` dedicado o se extiende el patrón existente
+- esta task es `P0` / `Alto`, por lo que requiere `plan.md` y checkpoint humano antes de implementación
+
 ## Sesión 2026-04-05 — ISSUE-012 resolved: Vercel Cron no longer depends on CRON_SECRET
 
 ### Rama / alcance

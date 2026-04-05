@@ -29,6 +29,12 @@ Regla nueva:
 - cualquier módulo que necesite estructura organizacional interna debe consumir `greenhouse_core.departments` como source of truth runtime
 - si BigQuery necesita la estructura para analytics, debe recibirla por proyección explícita desde Postgres y no por dual-write silencioso
 
+## Delta 2026-04-05 — Profile fallback when person_360 has no row (TASK-255)
+
+- `GET /api/my/profile` ya no depende exclusivamente de `person_360`. Si la view no tiene fila para el usuario (e.g. `identity_profile_id` no linkeado aun), la route hace fallback a datos de sesion JWT (nombre, email, avatar).
+- Nuevo tipo `PersonProfileSummary` en `src/types/person-360.ts` y proyecciones `toPersonProfileSummary()` / `toPersonProfileSummaryFromSession()` en `src/lib/person-360/get-person-profile.ts`.
+- Patron: `person_360` sigue siendo la fuente canonica para perfil completo; el fallback de sesion es degradacion graceful, no un canal alternativo de datos.
+
 ## Purpose
 
 Define the first canonical PostgreSQL model that will support Greenhouse as:
