@@ -84,8 +84,8 @@ Nuevos source systems se agregan al CASE de `canonical_source_system()`, no al f
 - **Scheduler → Cloud Run confirmado**: invocación exitosa (200, 50 events processed, 758ms)
 - **Problema resuelto**: ESM/CJS interop con `next-auth` — shimmed via esbuild `--alias` (6 aliases: next-auth, 3 providers, next-auth/next, bcryptjs)
 - Las rutas API de Vercel (`/api/cron/outbox-react`, etc.) siguen existiendo como fallback manual, pero ya no están scheduleadas en `vercel.json`
-- **Siguiente paso**: período dual-run para confirmar estabilidad, luego eliminar las 3 rutas cron de Vercel
-- Verificar en staging que `getOperationsOverview()` expone correctamente el subsistema Reactive Worker con datos de `source_sync_runs`
+- **Mergeado a `develop`** (commit `3562f835`, 2026-06-17) — staging deployment disparado en Vercel
+- **Siguiente paso**: observar Staging, verificar que `getOperationsOverview()` expone Reactive Worker en Admin > Ops Health, y luego promover a `main`
 
 ## Sesión 2026-04-05 — ISSUE-014: person_360 VIEW v2 + TASK-256 cierre
 
