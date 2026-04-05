@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { resolveFinanceDownstreamScope } from '@/lib/finance/canonical'
+import {
+  financeSchemaDriftResponse,
+  isFinanceSchemaDriftError,
+  logFinanceSchemaDrift
+} from '@/lib/finance/schema-drift'
 import { FinanceValidationError } from '@/lib/finance/shared'
 import { listHes, createHes } from '@/lib/finance/hes-store'
 
@@ -21,15 +26,16 @@ export async function GET(request: Request) {
     const hubspotCompanyId = searchParams.get('hubspotCompanyId') || undefined
     const requestedSpaceId = searchParams.get('spaceId') || undefined
 
-    const resolvedScope = (clientId || organizationId || clientProfileId || hubspotCompanyId || requestedSpaceId)
-      ? await resolveFinanceDownstreamScope({
-          clientId,
-          organizationId,
-          clientProfileId,
-          hubspotCompanyId,
-          requestedSpaceId
-        })
-      : null
+    const resolvedScope =
+      clientId || organizationId || clientProfileId || hubspotCompanyId || requestedSpaceId
+        ? await resolveFinanceDownstreamScope({
+            clientId,
+            organizationId,
+            clientProfileId,
+            hubspotCompanyId,
+            requestedSpaceId
+          })
+        : null
 
     const items = await listHes({
       clientId: resolvedScope?.clientId ?? clientId,
@@ -45,8 +51,10 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode })
     }
 
-    if (error instanceof Error && error.message.includes('does not exist')) {
-      return NextResponse.json({ items: [], total: 0 })
+    if (isFinanceSchemaDriftError(error)) {
+      logFinanceSchemaDrift('hes', error)
+
+      return financeSchemaDriftResponse('hes', { items: [], total: 0 })
     }
 
     throw error
@@ -61,7 +69,10 @@ export async function POST(request: Request) {
   const body = await request.json()
 
   if (!body.hesNumber || !body.serviceDescription || !body.amount) {
-    return NextResponse.json({ error: 'Missing required fields: hesNumber, serviceDescription, amount' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'Missing required fields: hesNumber, serviceDescription, amount' },
+      { status: 400 }
+    )
   }
 
   try {

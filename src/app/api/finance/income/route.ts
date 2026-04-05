@@ -120,12 +120,8 @@ export async function GET(request: Request) {
     try {
       resolvedClient = await resolveFinanceClientContext({ clientId, clientProfileId, hubspotCompanyId })
     } catch (error) {
-      const canRetryLegacyHubspotAlias = (
-        error instanceof FinanceValidationError
-        && !clientId
-        && !hubspotCompanyId
-        && Boolean(clientProfileId)
-      )
+      const canRetryLegacyHubspotAlias =
+        error instanceof FinanceValidationError && !clientId && !hubspotCompanyId && Boolean(clientProfileId)
 
       if (!canRetryLegacyHubspotAlias) {
         throw error
@@ -170,7 +166,14 @@ export async function GET(request: Request) {
     params.status = status
   }
 
-  if (resolvedClient?.clientId || resolvedClient?.clientProfileId || resolvedClient?.hubspotCompanyId || clientId || clientProfileId || hubspotCompanyId) {
+  if (
+    resolvedClient?.clientId ||
+    resolvedClient?.clientProfileId ||
+    resolvedClient?.hubspotCompanyId ||
+    clientId ||
+    clientProfileId ||
+    hubspotCompanyId
+  ) {
     const clientFilters: string[] = []
 
     if (resolvedClient?.clientId ?? clientId) {
@@ -206,21 +209,27 @@ export async function GET(request: Request) {
     params.toDate = toDate
   }
 
-  const countRows = await runFinanceQuery<{ total: number }>(`
+  const countRows = await runFinanceQuery<{ total: number }>(
+    `
     SELECT COUNT(*) AS total
     FROM \`${projectId}.greenhouse.fin_income\`
     WHERE TRUE ${filters}
-  `, params)
+  `,
+    params
+  )
 
   const total = toNumber(countRows[0]?.total)
 
-  const rows = await runFinanceQuery<IncomeRow>(`
+  const rows = await runFinanceQuery<IncomeRow>(
+    `
     SELECT *
     FROM \`${projectId}.greenhouse.fin_income\`
     WHERE TRUE ${filters}
     ORDER BY invoice_date DESC
     LIMIT @limit OFFSET @offset
-  `, { ...params, limit: pageSize, offset: (page - 1) * pageSize })
+  `,
+    { ...params, limit: pageSize, offset: (page - 1) * pageSize }
+  )
 
   return NextResponse.json({
     items: rows.map(normalizeIncome),
@@ -263,27 +272,31 @@ export async function POST(request: Request) {
 
     const period = invoiceDate.slice(0, 7).replace('-', '')
 
-    const serviceLine = body.serviceLine && SERVICE_LINES.includes(body.serviceLine)
-      ? (body.serviceLine as ServiceLine)
-      : null
+    const serviceLine =
+      body.serviceLine && SERVICE_LINES.includes(body.serviceLine) ? (body.serviceLine as ServiceLine) : null
 
-    const paymentStatus = body.paymentStatus && PAYMENT_STATUSES.includes(body.paymentStatus)
-      ? (body.paymentStatus as PaymentStatus) : 'pending'
+    const paymentStatus =
+      body.paymentStatus && PAYMENT_STATUSES.includes(body.paymentStatus)
+        ? (body.paymentStatus as PaymentStatus)
+        : 'pending'
 
     const incomeType = normalizeString(body.incomeType) || 'service_fee'
 
+    let generatedIncomeId = normalizeString(body.incomeId)
+
     // ── Postgres-first path ──
     try {
-      const incomeId = normalizeString(body.incomeId) ||
-        await buildMonthlySequenceIdFromPostgres({
+      if (!generatedIncomeId) {
+        generatedIncomeId = await buildMonthlySequenceIdFromPostgres({
           tableName: 'income',
           idColumn: 'income_id',
           prefix: 'INC',
           period
         })
+      }
 
       await createFinanceIncomeInPostgres({
-        incomeId,
+        incomeId: generatedIncomeId,
         clientId: resolvedClient.clientId,
         organizationId: resolvedClient.organizationId,
         clientProfileId: resolvedClient.clientProfileId,
@@ -315,7 +328,7 @@ export async function POST(request: Request) {
         actorUserId: tenant.userId || null
       })
 
-      return NextResponse.json({ incomeId, created: true }, { status: 201 })
+      return NextResponse.json({ incomeId: generatedIncomeId, created: true }, { status: 201 })
     } catch (pgError) {
       if (!shouldFallbackFromFinancePostgres(pgError)) {
         throw pgError
@@ -335,17 +348,19 @@ export async function POST(request: Request) {
     // ── BigQuery fallback ──
     await ensureFinanceInfrastructure()
 
-    const incomeId = normalizeString(body.incomeId) ||
-      await buildMonthlySequenceId({
+    const incomeId =
+      generatedIncomeId ||
+      (await buildMonthlySequenceId({
         tableName: 'fin_income',
         idColumn: 'income_id',
         prefix: 'INC',
         period
-      })
+      }))
 
     const projectId = getFinanceProjectId()
 
-    await runFinanceQuery(`
+    await runFinanceQuery(
+      `
       INSERT INTO \`${projectId}.greenhouse.fin_income\` (
         income_id, client_id, client_profile_id, hubspot_company_id, hubspot_deal_id,
         client_name, invoice_number, invoice_date, due_date,
@@ -365,32 +380,34 @@ export async function POST(request: Request) {
         FALSE, NULLIF(@notes, ''), NULLIF(@createdBy, ''),
         CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP()
       )
-    `, {
-      incomeId,
-      clientId: resolvedClient.clientId,
-      clientProfileId: resolvedClient.clientProfileId,
-      hubspotCompanyId: resolvedClient.hubspotCompanyId,
-      hubspotDealId: body.hubspotDealId ? normalizeString(body.hubspotDealId) : null,
-      clientName,
-      invoiceNumber: body.invoiceNumber ? normalizeString(body.invoiceNumber) : null,
-      invoiceDate,
-      dueDate: body.dueDate ? normalizeString(body.dueDate) : null,
-      currency,
-      subtotal,
-      taxRate,
-      taxAmount,
-      totalAmount,
-      exchangeRateToClp,
-      totalAmountClp,
-      paymentStatus,
-      poNumber: body.poNumber ? normalizeString(body.poNumber) : null,
-      hesNumber: body.hesNumber ? normalizeString(body.hesNumber) : null,
-      serviceLine,
-      incomeType,
-      description: body.description ? normalizeString(body.description) : null,
-      notes: body.notes ? normalizeString(body.notes) : null,
-      createdBy: tenant.userId || null
-    })
+    `,
+      {
+        incomeId,
+        clientId: resolvedClient.clientId,
+        clientProfileId: resolvedClient.clientProfileId,
+        hubspotCompanyId: resolvedClient.hubspotCompanyId,
+        hubspotDealId: body.hubspotDealId ? normalizeString(body.hubspotDealId) : null,
+        clientName,
+        invoiceNumber: body.invoiceNumber ? normalizeString(body.invoiceNumber) : null,
+        invoiceDate,
+        dueDate: body.dueDate ? normalizeString(body.dueDate) : null,
+        currency,
+        subtotal,
+        taxRate,
+        taxAmount,
+        totalAmount,
+        exchangeRateToClp,
+        totalAmountClp,
+        paymentStatus,
+        poNumber: body.poNumber ? normalizeString(body.poNumber) : null,
+        hesNumber: body.hesNumber ? normalizeString(body.hesNumber) : null,
+        serviceLine,
+        incomeType,
+        description: body.description ? normalizeString(body.description) : null,
+        notes: body.notes ? normalizeString(body.notes) : null,
+        createdBy: tenant.userId || null
+      }
+    )
 
     return NextResponse.json({ incomeId, created: true }, { status: 201 })
   } catch (error) {
@@ -402,6 +419,9 @@ export async function POST(request: Request) {
 
     console.error('POST /api/finance/income failed:', detail, error)
 
-    return NextResponse.json({ error: 'No pudimos registrar el ingreso. Intenta nuevamente o contacta soporte si el problema persiste.' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'No pudimos registrar el ingreso. Intenta nuevamente o contacta soporte si el problema persiste.' },
+      { status: 500 }
+    )
   }
 }

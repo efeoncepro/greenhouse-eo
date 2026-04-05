@@ -160,15 +160,16 @@ export async function GET(request: Request) {
   const page = Math.max(1, toNumber(searchParams.get('page') || '1'))
   const pageSize = Math.min(200, Math.max(1, toNumber(searchParams.get('pageSize') || '50')))
 
-  const resolvedScope = (clientId || organizationId || clientProfileId || hubspotCompanyId || spaceId)
-    ? await resolveFinanceDownstreamScope({
-        clientId,
-        organizationId,
-        clientProfileId,
-        hubspotCompanyId,
-        requestedSpaceId: spaceId
-      })
-    : null
+  const resolvedScope =
+    clientId || organizationId || clientProfileId || hubspotCompanyId || spaceId
+      ? await resolveFinanceDownstreamScope({
+          clientId,
+          organizationId,
+          clientProfileId,
+          hubspotCompanyId,
+          requestedSpaceId: spaceId
+        })
+      : null
 
   // ── Postgres-first path ──
   try {
@@ -247,21 +248,27 @@ export async function GET(request: Request) {
       params.toDate = toDate
     }
 
-    const countRows = await runFinanceQuery<{ total: number }>(`
+    const countRows = await runFinanceQuery<{ total: number }>(
+      `
       SELECT COUNT(*) AS total
       FROM \`${projectId}.greenhouse.fin_expenses\`
       WHERE TRUE ${filters}
-    `, params)
+    `,
+      params
+    )
 
     const total = toNumber(countRows[0]?.total)
 
-    const rows = await runFinanceQuery<ExpenseRow>(`
+    const rows = await runFinanceQuery<ExpenseRow>(
+      `
       SELECT *
       FROM \`${projectId}.greenhouse.fin_expenses\`
       WHERE TRUE ${filters}
       ORDER BY COALESCE(document_date, payment_date, DATE(created_at)) DESC
       LIMIT @limit OFFSET @offset
-    `, { ...params, limit: pageSize, offset: (page - 1) * pageSize })
+    `,
+      { ...params, limit: pageSize, offset: (page - 1) * pageSize }
+    )
 
     return NextResponse.json({
       items: rows.map(normalizeExpense),
@@ -305,12 +312,11 @@ export async function POST(request: Request) {
       payrollEntryId: body.payrollEntryId
     })
 
-    const expenseType = body.expenseType && EXPENSE_TYPES.includes(body.expenseType)
-      ? (body.expenseType as ExpenseType) : 'supplier'
+    const expenseType =
+      body.expenseType && EXPENSE_TYPES.includes(body.expenseType) ? (body.expenseType as ExpenseType) : 'supplier'
 
-    const sourceType = body.sourceType && EXPENSE_SOURCE_TYPES.includes(body.sourceType)
-      ? normalizeString(body.sourceType)
-      : 'manual'
+    const sourceType =
+      body.sourceType && EXPENSE_SOURCE_TYPES.includes(body.sourceType) ? normalizeString(body.sourceType) : 'manual'
 
     const taxRate = toNumber(body.taxRate ?? 0)
     const taxAmount = toNumber(body.taxAmount) || subtotal * taxRate
@@ -321,44 +327,48 @@ export async function POST(request: Request) {
     const periodSource = normalizeString(body.documentDate || body.paymentDate) || new Date().toISOString().slice(0, 10)
     const period = periodSource.slice(0, 7).replace('-', '')
 
-    const paymentStatus = body.paymentStatus && EXPENSE_PAYMENT_STATUSES.includes(body.paymentStatus)
-      ? (body.paymentStatus as ExpensePaymentStatus) : 'pending'
+    const paymentStatus =
+      body.paymentStatus && EXPENSE_PAYMENT_STATUSES.includes(body.paymentStatus)
+        ? (body.paymentStatus as ExpensePaymentStatus)
+        : 'pending'
 
-    const paymentMethod = body.paymentMethod && PAYMENT_METHODS.includes(body.paymentMethod)
-      ? (body.paymentMethod as PaymentMethod) : null
+    const paymentMethod =
+      body.paymentMethod && PAYMENT_METHODS.includes(body.paymentMethod) ? (body.paymentMethod as PaymentMethod) : null
 
-    const paymentProvider = body.paymentProvider && PAYMENT_PROVIDERS.includes(body.paymentProvider)
-      ? normalizeString(body.paymentProvider)
-      : null
+    const paymentProvider =
+      body.paymentProvider && PAYMENT_PROVIDERS.includes(body.paymentProvider)
+        ? normalizeString(body.paymentProvider)
+        : null
 
-    const paymentRail = body.paymentRail && PAYMENT_RAILS.includes(body.paymentRail)
-      ? normalizeString(body.paymentRail)
-      : null
+    const paymentRail =
+      body.paymentRail && PAYMENT_RAILS.includes(body.paymentRail) ? normalizeString(body.paymentRail) : null
 
-    const serviceLine = body.serviceLine && SERVICE_LINES.includes(body.serviceLine)
-      ? (body.serviceLine as ServiceLine) : null
+    const serviceLine =
+      body.serviceLine && SERVICE_LINES.includes(body.serviceLine) ? (body.serviceLine as ServiceLine) : null
 
     // Shared field resolution
-    const socialSecurityType = body.socialSecurityType && SOCIAL_SECURITY_TYPES.includes(body.socialSecurityType)
-      ? normalizeString(body.socialSecurityType)
-      : null
+    const socialSecurityType =
+      body.socialSecurityType && SOCIAL_SECURITY_TYPES.includes(body.socialSecurityType)
+        ? normalizeString(body.socialSecurityType)
+        : null
 
-    const taxType = body.taxType && TAX_TYPES.includes(body.taxType)
-      ? normalizeString(body.taxType)
-      : null
+    const taxType = body.taxType && TAX_TYPES.includes(body.taxType) ? normalizeString(body.taxType) : null
+
+    let generatedExpenseId = normalizeString(body.expenseId)
 
     // ── Postgres-first path ──
     try {
-      const expenseId = normalizeString(body.expenseId) ||
-        await buildMonthlySequenceIdFromPostgres({
+      if (!generatedExpenseId) {
+        generatedExpenseId = await buildMonthlySequenceIdFromPostgres({
           tableName: 'expenses',
           idColumn: 'expense_id',
           prefix: 'EXP',
           period
         })
+      }
 
       await createFinanceExpenseInPostgres({
-        expenseId,
+        expenseId: generatedExpenseId,
         clientId: resolvedScope.clientId,
         spaceId: resolvedScope.spaceId,
         expenseType,
@@ -389,7 +399,9 @@ export async function POST(request: Request) {
         memberId: resolvedMember.memberId,
         memberName: normalizeString(body.memberName) || resolvedMember.memberName,
         socialSecurityType,
-        socialSecurityInstitution: body.socialSecurityInstitution ? normalizeString(body.socialSecurityInstitution) : null,
+        socialSecurityInstitution: body.socialSecurityInstitution
+          ? normalizeString(body.socialSecurityInstitution)
+          : null,
         socialSecurityPeriod: body.socialSecurityPeriod ? normalizeString(body.socialSecurityPeriod) : null,
         taxType,
         taxPeriod: body.taxPeriod ? normalizeString(body.taxPeriod) : null,
@@ -401,16 +413,20 @@ export async function POST(request: Request) {
         costCategory: body.costCategory ? normalizeString(body.costCategory) : null,
         costIsDirect: Boolean(body.costIsDirect),
         allocatedClientId: body.allocatedClientId ? normalizeString(body.allocatedClientId) : null,
-        directOverheadScope: body.directOverheadScope && DIRECT_OVERHEAD_SCOPES.includes(body.directOverheadScope)
-          ? normalizeString(body.directOverheadScope) : 'none',
-        directOverheadKind: body.directOverheadKind && DIRECT_OVERHEAD_KINDS.includes(body.directOverheadKind)
-          ? normalizeString(body.directOverheadKind) : null,
+        directOverheadScope:
+          body.directOverheadScope && DIRECT_OVERHEAD_SCOPES.includes(body.directOverheadScope)
+            ? normalizeString(body.directOverheadScope)
+            : 'none',
+        directOverheadKind:
+          body.directOverheadKind && DIRECT_OVERHEAD_KINDS.includes(body.directOverheadKind)
+            ? normalizeString(body.directOverheadKind)
+            : null,
         directOverheadMemberId: body.directOverheadMemberId ? normalizeString(body.directOverheadMemberId) : null,
         notes: body.notes ? normalizeString(body.notes) : null,
         actorUserId: tenant.userId || null
       })
 
-      return NextResponse.json({ expenseId, created: true }, { status: 201 })
+      return NextResponse.json({ expenseId: generatedExpenseId, created: true }, { status: 201 })
     } catch (pgError) {
       if (!shouldFallbackFromFinancePostgres(pgError)) {
         throw pgError
@@ -430,17 +446,19 @@ export async function POST(request: Request) {
     // ── BigQuery fallback ──
     await ensureFinanceInfrastructure()
 
-    const expenseId = normalizeString(body.expenseId) ||
-      await buildMonthlySequenceId({
+    const expenseId =
+      generatedExpenseId ||
+      (await buildMonthlySequenceId({
         tableName: 'fin_expenses',
         idColumn: 'expense_id',
         prefix: 'EXP',
         period
-      })
+      }))
 
     const projectId = getFinanceProjectId()
 
-    await runFinanceQuery(`
+    await runFinanceQuery(
+      `
       INSERT INTO \`${projectId}.greenhouse.fin_expenses\` (
         expense_id, client_id, space_id, expense_type, description, currency,
         subtotal, tax_rate, tax_amount, total_amount,
@@ -470,47 +488,51 @@ export async function POST(request: Request) {
         FALSE, @notes, @createdBy,
         CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP()
       )
-    `, {
-      expenseId,
-      clientId: resolvedScope.clientId,
-      spaceId: resolvedScope.spaceId,
-      expenseType,
-      description,
-      currency,
-      subtotal,
-      taxRate,
-      taxAmount,
-      totalAmount,
-      exchangeRateToClp,
-      totalAmountClp,
-      paymentDate: body.paymentDate ? normalizeString(body.paymentDate) : null,
-      paymentStatus,
-      paymentMethod,
-      paymentAccountId: body.paymentAccountId ? normalizeString(body.paymentAccountId) : null,
-      paymentReference: body.paymentReference ? normalizeString(body.paymentReference) : null,
-      documentNumber: body.documentNumber ? normalizeString(body.documentNumber) : null,
-      documentDate: body.documentDate ? normalizeString(body.documentDate) : null,
-      dueDate: body.dueDate ? normalizeString(body.dueDate) : null,
-      supplierId: body.supplierId ? normalizeString(body.supplierId) : null,
-      supplierName: body.supplierName ? normalizeString(body.supplierName) : null,
-      supplierInvoiceNumber: body.supplierInvoiceNumber ? normalizeString(body.supplierInvoiceNumber) : null,
-      payrollPeriodId: normalizeString(body.payrollPeriodId) || resolvedMember.payrollPeriodId,
-      payrollEntryId: resolvedMember.payrollEntryId,
-      memberId: resolvedMember.memberId,
-      memberName: normalizeString(body.memberName) || resolvedMember.memberName,
-      socialSecurityType,
-      socialSecurityInstitution: body.socialSecurityInstitution ? normalizeString(body.socialSecurityInstitution) : null,
-      socialSecurityPeriod: body.socialSecurityPeriod ? normalizeString(body.socialSecurityPeriod) : null,
-      taxType,
-      taxPeriod: body.taxPeriod ? normalizeString(body.taxPeriod) : null,
-      taxFormNumber: body.taxFormNumber ? normalizeString(body.taxFormNumber) : null,
-      miscellaneousCategory: body.miscellaneousCategory ? normalizeString(body.miscellaneousCategory) : null,
-      serviceLine,
-      isRecurring: Boolean(body.isRecurring),
-      recurrenceFrequency: body.recurrenceFrequency ? normalizeString(body.recurrenceFrequency) : null,
-      notes: body.notes ? normalizeString(body.notes) : null,
-      createdBy: tenant.userId || null
-    })
+    `,
+      {
+        expenseId,
+        clientId: resolvedScope.clientId,
+        spaceId: resolvedScope.spaceId,
+        expenseType,
+        description,
+        currency,
+        subtotal,
+        taxRate,
+        taxAmount,
+        totalAmount,
+        exchangeRateToClp,
+        totalAmountClp,
+        paymentDate: body.paymentDate ? normalizeString(body.paymentDate) : null,
+        paymentStatus,
+        paymentMethod,
+        paymentAccountId: body.paymentAccountId ? normalizeString(body.paymentAccountId) : null,
+        paymentReference: body.paymentReference ? normalizeString(body.paymentReference) : null,
+        documentNumber: body.documentNumber ? normalizeString(body.documentNumber) : null,
+        documentDate: body.documentDate ? normalizeString(body.documentDate) : null,
+        dueDate: body.dueDate ? normalizeString(body.dueDate) : null,
+        supplierId: body.supplierId ? normalizeString(body.supplierId) : null,
+        supplierName: body.supplierName ? normalizeString(body.supplierName) : null,
+        supplierInvoiceNumber: body.supplierInvoiceNumber ? normalizeString(body.supplierInvoiceNumber) : null,
+        payrollPeriodId: normalizeString(body.payrollPeriodId) || resolvedMember.payrollPeriodId,
+        payrollEntryId: resolvedMember.payrollEntryId,
+        memberId: resolvedMember.memberId,
+        memberName: normalizeString(body.memberName) || resolvedMember.memberName,
+        socialSecurityType,
+        socialSecurityInstitution: body.socialSecurityInstitution
+          ? normalizeString(body.socialSecurityInstitution)
+          : null,
+        socialSecurityPeriod: body.socialSecurityPeriod ? normalizeString(body.socialSecurityPeriod) : null,
+        taxType,
+        taxPeriod: body.taxPeriod ? normalizeString(body.taxPeriod) : null,
+        taxFormNumber: body.taxFormNumber ? normalizeString(body.taxFormNumber) : null,
+        miscellaneousCategory: body.miscellaneousCategory ? normalizeString(body.miscellaneousCategory) : null,
+        serviceLine,
+        isRecurring: Boolean(body.isRecurring),
+        recurrenceFrequency: body.recurrenceFrequency ? normalizeString(body.recurrenceFrequency) : null,
+        notes: body.notes ? normalizeString(body.notes) : null,
+        createdBy: tenant.userId || null
+      }
+    )
 
     return NextResponse.json({ expenseId, created: true }, { status: 201 })
   } catch (error) {

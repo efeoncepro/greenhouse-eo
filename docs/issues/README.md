@@ -14,6 +14,12 @@ Pipeline de incidentes operativos del portal.
 - `open`: incidente detectado, en diagnóstico o pendiente de solución.
 - `resolved`: solución aplicada y verificada en el ambiente afectado.
 
+## Protocolo operativo
+
+- El modelo operativo canónico de issues vive en `docs/operations/ISSUE_OPERATING_MODEL_V1.md`.
+- Un issue puede resolverse directamente sin task si el fix es localizado y verificable.
+- Al resolverse, el archivo debe moverse de `docs/issues/open/` a `docs/issues/resolved/` y el tracker debe actualizarse en el mismo lote.
+
 ## Plantilla
 
 ```markdown
@@ -58,7 +64,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-007`
+`ISSUE-009`
 
 ## Open
 
@@ -72,6 +78,8 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Resolved
 
-| ID          | Título                                                                                          | Ambiente   | Detectado  | Resuelto   | Causa                                                |
-| ----------- | ----------------------------------------------------------------------------------------------- | ---------- | ---------- | ---------- | ---------------------------------------------------- |
-| `ISSUE-001` | [SSL bad certificate en webhook-dispatch](resolved/ISSUE-001-ssl-bad-certificate-production.md) | production | 2026-03-30 | 2026-03-30 | `GREENHOUSE_POSTGRES_IP_TYPE` faltante en production |
+| ID          | Título                                                                                                                                       | Ambiente             | Detectado  | Resuelto   | Causa                                                       |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------- | ---------- | ----------------------------------------------------------- |
+| `ISSUE-007` | [Finance fallback writes can duplicate income and expenses](resolved/ISSUE-007-finance-fallback-writes-can-duplicate-income-and-expenses.md) | preview + production | 2026-04-05 | 2026-04-05 | Fallback recalculaba un segundo ID en `income` y `expenses` |
+| `ISSUE-008` | [Finance routes mask schema drift as empty success](resolved/ISSUE-008-finance-routes-mask-schema-drift-as-empty-success.md)                 | preview + production | 2026-04-05 | 2026-04-05 | Routes devolvían vacío ambiguo ante drift de schema         |
+| `ISSUE-001` | [SSL bad certificate en webhook-dispatch](resolved/ISSUE-001-ssl-bad-certificate-production.md)                                              | production           | 2026-03-30 | 2026-03-30 | `GREENHOUSE_POSTGRES_IP_TYPE` faltante en production        |

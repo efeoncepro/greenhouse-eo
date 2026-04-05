@@ -84,6 +84,24 @@ describe('purchase-orders route org-first contract', () => {
     expect(body).toEqual({ items: [], total: 0 })
   })
 
+  it('returns an explicit degraded payload when schema drift breaks the purchase order query', async () => {
+    mockListPurchaseOrders.mockRejectedValueOnce(
+      new Error('relation greenhouse_finance.purchase_orders does not exist')
+    )
+
+    const response = await GET(new Request('http://localhost/api/finance/purchase-orders?status=active'))
+
+    const body = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(body).toMatchObject({
+      items: [],
+      total: 0,
+      degraded: true,
+      errorCode: 'FINANCE_SCHEMA_DRIFT'
+    })
+  })
+
   it('creates a purchase order from organization-first input without a raw clientId', async () => {
     const response = await POST(
       new Request('http://localhost/api/finance/purchase-orders', {

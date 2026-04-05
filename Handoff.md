@@ -1,5 +1,49 @@
 # Handoff.md
 
+## Sesión 2026-04-05 — ISSUE-008 Finance schema drift degraded responses
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: cerrar `ISSUE-008` sin romper consumers que hoy esperan listas en Finance
+
+### Qué se hizo
+
+- nuevo helper shared: `src/lib/finance/schema-drift.ts`
+- `purchase-orders`, `hes`, `quotes` y `intelligence/operational-pl` ahora responden payload degradado explícito cuando detectan drift de schema:
+  - preservan `items` / `total` o `snapshots`
+  - agregan `degraded: true`, `errorCode`, `message`
+- `ISSUE-008` quedó resuelta y movida a `docs/issues/resolved/`
+- nueva regresión: `src/app/api/finance/schema-drift-response.test.ts`
+- `purchase-orders/route.test.ts` ahora cubre también el caso degradado
+
+### Verificación
+
+- `pnpm exec vitest run src/app/api/finance/purchase-orders/route.test.ts src/app/api/finance/schema-drift-response.test.ts` — OK
+- `pnpm exec vitest run src/lib/finance/**/*.test.ts src/app/api/finance/**/*.test.ts` — OK (`24` files, `102` passed, `2` skipped)
+
+## Sesión 2026-04-05 — ISSUE-007 Finance fallback write ID reuse + issue protocol
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: cerrar `ISSUE-007` sin perder fallback funcional en Finance y formalizar lifecycle operativo de `ISSUE-###`
+
+### Qué se hizo
+
+- `POST /api/finance/income` y `POST /api/finance/expenses` ahora preservan un ID canónico por request:
+  - si el path Postgres-first ya generó `incomeId` / `expenseId`, el fallback BigQuery reutiliza ese mismo valor
+  - ya no se recalcula una segunda secuencia dentro del mismo create lógico
+- nueva regresión: `src/app/api/finance/fallback-id-reuse.test.ts`
+- `ISSUE-007` quedó resuelta y movida a `docs/issues/resolved/`
+- nuevo protocolo operativo de issues: `docs/operations/ISSUE_OPERATING_MODEL_V1.md`
+- `docs/issues/README.md` quedó alineado para tratar `ISSUE-###` como carril formal separado de tasks
+
+### Verificación
+
+- `pnpm exec vitest run src/app/api/finance/fallback-id-reuse.test.ts src/app/api/finance/identity-drift-payloads.test.ts src/app/api/finance/bigquery-write-cutover.test.ts` — OK
+- `pnpm exec vitest run src/lib/finance/**/*.test.ts src/app/api/finance/**/*.test.ts` — OK (`23` files, `99` passed, `2` skipped)
+
 ## Sesión 2026-04-05 — TASK-248 Identity & Access Spec Compliance
 
 ### Rama / alcance

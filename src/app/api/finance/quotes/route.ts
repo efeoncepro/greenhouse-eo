@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import {
+  financeSchemaDriftResponse,
+  isFinanceSchemaDriftError,
+  logFinanceSchemaDrift
+} from '@/lib/finance/schema-drift'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { roundCurrency, toNumber, toDateString } from '@/lib/finance/shared'
 
@@ -79,8 +84,10 @@ export async function GET(request: Request) {
     return NextResponse.json({ items, total: items.length })
   } catch (error) {
     // Table may not exist yet
-    if (error instanceof Error && error.message.includes('does not exist')) {
-      return NextResponse.json({ items: [], total: 0 })
+    if (isFinanceSchemaDriftError(error)) {
+      logFinanceSchemaDrift('quotes', error)
+
+      return financeSchemaDriftResponse('quotes', { items: [], total: 0 })
     }
 
     throw error

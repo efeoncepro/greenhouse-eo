@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { listOperationalPlSnapshots } from '@/lib/cost-intelligence/compute-operational-pl'
+import {
+  financeSchemaDriftResponse,
+  isFinanceSchemaDriftError,
+  logFinanceSchemaDrift
+} from '@/lib/finance/schema-drift'
 import { getFinanceCurrentPeriod } from '@/lib/finance/reporting'
 
 export const dynamic = 'force-dynamic'
@@ -24,8 +29,10 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ snapshots, year, month })
   } catch (error) {
-    if (error instanceof Error && error.message.includes('does not exist')) {
-      return NextResponse.json({ snapshots: [], year, month })
+    if (isFinanceSchemaDriftError(error)) {
+      logFinanceSchemaDrift('operational pl', error)
+
+      return financeSchemaDriftResponse('operational pl', { snapshots: [], year, month })
     }
 
     throw error

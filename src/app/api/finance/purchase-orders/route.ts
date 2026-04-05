@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { resolveFinanceDownstreamScope } from '@/lib/finance/canonical'
+import {
+  financeSchemaDriftResponse,
+  isFinanceSchemaDriftError,
+  logFinanceSchemaDrift
+} from '@/lib/finance/schema-drift'
 import { FinanceValidationError } from '@/lib/finance/shared'
 import { listPurchaseOrders, createPurchaseOrder } from '@/lib/finance/purchase-order-store'
 
@@ -21,15 +26,16 @@ export async function GET(request: Request) {
   const status = searchParams.get('status') || undefined
 
   try {
-    const resolvedScope = (clientId || organizationId || clientProfileId || hubspotCompanyId || requestedSpaceId)
-      ? await resolveFinanceDownstreamScope({
-          clientId,
-          organizationId,
-          clientProfileId,
-          hubspotCompanyId,
-          requestedSpaceId
-        })
-      : null
+    const resolvedScope =
+      clientId || organizationId || clientProfileId || hubspotCompanyId || requestedSpaceId
+        ? await resolveFinanceDownstreamScope({
+            clientId,
+            organizationId,
+            clientProfileId,
+            hubspotCompanyId,
+            requestedSpaceId
+          })
+        : null
 
     const items = await listPurchaseOrders({
       clientId: resolvedScope?.clientId ?? clientId,
@@ -44,8 +50,10 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode })
     }
 
-    if (error instanceof Error && error.message.includes('does not exist')) {
-      return NextResponse.json({ items: [], total: 0 })
+    if (isFinanceSchemaDriftError(error)) {
+      logFinanceSchemaDrift('purchase orders', error)
+
+      return financeSchemaDriftResponse('purchase orders', { items: [], total: 0 })
     }
 
     throw error
@@ -61,7 +69,10 @@ export async function POST(request: Request) {
   const { poNumber, authorizedAmount, issueDate } = body
 
   if (!poNumber || !authorizedAmount || !issueDate) {
-    return NextResponse.json({ error: 'Missing required fields: poNumber, authorizedAmount, issueDate' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'Missing required fields: poNumber, authorizedAmount, issueDate' },
+      { status: 400 }
+    )
   }
 
   try {

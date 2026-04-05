@@ -6,6 +6,43 @@
 
 ---
 
+## Delta 2026-04-05 — schema drift in Finance lists now surfaces as explicit degraded payload
+
+Las routes Finance que antes respondían vacío ante `relation/column does not exist` ya no deben ocultar drift de schema como si fuera ausencia sana de datos.
+
+Carriles ajustados:
+
+- `purchase-orders`
+- `hes`
+- `quotes`
+- `intelligence/operational-pl`
+
+Nuevo contrato runtime:
+
+- la shape base de lista se preserva (`items` / `total` o `snapshots`)
+- el payload agrega `degraded: true`, `errorCode` y `message`
+- el consumer puede distinguir explícitamente schema drift de un estado realmente vacío
+
+Objetivo:
+
+- no romper consumidores existentes que esperan listas
+- evitar que Finance oculte incidentes reales como “sin datos”
+
+## Delta 2026-04-05 — create routes reuse request-scoped IDs across dual-store fallback
+
+`POST /api/finance/income` y `POST /api/finance/expenses` ya no deben recalcular un segundo identificador si el path Postgres-first alcanzó a generar uno antes de caer al fallback BigQuery.
+
+Nuevo contrato runtime:
+
+- el request mantiene un ID canónico por operación de create
+- si PostgreSQL ya generó `income_id` o `expense_id`, BigQuery fallback debe reutilizar ese mismo valor
+- solo cuando no existía ID previo y no se pudo generar en el carril Postgres, el fallback puede asignar uno propio
+
+Objetivo:
+
+- evitar duplicidad lógica cross-store por recalcular secuencias distintas en una misma operación
+- preservar el comportamiento de fallback sin degradar integridad básica del ledger
+
 ## Delta 2026-04-03 — Currency comparison helpers como módulo compartido de Finance
 
 `src/lib/finance/currency-comparison.ts` es un módulo de funciones puras (sin `'server-only'`) que vive en Finance pero es importable desde cualquier módulo client o server:
@@ -53,6 +90,7 @@ Regla operativa:
 Finance ya no debe tratar la atribución comercial como una recomposición local entre bridges de payroll, assignments y overhead.
 
 Estado canónico vigente:
+
 - existe una capa materializada específica:
   - `greenhouse_serving.commercial_cost_attribution`
 - esta capa consolida por período y `member_id`:
@@ -63,6 +101,7 @@ Estado canónico vigente:
 - la capa expone además explainability por cliente/período y health semántico mínimo
 
 Regla arquitectónica:
+
 - `client_labor_cost_allocation` sigue existiendo, pero queda como bridge/input interno
 - readers nuevos de Finance no deben volver a depender de `client_labor_cost_allocation` directamente
 - el contrato compartido para costo comercial pasa a ser:
@@ -70,6 +109,7 @@ Regla arquitectónica:
   - o serving derivado que ya lo consuma (`operational_pl_snapshots`)
 
 Matriz de consumo:
+
 - Finance base / `client_economics`
   - debe consumir `commercial_cost_attribution`
 - Cost Intelligence / `operational_pl`
@@ -103,6 +143,7 @@ Matriz de consumo:
 ## Delta 2026-03-30 — revenue aggregation usa client_id canónico
 
 Regla canónica vigente para agregaciones financieras:
+
 - `client_economics` y `operational_pl` deben agregar revenue por `client_id` comercial canónico.
 - Si un income histórico solo trae `client_profile_id`, el runtime debe traducirlo vía `greenhouse_finance.client_profiles` antes de agrupar.
 - No se debe usar `client_profile_id` como sustituto directo de `client_id` en snapshots o serving ejecutivo nuevo.
@@ -146,6 +187,7 @@ Matiz importante de schema:
 Finance sigue siendo el owner del motor financiero central, pero ya no es la única surface que expone semántica de rentabilidad.
 
 Estado canónico vigente:
+
 - `GET /api/finance/dashboard/pnl` sigue siendo la referencia central del cálculo financiero mensual.
 - Cost Intelligence ya materializa esa semántica en serving propio, sin redefinir un P&L paralelo:
   - `greenhouse_serving.period_closure_status`
@@ -159,6 +201,7 @@ Estado canónico vigente:
   - Nexa
 
 Regla arquitectónica:
+
 - Finance mantiene ownership de ingresos, gastos, reconciliación, FX y semántica del P&L central.
 - Cost Intelligence actúa como layer de materialización y distribución operativa sobre esa base.
 - Nuevos consumers que necesiten margen, closure status o snapshots operativos deberían preferir `operational_pl_snapshots` y `period_closure_status` antes de recomputar on-read.
@@ -176,6 +219,7 @@ Se formaliza una regla que ya existía implícitamente en `Agency > Team` y `mem
   - un colaborador puede tener carga interna operativa y al mismo tiempo `1.0 FTE` comercial hacia un cliente sin que Finance le parta la nómina 50/50 contra `Efeonce`
 
 Regla de implementación:
+
 - la truth comercial compartida debe salir de una regla canónica reusable, no de filtros distintos por consumer
 - Cost Intelligence puede purgar snapshots obsoletos de una revisión para evitar que scopes internos antiguos sigan visibles después del recompute
 
@@ -187,23 +231,24 @@ Finance es el módulo más grande del portal: 49 API routes, 13 páginas, 28 arc
 
 ### Dual-Store: Postgres-First with BigQuery Fallback
 
-| Tabla | Store primario | BigQuery | Estado |
-|-------|---------------|----------|--------|
-| `income` | Postgres (`greenhouse_finance`) | `fin_income` (fallback) | Migrado |
-| `income_payments` | Postgres only | No existe en BQ | Nativo Postgres |
-| `expenses` | Postgres (`greenhouse_finance`) | `fin_expenses` (fallback) | Migrado |
-| `accounts` | Postgres | `fin_accounts` (fallback) | Migrado |
-| `suppliers` | Postgres | `fin_suppliers` (fallback) | Migrado |
-| `exchange_rates` | Postgres | `fin_exchange_rates` (fallback) | Migrado |
-| `economic_indicators` | Postgres | `fin_economic_indicators` (fallback) | Migrado |
-| `cost_allocations` | Postgres only | No existe en BQ | Nativo Postgres; persiste `organization_id`/`space_id` + `client_id` compat |
-| `client_economics` | Postgres (`greenhouse_finance`) | No | Nativo; persiste `organization_id` + `client_id` compat |
-| `reconciliation_periods` | Postgres | `fin_reconciliation_periods` (fallback) | Migrado |
-| `bank_statement_rows` | Postgres | `fin_bank_statement_rows` (fallback) | Migrado |
-| `dte_emission_queue` | Postgres only | No | TASK-139 |
-| `commercial_cost_attribution` | Serving Postgres (`greenhouse_serving`) | No | Canónico materializado; persiste `organization_id` + `client_id` compat |
+| Tabla                         | Store primario                          | BigQuery                                | Estado                                                                      |
+| ----------------------------- | --------------------------------------- | --------------------------------------- | --------------------------------------------------------------------------- |
+| `income`                      | Postgres (`greenhouse_finance`)         | `fin_income` (fallback)                 | Migrado                                                                     |
+| `income_payments`             | Postgres only                           | No existe en BQ                         | Nativo Postgres                                                             |
+| `expenses`                    | Postgres (`greenhouse_finance`)         | `fin_expenses` (fallback)               | Migrado                                                                     |
+| `accounts`                    | Postgres                                | `fin_accounts` (fallback)               | Migrado                                                                     |
+| `suppliers`                   | Postgres                                | `fin_suppliers` (fallback)              | Migrado                                                                     |
+| `exchange_rates`              | Postgres                                | `fin_exchange_rates` (fallback)         | Migrado                                                                     |
+| `economic_indicators`         | Postgres                                | `fin_economic_indicators` (fallback)    | Migrado                                                                     |
+| `cost_allocations`            | Postgres only                           | No existe en BQ                         | Nativo Postgres; persiste `organization_id`/`space_id` + `client_id` compat |
+| `client_economics`            | Postgres (`greenhouse_finance`)         | No                                      | Nativo; persiste `organization_id` + `client_id` compat                     |
+| `reconciliation_periods`      | Postgres                                | `fin_reconciliation_periods` (fallback) | Migrado                                                                     |
+| `bank_statement_rows`         | Postgres                                | `fin_bank_statement_rows` (fallback)    | Migrado                                                                     |
+| `dte_emission_queue`          | Postgres only                           | No                                      | TASK-139                                                                    |
+| `commercial_cost_attribution` | Serving Postgres (`greenhouse_serving`) | No                                      | Canónico materializado; persiste `organization_id` + `client_id` compat     |
 
 Nota operativa:
+
 - `commercial_cost_attribution` existe en el schema snapshot y ya es contrato vigente del sistema, pero su DDL base sigue asegurado por runtime/store code además de las migraciones incrementales; todavía no vive como create-table canónico separado dentro de `scripts/` o una migración histórica dedicada.
 
 ### BigQuery Cutover Plan
@@ -213,6 +258,7 @@ Ver `GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md` sección "Finance BigQuery →
 Flag de control: `FINANCE_BIGQUERY_WRITE_ENABLED` (default: true).
 
 Estado operativo post `TASK-166`:
+
 - `income`, `expenses`, `accounts`, `suppliers`, `exchange_rates`, `reconciliation` y los sync helpers principales ya respetan el guard fail-closed cuando PostgreSQL falla y el flag está apagado.
 - `clients` (`create/update/sync`) ya opera Postgres-first sobre `greenhouse_finance.client_profiles`; BigQuery queda solo como fallback transicional cuando PostgreSQL no está disponible y el flag sigue activo.
 - `clients` list/detail ya operan org-first sobre `greenhouse_core.organizations WHERE organization_type IN ('client', 'both')`, con `client_profiles.organization_id` como FK fuerte.
@@ -227,9 +273,9 @@ Este es el **endpoint más importante del módulo Finance**. Construye un P&L op
 
 ### Parámetros
 
-| Param | Default | Descripción |
-|-------|---------|-------------|
-| `year` | Año actual | Año del período |
+| Param   | Default    | Descripción     |
+| ------- | ---------- | --------------- |
+| `year`  | Año actual | Año del período |
 | `month` | Mes actual | Mes del período |
 
 ### Queries ejecutadas (en paralelo)
@@ -346,11 +392,11 @@ Margins:
 
 ### Quién consume este endpoint
 
-| Consumer | Qué usa | Para qué |
-|----------|---------|----------|
-| `FinanceDashboardView.tsx` | Todo el response | Card "Facturado vs Costos", Card "Costo de Personal", P&L table |
-| KPI "Ratio nómina / ingresos" | `payroll.totalGross / revenue.netRevenue` | Working capital metric |
-| Card "Costo de Personal" | `payroll.*` | Desglose bruto, líquido, descuentos, bonos |
+| Consumer                      | Qué usa                                   | Para qué                                                        |
+| ----------------------------- | ----------------------------------------- | --------------------------------------------------------------- |
+| `FinanceDashboardView.tsx`    | Todo el response                          | Card "Facturado vs Costos", Card "Costo de Personal", P&L table |
+| KPI "Ratio nómina / ingresos" | `payroll.totalGross / revenue.netRevenue` | Working capital metric                                          |
+| Card "Costo de Personal"      | `payroll.*`                               | Desglose bruto, líquido, descuentos, bonos                      |
 
 ### Reglas de negocio críticas
 
@@ -373,6 +419,7 @@ Para el intake reactivo de nómina:
 - `payroll_period.exported` es la señal canónica
 - el materializador debe crear gastos para nómina y cargas sociales cuando falten en el ledger
 - la publicación downstream sigue usando `finance.expense.created|updated`; no se introdujo un evento nuevo específico para tooling
+
 5. **`completeness`** — `'complete'` solo si hay payroll Y expenses; `'partial'` si falta alguno
 
 ## Dashboard Summary Endpoint
@@ -381,17 +428,17 @@ Para el intake reactivo de nómina:
 
 Endpoint complementario al PnL que provee métricas de working capital.
 
-| Campo | Cálculo | Fuente |
-|-------|---------|--------|
-| `incomeMonth` | Income cash del mes actual | income_payments |
-| `expensesMonth` | Expenses cash del mes actual | expenses (paid) |
-| `netFlow` | incomeMonth - expensesMonth | Derivado |
-| `receivables` | Facturas pendientes de cobro (CLP) | income WHERE payment_status IN (pending, partial, overdue) |
-| `payables` | Gastos pendientes de pago (CLP) | expenses WHERE payment_status = 'pending' |
-| `dso` | (receivables / revenue) × 30 | Derivado |
-| `dpo` | (payables / expenses) × 30 | Derivado |
-| `payrollToRevenueRatio` | Desde `total-company-cost.ts` | Payroll module |
-| `cash` / `accrual` | Métricas duales por base contable | Income/expenses |
+| Campo                   | Cálculo                            | Fuente                                                     |
+| ----------------------- | ---------------------------------- | ---------------------------------------------------------- |
+| `incomeMonth`           | Income cash del mes actual         | income_payments                                            |
+| `expensesMonth`         | Expenses cash del mes actual       | expenses (paid)                                            |
+| `netFlow`               | incomeMonth - expensesMonth        | Derivado                                                   |
+| `receivables`           | Facturas pendientes de cobro (CLP) | income WHERE payment_status IN (pending, partial, overdue) |
+| `payables`              | Gastos pendientes de pago (CLP)    | expenses WHERE payment_status = 'pending'                  |
+| `dso`                   | (receivables / revenue) × 30       | Derivado                                                   |
+| `dpo`                   | (payables / expenses) × 30         | Derivado                                                   |
+| `payrollToRevenueRatio` | Desde `total-company-cost.ts`      | Payroll module                                             |
+| `cash` / `accrual`      | Métricas duales por base contable  | Income/expenses                                            |
 
 ## Other Dashboard Endpoints
 
@@ -411,77 +458,77 @@ Revenue y costs desglosados por línea de servicio (globe, digital, reach, wave,
 
 ### Emitidos por Finance (13 event types)
 
-| Event Type | Aggregate | Cuándo |
-|------------|-----------|--------|
-| `finance.income.created` | income | Nueva factura |
-| `finance.income.updated` | income | Factura modificada |
-| `finance.expense.created` | expense | Nuevo gasto |
-| `finance.expense.updated` | expense | Gasto modificado |
-| `finance.income_payment.created` | income_payment | Pago registrado |
-| `finance.income_payment.recorded` | income_payment | Pago finalizado |
-| `finance.cost_allocation.created` | cost_allocation | Gasto asignado a cliente |
-| `finance.cost_allocation.deleted` | cost_allocation | Asignación eliminada |
-| `finance.exchange_rate.upserted` | exchange_rate | Tipo de cambio actualizado |
+| Event Type                            | Aggregate          | Cuándo                           |
+| ------------------------------------- | ------------------ | -------------------------------- |
+| `finance.income.created`              | income             | Nueva factura                    |
+| `finance.income.updated`              | income             | Factura modificada               |
+| `finance.expense.created`             | expense            | Nuevo gasto                      |
+| `finance.expense.updated`             | expense            | Gasto modificado                 |
+| `finance.income_payment.created`      | income_payment     | Pago registrado                  |
+| `finance.income_payment.recorded`     | income_payment     | Pago finalizado                  |
+| `finance.cost_allocation.created`     | cost_allocation    | Gasto asignado a cliente         |
+| `finance.cost_allocation.deleted`     | cost_allocation    | Asignación eliminada             |
+| `finance.exchange_rate.upserted`      | exchange_rate      | Tipo de cambio actualizado       |
 | `finance.economic_indicator.upserted` | economic_indicator | Indicador económico sincronizado |
-| `finance.dte.discrepancy_found` | dte_reconciliation | Discrepancia DTE detectada |
+| `finance.dte.discrepancy_found`       | dte_reconciliation | Discrepancia DTE detectada       |
 
 ### Consumidos (proyecciones reactivas)
 
-| Projection | Eventos que la disparan | Resultado |
-|------------|------------------------|-----------|
-| `client_economics` | income.*, expense.*, payment.*, allocation.*, payroll.*, assignment.*, membership.* | Recomputa snapshot de rentabilidad por cliente |
-| `member_capacity_economics` | expense.updated, exchange_rate.upserted, payroll.*, assignment.* | Recalcula costo por FTE |
-| `notification_dispatch` | dte.discrepancy_found, income.created, expense.created, payment.recorded, exchange_rate.upserted | Notificaciones in-app + email |
+| Projection                  | Eventos que la disparan                                                                          | Resultado                                      |
+| --------------------------- | ------------------------------------------------------------------------------------------------ | ---------------------------------------------- |
+| `client_economics`          | income._, expense._, payment._, allocation._, payroll._, assignment._, membership.\*             | Recomputa snapshot de rentabilidad por cliente |
+| `member_capacity_economics` | expense.updated, exchange*rate.upserted, payroll.*, assignment.\_                                | Recalcula costo por FTE                        |
+| `notification_dispatch`     | dte.discrepancy_found, income.created, expense.created, payment.recorded, exchange_rate.upserted | Notificaciones in-app + email                  |
 
 ## Notification Mappings
 
 Finance genera 5 tipos de notificación via webhook bus:
 
-| Evento | Categoría | Recipients |
-|--------|-----------|------------|
+| Evento                            | Categoría       | Recipients     |
+| --------------------------------- | --------------- | -------------- |
 | `finance.income_payment.recorded` | `finance_alert` | Finance admins |
-| `finance.expense.created` | `finance_alert` | Finance admins |
-| `finance.dte.discrepancy_found` | `finance_alert` | Finance admins |
-| `finance.income.created` | `finance_alert` | Finance admins |
-| `finance.exchange_rate.upserted` | `finance_alert` | Finance admins |
+| `finance.expense.created`         | `finance_alert` | Finance admins |
+| `finance.dte.discrepancy_found`   | `finance_alert` | Finance admins |
+| `finance.income.created`          | `finance_alert` | Finance admins |
+| `finance.exchange_rate.upserted`  | `finance_alert` | Finance admins |
 
 ## Cross-Module Bridges
 
 ### Finance ↔ Payroll
 
-| Bridge | Dirección | Mecanismo |
-|--------|-----------|-----------|
-| Labor cost in P&L | Payroll → Finance | PnL endpoint lee `payroll_entries` directamente |
-| Expense linking | Finance → Payroll | `expenses.payroll_entry_id` + `member_id` |
-| Cost allocation | Payroll → Finance | `client_labor_cost_allocation` serving view |
-| Commercial cost attribution | Payroll/Capacity/Finance → Finance/Cost Intelligence | `commercial_cost_attribution` serving table |
-| Period status | Payroll → Finance | PnL solo incluye `approved`/`exported` |
+| Bridge                      | Dirección                                            | Mecanismo                                       |
+| --------------------------- | ---------------------------------------------------- | ----------------------------------------------- |
+| Labor cost in P&L           | Payroll → Finance                                    | PnL endpoint lee `payroll_entries` directamente |
+| Expense linking             | Finance → Payroll                                    | `expenses.payroll_entry_id` + `member_id`       |
+| Cost allocation             | Payroll → Finance                                    | `client_labor_cost_allocation` serving view     |
+| Commercial cost attribution | Payroll/Capacity/Finance → Finance/Cost Intelligence | `commercial_cost_attribution` serving table     |
+| Period status               | Payroll → Finance                                    | PnL solo incluye `approved`/`exported`          |
 
 ### Finance ↔ People
 
-| Bridge | Dirección | Mecanismo |
-|--------|-----------|-----------|
-| Member cost | Finance → People | `GET /api/people/[memberId]/finance-impact` |
-| Capacity economics | Payroll → People | `member_capacity_economics` serving view |
-| Cost/revenue ratio | Finance → People | Finance impact card en HR Profile tab |
+| Bridge             | Dirección        | Mecanismo                                   |
+| ------------------ | ---------------- | ------------------------------------------- |
+| Member cost        | Finance → People | `GET /api/people/[memberId]/finance-impact` |
+| Capacity economics | Payroll → People | `member_capacity_economics` serving view    |
+| Cost/revenue ratio | Finance → People | Finance impact card en HR Profile tab       |
 
 ### Finance ↔ Agency
 
-| Bridge | Dirección | Mecanismo |
-|--------|-----------|-----------|
-| Space revenue/margin | Finance → Agency | `getSpaceFinanceMetrics()` + `GET /api/agency/finance-metrics` |
-| Org economics | Finance → Agency | `operational_pl_snapshots` org-first, con fallback a `client_economics.organization_id` |
+| Bridge               | Dirección        | Mecanismo                                                                               |
+| -------------------- | ---------------- | --------------------------------------------------------------------------------------- |
+| Space revenue/margin | Finance → Agency | `getSpaceFinanceMetrics()` + `GET /api/agency/finance-metrics`                          |
+| Org economics        | Finance → Agency | `operational_pl_snapshots` org-first, con fallback a `client_economics.organization_id` |
 
 ## Cost Allocation System
 
 ### Métodos disponibles
 
-| Método | Cuándo | Implementación |
-|--------|--------|----------------|
-| `manual` | Admin asigna explícitamente | UI en `/finance/cost-allocations` |
-| `fte_weighted` | Distribución por FTE del member | `auto-allocation-rules.ts` |
-| `revenue_weighted` | Distribución por ingreso del cliente | `auto-allocation-rules.ts` |
-| `headcount` | Distribución por headcount | Disponible, no wired |
+| Método             | Cuándo                               | Implementación                    |
+| ------------------ | ------------------------------------ | --------------------------------- |
+| `manual`           | Admin asigna explícitamente          | UI en `/finance/cost-allocations` |
+| `fte_weighted`     | Distribución por FTE del member      | `auto-allocation-rules.ts`        |
+| `revenue_weighted` | Distribución por ingreso del cliente | `auto-allocation-rules.ts`        |
+| `headcount`        | Distribución por headcount           | Disponible, no wired              |
 
 ### Auto-allocation (TASK-138)
 
@@ -494,48 +541,48 @@ Reglas declarativas ejecutadas fire-and-forget al crear un expense:
 
 ## Canonical Helpers
 
-| Helper | Archivo | Propósito |
-|--------|---------|-----------|
-| `getLatestPeriodCompanyCost()` | `total-company-cost.ts` | Costo empresa = gross + employer charges |
-| `resolveExchangeRateToClp()` | `shared.ts` | Resuelve tipo de cambio, error si no existe |
-| `checkExchangeRateStaleness()` | `shared.ts` | Detecta rates >7 días |
-| `resolveAutoAllocation()` | `auto-allocation-rules.ts` | Auto-asignación de gastos a clientes |
-| `resolveFinanceClientContext()` | `canonical.ts` | Resuelve clientId/orgId/profileId |
-| `reconcilePaymentTotals()` | `payment-ledger.ts` | Reconcilia amount_paid vs SUM(payments) |
+| Helper                          | Archivo                    | Propósito                                   |
+| ------------------------------- | -------------------------- | ------------------------------------------- |
+| `getLatestPeriodCompanyCost()`  | `total-company-cost.ts`    | Costo empresa = gross + employer charges    |
+| `resolveExchangeRateToClp()`    | `shared.ts`                | Resuelve tipo de cambio, error si no existe |
+| `checkExchangeRateStaleness()`  | `shared.ts`                | Detecta rates >7 días                       |
+| `resolveAutoAllocation()`       | `auto-allocation-rules.ts` | Auto-asignación de gastos a clientes        |
+| `resolveFinanceClientContext()` | `canonical.ts`             | Resuelve clientId/orgId/profileId           |
+| `reconcilePaymentTotals()`      | `payment-ledger.ts`        | Reconcilia amount_paid vs SUM(payments)     |
 
 ## Data Quality
 
 `GET /api/finance/data-quality` retorna 6 checks:
 
-| Check | Qué verifica |
-|-------|-------------|
-| `payment_ledger_integrity` | amount_paid = SUM(income_payments.amount) |
-| `exchange_rate_freshness` | Rate USD/CLP no tiene >7 días |
-| `orphan_expenses` | Gastos sin client_id (excluye tax/social_security) |
-| `income_without_client` | Ingresos sin client_id |
-| `dte_pending_emission` | Emisiones DTE en cola de retry |
-| `overdue_receivables` | Facturas vencidas (due_date < today) |
+| Check                      | Qué verifica                                       |
+| -------------------------- | -------------------------------------------------- |
+| `payment_ledger_integrity` | amount_paid = SUM(income_payments.amount)          |
+| `exchange_rate_freshness`  | Rate USD/CLP no tiene >7 días                      |
+| `orphan_expenses`          | Gastos sin client_id (excluye tax/social_security) |
+| `income_without_client`    | Ingresos sin client_id                             |
+| `dte_pending_emission`     | Emisiones DTE en cola de retry                     |
+| `overdue_receivables`      | Facturas vencidas (due_date < today)               |
 
 Integrado en Admin Center > Ops Health como subsistema "Finance Data Quality".
 
 ## File Reference
 
-| Archivo | Propósito |
-|---------|-----------|
-| `src/lib/finance/shared.ts` | Tipos, validadores, helpers compartidos |
-| `src/lib/finance/postgres-store.ts` | Slice 1: accounts, suppliers, rates |
-| `src/lib/finance/postgres-store-slice2.ts` | Slice 2: income, expenses, payments (primary) |
-| `src/lib/finance/postgres-store-intelligence.ts` | Client economics snapshots |
-| `src/lib/finance/payment-ledger.ts` | Income payment recording |
-| `src/lib/finance/reconciliation.ts` | BigQuery reconciliation (@deprecated) |
-| `src/lib/finance/postgres-reconciliation.ts` | Postgres reconciliation (primary) |
-| `src/lib/finance/exchange-rates.ts` | Exchange rate sync |
-| `src/lib/finance/economic-indicators.ts` | UF, UTM, IPC sync |
-| `src/lib/finance/dte-coverage.ts` | DTE/Nubox reconciliation metrics |
-| `src/lib/finance/dte-emission-queue.ts` | DTE emission retry queue |
-| `src/lib/finance/auto-allocation-rules.ts` | Cost allocation automation |
-| `src/lib/finance/total-company-cost.ts` | Canonical company cost helper |
-| `src/lib/finance/payroll-cost-allocation.ts` | Labor cost bridge to payroll |
-| `src/app/api/finance/dashboard/pnl/route.ts` | P&L endpoint (motor central) |
-| `src/app/api/finance/dashboard/summary/route.ts` | Working capital metrics |
-| `src/app/api/finance/data-quality/route.ts` | Data quality checks |
+| Archivo                                          | Propósito                                     |
+| ------------------------------------------------ | --------------------------------------------- |
+| `src/lib/finance/shared.ts`                      | Tipos, validadores, helpers compartidos       |
+| `src/lib/finance/postgres-store.ts`              | Slice 1: accounts, suppliers, rates           |
+| `src/lib/finance/postgres-store-slice2.ts`       | Slice 2: income, expenses, payments (primary) |
+| `src/lib/finance/postgres-store-intelligence.ts` | Client economics snapshots                    |
+| `src/lib/finance/payment-ledger.ts`              | Income payment recording                      |
+| `src/lib/finance/reconciliation.ts`              | BigQuery reconciliation (@deprecated)         |
+| `src/lib/finance/postgres-reconciliation.ts`     | Postgres reconciliation (primary)             |
+| `src/lib/finance/exchange-rates.ts`              | Exchange rate sync                            |
+| `src/lib/finance/economic-indicators.ts`         | UF, UTM, IPC sync                             |
+| `src/lib/finance/dte-coverage.ts`                | DTE/Nubox reconciliation metrics              |
+| `src/lib/finance/dte-emission-queue.ts`          | DTE emission retry queue                      |
+| `src/lib/finance/auto-allocation-rules.ts`       | Cost allocation automation                    |
+| `src/lib/finance/total-company-cost.ts`          | Canonical company cost helper                 |
+| `src/lib/finance/payroll-cost-allocation.ts`     | Labor cost bridge to payroll                  |
+| `src/app/api/finance/dashboard/pnl/route.ts`     | P&L endpoint (motor central)                  |
+| `src/app/api/finance/dashboard/summary/route.ts` | Working capital metrics                       |
+| `src/app/api/finance/data-quality/route.ts`      | Data quality checks                           |

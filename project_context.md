@@ -1,5 +1,33 @@
 # project_context.md
 
+## Delta 2026-04-05 Finance schema drift now surfaces as degraded payload, not empty success
+
+- Las routes Finance `purchase-orders`, `hes`, `quotes` y `intelligence/operational-pl` ya no responden vacío indistinguible cuando falta una relación o columna crítica.
+- Regla vigente:
+  - se preserva la shape de lista base
+  - el payload agrega `degraded: true`, `errorCode` y `message`
+  - el runtime debe distinguir ausencia real de datos versus schema drift
+- Motivación:
+  - cerrar `ISSUE-008` sin perder compatibilidad básica con consumers que esperan arrays
+
+## Delta 2026-04-05 Finance create fallback now reuses a request-scoped canonical ID
+
+- `POST /api/finance/income` y `POST /api/finance/expenses` ya no recalculan un segundo ID cuando el path Postgres-first alcanzó a generar uno antes del fallback BigQuery.
+- Regla vigente:
+  - si la request ya trae ID, se preserva
+  - si PostgreSQL ya generó ID, BigQuery fallback reutiliza ese mismo valor
+  - solo si nunca existió ID canónico previo, el fallback puede asignar uno nuevo
+- Motivación:
+  - cerrar el riesgo de duplicidad lógica cross-store detectado en `ISSUE-007`
+
+## Delta 2026-04-05 Issue lifecycle protocol formalized
+
+- El lifecycle formal de `ISSUE-###` ya vive en `docs/operations/ISSUE_OPERATING_MODEL_V1.md`.
+- Regla operativa:
+  - los issues documentan incidentes y regressions confirmados
+  - pueden resolverse sin `TASK-###` si el fix es localizado y verificable
+  - al resolverse deben moverse físicamente de `docs/issues/open/` a `docs/issues/resolved/` y actualizar `docs/issues/README.md` en el mismo lote
+
 ## Delta 2026-04-03 Internal roles and hierarchies canonical architecture
 
 - Greenhouse ya distingue formalmente cuatro planos internos que antes aparecían mezclados entre HR, Identity y Agency:

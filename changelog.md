@@ -2,6 +2,24 @@
 
 ## 2026-04-05
 
+- **ISSUE-008 Finance routes mask schema drift as empty success — resuelto**:
+  - nuevo helper compartido `src/lib/finance/schema-drift.ts`
+  - `purchase-orders`, `hes`, `quotes` y `intelligence/operational-pl` ya no responden vacío ambiguo ante `relation/column does not exist`
+  - los payloads preservan la shape base pero ahora agregan `degraded: true`, `errorCode` y `message`
+  - nueva cobertura focalizada: `purchase-orders/route.test.ts` y `schema-drift-response.test.ts`
+  - validado con suite focalizada del fix y suite completa de Finance (`24` files, `102` tests passing, `2` skipped)
+
+- **ISSUE-007 Finance fallback writes can duplicate income and expenses — resuelto**:
+  - `POST /api/finance/income` y `POST /api/finance/expenses` ahora reutilizan un ID canónico por request entre el path Postgres-first y el fallback BigQuery
+  - si PostgreSQL ya generó el ID, el fallback ya no recalcula una segunda secuencia
+  - nueva regresión focalizada: `src/app/api/finance/fallback-id-reuse.test.ts`
+  - validado con suite focalizada del fix y suite completa de Finance (`23` files, `99` tests passing, `2` skipped)
+
+- **Issue lifecycle protocol — formalizado**:
+  - nuevo documento operativo `docs/operations/ISSUE_OPERATING_MODEL_V1.md`
+  - `docs/issues/README.md` ya trata los issues como carril formal separado de tasks
+  - una issue ya puede resolverse sin task cuando el fix es localizado, verificable y con cierre documental completo
+
 - **TASK-249 Test Observability MVP — cerrada**:
   - nuevo carril artifacts-first de observabilidad de tests, sin backend admin ni persistence runtime
   - scripts nuevos: `test:inventory`, `test:results`, `test:coverage`, `test:observability:summary`, `test:observability`
