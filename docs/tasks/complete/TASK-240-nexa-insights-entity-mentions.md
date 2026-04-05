@@ -8,15 +8,15 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `agency`
-- Blocked by: `TASK-239` (el prompt de TASK-239 resuelve los nombres — esta task los hace clickeables)
+- Blocked by: `none`
 - Branch: `task/TASK-240-nexa-insights-entity-mentions`
 - Legacy ID: `none`
 - GitHub Issue: `[optional]`
