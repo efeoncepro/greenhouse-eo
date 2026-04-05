@@ -215,12 +215,23 @@ export const getPersonProfileByUserId = async (userId: string): Promise<Person36
   return rows[0] ? normalizeRow(rows[0]) : null
 }
 
+/**
+ * Resolve an avatar URL for the frontend.
+ * Stored as gs:// in the DB; served via /api/media/users/{userId}/avatar proxy.
+ */
+const resolveAvatarUrl = (avatarUrl: string | null, userId: string | null): string | null => {
+  if (!avatarUrl) return null
+  if (avatarUrl.startsWith('gs://') && userId) return `/api/media/users/${userId}/avatar`
+
+  return avatarUrl
+}
+
 /** Flat projection of Person360 for self-service profile views */
 export const toPersonProfileSummary = (p: Person360): PersonProfileSummary => ({
   resolvedDisplayName: p.resolved.displayName,
   resolvedEmail: p.resolved.email,
   resolvedPhone: p.resolved.phone,
-  resolvedAvatarUrl: p.resolved.avatarUrl,
+  resolvedAvatarUrl: resolveAvatarUrl(p.resolved.avatarUrl, p.userFacet?.userId ?? null),
   resolvedJobTitle: p.resolved.jobTitle,
   departmentName: p.memberFacet?.departmentName ?? null,
   jobLevel: p.memberFacet?.jobLevel ?? null,

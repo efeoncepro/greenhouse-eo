@@ -1,8 +1,11 @@
 import 'server-only'
 
 import { query } from '@/lib/db'
+import { uploadGreenhouseMediaAsset } from '@/lib/storage/greenhouse-media'
+import { setUserAvatarAssetPath } from '@/lib/admin/media-assets'
 
 import type { EntraUserProfile } from './graph-client'
+import { fetchEntraUserPhoto } from './graph-client'
 
 // ── Types ──
 
@@ -10,7 +13,10 @@ interface SyncResult {
   processed: number
   usersUpdated: number
   profilesUpdated: number
+  profilesCreated: number
+  profilesLinked: number
   membersUpdated: number
+  avatarsSynced: number
   skipped: number
   errors: string[]
 }
@@ -36,7 +42,10 @@ export const syncEntraProfiles = async (
     processed: 0,
     usersUpdated: 0,
     profilesUpdated: 0,
+    profilesCreated: 0,
+    profilesLinked: 0,
     membersUpdated: 0,
+    avatarsSynced: 0,
     skipped: 0,
     errors: []
   }
@@ -83,7 +92,19 @@ export const syncEntraProfiles = async (
         result.usersUpdated++
       }
 
-      // 2. Update identity_profiles (job_title, full_name, canonical_email)
+      // 2. Ensure identity_profile link
+      if (!gh.identity_profile_id && entra.mail) {
+        const linked = await ensureIdentityProfileLink(gh, entra)
+
+        if (linked) {
+          gh.identity_profile_id = linked.profileId
+
+          if (linked.created) result.profilesCreated++
+          result.profilesLinked++
+        }
+      }
+
+      // 3. Update identity_profiles (job_title, full_name, canonical_email)
       if (gh.identity_profile_id) {
         const ipSets: string[] = []
         const ipVals: unknown[] = []
@@ -128,7 +149,7 @@ export const syncEntraProfiles = async (
         }
       }
 
-      // 3. Update members
+      // 4. Update members
       if (gh.member_id) {
         const memberChanges = buildMemberChanges(entra)
 
@@ -147,6 +168,43 @@ export const syncEntraProfiles = async (
           if (mResult.length > 0) result.membersUpdated++
         }
       }
+
+      // 5. Sync avatar from Microsoft Graph
+      try {
+        const photo = await fetchEntraUserPhoto(entra.id)
+
+        if (photo) {
+          const assetPath = await uploadGreenhouseMediaAsset({
+            entityFolder: 'users',
+            entityId: gh.user_id,
+            kind: 'avatar',
+            fileName: `entra-${entra.id}.jpg`,
+            contentType: photo.contentType,
+            bytes: photo.buffer.buffer.slice(
+              photo.buffer.byteOffset,
+              photo.buffer.byteOffset + photo.buffer.byteLength
+            ) as ArrayBuffer
+          })
+
+          // Update PostgreSQL
+          await query(
+            `UPDATE greenhouse_core.client_users
+             SET avatar_url = $1, updated_at = CURRENT_TIMESTAMP
+             WHERE user_id = $2 AND (avatar_url IS DISTINCT FROM $1)`,
+            [assetPath, gh.user_id]
+          )
+
+          // Update BigQuery (fire-and-forget, non-blocking)
+          setUserAvatarAssetPath({ userId: gh.user_id, assetPath }).catch(err => {
+            console.warn('[entra-profile-sync] BQ avatar update failed:', gh.user_id, err)
+          })
+
+          result.avatarsSynced++
+        }
+      } catch (avatarErr) {
+        // Avatar failures are non-fatal — log and continue
+        console.warn('[entra-profile-sync] Avatar sync failed for', gh.user_id, avatarErr)
+      }
     } catch (error) {
       const msg = `${gh.full_name || gh.email}: ${error instanceof Error ? error.message : 'unknown'}`
 
@@ -156,6 +214,72 @@ export const syncEntraProfiles = async (
   }
 
   return result
+}
+
+// ── Identity Profile Ensure ──
+
+const normalizeToken = (s: string) => s.replace(/[^a-z0-9-]/gi, '-').toLowerCase()
+
+const buildIdentityProfileId = (source: { sourceSystem: string; sourceObjectType: string; sourceObjectId: string }) =>
+  `identity-${normalizeToken(source.sourceSystem)}-${normalizeToken(source.sourceObjectType)}-${normalizeToken(source.sourceObjectId)}`
+
+async function ensureIdentityProfileLink(
+  gh: GhUser,
+  entra: EntraUserProfile
+): Promise<{ profileId: string; created: boolean } | null> {
+  const email = entra.mail?.toLowerCase().trim()
+
+  if (!email) return null
+
+  // Try to find existing identity_profile by canonical_email
+  const existing = await query<{ profile_id: string }>(
+    `SELECT profile_id FROM greenhouse_core.identity_profiles
+     WHERE LOWER(canonical_email) = $1 AND active = TRUE
+     LIMIT 1`,
+    [email]
+  )
+
+  let profileId: string
+  let created = false
+
+  if (existing.length > 0) {
+    profileId = existing[0].profile_id
+  } else {
+    // Create a new identity_profile from Entra data
+    profileId = buildIdentityProfileId({
+      sourceSystem: 'greenhouse_auth',
+      sourceObjectType: 'client_user',
+      sourceObjectId: gh.user_id
+    })
+
+    const displayName = cleanDisplayName(entra.displayName) || email
+
+    await query(
+      `INSERT INTO greenhouse_core.identity_profiles (
+        profile_id, profile_type, canonical_email, full_name, job_title,
+        status, active, default_auth_mode,
+        primary_source_system, primary_source_object_type, primary_source_object_id,
+        created_at, updated_at
+      )
+      VALUES ($1, 'efeonce_internal', $2, $3, $4, 'active', TRUE, 'sso',
+              'greenhouse_auth', 'client_user', $5,
+              CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      ON CONFLICT (profile_id) DO NOTHING`,
+      [profileId, email, displayName, entra.jobTitle, gh.user_id]
+    )
+
+    created = true
+  }
+
+  // Link client_users → identity_profile
+  await query(
+    `UPDATE greenhouse_core.client_users
+     SET identity_profile_id = $1, updated_at = CURRENT_TIMESTAMP
+     WHERE user_id = $2 AND identity_profile_id IS NULL`,
+    [profileId, gh.user_id]
+  )
+
+  return { profileId, created }
 }
 
 // ── Change Builders ──

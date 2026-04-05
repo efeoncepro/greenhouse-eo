@@ -92,6 +92,29 @@ const GRAPH_USER_FIELDS = [
   'accountEnabled', 'usageLocation'
 ].join(',')
 
+/**
+ * Fetch profile photo for a single Entra user.
+ * Returns the raw image buffer + content type, or null if the user has no photo.
+ * Microsoft Graph requires a separate endpoint for photos — they don't come in bulk user queries.
+ */
+export const fetchEntraUserPhoto = async (
+  oid: string
+): Promise<{ buffer: Buffer; contentType: string } | null> => {
+  const token = await getAccessToken()
+
+  const res = await fetch(`https://graph.microsoft.com/v1.0/users/${oid}/photo/$value`, {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+
+  if (res.status === 404) return null
+  if (!res.ok) return null
+
+  const contentType = res.headers.get('content-type') || 'image/jpeg'
+  const arrayBuffer = await res.arrayBuffer()
+
+  return { buffer: Buffer.from(arrayBuffer), contentType }
+}
+
 export const fetchEntraUsers = async (): Promise<EntraUserProfile[]> => {
   const token = await getAccessToken()
 

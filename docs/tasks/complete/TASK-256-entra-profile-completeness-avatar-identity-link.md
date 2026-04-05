@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Implementado`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -144,11 +144,21 @@ Reglas obligatorias:
 
 ### Slice 2 — Entra sync: fetch y almacenar avatar desde Microsoft Graph
 
-- En `graph-client.ts`, agregar funcion para fetchear foto de perfil: `GET /users/{oid}/photo/$value`
-  - Retorna binario (image/jpeg o image/png)
-  - Opciones de almacenamiento a evaluar en Discovery: (a) convertir a data URI y guardar en `avatar_url`, (b) subir a Cloud Storage y guardar URL publica, (c) usar endpoint proxy `/api/media/avatar/{oid}` que sirva la foto desde Graph on-demand
-- En `profile-sync.ts`, despues de sincronizar datos, actualizar `client_users.avatar_url` con la URL/data del avatar
-- Resultado: `client_users.avatar_url` poblado para todo usuario que tenga foto en Entra
+- En `graph-client.ts`, agregar funcion `fetchEntraUserPhoto(oid, token)` para fetchear foto: `GET /users/{oid}/photo/$value`
+  - Retorna `Buffer` (image/jpeg) o `null` si 404
+- En `profile-sync.ts`, para cada usuario matched:
+  - Llamar `fetchEntraUserPhoto(entra.id, token)` para obtener la foto
+  - Subir a GCS usando `uploadGreenhouseMediaAsset()` existente (bucket: GREENHOUSE_PUBLIC_MEDIA_BUCKET)
+  - Almacenar asset path (`gs://bucket/path`) en PostgreSQL `client_users.avatar_url`
+  - Almacenar asset path en BigQuery via `setUserAvatarAssetPath()` existente
+  - El avatar se sirve al frontend via proxy endpoint existente `/api/media/users/[id]/avatar`
+- Resultado: `client_users.avatar_url` poblado, `person_360.resolved_avatar_url` funcional, Mi Perfil muestra foto
+
+**Infraestructura reutilizada (NO crear nueva):**
+- `uploadGreenhouseMediaAsset()` → `src/lib/storage/greenhouse-media.ts`
+- `setUserAvatarAssetPath()` → `src/lib/admin/media-assets.ts`
+- Proxy endpoint → `src/app/api/media/users/[id]/avatar/route.ts`
+- Buckets ya configurados en env vars
 
 ### Slice 3 — Verificacion end-to-end y hardening
 
