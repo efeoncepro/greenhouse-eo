@@ -29,23 +29,27 @@
 ### Rama / alcance
 
 - rama: `develop`
-- scope: discovery + issue draft + plan de ejecución para la lane de observabilidad de tests sin backend admin
+- scope: implementación completa del MVP de observabilidad de tests sin backend admin
 
 ### Qué se hizo
 
-- `TASK-249` quedó promovida a `in-progress`.
-- Priority ajustada a `P1` por impacto cross-repo sobre merge quality, CI ergonomics y promoción segura.
-- Se preparó el draft de issue GitHub con título canónico: `[TASK-249] Test Observability MVP`.
-- Se creó `docs/tasks/plans/TASK-249-plan.md` con discovery summary, estrategia secuencial, orden de ejecución, risk flags y checkpoint humano.
-- El alcance sigue explícitamente `artifacts-first`: sin tablas runtime, sin APIs nuevas y sin admin backend.
-
-### Pendiente operacional
-
-- Aprobación humana del plan antes de tocar `ci.yml`, `vitest.config.ts`, `package.json` y docs de testing.
+- `TASK-249` quedó implementada y cerrada.
+- Se agregaron scripts canónicos: `test:inventory`, `test:results`, `test:coverage`, `test:observability:summary` y `test:observability`.
+- `scripts/test-inventory.ts` ahora genera `artifacts/tests/inventory.json` e `inventory.md` con clasificación por dominio, tipo y entorno.
+- `scripts/test-observability-summary.ts` sintetiza inventario, resultados, coverage y warnings en `artifacts/tests/summary.md` y publica el mismo contenido en GitHub Actions Summary.
+- `vitest.config.ts` ahora publica coverage con provider `v8` y reporters `text`, `json-summary`, `html` hacia `artifacts/coverage/`.
+- `.github/workflows/ci.yml` ahora ejecuta inventario, `test:results`, `test:coverage`, summary y upload de artifacts reutilizables.
+- `docs/architecture/12-testing-development.md` quedó alineado con la nueva fuente operativa de verdad basada en CI + artifacts.
 
 ### Verificación
 
-- No aplica validación técnica todavía: esta sesión dejó solo planeamiento y documentación de la task.
+- `pnpm test:inventory` — OK
+- `pnpm test:results` — OK (`220` archivos, `924` tests, `922` passed, `2` skipped)
+- `pnpm test:coverage` — OK (`lines 51.22%`, `statements 49.94%`, `functions 44.79%`, `branches 34.28%`)
+- `pnpm test:observability:summary` — OK
+- `pnpm lint` — OK
+- `npx tsc --noEmit` — OK
+- `pnpm build` — OK
 
 ## Sesión 2026-04-05 — TASK-247 Identity & Platform Block Hardening
 

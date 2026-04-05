@@ -261,6 +261,28 @@
   - esto cubre carriles de DB/tooling como `pg:doctor`, migraciones y generación de tipos cuando tengan lógica testeable
 - El helper `scripts/lib/load-greenhouse-tool-env.ts` ahora normaliza passwords vacías (`''`) como no definidas cuando un profile usa `*_PASSWORD_SECRET_REF`, para no contaminar `GREENHOUSE_POSTGRES_PASSWORD` con un valor vacío.
 
+## Delta 2026-04-05 Test observability MVP
+
+- Greenhouse ya tiene una lane mínima de observabilidad de tests basada en artifacts locales y de CI.
+- Nuevos comandos canónicos:
+  - `pnpm test:inventory`
+  - `pnpm test:results`
+  - `pnpm test:coverage`
+  - `pnpm test:observability:summary`
+  - `pnpm test:observability`
+- Outputs canónicos:
+  - `artifacts/tests/inventory.json`
+  - `artifacts/tests/inventory.md`
+  - `artifacts/tests/results.json`
+  - `artifacts/tests/vitest.log`
+  - `artifacts/tests/summary.md`
+  - `artifacts/coverage/coverage-summary.json`
+  - `artifacts/coverage/index.html`
+- Regla vigente:
+  - el source of truth del estado del suite vive en CI + artifacts
+  - no existe admin backend ni persistence runtime para corridas de test en esta iteración
+  - GitHub Actions publica artifacts reutilizables y un summary corto del suite
+
 ## Delta 2026-04-01 TASK-026 contract canonicalization
 
 - `greenhouse_core.members` ya es el ancla canonica de contrato para HRIS:
@@ -296,6 +318,7 @@
   - `gcloud` sí estaba autenticado con `julio.reyes@efeonce.org` como cuenta activa
   - `ADC` no estaba inicializado, por lo que algunas operaciones terminaron requiriendo fallback temporal
   - esta situación debe corregirse antes de normalizar nuevos flujos operativos sobre GCP
+
 ## Delta 2026-03-31 Shared attachments and GCP bucket topology
 
 - Alineación operativa de entorno:

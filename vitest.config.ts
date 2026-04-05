@@ -15,7 +15,12 @@ export default defineConfig({
       'scripts/**/*.spec.ts',
       'scripts/**/*.spec.tsx'
     ],
-    setupFiles: ['src/test/setup.ts']
+    setupFiles: ['src/test/setup.ts'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json-summary', 'html'],
+      reportsDirectory: path.resolve(__dirname, 'artifacts/coverage')
+    }
   },
   resolve: {
     alias: {

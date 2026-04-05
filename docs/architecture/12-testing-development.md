@@ -1,7 +1,7 @@
 # Flujo de Testing & Desarrollo — Greenhouse Portal
 
-**Versión:** 2.1
-**Fecha:** 2026-04-02
+**Versión:** 2.2
+**Fecha:** 2026-04-05
 **Clasificación:** Especificación de Arquitectura
 
 ---
@@ -16,14 +16,14 @@ Este documento detalla el marco de pruebas, ciclo de desarrollo, migraciones de 
 
 ### 1.1 Stack Tecnológico
 
-| Componente | Versión | Propósito |
-|-----------|---------|----------|
-| **Vitest** | 4.1.0 | Test runner canónico, API compatible con Jest |
-| **@testing-library/react** | 16.3.2 | Testing con comportamiento de usuario, no implementación |
-| **@testing-library/dom** | 10.4.1 | Queries y matchers de DOM |
-| **@testing-library/user-event** | 14.6.1 | Simulación realista de eventos de usuario |
-| **@testing-library/jest-dom** | 6.9.1 | Matchers semánticos (toBeVisible, toBeInTheDocument, etc.) |
-| **jsdom** | 29.0.0 | Entorno DOM simulado (Node.js) |
+| Componente                      | Versión | Propósito                                                  |
+| ------------------------------- | ------- | ---------------------------------------------------------- |
+| **Vitest**                      | 4.1.0   | Test runner canónico, API compatible con Jest              |
+| **@testing-library/react**      | 16.3.2  | Testing con comportamiento de usuario, no implementación   |
+| **@testing-library/dom**        | 10.4.1  | Queries y matchers de DOM                                  |
+| **@testing-library/user-event** | 14.6.1  | Simulación realista de eventos de usuario                  |
+| **@testing-library/jest-dom**   | 6.9.1   | Matchers semánticos (toBeVisible, toBeInTheDocument, etc.) |
+| **jsdom**                       | 29.0.0  | Entorno DOM simulado (Node.js)                             |
 
 ### 1.2 Comandos de Testing
 
@@ -34,13 +34,94 @@ pnpm test
 # Modo watch (re-ejecuta al cambiar archivos)
 pnpm test:watch
 
-# Coverage (si está configurado)
-pnpm test --coverage
+# Inventario del suite
+pnpm test:inventory
+
+# Corrida con output JSON + log para artifacts
+pnpm test:results
+
+# Coverage baseline del repo
+pnpm test:coverage
+
+# Summary de observabilidad (lee inventory/results/coverage)
+pnpm test:observability:summary
 ```
+
+### 1.3 Source Of Truth Operativa
+
+La fuente de verdad del estado del suite ya no debe ser una combinación de memoria manual + logs crudos.
+
+- **Local**: `pnpm test:inventory`, `pnpm test:results`, `pnpm test:coverage`
+- **CI**: artifacts bajo `artifacts/tests/` y `artifacts/coverage/`
+- **Resumen humano**: `artifacts/tests/summary.md` + GitHub Actions Summary
+
+Regla operativa:
+
+- el MVP de observabilidad de tests vive en CI + artifacts
+- no crea tablas runtime, APIs ni un admin backend en el portal
+- cualquier UI futura debe nacer como follow-up explícito
+
+### 1.4 Flujo Actual de Observabilidad de Tests
+
+El flujo vigente ya no depende de contar archivos a mano ni de leer el log completo de Vitest para saber si el suite está sano.
+
+#### Paso 1 — Inventario del suite
+
+- `pnpm test:inventory` escanea `src/**` y `scripts/**`
+- clasifica cada test por:
+  - dominio (`payroll`, `finance`, `sync`, `api`, `components`, etc.)
+  - tipo (`domain`, `api`, `ui`, `email`, `script`, `config`)
+  - entorno (`node`, `jsdom`)
+- publica:
+  - `artifacts/tests/inventory.json`
+  - `artifacts/tests/inventory.md`
+
+#### Paso 2 — Resultados estructurados
+
+- `pnpm test:results` corre Vitest con reporter humano + reporter JSON
+- el log sigue siendo útil para debugging rápido
+- el estado machine-readable queda persistido en:
+  - `artifacts/tests/results.json`
+  - `artifacts/tests/vitest.log`
+
+#### Paso 3 — Coverage baseline
+
+- `pnpm test:coverage` genera coverage con provider `v8`
+- el baseline actual se usa como visibilidad operativa, no como gate estricto por dominio
+- los outputs quedan en:
+  - `artifacts/coverage/coverage-summary.json`
+  - `artifacts/coverage/index.html`
+
+#### Paso 4 — Summary corto
+
+- `pnpm test:observability:summary` lee inventario, resultados, coverage y warnings relevantes
+- genera un resumen corto y estable para humanos en:
+  - `artifacts/tests/summary.md`
+- en CI, ese mismo resumen se publica también en GitHub Actions Summary
+
+#### Paso 5 — Publicación en CI
+
+El workflow `quality` en GitHub Actions sigue este orden:
+
+1. `pnpm lint`
+2. `pnpm test:inventory`
+3. `pnpm test:results`
+4. `pnpm test:coverage`
+5. `pnpm test:observability:summary`
+6. upload de `artifacts/tests/**` y `artifacts/coverage/**`
+7. `pnpm build`
+
+Regla operativa:
+
+- si alguien necesita una lectura rápida, debe empezar por `summary.md`
+- si necesita detalle estructurado, debe abrir `results.json` y `coverage-summary.json`
+- si necesita debugging textual, debe abrir `vitest.log`
+- los conteos del suite deben salir de los artifacts generados, no de una tabla mantenida manualmente en documentación
 
 ### 1.3 Patrones de Archivo
 
 Los tests se descubren automáticamente según estos patrones:
+
 ```
 src/**/*.test.ts(x)
 src/**/*.spec.ts(x)
@@ -49,6 +130,7 @@ scripts/**/*.spec.ts(x)
 ```
 
 **Convención de nombrado:**
+
 - Test unitario: `src/lib/payroll/calculate-net.test.ts` (junto al módulo)
 - Test de componente: `src/components/greenhouse/Button.test.tsx`
 - Test de integración: `src/lib/finance/period-closure.test.ts`
@@ -64,16 +146,33 @@ import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   test: {
-    // Entorno: jsdom para DOM, node para lógica pura
-    environment: 'jsdom',
-
-    // Globales de Jest disponibles sin import
-    globals: true,
+    // Entorno default: node. Los tests UI usan pragma jsdom por archivo.
+    environment: 'node',
 
     // Archivo setup: inyecta matchers y mocks globales
     setupFiles: ['src/test/setup.ts'],
 
-    // Alias de path (coinciden con tsconfig.json)
+    // Coverage baseline del repo
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json-summary', 'html'],
+      reportsDirectory: 'artifacts/coverage'
+    },
+
+    // Patrones de descubrimiento de tests del repo operativo
+    include: [
+      'src/**/*.test.ts',
+      'src/**/*.test.tsx',
+      'src/**/*.spec.ts',
+      'src/**/*.spec.tsx',
+      'scripts/**/*.test.ts',
+      'scripts/**/*.test.tsx',
+      'scripts/**/*.spec.ts',
+      'scripts/**/*.spec.tsx'
+    ]
+  },
+
+  resolve: {
     alias: {
       '@': 'src/',
       '@core': 'src/@core',
@@ -88,9 +187,45 @@ export default defineConfig({
 })
 ```
 
-### 2.2 Patrones de Alias
+### 2.2 Outputs de Observabilidad
+
+El repo debe poder producir estos outputs sin instrumentación backend:
+
+- `artifacts/tests/inventory.json`
+- `artifacts/tests/inventory.md`
+- `artifacts/tests/results.json`
+- `artifacts/tests/vitest.log`
+- `artifacts/tests/summary.md`
+- `artifacts/coverage/coverage-summary.json`
+- `artifacts/coverage/index.html`
+
+### 2.3 Contrato de cada Artifact
+
+| Artifact                                   | Lo produce                        | Para qué sirve                             |
+| ------------------------------------------ | --------------------------------- | ------------------------------------------ |
+| `artifacts/tests/inventory.json`           | `pnpm test:inventory`             | Fuente machine-readable del mapa del suite |
+| `artifacts/tests/inventory.md`             | `pnpm test:inventory`             | Vista legible del inventario               |
+| `artifacts/tests/results.json`             | `pnpm test:results`               | Resultado estructurado de Vitest           |
+| `artifacts/tests/vitest.log`               | `pnpm test:results`               | Log textual completo de la corrida         |
+| `artifacts/tests/summary.md`               | `pnpm test:observability:summary` | Resumen corto para revisión humana         |
+| `artifacts/coverage/coverage-summary.json` | `pnpm test:coverage`              | Coverage agregado machine-readable         |
+| `artifacts/coverage/index.html`            | `pnpm test:coverage`              | Reporte navegable de coverage              |
+
+### 2.4 Qué No Hace Este MVP
+
+Este diseño no:
+
+- ejecuta tests desde el portal
+- guarda corridas en PostgreSQL o BigQuery
+- crea un panel admin runtime
+- sustituye futuras policies de quality gate por dominio
+
+Su propósito actual es volver observable el suite con el menor blast radius posible usando tooling y CI.
+
+### 2.5 Patrones de Alias
 
 Usar siempre alias en imports de test:
+
 ```typescript
 // ✓ Correcto
 import { calculatePayroll } from '@/lib/payroll/calculate'
@@ -120,6 +255,7 @@ vi.mock('server-only', () => ({
 ```
 
 **Qué va aquí:**
+
 - Jest-dom matchers (toBeVisible, toBeInTheDocument, etc.)
 - Mocks de módulos globales (server-only, next/router, etc.)
 - Setup de librerías externas (msw, vitest-canvas-mock, etc.)
@@ -155,6 +291,7 @@ export { customRender as render }
 ```
 
 **Uso en tests:**
+
 ```typescript
 import { render, screen } from '@/test/render'
 
@@ -170,37 +307,37 @@ test('Button renders with theme', () => {
 
 ### 4.1 Módulos Core (lib/)
 
-| Módulo | Ejemplos de Tests |
-|--------|-------------------|
-| **admin** | admin-preview-persons.test.ts |
-| **agency** | agency-finance-metrics.test.ts, agency-queries.test.ts |
-| **alerts** | slack-notify.test.ts |
-| **calendar** | get-admin-operational-calendar-overview.test.ts, nager-date-holidays.test.ts |
-| **campaigns** | campaign-extended.test.ts, campaign-metrics.test.ts, backfill-heuristics.test.ts |
-| **cloud** | bigquery.test.ts, cron.test.ts |
+| Módulo                          | Ejemplos de Tests                                                                      |
+| ------------------------------- | -------------------------------------------------------------------------------------- |
+| **admin**                       | admin-preview-persons.test.ts                                                          |
+| **agency**                      | agency-finance-metrics.test.ts, agency-queries.test.ts                                 |
+| **alerts**                      | slack-notify.test.ts                                                                   |
+| **calendar**                    | get-admin-operational-calendar-overview.test.ts, nager-date-holidays.test.ts           |
+| **campaigns**                   | campaign-extended.test.ts, campaign-metrics.test.ts, backfill-heuristics.test.ts       |
+| **cloud**                       | bigquery.test.ts, cron.test.ts                                                         |
 | **commercial-cost-attribution** | member-period-attribution.test.ts, assignment-classification.test.ts, insights.test.ts |
-| **cost-intelligence** | compute-operational-pl.test.ts, check-period-readiness.test.ts |
-| **cron** | require-cron-auth.test.ts |
-| **email** | delivery.test.ts, templates.test.ts |
-| **finance** | auto-allocation-rules.test.ts, canonical.test.ts (y otros) |
-| **forms** | greenhouse-form-patterns.test.ts |
-| **identity** | canonical-person.test.ts, matching-engine.test.ts, normalize.test.ts |
-| **nexa** | nexa-service.test.ts |
-| **notifications** | notification-service.test.ts, person-recipient-resolver.test.ts |
-| **nubox** | client.test.ts, sync-nubox-conformed.test.ts, mappers.test.ts, dte-matching.test.ts |
-| **payroll** | auto-calculate-payroll.test.ts |
-| **people** | get-people-list.test.ts, get-person-detail.test.ts |
-| **person-360** | get-person-finance.test.ts, get-person-delivery.test.ts |
-| **person-intelligence** | compute.test.ts |
-| **providers** | provider-tooling-snapshots.test.ts |
-| **secrets** | secret-manager.test.ts |
-| **services** | service-sync.test.ts |
-| **space-notion** | notion-performance-report-publication.test.ts |
-| **storage** | greenhouse-assets-shared.test.ts |
-| **sync** | projection-registry.test.ts |
-| **team-capacity** | economics.test.ts, internal-assignments.test.ts, overhead.test.ts |
-| **tenant** | authorization.test.ts |
-| **webhooks** | signing.test.ts |
+| **cost-intelligence**           | compute-operational-pl.test.ts, check-period-readiness.test.ts                         |
+| **cron**                        | require-cron-auth.test.ts                                                              |
+| **email**                       | delivery.test.ts, templates.test.ts                                                    |
+| **finance**                     | auto-allocation-rules.test.ts, canonical.test.ts (y otros)                             |
+| **forms**                       | greenhouse-form-patterns.test.ts                                                       |
+| **identity**                    | canonical-person.test.ts, matching-engine.test.ts, normalize.test.ts                   |
+| **nexa**                        | nexa-service.test.ts                                                                   |
+| **notifications**               | notification-service.test.ts, person-recipient-resolver.test.ts                        |
+| **nubox**                       | client.test.ts, sync-nubox-conformed.test.ts, mappers.test.ts, dte-matching.test.ts    |
+| **payroll**                     | auto-calculate-payroll.test.ts                                                         |
+| **people**                      | get-people-list.test.ts, get-person-detail.test.ts                                     |
+| **person-360**                  | get-person-finance.test.ts, get-person-delivery.test.ts                                |
+| **person-intelligence**         | compute.test.ts                                                                        |
+| **providers**                   | provider-tooling-snapshots.test.ts                                                     |
+| **secrets**                     | secret-manager.test.ts                                                                 |
+| **services**                    | service-sync.test.ts                                                                   |
+| **space-notion**                | notion-performance-report-publication.test.ts                                          |
+| **storage**                     | greenhouse-assets-shared.test.ts                                                       |
+| **sync**                        | projection-registry.test.ts                                                            |
+| **team-capacity**               | economics.test.ts, internal-assignments.test.ts, overhead.test.ts                      |
+| **tenant**                      | authorization.test.ts                                                                  |
+| **webhooks**                    | signing.test.ts                                                                        |
 
 ### 4.2 Componentes UI (components/)
 
@@ -273,11 +410,13 @@ pnpm exec ts-node scripts/audit-person-360-coverage.ts
 ### 6.1 Ambiente de Desarrollo Local
 
 **Prerrequisitos:**
+
 - Node.js 20+ (recomendado)
 - pnpm 9+
 - Cloud SQL Auth Proxy (para acceso a PostgreSQL)
 
 **Instalación inicial:**
+
 ```bash
 # Clonar repositorio
 git clone <repo-url>
@@ -322,6 +461,10 @@ pnpm format
 # Tests (Vitest)
 pnpm test
 pnpm test:watch  # modo watch
+pnpm test:inventory
+pnpm test:results
+pnpm test:coverage
+pnpm test:observability:summary
 
 # Salud de BD (conexión + perfiles)
 pnpm pg:doctor
@@ -330,23 +473,27 @@ pnpm pg:doctor
 ### 6.4 Ciclo de Trabajo Típico
 
 1. **Crear rama de feature:**
+
    ```bash
    git checkout -b feature/mi-caracteristica
    ```
 
 2. **Desarrollo incremental:**
+
    ```bash
    pnpm dev        # servidor corriendo
    pnpm test:watch # tests en watch
    ```
 
 3. **Escribir tests primero:**
+
    ```bash
    # nuevo test: src/lib/payroll/new-feature.test.ts
    # luego implementación: src/lib/payroll/new-feature.ts
    ```
 
 4. **Validar antes de commit:**
+
    ```bash
    pnpm lint:fix
    pnpm format
@@ -356,6 +503,7 @@ pnpm pg:doctor
    ```
 
 5. **Commit con formato canónico:**
+
    ```bash
    git commit -m "feat: nueva funcionalidad de payroll"
    # prefijos: feat:, fix:, refactor:, docs:, chore:
@@ -374,6 +522,7 @@ pnpm pg:doctor
 ### 7.1 Framework: node-pg-migrate
 
 **Características:**
+
 - SQL-first (no ORMs para DDL)
 - Versionado automático por timestamp
 - Reversible (up/down)
@@ -392,6 +541,7 @@ pnpm migrate:create crear_tabla_miembro_permisos
 ```
 
 **Editar migración:**
+
 ```sql
 -- migrations/1704067200000_crear_miembro_permisos.sql
 
@@ -441,6 +591,7 @@ pnpm migrate:status
    - Migración + código van en el mismo commit/PR
 
 2. **Columnas nullable primero:**
+
    ```sql
    -- ✓ Correcto (orden de cambios)
    ALTER TABLE table_a ADD COLUMN new_col VARCHAR NULL;
@@ -448,6 +599,7 @@ pnpm migrate:status
    ```
 
 3. **Nunca renombrar timestamps ni crear a mano:**
+
    ```bash
    # ✓ Correcto
    pnpm migrate:create
@@ -462,6 +614,7 @@ pnpm migrate:status
    - Si migración falla, se revierte automáticamente
 
 5. **Post-migración:**
+
    ```bash
    # Regenerar tipos TypeScript
    pnpm db:generate-types
@@ -475,12 +628,12 @@ pnpm migrate:status
 
 ### 8.1 Métodos de Conexión
 
-| Escenario | Método | Detalles |
-|-----------|--------|---------|
-| **Runtime (app Next.js)** | Cloud SQL Connector | GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME |
-| **Desarrollo local (CLI)** | Cloud SQL Auth Proxy | Túnel local en puerto 15432 |
-| **Migraciones locales** | Auth Proxy | Requerido para node-pg-migrate |
-| **TCP directo a 34.86.135.144** | NO disponible | Sin authorized networks configuradas |
+| Escenario                       | Método               | Detalles                                     |
+| ------------------------------- | -------------------- | -------------------------------------------- |
+| **Runtime (app Next.js)**       | Cloud SQL Connector  | GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME |
+| **Desarrollo local (CLI)**      | Cloud SQL Auth Proxy | Túnel local en puerto 15432                  |
+| **Migraciones locales**         | Auth Proxy           | Requerido para node-pg-migrate               |
+| **TCP directo a 34.86.135.144** | NO disponible        | Sin authorized networks configuradas         |
 
 ### 8.2 Cloud SQL Auth Proxy (Local)
 
@@ -500,6 +653,7 @@ pnpm pg:doctor
 ### 8.3 Cloud SQL Connector (Runtime)
 
 **En Vercel/production:**
+
 ```bash
 # .env.production (Vercel)
 GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME="efeonce-group:us-east4:greenhouse-pg-dev"
@@ -511,6 +665,7 @@ GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME="efeonce-group:us-east4:greenhouse-
 ```
 
 **Prioridad en src/lib/postgres/client.ts:133:**
+
 ```typescript
 if (process.env.GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME) {
   // Cloud SQL Connector (Vercel/WIF)
@@ -521,12 +676,12 @@ if (process.env.GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME) {
 
 ### 8.4 Perfiles de Acceso
 
-| Perfil | Permisos | Uso |
-|--------|----------|-----|
-| **runtime** | SELECT, INSERT, UPDATE, DELETE | DML en app |
-| **migrator** | CREATE, ALTER, DROP (DDL) | node-pg-migrate |
-| **admin** | SUPERUSER | Bootstrap inicial |
-| **ops** | OWNER (todos objetos) | Dueño canónico (greenhouse_ops) |
+| Perfil       | Permisos                       | Uso                             |
+| ------------ | ------------------------------ | ------------------------------- |
+| **runtime**  | SELECT, INSERT, UPDATE, DELETE | DML en app                      |
+| **migrator** | CREATE, ALTER, DROP (DDL)      | node-pg-migrate                 |
+| **admin**    | SUPERUSER                      | Bootstrap inicial               |
+| **ops**      | OWNER (todos objetos)          | Dueño canónico (greenhouse_ops) |
 
 ### 8.5 Validación de Conexión
 
@@ -555,11 +710,11 @@ main (production)
  └── hotfix/parche-urgente
 ```
 
-| Rama | Entorno | URL |
-|------|---------|-----|
-| **main** | Production | greenhouse.efeoncepro.com |
-| **develop** | Staging (Custom) | dev-greenhouse.efeoncepro.com |
-| **feature/\*, fix/\*, hotfix/\*** | Preview | {rama}.vercel.app |
+| Rama                              | Entorno          | URL                           |
+| --------------------------------- | ---------------- | ----------------------------- |
+| **main**                          | Production       | greenhouse.efeoncepro.com     |
+| **develop**                       | Staging (Custom) | dev-greenhouse.efeoncepro.com |
+| **feature/\*, fix/\*, hotfix/\*** | Preview          | {rama}.vercel.app             |
 
 ### 9.2 Ciclo de Despliegue
 
@@ -582,6 +737,7 @@ main (production)
 ### 9.3 GitHub Actions (CI/CD)
 
 **Validación automática en push/PR:**
+
 ```yaml
 # .github/workflows/ci.yml (conceptual)
 - ESLint: pnpm lint
@@ -606,6 +762,7 @@ pnpm db:generate-types
 ```
 
 **Uso en código:**
+
 ```typescript
 import { getDb } from '@/lib/db'
 
@@ -620,6 +777,7 @@ const result = await getDb()
 ```
 
 **Obligatorio después de cada migración:**
+
 ```bash
 pnpm migrate:up   # aplica cambios
 # ↓ auto-ejecuta
@@ -681,27 +839,29 @@ git commit -m "chore: actualizar dependencias"
 
 ## 12. Troubleshooting Común
 
-| Problema | Solución |
-|----------|----------|
-| **Tests fallan con error de tema MUI** | Usar `render` desde `@/test/render.tsx` (envuelve con ThemeProvider) |
-| **Migración rechazada (timestamp anterior)** | Nunca renombrar timestamps. Usar `pnpm migrate:create` siempre. |
-| **Error ETIMEDOUT en conexión PostgreSQL** | Verificar que Auth Proxy esté corriendo (`cloud-sql-proxy`) en puerto 15432. |
-| **Tipos desactualizados en src/types/db.d.ts** | Ejecutar `pnpm db:generate-types` después de migración. |
-| **ESLint error en imports** | Usar alias (@/lib/...). Verificar rutas relativas si error persiste. |
-| **Build fallando con "server-only"** | Mock en src/test/setup.ts está configurado. Si falla, revisar import del mock. |
-| **Prettier + ESLint en conflicto** | Ejecutar `pnpm lint:fix` luego `pnpm format` (este orden). |
+| Problema                                       | Solución                                                                       |
+| ---------------------------------------------- | ------------------------------------------------------------------------------ |
+| **Tests fallan con error de tema MUI**         | Usar `render` desde `@/test/render.tsx` (envuelve con ThemeProvider)           |
+| **Migración rechazada (timestamp anterior)**   | Nunca renombrar timestamps. Usar `pnpm migrate:create` siempre.                |
+| **Error ETIMEDOUT en conexión PostgreSQL**     | Verificar que Auth Proxy esté corriendo (`cloud-sql-proxy`) en puerto 15432.   |
+| **Tipos desactualizados en src/types/db.d.ts** | Ejecutar `pnpm db:generate-types` después de migración.                        |
+| **ESLint error en imports**                    | Usar alias (@/lib/...). Verificar rutas relativas si error persiste.           |
+| **Build fallando con "server-only"**           | Mock en src/test/setup.ts está configurado. Si falla, revisar import del mock. |
+| **Prettier + ESLint en conflicto**             | Ejecutar `pnpm lint:fix` luego `pnpm format` (este orden).                     |
 
 ---
 
 ## 13. Recursos Clave
 
 ### Documentación Relacionada
+
 - `CLAUDE.md` — instrucciones de proyecto (branching, deploy, DB access)
 - `AGENTS.md` — reglas operativas completas
 - `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md` — especificación completa de node-pg-migrate y Kysely
 - `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md` — stack UI, librerías, patrones de componentes
 
 ### Archivos Clave en Codebase
+
 - `vitest.config.ts` — configuración de tests
 - `src/test/setup.ts` — setup global (jest-dom, mocks)
 - `src/test/render.tsx` — helper de render con tema
@@ -713,11 +873,11 @@ git commit -m "chore: actualizar dependencias"
 
 ## 14. Control de Cambios
 
-| Versión | Fecha | Cambios |
-|---------|-------|---------|
-| 1.0 | 2025-11-15 | Documento inicial |
-| 2.0 | 2026-02-01 | Adición de cobertura detallada de tests, restructuración de secciones DB |
-| 2.1 | 2026-04-02 | Ampliación de ejemplos, clarificación de Cloud SQL Connector vs Auth Proxy, reglas obligatorias de migraciones |
+| Versión | Fecha      | Cambios                                                                                                        |
+| ------- | ---------- | -------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2025-11-15 | Documento inicial                                                                                              |
+| 2.0     | 2026-02-01 | Adición de cobertura detallada de tests, restructuración de secciones DB                                       |
+| 2.1     | 2026-04-02 | Ampliación de ejemplos, clarificación de Cloud SQL Connector vs Auth Proxy, reglas obligatorias de migraciones |
 
 ---
 

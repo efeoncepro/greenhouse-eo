@@ -298,4 +298,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-246` | `to-do` | Narrativa ejecutiva semanal de Nexa | `docs/tasks/to-do/TASK-246-nexa-weekly-executive-digest.md` |
 | `TASK-247` | `complete` | Identity & Platform Block Hardening | `docs/tasks/complete/TASK-247-identity-platform-block-hardening.md` |
 | `TASK-248` | `complete` | Identity & Access Spec Compliance | `docs/tasks/complete/TASK-248-identity-access-spec-compliance.md` |
-| `TASK-249` | `in-progress` | Test Observability MVP | `docs/tasks/in-progress/TASK-249-test-observability-mvp.md` |
+| `TASK-249` | `complete` | Test Observability MVP | `docs/tasks/complete/TASK-249-test-observability-mvp.md` |

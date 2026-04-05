@@ -2,6 +2,15 @@
 
 ## 2026-04-05
 
+- **TASK-249 Test Observability MVP — cerrada**:
+  - nuevo carril artifacts-first de observabilidad de tests, sin backend admin ni persistence runtime
+  - scripts nuevos: `test:inventory`, `test:results`, `test:coverage`, `test:observability:summary`, `test:observability`
+  - `scripts/test-inventory.ts` genera inventario del suite por dominio, tipo y entorno en `artifacts/tests/inventory.json` e `inventory.md`
+  - `scripts/test-observability-summary.ts` genera `artifacts/tests/summary.md` desde inventario, resultados, coverage y warnings relevantes
+  - `vitest.config.ts` ahora publica coverage v8 en `artifacts/coverage/` con reporters `text`, `json-summary` y `html`
+  - `.github/workflows/ci.yml` publica inventory, results, coverage, summary y artifacts reutilizables en GitHub Actions
+  - `docs/architecture/12-testing-development.md` ya fija CI + artifacts como source of truth operativa del suite
+
 - **TASK-248 Identity & Access Spec Compliance — cerrada**:
   - Audit events: `scope.assigned`, `scope.revoked`, `auth.login.success`, `auth.login.failed` con payloads tipados
   - Login success emitido via NextAuth `events.signIn` (fire-and-forget), login failed inline en `authorize()`

@@ -22,8 +22,8 @@ jobs:
       NEXTAUTH_URL: http://localhost:3000
       GCP_PROJECT: ci-placeholder-project
       GOOGLE_CLOUD_LOCATION: us-central1
-      GOOGLE_GENAI_USE_VERTEXAI: "false"
-      GOOGLE_APPLICATION_CREDENTIALS_JSON: "{}"
+      GOOGLE_GENAI_USE_VERTEXAI: 'false'
+      GOOGLE_APPLICATION_CREDENTIALS_JSON: '{}'
       GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64: e30=
       GOOGLE_CLIENT_ID: ci-google-client-id
       GOOGLE_CLIENT_SECRET: ci-google-client-secret
@@ -70,9 +70,37 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      - name: Test inventory
+        run: pnpm test:inventory
+
       - name: Test
-        run: pnpm test
+        run: pnpm test:results
         timeout-minutes: 5
+
+      - name: Coverage
+        run: pnpm test:coverage
+        timeout-minutes: 8
+
+      - name: Test observability summary
+        if: always()
+        run: pnpm test:observability:summary
+
+      - name: Publish test summary
+        if: always()
+        run: |
+          if [ -f artifacts/tests/summary.md ]; then
+            cat artifacts/tests/summary.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload test observability artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-observability
+          if-no-files-found: warn
+          path: |
+            artifacts/tests/**
+            artifacts/coverage/**
 
       - name: Build
         run: pnpm build
