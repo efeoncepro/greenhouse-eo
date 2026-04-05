@@ -353,9 +353,9 @@ export const readAgencyMetrics = async (
   const rows = await runIcoEngineQuery<SnapshotRow>(`
     SELECT ms.*, COALESCE(c1.client_name, c2.client_name) AS client_name
     FROM \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\` ms
-    LEFT JOIN \`${projectId}.greenhouse.clients\` c1
+    LEFT JOIN (SELECT client_id, client_name FROM \`${projectId}.greenhouse.clients\`) c1
       ON c1.client_id = ms.client_id
-    LEFT JOIN \`${projectId}.greenhouse.clients\` c2
+    LEFT JOIN (SELECT client_id, client_name FROM \`${projectId}.greenhouse.clients\`) c2
       ON c2.client_id = ms.space_id
     WHERE ms.period_year = @periodYear
       AND ms.period_month = @periodMonth
