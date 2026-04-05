@@ -64,7 +64,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-016`
+`ISSUE-017`
 
 ## Open
 
@@ -80,6 +80,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 | ID          | Título                                                                                                                                                            | Ambiente             | Detectado  | Resuelto   | Causa                                                                                                                    |
 | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `ISSUE-016` | [Microsoft SSO roto en produccion (secret rotado + member_id faltante en BQ)](resolved/ISSUE-016-microsoft-sso-broken-production-secret-rotation.md) | production | 2026-04-05 | 2026-04-05 | Azure AD client secret rotado sin sincronizar produccion + `cu.member_id` inexistente en BQ query |
 | `ISSUE-015` | [Scroll horizontal en AgencyWorkspace (CustomTabList sin wrapper overflow)](resolved/ISSUE-015-agency-workspace-horizontal-scroll-overflow.md) | staging | 2026-04-05 | 2026-04-05 | `CustomTabList variant='scrollable'` en flex container sin `minWidth: 0` + `overflow: hidden` |
 | `ISSUE-014` | [person_360 VIEW faltaba columnas enriched (avatar, job_title, phone)](resolved/ISSUE-014-person-360-view-missing-enriched-columns.md) | staging | 2026-04-05 | 2026-04-05 | VIEW era version antigua sin `resolved_avatar_url`, `resolved_job_title`, etc. — datos existian pero no se exponian |
 | `ISSUE-013` | [Staging deploy failures: proyecto duplicado, variables faltantes y bypass secret](resolved/ISSUE-013-staging-deploy-failures-duplicate-project-bypass-secret.md) | staging + preview    | 2026-04-05 | 2026-04-05 | Proyecto Vercel duplicado + `AGENT_AUTH_SECRET` faltante + `VERCEL_AUTOMATION_BYPASS_SECRET` manual con valor incorrecto |
