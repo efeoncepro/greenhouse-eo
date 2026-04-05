@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Implementado`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -126,12 +126,15 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — BigQuery query: agregar member_id e identity_profile_id
+### Slice 1 — BigQuery query + credentials authorize: paridad de identity fields
 
-- Agregar `cu.member_id` y `cu.identity_profile_id` al SELECT de `getIdentityAccessRecord` en `src/lib/tenant/access.ts`
-- Agregar ambas columnas al GROUP BY del mismo query
+- Agregar `cu.member_id` y `cu.identity_profile_id` al SELECT de `getIdentityAccessRecord` en `src/lib/tenant/access.ts` (despues de linea 262)
+- Agregar ambas columnas al GROUP BY del mismo query (despues de linea 318)
+- Agregar `memberId` e `identityProfileId` al return object de `authorize()` en `src/lib/auth.ts:228-254`
+  - Actualmente el credentials path retorna user SIN estos campos, aunque el tenant los tiene
+  - SSO paths no tienen este bug porque leen `tenant.memberId` directamente en el JWT callback
 - Verificar que `normalizeTenantAccessRow` ya mapea correctamente (ya existe, lineas 207-208)
-- Resultado: el path BigQuery retorna `memberId` en el JWT igual que PostgreSQL
+- Resultado: los 3 paths de login (credentials, Microsoft SSO, Google SSO) retornan `memberId` en el JWT
 
 ### Slice 2 — Route resiliente con fallback a sesion
 
@@ -211,6 +214,7 @@ El agente debe consolidar la route a su forma final (Slice 2) sin romper lo que 
 
 - [ ] BigQuery SELECT en `getIdentityAccessRecord` incluye `cu.member_id` y `cu.identity_profile_id`
 - [ ] BigQuery GROUP BY incluye ambas columnas
+- [ ] Credentials `authorize()` en `auth.ts` incluye `memberId` e `identityProfileId` en el user retornado
 - [ ] `GET /api/my/profile` retorna 200 para un usuario autenticado sin `memberId` en sesion
 - [ ] `GET /api/my/profile` retorna 200 con datos completos de `person_360` cuando `memberId` y fila existen
 - [ ] La vista Mi Perfil nunca muestra "Perfil no disponible" para un usuario logueado
@@ -234,6 +238,11 @@ El agente debe consolidar la route a su forma final (Slice 2) sin romper lo que 
 - Auditar otros endpoints que usan `requireMyTenantContext` (Mi Nomina, Mis Permisos, Mi Delivery, Mi Desempeno) — si `memberId` falta, todos fallan con 422
 - Considerar migrar `password_hash` a PostgreSQL para eliminar el fallthrough a BigQuery en credentials login
 - Considerar agregar test de integracion que verifique paridad de campos entre PG y BQ session resolution paths
+
+## Delta 2026-04-05
+
+- Discovery encontro un gap adicional: `credentials authorize()` en `auth.ts:228-254` retorna user object SIN `memberId` ni `identityProfileId`, aunque el `tenant` los tiene. Esto causa que el JWT callback (linea 399-400) lea `undefined`. SSO paths no tienen este bug porque leen `tenant` directamente. Slice 1 actualizado para incluir el fix.
+- Tambien falta `spaceId`, `organizationId`, `organizationName` en el mismo return — mismo patron de bug, pero fuera del scope de TASK-255.
 
 ## Open Questions
 

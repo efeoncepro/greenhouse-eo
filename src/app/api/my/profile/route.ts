@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
+
 import { getServerSession } from 'next-auth'
 
 import { authOptions } from '@/lib/auth'
-import { requireMyTenantContext } from '@/lib/tenant/authorization'
+import { requireTenantContext } from '@/lib/tenant/authorization'
 import {
   getPersonProfileByMemberId,
   toPersonProfileSummary,
@@ -12,27 +13,26 @@ import {
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
-  const { tenant, memberId, errorResponse } = await requireMyTenantContext()
+  const { tenant, unauthorizedResponse } = await requireTenantContext()
 
-  if (!tenant || !memberId) {
-    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!tenant) {
+    return unauthorizedResponse
   }
 
   try {
-    const profile = await getPersonProfileByMemberId(memberId)
+    // Try person_360 if memberId is available
+    if (tenant.memberId) {
+      const profile = await getPersonProfileByMemberId(tenant.memberId)
 
-    if (profile) {
-      return NextResponse.json(toPersonProfileSummary(profile))
+      if (profile) {
+        return NextResponse.json(toPersonProfileSummary(profile))
+      }
     }
 
-    // Fallback: session always has basic identity data
+    // Fallback: session always has name, email, avatar for authenticated users
     const session = await getServerSession(authOptions)
 
-    if (session?.user) {
-      return NextResponse.json(toPersonProfileSummaryFromSession(session.user))
-    }
-
-    return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
+    return NextResponse.json(toPersonProfileSummaryFromSession(session!.user))
   } catch (error) {
     console.error('GET /api/my/profile failed:', error)
 
