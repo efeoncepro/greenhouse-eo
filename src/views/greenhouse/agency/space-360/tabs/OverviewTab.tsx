@@ -1,9 +1,11 @@
 'use client'
 
 import Alert from '@mui/material/Alert'
+import Avatar from '@mui/material/Avatar'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
+import Chip from '@mui/material/Chip'
 import Grid from '@mui/material/Grid'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
@@ -13,11 +15,22 @@ import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 
+import type { ScopeOwnership } from '@/lib/operational-responsibility/readers'
+
 import type { Space360Detail } from '@/lib/agency/space-360'
 
 type Props = {
   detail: Space360Detail
 }
+
+const ownershipLabels: Record<keyof ScopeOwnership, string> = {
+  accountLead: 'Líder de Cuenta',
+  deliveryLead: 'Líder de Delivery',
+  financeReviewer: 'Revisor Financiero',
+  operationsLead: 'Líder de Operaciones'
+}
+
+const ownershipKeys: (keyof ScopeOwnership)[] = ['accountLead', 'deliveryLead', 'financeReviewer', 'operationsLead']
 
 const statusColor = (status: string) => {
   if (status === 'optimal') return 'success'
@@ -61,6 +74,40 @@ const OverviewTab = ({ detail }: Props) => (
 
     <Grid size={{ xs: 12, lg: 5 }}>
       <Stack spacing={6}>
+        <Card variant='outlined'>
+          <CardHeader
+            title='Ownership'
+            avatar={
+              <Avatar variant='rounded' sx={{ bgcolor: 'action.hover', color: 'text.primary', width: 34, height: 34 }}>
+                <i className='tabler-users' style={{ fontSize: 20 }} />
+              </Avatar>
+            }
+          />
+          <CardContent sx={{ pt: 0 }}>
+            {ownershipKeys.some(k => detail.ownership[k] !== null) ? (
+              <Stack direction='row' flexWrap='wrap' gap={1.5}>
+                {ownershipKeys.map(key => {
+                  const entry = detail.ownership[key]
+
+                  return entry ? (
+                    <Chip
+                      key={key}
+                      variant='outlined'
+                      color='primary'
+                      size='small'
+                      label={`${ownershipLabels[key]}: ${entry.memberName}`}
+                    />
+                  ) : null
+                })}
+              </Stack>
+            ) : (
+              <Typography variant='body2' color='text.disabled'>
+                Sin responsabilidades asignadas para este space.
+              </Typography>
+            )}
+          </CardContent>
+        </Card>
+
         <Card variant='outlined'>
           <CardHeader title='Alertas' subheader='Señales actuales y gaps que todavía requieren follow-on.' />
           <CardContent sx={{ display: 'grid', gap: 2 }}>

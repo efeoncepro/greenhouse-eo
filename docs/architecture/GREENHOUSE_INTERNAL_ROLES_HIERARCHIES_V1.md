@@ -28,6 +28,19 @@ Usar junto con:
 - Origen: `TASK-225`
 - Estado: contrato arquitectónico nuevo; describe foundations ya existentes y formaliza la dirección target
 
+## Delta 2026-04-05 — Operational Responsibility Registry implementado (TASK-227)
+
+- `greenhouse_core.operational_responsibilities` creada como tabla canónica del Plano 4
+- Schema: `responsibility_id`, `member_id`, `scope_type`, `scope_id`, `responsibility_type`, `is_primary`, `effective_from`, `effective_to`, `active`
+- Scope types: `organization`, `space`, `project`, `department`
+- Responsibility types: `account_lead`, `delivery_lead`, `finance_reviewer`, `approval_delegate`, `operations_lead`
+- Unique constraint: máximo un primary por scope + type
+- API CRUD: `GET/POST /api/admin/responsibilities`, `PATCH/DELETE /api/admin/responsibilities/[id]`
+- Event catalog: `responsibility.assigned`, `responsibility.revoked`, `responsibility.updated`
+- Primer consumer: Agency Space 360 muestra ownership en OverviewTab
+- Admin UI: `/admin/responsibilities` con panel de asignación y tabla CRUD
+- Config canónico: `src/config/responsibility-codes.ts` (tipos y labels)
+
 ## Delta 2026-04-03 — separacion formal de roles y jerarquias
 
 Regla nueva:

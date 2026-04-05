@@ -1,12 +1,26 @@
 # TASK-227 - Operational Responsibility Registry
 
+## Delta 2026-04-05
+
+- Implementación completa del registry:
+  - Migración DDL: `greenhouse_core.operational_responsibilities`
+  - Config canónico: `src/config/responsibility-codes.ts`
+  - Event catalog: `responsibility.assigned`, `responsibility.revoked`, `responsibility.updated`
+  - Store (CRUD + outbox): `src/lib/operational-responsibility/store.ts`
+  - Readers: `src/lib/operational-responsibility/readers.ts`
+  - API Admin: `GET/POST /api/admin/responsibilities`, `PATCH/DELETE /api/admin/responsibilities/[id]`
+  - UI Admin: `/admin/responsibilities` con panel CRUD
+  - Consumer Agency: Space 360 OverviewTab muestra ownership badges
+- Pendiente operacional: `pnpm migrate:up` en staging (requiere Cloud SQL Proxy)
+- Pendiente: regenerar Kysely types con `pnpm db:generate-types` post-migración
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
-- Status real: `Diseño`
+- Status real: `Implementado — pendiente migración staging`
 - Rank: `[pending]`
 - Domain: `identity / agency / platform`
 - GitHub Project: `[pending]`

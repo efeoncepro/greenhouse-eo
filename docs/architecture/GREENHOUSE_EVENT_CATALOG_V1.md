@@ -147,6 +147,14 @@ Notas:
 | `identity_reconciliation` | `identity.reconciliation.rejected` | `identity/reconciliation/apply-link.ts` | `{ proposalId, status, resolvedBy }` | — |
 | `identity_profile` | `identity.profile.linked` | `identity/reconciliation/apply-link.ts` | `{ proposalId, profileId, memberId, sourceSystem, sourceObjectId }` | — |
 
+### Operational Responsibility (nuevo, TASK-227)
+
+| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
+|---|---|---|---|---|
+| `operational_responsibility` | `responsibility.assigned` | `operational-responsibility/store.ts` | `{ responsibilityId, memberId, scopeType, scopeId, responsibilityType, isPrimary }` | — |
+| `operational_responsibility` | `responsibility.revoked` | `operational-responsibility/store.ts` | `{ responsibilityId, memberId, scopeType, scopeId, responsibilityType }` | — |
+| `operational_responsibility` | `responsibility.updated` | `operational-responsibility/store.ts` | `{ responsibilityId, memberId, scopeType, scopeId, responsibilityType, changes }` | — |
+
 ### Services (nuevo)
 
 | Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |

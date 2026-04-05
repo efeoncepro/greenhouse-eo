@@ -8,6 +8,7 @@ import { readMemberCapacityEconomicsBatch } from '@/lib/member-capacity-economic
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getServicesBySpace, type ServiceListItem } from '@/lib/services/service-store'
 import { getSpaceHealth, type SpaceHealthZone } from '@/components/agency/space-health'
+import { getScopeOwnership, type ScopeOwnership } from '@/lib/operational-responsibility/readers'
 
 type RiskLevel = 'low' | 'medium' | 'high'
 type DataStatus = 'ready' | 'partial' | 'missing'
@@ -526,6 +527,7 @@ export type Space360Detail = {
   organizationPublicId: string | null
   resolutionStatus: 'client_only' | 'client_and_space'
   dataStatus: DataStatus
+  ownership: ScopeOwnership
   kpis: {
     revenueClp: number
     totalCostClp: number
@@ -665,6 +667,7 @@ export const getAgencySpace360 = async (requestedId: string): Promise<Space360De
     recentIncome,
     recentExpenses,
     assignments,
+    ownership,
     placementExposure,
     services,
     recentActivity
@@ -679,6 +682,9 @@ export const getAgencySpace360 = async (requestedId: string): Promise<Space360De
     readRecentIncome(context.client_id),
     readRecentExpenses(context.client_id),
     readTeamAssignments(context.client_id),
+    context.space_id
+      ? getScopeOwnership('space', context.space_id).catch(() => ({ accountLead: null, deliveryLead: null, financeReviewer: null, operationsLead: null }))
+      : Promise.resolve({ accountLead: null, deliveryLead: null, financeReviewer: null, operationsLead: null }),
     readPlacementExposure(context.client_id),
     context.space_id ? getServicesBySpace(context.space_id).catch(() => []) : Promise.resolve([]),
     readRecentActivity({
@@ -826,6 +832,7 @@ export const getAgencySpace360 = async (requestedId: string): Promise<Space360De
     organizationPublicId: context.organization_public_id,
     resolutionStatus: context.space_id ? 'client_and_space' : 'client_only',
     dataStatus: alerts.length > 0 ? 'partial' : 'ready',
+    ownership,
     kpis: {
       revenueClp: effectiveRevenueClp,
       totalCostClp: effectiveCostClp,

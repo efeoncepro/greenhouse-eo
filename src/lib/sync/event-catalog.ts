@@ -83,7 +83,10 @@ export const AGGREGATE_TYPES = {
   marginAlert: 'margin_alert',
   staffAugPlacement: 'staff_aug_placement',
   staffAugOnboardingItem: 'staff_aug_onboarding_item',
-  staffAugPlacementSnapshot: 'staff_aug_placement_snapshot'
+  staffAugPlacementSnapshot: 'staff_aug_placement_snapshot',
+
+  // Operational Responsibility
+  operationalResponsibility: 'operational_responsibility'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -223,7 +226,12 @@ export const EVENT_TYPES = {
   staffAugPlacementUpdated: 'staff_aug.placement.updated',
   staffAugPlacementStatusChanged: 'staff_aug.placement.status_changed',
   staffAugOnboardingItemUpdated: 'staff_aug.onboarding_item.updated',
-  staffAugPlacementSnapshotMaterialized: 'staff_aug.placement_snapshot.materialized'
+  staffAugPlacementSnapshotMaterialized: 'staff_aug.placement_snapshot.materialized',
+
+  // Operational Responsibility
+  responsibilityAssigned: 'responsibility.assigned',
+  responsibilityRevoked: 'responsibility.revoked',
+  responsibilityUpdated: 'responsibility.updated'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
