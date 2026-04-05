@@ -41,11 +41,13 @@
 - Se creó `scripts/playwright-auth-setup.mjs` — script que obtiene la cookie y genera `.auth/storageState.json`
 - Se agregó `AGENT_AUTH_SECRET`, `AGENT_AUTH_EMAIL` a `.env.example`
 - Se agregó `/.auth/` a `.gitignore`
-- Se documentó en `AGENTS.md` (sección "Agent Auth"), `CLAUDE.md` (API Routes), `GREENHOUSE_IDENTITY_ACCESS_V2.md` (sección Agent Auth), y `docs/documentation/identity/sistema-identidad-roles-acceso.md`
+- Se creó `getTenantAccessRecordForAgent()` en `src/lib/tenant/access.ts` — variante PG-first que NO requiere `passwordHash` y evita fallthrough roto a BigQuery
+- Se documentó en `AGENTS.md` (sección "Agent Auth"), `CLAUDE.md` (API Routes), `GREENHOUSE_IDENTITY_ACCESS_V2.md` (sección Agent Auth), `docs/documentation/identity/sistema-identidad-roles-acceso.md`, `project_context.md` y `changelog.md`
 
 ### Archivos modificados
 
 - `src/app/api/auth/agent-session/route.ts` (nuevo)
+- `src/lib/tenant/access.ts` — nueva función `getTenantAccessRecordForAgent`
 - `scripts/playwright-auth-setup.mjs` (nuevo)
 - `.env.example` — variables de agent auth
 - `.gitignore` — excluir `.auth/`
@@ -53,6 +55,8 @@
 - `CLAUDE.md` — API Routes actualizado
 - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md` — delta Agent Auth
 - `docs/documentation/identity/sistema-identidad-roles-acceso.md` — sección agentes
+- `project_context.md` — variables de entorno
+- `changelog.md` — entrada de agent auth
 
 ### Seguridad
 
@@ -75,11 +79,55 @@ AGENT_AUTH_SECRET=<secret> AGENT_AUTH_EMAIL=<email> node scripts/playwright-auth
 # → .auth/storageState.json contiene la cookie de sesión
 ```
 
+### Verificación
+
+- Endpoint probado localmente con `curl` — HTTP 200, JWT generado correctamente
+- Cookie verificada contra `http://localhost:3000/home` — página protegida devuelve HTML autenticado
+- `julio.reyes@efeonce.org` NO está en `greenhouse_serving.session_360` — no puede usarse como email de test
+- `valentina.hoyos@efeonce.org` SÍ está y funciona como email de prueba
+- `NEXTAUTH_SECRET` debe tener un valor real en `.env.local` (estaba vacío — genera error en `encode()`)
+
+### Hallazgo: PG-first para agent auth
+
+- `getTenantAccessRecordByEmail()` original hace fallthrough a BigQuery cuando `passwordHash` es null en PG
+- El query BigQuery fallaba con `Name member_id not found` (columna faltante en la vista — bug pre-existente, corregido por TASK-255)
+- Para agent auth no se necesita `passwordHash` → se creó `getTenantAccessRecordForAgent()` que resuelve desde PG sin exigir hash
+- Si PG no tiene el usuario, recién entonces cae a BigQuery como fallback
+
 ### Riesgo / siguiente paso
 
-- El endpoint está listo pero requiere que `AGENT_AUTH_SECRET` esté en `.env.local` para funcionar
+- El endpoint está listo pero requiere que `AGENT_AUTH_SECRET` y `NEXTAUTH_SECRET` estén en `.env.local`
 - Modo credentials requiere Playwright instalado como devDependency
+
+## Sesión 2026-04-05 — Agent User dedicado (E2E)
+
+### Qué se hizo
+
+- Se creó un usuario dedicado para agentes/E2E en PostgreSQL via migración `20260405151705425_provision-agent-e2e-user.sql`
+- Este usuario NO depende de cuentas de team members reales — es exclusivo para automatización
+
+### Datos del usuario
+
+| Campo         | Valor                           |
+| ------------- | ------------------------------- |
+| `user_id`     | `user-agent-e2e-001`            |
+| `email`       | `agent@greenhouse.efeonce.org`  |
+| `password`    | `Gh-Agent-2026!`                |
+| `tenant_type` | `efeonce_internal`              |
+| `roles`       | `efeonce_admin`, `collaborator` |
+
+### Archivos modificados
+
+- `migrations/20260405151705425_provision-agent-e2e-user.sql` (nuevo)
+- `.env.local` — `AGENT_AUTH_EMAIL` actualizado a `agent@greenhouse.efeonce.org`
+
+### Verificación
+
+- Migración aplicada con `pnpm migrate:up` — OK
+- `POST /api/auth/agent-session` con el nuevo email — HTTP 200, JWT válido
+- Cookie probada contra `/home` — HTTP 200, autenticación exitosa
 - No se tocó middleware ni rutas existentes — es puramente aditivo
+- `julio.reyes@efeonce.org` necesita ser provisionado en `greenhouse_serving.session_360` para funcionar como email de agent auth
 
 ## Sesión 2026-04-05 — TASK-254 plan drafted, no runtime implementation
 

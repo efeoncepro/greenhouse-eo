@@ -370,6 +370,22 @@ export const getTenantAccessRecordByEmail = async (email: string) => {
   return getIdentityAccessRecordByEmail(email)
 }
 
+/**
+ * Resolve a tenant record for agent/headless auth.
+ * Unlike getTenantAccessRecordByEmail, this does NOT require a passwordHash
+ * and does NOT fall through to BigQuery when passwordHash is missing.
+ * Meant for agent-session and E2E setup where no password validation is needed.
+ */
+export const getTenantAccessRecordForAgent = async (email: string) => {
+  const pgRow = await getSessionFromPostgresByEmail(email)
+
+  if (pgRow) {
+    return resolveTenantRuntimeAccess(normalizeTenantAccessRow(pgRow as TenantAccessRow))
+  }
+
+  return null
+}
+
 export const getTenantAccessRecordByMicrosoftOid = async (oid: string) => {
   try {
     const pgRow = await getSessionFromPostgresByMicrosoftOid(oid)

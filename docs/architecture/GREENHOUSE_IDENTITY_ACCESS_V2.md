@@ -56,15 +56,60 @@ The JWT is generated via `next-auth/jwt` `encode()` with the same payload shape 
 
 Output: `.auth/storageState.json` — compatible with Playwright's `storageState` option.
 
+### Dedicated agent user
+
+A dedicated PostgreSQL-provisioned user exists exclusively for agent and E2E test sessions. This avoids using personal accounts for automated workflows.
+
+| Field           | Value                                            |
+| --------------- | ------------------------------------------------ |
+| `user_id`       | `user-agent-e2e-001`                             |
+| `email`         | `agent@greenhouse.efeonce.org`                   |
+| `password`      | `Gh-Agent-2026!`                                 |
+| `password_hash` | bcrypt cost-12 (`$2b$12$Du4oz...`)               |
+| `tenant_type`   | `efeonce_internal`                               |
+| `auth_mode`     | `credentials`                                    |
+| `roles`         | `efeonce_admin` + `collaborator`                 |
+| `timezone`      | `America/Santiago`                               |
+| `migration`     | `20260405151705425_provision-agent-e2e-user.sql` |
+
+The migration inserts into `greenhouse_core.client_users` and two rows into `greenhouse_core.user_role_assignments`. All INSERTs use `ON CONFLICT DO NOTHING` for idempotency.
+
+### Why a dedicated user?
+
+- **Isolation**: personal accounts can change passwords, roles, or be deactivated — breaking CI/E2E silently.
+- **Auditability**: events emitted under `user-agent-e2e-001` are immediately identifiable as automated.
+- **Least surprise**: agents never accidentally modify personal data or trigger supervisor-based workflows.
+- **Reproducibility**: all agents and environments share the same deterministic identity, reducing test flakiness.
+
+### Tenant resolution flow
+
+```
+POST /api/auth/agent-session { secret, email }
+  │
+  ├─ timingSafeEqual(secret, AGENT_AUTH_SECRET) → 401 if mismatch
+  ├─ VERCEL_ENV === 'production' && !ALLOW_PRODUCTION → 403
+  │
+  └─ getTenantAccessRecordForAgent(email)
+       │
+       ├─ 1. PostgreSQL: greenhouse_serving.session_360 WHERE email = $1
+       │     → returns user_id, tenant_type, roles[], member_id, ...
+       │     → ALL LEFT JOINs: works even without member/identity links
+       │
+       └─ 2. If PG returns null → BigQuery fallback (getIdentityAccessRecord)
+             → same field contract as PG path
+       │
+       └─ encode JWT via NextAuth → return { cookieName, cookieValue, portalHomePath }
+```
+
 ### Environment variables
 
-| Variable                      | Required              | Purpose                                              |
-| ----------------------------- | --------------------- | ---------------------------------------------------- |
-| `AGENT_AUTH_SECRET`           | Yes                   | Shared secret (generate with `openssl rand -hex 32`) |
-| `AGENT_AUTH_EMAIL`            | Yes                   | Email of the user to authenticate as                 |
-| `AGENT_AUTH_ALLOW_PRODUCTION` | No                    | Set `true` to allow in production (not recommended)  |
-| `AGENT_AUTH_PASSWORD`         | Only credentials mode | Password for login form                              |
-| `AGENT_AUTH_MODE`             | No                    | `api` (default) or `credentials`                     |
+| Variable                      | Required              | Purpose                                              | Default                        |
+| ----------------------------- | --------------------- | ---------------------------------------------------- | ------------------------------ |
+| `AGENT_AUTH_SECRET`           | Yes                   | Shared secret (generate with `openssl rand -hex 32`) | —                              |
+| `AGENT_AUTH_EMAIL`            | Yes                   | Email of the user to authenticate as                 | `agent@greenhouse.efeonce.org` |
+| `AGENT_AUTH_ALLOW_PRODUCTION` | No                    | Set `true` to allow in production (not recommended)  | `false`                        |
+| `AGENT_AUTH_PASSWORD`         | Only credentials mode | Password for login form                              | `Gh-Agent-2026!`               |
+| `AGENT_AUTH_MODE`             | No                    | `api` (default) or `credentials`                     | `api`                          |
 
 ## Delta 2026-04-05 — Mi Perfil identity chain fix (TASK-255)
 

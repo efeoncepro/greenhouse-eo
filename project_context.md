@@ -3763,6 +3763,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `RESEND_API_KEY`
 - `EMAIL_FROM`
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`
+- `AGENT_AUTH_SECRET` — shared secret para autenticación headless de agentes y E2E (generar con `openssl rand -hex 32`). Sin esta variable el endpoint `/api/auth/agent-session` responde 404.
+- `AGENT_AUTH_EMAIL` — email del usuario a autenticar en modo headless. Debe existir en la tabla de acceso de tenants.
+- `AGENT_AUTH_ALLOW_PRODUCTION` — `true` para permitir agent auth en production (no recomendado). Por defecto bloqueado cuando `VERCEL_ENV === 'production'`.
 - `next.config.ts` usa `process.env.BASEPATH` como `basePath`
 - Riesgo operativo: si `BASEPATH` se configura en Vercel sin necesitarlo, la app deja de vivir en `/`
 

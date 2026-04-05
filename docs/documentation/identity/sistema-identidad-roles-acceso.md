@@ -1,9 +1,9 @@
 # Sistema de Identidad, Roles y Acceso
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-04-05 por Claude (TASK-248)
-> **Ultima actualizacion:** 2026-04-05 por Claude (TASK-255 Mi Perfil identity chain fix)
+> **Ultima actualizacion:** 2026-04-05 por Claude (Agent Auth — usuario dedicado y documentacion completa)
 > **Documentacion tecnica:** [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md), [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md)
 
 ---
@@ -156,14 +156,49 @@ Cada evento incluye: quien lo hizo, cuando, y los detalles del cambio.
 
 ## Acceso para agentes y automatizaciones
 
-Greenhouse incluye un mecanismo especial para que agentes de IA y tests automatizados puedan entrar al portal sin pasar por el formulario de login. Esto se usa internamente para verificar que las paginas funcionan correctamente.
+Greenhouse incluye un mecanismo especial para que agentes de IA y tests automatizados (E2E) puedan obtener una sesion valida del portal sin pasar por el formulario de login.
 
-- El agente proporciona un secreto compartido junto con un email de un usuario existente
-- El sistema genera una sesion valida automaticamente
-- El email debe corresponder a una persona activa en el portal — no se pueden crear usuarios nuevos por esta via
-- Este mecanismo esta desactivado en produccion por defecto
+### Por que existe
 
-> **Detalle tecnico:** El endpoint es `POST /api/auth/agent-session`, documentado en [GREENHOUSE_IDENTITY_ACCESS_V2.md — Agent Auth](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md). Script de setup: `scripts/playwright-auth-setup.mjs`.
+Los agentes de desarrollo (Claude, Copilot, Codex) y los tests de Playwright necesitan navegar el portal como un usuario real para verificar que las paginas funcionan. Si usaran la cuenta de una persona real, cualquier cambio de password o de rol romperia las pruebas sin aviso. Ademas, los eventos generados por un agente quedarian mezclados con los de un usuario humano.
+
+### Como funciona
+
+1. El agente envia un **secreto compartido** junto con el email de un usuario existente a un endpoint especial
+2. El sistema verifica que el secreto sea correcto (usando comparacion segura contra timing attacks)
+3. Busca al usuario en la base de datos — si no existe, rechaza la solicitud
+4. Genera una cookie de sesion valida identica a la que obtendria un usuario al hacer login normal
+5. El agente usa esa cookie para navegar el portal como si fuera ese usuario
+
+### El usuario de agente
+
+Existe un usuario dedicado exclusivamente para agentes y tests automatizados:
+
+| Dato           | Valor                            |
+| -------------- | -------------------------------- |
+| Email          | `agent@greenhouse.efeonce.org`   |
+| Password       | `Gh-Agent-2026!`                 |
+| ID de usuario  | `user-agent-e2e-001`             |
+| Tipo de tenant | Interno de Efeonce               |
+| Roles          | Superadministrador + Colaborador |
+
+Este usuario fue creado via migracion de base de datos (`20260405151705425_provision-agent-e2e-user.sql`) y no debe usarse para acceso humano.
+
+### Modos de uso
+
+| Modo              | Que hace                                           | Cuando usarlo                                        |
+| ----------------- | -------------------------------------------------- | ---------------------------------------------------- |
+| **API** (default) | Llama al endpoint directamente sin abrir navegador | Tests automatizados, agentes AI, CI/CD               |
+| **Credentials**   | Abre un navegador y llena el formulario de login   | Cuando se necesita probar el flujo completo de login |
+
+### Restricciones de seguridad
+
+- **Produccion bloqueada**: el endpoint no funciona en el entorno de produccion salvo configuracion explicita
+- **Sin secreto, invisible**: si la variable `AGENT_AUTH_SECRET` no esta configurada, el endpoint ni siquiera aparece (devuelve 404)
+- **No crea usuarios**: solo puede autenticar usuarios que ya existen en la base de datos
+- **Comparacion segura**: el secreto se valida con `timingSafeEqual` para prevenir ataques de timing
+
+> **Detalle tecnico:** El endpoint es `POST /api/auth/agent-session`, documentado en [GREENHOUSE_IDENTITY_ACCESS_V2.md — Agent Auth](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md). Script de setup: `scripts/playwright-auth-setup.mjs`. Lookup PG-first: `getTenantAccessRecordForAgent()` en `src/lib/tenant/access.ts`.
 
 ---
 

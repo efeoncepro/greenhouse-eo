@@ -2,6 +2,15 @@
 
 ## 2026-04-05
 
+- **Agent Auth — endpoint headless para agentes y E2E**:
+  - nuevo `POST /api/auth/agent-session` — genera JWT NextAuth válido dado un shared secret + email, sin login interactivo
+  - nuevo `scripts/playwright-auth-setup.mjs` — genera `.auth/storageState.json` con la cookie de sesión (modo API o Credentials)
+  - nueva función `getTenantAccessRecordForAgent()` en `src/lib/tenant/access.ts` — variante PG-first que no requiere `passwordHash`
+  - seguridad: desactivado sin `AGENT_AUTH_SECRET`, bloqueado en production por defecto, timing-safe comparison
+  - nuevas variables: `AGENT_AUTH_SECRET`, `AGENT_AUTH_EMAIL`, `AGENT_AUTH_ALLOW_PRODUCTION`
+  - documentado en AGENTS.md, CLAUDE.md, GREENHOUSE_IDENTITY_ACCESS_V2.md, proyecto_context.md y docs funcionales
+  - verificado localmente: endpoint retorna JWT válido, cookie autentica páginas protegidas
+
 - **TASK-255 Mi Perfil identity chain fix — completo**:
   - `GET /api/my/profile` respondía 422 porque `memberId` no llegaba al JWT de sesión
   - `src/lib/tenant/access.ts`: agregados `cu.member_id` y `cu.identity_profile_id` al SELECT y GROUP BY de BigQuery en `getIdentityAccessRecord()` — arregla credentials, Microsoft SSO y Google SSO
