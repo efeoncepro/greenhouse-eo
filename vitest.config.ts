@@ -13,7 +13,9 @@ export default defineConfig({
       'scripts/**/*.test.ts',
       'scripts/**/*.test.tsx',
       'scripts/**/*.spec.ts',
-      'scripts/**/*.spec.tsx'
+      'scripts/**/*.spec.tsx',
+      'services/**/*.test.ts',
+      'services/**/*.spec.ts'
     ],
     setupFiles: ['src/test/setup.ts'],
     coverage: {

@@ -1,5 +1,37 @@
 # project_context.md
 
+## Delta 2026-04-05 Session resolution: paridad PG ↔ BQ cerrada (TASK-255)
+
+- El contrato `TenantAccessRow` ahora tiene paridad completa entre el path PostgreSQL (`session_360`) y el path BigQuery (`getIdentityAccessRecord`): ambos retornan `member_id` e `identity_profile_id`.
+
+## Delta 2026-06-17 TASK-254 ops-worker Cloud Run desplegado y operativo
+
+- Los 3 crons reactivos del outbox (`outbox-react`, `outbox-react-delivery`, `projection-recovery`) ya no corren como Vercel cron.
+- Ahora corren en Cloud Run como servicio dedicado `ops-worker` en `us-east4`, disparados por Cloud Scheduler.
+- Revision activa: `ops-worker-00004-pmk`, 100% tráfico.
+- Service URL: `https://ops-worker-183008134038.us-east4.run.app`
+- Image: `gcr.io/efeonce-group/ops-worker` (Cloud Build two-stage esbuild).
+- SA: `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` con `roles/run.invoker`.
+- 3 Cloud Scheduler jobs: `ops-reactive-process` (*/5), `ops-reactive-process-delivery` (2-59/5), `ops-reactive-recover` (*/15), timezone `America/Santiago`, auth OIDC.
+- Las rutas API Vercel siguen existiendo como fallback manual pero ya no están scheduladas en `vercel.json` (16 → 13 crons).
+- Regla ESM/CJS: servicios Cloud Run que reutilicen `src/lib/` sin necesitar NextAuth deben shimear `next-auth`, sus providers y `bcryptjs` via esbuild `--alias`. El ops-worker tiene 9 shims (server-only, next/server, next/headers, next-auth, 3 providers, next-auth/next, bcryptjs).
+- Regla de health check: usar `gcloud run services proxy` en vez de `gcloud auth print-identity-token --audiences=` (el segundo requiere permisos de impersonation que no siempre están disponibles).
+- Run tracking: cada corrida queda en `source_sync_runs` con `source_system='reactive_worker'`, visible en Admin > Ops Health como subsistema `Reactive Worker`.
+- Fuente canónica: `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` §4.9 y §5.
+- Regla vigente: todo campo nuevo que se agregue a `session_360` debe ir tambien en el SELECT/GROUP BY de BigQuery en `src/lib/tenant/access.ts`.
+- La funcion `authorize()` de credentials en `src/lib/auth.ts` ahora incluye todos los campos de identidad en el user retornado (`memberId`, `identityProfileId`, `spaceId`, `organizationId`, `organizationName`). SSO ya los tenia porque lee `tenant.*` directamente.
+- `/api/my/profile` es resiliente: intenta `person_360`, fallback a session data. Un usuario autenticado nunca ve "Perfil no disponible".
+
+## Delta 2026-04-05 Vercel Cron no depende de CRON_SECRET
+
+- Las routes protegidas con `requireCronAuth()` ya no deben bloquear corridas legítimas de Vercel Cron si `CRON_SECRET` falta en el entorno.
+- Regla vigente:
+  - requests con `x-vercel-cron: 1` o `user-agent` `vercel-cron/*` se autorizan como scheduler traffic válido
+  - `CRON_SECRET` sigue siendo obligatorio para invocaciones bearer/manuales fuera de Vercel
+  - si una request no es Vercel Cron y el secret falta, el runtime sigue fallando en cerrado con `503`
+- Motivación:
+  - cerrar `ISSUE-012` y evitar que la ausencia de `CRON_SECRET` vuelva a detener el carril reactivo u otras routes cron programadas
+
 ## Delta 2026-04-05 Reactive backlog hidden stage now surfaces in Admin Ops
 
 - `Admin Center`, `Ops Health` y el contrato interno `/api/internal/projections` ya distinguen explícitamente el tramo reactivo oculto `published -> outbox_reactive_log`.
@@ -104,6 +136,19 @@
 - Regla operativa:
   - para `OTD`, `FTR` y `RpA` prevalecen las bandas documentadas en `docs/architecture/Greenhouse_ICO_Engine_v1.md` § `A.5.5`
   - para `Cycle Time`, `CTV` y `BCS` se mantiene calibración interna según baseline operativo por cuenta
+
+## Delta 2026-04-05 Vercel Deployment Protection, bypass SSO y proyecto único
+
+- **SSO habilitada** con `deploymentType: "all_except_custom_domains"` — protege todos los deployments excepto custom domains de Production.
+- El custom domain de staging (`dev-greenhouse.efeoncepro.com`) **SÍ recibe SSO** — no es excepción (la excepción solo aplica a custom domains de Production como `greenhouse.efeoncepro.com`).
+- Para acceso programático (agentes, Playwright, curl), usar:
+  - URL `.vercel.app` del deployment: `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`
+  - Header: `x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET`
+- **REGLA CRÍTICA**: `VERCEL_AUTOMATION_BYPASS_SECRET` es auto-gestionada por el sistema (está en `protectionBypass` del proyecto con `scope: "automation-bypass"` e `isEnvVar: true`). NUNCA crear manualmente esa variable en Vercel — si se crea con otro valor, sombrea el real y rompe el bypass silenciosamente.
+- Proyecto canónico: `greenhouse-eo` (`prj_d9v6gihlDq4k1EXazPvzWhSU0qbl`), team `efeonce-7670142f`. No debe existir un segundo proyecto vincualdo al mismo repo.
+- **Incidente real (2026-04-05)**: se eliminó un proyecto duplicado en scope personal (`prj_5zqdjJOz6OUQy7hiPh8xHZJj8tA8`) que causaba failures constantes en GitHub — tenía 0 variables y sin framework.
+- Variables de Agent Auth (`AGENT_AUTH_SECRET`, `AGENT_AUTH_EMAIL`) verificadas activas en Staging + Preview(develop).
+- Agent Auth verificado funcional en staging: `POST /api/auth/agent-session` → HTTP 200, JWT válido para `user-agent-e2e-001`.
 
 ## Delta 2026-04-03 ICO Engine external benchmarks documented
 
@@ -3746,6 +3791,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `RESEND_API_KEY`
 - `EMAIL_FROM`
 - `HUBSPOT_GREENHOUSE_INTEGRATION_BASE_URL`
+- `AGENT_AUTH_SECRET` — shared secret para autenticación headless de agentes y E2E (generar con `openssl rand -hex 32`). Sin esta variable el endpoint `/api/auth/agent-session` responde 404.
+- `AGENT_AUTH_EMAIL` — email del usuario a autenticar en modo headless. Debe existir en la tabla de acceso de tenants.
+- `AGENT_AUTH_ALLOW_PRODUCTION` — `true` para permitir agent auth en production (no recomendado). Por defecto bloqueado cuando `VERCEL_ENV === 'production'`.
 - `next.config.ts` usa `process.env.BASEPATH` como `basePath`
 - Riesgo operativo: si `BASEPATH` se configura en Vercel sin necesitarlo, la app deja de vivir en `/`
 

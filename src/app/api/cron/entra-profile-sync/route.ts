@@ -5,7 +5,7 @@ import { fetchEntraUsers } from '@/lib/entra/graph-client'
 import { syncEntraProfiles } from '@/lib/entra/profile-sync'
 
 export const dynamic = 'force-dynamic'
-export const maxDuration = 60
+export const maxDuration = 300
 
 export async function GET(request: Request) {
   const { authorized, errorResponse } = requireCronAuth(request)
@@ -24,7 +24,7 @@ export async function GET(request: Request) {
     const durationMs = Date.now() - startMs
 
     console.log(
-      `[entra-profile-sync] done processed=${result.processed} users_updated=${result.usersUpdated} profiles_updated=${result.profilesUpdated} members_updated=${result.membersUpdated} skipped=${result.skipped} errors=${result.errors.length} duration=${durationMs}ms`
+      `[entra-profile-sync] done processed=${result.processed} users_updated=${result.usersUpdated} profiles_created=${result.profilesCreated} profiles_linked=${result.profilesLinked} profiles_updated=${result.profilesUpdated} members_updated=${result.membersUpdated} avatars_synced=${result.avatarsSynced} skipped=${result.skipped} errors=${result.errors.length} duration=${durationMs}ms`
     )
 
     return NextResponse.json({ ...result, durationMs })

@@ -1,9 +1,11 @@
 # AGENTS.md
 
 ## Objetivo
+
 Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui trabajaran multiples agentes y personas. Este documento define reglas obligatorias para evitar conflictos, duplicidad de trabajo y despliegues rotos.
 
 ## Alcance
+
 - Este repo corresponde solo a `starter-kit`.
 - `full-version` debe usarse como referencia de contexto para entender componentes, patrones, flujos y alcance funcional esperado.
 - Aunque `full-version` exista versionado en este workspace como referencia local, no debe tratarse como source of truth del producto ni ampliarse como si fuera parte activa del portal.
@@ -16,6 +18,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - los briefs `CODEX_TASK_*` existentes siguen vigentes como legacy hasta su migracion y deben vivir versionados dentro de `docs/tasks/**`; el patron ignorado en raiz queda solo para scratch local fuera de la taxonomia documental.
 
 ## Prioridades
+
 1. Mantener el proyecto desplegable en Vercel.
 2. Evitar romper la base de Vuexy mientras se adapta a Greenhouse.
 3. Dejar handoff claro para el siguiente agente.
@@ -24,6 +27,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 ## Reglas Operativas
 
 ### 1. Antes de cambiar codigo
+
 - Leer `project_context.md`.
 - Leer `Handoff.md` para ver trabajo en curso, riesgos y proximos pasos.
 - Usar `Handoff.archive.md` solo si hace falta rastrear contexto historico; no como primera lectura operativa.
@@ -55,11 +59,13 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Confirmar si el cambio toca layout global, navegacion, autenticacion, tema o deploy. Si toca alguno, documentarlo en `Handoff.md`.
 
 ### 2. Limites de trabajo
+
 - Un agente debe trabajar un objetivo claro por vez.
 - No mezclar cambios de producto, infraestructura y refactor en un mismo lote sin necesidad real.
 - Si el cambio es exploratorio o incompleto, no dejarlo a medias sin actualizar `Handoff.md`.
 
 ### 3. Coordinacion entre agentes
+
 - El agente que toma una tarea debe dejar constancia breve en `Handoff.md` antes de cerrar su turno si:
   - modifico archivos de alto impacto
   - dejo deuda tecnica abierta
@@ -68,6 +74,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Si dos agentes pueden tocar la misma zona, prevalece el ultimo handoff documentado, no la memoria conversacional.
 
 ### 4. Regla de cambios minimos
+
 - Preferir cambios pequenos, verificables y reversibles.
 - Si un archivo base de Vuexy requiere cambios amplios, separar primero la adaptacion funcional y despues el cleanup.
 - Evitar renombrar masivamente archivos o mover carpetas sin una razon fuerte.
@@ -75,6 +82,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Las rutas y modulos deben reutilizar esa capa y dejar en `src/views/greenhouse/*` solo la composicion o piezas especificas del modulo.
 
 ### 5. Regla de verificacion
+
 - Todo cambio debe intentar validar al menos una de estas rutas:
   - `pnpm build`
   - `pnpm lint`
@@ -88,12 +96,14 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Si no se pudo validar, registrar exactamente que no se valido y por que en `Handoff.md`.
 
 ### 6. Regla de despliegue
+
 - El proyecto debe conservar configuracion compatible con Vercel.
 - `Framework Preset` en Vercel debe ser `Next.js`.
 - No depender de configuraciones manuales opacas en Vercel si el repo puede expresar el comportamiento.
 - Si un cambio altera rutas raiz, redirects, `basePath` o variables de entorno, documentarlo en `project_context.md` y `Handoff.md`.
 
 ### 7. Regla de documentacion viva
+
 - Actualizar `changelog.md` cuando haya un cambio real en comportamiento, estructura, flujo de trabajo o despliegue.
 - Actualizar `docs/changelog/CLIENT_CHANGELOG.md` cuando cambie una capacidad visible para usuarios/clientes o cuando una feature/modulo cambie de canal o disponibilidad.
 - Actualizar `project_context.md` cuando cambie arquitectura, stack, rutas clave, decisiones o restricciones.
@@ -108,6 +118,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - `docs/operations/` — modelos operativos del repo y del equipo (documentacion, GitHub Project, release channels)
 
 ### 8. Regla de line endings
+
 - El repositorio debe versionar archivos de texto con finales de linea `LF`.
 - Mantener `.gitattributes` como fuente de verdad para la politica de `EOL`.
 - No forzar conversiones masivas a `CRLF`.
@@ -116,6 +127,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 ## Convenciones de Trabajo
 
 ### Branching y commits
+
 - `main` es solo para codigo listo para produccion.
 - `develop` debe funcionar como rama de integracion y rama asociada a `Staging` en Vercel.
 - Todo trabajo de agentes debe salir desde rama propia salvo cambios minimos de emergencia.
@@ -141,6 +153,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - `chore: ...`
 
 ### Flujo por ramas
+
 - `feature/*` y `fix/*`:
   - sirven para trabajo aislado por agente
   - cada push debe generar Preview Deployment en Vercel
@@ -160,6 +173,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - despues de cerrar el hotfix, sincronizar tambien con `develop`
 
 ### Regla de merge
+
 - No mergear una rama si no esta claro:
   - que problema resuelve
   - como se valido
@@ -171,8 +185,10 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - el cambio ya debio haber pasado por `develop`, salvo hotfix
   - revisar preview o entorno de prueba compartido
   - confirmar que no hay pendientes abiertos en `Handoff.md` para esa zona
+  - verificar conflictos con: `git merge --no-commit --no-ff origin/main` (luego `git merge --abort` si solo es verificacion). **No usar** `git merge-tree | grep CONFLICT` — produce falsos positivos con sentencias SQL `ON CONFLICT` del codebase (ver ISSUE-011)
 
 ### Ambientes y Vercel
+
 - `Production` en Vercel debe estar asociado a `main`.
 - `Staging` en Vercel debe ser un `Custom Environment` asociado a `develop`.
 - `Preview` en Vercel debe usarse para:
@@ -182,7 +198,39 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Si se define un dominio de staging, debe apuntar al `Custom Environment` de `develop`, no a ramas personales.
 - No usar Production como entorno de prueba manual.
 
+### Vercel Deployment Protection (SSO)
+
+- El proyecto tiene **Vercel Authentication (SSO)** habilitada con `deploymentType: "all_except_custom_domains"`.
+- Esto significa que **todos los deployments** (preview, staging, `.vercel.app`) requieren autenticación SSO de Vercel, **excepto** custom domains de Production (`greenhouse.efeoncepro.com`).
+- **El custom domain de staging** (`dev-greenhouse.efeoncepro.com`) **SÍ recibe protección SSO** — no es una excepción. La excepción es solo para custom domains de Production.
+- **Para acceder programáticamente** a staging o preview (agentes, Playwright, curl), se debe usar:
+  - La URL `.vercel.app` del deployment (no el custom domain)
+  - Header `x-vercel-protection-bypass` con el secret del sistema
+- **El secret de bypass** es gestionado automáticamente por Vercel como variable de entorno `VERCEL_AUTOMATION_BYPASS_SECRET`. Está en el objeto `protectionBypass` del proyecto con `scope: "automation-bypass"` e `isEnvVar: true`.
+- **REGLA CRÍTICA: NUNCA crear manualmente** una variable `VERCEL_AUTOMATION_BYPASS_SECRET` en Vercel. La variable del sistema es auto-gestionada. Si se crea manualmente con un valor distinto, **sombrea** el valor real del sistema y rompe el bypass silenciosamente.
+- Si el bypass no funciona, verificar:
+  1. Que NO exista una variable manual `VERCEL_AUTOMATION_BYPASS_SECRET` que sombree la del sistema
+  2. Que se está usando la URL `.vercel.app`, no el custom domain
+  3. Que el header es `x-vercel-protection-bypass` (no `x-vercel-bypass` ni otro nombre)
+- Ejemplo de request con bypass:
+  ```bash
+  curl -s -X POST "https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app/api/auth/agent-session" \
+    -H "Content-Type: application/json" \
+    -H "x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET" \
+    -d '{"secret": "<AGENT_AUTH_SECRET>", "email": "agent@greenhouse.efeonce.org"}'
+  ```
+- URLs de staging:
+  - Custom domain (protegido por SSO, no usar para agentes): `dev-greenhouse.efeoncepro.com`
+  - Vercel app (usar con bypass header): `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`
+
+### Proyecto Vercel único
+
+- El proyecto canónico es `greenhouse-eo` (id: `prj_d9v6gihlDq4k1EXazPvzWhSU0qbl`) dentro del team `efeonce-7670142f`.
+- **NUNCA** debe existir un segundo proyecto Vercel vinculado al mismo repositorio GitHub. Si GitHub reporta failures constantes en deploys, verificar en `vercel.com` que no exista un proyecto duplicado en un scope personal u otro team.
+- **Incidente real (2026-04-05):** existía un proyecto duplicado en scope personal (`julioreyes-4376's projects`, id `prj_5zqdjJOz6OUQy7hiPh8xHZJj8tA8`) con 0 variables de entorno y sin framework — cada push disparaba builds en ambos proyectos, el duplicado siempre fallaba.
+
 ### Variables por ambiente
+
 - Separar variables en Vercel por entorno:
   - `Development`: trabajo local
   - `Preview`: feature branches, fix branches y hotfix
@@ -196,6 +244,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - valor esperado o formato
 
 ### Regla de promocion
+
 - El camino normal es:
   - rama de trabajo
   - Preview Deployment
@@ -211,6 +260,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - Greenhouse comunica releases principalmente por modulo o feature visible, no solo por plataforma completa
 
 ### Archivos sensibles
+
 - Tratar con cuidado:
   - `next.config.ts`
   - `package.json`
@@ -223,11 +273,79 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Si alguno cambia, dejar nota en `Handoff.md`.
 
 ### Variables de entorno
+
 - No introducir variables nuevas sin documentarlas en `project_context.md`.
 - Mantener `.env.example` alineado con cualquier variable requerida por el proyecto.
 - No asumir que Vercel tiene variables cargadas.
 
+### Agent Auth (acceso headless para agentes y E2E)
+
+- Endpoint: `POST /api/auth/agent-session` — genera un JWT NextAuth válido sin pasar por login interactivo.
+- Requiere `AGENT_AUTH_SECRET` en `.env.local`. Sin esa variable, el endpoint devuelve 404.
+- **Bloqueado en production** por defecto (`VERCEL_ENV === 'production'` → 403), salvo `AGENT_AUTH_ALLOW_PRODUCTION=true`.
+- El caller envía `{ secret, email }` y recibe `{ cookieName, cookieValue, portalHomePath }` para montar la cookie de sesión.
+- El email debe existir como usuario activo en la tabla de acceso de tenants; no crea usuarios.
+- **Usuario dedicado de agente**: `agent@greenhouse.efeonce.org` (user_id: `user-agent-e2e-001`, roles: `efeonce_admin` + `collaborator`). Provisionado via migración `20260405151705425_provision-agent-e2e-user.sql`. Password: `Gh-Agent-2026!`.
+- Script de setup: `node scripts/playwright-auth-setup.mjs` — genera `.auth/storageState.json` con la cookie lista para Playwright.
+- Dos modos:
+  - **API** (default): llama al endpoint, no necesita browser (`AGENT_AUTH_SECRET` + `AGENT_AUTH_EMAIL`).
+  - **Credentials**: abre Playwright y llena el formulario de login (`AGENT_AUTH_MODE=credentials` + `AGENT_AUTH_EMAIL` + `AGENT_AUTH_PASSWORD`).
+- `.auth/` está en `.gitignore` — nunca commitear storageState.
+- Variables:
+  - `AGENT_AUTH_SECRET` — secret compartido (generar con `openssl rand -hex 32`)
+  - `AGENT_AUTH_EMAIL` — email del usuario a autenticar (default: `agent@greenhouse.efeonce.org`)
+  - `AGENT_AUTH_PASSWORD` — password del usuario agente: `Gh-Agent-2026!` (solo modo credentials)
+  - `AGENT_AUTH_ALLOW_PRODUCTION` — `true` solo si se necesita en prod (no recomendado)
+- Fuente canónica: `src/app/api/auth/agent-session/route.ts`
+- Spec técnica: `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md` (sección Agent Auth)
+
+### Staging requests programáticas (agentes y CI)
+
+- Staging tiene **Vercel SSO Protection** activa — todo request sin bypass es redirigido a la SSO wall de Vercel.
+- **Comando canónico**: `pnpm staging:request <path>` — maneja bypass + auth + request en un solo paso.
+- Ejemplos:
+
+  ```bash
+  # GET simple
+  pnpm staging:request /api/agency/operations
+
+  # GET con búsqueda
+  pnpm staging:request /api/agency/operations --grep reactive
+
+  # POST con body
+  pnpm staging:request POST /api/some/endpoint '{"key":"value"}'
+
+  # Pretty-print
+  pnpm staging:request /api/agency/operations --pretty
+  ```
+
+- El script `scripts/staging-request.mjs`:
+  1. Lee `VERCEL_AUTOMATION_BYPASS_SECRET` de `.env.local`
+  2. Si no existe, lo auto-fetch desde la Vercel API (requiere `vercel login` previo)
+  3. Autentica como agente vía `/api/auth/agent-session` con bypass header
+  4. Ejecuta el request real con bypass header + cookie de sesión
+  5. Persiste el bypass secret en `.env.local` para future runs
+- **NUNCA** intentar hacer `curl` directo a la URL `.vercel.app` de staging sin bypass header — siempre devuelve HTML de Vercel SSO.
+- **NUNCA** crear `VERCEL_AUTOMATION_BYPASS_SECRET` manualmente en el dashboard de Vercel — la variable es auto-gestionada por el sistema.
+- Si el bypass secret se vuelve stale, borrar `VERCEL_AUTOMATION_BYPASS_SECRET` de `.env.local` y correr el script de nuevo — auto-refetch.
+- Fuente: `scripts/staging-request.mjs`
+
+### Cloud Run ops-worker (crons reactivos)
+
+- Greenhouse tiene un servicio Cloud Run dedicado (`ops-worker`) en `us-east4` que ejecuta los crons reactivos del outbox.
+- 3 Cloud Scheduler jobs disparan el servicio: `ops-reactive-process` (_/5), `ops-reactive-process-delivery` (2-59/5), `ops-reactive-recover` (_/15), timezone `America/Santiago`.
+- SA: `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` con `roles/run.invoker`.
+- **Si el cambio toca `src/lib/sync/`, `src/lib/operations/`, proyecciones reactivas, o `services/ops-worker/`**, verificar que el build del worker sigue compilando (`cd services/ops-worker && docker build .` o revisar esbuild aliases).
+- **Regla ESM/CJS para Cloud Run**: servicios que reutilicen `src/lib/` sin necesitar NextAuth deben shimear `next-auth`, sus providers y `bcryptjs` via esbuild `--alias`. El patrón canónico de shims está en `services/ops-worker/Dockerfile`.
+- **Deploy**: `bash services/ops-worker/deploy.sh` (requiere `gcloud` autenticado con acceso al proyecto `efeonce-group`).
+- **Health check**: el deploy script usa `gcloud run services proxy` (no requiere SA impersonation).
+- Las rutas API Vercel (`/api/cron/outbox-react`, etc.) siguen como fallback manual pero **no están scheduladas**.
+- Run tracking: `source_sync_runs` con `source_system='reactive_worker'`, visible en Admin > Ops Health.
+- Fuente canónica: `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` §4.9 y §5.
+- Documentación funcional: `docs/documentation/operations/ops-worker-reactive-crons.md`
+
 ### Conectividad PostgreSQL (leer ANTES de cualquier operación DB)
+
 - **Método preferido (todos los entornos)**: Cloud SQL Connector vía `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`. Conecta sin TCP directo — negocia un túnel seguro por la Cloud SQL Admin API. Funciona en Vercel (WIF + OIDC), local, y agentes AI.
 - **La IP pública de Cloud SQL (`34.86.135.144`) NO es accesible por TCP directo** — no hay authorized networks configuradas. Intentar conectar da `ETIMEDOUT`.
 - **Prioridad en `src/lib/postgres/client.ts`**: si `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` está definida, el Connector toma prioridad sobre `GREENHOUSE_POSTGRES_HOST`. Ambas pueden coexistir en `.env.local`.
@@ -248,6 +366,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - **Regla**: si un script Node.js de runtime falla con `ETIMEDOUT`, verificar que `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` esté definida y que las credenciales GCP sean válidas. Si una migración o binario standalone falla, verificar que el Cloud SQL Auth Proxy esté corriendo en `127.0.0.1:15432`.
 
 ### Acceso PostgreSQL
+
 - Greenhouse usa cuatro perfiles de acceso para PostgreSQL:
   - `runtime` — portal app (DML, via Cloud SQL Connector en Vercel)
   - `migrator` — migraciones DDL (`pnpm migrate:up`, `pnpm setup:postgres:*`)
@@ -294,6 +413,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
 
 ### Database Connection
+
 - **Import `query` from `@/lib/db`** for raw SQL queries (convenience alias for `runGreenhousePostgresQuery`).
 - **Import `getDb` from `@/lib/db`** for Kysely typed queries in new modules.
 - **Import `withTransaction` from `@/lib/db`** for transactions.
@@ -305,6 +425,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - New modules SHOULD use Kysely (`getDb()`) for type safety.
 
 ### Database Migrations
+
 - Todo cambio de schema PostgreSQL (DDL) debe hacerse via migración versionada, nunca con ALTER/CREATE manual.
 - Framework: `node-pg-migrate` — wrapper en `scripts/migrate.ts`, migraciones en `migrations/`.
 - Tabla de tracking: `public.pgmigrations`
@@ -330,9 +451,11 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 ## Task Lifecycle Protocol
 
 ### Regla general
+
 Todo agente que trabaje sobre una task del sistema debe gestionar su estado en el pipeline de tareas. Las tasks nuevas usan `TASK-###`; las `CODEX_TASK_*` existentes se consideran legacy hasta su migracion. Todas viven en `docs/tasks/{to-do,in-progress,complete}/` y su índice es `docs/tasks/README.md`.
 
 Antes de crear una task nueva:
+
 1. Revisar `docs/tasks/TASK_TEMPLATE.md` (plantilla copiable) y `docs/tasks/TASK_PROCESS.md` (protocolo)
 2. Revisar `docs/tasks/TASK_ID_REGISTRY.md`
 3. Asignar el siguiente `TASK-###` disponible sin renumerar tasks existentes
@@ -340,37 +463,47 @@ Antes de crear una task nueva:
 5. Crear la task en la carpeta de lifecycle correcta
 
 ### Al iniciar trabajo en una task
+
 1. Mover el archivo de la task de `to-do/` a `in-progress/`
 2. Actualizar `docs/tasks/README.md` — cambiar estado a `In Progress`
 3. Registrar en `Handoff.md` qué task se está trabajando, rama y objetivo
 
 ### Al completar una task
+
 1. Mover el archivo de `in-progress/` a `complete/`
 2. Actualizar `docs/tasks/README.md` — mover entrada a sección `Complete` con resumen de lo implementado
 3. Documentar en `Handoff.md` y `changelog.md`
 4. Ejecutar el chequeo de impacto cruzado (ver abajo)
 
 ### Chequeo de impacto cruzado (obligatorio al cerrar)
+
 Después de completar implementación, escanear `docs/tasks/to-do/` buscando tasks que:
+
 - **Referencien archivos que se modificaron** → actualizar su sección "Ya existe"
 - **Declaren gaps que el trabajo acaba de cerrar** → marcar el gap como resuelto con fecha
 - **Tengan supuestos que los cambios invaliden** → agregar nota delta con fecha y nuevo estado
 - **Estén ahora completamente implementadas** → marcar para cierre y notificar al usuario
 
 Regla: si una task ajena cambió de estado real (un gap se cerró, un supuesto cambió), agregar al inicio del archivo:
+
 ```markdown
 ## Delta YYYY-MM-DD
+
 - [descripción del cambio] — cerrado por trabajo en [task que lo causó]
 ```
 
 ### Reclasificación de documentos
+
 Si durante una auditoría se determina que un archivo en `docs/tasks/` no es una task sino una spec de arquitectura o referencia:
+
 - Moverlo a `docs/architecture/`
 - Actualizar `docs/tasks/README.md` con nota de reclasificación
 - Si tiene gaps operativos pendientes, crear una task derivada en `to-do/`
 
 ### Dependencias entre tasks
+
 Cada task activa debe tener un bloque `## Dependencies & Impact` que declare:
+
 - **Depende de:** qué tablas, schemas, o tasks deben existir antes
 - **Impacta a:** qué otras tasks se verían afectadas si esta se completa
 - **Archivos owned:** qué archivos son propiedad de esta task (para detectar impacto cruzado)
@@ -378,6 +511,7 @@ Cada task activa debe tener un bloque `## Dependencies & Impact` que declare:
 Cuando un agente modifica archivos listados como "owned" por otra task, debe revisar esa task y actualizar su estado si corresponde.
 
 ### GitHub Project mirror
+
 - El Project de GitHub es la capa operativa de seguimiento; la task markdown sigue siendo la fuente canonica de alcance.
 - Toda task activa o priorizada para iteracion debe idealmente tener:
   - issue con titulo `[TASK-###] ...`
@@ -387,6 +521,7 @@ Cuando un agente modifica archivos listados como "owned" por otra task, debe rev
   - `docs/operations/GITHUB_PROJECT_OPERATING_MODEL_V1.md`
 
 ## Checklist de Cierre de Turno
+
 - Cambios acotados y entendibles.
 - Verificacion ejecutada o limitacion documentada.
 - Ningun `commit` o `push` hecho sin revisar que el cambio este estable para su alcance.
@@ -396,4 +531,5 @@ Cuando un agente modifica archivos listados como "owned" por otra task, debe rev
 - `project_context.md` actualizado si cambio la arquitectura, el deploy o los supuestos.
 
 ## Regla Final
+
 Si una decision no esta documentada y puede afectar a otros agentes, aun no esta cerrada.

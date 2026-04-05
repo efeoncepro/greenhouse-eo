@@ -2591,71 +2591,72 @@ export interface GreenhouseServingPeriodClosureStatus {
 }
 
 export interface GreenhouseServingPerson360 {
-  active_user_count: number | null;
+  active_role_codes: string[] | null;
+  auth_mode: string | null;
+  avatar_url: string | null;
   canonical_email: string | null;
-  client_user_count: number | null;
-  contact_client_ids: string[] | null;
-  contact_count: number | null;
-  contact_emails: string[] | null;
-  contact_record_ids: string[] | null;
+  client_id: string | null;
+  client_name: string | null;
+  contract_end_date: Timestamp | null;
   created_at: Timestamp | null;
+  crm_contact_id: string | null;
+  crm_display_name: string | null;
+  crm_email: string | null;
+  crm_job_title: string | null;
+  crm_mobile_phone: string | null;
+  crm_phone: string | null;
+  daily_required: boolean | null;
   default_auth_mode: string | null;
-  display_name: string | null;
+  default_portal_home_path: string | null;
+  department_id: string | null;
+  department_name: string | null;
+  employment_type: string | null;
   eo_id: string | null;
-  has_active_contact: boolean | null;
-  has_active_member: boolean | null;
-  has_crm_contact_facet: boolean | null;
+  full_name: string | null;
+  google_sub: string | null;
+  has_crm_facet: boolean | null;
   has_member_facet: boolean | null;
-  has_membership_facet: boolean | null;
   has_user_facet: boolean | null;
+  hire_date: Timestamp | null;
+  hubspot_contact_id: string | null;
+  identity_active: boolean | null;
   identity_profile_id: string | null;
-  identity_profile_public_id: string | null;
-  internal_user_count: number | null;
-  is_efeonce_collaborator: boolean | null;
+  identity_status: string | null;
+  job_level: string | null;
   job_title: string | null;
-  member_count: number | null;
+  last_login_at: Timestamp | null;
+  lead_status: string | null;
+  lifecycle_stage: string | null;
+  linked_systems: string[] | null;
+  member_active: boolean | null;
   member_display_name: string | null;
   member_email: string | null;
   member_id: string | null;
-  membership_count: number | null;
-  memberships: Json | null;
-  organization_ids: string[] | null;
-  organization_membership_count: number | null;
-  person_facets: string[] | null;
-  primary_contact_email: string | null;
-  primary_contact_name: string | null;
-  primary_contact_record_id: string | null;
-  primary_department_id: string | null;
-  primary_hubspot_contact_id: string | null;
-  primary_member_id: string | null;
-  primary_member_public_id: string | null;
-  primary_membership_type: string | null;
-  primary_organization_id: string | null;
-  primary_organization_name: string | null;
-  primary_source_object_id: string | null;
-  primary_source_object_type: string | null;
+  member_phone: string | null;
+  member_public_id: string | null;
+  member_status: string | null;
+  microsoft_oid: string | null;
+  password_hash_algorithm: string | null;
   primary_source_system: string | null;
-  primary_user_email: string | null;
-  primary_user_id: string | null;
-  primary_user_name: string | null;
-  primary_user_public_id: string | null;
-  profile_active: boolean | null;
-  profile_full_name: string | null;
-  profile_status: string | null;
   profile_type: string | null;
+  reports_to_member_id: string | null;
+  resolved_avatar_url: string | null;
   resolved_display_name: string | null;
+  resolved_email: string | null;
+  resolved_job_title: string | null;
+  resolved_phone: string | null;
+  serial_number: number | null;
+  source_link_count: number | null;
   tenant_type: string | null;
-  tenant_types: string[] | null;
   updated_at: Timestamp | null;
   user_active: boolean | null;
-  user_client_ids: string[] | null;
   user_count: number | null;
   user_email: string | null;
-  user_emails: string[] | null;
   user_full_name: string | null;
   user_id: string | null;
-  user_ids: string[] | null;
+  user_public_id: string | null;
   user_status: string | null;
+  user_timezone: string | null;
 }
 
 export interface GreenhouseServingPersonDelivery360 {
@@ -2784,6 +2785,24 @@ export interface GreenhouseServingPersonOperational360 {
   total_tasks: Generated<number | null>;
   used_hours_month: number | null;
   utilization_pct: Numeric | null;
+}
+
+export interface GreenhouseServingPersonOperationalMetrics {
+  cycle_time_avg_days: Numeric | null;
+  ftr_pct: Numeric | null;
+  materialized_at: Generated<Timestamp>;
+  member_id: string;
+  otd_pct: Numeric | null;
+  period_month: number;
+  period_year: number;
+  project_breakdown: Generated<Json | null>;
+  rpa_avg: Numeric | null;
+  source: Generated<string>;
+  stuck_asset_count: Generated<number | null>;
+  tasks_active: Generated<number>;
+  tasks_completed: Generated<number>;
+  tasks_total: Generated<number>;
+  throughput_count: number | null;
 }
 
 export interface GreenhouseServingProjectedPayrollSnapshots {
@@ -3516,6 +3535,7 @@ export interface DB {
   "greenhouse_serving.person_finance_360": GreenhouseServingPersonFinance360;
   "greenhouse_serving.person_hr_360": GreenhouseServingPersonHr360;
   "greenhouse_serving.person_operational_360": GreenhouseServingPersonOperational360;
+  "greenhouse_serving.person_operational_metrics": GreenhouseServingPersonOperationalMetrics;
   "greenhouse_serving.projected_payroll_snapshots": GreenhouseServingProjectedPayrollSnapshots;
   "greenhouse_serving.provider_360": GreenhouseServingProvider360;
   "greenhouse_serving.provider_finance_360": GreenhouseServingProviderFinance360;

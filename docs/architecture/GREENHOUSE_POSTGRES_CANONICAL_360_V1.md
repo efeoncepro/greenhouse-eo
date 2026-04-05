@@ -29,6 +29,46 @@ Regla nueva:
 - cualquier módulo que necesite estructura organizacional interna debe consumir `greenhouse_core.departments` como source of truth runtime
 - si BigQuery necesita la estructura para analytics, debe recibirla por proyección explícita desde Postgres y no por dual-write silencioso
 
+## Delta 2026-04-05 — person_360 v2: enriched VIEW with resolved fields (TASK-256 / ISSUE-014)
+
+La VIEW `greenhouse_serving.person_360` fue reemplazada por la version v2 enriched.
+
+Cambio estructural:
+- La version anterior usaba CTEs con rollups (`member_rollup`, `user_rollup`, `contact_rollup`) y exponia columnas como `primary_member_id`, `primary_user_id`, `has_active_member`, etc.
+- La version v2 usa **LATERAL joins** para resolucion deterministica del primer registro activo y expone campos enriched: `resolved_avatar_url`, `resolved_email`, `resolved_phone`, `resolved_job_title`, `department_name`, `job_level`, `employment_type`, y facets completos de member/user/CRM.
+- Migracion: `20260405164846570_person-360-v2-enriched-view.sql`
+
+Columnas nuevas relevantes:
+- `resolved_avatar_url` — `first_user.avatar_url` (de `client_users`, sincronizado desde Microsoft Graph via GCS)
+- `resolved_job_title` — `COALESCE(ip.job_title, first_contact.job_title)`
+- `resolved_phone` — `COALESCE(m.phone, first_contact.phone)`
+- `resolved_email` — `COALESCE(ip.canonical_email, m.primary_email, first_user.email, first_contact.email)`
+- `department_name` — join a `greenhouse_core.departments`
+- `linked_systems` — aggregation normalizada de `identity_profile_source_links` via `canonical_source_system()`
+- `active_role_codes` — aggregation de `user_role_assignments`
+
+Normalizacion de source systems:
+- Funcion `greenhouse_core.canonical_source_system(raw TEXT)` (`IMMUTABLE`, SQL puro) normaliza valores tecnicos a nombres display-friendly
+- Mapping: `azure_ad`/`azure-ad`/`microsoft_sso`/`entra` → `microsoft`, `hubspot`/`hubspot_crm` → `hubspot`, `notion` → `notion`, `google`/`google_oauth`/`google_workspace` → `google`, `deel`/`deel_hr`/`deel_com` → `deel`
+- Sistemas internos (`greenhouse_auth`, `greenhouse_team`) retornan `NULL` → filtrados del array
+- La funcion se usa en el LATERAL join de `link_agg` para producir `linked_systems` limpio y deduplicado
+- Migracion: `20260405180048252_canonical-source-system-function-person360.sql`
+- Regla: nuevos source systems se agregan al CASE de la funcion, no al frontend
+
+Patron de resolucion:
+- Member facet: join directo por `identity_profile_id`
+- User facet: `LEFT JOIN LATERAL` selecciona el primer `client_users` activo (por `active DESC, created_at ASC`)
+- CRM facet: `LEFT JOIN LATERAL` selecciona el primer `contacts` linkeado
+- Aggregates: LATERAL subqueries para conteos y arrays
+
+Consumer principal: `src/lib/person-360/get-person-profile.ts` — tipo `Person360Row` mapea 1:1 con las columnas de la VIEW.
+
+## Delta 2026-04-05 — Profile fallback when person_360 has no row (TASK-255)
+
+- `GET /api/my/profile` ya no depende exclusivamente de `person_360`. Si la view no tiene fila para el usuario (e.g. `identity_profile_id` no linkeado aun), la route hace fallback a datos de sesion JWT (nombre, email, avatar).
+- Nuevo tipo `PersonProfileSummary` en `src/types/person-360.ts` y proyecciones `toPersonProfileSummary()` / `toPersonProfileSummaryFromSession()` en `src/lib/person-360/get-person-profile.ts`.
+- Patron: `person_360` sigue siendo la fuente canonica para perfil completo; el fallback de sesion es degradacion graceful, no un canal alternativo de datos.
+
 ## Purpose
 
 Define the first canonical PostgreSQL model that will support Greenhouse as:

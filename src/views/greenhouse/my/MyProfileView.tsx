@@ -1,54 +1,40 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import type { SyntheticEvent } from 'react'
 
-import Avatar from '@mui/material/Avatar'
+import dynamic from 'next/dynamic'
+
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
-import CardHeader from '@mui/material/CardHeader'
 import CircularProgress from '@mui/material/CircularProgress'
-import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
+import Tab from '@mui/material/Tab'
 import Typography from '@mui/material/Typography'
+import TabContext from '@mui/lab/TabContext'
+import TabPanel from '@mui/lab/TabPanel'
 
-import CustomAvatar from '@core/components/mui/Avatar'
+import CustomTabList from '@core/components/mui/TabList'
 
-interface ProfileData {
-  resolvedDisplayName: string | null
-  resolvedEmail: string | null
-  resolvedPhone: string | null
-  resolvedAvatarUrl: string | null
-  resolvedJobTitle: string | null
-  departmentName: string | null
-  jobLevel: string | null
-  employmentType: string | null
-  hireDate: string | null
-  hasMemberFacet: boolean
-  hasUserFacet: boolean
-  hasCrmFacet: boolean
-  linkedSystems: string[]
-}
+import type { PersonProfileSummary } from '@/types/person-360'
+import MyProfileSidebar from './my-profile/MyProfileSidebar'
 
-const INTEGRATION_LOGOS: Record<string, string> = {
-  microsoft: '/images/integrations/microsoft.svg',
-  notion: '/images/integrations/notion.svg',
-  hubspot: '/images/integrations/hubspot.svg'
-}
+// Lazy-loaded tabs
+const OverviewTab = dynamic(() => import('./my-profile/tabs/OverviewTab'))
+const SecurityTab = dynamic(() => import('./my-profile/tabs/SecurityTab'))
 
-const InfoRow = ({ icon, label, value }: { icon: string; label: string; value: string | null }) => (
-  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-    <i className={icon} style={{ fontSize: 16, color: 'var(--mui-palette-text-secondary)' }} />
-    <Box>
-      <Typography variant='caption' color='text.secondary'>{label}</Typography>
-      <Typography variant='body2'>{value || '—'}</Typography>
-    </Box>
-  </Box>
-)
+type ProfileTab = 'overview' | 'security'
+
+const TAB_CONFIG: { value: ProfileTab; label: string; icon: string }[] = [
+  { value: 'overview', label: 'Resumen', icon: 'tabler-user' },
+  { value: 'security', label: 'Seguridad', icon: 'tabler-lock' }
+]
 
 const MyProfileView = () => {
-  const [data, setData] = useState<ProfileData | null>(null)
+  const [data, setData] = useState<PersonProfileSummary | null>(null)
   const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState<ProfileTab>('overview')
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -64,13 +50,26 @@ const MyProfileView = () => {
 
   useEffect(() => { void load() }, [load])
 
-  if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress /></Box>
+  const handleTabChange = (_: SyntheticEvent, value: string) => {
+    setActiveTab(value as ProfileTab)
+  }
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+        <CircularProgress />
+      </Box>
+    )
+  }
 
   if (!data) {
     return (
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-        <CardContent sx={{ textAlign: 'center', py: 6 }}>
-          <Typography variant='h6'>Perfil no disponible</Typography>
+        <CardContent sx={{ textAlign: 'center', py: 6 }} role='status'>
+          <Typography variant='h6'>No pudimos cargar tu perfil</Typography>
+          <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
+            Intenta actualizar la pagina. Si el problema persiste, contacta al administrador.
+          </Typography>
         </CardContent>
       </Card>
     )
@@ -78,65 +77,41 @@ const MyProfileView = () => {
 
   return (
     <Grid container spacing={6}>
-      {/* Identity */}
-      <Grid size={{ xs: 12, md: 4 }}>
-        <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-          <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, py: 4 }}>
-            {data.resolvedAvatarUrl ? (
-              <Avatar src={data.resolvedAvatarUrl} sx={{ width: 80, height: 80 }} />
-            ) : (
-              <CustomAvatar color='primary' skin='light-static' sx={{ width: 80, height: 80, fontSize: 32 }}>
-                {(data.resolvedDisplayName || 'G')[0]}
-              </CustomAvatar>
-            )}
-            <Typography variant='h5'>{data.resolvedDisplayName || 'Colaborador'}</Typography>
-            <Typography variant='body2' color='text.secondary'>{data.resolvedEmail}</Typography>
-            {data.resolvedPhone && (
-              <Typography variant='body2' color='text.secondary'>{data.resolvedPhone}</Typography>
-            )}
-          </CardContent>
-        </Card>
+      {/* Sidebar — 4 cols */}
+      <Grid size={{ xs: 12, lg: 4 }}>
+        <MyProfileSidebar data={data} />
       </Grid>
 
-      {/* Professional */}
-      <Grid size={{ xs: 12, md: 8 }}>
-        <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-          <CardHeader title='Datos profesionales' avatar={<Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity' }}><i className='tabler-briefcase' style={{ fontSize: 20, color: 'var(--mui-palette-primary-main)' }} /></Avatar>} />
-          <Divider />
-          <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-            <InfoRow icon='tabler-id' label='Cargo' value={data.resolvedJobTitle} />
-            <InfoRow icon='tabler-building' label='Departamento' value={data.departmentName} />
-            <InfoRow icon='tabler-stairs' label='Nivel' value={data.jobLevel} />
-            <InfoRow icon='tabler-file-certificate' label='Tipo de contrato' value={data.employmentType} />
-            <InfoRow icon='tabler-calendar' label='Fecha de ingreso' value={data.hireDate} />
-          </CardContent>
-        </Card>
-      </Grid>
+      {/* Tabs — 8 cols */}
+      <Grid size={{ xs: 12, lg: 8 }}>
+        <TabContext value={activeTab}>
+          <Box sx={{ mb: 4 }}>
+            <CustomTabList
+              onChange={handleTabChange}
+              variant='scrollable'
+              pill='true'
+              aria-label='Secciones de mi perfil'
+            >
+              {TAB_CONFIG.map(tab => (
+                <Tab
+                  key={tab.value}
+                  value={tab.value}
+                  label={tab.label}
+                  icon={<i className={tab.icon} aria-hidden='true' />}
+                  iconPosition='start'
+                />
+              ))}
+            </CustomTabList>
+          </Box>
 
-      {/* Linked systems */}
-      <Grid size={{ xs: 12 }}>
-        <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-          <CardHeader title='Sistemas vinculados' avatar={<Avatar variant='rounded' sx={{ bgcolor: 'info.lightOpacity' }}><i className='tabler-plug-connected' style={{ fontSize: 20, color: 'var(--mui-palette-info-main)' }} /></Avatar>} />
-          <Divider />
-          <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-            {['microsoft', 'notion', 'hubspot'].map(sys => {
-              const linked = data.linkedSystems?.includes(sys) ?? false
+          <TabPanel value='overview' className='p-0'>
+            {activeTab === 'overview' && <OverviewTab data={data} />}
+          </TabPanel>
 
-              return (
-                <Box key={sys} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                  <Box
-                    component='img'
-                    src={INTEGRATION_LOGOS[sys]}
-                    alt={sys}
-                    sx={{ width: 24, height: 24, objectFit: 'contain', opacity: linked ? 1 : 0.5, filter: linked ? 'none' : 'grayscale(80%)' }}
-                  />
-                  <Typography variant='body2' color={linked ? 'text.primary' : 'text.disabled'} sx={{ textTransform: 'capitalize' }}>{sys}</Typography>
-                  <i className={linked ? 'tabler-check' : 'tabler-x'} style={{ fontSize: 14, marginLeft: 'auto', color: linked ? 'var(--mui-palette-success-main)' : 'var(--mui-palette-text-disabled)' }} />
-                </Box>
-              )
-            })}
-          </CardContent>
-        </Card>
+          <TabPanel value='security' className='p-0'>
+            {activeTab === 'security' && <SecurityTab />}
+          </TabPanel>
+        </TabContext>
       </Grid>
     </Grid>
   )

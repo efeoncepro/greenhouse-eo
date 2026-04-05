@@ -2,6 +2,77 @@
 
 ## 2026-04-05
 
+- **Normalizacion de source systems en person_360 — canonical_source_system()**:
+  - Funcion SQL `IMMUTABLE` `greenhouse_core.canonical_source_system()` normaliza `source_system` values: `azure_ad`/`azure-ad` → `microsoft`, `hubspot`/`hubspot_crm` → `hubspot`, sistemas internos → filtrados
+  - `person_360.linked_systems` ahora retorna `{hubspot,microsoft,notion}` en vez de `{azure_ad,azure-ad,greenhouse_auth,greenhouse_team,hubspot,hubspot_crm,notion}`
+  - Mi Perfil muestra Microsoft como vinculado correctamente (antes aparecia con X porque buscaba `'microsoft'` pero la DB tenia `'azure_ad'`)
+  - Migracion: `20260405180048252_canonical-source-system-function-person360.sql`
+  - Regla: nuevos source systems se agregan al CASE de la funcion SQL, no al frontend
+
+- **TASK-254 Operational Cron Durable Worker Migration — implementación completa**:
+  - 3 cron operativos worker-like (`outbox-react`, `outbox-react-delivery`, `projection-recovery`) migrados de Vercel scheduler a Cloud Run `ops-worker`
+  - Nuevo servicio `services/ops-worker/` con 4 endpoints HTTP (health + 3 reactive handlers), Dockerfile esbuild two-stage y deploy script idempotente
+  - Nuevo `src/lib/sync/reactive-run-tracker.ts` con run tracking institucional sobre `source_sync_runs` para auditar corridas del worker reactivo
+  - `vercel.json` reducido de 16 a 13 cron entries — las rutas API siguen como fallback manual sin schedule
+  - `getOperationsOverview()` ahora expone subsistema `Reactive Worker` con `lastRunAt`, `lastRunStatus` y señal de freshness
+  - Política de workload placement ampliada: cron con backlog, recovery o semántica de durabilidad deben correr en worker durable aunque no superen 30s
+  - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` actualizado a v1.2 con ops-worker, scheduler jobs y placement matrix
+  - Deploy a Cloud Run pendiente (requiere `bash services/ops-worker/deploy.sh` con GCP auth)
+
+- **TASK-254 Cloud Run deploy completado**:
+  - Cloud Run revision `ops-worker-00004-pmk` sirviendo 100% tráfico en `us-east4`
+  - 3 Cloud Scheduler jobs activos: `ops-reactive-process` (_/5), `ops-reactive-process-delivery` (2-59/5), `ops-reactive-recover` (_/15), timezone `America/Santiago`
+  - Problema ESM/CJS resuelto: `next-auth` y `bcryptjs` shimmed via esbuild `--alias` (el import chain `server.ts → … → auth.ts` arrastraba next-auth providers, que fallan en ESM bajo Node 22)
+  - IAM binding: `greenhouse-portal@` SA con `roles/run.invoker` sobre `ops-worker`
+  - deploy.sh actualizado: IAM binding idempotente + health check via `gcloud run services proxy` (no requiere service account impersonation)
+  - Invocación manual verificada: scheduler → OIDC → 200, 50 events processed en 758ms
+
+- **ISSUE-014 person_360 VIEW faltaba columnas enriched — resuelto**:
+  - Mi Perfil mostraba `hasMemberFacet: true` pero todos los campos enriched eran `null` (avatar, cargo, telefono, departamento)
+  - Causa raiz: la VIEW `person_360` en la DB era la version antigua (rollup-based) que no exponia `resolved_avatar_url`, `resolved_job_title`, `resolved_phone`, etc.
+  - Los datos estaban correctamente escritos por el Entra sync (TASK-256) pero la VIEW no los surfaceaba
+  - Fix: migracion `20260405164846570_person-360-v2-enriched-view.sql` reemplaza la VIEW con version v2 (LATERAL joins + resolved fields)
+  - Verificado con query directa: 7/8 usuarios internos con avatar, todos con cargo y member facet
+  - Documentado en GREENHOUSE_POSTGRES_CANONICAL_360_V1.md y GREENHOUSE_IDENTITY_ACCESS_V2.md
+
+- **TASK-256 Entra Profile Completeness — implementacion completa**:
+  - Entra sync ahora cierra el ciclo completo: match (OID/email/alias) → backfill OID → ensure identity_profile link → sync datos → sync avatar
+  - `fetchEntraUserPhoto()` en `graph-client.ts`: fetch foto de Microsoft Graph → upload a GCS → update `client_users.avatar_url`
+  - `ensureIdentityProfileLink()` en `profile-sync.ts`: crea identity_profile si no existe, linkea `client_users.identity_profile_id`
+  - Match cross-domain via `buildEfeonceEmailAliasCandidates()` (`@efeonce.org` ↔ `@efeoncepro.com`)
+  - Resultado: todos los usuarios internos activos tienen identity_profile linkeado, avatar sincronizado, y datos completos en person_360
+
+- **Staging deploy failures — 3 problemas resueltos (ISSUE-013)**:
+  - **Proyecto Vercel duplicado eliminado**: existía `prj_5zqdjJOz6OUQy7hiPh8xHZJj8tA8` en scope personal con 0 env vars y sin framework, cada push fallaba en paralelo al build real — eliminado via API
+  - **Variables Agent Auth agregadas a Vercel**: `AGENT_AUTH_SECRET` y `AGENT_AUTH_EMAIL` no existían en staging/preview — agregadas; endpoint agent-session ahora funciona en staging (HTTP 200)
+  - **VERCEL_AUTOMATION_BYPASS_SECRET manual eliminada**: otro agente había creado la variable con un valor incorrecto que sombreaba el secret real del sistema — eliminada; bypass SSO funciona
+  - Documentado en AGENTS.md (sección Vercel Deployment Protection + Proyecto único), CLAUDE.md, project_context.md, Handoff.md
+  - Regla nueva: NUNCA crear manualmente `VERCEL_AUTOMATION_BYPASS_SECRET` en Vercel — es auto-gestionada por el sistema
+
+- **Agent Auth — endpoint headless para agentes y E2E**:
+  - nuevo `POST /api/auth/agent-session` — genera JWT NextAuth válido dado un shared secret + email, sin login interactivo
+  - nuevo `scripts/playwright-auth-setup.mjs` — genera `.auth/storageState.json` con la cookie de sesión (modo API o Credentials)
+  - nueva función `getTenantAccessRecordForAgent()` en `src/lib/tenant/access.ts` — variante PG-first que no requiere `passwordHash`
+  - seguridad: desactivado sin `AGENT_AUTH_SECRET`, bloqueado en production por defecto, timing-safe comparison
+  - nuevas variables: `AGENT_AUTH_SECRET`, `AGENT_AUTH_EMAIL`, `AGENT_AUTH_ALLOW_PRODUCTION`
+  - documentado en AGENTS.md, CLAUDE.md, GREENHOUSE_IDENTITY_ACCESS_V2.md, proyecto_context.md y docs funcionales
+  - verificado localmente: endpoint retorna JWT válido, cookie autentica páginas protegidas
+
+- **TASK-255 Mi Perfil identity chain fix — completo**:
+  - `GET /api/my/profile` respondía 422 porque `memberId` no llegaba al JWT de sesión
+  - `src/lib/tenant/access.ts`: agregados `cu.member_id` y `cu.identity_profile_id` al SELECT y GROUP BY de BigQuery en `getIdentityAccessRecord()` — arregla credentials, Microsoft SSO y Google SSO
+  - `src/lib/auth.ts`: agregados `memberId`, `identityProfileId`, `spaceId`, `organizationId`, `organizationName` al return de credentials `authorize()`
+  - `src/app/api/my/profile/route.ts`: cambiado de `requireMyTenantContext` a `requireTenantContext` con fallback a session data
+  - nuevos: tipo `PersonProfileSummary`, proyecciones `toPersonProfileSummary()` y `toPersonProfileSummaryFromSession()` en `src/lib/person-360/get-person-profile.ts`
+  - validado con tsc, lint, 935 tests passing, y verificación manual en staging
+
+- **ISSUE-012 Reactive cron routes fail closed without CRON_SECRET — resuelto**:
+  - `requireCronAuth()` ahora autoriza primero tráfico válido de Vercel Cron (`x-vercel-cron` / `user-agent` `vercel-cron/*`)
+  - `CRON_SECRET` queda reservado para invocaciones bearer/manuales fuera de Vercel
+  - cuando el secret falta, las requests no-Vercel siguen fallando en cerrado con `503`
+  - nueva regresión focalizada en `src/lib/cron/require-cron-auth.test.ts`
+  - validado con Vitest focalizado (`8` tests passing) y `tsc --noEmit`
+
 - **ISSUE-009 Reactive event backlog can accumulate without Ops visibility — resuelto**:
   - nuevo reader `src/lib/operations/reactive-backlog.ts` para medir backlog reactivo oculto (`published` sin huella en `outbox_reactive_log`)
   - `getOperationsOverview()` ahora expone `kpis.hiddenReactiveBacklog` + bloque `reactiveBacklog`

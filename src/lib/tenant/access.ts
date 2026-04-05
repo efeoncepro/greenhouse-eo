@@ -260,6 +260,8 @@ const getIdentityAccessRecord = async ({
         cu.google_email,
         cu.full_name,
         cu.avatar_url,
+        cu.member_id,
+        cu.identity_profile_id,
         ARRAY_AGG(DISTINCT ura.role_code IGNORE NULLS ORDER BY ura.role_code) AS role_codes,
         ARRAY_AGG(DISTINCT route_group IGNORE NULLS ORDER BY route_group) AS route_groups,
         ARRAY_AGG(DISTINCT ups.project_id IGNORE NULLS ORDER BY ups.project_id) AS project_scopes,
@@ -316,6 +318,8 @@ const getIdentityAccessRecord = async ({
         cu.google_email,
         cu.full_name,
         cu.avatar_url,
+        cu.member_id,
+        cu.identity_profile_id,
         timezone,
         portal_home_path,
         cu.auth_mode,
@@ -364,6 +368,22 @@ export const getTenantAccessRecordByEmail = async (email: string) => {
   }
 
   return getIdentityAccessRecordByEmail(email)
+}
+
+/**
+ * Resolve a tenant record for agent/headless auth.
+ * Unlike getTenantAccessRecordByEmail, this does NOT require a passwordHash
+ * and does NOT fall through to BigQuery when passwordHash is missing.
+ * Meant for agent-session and E2E setup where no password validation is needed.
+ */
+export const getTenantAccessRecordForAgent = async (email: string) => {
+  const pgRow = await getSessionFromPostgresByEmail(email)
+
+  if (pgRow) {
+    return resolveTenantRuntimeAccess(normalizeTenantAccessRow(pgRow as TenantAccessRow))
+  }
+
+  return null
 }
 
 export const getTenantAccessRecordByMicrosoftOid = async (oid: string) => {

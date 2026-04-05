@@ -20,11 +20,13 @@ describe('requireCronAuth', () => {
   it('accepts the correct bearer token', () => {
     vi.stubEnv('CRON_SECRET', 'super-secret')
 
-    const { authorized, errorResponse } = requireCronAuth(new Request('https://example.com/api/cron/test', {
-      headers: {
-        authorization: 'Bearer super-secret'
-      }
-    }))
+    const { authorized, errorResponse } = requireCronAuth(
+      new Request('https://example.com/api/cron/test', {
+        headers: {
+          authorization: 'Bearer super-secret'
+        }
+      })
+    )
 
     expect(authorized).toBe(true)
     expect(errorResponse).toBeNull()
@@ -33,11 +35,13 @@ describe('requireCronAuth', () => {
   it('rejects an incorrect bearer token', async () => {
     vi.stubEnv('CRON_SECRET', 'super-secret')
 
-    const { authorized, errorResponse } = requireCronAuth(new Request('https://example.com/api/cron/test', {
-      headers: {
-        authorization: 'Bearer wrong-secret'
-      }
-    }))
+    const { authorized, errorResponse } = requireCronAuth(
+      new Request('https://example.com/api/cron/test', {
+        headers: {
+          authorization: 'Bearer wrong-secret'
+        }
+      })
+    )
 
     expect(authorized).toBe(false)
     expect(errorResponse?.status).toBe(401)
@@ -47,11 +51,13 @@ describe('requireCronAuth', () => {
   it('accepts vercel cron headers as the secondary factor', () => {
     vi.stubEnv('CRON_SECRET', 'super-secret')
 
-    const { authorized, errorResponse } = requireCronAuth(new Request('https://example.com/api/cron/test', {
-      headers: {
-        'x-vercel-cron': '1'
-      }
-    }))
+    const { authorized, errorResponse } = requireCronAuth(
+      new Request('https://example.com/api/cron/test', {
+        headers: {
+          'x-vercel-cron': '1'
+        }
+      })
+    )
 
     expect(authorized).toBe(true)
     expect(errorResponse).toBeNull()
@@ -60,24 +66,52 @@ describe('requireCronAuth', () => {
   it('accepts vercel cron user agents as the secondary factor', () => {
     vi.stubEnv('CRON_SECRET', 'super-secret')
 
-    const { authorized, errorResponse } = requireCronAuth(new Request('https://example.com/api/cron/test', {
-      headers: {
-        'user-agent': 'vercel-cron/1.0'
-      }
-    }))
+    const { authorized, errorResponse } = requireCronAuth(
+      new Request('https://example.com/api/cron/test', {
+        headers: {
+          'user-agent': 'vercel-cron/1.0'
+        }
+      })
+    )
 
     expect(authorized).toBe(true)
     expect(errorResponse).toBeNull()
   })
 
-  it('fails closed when CRON_SECRET is missing', async () => {
+  it('accepts vercel cron headers even when CRON_SECRET is missing', () => {
     vi.stubEnv('CRON_SECRET', '')
 
-    const { authorized, errorResponse } = requireCronAuth(new Request('https://example.com/api/cron/test', {
-      headers: {
-        'x-vercel-cron': '1'
-      }
-    }))
+    const { authorized, errorResponse } = requireCronAuth(
+      new Request('https://example.com/api/cron/test', {
+        headers: {
+          'x-vercel-cron': '1'
+        }
+      })
+    )
+
+    expect(authorized).toBe(true)
+    expect(errorResponse).toBeNull()
+  })
+
+  it('accepts vercel cron user agents even when CRON_SECRET is missing', () => {
+    vi.stubEnv('CRON_SECRET', '')
+
+    const { authorized, errorResponse } = requireCronAuth(
+      new Request('https://example.com/api/cron/test', {
+        headers: {
+          'user-agent': 'vercel-cron/1.0'
+        }
+      })
+    )
+
+    expect(authorized).toBe(true)
+    expect(errorResponse).toBeNull()
+  })
+
+  it('fails closed for non-vercel requests when CRON_SECRET is missing', async () => {
+    vi.stubEnv('CRON_SECRET', '')
+
+    const { authorized, errorResponse } = requireCronAuth(new Request('https://example.com/api/cron/test'))
 
     expect(authorized).toBe(false)
     expect(errorResponse?.status).toBe(503)

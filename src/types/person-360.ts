@@ -56,6 +56,23 @@ export interface Person360Resolved {
   jobTitle: string | null
 }
 
+/** Flat projection of Person360 for self-service profile views */
+export interface PersonProfileSummary {
+  resolvedDisplayName: string
+  resolvedEmail: string | null
+  resolvedPhone: string | null
+  resolvedAvatarUrl: string | null
+  resolvedJobTitle: string | null
+  departmentName: string | null
+  jobLevel: string | null
+  employmentType: string | null
+  hireDate: string | null
+  hasMemberFacet: boolean
+  hasUserFacet: boolean
+  hasCrmFacet: boolean
+  linkedSystems: string[]
+}
+
 export interface Person360 {
 
   // Canonical identity — THE one ID

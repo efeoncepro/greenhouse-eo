@@ -250,7 +250,16 @@ export const authOptions: NextAuthOptions = {
           authMode: tenant.authMode,
           provider: 'credentials',
           microsoftEmail: tenant.microsoftEmail,
-          googleEmail: tenant.googleEmail
+          googleEmail: tenant.googleEmail,
+
+          // Account 360
+          spaceId: tenant.spaceId ?? undefined,
+          organizationId: tenant.organizationId ?? undefined,
+          organizationName: tenant.organizationName ?? undefined,
+
+          // Collaborator identity
+          memberId: tenant.memberId ?? undefined,
+          identityProfileId: tenant.identityProfileId ?? undefined
         }
       }
     })

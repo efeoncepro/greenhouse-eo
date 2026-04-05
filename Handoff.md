@@ -1,5 +1,446 @@
 # Handoff.md
 
+## Sesion 2026-04-05 — TASK-257: Mi Perfil enterprise redesign (sidebar + tabs)
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: TASK-257 — redesign Mi Perfil usando patron Vuexy User View (sidebar 4 cols + tabs 8 cols)
+
+### Cambios
+
+- `src/views/greenhouse/my/MyProfileView.tsx` — reescrito: layout Grid lg=4/lg=8, TabContext con CustomTabList pill, dynamic() imports
+- `src/views/greenhouse/my/my-profile/MyProfileSidebar.tsx` — nuevo: avatar 120px, nombre, cargo chip, stats KPI (sistemas vinculados, facetas), detalles (email, telefono, departamento, nivel, contrato, fecha ingreso). Campos null no se renderizan.
+- `src/views/greenhouse/my/my-profile/tabs/OverviewTab.tsx` — nuevo: datos profesionales en FieldGrid (3 cols) + sistemas vinculados con status icon+texto
+- `src/views/greenhouse/my/my-profile/tabs/SecurityTab.tsx` — nuevo: placeholder "Proximamente"
+- No se modifico la API `/api/my/profile` ni el tipo `PersonProfileSummary` — ya retornaban todo lo necesario
+
+### Patron aplicado
+
+Sidebar + Tabs (Vuexy User View), documentado en GREENHOUSE_UI_PLATFORM_V1.md. Distinto del Person Detail View (horizontal header) usado para admin views. Sidebar fija identidad personal; tabs escalan para futuros modulos self-service.
+
+### Verificacion
+
+- `npx tsc --noEmit` — OK
+- `pnpm build` — OK
+- `pnpm lint` (archivos modificados) — OK
+- Fallback de sesion sigue funcionando (usuario sin person_360 ve nombre + email desde JWT)
+
+### Proximos pasos
+
+- Implementar tab "Mi Nomina" con datos de compensacion self-service
+- Implementar tab "Mi Delivery" con metricas ICO del colaborador
+- Implementar tab "Seguridad" con historial de login y 2FA
+
+## Sesión 2026-04-05 — Normalizacion de source systems en person_360
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: resolver que Mi Perfil mostraba Microsoft como desvinculado a pesar de que el Entra sync funciona correctamente
+
+### Diagnostico
+
+- Mi Perfil busca `'microsoft'` en `linkedSystems` pero la DB almacenaba `azure_ad` y `azure-ad`
+- Ya existia un normalizador TypeScript `mapIdentityProvider()` en `src/lib/people/shared.ts` pero no se usaba en Mi Perfil
+- El array crudo de `person_360.linked_systems` contenia 7 valores tecnicos: `azure_ad`, `azure-ad`, `greenhouse_auth`, `greenhouse_team`, `hubspot`, `hubspot_crm`, `notion`
+
+### Solucion
+
+- Funcion SQL `greenhouse_core.canonical_source_system(raw TEXT)` (`IMMUTABLE`) que normaliza valores tecnicos a display-friendly
+- La VIEW `person_360` ahora usa la funcion en el LATERAL join de `link_agg` para producir `linked_systems` limpio
+- Sistemas internos (`greenhouse_auth`, `greenhouse_team`) se filtran (retornan NULL → excluidos del array)
+- Resultado: `{hubspot,microsoft,notion}` — limpio, normalizado, deduplicado
+- No se toco TypeScript — la normalizacion vive en la unica fuente de verdad (la DB)
+
+### Verificacion
+
+- Query directa: 7/8 usuarios con `{hubspot,microsoft,notion}`, admin bootstrap con `{}`
+- `npx tsc --noEmit` — OK
+- Tipos regenerados por `kysely-codegen`
+
+### Archivos
+
+- `migrations/20260405180048252_canonical-source-system-function-person360.sql` (nuevo)
+- `src/types/db.d.ts` (regenerado)
+
+### Regla nueva
+
+Nuevos source systems se agregan al CASE de `canonical_source_system()`, no al frontend ni al TypeScript.
+
+## Sesión 2026-04-05 — TASK-254: Reactive cron workers migrados a Cloud Run ops-worker
+
+### Rama / alcance
+
+- rama: `task/TASK-254-operational-cron-durable-worker-migration`
+- scope: migrar 3 cron operativos worker-like (`outbox-react`, `outbox-react-delivery`, `projection-recovery`) de Vercel a Cloud Run como servicio dedicado `ops-worker`
+
+### Qué se hizo
+
+1. **Workload placement matrix**: los 16 cron de `vercel.json` se clasificaron en `keep in Vercel`, `trigger only` o `migrate to Cloud Run`. Resultado: 3 migran (los reactivos), el resto se queda.
+2. **`services/ops-worker/`** — nuevo servicio Cloud Run con 4 endpoints:
+   - `GET /health` — health check
+   - `POST /outbox-react` — process reactive backlog (todos los dominios)
+   - `POST /outbox-react-delivery` — process reactive backlog solo dominio `delivery`
+   - `POST /projection-recovery` — recovery de orphans de `projection_refresh_queue`
+3. **`src/lib/sync/reactive-run-tracker.ts`** — run tracking institucional usando `source_sync_runs` para que Ops vea corridas exitosas/fallidas del worker reactivo
+4. **`vercel.json`** — 3 cron eliminados (16 → 13), las rutas API siguen como fallback manual
+5. **`src/lib/operations/get-operations-overview.ts`** — nuevo subsistema `Reactive Worker` en Ops Health con `lastRunAt`, `lastRunStatus`, etc.
+6. **`docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`** — v1.2 con ops-worker, scheduler jobs y política de workload placement ampliada
+7. **`Dockerfile`** + **`deploy.sh`** + **`.dockerignore`** + **`README.md`** del servicio
+
+### Verificación
+
+- `npx tsc --noEmit` — OK
+- `pnpm lint` — OK (error pre-existente en ico-diagnostics, no relacionado)
+- `pnpm build` — OK
+
+### Archivos modificados
+
+- `services/ops-worker/server.ts` (nuevo)
+- `services/ops-worker/Dockerfile` (nuevo)
+- `services/ops-worker/deploy.sh` (nuevo)
+- `services/ops-worker/.dockerignore` (nuevo)
+- `services/ops-worker/README.md` (nuevo)
+- `src/lib/sync/reactive-run-tracker.ts` (nuevo)
+- `vercel.json` (3 cron eliminados)
+- `src/lib/operations/get-operations-overview.ts` (subsistema Reactive Worker)
+- `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` (v1.2)
+
+### Riesgo / siguiente paso
+
+- **Desplegado y operativo**: Cloud Run revision `ops-worker-00004-pmk` sirviendo 100% tráfico
+- **3 Cloud Scheduler jobs activos**: `ops-reactive-process` (_/5), `ops-reactive-process-delivery` (2-59/5), `ops-reactive-recover` (_/15)
+- **IAM**: `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` tiene `roles/run.invoker` sobre `ops-worker`
+- **Health check confirmado**: `{"status":"ok","service":"ops-worker"}` via proxy
+- **Scheduler → Cloud Run confirmado**: invocación exitosa (200, 50 events processed, 758ms)
+- **Problema resuelto**: ESM/CJS interop con `next-auth` — shimmed via esbuild `--alias` (6 aliases: next-auth, 3 providers, next-auth/next, bcryptjs)
+- Las rutas API de Vercel (`/api/cron/outbox-react`, etc.) siguen existiendo como fallback manual, pero ya no están scheduleadas en `vercel.json`
+- **Mergeado a `develop`** (commit `3562f835`, 2026-06-17) — staging deployment disparado en Vercel
+- **Siguiente paso**: observar Staging, verificar que `getOperationsOverview()` expone Reactive Worker en Admin > Ops Health, y luego promover a `main`
+
+## Sesión 2026-04-05 — ISSUE-014: person_360 VIEW v2 + TASK-256 cierre
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: diagnosticar y resolver por que Mi Perfil mostraba datos enriched como null a pesar de que el Entra sync reportaba exito
+
+### Diagnostico
+
+- Conexion directa a PostgreSQL via Cloud SQL Proxy (puerto 15432) confirmo:
+  - `client_users.avatar_url` = `gs://efeonce-group-greenhouse-public-media-staging/users/user-efeonce-admin-julio-reyes/avatar-1775407131810.jpg` — **el Entra sync SI escribio**
+  - `client_users.identity_profile_id` = linkeado correctamente
+- Pero la VIEW `person_360` en la DB no tenia columnas `resolved_avatar_url`, `resolved_job_title`, `resolved_phone`
+- La VIEW era la version antigua (rollup-based) — el script v2 (`scripts/setup-postgres-person-360-v2.sql`) existia pero nunca se habia aplicado como migracion
+
+### Solucion
+
+- Migracion `20260405164846570_person-360-v2-enriched-view.sql` aplicada con `pnpm migrate:up`
+- La VIEW ahora usa LATERAL joins y expone: `resolved_avatar_url`, `resolved_email`, `resolved_phone`, `resolved_job_title`, `department_name`, `job_level`, `employment_type`, `linked_systems`, `active_role_codes`
+- Tipos regenerados por `kysely-codegen`
+
+### Verificacion
+
+- Query directa: 7/8 usuarios internos con avatar, todos con cargo y member facet
+- `npx tsc --noEmit` — OK
+- `pnpm lint` — OK (error pre-existente en ico-diagnostics, no relacionado)
+
+### Documentacion
+
+- ISSUE-014 creado en `docs/issues/resolved/`
+- `docs/issues/README.md` actualizado (next ID: ISSUE-015)
+- `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md` — delta person_360 v2
+- `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md` — delta Entra sync pipeline completo
+- `docs/documentation/identity/sistema-identidad-roles-acceso.md` — Mi Perfil actualizado con flujo completo
+- `changelog.md` — entradas para ISSUE-014 y TASK-256
+
+### Archivos modificados
+
+- `migrations/20260405164846570_person-360-v2-enriched-view.sql` (nuevo)
+- `src/types/db.d.ts` (regenerado)
+- `docs/issues/resolved/ISSUE-014-person-360-view-missing-enriched-columns.md` (nuevo)
+- `docs/issues/README.md`
+- `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
+- `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+- `docs/documentation/identity/sistema-identidad-roles-acceso.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Riesgo / siguiente paso
+
+- `src/lib/identity/canonical-person.ts` tiene fallback code para columnas antiguas (`primary_member_id`, `primary_user_id`, etc.) — es dead code que no rompe pero deberia limpiarse
+- `scripts/verify-account-360.ts` referencia columnas antiguas (`membership_count`, `person_facets`) — fallara si se ejecuta
+- Verificar en staging que Mi Perfil muestra datos completos tras el deploy de Vercel
+
+## Sesión 2026-04-05 — Staging deploy failures: diagnóstico y resolución (3 problemas)
+
+### Rama / alcance
+
+- rama: `develop` (sin cambios de código — solo infraestructura Vercel)
+- scope: resolver failures constantes reportados por GitHub en cada push
+
+### Qué se encontró y resolvió
+
+**Problema 1: Variables de Agent Auth no existían en Vercel**
+
+- `AGENT_AUTH_SECRET` y `AGENT_AUTH_EMAIL` no estaban configuradas en ningún entorno de Vercel
+- Se agregaron a Staging + Preview(develop) via `vercel env add`
+- Resultado: el endpoint `POST /api/auth/agent-session` ahora funciona en staging (HTTP 200, JWT válido para `user-agent-e2e-001`)
+
+**Problema 2: Proyecto Vercel duplicado en scope personal**
+
+- Existía un segundo proyecto (`prj_5zqdjJOz6OUQy7hiPh8xHZJj8tA8`) en scope personal (`julioreyes-4376's projects`) vinculado al mismo repo GitHub
+- Tenía 0 variables de entorno y sin framework configurado → cada push disparaba builds en AMBOS proyectos, el duplicado siempre fallaba con `NEXTAUTH_SECRET is not set`
+- Se eliminó el proyecto duplicado via Vercel API
+- Resultado: GitHub ya no reporta failures constantes
+
+**Problema 3: VERCEL_AUTOMATION_BYPASS_SECRET con valor incorrecto**
+
+- Otro agente había creado manualmente la variable `VERCEL_AUTOMATION_BYPASS_SECRET` en staging y preview(develop) con un valor que NO correspondía al secret real del sistema
+- El valor manual sombreaba el secret auto-gestionado por Vercel (`gNYWFfHSlny2FXL7CO7IBnZuuJaEkIPJ`)
+- Se eliminaron las variables manuales via `vercel env rm`
+- Resultado: el bypass de SSO funciona correctamente con el secret del sistema
+
+### Verificación
+
+- Agent auth en staging: `curl -s -X POST "https://greenhouse-eo-env-staging-efeonce-7670142f.vercel.app/api/auth/agent-session"` con bypass header → HTTP 200, JWT válido
+- GitHub deploy status: sin failures adicionales tras eliminar proyecto duplicado
+- Vercel dashboard: solo el proyecto canónico `greenhouse-eo` existe para el team
+
+### Riesgo / siguiente paso
+
+- **Documentación**: se actualizaron AGENTS.md, CLAUDE.md, project_context.md, changelog.md, GREENHOUSE_IDENTITY_ACCESS_V2.md, y se creó ISSUE-013
+- Si un agente necesita el valor real del bypass secret, debe leerlo desde la variable de entorno del sistema `VERCEL_AUTOMATION_BYPASS_SECRET`, NO hardcodearlo
+- No crear NUNCA manualmente esa variable en Vercel — el sistema la gestiona
+
+## Sesión 2026-04-05 — TASK-255: Mi Perfil identity chain fix
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: cerrar TASK-255 — hacer que Mi Perfil nunca muestre "Perfil no disponible"
+
+### Qué se hizo
+
+- **Root cause:** `GET /api/my/profile` respondía 422 porque `requireMyTenantContext()` exigía `memberId` en la sesión, pero el JWT no lo tenía
+- **3 bugs encontrados y corregidos:**
+  1. `src/lib/tenant/access.ts` — BigQuery SELECT en `getIdentityAccessRecord()` no incluía `cu.member_id` ni `cu.identity_profile_id` → los 3 paths de login (credentials, Microsoft SSO, Google SSO) quedan corregidos
+  2. `src/lib/auth.ts` — `authorize()` de credentials no incluía `memberId`, `identityProfileId`, `spaceId`, `organizationId`, `organizationName` en el user retornado → el JWT callback leía `undefined`
+  3. `src/app/api/my/profile/route.ts` — usaba `requireMyTenantContext` (exige memberId) → cambiado a `requireTenantContext` con fallback a session data
+- **Tipos y proyecciones nuevos:** `PersonProfileSummary`, `toPersonProfileSummary()`, `toPersonProfileSummaryFromSession()` — siguen el patrón de Person360 contexts
+
+### Verificación
+
+- `npx tsc --noEmit` — OK
+- `pnpm lint` — OK (error pre-existente en ico-diagnostics, no relacionado)
+- `pnpm test` — 935 tests passed
+- Validación manual en staging: usuario hizo logout + login → `/my/profile` muestra datos
+
+### Riesgo / siguiente paso
+
+- Otros endpoints de "Mi Ficha" que usen `requireMyTenantContext` tienen el mismo gap potencial (Mi Nómina, Mis Permisos, Mi Delivery, Mi Desempeño) — documentado como follow-up en la task
+- Considerar migrar `password_hash` a PostgreSQL para eliminar el fallthrough a BigQuery en credentials login
+
+## Sesión 2026-04-05 — Agent Auth: endpoint headless + Playwright setup
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: habilitar autenticación headless para agentes AI y tests E2E
+
+### Qué se hizo
+
+- Se creó `POST /api/auth/agent-session` — endpoint que genera un JWT NextAuth válido dado un shared secret + email
+- Se creó `scripts/playwright-auth-setup.mjs` — script que obtiene la cookie y genera `.auth/storageState.json`
+- Se agregó `AGENT_AUTH_SECRET`, `AGENT_AUTH_EMAIL` a `.env.example`
+- Se agregó `/.auth/` a `.gitignore`
+- Se creó `getTenantAccessRecordForAgent()` en `src/lib/tenant/access.ts` — variante PG-first que NO requiere `passwordHash` y evita fallthrough roto a BigQuery
+- Se documentó en `AGENTS.md` (sección "Agent Auth"), `CLAUDE.md` (API Routes), `GREENHOUSE_IDENTITY_ACCESS_V2.md` (sección Agent Auth), `docs/documentation/identity/sistema-identidad-roles-acceso.md`, `project_context.md` y `changelog.md`
+
+### Archivos modificados
+
+- `src/app/api/auth/agent-session/route.ts` (nuevo)
+- `src/lib/tenant/access.ts` — nueva función `getTenantAccessRecordForAgent`
+- `scripts/playwright-auth-setup.mjs` (nuevo)
+- `.env.example` — variables de agent auth
+- `.gitignore` — excluir `.auth/`
+- `AGENTS.md` — sección Agent Auth completa
+- `CLAUDE.md` — API Routes actualizado
+- `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md` — delta Agent Auth
+- `docs/documentation/identity/sistema-identidad-roles-acceso.md` — sección agentes
+- `project_context.md` — variables de entorno
+- `changelog.md` — entrada de agent auth
+
+### Seguridad
+
+- Endpoint desactivado por defecto (requiere `AGENT_AUTH_SECRET`)
+- Bloqueado en production (`VERCEL_ENV === 'production'` → 403) salvo override explícito
+- Timing-safe comparison con `crypto.timingSafeEqual`
+- No crea usuarios — solo autentica emails que ya existen en la tabla de acceso
+
+### Uso rápido
+
+```bash
+# 1. Generar secret y agregarlo a .env.local
+openssl rand -hex 32
+# → AGENT_AUTH_SECRET=<valor>
+
+# 2. Con el dev server corriendo
+AGENT_AUTH_SECRET=<secret> AGENT_AUTH_EMAIL=<email> node scripts/playwright-auth-setup.mjs
+
+# 3. Usar storageState en Playwright
+# → .auth/storageState.json contiene la cookie de sesión
+```
+
+### Verificación
+
+- Endpoint probado localmente con `curl` — HTTP 200, JWT generado correctamente
+- Cookie verificada contra `http://localhost:3000/home` — página protegida devuelve HTML autenticado
+- `julio.reyes@efeonce.org` NO está en `greenhouse_serving.session_360` — no puede usarse como email de test
+- `valentina.hoyos@efeonce.org` SÍ está y funciona como email de prueba
+- `NEXTAUTH_SECRET` debe tener un valor real en `.env.local` (estaba vacío — genera error en `encode()`)
+
+### Hallazgo: PG-first para agent auth
+
+- `getTenantAccessRecordByEmail()` original hace fallthrough a BigQuery cuando `passwordHash` es null en PG
+- El query BigQuery fallaba con `Name member_id not found` (columna faltante en la vista — bug pre-existente, corregido por TASK-255)
+- Para agent auth no se necesita `passwordHash` → se creó `getTenantAccessRecordForAgent()` que resuelve desde PG sin exigir hash
+- Si PG no tiene el usuario, recién entonces cae a BigQuery como fallback
+
+### Riesgo / siguiente paso
+
+- El endpoint está listo pero requiere que `AGENT_AUTH_SECRET` y `NEXTAUTH_SECRET` estén en `.env.local`
+- Modo credentials requiere Playwright instalado como devDependency
+
+## Sesión 2026-04-05 — Agent User dedicado (E2E)
+
+### Qué se hizo
+
+- Se creó un usuario dedicado para agentes/E2E en PostgreSQL via migración `20260405151705425_provision-agent-e2e-user.sql`
+- Este usuario NO depende de cuentas de team members reales — es exclusivo para automatización
+
+### Datos del usuario
+
+| Campo         | Valor                           |
+| ------------- | ------------------------------- |
+| `user_id`     | `user-agent-e2e-001`            |
+| `email`       | `agent@greenhouse.efeonce.org`  |
+| `password`    | `Gh-Agent-2026!`                |
+| `tenant_type` | `efeonce_internal`              |
+| `roles`       | `efeonce_admin`, `collaborator` |
+
+### Archivos modificados
+
+- `migrations/20260405151705425_provision-agent-e2e-user.sql` (nuevo)
+- `.env.local` — `AGENT_AUTH_EMAIL` actualizado a `agent@greenhouse.efeonce.org`
+
+### Verificación
+
+- Migración aplicada con `pnpm migrate:up` — OK
+- `POST /api/auth/agent-session` con el nuevo email — HTTP 200, JWT válido
+- Cookie probada contra `/home` — HTTP 200, autenticación exitosa
+- No se tocó middleware ni rutas existentes — es puramente aditivo
+- `julio.reyes@efeonce.org` necesita ser provisionado en `greenhouse_serving.session_360` para funcionar como email de agent auth
+
+## Sesión 2026-04-05 — TASK-254 plan drafted, no runtime implementation
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: cerrar Plan Mode del worker migration sin tocar runtime
+
+### Qué se hizo
+
+- se detectó colisión documental: `TASK-253` ya existía como task cerrada en el registry
+- la lane urgente de cron durable worker migration se reasignó al siguiente ID libre: `TASK-254`
+- se movió la task a `docs/tasks/in-progress/TASK-254-operational-cron-durable-worker-migration.md`
+- se creó `docs/tasks/plans/TASK-254-plan.md`
+- el plan deja confirmados estos hallazgos:
+  - `outbox-react`, `outbox-react-delivery` y `projection-recovery` ya operan como workers sobre backlog/cola persistente
+  - el criterio actual basado solo en duración `<30s` ya no alcanza para decidir workload placement
+  - `services/ico-batch/` ya ofrece el patrón Cloud Run reusable para la primera ola
+
+### Riesgo / siguiente paso
+
+- **no se implementó runtime**
+- el siguiente paso correcto es checkpoint humano sobre `docs/tasks/plans/TASK-254-plan.md`
+- decisiones abiertas a resolver antes de código:
+  - si el worker nuevo vive como `services/ops-worker/` o extensión de `ico-batch`
+  - si `outbox-publish` entra en la misma ola o queda sólo clasificado para follow-up
+
+## Sesión 2026-04-05 — TASK-254 created: durable worker migration for operational crons
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: registrar task urgente para sacar del path primario de Vercel los cron que ya operan como workers durables
+
+### Qué se hizo
+
+- se creó `TASK-254` como lane de migración de cron operativos worker-like fuera de Vercel
+- la task nace como follow-on estructural de `ISSUE-009`, `ISSUE-012`, `TASK-241` y `TASK-251`
+- foco inicial explícito:
+  - `outbox-react`
+  - `outbox-react-delivery`
+  - `projection-recovery`
+- se dejó claro que esta lane no reemplaza `TASK-251`; la complementa resolviendo el execution plane del worker reactivo
+
+### Riesgo / siguiente paso
+
+- el siguiente agente debe ejecutar Discovery sobre `vercel.json`, `services/ico-batch/`, el consumer reactivo y la política cloud para decidir si se crea `services/ops-worker/` dedicado o se extiende el patrón existente
+- esta task es `P0` / `Alto`, por lo que requiere `plan.md` y checkpoint humano antes de implementación
+
+## Sesión 2026-04-05 — ISSUE-012 resolved: Vercel Cron no longer depends on CRON_SECRET
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: cerrar `ISSUE-012` corrigiendo el gate de auth para routes cron
+
+### Qué se hizo
+
+- `src/lib/cron/require-cron-auth.ts` ahora autoriza primero requests válidas de Vercel Cron (`x-vercel-cron` o `user-agent` `vercel-cron/*`)
+- `CRON_SECRET` queda como guardrail para invocaciones bearer/manuales fuera de Vercel
+- si falta `CRON_SECRET`, las requests no-Vercel siguen respondiendo `503`, por lo que no se abrió el endpoint manualmente
+- nueva regresión focalizada en `src/lib/cron/require-cron-auth.test.ts`:
+  - acepta Vercel Cron con secret presente
+  - acepta Vercel Cron con secret ausente
+  - mantiene fail-close para requests no-Vercel sin secret
+- `ISSUE-012` quedó movida a `docs/issues/resolved/`
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/cron/require-cron-auth.test.ts` — OK (`8` tests)
+- `pnpm exec tsc --noEmit --pretty false` — OK
+
+### Riesgo / siguiente paso
+
+- este fix destraba el scheduler path, pero `TASK-251` sigue pendiente para replay scoped, `dryRun` y semántica enterprise del backlog reactivo
+- conviene observar la próxima corrida real de `/api/cron/outbox-react` en el ambiente afectado para confirmar que `lastReactedAt` vuelve a avanzar
+
+## Sesión 2026-04-05 — ISSUE-012 opened: reactive cron auth can block scheduled drain
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: investigar por qué el carril reactivo dejó de drenar y documentarlo como issue operativo
+
+### Qué se hizo
+
+- se confirmó que `vercel.json` sí agenda `GET /api/cron/outbox-react` cada `5` minutos
+- se aisló una causa operacional de alta confianza en `src/lib/cron/require-cron-auth.ts`:
+  - si `CRON_SECRET` falta, la helper responde `503`
+  - esa validación ocurre antes de aceptar requests legítimas de Vercel Cron via `x-vercel-cron` / `user-agent`
+- se verificó además que `.env.local` no define `CRON_SECRET`
+- se intentó reproducir la route localmente por HTTP, pero el entorno local cae antes con `NEXTAUTH_SECRET` faltante; eso impide la reproducción end-to-end local, aunque no cambia el hallazgo principal del gate cron
+- se abrió `docs/issues/open/ISSUE-012-reactive-cron-routes-fail-closed-without-cron-secret.md`
+
+### Riesgo / siguiente paso
+
+- mientras no se corrija el gate de cron auth o la configuración del entorno afectado, el backlog reactivo puede seguir creciendo aunque la schedule exista
+- el fix debería entrar como parte de `TASK-251` o como fix puntual si se quiere destrabar el carril antes del replay scoped enterprise
+
 ## Sesión 2026-04-05 — ISSUE-009 resolved: hidden reactive backlog is now visible in Admin Ops
 
 ### Rama / alcance

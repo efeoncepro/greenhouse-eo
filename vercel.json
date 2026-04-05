@@ -33,24 +33,12 @@
       "schedule": "30 7 * * *"
     },
     {
-      "path": "/api/cron/outbox-react",
-      "schedule": "*/5 * * * *"
-    },
-    {
-      "path": "/api/cron/outbox-react-delivery",
-      "schedule": "*/5 * * * *"
-    },
-    {
       "path": "/api/cron/webhook-dispatch",
       "schedule": "*/2 * * * *"
     },
     {
       "path": "/api/cron/email-delivery-retry",
       "schedule": "*/5 * * * *"
-    },
-    {
-      "path": "/api/cron/projection-recovery",
-      "schedule": "*/15 * * * *"
     },
     {
       "path": "/api/cron/nubox-balance-sync",

@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import type { Person360 } from '@/types/person-360'
+import type { Person360, PersonProfileSummary } from '@/types/person-360'
 
 type Person360Row = {
 
@@ -214,3 +214,50 @@ export const getPersonProfileByUserId = async (userId: string): Promise<Person36
 
   return rows[0] ? normalizeRow(rows[0]) : null
 }
+
+/**
+ * Resolve an avatar URL for the frontend.
+ * Stored as gs:// in the DB; served via /api/media/users/{userId}/avatar proxy.
+ */
+const resolveAvatarUrl = (avatarUrl: string | null, userId: string | null): string | null => {
+  if (!avatarUrl) return null
+  if (avatarUrl.startsWith('gs://') && userId) return `/api/media/users/${userId}/avatar`
+
+  return avatarUrl
+}
+
+/** Flat projection of Person360 for self-service profile views */
+export const toPersonProfileSummary = (p: Person360): PersonProfileSummary => ({
+  resolvedDisplayName: p.resolved.displayName,
+  resolvedEmail: p.resolved.email,
+  resolvedPhone: p.resolved.phone,
+  resolvedAvatarUrl: resolveAvatarUrl(p.resolved.avatarUrl, p.userFacet?.userId ?? null),
+  resolvedJobTitle: p.resolved.jobTitle,
+  departmentName: p.memberFacet?.departmentName ?? null,
+  jobLevel: p.memberFacet?.jobLevel ?? null,
+  employmentType: p.memberFacet?.employmentType ?? null,
+  hireDate: p.memberFacet?.hireDate ?? null,
+  hasMemberFacet: p.hasMemberFacet,
+  hasUserFacet: p.hasUserFacet,
+  hasCrmFacet: p.hasCrmFacet,
+  linkedSystems: p.linkedSystems
+})
+
+/** Fallback when person_360 has no row — uses session data so profile is never empty */
+export const toPersonProfileSummaryFromSession = (
+  user: { name?: string | null; email?: string | null; image?: string | null; avatarUrl?: string | null }
+): PersonProfileSummary => ({
+  resolvedDisplayName: user.name ?? 'Colaborador',
+  resolvedEmail: user.email ?? null,
+  resolvedPhone: null,
+  resolvedAvatarUrl: user.avatarUrl ?? user.image ?? null,
+  resolvedJobTitle: null,
+  departmentName: null,
+  jobLevel: null,
+  employmentType: null,
+  hireDate: null,
+  hasMemberFacet: false,
+  hasUserFacet: true,
+  hasCrmFacet: false,
+  linkedSystems: []
+})

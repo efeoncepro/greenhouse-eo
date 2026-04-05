@@ -302,4 +302,13 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-250` | `to-do` | Payroll Export Email React Key Warning Cleanup | `docs/tasks/to-do/TASK-250-payroll-export-email-react-key-warning.md` |
 | `TASK-251` | `to-do` | Reactive Control Plane Backlog Observability & Replay | `docs/tasks/to-do/TASK-251-reactive-control-plane-backlog-observability-replay.md` |
 | `TASK-252` | `to-do` | Admin Center Ops Copilot | `docs/tasks/to-do/TASK-252-admin-center-ops-copilot.md` |
+| `TASK-254` | `in-progress` | Operational Cron Durable Worker Migration | `docs/tasks/in-progress/TASK-254-operational-cron-durable-worker-migration.md` |
 | `TASK-253` | `complete` | Identity Spec Residual Gaps (Approval Snapshot + Audit Events) | `docs/tasks/complete/TASK-253-identity-spec-residual-gaps.md` |
+| `TASK-255` | `complete` | Mi Perfil: fix identity chain so profile never shows "Perfil no disponible" | `docs/tasks/complete/TASK-255-mi-perfil-identity-chain-fix.md` |
+| `TASK-256` | `complete` | Entra Profile Completeness: avatar sync + identity link for all internal users | `docs/tasks/complete/TASK-256-entra-profile-completeness-avatar-identity-link.md` |
+| `TASK-257` | `to-do` | Mi Perfil: enterprise redesign con patron Vuexy User View (sidebar + tabs) | `docs/tasks/to-do/TASK-257-mi-perfil-enterprise-redesign.md` |
+| `TASK-258` | `to-do` | Migrar sync-conformed + sync-conformed-recovery a ops-worker | `docs/tasks/to-do/TASK-258-migrate-sync-conformed-to-ops-worker.md` |
+| `TASK-259` | `to-do` | Migrar entra-profile-sync a ops-worker | `docs/tasks/to-do/TASK-259-migrate-entra-profile-sync-to-ops-worker.md` |
+| `TASK-260` | `to-do` | Migrar nubox-sync + ico-member-sync a ops-worker | `docs/tasks/to-do/TASK-260-migrate-nubox-sync-ico-member-sync-to-ops-worker.md` |
+| `TASK-261` | `to-do` | Migrar webhook-dispatch a ops-worker | `docs/tasks/to-do/TASK-261-migrate-webhook-dispatch-to-ops-worker.md` |
+| `TASK-262` | `to-do` | Migrar outbox-publish a ops-worker | `docs/tasks/to-do/TASK-262-migrate-outbox-publish-to-ops-worker.md` |

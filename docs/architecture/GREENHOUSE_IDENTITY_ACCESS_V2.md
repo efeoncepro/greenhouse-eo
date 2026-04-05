@@ -1,5 +1,203 @@
 # Greenhouse Identity & Access Architecture V2
 
+## Delta 2026-04-05 — Entra sync cierra ciclo completo: avatar + identity link + person_360 v2 (TASK-256 / ISSUE-014)
+
+### Entra sync pipeline (completo)
+
+El cron `entra-profile-sync` ahora ejecuta el ciclo completo para cada usuario interno:
+
+1. **Match**: OID primero → email directo → alias email via `buildEfeonceEmailAliasCandidates()` (cruza `@efeonce.org` ↔ `@efeoncepro.com`)
+2. **Backfill OID**: si el match fue por email, backfill `microsoft_oid` en `client_users` para futuros syncs
+3. **Update client_users**: sync `full_name`, `active`/`status` desde Entra `accountEnabled`
+4. **Ensure identity_profile link**: si `client_users.identity_profile_id` es NULL:
+   - Busca `identity_profiles` por `canonical_email`
+   - Si existe → linkea. Si no existe → crea uno nuevo y linkea.
+5. **Update identity_profiles**: sync `job_title`, `full_name`, `canonical_email`
+6. **Update members**: sync `role_title`, `location_country`, `location_city`, `phone`
+7. **Sync avatar**: fetch foto de Microsoft Graph (`/users/{oid}/photo/$value`) → upload a GCS via `uploadGreenhouseMediaAsset()` → update `client_users.avatar_url` + BQ via `setUserAvatarAssetPath()`
+
+### person_360 VIEW v2
+
+La VIEW `greenhouse_serving.person_360` fue reemplazada para exponer campos enriched:
+- `resolved_avatar_url` (de `client_users.avatar_url`, sincronizado desde Graph via GCS)
+- `resolved_job_title`, `resolved_phone`, `resolved_email`
+- `department_name`, `job_level`, `employment_type`, `linked_systems`, `active_role_codes`
+
+Migracion: `20260405164846570_person-360-v2-enriched-view.sql`
+
+### Resultado
+
+- Todo usuario interno activo tiene `identity_profile_id` linkeado despues del cron
+- `person_360` retorna fila con datos enriched para todos los usuarios internos
+- Mi Perfil muestra avatar, cargo, telefono, departamento, y sistemas vinculados
+- 7/8 usuarios internos tienen avatar sincronizado desde Microsoft Graph
+
+### Normalizacion de source systems
+
+Funcion SQL `greenhouse_core.canonical_source_system(raw TEXT)` normaliza `source_system` values a nombres display-friendly en la VIEW `person_360`:
+
+| Raw DB values | Canonical | Mostrado en UI |
+|---|---|---|
+| `azure_ad`, `azure-ad`, `microsoft_sso`, `entra` | `microsoft` | Si |
+| `hubspot`, `hubspot_crm` | `hubspot` | Si |
+| `notion` | `notion` | Si |
+| `google`, `google_oauth`, `google_workspace` | `google` | Si |
+| `deel`, `deel_hr`, `deel_com` | `deel` | Si |
+| `greenhouse_auth`, `greenhouse_team` | `NULL` | No (filtrado) |
+
+Regla: nuevos source systems se agregan al CASE de la funcion SQL, no al frontend ni al TypeScript.
+
+### Source files
+
+- `src/lib/entra/graph-client.ts` — `fetchEntraUserPhoto()`
+- `src/lib/entra/profile-sync.ts` — sync engine con avatar + identity link
+- `src/app/api/cron/entra-profile-sync/route.ts` — cron handler
+- `src/lib/tenant/internal-email-aliases.ts` — alias matching cross-domain
+- `greenhouse_core.canonical_source_system()` — funcion SQL de normalizacion
+
+## Delta 2026-04-05 — Agent Auth (headless session for agents & E2E)
+
+### Endpoint
+
+- `POST /api/auth/agent-session`
+- Source: `src/app/api/auth/agent-session/route.ts`
+
+### Purpose
+
+Generate a valid NextAuth JWT session cookie without interactive login. Designed for:
+
+- AI coding agents that need to test authenticated pages
+- Playwright E2E tests that need to skip the login form
+- Any headless automation that requires a valid session
+
+### Security model
+
+| Guard                         | Behavior                                              |
+| ----------------------------- | ----------------------------------------------------- |
+| `AGENT_AUTH_SECRET` not set   | Endpoint returns 404 (invisible)                      |
+| `VERCEL_ENV === 'production'` | Returns 403 unless `AGENT_AUTH_ALLOW_PRODUCTION=true` |
+| Secret comparison             | `crypto.timingSafeEqual` — timing-safe                |
+| Email not found               | 404 (user must exist in tenant access table)          |
+
+### Request / Response
+
+```
+POST /api/auth/agent-session
+Content-Type: application/json
+
+{ "secret": "<AGENT_AUTH_SECRET>", "email": "user@example.com" }
+```
+
+```json
+{
+  "cookieName": "next-auth.session-token",
+  "cookieValue": "<JWT>",
+  "email": "user@example.com",
+  "userId": "user-xxx",
+  "portalHomePath": "/home"
+}
+```
+
+### Token shape
+
+The JWT is generated via `next-auth/jwt` `encode()` with the same payload shape as a normal login session — all tenant fields (roleCodes, authorizedViews, projectScopes, etc.) are populated from the tenant access record.
+
+### Playwright setup script
+
+`scripts/playwright-auth-setup.mjs` — two modes:
+
+- **API mode** (default): calls `/api/auth/agent-session`, no browser needed
+- **Credentials mode** (`AGENT_AUTH_MODE=credentials`): opens browser, fills login form
+
+Output: `.auth/storageState.json` — compatible with Playwright's `storageState` option.
+
+### Dedicated agent user
+
+A dedicated PostgreSQL-provisioned user exists exclusively for agent and E2E test sessions. This avoids using personal accounts for automated workflows.
+
+| Field           | Value                                            |
+| --------------- | ------------------------------------------------ |
+| `user_id`       | `user-agent-e2e-001`                             |
+| `email`         | `agent@greenhouse.efeonce.org`                   |
+| `password`      | `Gh-Agent-2026!`                                 |
+| `password_hash` | bcrypt cost-12 (`$2b$12$Du4oz...`)               |
+| `tenant_type`   | `efeonce_internal`                               |
+| `auth_mode`     | `credentials`                                    |
+| `roles`         | `efeonce_admin` + `collaborator`                 |
+| `timezone`      | `America/Santiago`                               |
+| `migration`     | `20260405151705425_provision-agent-e2e-user.sql` |
+
+The migration inserts into `greenhouse_core.client_users` and two rows into `greenhouse_core.user_role_assignments`. All INSERTs use `ON CONFLICT DO NOTHING` for idempotency.
+
+### Why a dedicated user?
+
+- **Isolation**: personal accounts can change passwords, roles, or be deactivated — breaking CI/E2E silently.
+- **Auditability**: events emitted under `user-agent-e2e-001` are immediately identifiable as automated.
+- **Least surprise**: agents never accidentally modify personal data or trigger supervisor-based workflows.
+- **Reproducibility**: all agents and environments share the same deterministic identity, reducing test flakiness.
+
+### Tenant resolution flow
+
+```
+POST /api/auth/agent-session { secret, email }
+  │
+  ├─ timingSafeEqual(secret, AGENT_AUTH_SECRET) → 401 if mismatch
+  ├─ VERCEL_ENV === 'production' && !ALLOW_PRODUCTION → 403
+  │
+  └─ getTenantAccessRecordForAgent(email)
+       │
+       ├─ 1. PostgreSQL: greenhouse_serving.session_360 WHERE email = $1
+       │     → returns user_id, tenant_type, roles[], member_id, ...
+       │     → ALL LEFT JOINs: works even without member/identity links
+       │
+       └─ 2. If PG returns null → BigQuery fallback (getIdentityAccessRecord)
+             → same field contract as PG path
+       │
+       └─ encode JWT via NextAuth → return { cookieName, cookieValue, portalHomePath }
+```
+
+### Environment variables
+
+| Variable                      | Required              | Purpose                                              | Default                        |
+| ----------------------------- | --------------------- | ---------------------------------------------------- | ------------------------------ |
+| `AGENT_AUTH_SECRET`           | Yes                   | Shared secret (generate with `openssl rand -hex 32`) | —                              |
+| `AGENT_AUTH_EMAIL`            | Yes                   | Email of the user to authenticate as                 | `agent@greenhouse.efeonce.org` |
+| `AGENT_AUTH_ALLOW_PRODUCTION` | No                    | Set `true` to allow in production (not recommended)  | `false`                        |
+| `AGENT_AUTH_PASSWORD`         | Only credentials mode | Password for login form                              | `Gh-Agent-2026!`               |
+| `AGENT_AUTH_MODE`             | No                    | `api` (default) or `credentials`                     | `api`                          |
+
+### Staging verification (2026-04-05)
+
+- Agent Auth verified working on staging: `POST /api/auth/agent-session` → HTTP 200, JWT for `user-agent-e2e-001`
+- `AGENT_AUTH_SECRET` and `AGENT_AUTH_EMAIL` are configured in Vercel for Staging + Preview(develop)
+- **Accessing staging programmatically** requires the Vercel SSO bypass header because `ssoProtection.deploymentType = "all_except_custom_domains"` protects all non-production-custom-domain deployments:
+  - Use the `.vercel.app` URL: `greenhouse-eo-env-staging-efeonce-7670142f.vercel.app`
+  - Add header: `x-vercel-protection-bypass: $VERCEL_AUTOMATION_BYPASS_SECRET`
+  - Do NOT use the custom domain `dev-greenhouse.efeoncepro.com` (still protected by SSO, not exempt)
+- **NEVER manually create** `VERCEL_AUTOMATION_BYPASS_SECRET` in Vercel — it is system-managed. A manual variable shadows the real one and silently breaks bypass (see ISSUE-013).
+
+## Delta 2026-04-05 — Mi Perfil identity chain fix (TASK-255)
+
+### Problema
+
+`GET /api/my/profile` respondia 422 para usuarios internos autenticados. Causa raiz: el path BigQuery de login (`getIdentityAccessRecord` en `src/lib/tenant/access.ts`) no seleccionaba `cu.member_id` ni `cu.identity_profile_id`, y la funcion `authorize()` de credentials en `src/lib/auth.ts` no incluia `memberId` ni `identityProfileId` en el user object retornado — el JWT quedaba sin estos campos.
+
+### Cambios
+
+1. **BigQuery query**: `cu.member_id` y `cu.identity_profile_id` agregados al SELECT y GROUP BY de `getIdentityAccessRecord()`. Todos los callers (credentials, Microsoft SSO, Google SSO) heredan el fix automaticamente.
+2. **Credentials authorize()**: `memberId`, `identityProfileId`, `spaceId`, `organizationId`, `organizationName` agregados al return object. SSO no tenia este bug porque lee `tenant.*` directamente en el JWT callback.
+3. **Profile route**: `/api/my/profile` usa `requireTenantContext()` (no `requireMyTenantContext()`). Intenta `person_360` si `memberId` existe, fallback a `session.user` si no. Un usuario autenticado nunca ve "Perfil no disponible".
+
+### Tipos y proyecciones nuevos
+
+- `PersonProfileSummary` — tipo compartido en `src/types/person-360.ts`
+- `toPersonProfileSummary(Person360)` — proyeccion canonico desde `person_360`
+- `toPersonProfileSummaryFromSession(session.user)` — fallback desde JWT session data
+
+### Regla
+
+El contrato `TenantAccessRow` (fields del session resolution) debe tener paridad de columnas entre el path PostgreSQL (`session_360`) y el path BigQuery (`getIdentityAccessRecord`). Todo campo nuevo que se agregue a `session_360` debe ir tambien en el SELECT/GROUP BY de BigQuery.
+
 ## Delta 2026-04-05 — Identity Spec Residual Gaps (TASK-253)
 
 ### Gaps cerrados
@@ -119,6 +317,7 @@ Define the unified permissions, roles, and access model for Greenhouse as a sing
 This document supersedes the informal role model scattered across earlier Codex tasks (`Agency_Operator_Layer`, `HR_Core_Module`, `Financial_Module`, `AI_Tooling_Credit_System`) and consolidates them into one canonical contract.
 
 Use together with:
+
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
@@ -134,10 +333,12 @@ This is the target access architecture. The PostgreSQL canonical backbone is alr
 Este documento sigue siendo `principal-first` para auth y access runtime.
 
 Eso no contradice el contrato `person-first` del modelo 360:
+
 - sesión, login, preferencias, inbox y overrides continúan anclados en `client_users.user_id`
 - surfaces que representen humanos no deberían tratar `client_user` como raíz humana si existe resolución canónica por persona
 
 Regla operativa:
+
 - access runtime puede seguir resolviendo desde `user_id`
 - consumers de preview, recipients y admin read surfaces deben enriquecer la sesión con `identity_profile_id` y `member_id` cuando corresponda
 - migraciones futuras no deben romper compatibilidad con tablas o logs que hoy son `userId`-scoped por diseño
@@ -147,6 +348,7 @@ Regla operativa:
 Para Delivery y `ICO`, el contrato operativo ya no debe asumirse como solo `notion_user_id -> member_id`.
 
 Regla operativa:
+
 - reconciliación de responsables Notion debe cerrar sobre el grafo canónico `identity_profile -> member/client_user`
 - `greenhouse.team_members` puede seguir existiendo como carril BigQuery de sync, pero no debe convertirse en autoridad silenciosa por encima de `greenhouse_core.*`
 - cuando un link de identidad se aprueba, la persistencia canónica debe vivir también en `greenhouse_core.identity_profile_source_links`
@@ -159,6 +361,7 @@ Regla operativa:
 Greenhouse is one Next.js application deployed on Vercel. Audience separation happens through Next.js route groups, not separate deployments.
 
 Route group families:
+
 - `/dashboard`, `/proyectos`, `/sprints`, `/campanas`, `/equipo`, `/settings` → client-facing
 - `/my/*` → collaborator-facing (personal self-service)
 - `/internal/*` → agency operator views (cross-tenant visibility)
@@ -172,6 +375,7 @@ Route group families:
 A single identity (one `client_users` record / one SSO principal) can hold multiple roles simultaneously. The session resolves all applicable roles at login time. Route guards check role membership, not a single `role` string.
 
 This means:
+
 - An Efeonce collaborator logs in via Microsoft SSO
 - The session resolves their `user_id`, `client_id`, and all assigned `role_codes`
 - They see sidebar sections for every route group their roles grant access to
@@ -200,6 +404,7 @@ The auth principal is the login entity. One person = one auth principal.
 Canonical anchor: `greenhouse_core.client_users.user_id`
 
 An auth principal carries:
+
 - `user_id` — Greenhouse-assigned UUID
 - `client_id` — the home tenant (FK to `greenhouse_core.clients`)
 - `identity_profile_id` — optional link to the broader cross-system identity graph
@@ -213,6 +418,7 @@ An auth principal carries:
 ### Collaborator Link
 
 For Efeonce internal users, the auth principal links to a collaborator record:
+
 - `greenhouse_core.members.member_id`
 
 This link is established through `identity_profile_id` (shared between `client_users` and `members`) or through a direct `member_id` FK on `client_users` when the mapping is explicit.
@@ -233,67 +439,68 @@ Roles are grouped into families that map to the three audiences plus cross-cutti
 
 Roles for external client users accessing their portal experience.
 
-| role_code | role_name | Description | Route Groups |
-|-----------|-----------|-------------|--------------|
-| `client_executive` | Client Executive | CMO/VP-level. Sees executive dashboard, high-level KPIs, team overview. | `client` |
-| `client_manager` | Client Manager | Marketing manager. Deeper operational context, project drilldowns, sprint detail. | `client` |
-| `client_specialist` | Client Specialist | Restricted to specific projects or campaigns. Uses scope filters. | `client` |
+| role_code           | role_name         | Description                                                                       | Route Groups |
+| ------------------- | ----------------- | --------------------------------------------------------------------------------- | ------------ |
+| `client_executive`  | Client Executive  | CMO/VP-level. Sees executive dashboard, high-level KPIs, team overview.           | `client`     |
+| `client_manager`    | Client Manager    | Marketing manager. Deeper operational context, project drilldowns, sprint detail. | `client`     |
+| `client_specialist` | Client Specialist | Restricted to specific projects or campaigns. Uses scope filters.                 | `client`     |
 
 #### Family: Collaborator
 
 Roles for Efeonce team members accessing their personal self-service.
 
-| role_code | role_name | Description | Route Groups |
-|-----------|-----------|-------------|--------------|
-| `collaborator` | Colaborador | Rol base de toda persona interna de Efeonce. Acceso a permisos, asistencia, nómina, perfil y herramientas. | `my` |
+| role_code      | role_name   | Description                                                                                                | Route Groups |
+| -------------- | ----------- | ---------------------------------------------------------------------------------------------------------- | ------------ |
+| `collaborator` | Colaborador | Rol base de toda persona interna de Efeonce. Acceso a permisos, asistencia, nómina, perfil y herramientas. | `my`         |
 
 #### Family: Agency Operations
 
 Roles for Efeonce team members with cross-tenant operational visibility.
 
-| role_code | role_name | Description | Route Groups |
-|-----------|-----------|-------------|--------------|
-| `efeonce_account` | Líder de Cuenta | Responde por relaciones con clientes, salud de cuentas y contexto operativo/comercial de sus clientes asignados. | `internal` |
-| `efeonce_operations` | Operaciones | Visibilidad operativa cross-tenant: capacidad, bloqueos, utilización y backlog de revisión. | `internal` |
+| role_code            | role_name       | Description                                                                                                      | Route Groups |
+| -------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------- | ------------ |
+| `efeonce_account`    | Líder de Cuenta | Responde por relaciones con clientes, salud de cuentas y contexto operativo/comercial de sus clientes asignados. | `internal`   |
+| `efeonce_operations` | Operaciones     | Visibilidad operativa cross-tenant: capacidad, bloqueos, utilización y backlog de revisión.                      | `internal`   |
 
 #### Family: Domain Operators
 
 Roles for Efeonce team members managing specific internal domains.
 
-| role_code | role_name | Description | Route Groups |
-|-----------|-----------|-------------|--------------|
-| `hr_manager` | Gestión HR | Administra personas, permisos, asistencia, estructura organizacional y catálogos HR. | `hr` |
-| `hr_payroll` | Nómina | Procesa períodos, entradas y compensaciones de payroll. | `hr` |
-| `finance_analyst` | Analista de Finanzas | Opera ingresos, egresos, conciliación y suppliers; lectura ampliada sobre finanzas. | `finance` |
-| `finance_admin` | Administrador de Finanzas | Acceso completo de escritura financiera, incluyendo cuentas, tipos de cambio y conciliación. | `finance` |
-| `people_viewer` | Lectura de Personas | Acceso de lectura a perfiles de colaboradores, assignments y capacidad. | `people` |
-| `ai_tooling_admin` | Administrador de Herramientas AI | Gestiona catálogo de herramientas, licencias, wallets y créditos. | `ai_tooling` |
+| role_code          | role_name                        | Description                                                                                  | Route Groups |
+| ------------------ | -------------------------------- | -------------------------------------------------------------------------------------------- | ------------ |
+| `hr_manager`       | Gestión HR                       | Administra personas, permisos, asistencia, estructura organizacional y catálogos HR.         | `hr`         |
+| `hr_payroll`       | Nómina                           | Procesa períodos, entradas y compensaciones de payroll.                                      | `hr`         |
+| `finance_analyst`  | Analista de Finanzas             | Opera ingresos, egresos, conciliación y suppliers; lectura ampliada sobre finanzas.          | `finance`    |
+| `finance_admin`    | Administrador de Finanzas        | Acceso completo de escritura financiera, incluyendo cuentas, tipos de cambio y conciliación. | `finance`    |
+| `people_viewer`    | Lectura de Personas              | Acceso de lectura a perfiles de colaboradores, assignments y capacidad.                      | `people`     |
+| `ai_tooling_admin` | Administrador de Herramientas AI | Gestiona catálogo de herramientas, licencias, wallets y créditos.                            | `ai_tooling` |
 
 #### Family: Platform Admin
 
-| role_code | role_name | Description | Route Groups |
-|-----------|-----------|-------------|--------------|
-| `efeonce_admin` | Superadministrador | Universal override. Todos los route groups. Gestión de tenants, usuarios, roles, feature flags y acceso total a Greenhouse. | `*` (all) |
+| role_code       | role_name          | Description                                                                                                                 | Route Groups |
+| --------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| `efeonce_admin` | Superadministrador | Universal override. Todos los route groups. Gestión de tenants, usuarios, roles, feature flags y acceso total a Greenhouse. | `*` (all)    |
 
 ### Role Composition Examples
 
 Real-world role assignments for typical Efeonce personas:
 
-| Persona | Assigned Roles | What They See |
-|---------|---------------|---------------|
-| Julio (founder) | `collaborator`, `efeonce_admin` | Self-service personal + `Superadministrador` con acceso total |
-| Account Lead | `collaborator`, `efeonce_account`, `people_viewer` | Self-service + cuentas + lectura de personas |
-| Operations Lead | `collaborator`, `efeonce_operations`, `people_viewer` | Self-service + operación transversal + lectura de personas |
-| HR Business Partner | `collaborator`, `hr_manager`, `hr_payroll` | Self-service + gestión HR + nómina |
-| Finance Lead | `collaborator`, `finance_admin` | Self-service + administración financiera |
-| Junior Designer | `collaborator` | Solo experiencia personal: permisos, asistencia, nómina, perfil y herramientas |
-| External CMO (Sky) | `client_executive` | Client dashboard, projects, team, capabilities for their tenant only |
-| External Marketing Mgr | `client_manager` | Deeper client operational context, sprint drilldowns |
-| External Coordinator | `client_specialist` | Scoped to specific projects/campaigns within their tenant |
+| Persona                | Assigned Roles                                        | What They See                                                                  |
+| ---------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Julio (founder)        | `collaborator`, `efeonce_admin`                       | Self-service personal + `Superadministrador` con acceso total                  |
+| Account Lead           | `collaborator`, `efeonce_account`, `people_viewer`    | Self-service + cuentas + lectura de personas                                   |
+| Operations Lead        | `collaborator`, `efeonce_operations`, `people_viewer` | Self-service + operación transversal + lectura de personas                     |
+| HR Business Partner    | `collaborator`, `hr_manager`, `hr_payroll`            | Self-service + gestión HR + nómina                                             |
+| Finance Lead           | `collaborator`, `finance_admin`                       | Self-service + administración financiera                                       |
+| Junior Designer        | `collaborator`                                        | Solo experiencia personal: permisos, asistencia, nómina, perfil y herramientas |
+| External CMO (Sky)     | `client_executive`                                    | Client dashboard, projects, team, capabilities for their tenant only           |
+| External Marketing Mgr | `client_manager`                                      | Deeper client operational context, sprint drilldowns                           |
+| External Coordinator   | `client_specialist`                                   | Scoped to specific projects/campaigns within their tenant                      |
 
 ### Default Role Assignment Rules
 
 When a user is created or provisioned:
+
 - External client users: assigned `client_executive` or `client_manager` based on admin decision at onboarding. No default auto-assignment.
 - Efeonce internal users (detected by `@efeonce.org` or `@efeoncepro.com` email domain): automatically assigned `collaborator`. Additional roles assigned explicitly by admin.
 - SCIM-provisioned users: assigned `collaborator` automatically. Role escalation requires admin action.
@@ -304,16 +511,16 @@ When a user is created or provisioned:
 
 Route groups are the enforcement boundary. Each route group maps to a set of URL prefixes and requires at least one matching role.
 
-| route_group | URL Prefixes | Required Roles (any of) | Tenant Context |
-|-------------|-------------|------------------------|----------------|
-| `client` | `/dashboard`, `/proyectos`, `/sprints`, `/campanas`, `/equipo`, `/settings` | `client_executive`, `client_manager`, `client_specialist`, `efeonce_account`, `efeonce_operations`, `efeonce_admin` | Active tenant |
-| `my` | `/my/leave`, `/my/attendance`, `/my/expenses`, `/my/tools`, `/my/payroll`, `/my/profile` | `collaborator`, `efeonce_admin` | Home tenant (efeonce) |
-| `internal` | `/internal/dashboard`, `/internal/clientes`, `/internal/capacidad`, `/internal/riesgos`, `/internal/kpis` | `efeonce_account`, `efeonce_operations`, `efeonce_admin` | Cross-tenant |
-| `hr` | `/hr/leave`, `/hr/attendance`, `/hr/org`, `/hr/payroll`, `/hr/approvals` | `hr_manager`, `hr_payroll`, `efeonce_admin` | Efeonce tenant |
-| `finance` | `/finance/dashboard`, `/finance/income`, `/finance/expenses`, `/finance/suppliers`, `/finance/reconciliation`, `/finance/clients` | `finance_analyst`, `finance_admin`, `efeonce_admin` | Efeonce tenant |
-| `people` | `/people`, `/people/[memberId]` | `people_viewer`, `hr_manager`, `efeonce_operations`, `efeonce_admin` | Efeonce tenant |
-| `ai_tooling` | `/ai-tools/catalog`, `/ai-tools/licenses`, `/ai-tools/wallets`, `/ai-tools/ledger` | `ai_tooling_admin`, `efeonce_admin` | Efeonce tenant |
-| `admin` | `/admin/tenants`, `/admin/users`, `/admin/roles`, `/admin/scopes`, `/admin/feature-flags` | `efeonce_admin` | Cross-tenant |
+| route_group  | URL Prefixes                                                                                                                      | Required Roles (any of)                                                                                             | Tenant Context        |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| `client`     | `/dashboard`, `/proyectos`, `/sprints`, `/campanas`, `/equipo`, `/settings`                                                       | `client_executive`, `client_manager`, `client_specialist`, `efeonce_account`, `efeonce_operations`, `efeonce_admin` | Active tenant         |
+| `my`         | `/my/leave`, `/my/attendance`, `/my/expenses`, `/my/tools`, `/my/payroll`, `/my/profile`                                          | `collaborator`, `efeonce_admin`                                                                                     | Home tenant (efeonce) |
+| `internal`   | `/internal/dashboard`, `/internal/clientes`, `/internal/capacidad`, `/internal/riesgos`, `/internal/kpis`                         | `efeonce_account`, `efeonce_operations`, `efeonce_admin`                                                            | Cross-tenant          |
+| `hr`         | `/hr/leave`, `/hr/attendance`, `/hr/org`, `/hr/payroll`, `/hr/approvals`                                                          | `hr_manager`, `hr_payroll`, `efeonce_admin`                                                                         | Efeonce tenant        |
+| `finance`    | `/finance/dashboard`, `/finance/income`, `/finance/expenses`, `/finance/suppliers`, `/finance/reconciliation`, `/finance/clients` | `finance_analyst`, `finance_admin`, `efeonce_admin`                                                                 | Efeonce tenant        |
+| `people`     | `/people`, `/people/[memberId]`                                                                                                   | `people_viewer`, `hr_manager`, `efeonce_operations`, `efeonce_admin`                                                | Efeonce tenant        |
+| `ai_tooling` | `/ai-tools/catalog`, `/ai-tools/licenses`, `/ai-tools/wallets`, `/ai-tools/ledger`                                                | `ai_tooling_admin`, `efeonce_admin`                                                                                 | Efeonce tenant        |
+| `admin`      | `/admin/tenants`, `/admin/users`, `/admin/roles`, `/admin/scopes`, `/admin/feature-flags`                                         | `efeonce_admin`                                                                                                     | Cross-tenant          |
 
 ### Enforcement Architecture
 
@@ -335,13 +542,13 @@ src/app/(dashboard)/admin/layout.tsx     → requireRouteGroup('admin')
 function requireRouteGroup(group: RouteGroup): void {
   const session = getServerSession()
   if (!session) redirect('/login')
-  
+
   const userRoles = session.roleCodes // string[]
   const allowedRoles = ROUTE_GROUP_ROLES[group] // from registry
-  
+
   // efeonce_admin bypasses all checks
   if (userRoles.includes('efeonce_admin')) return
-  
+
   // Check if any user role grants access to this route group
   const hasAccess = userRoles.some(role => allowedRoles.includes(role))
   if (!hasAccess) redirect('/unauthorized')
@@ -356,10 +563,10 @@ API routes use the same pattern but return `403` instead of redirecting:
 function requireApiAccess(group: RouteGroup): void {
   const session = getServerSession()
   if (!session) throw new ApiError(401)
-  
+
   const userRoles = session.roleCodes
   if (userRoles.includes('efeonce_admin')) return
-  
+
   const allowedRoles = ROUTE_GROUP_ROLES[group]
   if (!userRoles.some(role => allowedRoles.includes(role))) {
     throw new ApiError(403)
@@ -373,12 +580,12 @@ function requireApiAccess(group: RouteGroup): void {
 
 Beyond roles, some users have further restrictions on what data they can see within their granted route groups.
 
-| scope_level | Purpose | Applies To |
-|-------------|---------|------------|
-| `tenant_all` | Can see all data within their tenant. Default for most roles. | All |
-| `project_subset` | Can only see specific projects. | `client_specialist` |
-| `campaign_subset` | Can only see specific campaigns. | `client_specialist` |
-| `client_subset` | Can only see specific client tenants. | `efeonce_account` |
+| scope_level       | Purpose                                                       | Applies To          |
+| ----------------- | ------------------------------------------------------------- | ------------------- |
+| `tenant_all`      | Can see all data within their tenant. Default for most roles. | All                 |
+| `project_subset`  | Can only see specific projects.                               | `client_specialist` |
+| `campaign_subset` | Can only see specific campaigns.                              | `client_specialist` |
+| `client_subset`   | Can only see specific client tenants.                         | `efeonce_account`   |
 
 ### Scope Assignment Tables
 
@@ -391,6 +598,7 @@ Scopes are assigned per user and stored in dedicated assignment tables:
 ### Scope Enforcement
 
 Scope enforcement happens at the query layer, not the route guard layer:
+
 - Route guards check role membership (can you access this route group?)
 - Query filters check scope membership (which data within that route group can you see?)
 
@@ -401,6 +609,7 @@ Example: an `efeonce_account` user accessing `/internal/clientes` passes the rou
 For HR workflows (leave approvals), the supervisor is not a role — it is a relationship derived from `greenhouse_core.members.reports_to_member_id`.
 
 Rules:
+
 - When a collaborator submits a leave request, the system resolves their supervisor from `reports_to_member_id`
 - If `reports_to_member_id` is NULL (top of hierarchy), the request goes directly to `hr_manager` role holders
 - A person does not need a `supervisor` role to approve leave — they approve because they are the `reports_to` target of the requester
@@ -414,22 +623,22 @@ The authenticated session must carry enough context to resolve access without ad
 
 ```typescript
 interface GreenhouseSession {
-  userId: string              // client_users.user_id
-  clientId: string            // home tenant client_id
+  userId: string // client_users.user_id
+  clientId: string // home tenant client_id
   tenantType: 'client' | 'efeonce_internal'
   email: string
   fullName: string
-  roleCodes: string[]         // all assigned role_codes
-  routeGroups: string[]       // derived from roleCodes at login
-  memberId?: string           // if collaborator, link to members.member_id
-  identityProfileId?: string  // cross-system identity root
-  activeClientId?: string     // for operators: the Space they're currently viewing
-  projectScopes?: string[]    // for client_specialist
-  campaignScopes?: string[]   // for client_specialist
-  clientScopes?: string[]     // for efeonce_account
-  featureFlags?: string[]     // tenant-level feature flags
+  roleCodes: string[] // all assigned role_codes
+  routeGroups: string[] // derived from roleCodes at login
+  memberId?: string // if collaborator, link to members.member_id
+  identityProfileId?: string // cross-system identity root
+  activeClientId?: string // for operators: the Space they're currently viewing
+  projectScopes?: string[] // for client_specialist
+  campaignScopes?: string[] // for client_specialist
+  clientScopes?: string[] // for efeonce_account
+  featureFlags?: string[] // tenant-level feature flags
   timezone: string
-  portalHomePath: string      // where to redirect after login
+  portalHomePath: string // where to redirect after login
 }
 ```
 
@@ -455,27 +664,27 @@ Durante la resolución de sesión, la UI pasa por estados explícitos con feedba
 
 Errores categorizados por NextAuth error code:
 
-| Error code | Mensaje UX | Severity |
-|------------|-----------|----------|
-| `CredentialsSignin` | Email o contraseña incorrectos | error |
-| `AccessDenied` | Cuenta sin acceso al portal | error |
-| `SessionRequired` | Sesión expirada | error |
-| fetch/network | No se pudo conectar con el servidor | warning |
-| provider timeout | Proveedor no respondió | warning |
+| Error code          | Mensaje UX                          | Severity |
+| ------------------- | ----------------------------------- | -------- |
+| `CredentialsSignin` | Email o contraseña incorrectos      | error    |
+| `AccessDenied`      | Cuenta sin acceso al portal         | error    |
+| `SessionRequired`   | Sesión expirada                     | error    |
+| fetch/network       | No se pudo conectar con el servidor | warning  |
+| provider timeout    | Proveedor no respondió              | warning  |
 
 ### Portal home path resolution
 
-| Highest Priority Role | Home Path |
-|----------------------|-----------|
-| `efeonce_admin` | `/admin/tenants` |
-| `efeonce_operations` | `/internal/dashboard` |
-| `efeonce_account` | `/internal/clientes` |
-| `finance_admin` or `finance_analyst` | `/finance/dashboard` |
-| `hr_manager` or `hr_payroll` | `/hr/leave` |
-| `collaborator` (only) | `/my/profile` |
-| `client_executive` | `/dashboard` |
-| `client_manager` | `/dashboard` |
-| `client_specialist` | `/dashboard` |
+| Highest Priority Role                | Home Path             |
+| ------------------------------------ | --------------------- |
+| `efeonce_admin`                      | `/admin/tenants`      |
+| `efeonce_operations`                 | `/internal/dashboard` |
+| `efeonce_account`                    | `/internal/clientes`  |
+| `finance_admin` or `finance_analyst` | `/finance/dashboard`  |
+| `hr_manager` or `hr_payroll`         | `/hr/leave`           |
+| `collaborator` (only)                | `/my/profile`         |
+| `client_executive`                   | `/dashboard`          |
+| `client_manager`                     | `/dashboard`          |
+| `client_specialist`                  | `/dashboard`          |
 
 ## Sidebar Composition
 
@@ -485,20 +694,21 @@ The sidebar is built dynamically from the session's `routeGroups`.
 
 Each route group maps to a sidebar section with its own navigation items. Sections only render if the user has the corresponding route group.
 
-| Section | Route Group | Nav Items |
-|---------|------------|-----------|
-| **Mi Greenhouse** | `my` | Mi Perfil, Mis Permisos, Mi Asistencia, Mis Gastos, Mis Herramientas, Mi Nómina |
-| **Pulse** | `client` | Dashboard, Proyectos, Ciclos, Equipo, Campañas |
-| **Agencia** | `internal` | Pulse Global, Clientes, Capacidad, Riesgos, KPIs |
-| **Personas** | `people` | Directorio, Detalle |
-| **HR** | `hr` | Permisos, Asistencia, Organización, Nómina, Aprobaciones |
-| **Finanzas** | `finance` | Dashboard, Ingresos, Egresos, Proveedores, Clientes, Conciliación |
-| **AI & Tools** | `ai_tooling` | Catálogo, Licencias, Wallets, Consumos |
-| **Admin** | `admin` | Spaces, Usuarios, Roles, Scopes, Feature Flags |
+| Section           | Route Group  | Nav Items                                                                       |
+| ----------------- | ------------ | ------------------------------------------------------------------------------- |
+| **Mi Greenhouse** | `my`         | Mi Perfil, Mis Permisos, Mi Asistencia, Mis Gastos, Mis Herramientas, Mi Nómina |
+| **Pulse**         | `client`     | Dashboard, Proyectos, Ciclos, Equipo, Campañas                                  |
+| **Agencia**       | `internal`   | Pulse Global, Clientes, Capacidad, Riesgos, KPIs                                |
+| **Personas**      | `people`     | Directorio, Detalle                                                             |
+| **HR**            | `hr`         | Permisos, Asistencia, Organización, Nómina, Aprobaciones                        |
+| **Finanzas**      | `finance`    | Dashboard, Ingresos, Egresos, Proveedores, Clientes, Conciliación               |
+| **AI & Tools**    | `ai_tooling` | Catálogo, Licencias, Wallets, Consumos                                          |
+| **Admin**         | `admin`      | Spaces, Usuarios, Roles, Scopes, Feature Flags                                  |
 
 ### Section ordering in sidebar
 
 Fixed order:
+
 1. Mi Greenhouse (personal, always first if present)
 2. Pulse (client context)
 3. Agencia (cross-tenant)
@@ -514,22 +724,23 @@ Fixed order:
 
 Every permission-relevant action must be logged:
 
-| Event Type | Logged When |
-|-----------|-------------|
-| `role_assigned` | A role is granted to a user |
-| `role_revoked` | A role is removed from a user |
-| `scope_assigned` | A project, campaign, or client scope is granted |
-| `scope_revoked` | A scope is removed |
-| `user_created` | A new auth principal is created |
-| `user_deactivated` | A user is deactivated |
-| `user_reactivated` | A user is reactivated |
-| `login_success` | Successful authentication |
-| `login_failed` | Failed authentication attempt |
-| `session_impersonation` | An admin enters a client Space context |
+| Event Type              | Logged When                                     |
+| ----------------------- | ----------------------------------------------- |
+| `role_assigned`         | A role is granted to a user                     |
+| `role_revoked`          | A role is removed from a user                   |
+| `scope_assigned`        | A project, campaign, or client scope is granted |
+| `scope_revoked`         | A scope is removed                              |
+| `user_created`          | A new auth principal is created                 |
+| `user_deactivated`      | A user is deactivated                           |
+| `user_reactivated`      | A user is reactivated                           |
+| `login_success`         | Successful authentication                       |
+| `login_failed`          | Failed authentication attempt                   |
+| `session_impersonation` | An admin enters a client Space context          |
 
 ### Audit table
 
 `greenhouse_core.audit_events` stores immutable event records with:
+
 - `event_id` — UUID
 - `event_type` — from catalog above
 - `actor_user_id` — who performed the action
@@ -544,6 +755,7 @@ Every permission-relevant action must be logged:
 ### Current state
 
 Today the system uses:
+
 - `role` field on `greenhouse.clients` (BigQuery): `'client' | 'operator' | 'admin'`
 - `can_view_all_spaces` boolean on the same table
 - Route group checks in `authorization.ts` based on these fields
@@ -552,21 +764,25 @@ Today the system uses:
 ### Migration path
 
 Phase 1: Backfill PostgreSQL role assignments from current BigQuery state
+
 - Every user with `role = 'client'` gets `client_executive` (or `client_manager` based on admin review)
 - Every user with `role = 'operator'` gets `collaborator` + `efeonce_account` + `efeonce_operations`
 - Every user with `role = 'admin'` gets `collaborator` + `efeonce_admin`
 - Efeonce internal users additionally get `collaborator`
 
 Phase 2: Update session resolution
+
 - Session resolution reads roles from PostgreSQL `user_role_assignments` instead of the `role` field
 - Derive `routeGroups` from role catalog
 - Keep BigQuery `clients.role` as compatibility fallback during transition
 
 Phase 3: Update route guards
+
 - Replace `session.user.role === 'admin'` checks with `session.routeGroups.includes('admin')`
 - Replace `session.user.can_view_all_spaces` with `session.routeGroups.includes('internal')`
 
 Phase 4: Remove legacy fields
+
 - Deprecate `role` and `can_view_all_spaces` from `greenhouse.clients`
 - All access resolution flows through `user_role_assignments`
 
@@ -590,6 +806,7 @@ Phase 4: Remove legacy fields
 ## Operational Note
 
 If a future agent changes:
+
 - the role catalog
 - route group assignments
 - scope enforcement rules
@@ -597,6 +814,7 @@ If a future agent changes:
 - audit event types
 
 They must update:
+
 - this document
 - `project_context.md`
 - `Handoff.md`

@@ -1,8 +1,19 @@
 # Greenhouse EO — Cloud Infrastructure Reference
 
-> **Version:** 1.1
-> **Last updated:** 2026-04-04
+> **Version:** 1.3
+> **Last updated:** 2026-04-05
 > **Audience:** Platform engineers, DevOps, on-call operators
+
+---
+
+## Delta 2026-06-17 — Reactive workers migrated to Cloud Run (TASK-254)
+
+Three Vercel cron routes (`outbox-react`, `outbox-react-delivery`, `projection-recovery`) migrated to the new `ops-worker` Cloud Run service in `us-east4`. Cloud Scheduler triggers replace the Vercel cron entries. The original Vercel API routes remain as manual fallback endpoints but are no longer scheduled automáticamente.
+
+- New service: `services/ops-worker/` (§4.9)
+- New scheduler jobs: `ops-reactive-process`, `ops-reactive-process-delivery`, `ops-reactive-recover` (§5)
+- Run tracking via `greenhouse_sync.source_sync_runs` with `source_system='reactive_worker'`
+- Operability: Reactive Worker subsystem added to Ops Overview dashboard
 
 ---
 
@@ -13,6 +24,7 @@ TASK-239 expuso que la materialización ICO completa excede el timeout de Vercel
 **Todo proceso de datos que no sea request-response de portal debe ejecutarse en el servicio, artefacto o primitiva de GCP más idóneo — no en Vercel Functions.**
 
 Esto aplica a:
+
 - Materialización de snapshots y métricas (ICO Engine, conformed layer)
 - Pipelines de enriquecimiento AI/LLM (señales, enrichments, scoring)
 - Sync batch de fuentes externas (Notion, HubSpot, Nubox)
@@ -21,18 +33,21 @@ Esto aplica a:
 
 **Criterio de selección de artefacto GCP:**
 
-| Característica | Cloud Run | Cloud Functions (Gen 2) | Cloud Scheduler | Cloud Tasks |
-|---|---|---|---|---|
-| Proceso HTTP con timeout largo (>30s) | **Idóneo** | Alternativa | — | — |
-| Job periódico (cron) | — | — | **Idóneo** (trigger) | — |
-| Fan-out paralelo (N items) | — | — | — | **Idóneo** |
-| Sync con API externa (webhook/poll) | **Idóneo** (ya probado) | Alternativa | Trigger | — |
-| Pipeline AI/LLM (múltiples llamadas) | **Idóneo** (timeout configurable) | — | Trigger | — |
+| Característica                        | Cloud Run                         | Cloud Functions (Gen 2) | Cloud Scheduler      | Cloud Tasks |
+| ------------------------------------- | --------------------------------- | ----------------------- | -------------------- | ----------- |
+| Proceso HTTP con timeout largo (>30s) | **Idóneo**                        | Alternativa             | —                    | —           |
+| Job periódico (cron)                  | —                                 | —                       | **Idóneo** (trigger) | —           |
+| Fan-out paralelo (N items)            | —                                 | —                       | —                    | **Idóneo**  |
+| Sync con API externa (webhook/poll)   | **Idóneo** (ya probado)           | Alternativa             | Trigger              | —           |
+| Pipeline AI/LLM (múltiples llamadas)  | **Idóneo** (timeout configurable) | —                       | Trigger              | —           |
 
 **Vercel Functions** quedan reservados para:
+
 - API routes que sirven al portal (request-response < 30s)
 - Cron triggers livianos que disparan servicios GCP (fire-and-forget)
-- Reactive consumers del outbox (procesan eventos individualmente, < 30s cada uno)
+- Cron routes livianos que procesan eventos individualmente y completan consistentemente en < 30s
+
+> **Nota TASK-254:** Los reactive consumers del outbox fueron migrados a Cloud Run (`ops-worker`) porque un batch de 50 eventos puede exceder 30s bajo carga. Las Vercel API routes persisten como fallback manual.
 
 **Referencia de implementación:** TASK-241 materializa esta política con el primer servicio Cloud Run para ICO batch processing.
 
@@ -276,17 +291,17 @@ Vercel es la capa de presentación y API del portal. GCP Cloud es la capa de pro
 
 ### Reglas de colocación
 
-| Tipo de proceso | Dónde corre | Por qué |
-|---|---|---|
-| API route que sirve datos al portal (GET/POST < 30s) | Vercel Functions | Es request-response del portal, necesita sesión de usuario |
-| Materialización de métricas, snapshots, reports | **Cloud Run** | Excede 30s, no requiere sesión, accede a BigQuery + PostgreSQL |
-| Pipeline AI/LLM (scoring, enrichment, evaluación) | **Cloud Run** | Múltiples llamadas a LLM, timeout impredecible, no requiere sesión |
-| Sync batch de fuente externa (Notion, HubSpot, Nubox) | **Cloud Run / Cloud Functions** | Ya probado, volumen variable, timeout largo |
-| ETL, backfill, re-procesamiento | **Cloud Run** | Proceso pesado one-shot, timeout configurable hasta 60 min |
-| Trigger periódico (cron) | **Cloud Scheduler** → Cloud Run | Scheduler dispara, Cloud Run ejecuta |
-| Fan-out paralelo (procesar N items) | **Cloud Tasks** → Cloud Run/Functions | Distribuye carga, cada item es un HTTP call |
-| Reactive consumer del outbox (< 30s por evento) | Vercel Functions (cron) | Eventos individuales son livianos, cabe en Vercel |
-| Health checks y triggers fire-and-forget | Vercel Functions | Liviano, solo dispara y retorna |
+| Tipo de proceso                                       | Dónde corre                           | Por qué                                                                                           |
+| ----------------------------------------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| API route que sirve datos al portal (GET/POST < 30s)  | Vercel Functions                      | Es request-response del portal, necesita sesión de usuario                                        |
+| Materialización de métricas, snapshots, reports       | **Cloud Run**                         | Excede 30s, no requiere sesión, accede a BigQuery + PostgreSQL                                    |
+| Pipeline AI/LLM (scoring, enrichment, evaluación)     | **Cloud Run**                         | Múltiples llamadas a LLM, timeout impredecible, no requiere sesión                                |
+| Sync batch de fuente externa (Notion, HubSpot, Nubox) | **Cloud Run / Cloud Functions**       | Ya probado, volumen variable, timeout largo                                                       |
+| ETL, backfill, re-procesamiento                       | **Cloud Run**                         | Proceso pesado one-shot, timeout configurable hasta 60 min                                        |
+| Trigger periódico (cron)                              | **Cloud Scheduler** → Cloud Run       | Scheduler dispara, Cloud Run ejecuta                                                              |
+| Fan-out paralelo (procesar N items)                   | **Cloud Tasks** → Cloud Run/Functions | Distribuye carga, cada item es un HTTP call                                                       |
+| Reactive consumer del outbox (batch processing)       | **Cloud Run** (`ops-worker`)          | Batch de 50 eventos puede exceder 30s bajo carga; migrado a Cloud Run para durabilidad (TASK-254) |
+| Health checks y triggers fire-and-forget              | Vercel Functions                      | Liviano, solo dispara y retorna                                                                   |
 
 ### Regla de decisión rápida
 
@@ -306,15 +321,16 @@ Vercel es la capa de presentación y API del portal. GCP Cloud es la capa de pro
 
 ### Inventario de procesos por migrar (a 2026-04-04)
 
-| Proceso | Ubicación actual | Timeout típico | Acción |
-|---|---|---|---|
-| ICO materialización completa | Vercel `/api/cron/ico-materialize` | >120s (falla) | **Migrar a Cloud Run (TASK-241)** |
-| LLM enrichment pipeline | Vercel (trigger reactivo) | 60-90s (riesgo) | **Migrar a Cloud Run (TASK-241)** |
-| ICO member sync | Vercel `/api/cron/ico-member-sync` | ~45s | Monitorear, migrar si crece |
-| Sync conformed | Vercel `/api/cron/sync-conformed` | ~30-60s | Monitorear, migrar si crece |
-| Nubox sync | Vercel `/api/cron/nubox-sync` | ~15s | OK en Vercel por ahora |
-| Exchange rates / indicators | Vercel cron | ~5s | OK en Vercel |
-| Outbox publish / react | Vercel cron `*/5 min` | ~5-15s | OK en Vercel |
+| Proceso                      | Ubicación actual                   | Timeout típico  | Acción                                |
+| ---------------------------- | ---------------------------------- | --------------- | ------------------------------------- |
+| ICO materialización completa | Vercel `/api/cron/ico-materialize` | >120s (falla)   | **Migrar a Cloud Run (TASK-241)**     |
+| LLM enrichment pipeline      | Vercel (trigger reactivo)          | 60-90s (riesgo) | **Migrar a Cloud Run (TASK-241)**     |
+| ICO member sync              | Vercel `/api/cron/ico-member-sync` | ~45s            | Monitorear, migrar si crece           |
+| Sync conformed               | Vercel `/api/cron/sync-conformed`  | ~30-60s         | Monitorear, migrar si crece           |
+| Nubox sync                   | Vercel `/api/cron/nubox-sync`      | ~15s            | OK en Vercel por ahora                |
+| Exchange rates / indicators  | Vercel cron                        | ~5s             | OK en Vercel                          |
+| Outbox publish               | Vercel cron `*/5 min`              | ~5-15s          | OK en Vercel                          |
+| Outbox react + recovery      | ~~Vercel cron~~ → Cloud Run        | 5-60s           | **Migrado a `ops-worker` (TASK-254)** |
 
 ---
 
@@ -484,21 +500,46 @@ notion_ops  (legacy)   ─┤──►  greenhouse_conformed (replacement target
 
 #### 8. ico-batch-worker (us-east4)
 
-| Property      | Value                                                                                                                                         |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| Type          | Custom Cloud Run service                                                                                                                      |
-| Runtime       | Node.js 22 (via tsx)                                                                                                                          |
-| Region        | `us-east4` (co-located with Cloud SQL)                                                                                                        |
-| Memory        | 2 GiB                                                                                                                                         |
-| CPU           | 2                                                                                                                                             |
-| Timeout       | 900 s (15 min)                                                                                                                                |
-| Max instances | 2                                                                                                                                             |
-| Concurrency   | 1                                                                                                                                             |
-| Auth          | IAM (`--no-allow-unauthenticated`)                                                                                                            |
-| Source        | `services/ico-batch/` (monorepo, reuses `src/lib/`)                                                                                           |
+| Property      | Value                                                                                                                                               |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Type          | Custom Cloud Run service                                                                                                                            |
+| Runtime       | Node.js 22 (via tsx)                                                                                                                                |
+| Region        | `us-east4` (co-located with Cloud SQL)                                                                                                              |
+| Memory        | 2 GiB                                                                                                                                               |
+| CPU           | 2                                                                                                                                                   |
+| Timeout       | 900 s (15 min)                                                                                                                                      |
+| Max instances | 2                                                                                                                                                   |
+| Concurrency   | 1                                                                                                                                                   |
+| Auth          | IAM (`--no-allow-unauthenticated`)                                                                                                                  |
+| Source        | `services/ico-batch/` (monorepo, reuses `src/lib/`)                                                                                                 |
 | Purpose       | Heavy ICO Engine batch processing: monthly materialization (12 steps) and LLM enrichment pipeline. Replaces Vercel cron that exceeded 120s timeout. |
-| Endpoints     | `GET /health`, `POST /ico/materialize`, `POST /ico/llm-enrich`                                                                               |
-| TASK          | TASK-241                                                                                                                                       |
+| Endpoints     | `GET /health`, `POST /ico/materialize`, `POST /ico/llm-enrich`                                                                                      |
+| TASK          | TASK-241                                                                                                                                            |
+
+#### 9. ops-worker (us-east4)
+
+| Property      | Value                                                                                                                                                                                     |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Type          | Custom Cloud Run service                                                                                                                                                                  |
+| Runtime       | Node.js 22 (esbuild bundle)                                                                                                                                                               |
+| Region        | `us-east4` (co-located with Cloud SQL)                                                                                                                                                    |
+| Memory        | 1 GiB                                                                                                                                                                                     |
+| CPU           | 1                                                                                                                                                                                         |
+| Timeout       | 300 s (5 min)                                                                                                                                                                             |
+| Max instances | 2                                                                                                                                                                                         |
+| Concurrency   | 1                                                                                                                                                                                         |
+| Auth          | IAM (`--no-allow-unauthenticated`)                                                                                                                                                        |
+| Source        | `services/ops-worker/` (monorepo, reuses `src/lib/`)                                                                                                                                      |
+| Purpose       | Durable reactive worker: processes outbox reactive events, domain-specific reactive events, and recovers orphaned projection refreshes. Replaces 3 Vercel crons that risked 120s timeout. |
+| Endpoints     | `GET /health`, `POST /reactive/process`, `POST /reactive/process-domain`, `POST /reactive/recover`                                                                                        |
+| SA            | `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` (runs as + `roles/run.invoker` for scheduler OIDC)                                                                              |
+| Image         | `gcr.io/efeonce-group/ops-worker` (Cloud Build)                                                                                                                                           |
+| Build         | esbuild two-stage Dockerfile with 9 `--alias` shims for ESM/CJS interop (see note below)                                                                                                 |
+| TASK          | TASK-254                                                                                                                                                                                  |
+
+**ESM/CJS shim pattern:** The import chain `server.ts → projections/ → greenhouse-assets.ts → authorization.ts → auth.ts` pulls in `next-auth` providers which are CJS-only and fail under Node 22 ESM. Since the ops-worker never uses auth, 9 esbuild `--alias` shims stub out `server-only`, `next/server`, `next/headers`, `next-auth`, `next-auth/providers/credentials`, `next-auth/providers/azure-ad`, `next-auth/providers/google`, `next-auth/next`, and `bcryptjs`. This pattern should be replicated for any future Cloud Run service that reuses `src/lib/` without needing NextAuth.
+
+**Health check:** The deploy script uses `gcloud run services proxy` on a local port (does not require SA impersonation) instead of `gcloud auth print-identity-token --audiences=` which requires additional IAM permissions.
 
 ### Staging Services
 
@@ -516,18 +557,23 @@ Staging services share the same configuration as their production counterparts b
 
 ### Active Jobs
 
-| Job                           | Schedule                                             | Target Service                | Timezone         |
-| ----------------------------- | ---------------------------------------------------- | ----------------------------- | ---------------- |
-| `notion-bq-daily-sync`        | `0 3 * * *` (daily at 3:00 AM)                       | `notion-bq-sync`              | America/Santiago |
-| `hubspot-bq-daily-sync`       | `30 3 * * *` (daily at 3:30 AM)                      | `hubspot-bq-sync`             | America/Santiago |
-| `hubspot-notion-deal-poll`    | `*/15 * * * *` (every 15 min)                        | `hubspot-notion-deal-sync`    | America/Santiago |
-| `notion-hubspot-reverse-poll` | `7,22,37,52 * * * *` (every 15 min, offset by 7 min) | `notion-hubspot-reverse-sync` | America/Santiago |
-| `ico-materialize-daily`       | `15 3 * * *` (daily at 3:15 AM)                       | `ico-batch-worker` (us-east4) | America/Santiago |
-| `ico-llm-enrich-daily`        | `45 3 * * *` (daily at 3:45 AM)                       | `ico-batch-worker` (us-east4) | America/Santiago |
+| Job                             | Schedule                                             | Target Service                | Timezone         |
+| ------------------------------- | ---------------------------------------------------- | ----------------------------- | ---------------- |
+| `notion-bq-daily-sync`          | `0 3 * * *` (daily at 3:00 AM)                       | `notion-bq-sync`              | America/Santiago |
+| `hubspot-bq-daily-sync`         | `30 3 * * *` (daily at 3:30 AM)                      | `hubspot-bq-sync`             | America/Santiago |
+| `hubspot-notion-deal-poll`      | `*/15 * * * *` (every 15 min)                        | `hubspot-notion-deal-sync`    | America/Santiago |
+| `notion-hubspot-reverse-poll`   | `7,22,37,52 * * * *` (every 15 min, offset by 7 min) | `notion-hubspot-reverse-sync` | America/Santiago |
+| `ico-materialize-daily`         | `15 3 * * *` (daily at 3:15 AM)                      | `ico-batch-worker` (us-east4) | America/Santiago |
+| `ico-llm-enrich-daily`          | `45 3 * * *` (daily at 3:45 AM)                      | `ico-batch-worker` (us-east4) | America/Santiago |
+| `ops-reactive-process`          | `*/5 * * * *` (every 5 min)                          | `ops-worker` (us-east4)       | America/Santiago |
+| `ops-reactive-process-delivery` | `2-59/5 * * * *` (every 5 min, offset by 2 min)      | `ops-worker` (us-east4)       | America/Santiago |
+| `ops-reactive-recover`          | `*/15 * * * *` (every 15 min)                        | `ops-worker` (us-east4)       | America/Santiago |
 
 The 7-minute offset on `notion-hubspot-reverse-poll` prevents overlap with the forward sync job, reducing contention on shared Notion API rate limits.
 
 The `ico-materialize-daily` and `ico-llm-enrich-daily` jobs replace the Vercel cron routes that exceeded the 120s timeout. The 30-minute gap between materialization and LLM enrichment ensures outbox events from materialization are published before enrichment reads the signals. Both jobs target the `ico-batch-worker` service in `us-east4` (co-located with Cloud SQL) via IAM OIDC authentication.
+
+The `ops-reactive-*` jobs replace 3 Vercel cron routes (`outbox-react`, `outbox-react-delivery`, `projection-recovery`) migrated to Cloud Run for durability. The 2-minute offset on `ops-reactive-process-delivery` prevents overlap with the all-domains process job. All 3 jobs target the `ops-worker` service in `us-east4` via IAM OIDC authentication. The original Vercel API routes remain as manual fallback endpoints but are no longer scheduled.
 
 ### Paused Jobs (Staging)
 
@@ -538,22 +584,61 @@ The `ico-materialize-daily` and `ico-llm-enrich-daily` jobs replace the Vercel c
 
 ---
 
-## 6. Vercel Crons
+## 6. Vercel Crons (canonical inventory)
 
-Defined in `vercel.json` at the repository root. These are Next.js API routes invoked by Vercel's built-in cron scheduler.
+Defined in `vercel.json` at the repository root. Next.js API routes invoked by Vercel's built-in cron scheduler. Timezone: UTC.
 
-| Path                                    | Schedule (UTC)                | Purpose                                                                                                                                                                                              |
-| --------------------------------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/api/cron/outbox-publish`              | `*/5 * * * *` (every 5 min)   | Consumes the Postgres transactional outbox and publishes events to BigQuery                                                                                                                          |
-| `/api/cron/outbox-react`                | `*/5 * * * *` (every 5 min)   | Processes reactive projections (all domains sequentially)                                                                                                                                            |
-| `/api/cron/webhook-dispatch`            | `*/2 * * * *` (every 2 min)   | Dispatches pending outbound webhooks to subscribed endpoints                                                                                                                                         |
-| `/api/cron/email-delivery-retry`        | `*/5 * * * *` (every 5 min)   | Retries failed email deliveries                                                                                                                                                                      |
-| `/api/cron/projection-recovery`         | `*/15 * * * *` (every 15 min) | Recovers orphaned projection refresh items stuck as pending/processing >30 min                                                                                                                       |
-| `/api/cron/sync-conformed`              | `45 3 * * *` (daily 3:45 AM)  | Transforms raw Notion data (`notion_ops`) into normalized conformed layer (`greenhouse_conformed`) with PostgreSQL projections. Runs after `notion-bq-sync` (3:00 AM) and before ICO materialization |
-| `/api/cron/ico-materialize`             | `15 6 * * *` (daily 6:15 AM)  | Materializes ICO Engine monthly metric snapshots from conformed and raw data                                                                                                                         |
-| `/api/cron/nubox-sync`                  | `30 7 * * *` (daily 7:30 AM)  | Syncs Nubox DTE and financial data                                                                                                                                                                   |
-| `/api/finance/exchange-rates/sync`      | `5 23 * * *` (daily 11:05 PM) | Fetches latest currency exchange rates and persists to Postgres                                                                                                                                      |
-| `/api/finance/economic-indicators/sync` | `5 23 * * *` (daily 11:05 PM) | Fetches economic indicators (UF, UTM, IPC)                                                                                                                                                           |
+### Active (13 entries in vercel.json)
+
+| Path | Schedule | maxDuration | Purpose | Placement review |
+|---|---|---|---|---|
+| `/api/cron/outbox-publish` | `*/5 * * * *` | 60s | Consume Postgres outbox → publish events to BigQuery | Keep — queue ligera, 60s suficiente |
+| `/api/cron/webhook-dispatch` | `*/2 * * * *` | 60s | Dispatch pending outbound webhooks | Keep — async dispatch estándar |
+| `/api/cron/email-delivery-retry` | `*/5 * * * *` | 60s | Retry failed email deliveries | Keep — retry queue estándar |
+| `/api/cron/sync-conformed` | `20 7 * * *` | 120s | Orquestar Notion sync conformed layer + data quality | **Migrar** — orquestación compleja, 120s, retry |
+| `/api/cron/sync-conformed-recovery` | `*/30 * * * *` | 120s | Recovery de sync conformed runs fallidos | **Migrar** — backlog-driven recovery, durabilidad crítica |
+| `/api/cron/ico-materialize` | `15 10 * * *` | 120s | Materializar snapshots ICO mensuales | Keep — determinístico, 120s suficiente. **Duplicado**: también en Cloud Run `ico-batch-worker` a las 3:15 AM |
+| `/api/cron/ico-member-sync` | `30 10 * * *` | — | Sync BQ→PG de métricas ICO por miembro | Evaluar — upserts por fila, sin alerting |
+| `/api/cron/notion-delivery-data-quality` | `0 10 * * *` | 120s | Validar paridad de datos Notion delivery | Keep — scan sin backlog |
+| `/api/cron/nubox-sync` | `30 7 * * *` | 120s | ETL 3 fases: Nubox API → raw BQ → conformed → PG | Evaluar — multi-fase, fallos parciales tolerados |
+| `/api/cron/nubox-balance-sync` | `0 */4 * * *` | 60s | Reconciliación de balances Nubox BQ→PG | Keep — ligero, rápido |
+| `/api/cron/entra-profile-sync` | `0 8 * * *` | 300s | Sync Entra: avatar, identity link, datos profesionales | Evaluar — 300s (máximo Vercel), sin retry |
+| `/api/cron/entra-webhook-renew` | `0 6 */2 * *` | 30s | Renovar suscripción webhook de Entra | Keep — trigger simple |
+| `/api/finance/economic-indicators/sync` | `5 23 * * *` | — | Fetch indicadores económicos (UF, UTM, IPC, exchange rates) | Keep — API call diario |
+
+### Migrated to Cloud Run
+
+| Ruta original (fallback manual) | Cloud Run service | Scheduler job | Desde |
+|---|---|---|---|
+| `/api/cron/outbox-react` | `ops-worker` | `ops-reactive-process` | TASK-254 |
+| `/api/cron/outbox-react-delivery` | `ops-worker` | `ops-reactive-process-delivery` | TASK-254 |
+| `/api/cron/projection-recovery` | `ops-worker` | `ops-reactive-recover` | TASK-254 |
+
+> Las rutas API siguen existiendo como endpoints de fallback manual pero ya no están en `vercel.json`.
+
+### Próximos candidatos a migración
+
+| Cron | Razón | Prioridad | Task |
+|---|---|---|---|
+| `sync-conformed` | Orquestación compleja, 120s, semántica de retry, durabilidad | Alta | TASK-258 |
+| `sync-conformed-recovery` | Recovery de backlog, durabilidad crítica, 120s | Alta | TASK-258 |
+| `entra-profile-sync` | 300s (máximo Vercel), per-user upserts, sin retry | Media | TASK-259 |
+| `nubox-sync` | ETL 3 fases, fallos parciales, observabilidad | Media | TASK-260 |
+| `ico-member-sync` | Upserts BQ→PG por fila, sin alerting, latencia | Media | TASK-260 |
+| `webhook-dispatch` | Cola con latencia externa, fallo silencioso, cada 2 min | Media | TASK-261 |
+
+| `outbox-publish` | Fundamento del event bus, alimenta al reactor ya en Cloud Run | Alta | TASK-262 |
+
+> **Nota**: con TASK-262, el pipeline completo (publish → react → projections) correrá íntegramente en Cloud Run. Ya no habrá dependencia de Vercel para el event bus.
+
+### Placement decision criteria
+
+Un cron debe migrar a Cloud Run cuando cumple **2 o más** de:
+1. Procesa una cola o backlog (no determinístico)
+2. Necesita >60s de forma habitual
+3. Tiene semántica de retry/recovery
+4. Fallo silencioso tiene impacto operativo
+5. Se beneficia de run tracking institucional (`source_sync_runs`)
 
 ---
 
