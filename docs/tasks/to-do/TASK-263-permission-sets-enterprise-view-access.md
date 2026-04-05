@@ -318,6 +318,8 @@ const allViews = new Set([...roleViews, ...setViews])
 
 ## Open Questions
 
-- Los Permission Sets de sistema deberian ser editables (agregar/quitar vistas) o completamente fijos? Propuesta: editables en vistas pero no eliminables.
-- Cuando un admin cambia las vistas de un set, los usuarios asignados deberian reloguearse para ver el cambio? Si, porque `authorizedViews` vive en el JWT — alternativa: agregar TTL de refresh al session.
-- Deberia haber un limite maximo de Permission Sets por usuario? Propuesta: no, pero mostrar warning si > 5.
+Todas resueltas (2026-04-05):
+
+- ~~Los Permission Sets de sistema deberian ser editables o fijos?~~ **决definido: editables en vistas (admin puede agregar/quitar vistas) pero no eliminables.**
+- ~~Usuarios deben reloguearse tras cambio de set?~~ **Decidido: si, requiere re-login porque `authorizedViews` vive en el JWT. Futuro: evaluar TTL de refresh.**
+- ~~Limite maximo de Permission Sets por usuario?~~ **Decidido: sin limite, pero warning visual en UI si > 5 sets asignados.**
