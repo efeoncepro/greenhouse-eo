@@ -33,6 +33,7 @@ yarn-error.log*
 .env*.local
 .env
 .env.staging-check
+.env*.tmp
 
 # claude code local settings (may contain API keys)
 .claude/settings.json
