@@ -20,7 +20,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-251`
+- siguiente ID disponible: `TASK-253`
 - `TASK-241` migra procesos batch pesados (ICO materialización, LLM enrichment) de Vercel Functions a Cloud Run. Formaliza política: batch > 30s → Cloud Run. Código listo, deploy operacional pendiente.
 - `TASK-239` enriquece el prompt LLM de Nexa Insights con glosario de métricas, cadena causal, doble capa narrativa y nombres de Space/miembros.
 - `TASK-240` agrega menciones interactivas (@mentions) de Spaces y miembros en los insights de Nexa — chips clickeables que navegan a perfiles. Depende de `TASK-239`.
@@ -30,6 +30,8 @@ Primer bloque operativo asignado:
 - `TASK-245` crea el primer engine de señales fuera del ICO: detector de anomalías para métricas financieras, enrichment LLM domain-aware, y surfacing en Finance Dashboard.
 - `TASK-246` genera un digest semanal consolidado con top insights cross-Space, enviado por email al liderazgo cada lunes 7 AM vía Cloud Scheduler + Cloud Run + Resend. Depende de `TASK-244`.
 - `TASK-250` formaliza el cleanup del warning React `key` en `PayrollExportReadyEmail` para que el summary de observabilidad no siga reportando ruido no fatal del suite.
+- `TASK-251` crea la capability enterprise para backlog reactivo real: visibilidad del tramo `published -> outbox_reactive_log`, replay scoped, lag operativo y alerting en Admin Ops.
+- `TASK-252` crea el `Ops Copilot` para `Admin Center` y `Ops Health`: IA grounded en métricas reales, explicación operativa, payloads sugeridos, avisos no invasivos vía el sistema actual de notificaciones y aprobación humana antes de ejecutar acciones mutantes.
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 - `TASK-231` quedó cerrada como tooling repo/global para la skill `greenhouse-task-planner` de Codex.
 - `TASK-232` ya quedó cerrada con lane async LLM operativa para `ICO`: trigger reactivo, storage BQ/PG, readers downstream y baseline `Gemini`.
@@ -84,6 +86,8 @@ Primer bloque operativo asignado:
 | `TASK-244` | [TASK-244-nexa-insights-home-dashboard.md](to-do/TASK-244-nexa-insights-home-dashboard.md)                                                                                  | P2        | Alto     | Bajo     | Diseño                  | Widget "Top Insights" en Home Dashboard con las 3 señales más críticas cross-Space del período actual vía `NexaInsightsBlock`                                                                |
 | `TASK-245` | [TASK-245-finance-signal-engine.md](to-do/TASK-245-finance-signal-engine.md)                                                                                                | P2        | Muy alto | Alto     | Diseño                  | Primer engine de señales fuera del ICO: detector de anomalías financieras, enrichment LLM domain-aware, surfacing en Finance Dashboard                                                       |
 | `TASK-250` | [TASK-250-payroll-export-email-react-key-warning.md](to-do/TASK-250-payroll-export-email-react-key-warning.md)                                                              | P2        | Medio    | Bajo     | Diseño                  | Cleanup focalizado del warning React `key` en `PayrollExportReadyEmail` para limpiar la señal del summary de observabilidad sin reabrir el rediseño del email                                |
+| `TASK-251` | [TASK-251-reactive-control-plane-backlog-observability-replay.md](to-do/TASK-251-reactive-control-plane-backlog-observability-replay.md)                                    | P1        | Muy alto | Alto     | Diseño                  | Capability enterprise para medir backlog reactivo real, hacer replay scoped y degradar Ops Health cuando el reactor quede atrasado aunque publish siga sano                                  |
+| `TASK-252` | [TASK-252-admin-center-ops-copilot.md](to-do/TASK-252-admin-center-ops-copilot.md)                                                                                          | P2        | Alto     | Alto     | Diseño                  | Copiloto IA para Admin Center/Ops Health que explica backlog y lag, recomienda acciones scoped, puede emitir avisos no invasivos con el sistema actual de notificaciones y exige aprobación humana antes de ejecutar mutaciones |
 
 ## Complete
 

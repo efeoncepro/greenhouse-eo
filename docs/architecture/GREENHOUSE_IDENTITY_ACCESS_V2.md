@@ -1,5 +1,22 @@
 # Greenhouse Identity & Access Architecture V2
 
+## Delta 2026-04-05 — Identity Spec Residual Gaps (TASK-253)
+
+### Gaps cerrados
+
+- **Gap 1 (Approval Snapshot):** Verificado como ya cerrado — `supervisor_member_id` se persiste al momento del submit del leave request. No requiere cambios.
+- **Gap 2 (scope.revoked):** `revokeStaleProjectScopes()` en `tenant-member-provisioning.ts` desactiva scopes obsoletos y emite `scope.revoked` al outbox. Complementa la emisión de `scope.assigned` de TASK-248.
+- **Gap 4 (user.deactivated / user.reactivated):** Eventos canónicos emitidos desde ambas vías:
+  - Admin Center: `deactivateMember()` emite `user.deactivated` (deactivatedBy: 'admin')
+  - SCIM: `updateUser()` emite `user.deactivated` o `user.reactivated` (deactivatedBy: 'scim')
+- Aggregate type `userLifecycle` agregado al catálogo
+- Payloads: `UserDeactivatedPayload`, `UserReactivatedPayload`
+- Ambos eventos en `REACTIVE_EVENT_TYPES`
+
+### Estado de compliance con spec
+
+Todos los gaps identificados al contrastar `GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md` + `GREENHOUSE_IDENTITY_ACCESS_V2.md` contra el código están cerrados (TASK-247 + TASK-248 + TASK-253).
+
 ## Delta 2026-04-05 — Identity & Platform Block Hardening (TASK-247)
 
 - Race conditions cerradas: superadmin count con `FOR UPDATE` dentro de tx, primary demotion con `FOR UPDATE`

@@ -20,6 +20,7 @@ Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se
 | Cron react (people) | `/api/cron/outbox-react-people` | Solo dominio `people` |
 | Cron react (finance) | `/api/cron/outbox-react-finance` | Solo dominio `finance` |
 | Cron react (notify) | `/api/cron/outbox-react-notify` | Solo dominio `notifications` |
+| Cron react (delivery) | `/api/cron/outbox-react-delivery` | Solo dominio `delivery` (TASK-253) |
 | Log reactivo | `greenhouse_sync.outbox_reactive_log` | Tracking con retries y dead-letter, keyed by `(event_id, handler)` |
 | Recovery cron | `/api/cron/projection-recovery` | Cada 15 min — reclama items huérfanos (pending/processing >30 min) y re-ejecuta el refresh |
 | Observabilidad | `/api/internal/projections` | Stats por proyeccion + queue health |

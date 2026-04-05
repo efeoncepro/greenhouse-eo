@@ -95,7 +95,10 @@ export const AGGREGATE_TYPES = {
   userScope: 'user_scope',
 
   // Auth Session (TASK-248)
-  authSession: 'auth_session'
+  authSession: 'auth_session',
+
+  // User Lifecycle (TASK-253)
+  userLifecycle: 'user_lifecycle'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -252,7 +255,11 @@ export const EVENT_TYPES = {
 
   // Auth Session (TASK-248)
   loginSuccess: 'auth.login.success',
-  loginFailed: 'auth.login.failed'
+  loginFailed: 'auth.login.failed',
+
+  // User Lifecycle (TASK-253)
+  userDeactivated: 'user.deactivated',
+  userReactivated: 'user.reactivated'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
@@ -350,7 +357,11 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.scopeAssigned,
   EVENT_TYPES.scopeRevoked,
   EVENT_TYPES.loginSuccess,
-  EVENT_TYPES.loginFailed
+  EVENT_TYPES.loginFailed,
+
+  // User Lifecycle (TASK-253)
+  EVENT_TYPES.userDeactivated,
+  EVENT_TYPES.userReactivated
 ] as const
 
 // ── Event Payload Types (TASK-247) ──
@@ -422,4 +433,19 @@ export interface LoginFailedPayload {
   email: string
   provider: string
   reason: string
+}
+
+// ── Event Payload Types (TASK-253) ──
+
+export interface UserDeactivatedPayload {
+  userId: string
+  memberId?: string
+  deactivatedBy: 'admin' | 'scim' | 'system'
+  reason?: string
+}
+
+export interface UserReactivatedPayload {
+  userId: string
+  memberId?: string
+  reactivatedBy: 'admin' | 'scim' | 'system'
 }

@@ -2046,6 +2046,14 @@ export const deactivateMember = async ({
     payload: { memberId: updated.memberId }
   })
 
+  // Canonical user lifecycle event (TASK-253)
+  publishOutboxEvent({
+    aggregateType: AGGREGATE_TYPES.userLifecycle,
+    aggregateId: actorUserId,
+    eventType: EVENT_TYPES.userDeactivated,
+    payload: { userId: actorUserId, memberId: updated.memberId, deactivatedBy: 'admin' }
+  }).catch(() => {})
+
   return updated
 }
 

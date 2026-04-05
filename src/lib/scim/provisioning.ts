@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto'
 
 import { getDb, query } from '@/lib/db'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 
 import type { ScimUserRow } from './formatters'
 
@@ -344,6 +345,23 @@ export const updateUser = async (
       updates
     }
   })
+
+  // Canonical user lifecycle event (TASK-253)
+  if (updates.active === false) {
+    publishOutboxEvent({
+      aggregateType: AGGREGATE_TYPES.userLifecycle,
+      aggregateId: rows[0].user_id,
+      eventType: EVENT_TYPES.userDeactivated,
+      payload: { userId: rows[0].user_id, deactivatedBy: 'scim' }
+    }).catch(() => {})
+  } else if (updates.active === true) {
+    publishOutboxEvent({
+      aggregateType: AGGREGATE_TYPES.userLifecycle,
+      aggregateId: rows[0].user_id,
+      eventType: EVENT_TYPES.userReactivated,
+      payload: { userId: rows[0].user_id, reactivatedBy: 'scim' }
+    }).catch(() => {})
+  }
 
   return rows[0]
 }

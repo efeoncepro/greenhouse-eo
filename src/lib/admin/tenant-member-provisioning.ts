@@ -511,6 +511,61 @@ const upsertProjectScopes = async ({
   }
 }
 
+/**
+ * Revoke project scopes that are no longer in the active list.
+ * Sets active=FALSE in BigQuery and emits scope.revoked outbox event (TASK-253).
+ */
+export const revokeStaleProjectScopes = async ({
+  userId,
+  clientId,
+  activeProjectIds
+}: {
+  userId: string
+  clientId: string
+  activeProjectIds: string[]
+}) => {
+  const projectId = getBigQueryProjectId()
+  const bigQuery = getBigQueryClient()
+
+  // Find currently active scopes for this user+client that are NOT in the active list
+  const [staleRows] = await bigQuery.query({
+    query: `
+      SELECT project_id
+      FROM \`${projectId}.greenhouse.user_project_scopes\`
+      WHERE user_id = @userId
+        AND client_id = @clientId
+        AND active = TRUE
+        AND project_id NOT IN UNNEST(@activeProjectIds)
+    `,
+    params: { userId, clientId, activeProjectIds: activeProjectIds.length > 0 ? activeProjectIds : ['__none__'] }
+  })
+
+  if (!staleRows || staleRows.length === 0) return
+
+  for (const row of staleRows as Array<{ project_id: string }>) {
+    const revokedProjectId = row.project_id
+
+    await bigQuery.query({
+      query: `
+        UPDATE \`${projectId}.greenhouse.user_project_scopes\`
+        SET active = FALSE, updated_at = CURRENT_TIMESTAMP()
+        WHERE user_id = @userId AND project_id = @projectId AND active = TRUE
+      `,
+      params: { userId, projectId: revokedProjectId }
+    })
+
+    // Audit: emit scope.revoked event (TASK-253)
+    publishOutboxEvent({
+      aggregateType: AGGREGATE_TYPES.userScope,
+      aggregateId: buildScopeId(userId, revokedProjectId),
+      eventType: EVENT_TYPES.scopeRevoked,
+      payload: { userId, scopeType: 'project' as const, scopeId: revokedProjectId, clientId }
+    }).catch(err => {
+      console.warn('[tenant-member-provisioning] Failed to emit scope.revoked event:', err)
+    })
+  }
+}
+
 export const provisionTenantUsersFromHubSpotContacts = async ({
   clientId,
   actorUserId,
