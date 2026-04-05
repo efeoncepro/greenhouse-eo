@@ -1,5 +1,32 @@
 # Handoff.md
 
+## Sesión 2026-04-05 — TASK-195 Space Identity Consolidation
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: consolidación org-first del admin, nueva surface de cuentas, legacy banner, breadcrumbs
+
+### Qué se hizo
+
+- **TASK-195 implementada y cerrada** (5 slices):
+  - Slice 1: deltas en ARCHITECTURE_V1 y 360_OBJECT_MODEL_V1 formalizando Organization/Space/Space 360
+  - Slice 2: `/admin/accounts` (lista de organizaciones con KPIs) + `/admin/accounts/[id]` (detalle con spaces, readiness, create space dialog)
+  - Slice 3: creación de Space accesible desde ficha de cuenta con dialog inline
+  - Slice 4: banner info en `/admin/tenants/[id]` "Esta vista está en transición" con link a Cuentas
+  - Slice 5: breadcrumbs Space 360 muestran Organization, "Cuentas" en sidebar admin, nomenclatura en GH_INTERNAL_NAV
+
+### Pendiente operacional
+
+- Nada — build y lint OK, todo pusheado
+
+### Verificación
+
+- `pnpm build` — OK
+- `pnpm lint` — OK
+
+---
+
 ## Sesión 2026-04-05 — TASK-225 cierre + TASK-227 implementación
 
 ### Rama / alcance

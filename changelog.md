@@ -2,6 +2,15 @@
 
 ## 2026-04-05
 
+- **TASK-195 Space Identity Consolidation: Organization-First Admin — cerrada**:
+  - nueva surface admin: `/admin/accounts` (lista de organizaciones con 4 KPIs, tabla TanStack, paginación, búsqueda)
+  - nueva surface admin: `/admin/accounts/[id]` (detalle de cuenta con sidebar, lista de spaces, readiness chips, create space dialog, links a Space 360)
+  - banner legacy en `/admin/tenants/[id]` indicando transición a Cuentas
+  - breadcrumbs Space 360 muestran Organization cuando disponible
+  - "Cuentas" agregado al sidebar admin (menú Gobierno)
+  - nomenclatura: `adminAccounts` en `GH_INTERNAL_NAV`
+  - docs: deltas en ARCHITECTURE_V1 y 360_OBJECT_MODEL_V1 formalizando Organization→Space→Space 360
+
 - **TASK-225 Internal Roles & Hierarchies — cerrada**:
   - spec canónica `GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md` completada (474 líneas, 9 secciones)
   - 4 planos formalizados: Access Role, Reporting Hierarchy, Structural Hierarchy, Operational Responsibility

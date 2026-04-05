@@ -5,6 +5,7 @@ import { useRef, useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
+import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
@@ -223,14 +224,28 @@ const GreenhouseAdminTenantDetail = ({ data }: Props) => {
   // ─── Root: Sidebar + Content ───────────────────────────────────────────────
 
   return (
-    <Grid container spacing={6}>
-      <Grid size={{ xs: 12, md: 5, lg: 4 }}>
-        {sidebar}
+    <>
+      <Alert
+        severity='info'
+        variant='outlined'
+        sx={{ mb: 4 }}
+        action={
+          <Button component={Link} href='/admin/accounts' color='info' size='small'>
+            Ir a Cuentas
+          </Button>
+        }
+      >
+        Esta vista esta en transicion. La gestion de cuentas y spaces se consolida en Cuentas.
+      </Alert>
+      <Grid container spacing={6}>
+        <Grid size={{ xs: 12, md: 5, lg: 4 }}>
+          {sidebar}
+        </Grid>
+        <Grid size={{ xs: 12, md: 7, lg: 8 }}>
+          {content}
+        </Grid>
       </Grid>
-      <Grid size={{ xs: 12, md: 7, lg: 8 }}>
-        {content}
-      </Grid>
-    </Grid>
+    </>
   )
 }
 

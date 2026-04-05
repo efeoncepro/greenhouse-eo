@@ -1,5 +1,17 @@
 # Greenhouse 360 Object Model V1
 
+## Delta 2026-04-05 — Organization, Space y Space 360 formalizados (TASK-195)
+
+- `Organization` es la cuenta canónica (entrypoint admin principal)
+- `Space` es el child object operativo de la cuenta
+- `Space 360` es una vista del objeto Space, NO una entidad paralela
+- Boundaries explícitos:
+  - Organization: identidad de cuenta, personas, integraciones a nivel cuenta, contexto comercial
+  - Space: configuración operativa, Notion binding, capabilities, readiness, scope de delivery
+  - Space 360: lectura operativa rica del mismo Space (metrics, team, services, finance, ICO)
+- Regla: nuevos flujos de onboarding deben partir desde Organization y ejecutarse sobre Space
+- Regla: no abrir dos shells maestras nuevas para el mismo objeto
+
 ## Delta 2026-03-31 — `Asset` entra como object cross-module governado
 
 Greenhouse ya debe tratar `Asset` como object técnico compartido del portal.

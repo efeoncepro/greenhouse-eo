@@ -1,11 +1,13 @@
 # TASK-195 - Space Identity Consolidation: Organization-First Admin Entry & Space Onboarding
 
-## Delta 2026-04-05
-- TASK-225 cerrada — 4 planos de jerarquía interna formalizados; `Organization` y `Space` ya tienen separación arquitectónica canónica
-- TASK-227 implementada — `greenhouse_core.operational_responsibilities` ya disponible como registry de ownership por scope
-- Agency Space 360 ya muestra ownership badges (account_lead, delivery_lead, etc.) en OverviewTab
-- Implicación: la surface admin org-first (Slice 2) puede integrar el registry de responsabilidades desde el primer momento
-- Implicación: el onboarding de Space (Slice 3) puede asignar un `account_lead` como parte del flujo de creación
+## Delta 2026-04-05 — Implementación completa
+
+- **Slice 1 (Formalización)**: deltas en ARCHITECTURE_V1 y 360_OBJECT_MODEL_V1 con boundaries Organization/Space/Space 360
+- **Slice 2 (Admin org-first)**: `/admin/accounts` (lista) + `/admin/accounts/[id]` (detalle con spaces, readiness, CTAs)
+- **Slice 3 (Space onboarding)**: diálogo de creación de Space accesible desde ficha de cuenta; onboarding Notion linkeable desde cada space card
+- **Slice 4 (Legacy tenant)**: banner info en `/admin/tenants/[id]` con link a Cuentas
+- **Slice 5 (Alineación)**: breadcrumbs Space 360 muestran Organization, "Cuentas" en sidebar admin, nomenclatura actualizada
+- TASK-225/227 cerradas previamente, ownership operativo implementado
 
 ## Delta 2026-04-03
 
@@ -20,11 +22,11 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Diseño`
+- Status real: `Completada 2026-04-05`
 - Rank: `TBD`
 - Domain: `platform`
 - GitHub Project: `[pending]`

@@ -1,5 +1,19 @@
 # Greenhouse Architecture V1
 
+## Delta 2026-04-05 — Organization-first admin surface (TASK-195)
+
+- `Organization` es ahora el entrypoint administrativo principal de la cuenta
+- `Space` es el child object operativo de la cuenta
+- `Space 360` es una vista del objeto Space, no una entidad paralela
+- Nuevas surfaces admin:
+  - `/admin/accounts` — lista de organizaciones con space counts y readiness
+  - `/admin/accounts/[id]` — detalle admin de cuenta con lista de spaces, CTAs de onboarding, links a Space 360
+- `/admin/tenants/[id]` queda tratado como surface legacy/transicional con banner informativo
+- Navigation: "Cuentas" agregado al menú admin como entrypoint principal
+- Breadcrumbs Space 360: ahora muestra Organización cuando está disponible
+- Regla de naming: "Organización" para la cuenta, "Space" para el objeto operativo, "Space 360" para la vista operativa
+- El onboarding de Space y Notion se accede desde la ficha de cuenta, no desde `/admin/tenants/[id]`
+
 ## Delta 2026-04-03 — Internal roles and hierarchies now have a canonical spec
 
 La semántica interna de:

@@ -98,9 +98,21 @@ const Space360View = ({ detail, requestedId }: Props) => {
         <Typography component={Link} href='/agency?tab=spaces' color='inherit' variant='body2' sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
           Agencia
         </Typography>
-        <Typography component={Link} href='/agency?tab=spaces' color='inherit' variant='body2' sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
-          Spaces
-        </Typography>
+        {detail.organizationName ? (
+          <Typography
+            component={Link}
+            href={detail.organizationId ? `/agency/organizations/${detail.organizationId}` : '/agency?tab=spaces'}
+            color='inherit'
+            variant='body2'
+            sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+          >
+            {detail.organizationName}
+          </Typography>
+        ) : (
+          <Typography component={Link} href='/agency?tab=spaces' color='inherit' variant='body2' sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
+            Spaces
+          </Typography>
+        )}
         <Typography color='text.primary' variant='body2'>
           {detail.clientName ?? detail.spaceId}
         </Typography>
