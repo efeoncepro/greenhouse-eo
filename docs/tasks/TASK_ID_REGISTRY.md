@@ -291,3 +291,8 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-239` | `to-do` | Nexa Insights: Prompt Enrichment con Glosario de Métricas y Cadena Causal | `docs/tasks/to-do/TASK-239-nexa-advisory-prompt-enrichment-metric-glossary.md` |
 | `TASK-240` | `complete` | Nexa Insights: Menciones Interactivas de Spaces y Miembros | `docs/tasks/complete/TASK-240-nexa-insights-entity-mentions.md` |
 | `TASK-241` | `complete` | Migrar procesos batch pesados a Cloud Run | `docs/tasks/complete/TASK-241-batch-processes-cloud-run-migration.md` |
+| `TASK-242` | `to-do` | Nexa Insights en Space 360 | `docs/tasks/to-do/TASK-242-nexa-insights-space-360.md` |
+| `TASK-243` | `to-do` | Nexa Insights en Person 360 | `docs/tasks/to-do/TASK-243-nexa-insights-person-360.md` |
+| `TASK-244` | `to-do` | Nexa Insights Widget en Home Dashboard | `docs/tasks/to-do/TASK-244-nexa-insights-home-dashboard.md` |
+| `TASK-245` | `to-do` | Finance Signal Engine | `docs/tasks/to-do/TASK-245-finance-signal-engine.md` |
+| `TASK-246` | `to-do` | Narrativa ejecutiva semanal de Nexa | `docs/tasks/to-do/TASK-246-nexa-weekly-executive-digest.md` |

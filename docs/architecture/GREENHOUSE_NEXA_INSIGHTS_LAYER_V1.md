@@ -1,0 +1,273 @@
+# Greenhouse — Nexa Insights Layer Architecture
+
+> **Version:** 1.0
+> **Creado:** 2026-04-05
+> **Audience:** Agentes de implementación, arquitectos, product owners
+> **Docs relacionados:**
+> - `GREENHOUSE_MENTION_SYSTEM_V1.md` — formato de @mentions
+> - `Greenhouse_ICO_Engine_v1.md` — contrato del ICO Engine y LLM lane
+> - `GREENHOUSE_BATCH_PROCESSING_POLICY_V1.md` (§1.1 en Cloud Infrastructure) — política de Cloud Run
+
+---
+
+## 1. Qué es Nexa Insights Layer
+
+Un sistema transversal que permite a cualquier módulo del portal Greenhouse:
+
+1. **Generar señales operativas** (anomalías, predicciones, root causes, recomendaciones)
+2. **Enriquecerlas con narrativa AI** (LLM enrichment vía Gemini)
+3. **Mostrarlas en la UI** con componentes reutilizables y menciones interactivas
+
+**Principio rector:** todo módulo que muestre métricas operativas puede —y debería— tener una capa de narrativa inteligente que explique el *por qué* y sugiera el *qué hacer*.
+
+---
+
+## 2. Arquitectura de la capa
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                       SIGNAL SOURCES                             │
+│  Cada dominio tiene su propio detector de señales.               │
+│  El contrato de salida es estandar.                              │
+├──────────┬──────────┬──────────┬──────────┬─────────────────────┤
+│ ICO      │ Finance  │ Capacity │ HR/      │ [futuro dominio]    │
+│ Engine   │ Engine   │ Engine   │ Payroll  │                     │
+│ (activo) │ (futuro) │ (futuro) │ (futuro) │                     │
+└────┬─────┴────┬─────┴────┬─────┴────┬─────┴─────────────────────┘
+     │          │          │          │
+     ▼          ▼          ▼          ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      SIGNAL STORE                                │
+│  Domain-scoped tables (no tabla unificada)                       │
+│                                                                  │
+│  ICO:      greenhouse_serving.ico_ai_signals                     │
+│            greenhouse_serving.ico_ai_signal_enrichments           │
+│  Finance:  greenhouse_serving.finance_ai_signals (futuro)        │
+│  Capacity: greenhouse_serving.capacity_ai_signals (futuro)       │
+│                                                                  │
+│  Contrato común por signal:                                      │
+│  { signalId, signalType, entityScope, entityId, metricName,     │
+│    severity, currentValue, expectedValue, explanation,           │
+│    recommendedAction, confidence, processedAt }                  │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   LLM ENRICHMENT PIPELINE                        │
+│  Cloud Run: ico-batch-worker (us-east4)                          │
+│  Modelo: Gemini 2.5 Flash (Vertex AI)                            │
+│  Prompt: domain-aware con glosario, cadena causal, @mentions     │
+│  Output: narrativa en español con spanglish, doble capa          │
+│          (técnica + operativa), formato @[Nombre](type:ID)       │
+│  Trigger: Cloud Scheduler (diario) o on-demand                   │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     UI COMPONENTS                                │
+│  Reutilizables, domain-agnostic                                  │
+│                                                                  │
+│  NexaInsightsBlock    — Accordion con KPIs + lista de insights   │
+│  NexaInsightCard      — Card individual con chips, narrativa     │
+│  NexaMentionText      — Parser de @[Name](type:ID) → Chips      │
+│  NexaDigestWidget     — Widget compacto para Home (futuro)       │
+│                                                                  │
+│  Props comunes:                                                  │
+│  { insights: NexaInsightItem[], totalAnalyzed, lastAnalysis,    │
+│    runStatus, defaultExpanded }                                  │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      CONSUMERS (surfaces)                        │
+│                                                                  │
+│  Activos:                                                        │
+│  • Agency ICO tab (NexaInsightsBlock)                            │
+│  • Nexa Chat Home (enrichments como contexto)                    │
+│                                                                  │
+│  Próximos (Tier 1):                                              │
+│  • Space 360 Overview → NexaInsightsBlock filtrado por space_id  │
+│  • Person 360 Intelligence → filtrado por member_id              │
+│  • Home Dashboard → widget Top 3 insights cross-Space            │
+│                                                                  │
+│  Futuros (Tier 2-3):                                             │
+│  • Finance Dashboard → señales financieras                       │
+│  • Campaign 360 → señales de campaña                             │
+│  • Project Detail → señales de proyecto                          │
+│  • Digest semanal → email con top insights                       │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 3. Contrato estándar de señales
+
+Cualquier engine que genere señales para Nexa Insights debe producir este contrato mínimo:
+
+```typescript
+interface NexaSignal {
+  signalId: string                    // ID estable (EO-SIG-xxxx)
+  signalType: 'anomaly' | 'prediction' | 'root_cause' | 'recommendation'
+  entityScope: 'space' | 'member' | 'project' | 'organization' | 'business_unit'
+  entityId: string                    // ID de la entidad afectada
+  metricName: string                  // Código de la métrica (ej: 'ftr_pct', 'margin_pct')
+  severity: 'info' | 'warning' | 'critical'
+  currentValue: number | null
+  expectedValue: number | null
+  confidence: number | null           // 0-1
+  generatedAt: string                 // ISO timestamp
+}
+```
+
+Después del LLM enrichment:
+
+```typescript
+interface NexaEnrichedSignal extends NexaSignal {
+  explanationSummary: string          // Narrativa con @mentions
+  rootCauseNarrative: string          // Causa raíz + cadena causal
+  recommendedAction: string           // Acción concreta
+  qualityScore: number                // 0-100 (calidad del insight)
+  promptVersion: string               // Trazabilidad
+  promptHash: string
+}
+```
+
+---
+
+## 4. Componentes UI
+
+### NexaInsightsBlock
+
+Bloque Accordion reutilizable que muestra insights en cualquier surface.
+
+```tsx
+<NexaInsightsBlock
+  insights={insights}          // NexaInsightItem[]
+  totalAnalyzed={14}
+  lastAnalysis="2026-04-05T03:45:00Z"
+  runStatus="succeeded"
+  defaultExpanded={false}
+/>
+```
+
+**Ubicación:** `src/components/greenhouse/NexaInsightsBlock.tsx`
+
+### NexaMentionText
+
+Parser inline que convierte `@[Nombre](type:ID)` en MUI Chips clickeables.
+
+```tsx
+<NexaMentionText
+  text="@[Sky Airlines](space:spc-123) tuvo una caída de FTR%"
+  variant="body2"
+/>
+```
+
+**Ubicación:** `src/components/greenhouse/NexaMentionText.tsx`
+**Formato:** Ver `GREENHOUSE_MENTION_SYSTEM_V1.md`
+
+### Reader pattern (para consumers)
+
+Cada surface instancia el reader con su scope:
+
+```typescript
+// Space 360 — filtrado por space_id
+const insights = await readSpaceAiLlmEnrichments(spaceId, periodYear, periodMonth)
+
+// Person 360 — filtrado por member_id
+const insights = await readMemberAiLlmEnrichments(memberId, periodYear, periodMonth)
+
+// Home — top N cross-Space
+const insights = await readTopAiLlmEnrichments(periodYear, periodMonth, 3)
+```
+
+---
+
+## 5. Prompt strategy
+
+### Actual (v3): prompt genérico para ICO
+
+Un solo template con glosario de métricas ICO, cadena causal, instrucciones de narrativa y formato de @mentions. Sirve para las 3 métricas ICO actuales.
+
+### Futuro: prompts domain-aware
+
+Cuando se agreguen Finance/Capacity engines, el template se parametriza por dominio:
+
+```typescript
+const buildDomainPrompt = (domain: 'ico' | 'finance' | 'capacity') => {
+  const base = BASE_PROMPT_LINES        // Instrucciones comunes
+  const glossary = DOMAIN_GLOSSARY[domain]  // Glosario de métricas del dominio
+  const causalChain = DOMAIN_CAUSAL_CHAIN[domain]  // Cadena causal del dominio
+  return [...base, glossary, causalChain, MENTION_FORMAT, NARRATIVE_RULES].join('\n')
+}
+```
+
+Cada dominio define su propio glosario y cadena causal. Las instrucciones de narrativa y formato de mención son compartidas.
+
+---
+
+## 6. Reglas operativas
+
+### Qué va y qué no va en Nexa Insights
+
+| Sí | No |
+|----|----|
+| Anomalías detectadas estadísticamente | Opiniones sin datos |
+| Predicciones basadas en tendencias observadas | Predicciones inventadas |
+| Root causes con evidencia dimensional | Especulaciones causales |
+| Recomendaciones concretas y accionables | Recomendaciones genéricas |
+| Narrativa en español con spanglish operativo | Inglés puro o jerga no-operativa |
+| @mentions con IDs verificados | Nombres sin ID (puede confundir) |
+| Doble capa: técnica + operativa | Solo técnica o solo operativa |
+
+### Disclaimer obligatorio
+
+Todo bloque de Nexa Insights debe mostrar:
+
+> "Generado por Nexa con IA. Verifica la información antes de actuar."
+
+Definido en `GH_NEXA.disclaimer` (`greenhouse-nomenclature.ts`).
+
+### Advisory-only
+
+Los insights son **informativos** — nunca bloquean workflows, no ejecutan acciones automáticas, no modifican datos. El operador decide si actúa o no.
+
+---
+
+## 7. Extensibility: cómo agregar un nuevo dominio
+
+### Paso 1: Signal Detector
+
+Crear el detector de señales para el nuevo dominio (ej: `src/lib/finance/ai/anomaly-detector.ts`):
+- Input: métricas materializadas del dominio
+- Output: señales que cumplen el contrato `NexaSignal`
+- Materializar en tabla serving: `greenhouse_serving.{domain}_ai_signals`
+
+### Paso 2: Prompt domain-aware
+
+Agregar glosario y cadena causal del dominio a `llm-types.ts`:
+- `FINANCE_METRIC_GLOSSARY` con métricas financieras
+- `FINANCE_CAUSAL_CHAIN` con relaciones causales
+
+### Paso 3: LLM enrichment
+
+Reutilizar `materializeAiLlmEnrichments()` con la tabla de señales del dominio. El worker en Cloud Run ya es genérico.
+
+### Paso 4: Reader
+
+Crear reader scoped para el dominio (ej: `readFinanceAiLlmEnrichments()`). Seguir el patrón de `llm-enrichment-reader.ts`.
+
+### Paso 5: UI consumer
+
+Instanciar `NexaInsightsBlock` en la surface del dominio con los enrichments leídos.
+
+---
+
+## 8. Roadmap
+
+| Fase | Tasks | Timeline sugerido | Qué habilita |
+|------|-------|-------------------|--------------|
+| **Tier 1** | TASK-242, 243, 244 | Q2 2026 | Insights en Space 360, Person 360, Home |
+| **Tier 2** | TASK-245 | Q3 2026 | Señales financieras + primer engine nuevo |
+| **Tier 3** | TASK-246 | Q3-Q4 2026 | Digest semanal por email |
+| **Tier 4** | (futuro) | Q4 2026+ | Capacity Engine, feedback loop, Nexa Chat mentions |
