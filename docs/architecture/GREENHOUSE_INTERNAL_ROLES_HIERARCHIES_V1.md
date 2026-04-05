@@ -28,6 +28,26 @@ Usar junto con:
 - Origen: `TASK-225`
 - Estado: contrato arquitectónico nuevo; describe foundations ya existentes y formaliza la dirección target
 
+## Delta 2026-04-05 — Identity & Platform Block Hardening (TASK-247)
+
+### Race conditions cerradas
+- Superadmin count check movido DENTRO de `withGreenhousePostgresTransaction` con `SELECT ... FOR UPDATE` — imposible revocar el último efeonce_admin por request concurrente
+- Primary demotion en operational responsibilities usa `SELECT ... FOR UPDATE` antes del UPDATE — imposible crear dos primarios concurrentes para el mismo scope+type
+
+### Error classification
+- `RoleGuardrailError` class con `statusCode` — errores de negocio retornan HTTP 400, no 500
+- API route `PUT /api/admin/users/[id]/roles` clasifica `RoleGuardrailError` como 400
+
+### Robustez adicional
+- `administracion.cuentas` viewCode registrado en VIEW_REGISTRY para `/admin/accounts`
+- Date validation: `effectiveFrom < effectiveTo` en operational responsibilities
+- Paginación en `listResponsibilities` (LIMIT/OFFSET + count)
+- Input validation en `POST /api/admin/responsibilities`
+- Error state visible en `AdminAccountsView` (Alert + Reintentar)
+- 5 event types en REACTIVE_EVENT_TYPES (`responsibility.*`, `role.*`)
+- Payload interfaces TypeScript para todos los eventos nuevos
+- Test unitario Vitest para unicidad de VIEW_REGISTRY
+
 ## Delta 2026-04-05 — Identity & Access Spec Compliance (TASK-248)
 
 ### Drift #1 cerrado: people access formalizado
@@ -150,8 +170,6 @@ Su nombre visible recomendado en Greenhouse es `Superadministrador`.
 | `finance_admin` | `Administrador de Finanzas` | Configuración y operaciones financieras sensibles | Canónico |
 | `ai_tooling_admin` | `Administrador de Herramientas AI` | Gobierno de catálogo, licencias y wallets AI | Canónico |
 | `efeonce_admin` | `Superadministrador` | Control total de Greenhouse, usuarios, roles, settings y vistas | Canónico |
-| `employee` | `Empleado` | Alias técnico legacy del carril self-service interno | Legacy / deprecado |
-| `finance_manager` | `Responsable de Finanzas` | Alias técnico legacy del carril finance extendido | Legacy / deprecado |
 
 ### Matriz visible recomendada
 
@@ -224,18 +242,16 @@ Pero el contrato base debe partir por esta matriz y no por excepciones implícit
 
 | Nombre visible | `role_code` | `routeGroups` base | Bloques visibles base |
 |----------------|-------------|--------------------|------------------------|
-| `Superadministrador` | `efeonce_admin` | `internal`, `admin`, `client`, `finance`, `hr`, `employee`, `people`, `my`, `ai_tooling` | `Gestión`, `Administración`, `Portal cliente`, `Finanzas`, `Equipo/HR`, `Personas`, `Mi Ficha`, `IA` |
+| `Superadministrador` | `efeonce_admin` | `internal`, `admin`, `client`, `finance`, `hr`, `people`, `my`, `ai_tooling` | `Gestión`, `Administración`, `Portal cliente`, `Finanzas`, `Equipo/HR`, `Personas`, `Mi Ficha`, `IA` |
 | `Líder de Cuenta` | `efeonce_account` | `internal` | `Gestión` |
-| `Operaciones` | `efeonce_operations` | `internal` | `Gestión` |
-| `Nómina` | `hr_payroll` | `internal`, `hr` | `Gestión`, `Equipo/HR` |
+| `Operaciones` | `efeonce_operations` | `internal`, `people` | `Gestión`, `Personas` |
+| `Nómina` | `hr_payroll` | `internal`, `hr`, `people` | `Gestión`, `Equipo/HR`, `Personas` |
 | `Gestión HR` | `hr_manager` | `hr` | `Equipo/HR` |
 | `Analista de Finanzas` | `finance_analyst` | `finance` | `Finanzas` |
 | `Administrador de Finanzas` | `finance_admin` | `finance` | `Finanzas` |
 | `Lectura de Personas` | `people_viewer` | `people` | `Personas` |
 | `Administrador de Herramientas AI` | `ai_tooling_admin` | `ai_tooling` | `IA` |
 | `Colaborador` | `collaborator` | `my` | `Mi Ficha` |
-| `Empleado` `legacy` | `employee` | `internal`, `employee` | `Gestión` |
-| `Responsable de Finanzas` `legacy` | `finance_manager` | `internal`, `finance` | `Gestión`, `Finanzas` |
 | `Cliente Ejecutivo` | `client_executive` | `client` | `Portal cliente` |
 | `Cliente Manager` | `client_manager` | `client` | `Portal cliente` |
 | `Cliente Specialist` | `client_specialist` | `client` | `Portal cliente` |
@@ -255,30 +271,11 @@ Pero el contrato base debe partir por esta matriz y no por excepciones implícit
 
 ### Drift actual
 
-#### 1. El fallback hardcoded de gobernanza amplía accesos
+Todos los drifts identificados originalmente han sido cerrados:
 
-Hoy el fallback de gobernanza mantiene reglas adicionales para:
-
-- `people` para `efeonce_operations`
-- `people` para `hr_payroll`
-
-Para `efeonce_admin`, el mapping base ya debe considerarse total.
-
-#### 2. El catálogo cliente tiene duplicados
-
-El registry actual repite algunos `view_code` client-facing:
-
-- `cliente.equipo`
-- `cliente.revisiones`
-- `cliente.analytics`
-- `cliente.campanas`
-- `cliente.notificaciones`
-
-La arquitectura target debe converger a un catálogo sin duplicados antes de tratarlo como contrato UI definitivo.
-
-#### 3. `employee` sigue existiendo, pero sin bloque propio de vistas
-
-`employee` todavía deriva `internal`, pero no tiene una semántica limpia como familia de vistas. Debe tratarse como legacy hasta converger a `collaborator`.
+- ~~Drift #1: fallback hardcoded people para operations/hr_payroll~~ → cerrado (TASK-248): `people` en mapping base
+- ~~Drift #2: duplicados cliente en VIEW_REGISTRY~~ → cerrado (TASK-229): 5 duplicados eliminados, validación build-time
+- ~~Drift #3: `employee` sin bloque propio de vistas~~ → cerrado (TASK-248): `employee` eliminado, convergido a `collaborator`
 
 ### Regla target
 
@@ -505,19 +502,17 @@ El nombre físico final puede variar, pero la semántica target no.
 
 ## 7. Legacy and Convergence
 
-### Drift actual reconocido
+### Convergencia completada (TASK-248)
 
-- `employee` sigue vivo en runtime tipado, pero el contrato visible ya privilegia `collaborator`
-- `finance_manager` sigue vivo en runtime tipado, pero la taxonomía target distingue `finance_analyst` y `finance_admin`
-- `efeonce_admin` debe sostener el mismo alcance en docs, seeds y TypeScript
+Los 5 pasos de convergencia recomendados se completaron:
 
-### Convergencia recomendada
+1. ~~congelar `role_code` actuales como contratos técnicos~~ → OK
+2. ~~limpiar `role_name` visible primero~~ → OK (TASK-228)
+3. ~~marcar legacy codes explícitamente~~ → OK (TASK-228: `@deprecated`)
+4. ~~alinear seeds, docs y TypeScript~~ → OK (TASK-228 + TASK-248)
+5. ~~migración real de `role_code`~~ → OK (TASK-248): 1 usuario migrado de `employee` a `collaborator`, 0 `finance_manager` activos. Ambos eliminados del runtime
 
-1. congelar `role_code` actuales como contratos técnicos
-2. limpiar `role_name` visible primero
-3. marcar legacy codes explícitamente
-4. alinear seeds, docs y TypeScript
-5. recién después decidir si conviene una migración real de `role_code`
+Estado actual: **0 legacy role codes en runtime**. 13 role codes canónicos. BigQuery conserva entries históricas con descripción "Removed".
 
 ## 8. Non-Negotiable Rules
 

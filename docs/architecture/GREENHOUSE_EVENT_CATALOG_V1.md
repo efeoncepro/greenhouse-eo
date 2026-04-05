@@ -155,6 +155,27 @@ Notas:
 | `operational_responsibility` | `responsibility.revoked` | `operational-responsibility/store.ts` | `{ responsibilityId, memberId, scopeType, scopeId, responsibilityType }` | — |
 | `operational_responsibility` | `responsibility.updated` | `operational-responsibility/store.ts` | `{ responsibilityId, memberId, scopeType, scopeId, responsibilityType, changes }` | — |
 
+### Role Governance (TASK-226)
+
+| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
+|---|---|---|---|---|
+| `role_assignment` | `role.assigned` | `admin/role-management.ts` | `{ userId, roleCode, assignedByUserId }` | — |
+| `role_assignment` | `role.revoked` | `admin/role-management.ts` | `{ userId, roleCode, revokedByUserId }` | — |
+
+### Scope Governance (TASK-248)
+
+| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
+|---|---|---|---|---|
+| `user_scope` | `scope.assigned` | `admin/tenant-member-provisioning.ts` | `{ userId, scopeType, scopeId, clientId, accessLevel }` | — |
+| `user_scope` | `scope.revoked` | — (no revoke function yet) | `{ userId, scopeType, scopeId, clientId }` | — |
+
+### Auth Session (TASK-248)
+
+| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
+|---|---|---|---|---|
+| `auth_session` | `auth.login.success` | `auth.ts` (NextAuth `events.signIn`) | `{ userId, email, provider, tenantType }` | — |
+| `auth_session` | `auth.login.failed` | `auth.ts` (credentials `authorize`) | `{ email, provider, reason }` | — |
+
 ### Services (nuevo)
 
 | Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |

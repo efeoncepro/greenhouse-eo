@@ -1,5 +1,14 @@
 # Greenhouse Identity & Access Architecture V2
 
+## Delta 2026-04-05 — Identity & Platform Block Hardening (TASK-247)
+
+- Race conditions cerradas: superadmin count con `FOR UPDATE` dentro de tx, primary demotion con `FOR UPDATE`
+- `RoleGuardrailError` class para HTTP 400 en errores de negocio de role assignment
+- `administracion.cuentas` viewCode registrado, VerticalMenu actualizado
+- Paginación en `listResponsibilities`, error handling en AdminAccountsView
+- 5 event types en `REACTIVE_EVENT_TYPES`, payload interfaces tipadas
+- Test unitario VIEW_REGISTRY, input validation POST responsibilities
+
 ## Delta 2026-04-05 — Identity & Access Spec Compliance (TASK-248)
 
 ### Audit events implementados
