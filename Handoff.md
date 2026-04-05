@@ -25,10 +25,7 @@
 
 ### Pendiente operacional
 
-- `gcloud auth login` — tokens GCP expirados, bloquean Cloud SQL Proxy
-- `pnpm migrate:up` — ejecutar tras re-auth para crear la tabla en staging
-- `pnpm db:generate-types` — regenerar Kysely types post-migración
-- Commit del `db.d.ts` regenerado
+- Nada — todo cerrado end-to-end
 
 ### Verificación
 

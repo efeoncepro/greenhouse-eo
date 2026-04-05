@@ -18,7 +18,7 @@
   - API admin: `GET/POST /api/admin/responsibilities`, `PATCH/DELETE /[id]`
   - UI admin: `/admin/responsibilities` con tabla CRUD y diálogo de asignación
   - consumer Agency: Space 360 OverviewTab muestra ownership badges
-  - pendiente: `pnpm migrate:up` + `db:generate-types` en staging
+  - migración aplicada en `greenhouse-pg-dev`, Kysely types regenerados (162 tablas), store/readers en Kysely tipado
 
 ## 2026-04-04
 

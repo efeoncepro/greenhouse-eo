@@ -11,16 +11,17 @@
   - API Admin: `GET/POST /api/admin/responsibilities`, `PATCH/DELETE /api/admin/responsibilities/[id]`
   - UI Admin: `/admin/responsibilities` con panel CRUD
   - Consumer Agency: Space 360 OverviewTab muestra ownership badges
-- Pendiente operacional: `pnpm migrate:up` en staging (requiere Cloud SQL Proxy)
-- Pendiente: regenerar Kysely types con `pnpm db:generate-types` post-migración
+- Migración aplicada en `greenhouse-pg-dev` (staging)
+- Kysely types regenerados (162 tablas)
+- Store y readers migrados de raw SQL a Kysely tipado
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
-- Status real: `Implementado — pendiente migración staging`
+- Status real: `Completada 2026-04-05`
 - Rank: `[pending]`
 - Domain: `identity / agency / platform`
 - GitHub Project: `[pending]`
