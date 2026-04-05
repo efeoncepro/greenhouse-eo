@@ -20,6 +20,9 @@ interface SyncResult {
   membersUpdated: number
   avatarsSynced: number
   skipped: number
+  skippedDetails?: string[]
+  ghUserCount?: number
+  ghMapInfo?: string
   errors: string[]
 }
 
@@ -60,7 +63,7 @@ export const syncEntraProfiles = async (
      WHERE active = TRUE AND tenant_type = 'efeonce_internal'`
   )
 
-  console.log(`[entra-profile-sync] GH users loaded: ${ghUsers.length}`)
+  result.ghUserCount = ghUsers.length
 
   // Build OID → GH user map + email → GH user map (OID takes priority)
   const ghByOid = new Map<string, GhUser>()
@@ -71,7 +74,7 @@ export const syncEntraProfiles = async (
     if (u.email) ghByEmail.set(u.email.toLowerCase(), u)
   }
 
-  console.log(`[entra-profile-sync] GH map: ${ghByOid.size} by OID, ${ghByEmail.size} by email`)
+  result.ghMapInfo = `${ghByOid.size} by OID, ${ghByEmail.size} by email`
 
   for (const entra of entraUsers) {
     if (!entra.id || !entra.mail) continue
@@ -96,7 +99,8 @@ export const syncEntraProfiles = async (
     }
 
     if (!gh) {
-      console.log(`[entra-profile-sync] SKIP: ${entra.mail} (${entra.displayName}) — no GH match`)
+      result.skippedDetails = result.skippedDetails || []
+      result.skippedDetails.push(`${entra.mail} (${entra.displayName})`)
       result.skipped++
       continue
     }
