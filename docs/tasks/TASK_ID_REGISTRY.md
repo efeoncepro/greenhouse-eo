@@ -306,3 +306,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-253` | `complete` | Identity Spec Residual Gaps (Approval Snapshot + Audit Events) | `docs/tasks/complete/TASK-253-identity-spec-residual-gaps.md` |
 | `TASK-255` | `complete` | Mi Perfil: fix identity chain so profile never shows "Perfil no disponible" | `docs/tasks/complete/TASK-255-mi-perfil-identity-chain-fix.md` |
 | `TASK-256` | `complete` | Entra Profile Completeness: avatar sync + identity link for all internal users | `docs/tasks/complete/TASK-256-entra-profile-completeness-avatar-identity-link.md` |
+| `TASK-257` | `to-do` | Mi Perfil: enterprise redesign con patron Vuexy User View (sidebar + tabs) | `docs/tasks/to-do/TASK-257-mi-perfil-enterprise-redesign.md` |

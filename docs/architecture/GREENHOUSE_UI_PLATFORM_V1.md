@@ -10,6 +10,101 @@
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
 
+## Delta 2026-04-05 — Vuexy User View Pattern: sidebar profile + tabs (referencia para Mi Perfil)
+
+Patron enterprise de detalle de usuario extraido del full-version de Vuexy (`apps/user/view`). Aplicable a vistas self-service ("Mi *") donde el usuario ve su propia informacion.
+
+### Estructura en Vuexy full-version
+
+```
+# Ubicacion: vuexy-admin-v10.11.1/nextjs-version/typescript-version/full-version/
+
+src/app/[lang]/(dashboard)/(private)/apps/user/view/
+  page.tsx                          ← entry point: Grid lg=4/lg=8
+
+src/views/apps/user/view/
+  user-left-overview/
+    index.tsx                       ← contenedor: UserDetails + UserPlan
+    UserDetails.tsx                 ← card: avatar 120px, stats, key-value details, Edit/Suspend
+    UserPlan.tsx                    ← card: plan info (no aplica a Greenhouse)
+  user-right/
+    index.tsx                       ← TabContext + CustomTabList pill style
+    overview/
+      index.tsx                     ← ProjectListTable + UserActivityTimeline + InvoiceListTable
+      ProjectListTable.tsx          ← @tanstack/react-table con fuzzy search
+      UserActivityTimeline.tsx      ← MUI Lab Timeline
+      InvoiceListTable.tsx          ← tabla de facturas
+    security/                       ← ChangePassword, RecentDevice, TwoStepVerification
+    billing-plans/                  ← CurrentPlan, PaymentMethod, BillingAddress
+    notifications/                  ← tabla de notificaciones
+    connections/                    ← conexiones sociales
+```
+
+### Patron: Sidebar Profile + Tabbed Content
+
+```
+┌────────────────┬──────────────────────────────────────────┐
+│  SIDEBAR (4)   │  TABS (8)                                │
+│                │  [Overview] [Security] [Billing] [...]    │
+│  Avatar 120px  ├──────────────────────────────────────────┤
+│  Name          │                                          │
+│  Role Chip     │  Tab content                             │
+│                │  (dynamic() lazy loaded)                 │
+│  Stats:        │                                          │
+│  ✓ 1.23k tasks │                                          │
+│  ✓ 568 projects│                                          │
+│                │                                          │
+│  Details:      │                                          │
+│  Email: ...    │                                          │
+│  Phone: ...    │                                          │
+│  Status: ...   │                                          │
+│                │                                          │
+│  [Edit][Suspend]│                                         │
+└────────────────┴──────────────────────────────────────────┘
+```
+
+### Decisiones de diseno
+
+| Decision | Justificacion |
+|----------|---------------|
+| Sidebar 4 + Tabs 8 | Identidad siempre visible; content area maximizada para tablas y forms |
+| `CustomTabList pill='true'` | Tabs con pill style coherente con el resto del portal |
+| `dynamic()` en cada tab | Lazy loading — solo carga el tab activo, mejor performance |
+| Stats con `CustomAvatar` + Typography | Patron reusable de Vuexy: icon avatar + numero + label |
+| Key-value details con `Typography font-medium` | Patron consistente: label bold + value regular |
+| `OpenDialogOnElementClick` para acciones | Dialogs modales para edit/delete/suspend sin navegacion |
+
+### Diferencia con Person Detail View (TASK-168)
+
+| Aspecto | Person Detail View | User View (Mi Perfil) |
+|---------|-------------------|----------------------|
+| Layout | Horizontal header full-width + tabs below | Sidebar left + tabs right |
+| Uso | Admin ve a otro usuario | Usuario ve su propio perfil |
+| Actions | OptionMenu con acciones admin | Edit dialog (o read-only) |
+| Stats | `CardStatsSquare` en header | Stats inline en sidebar |
+| Tabs | 5 tabs domain-oriented (Profile, Economy, Delivery, Assignments, Activity) | Tabs self-service (Resumen, Seguridad, Mi Nomina, Mi Delivery) |
+
+### Cuando aplicar cada patron
+
+- **Person Detail View (horizontal header)**: cuando un admin o manager ve el perfil de OTRA persona. Necesita max content area para tablas de datos ajenos.
+- **User View (sidebar + tabs)**: cuando el usuario ve SU PROPIA informacion. La identidad fija en sidebar refuerza contexto personal.
+
+### Componentes core reutilizables (ya migrados)
+
+| Componente | Archivo | Rol en User View |
+|-----------|---------|------------------|
+| `CustomAvatar` | `src/@core/components/mui/Avatar.tsx` | Avatar 120px rounded en sidebar |
+| `CustomTabList` | `src/@core/components/mui/TabList.tsx` | Tabs con pill style |
+| `CustomTextField` | `src/@core/components/mui/TextField.tsx` | Inputs en dialogs de edicion |
+| `CustomChip` | `src/@core/components/mui/Chip.tsx` | Chip de rol/estado en sidebar |
+| `OpenDialogOnElementClick` | `src/components/dialogs/OpenDialogOnElementClick.tsx` | Edit dialog trigger |
+| `CardStatsSquare` | `src/components/card-statistics/CardStatsSquare.tsx` | KPIs compactos |
+| `TablePaginationComponent` | `src/components/TablePaginationComponent.tsx` | Paginacion en tablas de tabs |
+
+### Task de implementacion
+
+TASK-257 aplica este patron a Mi Perfil (`/my/profile`).
+
 ## Delta 2026-04-04 — TanStack React Table: componentes avanzados extraídos de Vuexy full-version
 
 Se extrajeron los patrones avanzados de tabla del full-version de Vuexy como componentes reutilizables.
