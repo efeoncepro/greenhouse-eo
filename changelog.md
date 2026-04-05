@@ -2,6 +2,21 @@
 
 ## 2026-04-05
 
+- **ISSUE-014 person_360 VIEW faltaba columnas enriched — resuelto**:
+  - Mi Perfil mostraba `hasMemberFacet: true` pero todos los campos enriched eran `null` (avatar, cargo, telefono, departamento)
+  - Causa raiz: la VIEW `person_360` en la DB era la version antigua (rollup-based) que no exponia `resolved_avatar_url`, `resolved_job_title`, `resolved_phone`, etc.
+  - Los datos estaban correctamente escritos por el Entra sync (TASK-256) pero la VIEW no los surfaceaba
+  - Fix: migracion `20260405164846570_person-360-v2-enriched-view.sql` reemplaza la VIEW con version v2 (LATERAL joins + resolved fields)
+  - Verificado con query directa: 7/8 usuarios internos con avatar, todos con cargo y member facet
+  - Documentado en GREENHOUSE_POSTGRES_CANONICAL_360_V1.md y GREENHOUSE_IDENTITY_ACCESS_V2.md
+
+- **TASK-256 Entra Profile Completeness — implementacion completa**:
+  - Entra sync ahora cierra el ciclo completo: match (OID/email/alias) → backfill OID → ensure identity_profile link → sync datos → sync avatar
+  - `fetchEntraUserPhoto()` en `graph-client.ts`: fetch foto de Microsoft Graph → upload a GCS → update `client_users.avatar_url`
+  - `ensureIdentityProfileLink()` en `profile-sync.ts`: crea identity_profile si no existe, linkea `client_users.identity_profile_id`
+  - Match cross-domain via `buildEfeonceEmailAliasCandidates()` (`@efeonce.org` ↔ `@efeoncepro.com`)
+  - Resultado: todos los usuarios internos activos tienen identity_profile linkeado, avatar sincronizado, y datos completos en person_360
+
 - **Staging deploy failures — 3 problemas resueltos (ISSUE-013)**:
   - **Proyecto Vercel duplicado eliminado**: existía `prj_5zqdjJOz6OUQy7hiPh8xHZJj8tA8` en scope personal con 0 env vars y sin framework, cada push fallaba en paralelo al build real — eliminado via API
   - **Variables Agent Auth agregadas a Vercel**: `AGENT_AUTH_SECRET` y `AGENT_AUTH_EMAIL` no existían en staging/preview — agregadas; endpoint agent-session ahora funciona en staging (HTTP 200)

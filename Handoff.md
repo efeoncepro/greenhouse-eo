@@ -1,5 +1,59 @@
 # Handoff.md
 
+## Sesión 2026-04-05 — ISSUE-014: person_360 VIEW v2 + TASK-256 cierre
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: diagnosticar y resolver por que Mi Perfil mostraba datos enriched como null a pesar de que el Entra sync reportaba exito
+
+### Diagnostico
+
+- Conexion directa a PostgreSQL via Cloud SQL Proxy (puerto 15432) confirmo:
+  - `client_users.avatar_url` = `gs://efeonce-group-greenhouse-public-media-staging/users/user-efeonce-admin-julio-reyes/avatar-1775407131810.jpg` — **el Entra sync SI escribio**
+  - `client_users.identity_profile_id` = linkeado correctamente
+- Pero la VIEW `person_360` en la DB no tenia columnas `resolved_avatar_url`, `resolved_job_title`, `resolved_phone`
+- La VIEW era la version antigua (rollup-based) — el script v2 (`scripts/setup-postgres-person-360-v2.sql`) existia pero nunca se habia aplicado como migracion
+
+### Solucion
+
+- Migracion `20260405164846570_person-360-v2-enriched-view.sql` aplicada con `pnpm migrate:up`
+- La VIEW ahora usa LATERAL joins y expone: `resolved_avatar_url`, `resolved_email`, `resolved_phone`, `resolved_job_title`, `department_name`, `job_level`, `employment_type`, `linked_systems`, `active_role_codes`
+- Tipos regenerados por `kysely-codegen`
+
+### Verificacion
+
+- Query directa: 7/8 usuarios internos con avatar, todos con cargo y member facet
+- `npx tsc --noEmit` — OK
+- `pnpm lint` — OK (error pre-existente en ico-diagnostics, no relacionado)
+
+### Documentacion
+
+- ISSUE-014 creado en `docs/issues/resolved/`
+- `docs/issues/README.md` actualizado (next ID: ISSUE-015)
+- `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md` — delta person_360 v2
+- `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md` — delta Entra sync pipeline completo
+- `docs/documentation/identity/sistema-identidad-roles-acceso.md` — Mi Perfil actualizado con flujo completo
+- `changelog.md` — entradas para ISSUE-014 y TASK-256
+
+### Archivos modificados
+
+- `migrations/20260405164846570_person-360-v2-enriched-view.sql` (nuevo)
+- `src/types/db.d.ts` (regenerado)
+- `docs/issues/resolved/ISSUE-014-person-360-view-missing-enriched-columns.md` (nuevo)
+- `docs/issues/README.md`
+- `docs/architecture/GREENHOUSE_POSTGRES_CANONICAL_360_V1.md`
+- `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+- `docs/documentation/identity/sistema-identidad-roles-acceso.md`
+- `changelog.md`
+- `Handoff.md`
+
+### Riesgo / siguiente paso
+
+- `src/lib/identity/canonical-person.ts` tiene fallback code para columnas antiguas (`primary_member_id`, `primary_user_id`, etc.) — es dead code que no rompe pero deberia limpiarse
+- `scripts/verify-account-360.ts` referencia columnas antiguas (`membership_count`, `person_facets`) — fallara si se ejecuta
+- Verificar en staging que Mi Perfil muestra datos completos tras el deploy de Vercel
+
 ## Sesión 2026-04-05 — Staging deploy failures: diagnóstico y resolución (3 problemas)
 
 ### Rama / alcance

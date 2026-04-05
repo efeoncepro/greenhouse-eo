@@ -112,7 +112,9 @@ Cuando alguien inicia sesion, el sistema calcula que secciones del menu mostrar 
 
 Cada vista individual del portal (53 en total) esta registrada en un catalogo. Si tu rol no te da acceso al grupo requerido, esa vista no aparece en tu menu.
 
-**Mi Perfil** siempre muestra informacion basica del colaborador (nombre, email, avatar). Si el sistema tiene datos completos de identidad (cargo, departamento, fecha de ingreso, sistemas vinculados), los muestra tambien. Si aun no tiene datos completos (por ejemplo, un usuario recien creado), muestra la informacion disponible de la sesion sin mostrar un error.
+**Mi Perfil** muestra la informacion completa del colaborador: nombre, email, avatar (sincronizado desde Microsoft Entra), cargo, departamento, nivel, tipo de empleo, fecha de ingreso, telefono, y los sistemas vinculados (Entra, Notion, HubSpot, etc.). Esta informacion se sincroniza automaticamente desde Microsoft Entra ID mediante un cron diario que actualiza fotos, cargos y datos profesionales. Si un usuario recien creado aun no tiene todos los datos sincronizados, se muestra la informacion disponible de la sesion sin mostrar un error.
+
+> **Detalle tecnico:** Los datos de perfil fluyen desde Microsoft Graph → `client_users` + `identity_profiles` → VIEW `person_360` → `toPersonProfileSummary()`. El avatar se almacena en GCS y se sirve via `/api/media/users/{id}/avatar`. El cron de Entra sync corre diariamente a las 8:00 UTC (`src/app/api/cron/entra-profile-sync/route.ts`). Spec: [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md).
 
 > **Detalle tecnico:** El catalogo de vistas esta en [`src/lib/admin/view-access-catalog.ts`](../../src/lib/admin/view-access-catalog.ts). La matriz completa rol-route groups esta en [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md §1.5](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md). El fallback de perfil usa `toPersonProfileSummaryFromSession()` en [`src/lib/person-360/get-person-profile.ts`](../../src/lib/person-360/get-person-profile.ts).
 

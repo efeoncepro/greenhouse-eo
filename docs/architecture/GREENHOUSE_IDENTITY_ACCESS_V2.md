@@ -1,5 +1,44 @@
 # Greenhouse Identity & Access Architecture V2
 
+## Delta 2026-04-05 — Entra sync cierra ciclo completo: avatar + identity link + person_360 v2 (TASK-256 / ISSUE-014)
+
+### Entra sync pipeline (completo)
+
+El cron `entra-profile-sync` ahora ejecuta el ciclo completo para cada usuario interno:
+
+1. **Match**: OID primero → email directo → alias email via `buildEfeonceEmailAliasCandidates()` (cruza `@efeonce.org` ↔ `@efeoncepro.com`)
+2. **Backfill OID**: si el match fue por email, backfill `microsoft_oid` en `client_users` para futuros syncs
+3. **Update client_users**: sync `full_name`, `active`/`status` desde Entra `accountEnabled`
+4. **Ensure identity_profile link**: si `client_users.identity_profile_id` es NULL:
+   - Busca `identity_profiles` por `canonical_email`
+   - Si existe → linkea. Si no existe → crea uno nuevo y linkea.
+5. **Update identity_profiles**: sync `job_title`, `full_name`, `canonical_email`
+6. **Update members**: sync `role_title`, `location_country`, `location_city`, `phone`
+7. **Sync avatar**: fetch foto de Microsoft Graph (`/users/{oid}/photo/$value`) → upload a GCS via `uploadGreenhouseMediaAsset()` → update `client_users.avatar_url` + BQ via `setUserAvatarAssetPath()`
+
+### person_360 VIEW v2
+
+La VIEW `greenhouse_serving.person_360` fue reemplazada para exponer campos enriched:
+- `resolved_avatar_url` (de `client_users.avatar_url`, sincronizado desde Graph via GCS)
+- `resolved_job_title`, `resolved_phone`, `resolved_email`
+- `department_name`, `job_level`, `employment_type`, `linked_systems`, `active_role_codes`
+
+Migracion: `20260405164846570_person-360-v2-enriched-view.sql`
+
+### Resultado
+
+- Todo usuario interno activo tiene `identity_profile_id` linkeado despues del cron
+- `person_360` retorna fila con datos enriched para todos los usuarios internos
+- Mi Perfil muestra avatar, cargo, telefono, departamento, y sistemas vinculados
+- 7/8 usuarios internos tienen avatar sincronizado desde Microsoft Graph
+
+### Source files
+
+- `src/lib/entra/graph-client.ts` — `fetchEntraUserPhoto()`
+- `src/lib/entra/profile-sync.ts` — sync engine con avatar + identity link
+- `src/app/api/cron/entra-profile-sync/route.ts` — cron handler
+- `src/lib/tenant/internal-email-aliases.ts` — alias matching cross-domain
+
 ## Delta 2026-04-05 — Agent Auth (headless session for agents & E2E)
 
 ### Endpoint
