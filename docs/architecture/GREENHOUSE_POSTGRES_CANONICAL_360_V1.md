@@ -44,8 +44,16 @@ Columnas nuevas relevantes:
 - `resolved_phone` — `COALESCE(m.phone, first_contact.phone)`
 - `resolved_email` — `COALESCE(ip.canonical_email, m.primary_email, first_user.email, first_contact.email)`
 - `department_name` — join a `greenhouse_core.departments`
-- `linked_systems` — aggregation de `identity_profile_source_links`
+- `linked_systems` — aggregation normalizada de `identity_profile_source_links` via `canonical_source_system()`
 - `active_role_codes` — aggregation de `user_role_assignments`
+
+Normalizacion de source systems:
+- Funcion `greenhouse_core.canonical_source_system(raw TEXT)` (`IMMUTABLE`, SQL puro) normaliza valores tecnicos a nombres display-friendly
+- Mapping: `azure_ad`/`azure-ad`/`microsoft_sso`/`entra` → `microsoft`, `hubspot`/`hubspot_crm` → `hubspot`, `notion` → `notion`, `google`/`google_oauth`/`google_workspace` → `google`, `deel`/`deel_hr`/`deel_com` → `deel`
+- Sistemas internos (`greenhouse_auth`, `greenhouse_team`) retornan `NULL` → filtrados del array
+- La funcion se usa en el LATERAL join de `link_agg` para producir `linked_systems` limpio y deduplicado
+- Migracion: `20260405180048252_canonical-source-system-function-person360.sql`
+- Regla: nuevos source systems se agregan al CASE de la funcion, no al frontend
 
 Patron de resolucion:
 - Member facet: join directo por `identity_profile_id`

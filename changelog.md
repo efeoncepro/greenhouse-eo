@@ -2,6 +2,13 @@
 
 ## 2026-04-05
 
+- **Normalizacion de source systems en person_360 — canonical_source_system()**:
+  - Funcion SQL `IMMUTABLE` `greenhouse_core.canonical_source_system()` normaliza `source_system` values: `azure_ad`/`azure-ad` → `microsoft`, `hubspot`/`hubspot_crm` → `hubspot`, sistemas internos → filtrados
+  - `person_360.linked_systems` ahora retorna `{hubspot,microsoft,notion}` en vez de `{azure_ad,azure-ad,greenhouse_auth,greenhouse_team,hubspot,hubspot_crm,notion}`
+  - Mi Perfil muestra Microsoft como vinculado correctamente (antes aparecia con X porque buscaba `'microsoft'` pero la DB tenia `'azure_ad'`)
+  - Migracion: `20260405180048252_canonical-source-system-function-person360.sql`
+  - Regla: nuevos source systems se agregan al CASE de la funcion SQL, no al frontend
+
 - **TASK-254 Operational Cron Durable Worker Migration — implementación completa**:
   - 3 cron operativos worker-like (`outbox-react`, `outbox-react-delivery`, `projection-recovery`) migrados de Vercel scheduler a Cloud Run `ops-worker`
   - Nuevo servicio `services/ops-worker/` con 4 endpoints HTTP (health + 3 reactive handlers), Dockerfile esbuild two-stage y deploy script idempotente
