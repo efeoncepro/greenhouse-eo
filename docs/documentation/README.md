@@ -6,7 +6,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 
 ### Identidad y acceso
 
-- [Como funciona el sistema de identidades](identity/como-funciona-identidad.md) — roles, permisos, supervisoria, responsabilidades operativas, candados de seguridad
+- [Sistema de Identidad, Roles y Acceso](identity/sistema-identidad-roles-acceso.md) — roles, permisos, supervisoria, responsabilidades operativas, candados de seguridad
 
 ### Admin Center
 
