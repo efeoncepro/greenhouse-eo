@@ -50,26 +50,30 @@ export const syncEntraProfiles = async (
     errors: []
   }
 
-  // Load all Greenhouse users with OID
+  // Load all active internal Greenhouse users (not just those with OID)
   const ghUsers = await query<GhUser>(
     `SELECT user_id, full_name, email, microsoft_oid, microsoft_email,
             identity_profile_id, member_id, active
      FROM greenhouse_core.client_users
-     WHERE microsoft_oid IS NOT NULL`
+     WHERE active = TRUE AND tenant_type = 'efeonce_internal'`
   )
 
-  // Build OID → GH user map
+  // Build OID → GH user map + email → GH user map (OID takes priority)
   const ghByOid = new Map<string, GhUser>()
+  const ghByEmail = new Map<string, GhUser>()
 
   for (const u of ghUsers) {
     if (u.microsoft_oid) ghByOid.set(u.microsoft_oid, u)
+    if (u.email) ghByEmail.set(u.email.toLowerCase(), u)
   }
 
   for (const entra of entraUsers) {
     if (!entra.id || !entra.mail) continue
 
     result.processed++
-    const gh = ghByOid.get(entra.id)
+
+    // Match by OID first, then by email
+    const gh = ghByOid.get(entra.id) || ghByEmail.get(entra.mail.toLowerCase()) || null
 
     if (!gh) {
       result.skipped++
@@ -77,6 +81,17 @@ export const syncEntraProfiles = async (
     }
 
     try {
+      // 0. Backfill microsoft_oid if matched by email (so future syncs match by OID)
+      if (!gh.microsoft_oid && entra.id) {
+        await query(
+          `UPDATE greenhouse_core.client_users
+           SET microsoft_oid = $1, microsoft_email = $2, updated_at = CURRENT_TIMESTAMP
+           WHERE user_id = $3 AND microsoft_oid IS NULL`,
+          [entra.id, entra.mail, gh.user_id]
+        )
+        gh.microsoft_oid = entra.id
+      }
+
       // 1. Update client_users
       const userChanges = buildUserChanges(gh, entra)
 
