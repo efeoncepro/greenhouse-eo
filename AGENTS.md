@@ -171,6 +171,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - el cambio ya debio haber pasado por `develop`, salvo hotfix
   - revisar preview o entorno de prueba compartido
   - confirmar que no hay pendientes abiertos en `Handoff.md` para esa zona
+  - verificar conflictos con: `git merge --no-commit --no-ff origin/main` (luego `git merge --abort` si solo es verificacion). **No usar** `git merge-tree | grep CONFLICT` — produce falsos positivos con sentencias SQL `ON CONFLICT` del codebase (ver ISSUE-011)
 
 ### Ambientes y Vercel
 - `Production` en Vercel debe estar asociado a `main`.
