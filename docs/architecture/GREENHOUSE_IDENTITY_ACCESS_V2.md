@@ -604,6 +604,60 @@ Scope enforcement happens at the query layer, not the route guard layer:
 
 Example: an `efeonce_account` user accessing `/internal/clientes` passes the route guard. But the query only returns clients where `client_id IN (user's assigned client scopes)`.
 
+## Permission Sets (TASK-263)
+
+Permission Sets are named, reusable bundles of view codes that act as **Layer 2** in the view access resolution pipeline. They sit between role-based access (Layer 1) and user overrides (Layer 3).
+
+### Resolution Formula
+
+```
+AuthorizedViews = Rol(base) ∪ PermissionSets(aditivos) ∪ UserOverrides(excepciones)
+```
+
+Permission Sets are **additive only** — they can grant access to additional views but never revoke what a role already grants. Only user overrides (Layer 3) can revoke a specific view.
+
+### Tables
+
+- `greenhouse_core.permission_sets` — named bundles with `set_id`, `set_name`, `view_codes[]`, `is_system`, `section`
+- `greenhouse_core.user_permission_set_assignments` — user ↔ set assignments with `expires_at`, `reason`, `assigned_by_user_id`
+
+### System Sets (seeded)
+
+| Set ID | Name | Section | Views |
+|--------|------|---------|-------|
+| `pset-gestion-financiera` | Gestion Financiera | finanzas | 11 |
+| `pset-nomina-completa` | Nomina Completa | equipo | 3 |
+| `pset-agencia-ops` | Agencia Operaciones | gestion | 5 |
+| `pset-solo-lectura-agencia` | Solo Lectura Agencia | gestion | 3 |
+| `pset-admin-plataforma` | Admin Plataforma | administracion | 12 |
+| `pset-mi-ficha-completa` | Mi Ficha Completa | mi_ficha | 8 |
+
+System sets are editable in their view codes but not deletable.
+
+### API Endpoints
+
+- `GET/POST /api/admin/views/sets` — list and create
+- `GET/PUT/DELETE /api/admin/views/sets/:setId` — detail, update, soft-delete
+- `GET/POST /api/admin/views/sets/:setId/users` — list and assign users
+- `DELETE /api/admin/views/sets/:setId/users/:userId` — revoke user
+- `GET /api/admin/team/roles/:userId/effective-views` — resolved views with source attribution
+
+### Effective Views Source Attribution
+
+Each effective view reports its source: `role`, `role_fallback`, `permission_set`, or `user_override`, with `sourceId` and `sourceName` for traceability.
+
+### Re-login Requirement
+
+`authorizedViews` is resolved at login and stored in the JWT. Changes to Permission Set assignments require the user to re-login to take effect. Future: evaluate TTL-based refresh.
+
+### Audit
+
+Actions logged to `view_access_log`: `grant_set`, `revoke_set`, `create_set`, `update_set`, `delete_set`. Outbox events: `viewAccessSetAssigned`, `viewAccessSetRevoked`.
+
+### Spec
+
+Full spec: `docs/architecture/GREENHOUSE_PERMISSION_SETS_ARCHITECTURE_V1.md`
+
 ## Supervisor Derivation
 
 For HR workflows (leave approvals), the supervisor is not a role — it is a relationship derived from `greenhouse_core.members.reports_to_member_id`.
