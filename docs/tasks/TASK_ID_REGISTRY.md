@@ -312,3 +312,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-260` | `to-do` | Migrar nubox-sync + ico-member-sync a ops-worker | `docs/tasks/to-do/TASK-260-migrate-nubox-sync-ico-member-sync-to-ops-worker.md` |
 | `TASK-261` | `to-do` | Migrar webhook-dispatch a ops-worker | `docs/tasks/to-do/TASK-261-migrate-webhook-dispatch-to-ops-worker.md` |
 | `TASK-262` | `to-do` | Migrar outbox-publish a ops-worker | `docs/tasks/to-do/TASK-262-migrate-outbox-publish-to-ops-worker.md` |
+| `TASK-263` | `to-do` | Permission Sets: CRUD enterprise para asignacion de vistas por persona y perfil | `docs/tasks/to-do/TASK-263-permission-sets-enterprise-view-access.md` |
