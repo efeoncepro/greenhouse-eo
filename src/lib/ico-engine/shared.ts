@@ -475,7 +475,12 @@ export const toIcoEngineErrorResponse = (error: unknown, fallbackMessage: string
     )
   }
 
+  const errorMessage = error instanceof Error ? error.message : String(error)
+
   console.error(fallbackMessage, error)
 
-  return NextResponse.json({ error: fallbackMessage }, { status: 500 })
+  return NextResponse.json({
+    error: fallbackMessage,
+    detail: process.env.VERCEL_ENV !== 'production' ? errorMessage : undefined
+  }, { status: 500 })
 }

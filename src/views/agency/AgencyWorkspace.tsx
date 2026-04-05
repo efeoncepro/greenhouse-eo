@@ -155,7 +155,10 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
 
         setIcoData(data)
       } else {
-        setIcoError(`Error al cargar metricas ICO (HTTP ${res.status}).`)
+        const body = await res.json().catch(() => null)
+        const detail = body?.detail ? ` — ${body.detail}` : ''
+
+        setIcoError(`Error al cargar metricas ICO (HTTP ${res.status})${detail}.`)
       }
     } catch {
       setIcoError('No pudimos cargar las métricas ICO. Intenta de nuevo.')
