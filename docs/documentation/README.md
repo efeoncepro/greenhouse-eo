@@ -14,7 +14,7 @@ _Pendiente de documentar._
 
 ### Plataforma interna y calidad
 
-- [Como funciona la observabilidad de tests](plataforma/como-funciona-observabilidad-de-tests.md) — inventario del suite, resultados, coverage, artifacts y como leer la ultima corrida sin abrir logs crudos
+- [Sistema de Observabilidad de Tests](plataforma/sistema-observabilidad-de-tests.md) — inventario del suite, resultados, coverage, artifacts y como leer la ultima corrida sin abrir logs crudos
 
 ### Finanzas
 

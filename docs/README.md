@@ -43,7 +43,7 @@ Indice maestro de la documentacion no operativa del repo.
 ### Documentation
 
 - [Portal Functional Documentation](documentation/README.md)
-- [Como funciona la observabilidad de tests](documentation/plataforma/como-funciona-observabilidad-de-tests.md)
+- [Sistema de Observabilidad de Tests](documentation/plataforma/sistema-observabilidad-de-tests.md)
 
 ### API
 

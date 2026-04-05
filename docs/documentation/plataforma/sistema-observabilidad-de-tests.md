@@ -1,4 +1,4 @@
-# Como funciona la observabilidad de tests
+# Sistema de Observabilidad de Tests
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
@@ -25,15 +25,15 @@ La respuesta ya no depende de contar archivos a mano ni de abrir todo el log de 
 
 Cada corrida puede dejar estos archivos:
 
-| Archivo                                    | Que contiene                     |
-| ------------------------------------------ | -------------------------------- |
-| `artifacts/tests/inventory.json`           | mapa estructurado del suite      |
-| `artifacts/tests/inventory.md`             | resumen legible del inventario   |
-| `artifacts/tests/results.json`             | resultado estructurado de Vitest |
-| `artifacts/tests/vitest.log`               | log textual completo             |
-| `artifacts/tests/summary.md`               | resumen corto para humanos       |
-| `artifacts/coverage/coverage-summary.json` | coverage agregado                |
-| `artifacts/coverage/index.html`            | reporte navegable de coverage    |
+| Archivo | Que contiene |
+| ------- | ------------ |
+| `artifacts/tests/inventory.json` | mapa estructurado del suite |
+| `artifacts/tests/inventory.md` | resumen legible del inventario |
+| `artifacts/tests/results.json` | resultado estructurado de Vitest |
+| `artifacts/tests/vitest.log` | log textual completo |
+| `artifacts/tests/summary.md` | resumen corto para humanos |
+| `artifacts/coverage/coverage-summary.json` | coverage agregado |
+| `artifacts/coverage/index.html` | reporte navegable de coverage |
 
 En GitHub Actions, esos mismos archivos se suben como artifacts y el resumen corto también aparece en el panel del job.
 
@@ -142,7 +142,6 @@ Si solo necesitas el estado general:
 Si necesitas saber cuantos tests hay y como se reparten:
 
 - abre `artifacts/tests/inventory.md`
-  or
 - `artifacts/tests/inventory.json` si quieres procesarlo
 
 Si necesitas saber exactamente que suite o test fallo:
