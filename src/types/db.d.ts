@@ -502,6 +502,20 @@ export interface GreenhouseCoreNotionWorkspaceSourceBindings {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCoreOperationalResponsibilities {
+  active: Generated<boolean>;
+  created_at: Generated<Timestamp>;
+  effective_from: Generated<Timestamp>;
+  effective_to: Timestamp | null;
+  is_primary: Generated<boolean>;
+  member_id: string;
+  responsibility_id: string;
+  responsibility_type: string;
+  scope_id: string;
+  scope_type: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCoreOrganizations {
   active: Generated<boolean>;
   country: Generated<string | null>;
@@ -3399,6 +3413,7 @@ export interface DB {
   "greenhouse_core.members": GreenhouseCoreMembers;
   "greenhouse_core.notion_workspace_source_bindings": GreenhouseCoreNotionWorkspaceSourceBindings;
   "greenhouse_core.notion_workspaces": GreenhouseCoreNotionWorkspaces;
+  "greenhouse_core.operational_responsibilities": GreenhouseCoreOperationalResponsibilities;
   "greenhouse_core.organizations": GreenhouseCoreOrganizations;
   "greenhouse_core.person_memberships": GreenhouseCorePersonMemberships;
   "greenhouse_core.providers": GreenhouseCoreProviders;

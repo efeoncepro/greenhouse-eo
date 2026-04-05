@@ -2,7 +2,7 @@ import 'server-only'
 
 import { randomUUID } from 'node:crypto'
 
-import { getDb, query, withTransaction } from '@/lib/db'
+import { getDb, withTransaction } from '@/lib/db'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 
@@ -26,18 +26,6 @@ export interface UpdateResponsibilityInput {
   effectiveFrom?: string
   effectiveTo?: string | null
   active?: boolean
-}
-
-interface ResponsibilityRow extends Record<string, unknown> {
-  responsibility_id: string
-  member_id: string
-  scope_type: string
-  scope_id: string
-  responsibility_type: string
-  is_primary: boolean
-  effective_from: string
-  effective_to: string | null
-  active: boolean
 }
 
 // ── Validation ──
@@ -82,7 +70,7 @@ const validateNonEmpty = (value: unknown, fieldName: string): string => {
   return s
 }
 
-// ── Scope validation (Kysely on existing tables) ──
+// ── Scope validation ──
 
 async function validateScopeExists(scopeType: ScopeType, scopeId: string): Promise<void> {
   const db = await getDb()
@@ -99,6 +87,7 @@ async function validateScopeExists(scopeType: ScopeType, scopeId: string): Promi
         .execute()
 
       exists = rows.length > 0
+
       break
     }
 
@@ -111,6 +100,7 @@ async function validateScopeExists(scopeType: ScopeType, scopeId: string): Promi
         .execute()
 
       exists = rows.length > 0
+
       break
     }
 
@@ -123,6 +113,7 @@ async function validateScopeExists(scopeType: ScopeType, scopeId: string): Promi
         .execute()
 
       exists = rows.length > 0
+
       break
     }
 
@@ -135,6 +126,7 @@ async function validateScopeExists(scopeType: ScopeType, scopeId: string): Promi
         .execute()
 
       exists = rows.length > 0
+
       break
     }
   }
@@ -155,7 +147,7 @@ export async function createResponsibility(input: CreateResponsibilityInput): Pr
   const effectiveFrom = input.effectiveFrom ?? new Date().toISOString()
   const effectiveTo = input.effectiveTo ?? null
 
-  // Validate member exists (Kysely on existing table)
+  // Validate member exists
   const db = await getDb()
 
   const memberRows = await db
@@ -214,17 +206,14 @@ export async function updateResponsibility(
   responsibilityId: string,
   input: UpdateResponsibilityInput
 ): Promise<void> {
-  // Raw SQL: table not yet in Kysely types until migration runs
-  const rows = await query<ResponsibilityRow>(
-    `SELECT responsibility_id, member_id, scope_type, scope_id, responsibility_type,
-            is_primary, effective_from::text, effective_to::text, active
-     FROM greenhouse_core.operational_responsibilities
-     WHERE responsibility_id = $1 AND active = TRUE
-     LIMIT 1`,
-    [responsibilityId]
-  )
+  const db = await getDb()
 
-  const existing = rows[0]
+  const existing = await db
+    .selectFrom('greenhouse_core.operational_responsibilities')
+    .selectAll()
+    .where('responsibility_id', '=', responsibilityId)
+    .where('active', '=', true)
+    .executeTakeFirst()
 
   if (!existing) {
     throw new ResponsibilityValidationError(`Responsabilidad '${responsibilityId}' no encontrada.`, 404)

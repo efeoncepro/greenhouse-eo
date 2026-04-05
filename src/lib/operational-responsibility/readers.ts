@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { query } from '@/lib/db'
+import { getDb } from '@/lib/db'
 
 import type { ResponsibilityType, ScopeType } from '@/config/responsibility-codes'
 
@@ -31,29 +31,10 @@ export interface ScopeOwnership {
   operationsLead: { memberId: string; memberName: string } | null
 }
 
-// ── Raw row type ──
-
-interface ResponsibilityJoinRow extends Record<string, unknown> {
-  responsibility_id: string
-  member_id: string
-  display_name: string | null
-  primary_email: string | null
-  scope_type: string
-  scope_id: string
-  responsibility_type: string
-  is_primary: boolean
-  effective_from: string
-  effective_to: string | null
-  active: boolean
-  created_at: string
-  updated_at: string
-}
-
 // ── Readers ──
 
 /**
  * List all responsibilities, optionally filtered by scope, member, or type.
- * Uses raw SQL because the table is not yet in Kysely types until migration runs and types are regenerated.
  */
 export async function listResponsibilities(filters?: {
   scopeType?: ScopeType
@@ -62,57 +43,49 @@ export async function listResponsibilities(filters?: {
   responsibilityType?: ResponsibilityType
   activeOnly?: boolean
 }): Promise<ResponsibilityRecord[]> {
-  const conditions: string[] = []
-  const params: unknown[] = []
-  let idx = 1
+  const db = await getDb()
+
+  let q = db
+    .selectFrom('greenhouse_core.operational_responsibilities as r')
+    .innerJoin('greenhouse_core.members as m', 'm.member_id', 'r.member_id')
+    .select([
+      'r.responsibility_id',
+      'r.member_id',
+      'm.display_name',
+      'm.primary_email',
+      'r.scope_type',
+      'r.scope_id',
+      'r.responsibility_type',
+      'r.is_primary',
+      'r.effective_from',
+      'r.effective_to',
+      'r.active',
+      'r.created_at',
+      'r.updated_at'
+    ])
+    .orderBy('r.created_at', 'desc')
 
   if (filters?.scopeType) {
-    conditions.push(`r.scope_type = $${idx++}`)
-    params.push(filters.scopeType)
+    q = q.where('r.scope_type', '=', filters.scopeType)
   }
 
   if (filters?.scopeId) {
-    conditions.push(`r.scope_id = $${idx++}`)
-    params.push(filters.scopeId)
+    q = q.where('r.scope_id', '=', filters.scopeId)
   }
 
   if (filters?.memberId) {
-    conditions.push(`r.member_id = $${idx++}`)
-    params.push(filters.memberId)
+    q = q.where('r.member_id', '=', filters.memberId)
   }
 
   if (filters?.responsibilityType) {
-    conditions.push(`r.responsibility_type = $${idx++}`)
-    params.push(filters.responsibilityType)
+    q = q.where('r.responsibility_type', '=', filters.responsibilityType)
   }
 
   if (filters?.activeOnly !== false) {
-    conditions.push(`r.active = TRUE`)
+    q = q.where('r.active', '=', true)
   }
 
-  const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
-
-  const rows = await query<ResponsibilityJoinRow>(
-    `SELECT
-       r.responsibility_id,
-       r.member_id,
-       m.display_name,
-       m.primary_email,
-       r.scope_type,
-       r.scope_id,
-       r.responsibility_type,
-       r.is_primary,
-       r.effective_from::text,
-       r.effective_to::text,
-       r.active,
-       r.created_at::text,
-       r.updated_at::text
-     FROM greenhouse_core.operational_responsibilities r
-     INNER JOIN greenhouse_core.members m ON m.member_id = r.member_id
-     ${where}
-     ORDER BY r.created_at DESC`,
-    params
-  )
+  const rows = await q.execute()
 
   return rows.map((r) => ({
     responsibilityId: r.responsibility_id,
@@ -138,14 +111,17 @@ export async function listResponsibilities(filters?: {
  * Used by Agency Space 360, Organization detail, and other consumers.
  */
 export async function getScopeOwnership(scopeType: ScopeType, scopeId: string): Promise<ScopeOwnership> {
-  const rows = await query<Record<string, unknown> & { responsibility_type: string; member_id: string; display_name: string | null }>(
-    `SELECT r.responsibility_type, r.member_id, m.display_name
-     FROM greenhouse_core.operational_responsibilities r
-     INNER JOIN greenhouse_core.members m ON m.member_id = r.member_id
-     WHERE r.scope_type = $1 AND r.scope_id = $2
-       AND r.is_primary = TRUE AND r.active = TRUE`,
-    [scopeType, scopeId]
-  )
+  const db = await getDb()
+
+  const rows = await db
+    .selectFrom('greenhouse_core.operational_responsibilities as r')
+    .innerJoin('greenhouse_core.members as m', 'm.member_id', 'r.member_id')
+    .select(['r.responsibility_type', 'r.member_id', 'm.display_name'])
+    .where('r.scope_type', '=', scopeType)
+    .where('r.scope_id', '=', scopeId)
+    .where('r.is_primary', '=', true)
+    .where('r.active', '=', true)
+    .execute()
 
   const byType = new Map(
     rows.map((r) => [r.responsibility_type, { memberId: r.member_id, memberName: String(r.display_name ?? '') }])
