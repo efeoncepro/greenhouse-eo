@@ -64,6 +64,31 @@ El resultado es que una falla del reader de permisos se convierte en una nómina
 - Definir política: si `leave_requests` no puede leerse, el cálculo oficial debe bloquear o marcarse como incompleto de forma visible.
 - Mantener projected payroll separado si se decide tolerancia distinta, pero con señal explícita en UI/API.
 
+## Plan de resolución sin pérdida funcional
+
+### Funcionalidad que se debe preservar
+
+- El equipo debe poder seguir consultando readiness, preview y proyección aunque exista una degradación temporal del reader de permisos.
+- El módulo debe seguir distinguiendo permisos reales en cero versus ausencia de datos, sin colapsar ambas cosas al mismo resultado.
+- La operación oficial de Payroll debe mantener confiabilidad antes de approve/export/close.
+
+### Comportamiento que sí debe eliminarse
+
+- Que una falla de `leave_requests` se transforme silenciosamente en `daysOnUnpaidLeave = 0`.
+- Que el cálculo oficial continúe como si la data fuera íntegra cuando el reader de permisos falló.
+
+### Estrategia propuesta
+
+1. Cambiar `fetchApprovedLeaveForPeriod()` para devolver además un estado explícito de integridad o degradación, en vez de solo `[]`.
+2. Hacer que `fetchAttendanceForAllMembers()` y los consumers posteriores distingan entre `sin permisos` y `dato no disponible`.
+3. Mantener `readiness`, `preview` y `projected payroll` visibles bajo estado `degraded`, pero bloquear o marcar como incompleto el cálculo oficial que alimenta approve/export/close.
+4. Reflejar la degradación en UI/API con una señal explícita para que el operador entienda por qué no puede consolidar el período todavía.
+
+### Tradeoff aceptado
+
+- Se acepta perder tolerancia silenciosa bajo falla de PostgreSQL o del reader de permisos.
+- No se acepta perder acceso a diagnóstico, preview o proyección si el sistema todavía puede mostrar el estado degradado de forma honesta y accionable.
+
 ## Verificación
 
 1. Simular fallo de PostgreSQL o error en la query de `greenhouse_hr.leave_requests`.
