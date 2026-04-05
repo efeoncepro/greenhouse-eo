@@ -24,7 +24,7 @@ export const isFinanceSchemaDriftError = (error: unknown) => {
 export const financeSchemaDriftMessage = (surface: string) =>
   `Finance data for ${surface} is temporarily unavailable because the database schema is not ready.`
 
-export const logFinanceSchemaDrift = (surface: string, error: Error) => {
+export const logFinanceSchemaDrift = (surface: string, error: unknown) => {
   console.error(`[finance] ${surface} degraded due to schema drift:`, error)
 }
 
