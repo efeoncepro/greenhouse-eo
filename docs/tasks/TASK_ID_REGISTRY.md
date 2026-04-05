@@ -300,3 +300,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-248` | `complete` | Identity & Access Spec Compliance | `docs/tasks/complete/TASK-248-identity-access-spec-compliance.md` |
 | `TASK-249` | `complete` | Test Observability MVP | `docs/tasks/complete/TASK-249-test-observability-mvp.md` |
 | `TASK-250` | `to-do` | Payroll Export Email React Key Warning Cleanup | `docs/tasks/to-do/TASK-250-payroll-export-email-react-key-warning.md` |
+| `TASK-251` | `to-do` | Reactive Control Plane Backlog Observability & Replay | `docs/tasks/to-do/TASK-251-reactive-control-plane-backlog-observability-replay.md` |
+| `TASK-252` | `to-do` | Admin Center Ops Copilot | `docs/tasks/to-do/TASK-252-admin-center-ops-copilot.md` |
+| `TASK-253` | `to-do` | Identity Spec Residual Gaps (Approval Snapshot + Audit Events) | `docs/tasks/to-do/TASK-253-identity-spec-residual-gaps.md` |
