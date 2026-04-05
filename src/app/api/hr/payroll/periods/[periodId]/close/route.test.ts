@@ -13,8 +13,7 @@ vi.mock('@/lib/payroll/close-payroll-period', () => ({
 }))
 
 vi.mock('@/lib/payroll/dispatch-payroll-export-notifications', () => ({
-  dispatchPayrollExportNotifications: (...args: unknown[]) =>
-    mockDispatchPayrollExportNotifications(...args)
+  dispatchPayrollExportNotifications: (...args: unknown[]) => mockDispatchPayrollExportNotifications(...args)
 }))
 
 vi.mock('@/lib/payroll/get-payroll-periods', () => ({
@@ -54,8 +53,9 @@ describe('POST /api/hr/payroll/periods/[periodId]/close', () => {
       exportedNow: true
     })
     mockDispatchPayrollExportNotifications.mockResolvedValueOnce({
-      outbox: { runId: 'outbox-1' },
-      reactive: { runId: 'react-1' }
+      event: 'payroll_period.exported',
+      periodId: '2026-03',
+      dispatch: 'async'
     })
 
     const response = await POST(new Request('http://localhost'), {
@@ -65,9 +65,11 @@ describe('POST /api/hr/payroll/periods/[periodId]/close', () => {
     const body = await response.json()
 
     expect(mockDispatchPayrollExportNotifications).toHaveBeenCalledTimes(1)
+    expect(mockDispatchPayrollExportNotifications).toHaveBeenCalledWith('2026-03')
     expect(body.notificationDispatch).toEqual({
-      outbox: { runId: 'outbox-1' },
-      reactive: { runId: 'react-1' }
+      event: 'payroll_period.exported',
+      periodId: '2026-03',
+      dispatch: 'async'
     })
   })
 

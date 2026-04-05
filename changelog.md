@@ -2,6 +2,12 @@
 
 ## 2026-04-05
 
+- **ISSUE-005 fix: Payroll close route no longer drains global notification backlog**:
+  - `dispatchPayrollExportNotifications()` reescrita como función scoped al `periodId` — ya no llama `publishPendingOutboxEvents()` ni `processReactiveEvents()` inline
+  - La notificación del período exportado se procesará asincrónicamente por el ops-worker cron (cada ~5 min) a partir del evento `payroll_period.exported` ya emitido transaccionalmente por `closePayrollPeriod()`
+  - El endpoint `POST /api/hr/payroll/periods/[periodId]/close` ahora responde con `notificationDispatch: { event, periodId, dispatch: 'async' }` en vez del resultado de drenar consumidores globales
+  - Latencia del botón de cierre ya no depende del backlog global del outbox
+
 - **Normalizacion de source systems en person_360 — canonical_source_system()**:
   - Funcion SQL `IMMUTABLE` `greenhouse_core.canonical_source_system()` normaliza `source_system` values: `azure_ad`/`azure-ad` → `microsoft`, `hubspot`/`hubspot_crm` → `hubspot`, sistemas internos → filtrados
   - `person_360.linked_systems` ahora retorna `{hubspot,microsoft,notion}` en vez de `{azure_ad,azure-ad,greenhouse_auth,greenhouse_team,hubspot,hubspot_crm,notion}`
