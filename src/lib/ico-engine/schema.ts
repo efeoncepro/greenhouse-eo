@@ -982,9 +982,15 @@ export const ensureIcoEngineInfrastructure = async () => {
     } catch (viewError) {
       console.warn('[ICO] Could not create v_metric_latest:', viewError instanceof Error ? viewError.message : viewError)
     }
-  })()
+  })().catch(error => {
+    ensureIcoEngineInfrastructurePromise = null
+    throw error
+  })
 
-  // Never reset the promise — if infra fails, queries against pre-created
-  // tables will still work. Resetting would cause repeated retry storms.
-  return ensureIcoEngineInfrastructurePromise
+  // Add timeout protection — if BigQuery hangs (network, credentials), don't block forever
+  const timeout = new Promise<void>((_, reject) =>
+    setTimeout(() => reject(new Error('[ICO] Infrastructure setup timed out after 30s')), 30_000)
+  )
+
+  return Promise.race([ensureIcoEngineInfrastructurePromise, timeout])
 }
