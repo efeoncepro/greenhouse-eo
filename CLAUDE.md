@@ -55,6 +55,7 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - `docs/tasks/README.md` — pipeline de tareas `TASK-###` y legacy `CODEX_TASK_*`
 - `docs/issues/README.md` — pipeline de incidentes operativos `ISSUE-###`
 - `docs/architecture/` — specs de arquitectura canónicas (30+ documentos)
+- `docs/documentation/` — documentación funcional de la plataforma en lenguaje simple, organizada por dominio (identity, finance, hr, etc.). Cada documento enlaza a su spec técnica en `docs/architecture/`
 - `docs/operations/` — modelos operativos (documentación, GitHub Project, data model, repo ecosystem)
 
 ### Architecture Docs (los más críticos)
@@ -140,6 +141,44 @@ Si un archivo en `docs/tasks/` no es una task sino una spec de arquitectura o re
 - Moverlo a `docs/architecture/`
 - Actualizar `docs/tasks/README.md` con nota de reclasificación
 - Si tiene gaps operativos pendientes, crear una task derivada en `to-do/`
+
+## Platform Documentation Protocol
+
+La documentación funcional de la plataforma vive en `docs/documentation/` y explica cómo funciona cada módulo en lenguaje simple (no técnico). Su índice es `docs/documentation/README.md`.
+
+### Estructura
+
+```
+docs/documentation/
+  README.md                    # Índice general + links a docs técnicos
+  identity/                    # Identidad, roles, acceso, seguridad
+  admin-center/                # Admin Center, governance
+  finance/                     # Módulo financiero
+  hr/                          # HR, nómina, permisos
+  people/                      # Personas, directorio, capacidad
+  agency/                      # Agencia, operaciones, delivery
+  delivery/                    # Entrega, ICO, proyectos
+  ai-tooling/                  # Herramientas IA, licencias
+  client-portal/               # Portal cliente
+```
+
+### Cuándo crear o actualizar
+
+- **Al completar una task** que cambie comportamiento visible de un módulo, verificar si existe documentación funcional del módulo afectado en `docs/documentation/`. Si existe, actualizarla. Si no existe y el cambio es significativo, considerar crearla.
+- **Al cerrar un bloque de tasks** (como un hardening o una feature completa), crear el documento funcional del dominio si aún no existe.
+- **Al modificar roles, permisos, menú o acceso**, actualizar `docs/documentation/identity/como-funciona-identidad.md`.
+
+### Formato de cada documento
+
+- Lenguaje simple, sin jerga técnica
+- Tablas y listas para información estructurada
+- Al final de cada sección, un bloque `> Detalle técnico:` con links a la spec de arquitectura y al código fuente relevante
+- No duplicar contenido de `docs/architecture/` — referenciar con links relativos
+
+### Diferencia con docs de arquitectura
+
+- `docs/architecture/` → contratos técnicos para agentes y desarrolladores (schemas, APIs, decisiones de diseño)
+- `docs/documentation/` → explicaciones funcionales para entender cómo funciona la plataforma (roles, flujos, reglas de negocio)
 
 ## Conventions
 

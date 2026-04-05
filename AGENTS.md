@@ -49,6 +49,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - correr `pnpm pg:doctor` antes de asumir que el acceso esta sano
 - Si una task del sistema contradice la arquitectura vigente, no implementarla tal cual; corregir primero la task o documentar la nueva decision arquitectonica.
 - Si el cambio es UI, UX o seleccion de componentes, usar como criterio operativo los skills locales vigentes (`greenhouse-agent`, `greenhouse-portal-ui-implementer`, `greenhouse-ui-orchestrator` o `greenhouse-vuexy-ui-expert`) y revisar `full-version` junto con la documentacion oficial de Vuexy antes de inventar componentes nuevos.
+- Si el cambio afecta como funciona un modulo desde la perspectiva del usuario, verificar si existe documentacion funcional en `docs/documentation/` para el dominio afectado y actualizarla.
 - Aplicar `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md` para documentar con una fuente canonica y deltas cortos en los documentos vivos.
 - Revisar `git status` y no asumir que el arbol esta limpio.
 - Confirmar si el cambio toca layout global, navegacion, autenticacion, tema o deploy. Si toca alguno, documentarlo en `Handoff.md`.
@@ -96,10 +97,15 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Actualizar `changelog.md` cuando haya un cambio real en comportamiento, estructura, flujo de trabajo o despliegue.
 - Actualizar `docs/changelog/CLIENT_CHANGELOG.md` cuando cambie una capacidad visible para usuarios/clientes o cuando una feature/modulo cambie de canal o disponibilidad.
 - Actualizar `project_context.md` cuando cambie arquitectura, stack, rutas clave, decisiones o restricciones.
+- Actualizar `docs/documentation/` cuando cambie comportamiento funcional de un modulo. Cada dominio tiene su subcarpeta (identity, finance, hr, etc.). Si un documento del dominio afectado existe, actualizarlo. Si no existe y el cambio es significativo, crearlo. El indice vive en `docs/documentation/README.md`.
 - No usar estos documentos como dumping ground. Deben quedar legibles.
 - Usar `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md` para evitar duplicacion: una fuente canonica por tema y deltas breves en el resto.
 - La politica canonica de release channels y changelog client-facing vive en `docs/operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md`.
-- La convención canonica de Git tags para releases (`platform/`, `<module>/`, `api/<slug>/`) vive en ese mismo documento; no improvisar tags globales ambiguos como `v1.1.0` para el portal completo.
+- La convencion canonica de Git tags para releases (`platform/`, `<module>/`, `api/<slug>/`) vive en ese mismo documento; no improvisar tags globales ambiguos como `v1.1.0` para el portal completo.
+- Tres capas de documentacion, cada una con su proposito:
+  - `docs/architecture/` — contratos tecnicos para agentes y desarrolladores (schemas, APIs, decisiones de diseno)
+  - `docs/documentation/` — explicaciones funcionales en lenguaje simple (roles, flujos, reglas de negocio). Cada documento enlaza a su spec tecnica
+  - `docs/operations/` — modelos operativos del repo y del equipo (documentacion, GitHub Project, release channels)
 
 ### 8. Regla de line endings
 - El repositorio debe versionar archivos de texto con finales de linea `LF`.
