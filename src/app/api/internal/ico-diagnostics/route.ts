@@ -156,5 +156,22 @@ export async function GET(request: Request) {
     results.fullPerformanceReport = `FAIL: ${e instanceof Error ? e.message : String(e)}`
   }
 
+  // Step 8: If Postgres serving is empty but BQ has data, seed it directly
+  if (results.performanceReportServing === 'EMPTY (will trigger BQ fallback)' && typeof results.performanceReportBQ === 'string' && results.performanceReportBQ.startsWith('OK')) {
+    try {
+      const { agencyPerformanceReportProjection } = await import('@/lib/sync/projections/agency-performance-report')
+
+      const scope = agencyPerformanceReportProjection.extractScope({ reportScope: 'agency', periodYear: year, periodMonth: month })
+
+      if (scope) {
+        const refreshResult = await agencyPerformanceReportProjection.refresh(scope, { reportScope: 'agency', periodYear: year, periodMonth: month })
+
+        results.postgresProjectionSeed = refreshResult ?? 'no-op'
+      }
+    } catch (e: unknown) {
+      results.postgresProjectionSeed = `FAIL: ${e instanceof Error ? e.message : String(e)}`
+    }
+  }
+
   return NextResponse.json({ period: `${year}-${month}`, ...results })
 }

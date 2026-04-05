@@ -37,6 +37,10 @@
       "schedule": "*/5 * * * *"
     },
     {
+      "path": "/api/cron/outbox-react-delivery",
+      "schedule": "*/5 * * * *"
+    },
+    {
       "path": "/api/cron/webhook-dispatch",
       "schedule": "*/2 * * * *"
     },
