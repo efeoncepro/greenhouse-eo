@@ -1,7 +1,13 @@
 import { NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
 
+import { authOptions } from '@/lib/auth'
 import { requireMyTenantContext } from '@/lib/tenant/authorization'
-import { getPersonProfileByMemberId, toPersonProfileSummary } from '@/lib/person-360/get-person-profile'
+import {
+  getPersonProfileByMemberId,
+  toPersonProfileSummary,
+  toPersonProfileSummaryFromSession
+} from '@/lib/person-360/get-person-profile'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,11 +21,18 @@ export async function GET() {
   try {
     const profile = await getPersonProfileByMemberId(memberId)
 
-    if (!profile) {
-      return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
+    if (profile) {
+      return NextResponse.json(toPersonProfileSummary(profile))
     }
 
-    return NextResponse.json(toPersonProfileSummary(profile))
+    // Fallback: session always has basic identity data
+    const session = await getServerSession(authOptions)
+
+    if (session?.user) {
+      return NextResponse.json(toPersonProfileSummaryFromSession(session.user))
+    }
+
+    return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
   } catch (error) {
     console.error('GET /api/my/profile failed:', error)
 

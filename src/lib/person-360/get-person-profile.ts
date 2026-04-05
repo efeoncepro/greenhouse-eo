@@ -231,3 +231,22 @@ export const toPersonProfileSummary = (p: Person360): PersonProfileSummary => ({
   hasCrmFacet: p.hasCrmFacet,
   linkedSystems: p.linkedSystems
 })
+
+/** Fallback when person_360 has no row — uses session data so profile is never empty */
+export const toPersonProfileSummaryFromSession = (
+  user: { name?: string | null; email?: string | null; image?: string | null; avatarUrl?: string | null }
+): PersonProfileSummary => ({
+  resolvedDisplayName: user.name ?? 'Colaborador',
+  resolvedEmail: user.email ?? null,
+  resolvedPhone: null,
+  resolvedAvatarUrl: user.avatarUrl ?? user.image ?? null,
+  resolvedJobTitle: null,
+  departmentName: null,
+  jobLevel: null,
+  employmentType: null,
+  hireDate: null,
+  hasMemberFacet: false,
+  hasUserFacet: true,
+  hasCrmFacet: false,
+  linkedSystems: []
+})
