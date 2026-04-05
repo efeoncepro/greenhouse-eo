@@ -78,7 +78,7 @@ Nuevos source systems se agregan al CASE de `canonical_source_system()`, no al f
 ### Riesgo / siguiente paso
 
 - **Desplegado y operativo**: Cloud Run revision `ops-worker-00004-pmk` sirviendo 100% tráfico
-- **3 Cloud Scheduler jobs activos**: `ops-reactive-process` (*/5), `ops-reactive-process-delivery` (2-59/5), `ops-reactive-recover` (*/15)
+- **3 Cloud Scheduler jobs activos**: `ops-reactive-process` (_/5), `ops-reactive-process-delivery` (2-59/5), `ops-reactive-recover` (_/15)
 - **IAM**: `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` tiene `roles/run.invoker` sobre `ops-worker`
 - **Health check confirmado**: `{"status":"ok","service":"ops-worker"}` via proxy
 - **Scheduler → Cloud Run confirmado**: invocación exitosa (200, 50 events processed, 758ms)

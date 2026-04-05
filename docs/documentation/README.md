@@ -30,7 +30,7 @@ _Pendiente de documentar._
 
 ### Agencia y Operaciones
 
-_Pendiente de documentar._
+- [Ops Worker — Crons Reactivos en Cloud Run](operations/ops-worker-reactive-crons.md) — servicio Cloud Run que procesa eventos reactivos del outbox, corridas scheduladas, ESM/CJS shim pattern, monitoreo en Ops Health
 
 ### Delivery
 

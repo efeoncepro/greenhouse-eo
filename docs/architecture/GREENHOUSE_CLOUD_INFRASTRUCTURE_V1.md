@@ -532,7 +532,14 @@ notion_ops  (legacy)   ─┤──►  greenhouse_conformed (replacement target
 | Source        | `services/ops-worker/` (monorepo, reuses `src/lib/`)                                                                                                                                      |
 | Purpose       | Durable reactive worker: processes outbox reactive events, domain-specific reactive events, and recovers orphaned projection refreshes. Replaces 3 Vercel crons that risked 120s timeout. |
 | Endpoints     | `GET /health`, `POST /reactive/process`, `POST /reactive/process-domain`, `POST /reactive/recover`                                                                                        |
+| SA            | `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` (runs as + `roles/run.invoker` for scheduler OIDC)                                                                              |
+| Image         | `gcr.io/efeonce-group/ops-worker` (Cloud Build)                                                                                                                                           |
+| Build         | esbuild two-stage Dockerfile with 9 `--alias` shims for ESM/CJS interop (see note below)                                                                                                 |
 | TASK          | TASK-254                                                                                                                                                                                  |
+
+**ESM/CJS shim pattern:** The import chain `server.ts → projections/ → greenhouse-assets.ts → authorization.ts → auth.ts` pulls in `next-auth` providers which are CJS-only and fail under Node 22 ESM. Since the ops-worker never uses auth, 9 esbuild `--alias` shims stub out `server-only`, `next/server`, `next/headers`, `next-auth`, `next-auth/providers/credentials`, `next-auth/providers/azure-ad`, `next-auth/providers/google`, `next-auth/next`, and `bcryptjs`. This pattern should be replicated for any future Cloud Run service that reuses `src/lib/` without needing NextAuth.
+
+**Health check:** The deploy script uses `gcloud run services proxy` on a local port (does not require SA impersonation) instead of `gcloud auth print-identity-token --audiences=` which requires additional IAM permissions.
 
 ### Staging Services
 

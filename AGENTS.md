@@ -299,6 +299,20 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Fuente canónica: `src/app/api/auth/agent-session/route.ts`
 - Spec técnica: `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md` (sección Agent Auth)
 
+### Cloud Run ops-worker (crons reactivos)
+
+- Greenhouse tiene un servicio Cloud Run dedicado (`ops-worker`) en `us-east4` que ejecuta los crons reactivos del outbox.
+- 3 Cloud Scheduler jobs disparan el servicio: `ops-reactive-process` (*/5), `ops-reactive-process-delivery` (2-59/5), `ops-reactive-recover` (*/15), timezone `America/Santiago`.
+- SA: `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` con `roles/run.invoker`.
+- **Si el cambio toca `src/lib/sync/`, `src/lib/operations/`, proyecciones reactivas, o `services/ops-worker/`**, verificar que el build del worker sigue compilando (`cd services/ops-worker && docker build .` o revisar esbuild aliases).
+- **Regla ESM/CJS para Cloud Run**: servicios que reutilicen `src/lib/` sin necesitar NextAuth deben shimear `next-auth`, sus providers y `bcryptjs` via esbuild `--alias`. El patrón canónico de shims está en `services/ops-worker/Dockerfile`.
+- **Deploy**: `bash services/ops-worker/deploy.sh` (requiere `gcloud` autenticado con acceso al proyecto `efeonce-group`).
+- **Health check**: el deploy script usa `gcloud run services proxy` (no requiere SA impersonation).
+- Las rutas API Vercel (`/api/cron/outbox-react`, etc.) siguen como fallback manual pero **no están scheduladas**.
+- Run tracking: `source_sync_runs` con `source_system='reactive_worker'`, visible en Admin > Ops Health.
+- Fuente canónica: `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` §4.9 y §5.
+- Documentación funcional: `docs/documentation/operations/ops-worker-reactive-crons.md`
+
 ### Conectividad PostgreSQL (leer ANTES de cualquier operación DB)
 
 - **Método preferido (todos los entornos)**: Cloud SQL Connector vía `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`. Conecta sin TCP directo — negocia un túnel seguro por la Cloud SQL Admin API. Funciona en Vercel (WIF + OIDC), local, y agentes AI.

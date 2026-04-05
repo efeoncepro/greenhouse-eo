@@ -21,7 +21,7 @@
 
 - **TASK-254 Cloud Run deploy completado**:
   - Cloud Run revision `ops-worker-00004-pmk` sirviendo 100% tráfico en `us-east4`
-  - 3 Cloud Scheduler jobs activos: `ops-reactive-process` (*/5), `ops-reactive-process-delivery` (2-59/5), `ops-reactive-recover` (*/15), timezone `America/Santiago`
+  - 3 Cloud Scheduler jobs activos: `ops-reactive-process` (_/5), `ops-reactive-process-delivery` (2-59/5), `ops-reactive-recover` (_/15), timezone `America/Santiago`
   - Problema ESM/CJS resuelto: `next-auth` y `bcryptjs` shimmed via esbuild `--alias` (el import chain `server.ts → … → auth.ts` arrastraba next-auth providers, que fallan en ESM bajo Node 22)
   - IAM binding: `greenhouse-portal@` SA con `roles/run.invoker` sobre `ops-worker`
   - deploy.sh actualizado: IAM binding idempotente + health check via `gcloud run services proxy` (no requiere service account impersonation)
