@@ -77,8 +77,14 @@ Nuevos source systems se agregan al CASE de `canonical_source_system()`, no al f
 
 ### Riesgo / siguiente paso
 
-- **Deploy pendiente**: `bash services/ops-worker/deploy.sh` aún no se ha ejecutado — requiere GCP auth activa y confirmación manual para crear el servicio Cloud Run + 3 jobs Cloud Scheduler en `us-east4`
+- **Desplegado y operativo**: Cloud Run revision `ops-worker-00004-pmk` sirviendo 100% tráfico
+- **3 Cloud Scheduler jobs activos**: `ops-reactive-process` (*/5), `ops-reactive-process-delivery` (2-59/5), `ops-reactive-recover` (*/15)
+- **IAM**: `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` tiene `roles/run.invoker` sobre `ops-worker`
+- **Health check confirmado**: `{"status":"ok","service":"ops-worker"}` via proxy
+- **Scheduler → Cloud Run confirmado**: invocación exitosa (200, 50 events processed, 758ms)
+- **Problema resuelto**: ESM/CJS interop con `next-auth` — shimmed via esbuild `--alias` (6 aliases: next-auth, 3 providers, next-auth/next, bcryptjs)
 - Las rutas API de Vercel (`/api/cron/outbox-react`, etc.) siguen existiendo como fallback manual, pero ya no están scheduleadas en `vercel.json`
+- **Siguiente paso**: período dual-run para confirmar estabilidad, luego eliminar las 3 rutas cron de Vercel
 - Verificar en staging que `getOperationsOverview()` expone correctamente el subsistema Reactive Worker con datos de `source_sync_runs`
 
 ## Sesión 2026-04-05 — ISSUE-014: person_360 VIEW v2 + TASK-256 cierre

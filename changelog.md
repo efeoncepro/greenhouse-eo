@@ -19,6 +19,14 @@
   - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` actualizado a v1.2 con ops-worker, scheduler jobs y placement matrix
   - Deploy a Cloud Run pendiente (requiere `bash services/ops-worker/deploy.sh` con GCP auth)
 
+- **TASK-254 Cloud Run deploy completado**:
+  - Cloud Run revision `ops-worker-00004-pmk` sirviendo 100% tráfico en `us-east4`
+  - 3 Cloud Scheduler jobs activos: `ops-reactive-process` (*/5), `ops-reactive-process-delivery` (2-59/5), `ops-reactive-recover` (*/15), timezone `America/Santiago`
+  - Problema ESM/CJS resuelto: `next-auth` y `bcryptjs` shimmed via esbuild `--alias` (el import chain `server.ts → … → auth.ts` arrastraba next-auth providers, que fallan en ESM bajo Node 22)
+  - IAM binding: `greenhouse-portal@` SA con `roles/run.invoker` sobre `ops-worker`
+  - deploy.sh actualizado: IAM binding idempotente + health check via `gcloud run services proxy` (no requiere service account impersonation)
+  - Invocación manual verificada: scheduler → OIDC → 200, 50 events processed en 758ms
+
 - **ISSUE-014 person_360 VIEW faltaba columnas enriched — resuelto**:
   - Mi Perfil mostraba `hasMemberFacet: true` pero todos los campos enriched eran `null` (avatar, cargo, telefono, departamento)
   - Causa raiz: la VIEW `person_360` en la DB era la version antigua (rollup-based) que no exponia `resolved_avatar_url`, `resolved_job_title`, `resolved_phone`, etc.
