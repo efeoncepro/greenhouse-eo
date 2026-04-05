@@ -3,6 +3,21 @@
 ## Delta 2026-04-05 Session resolution: paridad PG ↔ BQ cerrada (TASK-255)
 
 - El contrato `TenantAccessRow` ahora tiene paridad completa entre el path PostgreSQL (`session_360`) y el path BigQuery (`getIdentityAccessRecord`): ambos retornan `member_id` e `identity_profile_id`.
+
+## Delta 2026-06-17 TASK-254 ops-worker Cloud Run desplegado y operativo
+
+- Los 3 crons reactivos del outbox (`outbox-react`, `outbox-react-delivery`, `projection-recovery`) ya no corren como Vercel cron.
+- Ahora corren en Cloud Run como servicio dedicado `ops-worker` en `us-east4`, disparados por Cloud Scheduler.
+- Revision activa: `ops-worker-00004-pmk`, 100% tráfico.
+- Service URL: `https://ops-worker-183008134038.us-east4.run.app`
+- Image: `gcr.io/efeonce-group/ops-worker` (Cloud Build two-stage esbuild).
+- SA: `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` con `roles/run.invoker`.
+- 3 Cloud Scheduler jobs: `ops-reactive-process` (*/5), `ops-reactive-process-delivery` (2-59/5), `ops-reactive-recover` (*/15), timezone `America/Santiago`, auth OIDC.
+- Las rutas API Vercel siguen existiendo como fallback manual pero ya no están scheduladas en `vercel.json` (16 → 13 crons).
+- Regla ESM/CJS: servicios Cloud Run que reutilicen `src/lib/` sin necesitar NextAuth deben shimear `next-auth`, sus providers y `bcryptjs` via esbuild `--alias`. El ops-worker tiene 9 shims (server-only, next/server, next/headers, next-auth, 3 providers, next-auth/next, bcryptjs).
+- Regla de health check: usar `gcloud run services proxy` en vez de `gcloud auth print-identity-token --audiences=` (el segundo requiere permisos de impersonation que no siempre están disponibles).
+- Run tracking: cada corrida queda en `source_sync_runs` con `source_system='reactive_worker'`, visible en Admin > Ops Health como subsistema `Reactive Worker`.
+- Fuente canónica: `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` §4.9 y §5.
 - Regla vigente: todo campo nuevo que se agregue a `session_360` debe ir tambien en el SELECT/GROUP BY de BigQuery en `src/lib/tenant/access.ts`.
 - La funcion `authorize()` de credentials en `src/lib/auth.ts` ahora incluye todos los campos de identidad en el user retornado (`memberId`, `identityProfileId`, `spaceId`, `organizationId`, `organizationName`). SSO ya los tenia porque lee `tenant.*` directamente.
 - `/api/my/profile` es resiliente: intenta `person_360`, fallback a session data. Un usuario autenticado nunca ve "Perfil no disponible".

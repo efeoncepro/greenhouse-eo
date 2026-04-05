@@ -306,6 +306,18 @@ AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs
 - Setup Playwright: `scripts/playwright-auth-setup.mjs`
 - Spec técnica: `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md` (sección Agent Auth)
 
+### Cloud Run ops-worker (crons reactivos)
+
+- Servicio Cloud Run dedicado (`ops-worker`) en `us-east4` para los crons reactivos del outbox.
+- 3 Cloud Scheduler jobs: `ops-reactive-process` (*/5), `ops-reactive-process-delivery` (2-59/5), `ops-reactive-recover` (*/15), timezone `America/Santiago`.
+- SA: `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` con `roles/run.invoker`.
+- Si el cambio toca `src/lib/sync/`, `src/lib/operations/`, o `services/ops-worker/`, verificar build del worker.
+- **ESM/CJS**: servicios Cloud Run que reutilicen `src/lib/` sin NextAuth shimean `next-auth`, providers y `bcryptjs` via esbuild `--alias`. Patrón en `services/ops-worker/Dockerfile`.
+- **Deploy**: `bash services/ops-worker/deploy.sh` (requiere `gcloud` autenticado).
+- Las rutas API Vercel (`/api/cron/outbox-react`, etc.) son fallback manual, no scheduladas.
+- Run tracking: `source_sync_runs` con `source_system='reactive_worker'`, visible en Admin > Ops Health.
+- Fuente canónica: `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` §4.9 y §5.
+
 ### PostgreSQL Access
 
 - **Método preferido (todos los entornos)**: Cloud SQL Connector vía `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`. Conecta sin TCP directo — negocia túnel seguro por la Cloud SQL Admin API. Funciona en Vercel (WIF + OIDC), local, y agentes AI.

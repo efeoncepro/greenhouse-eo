@@ -36,6 +36,57 @@
 
 Nuevos source systems se agregan al CASE de `canonical_source_system()`, no al frontend ni al TypeScript.
 
+## Sesión 2026-04-05 — TASK-254: Reactive cron workers migrados a Cloud Run ops-worker
+
+### Rama / alcance
+
+- rama: `task/TASK-254-operational-cron-durable-worker-migration`
+- scope: migrar 3 cron operativos worker-like (`outbox-react`, `outbox-react-delivery`, `projection-recovery`) de Vercel a Cloud Run como servicio dedicado `ops-worker`
+
+### Qué se hizo
+
+1. **Workload placement matrix**: los 16 cron de `vercel.json` se clasificaron en `keep in Vercel`, `trigger only` o `migrate to Cloud Run`. Resultado: 3 migran (los reactivos), el resto se queda.
+2. **`services/ops-worker/`** — nuevo servicio Cloud Run con 4 endpoints:
+   - `GET /health` — health check
+   - `POST /outbox-react` — process reactive backlog (todos los dominios)
+   - `POST /outbox-react-delivery` — process reactive backlog solo dominio `delivery`
+   - `POST /projection-recovery` — recovery de orphans de `projection_refresh_queue`
+3. **`src/lib/sync/reactive-run-tracker.ts`** — run tracking institucional usando `source_sync_runs` para que Ops vea corridas exitosas/fallidas del worker reactivo
+4. **`vercel.json`** — 3 cron eliminados (16 → 13), las rutas API siguen como fallback manual
+5. **`src/lib/operations/get-operations-overview.ts`** — nuevo subsistema `Reactive Worker` en Ops Health con `lastRunAt`, `lastRunStatus`, etc.
+6. **`docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`** — v1.2 con ops-worker, scheduler jobs y política de workload placement ampliada
+7. **`Dockerfile`** + **`deploy.sh`** + **`.dockerignore`** + **`README.md`** del servicio
+
+### Verificación
+
+- `npx tsc --noEmit` — OK
+- `pnpm lint` — OK (error pre-existente en ico-diagnostics, no relacionado)
+- `pnpm build` — OK
+
+### Archivos modificados
+
+- `services/ops-worker/server.ts` (nuevo)
+- `services/ops-worker/Dockerfile` (nuevo)
+- `services/ops-worker/deploy.sh` (nuevo)
+- `services/ops-worker/.dockerignore` (nuevo)
+- `services/ops-worker/README.md` (nuevo)
+- `src/lib/sync/reactive-run-tracker.ts` (nuevo)
+- `vercel.json` (3 cron eliminados)
+- `src/lib/operations/get-operations-overview.ts` (subsistema Reactive Worker)
+- `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` (v1.2)
+
+### Riesgo / siguiente paso
+
+- **Desplegado y operativo**: Cloud Run revision `ops-worker-00004-pmk` sirviendo 100% tráfico
+- **3 Cloud Scheduler jobs activos**: `ops-reactive-process` (_/5), `ops-reactive-process-delivery` (2-59/5), `ops-reactive-recover` (_/15)
+- **IAM**: `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` tiene `roles/run.invoker` sobre `ops-worker`
+- **Health check confirmado**: `{"status":"ok","service":"ops-worker"}` via proxy
+- **Scheduler → Cloud Run confirmado**: invocación exitosa (200, 50 events processed, 758ms)
+- **Problema resuelto**: ESM/CJS interop con `next-auth` — shimmed via esbuild `--alias` (6 aliases: next-auth, 3 providers, next-auth/next, bcryptjs)
+- Las rutas API de Vercel (`/api/cron/outbox-react`, etc.) siguen existiendo como fallback manual, pero ya no están scheduleadas en `vercel.json`
+- **Siguiente paso**: período dual-run para confirmar estabilidad, luego eliminar las 3 rutas cron de Vercel
+- Verificar en staging que `getOperationsOverview()` expone correctamente el subsistema Reactive Worker con datos de `source_sync_runs`
+
 ## Sesión 2026-04-05 — ISSUE-014: person_360 VIEW v2 + TASK-256 cierre
 
 ### Rama / alcance

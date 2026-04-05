@@ -9,6 +9,24 @@
   - Migracion: `20260405180048252_canonical-source-system-function-person360.sql`
   - Regla: nuevos source systems se agregan al CASE de la funcion SQL, no al frontend
 
+- **TASK-254 Operational Cron Durable Worker Migration — implementación completa**:
+  - 3 cron operativos worker-like (`outbox-react`, `outbox-react-delivery`, `projection-recovery`) migrados de Vercel scheduler a Cloud Run `ops-worker`
+  - Nuevo servicio `services/ops-worker/` con 4 endpoints HTTP (health + 3 reactive handlers), Dockerfile esbuild two-stage y deploy script idempotente
+  - Nuevo `src/lib/sync/reactive-run-tracker.ts` con run tracking institucional sobre `source_sync_runs` para auditar corridas del worker reactivo
+  - `vercel.json` reducido de 16 a 13 cron entries — las rutas API siguen como fallback manual sin schedule
+  - `getOperationsOverview()` ahora expone subsistema `Reactive Worker` con `lastRunAt`, `lastRunStatus` y señal de freshness
+  - Política de workload placement ampliada: cron con backlog, recovery o semántica de durabilidad deben correr en worker durable aunque no superen 30s
+  - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` actualizado a v1.2 con ops-worker, scheduler jobs y placement matrix
+  - Deploy a Cloud Run pendiente (requiere `bash services/ops-worker/deploy.sh` con GCP auth)
+
+- **TASK-254 Cloud Run deploy completado**:
+  - Cloud Run revision `ops-worker-00004-pmk` sirviendo 100% tráfico en `us-east4`
+  - 3 Cloud Scheduler jobs activos: `ops-reactive-process` (_/5), `ops-reactive-process-delivery` (2-59/5), `ops-reactive-recover` (_/15), timezone `America/Santiago`
+  - Problema ESM/CJS resuelto: `next-auth` y `bcryptjs` shimmed via esbuild `--alias` (el import chain `server.ts → … → auth.ts` arrastraba next-auth providers, que fallan en ESM bajo Node 22)
+  - IAM binding: `greenhouse-portal@` SA con `roles/run.invoker` sobre `ops-worker`
+  - deploy.sh actualizado: IAM binding idempotente + health check via `gcloud run services proxy` (no requiere service account impersonation)
+  - Invocación manual verificada: scheduler → OIDC → 200, 50 events processed en 758ms
+
 - **ISSUE-014 person_360 VIEW faltaba columnas enriched — resuelto**:
   - Mi Perfil mostraba `hasMemberFacet: true` pero todos los campos enriched eran `null` (avatar, cargo, telefono, departamento)
   - Causa raiz: la VIEW `person_360` en la DB era la version antigua (rollup-based) que no exponia `resolved_avatar_url`, `resolved_job_title`, `resolved_phone`, etc.
