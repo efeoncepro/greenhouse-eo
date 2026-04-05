@@ -9,7 +9,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithTheme } from '@/test/render'
 import type { AdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
 import type { AdminTenantsOverview } from '@/lib/admin/get-admin-tenants-overview'
-import type { InternalDashboardClientRow, InternalDashboardOverview } from '@/lib/internal/get-internal-dashboard-overview'
+import type {
+  InternalDashboardClientRow,
+  InternalDashboardOverview
+} from '@/lib/internal/get-internal-dashboard-overview'
 import type { OperationsOverview } from '@/lib/operations/get-operations-overview'
 
 import AdminCenterView from './AdminCenterView'
@@ -33,30 +36,14 @@ vi.mock('next/navigation', () => ({
 }))
 
 vi.mock('@/components/greenhouse', () => ({
-  ExecutiveCardShell: ({
-    title,
-    subtitle,
-    children
-  }: {
-    title: string
-    subtitle?: string
-    children: ReactNode
-  }) => (
+  ExecutiveCardShell: ({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) => (
     <section>
       <h2>{title}</h2>
       {subtitle ? <p>{subtitle}</p> : null}
       {children}
     </section>
   ),
-  ExecutiveMiniStatCard: ({
-    title,
-    value,
-    detail
-  }: {
-    title: string
-    value: string
-    detail: string
-  }) => (
+  ExecutiveMiniStatCard: ({ title, value, detail }: { title: string; value: string; detail: string }) => (
     <section>
       <h3>{title}</h3>
       <div>{value}</div>
@@ -166,9 +153,23 @@ const operations: OperationsOverview = {
   kpis: {
     outboxEvents24h: 28,
     pendingProjections: 4,
+    hiddenReactiveBacklog: 128,
     notificationsSent24h: 12,
     activeSyncs: 5,
     failedHandlers: 2
+  },
+  reactiveBacklog: {
+    totalUnreacted: 128,
+    last24hUnreacted: 128,
+    oldestUnreactedAt: '2026-03-20T08:22:59.000Z',
+    newestUnreactedAt: '2026-04-05T12:59:23.000Z',
+    lastReactedAt: '2026-04-03T01:50:29.000Z',
+    lagHours: 59,
+    status: 'down',
+    topEventTypes: [
+      { eventType: 'ico.materialization.completed', count: 187 },
+      { eventType: 'finance.income.created', count: 132 }
+    ]
   },
   subsystems: [],
   recentEvents: [],
@@ -272,12 +273,7 @@ describe('AdminCenterView', () => {
     currentSearchParams = new URLSearchParams('filter=attention&q=acme')
 
     renderWithTheme(
-      <AdminCenterView
-        access={access}
-        tenants={tenants}
-        controlTower={controlTower}
-        operations={operations}
-      />
+      <AdminCenterView access={access} tenants={tenants} controlTower={controlTower} operations={operations} />
     )
 
     expect(screen.getByDisplayValue('acme')).toBeInTheDocument()
@@ -285,7 +281,7 @@ describe('AdminCenterView', () => {
     expect(screen.getByText('Acme')).toBeInTheDocument()
     expect(screen.queryByText('Orbit')).not.toBeInTheDocument()
     expect(screen.getByText('Posture parcial')).toBeInTheDocument()
-    expect(screen.getAllByText('2 degradados').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('128 backlog oculto').length).toBeGreaterThan(0)
 
     const user = userEvent.setup()
     const searchInput = screen.getByPlaceholderText('Buscar por cliente o email')
@@ -300,16 +296,12 @@ describe('AdminCenterView', () => {
 
   it('renders the consolidated alert block only when there are active signals', () => {
     renderWithTheme(
-      <AdminCenterView
-        access={access}
-        tenants={tenants}
-        controlTower={controlTower}
-        operations={operations}
-      />
+      <AdminCenterView access={access} tenants={tenants} controlTower={controlTower} operations={operations} />
     )
 
     expect(screen.getByRole('heading', { level: 2, name: 'Requiere atencion' })).toBeInTheDocument()
     expect(screen.getByText('2 handlers degradados')).toBeInTheDocument()
+    expect(screen.getByText('128 backlog reactivo oculto')).toBeInTheDocument()
     expect(screen.getByText('1 deliveries en dead-letter')).toBeInTheDocument()
     expect(screen.getByText('12 usuarios sin activar')).toBeInTheDocument()
   })
@@ -342,8 +334,16 @@ describe('AdminCenterView', () => {
           ...operations,
           kpis: {
             ...operations.kpis,
+            hiddenReactiveBacklog: 0,
             failedHandlers: 0,
             pendingProjections: 0
+          },
+          reactiveBacklog: {
+            ...operations.reactiveBacklog,
+            totalUnreacted: 0,
+            last24hUnreacted: 0,
+            status: 'healthy',
+            topEventTypes: []
           },
           webhooks: {
             ...operations.webhooks,

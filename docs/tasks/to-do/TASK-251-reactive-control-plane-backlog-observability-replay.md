@@ -25,6 +25,16 @@
 
 Crear una capability operativa para que Greenhouse mida backlog reactivo real, detecte lag del reactor y permita replay/drain scoped desde Admin Ops sin depender de corridas globales ciegas. La task nace del incidente `ISSUE-009`, donde existía backlog reactivo acumulado aunque los KPIs actuales mostraban `pendingProjections = 0` y `failedHandlers = 0`.
 
+## Delta 2026-04-05
+
+- `ISSUE-009` ya quedó resuelta en su capa de visibilidad operativa.
+- `Admin Center`, `Ops Health` y `/api/internal/projections` ya exponen backlog reactivo oculto y `lastReactedAt` vía `getOperationsOverview()`.
+- El alcance remanente de esta task ya no es “hacer visible el bug”, sino completar la capability enterprise pendiente:
+     - replay/drain scoped
+     - `dryRun`
+     - lag/alert semantics más robustas
+     - guardrails operativos de remediación
+
 ## Why This Task Exists
 
 El incidente `ISSUE-009` confirmó una brecha de plataforma, no solo un bug puntual.
@@ -77,7 +87,7 @@ Reglas obligatorias:
 ## Normative Docs
 
 - `docs/operations/ISSUE_OPERATING_MODEL_V1.md`
-- `docs/issues/open/ISSUE-009-reactive-event-backlog-can-accumulate-without-ops-visibility.md`
+- `docs/issues/resolved/ISSUE-009-reactive-event-backlog-can-accumulate-without-ops-visibility.md`
 - `docs/tasks/to-do/TASK-135-ops-health-sentry-reactive-refresh.md`
 
 ## Dependencies & Impact

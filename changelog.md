@@ -2,6 +2,14 @@
 
 ## 2026-04-05
 
+- **ISSUE-009 Reactive event backlog can accumulate without Ops visibility — resuelto**:
+  - nuevo reader `src/lib/operations/reactive-backlog.ts` para medir backlog reactivo oculto (`published` sin huella en `outbox_reactive_log`)
+  - `getOperationsOverview()` ahora expone `kpis.hiddenReactiveBacklog` + bloque `reactiveBacklog`
+  - `/api/internal/projections` ahora devuelve backlog reactivo real y deja de marcar health global como sana si ese backlog existe
+  - `AdminOpsHealthView` y `AdminCenterView` ya separan backlog reactivo oculto de `pendingProjections` y `failedHandlers`
+  - nueva cobertura focalizada: `reactive-backlog.test.ts` y regresión de `AdminCenterView`
+  - validado con Vitest focalizado (`8` tests passing) y `tsc --noEmit`
+
 - **ISSUE-008 Finance routes mask schema drift as empty success — resuelto**:
   - nuevo helper compartido `src/lib/finance/schema-drift.ts`
   - `purchase-orders`, `hes`, `quotes` y `intelligence/operational-pl` ya no responden vacío ambiguo ante `relation/column does not exist`

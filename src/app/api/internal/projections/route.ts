@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { readReactiveBacklogOverview } from '@/lib/operations/reactive-backlog'
 import { getRegisteredProjections, getSupportedProjectionDomains } from '@/lib/sync/projection-registry'
 import { ensureProjectionsRegistered } from '@/lib/sync/projections'
 import { getQueueStats } from '@/lib/sync/refresh-queue'
@@ -71,14 +72,18 @@ export async function GET() {
     })
 
     // Queue stats
-    const queue = await getQueueStats().catch(() => ({ pending: 0, processing: 0, completed: 0, failed: 0 }))
+    const [queue, reactiveBacklog] = await Promise.all([
+      getQueueStats().catch(() => ({ pending: 0, processing: 0, completed: 0, failed: 0 })),
+      readReactiveBacklogOverview()
+    ])
 
     // Global health: no dead letters, no failed queue items
     const globalDeadLetters = projectionStatus.reduce((s, p) => s + p.last24h.deadLetters, 0)
-    const healthy = globalDeadLetters === 0 && queue.failed === 0
+    const healthy = globalDeadLetters === 0 && queue.failed === 0 && reactiveBacklog.totalUnreacted === 0
 
     return NextResponse.json({
       projections: projectionStatus,
+      reactiveBacklog,
       supportedDomains: getSupportedProjectionDomains(),
       queue,
       totalRegistered: projections.length,
@@ -89,9 +94,6 @@ export async function GET() {
   } catch (error) {
     console.error('GET /api/internal/projections failed:', error)
 
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 })
   }
 }

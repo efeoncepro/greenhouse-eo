@@ -80,7 +80,16 @@ const cloudStatusColor = (operations: OperationsOverview): 'success' | 'warning'
 }
 
 const exportToCsv = (rows: DerivedControlTowerTenant[]) => {
-  const headers = ['Cliente', 'Estado', 'Contacto', 'Usuarios activos', 'Usuarios totales', 'Proyectos', 'OTD', 'Ultima actividad']
+  const headers = [
+    'Cliente',
+    'Estado',
+    'Contacto',
+    'Usuarios activos',
+    'Usuarios totales',
+    'Proyectos',
+    'OTD',
+    'Ultima actividad'
+  ]
 
   const lines = rows.map(row =>
     [
@@ -108,14 +117,21 @@ const exportToCsv = (rows: DerivedControlTowerTenant[]) => {
   URL.revokeObjectURL(url)
 }
 
-const buildDomainCards = ({ access, tenants, operations }: Pick<Props, 'access' | 'tenants' | 'operations'>): DomainCard[] => [
+const buildDomainCards = ({
+  access,
+  tenants,
+  operations
+}: Pick<Props, 'access' | 'tenants' | 'operations'>): DomainCard[] => [
   {
     id: 'identity-access',
     title: 'Identity & Access',
     subtitle: 'Usuarios, roles, equipo interno y scopes visibles del portal.',
     icon: 'tabler-shield-lock',
     avatarColor: 'info',
-    status: { label: access.totals.activeUsers > 0 ? 'Operativo' : 'Pendiente', color: access.totals.activeUsers > 0 ? 'success' : 'warning' },
+    status: {
+      label: access.totals.activeUsers > 0 ? 'Operativo' : 'Pendiente',
+      color: access.totals.activeUsers > 0 ? 'success' : 'warning'
+    },
     href: '/admin/users',
     primaryAction: 'Abrir usuarios',
     routes: ['/admin/users', '/admin/roles', '/admin/team'],
@@ -234,14 +250,22 @@ const buildDomainCards = ({ access, tenants, operations }: Pick<Props, 'access' 
     icon: 'tabler-activity-heartbeat',
     avatarColor: 'error',
     status: {
-      label: operations.kpis.failedHandlers > 0 ? `${operations.kpis.failedHandlers} degradados` : 'Ok',
-      color: operations.kpis.failedHandlers > 0 ? 'warning' : 'success'
+      label:
+        operations.kpis.hiddenReactiveBacklog > 0
+          ? `${operations.kpis.hiddenReactiveBacklog} backlog oculto`
+          : operations.kpis.failedHandlers > 0
+            ? `${operations.kpis.failedHandlers} degradados`
+            : 'Ok',
+      color: operations.kpis.hiddenReactiveBacklog > 0 || operations.kpis.failedHandlers > 0 ? 'warning' : 'success'
     },
     href: '/admin/ops-health',
     primaryAction: 'Abrir ops health',
     routes: ['/admin/ops-health'],
     points: [
       `${operations.kpis.outboxEvents24h} eventos en 24h`,
+      operations.kpis.hiddenReactiveBacklog > 0
+        ? `${operations.kpis.hiddenReactiveBacklog} eventos reactivos publicados fuera del ledger`
+        : 'Sin backlog reactivo oculto visible',
       operations.kpis.pendingProjections > 0
         ? `${operations.kpis.pendingProjections} proyecciones pendientes`
         : 'Sin proyecciones en cola',
@@ -254,7 +278,10 @@ const buildDomainCards = ({ access, tenants, operations }: Pick<Props, 'access' 
     subtitle: 'Provisioning context, enablement y postura de acceso por tenant.',
     icon: 'tabler-grid-4x4',
     avatarColor: 'primary',
-    status: { label: tenants.totals.activeTenants > 0 ? 'Activo' : 'Sin spaces', color: tenants.totals.activeTenants > 0 ? 'success' : 'warning' },
+    status: {
+      label: tenants.totals.activeTenants > 0 ? 'Activo' : 'Sin spaces',
+      color: tenants.totals.activeTenants > 0 ? 'success' : 'warning'
+    },
     href: '/admin/tenants',
     primaryAction: 'Abrir spaces',
     routes: ['/admin/tenants'],
@@ -342,10 +369,7 @@ const AdminCenterView = ({ access, tenants, controlTower, operations }: Props) =
 
       const matchesSearch =
         query.length === 0 ||
-        [tenant.clientName, tenant.primaryContactEmail || '']
-          .join(' ')
-          .toLowerCase()
-          .includes(query)
+        [tenant.clientName, tenant.primaryContactEmail || ''].join(' ').toLowerCase().includes(query)
 
       return matchesStatus && matchesSearch
     })
@@ -357,15 +381,15 @@ const AdminCenterView = ({ access, tenants, controlTower, operations }: Props) =
   )
 
   const otdKpiTone: 'success' | 'warning' | 'error' | 'info' =
-    summary.avgOnTimePct === null ? 'info'
-      : summary.avgOnTimePct >= 90 ? 'success'
-        : summary.avgOnTimePct >= 70 ? 'warning'
+    summary.avgOnTimePct === null
+      ? 'info'
+      : summary.avgOnTimePct >= 90
+        ? 'success'
+        : summary.avgOnTimePct >= 70
+          ? 'warning'
           : 'error'
 
-  const cards = useMemo(
-    () => buildDomainCards({ access, tenants, operations }),
-    [access, tenants, operations]
-  )
+  const cards = useMemo(() => buildDomainCards({ access, tenants, operations }), [access, tenants, operations])
 
   const [domainCardOrder, setDomainCardOrder] = useState<string[]>([])
 
@@ -432,15 +456,24 @@ const AdminCenterView = ({ access, tenants, controlTower, operations }: Props) =
           }}
         >
           <Stack spacing={2.5}>
-            <Chip label={GH_INTERNAL_NAV.adminCenter.label} color='primary' variant='outlined' sx={{ width: 'fit-content' }} />
+            <Chip
+              label={GH_INTERNAL_NAV.adminCenter.label}
+              color='primary'
+              variant='outlined'
+              sx={{ width: 'fit-content' }}
+            />
             <Typography variant='h3'>{GH_INTERNAL_NAV.adminCenter.subtitle}</Typography>
             <Typography color='text.secondary' sx={{ maxWidth: 980 }}>
-              Plano de gobierno que unifica health de spaces, identity, delivery, integraciones y observabilidad operativa.
-              Cada dominio indexa una family funcional sin reemplazar las surfaces especialistas.
+              Plano de gobierno que unifica health de spaces, identity, delivery, integraciones y observabilidad
+              operativa. Cada dominio indexa una family funcional sin reemplazar las surfaces especialistas.
             </Typography>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <Button component={Link} href='/admin/tenants' variant='contained'>Abrir Spaces</Button>
-              <Button component={Link} href='/admin/integrations' variant='outlined'>Ver Cloud & Integrations</Button>
+              <Button component={Link} href='/admin/tenants' variant='contained'>
+                Abrir Spaces
+              </Button>
+              <Button component={Link} href='/admin/integrations' variant='outlined'>
+                Ver Cloud & Integrations
+              </Button>
             </Stack>
           </Stack>
         </CardContent>
@@ -507,6 +540,15 @@ const AdminCenterView = ({ access, tenants, controlTower, operations }: Props) =
             tone: 'error',
             label: `${operations.kpis.failedHandlers} handlers degradados`,
             detail: 'Retries o dead-letters visibles en el runtime reactivo.'
+          })
+        }
+
+        if (operations.kpis.hiddenReactiveBacklog > 0) {
+          alerts.push({
+            icon: 'tabler-radar-2',
+            tone: 'warning',
+            label: `${operations.kpis.hiddenReactiveBacklog} backlog reactivo oculto`,
+            detail: 'Eventos publicados de tipo reactivo siguen sin huella en el ledger reactivo.'
           })
         }
 
@@ -628,7 +670,10 @@ const AdminCenterView = ({ access, tenants, controlTower, operations }: Props) =
                   <Stack direction='row' justifyContent='space-between' alignItems='flex-start' gap={2}>
                     <Stack spacing={1}>
                       <Stack direction='row' spacing={1.5} alignItems='center'>
-                        <Avatar variant='rounded' sx={{ bgcolor: `${card.avatarColor}.lightOpacity`, color: `${card.avatarColor}.main` }}>
+                        <Avatar
+                          variant='rounded'
+                          sx={{ bgcolor: `${card.avatarColor}.lightOpacity`, color: `${card.avatarColor}.main` }}
+                        >
                           <i className={card.icon} />
                         </Avatar>
                         <Typography variant='h5'>{card.title}</Typography>
@@ -653,10 +698,18 @@ const AdminCenterView = ({ access, tenants, controlTower, operations }: Props) =
                   </Stack>
 
                   <Box sx={{ mt: 'auto' }}>
-                    <Typography variant='overline' color='text.secondary'>Rutas indexadas</Typography>
+                    <Typography variant='overline' color='text.secondary'>
+                      Rutas indexadas
+                    </Typography>
                     <Stack direction='row' gap={1} flexWrap='wrap' sx={{ mt: 1.25, mb: 2.5 }}>
                       {card.routes.map(route => (
-                        <Chip key={route} size='small' label={route} variant='outlined' sx={{ fontFamily: 'monospace' }} />
+                        <Chip
+                          key={route}
+                          size='small'
+                          label={route}
+                          variant='outlined'
+                          sx={{ fontFamily: 'monospace' }}
+                        />
                       ))}
                     </Stack>
                     <Button component={Link} href={card.href} variant='outlined'>

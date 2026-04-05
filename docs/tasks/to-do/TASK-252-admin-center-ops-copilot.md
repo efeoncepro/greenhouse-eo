@@ -83,7 +83,7 @@ Reglas obligatorias:
 ## Normative Docs
 
 - `docs/tasks/to-do/TASK-251-reactive-control-plane-backlog-observability-replay.md`
-- `docs/issues/open/ISSUE-009-reactive-event-backlog-can-accumulate-without-ops-visibility.md`
+- `docs/issues/resolved/ISSUE-009-reactive-event-backlog-can-accumulate-without-ops-visibility.md`
 - `docs/operations/ISSUE_OPERATING_MODEL_V1.md`
 
 ## Dependencies & Impact

@@ -10,12 +10,18 @@ import { getCloudObservabilityPosture, getCloudSentryIncidents } from '@/lib/clo
 import { getCloudPostgresPosture } from '@/lib/cloud/postgres'
 import { readAiLlmOperationsSnapshot } from '@/lib/ico-engine/ai/llm-enrichment-reader'
 import { getNotionDeliveryDataQualityOverview } from '@/lib/integrations/notion-delivery-data-quality'
-import { getGreenhousePostgresConfig, isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { readReactiveBacklogOverview, type ReactiveBacklogOverview } from '@/lib/operations/reactive-backlog'
+import {
+  getGreenhousePostgresConfig,
+  isGreenhousePostgresConfigured,
+  runGreenhousePostgresQuery
+} from '@/lib/postgres/client'
 import type { IntegrationDataQualityOverview } from '@/types/integration-data-quality'
 
 export interface OperationsKpis {
   outboxEvents24h: number
   pendingProjections: number
+  hiddenReactiveBacklog: number
   notificationsSent24h: number
   activeSyncs: number
   failedHandlers: number
@@ -76,6 +82,7 @@ export interface OperationsWebhookOverview {
 
 export interface OperationsOverview {
   kpis: OperationsKpis
+  reactiveBacklog: ReactiveBacklogOverview
   subsystems: OperationsSubsystem[]
   recentEvents: OperationsRecentEvent[]
   failedProjections: OperationsFailedProjection[]
@@ -210,9 +217,7 @@ const buildFinanceDataQualitySubsystem = async (): Promise<OperationsSubsystem> 
     const totalIssues = divergentPayments + orphanExpenses
 
     const status: OperationsHealthStatus =
-      divergentPayments > 3 ? 'degraded'
-        : orphanExpenses > 10 ? 'degraded'
-          : 'healthy'
+      divergentPayments > 3 ? 'degraded' : orphanExpenses > 10 ? 'degraded' : 'healthy'
 
     return {
       name: 'Finance Data Quality',
@@ -259,20 +264,31 @@ const buildNotionDeliveryDataQualitySubsystem = (
 }
 
 export const getOperationsOverview = async (): Promise<OperationsOverview> => {
-  const [hasOutbox, hasProjections, hasReactiveLog, hasNotifications, hasServices, hasIcoMetrics, hasIcoAiSignals, hasWebhookEndpoints, hasWebhookInbox, hasWebhookDeliveries, hasWebhookSubscriptions] =
-    await Promise.all([
-      tableExists('greenhouse_sync', 'outbox_events'),
-      tableExists('greenhouse_sync', 'projection_refresh_queue'),
-      tableExists('greenhouse_sync', 'outbox_reactive_log'),
-      tableExists('greenhouse_notifications', 'notifications'),
-      tableExists('greenhouse_core', 'services'),
-      tableExists('greenhouse_serving', 'ico_member_metrics'),
-      tableExists('greenhouse_serving', 'ico_ai_signals'),
-      tableExists('greenhouse_sync', 'webhook_endpoints'),
-      tableExists('greenhouse_sync', 'webhook_inbox_events'),
-      tableExists('greenhouse_sync', 'webhook_deliveries'),
-      tableExists('greenhouse_sync', 'webhook_subscriptions')
-    ])
+  const [
+    hasOutbox,
+    hasProjections,
+    hasReactiveLog,
+    hasNotifications,
+    hasServices,
+    hasIcoMetrics,
+    hasIcoAiSignals,
+    hasWebhookEndpoints,
+    hasWebhookInbox,
+    hasWebhookDeliveries,
+    hasWebhookSubscriptions
+  ] = await Promise.all([
+    tableExists('greenhouse_sync', 'outbox_events'),
+    tableExists('greenhouse_sync', 'projection_refresh_queue'),
+    tableExists('greenhouse_sync', 'outbox_reactive_log'),
+    tableExists('greenhouse_notifications', 'notifications'),
+    tableExists('greenhouse_core', 'services'),
+    tableExists('greenhouse_serving', 'ico_member_metrics'),
+    tableExists('greenhouse_serving', 'ico_ai_signals'),
+    tableExists('greenhouse_sync', 'webhook_endpoints'),
+    tableExists('greenhouse_sync', 'webhook_inbox_events'),
+    tableExists('greenhouse_sync', 'webhook_deliveries'),
+    tableExists('greenhouse_sync', 'webhook_subscriptions')
+  ])
 
   const aiLlmSnapshot = await readAiLlmOperationsSnapshot().catch(() => ({
     tablesReady: false,
@@ -283,15 +299,23 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
     lastProcessedAt: null
   }))
 
-  const [outboxEvents24h, pendingProjections, notificationsSent24h, activeSyncs, failedHandlers] = await Promise.all([
-    safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.outbox_events WHERE occurred_at > NOW() - INTERVAL '24 hours'`),
-    safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.projection_refresh_queue WHERE status = 'pending'`),
-    safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_notifications.notifications WHERE created_at > NOW() - INTERVAL '24 hours'`),
-    safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_core.space_notion_sources WHERE sync_enabled = TRUE`),
-    hasReactiveLog
-      ? safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.outbox_reactive_log WHERE result IN ('retry', 'dead-letter')`)
-      : 0
-  ])
+  const [outboxEvents24h, pendingProjections, notificationsSent24h, activeSyncs, failedHandlers, reactiveBacklog] =
+    await Promise.all([
+      safeCount(
+        `SELECT COUNT(*) AS cnt FROM greenhouse_sync.outbox_events WHERE occurred_at > NOW() - INTERVAL '24 hours'`
+      ),
+      safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.projection_refresh_queue WHERE status = 'pending'`),
+      safeCount(
+        `SELECT COUNT(*) AS cnt FROM greenhouse_notifications.notifications WHERE created_at > NOW() - INTERVAL '24 hours'`
+      ),
+      safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_core.space_notion_sources WHERE sync_enabled = TRUE`),
+      hasReactiveLog
+        ? safeCount(
+            `SELECT COUNT(*) AS cnt FROM greenhouse_sync.outbox_reactive_log WHERE result IN ('retry', 'dead-letter')`
+          )
+        : 0,
+      readReactiveBacklogOverview()
+    ])
 
   const [
     outboxProcessed,
@@ -317,49 +341,73 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
     webhookLastInboxAt,
     webhookLastDeliveryAt
   ] = await Promise.all([
-    safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.outbox_events WHERE occurred_at > NOW() - INTERVAL '24 hours' AND status = 'processed'`),
-    safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.outbox_events WHERE occurred_at > NOW() - INTERVAL '24 hours' AND status = 'failed'`),
+    safeCount(
+      `SELECT COUNT(*) AS cnt FROM greenhouse_sync.outbox_events WHERE occurred_at > NOW() - INTERVAL '24 hours' AND status = 'processed'`
+    ),
+    safeCount(
+      `SELECT COUNT(*) AS cnt FROM greenhouse_sync.outbox_events WHERE occurred_at > NOW() - INTERVAL '24 hours' AND status = 'failed'`
+    ),
     runGreenhousePostgresQuery<Record<string, unknown> & { last_run: string | null }>(
       `SELECT MAX(occurred_at)::text AS last_run FROM greenhouse_sync.outbox_events`
-    ).then(rows => rows[0]?.last_run ?? null).catch(() => null),
+    )
+      .then(rows => rows[0]?.last_run ?? null)
+      .catch(() => null),
 
     safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.projection_refresh_queue WHERE status = 'completed'`),
-    safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.projection_refresh_queue WHERE status = 'failed' AND updated_at > NOW() - INTERVAL '48 hours'`),
+    safeCount(
+      `SELECT COUNT(*) AS cnt FROM greenhouse_sync.projection_refresh_queue WHERE status = 'failed' AND updated_at > NOW() - INTERVAL '48 hours'`
+    ),
     runGreenhousePostgresQuery<Record<string, unknown> & { last_run: string | null }>(
       `SELECT MAX(updated_at)::text AS last_run FROM greenhouse_sync.projection_refresh_queue WHERE status = 'completed'`
-    ).then(rows => rows[0]?.last_run ?? null).catch(() => null),
+    )
+      .then(rows => rows[0]?.last_run ?? null)
+      .catch(() => null),
 
     safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_notifications.notifications`),
     safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_notifications.notifications WHERE status = 'failed'`),
 
     runGreenhousePostgresQuery<Record<string, unknown> & { last_sync: string | null }>(
       `SELECT MAX(last_synced_at)::text AS last_sync FROM greenhouse_core.space_notion_sources WHERE sync_enabled = TRUE`
-    ).then(rows => rows[0]?.last_sync ?? null).catch(() => null),
+    )
+      .then(rows => rows[0]?.last_sync ?? null)
+      .catch(() => null),
 
     runGreenhousePostgresQuery<Record<string, unknown> & { last_sync: string | null }>(
       `SELECT MAX(hubspot_last_synced_at)::text AS last_sync FROM greenhouse_core.services`
-    ).then(rows => rows[0]?.last_sync ?? null).catch(() => null),
+    )
+      .then(rows => rows[0]?.last_sync ?? null)
+      .catch(() => null),
 
     runGreenhousePostgresQuery<Record<string, unknown> & { last_sync: string | null }>(
       `SELECT MAX(materialized_at)::text AS last_sync FROM greenhouse_serving.ico_member_metrics`
-    ).then(rows => rows[0]?.last_sync ?? null).catch(() => null),
+    )
+      .then(rows => rows[0]?.last_sync ?? null)
+      .catch(() => null),
     hasIcoAiSignals
       ? runGreenhousePostgresQuery<Record<string, unknown> & { last_sync: string | null }>(
           `SELECT MAX(generated_at)::text AS last_sync FROM greenhouse_serving.ico_ai_signals`
-        ).then(rows => rows[0]?.last_sync ?? null).catch(() => null)
+        )
+          .then(rows => rows[0]?.last_sync ?? null)
+          .catch(() => null)
       : null,
 
     hasWebhookEndpoints
       ? safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.webhook_endpoints WHERE active = TRUE`)
       : 0,
     hasWebhookSubscriptions
-      ? safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.webhook_subscriptions WHERE active = TRUE AND paused_at IS NULL`)
+      ? safeCount(
+          `SELECT COUNT(*) AS cnt FROM greenhouse_sync.webhook_subscriptions WHERE active = TRUE AND paused_at IS NULL`
+        )
       : 0,
     hasWebhookInbox
-      ? safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.webhook_inbox_events WHERE received_at > NOW() - INTERVAL '24 hours'`)
+      ? safeCount(
+          `SELECT COUNT(*) AS cnt FROM greenhouse_sync.webhook_inbox_events WHERE received_at > NOW() - INTERVAL '24 hours'`
+        )
       : 0,
     hasWebhookInbox
-      ? safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.webhook_inbox_events WHERE status IN ('failed', 'dead_letter') AND received_at > NOW() - INTERVAL '24 hours'`)
+      ? safeCount(
+          `SELECT COUNT(*) AS cnt FROM greenhouse_sync.webhook_inbox_events WHERE status IN ('failed', 'dead_letter') AND received_at > NOW() - INTERVAL '24 hours'`
+        )
       : 0,
     hasWebhookDeliveries
       ? safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.webhook_deliveries WHERE status = 'pending'`)
@@ -370,7 +418,7 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
     hasWebhookDeliveries
       ? safeCount(`SELECT COUNT(*) AS cnt FROM greenhouse_sync.webhook_deliveries WHERE status = 'dead_letter'`)
       : 0,
-    (hasWebhookEndpoints || hasWebhookSubscriptions)
+    hasWebhookEndpoints || hasWebhookSubscriptions
       ? safeCount(`
           SELECT COUNT(*) AS cnt
           FROM (
@@ -383,12 +431,16 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
     hasWebhookInbox
       ? runGreenhousePostgresQuery<Record<string, unknown> & { last_run: string | null }>(
           `SELECT MAX(received_at)::text AS last_run FROM greenhouse_sync.webhook_inbox_events`
-        ).then(rows => rows[0]?.last_run ?? null).catch(() => null)
+        )
+          .then(rows => rows[0]?.last_run ?? null)
+          .catch(() => null)
       : null,
     hasWebhookDeliveries
       ? runGreenhousePostgresQuery<Record<string, unknown> & { last_run: string | null }>(
           `SELECT MAX(created_at)::text AS last_run FROM greenhouse_sync.webhook_deliveries`
-        ).then(rows => rows[0]?.last_run ?? null).catch(() => null)
+        )
+          .then(rows => rows[0]?.last_run ?? null)
+          .catch(() => null)
       : null
   ])
 
@@ -430,8 +482,17 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       lastRun: projLastRun
     },
     {
+      name: 'Reactive backlog',
+      status: reactiveBacklog.status,
+      processed: reactiveBacklog.totalUnreacted,
+      failed: reactiveBacklog.last24hUnreacted,
+      lastRun: reactiveBacklog.lastReactedAt
+    },
+    {
       name: 'AI LLM Enrichment',
-      status: aiLlmSnapshot.tablesReady ? deriveHealth(aiLlmSnapshot.processed, aiLlmSnapshot.failed, aiLlmSnapshot.lastRun, aiLlmSnapshot.tablesReady) : 'not_configured',
+      status: aiLlmSnapshot.tablesReady
+        ? deriveHealth(aiLlmSnapshot.processed, aiLlmSnapshot.failed, aiLlmSnapshot.lastRun, aiLlmSnapshot.tablesReady)
+        : 'not_configured',
       processed: aiLlmSnapshot.processed,
       failed: aiLlmSnapshot.failed,
       lastRun: aiLlmSnapshot.lastRun
@@ -544,13 +605,15 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
 
   try {
     if (hasReactiveLog) {
-      const rows = await runGreenhousePostgresQuery<{
-        handler: string
-        result: string
-        retries: number
-        reacted_at: string
-        last_error: string | null
-      } & Record<string, unknown>>(
+      const rows = await runGreenhousePostgresQuery<
+        {
+          handler: string
+          result: string
+          retries: number
+          reacted_at: string
+          last_error: string | null
+        } & Record<string, unknown>
+      >(
         `SELECT handler, result, retries, reacted_at::text, last_error
          FROM greenhouse_sync.outbox_reactive_log
          WHERE result IN ('retry', 'dead-letter')
@@ -672,11 +735,17 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
     {
       key: 'postgres',
       label: 'Cloud SQL runtime',
-      status: postgresHealth?.ok ? (postgresPosture.risks.length === 0 ? 'ok' : 'warning') : postgresConfigured ? 'failed' : 'warning',
-      summary:
-        postgresHealth?.ok
-          ? postgresPosture.summary
-          : (postgresHealth?.summary ?? (postgresConfigured ? 'Cloud SQL no respondió al health check' : 'Postgres runtime no configurado')),
+      status: postgresHealth?.ok
+        ? postgresPosture.risks.length === 0
+          ? 'ok'
+          : 'warning'
+        : postgresConfigured
+          ? 'failed'
+          : 'warning',
+      summary: postgresHealth?.ok
+        ? postgresPosture.summary
+        : (postgresHealth?.summary ??
+          (postgresConfigured ? 'Cloud SQL no respondió al health check' : 'Postgres runtime no configurado')),
       details: {
         maxConnections: postgresConfig.maxConnections,
         usesConnector: Boolean(postgresConfig.instanceConnectionName),
@@ -688,7 +757,9 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       key: 'bigquery',
       label: 'BigQuery runtime',
       status: bigQueryHealth?.ok ? 'ok' : bigQueryProjectId ? 'failed' : 'warning',
-      summary: bigQueryHealth?.summary ?? (bigQueryProjectId ? 'BigQuery no respondió al health check' : 'BigQuery project no configurado'),
+      summary:
+        bigQueryHealth?.summary ??
+        (bigQueryProjectId ? 'BigQuery no respondió al health check' : 'BigQuery project no configurado'),
       details: {
         projectId: bigQueryProjectId
       }
@@ -697,7 +768,9 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       key: 'cron',
       label: 'Cron control plane',
       status: cronState.configured ? 'ok' : 'failed',
-      summary: cronState.configured ? 'CRON_SECRET configurado para routes scheduler-driven' : 'CRON_SECRET ausente; control plane incompleto'
+      summary: cronState.configured
+        ? 'CRON_SECRET configurado para routes scheduler-driven'
+        : 'CRON_SECRET ausente; control plane incompleto'
     },
     {
       key: 'cost_guard',
@@ -717,9 +790,16 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
   const warningCloudControls = cloudControls.filter(control => control.status === 'warning').length
   const cloudOverallStatus = failedCloudControls > 0 ? 'failed' : warningCloudControls > 0 ? 'warning' : 'ok'
 
-
   return {
-    kpis: { outboxEvents24h, pendingProjections, notificationsSent24h, activeSyncs, failedHandlers },
+    kpis: {
+      outboxEvents24h,
+      pendingProjections,
+      hiddenReactiveBacklog: reactiveBacklog.totalUnreacted,
+      notificationsSent24h,
+      activeSyncs,
+      failedHandlers
+    },
+    reactiveBacklog,
     subsystems,
     recentEvents,
     failedProjections,
@@ -758,12 +838,16 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
         usesConnector: Boolean(postgresConfig.instanceConnectionName),
         sslEnabled: postgresPosture.sslEnabled,
         maxConnections: postgresConfig.maxConnections,
-        summary: postgresHealth?.ok ? postgresPosture.summary : (postgresHealth?.summary ?? (postgresConfigured ? 'Configurado sin respuesta de health' : 'No configurado'))
+        summary: postgresHealth?.ok
+          ? postgresPosture.summary
+          : (postgresHealth?.summary ?? (postgresConfigured ? 'Configurado sin respuesta de health' : 'No configurado'))
       },
       bigquery: {
         projectId: bigQueryProjectId,
         maximumBytesBilled,
-        summary: bigQueryHealth?.summary ?? (bigQueryProjectId ? 'Proyecto configurado sin respuesta de health' : 'Proyecto no configurado'),
+        summary:
+          bigQueryHealth?.summary ??
+          (bigQueryProjectId ? 'Proyecto configurado sin respuesta de health' : 'Proyecto no configurado'),
         blockedQueries: [...getBlockedQueries()]
       },
       observability: {

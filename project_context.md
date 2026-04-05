@@ -1,5 +1,30 @@
 # project_context.md
 
+## Delta 2026-04-05 Reactive backlog hidden stage now surfaces in Admin Ops
+
+- `Admin Center`, `Ops Health` y el contrato interno `/api/internal/projections` ya distinguen explícitamente el tramo reactivo oculto `published -> outbox_reactive_log`.
+- Nuevo contrato runtime:
+  - `getOperationsOverview()` expone `kpis.hiddenReactiveBacklog`
+  - además expone `reactiveBacklog` con:
+    - `totalUnreacted`
+    - `last24hUnreacted`
+    - `oldestUnreactedAt`
+    - `newestUnreactedAt`
+    - `lastReactedAt`
+    - `lagHours`
+    - `status`
+    - `topEventTypes`
+- Regla vigente:
+  - `pendingProjections` ya no puede leerse como proxy suficiente de salud reactiva
+  - `failedHandlers` ya no puede leerse como proxy suficiente de backlog reactivo real
+  - la lectura correcta del control plane debe distinguir al menos:
+    - publish lane
+    - hidden reactive backlog
+    - persistent queue backlog
+    - handler degradation
+- Motivación:
+  - cerrar `ISSUE-009` para que el backlog reactivo no pueda seguir acumulándose sin visibilidad operativa
+
 ## Delta 2026-04-05 Finance schema drift now surfaces as degraded payload, not empty success
 
 - Las routes Finance `purchase-orders`, `hes`, `quotes` y `intelligence/operational-pl` ya no responden vacío indistinguible cuando falta una relación o columna crítica.

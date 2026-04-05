@@ -20,7 +20,11 @@ import type { TimelineProps } from '@mui/lab/Timeline'
 
 import { ExecutiveCardShell, ExecutiveMiniStatCard } from '@/components/greenhouse'
 import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
-import type { OperationsHealthStatus, OperationsOverview, OperationsSubsystem } from '@/lib/operations/get-operations-overview'
+import type {
+  OperationsHealthStatus,
+  OperationsOverview,
+  OperationsSubsystem
+} from '@/lib/operations/get-operations-overview'
 import type { IntegrationDataQualityRunResult, IntegrationDataQualityStatus } from '@/types/integration-data-quality'
 import AdminOperationalActionsPanel from './AdminOperationalActionsPanel'
 import AdminOpsActionButton from './AdminOpsActionButton'
@@ -91,12 +95,35 @@ const sentryLevelColor = (level: string): 'success' | 'warning' | 'error' | 'sec
 
 const healthSubsystems = (subsystems: OperationsSubsystem[]) =>
   subsystems.filter(subsystem =>
-    ['Outbox', 'Proyecciones', 'Notificaciones', 'Finance Data Quality', 'Notion Delivery Data Quality'].includes(subsystem.name)
+    [
+      'Outbox',
+      'Proyecciones',
+      'Reactive backlog',
+      'Notificaciones',
+      'Finance Data Quality',
+      'Notion Delivery Data Quality'
+    ].includes(subsystem.name)
   )
 
-const dataQualityColor = (
-  status: IntegrationDataQualityStatus
-): 'success' | 'warning' | 'error' | 'secondary' => {
+const subsystemDetail = (subsystem: OperationsSubsystem) => {
+  if (subsystem.name === 'Reactive backlog') {
+    if (subsystem.processed === 0) {
+      return 'Sin eventos reactivos publicados pendientes de entrar al ledger.'
+    }
+
+    if (subsystem.failed > 0) {
+      return `${subsystem.processed} eventos publicados siguen sin huella reactiva; ${subsystem.failed} ocurrieron en las últimas 24h.`
+    }
+
+    return `${subsystem.processed} eventos antiguos siguen sin huella reactiva visible en el ledger.`
+  }
+
+  return subsystem.failed > 0
+    ? `${subsystem.failed} fallos visibles sobre ${subsystem.processed} registros observados.`
+    : `${subsystem.processed} registros observados sin fallos activos visibles.`
+}
+
+const dataQualityColor = (status: IntegrationDataQualityStatus): 'success' | 'warning' | 'error' | 'secondary' => {
   if (status === 'healthy') return 'success'
   if (status === 'degraded') return 'warning'
   if (status === 'broken') return 'error'
@@ -124,9 +151,10 @@ const getDataQualityFindings = (runs: IntegrationDataQualityRunResult[]) => {
   const totals = new Map<string, number>()
 
   for (const run of runs.slice(0, 6)) {
-    const bucketCounts = typeof run.summary.bucketCounts === 'object' && run.summary.bucketCounts !== null
-      ? run.summary.bucketCounts as Record<string, unknown>
-      : {}
+    const bucketCounts =
+      typeof run.summary.bucketCounts === 'object' && run.summary.bucketCounts !== null
+        ? (run.summary.bucketCounts as Record<string, unknown>)
+        : {}
 
     for (const [bucket, count] of Object.entries(bucketCounts)) {
       const normalizedCount = toNumber(count)
@@ -177,9 +205,10 @@ const buildAuditEvents = (data: OperationsOverview): AuditEvent[] => {
     result: handler.result,
     resultTone: (handler.result === 'dead-letter' ? 'failed' : 'warning') as AdminHealth,
     actorLabel: 'Sistema',
-    followUp: handler.result === 'dead-letter'
-      ? 'Requiere intervención manual o replay'
-      : `Retry automático (${handler.retries} intentos)`
+    followUp:
+      handler.result === 'dead-letter'
+        ? 'Requiere intervención manual o replay'
+        : `Retry automático (${handler.retries} intentos)`
   }))
 
   return [...fromEvents, ...fromHandlers]
@@ -213,11 +242,16 @@ const AdminOpsHealthView = ({ data }: Props) => {
           }}
         >
           <Stack spacing={2.5}>
-            <Chip label={GH_INTERNAL_NAV.adminOpsHealth.label} color='warning' variant='outlined' sx={{ width: 'fit-content' }} />
+            <Chip
+              label={GH_INTERNAL_NAV.adminOpsHealth.label}
+              color='warning'
+              variant='outlined'
+              sx={{ width: 'fit-content' }}
+            />
             <Typography variant='h3'>{GH_INTERNAL_NAV.adminOpsHealth.subtitle}</Typography>
             <Typography color='text.secondary' sx={{ maxWidth: 980 }}>
-              Health del control plane separado de las vistas de negocio. Presión sobre outbox, cola reactiva,
-              señales recientes y handlers fallidos para decidir si hace falta retry, replay o navegación profunda.
+              Health del control plane separado de las vistas de negocio. Presión sobre outbox, cola reactiva, señales
+              recientes y handlers fallidos para decidir si hace falta retry, replay o navegación profunda.
             </Typography>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <Button component={Link} href='/agency/operations' variant='contained'>
@@ -236,7 +270,7 @@ const AdminOpsHealthView = ({ data }: Props) => {
         sx={{
           display: 'grid',
           gap: 3,
-          gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))', xl: 'repeat(4, minmax(0, 1fr))' }
+          gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))', xl: 'repeat(5, minmax(0, 1fr))' }
         }}
       >
         <ExecutiveMiniStatCard
@@ -256,11 +290,33 @@ const AdminOpsHealthView = ({ data }: Props) => {
           icon='tabler-refresh'
         />
         <ExecutiveMiniStatCard
+          eyebrow='Hidden backlog'
+          tone={
+            data.reactiveBacklog.status === 'down'
+              ? 'error'
+              : data.reactiveBacklog.totalUnreacted > 0
+                ? 'warning'
+                : 'success'
+          }
+          title='Backlog reactivo'
+          value={String(data.reactiveBacklog.totalUnreacted)}
+          detail={
+            data.reactiveBacklog.totalUnreacted > 0
+              ? `${data.reactiveBacklog.last24hUnreacted} nuevos sin reaccionar · último reacted ${formatDateTime(data.reactiveBacklog.lastReactedAt)}`
+              : 'Sin eventos publicados pendientes de entrar al ledger reactivo.'
+          }
+          icon='tabler-radar-2'
+        />
+        <ExecutiveMiniStatCard
           eyebrow='Failures'
           tone={data.kpis.failedHandlers > 0 ? 'error' : 'success'}
           title='Handlers degradados'
           value={String(data.kpis.failedHandlers)}
-          detail={data.kpis.failedHandlers > 0 ? 'Retries o dead-letters visibles en el ledger reactivo.' : 'Sin degradación visible en handlers reactivos.'}
+          detail={
+            data.kpis.failedHandlers > 0
+              ? 'Retries o dead-letters visibles en el ledger reactivo.'
+              : 'Sin degradación visible en handlers reactivos.'
+          }
           icon='tabler-alert-triangle'
         />
         <ExecutiveMiniStatCard
@@ -302,9 +358,7 @@ const AdminOpsHealthView = ({ data }: Props) => {
                       <Chip size='small' variant='tonal' color={chipColor(health)} label={health} />
                     </Stack>
                     <Typography variant='body2' color='text.secondary'>
-                      {subsystem.failed > 0
-                        ? `${subsystem.failed} fallos visibles sobre ${subsystem.processed} registros observados.`
-                        : `${subsystem.processed} registros observados sin fallos activos visibles.`}
+                      {subsystemDetail(subsystem)}
                     </Typography>
                   </Stack>
                 </CardContent>
@@ -363,7 +417,13 @@ const AdminOpsHealthView = ({ data }: Props) => {
                   <Stack spacing={2}>
                     <Typography variant='h6'>Latest status por space</Typography>
                     {notionDataQuality.latestBySpace.map(space => (
-                      <Stack key={space.spaceId} direction='row' justifyContent='space-between' alignItems='center' gap={2}>
+                      <Stack
+                        key={space.spaceId}
+                        direction='row'
+                        justifyContent='space-between'
+                        alignItems='center'
+                        gap={2}
+                      >
                         <Stack spacing={0.5}>
                           <Typography variant='body2' sx={{ fontWeight: 500 }}>
                             {space.spaceName ?? space.spaceId}
@@ -390,7 +450,13 @@ const AdminOpsHealthView = ({ data }: Props) => {
                     <Typography variant='h6'>Findings e historia corta</Typography>
                     {notionDataQualityFindings.length > 0 ? (
                       notionDataQualityFindings.map(finding => (
-                        <Stack key={finding.bucket} direction='row' justifyContent='space-between' alignItems='center' gap={2}>
+                        <Stack
+                          key={finding.bucket}
+                          direction='row'
+                          justifyContent='space-between'
+                          alignItems='center'
+                          gap={2}
+                        >
                           <Typography variant='body2' color='text.secondary'>
                             {finding.bucket}
                           </Typography>
@@ -405,7 +471,13 @@ const AdminOpsHealthView = ({ data }: Props) => {
 
                     <Stack spacing={1}>
                       {notionDataQuality.recentRuns.slice(0, 4).map(run => (
-                        <Stack key={run.dataQualityRunId} direction='row' justifyContent='space-between' alignItems='center' gap={2}>
+                        <Stack
+                          key={run.dataQualityRunId}
+                          direction='row'
+                          justifyContent='space-between'
+                          alignItems='center'
+                          gap={2}
+                        >
                           <Stack spacing={0.25}>
                             <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8125rem' }}>
                               {run.spaceId}
@@ -450,7 +522,13 @@ const AdminOpsHealthView = ({ data }: Props) => {
                   <Chip
                     size='small'
                     variant='tonal'
-                    color={data.cloud.posture.overallStatus === 'ok' ? 'success' : data.cloud.posture.overallStatus === 'warning' ? 'warning' : 'error'}
+                    color={
+                      data.cloud.posture.overallStatus === 'ok'
+                        ? 'success'
+                        : data.cloud.posture.overallStatus === 'warning'
+                          ? 'warning'
+                          : 'error'
+                    }
                     label={data.cloud.posture.overallStatus}
                   />
                 </Stack>
@@ -525,7 +603,12 @@ const AdminOpsHealthView = ({ data }: Props) => {
                     Estado
                   </Typography>
                   <Stack direction='row' spacing={1.5} alignItems='center'>
-                    <Chip size='small' variant='tonal' color={sentryStatusColor(sentryIncidents.status)} label={sentryIncidents.status} />
+                    <Chip
+                      size='small'
+                      variant='tonal'
+                      color={sentryStatusColor(sentryIncidents.status)}
+                      label={sentryIncidents.status}
+                    />
                     <Typography variant='body2' color='text.secondary'>
                       {sentryIncidents.summary}
                     </Typography>
@@ -583,18 +666,32 @@ const AdminOpsHealthView = ({ data }: Props) => {
                           </Typography>
                         </Stack>
                         <Stack direction='row' spacing={1} flexWrap='wrap' justifyContent='flex-end'>
-                          <Chip size='small' variant='tonal' color={sentryLevelColor(incident.level)} label={incident.level} />
+                          <Chip
+                            size='small'
+                            variant='tonal'
+                            color={sentryLevelColor(incident.level)}
+                            label={incident.level}
+                          />
                           <Chip size='small' variant='outlined' label={incident.environment || 'sin env'} />
                         </Stack>
                       </Stack>
                       <Typography variant='body2' color='text.secondary'>
-                        {incident.shortId || 'Sentry'} · {incident.release || 'sin release'} · {incident.count} eventos · {incident.userCount} usuarios
+                        {incident.shortId || 'Sentry'} · {incident.release || 'sin release'} · {incident.count} eventos
+                        · {incident.userCount} usuarios
                       </Typography>
                       <Typography variant='caption' color='text.secondary'>
-                        First seen: {formatDateTime(incident.firstSeen)} · Last seen: {formatDateTime(incident.lastSeen)}
+                        First seen: {formatDateTime(incident.firstSeen)} · Last seen:{' '}
+                        {formatDateTime(incident.lastSeen)}
                       </Typography>
                       {incident.permalink ? (
-                        <Button component='a' href={incident.permalink} target='_blank' rel='noreferrer' variant='outlined' size='small'>
+                        <Button
+                          component='a'
+                          href={incident.permalink}
+                          target='_blank'
+                          rel='noreferrer'
+                          variant='outlined'
+                          size='small'
+                        >
                           Abrir issue en Sentry
                         </Button>
                       ) : null}
@@ -643,10 +740,7 @@ const AdminOpsHealthView = ({ data }: Props) => {
           </Stack>
         </ExecutiveCardShell>
 
-        <ExecutiveCardShell
-          title='Focos actuales'
-          subtitle='Resumen corto para decidir el siguiente salto operativo.'
-        >
+        <ExecutiveCardShell title='Focos actuales' subtitle='Resumen corto para decidir el siguiente salto operativo.'>
           <Stack spacing={2.5}>
             <Card variant='outlined'>
               <CardContent>
@@ -655,7 +749,13 @@ const AdminOpsHealthView = ({ data }: Props) => {
                   <Stack direction='row' gap={1} flexWrap='wrap'>
                     {uniqueRecentEventTypes.length > 0 ? (
                       uniqueRecentEventTypes.map(eventType => (
-                        <Chip key={eventType} size='small' variant='outlined' label={eventType} sx={{ fontFamily: 'monospace' }} />
+                        <Chip
+                          key={eventType}
+                          size='small'
+                          variant='outlined'
+                          label={eventType}
+                          sx={{ fontFamily: 'monospace' }}
+                        />
                       ))
                     ) : (
                       <Typography variant='body2' color='text.secondary'>
@@ -663,6 +763,41 @@ const AdminOpsHealthView = ({ data }: Props) => {
                       </Typography>
                     )}
                   </Stack>
+                </Stack>
+              </CardContent>
+            </Card>
+
+            <Card variant='outlined'>
+              <CardContent>
+                <Stack spacing={1.5}>
+                  <Typography variant='h6'>Backlog reactivo real</Typography>
+                  {data.reactiveBacklog.totalUnreacted === 0 ? (
+                    <Typography variant='body2' color='text.secondary'>
+                      No hay eventos reactivos publicados sin huella en el ledger en este momento.
+                    </Typography>
+                  ) : (
+                    <Stack spacing={1.25}>
+                      <Typography variant='body2' color='text.secondary'>
+                        {data.reactiveBacklog.totalUnreacted} eventos reactivos publicados siguen fuera del ledger.
+                        Último reacted visible: {formatDateTime(data.reactiveBacklog.lastReactedAt)}.
+                      </Typography>
+                      <Typography variant='body2' color='text.secondary'>
+                        Ventana observada: {formatDateTime(data.reactiveBacklog.oldestUnreactedAt)} →{' '}
+                        {formatDateTime(data.reactiveBacklog.newestUnreactedAt)}.
+                      </Typography>
+                      <Stack direction='row' gap={1} flexWrap='wrap'>
+                        {data.reactiveBacklog.topEventTypes.map(item => (
+                          <Chip
+                            key={item.eventType}
+                            size='small'
+                            variant='outlined'
+                            label={`${item.eventType} · ${item.count}`}
+                            sx={{ fontFamily: 'monospace' }}
+                          />
+                        ))}
+                      </Stack>
+                    </Stack>
+                  )}
                 </Stack>
               </CardContent>
             </Card>
@@ -757,7 +892,12 @@ const AdminOpsHealthView = ({ data }: Props) => {
                     <Stack spacing={1.25}>
                       <Stack direction='row' justifyContent='space-between' alignItems='flex-start' gap={2}>
                         <Typography variant='h6'>{item.handler}</Typography>
-                        <Chip size='small' variant='tonal' color={item.result === 'dead-letter' ? 'error' : 'warning'} label={item.result} />
+                        <Chip
+                          size='small'
+                          variant='tonal'
+                          color={item.result === 'dead-letter' ? 'error' : 'warning'}
+                          label={item.result}
+                        />
                       </Stack>
                       <Typography variant='body2' color='text.secondary'>
                         Retries: {item.retries}
@@ -792,7 +932,13 @@ const AdminOpsHealthView = ({ data }: Props) => {
                     {index < auditEvents.length - 1 ? <TimelineConnector /> : null}
                   </TimelineSeparator>
                   <TimelineContent>
-                    <Stack direction='row' justifyContent='space-between' alignItems='flex-start' gap={2} sx={{ mb: 0.5 }}>
+                    <Stack
+                      direction='row'
+                      justifyContent='space-between'
+                      alignItems='flex-start'
+                      gap={2}
+                      sx={{ mb: 0.5 }}
+                    >
                       <Typography variant='body2' sx={{ fontWeight: 500, fontFamily: 'monospace' }}>
                         {event.title}
                       </Typography>
@@ -805,7 +951,12 @@ const AdminOpsHealthView = ({ data }: Props) => {
                       <Typography variant='caption' color='text.secondary'>
                         {formatDateTime(event.timestamp)}
                       </Typography>
-                      <Chip size='small' variant='outlined' label={event.actorLabel} sx={{ height: 20, fontSize: '0.7rem' }} />
+                      <Chip
+                        size='small'
+                        variant='outlined'
+                        label={event.actorLabel}
+                        sx={{ height: 20, fontSize: '0.7rem' }}
+                      />
                     </Stack>
                     {event.followUp ? (
                       <Typography variant='caption' color='warning.main' sx={{ mt: 0.5, display: 'block' }}>
@@ -828,7 +979,8 @@ const AdminOpsHealthView = ({ data }: Props) => {
                 <Stack spacing={1.5}>
                   <Typography variant='h6'>Acciones manuales</Typography>
                   <Typography variant='body2' color='text.secondary'>
-                    Las acciones ejecutadas desde botones de governance aparecerán aquí cuando exista un ledger de auditoría persistido.
+                    Las acciones ejecutadas desde botones de governance aparecerán aquí cuando exista un ledger de
+                    auditoría persistido.
                   </Typography>
                   <Typography variant='body2' color='text.secondary'>
                     Hoy el audit trail refleja eventos del bus operativo y handlers degradados del runtime.
@@ -878,10 +1030,12 @@ const AdminOpsHealthView = ({ data }: Props) => {
             {
               id: 'replay-reactive',
               label: 'Replay reactive',
-              description: 'Ejecuta el consumer reactivo para procesar eventos publicados y refrescar proyecciones.',
+              description:
+                'Ejecuta el consumer reactivo canónico. Úsalo cuando exista backlog oculto o handlers degradados visibles.',
               endpoint: '/api/admin/ops/replay-reactive',
               confirmTitle: '¿Reprocesar eventos reactivos?',
-              confirmDescription: 'Esto corre el consumer reactivo canónico y puede disparar refreshes downstream.',
+              confirmDescription:
+                'Esto corre el consumer reactivo canónico y puede disparar refreshes y side effects downstream.',
               confirmColor: 'warning'
             },
             {
@@ -890,7 +1044,8 @@ const AdminOpsHealthView = ({ data }: Props) => {
               description: 'Procesa manualmente deliveries fallidas elegibles dentro de la ventana activa de retry.',
               endpoint: '/api/admin/ops/email-delivery-retry',
               confirmTitle: '¿Reintentar correos fallidos?',
-              confirmDescription: 'Esto usa la capa canónica de email delivery para reprocesar deliveries fallidas elegibles.',
+              confirmDescription:
+                'Esto usa la capa canónica de email delivery para reprocesar deliveries fallidas elegibles.',
               confirmColor: 'primary'
             }
           ]}

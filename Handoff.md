@@ -1,5 +1,104 @@
 # Handoff.md
 
+## Sesión 2026-04-05 — ISSUE-009 resolved: hidden reactive backlog is now visible in Admin Ops
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: cerrar `ISSUE-009` corrigiendo la invisibilidad del backlog reactivo en surfaces admin
+
+### Qué se hizo
+
+- nuevo reader canónico `src/lib/operations/reactive-backlog.ts`
+  - total backlog reactivo oculto
+  - backlog últimas `24h`
+  - oldest/newest
+  - `lastReactedAt`
+  - `lagHours`
+  - status derivado + top event types
+- `getOperationsOverview()` ahora expone:
+  - `kpis.hiddenReactiveBacklog`
+  - bloque estructurado `reactiveBacklog`
+  - subsystem visible `Reactive backlog`
+- `/api/internal/projections` ahora devuelve `reactiveBacklog` y deja de marcar health global como sana cuando hay backlog oculto
+- `AdminOpsHealthView` ahora muestra:
+  - KPI separado de backlog reactivo real
+  - `lastReactedAt`
+  - ventana oldest/newest
+  - top event types sin abrir SQL
+- `AdminCenterView` ahora deja de mostrar `Ops Health` como `Ok` cuando existe backlog reactivo oculto y lo agrega al bloque `Requiere atención`
+- nueva cobertura focalizada:
+  - `src/lib/operations/reactive-backlog.test.ts`
+  - `src/views/greenhouse/admin/AdminCenterView.test.tsx`
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/operations/reactive-backlog.test.ts src/views/greenhouse/admin/AdminCenterView.test.tsx` — OK (`8` tests)
+- `pnpm exec tsc --noEmit --pretty false` — OK
+- query runtime confirmada post-fix:
+  - `607` eventos reactivos ocultos
+  - `128` en últimas `24h`
+  - `lastReactedAt = 2026-04-03 01:50:29+00`
+
+### Riesgo / siguiente paso
+
+- el incidente de invisibilidad quedó resuelto
+- el backlog live sigue existiendo y ahora ya es visible; no se ejecutó replay global ciego porque podría disparar side effects stale
+- el siguiente paso estructural sigue siendo `TASK-251`: replay/drain scoped, `dryRun`, lag semantics y guardrails enterprise
+
+## Sesión 2026-04-05 — TASK-252 pre-implementation plan drafted, still blocked by TASK-251
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: ejecutar discovery y dejar plan de `TASK-252` sin tocar implementación runtime
+
+### Qué se hizo
+
+- se validó que `TASK-252` sigue correctamente bloqueada por `TASK-251`
+- se confirmó que el runtime más fuerte para esta lane no es `greenhouse-agent`, sino `NexaService` + `nexa-tools`:
+  - `greenhouse-agent` hoy funciona como prompt helper advisory
+  - `NexaService` ya soporta function calling, `runtimeContext`, gating por roles y synthesis con tools
+- se confirmó que las surfaces target ya existen:
+  - `AdminCenterView`
+  - `AdminOpsHealthView`
+  - `AdminOperationalActionsPanel`
+- se confirmó que el sistema actual de notificaciones ya puede reutilizarse para avisos no invasivos con guardrails sobre `NotificationService`
+- se creó `docs/tasks/plans/TASK-252-plan.md` con:
+  - decisión de runtime base
+  - orden de slices
+  - archivos probables a crear/modificar
+  - riesgos y preguntas abiertas
+
+### Riesgo / siguiente paso
+
+- no iniciar implementación de `TASK-252` hasta que `TASK-251` entregue la truth layer del backlog reactivo y el replay scoped/dry-run
+- cuando `TASK-251` cierre o deje esos contratos listos, `TASK-252` ya tiene plan humano-aprobable y puede entrar a ejecución sin redescubrir la lane
+
+## Sesión 2026-04-05 — ISSUE-009 Reactive backlog invisible to current Ops metrics
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: registrar incidente operativo confirmado en el carril outbox/reactive sin tocar runtime
+
+### Qué se hizo
+
+- se confirmó que el publish lane está sano en `greenhouse-pg-dev`:
+  - `0` eventos `pending`
+  - `329` eventos en últimas `24h`, todos publicados
+- se confirmó backlog reactivo real no visible por los KPIs actuales:
+  - `607` eventos reactivos publicados sin fila en `greenhouse_sync.outbox_reactive_log`
+  - `128` de esos eventos ocurrieron en últimas `24h`
+  - backlog observado desde `2026-03-20 08:22:59+00`
+  - último `reacted_at` observado: `2026-04-03 01:50:29+00`
+- se creó `ISSUE-009` para formalizar el incidente y la brecha de observabilidad
+
+### Riesgo / siguiente paso
+
+- `getOperationsOverview()` hoy puede mostrar `pendingProjections = 0` y `failedHandlers = 0` mientras exista backlog real en la transición `published -> outbox_reactive_log`
+- además del fix operativo puntual, esto amerita una capacidad más robusta de observabilidad/replay del control plane reactivo
+
 ## Sesión 2026-04-05 — ISSUE-008 Finance schema drift degraded responses
 
 ### Rama / alcance
