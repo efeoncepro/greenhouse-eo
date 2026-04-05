@@ -4,6 +4,8 @@ import { query } from '@/lib/db'
 import { uploadGreenhouseMediaAsset } from '@/lib/storage/greenhouse-media'
 import { setUserAvatarAssetPath } from '@/lib/admin/media-assets'
 
+import { buildEfeonceEmailAliasCandidates } from '@/lib/tenant/internal-email-aliases'
+
 import type { EntraUserProfile } from './graph-client'
 import { fetchEntraUserPhoto } from './graph-client'
 
@@ -72,8 +74,22 @@ export const syncEntraProfiles = async (
 
     result.processed++
 
-    // Match by OID first, then by email
-    const gh = ghByOid.get(entra.id) || ghByEmail.get(entra.mail.toLowerCase()) || null
+    // Match by OID first, then by email (direct or alias)
+    let gh = ghByOid.get(entra.id) || ghByEmail.get(entra.mail.toLowerCase()) || null
+
+    if (!gh) {
+      // Try alias matching (e.g. julio.reyes@efeonce.org → jreyes@efeoncepro.com)
+      const aliases = buildEfeonceEmailAliasCandidates({
+        email: entra.mail,
+        fullName: entra.displayName
+      })
+
+      for (const alias of aliases) {
+        const match = ghByEmail.get(alias.toLowerCase())
+
+        if (match) { gh = match; break }
+      }
+    }
 
     if (!gh) {
       result.skipped++
