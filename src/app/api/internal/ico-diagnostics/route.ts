@@ -6,11 +6,20 @@ import { runIcoEngineQuery, getIcoEngineProjectId } from '@/lib/ico-engine/share
 
 export const dynamic = 'force-dynamic'
 
-export async function GET() {
-  const { tenant, errorResponse } = await requireAgencyTenantContext()
+export async function GET(request: Request) {
+  // Allow CRON_SECRET bypass for automated diagnostics
+  const { searchParams } = new URL(request.url)
+  const internalKey = searchParams.get('key')
+  const cronSecret = process.env.CRON_SECRET?.trim()
 
-  if (!tenant) {
-    return errorResponse ?? NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const isInternalKeyAuth = cronSecret && internalKey === cronSecret
+
+  if (!isInternalKeyAuth) {
+    const { tenant, errorResponse } = await requireAgencyTenantContext()
+
+    if (!tenant) {
+      return errorResponse ?? NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
   }
 
   const results: Record<string, unknown> = {}
