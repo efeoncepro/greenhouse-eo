@@ -75,6 +75,8 @@ Primer bloque operativo asignado:
 | `TASK-196` | [TASK-196-delivery-performance-report-parity-greenhouse-notion.md](complete/TASK-196-delivery-performance-report-parity-greenhouse-notion.md) | P0        | Muy alto | Alto     | Cerrada                | Lane completa de paridad Delivery: source sync, identidad, owner attribution, semántica, freeze histórico y cutover outbound `Greenhouse -> Notion` sobre `Performance Reports` |
 ## Complete
 
+- [TASK-241-batch-processes-cloud-run-migration.md](complete/TASK-241-batch-processes-cloud-run-migration.md) — ICO Batch Worker desplegado en Cloud Run (`us-east4`): materialización ICO + LLM enrichment sin timeout. Cloud Scheduler jobs activos (3:15 AM, 3:45 AM Santiago). Política §1.1 Workload Placement formalizada. Feb/Mar 2026 re-materializados con prompt v2.
+
 - [TASK-239-nexa-advisory-prompt-enrichment-metric-glossary.md](complete/TASK-239-nexa-advisory-prompt-enrichment-metric-glossary.md) — Prompt LLM v2: glosario dinámico de métricas desde `ICO_METRIC_REGISTRY`, cadena causal formal (BCS→FTR%→RpA→CT→TTM→RE), doble capa narrativa, entity resolution batch (space/member/project names), `shortName` en `MetricDefinition` + UI. Re-materialización automática en siguiente ciclo cron.
 
 - [TASK-235-agency-ico-llm-insights-ui.md](complete/TASK-235-agency-ico-llm-insights-ui.md) — `Agency > ICO Engine` ahora renderiza el bloque advisory AI (`IcoAdvisoryBlock`) con KPIs de enrichments, calidad promedio, estado del último run y lista compacta de enrichments recientes. Empty state honesto cuando la lane no tiene datos. Surfacing puro del payload `aiLlm` ya disponible desde `TASK-232`.

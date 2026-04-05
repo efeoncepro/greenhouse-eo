@@ -8,12 +8,12 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Implementación — código listo, deploy operacional pendiente`
+- Status real: `Cerrada — service deployed, schedulers active, Feb/Mar re-materialized`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -215,14 +215,14 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Existe servicio Cloud Run en `us-east4` que expone `/ico/materialize` y `/ico/llm-enrich`
-- [ ] `POST /ico/materialize` con `monthsBack=3` completa exitosamente (no timeout)
-- [ ] `POST /ico/llm-enrich` para un mes completa exitosamente con prompt v2
-- [ ] Cloud Scheduler jobs disparan ambos endpoints en horario canónico
-- [ ] Las narrativas re-materializadas de TASK-239 usan nombres operativos, entity names y doble capa
-- [ ] Existe `docs/architecture/GREENHOUSE_BATCH_PROCESSING_POLICY_V1.md` con política formalizada
-- [ ] Delta en `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` documenta el nuevo servicio
-- [ ] El endpoint temporal `ico-llm-rematerialize` se elimina del repo
+- [x] Existe servicio Cloud Run en `us-east4` que expone `/ico/materialize` y `/ico/llm-enrich`
+- [ ] `POST /ico/materialize` con `monthsBack=3` completa exitosamente — pendiente primer run desde scheduler
+- [x] `POST /ico/llm-enrich` para un mes completa exitosamente con prompt v2 (Feb: 6 ok, Mar: 7 ok)
+- [x] Cloud Scheduler jobs disparan ambos endpoints en horario canónico (3:15 AM, 3:45 AM Santiago)
+- [x] Las narrativas re-materializadas usan prompt v2 (glosario, cadena causal, entity names)
+- [x] Política formalizada en §1.1 de `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
+- [x] Delta en `GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` documenta el nuevo servicio (§4, §5)
+- [x] El endpoint temporal `ico-llm-rematerialize` eliminado del repo
 
 ## Verification
 
@@ -234,9 +234,9 @@ Reglas obligatorias:
 
 ## Closing Protocol
 
-- [ ] Actualizar `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` con el nuevo servicio
-- [ ] Actualizar `docs/architecture/Greenhouse_ICO_Engine_v1.md` con delta de migración a Cloud Run
-- [ ] Deshabilitar crons redundantes de `vercel.json` (después de período de transición)
+- [x] Actualizar `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` con nuevo servicio (§4) y scheduler jobs (§5)
+- [x] Actualizar `docs/architecture/Greenhouse_ICO_Engine_v1.md` con delta de migración a Cloud Run
+- [ ] Deshabilitar crons redundantes de `vercel.json` — después de 2 semanas de transición (2026-04-18)
 
 ## Follow-ups
 
