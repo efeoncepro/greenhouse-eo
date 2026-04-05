@@ -14,21 +14,7 @@ import Typography from '@mui/material/Typography'
 
 import CustomAvatar from '@core/components/mui/Avatar'
 
-interface ProfileData {
-  resolvedDisplayName: string | null
-  resolvedEmail: string | null
-  resolvedPhone: string | null
-  resolvedAvatarUrl: string | null
-  resolvedJobTitle: string | null
-  departmentName: string | null
-  jobLevel: string | null
-  employmentType: string | null
-  hireDate: string | null
-  hasMemberFacet: boolean
-  hasUserFacet: boolean
-  hasCrmFacet: boolean
-  linkedSystems: string[]
-}
+import type { PersonProfileSummary } from '@/types/person-360'
 
 const INTEGRATION_LOGOS: Record<string, string> = {
   microsoft: '/images/integrations/microsoft.svg',
@@ -47,7 +33,7 @@ const InfoRow = ({ icon, label, value }: { icon: string; label: string; value: s
 )
 
 const MyProfileView = () => {
-  const [data, setData] = useState<ProfileData | null>(null)
+  const [data, setData] = useState<PersonProfileSummary | null>(null)
   const [loading, setLoading] = useState(true)
 
   const load = useCallback(async () => {

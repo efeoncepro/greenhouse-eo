@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import type { Person360 } from '@/types/person-360'
+import type { Person360, PersonProfileSummary } from '@/types/person-360'
 
 type Person360Row = {
 
@@ -214,3 +214,20 @@ export const getPersonProfileByUserId = async (userId: string): Promise<Person36
 
   return rows[0] ? normalizeRow(rows[0]) : null
 }
+
+/** Flat projection of Person360 for self-service profile views */
+export const toPersonProfileSummary = (p: Person360): PersonProfileSummary => ({
+  resolvedDisplayName: p.resolved.displayName,
+  resolvedEmail: p.resolved.email,
+  resolvedPhone: p.resolved.phone,
+  resolvedAvatarUrl: p.resolved.avatarUrl,
+  resolvedJobTitle: p.resolved.jobTitle,
+  departmentName: p.memberFacet?.departmentName ?? null,
+  jobLevel: p.memberFacet?.jobLevel ?? null,
+  employmentType: p.memberFacet?.employmentType ?? null,
+  hireDate: p.memberFacet?.hireDate ?? null,
+  hasMemberFacet: p.hasMemberFacet,
+  hasUserFacet: p.hasUserFacet,
+  hasCrmFacet: p.hasCrmFacet,
+  linkedSystems: p.linkedSystems
+})
