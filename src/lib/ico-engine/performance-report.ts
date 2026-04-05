@@ -516,11 +516,11 @@ const readTopPerformer = async (periodYear: number, periodMonth: number): Promis
         COALESCE(tm.display_name, te.primary_owner_member_id) AS member_name,
         ${buildMetricSelectSQL()}
       FROM ${buildDeliveryPeriodSourceSql(projectId)} te
-      LEFT JOIN \`${projectId}.greenhouse.team_members\` tm
+      LEFT JOIN (SELECT member_id, display_name FROM \`${projectId}.greenhouse.team_members\`) tm
         ON tm.member_id = te.primary_owner_member_id
-      LEFT JOIN \`${projectId}.greenhouse.clients\` c1
+      LEFT JOIN (SELECT client_id, client_name FROM \`${projectId}.greenhouse.clients\`) c1
         ON c1.client_id = te.client_id
-      LEFT JOIN \`${projectId}.greenhouse.clients\` c2
+      LEFT JOIN (SELECT client_id, client_name FROM \`${projectId}.greenhouse.clients\`) c2
         ON c2.client_id = te.space_id
       WHERE te.primary_owner_member_id IS NOT NULL
         AND te.primary_owner_member_id != ''
