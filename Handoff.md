@@ -1,5 +1,37 @@
 # Handoff.md
 
+## Sesion 2026-04-05 — TASK-257: Mi Perfil enterprise redesign (sidebar + tabs)
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: TASK-257 — redesign Mi Perfil usando patron Vuexy User View (sidebar 4 cols + tabs 8 cols)
+
+### Cambios
+
+- `src/views/greenhouse/my/MyProfileView.tsx` — reescrito: layout Grid lg=4/lg=8, TabContext con CustomTabList pill, dynamic() imports
+- `src/views/greenhouse/my/my-profile/MyProfileSidebar.tsx` — nuevo: avatar 120px, nombre, cargo chip, stats KPI (sistemas vinculados, facetas), detalles (email, telefono, departamento, nivel, contrato, fecha ingreso). Campos null no se renderizan.
+- `src/views/greenhouse/my/my-profile/tabs/OverviewTab.tsx` — nuevo: datos profesionales en FieldGrid (3 cols) + sistemas vinculados con status icon+texto
+- `src/views/greenhouse/my/my-profile/tabs/SecurityTab.tsx` — nuevo: placeholder "Proximamente"
+- No se modifico la API `/api/my/profile` ni el tipo `PersonProfileSummary` — ya retornaban todo lo necesario
+
+### Patron aplicado
+
+Sidebar + Tabs (Vuexy User View), documentado en GREENHOUSE_UI_PLATFORM_V1.md. Distinto del Person Detail View (horizontal header) usado para admin views. Sidebar fija identidad personal; tabs escalan para futuros modulos self-service.
+
+### Verificacion
+
+- `npx tsc --noEmit` — OK
+- `pnpm build` — OK
+- `pnpm lint` (archivos modificados) — OK
+- Fallback de sesion sigue funcionando (usuario sin person_360 ve nombre + email desde JWT)
+
+### Proximos pasos
+
+- Implementar tab "Mi Nomina" con datos de compensacion self-service
+- Implementar tab "Mi Delivery" con metricas ICO del colaborador
+- Implementar tab "Seguridad" con historial de login y 2FA
+
 ## Sesión 2026-04-05 — Normalizacion de source systems en person_360
 
 ### Rama / alcance
