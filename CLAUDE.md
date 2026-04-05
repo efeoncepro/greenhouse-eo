@@ -166,7 +166,15 @@ docs/documentation/
 
 - **Al completar una task** que cambie comportamiento visible de un módulo, verificar si existe documentación funcional del módulo afectado en `docs/documentation/`. Si existe, actualizarla. Si no existe y el cambio es significativo, considerar crearla.
 - **Al cerrar un bloque de tasks** (como un hardening o una feature completa), crear el documento funcional del dominio si aún no existe.
-- **Al modificar roles, permisos, menú o acceso**, actualizar `docs/documentation/identity/como-funciona-identidad.md`.
+- **Al modificar roles, permisos, menú o acceso**, actualizar `docs/documentation/identity/sistema-identidad-roles-acceso.md`.
+
+### Convención de nombres
+
+- **Archivos**: `dominio-del-tema.md` en kebab-case. Usar nombre sustantivo formal, no verbos ni preguntas.
+  - Correcto: `sistema-identidad-roles-acceso.md`, `motor-ico-metricas-operativas.md`
+  - Incorrecto: `como-funciona-identidad.md`, `que-es-el-ico-engine.md`
+- **Títulos (h1)**: Nombre del sistema o módulo + alcance. Ej: `# Motor ICO — Metricas Operativas`
+- **Subcarpetas**: por dominio (`identity/`, `delivery/`, `plataforma/`, etc.)
 
 ### Formato de cada documento
 

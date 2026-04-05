@@ -4,7 +4,7 @@
 > **Ultima actualizacion:** 2026-04-05 por Claude (agente)
 > **Documentacion tecnica:** [Greenhouse ICO Engine v1](../../architecture/Greenhouse_ICO_Engine_v1.md), [Contrato Metricas ICO v1](../../architecture/Contrato_Metricas_ICO_v1.md)
 
-# ICO Engine — Como funciona
+# Motor ICO — Metricas Operativas
 
 El ICO Engine es el motor de metricas operativas de Greenhouse. Calcula indicadores de rendimiento para cada Space (cliente), proyecto, miembro del equipo y unidad de negocio, usando los datos de tareas sincronizados desde Notion.
 

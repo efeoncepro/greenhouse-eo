@@ -34,7 +34,7 @@ _Pendiente de documentar._
 
 ### Delivery
 
-- [ICO Engine — Como funciona](delivery/como-funciona-ico-engine.md) — metricas operativas, materializacion diaria, cadena de fallback (Postgres/BQ/live), diagnostico
+- [Motor ICO — Metricas Operativas](delivery/motor-ico-metricas-operativas.md) — metricas operativas, materializacion diaria, cadena de fallback (Postgres/BQ/live), diagnostico
 
 ### Herramientas IA
 
