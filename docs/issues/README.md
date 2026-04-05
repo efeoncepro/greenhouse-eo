@@ -64,12 +64,13 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-011`
+`ISSUE-012`
 
 ## Open
 
 | ID          | Título                                                                                                                             | Ambiente             | Detectado  | Estado   |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------- | -------- |
+| `ISSUE-011` | [Pre-merge conflict check false positives from SQL](open/ISSUE-011-merge-tree-conflict-check-false-positives.md)                   | develop (tooling)    | 2026-04-05 | open     |
 | `ISSUE-005` | [Payroll close route drains global notification backlog](open/ISSUE-005-payroll-close-route-drains-global-notification-backlog.md) | preview + production | 2026-04-05 | open     |
 | `ISSUE-006` | [Payroll leave fallback silently zeroes unpaid leave](open/ISSUE-006-payroll-leave-fallback-silently-zeroes-unpaid-leave.md)       | preview + production | 2026-04-05 | open     |
 | `ISSUE-002` | [Nubox sync conformed: data integrity (period mixing, identity loss)](open/ISSUE-002-nubox-sync-conformed-data-integrity.md)       | staging + production | 2026-03-30 | open     |
