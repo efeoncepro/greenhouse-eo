@@ -170,10 +170,29 @@ docs/documentation/
 
 ### Formato de cada documento
 
+Cada documento debe incluir un encabezado con metadatos:
+
+```markdown
+> **Tipo de documento:** Documentacion funcional (lenguaje simple)
+> **Version:** 1.0
+> **Creado:** YYYY-MM-DD por [nombre o agente]
+> **Ultima actualizacion:** YYYY-MM-DD por [nombre o agente]
+> **Documentacion tecnica:** [link a spec de arquitectura]
+```
+
+Contenido:
 - Lenguaje simple, sin jerga técnica
 - Tablas y listas para información estructurada
 - Al final de cada sección, un bloque `> Detalle técnico:` con links a la spec de arquitectura y al código fuente relevante
 - No duplicar contenido de `docs/architecture/` — referenciar con links relativos
+
+### Versionamiento
+
+- Cada documento tiene un número de versión (`1.0`, `1.1`, `2.0`)
+- Incrementar versión menor (1.0 → 1.1) al agregar o corregir secciones dentro del mismo alcance
+- Incrementar versión mayor (1.x → 2.0) cuando cambie la estructura o el alcance del documento
+- Registrar quién actualizó y la fecha en el encabezado
+- No es necesario mantener historial de cambios dentro del documento — el git log es la fuente de verdad para el historial detallado
 
 ### Diferencia con docs de arquitectura
 

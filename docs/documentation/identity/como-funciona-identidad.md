@@ -1,7 +1,9 @@
 # Como funciona el sistema de identidades
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Ultima actualizacion:** 2026-04-05
+> **Version:** 1.0
+> **Creado:** 2026-04-05 por Claude (TASK-248)
+> **Ultima actualizacion:** 2026-04-05 por Claude (TASK-248)
 > **Documentacion tecnica:** [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md), [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md)
 
 ---
