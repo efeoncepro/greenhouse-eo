@@ -1,18 +1,24 @@
 # TASK-226 - Superadministrador Bootstrap & Assignment Policy
 
-## Delta 2026-04-05
-- Dependencia TASK-225 cerrada — spec canónica de roles y jerarquías completada
-- `Superadministrador` ya formalizado como `efeonce_admin` + `collaborator` en `GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md`
-- El Plano 4 (Operational Responsibility) ya implementado por TASK-227 — ownership operativo separado de roles
-- Esta task puede comenzar sin blockers
+## Delta 2026-04-05 — Implementación completa
+
+- **Slice 1**: `SUPERADMIN_PROFILE_ROLES` + `isSuperadmin()` en `role-codes.ts`
+- **Slice 2**: Invite hardened — auto-agrega collaborator al invitar con efeonce_admin, popula `assigned_by_user_id`
+- **Slice 3**: Guardrails en `updateUserRoles()`:
+  - Solo admin asigna/revoca admin
+  - No se puede revocar el último superadmin
+  - efeonce_admin siempre incluye collaborator
+  - Audit events: `role.assigned`, `role.revoked` vía outbox
+- **Slice 4**: `pnpm pg:doctor` reporta superadmin health (count, users, warning)
+- **Docs**: deltas en IDENTITY_ACCESS_V2 + INTERNAL_ROLES_HIERARCHIES_V1
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
-- Status real: `Diseño`
+- Status real: `Completada 2026-04-05`
 - Rank: `42`
 - Domain: `identity / platform / admin`
 

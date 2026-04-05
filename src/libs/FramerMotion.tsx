@@ -1,3 +1,3 @@
 'use client'
 
-export { motion, AnimatePresence, useSpring, useTransform, useMotionValue } from 'framer-motion'
+export { motion, AnimatePresence, useInView, useSpring, useTransform, useMotionValue } from 'framer-motion'

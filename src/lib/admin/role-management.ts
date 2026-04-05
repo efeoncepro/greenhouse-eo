@@ -1,10 +1,12 @@
 import 'server-only'
 
-import { isRoleCode } from '@/config/role-codes'
+import { ROLE_CODES, isRoleCode } from '@/config/role-codes'
 import {
   runGreenhousePostgresQuery,
   withGreenhousePostgresTransaction
 } from '@/lib/postgres/client'
+import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 
 export interface RoleCatalogEntry {
   roleCode: string
@@ -132,23 +134,75 @@ export const getUserRoleState = async (userId: string): Promise<UserRoleState> =
   return { userId, currentAssignments, availableRoles }
 }
 
+/**
+ * Count active superadmins in the system.
+ * Used to prevent revoking the last superadmin.
+ */
+export const countActiveSuperadmins = async (): Promise<number> => {
+  const rows = await runGreenhousePostgresQuery<{ count: string }>(
+    `SELECT COUNT(DISTINCT user_id)::text AS count
+     FROM greenhouse_core.user_role_assignments
+     WHERE role_code = $1 AND active = TRUE`,
+    [ROLE_CODES.EFEONCE_ADMIN]
+  )
+
+  return Number(rows[0]?.count ?? 0)
+}
+
 export const updateUserRoles = async (params: {
   userId: string
   roleCodes: string[]
   assignedByUserId: string
 }): Promise<UserRoleAssignment[]> => {
-  const { userId, roleCodes } = params
+  const { userId, roleCodes, assignedByUserId } = params
 
   // Warn if any role code is not in the typed ROLE_CODES constant.
-  // This catches drift between the DB role catalog and the TypeScript constants.
   const unknownRoles = roleCodes.filter(code => !isRoleCode(code))
 
   if (unknownRoles.length > 0) {
     console.warn(`[role-management] Assigning unknown role codes not in ROLE_CODES: ${unknownRoles.join(', ')}. Route group derivation may not work for these roles.`)
   }
 
+  // ── Guardrail: only efeonce_admin can assign/revoke efeonce_admin ──
+  const currentAssignments = await getUserRoleAssignments(userId)
+  const hadAdmin = currentAssignments.some(a => a.roleCode === ROLE_CODES.EFEONCE_ADMIN)
+  const willHaveAdmin = roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)
+
+  if (hadAdmin !== willHaveAdmin) {
+    // Admin role is being added or removed — verify the actor is also admin
+    const actorAssignments = await getUserRoleAssignments(assignedByUserId)
+    const actorIsAdmin = actorAssignments.some(a => a.roleCode === ROLE_CODES.EFEONCE_ADMIN)
+
+    if (!actorIsAdmin) {
+      throw new Error('Solo un Superadministrador puede asignar o revocar el rol Superadministrador.')
+    }
+  }
+
+  // ── Guardrail: cannot revoke the last superadmin ──
+  if (hadAdmin && !willHaveAdmin) {
+    const adminCount = await countActiveSuperadmins()
+
+    if (adminCount <= 1) {
+      throw new Error('No se puede revocar el último Superadministrador activo del sistema.')
+    }
+  }
+
+  // ── Guardrail: efeonce_admin always requires collaborator ──
+  if (willHaveAdmin && !roleCodes.includes(ROLE_CODES.COLLABORATOR)) {
+    roleCodes.push(ROLE_CODES.COLLABORATOR)
+  }
+
   return withGreenhousePostgresTransaction(async client => {
-    // 1. Deactivate roles no longer in the list
+    // 1. Find roles being revoked (for audit)
+    const revokedRoles = currentAssignments
+      .filter(a => !roleCodes.includes(a.roleCode))
+      .map(a => a.roleCode)
+
+    // 2. Find roles being added (for audit)
+    const existingCodes = new Set(currentAssignments.map(a => a.roleCode))
+    const addedRoles = roleCodes.filter(code => !existingCodes.has(code))
+
+    // 3. Deactivate roles no longer in the list
     if (roleCodes.length > 0) {
       await client.query(
         `UPDATE greenhouse_core.user_role_assignments
@@ -165,7 +219,7 @@ export const updateUserRoles = async (params: {
       )
     }
 
-    // 2. Upsert each role: reactivate existing or insert new
+    // 4. Upsert each role: reactivate existing or insert new
     for (const roleCode of roleCodes) {
       const existing = await client.query(
         `SELECT assignment_id FROM greenhouse_core.user_role_assignments
@@ -176,23 +230,42 @@ export const updateUserRoles = async (params: {
       if (existing.rows.length > 0) {
         await client.query(
           `UPDATE greenhouse_core.user_role_assignments
-           SET active = true, status = 'active', updated_at = NOW()
+           SET active = true, status = 'active', assigned_by_user_id = $2, updated_at = NOW()
            WHERE assignment_id = $1`,
-          [existing.rows[0].assignment_id]
+          [existing.rows[0].assignment_id, assignedByUserId]
         )
       } else {
         const assignmentId = `ura-${userId}-${roleCode}`
 
         await client.query(
           `INSERT INTO greenhouse_core.user_role_assignments
-             (assignment_id, user_id, role_code, status, active, created_at, updated_at)
-           VALUES ($1, $2, $3, 'active', true, NOW(), NOW())`,
-          [assignmentId, userId, roleCode]
+             (assignment_id, user_id, role_code, status, active, assigned_by_user_id, created_at, updated_at)
+           VALUES ($1, $2, $3, 'active', true, $4, NOW(), NOW())`,
+          [assignmentId, userId, roleCode, assignedByUserId]
         )
       }
     }
 
-    // 3. Return updated assignments
+    // 5. Emit audit events for role changes
+    for (const roleCode of addedRoles) {
+      await publishOutboxEvent({
+        aggregateType: AGGREGATE_TYPES.roleAssignment,
+        aggregateId: `ura-${userId}-${roleCode}`,
+        eventType: EVENT_TYPES.roleAssigned,
+        payload: { userId, roleCode, assignedByUserId }
+      }, client)
+    }
+
+    for (const roleCode of revokedRoles) {
+      await publishOutboxEvent({
+        aggregateType: AGGREGATE_TYPES.roleAssignment,
+        aggregateId: `ura-${userId}-${roleCode}`,
+        eventType: EVENT_TYPES.roleRevoked,
+        payload: { userId, roleCode, revokedByUserId: assignedByUserId }
+      }, client)
+    }
+
+    // 6. Return updated assignments
     const result = await client.query<AssignmentRow>(
       `SELECT ura.assignment_id, ura.role_code, r.role_name, r.role_family,
               ura.active, r.route_group_scope

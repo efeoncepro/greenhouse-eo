@@ -1,5 +1,9 @@
 # TASK-233 — Three.js 3D Logo Animation
 
+## Delta 2026-04-05
+
+- El `Out of Scope` de `TASK-230` ya referencia explícitamente a esta task como lane 3D — ajuste cerrado por el cierre documental de `TASK-230`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -154,11 +158,11 @@ Los 2 paths del isotipo se convierten a `THREE.Shape` via `SVGLoader` (de drei/t
 
 ```tsx
 const extrudeSettings = {
-  depth: 8,           // profundidad del extrude
+  depth: 8, // profundidad del extrude
   bevelEnabled: true,
   bevelThickness: 1,
   bevelSize: 0.5,
-  bevelSegments: 3,
+  bevelSegments: 3
 }
 
 // Por cada path del SVG:
@@ -171,7 +175,7 @@ const geometry = new ExtrudeGeometry(shape, extrudeSettings)
 ```tsx
 <Canvas
   camera={{ position: [0, 0, 120], fov: 50 }}
-  frameloop="demand" // solo renderiza cuando hay cambios
+  frameloop='demand' // solo renderiza cuando hay cambios
   gl={{ antialias: true, alpha: true }} // fondo transparente
 >
   <ambientLight intensity={0.4} />
@@ -223,7 +227,7 @@ return <ThreeCanvas>...</ThreeCanvas>
 
 ## Closing Protocol
 
-- [ ] Actualizar Out of Scope de TASK-230 para referenciar TASK-233 en vez de "no hay caso de uso claro"
+- [x] Actualizar Out of Scope de TASK-230 para referenciar TASK-233 en vez de "no hay caso de uso claro"
 
 ## Follow-ups
 

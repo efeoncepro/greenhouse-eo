@@ -1,5 +1,33 @@
 # Handoff.md
 
+## Sesión 2026-04-05 — TASK-226 Superadministrador Bootstrap & Assignment Policy
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: policy de Superadministrador, guardrails, audit events, pg:doctor health check
+
+### Qué se hizo
+
+- **TASK-226 implementada y cerrada**:
+  - `SUPERADMIN_PROFILE_ROLES` + `isSuperadmin()` en `role-codes.ts`
+  - Guardrails en `updateUserRoles()`: solo admin asigna admin, no revocar último superadmin, efeonce_admin siempre incluye collaborator
+  - Audit events: `role.assigned` + `role.revoked` vía outbox con `assigned_by_user_id`
+  - Invite hardened: auto-agrega collaborator al invitar con efeonce_admin
+  - `pnpm pg:doctor` reporta superadmin health (count, users, warning si 0)
+  - Docs: deltas en IDENTITY_ACCESS_V2 + INTERNAL_ROLES_HIERARCHIES_V1
+
+### Pendiente operacional
+
+- Nada
+
+### Verificación
+
+- `pnpm build` — OK
+- `pnpm lint` — OK (1 error pre-existente en AnimatedCounter.test.tsx)
+
+---
+
 ## Sesión 2026-04-05 — TASK-195 Space Identity Consolidation
 
 ### Rama / alcance
@@ -24,6 +52,37 @@
 
 - `pnpm build` — OK
 - `pnpm lint` — OK
+
+---
+
+## Sesión 2026-04-05 — TASK-230 cierre documental + convergencia final
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: cierre completo de `TASK-230` (wrapper canónico + documentación + commit/push)
+
+### Qué se hizo
+
+- `src/libs/FramerMotion.tsx` ahora expone `useInView`.
+- `src/components/greenhouse/AnimatedCounter.tsx` dejó de importar `framer-motion` directo y ahora usa `@/libs/FramerMotion`.
+- Nueva cobertura focalizada: `src/components/greenhouse/AnimatedCounter.test.tsx`.
+- Verificación del carril de animación:
+  - `pnpm lint` — OK
+  - `pnpm build` — OK
+  - `pnpm exec vitest run src/components/greenhouse/AnimatedCounter.test.tsx src/components/greenhouse/EmptyState.test.tsx src/views/greenhouse/finance/FinancePeriodClosureDashboardView.test.tsx` — OK
+- Intento de preview manual local ejecutado sobre `http://localhost:3000/finance` con `NEXTAUTH_SECRET` temporal:
+  - el route dejó de caer en `500`
+  - el dashboard siguió bloqueado por sesión local de login
+  - no se observaron errores de runtime propios de la lane de animación
+- `TASK-230` movida a `complete/`.
+- Índice, registry, changelog y task docs alineados.
+- Cross-impact check: `TASK-233` recibió delta porque el `Out of Scope` de `TASK-230` ya referencia la lane 3D correcta.
+
+### Limitaciones verificadas
+
+- `pnpm test` completo del repo sigue con fallas ajenas a `TASK-230` (`Space360View` / `space-360`).
+- `npx tsc --noEmit` también sigue contaminado por drift ajeno en tests; el `build` productivo sí completó TypeScript.
 
 ---
 
@@ -1781,7 +1840,7 @@ Las tasks existentes en el backlog — tanto `CODEX_TASK_*` como `TASK-###` ya c
   - `OTD >= 90`
   - `FTR >= 70`
   - `RpA <= 1.5`
-  como si fueran thresholds equivalentes en respaldo metodológico
+    como si fueran thresholds equivalentes en respaldo metodológico
 
 ### Verificación
 
@@ -2061,7 +2120,6 @@ Las tasks existentes en el backlog — tanto `CODEX_TASK_*` como `TASK-###` ya c
 - pendiente ejecutar:
   - `pnpm exec vitest run src/lib/agency/agency-queries.test.ts`
   - `pnpm exec eslint src/lib/agency/agency-queries.ts src/lib/agency/agency-queries.test.ts`
-
 
 ## Sesión 2026-04-03 — Hotfix Deel KPI bonuses in projected/offical payroll
 
@@ -2751,7 +2809,7 @@ Las tasks existentes en el backlog — tanto `CODEX_TASK_*` como `TASK-###` ya c
   - frescura del sync
   - preservación de jerarquía
   - observabilidad y data quality
-  debe nacer dentro de ese integration layer, no como solución paralela
+    debe nacer dentro de ese integration layer, no como solución paralela
 
 ### Delta documental
 

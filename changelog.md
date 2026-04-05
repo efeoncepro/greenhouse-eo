@@ -2,6 +2,20 @@
 
 ## 2026-04-05
 
+- **TASK-226 Superadministrador Bootstrap & Assignment Policy — cerrada**:
+  - `SUPERADMIN_PROFILE_ROLES` + `isSuperadmin()` como constantes canónicas en `role-codes.ts`
+  - guardrails en `updateUserRoles()`: solo admin asigna/revoca admin, no revocar último superadmin, efeonce_admin siempre incluye collaborator
+  - audit events: `role.assigned` + `role.revoked` emitidos vía outbox con `assigned_by_user_id`
+  - invite hardened: auto-agrega collaborator al invitar con efeonce_admin, popula `assigned_by_user_id`
+  - `pnpm pg:doctor` reporta superadmin health check (count, users, warning)
+
+- **TASK-230 Portal Animation Library Integration — cerrada**:
+  - `src/libs/FramerMotion.tsx` ahora expone también `useInView`, alineando el wrapper con la arquitectura canónica
+  - `src/components/greenhouse/AnimatedCounter.tsx` dejó de importar `framer-motion` directo y ya consume el wrapper shared
+  - nueva cobertura focalizada: `AnimatedCounter.test.tsx` valida `integer`, `currency`, `percentage` y reduced motion
+  - `pnpm build` y `pnpm lint` pasan; el carril de animación también queda cubierto con suite focalizada (`AnimatedCounter`, `EmptyState`, `FinancePeriodClosureDashboardView`)
+  - se intentó el preview manual autenticado de `/finance`, pero el dashboard quedó bloqueado por el session flow local; la limitación quedó documentada en la task y el handoff
+
 - **TASK-195 Space Identity Consolidation: Organization-First Admin — cerrada**:
   - nueva surface admin: `/admin/accounts` (lista de organizaciones con 4 KPIs, tabla TanStack, paginación, búsqueda)
   - nueva surface admin: `/admin/accounts/[id]` (detalle de cuenta con sidebar, lista de spaces, readiness chips, create space dialog, links a Space 360)
@@ -4437,11 +4451,13 @@
   - `/api/hr/core/meta` devuelve `currentMemberId` resuelto para superficies HR/My
   - `/api/assets/private` hace fallback server-side para `leave_request_draft` cuando la sesión no expone `tenant.memberId`
   - Esto corrige el error visible `ownerMemberId is required for leave drafts.` en `greenhouse.efeoncepro.com/hr/leave`
+
 # 2026-04-02
 
 - Delivery performance parity lane cerrada end-to-end: `TASK-202` implementó el cutover outbound `Greenhouse -> Notion` con target formal `Performance Reports`, integración `notion_delivery_performance_reports`, route cron `GET /api/cron/notion-delivery-performance-publish`, writer Notion real y ledger `greenhouse_sync.notion_publication_runs`.
 - Se agregó configuración canónica de destino en `greenhouse_core.space_notion_publication_targets`, seeded para `space-efeonce` hacia la base Notion `Performance Reports`.
 - La validación funcional quedó cubierta con `dryRun` real para `Marzo 2026`, resolviendo el target page existente sin sobrescribir el contenido histórico durante la verificación.
+
 # Changelog
 
 ## 2026-04-03

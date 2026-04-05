@@ -44,3 +44,19 @@ export const ROLE_PRIORITY: RoleCode[] = [
 /** Type guard: check if a string is a known role code. */
 export const isRoleCode = (value: string): value is RoleCode =>
   (Object.values(ROLE_CODES) as string[]).includes(value)
+
+/**
+ * Canonical profile for the portal owner/founder.
+ * Policy: the founder always holds efeonce_admin (full access) + collaborator (personal experience).
+ * Ref: GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1 § 1, GREENHOUSE_IDENTITY_ACCESS_V2 § Default Role Assignment Rules
+ */
+export const SUPERADMIN_PROFILE_ROLES: readonly RoleCode[] = [
+  ROLE_CODES.EFEONCE_ADMIN,
+  ROLE_CODES.COLLABORATOR
+] as const
+
+/**
+ * Returns true if the given role codes contain the Superadministrador role.
+ */
+export const isSuperadmin = (roleCodes: string[]): boolean =>
+  roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)

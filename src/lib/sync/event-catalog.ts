@@ -86,7 +86,10 @@ export const AGGREGATE_TYPES = {
   staffAugPlacementSnapshot: 'staff_aug_placement_snapshot',
 
   // Operational Responsibility
-  operationalResponsibility: 'operational_responsibility'
+  operationalResponsibility: 'operational_responsibility',
+
+  // Role Governance
+  roleAssignment: 'role_assignment'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -231,7 +234,11 @@ export const EVENT_TYPES = {
   // Operational Responsibility
   responsibilityAssigned: 'responsibility.assigned',
   responsibilityRevoked: 'responsibility.revoked',
-  responsibilityUpdated: 'responsibility.updated'
+  responsibilityUpdated: 'responsibility.updated',
+
+  // Role Governance
+  roleAssigned: 'role.assigned',
+  roleRevoked: 'role.revoked'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]

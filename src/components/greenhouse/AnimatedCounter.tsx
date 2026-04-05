@@ -2,9 +2,8 @@
 
 import { useEffect, useRef } from 'react'
 
-import { useInView, useMotionValue, useSpring } from 'framer-motion'
-
 import useReducedMotion from '@/hooks/useReducedMotion'
+import { useInView, useMotionValue, useSpring } from '@/libs/FramerMotion'
 
 type Format = 'currency' | 'percentage' | 'integer'
 
@@ -66,7 +65,7 @@ const AnimatedCounter = ({
     })
 
     return unsubscribe
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [spring, format, currency, locale, formatter])
 
   return <span ref={ref}>{fmt(prefersReduced ? value : 0)}</span>

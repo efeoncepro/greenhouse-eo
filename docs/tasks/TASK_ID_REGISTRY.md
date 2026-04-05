@@ -279,7 +279,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-227` | `to-do` | Operational Responsibility Registry | `docs/tasks/to-do/TASK-227-operational-responsibility-registry.md` |
 | `TASK-228` | `to-do` | Employee Legacy Role Code Convergence | `docs/tasks/to-do/TASK-228-employee-legacy-role-convergence.md` |
 | `TASK-229` | `to-do` | Client View Catalog Deduplication | `docs/tasks/to-do/TASK-229-client-view-catalog-deduplication.md` |
-| `TASK-230` | `to-do` | Portal Animation Library Integration | `docs/tasks/to-do/TASK-230-portal-animation-library-integration.md` |
+| `TASK-230` | `complete` | Portal Animation Library Integration | `docs/tasks/complete/TASK-230-portal-animation-library-integration.md` |
 | `TASK-231` | `complete` | Codex Task Planner Skill | `docs/tasks/complete/TASK-231-codex-task-planner-skill.md` |
 | `TASK-232` | `complete` | ICO LLM Quality Scoring & Explanation Pipeline | `docs/tasks/complete/TASK-232-ico-llm-quality-scoring-explanation-pipeline.md` |
 | `TASK-233` | `to-do` | Three.js 3D Logo Animation | `docs/tasks/to-do/TASK-233-threejs-3d-logo-animation.md` |

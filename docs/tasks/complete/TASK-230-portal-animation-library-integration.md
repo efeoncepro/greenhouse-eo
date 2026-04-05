@@ -80,7 +80,7 @@ Reglas obligatorias:
 ### Files owned
 
 - `src/libs/Lottie.tsx` (nuevo — wrapper con dynamic import)
-- `src/libs/Lordicon.tsx` (nuevo — wrapper con dynamic import)
+- `src/libs/FramerMotion.tsx` (nuevo — wrapper/re-export client-side)
 - `src/components/greenhouse/EmptyState.tsx` (modificar — agregar soporte para animated icons)
 - `src/components/greenhouse/AnimatedCounter.tsx` (nuevo — KPI number transitions)
 - `public/animations/` (nuevo — directorio para assets Lottie JSON)
@@ -127,7 +127,7 @@ Reglas obligatorias:
 
 ### Slice 2 — EmptyState animated icon support
 
-- Extender `EmptyState.tsx` para aceptar opcionalmente un Lottie JSON o Lordicon icon ademas del Tabler icon string existente
+- Extender `EmptyState.tsx` para aceptar opcionalmente un asset Lottie JSON ademas del Tabler icon string existente
 - Backward-compatible: si se pasa `icon` como string, sigue funcionando igual
 - Nuevo prop opcional (e.g., `animatedIcon`) para pasar una animacion
 - Respetar `prefers-reduced-motion` — si esta activo, mostrar el primer frame estatico
@@ -151,7 +151,7 @@ Reglas obligatorias:
 - Reemplazar todos los empty states del portal — esta task es el pilot, la adopcion masiva es follow-up
 - Animaciones 3D (Three.js, Spline) — eso vive en [TASK-233](../to-do/TASK-233-threejs-3d-logo-animation.md)
 - Reemplazar ApexCharts o Recharts por otra libreria de charts
-- Crear animaciones custom en After Effects / Lottie Editor — usar assets existentes de LottieFiles o Lordicon
+- Crear animaciones custom en After Effects / Lottie Editor — usar assets existentes de LottieFiles
 - GSAP o librerias de animacion complejas con licencia comercial
 
 ## Detailed Spec

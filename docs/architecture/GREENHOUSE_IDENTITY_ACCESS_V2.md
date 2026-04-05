@@ -1,5 +1,35 @@
 # Greenhouse Identity & Access Architecture V2
 
+## Delta 2026-04-05 — Superadministrador bootstrap & assignment policy (TASK-226)
+
+### Policy formalizada
+
+- El perfil owner/founder recomendado es `efeonce_admin` + `collaborator`
+- `efeonce_admin` implica acceso total a todas las vistas posibles del portal (9 route groups)
+- `collaborator` garantiza la experiencia personal (Mi Ficha, Mi Nómina, etc.)
+- Constante canónica: `SUPERADMIN_PROFILE_ROLES` en `src/config/role-codes.ts`
+
+### Bootstrap
+
+- El primer Superadministrador se crea vía `POST /api/admin/invite` con `role_codes: ['efeonce_admin']`
+- El sistema auto-agrega `collaborator` si no está incluido (policy code en invite + role-management)
+- Si no existe ningún Superadministrador activo, `pnpm pg:doctor` reporta warning
+
+### Governance
+
+- Solo un Superadministrador puede asignar o revocar el rol `efeonce_admin` a otro usuario
+- No se puede revocar el último Superadministrador activo del sistema
+- Todo cambio de roles emite eventos audit: `role.assigned`, `role.revoked`
+- `assigned_by_user_id` se registra en cada assignment (audit trail)
+
+### Guardrails implementados
+
+- `updateUserRoles()` en `role-management.ts` verifica:
+  1. Actor es admin si el cambio toca `efeonce_admin`
+  2. No se puede dejar el sistema sin superadmin
+  3. `efeonce_admin` siempre incluye `collaborator`
+  4. Emite outbox events para audit
+
 ## Delta 2026-04-03 — internal roles and hierarchies separated into their own canonical spec
 
 Este documento sigue siendo la fuente canónica para:

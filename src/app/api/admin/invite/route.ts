@@ -38,9 +38,14 @@ export async function POST(request: Request) {
     let roles: string[] = role_codes || []
 
     if (tenant_type === 'efeonce_internal' && !roles.includes(ROLE_CODES.COLLABORATOR)) {
-      roles = ['collaborator', ...roles]
+      roles = [ROLE_CODES.COLLABORATOR, ...roles]
     } else if (tenant_type === 'client' && roles.length === 0) {
-      roles = ['client_executive']
+      roles = [ROLE_CODES.CLIENT_EXECUTIVE]
+    }
+
+    // Policy: efeonce_admin always requires collaborator (personal experience)
+    if (roles.includes(ROLE_CODES.EFEONCE_ADMIN) && !roles.includes(ROLE_CODES.COLLABORATOR)) {
+      roles = [ROLE_CODES.COLLABORATOR, ...roles]
     }
 
     // Create user + role assignments in a transaction
@@ -54,12 +59,14 @@ export async function POST(request: Request) {
 
       const newUserId = userResult.rows[0].user_id
 
+      const inviterUserId = session.user?.id || null
+
       for (const roleCode of roles) {
         await client.query(
-          `INSERT INTO greenhouse_core.user_role_assignments (user_id, role_code)
-           SELECT $1, role_code FROM greenhouse_core.roles WHERE role_code = $2
+          `INSERT INTO greenhouse_core.user_role_assignments (user_id, role_code, assigned_by_user_id)
+           SELECT $1, role_code, $3 FROM greenhouse_core.roles WHERE role_code = $2
            ON CONFLICT DO NOTHING`,
-          [newUserId, roleCode]
+          [newUserId, roleCode, inviterUserId]
         )
       }
 

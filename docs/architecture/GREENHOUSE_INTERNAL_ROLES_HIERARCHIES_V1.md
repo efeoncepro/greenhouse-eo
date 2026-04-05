@@ -28,6 +28,15 @@ Usar junto con:
 - Origen: `TASK-225`
 - Estado: contrato arquitectónico nuevo; describe foundations ya existentes y formaliza la dirección target
 
+## Delta 2026-04-05 — Superadministrador bootstrap & assignment policy (TASK-226)
+
+- Policy formalizada: perfil owner/founder = `efeonce_admin` + `collaborator`
+- Constante canónica: `SUPERADMIN_PROFILE_ROLES` en `src/config/role-codes.ts`
+- Guardrails: solo admin asigna admin, no se puede dejar sistema sin superadmin, efeonce_admin siempre incluye collaborator
+- Audit: `role.assigned` y `role.revoked` en event catalog con `assigned_by_user_id`
+- Health check: `pnpm pg:doctor` reporta superadmin count y warning si es 0
+- Invite hardened: `POST /api/admin/invite` auto-agrega collaborator al invitar con efeonce_admin
+
 ## Delta 2026-04-05 — Operational Responsibility Registry implementado (TASK-227)
 
 - `greenhouse_core.operational_responsibilities` creada como tabla canónica del Plano 4

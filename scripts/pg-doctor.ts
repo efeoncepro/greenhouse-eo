@@ -101,6 +101,25 @@ const main = async () => {
       `
     )
 
+    // ── Superadmin health check ──
+    const superadminCheck = await runGreenhousePostgresQuery<{
+      active_superadmin_count: string
+      superadmin_users: string | null
+    }>(
+      `
+        SELECT
+          COUNT(DISTINCT ura.user_id)::text AS active_superadmin_count,
+          STRING_AGG(DISTINCT cu.email, ', ') AS superadmin_users
+        FROM greenhouse_core.user_role_assignments ura
+        INNER JOIN greenhouse_core.client_users cu ON cu.user_id = ura.user_id
+        WHERE ura.role_code = 'efeonce_admin'
+          AND ura.active = TRUE
+          AND cu.status = 'active'
+      `
+    )
+
+    const superadminCount = Number(superadminCheck[0]?.active_superadmin_count ?? 0)
+
     console.log(
       JSON.stringify(
         {
@@ -113,7 +132,13 @@ const main = async () => {
           },
           identity,
           roleMemberships,
-          schemata
+          schemata,
+          superadminHealth: {
+            activeSuperadminCount: superadminCount,
+            healthy: superadminCount >= 1,
+            users: superadminCheck[0]?.superadmin_users || null,
+            warning: superadminCount === 0 ? 'No active Superadministrador found. System needs at least one.' : null
+          }
         },
         null,
         2
