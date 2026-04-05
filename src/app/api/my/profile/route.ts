@@ -19,7 +19,21 @@ export async function GET() {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
     }
 
-    return NextResponse.json(profile)
+    return NextResponse.json({
+      resolvedDisplayName: profile.resolved.displayName,
+      resolvedEmail: profile.resolved.email,
+      resolvedPhone: profile.resolved.phone,
+      resolvedAvatarUrl: profile.resolved.avatarUrl,
+      resolvedJobTitle: profile.resolved.jobTitle,
+      departmentName: profile.memberFacet?.departmentName ?? null,
+      jobLevel: profile.memberFacet?.jobLevel ?? null,
+      employmentType: profile.memberFacet?.employmentType ?? null,
+      hireDate: profile.memberFacet?.hireDate ?? null,
+      hasMemberFacet: profile.hasMemberFacet,
+      hasUserFacet: profile.hasUserFacet,
+      hasCrmFacet: profile.hasCrmFacet,
+      linkedSystems: profile.linkedSystems
+    })
   } catch (error) {
     console.error('GET /api/my/profile failed:', error)
 

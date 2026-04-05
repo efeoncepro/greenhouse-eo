@@ -42,10 +42,17 @@ const safeEquals = (left: string, right: string) => {
 }
 
 export const requireCronAuth = (request: Request): CronAuthResult => {
+  if (isVercelCronRequest(request)) {
+    return {
+      authorized: true,
+      errorResponse: null
+    }
+  }
+
   const secret = getCronSecretValue()
 
   if (!secret) {
-    console.error('[cron-auth] CRON_SECRET not configured; rejecting request')
+    console.error('[cron-auth] CRON_SECRET not configured; rejecting non-Vercel cron request')
 
     return {
       authorized: false,
@@ -56,13 +63,6 @@ export const requireCronAuth = (request: Request): CronAuthResult => {
   const bearerToken = getBearerToken(request)
 
   if (bearerToken && safeEquals(bearerToken, secret)) {
-    return {
-      authorized: true,
-      errorResponse: null
-    }
-  }
-
-  if (isVercelCronRequest(request)) {
     return {
       authorized: true,
       errorResponse: null

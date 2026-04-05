@@ -1,5 +1,15 @@
 # project_context.md
 
+## Delta 2026-04-05 Vercel Cron no depende de CRON_SECRET
+
+- Las routes protegidas con `requireCronAuth()` ya no deben bloquear corridas legítimas de Vercel Cron si `CRON_SECRET` falta en el entorno.
+- Regla vigente:
+  - requests con `x-vercel-cron: 1` o `user-agent` `vercel-cron/*` se autorizan como scheduler traffic válido
+  - `CRON_SECRET` sigue siendo obligatorio para invocaciones bearer/manuales fuera de Vercel
+  - si una request no es Vercel Cron y el secret falta, el runtime sigue fallando en cerrado con `503`
+- Motivación:
+  - cerrar `ISSUE-012` y evitar que la ausencia de `CRON_SECRET` vuelva a detener el carril reactivo u otras routes cron programadas
+
 ## Delta 2026-04-05 Reactive backlog hidden stage now surfaces in Admin Ops
 
 - `Admin Center`, `Ops Health` y el contrato interno `/api/internal/projections` ya distinguen explícitamente el tramo reactivo oculto `published -> outbox_reactive_log`.

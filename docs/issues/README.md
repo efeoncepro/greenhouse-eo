@@ -64,7 +64,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-012`
+`ISSUE-013`
 
 ## Open
 
@@ -78,11 +78,12 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Resolved
 
-| ID          | Título                                                                                                                                             | Ambiente             | Detectado  | Resuelto   | Causa                                                                                  |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------- | ---------- | -------------------------------------------------------------------------------------- |
+| ID          | Título                                                                                                                                             | Ambiente             | Detectado  | Resuelto   | Causa                                                                                                  |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------ |
+| `ISSUE-012` | [Reactive cron routes fail closed without CRON_SECRET](resolved/ISSUE-012-reactive-cron-routes-fail-closed-without-cron-secret.md)                 | develop runtime      | 2026-04-05 | 2026-04-05 | `requireCronAuth()` validaba `CRON_SECRET` antes de reconocer requests legítimas de Vercel Cron        |
 | `ISSUE-011` | [Pre-merge conflict check false positives from SQL](resolved/ISSUE-011-merge-tree-conflict-check-false-positives.md)                               | develop (tooling)    | 2026-04-05 | 2026-04-05 | `git merge-tree \| grep CONFLICT` matchea SQL `ON CONFLICT`; documentado comando correcto en AGENTS.md |
-| `ISSUE-009` | [Reactive event backlog can accumulate without Ops visibility](resolved/ISSUE-009-reactive-event-backlog-can-accumulate-without-ops-visibility.md) | develop runtime      | 2026-04-05 | 2026-04-05 | Admin Ops no contaba backlog reactivo oculto entre `published` y `outbox_reactive_log` |
-| `ISSUE-010` | [Finance schema drift logger type mismatch](resolved/ISSUE-010-finance-schema-drift-logger-type-mismatch.md)                                       | staging + production | 2026-04-05 | 2026-04-05 | `logFinanceSchemaDrift` tipaba `Error` pero catch da `unknown`                         |
-| `ISSUE-007` | [Finance fallback writes can duplicate income and expenses](resolved/ISSUE-007-finance-fallback-writes-can-duplicate-income-and-expenses.md)       | preview + production | 2026-04-05 | 2026-04-05 | Fallback recalculaba un segundo ID en `income` y `expenses`                            |
-| `ISSUE-008` | [Finance routes mask schema drift as empty success](resolved/ISSUE-008-finance-routes-mask-schema-drift-as-empty-success.md)                       | preview + production | 2026-04-05 | 2026-04-05 | Routes devolvían vacío ambiguo ante drift de schema                                    |
-| `ISSUE-001` | [SSL bad certificate en webhook-dispatch](resolved/ISSUE-001-ssl-bad-certificate-production.md)                                                    | production           | 2026-03-30 | 2026-03-30 | `GREENHOUSE_POSTGRES_IP_TYPE` faltante en production                                   |
+| `ISSUE-009` | [Reactive event backlog can accumulate without Ops visibility](resolved/ISSUE-009-reactive-event-backlog-can-accumulate-without-ops-visibility.md) | develop runtime      | 2026-04-05 | 2026-04-05 | Admin Ops no contaba backlog reactivo oculto entre `published` y `outbox_reactive_log`                 |
+| `ISSUE-010` | [Finance schema drift logger type mismatch](resolved/ISSUE-010-finance-schema-drift-logger-type-mismatch.md)                                       | staging + production | 2026-04-05 | 2026-04-05 | `logFinanceSchemaDrift` tipaba `Error` pero catch da `unknown`                                         |
+| `ISSUE-007` | [Finance fallback writes can duplicate income and expenses](resolved/ISSUE-007-finance-fallback-writes-can-duplicate-income-and-expenses.md)       | preview + production | 2026-04-05 | 2026-04-05 | Fallback recalculaba un segundo ID en `income` y `expenses`                                            |
+| `ISSUE-008` | [Finance routes mask schema drift as empty success](resolved/ISSUE-008-finance-routes-mask-schema-drift-as-empty-success.md)                       | preview + production | 2026-04-05 | 2026-04-05 | Routes devolvían vacío ambiguo ante drift de schema                                                    |
+| `ISSUE-001` | [SSL bad certificate en webhook-dispatch](resolved/ISSUE-001-ssl-bad-certificate-production.md)                                                    | production           | 2026-03-30 | 2026-03-30 | `GREENHOUSE_POSTGRES_IP_TYPE` faltante en production                                                   |

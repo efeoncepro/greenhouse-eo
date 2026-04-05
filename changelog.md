@@ -2,6 +2,13 @@
 
 ## 2026-04-05
 
+- **ISSUE-012 Reactive cron routes fail closed without CRON_SECRET — resuelto**:
+  - `requireCronAuth()` ahora autoriza primero tráfico válido de Vercel Cron (`x-vercel-cron` / `user-agent` `vercel-cron/*`)
+  - `CRON_SECRET` queda reservado para invocaciones bearer/manuales fuera de Vercel
+  - cuando el secret falta, las requests no-Vercel siguen fallando en cerrado con `503`
+  - nueva regresión focalizada en `src/lib/cron/require-cron-auth.test.ts`
+  - validado con Vitest focalizado (`8` tests passing) y `tsc --noEmit`
+
 - **ISSUE-009 Reactive event backlog can accumulate without Ops visibility — resuelto**:
   - nuevo reader `src/lib/operations/reactive-backlog.ts` para medir backlog reactivo oculto (`published` sin huella en `outbox_reactive_log`)
   - `getOperationsOverview()` ahora expone `kpis.hiddenReactiveBacklog` + bloque `reactiveBacklog`

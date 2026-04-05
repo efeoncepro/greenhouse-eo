@@ -28,12 +28,13 @@ Crear una capability operativa para que Greenhouse mida backlog reactivo real, d
 ## Delta 2026-04-05
 
 - `ISSUE-009` ya quedó resuelta en su capa de visibilidad operativa.
+- `ISSUE-012` ya quedó resuelta en la capa de scheduler/auth: `requireCronAuth()` ahora acepta tráfico válido de Vercel Cron aunque `CRON_SECRET` falte.
 - `Admin Center`, `Ops Health` y `/api/internal/projections` ya exponen backlog reactivo oculto y `lastReactedAt` vía `getOperationsOverview()`.
 - El alcance remanente de esta task ya no es “hacer visible el bug”, sino completar la capability enterprise pendiente:
-     - replay/drain scoped
-     - `dryRun`
-     - lag/alert semantics más robustas
-     - guardrails operativos de remediación
+  - replay/drain scoped
+  - `dryRun`
+  - lag/alert semantics más robustas
+  - guardrails operativos de remediación
 
 ## Why This Task Exists
 

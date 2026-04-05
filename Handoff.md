@@ -1,5 +1,55 @@
 # Handoff.md
 
+## Sesión 2026-04-05 — ISSUE-012 resolved: Vercel Cron no longer depends on CRON_SECRET
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: cerrar `ISSUE-012` corrigiendo el gate de auth para routes cron
+
+### Qué se hizo
+
+- `src/lib/cron/require-cron-auth.ts` ahora autoriza primero requests válidas de Vercel Cron (`x-vercel-cron` o `user-agent` `vercel-cron/*`)
+- `CRON_SECRET` queda como guardrail para invocaciones bearer/manuales fuera de Vercel
+- si falta `CRON_SECRET`, las requests no-Vercel siguen respondiendo `503`, por lo que no se abrió el endpoint manualmente
+- nueva regresión focalizada en `src/lib/cron/require-cron-auth.test.ts`:
+  - acepta Vercel Cron con secret presente
+  - acepta Vercel Cron con secret ausente
+  - mantiene fail-close para requests no-Vercel sin secret
+- `ISSUE-012` quedó movida a `docs/issues/resolved/`
+
+### Verificación
+
+- `pnpm exec vitest run src/lib/cron/require-cron-auth.test.ts` — OK (`8` tests)
+- `pnpm exec tsc --noEmit --pretty false` — OK
+
+### Riesgo / siguiente paso
+
+- este fix destraba el scheduler path, pero `TASK-251` sigue pendiente para replay scoped, `dryRun` y semántica enterprise del backlog reactivo
+- conviene observar la próxima corrida real de `/api/cron/outbox-react` en el ambiente afectado para confirmar que `lastReactedAt` vuelve a avanzar
+
+## Sesión 2026-04-05 — ISSUE-012 opened: reactive cron auth can block scheduled drain
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: investigar por qué el carril reactivo dejó de drenar y documentarlo como issue operativo
+
+### Qué se hizo
+
+- se confirmó que `vercel.json` sí agenda `GET /api/cron/outbox-react` cada `5` minutos
+- se aisló una causa operacional de alta confianza en `src/lib/cron/require-cron-auth.ts`:
+  - si `CRON_SECRET` falta, la helper responde `503`
+  - esa validación ocurre antes de aceptar requests legítimas de Vercel Cron via `x-vercel-cron` / `user-agent`
+- se verificó además que `.env.local` no define `CRON_SECRET`
+- se intentó reproducir la route localmente por HTTP, pero el entorno local cae antes con `NEXTAUTH_SECRET` faltante; eso impide la reproducción end-to-end local, aunque no cambia el hallazgo principal del gate cron
+- se abrió `docs/issues/open/ISSUE-012-reactive-cron-routes-fail-closed-without-cron-secret.md`
+
+### Riesgo / siguiente paso
+
+- mientras no se corrija el gate de cron auth o la configuración del entorno afectado, el backlog reactivo puede seguir creciendo aunque la schedule exista
+- el fix debería entrar como parte de `TASK-251` o como fix puntual si se quiere destrabar el carril antes del replay scoped enterprise
+
 ## Sesión 2026-04-05 — ISSUE-009 resolved: hidden reactive backlog is now visible in Admin Ops
 
 ### Rama / alcance
