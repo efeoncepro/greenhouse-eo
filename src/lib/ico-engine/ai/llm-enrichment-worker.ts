@@ -605,18 +605,23 @@ export const materializeAiLlmEnrichments = async (
     completedAt
   }
 
-  await deleteBigQueryCurrentState({
-    projectId,
-    periodYear: input.periodYear,
-    periodMonth: input.periodMonth,
-    spaceId: input.spaceId
-  })
+  // BigQuery write: best-effort. If streaming buffer blocks DELETE, continue with PostgreSQL serving.
+  try {
+    await deleteBigQueryCurrentState({
+      projectId,
+      periodYear: input.periodYear,
+      periodMonth: input.periodMonth,
+      spaceId: input.spaceId
+    })
 
-  if (records.length > 0) {
-    await bigQuery.dataset(ICO_DATASET).table('ai_signal_enrichments').insert(records.map(toBigQueryEnrichmentRow))
+    if (records.length > 0) {
+      await bigQuery.dataset(ICO_DATASET).table('ai_signal_enrichments').insert(records.map(toBigQueryEnrichmentRow))
+    }
+
+    await bigQuery.dataset(ICO_DATASET).table('ai_enrichment_runs').insert([toBigQueryRunRow(run)])
+  } catch (bqError) {
+    console.warn('[llm-enrichment] BigQuery write skipped (streaming buffer or transient error), persisting to PostgreSQL serving:', bqError instanceof Error ? bqError.message : bqError)
   }
-
-  await bigQuery.dataset(ICO_DATASET).table('ai_enrichment_runs').insert([toBigQueryRunRow(run)])
 
   await persistServingState(records, run)
 
