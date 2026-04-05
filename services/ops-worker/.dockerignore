@@ -1,0 +1,44 @@
+# Next.js build output
+.next/
+out/
+
+# Vuexy reference (read-only, not needed at runtime)
+full-version/
+
+# Documentation
+docs/
+
+# Static assets (not needed for batch processing)
+public/
+
+# UI-only code (React components, views, pages)
+src/app/
+src/components/
+src/views/
+src/@core/
+src/@layout/
+src/@menu/
+src/libs/
+src/hooks/
+src/hocs/
+src/assets/
+
+# Dev tooling
+.git/
+.github/
+.vscode/
+.vercel/
+node_modules/
+
+# Test files
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+src/test/
+
+# Env files (secrets injected via Cloud Run env vars)
+.env*
+
+# Misc
+*.md
+LICENSE

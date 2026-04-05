@@ -11,6 +11,7 @@ import { getCloudPostgresPosture } from '@/lib/cloud/postgres'
 import { readAiLlmOperationsSnapshot } from '@/lib/ico-engine/ai/llm-enrichment-reader'
 import { getNotionDeliveryDataQualityOverview } from '@/lib/integrations/notion-delivery-data-quality'
 import { readReactiveBacklogOverview, type ReactiveBacklogOverview } from '@/lib/operations/reactive-backlog'
+import { getLastReactiveRun } from '@/lib/sync/reactive-run-tracker'
 import {
   getGreenhousePostgresConfig,
   isGreenhousePostgresConfigured,
@@ -299,6 +300,8 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
     lastProcessedAt: null
   }))
 
+  const lastReactiveWorkerRun = await getLastReactiveRun().catch(() => null)
+
   const [outboxEvents24h, pendingProjections, notificationsSent24h, activeSyncs, failedHandlers, reactiveBacklog] =
     await Promise.all([
       safeCount(
@@ -487,6 +490,21 @@ export const getOperationsOverview = async (): Promise<OperationsOverview> => {
       processed: reactiveBacklog.totalUnreacted,
       failed: reactiveBacklog.last24hUnreacted,
       lastRun: reactiveBacklog.lastReactedAt
+    },
+    {
+      name: 'Reactive Worker',
+      status: lastReactiveWorkerRun
+        ? lastReactiveWorkerRun.status === 'succeeded' || lastReactiveWorkerRun.status === 'partial'
+          ? 'healthy'
+          : lastReactiveWorkerRun.status === 'failed'
+            ? 'degraded'
+            : 'idle'
+        : 'idle',
+      processed: lastReactiveWorkerRun?.eventsProcessed ?? 0,
+      failed: lastReactiveWorkerRun?.status === 'failed' ? 1 : 0,
+      lastRun: lastReactiveWorkerRun
+        ? new Date(Date.now() - (lastReactiveWorkerRun.durationMs || 0)).toISOString()
+        : null
     },
     {
       name: 'AI LLM Enrichment',

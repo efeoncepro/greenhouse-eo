@@ -2,6 +2,16 @@
 
 ## 2026-04-05
 
+- **TASK-254 Operational Cron Durable Worker Migration — implementación completa**:
+  - 3 cron operativos worker-like (`outbox-react`, `outbox-react-delivery`, `projection-recovery`) migrados de Vercel scheduler a Cloud Run `ops-worker`
+  - Nuevo servicio `services/ops-worker/` con 4 endpoints HTTP (health + 3 reactive handlers), Dockerfile esbuild two-stage y deploy script idempotente
+  - Nuevo `src/lib/sync/reactive-run-tracker.ts` con run tracking institucional sobre `source_sync_runs` para auditar corridas del worker reactivo
+  - `vercel.json` reducido de 16 a 13 cron entries — las rutas API siguen como fallback manual sin schedule
+  - `getOperationsOverview()` ahora expone subsistema `Reactive Worker` con `lastRunAt`, `lastRunStatus` y señal de freshness
+  - Política de workload placement ampliada: cron con backlog, recovery o semántica de durabilidad deben correr en worker durable aunque no superen 30s
+  - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` actualizado a v1.2 con ops-worker, scheduler jobs y placement matrix
+  - Deploy a Cloud Run pendiente (requiere `bash services/ops-worker/deploy.sh` con GCP auth)
+
 - **ISSUE-014 person_360 VIEW faltaba columnas enriched — resuelto**:
   - Mi Perfil mostraba `hasMemberFacet: true` pero todos los campos enriched eran `null` (avatar, cargo, telefono, departamento)
   - Causa raiz: la VIEW `person_360` en la DB era la version antigua (rollup-based) que no exponia `resolved_avatar_url`, `resolved_job_title`, `resolved_phone`, etc.
