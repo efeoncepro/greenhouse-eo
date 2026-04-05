@@ -17,6 +17,7 @@ import { motion, AnimatePresence } from '@/libs/FramerMotion'
 import useReducedMotion from '@/hooks/useReducedMotion'
 import { GH_NEXA, GH_COLORS } from '@/config/greenhouse-nomenclature'
 import { getMetricById } from '@/lib/ico-engine/metric-registry'
+import NexaMentionText from '@/components/greenhouse/NexaMentionText'
 
 // ─── Public Types ──────────────────────────────────────────────────────────
 
@@ -114,7 +115,8 @@ const InsightCard = ({ item, index, animate }: { item: NexaInsightItem; index: n
 
         {/* Explanation */}
         {item.explanation && (
-          <Typography
+          <NexaMentionText
+            text={item.explanation}
             variant='body2'
             sx={{
               color: GH_COLORS.neutral.textSecondary,
@@ -123,9 +125,7 @@ const InsightCard = ({ item, index, animate }: { item: NexaInsightItem; index: n
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden'
             }}
-          >
-            {item.explanation}
-          </Typography>
+          />
         )}
 
         {/* Recommended action */}
@@ -140,9 +140,11 @@ const InsightCard = ({ item, index, animate }: { item: NexaInsightItem; index: n
             <Typography variant='caption' sx={{ fontWeight: 600, color: GH_COLORS.neutral.textSecondary, display: 'block', mb: 0.25 }}>
               {GH_NEXA.insights_action_label}
             </Typography>
-            <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary }}>
-              {item.recommendedAction}
-            </Typography>
+            <NexaMentionText
+              text={item.recommendedAction}
+              variant='body2'
+              sx={{ color: GH_COLORS.neutral.textPrimary }}
+            />
           </Box>
         )}
       </Stack>

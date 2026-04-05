@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto'
 import { ICO_METRIC_REGISTRY } from '../metric-registry'
 import type { AiSignalRecord } from './types'
 
-export const ICO_LLM_PROMPT_VERSION = 'ico_signal_enrichment_v2'
+export const ICO_LLM_PROMPT_VERSION = 'ico_signal_enrichment_v3'
 export const ICO_LLM_DEFAULT_MODEL_ID = 'google/gemini-2.5-flash@default'
 export const ICO_LLM_SUPPORTED_SIGNAL_TYPES = ['anomaly', 'prediction', 'root_cause', 'recommendation'] as const
 export const ICO_LLM_ENRICHMENT_STATUSES = ['succeeded', 'failed', 'skipped'] as const
@@ -162,7 +162,14 @@ const PROMPT_TEMPLATE_LINES = [
   '- Estructura la explicación en dos partes:',
   '  1. Impacto técnico: qué métrica se desvió, cuánto, y qué otras métricas presiona según la cadena causal.',
   '  2. Bajada operativa: qué significa esto para alguien que no conoce las métricas — en términos de equipo, entregas y capacidad.',
-  '- Escribe en español con nombres de métricas en inglés (spanglish natural).'
+  '- Escribe en español con nombres de métricas en inglés (spanglish natural).',
+  '',
+  'Formato de menciones (obligatorio cuando refieras a entidades con ID):',
+  '- Miembro del equipo: @[Nombre Completo](member:MEMBER_ID)',
+  '- Space o cliente: @[Nombre del Space](space:SPACE_ID)',
+  '- Proyecto: @[Nombre del Proyecto](project:PROJECT_ID)',
+  '- Siempre incluye el nombre legible dentro de los corchetes y el ID entre paréntesis.',
+  '- Si no tienes el ID de una entidad, menciona solo el nombre sin formato de mención.'
 ]
 
 export const ICO_LLM_PROMPT_TEMPLATE = PROMPT_TEMPLATE_LINES.join('\n')

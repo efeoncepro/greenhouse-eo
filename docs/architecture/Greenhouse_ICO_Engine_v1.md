@@ -1,5 +1,16 @@
 # EFEONCE GREENHOUSE™ — ICO Engine
 
+## Delta 2026-04-04 — TASK-240 adds interactive @mentions in Nexa Insights narratives
+
+`TASK-240` hace clickeables las referencias a Spaces y miembros en las narrativas de Nexa Insights.
+
+- **Prompt v3:** instrucción de formato `@[Nombre](type:ID)` para miembros, Spaces y proyectos
+- **`NexaMentionText`:** componente parser que convierte marcas `@[Name](member:ID)` en MUI Chips clickeables con navegación inline
+- **Navegación:** members → `/people/[memberId]`, spaces → `/agency/spaces/[id]`, projects → chip no-clickeable (ruta no definida)
+- **Fallback:** texto sin marcas se renderiza como Typography normal; marcas malformadas se muestran como texto plano
+- **Reutilizable:** `NexaMentionText` puede usarse en cualquier surface de Nexa (chat, notifications)
+- **Prompt version:** `ico_signal_enrichment_v2` → `ico_signal_enrichment_v3`
+
 ## Delta 2026-04-04 — TASK-241 migrates ICO batch processing to Cloud Run
 
 `TASK-241` mueve los procesos batch pesados del ICO Engine (materialización + LLM enrichment) de Vercel Functions a un servicio Cloud Run dedicado.
