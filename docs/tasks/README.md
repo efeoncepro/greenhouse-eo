@@ -20,7 +20,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-248`
+- siguiente ID disponible: `TASK-249`
 - `TASK-241` migra procesos batch pesados (ICO materialización, LLM enrichment) de Vercel Functions a Cloud Run. Formaliza política: batch > 30s → Cloud Run. Código listo, deploy operacional pendiente.
 - `TASK-239` enriquece el prompt LLM de Nexa Insights con glosario de métricas, cadena causal, doble capa narrativa y nombres de Space/miembros.
 - `TASK-240` agrega menciones interactivas (@mentions) de Spaces y miembros en los insights de Nexa — chips clickeables que navegan a perfiles. Depende de `TASK-239`.
@@ -82,6 +82,7 @@ Primer bloque operativo asignado:
 | `TASK-196` | [TASK-196-delivery-performance-report-parity-greenhouse-notion.md](complete/TASK-196-delivery-performance-report-parity-greenhouse-notion.md)                               | P0        | Muy alto | Alto     | Cerrada                 | Lane completa de paridad Delivery: source sync, identidad, owner attribution, semántica, freeze histórico y cutover outbound `Greenhouse -> Notion` sobre `Performance Reports`              |
 | `TASK-244` | [TASK-244-nexa-insights-home-dashboard.md](to-do/TASK-244-nexa-insights-home-dashboard.md)                                                                                  | P2        | Alto     | Bajo     | Diseño                  | Widget "Top Insights" en Home Dashboard con las 3 señales más críticas cross-Space del período actual vía `NexaInsightsBlock`                                                                |
 | `TASK-245` | [TASK-245-finance-signal-engine.md](to-do/TASK-245-finance-signal-engine.md)                                                                                                | P2        | Muy alto | Alto     | Diseño                  | Primer engine de señales fuera del ICO: detector de anomalías financieras, enrichment LLM domain-aware, surfacing en Finance Dashboard                                                       |
+| `TASK-248` | [TASK-248-identity-access-spec-compliance.md](to-do/TASK-248-identity-access-spec-compliance.md) | P2 | Medio | Medio | Diseño | Spec compliance: audit de scope assignments y login events, formalizar drift people/operations, migrar legacy role codes en datos |
 
 ## Complete
 

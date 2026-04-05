@@ -296,4 +296,5 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-244` | `to-do` | Nexa Insights Widget en Home Dashboard | `docs/tasks/to-do/TASK-244-nexa-insights-home-dashboard.md` |
 | `TASK-245` | `to-do` | Finance Signal Engine | `docs/tasks/to-do/TASK-245-finance-signal-engine.md` |
 | `TASK-246` | `to-do` | Narrativa ejecutiva semanal de Nexa | `docs/tasks/to-do/TASK-246-nexa-weekly-executive-digest.md` |
-| `TASK-247` | `to-do` | Identity & Platform Block Hardening | `docs/tasks/to-do/TASK-247-identity-platform-block-hardening.md` |
+| `TASK-247` | `complete` | Identity & Platform Block Hardening | `docs/tasks/complete/TASK-247-identity-platform-block-hardening.md` |
+| `TASK-248` | `to-do` | Identity & Access Spec Compliance | `docs/tasks/to-do/TASK-248-identity-access-spec-compliance.md` |
