@@ -35,26 +35,10 @@ const CRON_SECRET = process.env.CRON_SECRET?.trim() || ''
 
 // ─── Auth ───────────────────────────────────────────────────────────────────
 
-const isAuthorized = (req: IncomingMessage): boolean => {
-  // Cloud Run IAM handles primary auth (--no-allow-unauthenticated).
-  // When CRON_SECRET is not set, trust IAM exclusively.
-  if (!CRON_SECRET) return true
+import { checkAuthorization } from './auth'
 
-  const authHeader = req.headers.authorization?.trim() || ''
-
-  if (authHeader.toLowerCase().startsWith('bearer ')) {
-    const token = authHeader.slice('bearer '.length).trim()
-
-    return token === CRON_SECRET
-  }
-
-  // Cloud Run strips the Authorization header after IAM validation,
-  // so absence of header means the request already passed IAM — allow it.
-  if (!authHeader) return true
-
-  // Header present but not a valid Bearer token — reject.
-  return false
-}
+const isAuthorized = (req: IncomingMessage): boolean =>
+  checkAuthorization(req.headers.authorization, CRON_SECRET)
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
