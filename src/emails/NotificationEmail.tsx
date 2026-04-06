@@ -14,11 +14,11 @@ interface NotificationEmailProps {
 }
 
 export default function NotificationEmail({
-  title,
-  body,
-  actionUrl,
+  title = 'Nuevo activo disponible para revisión',
+  body = 'El equipo de diseño subió 3 nuevos archivos al proyecto Campaña Q2. Requieren tu aprobación antes del viernes.',
+  actionUrl = 'https://greenhouse.efeoncepro.com/delivery',
   actionLabel,
-  recipientName,
+  recipientName = 'María González',
   locale = 'es'
 }: NotificationEmailProps) {
   const t = locale === 'en' ? {

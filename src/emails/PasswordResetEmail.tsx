@@ -10,7 +10,11 @@ interface PasswordResetEmailProps {
   locale?: 'es' | 'en'
 }
 
-export default function PasswordResetEmail({ resetUrl, userName, locale = 'es' }: PasswordResetEmailProps) {
+export default function PasswordResetEmail({
+  resetUrl = 'https://greenhouse.efeoncepro.com/auth/reset-password?token=preview-token',
+  userName = 'María González',
+  locale = 'es'
+}: PasswordResetEmailProps) {
   const t = locale === 'en' ? {
     heading: 'Reset your password',
     greeting: (name?: string) => name ? `Hi ${name},` : 'Hi,',

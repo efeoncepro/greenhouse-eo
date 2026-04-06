@@ -12,7 +12,13 @@ interface InvitationEmailProps {
   locale?: 'es' | 'en'
 }
 
-export default function InvitationEmail({ inviteUrl, inviterName, clientName, userName, locale = 'es' }: InvitationEmailProps) {
+export default function InvitationEmail({
+  inviteUrl = 'https://greenhouse.efeoncepro.com/auth/accept-invite?token=preview-token',
+  inviterName = 'Julio Reyes',
+  clientName = 'Efeonce Group',
+  userName = 'María González',
+  locale = 'es'
+}: InvitationEmailProps) {
   const t = locale === 'en' ? {
     heading: 'You have been invited to Greenhouse',
     greeting: (name?: string) => name ? `Hi ${name},` : 'Hi,',

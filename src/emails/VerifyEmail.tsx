@@ -10,7 +10,11 @@ interface VerifyEmailProps {
   locale?: 'es' | 'en'
 }
 
-export default function VerifyEmail({ verifyUrl, userName, locale = 'es' }: VerifyEmailProps) {
+export default function VerifyEmail({
+  verifyUrl = 'https://greenhouse.efeoncepro.com/auth/verify-email?token=preview-token',
+  userName = 'María González',
+  locale = 'es'
+}: VerifyEmailProps) {
   const t = locale === 'en' ? {
     heading: 'Confirm your email',
     greeting: (name?: string) => name ? `Hi ${name},` : 'Hi,',
