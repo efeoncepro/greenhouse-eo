@@ -8,11 +8,14 @@ interface EmailLayoutProps {
   children: React.ReactNode
   previewText?: string
   lang?: 'es' | 'en'
+  locale?: 'es' | 'en'
 }
 
-export default function EmailLayout({ children, previewText, lang = 'es' }: EmailLayoutProps) {
+export default function EmailLayout({ children, previewText, lang, locale = 'es' }: EmailLayoutProps) {
+  const effectiveLang = lang ?? locale
+
   return (
-    <Html lang={lang} dir="ltr">
+    <Html lang={effectiveLang} dir="ltr">
       <Head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -87,7 +90,9 @@ export default function EmailLayout({ children, previewText, lang = 'es' }: Emai
             lineHeight: '18px',
             margin: '0',
           }}>
-            Este es un correo automático. Si tienes dudas, contacta a tu administrador.
+            {locale === 'en'
+              ? 'This is an automated email. If you have questions, contact your administrator.'
+              : 'Este es un correo automático. Si tienes dudas, contacta a tu administrador.'}
           </Text>
         </Section>
       </Body>

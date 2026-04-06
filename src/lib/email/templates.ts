@@ -125,16 +125,27 @@ const buildNotificationPlainText = (context: {
   body?: string
   actionUrl?: string
   recipientName?: string
-}) => [
-  context.recipientName ? `Hola ${context.recipientName.split(' ')[0]},` : 'Hola,',
-  '',
-  context.title,
-  context.body || '',
-  '',
-  context.actionUrl ? `Ver más: ${context.actionUrl}` : '',
-  '',
-  '— Greenhouse by Efeonce Group'
-].filter(Boolean).join('\n')
+  locale?: 'es' | 'en'
+}) => {
+  const locale = context.locale || 'es'
+
+  const greeting = locale === 'en'
+    ? (context.recipientName ? `Hi ${context.recipientName},` : 'Hi,')
+    : (context.recipientName ? `Hola ${context.recipientName.split(' ')[0]},` : 'Hola,')
+
+  const actionPrefix = locale === 'en' ? 'View more:' : 'Ver m\u00e1s:'
+
+  return [
+    greeting,
+    '',
+    context.title,
+    context.body || '',
+    '',
+    context.actionUrl ? `${actionPrefix} ${context.actionUrl}` : '',
+    '',
+    '\u2014 Greenhouse by Efeonce Group'
+  ].filter(Boolean).join('\n')
+}
 
 export function registerTemplate<TContext extends EmailTemplateContext>(
   emailType: EmailType,
@@ -161,43 +172,58 @@ export const listRegisteredTemplates = () => Array.from(EMAIL_TEMPLATES.keys())
 registerTemplate('password_reset', (context: {
   resetUrl: string
   userName?: string
-}) => ({
-  subject: 'Restablece tu contraseña — Greenhouse',
-  react: PasswordResetEmail({ resetUrl: context.resetUrl, userName: context.userName }),
-  text: [
-    'Restablece tu contraseña en Greenhouse.',
-    '',
-    `Enlace: ${context.resetUrl}`
-  ].join('\n')
-}))
+  locale?: 'es' | 'en'
+}) => {
+  const locale = context.locale || 'es'
+
+  return {
+    subject: locale === 'en'
+      ? 'Reset your password \u2014 Greenhouse'
+      : 'Restablece tu contrase\u00f1a \u2014 Greenhouse',
+    react: PasswordResetEmail({ resetUrl: context.resetUrl, userName: context.userName, locale }),
+    text: locale === 'en'
+      ? ['Reset your Greenhouse password.', '', `Link: ${context.resetUrl}`].join('\n')
+      : ['Restablece tu contrase\u00f1a en Greenhouse.', '', `Enlace: ${context.resetUrl}`].join('\n')
+  }
+})
 
 registerTemplate('invitation', (context: {
   inviteUrl: string
   inviterName: string
   clientName: string
   userName?: string
-}) => ({
-  subject: 'Te invitaron a Greenhouse — Efeonce',
-  react: InvitationEmail(context),
-  text: [
-    `${context.inviterName} te invitó a ${context.clientName} en Greenhouse.`,
-    '',
-    `Activa tu cuenta: ${context.inviteUrl}`
-  ].join('\n')
-}))
+  locale?: 'es' | 'en'
+}) => {
+  const locale = context.locale || 'es'
+
+  return {
+    subject: locale === 'en'
+      ? 'You were invited to Greenhouse \u2014 Efeonce'
+      : 'Te invitaron a Greenhouse \u2014 Efeonce',
+    react: InvitationEmail({ ...context, locale }),
+    text: locale === 'en'
+      ? [`${context.inviterName} invited you to ${context.clientName} on Greenhouse.`, '', `Activate your account: ${context.inviteUrl}`].join('\n')
+      : [`${context.inviterName} te invit\u00f3 a ${context.clientName} en Greenhouse.`, '', `Activa tu cuenta: ${context.inviteUrl}`].join('\n')
+  }
+})
 
 registerTemplate('verify_email', (context: {
   verifyUrl: string
   userName?: string
-}) => ({
-  subject: 'Confirma tu correo — Greenhouse',
-  react: VerifyEmail({ verifyUrl: context.verifyUrl, userName: context.userName }),
-  text: [
-    'Confirma tu correo en Greenhouse.',
-    '',
-    `Enlace: ${context.verifyUrl}`
-  ].join('\n')
-}))
+  locale?: 'es' | 'en'
+}) => {
+  const locale = context.locale || 'es'
+
+  return {
+    subject: locale === 'en'
+      ? 'Confirm your email \u2014 Greenhouse'
+      : 'Confirma tu correo \u2014 Greenhouse',
+    react: VerifyEmail({ verifyUrl: context.verifyUrl, userName: context.userName, locale }),
+    text: locale === 'en'
+      ? ['Confirm your Greenhouse email.', '', `Link: ${context.verifyUrl}`].join('\n')
+      : ['Confirma tu correo en Greenhouse.', '', `Enlace: ${context.verifyUrl}`].join('\n')
+  }
+})
 
 registerTemplate('notification', (context: {
   title: string
@@ -205,17 +231,23 @@ registerTemplate('notification', (context: {
   actionUrl?: string
   actionLabel?: string
   recipientName?: string
-}) => ({
-  subject: context.title,
-  react: NotificationEmail({
-    title: context.title,
-    body: context.body,
-    actionUrl: context.actionUrl,
-    actionLabel: context.actionLabel,
-    recipientName: context.recipientName
-  }),
-  text: buildNotificationPlainText(context)
-}))
+  locale?: 'es' | 'en'
+}) => {
+  const locale = context.locale || 'es'
+
+  return {
+    subject: context.title,
+    react: NotificationEmail({
+      title: context.title,
+      body: context.body,
+      actionUrl: context.actionUrl,
+      actionLabel: context.actionLabel,
+      recipientName: context.recipientName,
+      locale
+    }),
+    text: buildNotificationPlainText({ ...context, locale })
+  }
+})
 
 registerTemplate('payroll_export', (context: {
   periodLabel: string

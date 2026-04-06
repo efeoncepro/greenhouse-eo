@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 
-import { ensureEmailSchema } from '@/lib/email/schema'
 import { addSubscriber } from '@/lib/email/subscriptions'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
@@ -22,8 +21,6 @@ export async function GET() {
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-
-  await ensureEmailSchema()
 
   const rows = await runGreenhousePostgresQuery<SubscriptionRow>(
     `
@@ -85,8 +82,6 @@ export async function DELETE(request: Request) {
   if (!subscriptionId) {
     return NextResponse.json({ error: 'subscriptionId is required.' }, { status: 400 })
   }
-
-  await ensureEmailSchema()
 
   await runGreenhousePostgresQuery(
     `UPDATE greenhouse_notifications.email_subscriptions SET active = FALSE, updated_at = NOW() WHERE subscription_id = $1`,

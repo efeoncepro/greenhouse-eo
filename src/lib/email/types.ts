@@ -10,7 +10,7 @@ export type EmailType =
   | 'payroll_receipt'
   | 'notification'
 
-export type EmailDeliveryStatus = 'pending' | 'sent' | 'failed' | 'skipped'
+export type EmailDeliveryStatus = 'pending' | 'sent' | 'failed' | 'skipped' | 'rate_limited' | 'delivered'
 
 export interface EmailRecipient {
   email: string

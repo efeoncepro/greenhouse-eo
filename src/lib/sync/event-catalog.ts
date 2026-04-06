@@ -63,6 +63,9 @@ export const AGGREGATE_TYPES = {
   // Email Verification
   emailVerification: 'email_verification',
 
+  // Email Delivery
+  emailDelivery: 'email_delivery',
+
   // Quotes
   quote: 'quote',
 
@@ -197,6 +200,12 @@ export const EVENT_TYPES = {
   // Email Verification
   emailVerificationRequested: 'identity.email_verification.requested',
   emailVerificationCompleted: 'identity.email_verification.completed',
+
+  // Email Delivery
+  emailDeliveryBounced: 'email_delivery.bounced',
+  emailDeliveryComplained: 'email_delivery.complained',
+  emailDeliveryRateLimited: 'email_delivery.rate_limited',
+  emailDeliveryUndeliverableMarked: 'email_delivery.undeliverable_marked',
 
   // Quotes & Credit Notes
   quoteCreated: 'finance.quote.created',

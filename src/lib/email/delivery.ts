@@ -5,7 +5,8 @@ import { randomUUID } from 'crypto'
 import { getEmailFromAddress, getResendClient, isResendConfigured } from '@/lib/resend'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
-import { ensureEmailSchema } from './schema'
+import { resolveEmailContext, EmailUndeliverableError } from './context-resolver'
+import { checkRecipientRateLimit } from './rate-limit'
 import { getSubscribers } from './subscriptions'
 import { resolveTemplate } from './templates'
 import type {
@@ -50,7 +51,7 @@ const reviveJsonSafe = (value: unknown): unknown => {
 const toResendAttachments = (attachments: EmailAttachment[] | undefined) =>
   (attachments ?? []).map(attachment => ({
     filename: attachment.filename,
-    content: attachment.content.toString('base64'),
+    content: attachment.content,
     contentType: attachment.contentType
   }))
 
@@ -153,12 +154,6 @@ const createDeliveryRow = async (input: {
   actorEmail?: string
   errorMessage?: string | null
 }) => {
-  try {
-    await ensureEmailSchema()
-  } catch (error) {
-    console.warn('[email-delivery] Schema bootstrap failed:', error)
-  }
-
   const rows = await runGreenhousePostgresQuery<{ delivery_id: string } & Record<string, unknown>>(
     `
       INSERT INTO greenhouse_notifications.email_deliveries (
@@ -306,12 +301,120 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
   })
 
   try {
-    const resolvedTemplate = resolveTemplate(input.emailType, {
+    // ── Context Resolver: auto-hydrate recipient + client data ──
+    let resolvedContext: Record<string, unknown> = {}
+
+    try {
+      const emailContext = await resolveEmailContext(input.recipient.email)
+
+      if (emailContext) {
+        resolvedContext = {
+          userName: emailContext.recipient.fullName,
+          recipientFirstName: emailContext.recipient.firstName,
+          clientName: emailContext.client.name,
+          clientId: emailContext.client.id,
+          locale: emailContext.recipient.locale,
+          tenantType: emailContext.client.tenantType,
+          platformUrl: emailContext.platform.url,
+          supportEmail: emailContext.platform.supportEmail
+        }
+
+        // Enrich recipient with resolved data if missing
+        if (!input.recipient.name && emailContext.recipient.fullName) {
+          input.recipient.name = emailContext.recipient.fullName
+        }
+
+        if (!input.recipient.userId && emailContext.recipient.userId) {
+          input.recipient.userId = emailContext.recipient.userId
+        }
+      }
+    } catch (error) {
+      if (error instanceof EmailUndeliverableError) {
+        const errorMessage = error.message
+
+        if (input.existingDeliveryId) {
+          await updateDeliveryRow({
+            deliveryId: input.existingDeliveryId,
+            resendId: null,
+            status: 'skipped',
+            errorMessage
+          })
+        } else {
+          await createDeliveryRow({
+            batchId: input.batchId,
+            emailType: input.emailType,
+            domain: input.domain,
+            recipient: input.recipient,
+            subject: '[undeliverable]',
+            resendId: null,
+            status: 'skipped',
+            hasAttachments: false,
+            payload: basePayload,
+            sourceEventId: input.sourceEventId,
+            sourceEntity: input.sourceEntity,
+            actorEmail: input.actorEmail,
+            errorMessage
+          })
+        }
+
+        return {
+          deliveryId: input.existingDeliveryId || input.batchId,
+          recipientEmail: input.recipient.email,
+          resendId: null,
+          status: 'skipped' as const,
+          error: errorMessage
+        }
+      }
+
+      // Non-blocking: if resolver fails for other reasons, continue with caller context
+      console.warn('[email-delivery] Context resolver failed, continuing with caller context:', error instanceof Error ? error.message : error)
+    }
+
+    // ── Rate Limit: check per-recipient hourly limit ──
+    if (!input.existingDeliveryId) {
+      const rateCheck = await checkRecipientRateLimit(input.recipient.email)
+
+      if (!rateCheck.allowed) {
+        const errorMessage = `Rate limit exceeded: ${rateCheck.currentCount} emails/hour to ${input.recipient.email}`
+
+        console.warn(`[email-delivery] ${errorMessage}`)
+
+        await createDeliveryRow({
+          batchId: input.batchId,
+          emailType: input.emailType,
+          domain: input.domain,
+          recipient: input.recipient,
+          subject: '[rate_limited]',
+          resendId: null,
+          status: 'rate_limited',
+          hasAttachments: false,
+          payload: basePayload,
+          sourceEventId: input.sourceEventId,
+          sourceEntity: input.sourceEntity,
+          actorEmail: input.actorEmail,
+          errorMessage
+        })
+
+        return {
+          deliveryId: input.batchId,
+          recipientEmail: input.recipient.email,
+          resendId: null,
+          status: 'failed' as const,
+          error: errorMessage
+        }
+      }
+    }
+
+    // Merge contexts: caller values take precedence over auto-resolved
+    const mergedContext = {
+      ...resolvedContext,
       ...input.context,
       recipientEmail: input.recipient.email,
       recipientName: input.recipient.name,
       recipientUserId: input.recipient.userId
-    })
+    }
+
+    const resolvedTemplate = resolveTemplate(input.emailType, mergedContext)
 
     const mergedAttachments = mergeAttachments(resolvedTemplate.attachments, input.attachments)
     const resendAttachments = toResendAttachments(mergedAttachments)
@@ -528,8 +631,6 @@ export const processFailedEmailDeliveries = async (limit = 25) => {
     }
   }
 
-  await ensureEmailSchema()
-
   const rows = await runGreenhousePostgresQuery<FailedDeliveryRow & Record<string, unknown>>(
     `
       SELECT
@@ -553,7 +654,7 @@ export const processFailedEmailDeliveries = async (limit = 25) => {
       FROM greenhouse_notifications.email_deliveries
       WHERE status = 'failed'
         AND attempt_number < 3
-        AND created_at > NOW() - INTERVAL '1 hour'
+        AND created_at > NOW() - INTERVAL '24 hours'
       ORDER BY created_at ASC
       LIMIT $1
     `,
@@ -634,8 +735,6 @@ export const retryFailedDelivery = async (deliveryId: string): Promise<{
   if (!isResendConfigured()) {
     return { status: 'skipped', resendId: null, error: 'RESEND_API_KEY is not configured.' }
   }
-
-  await ensureEmailSchema()
 
   const claimed = await claimFailedDelivery(deliveryId)
 

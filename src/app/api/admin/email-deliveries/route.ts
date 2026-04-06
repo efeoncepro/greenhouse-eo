@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 
-import { ensureEmailSchema } from '@/lib/email/schema'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 
@@ -42,8 +41,6 @@ export async function GET(request: Request) {
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-
-  await ensureEmailSchema()
 
   const { searchParams } = new URL(request.url)
   const page = Math.max(1, Number(searchParams.get('page') || '1'))

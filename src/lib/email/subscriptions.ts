@@ -2,7 +2,6 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
-import { ensureEmailSchema } from './schema'
 import type { EmailRecipient } from './types'
 
 interface SubscriptionRow {
@@ -12,12 +11,6 @@ interface SubscriptionRow {
 }
 
 export const getSubscribers = async (emailType: string): Promise<EmailRecipient[]> => {
-  try {
-    await ensureEmailSchema()
-  } catch (error) {
-    console.warn('[email-subscriptions] Schema bootstrap failed:', error)
-  }
-
   const rows = await runGreenhousePostgresQuery<SubscriptionRow & Record<string, unknown>>(
     `
       SELECT recipient_email, recipient_name, recipient_user_id
@@ -41,8 +34,6 @@ export const addSubscriber = async (params: {
   recipientName?: string | null
   recipientUserId?: string | null
 }) => {
-  await ensureEmailSchema()
-
   await runGreenhousePostgresQuery(
     `
       INSERT INTO greenhouse_notifications.email_subscriptions
@@ -67,8 +58,6 @@ export const removeSubscriber = async (params: {
   emailType: string
   recipientEmail: string
 }) => {
-  await ensureEmailSchema()
-
   await runGreenhousePostgresQuery(
     `
       UPDATE greenhouse_notifications.email_subscriptions

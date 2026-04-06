@@ -9,13 +9,38 @@ interface InvitationEmailProps {
   inviterName: string
   clientName: string
   userName?: string
+  locale?: 'es' | 'en'
 }
 
-export default function InvitationEmail({ inviteUrl, inviterName, clientName, userName }: InvitationEmailProps) {
-  const greeting = userName ? `Hola ${userName.split(' ')[0]},` : 'Hola,'
+export default function InvitationEmail({ inviteUrl, inviterName, clientName, userName, locale = 'es' }: InvitationEmailProps) {
+  const t = locale === 'en' ? {
+    heading: 'You have been invited to Greenhouse',
+    greeting: (name?: string) => name ? `Hi ${name},` : 'Hi,',
+    bodyPrefix: 'invited you to join',
+    bodySuffix: "'s team on Efeonce Greenhouse\u2122, the management and operations platform.",
+    validityPrefix: 'You just need to create your password to activate your account. The link is valid for ',
+    validityBold: '72 hours',
+    validitySuffix: '.',
+    cta: 'Activate my account',
+    disclaimer: 'If you were not expecting this invitation, you can safely ignore this email.',
+    fallback: 'If the button does not work, copy and paste this address into your browser:',
+    previewText: (inviter: string, client: string) => `${inviter} invited you to ${client} on Greenhouse`
+  } : {
+    heading: 'Te han invitado a Greenhouse',
+    greeting: (name?: string) => name ? `Hola ${name.split(' ')[0]},` : 'Hola,',
+    bodyPrefix: 'te invitó a unirte al equipo de',
+    bodySuffix: ' en Efeonce Greenhouse\u2122, la plataforma de gestión y operaciones.',
+    validityPrefix: 'Solo necesitas crear tu contraseña para activar tu cuenta. El enlace es válido por ',
+    validityBold: '72 horas',
+    validitySuffix: '.',
+    cta: 'Activar mi cuenta',
+    disclaimer: 'Si no esperabas esta invitación, puedes ignorar este correo de forma segura.',
+    fallback: 'Si el botón no funciona, copia y pega esta dirección en tu navegador:',
+    previewText: (inviter: string, client: string) => `${inviter} te invitó a ${client} en Greenhouse`
+  }
 
   return (
-    <EmailLayout previewText={`${inviterName} te invitó a ${clientName} en Greenhouse`}>
+    <EmailLayout previewText={t.previewText(inviterName, clientName)} locale={locale}>
       <Heading style={{
         fontFamily: EMAIL_FONTS.heading,
         fontSize: '24px',
@@ -24,7 +49,7 @@ export default function InvitationEmail({ inviteUrl, inviterName, clientName, us
         margin: '0 0 8px',
         lineHeight: '32px',
       }}>
-        Te han invitado a Greenhouse
+        {t.heading}
       </Heading>
 
       <Text style={{
@@ -33,7 +58,7 @@ export default function InvitationEmail({ inviteUrl, inviterName, clientName, us
         lineHeight: '24px',
         margin: '0 0 20px',
       }}>
-        {greeting} <strong>{inviterName}</strong> te invitó a unirte al equipo de <strong>{clientName}</strong> en Efeonce Greenhouse™, la plataforma de gestión y operaciones.
+        {t.greeting(userName)} <strong>{inviterName}</strong> {t.bodyPrefix} <strong>{clientName}</strong>{t.bodySuffix}
       </Text>
 
       <Text style={{
@@ -42,11 +67,11 @@ export default function InvitationEmail({ inviteUrl, inviterName, clientName, us
         lineHeight: '24px',
         margin: '0 0 28px',
       }}>
-        Solo necesitas crear tu contraseña para activar tu cuenta. El enlace es válido por <strong>72 horas</strong>.
+        {t.validityPrefix}<strong>{t.validityBold}</strong>{t.validitySuffix}
       </Text>
 
       <Section style={{ textAlign: 'center' as const, margin: '0 0 28px' }}>
-        <EmailButton href={inviteUrl}>Activar mi cuenta</EmailButton>
+        <EmailButton href={inviteUrl}>{t.cta}</EmailButton>
       </Section>
 
       <Text style={{
@@ -57,7 +82,7 @@ export default function InvitationEmail({ inviteUrl, inviterName, clientName, us
         borderTop: `1px solid ${EMAIL_COLORS.border}`,
         paddingTop: '20px',
       }}>
-        Si no esperabas esta invitación, puedes ignorar este correo de forma segura.
+        {t.disclaimer}
       </Text>
 
       <Text style={{
@@ -66,7 +91,7 @@ export default function InvitationEmail({ inviteUrl, inviterName, clientName, us
         lineHeight: '18px',
         margin: '0',
       }}>
-        Si el botón no funciona, copia y pega esta dirección en tu navegador:{' '}
+        {t.fallback}{' '}
         <span style={{ wordBreak: 'break-all' as const }}>{inviteUrl}</span>
       </Text>
     </EmailLayout>
