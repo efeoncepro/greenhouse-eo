@@ -319,3 +319,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-267` | `to-do` | Reenviar email de onboarding desde ficha de usuario | `docs/tasks/to-do/TASK-267-admin-resend-onboarding-email.md` |
 | `TASK-268` | `to-do` | Boton "Revisar acceso" navega al tab Accesos | `docs/tasks/to-do/TASK-268-admin-review-access-button.md` |
 | `TASK-269` | `to-do` | Email Delivery Enterprise Hardening: Context Resolver, i18n, Rate Limit, Bounce Handling | `docs/tasks/to-do/TASK-269-email-delivery-enterprise-hardening.md` |
+| `TASK-270` | `to-do` | Admin Email Template Preview: vista integrada para previsualizar y probar templates | `docs/tasks/to-do/TASK-270-admin-email-template-preview.md` |
