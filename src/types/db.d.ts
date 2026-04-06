@@ -335,12 +335,14 @@ export interface GreenhouseCoreClientUsers {
   deactivated_at: Timestamp | null;
   default_portal_home_path: string | null;
   email: string | null;
+  email_undeliverable: Generated<boolean>;
   full_name: string | null;
   google_email: string | null;
   google_sub: string | null;
   identity_profile_id: string | null;
   last_login_at: Timestamp | null;
   last_login_provider: string | null;
+  locale: Generated<string>;
   member_id: string | null;
   microsoft_email: string | null;
   microsoft_oid: string | null;
