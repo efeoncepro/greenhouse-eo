@@ -54,6 +54,7 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - **Lint:** `pnpm lint`
 - **Test:** `pnpm test` (Vitest)
 - **Type check:** `npx tsc --noEmit`
+- **PostgreSQL connect:** `pnpm pg:connect` (ADC + proxy + test), `pnpm pg:connect:migrate`, `pnpm pg:connect:status`, `pnpm pg:connect:shell`
 - **PostgreSQL health:** `pnpm pg:doctor`
 - **Migrations:** `pnpm migrate:up`, `pnpm migrate:down`, `pnpm migrate:create <nombre>`, `pnpm migrate:status`
 - **DB types:** `pnpm db:generate-types` (regenerar después de cada migración)
@@ -336,9 +337,17 @@ AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs
 
 ### PostgreSQL Access
 
-- **Método preferido (todos los entornos)**: Cloud SQL Connector vía `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`. Conecta sin TCP directo — negocia túnel seguro por la Cloud SQL Admin API. Funciona en Vercel (WIF + OIDC), local, y agentes AI.
+- **Script automatizado `pg-connect.sh`** — resuelve ADC, levanta Cloud SQL Proxy, conecta con el usuario correcto y ejecuta la operación solicitada. **Usar esto primero antes de intentar conectar manualmente.**
+  ```bash
+  pnpm pg:connect              # Verificar ADC + levantar proxy + test conexión
+  pnpm pg:connect:migrate      # Lo anterior + ejecutar migraciones pendientes
+  pnpm pg:connect:status       # Lo anterior + mostrar estado de migraciones
+  pnpm pg:connect:shell        # Lo anterior + abrir shell SQL interactivo
+  ```
+  El script selecciona automáticamente el usuario correcto: `ops` para connect/migrate/status, `admin` para shell.
+- **Método preferido (runtime en todos los entornos)**: Cloud SQL Connector vía `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`. Conecta sin TCP directo — negocia túnel seguro por la Cloud SQL Admin API. Funciona en Vercel (WIF + OIDC), local, y agentes AI.
 - **La IP pública de Cloud SQL NO es accesible por TCP directo** — no hay authorized networks configuradas. Intentar conectar a `34.86.135.144` da `ETIMEDOUT`.
-- **Migraciones y binarios standalone** (`pnpm migrate:up`, `pg_dump`, `psql`): requieren Cloud SQL Auth Proxy como túnel local:
+- **Migraciones y binarios standalone** (`pnpm migrate:up`, `pg_dump`, `psql`): requieren Cloud SQL Auth Proxy como túnel local. Usar `pnpm pg:connect` para levantarlo automáticamente, o manualmente:
   ```bash
   cloud-sql-proxy "efeonce-group:us-east4:greenhouse-pg-dev" --port 15432
   # .env.local: GREENHOUSE_POSTGRES_HOST="127.0.0.1", PORT="15432", SSL="false"

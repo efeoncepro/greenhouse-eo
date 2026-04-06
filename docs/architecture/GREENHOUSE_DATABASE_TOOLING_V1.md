@@ -185,9 +185,48 @@ When `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME` is set, `src/lib/postgres/cl
 
 **This covers ALL Node.js tools**: `pnpm migrate:*`, `pnpm db:generate-types`, `pnpm setup:postgres:*`, `pnpm pg:doctor`, backfill scripts, and the portal runtime.
 
-### Fallback: Cloud SQL Auth Proxy (standalone binaries only)
+### Automated: `pg-connect.sh` (recommended for interactive use)
 
-Standalone binaries like `pg_dump` and `psql` cannot use the Node.js Connector. For these, use Cloud SQL Auth Proxy:
+The script `scripts/pg-connect.sh` automates the entire connectivity lifecycle — ADC verification, proxy startup, user selection, and operation execution — in a single command.
+
+```bash
+pnpm pg:connect              # Verify ADC + start proxy + test connection
+pnpm pg:connect:migrate      # Above + apply pending migrations (pnpm migrate:up)
+pnpm pg:connect:status       # Above + show migration status (pnpm migrate:status)
+pnpm pg:connect:shell        # Above + open interactive SQL shell (as admin)
+```
+
+**What it does automatically:**
+
+1. **ADC check** — verifies `gcloud auth application-default print-access-token`. If expired, runs `gcloud auth application-default login`.
+2. **Port cleanup** — kills any existing process on port 15432 to avoid conflicts.
+3. **Proxy start** — launches `cloud-sql-proxy` on `127.0.0.1:15432` as a background process.
+4. **User resolution** — selects the correct PostgreSQL user per operation:
+   - `connect`, `migrate`, `status` → `GREENHOUSE_POSTGRES_OPS_USER` / `GREENHOUSE_POSTGRES_OPS_PASSWORD`
+   - `shell` → `GREENHOUSE_POSTGRES_ADMIN_USER` / `GREENHOUSE_POSTGRES_ADMIN_PASSWORD`
+5. **Connection test** — verifies the connection works before proceeding with the operation.
+6. **Operation execution** — runs the requested operation (`migrate:up`, `migrate:status`, or `psql`).
+
+**Prerequisites:**
+
+| Requirement | How to satisfy |
+|-------------|---------------|
+| `cloud-sql-proxy` binary | `gcloud components install cloud-sql-proxy` |
+| `.env.local` with PG credentials | Must contain `GREENHOUSE_POSTGRES_OPS_USER`, `GREENHOUSE_POSTGRES_OPS_PASSWORD`, `GREENHOUSE_POSTGRES_ADMIN_USER`, `GREENHOUSE_POSTGRES_ADMIN_PASSWORD` |
+| GCP project access | `gcloud auth application-default login` (script handles renewal) |
+
+**Configuration:**
+
+| Constant | Default | Override |
+|----------|---------|----------|
+| `INSTANCE` | `efeonce-group:us-east4:greenhouse-pg-dev` | Edit script |
+| `PORT` | `15432` | Edit script |
+| `DATABASE` | `greenhouse_app` | Edit script |
+| `CLOUD_SQL_PROXY` | Auto-detected via `which` | `CLOUD_SQL_PROXY_BIN` env var |
+
+### Fallback: Cloud SQL Auth Proxy (manual)
+
+For standalone binaries or when `pg-connect.sh` is not suitable, start the proxy manually:
 
 ```bash
 # Install (once)
@@ -249,6 +288,7 @@ greenhouse-eo/
 ├── migrations/                              # Versioned SQL migrations
 │   └── 20260401120000000_initial-baseline.sql  # Baseline (no-op)
 ├── scripts/
+│   ├── pg-connect.sh                        # Automated Cloud SQL connectivity (ADC + proxy + connect)
 │   ├── migrate.ts                           # Migration CLI wrapper
 │   ├── generate-db-types.ts                 # Kysely codegen wrapper
 │   └── lib/
