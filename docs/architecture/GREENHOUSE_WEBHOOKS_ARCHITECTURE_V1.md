@@ -127,6 +127,27 @@ outbox_events (published) → webhook-dispatch cron (*/2 min) → matches wh-sub
   - `staging`: `assignment.created` visible en campanita y `payroll_period.exported` con 4 notificaciones `payroll_ready`
   - `production`: delivery firmada real `assignment.created` con notificación persistida para `user-efeonce-admin-julio-reyes`
 
+### Resend Email Delivery Webhooks (TASK-269)
+
+**Endpoint:** `POST /api/webhooks/resend`
+**Authentication:** HMAC-SHA256 via Svix signing (`svix-id`, `svix-timestamp`, `svix-signature` headers)
+**Secret:** `RESEND_WEBHOOK_SIGNING_SECRET` (stored in Secret Manager, `whsec_` prefixed)
+
+**Events consumed:**
+
+| Resend Event | Action | Database Effect |
+|-------------|--------|-----------------|
+| `email.bounced` (hard) | Mark recipient undeliverable | `client_users.email_undeliverable = TRUE` |
+| `email.bounced` (soft) | Log only | Outbox event published |
+| `email.complained` | Auto-unsubscribe from email type | `email_subscriptions.active = FALSE` |
+| `email.delivered` | Update delivery tracking | `email_deliveries.status = 'delivered'` |
+
+**Outbox events emitted:** `email_delivery.bounced`, `email_delivery.complained`, `email_delivery.undeliverable_marked`
+
+**Error handling:** Always returns 200 (even on processing errors) to prevent Resend retries. Errors logged for investigation. Only returns 401 for invalid signatures.
+
+**Configuration:** Webhook URL must be registered in Resend dashboard pointing to `https://greenhouse.efeoncepro.com/api/webhooks/resend`
+
 ### Not Yet Active
 
 - No external consumers registered (first real external consumer is a future task)

@@ -177,6 +177,18 @@ Notas:
 | `auth_session` | `auth.login.success` | `auth.ts` (NextAuth `events.signIn`) | `{ userId, email, provider, tenantType }` | — |
 | `auth_session` | `auth.login.failed` | `auth.ts` (credentials `authorize`) | `{ email, provider, reason }` | — |
 
+### Email Delivery
+
+| Aggregate | Event Type | Trigger | Payload |
+|-----------|-----------|---------|---------|
+| `email_delivery` | `email_delivery.bounced` | Resend webhook `email.bounced` | `{ recipientEmail, resendId, bounceType, reason }` |
+| `email_delivery` | `email_delivery.complained` | Resend webhook `email.complained` | `{ recipientEmail, resendId, reason }` |
+| `email_delivery` | `email_delivery.rate_limited` | deliverRecipient() rate limit exceeded | `{ recipientEmail, emailType, currentCount, limit }` |
+| `email_delivery` | `email_delivery.undeliverable_marked` | Hard bounce → client_users.email_undeliverable = true | `{ recipientEmail, userId, reason }` |
+
+Publisher: `src/app/api/webhooks/resend/route.ts` (bounce/complaint), `src/lib/email/delivery.ts` (rate_limited)
+Consumer: none yet (future: admin alerts, delivery health metrics)
+
 ### Services (nuevo)
 
 | Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
