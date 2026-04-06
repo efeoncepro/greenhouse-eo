@@ -15,7 +15,7 @@ import Typography from '@mui/material/Typography'
 
 import CustomTextField from '@core/components/mui/TextField'
 
-import type { CreateLeaveRequestInput, HrLeaveType } from '@/types/hr-core'
+import type { CreateLeaveRequestInput, HrLeaveType, LeaveDayPeriod } from '@/types/hr-core'
 import GreenhouseFileUploader, { type UploadedFileValue } from './GreenhouseFileUploader'
 
 type LeaveRequestDialogProps = {
@@ -41,6 +41,8 @@ const LeaveRequestDialog = ({
   const [leaveTypeCode, setLeaveTypeCode] = useState('')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
+  const [startPeriod, setStartPeriod] = useState<LeaveDayPeriod>('full_day')
+  const [endPeriod, setEndPeriod] = useState<LeaveDayPeriod>('full_day')
   const [reason, setReason] = useState('')
   const [attachmentAsset, setAttachmentAsset] = useState<UploadedFileValue | null>(null)
   const [notes, setNotes] = useState('')
@@ -58,6 +60,8 @@ const LeaveRequestDialog = ({
     setLeaveTypeCode(activeLeaveTypes[0]?.leaveTypeCode || '')
     setStartDate('')
     setEndDate('')
+    setStartPeriod('full_day')
+    setEndPeriod('full_day')
     setReason('')
     setAttachmentAsset(null)
     setNotes('')
@@ -78,6 +82,8 @@ const LeaveRequestDialog = ({
       leaveTypeCode,
       startDate,
       endDate,
+      startPeriod,
+      endPeriod,
       reason: reason || null,
       attachmentAssetId: attachmentAsset?.assetId || null,
       attachmentUrl: null,
@@ -124,7 +130,11 @@ const LeaveRequestDialog = ({
                 label='Desde'
                 type='date'
                 value={startDate}
-                onChange={event => setStartDate(event.target.value)}
+                onChange={event => {
+                  setStartDate(event.target.value)
+                  setStartPeriod('full_day')
+                  setEndPeriod('full_day')
+                }}
                 InputLabelProps={{ shrink: true }}
                 required
               />
@@ -136,12 +146,67 @@ const LeaveRequestDialog = ({
                 label='Hasta'
                 type='date'
                 value={endDate}
-                onChange={event => setEndDate(event.target.value)}
+                onChange={event => {
+                  setEndDate(event.target.value)
+                  setStartPeriod('full_day')
+                  setEndPeriod('full_day')
+                }}
                 InputLabelProps={{ shrink: true }}
                 required
               />
             </Grid>
           </Grid>
+
+          {startDate && endDate && startDate === endDate && (
+            <CustomTextField
+              select
+              fullWidth
+              size='small'
+              label='Jornada'
+              value={startPeriod === 'full_day' && endPeriod === 'full_day' ? 'full_day' : startPeriod}
+              onChange={event => {
+                const value = event.target.value as LeaveDayPeriod
+
+                setStartPeriod(value)
+                setEndPeriod(value)
+              }}
+            >
+              <MenuItem value='full_day'>Dia completo</MenuItem>
+              <MenuItem value='morning'>Solo mañana</MenuItem>
+              <MenuItem value='afternoon'>Solo tarde</MenuItem>
+            </CustomTextField>
+          )}
+
+          {startDate && endDate && startDate !== endDate && (
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <CustomTextField
+                  select
+                  fullWidth
+                  size='small'
+                  label='Primer dia'
+                  value={startPeriod}
+                  onChange={event => setStartPeriod(event.target.value as LeaveDayPeriod)}
+                >
+                  <MenuItem value='full_day'>Dia completo</MenuItem>
+                  <MenuItem value='afternoon'>Desde la tarde</MenuItem>
+                </CustomTextField>
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <CustomTextField
+                  select
+                  fullWidth
+                  size='small'
+                  label='Ultimo dia'
+                  value={endPeriod}
+                  onChange={event => setEndPeriod(event.target.value as LeaveDayPeriod)}
+                >
+                  <MenuItem value='full_day'>Dia completo</MenuItem>
+                  <MenuItem value='morning'>Solo la mañana</MenuItem>
+                </CustomTextField>
+              </Grid>
+            </Grid>
+          )}
 
           <Typography variant='caption' color='text.secondary'>
             Los días hábiles se calculan automáticamente desde el calendario operativo y feriados Chile.

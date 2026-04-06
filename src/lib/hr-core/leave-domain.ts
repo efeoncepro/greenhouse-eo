@@ -6,6 +6,8 @@ import {
 } from '@/lib/calendar/operational-calendar'
 import { loadNagerDateHolidayDateSet } from '@/lib/calendar/nager-date-holidays'
 
+export type LeaveDayPeriod = 'full_day' | 'morning' | 'afternoon'
+
 export type LeaveHolidaySource = 'nager' | 'empty-fallback' | 'none'
 
 export interface LeavePolicy {
@@ -180,11 +182,15 @@ export const loadHolidayDateSetForRange = async ({
 export const computeLeaveDayBreakdown = async ({
   startDate,
   endDate,
-  countryCode
+  countryCode,
+  startPeriod = 'full_day',
+  endPeriod = 'full_day'
 }: {
   startDate: string
   endDate: string
   countryCode: string | null
+  startPeriod?: LeaveDayPeriod
+  endPeriod?: LeaveDayPeriod
 }): Promise<LeaveDayBreakdown> => {
   const { holidayDates, source } = await loadHolidayDateSetForRange({
     startDate,
@@ -208,8 +214,34 @@ export const computeLeaveDayBreakdown = async ({
     daysByYear.set(year, (daysByYear.get(year) ?? 0) + 1)
   }
 
+  if (dateKeys.length === 1) {
+    if (startPeriod === 'morning' || startPeriod === 'afternoon') {
+      const year = Number(dateKeys[0].slice(0, 4))
+
+      daysByYear.set(year, (daysByYear.get(year) ?? 1) - 0.5)
+    }
+  } else if (dateKeys.length > 1) {
+    if (startPeriod === 'afternoon') {
+      const firstYear = Number(dateKeys[0].slice(0, 4))
+
+      daysByYear.set(firstYear, (daysByYear.get(firstYear) ?? 1) - 0.5)
+    }
+
+    if (endPeriod === 'morning') {
+      const lastYear = Number(dateKeys[dateKeys.length - 1].slice(0, 4))
+
+      daysByYear.set(lastYear, (daysByYear.get(lastYear) ?? 1) - 0.5)
+    }
+  }
+
+  let totalDays = 0
+
+  for (const days of daysByYear.values()) {
+    totalDays += days
+  }
+
   return {
-    totalDays: dateKeys.length,
+    totalDays,
     dateKeys,
     daysByYear,
     holidaySource: source,
@@ -348,11 +380,49 @@ export const getLeaveColorByStatus = (status: string) => {
 
 export const getLeaveTitle = ({
   leaveTypeName,
-  memberName
+  memberName,
+  startPeriod = 'full_day',
+  endPeriod = 'full_day',
+  isSingleDay = false
 }: {
   leaveTypeName: string
   memberName: string | null
-}) => (memberName?.trim() ? `${memberName} · ${leaveTypeName}` : leaveTypeName)
+  startPeriod?: LeaveDayPeriod
+  endPeriod?: LeaveDayPeriod
+  isSingleDay?: boolean
+}) => {
+  const base = memberName?.trim() ? `${memberName} · ${leaveTypeName}` : leaveTypeName
+
+  if (startPeriod === 'full_day' && endPeriod === 'full_day') {
+    return base
+  }
+
+  if (isSingleDay) {
+    if (startPeriod === 'morning') {
+      return `${base} (AM)`
+    }
+
+    if (startPeriod === 'afternoon') {
+      return `${base} (PM)`
+    }
+
+    return base
+  }
+
+  if (startPeriod === 'afternoon' && endPeriod === 'morning') {
+    return `${base} (PM→AM)`
+  }
+
+  if (startPeriod === 'afternoon') {
+    return `${base} (desde PM)`
+  }
+
+  if (endPeriod === 'morning') {
+    return `${base} (hasta AM)`
+  }
+
+  return base
+}
 
 export const getLeaveEventEndDate = (endDate: string) => addUtcDays(endDate, 1)
 

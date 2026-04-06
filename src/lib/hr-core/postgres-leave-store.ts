@@ -35,7 +35,7 @@ import {
   listPeriodIdsInRange,
   loadHolidayDateSetForRange
 } from '@/lib/hr-core/leave-domain'
-import type { LeavePayrollImpactPeriod, LeavePolicy } from '@/lib/hr-core/leave-domain'
+import type { LeaveDayPeriod, LeavePayrollImpactPeriod, LeavePolicy } from '@/lib/hr-core/leave-domain'
 import {
   isGreenhousePostgresConfigured,
   runGreenhousePostgresQuery,
@@ -110,6 +110,8 @@ type PostgresLeaveRequestRow = {
   leave_type_name: string | null
   start_date: string | Date
   end_date: string | Date
+  start_period: string | null
+  end_period: string | null
   requested_days: number | string
   status: string
   reason: string | null
@@ -272,7 +274,7 @@ const mapLeavePolicy = (row: PostgresLeavePolicyRow): HrLeavePolicy & LeavePolic
   annualDays: toNullableNumber(row.annual_days) ?? 0,
   maxCarryOverDays: toNullableNumber(row.max_carry_over_days) ?? 0,
   requiresApproval: Boolean(row.requires_approval),
-  minAdvanceDays: toInt(row.min_advance_days),
+  minAdvanceDays: toNullableNumber(row.min_advance_days) ?? 0,
   maxConsecutiveDays: toNullableNumber(row.max_consecutive_days),
   minContinuousDays: toNullableNumber(row.min_continuous_days),
   maxAccumulationPeriods: toNullableNumber(row.max_accumulation_periods),
@@ -302,6 +304,8 @@ const mapLeaveRequest = (row: PostgresLeaveRequestRow): HrLeaveRequest => ({
   leaveTypeName: normalizeNullableString(row.leave_type_name) || row.leave_type_code,
   startDate: toPgDateString(row.start_date) || '',
   endDate: toPgDateString(row.end_date) || '',
+  startPeriod: (row.start_period || 'full_day') as LeaveDayPeriod,
+  endPeriod: (row.end_period || 'full_day') as LeaveDayPeriod,
   requestedDays: toNullableNumber(row.requested_days) ?? 0,
   status: (normalizeNullableString(row.status) || 'pending_supervisor') as HrLeaveRequest['status'],
   reason: normalizeNullableString(row.reason),
@@ -859,6 +863,8 @@ const getLeaveRequestByIdInternal = async (requestId: string, client?: PoolClien
         lt.leave_type_name,
         r.start_date,
         r.end_date,
+        r.start_period,
+        r.end_period,
         r.requested_days,
         r.status,
         r.reason,
@@ -1159,6 +1165,8 @@ export const listLeaveRequestsFromPostgres = async ({
         lt.leave_type_name,
         r.start_date,
         r.end_date,
+        r.start_period,
+        r.end_period,
         r.requested_days,
         r.status,
         r.reason,
@@ -1263,6 +1271,8 @@ export const listLeaveCalendarFromPostgres = async ({
         lt.leave_type_name,
         r.start_date,
         r.end_date,
+        r.start_period,
+        r.end_period,
         r.requested_days,
         r.status,
         r.reason,
@@ -1305,7 +1315,10 @@ export const listLeaveCalendarFromPostgres = async ({
       id: request.requestId,
       title: getLeaveTitle({
         leaveTypeName: request.leaveTypeName,
-        memberName: request.memberName
+        memberName: request.memberName,
+        startPeriod: request.startPeriod,
+        endPeriod: request.endPeriod,
+        isSingleDay: request.startDate === request.endDate
       }),
       start: request.startDate,
       end: getLeaveEventEndDate(request.endDate),
@@ -1318,7 +1331,9 @@ export const listLeaveCalendarFromPostgres = async ({
         memberName: request.memberName,
         leaveTypeCode: request.leaveTypeCode,
         leaveTypeName: request.leaveTypeName,
-        requestedDays: request.requestedDays
+        requestedDays: request.requestedDays,
+        startPeriod: request.startPeriod,
+        endPeriod: request.endPeriod
       }
     }
   })
@@ -1372,6 +1387,24 @@ export const createLeaveRequestInPostgres = async ({
     throw new HrCoreValidationError('endDate must be greater than or equal to startDate.')
   }
 
+  const VALID_PERIODS = ['full_day', 'morning', 'afternoon'] as const
+
+  const startPeriod: LeaveDayPeriod = VALID_PERIODS.includes(input.startPeriod as typeof VALID_PERIODS[number])
+    ? (input.startPeriod as LeaveDayPeriod)
+    : 'full_day'
+
+  const endPeriod: LeaveDayPeriod = VALID_PERIODS.includes(input.endPeriod as typeof VALID_PERIODS[number])
+    ? (input.endPeriod as LeaveDayPeriod)
+    : 'full_day'
+
+  if (startDate === endDate && startPeriod !== endPeriod) {
+    throw new HrCoreValidationError('For single-day requests, startPeriod and endPeriod must match.', 409)
+  }
+
+  if (startDate === endDate && startPeriod === 'afternoon' && endPeriod === 'morning') {
+    throw new HrCoreValidationError('Invalid period combination: afternoon start with morning end on the same day.', 409)
+  }
+
   return withGreenhousePostgresTransaction(async client => {
     const member = await getMemberById(effectiveMemberId, client)
 
@@ -1396,7 +1429,9 @@ export const createLeaveRequestInPostgres = async ({
     const dayBreakdown = await computeLeaveDayBreakdown({
       startDate,
       endDate,
-      countryCode: 'CL'
+      countryCode: 'CL',
+      startPeriod,
+      endPeriod
     })
 
     const requestedDays = dayBreakdown.totalDays
@@ -1491,6 +1526,8 @@ export const createLeaveRequestInPostgres = async ({
           leave_type_code,
           start_date,
           end_date,
+          start_period,
+          end_period,
           requested_days,
           status,
           reason,
@@ -1500,7 +1537,7 @@ export const createLeaveRequestInPostgres = async ({
           notes,
           created_by_user_id
         )
-        VALUES ($1, $2, $3, $4::date, $5::date, $6, $7, $8, $9, $10, $11, $12, $13)
+        VALUES ($1, $2, $3, $4::date, $5::date, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
       `,
       [
         requestId,
@@ -1508,6 +1545,8 @@ export const createLeaveRequestInPostgres = async ({
         leaveTypeCode,
         startDate,
         endDate,
+        startPeriod,
+        endPeriod,
         requestedDays,
         status,
         reason,
@@ -1574,6 +1613,8 @@ export const createLeaveRequestInPostgres = async ({
       leaveTypeName: leaveType.leaveTypeName,
       startDate,
       endDate,
+      startPeriod,
+      endPeriod,
       requestedDays,
       status,
       reason,
@@ -1689,7 +1730,9 @@ export const reviewLeaveRequestInPostgres = async ({
     const dayBreakdown = await computeLeaveDayBreakdown({
       startDate: request.startDate,
       endDate: request.endDate,
-      countryCode: 'CL'
+      countryCode: 'CL',
+      startPeriod: request.startPeriod,
+      endPeriod: request.endPeriod
     })
 
     const tracksBalance = doesLeaveTrackBalance(policy)

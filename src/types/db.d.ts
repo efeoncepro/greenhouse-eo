@@ -335,12 +335,14 @@ export interface GreenhouseCoreClientUsers {
   deactivated_at: Timestamp | null;
   default_portal_home_path: string | null;
   email: string | null;
+  email_undeliverable: Generated<boolean>;
   full_name: string | null;
   google_email: string | null;
   google_sub: string | null;
   identity_profile_id: string | null;
   last_login_at: Timestamp | null;
   last_login_provider: string | null;
+  locale: Generated<string>;
   member_id: string | null;
   microsoft_email: string | null;
   microsoft_oid: string | null;
@@ -1706,7 +1708,7 @@ export interface GreenhouseHrLeavePolicies {
   max_accumulation_periods: Numeric | null;
   max_carry_over_days: Generated<Numeric>;
   max_consecutive_days: Numeric | null;
-  min_advance_days: Generated<number>;
+  min_advance_days: Generated<Numeric>;
   min_continuous_days: Numeric | null;
   policy_id: string;
   policy_name: string;
@@ -1737,6 +1739,7 @@ export interface GreenhouseHrLeaveRequests {
   decided_at: Timestamp | null;
   decided_by: string | null;
   end_date: Timestamp;
+  end_period: Generated<string>;
   hr_reviewer_user_id: string | null;
   leave_type_code: string;
   member_id: string;
@@ -1745,6 +1748,7 @@ export interface GreenhouseHrLeaveRequests {
   request_id: string;
   requested_days: Numeric;
   start_date: Timestamp;
+  start_period: Generated<string>;
   status: string;
   supervisor_member_id: string | null;
   updated_at: Generated<Timestamp>;

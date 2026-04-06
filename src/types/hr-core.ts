@@ -118,6 +118,8 @@ export interface HrLeaveRequest {
   leaveTypeName: string
   startDate: string
   endDate: string
+  startPeriod: 'full_day' | 'morning' | 'afternoon'
+  endPeriod: 'full_day' | 'morning' | 'afternoon'
   requestedDays: number
   status: HrLeaveRequestStatus
   reason: string | null
@@ -291,11 +293,15 @@ export interface UpdateHrMemberProfileInput {
   notes?: string | null
 }
 
+export type LeaveDayPeriod = 'full_day' | 'morning' | 'afternoon'
+
 export interface CreateLeaveRequestInput {
   memberId?: string
   leaveTypeCode: string
   startDate: string
   endDate: string
+  startPeriod?: LeaveDayPeriod
+  endPeriod?: LeaveDayPeriod
   requestedDays?: number | null
   reason?: string | null
   attachmentAssetId?: string | null

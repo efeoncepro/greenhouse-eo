@@ -177,6 +177,8 @@ type LeaveRequestRow = {
   leave_type_name: string | null
   start_date: { value?: string } | string | null
   end_date: { value?: string } | string | null
+  start_period: string | null
+  end_period: string | null
   requested_days: number | string | null
   status: string | null
   reason: string | null
@@ -327,6 +329,8 @@ const mapLeaveRequest = (row: LeaveRequestRow): HrLeaveRequest => ({
   leaveTypeName: String(row.leave_type_name || row.leave_type_code || ''),
   startDate: toDateString(row.start_date) || '',
   endDate: toDateString(row.end_date) || '',
+  startPeriod: (row.start_period || 'full_day') as 'full_day' | 'morning' | 'afternoon',
+  endPeriod: (row.end_period || 'full_day') as 'full_day' | 'morning' | 'afternoon',
   requestedDays: toNullableNumber(row.requested_days) ?? 0,
   status: (row.status || 'pending_supervisor') as HrLeaveRequest['status'],
   reason: normalizeNullableString(row.reason),
@@ -1550,6 +1554,8 @@ export const createLeaveRequest = async ({
           leaveTypeName: leaveType.leaveTypeName,
           startDate,
           endDate,
+          startPeriod: 'full_day' as const,
+          endPeriod: 'full_day' as const,
           requestedDays,
           status,
           reason: normalizeNullableString(input.reason),

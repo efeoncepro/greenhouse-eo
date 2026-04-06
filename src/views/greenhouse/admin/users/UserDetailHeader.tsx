@@ -1,10 +1,14 @@
 'use client'
 
+import { useState } from 'react'
+
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
+import CircularProgress from '@mui/material/CircularProgress'
 import Typography from '@mui/material/Typography'
+import { toast } from 'react-toastify'
 
 import { IdentityImageUploader } from '@/components/greenhouse'
 import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
@@ -19,9 +23,32 @@ type Props = {
 }
 
 const UserDetailHeader = ({ data }: Props) => {
+  const [resending, setResending] = useState(false)
+
   const avatarSrc = data.avatarUrl
     ? `/api/media/users/${data.userId}/avatar`
     : resolveAvatarPath({ name: data.fullName, email: data.email })
+
+  const handleResendOnboarding = async () => {
+    setResending(true)
+
+    try {
+      const response = await fetch(`/api/admin/users/${data.userId}/resend-onboarding`, { method: 'POST' })
+      const result = await response.json()
+
+      if (!response.ok) {
+        toast.error(result.error || GH_INTERNAL_MESSAGES.admin_user_detail_resend_onboarding_error)
+
+        return
+      }
+
+      toast.success(GH_INTERNAL_MESSAGES.admin_user_detail_resend_onboarding_success)
+    } catch {
+      toast.error(GH_INTERNAL_MESSAGES.admin_user_detail_resend_onboarding_error)
+    } finally {
+      setResending(false)
+    }
+  }
 
   return (
     <Card>
@@ -89,7 +116,13 @@ const UserDetailHeader = ({ data }: Props) => {
             </div>
           </div>
           <div className='flex gap-3'>
-            <Button variant='contained' className='flex gap-2' startIcon={<i className='tabler-mail-forward' />}>
+            <Button
+              variant='contained'
+              className='flex gap-2'
+              startIcon={resending ? <CircularProgress size={16} color='inherit' /> : <i className='tabler-mail-forward' />}
+              onClick={handleResendOnboarding}
+              disabled={data.status !== 'invited' || resending}
+            >
               {GH_INTERNAL_MESSAGES.admin_user_detail_resend_onboarding}
             </Button>
             <Button variant='tonal' color='warning' className='flex gap-2' startIcon={<i className='tabler-user-cancel' />}>
