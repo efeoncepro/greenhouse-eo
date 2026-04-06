@@ -62,6 +62,8 @@ CREATE TABLE IF NOT EXISTS greenhouse_hr.leave_requests (
   leave_type_code TEXT NOT NULL REFERENCES greenhouse_hr.leave_types(leave_type_code),
   start_date DATE NOT NULL,
   end_date DATE NOT NULL,
+  start_period TEXT NOT NULL DEFAULT 'full_day' CHECK (start_period IN ('full_day', 'morning', 'afternoon')),
+  end_period TEXT NOT NULL DEFAULT 'full_day' CHECK (end_period IN ('full_day', 'morning', 'afternoon')),
   requested_days NUMERIC(10, 2) NOT NULL,
   status TEXT NOT NULL CHECK (status IN ('pending_supervisor', 'pending_hr', 'approved', 'rejected', 'cancelled')),
   reason TEXT,

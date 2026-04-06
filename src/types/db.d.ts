@@ -1739,6 +1739,7 @@ export interface GreenhouseHrLeaveRequests {
   decided_at: Timestamp | null;
   decided_by: string | null;
   end_date: Timestamp;
+  end_period: Generated<string>;
   hr_reviewer_user_id: string | null;
   leave_type_code: string;
   member_id: string;
@@ -1747,6 +1748,7 @@ export interface GreenhouseHrLeaveRequests {
   request_id: string;
   requested_days: Numeric;
   start_date: Timestamp;
+  start_period: Generated<string>;
   status: string;
   supervisor_member_id: string | null;
   updated_at: Generated<Timestamp>;
