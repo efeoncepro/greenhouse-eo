@@ -31,6 +31,7 @@ import OptionMenu from '@core/components/option-menu'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 
 import type { AdminAccessOverview, AdminUserRow } from '@/lib/admin/get-admin-access-overview'
+import { ROLE_CODES } from '@/config/role-codes'
 import { GH_INTERNAL_MESSAGES, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
 import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 import { getInitials } from '@/utils/getInitials'
@@ -80,9 +81,22 @@ const UserListTable = ({ data }: { data: AdminAccessOverview }) => {
   const [sorting, setSorting] = useState<SortingState>([{ id: 'fullName', desc: false }])
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
+  const roleNameMap = useMemo(() => {
+    const map = new Map<string, string>()
+
+    for (const role of data.roles) {
+      map.set(role.roleCode, role.roleName)
+    }
+
+    return map
+  }, [data.roles])
+
   const roleOptions = useMemo(
-    () => Array.from(new Set(data.users.flatMap(user => user.roleCodes))).sort((left, right) => left.localeCompare(right)),
-    [data.users]
+    () =>
+      Object.values(ROLE_CODES)
+        .map(code => ({ code, label: roleNameMap.get(code) || toTitleCase(code) }))
+        .sort((a, b) => a.label.localeCompare(b.label, 'es')),
+    [roleNameMap]
   )
 
   const filteredUsers = useMemo(() => {
@@ -264,9 +278,9 @@ const UserListTable = ({ data }: { data: AdminAccessOverview }) => {
         <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
           <CustomTextField select fullWidth value={roleFilter} onChange={event => setRoleFilter(event.target.value)} label={GH_INTERNAL_MESSAGES.admin_users_filter_role}>
             <MenuItem value='all'>{GH_INTERNAL_MESSAGES.admin_users_filter_role_all}</MenuItem>
-            {roleOptions.map(roleCode => (
-              <MenuItem key={roleCode} value={roleCode}>
-                {toTitleCase(roleCode)}
+            {roleOptions.map(role => (
+              <MenuItem key={role.code} value={role.code}>
+                {role.label}
               </MenuItem>
             ))}
           </CustomTextField>
