@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { ROLE_CODES } from '@/config/role-codes'
+import { ROLE_CODES, isRoleCode } from '@/config/role-codes'
 import { getAdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
 import { enrichGovernancePreviewUsers, type AdminGovernanceUserPreview } from '@/lib/admin/admin-preview-persons'
 import { getAdminPersistedViewAccessGovernance } from '@/lib/admin/view-access-store'
@@ -111,15 +111,17 @@ export const getAdminViewAccessGovernance = async (): Promise<AdminGovernanceOve
 
   const access = await getAdminAccessOverview()
 
-  const roles: AdminGovernanceRole[] = access.roles.map(role => ({
-    roleCode: role.roleCode,
-    roleName: role.roleName,
-    tenantType: role.tenantType,
-    isAdmin: role.isAdmin,
-    isInternal: role.isInternal,
-    routeGroups: role.routeGroups,
-    assignedUsers: role.assignedUsers
-  }))
+  const roles: AdminGovernanceRole[] = access.roles
+    .filter(role => isRoleCode(role.roleCode))
+    .map(role => ({
+      roleCode: role.roleCode,
+      roleName: role.roleName,
+      tenantType: role.tenantType,
+      isAdmin: role.isAdmin,
+      isInternal: role.isInternal,
+      routeGroups: role.routeGroups,
+      assignedUsers: role.assignedUsers
+    }))
 
   const users = await enrichGovernancePreviewUsers(
     access.users.map(user => ({
