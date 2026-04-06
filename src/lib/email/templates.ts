@@ -232,6 +232,7 @@ registerTemplate('notification', (context: {
   actionLabel?: string
   recipientName?: string
   locale?: 'es' | 'en'
+  unsubscribeUrl?: string
 }) => {
   const locale = context.locale || 'es'
 
@@ -243,7 +244,8 @@ registerTemplate('notification', (context: {
       actionUrl: context.actionUrl,
       actionLabel: context.actionLabel,
       recipientName: context.recipientName,
-      locale
+      locale,
+      unsubscribeUrl: context.unsubscribeUrl
     }),
     text: buildNotificationPlainText({ ...context, locale })
   }
@@ -257,6 +259,7 @@ registerTemplate('payroll_export', (context: {
   exportedBy?: string | null
   exportedAt?: string | null
   attachments?: EmailAttachment[]
+  unsubscribeUrl?: string
 }) => ({
   subject: `Nómina cerrada — ${context.periodLabel} · ${context.entryCount} colaboradores`,
   react: PayrollExportReadyEmail({
@@ -265,7 +268,8 @@ registerTemplate('payroll_export', (context: {
     breakdowns: context.breakdowns,
     netTotalDisplay: context.netTotalDisplay,
     exportedBy: context.exportedBy ?? undefined,
-    exportedAt: formatShortDateTime(context.exportedAt) ?? undefined
+    exportedAt: formatShortDateTime(context.exportedAt) ?? undefined,
+    unsubscribeUrl: context.unsubscribeUrl
   }),
   text: buildPayrollExportPlainText(context),
   attachments: context.attachments

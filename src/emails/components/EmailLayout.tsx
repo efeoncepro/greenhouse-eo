@@ -9,9 +9,10 @@ interface EmailLayoutProps {
   previewText?: string
   lang?: 'es' | 'en'
   locale?: 'es' | 'en'
+  unsubscribeUrl?: string
 }
 
-export default function EmailLayout({ children, previewText, lang, locale = 'es' }: EmailLayoutProps) {
+export default function EmailLayout({ children, previewText, lang, locale = 'es', unsubscribeUrl }: EmailLayoutProps) {
   const effectiveLang = lang ?? locale
 
   return (
@@ -94,6 +95,19 @@ export default function EmailLayout({ children, previewText, lang, locale = 'es'
               ? 'This is an automated email. If you have questions, contact your administrator.'
               : 'Este es un correo automático. Si tienes dudas, contacta a tu administrador.'}
           </Text>
+          {unsubscribeUrl && (
+            <Text style={{
+              fontFamily: EMAIL_FONTS.body,
+              fontSize: '11px',
+              color: EMAIL_COLORS.muted,
+              lineHeight: '16px',
+              margin: '12px 0 0',
+            }}>
+              <Link href={unsubscribeUrl} style={{ color: EMAIL_COLORS.muted, textDecoration: 'underline' }}>
+                {locale === 'en' ? 'Unsubscribe from these emails' : 'Dejar de recibir estos correos'}
+              </Link>
+            </Text>
+          )}
         </Section>
       </Body>
     </Html>

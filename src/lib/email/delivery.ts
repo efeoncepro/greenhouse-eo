@@ -9,6 +9,7 @@ import { resolveEmailContext, EmailUndeliverableError } from './context-resolver
 import { checkRecipientRateLimit } from './rate-limit'
 import { getSubscribers } from './subscriptions'
 import { resolveTemplate } from './templates'
+import { generateUnsubscribeUrl } from './unsubscribe'
 import type {
   EmailDomain,
   EmailAttachment,
@@ -405,13 +406,26 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
       }
     }
 
+    // ── Unsubscribe URL: only for broadcast email types ──
+    const BROADCAST_EMAIL_TYPES: EmailType[] = ['payroll_export', 'notification']
+    let unsubscribeUrl: string | undefined
+
+    if (BROADCAST_EMAIL_TYPES.includes(input.emailType)) {
+      try {
+        unsubscribeUrl = await generateUnsubscribeUrl(input.recipient.email, input.emailType)
+      } catch {
+        // Non-blocking: if token generation fails, send without unsubscribe link
+      }
+    }
+
     // Merge contexts: caller values take precedence over auto-resolved
     const mergedContext = {
       ...resolvedContext,
       ...input.context,
       recipientEmail: input.recipient.email,
       recipientName: input.recipient.name,
-      recipientUserId: input.recipient.userId
+      recipientUserId: input.recipient.userId,
+      unsubscribeUrl
     }
 
     const resolvedTemplate = resolveTemplate(input.emailType, mergedContext)

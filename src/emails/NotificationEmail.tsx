@@ -11,6 +11,7 @@ interface NotificationEmailProps {
   actionLabel?: string
   recipientName?: string
   locale?: 'es' | 'en'
+  unsubscribeUrl?: string
 }
 
 export default function NotificationEmail({
@@ -19,7 +20,8 @@ export default function NotificationEmail({
   actionUrl = 'https://greenhouse.efeoncepro.com/delivery',
   actionLabel,
   recipientName = 'María González',
-  locale = 'es'
+  locale = 'es',
+  unsubscribeUrl
 }: NotificationEmailProps) {
   const t = locale === 'en' ? {
     greeting: (name?: string) => name ? `Hi ${name},` : 'Hi,',
@@ -32,7 +34,7 @@ export default function NotificationEmail({
   }
 
   return (
-    <EmailLayout previewText={title} locale={locale}>
+    <EmailLayout previewText={title} locale={locale} unsubscribeUrl={unsubscribeUrl}>
       <Heading style={{
         fontFamily: EMAIL_FONTS.heading,
         fontSize: '24px',
