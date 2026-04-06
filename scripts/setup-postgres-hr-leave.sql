@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_hr.leave_policies (
   annual_days NUMERIC(10, 2) NOT NULL DEFAULT 0,
   max_carry_over_days NUMERIC(10, 2) NOT NULL DEFAULT 0,
   requires_approval BOOLEAN NOT NULL DEFAULT TRUE,
-  min_advance_days INTEGER NOT NULL DEFAULT 0,
+  min_advance_days NUMERIC(10, 2) NOT NULL DEFAULT 0,
   max_consecutive_days NUMERIC(10, 2),
   min_continuous_days NUMERIC(10, 2),
   max_accumulation_periods NUMERIC(10, 2),
@@ -180,10 +180,10 @@ VALUES
   ('policy-bereavement-default', 'bereavement', 'Permiso por duelo', 'annual_fixed', 3, 0, TRUE, 0, 3, 1, 0, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], FALSE, TRUE),
   ('policy-civic-duty-default', 'civic_duty', 'Permiso por deber cívico', 'annual_fixed', 2, 0, TRUE, 0, 2, 1, 0, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], FALSE, TRUE),
   ('policy-parental-default', 'parental', 'Permiso parental extendido', 'custom', 0, 0, TRUE, 0, NULL, NULL, NULL, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], TRUE, TRUE),
-  ('policy-study-default', 'study', 'Permiso por estudio', 'custom', 0, 0, TRUE, 3, NULL, NULL, NULL, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], TRUE, TRUE),
+  ('policy-study-default', 'study', 'Permiso por estudio', 'custom', 0, 0, TRUE, 1.5, NULL, NULL, NULL, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], TRUE, TRUE),
   ('policy-personal-default', 'personal', 'Permiso personal', 'custom', 0, 0, TRUE, 1, NULL, NULL, NULL, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], TRUE, TRUE),
   ('policy-medical-default', 'medical', 'Permiso médico', 'custom', 0, 0, TRUE, 0, NULL, NULL, NULL, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], TRUE, TRUE),
-  ('policy-unpaid-default', 'unpaid', 'Permiso sin goce', 'custom', 0, 0, TRUE, 1, NULL, NULL, NULL, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], TRUE, TRUE)
+  ('policy-unpaid-default', 'unpaid', 'Permiso sin goce', 'custom', 0, 0, TRUE, 2, NULL, NULL, NULL, FALSE, 10, 3, 10, ARRAY[]::TEXT[], ARRAY[]::TEXT[], TRUE, TRUE)
 ON CONFLICT (policy_id) DO UPDATE
 SET
   leave_type_code = EXCLUDED.leave_type_code,

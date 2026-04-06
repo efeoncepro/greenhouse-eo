@@ -1708,7 +1708,7 @@ export interface GreenhouseHrLeavePolicies {
   max_accumulation_periods: Numeric | null;
   max_carry_over_days: Generated<Numeric>;
   max_consecutive_days: Numeric | null;
-  min_advance_days: Generated<number>;
+  min_advance_days: Generated<Numeric>;
   min_continuous_days: Numeric | null;
   policy_id: string;
   policy_name: string;

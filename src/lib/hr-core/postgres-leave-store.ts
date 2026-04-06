@@ -272,7 +272,7 @@ const mapLeavePolicy = (row: PostgresLeavePolicyRow): HrLeavePolicy & LeavePolic
   annualDays: toNullableNumber(row.annual_days) ?? 0,
   maxCarryOverDays: toNullableNumber(row.max_carry_over_days) ?? 0,
   requiresApproval: Boolean(row.requires_approval),
-  minAdvanceDays: toInt(row.min_advance_days),
+  minAdvanceDays: toNullableNumber(row.min_advance_days) ?? 0,
   maxConsecutiveDays: toNullableNumber(row.max_consecutive_days),
   minContinuousDays: toNullableNumber(row.min_continuous_days),
   maxAccumulationPeriods: toNullableNumber(row.max_accumulation_periods),
