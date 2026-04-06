@@ -25,6 +25,7 @@ export const GH_INTERNAL_NAV = {
   adminOperationalCalendar: { label: 'Calendario operativo', subtitle: 'Feriados, cierre y hitos del mes operativo' },
   adminAiTools: { label: 'Herramientas IA', subtitle: 'Catálogo, licencias y créditos IA' },
   adminCorreos: { label: 'Correos', subtitle: 'Historial de envíos y suscripciones' },
+  adminEmailPreview: { label: 'Preview de correos', subtitle: 'Previsualizar y probar templates de email' },
   adminCloudIntegrations: { label: 'Cloud & Integrations', subtitle: 'Syncs, webhooks, auth y runtime operativo' },
   adminNotifications: { label: 'Notificaciones', subtitle: 'Sistema de notificaciones in-app y email' },
   adminOpsHealth: { label: 'Ops Health', subtitle: 'Outbox, proyecciones y freshness del serving' },

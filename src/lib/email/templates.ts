@@ -9,6 +9,7 @@ import VerifyEmail from '@/emails/VerifyEmail'
 
 import type {
   EmailAttachment,
+  EmailPreviewMeta,
   EmailTemplateContext,
   EmailTemplateRenderResult,
   EmailTemplateResolver,
@@ -16,8 +17,10 @@ import type {
 } from './types'
 
 type ResolverMap = Map<EmailType, EmailTemplateResolver<any>>
+type PreviewMetaMap = Map<EmailType, EmailPreviewMeta>
 
 const EMAIL_TEMPLATES: ResolverMap = new Map()
+const EMAIL_PREVIEW_META: PreviewMetaMap = new Map()
 
 const MONTH_NAMES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -169,6 +172,21 @@ export function resolveTemplate<TContext extends EmailTemplateContext>(
 
 export const listRegisteredTemplates = () => Array.from(EMAIL_TEMPLATES.keys())
 
+export function registerPreviewMeta(emailType: EmailType, meta: EmailPreviewMeta) {
+  EMAIL_PREVIEW_META.set(emailType, meta)
+}
+
+export function getPreviewMeta(emailType: EmailType): EmailPreviewMeta | null {
+  return EMAIL_PREVIEW_META.get(emailType) ?? null
+}
+
+export function getPreviewCatalog(): Array<{ emailType: EmailType } & EmailPreviewMeta> {
+  return Array.from(EMAIL_PREVIEW_META.entries()).map(([emailType, meta]) => ({
+    emailType,
+    ...meta
+  }))
+}
+
 registerTemplate('password_reset', (context: {
   resetUrl: string
   userName?: string
@@ -307,3 +325,126 @@ registerTemplate('payroll_receipt', (context: {
     contentType: 'application/pdf'
   }]
 }))
+
+// ═══════════════════════════════════════════════════════════
+// Preview Metadata Registry
+// Auto-descubrible: nuevos templates con registerPreviewMeta()
+// aparecen automaticamente en la vista de preview admin.
+// ═══════════════════════════════════════════════════════════
+
+registerPreviewMeta('invitation', {
+  label: 'Invitacion de onboarding',
+  description: 'Email que se envia al invitar un usuario nuevo a la plataforma',
+  domain: 'identity',
+  supportsLocale: true,
+  defaultProps: {
+    inviteUrl: 'https://greenhouse.efeoncepro.com/auth/accept-invite?token=preview-token',
+    inviterName: 'Julio Reyes',
+    clientName: 'Efeonce Group',
+    userName: 'Maria Gonzalez'
+  },
+  propsSchema: [
+    { key: 'inviterName', label: 'Nombre del invitador', type: 'text' },
+    { key: 'clientName', label: 'Nombre del cliente', type: 'text' },
+    { key: 'userName', label: 'Nombre del destinatario', type: 'text' },
+    { key: 'inviteUrl', label: 'URL de invitacion', type: 'text' }
+  ]
+})
+
+registerPreviewMeta('password_reset', {
+  label: 'Restablecer contrasena',
+  description: 'Email con enlace para cambiar la contrasena',
+  domain: 'identity',
+  supportsLocale: true,
+  defaultProps: {
+    resetUrl: 'https://greenhouse.efeoncepro.com/auth/reset-password?token=preview-token',
+    userName: 'Maria Gonzalez'
+  },
+  propsSchema: [
+    { key: 'userName', label: 'Nombre del destinatario', type: 'text' },
+    { key: 'resetUrl', label: 'URL de reset', type: 'text' }
+  ]
+})
+
+registerPreviewMeta('verify_email', {
+  label: 'Verificacion de correo',
+  description: 'Email para confirmar la direccion de correo electronico',
+  domain: 'identity',
+  supportsLocale: true,
+  defaultProps: {
+    verifyUrl: 'https://greenhouse.efeoncepro.com/auth/verify-email?token=preview-token',
+    userName: 'Maria Gonzalez'
+  },
+  propsSchema: [
+    { key: 'userName', label: 'Nombre del destinatario', type: 'text' },
+    { key: 'verifyUrl', label: 'URL de verificacion', type: 'text' }
+  ]
+})
+
+registerPreviewMeta('notification', {
+  label: 'Notificacion generica',
+  description: 'Template generico para notificaciones del sistema',
+  domain: 'system',
+  supportsLocale: true,
+  defaultProps: {
+    title: 'Nuevo activo disponible para revision',
+    body: 'El equipo de diseno subio 3 nuevos archivos al proyecto Campana Q2. Requieren tu aprobacion antes del viernes.',
+    actionUrl: 'https://greenhouse.efeoncepro.com/delivery',
+    recipientName: 'Maria Gonzalez'
+  },
+  propsSchema: [
+    { key: 'title', label: 'Titulo', type: 'text' },
+    { key: 'body', label: 'Cuerpo del mensaje', type: 'text' },
+    { key: 'actionUrl', label: 'URL de accion', type: 'text' },
+    { key: 'actionLabel', label: 'Texto del boton', type: 'text' },
+    { key: 'recipientName', label: 'Nombre del destinatario', type: 'text' }
+  ]
+})
+
+registerPreviewMeta('payroll_export', {
+  label: 'Nomina cerrada',
+  description: 'Notificacion de que la nomina del periodo fue exportada y esta lista para revision',
+  domain: 'payroll',
+  supportsLocale: false,
+  defaultProps: {
+    periodLabel: 'Marzo 2026',
+    entryCount: 11,
+    breakdowns: [
+      { currency: 'CLP', regimeLabel: 'Chile', grossTotal: '$12.450.000', netTotal: '$9.280.000', entryCount: 8 },
+      { currency: 'USD', regimeLabel: 'Internacional', grossTotal: 'US$8,500.00', netTotal: 'US$7,200.00', entryCount: 3 }
+    ],
+    netTotalDisplay: '$9.280.000 + US$7,200.00'
+  },
+  propsSchema: [
+    { key: 'periodLabel', label: 'Periodo', type: 'text' },
+    { key: 'entryCount', label: 'Colaboradores', type: 'number' },
+    { key: 'netTotalDisplay', label: 'Neto total a mostrar', type: 'text' }
+  ]
+})
+
+registerPreviewMeta('payroll_receipt', {
+  label: 'Recibo de nomina',
+  description: 'Liquidacion individual del colaborador con PDF adjunto',
+  domain: 'payroll',
+  supportsLocale: false,
+  defaultProps: {
+    fullName: 'Maria Gonzalez Rojas',
+    periodYear: 2026,
+    periodMonth: 3,
+    entryCurrency: 'CLP',
+    grossTotal: 1850000,
+    totalDeductions: 370000,
+    netTotal: 1480000,
+    payRegime: 'chile'
+  },
+  propsSchema: [
+    { key: 'fullName', label: 'Nombre completo', type: 'text' },
+    { key: 'periodYear', label: 'Ano', type: 'number' },
+    { key: 'periodMonth', label: 'Mes (1-12)', type: 'number' },
+    { key: 'entryCurrency', label: 'Moneda', type: 'select', options: ['CLP', 'USD'] },
+    { key: 'grossTotal', label: 'Bruto', type: 'number' },
+    { key: 'totalDeductions', label: 'Descuentos', type: 'number' },
+    { key: 'netTotal', label: 'Liquido', type: 'number' },
+    { key: 'payRegime', label: 'Regimen', type: 'select', options: ['chile', 'international'] }
+  ]
+})
