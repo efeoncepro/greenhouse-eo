@@ -103,7 +103,7 @@ export const listPermissionSets = async (): Promise<PermissionSetSummary[]> => {
       COALESCE(uc.user_count, 0) AS user_count
     FROM greenhouse_core.permission_sets ps
     LEFT JOIN (
-      SELECT set_id, COUNT(*)::text AS user_count
+      SELECT set_id, COUNT(*) AS user_count
       FROM greenhouse_core.user_permission_set_assignments
       WHERE active = true
         AND (expires_at IS NULL OR expires_at > NOW())
@@ -125,7 +125,7 @@ export const getPermissionSet = async (setId: string): Promise<PermissionSetDeta
       COALESCE(uc.user_count, 0) AS user_count
     FROM greenhouse_core.permission_sets ps
     LEFT JOIN (
-      SELECT set_id, COUNT(*)::text AS user_count
+      SELECT set_id, COUNT(*) AS user_count
       FROM greenhouse_core.user_permission_set_assignments
       WHERE active = true
         AND (expires_at IS NULL OR expires_at > NOW())
