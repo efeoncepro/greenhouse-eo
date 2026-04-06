@@ -272,6 +272,7 @@ export const EVENT_TYPES = {
   // User Lifecycle (TASK-253)
   userDeactivated: 'user.deactivated',
   userReactivated: 'user.reactivated',
+  invitationResent: 'invitation.resent',
 
   // Permission Sets (TASK-263)
   viewAccessSetAssigned: 'access.permission_set_assigned',

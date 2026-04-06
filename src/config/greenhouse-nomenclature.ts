@@ -923,6 +923,10 @@ export const GH_INTERNAL_MESSAGES = {
   admin_user_detail_commercial_readiness: 'Preparacion comercial',
   admin_user_detail_commercial_readiness_value: (hasContact: boolean) => hasContact ? '65%' : '35%',
 
+  admin_user_detail_resend_onboarding_success: 'Invitacion de onboarding reenviada.',
+  admin_user_detail_resend_onboarding_error: 'No se pudo reenviar la invitacion.',
+  admin_user_detail_resend_onboarding_not_eligible: 'Este usuario no es elegible para reenvio de onboarding.',
+
   // Cross-links Person 360
   admin_user_detail_link_people: 'Ver perfil operativo',
   people_detail_link_admin: 'Ver acceso y permisos',
