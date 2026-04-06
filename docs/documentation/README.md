@@ -10,7 +10,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 
 ### Admin Center
 
-_Pendiente de documentar._
+- [Sets de permisos](admin-center/sets-de-permisos.md) — Gobierno de acceso por conjuntos reutilizables de vistas
 
 ### Plataforma interna y calidad
 

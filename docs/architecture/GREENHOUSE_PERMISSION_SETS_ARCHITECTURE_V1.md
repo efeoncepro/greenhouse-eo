@@ -1,8 +1,8 @@
 # GREENHOUSE_PERMISSION_SETS_ARCHITECTURE_V1
 
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-04-05 por Claude (investigacion) + Julio Reyes (brief)
-> **Ultima actualizacion:** 2026-04-05 — implementacion completada
+> **Ultima actualizacion:** 2026-04-05 — implementacion completada + hardening UX/a11y
 > **Estado:** Implementado (TASK-263 completado 2026-04-05)
 
 ## 1. Problema
@@ -157,22 +157,41 @@ Response shape:
 
 ## 5. Superficies UI
 
-### 5.1 Ficha de accesos por usuario (NUEVO)
+### 5.1 Tab "Sets de permisos" en Admin > Vistas y acceso
 
-Accesible desde la vista de Person Detail (`/people/:slug`) o User Detail como un tab o seccion. Muestra:
+- **Ubicacion:** `/admin/views` → tab "Sets de permisos"
+- **Componente:** `src/views/greenhouse/admin/permission-sets/PermissionSetsTab.tsx`
 
-- **Roles actuales** — chips con route groups derivados
-- **Permission Sets asignados** — cards con nombre, descripcion, count de vistas, boton asignar/revocar
-- **Overrides activos** — tabla con viewCode, tipo (grant/revoke), razon, expiracion
-- **Effective Views** — lista completa con source attribution (icono + color por fuente)
+**Features implementadas:**
 
-### 5.2 Permission Set editor (NUEVO)
+- Lista de sets con busqueda, cards con nombre/descripcion/seccion/conteo de vistas y usuarios
+- Chip "Sistema" con tooltip para sets no eliminables (`is_system = true`)
+- Panel de detalle al hacer click: nombre, descripcion, checkboxes de vistas agrupadas por seccion, usuarios asignados
+- CRUD completo: crear (dialog con nombre/descripcion/seccion/checkboxes), editar (inline), eliminar (confirmacion), guardar
+- Asignacion de usuarios con Autocomplete searchable (nombre + email), no IDs crudos
+- Confirmacion antes de eliminar set o revocar usuario
+- Toasts de exito para todas las operaciones (react-toastify)
+- Cards accesibles: `role="button"`, `tabIndex={0}`, keyboard Enter/Space, `focus-visible` outline
+- `CircularProgress` para estados de carga
 
-Tab adicional en `/admin/views`. Muestra:
+### 5.2 Tab "Accesos" en Admin > Usuarios > [userId]
 
-- Lista de sets con nombre, descripcion, count de vistas, count de usuarios
-- Click en un set → editor: nombre, descripcion, checkboxes de vistas agrupados por seccion
-- Tab "Usuarios" dentro del set → lista de usuarios asignados + boton asignar
+- **Ubicacion:** `/admin/users/[id]` → tab "Accesos"
+- **Componente:** `src/views/greenhouse/admin/users/UserAccessTab.tsx`
+
+4 secciones stacked (no sub-tabs):
+
+1. **Roles asignados** — chips con color por rol, route groups secundarios
+2. **Sets de permisos** — cards con accent border, nombre, descripcion, conteo de vistas, badge "Sistema"
+3. **Ajustes manuales** — tabla con viewCode, label, fuente (siempre visible, con empty state si no hay)
+4. **Vistas efectivas** — summary chips (total, roles, heredados, sets, manuales) + Accordions por seccion con source chip por vista
+
+**Detalles de implementacion:**
+
+- Source chips con colores: role=primary, fallback=secondary, set=info, manual=warning
+- Link "Gestionar sets y permisos" → `/admin/views`
+- Error states separados para roles vs vistas
+- Datos reales de sets (fetch cruzado con `/api/admin/views/sets`)
 
 ### 5.3 Matriz rol × vista (ya existe, sin cambios)
 
@@ -200,7 +219,43 @@ Adicionalmente, cada asignacion de set emite un evento outbox `viewAccessSetAssi
 - Si las tablas no existen (entorno sin migracion), el fallback actual sigue funcionando sin cambios.
 - No se modifican tablas existentes.
 
-## 8. Diferencia con el modelo actual
+## 8. Notas de implementacion
+
+### Bugs encontrados y resueltos
+
+1. **FK violation en `view_access_log`** (CRITICAL): La columna `view_code` tenia FK a `view_registry`. Las acciones de sets pasaban `set_id` como `view_code`, violando la FK. Solucion: migracion `20260406003313975_permission-sets-audit-fix.sql` anade columna `target_set`, hace `view_code` nullable, y las acciones de sets usan `target_set` en vez de `view_code`.
+
+2. **COALESCE type mismatch**: `COUNT(*)::text` + `COALESCE(..., 0)` causaba error de tipos en PostgreSQL. Solucion: remover `::text` del COUNT.
+
+3. **Create/update no transaccionales**: La mutacion y el audit log eran queries separadas — si el audit fallaba, los datos se guardaban pero se retornaba 500. Solucion: envolver en `withGreenhousePostgresTransaction`.
+
+4. **FK violation en user assignment**: Asignar un `user_id` inexistente causaba 500 generico. Solucion: catch especifico del error code `23503` → retorna 400 con mensaje "Uno o mas usuarios no existen".
+
+### UX Hardening aplicado
+
+- Todas las instancias de "Permission Set" reemplazadas por "Set de permisos" (spanglish eliminado)
+- "Override" reemplazado por "Ajuste manual" en toda la UI
+- "fallback" reemplazado por "por defecto" / "heredado"
+- Jargon tecnico en alerts y KPIs de governance reescrito en espanol user-friendly
+- Audit log: action codes mapeados a labels en espanol
+- Preview chips: prefijos tecnicos (`portal:active`, `bridge:X`) reemplazados por labels humanos
+- Acentos corregidos: Descripcion, Seccion
+
+### Accesibilidad (WCAG 2.2 AA)
+
+- Cards clickeables: `role="button"`, `tabIndex={0}`, `onKeyDown` Enter/Space, `focus-visible` outline
+- FormGroup: `role="group"` + `aria-label` por seccion de vistas
+- Headings: `component="h3"` en subtitulos de seccion
+- Table: `aria-label` en tabla de ajustes manuales
+- Accordions: `aria-label` con nombre de seccion + conteo de vistas
+- Tooltip en chip "Sistema" explicando su proposito
+- Icons decorativos: `aria-hidden="true"` en todos los `<i>` dentro de chips
+
+### SECTION_ACCENT deduplicado
+
+El mapa de colores por seccion (`SECTION_ACCENT`) se movio a `src/lib/admin/view-access-catalog.ts` como export compartido, eliminando duplicacion entre `PermissionSetsTab.tsx` y `AdminViewAccessGovernanceView.tsx`.
+
+## 9. Diferencia con el modelo actual
 
 | Aspecto | Hoy | Con Permission Sets |
 |---|---|---|
