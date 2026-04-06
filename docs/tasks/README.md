@@ -20,7 +20,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-271`
+- siguiente ID disponible: `TASK-272`
 - `TASK-241` migra procesos batch pesados (ICO materialización, LLM enrichment) de Vercel Functions a Cloud Run. Formaliza política: batch > 30s → Cloud Run. Código listo, deploy operacional pendiente.
 - `TASK-239` enriquece el prompt LLM de Nexa Insights con glosario de métricas, cadena causal, doble capa narrativa y nombres de Space/miembros.
 - `TASK-240` agrega menciones interactivas (@mentions) de Spaces y miembros en los insights de Nexa — chips clickeables que navegan a perfiles. Depende de `TASK-239`.
@@ -103,6 +103,7 @@ Primer bloque operativo asignado:
 | `TASK-266` | [TASK-266-greenhouse-i18n-globalization-activation.md](to-do/TASK-266-greenhouse-i18n-globalization-activation.md)                                                          | P1        | Muy alto | Alto     | Diseno                  | Formalizar la activación i18n/globalization de Greenhouse como programa incremental separado de nomenclature, con strategy de locales, diccionarios, formatting y rollout por superficies                                       |
 | `TASK-267` | [TASK-267-admin-resend-onboarding-email.md](complete/TASK-267-admin-resend-onboarding-email.md)                                                                             | P2        | Medio    | Medio    | Complete                | Cablear boton "Reenviar onboarding" en ficha de usuario: endpoint POST, email via Resend, validacion status invited, toast feedback, outbox event                                                                               |
 | `TASK-268` | [TASK-268-admin-review-access-button.md](to-do/TASK-268-admin-review-access-button.md)                                                                                      | P2        | Bajo     | Bajo     | Diseno                  | Cablear boton "Revisar acceso" para navegar al tab Accesos del usuario (solo UI, sin backend)                                                                                                                                   |
+| `TASK-271` | [TASK-271-hr-leave-half-day-periods.md](to-do/TASK-271-hr-leave-half-day-periods.md)                                                                                        | P2        | Medio    | Medio    | Diseno                  | Soporte de medio dia en permisos: `start_period`/`end_period` en leave_requests, calculo fraccionario en `computeLeaveDayBreakdown()`, selector de periodo en form, indicador AM/PM en calendario                               |
 
 ## Complete
 
