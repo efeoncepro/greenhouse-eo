@@ -829,13 +829,13 @@ export const GH_INTERNAL_MESSAGES = {
 
   // ── Admin User Detail: Tab Accesos ──
   admin_user_access_roles_title: 'Roles asignados',
-  admin_user_access_roles_description: 'Roles activos del usuario y los modulos que habilitan.',
+  admin_user_access_roles_description: 'Roles activos del usuario y los módulos que habilitan.',
   admin_user_access_no_roles: 'Sin roles asignados.',
   admin_user_access_sets_title: 'Sets de permisos',
   admin_user_access_sets_description: 'Conjuntos de vistas adicionales asignados al usuario.',
   admin_user_access_no_sets: 'Sin sets de permisos asignados.',
-  admin_user_access_overrides_title: 'Overrides manuales',
-  admin_user_access_overrides_description: 'Vistas otorgadas individualmente al usuario fuera de roles y sets.',
+  admin_user_access_overrides_title: 'Ajustes manuales',
+  admin_user_access_overrides_description: 'Vistas otorgadas o revocadas individualmente al usuario.',
   admin_user_access_col_view_code: 'Codigo de vista',
   admin_user_access_col_label: 'Nombre',
   admin_user_access_col_source: 'Origen',

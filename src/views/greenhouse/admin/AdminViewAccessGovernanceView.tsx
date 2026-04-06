@@ -22,6 +22,7 @@ import Typography from '@mui/material/Typography'
 
 import { ExecutiveMiniStatCard } from '@/components/greenhouse'
 import type { AdminGovernanceOverview } from '@/lib/admin/get-admin-view-access-governance'
+import { SECTION_ACCENT } from '@/lib/admin/view-access-catalog'
 import { ROLE_CODES } from '@/config/role-codes'
 import PermissionSetsTab from '@/views/greenhouse/admin/permission-sets/PermissionSetsTab'
 
@@ -35,14 +36,17 @@ type OverrideMode = 'inherit' | 'grant' | 'revoke'
 type PermissionsFocus = 'all' | 'changed' | 'fallback'
 type PreviewFocus = 'all' | 'visible' | 'overrides' | 'impact'
 
-const SECTION_ACCENT: Record<string, 'primary' | 'info' | 'success' | 'warning' | 'secondary'> = {
-  gestion: 'info',
-  equipo: 'success',
-  finanzas: 'warning',
-  ia: 'secondary',
-  administracion: 'primary',
-  mi_ficha: 'secondary',
-  cliente: 'success'
+const ACTION_LABELS: Record<string, string> = {
+  grant_role: 'Acceso por rol concedido',
+  revoke_role: 'Acceso por rol revocado',
+  grant_user: 'Acceso individual concedido',
+  revoke_user: 'Acceso individual revocado',
+  expire_user: 'Acceso expirado',
+  grant_set: 'Set asignado',
+  revoke_set: 'Set revocado',
+  create_set: 'Set creado',
+  update_set: 'Set actualizado',
+  delete_set: 'Set eliminado'
 }
 
 const PREVIEW_STATE_COPY = {
@@ -541,7 +545,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems={{ md: 'center' }} justifyContent='space-between'>
           <Box>
             <Stack direction='row' spacing={1.5} alignItems='center' sx={{ mb: 1.5 }}>
-              <Chip size='small' variant='outlined' label='Persistencia + enforcement activos' />
+              <Chip size='small' variant='outlined' label='Gobierno de acceso activo' />
             </Stack>
             <Typography variant='h4' sx={{ mb: 1 }}>
               Vistas y acceso
@@ -554,8 +558,8 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
           </Box>
           <Alert severity={data.persistence?.rolesWithPersistedAssignments ? 'success' : 'info'} variant='outlined' sx={{ maxWidth: 460 }}>
             {data.persistence?.rolesWithPersistedAssignments
-              ? `Persistencia activa para ${data.persistence.rolesWithPersistedAssignments} rol(es). La prioridad ahora es completar catálogo fino y reducir fallback.`
-              : 'La pantalla ya puede guardar assignments por rol, pero todavía conviene revisar qué vistas siguen dependiendo del baseline heredado.'}
+              ? `La persistencia está activa para ${data.persistence.rolesWithPersistedAssignments} rol(es). Las vistas restantes usan acceso por defecto del rol.`
+              : 'Las vistas se asignan usando el acceso por defecto de cada rol. Persiste las asignaciones para control granular.'}
           </Alert>
         </Stack>
       </Stack>
@@ -569,7 +573,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
       >
         <ExecutiveMiniStatCard title='Vistas registradas' value={String(data.totals.registeredViews)} detail='Mapa inicial de superficies gobernables' icon='tabler-layout-grid' tone='info' />
         <ExecutiveMiniStatCard title='Roles configurados' value={String(data.totals.configuredRoles)} detail='Perfiles visibles en la matrix actual' icon='tabler-shield-lock' tone='info' />
-        <ExecutiveMiniStatCard title='Personas previewables' value={String(data.totals.previewableUsers)} detail='Universo visible del consumer persona-first actual' icon='tabler-user-search' tone='success' />
+        <ExecutiveMiniStatCard title='Personas previewables' value={String(data.totals.previewableUsers)} detail='Usuarios con acceso verificable al portal' icon='tabler-user-search' tone='success' />
         <ExecutiveMiniStatCard title='Secciones cubiertas' value={String(data.totals.sections)} detail='Gestión, equipo, finanzas y administración' icon='tabler-layout-kanban' tone='warning' />
       </Box>
 
@@ -584,7 +588,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
             >
               <Tab value='permissions' label='Permisos' />
               <Tab value='preview' label='Preview' />
-              <Tab value='sets' label='Permission Sets' />
+              <Tab value='sets' label='Sets de permisos' />
             </Tabs>
 
             {activeTab === 'permissions' ? (
@@ -947,9 +951,9 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                               size='small'
                               color={previewUser.portalAccessState === 'active' ? 'success' : previewUser.portalAccessState === 'inactive' ? 'default' : 'warning'}
                               variant='tonal'
-                              label={`portal:${previewUser.portalAccessState}`}
+                              label={previewUser.portalAccessState === 'active' ? 'Portal activo' : previewUser.portalAccessState === 'inactive' ? 'Portal inactivo' : 'Sin portal'}
                             />
-                            <Chip size='small' variant='outlined' label={`bridge:${previewUser.resolutionSource}`} />
+                            <Chip size='small' variant='outlined' label={`Vínculo: ${previewUser.resolutionSource.replace(/_/g, ' ')}`} />
                             <Chip size='small' variant='outlined' label={`${previewViews.length} vistas visibles`} />
                           </Stack>
                         </Stack>
@@ -1041,7 +1045,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                                 label='Expira el'
                                 value={overrideExpiresAt}
                                 onChange={event => setOverrideExpiresAt(event.target.value)}
-                                InputLabelProps={{ shrink: true }}
+                                slotProps={{ inputLabel: { shrink: true } }}
                                 helperText='Opcional. Se aplica al batch de overrides que guardes para este usuario.'
                               />
 
@@ -1149,7 +1153,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                                             size='small'
                                             color={entry.action.includes('grant') ? 'success' : entry.action.includes('revoke') ? 'error' : 'warning'}
                                             variant='tonal'
-                                            label={entry.action}
+                                            label={ACTION_LABELS[entry.action] ?? entry.action}
                                           />
                                           <Chip size='small' variant='outlined' label={entry.viewCode} />
                                           <Chip size='small' variant='outlined' label={String(entry.createdAt).replace('T', ' ').slice(0, 16)} />

@@ -2,12 +2,15 @@
 
 import { useEffect, useMemo, useState } from 'react'
 
+import Link from 'next/link'
+
 import Accordion from '@mui/material/Accordion'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
@@ -27,6 +30,7 @@ import Typography from '@mui/material/Typography'
 import type { ThemeColor } from '@core/types'
 
 import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
+import { GOVERNANCE_SECTIONS } from '@/lib/admin/view-access-catalog'
 import type {
   EffectiveViewEntry,
   EffectiveViewSource,
@@ -36,6 +40,10 @@ import type {
 } from '@/types/permission-sets'
 
 import { roleColorFor, roleIconFor, toTitleCase } from './helpers'
+
+// ── Section label map ──
+
+const SECTION_LABEL_MAP = new Map<string, string>(GOVERNANCE_SECTIONS.map(s => [s.key, s.label]))
 
 // ── Types ──
 
@@ -75,9 +83,9 @@ const SOURCE_ICON: Record<EffectiveViewSource, string> = {
 
 const SOURCE_LABEL: Record<EffectiveViewSource, string> = {
   role: 'Rol',
-  role_fallback: 'Rol (fallback)',
+  role_fallback: 'Rol (por defecto)',
   permission_set: 'Set de permisos',
-  user_override: 'Override'
+  user_override: 'Ajuste manual'
 }
 
 // ── Section: Roles ──
@@ -191,8 +199,6 @@ const PermissionSetsSection = ({
 // ── Section: Overrides ──
 
 const OverridesSection = ({ overrides }: { overrides: EffectiveViewEntry[] }) => {
-  if (overrides.length === 0) return null
-
   return (
     <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
       <CardHeader
@@ -206,38 +212,42 @@ const OverridesSection = ({ overrides }: { overrides: EffectiveViewEntry[] }) =>
       />
       <Divider />
       <CardContent>
-        <TableContainer>
-          <Table size='small'>
-            <TableHead>
-              <TableRow>
-                <TableCell>{GH_INTERNAL_MESSAGES.admin_user_access_col_view_code}</TableCell>
-                <TableCell>{GH_INTERNAL_MESSAGES.admin_user_access_col_label}</TableCell>
-                <TableCell>{GH_INTERNAL_MESSAGES.admin_user_access_col_source}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {overrides.map(view => (
-                <TableRow key={view.viewCode}>
-                  <TableCell>
-                    <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
-                      {view.viewCode}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>{view.label}</TableCell>
-                  <TableCell>
-                    <Chip
-                      size='small'
-                      variant='tonal'
-                      color='warning'
-                      icon={<i className='tabler-adjustments' aria-hidden='true' />}
-                      label={SOURCE_LABEL.user_override}
-                    />
-                  </TableCell>
+        {overrides.length === 0 ? (
+          <Typography color='text.secondary'>Sin ajustes manuales para este usuario.</Typography>
+        ) : (
+          <TableContainer>
+            <Table size='small' aria-label='Ajustes de acceso manuales del usuario'>
+              <TableHead>
+                <TableRow>
+                  <TableCell>{GH_INTERNAL_MESSAGES.admin_user_access_col_view_code}</TableCell>
+                  <TableCell>{GH_INTERNAL_MESSAGES.admin_user_access_col_label}</TableCell>
+                  <TableCell>{GH_INTERNAL_MESSAGES.admin_user_access_col_source}</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {overrides.map(view => (
+                  <TableRow key={view.viewCode}>
+                    <TableCell>
+                      <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                        {view.viewCode}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>{view.label}</TableCell>
+                    <TableCell>
+                      <Chip
+                        size='small'
+                        variant='tonal'
+                        color='warning'
+                        icon={<i className='tabler-adjustments' aria-hidden='true' />}
+                        label={SOURCE_LABEL.user_override}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </CardContent>
     </Card>
   )
@@ -304,7 +314,7 @@ const EffectiveViewsSection = ({
                   size='small'
                   variant='outlined'
                   icon={<i className={SOURCE_ICON.role_fallback} aria-hidden='true' />}
-                  label={`${summary.fromRoleFallback} fallback`}
+                  label={`${summary.fromRoleFallback} heredados`}
                 />
                 <Chip
                   size='small'
@@ -316,7 +326,7 @@ const EffectiveViewsSection = ({
                   size='small'
                   variant='outlined'
                   icon={<i className={SOURCE_ICON.user_override} aria-hidden='true' />}
-                  label={`${summary.fromOverrides} overrides`}
+                  label={`${summary.fromOverrides} manuales`}
                 />
               </Stack>
             )}
@@ -325,11 +335,17 @@ const EffectiveViewsSection = ({
               <Typography color='text.secondary'>{GH_INTERNAL_MESSAGES.admin_user_access_no_views}</Typography>
             ) : (
               grouped.map(([section, sectionViews]) => (
-                <Accordion key={section} defaultExpanded={grouped.length <= 5} disableGutters elevation={0}>
+                <Accordion
+                  key={section}
+                  defaultExpanded={grouped.length <= 5}
+                  disableGutters
+                  elevation={0}
+                  aria-label={`Sección ${SECTION_LABEL_MAP.get(section) ?? section}: ${sectionViews.length} vistas`}
+                >
                   <AccordionSummary expandIcon={<i className='tabler-chevron-down' />}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                       <Typography variant='subtitle1' fontWeight={600}>
-                        {section}
+                        {SECTION_LABEL_MAP.get(section) ?? section}
                       </Typography>
                       <Chip size='small' variant='outlined' label={`${sectionViews.length}`} />
                     </Box>
@@ -394,7 +410,8 @@ const UserAccessTab = ({ userId }: Props) => {
   const [summary, setSummary] = useState<EffectiveViewsResponse['summary'] | null>(null)
   const [loadingRoles, setLoadingRoles] = useState(true)
   const [loadingViews, setLoadingViews] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [rolesError, setRolesError] = useState<string | null>(null)
+  const [viewsError, setViewsError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -407,7 +424,7 @@ const UserAccessTab = ({ userId }: Props) => {
 
         setRoles(data.currentAssignments)
       } catch {
-        setError('No se pudieron cargar los roles del usuario.')
+        setRolesError('No se pudieron cargar los roles del usuario.')
       } finally {
         setLoadingRoles(false)
       }
@@ -460,7 +477,7 @@ const UserAccessTab = ({ userId }: Props) => {
           setPermissionSets([])
         }
       } catch {
-        setError('No se pudieron cargar las vistas efectivas.')
+        setViewsError('No se pudieron cargar las vistas efectivas.')
       } finally {
         setLoadingViews(false)
       }
@@ -477,9 +494,14 @@ const UserAccessTab = ({ userId }: Props) => {
 
   return (
     <Grid container spacing={6}>
-      {error && (
+      {rolesError && (
         <Grid size={{ xs: 12 }}>
-          <Alert severity='error'>{error}</Alert>
+          <Alert severity='error'>{rolesError}</Alert>
+        </Grid>
+      )}
+      {viewsError && (
+        <Grid size={{ xs: 12 }}>
+          <Alert severity='error'>{viewsError}</Alert>
         </Grid>
       )}
 
@@ -491,14 +513,26 @@ const UserAccessTab = ({ userId }: Props) => {
         <PermissionSetsSection sets={permissionSets} loading={loadingViews} />
       </Grid>
 
-      {overrideViews.length > 0 && (
-        <Grid size={{ xs: 12 }}>
-          <OverridesSection overrides={overrideViews} />
-        </Grid>
-      )}
+      <Grid size={{ xs: 12 }}>
+        <OverridesSection overrides={overrideViews} />
+      </Grid>
 
       <Grid size={{ xs: 12 }}>
         <EffectiveViewsSection views={effectiveViews} summary={summary} loading={loadingViews} />
+      </Grid>
+
+      <Grid size={{ xs: 12 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Button
+            component={Link}
+            href='/admin/views'
+            variant='text'
+            size='small'
+            endIcon={<i className='tabler-external-link' aria-hidden='true' />}
+          >
+            Gestionar sets y permisos
+          </Button>
+        </Box>
       </Grid>
     </Grid>
   )

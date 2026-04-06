@@ -14,6 +14,7 @@ import CardContent from '@mui/material/CardContent'
 import Checkbox from '@mui/material/Checkbox'
 import Chip from '@mui/material/Chip'
 import CircularProgress from '@mui/material/CircularProgress'
+import Tooltip from '@mui/material/Tooltip'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
@@ -28,20 +29,10 @@ import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
-import { GOVERNANCE_SECTIONS, VIEW_REGISTRY, type GovernanceSection } from '@/lib/admin/view-access-catalog'
+import { GOVERNANCE_SECTIONS, SECTION_ACCENT, VIEW_REGISTRY, type GovernanceSection } from '@/lib/admin/view-access-catalog'
 import type { PermissionSetSummary, PermissionSetDetail, PermissionSetUserAssignment } from '@/types/permission-sets'
 
 // ── Constants ──
-
-const SECTION_ACCENT: Record<string, 'primary' | 'info' | 'success' | 'warning' | 'secondary'> = {
-  gestion: 'info',
-  equipo: 'success',
-  finanzas: 'warning',
-  ia: 'secondary',
-  administracion: 'primary',
-  mi_ficha: 'secondary',
-  cliente: 'success'
-}
 
 const SECTION_LABEL_MAP = new Map<string, string>(GOVERNANCE_SECTIONS.map(s => [s.key, s.label]))
 
@@ -106,11 +97,11 @@ const PermissionSetsTab = () => {
       const response = await fetch('/api/admin/views/sets')
       const data = (await response.json()) as { sets?: PermissionSetSummary[]; error?: string }
 
-      if (!response.ok) throw new Error(data.error || 'No se pudieron cargar los Permission Sets.')
+      if (!response.ok) throw new Error(data.error || 'No se pudieron cargar los sets de permisos.')
 
       setSets(data.sets ?? [])
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al cargar Permission Sets.')
+      setError(err instanceof Error ? err.message : 'Error al cargar sets de permisos.')
     } finally {
       setLoading(false)
     }
@@ -208,13 +199,13 @@ const PermissionSetsTab = () => {
 
       const data = (await response.json()) as { error?: string }
 
-      if (!response.ok) throw new Error(data.error || 'No se pudo crear el Permission Set.')
+      if (!response.ok) throw new Error(data.error || 'No se pudo crear el set de permisos.')
 
       setCreateOpen(false)
-      toast.success('Permission Set creado.')
+      toast.success('Set de permisos creado.')
       await fetchSets()
     } catch (err) {
-      setCreateError(err instanceof Error ? err.message : 'Error al crear Permission Set.')
+      setCreateError(err instanceof Error ? err.message : 'Error al crear set de permisos.')
     } finally {
       setCreating(false)
     }
@@ -299,7 +290,7 @@ const PermissionSetsTab = () => {
 
       if (!response.ok) throw new Error(data.error || 'No se pudo eliminar.')
 
-      toast.success('Permission Set eliminado.')
+      toast.success('Set de permisos eliminado.')
       setSelectedSetId(null)
       await fetchSets()
     } catch (err) {
@@ -463,7 +454,7 @@ const PermissionSetsTab = () => {
                 {group.views.filter(v => selectedCodes.has(v.viewCode)).length} de {group.views.length}
               </Typography>
             </Stack>
-            <FormGroup sx={{ pl: 1 }}>
+            <FormGroup sx={{ pl: 1 }} role='group' aria-label={`Vistas de ${group.label}`}>
               {group.views.map(view => (
                 <FormControlLabel
                   key={view.viewCode}
@@ -500,6 +491,9 @@ const PermissionSetsTab = () => {
       <Card
         key={set.setId}
         variant='outlined'
+        role='button'
+        tabIndex={0}
+        aria-label={`Ver detalle de ${set.setName}`}
         sx={{
           cursor: 'pointer',
           transition: 'box-shadow 0.15s',
@@ -507,9 +501,16 @@ const PermissionSetsTab = () => {
             borderColor: 'primary.main',
             borderWidth: 2
           }),
-          '&:hover': { boxShadow: theme => theme.shadows[4] }
+          '&:hover': { boxShadow: theme => theme.shadows[4] },
+          '&:focus-visible': { outline: '2px solid', outlineColor: 'primary.main', outlineOffset: 2 }
         }}
         onClick={() => setSelectedSetId(isSelected ? null : set.setId)}
+        onKeyDown={e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            setSelectedSetId(isSelected ? null : set.setId)
+          }
+        }}
       >
         <CardContent>
           <Stack spacing={1.5}>
@@ -517,7 +518,9 @@ const PermissionSetsTab = () => {
               <Stack direction='row' spacing={1} alignItems='center' sx={{ minWidth: 0 }}>
                 <Typography variant='subtitle1' noWrap>{set.setName}</Typography>
                 {set.isSystem ? (
-                  <Chip size='small' variant='tonal' color='secondary' label='Sistema' />
+                  <Tooltip title='Creado por el sistema. No se puede eliminar.'>
+                    <Chip size='small' variant='tonal' color='secondary' label='Sistema' />
+                  </Tooltip>
                 ) : null}
               </Stack>
               {set.section ? (
@@ -535,8 +538,8 @@ const PermissionSetsTab = () => {
               </Typography>
             ) : null}
             <Stack direction='row' spacing={1.5}>
-              <Chip size='small' variant='outlined' icon={<i className='tabler-eye' />} label={`${set.viewCodes.length} vistas`} />
-              <Chip size='small' variant='outlined' icon={<i className='tabler-users' />} label={`${set.userCount} usuarios`} />
+              <Chip size='small' variant='outlined' icon={<i className='tabler-eye' aria-hidden='true' />} label={`${set.viewCodes.length} vistas`} />
+              <Chip size='small' variant='outlined' icon={<i className='tabler-users' aria-hidden='true' />} label={`${set.userCount} usuarios`} />
             </Stack>
           </Stack>
         </CardContent>
@@ -553,7 +556,9 @@ const PermissionSetsTab = () => {
       return (
         <Card variant='outlined'>
           <CardContent>
-            <Typography color='text.secondary'>Cargando detalle...</Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+              <CircularProgress />
+            </Box>
           </CardContent>
         </Card>
       )
@@ -582,7 +587,9 @@ const PermissionSetsTab = () => {
                 </Avatar>
                 <Typography variant='h6'>{detail.setName}</Typography>
                 {detail.isSystem ? (
-                  <Chip size='small' variant='tonal' color='secondary' label='Sistema' />
+                  <Tooltip title='Creado por el sistema. No se puede eliminar.'>
+                    <Chip size='small' variant='tonal' color='secondary' label='Sistema' />
+                  </Tooltip>
                 ) : null}
               </Stack>
               <IconButton size='small' onClick={() => setSelectedSetId(null)} aria-label='Cerrar panel'>
@@ -602,7 +609,7 @@ const PermissionSetsTab = () => {
                 disabled={detail.isSystem}
               />
               <TextField
-                label='Descripcion'
+                label='Descripción'
                 size='small'
                 fullWidth
                 multiline
@@ -616,7 +623,7 @@ const PermissionSetsTab = () => {
             <Divider />
 
             <Box>
-              <Typography variant='subtitle2' sx={{ mb: 2 }}>Vistas incluidas</Typography>
+              <Typography variant='subtitle2' component='h3' sx={{ mb: 2 }}>Vistas incluidas</Typography>
               {renderViewCodeCheckboxes(editViewCodes, toggleEditViewCode)}
             </Box>
 
@@ -648,7 +655,7 @@ const PermissionSetsTab = () => {
 
             <Stack spacing={2}>
               <Stack direction='row' spacing={1.5} alignItems='center' justifyContent='space-between'>
-                <Typography variant='subtitle2'>Usuarios asignados</Typography>
+                <Typography variant='subtitle2' component='h3'>Usuarios asignados</Typography>
                 <Button
                   size='small'
                   variant='outlined'
@@ -665,7 +672,7 @@ const PermissionSetsTab = () => {
 
               {detail.users.length === 0 ? (
                 <Typography variant='body2' color='text.secondary'>
-                  Este Permission Set no tiene usuarios asignados.
+                  Este set de permisos no tiene usuarios asignados.
                 </Typography>
               ) : (
                 <Stack spacing={1}>
@@ -720,7 +727,7 @@ const PermissionSetsTab = () => {
     <Stack spacing={3}>
       <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems={{ md: 'center' }} justifyContent='space-between'>
         <Box>
-          <Typography variant='h6' sx={{ mb: 0.5 }}>Permission Sets</Typography>
+          <Typography variant='h6' sx={{ mb: 0.5 }}>Sets de permisos</Typography>
           <Typography variant='body2' color='text.secondary'>
             Agrupa vistas en conjuntos reutilizables y asigna a usuarios para gobierno de acceso granular.
           </Typography>
@@ -730,7 +737,7 @@ const PermissionSetsTab = () => {
           startIcon={<i className='tabler-plus' />}
           onClick={handleCreateOpen}
         >
-          Crear Permission Set
+          Crear set de permisos
         </Button>
       </Stack>
 
@@ -754,8 +761,8 @@ const PermissionSetsTab = () => {
           <CardContent>
             <Typography color='text.secondary'>
               {searchQuery.trim()
-                ? `No hay Permission Sets que coincidan con "${searchQuery}".`
-                : 'No hay Permission Sets creados. Crea el primero para empezar a gobernar acceso por conjuntos de vistas.'}
+                ? `No hay sets de permisos que coincidan con "${searchQuery}".`
+                : 'No hay sets de permisos creados. Crea el primero para empezar a gobernar acceso por conjuntos de vistas.'}
             </Typography>
           </CardContent>
         </Card>
@@ -791,7 +798,7 @@ const PermissionSetsTab = () => {
         fullWidth
         aria-labelledby='create-permission-set-title'
       >
-        <DialogTitle id='create-permission-set-title'>Crear Permission Set</DialogTitle>
+        <DialogTitle id='create-permission-set-title'>Crear set de permisos</DialogTitle>
         <DialogContent>
           <Stack spacing={3} sx={{ mt: 1 }}>
             <TextField
@@ -804,24 +811,24 @@ const PermissionSetsTab = () => {
               placeholder='ej. Acceso operaciones'
             />
             <TextField
-              label='Descripcion'
+              label='Descripción'
               size='small'
               fullWidth
               multiline
               minRows={2}
               value={createDescription}
               onChange={e => setCreateDescription(e.target.value)}
-              placeholder='Descripcion opcional del conjunto de permisos'
+              placeholder='Describe brevemente qué acceso otorga este set'
             />
             <TextField
               select
-              label='Seccion'
+              label='Sección'
               size='small'
               fullWidth
               value={createSection}
               onChange={e => setCreateSection(e.target.value)}
             >
-              <MenuItem value=''>Sin seccion</MenuItem>
+              <MenuItem value=''>Sin sección</MenuItem>
               {GOVERNANCE_SECTIONS.map(section => (
                 <MenuItem key={section.key} value={section.key}>
                   {section.label}
@@ -832,7 +839,7 @@ const PermissionSetsTab = () => {
             <Divider />
 
             <Box>
-              <Typography variant='subtitle2' sx={{ mb: 1 }}>Vistas incluidas</Typography>
+              <Typography variant='subtitle2' component='h3' sx={{ mb: 1 }}>Vistas incluidas</Typography>
               {renderViewCodeCheckboxes(createViewCodes, toggleCreateViewCode, createSection || undefined)}
             </Box>
 
@@ -846,7 +853,7 @@ const PermissionSetsTab = () => {
             onClick={handleCreateSubmit}
             disabled={creating}
           >
-            {creating ? 'Creando...' : 'Crear Permission Set'}
+            {creating ? 'Creando...' : 'Crear set de permisos'}
           </Button>
         </DialogActions>
       </Dialog>
@@ -863,7 +870,7 @@ const PermissionSetsTab = () => {
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <Typography variant='body2' color='text.secondary'>
-              Busca y selecciona los usuarios que quieres agregar a este Permission Set.
+              Busca y selecciona los usuarios que quieres agregar a este set de permisos.
             </Typography>
             {availableUsersLoading ? (
               <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
@@ -917,11 +924,11 @@ const PermissionSetsTab = () => {
         aria-labelledby='delete-confirm-title'
       >
         <DialogTitle id='delete-confirm-title'>
-          {'¿Eliminar este Permission Set?'}
+          {detail ? `¿Eliminar «${detail.setName}»?` : '¿Eliminar este set de permisos?'}
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Esta accion no se puede deshacer. Los usuarios asignados perderan el acceso que este set otorga.
+            Esta acción no se puede deshacer. Los usuarios asignados perderán el acceso que este set otorga.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -946,8 +953,8 @@ const PermissionSetsTab = () => {
         <DialogContent>
           <DialogContentText>
             {removeTargetName
-              ? `El usuario ${removeTargetName} perdera las vistas que obtiene de este Permission Set. Debe re-loguearse para que el cambio tome efecto.`
-              : 'El usuario perdera las vistas que obtiene de este Permission Set. Debe re-loguearse para que el cambio tome efecto.'}
+              ? `El usuario ${removeTargetName} perderá las vistas que obtiene de este set de permisos. El usuario debe iniciar sesión de nuevo para que el cambio sea visible.`
+              : 'El usuario perderá las vistas que obtiene de este set de permisos. El usuario debe iniciar sesión de nuevo para que el cambio sea visible.'}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
