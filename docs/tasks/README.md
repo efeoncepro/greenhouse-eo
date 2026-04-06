@@ -20,7 +20,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-267`
+- siguiente ID disponible: `TASK-271`
 - `TASK-241` migra procesos batch pesados (ICO materialización, LLM enrichment) de Vercel Functions a Cloud Run. Formaliza política: batch > 30s → Cloud Run. Código listo, deploy operacional pendiente.
 - `TASK-239` enriquece el prompt LLM de Nexa Insights con glosario de métricas, cadena causal, doble capa narrativa y nombres de Space/miembros.
 - `TASK-240` agrega menciones interactivas (@mentions) de Spaces y miembros en los insights de Nexa — chips clickeables que navegan a perfiles. Depende de `TASK-239`.
@@ -106,6 +106,8 @@ Primer bloque operativo asignado:
 
 ## Complete
 
+- [TASK-270-admin-email-template-preview.md](complete/TASK-270-admin-email-template-preview.md) — Vista admin `/admin/emails/preview` para previsualizar y probar email templates: auto-discovery via `registerPreviewMeta()`, renderizado server-side con `@react-email/render`, toggle locale es/en, toggle viewport desktop/mobile, editor de props, envio de prueba via delivery enterprise.
+- [TASK-269-email-delivery-enterprise-hardening.md](complete/TASK-269-email-delivery-enterprise-hardening.md) — Email delivery enterprise hardening (6 slices): context resolver auto-hydrata recipient/client/platform, token catalog `ResolvedEmailContext`, i18n es/en en 6 templates, rate limit 10/hora por destinatario, unsubscribe con JWT firmado, bounce/complaint webhook Resend con HMAC-SHA256, 4 eventos outbox, non-breaking contract con NotificationService.
 - [TASK-267-admin-resend-onboarding-email.md](complete/TASK-267-admin-resend-onboarding-email.md) — Boton "Reenviar onboarding" cableado en ficha de usuario admin: endpoint POST `/api/admin/users/[id]/resend-onboarding` con validacion de status `invited`, generacion de nuevo token 72h, envio via delivery enterprise (Resend + context resolver), outbox event `invitation.resent`, toast feedback en UI.
 - [TASK-263-permission-sets-enterprise-view-access.md](complete/TASK-263-permission-sets-enterprise-view-access.md) — Permission Sets enterprise: tablas `permission_sets` + `user_permission_set_assignments`, 6 sets de sistema seeded, resolucion 3+1 capas (Rol ∪ PermSets ∪ Overrides), CRUD API completo, effective views con source attribution, UI tab "Permission Sets" en Admin Views Governance, UI tab "Accesos" en Admin User Detail, 5 acciones audit log, 2 eventos outbox.
 
