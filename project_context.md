@@ -1,5 +1,12 @@
 # project_context.md
 
+## Delta 2026-04-06 Vuexy upstream documentado en repo ecosystem
+
+- `pixinvent/vuexy-nextjs-admin-template` queda registrado como upstream de referencia del starter/theme Vuexy que Greenhouse adapta en este portal.
+- No debe tratarse como source of truth funcional del producto ni como reemplazo de `greenhouse-eo`.
+- Debe consultarse cuando el cambio toque layout base, shell, navegacion o comportamiento heredado de Vuexy.
+- Fuente canonica: `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`.
+
 ## Delta 2026-04-05 Session resolution: paridad PG ↔ BQ cerrada (TASK-255)
 
 - El contrato `TenantAccessRow` ahora tiene paridad completa entre el path PostgreSQL (`session_360`) y el path BigQuery (`getIdentityAccessRecord`): ambos retornan `member_id` e `identity_profile_id`.
@@ -12,7 +19,7 @@
 - Service URL: `https://ops-worker-183008134038.us-east4.run.app`
 - Image: `gcr.io/efeonce-group/ops-worker` (Cloud Build two-stage esbuild).
 - SA: `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` con `roles/run.invoker`.
-- 3 Cloud Scheduler jobs: `ops-reactive-process` (*/5), `ops-reactive-process-delivery` (2-59/5), `ops-reactive-recover` (*/15), timezone `America/Santiago`, auth OIDC.
+- 3 Cloud Scheduler jobs: `ops-reactive-process` (_/5), `ops-reactive-process-delivery` (2-59/5), `ops-reactive-recover` (_/15), timezone `America/Santiago`, auth OIDC.
 - Las rutas API Vercel siguen existiendo como fallback manual pero ya no están scheduladas en `vercel.json` (16 → 13 crons).
 - Regla ESM/CJS: servicios Cloud Run que reutilicen `src/lib/` sin necesitar NextAuth deben shimear `next-auth`, sus providers y `bcryptjs` via esbuild `--alias`. El ops-worker tiene 9 shims (server-only, next/server, next/headers, next-auth, 3 providers, next-auth/next, bcryptjs).
 - Regla de health check: usar `gcloud run services proxy` en vez de `gcloud auth print-identity-token --audiences=` (el segundo requiere permisos de impersonation que no siempre están disponibles).

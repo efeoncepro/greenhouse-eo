@@ -1,5 +1,25 @@
 # Handoff.md
 
+## Sesion 2026-04-06 — repo upstream Vuexy registrado en ecosystem doc
+
+### Rama / alcance
+
+- rama: actual
+- scope: documentar `pixinvent/vuexy-nextjs-admin-template` como upstream de referencia del tema Vuexy usado por Greenhouse
+
+### Cambios
+
+- `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md` ahora incluye el repo upstream de Vuexy con su rol, source of truth tecnico y guardrails de uso.
+- `project_context.md` actualizado con delta breve para dejar explicita la regla de consulta del upstream.
+
+### Verificacion
+
+- Validacion documental solamente
+
+### Riesgo / siguiente paso
+
+- Cuando un cambio toque shell, layout base o patrones heredados de Vuexy, revisar este upstream antes de asumir que el comportamiento nace en Greenhouse.
+
 ## Sesion 2026-04-05 — TASK-263: Permission Sets enterprise view access
 
 ### Rama / alcance

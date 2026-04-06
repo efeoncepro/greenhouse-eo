@@ -1,5 +1,11 @@
 # changelog.md
 
+## 2026-04-06
+
+- **Repo ecosystem doc: upstream Vuexy registrado**:
+  - `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md` ahora incluye `pixinvent/vuexy-nextjs-admin-template` como repo upstream de referencia del tema/starter que usa Greenhouse
+  - usarlo para contrastar layout base, shell y patrones heredados de Vuexy; no como source of truth funcional del producto
+
 ## 2026-04-05
 
 - **TASK-263: Permission Sets — CRUD enterprise para asignacion de vistas por persona y perfil**:
