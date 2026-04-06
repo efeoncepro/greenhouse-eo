@@ -92,7 +92,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
   const [overrideError, setOverrideError] = useState<string | null>(null)
   const [overrideSuccess, setOverrideSuccess] = useState<string | null>(null)
   const [savingOverrides, setSavingOverrides] = useState(false)
-  const [previewPermSetViewCodes, setPreviewPermSetViewCodes] = useState<Set<string>>(new Set())
+  const [resolvedEffectiveViewCodes, setResolvedEffectiveViewCodes] = useState<Set<string> | null>(null)
 
   useEffect(() => {
     setEditableViews(data.views)
@@ -222,27 +222,45 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
 
   useEffect(() => {
     if (!previewUser?.userId) {
-      setPreviewPermSetViewCodes(new Set())
+      setResolvedEffectiveViewCodes(null)
 
       return
     }
 
+    setResolvedEffectiveViewCodes(null)
+
     fetch(`/api/admin/team/roles/${previewUser.userId}/effective-views`)
       .then(res => (res.ok ? res.json() : null))
-      .then((responseData: { effectiveViews?: Array<{ source: string; viewCode: string }> } | null) => {
+      .then((responseData: { effectiveViews?: Array<{ viewCode: string }> } | null) => {
         if (!responseData?.effectiveViews) return
 
-        const setCodes = new Set<string>(
-          responseData.effectiveViews.filter(v => v.source === 'permission_set').map(v => v.viewCode)
-        )
-
-        setPreviewPermSetViewCodes(setCodes)
+        setResolvedEffectiveViewCodes(new Set(responseData.effectiveViews.map(v => v.viewCode)))
       })
-      .catch(() => setPreviewPermSetViewCodes(new Set()))
+      .catch(() => setResolvedEffectiveViewCodes(null))
   }, [previewUser?.userId])
 
   const previewViews = useMemo(() => {
     if (!previewUser) return []
+
+    if (resolvedEffectiveViewCodes) {
+      const resolved = editableViews.filter(view => resolvedEffectiveViewCodes.has(view.viewCode))
+
+      const current = new Map(resolved.map(view => [view.viewCode, view]))
+
+      for (const override of selectedUserOverrides) {
+        const view = editableViews.find(candidate => candidate.viewCode === override.viewCode)
+
+        if (!view) continue
+
+        if (override.overrideType === 'grant') {
+          current.set(view.viewCode, view)
+        } else {
+          current.delete(view.viewCode)
+        }
+      }
+
+      return Array.from(current.values())
+    }
 
     const baseVisibleViews = editableViews.filter(view => {
       const roleGranted = previewUser.roleCodes.some(roleCode => Boolean(view.roleAccess[roleCode]))
@@ -258,12 +276,6 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
 
     const current = new Map(baseVisibleViews.map(view => [view.viewCode, view]))
 
-    for (const view of editableViews) {
-      if (previewPermSetViewCodes.has(view.viewCode) && !current.has(view.viewCode)) {
-        current.set(view.viewCode, view)
-      }
-    }
-
     for (const override of selectedUserOverrides) {
       const view = editableViews.find(candidate => candidate.viewCode === override.viewCode)
 
@@ -277,12 +289,16 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
     }
 
     return Array.from(current.values())
-  }, [editableViews, previewUser, selectedUserOverrides, previewPermSetViewCodes])
+  }, [editableViews, previewUser, selectedUserOverrides, resolvedEffectiveViewCodes])
 
   const previewBaselineViews = useMemo(() => {
     if (!previewUser) return []
 
-    const roleViews = editableViews.filter(view => {
+    if (resolvedEffectiveViewCodes) {
+      return editableViews.filter(view => resolvedEffectiveViewCodes.has(view.viewCode))
+    }
+
+    return editableViews.filter(view => {
       const roleGranted = previewUser.roleCodes.some(roleCode => Boolean(view.roleAccess[roleCode]))
 
       if (roleGranted) return true
@@ -293,13 +309,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
 
       return false
     })
-
-    const permSetViews = editableViews.filter(
-      view => previewPermSetViewCodes.has(view.viewCode) && !roleViews.some(rv => rv.viewCode === view.viewCode)
-    )
-
-    return [...roleViews, ...permSetViews]
-  }, [editableViews, previewUser, previewPermSetViewCodes])
+  }, [editableViews, previewUser, resolvedEffectiveViewCodes])
 
   const previewGrantedByOverride = useMemo(() => {
     const baselineCodes = new Set(previewBaselineViews.map(view => view.viewCode))
