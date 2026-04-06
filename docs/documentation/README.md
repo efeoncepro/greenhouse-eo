@@ -24,7 +24,7 @@ _Pendiente de documentar._
 
 ### HR y Nomina
 
-_Pendiente de documentar._
+- [Sistema de Permisos y Licencias](hr/sistema-permisos-leave.md) — tipos de permiso, medio dia (AM/PM), calculo de dias habiles, flujo de aprobacion, saldo y acumulacion
 
 ### Personas
 

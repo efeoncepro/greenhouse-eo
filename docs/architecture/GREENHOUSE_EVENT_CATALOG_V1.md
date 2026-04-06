@@ -189,6 +189,14 @@ Notas:
 Publisher: `src/app/api/webhooks/resend/route.ts` (bounce/complaint), `src/lib/email/delivery.ts` (rate_limited)
 Consumer: none yet (future: admin alerts, delivery health metrics)
 
+### User Lifecycle (TASK-253, TASK-267)
+
+| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
+|---|---|---|---|---|
+| `user_lifecycle` | `user.deactivated` | `admin/users/[id]/route.ts` | `{ userId, email, deactivatedByUserId }` | — |
+| `user_lifecycle` | `user.reactivated` | `admin/users/[id]/route.ts` | `{ userId, email, reactivatedByUserId }` | — |
+| `user_lifecycle` | `invitation.resent` | `admin/users/[id]/route.ts` | `{ userId, email, resentByUserId }` | — |
+
 ### Services (nuevo)
 
 | Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
