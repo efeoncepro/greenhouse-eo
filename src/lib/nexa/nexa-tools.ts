@@ -8,7 +8,6 @@ import { getAgencyPulseKpis } from '@/lib/agency/agency-queries'
 import { readOrganizationAiSignals, type AiSignalListItem } from '@/lib/ico-engine/ai/read-signals'
 import { readOrganizationAiLlmEnrichments } from '@/lib/ico-engine/ai/llm-enrichment-reader'
 import type { OrganizationAiLlmEnrichmentItem } from '@/lib/ico-engine/ai/llm-types'
-import { ensureEmailSchema } from '@/lib/email/schema'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import { getFinanceProjectId, roundCurrency, runFinanceQuery, toNumber as toFinanceNumber } from '@/lib/finance/shared'
 import { ensureMemberCapacityEconomicsSchema, readLatestMemberCapacityEconomicsSnapshot } from '@/lib/member-capacity-economics/store'
@@ -396,8 +395,6 @@ const checkEmailsTool: NexaToolDefinition = {
   async execute(args, context) {
     void args
     void context
-
-    await ensureEmailSchema()
 
     const rows = await runGreenhousePostgresQuery<EmailHealthRow>(
       `

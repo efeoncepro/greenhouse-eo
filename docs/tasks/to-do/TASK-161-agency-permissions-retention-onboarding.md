@@ -1,5 +1,13 @@
 # TASK-161 — Agency Permissions, Data Retention & Operational Onboarding
 
+## Delta 2026-04-05
+
+- TASK-263 (Permission Sets) implementado — la capa de permisos ahora resuelve `Rol ∪ PermissionSets ∪ UserOverrides`
+- `resolveAuthorizedViewsForUser()` en `src/lib/admin/view-access-store.ts` tiene un nuevo Layer 2 (Permission Sets) que es aditivo
+- `src/lib/admin/permission-sets.ts` contiene CRUD + resolucion de sets — reutilizar patron para Agency permissions si corresponde
+- `src/lib/sync/event-catalog.ts` tiene nuevos eventos: `viewAccessSetAssigned`, `viewAccessSetRevoked`, aggregate `permissionSet`
+- La dependency de TASK-136 sigue vigente; TASK-263 extiende sin romper backward compatibility
+
 ## Delta 2026-04-03
 
 - El glosario operativo y los playbooks de esta lane deben alinearse a `docs/architecture/Contrato_Metricas_ICO_v1.md`.

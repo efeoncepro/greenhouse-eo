@@ -513,6 +513,16 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
   }
 ]
 
+export const SECTION_ACCENT: Record<string, 'primary' | 'info' | 'success' | 'warning' | 'secondary'> = {
+  gestion: 'info',
+  equipo: 'success',
+  finanzas: 'warning',
+  ia: 'secondary',
+  administracion: 'primary',
+  mi_ficha: 'secondary',
+  cliente: 'success'
+}
+
 // ── Build-time uniqueness validation (TASK-229) ──
 // Prevents duplicate viewCodes from being introduced silently.
 

@@ -1,4 +1,10 @@
-import type { PayrollApprovalReadiness, PayrollCalculationReadiness, PayrollPeriod, PayrollPeriodReadiness, PayrollReadinessIssue } from '@/types/payroll'
+import type {
+  PayrollApprovalReadiness,
+  PayrollCalculationReadiness,
+  PayrollPeriod,
+  PayrollPeriodReadiness,
+  PayrollReadinessIssue
+} from '@/types/payroll'
 
 import { getLastBusinessDayOfMonth, getOperationalDateKey } from '@/lib/calendar/operational-calendar'
 import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
@@ -9,9 +15,10 @@ import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
 import { PayrollValidationError, getPeriodRangeFromId } from '@/lib/payroll/shared'
 
 type ApplicableCompensation = Awaited<ReturnType<typeof getApplicableCompensationVersionsForPeriod>>[number]
-type AttendanceSnapshot = Awaited<ReturnType<typeof fetchAttendanceForPayrollPeriod>>['snapshots'] extends Map<string, infer TValue>
-  ? TValue
-  : never
+type AttendanceSnapshot =
+  Awaited<ReturnType<typeof fetchAttendanceForPayrollPeriod>>['snapshots'] extends Map<string, infer TValue>
+    ? TValue
+    : never
 
 const hasAttendanceSignal = (attendance: AttendanceSnapshot | null | undefined) => {
   if (!attendance) {
@@ -19,10 +26,10 @@ const hasAttendanceSignal = (attendance: AttendanceSnapshot | null | undefined) 
   }
 
   return (
-    attendance.daysPresent > 0
-    || attendance.daysAbsent > 0
-    || attendance.daysOnLeave > 0
-    || attendance.daysOnUnpaidLeave > 0
+    attendance.daysPresent > 0 ||
+    attendance.daysAbsent > 0 ||
+    attendance.daysOnLeave > 0 ||
+    attendance.daysOnUnpaidLeave > 0
   )
 }
 
@@ -48,7 +55,10 @@ export const buildPayrollPeriodReadiness = ({
 }): PayrollPeriodReadiness => {
   const includedCompensations = compensationRows.filter(row => row.hasCompensationVersion)
   const includedMemberIds = includedCompensations.map(row => row.memberId)
-  const missingCompensationMemberIds = compensationRows.filter(row => !row.hasCompensationVersion).map(row => row.memberId)
+
+  const missingCompensationMemberIds = compensationRows
+    .filter(row => !row.hasCompensationVersion)
+    .map(row => row.memberId)
 
   const requiresUfValue = includedCompensations.some(
     row => row.payRegime === 'chile' && row.healthSystem === 'isapre' && (row.healthPlanUf || 0) > 0
@@ -79,7 +89,8 @@ export const buildPayrollPeriodReadiness = ({
     blockingIssues.push({
       code: 'missing_tax_table_version',
       severity: 'blocking',
-      message: 'Este período incluye colaboradores Chile y requiere una versión de tabla impositiva para calcular impuesto.'
+      message:
+        'Este período incluye colaboradores Chile y requiere una versión de tabla impositiva para calcular impuesto.'
     })
   }
 
@@ -97,6 +108,15 @@ export const buildPayrollPeriodReadiness = ({
       severity: 'warning',
       message: `${missingCompensationMemberIds.length} colaborador(es) activos quedarían fuera por no tener compensación vigente.`,
       memberIds: missingCompensationMemberIds
+    })
+  }
+
+  if (attendanceDiagnostics.leaveDataDegraded) {
+    blockingIssues.push({
+      code: 'leave_data_unavailable',
+      severity: 'blocking',
+      message:
+        'Los datos de permisos (leave_requests) no están disponibles. El cálculo oficial no puede continuar sin esta información.'
     })
   }
 
@@ -121,9 +141,7 @@ export const buildPayrollPeriodReadiness = ({
   const lastBusinessDay = getLastBusinessDayOfMonth(period.year, period.month)
   const referenceDateKey = getOperationalDateKey(referenceDate)
 
-  const calculatedOnTime = period.calculatedAt
-    ? getOperationalDateKey(period.calculatedAt) <= lastBusinessDay
-    : null
+  const calculatedOnTime = period.calculatedAt ? getOperationalDateKey(period.calculatedAt) <= lastBusinessDay : null
 
   const calculation: PayrollCalculationReadiness = {
     ready: blockingIssues.length === 0,
@@ -167,23 +185,29 @@ export const getPayrollPeriodReadiness = async (periodId: string): Promise<Payro
 
   const range = getPeriodRangeFromId(periodId)
 
-  const resolvedUfValue = typeof period.ufValue === 'number'
-    ? period.ufValue
-    : (await getHistoricalEconomicIndicatorForPeriod({
-        indicatorCode: 'UF',
-        periodDate: range.periodEnd
-      }))?.value ?? null
+  const resolvedUfValue =
+    typeof period.ufValue === 'number'
+      ? period.ufValue
+      : ((
+          await getHistoricalEconomicIndicatorForPeriod({
+            indicatorCode: 'UF',
+            periodDate: range.periodEnd
+          })
+        )?.value ?? null)
 
   const compensationRows = await getApplicableCompensationVersionsForPeriod(range.periodStart, range.periodEnd)
   const includedCompensations = compensationRows.filter(row => row.hasCompensationVersion)
   const includesChilePayroll = includedCompensations.some(isChileLaborCompensation)
 
-  const resolvedUtmValue = includesChilePayroll && period.taxTableVersion
-    ? (await getHistoricalEconomicIndicatorForPeriod({
-        indicatorCode: 'UTM',
-        periodDate: range.periodEnd
-      }))?.value ?? null
-    : null
+  const resolvedUtmValue =
+    includesChilePayroll && period.taxTableVersion
+      ? ((
+          await getHistoricalEconomicIndicatorForPeriod({
+            indicatorCode: 'UTM',
+            periodDate: range.periodEnd
+          })
+        )?.value ?? null)
+      : null
 
   const includedMemberIds = compensationRows.filter(row => row.hasCompensationVersion).map(row => row.memberId)
 
@@ -199,7 +223,10 @@ export const getPayrollPeriodReadiness = async (periodId: string): Promise<Payro
   const attendanceData = attendanceResult.snapshots
 
   const missingKpiMemberIds = includedMemberIds.filter(memberId => !kpiData.snapshots.has(memberId))
-  const missingAttendanceMemberIds = includedMemberIds.filter(memberId => !hasAttendanceSignal(attendanceData.get(memberId)))
+
+  const missingAttendanceMemberIds = includedMemberIds.filter(
+    memberId => !hasAttendanceSignal(attendanceData.get(memberId))
+  )
 
   return buildPayrollPeriodReadiness({
     period: resolvedUfValue == null ? period : { ...period, ufValue: resolvedUfValue },

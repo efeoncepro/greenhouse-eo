@@ -22,26 +22,31 @@ import Typography from '@mui/material/Typography'
 
 import { ExecutiveMiniStatCard } from '@/components/greenhouse'
 import type { AdminGovernanceOverview } from '@/lib/admin/get-admin-view-access-governance'
+import { SECTION_ACCENT } from '@/lib/admin/view-access-catalog'
 import { ROLE_CODES } from '@/config/role-codes'
+import PermissionSetsTab from '@/views/greenhouse/admin/permission-sets/PermissionSetsTab'
 
 type Props = {
   data: AdminGovernanceOverview
 }
 
 type RoleFilter = 'all' | 'efeonce_internal' | 'client'
-type ActiveTab = 'permissions' | 'preview' | 'roadmap'
+type ActiveTab = 'permissions' | 'preview' | 'sets'
 type OverrideMode = 'inherit' | 'grant' | 'revoke'
 type PermissionsFocus = 'all' | 'changed' | 'fallback'
 type PreviewFocus = 'all' | 'visible' | 'overrides' | 'impact'
 
-const SECTION_ACCENT: Record<string, 'primary' | 'info' | 'success' | 'warning' | 'secondary'> = {
-  gestion: 'info',
-  equipo: 'success',
-  finanzas: 'warning',
-  ia: 'secondary',
-  administracion: 'primary',
-  mi_ficha: 'secondary',
-  cliente: 'success'
+const ACTION_LABELS: Record<string, string> = {
+  grant_role: 'Acceso por rol concedido',
+  revoke_role: 'Acceso por rol revocado',
+  grant_user: 'Acceso individual concedido',
+  revoke_user: 'Acceso individual revocado',
+  expire_user: 'Acceso expirado',
+  grant_set: 'Set asignado',
+  revoke_set: 'Set revocado',
+  create_set: 'Set creado',
+  update_set: 'Set actualizado',
+  delete_set: 'Set eliminado'
 }
 
 const PREVIEW_STATE_COPY = {
@@ -87,6 +92,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
   const [overrideError, setOverrideError] = useState<string | null>(null)
   const [overrideSuccess, setOverrideSuccess] = useState<string | null>(null)
   const [savingOverrides, setSavingOverrides] = useState(false)
+  const [resolvedEffectiveViewCodes, setResolvedEffectiveViewCodes] = useState<Set<string> | null>(null)
 
   useEffect(() => {
     setEditableViews(data.views)
@@ -214,8 +220,47 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
     setOverrideSuccess(null)
   }, [data.userOverrides, previewUser?.userId])
 
+  useEffect(() => {
+    if (!previewUser?.userId) {
+      setResolvedEffectiveViewCodes(null)
+
+      return
+    }
+
+    setResolvedEffectiveViewCodes(null)
+
+    fetch(`/api/admin/team/roles/${previewUser.userId}/effective-views`)
+      .then(res => (res.ok ? res.json() : null))
+      .then((responseData: { effectiveViews?: Array<{ viewCode: string }> } | null) => {
+        if (!responseData?.effectiveViews) return
+
+        setResolvedEffectiveViewCodes(new Set(responseData.effectiveViews.map(v => v.viewCode)))
+      })
+      .catch(() => setResolvedEffectiveViewCodes(null))
+  }, [previewUser?.userId])
+
   const previewViews = useMemo(() => {
     if (!previewUser) return []
+
+    if (resolvedEffectiveViewCodes) {
+      const resolved = editableViews.filter(view => resolvedEffectiveViewCodes.has(view.viewCode))
+
+      const current = new Map(resolved.map(view => [view.viewCode, view]))
+
+      for (const override of selectedUserOverrides) {
+        const view = editableViews.find(candidate => candidate.viewCode === override.viewCode)
+
+        if (!view) continue
+
+        if (override.overrideType === 'grant') {
+          current.set(view.viewCode, view)
+        } else {
+          current.delete(view.viewCode)
+        }
+      }
+
+      return Array.from(current.values())
+    }
 
     const baseVisibleViews = editableViews.filter(view => {
       const roleGranted = previewUser.roleCodes.some(roleCode => Boolean(view.roleAccess[roleCode]))
@@ -244,10 +289,14 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
     }
 
     return Array.from(current.values())
-  }, [editableViews, previewUser, selectedUserOverrides])
+  }, [editableViews, previewUser, selectedUserOverrides, resolvedEffectiveViewCodes])
 
   const previewBaselineViews = useMemo(() => {
     if (!previewUser) return []
+
+    if (resolvedEffectiveViewCodes) {
+      return editableViews.filter(view => resolvedEffectiveViewCodes.has(view.viewCode))
+    }
 
     return editableViews.filter(view => {
       const roleGranted = previewUser.roleCodes.some(roleCode => Boolean(view.roleAccess[roleCode]))
@@ -260,7 +309,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
 
       return false
     })
-  }, [editableViews, previewUser])
+  }, [editableViews, previewUser, resolvedEffectiveViewCodes])
 
   const previewGrantedByOverride = useMemo(() => {
     const baselineCodes = new Set(previewBaselineViews.map(view => view.viewCode))
@@ -540,8 +589,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems={{ md: 'center' }} justifyContent='space-between'>
           <Box>
             <Stack direction='row' spacing={1.5} alignItems='center' sx={{ mb: 1.5 }}>
-              <Chip size='small' color='primary' variant='tonal' label='TASK-136' />
-              <Chip size='small' variant='outlined' label='Persistencia + enforcement activos' />
+              <Chip size='small' variant='outlined' label='Gobierno de acceso activo' />
             </Stack>
             <Typography variant='h4' sx={{ mb: 1 }}>
               Vistas y acceso
@@ -554,8 +602,8 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
           </Box>
           <Alert severity={data.persistence?.rolesWithPersistedAssignments ? 'success' : 'info'} variant='outlined' sx={{ maxWidth: 460 }}>
             {data.persistence?.rolesWithPersistedAssignments
-              ? `Persistencia activa para ${data.persistence.rolesWithPersistedAssignments} rol(es). La prioridad ahora es completar catálogo fino y reducir fallback.`
-              : 'La pantalla ya puede guardar assignments por rol, pero todavía conviene revisar qué vistas siguen dependiendo del baseline heredado.'}
+              ? `La persistencia está activa para ${data.persistence.rolesWithPersistedAssignments} rol(es). Las vistas restantes usan acceso por defecto del rol.`
+              : 'Las vistas se asignan usando el acceso por defecto de cada rol. Persiste las asignaciones para control granular.'}
           </Alert>
         </Stack>
       </Stack>
@@ -569,7 +617,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
       >
         <ExecutiveMiniStatCard title='Vistas registradas' value={String(data.totals.registeredViews)} detail='Mapa inicial de superficies gobernables' icon='tabler-layout-grid' tone='info' />
         <ExecutiveMiniStatCard title='Roles configurados' value={String(data.totals.configuredRoles)} detail='Perfiles visibles en la matrix actual' icon='tabler-shield-lock' tone='info' />
-        <ExecutiveMiniStatCard title='Personas previewables' value={String(data.totals.previewableUsers)} detail='Universo visible del consumer persona-first actual' icon='tabler-user-search' tone='success' />
+        <ExecutiveMiniStatCard title='Personas previewables' value={String(data.totals.previewableUsers)} detail='Usuarios con acceso verificable al portal' icon='tabler-user-search' tone='success' />
         <ExecutiveMiniStatCard title='Secciones cubiertas' value={String(data.totals.sections)} detail='Gestión, equipo, finanzas y administración' icon='tabler-layout-kanban' tone='warning' />
       </Box>
 
@@ -584,7 +632,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
             >
               <Tab value='permissions' label='Permisos' />
               <Tab value='preview' label='Preview' />
-              <Tab value='roadmap' label='Siguiente slice' />
+              <Tab value='sets' label='Sets de permisos' />
             </Tabs>
 
             {activeTab === 'permissions' ? (
@@ -890,7 +938,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                     </TextField>
                   </Box>
                   <Alert severity='info' variant='outlined'>
-                    El universo del selector ya es persona-first cuando existe `identityProfileId`. Los overrides y la auditoría siguen siendo `userId`-scoped sobre el principal portal compatible.
+                    El selector prioriza la persona canónica cuando existe perfil de identidad. Los overrides y la auditoría se aplican sobre el principal portal compatible del usuario.
                   </Alert>
                 </Stack>
 
@@ -947,9 +995,9 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                               size='small'
                               color={previewUser.portalAccessState === 'active' ? 'success' : previewUser.portalAccessState === 'inactive' ? 'default' : 'warning'}
                               variant='tonal'
-                              label={`portal:${previewUser.portalAccessState}`}
+                              label={previewUser.portalAccessState === 'active' ? 'Portal activo' : previewUser.portalAccessState === 'inactive' ? 'Portal inactivo' : 'Sin portal'}
                             />
-                            <Chip size='small' variant='outlined' label={`bridge:${previewUser.resolutionSource}`} />
+                            <Chip size='small' variant='outlined' label={`Vínculo: ${previewUser.resolutionSource.replace(/_/g, ' ')}`} />
                             <Chip size='small' variant='outlined' label={`${previewViews.length} vistas visibles`} />
                           </Stack>
                         </Stack>
@@ -999,7 +1047,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                                 <Box>
                                   <Typography variant='h6'>Overrides del principal portal</Typography>
                                   <Typography variant='body2' color='text.secondary'>
-                                    Cambia una vista entre `inherit`, `grant` y `revoke`. La persona es la raíz del preview, pero la persistencia sigue usando el principal portal compatible para no romper auditoría ni `authorizedViews`.
+                                    Cambia una vista entre heredar del rol, conceder acceso y revocar acceso. La persona es la raíz del preview, pero la persistencia sigue usando el principal portal compatible para mantener la auditoría.
                                   </Typography>
                                 </Box>
                                 <Stack direction='row' spacing={1}>
@@ -1020,7 +1068,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
 
                               {!previewUser.userId ? (
                                 <Alert severity='warning' variant='outlined'>
-                                  Esta persona todavía no tiene un principal portal persistible. Puedes revisar el acceso efectivo, pero no guardar overrides hasta que exista `userId` compatible.
+                                  Esta persona todavía no tiene un principal portal persistible. Puedes revisar el acceso efectivo, pero no guardar overrides hasta que exista un identificador de usuario compatible.
                                 </Alert>
                               ) : null}
 
@@ -1041,7 +1089,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                                 label='Expira el'
                                 value={overrideExpiresAt}
                                 onChange={event => setOverrideExpiresAt(event.target.value)}
-                                InputLabelProps={{ shrink: true }}
+                                slotProps={{ inputLabel: { shrink: true } }}
                                 helperText='Opcional. Se aplica al batch de overrides que guardes para este usuario.'
                               />
 
@@ -1101,7 +1149,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                                             onClick={() => toggleUserOverride(view.viewCode)}
                                             color={mode === 'grant' ? 'success' : mode === 'revoke' ? 'error' : 'default'}
                                             variant={mode === 'inherit' ? 'outlined' : 'tonal'}
-                                            label={mode === 'inherit' ? 'Inherit' : mode === 'grant' ? 'Grant' : 'Revoke'}
+                                            label={mode === 'inherit' ? 'Heredar' : mode === 'grant' ? 'Conceder' : 'Revocar'}
                                           />
                                         </Stack>
                                         {mode !== 'inherit' ? (
@@ -1149,7 +1197,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                                             size='small'
                                             color={entry.action.includes('grant') ? 'success' : entry.action.includes('revoke') ? 'error' : 'warning'}
                                             variant='tonal'
-                                            label={entry.action}
+                                            label={ACTION_LABELS[entry.action] ?? entry.action}
                                           />
                                           <Chip size='small' variant='outlined' label={entry.viewCode} />
                                           <Chip size='small' variant='outlined' label={String(entry.createdAt).replace('T', ' ').slice(0, 16)} />
@@ -1299,49 +1347,8 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
               </Stack>
             ) : null}
 
-            {activeTab === 'roadmap' ? (
-              <Box
-                sx={{
-                  display: 'grid',
-                  gap: 3,
-                  gridTemplateColumns: { xs: '1fr', md: 'repeat(3, minmax(0, 1fr))' }
-                }}
-              >
-                <Card variant='outlined'>
-                  <CardContent>
-                    <Stack spacing={2}>
-                      <Chip size='small' color='warning' variant='tonal' label='Siguiente slice' />
-                      <Typography variant='h6'>Validación visual real</Typography>
-                      <Typography color='text.secondary'>
-                        Confirmar en preview que los casos persona interna, persona cliente y bridge degradado se leen bien y no inducen a confundir persona con principal portal.
-                      </Typography>
-                    </Stack>
-                  </CardContent>
-                </Card>
-                <Card variant='outlined'>
-                  <CardContent>
-                    <Stack spacing={2}>
-                      <Chip size='small' color='warning' variant='tonal' label='Siguiente slice' />
-                      <Typography variant='h6'>Casos sin principal persistible</Typography>
-                      <Typography color='text.secondary'>
-                        Falta decidir si las personas sin `userId` compatible deben quedar fuera del preview editable o entrar como casos informativos de acceso incompleto.
-                      </Typography>
-                    </Stack>
-                  </CardContent>
-                </Card>
-                <Card variant='outlined'>
-                  <CardContent>
-                    <Stack spacing={2}>
-                      <Chip size='small' color='warning' variant='tonal' label='Siguiente slice' />
-                      <Typography variant='h6'>Cleanup de copy y policy</Typography>
-                      <Typography color='text.secondary'>
-                        Si el panel ya se siente estable, el cierre real de `TASK-140` pasa por fijar la policy final del universo previewable y dejar el resto del hardening a follow-ons.
-                      </Typography>
-                    </Stack>
-                  </CardContent>
-                </Card>
-              </Box>
-            ) : null}
+            {activeTab === 'sets' ? <PermissionSetsTab /> : null}
+
           </Stack>
         </CardContent>
       </Card>

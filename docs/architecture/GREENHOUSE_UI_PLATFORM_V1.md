@@ -10,6 +10,107 @@
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
 
+## Delta 2026-04-05 — Permission Sets UI patterns (TASK-263)
+
+### Keyboard-accessible interactive cards
+
+Pattern para cards clickeables que abren un panel de detalle. Usado en la lista de sets de permisos.
+
+```tsx
+<Card
+  role='button'
+  tabIndex={0}
+  aria-label={`Ver detalle de ${set.setName}`}
+  onClick={() => selectItem(set.id)}
+  onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectItem(set.id) } }}
+  sx={{
+    cursor: 'pointer',
+    '&:focus-visible': { outline: '2px solid', outlineColor: 'primary.main', outlineOffset: 2 },
+    '&:hover': { boxShadow: theme => theme.shadows[4] }
+  }}
+>
+```
+
+Regla: toda `<Card>` con `onClick` debe incluir `role="button"`, `tabIndex={0}`, `onKeyDown` y `focus-visible`.
+
+### Confirmation dialogs para acciones destructivas
+
+Pattern estandar para confirmacion antes de eliminar o revocar:
+
+```tsx
+<Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)} maxWidth='xs' fullWidth aria-labelledby='confirm-title'>
+  <DialogTitle id='confirm-title'>¿Eliminar «{itemName}»?</DialogTitle>
+  <DialogContent>
+    <DialogContentText>Esta acción no se puede deshacer. [consecuencia específica].</DialogContentText>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={() => setConfirmOpen(false)}>Cancelar</Button>
+    <Button variant='contained' color='error' onClick={handleConfirm}>Eliminar [objeto]</Button>
+  </DialogActions>
+</Dialog>
+```
+
+Reglas:
+- Titulo como pregunta con nombre del objeto entre comillas latinas (« »)
+- Body describe la consecuencia, no repite el titulo
+- Boton destructivo: `variant='contained' color='error'`, label especifico ("Eliminar set", "Revocar acceso")
+- Boton cancelar: sin variant (default), siempre "Cancelar"
+
+### Toast feedback pattern (react-toastify)
+
+```tsx
+import { toast } from 'react-toastify'
+
+// Success — auto-dismiss
+toast.success('Cambios guardados.')
+toast.success('Set de permisos creado.')
+
+// Error — persistent
+toast.error('No se pudo guardar. Intenta de nuevo.')
+```
+
+Regla: toda operacion de escritura exitosa muestra toast de exito. Copy en espanol, sin exclamaciones, confirma que se hizo.
+
+### Autocomplete user picker
+
+Pattern para asignar usuarios desde un buscador en vez de IDs crudos:
+
+```tsx
+<Autocomplete
+  multiple
+  options={availableUsers}
+  getOptionLabel={opt => `${opt.fullName} (${opt.email})`}
+  isOptionEqualToValue={(opt, val) => opt.userId === val.userId}
+  renderInput={params => <TextField {...params} label='Buscar usuarios' placeholder='Escribe un nombre...' size='small' />}
+  renderTags={(value, getTagProps) => value.map((opt, i) => <Chip {...getTagProps({ index: i })} key={opt.userId} label={opt.fullName} size='small' />)}
+  noOptionsText='No se encontraron usuarios disponibles'
+/>
+```
+
+Fuente: `GET /api/admin/views/sets/:setId/users?scope=assignable` retorna lista de usuarios activos.
+
+### SECTION_ACCENT shared constant
+
+Mapa de colores por seccion de governance, exportado desde `src/lib/admin/view-access-catalog.ts`:
+
+```tsx
+export const SECTION_ACCENT: Record<string, 'primary' | 'info' | 'success' | 'warning' | 'secondary'> = {
+  gestion: 'info', equipo: 'success', finanzas: 'warning', ia: 'secondary',
+  administracion: 'primary', mi_ficha: 'secondary', cliente: 'success'
+}
+```
+
+Importar desde `@/lib/admin/view-access-catalog` en vez de duplicar en cada componente.
+
+### Archivos clave
+
+| Archivo | Proposito |
+|---------|-----------|
+| `src/views/greenhouse/admin/permission-sets/PermissionSetsTab.tsx` | Tab CRUD de sets de permisos |
+| `src/views/greenhouse/admin/users/UserAccessTab.tsx` | Tab "Accesos" en detalle de usuario |
+| `src/lib/admin/permission-sets.ts` | CRUD + resolucion de Permission Sets |
+| `src/lib/admin/view-access-catalog.ts` | VIEW_REGISTRY, GOVERNANCE_SECTIONS, SECTION_ACCENT |
+
 ## Delta 2026-04-05 — Vuexy User View Pattern: sidebar profile + tabs (referencia para Mi Perfil)
 
 Patron enterprise de detalle de usuario extraido del full-version de Vuexy (`apps/user/view`). Aplicable a vistas self-service ("Mi *") donde el usuario ve su propia informacion.

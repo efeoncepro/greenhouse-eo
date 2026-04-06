@@ -52,7 +52,7 @@ export async function POST(request: Request) {
     const userId = await withGreenhousePostgresTransaction(async (client) => {
       const userResult = await client.query<{ user_id: string }>(
         `INSERT INTO greenhouse_core.client_users (email, full_name, client_id, status, auth_mode, created_at)
-         VALUES ($1, $2, $3, 'pending', 'credentials', now())
+         VALUES ($1, $2, $3, 'invited', 'credentials', now())
          RETURNING user_id`,
         [normalizedEmail, full_name, client_id]
       )
@@ -86,27 +86,17 @@ export async function POST(request: Request) {
     const inviteUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/auth/accept-invite?token=${token}`
     const inviterName = session.user.name || 'Un administrador'
 
-    // Get client name
-    const clients = await runGreenhousePostgresQuery<{ display_name: string }>(
-      `SELECT display_name FROM greenhouse_core.clients WHERE client_id = $1 LIMIT 1`,
-      [client_id]
-    )
-
-    const clientName = clients[0]?.display_name || 'Greenhouse'
-
+    // clientName, userName, locale → resolved automatically by context resolver
     const delivery = await sendEmail({
       emailType: 'invitation',
       domain: 'identity',
       recipients: [{
         email: normalizedEmail,
-        userId,
-        name: full_name
+        userId
       }],
       context: {
         inviteUrl,
-        inviterName,
-        clientName,
-        userName: full_name
+        inviterName
       },
       sourceEntity: 'client_users',
       actorEmail: session.user.email || undefined

@@ -1,14 +1,17 @@
 # GREENHOUSE_REPO_ECOSYSTEM_V1.md
 
 ## Objetivo
-Dejar explicito que `greenhouse-eo` no vive aislado: depende de un ecosistema pequeño de repos hermanos que cubren pipelines, notificaciones e inteligencia adyacente.
+
+Dejar explicito que `greenhouse-eo` no vive aislado: depende de un ecosistema pequeño de repos hermanos que cubren pipelines, notificaciones e inteligencia adyacente, y de un upstream de referencia para la base Vuexy.
 
 Este documento existe para que cualquier agente sepa:
+
 - que repo consultar primero segun el dominio
 - que repo parece ser source of truth operativo de cada integracion
 - cuando no corresponde implementar algo dentro de `greenhouse-eo`
 
 ## Regla base
+
 - `greenhouse-eo` es el portal y la capa de experiencia Greenhouse.
 - Los repos hermanos no deben tratarse como anexos casuales: cada uno tiene ownership funcional propio.
 - Si un cambio depende de una integracion o pipeline que runtimea fuera de este repo, revisar primero el repo hermano correspondiente.
@@ -16,7 +19,12 @@ Este documento existe para que cualquier agente sepa:
 
 ## Repos hermanos canonicos
 
+Nota:
+
+- Esta lista incluye repos operativos hermanos y un upstream de referencia del starter/theme cuando ese upstream afecta decisiones reales de implementacion.
+
 ### 1. Portal Greenhouse
+
 - Repo: `efeoncepro/greenhouse-eo`
 - Rol: portal principal sobre Next.js + Vuexy + MUI
 - Source of truth para:
@@ -31,6 +39,7 @@ Este documento existe para que cualquier agente sepa:
   - runtime Postgres-first / BigQuery fallback del portal
 
 ### 2. Notion -> BigQuery delivery pipeline
+
 - Repo: `cesargrowth11/notion-bigquery`
 - Rol: Cloud Function que sincroniza Notion hacia BigQuery (`notion_ops`) y genera tablas operativas/staging para analitica
 - Source of truth para:
@@ -44,6 +53,7 @@ Este documento existe para que cualquier agente sepa:
 - No asumir que `greenhouse-eo` puede corregir por si solo un gap del pipeline si la columna o la logica nace en esta Cloud Function.
 
 ### 3. HubSpot -> BigQuery CRM pipeline
+
 - Repo: `cesargrowth11/hubspot-bigquery`
 - Rol: Cloud Function que sincroniza HubSpot hacia BigQuery (`hubspot_crm`) y opera el bridge con Greenhouse para catalogo/capabilities y lecturas salientes
 - Source of truth para:
@@ -56,6 +66,7 @@ Este documento existe para que cualquier agente sepa:
   - bridges de capabilities / tenant pulls entre HubSpot y Greenhouse
 
 ### 4. Notion -> Teams notifier
+
 - Repo: `cesargrowth11/notion-teams`
 - Rol: Cloud Function que recibe eventos/cambios de Notion y publica notificaciones hacia Microsoft Teams
 - Source of truth para:
@@ -68,6 +79,7 @@ Este documento existe para que cualquier agente sepa:
   - health/admin panel del notificador
 
 ### 5. Notion <-> Frame.io review sync
+
 - Repo: `cesargrowth11/notion-frame-io`
 - Rol: Cloud Function que sincroniza estado y senales de revision entre Notion y Frame.io V4
 - Source of truth para:
@@ -80,6 +92,7 @@ Este documento existe para que cualquier agente sepa:
   - rounds de cambio y metadata de revision
 
 ### 6. Kortex
+
 - Repo: `efeoncepro/kortex`
 - Rol: plataforma separada con frontend Next.js + runtime Python para agentes, despliegues y analitica sobre BigQuery
 - Source of truth para:
@@ -94,18 +107,36 @@ Este documento existe para que cualquier agente sepa:
   - `kortex` es repo hermano, no submodulo ni package interno de `greenhouse-eo`
   - usarlo como referencia de ownership funcional o integracion, no como source of truth de UX del portal Greenhouse
 
+### 7. Vuexy Next.js Admin Template
+
+- Repo: `pixinvent/vuexy-nextjs-admin-template`
+- Rol: upstream de referencia del starter/theme Vuexy sobre Next.js que Greenhouse adapta en este portal
+- Source of truth para:
+  - patrones base de layout, shell y navegacion heredados de Vuexy
+  - ejemplos originales del starter, wiring del tema y convenciones base de la plantilla
+  - contraste entre el template upstream y las referencias locales (`starter-kit` / `full-version`) cuando haya duda sobre comportamiento base
+- Tomar desde aqui cuando el cambio afecte:
+  - layout global, navegacion base, settings o shell heredado de Vuexy
+  - componentes o patrones de la plantilla que Greenhouse este adaptando
+  - dudas sobre si un comportamiento viene del template original o de una customizacion Greenhouse
+- Guardrail:
+  - no tratar este repo como source of truth funcional del producto
+  - no copiar componentes o flujos a ciegas; toda integracion debe adaptarse al contexto Greenhouse
+
 ## Regla de seleccion rapida
 
-| Si el cambio toca... | Consultar primero |
-|---|---|
-| UX, rutas, permisos, modulos del portal | `greenhouse-eo` |
-| Notion -> BigQuery operativo (`notion_ops`) | `notion-bigquery` |
-| HubSpot -> BigQuery / bridge CRM | `hubspot-bigquery` |
-| Notificaciones Notion -> Teams | `notion-teams` |
-| Sync de revision Notion <-> Frame.io | `notion-frame-io` |
-| Agentes/Kortex/MCP fuera del portal | `kortex` |
+| Si el cambio toca...                        | Consultar primero             |
+| ------------------------------------------- | ----------------------------- |
+| UX, rutas, permisos, modulos del portal     | `greenhouse-eo`               |
+| Layout base, shell o tema Vuexy             | `vuexy-nextjs-admin-template` |
+| Notion -> BigQuery operativo (`notion_ops`) | `notion-bigquery`             |
+| HubSpot -> BigQuery / bridge CRM            | `hubspot-bigquery`            |
+| Notificaciones Notion -> Teams              | `notion-teams`                |
+| Sync de revision Notion <-> Frame.io        | `notion-frame-io`             |
+| Agentes/Kortex/MCP fuera del portal         | `kortex`                      |
 
 ## Guardrails para agentes
+
 - No reimplementar dentro de `greenhouse-eo` una logica cuyo ownership ya vive en un repo hermano.
 - Si desde `greenhouse-eo` solo se consume una tabla o efecto externo, tratar el repo hermano como upstream.
 - Si una task del portal depende de un cambio aguas arriba, dejarlo explicitado en la task y en `Handoff.md`.
@@ -117,6 +148,7 @@ Este documento existe para que cualquier agente sepa:
   - `kortex` owns su propia plataforma y runtime de agentes
 
 ## Estado actual validado
+
 - Repos verificados por GitHub CLI en esta sesion:
   - `efeoncepro/greenhouse-eo`
   - `cesargrowth11/notion-bigquery`
@@ -124,4 +156,5 @@ Este documento existe para que cualquier agente sepa:
   - `cesargrowth11/notion-teams`
   - `cesargrowth11/notion-frame-io`
   - `efeoncepro/kortex`
+  - `pixinvent/vuexy-nextjs-admin-template`
 - Esta lista debe mantenerse corta y util. Si aparece otro repo realmente operativo para Greenhouse, agregarlo aqui y dejar solo un delta breve en `project_context.md` y `Handoff.md`.

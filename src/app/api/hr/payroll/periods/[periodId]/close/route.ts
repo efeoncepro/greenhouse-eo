@@ -21,9 +21,7 @@ export async function POST(_: Request, { params }: { params: Promise<{ periodId:
     const { period, exportedNow } = await closePayrollPeriod(periodId)
 
     const notificationDispatch =
-      currentPeriod?.status === 'exported' || !exportedNow
-        ? null
-        : await dispatchPayrollExportNotifications()
+      currentPeriod?.status === 'exported' || !exportedNow ? null : await dispatchPayrollExportNotifications(periodId)
 
     return NextResponse.json({
       ...period,

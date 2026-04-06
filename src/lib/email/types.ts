@@ -10,7 +10,7 @@ export type EmailType =
   | 'payroll_receipt'
   | 'notification'
 
-export type EmailDeliveryStatus = 'pending' | 'sent' | 'failed' | 'skipped'
+export type EmailDeliveryStatus = 'pending' | 'sent' | 'failed' | 'skipped' | 'rate_limited' | 'delivered'
 
 export interface EmailRecipient {
   email: string
@@ -45,6 +45,22 @@ export interface EmailTemplateContext extends Record<string, unknown> {
 
 export type EmailTemplateResolver<TContext extends EmailTemplateContext = EmailTemplateContext> =
   (context: TContext) => EmailTemplateRenderResult
+
+export interface EmailPreviewMeta {
+  label: string
+  description: string
+  domain: EmailDomain
+  defaultProps: Record<string, unknown>
+  supportsLocale: boolean
+  propsSchema: EmailPreviewPropField[]
+}
+
+export interface EmailPreviewPropField {
+  key: string
+  label: string
+  type: 'text' | 'number' | 'select' | 'boolean'
+  options?: string[]
+}
 
 export interface SendEmailInput<TContext extends EmailTemplateContext = EmailTemplateContext> {
   emailType: EmailType

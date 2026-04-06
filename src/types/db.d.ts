@@ -536,6 +536,20 @@ export interface GreenhouseCoreOrganizations {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCorePermissionSets {
+  active: Generated<boolean>;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  description: string | null;
+  is_system: Generated<boolean>;
+  section: string | null;
+  set_id: string;
+  set_name: string;
+  updated_at: Generated<Timestamp>;
+  updated_by: string | null;
+  view_codes: Generated<string[]>;
+}
+
 export interface GreenhouseCorePersonMemberships {
   active: Generated<boolean>;
   created_at: Generated<Timestamp>;
@@ -766,6 +780,18 @@ export interface GreenhouseCoreUserClientScopes {
   user_id: string;
 }
 
+export interface GreenhouseCoreUserPermissionSetAssignments {
+  active: Generated<boolean>;
+  assigned_by_user_id: string | null;
+  assignment_id: string;
+  created_at: Generated<Timestamp>;
+  expires_at: Timestamp | null;
+  reason: string | null;
+  set_id: string;
+  updated_at: Generated<Timestamp>;
+  user_id: string;
+}
+
 export interface GreenhouseCoreUserProjectScopes {
   active: Generated<boolean>;
   created_at: Generated<Timestamp>;
@@ -817,8 +843,9 @@ export interface GreenhouseCoreViewAccessLog {
   performed_by: string;
   reason: string | null;
   target_role: string | null;
+  target_set: string | null;
   target_user: string | null;
-  view_code: string;
+  view_code: string | null;
 }
 
 export interface GreenhouseCoreViewRegistry {
@@ -3434,6 +3461,7 @@ export interface DB {
   "greenhouse_core.notion_workspaces": GreenhouseCoreNotionWorkspaces;
   "greenhouse_core.operational_responsibilities": GreenhouseCoreOperationalResponsibilities;
   "greenhouse_core.organizations": GreenhouseCoreOrganizations;
+  "greenhouse_core.permission_sets": GreenhouseCorePermissionSets;
   "greenhouse_core.person_memberships": GreenhouseCorePersonMemberships;
   "greenhouse_core.providers": GreenhouseCoreProviders;
   "greenhouse_core.role_view_assignments": GreenhouseCoreRoleViewAssignments;
@@ -3450,6 +3478,7 @@ export interface DB {
   "greenhouse_core.spaces": GreenhouseCoreSpaces;
   "greenhouse_core.user_campaign_scopes": GreenhouseCoreUserCampaignScopes;
   "greenhouse_core.user_client_scopes": GreenhouseCoreUserClientScopes;
+  "greenhouse_core.user_permission_set_assignments": GreenhouseCoreUserPermissionSetAssignments;
   "greenhouse_core.user_project_scopes": GreenhouseCoreUserProjectScopes;
   "greenhouse_core.user_role_assignments": GreenhouseCoreUserRoleAssignments;
   "greenhouse_core.user_view_overrides": GreenhouseCoreUserViewOverrides;

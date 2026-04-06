@@ -10,19 +10,31 @@ interface NotificationEmailProps {
   actionUrl?: string
   actionLabel?: string
   recipientName?: string
+  locale?: 'es' | 'en'
+  unsubscribeUrl?: string
 }
 
 export default function NotificationEmail({
-  title,
-  body,
-  actionUrl,
+  title = 'Nuevo activo disponible para revisión',
+  body = 'El equipo de diseño subió 3 nuevos archivos al proyecto Campaña Q2. Requieren tu aprobación antes del viernes.',
+  actionUrl = 'https://greenhouse.efeoncepro.com/delivery',
   actionLabel,
-  recipientName
+  recipientName = 'María González',
+  locale = 'es',
+  unsubscribeUrl
 }: NotificationEmailProps) {
-  const greeting = recipientName ? `Hola ${recipientName.split(' ')[0]},` : 'Hola,'
+  const t = locale === 'en' ? {
+    greeting: (name?: string) => name ? `Hi ${name},` : 'Hi,',
+    defaultAction: 'View in Greenhouse',
+    fallback: 'If the button does not work, copy and paste this address into your browser:'
+  } : {
+    greeting: (name?: string) => name ? `Hola ${name.split(' ')[0]},` : 'Hola,',
+    defaultAction: 'Ver en Greenhouse',
+    fallback: 'Si el bot\u00f3n no funciona, copia y pega esta direcci\u00f3n en tu navegador:'
+  }
 
   return (
-    <EmailLayout previewText={title}>
+    <EmailLayout previewText={title} locale={locale} unsubscribeUrl={unsubscribeUrl}>
       <Heading style={{
         fontFamily: EMAIL_FONTS.heading,
         fontSize: '24px',
@@ -40,7 +52,7 @@ export default function NotificationEmail({
         lineHeight: '24px',
         margin: '0 0 20px'
       }}>
-        {greeting}
+        {t.greeting(recipientName)}
       </Text>
 
       {body && (
@@ -56,7 +68,7 @@ export default function NotificationEmail({
 
       {actionUrl && (
         <Section style={{ textAlign: 'center' as const, margin: '0 0 28px' }}>
-          <EmailButton href={actionUrl}>{actionLabel || 'Ver en Greenhouse'}</EmailButton>
+          <EmailButton href={actionUrl}>{actionLabel || t.defaultAction}</EmailButton>
         </Section>
       )}
 
@@ -68,7 +80,7 @@ export default function NotificationEmail({
           margin: '0',
           wordBreak: 'break-all'
         }}>
-          Si el botón no funciona, copia y pega esta dirección en tu navegador: {actionUrl}
+          {t.fallback} {actionUrl}
         </Text>
       )}
     </EmailLayout>

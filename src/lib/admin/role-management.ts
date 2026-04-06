@@ -94,7 +94,7 @@ export const getAvailableRoles = async (): Promise<RoleCatalogEntry[]> => {
      ORDER BY role_name ASC`
   )
 
-  return rows.map(normalizeRoleCatalog)
+  return rows.filter(row => isRoleCode(row.role_code)).map(normalizeRoleCatalog)
 }
 
 /**

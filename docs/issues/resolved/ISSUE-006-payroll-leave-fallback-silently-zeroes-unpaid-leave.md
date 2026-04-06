@@ -98,7 +98,34 @@ El resultado es que una falla del reader de permisos se convierte en una nómina
 
 ## Estado
 
-open
+resolved — 2026-04-05
+
+## Resolución
+
+Se propagó un flag explícito `leaveDataDegraded: boolean` desde el origen del fetch hasta readiness y projection:
+
+1. **`fetchApprovedLeaveForPeriod()`** ahora retorna `{ rows, degraded }` en vez de `LeaveCountRow[]`. Ambos caminos de fallback (`!isGreenhousePostgresConfigured()` y `catch`) retornan `{ rows: [], degraded: true }`.
+2. **`fetchAttendanceForAllMembers()`** retorna un nuevo tipo `AttendanceResult = { snapshots: Map<string, AttendanceSnapshot>, leaveDataDegraded: boolean }` en vez de un `Map` desnudo.
+3. **`PayrollAttendanceDiagnostics`** incluye `leaveDataDegraded: boolean` y las diagnostics marcan `blocking: true` cuando está degradado.
+4. **`buildPayrollPeriodReadiness()`** emite un `blockingIssue` con code `'leave_data_unavailable'` cuando `attendanceDiagnostics.leaveDataDegraded` es `true`, impidiendo que el operador apruebe/exporte un período con datos incompletos.
+5. **`projectPayrollForPeriod()`** maneja el nuevo tipo de retorno, expone `attendanceDiagnostics` en el resultado y su `.catch()` retorna `{ snapshots: new Map(), leaveDataDegraded: true }`.
+6. **`calculatePayroll()`** ahora falla explícitamente si `leaveDataDegraded` es `true`, de modo que el carril oficial no puede seguir calculando con permisos no remunerados implícitamente en cero.
+
+### Archivos modificados
+
+- `src/types/payroll.ts` — nuevo code `'leave_data_unavailable'` + campo `leaveDataDegraded` en diagnostics
+- `src/lib/payroll/fetch-attendance-for-period.ts` — tipo `AttendanceResult`, refactor de fetch y diagnostics
+- `src/lib/payroll/payroll-readiness.ts` — blocking issue para leave degradado
+- `src/lib/payroll/project-payroll.ts` — adaptado al nuevo tipo de retorno
+- `src/lib/payroll/payroll-readiness.test.ts` — fixture actualizado
+- `src/lib/payroll/project-payroll.test.ts` — mocks actualizados
+
+### Verificación
+
+- `npx tsc --noEmit`: OK
+- `pnpm lint`: OK
+- `pnpm test`: OK
+- `pnpm build`: OK
 
 ## Relacionado
 

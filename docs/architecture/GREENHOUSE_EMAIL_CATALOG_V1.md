@@ -10,6 +10,21 @@ La relacion correcta entre ambas es:
 - `CODEX_TASK_Transactional_Email_System.md` define la infraestructura base de envio, tokens, templates y flows de acceso
 - esta task define el catalogo mas amplio de emails que Greenhouse necesitara como portal ejecutivo-operativo
 
+## Delta 2026-04-06
+
+- TASK-269: Email Delivery Enterprise Hardening implementado
+- Context Resolver automatico: `resolveEmailContext()` hidrata recipient/client/platform
+- i18n: templates de identidad soportan es/en via `locale` en `client_users`
+- Rate limiting: 10 emails/hora por recipient (`src/lib/email/rate-limit.ts`)
+- Unsubscribe: link firmado en emails broadcast, endpoint `POST /api/account/email-preferences`
+- Bounce/Complaint webhook: `POST /api/webhooks/resend` — hard bounce marca undeliverable, complaint auto-unsubscribe
+- Eventos outbox: `email_delivery.bounced`, `email_delivery.complained`, `email_delivery.rate_limited`, `email_delivery.undeliverable_marked`
+- Runtime DDL eliminado: `ensureEmailSchema()` removido, schema formalizado via migracion
+- Retry window ampliada: 1 hora → 24 horas
+- Attachments: Buffer directo (no base64 string)
+- Endpoints retry consolidados: 3 → 1 (`/api/admin/ops/email-delivery-retry`)
+- Resuelve: ISSUE-017 (display_name), ISSUE-018 (status pending), ISSUE-019 (runtime DDL), ISSUE-020 (retry duplicados), ISSUE-021 (retry window), ISSUE-022 (base64 attachments), ISSUE-023 (no migration)
+
 ## Delta 2026-03-28
 
 - `TASK-095` quedó implementada como capa unificada de delivery sobre Resend en `src/lib/email/delivery.ts`.

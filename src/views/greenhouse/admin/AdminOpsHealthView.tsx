@@ -835,7 +835,7 @@ const AdminOpsHealthView = ({ data }: Props) => {
                     helper='Devuelve a pending las proyecciones fallidas para un nuevo intento.'
                   />
                   <AdminOpsActionButton
-                    endpoint='/api/admin/ops/email-delivery/retry-failed'
+                    endpoint='/api/admin/ops/email-delivery-retry'
                     label='Retry email delivery'
                     helper='Reintenta deliveries fallidas elegibles usando el payload persistido.'
                   />

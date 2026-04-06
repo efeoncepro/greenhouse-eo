@@ -24,6 +24,7 @@ import CustomTabList from '@core/components/mui/TabList'
 import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
 import type { AdminUserDetail } from '@/lib/admin/get-admin-user-detail'
 
+import UserAccessTab from './admin/users/UserAccessTab'
 import UserActivityTimeline from './admin/users/UserActivityTimeline'
 import UserDetailHeader from './admin/users/UserDetailHeader'
 import UserProjectListTable from './admin/users/UserProjectListTable'
@@ -418,6 +419,12 @@ const GreenhouseAdminUserDetail = ({ data }: Props) => {
               label={GH_INTERNAL_MESSAGES.admin_user_detail_tab_roles}
               iconPosition='start'
             />
+            <Tab
+              icon={<i className='tabler-eye-check' />}
+              value='access'
+              label={GH_INTERNAL_MESSAGES.admin_user_detail_tab_access}
+              iconPosition='start'
+            />
           </CustomTabList>
 
           <TabPanel value='profile' className='p-0 pbs-6'>
@@ -435,6 +442,9 @@ const GreenhouseAdminUserDetail = ({ data }: Props) => {
               tenantType={data.tenantType}
               initialRoleCodes={data.roleCodes}
             />
+          </TabPanel>
+          <TabPanel value='access' className='p-0 pbs-6'>
+            <UserAccessTab userId={data.userId} />
           </TabPanel>
         </TabContext>
       </Grid>

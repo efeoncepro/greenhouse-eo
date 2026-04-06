@@ -33,6 +33,7 @@ export async function GET(request: Request) {
     results.infrastructure = 'OK'
   } catch (e: unknown) {
     results.infrastructure = `FAIL: ${e instanceof Error ? e.message : String(e)}`
+
     return NextResponse.json(results)
   }
 

@@ -19,6 +19,7 @@ interface PayrollExportReadyEmailProps {
   netTotalDisplay: string
   exportedBy?: string | null
   exportedAt?: string | null
+  unsubscribeUrl?: string
 }
 
 const BRAND_BLUE = '#023c70'
@@ -96,13 +97,19 @@ const attachmentRow = (title: string, subtitle: string) => (
   </tr>
 )
 
+const PREVIEW_BREAKDOWNS: CurrencyBreakdown[] = [
+  { currency: 'CLP', regimeLabel: 'Chile', grossTotal: '$12.450.000', netTotal: '$9.280.000', entryCount: 8 },
+  { currency: 'USD', regimeLabel: 'Internacional', grossTotal: 'US$8,500.00', netTotal: 'US$7,200.00', entryCount: 3 }
+]
+
 export default function PayrollExportReadyEmail({
-  periodLabel,
-  entryCount,
-  breakdowns,
-  netTotalDisplay,
+  periodLabel = 'Marzo 2026',
+  entryCount = 11,
+  breakdowns = PREVIEW_BREAKDOWNS,
+  netTotalDisplay = '$9.280.000 + US$7,200.00',
   exportedBy,
-  exportedAt
+  exportedAt,
+  unsubscribeUrl
 }: PayrollExportReadyEmailProps) {
   const metaParts: string[] = []
 
@@ -112,7 +119,7 @@ export default function PayrollExportReadyEmail({
   const metaLine = metaParts.join(' · ')
 
   return (
-    <EmailLayout previewText={`Nómina ${periodLabel} cerrada — neto total ${netTotalDisplay}`} lang='es'>
+    <EmailLayout previewText={`Nómina ${periodLabel} cerrada — neto total ${netTotalDisplay}`} lang='es' unsubscribeUrl={unsubscribeUrl}>
       {/* Overline */}
       <Text style={{
         fontFamily: EMAIL_FONTS.body,

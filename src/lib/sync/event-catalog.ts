@@ -63,6 +63,9 @@ export const AGGREGATE_TYPES = {
   // Email Verification
   emailVerification: 'email_verification',
 
+  // Email Delivery
+  emailDelivery: 'email_delivery',
+
   // Quotes
   quote: 'quote',
 
@@ -98,7 +101,10 @@ export const AGGREGATE_TYPES = {
   authSession: 'auth_session',
 
   // User Lifecycle (TASK-253)
-  userLifecycle: 'user_lifecycle'
+  userLifecycle: 'user_lifecycle',
+
+  // Permission Sets (TASK-263)
+  permissionSet: 'permission_set'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -195,6 +201,12 @@ export const EVENT_TYPES = {
   emailVerificationRequested: 'identity.email_verification.requested',
   emailVerificationCompleted: 'identity.email_verification.completed',
 
+  // Email Delivery
+  emailDeliveryBounced: 'email_delivery.bounced',
+  emailDeliveryComplained: 'email_delivery.complained',
+  emailDeliveryRateLimited: 'email_delivery.rate_limited',
+  emailDeliveryUndeliverableMarked: 'email_delivery.undeliverable_marked',
+
   // Quotes & Credit Notes
   quoteCreated: 'finance.quote.created',
   quoteConverted: 'finance.quote.converted',
@@ -259,7 +271,11 @@ export const EVENT_TYPES = {
 
   // User Lifecycle (TASK-253)
   userDeactivated: 'user.deactivated',
-  userReactivated: 'user.reactivated'
+  userReactivated: 'user.reactivated',
+
+  // Permission Sets (TASK-263)
+  viewAccessSetAssigned: 'access.permission_set_assigned',
+  viewAccessSetRevoked: 'access.permission_set_revoked'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
@@ -361,7 +377,11 @@ export const REACTIVE_EVENT_TYPES = [
 
   // User Lifecycle (TASK-253)
   EVENT_TYPES.userDeactivated,
-  EVENT_TYPES.userReactivated
+  EVENT_TYPES.userReactivated,
+
+  // Permission Sets (TASK-263)
+  EVENT_TYPES.viewAccessSetAssigned,
+  EVENT_TYPES.viewAccessSetRevoked
 ] as const
 
 // ── Event Payload Types (TASK-247) ──

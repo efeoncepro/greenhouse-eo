@@ -8,6 +8,7 @@ const attendanceDiagnostics = {
   source: 'legacy_attendance_daily_plus_hr_leave' as const,
   integrationTarget: 'microsoft_teams' as const,
   blocking: false,
+  leaveDataDegraded: false,
   notes: [
     'La asistencia aún se resume desde attendance_daily + leave_requests.',
     'La integración futura objetivo para asistencia es Microsoft Teams.'
@@ -221,6 +222,26 @@ describe('buildPayrollPeriodReadiness', () => {
     expect(readiness.ready).toBe(false)
     expect(readiness.calculation.ready).toBe(false)
     expect(readiness.blockingIssues.map(issue => issue.code)).toEqual(['missing_utm_value'])
+  })
+
+  it('blocks calculation when leave data is degraded', () => {
+    const readiness = buildPayrollPeriodReadiness({
+      period,
+      compensationRows: [compensatedMember],
+      missingKpiMemberIds: [],
+      missingAttendanceMemberIds: [],
+      attendanceDiagnostics: {
+        ...attendanceDiagnostics,
+        blocking: true,
+        leaveDataDegraded: true,
+        notes: [...attendanceDiagnostics.notes, 'Leave data unavailable from PostgreSQL.']
+      }
+    })
+
+    expect(readiness.ready).toBe(false)
+    expect(readiness.calculation.ready).toBe(false)
+    expect(readiness.approval.ready).toBe(false)
+    expect(readiness.blockingIssues.map(issue => issue.code)).toEqual(['leave_data_unavailable'])
   })
 
   it('marks draft periods as overdue once the calculation deadline passed', () => {

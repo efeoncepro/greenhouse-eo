@@ -62,14 +62,14 @@ const summaryRow = (label: string, value: string, emphasis = false) => (
 )
 
 export default function PayrollReceiptEmail({
-  fullName,
-  periodYear,
-  periodMonth,
-  entryCurrency,
-  grossTotal,
-  totalDeductions,
-  netTotal,
-  payRegime
+  fullName = 'María González Rojas',
+  periodYear = 2026,
+  periodMonth = 3,
+  entryCurrency = 'CLP',
+  grossTotal = 1850000,
+  totalDeductions = 370000,
+  netTotal = 1480000,
+  payRegime = 'chile'
 }: PayrollReceiptEmailProps) {
   const monthName = MONTH_NAMES[periodMonth - 1] ?? String(periodMonth)
   const isChile = payRegime === 'chile'

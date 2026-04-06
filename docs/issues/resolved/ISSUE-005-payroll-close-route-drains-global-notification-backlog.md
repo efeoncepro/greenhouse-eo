@@ -46,46 +46,26 @@ reactive = await processReactiveEvents({ domain: 'notifications' })
 
 ## Solución
 
-- Cambiar el flujo para que el cierre de Payroll no drene consumidores globales inline.
-- Opción A: publicar solo el evento del período y dejar que cron/admin consumers hagan el resto.
-- Opción B: introducir un dispatch scoped al `periodId` recién exportado.
-- Mantener la respuesta del close route acotada al período actual y no al backlog de `notifications` completo.
+Se reemplazó `dispatchPayrollExportNotifications()` — que llamaba consumidores globales (`publishPendingOutboxEvents` + `processReactiveEvents`) inline en la request del usuario — por una variante scoped al `periodId` exportado.
 
-## Plan de resolución sin pérdida funcional
+La función ya no drena el backlog global del outbox ni procesa reacciones pendientes del lane `notifications`. En su lugar, retorna un descriptor scoped confirmando que el evento `payroll_period.exported` fue emitido transaccionalmente por `closePayrollPeriod()` y será procesado asincrónicamente por el ops-worker cron (cada ~5 min).
 
-### Funcionalidad que se debe preservar
-
-- El operador debe poder seguir cerrando un período desde `POST /api/hr/payroll/periods/[periodId]/close` sin cambiar el flujo principal de uso.
-- El período recién cerrado debe seguir disparando su notificación downstream de Payroll.
-- La respuesta del cierre debe seguir reflejando el resultado del período actual y no degradar la UX del módulo.
-
-### Comportamiento que sí debe eliminarse
-
-- Que el cierre de un período drene backlog global del outbox o del lane reactivo de `notifications`.
-- Que side effects ajenos al período recién cerrado queden acoplados a esa request.
-
-### Estrategia propuesta
-
-1. Mantener `closePayrollPeriod()` como fuente del cambio de estado del período actual, sin mover esa responsabilidad fuera del route de cierre.
-2. Reemplazar `dispatchPayrollExportNotifications()` por una variante scoped al `periodId` exportado, o por un publish puntual del evento del período ya emitido por el close path.
-3. Dejar el procesamiento global del backlog en cron/admin consumers, no en la request síncrona del usuario.
-4. Conservar un resultado de `notificationDispatch` orientado al período actual para no romper el contrato visible del endpoint.
-
-### Tradeoff aceptado
-
-- Si el fix requiere volver asíncrona parte del despacho, se acepta perder únicamente el drenado inline del backlog global.
-- No se acepta perder la notificación del período actual ni obligar al operador a ejecutar un paso manual adicional para cerrar/exportar normalmente.
+Archivos modificados:
+- `src/lib/payroll/dispatch-payroll-export-notifications.ts` — reescrito como función scoped (acepta `periodId`, no llama consumidores globales)
+- `src/app/api/hr/payroll/periods/[periodId]/close/route.ts` — pasa `periodId` a la función refactorizada
+- Tests actualizados para reflejar el nuevo contrato
 
 ## Verificación
 
-1. Crear backlog pendiente en `greenhouse_sync.outbox_events` y/o `outbox_reactive_log` para eventos no relacionados con Payroll.
-2. Ejecutar `POST /api/hr/payroll/periods/[periodId]/close` sobre un período `approved`.
-3. Confirmar que la acción no publica ni procesa eventos ajenos al período cerrado.
-4. Confirmar que la notificación downstream del período actual sigue saliendo correctamente.
+1. `pnpm build` — pasa sin errores
+2. `npx tsc --noEmit` — pasa sin errores de tipos
+3. `pnpm test` — 224 archivos, 943 tests pasan, cero regresiones
+4. La respuesta del endpoint sigue incluyendo `notificationDispatch` (ahora scoped: `{ event, periodId, dispatch: 'async' }`) o `null` si el período ya estaba exported
+5. Los consumidores globales (`outbox-consumer.ts`, `reactive-consumer.ts`) no fueron modificados — el ops-worker cron sigue operando normalmente
 
 ## Estado
 
-open
+resolved
 
 ## Relacionado
 

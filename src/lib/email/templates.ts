@@ -9,6 +9,7 @@ import VerifyEmail from '@/emails/VerifyEmail'
 
 import type {
   EmailAttachment,
+  EmailPreviewMeta,
   EmailTemplateContext,
   EmailTemplateRenderResult,
   EmailTemplateResolver,
@@ -16,8 +17,10 @@ import type {
 } from './types'
 
 type ResolverMap = Map<EmailType, EmailTemplateResolver<any>>
+type PreviewMetaMap = Map<EmailType, EmailPreviewMeta>
 
 const EMAIL_TEMPLATES: ResolverMap = new Map()
+const EMAIL_PREVIEW_META: PreviewMetaMap = new Map()
 
 const MONTH_NAMES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -125,16 +128,27 @@ const buildNotificationPlainText = (context: {
   body?: string
   actionUrl?: string
   recipientName?: string
-}) => [
-  context.recipientName ? `Hola ${context.recipientName.split(' ')[0]},` : 'Hola,',
-  '',
-  context.title,
-  context.body || '',
-  '',
-  context.actionUrl ? `Ver más: ${context.actionUrl}` : '',
-  '',
-  '— Greenhouse by Efeonce Group'
-].filter(Boolean).join('\n')
+  locale?: 'es' | 'en'
+}) => {
+  const locale = context.locale || 'es'
+
+  const greeting = locale === 'en'
+    ? (context.recipientName ? `Hi ${context.recipientName},` : 'Hi,')
+    : (context.recipientName ? `Hola ${context.recipientName.split(' ')[0]},` : 'Hola,')
+
+  const actionPrefix = locale === 'en' ? 'View more:' : 'Ver m\u00e1s:'
+
+  return [
+    greeting,
+    '',
+    context.title,
+    context.body || '',
+    '',
+    context.actionUrl ? `${actionPrefix} ${context.actionUrl}` : '',
+    '',
+    '\u2014 Greenhouse by Efeonce Group'
+  ].filter(Boolean).join('\n')
+}
 
 export function registerTemplate<TContext extends EmailTemplateContext>(
   emailType: EmailType,
@@ -158,46 +172,76 @@ export function resolveTemplate<TContext extends EmailTemplateContext>(
 
 export const listRegisteredTemplates = () => Array.from(EMAIL_TEMPLATES.keys())
 
+export function registerPreviewMeta(emailType: EmailType, meta: EmailPreviewMeta) {
+  EMAIL_PREVIEW_META.set(emailType, meta)
+}
+
+export function getPreviewMeta(emailType: EmailType): EmailPreviewMeta | null {
+  return EMAIL_PREVIEW_META.get(emailType) ?? null
+}
+
+export function getPreviewCatalog(): Array<{ emailType: EmailType } & EmailPreviewMeta> {
+  return Array.from(EMAIL_PREVIEW_META.entries()).map(([emailType, meta]) => ({
+    emailType,
+    ...meta
+  }))
+}
+
 registerTemplate('password_reset', (context: {
   resetUrl: string
   userName?: string
-}) => ({
-  subject: 'Restablece tu contraseña — Greenhouse',
-  react: PasswordResetEmail({ resetUrl: context.resetUrl, userName: context.userName }),
-  text: [
-    'Restablece tu contraseña en Greenhouse.',
-    '',
-    `Enlace: ${context.resetUrl}`
-  ].join('\n')
-}))
+  locale?: 'es' | 'en'
+}) => {
+  const locale = context.locale || 'es'
+
+  return {
+    subject: locale === 'en'
+      ? 'Reset your password \u2014 Greenhouse'
+      : 'Restablece tu contrase\u00f1a \u2014 Greenhouse',
+    react: PasswordResetEmail({ resetUrl: context.resetUrl, userName: context.userName, locale }),
+    text: locale === 'en'
+      ? ['Reset your Greenhouse password.', '', `Link: ${context.resetUrl}`].join('\n')
+      : ['Restablece tu contrase\u00f1a en Greenhouse.', '', `Enlace: ${context.resetUrl}`].join('\n')
+  }
+})
 
 registerTemplate('invitation', (context: {
   inviteUrl: string
   inviterName: string
   clientName: string
   userName?: string
-}) => ({
-  subject: 'Te invitaron a Greenhouse — Efeonce',
-  react: InvitationEmail(context),
-  text: [
-    `${context.inviterName} te invitó a ${context.clientName} en Greenhouse.`,
-    '',
-    `Activa tu cuenta: ${context.inviteUrl}`
-  ].join('\n')
-}))
+  locale?: 'es' | 'en'
+}) => {
+  const locale = context.locale || 'es'
+
+  return {
+    subject: locale === 'en'
+      ? 'You were invited to Greenhouse \u2014 Efeonce'
+      : 'Te invitaron a Greenhouse \u2014 Efeonce',
+    react: InvitationEmail({ ...context, locale }),
+    text: locale === 'en'
+      ? [`${context.inviterName} invited you to ${context.clientName} on Greenhouse.`, '', `Activate your account: ${context.inviteUrl}`].join('\n')
+      : [`${context.inviterName} te invit\u00f3 a ${context.clientName} en Greenhouse.`, '', `Activa tu cuenta: ${context.inviteUrl}`].join('\n')
+  }
+})
 
 registerTemplate('verify_email', (context: {
   verifyUrl: string
   userName?: string
-}) => ({
-  subject: 'Confirma tu correo — Greenhouse',
-  react: VerifyEmail({ verifyUrl: context.verifyUrl, userName: context.userName }),
-  text: [
-    'Confirma tu correo en Greenhouse.',
-    '',
-    `Enlace: ${context.verifyUrl}`
-  ].join('\n')
-}))
+  locale?: 'es' | 'en'
+}) => {
+  const locale = context.locale || 'es'
+
+  return {
+    subject: locale === 'en'
+      ? 'Confirm your email \u2014 Greenhouse'
+      : 'Confirma tu correo \u2014 Greenhouse',
+    react: VerifyEmail({ verifyUrl: context.verifyUrl, userName: context.userName, locale }),
+    text: locale === 'en'
+      ? ['Confirm your Greenhouse email.', '', `Link: ${context.verifyUrl}`].join('\n')
+      : ['Confirma tu correo en Greenhouse.', '', `Enlace: ${context.verifyUrl}`].join('\n')
+  }
+})
 
 registerTemplate('notification', (context: {
   title: string
@@ -205,17 +249,25 @@ registerTemplate('notification', (context: {
   actionUrl?: string
   actionLabel?: string
   recipientName?: string
-}) => ({
-  subject: context.title,
-  react: NotificationEmail({
-    title: context.title,
-    body: context.body,
-    actionUrl: context.actionUrl,
-    actionLabel: context.actionLabel,
-    recipientName: context.recipientName
-  }),
-  text: buildNotificationPlainText(context)
-}))
+  locale?: 'es' | 'en'
+  unsubscribeUrl?: string
+}) => {
+  const locale = context.locale || 'es'
+
+  return {
+    subject: context.title,
+    react: NotificationEmail({
+      title: context.title,
+      body: context.body,
+      actionUrl: context.actionUrl,
+      actionLabel: context.actionLabel,
+      recipientName: context.recipientName,
+      locale,
+      unsubscribeUrl: context.unsubscribeUrl
+    }),
+    text: buildNotificationPlainText({ ...context, locale })
+  }
+})
 
 registerTemplate('payroll_export', (context: {
   periodLabel: string
@@ -225,6 +277,7 @@ registerTemplate('payroll_export', (context: {
   exportedBy?: string | null
   exportedAt?: string | null
   attachments?: EmailAttachment[]
+  unsubscribeUrl?: string
 }) => ({
   subject: `Nómina cerrada — ${context.periodLabel} · ${context.entryCount} colaboradores`,
   react: PayrollExportReadyEmail({
@@ -233,7 +286,8 @@ registerTemplate('payroll_export', (context: {
     breakdowns: context.breakdowns,
     netTotalDisplay: context.netTotalDisplay,
     exportedBy: context.exportedBy ?? undefined,
-    exportedAt: formatShortDateTime(context.exportedAt) ?? undefined
+    exportedAt: formatShortDateTime(context.exportedAt) ?? undefined,
+    unsubscribeUrl: context.unsubscribeUrl
   }),
   text: buildPayrollExportPlainText(context),
   attachments: context.attachments
@@ -271,3 +325,126 @@ registerTemplate('payroll_receipt', (context: {
     contentType: 'application/pdf'
   }]
 }))
+
+// ═══════════════════════════════════════════════════════════
+// Preview Metadata Registry
+// Auto-descubrible: nuevos templates con registerPreviewMeta()
+// aparecen automaticamente en la vista de preview admin.
+// ═══════════════════════════════════════════════════════════
+
+registerPreviewMeta('invitation', {
+  label: 'Invitacion de onboarding',
+  description: 'Email que se envia al invitar un usuario nuevo a la plataforma',
+  domain: 'identity',
+  supportsLocale: true,
+  defaultProps: {
+    inviteUrl: 'https://greenhouse.efeoncepro.com/auth/accept-invite?token=preview-token',
+    inviterName: 'Julio Reyes',
+    clientName: 'Efeonce Group',
+    userName: 'Maria Gonzalez'
+  },
+  propsSchema: [
+    { key: 'inviterName', label: 'Nombre del invitador', type: 'text' },
+    { key: 'clientName', label: 'Nombre del cliente', type: 'text' },
+    { key: 'userName', label: 'Nombre del destinatario', type: 'text' },
+    { key: 'inviteUrl', label: 'URL de invitacion', type: 'text' }
+  ]
+})
+
+registerPreviewMeta('password_reset', {
+  label: 'Restablecer contrasena',
+  description: 'Email con enlace para cambiar la contrasena',
+  domain: 'identity',
+  supportsLocale: true,
+  defaultProps: {
+    resetUrl: 'https://greenhouse.efeoncepro.com/auth/reset-password?token=preview-token',
+    userName: 'Maria Gonzalez'
+  },
+  propsSchema: [
+    { key: 'userName', label: 'Nombre del destinatario', type: 'text' },
+    { key: 'resetUrl', label: 'URL de reset', type: 'text' }
+  ]
+})
+
+registerPreviewMeta('verify_email', {
+  label: 'Verificacion de correo',
+  description: 'Email para confirmar la direccion de correo electronico',
+  domain: 'identity',
+  supportsLocale: true,
+  defaultProps: {
+    verifyUrl: 'https://greenhouse.efeoncepro.com/auth/verify-email?token=preview-token',
+    userName: 'Maria Gonzalez'
+  },
+  propsSchema: [
+    { key: 'userName', label: 'Nombre del destinatario', type: 'text' },
+    { key: 'verifyUrl', label: 'URL de verificacion', type: 'text' }
+  ]
+})
+
+registerPreviewMeta('notification', {
+  label: 'Notificacion generica',
+  description: 'Template generico para notificaciones del sistema',
+  domain: 'system',
+  supportsLocale: true,
+  defaultProps: {
+    title: 'Nuevo activo disponible para revision',
+    body: 'El equipo de diseno subio 3 nuevos archivos al proyecto Campana Q2. Requieren tu aprobacion antes del viernes.',
+    actionUrl: 'https://greenhouse.efeoncepro.com/delivery',
+    recipientName: 'Maria Gonzalez'
+  },
+  propsSchema: [
+    { key: 'title', label: 'Titulo', type: 'text' },
+    { key: 'body', label: 'Cuerpo del mensaje', type: 'text' },
+    { key: 'actionUrl', label: 'URL de accion', type: 'text' },
+    { key: 'actionLabel', label: 'Texto del boton', type: 'text' },
+    { key: 'recipientName', label: 'Nombre del destinatario', type: 'text' }
+  ]
+})
+
+registerPreviewMeta('payroll_export', {
+  label: 'Nomina cerrada',
+  description: 'Notificacion de que la nomina del periodo fue exportada y esta lista para revision',
+  domain: 'payroll',
+  supportsLocale: false,
+  defaultProps: {
+    periodLabel: 'Marzo 2026',
+    entryCount: 11,
+    breakdowns: [
+      { currency: 'CLP', regimeLabel: 'Chile', grossTotal: '$12.450.000', netTotal: '$9.280.000', entryCount: 8 },
+      { currency: 'USD', regimeLabel: 'Internacional', grossTotal: 'US$8,500.00', netTotal: 'US$7,200.00', entryCount: 3 }
+    ],
+    netTotalDisplay: '$9.280.000 + US$7,200.00'
+  },
+  propsSchema: [
+    { key: 'periodLabel', label: 'Periodo', type: 'text' },
+    { key: 'entryCount', label: 'Colaboradores', type: 'number' },
+    { key: 'netTotalDisplay', label: 'Neto total a mostrar', type: 'text' }
+  ]
+})
+
+registerPreviewMeta('payroll_receipt', {
+  label: 'Recibo de nomina',
+  description: 'Liquidacion individual del colaborador con PDF adjunto',
+  domain: 'payroll',
+  supportsLocale: false,
+  defaultProps: {
+    fullName: 'Maria Gonzalez Rojas',
+    periodYear: 2026,
+    periodMonth: 3,
+    entryCurrency: 'CLP',
+    grossTotal: 1850000,
+    totalDeductions: 370000,
+    netTotal: 1480000,
+    payRegime: 'chile'
+  },
+  propsSchema: [
+    { key: 'fullName', label: 'Nombre completo', type: 'text' },
+    { key: 'periodYear', label: 'Ano', type: 'number' },
+    { key: 'periodMonth', label: 'Mes (1-12)', type: 'number' },
+    { key: 'entryCurrency', label: 'Moneda', type: 'select', options: ['CLP', 'USD'] },
+    { key: 'grossTotal', label: 'Bruto', type: 'number' },
+    { key: 'totalDeductions', label: 'Descuentos', type: 'number' },
+    { key: 'netTotal', label: 'Liquido', type: 'number' },
+    { key: 'payRegime', label: 'Regimen', type: 'select', options: ['chile', 'international'] }
+  ]
+})

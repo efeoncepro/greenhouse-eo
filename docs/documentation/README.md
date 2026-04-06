@@ -10,11 +10,13 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 
 ### Admin Center
 
-_Pendiente de documentar._
+- [Sets de permisos](admin-center/sets-de-permisos.md) — Gobierno de acceso por conjuntos reutilizables de vistas
+- [Preview de correos](admin-center/preview-de-correos.md) — Herramienta admin para ver y probar templates de email antes de enviar, con cambio de idioma, viewport movil/escritorio y envio de prueba
 
 ### Plataforma interna y calidad
 
 - [Sistema de Observabilidad de Tests](plataforma/sistema-observabilidad-de-tests.md) — inventario del suite, resultados, coverage, artifacts y como leer la ultima corrida sin abrir logs crudos
+- [Sistema de Email Templates](plataforma/sistema-email-templates.md) — inventario de templates (react-email + Resend), design tokens, assets de marca, workflow Figma ↔ codigo
 
 ### Finanzas
 

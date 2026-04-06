@@ -24,12 +24,7 @@ import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
 import { canRecalculatePayrollPeriod } from '@/lib/payroll/period-lifecycle'
 import { upsertPayrollEntry } from '@/lib/payroll/persist-entry'
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
-import {
-  PayrollValidationError,
-  getPeriodRangeFromId,
-  runPayrollQuery,
-  toNumber
-} from '@/lib/payroll/shared'
+import { PayrollValidationError, getPeriodRangeFromId, runPayrollQuery, toNumber } from '@/lib/payroll/shared'
 import {
   isPayrollPostgresEnabled,
   pgDeleteStalePayrollEntries,
@@ -121,18 +116,23 @@ const resolvePayrollPeriodIndicators = async ({
   const { periodEnd } = getPeriodRangeFromId(periodId)
   const resolvedIndicatorDate = indicatorPeriodDate || periodEnd
 
-  const ufValue = typeof periodUfValue === 'number'
-    ? periodUfValue
-    : (await getHistoricalEconomicIndicatorForPeriod({
-        indicatorCode: 'UF',
-        periodDate: resolvedIndicatorDate
-      }))?.value ?? null
+  const ufValue =
+    typeof periodUfValue === 'number'
+      ? periodUfValue
+      : ((
+          await getHistoricalEconomicIndicatorForPeriod({
+            indicatorCode: 'UF',
+            periodDate: resolvedIndicatorDate
+          })
+        )?.value ?? null)
 
   const utmValue = taxTableVersion
-    ? (await getHistoricalEconomicIndicatorForPeriod({
-        indicatorCode: 'UTM',
-        periodDate: resolvedIndicatorDate
-      }))?.value ?? null
+    ? ((
+        await getHistoricalEconomicIndicatorForPeriod({
+          indicatorCode: 'UTM',
+          periodDate: resolvedIndicatorDate
+        })
+      )?.value ?? null)
     : null
 
   return { ufValue, utmValue }
@@ -172,29 +172,33 @@ export const buildPayrollEntry = async ({
   const bonusRpaAmount = rpaResult.amount
 
   // Attendance-based adjustments
-  const deductibleDays = skipsAttendanceAdjustments ? 0 : attendance ? attendance.daysAbsent + attendance.daysOnUnpaidLeave : 0
-  const workingDays = skipsAttendanceAdjustments ? 22 : attendance?.workingDaysInPeriod ?? 22
+  const deductibleDays = skipsAttendanceAdjustments
+    ? 0
+    : attendance
+      ? attendance.daysAbsent + attendance.daysOnUnpaidLeave
+      : 0
+
+  const workingDays = skipsAttendanceAdjustments ? 22 : (attendance?.workingDaysInPeriod ?? 22)
   const attendanceRatio = workingDays > 0 ? Math.max(0, (workingDays - deductibleDays) / workingDays) : 1
 
-  const adjustedBaseSalary = deductibleDays > 0
-    ? roundCurrency(compensation.baseSalary * attendanceRatio)
-    : compensation.baseSalary
+  const adjustedBaseSalary =
+    deductibleDays > 0 ? roundCurrency(compensation.baseSalary * attendanceRatio) : compensation.baseSalary
 
-  const adjustedRemoteAllowance = deductibleDays > 0
-    ? roundCurrency(compensation.remoteAllowance * attendanceRatio)
-    : compensation.remoteAllowance
+  const adjustedRemoteAllowance =
+    deductibleDays > 0 ? roundCurrency(compensation.remoteAllowance * attendanceRatio) : compensation.remoteAllowance
 
-  const adjustedColacionAmount = deductibleDays > 0
-    ? roundCurrency((compensation.colacionAmount ?? 0) * attendanceRatio)
-    : (compensation.colacionAmount ?? 0)
+  const adjustedColacionAmount =
+    deductibleDays > 0
+      ? roundCurrency((compensation.colacionAmount ?? 0) * attendanceRatio)
+      : (compensation.colacionAmount ?? 0)
 
-  const adjustedMovilizacionAmount = deductibleDays > 0
-    ? roundCurrency((compensation.movilizacionAmount ?? 0) * attendanceRatio)
-    : (compensation.movilizacionAmount ?? 0)
+  const adjustedMovilizacionAmount =
+    deductibleDays > 0
+      ? roundCurrency((compensation.movilizacionAmount ?? 0) * attendanceRatio)
+      : (compensation.movilizacionAmount ?? 0)
 
-  const adjustedFixedBonusAmount = deductibleDays > 0
-    ? roundCurrency(compensation.fixedBonusAmount * attendanceRatio)
-    : compensation.fixedBonusAmount
+  const adjustedFixedBonusAmount =
+    deductibleDays > 0 ? roundCurrency(compensation.fixedBonusAmount * attendanceRatio) : compensation.fixedBonusAmount
 
   const honorariosTotals =
     compensation.contractType === 'honorarios'
@@ -208,15 +212,43 @@ export const buildPayrollEntry = async ({
         })
       : null
 
-  const deelGrossTotal = compensation.payrollVia === 'deel'
-    ? roundCurrency(adjustedBaseSalary + adjustedFixedBonusAmount + bonusOtdAmount + bonusRpaAmount)
-    : null
+  const deelGrossTotal =
+    compensation.payrollVia === 'deel'
+      ? roundCurrency(adjustedBaseSalary + adjustedFixedBonusAmount + bonusOtdAmount + bonusRpaAmount)
+      : null
 
-  const totals =
-    honorariosTotals
+  const totals = honorariosTotals
+    ? {
+        grossTotal: honorariosTotals.grossTotal,
+        netTotalCalculated: honorariosTotals.netTotalCalculated,
+        chileAfpName: null,
+        chileAfpRate: null,
+        chileAfpAmount: null,
+        chileAfpCotizacionAmount: null,
+        chileAfpComisionAmount: null,
+        chileGratificacionLegalAmount: null,
+        chileColacionAmount: null,
+        chileMovilizacionAmount: null,
+        chileHealthSystem: null,
+        chileHealthAmount: null,
+        chileHealthObligatoriaAmount: null,
+        chileHealthVoluntariaAmount: null,
+        chileEmployerSisAmount: null,
+        chileEmployerCesantiaAmount: null,
+        chileEmployerMutualAmount: null,
+        chileEmployerTotalCost: null,
+        chileUnemploymentRate: null,
+        chileUnemploymentAmount: null,
+        chileTaxableBase: honorariosTotals.grossTotal,
+        chileTaxAmount: null,
+        chileApvAmount: null,
+        chileUfValue: null,
+        chileTotalDeductions: honorariosTotals.siiRetentionAmount
+      }
+    : compensation.payrollVia === 'deel'
       ? {
-          grossTotal: honorariosTotals.grossTotal,
-          netTotalCalculated: honorariosTotals.netTotalCalculated,
+          grossTotal: deelGrossTotal ?? 0,
+          netTotalCalculated: deelGrossTotal ?? 0,
           chileAfpName: null,
           chileAfpRate: null,
           chileAfpAmount: null,
@@ -235,65 +267,37 @@ export const buildPayrollEntry = async ({
           chileEmployerTotalCost: null,
           chileUnemploymentRate: null,
           chileUnemploymentAmount: null,
-          chileTaxableBase: honorariosTotals.grossTotal,
+          chileTaxableBase: null,
           chileTaxAmount: null,
           chileApvAmount: null,
           chileUfValue: null,
-          chileTotalDeductions: honorariosTotals.siiRetentionAmount
+          chileTotalDeductions: 0
         }
-      : compensation.payrollVia === 'deel'
-        ? {
-            grossTotal: deelGrossTotal ?? 0,
-            netTotalCalculated: deelGrossTotal ?? 0,
-            chileAfpName: null,
-            chileAfpRate: null,
-            chileAfpAmount: null,
-            chileAfpCotizacionAmount: null,
-            chileAfpComisionAmount: null,
-            chileGratificacionLegalAmount: null,
-            chileColacionAmount: null,
-            chileMovilizacionAmount: null,
-            chileHealthSystem: null,
-            chileHealthAmount: null,
-            chileHealthObligatoriaAmount: null,
-            chileHealthVoluntariaAmount: null,
-            chileEmployerSisAmount: null,
-            chileEmployerCesantiaAmount: null,
-            chileEmployerMutualAmount: null,
-            chileEmployerTotalCost: null,
-            chileUnemploymentRate: null,
-            chileUnemploymentAmount: null,
-            chileTaxableBase: null,
-            chileTaxAmount: null,
-            chileApvAmount: null,
-            chileUfValue: null,
-            chileTotalDeductions: 0
-          }
-        : await calculatePayrollTotals({
-            payRegime: compensation.payRegime,
-            baseSalary: adjustedBaseSalary,
-            remoteAllowance: adjustedRemoteAllowance,
-            colacionAmount: adjustedColacionAmount,
-            movilizacionAmount: adjustedMovilizacionAmount,
-            fixedBonusAmount: adjustedFixedBonusAmount,
-            bonusOtdAmount,
-            bonusRpaAmount,
-            bonusOtherAmount: 0,
-            gratificacionLegalMode: compensation.gratificacionLegalMode,
-            afpName: compensation.afpName,
-            afpRate: compensation.afpRate,
-            afpCotizacionRate: compensation.afpCotizacionRate,
-            afpComisionRate: compensation.afpComisionRate,
-            healthSystem: compensation.healthSystem,
-            healthPlanUf: compensation.healthPlanUf,
-            unemploymentRate: compensation.unemploymentRate,
-            contractType: compensation.contractType,
-            hasApv: compensation.hasApv,
-            apvAmount: compensation.apvAmount,
-            ufValue,
-            taxAmount: 0,
-            periodDate
-          })
+      : await calculatePayrollTotals({
+          payRegime: compensation.payRegime,
+          baseSalary: adjustedBaseSalary,
+          remoteAllowance: adjustedRemoteAllowance,
+          colacionAmount: adjustedColacionAmount,
+          movilizacionAmount: adjustedMovilizacionAmount,
+          fixedBonusAmount: adjustedFixedBonusAmount,
+          bonusOtdAmount,
+          bonusRpaAmount,
+          bonusOtherAmount: 0,
+          gratificacionLegalMode: compensation.gratificacionLegalMode,
+          afpName: compensation.afpName,
+          afpRate: compensation.afpRate,
+          afpCotizacionRate: compensation.afpCotizacionRate,
+          afpComisionRate: compensation.afpComisionRate,
+          healthSystem: compensation.healthSystem,
+          healthPlanUf: compensation.healthPlanUf,
+          unemploymentRate: compensation.unemploymentRate,
+          contractType: compensation.contractType,
+          hasApv: compensation.hasApv,
+          apvAmount: compensation.apvAmount,
+          ufValue,
+          taxAmount: 0,
+          periodDate
+        })
 
   return {
     entryId: `${periodId}_${compensation.memberId}`,
@@ -307,7 +311,10 @@ export const buildPayrollEntry = async ({
     payrollVia: compensation.payrollVia,
     currency: compensation.currency,
     baseSalary: compensation.baseSalary,
-    remoteAllowance: compensation.payrollVia === 'deel' || compensation.contractType === 'honorarios' ? 0 : compensation.remoteAllowance,
+    remoteAllowance:
+      compensation.payrollVia === 'deel' || compensation.contractType === 'honorarios'
+        ? 0
+        : compensation.remoteAllowance,
     colacionAmount: compensation.contractType === 'honorarios' ? 0 : compensation.colacionAmount,
     movilizacionAmount: compensation.contractType === 'honorarios' ? 0 : compensation.movilizacionAmount,
     fixedBonusLabel: compensation.fixedBonusLabel,
@@ -360,11 +367,11 @@ export const buildPayrollEntry = async ({
     manualOverrideNote: null,
     bonusOtdProrationFactor: otdResult.prorationFactor,
     bonusRpaProrationFactor: rpaResult.prorationFactor,
-    workingDaysInPeriod: skipsAttendanceAdjustments ? null : attendance?.workingDaysInPeriod ?? null,
-    daysPresent: skipsAttendanceAdjustments ? null : attendance?.daysPresent ?? null,
-    daysAbsent: skipsAttendanceAdjustments ? null : attendance?.daysAbsent ?? null,
-    daysOnLeave: skipsAttendanceAdjustments ? null : attendance?.daysOnLeave ?? null,
-    daysOnUnpaidLeave: skipsAttendanceAdjustments ? null : attendance?.daysOnUnpaidLeave ?? null,
+    workingDaysInPeriod: skipsAttendanceAdjustments ? null : (attendance?.workingDaysInPeriod ?? null),
+    daysPresent: skipsAttendanceAdjustments ? null : (attendance?.daysPresent ?? null),
+    daysAbsent: skipsAttendanceAdjustments ? null : (attendance?.daysAbsent ?? null),
+    daysOnLeave: skipsAttendanceAdjustments ? null : (attendance?.daysOnLeave ?? null),
+    daysOnUnpaidLeave: skipsAttendanceAdjustments ? null : (attendance?.daysOnUnpaidLeave ?? null),
     adjustedBaseSalary: deductibleDays > 0 ? adjustedBaseSalary : null,
     adjustedRemoteAllowance: deductibleDays > 0 ? adjustedRemoteAllowance : null,
     adjustedColacionAmount: deductibleDays > 0 ? adjustedColacionAmount : null,
@@ -401,7 +408,9 @@ export const calculatePayroll = async ({
 
   const attendanceCutDate =
     projectionContext?.mode === 'actual_to_date'
-      ? (projectionContext.asOfDate < range.periodEnd ? projectionContext.asOfDate : range.periodEnd)
+      ? projectionContext.asOfDate < range.periodEnd
+        ? projectionContext.asOfDate
+        : range.periodEnd
       : range.periodEnd
 
   const allRows = await getApplicableCompensationVersionsForPeriod(range.periodStart, range.periodEnd)
@@ -434,11 +443,17 @@ export const calculatePayroll = async ({
   }
 
   if (includesChilePayroll && !period.taxTableVersion) {
-    throw new PayrollValidationError('This payroll period requires taxTableVersion to calculate Chile payroll taxes.', 400)
+    throw new PayrollValidationError(
+      'This payroll period requires taxTableVersion to calculate Chile payroll taxes.',
+      400
+    )
   }
 
   if (includesChilePayroll && period.taxTableVersion && typeof indicatorValues.utmValue !== 'number') {
-    throw new PayrollValidationError('This payroll period requires a historical UTM value to calculate Chile payroll taxes.', 400)
+    throw new PayrollValidationError(
+      'This payroll period requires a historical UTM value to calculate Chile payroll taxes.',
+      400
+    )
   }
 
   const memberIds = compensationRows.map(row => row.memberId)
@@ -452,6 +467,13 @@ export const calculatePayroll = async ({
     }),
     fetchAttendanceForPayrollPeriod(memberIds, range.periodStart, attendanceCutDate)
   ])
+
+  if (attendanceResult.leaveDataDegraded) {
+    throw new PayrollValidationError(
+      'Leave data unavailable from PostgreSQL. Official payroll calculation cannot continue.',
+      503
+    )
+  }
 
   const attendanceData = attendanceResult.snapshots
 

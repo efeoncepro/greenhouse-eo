@@ -6,6 +6,7 @@ import { GOVERNANCE_SECTIONS, VIEW_REGISTRY, type GovernanceViewRegistryEntry } 
 import { getAdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { resolvePermissionSetViews } from '@/lib/admin/permission-sets'
 
 type RoleAssignmentRow = {
   role_code: string
@@ -83,7 +84,7 @@ const missingRelation = (error: unknown) => {
   )
 }
 
-import { ROLE_CODES } from '@/config/role-codes'
+import { ROLE_CODES, isRoleCode } from '@/config/role-codes'
 
 const roleCanAccessViewFallback = (
   role: {
@@ -803,15 +804,17 @@ export const getAdminPersistedViewAccessGovernance = async () => {
   const registryRows = toRegistryRows(persistedRegistryRows)
   const persistedByRole = toPersistedByRole(persistedRows)
 
-  const roles = access.roles.map(role => ({
-    roleCode: role.roleCode,
-    roleName: role.roleName,
-    tenantType: role.tenantType,
-    isAdmin: role.isAdmin,
-    isInternal: role.isInternal,
-    routeGroups: role.routeGroups,
-    assignedUsers: role.assignedUsers
-  }))
+  const roles = access.roles
+    .filter(role => isRoleCode(role.roleCode))
+    .map(role => ({
+      roleCode: role.roleCode,
+      roleName: role.roleName,
+      tenantType: role.tenantType,
+      isAdmin: role.isAdmin,
+      isInternal: role.isInternal,
+      routeGroups: role.routeGroups,
+      assignedUsers: role.assignedUsers
+    }))
 
   const userBaselines = access.users.map(user => ({
     userId: user.userId,
@@ -945,6 +948,11 @@ export const resolveAuthorizedViewsForUser = async ({
       )
       .map(view => view.viewCode)
 
+    // Layer 2 — Permission Sets (additive, TASK-263)
+    const permissionSetViews = userId
+      ? await resolvePermissionSetViews(userId).catch(() => [] as string[])
+      : []
+
     const overridesForUser = userId
       ? persistedUserOverrides.filter(override => override.user_id === userId)
       : []
@@ -958,7 +966,7 @@ export const resolveAuthorizedViewsForUser = async ({
         }
 
         return current
-      }, new Set(baseAuthorizedViews))
+      }, new Set([...baseAuthorizedViews, ...permissionSetViews]))
     )
 
     const routeGroups = Array.from(

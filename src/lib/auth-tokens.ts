@@ -9,7 +9,7 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 // ── Types ────────────────────────────────────────────────────────────
 
-type TokenType = 'reset' | 'invite' | 'verify'
+type TokenType = 'reset' | 'invite' | 'verify' | 'unsubscribe'
 
 interface TokenPayload {
   user_id?: string
@@ -53,7 +53,7 @@ async function ensureTable(): Promise<void> {
         user_id      TEXT,
         email        TEXT NOT NULL,
         client_id    TEXT,
-        token_type   TEXT NOT NULL CHECK (token_type IN ('reset', 'invite', 'verify')),
+        token_type   TEXT NOT NULL CHECK (token_type IN ('reset', 'invite', 'verify', 'unsubscribe')),
         token_hash   TEXT NOT NULL,
         created_at   TIMESTAMPTZ DEFAULT now(),
         expires_at   TIMESTAMPTZ NOT NULL,

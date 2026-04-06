@@ -1,5 +1,84 @@
 # Handoff.md
 
+## Sesion 2026-04-06 — repo upstream Vuexy registrado en ecosystem doc
+
+### Rama / alcance
+
+- rama: actual
+- scope: documentar `pixinvent/vuexy-nextjs-admin-template` como upstream de referencia del tema Vuexy usado por Greenhouse
+
+### Cambios
+
+- `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md` ahora incluye el repo upstream de Vuexy con su rol, source of truth tecnico y guardrails de uso.
+- `project_context.md` actualizado con delta breve para dejar explicita la regla de consulta del upstream.
+
+### Verificacion
+
+- Validacion documental solamente
+
+### Riesgo / siguiente paso
+
+- Cuando un cambio toque shell, layout base o patrones heredados de Vuexy, revisar este upstream antes de asumir que el comportamiento nace en Greenhouse.
+
+## Sesion 2026-04-05 — TASK-263: Permission Sets enterprise view access
+
+### Rama / alcance
+
+- rama: `fix/ISSUE-006-silent-payroll-leave-zeroing` (trabajo incluido en rama existente)
+- scope: TASK-263 — Permission Sets CRUD, resolucion 3+1 capas, API, UI, effective views
+
+### Cambios
+
+- **Migracion**: `20260405232932457_permission-sets-tables.sql` — tablas `permission_sets` + `user_permission_set_assignments`, ALTER `view_access_log` CHECK constraint, seed 6 sets de sistema
+- **Event catalog**: `viewAccessSetAssigned` + `viewAccessSetRevoked` en `event-catalog.ts`; nuevo aggregate `permissionSet`
+- **Lib**: `src/lib/admin/permission-sets.ts` — CRUD completo, asignacion de usuarios, resolucion de vistas por sets, audit log
+- **Resolucion**: `resolveAuthorizedViewsForUser()` extendido con layer 2 (Permission Sets) entre rol y overrides
+- **API**: 5 nuevos endpoints bajo `/api/admin/views/sets/` + 1 effective-views en `/api/admin/team/roles/[userId]/effective-views`
+- **Types**: `src/types/permission-sets.ts` — shared types para API y UI
+- **UI**: `PermissionSetsTab.tsx` — nuevo tab "Permission Sets" en admin view governance (CRUD, detalle, asignacion usuarios)
+- **UI**: `UserAccessTab.tsx` — nuevo tab "Accesos" en admin user detail (roles, sets, overrides, effective views con source attribution)
+- **Nomenclatura**: 16 nuevos mensajes `admin_user_access_*` en `greenhouse-nomenclature.ts`
+
+### Verificacion
+
+- `npx tsc --noEmit` — OK
+- `pnpm lint` — OK
+- `pnpm build` — OK
+- Migracion pendiente: `pnpm migrate:up` (requiere Cloud SQL Proxy)
+
+### Riesgo / siguiente paso
+
+- Usuarios deben re-login para que los Permission Sets se reflejen en el JWT (`authorizedViews`)
+- La migracion debe ejecutarse antes del deploy (crea tablas + seed)
+- Follow-ups: Permission Set Groups, muting, data-scoping, PIM
+
+## Sesión 2026-04-05 — ISSUE-006: payroll leave fallback ya no permite cálculo oficial silenciosamente degradado
+
+### Rama / alcance
+
+- rama: `fix/ISSUE-006-silent-payroll-leave-zeroing`
+- scope: bloquear el cálculo oficial de Payroll cuando `leave_requests` no está disponible y exponer degradación explícita en proyección/readiness
+
+### Cambios
+
+- `src/lib/payroll/fetch-attendance-for-period.ts` — `fetchApprovedLeaveForPeriod()` ahora retorna `{ rows, degraded }`; el reader de asistencia propaga `leaveDataDegraded`
+- `src/types/payroll.ts` — nuevo code `leave_data_unavailable` + `leaveDataDegraded` en `PayrollAttendanceDiagnostics`
+- `src/lib/payroll/payroll-readiness.ts` — agrega blocker explícito si los permisos no pueden leerse
+- `src/lib/payroll/calculate-payroll.ts` — falla explícitamente si la data de permisos está degradada; ya no permite cálculo oficial con `daysOnUnpaidLeave = 0` implícito
+- `src/lib/payroll/project-payroll.ts` — mantiene tolerancia en proyección pero ahora expone `attendanceDiagnostics` para UI/API
+- tests actualizados en `payroll-readiness.test.ts` y `project-payroll.test.ts`
+
+### Verificación
+
+- `npx tsc --noEmit` — OK
+- `pnpm lint` — OK
+- `pnpm test` — OK
+- `pnpm build` — OK
+
+### Riesgo / siguiente paso
+
+- La API de proyección ahora expone `attendanceDiagnostics`; si alguna vista asume shape cerrada del payload, verificar en staging la lectura del nuevo campo
+
 ## Sesion 2026-04-05 — TASK-257: Mi Perfil enterprise redesign (sidebar + tabs)
 
 ### Rama / alcance

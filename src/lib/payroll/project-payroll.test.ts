@@ -8,7 +8,8 @@ const mockIsPayrollPostgresEnabled = vi.fn(() => true)
 const mockGetHistoricalEconomicIndicatorForPeriod = vi.fn()
 
 vi.mock('@/lib/payroll/get-compensation', () => ({
-  getApplicableCompensationVersionsForPeriod: (...args: unknown[]) => mockGetApplicableCompensationVersionsForPeriod(...args)
+  getApplicableCompensationVersionsForPeriod: (...args: unknown[]) =>
+    mockGetApplicableCompensationVersionsForPeriod(...args)
 }))
 
 vi.mock('@/lib/payroll/fetch-kpis-for-period', () => ({
@@ -17,6 +18,13 @@ vi.mock('@/lib/payroll/fetch-kpis-for-period', () => ({
 
 vi.mock('@/lib/payroll/fetch-attendance-for-period', () => ({
   fetchAttendanceForAllMembers: (...args: unknown[]) => mockFetchAttendanceForAllMembers(...args),
+  getPayrollAttendanceDiagnostics: ({ leaveDataDegraded = false }: { leaveDataDegraded?: boolean } = {}) => ({
+    source: 'legacy_attendance_daily_plus_hr_leave',
+    integrationTarget: 'microsoft_teams',
+    blocking: leaveDataDegraded,
+    leaveDataDegraded,
+    notes: []
+  }),
   countWeekdays: () => 22
 }))
 
@@ -49,10 +57,14 @@ vi.mock('@/lib/payroll/chile-previsional-helpers', () => ({
   getSisRate: vi.fn().mockResolvedValue(0.0154),
   getTopeAfpForPeriod: vi.fn().mockResolvedValue(90.3),
   getTopeCesantiaForPeriod: vi.fn().mockResolvedValue(135.5),
-  getChileAfpRatesForPeriod: vi.fn().mockResolvedValue([
-    { afpCode: 'habitat', afpName: 'Habitat', totalRate: 0.1127, cotizacionRate: 0.1027, comisionRate: 0.01 }
-  ]),
-  getAfpRateForCode: vi.fn().mockResolvedValue({ totalRate: 0.1127, cotizacionRate: 0.1027, comisionRate: 0.01, afpName: 'Habitat' }),
+  getChileAfpRatesForPeriod: vi
+    .fn()
+    .mockResolvedValue([
+      { afpCode: 'habitat', afpName: 'Habitat', totalRate: 0.1127, cotizacionRate: 0.1027, comisionRate: 0.01 }
+    ]),
+  getAfpRateForCode: vi
+    .fn()
+    .mockResolvedValue({ totalRate: 0.1127, cotizacionRate: 0.1027, comisionRate: 0.01, afpName: 'Habitat' }),
   getUnemploymentRateForPeriod: vi.fn().mockResolvedValue(0.006),
   resolveChileAfpRateForCompensation: vi.fn().mockResolvedValue({ totalRate: 0.1127, afpName: 'Habitat' }),
   resolveChileAfpRateSplitForCompensation: vi.fn().mockResolvedValue({
@@ -111,29 +123,39 @@ describe('projectPayrollForPeriod', () => {
 
   it('projects payroll for actual_to_date mode with real KPIs and attendance', async () => {
     mockGetApplicableCompensationVersionsForPeriod.mockResolvedValue([baseCompensation])
-    mockFetchKpisForPeriod.mockResolvedValue({ snapshots:
-      new Map([['member-1', {
-        memberId: 'member-1',
-        otdPercent: 96,
-        rpaAvg: 1.8,
-        rpaDataStatus: 'valid',
-        rpaConfidenceLevel: 'high',
-        rpaSuppressionReason: null,
-        rpaEvidence: { completedTasks: 15, eligibleTasks: 15, missingTasks: 0, nonPositiveTasks: 0 },
-        tasksCompleted: 15,
-        dataSource: 'ico',
-        sourceMode: 'materialized'
-      }]])
+    mockFetchKpisForPeriod.mockResolvedValue({
+      snapshots: new Map([
+        [
+          'member-1',
+          {
+            memberId: 'member-1',
+            otdPercent: 96,
+            rpaAvg: 1.8,
+            rpaDataStatus: 'valid',
+            rpaConfidenceLevel: 'high',
+            rpaSuppressionReason: null,
+            rpaEvidence: { completedTasks: 15, eligibleTasks: 15, missingTasks: 0, nonPositiveTasks: 0 },
+            tasksCompleted: 15,
+            dataSource: 'ico',
+            sourceMode: 'materialized'
+          }
+        ]
+      ])
     })
-    mockFetchAttendanceForAllMembers.mockResolvedValue(
-      new Map([['member-1', { workingDaysInPeriod: 18, daysPresent: 16, daysAbsent: 1, daysOnLeave: 1, daysOnUnpaidLeave: 0 }]])
-    )
+    mockFetchAttendanceForAllMembers.mockResolvedValue({
+      snapshots: new Map([
+        ['member-1', { workingDaysInPeriod: 18, daysPresent: 16, daysAbsent: 1, daysOnLeave: 1, daysOnUnpaidLeave: 0 }]
+      ]),
+      leaveDataDegraded: false
+    })
 
     const result = await projectPayrollForPeriod({ year: 2026, month: 3, mode: 'actual_to_date' })
 
     expect(result.entries).toHaveLength(1)
     expect(result.mode).toBe('actual_to_date')
     expect(result.totals.memberCount).toBe(1)
+    expect(result.attendanceDiagnostics.leaveDataDegraded).toBe(false)
+    expect(result.attendanceDiagnostics.blocking).toBe(false)
 
     const entry = result.entries[0]
 
@@ -158,14 +180,28 @@ describe('projectPayrollForPeriod', () => {
 
     expect(result.entries).toHaveLength(0)
     expect(result.totals.memberCount).toBe(0)
+    expect(result.attendanceDiagnostics.leaveDataDegraded).toBe(false)
   })
 
   it('handles mixed currency (CLP + USD) members', async () => {
-    const usdComp = { ...baseCompensation, versionId: 'cv-2', memberId: 'member-2', memberName: 'Daniela Ferreira', currency: 'USD', baseSalary: 2000, remoteAllowance: 100, fixedBonusAmount: 0, bonusOtdMax: 0, bonusRpaMax: 0, payRegime: 'contractor_usd', gratificacionLegalMode: 'ninguna' }
+    const usdComp = {
+      ...baseCompensation,
+      versionId: 'cv-2',
+      memberId: 'member-2',
+      memberName: 'Daniela Ferreira',
+      currency: 'USD',
+      baseSalary: 2000,
+      remoteAllowance: 100,
+      fixedBonusAmount: 0,
+      bonusOtdMax: 0,
+      bonusRpaMax: 0,
+      payRegime: 'contractor_usd',
+      gratificacionLegalMode: 'ninguna'
+    }
 
     mockGetApplicableCompensationVersionsForPeriod.mockResolvedValue([baseCompensation, usdComp])
     mockFetchKpisForPeriod.mockResolvedValue({ snapshots: new Map() })
-    mockFetchAttendanceForAllMembers.mockResolvedValue(new Map())
+    mockFetchAttendanceForAllMembers.mockResolvedValue({ snapshots: new Map(), leaveDataDegraded: false })
 
     const result = await projectPayrollForPeriod({ year: 2026, month: 3, mode: 'projected_month_end' })
 
@@ -195,23 +231,29 @@ describe('projectPayrollForPeriod', () => {
     mockGetApplicableCompensationVersionsForPeriod.mockResolvedValue([deelComp])
     mockFetchKpisForPeriod.mockResolvedValue({
       snapshots: new Map([
-        ['member-2', {
-          memberId: 'member-2',
-          otdPercent: 96,
-          rpaAvg: 1.6,
-          rpaDataStatus: 'valid',
-          rpaConfidenceLevel: 'high',
-          rpaSuppressionReason: null,
-          rpaEvidence: { completedTasks: 22, eligibleTasks: 22, missingTasks: 0, nonPositiveTasks: 0 },
-          tasksCompleted: 22,
-          dataSource: 'ico',
-          sourceMode: 'materialized'
-        }]
+        [
+          'member-2',
+          {
+            memberId: 'member-2',
+            otdPercent: 96,
+            rpaAvg: 1.6,
+            rpaDataStatus: 'valid',
+            rpaConfidenceLevel: 'high',
+            rpaSuppressionReason: null,
+            rpaEvidence: { completedTasks: 22, eligibleTasks: 22, missingTasks: 0, nonPositiveTasks: 0 },
+            tasksCompleted: 22,
+            dataSource: 'ico',
+            sourceMode: 'materialized'
+          }
+        ]
       ])
     })
-    mockFetchAttendanceForAllMembers.mockResolvedValue(
-      new Map([['member-2', { workingDaysInPeriod: 20, daysPresent: 18, daysAbsent: 2, daysOnLeave: 0, daysOnUnpaidLeave: 0 }]])
-    )
+    mockFetchAttendanceForAllMembers.mockResolvedValue({
+      snapshots: new Map([
+        ['member-2', { workingDaysInPeriod: 20, daysPresent: 18, daysAbsent: 2, daysOnLeave: 0, daysOnUnpaidLeave: 0 }]
+      ]),
+      leaveDataDegraded: false
+    })
 
     const result = await projectPayrollForPeriod({ year: 2026, month: 3, mode: 'projected_month_end' })
     const entry = result.entries[0]
@@ -236,6 +278,8 @@ describe('projectPayrollForPeriod', () => {
     const result = await projectPayrollForPeriod({ year: 2026, month: 3, mode: 'actual_to_date' })
 
     expect(result.entries).toHaveLength(1)
+    expect(result.attendanceDiagnostics.leaveDataDegraded).toBe(true)
+    expect(result.attendanceDiagnostics.blocking).toBe(true)
 
     // Without KPIs: no variable bonus
     expect(result.entries[0].bonusOtdAmount).toBe(0)
@@ -257,7 +301,7 @@ describe('projectPayrollForPeriod', () => {
       }
     ])
     mockFetchKpisForPeriod.mockResolvedValue({ snapshots: new Map() })
-    mockFetchAttendanceForAllMembers.mockResolvedValue(new Map())
+    mockFetchAttendanceForAllMembers.mockResolvedValue({ snapshots: new Map(), leaveDataDegraded: false })
 
     const result = await projectPayrollForPeriod({ year: 2026, month: 3, mode: 'actual_to_date' })
 
