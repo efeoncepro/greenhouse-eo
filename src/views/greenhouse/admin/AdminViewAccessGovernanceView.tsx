@@ -30,7 +30,7 @@ type Props = {
 }
 
 type RoleFilter = 'all' | 'efeonce_internal' | 'client'
-type ActiveTab = 'permissions' | 'preview' | 'sets' | 'roadmap'
+type ActiveTab = 'permissions' | 'preview' | 'sets'
 type OverrideMode = 'inherit' | 'grant' | 'revoke'
 type PermissionsFocus = 'all' | 'changed' | 'fallback'
 type PreviewFocus = 'all' | 'visible' | 'overrides' | 'impact'
@@ -541,7 +541,6 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems={{ md: 'center' }} justifyContent='space-between'>
           <Box>
             <Stack direction='row' spacing={1.5} alignItems='center' sx={{ mb: 1.5 }}>
-              <Chip size='small' color='primary' variant='tonal' label='TASK-136' />
               <Chip size='small' variant='outlined' label='Persistencia + enforcement activos' />
             </Stack>
             <Typography variant='h4' sx={{ mb: 1 }}>
@@ -586,7 +585,6 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
               <Tab value='permissions' label='Permisos' />
               <Tab value='preview' label='Preview' />
               <Tab value='sets' label='Permission Sets' />
-              <Tab value='roadmap' label='Siguiente slice' />
             </Tabs>
 
             {activeTab === 'permissions' ? (
@@ -892,7 +890,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                     </TextField>
                   </Box>
                   <Alert severity='info' variant='outlined'>
-                    El universo del selector ya es persona-first cuando existe `identityProfileId`. Los overrides y la auditoría siguen siendo `userId`-scoped sobre el principal portal compatible.
+                    El selector prioriza la persona canónica cuando existe perfil de identidad. Los overrides y la auditoría se aplican sobre el principal portal compatible del usuario.
                   </Alert>
                 </Stack>
 
@@ -1001,7 +999,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                                 <Box>
                                   <Typography variant='h6'>Overrides del principal portal</Typography>
                                   <Typography variant='body2' color='text.secondary'>
-                                    Cambia una vista entre `inherit`, `grant` y `revoke`. La persona es la raíz del preview, pero la persistencia sigue usando el principal portal compatible para no romper auditoría ni `authorizedViews`.
+                                    Cambia una vista entre heredar del rol, conceder acceso y revocar acceso. La persona es la raíz del preview, pero la persistencia sigue usando el principal portal compatible para mantener la auditoría.
                                   </Typography>
                                 </Box>
                                 <Stack direction='row' spacing={1}>
@@ -1022,7 +1020,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
 
                               {!previewUser.userId ? (
                                 <Alert severity='warning' variant='outlined'>
-                                  Esta persona todavía no tiene un principal portal persistible. Puedes revisar el acceso efectivo, pero no guardar overrides hasta que exista `userId` compatible.
+                                  Esta persona todavía no tiene un principal portal persistible. Puedes revisar el acceso efectivo, pero no guardar overrides hasta que exista un identificador de usuario compatible.
                                 </Alert>
                               ) : null}
 
@@ -1103,7 +1101,7 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
                                             onClick={() => toggleUserOverride(view.viewCode)}
                                             color={mode === 'grant' ? 'success' : mode === 'revoke' ? 'error' : 'default'}
                                             variant={mode === 'inherit' ? 'outlined' : 'tonal'}
-                                            label={mode === 'inherit' ? 'Inherit' : mode === 'grant' ? 'Grant' : 'Revoke'}
+                                            label={mode === 'inherit' ? 'Heredar' : mode === 'grant' ? 'Conceder' : 'Revocar'}
                                           />
                                         </Stack>
                                         {mode !== 'inherit' ? (
@@ -1303,49 +1301,6 @@ const AdminViewAccessGovernanceView = ({ data }: Props) => {
 
             {activeTab === 'sets' ? <PermissionSetsTab /> : null}
 
-            {activeTab === 'roadmap' ? (
-              <Box
-                sx={{
-                  display: 'grid',
-                  gap: 3,
-                  gridTemplateColumns: { xs: '1fr', md: 'repeat(3, minmax(0, 1fr))' }
-                }}
-              >
-                <Card variant='outlined'>
-                  <CardContent>
-                    <Stack spacing={2}>
-                      <Chip size='small' color='warning' variant='tonal' label='Siguiente slice' />
-                      <Typography variant='h6'>Validación visual real</Typography>
-                      <Typography color='text.secondary'>
-                        Confirmar en preview que los casos persona interna, persona cliente y bridge degradado se leen bien y no inducen a confundir persona con principal portal.
-                      </Typography>
-                    </Stack>
-                  </CardContent>
-                </Card>
-                <Card variant='outlined'>
-                  <CardContent>
-                    <Stack spacing={2}>
-                      <Chip size='small' color='warning' variant='tonal' label='Siguiente slice' />
-                      <Typography variant='h6'>Casos sin principal persistible</Typography>
-                      <Typography color='text.secondary'>
-                        Falta decidir si las personas sin `userId` compatible deben quedar fuera del preview editable o entrar como casos informativos de acceso incompleto.
-                      </Typography>
-                    </Stack>
-                  </CardContent>
-                </Card>
-                <Card variant='outlined'>
-                  <CardContent>
-                    <Stack spacing={2}>
-                      <Chip size='small' color='warning' variant='tonal' label='Siguiente slice' />
-                      <Typography variant='h6'>Cleanup de copy y policy</Typography>
-                      <Typography color='text.secondary'>
-                        Si el panel ya se siente estable, el cierre real de `TASK-140` pasa por fijar la policy final del universo previewable y dejar el resto del hardening a follow-ons.
-                      </Typography>
-                    </Stack>
-                  </CardContent>
-                </Card>
-              </Box>
-            ) : null}
           </Stack>
         </CardContent>
       </Card>

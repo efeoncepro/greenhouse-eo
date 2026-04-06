@@ -843,8 +843,9 @@ export interface GreenhouseCoreViewAccessLog {
   performed_by: string;
   reason: string | null;
   target_role: string | null;
+  target_set: string | null;
   target_user: string | null;
-  view_code: string;
+  view_code: string | null;
 }
 
 export interface GreenhouseCoreViewRegistry {

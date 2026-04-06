@@ -31,6 +31,7 @@ import type {
   EffectiveViewEntry,
   EffectiveViewSource,
   EffectiveViewsResponse,
+  PermissionSetSummary,
   UserPermissionSetInfo
 } from '@/types/permission-sets'
 
@@ -414,42 +415,50 @@ const UserAccessTab = ({ userId }: Props) => {
 
     const fetchEffectiveViews = async () => {
       try {
-        const res = await fetch(`/api/admin/team/roles/${userId}/effective-views`)
+        const [viewsRes, setsRes] = await Promise.all([
+          fetch(`/api/admin/team/roles/${userId}/effective-views`),
+          fetch('/api/admin/views/sets')
+        ])
 
-        if (!res.ok) throw new Error('Error al cargar vistas efectivas')
+        if (!viewsRes.ok) throw new Error('Error al cargar vistas efectivas')
 
-        const data: EffectiveViewsResponse = await res.json()
+        const viewsData: EffectiveViewsResponse = await viewsRes.json()
 
-        setEffectiveViews(data.effectiveViews)
-        setSummary(data.summary)
+        setEffectiveViews(viewsData.effectiveViews)
+        setSummary(viewsData.summary)
 
-        // Derive permission set info from effective views
-        const setMap = new Map<string, UserPermissionSetInfo>()
+        // Cross-reference effective views with real permission set data
+        const userSetIds = new Set(
+          viewsData.effectiveViews
+            .filter(v => v.source === 'permission_set' && v.sourceId)
+            .map(v => v.sourceId!)
+        )
 
-        for (const view of data.effectiveViews) {
-          if (view.source === 'permission_set' && view.sourceId && !setMap.has(view.sourceId)) {
-            setMap.set(view.sourceId, {
-              setId: view.sourceId,
-              setName: view.sourceName || view.sourceId,
-              description: null,
-              section: null,
-              viewCodes: [],
-              isSystem: false,
-              active: true,
-              assignmentId: '',
+        if (setsRes.ok && userSetIds.size > 0) {
+          const setsData: { sets: PermissionSetSummary[] } = await setsRes.json()
+          const allSets = setsData.sets || []
+
+          const userSets: UserPermissionSetInfo[] = allSets
+            .filter(s => userSetIds.has(s.setId))
+            .map(s => ({
+              setId: s.setId,
+              setName: s.setName,
+              description: s.description,
+              section: s.section,
+              viewCodes: s.viewCodes,
+              isSystem: s.isSystem,
+              active: s.active,
+              assignmentId: s.setId,
               expiresAt: null,
               reason: null,
               assignedByUserId: null,
-              assignedAt: ''
-            })
-          }
+              assignedAt: s.createdAt
+            }))
 
-          if (view.source === 'permission_set' && view.sourceId) {
-            setMap.get(view.sourceId)?.viewCodes.push(view.viewCode)
-          }
+          setPermissionSets(userSets)
+        } else {
+          setPermissionSets([])
         }
-
-        setPermissionSets(Array.from(setMap.values()))
       } catch {
         setError('No se pudieron cargar las vistas efectivas.')
       } finally {

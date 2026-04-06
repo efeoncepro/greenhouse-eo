@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
 
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
-import { getSetUsers, assignUsersToSet, PermissionSetError } from '@/lib/admin/permission-sets'
+import { getSetUsers, listAssignableUsers, assignUsersToSet, PermissionSetError } from '@/lib/admin/permission-sets'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(_request: Request, { params }: { params: Promise<{ setId: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ setId: string }> }) {
   const { tenant, errorResponse } = await requireAdminTenantContext()
 
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -13,6 +13,15 @@ export async function GET(_request: Request, { params }: { params: Promise<{ set
   const { setId } = await params
 
   try {
+    const url = new URL(request.url)
+    const scope = url.searchParams.get('scope')
+
+    if (scope === 'assignable') {
+      const users = await listAssignableUsers()
+
+      return NextResponse.json({ users })
+    }
+
     const users = await getSetUsers(setId)
 
     return NextResponse.json({ users })

@@ -185,20 +185,22 @@ export const createPermissionSet = async ({
   viewCodes: string[]
   createdBy: string
 }): Promise<string> => {
-  await runGreenhousePostgresQuery(
-    `
-    INSERT INTO greenhouse_core.permission_sets
-      (set_id, set_name, description, section, view_codes, is_system, active, created_by, created_at, updated_at)
-    VALUES ($1, $2, $3, $4, $5, false, true, $6, NOW(), NOW())
-    `,
-    [setId, name, description || null, section || null, viewCodes, createdBy]
-  )
+  await withGreenhousePostgresTransaction(async client => {
+    await client.query(
+      `
+      INSERT INTO greenhouse_core.permission_sets
+        (set_id, set_name, description, section, view_codes, is_system, active, created_by, created_at, updated_at)
+      VALUES ($1, $2, $3, $4, $5, false, true, $6, NOW(), NOW())
+      `,
+      [setId, name, description || null, section || null, viewCodes, createdBy]
+    )
 
-  await logViewAccessAction({
-    action: 'create_set',
-    viewCode: setId,
-    performedBy: createdBy,
-    reason: `Permission Set creado: ${name}`
+    await logSetAction(client, {
+      action: 'create_set',
+      targetSet: setId,
+      performedBy: createdBy,
+      reason: `Permission Set creado: ${name}`
+    })
   })
 
   return setId
@@ -252,16 +254,18 @@ export const updatePermissionSet = async (
     paramIdx++
   }
 
-  await runGreenhousePostgresQuery(
-    `UPDATE greenhouse_core.permission_sets SET ${updates.join(', ')} WHERE set_id = $1 AND active = true`,
-    params
-  )
+  await withGreenhousePostgresTransaction(async client => {
+    await client.query(
+      `UPDATE greenhouse_core.permission_sets SET ${updates.join(', ')} WHERE set_id = $1 AND active = true`,
+      params
+    )
 
-  await logViewAccessAction({
-    action: 'update_set',
-    viewCode: setId,
-    performedBy: updatedBy,
-    reason: `Permission Set actualizado: ${name || set.set_name}`
+    await logSetAction(client, {
+      action: 'update_set',
+      targetSet: setId,
+      performedBy: updatedBy,
+      reason: `Permission Set actualizado: ${name || set.set_name}`
+    })
   })
 }
 
@@ -282,11 +286,12 @@ export const deletePermissionSet = async (setId: string, deletedBy: string): Pro
       [setId, deletedBy]
     )
 
-    await client.query(
-      `INSERT INTO greenhouse_core.view_access_log (action, view_code, performed_by, reason)
-       VALUES ('delete_set', $1, $2, $3)`,
-      [setId, deletedBy, `Permission Set eliminado: ${set.set_name}`]
-    )
+    await logSetAction(client, {
+      action: 'delete_set',
+      targetSet: setId,
+      performedBy: deletedBy,
+      reason: `Permission Set eliminado: ${set.set_name}`
+    })
   })
 }
 
@@ -318,6 +323,26 @@ export const getSetUsers = async (setId: string): Promise<PermissionSetUserAssig
   return rows.map(normalizeAssignment)
 }
 
+/** Lightweight user list for the permission set assignment picker */
+export type AssignableUser = { userId: string; fullName: string; email: string }
+
+export const listAssignableUsers = async (): Promise<AssignableUser[]> => {
+  const rows = await runGreenhousePostgresQuery<{ user_id: string; full_name: string | null; email: string }>(
+    `
+    SELECT user_id, full_name, email
+    FROM greenhouse_core.client_users
+    WHERE active = true
+    ORDER BY full_name ASC, email ASC
+    `
+  )
+
+  return rows.map(r => ({
+    userId: r.user_id,
+    fullName: r.full_name ?? r.email,
+    email: r.email
+  }))
+}
+
 export const assignUsersToSet = async (
   setId: string,
   userIds: string[],
@@ -337,11 +362,12 @@ export const assignUsersToSet = async (
 
   let assignedCount = 0
 
-  await withGreenhousePostgresTransaction(async client => {
-    for (const userId of userIds) {
-      const assignmentId = `upsa-${userId}-${setId}`
+  try {
+    await withGreenhousePostgresTransaction(async client => {
+      for (const userId of userIds) {
+        const assignmentId = `upsa-${userId}-${setId}`
 
-      await client.query(
+        await client.query(
         `
         INSERT INTO greenhouse_core.user_permission_set_assignments
           (assignment_id, user_id, set_id, active, expires_at, reason, assigned_by_user_id, created_at, updated_at)
@@ -353,11 +379,13 @@ export const assignUsersToSet = async (
         [assignmentId, userId, setId, expiresAt || null, reason || null, assignedBy]
       )
 
-      await client.query(
-        `INSERT INTO greenhouse_core.view_access_log (action, target_user, view_code, performed_by, reason)
-         VALUES ('grant_set', $1, $2, $3, $4)`,
-        [userId, setId, assignedBy, reason || `Asignado a Permission Set: ${set.set_name}`]
-      )
+      await logSetAction(client, {
+        action: 'grant_set',
+        targetUser: userId,
+        targetSet: setId,
+        performedBy: assignedBy,
+        reason: reason || `Asignado a Permission Set: ${set.set_name}`
+      })
 
       await publishOutboxEvent(
         {
@@ -370,8 +398,15 @@ export const assignUsersToSet = async (
       )
 
       assignedCount++
+      }
+    })
+  } catch (error) {
+    if (isForeignKeyViolation(error)) {
+      throw new PermissionSetError('Uno o más usuarios no existen en el sistema.', 400)
     }
-  })
+
+    throw error
+  }
 
   return assignedCount
 }
@@ -397,11 +432,13 @@ export const removeUserFromSet = async (
       throw new PermissionSetError('El usuario no tiene esta asignación activa.', 404)
     }
 
-    await client.query(
-      `INSERT INTO greenhouse_core.view_access_log (action, target_user, view_code, performed_by, reason)
-       VALUES ('revoke_set', $1, $2, $3, $4)`,
-      [userId, setId, removedBy, `Revocado de Permission Set: ${set.set_name}`]
-    )
+    await logSetAction(client, {
+      action: 'revoke_set',
+      targetUser: userId,
+      targetSet: setId,
+      performedBy: removedBy,
+      reason: `Revocado de Permission Set: ${set.set_name}`
+    })
 
     await publishOutboxEvent(
       {
@@ -498,22 +535,28 @@ const getPermissionSetRaw = async (setId: string) => {
   return rows[0] || null
 }
 
-const logViewAccessAction = async ({
-  action,
-  targetUser,
-  viewCode,
-  performedBy,
-  reason
-}: {
-  action: string
-  targetUser?: string
-  viewCode: string
-  performedBy: string
-  reason?: string
-}) => {
-  await runGreenhousePostgresQuery(
-    `INSERT INTO greenhouse_core.view_access_log (action, target_user, view_code, performed_by, reason)
+const logSetAction = async (
+  client: { query: (text: string, values?: unknown[]) => Promise<unknown> },
+  {
+    action,
+    targetUser,
+    targetSet,
+    performedBy,
+    reason
+  }: {
+    action: string
+    targetUser?: string
+    targetSet: string
+    performedBy: string
+    reason?: string
+  }
+) => {
+  await client.query(
+    `INSERT INTO greenhouse_core.view_access_log (action, target_user, target_set, performed_by, reason)
      VALUES ($1, $2, $3, $4, $5)`,
-    [action, targetUser || null, viewCode, performedBy, reason || null]
+    [action, targetUser || null, targetSet, performedBy, reason || null]
   )
 }
+
+const isForeignKeyViolation = (error: unknown): boolean =>
+  typeof error === 'object' && error !== null && 'code' in error && (error as { code?: string }).code === '23503'

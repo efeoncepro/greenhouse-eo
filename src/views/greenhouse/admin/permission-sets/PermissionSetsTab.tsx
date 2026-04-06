@@ -2,7 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
+import { toast } from 'react-toastify'
+
 import Alert from '@mui/material/Alert'
+import Autocomplete from '@mui/material/Autocomplete'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -10,9 +13,11 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Checkbox from '@mui/material/Checkbox'
 import Chip from '@mui/material/Chip'
+import CircularProgress from '@mui/material/CircularProgress'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 import Divider from '@mui/material/Divider'
 import FormControlLabel from '@mui/material/FormControlLabel'
@@ -71,16 +76,25 @@ const PermissionSetsTab = () => {
   const [editDescription, setEditDescription] = useState('')
   const [editViewCodes, setEditViewCodes] = useState<Set<string>>(new Set())
   const [saveError, setSaveError] = useState<string | null>(null)
-  const [saveSuccess, setSaveSuccess] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 
   const [deleteError, setDeleteError] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
 
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+
+  const [removeConfirmOpen, setRemoveConfirmOpen] = useState(false)
+  const [removeTargetUserId, setRemoveTargetUserId] = useState<string | null>(null)
+  const [removeTargetName, setRemoveTargetName] = useState<string>('')
+  const [removing, setRemoving] = useState(false)
+
   const [assignDialogOpen, setAssignDialogOpen] = useState(false)
-  const [assignUserIds, setAssignUserIds] = useState('')
   const [assignError, setAssignError] = useState<string | null>(null)
   const [assigning, setAssigning] = useState(false)
+
+  const [availableUsers, setAvailableUsers] = useState<Array<{ userId: string; fullName: string; email: string }>>([])
+  const [availableUsersLoading, setAvailableUsersLoading] = useState(false)
+  const [selectedUsers, setSelectedUsers] = useState<Array<{ userId: string; fullName: string; email: string }>>([])
 
   // ── Fetch sets ──
 
@@ -112,7 +126,6 @@ const PermissionSetsTab = () => {
     setDetailLoading(true)
     setDetailError(null)
     setSaveError(null)
-    setSaveSuccess(null)
     setDeleteError(null)
 
     try {
@@ -198,6 +211,7 @@ const PermissionSetsTab = () => {
       if (!response.ok) throw new Error(data.error || 'No se pudo crear el Permission Set.')
 
       setCreateOpen(false)
+      toast.success('Permission Set creado.')
       await fetchSets()
     } catch (err) {
       setCreateError(err instanceof Error ? err.message : 'Error al crear Permission Set.')
@@ -236,7 +250,6 @@ const PermissionSetsTab = () => {
 
     setSaving(true)
     setSaveError(null)
-    setSaveSuccess(null)
 
     try {
       const body: Record<string, unknown> = { viewCodes: Array.from(editViewCodes) }
@@ -256,7 +269,7 @@ const PermissionSetsTab = () => {
 
       if (!response.ok) throw new Error(data.error || 'No se pudo actualizar.')
 
-      setSaveSuccess('Permission Set actualizado.')
+      toast.success('Cambios guardados.')
       await fetchSets()
       await fetchDetail(detail.setId)
     } catch (err) {
@@ -268,9 +281,15 @@ const PermissionSetsTab = () => {
 
   // ── Delete ──
 
-  const handleDelete = async () => {
+  const handleDeleteClick = () => {
+    if (!detail || detail.isSystem) return
+    setDeleteConfirmOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
     if (!detail || detail.isSystem) return
 
+    setDeleteConfirmOpen(false)
     setDeleting(true)
     setDeleteError(null)
 
@@ -280,6 +299,7 @@ const PermissionSetsTab = () => {
 
       if (!response.ok) throw new Error(data.error || 'No se pudo eliminar.')
 
+      toast.success('Permission Set eliminado.')
       setSelectedSetId(null)
       await fetchSets()
     } catch (err) {
@@ -291,16 +311,40 @@ const PermissionSetsTab = () => {
 
   // ── Assign users ──
 
+  const fetchAvailableUsers = useCallback(async () => {
+    if (!detail) return
+    setAvailableUsersLoading(true)
+
+    try {
+      const response = await fetch(`/api/admin/views/sets/${detail.setId}/users?scope=assignable`)
+      const data = (await response.json()) as { users?: Array<{ userId: string; fullName: string; email: string }>; error?: string }
+
+      if (!response.ok) throw new Error(data.error || 'No se pudieron cargar los usuarios.')
+
+      const assignedIds = new Set(detail.users.map(u => u.userId))
+      const filtered = (data.users ?? []).filter(u => !assignedIds.has(u.userId))
+
+      setAvailableUsers(filtered)
+    } catch {
+      setAvailableUsers([])
+    } finally {
+      setAvailableUsersLoading(false)
+    }
+  }, [detail])
+
+  useEffect(() => {
+    if (assignDialogOpen) {
+      fetchAvailableUsers()
+    }
+  }, [assignDialogOpen, fetchAvailableUsers])
+
   const handleAssignSubmit = async () => {
     if (!detail) return
 
-    const ids = assignUserIds
-      .split(',')
-      .map(id => id.trim())
-      .filter(Boolean)
+    const ids = selectedUsers.map(u => u.userId)
 
     if (ids.length === 0) {
-      setAssignError('Ingresa al menos un user ID.')
+      setAssignError('Selecciona al menos un usuario.')
 
       return
     }
@@ -320,7 +364,8 @@ const PermissionSetsTab = () => {
       if (!response.ok) throw new Error(data.error || 'No se pudieron asignar los usuarios.')
 
       setAssignDialogOpen(false)
-      setAssignUserIds('')
+      setSelectedUsers([])
+      toast.success('Usuarios asignados.')
       await fetchDetail(detail.setId)
       await fetchSets()
     } catch (err) {
@@ -332,19 +377,33 @@ const PermissionSetsTab = () => {
 
   // ── Remove user ──
 
-  const handleRemoveUser = async (userId: string) => {
-    if (!detail) return
+  const handleRemoveUserClick = (userId: string, displayName: string) => {
+    setRemoveTargetUserId(userId)
+    setRemoveTargetName(displayName)
+    setRemoveConfirmOpen(true)
+  }
+
+  const handleRemoveUserConfirm = async () => {
+    if (!detail || !removeTargetUserId) return
+
+    setRemoveConfirmOpen(false)
+    setRemoving(true)
 
     try {
-      const response = await fetch(`/api/admin/views/sets/${detail.setId}/users/${userId}`, { method: 'DELETE' })
+      const response = await fetch(`/api/admin/views/sets/${detail.setId}/users/${removeTargetUserId}`, { method: 'DELETE' })
       const data = (await response.json()) as { error?: string }
 
       if (!response.ok) throw new Error(data.error || 'No se pudo revocar al usuario.')
 
+      toast.success('Usuario revocado del set.')
       await fetchDetail(detail.setId)
       await fetchSets()
     } catch {
       setSaveError('No se pudo revocar al usuario del set.')
+    } finally {
+      setRemoving(false)
+      setRemoveTargetUserId(null)
+      setRemoveTargetName('')
     }
   }
 
@@ -562,7 +621,6 @@ const PermissionSetsTab = () => {
             </Box>
 
             {saveError ? <Alert severity='error'>{saveError}</Alert> : null}
-            {saveSuccess ? <Alert severity='success'>{saveSuccess}</Alert> : null}
 
             <Stack direction='row' spacing={1.5}>
               <Button
@@ -576,7 +634,7 @@ const PermissionSetsTab = () => {
                 <Button
                   variant='outlined'
                   color='error'
-                  onClick={handleDelete}
+                  onClick={handleDeleteClick}
                   disabled={deleting}
                 >
                   {deleting ? 'Eliminando...' : 'Eliminar set'}
@@ -596,7 +654,7 @@ const PermissionSetsTab = () => {
                   variant='outlined'
                   startIcon={<i className='tabler-user-plus' />}
                   onClick={() => {
-                    setAssignUserIds('')
+                    setSelectedUsers([])
                     setAssignError(null)
                     setAssignDialogOpen(true)
                   }}
@@ -628,9 +686,10 @@ const PermissionSetsTab = () => {
                           <IconButton
                             size='small'
                             color='error'
+                            disabled={removing && removeTargetUserId === user.userId}
                             onClick={e => {
                               e.stopPropagation()
-                              handleRemoveUser(user.userId)
+                              handleRemoveUserClick(user.userId, user.fullName ?? user.userId)
                             }}
                             aria-label={`Revocar ${user.fullName ?? user.userId}`}
                           >
@@ -687,7 +746,9 @@ const PermissionSetsTab = () => {
       {error ? <Alert severity='error'>{error}</Alert> : null}
 
       {loading ? (
-        <Typography color='text.secondary'>Cargando Permission Sets...</Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+          <CircularProgress />
+        </Box>
       ) : filteredSets.length === 0 ? (
         <Card variant='outlined'>
           <CardContent>
@@ -802,18 +863,36 @@ const PermissionSetsTab = () => {
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <Typography variant='body2' color='text.secondary'>
-              Ingresa los IDs de usuario separados por coma.
+              Busca y selecciona los usuarios que quieres agregar a este Permission Set.
             </Typography>
-            <TextField
-              label='User IDs'
-              size='small'
-              fullWidth
-              multiline
-              minRows={2}
-              value={assignUserIds}
-              onChange={e => setAssignUserIds(e.target.value)}
-              placeholder='ej. user-abc-123, user-def-456'
-            />
+            {availableUsersLoading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
+                <CircularProgress size={28} />
+              </Box>
+            ) : (
+              <Autocomplete
+                multiple
+                options={availableUsers}
+                getOptionLabel={opt => `${opt.fullName} (${opt.email})`}
+                isOptionEqualToValue={(opt, val) => opt.userId === val.userId}
+                value={selectedUsers}
+                onChange={(_, newVal) => setSelectedUsers(newVal)}
+                renderInput={params => (
+                  <TextField
+                    {...params}
+                    label='Buscar usuarios'
+                    placeholder='Escribe un nombre...'
+                    size='small'
+                  />
+                )}
+                renderTags={(value, getTagProps) =>
+                  value.map((opt, index) => (
+                    <Chip {...getTagProps({ index })} key={opt.userId} label={opt.fullName} size='small' />
+                  ))
+                }
+                noOptionsText='No se encontraron usuarios disponibles'
+              />
+            )}
             {assignError ? <Alert severity='error'>{assignError}</Alert> : null}
           </Stack>
         </DialogContent>
@@ -822,9 +901,59 @@ const PermissionSetsTab = () => {
           <Button
             variant='contained'
             onClick={handleAssignSubmit}
-            disabled={assigning}
+            disabled={assigning || selectedUsers.length === 0}
           >
             {assigning ? 'Asignando...' : 'Asignar usuarios'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete confirmation dialog */}
+      <Dialog
+        open={deleteConfirmOpen}
+        onClose={() => setDeleteConfirmOpen(false)}
+        maxWidth='xs'
+        fullWidth
+        aria-labelledby='delete-confirm-title'
+      >
+        <DialogTitle id='delete-confirm-title'>
+          {'¿Eliminar este Permission Set?'}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Esta accion no se puede deshacer. Los usuarios asignados perderan el acceso que este set otorga.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteConfirmOpen(false)}>Cancelar</Button>
+          <Button variant='contained' color='error' onClick={handleDeleteConfirm}>
+            Eliminar set
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Remove user confirmation dialog */}
+      <Dialog
+        open={removeConfirmOpen}
+        onClose={() => setRemoveConfirmOpen(false)}
+        maxWidth='xs'
+        fullWidth
+        aria-labelledby='remove-user-confirm-title'
+      >
+        <DialogTitle id='remove-user-confirm-title'>
+          {'¿Revocar acceso de este usuario?'}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {removeTargetName
+              ? `El usuario ${removeTargetName} perdera las vistas que obtiene de este Permission Set. Debe re-loguearse para que el cambio tome efecto.`
+              : 'El usuario perdera las vistas que obtiene de este Permission Set. Debe re-loguearse para que el cambio tome efecto.'}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setRemoveConfirmOpen(false)}>Cancelar</Button>
+          <Button variant='contained' color='error' onClick={handleRemoveUserConfirm}>
+            Revocar acceso
           </Button>
         </DialogActions>
       </Dialog>
