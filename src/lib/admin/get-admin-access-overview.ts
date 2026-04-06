@@ -1,5 +1,7 @@
 import 'server-only'
 
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { isRoleCode } from '@/config/role-codes'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 
 export interface AdminUserRow {
@@ -62,7 +64,161 @@ const normalizeStringArray = (value: unknown) => {
     .filter(Boolean)
 }
 
+// ── PostgreSQL-first implementation (real-time data) ──
+
+type PgUserRow = {
+  user_id: string
+  full_name: string | null
+  email: string | null
+  avatar_url: string | null
+  client_name: string | null
+  tenant_type: string
+  status: string
+  active: boolean
+  auth_mode: string | null
+  default_portal_home_path: string | null
+  last_login_at: string | null
+  role_codes: string[] | null
+  route_groups: string[] | null
+  project_scope_count: string
+}
+
+type PgRoleRow = {
+  role_code: string
+  role_name: string
+  tenant_type: string | null
+  is_admin: boolean
+  is_internal: boolean
+  route_group_scope: string[] | null
+  assigned_users: string
+  assigned_clients: string
+}
+
+type PgTotalsRow = {
+  total_users: string
+  active_users: string
+  invited_users: string
+  internal_users: string
+  client_users: string
+}
+
+const getAdminAccessOverviewPostgres = async (): Promise<AdminAccessOverview> => {
+  const [userRows, roleRows, totalsRows] = await Promise.all([
+    runGreenhousePostgresQuery<PgUserRow>(`
+      SELECT
+        cu.user_id,
+        cu.full_name,
+        cu.email,
+        cu.avatar_url,
+        COALESCE(c.client_name, CASE WHEN cu.tenant_type = 'efeonce_internal' THEN 'Efeonce Internal' ELSE cu.client_id END) AS client_name,
+        cu.tenant_type,
+        cu.status,
+        cu.active,
+        cu.auth_mode,
+        cu.default_portal_home_path,
+        cu.last_login_at,
+        COALESCE(
+          (SELECT ARRAY_AGG(DISTINCT ura.role_code ORDER BY ura.role_code)
+           FROM greenhouse_core.user_role_assignments ura
+           WHERE ura.user_id = cu.user_id AND ura.active = true),
+          ARRAY[]::text[]
+        ) AS role_codes,
+        COALESCE(
+          (SELECT ARRAY_AGG(DISTINCT rg ORDER BY rg)
+           FROM greenhouse_core.user_role_assignments ura2
+           INNER JOIN greenhouse_core.roles r2 ON r2.role_code = ura2.role_code
+           CROSS JOIN LATERAL unnest(COALESCE(r2.route_group_scope, ARRAY[]::text[])) AS rg
+           WHERE ura2.user_id = cu.user_id AND ura2.active = true),
+          ARRAY[]::text[]
+        ) AS route_groups,
+        (SELECT COUNT(*)::text FROM greenhouse_core.user_project_scopes ups
+         WHERE ups.user_id = cu.user_id AND ups.active = true) AS project_scope_count
+      FROM greenhouse_core.client_users cu
+      LEFT JOIN greenhouse_core.clients c ON c.client_id = cu.client_id
+      ORDER BY cu.tenant_type DESC, cu.active DESC, cu.full_name ASC
+    `),
+    runGreenhousePostgresQuery<PgRoleRow>(`
+      SELECT
+        r.role_code,
+        r.role_name,
+        r.tenant_type,
+        r.is_admin,
+        r.is_internal,
+        r.route_group_scope,
+        COUNT(DISTINCT CASE WHEN ura.active THEN ura.user_id END)::text AS assigned_users,
+        COUNT(DISTINCT CASE WHEN ura.active THEN ura.client_id END)::text AS assigned_clients
+      FROM greenhouse_core.roles r
+      LEFT JOIN greenhouse_core.user_role_assignments ura ON ura.role_code = r.role_code
+      GROUP BY r.role_code, r.role_name, r.tenant_type, r.is_admin, r.is_internal, r.route_group_scope
+      ORDER BY r.tenant_type DESC, r.role_code
+    `),
+    runGreenhousePostgresQuery<PgTotalsRow>(`
+      SELECT
+        COUNT(*)::text AS total_users,
+        COUNT(*) FILTER (WHERE active = true)::text AS active_users,
+        COUNT(*) FILTER (WHERE status = 'invited')::text AS invited_users,
+        COUNT(*) FILTER (WHERE tenant_type = 'efeonce_internal')::text AS internal_users,
+        COUNT(*) FILTER (WHERE tenant_type = 'client')::text AS client_users
+      FROM greenhouse_core.client_users
+    `)
+  ])
+
+  const t = totalsRows[0]
+
+  return {
+    totals: {
+      totalUsers: Number(t?.total_users ?? 0),
+      activeUsers: Number(t?.active_users ?? 0),
+      invitedUsers: Number(t?.invited_users ?? 0),
+      internalUsers: Number(t?.internal_users ?? 0),
+      clientUsers: Number(t?.client_users ?? 0)
+    },
+    users: userRows.map(row => ({
+      userId: row.user_id,
+      fullName: row.full_name || 'Sin nombre',
+      email: row.email || '',
+      avatarUrl: row.avatar_url,
+      clientName: row.client_name || '',
+      tenantType: (row.tenant_type as AdminUserRow['tenantType']) || 'client',
+      status: row.status || '',
+      active: row.active,
+      authMode: row.auth_mode || '',
+      roleCodes: (row.role_codes || []).filter(c => isRoleCode(c)),
+      routeGroups: row.route_groups || [],
+      projectScopeCount: Number(row.project_scope_count ?? 0),
+      lastLoginAt: row.last_login_at ? String(row.last_login_at) : null,
+      portalHomePath: row.default_portal_home_path || ''
+    })),
+    roles: roleRows
+      .filter(row => isRoleCode(row.role_code))
+      .map(row => ({
+        roleCode: row.role_code,
+        roleName: row.role_name,
+        tenantType: (row.tenant_type as AdminRoleRow['tenantType']) || 'client',
+        isAdmin: row.is_admin,
+        isInternal: row.is_internal,
+        routeGroups: row.route_group_scope || [],
+        assignedUsers: Number(row.assigned_users ?? 0),
+        assignedClients: Number(row.assigned_clients ?? 0)
+      }))
+  }
+}
+
+// ── Main entry point: PG first, BQ fallback ──
+
 export const getAdminAccessOverview = async (): Promise<AdminAccessOverview> => {
+  try {
+    return await getAdminAccessOverviewPostgres()
+  } catch (error) {
+    console.warn('[admin-access-overview] PG failed, falling back to BigQuery:', error instanceof Error ? error.message : error)
+  }
+
+  return getAdminAccessOverviewBigQuery()
+}
+
+// ── BigQuery fallback ──
+
+const getAdminAccessOverviewBigQuery = async (): Promise<AdminAccessOverview> => {
   const projectId = getBigQueryProjectId()
   const bigQuery = getBigQueryClient()
 
