@@ -64,21 +64,28 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-017`
+`ISSUE-024`
 
 ## Open
 
 | ID          | Título                                                                                                                                 | Ambiente             | Detectado  | Estado   |
 | ----------- | -------------------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------- | -------- |
-| `ISSUE-005` | [Payroll close route drains global notification backlog](resolved/ISSUE-005-payroll-close-route-drains-global-notification-backlog.md) | preview + production | 2026-04-05 | resolved |
 | `ISSUE-002` | [Nubox sync conformed: data integrity (period mixing, identity loss)](open/ISSUE-002-nubox-sync-conformed-data-integrity.md)           | staging + production | 2026-03-30 | open     |
-| `ISSUE-003` | [Permission denied for schema greenhouse_notifications](open/ISSUE-003-notification-schema-permission-denied.md)                       | preview              | 2026-04-01 | resolved |
-| `ISSUE-004` | [column "organization_id" does not exist en finance route](resolved/ISSUE-004-finance-organization-id-column-missing.md)               | preview              | 2026-04-02 | resolved |
+| `ISSUE-017` | [invite/route.ts consulta columna inexistente `display_name`](open/ISSUE-017-invite-route-display-name-column-missing.md)              | production + staging | 2026-04-06 | open     |
+| `ISSUE-018` | [Usuario invitado se crea con status 'pending' en vez de 'invited'](open/ISSUE-018-invite-user-status-pending-not-invited.md)          | production + staging | 2026-04-06 | open     |
+| `ISSUE-019` | [ensureEmailSchema() ejecuta DDL en cada envio de email](open/ISSUE-019-email-schema-runtime-ddl-on-every-send.md)                    | production + staging | 2026-04-06 | open     |
+| `ISSUE-020` | [3 endpoints duplicados de retry batch sin error handling](open/ISSUE-020-duplicate-email-retry-endpoints.md)                          | staging + production | 2026-04-06 | open     |
+| `ISSUE-021` | [Ventana de retry de emails limitada a 1 hora](open/ISSUE-021-email-retry-window-too-narrow.md)                                       | production + staging | 2026-04-06 | open     |
+| `ISSUE-022` | [Adjuntos de email base64 pueden corromper PDFs](open/ISSUE-022-email-attachments-base64-corruption.md)                                | production + staging | 2026-04-06 | open     |
+| `ISSUE-023` | [Tablas de email sin migracion formal](open/ISSUE-023-email-tables-no-formal-migration.md)                                            | production + staging | 2026-04-06 | open     |
 
 ## Resolved
 
 | ID          | Título                                                                                                                                                            | Ambiente             | Detectado  | Resuelto   | Causa                                                                                                                    |
 | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `ISSUE-005` | [Payroll close route drains global notification backlog](resolved/ISSUE-005-payroll-close-route-drains-global-notification-backlog.md)                              | preview + production | 2026-04-05 | 2026-04-05 | Payroll close drenaba backlog de notificaciones globales                                                                  |
+| `ISSUE-004` | [column "organization_id" does not exist en finance route](resolved/ISSUE-004-finance-organization-id-column-missing.md)                                           | preview              | 2026-04-02 | 2026-04-02 | Columna inexistente referenciada en query de finance                                                                      |
+| `ISSUE-003` | [Permission denied for schema greenhouse_notifications](resolved/ISSUE-003-notification-schema-permission-denied.md)                                               | preview              | 2026-04-01 | 2026-04-01 | Runtime user sin permisos DDL para crear schema notifications                                                             |
 | `ISSUE-016` | [Microsoft SSO roto en produccion (secret rotado + member_id faltante en BQ)](resolved/ISSUE-016-microsoft-sso-broken-production-secret-rotation.md)              | production           | 2026-04-05 | 2026-04-05 | Azure AD client secret rotado sin sincronizar produccion + `cu.member_id` inexistente en BQ query                        |
 | `ISSUE-006` | [Payroll leave fallback silently zeroes unpaid leave](resolved/ISSUE-006-payroll-leave-fallback-silently-zeroes-unpaid-leave.md)                                  | preview + production | 2026-04-05 | 2026-04-05 | Fallback silencioso de `leave_requests` colapsaba `dato no disponible` a `0` y permitía cálculo oficial incorrecto       |
 | `ISSUE-015` | [Scroll horizontal en AgencyWorkspace (CustomTabList sin wrapper overflow)](resolved/ISSUE-015-agency-workspace-horizontal-scroll-overflow.md)                    | staging              | 2026-04-05 | 2026-04-05 | `CustomTabList variant='scrollable'` en flex container sin `minWidth: 0` + `overflow: hidden`                            |
