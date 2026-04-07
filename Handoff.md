@@ -1,5 +1,24 @@
 # Handoff.md
 
+## Sesion 2026-04-07 — labor_cost_clp separation + type consolidation
+
+### Separación de costo laboral en client_economics (2026-04-07)
+
+El costo laboral estaba lumped en `direct_costs_clp`, causando que la columna "Costo laboral" mostrara $0 y el sanitizer anulara márgenes cuando los otros costos eran 0.
+
+- **Migración**: `labor_cost_clp` columna dedicada en `client_economics` + backfill desde `commercial_cost_attribution.commercial_labor_cost_target`
+- **Compute**: `computeClientEconomicsSnapshots` separa `laborCosts` de `directCosts` en el pipeline
+- **Sanitizer**: `laborCostClp` ahora **requerido** (no opcional) — `totalCosts = labor + direct + indirect`. TypeScript rechaza callers que no lo pasen.
+- **360 facet**: `AccountClientProfitability.laborCostCLP` expuesto en `byClient`
+- **Finance tab**: nueva columna "Costo laboral" en tabla Rentabilidad por Space
+- **Economics tab**: `laborCostClp` usa campo real (no hardcoded 0), `directCostsClp = costCLP - laborCostCLP`
+- **Trend chart**: ordenado cronológicamente (Nov 25 → Mar 26) en vez de invertido
+- **Type consolidation**: `OrganizationClientFinance` y `OrganizationFinanceSummary` definidas solo en `types.ts`. Backend importa de ahí — eliminados duplicados de `organization-store.ts`.
+- **Archivos**: migration SQL, `postgres-store-intelligence.ts`, `postgres-store-slice2.ts`, `client-economics-presentation.ts`, `organization-store.ts`, `types.ts`, `account-complete-360.ts`, `economics.ts` (facet), `OrganizationEconomicsTab.tsx`, `OrganizationFinanceTab.tsx`
+- **Rama**: develop
+
+---
+
 ## Sesion 2026-04-07 — ops-worker: cost attribution endpoint + deploy + fixes
 
 ### ops-worker Cloud Run update (2026-04-07)

@@ -2,6 +2,17 @@
 
 ## 2026-04-07
 
+### 2026-04-07 — Separación labor_cost_clp + consolidación de tipos
+
+- Nueva columna `labor_cost_clp` en `client_economics` — costo laboral (de commercial_cost_attribution) ya no se mezcla con `direct_costs_clp`
+- Migración con backfill desde `commercial_cost_attribution.commercial_labor_cost_target`
+- `sanitizeSnapshotForPresentation` requiere `laborCostClp` (requerido, no opcional) — TypeScript rechaza callers que no lo pasen
+- 360 economics facet expone `laborCostCLP` per client en `byClient`
+- Finance tab: nueva columna "Costo laboral" en tabla Rentabilidad por Space
+- Economics tab: usa campo real en vez de hardcoded `0`
+- Trend chart ordenado cronológicamente (ASC) en vez de DESC
+- `OrganizationClientFinance` y `OrganizationFinanceSummary` consolidadas en un solo archivo (`types.ts`), backend re-exporta — eliminados duplicados
+
 ### 2026-04-07 — ops-worker: cost attribution materialization endpoint
 
 - Nuevo endpoint `POST /cost-attribution/materialize` en Cloud Run ops-worker (TASK-279 continuación)

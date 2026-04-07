@@ -48,6 +48,14 @@
 
 - El contrato `TenantAccessRow` ahora tiene paridad completa entre el path PostgreSQL (`session_360`) y el path BigQuery (`getIdentityAccessRecord`): ambos retornan `member_id` e `identity_profile_id`.
 
+## Delta 2026-04-07 labor_cost_clp separado en client_economics + type consolidation
+
+- `client_economics` tiene nueva columna `labor_cost_clp` — costo laboral ya no se mezcla con `direct_costs_clp`.
+- `sanitizeSnapshotForPresentation` requiere `laborCostClp` (no opcional) — TypeScript rechaza callers que no lo pasen.
+- Tipos `OrganizationClientFinance` y `OrganizationFinanceSummary` consolidados en `src/views/greenhouse/organizations/types.ts` — single source of truth, backend importa de ahí.
+- 360 economics facet expone `laborCostCLP` per client. Finance tab tiene columna "Costo laboral" dedicada.
+- Trend chart de Economics tab ordenado cronológicamente (ASC).
+
 ## Delta 2026-04-07 TASK-279 ops-worker: cost attribution materialization endpoint
 
 - Nuevo endpoint `POST /cost-attribution/materialize` en ops-worker Cloud Run.

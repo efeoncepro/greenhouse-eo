@@ -85,6 +85,26 @@ Regla operativa:
 - ni una compra de Nubox como si fuera por sí misma un pago
 - el módulo puede seguir usando `income` / `expenses` para P&L devengado, pero debe distinguir visualmente documento/devengo vs caja
 
+## Delta 2026-04-07 — labor_cost_clp separado en client_economics + type consolidation
+
+`client_economics` ahora tiene una columna `labor_cost_clp` dedicada para el costo laboral (de `commercial_cost_attribution`), separada de `direct_costs_clp` (allocaciones + gastos directos) e `indirect_costs_clp`.
+
+Cambios estructurales:
+
+- **Migración**: `20260407171920933_add-labor-cost-clp-to-client-economics.sql` — agrega columna + backfill desde `commercial_cost_attribution.commercial_labor_cost_target`
+- **Compute pipeline**: `computeClientEconomicsSnapshots` ahora trackea `laborCosts` separado de `directCosts` en el `clientMap`
+- **Sanitizer**: `sanitizeSnapshotForPresentation` requiere `laborCostClp` (no opcional) — `totalCosts = labor + direct + indirect`. Si un consumer no lo pasa, TypeScript lo rechaza.
+- **360 facet**: `AccountClientProfitability.laborCostCLP` expuesto por `fetchEconomicsFacet` → query incluye `COALESCE(ce.labor_cost_clp, 0)`
+- **Finance legacy**: `getOrganizationFinanceSummary` incluye `labor_cost_clp` en el SELECT y en `OrganizationClientFinance`
+- **Tipos consolidados**: `OrganizationClientFinance` y `OrganizationFinanceSummary` definidas una sola vez en `src/views/greenhouse/organizations/types.ts`. El backend (`organization-store.ts`) importa y re-exporta — no hay duplicados.
+
+Impacto en UI:
+- Tab Economics: "Costo laboral" usa `c.laborCostCLP` (antes hardcoded `0`), "C. Directos" = `costCLP - laborCostCLP`
+- Tab Finance: nueva columna "Costo laboral" entre Ingreso y C. Directos
+- Trend chart: ordenado cronológicamente (ASC) en vez de DESC
+
+---
+
 ## Delta 2026-03-30 — Commercial cost attribution ya es contrato operativo de plataforma
 
 Finance ya no debe tratar la atribución comercial como una recomposición local entre bridges de payroll, assignments y overhead.
