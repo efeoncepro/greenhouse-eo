@@ -2,6 +2,8 @@ import 'server-only'
 
 import InvitationEmail from '@/emails/InvitationEmail'
 import LeaveRequestDecisionEmail from '@/emails/LeaveRequestDecisionEmail'
+import LeaveRequestPendingReviewEmail from '@/emails/LeaveRequestPendingReviewEmail'
+import LeaveRequestSubmittedEmail from '@/emails/LeaveRequestSubmittedEmail'
 import LeaveReviewConfirmationEmail from '@/emails/LeaveReviewConfirmationEmail'
 import NotificationEmail from '@/emails/NotificationEmail'
 import PasswordResetEmail from '@/emails/PasswordResetEmail'
@@ -499,6 +501,140 @@ registerTemplate('leave_review_confirmation', (context: {
   }
 })
 
+// ── Leave Request Submitted (to the requester) ──
+
+const buildLeaveSubmittedPlainText = (context: {
+  memberFirstName: string
+  leaveTypeName: string
+  startDate: string
+  endDate: string
+  requestedDays: number
+  reason?: string | null
+  locale?: 'es' | 'en'
+}) => {
+  const isEn = (context.locale || 'es') === 'en'
+
+  const daysLabel = isEn
+    ? `${context.requestedDays} ${context.requestedDays === 1 ? 'day' : 'days'}`
+    : `${context.requestedDays} ${context.requestedDays === 1 ? 'día' : 'días'}`
+
+  return [
+    isEn ? `Hi ${context.memberFirstName},` : `Hola ${context.memberFirstName},`,
+    '',
+    isEn
+      ? `Your ${context.leaveTypeName} request for ${daysLabel} has been submitted and is pending review.`
+      : `Tu solicitud de ${context.leaveTypeName} por ${daysLabel} fue enviada y está pendiente de revisión.`,
+    '',
+    isEn ? 'Summary:' : 'Resumen:',
+    `- ${isEn ? 'Type' : 'Tipo'}: ${context.leaveTypeName}`,
+    `- ${isEn ? 'From' : 'Desde'}: ${context.startDate}`,
+    `- ${isEn ? 'To' : 'Hasta'}: ${context.endDate}`,
+    `- ${isEn ? 'Days' : 'Días'}: ${daysLabel}`,
+    '',
+    ...(context.reason ? [isEn ? 'Your reason:' : 'Tu motivo:', context.reason, ''] : []),
+    `→ ${isEn ? 'View my leave' : 'Ver mis permisos'}: ${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/my/leave`,
+    '',
+    '— Greenhouse by Efeonce Group'
+  ].filter(line => line !== undefined).join('\n')
+}
+
+registerTemplate('leave_request_submitted', (context: {
+  memberFirstName: string
+  leaveTypeName: string
+  startDate: string
+  endDate: string
+  requestedDays: number
+  reason?: string | null
+  locale?: 'es' | 'en'
+}) => {
+  const locale = context.locale || 'es'
+
+  return {
+    subject: locale === 'en'
+      ? `Your ${context.leaveTypeName} request was submitted — Greenhouse`
+      : `Tu solicitud de ${context.leaveTypeName} fue enviada — Greenhouse`,
+    react: LeaveRequestSubmittedEmail({
+      memberFirstName: context.memberFirstName,
+      leaveTypeName: context.leaveTypeName,
+      startDate: context.startDate,
+      endDate: context.endDate,
+      requestedDays: context.requestedDays,
+      reason: context.reason,
+      locale
+    }),
+    text: buildLeaveSubmittedPlainText(context)
+  }
+})
+
+// ── Leave Request Pending Review (to the reviewer) ──
+
+const buildLeavePendingReviewPlainText = (context: {
+  reviewerFirstName: string
+  memberName: string
+  leaveTypeName: string
+  startDate: string
+  endDate: string
+  requestedDays: number
+  reason?: string | null
+  locale?: 'es' | 'en'
+}) => {
+  const isEn = (context.locale || 'es') === 'en'
+
+  const daysLabel = isEn
+    ? `${context.requestedDays} ${context.requestedDays === 1 ? 'day' : 'days'}`
+    : `${context.requestedDays} ${context.requestedDays === 1 ? 'día' : 'días'}`
+
+  return [
+    isEn ? `Hi ${context.reviewerFirstName},` : `Hola ${context.reviewerFirstName},`,
+    '',
+    isEn
+      ? `${context.memberName} submitted a ${context.leaveTypeName} request for ${daysLabel} that needs your review.`
+      : `${context.memberName} envió una solicitud de ${context.leaveTypeName} por ${daysLabel} que necesita tu revisión.`,
+    '',
+    isEn ? 'Summary:' : 'Resumen:',
+    `- ${isEn ? 'Team member' : 'Colaborador'}: ${context.memberName}`,
+    `- ${isEn ? 'Type' : 'Tipo'}: ${context.leaveTypeName}`,
+    `- ${isEn ? 'From' : 'Desde'}: ${context.startDate}`,
+    `- ${isEn ? 'To' : 'Hasta'}: ${context.endDate}`,
+    `- ${isEn ? 'Days' : 'Días'}: ${daysLabel}`,
+    '',
+    ...(context.reason ? [isEn ? 'Request reason:' : 'Motivo de la solicitud:', context.reason, ''] : []),
+    `→ ${isEn ? 'Review request' : 'Revisar solicitud'}: ${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/hr/leave`,
+    '',
+    '— Greenhouse by Efeonce Group'
+  ].filter(line => line !== undefined).join('\n')
+}
+
+registerTemplate('leave_request_pending_review', (context: {
+  reviewerFirstName: string
+  memberName: string
+  leaveTypeName: string
+  startDate: string
+  endDate: string
+  requestedDays: number
+  reason?: string | null
+  locale?: 'es' | 'en'
+}) => {
+  const locale = context.locale || 'es'
+
+  return {
+    subject: locale === 'en'
+      ? `${context.memberName} requested ${context.leaveTypeName} — Greenhouse`
+      : `${context.memberName} solicitó ${context.leaveTypeName} — Greenhouse`,
+    react: LeaveRequestPendingReviewEmail({
+      reviewerFirstName: context.reviewerFirstName,
+      memberName: context.memberName,
+      leaveTypeName: context.leaveTypeName,
+      startDate: context.startDate,
+      endDate: context.endDate,
+      requestedDays: context.requestedDays,
+      reason: context.reason,
+      locale
+    }),
+    text: buildLeavePendingReviewPlainText(context)
+  }
+})
+
 // ═══════════════════════════════════════════════════════════
 // Preview Metadata Registry
 // Auto-descubrible: nuevos templates con registerPreviewMeta()
@@ -674,6 +810,54 @@ registerPreviewMeta('leave_review_confirmation', {
     { key: 'requestedDays', label: 'Dias solicitados', type: 'number' },
     { key: 'status', label: 'Estado', type: 'select', options: ['approved', 'rejected', 'cancelled'] },
     { key: 'notes', label: 'Observaciones del revisor', type: 'text' },
+    { key: 'reason', label: 'Motivo de la solicitud', type: 'text' }
+  ]
+})
+
+registerPreviewMeta('leave_request_submitted', {
+  label: 'Solicitud enviada (solicitante)',
+  description: 'Confirma al colaborador que su solicitud de permiso fue enviada y esta pendiente de revision',
+  domain: 'hr',
+  supportsLocale: true,
+  defaultProps: {
+    memberFirstName: 'Andres',
+    leaveTypeName: 'Permiso por estudio',
+    startDate: '2026-04-09',
+    endDate: '2026-04-09',
+    requestedDays: 0.5,
+    reason: 'Debo realizar la sustentacion de mi trabajo de fin de master.'
+  },
+  propsSchema: [
+    { key: 'memberFirstName', label: 'Nombre del solicitante', type: 'text' },
+    { key: 'leaveTypeName', label: 'Tipo de permiso', type: 'text' },
+    { key: 'startDate', label: 'Fecha inicio', type: 'text' },
+    { key: 'endDate', label: 'Fecha fin', type: 'text' },
+    { key: 'requestedDays', label: 'Dias solicitados', type: 'number' },
+    { key: 'reason', label: 'Motivo', type: 'text' }
+  ]
+})
+
+registerPreviewMeta('leave_request_pending_review', {
+  label: 'Permiso por revisar (aprobador)',
+  description: 'Notifica al supervisor o HR que hay una solicitud de permiso pendiente de revision',
+  domain: 'hr',
+  supportsLocale: true,
+  defaultProps: {
+    reviewerFirstName: 'Julio',
+    memberName: 'Andres Carlosama',
+    leaveTypeName: 'Permiso por estudio',
+    startDate: '2026-04-09',
+    endDate: '2026-04-09',
+    requestedDays: 0.5,
+    reason: 'Debo realizar la sustentacion de mi trabajo de fin de master.'
+  },
+  propsSchema: [
+    { key: 'reviewerFirstName', label: 'Nombre del revisor', type: 'text' },
+    { key: 'memberName', label: 'Nombre del colaborador', type: 'text' },
+    { key: 'leaveTypeName', label: 'Tipo de permiso', type: 'text' },
+    { key: 'startDate', label: 'Fecha inicio', type: 'text' },
+    { key: 'endDate', label: 'Fecha fin', type: 'text' },
+    { key: 'requestedDays', label: 'Dias solicitados', type: 'number' },
     { key: 'reason', label: 'Motivo de la solicitud', type: 'text' }
   ]
 })
