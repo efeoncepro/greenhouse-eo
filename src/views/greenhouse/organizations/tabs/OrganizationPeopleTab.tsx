@@ -22,6 +22,7 @@ import classnames from 'classnames'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import { fuzzyFilter } from '@/components/tableUtils'
 import { formatFte } from '@/views/greenhouse/people/helpers'
 
@@ -128,6 +129,7 @@ const columns: ColumnDef<OrganizationPerson, any>[] = [
 
 const OrganizationPeopleTab = ({ organizationId, isAdmin, onAddMembership }: Props) => {
   const [memberships, setMemberships] = useState<OrganizationPerson[]>([])
+  const [teamSummary, setTeamSummary] = useState<{ totalMembers: number; totalFte: number } | null>(null)
   const [loading, setLoading] = useState(true)
   const [sorting, setSorting] = useState<SortingState>([{ id: 'fullName', desc: false }])
   const [globalFilter, setGlobalFilter] = useState('')
@@ -135,12 +137,26 @@ const OrganizationPeopleTab = ({ organizationId, isAdmin, onAddMembership }: Pro
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch(`/api/organizations/${organizationId}/memberships`)
+        const [resLegacy, res360] = await Promise.all([
+          fetch(`/api/organizations/${organizationId}/memberships`)
+            .then(r => (r.ok ? r.json() : null))
+            .catch(() => null),
+          fetch(`/api/organization/${organizationId}/360?facets=team`)
+            .then(r => (r.ok ? r.json() : null))
+            .catch(() => null)
+        ])
 
-        if (res.ok) {
-          const json = await res.json()
+        if (resLegacy) {
+          setMemberships(resLegacy.items ?? [])
+        }
 
-          setMemberships(json.items ?? [])
+        if (res360?.team) {
+          setTeamSummary({
+            totalMembers: res360.team.totalMembers ?? 0,
+            totalFte: res360.team.totalFte ?? 0
+          })
+        } else {
+          setTeamSummary(null)
         }
       } catch {
         // Non-blocking
@@ -174,6 +190,30 @@ const OrganizationPeopleTab = ({ organizationId, isAdmin, onAddMembership }: Pro
 
   return (
     <Grid container spacing={6}>
+      {/* 360 Team Summary KPIs */}
+      {teamSummary ? (
+        <>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+            <HorizontalWithSubtitle
+              title='Total personas'
+              stats={String(teamSummary.totalMembers)}
+              subtitle='miembros vinculados (360)'
+              avatarIcon='tabler-users'
+              avatarColor='info'
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+            <HorizontalWithSubtitle
+              title='FTE total'
+              stats={formatFte(teamSummary.totalFte)}
+              subtitle='dedicación acumulada (360)'
+              avatarIcon='tabler-clock'
+              avatarColor='success'
+            />
+          </Grid>
+        </>
+      ) : null}
+
       <Grid size={{ xs: 12 }}>
         <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
           <CardHeader

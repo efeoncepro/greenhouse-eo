@@ -99,10 +99,54 @@ const OrganizationOverviewTab = ({ detail }: Props) => {
       setLoading(true)
 
       try {
-        const res = await fetch(`/api/organizations/${detail.organizationId}/executive`)
+        // Compute asOf as last day of previous month (last closed month)
+        const today = new Date()
+        const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0) // last day of prev month
+        const asOf = `${lastMonth.getFullYear()}-${String(lastMonth.getMonth() + 1).padStart(2, '0')}-${String(lastMonth.getDate()).padStart(2, '0')}`
+
+        const res = await fetch(
+          `/api/organization/${detail.organizationId}/360?facets=economics,delivery,team&asOf=${asOf}`
+        )
 
         if (res.ok) {
-          setSnapshot(await res.json())
+          const data = await res.json()
+
+          // Derive overallHealth from avgRpa
+          const avgRpa = data.delivery?.icoMetrics?.rpaAvg ?? 0
+
+          const overallHealth: 'green' | 'yellow' | 'red' =
+            avgRpa >= 0.8 ? 'green' : avgRpa >= 0.5 ? 'yellow' : 'red'
+
+          const mapped: ExecutiveSnapshot = {
+            organizationId: detail.organizationId,
+            periodYear: data.economics?.currentPeriod?.year ?? lastMonth.getFullYear(),
+            periodMonth: data.economics?.currentPeriod?.month ?? (lastMonth.getMonth() + 1),
+            economics: data.economics?.currentPeriod
+              ? {
+                  totalRevenueClp: data.economics.currentPeriod.revenueCLP,
+                  totalLaborCostClp: data.economics.currentPeriod.laborCostCLP,
+                  adjustedMarginClp: data.economics.currentPeriod.grossMarginCLP,
+                  adjustedMarginPercent: data.economics.currentPeriod.grossMarginPct,
+                  activeFte: data.economics.currentPeriod.headcountFte,
+                  clientCount: data.economics?.byClient?.length ?? 0
+                }
+              : null,
+            delivery: data.delivery
+              ? {
+                  totalProjects: data.delivery.projectCount,
+                  activeProjects: data.delivery.activeProjectCount,
+                  totalTasks: data.delivery.taskCounts.total,
+                  completedTasks: data.delivery.taskCounts.completed,
+                  avgRpa,
+                  overallHealth
+                }
+              : null,
+            operations: null, // ICO tab handles this
+            taxHealth: null, // not in 360
+            computedAt: data._meta.resolvedAt
+          }
+
+          setSnapshot(mapped)
         }
       } catch (error) {
         console.error('Failed to fetch executive snapshot:', error)
