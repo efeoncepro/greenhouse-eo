@@ -260,15 +260,17 @@ const OrganizationEconomicsTab = ({ detail }: Props) => {
   const current = data?.current
   const ico = data?.ico
 
-  // Trend chart data
-  const trendChartData = data?.trend?.map(t => ({
+  // Trend chart data — sorted chronologically (oldest → newest, left → right)
+  const trendChartData = [...(data?.trend ?? [])].sort((a, b) =>
+    a.periodYear !== b.periodYear ? a.periodYear - b.periodYear : a.periodMonth - b.periodMonth
+  ).map(t => ({
     label: `${MONTH_SHORT[t.periodMonth]} ${String(t.periodYear).slice(2)}`,
     ingreso: Math.round(t.totalRevenueClp / 1_000_000),
     costo: Math.round(t.totalLaborCostClp / 1_000_000),
     margen: Math.round(t.adjustedMarginClp / 1_000_000),
     closureStatus: t.closureStatus,
     periodClosed: t.periodClosed
-  })) ?? []
+  }))
 
   return (
     <Grid container spacing={6}>
@@ -399,7 +401,9 @@ const OrganizationEconomicsTab = ({ detail }: Props) => {
                 <Divider />
                 <CardContent>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mb: 4 }}>
-                    {data?.trend?.map(point => (
+                    {[...(data?.trend ?? [])].sort((a, b) =>
+                      a.periodYear !== b.periodYear ? a.periodYear - b.periodYear : a.periodMonth - b.periodMonth
+                    ).map(point => (
                       <CustomChip
                         key={`${point.periodYear}-${point.periodMonth}`}
                         round='true'
