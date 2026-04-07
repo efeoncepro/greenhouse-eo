@@ -1371,3 +1371,26 @@ They must update:
 
 And if the change alters behavior, they must also update:
 - `changelog.md`
+
+## Account Complete 360 — Federated Resolver (TASK-274)
+
+Account Complete 360 mirrors the Person Complete 360 pattern (TASK-273) for organizations. Where Person 360 resolves `profileId -> memberId` once and fans out to person-scoped facets, Account 360 resolves `organizationId -> AccountScope` once (org, spaces, clients) and fans out to 9 org-scoped facets.
+
+The 9 facets are: `identity`, `spaces`, `team`, `economics`, `delivery`, `finance`, `crm`, `services`, `staffAug`.
+
+Key differences from Person 360:
+
+- **Scope resolution** replaces identity resolution — `resolveAccountScope` resolves the org-space-client graph once and passes `AccountScope` to all facets.
+- **Bulk cap** is 50 organizations (vs 100 persons) due to the wider graph per entity.
+- **Authorization** is role + tenant_type + org relationship (same_org / different_org / internal).
+
+Shared infrastructure with Person 360: in-memory per-facet cache with stale-while-revalidate (prepared for Redis via TASK-276), outbox event-driven invalidation, `ResolverTrace` logging, and `X-Resolver-Version` / `X-Timing-Ms` / `X-Cache-Status` response headers.
+
+Reglas:
+- Los consumidores de datos de organizacion deben usar `getAccountComplete360`, no queries directas a tablas individuales.
+- Nuevas facetas se agregan como modulos en `src/lib/account-360/facets/` + registro en `FACET_REGISTRY`.
+- El patron es identico al de Person 360: un resolver, N facetas, autorizacion per-facet, cache per-facet.
+
+Endpoints: `GET /api/organization/{id}/360` + `POST /api/organizations/360` (bulk).
+
+Spec dedicada: `docs/architecture/GREENHOUSE_ACCOUNT_COMPLETE_360_V1.md`.
