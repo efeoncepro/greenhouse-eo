@@ -68,23 +68,23 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Open
 
-| ID          | Título                                                                                                                          | Ambiente             | Detectado  | Estado |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------- | ------ |
-| `ISSUE-002` | [Nubox sync conformed: data integrity (period mixing, identity loss)](open/ISSUE-002-nubox-sync-conformed-data-integrity.md)    | staging + production | 2026-03-30 | open   |
-| `ISSUE-017` | [invite/route.ts consulta columna inexistente `display_name`](open/ISSUE-017-invite-route-display-name-column-missing.md)       | production + staging | 2026-04-06 | open   |
-| `ISSUE-018` | [Usuario invitado se crea con status 'pending' en vez de 'invited'](open/ISSUE-018-invite-user-status-pending-not-invited.md)   | production + staging | 2026-04-06 | open   |
-| `ISSUE-019` | [ensureEmailSchema() ejecuta DDL en cada envio de email](open/ISSUE-019-email-schema-runtime-ddl-on-every-send.md)              | production + staging | 2026-04-06 | open   |
-| `ISSUE-020` | [3 endpoints duplicados de retry batch sin error handling](open/ISSUE-020-duplicate-email-retry-endpoints.md)                   | staging + production | 2026-04-06 | open   |
-| `ISSUE-021` | [Ventana de retry de emails limitada a 1 hora](open/ISSUE-021-email-retry-window-too-narrow.md)                                 | production + staging | 2026-04-06 | open   |
-| `ISSUE-022` | [Adjuntos de email base64 pueden corromper PDFs](open/ISSUE-022-email-attachments-base64-corruption.md)                         | production + staging | 2026-04-06 | open   |
-| `ISSUE-023` | [Tablas de email sin migracion formal](open/ISSUE-023-email-tables-no-formal-migration.md)                                      | production + staging | 2026-04-06 | open   |
-| `ISSUE-024` | [Admin Notifications: errores silenciosos ocultan estado real](open/ISSUE-024-admin-notifications-silent-failures-zero-kpis.md) | staging + preview    | 2026-04-06 | open   |
+| ID          | Título                                                                                                                        | Ambiente             | Detectado  | Estado |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------- | ------ |
+| `ISSUE-002` | [Nubox sync conformed: data integrity (period mixing, identity loss)](open/ISSUE-002-nubox-sync-conformed-data-integrity.md)  | staging + production | 2026-03-30 | open   |
+| `ISSUE-017` | [invite/route.ts consulta columna inexistente `display_name`](open/ISSUE-017-invite-route-display-name-column-missing.md)     | production + staging | 2026-04-06 | open   |
+| `ISSUE-018` | [Usuario invitado se crea con status 'pending' en vez de 'invited'](open/ISSUE-018-invite-user-status-pending-not-invited.md) | production + staging | 2026-04-06 | open   |
+| `ISSUE-019` | [ensureEmailSchema() ejecuta DDL en cada envio de email](open/ISSUE-019-email-schema-runtime-ddl-on-every-send.md)            | production + staging | 2026-04-06 | open   |
+| `ISSUE-020` | [3 endpoints duplicados de retry batch sin error handling](open/ISSUE-020-duplicate-email-retry-endpoints.md)                 | staging + production | 2026-04-06 | open   |
+| `ISSUE-021` | [Ventana de retry de emails limitada a 1 hora](open/ISSUE-021-email-retry-window-too-narrow.md)                               | production + staging | 2026-04-06 | open   |
+| `ISSUE-022` | [Adjuntos de email base64 pueden corromper PDFs](open/ISSUE-022-email-attachments-base64-corruption.md)                       | production + staging | 2026-04-06 | open   |
+| `ISSUE-023` | [Tablas de email sin migracion formal](open/ISSUE-023-email-tables-no-formal-migration.md)                                    | production + staging | 2026-04-06 | open   |
 
 ## Resolved
 
 | ID          | Título                                                                                                                                                            | Ambiente                       | Detectado  | Resuelto   | Causa                                                                                                                    |
 | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
 | `ISSUE-025` | [sendEmail() reporta 'sent' cuando todos los recipients fueron skipped](resolved/ISSUE-025-sendmail-status-aggregation-skipped-as-sent.md)                        | production + staging + preview | 2026-04-06 | 2026-04-07 | `sendEmail()` no trackeaba `sawSkipped`; 18 registros históricos corregidos via backfill                                 |
+| `ISSUE-024` | [Admin Notifications: errores silenciosos ocultan estado real](resolved/ISSUE-024-admin-notifications-silent-failures-zero-kpis.md)                               | staging + preview              | 2026-04-06 | 2026-04-07 | Catch blocks silenciosos + logDispatch vacío + schema validation faltante + diagnostics UI ausente                       |
 | `ISSUE-005` | [Payroll close route drains global notification backlog](resolved/ISSUE-005-payroll-close-route-drains-global-notification-backlog.md)                            | preview + production           | 2026-04-05 | 2026-04-05 | Payroll close drenaba backlog de notificaciones globales                                                                 |
 | `ISSUE-004` | [column "organization_id" does not exist en finance route](resolved/ISSUE-004-finance-organization-id-column-missing.md)                                          | preview                        | 2026-04-02 | 2026-04-02 | Columna inexistente referenciada en query de finance                                                                     |
 | `ISSUE-003` | [Permission denied for schema greenhouse_notifications](resolved/ISSUE-003-notification-schema-permission-denied.md)                                              | preview                        | 2026-04-01 | 2026-04-01 | Runtime user sin permisos DDL para crear schema notifications                                                            |

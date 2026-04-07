@@ -1,5 +1,22 @@
 # changelog.md
 
+## 2026-04-07
+
+- **TASK-273: Person Complete 360 — capa de serving federada por facetas**:
+  - Nuevo resolver federado `getPersonComplete360(identifier, options)` que consolida toda la data de una persona bajo un solo entry point con facetas on-demand
+  - 8 facetas independientes: identity, assignments, organization, leave, payroll, delivery, costs, staffAug — cada una como modulo autonomo en `src/lib/person-360/facets/`
+  - Motor de autorizacion per-facet con field-level redaction: self ve todo, collaborator ve 4 facetas, HR manager ve todo menos costs, admin ve todo, client ve identity+assignments+delivery
+  - Cache in-memory per-facet con TTL (identity 5min, payroll 1h, leave 2min), stale-while-revalidate, bypass via `?cache=bypass`, preparado para Redis (TASK-276)
+  - Invalidacion de cache via outbox events (leave.request.created → invalida leave facet, etc.)
+  - Endpoints REST: `GET /api/person/{id}/360` (single) + `POST /api/persons/360` (bulk, max 100)
+  - Resolucion flexible de identidad: profile_id, member_id, user_id, eo_id, o "me"
+  - Queries temporales via `?asOf=YYYY-MM-DD` para payroll, costs, delivery, leave, assignments
+  - Observabilidad: ResolverTrace JSON en logs de Vercel + response headers X-Resolver-Version, X-Timing-Ms, X-Cache-Status
+  - `resolveAvatarUrl` centralizado en `src/lib/person-360/resolve-avatar.ts` — elimina 3 copias duplicadas
+  - Types completos en `src/types/person-complete-360.ts` (PersonComplete360, 8 facet interfaces, ResolverMeta, authorization types)
+  - Spec de arquitectura: `docs/architecture/GREENHOUSE_PERSON_COMPLETE_360_V1.md`
+  - Documentacion funcional: `docs/documentation/personas/person-complete-360.md`
+
 ## 2026-04-06
 
 - **ISSUE-024 fix: Admin Notifications — observabilidad de errores silenciosos**:

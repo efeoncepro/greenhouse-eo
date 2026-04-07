@@ -1,5 +1,42 @@
 # Handoff.md
 
+## Sesion 2026-04-07 — TASK-273: Person Complete 360 federated serving layer
+
+### Rama / alcance
+
+- rama: `task/TASK-273-person-complete-360`
+- scope: Capa de serving federada que consolida toda la data de una persona bajo un solo resolver con facetas on-demand, autorizacion, cache, y observabilidad.
+
+### Cambios
+
+- `src/types/person-complete-360.ts` — Types completos: PersonComplete360, 8 facet interfaces, ResolverMeta, authorization/trace types
+- `src/lib/person-360/resolve-avatar.ts` — resolveAvatarUrl centralizado (reemplaza 3 copias)
+- `src/lib/person-360/facet-authorization.ts` — Motor de autorizacion per-facet + field-level redaction
+- `src/lib/person-360/facet-cache.ts` — Cache in-memory con TTL per-facet, stale-while-revalidate
+- `src/lib/person-360/facet-cache-invalidation.ts` — Outbox event → cache invalidation mapping
+- `src/lib/person-360/person-complete-360.ts` — Resolver federado principal + bulk resolver
+- `src/lib/person-360/facets/{identity,assignments,organization,leave,payroll,delivery,costs,staff-aug}.ts` — 8 modulos de faceta
+- `src/app/api/person/[id]/360/route.ts` — GET endpoint (single person)
+- `src/app/api/persons/360/route.ts` — POST endpoint (bulk, max 100)
+- `src/lib/person-360/get-person-profile.ts` — Importa resolveAvatarUrl centralizado
+- `src/app/api/my/assignments/route.ts` — Importa resolveAvatarUrl centralizado
+- `src/app/api/my/organization/members/route.ts` — Importa resolveAvatarUrl centralizado
+- `docs/architecture/GREENHOUSE_PERSON_COMPLETE_360_V1.md` — Spec de arquitectura
+- `docs/documentation/personas/person-complete-360.md` — Documentacion funcional
+
+### Verificacion
+
+- `pnpm build` — OK
+- `pnpm lint` — OK (0 errores)
+- `tsc --noEmit` — OK (0 errores)
+
+### Riesgo / siguiente paso
+
+- Phase F (consumer migration) pendiente: MyProfileView, Admin User Detail, People Detail deben migrar a usar el endpoint 360
+- TASK-274 (Account Complete 360) sigue el mismo patron para organizaciones
+- TASK-276 (Upstash Redis) reemplazara el cache in-memory por cache distribuido
+- Pool sizing: con 8 facetas paralelas, verificar que el PG pool soporta la concurrencia en produccion
+
 ## Sesion 2026-04-06 — ISSUE-025: fix sendEmail() status aggregation
 
 ### Rama / alcance
