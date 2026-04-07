@@ -70,45 +70,33 @@ const OrganizationView = ({ organizationId }: Props) => {
 
   const loadDetail = useCallback(async () => {
     try {
-      const res = await fetch(`/api/organizations/${organizationId}`)
+      // Fetch organization detail + economics KPIs in a single 360 call
+      const [detailRes, res360] = await Promise.all([
+        fetch(`/api/organizations/${organizationId}`),
+        fetch(`/api/organization/${organizationId}/360?facets=identity,economics,team,delivery`)
+      ])
 
-      if (res.ok) {
-        const data = await res.json()
+      if (detailRes.ok) {
+        const data = await detailRes.json()
 
         setDetail(data)
+      }
 
-        // Fetch KPIs from operational PL — aggregate client snapshots for this org's spaces
-        try {
-          const now = new Date()
-          const plRes = await fetch(`/api/finance/intelligence/operational-pl?year=${now.getFullYear()}&month=${now.getMonth() + 1}&scope=client`)
+      // Extract KPIs from 360 economics facet
+      if (res360.ok) {
+        const data360 = await res360.json()
+        const econ = data360.economics
 
-          if (plRes.ok) {
-            const plData = await plRes.json()
-            const allSnaps = plData.snapshots ?? []
+        if (econ?.currentPeriod) {
+          const p = econ.currentPeriod
 
-            // Match by organization_id or by client IDs from this org's spaces
-            const orgClientIds = new Set(
-              (data.spaces ?? []).map((s: { clientId: string | null }) => s.clientId).filter(Boolean)
-            )
-
-            const orgSnaps = allSnaps.filter((s: Record<string, unknown>) =>
-              s.scopeId === data.organizationId || orgClientIds.has(s.scopeId as string)
-            )
-
-            if (orgSnaps.length > 0) {
-              const totalRev = orgSnaps.reduce((sum: number, s: Record<string, unknown>) => sum + Number(s.revenueClp ?? 0), 0)
-              const totalCost = orgSnaps.reduce((sum: number, s: Record<string, unknown>) => sum + Number(s.totalCostClp ?? 0), 0)
-              const totalFte = orgSnaps.reduce((sum: number, s: Record<string, unknown>) => sum + Number(s.headcountFte ?? 0), 0)
-
-              setKpis({
-                revenueClp: totalRev,
-                grossMarginPct: totalRev > 0 ? Math.round(((totalRev - totalCost) / totalRev) * 1000) / 10 : null,
-                headcountFte: totalFte > 0 ? totalFte : null,
-                totalCostClp: totalCost
-              })
-            }
-          }
-        } catch { /* non-blocking */ }
+          setKpis({
+            revenueClp: p.revenueCLP,
+            grossMarginPct: p.grossMarginPct,
+            headcountFte: p.headcountFte,
+            totalCostClp: p.totalCostCLP
+          })
+        }
       }
     } catch {
       // Non-blocking
