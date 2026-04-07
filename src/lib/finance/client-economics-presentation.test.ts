@@ -4,6 +4,7 @@ import { sanitizeSnapshotForPresentation } from '@/lib/finance/client-economics-
 
 const makeSnapshot = (overrides: Partial<{
   totalRevenueClp: number
+  laborCostClp: number
   directCostsClp: number
   indirectCostsClp: number
   grossMarginPercent: number | null
@@ -11,7 +12,8 @@ const makeSnapshot = (overrides: Partial<{
   notes: string | null
 }> = {}) => ({
   totalRevenueClp: 100000,
-  directCostsClp: 25000,
+  laborCostClp: 20000,
+  directCostsClp: 5000,
   indirectCostsClp: 5000,
   grossMarginPercent: 0.7,
   netMarginPercent: 0.65,
@@ -23,6 +25,7 @@ describe('sanitizeSnapshotForPresentation', () => {
   describe('completitud de snapshots', () => {
     it('hides margins when costs are zero', () => {
       const result = sanitizeSnapshotForPresentation(makeSnapshot({
+        laborCostClp: 0,
         directCostsClp: 0,
         indirectCostsClp: 0,
         grossMarginPercent: 0.99,
@@ -42,8 +45,22 @@ describe('sanitizeSnapshotForPresentation', () => {
       expect(result.netMarginPercent).toBe(0.65)
     })
 
+    it('keeps margins when only labor cost is present (no direct/indirect)', () => {
+      const result = sanitizeSnapshotForPresentation(makeSnapshot({
+        laborCostClp: 2500000,
+        directCostsClp: 0,
+        indirectCostsClp: 0,
+        grossMarginPercent: 0.64,
+        netMarginPercent: 0.64
+      }))
+
+      expect(result.hasCompleteCostCoverage).toBe(true)
+      expect(result.grossMarginPercent).toBe(0.64)
+    })
+
     it('flags backfill snapshots with suspiciously low costs', () => {
       const result = sanitizeSnapshotForPresentation(makeSnapshot({
+        laborCostClp: 0,
         directCostsClp: 1225,
         indirectCostsClp: 0,
         notes: 'Backfill from Codex for organization finance visibility'
@@ -67,6 +84,7 @@ describe('sanitizeSnapshotForPresentation', () => {
     it('keeps original values when revenue is zero', () => {
       const result = sanitizeSnapshotForPresentation(makeSnapshot({
         totalRevenueClp: 0,
+        laborCostClp: 0,
         directCostsClp: 0,
         indirectCostsClp: 0,
         grossMarginPercent: null,
@@ -89,9 +107,9 @@ describe('sanitizeSnapshotForPresentation', () => {
   describe('trend sanitization', () => {
     it('sanitizes an array of snapshots consistently', () => {
       const trend = [
-        makeSnapshot({ directCostsClp: 0, indirectCostsClp: 0, grossMarginPercent: 0.99 }),
+        makeSnapshot({ laborCostClp: 0, directCostsClp: 0, indirectCostsClp: 0, grossMarginPercent: 0.99 }),
         makeSnapshot({ directCostsClp: 50000, grossMarginPercent: 0.5 }),
-        makeSnapshot({ directCostsClp: 1000, indirectCostsClp: 0, notes: 'Backfill manual', grossMarginPercent: 0.95 })
+        makeSnapshot({ laborCostClp: 0, directCostsClp: 1000, indirectCostsClp: 0, notes: 'Backfill manual', grossMarginPercent: 0.95 })
       ].map(sanitizeSnapshotForPresentation)
 
       expect(trend[0].hasCompleteCostCoverage).toBe(false)

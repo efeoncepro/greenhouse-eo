@@ -7,6 +7,7 @@ import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-in
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { getOrganizationOperationalServing } from './get-organization-operational-serving'
+import type { OrganizationClientFinance, OrganizationFinanceSummary } from '@/views/greenhouse/organizations/types'
 
 // ── Types ───────────────────────────────────────────────────────────────
 
@@ -529,33 +530,10 @@ export const deactivateMembership = async (membershipId: string) => {
 
 // ── Finance ────────────────────────────────────────────────────────────
 
-export interface OrganizationClientFinance {
-  clientId: string
-  clientName: string
-  totalRevenueClp: number
-  laborCostClp: number
-  directCostsClp: number
-  indirectCostsClp: number
-  grossMarginPercent: number | null
-  netMarginPercent: number | null
-  headcountFte: number | null
-  hasCompleteCostCoverage?: boolean
-}
-
-export interface OrganizationFinanceSummary {
-  organizationId: string
-  periodYear: number
-  periodMonth: number
-  clientCount: number
-  totalRevenueClp: number
-  totalLaborCostClp: number
-  totalDirectCostsClp: number
-  totalIndirectCostsClp: number
-  avgGrossMarginPercent: number | null
-  avgNetMarginPercent: number | null
-  totalFte: number | null
-  clients: OrganizationClientFinance[]
-}
+// OrganizationClientFinance and OrganizationFinanceSummary are imported from
+// @/views/greenhouse/organizations/types — single source of truth for both
+// server and client code. Re-export for backward compatibility.
+export type { OrganizationClientFinance, OrganizationFinanceSummary }
 
 interface OrgFinanceRow extends Record<string, unknown> {
   client_id: string

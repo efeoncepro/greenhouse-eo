@@ -10,6 +10,7 @@ export interface OrganizationClientFinance {
   grossMarginPercent: number | null
   netMarginPercent: number | null
   headcountFte: number | null
+  hasCompleteCostCoverage?: boolean
 }
 
 export interface OrganizationFinanceSummary {
