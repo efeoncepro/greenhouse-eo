@@ -70,10 +70,15 @@ const OrganizationView = ({ organizationId }: Props) => {
 
   const loadDetail = useCallback(async () => {
     try {
+      // Use last closed month (previous month) for economics — current month may have no data yet
+      const today = new Date()
+      const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0)
+      const asOf = `${lastMonth.getFullYear()}-${String(lastMonth.getMonth() + 1).padStart(2, '0')}-${String(lastMonth.getDate()).padStart(2, '0')}`
+
       // Fetch organization detail + economics KPIs in a single 360 call
       const [detailRes, res360] = await Promise.all([
         fetch(`/api/organizations/${organizationId}`),
-        fetch(`/api/organization/${organizationId}/360?facets=identity,economics,team,delivery`)
+        fetch(`/api/organization/${organizationId}/360?facets=identity,economics,team,delivery&asOf=${asOf}`)
       ])
 
       if (detailRes.ok) {

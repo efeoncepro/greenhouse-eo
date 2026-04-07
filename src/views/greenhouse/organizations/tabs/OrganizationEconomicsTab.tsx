@@ -135,8 +135,11 @@ type Props = {
 const OrganizationEconomicsTab = ({ detail }: Props) => {
   const now = new Date()
   const theme = useTheme()
-  const [year, setYear] = useState(now.getFullYear())
-  const [month, setMonth] = useState(now.getMonth() + 1)
+
+  // Default to previous month (last closed month) — current month often has no data yet
+  const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+  const [year, setYear] = useState(prevMonth.getFullYear())
+  const [month, setMonth] = useState(prevMonth.getMonth() + 1)
   const [data, setData] = useState<EconomicsResponse | null>(null)
   const [loading, setLoading] = useState(true)
 
