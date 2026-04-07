@@ -25,7 +25,7 @@ export const resolvePersonIdentifier = async (identifier: string): Promise<Resol
 
     const whereClause = isEoId
       ? 'eo_id = $1'
-      : 'member_id = $1 OR user_id = $1'
+      : 'identity_profile_id = $1 OR member_id = $1 OR user_id = $1'
 
     const rows = await runGreenhousePostgresQuery<{
       eo_id: string
