@@ -21,7 +21,7 @@ const makeSnapshot = (overrides: Partial<{
 
 describe('sanitizeSnapshotForPresentation', () => {
   describe('completitud de snapshots', () => {
-    it('computes 100% margin when costs are zero but revenue exists', () => {
+    it('hides margins when costs are zero', () => {
       const result = sanitizeSnapshotForPresentation(makeSnapshot({
         directCostsClp: 0,
         indirectCostsClp: 0,
@@ -29,9 +29,9 @@ describe('sanitizeSnapshotForPresentation', () => {
         netMarginPercent: 0.99
       }))
 
-      expect(result.hasCompleteCostCoverage).toBe(true)
-      expect(result.grossMarginPercent).toBe(1.0)
-      expect(result.netMarginPercent).toBe(1.0)
+      expect(result.hasCompleteCostCoverage).toBe(false)
+      expect(result.grossMarginPercent).toBeNull()
+      expect(result.netMarginPercent).toBeNull()
     })
 
     it('keeps margins when coverage is materially present', () => {
@@ -94,8 +94,8 @@ describe('sanitizeSnapshotForPresentation', () => {
         makeSnapshot({ directCostsClp: 1000, indirectCostsClp: 0, notes: 'Backfill manual', grossMarginPercent: 0.95 })
       ].map(sanitizeSnapshotForPresentation)
 
-      expect(trend[0].hasCompleteCostCoverage).toBe(true)
-      expect(trend[0].grossMarginPercent).toBe(1.0)
+      expect(trend[0].hasCompleteCostCoverage).toBe(false)
+      expect(trend[0].grossMarginPercent).toBeNull()
 
       expect(trend[1].hasCompleteCostCoverage).toBe(true)
       expect(trend[1].grossMarginPercent).toBe(0.5)
