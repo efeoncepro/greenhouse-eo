@@ -10,23 +10,51 @@ La relacion correcta entre ambas es:
 - `CODEX_TASK_Transactional_Email_System.md` define la infraestructura base de envio, tokens, templates y flows de acceso
 - esta task define el catalogo mas amplio de emails que Greenhouse necesitara como portal ejecutivo-operativo
 
-## Delta 2026-04-07
+## Delta 2026-04-07 — Leave Request Email Family (P2 completado)
 
-- Leave request submission emails implementados (2 templates dedicados)
-- `leave_request_submitted`: confirmacion al solicitante al enviar solicitud (pending badge, summary card, motivo)
-- `leave_request_pending_review`: notificacion al supervisor/HR con datos del colaborador, periodo y motivo
-- Integrado en `leave_request.created` (email a requester + reviewers) y `leave_request.escalated_to_hr` (email a HR)
-- Hero images clay 3D: avion de papel (submitted) + campana con badge (pending review)
-- P2 `leave_request_*` completamente implementado: submitted, approved, rejected, cancelled + review confirmation
-- Leave request decision emails implementados (2 templates dedicados)
-- `leave_request_decision`: email al solicitante cuando su permiso es aprobado/rechazado/cancelado
-- `leave_review_confirmation`: email al revisor confirmando su accion (approve/reject, no cancel)
-- Ambos templates soportan es/en, hero images (Imagen 4), status badge, summary card, notas condicionales
-- Integracion via notification projection: disparo automatico en eventos `leave_request.approved`, `.rejected`, `.cancelled`
-- Event payload enriquecido con `notes` y `reason` para personalizacion
-- Hero images pre-generadas con Imagen 4 en `public/images/emails/` — servidas via Vercel CDN
-- Skill invocable `/greenhouse-email` creada (repo + global) cubriendo workflow completo de creacion de emails
-- P2 `leave_request_*` parcialmente implementado: falta `leave_request_submitted` (notificacion al supervisor)
+Familia completa de 4 templates transaccionales dedicados para permisos/ausencias. Todos verificados end-to-end en produccion con 8 emails de prueba enviados exitosamente, cubriendo 4 tipos de permiso distintos (estudio, vacaciones, medico, parental) y 4 personas distintas como solicitante/revisor.
+
+### Templates implementados
+
+| EmailType | Disparador(es) | Destinatario | Proposito |
+|-----------|---------------|-------------|-----------|
+| `leave_request_submitted` | `leave_request.created` | Solicitante | Confirmacion de envio (badge pendiente, summary card, motivo) |
+| `leave_request_pending_review` | `leave_request.created`, `leave_request.escalated_to_hr` | Supervisor o HR | Notificacion de revision pendiente (datos colaborador, CTA revisar) |
+| `leave_request_decision` | `leave_request.approved`, `.rejected`, `.cancelled` | Solicitante | Resultado de la solicitud (status badge verde/rojo/gris, notas del revisor) |
+| `leave_review_confirmation` | `leave_request.approved`, `.rejected` | Revisor | Confirmacion de la accion tomada (motivo original, notas propias) |
+
+### Personalizacion dinamica
+
+Los emails se personalizan automaticamente desde el event payload del outbox — no hay valores hardcodeados:
+- `memberName` / `memberEmail` — del registro del colaborador en PostgreSQL
+- `actorName` — del miembro que toma la accion (supervisor o HR)
+- `leaveTypeName` — nombre del tipo de permiso (Vacaciones, Permiso medico, Permiso parental, etc.)
+- `startDate`, `endDate`, `requestedDays` — fechas y duracion
+- `reason` — motivo original del solicitante (condicional)
+- `notes` — observaciones del revisor (condicional)
+- `locale` — es/en auto-resuelto via context resolver
+
+### Hero images (Imagen 4, clay 3D)
+
+Estilo canonico: **clay 3D sobre fondo blanco puro** con colores de marca (navy/blue/teal/green).
+Almacenadas en **GCS public buckets** (no Vercel), accesibles sin auth:
+
+| Imagen | Bucket path | Descripcion |
+|--------|------------|-------------|
+| `leave-submitted.png` | `emails/leave-submitted.png` | Avion de papel azul + reloj de arena navy |
+| `leave-pending-review.png` | `emails/leave-pending-review.png` | Bandeja navy + documento azul + campana verde |
+| `leave-decision-v2.png` | `emails/leave-decision-v2.png` | Calendario navy + checkmark azul + sobre |
+| `leave-review-v2.png` | `emails/leave-review-v2.png` | Clipboard navy + timbre azul + lapicera |
+
+URL pattern: `https://storage.googleapis.com/${GREENHOUSE_PUBLIC_MEDIA_BUCKET}/emails/<filename>`
+
+### Infraestructura
+
+- **Delivery**: via notification projection en ops-worker Cloud Run (outbox reactivo, cada 5 min)
+- **Event payload**: enriquecido con `notes` y `reason` en `buildLeaveEventPayload`
+- **Skill**: `/greenhouse-email` creada (repo `.claude/skills/` + global `~/.claude/skills/`) con workflow completo
+- **CRITICO**: cambios en templates requieren redeploy de ops-worker (`bash services/ops-worker/deploy.sh`)
+- **Imagenes**: GCS public bucket por entorno, NUNCA Vercel (SSO Protection bloquea carga)
 
 ## Delta 2026-04-06
 
