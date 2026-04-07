@@ -22,10 +22,10 @@ import type {
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase()
 
-const mergeAttachments = (templateAttachments: EmailAttachment[] | undefined, inputAttachments: EmailAttachment[] | undefined) => [
-  ...(templateAttachments ?? []),
-  ...(inputAttachments ?? [])
-]
+const mergeAttachments = (
+  templateAttachments: EmailAttachment[] | undefined,
+  inputAttachments: EmailAttachment[] | undefined
+) => [...(templateAttachments ?? []), ...(inputAttachments ?? [])]
 
 const serializeJsonSafe = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T
 
@@ -41,9 +41,7 @@ const reviveJsonSafe = (value: unknown): unknown => {
       return Buffer.from(record.data as number[])
     }
 
-    return Object.fromEntries(
-      Object.entries(record).map(([key, entry]) => [key, reviveJsonSafe(entry)])
-    )
+    return Object.fromEntries(Object.entries(record).map(([key, entry]) => [key, reviveJsonSafe(entry)]))
   }
 
   return value
@@ -105,9 +103,7 @@ const reviveDeliveryPayload = <TContext extends Record<string, unknown>>(
     return null
   }
 
-  const context = record.context && typeof record.context === 'object'
-    ? (record.context as TContext)
-    : ({} as TContext)
+  const context = record.context && typeof record.context === 'object' ? (record.context as TContext) : ({} as TContext)
 
   const attachments = Array.isArray(record.attachments)
     ? record.attachments
@@ -218,12 +214,7 @@ const updateDeliveryRow = async (input: {
           updated_at = NOW()
       WHERE delivery_id = $1
     `,
-    [
-      input.deliveryId,
-      input.resendId,
-      input.status,
-      input.errorMessage ?? null
-    ]
+    [input.deliveryId, input.resendId, input.status, input.errorMessage ?? null]
   )
 }
 
@@ -368,7 +359,10 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
       }
 
       // Non-blocking: if resolver fails for other reasons, continue with caller context
-      console.warn('[email-delivery] Context resolver failed, continuing with caller context:', error instanceof Error ? error.message : error)
+      console.warn(
+        '[email-delivery] Context resolver failed, continuing with caller context:',
+        error instanceof Error ? error.message : error
+      )
     }
 
     // ── Rate Limit: check per-recipient hourly limit ──
@@ -519,9 +513,10 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to send email.'
 
-    const subject = error instanceof Error && error.message.includes('No email template registered')
-      ? '[template missing]'
-      : '[email delivery failed]'
+    const subject =
+      error instanceof Error && error.message.includes('No email template registered')
+        ? '[template missing]'
+        : '[email delivery failed]'
 
     if (input.existingDeliveryId) {
       await updateDeliveryRow({
@@ -562,14 +557,15 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
   }
 }
 
-export const sendEmail = async <TContext extends Record<string, unknown>>(input: SendEmailInput<TContext>): Promise<SendEmailResult> => {
+export const sendEmail = async <TContext extends Record<string, unknown>>(
+  input: SendEmailInput<TContext>
+): Promise<SendEmailResult> => {
   const batchId = randomUUID()
   let recipients: EmailRecipient[]
 
   try {
-    recipients = input.recipients && input.recipients.length > 0
-      ? input.recipients
-      : await getSubscribers(input.emailType)
+    recipients =
+      input.recipients && input.recipients.length > 0 ? input.recipients : await getSubscribers(input.emailType)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unable to resolve email recipients.'
 
@@ -592,6 +588,7 @@ export const sendEmail = async <TContext extends Record<string, unknown>>(input:
 
   let firstResendId: string | null = null
   let sawFailure = false
+  let sawSkipped = false
   let lastError: string | undefined
   const recipientResults: NonNullable<SendEmailResult['recipientResults']> = []
 
@@ -622,13 +619,16 @@ export const sendEmail = async <TContext extends Record<string, unknown>>(input:
     if (result.status === 'failed') {
       sawFailure = true
       lastError = lastError || result.error
+    } else if (result.status === 'skipped') {
+      sawSkipped = true
+      lastError = lastError || result.error
     }
   }
 
   return {
     deliveryId: batchId,
     resendId: firstResendId,
-    status: sawFailure ? 'failed' : 'sent',
+    status: sawFailure ? 'failed' : sawSkipped ? 'skipped' : 'sent',
     recipientResults,
     ...(lastError ? { error: lastError } : {})
   }
@@ -704,7 +704,9 @@ export const processFailedEmailDeliveries = async (limit = 25) => {
       continue
     }
 
-    const recipient = payload.recipients.find(item => normalizeEmail(item.email) === normalizeEmail(claimedRow.recipient_email)) ?? {
+    const recipient = payload.recipients.find(
+      item => normalizeEmail(item.email) === normalizeEmail(claimedRow.recipient_email)
+    ) ?? {
       email: claimedRow.recipient_email,
       name: claimedRow.recipient_name ?? undefined,
       userId: claimedRow.recipient_user_id ?? undefined
@@ -741,7 +743,9 @@ export const processFailedEmailDeliveries = async (limit = 25) => {
   }
 }
 
-export const retryFailedDelivery = async (deliveryId: string): Promise<{
+export const retryFailedDelivery = async (
+  deliveryId: string
+): Promise<{
   status: 'sent' | 'failed' | 'skipped'
   resendId: string | null
   error?: string

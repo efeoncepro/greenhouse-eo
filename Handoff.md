@@ -1,5 +1,32 @@
 # Handoff.md
 
+## Sesion 2026-04-06 — ISSUE-025: fix sendEmail() status aggregation
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: ISSUE-025 — `sendEmail()` retornaba `'sent'` cuando todos los recipients eran `'skipped'`, causando inconsistencia entre `notification_log` y `email_deliveries`
+
+### Cambios
+
+- `src/lib/email/delivery.ts` — agregado tracking de `sawSkipped` en aggregate status de `sendEmail()`; retorna `'skipped'` cuando corresponde
+- `src/lib/email/delivery.test.ts` — test para escenario "all recipients skipped"
+- `docs/issues/open/ISSUE-025-sendmail-status-aggregation-skipped-as-sent.md` — documentación del issue
+
+### Verificacion
+
+- 4/4 tests de delivery passing
+- 2/2 tests de notification service passing
+- `npx tsc --noEmit` — OK
+
+### Riesgo / siguiente paso
+
+- Los 18 registros históricos en `notification_log` con `status='sent'` que realmente fueron `'skipped'` quedan como están (data histórica)
+- Para corregirlos se podría hacer un UPDATE manual validando contra `email_deliveries`, pero no es crítico
+- El fix previene inconsistencia futura
+
+---
+
 ## Sesion 2026-04-06 — ISSUE-024: fix observabilidad Admin Notifications
 
 ### Rama / alcance

@@ -21,7 +21,7 @@ export default async function Page() {
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath || '/auth/landing')
+    redirect(tenant.portalHomePath || '/home')
   }
 
   const data = await getDashboardOverview({

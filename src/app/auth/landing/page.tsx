@@ -11,5 +11,5 @@ export default async function Page() {
     redirect('/login')
   }
 
-  redirect(session.user.portalHomePath || '/dashboard')
+  redirect(session.user.portalHomePath || '/home')
 }
