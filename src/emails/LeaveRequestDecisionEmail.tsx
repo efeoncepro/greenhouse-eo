@@ -2,12 +2,10 @@ import { Heading, Img, Section, Text } from '@react-email/components'
 
 import EmailButton from './components/EmailButton'
 import EmailLayout from './components/EmailLayout'
-import { EMAIL_COLORS, EMAIL_FONTS } from './constants'
+import { APP_URL, EMAIL_COLORS, EMAIL_FONTS } from './constants'
 
-const EMAIL_BASE_URL = process.env.NEXT_PUBLIC_APP_URL
-  || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://greenhouse.efeoncepro.com')
-
-const HERO_IMAGE_PATH = '/images/emails/leave-decision.png'
+const MEDIA_BUCKET = process.env.GREENHOUSE_PUBLIC_MEDIA_BUCKET || 'efeonce-group-greenhouse-public-media-prod'
+const HERO_IMAGE_URL = `https://storage.googleapis.com/${MEDIA_BUCKET}/emails/leave-decision.png`
 
 type LeaveStatus = 'approved' | 'rejected' | 'cancelled'
 
@@ -125,7 +123,7 @@ export default function LeaveRequestDecisionEmail({
   const t = getTranslations(locale, status)
   const styles = STATUS_STYLES[status]
   const actorFirstName = actorName.split(' ')[0] || actorName
-  const appUrl = `${EMAIL_BASE_URL}/my/leave`
+  const appUrl = `${APP_URL}/my/leave`
 
   const bodyText = status === 'approved'
     ? (t.body as (a: string, b: string, c: number) => string)(actorFirstName, leaveTypeName, requestedDays)
@@ -137,7 +135,7 @@ export default function LeaveRequestDecisionEmail({
     <EmailLayout previewText={t.heading} locale={locale}>
       {/* Hero image */}
       <Img
-        src={`${EMAIL_BASE_URL}${HERO_IMAGE_PATH}`}
+        src={HERO_IMAGE_URL}
         alt=""
         width={560}
         height={180}
