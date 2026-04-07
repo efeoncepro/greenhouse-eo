@@ -708,8 +708,8 @@ export const createIdentityProfile = async (data: {
 
   await runGreenhousePostgresQuery(`
     INSERT INTO greenhouse_core.identity_profiles (
-      profile_id, full_name, canonical_email, source_system,
-      source_object_type, source_object_id, active, created_at, updated_at
+      profile_id, full_name, canonical_email, primary_source_system,
+      primary_source_object_type, primary_source_object_id, active, created_at, updated_at
     ) VALUES ($1, $2, $3, $4, $5, $6, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
     ON CONFLICT (profile_id) DO UPDATE
     SET
