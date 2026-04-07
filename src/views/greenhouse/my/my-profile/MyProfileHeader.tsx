@@ -57,9 +57,9 @@ const MyProfileHeader = ({ fullName, avatarUrl, designation, department, joining
             </CustomAvatar>
           )}
         </div>
-        <div className='flex is-full justify-start self-end flex-col items-center gap-6 sm-gap-0 sm:flex-row sm:justify-between sm:items-end'>
+        <div className='flex is-full justify-start self-end flex-col items-center gap-6 sm-gap-0 sm:flex-row sm:justify-between sm:items-end' style={{ marginTop: 8 }}>
           <div className='flex flex-col items-center sm:items-start gap-2'>
-            <Typography variant='h4'>{fullName}</Typography>
+            <Typography variant='h4' sx={{ mt: 1 }}>{fullName}</Typography>
             <div className='flex flex-wrap gap-6 justify-center sm:justify-normal'>
               {designation && (
                 <div className='flex items-center gap-2'>
