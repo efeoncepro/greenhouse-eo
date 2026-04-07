@@ -10,7 +10,7 @@ import LinearProgress from '@mui/material/LinearProgress'
 
 import CustomTabList from '@core/components/mui/TabList'
 
-import type { PersonProfileSummary } from '@/types/person-360'
+import type { PersonComplete360 } from '@/types/person-complete-360'
 
 // Sub-components
 import MyProfileHeader from './my-profile/MyProfileHeader'
@@ -57,9 +57,7 @@ const formatRelativeTime = (isoDate: string): string => {
 // ── View ──
 
 const MyProfileView = () => {
-  const [profile, setProfile] = useState<PersonProfileSummary | null>(null)
-  const [assignments, setAssignments] = useState<any>(null)
-  const [leave, setLeave] = useState<any>(null)
+  const [data, setData] = useState<PersonComplete360 | null>(null)
   const [colleagues, setColleagues] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('profile')
@@ -67,16 +65,12 @@ const MyProfileView = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const [profileRes, assignmentsRes, leaveRes, colleaguesRes] = await Promise.all([
-          fetch('/api/my/profile').then(r => (r.ok ? r.json() : null)),
-          fetch('/api/my/assignments').then(r => (r.ok ? r.json() : null)),
-          fetch('/api/my/leave').then(r => (r.ok ? r.json() : null)),
+        const [person360Res, colleaguesRes] = await Promise.all([
+          fetch('/api/person/me/360?facets=identity,assignments,leave,organization').then(r => (r.ok ? r.json() : null)),
           fetch('/api/my/organization/members').then(r => (r.ok ? r.json() : null))
         ])
 
-        setProfile(profileRes)
-        setAssignments(assignmentsRes)
-        setLeave(leaveRes)
+        setData(person360Res)
         setColleagues(colleaguesRes?.items ?? [])
       } catch {
         // silent — components handle null data gracefully
@@ -92,54 +86,58 @@ const MyProfileView = () => {
     return <LinearProgress />
   }
 
-  // ── Data transformation ──
+  // ── Data transformation (from Person Complete 360) ──
+
+  const identity = data?.identity
+  const assignmentsList = data?.assignments ?? []
+  const leaveData = data?.leave
 
   const headerProps = {
-    fullName: profile?.resolvedDisplayName ?? '',
-    avatarUrl: profile?.resolvedAvatarUrl ?? null,
-    designation: profile?.resolvedJobTitle ?? null,
-    department: profile?.departmentName ?? null,
-    joiningDate: profile?.hireDate ? formatDate(profile.hireDate) : null
+    fullName: identity?.resolvedDisplayName ?? '',
+    avatarUrl: identity?.resolvedAvatarUrl ?? null,
+    designation: identity?.resolvedJobTitle ?? null,
+    department: identity?.departmentName ?? null,
+    joiningDate: identity?.hireDate ? formatDate(identity.hireDate) : null
   }
 
   const about = [
-    profile?.resolvedJobTitle && {
+    identity?.resolvedJobTitle && {
       icon: 'tabler-briefcase',
       property: 'Cargo',
-      value: profile.resolvedJobTitle
+      value: identity.resolvedJobTitle
     },
-    profile?.departmentName && {
+    identity?.departmentName && {
       icon: 'tabler-building',
       property: 'Departamento',
-      value: profile.departmentName
+      value: identity.departmentName
     },
-    profile?.jobLevel && {
+    identity?.jobLevel && {
       icon: 'tabler-chart-bar',
       property: 'Nivel',
-      value: profile.jobLevel
+      value: identity.jobLevel
     },
-    profile?.employmentType && {
+    identity?.employmentType && {
       icon: 'tabler-clock',
       property: 'Tipo de contrato',
-      value: profile.employmentType
+      value: identity.employmentType
     },
-    profile?.hireDate && {
+    identity?.hireDate && {
       icon: 'tabler-calendar',
       property: 'Fecha de ingreso',
-      value: formatDate(profile.hireDate)
+      value: formatDate(identity.hireDate)
     }
   ].filter(Boolean) as { icon: string; property: string; value: string }[]
 
   const contacts = [
-    profile?.resolvedEmail && {
+    identity?.resolvedEmail && {
       icon: 'tabler-mail',
       property: 'Email',
-      value: profile.resolvedEmail
+      value: identity.resolvedEmail
     },
-    profile?.resolvedPhone && {
+    identity?.resolvedPhone && {
       icon: 'tabler-phone',
       property: 'Telefono',
-      value: profile.resolvedPhone
+      value: identity.resolvedPhone
     }
   ].filter(Boolean) as { icon: string; property: string; value: string }[]
 
@@ -147,7 +145,7 @@ const MyProfileView = () => {
     {
       icon: 'tabler-check',
       property: 'Asignaciones activas',
-      value: String(assignments?.assignments?.length ?? 0)
+      value: String(assignmentsList.filter(a => a.active).length)
     },
     {
       icon: 'tabler-users',
@@ -157,30 +155,30 @@ const MyProfileView = () => {
     {
       icon: 'tabler-calendar-stats',
       property: 'Sistemas vinculados',
-      value: String(profile?.linkedSystems?.length ?? 0)
+      value: String(identity?.linkedSystems?.length ?? 0)
     }
   ]
 
-  const teams = (assignments?.assignments ?? []).map((a: any) => ({
-    property: a.clientName || a.client_name || 'Sin nombre',
-    value: a.roleTitle || a.role_title_override || 'Asignado'
+  const teams = assignmentsList.map(a => ({
+    property: a.clientName || 'Sin nombre',
+    value: a.roleTitleOverride || 'Asignado'
   }))
 
-  const teamsTech = (assignments?.assignments ?? []).map((a: any) => {
+  const teamsTech = assignmentsList.map(a => {
     const tm = a.teamMembers ?? []
 
     return {
-      title: a.clientName || a.client_name || 'Sin nombre',
+      title: a.clientName || 'Sin nombre',
       avatar: tm[0]?.avatarUrl || '',
       members: tm.length,
-      chipText: `${Math.round((a.fteAllocation || a.fte_allocation || 0) * 100)}% FTE`,
+      chipText: `${Math.round((a.fteAllocation || 0) * 100)}% FTE`,
       chipColor: 'primary' as const
     }
   })
 
-  const leaveRequests = Array.isArray(leave?.requests) ? leave.requests : (leave?.requests?.requests ?? [])
+  const leaveRequests = leaveData?.recentRequests ?? []
 
-  const activity = leaveRequests.slice(0, 5).map((r: any) => ({
+  const activity = leaveRequests.slice(0, 5).map(r => ({
     title: `${r.leaveTypeName || 'Permiso'} — ${r.requestedDays} dia(s)`,
     description: r.reason || `${r.startDate} a ${r.endDate}`,
     time: r.createdAt ? formatRelativeTime(r.createdAt) : '',
@@ -193,57 +191,57 @@ const MyProfileView = () => {
     role: c.jobTitle || c.roleLabel || c.membershipType || ''
   }))
 
-  const projectTable = (assignments?.assignments ?? []).map((a: any, i: number) => {
+  const projectTable = assignmentsList.map((a, i) => {
     const tm = a.teamMembers ?? []
 
     return {
       id: i + 1,
-      title: a.clientName || a.client_name || 'Sin nombre',
-      subtitle: a.roleTitle || a.role_title_override || 'Asignado',
+      title: a.clientName || 'Sin nombre',
+      subtitle: a.roleTitleOverride || 'Asignado',
       leader: '',
-      avatarGroup: tm.map((m: any) => m.avatarUrl).filter(Boolean) as string[],
-      status: Math.round((a.fteAllocation || a.fte_allocation || 0) * 100)
+      avatarGroup: tm.map(m => m.avatarUrl).filter(Boolean) as string[],
+      status: Math.round((a.fteAllocation || 0) * 100)
     }
   })
 
-  const teamsTabData = (assignments?.assignments ?? []).map((a: any) => {
+  const teamsTabData = assignmentsList.map(a => {
     const tm = a.teamMembers ?? []
 
     return {
-      title: a.clientName || a.client_name || 'Sin nombre',
+      title: a.clientName || 'Sin nombre',
       avatar: '',
-      description: a.roleTitle || a.role_title_override || 'Miembro del equipo',
+      description: a.roleTitleOverride || 'Miembro del equipo',
       chips: [
         {
-          title: `${Math.round((a.fteAllocation || a.fte_allocation || 0) * 100)}% FTE`,
+          title: `${Math.round((a.fteAllocation || 0) * 100)}% FTE`,
           color: 'primary' as const
         }
       ],
       extraMembers: 0,
-      avatarGroup: tm.map((m: any) => ({ name: m.name, avatar: m.avatarUrl || '' }))
+      avatarGroup: tm.map(m => ({ name: m.name, avatar: m.avatarUrl || '' }))
     }
   })
 
-  const projectsTabData = (assignments?.assignments ?? []).map((a: any) => {
+  const projectsTabData = assignmentsList.map(a => {
     const tm = a.teamMembers ?? []
 
     return {
-      title: a.clientName || a.client_name || 'Sin nombre',
-      client: a.clientName || a.client_name || '',
+      title: a.clientName || 'Sin nombre',
+      client: a.clientName || '',
       avatar: '',
       budget: '-',
       budgetSpent: '-',
-      startDate: a.startDate || a.start_date || '-',
-      deadline: a.endDate || a.end_date || '-',
-      description: a.roleTitle || a.role_title_override || '',
-      hours: `${a.hoursPerMonth || a.hours_per_month || 0}h/mes`,
+      startDate: a.startDate || '-',
+      deadline: a.endDate || '-',
+      description: a.roleTitleOverride || '',
+      hours: `${a.hoursPerMonth || 0}h/mes`,
       daysLeft: 0,
       chipColor: 'info' as const,
       totalTask: tm.length + 1,
       completedTask: tm.length + 1,
       members: `${tm.length + 1} miembros`,
       comments: 0,
-      avatarGroup: tm.map((m: any) => ({ name: m.name, avatar: m.avatarUrl || '' }))
+      avatarGroup: tm.map(m => ({ name: m.name, avatar: m.avatarUrl || '' }))
     }
   })
 

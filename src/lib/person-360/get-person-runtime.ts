@@ -5,6 +5,10 @@ import { getPersonOperationalServing } from './get-person-operational-serving'
 import { getPersonIcoProfile } from './get-person-ico-profile'
 
 /**
+ * @deprecated Use `getPersonComplete360(identifier, { facets: ['identity', 'delivery'] })`
+ * from `@/lib/person-360/person-complete-360` instead. The federated 360 resolver
+ * provides the same data with authorization, caching, and observability (TASK-273).
+ *
  * Person 360 Runtime — Consolidated serving-first read model.
  *
  * Instead of fan-out to 8+ stores, reads from 3 materialized projections:

@@ -121,6 +121,11 @@ const str = (v: string | null | undefined): string | null =>
 
 // ── Main function ──
 
+/**
+ * @deprecated Use `getPersonComplete360(identifier, { facets: ['payroll', 'costs', 'assignments'] })`
+ * from `@/lib/person-360/person-complete-360` instead. This function will be removed
+ * once all consumers are migrated to the federated 360 resolver (TASK-273).
+ */
 export const getPersonFinanceOverviewFromPostgres = async (
   identifier: string,
   options: {
