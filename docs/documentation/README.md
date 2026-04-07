@@ -42,7 +42,7 @@ _Pendiente de documentar._
 
 ### Herramientas IA
 
-_Pendiente de documentar._
+- [Generador Visual de Assets con IA](ai-tooling/generador-visual-assets.md) — generacion de imagenes (Imagen 4) y animaciones SVG (Gemini) para enriquecer interfaces, banners de perfil por categoria
 
 ### Portal Cliente
 
@@ -71,3 +71,4 @@ Para detalle tecnico, schemas, contratos y decisiones de diseno, ver `docs/archi
 | [12-testing-development.md](../architecture/12-testing-development.md)                                     | Plataforma interna | Flujo actual de testing, observabilidad del suite, artifacts y CI |
 | [GREENHOUSE_STAGING_ACCESS_V1.md](../architecture/GREENHOUSE_STAGING_ACCESS_V1.md)                         | Plataforma         | Acceso programatico a Staging: SSO bypass, agent auth, script     |
 | [GREENHOUSE_PERSON_COMPLETE_360_V1.md](../architecture/GREENHOUSE_PERSON_COMPLETE_360_V1.md)               | Personas           | Person Complete 360: resolver federado, facetas, auth, cache      |
+| [GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md](../architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md)   | IA / Tooling       | Generador visual: Imagen 4, Gemini SVG, banners por categoria     |

@@ -2,6 +2,16 @@
 
 ## 2026-04-07
 
+- **TASK-278: AI Visual Asset Generator + Profile Banners**:
+  - Nuevo modulo `src/lib/ai/image-generator.ts` con `generateImage()` (Imagen 4) y `generateAnimation()` (Gemini SVG)
+  - Endpoints internos: `POST /api/internal/generate-image` y `POST /api/internal/generate-animation` (admin-only, disabled en production)
+  - 7 banners de perfil generados con Imagen 4, uno por categoria: leadership, operations, creative, technology, strategy, support, default
+  - Banner resolver `src/lib/person-360/resolve-banner.ts` — mapea roleCodes + departmentName a la categoria correcta
+  - MyProfileHeader ahora muestra banner AI-generated segun el rol del colaborador (fallback a gradiente CSS)
+  - Skill `/generate-visual-asset` para invocacion directa del agente
+  - Modelo configurable via `IMAGEN_MODEL` env var (default: `imagen-4.0-generate-001`)
+  - Spec de arquitectura: `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`
+
 - **TASK-273: Person Complete 360 — capa de serving federada por facetas**:
   - Nuevo resolver federado `getPersonComplete360(identifier, options)` que consolida toda la data de una persona bajo un solo entry point con facetas on-demand
   - 8 facetas independientes: identity, assignments, organization, leave, payroll, delivery, costs, staffAug — cada una como modulo autonomo en `src/lib/person-360/facets/`

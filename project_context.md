@@ -1,5 +1,15 @@
 # project_context.md
 
+## Delta 2026-04-07 AI Visual Asset Generator + Profile Banners (TASK-278)
+
+- `generateImage()` y `generateAnimation()` en `src/lib/ai/image-generator.ts` son el entry point para generar assets visuales durante el desarrollo.
+- Motor de imagenes: **Imagen 4** (`imagen-4.0-generate-001`), configurable via `IMAGEN_MODEL` env var.
+- Motor de animaciones: **Gemini** (ultimo modelo via `resolveNexaModel()`), genera SVG con CSS keyframes + `prefers-reduced-motion`.
+- Regla: **los banners de perfil se resuelven via `resolveProfileBanner(roleCodes, departmentName)`** en `src/lib/person-360/resolve-banner.ts`. No hardcodear paths de banner.
+- Regla: **endpoints de generacion deshabilitados en production** por defecto. Override: `ENABLE_ASSET_GENERATOR=true`.
+- 7 categorias de banner: leadership, operations, creative, technology, strategy, support, default.
+- Fuente canonica: `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`.
+
 ## Delta 2026-04-07 Person Complete 360 — serving federado por facetas (TASK-273)
 
 - `getPersonComplete360(identifier, facets[])` es el unico entry point server-side para obtener datos completos de una persona. Los consumidores NO deben hacer queries directas a tablas de persona — deben usar el resolver.

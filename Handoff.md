@@ -1,5 +1,36 @@
 # Handoff.md
 
+## Sesion 2026-04-07 — TASK-278: AI Visual Asset Generator + Profile Banners
+
+### Rama / alcance
+
+- rama: `develop` (direct)
+- scope: Modulo de generacion de assets visuales con IA + banners de perfil por categoria
+
+### Cambios
+
+- `src/lib/ai/image-generator.ts` — helper con `generateImage()` (Imagen 4) y `generateAnimation()` (Gemini SVG)
+- `src/app/api/internal/generate-image/route.ts` — endpoint POST admin-only
+- `src/app/api/internal/generate-animation/route.ts` — endpoint POST admin-only
+- `src/lib/person-360/resolve-banner.ts` — resolver role/department → banner category
+- `src/views/greenhouse/my/my-profile/MyProfileHeader.tsx` — acepta bannerUrl prop
+- `src/views/greenhouse/my/MyProfileView.tsx` — pasa bannerUrl del resolver
+- `public/images/banners/*.png` — 7 banners generados con Imagen 4
+- `scripts/generate-banners.mts` — script batch de generacion
+- `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` — spec
+- `docs/documentation/ai-tooling/generador-visual-assets.md` — doc funcional
+
+### Verificacion
+
+- `pnpm build` — OK
+- `pnpm lint` — OK
+
+### Riesgo / siguiente paso
+
+- Los banners estan como archivos estaticos en public/ — considerar moverlos a GCS bucket para mejor cache y no inflar el repo
+- Extender banner resolver a Admin User Detail y People Detail
+- Generar animaciones SVG para empty states existentes (reemplazar Lottie JSON)
+
 ## Sesion 2026-04-07 — TASK-273: Person Complete 360 federated serving layer
 
 ### Rama / alcance
