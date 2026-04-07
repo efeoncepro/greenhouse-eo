@@ -15,16 +15,18 @@ type Props = {
   designation: string | null
   department: string | null
   joiningDate: string | null
+  bannerUrl?: string | null
 }
 
-const MyProfileHeader = ({ fullName, avatarUrl, designation, department, joiningDate }: Props) => {
+const MyProfileHeader = ({ fullName, avatarUrl, designation, department, joiningDate, bannerUrl }: Props) => {
   return (
     <Card>
       <div
         className='bs-[200px]'
         style={{
-          background:
-            'linear-gradient(135deg, var(--mui-palette-primary-main) 0%, var(--mui-palette-primary-darkChannel) 50%, var(--mui-palette-info-main) 100%)',
+          background: bannerUrl
+            ? `url(${bannerUrl}) center/cover no-repeat`
+            : 'linear-gradient(135deg, var(--mui-palette-primary-main) 0%, var(--mui-palette-primary-darkChannel) 50%, var(--mui-palette-info-main) 100%)',
           opacity: 0.85
         }}
       />

@@ -11,6 +11,7 @@ import LinearProgress from '@mui/material/LinearProgress'
 import CustomTabList from '@core/components/mui/TabList'
 
 import type { PersonComplete360 } from '@/types/person-complete-360'
+import { resolveProfileBanner } from '@/lib/person-360/resolve-banner'
 
 // Sub-components
 import MyProfileHeader from './my-profile/MyProfileHeader'
@@ -97,7 +98,8 @@ const MyProfileView = () => {
     avatarUrl: identity?.resolvedAvatarUrl ?? null,
     designation: identity?.resolvedJobTitle ?? null,
     department: identity?.departmentName ?? null,
-    joiningDate: identity?.hireDate ? formatDate(identity.hireDate) : null
+    joiningDate: identity?.hireDate ? formatDate(identity.hireDate) : null,
+    bannerUrl: identity ? resolveProfileBanner(identity.activeRoleCodes, identity.departmentName) : null
   }
 
   const about = [
