@@ -13,7 +13,20 @@ Implementacion completa del resolver federado por facetas para organizaciones/cu
 - **Auth**: por faceta segun rol (admin todo, operations sin finance, client limitado a identity+spaces+team+delivery+services)
 - **Cache**: in-memory per-facet TTL + invalidacion por 22 eventos outbox
 - **Verificado E2E**: Sky Airline 9/9 facetas con datos reales (economics $6.9M revenue mar-2026, 20 team members, 7 CRM deals, 72 proyectos)
+- **Consumer migration**: TODAS las tabs de Organization Detail migradas al 360
 - **Rama**: develop (pendiente merge a main)
+
+### Consumer Migration — Organization Detail Tabs (2026-04-07)
+
+Todas las tabs de la vista Organization Detail (`/agency/organizations/{id}`) ahora usan el Account 360 resolver en lugar de endpoints legacy separados.
+
+- **OverviewTab**: `GET /api/organization/{id}/360?facets=economics,delivery,team&asOf={lastClosedMonth}` — fix: usa ultimo mes cerrado en vez de mes actual (soluciona KPIs mostrando "—" en abril sin datos)
+- **EconomicsTab**: `GET /api/organization/{id}/360?facets=economics&asOf={year}-{month}-01&limit=6` — mapea currentPeriod, trend y byClient del facet economics
+- **FinanceTab**: fetch paralelo legacy + 360 finance — legacy para tabla de detalle por Space, 360 para KPIs YTD (revenue YTD, invoice count, outstanding)
+- **PeopleTab**: fetch paralelo legacy + 360 team — legacy para tabla de memberships, 360 para KPIs summary (totalMembers, totalFte)
+- **ProjectsTab**: (migrado anteriormente) 360 delivery como source of truth para conteos, legacy para detalle por proyecto Notion
+- **OrganizationView header KPIs**: (migrado anteriormente) 360 economics para revenue, margen, FTE, spaces
+- **ICO Tab**: se mantiene en endpoint especializado (tiene distribuciones CSC, radar health, metricas por space que el facet delivery no replica)
 
 ## Sesion 2026-04-07 — TASK-278: AI Visual Asset Generator + Profile Banners
 

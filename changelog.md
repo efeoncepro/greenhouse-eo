@@ -14,6 +14,13 @@
 - Observability: ResolverTrace, X-Resolver-Version, X-Cache-Status, X-Timing-Ms
 - Deprecated: getOrganizationExecutiveSnapshot(), getOrganizationEconomics()
 - Verificado E2E en staging con Sky Airline (9/9 facetas, $6.9M revenue, 20 members)
+- **Consumer migration — Organization Detail tabs migradas al 360**:
+  - OverviewTab: economics+delivery+team facets con last-closed-month asOf (fix: KPIs "—" en mes sin datos)
+  - EconomicsTab: economics facet con trend chart, byClient table, period selector
+  - FinanceTab: parallel legacy+360 — agrega KPIs YTD (revenue, invoices, outstanding)
+  - PeopleTab: parallel legacy+360 — agrega KPIs team summary (totalMembers, totalFte)
+  - ProjectsTab: delivery facet como source of truth (fix: "Sin proyectos" con 72 proyectos existentes)
+  - ICO Tab: se mantiene en endpoint especializado
 
 - **TASK-278: AI Visual Asset Generator + Profile Banners**:
   - Nuevo modulo `src/lib/ai/image-generator.ts` con `generateImage()` (Imagen 4) y `generateAnimation()` (Gemini SVG)
