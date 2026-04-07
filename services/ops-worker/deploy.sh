@@ -175,7 +175,7 @@ gcloud scheduler jobs update http "ops-reactive-process" \
   --time-zone="${SCHEDULER_TZ}" \
   --uri="${SERVICE_URL}/reactive/process" \
   --http-method=POST \
-  --headers="Content-Type=application/json" \
+  --update-headers="Content-Type=application/json" \
   --message-body='{"batchSize":50}' \
   --oidc-service-account-email="${SERVICE_ACCOUNT}" \
   --oidc-token-audience="${SERVICE_URL}" \
@@ -208,7 +208,7 @@ gcloud scheduler jobs update http "ops-reactive-process-delivery" \
   --time-zone="${SCHEDULER_TZ}" \
   --uri="${SERVICE_URL}/reactive/process-domain" \
   --http-method=POST \
-  --headers="Content-Type=application/json" \
+  --update-headers="Content-Type=application/json" \
   --message-body='{"domain":"delivery","batchSize":50}' \
   --oidc-service-account-email="${SERVICE_ACCOUNT}" \
   --oidc-token-audience="${SERVICE_URL}" \
@@ -241,7 +241,7 @@ gcloud scheduler jobs update http "ops-reactive-recover" \
   --time-zone="${SCHEDULER_TZ}" \
   --uri="${SERVICE_URL}/reactive/recover" \
   --http-method=POST \
-  --headers="Content-Type=application/json" \
+  --update-headers="Content-Type=application/json" \
   --message-body='{"batchSize":10,"staleMinutes":30}' \
   --oidc-service-account-email="${SERVICE_ACCOUNT}" \
   --oidc-token-audience="${SERVICE_URL}" \
