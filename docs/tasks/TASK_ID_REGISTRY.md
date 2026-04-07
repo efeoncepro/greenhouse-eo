@@ -322,3 +322,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-270` | `to-do` | Admin Email Template Preview: vista integrada para previsualizar y probar templates | `docs/tasks/to-do/TASK-270-admin-email-template-preview.md` |
 | `TASK-271` | `to-do` | Soporte de permisos de medio dia (periodos parciales) | `docs/tasks/to-do/TASK-271-hr-leave-half-day-periods.md` |
 | `TASK-272` | `to-do` | Mi Perfil: vista rica basada en Vuexy user-profile | `docs/tasks/to-do/TASK-272-my-profile-vuexy-rich-view.md` |
+| `TASK-273` | `to-do` | Person Complete 360: capa de serving federada por facetas | `docs/tasks/to-do/TASK-273-person-complete-360-federated-serving-layer.md` |
