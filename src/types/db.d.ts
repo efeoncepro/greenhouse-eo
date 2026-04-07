@@ -1222,6 +1222,10 @@ export interface GreenhouseFinanceClientEconomics {
   gross_margin_percent: Numeric | null;
   headcount_fte: Numeric | null;
   indirect_costs_clp: Generated<Numeric | null>;
+  /**
+   * Labor cost from commercial cost attribution (payroll + overhead allocated to client). Separated from direct_costs_clp for accurate reporting.
+   */
+  labor_cost_clp: Generated<Numeric | null>;
   net_margin_clp: Generated<Numeric | null>;
   net_margin_percent: Numeric | null;
   notes: string | null;

@@ -155,6 +155,7 @@ export interface AccountClientProfitability {
   clientId: string
   clientName: string
   revenueCLP: number
+  laborCostCLP: number
   costCLP: number
   marginPct: number | null
   fte: number | null

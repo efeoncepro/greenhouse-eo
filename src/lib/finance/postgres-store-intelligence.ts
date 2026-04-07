@@ -51,6 +51,7 @@ type ClientEconomicsRow = {
   period_year: unknown
   period_month: unknown
   total_revenue_clp: unknown
+  labor_cost_clp: unknown
   direct_costs_clp: unknown
   indirect_costs_clp: unknown
   gross_margin_clp: unknown
@@ -101,6 +102,7 @@ const mapClientEconomics = (row: ClientEconomicsRow): ClientEconomicsRecord => (
   periodYear: toNumber(row.period_year),
   periodMonth: toNumber(row.period_month),
   totalRevenueClp: toNumber(row.total_revenue_clp),
+  laborCostClp: toNumber(row.labor_cost_clp),
   directCostsClp: toNumber(row.direct_costs_clp),
   indirectCostsClp: toNumber(row.indirect_costs_clp),
   grossMarginClp: toNumber(row.gross_margin_clp),
@@ -339,6 +341,7 @@ export const upsertClientEconomicsSnapshot = async ({
   periodYear,
   periodMonth,
   totalRevenueClp,
+  laborCostClp = 0,
   directCostsClp,
   indirectCostsClp,
   grossMarginClp,
@@ -356,6 +359,7 @@ export const upsertClientEconomicsSnapshot = async ({
   periodYear: number
   periodMonth: number
   totalRevenueClp: number
+  laborCostClp?: number
   directCostsClp: number
   indirectCostsClp: number
   grossMarginClp: number
@@ -376,7 +380,7 @@ export const upsertClientEconomicsSnapshot = async ({
       INSERT INTO greenhouse_finance.client_economics (
         snapshot_id, client_id, organization_id, client_name,
         period_year, period_month,
-        total_revenue_clp, direct_costs_clp, indirect_costs_clp,
+        total_revenue_clp, labor_cost_clp, direct_costs_clp, indirect_costs_clp,
         gross_margin_clp, gross_margin_percent,
         net_margin_clp, net_margin_percent,
         headcount_fte, revenue_per_fte, cost_per_fte,
@@ -385,17 +389,18 @@ export const upsertClientEconomicsSnapshot = async ({
       VALUES (
         $1, $2, $3, $4,
         $5, $6,
-        $7, $8, $9,
-        $10, $11,
-        $12, $13,
-        $14, $15, $16,
-        $17, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+        $7, $8, $9, $10,
+        $11, $12,
+        $13, $14,
+        $15, $16, $17,
+        $18, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
       )
       ON CONFLICT (client_id, period_year, period_month)
       DO UPDATE SET
         organization_id = EXCLUDED.organization_id,
         client_name = EXCLUDED.client_name,
         total_revenue_clp = EXCLUDED.total_revenue_clp,
+        labor_cost_clp = EXCLUDED.labor_cost_clp,
         direct_costs_clp = EXCLUDED.direct_costs_clp,
         indirect_costs_clp = EXCLUDED.indirect_costs_clp,
         gross_margin_clp = EXCLUDED.gross_margin_clp,
@@ -413,7 +418,7 @@ export const upsertClientEconomicsSnapshot = async ({
     [
       snapshotId, clientId, organizationId, clientName,
       periodYear, periodMonth,
-      roundCurrency(totalRevenueClp), roundCurrency(directCostsClp), roundCurrency(indirectCostsClp),
+      roundCurrency(totalRevenueClp), roundCurrency(laborCostClp), roundCurrency(directCostsClp), roundCurrency(indirectCostsClp),
       roundCurrency(grossMarginClp), grossMarginPercent,
       roundCurrency(netMarginClp), netMarginPercent,
       headcountFte, revenuePerFte != null ? roundCurrency(revenuePerFte) : null, costPerFte != null ? roundCurrency(costPerFte) : null,
@@ -550,6 +555,7 @@ export const computeClientEconomicsSnapshots = async (
     organizationId: string | null
     clientName: string
     revenue: number
+    laborCosts: number
     directCosts: number
     indirectCosts: number
   }>()
@@ -559,6 +565,7 @@ export const computeClientEconomicsSnapshots = async (
       organizationId: str(row.organization_id),
       clientName: row.client_name,
       revenue: toNumber(row.total_revenue_clp),
+      laborCosts: 0,
       directCosts: 0,
       indirectCosts: 0
     })
@@ -569,6 +576,7 @@ export const computeClientEconomicsSnapshots = async (
       organizationId: str(row.organization_id),
       clientName: row.client_name,
       revenue: 0,
+      laborCosts: 0,
       directCosts: 0,
       indirectCosts: 0
     }
@@ -589,6 +597,7 @@ export const computeClientEconomicsSnapshots = async (
         organizationId: str(row.organization_id),
         clientName: row.allocated_client_id,
         revenue: 0,
+        laborCosts: 0,
         directCosts: toNumber(row.total_direct_clp),
         indirectCosts: 0
       })
@@ -600,12 +609,13 @@ export const computeClientEconomicsSnapshots = async (
       organizationId: row.organizationId,
       clientName: row.clientName,
       revenue: 0,
+      laborCosts: 0,
       directCosts: 0,
       indirectCosts: 0
     }
 
     existing.organizationId = existing.organizationId || row.organizationId
-    existing.directCosts += row.laborCostClp
+    existing.laborCosts += row.laborCostClp
     clientMap.set(row.clientId, existing)
   }
 
@@ -646,8 +656,9 @@ export const computeClientEconomicsSnapshots = async (
   const results: ClientEconomicsRecord[] = []
 
   for (const [clientId, data] of clientMap.entries()) {
-    const totalCosts = roundCurrency(data.directCosts + data.indirectCosts)
-    const grossMargin = roundCurrency(data.revenue - data.directCosts)
+    const allDirectCosts = roundCurrency(data.laborCosts + data.directCosts)
+    const totalCosts = roundCurrency(allDirectCosts + data.indirectCosts)
+    const grossMargin = roundCurrency(data.revenue - allDirectCosts)
     const netMargin = roundCurrency(data.revenue - totalCosts)
 
     const fteData = fteMap.get(clientId)
@@ -660,6 +671,7 @@ export const computeClientEconomicsSnapshots = async (
       periodYear: year,
       periodMonth: month,
       totalRevenueClp: data.revenue,
+      laborCostClp: data.laborCosts,
       directCostsClp: data.directCosts,
       indirectCostsClp: data.indirectCosts,
       grossMarginClp: grossMargin,
@@ -699,7 +711,7 @@ export const getClientEconomics = async (
       SELECT
         snapshot_id, client_id, organization_id, client_name,
         period_year, period_month,
-        total_revenue_clp, direct_costs_clp, indirect_costs_clp,
+        total_revenue_clp, labor_cost_clp, direct_costs_clp, indirect_costs_clp,
         gross_margin_clp, gross_margin_percent,
         net_margin_clp, net_margin_percent,
         headcount_fte, revenue_per_fte, cost_per_fte,
@@ -725,7 +737,7 @@ export const listClientEconomicsByPeriod = async (
       SELECT
         snapshot_id, client_id, organization_id, client_name,
         period_year, period_month,
-        total_revenue_clp, direct_costs_clp, indirect_costs_clp,
+        total_revenue_clp, labor_cost_clp, direct_costs_clp, indirect_costs_clp,
         gross_margin_clp, gross_margin_percent,
         net_margin_clp, net_margin_percent,
         headcount_fte, revenue_per_fte, cost_per_fte,
@@ -752,7 +764,7 @@ export const listClientEconomicsByOrganization = async (
       SELECT
         snapshot_id, client_id, organization_id, client_name,
         period_year, period_month,
-        total_revenue_clp, direct_costs_clp, indirect_costs_clp,
+        total_revenue_clp, labor_cost_clp, direct_costs_clp, indirect_costs_clp,
         gross_margin_clp, gross_margin_percent,
         net_margin_clp, net_margin_percent,
         headcount_fte, revenue_per_fte, cost_per_fte,
@@ -819,7 +831,7 @@ export const listClientEconomicsTrend = async (
       SELECT
         snapshot_id, client_id, organization_id, client_name,
         period_year, period_month,
-        total_revenue_clp, direct_costs_clp, indirect_costs_clp,
+        total_revenue_clp, labor_cost_clp, direct_costs_clp, indirect_costs_clp,
         gross_margin_clp, gross_margin_percent,
         net_margin_clp, net_margin_percent,
         headcount_fte, revenue_per_fte, cost_per_fte,

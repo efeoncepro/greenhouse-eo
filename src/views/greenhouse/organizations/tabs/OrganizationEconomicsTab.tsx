@@ -187,6 +187,7 @@ const OrganizationEconomicsTab = ({ detail }: Props) => {
                   clientId: string
                   clientName: string
                   revenueCLP: number
+                  laborCostCLP: number
                   costCLP: number
                   marginPct: number | null
                   fte: number | null
@@ -222,8 +223,8 @@ const OrganizationEconomicsTab = ({ detail }: Props) => {
               periodClosed: cp?.periodClosed ?? false,
               snapshotRevision: null,
               revenueClp: c.revenueCLP,
-              laborCostClp: 0, // not in economics facet
-              directCostsClp: c.costCLP,
+              laborCostClp: c.laborCostCLP,
+              directCostsClp: c.costCLP - c.laborCostCLP,
               marginClp: c.revenueCLP - c.costCLP,
               marginPercent: c.marginPct,
               headcountFte: c.fte

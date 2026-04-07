@@ -39,6 +39,7 @@ interface ClientRow extends Record<string, unknown> {
   client_id: string
   client_name: string
   revenue: string | number
+  labor_cost: string | number
   cost: string | number
   headcount_fte: string | number | null
 }
@@ -145,7 +146,8 @@ const queryByClient = async (
   return runGreenhousePostgresQuery<ClientRow>(`
     SELECT ce.client_id, c.client_name,
       COALESCE(ce.total_revenue_clp, 0) as revenue,
-      COALESCE(ce.direct_costs_clp, 0) + COALESCE(ce.indirect_costs_clp, 0) as cost,
+      COALESCE(ce.labor_cost_clp, 0) as labor_cost,
+      COALESCE(ce.labor_cost_clp, 0) + COALESCE(ce.direct_costs_clp, 0) + COALESCE(ce.indirect_costs_clp, 0) as cost,
       ce.headcount_fte
     FROM greenhouse_finance.client_economics ce
     JOIN greenhouse_core.clients c ON c.client_id = ce.client_id
@@ -206,6 +208,7 @@ const mapTrendPoint = (row: TrendRow): AccountEconomicsTrendPoint => {
 
 const mapClientProfitability = (row: ClientRow): AccountClientProfitability => {
   const revenue = toNum(row.revenue)
+  const laborCost = toNum(row.labor_cost)
   const cost = toNum(row.cost)
   const margin = revenue - cost
 
@@ -213,6 +216,7 @@ const mapClientProfitability = (row: ClientRow): AccountClientProfitability => {
     clientId: String(row.client_id),
     clientName: String(row.client_name),
     revenueCLP: revenue,
+    laborCostCLP: laborCost,
     costCLP: cost,
     marginPct: revenue > 0 ? Math.round((margin / revenue) * 10000) / 100 : null,
     fte: toNullNum(row.headcount_fte)
