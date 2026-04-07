@@ -601,8 +601,34 @@ const HERO_IMAGE_URL = `https://storage.googleapis.com/${MEDIA_BUCKET}/emails/yo
 - [ ] If using AI images: clay 3D on white bg, brand colors, resized to 560px, under 200KB
 - [ ] If using AI images: uploaded to BOTH GCS public buckets (staging + prod), committed to git
 - [ ] If using AI images: template uses `GREENHOUSE_PUBLIC_MEDIA_BUCKET` env var for URL resolution
+- [ ] If email is sent via outbox/notification projection: **redeploy ops-worker** (`bash services/ops-worker/deploy.sh` from repo root)
 - [ ] `pnpm build` passes
 - [ ] `npx tsc --noEmit` passes
+
+---
+
+## ops-worker Cloud Run (CRITICAL for production emails)
+
+**IMPORTANT:** Emails triggered by outbox events (leave requests, payroll, etc.) are processed by the **ops-worker Cloud Run service**, NOT by Vercel serverless functions. The ops-worker bundles the email templates at build time via esbuild. If you add or modify email templates, **you MUST redeploy the ops-worker** or the new templates won't be available in production.
+
+**When to redeploy ops-worker:**
+- Any change to `src/lib/email/templates.ts` (new registrations)
+- Any change to `src/emails/*.tsx` (new or modified templates)
+- Any change to `src/lib/sync/projections/notifications.ts` (new email dispatch logic)
+- Any change to `src/lib/email/delivery.ts` (delivery behavior)
+
+**How to redeploy:**
+```bash
+# From the repo root (NOT from services/ops-worker/)
+bash services/ops-worker/deploy.sh
+```
+
+**Verify deployment:**
+```bash
+gcloud run revisions list --service ops-worker --region us-east4 --project efeonce-group --limit 3
+```
+
+**Architecture:** The ops-worker runs 3 Cloud Scheduler jobs every 5 minutes that process outbox events → notification projection → `sendEmail()`. Vercel only handles the admin preview API and the test send endpoint — it does NOT process outbox events in production.
 
 ---
 
