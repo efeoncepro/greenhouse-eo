@@ -315,7 +315,11 @@ export const readCommercialCostAttributionForPeriod = async (
   year: number,
   month: number
 ): Promise<MemberPeriodCommercialCostAttribution[]> => {
-  const materializedRows = await readCommercialCostAttributionAllocationsForPeriod(year, month).catch(() => [])
+  const materializedRows = await readCommercialCostAttributionAllocationsForPeriod(year, month).catch((error: unknown) => {
+    console.error(`[commercial-cost-attribution] readStoredAllocations failed for ${year}-${String(month).padStart(2, '0')}:`, error instanceof Error ? error.message : error)
+
+    return [] as Awaited<ReturnType<typeof readCommercialCostAttributionAllocationsForPeriod>>
+  })
 
   if (materializedRows.length > 0) {
     return buildMemberAttributionFromStoredRows(materializedRows)

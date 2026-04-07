@@ -545,6 +545,10 @@ export const computeClientEconomicsSnapshots = async (
 
   try {
     commercialCostRows = await readCommercialCostAttributionByClientForPeriod(year, month)
+
+    if (commercialCostRows.length > 0) {
+      console.log(`[client-economics] ${year}-${String(month).padStart(2, '0')}: ${commercialCostRows.length} client(s) with labor costs — ${commercialCostRows.map(r => `${r.clientId}=$${Math.round(r.laborCostClp)} FTE=${r.headcountFte}`).join(', ')}`)
+    }
   } catch (error: unknown) {
     console.error(
       `[client-economics] commercial cost attribution read failed for ${year}-${String(month).padStart(2, '0')}:`,
