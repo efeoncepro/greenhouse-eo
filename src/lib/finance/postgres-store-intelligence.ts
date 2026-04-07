@@ -530,15 +530,24 @@ export const computeClientEconomicsSnapshots = async (
     [periodStart, periodEnd]
   )
 
+  // Step 1: Materialize cost attribution (best-effort — failure does not block reading)
+  try {
+    await materializeCommercialCostAttributionForPeriod(year, month, notes ?? 'client-economics-snapshot')
+  } catch (error: unknown) {
+    console.error(
+      `[client-economics] commercial cost attribution materialization failed for ${year}-${String(month).padStart(2, '0')}:`,
+      error instanceof Error ? error.message : error
+    )
+  }
+
+  // Step 2: Read commercial cost rows (from materialized table or compute on-the-fly)
   let commercialCostRows: Awaited<ReturnType<typeof readCommercialCostAttributionByClientForPeriod>> = []
 
   try {
-    // Materialize cost attribution first to ensure serving table is populated
-    await materializeCommercialCostAttributionForPeriod(year, month, notes ?? 'client-economics-snapshot')
     commercialCostRows = await readCommercialCostAttributionByClientForPeriod(year, month)
   } catch (error: unknown) {
     console.error(
-      `[client-economics] commercial cost attribution failed for ${year}-${String(month).padStart(2, '0')}:`,
+      `[client-economics] commercial cost attribution read failed for ${year}-${String(month).padStart(2, '0')}:`,
       error instanceof Error ? error.message : error
     )
     commercialCostRows = []
