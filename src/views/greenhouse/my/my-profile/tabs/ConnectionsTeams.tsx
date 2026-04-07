@@ -9,6 +9,8 @@ import Chip from '@mui/material/Chip'
 
 import CustomAvatar from '@core/components/mui/Avatar'
 
+import { getInitials } from '@/utils/getInitials'
+
 type ConnectionItem = {
   name: string
   avatar: string
@@ -38,7 +40,13 @@ const ConnectionsTeams = ({ connections, teamsTech }: Props) => {
             {connections.map((connection, index) => (
               <div key={index} className='flex items-center gap-2'>
                 <div className='flex items-center grow gap-2'>
-                  <CustomAvatar src={connection.avatar} size={38} />
+                  {connection.avatar ? (
+                    <CustomAvatar src={connection.avatar} size={38} />
+                  ) : (
+                    <CustomAvatar color='primary' skin='light' size={38}>
+                      {getInitials(connection.name)}
+                    </CustomAvatar>
+                  )}
                   <div className='flex grow flex-col'>
                     <Typography className='font-medium' color='text.primary'>
                       {connection.name}
