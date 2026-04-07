@@ -206,7 +206,11 @@ export const readCommercialCostAttributionAllocationsForPeriod = async (
       ORDER BY member_id ASC, client_name ASC
     `,
     [year, month]
-  ).catch(() => [])
+  ).catch((error: unknown) => {
+    console.error(`[commercial-cost-attribution] read stored allocations failed for ${year}-${String(month).padStart(2, '0')}:`, error instanceof Error ? error.message : error)
+
+    return [] as CommercialCostAttributionRow[]
+  })
 
   return rows.map(row => ({
     memberId: row.member_id,

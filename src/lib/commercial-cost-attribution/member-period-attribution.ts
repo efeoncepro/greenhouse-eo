@@ -188,7 +188,11 @@ export const computeCommercialCostAttributionForPeriod = async (
         WHERE period_year = $1 AND period_month = $2
       `,
       [year, month]
-    ).catch(() => []),
+    ).catch((error: unknown) => {
+      console.error(`[commercial-cost-attribution] member_capacity_economics query failed for ${year}-${String(month).padStart(2, '0')}:`, error instanceof Error ? error.message : error)
+
+      return [] as MemberEconomicsRow[]
+    }),
     runGreenhousePostgresQuery<LaborAllocationRow>(
       `
       WITH client_bridge AS (
@@ -218,7 +222,11 @@ export const computeCommercialCostAttributionForPeriod = async (
         AND allocated_labor_clp IS NOT NULL
       `,
       [year, month]
-    ).catch(() => [])
+    ).catch((error: unknown) => {
+      console.error(`[commercial-cost-attribution] client_labor_cost_allocation query failed for ${year}-${String(month).padStart(2, '0')}:`, error instanceof Error ? error.message : error)
+
+      return [] as LaborAllocationRow[]
+    })
   ])
 
   const economicsByMember = new Map<string, MemberEconomicsRow>(

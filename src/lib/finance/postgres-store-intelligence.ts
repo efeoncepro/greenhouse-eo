@@ -20,7 +20,10 @@ import {
   type ClientEconomicsRecord,
   type AllocationMethod
 } from '@/lib/finance/postgres-store-slice2'
-import { readCommercialCostAttributionByClientForPeriod } from '@/lib/commercial-cost-attribution/member-period-attribution'
+import {
+  readCommercialCostAttributionByClientForPeriod,
+  materializeCommercialCostAttributionForPeriod
+} from '@/lib/commercial-cost-attribution/member-period-attribution'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 // ─── Row types ──────────────────────────────────────────────────────
@@ -530,8 +533,14 @@ export const computeClientEconomicsSnapshots = async (
   let commercialCostRows: Awaited<ReturnType<typeof readCommercialCostAttributionByClientForPeriod>> = []
 
   try {
+    // Materialize cost attribution first to ensure serving table is populated
+    await materializeCommercialCostAttributionForPeriod(year, month, notes ?? 'client-economics-snapshot')
     commercialCostRows = await readCommercialCostAttributionByClientForPeriod(year, month)
-  } catch {
+  } catch (error: unknown) {
+    console.error(
+      `[client-economics] commercial cost attribution failed for ${year}-${String(month).padStart(2, '0')}:`,
+      error instanceof Error ? error.message : error
+    )
     commercialCostRows = []
   }
 
