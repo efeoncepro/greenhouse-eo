@@ -64,7 +64,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-026`
+`ISSUE-027`
 
 ## Open
 
@@ -99,4 +99,5 @@ Tasks, docs de arquitectura, o commits relacionados.
 | `ISSUE-010` | [Finance schema drift logger type mismatch](resolved/ISSUE-010-finance-schema-drift-logger-type-mismatch.md)                                                      | staging + production | 2026-04-05 | 2026-04-05 | `logFinanceSchemaDrift` tipaba `Error` pero catch da `unknown`                                                           |
 | `ISSUE-007` | [Finance fallback writes can duplicate income and expenses](resolved/ISSUE-007-finance-fallback-writes-can-duplicate-income-and-expenses.md)                      | preview + production | 2026-04-05 | 2026-04-05 | Fallback recalculaba un segundo ID en `income` y `expenses`                                                              |
 | `ISSUE-008` | [Finance routes mask schema drift as empty success](resolved/ISSUE-008-finance-routes-mask-schema-drift-as-empty-success.md)                                      | preview + production | 2026-04-05 | 2026-04-05 | Routes devolvían vacío ambiguo ante drift de schema                                                                      |
+| `ISSUE-026` | [Mi Perfil crash: leave.requests nested object + auth redirect](resolved/ISSUE-026-my-profile-crash-leave-requests-nested-object.md) | production + staging | 2026-04-07 | 2026-04-07 | `leave?.requests` es objeto anidado no array; fallback auth a `/dashboard` en vez de `/home` |
 | `ISSUE-001` | [SSL bad certificate en webhook-dispatch](resolved/ISSUE-001-ssl-bad-certificate-production.md)                                                                   | production           | 2026-03-30 | 2026-03-30 | `GREENHOUSE_POSTGRES_IP_TYPE` faltante en production                                                                     |
