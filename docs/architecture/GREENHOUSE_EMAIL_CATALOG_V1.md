@@ -12,6 +12,12 @@ La relacion correcta entre ambas es:
 
 ## Delta 2026-04-07
 
+- Leave request submission emails implementados (2 templates dedicados)
+- `leave_request_submitted`: confirmacion al solicitante al enviar solicitud (pending badge, summary card, motivo)
+- `leave_request_pending_review`: notificacion al supervisor/HR con datos del colaborador, periodo y motivo
+- Integrado en `leave_request.created` (email a requester + reviewers) y `leave_request.escalated_to_hr` (email a HR)
+- Hero images clay 3D: avion de papel (submitted) + campana con badge (pending review)
+- P2 `leave_request_*` completamente implementado: submitted, approved, rejected, cancelled + review confirmation
 - Leave request decision emails implementados (2 templates dedicados)
 - `leave_request_decision`: email al solicitante cuando su permiso es aprobado/rechazado/cancelado
 - `leave_review_confirmation`: email al revisor confirmando su accion (approve/reject, no cancel)
@@ -183,7 +189,8 @@ Emails ligados a capacidades o modulos especificos, pero solo cuando el evento i
 
 ### HR / Payroll
 
-- `leave_request_submitted`
+- `leave_request_submitted` -- **implementado 2026-04-07** como `leave_request_submitted` (confirmacion al solicitante)
+- `leave_request_pending_review` -- **implementado 2026-04-07** (notificacion al supervisor/HR para revisar)
 - `leave_request_approved` -- **implementado 2026-04-07** como `leave_request_decision` (status: approved)
 - `leave_request_rejected` -- **implementado 2026-04-07** como `leave_request_decision` (status: rejected)
 - `leave_request_cancelled` -- **implementado 2026-04-07** como `leave_request_decision` (status: cancelled)

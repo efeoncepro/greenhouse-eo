@@ -2,6 +2,15 @@
 
 ## 2026-04-07
 
+### 2026-04-07 — Emails de solicitud + revision pendiente de permisos
+
+- Nuevos templates `leave_request_submitted` y `leave_request_pending_review`
+- Email al solicitante: confirmacion de envio con badge "pendiente", summary card, motivo
+- Email al aprobador: notificacion con datos del colaborador, periodo, dias, CTA a panel de revision
+- Integrado en `leave_request.created` y `leave_request.escalated_to_hr`
+- Hero images clay 3D en GCS (avion de papel, campana con badge naranja)
+- Familia `leave_request_*` completamente implementada: submitted, approved, rejected, cancelled + review confirmation
+
 ### 2026-04-07 — Emails de decision de permisos + hero images AI
 
 - Nuevos templates `leave_request_decision` y `leave_review_confirmation` (React Email + Resend)

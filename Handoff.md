@@ -1,5 +1,23 @@
 # Handoff.md
 
+## Sesion 2026-04-07 — Leave request submission + pending review emails
+
+### Emails de solicitud y revision de permisos (2026-04-07)
+
+Dos nuevos templates para el flujo de envio de solicitudes:
+
+- **`leave_request_submitted`**: confirmacion al solicitante al enviar solicitud. Badge "pendiente de revision", summary card, motivo condicional.
+- **`leave_request_pending_review`**: notificacion al supervisor/HR con datos del colaborador, tipo, periodo, dias y motivo. CTA directo a "Revisar solicitud".
+
+Integrado en:
+- `leave_request.created` → email al requester + email a reviewer(s)
+- `leave_request.escalated_to_hr` → email a HR reviewers
+- Hero images clay 3D en GCS (avion de papel + campana con badge)
+- **P2 `leave_request_*` completamente implementado**: submitted, approved, rejected, cancelled + review confirmation
+- **Rama**: develop → main
+
+---
+
 ## Sesion 2026-04-07 — Leave request decision emails + AI hero images
 
 ### Emails de decision de permisos (2026-04-07)
