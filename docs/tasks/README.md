@@ -20,7 +20,7 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-272`
+- siguiente ID disponible: `TASK-273`
 - `TASK-241` migra procesos batch pesados (ICO materialización, LLM enrichment) de Vercel Functions a Cloud Run. Formaliza política: batch > 30s → Cloud Run. Código listo, deploy operacional pendiente.
 - `TASK-239` enriquece el prompt LLM de Nexa Insights con glosario de métricas, cadena causal, doble capa narrativa y nombres de Space/miembros.
 - `TASK-240` agrega menciones interactivas (@mentions) de Spaces y miembros en los insights de Nexa — chips clickeables que navegan a perfiles. Depende de `TASK-239`.
@@ -104,6 +104,7 @@ Primer bloque operativo asignado:
 | `TASK-267` | [TASK-267-admin-resend-onboarding-email.md](complete/TASK-267-admin-resend-onboarding-email.md)                                                                             | P2        | Medio    | Medio    | Complete                | Cablear boton "Reenviar onboarding" en ficha de usuario: endpoint POST, email via Resend, validacion status invited, toast feedback, outbox event                                                                               |
 | `TASK-268` | [TASK-268-admin-review-access-button.md](to-do/TASK-268-admin-review-access-button.md)                                                                                      | P2        | Bajo     | Bajo     | Diseno                  | Cablear boton "Revisar acceso" para navegar al tab Accesos del usuario (solo UI, sin backend)                                                                                                                                   |
 | `TASK-271` | [TASK-271-hr-leave-half-day-periods.md](complete/TASK-271-hr-leave-half-day-periods.md)                                                                                      | P2        | Medio    | Medio    | Complete                | Soporte de medio dia en permisos: `start_period`/`end_period` en leave_requests, calculo fraccionario en `computeLeaveDayBreakdown()`, selector de periodo en form, indicador AM/PM en calendario                               |
+| `TASK-272` | [TASK-272-my-profile-vuexy-rich-view.md](to-do/TASK-272-my-profile-vuexy-rich-view.md)                                                                                      | P2        | Alto     | Alto     | Diseno                  | Mi Perfil vista rica: copiar y adaptar Vuexy user-profile (header banner, 4 tabs, projects table, teams grid, connections grid, activity timeline) con datos reales de person_360 + assignments + colegas                        |
 
 ## Complete
 
