@@ -90,6 +90,8 @@ interface OperationalPlServingRow extends Record<string, unknown> {
 /**
  * Get unified economics for an organization for a single period.
  * Correlates finance snapshots with canonical commercial cost attribution.
+ *
+ * @deprecated Use `getAccountComplete360(orgId, { facets: ['economics'] })` instead (TASK-274).
  */
 export const getOrganizationEconomics = async (
   orgId: string,
