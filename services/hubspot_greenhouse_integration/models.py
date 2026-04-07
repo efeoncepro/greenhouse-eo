@@ -130,7 +130,7 @@ def build_product_profile(product: dict[str, Any]) -> dict[str, Any]:
     return {
         "identity": {
             "productId": str(product.get("id")),
-            "name": props.get("hs_product_name"),
+            "name": props.get("name") or props.get("hs_product_name"),
             "sku": props.get("hs_sku"),
             "hubspotProductId": str(product.get("id")),
         },
@@ -146,7 +146,7 @@ def build_product_profile(product: dict[str, Any]) -> dict[str, Any]:
             "periodCount": _safe_number(props.get("hs_recurring_billing_frequency")),
         },
         "metadata": {
-            "description": props.get("hs_product_description"),
+            "description": props.get("description") or props.get("hs_product_description"),
             "isArchived": bool(product.get("archived")),
             "createdAt": props.get("createdate"),
             "lastModifiedAt": props.get("hs_lastmodifieddate"),

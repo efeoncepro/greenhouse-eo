@@ -234,11 +234,11 @@ def create_app() -> Flask:
                 return jsonify({"error": "name and sku are required"}), 400
 
             props: dict[str, Any] = {
-                "hs_product_name": name,
+                "name": name,
                 "hs_sku": sku,
             }
             if body.get("description"):
-                props["hs_product_description"] = body["description"]
+                props["description"] = body["description"]
             if body.get("unitPrice") is not None:
                 props["price"] = body["unitPrice"]
             if body.get("costOfGoodsSold") is not None:
@@ -256,7 +256,7 @@ def create_app() -> Flask:
             created_props = created.get("properties") or {}
             return jsonify({
                 "hubspotProductId": str(created.get("id")),
-                "name": created_props.get("hs_product_name"),
+                "name": created_props.get("name"),
                 "sku": created_props.get("hs_sku"),
             }), 201
         except HubSpotIntegrationError as exc:
@@ -270,11 +270,11 @@ def create_app() -> Flask:
             body = request.get_json(force=True) or {}
             props: dict[str, Any] = {}
             if body.get("name"):
-                props["hs_product_name"] = body["name"]
+                props["name"] = body["name"]
             if body.get("sku"):
                 props["hs_sku"] = body["sku"]
             if body.get("description") is not None:
-                props["hs_product_description"] = body["description"]
+                props["description"] = body["description"]
             if body.get("unitPrice") is not None:
                 props["price"] = body["unitPrice"]
             if body.get("costOfGoodsSold") is not None:

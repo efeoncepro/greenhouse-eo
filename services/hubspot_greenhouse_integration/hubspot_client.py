@@ -216,7 +216,7 @@ class HubSpotClient:
     # ------------------------------------------------------------------
 
     PRODUCT_PROPERTIES = [
-        "hs_product_name", "hs_sku", "hs_product_description", "price",
+        "name", "hs_sku", "description", "price",
         "cost_of_goods_sold", "hs_cost_price", "tax", "hs_recurring",
         "hs_recurring_billing_period", "hs_recurring_billing_frequency",
         "createdate", "hs_lastmodifieddate",
