@@ -13,12 +13,16 @@ export type TeamAvatarGroupMember = {
 }
 
 type TeamAvatarGroupProps = {
+
   /** List of team members to display */
   members: TeamAvatarGroupMember[]
+
   /** Maximum avatars before showing +N overflow (default: 4) */
   max?: number
+
   /** Avatar diameter in pixels (default: 32) */
   size?: number
+
   /** Show tooltip with name on hover (default: true) */
   showTooltip?: boolean
 }
