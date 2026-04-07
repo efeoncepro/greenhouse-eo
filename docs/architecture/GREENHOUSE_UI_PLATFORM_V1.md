@@ -1251,6 +1251,92 @@ Para vistas data-dense con más de 10 tarjetas en scroll vertical, usar **Accord
 - Cada Accordion summary muestra chip con estado/resumen para que el usuario sepa si vale la pena expandir
 - Implementado en: Agency ICO Engine tab (3 Accordions para performance report)
 
+## Delta 2026-04-06 — Mi Perfil rich view: Vuexy user-profile pattern (TASK-272)
+
+### Patron aplicado
+
+`/my/profile` implementa el patron de user-profile de Vuexy (`full-version/src/views/pages/user-profile/`) adaptado a un contexto read-only con datos reales del portal.
+
+Se copiaron y adaptaron 9 componentes del full-version en `src/views/greenhouse/my/my-profile/`:
+
+```
+src/views/greenhouse/my/my-profile/
+  MyProfileView.tsx                 ← orchestrator: fetch paralelo + transformacion + tabs
+  MyProfileHeader.tsx               ← gradient banner + avatar + nombre/cargo/departamento
+  profile/
+    AboutOverview.tsx               ← tab Perfil: "Sobre mi" + contacto + actividad + equipos + colegas
+    ActivityTimeline.tsx            ← styled MUI Timeline con solicitudes de permisos
+    ConnectionsTeams.tsx            ← cards de equipo y colegas
+  teams/                            ← tab Equipos: espacios/clientes asignados
+  projects/                         ← tab Proyectos: TanStack table con fuzzy search
+  connections/                      ← tab Colegas: miembros del departamento/organizacion
+```
+
+### Layout
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│  PROFILE HEADER (full-width)                                     │
+│  Gradient banner + Avatar + Nombre + Cargo + Departamento        │
+│  Fecha de ingreso + Badges (FTE, equipo, etc.)                   │
+├──────────────────────────────────────────────────────────────────┤
+│  [Perfil] [Equipos] [Proyectos] [Colegas] [Seguridad]           │
+├──────────────────────────────────────────────────────────────────┤
+│  Tab content (full-width)                                        │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+### Tabs
+
+| Tab | Contenido | Componente |
+|-----|-----------|------------|
+| Perfil | Sobre mi, Contacto, Actividad reciente (timeline), Equipos, Colegas | `AboutOverview` + `ActivityTimeline` + `ConnectionsTeams` |
+| Equipos | Espacios/clientes donde esta asignado | teams components |
+| Proyectos | Proyectos con progreso y detalle (TanStack table + fuzzy search) | projects components |
+| Colegas | Miembros del mismo departamento/organizacion | connections components |
+| Seguridad | Configuracion de seguridad (pendiente) | placeholder |
+
+### Data fetching
+
+4 APIs en paralelo desde `MyProfileView.tsx`:
+
+| API | Datos |
+|-----|-------|
+| `GET /api/my/profile` | person_360: nombre, cargo, departamento, fecha ingreso, contacto |
+| `GET /api/my/assignments` | asignaciones activas a espacios/clientes |
+| `GET /api/my/leave` | solicitudes de permisos (para activity timeline) |
+| `GET /api/my/organization/members` | miembros del departamento/organizacion |
+
+La capa de transformacion en `MyProfileView.tsx` mapea las respuestas de API a props compatibles con los componentes Vuexy adaptados.
+
+### Patron de adaptacion Vuexy → Greenhouse
+
+1. **Copiar** componentes del full-version (`src/views/pages/user-profile/`)
+2. **Adaptar** con datos reales del portal (reemplazar datos mock)
+3. **Traducir** labels a espanol
+4. **Remover** features interactivas no aplicables (connect/disconnect, OptionMenu) para contexto read-only
+5. **Preservar** la estructura visual y patrones de MUI/Vuexy
+
+### Componentes Vuexy reutilizados
+
+| Componente Vuexy | Uso en Mi Perfil |
+|-------------------|------------------|
+| `CustomAvatar` | Avatar en header |
+| `CustomChip` | Badges de estado, departamento |
+| `CustomTabList` | Tabs con pill style |
+| MUI `Timeline` (Lab) | Activity timeline con solicitudes |
+| TanStack `useReactTable` + `fuzzyFilter` | Tabla de proyectos con busqueda |
+
+### Diferencia con Person Detail View (TASK-168)
+
+| Aspecto | Person Detail View | Mi Perfil (TASK-272) |
+|---------|-------------------|---------------------|
+| Layout | Horizontal header + accordions | Gradient banner header + tabs |
+| Modelo Vuexy | `apps/user/view` (sidebar + tabs) | `pages/user-profile` (banner + tabs) |
+| Uso | Admin ve perfil de OTRA persona | Usuario ve SU propio perfil |
+| Interacciones | OptionMenu con acciones admin | Read-only, sin acciones admin |
+| Datos | person_360 completo (admin scope) | person_360 propio + asignaciones + permisos |
+
 ## Anti-Patterns
 
 - No usar MUI raw cuando existe wrapper Vuexy
