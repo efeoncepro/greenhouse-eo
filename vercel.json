@@ -51,6 +51,10 @@
     {
       "path": "/api/cron/entra-webhook-renew",
       "schedule": "0 6 */2 * *"
+    },
+    {
+      "path": "/api/cron/hubspot-quotes-sync",
+      "schedule": "0 */6 * * *"
     }
   ]
 }

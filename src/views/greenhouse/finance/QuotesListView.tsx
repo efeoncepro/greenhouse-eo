@@ -4,10 +4,13 @@ import { useCallback, useEffect, useState } from 'react'
 
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
 import Divider from '@mui/material/Divider'
+import Drawer from '@mui/material/Drawer'
+import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
@@ -34,7 +37,16 @@ interface Quote {
   currency: string
   status: string
   convertedToIncomeId: string | null
+  source: string
+  hubspotQuoteId: string | null
   isFromNubox: boolean
+}
+
+interface LineItemInput {
+  name: string
+  quantity: number
+  unitPrice: number
+  description: string
 }
 
 // ── Status config ──
@@ -50,12 +62,26 @@ const STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'info' |
 
 const STATUS_OPTIONS = [
   { value: '', label: 'Todos los estados' },
+  { value: 'draft', label: 'Borradores' },
   { value: 'sent', label: 'Enviadas' },
   { value: 'accepted', label: 'Aceptadas' },
   { value: 'rejected', label: 'Rechazadas' },
   { value: 'expired', label: 'Vencidas' },
   { value: 'converted', label: 'Facturadas' }
 ]
+
+const SOURCE_OPTIONS = [
+  { value: '', label: 'Todas las fuentes' },
+  { value: 'nubox', label: 'Nubox' },
+  { value: 'hubspot', label: 'HubSpot' },
+  { value: 'manual', label: 'Manual' }
+]
+
+const SOURCE_CHIP_CONFIG: Record<string, { label: string; color: 'info' | 'warning' | 'secondary' }> = {
+  nubox: { label: 'Nubox', color: 'info' },
+  hubspot: { label: 'HubSpot', color: 'warning' },
+  manual: { label: 'Manual', color: 'secondary' }
+}
 
 // ── Helpers ──
 
@@ -70,12 +96,254 @@ const formatDate = (date: string | null) => {
   return `${d}/${m}/${y}`
 }
 
+const emptyLineItem = (): LineItemInput => ({ name: '', quantity: 1, unitPrice: 0, description: '' })
+
+// ── Create Quote Drawer ──
+
+const CreateQuoteDrawer = ({
+  open,
+  onClose,
+  onCreated
+}: {
+  open: boolean
+  onClose: () => void
+  onCreated: () => void
+}) => {
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [organizationId, setOrganizationId] = useState('')
+  const [title, setTitle] = useState('')
+  const [expirationDate, setExpirationDate] = useState('')
+  const [publishImmediately, setPublishImmediately] = useState(false)
+  const [lineItems, setLineItems] = useState<LineItemInput[]>([emptyLineItem()])
+
+  const resetForm = () => {
+    setOrganizationId('')
+    setTitle('')
+    setExpirationDate('')
+    setPublishImmediately(false)
+    setLineItems([emptyLineItem()])
+    setError(null)
+  }
+
+  const handleClose = () => {
+    resetForm()
+    onClose()
+  }
+
+  const updateLineItem = (index: number, field: keyof LineItemInput, value: string | number) => {
+    setLineItems(prev => prev.map((li, i) => (i === index ? { ...li, [field]: value } : li)))
+  }
+
+  const addLineItem = () => setLineItems(prev => [...prev, emptyLineItem()])
+
+  const removeLineItem = (index: number) => {
+    if (lineItems.length <= 1) return
+
+    setLineItems(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const handleSubmit = async () => {
+    setError(null)
+
+    if (!organizationId.trim()) {
+      setError('Ingresa el ID de la organizacion')
+
+      return
+    }
+
+    if (!title.trim()) {
+      setError('Ingresa un titulo para la cotizacion')
+
+      return
+    }
+
+    if (!expirationDate || !/^\d{4}-\d{2}-\d{2}$/.test(expirationDate)) {
+      setError('Ingresa una fecha de vencimiento valida (AAAA-MM-DD)')
+
+      return
+    }
+
+    const validItems = lineItems.filter(li => li.name.trim())
+
+    if (validItems.length === 0) {
+      setError('Agrega al menos un item')
+
+      return
+    }
+
+    setSubmitting(true)
+
+    try {
+      const res = await fetch('/api/finance/quotes/hubspot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          organizationId: organizationId.trim(),
+          title: title.trim(),
+          expirationDate,
+          publishImmediately,
+          lineItems: validItems.map(li => ({
+            name: li.name.trim(),
+            quantity: Number(li.quantity) || 1,
+            unitPrice: Number(li.unitPrice) || 0,
+            description: li.description.trim() || undefined
+          }))
+        })
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || 'No se pudo crear la cotizacion')
+
+        return
+      }
+
+      handleClose()
+      onCreated()
+    } catch {
+      setError('Error de conexion. Intenta de nuevo.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const totalAmount = lineItems.reduce((sum, li) => sum + (Number(li.quantity) || 0) * (Number(li.unitPrice) || 0), 0)
+
+  return (
+    <Drawer anchor='right' open={open} onClose={handleClose} sx={{ '& .MuiDrawer-paper': { width: { xs: '100%', sm: 480 } } }}>
+      <Box sx={{ p: 4 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 4 }}>
+          <Typography variant='h6'>Nueva cotizacion HubSpot</Typography>
+          <IconButton onClick={handleClose} aria-label='Cerrar'>
+            <i className='tabler-x' />
+          </IconButton>
+        </Box>
+
+        <Stack spacing={3}>
+          <CustomTextField
+            fullWidth
+            size='small'
+            label='ID de organizacion'
+            value={organizationId}
+            onChange={e => setOrganizationId(e.target.value)}
+            placeholder='ej. ORG-0001'
+          />
+          <CustomTextField
+            fullWidth
+            size='small'
+            label='Titulo'
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            placeholder='ej. Propuesta servicios Q2 2026'
+          />
+          <CustomTextField
+            fullWidth
+            size='small'
+            label='Fecha de vencimiento'
+            type='date'
+            value={expirationDate}
+            onChange={e => setExpirationDate(e.target.value)}
+            slotProps={{ inputLabel: { shrink: true } }}
+          />
+
+          <Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+              <Typography variant='subtitle2'>Items</Typography>
+              <Button size='small' startIcon={<i className='tabler-plus' />} onClick={addLineItem}>
+                Agregar item
+              </Button>
+            </Box>
+
+            <Stack spacing={2}>
+              {lineItems.map((li, i) => (
+                <Card key={i} variant='outlined' sx={{ p: 2 }}>
+                  <Stack spacing={1.5}>
+                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+                      <CustomTextField
+                        fullWidth
+                        size='small'
+                        label='Nombre'
+                        value={li.name}
+                        onChange={e => updateLineItem(i, 'name', e.target.value)}
+                      />
+                      {lineItems.length > 1 && (
+                        <IconButton size='small' onClick={() => removeLineItem(i)} sx={{ mt: 2.5 }} aria-label='Eliminar item'>
+                          <i className='tabler-trash' style={{ fontSize: 16 }} />
+                        </IconButton>
+                      )}
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <CustomTextField
+                        size='small'
+                        label='Cantidad'
+                        type='number'
+                        value={li.quantity}
+                        onChange={e => updateLineItem(i, 'quantity', Number(e.target.value))}
+                        sx={{ width: 100 }}
+                      />
+                      <CustomTextField
+                        size='small'
+                        label='Precio unitario'
+                        type='number'
+                        value={li.unitPrice}
+                        onChange={e => updateLineItem(i, 'unitPrice', Number(e.target.value))}
+                        sx={{ flex: 1 }}
+                      />
+                    </Box>
+                  </Stack>
+                </Card>
+              ))}
+            </Stack>
+
+            {totalAmount > 0 && (
+              <Typography variant='body2' sx={{ mt: 1, textAlign: 'right', fontFamily: 'monospace' }}>
+                Total estimado: {formatCLP(totalAmount)}
+              </Typography>
+            )}
+          </Box>
+
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <input
+              type='checkbox'
+              id='publishImmediately'
+              checked={publishImmediately}
+              onChange={e => setPublishImmediately(e.target.checked)}
+            />
+            <label htmlFor='publishImmediately'>
+              <Typography variant='body2'>Publicar inmediatamente (sin aprobacion)</Typography>
+            </label>
+          </Box>
+
+          {error && (
+            <Typography variant='body2' color='error' role='alert'>
+              {error}
+            </Typography>
+          )}
+
+          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+            <Button variant='tonal' color='secondary' onClick={handleClose} disabled={submitting}>
+              Cancelar
+            </Button>
+            <Button variant='contained' onClick={handleSubmit} disabled={submitting}>
+              {submitting ? 'Creando...' : 'Crear cotizacion'}
+            </Button>
+          </Box>
+        </Stack>
+      </Box>
+    </Drawer>
+  )
+}
+
 // ── Component ──
 
 const QuotesListView = () => {
   const [loading, setLoading] = useState(true)
   const [items, setItems] = useState<Quote[]>([])
   const [statusFilter, setStatusFilter] = useState('')
+  const [sourceFilter, setSourceFilter] = useState('')
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
   const fetchQuotes = useCallback(async () => {
     setLoading(true)
@@ -84,6 +352,7 @@ const QuotesListView = () => {
       const params = new URLSearchParams()
 
       if (statusFilter) params.set('status', statusFilter)
+      if (sourceFilter) params.set('source', sourceFilter)
 
       const res = await fetch(`/api/finance/quotes?${params.toString()}`)
 
@@ -95,7 +364,7 @@ const QuotesListView = () => {
     } finally {
       setLoading(false)
     }
-  }, [statusFilter])
+  }, [statusFilter, sourceFilter])
 
   useEffect(() => {
     fetchQuotes()
@@ -112,11 +381,20 @@ const QuotesListView = () => {
 
   return (
     <Stack spacing={4}>
-      <Box>
-        <Typography variant='h5' sx={{ fontWeight: 500 }}>Cotizaciones</Typography>
-        <Typography variant='body2' color='text.secondary'>
-          Cotizaciones sincronizadas desde Nubox. No se incluyen en el cálculo de ingresos.
-        </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+        <Box>
+          <Typography variant='h5' sx={{ fontWeight: 500 }}>Cotizaciones</Typography>
+          <Typography variant='body2' color='text.secondary'>
+            Cotizaciones sincronizadas desde Nubox y HubSpot
+          </Typography>
+        </Box>
+        <Button
+          variant='contained'
+          startIcon={<i className='tabler-plus' />}
+          onClick={() => setDrawerOpen(true)}
+        >
+          Nueva cotizacion HubSpot
+        </Button>
       </Box>
 
       <Card variant='outlined'>
@@ -145,6 +423,18 @@ const QuotesListView = () => {
               <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
             ))}
           </CustomTextField>
+          <CustomTextField
+            select
+            size='small'
+            label='Fuente'
+            value={sourceFilter}
+            onChange={e => setSourceFilter(e.target.value)}
+            sx={{ minWidth: 160 }}
+          >
+            {SOURCE_OPTIONS.map(opt => (
+              <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
+            ))}
+          </CustomTextField>
         </CardContent>
         <Divider />
 
@@ -152,7 +442,7 @@ const QuotesListView = () => {
           <Box sx={{ textAlign: 'center', py: 8 }} role='status'>
             <Typography variant='h6' sx={{ mb: 1 }}>Sin cotizaciones</Typography>
             <Typography variant='body2' color='text.secondary'>
-              Las cotizaciones aparecen aquí cuando se sincronizan desde Nubox (DTE 52).
+              Las cotizaciones aparecen aqui cuando se sincronizan desde Nubox o HubSpot.
             </Typography>
           </Box>
         ) : (
@@ -172,6 +462,7 @@ const QuotesListView = () => {
               <TableBody>
                 {items.map(q => {
                   const statusConf = STATUS_CONFIG[q.status] ?? STATUS_CONFIG.draft
+                  const sourceConf = SOURCE_CHIP_CONFIG[q.source] ?? SOURCE_CHIP_CONFIG.manual
 
                   return (
                     <TableRow key={q.quoteId} hover>
@@ -196,9 +487,7 @@ const QuotesListView = () => {
                         <CustomChip round='true' size='small' variant='tonal' color={statusConf.color} label={statusConf.label} />
                       </TableCell>
                       <TableCell>
-                        {q.isFromNubox && (
-                          <CustomChip round='true' size='small' variant='tonal' color='info' label='Nubox' sx={{ height: 20, fontSize: '0.65rem' }} />
-                        )}
+                        <CustomChip round='true' size='small' variant='tonal' color={sourceConf.color} label={sourceConf.label} sx={{ height: 20, fontSize: '0.65rem' }} />
                       </TableCell>
                     </TableRow>
                   )
@@ -208,6 +497,12 @@ const QuotesListView = () => {
           </Box>
         )}
       </Card>
+
+      <CreateQuoteDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onCreated={fetchQuotes}
+      />
     </Stack>
   )
 }

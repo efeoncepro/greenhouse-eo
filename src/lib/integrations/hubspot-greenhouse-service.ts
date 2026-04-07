@@ -122,6 +122,86 @@ export interface HubSpotGreenhouseCompanyServicesResponse {
   count: number
 }
 
+// ── Quotes (TASK-210) ──
+
+export interface HubSpotGreenhouseQuoteProfile {
+  identity: {
+    quoteId: string
+    title: string | null
+    quoteNumber: string | null
+    hubspotQuoteId: string
+  }
+  financial: {
+    amount: number | null
+    currency: string | null
+    discount: number | null
+  }
+  dates: {
+    createDate: string | null
+    expirationDate: string | null
+    lastModifiedDate: string | null
+  }
+  status: {
+    approvalStatus: string | null
+    signatureStatus: string | null
+  }
+  associations: {
+    dealId: string | null
+    companyId: string | null
+    contactIds: string[]
+    lineItemCount: number
+  }
+  source: {
+    sourceSystem: 'hubspot'
+    sourceObjectType: 'quote'
+    sourceObjectId: string
+  }
+}
+
+export interface HubSpotGreenhouseCompanyQuotesResponse {
+  hubspotCompanyId: string
+  quotes: HubSpotGreenhouseQuoteProfile[]
+  count: number
+}
+
+export interface HubSpotGreenhouseCreateQuoteRequest {
+  title: string
+  expirationDate: string
+  language?: string
+  locale?: string
+  sender?: {
+    firstName: string
+    lastName: string
+    email: string
+    companyName: string
+  }
+  associations?: {
+    dealId?: string
+    companyId?: string
+    contactIds?: string[]
+    quoteTemplateId?: string
+  }
+  lineItems?: Array<{
+    name: string
+    quantity: number
+    unitPrice: number
+    description?: string
+    discount?: number
+    taxAmount?: number
+  }>
+}
+
+export interface HubSpotGreenhouseCreateQuoteResponse {
+  hubspotQuoteId: string
+  quoteNumber: string | null
+  status: string
+  quoteLink: string | null
+  associations: {
+    dealId: string | null
+    lineItemIds: string[]
+  }
+}
+
 export interface HubSpotGreenhouseLiveContext {
   serviceConfigured: boolean
   serviceBaseUrl: string | null
@@ -207,6 +287,32 @@ export const getHubSpotGreenhouseCompanyContacts = async (hubspotCompanyId: stri
       }))
     }
   }
+
+// ── Quotes client methods (TASK-210) ──
+
+export const getHubSpotGreenhouseCompanyQuotes = async (hubspotCompanyId: string) =>
+  fetchJson<HubSpotGreenhouseCompanyQuotesResponse>(`/companies/${hubspotCompanyId}/quotes`)
+
+export const createHubSpotGreenhouseQuote = async (payload: HubSpotGreenhouseCreateQuoteRequest) => {
+  const { baseUrl, timeoutMs } = getServiceConfig()
+
+  const response = await fetch(`${baseUrl}/quotes`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    cache: 'no-store',
+    next: { revalidate: 0 },
+    signal: AbortSignal.timeout(timeoutMs)
+  })
+
+  if (!response.ok) {
+    const body = await response.text()
+
+    throw new Error(`HubSpot integration service returned ${response.status} for POST /quotes: ${body || response.statusText}`)
+  }
+
+  return (await response.json()) as HubSpotGreenhouseCreateQuoteResponse
+}
 
 export const getHubSpotGreenhouseLiveContext = async (
   hubspotCompanyId: string | null

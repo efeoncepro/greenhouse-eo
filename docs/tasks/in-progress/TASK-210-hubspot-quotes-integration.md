@@ -1,12 +1,20 @@
 # TASK-210 - HubSpot Quotes Bidirectional Integration
 
+## Delta 2026-04-07
+
+- Greenhouse-side code complete: migration, event catalog, client methods, sync function, create function, cron route, API routes (GET update + POST), UI multi-source + create drawer, nomenclature, vercel.json cron schedule.
+- Backfill script created: `scripts/backfill-hubspot-quotes.ts`
+- Cron registered in vercel.json: every 6 hours (`0 */6 * * *`)
+- **Pending**: Cloud Run service endpoints (Slices 2 & 6) — separate repo `hubspot-greenhouse-integration`
+- **Pending**: Apply migration (`pnpm migrate:up`) once Cloud SQL Proxy is available
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
-- Status real: `Diseno`
+- Status real: `Implementacion parcial (Greenhouse-side complete, Cloud Run pending)`
 - Rank: `TBD`
 - Domain: `finance`
 

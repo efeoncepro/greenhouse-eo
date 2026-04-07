@@ -209,6 +209,7 @@ export const EVENT_TYPES = {
 
   // Quotes & Credit Notes
   quoteCreated: 'finance.quote.created',
+  quoteSynced: 'finance.quote.synced',
   quoteConverted: 'finance.quote.converted',
   creditNoteCreated: 'finance.credit_note.created',
 
