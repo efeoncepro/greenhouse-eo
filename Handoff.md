@@ -1,5 +1,22 @@
 # Handoff.md
 
+## Sesion 2026-04-07 — ops-worker: cost attribution endpoint + deploy + fixes
+
+### ops-worker Cloud Run update (2026-04-07)
+
+Nuevo endpoint `POST /cost-attribution/materialize` en Cloud Run ops-worker para materializar commercial cost attribution sin timeout de Vercel serverless.
+
+- **Endpoint**: `POST /cost-attribution/materialize` — acepta `{year, month}` para single-period o vacío para bulk. `recomputeEconomics` (default true) recomputa `client_economics` después.
+- **Pipeline**: Ejecuta VIEW `client_labor_cost_allocation` (3 CTEs + LATERAL JOIN + exchange rates) → `atomicReplacePeriod` (transaccional) → opcionalmente `computeClientEconomicsSnapshots`.
+- **Deploy**: Cloud Build + Cloud Run revision `ops-worker-00006-qtl` sirviendo 100% tráfico.
+- **Verificado**: Health check OK + `/cost-attribution/materialize` respondiendo (576ms).
+- **Bug fix pre-existente**: `deploy.sh` usaba `--headers` en `gcloud scheduler jobs update` (flag solo existe en `create`). Corregido a `--update-headers`. Los 3 scheduler jobs actualizados manualmente.
+- **Test fix**: Mock de `materializeCommercialCostAttributionForPeriod` en `commercial-cost-attribution.test.ts` actualizado para nuevo return type `{ rows, replaced }`.
+- **Archivos**: `services/ops-worker/server.ts`, `services/ops-worker/deploy.sh`, `src/lib/sync/projections/commercial-cost-attribution.test.ts`
+- **Documentación**: Architecture §4.9, functional doc ops-worker v1.1, CLAUDE.md, AGENTS.md, project_context.md actualizados.
+
+---
+
 ## Sesion 2026-04-07 — TASK-279: Labor Cost Attribution Pipeline
 
 ### TASK-279 — Labor Cost Attribution Pipeline (2026-04-07)

@@ -2,6 +2,15 @@
 
 ## 2026-04-07
 
+### 2026-04-07 — ops-worker: cost attribution materialization endpoint
+
+- Nuevo endpoint `POST /cost-attribution/materialize` en Cloud Run ops-worker (TASK-279 continuación)
+- Mueve materialización de `commercial_cost_attribution` a Cloud Run: VIEW con 3 CTEs + LATERAL JOIN + exchange rates timeout en Vercel serverless
+- Acepta `{year, month}` para single-period o vacío para bulk. Recomputa `client_economics` snapshots opcionalmente
+- Deploy: Cloud Build → revision `ops-worker-00006-qtl` sirviendo 100% tráfico
+- Bug fix: `deploy.sh` usaba `--headers` en `gcloud scheduler jobs update` (flag inválido) → corregido a `--update-headers`
+- Test fix: mock de projection test actualizado para nuevo return type `{ rows, replaced }`
+
 ### 2026-04-07 — TASK-279: Labor Cost Attribution Pipeline
 
 - Cierre de brecha payroll → client_economics: 5 silent `.catch(() => [])` reemplazados por logging estructurado

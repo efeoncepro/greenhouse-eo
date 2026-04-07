@@ -1,8 +1,20 @@
 # Greenhouse EO — Cloud Infrastructure Reference
 
-> **Version:** 1.3
-> **Last updated:** 2026-04-05
+> **Version:** 1.4
+> **Last updated:** 2026-04-07
 > **Audience:** Platform engineers, DevOps, on-call operators
+
+---
+
+## Delta 2026-04-07 — Cost attribution materialization endpoint added to ops-worker (TASK-279)
+
+The `ops-worker` Cloud Run service gains a new endpoint `POST /cost-attribution/materialize` that runs the heavy commercial cost attribution materialization pipeline (3 CTEs + LATERAL JOIN + exchange rate conversion) which times out on Vercel serverless cold-starts. Optionally recomputes `client_economics` snapshots after materialization.
+
+- New endpoint: `POST /cost-attribution/materialize` (§4.9)
+- Accepts `{ year, month }` for single-period or omit for bulk (all periods with data)
+- `recomputeEconomics` (default `true`): triggers `computeClientEconomicsSnapshots` after materialization
+- Active revision: `ops-worker-00006-qtl` serving 100% traffic
+- Bug fix: `deploy.sh` scheduler update commands used `--headers` (invalid for `gcloud scheduler jobs update`), changed to `--update-headers`
 
 ---
 
@@ -530,8 +542,8 @@ notion_ops  (legacy)   ─┤──►  greenhouse_conformed (replacement target
 | Concurrency   | 1                                                                                                                                                                                         |
 | Auth          | IAM (`--no-allow-unauthenticated`)                                                                                                                                                        |
 | Source        | `services/ops-worker/` (monorepo, reuses `src/lib/`)                                                                                                                                      |
-| Purpose       | Durable reactive worker: processes outbox reactive events, domain-specific reactive events, and recovers orphaned projection refreshes. Replaces 3 Vercel crons that risked 120s timeout. |
-| Endpoints     | `GET /health`, `POST /reactive/process`, `POST /reactive/process-domain`, `POST /reactive/recover`                                                                                        |
+| Purpose       | Durable reactive worker: processes outbox reactive events, domain-specific reactive events, recovers orphaned projection refreshes, and materializes commercial cost attribution. Replaces Vercel crons that risked 120s timeout. |
+| Endpoints     | `GET /health`, `POST /reactive/process`, `POST /reactive/process-domain`, `POST /reactive/recover`, `POST /cost-attribution/materialize`                                                   |
 | SA            | `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` (runs as + `roles/run.invoker` for scheduler OIDC)                                                                              |
 | Image         | `gcr.io/efeonce-group/ops-worker` (Cloud Build)                                                                                                                                           |
 | Build         | esbuild two-stage Dockerfile with 9 `--alias` shims for ESM/CJS interop (see note below)                                                                                                 |

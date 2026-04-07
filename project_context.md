@@ -48,11 +48,20 @@
 
 - El contrato `TenantAccessRow` ahora tiene paridad completa entre el path PostgreSQL (`session_360`) y el path BigQuery (`getIdentityAccessRecord`): ambos retornan `member_id` e `identity_profile_id`.
 
+## Delta 2026-04-07 TASK-279 ops-worker: cost attribution materialization endpoint
+
+- Nuevo endpoint `POST /cost-attribution/materialize` en ops-worker Cloud Run.
+- Mueve la materialización de `commercial_cost_attribution` (VIEW con 3 CTEs + LATERAL JOIN + exchange rates) fuera de Vercel serverless donde hace timeout.
+- Acepta `{year, month}` para single-period o vacío para bulk. Opcionalmente recomputa `client_economics` snapshots.
+- Revision activa: `ops-worker-00006-qtl`, 100% tráfico.
+- Bug fix: `deploy.sh` usaba `--headers` en `gcloud scheduler jobs update` (flag inválido), corregido a `--update-headers`.
+- Test fix: mock de `materializeCommercialCostAttributionForPeriod` actualizado para nuevo return type `{ rows, replaced }`.
+
 ## Delta 2026-06-17 TASK-254 ops-worker Cloud Run desplegado y operativo
 
 - Los 3 crons reactivos del outbox (`outbox-react`, `outbox-react-delivery`, `projection-recovery`) ya no corren como Vercel cron.
 - Ahora corren en Cloud Run como servicio dedicado `ops-worker` en `us-east4`, disparados por Cloud Scheduler.
-- Revision activa: `ops-worker-00004-pmk`, 100% tráfico.
+- Revision activa: `ops-worker-00006-qtl`, 100% tráfico.
 - Service URL: `https://ops-worker-183008134038.us-east4.run.app`
 - Image: `gcr.io/efeonce-group/ops-worker` (Cloud Build two-stage esbuild).
 - SA: `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` con `roles/run.invoker`.

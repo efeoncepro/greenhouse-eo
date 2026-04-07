@@ -323,12 +323,13 @@ AGENT_AUTH_SECRET=<secret> node scripts/playwright-auth-setup.mjs
 - **NUNCA** hacer `curl` directo a la URL `.vercel.app` de staging sin bypass header.
 - **NUNCA** crear `VERCEL_AUTOMATION_BYPASS_SECRET` manualmente en Vercel — es auto-gestionada.
 
-### Cloud Run ops-worker (crons reactivos)
+### Cloud Run ops-worker (crons reactivos + materialización)
 
-- Servicio Cloud Run dedicado (`ops-worker`) en `us-east4` para los crons reactivos del outbox.
+- Servicio Cloud Run dedicado (`ops-worker`) en `us-east4` para crons reactivos del outbox y materialización de cost attribution.
 - 3 Cloud Scheduler jobs: `ops-reactive-process` (_/5), `ops-reactive-process-delivery` (2-59/5), `ops-reactive-recover` (_/15), timezone `America/Santiago`.
+- Endpoint adicional: `POST /cost-attribution/materialize` — materializa `commercial_cost_attribution` + recomputa `client_economics`. Acepta `{year, month}` o vacío para bulk. Las VIEWs complejas (3 CTEs + LATERAL JOIN + exchange rates) que timeout en Vercel serverless corren aquí.
 - SA: `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` con `roles/run.invoker`.
-- Si el cambio toca `src/lib/sync/`, `src/lib/operations/`, o `services/ops-worker/`, verificar build del worker.
+- Si el cambio toca `src/lib/sync/`, `src/lib/operations/`, `src/lib/commercial-cost-attribution/`, o `services/ops-worker/`, verificar build del worker.
 - **ESM/CJS**: servicios Cloud Run que reutilicen `src/lib/` sin NextAuth shimean `next-auth`, providers y `bcryptjs` via esbuild `--alias`. Patrón en `services/ops-worker/Dockerfile`.
 - **Deploy**: `bash services/ops-worker/deploy.sh` (requiere `gcloud` autenticado).
 - Las rutas API Vercel (`/api/cron/outbox-react`, etc.) son fallback manual, no scheduladas.
