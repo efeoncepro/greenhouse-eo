@@ -185,8 +185,8 @@ const MyProfileView = () => {
 
   const connections = colleagues.slice(0, 6).map((c: any) => ({
     name: c.fullName || c.displayName || 'Sin nombre',
-    avatar: '/images/avatars/1.png',
-    role: c.roleLabel || c.membershipType || ''
+    avatar: c.avatarUrl || '',
+    role: c.jobTitle || c.roleLabel || c.membershipType || ''
   }))
 
   const projectTable = (assignments?.assignments ?? []).map((a: any, i: number) => ({
@@ -233,12 +233,12 @@ const MyProfileView = () => {
 
   const connectionsTabData = colleagues.slice(0, 12).map((c: any) => ({
     name: c.fullName || c.displayName || 'Sin nombre',
-    avatar: '/images/avatars/1.png',
-    designation: c.roleLabel || c.membershipType || '',
+    avatar: c.avatarUrl || '',
+    designation: c.jobTitle || c.roleLabel || c.membershipType || '',
     projects: '0',
     tasks: '0',
     connections: '0',
-    chips: [{ title: c.department || 'Equipo', color: 'info' as const }]
+    chips: [{ title: c.departmentName || c.department || 'Equipo', color: 'info' as const }]
   }))
 
   return (

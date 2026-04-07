@@ -1,11 +1,14 @@
 'use client'
 
 import Grid from '@mui/material/Grid'
-import Avatar from '@mui/material/Avatar'
 import Chip from '@mui/material/Chip'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
+
+import CustomAvatar from '@core/components/mui/Avatar'
+
+import { getInitials } from '@/utils/getInitials'
 
 type ConnectionItem = {
   name: string
@@ -28,7 +31,13 @@ const ConnectionsTab = ({ data }: Props) => {
         <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
           <Card>
             <CardContent className='flex items-center flex-col gap-6'>
-              <Avatar src={item.avatar} className='!mbs-5 bs-[100px] is-[100px]' />
+              {item.avatar ? (
+                <CustomAvatar src={item.avatar} className='!mbs-5' sx={{ width: 100, height: 100, fontSize: '2rem' }} />
+              ) : (
+                <CustomAvatar color='primary' skin='light-static' className='!mbs-5' sx={{ width: 100, height: 100, fontSize: '2rem' }}>
+                  {getInitials(item.name)}
+                </CustomAvatar>
+              )}
               <div className='flex flex-col items-center'>
                 <Typography variant='h5'>{item.name}</Typography>
                 <Typography>{item.designation}</Typography>
