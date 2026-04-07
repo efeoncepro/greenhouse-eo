@@ -62,25 +62,24 @@ describe('email delivery layer', () => {
     const resendClient = mockGetResendClient.mock.results[0]?.value as any
 
     expect(resendClient.emails.send).toHaveBeenCalledTimes(1)
-    expect(resendClient.emails.send).toHaveBeenCalledWith(expect.objectContaining({
-      from: 'no-reply@efeoncepro.com',
-      to: 'user@example.com',
-      subject: 'Restablece tu contraseña — Greenhouse'
-    }))
+    expect(resendClient.emails.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        from: 'no-reply@efeoncepro.com',
+        to: 'user@example.com',
+        subject: 'Restablece tu contraseña — Greenhouse'
+      })
+    )
 
     expect(mockRunGreenhousePostgresQuery).toHaveBeenCalledWith(
       expect.stringContaining('INSERT INTO greenhouse_notifications.email_deliveries'),
-      expect.arrayContaining([
-        expect.any(String),
-        'password_reset',
-        'identity',
-        'user@example.com'
-      ])
+      expect.arrayContaining([expect.any(String), 'password_reset', 'identity', 'user@example.com'])
     )
 
-    expect(mockRunGreenhousePostgresQuery.mock.calls.some(call =>
-      typeof call[0] === 'string' && call[0].includes('delivery_payload')
-    )).toBe(true)
+    expect(
+      mockRunGreenhousePostgresQuery.mock.calls.some(
+        call => typeof call[0] === 'string' && call[0].includes('delivery_payload')
+      )
+    ).toBe(true)
   })
 
   it('skips delivery when no recipients can be resolved', async () => {
@@ -100,79 +99,91 @@ describe('email delivery layer', () => {
   it('retries failed deliveries using the persisted replay payload', async () => {
     mockRunGreenhousePostgresQuery.mockImplementation((sql: string) => {
       if (sql.includes("WHERE status = 'failed'")) {
-        return Promise.resolve([{
-          delivery_id: 'delivery-claim-1',
-          batch_id: 'batch-1',
-          email_type: 'notification',
-          domain: 'system',
-          recipient_email: 'user@example.com',
-          recipient_name: 'User Example',
-          recipient_user_id: 'user-1',
-          subject: 'Hola',
-          resend_id: null,
-          status: 'pending',
-          has_attachments: true,
-          delivery_payload: {
-            recipients: [{
-              email: 'user@example.com',
-              name: 'User Example',
-              userId: 'user-1'
-            }],
-            context: {
-              title: 'Hola',
-              body: 'Tu notificación',
-              recipientName: 'User Example'
+        return Promise.resolve([
+          {
+            delivery_id: 'delivery-claim-1',
+            batch_id: 'batch-1',
+            email_type: 'notification',
+            domain: 'system',
+            recipient_email: 'user@example.com',
+            recipient_name: 'User Example',
+            recipient_user_id: 'user-1',
+            subject: 'Hola',
+            resend_id: null,
+            status: 'pending',
+            has_attachments: true,
+            delivery_payload: {
+              recipients: [
+                {
+                  email: 'user@example.com',
+                  name: 'User Example',
+                  userId: 'user-1'
+                }
+              ],
+              context: {
+                title: 'Hola',
+                body: 'Tu notificación',
+                recipientName: 'User Example'
+              },
+              attachments: [
+                {
+                  filename: 'hello.txt',
+                  content: { type: 'Buffer', data: [104, 105] },
+                  contentType: 'text/plain'
+                }
+              ]
             },
-            attachments: [{
-              filename: 'hello.txt',
-              content: { type: 'Buffer', data: [104, 105] },
-              contentType: 'text/plain'
-            }]
-          },
-          source_event_id: 'event-1',
-          source_entity: 'service.created',
-          actor_email: 'ops@example.com',
-          error_message: null,
-          attempt_number: 2
-        }])
+            source_event_id: 'event-1',
+            source_entity: 'service.created',
+            actor_email: 'ops@example.com',
+            error_message: null,
+            attempt_number: 2
+          }
+        ])
       }
 
       if (sql.includes("SET status = 'pending'")) {
-        return Promise.resolve([{
-          delivery_id: 'delivery-claim-1',
-          batch_id: 'batch-1',
-          email_type: 'notification',
-          domain: 'system',
-          recipient_email: 'user@example.com',
-          recipient_name: 'User Example',
-          recipient_user_id: 'user-1',
-          subject: 'Hola',
-          resend_id: null,
-          status: 'pending',
-          has_attachments: true,
-          delivery_payload: {
-            recipients: [{
-              email: 'user@example.com',
-              name: 'User Example',
-              userId: 'user-1'
-            }],
-            context: {
-              title: 'Hola',
-              body: 'Tu notificación',
-              recipientName: 'User Example'
+        return Promise.resolve([
+          {
+            delivery_id: 'delivery-claim-1',
+            batch_id: 'batch-1',
+            email_type: 'notification',
+            domain: 'system',
+            recipient_email: 'user@example.com',
+            recipient_name: 'User Example',
+            recipient_user_id: 'user-1',
+            subject: 'Hola',
+            resend_id: null,
+            status: 'pending',
+            has_attachments: true,
+            delivery_payload: {
+              recipients: [
+                {
+                  email: 'user@example.com',
+                  name: 'User Example',
+                  userId: 'user-1'
+                }
+              ],
+              context: {
+                title: 'Hola',
+                body: 'Tu notificación',
+                recipientName: 'User Example'
+              },
+              attachments: [
+                {
+                  filename: 'hello.txt',
+                  content: { type: 'Buffer', data: [104, 105] },
+                  contentType: 'text/plain'
+                }
+              ]
             },
-            attachments: [{
-              filename: 'hello.txt',
-              content: { type: 'Buffer', data: [104, 105] },
-              contentType: 'text/plain'
-            }]
-          },
-          source_event_id: 'event-1',
-          source_entity: 'service.created',
-          actor_email: 'ops@example.com',
-          error_message: null,
-          attempt_number: 3
-        }])
+            source_event_id: 'event-1',
+            source_entity: 'service.created',
+            actor_email: 'ops@example.com',
+            error_message: null,
+            attempt_number: 3
+          }
+        ])
       }
 
       if (sql.includes('SET resend_id = $2')) {
@@ -195,9 +206,26 @@ describe('email delivery layer', () => {
     const resendClient = mockGetResendClient.mock.results[0]?.value as any
 
     expect(resendClient.emails.send).toHaveBeenCalledTimes(1)
-    expect(resendClient.emails.send).toHaveBeenCalledWith(expect.objectContaining({
-      to: 'user@example.com',
-      subject: 'Hola'
-    }))
+    expect(resendClient.emails.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: 'user@example.com',
+        subject: 'Hola'
+      })
+    )
+  })
+
+  it('returns skipped aggregate when all recipients are skipped (e.g. RESEND_API_KEY missing)', async () => {
+    mockIsResendConfigured.mockReturnValue(false)
+
+    const result = await sendEmail({
+      emailType: 'notification',
+      domain: 'system',
+      recipients: [{ email: 'user@example.com', name: 'User' }],
+      context: { title: 'Test', body: 'Test body' }
+    })
+
+    expect(result.status).toBe('skipped')
+    expect(result.recipientResults).toBeDefined()
+    expect(result.recipientResults?.[0]?.status).toBe('skipped')
   })
 })

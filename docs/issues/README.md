@@ -64,7 +64,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-025`
+`ISSUE-026`
 
 ## Open
 
@@ -79,6 +79,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 | `ISSUE-022` | [Adjuntos de email base64 pueden corromper PDFs](open/ISSUE-022-email-attachments-base64-corruption.md)                         | production + staging | 2026-04-06 | open   |
 | `ISSUE-023` | [Tablas de email sin migracion formal](open/ISSUE-023-email-tables-no-formal-migration.md)                                      | production + staging | 2026-04-06 | open   |
 | `ISSUE-024` | [Admin Notifications: errores silenciosos ocultan estado real](open/ISSUE-024-admin-notifications-silent-failures-zero-kpis.md) | staging + preview    | 2026-04-06 | open   |
+| `ISSUE-025` | [sendEmail() reporta 'sent' cuando todos los recipients fueron skipped](open/ISSUE-025-sendmail-status-aggregation-skipped-as-sent.md) | production + staging + preview | 2026-04-06 | open |
 
 ## Resolved
 
