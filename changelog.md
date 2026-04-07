@@ -7,6 +7,8 @@
 - Cierre de brecha payroll → client_economics: 5 silent `.catch(() => [])` reemplazados por logging estructurado
 - Cron `economics-materialize` ahora materializa `commercial_cost_attribution` antes de computar snapshots
 - Backfill: `commercial_cost_attribution` (5 rows), `client_economics` Sky Airline (directCosts=$2.5M, margin=63.6%, 3 FTE), `operational_pl_snapshots` (laborCost, headcountFte)
+- Enterprise hardening: `atomicReplacePeriod` (transaccional purge+insert), `materializeAllAvailablePeriods`, admin endpoint `POST /api/internal/cost-attribution-materialize`, cron best-effort con fallback graceful
+- Causa raiz Vercel: VIEW `client_labor_cost_allocation` timeout en serverless cold-start (3 CTEs + LATERAL JOIN). Arquitectura: Vercel solo lee materializado, Cloud Run/admin materializa
 - ISSUE-028: HubSpot Cloud Run Private App Token expirado → rotado en Secret Manager v2 + Cloud Run update
 - ISSUE-029: `createIdentityProfile` columnas incorrectas (`source_system` → `primary_source_system`) + `profile_type` NOT NULL faltante
 

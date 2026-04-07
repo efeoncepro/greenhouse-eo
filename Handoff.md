@@ -11,7 +11,9 @@ Cierre de brecha entre payroll y client_economics. Los costos laborales existian
 - **Fix datos**: Backfill manual de `commercial_cost_attribution` (5 rows Feb+Mar 2026), actualizacion de `client_economics` y `operational_pl_snapshots` para Sky Airline con costos reales.
 - **Resultado**: Sky Airline marzo 2026 — Revenue $6.9M, Labor $2.5M, Margen 63.6%, 3 FTE. UI muestra margenes reales en vez de "—".
 - **Archivos**: `src/lib/commercial-cost-attribution/member-period-attribution.ts`, `store.ts`, `src/lib/finance/postgres-store-intelligence.ts`, `src/app/api/cron/economics-materialize/route.ts`
-- **Pendiente**: investigar por que `computeCommercialCostAttributionForPeriod` falla en Vercel (Cloud SQL Connector query issues). La materializacion funciona via proxy local pero no inline en serverless.
+- **Causa raiz Vercel**: VIEW `client_labor_cost_allocation` tiene 3 CTEs + LATERAL JOIN + exchange rates → timeout en serverless cold-start. Solucion: materializar via Cloud Run/admin, Vercel solo lee de tabla materializada.
+- **Enterprise hardening**: `atomicReplacePeriod` (transaccional), `materializeAllAvailablePeriods`, admin endpoint `POST /api/internal/cost-attribution-materialize`, cron best-effort con fallback graceful.
+- **Backfill**: Feb 2026 (78.5% margin, 2 allocations) + Mar 2026 (63.6% margin, 3 allocations) + operational_pl_snapshots actualizados.
 - **Rama**: develop
 
 ### ISSUE-028 — HubSpot Cloud Run Token Expirado (2026-04-07)
