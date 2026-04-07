@@ -2,6 +2,14 @@
 
 ## 2026-04-07
 
+### 2026-04-07 — TASK-279: Labor Cost Attribution Pipeline
+
+- Cierre de brecha payroll → client_economics: 5 silent `.catch(() => [])` reemplazados por logging estructurado
+- Cron `economics-materialize` ahora materializa `commercial_cost_attribution` antes de computar snapshots
+- Backfill: `commercial_cost_attribution` (5 rows), `client_economics` Sky Airline (directCosts=$2.5M, margin=63.6%, 3 FTE), `operational_pl_snapshots` (laborCost, headcountFte)
+- ISSUE-028: HubSpot Cloud Run Private App Token expirado → rotado en Secret Manager v2 + Cloud Run update
+- ISSUE-029: `createIdentityProfile` columnas incorrectas (`source_system` → `primary_source_system`) + `profile_type` NOT NULL faltante
+
 ### 2026-04-07 — TASK-274: Account Complete 360 federated serving layer
 
 - Resolver federado `getAccountComplete360()` con 9 facetas independientes

@@ -1,5 +1,30 @@
 # Handoff.md
 
+## Sesion 2026-04-07 — TASK-279: Labor Cost Attribution Pipeline
+
+### TASK-279 — Labor Cost Attribution Pipeline (2026-04-07)
+
+Cierre de brecha entre payroll y client_economics. Los costos laborales existian en serving tables pero no fluian a los snapshots de rentabilidad.
+
+- **Causa raiz**: 5 `.catch(() => [])` silenciosos en el pipeline de commercial cost attribution ocultaban errores. `commercial_cost_attribution` nunca se materializo (0 rows). Snapshots se computaban sin costos laborales.
+- **Fix codigo**: Reemplazo de silent catches por `console.error` con contexto. Cron `economics-materialize` ahora materializa cost attribution como primer paso.
+- **Fix datos**: Backfill manual de `commercial_cost_attribution` (5 rows Feb+Mar 2026), actualizacion de `client_economics` y `operational_pl_snapshots` para Sky Airline con costos reales.
+- **Resultado**: Sky Airline marzo 2026 — Revenue $6.9M, Labor $2.5M, Margen 63.6%, 3 FTE. UI muestra margenes reales en vez de "—".
+- **Archivos**: `src/lib/commercial-cost-attribution/member-period-attribution.ts`, `store.ts`, `src/lib/finance/postgres-store-intelligence.ts`, `src/app/api/cron/economics-materialize/route.ts`
+- **Pendiente**: investigar por que `computeCommercialCostAttributionForPeriod` falla en Vercel (Cloud SQL Connector query issues). La materializacion funciona via proxy local pero no inline en serverless.
+- **Rama**: develop
+
+### ISSUE-028 — HubSpot Cloud Run Token Expirado (2026-04-07)
+
+- Private App Token en Secret Manager revocado → 401 en todas las llamadas HubSpot
+- Fix: nuevo token → Secret Manager version 2 → Cloud Run service update
+- Verificado: company profile + contacts devuelven 200
+
+### ISSUE-029 — HubSpot Sync identity_profiles Column Mismatch (2026-04-07)
+
+- `createIdentityProfile` usaba `source_system` (no existe) en vez de `primary_source_system`, y faltaba `profile_type` (NOT NULL)
+- Fix: renombrar columnas + agregar `profile_type = 'external_contact'`
+
 ## Sesion 2026-04-07 — TASK-274: Account Complete 360
 
 ### TASK-274 — Account Complete 360 (2026-04-07)
