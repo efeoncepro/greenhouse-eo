@@ -212,6 +212,176 @@ class HubSpotClient:
         return deduped_service_ids
 
     # ------------------------------------------------------------------
+    # Products (catalog)
+    # ------------------------------------------------------------------
+
+    PRODUCT_PROPERTIES = [
+        "hs_product_name", "hs_sku", "hs_product_description", "price",
+        "cost_of_goods_sold", "hs_cost_price", "tax", "hs_recurring",
+        "hs_recurring_billing_period", "hs_recurring_billing_frequency",
+        "createdate", "hs_lastmodifieddate",
+    ]
+
+    def list_all_products(self, *, properties: list[str] | None = None) -> list[dict[str, Any]]:
+        props = properties or self.PRODUCT_PROPERTIES
+        results: list[dict[str, Any]] = []
+        after: str | None = None
+
+        while True:
+            params: dict[str, str | int] = {"limit": 100, "properties": ",".join(props)}
+            if after:
+                params["after"] = after
+
+            response = self.session.get(
+                f"{HUBSPOT_API}/crm/v3/objects/products",
+                headers=self._headers(),
+                params=params,
+                timeout=self.timeout_seconds,
+            )
+            if response.status_code >= 400:
+                raise HubSpotIntegrationError(
+                    _parse_error(response),
+                    status_code=response.status_code,
+                )
+
+            payload = response.json()
+            results.extend(payload.get("results") or [])
+
+            paging = payload.get("paging") or {}
+            next_page = paging.get("next") or {}
+            after = next_page.get("after")
+            if not after:
+                break
+
+        return results
+
+    def get_product(self, product_id: str, *, properties: list[str] | None = None) -> dict[str, Any]:
+        props = properties or self.PRODUCT_PROPERTIES
+        response = self.session.get(
+            f"{HUBSPOT_API}/crm/v3/objects/products/{product_id}",
+            headers=self._headers(),
+            params={"properties": ",".join(props)},
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            raise HubSpotIntegrationError(
+                _parse_error(response),
+                status_code=response.status_code,
+            )
+        return response.json()
+
+    def create_product(self, properties: dict[str, Any]) -> dict[str, Any]:
+        response = self.session.post(
+            f"{HUBSPOT_API}/crm/v3/objects/products",
+            headers=self._headers(),
+            json={"properties": properties},
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            raise HubSpotIntegrationError(
+                _parse_error(response),
+                status_code=response.status_code,
+            )
+        return response.json()
+
+    def update_product(self, product_id: str, properties: dict[str, Any]) -> dict[str, Any]:
+        response = self.session.patch(
+            f"{HUBSPOT_API}/crm/v3/objects/products/{product_id}",
+            headers=self._headers(),
+            json={"properties": properties},
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            raise HubSpotIntegrationError(
+                _parse_error(response),
+                status_code=response.status_code,
+            )
+        return response.json()
+
+    # ------------------------------------------------------------------
+    # Line Items (read for quotes/deals)
+    # ------------------------------------------------------------------
+
+    LINE_ITEM_PROPERTIES = [
+        "hs_product_id", "name", "quantity", "price",
+        "discount", "discount_percentage", "amount", "tax",
+        "description", "hs_billing_frequency", "hs_billing_period",
+        "hs_createdate",
+    ]
+
+    def list_quote_line_item_ids(self, quote_id: str, *, limit: int = 100) -> list[str]:
+        li_ids: list[str] = []
+        after: str | None = None
+
+        while True:
+            params: dict[str, str | int] = {"limit": limit}
+            if after:
+                params["after"] = after
+
+            response = self.session.get(
+                f"{HUBSPOT_API}/crm/v4/objects/quotes/{quote_id}/associations/line_items",
+                headers=self._headers(),
+                params=params,
+                timeout=self.timeout_seconds,
+            )
+            if response.status_code >= 400:
+                raise HubSpotIntegrationError(
+                    _parse_error(response),
+                    status_code=response.status_code,
+                )
+
+            payload = response.json()
+            for result in payload.get("results") or []:
+                li_id = result.get("toObjectId")
+                if li_id is not None:
+                    li_ids.append(str(li_id))
+
+            paging = payload.get("paging") or {}
+            next_page = paging.get("next") or {}
+            after = next_page.get("after")
+            if not after:
+                break
+
+        seen: set[str] = set()
+        deduped: list[str] = []
+        for lid in li_ids:
+            if lid not in seen:
+                seen.add(lid)
+                deduped.append(lid)
+        return deduped
+
+    def get_line_items_by_ids(
+        self,
+        line_item_ids: list[str],
+        *,
+        properties: list[str] | None = None,
+    ) -> list[dict[str, Any]]:
+        if not line_item_ids:
+            return []
+
+        props = properties or self.LINE_ITEM_PROPERTIES
+        results: list[dict[str, Any]] = []
+        for start in range(0, len(line_item_ids), 100):
+            batch_ids = line_item_ids[start : start + 100]
+            response = self.session.post(
+                f"{HUBSPOT_API}/crm/v3/objects/line_items/batch/read",
+                headers=self._headers(),
+                json={
+                    "properties": props,
+                    "inputs": [{"id": lid} for lid in batch_ids],
+                },
+                timeout=self.timeout_seconds,
+            )
+            if response.status_code >= 400:
+                raise HubSpotIntegrationError(
+                    _parse_error(response),
+                    status_code=response.status_code,
+                )
+            payload = response.json()
+            results.extend(payload.get("results") or [])
+        return results
+
+    # ------------------------------------------------------------------
     # Quotes
     # ------------------------------------------------------------------
 

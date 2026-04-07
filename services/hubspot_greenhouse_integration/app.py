@@ -8,7 +8,9 @@ try:
     from .models import (
         build_company_profile,
         build_contact_profile,
+        build_line_item_profile,
         build_owner_profile,
+        build_product_profile,
         build_quote_profile,
         build_service_profile,
     )
@@ -25,7 +27,7 @@ except ImportError:
     from contract import build_contract
     from greenhouse_client import GreenhouseClient
     from hubspot_client import HubSpotClient, HubSpotIntegrationError
-    from models import build_company_profile, build_contact_profile, build_owner_profile, build_quote_profile, build_service_profile
+    from models import build_company_profile, build_contact_profile, build_line_item_profile, build_owner_profile, build_product_profile, build_quote_profile, build_service_profile
     from webhooks import (
         extract_company_ids_from_webhook_events,
         parse_webhook_events,
@@ -191,6 +193,122 @@ def create_app() -> Flask:
                     "services": ordered_services,
                 }
             )
+        except HubSpotIntegrationError as exc:
+            return jsonify({"error": str(exc), "status_code": exc.status_code}), (
+                exc.status_code or 502
+            )
+
+    # ------------------------------------------------------------------
+    # Products (TASK-211)
+    # ------------------------------------------------------------------
+
+    @app.get("/products")
+    def product_catalog():
+        try:
+            client = _client()
+            products_raw = client.list_all_products()
+            products = [build_product_profile(p) for p in products_raw]
+            return jsonify({"count": len(products), "products": products})
+        except HubSpotIntegrationError as exc:
+            return jsonify({"error": str(exc), "status_code": exc.status_code}), (
+                exc.status_code or 502
+            )
+
+    @app.get("/products/<product_id>")
+    def product_detail(product_id: str):
+        try:
+            product = _client().get_product(product_id)
+            return jsonify(build_product_profile(product))
+        except HubSpotIntegrationError as exc:
+            return jsonify({"error": str(exc), "status_code": exc.status_code}), (
+                exc.status_code or 502
+            )
+
+    @app.post("/products")
+    def create_product_endpoint():
+        try:
+            body = request.get_json(force=True) or {}
+            name = body.get("name")
+            sku = body.get("sku")
+            if not name or not sku:
+                return jsonify({"error": "name and sku are required"}), 400
+
+            props: dict[str, Any] = {
+                "hs_product_name": name,
+                "hs_sku": sku,
+            }
+            if body.get("description"):
+                props["hs_product_description"] = body["description"]
+            if body.get("unitPrice") is not None:
+                props["price"] = body["unitPrice"]
+            if body.get("costOfGoodsSold") is not None:
+                props["cost_of_goods_sold"] = body["costOfGoodsSold"]
+            if body.get("tax") is not None:
+                props["tax"] = body["tax"]
+            if body.get("isRecurring") is not None:
+                props["hs_recurring"] = body["isRecurring"]
+            if body.get("billingFrequency"):
+                props["hs_recurring_billing_period"] = body["billingFrequency"]
+            if body.get("billingPeriodCount") is not None:
+                props["hs_recurring_billing_frequency"] = body["billingPeriodCount"]
+
+            created = _client().create_product(props)
+            created_props = created.get("properties") or {}
+            return jsonify({
+                "hubspotProductId": str(created.get("id")),
+                "name": created_props.get("hs_product_name"),
+                "sku": created_props.get("hs_sku"),
+            }), 201
+        except HubSpotIntegrationError as exc:
+            return jsonify({"error": str(exc), "status_code": exc.status_code}), (
+                exc.status_code or 502
+            )
+
+    @app.patch("/products/<product_id>")
+    def update_product_endpoint(product_id: str):
+        try:
+            body = request.get_json(force=True) or {}
+            props: dict[str, Any] = {}
+            if body.get("name"):
+                props["hs_product_name"] = body["name"]
+            if body.get("sku"):
+                props["hs_sku"] = body["sku"]
+            if body.get("description") is not None:
+                props["hs_product_description"] = body["description"]
+            if body.get("unitPrice") is not None:
+                props["price"] = body["unitPrice"]
+            if body.get("costOfGoodsSold") is not None:
+                props["cost_of_goods_sold"] = body["costOfGoodsSold"]
+
+            if not props:
+                return jsonify({"error": "No fields to update"}), 400
+
+            updated = _client().update_product(product_id, props)
+            return jsonify(build_product_profile(updated))
+        except HubSpotIntegrationError as exc:
+            return jsonify({"error": str(exc), "status_code": exc.status_code}), (
+                exc.status_code or 502
+            )
+
+    # ------------------------------------------------------------------
+    # Line Items (TASK-211)
+    # ------------------------------------------------------------------
+
+    @app.get("/quotes/<quote_id>/line-items")
+    def quote_line_items(quote_id: str):
+        try:
+            client = _client()
+            li_ids = client.list_quote_line_item_ids(quote_id)
+            if not li_ids:
+                return jsonify({"hubspotQuoteId": quote_id, "count": 0, "lineItems": []})
+
+            line_items_raw = client.get_line_items_by_ids(li_ids)
+            line_items = [build_line_item_profile(li) for li in line_items_raw]
+            return jsonify({
+                "hubspotQuoteId": quote_id,
+                "count": len(line_items),
+                "lineItems": line_items,
+            })
         except HubSpotIntegrationError as exc:
             return jsonify({"error": str(exc), "status_code": exc.status_code}), (
                 exc.status_code or 502

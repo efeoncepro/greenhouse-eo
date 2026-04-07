@@ -124,6 +124,71 @@ def build_contact_profile(contact: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def build_product_profile(product: dict[str, Any]) -> dict[str, Any]:
+    props = product.get("properties") or {}
+    is_recurring = str(props.get("hs_recurring") or "").lower() in ("true", "1", "yes")
+    return {
+        "identity": {
+            "productId": str(product.get("id")),
+            "name": props.get("hs_product_name"),
+            "sku": props.get("hs_sku"),
+            "hubspotProductId": str(product.get("id")),
+        },
+        "pricing": {
+            "unitPrice": _safe_number(props.get("price")),
+            "costOfGoodsSold": _safe_number(props.get("cost_of_goods_sold")),
+            "currency": None,
+            "tax": _safe_number(props.get("tax")),
+        },
+        "billing": {
+            "isRecurring": is_recurring,
+            "frequency": props.get("hs_recurring_billing_period"),
+            "periodCount": _safe_number(props.get("hs_recurring_billing_frequency")),
+        },
+        "metadata": {
+            "description": props.get("hs_product_description"),
+            "isArchived": bool(product.get("archived")),
+            "createdAt": props.get("createdate"),
+            "lastModifiedAt": props.get("hs_lastmodifieddate"),
+        },
+        "source": {
+            "sourceSystem": "hubspot",
+            "sourceObjectType": "product",
+            "sourceObjectId": str(product.get("id")),
+        },
+    }
+
+
+def build_line_item_profile(li: dict[str, Any]) -> dict[str, Any]:
+    props = li.get("properties") or {}
+    return {
+        "identity": {
+            "lineItemId": str(li.get("id")),
+            "hubspotLineItemId": str(li.get("id")),
+            "hubspotProductId": props.get("hs_product_id"),
+        },
+        "content": {
+            "name": props.get("name"),
+            "description": props.get("description"),
+            "quantity": _safe_number(props.get("quantity")) or 1,
+            "unitPrice": _safe_number(props.get("price")) or 0,
+            "discountPercent": _safe_number(props.get("discount_percentage")),
+            "discountAmount": _safe_number(props.get("discount")),
+            "taxAmount": _safe_number(props.get("tax")),
+            "totalAmount": _safe_number(props.get("amount")) or 0,
+        },
+        "billing": {
+            "frequency": props.get("hs_billing_frequency"),
+            "period": _safe_number(props.get("hs_billing_period")),
+        },
+        "source": {
+            "sourceSystem": "hubspot",
+            "sourceObjectType": "line_item",
+            "sourceObjectId": str(li.get("id")),
+        },
+    }
+
+
 def build_quote_profile(quote: dict[str, Any]) -> dict[str, Any]:
     props = quote.get("properties") or {}
     associations = quote.get("associations") or {}
