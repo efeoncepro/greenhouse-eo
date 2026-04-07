@@ -195,9 +195,8 @@ Rules:
 
 | Motor | Modelo | Uso |
 |-------|--------|-----|
-| Imagen 3 | `imagen-3.0-generate-002` | Imagenes rasterizadas (PNG/WebP) |
-| Imagen 4 | `imagen-4.0-generate-001` | Alternativa mas reciente (si disponible) |
-| Gemini | Modelo resuelto por `resolveNexaModel()` | Animaciones SVG/HTML/CSS |
+| Imagen 4 | `imagen-4.0-generate-001` (default, configurable via `IMAGEN_MODEL` env var) | Imagenes rasterizadas (PNG/WebP) |
+| Gemini | Modelo resuelto por `resolveNexaModel()` (actualmente gemini-2.5-flash) | Animaciones SVG/HTML/CSS |
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
