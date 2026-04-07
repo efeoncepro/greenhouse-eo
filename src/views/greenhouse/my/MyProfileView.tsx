@@ -174,7 +174,9 @@ const MyProfileView = () => {
     chipColor: 'primary' as const
   }))
 
-  const activity = (leave?.requests ?? []).slice(0, 5).map((r: any) => ({
+  const leaveRequests = Array.isArray(leave?.requests) ? leave.requests : (leave?.requests?.requests ?? [])
+
+  const activity = leaveRequests.slice(0, 5).map((r: any) => ({
     title: `${r.leaveTypeName || 'Permiso'} — ${r.requestedDays} dia(s)`,
     description: r.reason || `${r.startDate} a ${r.endDate}`,
     time: r.createdAt ? formatRelativeTime(r.createdAt) : '',
