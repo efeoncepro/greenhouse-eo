@@ -1,38 +1,24 @@
 # Handoff.md
 
-## Sesion 2026-04-07 — Leave request submission + pending review emails
+## Sesion 2026-04-07 — Leave request email family (P2 completado)
 
-### Emails de solicitud y revision de permisos (2026-04-07)
+### Sistema de emails de permisos/ausencias (2026-04-07)
 
-Dos nuevos templates para el flujo de envio de solicitudes:
+4 templates transaccionales dedicados que cubren el ciclo completo de solicitudes de permisos:
 
-- **`leave_request_submitted`**: confirmacion al solicitante al enviar solicitud. Badge "pendiente de revision", summary card, motivo condicional.
-- **`leave_request_pending_review`**: notificacion al supervisor/HR con datos del colaborador, tipo, periodo, dias y motivo. CTA directo a "Revisar solicitud".
+| Template | Evento | Destinatario |
+|----------|--------|-------------|
+| `leave_request_submitted` | `leave_request.created` | Solicitante |
+| `leave_request_pending_review` | `created` + `escalated_to_hr` | Supervisor / HR |
+| `leave_request_decision` | `approved` / `rejected` / `cancelled` | Solicitante |
+| `leave_review_confirmation` | `approved` / `rejected` | Revisor |
 
-Integrado en:
-- `leave_request.created` → email al requester + email a reviewer(s)
-- `leave_request.escalated_to_hr` → email a HR reviewers
-- Hero images clay 3D en GCS (avion de papel + campana con badge)
-- **P2 `leave_request_*` completamente implementado**: submitted, approved, rejected, cancelled + review confirmation
+- **Personalizacion**: nombres, tipo de permiso, fechas, dias, motivo, notas — todo desde event payload (no hardcodeado)
+- **Hero images**: clay 3D fondo blanco en GCS public bucket (Imagen 4)
+- **Delivery**: ops-worker Cloud Run (outbox reactivo cada 5 min). Redeployado con templates nuevos.
+- **Skill**: `/greenhouse-email` con workflow completo (repo + global)
+- **Verificado**: 8 emails enviados en produccion con 4 tipos de permiso y 4 personas distintas
 - **Rama**: develop → main
-
----
-
-## Sesion 2026-04-07 — Leave request decision emails + AI hero images
-
-### Emails de decision de permisos (2026-04-07)
-
-Dos nuevos templates transaccionales dedicados para el flujo de permisos/ausencias:
-
-- **`leave_request_decision`**: email al solicitante cuando su permiso es aprobado, rechazado o cancelado. Status badge (verde/rojo/gris), summary card con tipo/fechas/dias, notas del revisor condicionales.
-- **`leave_review_confirmation`**: email al revisor confirmando la accion que tomo (approve/reject). Incluye motivo original del solicitante y notas propias.
-
-Ambos soportan es/en, hero images generadas con Imagen 4, auto-context hydration.
-
-- **Integracion**: notification projection envia emails dedicados + in-app notification (paralelo)
-- **Event payload**: enriquecido con `notes` y `reason` en `buildLeaveEventPayload`
-- **Skill**: `/greenhouse-email` creada (repo + global) — workflow completo de creacion de emails con AI images
-- **Rama**: develop
 
 ---
 

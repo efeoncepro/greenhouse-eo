@@ -2,24 +2,16 @@
 
 ## 2026-04-07
 
-### 2026-04-07 — Emails de solicitud + revision pendiente de permisos
+### 2026-04-07 — Sistema de emails de permisos/ausencias (P2 completado)
 
-- Nuevos templates `leave_request_submitted` y `leave_request_pending_review`
-- Email al solicitante: confirmacion de envio con badge "pendiente", summary card, motivo
-- Email al aprobador: notificacion con datos del colaborador, periodo, dias, CTA a panel de revision
-- Integrado en `leave_request.created` y `leave_request.escalated_to_hr`
-- Hero images clay 3D en GCS (avion de papel, campana con badge naranja)
-- Familia `leave_request_*` completamente implementada: submitted, approved, rejected, cancelled + review confirmation
-
-### 2026-04-07 — Emails de decision de permisos + hero images AI
-
-- Nuevos templates `leave_request_decision` y `leave_review_confirmation` (React Email + Resend)
-- Email al solicitante: status badge, summary card (tipo/fechas/dias), notas del revisor
-- Email al revisor: confirmacion de accion, motivo original del colaborador
-- Soporte es/en via auto-context hydration, hero images generadas con Imagen 4
-- Integracion en notification projection: disparo automatico en `leave_request.approved`, `.rejected`, `.cancelled`
-- Event payload enriquecido con `notes` y `reason` para personalizacion
-- Skill `/greenhouse-email` creada (repo + global) para workflow de creacion de nuevos emails
+- 4 templates transaccionales: `leave_request_submitted`, `leave_request_pending_review`, `leave_request_decision`, `leave_review_confirmation`
+- Ciclo completo: solicitud → revision pendiente → aprobacion/rechazo/cancelacion → confirmacion al revisor
+- Personalizacion dinamica via event payload: nombre solicitante/revisor, tipo permiso, fechas, dias, motivo, notas
+- Hero images clay 3D (Imagen 4) en GCS public bucket, fondo blanco, colores de marca
+- Soporte es/en via auto-context hydration
+- Delivery via ops-worker Cloud Run (outbox reactivo). Redeploy requerido al modificar templates.
+- Skill `/greenhouse-email` creada (repo + global) con workflow completo + aprendizajes operativos
+- Verificado end-to-end: 8 emails enviados con 4 tipos de permiso y 4 personas distintas
 
 ### 2026-04-07 — Separación labor_cost_clp + consolidación de tipos
 
