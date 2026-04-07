@@ -148,28 +148,30 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Types: definir AccountComplete360 con todas las facetas
+### Phase A — Core Resolver
+
+#### Slice 1 — Types: definir AccountComplete360 con todas las facetas
 
 Crear `src/types/account-complete-360.ts` con:
 
 ```typescript
 type AccountComplete360 = {
-  // Faceta core (siempre presente)
-  identity: AccountIdentityFacet          // de organization_360
-
-  // Facetas on-demand
-  spaces?: AccountSpaceFacet[]            // spaces con client bridge
-  team?: AccountTeamFacet                 // memberships + FTE + team members
-  economics?: AccountEconomicsFacet       // P&L, revenue, margins, trend
-  delivery?: AccountDeliveryFacet         // projects, sprints, ICO metrics
-  finance?: AccountFinanceFacet           // client profiles, invoicing, DTE
-  crm?: AccountCrmFacet                   // HubSpot company, deals, contacts
-  services?: AccountServicesFacet         // active services, capabilities, BLs
-  staffAug?: AccountStaffAugFacet         // placements, billing, contracts
+  _meta: ResolverMeta                       // timing, cache status, version (shared type with TASK-273)
+  identity: AccountIdentityFacet
+  spaces?: AccountSpaceFacet[]
+  team?: AccountTeamFacet
+  economics?: AccountEconomicsFacet
+  delivery?: AccountDeliveryFacet
+  finance?: AccountFinanceFacet
+  crm?: AccountCrmFacet
+  services?: AccountServicesFacet
+  staffAug?: AccountStaffAugFacet
 }
 ```
 
-### Slice 2 — Scope resolver: org → spaces → clients (centralizado)
+`ResolverMeta` is the same shared type from TASK-273 — `{ resolvedAt, resolverVersion, facetsRequested, facetsResolved, timing, cacheStatus }`.
+
+#### Slice 2 — Scope resolver: org → spaces → clients (centralizado)
 
 Crear un utility que se ejecuta una sola vez al inicio del resolver:
 
@@ -184,7 +186,7 @@ type AccountScope = {
 
 Todas las facetas reciben `AccountScope` en vez de resolver las cadenas por su cuenta.
 
-### Slice 3 — Facet modules
+#### Slice 3 — Facet modules
 
 Crear `src/lib/account-360/facets/`:
 
@@ -200,62 +202,158 @@ Crear `src/lib/account-360/facets/`:
 
 Cada modulo refactoriza la logica existente de `src/lib/account-360/organization-*.ts` en una funcion que recibe `AccountScope`.
 
-### Slice 4 — Resolver: `getAccountComplete360()`
+#### Slice 4 — Resolver: `getAccountComplete360()`
 
-Crear `src/lib/account-360/account-complete-360.ts`:
+Crear `src/lib/account-360/account-complete-360.ts` con facet registry:
 
 ```typescript
-export async function getAccountComplete360(
-  organizationId: string,
-  facets: AccountFacetName[] = ['identity']
-): Promise<AccountComplete360> {
-  const identity = await fetchIdentityFacet(organizationId)
-  const scope: AccountScope = {
-    organizationId,
-    spaceIds: identity.spaces.map(s => s.spaceId),
-    clientIds: identity.spaces.map(s => s.clientId).filter(Boolean),
-    hubspotCompanyId: identity.hubspotCompanyId
-  }
-
-  const [spaces, team, economics, delivery, finance, crm, services, staffAug] =
-    await Promise.all([
-      facets.includes('spaces') ? fetchSpacesFacet(scope) : undefined,
-      facets.includes('team') ? fetchTeamFacet(scope) : undefined,
-      facets.includes('economics') ? fetchEconomicsFacet(scope) : undefined,
-      facets.includes('delivery') ? fetchDeliveryFacet(scope) : undefined,
-      facets.includes('finance') ? fetchFinanceFacet(scope) : undefined,
-      facets.includes('crm') ? fetchCrmFacet(scope) : undefined,
-      facets.includes('services') ? fetchServicesFacet(scope) : undefined,
-      facets.includes('staffAug') ? fetchStaffAugFacet(scope) : undefined,
-    ])
-
-  return { identity, spaces, team, economics, delivery, finance, crm, services, staffAug }
+const FACET_REGISTRY: Record<AccountFacetName, FacetDefinition> = {
+  identity:  { fetch: fetchIdentityFacet,  cacheTTL: 600,  sensitivityLevel: 'public'      },
+  spaces:    { fetch: fetchSpacesFacet,    cacheTTL: 600,  sensitivityLevel: 'internal'    },
+  team:      { fetch: fetchTeamFacet,      cacheTTL: 300,  sensitivityLevel: 'internal'    },
+  economics: { fetch: fetchEconomicsFacet, cacheTTL: 300,  sensitivityLevel: 'confidential'},
+  delivery:  { fetch: fetchDeliveryFacet,  cacheTTL: 300,  sensitivityLevel: 'internal'    },
+  finance:   { fetch: fetchFinanceFacet,   cacheTTL: 600,  sensitivityLevel: 'confidential'},
+  crm:       { fetch: fetchCrmFacet,       cacheTTL: 600,  sensitivityLevel: 'internal'    },
+  services:  { fetch: fetchServicesFacet,  cacheTTL: 600,  sensitivityLevel: 'internal'    },
+  staffAug:  { fetch: fetchStaffAugFacet,  cacheTTL: 600,  sensitivityLevel: 'confidential'},
 }
 ```
 
-### Slice 5 — API endpoint: `GET /api/organization/[id]/360`
+The resolver resolves scope once, authorizes facets, executes in parallel, collects timing, and returns `_meta`.
 
-- Auth: `requireTenantContext` — admin o usuario de la organizacion
-- Query param `facets` — comma-separated (default: `identity`)
+#### Slice 5 — API endpoint: `GET /api/organization/[id]/360`
+
+- Auth: `requireTenantContext`
+- Query params: `facets` (comma-separated), `asOf` (ISO date), `limit` (per-collection cap), `cache` (`bypass` to force fresh)
 - El `[id]` acepta `organization_id`, `public_id` (`EO-ORG...`), o `hubspot_company_id`
-- Respuesta: `AccountComplete360` con solo las facetas solicitadas
+- Response headers: `X-Resolver-Version`, `X-Cache-Status`, `X-Timing-Ms`
+- Error per-facet: si una faceta falla, las demas siguen
 
-### Slice 6 — Migrar Organization Detail al resolver
+### Phase B — Enterprise Authorization
 
-Reescribir las vistas de Organization Detail para consumir el endpoint 360 con las facetas necesarias en vez de 6 fetches separados.
+#### Slice 6 — Facet Authorization Engine
 
-### Slice 7 — Migrar Agency Spaces al resolver
+Crear `src/lib/account-360/facet-authorization.ts`:
 
-Reescribir la vista de Agency Spaces para usar el resolver con `facets=identity,economics,delivery,team`.
+```typescript
+type AccountFacetAuthContext = {
+  requesterRoleCodes: string[]
+  requesterTenantType: string
+  requesterOrganizationId: string | null
+  targetOrganizationId: string
+  requestedFacets: AccountFacetName[]
+}
+```
+
+Reglas de autorizacion:
+
+| Relacion | Facetas permitidas | Campos redactados |
+|----------|-------------------|-------------------|
+| `efeonce_admin` | TODAS | ninguno |
+| `efeonce_operations` | TODAS excepto finance | economics.revenuePerFte |
+| `same_org` + `client_executive` | identity, spaces, team, delivery, services | economics denegado, finance denegado |
+| `same_org` + `finance_admin` | identity, spaces, team, economics, finance | staffAug denegado |
+| `different_org` + no-admin | identity solamente | |
+
+#### Slice 7 — Integration en el resolver
+
+Misma mecanica que TASK-273: `authorizeFacets()` ANTES de ejecutar, field redaction DESPUES. `_meta.deniedFacets` y `_meta.redactedFields` reportados.
+
+### Phase C — Caching Layer
+
+#### Slice 8 — In-memory facet cache con TTL
+
+Reutiliza la misma infraestructura de cache de TASK-273 (`src/lib/shared/facet-cache.ts` — shared module):
+
+- Cache key: `account360:{organizationId}:{facetName}:{version}`
+- TTL por faceta (del registry)
+- Stale-while-revalidate
+- `cache=bypass` param
+
+#### Slice 9 — Cache invalidation via outbox events
+
+| Evento | Faceta invalidada |
+|--------|-------------------|
+| `space.created/updated/deactivated` | `spaces`, `identity` |
+| `assignment.created/updated` | `team` |
+| `membership.created/deactivated` | `team` |
+| `pl.snapshot.materialized` | `economics` |
+| `income.created/updated` | `finance` |
+| `delivery.project.synced` | `delivery` |
+| `ico.metrics.materialized` | `delivery` |
+| `crm.company.synced` | `crm` |
+| `service.created/updated` | `services` |
+| `placement.created/updated` | `staffAug` |
+
+### Phase D — Bulk & Pagination
+
+#### Slice 10 — Bulk resolver: `getAccountsComplete360()`
+
+```typescript
+export async function getAccountsComplete360(
+  organizationIds: string[],
+  facets: AccountFacetName[] = ['identity'],
+  options?: { limit?: number }
+): Promise<AccountComplete360[]>
+```
+
+- Batch scope resolution: un solo query para todos los org → spaces → clients
+- Max 50 organizations por request
+- Endpoint: `POST /api/organizations/360` con body `{ organizationIds, facets }`
+
+#### Slice 11 — Sub-collection pagination
+
+Default limits:
+
+| Coleccion | Default | Max |
+|-----------|---------|-----|
+| `team.members` | 20 | 100 |
+| `economics.trend` | 12 (meses) | 36 |
+| `economics.byClient` | 20 | 100 |
+| `delivery.taskCounts` | sin paginacion (aggregated) | — |
+| `crm.dealsPipeline` | 10 | 50 |
+| `services.activeServices` | 20 | 50 |
+| `staffAug.placements` | 20 | 50 |
+
+### Phase E — Observability & Temporal
+
+#### Slice 12 — Observability: tracing por faceta
+
+Mismo `ResolverTrace` type que TASK-273, logueado en Vercel runtime logs.
+
+#### Slice 13 — Point-in-time queries
+
+| Faceta | Point-in-time | Mecanismo |
+|--------|--------------|-----------|
+| `economics` | Si | `WHERE period_year/month` del `asOf` en `operational_pl_snapshots` |
+| `delivery` | Si | `WHERE period_year/month` del `asOf` en `ico_organization_metrics` |
+| `finance` | Parcial | revenue YTD calculado hasta `asOf` |
+| `team` | Parcial | assignments con `WHERE start_date <= $asOf AND (end_date IS NULL OR end_date >= $asOf)` |
+| `identity`, `spaces`, `crm`, `services` | No | siempre estado actual |
+
+### Phase F — Consumer Migration
+
+#### Slice 14 — Migrar Organization Detail al resolver
+
+Reescribir las vistas de Organization Detail para consumir `GET /api/organization/{id}/360?facets=...` en vez de 6 fetches separados.
+
+#### Slice 15 — Migrar Agency Spaces al resolver
+
+Reescribir la vista de Agency Spaces para usar `POST /api/organizations/360` bulk con `facets=identity,economics,delivery,team`.
+
+#### Slice 16 — Migrar Client Economics al resolver
+
+Reescribir la vista de Client Economics para consumir la faceta `economics` del resolver.
 
 ## Out of Scope
 
-- Crear tablas nuevas o materialized views
-- Migrar BigQuery data a PostgreSQL
+- Redis / external cache — in-memory preparado para Redis si se necesita
+- GraphQL — los facets son el building block para eso
 - Reescribir `organization_360` VIEW — se reutiliza como faceta identity
-- Migrar TODAS las vistas de cuenta en un solo PR — incremental por slice
-- Cache layer — optimizacion futura
-- GraphQL — los facets son el building block para eso si se necesita despues
+- API publica/externa — solo consumo interno del portal
+- Migrar TODAS las vistas en un solo PR — incremental por phase
+- Real-time subscriptions (WebSocket) — futuro sobre cache invalidation
 
 ## Detailed Spec
 
@@ -275,27 +373,33 @@ WHERE o.organization_id = $1
 GROUP BY o.organization_id, o.hubspot_company_id
 ```
 
-Cada faceta recibe `{ organizationId, spaceIds, clientIds, hubspotCompanyId }` y no necesita resolver la cadena.
+### Sensitivity Levels
+
+| Level | Significado | Quien puede ver |
+|-------|------------|-----------------|
+| `public` | Nombre, tipo, country | cualquier usuario autenticado |
+| `internal` | Spaces, team, delivery, CRM, services | internal users (efeonce) |
+| `confidential` | Economics, finance, costs, staff aug billing | admin + finance roles |
 
 ### Datos de cada faceta
 
-**identity**: organizationId, publicId, name, legalName, taxId, industry, country, type, status, hubspotCompanyId, spaceCount, membershipCount, uniquePersonCount
+**identity**: organizationId, publicId, name, legalName, taxId, taxIdType, industry, country, type, status, hubspotCompanyId, isOperatingEntity, legalAddress, spaceCount, membershipCount, uniquePersonCount, createdAt
 
-**spaces**: spaceId, publicId, spaceName, spaceType, clientId, clientName, status
+**spaces**: spaceId, publicId, spaceName, spaceType, clientId, clientName, status, activeModuleCodes[], activeModuleCount
 
-**team**: totalMembers, totalFte, members[{profileId, name, avatarUrl, jobTitle, department, fteAllocation, membershipType}]
+**team**: totalMembers, totalFte, members[{profileId, eoId, name, avatarUrl, jobTitle, department, fteAllocation, membershipType, isPrimary}], teamPagination{total, limit, offset, hasMore}
 
-**economics**: currentPeriod{year, month, revenueCLP, laborCostCLP, directExpenseCLP, overheadCLP, totalCostCLP, grossMarginCLP, grossMarginPct, headcountFte, revenuePerFte}, trend[{year, month, revenueCLP, grossMarginPct}], byClient[{clientName, revenueCLP, costCLP, marginPct}]
+**economics**: currentPeriod{year, month, revenueCLP, laborCostCLP, directExpenseCLP, overheadCLP, totalCostCLP, grossMarginCLP, grossMarginPct, netMarginCLP, netMarginPct, headcountFte, revenuePerFte, costPerFte}, trend[{year, month, revenueCLP, grossMarginPct, headcountFte}], trendPagination{total, limit, offset}, byClient[{clientName, revenueCLP, costCLP, marginPct, fte}]
 
-**delivery**: icoMetrics{rpaAvg, otdPct, throughputCount, cycleTimeAvg, stuckAssetCount}, projectCount, activeProjectCount, sprintCount, taskCounts{total, completed, active, overdue}
+**delivery**: icoMetrics{rpaAvg, rpaMedian, otdPct, ftrPct, throughputCount, cycleTimeAvg, pipelineVelocity, stuckAssetCount, stuckAssetPct}, projectCount, activeProjectCount, sprintCount, taskCounts{total, completed, active, overdue, carryOver}
 
-**finance**: clientProfiles[{clientId, legalName, currency, paymentTerms}], revenueYTD, invoiceCount, outstandingAmount, dteCoverage{coveredPct, uncoveredCount}
+**finance**: clientProfiles[{clientId, legalName, currency, paymentTerms, requiresPo, requiresHes}], revenueYTD, invoiceCount, outstandingAmount, dteCoverage{coveredPct, uncoveredCount}, accountsReceivable{current, overdue30, overdue60, overdue90}
 
-**crm**: company{hubspotId, name, lifecycleStage, industry}, dealCount, dealsPipeline[{dealName, stage, amount, closeDate}], contactCount
+**crm**: company{hubspotId, name, lifecycleStage, industry, website, ownerName}, dealCount, openDealAmount, closedWonYTD, dealsPipeline[{dealName, stage, amount, currency, closeDate, ownerName}], contactCount
 
-**services**: activeServices[{serviceId, name, businessLine, modalidad, startDate, status}], byBusinessLine{globe, efeonce_digital, reach, wave, crm_solutions}, totalActiveCount
+**services**: activeServices[{serviceId, publicId, name, businessLine, servicoEspecifico, modalidad, startDate, targetEndDate, status, billingFrequency, totalCost, currency}], byBusinessLine{globe, efeonce_digital, reach, wave, crm_solutions}, totalActiveCount, totalRevenue
 
-**staffAug**: placements[{placementId, memberName, status, billingRate, currency, contractStart, contractEnd}], activePlacementCount, totalBillingRate
+**staffAug**: placements[{placementId, memberName, memberAvatarUrl, organizationName, status, lifecycleStage, billingRate, billingCurrency, contractStart, contractEnd, providerType, requiredSkills}], activePlacementCount, totalBillingRate, byCurrency[{currency, totalRate, count}]
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -303,42 +407,74 @@ Cada faceta recibe `{ organizationId, spaceIds, clientIds, hubspotCompanyId }` y
 
 ## Acceptance Criteria
 
+### Phase A — Core Resolver
 - [ ] `getAccountComplete360(orgId, ['identity'])` retorna datos equivalentes a `organization_360` actual
-- [ ] `getAccountComplete360(orgId, ['identity', 'economics'])` retorna P&L + margins + trend
-- [ ] `getAccountComplete360(orgId, ['identity', 'team'])` retorna team con avatares y FTE
-- [ ] `getAccountComplete360(orgId, ['identity', 'delivery'])` retorna ICO metrics + project/task counts
-- [ ] `getAccountComplete360(orgId, ['identity', 'finance'])` retorna perfiles financieros + revenue YTD
-- [ ] `getAccountComplete360(orgId, ['identity', 'crm'])` retorna company + deals + contacts
-- [ ] `getAccountComplete360(orgId, ['identity', 'services'])` retorna servicios activos por BL
-- [ ] `GET /api/organization/{orgId}/360?facets=identity,economics,team` retorna datos correctos
+- [ ] Todas las 9 facetas retornan datos correctos cuando se solicitan
+- [ ] `_meta` incluye timing por faceta, resolverVersion, cacheStatus
+- [ ] Si una faceta falla, las demas siguen — error reportado en `_meta.errors[]`
 - [ ] Scope resolution `org → spaces → clients` ejecutada una sola vez (no por faceta)
+- [ ] `GET /api/organization/{id}/360` acepta organization_id, public_id, y hubspot_company_id
+- [ ] Response headers incluyen `X-Resolver-Version`, `X-Cache-Status`, `X-Timing-Ms`
+
+### Phase B — Enterprise Authorization
+- [ ] `efeonce_operations` NO puede ver faceta `finance` de una org
+- [ ] `client_executive` de la misma org puede ver identity + spaces + team + delivery + services (no economics ni finance)
+- [ ] `efeonce_admin` puede ver TODAS las facetas
+- [ ] `finance_admin` puede ver economics + finance pero no staffAug
+- [ ] Facetas denegadas se listan en `_meta.deniedFacets` con reason
+
+### Phase C — Caching
+- [ ] Second request retorna `cacheStatus: 'hit'` para facetas dentro de TTL
+- [ ] Outbox event `pl.snapshot.materialized` invalida cache de economics
+- [ ] `cache=bypass` fuerza fresh data
+
+### Phase D — Bulk & Pagination
+- [ ] `POST /api/organizations/360` con 20 orgIds retorna datos correctos en batch
+- [ ] `team.members` respeta `limit` y `offset`
+- [ ] `economics.trend` respeta `limit` (default 12 meses)
+
+### Phase E — Observability & Temporal
+- [ ] Cada request logea `ResolverTrace` en Vercel runtime logs
+- [ ] `asOf=2026-03-01&facets=economics` retorna datos de marzo
+- [ ] Faceta lenta se registra como warning
+
+### Phase F — Consumer Migration
+- [ ] Organization Detail usa el endpoint 360
+- [ ] Agency Spaces usa bulk endpoint 360
+- [ ] Client Economics usa la faceta economics del resolver
 - [ ] `pnpm build`, `pnpm lint` pasan sin errores
 
 ## Verification
 
-- `pnpm build`
-- `pnpm lint`
-- `npx tsc --noEmit`
-- Verificacion E2E: `pnpm staging:request /api/organization/{orgId}/360?facets=identity,economics,team,delivery`
-- Verificacion: comparar output del resolver con output de `getOrganizationExecutiveSnapshot()` existente — deben coincidir
-- Verificacion: agregar faceta nueva (mock) para confirmar extensibilidad
+- `pnpm build` + `pnpm lint` + `npx tsc --noEmit`
+- Verificacion E2E per phase:
+  - Phase A: `pnpm staging:request /api/organization/{orgId}/360?facets=identity,economics,team,delivery` — datos correctos; comparar con `getOrganizationExecutiveSnapshot()` existente
+  - Phase B: request como `efeonce_operations` pidiendo `finance` → denied; request como `efeonce_admin` → allowed
+  - Phase C: 2 requests rapidos → segundo hit; create income → tercero miss para `finance`
+  - Phase D: `POST /api/organizations/360` con 10 ids → 10 resultados
+  - Phase E: verificar logs contienen `ResolverTrace`; `?asOf=2026-03-01&facets=economics` → datos de marzo
+  - Phase F: navegar a Organization Detail — Network tab muestra 1 request al endpoint 360
 
 ## Closing Protocol
 
-- [ ] Actualizar `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md` con la arquitectura del resolver
+- [ ] Actualizar `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md` con la arquitectura completa
+- [ ] Crear `docs/architecture/GREENHOUSE_ACCOUNT_COMPLETE_360_V1.md` — spec dedicada
+- [ ] Deprecar `getOrganizationEconomics()`, `getOrganizationExecutiveSnapshot()`, etc. con JSDoc `@deprecated`
 - [ ] Actualizar `docs/architecture/GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md` con el endpoint 360
-- [ ] Deprecar gradualmente las funciones individuales de `organization-*.ts` a favor de las facetas
 
 ## Follow-ups
 
-- Cache layer: facetas de economics y delivery con TTL de 5 min
-- Streaming: para dashboards que muestran KPIs progresivamente
-- Person 360 + Account 360 cross-reference: persona → sus organizaciones → economics de cada una
-- Client portal: el mismo resolver sirve el dashboard del cliente con facetas filtradas por permisos
-- Space-level 360: si se necesita granularidad sub-org, crear `getSpaceComplete360()` con el mismo patron
+- Redis cache: migrar de in-memory a Redis cuando la escala lo requiera
+- GraphQL: los facets son el building block
+- Space-level 360: `getSpaceComplete360()` con el mismo patron para granularidad sub-org
+- Client portal dashboard: el resolver sirve el dashboard del cliente con facetas filtradas
+- Cross-object queries: persona → sus orgs → economics (requiere TASK-273 + TASK-274 coordinados)
+- Real-time subscriptions: WebSocket push cuando una faceta cambia
+- Audit trail: registrar en `audit_events` quien consulto que facetas de que organizacion
 
 ## Open Questions
 
-- El scope resolver usa `spaces.client_id` como bridge a datos legacy. Si un org tiene spaces sin client_id, esas facetas de finance/delivery quedaran vacias. Aceptable?
-- CRM facet: usar `hubspot_company_id` como join key o resolver via `client_id`? Propuesta: ambos, COALESCE.
-- Auth: un usuario de una organizacion puede ver economics de otra org? Propuesta: solo admin. Usuarios normales solo ven su propia org.
+- Scope resolver: si un org tiene spaces sin client_id, facetas finance/delivery quedan vacias. Aceptable? Propuesta: si — documentar en `_meta.warnings`.
+- CRM join: `hubspot_company_id` vs `client_id`? Propuesta: COALESCE ambos.
+- PG pool sizing: con bulk requests de 50 orgs x 9 facetas x 2 queries/faceta = ~900 queries. Pool default es 20. Verificar connection pooling de Cloud SQL Connector.
+- Cache TTL tuning: los defaults son estimaciones. Ajustar post-deploy con metricas reales de `ResolverTrace`.

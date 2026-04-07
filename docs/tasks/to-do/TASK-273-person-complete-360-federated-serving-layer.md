@@ -128,29 +128,38 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Types: definir PersonComplete360 con todas las facetas
+### Phase A — Core Resolver
+
+#### Slice 1 — Types: definir PersonComplete360 con todas las facetas
 
 Crear `src/types/person-complete-360.ts` con:
 
 ```typescript
 type PersonComplete360 = {
-  // Faceta core (siempre presente)
-  identity: PersonIdentityFacet       // de person_360
-  
-  // Facetas on-demand
-  assignments?: PersonAssignmentFacet[]    // client_team_assignments + team members
-  organization?: PersonOrganizationFacet   // person_memberships + organizations
-  leave?: PersonLeaveFacet                 // leave_balances + leave_requests summary
-  payroll?: PersonPayrollFacet             // current compensation + last payroll entry
-  delivery?: PersonDeliveryFacet           // projects + task counts + ICO metrics
-  costs?: PersonCostFacet                  // cost attribution + capacity economics
-  staffAug?: PersonStaffAugFacet           // placements si aplica
+  _meta: ResolverMeta                     // timing, cache status, version
+  identity: PersonIdentityFacet           // de person_360
+  assignments?: PersonAssignmentFacet[]
+  organization?: PersonOrganizationFacet
+  leave?: PersonLeaveFacet
+  payroll?: PersonPayrollFacet
+  delivery?: PersonDeliveryFacet
+  costs?: PersonCostFacet
+  staffAug?: PersonStaffAugFacet
+}
+
+type ResolverMeta = {
+  resolvedAt: string                      // ISO timestamp
+  resolverVersion: string                 // semver, para backward compat
+  facetsRequested: PersonFacetName[]
+  facetsResolved: PersonFacetName[]
+  timing: Record<PersonFacetName, number> // ms por faceta
+  cacheStatus: Record<PersonFacetName, 'hit' | 'miss' | 'stale' | 'bypass'>
 }
 ```
 
-Cada faceta es una interface tipada con los campos que el consumidor necesita. No exponer raw rows — transformar a la forma que la UI consume.
+Cada faceta es una interface tipada. No exponer raw rows — transformar a la forma que la UI consume.
 
-### Slice 2 — Facet modules: un archivo por faceta
+#### Slice 2 — Facet modules: un archivo por faceta
 
 Crear `src/lib/person-360/facets/`:
 
@@ -164,45 +173,209 @@ Crear `src/lib/person-360/facets/`:
 
 Cada modulo exporta una funcion `fetchXxxFacet(memberId: string): Promise<XxxFacet>`.
 
-### Slice 3 — Resolver: `getPersonComplete360()`
+#### Slice 3 — Resolver: `getPersonComplete360()`
 
-Crear `src/lib/person-360/person-complete-360.ts`:
+Crear `src/lib/person-360/person-complete-360.ts` con facet registry pattern:
 
 ```typescript
-export async function getPersonComplete360(
-  profileId: string,
-  facets: PersonFacetName[] = ['identity']
-): Promise<PersonComplete360> {
-  // 1. Siempre: resolver identity + member_id
-  const identity = await fetchIdentityFacet(profileId)
-  const memberId = identity.memberId // puede ser null si no tiene faceta member
-  
-  // 2. Facetas on-demand en paralelo
-  const [assignments, organization, leave, payroll, delivery, costs] = await Promise.all([
-    facets.includes('assignments') && memberId ? fetchAssignmentsFacet(memberId) : undefined,
-    facets.includes('organization') ? fetchOrganizationFacet(profileId) : undefined,
-    facets.includes('leave') && memberId ? fetchLeaveFacet(memberId) : undefined,
-    facets.includes('payroll') && memberId ? fetchPayrollFacet(memberId) : undefined,
-    facets.includes('delivery') && memberId ? fetchDeliveryFacet(memberId) : undefined,
-    facets.includes('costs') && memberId ? fetchCostsFacet(memberId) : undefined,
-  ])
-  
-  return { identity, assignments, organization, leave, payroll, delivery, costs }
+const FACET_REGISTRY: Record<PersonFacetName, FacetDefinition> = {
+  identity:     { fetch: fetchIdentityFacet,     requiresMemberId: false, cacheTTL: 300,  sensitivityLevel: 'public'      },
+  assignments:  { fetch: fetchAssignmentsFacet,  requiresMemberId: true,  cacheTTL: 300,  sensitivityLevel: 'internal'    },
+  organization: { fetch: fetchOrganizationFacet, requiresMemberId: false, cacheTTL: 600,  sensitivityLevel: 'public'      },
+  leave:        { fetch: fetchLeaveFacet,        requiresMemberId: true,  cacheTTL: 120,  sensitivityLevel: 'personal'    },
+  payroll:      { fetch: fetchPayrollFacet,      requiresMemberId: true,  cacheTTL: 3600, sensitivityLevel: 'confidential'},
+  delivery:     { fetch: fetchDeliveryFacet,     requiresMemberId: true,  cacheTTL: 300,  sensitivityLevel: 'internal'    },
+  costs:        { fetch: fetchCostsFacet,        requiresMemberId: true,  cacheTTL: 600,  sensitivityLevel: 'confidential'},
+  staffAug:     { fetch: fetchStaffAugFacet,     requiresMemberId: true,  cacheTTL: 600,  sensitivityLevel: 'confidential'},
 }
 ```
 
-El resolver resuelve `profile_id → member_id` **una sola vez** y lo pasa a cada faceta. Las facetas que requieren `member_id` se saltan si la persona no tiene faceta member (ej: contacto CRM puro).
+El resolver resuelve `profile_id → member_id` **una sola vez**, ejecuta facetas en paralelo, recolecta timing, y retorna `_meta`.
 
-### Slice 4 — API endpoint: `GET /api/person/[id]/360`
+#### Slice 4 — API endpoint: `GET /api/person/[id]/360`
 
-Crear `src/app/api/person/[id]/360/route.ts`:
+- Auth: `requireTenantContext`
+- Query params: `facets` (comma-separated), `asOf` (ISO date, point-in-time), `limit` (per-collection cap)
+- El `[id]` acepta `profile_id`, `member_id`, `user_id`, `eo_id`, o `me`
+- Response headers: `X-Resolver-Version`, `X-Cache-Status`, `X-Timing-Ms`
+- Error per-facet: si una faceta falla, las demas siguen — el error se reporta en `_meta`
 
-- Auth: `requireTenantContext` — cualquier usuario autenticado puede consultar personas de su organizacion
-- Query param `facets` — comma-separated list de facetas a incluir (default: `identity`)
-- El `[id]` acepta `profile_id`, `member_id`, `user_id`, o `eo_id` — el resolver normaliza a `profile_id`
-- Respuesta: `PersonComplete360` con solo las facetas solicitadas
+#### Slice 5 — Centralizar `resolveAvatarUrl`
 
-### Slice 5 — Migrar MyProfileView al resolver
+Mover a `src/lib/person-360/resolve-avatar.ts` y eliminar las 3 copias. Todos los facets importan de ahi.
+
+### Phase B — Enterprise Authorization
+
+#### Slice 6 — Facet Authorization Engine
+
+Crear `src/lib/person-360/facet-authorization.ts`:
+
+```typescript
+type FacetAuthorizationContext = {
+  requesterProfileId: string
+  requesterRoleCodes: string[]
+  requesterTenantType: string
+  targetProfileId: string
+  targetOrganizationId: string | null
+  requestedFacets: PersonFacetName[]
+}
+
+type FacetAuthorizationResult = {
+  allowedFacets: PersonFacetName[]
+  deniedFacets: { facet: PersonFacetName; reason: string }[]
+  fieldRedactions: Record<PersonFacetName, string[]>  // campos a omitir dentro de una faceta permitida
+}
+```
+
+Reglas de autorizacion:
+
+| Relacion | Facetas permitidas | Campos redactados |
+|----------|-------------------|-------------------|
+| `self` (me) | TODAS | ninguno |
+| `same_org` + `collaborator` | identity, assignments, organization, delivery | payroll.baseSalary, costs.* |
+| `same_org` + `hr_manager` | TODAS excepto costs | payroll completo |
+| `same_org` + `efeonce_admin` | TODAS | ninguno |
+| `different_org` + `efeonce_admin` | TODAS | ninguno |
+| `different_org` + cualquier otro | identity solamente | phone, email parcial |
+| `client` tenant | identity, assignments, delivery | todo lo demas denegado |
+
+Field-level redaction: el resolver recibe el `FacetAuthorizationResult` y aplica redacciones antes de retornar. Los campos redactados se reemplazan con `null` y se listan en `_meta.redactedFields`.
+
+#### Slice 7 — Integration en el resolver
+
+El resolver llama a `authorizeFacets()` ANTES de ejecutar las facetas. Solo ejecuta las permitidas. Los campos redactados se aplican DESPUES de ejecutar la faceta (post-processing).
+
+```typescript
+const authResult = await authorizeFacets({ requester, target, requestedFacets })
+// Solo ejecutar facetas permitidas
+const resolvedFacets = authResult.allowedFacets
+// Post-process: redactar campos
+applyFieldRedactions(result, authResult.fieldRedactions)
+// Agregar denied info a _meta
+result._meta.deniedFacets = authResult.deniedFacets
+```
+
+### Phase C — Caching Layer
+
+#### Slice 8 — In-memory facet cache con TTL
+
+Crear `src/lib/person-360/facet-cache.ts`:
+
+- Cache key: `person360:{profileId}:{facetName}:{version}`
+- TTL por faceta (definido en registry): identity 5min, payroll 1h, delivery 5min, leave 2min
+- Storage: `Map<string, { data, expiresAt, resolvedAt }>` in-process (sin Redis — escalable a Redis despues)
+- Stale-while-revalidate: si el cache esta stale (<2x TTL), retorna stale + dispara revalidation en background
+- Cache bypass: query param `cache=bypass` para forzar fresh data
+- Cache status reportado en `_meta.cacheStatus` por faceta
+
+#### Slice 9 — Cache invalidation via outbox events
+
+Crear `src/lib/person-360/facet-cache-invalidation.ts`:
+
+Escuchar eventos del outbox para invalidar facetas especificas:
+
+| Evento | Faceta invalidada |
+|--------|-------------------|
+| `assignment.created/updated/deactivated` | `assignments` |
+| `leave.request.created/approved/rejected` | `leave` |
+| `payroll.entry.created/closed` | `payroll` |
+| `compensation.version.created` | `payroll`, `costs` |
+| `membership.created/deactivated` | `organization` |
+| `delivery.task.synced` | `delivery` |
+| `identity.profile.updated` | `identity` |
+
+Integracion con el reactive worker existente: registrar un handler en el outbox consumer que llama a `invalidateFacetCache(profileId, facetName)`.
+
+### Phase D — Bulk & Pagination
+
+#### Slice 10 — Bulk resolver: `getPersonsComplete360()`
+
+Crear `src/lib/person-360/person-complete-360-bulk.ts`:
+
+```typescript
+export async function getPersonsComplete360(
+  profileIds: string[],
+  facets: PersonFacetName[] = ['identity'],
+  options?: { limit?: number; offset?: number }
+): Promise<PersonComplete360[]>
+```
+
+- Batch identity resolution: un solo query `WHERE profile_id IN (...)` en vez de N queries
+- Batch facet fetching: cada faceta recibe `memberId[]` y retorna `Map<memberId, FacetData>`
+- Limit: max 100 personas por request
+- Authorization: `authorizeFacets()` ejecutado una vez con el requester, aplicado a todos los targets (mismas reglas para todos en el batch)
+
+Endpoint: `POST /api/persons/360` con body `{ profileIds: string[], facets: string[] }`
+
+#### Slice 11 — Sub-collection pagination
+
+Cada faceta con colecciones anidadas soporta paginacion:
+
+```typescript
+type PersonLeaveFacet = {
+  balances: LeaveBalance[]                            // siempre completo (max ~10 tipos)
+  recentRequests: LeaveRequestSummary[]               // paginado
+  recentRequestsPagination: { total: number; limit: number; offset: number; hasMore: boolean }
+  summary: LeavesSummary
+}
+```
+
+Query params en el endpoint: `leave.requests.limit=5&leave.requests.offset=0`
+
+Default limits por sub-coleccion:
+
+| Coleccion | Default | Max |
+|-----------|---------|-----|
+| `assignments[].teamMembers` | 10 | 50 |
+| `leave.recentRequests` | 5 | 50 |
+| `delivery.ownedProjects` | 10 | 50 |
+| `costs.allocationsBySpace` | 20 | 100 |
+
+### Phase E — Observability & Temporal
+
+#### Slice 12 — Observability: tracing por faceta
+
+Cada invocacion del resolver registra:
+
+```typescript
+type ResolverTrace = {
+  traceId: string
+  profileId: string
+  requestedFacets: string[]
+  resolvedFacets: string[]
+  deniedFacets: string[]
+  timingMs: Record<string, number>
+  totalMs: number
+  cacheHits: number
+  cacheMisses: number
+  errors: { facet: string; error: string }[]
+  requesterUserId: string
+  timestamp: string
+}
+```
+
+- Logging: `console.info('[person-360-resolver]', JSON.stringify(trace))` — capturado por Vercel runtime logs
+- Metricas: si una faceta excede su p95 (ej: payroll > 200ms), se registra como warning
+- Dashboard: `/admin/ops/360-health` muestra p50/p95/p99 de cada faceta (futuro, via Vercel log drain)
+
+#### Slice 13 — Point-in-time queries (temporal)
+
+Facetas que soportan consulta historica reciben `asOf?: string` (ISO date):
+
+| Faceta | Point-in-time soportado | Mecanismo |
+|--------|------------------------|-----------|
+| `payroll` | Si | `WHERE period_year = EXTRACT(YEAR FROM $asOf) AND period_month = EXTRACT(MONTH FROM $asOf)` |
+| `costs` | Si | `WHERE period_year/period_month` del `asOf` |
+| `delivery` | Si | `WHERE period_year/period_month` del `asOf` via `person_operational_360` |
+| `leave` | Parcial | `WHERE year = EXTRACT(YEAR FROM $asOf)` para balances |
+| `assignments` | Parcial | `WHERE start_date <= $asOf AND (end_date IS NULL OR end_date >= $asOf)` |
+| `identity` | No | siempre estado actual (snapshot historico requiere audit_events, futuro) |
+
+Query param: `GET /api/person/{id}/360?facets=payroll,costs&asOf=2026-03-15`
+
+### Phase F — Consumer Migration
+
+#### Slice 14 — Migrar MyProfileView al resolver
 
 Reescribir `MyProfileView` para usar un solo fetch:
 
@@ -210,49 +383,32 @@ Reescribir `MyProfileView` para usar un solo fetch:
 GET /api/person/me/360?facets=identity,assignments,leave,organization
 ```
 
-Donde `me` se resuelve al `identity_profile_id` del usuario autenticado.
+Elimina los 4 fetches paralelos actuales.
 
-Elimina los 4 fetches paralelos actuales (`/api/my/profile`, `/api/my/assignments`, `/api/my/leave`, `/api/my/organization/members`).
+#### Slice 15 — Migrar Admin User Detail al resolver
 
-### Slice 6 — Migrar Admin User Detail al resolver
+Reescribir `getPersonDetailFromPostgres()` y relacionadas para usar:
 
-Reescribir las queries de `getPersonDetailFromPostgres()` y relacionadas para usar el resolver con todas las facetas.
+```
+GET /api/person/{profileId}/360?facets=identity,assignments,leave,payroll,delivery,costs,organization
+```
 
-### Slice 7 — Centralizar `resolveAvatarUrl`
+#### Slice 16 — Migrar People Detail al resolver
 
-Mover `resolveAvatarUrl` a `src/lib/person-360/resolve-avatar.ts` y eliminar las 3 copias actuales. Todos los facets y APIs importan de ahi.
+Reescribir la vista de People Detail para consumir el endpoint 360.
 
 ## Out of Scope
 
-- Crear tablas nuevas o materialized views — esto es un serving layer sobre datos existentes
-- Migrar BigQuery data a PostgreSQL — se sigue usando el patron PG first, BQ fallback
-- API publica/externa — el endpoint es solo para consumo interno del portal
-- Caching layer (Redis, etc.) — optimizacion futura si se necesita
+- Redis / external cache — in-memory es suficiente para la escala actual, preparado para Redis si se necesita
+- GraphQL — los facets son el building block; GraphQL es una capa futura sobre el mismo resolver
 - Reescribir `person_360` VIEW — se reutiliza tal cual como faceta identity
-- Migrar TODAS las vistas de persona en un solo PR — se hace incremental por slice
+- API publica/externa — solo consumo interno del portal
+- Migrar TODAS las vistas en un solo PR — incremental por phase/slice
+- Real-time subscriptions (WebSocket) — futuro sobre cache invalidation
 
 ## Detailed Spec
 
-### Facet Registry Pattern
-
-```typescript
-const FACET_REGISTRY: Record<PersonFacetName, FacetFetcher> = {
-  identity: { fetch: fetchIdentityFacet, requiresMemberId: false },
-  assignments: { fetch: fetchAssignmentsFacet, requiresMemberId: true },
-  organization: { fetch: fetchOrganizationFacet, requiresMemberId: false },
-  leave: { fetch: fetchLeaveFacet, requiresMemberId: true },
-  payroll: { fetch: fetchPayrollFacet, requiresMemberId: true },
-  delivery: { fetch: fetchDeliveryFacet, requiresMemberId: true },
-  costs: { fetch: fetchCostsFacet, requiresMemberId: true },
-  staffAug: { fetch: fetchStaffAugFacet, requiresMemberId: true },
-}
-```
-
-Agregar una faceta nueva es agregar un archivo en `facets/` y registrarlo. El resolver no cambia.
-
 ### Resolution de identidad flexible
-
-El endpoint acepta multiples identificadores:
 
 | Input | Resolucion |
 |-------|-----------|
@@ -262,21 +418,32 @@ El endpoint acepta multiples identificadores:
 | `eo_id` (`EO-ID0001`) | `identity_profiles.public_id` |
 | `me` | `tenant.identityProfileId` del session |
 
+### Sensitivity Levels
+
+| Level | Significado | Quien puede ver |
+|-------|------------|-----------------|
+| `public` | Nombre, cargo, departamento, avatar | cualquier usuario autenticado |
+| `internal` | Asignaciones, delivery metrics | misma organizacion |
+| `personal` | Leave requests, balances | self + HR + admin |
+| `confidential` | Salario, costos, compensation | self + admin + finance |
+
 ### Datos de cada faceta
 
-**identity**: resolvedDisplayName, resolvedEmail, resolvedPhone, resolvedAvatarUrl, resolvedJobTitle, departmentName, jobLevel, employmentType, hireDate, hasMemberFacet, hasUserFacet, hasCrmFacet, linkedSystems[], activeRoleCodes[], eoId
+**identity**: resolvedDisplayName, resolvedEmail, resolvedPhone, resolvedAvatarUrl, resolvedJobTitle, departmentName, jobLevel, employmentType, hireDate, contractType, payRegime, locationCity, locationCountry, timezone, hasMemberFacet, hasUserFacet, hasCrmFacet, linkedSystems[], activeRoleCodes[], eoId, biography, seniorityLevel
 
-**assignments**: assignmentId, clientId, clientName, fteAllocation, hoursPerMonth, roleTitle, startDate, endDate, active, teamMembers[{name, avatarUrl}]
+**assignments**: assignmentId, clientId, clientName, fteAllocation, hoursPerMonth, contractedHoursMonth, roleTitle, assignmentType, startDate, endDate, active, teamMembers[{name, avatarUrl}]
 
-**organization**: memberships[{membershipId, organizationId, organizationName, spaceName, membershipType, roleLabel, department, isPrimary}], primaryOrganization{id, name, legalName}
+**organization**: memberships[{membershipId, organizationId, organizationName, spaceName, spaceType, membershipType, roleLabel, department, isPrimary, startDate}], primaryOrganization{id, publicId, name, legalName, industry, country}
 
-**leave**: balances[{leaveTypeCode, leaveTypeName, year, allowance, used, reserved, available}], recentRequests[{requestId, leaveTypeName, startDate, endDate, requestedDays, status, startPeriod, endPeriod}], summary{totalPending, totalApproved, totalUsedThisYear}
+**leave**: balances[{leaveTypeCode, leaveTypeName, year, allowance, progressiveExtra, carriedOver, adjustments, used, reserved, available}], recentRequests[{requestId, leaveTypeName, startDate, endDate, requestedDays, status, startPeriod, endPeriod, reason, createdAt}], recentRequestsPagination{total, limit, offset, hasMore}, summary{totalPending, totalApproved, totalUsedThisYear, totalAvailableVacation}
 
-**payroll**: currentCompensation{currency, baseSalary, remoteAllowance, totalComp, payRegime, contractType}, lastEntry{periodYear, periodMonth, grossTotal, netTotal, status}
+**payroll**: currentCompensation{currency, baseSalary, remoteAllowance, colacion, movilizacion, fixedBonus, totalComp, payRegime, contractType, afpName, healthSystem, effectiveFrom}, lastEntry{periodYear, periodMonth, grossTotal, netTotal, status, workingDays, daysPresent, daysAbsent, daysOnLeave}, compensationHistory[{version, effectiveFrom, baseSalary, currency, changeReason}]
 
-**delivery**: icoMetrics{rpaAvg, otdPct, throughputCount, cycleTimeAvg}, projectCount, activeTaskCount, completedTaskCount, ownedProjects[{name, status, clientName}]
+**delivery**: icoMetrics{rpaAvg, rpaMedian, otdPct, ftrPct, throughputCount, cycleTimeAvg, pipelineVelocity, stuckAssetCount}, projectCount, activeTaskCount, completedTaskCount, overdueTaskCount, ownedProjects[{name, status, clientName, onTimePct, avgRpa}]
 
-**costs**: currentPeriod{year, month, loadedCostTarget, costPerHour, utilizationPct, capacityHealth}, allocationsBySpace[{clientName, fteContribution, commercialLoadedCost}]
+**costs**: currentPeriod{year, month, loadedCostTarget, laborCostTarget, directOverhead, sharedOverhead, costPerHour, utilizationPct, capacityHealth, contractedHours, assignedHours, usedHours}, allocationsBySpace[{clientName, fteContribution, commercialLoadedCost, allocationRatio}]
+
+**staffAug**: placements[{placementId, clientName, organizationName, status, lifecycleStage, billingRate, billingCurrency, contractStart, contractEnd, requiredSkills, matchedSkills}], activePlacementCount
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -284,45 +451,76 @@ El endpoint acepta multiples identificadores:
 
 ## Acceptance Criteria
 
+### Phase A — Core Resolver
 - [ ] `getPersonComplete360('identity-xxx', ['identity'])` retorna datos equivalentes a `person_360` actual
-- [ ] `getPersonComplete360('identity-xxx', ['identity', 'assignments'])` retorna asignaciones con team members y avatares resueltos
-- [ ] `getPersonComplete360('identity-xxx', ['identity', 'leave'])` retorna saldos y solicitudes recientes
-- [ ] `getPersonComplete360('identity-xxx', ['identity', 'payroll'])` retorna compensacion actual y ultima liquidacion
-- [ ] `getPersonComplete360('identity-xxx', ['identity', 'delivery'])` retorna metricas ICO y conteos de proyectos/tareas
-- [ ] `getPersonComplete360('identity-xxx', ['identity', 'costs'])` retorna cost attribution y capacity economics
-- [ ] `getPersonComplete360('identity-xxx', ['identity', 'organization'])` retorna memberships organizacionales
-- [ ] `GET /api/person/me/360?facets=identity,assignments,leave` retorna datos correctos para el usuario autenticado
-- [ ] `GET /api/person/{profileId}/360?facets=identity` funciona con profile_id, member_id, user_id, y eo_id
-- [ ] MyProfileView usa un solo fetch al endpoint 360 (no 4 fetches separados)
+- [ ] Todas las 8 facetas retornan datos correctos cuando se solicitan
+- [ ] `_meta` incluye timing por faceta, facetsRequested, facetsResolved, resolverVersion
+- [ ] Si una faceta falla, las demas siguen — el error se reporta en `_meta.errors[]`
+- [ ] `GET /api/person/{id}/360` acepta profile_id, member_id, user_id, eo_id, y `me`
+- [ ] Response headers incluyen `X-Resolver-Version`, `X-Cache-Status`, `X-Timing-Ms`
 - [ ] `resolveAvatarUrl` centralizada en un solo archivo, sin copias
+
+### Phase B — Enterprise Authorization
+- [ ] Collaborator de misma org NO puede ver facetas `payroll` ni `costs` de otro colega
+- [ ] HR manager de misma org SI puede ver faceta `payroll` (sin `costs`)
+- [ ] Admin puede ver TODAS las facetas de cualquier persona
+- [ ] Self (`me`) puede ver TODAS sus propias facetas
+- [ ] Cliente solo puede ver `identity` + `assignments` + `delivery` de miembros asignados
+- [ ] Campos redactados se reemplazan con `null` y se listan en `_meta.redactedFields`
+- [ ] Facetas denegadas se listan en `_meta.deniedFacets` con reason
+
+### Phase C — Caching
+- [ ] Facetas con TTL activo retornan `cacheStatus: 'hit'` en `_meta`
+- [ ] Cache invalidation funciona: al crear leave request, faceta `leave` se invalida
+- [ ] `cache=bypass` query param fuerza fresh data
+- [ ] Stale-while-revalidate: retorna stale + dispara revalidation en background
+
+### Phase D — Bulk & Pagination
+- [ ] `POST /api/persons/360` con 30 profileIds retorna datos correctos en batch
+- [ ] Sub-colecciones respetan `limit` y `offset` parameters
+- [ ] `recentRequestsPagination.hasMore` reporta correctamente si hay mas items
+
+### Phase E — Observability & Temporal
+- [ ] Cada request logea `ResolverTrace` en Vercel runtime logs
+- [ ] `asOf` parameter retorna datos del periodo solicitado (payroll, costs, delivery)
+- [ ] Faceta con p95 > threshold se registra como warning
+
+### Phase F — Consumer Migration
+- [ ] MyProfileView usa un solo fetch al endpoint 360
+- [ ] Admin User Detail usa el endpoint 360
+- [ ] People Detail usa el endpoint 360
 - [ ] `pnpm build`, `pnpm lint` pasan sin errores
 
 ## Verification
 
-- `pnpm build`
-- `pnpm lint`
-- `npx tsc --noEmit`
-- Verificacion E2E: navegar a `/my/profile` como usuario interno, verificar que todos los datos cargan desde el endpoint 360
-- Verificacion: `pnpm staging:request /api/person/me/360?facets=identity,assignments,leave,organization`
-- Verificacion: agregar una faceta nueva (mock) para confirmar que el patron de registro funciona sin modificar el resolver
+- `pnpm build` + `pnpm lint` + `npx tsc --noEmit`
+- Verificacion E2E per phase:
+  - Phase A: `pnpm staging:request /api/person/me/360?facets=identity,assignments,leave,organization` — datos correctos
+  - Phase B: request como collaborator pidiendo `payroll` → denied en `_meta`; request como admin → allowed
+  - Phase C: request 2 veces rapido → segundo retorna `cacheStatus: 'hit'`; crear leave request → tercer request retorna `cacheStatus: 'miss'`
+  - Phase D: `POST /api/persons/360` con 10 ids → 10 resultados; `leave.requests.limit=2` → max 2 requests
+  - Phase E: verificar logs en Vercel contienen `ResolverTrace`; `?asOf=2026-03-01&facets=payroll` → datos de marzo
+  - Phase F: navegar a `/my/profile` — Network tab muestra 1 request al endpoint 360 (no 4)
 
 ## Closing Protocol
 
-- [ ] Actualizar `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md` con la arquitectura del resolver federado
-- [ ] Actualizar `docs/architecture/GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md` con el endpoint 360
+- [ ] Actualizar `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md` con la arquitectura completa del resolver federado
+- [ ] Crear `docs/architecture/GREENHOUSE_PERSON_COMPLETE_360_V1.md` — spec dedicada del serving layer
 - [ ] Actualizar `docs/documentation/plataforma/mi-perfil.md` con el nuevo data source
 - [ ] Marcar TASK-011 (ICO Person 360 Integration) como subsumida
+- [ ] Deprecar `getPersonFinanceOverviewFromPostgres()`, `getPersonDetailFromPostgres()`, `getPersonRuntimeProfile()` con JSDoc `@deprecated`
 
 ## Follow-ups
 
-- Cache layer: si el endpoint 360 es lento con todas las facetas, agregar cache per-facet con TTL
-- Streaming: para vistas que muestran datos parciales progresivamente, considerar streaming de facetas
-- Webhooks: cuando una faceta cambia (nuevo payroll entry, nueva asignacion), emitir evento para invalidar cache
-- GraphQL: si los consumers necesitan granularidad sub-faceta, considerar un resolver GraphQL sobre las mismas facetas
-- Person 360 VIEW v3: si las facetas de identidad se quedan cortas, extender la VIEW con los ~25 campos de `members` que faltan
+- Redis cache: cuando la escala requiera cache distribuido, migrar `facet-cache.ts` de in-memory a Redis
+- GraphQL: los facets son el building block para un resolver GraphQL sobre las mismas facetas
+- Person 360 VIEW v3: extender la VIEW con los ~25 campos de `members` que faltan
+- Real-time subscriptions: WebSocket push cuando una faceta cambia
+- Audit trail: registrar en `audit_events` quien consulto que facetas de quien
+- Cross-object: persona → sus organizaciones → economics de cada una (requiere TASK-274)
 
 ## Open Questions
 
-- Performance: con todas las facetas, cuantas queries paralelas son? Estimar ~7 queries concurrentes. Verificar que PG pool size lo soporte.
-- Auth: un usuario puede consultar el 360 de otro usuario? Propuesta: si, pero solo para usuarios de la misma organizacion. Admin puede consultar cualquiera.
-- Facetas de solo-lectura vs facetas mutables: delivery metrics son calculadas, payroll es sensible. Considerar field-level visibility por rol.
+- Performance: con todas las facetas, son ~8 queries paralelas. PG pool default es 20 connections. Con 10 usuarios concurrentes son 80 queries simultaneas — verificar pool sizing.
+- Cache TTL tuning: los defaults propuestos (identity 5min, payroll 1h) son estimaciones. Ajustar basado en metricas reales post-deploy.
+- Field redaction granularity: redactar `baseSalary` pero mostrar `totalComp` range? O todo-o-nada per faceta? Propuesta: per-field, no per-faceta.
