@@ -6,6 +6,50 @@
 
 ---
 
+## Delta 2026-04-07 — HubSpot Quotes bidirectional integration (TASK-210)
+
+`greenhouse_finance.quotes` es ahora multi-source. Nuevas columnas: `source_system` (`nubox`/`hubspot`/`manual`), `hubspot_quote_id`, `hubspot_deal_id`, `hubspot_last_synced_at`.
+
+### Inbound (HubSpot → Greenhouse)
+
+- Cloud Run service `hubspot-greenhouse-integration` expone `GET /companies/{id}/quotes`
+- Client: `getHubSpotGreenhouseCompanyQuotes()` en `src/lib/integrations/hubspot-greenhouse-service.ts`
+- Sync: `syncAllHubSpotQuotes()` en `src/lib/hubspot/sync-hubspot-quotes.ts`
+- Cron: `GET /api/cron/hubspot-quotes-sync` cada 6 horas, con readiness gate
+- Identity resolution: `hubspot_company_id` → `organization_id` → `space_id` + `client_id`
+- ID format: `QUO-HS-{hubspot_quote_id}` (coexiste con `QUO-NB-{nubox_sale_id}`)
+- Status mapping: HubSpot `hs_status` → Greenhouse normalized (`DRAFT`→`draft`, `APPROVAL_NOT_NEEDED`→`sent`, etc.)
+
+### Outbound (Greenhouse → HubSpot)
+
+- Cloud Run service expone `POST /quotes` (crea quote + line items + asociaciones)
+- Client: `createHubSpotGreenhouseQuote()` en `src/lib/integrations/hubspot-greenhouse-service.ts`
+- Logic: `createHubSpotQuote()` en `src/lib/hubspot/create-hubspot-quote.ts`
+- API: `POST /api/finance/quotes/hubspot` con validacion
+- Patron: resolver org → call Cloud Run → persist local → outbox event (transaccional)
+
+### API update
+
+- `GET /api/finance/quotes` ahora devuelve `source`, `hubspotQuoteId`, `hubspotDealId`
+- Nuevo query param: `?source=hubspot|nubox|manual`
+- `isFromNubox` se mantiene como campo derivado de backward compat
+
+### Outbox events
+
+- `finance.quote.synced` — inbound sync desde HubSpot
+- `finance.quote.created` — outbound creation hacia HubSpot (con `direction: 'outbound'`)
+
+### Archivos clave
+
+| Archivo | Funcion |
+|---------|---------|
+| `migrations/20260407182811937_add-hubspot-quotes-columns.sql` | DDL + backfill |
+| `src/lib/hubspot/sync-hubspot-quotes.ts` | Inbound sync |
+| `src/lib/hubspot/create-hubspot-quote.ts` | Outbound create |
+| `src/app/api/cron/hubspot-quotes-sync/route.ts` | Cron endpoint |
+| `src/app/api/finance/quotes/hubspot/route.ts` | POST outbound API |
+| `scripts/backfill-hubspot-quotes.ts` | Backfill one-time |
+
 ## Delta 2026-04-05 — schema drift in Finance lists now surfaces as explicit degraded payload
 
 Las routes Finance que antes respondían vacío ante `relation/column does not exist` ya no deben ocultar drift de schema como si fuera ausencia sana de datos.

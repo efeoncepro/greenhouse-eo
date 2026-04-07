@@ -47,6 +47,14 @@ Mutacion en store
 | `exchange_rate` | `exchange_rate.updated` | `finance/postgres-store-slice2.ts` | `{ currency, rate }` | — |
 | `economic_indicator` | `finance.economic_indicator.upserted` | `finance/postgres-store.ts` | `{ indicatorId, indicatorCode, indicatorDate, value, source }` | `member_capacity_economics`, `person_intelligence`, futuros consumers de forecast laboral/financiero |
 
+### Quotes (TASK-210)
+
+| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
+|---|---|---|---|---|
+| `quote` | `finance.quote.created` | `hubspot/create-hubspot-quote.ts` | `{ quoteId, hubspotQuoteId, sourceSystem, direction, organizationId, amount, currency }` | — |
+| `quote` | `finance.quote.synced` | `hubspot/sync-hubspot-quotes.ts` | `{ quoteId, hubspotQuoteId, hubspotDealId, sourceSystem, action, organizationId, spaceId }` | — |
+| `quote` | `finance.quote.converted` | (futuro: quote → invoice bridge) | `{ quoteId, incomeId }` | — |
+
 ### Nubox
 
 | Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |

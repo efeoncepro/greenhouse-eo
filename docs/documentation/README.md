@@ -21,7 +21,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 
 ### Finanzas
 
-_Pendiente de documentar._
+- [Cotizaciones multi-source](finance/cotizaciones-multi-source.md) — cotizaciones de Nubox y HubSpot unificadas, sync automatico, creacion outbound, mapeo de estados
 
 ### HR y Nomina
 
