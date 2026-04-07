@@ -81,7 +81,7 @@ Agregada columna `metadata JSONB DEFAULT '{}'` a la definición de `notification
 
 ## Estado
 
-open — fix implementado en código local, pendiente de commit, deploy y verificación en ambiente.
+resolved — fix committeado en `develop` (commit `b06e0340`), verificado en staging. Resolución: 2026-04-07.
 
 ## Relacionado
 

@@ -7,6 +7,7 @@ import {
   readMemberCapacityEconomicsSnapshot
 } from '@/lib/member-capacity-economics/store'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { resolveAvatarUrl } from '@/lib/person-360/resolve-avatar'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,13 +19,6 @@ interface SpaceTeamMemberRow extends Record<string, unknown> {
   display_name: string | null
   avatar_url: string | null
   user_id: string | null
-}
-
-const resolveAvatarUrl = (avatarUrl: string | null, userId: string | null): string | null => {
-  if (!avatarUrl) return null
-  if (avatarUrl.startsWith('gs://') && userId) return `/api/media/users/${userId}/avatar`
-
-  return avatarUrl
 }
 
 /** For a list of client_ids, fetch all active team members with name + avatar from person_360 */

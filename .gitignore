@@ -62,6 +62,6 @@ src/assets/iconify-icons/generated-icons.css
 .codex/skills/greenhouse-vuexy-ui-expert/
 /CODEX_TASK_*.md
 !docs/tasks/**/CODEX_TASK*.md
-src/lib/ai/
+# Legacy AI skill artifacts (not the src/lib/ai/ module which is tracked)
 
 .vercel

@@ -15,19 +15,34 @@ type Props = {
   designation: string | null
   department: string | null
   joiningDate: string | null
+  bannerUrl?: string | null
 }
 
-const MyProfileHeader = ({ fullName, avatarUrl, designation, department, joiningDate }: Props) => {
+const MyProfileHeader = ({ fullName, avatarUrl, designation, department, joiningDate, bannerUrl }: Props) => {
   return (
     <Card>
-      <div
-        className='bs-[200px]'
-        style={{
-          background:
-            'linear-gradient(135deg, var(--mui-palette-primary-main) 0%, var(--mui-palette-primary-darkChannel) 50%, var(--mui-palette-info-main) 100%)',
-          opacity: 0.85
-        }}
-      />
+      {bannerUrl ? (
+        <img
+          src={bannerUrl}
+          alt=''
+          draggable={false}
+          style={{
+            width: '100%',
+            height: 200,
+            objectFit: 'cover',
+            objectPosition: 'center',
+            display: 'block'
+          }}
+        />
+      ) : (
+        <div
+          className='bs-[200px]'
+          style={{
+            background:
+              'linear-gradient(135deg, var(--mui-palette-primary-main) 0%, var(--mui-palette-primary-darkChannel) 50%, var(--mui-palette-info-main) 100%)'
+          }}
+        />
+      )}
       <CardContent className='flex gap-5 justify-center flex-col items-center md:items-end md:flex-row !pt-0 md:justify-start'>
         <div className='flex rounded-bs-md mbs-[-40px] border-[5px] mis-[-5px] border-be-0 border-backgroundPaper bg-backgroundPaper'>
           {avatarUrl ? (
@@ -42,9 +57,9 @@ const MyProfileHeader = ({ fullName, avatarUrl, designation, department, joining
             </CustomAvatar>
           )}
         </div>
-        <div className='flex is-full justify-start self-end flex-col items-center gap-6 sm-gap-0 sm:flex-row sm:justify-between sm:items-end'>
+        <div className='flex is-full justify-start self-end flex-col items-center gap-6 sm-gap-0 sm:flex-row sm:justify-between sm:items-end' style={{ marginTop: 8 }}>
           <div className='flex flex-col items-center sm:items-start gap-2'>
-            <Typography variant='h4'>{fullName}</Typography>
+            <Typography variant='h4' sx={{ mt: 1 }}>{fullName}</Typography>
             <div className='flex flex-wrap gap-6 justify-center sm:justify-normal'>
               {designation && (
                 <div className='flex items-center gap-2'>

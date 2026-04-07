@@ -1,5 +1,19 @@
 # Greenhouse 360 Object Model V1
 
+## Delta 2026-04-07 — Person Complete 360 Federated Resolver implementado (TASK-273)
+
+- **Person Complete 360** es ahora un resolver federado (`getPersonComplete360`) que consolida toda la data de una persona bajo un solo entry point con 8 facetas on-demand.
+- Las facetas son: `identity`, `assignments`, `organization`, `leave`, `payroll`, `delivery`, `costs`, `staffAug`.
+- Regla: los consumidores de datos de persona deben usar el resolver 360, no queries directas a tablas individuales.
+- Regla: `resolveAvatarUrl` centralizado en `src/lib/person-360/resolve-avatar.ts` — no crear copias.
+- Regla: nuevas facetas se agregan como modulos en `src/lib/person-360/facets/` + registro en `FACET_REGISTRY`.
+- El resolver resuelve `profile_id -> member_id` una sola vez y pasa el contexto a todas las facetas.
+- Autorizacion per-facet con field-level redaction basada en relacion (self/same_org/different_org) x rol x tenant_type.
+- Cache in-memory per-facet con TTL, stale-while-revalidate, invalidacion via outbox events. Preparado para Redis (TASK-276).
+- Endpoints: `GET /api/person/{id}/360` + `POST /api/persons/360` (bulk).
+- Spec dedicada: `docs/architecture/GREENHOUSE_PERSON_COMPLETE_360_V1.md`.
+- Siguiente paso: TASK-274 replica el mismo patron para Account/Organization Complete 360.
+
 ## Delta 2026-04-05 — Organization, Space y Space 360 formalizados (TASK-195)
 
 - `Organization` es la cuenta canónica (entrypoint admin principal)

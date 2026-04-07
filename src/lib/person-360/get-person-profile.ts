@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { resolveAvatarUrl } from '@/lib/person-360/resolve-avatar'
 import type { Person360, PersonProfileSummary } from '@/types/person-360'
 
 type Person360Row = {
@@ -213,17 +214,6 @@ export const getPersonProfileByUserId = async (userId: string): Promise<Person36
   )
 
   return rows[0] ? normalizeRow(rows[0]) : null
-}
-
-/**
- * Resolve an avatar URL for the frontend.
- * Stored as gs:// in the DB; served via /api/media/users/{userId}/avatar proxy.
- */
-const resolveAvatarUrl = (avatarUrl: string | null, userId: string | null): string | null => {
-  if (!avatarUrl) return null
-  if (avatarUrl.startsWith('gs://') && userId) return `/api/media/users/${userId}/avatar`
-
-  return avatarUrl
 }
 
 /** Flat projection of Person360 for self-service profile views */

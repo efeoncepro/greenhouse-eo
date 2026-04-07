@@ -1,5 +1,28 @@
 # project_context.md
 
+## Delta 2026-04-07 AI Visual Asset Generator + Profile Banners (TASK-278)
+
+- `generateImage()` y `generateAnimation()` en `src/lib/ai/image-generator.ts` son el entry point para generar assets visuales durante el desarrollo.
+- Motor de imagenes: **Imagen 4** (`imagen-4.0-generate-001`), configurable via `IMAGEN_MODEL` env var.
+- Motor de animaciones: **Gemini** (ultimo modelo via `resolveNexaModel()`), genera SVG con CSS keyframes + `prefers-reduced-motion`.
+- Regla: **los banners de perfil se resuelven via `resolveProfileBanner(roleCodes, departmentName)`** en `src/lib/person-360/resolve-banner.ts`. No hardcodear paths de banner.
+- Regla: **endpoints de generacion deshabilitados en production** por defecto. Override: `ENABLE_ASSET_GENERATOR=true`.
+- 7 categorias de banner: leadership, operations, creative, technology, strategy, support, default.
+- Fuente canonica: `docs/architecture/GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md`.
+
+## Delta 2026-04-07 Person Complete 360 — serving federado por facetas (TASK-273)
+
+- `getPersonComplete360(identifier, facets[])` es el unico entry point server-side para obtener datos completos de una persona. Los consumidores NO deben hacer queries directas a tablas de persona — deben usar el resolver.
+- 8 facetas: identity, assignments, organization, leave, payroll, delivery, costs, staffAug. Cada faceta es un modulo independiente en `src/lib/person-360/facets/`.
+- Regla: **nuevas facetas se agregan como modulos en `facets/` + registro en FACET_REGISTRY**. No modificar el resolver core.
+- Regla: **resolveAvatarUrl centralizado en `src/lib/person-360/resolve-avatar.ts`**. No crear copias locales.
+- Regla: **resolucion `profile_id -> member_id` ocurre una sola vez** en el resolver. Las facetas reciben `FacetFetchContext` con ambos IDs pre-resueltos.
+- Autorizacion per-facet en `facet-authorization.ts`: self ve todo, admin ve todo, collaborator ve identity+assignments+organization+delivery, HR ve todo menos costs, client ve identity+assignments+delivery.
+- Cache in-memory per-facet con TTL (identity 5min, payroll 1h, leave 2min). Preparado para Redis (TASK-276).
+- Endpoints: `GET /api/person/{id}/360?facets=...` y `POST /api/persons/360` (bulk).
+- `_meta` en cada response: timing por faceta, cacheStatus, errores, deniedFacets, redactedFields.
+- Fuente canonica: `docs/architecture/GREENHOUSE_PERSON_COMPLETE_360_V1.md`.
+
 ## Delta 2026-04-06 Vuexy upstream documentado en repo ecosystem
 
 - `pixinvent/vuexy-nextjs-admin-template` queda registrado como upstream de referencia del starter/theme Vuexy que Greenhouse adapta en este portal.

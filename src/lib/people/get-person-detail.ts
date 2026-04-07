@@ -630,6 +630,12 @@ const getIdentityProvidersByProfile = async (identityProfileId: string | null): 
   return getIdentityProvidersByProfileFromBigQuery(identityProfileId)
 }
 
+/**
+ * @deprecated For new consumers, use `getPersonComplete360(identifier, { facets: [...] })`
+ * from `@/lib/person-360/person-complete-360` instead. The federated 360 resolver provides
+ * unified identity resolution, per-facet authorization, caching, and observability (TASK-273).
+ * This function remains in use by the People Detail view until its incremental migration.
+ */
 export const getPersonDetail = async ({
   memberId: memberIdOrEoId,
   access,
