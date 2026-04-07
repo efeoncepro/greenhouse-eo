@@ -13,18 +13,17 @@ import type {
 
 type PlacementRow = {
   placement_id: string
-  placement_name: string | null
   member_name: string | null
   member_avatar_url: string | null
   user_id: string | null
   organization_name: string | null
   status: string
   lifecycle_stage: string | null
-  billing_rate: string | number | null
-  billing_currency: string | null
-  contract_start: string | null
-  contract_end: string | null
-  provider_type: string | null
+  billing_rate_amount: string | number | null
+  billing_rate_currency: string | null
+  contract_start_date: string | null
+  contract_end_date: string | null
+  provider_relationship_type: string | null
   required_skills: string | string[] | null
 }
 
@@ -74,23 +73,23 @@ export const fetchStaffAugFacet = async (
   const rows = await runGreenhousePostgresQuery<PlacementRow>(
     `SELECT
       p.placement_id,
-      p.placement_name,
       p360.resolved_display_name AS member_name,
       p360.resolved_avatar_url AS member_avatar_url,
       p360.user_id,
-      p.organization_name,
+      o.organization_name,
       p.status,
       p.lifecycle_stage,
-      p.billing_rate,
-      p.billing_currency,
-      p.contract_start::text,
-      p.contract_end::text,
-      p.provider_type,
+      p.billing_rate_amount,
+      p.billing_rate_currency,
+      p.contract_start_date::text,
+      p.contract_end_date::text,
+      p.provider_relationship_type,
       p.required_skills
     FROM greenhouse_delivery.staff_aug_placements p
     LEFT JOIN greenhouse_serving.person_360 p360 ON p360.member_id = p.member_id
+    LEFT JOIN greenhouse_core.organizations o ON o.organization_id = p.organization_id
     WHERE p.space_id = ANY($1)
-    ORDER BY p.contract_start DESC NULLS LAST
+    ORDER BY p.contract_start_date DESC NULLS LAST
     LIMIT $2`,
     [scope.spaceIds, limit]
   )
@@ -103,11 +102,11 @@ export const fetchStaffAugFacet = async (
     organizationName: row.organization_name,
     status: row.status,
     lifecycleStage: row.lifecycle_stage,
-    billingRate: row.billing_rate != null ? toNum(row.billing_rate) : null,
-    billingCurrency: row.billing_currency,
-    contractStart: row.contract_start,
-    contractEnd: row.contract_end,
-    providerType: row.provider_type,
+    billingRate: row.billing_rate_amount != null ? toNum(row.billing_rate_amount) : null,
+    billingCurrency: row.billing_rate_currency,
+    contractStart: row.contract_start_date,
+    contractEnd: row.contract_end_date,
+    providerType: row.provider_relationship_type,
     requiredSkills: parseSkills(row.required_skills)
   }))
 
@@ -121,18 +120,18 @@ export const fetchStaffAugFacet = async (
 
     if (isActive) activePlacementCount++
 
-    const rate = row.billing_rate != null ? toNum(row.billing_rate) : 0
+    const rate = row.billing_rate_amount != null ? toNum(row.billing_rate_amount) : 0
 
     totalBillingRate += rate
 
-    if (row.billing_currency && rate > 0) {
-      const entry = currencyMap.get(row.billing_currency)
+    if (row.billing_rate_currency && rate > 0) {
+      const entry = currencyMap.get(row.billing_rate_currency)
 
       if (entry) {
         entry.totalRate += rate
         entry.count += 1
       } else {
-        currencyMap.set(row.billing_currency, { totalRate: rate, count: 1 })
+        currencyMap.set(row.billing_rate_currency, { totalRate: rate, count: 1 })
       }
     }
   }

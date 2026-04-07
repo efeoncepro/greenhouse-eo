@@ -13,7 +13,7 @@ import type {
 type ServiceRow = {
   service_id: string
   public_id: string | null
-  service_name: string
+  name: string
   linea_de_servicio: string | null
   servicio_especifico: string | null
   modalidad: string | null
@@ -21,7 +21,7 @@ type ServiceRow = {
   target_end_date: string | null
   pipeline_stage: string
   billing_frequency: string | null
-  monthly_cost: string | number | null
+  total_cost: string | number | null
   currency: string | null
 }
 
@@ -73,7 +73,7 @@ export const fetchServicesFacet = async (
     `SELECT
       s.service_id,
       s.public_id,
-      s.service_name,
+      s.name,
       s.linea_de_servicio,
       s.servicio_especifico,
       s.modalidad,
@@ -81,7 +81,7 @@ export const fetchServicesFacet = async (
       s.target_end_date::text,
       s.pipeline_stage,
       s.billing_frequency,
-      s.monthly_cost,
+      s.total_cost,
       s.currency
     FROM greenhouse_core.services s
     WHERE s.space_id = ANY($1)
@@ -95,7 +95,7 @@ export const fetchServicesFacet = async (
   const activeServices: AccountServiceEntry[] = rows.map(row => ({
     serviceId: row.service_id,
     publicId: row.public_id,
-    name: row.service_name,
+    name: row.name,
     businessLine: row.linea_de_servicio,
     servicoEspecifico: row.servicio_especifico,
     modalidad: row.modalidad,
@@ -103,7 +103,7 @@ export const fetchServicesFacet = async (
     targetEndDate: row.target_end_date,
     status: mapStatus(row.pipeline_stage),
     billingFrequency: row.billing_frequency,
-    totalCost: row.monthly_cost != null ? toNum(row.monthly_cost) : null,
+    totalCost: row.total_cost != null ? toNum(row.total_cost) : null,
     currency: row.currency
   }))
 
@@ -115,7 +115,7 @@ export const fetchServicesFacet = async (
     const bl = row.linea_de_servicio ?? 'unclassified'
 
     byBusinessLine[bl] = (byBusinessLine[bl] ?? 0) + 1
-    totalRevenue += row.monthly_cost != null ? toNum(row.monthly_cost) : 0
+    totalRevenue += row.total_cost != null ? toNum(row.total_cost) : 0
   }
 
   return {

@@ -16,17 +16,17 @@ type CompanyRow = {
   company_name: string | null
   lifecycle_stage: string | null
   industry: string | null
-  website: string | null
-  owner_name: string | null
+  website_url: string | null
 }
 
 type DealRow = {
   deal_name: string
-  deal_stage: string | null
+  stage_name: string | null
   amount: string | number | null
   currency: string | null
   close_date: string | null
-  owner_name: string | null
+  is_closed_won: boolean
+  is_closed_lost: boolean
 }
 
 type CountRow = {
@@ -47,8 +47,6 @@ return Number.isFinite(n) ? n : 0 }
 return 0
 }
 
-const CLOSED_STAGES = new Set(['closedwon', 'closedlost'])
-
 // ── Facet ──
 
 export const fetchCrmFacet = async (
@@ -66,8 +64,7 @@ export const fetchCrmFacet = async (
         company_name,
         lifecycle_stage,
         industry,
-        website,
-        owner_name
+        website_url
       FROM greenhouse_crm.companies
       WHERE hubspot_company_id = $1
       LIMIT 1`,
@@ -76,11 +73,12 @@ export const fetchCrmFacet = async (
     runGreenhousePostgresQuery<DealRow>(
       `SELECT
         deal_name,
-        deal_stage,
+        stage_name,
         amount,
         currency,
         close_date::text,
-        owner_name
+        is_closed_won,
+        is_closed_lost
       FROM greenhouse_crm.deals
       WHERE hubspot_company_id = $1
       ORDER BY close_date DESC NULLS LAST
@@ -104,19 +102,19 @@ export const fetchCrmFacet = async (
         name: companyRow.company_name,
         lifecycleStage: companyRow.lifecycle_stage,
         industry: companyRow.industry,
-        website: companyRow.website,
-        ownerName: companyRow.owner_name
+        website: companyRow.website_url,
+        ownerName: null
       }
     : null
 
   // ── Deals ──
   const dealsPipeline: AccountCrmDeal[] = dealRows.map(row => ({
     dealName: row.deal_name,
-    stage: row.deal_stage,
+    stage: row.stage_name,
     amount: row.amount != null ? toNum(row.amount) : null,
     currency: row.currency,
     closeDate: row.close_date,
-    ownerName: row.owner_name
+    ownerName: null
   }))
 
   const currentYear = new Date().getFullYear()
@@ -126,13 +124,12 @@ export const fetchCrmFacet = async (
 
   for (const row of dealRows) {
     const amt = row.amount != null ? toNum(row.amount) : 0
-    const stage = (row.deal_stage ?? '').toLowerCase()
 
-    if (!CLOSED_STAGES.has(stage)) {
+    if (!row.is_closed_won && !row.is_closed_lost) {
       openDealAmount += amt
     }
 
-    if (stage === 'closedwon' && row.close_date) {
+    if (row.is_closed_won && row.close_date) {
       const year = new Date(row.close_date).getFullYear()
 
       if (year === currentYear) closedWonYTD += amt

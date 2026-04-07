@@ -125,13 +125,18 @@ export const getAccountComplete360 = async (
 
   if (!scope) return null
 
-  // 3. Authorization — determine what's allowed
+  // 3. Always include identity (mandatory facet)
+  const facetsWithIdentity = requestedFacets.includes('identity')
+    ? requestedFacets
+    : ['identity' as AccountFacetName, ...requestedFacets]
+
+  // 4. Authorization — determine what's allowed
   const authResult = authorizeAccountFacets({
     requesterRoleCodes,
     requesterTenantType,
     requesterOrganizationId,
     targetOrganizationId: scope.organizationId,
-    requestedFacets
+    requestedFacets: facetsWithIdentity
   })
 
   // 4. Build fetch context
