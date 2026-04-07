@@ -325,3 +325,5 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-273` | `to-do` | Person Complete 360: capa de serving federada por facetas | `docs/tasks/to-do/TASK-273-person-complete-360-federated-serving-layer.md` |
 | `TASK-274` | `to-do` | Account Complete 360: capa de serving federada por facetas | `docs/tasks/to-do/TASK-274-account-complete-360-federated-serving-layer.md` |
 | `TASK-275` | `to-do` | Notification Dispatch Correlation ID | `docs/tasks/to-do/TASK-275-notification-dispatch-correlation-id.md` |
+| `TASK-276` | `to-do` | Upstash Redis: cache distribuido para resolvers 360 | `docs/tasks/to-do/TASK-276-upstash-redis-distributed-cache.md` |
+| `TASK-277` | `to-do` | GraphQL API Layer sobre resolvers 360 | `docs/tasks/to-do/TASK-277-graphql-api-layer.md` |
