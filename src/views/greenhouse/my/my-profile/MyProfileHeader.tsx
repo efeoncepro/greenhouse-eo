@@ -21,15 +21,28 @@ type Props = {
 const MyProfileHeader = ({ fullName, avatarUrl, designation, department, joiningDate, bannerUrl }: Props) => {
   return (
     <Card>
-      <div
-        className='bs-[200px]'
-        style={{
-          background: bannerUrl
-            ? `url(${bannerUrl}) center/cover no-repeat`
-            : 'linear-gradient(135deg, var(--mui-palette-primary-main) 0%, var(--mui-palette-primary-darkChannel) 50%, var(--mui-palette-info-main) 100%)',
-          opacity: 0.85
-        }}
-      />
+      {bannerUrl ? (
+        <img
+          src={bannerUrl}
+          alt=''
+          draggable={false}
+          style={{
+            width: '100%',
+            height: 200,
+            objectFit: 'cover',
+            objectPosition: 'center',
+            display: 'block'
+          }}
+        />
+      ) : (
+        <div
+          className='bs-[200px]'
+          style={{
+            background:
+              'linear-gradient(135deg, var(--mui-palette-primary-main) 0%, var(--mui-palette-primary-darkChannel) 50%, var(--mui-palette-info-main) 100%)'
+          }}
+        />
+      )}
       <CardContent className='flex gap-5 justify-center flex-col items-center md:items-end md:flex-row !pt-0 md:justify-start'>
         <div className='flex rounded-bs-md mbs-[-40px] border-[5px] mis-[-5px] border-be-0 border-backgroundPaper bg-backgroundPaper'>
           {avatarUrl ? (
