@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { ROLE_CODES } from '@/config/role-codes'
+import { sendEmail } from '@/lib/email/delivery'
 import {
   getMemberNotificationRecipients,
   getProfileNotificationRecipient,
@@ -240,41 +241,105 @@ export const notificationProjection: ProjectionDefinition = {
     if (eventType === 'leave_request.created') {
       const requestId = typeof payload.requestId === 'string' ? payload.requestId : null
       const supervisorMemberId = typeof payload.supervisorMemberId === 'string' ? payload.supervisorMemberId : null
+      const memberId = typeof payload.memberId === 'string' ? payload.memberId : null
       const memberName = typeof payload.memberName === 'string' ? payload.memberName : 'Colaborador'
+      const memberEmail = typeof payload.memberEmail === 'string' ? payload.memberEmail : null
       const leaveTypeName = typeof payload.leaveTypeName === 'string' ? payload.leaveTypeName : 'Permiso'
-      const startDate = typeof payload.startDate === 'string' ? payload.startDate : null
-      const endDate = typeof payload.endDate === 'string' ? payload.endDate : null
+      const startDate = typeof payload.startDate === 'string' ? payload.startDate : ''
+      const endDate = typeof payload.endDate === 'string' ? payload.endDate : ''
+      const requestedDays = typeof payload.requestedDays === 'number' ? payload.requestedDays : 0
+      const reason = typeof payload.reason === 'string' ? payload.reason : null
 
-      const recipients = supervisorMemberId
+      const reviewerRecipients = supervisorMemberId
         ? [...(await getMemberNotificationRecipients([supervisorMemberId])).values()].filter(
           (recipient): recipient is PersonNotificationRecipient => recipient !== null
         )
         : await getHrReviewRecipients()
 
-      if (!requestId || recipients.length === 0) return null
+      if (!requestId) return null
 
-      await NotificationService.dispatch({
-        category: 'leave_review',
-        title: `${memberName} solicitó ${leaveTypeName}`,
-        body: startDate && endDate
-          ? `Revisar tramo ${startDate} al ${endDate}.`
-          : 'Hay una solicitud pendiente de revisión.',
-        actionUrl: '/hr/leave',
-        metadata: payload,
-        recipients
-      })
+      // In-app notification to reviewer (existing behavior)
+      if (reviewerRecipients.length > 0) {
+        await NotificationService.dispatch({
+          category: 'leave_review',
+          title: `${memberName} solicitó ${leaveTypeName}`,
+          body: startDate && endDate
+            ? `Revisar tramo ${startDate} al ${endDate}.`
+            : 'Hay una solicitud pendiente de revisión.',
+          actionUrl: '/hr/leave',
+          metadata: payload,
+          recipients: reviewerRecipients
+        })
+      }
 
-      return `notified ${recipients.length} recipients about leave_request.created`
+      // ── Email to the REQUESTER: confirmation of submission ──
+      const memberFirstName = memberName.split(' ')[0] || memberName
+
+      if (memberEmail) {
+        const memberRecipientMap = memberId ? await getMemberNotificationRecipients([memberId]) : new Map()
+        const memberRecipient = memberId ? memberRecipientMap.get(memberId) ?? null : null
+
+        await sendEmail({
+          emailType: 'leave_request_submitted',
+          domain: 'hr',
+          recipients: [{ email: memberEmail, name: memberName, userId: memberRecipient?.userId }],
+          context: {
+            memberFirstName,
+            leaveTypeName,
+            startDate,
+            endDate,
+            requestedDays,
+            reason
+          },
+          sourceEventId: requestId,
+          sourceEntity: 'leave_request_submitted'
+        }).catch(err => {
+          console.warn('[notifications] Failed to send leave_request_submitted email:', err instanceof Error ? err.message : err)
+        })
+      }
+
+      // ── Email to REVIEWERS: pending review notification ──
+      for (const reviewer of reviewerRecipients) {
+        if (!reviewer.email) continue
+
+        const reviewerFirstName = (reviewer.fullName || '').split(' ')[0] || 'Revisor'
+
+        await sendEmail({
+          emailType: 'leave_request_pending_review',
+          domain: 'hr',
+          recipients: [{ email: reviewer.email, name: reviewer.fullName, userId: reviewer.userId }],
+          context: {
+            reviewerFirstName,
+            memberName,
+            leaveTypeName,
+            startDate,
+            endDate,
+            requestedDays,
+            reason
+          },
+          sourceEventId: requestId,
+          sourceEntity: 'leave_request_pending_review'
+        }).catch(err => {
+          console.warn('[notifications] Failed to send leave_request_pending_review email:', err instanceof Error ? err.message : err)
+        })
+      }
+
+      return `notified ${reviewerRecipients.length} recipients about leave_request.created`
     }
 
     if (eventType === 'leave_request.escalated_to_hr') {
       const requestId = typeof payload.requestId === 'string' ? payload.requestId : null
       const memberName = typeof payload.memberName === 'string' ? payload.memberName : 'Colaborador'
       const leaveTypeName = typeof payload.leaveTypeName === 'string' ? payload.leaveTypeName : 'Permiso'
+      const startDate = typeof payload.startDate === 'string' ? payload.startDate : ''
+      const endDate = typeof payload.endDate === 'string' ? payload.endDate : ''
+      const requestedDays = typeof payload.requestedDays === 'number' ? payload.requestedDays : 0
+      const reason = typeof payload.reason === 'string' ? payload.reason : null
       const recipients = await getHrReviewRecipients()
 
       if (!requestId || recipients.length === 0) return null
 
+      // In-app notification (existing behavior)
       await NotificationService.dispatch({
         category: 'leave_review',
         title: `${leaveTypeName} pendiente HR`,
@@ -283,6 +348,32 @@ export const notificationProjection: ProjectionDefinition = {
         metadata: payload,
         recipients
       })
+
+      // ── Email to HR REVIEWERS: escalated request needs review ──
+      for (const reviewer of recipients) {
+        if (!reviewer.email) continue
+
+        const reviewerFirstName = (reviewer.fullName || '').split(' ')[0] || 'Revisor'
+
+        await sendEmail({
+          emailType: 'leave_request_pending_review',
+          domain: 'hr',
+          recipients: [{ email: reviewer.email, name: reviewer.fullName, userId: reviewer.userId }],
+          context: {
+            reviewerFirstName,
+            memberName,
+            leaveTypeName,
+            startDate,
+            endDate,
+            requestedDays,
+            reason
+          },
+          sourceEventId: requestId,
+          sourceEntity: 'leave_request_pending_review'
+        }).catch(err => {
+          console.warn('[notifications] Failed to send leave_request_pending_review email (escalated):', err instanceof Error ? err.message : err)
+        })
+      }
 
       return `notified ${recipients.length} HR recipients about leave_request.escalated_to_hr`
     }
@@ -295,6 +386,22 @@ export const notificationProjection: ProjectionDefinition = {
       const memberId = typeof payload.memberId === 'string' ? payload.memberId : null
       const requestId = typeof payload.requestId === 'string' ? payload.requestId : null
       const leaveTypeName = typeof payload.leaveTypeName === 'string' ? payload.leaveTypeName : 'permiso'
+      const memberName = typeof payload.memberName === 'string' ? payload.memberName : 'Colaborador'
+      const memberEmail = typeof payload.memberEmail === 'string' ? payload.memberEmail : null
+      const actorName = typeof payload.actorName === 'string' ? payload.actorName : 'Greenhouse'
+      const actorUserId = typeof payload.actorUserId === 'string' ? payload.actorUserId : null
+      const startDate = typeof payload.startDate === 'string' ? payload.startDate : ''
+      const endDate = typeof payload.endDate === 'string' ? payload.endDate : ''
+      const requestedDays = typeof payload.requestedDays === 'number' ? payload.requestedDays : 0
+      const notes = typeof payload.notes === 'string' ? payload.notes : null
+      const reason = typeof payload.reason === 'string' ? payload.reason : null
+
+      const leaveStatus = eventType === 'leave_request.approved'
+        ? 'approved' as const
+        : eventType === 'leave_request.rejected'
+          ? 'rejected' as const
+          : 'cancelled' as const
+
       const recipientMap = memberId ? await getMemberNotificationRecipients([memberId]) : new Map()
       const recipient = memberId ? recipientMap.get(memberId) ?? null : null
 
@@ -314,6 +421,7 @@ export const notificationProjection: ProjectionDefinition = {
             ? 'Tu solicitud fue rechazada. Revisa el detalle y las notas del revisor.'
             : 'La solicitud quedó cancelada y ya no se considera pendiente.'
 
+      // In-app notification (existing behavior)
       await NotificationService.dispatch({
         category: 'leave_status',
         title,
@@ -322,6 +430,63 @@ export const notificationProjection: ProjectionDefinition = {
         metadata: payload,
         recipients: [recipient]
       })
+
+      // ── Dedicated email to the REQUESTER ──
+      const memberFirstName = memberName.split(' ')[0] || memberName
+
+      if (memberEmail) {
+        await sendEmail({
+          emailType: 'leave_request_decision',
+          domain: 'hr',
+          recipients: [{ email: memberEmail, name: memberName, userId: recipient.userId }],
+          context: {
+            memberFirstName,
+            actorName,
+            leaveTypeName,
+            startDate,
+            endDate,
+            requestedDays,
+            status: leaveStatus,
+            notes
+          },
+          sourceEventId: requestId,
+          sourceEntity: 'leave_request_decision',
+          actorEmail: actorUserId ?? undefined
+        }).catch(err => {
+          console.warn('[notifications] Failed to send leave_request_decision email:', err instanceof Error ? err.message : err)
+        })
+      }
+
+      // ── Dedicated email to the REVIEWER ──
+      if (actorUserId && leaveStatus !== 'cancelled') {
+        const actorRecipient = await getUserNotificationRecipient(actorUserId).catch(() => null)
+
+        if (actorRecipient?.email) {
+          const actorFirstName = actorName.split(' ')[0] || actorName
+
+          await sendEmail({
+            emailType: 'leave_review_confirmation',
+            domain: 'hr',
+            recipients: [{ email: actorRecipient.email, name: actorRecipient.fullName || actorName, userId: actorUserId }],
+            context: {
+              actorFirstName,
+              memberName,
+              leaveTypeName,
+              startDate,
+              endDate,
+              requestedDays,
+              status: leaveStatus,
+              notes,
+              reason
+            },
+            sourceEventId: requestId,
+            sourceEntity: 'leave_review_confirmation',
+            actorEmail: actorRecipient.email
+          }).catch(err => {
+            console.warn('[notifications] Failed to send leave_review_confirmation email:', err instanceof Error ? err.message : err)
+          })
+        }
+      }
 
       return `notified ${buildNotificationRecipientKey(recipient)} about ${eventType}`
     }

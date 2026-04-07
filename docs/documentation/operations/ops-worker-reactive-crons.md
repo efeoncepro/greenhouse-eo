@@ -1,9 +1,9 @@
-# Ops Worker — Crons Reactivos en Cloud Run
+# Ops Worker — Crons Reactivos y Materializacion en Cloud Run
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-06-17 por agente (TASK-254)
-> **Ultima actualizacion:** 2026-06-17 por agente (TASK-254)
+> **Ultima actualizacion:** 2026-04-07 por agente (TASK-279)
 > **Documentacion tecnica:** [GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md](../../architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md) (§4.9, §5)
 
 ---
@@ -12,13 +12,14 @@
 
 El **ops-worker** es un servicio que corre en Google Cloud Run y se encarga de procesar los eventos reactivos del portal Greenhouse. Antes, estos procesos corrian como cron jobs dentro de Vercel, pero se migraron a Cloud Run para mayor durabilidad y tiempo de ejecucion.
 
-El servicio procesa tres tipos de trabajo:
+El servicio procesa cuatro tipos de trabajo:
 
 | Trabajo | Que hace | Cada cuanto corre |
 |---|---|---|
 | **Reactive Process** | Procesa el backlog completo de eventos reactivos del outbox (todas las domains) | Cada 5 minutos |
 | **Reactive Process Delivery** | Procesa solo los eventos reactivos del dominio `delivery` | Cada 5 minutos (desplazado 2 min) |
 | **Reactive Recover** | Recupera proyecciones huerfanas que quedaron pendientes en la cola de refresh | Cada 15 minutos |
+| **Cost Attribution Materialize** | Materializa la atribucion de costos laborales comerciales por periodo y recomputa snapshots de economics de clientes | Bajo demanda (manual o via reactive projection) |
 
 ---
 
@@ -48,8 +49,14 @@ En **Admin Center > Ops Health**, el subsistema **Reactive Worker** muestra:
 | POST | `/reactive/process` | Procesa backlog reactivo completo |
 | POST | `/reactive/process-domain` | Procesa backlog de un dominio especifico |
 | POST | `/reactive/recover` | Recupera proyecciones huerfanas |
+| POST | `/cost-attribution/materialize` | Materializa cost attribution + client economics |
 
-Todos los endpoints POST aceptan un body JSON con `batchSize` (tamaño del lote).
+Los endpoints reactivos aceptan un body JSON con `batchSize` (tamaño del lote).
+
+El endpoint `/cost-attribution/materialize` acepta:
+- `{ year, month }` — materializa un periodo especifico
+- `{}` (sin parametros) — materializa todos los periodos con datos
+- `{ recomputeEconomics: false }` — omite la recomputacion de `client_economics` despues de materializar
 
 ---
 
@@ -65,6 +72,20 @@ Todos los endpoints POST aceptan un body JSON con `batchSize` (tamaño del lote)
 | **Concurrencia** | 1 (una request a la vez por instancia) |
 | **Autenticacion** | IAM + OIDC (no acepta requests sin autenticar) |
 | **Timezone** | `America/Santiago` |
+
+---
+
+## Por que la materializacion de costos corre aqui
+
+La vista `client_labor_cost_allocation` combina 3 CTEs + un LATERAL JOIN + conversion de moneda via `exchange_rates`. Esta consulta excede el timeout de 10s de Vercel serverless en cold-starts. La solucion arquitectural: el ops-worker materializa los resultados en la tabla `greenhouse_serving.commercial_cost_attribution` y Vercel solo lee de la tabla materializada.
+
+Cuando un evento financiero (factura, gasto, asignacion, nomina) dispara la proyeccion reactiva `commercial_cost_attribution`, el ops-worker:
+
+1. Ejecuta la VIEW compleja y escribe el resultado atomicamente (purge + insert en transaccion)
+2. Publica un evento outbox `accounting.commercial_cost_attribution.materialized`
+3. Opcionalmente recomputa los snapshots de `client_economics` con los nuevos costos
+
+> Detalle tecnico: [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md) — commercial cost attribution pipeline
 
 ---
 

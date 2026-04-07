@@ -23,6 +23,24 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 
 import type { OrganizationDetailData } from '../types'
 
+interface DeliveryFacet {
+  icoMetrics: {
+    rpaAvg: number | null
+    otdPct: number | null
+    throughputCount: number
+  } | null
+  projectCount: number
+  activeProjectCount: number
+  sprintCount: number
+  taskCounts: {
+    total: number
+    completed: number
+    active: number
+    overdue: number
+    carryOver: number
+  }
+}
+
 interface ProjectSummary {
   notionPageId: string
   projectName: string
@@ -77,6 +95,7 @@ type Props = {
 
 const OrganizationProjectsTab = ({ detail }: Props) => {
   const [data, setData] = useState<ProjectsData | null>(null)
+  const [delivery360, setDelivery360] = useState<DeliveryFacet | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -84,9 +103,14 @@ const OrganizationProjectsTab = ({ detail }: Props) => {
       setLoading(true)
 
       try {
-        const res = await fetch(`/api/organizations/${detail.organizationId}/projects`)
+        // Fetch both: 360 delivery facet (aggregate counts) + legacy projects (detailed per-project)
+        const [res360, resLegacy] = await Promise.all([
+          fetch(`/api/organization/${detail.organizationId}/360?facets=delivery`).then(r => r.ok ? r.json() : null).catch(() => null),
+          fetch(`/api/organizations/${detail.organizationId}/projects`).then(r => r.ok ? r.json() : null).catch(() => null)
+        ])
 
-        if (res.ok) setData(await res.json())
+        if (res360?.delivery) setDelivery360(res360.delivery)
+        if (resLegacy) setData(resLegacy)
       } catch {
         // Non-blocking
       } finally {
@@ -105,14 +129,19 @@ const OrganizationProjectsTab = ({ detail }: Props) => {
     )
   }
 
-  if (!data || data.totals.totalProjects === 0) {
+  // Use 360 delivery counts as source of truth for totals; fall back to legacy data for per-project detail
+  const totalProjects = delivery360?.projectCount ?? data?.totals?.totalProjects ?? 0
+  const hasProjects = totalProjects > 0
+  const hasDetailedProjects = data && data.totals.totalProjects > 0
+
+  if (!hasProjects) {
     return (
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
         <CardContent>
           <Box sx={{ textAlign: 'center', py: 4 }}>
-            <Typography variant='h6' sx={{ mb: 1 }}>Sin proyectos configurados</Typography>
+            <Typography variant='h6' sx={{ mb: 1 }}>Sin proyectos</Typography>
             <Typography variant='body2' color='text.secondary'>
-              Configura las fuentes de Notion en los Spaces de {detail.organizationName} para ver proyectos aquí.
+              No hay proyectos registrados para {detail.organizationName}.
             </Typography>
           </Box>
         </CardContent>
@@ -120,14 +149,23 @@ const OrganizationProjectsTab = ({ detail }: Props) => {
     )
   }
 
+  // Resolved KPI values — prefer 360 data for counts, legacy for detail
+  const activeProjects = delivery360?.activeProjectCount ?? data?.totals?.activeProjects ?? 0
+  const totalTasks = delivery360?.taskCounts?.total ?? data?.totals?.totalTasks ?? 0
+  const activeTasks = delivery360?.taskCounts?.active ?? data?.totals?.activeTasks ?? 0
+  const completedTasks = delivery360?.taskCounts?.completed ?? data?.totals?.completedTasks ?? 0
+  const avgRpa = delivery360?.icoMetrics?.rpaAvg ?? data?.totals?.avgRpa ?? 0
+  const overallHealth = data?.totals?.overallHealth ?? (avgRpa >= 70 ? 'green' : avgRpa >= 40 ? 'yellow' : 'red')
+  const spaceCount = data?.spaces?.length ?? (detail.spaces?.length ?? 0)
+
   return (
     <Grid container spacing={6}>
       {/* KPI row */}
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
         <HorizontalWithSubtitle
           title='Proyectos totales'
-          stats={String(data.totals.totalProjects)}
-          subtitle={`${data.totals.activeProjects} activo${data.totals.activeProjects !== 1 ? 's' : ''}`}
+          stats={String(totalProjects)}
+          subtitle={`${activeProjects} activo${activeProjects !== 1 ? 's' : ''}`}
           avatarIcon='tabler-folders'
           avatarColor='primary'
         />
@@ -135,8 +173,8 @@ const OrganizationProjectsTab = ({ detail }: Props) => {
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
         <HorizontalWithSubtitle
           title='Tasks totales'
-          stats={String(data.totals.totalTasks)}
-          subtitle={`${data.totals.activeTasks} activas · ${data.totals.completedTasks} completadas`}
+          stats={String(totalTasks)}
+          subtitle={`${activeTasks} activas · ${completedTasks} completadas`}
           avatarIcon='tabler-list-check'
           avatarColor='info'
         />
@@ -144,24 +182,38 @@ const OrganizationProjectsTab = ({ detail }: Props) => {
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
         <HorizontalWithSubtitle
           title='RPA promedio'
-          stats={`${data.totals.avgRpa}%`}
+          stats={avgRpa ? `${Math.round(avgRpa)}%` : '—'}
           subtitle='Rendimiento por asignación'
           avatarIcon='tabler-chart-line'
-          avatarColor={healthColor(data.totals.overallHealth)}
+          avatarColor={healthColor(overallHealth)}
         />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
         <HorizontalWithSubtitle
           title='Health general'
-          stats={data.totals.overallHealth === 'green' ? 'Óptimo' : data.totals.overallHealth === 'yellow' ? 'Atención' : 'Crítico'}
-          subtitle={`${data.spaces.length} Space${data.spaces.length !== 1 ? 's' : ''} con proyectos`}
+          stats={overallHealth === 'green' ? 'Óptimo' : overallHealth === 'yellow' ? 'Atención' : 'Crítico'}
+          subtitle={`${spaceCount} Space${spaceCount !== 1 ? 's' : ''}`}
           avatarIcon='tabler-heart-rate-monitor'
-          avatarColor={healthColor(data.totals.overallHealth)}
+          avatarColor={healthColor(overallHealth)}
         />
       </Grid>
 
-      {/* Project tables grouped by space */}
-      {data.spaces.map(space => (
+      {/* Project detail tables (from legacy endpoint, if available) */}
+      {!hasDetailedProjects && (
+        <Grid size={{ xs: 12 }}>
+          <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
+            <CardContent>
+              <Box sx={{ textAlign: 'center', py: 3 }}>
+                <Typography variant='body2' color='text.secondary'>
+                  {totalProjects} proyecto{totalProjects !== 1 ? 's' : ''} registrado{totalProjects !== 1 ? 's' : ''} — el detalle por proyecto estará disponible cuando se configuren las fuentes de Notion.
+                </Typography>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      )}
+
+      {hasDetailedProjects && data!.spaces.map(space => (
         <Grid size={{ xs: 12 }} key={space.spaceId}>
           <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
             <CardHeader

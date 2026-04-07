@@ -6,6 +6,95 @@
 
 ---
 
+## Delta 2026-04-07 — Products catalog + Quote Line Items (TASK-211)
+
+Dos nuevas tablas en `greenhouse_finance`:
+
+### `greenhouse_finance.products`
+
+Catalogo de productos sincronizado desde HubSpot o creado manualmente.
+
+- ID: `GH-PROD-{hubspot_product_id}` para HubSpot, UUID para manual
+- Columnas clave: `name`, `sku`, `unit_price`, `cost_of_goods_sold`, `is_recurring`, `billing_frequency`
+- Margen calculado en API: `(unit_price - cost_of_goods_sold) / unit_price * 100`
+- Sync: cron diario `hubspot-products-sync` (8 AM)
+
+### `greenhouse_finance.quote_line_items`
+
+Line items transaccionales vinculados a quotes. FK a `quotes(quote_id)` y opcionalmente a `products(product_id)`.
+
+- ID: `GH-LI-{hubspot_line_item_id}` para HubSpot
+- Synced automaticamente con cada quote sync (TASK-210)
+- Creados localmente en outbound quotes con product picker
+
+### Sinergia con TASK-210
+
+- Quote sync ahora sincroniza line items despues de cada quote
+- Quote outbound persiste line items en transaccion
+- CreateQuoteDrawer tiene product picker que auto-fill nombre + precio
+
+### Endpoints
+
+- `GET /api/finance/products` — catalogo con filtros (source, active, search)
+- `POST /api/finance/products/hubspot` — crear producto en HubSpot + local
+- `GET /api/finance/quotes/{id}/lines` — line items de una quote con JOIN a products
+
+### Archivos clave
+
+| Archivo | Funcion |
+|---------|---------|
+| `migrations/20260407193443222_create-products-and-quote-line-items.sql` | DDL |
+| `src/lib/hubspot/sync-hubspot-products.ts` | Inbound product sync |
+| `src/lib/hubspot/sync-hubspot-line-items.ts` | Inbound line items sync per quote |
+| `src/lib/hubspot/create-hubspot-product.ts` | Outbound product creation |
+| `src/app/api/cron/hubspot-products-sync/route.ts` | Cron endpoint |
+| `src/views/greenhouse/finance/ProductCatalogView.tsx` | UI catalogo |
+| `scripts/backfill-hubspot-products.ts` | Backfill one-time |
+
+## Delta 2026-04-07 — HubSpot Quotes bidirectional integration (TASK-210)
+
+`greenhouse_finance.quotes` es ahora multi-source. Nuevas columnas: `source_system` (`nubox`/`hubspot`/`manual`), `hubspot_quote_id`, `hubspot_deal_id`, `hubspot_last_synced_at`.
+
+### Inbound (HubSpot → Greenhouse)
+
+- Cloud Run service `hubspot-greenhouse-integration` expone `GET /companies/{id}/quotes`
+- Client: `getHubSpotGreenhouseCompanyQuotes()` en `src/lib/integrations/hubspot-greenhouse-service.ts`
+- Sync: `syncAllHubSpotQuotes()` en `src/lib/hubspot/sync-hubspot-quotes.ts`
+- Cron: `GET /api/cron/hubspot-quotes-sync` cada 6 horas, con readiness gate
+- Identity resolution: `hubspot_company_id` → `organization_id` → `space_id` + `client_id`
+- ID format: `QUO-HS-{hubspot_quote_id}` (coexiste con `QUO-NB-{nubox_sale_id}`)
+- Status mapping: HubSpot `hs_status` → Greenhouse normalized (`DRAFT`→`draft`, `APPROVAL_NOT_NEEDED`→`sent`, etc.)
+
+### Outbound (Greenhouse → HubSpot)
+
+- Cloud Run service expone `POST /quotes` (crea quote + line items + asociaciones)
+- Client: `createHubSpotGreenhouseQuote()` en `src/lib/integrations/hubspot-greenhouse-service.ts`
+- Logic: `createHubSpotQuote()` en `src/lib/hubspot/create-hubspot-quote.ts`
+- API: `POST /api/finance/quotes/hubspot` con validacion
+- Patron: resolver org → call Cloud Run → persist local → outbox event (transaccional)
+
+### API update
+
+- `GET /api/finance/quotes` ahora devuelve `source`, `hubspotQuoteId`, `hubspotDealId`
+- Nuevo query param: `?source=hubspot|nubox|manual`
+- `isFromNubox` se mantiene como campo derivado de backward compat
+
+### Outbox events
+
+- `finance.quote.synced` — inbound sync desde HubSpot
+- `finance.quote.created` — outbound creation hacia HubSpot (con `direction: 'outbound'`)
+
+### Archivos clave
+
+| Archivo | Funcion |
+|---------|---------|
+| `migrations/20260407182811937_add-hubspot-quotes-columns.sql` | DDL + backfill |
+| `src/lib/hubspot/sync-hubspot-quotes.ts` | Inbound sync |
+| `src/lib/hubspot/create-hubspot-quote.ts` | Outbound create |
+| `src/app/api/cron/hubspot-quotes-sync/route.ts` | Cron endpoint |
+| `src/app/api/finance/quotes/hubspot/route.ts` | POST outbound API |
+| `scripts/backfill-hubspot-quotes.ts` | Backfill one-time |
+
 ## Delta 2026-04-05 — schema drift in Finance lists now surfaces as explicit degraded payload
 
 Las routes Finance que antes respondían vacío ante `relation/column does not exist` ya no deben ocultar drift de schema como si fuera ausencia sana de datos.
@@ -84,6 +173,26 @@ Regla operativa:
 - las surfaces Finance no deben presentar una factura de Nubox como si fuera por sí misma un cobro
 - ni una compra de Nubox como si fuera por sí misma un pago
 - el módulo puede seguir usando `income` / `expenses` para P&L devengado, pero debe distinguir visualmente documento/devengo vs caja
+
+## Delta 2026-04-07 — labor_cost_clp separado en client_economics + type consolidation
+
+`client_economics` ahora tiene una columna `labor_cost_clp` dedicada para el costo laboral (de `commercial_cost_attribution`), separada de `direct_costs_clp` (allocaciones + gastos directos) e `indirect_costs_clp`.
+
+Cambios estructurales:
+
+- **Migración**: `20260407171920933_add-labor-cost-clp-to-client-economics.sql` — agrega columna + backfill desde `commercial_cost_attribution.commercial_labor_cost_target`
+- **Compute pipeline**: `computeClientEconomicsSnapshots` ahora trackea `laborCosts` separado de `directCosts` en el `clientMap`
+- **Sanitizer**: `sanitizeSnapshotForPresentation` requiere `laborCostClp` (no opcional) — `totalCosts = labor + direct + indirect`. Si un consumer no lo pasa, TypeScript lo rechaza.
+- **360 facet**: `AccountClientProfitability.laborCostCLP` expuesto por `fetchEconomicsFacet` → query incluye `COALESCE(ce.labor_cost_clp, 0)`
+- **Finance legacy**: `getOrganizationFinanceSummary` incluye `labor_cost_clp` en el SELECT y en `OrganizationClientFinance`
+- **Tipos consolidados**: `OrganizationClientFinance` y `OrganizationFinanceSummary` definidas una sola vez en `src/views/greenhouse/organizations/types.ts`. El backend (`organization-store.ts`) importa y re-exporta — no hay duplicados.
+
+Impacto en UI:
+- Tab Economics: "Costo laboral" usa `c.laborCostCLP` (antes hardcoded `0`), "C. Directos" = `costCLP - laborCostCLP`
+- Tab Finance: nueva columna "Costo laboral" entre Ingreso y C. Directos
+- Trend chart: ordenado cronológicamente (ASC) en vez de DESC
+
+---
 
 ## Delta 2026-03-30 — Commercial cost attribution ya es contrato operativo de plataforma
 

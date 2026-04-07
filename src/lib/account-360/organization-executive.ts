@@ -15,6 +15,10 @@ import type { DteCoverageSummary } from '@/lib/finance/dte-coverage'
  *
  * Specialized breakdowns (per-client economics, per-space projects, DTE proposals)
  * remain in their own endpoints — this is the summary layer.
+ *
+ * @deprecated Use `getAccountComplete360(orgId, { facets: ['identity', 'economics', 'delivery', 'finance'] })`
+ * from `@/lib/account-360/account-complete-360` instead. This monolithic function is superseded
+ * by the federated Account Complete 360 resolver (TASK-274).
  */
 
 export interface OrganizationExecutiveSnapshot {

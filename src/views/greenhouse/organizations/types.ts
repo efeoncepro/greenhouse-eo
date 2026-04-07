@@ -4,11 +4,13 @@ export interface OrganizationClientFinance {
   clientId: string
   clientName: string
   totalRevenueClp: number
+  laborCostClp: number
   directCostsClp: number
   indirectCostsClp: number
   grossMarginPercent: number | null
   netMarginPercent: number | null
   headcountFte: number | null
+  hasCompleteCostCoverage?: boolean
 }
 
 export interface OrganizationFinanceSummary {
@@ -17,6 +19,7 @@ export interface OrganizationFinanceSummary {
   periodMonth: number
   clientCount: number
   totalRevenueClp: number
+  totalLaborCostClp: number
   totalDirectCostsClp: number
   totalIndirectCostsClp: number
   avgGrossMarginPercent: number | null

@@ -1012,6 +1012,8 @@ const buildLeaveEventPayload = async ({
     actorUserId,
     actorMemberId,
     actorName,
+    notes: normalizeNullableString(request.notes),
+    reason: normalizeNullableString(request.reason),
     holidaySource,
     impactedYears: [...daysByYear.entries()].map(([year, days]) => ({ year, days })),
     payrollImpact,

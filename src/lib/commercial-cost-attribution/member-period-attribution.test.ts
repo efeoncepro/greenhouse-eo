@@ -4,6 +4,7 @@ const mockRunGreenhousePostgresQuery = vi.fn()
 const mockPurgeCommercialCostAttributionPeriod = vi.fn()
 const mockReadCommercialCostAttributionAllocationsForPeriod = vi.fn()
 const mockUpsertCommercialCostAttributionAllocations = vi.fn()
+const mockAtomicReplacePeriod = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
@@ -14,7 +15,8 @@ vi.mock('@/lib/commercial-cost-attribution/store', () => ({
   readCommercialCostAttributionAllocationsForPeriod: (...args: unknown[]) =>
     mockReadCommercialCostAttributionAllocationsForPeriod(...args),
   upsertCommercialCostAttributionAllocations: (...args: unknown[]) =>
-    mockUpsertCommercialCostAttributionAllocations(...args)
+    mockUpsertCommercialCostAttributionAllocations(...args),
+  atomicReplacePeriod: (...args: unknown[]) => mockAtomicReplacePeriod(...args)
 }))
 
 import {
@@ -30,6 +32,7 @@ describe('readCommercialCostAttributionForPeriod', () => {
     mockReadCommercialCostAttributionAllocationsForPeriod.mockResolvedValue([])
     mockPurgeCommercialCostAttributionPeriod.mockResolvedValue(undefined)
     mockUpsertCommercialCostAttributionAllocations.mockResolvedValue(undefined)
+    mockAtomicReplacePeriod.mockResolvedValue({ replaced: 0 })
   })
 
   it('combines member capacity economics with labor allocation into a canonical member-period row', async () => {
@@ -371,7 +374,7 @@ describe('readCommercialCostAttributionForPeriod', () => {
     ])
   })
 
-  it('materializes the computed period into the serving store', async () => {
+  it('materializes the computed period into the serving store atomically', async () => {
     mockRunGreenhousePostgresQuery
       .mockResolvedValueOnce([
         {
@@ -397,10 +400,11 @@ describe('readCommercialCostAttributionForPeriod', () => {
         }
       ])
 
-    await materializeCommercialCostAttributionForPeriod(2026, 3, 'test-materialization')
+    mockAtomicReplacePeriod.mockResolvedValueOnce({ replaced: 1 })
 
-    expect(mockPurgeCommercialCostAttributionPeriod).toHaveBeenCalledWith(2026, 3)
-    expect(mockUpsertCommercialCostAttributionAllocations).toHaveBeenCalledWith([
+    const result = await materializeCommercialCostAttributionForPeriod(2026, 3, 'test-materialization')
+
+    expect(mockAtomicReplacePeriod).toHaveBeenCalledWith(2026, 3, [
       expect.objectContaining({
         memberId: 'member-1',
         clientId: 'client-1',
@@ -408,5 +412,8 @@ describe('readCommercialCostAttributionForPeriod', () => {
         materializationReason: 'test-materialization'
       })
     ])
+
+    expect(result.rows).toHaveLength(1)
+    expect(result.replaced).toBe(1)
   })
 })

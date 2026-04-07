@@ -1,5 +1,19 @@
 # project_context.md
 
+## Delta 2026-04-07 Account Complete 360 — serving federado por facetas (TASK-274)
+
+### Account Complete 360 (TASK-274)
+- Resolver federado analogo a Person 360, 9 facetas: identity, spaces, team, economics, delivery, finance, crm, services, staffAug
+- API: `GET /api/organization/[id]/360`, `POST /api/organizations/360`
+- Serving layer puro sobre tablas existentes, sin migraciones
+- `getAccountComplete360(identifier, { facets: [...] })` es el unico entry point server-side para obtener datos completos de una organizacion/cuenta. Los consumidores NO deben hacer queries directas — deben usar el resolver.
+- Scope resolver centralizado: org → spaces → clients resuelto una sola vez, compartido por todas las facetas.
+- Regla: **nuevas facetas se agregan como modulos en `src/lib/account-360/facets/` + registro en FACET_REGISTRY**. No modificar el resolver core.
+- Autorizacion per-facet: admin todo, operations sin finance, client limitado a identity+spaces+team+delivery+services.
+- Cache in-memory per-facet con TTL + invalidacion por 22 eventos outbox. Preparado para Redis (TASK-276).
+- Identifier resolver: acepta organization_id, public_id (EO-ORG-*), hubspot_company_id.
+- Fuente canonica: `docs/architecture/GREENHOUSE_ACCOUNT_COMPLETE_360_V1.md` (si existe) o el codigo en `src/lib/account-360/`.
+
 ## Delta 2026-04-07 AI Visual Asset Generator + Profile Banners (TASK-278)
 
 - `generateImage()` y `generateAnimation()` en `src/lib/ai/image-generator.ts` son el entry point para generar assets visuales durante el desarrollo.
@@ -34,11 +48,28 @@
 
 - El contrato `TenantAccessRow` ahora tiene paridad completa entre el path PostgreSQL (`session_360`) y el path BigQuery (`getIdentityAccessRecord`): ambos retornan `member_id` e `identity_profile_id`.
 
+## Delta 2026-04-07 labor_cost_clp separado en client_economics + type consolidation
+
+- `client_economics` tiene nueva columna `labor_cost_clp` — costo laboral ya no se mezcla con `direct_costs_clp`.
+- `sanitizeSnapshotForPresentation` requiere `laborCostClp` (no opcional) — TypeScript rechaza callers que no lo pasen.
+- Tipos `OrganizationClientFinance` y `OrganizationFinanceSummary` consolidados en `src/views/greenhouse/organizations/types.ts` — single source of truth, backend importa de ahí.
+- 360 economics facet expone `laborCostCLP` per client. Finance tab tiene columna "Costo laboral" dedicada.
+- Trend chart de Economics tab ordenado cronológicamente (ASC).
+
+## Delta 2026-04-07 TASK-279 ops-worker: cost attribution materialization endpoint
+
+- Nuevo endpoint `POST /cost-attribution/materialize` en ops-worker Cloud Run.
+- Mueve la materialización de `commercial_cost_attribution` (VIEW con 3 CTEs + LATERAL JOIN + exchange rates) fuera de Vercel serverless donde hace timeout.
+- Acepta `{year, month}` para single-period o vacío para bulk. Opcionalmente recomputa `client_economics` snapshots.
+- Revision activa: `ops-worker-00006-qtl`, 100% tráfico.
+- Bug fix: `deploy.sh` usaba `--headers` en `gcloud scheduler jobs update` (flag inválido), corregido a `--update-headers`.
+- Test fix: mock de `materializeCommercialCostAttributionForPeriod` actualizado para nuevo return type `{ rows, replaced }`.
+
 ## Delta 2026-06-17 TASK-254 ops-worker Cloud Run desplegado y operativo
 
 - Los 3 crons reactivos del outbox (`outbox-react`, `outbox-react-delivery`, `projection-recovery`) ya no corren como Vercel cron.
 - Ahora corren en Cloud Run como servicio dedicado `ops-worker` en `us-east4`, disparados por Cloud Scheduler.
-- Revision activa: `ops-worker-00004-pmk`, 100% tráfico.
+- Revision activa: `ops-worker-00006-qtl`, 100% tráfico.
 - Service URL: `https://ops-worker-183008134038.us-east4.run.app`
 - Image: `gcr.io/efeonce-group/ops-worker` (Cloud Build two-stage esbuild).
 - SA: `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` con `roles/run.invoker`.

@@ -374,6 +374,7 @@ export type ClientEconomicsRecord = {
   periodYear: number
   periodMonth: number
   totalRevenueClp: number
+  laborCostClp: number
   directCostsClp: number
   indirectCostsClp: number
   grossMarginClp: number

@@ -133,7 +133,7 @@ export const commercialCostAttributionProjection: ProjectionDefinition = {
 
     const eventType = typeof payload._eventType === 'string' ? payload._eventType : 'reactive-refresh'
 
-    const rows = await materializeCommercialCostAttributionForPeriod(
+    const { rows, replaced } = await materializeCommercialCostAttributionForPeriod(
       year,
       month,
       `reactive-refresh:${eventType}:${scope.entityId}`
@@ -150,7 +150,7 @@ export const commercialCostAttributionProjection: ProjectionDefinition = {
         periodMonth: month,
         periodId: `${year}-${String(month).padStart(2, '0')}`,
         memberCount: rows.length,
-        allocationCount: rows.reduce((sum, row) => sum + row.allocations.length, 0),
+        allocationCount: replaced,
         clientCount: clientSummary.length
       }
     })

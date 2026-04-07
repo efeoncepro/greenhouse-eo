@@ -330,12 +330,13 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Si el bypass secret se vuelve stale, borrar `VERCEL_AUTOMATION_BYPASS_SECRET` de `.env.local` y correr el script de nuevo — auto-refetch.
 - Fuente: `scripts/staging-request.mjs`
 
-### Cloud Run ops-worker (crons reactivos)
+### Cloud Run ops-worker (crons reactivos + materialización)
 
-- Greenhouse tiene un servicio Cloud Run dedicado (`ops-worker`) en `us-east4` que ejecuta los crons reactivos del outbox.
+- Greenhouse tiene un servicio Cloud Run dedicado (`ops-worker`) en `us-east4` que ejecuta los crons reactivos del outbox y la materialización de cost attribution.
 - 3 Cloud Scheduler jobs disparan el servicio: `ops-reactive-process` (_/5), `ops-reactive-process-delivery` (2-59/5), `ops-reactive-recover` (_/15), timezone `America/Santiago`.
+- Endpoint adicional: `POST /cost-attribution/materialize` — materializa `commercial_cost_attribution` + recomputa `client_economics`. Acepta `{year, month}` para single-period o vacío para bulk. Las VIEWs complejas (3 CTEs + LATERAL JOIN + exchange rates) que timeout en Vercel serverless corren aquí.
 - SA: `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` con `roles/run.invoker`.
-- **Si el cambio toca `src/lib/sync/`, `src/lib/operations/`, proyecciones reactivas, o `services/ops-worker/`**, verificar que el build del worker sigue compilando (`cd services/ops-worker && docker build .` o revisar esbuild aliases).
+- **Si el cambio toca `src/lib/sync/`, `src/lib/operations/`, `src/lib/commercial-cost-attribution/`, proyecciones reactivas, o `services/ops-worker/`**, verificar que el build del worker sigue compilando (`cd services/ops-worker && docker build .` o revisar esbuild aliases).
 - **Regla ESM/CJS para Cloud Run**: servicios que reutilicen `src/lib/` sin necesitar NextAuth deben shimear `next-auth`, sus providers y `bcryptjs` via esbuild `--alias`. El patrón canónico de shims está en `services/ops-worker/Dockerfile`.
 - **Deploy**: `bash services/ops-worker/deploy.sh` (requiere `gcloud` autenticado con acceso al proyecto `efeonce-group`).
 - **Health check**: el deploy script usa `gcloud run services proxy` (no requiere SA impersonation).

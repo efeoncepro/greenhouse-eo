@@ -9,6 +9,10 @@ export type EmailType =
   | 'payroll_export'
   | 'payroll_receipt'
   | 'notification'
+  | 'leave_request_decision'
+  | 'leave_review_confirmation'
+  | 'leave_request_submitted'
+  | 'leave_request_pending_review'
 
 export type EmailDeliveryStatus = 'pending' | 'sent' | 'failed' | 'skipped' | 'rate_limited' | 'delivered'
 

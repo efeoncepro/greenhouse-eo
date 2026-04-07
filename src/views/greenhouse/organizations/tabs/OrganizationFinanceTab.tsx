@@ -51,9 +51,13 @@ type Props = {
 
 const OrganizationFinanceTab = ({ detail }: Props) => {
   const now = new Date()
-  const [year, setYear] = useState(now.getFullYear())
-  const [month, setMonth] = useState(now.getMonth() + 1)
+
+  // Default to previous month (last closed month) — current month often has no data yet
+  const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+  const [year, setYear] = useState(prevMonth.getFullYear())
+  const [month, setMonth] = useState(prevMonth.getMonth() + 1)
   const [data, setData] = useState<OrganizationFinanceSummary | null>(null)
+  const [financeYtd, setFinanceYtd] = useState<{ revenueYTD: number; invoiceCount: number; outstandingAmount: number } | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -61,9 +65,28 @@ const OrganizationFinanceTab = ({ detail }: Props) => {
       setLoading(true)
 
       try {
-        const res = await fetch(`/api/organizations/${detail.organizationId}/finance?year=${year}&month=${month}`)
+        const asOf = `${year}-${String(month).padStart(2, '0')}-01`
 
-        if (res.ok) setData(await res.json())
+        const [resLegacy, res360] = await Promise.all([
+          fetch(`/api/organizations/${detail.organizationId}/finance?year=${year}&month=${month}`)
+            .then(r => (r.ok ? r.json() : null))
+            .catch(() => null),
+          fetch(`/api/organization/${detail.organizationId}/360?facets=finance&asOf=${asOf}`)
+            .then(r => (r.ok ? r.json() : null))
+            .catch(() => null)
+        ])
+
+        if (resLegacy) setData(resLegacy)
+
+        if (res360?.finance) {
+          setFinanceYtd({
+            revenueYTD: res360.finance.revenueYTD ?? 0,
+            invoiceCount: res360.finance.invoiceCount ?? 0,
+            outstandingAmount: res360.finance.outstandingAmount ?? 0
+          })
+        } else {
+          setFinanceYtd(null)
+        }
       } catch {
         // Non-blocking
       } finally {
@@ -165,6 +188,39 @@ const OrganizationFinanceTab = ({ detail }: Props) => {
             />
           </Grid>
 
+          {/* 360 YTD supplementary KPIs */}
+          {financeYtd ? (
+            <>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <HorizontalWithSubtitle
+                  title='Ingreso YTD'
+                  stats={formatCLP(financeYtd.revenueYTD)}
+                  subtitle='acumulado del año (360)'
+                  avatarIcon='tabler-report-money'
+                  avatarColor='success'
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <HorizontalWithSubtitle
+                  title='Documentos emitidos'
+                  stats={String(financeYtd.invoiceCount)}
+                  subtitle='facturas YTD (360)'
+                  avatarIcon='tabler-file-invoice'
+                  avatarColor='warning'
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                <HorizontalWithSubtitle
+                  title='Saldo pendiente'
+                  stats={formatCLP(financeYtd.outstandingAmount)}
+                  subtitle='por cobrar (360)'
+                  avatarIcon='tabler-clock-dollar'
+                  avatarColor={financeYtd.outstandingAmount > 0 ? 'error' : 'success'}
+                />
+              </Grid>
+            </>
+          ) : null}
+
           {/* Client breakdown table */}
           <Grid size={{ xs: 12 }}>
             <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
@@ -184,6 +240,7 @@ const OrganizationFinanceTab = ({ detail }: Props) => {
                     <TableRow>
                       <TableCell>Space</TableCell>
                       <TableCell align='right'>Ingreso</TableCell>
+                      <TableCell align='right'>Costo laboral</TableCell>
                       <TableCell align='right'>C. Directos</TableCell>
                       <TableCell align='right'>C. Indirectos</TableCell>
                       <TableCell align='center'>Margen Bruto</TableCell>
@@ -199,6 +256,9 @@ const OrganizationFinanceTab = ({ detail }: Props) => {
                         </TableCell>
                         <TableCell align='right'>
                           <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(c.totalRevenueClp)}</Typography>
+                        </TableCell>
+                        <TableCell align='right'>
+                          <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(c.laborCostClp)}</Typography>
                         </TableCell>
                         <TableCell align='right'>
                           <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(c.directCostsClp)}</Typography>

@@ -1,5 +1,48 @@
 # Greenhouse Source Sync Pipelines V1
 
+## Delta 2026-04-07 — TASK-210 HubSpot Quotes sync pipeline
+
+Nuevo pipeline inbound: HubSpot Quotes → PostgreSQL `greenhouse_finance.quotes`.
+
+### Topologia
+
+```
+HubSpot CRM (quotes API)
+  → Cloud Run hubspot-greenhouse-integration (GET /companies/{id}/quotes)
+    → Greenhouse sync function (sync-hubspot-quotes.ts)
+      → PostgreSQL greenhouse_finance.quotes (source_system='hubspot')
+        → Outbox event (finance.quote.synced)
+```
+
+### Identidad
+
+- Key de resolucion: `hubspot_company_id` en `greenhouse_core.organizations`
+- Join: `organizations` → `spaces` → `client_id` + `organization_id`
+- ID format: `QUO-HS-{hubspot_quote_id}`
+- Idempotencia: `ON CONFLICT (quote_id) DO UPDATE`
+
+### Scheduling
+
+- Cron: `GET /api/cron/hubspot-quotes-sync` registrado en `vercel.json`
+- Frecuencia: cada 6 horas (`0 */6 * * *`)
+- Readiness gate: `checkIntegrationReadiness('hubspot')` — skip si down/blocked
+
+### Outbound (reverse sync)
+
+- `POST /api/finance/quotes/hubspot` → Cloud Run `POST /quotes`
+- Crea quote + line items + asociaciones en HubSpot en una sola operacion
+- Persiste localmente en transaccion con outbox event `finance.quote.created`
+
+### Archivos
+
+| Archivo | Funcion |
+|---------|---------|
+| `src/lib/hubspot/sync-hubspot-quotes.ts` | `syncAllHubSpotQuotes()`, `syncHubSpotQuotesForCompany()` |
+| `src/lib/hubspot/create-hubspot-quote.ts` | `createHubSpotQuote()` — outbound |
+| `src/app/api/cron/hubspot-quotes-sync/route.ts` | Cron endpoint con readiness gate |
+| `src/lib/integrations/hubspot-greenhouse-service.ts` | Client methods para Cloud Run |
+| `scripts/backfill-hubspot-quotes.ts` | Backfill one-time para quotes existentes |
+
 ## Delta 2026-04-03 — TASK-209 final closure in production
 
 La lane `TASK-209` quedó cerrada también a nivel de arquitectura runtime, no solo como control plane local.

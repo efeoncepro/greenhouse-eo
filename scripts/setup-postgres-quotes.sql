@@ -29,6 +29,11 @@ CREATE TABLE IF NOT EXISTS greenhouse_finance.quotes (
   dte_folio TEXT,
   nubox_emitted_at TIMESTAMPTZ,
   nubox_last_synced_at TIMESTAMPTZ,
+  -- Multi-source (TASK-210)
+  source_system TEXT DEFAULT 'manual',  -- nubox, hubspot, manual
+  hubspot_quote_id TEXT,
+  hubspot_deal_id TEXT,
+  hubspot_last_synced_at TIMESTAMPTZ,
   -- Context
   notes TEXT,
   created_by TEXT,
@@ -39,6 +44,8 @@ CREATE TABLE IF NOT EXISTS greenhouse_finance.quotes (
 CREATE INDEX IF NOT EXISTS idx_quotes_client ON greenhouse_finance.quotes (client_id);
 CREATE INDEX IF NOT EXISTS idx_quotes_status ON greenhouse_finance.quotes (status);
 CREATE INDEX IF NOT EXISTS idx_quotes_nubox ON greenhouse_finance.quotes (nubox_document_id);
+CREATE INDEX IF NOT EXISTS idx_quotes_hubspot ON greenhouse_finance.quotes (hubspot_quote_id);
+CREATE INDEX IF NOT EXISTS idx_quotes_source ON greenhouse_finance.quotes (source_system);
 
 -- Add referenced_income_id to income for credit note → invoice linking
 ALTER TABLE greenhouse_finance.income

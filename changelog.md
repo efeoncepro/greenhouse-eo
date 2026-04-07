@@ -2,6 +2,75 @@
 
 ## 2026-04-07
 
+### 2026-04-07 — Emails de solicitud + revision pendiente de permisos
+
+- Nuevos templates `leave_request_submitted` y `leave_request_pending_review`
+- Email al solicitante: confirmacion de envio con badge "pendiente", summary card, motivo
+- Email al aprobador: notificacion con datos del colaborador, periodo, dias, CTA a panel de revision
+- Integrado en `leave_request.created` y `leave_request.escalated_to_hr`
+- Hero images clay 3D en GCS (avion de papel, campana con badge naranja)
+- Familia `leave_request_*` completamente implementada: submitted, approved, rejected, cancelled + review confirmation
+
+### 2026-04-07 — Emails de decision de permisos + hero images AI
+
+- Nuevos templates `leave_request_decision` y `leave_review_confirmation` (React Email + Resend)
+- Email al solicitante: status badge, summary card (tipo/fechas/dias), notas del revisor
+- Email al revisor: confirmacion de accion, motivo original del colaborador
+- Soporte es/en via auto-context hydration, hero images generadas con Imagen 4
+- Integracion en notification projection: disparo automatico en `leave_request.approved`, `.rejected`, `.cancelled`
+- Event payload enriquecido con `notes` y `reason` para personalizacion
+- Skill `/greenhouse-email` creada (repo + global) para workflow de creacion de nuevos emails
+
+### 2026-04-07 — Separación labor_cost_clp + consolidación de tipos
+
+- Nueva columna `labor_cost_clp` en `client_economics` — costo laboral (de commercial_cost_attribution) ya no se mezcla con `direct_costs_clp`
+- Migración con backfill desde `commercial_cost_attribution.commercial_labor_cost_target`
+- `sanitizeSnapshotForPresentation` requiere `laborCostClp` (requerido, no opcional) — TypeScript rechaza callers que no lo pasen
+- 360 economics facet expone `laborCostCLP` per client en `byClient`
+- Finance tab: nueva columna "Costo laboral" en tabla Rentabilidad por Space
+- Economics tab: usa campo real en vez de hardcoded `0`
+- Trend chart ordenado cronológicamente (ASC) en vez de DESC
+- `OrganizationClientFinance` y `OrganizationFinanceSummary` consolidadas en un solo archivo (`types.ts`), backend re-exporta — eliminados duplicados
+
+### 2026-04-07 — ops-worker: cost attribution materialization endpoint
+
+- Nuevo endpoint `POST /cost-attribution/materialize` en Cloud Run ops-worker (TASK-279 continuación)
+- Mueve materialización de `commercial_cost_attribution` a Cloud Run: VIEW con 3 CTEs + LATERAL JOIN + exchange rates timeout en Vercel serverless
+- Acepta `{year, month}` para single-period o vacío para bulk. Recomputa `client_economics` snapshots opcionalmente
+- Deploy: Cloud Build → revision `ops-worker-00006-qtl` sirviendo 100% tráfico
+- Bug fix: `deploy.sh` usaba `--headers` en `gcloud scheduler jobs update` (flag inválido) → corregido a `--update-headers`
+- Test fix: mock de projection test actualizado para nuevo return type `{ rows, replaced }`
+
+### 2026-04-07 — TASK-279: Labor Cost Attribution Pipeline
+
+- Cierre de brecha payroll → client_economics: 5 silent `.catch(() => [])` reemplazados por logging estructurado
+- Cron `economics-materialize` ahora materializa `commercial_cost_attribution` antes de computar snapshots
+- Backfill: `commercial_cost_attribution` (5 rows), `client_economics` Sky Airline (directCosts=$2.5M, margin=63.6%, 3 FTE), `operational_pl_snapshots` (laborCost, headcountFte)
+- Enterprise hardening: `atomicReplacePeriod` (transaccional purge+insert), `materializeAllAvailablePeriods`, admin endpoint `POST /api/internal/cost-attribution-materialize`, cron best-effort con fallback graceful
+- Causa raiz Vercel: VIEW `client_labor_cost_allocation` timeout en serverless cold-start (3 CTEs + LATERAL JOIN). Arquitectura: Vercel solo lee materializado, Cloud Run/admin materializa
+- ISSUE-028: HubSpot Cloud Run Private App Token expirado → rotado en Secret Manager v2 + Cloud Run update
+- ISSUE-029: `createIdentityProfile` columnas incorrectas (`source_system` → `primary_source_system`) + `profile_type` NOT NULL faltante
+
+### 2026-04-07 — TASK-274: Account Complete 360 federated serving layer
+
+- Resolver federado `getAccountComplete360()` con 9 facetas independientes
+- Scope resolver centralizado: org → spaces → clients ejecutado una vez
+- Identifier resolver: acepta organization_id, public_id (EO-ORG-*), hubspot_company_id
+- Authorization engine per-facet con 6 niveles de acceso
+- In-memory cache per-facet con TTL + stale-while-revalidate
+- Cache invalidation via 22 outbox events
+- API: GET /api/organization/[id]/360 + POST /api/organizations/360 (bulk)
+- Observability: ResolverTrace, X-Resolver-Version, X-Cache-Status, X-Timing-Ms
+- Deprecated: getOrganizationExecutiveSnapshot(), getOrganizationEconomics()
+- Verificado E2E en staging con Sky Airline (9/9 facetas, $6.9M revenue, 20 members)
+- **Consumer migration — Organization Detail tabs migradas al 360**:
+  - OverviewTab: economics+delivery+team facets con last-closed-month asOf (fix: KPIs "—" en mes sin datos)
+  - EconomicsTab: economics facet con trend chart, byClient table, period selector
+  - FinanceTab: parallel legacy+360 — agrega KPIs YTD (revenue, invoices, outstanding)
+  - PeopleTab: parallel legacy+360 — agrega KPIs team summary (totalMembers, totalFte)
+  - ProjectsTab: delivery facet como source of truth (fix: "Sin proyectos" con 72 proyectos existentes)
+  - ICO Tab: se mantiene en endpoint especializado
+
 - **TASK-278: AI Visual Asset Generator + Profile Banners**:
   - Nuevo modulo `src/lib/ai/image-generator.ts` con `generateImage()` (Imagen 4) y `generateAnimation()` (Gemini SVG)
   - Endpoints internos: `POST /api/internal/generate-image` y `POST /api/internal/generate-animation` (admin-only, disabled en production)

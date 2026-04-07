@@ -7,6 +7,7 @@ import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-in
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { getOrganizationOperationalServing } from './get-organization-operational-serving'
+import type { OrganizationClientFinance, OrganizationFinanceSummary } from '@/views/greenhouse/organizations/types'
 
 // ── Types ───────────────────────────────────────────────────────────────
 
@@ -529,36 +530,16 @@ export const deactivateMembership = async (membershipId: string) => {
 
 // ── Finance ────────────────────────────────────────────────────────────
 
-export interface OrganizationClientFinance {
-  clientId: string
-  clientName: string
-  totalRevenueClp: number
-  directCostsClp: number
-  indirectCostsClp: number
-  grossMarginPercent: number | null
-  netMarginPercent: number | null
-  headcountFte: number | null
-  hasCompleteCostCoverage?: boolean
-}
-
-export interface OrganizationFinanceSummary {
-  organizationId: string
-  periodYear: number
-  periodMonth: number
-  clientCount: number
-  totalRevenueClp: number
-  totalDirectCostsClp: number
-  totalIndirectCostsClp: number
-  avgGrossMarginPercent: number | null
-  avgNetMarginPercent: number | null
-  totalFte: number | null
-  clients: OrganizationClientFinance[]
-}
+// OrganizationClientFinance and OrganizationFinanceSummary are imported from
+// @/views/greenhouse/organizations/types — single source of truth for both
+// server and client code. Re-export for backward compatibility.
+export type { OrganizationClientFinance, OrganizationFinanceSummary }
 
 interface OrgFinanceRow extends Record<string, unknown> {
   client_id: string
   client_name: string
   total_revenue_clp: string | number
+  labor_cost_clp: string | number
   direct_costs_clp: string | number
   indirect_costs_clp: string | number
   gross_margin_percent: string | number | null
@@ -575,7 +556,8 @@ export const getOrganizationFinanceSummary = async (
     runGreenhousePostgresQuery<OrgFinanceRow>(`
       SELECT
         ce.client_id, ce.client_name,
-        ce.total_revenue_clp, ce.direct_costs_clp, ce.indirect_costs_clp,
+        ce.total_revenue_clp, COALESCE(ce.labor_cost_clp, 0) AS labor_cost_clp,
+        ce.direct_costs_clp, ce.indirect_costs_clp,
         ce.gross_margin_percent, ce.net_margin_percent,
         ce.headcount_fte
       FROM greenhouse_finance.client_economics ce
@@ -600,11 +582,12 @@ export const getOrganizationFinanceSummary = async (
     rows = await queryRows()
   }
 
-  const clients: OrganizationClientFinance[] = rows.map(r =>
-    sanitizeSnapshotForPresentation({
+  const clients: OrganizationClientFinance[] = rows.map(r => {
+    const sanitized = sanitizeSnapshotForPresentation({
       clientId: String(r.client_id),
       clientName: String(r.client_name),
       totalRevenueClp: toNum(r.total_revenue_clp),
+      laborCostClp: toNum(r.labor_cost_clp),
       directCostsClp: toNum(r.direct_costs_clp),
       indirectCostsClp: toNum(r.indirect_costs_clp),
       grossMarginPercent: r.gross_margin_percent != null ? toNum(r.gross_margin_percent) : null,
@@ -612,9 +595,12 @@ export const getOrganizationFinanceSummary = async (
       headcountFte: r.headcount_fte != null ? toNum(r.headcount_fte) : null,
       notes: null
     })
-  )
+
+    return sanitized
+  })
 
   const totalRev = clients.reduce((s, c) => s + c.totalRevenueClp, 0)
+  const totalLabor = clients.reduce((s, c) => s + (c.laborCostClp ?? 0), 0)
   const totalDirect = clients.reduce((s, c) => s + c.directCostsClp, 0)
   const totalIndirect = clients.reduce((s, c) => s + c.indirectCostsClp, 0)
   const totalFte = clients.reduce((s, c) => s + (c.headcountFte ?? 0), 0)
@@ -642,6 +628,7 @@ export const getOrganizationFinanceSummary = async (
     periodMonth: month,
     clientCount: clients.length,
     totalRevenueClp: totalRev,
+    totalLaborCostClp: totalLabor,
     totalDirectCostsClp: totalDirect,
     totalIndirectCostsClp: totalIndirect,
     avgGrossMarginPercent: avgGross,
@@ -708,9 +695,10 @@ export const createIdentityProfile = async (data: {
 
   await runGreenhousePostgresQuery(`
     INSERT INTO greenhouse_core.identity_profiles (
-      profile_id, full_name, canonical_email, source_system,
-      source_object_type, source_object_id, active, created_at, updated_at
-    ) VALUES ($1, $2, $3, $4, $5, $6, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      profile_id, full_name, canonical_email, profile_type,
+      primary_source_system, primary_source_object_type, primary_source_object_id,
+      active, created_at, updated_at
+    ) VALUES ($1, $2, $3, 'external_contact', $4, $5, $6, TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
     ON CONFLICT (profile_id) DO UPDATE
     SET
       full_name = EXCLUDED.full_name,

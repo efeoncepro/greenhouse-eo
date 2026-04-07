@@ -135,8 +135,11 @@ type Props = {
 const OrganizationEconomicsTab = ({ detail }: Props) => {
   const now = new Date()
   const theme = useTheme()
-  const [year, setYear] = useState(now.getFullYear())
-  const [month, setMonth] = useState(now.getMonth() + 1)
+
+  // Default to previous month (last closed month) — current month often has no data yet
+  const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+  const [year, setYear] = useState(prevMonth.getFullYear())
+  const [month, setMonth] = useState(prevMonth.getMonth() + 1)
   const [data, setData] = useState<EconomicsResponse | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -145,11 +148,104 @@ const OrganizationEconomicsTab = ({ detail }: Props) => {
       setLoading(true)
 
       try {
+        const asOf = `${year}-${String(month).padStart(2, '0')}-01`
+
         const res = await fetch(
-          `/api/organizations/${detail.organizationId}/economics?year=${year}&month=${month}&trend=6`
+          `/api/organization/${detail.organizationId}/360?facets=economics&asOf=${asOf}&limit=6`
         )
 
-        if (res.ok) setData(await res.json())
+        if (res.ok) {
+          const raw = await res.json()
+
+          const econ = raw.economics as
+            | {
+                currentPeriod: {
+                  year: number
+                  month: number
+                  closureStatus: string | null
+                  periodClosed: boolean
+                  revenueCLP: number
+                  laborCostCLP: number
+                  directExpenseCLP: number
+                  indirectExpenseCLP: number
+                  grossMarginCLP: number
+                  grossMarginPct: number | null
+                  headcountFte: number | null
+                  revenuePerFte: number | null
+                  costPerFte: number | null
+                } | null
+                trend: {
+                  year: number
+                  month: number
+                  revenueCLP: number
+                  laborCostCLP: number
+                  grossMarginCLP: number
+                  grossMarginPct: number | null
+                  headcountFte: number | null
+                }[]
+                byClient: {
+                  clientId: string
+                  clientName: string
+                  revenueCLP: number
+                  laborCostCLP: number
+                  costCLP: number
+                  marginPct: number | null
+                  fte: number | null
+                }[]
+              }
+            | undefined
+
+          const cp = econ?.currentPeriod
+
+          const mapped: EconomicsResponse = {
+            current: {
+              organizationId: detail.organizationId,
+              periodYear: cp?.year ?? year,
+              periodMonth: cp?.month ?? month,
+              closureStatus: cp?.closureStatus ?? null,
+              periodClosed: cp?.periodClosed ?? false,
+              snapshotRevision: null,
+              totalRevenueClp: cp?.revenueCLP ?? 0,
+              totalLaborCostClp: cp?.laborCostCLP ?? 0,
+              totalDirectCostsClp: cp?.directExpenseCLP ?? 0,
+              totalIndirectCostsClp: cp?.indirectExpenseCLP ?? 0,
+              adjustedMarginClp: cp?.grossMarginCLP ?? 0,
+              adjustedMarginPercent: cp?.grossMarginPct ?? null,
+              activeFte: cp?.headcountFte ?? null,
+              revenuePerFte: cp?.revenuePerFte ?? null,
+              costPerFte: cp?.costPerFte ?? null,
+              clientCount: econ?.byClient?.length ?? 0
+            },
+            breakdown: (econ?.byClient ?? []).map(c => ({
+              clientId: c.clientId,
+              clientName: c.clientName,
+              closureStatus: cp?.closureStatus ?? null,
+              periodClosed: cp?.periodClosed ?? false,
+              snapshotRevision: null,
+              revenueClp: c.revenueCLP,
+              laborCostClp: c.laborCostCLP,
+              directCostsClp: c.costCLP - c.laborCostCLP,
+              marginClp: c.revenueCLP - c.costCLP,
+              marginPercent: c.marginPct,
+              headcountFte: c.fte
+            })),
+            ico: null, // not in economics facet
+            trend: (econ?.trend ?? []).map(t => ({
+              periodYear: t.year,
+              periodMonth: t.month,
+              closureStatus: null,
+              periodClosed: false,
+              snapshotRevision: null,
+              totalRevenueClp: t.revenueCLP,
+              totalLaborCostClp: t.laborCostCLP,
+              adjustedMarginClp: t.grossMarginCLP,
+              adjustedMarginPercent: t.grossMarginPct,
+              activeFte: t.headcountFte
+            }))
+          }
+
+          setData(mapped)
+        }
       } catch {
         // Non-blocking
       } finally {
@@ -164,15 +260,17 @@ const OrganizationEconomicsTab = ({ detail }: Props) => {
   const current = data?.current
   const ico = data?.ico
 
-  // Trend chart data
-  const trendChartData = data?.trend?.map(t => ({
+  // Trend chart data — sorted chronologically (oldest → newest, left → right)
+  const trendChartData = [...(data?.trend ?? [])].sort((a, b) =>
+    a.periodYear !== b.periodYear ? a.periodYear - b.periodYear : a.periodMonth - b.periodMonth
+  ).map(t => ({
     label: `${MONTH_SHORT[t.periodMonth]} ${String(t.periodYear).slice(2)}`,
     ingreso: Math.round(t.totalRevenueClp / 1_000_000),
     costo: Math.round(t.totalLaborCostClp / 1_000_000),
     margen: Math.round(t.adjustedMarginClp / 1_000_000),
     closureStatus: t.closureStatus,
     periodClosed: t.periodClosed
-  })) ?? []
+  }))
 
   return (
     <Grid container spacing={6}>
@@ -303,7 +401,9 @@ const OrganizationEconomicsTab = ({ detail }: Props) => {
                 <Divider />
                 <CardContent>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mb: 4 }}>
-                    {data?.trend?.map(point => (
+                    {[...(data?.trend ?? [])].sort((a, b) =>
+                      a.periodYear !== b.periodYear ? a.periodYear - b.periodYear : a.periodMonth - b.periodMonth
+                    ).map(point => (
                       <CustomChip
                         key={`${point.periodYear}-${point.periodMonth}`}
                         round='true'

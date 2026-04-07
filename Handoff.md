@@ -1,5 +1,132 @@
 # Handoff.md
 
+## Sesion 2026-04-07 — Leave request submission + pending review emails
+
+### Emails de solicitud y revision de permisos (2026-04-07)
+
+Dos nuevos templates para el flujo de envio de solicitudes:
+
+- **`leave_request_submitted`**: confirmacion al solicitante al enviar solicitud. Badge "pendiente de revision", summary card, motivo condicional.
+- **`leave_request_pending_review`**: notificacion al supervisor/HR con datos del colaborador, tipo, periodo, dias y motivo. CTA directo a "Revisar solicitud".
+
+Integrado en:
+- `leave_request.created` → email al requester + email a reviewer(s)
+- `leave_request.escalated_to_hr` → email a HR reviewers
+- Hero images clay 3D en GCS (avion de papel + campana con badge)
+- **P2 `leave_request_*` completamente implementado**: submitted, approved, rejected, cancelled + review confirmation
+- **Rama**: develop → main
+
+---
+
+## Sesion 2026-04-07 — Leave request decision emails + AI hero images
+
+### Emails de decision de permisos (2026-04-07)
+
+Dos nuevos templates transaccionales dedicados para el flujo de permisos/ausencias:
+
+- **`leave_request_decision`**: email al solicitante cuando su permiso es aprobado, rechazado o cancelado. Status badge (verde/rojo/gris), summary card con tipo/fechas/dias, notas del revisor condicionales.
+- **`leave_review_confirmation`**: email al revisor confirmando la accion que tomo (approve/reject). Incluye motivo original del solicitante y notas propias.
+
+Ambos soportan es/en, hero images generadas con Imagen 4, auto-context hydration.
+
+- **Integracion**: notification projection envia emails dedicados + in-app notification (paralelo)
+- **Event payload**: enriquecido con `notes` y `reason` en `buildLeaveEventPayload`
+- **Skill**: `/greenhouse-email` creada (repo + global) — workflow completo de creacion de emails con AI images
+- **Rama**: develop
+
+---
+
+## Sesion 2026-04-07 — labor_cost_clp separation + type consolidation
+
+### Separación de costo laboral en client_economics (2026-04-07)
+
+El costo laboral estaba lumped en `direct_costs_clp`, causando que la columna "Costo laboral" mostrara $0 y el sanitizer anulara márgenes cuando los otros costos eran 0.
+
+- **Migración**: `labor_cost_clp` columna dedicada en `client_economics` + backfill desde `commercial_cost_attribution.commercial_labor_cost_target`
+- **Compute**: `computeClientEconomicsSnapshots` separa `laborCosts` de `directCosts` en el pipeline
+- **Sanitizer**: `laborCostClp` ahora **requerido** (no opcional) — `totalCosts = labor + direct + indirect`. TypeScript rechaza callers que no lo pasen.
+- **360 facet**: `AccountClientProfitability.laborCostCLP` expuesto en `byClient`
+- **Finance tab**: nueva columna "Costo laboral" en tabla Rentabilidad por Space
+- **Economics tab**: `laborCostClp` usa campo real (no hardcoded 0), `directCostsClp = costCLP - laborCostCLP`
+- **Trend chart**: ordenado cronológicamente (Nov 25 → Mar 26) en vez de invertido
+- **Type consolidation**: `OrganizationClientFinance` y `OrganizationFinanceSummary` definidas solo en `types.ts`. Backend importa de ahí — eliminados duplicados de `organization-store.ts`.
+- **Archivos**: migration SQL, `postgres-store-intelligence.ts`, `postgres-store-slice2.ts`, `client-economics-presentation.ts`, `organization-store.ts`, `types.ts`, `account-complete-360.ts`, `economics.ts` (facet), `OrganizationEconomicsTab.tsx`, `OrganizationFinanceTab.tsx`
+- **Rama**: develop
+
+---
+
+## Sesion 2026-04-07 — ops-worker: cost attribution endpoint + deploy + fixes
+
+### ops-worker Cloud Run update (2026-04-07)
+
+Nuevo endpoint `POST /cost-attribution/materialize` en Cloud Run ops-worker para materializar commercial cost attribution sin timeout de Vercel serverless.
+
+- **Endpoint**: `POST /cost-attribution/materialize` — acepta `{year, month}` para single-period o vacío para bulk. `recomputeEconomics` (default true) recomputa `client_economics` después.
+- **Pipeline**: Ejecuta VIEW `client_labor_cost_allocation` (3 CTEs + LATERAL JOIN + exchange rates) → `atomicReplacePeriod` (transaccional) → opcionalmente `computeClientEconomicsSnapshots`.
+- **Deploy**: Cloud Build + Cloud Run revision `ops-worker-00006-qtl` sirviendo 100% tráfico.
+- **Verificado**: Health check OK + `/cost-attribution/materialize` respondiendo (576ms).
+- **Bug fix pre-existente**: `deploy.sh` usaba `--headers` en `gcloud scheduler jobs update` (flag solo existe en `create`). Corregido a `--update-headers`. Los 3 scheduler jobs actualizados manualmente.
+- **Test fix**: Mock de `materializeCommercialCostAttributionForPeriod` en `commercial-cost-attribution.test.ts` actualizado para nuevo return type `{ rows, replaced }`.
+- **Archivos**: `services/ops-worker/server.ts`, `services/ops-worker/deploy.sh`, `src/lib/sync/projections/commercial-cost-attribution.test.ts`
+- **Documentación**: Architecture §4.9, functional doc ops-worker v1.1, CLAUDE.md, AGENTS.md, project_context.md actualizados.
+
+---
+
+## Sesion 2026-04-07 — TASK-279: Labor Cost Attribution Pipeline
+
+### TASK-279 — Labor Cost Attribution Pipeline (2026-04-07)
+
+Cierre de brecha entre payroll y client_economics. Los costos laborales existian en serving tables pero no fluian a los snapshots de rentabilidad.
+
+- **Causa raiz**: 5 `.catch(() => [])` silenciosos en el pipeline de commercial cost attribution ocultaban errores. `commercial_cost_attribution` nunca se materializo (0 rows). Snapshots se computaban sin costos laborales.
+- **Fix codigo**: Reemplazo de silent catches por `console.error` con contexto. Cron `economics-materialize` ahora materializa cost attribution como primer paso.
+- **Fix datos**: Backfill manual de `commercial_cost_attribution` (5 rows Feb+Mar 2026), actualizacion de `client_economics` y `operational_pl_snapshots` para Sky Airline con costos reales.
+- **Resultado**: Sky Airline marzo 2026 — Revenue $6.9M, Labor $2.5M, Margen 63.6%, 3 FTE. UI muestra margenes reales en vez de "—".
+- **Archivos**: `src/lib/commercial-cost-attribution/member-period-attribution.ts`, `store.ts`, `src/lib/finance/postgres-store-intelligence.ts`, `src/app/api/cron/economics-materialize/route.ts`
+- **Causa raiz Vercel**: VIEW `client_labor_cost_allocation` tiene 3 CTEs + LATERAL JOIN + exchange rates → timeout en serverless cold-start. Solucion: materializar via Cloud Run/admin, Vercel solo lee de tabla materializada.
+- **Enterprise hardening**: `atomicReplacePeriod` (transaccional), `materializeAllAvailablePeriods`, admin endpoint `POST /api/internal/cost-attribution-materialize`, cron best-effort con fallback graceful.
+- **Backfill**: Feb 2026 (78.5% margin, 2 allocations) + Mar 2026 (63.6% margin, 3 allocations) + operational_pl_snapshots actualizados.
+- **Rama**: develop
+
+### ISSUE-028 — HubSpot Cloud Run Token Expirado (2026-04-07)
+
+- Private App Token en Secret Manager revocado → 401 en todas las llamadas HubSpot
+- Fix: nuevo token → Secret Manager version 2 → Cloud Run service update
+- Verificado: company profile + contacts devuelven 200
+
+### ISSUE-029 — HubSpot Sync identity_profiles Column Mismatch (2026-04-07)
+
+- `createIdentityProfile` usaba `source_system` (no existe) en vez de `primary_source_system`, y faltaba `profile_type` (NOT NULL)
+- Fix: renombrar columnas + agregar `profile_type = 'external_contact'`
+
+## Sesion 2026-04-07 — TASK-274: Account Complete 360
+
+### TASK-274 — Account Complete 360 (2026-04-07)
+
+Implementacion completa del resolver federado por facetas para organizaciones/cuentas. Analogo a Person Complete 360 (TASK-273).
+
+- **Resolver**: `getAccountComplete360(identifier, { facets: [...] })` en `src/lib/account-360/account-complete-360.ts`
+- **9 facetas**: identity, spaces, team, economics, delivery, finance, crm, services, staffAug
+- **Scope**: org → spaces → clients resuelto una sola vez, compartido por todas las facetas
+- **API**: `GET /api/organization/[id]/360?facets=...` + `POST /api/organizations/360` (bulk, max 50)
+- **Auth**: por faceta segun rol (admin todo, operations sin finance, client limitado a identity+spaces+team+delivery+services)
+- **Cache**: in-memory per-facet TTL + invalidacion por 22 eventos outbox
+- **Verificado E2E**: Sky Airline 9/9 facetas con datos reales (economics $6.9M revenue mar-2026, 20 team members, 7 CRM deals, 72 proyectos)
+- **Consumer migration**: TODAS las tabs de Organization Detail migradas al 360
+- **Rama**: develop (pendiente merge a main)
+
+### Consumer Migration — Organization Detail Tabs (2026-04-07)
+
+Todas las tabs de la vista Organization Detail (`/agency/organizations/{id}`) ahora usan el Account 360 resolver en lugar de endpoints legacy separados.
+
+- **OverviewTab**: `GET /api/organization/{id}/360?facets=economics,delivery,team&asOf={lastClosedMonth}` — fix: usa ultimo mes cerrado en vez de mes actual (soluciona KPIs mostrando "—" en abril sin datos)
+- **EconomicsTab**: `GET /api/organization/{id}/360?facets=economics&asOf={year}-{month}-01&limit=6` — mapea currentPeriod, trend y byClient del facet economics
+- **FinanceTab**: fetch paralelo legacy + 360 finance — legacy para tabla de detalle por Space, 360 para KPIs YTD (revenue YTD, invoice count, outstanding)
+- **PeopleTab**: fetch paralelo legacy + 360 team — legacy para tabla de memberships, 360 para KPIs summary (totalMembers, totalFte)
+- **ProjectsTab**: (migrado anteriormente) 360 delivery como source of truth para conteos, legacy para detalle por proyecto Notion
+- **OrganizationView header KPIs**: (migrado anteriormente) 360 economics para revenue, margen, FTE, spaces
+- **ICO Tab**: se mantiene en endpoint especializado (tiene distribuciones CSC, radar health, metricas por space que el facet delivery no replica)
+
 ## Sesion 2026-04-07 — TASK-278: AI Visual Asset Generator + Profile Banners
 
 ### Rama / alcance

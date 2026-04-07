@@ -10,6 +10,7 @@
  *   POST /reactive/process          → Process all reactive events (replaces outbox-react cron)
  *   POST /reactive/process-domain   → Process domain-scoped reactive events (replaces outbox-react-delivery cron)
  *   POST /reactive/recover          → Recover orphaned projection queue items (replaces projection-recovery cron)
+ *   POST /cost-attribution/materialize → Materialize commercial cost attribution + client economics
  *
  * Auth: Cloud Run IAM (--no-allow-unauthenticated) + optional CRON_SECRET header
  * Runtime: Node.js 22 via esbuild bundle (handles TypeScript + @/ path aliases)
@@ -27,6 +28,11 @@ import {
   writeReactiveRunComplete,
   writeReactiveRunFailure
 } from '@/lib/sync/reactive-run-tracker'
+import {
+  materializeCommercialCostAttributionForPeriod,
+  materializeAllAvailablePeriods
+} from '@/lib/commercial-cost-attribution/member-period-attribution'
+import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
 
 // ─── Config ─────────────────────────────────────────────────────────────────
 
@@ -272,6 +278,81 @@ const handleReactiveRecover = async (req: IncomingMessage, res: ServerResponse) 
   }
 }
 
+/**
+ * POST /cost-attribution/materialize
+ * Materializes commercial cost attribution for one period or all periods.
+ * Runs the heavy VIEW queries that timeout on Vercel serverless.
+ * Optionally recomputes client_economics snapshots after materialization.
+ *
+ * Body:
+ *   { year?: number, month?: number, recomputeEconomics?: boolean }
+ *   - If year+month provided: single period
+ *   - If omitted: all periods with data
+ *   - recomputeEconomics defaults to true
+ */
+const handleCostAttributionMaterialize = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+  const year = typeof body.year === 'number' ? body.year : undefined
+  const month = typeof body.month === 'number' ? body.month : undefined
+  const recomputeEconomics = body.recomputeEconomics !== false
+
+  const startMs = Date.now()
+
+  console.log(`[ops-worker] POST /cost-attribution/materialize — year=${year ?? 'all'} month=${month ?? 'all'} recompute=${recomputeEconomics}`)
+
+  try {
+    let result: { periods: number; totalAllocations: number; economicsRecomputed: number }
+
+    if (year && month) {
+      const { replaced } = await materializeCommercialCostAttributionForPeriod(
+        year, month, 'ops-worker-trigger'
+      )
+
+      let economicsRecomputed = 0
+
+      if (recomputeEconomics && replaced > 0) {
+        const snapshots = await computeClientEconomicsSnapshots(year, month, 'ops-worker-cost-attribution-refresh')
+
+        economicsRecomputed = snapshots.length
+      }
+
+      result = { periods: 1, totalAllocations: replaced, economicsRecomputed }
+    } else {
+      const { periods, totalAllocations } = await materializeAllAvailablePeriods('ops-worker-trigger-all')
+
+      let economicsRecomputed = 0
+
+      if (recomputeEconomics && totalAllocations > 0) {
+        const currYear = new Date().getFullYear()
+        const currMonth = new Date().getMonth() + 1
+        const prevDate = new Date(currYear, currMonth - 2, 1)
+
+        const [curr, prev] = await Promise.all([
+          computeClientEconomicsSnapshots(currYear, currMonth, 'ops-worker-cost-attribution-refresh'),
+          computeClientEconomicsSnapshots(prevDate.getFullYear(), prevDate.getMonth() + 1, 'ops-worker-cost-attribution-refresh-prev')
+        ])
+
+        economicsRecomputed = curr.length + prev.length
+      }
+
+      result = { periods, totalAllocations, economicsRecomputed }
+    }
+
+    const durationMs = Date.now() - startMs
+
+    console.log(
+      `[ops-worker] /cost-attribution/materialize done — ${result.periods} periods, ${result.totalAllocations} allocations, ${result.economicsRecomputed} economics refreshed, ${durationMs}ms`
+    )
+
+    json(res, 200, { ...result, durationMs })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /cost-attribution/materialize failed:', message)
+    json(res, 500, { error: message })
+  }
+}
+
 // ─── Router ─────────────────────────────────────────────────────────────────
 
 const server = createServer(async (req, res) => {
@@ -306,6 +387,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/reactive/recover') {
       await handleReactiveRecover(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/cost-attribution/materialize') {
+      await handleCostAttributionMaterialize(req, res)
 
       return
     }
