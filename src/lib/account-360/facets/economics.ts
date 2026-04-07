@@ -94,13 +94,13 @@ const queryCurrentPeriod = async (
     runGreenhousePostgresQuery<PeriodRow>(`
       SELECT
         period_year, period_month,
-        COALESCE(SUM(total_revenue_clp), 0) as revenue,
+        COALESCE(SUM(revenue_clp), 0) as revenue,
         COALESCE(SUM(labor_cost_clp), 0) as labor,
-        COALESCE(SUM(direct_costs_clp), 0) as direct,
-        COALESCE(SUM(indirect_costs_clp), 0) as indirect,
+        COALESCE(SUM(direct_expense_clp), 0) as direct,
+        COALESCE(SUM(overhead_clp), 0) as indirect,
         COALESCE(SUM(headcount_fte), 0) as fte
       FROM greenhouse_serving.operational_pl_snapshots
-      WHERE organization_id = $1
+      WHERE scope_id = $1 AND scope_type = 'organization'
         AND period_year = $2 AND period_month = $3
       GROUP BY period_year, period_month
     `, [organizationId, year, month]).catch(() => [] as PeriodRow[]),
@@ -125,11 +125,12 @@ const queryTrend = async (
 ): Promise<TrendRow[]> =>
   runGreenhousePostgresQuery<TrendRow>(`
     SELECT period_year, period_month,
-      COALESCE(SUM(total_revenue_clp), 0) as revenue,
+      COALESCE(SUM(revenue_clp), 0) as revenue,
       COALESCE(SUM(labor_cost_clp), 0) as labor,
       COALESCE(SUM(headcount_fte), 0) as fte
     FROM greenhouse_serving.operational_pl_snapshots
-    WHERE organization_id = $1
+    WHERE scope_id = $1 AND scope_type = 'organization'
+    GROUP BY period_year, period_month
     ORDER BY period_year DESC, period_month DESC
     LIMIT $2
   `, [organizationId, limit]).catch(() => [] as TrendRow[])
@@ -144,7 +145,7 @@ const queryByClient = async (
   return runGreenhousePostgresQuery<ClientRow>(`
     SELECT ce.client_id, c.client_name,
       COALESCE(ce.total_revenue_clp, 0) as revenue,
-      COALESCE(ce.labor_cost_clp + ce.direct_costs_clp + ce.indirect_costs_clp, 0) as cost,
+      COALESCE(ce.direct_costs_clp, 0) + COALESCE(ce.indirect_costs_clp, 0) as cost,
       ce.headcount_fte
     FROM greenhouse_finance.client_economics ce
     JOIN greenhouse_core.clients c ON c.client_id = ce.client_id
