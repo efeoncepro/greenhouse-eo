@@ -192,6 +192,26 @@ export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promis
       ]
     )
 
+    // Persist line items locally (TASK-211)
+    for (let i = 0; i < lineItems.length; i++) {
+      const li = lineItems[i]
+      const liId = `GH-LI-OUT-${Date.now()}-${i}`
+
+      await client.query(
+        `INSERT INTO greenhouse_finance.quote_line_items (
+          line_item_id, quote_id, source_system,
+          line_number, name, description,
+          quantity, unit_price, total_amount,
+          created_at, updated_at
+        ) VALUES ($1, $2, 'hubspot', $3, $4, $5, $6, $7, $8, NOW(), NOW())`,
+        [
+          liId, quoteId, i + 1,
+          li.name, li.description || null,
+          li.quantity, li.unitPrice, li.quantity * li.unitPrice
+        ]
+      )
+    }
+
     await publishOutboxEvent({
       aggregateType: AGGREGATE_TYPES.quote,
       aggregateId: quoteId,
@@ -205,7 +225,8 @@ export const createHubSpotQuote = async (input: CreateHubSpotQuoteInput): Promis
         organizationId,
         spaceId: space.space_id,
         amount: totalAmount,
-        currency: 'CLP'
+        currency: 'CLP',
+        lineItemCount: lineItems.length
       }
     }, client)
   })

@@ -1541,6 +1541,28 @@ export interface GreenhouseFinanceNuboxEmissionLog {
   response_status: number | null;
 }
 
+export interface GreenhouseFinanceProducts {
+  billing_frequency: string | null;
+  billing_period_count: number | null;
+  category: string | null;
+  cost_of_goods_sold: Numeric | null;
+  created_at: Generated<Timestamp | null>;
+  created_by: string | null;
+  currency: Generated<string | null>;
+  description: string | null;
+  hubspot_last_synced_at: Timestamp | null;
+  hubspot_product_id: string | null;
+  is_active: Generated<boolean | null>;
+  is_recurring: Generated<boolean | null>;
+  name: string;
+  product_id: string;
+  sku: string | null;
+  source_system: Generated<string>;
+  tax_rate: Generated<Numeric | null>;
+  unit_price: Numeric | null;
+  updated_at: Generated<Timestamp | null>;
+}
+
 export interface GreenhouseFinancePurchaseOrders {
   attachment_asset_id: string | null;
   attachment_url: string | null;
@@ -1567,6 +1589,28 @@ export interface GreenhouseFinancePurchaseOrders {
   service_scope: string | null;
   space_id: string | null;
   status: Generated<string>;
+  updated_at: Generated<Timestamp | null>;
+}
+
+export interface GreenhouseFinanceQuoteLineItems {
+  created_at: Generated<Timestamp | null>;
+  description: string | null;
+  discount_amount: Generated<Numeric | null>;
+  discount_percent: Generated<Numeric | null>;
+  hubspot_last_synced_at: Timestamp | null;
+  hubspot_line_item_id: string | null;
+  hubspot_product_id: string | null;
+  is_exempt: Generated<boolean | null>;
+  line_item_id: string;
+  line_number: number | null;
+  name: string;
+  product_id: string | null;
+  quantity: Generated<Numeric>;
+  quote_id: string;
+  source_system: Generated<string>;
+  tax_amount: Generated<Numeric | null>;
+  total_amount: Numeric | null;
+  unit_price: Numeric;
   updated_at: Generated<Timestamp | null>;
 }
 
@@ -3522,7 +3566,9 @@ export interface DB {
   "greenhouse_finance.income_line_items": GreenhouseFinanceIncomeLineItems;
   "greenhouse_finance.income_payments": GreenhouseFinanceIncomePayments;
   "greenhouse_finance.nubox_emission_log": GreenhouseFinanceNuboxEmissionLog;
+  "greenhouse_finance.products": GreenhouseFinanceProducts;
   "greenhouse_finance.purchase_orders": GreenhouseFinancePurchaseOrders;
+  "greenhouse_finance.quote_line_items": GreenhouseFinanceQuoteLineItems;
   "greenhouse_finance.quotes": GreenhouseFinanceQuotes;
   "greenhouse_finance.reconciliation_periods": GreenhouseFinanceReconciliationPeriods;
   "greenhouse_finance.service_entry_sheets": GreenhouseFinanceServiceEntrySheets;

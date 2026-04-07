@@ -1,12 +1,22 @@
 # TASK-211 - HubSpot Products & Line Items Bidirectional Integration
 
+## Delta 2026-04-07
+
+- **Complete**: all 9 slices implemented and deployed
+- Migration applied: `products` (36 synced) + `quote_line_items` (32 synced) tables
+- Cloud Run service deployed: `GET /products`, `POST /products`, `PATCH /products/{id}`, `GET /quotes/{id}/line-items`
+- Product catalog UI: `ProductCatalogView.tsx` with margin calculation, create drawer
+- Product picker integrated into TASK-210 quote creation drawer
+- Line items sync integrated into quote sync (automatic per-quote)
+- Cron registered: `hubspot-products-sync` daily at 8 AM
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
-- Status real: `Diseno`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `finance`
 

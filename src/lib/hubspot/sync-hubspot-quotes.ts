@@ -7,6 +7,7 @@ import {
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { syncQuoteLineItems } from '@/lib/hubspot/sync-hubspot-line-items'
 
 // ── Status mapping: HubSpot → Greenhouse ──
 
@@ -185,6 +186,17 @@ export const syncHubSpotQuotesForCompany = async (hubspotCompanyId: string): Pro
       if (action === 'created') result.created++
       else if (action === 'updated') result.updated++
       else result.skipped++
+
+      // Sync line items for this quote (TASK-211)
+      if (action === 'created' || action === 'updated') {
+        const quoteId = `QUO-HS-${quote.identity.hubspotQuoteId}`
+
+        try {
+          await syncQuoteLineItems(quoteId, quote.identity.hubspotQuoteId)
+        } catch (liErr) {
+          result.errors.push(`Quote ${quoteId} line items: ${liErr instanceof Error ? liErr.message : String(liErr)}`)
+        }
+      }
     } catch (err) {
       result.errors.push(`Quote ${quote.identity.quoteId}: ${err instanceof Error ? err.message : String(err)}`)
     }

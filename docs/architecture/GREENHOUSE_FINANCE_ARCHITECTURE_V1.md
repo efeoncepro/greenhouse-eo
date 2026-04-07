@@ -6,6 +6,51 @@
 
 ---
 
+## Delta 2026-04-07 — Products catalog + Quote Line Items (TASK-211)
+
+Dos nuevas tablas en `greenhouse_finance`:
+
+### `greenhouse_finance.products`
+
+Catalogo de productos sincronizado desde HubSpot o creado manualmente.
+
+- ID: `GH-PROD-{hubspot_product_id}` para HubSpot, UUID para manual
+- Columnas clave: `name`, `sku`, `unit_price`, `cost_of_goods_sold`, `is_recurring`, `billing_frequency`
+- Margen calculado en API: `(unit_price - cost_of_goods_sold) / unit_price * 100`
+- Sync: cron diario `hubspot-products-sync` (8 AM)
+
+### `greenhouse_finance.quote_line_items`
+
+Line items transaccionales vinculados a quotes. FK a `quotes(quote_id)` y opcionalmente a `products(product_id)`.
+
+- ID: `GH-LI-{hubspot_line_item_id}` para HubSpot
+- Synced automaticamente con cada quote sync (TASK-210)
+- Creados localmente en outbound quotes con product picker
+
+### Sinergia con TASK-210
+
+- Quote sync ahora sincroniza line items despues de cada quote
+- Quote outbound persiste line items en transaccion
+- CreateQuoteDrawer tiene product picker que auto-fill nombre + precio
+
+### Endpoints
+
+- `GET /api/finance/products` — catalogo con filtros (source, active, search)
+- `POST /api/finance/products/hubspot` — crear producto en HubSpot + local
+- `GET /api/finance/quotes/{id}/lines` — line items de una quote con JOIN a products
+
+### Archivos clave
+
+| Archivo | Funcion |
+|---------|---------|
+| `migrations/20260407193443222_create-products-and-quote-line-items.sql` | DDL |
+| `src/lib/hubspot/sync-hubspot-products.ts` | Inbound product sync |
+| `src/lib/hubspot/sync-hubspot-line-items.ts` | Inbound line items sync per quote |
+| `src/lib/hubspot/create-hubspot-product.ts` | Outbound product creation |
+| `src/app/api/cron/hubspot-products-sync/route.ts` | Cron endpoint |
+| `src/views/greenhouse/finance/ProductCatalogView.tsx` | UI catalogo |
+| `scripts/backfill-hubspot-products.ts` | Backfill one-time |
+
 ## Delta 2026-04-07 — HubSpot Quotes bidirectional integration (TASK-210)
 
 `greenhouse_finance.quotes` es ahora multi-source. Nuevas columnas: `source_system` (`nubox`/`hubspot`/`manual`), `hubspot_quote_id`, `hubspot_deal_id`, `hubspot_last_synced_at`.

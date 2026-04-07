@@ -54,6 +54,14 @@ Mutacion en store
 | `quote` | `finance.quote.created` | `hubspot/create-hubspot-quote.ts` | `{ quoteId, hubspotQuoteId, sourceSystem, direction, organizationId, amount, currency }` | — |
 | `quote` | `finance.quote.synced` | `hubspot/sync-hubspot-quotes.ts` | `{ quoteId, hubspotQuoteId, hubspotDealId, sourceSystem, action, organizationId, spaceId }` | — |
 | `quote` | `finance.quote.converted` | (futuro: quote → invoice bridge) | `{ quoteId, incomeId }` | — |
+| `quote_line_item` | `finance.quote_line_item.synced` | `hubspot/sync-hubspot-line-items.ts` | `{ quoteId, hubspotQuoteId, created, updated }` | — |
+
+### Products (TASK-211)
+
+| Aggregate Type | Event Type | Publisher | Payload | Consumer reactivo |
+|---|---|---|---|---|
+| `product` | `finance.product.synced` | `hubspot/sync-hubspot-products.ts` | `{ productId, hubspotProductId, name, sku, action }` | — |
+| `product` | `finance.product.created` | `hubspot/create-hubspot-product.ts` | `{ productId, hubspotProductId, name, sku, direction }` | — |
 
 ### Nubox
 

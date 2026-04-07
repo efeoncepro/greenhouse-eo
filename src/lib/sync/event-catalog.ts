@@ -68,6 +68,10 @@ export const AGGREGATE_TYPES = {
 
   // Quotes
   quote: 'quote',
+  quoteLineItem: 'quote_line_item',
+
+  // Products
+  product: 'product',
 
   // Purchase Orders & HES
   purchaseOrder: 'purchase_order',
@@ -211,7 +215,12 @@ export const EVENT_TYPES = {
   quoteCreated: 'finance.quote.created',
   quoteSynced: 'finance.quote.synced',
   quoteConverted: 'finance.quote.converted',
+  quoteLineItemSynced: 'finance.quote_line_item.synced',
   creditNoteCreated: 'finance.credit_note.created',
+
+  // Products
+  productSynced: 'finance.product.synced',
+  productCreated: 'finance.product.created',
 
   // Purchase Orders & HES
   purchaseOrderCreated: 'finance.purchase_order.created',

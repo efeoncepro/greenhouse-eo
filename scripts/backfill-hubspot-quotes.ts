@@ -110,9 +110,10 @@ async function main() {
       const clientName = clientNames[0]?.client_name ?? org.organization_name
 
       // Fetch quotes from Cloud Run
-      const timeout = 10000 // 10s for backfill (longer than normal)
+      const fetchTimeout = 10000 // 10s for backfill (longer than normal)
+
       const response = await fetch(`${baseUrl}/companies/${org.hubspot_company_id}/quotes`, {
-        signal: AbortSignal.timeout(timeout)
+        signal: AbortSignal.timeout(fetchTimeout)
       })
 
       if (!response.ok) {

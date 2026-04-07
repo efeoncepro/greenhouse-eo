@@ -47,6 +47,14 @@ interface LineItemInput {
   quantity: number
   unitPrice: number
   description: string
+  productId: string | null
+}
+
+interface ProductOption {
+  productId: string
+  name: string
+  sku: string | null
+  unitPrice: number | null
 }
 
 // ── Status config ──
@@ -96,7 +104,7 @@ const formatDate = (date: string | null) => {
   return `${d}/${m}/${y}`
 }
 
-const emptyLineItem = (): LineItemInput => ({ name: '', quantity: 1, unitPrice: 0, description: '' })
+const emptyLineItem = (): LineItemInput => ({ name: '', quantity: 1, unitPrice: 0, description: '', productId: null })
 
 // ── Create Quote Drawer ──
 
@@ -116,6 +124,24 @@ const CreateQuoteDrawer = ({
   const [expirationDate, setExpirationDate] = useState('')
   const [publishImmediately, setPublishImmediately] = useState(false)
   const [lineItems, setLineItems] = useState<LineItemInput[]>([emptyLineItem()])
+  const [products, setProducts] = useState<ProductOption[]>([])
+
+  // Fetch product catalog for picker
+  useEffect(() => {
+    if (!open) return
+
+    fetch('/api/finance/products?active=true')
+      .then(r => r.ok ? r.json() : { items: [] })
+      .then(data => {
+        setProducts((data.items ?? []).map((p: { productId: string; name: string; sku: string | null; unitPrice: number | null }) => ({
+          productId: p.productId,
+          name: p.name,
+          sku: p.sku,
+          unitPrice: p.unitPrice
+        })))
+      })
+      .catch(() => setProducts([]))
+  }, [open])
 
   const resetForm = () => {
     setOrganizationId('')
@@ -131,8 +157,20 @@ const CreateQuoteDrawer = ({
     onClose()
   }
 
-  const updateLineItem = (index: number, field: keyof LineItemInput, value: string | number) => {
+  const updateLineItem = (index: number, field: keyof LineItemInput, value: string | number | null) => {
     setLineItems(prev => prev.map((li, i) => (i === index ? { ...li, [field]: value } : li)))
+  }
+
+  const selectProduct = (index: number, productId: string) => {
+    const product = products.find(p => p.productId === productId)
+
+    if (product) {
+      setLineItems(prev => prev.map((li, i) =>
+        i === index
+          ? { ...li, name: product.name, unitPrice: product.unitPrice ?? li.unitPrice, productId: product.productId }
+          : li
+      ))
+    }
   }
 
   const addLineItem = () => setLineItems(prev => [...prev, emptyLineItem()])
@@ -260,6 +298,26 @@ const CreateQuoteDrawer = ({
               {lineItems.map((li, i) => (
                 <Card key={i} variant='outlined' sx={{ p: 2 }}>
                   <Stack spacing={1.5}>
+                    {products.length > 0 && (
+                      <CustomTextField
+                        select
+                        fullWidth
+                        size='small'
+                        label='Producto del catalogo'
+                        value={li.productId || ''}
+                        onChange={e => {
+                          if (e.target.value) selectProduct(i, e.target.value)
+                          else updateLineItem(i, 'productId', null)
+                        }}
+                      >
+                        <MenuItem value=''>Item personalizado</MenuItem>
+                        {products.map(p => (
+                          <MenuItem key={p.productId} value={p.productId}>
+                            {p.name}{p.sku ? ` (${p.sku})` : ''}
+                          </MenuItem>
+                        ))}
+                      </CustomTextField>
+                    )}
                     <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
                       <CustomTextField
                         fullWidth
