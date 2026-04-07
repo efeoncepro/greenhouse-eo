@@ -1,5 +1,30 @@
 # Handoff.md
 
+## Sesion 2026-04-06 — ISSUE-024: fix observabilidad Admin Notifications
+
+### Rama / alcance
+
+- rama: `develop`
+- scope: ISSUE-024 — Admin Notifications mostraba KPIs en cero sin indicar si era por falta de datos o error silencioso
+
+### Cambios
+
+- `src/lib/admin/get-admin-notifications-overview.ts` — logging con `console.error` en los 6 catch blocks + campo `diagnostics: string[]` en interfaz + recolección de diagnósticos descriptivos
+- `src/lib/notifications/notification-service.ts` — logging en catch vacío de `logDispatch()`
+- `src/app/api/admin/ops/notifications/test-dispatch/route.ts` — `ensureNotificationSchema()` con 503 si falla + detalle en respuesta
+- `src/views/greenhouse/admin/AdminNotificationsView.tsx` — banner `Alert` de diagnósticos cuando hay problemas detectados
+- `scripts/setup-postgres-notifications.sql` — columna `metadata JSONB DEFAULT '{}'` faltante en `notification_log`
+
+### Verificacion
+
+- `npx tsc --noEmit` — OK
+- `pnpm lint` — OK (archivos modificados)
+
+### Riesgo / siguiente paso
+
+- Verificar en staging que el banner de diagnósticos aparece cuando corresponde
+- Si los KPIs siguen en cero sin diagnósticos, el sistema simplemente no ha recibido eventos de notificación
+
 ## Sesion 2026-04-06 — repo upstream Vuexy registrado en ecosystem doc
 
 ### Rama / alcance

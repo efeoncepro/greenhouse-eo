@@ -15,6 +15,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 
 ### Plataforma interna y calidad
 
+- [Mi Perfil](plataforma/mi-perfil.md) — vista personal del colaborador: datos de identidad, equipos, proyectos, colegas y actividad reciente
 - [Sistema de Observabilidad de Tests](plataforma/sistema-observabilidad-de-tests.md) — inventario del suite, resultados, coverage, artifacts y como leer la ultima corrida sin abrir logs crudos
 - [Sistema de Email Templates](plataforma/sistema-email-templates.md) — inventario de templates (react-email + Resend), design tokens, assets de marca, workflow Figma ↔ codigo
 
@@ -24,7 +25,7 @@ _Pendiente de documentar._
 
 ### HR y Nomina
 
-_Pendiente de documentar._
+- [Sistema de Permisos y Licencias](hr/sistema-permisos-leave.md) — tipos de permiso, medio dia (AM/PM), calculo de dias habiles, flujo de aprobacion, saldo y acumulacion
 
 ### Personas
 

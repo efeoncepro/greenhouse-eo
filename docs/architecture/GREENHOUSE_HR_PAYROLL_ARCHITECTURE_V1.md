@@ -1,5 +1,42 @@
 # GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md
 
+## Delta 2026-04-06 — TASK-271: Half-day leave periods + min_advance_days precision
+
+### Half-day leave periods
+
+`leave_requests` ahora soporta permisos de medio dia. Columnas nuevas:
+
+- `start_period TEXT NOT NULL DEFAULT 'full_day'` — periodo del primer dia de la solicitud
+- `end_period TEXT NOT NULL DEFAULT 'full_day'` — periodo del ultimo dia de la solicitud
+- CHECK constraint: valores validos `('full_day', 'morning', 'afternoon')`
+
+Backward compatible: solicitudes existentes quedan con valor default `full_day`.
+
+Funcion `computeLeaveDayBreakdown()` acepta parametros opcionales `startPeriod` y `endPeriod` y ajusta el calculo de dias habiles:
+
+- Dia unico con `morning` o `afternoon` = 0.5 dias
+- Rango con `afternoon` en start = primer dia cuenta 0.5
+- Rango con `morning` en end = ultimo dia cuenta 0.5
+- Combinacion posible: rango con `afternoon` start + `morning` end = ambos extremos cuentan 0.5
+
+Reglas de producto:
+
+- dia unico: el usuario elige entre `full_day`, `morning` o `afternoon`
+- rango de fechas: selectores independientes para primer dia y ultimo dia
+- los dias fraccionarios (0.5) participan en todas las validaciones de saldo, carry-over y policy
+- el calendario de permisos muestra indicadores AM/PM para solicitudes de medio dia
+
+### min_advance_days ahora es NUMERIC(10,2)
+
+`leave_policies.min_advance_days` cambio de `INTEGER` a `NUMERIC(10,2)` para soportar anticipaciones fraccionarias en horas de negocio.
+
+Valores actualizados en seed:
+
+- `study`: `min_advance_days = 1.5` (equivale a 36 horas habiles de anticipacion)
+- `unpaid`: `min_advance_days = 2` (equivale a 48 horas habiles de anticipacion)
+
+Regla: la validacion de anticipacion sigue comparando contra dias calendario desde la fecha operativa de hoy.
+
 ## Delta 2026-03-31 — Exported también alimenta el ledger de Finance
 
 El cierre `payroll_period.exported` ya no solo dispara recibos/notificaciones downstream.
@@ -421,10 +458,13 @@ Reglas base seed observables por tipo:
   - `max_consecutive_days = 2`
   - `min_continuous_days = 1`
 - `study`
-  - `min_advance_days = 3`
+  - `min_advance_days = 1.5` (36h habiles de anticipacion)
   - `allow_negative_balance = true`
 - `personal`
   - `min_advance_days = 1`
+  - `allow_negative_balance = true`
+- `unpaid`
+  - `min_advance_days = 2` (48h habiles de anticipacion)
   - `allow_negative_balance = true`
 - `medical`
   - `min_advance_days = 0`

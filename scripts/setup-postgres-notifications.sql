@@ -84,6 +84,7 @@ CREATE TABLE IF NOT EXISTS greenhouse_notifications.notification_log (
   channel           TEXT NOT NULL CHECK (channel IN ('in_app', 'email')),
   status            TEXT NOT NULL CHECK (status IN ('sent', 'skipped', 'failed')),
   skip_reason       TEXT,
+  metadata          JSONB DEFAULT '{}',
   error_message     TEXT,
   created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
 );

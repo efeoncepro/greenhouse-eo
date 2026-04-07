@@ -1,5 +1,7 @@
 'use client'
 
+import Alert from '@mui/material/Alert'
+import AlertTitle from '@mui/material/AlertTitle'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
@@ -33,7 +35,10 @@ const chipColor = (status: string): 'success' | 'warning' | 'error' | 'secondary
   return 'info'
 }
 
-const healthStatus = (rate: number, sent: number): { label: string; color: 'success' | 'warning' | 'error' | 'secondary' } => {
+const healthStatus = (
+  rate: number,
+  sent: number
+): { label: string; color: 'success' | 'warning' | 'error' | 'secondary' } => {
   if (sent === 0) return { label: 'idle', color: 'secondary' }
   if (rate >= 95) return { label: 'ok', color: 'success' }
   if (rate >= 80) return { label: 'degradado', color: 'warning' }
@@ -52,7 +57,12 @@ const formatDateTime = (value: string | null) => {
 }
 
 const audienceLabel = (audience: string) => {
-  const map: Record<string, string> = { client: 'Cliente', collaborator: 'Colaborador', internal: 'Interno', admin: 'Admin' }
+  const map: Record<string, string> = {
+    client: 'Cliente',
+    collaborator: 'Colaborador',
+    internal: 'Interno',
+    admin: 'Admin'
+  }
 
   return map[audience] ?? audience
 }
@@ -70,8 +80,7 @@ const priorityColor = (priority: string): 'error' | 'info' | 'secondary' => {
   return 'secondary'
 }
 
-const channelIcons = (channels: string[]) =>
-  channels.map(c => (c === 'in_app' ? '🔔' : '✉️')).join(' ')
+const channelIcons = (channels: string[]) => channels.map(c => (c === 'in_app' ? '🔔' : '✉️')).join(' ')
 
 const statusLabel = (status: string) => {
   const map: Record<string, string> = { sent: 'Enviada', skipped: 'Saltada', failed: 'Fallida' }
@@ -97,6 +106,18 @@ const AdminNotificationsView = ({ data }: Props) => {
           Salud, categorías, dispatch reciente y preferencias por defecto de los canales in-app y email.
         </Typography>
       </Box>
+
+      {/* Diagnostics banner */}
+      {data.diagnostics.length > 0 && (
+        <Alert severity='warning' variant='outlined'>
+          <AlertTitle>Diagnóstico del sistema de notificaciones</AlertTitle>
+          <ul style={{ margin: 0, paddingLeft: 20 }}>
+            {data.diagnostics.map((d, i) => (
+              <li key={i}>{d}</li>
+            ))}
+          </ul>
+        </Alert>
+      )}
 
       {/* KPIs */}
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr' }, gap: 3 }}>
@@ -141,7 +162,9 @@ const AdminNotificationsView = ({ data }: Props) => {
               {/* In-app */}
               <Stack spacing={1}>
                 <Stack direction='row' justifyContent='space-between' alignItems='center'>
-                  <Typography variant='body2' sx={{ fontWeight: 500 }}>In-app</Typography>
+                  <Typography variant='body2' sx={{ fontWeight: 500 }}>
+                    In-app
+                  </Typography>
                   <Chip size='small' variant='tonal' color={inAppStatus.color} label={inAppStatus.label} />
                 </Stack>
                 <LinearProgress
@@ -151,14 +174,17 @@ const AdminNotificationsView = ({ data }: Props) => {
                   sx={{ height: 8, borderRadius: 4 }}
                 />
                 <Typography variant='caption' color='text.secondary'>
-                  {data.deliveryHealth.inApp.sent} enviadas · {data.deliveryHealth.inApp.failed} fallidas · {data.deliveryHealth.inApp.rate}%
+                  {data.deliveryHealth.inApp.sent} enviadas · {data.deliveryHealth.inApp.failed} fallidas ·{' '}
+                  {data.deliveryHealth.inApp.rate}%
                 </Typography>
               </Stack>
 
               {/* Email */}
               <Stack spacing={1}>
                 <Stack direction='row' justifyContent='space-between' alignItems='center'>
-                  <Typography variant='body2' sx={{ fontWeight: 500 }}>Email</Typography>
+                  <Typography variant='body2' sx={{ fontWeight: 500 }}>
+                    Email
+                  </Typography>
                   <Chip size='small' variant='tonal' color={emailStatus.color} label={emailStatus.label} />
                 </Stack>
                 <LinearProgress
@@ -168,7 +194,8 @@ const AdminNotificationsView = ({ data }: Props) => {
                   sx={{ height: 8, borderRadius: 4 }}
                 />
                 <Typography variant='caption' color='text.secondary'>
-                  {data.deliveryHealth.email.sent} enviadas · {data.deliveryHealth.email.failed} fallidas · {data.deliveryHealth.email.rate}%
+                  {data.deliveryHealth.email.sent} enviadas · {data.deliveryHealth.email.failed} fallidas ·{' '}
+                  {data.deliveryHealth.email.rate}%
                 </Typography>
               </Stack>
 
@@ -200,8 +227,12 @@ const AdminNotificationsView = ({ data }: Props) => {
                 <TableRow key={cat.code}>
                   <TableCell>
                     <Stack spacing={0.5}>
-                      <Typography variant='body2' sx={{ fontWeight: 500 }}>{cat.label}</Typography>
-                      <Typography variant='caption' color='text.secondary'>{cat.description}</Typography>
+                      <Typography variant='body2' sx={{ fontWeight: 500 }}>
+                        {cat.label}
+                      </Typography>
+                      <Typography variant='caption' color='text.secondary'>
+                        {cat.description}
+                      </Typography>
                     </Stack>
                   </TableCell>
                   <TableCell>
@@ -209,7 +240,12 @@ const AdminNotificationsView = ({ data }: Props) => {
                   </TableCell>
                   <TableCell>{channelIcons(cat.defaultChannels)}</TableCell>
                   <TableCell>
-                    <Chip size='small' variant='tonal' color={priorityColor(cat.priority)} label={priorityLabel(cat.priority)} />
+                    <Chip
+                      size='small'
+                      variant='tonal'
+                      color={priorityColor(cat.priority)}
+                      label={priorityLabel(cat.priority)}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
@@ -245,7 +281,9 @@ const AdminNotificationsView = ({ data }: Props) => {
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>{row.category}</Typography>
+                        <Typography variant='body2' sx={{ fontSize: '0.8rem' }}>
+                          {row.category}
+                        </Typography>
                       </TableCell>
                       <TableCell>
                         <Typography variant='body2'>{row.channel === 'in_app' ? '🔔' : '✉️'}</Typography>
@@ -312,7 +350,9 @@ const AdminNotificationsView = ({ data }: Props) => {
               {data.categories.map(cat => (
                 <TableRow key={`pref-${cat.code}`}>
                   <TableCell>
-                    <Typography variant='body2' sx={{ fontWeight: 500 }}>{cat.label}</Typography>
+                    <Typography variant='body2' sx={{ fontWeight: 500 }}>
+                      {cat.label}
+                    </Typography>
                   </TableCell>
                   <TableCell align='center'>
                     <Chip

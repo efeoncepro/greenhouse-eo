@@ -94,11 +94,7 @@ export class NotificationService {
       }
 
       const channels = recipient.userId
-        ? await this.resolveChannels(
-            recipient.userId,
-            input.category,
-            categoryConfig.defaultChannels
-          )
+        ? await this.resolveChannels(recipient.userId, input.category, categoryConfig.defaultChannels)
         : categoryConfig.defaultChannels.filter(channel => channel === 'email')
 
       if (channels.length === 0) {
@@ -138,16 +134,7 @@ export class NotificationService {
           const msg = error instanceof Error ? error.message : 'Unknown error'
 
           result.failed.push({ userId: recipientKey, channel: 'in_app', error: msg })
-          await this.logDispatch(
-            null,
-            recipientKey,
-            input.category,
-            'in_app',
-            'failed',
-            undefined,
-            msg,
-            input.metadata
-          )
+          await this.logDispatch(null, recipientKey, input.category, 'in_app', 'failed', undefined, msg, input.metadata)
         }
       }
 
@@ -181,7 +168,11 @@ export class NotificationService {
               input.metadata
             )
           } else {
-            result.failed.push({ userId: recipientKey, channel: 'email', error: emailResult.error || 'Email delivery failed' })
+            result.failed.push({
+              userId: recipientKey,
+              channel: 'email',
+              error: emailResult.error || 'Email delivery failed'
+            })
             await this.logDispatch(
               null,
               recipientKey,
@@ -197,16 +188,7 @@ export class NotificationService {
           const msg = error instanceof Error ? error.message : 'Unknown error'
 
           result.failed.push({ userId: recipientKey, channel: 'email', error: msg })
-          await this.logDispatch(
-            null,
-            recipientKey,
-            input.category,
-            'email',
-            'failed',
-            undefined,
-            msg,
-            input.metadata
-          )
+          await this.logDispatch(null, recipientKey, input.category, 'email', 'failed', undefined, msg, input.metadata)
         }
       } else if (channels.includes('email') && !recipient.email) {
         result.skipped.push({ userId: recipientKey, reason: 'email_not_provided' })
@@ -307,11 +289,13 @@ export class NotificationService {
     return sendEmail({
       emailType: 'notification',
       domain: 'system',
-      recipients: [{
-        userId: recipient.userId,
-        email: recipient.email,
-        name: recipient.fullName
-      }],
+      recipients: [
+        {
+          userId: recipient.userId,
+          email: recipient.email,
+          name: recipient.fullName
+        }
+      ],
       context: {
         title: input.title,
         body: input.body,
@@ -349,8 +333,11 @@ export class NotificationService {
           errorMessage || null
         ]
       )
-    } catch {
-      // Log dispatch failure is non-blocking
+    } catch (error) {
+      console.error(
+        `[notification-service] logDispatch failed for user=${userId} category=${category} channel=${channel}:`,
+        error
+      )
     }
   }
 
