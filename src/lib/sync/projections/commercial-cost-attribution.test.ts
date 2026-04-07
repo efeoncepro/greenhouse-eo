@@ -49,12 +49,15 @@ describe('commercialCostAttributionProjection', () => {
   })
 
   it('materializes the period and emits an attribution materialized event', async () => {
-    mockMaterializeCommercialCostAttributionForPeriod.mockResolvedValue([
-      {
-        memberId: 'member-1',
-        allocations: [{ clientId: 'client-1' }]
-      }
-    ])
+    mockMaterializeCommercialCostAttributionForPeriod.mockResolvedValue({
+      rows: [
+        {
+          memberId: 'member-1',
+          allocations: [{ clientId: 'client-1' }]
+        }
+      ],
+      replaced: 1
+    })
     mockReadCommercialCostAttributionByClientForPeriod.mockResolvedValue([
       { clientId: 'client-1' }
     ])
