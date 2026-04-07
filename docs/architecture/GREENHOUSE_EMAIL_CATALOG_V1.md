@@ -10,6 +10,18 @@ La relacion correcta entre ambas es:
 - `CODEX_TASK_Transactional_Email_System.md` define la infraestructura base de envio, tokens, templates y flows de acceso
 - esta task define el catalogo mas amplio de emails que Greenhouse necesitara como portal ejecutivo-operativo
 
+## Delta 2026-04-07
+
+- Leave request decision emails implementados (2 templates dedicados)
+- `leave_request_decision`: email al solicitante cuando su permiso es aprobado/rechazado/cancelado
+- `leave_review_confirmation`: email al revisor confirmando su accion (approve/reject, no cancel)
+- Ambos templates soportan es/en, hero images (Imagen 4), status badge, summary card, notas condicionales
+- Integracion via notification projection: disparo automatico en eventos `leave_request.approved`, `.rejected`, `.cancelled`
+- Event payload enriquecido con `notes` y `reason` para personalizacion
+- Hero images pre-generadas con Imagen 4 en `public/images/emails/` — servidas via Vercel CDN
+- Skill invocable `/greenhouse-email` creada (repo + global) cubriendo workflow completo de creacion de emails
+- P2 `leave_request_*` parcialmente implementado: falta `leave_request_submitted` (notificacion al supervisor)
+
 ## Delta 2026-04-06
 
 - TASK-269: Email Delivery Enterprise Hardening implementado
@@ -172,8 +184,10 @@ Emails ligados a capacidades o modulos especificos, pero solo cuando el evento i
 ### HR / Payroll
 
 - `leave_request_submitted`
-- `leave_request_approved`
-- `leave_request_rejected`
+- `leave_request_approved` -- **implementado 2026-04-07** como `leave_request_decision` (status: approved)
+- `leave_request_rejected` -- **implementado 2026-04-07** como `leave_request_decision` (status: rejected)
+- `leave_request_cancelled` -- **implementado 2026-04-07** como `leave_request_decision` (status: cancelled)
+- `leave_review_confirmation` -- **implementado 2026-04-07** (email de confirmacion al revisor)
 - `payroll_period_approved`
 - `payroll_export_ready`
 

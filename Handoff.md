@@ -1,5 +1,23 @@
 # Handoff.md
 
+## Sesion 2026-04-07 — Leave request decision emails + AI hero images
+
+### Emails de decision de permisos (2026-04-07)
+
+Dos nuevos templates transaccionales dedicados para el flujo de permisos/ausencias:
+
+- **`leave_request_decision`**: email al solicitante cuando su permiso es aprobado, rechazado o cancelado. Status badge (verde/rojo/gris), summary card con tipo/fechas/dias, notas del revisor condicionales.
+- **`leave_review_confirmation`**: email al revisor confirmando la accion que tomo (approve/reject). Incluye motivo original del solicitante y notas propias.
+
+Ambos soportan es/en, hero images generadas con Imagen 4, auto-context hydration.
+
+- **Integracion**: notification projection envia emails dedicados + in-app notification (paralelo)
+- **Event payload**: enriquecido con `notes` y `reason` en `buildLeaveEventPayload`
+- **Skill**: `/greenhouse-email` creada (repo + global) — workflow completo de creacion de emails con AI images
+- **Rama**: develop
+
+---
+
 ## Sesion 2026-04-07 — labor_cost_clp separation + type consolidation
 
 ### Separación de costo laboral en client_economics (2026-04-07)

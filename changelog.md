@@ -2,6 +2,16 @@
 
 ## 2026-04-07
 
+### 2026-04-07 — Emails de decision de permisos + hero images AI
+
+- Nuevos templates `leave_request_decision` y `leave_review_confirmation` (React Email + Resend)
+- Email al solicitante: status badge, summary card (tipo/fechas/dias), notas del revisor
+- Email al revisor: confirmacion de accion, motivo original del colaborador
+- Soporte es/en via auto-context hydration, hero images generadas con Imagen 4
+- Integracion en notification projection: disparo automatico en `leave_request.approved`, `.rejected`, `.cancelled`
+- Event payload enriquecido con `notes` y `reason` para personalizacion
+- Skill `/greenhouse-email` creada (repo + global) para workflow de creacion de nuevos emails
+
 ### 2026-04-07 — Separación labor_cost_clp + consolidación de tipos
 
 - Nueva columna `labor_cost_clp` en `client_economics` — costo laboral (de commercial_cost_attribution) ya no se mezcla con `direct_costs_clp`
