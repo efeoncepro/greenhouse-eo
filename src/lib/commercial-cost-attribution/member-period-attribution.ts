@@ -1,9 +1,8 @@
 import 'server-only'
 
 import {
-  purgeCommercialCostAttributionPeriod,
   readCommercialCostAttributionAllocationsForPeriod,
-  upsertCommercialCostAttributionAllocations
+  atomicReplacePeriod
 } from './store'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
@@ -315,6 +314,11 @@ export const readCommercialCostAttributionForPeriod = async (
   year: number,
   month: number
 ): Promise<MemberPeriodCommercialCostAttribution[]> => {
+  // Prefer materialized data (fast, no complex VIEWs).
+  // Fall back to on-the-fly compute only if materialized table is empty.
+  // On serverless (Vercel), the on-the-fly path may timeout due to the
+  // client_labor_cost_allocation VIEW complexity — materialization via
+  // Cloud Run ops-worker or admin endpoint is the reliable path.
   const materializedRows = await readCommercialCostAttributionAllocationsForPeriod(year, month).catch((error: unknown) => {
     console.error(`[commercial-cost-attribution] readStoredAllocations failed for ${year}-${String(month).padStart(2, '0')}:`, error instanceof Error ? error.message : error)
 
@@ -325,7 +329,17 @@ export const readCommercialCostAttributionForPeriod = async (
     return buildMemberAttributionFromStoredRows(materializedRows)
   }
 
-  return computeCommercialCostAttributionForPeriod(year, month)
+  // Fallback: compute on-the-fly (may fail on serverless cold-starts)
+  try {
+    return await computeCommercialCostAttributionForPeriod(year, month)
+  } catch (error: unknown) {
+    console.error(
+      `[commercial-cost-attribution] on-the-fly compute failed for ${year}-${String(month).padStart(2, '0')} (materialized table empty, fallback exhausted):`,
+      error instanceof Error ? error.message : error
+    )
+
+    return []
+  }
 }
 
 export const summarizeCommercialCostAttributionByClient = (
@@ -384,37 +398,84 @@ export const materializeCommercialCostAttributionForPeriod = async (
   year: number,
   month: number,
   reason: string | null = null
-) => {
+): Promise<{ rows: MemberPeriodCommercialCostAttribution[]; replaced: number }> => {
+  const periodLabel = `${year}-${String(month).padStart(2, '0')}`
+  const startMs = Date.now()
+
   const rows = await computeCommercialCostAttributionForPeriod(year, month)
   const materializedAt = new Date().toISOString()
 
-  await purgeCommercialCostAttributionPeriod(year, month)
-  await upsertCommercialCostAttributionAllocations(
-    rows.flatMap(row =>
-      row.allocations.map(allocation => ({
-        memberId: allocation.memberId,
-        clientId: allocation.clientId,
-        organizationId: allocation.organizationId,
-        clientName: allocation.clientName,
-        periodYear: allocation.periodYear,
-        periodMonth: allocation.periodMonth,
-        baseLaborCostTarget: row.baseLaborCostTarget,
-        internalOperationalCostTarget: row.internalOperationalCostTarget,
-        directOverheadTarget: row.directOverheadTarget,
-        sharedOverheadTarget: row.sharedOverheadTarget,
-        fteContribution: allocation.fteContribution,
-        allocationRatio: allocation.allocationRatio,
-        commercialLaborCostTarget: allocation.commercialLaborCostTarget,
-        commercialDirectOverheadTarget: allocation.commercialDirectOverheadTarget,
-        commercialSharedOverheadTarget: allocation.commercialSharedOverheadTarget,
-        commercialLoadedCostTarget: allocation.commercialLoadedCostTarget,
-        sourceOfTruth: allocation.sourceOfTruth,
-        ruleVersion: allocation.ruleVersion,
-        materializationReason: reason,
-        materializedAt
-      }))
-    )
+  const allocations = rows.flatMap(row =>
+    row.allocations.map(allocation => ({
+      memberId: allocation.memberId,
+      clientId: allocation.clientId,
+      organizationId: allocation.organizationId,
+      clientName: allocation.clientName,
+      periodYear: allocation.periodYear,
+      periodMonth: allocation.periodMonth,
+      baseLaborCostTarget: row.baseLaborCostTarget,
+      internalOperationalCostTarget: row.internalOperationalCostTarget,
+      directOverheadTarget: row.directOverheadTarget,
+      sharedOverheadTarget: row.sharedOverheadTarget,
+      fteContribution: allocation.fteContribution,
+      allocationRatio: allocation.allocationRatio,
+      commercialLaborCostTarget: allocation.commercialLaborCostTarget,
+      commercialDirectOverheadTarget: allocation.commercialDirectOverheadTarget,
+      commercialSharedOverheadTarget: allocation.commercialSharedOverheadTarget,
+      commercialLoadedCostTarget: allocation.commercialLoadedCostTarget,
+      sourceOfTruth: allocation.sourceOfTruth,
+      ruleVersion: allocation.ruleVersion,
+      materializationReason: reason,
+      materializedAt
+    }))
   )
 
-  return rows
+  // Atomic: purge + insert in a single transaction. If insert fails, purge rolls back.
+  const { replaced } = await atomicReplacePeriod(year, month, allocations)
+
+  const durationMs = Date.now() - startMs
+
+  console.log(
+    `[commercial-cost-attribution] materialize ${periodLabel}: ${rows.length} members, ${replaced} allocations, ${durationMs}ms`
+  )
+
+  return { rows, replaced }
+}
+
+export const materializeAllAvailablePeriods = async (
+  reason: string | null = null
+): Promise<{ periods: number; totalAllocations: number; durationMs: number }> => {
+  const startMs = Date.now()
+
+  // Discover all periods with labor allocation data
+  const periodRows = await runGreenhousePostgresQuery<{ period_year: number; period_month: number }>(
+    `SELECT DISTINCT period_year, period_month
+     FROM greenhouse_serving.client_labor_cost_allocation
+     ORDER BY period_year, period_month`
+  )
+
+  let totalAllocations = 0
+
+  for (const { period_year, period_month } of periodRows) {
+    try {
+      const { replaced } = await materializeCommercialCostAttributionForPeriod(
+        period_year, period_month, reason ?? 'bulk-materialize'
+      )
+
+      totalAllocations += replaced
+    } catch (error: unknown) {
+      console.error(
+        `[commercial-cost-attribution] materializeAll failed for ${period_year}-${String(period_month).padStart(2, '0')}:`,
+        error instanceof Error ? error.message : error
+      )
+    }
+  }
+
+  const durationMs = Date.now() - startMs
+
+  console.log(
+    `[commercial-cost-attribution] materializeAll: ${periodRows.length} periods, ${totalAllocations} allocations, ${durationMs}ms`
+  )
+
+  return { periods: periodRows.length, totalAllocations, durationMs }
 }

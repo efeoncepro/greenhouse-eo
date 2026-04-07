@@ -21,19 +21,34 @@ export async function GET(request: Request) {
     const month = now.getMonth() + 1
     const prevDate = new Date(year, month - 2, 1)
 
-    // Step 1: Materialize commercial cost attribution (labor costs → clients)
-    // This populates greenhouse_serving.commercial_cost_attribution from
-    // member_capacity_economics + client_labor_cost_allocation
-    const costAttrStart = Date.now()
+    // Step 1: Materialize commercial cost attribution (best-effort on Vercel).
+    // The VIEW client_labor_cost_allocation is complex and may timeout on serverless
+    // cold starts. If materialization fails, client_economics will still read from
+    // whatever was previously materialized (by Cloud Run ops-worker or admin trigger).
+    let costAttrMs = 0
+    let costAttrStatus = 'ok'
 
-    await Promise.all([
-      materializeCommercialCostAttributionForPeriod(year, month, 'cron-materialize'),
-      materializeCommercialCostAttributionForPeriod(prevDate.getFullYear(), prevDate.getMonth() + 1, 'cron-materialize-prev')
-    ])
+    try {
+      const costAttrStart = Date.now()
 
-    const costAttrMs = Date.now() - costAttrStart
+      await Promise.all([
+        materializeCommercialCostAttributionForPeriod(year, month, 'cron-materialize'),
+        materializeCommercialCostAttributionForPeriod(prevDate.getFullYear(), prevDate.getMonth() + 1, 'cron-materialize-prev')
+      ])
 
-    // Step 2: Compute client economics snapshots (reads materialized cost attribution)
+      costAttrMs = Date.now() - costAttrStart
+    } catch (error: unknown) {
+      costAttrStatus = 'failed'
+
+      console.error(
+        '[economics-materialize] cost attribution materialization failed (best-effort, continuing):',
+        error instanceof Error ? error.message : error
+      )
+    }
+
+    // Step 2: Compute client economics snapshots.
+    // Reads commercial cost from materialized table if available,
+    // or falls back to on-the-fly compute (which may also fail on serverless).
     const currentResults = await computeClientEconomicsSnapshots(year, month, 'cron-materialize')
 
     const prevResults = await computeClientEconomicsSnapshots(
@@ -45,13 +60,13 @@ export async function GET(request: Request) {
     const durationMs = Date.now() - startMs
 
     console.log(
-      `[economics-materialize] costAttr=${costAttrMs}ms current=${currentResults.length} prev=${prevResults.length} total=${durationMs}ms`
+      `[economics-materialize] costAttr=${costAttrStatus}(${costAttrMs}ms) current=${currentResults.length} prev=${prevResults.length} total=${durationMs}ms`
     )
 
     return NextResponse.json({
       currentMonth: { year, month, snapshots: currentResults.length },
       previousMonth: { year: prevDate.getFullYear(), month: prevDate.getMonth() + 1, snapshots: prevResults.length },
-      costAttributionMs: costAttrMs,
+      costAttribution: { status: costAttrStatus, durationMs: costAttrMs },
       durationMs
     })
   } catch (error) {

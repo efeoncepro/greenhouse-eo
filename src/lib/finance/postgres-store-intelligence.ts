@@ -527,18 +527,13 @@ export const computeClientEconomicsSnapshots = async (
     [periodStart, periodEnd]
   )
 
-  // Read commercial cost rows (from materialized table or compute on-the-fly)
-  // Note: materialization is handled by the economics-materialize cron, not here.
-  // Calling materialize inline caused purge+fail on Vercel (the purge succeeds but
-  // the re-insert fails due to Cloud SQL Connector query issues), leaving the table empty.
+  // Read commercial cost rows from materialized table (preferred) or on-the-fly compute.
+  // Materialization is handled by the economics-materialize cron or admin endpoint,
+  // NOT inline here — the VIEW client_labor_cost_allocation is too complex for Vercel serverless.
   let commercialCostRows: Awaited<ReturnType<typeof readCommercialCostAttributionByClientForPeriod>> = []
 
   try {
     commercialCostRows = await readCommercialCostAttributionByClientForPeriod(year, month)
-
-    if (commercialCostRows.length > 0) {
-      console.log(`[client-economics] ${year}-${String(month).padStart(2, '0')}: ${commercialCostRows.length} client(s) with labor costs — ${commercialCostRows.map(r => `${r.clientId}=$${Math.round(r.laborCostClp)} FTE=${r.headcountFte}`).join(', ')}`)
-    }
   } catch (error: unknown) {
     console.error(
       `[client-economics] commercial cost attribution read failed for ${year}-${String(month).padStart(2, '0')}:`,

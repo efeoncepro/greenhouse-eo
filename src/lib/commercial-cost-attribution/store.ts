@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { toTimestampString } from '@/lib/finance/shared'
 
 export type CommercialCostAttributionRow = {
@@ -98,50 +98,42 @@ export const ensureCommercialCostAttributionSchema = async () => {
   return ensureSchemaPromise
 }
 
-export const purgeCommercialCostAttributionPeriod = async (year: number, month: number) => {
-  await ensureCommercialCostAttributionSchema()
+// ── Atomic purge + upsert within a transaction ──
+// Prevents data loss: if upsert fails, the purge is rolled back.
 
-  await runGreenhousePostgresQuery(
-    `
-      DELETE FROM greenhouse_serving.commercial_cost_attribution
-      WHERE period_year = $1
-        AND period_month = $2
-    `,
-    [year, month]
-  )
-}
-
-export const upsertCommercialCostAttributionAllocations = async (
+export const atomicReplacePeriod = async (
+  year: number,
+  month: number,
   allocations: CommercialCostAttributionStoredAllocation[]
-) => {
+): Promise<{ replaced: number }> => {
   await ensureCommercialCostAttributionSchema()
 
-  for (const row of allocations) {
-    await runGreenhousePostgresQuery(
-      `
-        INSERT INTO greenhouse_serving.commercial_cost_attribution (
-          member_id,
-          client_id,
-          organization_id,
-          client_name,
-          period_year,
-          period_month,
-          base_labor_cost_target,
-          internal_operational_cost_target,
-          direct_overhead_target,
-          shared_overhead_target,
-          fte_contribution,
-          allocation_ratio,
-          commercial_labor_cost_target,
-          commercial_direct_overhead_target,
-          commercial_shared_overhead_target,
-          commercial_loaded_cost_target,
-          source_of_truth,
-          rule_version,
-          materialization_reason,
-          materialized_at
-        )
-        VALUES (
+  const periodLabel = `${year}-${String(month).padStart(2, '0')}`
+
+  if (allocations.length === 0) {
+    console.log(`[commercial-cost-attribution] atomicReplace ${periodLabel}: 0 allocations, skipping purge`)
+
+    return { replaced: 0 }
+  }
+
+  return withGreenhousePostgresTransaction(async (client) => {
+    await client.query(
+      'DELETE FROM greenhouse_serving.commercial_cost_attribution WHERE period_year = $1 AND period_month = $2',
+      [year, month]
+    )
+
+    for (const row of allocations) {
+      await client.query(
+        `INSERT INTO greenhouse_serving.commercial_cost_attribution (
+          member_id, client_id, organization_id, client_name,
+          period_year, period_month,
+          base_labor_cost_target, internal_operational_cost_target,
+          direct_overhead_target, shared_overhead_target,
+          fte_contribution, allocation_ratio,
+          commercial_labor_cost_target, commercial_direct_overhead_target,
+          commercial_shared_overhead_target, commercial_loaded_cost_target,
+          source_of_truth, rule_version, materialization_reason, materialized_at
+        ) VALUES (
           $1, $2, $3, $4, $5, $6,
           $7, $8, $9, $10, $11,
           $12, $13, $14, $15, $16,
@@ -163,33 +155,93 @@ export const upsertCommercialCostAttributionAllocations = async (
           source_of_truth = EXCLUDED.source_of_truth,
           rule_version = EXCLUDED.rule_version,
           materialization_reason = EXCLUDED.materialization_reason,
-          materialized_at = EXCLUDED.materialized_at
-      `,
+          materialized_at = EXCLUDED.materialized_at`,
+        [
+          row.memberId, row.clientId, row.organizationId, row.clientName,
+          row.periodYear, row.periodMonth,
+          row.baseLaborCostTarget, row.internalOperationalCostTarget,
+          row.directOverheadTarget, row.sharedOverheadTarget,
+          row.fteContribution, row.allocationRatio,
+          row.commercialLaborCostTarget, row.commercialDirectOverheadTarget,
+          row.commercialSharedOverheadTarget, row.commercialLoadedCostTarget,
+          row.sourceOfTruth, row.ruleVersion,
+          row.materializationReason, row.materializedAt
+        ]
+      )
+    }
+
+    console.log(`[commercial-cost-attribution] atomicReplace ${periodLabel}: ${allocations.length} allocations committed`)
+
+    return { replaced: allocations.length }
+  })
+}
+
+// ── Legacy exports (kept for backward compatibility) ──
+
+export const purgeCommercialCostAttributionPeriod = async (year: number, month: number) => {
+  await ensureCommercialCostAttributionSchema()
+
+  await runGreenhousePostgresQuery(
+    'DELETE FROM greenhouse_serving.commercial_cost_attribution WHERE period_year = $1 AND period_month = $2',
+    [year, month]
+  )
+}
+
+export const upsertCommercialCostAttributionAllocations = async (
+  allocations: CommercialCostAttributionStoredAllocation[]
+) => {
+  await ensureCommercialCostAttributionSchema()
+
+  for (const row of allocations) {
+    await runGreenhousePostgresQuery(
+      `INSERT INTO greenhouse_serving.commercial_cost_attribution (
+        member_id, client_id, organization_id, client_name,
+        period_year, period_month,
+        base_labor_cost_target, internal_operational_cost_target,
+        direct_overhead_target, shared_overhead_target,
+        fte_contribution, allocation_ratio,
+        commercial_labor_cost_target, commercial_direct_overhead_target,
+        commercial_shared_overhead_target, commercial_loaded_cost_target,
+        source_of_truth, rule_version, materialization_reason, materialized_at
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6,
+        $7, $8, $9, $10, $11,
+        $12, $13, $14, $15, $16,
+        $17, $18, $19, $20::timestamptz
+      )
+      ON CONFLICT (member_id, client_id, period_year, period_month) DO UPDATE SET
+        organization_id = EXCLUDED.organization_id,
+        client_name = EXCLUDED.client_name,
+        base_labor_cost_target = EXCLUDED.base_labor_cost_target,
+        internal_operational_cost_target = EXCLUDED.internal_operational_cost_target,
+        direct_overhead_target = EXCLUDED.direct_overhead_target,
+        shared_overhead_target = EXCLUDED.shared_overhead_target,
+        fte_contribution = EXCLUDED.fte_contribution,
+        allocation_ratio = EXCLUDED.allocation_ratio,
+        commercial_labor_cost_target = EXCLUDED.commercial_labor_cost_target,
+        commercial_direct_overhead_target = EXCLUDED.commercial_direct_overhead_target,
+        commercial_shared_overhead_target = EXCLUDED.commercial_shared_overhead_target,
+        commercial_loaded_cost_target = EXCLUDED.commercial_loaded_cost_target,
+        source_of_truth = EXCLUDED.source_of_truth,
+        rule_version = EXCLUDED.rule_version,
+        materialization_reason = EXCLUDED.materialization_reason,
+        materialized_at = EXCLUDED.materialized_at`,
       [
-        row.memberId,
-        row.clientId,
-        row.organizationId,
-        row.clientName,
-        row.periodYear,
-        row.periodMonth,
-        row.baseLaborCostTarget,
-        row.internalOperationalCostTarget,
-        row.directOverheadTarget,
-        row.sharedOverheadTarget,
-        row.fteContribution,
-        row.allocationRatio,
-        row.commercialLaborCostTarget,
-        row.commercialDirectOverheadTarget,
-        row.commercialSharedOverheadTarget,
-        row.commercialLoadedCostTarget,
-        row.sourceOfTruth,
-        row.ruleVersion,
-        row.materializationReason,
-        row.materializedAt
+        row.memberId, row.clientId, row.organizationId, row.clientName,
+        row.periodYear, row.periodMonth,
+        row.baseLaborCostTarget, row.internalOperationalCostTarget,
+        row.directOverheadTarget, row.sharedOverheadTarget,
+        row.fteContribution, row.allocationRatio,
+        row.commercialLaborCostTarget, row.commercialDirectOverheadTarget,
+        row.commercialSharedOverheadTarget, row.commercialLoadedCostTarget,
+        row.sourceOfTruth, row.ruleVersion,
+        row.materializationReason, row.materializedAt
       ]
     )
   }
 }
+
+// ── Read ──
 
 export const readCommercialCostAttributionAllocationsForPeriod = async (
   year: number,
@@ -198,19 +250,12 @@ export const readCommercialCostAttributionAllocationsForPeriod = async (
   await ensureCommercialCostAttributionSchema()
 
   const rows = await runGreenhousePostgresQuery<CommercialCostAttributionRow>(
-    `
-      SELECT *
-      FROM greenhouse_serving.commercial_cost_attribution
-      WHERE period_year = $1
-        AND period_month = $2
-      ORDER BY member_id ASC, client_name ASC
-    `,
+    `SELECT *
+     FROM greenhouse_serving.commercial_cost_attribution
+     WHERE period_year = $1 AND period_month = $2
+     ORDER BY member_id ASC, client_name ASC`,
     [year, month]
-  ).catch((error: unknown) => {
-    console.error(`[commercial-cost-attribution] read stored allocations failed for ${year}-${String(month).padStart(2, '0')}:`, error instanceof Error ? error.message : error)
-
-    return [] as CommercialCostAttributionRow[]
-  })
+  )
 
   return rows.map(row => ({
     memberId: row.member_id,
