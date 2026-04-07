@@ -328,3 +328,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-276` | `to-do` | Upstash Redis: cache distribuido para resolvers 360 | `docs/tasks/to-do/TASK-276-upstash-redis-distributed-cache.md` |
 | `TASK-277` | `to-do` | GraphQL API Layer sobre resolvers 360 | `docs/tasks/to-do/TASK-277-graphql-api-layer.md` |
 | `TASK-278` | `to-do` | AI Visual Asset Generator: imagenes + animaciones SVG on-demand | `docs/tasks/to-do/TASK-278-ai-visual-asset-generator.md` |
+| `TASK-279` | `to-do` | Labor Cost Attribution Pipeline: cerrar brecha payroll → client_economics | `docs/tasks/to-do/TASK-279-labor-cost-attribution-client-economics-pipeline.md` |
