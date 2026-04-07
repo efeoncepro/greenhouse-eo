@@ -2,9 +2,12 @@ import { Heading, Img, Section, Text } from '@react-email/components'
 
 import EmailButton from './components/EmailButton'
 import EmailLayout from './components/EmailLayout'
-import { APP_URL, EMAIL_COLORS, EMAIL_FONTS } from './constants'
+import { EMAIL_COLORS, EMAIL_FONTS } from './constants'
 
-const HERO_IMAGE_URL = `${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/images/emails/leave-review.png`
+const EMAIL_BASE_URL = process.env.NEXT_PUBLIC_APP_URL
+  || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://greenhouse.efeoncepro.com')
+
+const HERO_IMAGE_PATH = '/images/emails/leave-review.png'
 
 type LeaveStatus = 'approved' | 'rejected' | 'cancelled'
 
@@ -128,7 +131,7 @@ export default function LeaveReviewConfirmationEmail({
 }: LeaveReviewConfirmationEmailProps) {
   const t = getTranslations(locale, status)
   const styles = STATUS_STYLES[status]
-  const appUrl = `${APP_URL}/hr/leave`
+  const appUrl = `${EMAIL_BASE_URL}/hr/leave`
 
   const bodyText = status === 'approved'
     ? (t.body as (a: string, b: string, c: number) => string)(memberName, leaveTypeName, requestedDays)
@@ -142,7 +145,7 @@ export default function LeaveReviewConfirmationEmail({
     <EmailLayout previewText={t.heading} locale={locale}>
       {/* Hero image */}
       <Img
-        src={HERO_IMAGE_URL}
+        src={`${EMAIL_BASE_URL}${HERO_IMAGE_PATH}`}
         alt=""
         width={560}
         height={180}
