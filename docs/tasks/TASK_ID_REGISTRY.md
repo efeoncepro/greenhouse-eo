@@ -324,3 +324,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-272` | `to-do` | Mi Perfil: vista rica basada en Vuexy user-profile | `docs/tasks/to-do/TASK-272-my-profile-vuexy-rich-view.md` |
 | `TASK-273` | `to-do` | Person Complete 360: capa de serving federada por facetas | `docs/tasks/to-do/TASK-273-person-complete-360-federated-serving-layer.md` |
 | `TASK-274` | `to-do` | Account Complete 360: capa de serving federada por facetas | `docs/tasks/to-do/TASK-274-account-complete-360-federated-serving-layer.md` |
+| `TASK-275` | `to-do` | Notification Dispatch Correlation ID | `docs/tasks/to-do/TASK-275-notification-dispatch-correlation-id.md` |

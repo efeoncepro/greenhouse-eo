@@ -72,6 +72,35 @@ Test unitario agregado para el escenario "all recipients skipped".
 - 2/2 tests de notification service passing
 - `npx tsc --noEmit` — OK
 
+## Backfill de datos historicos
+
+18 registros en `notification_log` tenían `status='sent'` cuando las `email_deliveries` correspondientes estaban en `status='skipped'` (error: `RESEND_API_KEY is not configured.`). Todos del 2026-04-05.
+
+```sql
+-- UPDATE ejecutado 2026-04-07
+UPDATE greenhouse_notifications.notification_log
+SET status = 'skipped',
+    skip_reason = 'RESEND_API_KEY is not configured. (backfill ISSUE-025)'
+WHERE log_id IN (
+  SELECT DISTINCT nl.log_id
+  FROM greenhouse_notifications.notification_log nl
+  JOIN greenhouse_notifications.email_deliveries ed
+    ON nl.user_id = ed.recipient_user_id
+    AND ed.created_at BETWEEN nl.created_at - interval '10 seconds' AND nl.created_at + interval '10 seconds'
+  WHERE nl.channel = 'email' AND nl.status = 'sent' AND ed.status = 'skipped'
+  EXCEPT
+  SELECT DISTINCT nl.log_id
+  FROM greenhouse_notifications.notification_log nl
+  JOIN greenhouse_notifications.email_deliveries ed
+    ON nl.user_id = ed.recipient_user_id
+    AND ed.created_at BETWEEN nl.created_at - interval '10 seconds' AND nl.created_at + interval '10 seconds'
+  WHERE nl.channel = 'email' AND nl.status = 'sent' AND ed.status = 'sent'
+);
+-- UPDATE 18
+```
+
+Resultado post-fix: 12 `sent` (legítimos) + 18 `skipped` (corregidos).
+
 ## Archivos modificados
 
 - `src/lib/email/delivery.ts` — fix en `sendEmail()` aggregate status
