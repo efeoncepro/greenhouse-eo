@@ -88,7 +88,7 @@ export const fetchCrmFacet = async (
     runGreenhousePostgresQuery<CountRow>(
       `SELECT COUNT(*) AS cnt
       FROM greenhouse_crm.contacts
-      WHERE hubspot_company_id = $1`,
+      WHERE hubspot_primary_company_id = $1`,
       [scope.hubspotCompanyId]
     )
   ])
