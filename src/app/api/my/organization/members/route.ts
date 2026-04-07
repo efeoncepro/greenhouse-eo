@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { requireTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { resolveAvatarUrl } from '@/lib/person-360/resolve-avatar'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,14 +19,6 @@ interface MemberRow extends Record<string, unknown> {
   job_title: string | null
   department_name: string | null
   user_id: string | null
-}
-
-/** Resolve gs:// avatar URLs to the /api/media proxy path */
-const resolveAvatarUrl = (avatarUrl: string | null, userId: string | null): string | null => {
-  if (!avatarUrl) return null
-  if (avatarUrl.startsWith('gs://') && userId) return `/api/media/users/${userId}/avatar`
-
-  return avatarUrl
 }
 
 export async function GET() {
