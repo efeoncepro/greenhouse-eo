@@ -424,7 +424,41 @@ Callers can also pass attachments via `sendEmail({ attachments })`. Both are mer
 
 ## AI Visual Enrichment (Imagen 4 + Gemini)
 
-Emails can include AI-generated images to make them visually richer and more engaging. The project has a full image generation pipeline using **Imagen 4** (raster images) and **Gemini** (SVG animations) via Vertex AI.
+Emails can include AI-generated hero images to make them visually richer. The project uses **Imagen 4** (raster images) via Vertex AI.
+
+### Image Storage: GCS Public Buckets (NOT Vercel)
+
+**CRITICAL:** Email images MUST be stored in the **GCS public media bucket**, NOT in `public/` served by Vercel. Reasons learned from production:
+
+1. Vercel staging has **SSO Protection** — the browser cannot load images from Vercel URLs in email previews or real emails
+2. `NEXT_PUBLIC_APP_URL` is not set in Vercel — URL resolution breaks across environments
+3. GCS public buckets are accessible without auth, work in all email clients, and are environment-aware
+
+**Buckets per environment:**
+
+| Environment | Bucket | URL pattern |
+|-------------|--------|-------------|
+| Staging | `efeonce-group-greenhouse-public-media-staging` | `https://storage.googleapis.com/efeonce-group-greenhouse-public-media-staging/emails/...` |
+| Production | `efeonce-group-greenhouse-public-media-prod` | `https://storage.googleapis.com/efeonce-group-greenhouse-public-media-prod/emails/...` |
+
+**Env var:** `GREENHOUSE_PUBLIC_MEDIA_BUCKET` — set per environment in Vercel.
+
+### Workflow for Adding Images to an Email
+
+1. **Generate** the image using Imagen 4 (via script or API)
+2. **Resize** to 560px width using `sips --resampleWidth 560` (macOS) — target under 200KB
+3. **Upload to BOTH GCS buckets:**
+   ```bash
+   gcloud storage cp image.png gs://efeonce-group-greenhouse-public-media-staging/emails/image.png
+   gcloud storage cp image.png gs://efeonce-group-greenhouse-public-media-prod/emails/image.png
+   ```
+4. **Also commit** to `public/images/emails/` for local dev and as a git record
+5. **Reference in the template** using the GCS URL resolved from the bucket env var:
+
+```typescript
+const MEDIA_BUCKET = process.env.GREENHOUSE_PUBLIC_MEDIA_BUCKET || 'efeonce-group-greenhouse-public-media-prod'
+const HERO_IMAGE_URL = `https://storage.googleapis.com/${MEDIA_BUCKET}/emails/your-image.png`
+```
 
 ### Image Generation API
 
@@ -433,173 +467,102 @@ Emails can include AI-generated images to make them visually richer and more eng
 ```typescript
 import { generateImage } from '@/lib/ai/image-generator'
 
-// Generate a hero/header image for an email template
 const result = await generateImage(
-  'Modern SaaS abstract banner, soft gradient from navy to teal, translucent glass shapes, minimal, no text no people no logos, 8K quality',
-  {
-    aspectRatio: '16:9',    // '1:1' | '16:9' | '9:16' | '4:3' | '3:4'
-    format: 'png',          // 'png' | 'webp'
-    filename: 'email-hero-finance-report.png',  // optional, auto-slugified if omitted
-    numberOfImages: 1
-  }
+  'Clay 3D render on a pure white background. [describe objects]...',
+  { aspectRatio: '16:9', format: 'png', filename: 'email-hero-name.png' }
 )
-// result: { path: '/images/generated/email-hero-finance-report.png', filename, format, sizeBytes }
 ```
 
-**SVG animation (Gemini):**
+**Batch script:** `scripts/generate-email-images.mts` — run with `npx tsx scripts/generate-email-images.mts`
 
-```typescript
-import { generateAnimation } from '@/lib/ai/image-generator'
+### Prompt Guidelines for Email Hero Images
 
-const result = await generateAnimation(
-  'Subtle pulsing notification bell icon with gentle glow effect',
-  { filename: 'email-notification-icon.svg', width: 120, height: 120 }
-)
-// result: { path: '/animations/generated/email-notification-icon.svg', svgContent, sizeBytes }
+**Mandatory style: Clay 3D on white background.** This is the canonical style for Greenhouse email heroes.
+
+**Prompt structure:**
+
+```
+Clay 3D render on a pure white background. [Describe the main object in midnight navy (#022a4e)].
+[Describe secondary objects using core blue (#0375db) and teal accents].
+[Describe small accent in success green (#12B76A) if approval-related].
+All objects have rounded edges, matte clay textures, and cast soft diffused shadows
+directly below onto the white surface. Minimal composition, centered, professional.
+Soft ambient studio lighting from above. Cool neutral shadows, no warm tones.
+No text, no people, no logos. 16:9 aspect ratio.
 ```
 
-### API Endpoints (admin-only)
+**Rules:**
+- **ALWAYS** use `pure white background` — the image sits inside a white email card, must blend seamlessly
+- **ALWAYS** use clay 3D style: `matte clay textures`, `rounded edges`, `soft diffused shadows`
+- **ALWAYS** use brand colors for objects: midnight navy (#022a4e) as primary, core blue (#0375db) as accent, success green (#12B76A) for positive elements
+- **ALWAYS** include: `No text, no people, no logos`
+- **ALWAYS** include: `Cool neutral shadows, no warm tones` — prevents Imagen from adding warm tinted backgrounds
+- **NEVER** use dark backgrounds, abstract gradients, glass morphism, or tech-circuit aesthetics — those are for profile banners, not emails
+- Choose objects that are **semantically related** to the email content (calendar for leave, clipboard for review, invoice for finance, etc.)
+- Keep composition **centered and minimal** — the image is small (560×305), complex scenes become noisy
 
-```bash
-# Generate raster image
-POST /api/internal/generate-image
-  { "prompt": "...", "aspectRatio": "16:9", "format": "png", "filename": "..." }
+**Domain object mapping (clay 3D):**
 
-# Generate SVG animation
-POST /api/internal/generate-animation
-  { "prompt": "...", "filename": "...", "width": 120, "height": 120 }
-```
+| Domain | Primary object | Secondary objects | Accent |
+|--------|---------------|-------------------|--------|
+| identity | Navy key or shield | Blue lock, teal envelope | Green checkmark |
+| payroll | Navy payslip/document | Blue calculator, teal coins | Green badge |
+| finance | Navy chart/ledger | Blue coins, teal arrow up | Green growth indicator |
+| hr | Navy calendar | Blue checkmark, teal clock | Green ribbon |
+| delivery | Navy package/box | Blue rocket, teal clipboard | Green star |
+| system | Navy gear/bell | Blue wrench, teal notification | Green pulse |
 
-Both require `requireAdminTenantContext()` + `ENABLE_ASSET_GENERATOR=true` in production.
+### Using Images in EmailLayout
 
-### Strategy: Pre-generate, Not On-the-fly
-
-**IMPORTANT:** Email images must be **pre-generated and committed to the repo**, not generated at send time. Reasons:
-
-1. Email clients need stable, absolute URLs that resolve instantly
-2. Generated images go to `public/` and are served by Vercel CDN
-3. Generating at send time would add latency and risk failures
-4. Images must be identical for all recipients of the same email type
-
-**Workflow for adding images to an email:**
-
-1. **Generate** the image using `generateImage()` or the batch script pattern
-2. **Save** to `public/images/emails/` (create this dir for email-specific images)
-3. **Commit** the image to git — Vercel CDN serves it automatically
-4. **Reference** in the template with an absolute URL:
+Place the `<Img>` as the **first child** inside `<EmailLayout>`:
 
 ```typescript
 import { Img } from '@react-email/components'
 
-// In your email template:
-<Img
-  src="https://greenhouse.efeoncepro.com/images/emails/hero-finance-report.png"
-  alt="Greenhouse Finance"
-  width={560}
-  height={180}
-  style={{
-    width: '100%',
-    height: 'auto',
-    borderRadius: '8px',
-    margin: '0 0 24px'
-  }}
-/>
-```
+const MEDIA_BUCKET = process.env.GREENHOUSE_PUBLIC_MEDIA_BUCKET || 'efeonce-group-greenhouse-public-media-prod'
+const HERO_IMAGE_URL = `https://storage.googleapis.com/${MEDIA_BUCKET}/emails/your-image.png`
 
-### Batch Generation Script Pattern
-
-Follow the pattern in `scripts/generate-banners.mts` to create a batch script for email images:
-
-```typescript
-// scripts/generate-email-images.mts
-import { GoogleGenAI } from '@google/genai'
-import { writeFile, mkdir } from 'node:fs/promises'
-import { join } from 'node:path'
-
-const OUTPUT_DIR = join(process.cwd(), 'public', 'images', 'emails')
-const MODELS = ['imagen-4.0-generate-001', 'imagen-3.0-generate-002']
-
-const EMAIL_IMAGES: Record<string, string> = {
-  'hero-your-email-type':
-    'Modern SaaS email header banner, [describe visual metaphor], translucent glass shapes with soft gradients, deep navy to [accent color] gradient background, glass morphism aesthetic, ultra clean Linear/Vercel design language, no text no people no logos, 8K render quality'
-}
-
-// ... follow generate-banners.mts pattern for client setup + generation loop
-```
-
-Run: `npx tsx scripts/generate-email-images.mts`
-
-### Prompt Guidelines for Email Images
-
-**Style rules (match existing banner aesthetic):**
-- Always include: `no text no people no logos, 8K render quality`
-- Always include: `ultra clean Linear/Vercel design language`
-- Use: `glass morphism`, `translucent`, `soft gradients`, `abstract 3D shapes`
-- Use Greenhouse brand gradients: navy (#022a4e) to blue (#0375db), or domain-specific palettes
-- Aspect ratio: `16:9` for hero banners, `1:1` for icons/thumbnails
-- Keep images abstract and professional — never photorealistic faces or specific objects
-
-**Domain color mapping:**
-
-| Domain | Palette | Metaphor |
-|--------|---------|----------|
-| identity | Navy → purple | Glass structures, frameworks, keys |
-| payroll | Blue → teal | Flowing pipelines, rhythmic flow |
-| finance | Indigo → amber | Growth curves, analytical layers, charts |
-| hr | Green → warm earth | Root networks, organic connections |
-| delivery | Magenta → coral | Blooming shapes, creative bursts |
-| system | Navy → cyan | Circuit meshes, sensor grids |
-
-### Using Images in EmailLayout
-
-For hero images that sit between the header gradient and the body card, place the `<Img>` as the first child inside `<EmailLayout>`:
-
-```typescript
+// Inside the component:
 <EmailLayout previewText={t.heading} locale={locale}>
-  {/* Hero image — full width of the card */}
   <Img
-    src="https://greenhouse.efeoncepro.com/images/emails/hero-your-type.png"
+    src={HERO_IMAGE_URL}
     alt=""
     width={560}
-    height={180}
+    height={305}
     style={{
       width: '100%',
       height: 'auto',
-      borderRadius: '8px 8px 0 0',
-      margin: '-40px -36px 24px -36px',  // Bleed into card padding for edge-to-edge effect
-      maxWidth: 'calc(100% + 72px)',
+      borderRadius: '8px',
+      margin: '0 0 24px',
       display: 'block'
     }}
   />
-
-  <Heading style={{ ... }}>
-    {t.heading}
-  </Heading>
-  {/* rest of content */}
+  {/* rest of email content */}
 </EmailLayout>
 ```
 
-For inline illustrations (smaller, within the body):
+### Post-Generation Checklist
 
-```typescript
-<Img
-  src="https://greenhouse.efeoncepro.com/images/emails/icon-success.png"
-  alt=""
-  width={80}
-  height={80}
-  style={{ margin: '0 auto 16px', display: 'block' }}
-/>
-```
+- [ ] Generated with Imagen 4 (`imagen-4.0-generate-001`)
+- [ ] White background, clay 3D style, brand colors
+- [ ] Resized to **560px width** (`sips --resampleWidth 560`)
+- [ ] File size **under 200KB** (PNG)
+- [ ] Uploaded to **staging** GCS bucket (`gcloud storage cp`)
+- [ ] Uploaded to **prod** GCS bucket (`gcloud storage cp`)
+- [ ] Committed to `public/images/emails/` in git (local dev + record)
+- [ ] Template references `GREENHOUSE_PUBLIC_MEDIA_BUCKET` env var for URL
+- [ ] `alt=""` (decorative), `width` and `height` attributes set
+- [ ] Verified in admin preview (`/admin/emails/preview`)
 
 ### Email Client Compatibility Notes
 
-- **Always use absolute URLs** (`https://greenhouse.efeoncepro.com/...`), never relative paths
+- **Always use absolute GCS URLs** — never Vercel URLs or relative paths
 - **Always set `width` and `height`** attributes — many email clients need them for layout
 - **Use `alt=""`** for decorative images (screen readers skip them)
-- **PNG preferred** over WebP — Gmail, Outlook, and Apple Mail all support PNG; WebP support is inconsistent
+- **PNG only** — Gmail, Outlook, and Apple Mail all support PNG; WebP support is inconsistent
 - **Max image width: 560px** — matches the `<Container>` max-width in EmailLayout
-- **Keep file size under 200KB** per image — large images get clipped or blocked by email clients
-- **SVG animations do NOT work in email** — email clients strip `<style>` and `<script>`. Only use raster images (PNG) in email templates. SVG animations are for the web portal only.
+- **Keep file size under 200KB** per image — large images get clipped or blocked
+- **SVG animations do NOT work in email** — email clients strip `<style>` and `<script>`. Only use raster PNG in emails
 
 ---
 
@@ -635,8 +598,9 @@ For inline illustrations (smaller, within the body):
 - [ ] If broadcast: added to `BROADCAST_EMAIL_TYPES` + accepts `unsubscribeUrl`
 - [ ] Sending code uses `sendEmail()` from `src/lib/email/delivery.ts`
 - [ ] Subject follows pattern: `"Text — Context"` (no emojis)
-- [ ] If using AI images: generated with Imagen 4, saved to `public/images/emails/`, committed to git
-- [ ] If using AI images: absolute URLs, PNG format, width/height attributes, under 200KB
+- [ ] If using AI images: clay 3D on white bg, brand colors, resized to 560px, under 200KB
+- [ ] If using AI images: uploaded to BOTH GCS public buckets (staging + prod), committed to git
+- [ ] If using AI images: template uses `GREENHOUSE_PUBLIC_MEDIA_BUCKET` env var for URL resolution
 - [ ] `pnpm build` passes
 - [ ] `npx tsc --noEmit` passes
 
