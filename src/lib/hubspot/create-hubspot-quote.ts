@@ -78,13 +78,26 @@ const resolveSpaceForOrg = async (organizationId: string): Promise<SpaceRow | nu
 
 // ── Client name resolution ──
 
+// ── Client name resolution (canonical: clients.client_name → org.organization_name fallback) ──
+
 const resolveClientName = async (clientId: string): Promise<string | null> => {
   const rows = await runGreenhousePostgresQuery<{ client_name: string | null }>(
-    `SELECT client_name FROM greenhouse_finance.client_profiles WHERE client_profile_id = $1 LIMIT 1`,
+    `SELECT client_name FROM greenhouse_core.clients WHERE client_id = $1 LIMIT 1`,
     [clientId]
   )
 
-  return rows[0]?.client_name ?? null
+  if (rows[0]?.client_name) return rows[0].client_name
+
+  // Fallback: organization name
+  const orgRows = await runGreenhousePostgresQuery<{ organization_name: string | null }>(
+    `SELECT o.organization_name
+     FROM greenhouse_core.clients c
+     JOIN greenhouse_core.organizations o ON o.organization_id = c.organization_id
+     WHERE c.client_id = $1 LIMIT 1`,
+    [clientId]
+  )
+
+  return orgRows[0]?.organization_name ?? null
 }
 
 // ── Core creation logic ──

@@ -1583,6 +1583,9 @@ export interface GreenhouseFinanceQuotes {
   due_date: Timestamp | null;
   exchange_rate_to_clp: Generated<Numeric | null>;
   expiry_date: Timestamp | null;
+  hubspot_deal_id: string | null;
+  hubspot_last_synced_at: Timestamp | null;
+  hubspot_quote_id: string | null;
   notes: string | null;
   nubox_document_id: string | null;
   nubox_emission_status: string | null;
@@ -1593,6 +1596,7 @@ export interface GreenhouseFinanceQuotes {
   quote_date: Timestamp | null;
   quote_id: string;
   quote_number: string | null;
+  source_system: Generated<string | null>;
   status: Generated<string | null>;
   subtotal: Numeric | null;
   tax_amount: Numeric | null;

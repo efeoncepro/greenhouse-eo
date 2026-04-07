@@ -101,13 +101,13 @@ async function main() {
 
       const space = spaces[0]
 
-      // Resolve client name
+      // Resolve client name (canonical: clients.client_name → org.organization_name fallback)
       const clientNames = await runGreenhousePostgresQuery<{ client_name: string | null }>(
-        `SELECT client_name FROM greenhouse_finance.client_profiles WHERE client_profile_id = $1 LIMIT 1`,
+        `SELECT client_name FROM greenhouse_core.clients WHERE client_id = $1 LIMIT 1`,
         [space.client_id]
       )
 
-      const clientName = clientNames[0]?.client_name ?? null
+      const clientName = clientNames[0]?.client_name ?? org.organization_name
 
       // Fetch quotes from Cloud Run
       const timeout = 10000 // 10s for backfill (longer than normal)
