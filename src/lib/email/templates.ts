@@ -1,6 +1,8 @@
 import 'server-only'
 
 import InvitationEmail from '@/emails/InvitationEmail'
+import LeaveRequestDecisionEmail from '@/emails/LeaveRequestDecisionEmail'
+import LeaveReviewConfirmationEmail from '@/emails/LeaveReviewConfirmationEmail'
 import NotificationEmail from '@/emails/NotificationEmail'
 import PasswordResetEmail from '@/emails/PasswordResetEmail'
 import PayrollExportReadyEmail, { type CurrencyBreakdown } from '@/emails/PayrollExportReadyEmail'
@@ -326,6 +328,177 @@ registerTemplate('payroll_receipt', (context: {
   }]
 }))
 
+// ── Leave Request Decision (to the requester) ──
+
+type LeaveDecisionStatus = 'approved' | 'rejected' | 'cancelled'
+
+const LEAVE_STATUS_LABELS_ES: Record<LeaveDecisionStatus, string> = {
+  approved: 'aprobada',
+  rejected: 'no aprobada',
+  cancelled: 'cancelada'
+}
+
+const LEAVE_STATUS_LABELS_EN: Record<LeaveDecisionStatus, string> = {
+  approved: 'approved',
+  rejected: 'not approved',
+  cancelled: 'cancelled'
+}
+
+const buildLeaveDecisionPlainText = (context: {
+  memberFirstName: string
+  actorName: string
+  leaveTypeName: string
+  startDate: string
+  endDate: string
+  requestedDays: number
+  status: LeaveDecisionStatus
+  notes?: string | null
+  locale?: 'es' | 'en'
+}) => {
+  const isEn = (context.locale || 'es') === 'en'
+  const statusLabel = isEn ? LEAVE_STATUS_LABELS_EN[context.status] : LEAVE_STATUS_LABELS_ES[context.status]
+
+  const daysLabel = isEn
+    ? `${context.requestedDays} ${context.requestedDays === 1 ? 'day' : 'days'}`
+    : `${context.requestedDays} ${context.requestedDays === 1 ? 'día' : 'días'}`
+
+  return [
+    isEn ? `Hi ${context.memberFirstName},` : `Hola ${context.memberFirstName},`,
+    '',
+    isEn
+      ? `Your ${context.leaveTypeName} request was ${statusLabel}.`
+      : `Tu solicitud de ${context.leaveTypeName} fue ${statusLabel}.`,
+    '',
+    isEn ? 'Summary:' : 'Resumen:',
+    `- ${isEn ? 'Type' : 'Tipo'}: ${context.leaveTypeName}`,
+    `- ${isEn ? 'From' : 'Desde'}: ${context.startDate}`,
+    `- ${isEn ? 'To' : 'Hasta'}: ${context.endDate}`,
+    `- ${isEn ? 'Days' : 'Días'}: ${daysLabel}`,
+    '',
+    ...(context.notes ? [isEn ? 'Reviewer notes:' : 'Observaciones del revisor:', context.notes, ''] : []),
+    `→ ${isEn ? 'View my leave' : 'Ver mis permisos'}: ${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/my/leave`,
+    '',
+    '— Greenhouse by Efeonce Group'
+  ].filter(line => line !== undefined).join('\n')
+}
+
+registerTemplate('leave_request_decision', (context: {
+  memberFirstName: string
+  actorName: string
+  leaveTypeName: string
+  startDate: string
+  endDate: string
+  requestedDays: number
+  status: LeaveDecisionStatus
+  notes?: string | null
+  locale?: 'es' | 'en'
+}) => {
+  const locale = context.locale || 'es'
+  const statusLabel = locale === 'en' ? LEAVE_STATUS_LABELS_EN[context.status] : LEAVE_STATUS_LABELS_ES[context.status]
+
+  return {
+    subject: locale === 'en'
+      ? `Your ${context.leaveTypeName} request was ${statusLabel} — Greenhouse`
+      : `Tu solicitud de ${context.leaveTypeName} fue ${statusLabel} — Greenhouse`,
+    react: LeaveRequestDecisionEmail({
+      memberFirstName: context.memberFirstName,
+      actorName: context.actorName,
+      leaveTypeName: context.leaveTypeName,
+      startDate: context.startDate,
+      endDate: context.endDate,
+      requestedDays: context.requestedDays,
+      status: context.status,
+      notes: context.notes,
+      locale
+    }),
+    text: buildLeaveDecisionPlainText(context)
+  }
+})
+
+// ── Leave Review Confirmation (to the reviewer) ──
+
+const buildLeaveReviewPlainText = (context: {
+  actorFirstName: string
+  memberName: string
+  leaveTypeName: string
+  startDate: string
+  endDate: string
+  requestedDays: number
+  status: LeaveDecisionStatus
+  notes?: string | null
+  reason?: string | null
+  locale?: 'es' | 'en'
+}) => {
+  const isEn = (context.locale || 'es') === 'en'
+
+  const statusLabel = isEn
+    ? { approved: 'approved', rejected: 'rejected', cancelled: 'cancelled' }[context.status]
+    : { approved: 'aprobado', rejected: 'rechazado', cancelled: 'cancelado' }[context.status]
+
+  const daysLabel = isEn
+    ? `${context.requestedDays} ${context.requestedDays === 1 ? 'day' : 'days'}`
+    : `${context.requestedDays} ${context.requestedDays === 1 ? 'día' : 'días'}`
+
+  return [
+    isEn ? `Hi ${context.actorFirstName},` : `Hola ${context.actorFirstName},`,
+    '',
+    isEn
+      ? `You ${statusLabel} ${context.memberName}'s ${context.leaveTypeName} request.`
+      : `${statusLabel.charAt(0).toUpperCase() + statusLabel.slice(1)} la solicitud de ${context.leaveTypeName} de ${context.memberName}.`,
+    '',
+    isEn ? 'Summary:' : 'Resumen:',
+    `- ${isEn ? 'Team member' : 'Colaborador'}: ${context.memberName}`,
+    `- ${isEn ? 'Type' : 'Tipo'}: ${context.leaveTypeName}`,
+    `- ${isEn ? 'From' : 'Desde'}: ${context.startDate}`,
+    `- ${isEn ? 'To' : 'Hasta'}: ${context.endDate}`,
+    `- ${isEn ? 'Days' : 'Días'}: ${daysLabel}`,
+    '',
+    ...(context.notes ? [isEn ? 'Your notes:' : 'Tus observaciones:', context.notes, ''] : []),
+    ...(context.reason ? [isEn ? 'Original reason:' : 'Motivo de la solicitud:', context.reason, ''] : []),
+    `→ ${isEn ? 'View team leave' : 'Ver permisos del equipo'}: ${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/hr/leave`,
+    '',
+    '— Greenhouse by Efeonce Group'
+  ].filter(line => line !== undefined).join('\n')
+}
+
+registerTemplate('leave_review_confirmation', (context: {
+  actorFirstName: string
+  memberName: string
+  leaveTypeName: string
+  startDate: string
+  endDate: string
+  requestedDays: number
+  status: LeaveDecisionStatus
+  notes?: string | null
+  reason?: string | null
+  locale?: 'es' | 'en'
+}) => {
+  const locale = context.locale || 'es'
+
+  const statusLabel = locale === 'en'
+    ? { approved: 'approved', rejected: 'rejected', cancelled: 'cancelled' }[context.status]
+    : { approved: 'aprobado', rejected: 'rechazado', cancelled: 'cancelado' }[context.status]
+
+  return {
+    subject: locale === 'en'
+      ? `Leave ${statusLabel} for ${context.memberName} — Greenhouse`
+      : `Permiso ${statusLabel} para ${context.memberName} — Greenhouse`,
+    react: LeaveReviewConfirmationEmail({
+      actorFirstName: context.actorFirstName,
+      memberName: context.memberName,
+      leaveTypeName: context.leaveTypeName,
+      startDate: context.startDate,
+      endDate: context.endDate,
+      requestedDays: context.requestedDays,
+      status: context.status,
+      notes: context.notes,
+      reason: context.reason,
+      locale
+    }),
+    text: buildLeaveReviewPlainText(context)
+  }
+})
+
 // ═══════════════════════════════════════════════════════════
 // Preview Metadata Registry
 // Auto-descubrible: nuevos templates con registerPreviewMeta()
@@ -446,5 +619,61 @@ registerPreviewMeta('payroll_receipt', {
     { key: 'totalDeductions', label: 'Descuentos', type: 'number' },
     { key: 'netTotal', label: 'Liquido', type: 'number' },
     { key: 'payRegime', label: 'Regimen', type: 'select', options: ['chile', 'international'] }
+  ]
+})
+
+registerPreviewMeta('leave_request_decision', {
+  label: 'Decision de permiso (solicitante)',
+  description: 'Notifica al colaborador que su solicitud de permiso fue aprobada, rechazada o cancelada',
+  domain: 'hr',
+  supportsLocale: true,
+  defaultProps: {
+    memberFirstName: 'Maria',
+    actorName: 'Julio Reyes',
+    leaveTypeName: 'Vacaciones',
+    startDate: '2026-04-14',
+    endDate: '2026-04-18',
+    requestedDays: 5,
+    status: 'approved',
+    notes: 'Aprobado sin observaciones. Buen descanso!'
+  },
+  propsSchema: [
+    { key: 'memberFirstName', label: 'Nombre del solicitante', type: 'text' },
+    { key: 'actorName', label: 'Nombre del revisor', type: 'text' },
+    { key: 'leaveTypeName', label: 'Tipo de permiso', type: 'text' },
+    { key: 'startDate', label: 'Fecha inicio', type: 'text' },
+    { key: 'endDate', label: 'Fecha fin', type: 'text' },
+    { key: 'requestedDays', label: 'Dias solicitados', type: 'number' },
+    { key: 'status', label: 'Estado', type: 'select', options: ['approved', 'rejected', 'cancelled'] },
+    { key: 'notes', label: 'Observaciones del revisor', type: 'text' }
+  ]
+})
+
+registerPreviewMeta('leave_review_confirmation', {
+  label: 'Confirmacion de revision (revisor)',
+  description: 'Confirma al supervisor/admin que su decision sobre un permiso fue registrada',
+  domain: 'hr',
+  supportsLocale: true,
+  defaultProps: {
+    actorFirstName: 'Julio',
+    memberName: 'Maria Gonzalez Rojas',
+    leaveTypeName: 'Vacaciones',
+    startDate: '2026-04-14',
+    endDate: '2026-04-18',
+    requestedDays: 5,
+    status: 'approved',
+    notes: 'Aprobado sin observaciones. Buen descanso!',
+    reason: 'Necesito tomar mis vacaciones pendientes del periodo anterior.'
+  },
+  propsSchema: [
+    { key: 'actorFirstName', label: 'Nombre del revisor', type: 'text' },
+    { key: 'memberName', label: 'Nombre del colaborador', type: 'text' },
+    { key: 'leaveTypeName', label: 'Tipo de permiso', type: 'text' },
+    { key: 'startDate', label: 'Fecha inicio', type: 'text' },
+    { key: 'endDate', label: 'Fecha fin', type: 'text' },
+    { key: 'requestedDays', label: 'Dias solicitados', type: 'number' },
+    { key: 'status', label: 'Estado', type: 'select', options: ['approved', 'rejected', 'cancelled'] },
+    { key: 'notes', label: 'Observaciones del revisor', type: 'text' },
+    { key: 'reason', label: 'Motivo de la solicitud', type: 'text' }
   ]
 })
