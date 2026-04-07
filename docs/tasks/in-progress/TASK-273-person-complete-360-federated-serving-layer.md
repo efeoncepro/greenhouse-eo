@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Critico`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Implementación — Phases A–E complete, Phase F (consumer migration) pending`
 - Rank: `TBD`
 - Domain: `data`, `platform`, `identity`
 - Blocked by: `none`
