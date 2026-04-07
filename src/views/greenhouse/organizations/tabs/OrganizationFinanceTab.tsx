@@ -240,6 +240,7 @@ const OrganizationFinanceTab = ({ detail }: Props) => {
                     <TableRow>
                       <TableCell>Space</TableCell>
                       <TableCell align='right'>Ingreso</TableCell>
+                      <TableCell align='right'>Costo laboral</TableCell>
                       <TableCell align='right'>C. Directos</TableCell>
                       <TableCell align='right'>C. Indirectos</TableCell>
                       <TableCell align='center'>Margen Bruto</TableCell>
@@ -255,6 +256,9 @@ const OrganizationFinanceTab = ({ detail }: Props) => {
                         </TableCell>
                         <TableCell align='right'>
                           <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(c.totalRevenueClp)}</Typography>
+                        </TableCell>
+                        <TableCell align='right'>
+                          <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(c.laborCostClp)}</Typography>
                         </TableCell>
                         <TableCell align='right'>
                           <Typography variant='body2' sx={{ fontFamily: 'monospace' }}>{formatCLP(c.directCostsClp)}</Typography>

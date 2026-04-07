@@ -1,12 +1,13 @@
 export const sanitizeSnapshotForPresentation = <T extends {
   totalRevenueClp: number
+  laborCostClp?: number
   directCostsClp: number
   indirectCostsClp: number
   grossMarginPercent: number | null
   netMarginPercent: number | null
   notes?: string | null
 }>(snapshot: T) => {
-  const totalCosts = snapshot.directCostsClp + snapshot.indirectCostsClp
+  const totalCosts = (snapshot.laborCostClp ?? 0) + snapshot.directCostsClp + snapshot.indirectCostsClp
   const isBackfill = (snapshot.notes || '').toLowerCase().includes('backfill')
   const lacksCostCoverage = snapshot.totalRevenueClp > 0 && totalCosts <= 0
   const suspiciousPlaceholderCosts = snapshot.totalRevenueClp > 0 && totalCosts > 0 && totalCosts < 5000
