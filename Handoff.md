@@ -1,5 +1,20 @@
 # Handoff.md
 
+## Sesion 2026-04-07 — TASK-274: Account Complete 360
+
+### TASK-274 — Account Complete 360 (2026-04-07)
+
+Implementacion completa del resolver federado por facetas para organizaciones/cuentas. Analogo a Person Complete 360 (TASK-273).
+
+- **Resolver**: `getAccountComplete360(identifier, { facets: [...] })` en `src/lib/account-360/account-complete-360.ts`
+- **9 facetas**: identity, spaces, team, economics, delivery, finance, crm, services, staffAug
+- **Scope**: org → spaces → clients resuelto una sola vez, compartido por todas las facetas
+- **API**: `GET /api/organization/[id]/360?facets=...` + `POST /api/organizations/360` (bulk, max 50)
+- **Auth**: por faceta segun rol (admin todo, operations sin finance, client limitado a identity+spaces+team+delivery+services)
+- **Cache**: in-memory per-facet TTL + invalidacion por 22 eventos outbox
+- **Verificado E2E**: Sky Airline 9/9 facetas con datos reales (economics $6.9M revenue mar-2026, 20 team members, 7 CRM deals, 72 proyectos)
+- **Rama**: develop (pendiente merge a main)
+
 ## Sesion 2026-04-07 — TASK-278: AI Visual Asset Generator + Profile Banners
 
 ### Rama / alcance

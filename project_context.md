@@ -1,5 +1,19 @@
 # project_context.md
 
+## Delta 2026-04-07 Account Complete 360 — serving federado por facetas (TASK-274)
+
+### Account Complete 360 (TASK-274)
+- Resolver federado analogo a Person 360, 9 facetas: identity, spaces, team, economics, delivery, finance, crm, services, staffAug
+- API: `GET /api/organization/[id]/360`, `POST /api/organizations/360`
+- Serving layer puro sobre tablas existentes, sin migraciones
+- `getAccountComplete360(identifier, { facets: [...] })` es el unico entry point server-side para obtener datos completos de una organizacion/cuenta. Los consumidores NO deben hacer queries directas — deben usar el resolver.
+- Scope resolver centralizado: org → spaces → clients resuelto una sola vez, compartido por todas las facetas.
+- Regla: **nuevas facetas se agregan como modulos en `src/lib/account-360/facets/` + registro en FACET_REGISTRY**. No modificar el resolver core.
+- Autorizacion per-facet: admin todo, operations sin finance, client limitado a identity+spaces+team+delivery+services.
+- Cache in-memory per-facet con TTL + invalidacion por 22 eventos outbox. Preparado para Redis (TASK-276).
+- Identifier resolver: acepta organization_id, public_id (EO-ORG-*), hubspot_company_id.
+- Fuente canonica: `docs/architecture/GREENHOUSE_ACCOUNT_COMPLETE_360_V1.md` (si existe) o el codigo en `src/lib/account-360/`.
+
 ## Delta 2026-04-07 AI Visual Asset Generator + Profile Banners (TASK-278)
 
 - `generateImage()` y `generateAnimation()` en `src/lib/ai/image-generator.ts` son el entry point para generar assets visuales durante el desarrollo.

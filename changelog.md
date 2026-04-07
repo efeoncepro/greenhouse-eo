@@ -2,6 +2,19 @@
 
 ## 2026-04-07
 
+### 2026-04-07 — TASK-274: Account Complete 360 federated serving layer
+
+- Resolver federado `getAccountComplete360()` con 9 facetas independientes
+- Scope resolver centralizado: org → spaces → clients ejecutado una vez
+- Identifier resolver: acepta organization_id, public_id (EO-ORG-*), hubspot_company_id
+- Authorization engine per-facet con 6 niveles de acceso
+- In-memory cache per-facet con TTL + stale-while-revalidate
+- Cache invalidation via 22 outbox events
+- API: GET /api/organization/[id]/360 + POST /api/organizations/360 (bulk)
+- Observability: ResolverTrace, X-Resolver-Version, X-Cache-Status, X-Timing-Ms
+- Deprecated: getOrganizationExecutiveSnapshot(), getOrganizationEconomics()
+- Verificado E2E en staging con Sky Airline (9/9 facetas, $6.9M revenue, 20 members)
+
 - **TASK-278: AI Visual Asset Generator + Profile Banners**:
   - Nuevo modulo `src/lib/ai/image-generator.ts` con `generateImage()` (Imagen 4) y `generateAnimation()` (Gemini SVG)
   - Endpoints internos: `POST /api/internal/generate-image` y `POST /api/internal/generate-animation` (admin-only, disabled en production)
