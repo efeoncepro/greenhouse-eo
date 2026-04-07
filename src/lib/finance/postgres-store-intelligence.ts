@@ -20,10 +20,7 @@ import {
   type ClientEconomicsRecord,
   type AllocationMethod
 } from '@/lib/finance/postgres-store-slice2'
-import {
-  readCommercialCostAttributionByClientForPeriod,
-  materializeCommercialCostAttributionForPeriod
-} from '@/lib/commercial-cost-attribution/member-period-attribution'
+import { readCommercialCostAttributionByClientForPeriod } from '@/lib/commercial-cost-attribution/member-period-attribution'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 // ─── Row types ──────────────────────────────────────────────────────
@@ -530,17 +527,10 @@ export const computeClientEconomicsSnapshots = async (
     [periodStart, periodEnd]
   )
 
-  // Step 1: Materialize cost attribution (best-effort — failure does not block reading)
-  try {
-    await materializeCommercialCostAttributionForPeriod(year, month, notes ?? 'client-economics-snapshot')
-  } catch (error: unknown) {
-    console.error(
-      `[client-economics] commercial cost attribution materialization failed for ${year}-${String(month).padStart(2, '0')}:`,
-      error instanceof Error ? error.message : error
-    )
-  }
-
-  // Step 2: Read commercial cost rows (from materialized table or compute on-the-fly)
+  // Read commercial cost rows (from materialized table or compute on-the-fly)
+  // Note: materialization is handled by the economics-materialize cron, not here.
+  // Calling materialize inline caused purge+fail on Vercel (the purge succeeds but
+  // the re-insert fails due to Cloud SQL Connector query issues), leaving the table empty.
   let commercialCostRows: Awaited<ReturnType<typeof readCommercialCostAttributionByClientForPeriod>> = []
 
   try {
