@@ -2,7 +2,7 @@
  * Resolve a profile banner image based on the person's role or department.
  *
  * Banners are pre-generated per category using Imagen 4 and stored as static
- * assets in public/images/banners/. The resolver maps role codes and department
+ * assets in public/api/media/banners/. The resolver maps role codes and department
  * names to one of 7 category banners.
  *
  * Categories:
@@ -90,7 +90,7 @@ export const resolveProfileBanner = (
   for (const role of roleCodes) {
     const category = ROLE_TO_BANNER[role]
 
-    if (category) return `/images/banners/${category}.png`
+    if (category) return `/api/media/banners/${category}`
   }
 
   // Check department name
@@ -98,8 +98,8 @@ export const resolveProfileBanner = (
     const normalized = departmentName.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     const category = DEPARTMENT_TO_BANNER[normalized]
 
-    if (category) return `/images/banners/${category}.png`
+    if (category) return `/api/media/banners/${category}`
   }
 
-  return '/images/banners/default.png'
+  return '/api/media/banners/default.png'
 }
