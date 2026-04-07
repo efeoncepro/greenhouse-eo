@@ -9,6 +9,7 @@ try:
         build_company_profile,
         build_contact_profile,
         build_owner_profile,
+        build_quote_profile,
         build_service_profile,
     )
     from .webhooks import (
@@ -24,7 +25,7 @@ except ImportError:
     from contract import build_contract
     from greenhouse_client import GreenhouseClient
     from hubspot_client import HubSpotClient, HubSpotIntegrationError
-    from models import build_company_profile, build_contact_profile, build_owner_profile, build_service_profile
+    from models import build_company_profile, build_contact_profile, build_owner_profile, build_quote_profile, build_service_profile
     from webhooks import (
         extract_company_ids_from_webhook_events,
         parse_webhook_events,
@@ -190,6 +191,136 @@ def create_app() -> Flask:
                     "services": ordered_services,
                 }
             )
+        except HubSpotIntegrationError as exc:
+            return jsonify({"error": str(exc), "status_code": exc.status_code}), (
+                exc.status_code or 502
+            )
+
+    # ------------------------------------------------------------------
+    # Quotes (TASK-210)
+    # ------------------------------------------------------------------
+
+    @app.get("/companies/<company_id>/quotes")
+    def company_quotes(company_id: str):
+        try:
+            client = _client()
+            quote_ids = client.list_company_quote_ids(company_id)
+            if not quote_ids:
+                return jsonify(
+                    {
+                        "hubspotCompanyId": company_id,
+                        "count": 0,
+                        "quotes": [],
+                    }
+                )
+
+            quotes_raw = client.get_quotes_by_ids(quote_ids)
+            # Enrich each quote with associations (batch read doesn't include them)
+            quotes = []
+            for q in quotes_raw:
+                try:
+                    enriched = client.get_quote(str(q.get("id")))
+                    quotes.append(build_quote_profile(enriched))
+                except HubSpotIntegrationError:
+                    # Fall back to basic profile without associations
+                    quotes.append(build_quote_profile(q))
+
+            return jsonify(
+                {
+                    "hubspotCompanyId": company_id,
+                    "count": len(quotes),
+                    "quotes": quotes,
+                }
+            )
+        except HubSpotIntegrationError as exc:
+            return jsonify({"error": str(exc), "status_code": exc.status_code}), (
+                exc.status_code or 502
+            )
+
+    @app.post("/quotes")
+    def create_quote():
+        try:
+            body = request.get_json(force=True) or {}
+            client = _client()
+
+            title = body.get("title")
+            expiration_date = body.get("expirationDate")
+            if not title or not expiration_date:
+                return jsonify({"error": "title and expirationDate are required"}), 400
+
+            # 1. Create quote draft
+            quote_props = {
+                "hs_title": title,
+                "hs_expiration_date": expiration_date,
+                "hs_status": "DRAFT",
+            }
+            if body.get("language"):
+                quote_props["hs_language"] = body["language"]
+            if body.get("locale"):
+                quote_props["hs_locale"] = body["locale"]
+
+            sender = body.get("sender") or {}
+            if sender.get("firstName"):
+                quote_props["hs_sender_firstname"] = sender["firstName"]
+            if sender.get("lastName"):
+                quote_props["hs_sender_lastname"] = sender["lastName"]
+            if sender.get("email"):
+                quote_props["hs_sender_email"] = sender["email"]
+            if sender.get("companyName"):
+                quote_props["hs_sender_company_name"] = sender["companyName"]
+
+            created_quote = client.create_quote(quote_props)
+            hs_quote_id = str(created_quote.get("id"))
+
+            # 2. Create and associate line items
+            line_item_ids = []
+            for li in body.get("lineItems") or []:
+                li_props = {
+                    "name": li.get("name", "Item"),
+                    "quantity": li.get("quantity", 1),
+                    "price": li.get("unitPrice", 0),
+                }
+                if li.get("description"):
+                    li_props["description"] = li["description"]
+
+                created_li = client.create_line_item(li_props)
+                li_id = str(created_li.get("id"))
+                line_item_ids.append(li_id)
+
+                # Associate line item → quote (type 67)
+                client.create_association("line_items", li_id, "quotes", hs_quote_id, 67)
+
+            # 3. Associate to deal if provided
+            associations = body.get("associations") or {}
+            deal_id = associations.get("dealId")
+            if deal_id:
+                client.create_association("quotes", hs_quote_id, "deals", deal_id, 64)
+
+            # 4. Associate to company if provided
+            company_id = associations.get("companyId")
+            if company_id:
+                client.create_association("quotes", hs_quote_id, "companies", company_id, 69)
+
+            # 5. Associate to contacts if provided
+            for contact_id in associations.get("contactIds") or []:
+                client.create_association("quotes", hs_quote_id, "contacts", contact_id, 70)
+
+            # 6. Read back to get computed fields
+            final_quote = client.get_quote(hs_quote_id)
+            final_props = final_quote.get("properties") or {}
+
+            return jsonify(
+                {
+                    "hubspotQuoteId": hs_quote_id,
+                    "quoteNumber": final_props.get("hs_quote_number"),
+                    "status": final_props.get("hs_status", "DRAFT"),
+                    "quoteLink": final_props.get("hs_quote_link"),
+                    "associations": {
+                        "dealId": deal_id,
+                        "lineItemIds": line_item_ids,
+                    },
+                }
+            ), 201
         except HubSpotIntegrationError as exc:
             return jsonify({"error": str(exc), "status_code": exc.status_code}), (
                 exc.status_code or 502

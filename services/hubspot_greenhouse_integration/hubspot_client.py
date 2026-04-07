@@ -211,6 +211,165 @@ class HubSpotClient:
             deduped_service_ids.append(service_id)
         return deduped_service_ids
 
+    # ------------------------------------------------------------------
+    # Quotes
+    # ------------------------------------------------------------------
+
+    QUOTE_PROPERTIES = [
+        "hs_title", "hs_quote_number", "hs_quote_amount", "hs_currency",
+        "hs_discount_percentage", "hs_status", "hs_expiration_date",
+        "hs_quote_link", "hs_esign_enabled", "hs_payment_enabled",
+        "hs_language", "hs_locale", "hs_sender_firstname", "hs_sender_lastname",
+        "hs_sender_email", "hs_sender_company_name", "createdate", "hs_lastmodifieddate",
+    ]
+
+    def list_company_quote_ids(self, company_id: str, *, limit: int = 100) -> list[str]:
+        quote_ids: list[str] = []
+        after: str | None = None
+
+        while True:
+            params: dict[str, str | int] = {"limit": limit}
+            if after:
+                params["after"] = after
+
+            response = self.session.get(
+                f"{HUBSPOT_API}/crm/v4/objects/companies/{company_id}/associations/quotes",
+                headers=self._headers(),
+                params=params,
+                timeout=self.timeout_seconds,
+            )
+            if response.status_code >= 400:
+                raise HubSpotIntegrationError(
+                    _parse_error(response),
+                    status_code=response.status_code,
+                )
+
+            payload = response.json()
+            for result in payload.get("results") or []:
+                quote_id = result.get("toObjectId")
+                if quote_id is not None:
+                    quote_ids.append(str(quote_id))
+
+            paging = payload.get("paging") or {}
+            next_page = paging.get("next") or {}
+            after = next_page.get("after")
+            if not after:
+                break
+
+        seen: set[str] = set()
+        deduped: list[str] = []
+        for qid in quote_ids:
+            if qid not in seen:
+                seen.add(qid)
+                deduped.append(qid)
+        return deduped
+
+    def get_quotes_by_ids(
+        self,
+        quote_ids: list[str],
+        *,
+        properties: list[str] | None = None,
+    ) -> list[dict[str, Any]]:
+        if not quote_ids:
+            return []
+
+        props = properties or self.QUOTE_PROPERTIES
+        results: list[dict[str, Any]] = []
+        for start in range(0, len(quote_ids), 100):
+            batch_ids = quote_ids[start : start + 100]
+            response = self.session.post(
+                f"{HUBSPOT_API}/crm/v3/objects/quotes/batch/read",
+                headers=self._headers(),
+                json={
+                    "properties": props,
+                    "inputs": [{"id": qid} for qid in batch_ids],
+                },
+                timeout=self.timeout_seconds,
+            )
+            if response.status_code >= 400:
+                raise HubSpotIntegrationError(
+                    _parse_error(response),
+                    status_code=response.status_code,
+                )
+            payload = response.json()
+            results.extend(payload.get("results") or [])
+        return results
+
+    def get_quote(self, quote_id: str, *, properties: list[str] | None = None) -> dict[str, Any]:
+        props = properties or self.QUOTE_PROPERTIES
+        response = self.session.get(
+            f"{HUBSPOT_API}/crm/v3/objects/quotes/{quote_id}",
+            headers=self._headers(),
+            params={
+                "properties": ",".join(props),
+                "associations": "deals,companies,contacts,line_items",
+            },
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            raise HubSpotIntegrationError(
+                _parse_error(response),
+                status_code=response.status_code,
+            )
+        return response.json()
+
+    def create_quote(self, properties: dict[str, Any]) -> dict[str, Any]:
+        response = self.session.post(
+            f"{HUBSPOT_API}/crm/v3/objects/quotes",
+            headers=self._headers(),
+            json={"properties": properties},
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            raise HubSpotIntegrationError(
+                _parse_error(response),
+                status_code=response.status_code,
+            )
+        return response.json()
+
+    def create_line_item(self, properties: dict[str, Any]) -> dict[str, Any]:
+        response = self.session.post(
+            f"{HUBSPOT_API}/crm/v3/objects/line_items",
+            headers=self._headers(),
+            json={"properties": properties},
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            raise HubSpotIntegrationError(
+                _parse_error(response),
+                status_code=response.status_code,
+            )
+        return response.json()
+
+    def create_association(
+        self, from_type: str, from_id: str, to_type: str, to_id: str, assoc_type: int
+    ) -> None:
+        response = self.session.put(
+            f"{HUBSPOT_API}/crm/v4/objects/{from_type}/{from_id}/associations/{to_type}/{to_id}",
+            headers=self._headers(),
+            json=[{"associationCategory": "HUBSPOT_DEFINED", "associationTypeId": assoc_type}],
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            raise HubSpotIntegrationError(
+                _parse_error(response),
+                status_code=response.status_code,
+            )
+
+    def update_quote(self, quote_id: str, properties: dict[str, Any]) -> dict[str, Any]:
+        response = self.session.patch(
+            f"{HUBSPOT_API}/crm/v3/objects/quotes/{quote_id}",
+            headers=self._headers(),
+            json={"properties": properties},
+            timeout=self.timeout_seconds,
+        )
+        if response.status_code >= 400:
+            raise HubSpotIntegrationError(
+                _parse_error(response),
+                status_code=response.status_code,
+            )
+        return response.json()
+
     def get_services_by_ids(
         self,
         service_ids: list[str],

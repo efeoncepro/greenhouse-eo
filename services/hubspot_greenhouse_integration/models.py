@@ -124,6 +124,60 @@ def build_contact_profile(contact: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def build_quote_profile(quote: dict[str, Any]) -> dict[str, Any]:
+    props = quote.get("properties") or {}
+    associations = quote.get("associations") or {}
+
+    # Extract associated IDs
+    deal_ids = [
+        str(r.get("id"))
+        for r in (associations.get("deals", {}).get("results") or [])
+    ]
+    company_ids = [
+        str(r.get("id"))
+        for r in (associations.get("companies", {}).get("results") or [])
+    ]
+    contact_ids = [
+        str(r.get("id"))
+        for r in (associations.get("contacts", {}).get("results") or [])
+    ]
+    line_items = associations.get("line_items", {}).get("results") or associations.get("line items", {}).get("results") or []
+
+    return {
+        "identity": {
+            "quoteId": str(quote.get("id")),
+            "title": props.get("hs_title"),
+            "quoteNumber": props.get("hs_quote_number"),
+            "hubspotQuoteId": str(quote.get("id")),
+        },
+        "financial": {
+            "amount": _safe_number(props.get("hs_quote_amount")),
+            "currency": props.get("hs_currency"),
+            "discount": _safe_number(props.get("hs_discount_percentage")),
+        },
+        "dates": {
+            "createDate": props.get("createdate"),
+            "expirationDate": props.get("hs_expiration_date"),
+            "lastModifiedDate": props.get("hs_lastmodifieddate"),
+        },
+        "status": {
+            "approvalStatus": props.get("hs_status"),
+            "signatureStatus": None,
+        },
+        "associations": {
+            "dealId": deal_ids[0] if deal_ids else None,
+            "companyId": company_ids[0] if company_ids else None,
+            "contactIds": contact_ids,
+            "lineItemCount": len(line_items),
+        },
+        "source": {
+            "sourceSystem": "hubspot",
+            "sourceObjectType": "quote",
+            "sourceObjectId": str(quote.get("id")),
+        },
+    }
+
+
 def _safe_number(value: Any) -> float | None:
     if value is None:
         return None
