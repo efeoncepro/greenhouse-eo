@@ -47,11 +47,11 @@ export const fetchSpacesFacet = async (
     LEFT JOIN greenhouse_core.clients c
       ON c.client_id = s.client_id
     LEFT JOIN (
-      SELECT space_id, COUNT(*) AS cnt
+      SELECT client_id, COUNT(*) AS cnt
       FROM greenhouse_core.client_service_modules
       WHERE status = 'active'
-      GROUP BY space_id
-    ) csm ON csm.space_id = s.space_id
+      GROUP BY client_id
+    ) csm ON csm.client_id = s.client_id
     WHERE s.space_id = ANY($1)
     ORDER BY s.space_name ASC`,
     [scope.spaceIds]

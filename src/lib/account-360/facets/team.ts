@@ -65,17 +65,21 @@ export const fetchTeamFacet = async (
       baseParams
     ),
 
-    // Total FTE (aggregate across all active memberships, no pagination)
+    // Total FTE (aggregate across active client_team_assignments linked via members)
     runGreenhousePostgresQuery<FteRow>(
-      `SELECT SUM(pm.fte_allocation) AS total_fte
+      `SELECT SUM(cta.fte_allocation) AS total_fte
        FROM greenhouse_core.person_memberships pm
+       JOIN greenhouse_core.members m
+         ON m.identity_profile_id = pm.profile_id
+       JOIN greenhouse_core.client_team_assignments cta
+         ON cta.member_id = m.member_id AND cta.active = TRUE
        WHERE pm.organization_id = $1
          AND pm.active = TRUE
          ${temporalClause}`,
       baseParams
     ),
 
-    // Paginated members joined with person_360 for avatar/name
+    // Paginated members joined with person_360 for avatar/name, and client_team_assignments for FTE
     runGreenhousePostgresQuery<TeamMemberRow>(
       `SELECT
         pm.profile_id,
@@ -85,12 +89,21 @@ export const fetchTeamFacet = async (
         p360.user_id,
         p360.resolved_job_title,
         p360.department_name,
-        pm.fte_allocation,
+        cta.fte_allocation,
         pm.membership_type,
         pm.is_primary
       FROM greenhouse_core.person_memberships pm
       LEFT JOIN greenhouse_serving.person_360 p360
         ON p360.identity_profile_id = pm.profile_id
+      LEFT JOIN greenhouse_core.members m
+        ON m.identity_profile_id = pm.profile_id
+      LEFT JOIN LATERAL (
+        SELECT cta2.fte_allocation
+        FROM greenhouse_core.client_team_assignments cta2
+        WHERE cta2.member_id = m.member_id AND cta2.active = TRUE
+        ORDER BY cta2.start_date DESC NULLS LAST
+        LIMIT 1
+      ) cta ON TRUE
       WHERE pm.organization_id = $1
         AND pm.active = TRUE
         ${temporalClause}
