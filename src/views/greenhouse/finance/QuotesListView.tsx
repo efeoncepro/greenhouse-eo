@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react'
 
+import { useRouter } from 'next/navigation'
+
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -397,6 +399,7 @@ const CreateQuoteDrawer = ({
 // ── Component ──
 
 const QuotesListView = () => {
+  const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [items, setItems] = useState<Quote[]>([])
   const [statusFilter, setStatusFilter] = useState('')
@@ -523,7 +526,7 @@ const QuotesListView = () => {
                   const sourceConf = SOURCE_CHIP_CONFIG[q.source] ?? SOURCE_CHIP_CONFIG.manual
 
                   return (
-                    <TableRow key={q.quoteId} hover>
+                    <TableRow key={q.quoteId} hover sx={{ cursor: 'pointer' }} onClick={() => router.push(`/finance/quotes/${q.quoteId}`)}>
                       <TableCell>
                         <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
                           {q.quoteNumber ?? '—'}
