@@ -2,6 +2,14 @@
 
 ## 2026-04-06
 
+- **ISSUE-024 fix: Admin Notifications — observabilidad de errores silenciosos**:
+  - Los 6 catch blocks de `get-admin-notifications-overview.ts` ahora logean con `console.error` en vez de fallar silenciosamente a cero
+  - Nueva propiedad `diagnostics: string[]` en `AdminNotificationsOverview` — expone mensajes descriptivos cuando tablas faltan o queries fallan
+  - Banner de diagnóstico en `AdminNotificationsView.tsx` — aparece solo cuando hay problemas detectados
+  - `logDispatch()` en `notification-service.ts` ya no tiene catch vacío
+  - `test-dispatch` route valida schema con `ensureNotificationSchema()` antes de enviar (503 si falla)
+  - `setup-postgres-notifications.sql` corregido: columna `metadata JSONB DEFAULT '{}'` faltante en `notification_log`
+
 - **Repo ecosystem doc: upstream Vuexy registrado**:
   - `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md` ahora incluye `pixinvent/vuexy-nextjs-admin-template` como repo upstream de referencia del tema/starter que usa Greenhouse
   - usarlo para contrastar layout base, shell y patrones heredados de Vuexy; no como source of truth funcional del producto

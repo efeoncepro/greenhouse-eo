@@ -51,18 +51,21 @@ export interface AdminNotificationsOverview {
   deliveryHealth: DeliveryHealth
   categories: NotificationCategoryRow[]
   recentDispatch: DispatchLogRow[]
+  diagnostics: string[]
 }
 
 // ── Helpers ──
 
 type CountRow = Record<string, unknown> & { count: string | number }
 
-const safeCount = async (query: string, params?: unknown[]): Promise<number> => {
+const safeCount = async (label: string, query: string, params?: unknown[]): Promise<number> => {
   try {
     const rows = await runGreenhousePostgresQuery<CountRow>(query, params)
 
     return Number(rows[0]?.count ?? 0)
-  } catch {
+  } catch (error) {
+    console.error(`[notifications-overview] safeCount(${label}) failed:`, error)
+
     return 0
   }
 }
@@ -75,7 +78,9 @@ const tableExists = async (schema: string, table: string): Promise<boolean> => {
     )
 
     return rows[0]?.exists === true
-  } catch {
+  } catch (error) {
+    console.error(`[notifications-overview] tableExists(${schema}.${table}) failed:`, error)
+
     return false
   }
 }
@@ -96,14 +101,22 @@ const buildCategories = (): NotificationCategoryRow[] =>
 // ── Main ──
 
 export const getAdminNotificationsOverview = async (): Promise<AdminNotificationsOverview> => {
+  const diagnostics: string[] = []
   const hasLog = await tableExists('greenhouse_notifications', 'notification_log')
 
   if (!hasLog) {
+    diagnostics.push('La tabla notification_log no existe o no es accesible — los KPIs no pueden calcularse.')
+
     return {
       kpis: { totalSent24h: 0, inAppDelivered24h: 0, emailDelivered24h: 0, failed24h: 0, skipped24h: 0 },
-      deliveryHealth: { inApp: { sent: 0, failed: 0, rate: 0 }, email: { sent: 0, failed: 0, rate: 0 }, lastSignalAt: null },
+      deliveryHealth: {
+        inApp: { sent: 0, failed: 0, rate: 0 },
+        email: { sent: 0, failed: 0, rate: 0 },
+        lastSignalAt: null
+      },
       categories: buildCategories(),
-      recentDispatch: []
+      recentDispatch: [],
+      diagnostics
     }
   }
 
@@ -111,22 +124,27 @@ export const getAdminNotificationsOverview = async (): Promise<AdminNotification
 
   const [totalSent24h, inAppDelivered24h, emailDelivered24h, failed24h, skipped24h] = await Promise.all([
     safeCount(
+      'totalSent24h',
       `SELECT COUNT(*) AS count FROM greenhouse_notifications.notification_log
        WHERE status = 'sent' AND created_at > NOW() - INTERVAL '24 hours'`
     ),
     safeCount(
+      'inAppDelivered24h',
       `SELECT COUNT(*) AS count FROM greenhouse_notifications.notification_log
        WHERE status = 'sent' AND channel = 'in_app' AND created_at > NOW() - INTERVAL '24 hours'`
     ),
     safeCount(
+      'emailDelivered24h',
       `SELECT COUNT(*) AS count FROM greenhouse_notifications.notification_log
        WHERE status = 'sent' AND channel = 'email' AND created_at > NOW() - INTERVAL '24 hours'`
     ),
     safeCount(
+      'failed24h',
       `SELECT COUNT(*) AS count FROM greenhouse_notifications.notification_log
        WHERE status = 'failed' AND created_at > NOW() - INTERVAL '24 hours'`
     ),
     safeCount(
+      'skipped24h',
       `SELECT COUNT(*) AS count FROM greenhouse_notifications.notification_log
        WHERE status = 'skipped' AND created_at > NOW() - INTERVAL '24 hours'`
     )
@@ -159,8 +177,9 @@ export const getAdminNotificationsOverview = async (): Promise<AdminNotification
       if (row.channel === 'in_app') inAppHealth = { sent, failed, rate }
       if (row.channel === 'email') emailHealth = { sent, failed, rate }
     }
-  } catch {
-    // Keep defaults
+  } catch (error) {
+    console.error('[notifications-overview] channel health query failed:', error)
+    diagnostics.push('Error al consultar salud de canales: ' + (error instanceof Error ? error.message : String(error)))
   }
 
   // ── Last signal ──
@@ -173,8 +192,9 @@ export const getAdminNotificationsOverview = async (): Promise<AdminNotification
     )
 
     lastSignalAt = rows[0]?.last_signal ?? null
-  } catch {
-    // Keep null
+  } catch (error) {
+    console.error('[notifications-overview] lastSignalAt query failed:', error)
+    diagnostics.push('Error al consultar última señal: ' + (error instanceof Error ? error.message : String(error)))
   }
 
   // ── Recent dispatch (last 50) ──
@@ -182,16 +202,18 @@ export const getAdminNotificationsOverview = async (): Promise<AdminNotification
   let recentDispatch: DispatchLogRow[] = []
 
   try {
-    const rows = await runGreenhousePostgresQuery<Record<string, unknown> & {
-      log_id: string
-      user_id: string
-      category: string
-      channel: string
-      status: string
-      skip_reason: string | null
-      error_message: string | null
-      created_at: string
-    }>(
+    const rows = await runGreenhousePostgresQuery<
+      Record<string, unknown> & {
+        log_id: string
+        user_id: string
+        category: string
+        channel: string
+        status: string
+        skip_reason: string | null
+        error_message: string | null
+        created_at: string
+      }
+    >(
       `SELECT log_id::text, user_id, category, channel, status, skip_reason, error_message, created_at::text
        FROM greenhouse_notifications.notification_log
        ORDER BY created_at DESC
@@ -208,14 +230,18 @@ export const getAdminNotificationsOverview = async (): Promise<AdminNotification
       errorMessage: r.error_message ?? null,
       createdAt: String(r.created_at)
     }))
-  } catch {
-    // Keep empty
+  } catch (error) {
+    console.error('[notifications-overview] recentDispatch query failed:', error)
+    diagnostics.push(
+      'Error al consultar despachos recientes: ' + (error instanceof Error ? error.message : String(error))
+    )
   }
 
   return {
     kpis: { totalSent24h, inAppDelivered24h, emailDelivered24h, failed24h, skipped24h },
     deliveryHealth: { inApp: inAppHealth, email: emailHealth, lastSignalAt },
     categories: buildCategories(),
-    recentDispatch
+    recentDispatch,
+    diagnostics
   }
 }
