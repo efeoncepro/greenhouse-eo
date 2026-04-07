@@ -17,6 +17,15 @@ interface MemberRow extends Record<string, unknown> {
   avatar_url: string | null
   job_title: string | null
   department_name: string | null
+  user_id: string | null
+}
+
+/** Resolve gs:// avatar URLs to the /api/media proxy path */
+const resolveAvatarUrl = (avatarUrl: string | null, userId: string | null): string | null => {
+  if (!avatarUrl) return null
+  if (avatarUrl.startsWith('gs://') && userId) return `/api/media/users/${userId}/avatar`
+
+  return avatarUrl
 }
 
 export async function GET() {
@@ -33,6 +42,9 @@ export async function GET() {
   }
 
   try {
+    // Exclude the current user from the colleagues list
+    const currentProfileId = tenant.identityProfileId || null
+
     const rows = await runGreenhousePostgresQuery<MemberRow>(
       `SELECT
         pm.membership_id,
@@ -45,15 +57,17 @@ export async function GET() {
         pm.is_primary,
         p360.resolved_avatar_url AS avatar_url,
         p360.resolved_job_title AS job_title,
-        p360.department_name
+        p360.department_name,
+        cu.user_id
       FROM greenhouse_core.person_memberships pm
       LEFT JOIN greenhouse_core.identity_profiles ip ON ip.profile_id = pm.profile_id
       LEFT JOIN greenhouse_core.client_users cu ON cu.identity_profile_id = pm.profile_id AND cu.active = TRUE
       LEFT JOIN greenhouse_serving.person_360 p360 ON p360.identity_profile_id = pm.profile_id
       WHERE pm.organization_id = $1
         AND pm.active = TRUE
+        AND ($2::TEXT IS NULL OR pm.profile_id != $2)
       ORDER BY pm.is_primary DESC, COALESCE(p360.resolved_display_name, ip.full_name, cu.full_name, pm.role_label) ASC`,
-      [orgId]
+      [orgId, currentProfileId]
     )
 
     const members = rows.map(r => ({
@@ -65,7 +79,7 @@ export async function GET() {
       roleLabel: r.role_label,
       department: r.department,
       isPrimary: r.is_primary,
-      avatarUrl: r.avatar_url || null,
+      avatarUrl: resolveAvatarUrl(r.avatar_url, r.user_id),
       jobTitle: r.job_title || null,
       departmentName: r.department_name || null
     }))
