@@ -2,19 +2,21 @@
 
 ## Delta 2026-04-07
 
-- Greenhouse-side code complete: migration, event catalog, client methods, sync function, create function, cron route, API routes (GET update + POST), UI multi-source + create drawer, nomenclature, vercel.json cron schedule.
-- Backfill script created: `scripts/backfill-hubspot-quotes.ts`
-- Cron registered in vercel.json: every 6 hours (`0 */6 * * *`)
-- **Pending**: Cloud Run service endpoints (Slices 2 & 6) — separate repo `hubspot-greenhouse-integration`
-- **Pending**: Apply migration (`pnpm migrate:up`) once Cloud SQL Proxy is available
+- **Complete**: all 9 slices implemented and deployed
+- Migration applied: `source_system`, `hubspot_quote_id`, `hubspot_deal_id`, `hubspot_last_synced_at`
+- Backfill executed: 15 HubSpot quotes synced across 9 organizations
+- Existing Nubox quotes tagged with `source_system = 'nubox'`
+- Cloud Run service deployed: `GET /companies/{id}/quotes` + `POST /quotes`
+- Cron registered: `hubspot-quotes-sync` every 6 hours in `vercel.json`
+- UI: multi-source chips, source filter, create drawer
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
-- Status real: `Implementacion parcial (Greenhouse-side complete, Cloud Run pending)`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `finance`
 
