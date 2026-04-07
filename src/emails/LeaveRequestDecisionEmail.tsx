@@ -4,7 +4,7 @@ import EmailButton from './components/EmailButton'
 import EmailLayout from './components/EmailLayout'
 import { APP_URL, EMAIL_COLORS, EMAIL_FONTS } from './constants'
 
-const HERO_IMAGE_URL = 'https://greenhouse.efeoncepro.com/images/emails/leave-decision.png'
+const HERO_IMAGE_URL = `${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/images/emails/leave-decision.png`
 
 type LeaveStatus = 'approved' | 'rejected' | 'cancelled'
 
