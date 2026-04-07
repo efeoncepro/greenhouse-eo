@@ -28,7 +28,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ category: 
     return new NextResponse(asset.arrayBuffer, {
       headers: {
         'Content-Type': asset.contentType,
-        'Cache-Control': 'public, max-age=86400, immutable'
+        'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400'
       }
     })
   } catch {

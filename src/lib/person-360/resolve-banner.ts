@@ -101,5 +101,5 @@ export const resolveProfileBanner = (
     if (category) return `/api/media/banners/${category}`
   }
 
-  return '/api/media/banners/default.png'
+  return '/api/media/banners/default'
 }
