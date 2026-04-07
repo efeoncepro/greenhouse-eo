@@ -64,7 +64,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-027`
+`ISSUE-028`
 
 ## Open
 
@@ -83,6 +83,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 | ID          | Título                                                                                                                                                            | Ambiente                       | Detectado  | Resuelto   | Causa                                                                                                                    |
 | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `ISSUE-027` | [My Profile vacío tras migración a Person 360: resolución "me" retorna 404](resolved/ISSUE-027-my-profile-360-me-resolution-404.md)                               | staging                        | 2026-04-07 | 2026-04-07 | `resolvePersonIdentifier` no buscaba por `identity_profile_id` — WHERE clause solo tenía `member_id OR user_id`          |
 | `ISSUE-025` | [sendEmail() reporta 'sent' cuando todos los recipients fueron skipped](resolved/ISSUE-025-sendmail-status-aggregation-skipped-as-sent.md)                        | production + staging + preview | 2026-04-06 | 2026-04-07 | `sendEmail()` no trackeaba `sawSkipped`; 18 registros históricos corregidos via backfill                                 |
 | `ISSUE-024` | [Admin Notifications: errores silenciosos ocultan estado real](resolved/ISSUE-024-admin-notifications-silent-failures-zero-kpis.md)                               | staging + preview              | 2026-04-06 | 2026-04-07 | Catch blocks silenciosos + logDispatch vacío + schema validation faltante + diagnostics UI ausente                       |
 | `ISSUE-005` | [Payroll close route drains global notification backlog](resolved/ISSUE-005-payroll-close-route-drains-global-notification-backlog.md)                            | preview + production           | 2026-04-05 | 2026-04-05 | Payroll close drenaba backlog de notificaciones globales                                                                 |
