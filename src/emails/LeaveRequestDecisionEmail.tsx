@@ -5,7 +5,7 @@ import EmailLayout from './components/EmailLayout'
 import { APP_URL, EMAIL_COLORS, EMAIL_FONTS } from './constants'
 
 const MEDIA_BUCKET = process.env.GREENHOUSE_PUBLIC_MEDIA_BUCKET || 'efeonce-group-greenhouse-public-media-prod'
-const HERO_IMAGE_URL = `https://storage.googleapis.com/${MEDIA_BUCKET}/emails/leave-decision.png`
+const HERO_IMAGE_URL = `https://storage.googleapis.com/${MEDIA_BUCKET}/emails/leave-decision-v2.png`
 
 type LeaveStatus = 'approved' | 'rejected' | 'cancelled'
 
