@@ -166,13 +166,17 @@ const MyProfileView = () => {
     value: a.roleTitle || a.role_title_override || 'Asignado'
   }))
 
-  const teamsTech = (assignments?.assignments ?? []).map((a: any) => ({
-    title: a.clientName || a.client_name || 'Sin nombre',
-    avatar: '/images/avatars/1.png',
-    members: 1,
-    chipText: `${Math.round((a.fteAllocation || a.fte_allocation || 0) * 100)}% FTE`,
-    chipColor: 'primary' as const
-  }))
+  const teamsTech = (assignments?.assignments ?? []).map((a: any) => {
+    const tm = a.teamMembers ?? []
+
+    return {
+      title: a.clientName || a.client_name || 'Sin nombre',
+      avatar: tm[0]?.avatarUrl || '',
+      members: tm.length,
+      chipText: `${Math.round((a.fteAllocation || a.fte_allocation || 0) * 100)}% FTE`,
+      chipColor: 'primary' as const
+    }
+  })
 
   const leaveRequests = Array.isArray(leave?.requests) ? leave.requests : (leave?.requests?.requests ?? [])
 
@@ -189,47 +193,59 @@ const MyProfileView = () => {
     role: c.jobTitle || c.roleLabel || c.membershipType || ''
   }))
 
-  const projectTable = (assignments?.assignments ?? []).map((a: any, i: number) => ({
-    id: i + 1,
-    title: a.clientName || a.client_name || 'Sin nombre',
-    subtitle: a.roleTitle || a.role_title_override || 'Asignado',
-    leader: '',
-    avatar: '/images/avatars/1.png',
-    avatarGroup: [] as string[],
-    status: Math.round((a.fteAllocation || a.fte_allocation || 0) * 100)
-  }))
+  const projectTable = (assignments?.assignments ?? []).map((a: any, i: number) => {
+    const tm = a.teamMembers ?? []
 
-  const teamsTabData = (assignments?.assignments ?? []).map((a: any) => ({
-    title: a.clientName || a.client_name || 'Sin nombre',
-    avatar: '/images/avatars/1.png',
-    description: a.roleTitle || a.role_title_override || 'Miembro del equipo',
-    chips: [
-      {
-        title: `${Math.round((a.fteAllocation || a.fte_allocation || 0) * 100)}% FTE`,
-        color: 'primary' as const
-      }
-    ],
-    avatarGroup: [] as { name: string; avatar: string }[]
-  }))
+    return {
+      id: i + 1,
+      title: a.clientName || a.client_name || 'Sin nombre',
+      subtitle: a.roleTitle || a.role_title_override || 'Asignado',
+      leader: '',
+      avatarGroup: tm.map((m: any) => m.avatarUrl).filter(Boolean) as string[],
+      status: Math.round((a.fteAllocation || a.fte_allocation || 0) * 100)
+    }
+  })
 
-  const projectsTabData = (assignments?.assignments ?? []).map((a: any) => ({
-    title: a.clientName || a.client_name || 'Sin nombre',
-    client: a.clientName || a.client_name || '',
-    avatar: '/images/avatars/1.png',
-    budget: '-',
-    budgetSpent: '-',
-    startDate: a.startDate || a.start_date || '-',
-    deadline: a.endDate || a.end_date || '-',
-    description: a.roleTitle || a.role_title_override || '',
-    hours: `${a.hoursPerMonth || a.hours_per_month || 0}h/mes`,
-    daysLeft: 0,
-    chipColor: 'info' as const,
-    totalTask: 1,
-    completedTask: 1,
-    members: '',
-    comments: 0,
-    avatarGroup: [] as { name: string; avatar: string }[]
-  }))
+  const teamsTabData = (assignments?.assignments ?? []).map((a: any) => {
+    const tm = a.teamMembers ?? []
+
+    return {
+      title: a.clientName || a.client_name || 'Sin nombre',
+      avatar: '',
+      description: a.roleTitle || a.role_title_override || 'Miembro del equipo',
+      chips: [
+        {
+          title: `${Math.round((a.fteAllocation || a.fte_allocation || 0) * 100)}% FTE`,
+          color: 'primary' as const
+        }
+      ],
+      extraMembers: 0,
+      avatarGroup: tm.map((m: any) => ({ name: m.name, avatar: m.avatarUrl || '' }))
+    }
+  })
+
+  const projectsTabData = (assignments?.assignments ?? []).map((a: any) => {
+    const tm = a.teamMembers ?? []
+
+    return {
+      title: a.clientName || a.client_name || 'Sin nombre',
+      client: a.clientName || a.client_name || '',
+      avatar: '',
+      budget: '-',
+      budgetSpent: '-',
+      startDate: a.startDate || a.start_date || '-',
+      deadline: a.endDate || a.end_date || '-',
+      description: a.roleTitle || a.role_title_override || '',
+      hours: `${a.hoursPerMonth || a.hours_per_month || 0}h/mes`,
+      daysLeft: 0,
+      chipColor: 'info' as const,
+      totalTask: tm.length + 1,
+      completedTask: tm.length + 1,
+      members: `${tm.length + 1} miembros`,
+      comments: 0,
+      avatarGroup: tm.map((m: any) => ({ name: m.name, avatar: m.avatarUrl || '' }))
+    }
+  })
 
   const connectionsTabData = colleagues.slice(0, 12).map((c: any) => ({
     name: c.fullName || c.displayName || 'Sin nombre',
