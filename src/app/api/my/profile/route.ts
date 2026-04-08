@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { getServerSession } from 'next-auth'
-
-import { authOptions } from '@/lib/auth'
+import { getServerAuthSession } from '@/lib/auth'
 import { requireTenantContext } from '@/lib/tenant/authorization'
 import {
   getPersonProfileByMemberId,
@@ -30,7 +28,7 @@ export async function GET() {
     }
 
     // Fallback: session always has name, email, avatar for authenticated users
-    const session = await getServerSession(authOptions)
+    const session = await getServerAuthSession()
 
     return NextResponse.json(toPersonProfileSummaryFromSession(session!.user))
   } catch (error) {

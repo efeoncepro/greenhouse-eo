@@ -1,14 +1,12 @@
 import { NextResponse } from 'next/server'
 
-import { getServerSession } from 'next-auth'
-
-import { authOptions } from '@/lib/auth'
+import { getServerAuthSession } from '@/lib/auth'
 import { getNexaThreadDetail } from '@/lib/nexa/store'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(_: Request, context: { params: Promise<{ threadId: string }> }) {
-  const session = await getServerSession(authOptions)
+  const session = await getServerAuthSession()
 
   if (!session?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

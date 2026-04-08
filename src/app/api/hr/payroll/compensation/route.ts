@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { getServerSession } from 'next-auth'
-
-import { authOptions } from '@/lib/auth'
+import { getServerAuthSession } from '@/lib/auth'
 import { createCompensationVersion, getCompensationOverview } from '@/lib/payroll/get-compensation'
 import { toPayrollErrorResponse } from '@/lib/payroll/api-response'
 import { assertPayrollDateString, parsePayrollNumber } from '@/lib/payroll/shared'
@@ -41,7 +39,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
     }
 
-    const session = await getServerSession(authOptions)
+    const session = await getServerAuthSession()
 
     const created = await createCompensationVersion({
       input: {

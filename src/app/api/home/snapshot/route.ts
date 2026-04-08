@@ -1,15 +1,13 @@
 import { NextResponse } from 'next/server'
 
-import { getServerSession } from 'next-auth'
-
-import { authOptions } from '@/lib/auth'
+import { getServerAuthSession } from '@/lib/auth'
 import { getHomeSnapshot } from '@/lib/home/get-home-snapshot'
 
 /**
  * API route to fetch the initial data for the Greenhouse Home view.
  */
 export async function GET() {
-  const session = await getServerSession(authOptions)
+  const session = await getServerAuthSession()
 
   if (!session?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

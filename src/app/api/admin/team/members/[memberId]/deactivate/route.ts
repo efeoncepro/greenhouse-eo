@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { getServerSession } from 'next-auth'
-
-import { authOptions } from '@/lib/auth'
+import { getServerAuthSession } from '@/lib/auth'
 import { deactivateMember, toTeamAdminErrorResponse } from '@/lib/team-admin/mutate-team'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 
@@ -17,7 +15,7 @@ export async function POST(_request: Request, context: { params: Promise<{ membe
 
   try {
     const { memberId } = await context.params
-    const session = await getServerSession(authOptions)
+    const session = await getServerAuthSession()
 
     const updated = await deactivateMember({
       memberId,

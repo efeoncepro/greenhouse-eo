@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server'
 
-import { getServerSession } from 'next-auth'
-
 import { resolveNexaModel } from '@/config/nexa-models'
-import { authOptions } from '@/lib/auth'
+import { getServerAuthSession } from '@/lib/auth'
 import { resolveCapabilityModules } from '@/lib/capabilities/resolve-capabilities'
 import { canSeeFinanceStatus, getHomeFinanceStatus } from '@/lib/home/get-home-snapshot'
 import type { NexaRuntimeContext } from '@/lib/nexa/nexa-contract'
@@ -19,7 +17,7 @@ export const dynamic = 'force-dynamic'
  * getHomeSnapshot() to avoid blocking on notifications/DB per message.
  */
 export async function POST(req: Request) {
-  const session = await getServerSession(authOptions)
+  const session = await getServerAuthSession()
 
   if (!session?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

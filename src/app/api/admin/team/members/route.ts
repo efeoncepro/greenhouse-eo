@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { getServerSession } from 'next-auth'
-
-import { authOptions } from '@/lib/auth'
+import { getServerAuthSession } from '@/lib/auth'
 import { createMember, getAdminTeamMembersPayload, toTeamAdminErrorResponse } from '@/lib/team-admin/mutate-team'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import type { CreateMemberInput } from '@/types/team'
@@ -39,7 +37,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
     }
 
-    const session = await getServerSession(authOptions)
+    const session = await getServerAuthSession()
 
     const created = await createMember({
       input: body,

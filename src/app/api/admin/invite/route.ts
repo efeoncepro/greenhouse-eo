@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { getServerSession } from 'next-auth'
-
-import { authOptions } from '@/lib/auth'
+import { getServerAuthSession } from '@/lib/auth'
 import { ROLE_CODES } from '@/config/role-codes'
 import { generateToken, storeToken } from '@/lib/auth-tokens'
 import { sendEmail } from '@/lib/email/delivery'
@@ -10,7 +8,7 @@ import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerAuthSession()
 
     if (!session?.user?.roleCodes?.includes(ROLE_CODES.EFEONCE_ADMIN)) {
       return NextResponse.json({ error: 'Acceso denegado.' }, { status: 403 })

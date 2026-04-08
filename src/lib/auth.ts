@@ -1,4 +1,4 @@
-import type { NextAuthOptions } from 'next-auth'
+import { getServerSession, type NextAuthOptions } from 'next-auth'
 import AzureADProvider from 'next-auth/providers/azure-ad'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
@@ -26,13 +26,6 @@ import {
 import { resolvePortalHomePath } from '@/lib/tenant/resolve-portal-home-path'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
-
-const microsoftClientId = process.env.AZURE_AD_CLIENT_ID
-const microsoftClientSecret = getAzureAdClientSecret()
-const googleClientId = process.env.GOOGLE_CLIENT_ID
-const googleClientSecret = getGoogleClientSecret()
-const hasMicrosoftProvider = hasMicrosoftAuthProvider()
-const hasGoogleProvider = hasGoogleAuthProvider()
 
 const getMicrosoftProfileIdentity = ({
   profile,
@@ -74,6 +67,30 @@ const getMicrosoftProfileIdentity = ({
     displayName,
     givenName,
     familyName
+  }
+}
+
+export const getAuthOptions = () => createAuthOptions()
+
+export const isMissingNextAuthSecretError = (error: unknown) =>
+  error instanceof Error && error.message === 'NEXTAUTH_SECRET is not set'
+
+let hasLoggedMissingNextAuthSecret = false
+
+export const getServerAuthSession = async () => {
+  try {
+    return await getServerSession(getAuthOptions())
+  } catch (error) {
+    if (isMissingNextAuthSecretError(error)) {
+      if (!hasLoggedMissingNextAuthSecret) {
+        console.warn('[auth] NEXTAUTH_SECRET is not set; treating request as unauthenticated in this runtime.')
+        hasLoggedMissingNextAuthSecret = true
+      }
+
+      return null
+    }
+
+    throw error
   }
 }
 
@@ -132,139 +149,147 @@ const getRejectedTenantMatchRedirect = async ({
   return '/auth/access-denied'
 }
 
-export const authOptions: NextAuthOptions = {
-  secret: getNextAuthSecret(),
-  session: {
-    strategy: 'jwt'
-  },
-  pages: {
-    signIn: '/login',
-    error: '/auth/access-denied'
-  },
-  providers: [
-    ...(hasMicrosoftProvider
-      ? [
-          AzureADProvider({
-            clientId: microsoftClientId!,
-            clientSecret: microsoftClientSecret!,
-            tenantId: 'common',
-            authorization: {
-              params: {
-                scope: 'openid profile email'
+const createAuthOptions = (): NextAuthOptions => {
+  const microsoftClientId = process.env.AZURE_AD_CLIENT_ID
+  const microsoftClientSecret = getAzureAdClientSecret()
+  const googleClientId = process.env.GOOGLE_CLIENT_ID
+  const googleClientSecret = getGoogleClientSecret()
+  const hasMicrosoftProvider = hasMicrosoftAuthProvider()
+  const hasGoogleProvider = hasGoogleAuthProvider()
+
+  return {
+    secret: getNextAuthSecret(),
+    session: {
+      strategy: 'jwt'
+    },
+    pages: {
+      signIn: '/login',
+      error: '/auth/access-denied'
+    },
+    providers: [
+      ...(hasMicrosoftProvider
+        ? [
+            AzureADProvider({
+              clientId: microsoftClientId!,
+              clientSecret: microsoftClientSecret!,
+              tenantId: 'common',
+              authorization: {
+                params: {
+                  scope: 'openid profile email'
+                }
               }
-            }
-          })
-        ]
-      : []),
-    ...(hasGoogleProvider
-      ? [
-          GoogleProvider({
-            clientId: googleClientId!,
-            clientSecret: googleClientSecret!,
-            authorization: {
-              params: {
-                scope: 'openid email'
+            })
+          ]
+        : []),
+      ...(hasGoogleProvider
+        ? [
+            GoogleProvider({
+              clientId: googleClientId!,
+              clientSecret: googleClientSecret!,
+              authorization: {
+                params: {
+                  scope: 'openid email'
+                }
               }
-            }
-          })
-        ]
-      : []),
-    CredentialsProvider({
-      name: 'Greenhouse Credentials',
-      credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' }
-      },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials.password) {
-          return null
-        }
+            })
+          ]
+        : []),
+      CredentialsProvider({
+        name: 'Greenhouse Credentials',
+        credentials: {
+          email: { label: 'Email', type: 'email' },
+          password: { label: 'Password', type: 'password' }
+        },
+        async authorize(credentials) {
+          if (!credentials?.email || !credentials.password) {
+            return null
+          }
 
-        const normalizedEmail = credentials.email.trim().toLowerCase()
+          const normalizedEmail = credentials.email.trim().toLowerCase()
 
-        let tenant = null
+          let tenant = null
 
-        try {
-          tenant = await getTenantAccessRecordByEmail(normalizedEmail)
-        } catch (error) {
-          console.error('Credentials auth lookup failed.', { email: normalizedEmail }, error)
+          try {
+            tenant = await getTenantAccessRecordByEmail(normalizedEmail)
+          } catch (error) {
+            console.error('Credentials auth lookup failed.', { email: normalizedEmail }, error)
 
-          return null
-        }
+            return null
+          }
 
-        if (!tenant) {
-          console.warn('Credentials auth rejected: tenant user not found.', { email: normalizedEmail })
+          if (!tenant) {
+            console.warn('Credentials auth rejected: tenant user not found.', { email: normalizedEmail })
 
-          return null
-        }
+            return null
+          }
 
-        const isValidPassword = await verifyTenantPassword(tenant, credentials.password)
+          const isValidPassword = await verifyTenantPassword(tenant, credentials.password)
 
-        if (!isValidPassword) {
-          console.warn('Credentials auth rejected: password mismatch or inactive user.', {
-            email: normalizedEmail,
+          if (!isValidPassword) {
+            console.warn('Credentials auth rejected: password mismatch or inactive user.', {
+              email: normalizedEmail,
+              userId: tenant.userId,
+              active: tenant.active,
+              status: tenant.status
+            })
+
+            // Audit: emit login.failed (TASK-248)
+            publishOutboxEvent({
+              aggregateType: AGGREGATE_TYPES.authSession,
+              aggregateId: tenant.userId,
+              eventType: EVENT_TYPES.loginFailed,
+              payload: { email: normalizedEmail, provider: 'credentials', reason: 'invalid_password' }
+            }).catch(() => {})
+
+            return null
+          }
+
+          try {
+            await updateTenantLastLogin(tenant, 'credentials')
+          } catch (error) {
+            console.warn('Unable to update tenant last_login_at after successful auth.', error)
+          }
+
+          return {
+            id: tenant.userId,
+            email: tenant.email,
+            name: tenant.fullName,
+            avatarUrl: tenant.avatarUrl,
             userId: tenant.userId,
-            active: tenant.active,
-            status: tenant.status
-          })
+            clientId: tenant.clientId,
+            clientName: tenant.clientName,
+            tenantType: tenant.tenantType,
+            roleCodes: tenant.roleCodes,
+            primaryRoleCode: tenant.primaryRoleCode,
+            routeGroups: tenant.routeGroups,
+            authorizedViews: tenant.authorizedViews,
+            projectScopes: tenant.projectScopes,
+            campaignScopes: tenant.campaignScopes,
+            businessLines: tenant.businessLines,
+            serviceModules: tenant.serviceModules,
+            projectIds: tenant.projectIds,
+            role: tenant.role,
+            featureFlags: tenant.featureFlags,
+            timezone: tenant.timezone,
+            portalHomePath: tenant.portalHomePath,
+            authMode: tenant.authMode,
+            provider: 'credentials',
+            microsoftEmail: tenant.microsoftEmail,
+            googleEmail: tenant.googleEmail,
 
-          // Audit: emit login.failed (TASK-248)
-          publishOutboxEvent({
-            aggregateType: AGGREGATE_TYPES.authSession,
-            aggregateId: tenant.userId,
-            eventType: EVENT_TYPES.loginFailed,
-            payload: { email: normalizedEmail, provider: 'credentials', reason: 'invalid_password' }
-          }).catch(() => {})
+            // Account 360
+            spaceId: tenant.spaceId ?? undefined,
+            organizationId: tenant.organizationId ?? undefined,
+            organizationName: tenant.organizationName ?? undefined,
 
-          return null
+            // Collaborator identity
+            memberId: tenant.memberId ?? undefined,
+            identityProfileId: tenant.identityProfileId ?? undefined
+          }
         }
-
-        try {
-          await updateTenantLastLogin(tenant, 'credentials')
-        } catch (error) {
-          console.warn('Unable to update tenant last_login_at after successful auth.', error)
-        }
-
-        return {
-          id: tenant.userId,
-          email: tenant.email,
-          name: tenant.fullName,
-          avatarUrl: tenant.avatarUrl,
-          userId: tenant.userId,
-          clientId: tenant.clientId,
-          clientName: tenant.clientName,
-          tenantType: tenant.tenantType,
-          roleCodes: tenant.roleCodes,
-          primaryRoleCode: tenant.primaryRoleCode,
-          routeGroups: tenant.routeGroups,
-          authorizedViews: tenant.authorizedViews,
-          projectScopes: tenant.projectScopes,
-          campaignScopes: tenant.campaignScopes,
-          businessLines: tenant.businessLines,
-          serviceModules: tenant.serviceModules,
-          projectIds: tenant.projectIds,
-          role: tenant.role,
-          featureFlags: tenant.featureFlags,
-          timezone: tenant.timezone,
-          portalHomePath: tenant.portalHomePath,
-          authMode: tenant.authMode,
-          provider: 'credentials',
-          microsoftEmail: tenant.microsoftEmail,
-          googleEmail: tenant.googleEmail,
-
-          // Account 360
-          spaceId: tenant.spaceId ?? undefined,
-          organizationId: tenant.organizationId ?? undefined,
-          organizationName: tenant.organizationName ?? undefined,
-
-          // Collaborator identity
-          memberId: tenant.memberId ?? undefined,
-          identityProfileId: tenant.identityProfileId ?? undefined
-        }
-      }
-    })
-  ],
-  callbacks: {
+      })
+    ],
+    callbacks: {
     async signIn({ user, account, profile }) {
       if (account?.provider === 'credentials') {
         return true
@@ -606,4 +631,5 @@ export const authOptions: NextAuthOptions = {
       }
     }
   }
+}
 }

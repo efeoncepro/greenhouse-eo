@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { getServerSession } from 'next-auth'
-
-import { authOptions } from '@/lib/auth'
+import { getServerAuthSession } from '@/lib/auth'
 import { recalculatePayrollEntry } from '@/lib/payroll/recalculate-entry'
 import { toPayrollErrorResponse } from '@/lib/payroll/api-response'
 import { normalizeNullableString, parsePayrollNumber } from '@/lib/payroll/shared'
@@ -20,7 +18,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ en
   try {
     const { entryId } = await params
     const body = (await request.json().catch(() => null)) as Record<string, unknown> | null
-    const session = await getServerSession(authOptions)
+    const session = await getServerAuthSession()
 
     if (!body) {
       return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })

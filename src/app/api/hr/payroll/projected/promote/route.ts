@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { getServerSession } from 'next-auth'
-
-import { authOptions } from '@/lib/auth'
+import { getServerAuthSession } from '@/lib/auth'
 import { toPayrollErrorResponse } from '@/lib/payroll/api-response'
 import { promoteProjectedPayrollToOfficialDraft } from '@/lib/payroll/promote-projected-payroll'
 import { requireHrTenantContext } from '@/lib/tenant/authorization'
@@ -24,7 +22,7 @@ export async function POST(request: Request) {
 
   try {
     const body = (await request.json().catch(() => ({}))) as PromoteBody
-    const session = await getServerSession(authOptions)
+    const session = await getServerAuthSession()
 
     const year = Number(body.year)
     const month = Number(body.month)

@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { getServerSession } from 'next-auth'
-
-import { authOptions } from '@/lib/auth'
+import { getServerAuthSession } from '@/lib/auth'
 import { generateToken, storeToken } from '@/lib/auth-tokens'
 import { sendEmail } from '@/lib/email/delivery'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
@@ -77,7 +75,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
     const inviteUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/auth/accept-invite?token=${token}`
 
     // Get inviter name from session
-    const session = await getServerSession(authOptions)
+    const session = await getServerAuthSession()
     const inviterName = session?.user?.name || 'Un administrador'
     const actorEmail = session?.user?.email || undefined
 
