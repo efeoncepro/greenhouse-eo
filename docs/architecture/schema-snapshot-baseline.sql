@@ -1913,6 +1913,34 @@ CREATE TABLE greenhouse_finance.income_payments (
 
 
 --
+-- Name: expense_payments; Type: TABLE; Schema: greenhouse_finance; Owner: -
+-- TASK-280: Symmetric to income_payments. Each row is an individual payment against a purchase document.
+--
+
+CREATE TABLE greenhouse_finance.expense_payments (
+    payment_id text NOT NULL,
+    expense_id text NOT NULL,
+    payment_date date NOT NULL,
+    amount numeric(14,2) NOT NULL,
+    currency text DEFAULT 'CLP'::text NOT NULL,
+    reference text,
+    payment_method text,
+    payment_account_id text,
+    payment_source text DEFAULT 'manual'::text NOT NULL,
+    notes text,
+    recorded_by_user_id text,
+    recorded_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    is_reconciled boolean DEFAULT false NOT NULL,
+    reconciliation_row_id text,
+    reconciled_at timestamp with time zone,
+    reconciled_by_user_id text,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT expense_payments_amount_check CHECK ((amount > (0)::numeric)),
+    CONSTRAINT expense_payments_payment_source_check CHECK ((payment_source = ANY (ARRAY['manual'::text, 'payroll_system'::text, 'nubox_sync'::text, 'bank_statement'::text])))
+);
+
+
+--
 -- Name: nubox_emission_log; Type: TABLE; Schema: greenhouse_finance; Owner: -
 --
 
