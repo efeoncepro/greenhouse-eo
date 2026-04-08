@@ -4,6 +4,7 @@
 
 ### 2026-04-08 — Finance reconciliation settlement orchestration completed
 
+- Fix posterior al cierre: el alta de `supplemental settlement legs` ya no se pierde al releer el settlement group. `ensureSettlementForPayment()` ahora preserva legs manuales (`funding`, `internal_transfer`, `fx_conversion`, `fee`) y recalcula `settlement_mode = mixed` cuando existe más de un tramo.
 - `Finance > Conciliación` quedó cerrada sobre el ledger real de caja: `cash-in`, `cash-out` y `Conciliación` ya hablan el mismo contrato con `matchedPaymentId` y `matchedSettlementLegId`.
 - `auto-match`, `match`, `unmatch` y `exclude` dejaron de duplicar eventos de pago en las routes; la transición reconciliado/no reconciliado vive en `postgres-reconciliation`.
 - Nuevo endpoint `GET/POST /api/finance/settlements/payment` + drawer `SettlementOrchestrationDrawer` para inspeccionar settlement groups y agregar legs manuales (`internal_transfer`, `funding`, `fx_conversion`, `fee`) desde el portal.

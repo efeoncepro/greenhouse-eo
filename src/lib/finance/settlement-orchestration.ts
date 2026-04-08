@@ -16,7 +16,7 @@ type QueryableClient = Pick<PoolClient, 'query'>
 
 type SettlementPaymentType = 'income_payment' | 'expense_payment'
 type SettlementDirection = 'incoming' | 'outgoing'
-type SettlementMode = 'direct' | 'via_intermediary'
+type SettlementMode = 'direct' | 'via_intermediary' | 'mixed'
 export type SettlementLegType = 'receipt' | 'payout' | 'internal_transfer' | 'funding' | 'fx_conversion' | 'fee'
 
 type PaymentSettlementContextRow = {
@@ -207,6 +207,13 @@ const legTypeForPayment = (paymentType: SettlementPaymentType): SettlementLegTyp
 const buildLegId = (paymentId: string, suffix?: string | null) =>
   suffix ? `stlleg-${paymentId}-${suffix}` : `stlleg-${paymentId}`
 
+const getManagedSettlementLegIds = (paymentId: string) => [
+  buildLegId(paymentId),
+  buildLegId(paymentId, 'funding'),
+  buildLegId(paymentId, 'fx'),
+  buildLegId(paymentId, 'fee')
+]
+
 const computeClpAmount = ({
   amount,
   amountClp,
@@ -379,7 +386,7 @@ const buildSettlementLegPlan = async (
     })
   }
 
-  const resolvedMode = legs.length > 1 ? 'mixed' : 'direct'
+  const resolvedMode: SettlementMode = legs.length > 1 ? 'mixed' : 'direct'
 
   return {
     settlementMode: resolvedMode,
@@ -494,6 +501,7 @@ const ensureSettlementForPayment = async (
   const settlementGroupId = `stlgrp-${input.paymentId}`
   const direction = directionForPayment(paymentType)
   const { settlementMode, primaryInstrumentId, legs } = await buildSettlementLegPlan(paymentType, input)
+  const managedLegIds = getManagedSettlementLegIds(input.paymentId)
 
   const groupRows = await queryRows<SettlementGroupRow>(
     `
@@ -550,9 +558,10 @@ const ensureSettlementForPayment = async (
     `
       DELETE FROM greenhouse_finance.settlement_legs
       WHERE settlement_group_id = $1
-        AND NOT (settlement_leg_id = ANY($2::text[]))
+        AND settlement_leg_id = ANY($2::text[])
+        AND NOT (settlement_leg_id = ANY($3::text[]))
     `,
-    [settlementGroupId, desiredLegIds],
+    [settlementGroupId, managedLegIds, desiredLegIds],
     input.client
   )
 
@@ -678,12 +687,32 @@ const ensureSettlementForPayment = async (
     input.client
   )
 
-  const group = groupRows[0]
+  const allLegRows = await listSettlementLegRows(settlementGroupId, input.client)
+  const effectiveSettlementMode: SettlementMode = allLegRows.length > 1 ? 'mixed' : settlementMode
+
+  if (effectiveSettlementMode !== normalizeString(groupRows[0]?.settlement_mode)) {
+    await queryRows(
+      `
+        UPDATE greenhouse_finance.settlement_groups
+        SET
+          settlement_mode = $2,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE settlement_group_id = $1
+      `,
+      [settlementGroupId, effectiveSettlementMode],
+      input.client
+    )
+  }
+
+  const group = {
+    ...groupRows[0],
+    settlement_mode: effectiveSettlementMode
+  }
 
   return {
     settlementGroup: mapSettlementGroup(group),
     settlementLeg: mapSettlementLeg(legRows[0]),
-    settlementLegs: legRows.map(mapSettlementLeg)
+    settlementLegs: allLegRows.map(mapSettlementLeg)
   }
 }
 

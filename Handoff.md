@@ -3,7 +3,7 @@
 ## Sesion 2026-04-08 — TASK-282 cerrada
 
 - estado actual:
-  - `TASK-282` queda lista para mover a `complete`
+  - `TASK-282` ya quedó en `complete`
   - el módulo de conciliación ya no está solo en foundation: quedó operable end-to-end desde el portal
 - cambios principales:
   - `ReconciliationDetailView` ahora muestra snapshots instrument-aware del período y acciones `Marcar conciliado` / `Cerrar período`
@@ -18,13 +18,14 @@
   - `pnpm lint` — OK
   - `pnpm build` — OK
   - `pnpm exec vitest run src/app/api/finance/bigquery-write-cutover.test.ts` — OK
+- validación staging adicional:
+  - `cash-in`, `cash-out`, `reconciliation` y `settlements/payment` responden `200` con la shape nueva
+  - el drawer `Liquidación` abre correctamente desde `ExpenseDetailView`
+  - se detectó y corrigió un bug donde los `supplemental settlement legs` se insertaban pero `ensureSettlementForPayment()` los borraba al reread
+  - fix aplicado: `ensureSettlementForPayment()` ahora preserva legs suplementarios, recalcula `settlement_mode` efectivo y no degrada un grupo `mixed` a `direct`
 - riesgo / siguiente paso recomendado:
-  - validar en staging un flujo real con:
-    - pago vía intermediario
-    - apertura del settlement drawer
-    - importación + conciliación de al menos un leg
-    - marcado y cierre del período
-  - `TASK-283` aparece en el worktree pero no pertenece a este cierre; dejarlo fuera de cualquier commit de `TASK-282`
+  - sigue pendiente una verificación con extracto real o CSV sintético para cerrar el tramo `statement import -> match/unmatch -> reconciled/closed`
+  - `TASK-283` aparece en el backlog pero no pertenece a este cierre
 
 ## Sesion 2026-04-08 — TASK-282 tomada para discovery/audit
 
