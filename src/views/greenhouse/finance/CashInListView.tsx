@@ -26,6 +26,7 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import RegisterCashInDrawer from '@views/greenhouse/finance/drawers/RegisterCashInDrawer'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -106,6 +107,9 @@ const CashInListView = () => {
   const [appliedFrom, setAppliedFrom] = useState(fromDate)
   const [appliedTo, setAppliedTo] = useState(toDate)
 
+  // Drawer state
+  const [drawerOpen, setDrawerOpen] = useState(false)
+
   const fetchCashIn = useCallback(async () => {
     setLoading(true)
     setError(null)
@@ -182,13 +186,18 @@ const CashInListView = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
       {/* Header */}
-      <Box>
-        <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>
-          Cobros
-        </Typography>
-        <Typography variant='body2' color='text.secondary'>
-          Pagos recibidos y conciliación de ingresos
-        </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
+        <Box>
+          <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>
+            Cobros
+          </Typography>
+          <Typography variant='body2' color='text.secondary'>
+            Pagos recibidos y conciliación de ingresos
+          </Typography>
+        </Box>
+        <Button variant='contained' color='success' startIcon={<i className='tabler-plus' />} onClick={() => setDrawerOpen(true)}>
+          Registrar cobro
+        </Button>
       </Box>
 
       {/* KPIs */}
@@ -370,6 +379,12 @@ const CashInListView = () => {
           </>
         )}
       </Card>
+
+      <RegisterCashInDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onSuccess={() => { setDrawerOpen(false); fetchCashIn() }}
+      />
     </Box>
   )
 }

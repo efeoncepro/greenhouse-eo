@@ -24,6 +24,7 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import RegisterCashOutDrawer from '@views/greenhouse/finance/drawers/RegisterCashOutDrawer'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -125,6 +126,7 @@ const getBeneficiary = (item: CashOutItem): string => {
 // ---------------------------------------------------------------------------
 
 const CashOutListView = () => {
+  const [drawerOpen, setDrawerOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [items, setItems] = useState<CashOutItem[]>([])
 
@@ -206,13 +208,15 @@ const CashOutListView = () => {
   if (loading && items.length === 0) {
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <Box>
-          <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>
-            Cash Out
-          </Typography>
-          <Typography variant='body2' color='text.secondary'>
-            Pagos ejecutados y salidas de caja
-          </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
+          <Box>
+            <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>
+              Pagos
+            </Typography>
+            <Typography variant='body2' color='text.secondary'>
+              Pagos ejecutados y salidas de caja
+            </Typography>
+          </Box>
         </Box>
         <Grid container spacing={6}>
           {[0, 1, 2, 3].map(i => (
@@ -233,13 +237,18 @@ const CashOutListView = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
       {/* Header */}
-      <Box>
-        <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>
-          Cash Out
-        </Typography>
-        <Typography variant='body2' color='text.secondary'>
-          Pagos ejecutados y salidas de caja
-        </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
+        <Box>
+          <Typography variant='h4' sx={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, mb: 1 }}>
+            Pagos
+          </Typography>
+          <Typography variant='body2' color='text.secondary'>
+            Pagos ejecutados y salidas de caja
+          </Typography>
+        </Box>
+        <Button variant='contained' color='success' startIcon={<i className='tabler-plus' />} onClick={() => setDrawerOpen(true)}>
+          Registrar pago
+        </Button>
       </Box>
 
       {fetchError && <Alert severity='error'>{fetchError}</Alert>}
@@ -436,6 +445,12 @@ const CashOutListView = () => {
           </>
         )}
       </Card>
+
+      <RegisterCashOutDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onSuccess={() => { setDrawerOpen(false); fetchCashOut() }}
+      />
     </Box>
   )
 }
