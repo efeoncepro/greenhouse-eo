@@ -1501,8 +1501,7 @@ const recomputePaymentReconciliationFromSettlement = async ({
       SET
         is_reconciled = $2,
         reconciliation_row_id = $3,
-        reconciled_at = CASE WHEN $2 THEN CURRENT_TIMESTAMP ELSE NULL END,
-        updated_at = CURRENT_TIMESTAMP
+        reconciled_at = CASE WHEN $2 THEN CURRENT_TIMESTAMP ELSE NULL END
       WHERE payment_id = $1
     `,
     [
