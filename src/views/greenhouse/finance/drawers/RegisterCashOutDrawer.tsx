@@ -69,6 +69,7 @@ type Props = {
 // ---------------------------------------------------------------------------
 
 const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
+  const [selectedSupplier, setSelectedSupplier] = useState('')
   const [selectedExpenseId, setSelectedExpenseId] = useState('')
   const [amount, setAmount] = useState('')
   const [paymentDate, setPaymentDate] = useState('')
@@ -92,6 +93,16 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
   const [expenses, setExpenses] = useState<ExpenseOption[]>([])
   const [loadingExpenses, setLoadingExpenses] = useState(false)
   const [expensesError, setExpensesError] = useState<string | null>(null)
+
+  // Derived: unique suppliers with pending expenses
+  const uniqueSuppliers = Array.from(
+    new Map(expenses.map(e => [e.supplierName || 'Sin proveedor', e.supplierName || 'Sin proveedor'])).keys()
+  ).sort((a, b) => a.localeCompare(b))
+
+  // Filtered expenses for selected supplier
+  const filteredExpenses = selectedSupplier
+    ? expenses.filter(e => (e.supplierName || 'Sin proveedor') === selectedSupplier)
+    : []
 
   // Selected expense for pending balance display
   const selectedExpense = expenses.find(e => e.expenseId === selectedExpenseId) ?? null
@@ -157,6 +168,12 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
     }
   }, [open, fetchExpenses])
 
+  const handleSupplierChange = (value: string) => {
+    setSelectedSupplier(value)
+    setSelectedExpenseId('')
+    setAmount('')
+  }
+
   const handleExpenseChange = (value: string) => {
     setSelectedExpenseId(value)
 
@@ -170,6 +187,7 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
   }
 
   const resetForm = () => {
+    setSelectedSupplier('')
     setSelectedExpenseId('')
     setAmount('')
     setPaymentDate('')
@@ -279,22 +297,50 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
           select
           fullWidth
           size='small'
-          label='Documento de compra'
-          value={selectedExpenseId}
-          onChange={e => handleExpenseChange(e.target.value)}
+          label='Proveedor'
+          value={selectedSupplier}
+          onChange={e => handleSupplierChange(e.target.value)}
           required
           disabled={loadingExpenses}
         >
           <MenuItem value=''>
             {loadingExpenses
               ? 'Cargando...'
-              : expenses.length === 0
-                ? 'No hay documentos pendientes'
+              : uniqueSuppliers.length === 0
+                ? 'No hay proveedores con documentos pendientes'
+                : '— Seleccionar proveedor —'}
+          </MenuItem>
+          {uniqueSuppliers.map(supplier => {
+            const count = expenses.filter(e => (e.supplierName || 'Sin proveedor') === supplier).length
+
+            return (
+              <MenuItem key={supplier} value={supplier}>
+                {supplier} ({count} {count === 1 ? 'documento' : 'documentos'})
+              </MenuItem>
+            )
+          })}
+        </CustomTextField>
+
+        <CustomTextField
+          select
+          fullWidth
+          size='small'
+          label='Documento de compra'
+          value={selectedExpenseId}
+          onChange={e => handleExpenseChange(e.target.value)}
+          required
+          disabled={!selectedSupplier}
+        >
+          <MenuItem value=''>
+            {!selectedSupplier
+              ? 'Selecciona un proveedor primero'
+              : filteredExpenses.length === 0
+                ? 'Sin documentos pendientes'
                 : '— Seleccionar documento —'}
           </MenuItem>
-          {expenses.map(e => (
+          {filteredExpenses.map(e => (
             <MenuItem key={e.expenseId} value={e.expenseId}>
-              {e.description}{e.supplierName ? ` (${e.supplierName})` : ''} — {formatAmount(e.pendingAmount, e.currency)}
+              {e.description} — {formatAmount(e.pendingAmount, e.currency)}
             </MenuItem>
           ))}
         </CustomTextField>

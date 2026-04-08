@@ -66,6 +66,7 @@ const formatCurrency = (amount: number, currency: string = 'CLP'): string =>
 // ---------------------------------------------------------------------------
 
 const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
+  const [selectedClient, setSelectedClient] = useState('')
   const [selectedIncomeId, setSelectedIncomeId] = useState('')
   const [amount, setAmount] = useState('')
   const [paymentDate, setPaymentDate] = useState('')
@@ -87,6 +88,16 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
   const [invoices, setInvoices] = useState<InvoiceOption[]>([])
   const [loadingInvoices, setLoadingInvoices] = useState(false)
   const [invoicesError, setInvoicesError] = useState<string | null>(null)
+
+  // Derived: unique clients with pending invoices
+  const uniqueClients = Array.from(
+    new Map(invoices.map(inv => [inv.clientName || 'Sin cliente', inv.clientName || 'Sin cliente'])).keys()
+  ).sort((a, b) => a.localeCompare(b))
+
+  // Filtered invoices for selected client
+  const filteredInvoices = selectedClient
+    ? invoices.filter(inv => (inv.clientName || 'Sin cliente') === selectedClient)
+    : []
 
   // Selected invoice details
   const selectedInvoice = invoices.find(inv => inv.incomeId === selectedIncomeId) ?? null
@@ -152,6 +163,12 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
     }
   }, [open, fetchInvoices])
 
+  const handleClientChange = (value: string) => {
+    setSelectedClient(value)
+    setSelectedIncomeId('')
+    setAmount('')
+  }
+
   const handleInvoiceChange = (value: string) => {
     setSelectedIncomeId(value)
 
@@ -165,6 +182,7 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
   }
 
   const resetForm = () => {
+    setSelectedClient('')
     setSelectedIncomeId('')
     setAmount('')
     setPaymentDate('')
@@ -264,22 +282,50 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
           select
           fullWidth
           size='small'
-          label='Factura'
-          value={selectedIncomeId}
-          onChange={e => handleInvoiceChange(e.target.value)}
+          label='Cliente'
+          value={selectedClient}
+          onChange={e => handleClientChange(e.target.value)}
           required
           disabled={loadingInvoices}
         >
           <MenuItem value=''>
             {loadingInvoices
               ? 'Cargando...'
-              : invoices.length === 0
-                ? 'No hay facturas pendientes'
+              : uniqueClients.length === 0
+                ? 'No hay clientes con facturas pendientes'
+                : '— Seleccionar cliente —'}
+          </MenuItem>
+          {uniqueClients.map(client => {
+            const count = invoices.filter(inv => (inv.clientName || 'Sin cliente') === client).length
+
+            return (
+              <MenuItem key={client} value={client}>
+                {client} ({count} {count === 1 ? 'factura' : 'facturas'})
+              </MenuItem>
+            )
+          })}
+        </CustomTextField>
+
+        <CustomTextField
+          select
+          fullWidth
+          size='small'
+          label='Factura'
+          value={selectedIncomeId}
+          onChange={e => handleInvoiceChange(e.target.value)}
+          required
+          disabled={!selectedClient}
+        >
+          <MenuItem value=''>
+            {!selectedClient
+              ? 'Selecciona un cliente primero'
+              : filteredInvoices.length === 0
+                ? 'Sin facturas pendientes'
                 : '— Seleccionar factura —'}
           </MenuItem>
-          {invoices.map(inv => (
+          {filteredInvoices.map(inv => (
             <MenuItem key={inv.incomeId} value={inv.incomeId}>
-              {inv.invoiceNumber || inv.incomeId} — {inv.clientName || 'Sin cliente'} — {formatCurrency(inv.pendingAmount, inv.currency)}
+              {inv.invoiceNumber || inv.incomeId} — {formatCurrency(inv.pendingAmount, inv.currency)}
             </MenuItem>
           ))}
         </CustomTextField>
