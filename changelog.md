@@ -2,6 +2,12 @@
 
 ## 2026-04-08
 
+### 2026-04-08 — Hotfix productivo Banco: materializacion de balances corregida
+
+- Fix post-merge de `Finance > Banco`: `GET /api/finance/bank` en produccion estaba devolviendo `500` por un descalce entre placeholders SQL y parametros enviados durante la materializacion de `account_balances`.
+- Causa raiz: `materializeAccountBalance()` enviaba un parametro extra al `INSERT` de `greenhouse_finance.account_balances`.
+- Resultado: el endpoint de Banco vuelve a poder recalcular/materializar balances sin romper el overview de tesoreria en runtime.
+
 ### 2026-04-08 — Finance bank & treasury module completed
 
 - Nuevo módulo `Finance > Banco` (`/finance/bank`) con lectura ledger-first por instrumento: saldos por cuenta, coverage de asignación, discrepancia contra conciliación, exposición multi-moneda y tarjetas de crédito.

@@ -1,5 +1,24 @@
 # Handoff.md
 
+## Sesion 2026-04-08 — Hotfix productivo Banco
+
+- contexto:
+  - despues del merge de `TASK-283` a `main`, el page `/finance/bank` cargaba en produccion pero `GET /api/finance/bank` respondia `500`
+  - logs Vercel mostraban: `bind message supplies 14 parameters, but prepared statement "" requires 13`
+- causa raiz:
+  - `materializeAccountBalance()` en `src/lib/finance/account-balances.ts` enviaba un parametro extra (`actorUserId`) al `INSERT INTO greenhouse_finance.account_balances`
+  - la sentencia tenia placeholders `$1..$13`, pero el array de valores estaba pasando 14 elementos
+- fix aplicado:
+  - se removio el parametro sobrante del upsert de `account_balances`
+- validacion local:
+  - `pnpm exec tsc --noEmit` — OK
+  - `pnpm lint` — OK
+  - `pnpm build` — OK
+- siguiente paso operativo:
+  - commit + push directo a `main`
+  - esperar deploy productivo
+  - revalidar `POST /api/auth/callback/credentials`, `GET /api/auth/session`, `GET /api/finance/bank` y `/finance/bank` en `greenhouse.efeoncepro.com`
+
 ## Sesion 2026-04-08 — TASK-283 cerrada
 
 - estado actual:

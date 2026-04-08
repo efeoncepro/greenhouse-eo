@@ -801,8 +801,7 @@ export const materializeAccountBalance = async (
       fxRateUsed,
       roundCurrency(toNumber(fxSummary.fx_gain_loss_clp)),
       Math.round(toNumber(movementSummary.transaction_count)),
-      movementSummary.last_transaction_at,
-      input.actorUserId || null
+      movementSummary.last_transaction_at
     ],
     input.client
   )
