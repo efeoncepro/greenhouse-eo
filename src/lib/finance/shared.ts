@@ -304,6 +304,42 @@ export const resolveExchangeRateToClp = async ({
 }
 
 /**
+ * Resolve exchange rate between any two supported currencies.
+ * Supports both USD→CLP and CLP→USD (bidirectional).
+ *
+ * Priority: (1) manual override, (2) latest stored rate, (3) auto-sync + retry.
+ * Both directions are persisted by the daily sync cron (buildUsdClpRatePairs).
+ */
+export const resolveExchangeRate = async ({
+  fromCurrency,
+  toCurrency,
+  requestedRate
+}: {
+  fromCurrency: FinanceCurrency
+  toCurrency: FinanceCurrency
+  requestedRate?: unknown
+}): Promise<number> => {
+  if (fromCurrency === toCurrency) return 1
+
+  const normalizedRequestedRate = toNumber(requestedRate)
+
+  if (normalizedRequestedRate > 0) {
+    return roundDecimal(normalizedRequestedRate, 6)
+  }
+
+  const latestRate = await getLatestExchangeRate({ fromCurrency, toCurrency })
+
+  if (!latestRate) {
+    throw new FinanceValidationError(
+      `Missing ${fromCurrency}/${toCurrency} exchange rate. Provide a rate manually or wait for the daily sync.`,
+      409
+    )
+  }
+
+  return roundDecimal(latestRate, 6)
+}
+
+/**
  * Check if the latest stored exchange rate is stale (older than EXCHANGE_RATE_STALE_DAYS).
  * Returns null if no rate exists, or a staleness report.
  */

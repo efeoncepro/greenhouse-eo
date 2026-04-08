@@ -20,6 +20,7 @@ import Typography from '@mui/material/Typography'
 import { useTheme } from '@mui/material/styles'
 
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
 import AppRecharts from '@/libs/styles/AppRecharts'
 import {
   ResponsiveContainer,
@@ -45,6 +46,8 @@ interface AccountRow {
   currency: string
   openingBalance: number
   isActive: boolean
+  instrumentCategory: string | null
+  providerSlug: string | null
 }
 
 interface ReceivableSummary {
@@ -69,6 +72,7 @@ interface CashPositionData {
   accounts: AccountRow[]
   receivable: ReceivableSummary
   payable: PayableSummary
+  fxGainLossClp: number
   netPosition: number
   monthlySeries: MonthlySeriesPoint[]
 }
@@ -155,8 +159,8 @@ const CashPositionView = () => {
   if (loading) {
     return (
       <Grid container spacing={6}>
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Grid key={i} size={{ xs: 12, sm: 6, lg: 3 }}>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Grid key={i} size={{ xs: 12, sm: 6, md: 2.4 }}>
             <Card>
               <CardContent>
                 <Skeleton variant='text' width='60%' height={24} />
@@ -225,7 +229,7 @@ const CashPositionView = () => {
   return (
     <Grid container spacing={6}>
       {/* KPI Row */}
-      <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+      <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
         <HorizontalWithSubtitle
           title='Posicion neta'
           stats={formatCLP(data.netPosition)}
@@ -235,7 +239,7 @@ const CashPositionView = () => {
         />
       </Grid>
 
-      <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+      <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
         <HorizontalWithSubtitle
           title='Por cobrar'
           stats={formatCLP(data.receivable.totalClp)}
@@ -245,7 +249,7 @@ const CashPositionView = () => {
         />
       </Grid>
 
-      <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+      <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
         <HorizontalWithSubtitle
           title='Por pagar'
           stats={formatCLP(data.payable.totalClp)}
@@ -255,7 +259,17 @@ const CashPositionView = () => {
         />
       </Grid>
 
-      <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+      <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
+        <HorizontalWithSubtitle
+          title='Resultado cambiario'
+          stats={formatCLP(data.fxGainLossClp)}
+          subtitle={data.fxGainLossClp >= 0 ? 'Ganancia cambiaria' : 'Perdida cambiaria'}
+          avatarIcon='tabler-arrows-exchange'
+          avatarColor={data.fxGainLossClp >= 0 ? 'success' : 'error'}
+        />
+      </Grid>
+
+      <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
         <HorizontalWithSubtitle
           title='Cuentas activas'
           stats={String(data.accounts.filter(a => a.isActive).length)}
@@ -328,9 +342,12 @@ const CashPositionView = () => {
                     {data.accounts.map(account => (
                       <TableRow key={account.accountId}>
                         <TableCell>
-                          <Typography variant='body2' fontWeight={500}>
-                            {account.accountName}
-                          </Typography>
+                          <PaymentInstrumentChip
+                            providerSlug={account.providerSlug}
+                            instrumentName={account.accountName}
+                            instrumentCategory={account.instrumentCategory as any}
+                            size='sm'
+                          />
                         </TableCell>
                         <TableCell>{account.bankName}</TableCell>
                         <TableCell>{account.currency}</TableCell>

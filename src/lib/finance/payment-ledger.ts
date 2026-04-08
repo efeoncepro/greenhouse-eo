@@ -9,10 +9,12 @@ import {
 import {
   FinanceValidationError,
   normalizeString,
+  resolveExchangeRateToClp,
   roundCurrency,
   toDateString,
   toNumber,
-  toTimestampString
+  toTimestampString,
+  type FinanceCurrency
 } from '@/lib/finance/shared'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
@@ -34,6 +36,7 @@ export interface RecordPaymentInput {
   paymentSource?: PaymentSource
   notes?: string | null
   actorUserId?: string | null
+  exchangeRateOverride?: number | null
 }
 
 export interface IncomePaymentRecord {
@@ -52,6 +55,9 @@ export interface IncomePaymentRecord {
   reconciliationRowId: string | null
   reconciledAt: string | null
   createdAt: string | null
+  exchangeRateAtPayment: number | null
+  amountClp: number | null
+  fxGainLossClp: number | null
 }
 
 export interface ReconcilePaymentTotalsResult {
@@ -81,6 +87,9 @@ type PostgresIncomePaymentRow = {
   reconciliation_row_id: string | null
   reconciled_at: string | Date | null
   created_at: string | Date | null
+  exchange_rate_at_payment: unknown
+  amount_clp: unknown
+  fx_gain_loss_clp: unknown
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────
@@ -121,14 +130,17 @@ const mapPaymentRow = (row: PostgresIncomePaymentRow): IncomePaymentRecord => ({
   isReconciled: Boolean(row.is_reconciled),
   reconciliationRowId: str(row.reconciliation_row_id),
   reconciledAt: toTimestampString(row.reconciled_at as string | { value?: string } | null),
-  createdAt: toTimestampString(row.created_at as string | { value?: string } | null)
+  createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
+  exchangeRateAtPayment: row.exchange_rate_at_payment != null ? toNumber(row.exchange_rate_at_payment) : null,
+  amountClp: row.amount_clp != null ? toNumber(row.amount_clp) : null,
+  fxGainLossClp: row.fx_gain_loss_clp != null ? toNumber(row.fx_gain_loss_clp) : null
 })
 
 const PAYMENT_COLUMNS = `
   payment_id, income_id, payment_date, amount, currency, reference,
   payment_method, payment_account_id, payment_source, notes,
   recorded_at, is_reconciled, reconciliation_row_id, reconciled_at,
-  created_at
+  created_at, exchange_rate_at_payment, amount_clp, fx_gain_loss_clp
 `
 
 // ─── recordPayment ──────────────────────────────────────────────────
@@ -163,8 +175,9 @@ export async function recordPayment(input: RecordPaymentInput): Promise<{
       total_amount: unknown
       amount_paid: unknown
       payment_status: string
+      exchange_rate_to_clp: unknown
     }>(
-      `SELECT income_id, currency, total_amount, amount_paid, payment_status
+      `SELECT income_id, currency, total_amount, amount_paid, payment_status, exchange_rate_to_clp
        FROM greenhouse_finance.income WHERE income_id = $1 FOR UPDATE`,
       [input.incomeId],
       client
@@ -203,27 +216,57 @@ export async function recordPayment(input: RecordPaymentInput): Promise<{
       }
     }
 
+    // FX resolution: compute CLP equivalents for multi-currency payments
+    const paymentCurrency = (input.currency || normalizeString(income.currency) || 'CLP') as FinanceCurrency
+    let exchangeRateAtPayment: number | null = null
+    let amountClp: number | null = null
+    let fxGainLossClp: number | null = null
+
+    if (paymentCurrency === 'CLP') {
+      exchangeRateAtPayment = 1
+      amountClp = input.amount
+      fxGainLossClp = 0
+    } else {
+      const rateAtPayment = await resolveExchangeRateToClp({
+        currency: paymentCurrency,
+        requestedRate: input.exchangeRateOverride
+      })
+
+      exchangeRateAtPayment = rateAtPayment
+      amountClp = roundCurrency(input.amount * rateAtPayment)
+
+      const documentRate = toNumber(income.exchange_rate_to_clp)
+
+      fxGainLossClp = documentRate > 0
+        ? roundCurrency(amountClp - roundCurrency(input.amount * documentRate))
+        : null
+    }
+
     // Insert payment record
     const paymentRows = await queryRows<PostgresIncomePaymentRow>(
       `INSERT INTO greenhouse_finance.income_payments (
         payment_id, income_id, payment_date, amount, currency, reference,
         payment_method, payment_account_id, payment_source, notes,
-        recorded_by_user_id, recorded_at, is_reconciled, created_at
+        recorded_by_user_id, recorded_at, is_reconciled, created_at,
+        exchange_rate_at_payment, amount_clp, fx_gain_loss_clp
       )
-      VALUES ($1, $2, $3::date, $4, $5, $6, $7, $8, $9, $10, $11, CURRENT_TIMESTAMP, FALSE, CURRENT_TIMESTAMP)
+      VALUES ($1, $2, $3::date, $4, $5, $6, $7, $8, $9, $10, $11, CURRENT_TIMESTAMP, FALSE, CURRENT_TIMESTAMP, $12, $13, $14)
       RETURNING ${PAYMENT_COLUMNS}`,
       [
         paymentId,
         input.incomeId,
         input.paymentDate,
         input.amount,
-        input.currency || normalizeString(income.currency) || 'CLP',
+        paymentCurrency,
         input.reference || null,
         input.paymentMethod || null,
         input.paymentAccountId || null,
         paymentSource,
         input.notes || null,
-        input.actorUserId || null
+        input.actorUserId || null,
+        exchangeRateAtPayment,
+        amountClp,
+        fxGainLossClp
       ],
       client
     )

@@ -37,6 +37,16 @@ type PostgresFinanceAccountRow = {
   opening_balance: unknown
   opening_balance_date: string | Date | null
   notes: string | null
+  instrument_category: string
+  provider_slug: string | null
+  provider_identifier: string | null
+  card_last_four: string | null
+  card_network: string | null
+  credit_limit: unknown
+  responsible_user_id: string | null
+  default_for: string[] | null
+  display_order: unknown
+  metadata_json: unknown
   created_at: string | Date | null
   updated_at: string | Date | null
 }
@@ -112,6 +122,16 @@ export type FinanceAccountRecord = {
   openingBalance: number
   openingBalanceDate: string | null
   notes: string | null
+  instrumentCategory: string
+  providerSlug: string | null
+  providerIdentifier: string | null
+  cardLastFour: string | null
+  cardNetwork: string | null
+  creditLimit: number | null
+  responsibleUserId: string | null
+  defaultFor: string[]
+  displayOrder: number
+  metadataJson: Record<string, unknown>
   createdAt: string | null
   updatedAt: string | null
 }
@@ -218,6 +238,16 @@ const mapAccount = (row: PostgresFinanceAccountRow): FinanceAccountRecord => ({
   openingBalance: toNumber(row.opening_balance),
   openingBalanceDate: toDateString(row.opening_balance_date as string | { value?: string } | null),
   notes: row.notes ? normalizeString(row.notes) : null,
+  instrumentCategory: normalizeString(row.instrument_category) || 'bank_account',
+  providerSlug: row.provider_slug ? normalizeString(row.provider_slug) : null,
+  providerIdentifier: row.provider_identifier ? normalizeString(row.provider_identifier) : null,
+  cardLastFour: row.card_last_four ? normalizeString(row.card_last_four) : null,
+  cardNetwork: row.card_network ? normalizeString(row.card_network) : null,
+  creditLimit: row.credit_limit != null ? toNumber(row.credit_limit) : null,
+  responsibleUserId: row.responsible_user_id ? normalizeString(row.responsible_user_id) : null,
+  defaultFor: Array.isArray(row.default_for) ? row.default_for : [],
+  displayOrder: toNumber(row.display_order),
+  metadataJson: typeof row.metadata_json === 'object' && row.metadata_json ? row.metadata_json as Record<string, unknown> : {},
   createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
   updatedAt: toTimestampString(row.updated_at as string | { value?: string } | null)
 })
@@ -448,11 +478,21 @@ export const listFinanceAccountsFromPostgres = async ({ includeInactive = false 
         opening_balance,
         opening_balance_date,
         notes,
+        instrument_category,
+        provider_slug,
+        provider_identifier,
+        card_last_four,
+        card_network,
+        credit_limit,
+        responsible_user_id,
+        default_for,
+        display_order,
+        metadata_json,
         created_at,
         updated_at
       FROM greenhouse_finance.accounts
       WHERE ($1::boolean = TRUE OR is_active = TRUE)
-      ORDER BY account_name ASC
+      ORDER BY display_order ASC, account_name ASC
     `,
     [includeInactive]
   )
@@ -478,6 +518,16 @@ export const getFinanceAccountFromPostgres = async (accountId: string) => {
         opening_balance,
         opening_balance_date,
         notes,
+        instrument_category,
+        provider_slug,
+        provider_identifier,
+        card_last_four,
+        card_network,
+        credit_limit,
+        responsible_user_id,
+        default_for,
+        display_order,
+        metadata_json,
         created_at,
         updated_at
       FROM greenhouse_finance.accounts
@@ -502,7 +552,17 @@ export const createFinanceAccountInPostgres = async ({
   openingBalance,
   openingBalanceDate,
   notes,
-  actorUserId
+  actorUserId,
+  instrumentCategory,
+  providerSlug,
+  providerIdentifier,
+  cardLastFour,
+  cardNetwork,
+  creditLimit,
+  responsibleUserId,
+  defaultFor,
+  displayOrder,
+  metadataJson
 }: {
   accountId: string
   accountName: string
@@ -516,6 +576,16 @@ export const createFinanceAccountInPostgres = async ({
   openingBalanceDate: string | null
   notes: string | null
   actorUserId: string | null
+  instrumentCategory?: string
+  providerSlug?: string | null
+  providerIdentifier?: string | null
+  cardLastFour?: string | null
+  cardNetwork?: string | null
+  creditLimit?: number | null
+  responsibleUserId?: string | null
+  defaultFor?: string[]
+  displayOrder?: number
+  metadataJson?: Record<string, unknown>
 }) => {
   await assertFinancePostgresReady()
 
@@ -545,12 +615,24 @@ export const createFinanceAccountInPostgres = async ({
           opening_balance,
           opening_balance_date,
           notes,
+          instrument_category,
+          provider_slug,
+          provider_identifier,
+          card_last_four,
+          card_network,
+          credit_limit,
+          responsible_user_id,
+          default_for,
+          display_order,
+          metadata_json,
           created_by_user_id,
           created_at,
           updated_at
         )
         VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, TRUE, $9, $10::date, $11, $12, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+          $1, $2, $3, $4, $5, $6, $7, $8, TRUE, $9, $10::date, $11,
+          $12, $13, $14, $15, $16, $17, $18, $19::text[], $20, $21::jsonb,
+          $22, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
         )
         RETURNING
           account_id,
@@ -565,6 +647,16 @@ export const createFinanceAccountInPostgres = async ({
           opening_balance,
           opening_balance_date,
           notes,
+          instrument_category,
+          provider_slug,
+          provider_identifier,
+          card_last_four,
+          card_network,
+          credit_limit,
+          responsible_user_id,
+          default_for,
+          display_order,
+          metadata_json,
           created_at,
           updated_at
       `,
@@ -580,6 +672,16 @@ export const createFinanceAccountInPostgres = async ({
         openingBalance,
         openingBalanceDate,
         notes,
+        instrumentCategory || 'bank_account',
+        providerSlug ?? null,
+        providerIdentifier ?? null,
+        cardLastFour ?? null,
+        cardNetwork ?? null,
+        creditLimit ?? null,
+        responsibleUserId ?? null,
+        defaultFor ?? [],
+        displayOrder ?? 0,
+        metadataJson ? JSON.stringify(metadataJson) : '{}',
         actorUserId
       ],
       client
@@ -611,7 +713,17 @@ export const updateFinanceAccountInPostgres = async ({
   openingBalanceDate,
   accountNumber,
   accountNumberFull,
-  notes
+  notes,
+  instrumentCategory,
+  providerSlug,
+  providerIdentifier,
+  cardLastFour,
+  cardNetwork,
+  creditLimit,
+  responsibleUserId,
+  defaultFor,
+  displayOrder,
+  metadataJson
 }: {
   accountId: string
   accountName?: string
@@ -625,6 +737,16 @@ export const updateFinanceAccountInPostgres = async ({
   accountNumber?: string | null
   accountNumberFull?: string | null
   notes?: string | null
+  instrumentCategory?: string
+  providerSlug?: string | null
+  providerIdentifier?: string | null
+  cardLastFour?: string | null
+  cardNetwork?: string | null
+  creditLimit?: number | null
+  responsibleUserId?: string | null
+  defaultFor?: string[]
+  displayOrder?: number
+  metadataJson?: Record<string, unknown>
 }) => {
   await assertFinancePostgresReady()
 
@@ -658,6 +780,25 @@ export const updateFinanceAccountInPostgres = async ({
     if (accountNumber !== undefined) pushUpdate('account_number', accountNumber)
     if (accountNumberFull !== undefined) pushUpdate('account_number_full', accountNumberFull)
     if (notes !== undefined) pushUpdate('notes', notes)
+    if (instrumentCategory !== undefined) pushUpdate('instrument_category', instrumentCategory)
+    if (providerSlug !== undefined) pushUpdate('provider_slug', providerSlug)
+    if (providerIdentifier !== undefined) pushUpdate('provider_identifier', providerIdentifier)
+    if (cardLastFour !== undefined) pushUpdate('card_last_four', cardLastFour)
+    if (cardNetwork !== undefined) pushUpdate('card_network', cardNetwork)
+    if (creditLimit !== undefined) pushUpdate('credit_limit', creditLimit)
+    if (responsibleUserId !== undefined) pushUpdate('responsible_user_id', responsibleUserId)
+
+    if (defaultFor !== undefined) {
+      values.push(defaultFor)
+      updates.push(`default_for = $${values.length}::text[]`)
+    }
+
+    if (displayOrder !== undefined) pushUpdate('display_order', displayOrder)
+
+    if (metadataJson !== undefined) {
+      values.push(JSON.stringify(metadataJson))
+      updates.push(`metadata_json = $${values.length}::jsonb`)
+    }
 
     if (updates.length === 0) {
       throw new FinanceValidationError('No fields to update')
@@ -683,6 +824,16 @@ export const updateFinanceAccountInPostgres = async ({
           opening_balance,
           opening_balance_date,
           notes,
+          instrument_category,
+          provider_slug,
+          provider_identifier,
+          card_last_four,
+          card_network,
+          credit_limit,
+          responsible_user_id,
+          default_for,
+          display_order,
+          metadata_json,
           created_at,
           updated_at
       `,

@@ -16,6 +16,8 @@ import Typography from '@mui/material/Typography'
 
 import CustomTextField from '@core/components/mui/TextField'
 
+import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
+
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
@@ -73,6 +75,11 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Payment instrument selector
+  const [instruments, setInstruments] = useState<Array<{ accountId: string; accountName: string; providerSlug: string | null; instrumentCategory: string; currency: string }>>([])
+  const [selectedInstrumentId, setSelectedInstrumentId] = useState('')
+  const [currentFxRate, setCurrentFxRate] = useState<number | null>(null)
+
   // Invoice dropdown data
   const [invoices, setInvoices] = useState<InvoiceOption[]>([])
   const [loadingInvoices, setLoadingInvoices] = useState(false)
@@ -121,6 +128,24 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
   useEffect(() => {
     if (open) {
       fetchInvoices()
+
+      fetch('/api/admin/payment-instruments', { cache: 'no-store' })
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (data?.items) {
+            setInstruments(data.items.filter((i: any) => i.isActive))
+          }
+        })
+        .catch(() => {})
+
+      fetch('/api/finance/exchange-rates/latest', { cache: 'no-store' })
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (data?.available && data.rate) {
+            setCurrentFxRate(data.rate)
+          }
+        })
+        .catch(() => {})
     }
   }, [open, fetchInvoices])
 
@@ -142,6 +167,8 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
     setPaymentDate('')
     setReference('')
     setPaymentMethod('')
+    setSelectedInstrumentId('')
+    setCurrentFxRate(null)
     setNotes('')
     setError(null)
   }
@@ -175,6 +202,7 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
     if (reference.trim()) body.reference = reference.trim()
     if (paymentMethod) body.paymentMethod = paymentMethod
     if (notes.trim()) body.notes = notes.trim()
+    if (selectedInstrumentId) body.paymentAccountId = selectedInstrumentId
 
     try {
       const res = await fetch(`/api/finance/income/${selectedIncomeId}/payments`, {
@@ -262,6 +290,14 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
           }
         />
 
+        {selectedInvoice?.currency === 'USD' && currentFxRate && (
+          <Box sx={{ p: 1.5, bgcolor: 'info.lightOpacity', borderRadius: 1 }}>
+            <Typography variant='caption' color='info.main'>
+              Dólar observado: ${new Intl.NumberFormat('es-CL', { maximumFractionDigits: 2 }).format(currentFxRate)} CLP — Equivalente: {new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(Number(amount || 0) * currentFxRate)}
+            </Typography>
+          </Box>
+        )}
+
         <CustomTextField
           fullWidth
           size='small'
@@ -296,6 +332,30 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
           <MenuItem value=''>—</MenuItem>
           {PAYMENT_METHODS.map(m => (
             <MenuItem key={m} value={m}>{PAYMENT_METHOD_LABELS[m]}</MenuItem>
+          ))}
+        </CustomTextField>
+
+        <CustomTextField
+          select
+          fullWidth
+          size='small'
+          label='Cuenta de destino'
+          value={selectedInstrumentId}
+          onChange={e => setSelectedInstrumentId(e.target.value)}
+        >
+          <MenuItem value=''>— Sin asignar —</MenuItem>
+          {instruments.map(inst => (
+            <MenuItem key={inst.accountId} value={inst.accountId}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <PaymentInstrumentChip
+                  providerSlug={inst.providerSlug}
+                  instrumentName={inst.accountName}
+                  size='sm'
+                  showName={false}
+                />
+                {inst.accountName} ({inst.currency})
+              </Box>
+            </MenuItem>
           ))}
         </CustomTextField>
 
