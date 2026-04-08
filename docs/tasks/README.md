@@ -20,7 +20,8 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-284`
+- siguiente ID disponible: `TASK-285`
+- `TASK-284` crea el módulo de Cuenta Corriente de Accionista (CCA) en Finance: movimientos bidireccionales accionista ↔ empresa, saldo neto en tiempo real, integración con settlement layer y posición de tesorería. Soporta multi-moneda y vinculación a expenses/incomes existentes.
 - `TASK-241` migra procesos batch pesados (ICO materialización, LLM enrichment) de Vercel Functions a Cloud Run. Formaliza política: batch > 30s → Cloud Run. Código listo, deploy operacional pendiente.
 - `TASK-239` enriquece el prompt LLM de Nexa Insights con glosario de métricas, cadena causal, doble capa narrativa y nombres de Space/miembros.
 - `TASK-240` agrega menciones interactivas (@mentions) de Spaces y miembros en los insights de Nexa — chips clickeables que navegan a perfiles. Depende de `TASK-239`.
@@ -112,6 +113,7 @@ Primer bloque operativo asignado:
 | `TASK-275` | [TASK-275-notification-dispatch-correlation-id.md](to-do/TASK-275-notification-dispatch-correlation-id.md)                                                                  | P2        | Medio    | Bajo     | Diseño                  | Agregar `dispatch_correlation_id` a `notification_log` para JOIN directo con `email_deliveries.batch_id` — cierra gap de trazabilidad detectado en ISSUE-025                                                                    |
 | `TASK-280` | [TASK-280-finance-cash-modules-ingresos-egresos.md](complete/TASK-280-finance-cash-modules-ingresos-egresos.md)                                                                | P1        | Alto     | Alto     | Complete             | Módulos reales de Ingresos (cobros/cash-in) y Egresos (pagos/cash-out): expense_payments ledger 1:N, surfaces centralizadas de cobros y pagos, posición de caja real, componente compartido de registro de pagos               |
 | `TASK-281` | [TASK-281-payment-instruments-registry-fx-tracking.md](complete/TASK-281-payment-instruments-registry-fx-tracking.md)                                                              | P1        | Alto     | Alto     | Complete             | Payment Instruments Registry (bancos, TC, fintech, Deel, Global66) + FX gain/loss tracking + logos SVG + Admin Center CRUD + posición de caja multi-moneda                                                                     |
+| `TASK-284` | [TASK-284-shareholder-current-account.md](to-do/TASK-284-shareholder-current-account.md)                                                                                   | P2        | Alto     | Medio    | Diseño                  | Cuenta Corriente de Accionista (CCA): movimientos bidireccionales accionista ↔ empresa, saldo neto, integración settlement layer, posición de tesorería, multi-moneda, vinculación a expenses/incomes                           |
 
 ## Complete
 
