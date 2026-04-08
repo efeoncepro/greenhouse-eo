@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { getServerSession } from 'next-auth'
-
-import { authOptions } from '@/lib/auth'
+import { getServerAuthSession } from '@/lib/auth'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { applyIdentityLink, updateProposalStatus } from '@/lib/identity/reconciliation/apply-link'
@@ -18,7 +16,7 @@ export async function POST(request: Request, { params }: Params) {
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { proposalId } = await params
-  const session = await getServerSession(authOptions)
+  const session = await getServerAuthSession()
   const resolvedBy = session?.user?.email || 'admin'
 
   try {

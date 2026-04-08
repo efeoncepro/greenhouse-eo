@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { getServerSession } from 'next-auth'
-
-import { authOptions } from '@/lib/auth'
+import { getServerAuthSession } from '@/lib/auth'
 import { calculatePayroll } from '@/lib/payroll/calculate-payroll'
 import { toPayrollErrorResponse } from '@/lib/payroll/api-response'
 import { requireHrTenantContext } from '@/lib/tenant/authorization'
@@ -17,7 +15,7 @@ export async function POST(_: Request, { params }: { params: Promise<{ periodId:
   }
 
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerAuthSession()
     const { periodId } = await params
 
     const result = await calculatePayroll({

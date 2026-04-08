@@ -4,9 +4,6 @@ import { redirect } from 'next/navigation'
 // MUI Imports
 import Button from '@mui/material/Button'
 
-// Third-party Imports
-import { getServerSession } from 'next-auth'
-
 // Type Imports
 import type { ChildrenType } from '@core/types'
 
@@ -30,12 +27,12 @@ import ChunkRecoveryClear from '@/components/ChunkRecoveryClear'
 import { getMode, getSystemMode } from '@core/utils/serverHelpers'
 
 // Lib Imports
-import { authOptions } from '@/lib/auth'
+import { getServerAuthSession } from '@/lib/auth'
 
 const Layout = async (props: ChildrenType) => {
   const { children } = props
 
-  const session = await getServerSession(authOptions)
+  const session = await getServerAuthSession()
 
   if (!session) {
     redirect('/login')

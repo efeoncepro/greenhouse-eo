@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { getServerSession } from 'next-auth'
-
-import { authOptions } from '@/lib/auth'
+import { getServerAuthSession } from '@/lib/auth'
 import { getBigQueryProjectId } from '@/lib/bigquery'
 import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
@@ -67,7 +65,7 @@ export async function POST(_: Request, { params }: { params: Promise<{ periodId:
       })
     }
 
-    const session = await getServerSession(authOptions)
+    const session = await getServerAuthSession()
     const actorIdentifier = session?.user?.email || tenant.userId
 
     if (isPayrollPostgresEnabled()) {

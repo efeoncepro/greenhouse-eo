@@ -1,5 +1,33 @@
 # Handoff.md
 
+## Sesion 2026-04-08 — ISSUE-031 resolved: Vercel Preview build no longer dies on missing NEXTAUTH_SECRET
+
+- contexto:
+  - los PR `#41`, `#42` y `#43` seguian mostrando `Vercel: Error` aun despues de limpiar la baseline de CI
+  - la reproduccion inicial local daba falso verde porque Next estaba leyendo `.env.production.local`
+- causa raiz confirmada:
+  - al aislar el entorno real de `Preview` (solo `.vercel/.env.preview.local`, sin `.env.local` ni `.env.production.local`), `pnpm build` fallo con:
+    - `NEXTAUTH_SECRET is not set`
+    - `Failed to collect page data for /api/admin/invite`
+  - `Preview` tambien venia sin `NEXTAUTH_URL`, `GCP_PROJECT` y `GOOGLE_APPLICATION_CREDENTIALS_JSON`
+  - el trigger tecnico del build rojo era que `src/lib/auth.ts` resolvia `authOptions` en import-time
+- fix aplicado:
+  - `src/lib/auth.ts` ahora resuelve auth lazy via `getAuthOptions()` y `getServerAuthSession()`
+  - los consumers server-side dejaron de importar `authOptions` eager
+  - `src/app/api/auth/[...nextauth]/route.ts` ahora devuelve `503` controlado si falta configuracion de auth
+- validacion ejecutada:
+  - `pnpm build` — OK
+  - `pnpm lint` — OK
+  - `pnpm build` con solo `.vercel/.env.preview.local` — OK
+- documentacion actualizada:
+  - `project_context.md`
+  - `changelog.md`
+  - `docs/issues/resolved/ISSUE-031-vercel-preview-build-fails-missing-nextauth-secret.md`
+  - `docs/issues/README.md`
+- nota operativa:
+  - el hardening evita que `Preview` quede rojo por drift de env
+  - si una branch preview necesita login real, Vercel igual debe tener `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `GCP_PROJECT` y credenciales Google validas
+
 ## Sesion 2026-04-08 — CI root cause for open PRs 41/42
 
 - contexto:

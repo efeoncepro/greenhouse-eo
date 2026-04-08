@@ -1,5 +1,17 @@
 # project_context.md
 
+## Delta 2026-04-08 Vercel Preview auth hardening
+
+- Se confirmó que `Preview` puede quedar con drift de env respecto de local/shared y faltar al menos `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `GCP_PROJECT` o `GOOGLE_APPLICATION_CREDENTIALS_JSON`.
+- `src/lib/auth.ts` ya no debe resolver `NextAuthOptions` en import-time. La resolución canónica ahora es lazy via `getAuthOptions()` y `getServerAuthSession()`.
+- Si `NEXTAUTH_SECRET` falta en `Preview`, el portal ya no debe romper el build:
+  - server components y route handlers degradan a sesión `null`
+  - `src/app/api/auth/[...nextauth]/route.ts` responde `503` controlado en vez de abortar `page-data collection`
+- Regla operativa vigente:
+  - el hardening evita que el deployment quede rojo por drift
+  - pero un Preview que necesite login funcional sigue debiendo tener `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `GCP_PROJECT` y credenciales Google válidas
+- Issue resuelto de referencia: `docs/issues/resolved/ISSUE-031-vercel-preview-build-fails-missing-nextauth-secret.md`
+
 ## Delta 2026-04-07 Account Complete 360 — serving federado por facetas (TASK-274)
 
 ### Account Complete 360 (TASK-274)

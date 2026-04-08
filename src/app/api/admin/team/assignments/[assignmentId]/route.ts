@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { getServerSession } from 'next-auth'
-
-import { authOptions } from '@/lib/auth'
+import { getServerAuthSession } from '@/lib/auth'
 import { deleteAssignment, getAdminTeamAssignmentDetail, toTeamAdminErrorResponse, updateAssignment } from '@/lib/team-admin/mutate-team'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import type { UpdateAssignmentInput } from '@/types/team'
@@ -41,7 +39,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ assig
       return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
     }
 
-    const session = await getServerSession(authOptions)
+    const session = await getServerAuthSession()
 
     const updated = await updateAssignment({
       assignmentId,
@@ -65,7 +63,7 @@ export async function DELETE(_request: Request, context: { params: Promise<{ ass
 
   try {
     const { assignmentId } = await context.params
-    const session = await getServerSession(authOptions)
+    const session = await getServerAuthSession()
 
     const deleted = await deleteAssignment({
       assignmentId,

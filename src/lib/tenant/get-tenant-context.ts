@@ -1,8 +1,6 @@
 import 'server-only'
 
-import { getServerSession } from 'next-auth'
-
-import { authOptions } from '@/lib/auth'
+import { getServerAuthSession } from '@/lib/auth'
 import { getCachedBusinessLineSummaries } from '@/lib/business-line/metadata'
 import type { BusinessLineMetadataSummary } from '@/types/business-line'
 
@@ -40,7 +38,7 @@ export interface TenantContext {
 }
 
 export const getTenantContext = async (): Promise<TenantContext | null> => {
-  const session = await getServerSession(authOptions)
+  const session = await getServerAuthSession()
 
   if (!session?.user) {
     return null
