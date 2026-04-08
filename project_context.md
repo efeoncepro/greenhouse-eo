@@ -182,11 +182,24 @@
   - `Nubox sales` se muestran como documentos de venta en `greenhouse_finance.income`
   - `Nubox purchases` se muestran como documentos de compra/obligación en `greenhouse_finance.expenses`
   - los cobros reales viven en `greenhouse_finance.income_payments`
-  - los pagos reales viven en `expenses.payment_date` + conciliación bancaria
+  - los pagos reales viven en `greenhouse_finance.expense_payments`
 - Implicación UX:
   - la navegación y copy visible de Finance debe evitar sugerir que una factura de venta ya es un cobro
   - o que una factura de compra ya es un pago
   - el P&L puede seguir leyendo devengo, pero la semántica visible debe distinguir documento vs caja
+
+## Delta 2026-04-08 Finance cash contract hardened around canonical ledgers
+
+- Todo cobro/pago real debe existir en el ledger canónico y publicar outbox:
+  - cobros: `greenhouse_finance.income_payments` + `finance.income_payment.recorded`
+  - pagos: `greenhouse_finance.expense_payments` + `finance.expense_payment.recorded`
+- `POST /api/finance/income/[id]/payment` queda solo como wrapper legacy-compatible del endpoint canónico `/api/finance/income/[id]/payments`; no puede volver a escribir por BigQuery fallback.
+- El sync de movimientos bancarios Nubox ya debe registrar cobros usando `recordPayment()` para que `client_economics`, `operational_pl`, `commercial_cost_attribution` y otros consumers reactivos escuchen el mismo contrato que escucha la UI manual.
+- Existe remediación operativa para histórico y drift:
+  - `pnpm audit:finance:payment-ledgers`
+  - `pnpm backfill:finance:payment-ledgers`
+- Regla operativa:
+  - si un documento aparece como `paid` o `partial`, debe existir al menos una fila en su ledger correspondiente o quedar explicitamente auditado como inconsistencia
 
 ## Delta 2026-04-03 Contrato_Metricas_ICO_v1 aligned to benchmark-informed thresholds
 

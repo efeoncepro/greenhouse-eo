@@ -31,7 +31,8 @@ export const GH_INTERNAL_NAV = {
   adminOpsHealth: { label: 'Ops Health', subtitle: 'Outbox, proyecciones y freshness del serving' },
   adminBusinessLines: { label: 'Business Lines', subtitle: 'Metadata canonica de las lineas de negocio' },
   adminIntegrationGovernance: { label: 'Integration Governance', subtitle: 'Registro, taxonomia, readiness y ownership de integraciones nativas' },
-  adminAccounts: { label: 'Cuentas', subtitle: 'Organizaciones, spaces y gobierno de identidad' }
+  adminAccounts: { label: 'Cuentas', subtitle: 'Organizaciones, spaces y gobierno de identidad' },
+  adminPaymentInstruments: { label: 'Instrumentos de pago', subtitle: 'Cuentas bancarias, tarjetas, fintech y plataformas' }
 } as const
 
 export const GH_PEOPLE_NAV = {

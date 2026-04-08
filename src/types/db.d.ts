@@ -1180,14 +1180,33 @@ export interface GreenhouseFinanceAccounts {
   account_number_full: string | null;
   account_type: string;
   bank_name: string;
+  card_last_four: string | null;
+  card_network: string | null;
   country_code: Generated<string>;
   created_at: Generated<Timestamp>;
   created_by_user_id: string | null;
+  credit_limit: Numeric | null;
   currency: string;
+  /**
+   * Array of default-use tags: supplier_payment, payroll, tax, client_collection, etc.
+   */
+  default_for: Generated<string[] | null>;
+  display_order: Generated<number | null>;
+  /**
+   * Payment instrument type: bank_account, credit_card, fintech, payment_platform, cash, payroll_processor
+   */
+  instrument_category: Generated<string>;
   is_active: Generated<boolean>;
+  metadata_json: Generated<Json | null>;
   notes: string | null;
   opening_balance: Generated<Numeric>;
   opening_balance_date: Timestamp | null;
+  provider_identifier: string | null;
+  /**
+   * Canonical slug for the provider (bci, banco-chile, paypal, deel, etc.) — maps to logo catalog
+   */
+  provider_slug: string | null;
+  responsible_user_id: string | null;
   updated_at: Generated<Timestamp>;
 }
 
@@ -1304,9 +1323,12 @@ export interface GreenhouseFinanceExchangeRates {
 
 export interface GreenhouseFinanceExpensePayments {
   amount: Numeric;
+  amount_clp: Numeric | null;
   created_at: Generated<Timestamp>;
   currency: Generated<string>;
+  exchange_rate_at_payment: Numeric | null;
   expense_id: string;
+  fx_gain_loss_clp: Numeric | null;
   is_reconciled: Generated<boolean>;
   notes: string | null;
   payment_account_id: string | null;
@@ -1534,8 +1556,20 @@ export interface GreenhouseFinanceIncomeLineItems {
 
 export interface GreenhouseFinanceIncomePayments {
   amount: Numeric;
+  /**
+   * Payment amount converted to CLP at exchange_rate_at_payment. For CLP payments, equals amount.
+   */
+  amount_clp: Numeric | null;
   created_at: Generated<Timestamp>;
   currency: string | null;
+  /**
+   * USD/CLP exchange rate at the time of payment (from Mindicador/exchange_rates). NULL for CLP payments.
+   */
+  exchange_rate_at_payment: Numeric | null;
+  /**
+   * FX gain/loss vs document rate: amount_clp - (amount * document.exchange_rate_to_clp). Positive = gain.
+   */
+  fx_gain_loss_clp: Numeric | null;
   income_id: string;
   is_reconciled: Generated<boolean>;
   notes: string | null;

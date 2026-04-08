@@ -289,6 +289,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             children: [
               { label: nl(GH_INTERNAL_NAV.adminCenter), href: '/admin' },
               { label: nl(GH_INTERNAL_NAV.adminAccounts), href: '/admin/accounts' },
+              { label: nl(GH_INTERNAL_NAV.adminPaymentInstruments), href: '/admin/payment-instruments' },
               { label: nl(GH_INTERNAL_NAV.adminTenants), href: '/admin/tenants' },
               { label: nl(GH_INTERNAL_NAV.adminUsers), href: '/admin/users' },
               { label: nl(GH_INTERNAL_NAV.adminRoles), href: '/admin/roles' },
@@ -298,6 +299,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             ].filter(item => {
               if (item.href === '/admin') return canSeeView('administracion.admin_center', true)
               if (item.href === '/admin/accounts') return canSeeView('administracion.cuentas', true)
+              if (item.href === '/admin/payment-instruments') return canSeeView('administracion.instrumentos_pago', true)
               if (item.href === '/admin/tenants') return canSeeView('administracion.spaces', true)
               if (item.href === '/admin/users') return canSeeView('administracion.usuarios', true)
               if (item.href === '/admin/roles') return canSeeView('administracion.roles', true)

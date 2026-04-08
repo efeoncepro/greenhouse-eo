@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { auditFinancePaymentLedgers } from '@/lib/finance/payment-ledger-remediation'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { checkExchangeRateStaleness } from '@/lib/finance/shared'
@@ -30,29 +31,48 @@ export async function GET() {
 
   // 1. Payment ledger integrity
   try {
-    const divergent = await runGreenhousePostgresQuery<{ count: string } & Record<string, unknown>>(
-      `SELECT COUNT(*)::text AS count
-       FROM greenhouse_finance.income i
-       LEFT JOIN (
-         SELECT income_id, SUM(amount)::numeric AS total
-         FROM greenhouse_finance.income_payments
-         GROUP BY income_id
-       ) p ON p.income_id = i.income_id
-       WHERE ABS(COALESCE(i.amount_paid, 0) - COALESCE(p.total, 0)) > 0.01`
-    )
-
-    const count = Number(divergent[0]?.count ?? 0)
+    const audit = await auditFinancePaymentLedgers()
 
     checks.push({
-      name: 'payment_ledger_integrity',
-      status: count === 0 ? 'ok' : 'warning',
-      detail: count === 0
+      name: 'income_payment_ledger_integrity',
+      status: audit.incomeLedgerDrift.count === 0 ? 'ok' : 'warning',
+      detail: audit.incomeLedgerDrift.count === 0
         ? 'Todos los saldos de pago están consistentes'
-        : `${count} factura(s) con amount_paid divergente de SUM(income_payments)`,
-      value: count
+        : `${audit.incomeLedgerDrift.count} factura(s) con amount_paid divergente de SUM(income_payments)`,
+      value: audit.incomeLedgerDrift.count
+    })
+
+    checks.push({
+      name: 'income_paid_without_ledger',
+      status: audit.incomePaidWithoutLedger.count === 0 ? 'ok' : 'warning',
+      detail: audit.incomePaidWithoutLedger.count === 0
+        ? 'No hay facturas marcadas como cobradas sin evento de cobro'
+        : `${audit.incomePaidWithoutLedger.count} factura(s) con amount_paid > 0 y sin filas en income_payments`,
+      value: audit.incomePaidWithoutLedger.count
+    })
+
+    checks.push({
+      name: 'expense_payment_ledger_integrity',
+      status: audit.expenseLedgerDrift.count === 0 ? 'ok' : 'warning',
+      detail: audit.expenseLedgerDrift.count === 0
+        ? 'Todos los saldos de pagos de compras están consistentes'
+        : `${audit.expenseLedgerDrift.count} compra(s) con amount_paid divergente de SUM(expense_payments)`,
+      value: audit.expenseLedgerDrift.count
+    })
+
+    checks.push({
+      name: 'expense_paid_without_ledger',
+      status: audit.expensePaidWithoutLedger.count === 0 ? 'ok' : 'warning',
+      detail: audit.expensePaidWithoutLedger.count === 0
+        ? 'No hay compras marcadas como pagadas sin evento de pago'
+        : `${audit.expensePaidWithoutLedger.count} compra(s) con amount_paid > 0 y sin filas en expense_payments`,
+      value: audit.expensePaidWithoutLedger.count
     })
   } catch {
-    checks.push({ name: 'payment_ledger_integrity', status: 'error', detail: 'No se pudo verificar integridad de pagos' })
+    checks.push({ name: 'income_payment_ledger_integrity', status: 'error', detail: 'No se pudo verificar integridad de cobros' })
+    checks.push({ name: 'income_paid_without_ledger', status: 'error', detail: 'No se pudo verificar cobros faltantes en ledger' })
+    checks.push({ name: 'expense_payment_ledger_integrity', status: 'error', detail: 'No se pudo verificar integridad de pagos' })
+    checks.push({ name: 'expense_paid_without_ledger', status: 'error', detail: 'No se pudo verificar pagos faltantes en ledger' })
   }
 
   // 2. Exchange rate freshness

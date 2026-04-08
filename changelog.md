@@ -1,5 +1,33 @@
 # changelog.md
 
+## 2026-04-08
+
+### 2026-04-08 — Finance cash lane alignment: registered payments now surface in Cobros/Pagos
+
+- `IncomeDetailView` ya registra cobros contra el endpoint canónico `POST /api/finance/income/[id]/payments` en vez del carril legacy singular `/payment`, evitando que un fallback a BigQuery deje el cobro fuera de `greenhouse_finance.income_payments`.
+- `CashInListView` quedó alineado a la shape real de `GET /api/finance/cash-in`: ahora mapea `paymentId -> cashInId` e `isReconciled -> reconciled`, por lo que los cobros registrados ya se renderizan correctamente en la tabla.
+- `CashOutListView` quedó alineado a la shape real de `GET /api/finance/cash-out`: ahora consume `paymentId`, `expenseId`, `amount`, `currency`, `expenseDescription` e `isReconciled` en lugar de campos legacy inexistentes como `cashOutId`, `amountClp` y `description`.
+- Impacto visible: el flujo `detalle documento -> registrar pago -> módulo Cobros/Pagos` vuelve a quedar consistente para pagos nuevos sobre el ledger canónico.
+
+### 2026-04-08 — Finance payment ledger hardening: canonical cash events for UI, sync and remediation
+
+- `POST /api/finance/income/[id]/payment` quedó como wrapper legacy-compatible del ledger canónico y ya no puede caer a BigQuery fallback. Si Postgres falla, la operación falla en cerrado para no dejar documentos “pagados” sin fila real en `income_payments`.
+- Nuevo módulo `src/lib/finance/payment-ledger-remediation.ts` con:
+  - auditoría de drift `amount_paid` vs `SUM(ledger)`
+  - detección de documentos `paid/partial` sin ledger
+  - backfill canónico para `income_payments` y `expense_payments`
+  - reconciliación de drift en ambos lados
+- Nuevos comandos operativos:
+  - `pnpm audit:finance:payment-ledgers`
+  - `pnpm backfill:finance:payment-ledgers`
+- `src/lib/nubox/sync-nubox-to-postgres.ts` ahora registra cobros bancarios vía `recordPayment()`, garantizando que los cobros sincronizados desde Nubox publiquen `finance.income_payment.recorded` y queden visibles para proyecciones reactivas y costos.
+- `GET /api/finance/data-quality`, `GET /api/finance/income/summary` y `GET /api/finance/expenses/summary` ahora exponen mejor los gaps `paid without ledger`, reforzando la lectura de caja desde ledgers canónicos.
+- Seguimiento operativo posterior al merge a `develop`:
+  - nueva migración `20260408084803360_widen-income-payment-source-check.sql` amplía el constraint de `income_payments.payment_source` para aceptar `nubox_bank_sync`
+  - se removió `server-only` de los módulos de ledger usados por scripts para que la remediación pueda ejecutarse vía `tsx`
+  - el backfill histórico de cobros sobre staging/dev recuperó `21` ingresos en `income_payments`
+  - verificación E2E en staging: un pago registrado desde el detalle de `EXP-NB-35568077` quedó visible inmediatamente en `Pagos`, y `Cobros` volvió a mostrar facturas Nubox cobradas tras ampliar el rango de fechas
+
 ## 2026-04-07
 
 ### 2026-04-07 — Sistema de emails de permisos/ausencias (P2 completado)
@@ -4727,3 +4755,6 @@
 ## 2026-04-03
 
 - Finance: se corrigió la semántica visible de `income` / `expenses` para dejar explícito que los documentos sincronizados desde Nubox son ledgers de venta/compra y devengo, no equivalentes directos a cobros/pagos. La navegación, títulos y copy de Finance ahora distinguen mejor documento vs caja.
+## 2026-04-08
+
+- Finance UX: `Cobros` y `Pagos` ya no muestran `Pendiente` para movimientos de caja ya ejecutados solo porque aun no estan conciliados. La tabla ahora separa `Estado` (`Cobrado` / `Pagado`) de `Conciliacion` (`Conciliado` / `Por conciliar`).

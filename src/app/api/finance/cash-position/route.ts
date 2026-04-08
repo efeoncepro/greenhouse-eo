@@ -15,6 +15,12 @@ interface AccountRow extends Record<string, unknown> {
   currency: string
   opening_balance: string | number
   is_active: boolean
+  instrument_category: string | null
+  provider_slug: string | null
+}
+
+interface FxSumRow extends Record<string, unknown> {
+  fx_total: string | number
 }
 
 interface ReceivableRow extends Record<string, unknown> {
@@ -45,13 +51,14 @@ export async function GET() {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const [accounts, receivable, payable, monthlySeries] = await Promise.all([
+  const [accounts, receivable, payable, monthlySeries, fxIncome, fxExpense] = await Promise.all([
     // Query 1 — Active accounts
     runGreenhousePostgresQuery<AccountRow>(
-      `SELECT account_id, account_name, bank_name, currency, opening_balance, is_active
+      `SELECT account_id, account_name, bank_name, currency, opening_balance, is_active,
+              instrument_category, provider_slug
        FROM greenhouse_finance.accounts
        WHERE is_active = TRUE
-       ORDER BY account_name`
+       ORDER BY display_order ASC, account_name ASC`
     ),
 
     // Query 2 — Accounts receivable (pending invoices)
@@ -112,6 +119,20 @@ export async function GET() {
        LEFT JOIN cash_in ci ON ci.month_start = m.month_start
        LEFT JOIN cash_out co ON co.month_start = m.month_start
        ORDER BY m.month_start`
+    ),
+
+    // Query 5a — FX gain/loss from income payments
+    runGreenhousePostgresQuery<FxSumRow>(
+      `SELECT COALESCE(SUM(fx_gain_loss_clp), 0)::text AS fx_total
+       FROM greenhouse_finance.income_payments
+       WHERE fx_gain_loss_clp IS NOT NULL`
+    ),
+
+    // Query 5b — FX gain/loss from expense payments
+    runGreenhousePostgresQuery<FxSumRow>(
+      `SELECT COALESCE(SUM(fx_gain_loss_clp), 0)::text AS fx_total
+       FROM greenhouse_finance.expense_payments
+       WHERE fx_gain_loss_clp IS NOT NULL`
     )
   ])
 
@@ -119,6 +140,7 @@ export async function GET() {
   const pendingInvoices = toNumber(receivable[0]?.pending_invoices)
   const payableClp = roundCurrency(toNumber(payable[0]?.payable_clp))
   const pendingExpenses = toNumber(payable[0]?.pending_expenses)
+  const fxGainLossClp = roundCurrency(toNumber(fxIncome[0]?.fx_total) + toNumber(fxExpense[0]?.fx_total))
 
   return NextResponse.json({
     accounts: accounts.map(a => ({
@@ -127,7 +149,9 @@ export async function GET() {
       bankName: a.bank_name ? normalizeString(a.bank_name) : null,
       currency: a.currency,
       openingBalance: roundCurrency(toNumber(a.opening_balance)),
-      isActive: a.is_active
+      isActive: a.is_active,
+      instrumentCategory: a.instrument_category ? normalizeString(a.instrument_category) : null,
+      providerSlug: a.provider_slug ? normalizeString(a.provider_slug) : null
     })),
     receivable: {
       totalClp: receivableClp,
@@ -137,6 +161,7 @@ export async function GET() {
       totalClp: payableClp,
       pendingExpenses
     },
+    fxGainLossClp,
     netPosition: roundCurrency(receivableClp - payableClp),
     monthlySeries: monthlySeries.map(row => ({
       year: toNumber(row.year),

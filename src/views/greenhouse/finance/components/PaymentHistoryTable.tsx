@@ -12,6 +12,8 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
+import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -23,6 +25,9 @@ interface PaymentRecord {
   currency?: string
   reference: string | null
   paymentMethod: string | null
+  paymentAccountId?: string | null
+  providerSlug?: string | null
+  instrumentCategory?: string | null
   notes: string | null
 }
 
@@ -81,13 +86,14 @@ const PaymentHistoryTable = ({
               <TableCell align='right'>Monto</TableCell>
               <TableCell>Referencia</TableCell>
               <TableCell>Metodo</TableCell>
+              <TableCell>Instrumento</TableCell>
               <TableCell>Notas</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {payments.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} align='center' sx={{ py: 6 }}>
+                <TableCell colSpan={6} align='center' sx={{ py: 6 }}>
                   <Typography variant='body2' color='text.secondary'>
                     {emptyMessage}
                   </Typography>
@@ -104,6 +110,17 @@ const PaymentHistoryTable = ({
                   </TableCell>
                   <TableCell>{p.reference || '\u2014'}</TableCell>
                   <TableCell>{p.paymentMethod || '\u2014'}</TableCell>
+                  <TableCell>
+                    {p.providerSlug ? (
+                      <PaymentInstrumentChip
+                        providerSlug={p.providerSlug}
+                        instrumentName={p.paymentMethod || 'Cuenta'}
+                        instrumentCategory={p.instrumentCategory as any}
+                        size='sm'
+                        showName={false}
+                      />
+                    ) : '\u2014'}
+                  </TableCell>
                   <TableCell>{p.notes || '\u2014'}</TableCell>
                 </TableRow>
               ))

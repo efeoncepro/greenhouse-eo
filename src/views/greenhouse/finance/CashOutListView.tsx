@@ -31,14 +31,28 @@ import RegisterCashOutDrawer from '@views/greenhouse/finance/drawers/RegisterCas
 // ---------------------------------------------------------------------------
 
 interface CashOutItem {
-  cashOutId: string
+  paymentId: string
+  expenseId: string
   paymentDate: string
   amount: number
-  amountClp: number
   currency: string
   expenseType: string
-  description: string
+  expenseDescription: string
   beneficiary: string | null
+  supplierName: string | null
+  memberName: string | null
+  reference: string | null
+  isReconciled: boolean
+}
+
+interface CashOutApiItem {
+  paymentId: string
+  expenseId: string
+  paymentDate: string
+  amount: number
+  currency: string
+  expenseType: string
+  expenseDescription: string
   supplierName: string | null
   memberName: string | null
   reference: string | null
@@ -55,7 +69,7 @@ interface CashOutSummary {
 }
 
 interface CashOutResponse {
-  items: CashOutItem[]
+  items: CashOutApiItem[]
   total: number
   page: number
   pageSize: number
@@ -93,6 +107,13 @@ const TYPE_OPTIONS = [
 
 const formatCLP = (amount: number): string =>
   new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
+
+const formatAmount = (amount: number, currency: string): string =>
+  new Intl.NumberFormat('es-CL', {
+    style: 'currency',
+    currency,
+    maximumFractionDigits: currency === 'CLP' ? 0 : 2
+  }).format(amount)
 
 const formatDate = (date: string | null): string => {
   if (!date) return '\u2014'
@@ -167,7 +188,22 @@ const CashOutListView = () => {
       if (res.ok) {
         const data: CashOutResponse = await res.json()
 
-        setItems(data.items ?? [])
+        setItems(
+          (data.items ?? []).map(item => ({
+            paymentId: item.paymentId,
+            expenseId: item.expenseId,
+            paymentDate: item.paymentDate,
+            amount: item.amount,
+            currency: item.currency,
+            expenseType: item.expenseType,
+            expenseDescription: item.expenseDescription,
+            beneficiary: item.supplierName || item.memberName || null,
+            supplierName: item.supplierName,
+            memberName: item.memberName,
+            reference: item.reference,
+            isReconciled: item.isReconciled
+          }))
+        )
         setTotal(data.total ?? 0)
         setSummary(data.summary ?? {
           totalPaidClp: 0,
@@ -354,12 +390,13 @@ const CashOutListView = () => {
                 <TableCell>Beneficiario</TableCell>
                 <TableCell>Referencia</TableCell>
                 <TableCell>Estado</TableCell>
+                <TableCell>Conciliación</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {items.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} align='center' sx={{ py: 6 }}>
+                  <TableCell colSpan={8} align='center' sx={{ py: 6 }}>
                     <Typography variant='body2' color='text.secondary'>
                       Sin pagos registrados en este periodo
                     </Typography>
@@ -370,13 +407,13 @@ const CashOutListView = () => {
                   const typeConf = TYPE_CONFIG[item.expenseType] ?? TYPE_CONFIG.miscellaneous
 
                   return (
-                    <TableRow key={item.cashOutId} hover>
+                    <TableRow key={item.paymentId} hover>
                       <TableCell>
                         <Typography variant='body2'>{formatDate(item.paymentDate)}</Typography>
                       </TableCell>
                       <TableCell align='right'>
                         <Typography variant='body2' fontWeight={600} color='error.main'>
-                          {formatCLP(item.amountClp)}
+                          {formatAmount(item.amount, item.currency)}
                         </Typography>
                       </TableCell>
                       <TableCell>
@@ -387,7 +424,7 @@ const CashOutListView = () => {
                           variant='body2'
                           sx={{ maxWidth: 280, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                         >
-                          {item.description || '\u2014'}
+                          {item.expenseDescription || '\u2014'}
                         </Typography>
                       </TableCell>
                       <TableCell>
@@ -399,10 +436,13 @@ const CashOutListView = () => {
                         </Typography>
                       </TableCell>
                       <TableCell>
+                        <CustomChip round='true' size='small' color='success' label='Pagado' />
+                      </TableCell>
+                      <TableCell>
                         {item.isReconciled ? (
                           <CustomChip round='true' size='small' color='success' label='Conciliado' />
                         ) : (
-                          <CustomChip round='true' size='small' color='secondary' label='Pendiente' />
+                          <CustomChip round='true' size='small' color='warning' label='Por conciliar' />
                         )}
                       </TableCell>
                     </TableRow>
