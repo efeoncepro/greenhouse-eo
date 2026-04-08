@@ -46,6 +46,7 @@ Mutacion en store
 | `supplier` | `supplier.created`, `supplier.updated` | `finance/postgres-store-slice2.ts` | `{ supplierId }` | — |
 | `exchange_rate` | `exchange_rate.updated` | `finance/postgres-store-slice2.ts` | `{ currency, rate }` | — |
 | `economic_indicator` | `finance.economic_indicator.upserted` | `finance/postgres-store.ts` | `{ indicatorId, indicatorCode, indicatorDate, value, source }` | `member_capacity_economics`, `person_intelligence`, futuros consumers de forecast laboral/financiero |
+| `finance_expense_payment` | `finance.expense_payment.recorded` | `finance/expense-payment-ledger.ts` | `{ paymentId, expenseId, paymentDate, amount, paymentSource, reference, paymentStatus, amountPaid }` | client-economics, commercial-cost-attribution, operational-pl, period-closure-status |
 
 ### Quotes (TASK-210)
 

@@ -22,6 +22,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 ### Finanzas
 
 - [Cotizaciones multi-source](finance/cotizaciones-multi-source.md) — cotizaciones de Nubox y HubSpot unificadas, sync automatico, creacion outbound, mapeo de estados
+- [Modulos de Caja — Cobros, Pagos y Posicion de Caja](finance/modulos-caja-cobros-pagos.md) — cobros (cash in), pagos (cash out), posicion de caja, registro de pagos, diferencia devengado vs caja
 
 ### HR y Nomina
 

@@ -1,23 +1,8 @@
--- ============================================================
--- Expense Payment Ledger
--- TASK-280: Finance Cash Modules — Ingresos y Egresos
--- ============================================================
--- This migration:
---   1. Creates greenhouse_finance.expense_payments (symmetric to income_payments)
---   2. Adds amount_paid column to expenses
---   3. Creates trigger to derive expenses.amount_paid from SUM(expense_payments.amount)
---   4. Backfills expense_payments from existing paid expenses
--- ============================================================
-
 -- Up Migration
--- NOTE: This migration used wrong markers originally and ran both up+down.
--- The actual table creation is in 20260408003922395_recreate-expense-payments-table.sql
 
--- ------------------------------------------------------------
--- 1. Create expense_payments table
--- ------------------------------------------------------------
+-- Recreate expense_payments table (original migration used wrong markers)
 
-CREATE TABLE greenhouse_finance.expense_payments (
+CREATE TABLE IF NOT EXISTS greenhouse_finance.expense_payments (
   payment_id              TEXT PRIMARY KEY,
   expense_id              TEXT NOT NULL REFERENCES greenhouse_finance.expenses(expense_id) ON DELETE CASCADE,
   payment_date            DATE NOT NULL,
@@ -38,26 +23,15 @@ CREATE TABLE greenhouse_finance.expense_payments (
   created_at              TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- Indices
-CREATE INDEX idx_expense_payments_expense_id ON greenhouse_finance.expense_payments(expense_id);
-CREATE INDEX idx_expense_payments_payment_date ON greenhouse_finance.expense_payments(payment_date);
+CREATE INDEX IF NOT EXISTS idx_expense_payments_expense_id ON greenhouse_finance.expense_payments(expense_id);
+CREATE INDEX IF NOT EXISTS idx_expense_payments_payment_date ON greenhouse_finance.expense_payments(payment_date);
 
--- Deduplication: same expense + reference = idempotent
-CREATE UNIQUE INDEX finance_expense_payments_dedup_ref_idx
+CREATE UNIQUE INDEX IF NOT EXISTS finance_expense_payments_dedup_ref_idx
   ON greenhouse_finance.expense_payments (expense_id, reference)
   WHERE reference IS NOT NULL;
 
--- ------------------------------------------------------------
--- 2. Add amount_paid column to expenses (if not exists)
--- ------------------------------------------------------------
-
 ALTER TABLE greenhouse_finance.expenses
   ADD COLUMN IF NOT EXISTS amount_paid NUMERIC(14, 2) NOT NULL DEFAULT 0;
-
--- ------------------------------------------------------------
--- 3. Trigger: derive expenses.amount_paid and payment_status
---    from SUM(expense_payments.amount) — mirrors income pattern
--- ------------------------------------------------------------
 
 CREATE OR REPLACE FUNCTION greenhouse_finance.fn_sync_expense_amount_paid()
 RETURNS TRIGGER AS $$
@@ -103,12 +77,7 @@ CREATE TRIGGER trg_sync_expense_amount_paid
   FOR EACH ROW
   EXECUTE FUNCTION greenhouse_finance.fn_sync_expense_amount_paid();
 
--- ------------------------------------------------------------
--- 4. Backfill: migrate existing paid expenses into expense_payments
---    For expenses with payment_status = 'paid' and total_amount > 0,
---    create a single payment record with the full amount.
--- ------------------------------------------------------------
-
+-- Backfill paid expenses
 INSERT INTO greenhouse_finance.expense_payments (
   payment_id, expense_id, payment_date, amount, currency,
   reference, payment_method, payment_source, notes, created_at
@@ -140,10 +109,15 @@ FROM (
 WHERE e.expense_id = sub.expense_id
   AND e.amount_paid <> sub.total_paid;
 
--- ------------------------------------------------------------
--- 5. Semantic comments
--- ------------------------------------------------------------
+-- Grants
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_finance.expense_payments TO greenhouse_runtime;
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_finance.expense_payments TO greenhouse_migrator;
+GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_finance.expense_payments TO greenhouse_app;
+GRANT EXECUTE ON FUNCTION greenhouse_finance.fn_sync_expense_amount_paid() TO greenhouse_runtime;
+GRANT EXECUTE ON FUNCTION greenhouse_finance.fn_sync_expense_amount_paid() TO greenhouse_migrator;
+GRANT EXECUTE ON FUNCTION greenhouse_finance.fn_sync_expense_amount_paid() TO greenhouse_app;
 
+-- Semantic comments
 COMMENT ON TABLE greenhouse_finance.expense_payments IS
   'Pagos individuales contra documentos de compra. Cada fila es un pago realizado.
    expenses.amount_paid es derivado de SUM(expense_payments.amount) via trigger.
@@ -151,15 +125,6 @@ COMMENT ON TABLE greenhouse_finance.expense_payments IS
 
 COMMENT ON COLUMN greenhouse_finance.expenses.amount_paid IS
   'Denormalized aggregate. Derived from SUM(expense_payments.amount) by trigger trg_sync_expense_amount_paid.';
-
--- ------------------------------------------------------------
--- 6. Grants
--- ------------------------------------------------------------
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_finance.expense_payments TO greenhouse_runtime;
-GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_finance.expense_payments TO greenhouse_migrator;
-GRANT EXECUTE ON FUNCTION greenhouse_finance.fn_sync_expense_amount_paid() TO greenhouse_runtime;
-GRANT EXECUTE ON FUNCTION greenhouse_finance.fn_sync_expense_amount_paid() TO greenhouse_migrator;
 
 -- Down Migration
 
