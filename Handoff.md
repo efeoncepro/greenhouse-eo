@@ -1,5 +1,98 @@
 # Handoff.md
 
+## Sesion 2026-04-08 — TASK-283 cerrada
+
+- estado actual:
+  - `TASK-283` quedó implementada y lista para merge/deploy
+  - el módulo `Banco` ya existe como surface propia en `Finance`
+  - acceso endurecido después del cierre: `Banco` solo lo pueden ver `efeonce_admin`, `finance_admin` y `finance_analyst`
+- cambios principales:
+  - nueva tabla `greenhouse_finance.account_balances` con snapshots diarios por cuenta y cierre de período
+  - nuevos helpers `account-balances.ts` e `internal-transfers.ts`
+  - nueva projection reactiva `accountBalancesProjection`
+  - nuevas APIs:
+    - `GET/POST /api/finance/bank`
+    - `GET/POST /api/finance/bank/[accountId]`
+    - `POST /api/finance/bank/transfer`
+  - nueva UI:
+    - `/finance/bank`
+    - `BankView`
+    - `AccountDetailDrawer`
+    - `AssignAccountDrawer`
+    - `InternalTransferDrawer`
+  - navegación y access catalog ya incluyen `finanzas.banco`
+  - drawers de `Cobros`, `Pagos`, `Ingresos`, `Egresos` y settlement ya leen instrumentos desde `/api/finance/accounts`
+- validación ejecutada:
+  - `pnpm pg:connect:migrate` — OK
+  - `pnpm exec tsc --noEmit` — OK
+  - `pnpm lint` — OK
+  - `pnpm build` — OK
+- siguiente paso recomendado:
+  - validar en staging los flujos `Banco -> Transferencia interna`, `Asignación retroactiva` y `Cerrar período`
+
+## Sesion 2026-04-08 — TASK-283 tomada para discovery/audit
+
+- estado actual:
+  - `TASK-283` movida a `in-progress`
+  - discovery y auditoría formal ya ejecutados antes de escribir runtime
+- hallazgos que cambian la baseline:
+  - `TASK-282` ya está cerrada y operativa; deja de ser bloqueo y pasa a foundation real
+  - la task estaba stale respecto al runtime: dependencias reales son `reconciliation_periods` / `bank_statement_rows`, no `fin_*`
+  - `settlement_groups` / `settlement_legs` ya existen y soportan `internal_transfer`, `funding`, `fx_conversion`, pero todavía no existe un módulo Banco/Tesorería como surface propia
+  - no existe `account_balances`, no existe projection reactiva de balances por cuenta y no existe `POST /api/finance/bank/transfer`
+  - tampoco existe `viewCode` `finanzas.banco`; navegación y permisos tendrán que ampliarse
+- siguiente paso:
+  - imprimir mapa de conexiones completo entre treasury, cash ledgers, settlement, reconciliación, proyecciones y navegación
+  - luego cerrar plan de implementación por slices antes de invocar skills y editar código
+
+## Sesion 2026-04-08 — TASK-282 cerrada
+
+- estado actual:
+  - `TASK-282` ya quedó en `complete`
+  - el módulo de conciliación ya no está solo en foundation: quedó operable end-to-end desde el portal
+- cambios principales:
+  - `ReconciliationDetailView` ahora muestra snapshots instrument-aware del período y acciones `Marcar conciliado` / `Cerrar período`
+  - `SettlementOrchestrationDrawer` quedó disponible desde el historial de pagos/cobros en `IncomeDetailView` y `ExpenseDetailView`
+  - nuevo endpoint `GET/POST /api/finance/settlements/payment` para inspección y alta de legs suplementarios
+  - `RegisterCashOutDrawer` soporta `settlementMode`, `fundingInstrumentId`, `fee*`, `exchangeRateOverride`
+  - `RegisterCashInDrawer` soporta `fee*` y `exchangeRateOverride`
+  - `match`, `unmatch`, `exclude` y `auto-match` ya no duplican eventos de pago en las routes
+  - `period_closure_status`, `client_economics`, `operational_pl` y `commercial_cost_attribution` ya escuchan también `internal_transfer` / `fx_conversion`
+- validación ejecutada:
+  - `pnpm exec tsc --noEmit` — OK
+  - `pnpm lint` — OK
+  - `pnpm build` — OK
+  - `pnpm exec vitest run src/app/api/finance/bigquery-write-cutover.test.ts` — OK
+- validación staging adicional:
+  - `cash-in`, `cash-out`, `reconciliation` y `settlements/payment` responden `200` con la shape nueva
+  - el drawer `Liquidación` abre correctamente desde `ExpenseDetailView`
+  - se detectó y corrigió un bug donde los `supplemental settlement legs` se insertaban pero `ensureSettlementForPayment()` los borraba al reread
+  - fix aplicado: `ensureSettlementForPayment()` ahora preserva legs suplementarios, recalcula `settlement_mode` efectivo y no degrada un grupo `mixed` a `direct`
+  - se validó también el tramo `statement import -> reimport idempotente -> unmatch -> match` sobre `santander-clp_2026_03`
+  - el row `santander-clp_2026_03_3bf2f840e20a` se importó una vez, el segundo import quedó en `skipped = 1`, `unmatch` bajó `isReconciled = false` en `cash-in` y el rematch volvió a dejar reconciliados el `income_payment` y su `settlement_leg`
+- riesgo / siguiente paso recomendado:
+  - como follow-on ya no queda deuda funcional de `TASK-282`; lo siguiente es tesorería/banking UX o nuevos rails, no hardening del core
+  - `TASK-283` aparece en el backlog pero no pertenece a este cierre
+
+## Sesion 2026-04-08 — TASK-282 tomada para discovery/audit
+
+### TASK-282 — Finance Payment Instrument Reconciliation & Settlement Orchestration
+
+- rama de trabajo esperada: `task/TASK-282-finance-payment-instrument-reconciliation-settlement-orchestration`
+- estado:
+  - `TASK-282` esta en `in-progress`
+  - discovery y auditoria en curso antes de tocar runtime
+- hallazgos iniciales que cambian la baseline:
+  - `TASK-280` y `TASK-281` ya actuan como foundations implementadas; dejaron de ser bloqueos reales
+  - conciliacion sigue con fallback BigQuery activo y ese residual de `TASK-179` debe absorberse en Slice 1
+  - ingresos ya tienen carril parcial payment-level; egresos siguen document-level sobre `expenses`
+  - `ReconciliationView` sigue cargando pendientes desde documentos, no desde `cash-in` / `cash-out`
+  - el outbox/reactive engine ya consume `finance.income_payment.recorded` y `finance.expense_payment.recorded` en `client_economics`, `commercial_cost_attribution`, `operational_pl` y `period_closure_status`
+- siguiente paso:
+  - imprimir auditoria formal `TASK-282`
+  - imprimir mapa de conexiones
+  - cerrar plan de implementacion antes de invocar skills y editar codigo
+
 ## Sesion 2026-04-08 — Finance cash lane alignment (document detail → cash modules)
 
 ### UX semantica caja: estado != conciliacion (2026-04-08)

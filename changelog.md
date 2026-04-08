@@ -2,6 +2,40 @@
 
 ## 2026-04-08
 
+### 2026-04-08 — Finance bank & treasury module completed
+
+- Nuevo módulo `Finance > Banco` (`/finance/bank`) con lectura ledger-first por instrumento: saldos por cuenta, coverage de asignación, discrepancia contra conciliación, exposición multi-moneda y tarjetas de crédito.
+- Restricción de acceso endurecida: `Banco` queda visible solo para `efeonce_admin`, `finance_admin` y `finance_analyst`, tanto en UI como en App Router y APIs.
+- Nueva tabla `greenhouse_finance.account_balances` con snapshots diarios por cuenta e indicadores de cierre de período, materializada reactivamente desde eventos de caja, settlement y conciliación.
+- Nuevos endpoints:
+  - `GET/POST /api/finance/bank`
+  - `GET/POST /api/finance/bank/[accountId]`
+  - `POST /api/finance/bank/transfer`
+- Nueva acción operativa de tesorería: `Transferencia interna`, que registra `settlement_groups` / `settlement_legs` entre cuentas propias y soporta `fx_conversion` cuando cruza monedas.
+- Nueva acción `Asignación retroactiva` para vincular cobros/pagos existentes a instrumentos y recuperar coverage de tesorería, caja y conciliación sobre el mismo ledger.
+- Integración de navegación y permisos:
+  - item `Banco` dentro de `Finance > Caja`
+  - nuevo `viewCode` `finanzas.banco`
+- Ajuste de acceso importante: drawers de caja y settlement dejaron de depender de `/api/admin/payment-instruments` y ahora consumen `/api/finance/accounts`, evitando el bloqueo para usuarios financieros no-admin.
+
+### 2026-04-08 — Finance reconciliation settlement orchestration completed
+
+- Fix posterior al cierre: el alta de `supplemental settlement legs` ya no se pierde al releer el settlement group. `ensureSettlementForPayment()` ahora preserva legs manuales (`funding`, `internal_transfer`, `fx_conversion`, `fee`) y recalcula `settlement_mode = mixed` cuando existe más de un tramo.
+- Fix posterior al cierre: la importación idempotente de cartolas ya usa el predicado correcto del índice parcial de `bank_statement_rows`, por lo que reimportar el mismo extracto del período deja `skipped > 0` en vez de romper con `42P10`.
+- Fix posterior al cierre: la recomputación de reconciliación sobre `income_payments` / `expense_payments` dejó de escribir `updated_at` sobre tablas que no tienen esa columna, cerrando el loop real `unmatch -> match` contra el ledger y settlement leg canónico.
+- `Finance > Conciliación` quedó cerrada sobre el ledger real de caja: `cash-in`, `cash-out` y `Conciliación` ya hablan el mismo contrato con `matchedPaymentId` y `matchedSettlementLegId`.
+- `auto-match`, `match`, `unmatch` y `exclude` dejaron de duplicar eventos de pago en las routes; la transición reconciliado/no reconciliado vive en `postgres-reconciliation`.
+- Nuevo endpoint `GET/POST /api/finance/settlements/payment` + drawer `SettlementOrchestrationDrawer` para inspeccionar settlement groups y agregar legs manuales (`internal_transfer`, `funding`, `fx_conversion`, `fee`) desde el portal.
+- `RegisterCashOutDrawer` ahora soporta pago directo o vía intermediario (`fundingInstrumentId`, `fee*`, `exchangeRateOverride`) y `RegisterCashInDrawer` soporta fee y FX override.
+- `ReconciliationDetailView` ahora muestra snapshots del período (instrumento, proveedor, moneda) y acciones operativas `Marcar conciliado` / `Cerrar período`.
+- Eventos y consumers extendidos:
+  - catálogo con `finance.internal_transfer.recorded` y `finance.fx_conversion.recorded`
+  - `client_economics`, `operational_pl`, `commercial_cost_attribution`, `period_closure_status` y `data-quality` ya reaccionan o auditan el nuevo contrato
+- Validación staging final:
+  - `statement import -> reimport -> unmatch -> match` validado sobre `santander-clp_2026_03`
+  - el cobro `PAY-NUBOX-inc-3699924` vuelve a cambiar `isReconciled` en `cash-in` y en `settlement_legs` al conciliar/desconciliar manualmente
+- Impacto operativo: Greenhouse ya puede modelar y conciliar mejor cadenas multi-leg como `Santander -> Global66 -> payout/fee/fx` sin volver a mezclar documento, caja y conciliación.
+
 ### 2026-04-08 — Finance cash lane alignment: registered payments now surface in Cobros/Pagos
 
 - `IncomeDetailView` ya registra cobros contra el endpoint canónico `POST /api/finance/income/[id]/payments` en vez del carril legacy singular `/payment`, evitando que un fallback a BigQuery deje el cobro fuera de `greenhouse_finance.income_payments`.

@@ -69,6 +69,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
  *   reference?: string
  *   paymentMethod?: string
  *   paymentAccountId?: string
+ *   exchangeRateOverride?: number
+ *   settlementMode?: 'direct' | 'via_intermediary'
+ *   fundingInstrumentId?: string
+ *   feeAmount?: number
+ *   feeCurrency?: string
+ *   feeReference?: string
  *   paymentSource?: 'manual' | 'payroll_system' | 'nubox_sync' | 'bank_statement'
  *   notes?: string
  * }
@@ -102,7 +108,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       paymentAccountId: body.paymentAccountId ? normalizeString(body.paymentAccountId) : null,
       paymentSource: body.paymentSource || undefined,
       notes: body.notes ? normalizeString(body.notes) : null,
-      actorUserId: tenant.userId || null
+      actorUserId: tenant.userId || null,
+      exchangeRateOverride: body.exchangeRateOverride != null ? toNumber(body.exchangeRateOverride) : null,
+      settlementConfig: {
+        settlementMode: body.settlementMode ? normalizeString(body.settlementMode) as 'direct' | 'via_intermediary' : null,
+        fundingInstrumentId: body.fundingInstrumentId ? normalizeString(body.fundingInstrumentId) : null,
+        feeAmount: body.feeAmount != null ? toNumber(body.feeAmount) : null,
+        feeCurrency: body.feeCurrency ? normalizeString(body.feeCurrency) : null,
+        feeReference: body.feeReference ? normalizeString(body.feeReference) : null
+      }
     })
 
     return NextResponse.json(

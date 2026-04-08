@@ -342,17 +342,17 @@ Finance
 
 ## Acceptance Criteria
 
-- [ ] Tabla `expense_payments` creada con trigger de derivacion `amount_paid` + `payment_status`
-- [ ] Backend `recordExpensePayment()` sigue patron de `recordPayment()`: transaccion, locking, deduplicacion, outbox event
-- [ ] API `POST /api/finance/expenses/[id]/payment` funcional
-- [ ] Datos existentes migrados: expenses con `payment_status = 'paid'` tienen registro en `expense_payments`
-- [ ] Componentes `PaymentRegistrationCard` y `PaymentHistoryTable` extraidos y reutilizados en `IncomeDetailView` y `ExpenseDetailView`
-- [ ] Vista `CashInListView` muestra todos los cobros de `income_payments` con filtros y KPIs
-- [ ] Vista `CashOutListView` muestra todos los pagos de `expense_payments` con filtros, agrupacion por tipo, y KPIs
-- [ ] Vista `CashPositionView` muestra saldo por cuenta, flujo neto del periodo, y grafico 12 meses con datos reales de caja
-- [ ] Navegacion de Finance incluye seccion "Caja" con Cobros, Pagos, y Posicion de caja
-- [ ] P&L, `client_economics`, y `operational_pl_snapshots` siguen funcionando sin regresion
-- [ ] `pnpm build` y `pnpm lint` pasan
+- [x] Tabla `expense_payments` creada con trigger de derivacion `amount_paid` + `payment_status`
+- [x] Backend `recordExpensePayment()` sigue patron de `recordPayment()`: transaccion, locking, deduplicacion, outbox event
+- [x] API `POST /api/finance/expenses/[id]/payment` funcional
+- [x] Datos existentes migrados: expenses con `payment_status = 'paid'` tienen registro en `expense_payments`
+- [x] Componentes `PaymentRegistrationCard` y `PaymentHistoryTable` extraidos y reutilizados en `IncomeDetailView` y `ExpenseDetailView`
+- [x] Vista `CashInListView` muestra todos los cobros de `income_payments` con filtros y KPIs
+- [x] Vista `CashOutListView` muestra todos los pagos de `expense_payments` con filtros, agrupacion por tipo, y KPIs
+- [x] Vista `CashPositionView` muestra saldo por cuenta, flujo neto del periodo, y grafico 12 meses con datos reales de caja
+- [x] Navegacion de Finance incluye seccion "Caja" con Cobros, Pagos, y Posicion de caja
+- [x] P&L, `client_economics`, y `operational_pl_snapshots` siguen funcionando sin regresion
+- [x] `pnpm build` y `pnpm lint` pasan
 
 ## Verification
 
@@ -370,11 +370,11 @@ Finance
 
 ## Closing Protocol
 
-- [ ] Marcar TASK-194 como absorbida por TASK-280 en `docs/tasks/README.md` y en su archivo
-- [ ] Actualizar TASK-224 con nota delta indicando que la surface de caja fue materializada
-- [ ] Actualizar `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` con schema de `expense_payments` y nuevos endpoints
-- [ ] Actualizar `project_context.md` con nuevos modulos de caja
-- [ ] Actualizar `greenhouse-nomenclature.ts` si se agregan nuevos labels
+- [x] Marcar TASK-194 como absorbida por TASK-280 en `docs/tasks/README.md` y en su archivo
+- [x] Actualizar TASK-224 con nota delta indicando que la surface de caja fue materializada
+- [x] Actualizar `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` con schema de `expense_payments` y nuevos endpoints
+- [x] Actualizar `project_context.md` con nuevos modulos de caja
+- [x] Actualizar `greenhouse-nomenclature.ts` si se agregan nuevos labels
 
 ## Follow-ups
 

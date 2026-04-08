@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { requireAdminTenantContext } from '@/lib/tenant/authorization'
+import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import {
   assertValidCurrency,
   FinanceValidationError,
@@ -23,7 +23,7 @@ export async function GET(
   _request: Request,
   context: { params: Promise<{ id: string }> }
 ) {
-  const { tenant, errorResponse } = await requireAdminTenantContext()
+  const { tenant, errorResponse } = await requireFinanceTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -51,7 +51,7 @@ export async function PUT(
   request: Request,
   context: { params: Promise<{ id: string }> }
 ) {
-  const { tenant, errorResponse } = await requireAdminTenantContext()
+  const { tenant, errorResponse } = await requireFinanceTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

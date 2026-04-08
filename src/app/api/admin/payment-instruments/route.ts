@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { requireAdminTenantContext } from '@/lib/tenant/authorization'
+import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import {
   assertNonEmptyString,
   assertValidCurrency,
@@ -15,7 +15,7 @@ import {
   listFinanceAccountsFromPostgres,
   createFinanceAccountInPostgres
 } from '@/lib/finance/postgres-store'
-import { INSTRUMENT_CATEGORIES, type InstrumentCategory } from '@/config/payment-instruments'
+import { INSTRUMENT_CATEGORIES, getProvider, type InstrumentCategory } from '@/config/payment-instruments'
 
 export const dynamic = 'force-dynamic'
 
@@ -57,7 +57,7 @@ const defaultAccountTypeForCategory = (category: InstrumentCategory): AccountTyp
 }
 
 export async function GET() {
-  const { tenant, errorResponse } = await requireAdminTenantContext()
+  const { tenant, errorResponse } = await requireFinanceTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -66,9 +66,36 @@ export async function GET() {
   try {
     const accounts = await listFinanceAccountsFromPostgres({ includeInactive: true })
 
+    const items = accounts.map(a => ({
+      accountId: a.accountId,
+      instrumentName: a.accountName,
+      instrumentCategory: a.instrumentCategory,
+      providerSlug: a.providerSlug,
+      providerName: a.providerSlug ? getProvider(a.providerSlug)?.name ?? null : null,
+      currency: a.currency,
+      active: a.isActive,
+      isActive: a.isActive,
+      accountName: a.accountName,
+      bankName: a.bankName,
+      accountNumber: a.accountNumber,
+      accountType: a.accountType,
+      country: a.country,
+      openingBalance: a.openingBalance,
+      defaultFor: a.defaultFor ?? [],
+      displayOrder: a.displayOrder,
+      cardLastFour: a.cardLastFour,
+      cardNetwork: a.cardNetwork,
+      creditLimit: a.creditLimit,
+      providerIdentifier: a.providerIdentifier,
+      responsibleUserId: a.responsibleUserId,
+      notes: a.notes,
+      metadataJson: a.metadataJson ?? {},
+      createdAt: a.createdAt ?? ''
+    }))
+
     return NextResponse.json({
-      items: accounts,
-      total: accounts.length
+      items,
+      total: items.length
     })
   } catch (error) {
     if (error instanceof FinanceValidationError) {
@@ -80,7 +107,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const { tenant, errorResponse } = await requireAdminTenantContext()
+  const { tenant, errorResponse } = await requireFinanceTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -90,8 +117,9 @@ export async function POST(request: Request) {
     const body = await request.json()
 
     // ── Required fields ──
-    const accountName = assertNonEmptyString(body.accountName, 'accountName')
-    const bankName = assertNonEmptyString(body.bankName, 'bankName')
+    // Accept both `instrumentName` (from CreatePaymentInstrumentDrawer) and `accountName` (legacy)
+    const accountName = assertNonEmptyString(body.instrumentName || body.accountName, 'instrumentName')
+    const bankName = normalizeString(body.bankName) || accountName
     const currency = assertValidCurrency(body.currency)
 
     // Validate instrument category
@@ -108,16 +136,18 @@ export async function POST(request: Request) {
     // ── Optional fields ──
     const providerSlug = body.providerSlug ? normalizeString(body.providerSlug) : null
 
-    const accountType = (body.accountType && ACCOUNT_TYPES.includes(body.accountType))
-      ? body.accountType as AccountType
+    const rawAccountType = body.accountType || body.bankAccountType
+
+    const accountType = (rawAccountType && ACCOUNT_TYPES.includes(rawAccountType))
+      ? rawAccountType as AccountType
       : defaultAccountTypeForCategory(instrumentCategory)
 
     const country = normalizeString(body.country) || 'CL'
-    const providerIdentifier = body.providerIdentifier ? normalizeString(body.providerIdentifier) : null
-    const cardLastFour = body.cardLastFour ? normalizeString(body.cardLastFour) : null
-    const cardNetwork = body.cardNetwork ? normalizeString(body.cardNetwork) : null
+    const providerIdentifier = normalizeString(body.providerIdentifier || body.fintechAccountId || body.merchantId || body.rutEmpresa) || null
+    const cardLastFour = normalizeString(body.cardLastFour || body.cardLast4) || null
+    const cardNetwork = normalizeString(body.cardNetwork) || null
     const creditLimit = toNullableNumber(body.creditLimit)
-    const accountNumber = body.accountNumber ? normalizeString(body.accountNumber) : null
+    const accountNumber = normalizeString(body.accountNumber || body.bankAccountNumber) || null
     const accountNumberFull = body.accountNumberFull ? normalizeString(body.accountNumberFull) : null
     const responsibleUserId = body.responsibleUserId ? normalizeString(body.responsibleUserId) : null
     const defaultFor = Array.isArray(body.defaultFor) ? body.defaultFor.map(String) : []

@@ -1173,6 +1173,34 @@ export interface GreenhouseDeliveryTasks {
   workflow_review_open: Generated<boolean>;
 }
 
+export interface GreenhouseFinanceAccountBalances {
+  account_id: string;
+  balance_date: Timestamp;
+  balance_id: string;
+  closed_at: Timestamp | null;
+  closed_by_user_id: string | null;
+  closing_balance: Generated<Numeric>;
+  /**
+   * Closing balance converted to CLP using fx_rate_used at materialization time.
+   */
+  closing_balance_clp: Numeric | null;
+  computed_at: Generated<Timestamp>;
+  created_at: Generated<Timestamp>;
+  currency: string;
+  fx_gain_loss_clp: Generated<Numeric>;
+  fx_rate_used: Numeric | null;
+  /**
+   * Soft immutable period-close flag. Closed snapshots are preserved for audit and not overwritten by reactive recompute.
+   */
+  is_period_closed: Generated<boolean>;
+  last_transaction_at: Timestamp | null;
+  opening_balance: Generated<Numeric>;
+  period_inflows: Generated<Numeric>;
+  period_outflows: Generated<Numeric>;
+  transaction_count: Generated<number>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseFinanceAccounts {
   account_id: string;
   account_name: string;
@@ -1221,11 +1249,19 @@ export interface GreenhouseFinanceBankStatementRows {
   matched_by_user_id: string | null;
   matched_id: string | null;
   matched_payment_id: string | null;
+  matched_settlement_leg_id: string | null;
   matched_type: string | null;
   notes: string | null;
   period_id: string;
   reference: string | null;
   row_id: string;
+  source_import_batch_id: string | null;
+  /**
+   * Fingerprint determinístico del extracto para imports idempotentes y retries seguros.
+   */
+  source_import_fingerprint: string | null;
+  source_imported_at: Timestamp | null;
+  source_payload_json: Generated<Json>;
   transaction_date: Timestamp;
   value_date: Timestamp | null;
 }
@@ -1342,6 +1378,7 @@ export interface GreenhouseFinanceExpensePayments {
   recorded_at: Generated<Timestamp | null>;
   recorded_by_user_id: string | null;
   reference: string | null;
+  settlement_group_id: string | null;
 }
 
 export interface GreenhouseFinanceExpenses {
@@ -1584,6 +1621,7 @@ export interface GreenhouseFinanceIncomePayments {
   recorded_at: Generated<Timestamp | null>;
   recorded_by_user_id: string | null;
   reference: string | null;
+  settlement_group_id: string | null;
 }
 
 export interface GreenhouseFinanceNuboxEmissionLog {
@@ -1714,10 +1752,21 @@ export interface GreenhouseFinanceReconciliationPeriods {
   closing_balance_system: Numeric | null;
   created_at: Generated<Timestamp>;
   difference: Numeric | null;
+  /**
+   * Snapshot del tipo de instrumento al crear el período de conciliación.
+   */
+  instrument_category_snapshot: string | null;
+  metadata_json: Generated<Json>;
   month: number;
   notes: string | null;
   opening_balance: Numeric;
+  period_currency_snapshot: string | null;
   period_id: string;
+  provider_name_snapshot: string | null;
+  /**
+   * Snapshot del provider canónico del instrumento al crear el período de conciliación.
+   */
+  provider_slug_snapshot: string | null;
   reconciled_at: Timestamp | null;
   reconciled_by_user_id: string | null;
   statement_imported: Generated<boolean>;
@@ -1756,6 +1805,46 @@ export interface GreenhouseFinanceServiceEntrySheets {
   status: Generated<string>;
   submitted_at: Timestamp | null;
   updated_at: Generated<Timestamp | null>;
+}
+
+export interface GreenhouseFinanceSettlementGroups {
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  group_direction: string;
+  notes: string | null;
+  primary_instrument_id: string | null;
+  provider_reference: string | null;
+  provider_status: Generated<string>;
+  settlement_group_id: string;
+  settlement_mode: Generated<string>;
+  source_payment_id: string | null;
+  source_payment_type: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinanceSettlementLegs {
+  amount: Numeric;
+  amount_clp: Numeric | null;
+  counterparty_instrument_id: string | null;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  currency: string;
+  direction: string;
+  fx_rate: Numeric | null;
+  instrument_id: string | null;
+  is_reconciled: Generated<boolean>;
+  leg_type: string;
+  linked_payment_id: string | null;
+  linked_payment_type: string | null;
+  notes: string | null;
+  provider_reference: string | null;
+  provider_status: Generated<string>;
+  reconciled_at: Timestamp | null;
+  reconciliation_row_id: string | null;
+  settlement_group_id: string;
+  settlement_leg_id: string;
+  transaction_date: Timestamp | null;
+  updated_at: Generated<Timestamp>;
 }
 
 export interface GreenhouseFinanceSuppliers {
@@ -3611,6 +3700,7 @@ export interface DB {
   "greenhouse_delivery.staff_aug_onboarding_items": GreenhouseDeliveryStaffAugOnboardingItems;
   "greenhouse_delivery.staff_aug_placements": GreenhouseDeliveryStaffAugPlacements;
   "greenhouse_delivery.tasks": GreenhouseDeliveryTasks;
+  "greenhouse_finance.account_balances": GreenhouseFinanceAccountBalances;
   "greenhouse_finance.accounts": GreenhouseFinanceAccounts;
   "greenhouse_finance.bank_statement_rows": GreenhouseFinanceBankStatementRows;
   "greenhouse_finance.client_economics": GreenhouseFinanceClientEconomics;
@@ -3631,6 +3721,8 @@ export interface DB {
   "greenhouse_finance.quotes": GreenhouseFinanceQuotes;
   "greenhouse_finance.reconciliation_periods": GreenhouseFinanceReconciliationPeriods;
   "greenhouse_finance.service_entry_sheets": GreenhouseFinanceServiceEntrySheets;
+  "greenhouse_finance.settlement_groups": GreenhouseFinanceSettlementGroups;
+  "greenhouse_finance.settlement_legs": GreenhouseFinanceSettlementLegs;
   "greenhouse_finance.suppliers": GreenhouseFinanceSuppliers;
   "greenhouse_hr.leave_balances": GreenhouseHrLeaveBalances;
   "greenhouse_hr.leave_policies": GreenhouseHrLeavePolicies;

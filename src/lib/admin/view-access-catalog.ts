@@ -192,6 +192,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'finance'
   },
   {
+    viewCode: 'finanzas.banco',
+    section: 'finanzas',
+    label: 'Banco',
+    description: 'Tesorería por instrumento, transferencias internas y saldos conciliables por cuenta.',
+    routePath: '/finance/bank',
+    routeGroup: 'finance'
+  },
+  {
     viewCode: 'finanzas.clientes',
     section: 'finanzas',
     label: 'Clientes',
@@ -278,6 +286,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     description: 'Organizaciones, spaces y gobierno de identidad.',
     routePath: '/admin/accounts',
     routeGroup: 'admin'
+  },
+  {
+    viewCode: 'administracion.instrumentos_pago',
+    section: 'administracion',
+    label: 'Instrumentos de pago',
+    description: 'Cuentas bancarias, tarjetas, fintech y medios de pago.',
+    routePath: '/admin/payment-instruments',
+    routeGroup: 'finance'
   },
   {
     viewCode: 'administracion.spaces',

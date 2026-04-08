@@ -56,6 +56,11 @@ export const canCloseCostIntelligencePeriod = (tenant: TenantContext) =>
 export const canReopenCostIntelligencePeriod = (tenant: TenantContext) =>
   hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
 
+export const canAccessBankTreasury = (tenant: TenantContext) =>
+  hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN) ||
+  hasRoleCode(tenant, ROLE_CODES.FINANCE_ADMIN) ||
+  hasRoleCode(tenant, ROLE_CODES.FINANCE_ANALYST)
+
 export const canAccessPeopleModule = (tenant: TenantContext) =>
   hasRouteGroup(tenant, 'people') ||
   hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN) ||
@@ -256,6 +261,35 @@ export const requireFinanceTenantContext = async () => {
   }
 
   if (!hasRouteGroup(tenant, 'finance') && !hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)) {
+    return {
+      tenant: null,
+      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+  }
+
+  return {
+    tenant,
+    errorResponse: null
+  }
+}
+
+export const requireBankTreasuryTenantContext = async () => {
+  const { tenant, unauthorizedResponse } = await requireTenantContext()
+
+  if (!tenant) {
+    return {
+      tenant: null,
+      errorResponse: unauthorizedResponse
+    }
+  }
+
+  const hasAccess = hasAuthorizedViewCode({
+    tenant,
+    viewCode: 'finanzas.banco',
+    fallback: canAccessBankTreasury(tenant)
+  })
+
+  if (!hasAccess) {
     return {
       tenant: null,
       errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })

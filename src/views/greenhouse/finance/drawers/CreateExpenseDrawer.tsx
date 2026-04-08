@@ -36,6 +36,7 @@ import {
   type ExpenseDrawerCategory,
   type ExpenseDrawerTab
 } from '@/lib/finance/expense-taxonomy'
+import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
 import CreateSupplierDrawer from '@views/greenhouse/finance/drawers/CreateSupplierDrawer'
 
 type SupplierOption = {
@@ -168,6 +169,10 @@ const CreateExpenseDrawer = ({ open, onClose, onSuccess }: Props) => {
   const [error, setError] = useState<string | null>(null)
   const [supplierDrawerOpen, setSupplierDrawerOpen] = useState(false)
 
+  // Payment instrument selector
+  const [instruments, setInstruments] = useState<Array<{ accountId: string; accountName: string; providerSlug: string | null; instrumentCategory: string; currency: string }>>([])
+  const [selectedInstrumentId, setSelectedInstrumentId] = useState('')
+
   const fetchMeta = useCallback(async () => {
     setLoadingMeta(true)
 
@@ -190,6 +195,17 @@ const CreateExpenseDrawer = ({ open, onClose, onSuccess }: Props) => {
     if (open && !meta) {
       fetchMeta()
     }
+
+    if (open) {
+      fetch('/api/finance/accounts', { cache: 'no-store' })
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (data?.items) {
+            setInstruments(data.items.filter((i: any) => i.isActive))
+          }
+        })
+        .catch(() => {})
+    }
   }, [fetchMeta, meta, open])
 
   const resetForm = useCallback(() => {
@@ -203,6 +219,7 @@ const CreateExpenseDrawer = ({ open, onClose, onSuccess }: Props) => {
     setPaymentMethod('')
     setPaymentProvider('')
     setPaymentRail('')
+    setSelectedInstrumentId('')
     setSupplierId('')
     setDocumentNumber('')
     setDocumentDate('')
@@ -344,6 +361,7 @@ const CreateExpenseDrawer = ({ open, onClose, onSuccess }: Props) => {
       miscellaneousCategory: drawerTab === 'other' ? selectedCategory.value : null,
       notes: notes.trim() || null,
       ...(currency !== 'CLP' && exchangeRate && { exchangeRateToClp: Number(exchangeRate) }),
+      ...(selectedInstrumentId && { paymentAccountId: selectedInstrumentId }),
       ...(supplierId && { supplierId }),
       ...(documentNumber.trim() && { documentNumber: documentNumber.trim() }),
       ...(documentDate && { documentDate })
@@ -624,6 +642,32 @@ const CreateExpenseDrawer = ({ open, onClose, onSuccess }: Props) => {
                         {(meta?.paymentRails ?? []).map(item => (
                           <MenuItem key={item} value={item}>
                             {PAYMENT_RAIL_LABELS[item] || item}
+                          </MenuItem>
+                        ))}
+                      </CustomTextField>
+                    </Grid>
+
+                    <Grid size={{ xs: 12 }}>
+                      <CustomTextField
+                        select
+                        fullWidth
+                        size='small'
+                        label='Pagado desde'
+                        value={selectedInstrumentId}
+                        onChange={event => setSelectedInstrumentId(event.target.value)}
+                      >
+                        <MenuItem value=''>— Sin asignar —</MenuItem>
+                        {instruments.map(inst => (
+                          <MenuItem key={inst.accountId} value={inst.accountId}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <PaymentInstrumentChip
+                                providerSlug={inst.providerSlug}
+                                instrumentName={inst.accountName}
+                                size='sm'
+                                showName={false}
+                              />
+                              {inst.accountName} ({inst.currency})
+                            </Box>
                           </MenuItem>
                         ))}
                       </CustomTextField>

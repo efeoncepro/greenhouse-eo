@@ -86,6 +86,11 @@ export type ReconciliationCandidate = {
   reconciliationId: string | null
   matchedRecordId?: string | null
   matchedPaymentId?: string | null
+  matchedSettlementLegId?: string | null
+  legType?: string | null
+  instrumentId?: string | null
+  instrumentName?: string | null
+  settlementMode?: string | null
 }
 
 export type ResolvedReconciliationTarget = {
@@ -93,6 +98,7 @@ export type ResolvedReconciliationTarget = {
   candidateId: string
   matchedRecordId: string
   matchedPaymentId: string | null
+  matchedSettlementLegId?: string | null
   isReconciled: boolean
   reconciliationId: string | null
 }

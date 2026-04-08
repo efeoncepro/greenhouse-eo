@@ -1,5 +1,7 @@
 import 'server-only'
 
+import { createHash, randomUUID } from 'node:crypto'
+
 import type { PoolClient } from 'pg'
 
 import {
@@ -16,6 +18,7 @@ import {
   toNumber,
   toTimestampString
 } from '@/lib/finance/shared'
+import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import type {
   ReconciliationCandidateType,
   ReconciliationPeriodContext,
@@ -43,6 +46,10 @@ type PostgresPeriodRow = {
   reconciled_by_user_id: string | null
   reconciled_at: string | Date | null
   notes: string | null
+  instrument_category_snapshot: string | null
+  provider_slug_snapshot: string | null
+  provider_name_snapshot: string | null
+  period_currency_snapshot: string | null
   created_at: string | Date | null
   updated_at: string | Date | null
 }
@@ -60,11 +67,39 @@ type PostgresStatementRow = {
   matched_type: string | null
   matched_id: string | null
   matched_payment_id: string | null
+  matched_settlement_leg_id: string | null
   match_confidence: unknown
   notes: string | null
   matched_by_user_id: string | null
   matched_at: string | Date | null
   created_at: string | Date | null
+}
+
+type SettlementLegCandidateRow = {
+  settlement_leg_id: string
+  settlement_group_id: string
+  linked_payment_type: string
+  linked_payment_id: string
+  leg_type: string
+  direction: string
+  instrument_id: string | null
+  instrument_name: string | null
+  settlement_mode: string | null
+  provider_reference: string | null
+  provider_status: string | null
+  transaction_date: string | Date | null
+  amount: unknown
+  currency: string | null
+  reconciliation_row_id: string | null
+  is_reconciled: boolean
+  payment_id: string
+  record_id: string
+  transaction_reference: string | null
+  document_reference: string | null
+  description: string | null
+  party_name: string | null
+  status: string | null
+  due_date: string | Date | null
 }
 
 type IncomeCandidateRow = {
@@ -101,8 +136,24 @@ type IncomeInvoiceFallbackRow = {
 }
 
 type ExpenseCandidateRow = {
+  payment_id: string
+  expense_id: string
+  amount: unknown
+  currency: string
+  payment_date: string | Date | null
+  reference: string | null
+  description: string
+  supplier_name: string | null
+  member_name: string | null
+  payment_status: string
+  is_reconciled: boolean
+  reconciliation_row_id: string | null
+}
+
+type ExpenseInvoiceFallbackRow = {
   expense_id: string
   total_amount: unknown
+  amount_paid: unknown
   currency: string
   payment_date: string | Date | null
   document_date: string | Date | null
@@ -114,6 +165,7 @@ type ExpenseCandidateRow = {
   payment_status: string
   is_reconciled: boolean
   reconciliation_id: string | null
+  payment_count: unknown
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────
@@ -156,6 +208,10 @@ const mapPeriod = (row: PostgresPeriodRow) => ({
   reconciledBy: str(row.reconciled_by_user_id),
   reconciledAt: toTimestampString(row.reconciled_at as string | { value?: string } | null),
   notes: str(row.notes),
+  instrumentCategorySnapshot: str(row.instrument_category_snapshot),
+  providerSlugSnapshot: str(row.provider_slug_snapshot),
+  providerNameSnapshot: str(row.provider_name_snapshot),
+  periodCurrencySnapshot: str(row.period_currency_snapshot),
   createdAt: toTimestampString(row.created_at as string | { value?: string } | null),
   updatedAt: toTimestampString(row.updated_at as string | { value?: string } | null)
 })
@@ -174,6 +230,7 @@ const mapStatementRow = (row: PostgresStatementRow) => ({
   matchedId: row.matched_payment_id ? normalizeString(row.matched_payment_id) : str(row.matched_id),
   matchedRecordId: str(row.matched_id),
   matchedPaymentId: str(row.matched_payment_id),
+  matchedSettlementLegId: str(row.matched_settlement_leg_id),
   matchConfidence: toNumber(row.match_confidence),
   notes: str(row.notes),
   matchedBy: str(row.matched_by_user_id),
@@ -196,6 +253,29 @@ const normalizeMatchStatusPg = (value: string | null | undefined) => {
       return 'unmatched'
   }
 }
+
+const buildStatementFingerprint = (
+  periodId: string,
+  row: {
+    transactionDate: string
+    valueDate?: string | null
+    description: string
+    reference?: string | null
+    amount: number
+    balance?: number | null
+  }
+) =>
+  createHash('md5')
+    .update([
+      periodId,
+      row.transactionDate,
+      row.valueDate || '',
+      normalizeString(row.description),
+      normalizeString(row.reference),
+      roundCurrency(row.amount).toFixed(2),
+      row.balance == null ? '' : roundCurrency(row.balance).toFixed(2)
+    ].join('||'))
+    .digest('hex')
 
 // ─── Periods: list ──────────────────────────────────────────────────
 
@@ -271,15 +351,48 @@ export const createReconciliationPeriodInPostgres = async ({
     )
   }
 
+  const accountRows = await queryRows<{
+    instrument_category: string | null
+    provider_slug: string | null
+    bank_name: string | null
+    currency: string | null
+  }>(
+    `
+      SELECT instrument_category, provider_slug, bank_name, currency
+      FROM greenhouse_finance.accounts
+      WHERE account_id = $1
+      LIMIT 1
+    `,
+    [accountId]
+  )
+
+  if (accountRows.length === 0) {
+    throw new FinanceValidationError(`Payment instrument "${accountId}" not found.`, 404)
+  }
+
+  const account = accountRows[0]
+
   await queryRows(
     `
       INSERT INTO greenhouse_finance.reconciliation_periods (
         period_id, account_id, year, month, opening_balance,
         status, statement_imported, statement_row_count,
-        notes, created_at, updated_at
-      ) VALUES ($1, $2, $3, $4, $5, 'open', FALSE, 0, $6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        notes, instrument_category_snapshot, provider_slug_snapshot, provider_name_snapshot,
+        period_currency_snapshot, created_at, updated_at
+      ) VALUES ($1, $2, $3, $4, $5, 'open', FALSE, 0, $6, $7, $8, $9, $10, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
     `,
-    [periodId, accountId, year, month, openingBalance, notes]
+    [
+      periodId,
+      accountId,
+      year,
+      month,
+      openingBalance,
+      notes,
+      str(account.instrument_category),
+      str(account.provider_slug),
+      str(account.bank_name),
+      str(account.currency)
+    ]
   )
 
   return { periodId, created: true }
@@ -442,38 +555,105 @@ export const importBankStatementsToPostgres = async (
   await assertFinanceSlice2PostgresReady()
 
   return withGreenhousePostgresTransaction(async client => {
-    // Get existing row count for ID generation
+    const importBatchId = `stmt-import-${randomUUID()}`
+    let imported = 0
+    let skipped = 0
+
+    const preparedRows = rows.map(row => ({
+      ...row,
+      fingerprint: buildStatementFingerprint(periodId, row)
+    }))
+
+    const uniqueRows = new Map<string, typeof preparedRows[number]>()
+
+    for (const row of preparedRows) {
+      if (uniqueRows.has(row.fingerprint)) {
+        skipped++
+        continue
+      }
+
+      uniqueRows.set(row.fingerprint, row)
+    }
+
+    const fingerprints = [...uniqueRows.keys()]
+
+    const existingRows = fingerprints.length > 0
+      ? await queryRows<{ source_import_fingerprint: string | null }>(
+          `
+            SELECT source_import_fingerprint
+            FROM greenhouse_finance.bank_statement_rows
+            WHERE period_id = $1
+              AND source_import_fingerprint = ANY($2::text[])
+          `,
+          [periodId, fingerprints],
+          client
+        )
+      : []
+
+    const existingFingerprints = new Set(
+      existingRows
+        .map(row => str(row.source_import_fingerprint))
+        .filter((value): value is string => Boolean(value))
+    )
+
+    for (const row of uniqueRows.values()) {
+      const fingerprint = row.fingerprint
+
+      if (existingFingerprints.has(fingerprint)) {
+        skipped++
+        continue
+      }
+
+      const rowId = `${periodId}_${fingerprint.slice(0, 12)}`
+
+      const inserted = await queryRows<{ row_id: string }>(
+        `
+          INSERT INTO greenhouse_finance.bank_statement_rows (
+            row_id, period_id, transaction_date, value_date,
+            description, reference, amount, balance,
+            match_status, source_import_batch_id, source_import_fingerprint, source_imported_at,
+            source_payload_json, created_at
+          ) VALUES ($1, $2, $3::date, $4::date, $5, $6, $7, $8, 'unmatched', $9, $10, CURRENT_TIMESTAMP, $11::jsonb, CURRENT_TIMESTAMP)
+          ON CONFLICT (period_id, source_import_fingerprint)
+            WHERE source_import_fingerprint IS NOT NULL
+          DO NOTHING
+          RETURNING row_id
+        `,
+        [
+          rowId,
+          periodId,
+          row.transactionDate,
+          row.valueDate || null,
+          row.description,
+          row.reference || null,
+          row.amount,
+          row.balance ?? null,
+          importBatchId,
+          fingerprint,
+          JSON.stringify({
+            transactionDate: row.transactionDate,
+            valueDate: row.valueDate || null,
+            description: row.description,
+            reference: row.reference || null,
+            amount: roundCurrency(row.amount),
+            balance: row.balance ?? null
+          })
+        ],
+        client
+      )
+
+      if (inserted.length > 0) {
+        imported++
+      }
+    }
+
     const countResult = await queryRows<{ total: string }>(
       `SELECT COUNT(*) AS total FROM greenhouse_finance.bank_statement_rows WHERE period_id = $1`,
       [periodId],
       client
     )
 
-    const existingRowCount = toNumber(countResult[0]?.total)
-    let imported = 0
-
-    for (const row of rows) {
-      const rowId = `${periodId}_${String(existingRowCount + imported + 1).padStart(4, '0')}`
-
-      await queryRows(
-        `
-          INSERT INTO greenhouse_finance.bank_statement_rows (
-            row_id, period_id, transaction_date, value_date,
-            description, reference, amount, balance,
-            match_status, created_at
-          ) VALUES ($1, $2, $3::date, $4::date, $5, $6, $7, $8, 'unmatched', CURRENT_TIMESTAMP)
-        `,
-        [
-          rowId, periodId, row.transactionDate,
-          row.valueDate || null,
-          row.description, row.reference || null,
-          row.amount, row.balance ?? null
-        ],
-        client
-      )
-
-      imported++
-    }
+    const totalRowCount = toNumber(countResult[0]?.total)
 
     // Update period metadata
     await queryRows(
@@ -487,11 +667,11 @@ export const importBankStatementsToPostgres = async (
           updated_at = CURRENT_TIMESTAMP
         WHERE period_id = $1
       `,
-      [periodId, existingRowCount + imported],
+      [periodId, totalRowCount],
       client
     )
 
-    return { imported, totalRowCount: existingRowCount + imported }
+    return { imported, skipped, totalRowCount, importBatchId }
   })
 }
 
@@ -518,6 +698,7 @@ export const updateStatementRowMatchInPostgres = async (
     matchedType: string
     matchedId: string
     matchedPaymentId: string | null
+    matchedSettlementLegId?: string | null
     matchConfidence: number
     matchedByUserId: string | null
     notes?: string | null
@@ -533,16 +714,17 @@ export const updateStatementRowMatchInPostgres = async (
         matched_type = $4,
         matched_id = $5,
         matched_payment_id = $6,
-        match_confidence = $7,
-        matched_by_user_id = $8,
+        matched_settlement_leg_id = $7,
+        match_confidence = $8,
+        matched_by_user_id = $9,
         matched_at = CURRENT_TIMESTAMP,
-        notes = $9
+        notes = $10
       WHERE row_id = $1 AND period_id = $2
     `,
     [
       rowId, periodId,
       match.matchStatus, match.matchedType, match.matchedId,
-      match.matchedPaymentId, match.matchConfidence,
+      match.matchedPaymentId, match.matchedSettlementLegId ?? null, match.matchConfidence,
       match.matchedByUserId, match.notes ?? null
     ]
   )
@@ -561,6 +743,7 @@ export const clearStatementRowMatchInPostgres = async (rowId: string, periodId: 
         matched_type = NULL,
         matched_id = NULL,
         matched_payment_id = NULL,
+        matched_settlement_leg_id = NULL,
         match_confidence = NULL,
         matched_by_user_id = NULL,
         matched_at = NULL
@@ -587,6 +770,7 @@ export const excludeStatementRowInPostgres = async (
         matched_type = NULL,
         matched_id = NULL,
         matched_payment_id = NULL,
+        matched_settlement_leg_id = NULL,
         match_confidence = NULL,
         matched_by_user_id = $3,
         matched_at = CURRENT_TIMESTAMP,
@@ -675,7 +859,86 @@ export const listReconciliationCandidatesFromPostgres = async ({
 
   // ── Income candidates via income_payments table ──
   if (shouldLoadIncome) {
-    // 1. Unreconciled individual payments
+    // 1. Canonical settlement legs linked to income payments
+    const incomeSettlementRows = await queryRows<SettlementLegCandidateRow>(
+      `
+        SELECT
+          sl.settlement_leg_id,
+          sl.settlement_group_id,
+          sl.linked_payment_type,
+          sl.linked_payment_id,
+          sl.leg_type,
+          sl.direction,
+          sl.instrument_id,
+          a.account_name AS instrument_name,
+          sg.settlement_mode,
+          sl.provider_reference,
+          sl.provider_status,
+          sl.transaction_date,
+          sl.amount,
+          sl.currency,
+          sl.reconciliation_row_id,
+          sl.is_reconciled,
+          ip.payment_id,
+          i.income_id AS record_id,
+          ip.reference AS transaction_reference,
+          i.invoice_number AS document_reference,
+          i.description,
+          i.client_name AS party_name,
+          i.payment_status AS status,
+          i.due_date
+        FROM greenhouse_finance.settlement_legs sl
+        JOIN greenhouse_finance.settlement_groups sg ON sg.settlement_group_id = sl.settlement_group_id
+        JOIN greenhouse_finance.income_payments ip ON ip.payment_id = sl.linked_payment_id
+        JOIN greenhouse_finance.income i ON i.income_id = ip.income_id
+        LEFT JOIN greenhouse_finance.accounts a ON a.account_id = sl.instrument_id
+        WHERE sl.linked_payment_type = 'income_payment'
+          AND sl.is_reconciled = FALSE
+          AND sl.transaction_date BETWEEN $1::date AND $2::date
+          AND (
+            $3 = ''
+            OR LOWER(sl.settlement_leg_id) LIKE $3
+            OR LOWER(COALESCE(sl.provider_reference, '')) LIKE $3
+            OR LOWER(COALESCE(ip.reference, '')) LIKE $3
+            OR LOWER(COALESCE(i.invoice_number, '')) LIKE $3
+            OR LOWER(COALESCE(i.description, '')) LIKE $3
+            OR LOWER(COALESCE(i.client_name, '')) LIKE $3
+            OR LOWER(COALESCE(a.account_name, '')) LIKE $3
+          )
+        ORDER BY sl.transaction_date DESC NULLS LAST, sl.amount DESC
+        LIMIT $4
+      `,
+      [startDate, endDate, searchPattern, candidateRowLimit]
+    )
+
+    for (const row of incomeSettlementRows) {
+      candidates.push({
+        id: normalizeString(row.settlement_leg_id),
+        type: 'income',
+        amount: roundCurrency(toNumber(row.amount)),
+        currency: normalizeString(row.currency || ''),
+        transactionDate: toDateString(row.transaction_date as string | { value?: string } | null),
+        dueDate: toDateString(row.due_date as string | { value?: string } | null),
+        reference: str(row.provider_reference) ?? str(row.transaction_reference) ?? str(row.document_reference),
+        description: [
+          row.description ? normalizeString(row.description) : '',
+          row.leg_type ? `· ${normalizeString(row.leg_type)}` : ''
+        ].join(' ').trim(),
+        partyName: row.party_name ? normalizeString(row.party_name) : null,
+        status: normalizeString(row.status),
+        isReconciled: false,
+        reconciliationId: str(row.reconciliation_row_id),
+        matchedRecordId: normalizeString(row.record_id),
+        matchedPaymentId: normalizeString(row.payment_id),
+        matchedSettlementLegId: normalizeString(row.settlement_leg_id),
+        legType: normalizeString(row.leg_type),
+        instrumentId: str(row.instrument_id),
+        instrumentName: str(row.instrument_name),
+        settlementMode: str(row.settlement_mode)
+      })
+    }
+
+    // 2. Legacy payment-level fallback when a payment has no settlement legs
     const paymentRows = await queryRows<IncomeCandidateRow>(
       `
         SELECT
@@ -686,6 +949,12 @@ export const listReconciliationCandidatesFromPostgres = async ({
         JOIN greenhouse_finance.income i ON i.income_id = ip.income_id
         WHERE ip.is_reconciled = FALSE
           AND ip.amount > 0
+          AND NOT EXISTS (
+            SELECT 1
+            FROM greenhouse_finance.settlement_legs sl
+            WHERE sl.linked_payment_type = 'income_payment'
+              AND sl.linked_payment_id = ip.payment_id
+          )
           AND (
             $1 = ''
             OR LOWER(ip.payment_id) LIKE $1
@@ -722,7 +991,7 @@ export const listReconciliationCandidatesFromPostgres = async ({
       })
     }
 
-    // 2. Invoice-level fallback: income fully paid with no payments table entries
+    // 3. Invoice-level fallback: income fully paid with no payments table entries
     const invoiceFallbackRows = await queryRows<IncomeInvoiceFallbackRow>(
       `
         SELECT
@@ -773,38 +1042,181 @@ export const listReconciliationCandidatesFromPostgres = async ({
 
   // ── Expense candidates ──
   if (shouldLoadExpense) {
-    const expenseRows = await queryRows<ExpenseCandidateRow>(
+    const expenseSettlementRows = await queryRows<SettlementLegCandidateRow>(
       `
         SELECT
-          expense_id, total_amount, currency, payment_date, document_date,
-          payment_reference, document_number, description,
-          supplier_name, member_name, payment_status,
-          is_reconciled, reconciliation_id
-        FROM greenhouse_finance.expenses
-        WHERE is_reconciled = FALSE
-          AND COALESCE(payment_date, document_date) BETWEEN $1::date AND $2::date
+          sl.settlement_leg_id,
+          sl.settlement_group_id,
+          sl.linked_payment_type,
+          sl.linked_payment_id,
+          sl.leg_type,
+          sl.direction,
+          sl.instrument_id,
+          a.account_name AS instrument_name,
+          sg.settlement_mode,
+          sl.provider_reference,
+          sl.provider_status,
+          sl.transaction_date,
+          sl.amount,
+          sl.currency,
+          sl.reconciliation_row_id,
+          sl.is_reconciled,
+          ep.payment_id,
+          e.expense_id AS record_id,
+          ep.reference AS transaction_reference,
+          COALESCE(e.payment_reference, e.document_number) AS document_reference,
+          e.description,
+          COALESCE(e.supplier_name, e.member_name) AS party_name,
+          e.payment_status AS status,
+          NULL::date AS due_date
+        FROM greenhouse_finance.settlement_legs sl
+        JOIN greenhouse_finance.settlement_groups sg ON sg.settlement_group_id = sl.settlement_group_id
+        JOIN greenhouse_finance.expense_payments ep ON ep.payment_id = sl.linked_payment_id
+        JOIN greenhouse_finance.expenses e ON e.expense_id = ep.expense_id
+        LEFT JOIN greenhouse_finance.accounts a ON a.account_id = sl.instrument_id
+        WHERE sl.linked_payment_type = 'expense_payment'
+          AND sl.is_reconciled = FALSE
+          AND sl.transaction_date BETWEEN $1::date AND $2::date
           AND (
             $3 = ''
-            OR LOWER(expense_id) LIKE $3
-            OR LOWER(COALESCE(payment_reference, '')) LIKE $3
-            OR LOWER(COALESCE(document_number, '')) LIKE $3
-            OR LOWER(description) LIKE $3
-            OR LOWER(COALESCE(supplier_name, '')) LIKE $3
-            OR LOWER(COALESCE(member_name, '')) LIKE $3
+            OR LOWER(sl.settlement_leg_id) LIKE $3
+            OR LOWER(COALESCE(sl.provider_reference, '')) LIKE $3
+            OR LOWER(COALESCE(ep.reference, '')) LIKE $3
+            OR LOWER(COALESCE(e.payment_reference, '')) LIKE $3
+            OR LOWER(COALESCE(e.document_number, '')) LIKE $3
+            OR LOWER(e.description) LIKE $3
+            OR LOWER(COALESCE(e.supplier_name, '')) LIKE $3
+            OR LOWER(COALESCE(e.member_name, '')) LIKE $3
+            OR LOWER(COALESCE(a.account_name, '')) LIKE $3
           )
-        ORDER BY COALESCE(payment_date, document_date) DESC, total_amount DESC
+        ORDER BY sl.transaction_date DESC NULLS LAST, sl.amount DESC
         LIMIT $4
       `,
-      [startDate, endDate, searchPattern, boundedLimit]
+      [startDate, endDate, searchPattern, candidateRowLimit]
     )
 
-    for (const row of expenseRows) {
+    for (const row of expenseSettlementRows) {
+      candidates.push({
+        id: normalizeString(row.settlement_leg_id),
+        type: 'expense',
+        amount: -roundCurrency(toNumber(row.amount)),
+        currency: normalizeString(row.currency),
+        transactionDate: toDateString(row.transaction_date as string | { value?: string } | null),
+        dueDate: null,
+        reference: str(row.provider_reference) ?? str(row.transaction_reference) ?? str(row.document_reference),
+        description: [
+          normalizeString(row.description || ''),
+          row.leg_type ? `· ${normalizeString(row.leg_type)}` : ''
+        ].join(' ').trim(),
+        partyName: row.party_name ? normalizeString(row.party_name) : null,
+        status: normalizeString(row.status),
+        isReconciled: false,
+        reconciliationId: str(row.reconciliation_row_id),
+        matchedRecordId: normalizeString(row.record_id),
+        matchedPaymentId: normalizeString(row.payment_id),
+        matchedSettlementLegId: normalizeString(row.settlement_leg_id),
+        legType: normalizeString(row.leg_type),
+        instrumentId: str(row.instrument_id),
+        instrumentName: str(row.instrument_name),
+        settlementMode: str(row.settlement_mode)
+      })
+    }
+
+    const expensePaymentRows = await queryRows<ExpenseCandidateRow>(
+      `
+        SELECT
+          ep.payment_id, ep.expense_id, ep.amount, ep.currency, ep.payment_date,
+          ep.reference,
+          e.description, e.supplier_name, e.member_name, e.payment_status,
+          ep.is_reconciled, ep.reconciliation_row_id
+        FROM greenhouse_finance.expense_payments ep
+        JOIN greenhouse_finance.expenses e ON e.expense_id = ep.expense_id
+        WHERE ep.is_reconciled = FALSE
+          AND ep.payment_date BETWEEN $1::date AND $2::date
+          AND NOT EXISTS (
+            SELECT 1
+            FROM greenhouse_finance.settlement_legs sl
+            WHERE sl.linked_payment_type = 'expense_payment'
+              AND sl.linked_payment_id = ep.payment_id
+          )
+          AND (
+            $3 = ''
+            OR LOWER(ep.payment_id) LIKE $3
+            OR LOWER(ep.expense_id) LIKE $3
+            OR LOWER(COALESCE(ep.reference, '')) LIKE $3
+            OR LOWER(e.description) LIKE $3
+            OR LOWER(COALESCE(e.supplier_name, '')) LIKE $3
+            OR LOWER(COALESCE(e.member_name, '')) LIKE $3
+          )
+        ORDER BY ep.payment_date DESC NULLS LAST, ep.amount DESC
+        LIMIT $4
+      `,
+      [startDate, endDate, searchPattern, candidateRowLimit]
+    )
+
+    for (const row of expensePaymentRows) {
+      const expenseId = normalizeString(row.expense_id)
+      const paymentId = normalizeString(row.payment_id)
+
+      candidates.push({
+        id: paymentId,
+        type: 'expense',
+        amount: -roundCurrency(toNumber(row.amount)),
+        currency: normalizeString(row.currency),
+        transactionDate: toDateString(row.payment_date as string | { value?: string } | null),
+        dueDate: null,
+        reference: str(row.reference),
+        description: normalizeString(row.description),
+        partyName: row.supplier_name
+          ? normalizeString(row.supplier_name)
+          : row.member_name
+            ? normalizeString(row.member_name)
+            : null,
+        status: normalizeString(row.payment_status),
+        isReconciled: false,
+        reconciliationId: str(row.reconciliation_row_id),
+        matchedRecordId: expenseId,
+        matchedPaymentId: paymentId
+      })
+    }
+
+    const expenseFallbackRows = await queryRows<ExpenseInvoiceFallbackRow>(
+      `
+        SELECT
+          e.expense_id, e.total_amount, e.amount_paid, e.currency,
+          e.payment_date, e.document_date, e.payment_reference, e.document_number,
+          e.description, e.supplier_name, e.member_name, e.payment_status,
+          e.is_reconciled, e.reconciliation_id,
+          (SELECT COUNT(*) FROM greenhouse_finance.expense_payments ep WHERE ep.expense_id = e.expense_id) AS payment_count
+        FROM greenhouse_finance.expenses e
+        WHERE e.is_reconciled = FALSE
+          AND COALESCE(e.amount_paid, 0) > 0
+          AND COALESCE(e.amount_paid, 0) >= e.total_amount - 0.01
+          AND COALESCE(e.payment_date, e.document_date) BETWEEN $1::date AND $2::date
+          AND (
+            $3 = ''
+            OR LOWER(e.expense_id) LIKE $3
+            OR LOWER(COALESCE(e.payment_reference, '')) LIKE $3
+            OR LOWER(COALESCE(e.document_number, '')) LIKE $3
+            OR LOWER(e.description) LIKE $3
+            OR LOWER(COALESCE(e.supplier_name, '')) LIKE $3
+            OR LOWER(COALESCE(e.member_name, '')) LIKE $3
+          )
+        ORDER BY COALESCE(e.payment_date, e.document_date) DESC NULLS LAST, e.total_amount DESC
+        LIMIT $4
+      `,
+      [startDate, endDate, searchPattern, candidateRowLimit]
+    )
+
+    for (const row of expenseFallbackRows) {
+      if (toNumber(row.payment_count) > 0) continue
+
       const expenseId = normalizeString(row.expense_id)
 
       candidates.push({
         id: expenseId,
         type: 'expense',
-        amount: -toNumber(row.total_amount),
+        amount: -roundCurrency(toNumber(row.total_amount)),
         currency: normalizeString(row.currency),
         transactionDate: toDateString((row.payment_date || row.document_date) as string | { value?: string } | null),
         dueDate: null,
@@ -854,15 +1266,100 @@ export const listReconciliationCandidatesFromPostgres = async ({
 export const resolveReconciliationTargetFromPostgres = async ({
   matchedType,
   matchedId,
-  matchedPaymentId
+  matchedPaymentId,
+  matchedSettlementLegId
 }: {
   matchedType: ReconciliationCandidateType
   matchedId: string
   matchedPaymentId?: string | null
+  matchedSettlementLegId?: string | null
 }): Promise<ResolvedReconciliationTarget> => {
   await assertFinanceSlice2PostgresReady()
 
+  if (matchedSettlementLegId) {
+    const legRows = await queryRows<{
+      settlement_leg_id: string
+      linked_payment_type: string
+      linked_payment_id: string
+      is_reconciled: boolean
+      reconciliation_row_id: string | null
+      expense_id: string | null
+      income_id: string | null
+    }>(
+      `
+        SELECT
+          sl.settlement_leg_id,
+          sl.linked_payment_type,
+          sl.linked_payment_id,
+          sl.is_reconciled,
+          sl.reconciliation_row_id,
+          ep.expense_id,
+          ip.income_id
+        FROM greenhouse_finance.settlement_legs sl
+        LEFT JOIN greenhouse_finance.expense_payments ep
+          ON sl.linked_payment_type = 'expense_payment'
+         AND ep.payment_id = sl.linked_payment_id
+        LEFT JOIN greenhouse_finance.income_payments ip
+          ON sl.linked_payment_type = 'income_payment'
+         AND ip.payment_id = sl.linked_payment_id
+        WHERE sl.settlement_leg_id = $1
+        LIMIT 1
+      `,
+      [matchedSettlementLegId]
+    )
+
+    if (legRows.length === 0) {
+      throw new FinanceValidationError(`settlement leg "${matchedSettlementLegId}" not found.`, 404)
+    }
+
+    const leg = legRows[0]
+    const resolvedType = normalizeString(leg.linked_payment_type) === 'expense_payment' ? 'expense' : 'income'
+
+    return {
+      matchedType: resolvedType,
+      candidateId: normalizeString(leg.settlement_leg_id),
+      matchedRecordId: resolvedType === 'expense'
+        ? normalizeString(leg.expense_id)
+        : normalizeString(leg.income_id),
+      matchedPaymentId: normalizeString(leg.linked_payment_id),
+      matchedSettlementLegId: normalizeString(leg.settlement_leg_id),
+      isReconciled: Boolean(leg.is_reconciled),
+      reconciliationId: str(leg.reconciliation_row_id)
+    }
+  }
+
   if (matchedType === 'expense') {
+    if (matchedPaymentId) {
+      const paymentRows = await queryRows<{
+        payment_id: string
+        expense_id: string
+        is_reconciled: boolean
+        reconciliation_row_id: string | null
+      }>(
+        `SELECT payment_id, expense_id, is_reconciled, reconciliation_row_id
+         FROM greenhouse_finance.expense_payments
+         WHERE payment_id = $1
+         LIMIT 1`,
+        [matchedPaymentId]
+      )
+
+      if (paymentRows.length === 0) {
+        throw new FinanceValidationError(`expense payment "${matchedPaymentId}" not found.`, 404)
+      }
+
+      const payment = paymentRows[0]
+
+      return {
+        matchedType: 'expense',
+        candidateId: normalizeString(payment.payment_id),
+        matchedRecordId: normalizeString(payment.expense_id),
+        matchedPaymentId: normalizeString(payment.payment_id),
+        matchedSettlementLegId: null,
+        isReconciled: Boolean(payment.is_reconciled),
+        reconciliationId: str(payment.reconciliation_row_id)
+      }
+    }
+
     const rows = await queryRows<{
       expense_id: string
       is_reconciled: boolean
@@ -884,6 +1381,7 @@ export const resolveReconciliationTargetFromPostgres = async ({
       candidateId: normalizeString(target.expense_id),
       matchedRecordId: normalizeString(target.expense_id),
       matchedPaymentId: null,
+      matchedSettlementLegId: null,
       isReconciled: Boolean(target.is_reconciled),
       reconciliationId: str(target.reconciliation_id)
     }
@@ -914,6 +1412,7 @@ export const resolveReconciliationTargetFromPostgres = async ({
       candidateId: normalizeString(payment.payment_id),
       matchedRecordId: normalizeString(payment.income_id),
       matchedPaymentId: normalizeString(payment.payment_id),
+      matchedSettlementLegId: null,
       isReconciled: Boolean(payment.is_reconciled),
       reconciliationId: str(payment.reconciliation_row_id)
     }
@@ -941,9 +1440,100 @@ export const resolveReconciliationTargetFromPostgres = async ({
     candidateId: normalizeString(income.income_id),
     matchedRecordId: normalizeString(income.income_id),
     matchedPaymentId: null,
+    matchedSettlementLegId: null,
     isReconciled: Boolean(income.is_reconciled),
     reconciliationId: str(income.reconciliation_id)
   }
+}
+
+const recomputePaymentReconciliationFromSettlement = async ({
+  paymentType,
+  paymentId
+}: {
+  paymentType: 'income' | 'expense'
+  paymentId: string
+}) => {
+  const linkedPaymentType = paymentType === 'income' ? 'income_payment' : 'expense_payment'
+
+  const paymentTable = paymentType === 'income'
+    ? 'greenhouse_finance.income_payments'
+    : 'greenhouse_finance.expense_payments'
+
+  const rows = await queryRows<{
+    total_legs: string
+    reconciled_legs: string
+    primary_reconciliation_row_id: string | null
+  }>(
+    `
+      SELECT
+        COUNT(*) AS total_legs,
+        COUNT(*) FILTER (WHERE is_reconciled) AS reconciled_legs,
+        (
+          SELECT reconciliation_row_id
+          FROM greenhouse_finance.settlement_legs
+          WHERE linked_payment_type = $1
+            AND linked_payment_id = $2
+            AND leg_type IN ('receipt', 'payout')
+            AND is_reconciled = TRUE
+          ORDER BY updated_at DESC
+          LIMIT 1
+        ) AS primary_reconciliation_row_id
+      FROM greenhouse_finance.settlement_legs
+      WHERE linked_payment_type = $1
+        AND linked_payment_id = $2
+    `,
+    [linkedPaymentType, paymentId]
+  )
+
+  const totalLegs = toNumber(rows[0]?.total_legs)
+
+  if (totalLegs <= 0) {
+    return null
+  }
+
+  const reconciledLegs = toNumber(rows[0]?.reconciled_legs)
+  const fullyReconciled = totalLegs > 0 && reconciledLegs === totalLegs
+  const primaryReconciliationRowId = str(rows[0]?.primary_reconciliation_row_id)
+
+  await queryRows(
+    `
+      UPDATE ${paymentTable}
+      SET
+        is_reconciled = $2,
+        reconciliation_row_id = $3,
+        reconciled_at = CASE WHEN $2 THEN CURRENT_TIMESTAMP ELSE NULL END
+      WHERE payment_id = $1
+    `,
+    [
+      paymentId,
+      fullyReconciled,
+      fullyReconciled ? primaryReconciliationRowId : null
+    ]
+  )
+
+  return {
+    fullyReconciled,
+    primaryReconciliationRowId
+  }
+}
+
+const getPaymentReconciledState = async ({
+  paymentType,
+  paymentId
+}: {
+  paymentType: 'income' | 'expense'
+  paymentId: string
+}) => {
+  const paymentTable = paymentType === 'income'
+    ? 'greenhouse_finance.income_payments'
+    : 'greenhouse_finance.expense_payments'
+
+  const rows = await queryRows<{ is_reconciled: boolean }>(
+    `SELECT is_reconciled FROM ${paymentTable} WHERE payment_id = $1 LIMIT 1`,
+    [paymentId]
+  )
+
+  return rows.length > 0 ? Boolean(rows[0].is_reconciled) : false
 }
 
 // ─── Set reconciliation link ────────────────────────────────────────
@@ -952,18 +1542,79 @@ export const setReconciliationLinkInPostgres = async ({
   matchedType,
   matchedId,
   matchedPaymentId,
+  matchedSettlementLegId,
   rowId,
   matchedBy
 }: {
   matchedType: ReconciliationCandidateType
   matchedId: string
   matchedPaymentId?: string | null
+  matchedSettlementLegId?: string | null
   rowId: string
   matchedBy?: string | null
 }) => {
   await assertFinanceSlice2PostgresReady()
 
   if (matchedType === 'expense') {
+    if (matchedPaymentId) {
+      const previousPaymentReconciled = await getPaymentReconciledState({
+        paymentType: 'expense',
+        paymentId: matchedPaymentId
+      })
+
+      await syncSettlementLegReconciliation({
+        paymentType: 'expense',
+        paymentId: matchedPaymentId,
+        settlementLegId: matchedSettlementLegId || null,
+        rowId,
+        matchedBy
+      })
+
+      const settlementSummary = await recomputePaymentReconciliationFromSettlement({
+        paymentType: 'expense',
+        paymentId: matchedPaymentId
+      })
+
+      if (!settlementSummary && !matchedSettlementLegId) {
+        await queryRows(
+          `
+            UPDATE greenhouse_finance.expense_payments
+            SET
+              is_reconciled = TRUE,
+              reconciliation_row_id = $2,
+              reconciled_at = CURRENT_TIMESTAMP,
+              reconciled_by_user_id = $3
+            WHERE payment_id = $1
+          `,
+          [matchedPaymentId, rowId, matchedBy || null]
+        )
+      }
+
+      const currentPaymentReconciled = settlementSummary?.fullyReconciled
+        ?? await getPaymentReconciledState({
+          paymentType: 'expense',
+          paymentId: matchedPaymentId
+        })
+
+      await summarizeAndUpdateExpenseReconciliation(matchedId)
+
+      if (currentPaymentReconciled && !previousPaymentReconciled) {
+        await publishOutboxEvent({
+          aggregateType: 'finance_expense_payment',
+          aggregateId: matchedPaymentId,
+          eventType: 'finance.expense_payment.reconciled',
+          payload: {
+            paymentId: matchedPaymentId,
+            expenseId: matchedId,
+            reconciliationRowId: rowId,
+            reconciledByUserId: matchedBy || null
+          }
+        })
+      }
+
+      return
+    }
+
     await queryRows(
       `
         UPDATE greenhouse_finance.expenses
@@ -978,22 +1629,61 @@ export const setReconciliationLinkInPostgres = async ({
 
   // ── Income reconciliation ──
   if (matchedPaymentId) {
-    // Update specific payment
-    await queryRows(
-      `
-        UPDATE greenhouse_finance.income_payments
-        SET
-          is_reconciled = TRUE,
-          reconciliation_row_id = $2,
-          reconciled_at = CURRENT_TIMESTAMP,
-          reconciled_by_user_id = $3
-        WHERE payment_id = $1
-      `,
-      [matchedPaymentId, rowId, matchedBy || null]
-    )
+    const previousPaymentReconciled = await getPaymentReconciledState({
+      paymentType: 'income',
+      paymentId: matchedPaymentId
+    })
+
+    await syncSettlementLegReconciliation({
+      paymentType: 'income',
+      paymentId: matchedPaymentId,
+      settlementLegId: matchedSettlementLegId || null,
+      rowId,
+      matchedBy
+    })
+
+    const settlementSummary = await recomputePaymentReconciliationFromSettlement({
+      paymentType: 'income',
+      paymentId: matchedPaymentId
+    })
+
+    if (!settlementSummary && !matchedSettlementLegId) {
+      await queryRows(
+        `
+          UPDATE greenhouse_finance.income_payments
+          SET
+            is_reconciled = TRUE,
+            reconciliation_row_id = $2,
+            reconciled_at = CURRENT_TIMESTAMP,
+            reconciled_by_user_id = $3
+          WHERE payment_id = $1
+        `,
+        [matchedPaymentId, rowId, matchedBy || null]
+      )
+    }
+
+    const currentPaymentReconciled = settlementSummary?.fullyReconciled
+      ?? await getPaymentReconciledState({
+        paymentType: 'income',
+        paymentId: matchedPaymentId
+      })
 
     // Summarize income reconciliation status
     await summarizeAndUpdateIncomeReconciliation(matchedId)
+
+    if (currentPaymentReconciled && !previousPaymentReconciled) {
+      await publishOutboxEvent({
+        aggregateType: 'finance_income_payment',
+        aggregateId: matchedPaymentId,
+        eventType: 'finance.income_payment.reconciled',
+        payload: {
+          paymentId: matchedPaymentId,
+          incomeId: matchedId,
+          reconciliationRowId: rowId,
+          reconciledByUserId: matchedBy || null
+        }
+      })
+    }
 
     return
   }
@@ -1015,11 +1705,13 @@ export const clearReconciliationLinkInPostgres = async ({
   matchedType,
   matchedId,
   matchedPaymentId,
+  matchedSettlementLegId,
   rowId
 }: {
   matchedType: string
   matchedId: string
   matchedPaymentId?: string | null
+  matchedSettlementLegId?: string | null
   rowId: string
 }) => {
   await assertFinanceSlice2PostgresReady()
@@ -1029,6 +1721,63 @@ export const clearReconciliationLinkInPostgres = async ({
   if (normalizedType !== 'income' && normalizedType !== 'expense') return
 
   if (normalizedType === 'expense') {
+    if (matchedPaymentId) {
+      const previousPaymentReconciled = await getPaymentReconciledState({
+        paymentType: 'expense',
+        paymentId: matchedPaymentId
+      })
+
+      await syncSettlementLegReconciliation({
+        paymentType: 'expense',
+        paymentId: matchedPaymentId,
+        settlementLegId: matchedSettlementLegId || null,
+        rowId: null
+      })
+
+      const settlementSummary = await recomputePaymentReconciliationFromSettlement({
+        paymentType: 'expense',
+        paymentId: matchedPaymentId
+      })
+
+      if (!settlementSummary && !matchedSettlementLegId) {
+        await queryRows(
+          `
+            UPDATE greenhouse_finance.expense_payments
+            SET
+              is_reconciled = FALSE,
+              reconciliation_row_id = NULL,
+              reconciled_at = NULL,
+              reconciled_by_user_id = NULL
+            WHERE payment_id = $1
+          `,
+          [matchedPaymentId]
+        )
+      }
+
+      const currentPaymentReconciled = settlementSummary?.fullyReconciled
+        ?? await getPaymentReconciledState({
+          paymentType: 'expense',
+          paymentId: matchedPaymentId
+        })
+
+      await summarizeAndUpdateExpenseReconciliation(matchedId)
+
+      if (previousPaymentReconciled && !currentPaymentReconciled) {
+        await publishOutboxEvent({
+          aggregateType: 'finance_expense_payment',
+          aggregateId: matchedPaymentId,
+          eventType: 'finance.expense_payment.unreconciled',
+          payload: {
+            paymentId: matchedPaymentId,
+            expenseId: matchedId,
+            reconciliationRowId: rowId
+          }
+        })
+      }
+
+      return
+    }
+
     await queryRows(
       `
         UPDATE greenhouse_finance.expenses
@@ -1038,25 +1787,65 @@ export const clearReconciliationLinkInPostgres = async ({
       [matchedId, rowId]
     )
 
+    await summarizeAndUpdateExpenseReconciliation(matchedId)
+
     return
   }
 
   // ── Income reconciliation clear ──
   if (matchedPaymentId) {
-    await queryRows(
-      `
-        UPDATE greenhouse_finance.income_payments
-        SET
-          is_reconciled = FALSE,
-          reconciliation_row_id = NULL,
-          reconciled_at = NULL,
-          reconciled_by_user_id = NULL
-        WHERE payment_id = $1
-      `,
-      [matchedPaymentId]
-    )
+    const previousPaymentReconciled = await getPaymentReconciledState({
+      paymentType: 'income',
+      paymentId: matchedPaymentId
+    })
+
+    await syncSettlementLegReconciliation({
+      paymentType: 'income',
+      paymentId: matchedPaymentId,
+      settlementLegId: matchedSettlementLegId || null,
+      rowId: null
+    })
+
+    const settlementSummary = await recomputePaymentReconciliationFromSettlement({
+      paymentType: 'income',
+      paymentId: matchedPaymentId
+    })
+
+    if (!settlementSummary && !matchedSettlementLegId) {
+      await queryRows(
+        `
+          UPDATE greenhouse_finance.income_payments
+          SET
+            is_reconciled = FALSE,
+            reconciliation_row_id = NULL,
+            reconciled_at = NULL,
+            reconciled_by_user_id = NULL
+          WHERE payment_id = $1
+        `,
+        [matchedPaymentId]
+      )
+    }
+
+    const currentPaymentReconciled = settlementSummary?.fullyReconciled
+      ?? await getPaymentReconciledState({
+        paymentType: 'income',
+        paymentId: matchedPaymentId
+      })
 
     await summarizeAndUpdateIncomeReconciliation(matchedId)
+
+    if (previousPaymentReconciled && !currentPaymentReconciled) {
+      await publishOutboxEvent({
+        aggregateType: 'finance_income_payment',
+        aggregateId: matchedPaymentId,
+        eventType: 'finance.income_payment.unreconciled',
+        payload: {
+          paymentId: matchedPaymentId,
+          incomeId: matchedId,
+          reconciliationRowId: rowId
+        }
+      })
+    }
 
     return
   }
@@ -1086,6 +1875,83 @@ export const clearReconciliationLinkInPostgres = async ({
   )
 
   await summarizeAndUpdateIncomeReconciliation(matchedId)
+}
+
+const syncSettlementLegReconciliation = async ({
+  paymentType,
+  paymentId,
+  settlementLegId,
+  rowId,
+  matchedBy
+}: {
+  paymentType: 'income' | 'expense'
+  paymentId: string
+  settlementLegId?: string | null
+  rowId: string | null
+  matchedBy?: string | null
+}) => {
+  const linkedPaymentType = paymentType === 'income' ? 'income_payment' : 'expense_payment'
+  const targetLegId = settlementLegId ? normalizeString(settlementLegId) : null
+
+  if (rowId) {
+    await queryRows(
+      `
+        UPDATE greenhouse_finance.settlement_legs
+        SET
+          is_reconciled = TRUE,
+          reconciliation_row_id = $4,
+          reconciled_at = CURRENT_TIMESTAMP,
+          provider_status = 'reconciled',
+          updated_at = CURRENT_TIMESTAMP
+        WHERE linked_payment_type = $1
+          AND linked_payment_id = $2
+          AND ($3::text IS NULL OR settlement_leg_id = $3)
+      `,
+      [linkedPaymentType, paymentId, targetLegId, rowId]
+    )
+
+    await publishOutboxEvent({
+      aggregateType: 'finance_settlement_leg',
+      aggregateId: targetLegId || `stlleg-${paymentId}`,
+      eventType: 'finance.settlement_leg.reconciled',
+      payload: {
+        paymentId,
+        paymentType: linkedPaymentType,
+        settlementLegId: targetLegId,
+        reconciliationRowId: rowId,
+        reconciledByUserId: matchedBy || null
+      }
+    })
+
+    return
+  }
+
+  await queryRows(
+    `
+      UPDATE greenhouse_finance.settlement_legs
+      SET
+        is_reconciled = FALSE,
+        reconciliation_row_id = NULL,
+        reconciled_at = NULL,
+        provider_status = 'settled',
+        updated_at = CURRENT_TIMESTAMP
+      WHERE linked_payment_type = $1
+        AND linked_payment_id = $2
+        AND ($3::text IS NULL OR settlement_leg_id = $3)
+    `,
+    [linkedPaymentType, paymentId, targetLegId]
+  )
+
+  await publishOutboxEvent({
+    aggregateType: 'finance_settlement_leg',
+    aggregateId: targetLegId || `stlleg-${paymentId}`,
+    eventType: 'finance.settlement_leg.unreconciled',
+    payload: {
+      paymentId,
+      paymentType: linkedPaymentType,
+      settlementLegId: targetLegId
+    }
+  })
 }
 
 // ─── Income reconciliation summary ──────────────────────────────────
@@ -1144,5 +2010,62 @@ const summarizeAndUpdateIncomeReconciliation = async (incomeId: string) => {
       WHERE income_id = $1
     `,
     [incomeId, isReconciled, reconciliationId]
+  )
+}
+
+const summarizeAndUpdateExpenseReconciliation = async (expenseId: string) => {
+  const expenseRows = await queryRows<{
+    expense_id: string
+    total_amount: unknown
+    amount_paid: unknown
+  }>(
+    `SELECT expense_id, total_amount, amount_paid FROM greenhouse_finance.expenses WHERE expense_id = $1`,
+    [expenseId]
+  )
+
+  if (expenseRows.length === 0) return
+
+  const expense = expenseRows[0]
+  const totalAmount = toNumber(expense.total_amount)
+  const amountPaid = toNumber(expense.amount_paid)
+  const fullyPaid = totalAmount > 0 && amountPaid >= totalAmount - 0.01
+
+  const paymentSummary = await queryRows<{
+    total_payments: string
+    reconciled_payments: string
+    latest_reconciliation_row_id: string | null
+  }>(
+    `
+      SELECT
+        COUNT(*) AS total_payments,
+        COUNT(*) FILTER (WHERE is_reconciled AND reconciliation_row_id IS NOT NULL) AS reconciled_payments,
+        (
+          SELECT reconciliation_row_id
+          FROM greenhouse_finance.expense_payments
+          WHERE expense_id = $1 AND is_reconciled AND reconciliation_row_id IS NOT NULL
+          ORDER BY COALESCE(reconciled_at, payment_date, created_at) DESC
+          LIMIT 1
+        ) AS latest_reconciliation_row_id
+      FROM greenhouse_finance.expense_payments
+      WHERE expense_id = $1
+    `,
+    [expenseId]
+  )
+
+  const totalPayments = toNumber(paymentSummary[0]?.total_payments)
+  const reconciledPayments = toNumber(paymentSummary[0]?.reconciled_payments)
+  const latestRowId = str(paymentSummary[0]?.latest_reconciliation_row_id)
+
+  const allReconciled = totalPayments > 0 && reconciledPayments === totalPayments
+  const isReconciled = fullyPaid && allReconciled
+  const reconciliationId = fullyPaid ? latestRowId : null
+
+  await queryRows(
+    `
+      UPDATE greenhouse_finance.expenses
+      SET is_reconciled = $2, reconciliation_id = $3, updated_at = CURRENT_TIMESTAMP
+      WHERE expense_id = $1
+    `,
+    [expenseId, isReconciled, reconciliationId]
   )
 }

@@ -50,6 +50,28 @@ const parseDateLike = (value: unknown): { year: number; month: number } | null =
   return { year, month }
 }
 
+const parseStatementRowPeriod = (value: unknown): { year: number; month: number } | null => {
+  if (typeof value !== 'string') return null
+
+  const match = value.match(/^(.*)_[0-9a-f]{12}$/i)
+
+  if (!match) return null
+
+  const periodId = match[1]
+  const parts = periodId.split('_')
+
+  if (parts.length < 3) return null
+
+  const year = Number(parts[parts.length - 2])
+  const month = Number(parts[parts.length - 1])
+
+  if (!Number.isInteger(year) || !Number.isInteger(month) || month < 1 || month > 12) {
+    return null
+  }
+
+  return { year, month }
+}
+
 export const getClientEconomicsPeriodFromPayload = (payload: Record<string, unknown>): { year: number; month: number } | null => {
   const explicitYear = toFiniteInteger(payload.periodYear) ?? toFiniteInteger(payload.year)
   const explicitMonth = toFiniteInteger(payload.periodMonth) ?? toFiniteInteger(payload.month)
@@ -70,7 +92,11 @@ export const getClientEconomicsPeriodFromPayload = (payload: Record<string, unkn
     parseDateLike(payload.invoiceDate) ??
     parseDateLike(payload.documentDate) ??
     parseDateLike(payload.paymentDate) ??
-    parseDateLike(payload.dueDate)
+    parseDateLike(payload.dueDate) ??
+    parseDateLike(payload.transactionDate) ??
+    parseDateLike(payload.reconciledAt) ??
+    parseStatementRowPeriod(payload.reconciliationRowId) ??
+    parseStatementRowPeriod(payload.rowId)
 
   if (datePeriod) return datePeriod
 
@@ -139,7 +165,18 @@ export const CLIENT_ECONOMICS_TRIGGER_EVENTS = [
   'finance.expense.updated',
   'finance.income_payment.created',
   'finance.income_payment.recorded',
+  'finance.income_payment.reconciled',
+  'finance.income_payment.unreconciled',
   'finance.expense_payment.recorded',
+  'finance.expense_payment.reconciled',
+  'finance.expense_payment.unreconciled',
+  'finance.settlement_leg.recorded',
+  'finance.settlement_leg.reconciled',
+  'finance.settlement_leg.unreconciled',
+  'finance.internal_transfer.recorded',
+  'finance.fx_conversion.recorded',
+  'finance.reconciliation_period.reconciled',
+  'finance.reconciliation_period.closed',
   'finance.cost_allocation.created',
   'finance.cost_allocation.deleted',
   'payroll_period.created',

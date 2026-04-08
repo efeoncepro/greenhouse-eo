@@ -21,6 +21,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
       'administracion.roles',
       'administracion.vistas',
       'administracion.ops_health',
+      'administracion.instrumentos_pago',
       'ia.herramientas'
     ],
     fallback: tenant.routeGroups.includes('admin')

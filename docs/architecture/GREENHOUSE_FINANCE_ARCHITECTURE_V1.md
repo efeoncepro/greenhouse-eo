@@ -16,6 +16,119 @@
   - Evento `finance.expense_payment.recorded` registrado en catálogo y 4 projections
   - Navegación Finance actualizada con sección Caja (3 items nuevos)
 
+## Delta 2026-04-08 — Payment Instruments Registry + FX Tracking (TASK-281)
+
+- **Tabla `accounts` evolucionada** con 10 nuevas columnas para Payment Instruments:
+  - `instrument_category` (bank_account, credit_card, fintech, payment_platform, cash, payroll_processor)
+  - `provider_slug` — link al catálogo estático de proveedores (`src/config/payment-instruments.ts`)
+  - `provider_identifier` — ID de cuenta en el proveedor externo
+  - `card_last_four`, `card_network` — campos de tarjeta
+  - `credit_limit` — límite de crédito
+  - `responsible_user_id` — persona responsable del instrumento
+  - `default_for` — array de usos por defecto (payroll, suppliers, tax, etc.)
+  - `display_order` — orden en selectores y listas
+  - `metadata_json` — campo extensible JSONB
+- **FX tracking en payment tables** — `income_payments` y `expense_payments` tienen:
+  - `exchange_rate_at_payment` — tipo de cambio al momento del pago
+  - `amount_clp` — monto equivalente en CLP al tipo de cambio del pago
+  - `fx_gain_loss_clp` — diferencia entre CLP al tipo de cambio del pago vs tipo de cambio del documento
+- **FX auto-calculado** en `recordPayment()` y `recordExpensePayment()` via `resolveExchangeRateToClp()`
+- **Bidirectional FX resolver** — `resolveExchangeRate({ fromCurrency, toCurrency })` en `shared.ts`
+- **Provider catalog** — 20 proveedores con logos SVG en `public/images/logos/payment/`:
+  - 10 bancos chilenos (BCI, Chile, Santander, Estado, Scotiabank, Itaú, BICE, Security, Falabella, Ripley)
+  - 3 redes de tarjeta (Visa, Mastercard, Amex)
+  - 4 fintech (PayPal, Wise, MercadoPago, Global66)
+  - 3 plataformas (Deel, Stripe, Previred)
+- **Admin Center CRUD** — `/admin/payment-instruments` con TanStack table, 4 KPIs, drawer de creación por categoría
+- **`PaymentInstrumentChip`** — componente con logo SVG + fallback a Avatar initials
+- **Selectores de instrumento** en RegisterCashIn/OutDrawer, CreateIncome/ExpenseDrawer
+- **Columna instrumento** en CashInListView y CashOutListView con logo
+- **KPI "Resultado cambiario"** en CashPositionView
+
+### Archivos clave TASK-281
+
+| Archivo | Función |
+|---------|---------|
+| `migrations/20260408091711953_evolve-accounts-to-payment-instruments.sql` | DDL evolución accounts + FX columns |
+| `src/config/payment-instruments.ts` | Catálogo de proveedores, categorías, logos |
+| `src/components/greenhouse/PaymentInstrumentChip.tsx` | Chip con logo + fallback |
+| `src/app/api/admin/payment-instruments/route.ts` | GET list + POST create |
+| `src/app/api/admin/payment-instruments/[id]/route.ts` | GET detail + PUT update |
+| `src/views/greenhouse/admin/payment-instruments/PaymentInstrumentsListView.tsx` | Admin list view |
+| `src/views/greenhouse/admin/payment-instruments/CreatePaymentInstrumentDrawer.tsx` | Drawer de creación |
+
+## Delta 2026-04-08 — Reconciliation settlement orchestration completed (TASK-282)
+
+- **Conciliación quedó `ledger-first` de forma operativa**
+  - candidatos y matching alineados a `income_payments` / `expense_payments`
+  - `matched_settlement_leg_id` persistido en `bank_statement_rows`
+  - `auto-match`, `match`, `unmatch` y `exclude` ya usan el store Postgres sin duplicar eventos de pago en las routes
+- **Settlement orchestration quedó utilizable desde runtime**
+  - helper `getSettlementDetailForPayment()` para inspección del settlement group real de un payment
+  - helper `recordSupplementalSettlementLegForPayment()` para agregar `internal_transfer`, `funding`, `fx_conversion` y `fee`
+  - endpoint `GET/POST /api/finance/settlements/payment`
+  - drawer UI `SettlementOrchestrationDrawer` accesible desde el historial de pagos/cobros
+- **Registro operativo de caja ya soporta configuración multi-leg**
+  - `POST /api/finance/expenses/[id]/payments` acepta `exchangeRateOverride`, `settlementMode`, `fundingInstrumentId`, `feeAmount`, `feeCurrency`, `feeReference`
+  - `POST /api/finance/income/[id]/payments` acepta `exchangeRateOverride`, `feeAmount`, `feeCurrency`, `feeReference`
+  - `RegisterCashOutDrawer` y `RegisterCashInDrawer` ya exponen esos campos operativos
+- **Settlement + reconciliación ya publican y consumen eventos canónicos**
+  - catálogo con `finance.internal_transfer.recorded` y `finance.fx_conversion.recorded`
+  - projections `client_economics`, `operational_pl`, `commercial_cost_attribution` y `period_closure_status` escuchan settlement/reconciliation relevante
+  - `data-quality` audita drift entre `payments`, `settlement_groups`, `settlement_legs` y períodos cerrados/reconciliados
+- **UX operativa de conciliación**
+  - `ReconciliationDetailView` muestra snapshots de instrumento/proveedor/moneda del período
+  - permite `Marcar conciliado` y `Cerrar período` usando `PUT /api/finance/reconciliation/[id]`
+  - la acción queda bloqueada hasta tener extracto importado, diferencia en cero y sin rows pendientes
+
+## Delta 2026-04-08 — Bank & Treasury module completed (TASK-283)
+
+- **Nueva tabla `greenhouse_finance.account_balances`**
+  - snapshot diario por instrumento (`account_id`, `balance_date`)
+  - persiste `opening_balance`, `period_inflows`, `period_outflows`, `closing_balance`
+  - guarda equivalente CLP, FX usado, resultado cambiario, conteo transaccional y estado de cierre del período
+  - UNIQUE `(account_id, balance_date)` para materialización idempotente
+- **Materialización reactiva de tesorería**
+  - helper `materializeAccountBalance()` y readers en `src/lib/finance/account-balances.ts`
+  - projection `accountBalancesProjection` escucha:
+    - `finance.income_payment.recorded`
+    - `finance.expense_payment.recorded`
+    - `finance.settlement_leg.recorded|reconciled|unreconciled`
+    - `finance.internal_transfer.recorded`
+    - `finance.fx_conversion.recorded`
+    - `finance.reconciliation_period.reconciled|closed`
+  - la UI `Banco` lee el snapshot materializado como source of truth
+- **Transferencias internas como movimiento canónico de tesorería**
+  - helper `recordInternalTransfer()` en `src/lib/finance/internal-transfers.ts`
+  - crea `settlement_group` con `settlement_mode = 'internal_transfer'`
+  - crea legs `internal_transfer` para salida/entrada y `fx_conversion` cuando la transferencia cruza monedas
+  - rematerializa balances de ambas cuentas desde la fecha del movimiento
+- **Nuevas APIs**
+  - `GET/POST /api/finance/bank`
+    - overview por instrumento
+    - coverage de `payment_account_id`
+    - asignación retroactiva de cobros/pagos a una cuenta
+  - `GET/POST /api/finance/bank/[accountId]`
+    - detalle de cuenta
+    - historial de 12 meses
+    - movimientos recientes
+    - cierre de período por cuenta
+  - `POST /api/finance/bank/transfer`
+    - alta de transferencias internas standalone
+- **Nueva superficie UI**
+  - página `GET /finance/bank`
+  - vista `BankView`
+  - drawers:
+    - `AccountDetailDrawer`
+    - `AssignAccountDrawer`
+    - `InternalTransferDrawer`
+  - access view registrado como `finanzas.banco`
+- **Integración con el ecosistema**
+  - `Banco`, `Cobros`, `Pagos`, `Conciliación` y `Posición de caja` comparten ahora la misma base instrument-aware
+  - los drawers operativos de caja ya consumen `/api/finance/accounts` en vez de la route admin-only de instrumentos
+
+---
+
 ## Delta 2026-04-07 — Products catalog + Quote Line Items (TASK-211)
 
 Dos nuevas tablas en `greenhouse_finance`:
@@ -403,6 +516,28 @@ Estado operativo post `TASK-166`:
 - `clients` list/detail ya operan org-first sobre `greenhouse_core.organizations WHERE organization_type IN ('client', 'both')`, con `client_profiles.organization_id` como FK fuerte.
 - `client_id` se preserva como bridge operativo para modules, `purchase_orders`, `hes`, `income`, `client_economics` y `v_client_active_modules`; el cutover actual no elimina esa clave legacy.
 - El residual de `Finance Clients` queda reducido a fallback transicional, no a dependencia estructural del request path.
+
+### Delta 2026-04-08 — Ledger-first reconciliation & settlement foundation
+
+- `Finance > Conciliación` ya converge al mismo contrato canónico que `Cobros` y `Pagos`: `income_payments` / `expense_payments` son la unidad primaria de caja conciliable cuando existe ledger real.
+- `reconciliation_periods` ahora guarda snapshots del instrumento (`instrument_category_snapshot`, `provider_slug_snapshot`, `provider_name_snapshot`, `period_currency_snapshot`) para que la conciliación no dependa del estado mutable del catálogo.
+- `bank_statement_rows` ahora soporta importación idempotente mediante `source_import_batch_id`, `source_import_fingerprint`, `source_imported_at` y `source_payload_json`.
+- `greenhouse_finance.settlement_groups` y `greenhouse_finance.settlement_legs` formalizan la base de settlement orchestration para pagos directos y cadenas multi-leg (`internal_transfer`, `funding`, `fx_conversion`, `payout`, `fee`).
+- La reconciliación payment-level quedó validada end-to-end contra staging: reimportar el mismo statement row no duplica filas y el loop `unmatch -> match` vuelve a sincronizar `bank_statement_rows`, `income_payments` / `expense_payments` y `settlement_legs` sobre el mismo `reconciliation_row_id`.
+- La semántica operativa queda explícita:
+  - `pagado/cobrado` != `conciliado`
+  - transferencia interna o funding no liquida la obligación
+  - el leg que liquida una obligación es el `payout` o `receipt` hacia la contraparte final
+- Eventos outbox nuevos de primer nivel del dominio:
+  - `finance.income_payment.reconciled`
+  - `finance.income_payment.unreconciled`
+  - `finance.expense_payment.reconciled`
+  - `finance.expense_payment.unreconciled`
+  - `finance.settlement_leg.recorded`
+  - `finance.settlement_leg.reconciled`
+  - `finance.settlement_leg.unreconciled`
+  - `finance.reconciliation_period.reconciled`
+  - `finance.reconciliation_period.closed`
 
 ## P&L Endpoint — Motor Financiero Central
 

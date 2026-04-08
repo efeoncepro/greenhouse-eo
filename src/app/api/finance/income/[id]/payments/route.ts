@@ -69,6 +69,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
  *   reference?: string
  *   paymentMethod?: string
  *   paymentAccountId?: string
+ *   exchangeRateOverride?: number
+ *   feeAmount?: number
+ *   feeCurrency?: string
+ *   feeReference?: string
  *   paymentSource?: 'client_direct' | 'factoring_proceeds' | 'nubox_bank_sync'
  *   notes?: string
  * }
@@ -102,7 +106,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       paymentAccountId: body.paymentAccountId ? normalizeString(body.paymentAccountId) : null,
       paymentSource: body.paymentSource || undefined,
       notes: body.notes ? normalizeString(body.notes) : null,
-      actorUserId: tenant.userId || null
+      actorUserId: tenant.userId || null,
+      exchangeRateOverride: body.exchangeRateOverride != null ? toNumber(body.exchangeRateOverride) : null,
+      settlementConfig: {
+        feeAmount: body.feeAmount != null ? toNumber(body.feeAmount) : null,
+        feeCurrency: body.feeCurrency ? normalizeString(body.feeCurrency) : null,
+        feeReference: body.feeReference ? normalizeString(body.feeReference) : null
+      }
     })
 
     return NextResponse.json(

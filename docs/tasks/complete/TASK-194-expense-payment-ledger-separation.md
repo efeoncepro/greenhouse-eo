@@ -1,12 +1,23 @@
 # TASK-194 — Expense Payment Ledger Separation
 
+## Delta 2026-04-08
+
+- **Absorbida por TASK-280** — todo el scope de esta task fue implementado como parte de TASK-280 (Finance Cash Modules):
+  - Tabla `expense_payments` creada con trigger `trg_sync_expense_amount_paid`
+  - `recordExpensePayment()` simétrico a `recordPayment()`
+  - API `POST /api/finance/expenses/[id]/payments` funcional
+  - Backfill de expenses existentes con `payment_status = 'paid'`
+  - `payment_status` derivado automáticamente via trigger
+  - Pagos parciales soportados nativamente
+  - Evento `finance.expense_payment.recorded` en catálogo y 4 projections
+
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
-- Status real: `Diseño`
+- Status real: `Absorbida por TASK-280`
 - Rank: `TBD`
 - Domain: `finance`
 

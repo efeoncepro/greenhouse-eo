@@ -16,6 +16,10 @@ import {
   toTimestampString,
   type FinanceCurrency
 } from '@/lib/finance/shared'
+import {
+  ensureSettlementForIncomePayment,
+  type SettlementConfigurationInput
+} from '@/lib/finance/settlement-orchestration'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 // ─── Types ──────────────────────────────────────────────────────────
@@ -37,11 +41,13 @@ export interface RecordPaymentInput {
   notes?: string | null
   actorUserId?: string | null
   exchangeRateOverride?: number | null
+  settlementConfig?: SettlementConfigurationInput | null
 }
 
 export interface IncomePaymentRecord {
   paymentId: string
   incomeId: string
+  settlementGroupId?: string | null
   paymentDate: string | null
   amount: number
   currency: string | null
@@ -85,6 +91,7 @@ type PostgresIncomePaymentRow = {
   recorded_at: string | Date | null
   is_reconciled: boolean
   reconciliation_row_id: string | null
+  settlement_group_id: string | null
   reconciled_at: string | Date | null
   created_at: string | Date | null
   exchange_rate_at_payment: unknown
@@ -118,6 +125,7 @@ const queryRows = async <T extends Record<string, unknown>>(
 const mapPaymentRow = (row: PostgresIncomePaymentRow): IncomePaymentRecord => ({
   paymentId: normalizeString(row.payment_id),
   incomeId: normalizeString(row.income_id),
+  settlementGroupId: str((row as PostgresIncomePaymentRow & { settlement_group_id?: string | null }).settlement_group_id),
   paymentDate: toDateString(row.payment_date as string | { value?: string } | null),
   amount: toNumber(row.amount),
   currency: str(row.currency),
@@ -140,7 +148,7 @@ const PAYMENT_COLUMNS = `
   payment_id, income_id, payment_date, amount, currency, reference,
   payment_method, payment_account_id, payment_source, notes,
   recorded_at, is_reconciled, reconciliation_row_id, reconciled_at,
-  created_at, exchange_rate_at_payment, amount_clp, fx_gain_loss_clp
+  created_at, exchange_rate_at_payment, amount_clp, fx_gain_loss_clp, settlement_group_id
 `
 
 // ─── recordPayment ──────────────────────────────────────────────────
@@ -272,6 +280,23 @@ export async function recordPayment(input: RecordPaymentInput): Promise<{
     )
 
     const payment = mapPaymentRow(paymentRows[0])
+
+    const settlement = await ensureSettlementForIncomePayment({
+      client,
+      paymentId,
+      paymentAccountId: input.paymentAccountId || null,
+      paymentDate: input.paymentDate,
+      amount: input.amount,
+      currency: paymentCurrency,
+      amountClp,
+      exchangeRate: exchangeRateAtPayment,
+      providerReference: input.reference || null,
+      actorUserId: input.actorUserId || null,
+      paymentSource,
+      settlementConfig: input.settlementConfig || null
+    })
+
+    payment.settlementGroupId = settlement.settlementGroup.settlementGroupId
 
     // The trigger should have already updated income.amount_paid, but we
     // re-derive here for the response (and as a fallback if trigger is absent)

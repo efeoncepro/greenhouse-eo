@@ -66,6 +66,7 @@ const formatCurrency = (amount: number, currency: string = 'CLP'): string =>
 // ---------------------------------------------------------------------------
 
 const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
+  const [selectedClient, setSelectedClient] = useState('')
   const [selectedIncomeId, setSelectedIncomeId] = useState('')
   const [amount, setAmount] = useState('')
   const [paymentDate, setPaymentDate] = useState('')
@@ -79,11 +80,24 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
   const [instruments, setInstruments] = useState<Array<{ accountId: string; accountName: string; providerSlug: string | null; instrumentCategory: string; currency: string }>>([])
   const [selectedInstrumentId, setSelectedInstrumentId] = useState('')
   const [currentFxRate, setCurrentFxRate] = useState<number | null>(null)
+  const [exchangeRateOverride, setExchangeRateOverride] = useState('')
+  const [feeAmount, setFeeAmount] = useState('')
+  const [feeCurrency, setFeeCurrency] = useState('CLP')
 
   // Invoice dropdown data
   const [invoices, setInvoices] = useState<InvoiceOption[]>([])
   const [loadingInvoices, setLoadingInvoices] = useState(false)
   const [invoicesError, setInvoicesError] = useState<string | null>(null)
+
+  // Derived: unique clients with pending invoices
+  const uniqueClients = Array.from(
+    new Map(invoices.map(inv => [inv.clientName || 'Sin cliente', inv.clientName || 'Sin cliente'])).keys()
+  ).sort((a, b) => a.localeCompare(b))
+
+  // Filtered invoices for selected client
+  const filteredInvoices = selectedClient
+    ? invoices.filter(inv => (inv.clientName || 'Sin cliente') === selectedClient)
+    : []
 
   // Selected invoice details
   const selectedInvoice = invoices.find(inv => inv.incomeId === selectedIncomeId) ?? null
@@ -129,7 +143,7 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
     if (open) {
       fetchInvoices()
 
-      fetch('/api/admin/payment-instruments', { cache: 'no-store' })
+      fetch('/api/finance/accounts', { cache: 'no-store' })
         .then(res => res.ok ? res.json() : null)
         .then(data => {
           if (data?.items) {
@@ -149,6 +163,12 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
     }
   }, [open, fetchInvoices])
 
+  const handleClientChange = (value: string) => {
+    setSelectedClient(value)
+    setSelectedIncomeId('')
+    setAmount('')
+  }
+
   const handleInvoiceChange = (value: string) => {
     setSelectedIncomeId(value)
 
@@ -162,6 +182,7 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
   }
 
   const resetForm = () => {
+    setSelectedClient('')
     setSelectedIncomeId('')
     setAmount('')
     setPaymentDate('')
@@ -169,6 +190,9 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
     setPaymentMethod('')
     setSelectedInstrumentId('')
     setCurrentFxRate(null)
+    setExchangeRateOverride('')
+    setFeeAmount('')
+    setFeeCurrency('CLP')
     setNotes('')
     setError(null)
   }
@@ -203,6 +227,9 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
     if (paymentMethod) body.paymentMethod = paymentMethod
     if (notes.trim()) body.notes = notes.trim()
     if (selectedInstrumentId) body.paymentAccountId = selectedInstrumentId
+    if (exchangeRateOverride.trim()) body.exchangeRateOverride = Number(exchangeRateOverride)
+    if (feeAmount.trim()) body.feeAmount = Number(feeAmount)
+    if (feeCurrency) body.feeCurrency = feeCurrency
 
     try {
       const res = await fetch(`/api/finance/income/${selectedIncomeId}/payments`, {
@@ -255,22 +282,50 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
           select
           fullWidth
           size='small'
-          label='Factura'
-          value={selectedIncomeId}
-          onChange={e => handleInvoiceChange(e.target.value)}
+          label='Cliente'
+          value={selectedClient}
+          onChange={e => handleClientChange(e.target.value)}
           required
           disabled={loadingInvoices}
         >
           <MenuItem value=''>
             {loadingInvoices
               ? 'Cargando...'
-              : invoices.length === 0
-                ? 'No hay facturas pendientes'
+              : uniqueClients.length === 0
+                ? 'No hay clientes con facturas pendientes'
+                : '— Seleccionar cliente —'}
+          </MenuItem>
+          {uniqueClients.map(client => {
+            const count = invoices.filter(inv => (inv.clientName || 'Sin cliente') === client).length
+
+            return (
+              <MenuItem key={client} value={client}>
+                {client} ({count} {count === 1 ? 'factura' : 'facturas'})
+              </MenuItem>
+            )
+          })}
+        </CustomTextField>
+
+        <CustomTextField
+          select
+          fullWidth
+          size='small'
+          label='Factura'
+          value={selectedIncomeId}
+          onChange={e => handleInvoiceChange(e.target.value)}
+          required
+          disabled={!selectedClient}
+        >
+          <MenuItem value=''>
+            {!selectedClient
+              ? 'Selecciona un cliente primero'
+              : filteredInvoices.length === 0
+                ? 'Sin facturas pendientes'
                 : '— Seleccionar factura —'}
           </MenuItem>
-          {invoices.map(inv => (
+          {filteredInvoices.map(inv => (
             <MenuItem key={inv.incomeId} value={inv.incomeId}>
-              {inv.invoiceNumber || inv.incomeId} — {inv.clientName || 'Sin cliente'} — {formatCurrency(inv.pendingAmount, inv.currency)}
+              {inv.invoiceNumber || inv.incomeId} — {formatCurrency(inv.pendingAmount, inv.currency)}
             </MenuItem>
           ))}
         </CustomTextField>
@@ -296,6 +351,19 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
               Dólar observado: ${new Intl.NumberFormat('es-CL', { maximumFractionDigits: 2 }).format(currentFxRate)} CLP — Equivalente: {new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(Number(amount || 0) * currentFxRate)}
             </Typography>
           </Box>
+        )}
+
+        {selectedInvoice?.currency !== 'CLP' && (
+          <CustomTextField
+            fullWidth
+            size='small'
+            label='Tipo de cambio aplicado'
+            type='number'
+            value={exchangeRateOverride}
+            onChange={e => setExchangeRateOverride(e.target.value)}
+            placeholder={currentFxRate ? String(currentFxRate) : 'Opcional'}
+            helperText='Opcional. Si lo informas, Greenhouse usará este tipo de cambio para CLP y settlement.'
+          />
         )}
 
         <CustomTextField
@@ -358,6 +426,30 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
             </MenuItem>
           ))}
         </CustomTextField>
+
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 120px' }, gap: 2 }}>
+          <CustomTextField
+            fullWidth
+            size='small'
+            label='Fee de recaudación'
+            type='number'
+            value={feeAmount}
+            onChange={e => setFeeAmount(e.target.value)}
+            helperText='Opcional. Se registra como settlement leg separado.'
+          />
+          <CustomTextField
+            select
+            fullWidth
+            size='small'
+            label='Moneda fee'
+            value={feeCurrency}
+            onChange={e => setFeeCurrency(e.target.value)}
+          >
+            <MenuItem value='CLP'>CLP</MenuItem>
+            <MenuItem value='USD'>USD</MenuItem>
+            <MenuItem value='EUR'>EUR</MenuItem>
+          </CustomTextField>
+        </Box>
 
         <CustomTextField
           fullWidth

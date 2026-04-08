@@ -188,6 +188,17 @@
   - o que una factura de compra ya es un pago
   - el P&L puede seguir leyendo devengo, pero la semántica visible debe distinguir documento vs caja
 
+## Delta 2026-04-08 Payment Instruments Registry + FX tracking (TASK-281)
+
+- `greenhouse_finance.accounts` evolucionada a Payment Instruments Registry: `instrument_category`, `provider_slug`, campos por tipo (tarjeta, fintech, procesador)
+- FX tracking nativo: `exchange_rate_at_payment`, `amount_clp`, `fx_gain_loss_clp` en ambos payment tables
+- `resolveExchangeRate()` bidireccional (CLP↔USD) reutilizando Mindicador dólar observado
+- Catálogo estático de 20 proveedores con logos SVG en `src/config/payment-instruments.ts`
+- `PaymentInstrumentChip` componente con logo + fallback a initials
+- Admin Center CRUD: `/admin/payment-instruments` con TanStack table y drawer por categoría
+- Selectores de instrumento en todos los drawers (CreateIncome, CreateExpense, RegisterCashIn, RegisterCashOut)
+- Columna instrumento con logo en CashInListView y CashOutListView
+
 ## Delta 2026-04-08 Finance cash contract hardened around canonical ledgers
 
 - Todo cobro/pago real debe existir en el ledger canónico y publicar outbox:
@@ -3012,6 +3023,50 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - los contratos nuevos siguen anclados a `client_id` y `member_id` cuando corresponde
 - Ajuste de consistencia relevante:
   - `auto-match`, `match`, `unmatch` y `exclude` ya no pueden dejar desacoplado el estado entre la fila bancaria y la transacción financiera reconciliada
+
+## Delta 2026-04-08 Finance reconciliation settlement orchestration completed
+
+- `Finance > Conciliación` ya opera sobre el mismo contrato ledger-first de `Cobros` y `Pagos`.
+- Regla operativa vigente:
+  - `income_payments` y `expense_payments` son la unidad canónica de caja
+  - `matchedPaymentId` y `matchedSettlementLegId` forman parte del contrato operativo de conciliación
+  - las routes de `match`, `unmatch`, `exclude` y `auto-match` no deben duplicar eventos de pago; el source of truth de publicación vive en el store Postgres
+- Settlement orchestration disponible en runtime:
+  - `GET/POST /api/finance/settlements/payment`
+  - `SettlementOrchestrationDrawer` desde el historial de pagos/cobros
+  - `RegisterCashOutDrawer` soporta `settlementMode`, `fundingInstrumentId`, `fee*` y `exchangeRateOverride`
+  - `RegisterCashInDrawer` soporta `fee*` y `exchangeRateOverride`
+- Conciliación operativa:
+  - `ReconciliationDetailView` muestra snapshots del instrumento/proveedor/moneda del período
+  - permite `Marcar conciliado` y `Cerrar período`
+  - la transición a `reconciled` exige extracto importado, diferencia en cero y sin filas pendientes
+- Eventos reactivos vigentes:
+  - `finance.income_payment.reconciled|unreconciled`
+  - `finance.expense_payment.reconciled|unreconciled`
+  - `finance.settlement_leg.recorded|reconciled|unreconciled`
+  - `finance.internal_transfer.recorded`
+  - `finance.fx_conversion.recorded`
+  - `finance.reconciliation_period.reconciled|closed`
+
+## Delta 2026-04-08 Finance bank & treasury module completed
+
+- `Finance` ya no expone solo `Cobros`, `Pagos`, `Posición de caja` y `Conciliación`; ahora también tiene la superficie `Banco` en `/finance/bank`.
+- Regla operativa vigente:
+  - el saldo por instrumento se lee desde `greenhouse_finance.account_balances`
+  - `account_balances` se materializa reactivamente; no debe recalcularse inline en la UI salvo recovery puntual
+  - transferencias internas entre cuentas propias viven como settlement orchestration (`internal_transfer` + opcional `fx_conversion`), no como gasto/ingreso
+- Superficie backend agregada:
+  - `GET/POST /api/finance/bank`
+  - `GET/POST /api/finance/bank/[accountId]`
+  - `POST /api/finance/bank/transfer`
+- Helpers nuevos:
+  - `src/lib/finance/account-balances.ts`
+  - `src/lib/finance/internal-transfers.ts`
+  - `src/lib/sync/projections/account-balances.ts`
+- Integración transversal:
+  - `Banco`, `Cobros`, `Pagos`, `Conciliación` y `Posición de caja` comparten el mismo contrato instrument-aware
+  - los drawers de caja y settlement usan `/api/finance/accounts` para seleccionar instrumentos visibles al equipo de finanzas
+  - `Banco` quedó restringido a `efeonce_admin`, `finance_admin` y `finance_analyst`; no debe asumirse como superficie general de cualquier usuario con route group `finance`
 
 ## Delta 2026-03-14 Task board reorganization
 

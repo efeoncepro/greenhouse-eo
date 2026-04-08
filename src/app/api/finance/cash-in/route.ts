@@ -93,15 +93,20 @@ export async function GET(request: Request) {
         ip.payment_source,
         ip.is_reconciled,
         ip.created_at,
+        ip.payment_account_id,
         i.invoice_number,
         i.description AS invoice_description,
         i.total_amount AS invoice_total,
         i.client_id,
         COALESCE(i.client_name, cp.legal_name) AS client_name,
-        i.exchange_rate_to_clp
+        i.exchange_rate_to_clp,
+        a.account_name AS payment_account_name,
+        a.provider_slug AS payment_provider_slug,
+        a.instrument_category AS payment_instrument_category
       FROM greenhouse_finance.income_payments ip
       INNER JOIN greenhouse_finance.income i ON i.income_id = ip.income_id
       LEFT JOIN greenhouse_finance.client_profiles cp ON cp.client_profile_id = i.client_profile_id
+      LEFT JOIN greenhouse_finance.accounts a ON a.account_id = ip.payment_account_id
       ${whereClause}
       ORDER BY ip.payment_date DESC, ip.created_at DESC
       LIMIT $${limitParam} OFFSET $${offsetParam}
@@ -153,7 +158,11 @@ export async function GET(request: Request) {
       invoiceTotal: row.invoice_total != null ? roundCurrency(toNumber(row.invoice_total)) : null,
       clientId: row.client_id ? normalizeString(row.client_id) : null,
       clientName: row.client_name ? normalizeString(row.client_name) : null,
-      exchangeRateToClp: row.exchange_rate_to_clp != null ? toNumber(row.exchange_rate_to_clp) : null
+      exchangeRateToClp: row.exchange_rate_to_clp != null ? toNumber(row.exchange_rate_to_clp) : null,
+      paymentAccountId: row.payment_account_id ? normalizeString(row.payment_account_id) : null,
+      paymentAccountName: row.payment_account_name ? normalizeString(row.payment_account_name) : null,
+      paymentProviderSlug: row.payment_provider_slug ? normalizeString(row.payment_provider_slug) : null,
+      paymentInstrumentCategory: row.payment_instrument_category ? normalizeString(row.payment_instrument_category) : null
     }))
 
     return NextResponse.json({

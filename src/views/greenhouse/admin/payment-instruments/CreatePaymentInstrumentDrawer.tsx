@@ -14,6 +14,8 @@ import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
+import ToggleButton from '@mui/material/ToggleButton'
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
 
 import CustomTextField from '@core/components/mui/TextField'
@@ -70,9 +72,11 @@ const CreatePaymentInstrumentDrawer = ({ open, onClose, onSuccess }: Props) => {
 
   // credit_card fields
   const [cardNetwork, setCardNetwork] = useState('')
-  const [cardIssuer, setCardIssuer] = useState('')
+  const [cardIssuerType, setCardIssuerType] = useState<'bank' | 'fintech'>('bank')
+  const [cardIssuerSlug, setCardIssuerSlug] = useState('')
   const [cardLast4, setCardLast4] = useState('')
-  const [cardLimit, setCardLimit] = useState('')
+  const [cardLimitClp, setCardLimitClp] = useState('')
+  const [cardLimitUsd, setCardLimitUsd] = useState('')
 
   // fintech fields
   const [fintechProvider, setFintechProvider] = useState('')
@@ -101,9 +105,11 @@ const CreatePaymentInstrumentDrawer = ({ open, onClose, onSuccess }: Props) => {
     setBankAccountType('corriente')
     setBankAccountNumber('')
     setCardNetwork('')
-    setCardIssuer('')
+    setCardIssuerType('bank')
+    setCardIssuerSlug('')
     setCardLast4('')
-    setCardLimit('')
+    setCardLimitClp('')
+    setCardLimitUsd('')
     setFintechProvider('')
     setFintechAccountId('')
     setPlatformProvider('')
@@ -171,9 +177,14 @@ const CreatePaymentInstrumentDrawer = ({ open, onClose, onSuccess }: Props) => {
             ...(bankAccountNumber.trim() && { bankAccountNumber: bankAccountNumber.trim() })
           }),
           ...(selectedCategory === 'credit_card' && {
-            ...(cardIssuer.trim() && { cardIssuer: cardIssuer.trim() }),
+            ...(cardIssuerSlug && { cardIssuer: cardIssuerSlug }),
             ...(cardLast4.trim() && { cardLast4: cardLast4.trim() }),
-            ...(cardLimit && { creditLimit: Number(cardLimit) })
+            ...(cardLimitClp && { creditLimit: Number(cardLimitClp) }),
+            metadataJson: {
+              ...(cardLimitClp && { creditLimitClp: Number(cardLimitClp) }),
+              ...(cardLimitUsd && { creditLimitUsd: Number(cardLimitUsd) }),
+              ...(cardIssuerSlug && { issuerSlug: cardIssuerSlug, issuerType: cardIssuerType })
+            }
           }),
           ...(selectedCategory === 'fintech' && {
             ...(fintechAccountId.trim() && { fintechAccountId: fintechAccountId.trim() })
@@ -398,16 +409,48 @@ const CreatePaymentInstrumentDrawer = ({ open, onClose, onSuccess }: Props) => {
                     ))}
                   </CustomTextField>
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
+
+                <Grid size={{ xs: 12 }}>
+                  <Typography variant='caption' color='text.secondary' sx={{ mb: 0.5, display: 'block' }}>
+                    Tipo de emisor
+                  </Typography>
+                  <ToggleButtonGroup
+                    exclusive
+                    fullWidth
+                    color='primary'
+                    value={cardIssuerType}
+                    onChange={(_, v: 'bank' | 'fintech' | null) => { if (v) { setCardIssuerType(v); setCardIssuerSlug('') } }}
+                    sx={{ '& .MuiToggleButton-root': { textTransform: 'none', py: 0.75 } }}
+                  >
+                    <ToggleButton value='bank'>Banco</ToggleButton>
+                    <ToggleButton value='fintech'>Fintech</ToggleButton>
+                  </ToggleButtonGroup>
+                </Grid>
+
+                <Grid size={{ xs: 12 }}>
                   <CustomTextField
+                    select
                     fullWidth
                     size='small'
-                    label='Banco emisor'
-                    value={cardIssuer}
-                    onChange={e => setCardIssuer(e.target.value)}
-                  />
+                    label='Emisor'
+                    value={cardIssuerSlug}
+                    onChange={e => setCardIssuerSlug(e.target.value)}
+                  >
+                    <MenuItem value=''>-- Seleccionar emisor --</MenuItem>
+                    {(cardIssuerType === 'bank' ? bankProviders : fintechProviders).map(p => (
+                      <MenuItem key={p.slug} value={p.slug}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          {p.logo && (
+                            <Box component='img' src={p.logo} alt={p.name} sx={{ height: 18, width: 'auto' }} />
+                          )}
+                          {p.name}
+                        </Box>
+                      </MenuItem>
+                    ))}
+                  </CustomTextField>
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
+
+                <Grid size={{ xs: 12 }}>
                   <CustomTextField
                     fullWidth
                     size='small'
@@ -417,14 +460,28 @@ const CreatePaymentInstrumentDrawer = ({ open, onClose, onSuccess }: Props) => {
                     slotProps={{ htmlInput: { maxLength: 4 } }}
                   />
                 </Grid>
-                <Grid size={{ xs: 12 }}>
+
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <CustomTextField
                     fullWidth
                     size='small'
-                    label='Limite de credito'
+                    label='Limite CLP'
                     type='number'
-                    value={cardLimit}
-                    onChange={e => setCardLimit(e.target.value)}
+                    value={cardLimitClp}
+                    onChange={e => setCardLimitClp(e.target.value)}
+                    placeholder='ej. 5000000'
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <CustomTextField
+                    fullWidth
+                    size='small'
+                    label='Limite USD'
+                    type='number'
+                    value={cardLimitUsd}
+                    onChange={e => setCardLimitUsd(e.target.value)}
+                    placeholder='ej. 3000'
                   />
                 </Grid>
               </>

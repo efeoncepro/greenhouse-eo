@@ -1,9 +1,6 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
-import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
-import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
-import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
 import {
   assertReconciliationPeriodIsMutableFromPostgres,
   getStatementRowFromPostgres,
@@ -15,16 +12,8 @@ import {
 import {
   FinanceValidationError,
   assertNonEmptyString,
-  getFinanceProjectId,
-  normalizeString,
-  runFinanceQuery
+  normalizeString
 } from '@/lib/finance/shared'
-import {
-  assertReconciliationPeriodIsMutable,
-  clearReconciliationLink,
-  resolveReconciliationTarget,
-  setReconciliationLink
-} from '@/lib/finance/reconciliation'
 
 export const dynamic = 'force-dynamic'
 
@@ -43,122 +32,27 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const matchedId = assertNonEmptyString(body.matchedId, 'matchedId')
     const matchedPaymentId = body.matchedPaymentId ? assertNonEmptyString(body.matchedPaymentId, 'matchedPaymentId') : null
 
+    const matchedSettlementLegId = body.matchedSettlementLegId
+      ? assertNonEmptyString(body.matchedSettlementLegId, 'matchedSettlementLegId')
+      : null
+
     if (!['income', 'expense'].includes(matchedType)) {
       throw new FinanceValidationError('matchedType must be "income" or "expense".')
     }
 
-    // ── Postgres-first path ──
-    try {
-      await assertReconciliationPeriodIsMutableFromPostgres(periodId)
+    await assertReconciliationPeriodIsMutableFromPostgres(periodId)
 
-      const currentRow = await getStatementRowFromPostgres(rowId, periodId)
+    const currentRow = await getStatementRowFromPostgres(rowId, periodId)
 
-      if (!currentRow) {
-        return NextResponse.json({ error: 'Statement row not found in this period' }, { status: 404 })
-      }
-
-      const target = await resolveReconciliationTargetFromPostgres({
-        matchedType: matchedType as 'income' | 'expense',
-        matchedId,
-        matchedPaymentId
-      })
-
-      if (target.isReconciled && normalizeString(target.reconciliationId) !== rowId) {
-        throw new FinanceValidationError(
-          `${matchedType} target "${target.candidateId}" is already reconciled to another statement row.`,
-          409
-        )
-      }
-
-      const previousMatchedType = normalizeString(currentRow.matched_type)
-      const previousMatchedId = normalizeString(currentRow.matched_id)
-      const previousMatchedPaymentId = normalizeString(currentRow.matched_payment_id)
-
-      const targetChanged = (
-        previousMatchedType !== matchedType
-        || previousMatchedId !== target.matchedRecordId
-        || previousMatchedPaymentId !== (target.matchedPaymentId || '')
-      )
-
-      if (previousMatchedType && previousMatchedId && targetChanged) {
-        await clearReconciliationLinkInPostgres({
-          matchedType: previousMatchedType,
-          matchedId: previousMatchedId,
-          matchedPaymentId: previousMatchedPaymentId || null,
-          rowId
-        })
-      }
-
-      await updateStatementRowMatchInPostgres(rowId, periodId, {
-        matchStatus: 'manual_matched',
-        matchedType,
-        matchedId: target.matchedRecordId,
-        matchedPaymentId: target.matchedPaymentId,
-        matchConfidence: 1.0,
-        matchedByUserId: tenant.userId || null,
-        notes: body.notes ? normalizeString(body.notes) : null
-      })
-
-      await setReconciliationLinkInPostgres({
-        matchedType: matchedType as 'income' | 'expense',
-        matchedId: target.matchedRecordId,
-        matchedPaymentId: target.matchedPaymentId,
-        rowId,
-        matchedBy: tenant.userId || null
-      })
-
-      return NextResponse.json({
-        matched: true,
-        rowId,
-        matchedType,
-        matchedId: target.candidateId,
-        matchedRecordId: target.matchedRecordId,
-        matchedPaymentId: target.matchedPaymentId,
-        matchStatus: 'manual_matched'
-      })
-    } catch (error) {
-      if (!shouldFallbackFromFinancePostgres(error)) {
-        throw error
-      }
-
-      if (!isFinanceBigQueryWriteEnabled()) {
-        return NextResponse.json(
-          {
-            error: 'Finance BigQuery fallback write is disabled. Postgres write path failed.',
-            code: 'FINANCE_BQ_WRITE_DISABLED'
-          },
-          { status: 503 }
-        )
-      }
-    }
-
-    // ── BigQuery fallback ──
-    await ensureFinanceInfrastructure()
-
-    await assertReconciliationPeriodIsMutable(periodId)
-
-    const projectId = getFinanceProjectId()
-
-    const rows = await runFinanceQuery<{
-      row_id: string
-      match_status: string
-      matched_type: string | null
-      matched_id: string | null
-      matched_payment_id: string | null
-    }>(`
-      SELECT row_id, match_status, matched_type, matched_id, matched_payment_id
-      FROM \`${projectId}.greenhouse.fin_bank_statement_rows\`
-      WHERE row_id = @rowId AND period_id = @periodId
-    `, { rowId, periodId })
-
-    if (rows.length === 0) {
+    if (!currentRow) {
       return NextResponse.json({ error: 'Statement row not found in this period' }, { status: 404 })
     }
 
-    const target = await resolveReconciliationTarget({
+    const target = await resolveReconciliationTargetFromPostgres({
       matchedType: matchedType as 'income' | 'expense',
       matchedId,
-      matchedPaymentId
+      matchedPaymentId,
+      matchedSettlementLegId
     })
 
     if (target.isReconciled && normalizeString(target.reconciliationId) !== rowId) {
@@ -168,52 +62,44 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       )
     }
 
-    const currentRow = rows[0]
     const previousMatchedType = normalizeString(currentRow.matched_type)
     const previousMatchedId = normalizeString(currentRow.matched_id)
     const previousMatchedPaymentId = normalizeString(currentRow.matched_payment_id)
+    const previousMatchedSettlementLegId = normalizeString(currentRow.matched_settlement_leg_id)
 
     const targetChanged = (
       previousMatchedType !== matchedType
       || previousMatchedId !== target.matchedRecordId
       || previousMatchedPaymentId !== (target.matchedPaymentId || '')
+      || previousMatchedSettlementLegId !== (target.matchedSettlementLegId || '')
     )
 
     if (previousMatchedType && previousMatchedId && targetChanged) {
-      await clearReconciliationLink({
+      await clearReconciliationLinkInPostgres({
         matchedType: previousMatchedType,
         matchedId: previousMatchedId,
         matchedPaymentId: previousMatchedPaymentId || null,
+        matchedSettlementLegId: previousMatchedSettlementLegId || null,
         rowId
       })
     }
 
-    await runFinanceQuery(`
-      UPDATE \`${projectId}.greenhouse.fin_bank_statement_rows\`
-      SET
-        match_status = 'manual_matched',
-        matched_type = @matchedType,
-        matched_id = @matchedId,
-        matched_payment_id = @matchedPaymentId,
-        match_confidence = 1.0,
-        matched_by = @matchedBy,
-        matched_at = CURRENT_TIMESTAMP(),
-        notes = @notes
-      WHERE row_id = @rowId AND period_id = @periodId
-    `, {
+    await updateStatementRowMatchInPostgres(rowId, periodId, {
+      matchStatus: 'manual_matched',
       matchedType,
       matchedId: target.matchedRecordId,
       matchedPaymentId: target.matchedPaymentId,
-      matchedBy: tenant.userId || null,
-      notes: body.notes ? normalizeString(body.notes) : null,
-      rowId,
-      periodId
+      matchedSettlementLegId: target.matchedSettlementLegId,
+      matchConfidence: 1.0,
+      matchedByUserId: tenant.userId || null,
+      notes: body.notes ? normalizeString(body.notes) : null
     })
 
-    await setReconciliationLink({
+    await setReconciliationLinkInPostgres({
       matchedType: matchedType as 'income' | 'expense',
       matchedId: target.matchedRecordId,
       matchedPaymentId: target.matchedPaymentId,
+      matchedSettlementLegId: target.matchedSettlementLegId,
       rowId,
       matchedBy: tenant.userId || null
     })
@@ -225,6 +111,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       matchedId: target.candidateId,
       matchedRecordId: target.matchedRecordId,
       matchedPaymentId: target.matchedPaymentId,
+      matchedSettlementLegId: target.matchedSettlementLegId,
       matchStatus: 'manual_matched'
     })
   } catch (error) {

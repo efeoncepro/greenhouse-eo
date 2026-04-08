@@ -42,11 +42,15 @@ interface StatementRow {
   matchedId: string | null
   matchConfidence: number | null
   notes: string | null
+  matchedSettlementLegId?: string | null
 }
 
 interface Candidate {
   id: string
   type: 'income' | 'expense'
+  matchedRecordId: string | null
+  matchedPaymentId: string | null
+  matchedSettlementLegId?: string | null
   amount: number
   currency: string
   transactionDate: string | null
@@ -56,6 +60,9 @@ interface Candidate {
   partyName: string | null
   status: string | null
   isReconciled: boolean
+  legType?: string | null
+  instrumentName?: string | null
+  settlementMode?: string | null
 }
 
 type DialogMode = 'match' | 'unmatch' | 'exclude'
@@ -185,7 +192,9 @@ const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionCompl
         body: JSON.stringify({
           rowId: row.rowId,
           matchedType: candidate.type,
-          matchedId: candidate.id
+          matchedId: candidate.matchedRecordId ?? candidate.id,
+          matchedPaymentId: candidate.matchedPaymentId ?? null,
+          matchedSettlementLegId: candidate.matchedSettlementLegId ?? null
         })
       })
 
@@ -344,7 +353,7 @@ const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionCompl
         {mode === 'unmatch' && (
           <Box sx={{ textAlign: 'center', py: 4 }}>
             <Typography variant='body1' sx={{ mb: 2 }}>
-              Esta fila esta vinculada a un {row.matchedType === 'income' ? 'ingreso' : 'egreso'}:
+              Esta fila esta vinculada a un {row.matchedType === 'income' ? 'cobro' : 'pago'}:
             </Typography>
             <Chip
               label={row.matchedId}
@@ -370,7 +379,7 @@ const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionCompl
               </Button>
             }
           >
-            El sistema sugirió vincular esta fila con {row.matchedType === 'income' ? 'el ingreso' : 'el egreso'} <strong>{row.matchedId}</strong>. Confirma la sugerencia o selecciona otro candidato.
+            El sistema sugirió vincular esta fila con {row.matchedType === 'income' ? 'el cobro' : 'el pago'} <strong>{row.matchedId}</strong>. Confirma la sugerencia o selecciona otro candidato.
           </Alert>
         )}
 
@@ -416,8 +425,8 @@ const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionCompl
                 sx={{ minWidth: 140 }}
               >
                 <MenuItem value='all'>Todos</MenuItem>
-                <MenuItem value='income'>Ingresos</MenuItem>
-                <MenuItem value='expense'>Egresos</MenuItem>
+                <MenuItem value='income'>Cobros</MenuItem>
+                <MenuItem value='expense'>Pagos</MenuItem>
               </CustomTextField>
             </Box>
 
@@ -471,7 +480,7 @@ const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionCompl
                                   round='true'
                                   size='small'
                                   color={candidate.type === 'income' ? 'success' : 'error'}
-                                  label={candidate.type === 'income' ? 'Ingreso' : 'Egreso'}
+                                  label={candidate.type === 'income' ? 'Cobro' : 'Pago'}
                                 />
                                 {isExactMatch && (
                                   <CustomChip round='true' size='small' color='primary' label='Monto exacto' />
@@ -481,6 +490,9 @@ const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionCompl
                                     {candidate.reference}
                                   </Typography>
                                 )}
+                                {candidate.legType && (
+                                  <CustomChip round='true' size='small' color='secondary' label={candidate.legType} />
+                                )}
                               </Box>
                               <Typography variant='body2' fontWeight={500} noWrap>
                                 {candidate.description}
@@ -488,6 +500,11 @@ const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionCompl
                               {candidate.partyName && (
                                 <Typography variant='caption' color='text.secondary'>
                                   {candidate.partyName}
+                                </Typography>
+                              )}
+                              {(candidate.instrumentName || candidate.settlementMode) && (
+                                <Typography variant='caption' color='text.secondary' sx={{ display: 'block' }}>
+                                  {[candidate.instrumentName, candidate.settlementMode].filter(Boolean).join(' · ')}
                                 </Typography>
                               )}
                             </Box>

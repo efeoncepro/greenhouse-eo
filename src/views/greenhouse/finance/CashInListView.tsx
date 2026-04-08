@@ -26,6 +26,7 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
 import RegisterCashInDrawer from '@views/greenhouse/finance/drawers/RegisterCashInDrawer'
 
 // ---------------------------------------------------------------------------
@@ -43,6 +44,9 @@ interface CashInItem {
   reference: string | null
   paymentMethod: string | null
   reconciled: boolean
+  paymentAccountName: string | null
+  paymentProviderSlug: string | null
+  paymentInstrumentCategory: string | null
 }
 
 interface CashInApiItem {
@@ -56,6 +60,9 @@ interface CashInApiItem {
   reference: string | null
   paymentMethod: string | null
   isReconciled: boolean
+  paymentAccountName: string | null
+  paymentProviderSlug: string | null
+  paymentInstrumentCategory: string | null
 }
 
 interface CashInSummary {
@@ -151,7 +158,10 @@ const CashInListView = () => {
             clientName: item.clientName,
             reference: item.reference,
             paymentMethod: item.paymentMethod,
-            reconciled: item.isReconciled
+            reconciled: item.isReconciled,
+            paymentAccountName: item.paymentAccountName,
+            paymentProviderSlug: item.paymentProviderSlug,
+            paymentInstrumentCategory: item.paymentInstrumentCategory
           }))
         )
         setTotal(data.total ?? 0)
@@ -311,16 +321,16 @@ const CashInListView = () => {
                 <TableCell align='right'>Monto</TableCell>
                 <TableCell>Factura</TableCell>
                 <TableCell>Cliente</TableCell>
+                <TableCell>Instrumento</TableCell>
                 <TableCell>Referencia</TableCell>
                 <TableCell>Método</TableCell>
-                <TableCell>Estado</TableCell>
                 <TableCell>Conciliación</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {items.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} sx={{ textAlign: 'center', py: 8 }}>
+                  <TableCell colSpan={8} align='center' sx={{ py: 8 }}>
                     <Typography variant='body2' color='text.secondary'>
                       Sin cobros registrados en este período
                     </Typography>
@@ -350,6 +360,17 @@ const CashInListView = () => {
                     </TableCell>
                     <TableCell>
                       <Typography variant='body2'>{item.clientName || '—'}</Typography>
+                    </TableCell>
+                    <TableCell>
+                      {item.paymentAccountName ? (
+                        <PaymentInstrumentChip
+                          providerSlug={item.paymentProviderSlug}
+                          instrumentName={item.paymentAccountName}
+                          size='sm'
+                        />
+                      ) : (
+                        <Typography variant='body2' color='text.secondary'>—</Typography>
+                      )}
                     </TableCell>
                     <TableCell>
                       <Typography variant='body2' color='text.secondary'>{item.reference || '—'}</Typography>

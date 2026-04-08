@@ -42,6 +42,11 @@ const PAYMENT_METHODS = [
   { value: 'other', label: 'Otro' }
 ]
 
+const SETTLEMENT_MODES = [
+  { value: 'direct', label: 'Pago directo' },
+  { value: 'via_intermediary', label: 'Vía instrumento intermediario' }
+]
+
 const formatAmount = (amount: number, currency = 'CLP'): string =>
   new Intl.NumberFormat('es-CL', {
     style: 'currency',
@@ -64,6 +69,7 @@ type Props = {
 // ---------------------------------------------------------------------------
 
 const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
+  const [selectedSupplier, setSelectedSupplier] = useState('')
   const [selectedExpenseId, setSelectedExpenseId] = useState('')
   const [amount, setAmount] = useState('')
   const [paymentDate, setPaymentDate] = useState('')
@@ -77,11 +83,26 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
   const [instruments, setInstruments] = useState<Array<{ accountId: string; accountName: string; providerSlug: string | null; instrumentCategory: string; currency: string }>>([])
   const [selectedInstrumentId, setSelectedInstrumentId] = useState('')
   const [currentFxRate, setCurrentFxRate] = useState<number | null>(null)
+  const [exchangeRateOverride, setExchangeRateOverride] = useState('')
+  const [settlementMode, setSettlementMode] = useState<'direct' | 'via_intermediary'>('direct')
+  const [fundingInstrumentId, setFundingInstrumentId] = useState('')
+  const [feeAmount, setFeeAmount] = useState('')
+  const [feeCurrency, setFeeCurrency] = useState('CLP')
 
   // Expense dropdown data
   const [expenses, setExpenses] = useState<ExpenseOption[]>([])
   const [loadingExpenses, setLoadingExpenses] = useState(false)
   const [expensesError, setExpensesError] = useState<string | null>(null)
+
+  // Derived: unique suppliers with pending expenses
+  const uniqueSuppliers = Array.from(
+    new Map(expenses.map(e => [e.supplierName || 'Sin proveedor', e.supplierName || 'Sin proveedor'])).keys()
+  ).sort((a, b) => a.localeCompare(b))
+
+  // Filtered expenses for selected supplier
+  const filteredExpenses = selectedSupplier
+    ? expenses.filter(e => (e.supplierName || 'Sin proveedor') === selectedSupplier)
+    : []
 
   // Selected expense for pending balance display
   const selectedExpense = expenses.find(e => e.expenseId === selectedExpenseId) ?? null
@@ -127,7 +148,7 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
     if (open) {
       fetchExpenses()
 
-      fetch('/api/admin/payment-instruments', { cache: 'no-store' })
+      fetch('/api/finance/accounts', { cache: 'no-store' })
         .then(res => res.ok ? res.json() : null)
         .then(data => {
           if (data?.items) {
@@ -147,6 +168,12 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
     }
   }, [open, fetchExpenses])
 
+  const handleSupplierChange = (value: string) => {
+    setSelectedSupplier(value)
+    setSelectedExpenseId('')
+    setAmount('')
+  }
+
   const handleExpenseChange = (value: string) => {
     setSelectedExpenseId(value)
 
@@ -160,6 +187,7 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
   }
 
   const resetForm = () => {
+    setSelectedSupplier('')
     setSelectedExpenseId('')
     setAmount('')
     setPaymentDate('')
@@ -167,6 +195,11 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
     setPaymentMethod('')
     setSelectedInstrumentId('')
     setCurrentFxRate(null)
+    setExchangeRateOverride('')
+    setSettlementMode('direct')
+    setFundingInstrumentId('')
+    setFeeAmount('')
+    setFeeCurrency('CLP')
     setNotes('')
     setError(null)
   }
@@ -207,6 +240,11 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
     if (paymentMethod) body.paymentMethod = paymentMethod
     if (notes.trim()) body.notes = notes.trim()
     if (selectedInstrumentId) body.paymentAccountId = selectedInstrumentId
+    if (exchangeRateOverride.trim()) body.exchangeRateOverride = Number(exchangeRateOverride)
+    if (settlementMode) body.settlementMode = settlementMode
+    if (settlementMode === 'via_intermediary' && fundingInstrumentId) body.fundingInstrumentId = fundingInstrumentId
+    if (feeAmount.trim()) body.feeAmount = Number(feeAmount)
+    if (feeCurrency) body.feeCurrency = feeCurrency
 
     try {
       const res = await fetch(`/api/finance/expenses/${selectedExpenseId}/payments`, {
@@ -259,22 +297,50 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
           select
           fullWidth
           size='small'
-          label='Documento de compra'
-          value={selectedExpenseId}
-          onChange={e => handleExpenseChange(e.target.value)}
+          label='Proveedor'
+          value={selectedSupplier}
+          onChange={e => handleSupplierChange(e.target.value)}
           required
           disabled={loadingExpenses}
         >
           <MenuItem value=''>
             {loadingExpenses
               ? 'Cargando...'
-              : expenses.length === 0
-                ? 'No hay documentos pendientes'
+              : uniqueSuppliers.length === 0
+                ? 'No hay proveedores con documentos pendientes'
+                : '— Seleccionar proveedor —'}
+          </MenuItem>
+          {uniqueSuppliers.map(supplier => {
+            const count = expenses.filter(e => (e.supplierName || 'Sin proveedor') === supplier).length
+
+            return (
+              <MenuItem key={supplier} value={supplier}>
+                {supplier} ({count} {count === 1 ? 'documento' : 'documentos'})
+              </MenuItem>
+            )
+          })}
+        </CustomTextField>
+
+        <CustomTextField
+          select
+          fullWidth
+          size='small'
+          label='Documento de compra'
+          value={selectedExpenseId}
+          onChange={e => handleExpenseChange(e.target.value)}
+          required
+          disabled={!selectedSupplier}
+        >
+          <MenuItem value=''>
+            {!selectedSupplier
+              ? 'Selecciona un proveedor primero'
+              : filteredExpenses.length === 0
+                ? 'Sin documentos pendientes'
                 : '— Seleccionar documento —'}
           </MenuItem>
-          {expenses.map(e => (
+          {filteredExpenses.map(e => (
             <MenuItem key={e.expenseId} value={e.expenseId}>
-              {e.description}{e.supplierName ? ` (${e.supplierName})` : ''} — {formatAmount(e.pendingAmount, e.currency)}
+              {e.description} — {formatAmount(e.pendingAmount, e.currency)}
             </MenuItem>
           ))}
         </CustomTextField>
@@ -300,6 +366,19 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
               Dólar observado: ${new Intl.NumberFormat('es-CL', { maximumFractionDigits: 2 }).format(currentFxRate)} CLP — Equivalente: {new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(Number(amount || 0) * currentFxRate)}
             </Typography>
           </Box>
+        )}
+
+        {selectedExpense?.currency !== 'CLP' && (
+          <CustomTextField
+            fullWidth
+            size='small'
+            label='Tipo de cambio aplicado'
+            type='number'
+            value={exchangeRateOverride}
+            onChange={e => setExchangeRateOverride(e.target.value)}
+            placeholder={currentFxRate ? String(currentFxRate) : 'Opcional'}
+            helperText='Opcional. Si lo informas, Greenhouse usará este tipo de cambio para CLP, FX y settlement.'
+          />
         )}
 
         <CustomTextField
@@ -362,6 +441,71 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
             </MenuItem>
           ))}
         </CustomTextField>
+
+        <CustomTextField
+          select
+          fullWidth
+          size='small'
+          label='Liquidación'
+          value={settlementMode}
+          onChange={e => setSettlementMode(e.target.value as 'direct' | 'via_intermediary')}
+          helperText='Usa pago directo para Swift/banco. Usa intermediario para flujos tipo Santander -> Global66 -> beneficiario.'
+        >
+          {SETTLEMENT_MODES.map(mode => (
+            <MenuItem key={mode.value} value={mode.value}>{mode.label}</MenuItem>
+          ))}
+        </CustomTextField>
+
+        {settlementMode === 'via_intermediary' && (
+          <CustomTextField
+            select
+            fullWidth
+            size='small'
+            label='Fondeado desde'
+            value={fundingInstrumentId}
+            onChange={e => setFundingInstrumentId(e.target.value)}
+            helperText='Instrumento origen del funding. No liquida la obligación; Greenhouse lo modela como leg separado.'
+          >
+            <MenuItem value=''>— Seleccionar instrumento origen —</MenuItem>
+            {instruments.map(inst => (
+              <MenuItem key={inst.accountId} value={inst.accountId}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <PaymentInstrumentChip
+                    providerSlug={inst.providerSlug}
+                    instrumentName={inst.accountName}
+                    size='sm'
+                    showName={false}
+                  />
+                  {inst.accountName} ({inst.currency})
+                </Box>
+              </MenuItem>
+            ))}
+          </CustomTextField>
+        )}
+
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 120px' }, gap: 2 }}>
+          <CustomTextField
+            fullWidth
+            size='small'
+            label='Fee de liquidación'
+            type='number'
+            value={feeAmount}
+            onChange={e => setFeeAmount(e.target.value)}
+            helperText='Opcional. Se registra como settlement leg separado.'
+          />
+          <CustomTextField
+            select
+            fullWidth
+            size='small'
+            label='Moneda fee'
+            value={feeCurrency}
+            onChange={e => setFeeCurrency(e.target.value)}
+          >
+            <MenuItem value='CLP'>CLP</MenuItem>
+            <MenuItem value='USD'>USD</MenuItem>
+            <MenuItem value='EUR'>EUR</MenuItem>
+          </CustomTextField>
+        </Box>
 
         <CustomTextField
           fullWidth

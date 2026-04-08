@@ -1,16 +1,11 @@
 import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
-import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
-import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
-import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
 import {
   assertReconciliationPeriodIsMutableFromPostgres,
   importBankStatementsToPostgres
 } from '@/lib/finance/postgres-reconciliation'
 import {
-  runFinanceQuery,
-  getFinanceProjectId,
   assertNonEmptyString,
   assertDateString,
   normalizeString,
@@ -29,10 +24,6 @@ interface StatementInput {
   reference?: string
   amount: number
   balance?: number
-}
-
-interface StatementCountRow {
-  total: unknown
 }
 
 /** Convert CSV-parsed rows into the standard StatementInput shape */
@@ -89,101 +80,16 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       balance: row.balance !== undefined ? toNumber(row.balance) : null
     }))
 
-    // ── Postgres-first path ──
-    try {
-      await assertReconciliationPeriodIsMutableFromPostgres(periodId)
+    await assertReconciliationPeriodIsMutableFromPostgres(periodId)
 
-      const result = await importBankStatementsToPostgres(periodId, validatedRows)
-
-      return NextResponse.json({
-        periodId,
-        imported: result.imported,
-        ...(body.bankFormat && { bankFormat: body.bankFormat })
-      }, { status: 201 })
-    } catch (error) {
-      if (!shouldFallbackFromFinancePostgres(error)) {
-        throw error
-      }
-
-      if (!isFinanceBigQueryWriteEnabled()) {
-        return NextResponse.json(
-          {
-            error: 'Finance BigQuery fallback write is disabled. Postgres write path failed.',
-            code: 'FINANCE_BQ_WRITE_DISABLED'
-          },
-          { status: 503 }
-        )
-      }
-    }
-
-    // ── BigQuery fallback ──
-    await ensureFinanceInfrastructure()
-    const projectId = getFinanceProjectId()
-
-    const existing = await runFinanceQuery<{ period_id: string; status: string }>(`
-      SELECT period_id, status
-      FROM \`${projectId}.greenhouse.fin_reconciliation_periods\`
-      WHERE period_id = @periodId
-    `, { periodId })
-
-    if (existing.length === 0) {
-      return NextResponse.json({ error: 'Reconciliation period not found' }, { status: 404 })
-    }
-
-    if (existing[0].status === 'reconciled' || existing[0].status === 'closed') {
-      throw new FinanceValidationError('Cannot import statements into a reconciled or closed period.', 409)
-    }
-
-    const statementCounts = await runFinanceQuery<StatementCountRow>(`
-      SELECT COUNT(*) AS total
-      FROM \`${projectId}.greenhouse.fin_bank_statement_rows\`
-      WHERE period_id = @periodId
-    `, { periodId })
-
-    const existingRowCount = toNumber(statementCounts[0]?.total)
-    let imported = 0
-
-    for (const row of validatedRows) {
-      const rowId = `${periodId}_${String(existingRowCount + imported + 1).padStart(4, '0')}`
-
-      await runFinanceQuery(`
-        INSERT INTO \`${projectId}.greenhouse.fin_bank_statement_rows\` (
-          row_id, period_id, transaction_date, value_date,
-          description, reference, amount, balance,
-          match_status, created_at
-        ) VALUES (
-          @rowId, @periodId, @transactionDate, IF(@valueDate = '', NULL, CAST(@valueDate AS DATE)),
-          @description, @reference, CAST(@amount AS NUMERIC), CAST(@balance AS NUMERIC),
-          'unmatched', CURRENT_TIMESTAMP()
-        )
-      `, {
-        rowId,
-        periodId,
-        transactionDate: row.transactionDate,
-        valueDate: row.valueDate,
-        description: row.description,
-        reference: row.reference,
-        amount: row.amount,
-        balance: row.balance
-      })
-
-      imported++
-    }
-
-    await runFinanceQuery(`
-      UPDATE \`${projectId}.greenhouse.fin_reconciliation_periods\`
-      SET
-        statement_imported = TRUE,
-        statement_imported_at = CURRENT_TIMESTAMP(),
-        statement_row_count = @rowCount,
-        status = CASE WHEN status = 'open' THEN 'in_progress' ELSE status END,
-        updated_at = CURRENT_TIMESTAMP()
-      WHERE period_id = @periodId
-    `, { periodId, rowCount: existingRowCount + imported })
+    const result = await importBankStatementsToPostgres(periodId, validatedRows)
 
     return NextResponse.json({
       periodId,
-      imported,
+      imported: result.imported,
+      skipped: result.skipped,
+      totalRowCount: result.totalRowCount,
+      importBatchId: result.importBatchId,
       ...(body.bankFormat && { bankFormat: body.bankFormat })
     }, { status: 201 })
   } catch (error) {

@@ -56,32 +56,41 @@ interface Account {
   accountName: string
 }
 
-interface IncomeMovement {
-  incomeId: string
-  clientName: string
-  invoiceDate: string | null
-  totalAmountClp: number
+interface CashInMovement {
+  paymentId: string
+  clientName: string | null
+  invoiceNumber: string | null
+  invoiceDescription: string | null
+  paymentDate: string | null
+  amount: number
   isReconciled: boolean
+  paymentAccountName: string | null
+  paymentProviderSlug: string | null
+  paymentInstrumentCategory: string | null
 }
 
-interface ExpenseMovement {
+interface CashOutMovement {
+  paymentId: string
   expenseId: string
-  description: string
+  expenseDescription: string
   supplierName: string | null
   memberName: string | null
   paymentDate: string | null
-  documentDate: string | null
-  totalAmountClp: number
+  amount: number
   isReconciled: boolean
+  paymentAccountName: string | null
+  paymentProviderSlug: string | null
+  paymentInstrumentCategory: string | null
 }
 
 interface PendingMovement {
   id: string
-  type: 'income' | 'expense'
+  type: 'cobro' | 'pago'
   description: string
   partyName: string | null
   date: string | null
   amount: number
+  instrumentName: string | null
 }
 
 // ---------------------------------------------------------------------------
@@ -126,7 +135,7 @@ const mvColumnHelper = createColumnHelper<PendingMovement>()
 const mvColumns: ColumnDef<PendingMovement, any>[] = [
   mvColumnHelper.accessor('type', {
     header: 'Tipo',
-    cell: ({ getValue }) => <CustomChip round='true' size='small' color={getValue() === 'income' ? 'success' : 'error'} label={getValue() === 'income' ? 'Ingreso' : 'Egreso'} />
+    cell: ({ getValue }) => <CustomChip round='true' size='small' color={getValue() === 'cobro' ? 'success' : 'warning'} label={getValue() === 'cobro' ? 'Cobro' : 'Pago'} />
   }),
   mvColumnHelper.accessor('description', {
     header: 'Descripción',
@@ -134,10 +143,15 @@ const mvColumns: ColumnDef<PendingMovement, any>[] = [
       <>
         <Typography variant='body2' fontWeight={500}>{row.original.description}</Typography>
         <Typography variant='caption' color='text.secondary'>{row.original.id}</Typography>
+        {row.original.instrumentName && (
+          <Typography variant='caption' color='text.secondary' display='block'>
+            {row.original.instrumentName}
+          </Typography>
+        )}
       </>
     )
   }),
-  mvColumnHelper.accessor('partyName', { header: 'Entidad', cell: ({ getValue }) => <Typography variant='body2'>{getValue() || '—'}</Typography> }),
+  mvColumnHelper.accessor('partyName', { header: 'Contraparte', cell: ({ getValue }) => <Typography variant='body2'>{getValue() || '—'}</Typography> }),
   mvColumnHelper.accessor('date', { header: 'Fecha', cell: ({ getValue }) => <Typography variant='body2'>{formatDate(getValue())}</Typography> }),
   mvColumnHelper.accessor('amount', {
     header: 'Monto',
@@ -173,8 +187,8 @@ const ReconciliationView = () => {
       const [periodsRes, accountsRes, incomeRes, expenseRes] = await Promise.all([
         fetch(`/api/finance/reconciliation?${params.toString()}`, { cache: 'no-store' }),
         fetch('/api/finance/accounts', { cache: 'no-store' }),
-        fetch('/api/finance/income?pageSize=20', { cache: 'no-store' }),
-        fetch('/api/finance/expenses?pageSize=20', { cache: 'no-store' })
+        fetch('/api/finance/cash-in?page=1&pageSize=20&isReconciled=false', { cache: 'no-store' }),
+        fetch('/api/finance/cash-out?page=1&pageSize=20&isReconciled=false', { cache: 'no-store' })
       ])
 
       if (periodsRes.ok) {
@@ -201,25 +215,25 @@ const ReconciliationView = () => {
         const expenseData = await expenseRes.json()
 
         const incomes: PendingMovement[] = (incomeData.items ?? [])
-          .filter((item: IncomeMovement) => !item.isReconciled)
-          .map((item: IncomeMovement) => ({
-            id: item.incomeId,
-            type: 'income',
-            description: item.clientName || item.incomeId,
+          .map((item: CashInMovement) => ({
+            id: item.paymentId,
+            type: 'cobro',
+            description: item.invoiceDescription || item.invoiceNumber || item.clientName || item.paymentId,
             partyName: item.clientName || null,
-            date: item.invoiceDate,
-            amount: item.totalAmountClp
+            date: item.paymentDate,
+            amount: item.amount,
+            instrumentName: item.paymentAccountName || item.paymentProviderSlug || item.paymentInstrumentCategory || null
           }))
 
         const expenses: PendingMovement[] = (expenseData.items ?? [])
-          .filter((item: ExpenseMovement) => !item.isReconciled)
-          .map((item: ExpenseMovement) => ({
-            id: item.expenseId,
-            type: 'expense',
-            description: item.description,
+          .map((item: CashOutMovement) => ({
+            id: item.paymentId,
+            type: 'pago',
+            description: item.expenseDescription || item.expenseId,
             partyName: item.supplierName || item.memberName || null,
-            date: item.paymentDate || item.documentDate,
-            amount: -item.totalAmountClp
+            date: item.paymentDate,
+            amount: -item.amount,
+            instrumentName: item.paymentAccountName || item.paymentProviderSlug || item.paymentInstrumentCategory || null
           }))
 
         setPendingMovements(
@@ -229,11 +243,11 @@ const ReconciliationView = () => {
         )
       } else {
         if (!incomeRes.ok) {
-          errors.push(`Ingresos: ${incomeRes.status}`)
+          errors.push(`Cobros: ${incomeRes.status}`)
         }
 
         if (!expenseRes.ok) {
-          errors.push(`Egresos: ${expenseRes.status}`)
+          errors.push(`Pagos: ${expenseRes.status}`)
         }
       }
     } catch (error) {
@@ -319,7 +333,7 @@ return <CustomChip round='true' size='small' color={c.color} label={c.label} /> 
             Conciliación
           </Typography>
           <Typography variant='body2' color='text.secondary'>
-            Conciliación bancaria y matching de transacciones
+            Conciliación bancaria y movimientos de caja
           </Typography>
         </Box>
         <Grid container spacing={6}>
@@ -347,7 +361,7 @@ return <CustomChip round='true' size='small' color={c.color} label={c.label} /> 
             Conciliación
           </Typography>
           <Typography variant='body2' color='text.secondary'>
-            Conciliación bancaria y matching de transacciones
+            Conciliación bancaria y movimientos de caja
           </Typography>
         </Box>
         <Button variant='contained' color='primary' startIcon={<i className='tabler-plus' />} onClick={() => setCreateDrawerOpen(true)}>
@@ -376,7 +390,7 @@ return <CustomChip round='true' size='small' color={c.color} label={c.label} /> 
 
       {accounts.length > 0 && periods.length === 0 && pendingMovementCount > 0 && (
         <Alert severity='info'>
-          Ya existen movimientos por conciliar, pero aún no hay períodos abiertos. Crea un período para el mes y cuenta correspondiente para empezar el matching bancario.
+          Ya existen movimientos de caja por conciliar, pero aún no hay períodos abiertos. Crea un período para el mes y cuenta correspondiente para empezar el matching bancario.
         </Alert>
       )}
 
@@ -413,7 +427,7 @@ return <CustomChip round='true' size='small' color={c.color} label={c.label} /> 
           <HorizontalWithSubtitle
             title='Por conciliar'
             stats={String(pendingMovementCount)}
-            subtitle={pendingMovementCount === 1 ? 'Movimiento pendiente' : 'Movimientos pendientes'}
+            subtitle={pendingMovementCount === 1 ? 'Movimiento de caja pendiente' : 'Movimientos de caja pendientes'}
             avatarIcon='tabler-alert-triangle'
             avatarColor={pendingMovementCount > 0 ? 'error' : 'success'}
           />
@@ -507,8 +521,8 @@ return <CustomChip round='true' size='small' color={c.color} label={c.label} /> 
 
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
         <CardHeader
-          title='Movimientos por conciliar'
-          subheader={pendingMovementCount > 0 ? `${pendingMovementCount} movimientos financieros sin match bancario` : 'Sin movimientos pendientes'}
+          title='Movimientos de caja por conciliar'
+          subheader={pendingMovementCount > 0 ? `${pendingMovementCount} movimientos de caja sin match bancario` : 'Sin movimientos de caja pendientes'}
           avatar={
             <Avatar variant='rounded' sx={{ bgcolor: 'warning.lightOpacity' }}>
               <i className='tabler-list-search' style={{ fontSize: 22, color: 'var(--mui-palette-warning-main)' }} />
@@ -532,7 +546,7 @@ return <CustomChip round='true' size='small' color={c.color} label={c.label} /> 
             </thead>
             <tbody>
               {mvTable.getRowModel().rows.length === 0 ? (
-                <tr><td colSpan={mvColumns.length} style={{ textAlign: 'center', padding: '3rem' }}><Typography variant='body2' color='text.secondary'>No hay movimientos pendientes por conciliar.</Typography></td></tr>
+                <tr><td colSpan={mvColumns.length} style={{ textAlign: 'center', padding: '3rem' }}><Typography variant='body2' color='text.secondary'>No hay movimientos de caja pendientes por conciliar.</Typography></td></tr>
               ) : mvTable.getRowModel().rows.map(row => (
                 <tr key={row.id}>
                   {row.getVisibleCells().map(cell => (
