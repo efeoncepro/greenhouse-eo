@@ -15,6 +15,19 @@
   - tampoco puede “desaparecer” la realidad ya materializada de facturas cobradas o compras pagadas
   - la separación correcta debe preservar el bridge entre documento, devengo y caja real
 
+## Delta 2026-04-08
+
+- Se endureció el contrato de caja sobre el ledger canónico:
+  - `IncomeDetailView` registra cobros por `POST /api/finance/income/[id]/payments`
+  - el endpoint legacy `POST /api/finance/income/[id]/payment` quedó como wrapper compatible del carril canónico y ya no puede caer a BigQuery
+  - `Cobros` y `Pagos` quedaron alineados a la shape real de sus APIs Postgres-first
+- Se agregó remediación operativa para histórico y drift:
+  - nuevo módulo `payment-ledger-remediation`
+  - scripts `pnpm audit:finance:payment-ledgers` y `pnpm backfill:finance:payment-ledgers`
+  - el backfill usa `recordPayment` / `recordExpensePayment`, por lo que también publica `finance.income_payment.recorded` y `finance.expense_payment.recorded`
+- El sync de movimientos bancarios Nubox ya usa el write path canónico de `income_payments`, evitando que cobros sincronizados queden fuera del contrato reactivo que consumen `client_economics`, `operational_pl` y `commercial_cost_attribution`
+- `data-quality` y los summaries Postgres-first ahora reportan gaps tipo `paid without ledger`
+
 ## Status
 
 - Lifecycle: `in-progress`
@@ -50,7 +63,7 @@ El problema no es solo de naming. Es un drift de contrato de dominio:
 - una `factura de venta` respalda revenue/devengo, pero no equivale automáticamente a un cobro
 - una `factura de compra` respalda costo/obligación, pero no equivale automáticamente a un pago
 - `income_payments` ya modela bien el cobro real en el lado de ventas
-- el lado de compras todavía depende en parte de `payment_date` / `payment_status` embebidos y de follow-ons como `TASK-194`
+- el lado de compras ya tiene `expense_payments` como ledger de caja, pero todavía conserva campos derivados embebidos (`payment_date`, `payment_status`, `amount_paid`) que deben tratarse como estado materializado y no como source of truth
 
 Síntomas visibles hoy:
 
@@ -94,11 +107,11 @@ Reglas obligatorias:
 
 - `Nubox sales` y `Nubox purchases` deben interpretarse primero como documentos fuente, no como caja.
 - `P&L` puede seguir leyendo devengo desde `income` / `expenses`, pero no debe venderse como cashflow.
-- `cashflow` y conciliación deben apoyarse en ledgers/pagos reales (`income_payments`, `payment_date`, `expense_payments` cuando exista).
+- `cashflow` y conciliación deben apoyarse en ledgers/pagos reales (`income_payments`, `expense_payments`), no en flags embebidos del documento cuando exista un ledger canónico.
 - no se debe renombrar físicamente el schema de golpe en esta lane si eso mezcla refactor masivo con semántica funcional.
 - las surfaces visibles deben preferir lenguaje explícito aunque el storage legacy conserve nombres históricos.
 - todo ajuste de contrato en esta lane debe ser aditivo o bridge-safe:
-  - no romper `payment_status`, `amount_paid`, `income_payments`, `payment_date` ni los readers que hoy sí capturan realidad de cobro/pago
+  - no romper `payment_status`, `amount_paid`, `income_payments`, `expense_payments`, `payment_date` ni los readers que hoy sí capturan realidad de cobro/pago
   - no degradar cálculos actuales de `Finance Dashboard`, `cashflow`, `P&L`, `client_economics` o `operational_pl`
 
 ## Dependencies & Impact
@@ -139,19 +152,19 @@ Reglas obligatorias:
 
 - `income` ya distingue varios tipos documentales relevantes (`service_fee`, `credit_note`, `debit_note`, `quote` ya separado)
 - `income_payments` ya modela cobros reales como ledger 1:N
+- `expense_payments` ya modela pagos reales como ledger 1:N
 - `cashflow` y `P&L` ya están separados como conceptos en arquitectura
 - `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` ya documenta `income` / `expenses` como carril de devengo y `income_payments` como caja del lado ventas
 - la capa visible principal ya recibió un primer ajuste de copy/navegación para `Ventas` / `Compras`
 - `Finance` y `Cost Intelligence` ya calculan realidad útil a partir de estos objetos:
   - facturación/devengo por documento
   - cobros reales vía `income_payments`
-  - pagos reales vía `payment_date` / `payment_status` en expenses
+  - pagos reales vía `expense_payments`
   - cuentas por cobrar / pagar y vistas de cierre
 
 ### Gap actual
 
 - el runtime sigue exponiendo nombres históricos `income` / `expenses` y no siempre agrega metadata explícita de `document vs cash`
-- el lado compras todavía no tiene un payment ledger 1:N simétrico al de ventas
 - algunos consumers siguen usando `Ingresos` / `Egresos` como shorthand ambiguo
 - la separación visible ya empezó, pero todavía no existe un inventario formal de todas las surfaces que deben alinearse
 - el gap no es “reemplazar” lo que hoy calcula Finance, sino explicitar qué parte del cálculo viene de:
@@ -197,7 +210,7 @@ Reglas obligatorias:
 - renombrar físicamente tablas `income` / `expenses` en PostgreSQL o BigQuery
 - rehacer completo el `P&L` engine en esta lane
 - migrar todas las rutas API a nuevos paths públicos en este mismo lote
-- implementar por sí sola el ledger 1:N de pagos de egresos
+- rediseñar por completo las surfaces de `Cobros` / `Pagos` en este mismo lote
 
 ## Acceptance Criteria
 

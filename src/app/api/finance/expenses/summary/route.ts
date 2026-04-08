@@ -18,31 +18,61 @@ interface ExpenseSummaryRow {
 
 interface PgExpenseRow extends Record<string, unknown> {
   document_date: string | null
-  payment_date: string | null
   total_amount_clp: string | number
-  payment_status: string | null
+}
+
+interface PgExpensePaymentRow extends Record<string, unknown> {
+  payment_date: string | null
+  amount: string | number
+  currency: string | null
+  exchange_rate_to_clp: string | number | null
 }
 
 async function getPostgresFirstSummary() {
   const monthKeys = getRecentMonthKeys(6)
 
-  const rows = await runGreenhousePostgresQuery<PgExpenseRow>(
-    `SELECT document_date::text, payment_date::text, total_amount_clp, payment_status
-     FROM greenhouse_finance.expenses`
-  )
+  const [rows, paymentRows, missingLedgerRows] = await Promise.all([
+    runGreenhousePostgresQuery<PgExpenseRow>(
+      `SELECT document_date::text, total_amount_clp
+       FROM greenhouse_finance.expenses`
+    ),
+    runGreenhousePostgresQuery<PgExpensePaymentRow>(
+      `SELECT
+         ep.payment_date::text,
+         ep.amount,
+         ep.currency,
+         COALESCE(e.exchange_rate_to_clp, 1) AS exchange_rate_to_clp
+       FROM greenhouse_finance.expense_payments ep
+       INNER JOIN greenhouse_finance.expenses e ON e.expense_id = ep.expense_id`
+    ),
+    runGreenhousePostgresQuery<{ count: string }>(
+      `SELECT COUNT(*)::text AS count
+       FROM greenhouse_finance.expenses e
+       LEFT JOIN (
+         SELECT expense_id, COUNT(*)::int AS payment_count
+         FROM greenhouse_finance.expense_payments
+         GROUP BY expense_id
+       ) ep ON ep.expense_id = e.expense_id
+       WHERE COALESCE(e.is_annulled, FALSE) = FALSE
+         AND COALESCE(e.amount_paid, 0) > 0
+         AND e.payment_status IN ('paid', 'partial')
+         AND COALESCE(ep.payment_count, 0) = 0`
+    )
+  ])
 
   const accrualEntries = rows
     .map(row => ({
-      period: getMonthKey((row.document_date || row.payment_date)?.slice(0, 10) ?? null),
+      period: getMonthKey(row.document_date?.slice(0, 10) ?? null),
       amountClp: roundCurrency(toNumber(row.total_amount_clp))
     }))
     .filter((e): e is { period: string; amountClp: number } => Boolean(e.period))
 
-  const cashEntries = rows
-    .filter(row => row.payment_status === 'paid' && row.payment_date)
+  const cashEntries = paymentRows
     .map(row => ({
-      period: getMonthKey(row.payment_date!.slice(0, 10)),
-      amountClp: roundCurrency(toNumber(row.total_amount_clp))
+      period: getMonthKey(row.payment_date?.slice(0, 10) ?? null),
+      amountClp: row.currency === 'CLP' || !row.currency
+        ? roundCurrency(toNumber(row.amount))
+        : roundCurrency(toNumber(row.amount) * (toNumber(row.exchange_rate_to_clp) || 1))
     }))
     .filter((e): e is { period: string; amountClp: number } => Boolean(e.period))
 
@@ -53,7 +83,10 @@ async function getPostgresFirstSummary() {
     accrualMonthlySeries,
     cashMonthlySeries,
     accrualCurrentMonth: buildCurrentMonthMetrics(accrualMonthlySeries),
-    cashCurrentMonth: buildCurrentMonthMetrics(cashMonthlySeries)
+    cashCurrentMonth: buildCurrentMonthMetrics(cashMonthlySeries),
+    cashDataQuality: {
+      paidExpensesWithoutPaymentEvents: Number(missingLedgerRows[0]?.count ?? 0)
+    }
   }
 }
 
@@ -115,7 +148,7 @@ export async function GET() {
 
     const { accrualMonthlySeries, cashMonthlySeries, accrualCurrentMonth, cashCurrentMonth, cashDataQuality } =
       usePostgres
-        ? { ...(await getPostgresFirstSummary()), cashDataQuality: undefined }
+        ? await getPostgresFirstSummary()
         : await getBigQueryFallbackSummary()
 
     return NextResponse.json({

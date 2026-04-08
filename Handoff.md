@@ -1,5 +1,60 @@
 # Handoff.md
 
+## Sesion 2026-04-08 — Finance cash lane alignment (document detail → cash modules)
+
+### Cobros/Pagos ahora leen y renderizan el ledger correcto (2026-04-08)
+
+Se corrigió una deriva entre el detalle documental (`Ventas` / `Compras`) y los módulos de caja (`Cobros` / `Pagos`).
+
+- **Ventas / cobros**:
+  - `IncomeDetailView` registraba pagos por el endpoint legacy singular `POST /api/finance/income/[id]/payment`.
+  - Ese carril podía caer al fallback BigQuery y dejar el pago fuera de `greenhouse_finance.income_payments`, mientras `cash-in` lee solo el ledger Postgres.
+  - Fix: el detalle ahora usa `POST /api/finance/income/[id]/payments` (endpoint canónico del ledger).
+- **Cobros UI**:
+  - `CashInListView` esperaba campos legacy (`cashInId`, `reconciled`) pero `GET /api/finance/cash-in` entrega `paymentId` e `isReconciled`.
+  - Fix: normalización client-side del payload antes de renderizar.
+- **Pagos UI**:
+  - `CashOutListView` esperaba `cashOutId`, `amountClp`, `description`; la API entrega `paymentId`, `amount`, `currency`, `expenseDescription`, `isReconciled`.
+  - Fix: normalización client-side + render de monto en moneda real.
+- **Verificación**:
+  - `pnpm exec tsc --noEmit` — OK
+- **Riesgo abierto / contexto**:
+  - Los documentos históricos marcados como `paid` sin fila en `income_payments` / `expense_payments` pueden seguir sin aparecer en `Cobros` / `Pagos`.
+  - Eso ya no afecta pagos nuevos registrados desde el detalle, pero sigue indicando deuda histórica de backfill / unificación de source-of-truth.
+
+### Contrato canónico ledger + outbox endurecido (2026-04-08)
+
+Se dejó cerrada la semántica para que caja real, remediación y proyecciones reactivas hablen el mismo idioma.
+
+- **Write path legacy endurecido**:
+  - `POST /api/finance/income/[id]/payment` ya no mantiene un carril propio ni puede caer a BigQuery fallback.
+  - Quedó como wrapper compatible de `recordPayment()` y devuelve `503 FINANCE_BQ_WRITE_DISABLED` si el ledger Postgres no está disponible.
+- **Sync Nubox alineado al contrato reactivo**:
+  - `src/lib/nubox/sync-nubox-to-postgres.ts` ahora registra cobros bancarios vía `recordPayment()`.
+  - Eso garantiza `income_payments` + evento `finance.income_payment.recorded`, que sí escucha `client_economics`, `operational_pl`, `commercial_cost_attribution` y otros consumers reactivos.
+  - Se mantiene además el evento legacy `finance.income.payment_received_via_nubox` para compatibilidad.
+- **Auditoría y backfill operativos**:
+  - Nuevo módulo `src/lib/finance/payment-ledger-remediation.ts`.
+  - Nuevos comandos:
+    - `pnpm audit:finance:payment-ledgers`
+    - `pnpm backfill:finance:payment-ledgers`
+  - El backfill usa `recordPayment()` y `recordExpensePayment()` para que cualquier corrección histórica también publique outbox canónico.
+- **Readers / KPIs**:
+  - `GET /api/finance/data-quality` ahora revisa:
+    - `income amount_paid` vs `SUM(income_payments)`
+    - `expense amount_paid` vs `SUM(expense_payments)`
+    - documentos `paid/partial` sin ledger
+  - `income/summary` y `expenses/summary` Postgres-first ya informan `cashDataQuality` usando el ledger, no solo flags embebidos.
+- **Validación**:
+  - `pnpm exec tsc --noEmit` — OK
+  - `pnpm exec vitest run src/app/api/finance/bigquery-write-cutover.test.ts` — OK
+  - `pnpm exec eslint ...` sobre archivos tocados — OK
+- **Pendiente operativo**:
+  - No ejecuté `pnpm backfill:finance:payment-ledgers --apply` en una base real dentro de esta sesión.
+  - El código y los comandos quedaron listos, pero la corrida de datos histórica debe hacerse de forma intencional porque puede disparar backlog reactivo y recomputes de costos/finanzas.
+
+---
+
 ## Sesion 2026-04-07 — Leave request email family (P2 completado)
 
 ### Sistema de emails de permisos/ausencias (2026-04-07)

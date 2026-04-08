@@ -554,7 +554,7 @@ const IncomeDetailView = () => {
       {data.paymentStatus !== 'paid' && data.paymentStatus !== 'written_off' && (
         <PaymentRegistrationCard
           onSubmit={async (amount, date, reference) => {
-            const res = await fetch(`/api/finance/income/${incomeId}/payment`, {
+            const res = await fetch(`/api/finance/income/${incomeId}/payments`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ amount, paymentDate: date, ...(reference.trim() && { reference: reference.trim() }) })

@@ -8,7 +8,7 @@ const mockGetFinanceSupplierFromPostgres = vi.fn()
 const mockCreateFinanceExpenseInPostgres = vi.fn()
 const mockUpdateFinanceIncomeInPostgres = vi.fn()
 const mockUpdateFinanceExpenseInPostgres = vi.fn()
-const mockCreateFinanceIncomePaymentInPostgres = vi.fn()
+const mockRecordPayment = vi.fn()
 const mockCreateReconciliationPeriodInPostgres = vi.fn()
 const mockGetFinanceClientProfileFromPostgres = vi.fn()
 const mockUpsertFinanceClientProfileInPostgres = vi.fn()
@@ -31,13 +31,18 @@ vi.mock('@/lib/finance/postgres-store-slice2', () => ({
   createFinanceExpenseInPostgres: (...args: unknown[]) => mockCreateFinanceExpenseInPostgres(...args),
   updateFinanceIncomeInPostgres: (...args: unknown[]) => mockUpdateFinanceIncomeInPostgres(...args),
   updateFinanceExpenseInPostgres: (...args: unknown[]) => mockUpdateFinanceExpenseInPostgres(...args),
-  createFinanceIncomePaymentInPostgres: (...args: unknown[]) => mockCreateFinanceIncomePaymentInPostgres(...args),
   getFinanceClientProfileFromPostgres: (...args: unknown[]) => mockGetFinanceClientProfileFromPostgres(...args),
   upsertFinanceClientProfileInPostgres: (...args: unknown[]) => mockUpsertFinanceClientProfileInPostgres(...args),
   syncFinanceClientProfilesFromPostgres: (...args: unknown[]) => mockSyncFinanceClientProfilesFromPostgres(...args),
   getFinanceIncomeFromPostgres: vi.fn(),
   getFinanceExpenseFromPostgres: vi.fn(),
   listFinanceExpensesFromPostgres: vi.fn().mockResolvedValue({ items: [] })
+}))
+
+vi.mock('@/lib/finance/payment-ledger', () => ({
+  recordPayment: (...args: unknown[]) => mockRecordPayment(...args),
+  getPaymentsForIncome: vi.fn(),
+  reconcilePaymentTotals: vi.fn()
 }))
 
 vi.mock('@/lib/finance/postgres-reconciliation', () => ({
@@ -265,7 +270,7 @@ describe('Finance BigQuery write cutover guards', () => {
   })
 
   it('fails closed for income payments when Postgres fails and fallback is disabled', async () => {
-    mockCreateFinanceIncomePaymentInPostgres.mockRejectedValue(new Error('pg down'))
+    mockRecordPayment.mockRejectedValue(new Error('pg down'))
 
     const response = await postIncomePayment(
       new Request('http://localhost/api/finance/income/inc-1/payment', {

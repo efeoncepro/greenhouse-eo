@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-04-07 por Claude
-> **Ultima actualizacion:** 2026-04-07 por Claude
+> **Ultima actualizacion:** 2026-04-08 por Codex
 > **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md)
 
 # Modulos de Caja — Cobros, Pagos y Posicion de Caja
@@ -23,6 +23,8 @@ Finance separa explícitamente los **documentos comerciales** (facturas de venta
 - Muestra todos los pagos recibidos contra facturas de venta
 - Cada cobro esta vinculado a una factura especifica
 - Se puede registrar un cobro desde el detalle de la factura ("Registrar pago")
+- El cobro real queda persistido en `greenhouse_finance.income_payments`
+- Registrar un cobro dispara el evento reactivo `finance.income_payment.recorded`
 - Los cobros se pueden reconciliar contra extractos bancarios
 - KPIs: Total cobrado, Pagos recibidos, Sin conciliar
 
@@ -31,6 +33,8 @@ Finance separa explícitamente los **documentos comerciales** (facturas de venta
 - Muestra todos los pagos realizados contra compromisos (facturas de compra, nomina, impuestos, etc.)
 - Se agrupan por tipo: Proveedor, Nomina, Prevision, Impuesto, Bancario
 - Se puede registrar un pago desde el detalle del documento de compra
+- El pago real queda persistido en `greenhouse_finance.expense_payments`
+- Registrar un pago dispara el evento reactivo `finance.expense_payment.recorded`
 - Soporta pagos parciales (multiples pagos contra un mismo documento)
 - KPIs: Total pagado, desglose por tipo (proveedores, nomina, fiscal)
 
@@ -53,6 +57,20 @@ Finance separa explícitamente los **documentos comerciales** (facturas de venta
    - **Referencia**: numero de transferencia, comprobante, etc.
 3. Hacer clic en "Registrar pago"
 4. El sistema actualiza automaticamente el estado del documento (pendiente → parcial → pagado)
+
+## Regla operativa canonica
+
+- El documento (`Ventas` / `Compras`) es la fuente comercial y tributaria
+- El ledger (`income_payments` / `expense_payments`) es la fuente canonica de caja real
+- Si un documento aparece como pagado o cobrado, debe existir al menos un evento en el ledger correspondiente
+- Los modulos `Cobros`, `Pagos`, `Posicion de caja`, las proyecciones reactivas y los calculos de costos deben leer caja desde ese ledger, no desde un flag embebido en el documento
+
+## Remediacion historica
+
+- Si existen documentos legacy marcados como `paid` o `partial` pero sin fila en el ledger, Greenhouse ahora tiene un script de auditoria/remediacion:
+  - `pnpm audit:finance:payment-ledgers`
+  - `pnpm backfill:finance:payment-ledgers`
+- El backfill usa el write path canonico para que tambien se publiquen los eventos de outbox que consumen Finance, Cost Intelligence y proyecciones operativas
 
 ## Diferencia con P&L
 

@@ -34,7 +34,7 @@ interface PgPaymentRow extends Record<string, unknown> {
 async function getPostgresFirstSummary() {
   const monthKeys = getRecentMonthKeys(6)
 
-  const [incomeRows, paymentRows] = await Promise.all([
+  const [incomeRows, paymentRows, missingLedgerRows] = await Promise.all([
     runGreenhousePostgresQuery<PgIncomeRow>(
       `SELECT invoice_date::text, total_amount_clp
        FROM greenhouse_finance.income`
@@ -46,6 +46,19 @@ async function getPostgresFirstSummary() {
                 1
               ) AS exchange_rate_to_clp
        FROM greenhouse_finance.income_payments ip`
+    ),
+    runGreenhousePostgresQuery<{ count: string }>(
+      `SELECT COUNT(*)::text AS count
+       FROM greenhouse_finance.income i
+       LEFT JOIN (
+         SELECT income_id, COUNT(*)::int AS payment_count
+         FROM greenhouse_finance.income_payments
+         GROUP BY income_id
+       ) ip ON ip.income_id = i.income_id
+       WHERE COALESCE(i.is_annulled, FALSE) = FALSE
+         AND COALESCE(i.amount_paid, 0) > 0
+         AND i.payment_status IN ('paid', 'partial')
+         AND COALESCE(ip.payment_count, 0) = 0`
     )
   ])
 
@@ -76,7 +89,15 @@ async function getPostgresFirstSummary() {
   const accrualCurrentMonth = buildCurrentMonthMetrics(accrualMonthlySeries)
   const cashCurrentMonth = buildCurrentMonthMetrics(cashMonthlySeries)
 
-  return { accrualMonthlySeries, cashMonthlySeries, accrualCurrentMonth, cashCurrentMonth }
+  return {
+    accrualMonthlySeries,
+    cashMonthlySeries,
+    accrualCurrentMonth,
+    cashCurrentMonth,
+    cashDataQuality: {
+      paidInvoicesWithoutPaymentEvents: Number(missingLedgerRows[0]?.count ?? 0)
+    }
+  }
 }
 
 async function getBigQueryFallbackSummary() {
@@ -138,7 +159,7 @@ export async function GET() {
 
     const { accrualMonthlySeries, cashMonthlySeries, accrualCurrentMonth, cashCurrentMonth, cashDataQuality } =
       usePostgres
-        ? { ...(await getPostgresFirstSummary()), cashDataQuality: undefined }
+        ? await getPostgresFirstSummary()
         : await getBigQueryFallbackSummary()
 
     return NextResponse.json({
