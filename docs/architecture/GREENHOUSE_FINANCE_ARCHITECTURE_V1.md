@@ -57,6 +57,30 @@
 | `src/views/greenhouse/admin/payment-instruments/PaymentInstrumentsListView.tsx` | Admin list view |
 | `src/views/greenhouse/admin/payment-instruments/CreatePaymentInstrumentDrawer.tsx` | Drawer de creación |
 
+## Delta 2026-04-08 — Reconciliation settlement orchestration completed (TASK-282)
+
+- **Conciliación quedó `ledger-first` de forma operativa**
+  - candidatos y matching alineados a `income_payments` / `expense_payments`
+  - `matched_settlement_leg_id` persistido en `bank_statement_rows`
+  - `auto-match`, `match`, `unmatch` y `exclude` ya usan el store Postgres sin duplicar eventos de pago en las routes
+- **Settlement orchestration quedó utilizable desde runtime**
+  - helper `getSettlementDetailForPayment()` para inspección del settlement group real de un payment
+  - helper `recordSupplementalSettlementLegForPayment()` para agregar `internal_transfer`, `funding`, `fx_conversion` y `fee`
+  - endpoint `GET/POST /api/finance/settlements/payment`
+  - drawer UI `SettlementOrchestrationDrawer` accesible desde el historial de pagos/cobros
+- **Registro operativo de caja ya soporta configuración multi-leg**
+  - `POST /api/finance/expenses/[id]/payments` acepta `exchangeRateOverride`, `settlementMode`, `fundingInstrumentId`, `feeAmount`, `feeCurrency`, `feeReference`
+  - `POST /api/finance/income/[id]/payments` acepta `exchangeRateOverride`, `feeAmount`, `feeCurrency`, `feeReference`
+  - `RegisterCashOutDrawer` y `RegisterCashInDrawer` ya exponen esos campos operativos
+- **Settlement + reconciliación ya publican y consumen eventos canónicos**
+  - catálogo con `finance.internal_transfer.recorded` y `finance.fx_conversion.recorded`
+  - projections `client_economics`, `operational_pl`, `commercial_cost_attribution` y `period_closure_status` escuchan settlement/reconciliation relevante
+  - `data-quality` audita drift entre `payments`, `settlement_groups`, `settlement_legs` y períodos cerrados/reconciliados
+- **UX operativa de conciliación**
+  - `ReconciliationDetailView` muestra snapshots de instrumento/proveedor/moneda del período
+  - permite `Marcar conciliado` y `Cerrar período` usando `PUT /api/finance/reconciliation/[id]`
+  - la acción queda bloqueada hasta tener extracto importado, diferencia en cero y sin rows pendientes
+
 ---
 
 ## Delta 2026-04-07 — Products catalog + Quote Line Items (TASK-211)

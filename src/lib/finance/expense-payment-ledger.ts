@@ -16,7 +16,10 @@ import {
   toTimestampString,
   type FinanceCurrency
 } from '@/lib/finance/shared'
-import { ensureSettlementForExpensePayment } from '@/lib/finance/settlement-orchestration'
+import {
+  ensureSettlementForExpensePayment,
+  type SettlementConfigurationInput
+} from '@/lib/finance/settlement-orchestration'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 // ─── Types ──────────────────────────────────────────────────────────
@@ -38,6 +41,7 @@ export interface RecordExpensePaymentInput {
   notes?: string | null
   actorUserId?: string | null
   exchangeRateOverride?: number | null
+  settlementConfig?: SettlementConfigurationInput | null
 }
 
 export interface ExpensePaymentRecord {
@@ -288,7 +292,8 @@ export async function recordExpensePayment(input: RecordExpensePaymentInput): Pr
       exchangeRate: exchangeRateAtPayment,
       providerReference: input.reference || null,
       actorUserId: input.actorUserId || null,
-      paymentSource
+      paymentSource,
+      settlementConfig: input.settlementConfig || null
     })
 
     payment.settlementGroupId = settlement.settlementGroup.settlementGroupId

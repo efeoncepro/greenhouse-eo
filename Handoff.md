@@ -1,37 +1,30 @@
 # Handoff.md
 
-## Sesion 2026-04-08 — TASK-282 implementación core + settlement foundation
+## Sesion 2026-04-08 — TASK-282 cerrada
 
 - estado actual:
-  - `TASK-282` sigue en `in-progress`, pero ya no está en discovery
-  - quedó implementado el core `ledger-first` de conciliación con foundation de settlement orchestration
+  - `TASK-282` queda lista para mover a `complete`
+  - el módulo de conciliación ya no está solo en foundation: quedó operable end-to-end desde el portal
 - cambios principales:
-  - `ReconciliationView` ahora arma pendientes desde `GET /api/finance/cash-in?isReconciled=false` y `GET /api/finance/cash-out?isReconciled=false`
-  - `ReconciliationMatchDialog` ya envía `matchedPaymentId` cuando el candidato corresponde a un payment real
-  - `src/lib/finance/postgres-reconciliation.ts` ahora:
-    - reconcilia egresos a nivel `expense_payments`
-    - sincroniza `settlement_legs` al reconciliar / desconciliar
-    - publica eventos `finance.income_payment.reconciled|unreconciled`, `finance.expense_payment.reconciled|unreconciled` y `finance.settlement_leg.reconciled|unreconciled`
-  - nuevo helper `src/lib/finance/settlement-orchestration.ts` que crea settlement directo para `income_payments` y `expense_payments`
-  - nueva migración `20260408103211338_finance-reconciliation-ledger-orchestration.sql`:
-    - snapshots instrument-aware en `reconciliation_periods`
-    - importación idempotente en `bank_statement_rows`
-    - tablas `settlement_groups` y `settlement_legs`
-    - `settlement_group_id` en `income_payments` y `expense_payments`
-  - `src/app/api/finance/reconciliation/[id]/route.ts` publica `finance.reconciliation_period.reconciled` y `finance.reconciliation_period.closed`
-  - `src/app/api/finance/reconciliation/route.ts` vuelve a fallar en cerrado con `FINANCE_BQ_WRITE_DISABLED` si Postgres falla
+  - `ReconciliationDetailView` ahora muestra snapshots instrument-aware del período y acciones `Marcar conciliado` / `Cerrar período`
+  - `SettlementOrchestrationDrawer` quedó disponible desde el historial de pagos/cobros en `IncomeDetailView` y `ExpenseDetailView`
+  - nuevo endpoint `GET/POST /api/finance/settlements/payment` para inspección y alta de legs suplementarios
+  - `RegisterCashOutDrawer` soporta `settlementMode`, `fundingInstrumentId`, `fee*`, `exchangeRateOverride`
+  - `RegisterCashInDrawer` soporta `fee*` y `exchangeRateOverride`
+  - `match`, `unmatch`, `exclude` y `auto-match` ya no duplican eventos de pago en las routes
+  - `period_closure_status`, `client_economics`, `operational_pl` y `commercial_cost_attribution` ya escuchan también `internal_transfer` / `fx_conversion`
 - validación ejecutada:
-  - `pnpm pg:connect:migrate` — OK
-  - `pnpm build` — OK
+  - `pnpm exec tsc --noEmit` — OK
   - `pnpm lint` — OK
-  - `pnpm exec tsc --noEmit` — OK durante implementación
-  - `pnpm test` — falla en 2 tests
-    - `src/app/api/finance/bigquery-write-cutover.test.ts` quedó corregido con el fail-closed de conciliación
-    - `src/views/greenhouse/organizations/tabs/OrganizationPeopleTab.test.tsx` sigue fallando por un comportamiento ajeno a esta lane: la vista ahora hace 2 fetches y el test todavía espera 1
+  - `pnpm build` — OK
+  - `pnpm exec vitest run src/app/api/finance/bigquery-write-cutover.test.ts` — OK
 - riesgo / siguiente paso recomendado:
-  - decidir si `TASK-282` se cierra como foundation implementada o si se mantiene abierta para follow-ons de consumers downstream y UX multi-leg más rica
-  - si se quiere dejar `pnpm test` completamente verde, hay que reconciliar el test de `OrganizationPeopleTab` con su contrato actual
-  - verificar staging de `Finance > Conciliación` con un flujo real de `match`, `unmatch`, reimport y período `closed`
+  - validar en staging un flujo real con:
+    - pago vía intermediario
+    - apertura del settlement drawer
+    - importación + conciliación de al menos un leg
+    - marcado y cierre del período
+  - `TASK-283` aparece en el worktree pero no pertenece a este cierre; dejarlo fuera de cualquier commit de `TASK-282`
 
 ## Sesion 2026-04-08 — TASK-282 tomada para discovery/audit
 

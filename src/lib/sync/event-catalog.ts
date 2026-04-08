@@ -162,6 +162,8 @@ export const EVENT_TYPES = {
   financeSettlementLegRecorded: 'finance.settlement_leg.recorded',
   financeSettlementLegReconciled: 'finance.settlement_leg.reconciled',
   financeSettlementLegUnreconciled: 'finance.settlement_leg.unreconciled',
+  financeInternalTransferRecorded: 'finance.internal_transfer.recorded',
+  financeFxConversionRecorded: 'finance.fx_conversion.recorded',
   financeReconciliationPeriodReconciled: 'finance.reconciliation_period.reconciled',
   financeReconciliationPeriodClosed: 'finance.reconciliation_period.closed',
   financeCostAllocationCreated: 'finance.cost_allocation.created',

@@ -14,7 +14,6 @@ import {
   assertNonEmptyString,
   normalizeString
 } from '@/lib/finance/shared'
-import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,6 +32,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const matchedId = assertNonEmptyString(body.matchedId, 'matchedId')
     const matchedPaymentId = body.matchedPaymentId ? assertNonEmptyString(body.matchedPaymentId, 'matchedPaymentId') : null
 
+    const matchedSettlementLegId = body.matchedSettlementLegId
+      ? assertNonEmptyString(body.matchedSettlementLegId, 'matchedSettlementLegId')
+      : null
+
     if (!['income', 'expense'].includes(matchedType)) {
       throw new FinanceValidationError('matchedType must be "income" or "expense".')
     }
@@ -48,7 +51,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const target = await resolveReconciliationTargetFromPostgres({
       matchedType: matchedType as 'income' | 'expense',
       matchedId,
-      matchedPaymentId
+      matchedPaymentId,
+      matchedSettlementLegId
     })
 
     if (target.isReconciled && normalizeString(target.reconciliationId) !== rowId) {
@@ -61,11 +65,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const previousMatchedType = normalizeString(currentRow.matched_type)
     const previousMatchedId = normalizeString(currentRow.matched_id)
     const previousMatchedPaymentId = normalizeString(currentRow.matched_payment_id)
+    const previousMatchedSettlementLegId = normalizeString(currentRow.matched_settlement_leg_id)
 
     const targetChanged = (
       previousMatchedType !== matchedType
       || previousMatchedId !== target.matchedRecordId
       || previousMatchedPaymentId !== (target.matchedPaymentId || '')
+      || previousMatchedSettlementLegId !== (target.matchedSettlementLegId || '')
     )
 
     if (previousMatchedType && previousMatchedId && targetChanged) {
@@ -73,6 +79,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         matchedType: previousMatchedType,
         matchedId: previousMatchedId,
         matchedPaymentId: previousMatchedPaymentId || null,
+        matchedSettlementLegId: previousMatchedSettlementLegId || null,
         rowId
       })
     }
@@ -82,6 +89,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       matchedType,
       matchedId: target.matchedRecordId,
       matchedPaymentId: target.matchedPaymentId,
+      matchedSettlementLegId: target.matchedSettlementLegId,
       matchConfidence: 1.0,
       matchedByUserId: tenant.userId || null,
       notes: body.notes ? normalizeString(body.notes) : null
@@ -91,27 +99,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       matchedType: matchedType as 'income' | 'expense',
       matchedId: target.matchedRecordId,
       matchedPaymentId: target.matchedPaymentId,
+      matchedSettlementLegId: target.matchedSettlementLegId,
       rowId,
       matchedBy: tenant.userId || null
     })
-
-    if (target.matchedPaymentId) {
-      await publishOutboxEvent({
-        aggregateType: matchedType === 'income' ? 'finance_income_payment' : 'finance_expense_payment',
-        aggregateId: target.matchedPaymentId,
-        eventType: matchedType === 'income'
-          ? 'finance.income_payment.reconciled'
-          : 'finance.expense_payment.reconciled',
-        payload: {
-          paymentId: target.matchedPaymentId,
-          recordId: target.matchedRecordId,
-          rowId,
-          periodId,
-          matchedType,
-          actorUserId: tenant.userId || null
-        }
-      })
-    }
 
     return NextResponse.json({
       matched: true,
@@ -120,6 +111,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       matchedId: target.candidateId,
       matchedRecordId: target.matchedRecordId,
       matchedPaymentId: target.matchedPaymentId,
+      matchedSettlementLegId: target.matchedSettlementLegId,
       matchStatus: 'manual_matched'
     })
   } catch (error) {

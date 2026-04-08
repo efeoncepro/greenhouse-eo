@@ -60,6 +60,20 @@ Finance separa explícitamente los **documentos comerciales** (facturas de venta
 3. Hacer clic en "Registrar pago"
 4. El sistema actualiza automaticamente el estado del documento (pendiente → parcial → pagado)
 
+### Registro avanzado de settlement
+
+- En `Pagos`, el drawer de registro ya permite modelar:
+  - pago directo
+  - pago via instrumento intermediario
+  - instrumento de funding
+  - fee separado
+  - override manual de tipo de cambio
+- En `Cobros`, el drawer de registro ya permite informar:
+  - instrumento
+  - fee de recaudacion
+  - override manual de tipo de cambio
+- Desde el historial de pagos/cobros del detalle documental existe la accion **Liquidacion**, que abre el settlement group del payment y permite agregar legs manuales (`internal_transfer`, `funding`, `fx_conversion`, `fee`) sin alterar el documento base
+
 ## Regla operativa canonica
 
 - El documento (`Ventas` / `Compras`) es la fuente comercial y tributaria
@@ -107,6 +121,14 @@ Cada cobro o pago puede asociarse a un **instrumento de pago** (cuenta bancaria,
 - Cuando existe un `income_payment` o `expense_payment`, el matching operativo ocurre contra ese movimiento real, no contra un flag embebido en la factura o el gasto
 - El periodo de conciliacion guarda snapshots del instrumento para que el cierre no dependa de que el catalogo cambie despues
 - Reimportar el mismo extracto o reporte no debe duplicar filas: Greenhouse usa fingerprints de importacion y omite rows repetidas del mismo periodo
+- La vista detalle del periodo ahora muestra:
+  - snapshot del instrumento, proveedor y moneda del periodo
+  - accion `Marcar conciliado`
+  - accion `Cerrar periodo`
+- Un periodo solo puede marcarse como conciliado cuando:
+  - tiene extracto importado
+  - no quedan filas `unmatched` o `suggested`
+  - la diferencia esta en cero
 
 ## Settlement y pagos internacionales
 
@@ -127,6 +149,17 @@ Esto permite que un mismo documento tenga:
 
 - un pago directo simple, o
 - una cadena multi-leg sin mezclar caja real, conciliacion e instrumento
+
+### Ejemplo operativo: Santander -> Global66 -> proveedor
+
+1. Se registra el pago contra la obligacion en `expense_payments`
+2. El settlement puede quedar como:
+   - `funding` desde Santander
+   - `fx_conversion`
+   - `payout` o `payout` directo ya asociado al payment
+   - `fee`
+3. Cada leg puede conciliarse por separado contra el extracto o reporte correcto
+4. El documento sigue separado del settlement: `pagado` no significa automaticamente `conciliado`
 
 ## Eventos reactivos relevantes
 

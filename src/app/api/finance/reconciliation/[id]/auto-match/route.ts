@@ -10,7 +10,6 @@ import {
 import { FinanceValidationError, normalizeString, toDateString, toNumber } from '@/lib/finance/shared'
 import type { ReconciliationCandidate } from '@/lib/finance/reconciliation'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
-import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 export const dynamic = 'force-dynamic'
 
@@ -104,6 +103,7 @@ const runAutoMatchAlgorithm = async ({
     const matchStatus = autoMatched ? 'auto_matched' : 'suggested'
     const matchedRecordId = bestMatch.candidate.matchedRecordId || bestMatch.candidate.id
     const matchedPaymentId = bestMatch.candidate.matchedPaymentId || null
+    const matchedSettlementLegId = bestMatch.candidate.matchedSettlementLegId || null
     const rowId = normalizeString(row.row_id)
 
     await updateStatementRowMatchInPostgres(rowId, periodId, {
@@ -111,6 +111,7 @@ const runAutoMatchAlgorithm = async ({
       matchedType: bestMatch.candidate.type,
       matchedId: matchedRecordId,
       matchedPaymentId,
+      matchedSettlementLegId,
       matchConfidence: bestMatch.confidence,
       matchedByUserId: autoMatched ? actorUserId || 'auto' : null
     })
@@ -125,27 +126,10 @@ const runAutoMatchAlgorithm = async ({
       matchedType: bestMatch.candidate.type,
       matchedId: matchedRecordId,
       matchedPaymentId,
+      matchedSettlementLegId,
       rowId,
       matchedBy: actorUserId || 'auto'
     })
-
-    if (matchedPaymentId) {
-      await publishOutboxEvent({
-        aggregateType: bestMatch.candidate.type === 'income' ? 'finance_income_payment' : 'finance_expense_payment',
-        aggregateId: matchedPaymentId,
-        eventType: bestMatch.candidate.type === 'income'
-          ? 'finance.income_payment.reconciled'
-          : 'finance.expense_payment.reconciled',
-        payload: {
-          paymentId: matchedPaymentId,
-          recordId: matchedRecordId,
-          rowId,
-          periodId,
-          actorUserId: actorUserId || 'auto',
-          matchMode: 'auto'
-        }
-      })
-    }
 
     matchedCandidateIds.add(bestMatch.candidate.id)
     matched++

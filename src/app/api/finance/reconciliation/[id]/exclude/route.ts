@@ -12,7 +12,6 @@ import {
   assertNonEmptyString,
   normalizeString
 } from '@/lib/finance/shared'
-import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 export const dynamic = 'force-dynamic'
 
@@ -40,12 +39,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const previousMatchedType = normalizeString(row.matched_type)
     const previousMatchedId = normalizeString(row.matched_id)
     const previousMatchedPaymentId = normalizeString(row.matched_payment_id)
+    const previousMatchedSettlementLegId = normalizeString(row.matched_settlement_leg_id)
 
     if (previousMatchedType && previousMatchedId) {
       await clearReconciliationLinkInPostgres({
         matchedType: previousMatchedType,
         matchedId: previousMatchedId,
         matchedPaymentId: previousMatchedPaymentId || null,
+        matchedSettlementLegId: previousMatchedSettlementLegId || null,
         rowId
       })
     }
@@ -55,31 +56,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       notes
     })
 
-    if (previousMatchedPaymentId && previousMatchedType) {
-      await publishOutboxEvent({
-        aggregateType: previousMatchedType === 'income' ? 'finance_income_payment' : 'finance_expense_payment',
-        aggregateId: previousMatchedPaymentId,
-        eventType: previousMatchedType === 'income'
-          ? 'finance.income_payment.unreconciled'
-          : 'finance.expense_payment.unreconciled',
-        payload: {
-          paymentId: previousMatchedPaymentId,
-          recordId: previousMatchedId || null,
-          rowId,
-          periodId,
-          actorUserId: tenant.userId || null,
-          reason: 'statement_excluded'
-        }
-      })
-    }
-
     return NextResponse.json({
       excluded: true,
       rowId,
       previousMatchedType: previousMatchedType || null,
       previousMatchedId: previousMatchedPaymentId || previousMatchedId || null,
       previousMatchedRecordId: previousMatchedId || null,
-      previousMatchedPaymentId: previousMatchedPaymentId || null
+      previousMatchedPaymentId: previousMatchedPaymentId || null,
+      previousMatchedSettlementLegId: previousMatchedSettlementLegId || null
     })
   } catch (error) {
     if (error instanceof FinanceValidationError) {

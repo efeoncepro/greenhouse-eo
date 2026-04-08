@@ -42,6 +42,7 @@ interface StatementRow {
   matchedId: string | null
   matchConfidence: number | null
   notes: string | null
+  matchedSettlementLegId?: string | null
 }
 
 interface Candidate {
@@ -49,6 +50,7 @@ interface Candidate {
   type: 'income' | 'expense'
   matchedRecordId: string | null
   matchedPaymentId: string | null
+  matchedSettlementLegId?: string | null
   amount: number
   currency: string
   transactionDate: string | null
@@ -58,6 +60,9 @@ interface Candidate {
   partyName: string | null
   status: string | null
   isReconciled: boolean
+  legType?: string | null
+  instrumentName?: string | null
+  settlementMode?: string | null
 }
 
 type DialogMode = 'match' | 'unmatch' | 'exclude'
@@ -188,7 +193,8 @@ const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionCompl
           rowId: row.rowId,
           matchedType: candidate.type,
           matchedId: candidate.matchedRecordId ?? candidate.id,
-          matchedPaymentId: candidate.matchedPaymentId ?? null
+          matchedPaymentId: candidate.matchedPaymentId ?? null,
+          matchedSettlementLegId: candidate.matchedSettlementLegId ?? null
         })
       })
 
@@ -484,6 +490,9 @@ const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionCompl
                                     {candidate.reference}
                                   </Typography>
                                 )}
+                                {candidate.legType && (
+                                  <CustomChip round='true' size='small' color='secondary' label={candidate.legType} />
+                                )}
                               </Box>
                               <Typography variant='body2' fontWeight={500} noWrap>
                                 {candidate.description}
@@ -491,6 +500,11 @@ const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionCompl
                               {candidate.partyName && (
                                 <Typography variant='caption' color='text.secondary'>
                                   {candidate.partyName}
+                                </Typography>
+                              )}
+                              {(candidate.instrumentName || candidate.settlementMode) && (
+                                <Typography variant='caption' color='text.secondary' sx={{ display: 'block' }}>
+                                  {[candidate.instrumentName, candidate.settlementMode].filter(Boolean).join(' · ')}
                                 </Typography>
                               )}
                             </Box>

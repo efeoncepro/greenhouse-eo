@@ -35,6 +35,10 @@ import ImportStatementDrawer from '@views/greenhouse/finance/drawers/ImportState
 interface ReconciliationPeriod {
   periodId: string
   accountId: string
+  instrumentCategorySnapshot: string | null
+  providerSlugSnapshot: string | null
+  providerNameSnapshot: string | null
+  periodCurrencySnapshot: string | null
   year: number
   month: number
   openingBalance: number
@@ -84,6 +88,15 @@ const MATCH_STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'w
 
 const MONTH_NAMES = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
 
+const INSTRUMENT_CATEGORY_LABELS: Record<string, string> = {
+  bank_account: 'Cuenta bancaria',
+  credit_card: 'Tarjeta de crédito',
+  fintech: 'Fintech / wallet',
+  payment_platform: 'Plataforma de pagos',
+  cash: 'Caja',
+  payroll_processor: 'Payroll processor'
+}
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -110,6 +123,7 @@ const ReconciliationDetailView = () => {
   const [period, setPeriod] = useState<ReconciliationPeriod | null>(null)
   const [statementRows, setStatementRows] = useState<StatementRow[]>([])
   const [autoMatchLoading, setAutoMatchLoading] = useState(false)
+  const [statusUpdateLoading, setStatusUpdateLoading] = useState<'reconciled' | 'closed' | null>(null)
   const [selectedRow, setSelectedRow] = useState<StatementRow | null>(null)
   const [matchDialogOpen, setMatchDialogOpen] = useState(false)
   const [importDrawerOpen, setImportDrawerOpen] = useState(false)
@@ -199,6 +213,43 @@ const ReconciliationDetailView = () => {
     fetchData()
   }
 
+  const handlePeriodStatusUpdate = async (nextStatus: 'reconciled' | 'closed') => {
+    setStatusUpdateLoading(nextStatus)
+
+    try {
+      const res = await fetch(`/api/finance/reconciliation/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: nextStatus })
+      })
+
+      if (res.ok) {
+        setSnackbar({
+          open: true,
+          message: nextStatus === 'reconciled' ? 'Período marcado como conciliado.' : 'Período cerrado correctamente.',
+          severity: 'success'
+        })
+        fetchData()
+      } else {
+        const data = await res.json().catch(() => ({}))
+
+        setSnackbar({
+          open: true,
+          message: data.error || 'No pudimos actualizar el período.',
+          severity: 'error'
+        })
+      }
+    } catch {
+      setSnackbar({
+        open: true,
+        message: 'Error de conexión al actualizar el período.',
+        severity: 'error'
+      })
+    } finally {
+      setStatusUpdateLoading(null)
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Loading
   // ---------------------------------------------------------------------------
@@ -236,6 +287,8 @@ const ReconciliationDetailView = () => {
   }
 
   const statusConf = STATUS_CONFIG[period.status] || STATUS_CONFIG.open
+  const pendingStatementRows = statementRows.filter(row => row.matchStatus === 'unmatched' || row.matchStatus === 'suggested').length
+  const canMarkReconciled = period.statementImported && Math.abs(period.difference) <= 0.01 && pendingStatementRows === 0
 
   // ---------------------------------------------------------------------------
   // Render
@@ -263,7 +316,7 @@ const ReconciliationDetailView = () => {
             </Box>
           </Box>
         </Box>
-        <Box sx={{ display: 'flex', gap: 2 }}>
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           <Button variant='outlined' startIcon={<i className='tabler-file-import' />} onClick={() => setImportDrawerOpen(true)}>
             Importar extracto
           </Button>
@@ -276,6 +329,29 @@ const ReconciliationDetailView = () => {
           >
             {autoMatchLoading ? 'Procesando...' : 'Auto-match'}
           </Button>
+          {period.status !== 'closed' && period.status !== 'reconciled' && (
+            <Button
+              variant='contained'
+              color='success'
+              startIcon={<i className='tabler-checks' />}
+              onClick={() => handlePeriodStatusUpdate('reconciled')}
+              disabled={!canMarkReconciled || statusUpdateLoading !== null}
+              title={!canMarkReconciled ? 'Necesitas extracto importado, diferencia en cero y sin filas pendientes.' : undefined}
+            >
+              {statusUpdateLoading === 'reconciled' ? 'Marcando...' : 'Marcar conciliado'}
+            </Button>
+          )}
+          {period.status === 'reconciled' && (
+            <Button
+              variant='contained'
+              color='secondary'
+              startIcon={<i className='tabler-lock' />}
+              onClick={() => handlePeriodStatusUpdate('closed')}
+              disabled={statusUpdateLoading !== null}
+            >
+              {statusUpdateLoading === 'closed' ? 'Cerrando...' : 'Cerrar período'}
+            </Button>
+          )}
         </Box>
       </Box>
 
@@ -318,6 +394,42 @@ const ReconciliationDetailView = () => {
           />
         </Grid>
       </Grid>
+
+      <Grid container spacing={6}>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <HorizontalWithSubtitle
+            title='Instrumento'
+            stats={period.instrumentCategorySnapshot ? (INSTRUMENT_CATEGORY_LABELS[period.instrumentCategorySnapshot] || period.instrumentCategorySnapshot) : 'No definido'}
+            subtitle='Contexto del período'
+            avatarIcon='tabler-wallet'
+            avatarColor='primary'
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <HorizontalWithSubtitle
+            title='Proveedor'
+            stats={period.providerNameSnapshot || period.providerSlugSnapshot || 'Sin proveedor'}
+            subtitle={period.providerSlugSnapshot || 'Proveedor del período'}
+            avatarIcon='tabler-building-bank'
+            avatarColor='info'
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <HorizontalWithSubtitle
+            title='Moneda'
+            stats={period.periodCurrencySnapshot || 'CLP'}
+            subtitle='Moneda del período'
+            avatarIcon='tabler-currency-dollar'
+            avatarColor='warning'
+          />
+        </Grid>
+      </Grid>
+
+      {pendingStatementRows > 0 && (
+        <Alert severity='info'>
+          Este período todavía tiene {pendingStatementRows} fila{pendingStatementRows !== 1 ? 's' : ''} sin resolver. Debes dejar todas las filas conciliadas o excluidas antes de marcarlo como conciliado.
+        </Alert>
+      )}
 
       {/* Statement Rows Table */}
       <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>

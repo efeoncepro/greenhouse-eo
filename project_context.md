@@ -3024,27 +3024,28 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Ajuste de consistencia relevante:
   - `auto-match`, `match`, `unmatch` y `exclude` ya no pueden dejar desacoplado el estado entre la fila bancaria y la transacción financiera reconciliada
 
-## Delta 2026-04-08 Finance reconciliation ledger-first + settlement orchestration foundation
+## Delta 2026-04-08 Finance reconciliation settlement orchestration completed
 
-- `Finance > Conciliación` ya no debe modelarse como un reader documental aislado.
+- `Finance > Conciliación` ya opera sobre el mismo contrato ledger-first de `Cobros` y `Pagos`.
 - Regla operativa vigente:
-  - `income_payments` y `expense_payments` son la unidad canónica de conciliación cuando existe ledger real
-  - `Cobros`, `Pagos` y `Conciliación` deben leer el mismo contrato de caja
-  - `matchedPaymentId` es parte del contrato manual para bajar el match al pago real
-- Foundation nueva en PostgreSQL:
-  - `greenhouse_finance.settlement_groups`
-  - `greenhouse_finance.settlement_legs`
-  - `reconciliation_periods` con snapshots del instrumento
-  - `bank_statement_rows` con fingerprints de importación idempotente
-- Semántica nueva formalizada:
-  - un pago puede tener varios settlement legs
-  - `internal_transfer` / `funding` no liquidan la obligación
-  - `payout` / `receipt` sí pueden liquidarla
-  - `Global66` y otros rails no bancarios deben tratarse como payment instruments conciliables
-- Eventos reactivos de conciliación ya disponibles para el ecosistema:
+  - `income_payments` y `expense_payments` son la unidad canónica de caja
+  - `matchedPaymentId` y `matchedSettlementLegId` forman parte del contrato operativo de conciliación
+  - las routes de `match`, `unmatch`, `exclude` y `auto-match` no deben duplicar eventos de pago; el source of truth de publicación vive en el store Postgres
+- Settlement orchestration disponible en runtime:
+  - `GET/POST /api/finance/settlements/payment`
+  - `SettlementOrchestrationDrawer` desde el historial de pagos/cobros
+  - `RegisterCashOutDrawer` soporta `settlementMode`, `fundingInstrumentId`, `fee*` y `exchangeRateOverride`
+  - `RegisterCashInDrawer` soporta `fee*` y `exchangeRateOverride`
+- Conciliación operativa:
+  - `ReconciliationDetailView` muestra snapshots del instrumento/proveedor/moneda del período
+  - permite `Marcar conciliado` y `Cerrar período`
+  - la transición a `reconciled` exige extracto importado, diferencia en cero y sin filas pendientes
+- Eventos reactivos vigentes:
   - `finance.income_payment.reconciled|unreconciled`
   - `finance.expense_payment.reconciled|unreconciled`
   - `finance.settlement_leg.recorded|reconciled|unreconciled`
+  - `finance.internal_transfer.recorded`
+  - `finance.fx_conversion.recorded`
   - `finance.reconciliation_period.reconciled|closed`
 
 ## Delta 2026-03-14 Task board reorganization

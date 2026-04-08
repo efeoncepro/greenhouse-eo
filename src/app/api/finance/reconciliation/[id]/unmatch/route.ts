@@ -12,7 +12,6 @@ import {
   assertNonEmptyString,
   normalizeString
 } from '@/lib/finance/shared'
-import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 export const dynamic = 'force-dynamic'
 
@@ -43,6 +42,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const previousType = normalizeString(row.matched_type)
     const previousId = normalizeString(row.matched_id)
     const previousPaymentId = normalizeString(row.matched_payment_id)
+    const previousSettlementLegId = normalizeString(row.matched_settlement_leg_id)
 
     await clearStatementRowMatchInPostgres(rowId, periodId)
 
@@ -51,25 +51,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         matchedType: previousType,
         matchedId: previousId,
         matchedPaymentId: previousPaymentId || null,
+        matchedSettlementLegId: previousSettlementLegId || null,
         rowId
-      })
-    }
-
-    if (previousPaymentId && previousType) {
-      await publishOutboxEvent({
-        aggregateType: previousType === 'income' ? 'finance_income_payment' : 'finance_expense_payment',
-        aggregateId: previousPaymentId,
-        eventType: previousType === 'income'
-          ? 'finance.income_payment.unreconciled'
-          : 'finance.expense_payment.unreconciled',
-        payload: {
-          paymentId: previousPaymentId,
-          recordId: previousId || null,
-          rowId,
-          periodId,
-          previousMatchedType: previousType,
-          actorUserId: tenant.userId || null
-        }
       })
     }
 
@@ -79,7 +62,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       previousMatchedType: previousType || null,
       previousMatchedId: previousPaymentId || previousId || null,
       previousMatchedRecordId: previousId || null,
-      previousMatchedPaymentId: previousPaymentId || null
+      previousMatchedPaymentId: previousPaymentId || null,
+      previousMatchedSettlementLegId: previousSettlementLegId || null
     })
   } catch (error) {
     if (error instanceof FinanceValidationError) {

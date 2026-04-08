@@ -8,12 +8,12 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Implementation`
+- Status real: `Complete`
 - Rank: `53`
 - Domain: `finance`
 - Blocked by: `None`

@@ -2,22 +2,17 @@
 
 ## 2026-04-08
 
-### 2026-04-08 — Finance reconciliation ledger-first + settlement orchestration foundation
+### 2026-04-08 — Finance reconciliation settlement orchestration completed
 
-- `Finance > Conciliación` quedó alineado al ledger real de caja: la cola de pendientes ya se arma desde `cash-in` / `cash-out`, no desde documentos `income` / `expenses`.
-- `ReconciliationMatchDialog` ya envía `matchedPaymentId`, cerrando el carril manual payment-level para cobros y pagos reales.
-- `postgres-reconciliation` ahora reconcilia egresos a nivel `expense_payments` y sincroniza `settlement_legs` al hacer match / unmatch.
-- Nueva base PostgreSQL para treasury enterprise:
-  - snapshots instrument-aware en `reconciliation_periods`
-  - importación idempotente en `bank_statement_rows`
-  - `settlement_groups` y `settlement_legs` para modelar `internal_transfer`, `funding`, `fx_conversion`, `payout` y `fee`
-  - `settlement_group_id` agregado a `income_payments` y `expense_payments`
-- Eventos outbox nuevos del dominio:
-  - `finance.income_payment.reconciled|unreconciled`
-  - `finance.expense_payment.reconciled|unreconciled`
-  - `finance.settlement_leg.recorded|reconciled|unreconciled`
-  - `finance.reconciliation_period.reconciled|closed`
-- Impacto operativo: Greenhouse ya tiene foundation canónica para conciliar pagos directos y cadenas multi-leg como `Santander -> Global66 -> beneficiario` sin liquidar la obligación en el leg equivocado.
+- `Finance > Conciliación` quedó cerrada sobre el ledger real de caja: `cash-in`, `cash-out` y `Conciliación` ya hablan el mismo contrato con `matchedPaymentId` y `matchedSettlementLegId`.
+- `auto-match`, `match`, `unmatch` y `exclude` dejaron de duplicar eventos de pago en las routes; la transición reconciliado/no reconciliado vive en `postgres-reconciliation`.
+- Nuevo endpoint `GET/POST /api/finance/settlements/payment` + drawer `SettlementOrchestrationDrawer` para inspeccionar settlement groups y agregar legs manuales (`internal_transfer`, `funding`, `fx_conversion`, `fee`) desde el portal.
+- `RegisterCashOutDrawer` ahora soporta pago directo o vía intermediario (`fundingInstrumentId`, `fee*`, `exchangeRateOverride`) y `RegisterCashInDrawer` soporta fee y FX override.
+- `ReconciliationDetailView` ahora muestra snapshots del período (instrumento, proveedor, moneda) y acciones operativas `Marcar conciliado` / `Cerrar período`.
+- Eventos y consumers extendidos:
+  - catálogo con `finance.internal_transfer.recorded` y `finance.fx_conversion.recorded`
+  - `client_economics`, `operational_pl`, `commercial_cost_attribution`, `period_closure_status` y `data-quality` ya reaccionan o auditan el nuevo contrato
+- Impacto operativo: Greenhouse ya puede modelar y conciliar mejor cadenas multi-leg como `Santander -> Global66 -> payout/fee/fx` sin volver a mezclar documento, caja y conciliación.
 
 ### 2026-04-08 — Finance cash lane alignment: registered payments now surface in Cobros/Pagos
 

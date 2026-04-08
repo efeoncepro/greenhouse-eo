@@ -75,6 +75,107 @@ export async function GET() {
     checks.push({ name: 'expense_paid_without_ledger', status: 'error', detail: 'No se pudo verificar pagos faltantes en ledger' })
   }
 
+  // 1b. Settlement orchestration consistency
+  try {
+    const [orphanSettlementGroups, unsettledIncome, unsettledExpense, reconciledPeriodDrift] = await Promise.all([
+      runGreenhousePostgresQuery<{ count: string }>(
+        `
+          SELECT COUNT(*)::text AS count
+          FROM greenhouse_finance.settlement_groups sg
+          WHERE NOT EXISTS (
+            SELECT 1
+            FROM greenhouse_finance.settlement_legs sl
+            WHERE sl.settlement_group_id = sg.settlement_group_id
+          )
+        `
+      ).catch(() => [{ count: '0' }]),
+      runGreenhousePostgresQuery<{ count: string }>(
+        `
+          SELECT COUNT(*)::text AS count
+          FROM greenhouse_finance.income_payments ip
+          WHERE ip.settlement_group_id IS NOT NULL
+            AND ip.is_reconciled = TRUE
+            AND NOT EXISTS (
+              SELECT 1
+              FROM greenhouse_finance.settlement_legs sl
+              WHERE sl.linked_payment_type = 'income_payment'
+                AND sl.linked_payment_id = ip.payment_id
+                AND sl.is_reconciled = TRUE
+            )
+        `
+      ).catch(() => [{ count: '0' }]),
+      runGreenhousePostgresQuery<{ count: string }>(
+        `
+          SELECT COUNT(*)::text AS count
+          FROM greenhouse_finance.expense_payments ep
+          WHERE ep.settlement_group_id IS NOT NULL
+            AND ep.is_reconciled = TRUE
+            AND NOT EXISTS (
+              SELECT 1
+              FROM greenhouse_finance.settlement_legs sl
+              WHERE sl.linked_payment_type = 'expense_payment'
+                AND sl.linked_payment_id = ep.payment_id
+                AND sl.is_reconciled = TRUE
+            )
+        `
+      ).catch(() => [{ count: '0' }]),
+      runGreenhousePostgresQuery<{ count: string }>(
+        `
+          SELECT COUNT(*)::text AS count
+          FROM greenhouse_finance.reconciliation_periods rp
+          WHERE rp.status IN ('reconciled', 'closed')
+            AND EXISTS (
+              SELECT 1
+              FROM greenhouse_finance.bank_statement_rows bsr
+              WHERE bsr.period_id = rp.period_id
+                AND bsr.match_status IN ('unmatched', 'suggested')
+            )
+        `
+      ).catch(() => [{ count: '0' }])
+    ])
+
+    checks.push({
+      name: 'settlement_groups_without_legs',
+      status: Number(orphanSettlementGroups[0]?.count ?? 0) === 0 ? 'ok' : 'warning',
+      detail: Number(orphanSettlementGroups[0]?.count ?? 0) === 0
+        ? 'Todos los settlement groups tienen al menos un leg'
+        : `${orphanSettlementGroups[0]?.count ?? 0} settlement group(s) sin settlement legs`,
+      value: Number(orphanSettlementGroups[0]?.count ?? 0)
+    })
+
+    checks.push({
+      name: 'income_settlement_leg_drift',
+      status: Number(unsettledIncome[0]?.count ?? 0) === 0 ? 'ok' : 'warning',
+      detail: Number(unsettledIncome[0]?.count ?? 0) === 0
+        ? 'Cobros reconciliados alineados con settlement legs'
+        : `${unsettledIncome[0]?.count ?? 0} cobro(s) reconciliado(s) sin leg reconciliado`,
+      value: Number(unsettledIncome[0]?.count ?? 0)
+    })
+
+    checks.push({
+      name: 'expense_settlement_leg_drift',
+      status: Number(unsettledExpense[0]?.count ?? 0) === 0 ? 'ok' : 'warning',
+      detail: Number(unsettledExpense[0]?.count ?? 0) === 0
+        ? 'Pagos reconciliados alineados con settlement legs'
+        : `${unsettledExpense[0]?.count ?? 0} pago(s) reconciliado(s) sin leg reconciliado`,
+      value: Number(unsettledExpense[0]?.count ?? 0)
+    })
+
+    checks.push({
+      name: 'reconciled_period_with_pending_rows',
+      status: Number(reconciledPeriodDrift[0]?.count ?? 0) === 0 ? 'ok' : 'warning',
+      detail: Number(reconciledPeriodDrift[0]?.count ?? 0) === 0
+        ? 'No hay períodos cerrados/reconciliados con filas pendientes'
+        : `${reconciledPeriodDrift[0]?.count ?? 0} período(s) reconciliado(s)/cerrado(s) con filas pendientes`,
+      value: Number(reconciledPeriodDrift[0]?.count ?? 0)
+    })
+  } catch {
+    checks.push({ name: 'settlement_groups_without_legs', status: 'error', detail: 'No se pudo verificar settlement groups' })
+    checks.push({ name: 'income_settlement_leg_drift', status: 'error', detail: 'No se pudo verificar drift entre cobros y settlement legs' })
+    checks.push({ name: 'expense_settlement_leg_drift', status: 'error', detail: 'No se pudo verificar drift entre pagos y settlement legs' })
+    checks.push({ name: 'reconciled_period_with_pending_rows', status: 'error', detail: 'No se pudo verificar períodos conciliados con filas pendientes' })
+  }
+
   // 2. Exchange rate freshness
   try {
     const staleness = await checkExchangeRateStaleness('USD', 'CLP')
@@ -214,7 +315,55 @@ export async function GET() {
     checks.push({ name: 'annulled_expenses_status', status: 'ok', detail: 'Check no disponible' })
   }
 
-  // 8. Overdue receivables
+  // 8. Statement import idempotency guardrails
+  try {
+    const [missingImportedFingerprintRows, duplicateImportedFingerprints] = await Promise.all([
+      runGreenhousePostgresQuery<{ count: string }>(
+        `
+          SELECT COUNT(*)::text AS count
+          FROM greenhouse_finance.bank_statement_rows
+          WHERE source_import_batch_id IS NOT NULL
+            AND (source_import_fingerprint IS NULL OR source_import_fingerprint = '')
+        `
+      ).catch(() => [{ count: '0' }]),
+      runGreenhousePostgresQuery<{ count: string }>(
+        `
+          SELECT COUNT(*)::text AS count
+          FROM (
+            SELECT period_id, source_import_fingerprint
+            FROM greenhouse_finance.bank_statement_rows
+            WHERE source_import_batch_id IS NOT NULL
+              AND source_import_fingerprint IS NOT NULL
+            GROUP BY period_id, source_import_fingerprint
+            HAVING COUNT(*) > 1
+          ) duplicates
+        `
+      ).catch(() => [{ count: '0' }])
+    ])
+
+    checks.push({
+      name: 'statement_import_missing_fingerprint',
+      status: Number(missingImportedFingerprintRows[0]?.count ?? 0) === 0 ? 'ok' : 'warning',
+      detail: Number(missingImportedFingerprintRows[0]?.count ?? 0) === 0
+        ? 'Todos los imports nuevos tienen fingerprint determinístico'
+        : `${missingImportedFingerprintRows[0]?.count ?? 0} fila(s) importada(s) sin fingerprint`,
+      value: Number(missingImportedFingerprintRows[0]?.count ?? 0)
+    })
+
+    checks.push({
+      name: 'statement_import_duplicate_fingerprint',
+      status: Number(duplicateImportedFingerprints[0]?.count ?? 0) === 0 ? 'ok' : 'warning',
+      detail: Number(duplicateImportedFingerprints[0]?.count ?? 0) === 0
+        ? 'No hay duplicados de import en statements'
+        : `${duplicateImportedFingerprints[0]?.count ?? 0} fingerprint(s) duplicado(s) en statements importados`,
+      value: Number(duplicateImportedFingerprints[0]?.count ?? 0)
+    })
+  } catch {
+    checks.push({ name: 'statement_import_missing_fingerprint', status: 'error', detail: 'No se pudo verificar fingerprints de import' })
+    checks.push({ name: 'statement_import_duplicate_fingerprint', status: 'error', detail: 'No se pudo verificar duplicados de import' })
+  }
+
+  // 9. Overdue receivables
   try {
     const overdue = await runGreenhousePostgresQuery<{ count: string; total_clp: string } & Record<string, unknown>>(
       `SELECT COUNT(*)::text AS count, COALESCE(SUM(total_amount_clp - COALESCE(amount_paid, 0)), 0)::text AS total_clp

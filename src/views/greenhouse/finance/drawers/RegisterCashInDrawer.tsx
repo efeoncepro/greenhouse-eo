@@ -79,6 +79,9 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
   const [instruments, setInstruments] = useState<Array<{ accountId: string; accountName: string; providerSlug: string | null; instrumentCategory: string; currency: string }>>([])
   const [selectedInstrumentId, setSelectedInstrumentId] = useState('')
   const [currentFxRate, setCurrentFxRate] = useState<number | null>(null)
+  const [exchangeRateOverride, setExchangeRateOverride] = useState('')
+  const [feeAmount, setFeeAmount] = useState('')
+  const [feeCurrency, setFeeCurrency] = useState('CLP')
 
   // Invoice dropdown data
   const [invoices, setInvoices] = useState<InvoiceOption[]>([])
@@ -169,6 +172,9 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
     setPaymentMethod('')
     setSelectedInstrumentId('')
     setCurrentFxRate(null)
+    setExchangeRateOverride('')
+    setFeeAmount('')
+    setFeeCurrency('CLP')
     setNotes('')
     setError(null)
   }
@@ -203,6 +209,9 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
     if (paymentMethod) body.paymentMethod = paymentMethod
     if (notes.trim()) body.notes = notes.trim()
     if (selectedInstrumentId) body.paymentAccountId = selectedInstrumentId
+    if (exchangeRateOverride.trim()) body.exchangeRateOverride = Number(exchangeRateOverride)
+    if (feeAmount.trim()) body.feeAmount = Number(feeAmount)
+    if (feeCurrency) body.feeCurrency = feeCurrency
 
     try {
       const res = await fetch(`/api/finance/income/${selectedIncomeId}/payments`, {
@@ -298,6 +307,19 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
           </Box>
         )}
 
+        {selectedInvoice?.currency !== 'CLP' && (
+          <CustomTextField
+            fullWidth
+            size='small'
+            label='Tipo de cambio aplicado'
+            type='number'
+            value={exchangeRateOverride}
+            onChange={e => setExchangeRateOverride(e.target.value)}
+            placeholder={currentFxRate ? String(currentFxRate) : 'Opcional'}
+            helperText='Opcional. Si lo informas, Greenhouse usará este tipo de cambio para CLP y settlement.'
+          />
+        )}
+
         <CustomTextField
           fullWidth
           size='small'
@@ -358,6 +380,30 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
             </MenuItem>
           ))}
         </CustomTextField>
+
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 120px' }, gap: 2 }}>
+          <CustomTextField
+            fullWidth
+            size='small'
+            label='Fee de recaudación'
+            type='number'
+            value={feeAmount}
+            onChange={e => setFeeAmount(e.target.value)}
+            helperText='Opcional. Se registra como settlement leg separado.'
+          />
+          <CustomTextField
+            select
+            fullWidth
+            size='small'
+            label='Moneda fee'
+            value={feeCurrency}
+            onChange={e => setFeeCurrency(e.target.value)}
+          >
+            <MenuItem value='CLP'>CLP</MenuItem>
+            <MenuItem value='USD'>USD</MenuItem>
+            <MenuItem value='EUR'>EUR</MenuItem>
+          </CustomTextField>
+        </Box>
 
         <CustomTextField
           fullWidth

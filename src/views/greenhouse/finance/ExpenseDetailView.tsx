@@ -23,6 +23,7 @@ import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import PaymentRegistrationCard from '@views/greenhouse/finance/components/PaymentRegistrationCard'
 import PaymentHistoryTable from '@views/greenhouse/finance/components/PaymentHistoryTable'
+import SettlementOrchestrationDrawer from '@views/greenhouse/finance/drawers/SettlementOrchestrationDrawer'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -147,6 +148,7 @@ const ExpenseDetailView = () => {
   const [data, setData] = useState<ExpenseDetail | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [payments, setPayments] = useState<Array<{ paymentId: string; paymentDate: string | null; amount: number; currency?: string; reference: string | null; paymentMethod: string | null; notes: string | null }>>([])
+  const [settlementPaymentId, setSettlementPaymentId] = useState<string | null>(null)
 
   const fetchDetail = useCallback(async () => {
     setLoading(true)
@@ -355,6 +357,15 @@ const ExpenseDetailView = () => {
       <PaymentHistoryTable
         payments={payments}
         currency={data.currency}
+        onManageSettlement={paymentId => setSettlementPaymentId(paymentId)}
+      />
+
+      <SettlementOrchestrationDrawer
+        open={Boolean(settlementPaymentId)}
+        paymentType='expense'
+        paymentId={settlementPaymentId}
+        onClose={() => setSettlementPaymentId(null)}
+        onSuccess={fetchDetail}
       />
     </Box>
   )
