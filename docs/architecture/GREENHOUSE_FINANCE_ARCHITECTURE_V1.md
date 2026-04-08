@@ -6,6 +6,16 @@
 
 ---
 
+## Delta 2026-04-07
+
+- **TASK-280**: Módulos de caja implementados
+  - Tabla `expense_payments` creada (simétrica a `income_payments`) con trigger de derivación
+  - Backfill automático de expenses con `payment_status = 'paid'`
+  - 3 surfaces nuevas: Cobros (`/finance/cash-in`), Pagos (`/finance/cash-out`), Posición de caja (`/finance/cash-position`)
+  - Componentes UI compartidos: `PaymentRegistrationCard`, `PaymentHistoryTable` — reutilizados en IncomeDetailView y ExpenseDetailView
+  - Evento `finance.expense_payment.recorded` registrado en catálogo y 4 projections
+  - Navegación Finance actualizada con sección Caja (3 items nuevos)
+
 ## Delta 2026-04-07 — Products catalog + Quote Line Items (TASK-211)
 
 Dos nuevas tablas en `greenhouse_finance`:
@@ -173,6 +183,26 @@ Regla operativa:
 - las surfaces Finance no deben presentar una factura de Nubox como si fuera por sí misma un cobro
 - ni una compra de Nubox como si fuera por sí misma un pago
 - el módulo puede seguir usando `income` / `expenses` para P&L devengado, pero debe distinguir visualmente documento/devengo vs caja
+
+### `greenhouse_finance.expense_payments` — Pagos contra compras
+
+Tabla simétrica a `income_payments`. Cada fila es un pago individual ejecutado contra un documento de compra.
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `payment_id` | TEXT PK | Prefijo `exp-pay-` + UUID |
+| `expense_id` | TEXT FK | Referencia al documento de compra |
+| `payment_date` | DATE | Fecha del pago real |
+| `amount` | NUMERIC(14,2) | Monto pagado (> 0) |
+| `currency` | TEXT | Moneda del pago |
+| `reference` | TEXT | Referencia bancaria o comprobante |
+| `payment_method` | TEXT | transfer, credit_card, etc. |
+| `payment_source` | TEXT | manual, payroll_system, nubox_sync, bank_statement |
+| `is_reconciled` | BOOLEAN | Vinculado a extracto bancario |
+
+**Trigger `trg_sync_expense_amount_paid`**: Después de INSERT/UPDATE/DELETE, recalcula `expenses.amount_paid = SUM(expense_payments.amount)` y deriva `payment_status`.
+
+**Evento outbox**: `finance.expense_payment.recorded` — consumido por client-economics, commercial-cost-attribution, operational-pl, period-closure-status.
 
 ## Delta 2026-04-07 — labor_cost_clp separado en client_economics + type consolidation
 
@@ -562,6 +592,16 @@ AR/AP aging analysis con buckets de 30/60/90+ días.
 ### `GET /api/finance/dashboard/by-service-line`
 
 Revenue y costs desglosados por línea de servicio (globe, digital, reach, wave, crm).
+
+### Cash management endpoints (TASK-280)
+
+| Endpoint | Método | Descripción |
+|----------|--------|-------------|
+| `/api/finance/expenses/[id]/payments` | GET | Pagos registrados contra un documento de compra |
+| `/api/finance/expenses/[id]/payments` | POST | Registrar pago contra documento de compra |
+| `/api/finance/cash-in` | GET | Lista consolidada de cobros (income_payments) |
+| `/api/finance/cash-out` | GET | Lista consolidada de pagos (expense_payments) |
+| `/api/finance/cash-position` | GET | Posición de caja: cuentas, por cobrar/pagar, serie 12 meses |
 
 ## Outbox Events
 

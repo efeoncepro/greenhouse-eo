@@ -1302,11 +1302,35 @@ export interface GreenhouseFinanceExchangeRates {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseFinanceExpensePayments {
+  amount: Numeric;
+  created_at: Generated<Timestamp>;
+  currency: Generated<string>;
+  expense_id: string;
+  is_reconciled: Generated<boolean>;
+  notes: string | null;
+  payment_account_id: string | null;
+  payment_date: Timestamp;
+  payment_id: string;
+  payment_method: string | null;
+  payment_source: Generated<string>;
+  reconciled_at: Timestamp | null;
+  reconciled_by_user_id: string | null;
+  reconciliation_row_id: string | null;
+  recorded_at: Generated<Timestamp | null>;
+  recorded_by_user_id: string | null;
+  reference: string | null;
+}
+
 export interface GreenhouseFinanceExpenses {
   /**
    * FK to greenhouse_core.client_profiles when expense is directly allocated
    */
   allocated_client_id: string | null;
+  /**
+   * Denormalized aggregate. Derived from SUM(expense_payments.amount) by trigger trg_sync_expense_amount_paid.
+   */
+  amount_paid: Generated<Numeric>;
   balance_nubox: Numeric | null;
   client_id: string | null;
   /**
@@ -3560,6 +3584,7 @@ export interface DB {
   "greenhouse_finance.cost_allocations": GreenhouseFinanceCostAllocations;
   "greenhouse_finance.economic_indicators": GreenhouseFinanceEconomicIndicators;
   "greenhouse_finance.exchange_rates": GreenhouseFinanceExchangeRates;
+  "greenhouse_finance.expense_payments": GreenhouseFinanceExpensePayments;
   "greenhouse_finance.expenses": GreenhouseFinanceExpenses;
   "greenhouse_finance.factoring_operations": GreenhouseFinanceFactoringOperations;
   "greenhouse_finance.income": GreenhouseFinanceIncome;

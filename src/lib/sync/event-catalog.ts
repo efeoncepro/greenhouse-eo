@@ -151,6 +151,7 @@ export const EVENT_TYPES = {
   financeSupplierUpdated: 'finance.supplier.updated',
   financeIncomePaymentCreated: 'finance.income_payment.created',
   financeIncomePaymentRecorded: 'finance.income_payment.recorded',
+  financeExpensePaymentRecorded: 'finance.expense_payment.recorded',
   financeCostAllocationCreated: 'finance.cost_allocation.created',
   financeCostAllocationDeleted: 'finance.cost_allocation.deleted',
   financeEconomicIndicatorUpserted: 'finance.economic_indicator.upserted',
