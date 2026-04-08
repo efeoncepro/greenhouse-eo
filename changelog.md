@@ -4755,3 +4755,6 @@
 ## 2026-04-03
 
 - Finance: se corrigió la semántica visible de `income` / `expenses` para dejar explícito que los documentos sincronizados desde Nubox son ledgers de venta/compra y devengo, no equivalentes directos a cobros/pagos. La navegación, títulos y copy de Finance ahora distinguen mejor documento vs caja.
+## 2026-04-08
+
+- Finance UX: `Cobros` y `Pagos` ya no muestran `Pendiente` para movimientos de caja ya ejecutados solo porque aun no estan conciliados. La tabla ahora separa `Estado` (`Cobrado` / `Pagado`) de `Conciliacion` (`Conciliado` / `Por conciliar`).

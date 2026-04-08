@@ -26,6 +26,7 @@ Finance separa explícitamente los **documentos comerciales** (facturas de venta
 - El cobro real queda persistido en `greenhouse_finance.income_payments`
 - Registrar un cobro dispara el evento reactivo `finance.income_payment.recorded`
 - Los cobros se pueden reconciliar contra extractos bancarios
+- En la tabla de `Cobros`, el **estado del movimiento** significa que el dinero ya entro (`Cobrado`); la **conciliacion** es un eje aparte (`Conciliado` / `Por conciliar`)
 - KPIs: Total cobrado, Pagos recibidos, Sin conciliar
 
 ## Pagos (Cash Out)
@@ -36,6 +37,7 @@ Finance separa explícitamente los **documentos comerciales** (facturas de venta
 - El pago real queda persistido en `greenhouse_finance.expense_payments`
 - Registrar un pago dispara el evento reactivo `finance.expense_payment.recorded`
 - Soporta pagos parciales (multiples pagos contra un mismo documento)
+- En la tabla de `Pagos`, el **estado del movimiento** significa que la salida de caja ya ocurrio (`Pagado`); la **conciliacion** es independiente (`Conciliado` / `Por conciliar`)
 - KPIs: Total pagado, desglose por tipo (proveedores, nomina, fiscal)
 
 ## Posicion de Caja

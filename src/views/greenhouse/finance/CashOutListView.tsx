@@ -390,12 +390,13 @@ const CashOutListView = () => {
                 <TableCell>Beneficiario</TableCell>
                 <TableCell>Referencia</TableCell>
                 <TableCell>Estado</TableCell>
+                <TableCell>Conciliación</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {items.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} align='center' sx={{ py: 6 }}>
+                  <TableCell colSpan={8} align='center' sx={{ py: 6 }}>
                     <Typography variant='body2' color='text.secondary'>
                       Sin pagos registrados en este periodo
                     </Typography>
@@ -435,10 +436,13 @@ const CashOutListView = () => {
                         </Typography>
                       </TableCell>
                       <TableCell>
+                        <CustomChip round='true' size='small' color='success' label='Pagado' />
+                      </TableCell>
+                      <TableCell>
                         {item.isReconciled ? (
                           <CustomChip round='true' size='small' color='success' label='Conciliado' />
                         ) : (
-                          <CustomChip round='true' size='small' color='secondary' label='Pendiente' />
+                          <CustomChip round='true' size='small' color='warning' label='Por conciliar' />
                         )}
                       </TableCell>
                     </TableRow>

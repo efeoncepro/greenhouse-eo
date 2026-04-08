@@ -314,12 +314,13 @@ const CashInListView = () => {
                 <TableCell>Referencia</TableCell>
                 <TableCell>Método</TableCell>
                 <TableCell>Estado</TableCell>
+                <TableCell>Conciliación</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {items.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} sx={{ textAlign: 'center', py: 8 }}>
+                  <TableCell colSpan={8} sx={{ textAlign: 'center', py: 8 }}>
                     <Typography variant='body2' color='text.secondary'>
                       Sin cobros registrados en este período
                     </Typography>
@@ -357,11 +358,14 @@ const CashInListView = () => {
                       <Typography variant='body2'>{item.paymentMethod || '—'}</Typography>
                     </TableCell>
                     <TableCell>
+                      <CustomChip round='true' size='small' color='success' label='Cobrado' />
+                    </TableCell>
+                    <TableCell>
                       <CustomChip
                         round='true'
                         size='small'
-                        color={item.reconciled ? 'success' : 'secondary'}
-                        label={item.reconciled ? 'Conciliado' : 'Pendiente'}
+                        color={item.reconciled ? 'success' : 'warning'}
+                        label={item.reconciled ? 'Conciliado' : 'Por conciliar'}
                       />
                     </TableCell>
                   </TableRow>

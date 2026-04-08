@@ -2,6 +2,24 @@
 
 ## Sesion 2026-04-08 — Finance cash lane alignment (document detail → cash modules)
 
+### UX semantica caja: estado != conciliacion (2026-04-08)
+
+Se corrigio una ambiguedad visible en `Cobros` y `Pagos`.
+
+- Antes:
+  - la columna `Estado` en los ledgers de caja mostraba realmente `isReconciled`
+  - eso hacia que un movimiento ya ejecutado apareciera como `Pendiente` si todavia no estaba conciliado con cartola
+  - caso visible: el pago E2E `E2E-EXP-NB-35568077-20260408` se veia como `Pendiente` en `Pagos` pese a existir en `expense_payments`
+- Ahora:
+  - `Cobros` muestra `Estado = Cobrado` y `Conciliacion = Conciliado / Por conciliar`
+  - `Pagos` muestra `Estado = Pagado` y `Conciliacion = Conciliado / Por conciliar`
+- Archivos:
+  - `src/views/greenhouse/finance/CashInListView.tsx`
+  - `src/views/greenhouse/finance/CashOutListView.tsx`
+  - `docs/documentation/finance/modulos-caja-cobros-pagos.md`
+- Validacion pendiente al cerrar este lote:
+  - volver a revisar staging una vez desplegado para confirmar que el pago E2E se ve `Pagado` + `Por conciliar`
+
 ### Cobros/Pagos ahora leen y renderizan el ledger correcto (2026-04-08)
 
 Se corrigió una deriva entre el detalle documental (`Ventas` / `Compras`) y los módulos de caja (`Cobros` / `Pagos`).
