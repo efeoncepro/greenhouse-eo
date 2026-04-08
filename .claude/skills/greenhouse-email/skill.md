@@ -426,6 +426,21 @@ Callers can also pass attachments via `sendEmail({ attachments })`. Both are mer
 
 Emails can include AI-generated hero images to make them visually richer. The project uses **Imagen 4** (raster images) via Vertex AI.
 
+### Image Design Process (MANDATORY)
+
+**Before generating any image, ALWAYS invoke the `/greenhouse-ux` skill first** to get a design brief for the hero image. The UX advisor decides:
+- What clay 3D objects best represent the email's purpose
+- Which brand colors to use for each object
+- The composition and visual metaphor
+
+**Process:**
+1. **Invoke `/greenhouse-ux`** — describe the email's purpose and ask for the hero image brief (objects, colors, composition)
+2. **Receive the Imagen 4 prompt** from the UX advisor — it will include the correct objects, brand colors, and white background directives
+3. **Generate with Imagen 4** using the UX-approved prompt
+4. **Resize + upload to GCS** following the workflow below
+
+Do NOT skip the UX step and write prompts directly — the UX advisor ensures visual coherence with the email design system (white bg, brand navy/blue/teal/green, clay 3D style, semantically relevant objects).
+
 ### Image Storage: GCS Public Buckets (NOT Vercel)
 
 **CRITICAL:** Email images MUST be stored in the **GCS public media bucket**, NOT in `public/` served by Vercel. Reasons learned from production:
