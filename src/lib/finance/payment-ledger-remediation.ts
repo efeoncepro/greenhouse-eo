@@ -1,5 +1,3 @@
-import 'server-only'
-
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
@@ -140,6 +138,18 @@ const MISSING_INCOME_LEDGER_FROM = `
   WHERE COALESCE(i.is_annulled, FALSE) = FALSE
     AND COALESCE(i.amount_paid, 0) > 0
     AND i.payment_status IN ('paid', 'partial')
+    AND COALESCE(ip.payment_count, 0) = 0
+`
+
+const BACKFILLABLE_INCOME_LEDGER_FROM = `
+  FROM greenhouse_finance.income i
+  LEFT JOIN (
+    SELECT income_id, COUNT(*)::int AS payment_count
+    FROM greenhouse_finance.income_payments
+    GROUP BY income_id
+  ) ip ON ip.income_id = i.income_id
+  WHERE COALESCE(i.is_annulled, FALSE) = FALSE
+    AND i.nubox_document_id IS NOT NULL
     AND COALESCE(ip.payment_count, 0) = 0
 `
 
@@ -308,7 +318,7 @@ export async function backfillIncomePaymentLedgers({
        i.total_amount,
        COALESCE(i.amount_paid, 0) AS amount_paid,
        i.payment_status
-     ${MISSING_INCOME_LEDGER_FROM}
+     ${BACKFILLABLE_INCOME_LEDGER_FROM}
      ORDER BY i.invoice_date DESC NULLS LAST, i.income_id
      LIMIT $1`,
     [limit]
@@ -356,7 +366,7 @@ export async function backfillIncomePaymentLedgers({
       continue
     }
 
-    if (!allowIncomeAmountMismatch && Math.abs(matchedTotal - storedAmountPaid) > 0.01) {
+    if (!allowIncomeAmountMismatch && storedAmountPaid > 0.01 && Math.abs(matchedTotal - storedAmountPaid) > 0.01) {
       skippedAmountMismatch++
       continue
     }
@@ -368,6 +378,10 @@ export async function backfillIncomePaymentLedgers({
     }
 
     try {
+      if (storedAmountPaid > 0.01) {
+        await reconcilePaymentTotals(incomeId)
+      }
+
       for (const movement of matchedMovements) {
         await recordPayment({
           incomeId,

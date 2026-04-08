@@ -22,6 +22,11 @@
   - `pnpm backfill:finance:payment-ledgers`
 - `src/lib/nubox/sync-nubox-to-postgres.ts` ahora registra cobros bancarios vía `recordPayment()`, garantizando que los cobros sincronizados desde Nubox publiquen `finance.income_payment.recorded` y queden visibles para proyecciones reactivas y costos.
 - `GET /api/finance/data-quality`, `GET /api/finance/income/summary` y `GET /api/finance/expenses/summary` ahora exponen mejor los gaps `paid without ledger`, reforzando la lectura de caja desde ledgers canónicos.
+- Seguimiento operativo posterior al merge a `develop`:
+  - nueva migración `20260408084803360_widen-income-payment-source-check.sql` amplía el constraint de `income_payments.payment_source` para aceptar `nubox_bank_sync`
+  - se removió `server-only` de los módulos de ledger usados por scripts para que la remediación pueda ejecutarse vía `tsx`
+  - el backfill histórico de cobros sobre staging/dev recuperó `21` ingresos en `income_payments`
+  - verificación E2E en staging: un pago registrado desde el detalle de `EXP-NB-35568077` quedó visible inmediatamente en `Pagos`, y `Cobros` volvió a mostrar facturas Nubox cobradas tras ampliar el rango de fechas
 
 ## 2026-04-07
 

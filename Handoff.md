@@ -50,8 +50,20 @@ Se dejó cerrada la semántica para que caja real, remediación y proyecciones r
   - `pnpm exec vitest run src/app/api/finance/bigquery-write-cutover.test.ts` — OK
   - `pnpm exec eslint ...` sobre archivos tocados — OK
 - **Pendiente operativo**:
-  - No ejecuté `pnpm backfill:finance:payment-ledgers --apply` en una base real dentro de esta sesión.
-  - El código y los comandos quedaron listos, pero la corrida de datos histórica debe hacerse de forma intencional porque puede disparar backlog reactivo y recomputes de costos/finanzas.
+  - Ejecutado en base dev/staging:
+    - migración `20260408084803360_widen-income-payment-source-check.sql`
+    - backfill de cobros `pnpm exec tsx scripts/remediate-finance-payment-ledgers.ts --apply --income-only`
+  - Resultado del backfill:
+    - `21` cobros históricos recuperados en `income_payments`
+    - `Cobros` pasó de `1` a `22` pagos visibles
+  - Verificación E2E en staging (`develop`):
+    - ingreso `INC-NB-25302941` ahora vuelve a estado `paid` y expone `paymentsReceived[0].paymentSource = nubox_bank_sync`
+    - se registró desde UI un pago sobre `EXP-NB-35568077` por `$19.495` con referencia `E2E-EXP-NB-35568077-20260408`
+    - el documento quedó `paymentStatus = paid` y el pago apareció como primera fila en `Pagos`
+  - Hallazgo de UX operativo:
+    - `Cobros` abre filtrado al rango actual (`2026-04-01` → `2026-04-08` en la prueba), por lo que cobros históricos recuperados no se ven hasta ampliar el rango
+  - Ruido observado en browser:
+    - errores CORS de Sentry al usar `x-vercel-protection-bypass`; son efecto del bypass de staging, no del flujo de caja en sí
 
 ---
 
