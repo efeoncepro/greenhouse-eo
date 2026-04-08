@@ -280,6 +280,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'admin'
   },
   {
+    viewCode: 'administracion.instrumentos_pago',
+    section: 'administracion',
+    label: 'Instrumentos de pago',
+    description: 'Cuentas bancarias, tarjetas, fintech y medios de pago.',
+    routePath: '/admin/payment-instruments',
+    routeGroup: 'finance'
+  },
+  {
     viewCode: 'administracion.spaces',
     section: 'administracion',
     label: 'Spaces',

@@ -116,17 +116,25 @@ const roleCanAccessViewFallback = (
 
 import { deriveRouteGroupsForSingleRole } from '@/lib/tenant/role-route-mapping'
 
-const toRegistryRows = (persistedRegistryRows: ViewRegistryRow[]) =>
-  persistedRegistryRows.length > 0
-    ? persistedRegistryRows.map<GovernanceViewRegistryEntry>(row => ({
-        viewCode: row.view_code,
-        section: row.section as GovernanceViewRegistryEntry['section'],
-        label: row.label,
-        description: row.description || '',
-        routeGroup: row.route_group,
-        routePath: row.route_path
-      }))
-    : VIEW_REGISTRY
+const toRegistryRows = (persistedRegistryRows: ViewRegistryRow[]) => {
+  if (persistedRegistryRows.length === 0) return VIEW_REGISTRY
+
+  const persisted = persistedRegistryRows.map<GovernanceViewRegistryEntry>(row => ({
+    viewCode: row.view_code,
+    section: row.section as GovernanceViewRegistryEntry['section'],
+    label: row.label,
+    description: row.description || '',
+    routeGroup: row.route_group,
+    routePath: row.route_path
+  }))
+
+  // Merge hardcoded entries not yet synced to DB so new views are visible immediately
+  const persistedCodes = new Set(persisted.map(v => v.viewCode))
+
+  const missing = VIEW_REGISTRY.filter(v => !persistedCodes.has(v.viewCode))
+
+  return missing.length > 0 ? [...persisted, ...missing] : persisted
+}
 
 const toPersistedByRole = (persistedRows: RoleAssignmentRow[]) => {
   const persistedByRole = new Map<string, Map<string, boolean>>()

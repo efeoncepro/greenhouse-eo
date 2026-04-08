@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { requireAdminTenantContext } from '@/lib/tenant/authorization'
+import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import {
   assertNonEmptyString,
   assertValidCurrency,
@@ -57,7 +57,7 @@ const defaultAccountTypeForCategory = (category: InstrumentCategory): AccountTyp
 }
 
 export async function GET() {
-  const { tenant, errorResponse } = await requireAdminTenantContext()
+  const { tenant, errorResponse } = await requireFinanceTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -80,7 +80,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const { tenant, errorResponse } = await requireAdminTenantContext()
+  const { tenant, errorResponse } = await requireFinanceTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
