@@ -422,19 +422,19 @@ Ejemplo:
 
 ## Acceptance Criteria
 
-- [ ] Tabla `accounts` evolucionada con instrument_category, provider_slug, y campos por tipo
-- [ ] income_payments y expense_payments tienen exchange_rate_at_payment, amount_clp, fx_gain_loss_clp
-- [ ] recordPayment() y recordExpensePayment() calculan FX gain/loss automaticamente para pagos USD
-- [ ] Admin Center `/admin/payment-instruments` con lista, drawer de creacion por categoria, y detalle
-- [ ] 20+ logos SVG de proveedores en `public/images/logos/payment/`
-- [ ] PaymentInstrumentChip componente con logo + nombre, fallback a iniciales
-- [ ] Drawers de cobro y pago incluyen selector de instrumento con logos
-- [ ] CreateIncomeDrawer y CreateExpenseDrawer incluyen selector de instrumento
-- [ ] CashInListView y CashOutListView muestran logo del instrumento en la tabla
-- [ ] PaymentHistoryTable muestra logo del instrumento por pago
-- [ ] CashPositionView muestra saldos por instrumento agrupados por moneda
-- [ ] KPI "Resultado cambiario" visible en CashPositionView
-- [ ] `pnpm build` y `pnpm lint` pasan
+- [x] Tabla `accounts` evolucionada con instrument_category, provider_slug, y campos por tipo
+- [x] income_payments y expense_payments tienen exchange_rate_at_payment, amount_clp, fx_gain_loss_clp
+- [x] recordPayment() y recordExpensePayment() calculan FX gain/loss automaticamente para pagos USD
+- [x] Admin Center `/admin/payment-instruments` con lista, drawer de creacion por categoria, y detalle
+- [x] 20+ logos SVG de proveedores en `public/images/logos/payment/`
+- [x] PaymentInstrumentChip componente con logo + nombre, fallback a iniciales
+- [x] Drawers de cobro y pago incluyen selector de instrumento con logos
+- [x] CreateIncomeDrawer y CreateExpenseDrawer incluyen selector de instrumento
+- [x] CashInListView y CashOutListView muestran logo del instrumento en la tabla
+- [x] PaymentHistoryTable muestra logo del instrumento por pago
+- [x] CashPositionView muestra saldos por instrumento agrupados por moneda
+- [x] KPI "Resultado cambiario" visible en CashPositionView
+- [x] `pnpm build` y `pnpm lint` pasan
 
 ## Verification
 
@@ -450,9 +450,9 @@ Ejemplo:
 
 ## Closing Protocol
 
-- [ ] Actualizar `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` con schema de instrumentos y FX tracking
-- [ ] Actualizar `GREENHOUSE_EVENT_CATALOG_V1.md` si hay nuevos eventos
-- [ ] Actualizar `docs/documentation/finance/modulos-caja-cobros-pagos.md` con instrumentos y FX
+- [x] Actualizar `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` con schema de instrumentos y FX tracking
+- [x] Actualizar `GREENHOUSE_EVENT_CATALOG_V1.md` si hay nuevos eventos
+- [x] Actualizar `docs/documentation/finance/modulos-caja-cobros-pagos.md` con instrumentos y FX
 - [ ] Actualizar `schema-snapshot-baseline.sql` con DDL evolucionado
 - [ ] Regenerar `db.d.ts` post-migracion
 

@@ -24,6 +24,7 @@ import Typography from '@mui/material/Typography'
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
 import RegisterCashOutDrawer from '@views/greenhouse/finance/drawers/RegisterCashOutDrawer'
 
 // ---------------------------------------------------------------------------
@@ -43,6 +44,9 @@ interface CashOutItem {
   memberName: string | null
   reference: string | null
   isReconciled: boolean
+  paymentAccountName: string | null
+  paymentProviderSlug: string | null
+  paymentInstrumentCategory: string | null
 }
 
 interface CashOutApiItem {
@@ -57,6 +61,9 @@ interface CashOutApiItem {
   memberName: string | null
   reference: string | null
   isReconciled: boolean
+  paymentAccountName: string | null
+  paymentProviderSlug: string | null
+  paymentInstrumentCategory: string | null
 }
 
 interface CashOutSummary {
@@ -201,7 +208,10 @@ const CashOutListView = () => {
             supplierName: item.supplierName,
             memberName: item.memberName,
             reference: item.reference,
-            isReconciled: item.isReconciled
+            isReconciled: item.isReconciled,
+            paymentAccountName: item.paymentAccountName,
+            paymentProviderSlug: item.paymentProviderSlug,
+            paymentInstrumentCategory: item.paymentInstrumentCategory
           }))
         )
         setTotal(data.total ?? 0)
@@ -388,8 +398,8 @@ const CashOutListView = () => {
                 <TableCell>Tipo</TableCell>
                 <TableCell>Descripcion</TableCell>
                 <TableCell>Beneficiario</TableCell>
+                <TableCell>Instrumento</TableCell>
                 <TableCell>Referencia</TableCell>
-                <TableCell>Estado</TableCell>
                 <TableCell>Conciliación</TableCell>
               </TableRow>
             </TableHead>
@@ -431,12 +441,20 @@ const CashOutListView = () => {
                         <Typography variant='body2'>{getBeneficiary(item)}</Typography>
                       </TableCell>
                       <TableCell>
+                        {item.paymentAccountName ? (
+                          <PaymentInstrumentChip
+                            providerSlug={item.paymentProviderSlug}
+                            instrumentName={item.paymentAccountName}
+                            size='sm'
+                          />
+                        ) : (
+                          <Typography variant='body2' color='text.secondary'>{'\u2014'}</Typography>
+                        )}
+                      </TableCell>
+                      <TableCell>
                         <Typography variant='body2' sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
                           {item.reference || '\u2014'}
                         </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <CustomChip round='true' size='small' color='success' label='Pagado' />
                       </TableCell>
                       <TableCell>
                         {item.isReconciled ? (

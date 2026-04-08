@@ -188,6 +188,17 @@
   - o que una factura de compra ya es un pago
   - el P&L puede seguir leyendo devengo, pero la semántica visible debe distinguir documento vs caja
 
+## Delta 2026-04-08 Payment Instruments Registry + FX tracking (TASK-281)
+
+- `greenhouse_finance.accounts` evolucionada a Payment Instruments Registry: `instrument_category`, `provider_slug`, campos por tipo (tarjeta, fintech, procesador)
+- FX tracking nativo: `exchange_rate_at_payment`, `amount_clp`, `fx_gain_loss_clp` en ambos payment tables
+- `resolveExchangeRate()` bidireccional (CLP↔USD) reutilizando Mindicador dólar observado
+- Catálogo estático de 20 proveedores con logos SVG en `src/config/payment-instruments.ts`
+- `PaymentInstrumentChip` componente con logo + fallback a initials
+- Admin Center CRUD: `/admin/payment-instruments` con TanStack table y drawer por categoría
+- Selectores de instrumento en todos los drawers (CreateIncome, CreateExpense, RegisterCashIn, RegisterCashOut)
+- Columna instrumento con logo en CashInListView y CashOutListView
+
 ## Delta 2026-04-08 Finance cash contract hardened around canonical ledgers
 
 - Todo cobro/pago real debe existir en el ledger canónico y publicar outbox:

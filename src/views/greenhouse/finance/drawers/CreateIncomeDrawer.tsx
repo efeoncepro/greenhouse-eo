@@ -17,6 +17,8 @@ import Typography from '@mui/material/Typography'
 
 import CustomTextField from '@core/components/mui/TextField'
 
+import PaymentInstrumentChip from '@/components/greenhouse/PaymentInstrumentChip'
+
 const CURRENCIES = ['CLP', 'USD']
 
 const SERVICE_LINE_LABELS: Record<string, string> = {
@@ -73,6 +75,10 @@ const CreateIncomeDrawer = ({ open, onClose, onSuccess }: Props) => {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Payment instrument selector
+  const [instruments, setInstruments] = useState<Array<{ accountId: string; accountName: string; providerSlug: string | null; instrumentCategory: string; currency: string }>>([])
+  const [selectedInstrumentId, setSelectedInstrumentId] = useState('')
+
   // Client dropdown data
   const [clients, setClients] = useState<ClientOption[]>([])
   const [loadingClients, setLoadingClients] = useState(false)
@@ -108,6 +114,15 @@ const CreateIncomeDrawer = ({ open, onClose, onSuccess }: Props) => {
   useEffect(() => {
     if (open) {
       fetchClients()
+
+      fetch('/api/admin/payment-instruments', { cache: 'no-store' })
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (data?.items) {
+            setInstruments(data.items.filter((i: any) => i.isActive))
+          }
+        })
+        .catch(() => {})
     }
   }, [open, fetchClients])
 
@@ -140,6 +155,7 @@ const CreateIncomeDrawer = ({ open, onClose, onSuccess }: Props) => {
     setInvoiceNumber('')
     setServiceLine('')
     setHubspotCompanyId('')
+    setSelectedInstrumentId('')
     setNotes('')
     setError(null)
   }
@@ -182,6 +198,7 @@ const CreateIncomeDrawer = ({ open, onClose, onSuccess }: Props) => {
       ...(invoiceNumber.trim() && { invoiceNumber: invoiceNumber.trim() }),
       ...(serviceLine && { serviceLine }),
       ...(hubspotCompanyId.trim() && { hubspotCompanyId: hubspotCompanyId.trim() }),
+      ...(selectedInstrumentId && { paymentAccountId: selectedInstrumentId }),
       ...(notes.trim() && { notes: notes.trim() })
     }
 
@@ -342,6 +359,29 @@ const CreateIncomeDrawer = ({ open, onClose, onSuccess }: Props) => {
           <MenuItem value=''>—</MenuItem>
           {SERVICE_LINES.map(sl => (
             <MenuItem key={sl} value={sl}>{SERVICE_LINE_LABELS[sl]}</MenuItem>
+          ))}
+        </CustomTextField>
+        <CustomTextField
+          select
+          fullWidth
+          size='small'
+          label='Cuenta de destino'
+          value={selectedInstrumentId}
+          onChange={e => setSelectedInstrumentId(e.target.value)}
+        >
+          <MenuItem value=''>— Sin asignar —</MenuItem>
+          {instruments.map(inst => (
+            <MenuItem key={inst.accountId} value={inst.accountId}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <PaymentInstrumentChip
+                  providerSlug={inst.providerSlug}
+                  instrumentName={inst.accountName}
+                  size='sm'
+                  showName={false}
+                />
+                {inst.accountName} ({inst.currency})
+              </Box>
+            </MenuItem>
           ))}
         </CustomTextField>
         <CustomTextField

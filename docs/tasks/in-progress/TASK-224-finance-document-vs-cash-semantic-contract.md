@@ -28,6 +28,18 @@
 - El sync de movimientos bancarios Nubox ya usa el write path canónico de `income_payments`, evitando que cobros sincronizados queden fuera del contrato reactivo que consumen `client_economics`, `operational_pl` y `commercial_cost_attribution`
 - `data-quality` y los summaries Postgres-first ahora reportan gaps tipo `paid without ledger`
 
+## Delta 2026-04-08 — Cash surface materializada (TASK-280 + TASK-281)
+
+- La surface de caja real quedó completamente materializada:
+  - **Cobros** (`/finance/cash-in`) con instrumento de pago y logo en tabla
+  - **Pagos** (`/finance/cash-out`) con instrumento de pago y logo en tabla
+  - **Posición de caja** (`/finance/cash-position`) con resultado cambiario y multi-moneda
+- Payment Instruments Registry operativo en Admin Center con 20 proveedores (bancos, TC, fintech, payroll processors)
+- FX gain/loss auto-calculado al registrar pagos USD
+- `CreateIncomeDrawer` y `CreateExpenseDrawer` incluyen selector de instrumento
+- TASK-194 (expense payment ledger separation) absorbida completamente por TASK-280
+- La separación documento/caja queda visible a nivel de navegación y UX — resta formalizar en runtime (renombrar APIs internas de `income`/`expenses` a vocabulario semántico)
+
 ## Status
 
 - Lifecycle: `in-progress`

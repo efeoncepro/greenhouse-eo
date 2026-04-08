@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.1
 > **Creado:** 2026-04-07 por Claude
-> **Ultima actualizacion:** 2026-04-08 por Codex
+> **Ultima actualizacion:** 2026-04-08 por Claude
 > **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md)
 
 # Modulos de Caja — Cobros, Pagos y Posicion de Caja
@@ -73,6 +73,44 @@ Finance separa explícitamente los **documentos comerciales** (facturas de venta
   - `pnpm audit:finance:payment-ledgers`
   - `pnpm backfill:finance:payment-ledgers`
 - El backfill usa el write path canonico para que tambien se publiquen los eventos de outbox que consumen Finance, Cost Intelligence y proyecciones operativas
+
+## Instrumentos de pago
+
+Cada cobro o pago puede asociarse a un **instrumento de pago** (cuenta bancaria, tarjeta de crédito, fintech, etc.). Esto permite:
+
+- Saber desde qué cuenta se pagó o a cuál cuenta se recibió
+- Ver logos de proveedores (bancos, PayPal, Wise, Deel, etc.) en las tablas de cobros y pagos
+- Agrupar posición de caja por instrumento
+- Registrar nuevos instrumentos desde Admin Center (`/admin/payment-instruments`)
+
+### Categorías de instrumentos
+
+| Categoría | Ejemplos |
+|-----------|----------|
+| Cuenta bancaria | BCI, Banco de Chile, Santander, Estado |
+| Tarjeta de crédito | Visa, Mastercard, Amex |
+| Fintech | PayPal, Wise, MercadoPago, Global66 |
+| Plataforma de pago | Deel, Stripe |
+| Procesador de nómina | Previred |
+| Efectivo | Caja chica |
+
+### Dónde se selecciona el instrumento
+
+- Al registrar un cobro (drawer "Registrar cobro")
+- Al registrar un pago (drawer "Registrar pago")
+- Al crear una factura de venta (drawer "Registrar ingreso")
+- Al crear un compromiso de compra (drawer "Registrar egreso")
+
+## Tipo de cambio y resultado cambiario
+
+Greenhouse soporta operaciones en CLP y USD. Cuando se registra un pago en USD:
+
+- El sistema obtiene automáticamente el **dólar observado** del día desde Mindicador
+- Calcula el **monto equivalente en CLP** al tipo de cambio del pago
+- Compara con el tipo de cambio del documento original para calcular el **resultado cambiario** (FX gain/loss)
+- El KPI "Resultado cambiario" en Posición de caja muestra la ganancia o pérdida acumulada por diferencia de tipo de cambio
+
+> Ejemplo: una factura emitida a USD 1.000 cuando el dólar estaba a $900 CLP (= $900.000 CLP). Si el cobro se recibe cuando el dólar está a $950, el monto real es $950.000 CLP. El resultado cambiario es +$50.000 CLP.
 
 ## Diferencia con P&L
 

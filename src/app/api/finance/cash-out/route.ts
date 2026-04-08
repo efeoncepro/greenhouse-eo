@@ -35,6 +35,10 @@ interface PaymentRow {
   document_number: string | null
   member_name: string | null
   exchange_rate_to_clp: unknown
+  payment_account_id: string | null
+  payment_account_name: string | null
+  payment_provider_slug: string | null
+  payment_instrument_category: string | null
 }
 
 interface SummaryRow {
@@ -68,7 +72,11 @@ const normalizePayment = (row: PaymentRow) => ({
   costCategory: row.cost_category ? normalizeString(row.cost_category) : null,
   documentNumber: row.document_number ? normalizeString(row.document_number) : null,
   memberName: row.member_name ? normalizeString(row.member_name) : null,
-  exchangeRateToClp: toNumber(row.exchange_rate_to_clp)
+  exchangeRateToClp: toNumber(row.exchange_rate_to_clp),
+  paymentAccountId: row.payment_account_id ? normalizeString(row.payment_account_id) : null,
+  paymentAccountName: row.payment_account_name ? normalizeString(row.payment_account_name) : null,
+  paymentProviderSlug: row.payment_provider_slug ? normalizeString(row.payment_provider_slug) : null,
+  paymentInstrumentCategory: row.payment_instrument_category ? normalizeString(row.payment_instrument_category) : null
 })
 
 // ── GET handler ─────────────────────────────────────────────────────
@@ -154,6 +162,7 @@ export async function GET(request: Request) {
         ep.payment_source,
         ep.is_reconciled,
         ep.created_at,
+        ep.payment_account_id,
         e.description AS expense_description,
         e.expense_type,
         e.total_amount AS expense_total,
@@ -162,9 +171,13 @@ export async function GET(request: Request) {
         e.cost_category,
         e.document_number,
         e.member_name,
-        e.exchange_rate_to_clp
+        e.exchange_rate_to_clp,
+        a.account_name AS payment_account_name,
+        a.provider_slug AS payment_provider_slug,
+        a.instrument_category AS payment_instrument_category
       FROM greenhouse_finance.expense_payments ep
       INNER JOIN greenhouse_finance.expenses e ON e.expense_id = ep.expense_id
+      LEFT JOIN greenhouse_finance.accounts a ON a.account_id = ep.payment_account_id
       ${whereClause}
       ORDER BY ep.payment_date DESC, ep.created_at DESC
       LIMIT ${limitParam} OFFSET ${offsetParam}

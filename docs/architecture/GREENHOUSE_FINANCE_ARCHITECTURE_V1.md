@@ -16,6 +16,49 @@
   - Evento `finance.expense_payment.recorded` registrado en catálogo y 4 projections
   - Navegación Finance actualizada con sección Caja (3 items nuevos)
 
+## Delta 2026-04-08 — Payment Instruments Registry + FX Tracking (TASK-281)
+
+- **Tabla `accounts` evolucionada** con 10 nuevas columnas para Payment Instruments:
+  - `instrument_category` (bank_account, credit_card, fintech, payment_platform, cash, payroll_processor)
+  - `provider_slug` — link al catálogo estático de proveedores (`src/config/payment-instruments.ts`)
+  - `provider_identifier` — ID de cuenta en el proveedor externo
+  - `card_last_four`, `card_network` — campos de tarjeta
+  - `credit_limit` — límite de crédito
+  - `responsible_user_id` — persona responsable del instrumento
+  - `default_for` — array de usos por defecto (payroll, suppliers, tax, etc.)
+  - `display_order` — orden en selectores y listas
+  - `metadata_json` — campo extensible JSONB
+- **FX tracking en payment tables** — `income_payments` y `expense_payments` tienen:
+  - `exchange_rate_at_payment` — tipo de cambio al momento del pago
+  - `amount_clp` — monto equivalente en CLP al tipo de cambio del pago
+  - `fx_gain_loss_clp` — diferencia entre CLP al tipo de cambio del pago vs tipo de cambio del documento
+- **FX auto-calculado** en `recordPayment()` y `recordExpensePayment()` via `resolveExchangeRateToClp()`
+- **Bidirectional FX resolver** — `resolveExchangeRate({ fromCurrency, toCurrency })` en `shared.ts`
+- **Provider catalog** — 20 proveedores con logos SVG en `public/images/logos/payment/`:
+  - 10 bancos chilenos (BCI, Chile, Santander, Estado, Scotiabank, Itaú, BICE, Security, Falabella, Ripley)
+  - 3 redes de tarjeta (Visa, Mastercard, Amex)
+  - 4 fintech (PayPal, Wise, MercadoPago, Global66)
+  - 3 plataformas (Deel, Stripe, Previred)
+- **Admin Center CRUD** — `/admin/payment-instruments` con TanStack table, 4 KPIs, drawer de creación por categoría
+- **`PaymentInstrumentChip`** — componente con logo SVG + fallback a Avatar initials
+- **Selectores de instrumento** en RegisterCashIn/OutDrawer, CreateIncome/ExpenseDrawer
+- **Columna instrumento** en CashInListView y CashOutListView con logo
+- **KPI "Resultado cambiario"** en CashPositionView
+
+### Archivos clave TASK-281
+
+| Archivo | Función |
+|---------|---------|
+| `migrations/20260408091711953_evolve-accounts-to-payment-instruments.sql` | DDL evolución accounts + FX columns |
+| `src/config/payment-instruments.ts` | Catálogo de proveedores, categorías, logos |
+| `src/components/greenhouse/PaymentInstrumentChip.tsx` | Chip con logo + fallback |
+| `src/app/api/admin/payment-instruments/route.ts` | GET list + POST create |
+| `src/app/api/admin/payment-instruments/[id]/route.ts` | GET detail + PUT update |
+| `src/views/greenhouse/admin/payment-instruments/PaymentInstrumentsListView.tsx` | Admin list view |
+| `src/views/greenhouse/admin/payment-instruments/CreatePaymentInstrumentDrawer.tsx` | Drawer de creación |
+
+---
+
 ## Delta 2026-04-07 — Products catalog + Quote Line Items (TASK-211)
 
 Dos nuevas tablas en `greenhouse_finance`:
