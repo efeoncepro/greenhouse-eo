@@ -330,3 +330,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-278` | `to-do` | AI Visual Asset Generator: imagenes + animaciones SVG on-demand | `docs/tasks/to-do/TASK-278-ai-visual-asset-generator.md` |
 | `TASK-279` | `complete` | Labor Cost Attribution Pipeline: cerrar brecha payroll → client_economics | `docs/tasks/complete/TASK-279-labor-cost-attribution-client-economics-pipeline.md` |
 | `TASK-280` | `in-progress` | Finance Cash Modules: Ingresos (Cobros) y Egresos (Pagos/Desembolsos) | `docs/tasks/in-progress/TASK-280-finance-cash-modules-ingresos-egresos.md` |
+| `TASK-281` | `to-do` | Payment Instruments Registry, FX Tracking & Provider Logos | `docs/tasks/to-do/TASK-281-payment-instruments-registry-fx-tracking.md` |
