@@ -209,8 +209,15 @@ export async function GET(request: Request) {
     }
 
     if (status) {
-      filters += ' AND payment_status = @status'
-      params.status = status
+      const statuses = status.split(',').map(s => s.trim()).filter(Boolean)
+
+      if (statuses.length === 1) {
+        filters += ' AND payment_status = @status'
+        params.status = statuses[0]
+      } else if (statuses.length > 1) {
+        filters += ` AND payment_status IN (${statuses.map((_, i) => `@status${i}`).join(', ')})`
+        statuses.forEach((s, i) => { params[`status${i}`] = s })
+      }
     }
 
     if (resolvedScope?.clientId ?? clientId) {

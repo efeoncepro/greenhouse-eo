@@ -84,12 +84,22 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
     setExpensesError(null)
 
     try {
-      const res = await fetch('/api/finance/expenses?pageSize=100&status=pending,partial', { cache: 'no-store' })
+      const res = await fetch('/api/finance/expenses?pageSize=200&status=pending,partial', { cache: 'no-store' })
 
       if (res.ok) {
         const data = await res.json()
 
-        setExpenses(data.items ?? [])
+        const items: ExpenseOption[] = (data.items ?? []).map((e: any) => ({
+          expenseId: e.expenseId,
+          description: e.description ?? '',
+          supplierName: e.supplierName ?? null,
+          totalAmount: Number(e.totalAmountClp ?? e.totalAmount ?? 0),
+          paidAmount: Number(e.amountPaid ?? 0),
+          pendingAmount: Math.max(0, Number(e.totalAmountClp ?? e.totalAmount ?? 0) - Number(e.amountPaid ?? 0)),
+          currency: e.currency ?? 'CLP'
+        }))
+
+        setExpenses(items)
 
         return
       }

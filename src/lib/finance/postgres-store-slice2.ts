@@ -766,7 +766,15 @@ export const listFinanceIncomeFromPostgres = async ({
     values.push(value)
   }
 
-  if (status) push('payment_status = $?', status)
+  if (status) {
+    const statuses = status.split(',').map(s => s.trim()).filter(Boolean)
+
+    if (statuses.length === 1) {
+      push('payment_status = $?', statuses[0])
+    } else if (statuses.length > 1) {
+      push(`payment_status = ANY($?::text[])`, statuses)
+    }
+  }
 
   if (clientId || clientProfileId || hubspotCompanyId) {
     const clientConditions: string[] = []
@@ -1700,7 +1708,17 @@ export const listFinanceExpensesFromPostgres = async ({
   }
 
   if (expenseType) push('expense_type = $?', expenseType)
-  if (status) push('payment_status = $?', status)
+
+  if (status) {
+    const statuses = status.split(',').map(s => s.trim()).filter(Boolean)
+
+    if (statuses.length === 1) {
+      push('payment_status = $?', statuses[0])
+    } else if (statuses.length > 1) {
+      push(`payment_status = ANY($?::text[])`, statuses)
+    }
+  }
+
   if (clientId) push('client_id = $?', clientId)
   if (spaceId) push('space_id = $?', spaceId)
   if (memberId) push('member_id = $?', memberId)
