@@ -232,6 +232,27 @@ export const getNuboxSaleXml = async (id: number): Promise<string> => {
   return decodeNuboxXmlPayload(await response.text())
 }
 
+export const getNuboxPurchasePdf = async (id: number): Promise<ArrayBuffer> => {
+  const baseUrl = getBaseUrl()
+  const url = `${baseUrl}/purchases/${id}/pdf?template=TEMPLATE_A4`
+
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${await getBearerToken()}`,
+      'x-api-key': getApiKey(),
+      Accept: 'application/pdf'
+    },
+    cache: 'no-store',
+    signal: AbortSignal.timeout(30_000)
+  })
+
+  if (!response.ok) {
+    throw new Error(`Nubox purchase PDF download failed with ${response.status}`)
+  }
+
+  return response.arrayBuffer()
+}
+
 // ─── Purchases ──────────────────────────────────────────────────────────────
 
 export const listNuboxPurchases = async (period: string, page = 1, size = 100) =>

@@ -309,10 +309,10 @@ const IncomeListView = () => {
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <Typography variant='body2' fontWeight={600}>{row.original.invoiceNumber || row.original.incomeId}</Typography>
-            {row.original.nuboxPdfUrl && (
+            {row.original.nuboxDocumentId && (
               <Box
                 component='a'
-                href={row.original.nuboxPdfUrl}
+                href={`/api/finance/income/${row.original.incomeId}/dte-pdf`}
                 target='_blank'
                 rel='noopener noreferrer'
                 onClick={e => e.stopPropagation()}
@@ -322,10 +322,10 @@ const IncomeListView = () => {
                 <i className='tabler-file-type-pdf' style={{ fontSize: 16 }} />
               </Box>
             )}
-            {row.original.nuboxXmlUrl && (
+            {row.original.nuboxDocumentId && (
               <Box
                 component='a'
-                href={row.original.nuboxXmlUrl}
+                href={`/api/finance/income/${row.original.incomeId}/dte-xml`}
                 target='_blank'
                 rel='noopener noreferrer'
                 onClick={e => e.stopPropagation()}

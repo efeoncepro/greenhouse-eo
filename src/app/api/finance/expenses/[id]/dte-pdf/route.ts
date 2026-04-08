@@ -2,12 +2,12 @@ import { NextResponse } from 'next/server'
 
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { getNuboxSalePdf } from '@/lib/nubox/client'
+import { getNuboxPurchasePdf } from '@/lib/nubox/client'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { tenant, errorResponse } = await requireFinanceTenantContext()
@@ -16,31 +16,31 @@ export async function GET(
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { id: incomeId } = await params
+  const { id: expenseId } = await params
 
-  const rows = await runGreenhousePostgresQuery<{ nubox_document_id: number | null; dte_folio: string | null }>(
-    `SELECT nubox_document_id, dte_folio FROM greenhouse_finance.income WHERE income_id = $1`,
-    [incomeId]
+  const rows = await runGreenhousePostgresQuery<{ nubox_purchase_id: number | null; document_number: string | null }>(
+    `SELECT nubox_purchase_id, document_number FROM greenhouse_finance.expenses WHERE expense_id = $1`,
+    [expenseId]
   )
 
-  if (rows.length === 0 || !rows[0].nubox_document_id) {
-    return NextResponse.json({ error: 'No DTE emitted for this income' }, { status: 404 })
+  if (rows.length === 0 || !rows[0].nubox_purchase_id) {
+    return NextResponse.json({ error: 'No Nubox purchase linked to this expense' }, { status: 404 })
   }
 
   try {
-    const pdfBuffer = await getNuboxSalePdf(rows[0].nubox_document_id)
-    const folio = rows[0].dte_folio || rows[0].nubox_document_id
+    const pdfBuffer = await getNuboxPurchasePdf(rows[0].nubox_purchase_id)
+    const docNum = rows[0].document_number || rows[0].nubox_purchase_id
 
     return new NextResponse(pdfBuffer, {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="DTE-${folio}.pdf"`
+        'Content-Disposition': `attachment; filename="Compra-${docNum}.pdf"`
       }
     })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
 
-    console.error('DTE PDF download failed:', error)
+    console.error('Expense PDF download failed:', error)
 
     return NextResponse.json({ error: message }, { status: 502 })
   }

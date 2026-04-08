@@ -176,10 +176,10 @@ const expColumns: ColumnDef<Expense, any>[] = [
           )}
           {row.original.isAnnulled && <CustomChip round='true' size='small' variant='tonal' color='secondary' label='Anulada' sx={{ height: 20, fontSize: '0.65rem' }} />}
           {row.original.nuboxPurchaseId && <CustomChip round='true' size='small' color='info' variant='outlined' label='Nubox' sx={{ height: 20, fontSize: '0.65rem' }} />}
-          {row.original.nuboxPdfUrl && (
+          {row.original.nuboxPurchaseId && (
             <Box
               component='a'
-              href={row.original.nuboxPdfUrl}
+              href={`/api/finance/expenses/${row.original.expenseId}/dte-pdf`}
               target='_blank'
               rel='noopener noreferrer'
               onClick={e => e.stopPropagation()}
