@@ -86,7 +86,7 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
     setInvoicesError(null)
 
     try {
-      const res = await fetch('/api/finance/income?pageSize=100&status=pending,partial', { cache: 'no-store' })
+      const res = await fetch('/api/finance/income?pageSize=200&status=pending,partial', { cache: 'no-store' })
 
       if (res.ok) {
         const data = await res.json()
@@ -97,8 +97,8 @@ const RegisterCashInDrawer = ({ open, onClose, onSuccess }: Props) => {
           clientName: item.clientName ?? null,
           currency: item.currency ?? 'CLP',
           totalAmount: Number(item.totalAmount ?? 0),
-          paidAmount: Number(item.paidAmount ?? 0),
-          pendingAmount: Number(item.pendingAmount ?? item.totalAmount ?? 0)
+          paidAmount: Number(item.amountPaid ?? 0),
+          pendingAmount: Math.max(0, Number(item.totalAmount ?? 0) - Number(item.amountPaid ?? 0))
         }))
 
         setInvoices(items)
