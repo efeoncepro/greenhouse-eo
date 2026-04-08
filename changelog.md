@@ -5,6 +5,8 @@
 ### 2026-04-08 — Finance reconciliation settlement orchestration completed
 
 - Fix posterior al cierre: el alta de `supplemental settlement legs` ya no se pierde al releer el settlement group. `ensureSettlementForPayment()` ahora preserva legs manuales (`funding`, `internal_transfer`, `fx_conversion`, `fee`) y recalcula `settlement_mode = mixed` cuando existe más de un tramo.
+- Fix posterior al cierre: la importación idempotente de cartolas ya usa el predicado correcto del índice parcial de `bank_statement_rows`, por lo que reimportar el mismo extracto del período deja `skipped > 0` en vez de romper con `42P10`.
+- Fix posterior al cierre: la recomputación de reconciliación sobre `income_payments` / `expense_payments` dejó de escribir `updated_at` sobre tablas que no tienen esa columna, cerrando el loop real `unmatch -> match` contra el ledger y settlement leg canónico.
 - `Finance > Conciliación` quedó cerrada sobre el ledger real de caja: `cash-in`, `cash-out` y `Conciliación` ya hablan el mismo contrato con `matchedPaymentId` y `matchedSettlementLegId`.
 - `auto-match`, `match`, `unmatch` y `exclude` dejaron de duplicar eventos de pago en las routes; la transición reconciliado/no reconciliado vive en `postgres-reconciliation`.
 - Nuevo endpoint `GET/POST /api/finance/settlements/payment` + drawer `SettlementOrchestrationDrawer` para inspeccionar settlement groups y agregar legs manuales (`internal_transfer`, `funding`, `fx_conversion`, `fee`) desde el portal.
@@ -13,6 +15,9 @@
 - Eventos y consumers extendidos:
   - catálogo con `finance.internal_transfer.recorded` y `finance.fx_conversion.recorded`
   - `client_economics`, `operational_pl`, `commercial_cost_attribution`, `period_closure_status` y `data-quality` ya reaccionan o auditan el nuevo contrato
+- Validación staging final:
+  - `statement import -> reimport -> unmatch -> match` validado sobre `santander-clp_2026_03`
+  - el cobro `PAY-NUBOX-inc-3699924` vuelve a cambiar `isReconciled` en `cash-in` y en `settlement_legs` al conciliar/desconciliar manualmente
 - Impacto operativo: Greenhouse ya puede modelar y conciliar mejor cadenas multi-leg como `Santander -> Global66 -> payout/fee/fx` sin volver a mezclar documento, caja y conciliación.
 
 ### 2026-04-08 — Finance cash lane alignment: registered payments now surface in Cobros/Pagos

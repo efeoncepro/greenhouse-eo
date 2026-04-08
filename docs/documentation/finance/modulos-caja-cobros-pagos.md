@@ -121,6 +121,7 @@ Cada cobro o pago puede asociarse a un **instrumento de pago** (cuenta bancaria,
 - Cuando existe un `income_payment` o `expense_payment`, el matching operativo ocurre contra ese movimiento real, no contra un flag embebido en la factura o el gasto
 - El periodo de conciliacion guarda snapshots del instrumento para que el cierre no dependa de que el catalogo cambie despues
 - Reimportar el mismo extracto o reporte no debe duplicar filas: Greenhouse usa fingerprints de importacion y omite rows repetidas del mismo periodo
+- El loop operativo ya quedó cerrado sobre el ledger real: si desconcilias un row, `Cobros` o `Pagos` vuelven a `Por conciliar`; si lo reconcilias otra vez, el `payment` y su `settlement leg` recuperan el estado reconciliado
 - La vista detalle del periodo ahora muestra:
   - snapshot del instrumento, proveedor y moneda del periodo
   - accion `Marcar conciliado`

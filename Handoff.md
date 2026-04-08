@@ -23,8 +23,10 @@
   - el drawer `Liquidación` abre correctamente desde `ExpenseDetailView`
   - se detectó y corrigió un bug donde los `supplemental settlement legs` se insertaban pero `ensureSettlementForPayment()` los borraba al reread
   - fix aplicado: `ensureSettlementForPayment()` ahora preserva legs suplementarios, recalcula `settlement_mode` efectivo y no degrada un grupo `mixed` a `direct`
+  - se validó también el tramo `statement import -> reimport idempotente -> unmatch -> match` sobre `santander-clp_2026_03`
+  - el row `santander-clp_2026_03_3bf2f840e20a` se importó una vez, el segundo import quedó en `skipped = 1`, `unmatch` bajó `isReconciled = false` en `cash-in` y el rematch volvió a dejar reconciliados el `income_payment` y su `settlement_leg`
 - riesgo / siguiente paso recomendado:
-  - sigue pendiente una verificación con extracto real o CSV sintético para cerrar el tramo `statement import -> match/unmatch -> reconciled/closed`
+  - como follow-on ya no queda deuda funcional de `TASK-282`; lo siguiente es tesorería/banking UX o nuevos rails, no hardening del core
   - `TASK-283` aparece en el backlog pero no pertenece a este cierre
 
 ## Sesion 2026-04-08 — TASK-282 tomada para discovery/audit

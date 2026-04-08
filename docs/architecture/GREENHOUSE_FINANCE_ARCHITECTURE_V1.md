@@ -477,6 +477,7 @@ Estado operativo post `TASK-166`:
 - `reconciliation_periods` ahora guarda snapshots del instrumento (`instrument_category_snapshot`, `provider_slug_snapshot`, `provider_name_snapshot`, `period_currency_snapshot`) para que la conciliación no dependa del estado mutable del catálogo.
 - `bank_statement_rows` ahora soporta importación idempotente mediante `source_import_batch_id`, `source_import_fingerprint`, `source_imported_at` y `source_payload_json`.
 - `greenhouse_finance.settlement_groups` y `greenhouse_finance.settlement_legs` formalizan la base de settlement orchestration para pagos directos y cadenas multi-leg (`internal_transfer`, `funding`, `fx_conversion`, `payout`, `fee`).
+- La reconciliación payment-level quedó validada end-to-end contra staging: reimportar el mismo statement row no duplica filas y el loop `unmatch -> match` vuelve a sincronizar `bank_statement_rows`, `income_payments` / `expense_payments` y `settlement_legs` sobre el mismo `reconciliation_row_id`.
 - La semántica operativa queda explícita:
   - `pagado/cobrado` != `conciliado`
   - transferencia interna o funding no liquida la obligación
