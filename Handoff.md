@@ -1,5 +1,49 @@
 # Handoff.md
 
+## Sesion 2026-04-08 — TASK-283 cerrada
+
+- estado actual:
+  - `TASK-283` quedó implementada y lista para merge/deploy
+  - el módulo `Banco` ya existe como surface propia en `Finance`
+- cambios principales:
+  - nueva tabla `greenhouse_finance.account_balances` con snapshots diarios por cuenta y cierre de período
+  - nuevos helpers `account-balances.ts` e `internal-transfers.ts`
+  - nueva projection reactiva `accountBalancesProjection`
+  - nuevas APIs:
+    - `GET/POST /api/finance/bank`
+    - `GET/POST /api/finance/bank/[accountId]`
+    - `POST /api/finance/bank/transfer`
+  - nueva UI:
+    - `/finance/bank`
+    - `BankView`
+    - `AccountDetailDrawer`
+    - `AssignAccountDrawer`
+    - `InternalTransferDrawer`
+  - navegación y access catalog ya incluyen `finanzas.banco`
+  - drawers de `Cobros`, `Pagos`, `Ingresos`, `Egresos` y settlement ya leen instrumentos desde `/api/finance/accounts`
+- validación ejecutada:
+  - `pnpm pg:connect:migrate` — OK
+  - `pnpm exec tsc --noEmit` — OK
+  - `pnpm lint` — OK
+  - `pnpm build` — OK
+- siguiente paso recomendado:
+  - validar en staging los flujos `Banco -> Transferencia interna`, `Asignación retroactiva` y `Cerrar período`
+
+## Sesion 2026-04-08 — TASK-283 tomada para discovery/audit
+
+- estado actual:
+  - `TASK-283` movida a `in-progress`
+  - discovery y auditoría formal ya ejecutados antes de escribir runtime
+- hallazgos que cambian la baseline:
+  - `TASK-282` ya está cerrada y operativa; deja de ser bloqueo y pasa a foundation real
+  - la task estaba stale respecto al runtime: dependencias reales son `reconciliation_periods` / `bank_statement_rows`, no `fin_*`
+  - `settlement_groups` / `settlement_legs` ya existen y soportan `internal_transfer`, `funding`, `fx_conversion`, pero todavía no existe un módulo Banco/Tesorería como surface propia
+  - no existe `account_balances`, no existe projection reactiva de balances por cuenta y no existe `POST /api/finance/bank/transfer`
+  - tampoco existe `viewCode` `finanzas.banco`; navegación y permisos tendrán que ampliarse
+- siguiente paso:
+  - imprimir mapa de conexiones completo entre treasury, cash ledgers, settlement, reconciliación, proyecciones y navegación
+  - luego cerrar plan de implementación por slices antes de invocar skills y editar código
+
 ## Sesion 2026-04-08 — TASK-282 cerrada
 
 - estado actual:

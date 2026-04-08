@@ -1,10 +1,10 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-04-07 por Claude
 > **Ultima actualizacion:** 2026-04-08 por Codex
 > **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md)
 
-# Modulos de Caja — Cobros, Pagos y Posicion de Caja
+# Modulos de Caja — Cobros, Pagos, Banco y Posicion de Caja
 
 ## Que son estos modulos
 
@@ -16,6 +16,7 @@ Finance separa explícitamente los **documentos comerciales** (facturas de venta
 | Compras | `/finance/expenses` | Facturas recibidas de proveedores (obligaciones) |
 | **Cobros** | `/finance/cash-in` | Dinero efectivamente recibido |
 | **Pagos** | `/finance/cash-out` | Dinero efectivamente pagado |
+| **Banco** | `/finance/bank` | Tesoreria por instrumento: saldo, coverage, discrepancia y cierre |
 | **Posicion de caja** | `/finance/cash-position` | Saldo real: cobrado menos pagado |
 
 ## Cobros (Cash In)
@@ -49,6 +50,75 @@ Finance separa explícitamente los **documentos comerciales** (facturas de venta
   - **Por pagar**: compromisos pendientes de pago
   - **Grafico 12 meses**: cobros vs pagos vs flujo neto mensual
   - **Cuentas bancarias**: listado de cuentas activas con saldo de apertura
+
+## Banco (Treasury)
+
+- Vista operativa de tesoreria por instrumento real: cuenta bancaria, tarjeta, fintech o wallet
+- Lee desde `account_balances`, settlement legs y payment ledgers, no desde flags documentales
+- Responde preguntas como:
+  - cuanto saldo estimado tiene cada cuenta
+  - cuantos movimientos del periodo quedaron sin instrumento asignado
+  - cual es la discrepancia contra el ultimo periodo de conciliacion
+  - que instrumentos tienen el periodo cerrado
+- KPIs visibles:
+  - saldo CLP
+  - saldo USD
+  - equivalente CLP consolidado
+  - instrumentos activos
+  - coverage de asignacion
+  - resultado cambiario
+
+### Lo que muestra Banco
+
+- **Saldos por instrumento**
+  - apertura
+  - ingresos
+  - salidas
+  - saldo estimado
+  - discrepancia
+  - estado de conciliacion
+  - estado del cierre del periodo
+- **Tarjetas de credito**
+  - cupo
+  - consumo del periodo
+  - disponible estimado
+- **Detalle por cuenta**
+  - historial de 12 meses
+  - movimientos recientes
+  - cierre de periodo por cuenta
+
+### Coverage de instrumentos
+
+- Si un cobro o pago existe pero no tiene `payment_account_id`, afecta el KPI de coverage
+- `Banco` muestra un banner cuando la cobertura es menor a 100%
+- La accion **Asignacion retroactiva** permite vincular pagos/cobros existentes a una cuenta para que:
+  - `Banco`
+  - `Cobros`
+  - `Pagos`
+  - `Conciliacion`
+  - `Posicion de caja`
+  lean el mismo instrumento canonico
+
+### Transferencias internas
+
+- `Banco` agrega la accion **Transferencia interna**
+- Sirve para mover fondos entre instrumentos propios sin registrar un gasto o ingreso nuevo
+- Caso tipico:
+  - `Santander -> Global66`
+  - `Banco Estado -> cuenta operativa`
+- La transferencia:
+  - crea settlement legs `internal_transfer`
+  - puede crear legs `fx_conversion` si cruza monedas
+  - rematerializa saldos de ambas cuentas
+- Importante:
+  - una transferencia interna no liquida una obligacion comercial
+  - el pago real al proveedor o colaborador sigue viviendo en `expense_payments`
+
+### Cierre de periodo por cuenta
+
+- Cada cuenta puede cerrarse por periodo una vez terminado el mes
+- El cierre congela el snapshot de `account_balances` para ese mes
+- Si aparece movimiento retroactivo despues del cierre, Greenhouse lo muestra como drift operativo; no reescribe silenciosamente el cierre
 
 ## Como registrar un pago
 

@@ -148,7 +148,7 @@ const RegisterCashOutDrawer = ({ open, onClose, onSuccess }: Props) => {
     if (open) {
       fetchExpenses()
 
-      fetch('/api/admin/payment-instruments', { cache: 'no-store' })
+      fetch('/api/finance/accounts', { cache: 'no-store' })
         .then(res => res.ok ? res.json() : null)
         .then(data => {
           if (data?.items) {

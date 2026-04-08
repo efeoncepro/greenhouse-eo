@@ -218,7 +218,7 @@ const SettlementOrchestrationDrawer = ({ open, paymentType, paymentId, onClose, 
     try {
       const [detailRes, instrumentsRes] = await Promise.all([
         fetch(`/api/finance/settlements/payment?paymentType=${paymentType}&paymentId=${paymentId}`, { cache: 'no-store' }),
-        fetch('/api/admin/payment-instruments', { cache: 'no-store' })
+        fetch('/api/finance/accounts', { cache: 'no-store' })
       ])
 
       if (detailRes.ok) {

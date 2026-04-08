@@ -213,6 +213,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               { label: nl(GH_FINANCE_NAV.suppliers), href: '/finance/suppliers' },
               { label: nl(GH_FINANCE_NAV.cashIn), href: '/finance/cash-in' },
               { label: nl(GH_FINANCE_NAV.cashOut), href: '/finance/cash-out' },
+              { label: nl(GH_FINANCE_NAV.bank), href: '/finance/bank' },
               { label: nl(GH_FINANCE_NAV.cashPosition), href: '/finance/cash-position' }
             ].filter(item => {
               if (item.href === '/finance') return canSeeView('finanzas.resumen', true)
@@ -222,6 +223,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               if (item.href === '/finance/suppliers') return canSeeView('finanzas.proveedores', true)
               if (item.href === '/finance/cash-in') return canSeeView('finanzas.ingresos', true)
               if (item.href === '/finance/cash-out') return canSeeView('finanzas.egresos', true)
+              if (item.href === '/finance/bank') return canSeeView('finanzas.banco', true)
               if (item.href === '/finance/cash-position') return canSeeView('finanzas.resumen', true)
 
               return true

@@ -3048,6 +3048,25 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - `finance.fx_conversion.recorded`
   - `finance.reconciliation_period.reconciled|closed`
 
+## Delta 2026-04-08 Finance bank & treasury module completed
+
+- `Finance` ya no expone solo `Cobros`, `Pagos`, `Posición de caja` y `Conciliación`; ahora también tiene la superficie `Banco` en `/finance/bank`.
+- Regla operativa vigente:
+  - el saldo por instrumento se lee desde `greenhouse_finance.account_balances`
+  - `account_balances` se materializa reactivamente; no debe recalcularse inline en la UI salvo recovery puntual
+  - transferencias internas entre cuentas propias viven como settlement orchestration (`internal_transfer` + opcional `fx_conversion`), no como gasto/ingreso
+- Superficie backend agregada:
+  - `GET/POST /api/finance/bank`
+  - `GET/POST /api/finance/bank/[accountId]`
+  - `POST /api/finance/bank/transfer`
+- Helpers nuevos:
+  - `src/lib/finance/account-balances.ts`
+  - `src/lib/finance/internal-transfers.ts`
+  - `src/lib/sync/projections/account-balances.ts`
+- Integración transversal:
+  - `Banco`, `Cobros`, `Pagos`, `Conciliación` y `Posición de caja` comparten el mismo contrato instrument-aware
+  - los drawers de caja y settlement usan `/api/finance/accounts` para seleccionar instrumentos visibles al equipo de finanzas
+
 ## Delta 2026-03-14 Task board reorganization
 
 - `docs/tasks/` ya no debe leerse como una carpeta plana de briefs.

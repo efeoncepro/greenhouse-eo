@@ -2,6 +2,21 @@
 
 ## 2026-04-08
 
+### 2026-04-08 — Finance bank & treasury module completed
+
+- Nuevo módulo `Finance > Banco` (`/finance/bank`) con lectura ledger-first por instrumento: saldos por cuenta, coverage de asignación, discrepancia contra conciliación, exposición multi-moneda y tarjetas de crédito.
+- Nueva tabla `greenhouse_finance.account_balances` con snapshots diarios por cuenta e indicadores de cierre de período, materializada reactivamente desde eventos de caja, settlement y conciliación.
+- Nuevos endpoints:
+  - `GET/POST /api/finance/bank`
+  - `GET/POST /api/finance/bank/[accountId]`
+  - `POST /api/finance/bank/transfer`
+- Nueva acción operativa de tesorería: `Transferencia interna`, que registra `settlement_groups` / `settlement_legs` entre cuentas propias y soporta `fx_conversion` cuando cruza monedas.
+- Nueva acción `Asignación retroactiva` para vincular cobros/pagos existentes a instrumentos y recuperar coverage de tesorería, caja y conciliación sobre el mismo ledger.
+- Integración de navegación y permisos:
+  - item `Banco` dentro de `Finance > Caja`
+  - nuevo `viewCode` `finanzas.banco`
+- Ajuste de acceso importante: drawers de caja y settlement dejaron de depender de `/api/admin/payment-instruments` y ahora consumen `/api/finance/accounts`, evitando el bloqueo para usuarios financieros no-admin.
+
 ### 2026-04-08 — Finance reconciliation settlement orchestration completed
 
 - Fix posterior al cierre: el alta de `supplemental settlement legs` ya no se pierde al releer el settlement group. `ensureSettlementForPayment()` ahora preserva legs manuales (`funding`, `internal_transfer`, `fx_conversion`, `fee`) y recalcula `settlement_mode = mixed` cuando existe más de un tramo.

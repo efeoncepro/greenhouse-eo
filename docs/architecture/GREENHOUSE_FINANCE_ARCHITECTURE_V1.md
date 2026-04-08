@@ -81,6 +81,52 @@
   - permite `Marcar conciliado` y `Cerrar período` usando `PUT /api/finance/reconciliation/[id]`
   - la acción queda bloqueada hasta tener extracto importado, diferencia en cero y sin rows pendientes
 
+## Delta 2026-04-08 — Bank & Treasury module completed (TASK-283)
+
+- **Nueva tabla `greenhouse_finance.account_balances`**
+  - snapshot diario por instrumento (`account_id`, `balance_date`)
+  - persiste `opening_balance`, `period_inflows`, `period_outflows`, `closing_balance`
+  - guarda equivalente CLP, FX usado, resultado cambiario, conteo transaccional y estado de cierre del período
+  - UNIQUE `(account_id, balance_date)` para materialización idempotente
+- **Materialización reactiva de tesorería**
+  - helper `materializeAccountBalance()` y readers en `src/lib/finance/account-balances.ts`
+  - projection `accountBalancesProjection` escucha:
+    - `finance.income_payment.recorded`
+    - `finance.expense_payment.recorded`
+    - `finance.settlement_leg.recorded|reconciled|unreconciled`
+    - `finance.internal_transfer.recorded`
+    - `finance.fx_conversion.recorded`
+    - `finance.reconciliation_period.reconciled|closed`
+  - la UI `Banco` lee el snapshot materializado como source of truth
+- **Transferencias internas como movimiento canónico de tesorería**
+  - helper `recordInternalTransfer()` en `src/lib/finance/internal-transfers.ts`
+  - crea `settlement_group` con `settlement_mode = 'internal_transfer'`
+  - crea legs `internal_transfer` para salida/entrada y `fx_conversion` cuando la transferencia cruza monedas
+  - rematerializa balances de ambas cuentas desde la fecha del movimiento
+- **Nuevas APIs**
+  - `GET/POST /api/finance/bank`
+    - overview por instrumento
+    - coverage de `payment_account_id`
+    - asignación retroactiva de cobros/pagos a una cuenta
+  - `GET/POST /api/finance/bank/[accountId]`
+    - detalle de cuenta
+    - historial de 12 meses
+    - movimientos recientes
+    - cierre de período por cuenta
+  - `POST /api/finance/bank/transfer`
+    - alta de transferencias internas standalone
+- **Nueva superficie UI**
+  - página `GET /finance/bank`
+  - vista `BankView`
+  - drawers:
+    - `AccountDetailDrawer`
+    - `AssignAccountDrawer`
+    - `InternalTransferDrawer`
+  - access view registrado como `finanzas.banco`
+- **Integración con el ecosistema**
+  - `Banco`, `Cobros`, `Pagos`, `Conciliación` y `Posición de caja` comparten ahora la misma base instrument-aware
+  - los drawers operativos de caja ya consumen `/api/finance/accounts` en vez de la route admin-only de instrumentos
+
 ---
 
 ## Delta 2026-04-07 — Products catalog + Quote Line Items (TASK-211)

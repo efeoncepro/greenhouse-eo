@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Complete`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`
@@ -22,6 +22,23 @@
 ## Summary
 
 Modulo de tesoreria que consolida saldos reales por cuenta bancaria, tarjeta y fintech con saldos materializados reactivamente, transferencias internas, coverage de asignacion, discrepancia vs extracto y posicion multi-moneda con exposicion cambiaria. Construido sobre la infraestructura de payment instruments (TASK-281), settlement ledger (TASK-282) y reconciliacion existente.
+
+## Outcome
+
+- `greenhouse_finance.account_balances` creada y migrada
+- materializacion reactiva de balances por cuenta implementada
+- transferencias internas standalone implementadas via `settlement_groups` / `settlement_legs`
+- APIs `GET/POST /api/finance/bank`, `GET/POST /api/finance/bank/[accountId]` y `POST /api/finance/bank/transfer`
+- UI `/finance/bank` implementada con KPIs, tabla de cuentas, tarjetas, detalle, asignacion retroactiva y transferencia interna
+- navegacion + access catalog alineados con `finanzas.banco`
+- drawers operativos de Finance leen instrumentos desde `/api/finance/accounts`
+
+## Validation
+
+- `pnpm pg:connect:migrate`
+- `pnpm exec tsc --noEmit`
+- `pnpm lint`
+- `pnpm build`
 
 ## Why This Task Exists
 
@@ -81,9 +98,9 @@ Reglas obligatorias:
 - `greenhouse_finance.accounts` — tabla de instrumentos con `instrument_category`, `provider_slug`, `opening_balance` (TASK-281, complete)
 - `greenhouse_finance.income_payments` — `payment_account_id` vincula cobros a cuentas (TASK-280, complete)
 - `greenhouse_finance.expense_payments` — `payment_account_id` vincula pagos a cuentas (TASK-280, complete)
-- `greenhouse_finance.settlement_groups` / `settlement_legs` — ledger de movimientos por instrumento (TASK-282, in-progress)
-- `greenhouse_finance.fin_reconciliation_periods` — periodos de conciliacion por cuenta/mes
-- `greenhouse_finance.fin_bank_statement_rows` — extractos bancarios importados
+- `greenhouse_finance.settlement_groups` / `settlement_legs` — ledger de movimientos por instrumento (TASK-282, complete)
+- `greenhouse_finance.reconciliation_periods` — periodos de conciliacion por cuenta/mes
+- `greenhouse_finance.bank_statement_rows` — extractos bancarios importados
 - Outbox events: `finance.income_payment.recorded`, `finance.expense_payment.recorded`
 - Exchange rate infrastructure: `resolveExchangeRateToClp()`, `/api/finance/exchange-rates/latest`
 
@@ -112,13 +129,14 @@ Reglas obligatorias:
 - `greenhouse_finance.accounts` con 10 columnas de instrumentos, logos, metadata_json (TASK-281)
 - `income_payments` y `expense_payments` con `payment_account_id`, `exchange_rate_at_payment`, `amount_clp`, `fx_gain_loss_clp`
 - `settlement_groups` y `settlement_legs` con `instrument_id`, `counterparty_instrument_id`, `leg_type` incluyendo `internal_transfer` (TASK-282)
-- `fin_reconciliation_periods` con `account_id`, `opening_balance`, `closing_balance_bank`, `closing_balance_system`, `difference`, `status`
-- `fin_bank_statement_rows` con `match_status`, `matched_payment_id`, `matched_settlement_leg_id`
+- `reconciliation_periods` con `account_id`, `opening_balance`, `closing_balance_bank`, `closing_balance_system`, `difference`, `status`
+- `bank_statement_rows` con `match_status`, `matched_payment_id`, `matched_settlement_leg_id`
 - `PaymentInstrumentChip` componente con logos SVG de 20 proveedores
 - Reactive projection infrastructure: 4 projections activas con outbox + ops-worker
 - `resolveExchangeRateToClp()` y `resolveExchangeRate()` bidireccional
 - Cash Position view con grafico 12 meses y KPIs globales
 - Navigation menu con seccion Flujo bajo Finanzas
+- `GET/POST /api/finance/settlements/payment` + `SettlementOrchestrationDrawer` para agregar `internal_transfer`, `funding`, `fx_conversion` y `fee` sobre payments existentes
 
 ### Gap
 
@@ -174,7 +192,7 @@ Reglas obligatorias:
 
 - Crear `src/lib/finance/internal-transfers.ts`:
   - `recordInternalTransfer({ fromAccountId, toAccountId, amount, currency, transferDate, reference, notes })`
-  - Crea un `settlement_group` con `settlement_mode = 'internal'`
+  - Crea un `settlement_group` con `settlement_mode = 'internal_transfer'`
   - Crea 2 `settlement_legs`: uno `outgoing` desde cuenta origen, uno `incoming` a cuenta destino, ambos con `leg_type = 'internal_transfer'`
   - Publica evento `finance.internal_transfer.recorded`
   - Recomputa saldo de ambas cuentas
@@ -191,7 +209,7 @@ Reglas obligatorias:
     - Leer `account_balances` del mes solicitado (o computar on-the-fly si no existe)
     - `period_inflows`, `period_outflows`, `closing_balance`
     - Estado de conciliacion: ultimo `fin_reconciliation_periods` de esa cuenta
-    - Discrepancia: `closing_balance - closing_balance_bank` (del periodo de conciliacion)
+    - Discrepancia: `closing_balance_system - closing_balance_bank` (o `difference` del periodo de conciliacion)
     - Ultima actividad: `last_transaction_at`
   - KPIs globales:
     - Saldo total CLP (sum de closing_balance WHERE currency = 'CLP')
@@ -330,8 +348,8 @@ WHERE payment_account_id = $1
 
 ```
 settlement_group:
-  group_direction: 'internal'
-  settlement_mode: 'internal'
+  group_direction: 'outgoing' | 'incoming' (segun diseño final del helper)
+  settlement_mode: 'internal_transfer'
   source_payment_type: NULL
   source_payment_id: NULL
   primary_instrument_id: from_account_id

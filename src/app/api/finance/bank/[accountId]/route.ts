@@ -1,0 +1,97 @@
+import { NextResponse } from 'next/server'
+
+import {
+  closeAccountBalancePeriod,
+  getBankAccountDetail
+} from '@/lib/finance/account-balances'
+import { FinanceValidationError } from '@/lib/finance/shared'
+import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+
+export const dynamic = 'force-dynamic'
+
+const parsePositiveInteger = (value: unknown, fieldName: string) => {
+  const parsed = Number(value)
+
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new FinanceValidationError(`${fieldName} must be a positive integer.`)
+  }
+
+  return parsed
+}
+
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ accountId: string }> }
+) {
+  const { tenant, errorResponse } = await requireFinanceTenantContext()
+
+  if (!tenant) {
+    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  try {
+    const { accountId } = await params
+    const url = new URL(request.url)
+    const yearParam = url.searchParams.get('year')
+    const monthParam = url.searchParams.get('month')
+    const year = yearParam ? parsePositiveInteger(yearParam, 'year') : null
+    const month = monthParam ? parsePositiveInteger(monthParam, 'month') : null
+
+    const detail = await getBankAccountDetail({
+      accountId,
+      year,
+      month,
+      actorUserId: tenant.userId || null
+    })
+
+    return NextResponse.json(detail)
+  } catch (error) {
+    if (error instanceof FinanceValidationError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
+
+    throw error
+  }
+}
+
+export async function POST(
+  request: Request,
+  { params }: { params: Promise<{ accountId: string }> }
+) {
+  const { tenant, errorResponse } = await requireFinanceTenantContext()
+
+  if (!tenant) {
+    return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  try {
+    const { accountId } = await params
+    const body = await request.json()
+
+    if (body?.action !== 'close-period') {
+      throw new FinanceValidationError('Unsupported action for treasury account detail route.', 400)
+    }
+
+    const year = parsePositiveInteger(body.year, 'year')
+    const month = parsePositiveInteger(body.month, 'month')
+
+    const balance = await closeAccountBalancePeriod({
+      accountId,
+      year,
+      month,
+      actorUserId: tenant.userId || null
+    })
+
+    return NextResponse.json({
+      accountId,
+      closed: true,
+      balance
+    })
+  } catch (error) {
+    if (error instanceof FinanceValidationError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
+
+    throw error
+  }
+}

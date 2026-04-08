@@ -1173,6 +1173,34 @@ export interface GreenhouseDeliveryTasks {
   workflow_review_open: Generated<boolean>;
 }
 
+export interface GreenhouseFinanceAccountBalances {
+  account_id: string;
+  balance_date: Timestamp;
+  balance_id: string;
+  closed_at: Timestamp | null;
+  closed_by_user_id: string | null;
+  closing_balance: Generated<Numeric>;
+  /**
+   * Closing balance converted to CLP using fx_rate_used at materialization time.
+   */
+  closing_balance_clp: Numeric | null;
+  computed_at: Generated<Timestamp>;
+  created_at: Generated<Timestamp>;
+  currency: string;
+  fx_gain_loss_clp: Generated<Numeric>;
+  fx_rate_used: Numeric | null;
+  /**
+   * Soft immutable period-close flag. Closed snapshots are preserved for audit and not overwritten by reactive recompute.
+   */
+  is_period_closed: Generated<boolean>;
+  last_transaction_at: Timestamp | null;
+  opening_balance: Generated<Numeric>;
+  period_inflows: Generated<Numeric>;
+  period_outflows: Generated<Numeric>;
+  transaction_count: Generated<number>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseFinanceAccounts {
   account_id: string;
   account_name: string;
@@ -3672,6 +3700,7 @@ export interface DB {
   "greenhouse_delivery.staff_aug_onboarding_items": GreenhouseDeliveryStaffAugOnboardingItems;
   "greenhouse_delivery.staff_aug_placements": GreenhouseDeliveryStaffAugPlacements;
   "greenhouse_delivery.tasks": GreenhouseDeliveryTasks;
+  "greenhouse_finance.account_balances": GreenhouseFinanceAccountBalances;
   "greenhouse_finance.accounts": GreenhouseFinanceAccounts;
   "greenhouse_finance.bank_statement_rows": GreenhouseFinanceBankStatementRows;
   "greenhouse_finance.client_economics": GreenhouseFinanceClientEconomics;
