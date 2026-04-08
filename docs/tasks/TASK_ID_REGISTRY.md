@@ -332,3 +332,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-280` | `complete` | Finance Cash Modules: Ingresos (Cobros) y Egresos (Pagos/Desembolsos) | `docs/tasks/complete/TASK-280-finance-cash-modules-ingresos-egresos.md` |
 | `TASK-281` | `complete` | Payment Instruments Registry, FX Tracking & Provider Logos | `docs/tasks/complete/TASK-281-payment-instruments-registry-fx-tracking.md` |
 | `TASK-282` | `in-progress` | Finance Payment Instrument Reconciliation & Settlement Orchestration | `docs/tasks/in-progress/TASK-282-finance-payment-instrument-reconciliation-settlement-orchestration.md` |
+| `TASK-283` | `to-do` | Finance Bank & Treasury Module: saldos materializados, transferencias internas, coverage, multi-moneda | `docs/tasks/to-do/TASK-283-finance-bank-treasury-module.md` |
