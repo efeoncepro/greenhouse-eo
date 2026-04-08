@@ -89,6 +89,7 @@ export async function GET() {
       providerIdentifier: a.providerIdentifier,
       responsibleUserId: a.responsibleUserId,
       notes: a.notes,
+      metadataJson: a.metadataJson ?? {},
       createdAt: a.createdAt ?? ''
     }))
 
@@ -144,7 +145,7 @@ export async function POST(request: Request) {
     const country = normalizeString(body.country) || 'CL'
     const providerIdentifier = normalizeString(body.providerIdentifier || body.fintechAccountId || body.merchantId || body.rutEmpresa) || null
     const cardLastFour = normalizeString(body.cardLastFour || body.cardLast4) || null
-    const cardNetwork = normalizeString(body.cardNetwork || body.cardIssuer) || null
+    const cardNetwork = normalizeString(body.cardNetwork) || null
     const creditLimit = toNullableNumber(body.creditLimit)
     const accountNumber = normalizeString(body.accountNumber || body.bankAccountNumber) || null
     const accountNumberFull = body.accountNumberFull ? normalizeString(body.accountNumberFull) : null
