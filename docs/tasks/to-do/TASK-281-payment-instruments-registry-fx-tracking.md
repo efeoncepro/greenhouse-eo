@@ -113,21 +113,39 @@ Reglas obligatorias:
 - `PAYMENT_PROVIDERS` enum en `expense-taxonomy.ts`: bank, previred, stripe, webpay, paypal, mercadopago, wise, other
 - `PAYMENT_RAILS` enum: bank_transfer, card, gateway, wallet, cash, check, payroll_file, previred, other
 - `payment_account_id` FK en income_payments, expense_payments, expenses — wiring de schema existe pero sin validacion
-- `exchange_rates` tabla con USD/CLP diario auto-synced desde Mindicador
-- `resolveExchangeRateToClp()` en shared.ts — resuelve rate por moneda
 - `CreateAccountDrawer.tsx` — drawer basico para crear cuentas bancarias
 - Admin Center patron probado en `AdminAccountsView.tsx` (631 LOC)
+
+**Infraestructura FX existente (critica — reutilizar, no recrear):**
+
+- `greenhouse_finance.exchange_rates` — tabla con USD/CLP diario, ambas direcciones (USD→CLP + CLP→USD), auto-synced
+- `greenhouse_finance.economic_indicators` — USD_CLP, UF, UTM, IPC, IMM desde Mindicador
+- `src/lib/finance/exchange-rates.ts` — capa completa de resolucion FX:
+  - `fetchMindicadorUsdToClp(rateDate?)` — dolar observado del Banco Central via `mindicador.cl/api/dolar`, con lookback de 7 dias para feriados/fines de semana
+  - `fetchOpenExchangeRateUsdToClp()` — fallback via `open.er-api.com`
+  - `fetchUsdToClpFromProviders(rateDate?)` — orquesta Mindicador primero, Open ER como fallback
+  - `syncDailyUsdClpExchangeRate(date?)` — fetch + persist dual-store (Postgres + BigQuery)
+  - `getLatestStoredExchangeRatePair({ from, to })` — lee ultimo rate persistido (Postgres-first)
+  - `buildUsdClpRatePairs({ usdToClp, rateDate, source })` — genera par USD→CLP + CLP→USD
+- `src/lib/finance/shared.ts` → `resolveExchangeRateToClp({ currency, requestedRate })` — resolucion canonica: CLP=1, rate manual si se provee, sino ultimo rate persistido, sino error 409
+- `GET /api/finance/exchange-rates/latest` — devuelve ultimo tipo de cambio con auto-sync si no hay rate
+- `POST /api/finance/exchange-rates/sync` — cron de sync diario
+- `GET /api/finance/economic-indicators/latest` — USD_CLP, UF, UTM, IPC del dia
+- Timezone canonica: `America/Santiago` para determinar "hoy"
+- Rate sources: `mindicador` (primario, dolar observado del Banco Central de Chile), `open-er-api` (fallback)
 
 ### Gap
 
 - `accounts` no tiene columnas para categoria, proveedor, identificador, limites, responsable, routing
-- No hay concept de "instrumento de pago" como entidad de primer nivel con categorias ricas
-- income_payments y expense_payments no capturan tipo de cambio del momento del pago
-- No se calcula ganancia/perdida cambiaria
+- No hay concepto de "instrumento de pago" como entidad de primer nivel con categorias ricas
+- income_payments y expense_payments no capturan tipo de cambio del momento del pago — usan el rate del documento (factura), no el del dia del cobro/pago
+- No se calcula ganancia/perdida cambiaria (FX gain/loss) a pesar de operar en CLP y USD
+- La infra FX existe pero no se conecta al momento del pago: `resolveExchangeRateToClp()` resuelve el rate, pero `recordPayment()` y `recordExpensePayment()` no lo llaman
 - No hay logos de bancos ni fintechs en la UI
 - No hay surface de admin para gestionar instrumentos
 - Drawers de cobro/pago no tienen selector de instrumento
 - Posicion de caja no muestra saldos por moneda nativa
+- Los drawers de registro de pago no muestran el dolar observado del dia como referencia
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -169,14 +187,20 @@ Columnas nuevas en `greenhouse_finance.income_payments`:
 
 Mismas columnas en `greenhouse_finance.expense_payments`.
 
-**Backend: actualizar `recordPayment()` y `recordExpensePayment()`**
+**Backend: conectar infra FX existente a `recordPayment()` y `recordExpensePayment()`**
+
+La infraestructura de tipos de cambio ya esta construida (`exchange-rates.ts`). Hoy `resolveExchangeRateToClp()` se usa al **crear** documentos (income/expenses), pero NO al **registrar pagos**. El fix es conectar esa misma funcion al flujo de registro de pago:
 
 - Al registrar pago en moneda distinta a CLP:
-  1. Resolver exchange_rate_at_payment via `resolveExchangeRateToClp()`
-  2. Calcular amount_clp = amount * exchange_rate_at_payment
-  3. Calcular fx_gain_loss_clp = amount_clp - (amount * document.exchange_rate_to_clp)
+  1. Llamar `resolveExchangeRateToClp({ currency })` — resuelve el dolar observado del dia via Mindicador (ya persistido por cron diario en `exchange_rates`)
+  2. Calcular `amount_clp = amount * exchange_rate_at_payment`
+  3. Leer `document.exchange_rate_to_clp` del income/expense vinculado (rate al momento de facturacion)
+  4. Calcular `fx_gain_loss_clp = amount_clp - (amount * document.exchange_rate_to_clp)`
 - Si moneda es CLP: exchange_rate = 1, amount_clp = amount, fx_gain_loss = 0
 - Validar payment_account_id contra instrumentos activos
+- Si el rate del dia no esta disponible (feriado, error de sync), usar `fetchUsdToClpFromProviders()` como fallback live — la funcion ya orquesta Mindicador + Open ER con lookback de 7 dias
+
+**Nota de re-uso**: NO crear nueva logica de resolucion de FX. Reutilizar `resolveExchangeRateToClp()` de `src/lib/finance/shared.ts` que ya maneja: CLP=1, rate manual override, rate persistido en DB, fallback a providers, error 409 si no hay rate.
 
 ### Slice 2 — Catalogo de proveedores + logos SVG
 
@@ -261,6 +285,18 @@ export const PAYMENT_PROVIDERS_CATALOG = {
 - `RegisterCashOutDrawer` — agregar campo "Pagado desde" (select con logos)
 - `CreateIncomeDrawer` — agregar campo "Cuenta de cobro esperada" (opcional)
 - `CreateExpenseDrawer` — agregar campo "Medio de pago" (select con logos)
+
+**Dolar observado del dia en drawers de pago (UX critica):**
+
+Cuando el documento vinculado esta en USD, los drawers de cobro y pago deben mostrar:
+- **Chip informativo**: "Dolar observado hoy: $XXX,XX" — obtenido de `GET /api/finance/exchange-rates/latest` al abrir el drawer
+- **Rate del documento**: "TC de facturacion: $YYY,YY" — leido del documento seleccionado (`exchange_rate_to_clp`)
+- **Delta visual**: si el rate de hoy es mayor al de facturacion → chip verde "Ganancia cambiaria estimada: +$ZZZ"; si es menor → chip rojo "Perdida cambiaria estimada: -$ZZZ"
+- El calculo se muestra en tiempo real al ingresar el monto, ANTES de confirmar el pago
+- Source: usar `GET /api/finance/exchange-rates/latest` (ya existe, auto-sync si no hay rate)
+- El usuario puede override manual del TC si el pago se hizo a un rate distinto (ej. rate pactado con el banco)
+
+Esto le da al usuario transparencia total sobre el impacto cambiario antes de registrar.
 
 **Logos en vistas existentes:**
 - `CashInListView` — columna "Cuenta" con PaymentInstrumentChip
