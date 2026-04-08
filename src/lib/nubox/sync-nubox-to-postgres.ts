@@ -3,6 +3,7 @@ import 'server-only'
 import { randomUUID } from 'node:crypto'
 
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
+import { recordPayment } from '@/lib/finance/payment-ledger'
 import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { ensureOrganizationForSupplier } from '@/lib/account-360/organization-identity'
 import type { NuboxConformedSale, NuboxConformedPurchase, NuboxConformedBankMovement } from '@/lib/nubox/types'
@@ -510,6 +511,7 @@ const reconcileIncomeFromBankMovement = async (
   movement: NuboxConformedBankMovement
 ): Promise<boolean> => {
   if (!movement.linked_sale_id) return false
+  if (!movement.payment_date) return false
 
   // Find the income by nubox_document_id matching the linked sale
   const incomeRows = await runGreenhousePostgresQuery<{ income_id: string; total_amount: number; amount_paid: number }>(
@@ -536,36 +538,19 @@ const reconcileIncomeFromBankMovement = async (
 
   if (existingPayment.length > 0) return false
 
-  // Create proper payment record in income_payments ledger
   const paymentId = `PAY-NUBOX-${movement.nubox_movement_id}`
 
-  await runGreenhousePostgresQuery(
-    `INSERT INTO greenhouse_finance.income_payments (
-      payment_id, income_id, payment_date, amount, currency,
-      reference, payment_method, payment_source, notes, recorded_at
-    ) VALUES ($1, $2, $3::date, $4, 'CLP', $5, 'bank_transfer', 'nubox_bank_sync',
-      'Auto-registrado desde movimiento bancario Nubox', NOW())`,
-    [paymentId, income.income_id, movement.payment_date, paymentAmount, nuboxRef]
-  )
-
-  // Derive amount_paid from SUM(income_payments.amount) — single source of truth
-  const sumResult = await runGreenhousePostgresQuery<{ total: string }>(
-    `SELECT COALESCE(SUM(amount), 0)::text AS total
-     FROM greenhouse_finance.income_payments WHERE income_id = $1`,
-    [income.income_id]
-  )
-
-  const newAmountPaid = Number(sumResult[0]?.total ?? 0)
-  const newStatus = newAmountPaid >= Number(income.total_amount) ? 'paid' : 'partial'
-
-  await runGreenhousePostgresQuery(
-    `UPDATE greenhouse_finance.income SET
-      payment_status = $2,
-      amount_paid = $3,
-      updated_at = NOW()
-    WHERE income_id = $1`,
-    [income.income_id, newStatus, newAmountPaid]
-  )
+  const recordedPayment = await recordPayment({
+    incomeId: income.income_id,
+    paymentId,
+    paymentDate: movement.payment_date,
+    amount: paymentAmount,
+    currency: 'CLP',
+    reference: nuboxRef,
+    paymentMethod: 'bank_transfer',
+    paymentSource: 'nubox_bank_sync',
+    notes: 'Auto-registrado desde movimiento bancario Nubox'
+  })
 
   await publishOutboxEvent(
     'finance.income',
@@ -576,7 +561,7 @@ const reconcileIncomeFromBankMovement = async (
       linked_sale_id: movement.linked_sale_id,
       amount: paymentAmount,
       payment_date: movement.payment_date,
-      new_status: newStatus,
+      new_status: recordedPayment.paymentStatus,
       payment_id: paymentId
     }
   )
