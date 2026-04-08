@@ -25,11 +25,21 @@ Error: Failed to collect page data for /api/admin/invite
 
 ## Causa raíz
 
-El ambiente `Preview` de Vercel tenía drift respecto del baseline local y compartido:
+La causa real tenía dos capas:
 
-- faltaba `NEXTAUTH_SECRET`
-- faltaba `NEXTAUTH_URL`
-- también faltaban `GCP_PROJECT` y `GOOGLE_APPLICATION_CREDENTIALS_JSON`
+- el `Preview` genérico de Vercel no tenía baseline compartido de auth/runtime
+- varias variables críticas estaban definidas solo como overrides por branch (`develop` u otras ramas históricas), por lo que ramas nuevas no las heredaban
+
+El entorno efectivo de una preview nueva resolvía solo un set mínimo (`NUBOX_*` y variables internas de Vercel) y dejaba afuera, al menos:
+
+- `NEXTAUTH_SECRET`
+- `NEXTAUTH_URL`
+- `GCP_PROJECT`
+- `GCP_SERVICE_ACCOUNT_EMAIL`
+- `GCP_WORKLOAD_IDENTITY_PROVIDER`
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `GREENHOUSE_POSTGRES_*`
 
 El fallo que rompía el deployment aparecía primero en `NEXTAUTH_SECRET` porque `src/lib/auth.ts` resolvía `authOptions` en import-time. Durante `page-data collection`, Next importaba routes y páginas que llamaban `getServerSession(authOptions)`, por lo que el build abortaba antes de terminar.
 
@@ -41,6 +51,10 @@ El fallo que rompía el deployment aparecía primero en `NEXTAUTH_SECRET` porque
 
 ## Solución
 
+Se resolvió por dos carriles complementarios.
+
+### 1. Hardening de aplicación
+
 Se endureció el carril de auth para que el drift de Preview no vuelva a bloquear el build:
 
 - `src/lib/auth.ts` ahora construye `NextAuthOptions` de forma lazy (`getAuthOptions()`) en vez de hacerlo al importar el módulo.
@@ -48,7 +62,21 @@ Se endureció el carril de auth para que el drift de Preview no vuelva a bloquea
 - Si falta `NEXTAUTH_SECRET`, `getServerAuthSession()` degrada a sesión `null` en vez de romper el build.
 - `src/app/api/auth/[...nextauth]/route.ts` ahora responde `503` controlado cuando la autenticación no está configurada en ese runtime, en vez de explotar durante import-time.
 
-Esto no reemplaza la política operativa de Vercel: un Preview que necesite login real sigue debiendo tener `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `GCP_PROJECT` y credenciales Google válidas. Pero el deployment deja de caer silenciosamente por ese drift.
+### 2. Alineación operativa de Vercel Preview
+
+Se dejó creado un baseline genérico de `Preview` para ramas nuevas, en vez de seguir dependiendo de overrides por branch:
+
+- auth: `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `AZURE_AD_CLIENT_ID`, `AZURE_AD_CLIENT_SECRET`
+- runtime GCP: `GCP_PROJECT`, `GCP_SERVICE_ACCOUNT_EMAIL`, `GCP_WORKLOAD_IDENTITY_PROVIDER`
+- runtime PostgreSQL: `GREENHOUSE_POSTGRES_DATABASE`, `GREENHOUSE_POSTGRES_HOST`, `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`, `GREENHOUSE_POSTGRES_IP_TYPE`, `GREENHOUSE_POSTGRES_MAX_CONNECTIONS`, `GREENHOUSE_POSTGRES_PASSWORD`, `GREENHOUSE_POSTGRES_SSL`, `GREENHOUSE_POSTGRES_USER`
+- baseline funcional: `GREENHOUSE_MEDIA_BUCKET`, `GREENHOUSE_PRIVATE_ASSETS_BUCKET`, `GREENHOUSE_PUBLIC_MEDIA_BUCKET`
+- acceso headless: `AGENT_AUTH_EMAIL`, `AGENT_AUTH_SECRET`
+- referencia de webhook: `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF`
+
+Regla operativa consolidada:
+
+- el hardening evita que el deployment quede rojo si vuelve a existir drift
+- pero el baseline genérico de `Preview` ya no debe depender de overrides por branch para auth, DB o acceso de agente
 
 ## Verificación
 
@@ -65,6 +93,22 @@ La reproducción aislada confirmó el before/after:
 
 - antes del fix: `NEXTAUTH_SECRET is not set` durante `page-data collection`
 - después del fix: el build de `Preview` completa
+
+Validación operativa posterior en Vercel:
+
+- `vercel env pull --environment preview --git-branch fix/codex-preview-baseline-smoke` ya resuelve para una branch cualquiera:
+  - `NEXTAUTH_SECRET`
+  - `NEXTAUTH_URL`
+  - `GCP_PROJECT`
+  - `GCP_SERVICE_ACCOUNT_EMAIL`
+  - `GCP_WORKLOAD_IDENTITY_PROVIDER`
+  - `GOOGLE_CLIENT_ID`
+  - `GOOGLE_CLIENT_SECRET`
+  - `GREENHOUSE_POSTGRES_*`
+  - `AGENT_AUTH_*`
+- se desplegó un preview fresco y:
+  - `GET /api/auth/session` respondió `200` con body `{}` en vez de `503`
+  - `POST /api/auth/agent-session` respondió `200` y devolvió `cookieName`, `cookieValue`, `portalHomePath`, `userId`
 
 ## Estado
 

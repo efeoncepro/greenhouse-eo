@@ -7,6 +7,8 @@
 - Se resolvió el incidente donde los Preview Deployments de Vercel quedaban en `Error` por `NEXTAUTH_SECRET` faltante durante `page-data collection`.
 - `src/lib/auth.ts` pasó a resolver `NextAuthOptions` de forma lazy y los consumers server-side ahora usan `getServerAuthSession()`.
 - Si un runtime carece de `NEXTAUTH_SECRET`, el build ya no se cae: el portal degrada a sesión `null` y `/api/auth/[...nextauth]` responde `503` controlado.
+- Seguimiento operativo: el baseline genérico de `Preview` en Vercel quedó alineado para ramas nuevas con `NEXTAUTH_*`, Google/Azure auth, PostgreSQL, media buckets y `AGENT_AUTH_*`, evitando depender de overrides por branch como baseline compartido.
+- Validación posterior: un preview fresco ya respondió `200 {}` en `/api/auth/session` y `200` en `/api/auth/agent-session`.
 - El incidente quedó documentado como `ISSUE-031`.
 
 ### 2026-04-08 — Hotfix productivo Banco: materializacion de balances corregida

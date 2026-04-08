@@ -10,6 +10,10 @@
 - Regla operativa vigente:
   - el hardening evita que el deployment quede rojo por drift
   - pero un Preview que necesite login funcional sigue debiendo tener `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `GCP_PROJECT` y credenciales Google válidas
+- Cierre operativo 2026-04-08:
+  - el baseline genérico de `Preview` ya quedó alineado en Vercel para ramas nuevas
+  - auth, Google/Azure, PostgreSQL, media buckets y `AGENT_AUTH_*` no deben seguir dependiendo de overrides por branch como baseline compartido
+  - validación runtime: un preview fresco ya responde `200` en `/api/auth/session` y `200` en `/api/auth/agent-session`
 - Issue resuelto de referencia: `docs/issues/resolved/ISSUE-031-vercel-preview-build-fails-missing-nextauth-secret.md`
 
 ## Delta 2026-04-07 Account Complete 360 — serving federado por facetas (TASK-274)
