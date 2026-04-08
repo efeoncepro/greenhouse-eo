@@ -68,6 +68,9 @@ export const GH_FINANCE_NAV = {
   clients: { label: 'Clientes', subtitle: 'Maestro de clientes y coberturas' },
   costAllocations: { label: 'Asignaciones', subtitle: 'Reparto e imputación de costos' },
   flow: { label: 'Caja', subtitle: 'Cobros, pagos y cuentas' },
+  cashIn: { label: 'Cobros', subtitle: 'Pagos recibidos contra facturas de venta' },
+  cashOut: { label: 'Pagos', subtitle: 'Pagos ejecutados contra compromisos' },
+  cashPosition: { label: 'Posición de caja', subtitle: 'Saldo real, cuentas por cobrar y por pagar' },
   documents: { label: 'Documentos', subtitle: 'Cotizaciones, OC, HES y conciliación' },
   analytics: { label: 'Inteligencia', subtitle: 'Economía y asignaciones de costos' }
 } as const

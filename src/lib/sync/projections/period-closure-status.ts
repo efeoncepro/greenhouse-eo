@@ -84,6 +84,7 @@ export const PERIOD_CLOSURE_STATUS_TRIGGER_EVENTS = [
   'finance.income.updated',
   'finance.expense.created',
   'finance.expense.updated',
+  'finance.expense_payment.recorded',
   'finance.exchange_rate.upserted'
 ] as const
 

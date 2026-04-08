@@ -96,6 +96,7 @@ export const COMMERCIAL_COST_ATTRIBUTION_TRIGGER_EVENTS = [
   'finance.income.updated',
   'finance.expense.created',
   'finance.expense.updated',
+  'finance.expense_payment.recorded',
   'finance.cost_allocation.created',
   'finance.cost_allocation.deleted',
   'finance.exchange_rate.upserted',

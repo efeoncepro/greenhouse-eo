@@ -22,17 +22,12 @@ import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableContainer from '@mui/material/TableContainer'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
-import CustomTextField from '@core/components/mui/TextField'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import PaymentRegistrationCard from '@views/greenhouse/finance/components/PaymentRegistrationCard'
+import PaymentHistoryTable from '@views/greenhouse/finance/components/PaymentHistoryTable'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -174,12 +169,6 @@ const IncomeDetailView = () => {
   const [data, setData] = useState<IncomeDetail | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  // Payment form
-  const [payAmount, setPayAmount] = useState('')
-  const [payDate, setPayDate] = useState('')
-  const [payReference, setPayReference] = useState('')
-  const [paying, setPaying] = useState(false)
-
   // DTE emission
   const [emitDialogOpen, setEmitDialogOpen] = useState(false)
   const [emitting, setEmitting] = useState(false)
@@ -206,48 +195,6 @@ const IncomeDetailView = () => {
   }, [incomeId])
 
   useEffect(() => { fetchDetail() }, [fetchDetail])
-
-  const handlePayment = async () => {
-    const amount = Number(payAmount)
-
-    if (!amount || amount <= 0 || !payDate) {
-      toast.error('Ingresa monto y fecha de pago')
-
-      return
-    }
-
-    setPaying(true)
-
-    try {
-      const res = await fetch(`/api/finance/income/${incomeId}/payment`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount,
-          paymentDate: payDate,
-          ...(payReference.trim() && { reference: payReference.trim() })
-        })
-      })
-
-      if (!res.ok) {
-        const d = await res.json().catch(() => ({}))
-
-        toast.error(d.error || 'Error al registrar pago')
-
-        return
-      }
-
-      toast.success('Pago registrado')
-      setPayAmount('')
-      setPayDate('')
-      setPayReference('')
-      fetchDetail()
-    } catch {
-      toast.error('Error de conexión')
-    } finally {
-      setPaying(false)
-    }
-  }
 
   const handleEmitDte = async () => {
     setEmitting(true)
@@ -605,90 +552,33 @@ const IncomeDetailView = () => {
 
       {/* Register payment form (if not fully paid) */}
       {data.paymentStatus !== 'paid' && data.paymentStatus !== 'written_off' && (
-        <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-          <CardHeader
-            title='Registrar pago'
-            avatar={<Avatar variant='rounded' sx={{ bgcolor: 'warning.lightOpacity' }}><i className='tabler-coin' style={{ fontSize: 22, color: 'var(--mui-palette-warning-main)' }} /></Avatar>}
-          />
-          <Divider />
-          <CardContent>
-            <Stack direction='row' spacing={2} sx={{ flexWrap: 'wrap' }}>
-              <CustomTextField
-                size='small'
-                label='Monto'
-                type='number'
-                value={payAmount}
-                onChange={e => setPayAmount(e.target.value)}
-                sx={{ width: 160 }}
-              />
-              <CustomTextField
-                size='small'
-                label='Fecha'
-                type='date'
-                value={payDate}
-                onChange={e => setPayDate(e.target.value)}
-                InputLabelProps={{ shrink: true }}
-                sx={{ width: 160 }}
-              />
-              <CustomTextField
-                size='small'
-                label='Referencia'
-                value={payReference}
-                onChange={e => setPayReference(e.target.value)}
-                sx={{ width: 200 }}
-              />
-              <Button variant='contained' color='success' onClick={handlePayment} disabled={paying}>
-                {paying ? 'Registrando...' : 'Registrar pago'}
-              </Button>
-            </Stack>
-          </CardContent>
-        </Card>
+        <PaymentRegistrationCard
+          onSubmit={async (amount, date, reference) => {
+            const res = await fetch(`/api/finance/income/${incomeId}/payment`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ amount, paymentDate: date, ...(reference.trim() && { reference: reference.trim() }) })
+            })
+
+            if (!res.ok) {
+              const d = await res.json().catch(() => ({}))
+
+              throw new Error(d.error || 'Error al registrar pago')
+            }
+
+            toast.success('Pago registrado')
+            fetchDetail()
+          }}
+          pendingBalance={data.totalAmount - (data.amountPaid || 0)}
+          currency={data.currency}
+        />
       )}
 
       {/* Payments timeline */}
-      <Card elevation={0} sx={{ border: t => `1px solid ${t.palette.divider}` }}>
-        <CardHeader
-          title='Historial de pagos'
-          avatar={<Avatar variant='rounded' sx={{ bgcolor: 'info.lightOpacity' }}><i className='tabler-history' style={{ fontSize: 22, color: 'var(--mui-palette-info-main)' }} /></Avatar>}
-        />
-        <Divider />
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Fecha</TableCell>
-                <TableCell align='right'>Monto</TableCell>
-                <TableCell>Referencia</TableCell>
-                <TableCell>Método</TableCell>
-                <TableCell>Notas</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.paymentsReceived.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} align='center' sx={{ py: 6 }}>
-                    <Typography variant='body2' color='text.secondary'>Sin pagos registrados</Typography>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                data.paymentsReceived.map((p, i) => (
-                  <TableRow key={p.paymentId || i}>
-                    <TableCell>{formatDate(p.paymentDate)}</TableCell>
-                    <TableCell align='right'>
-                      <Typography variant='body2' fontWeight={600} color='success.main'>
-                        {formatAmount(p.amount, p.currency || data.currency)}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>{p.reference || '—'}</TableCell>
-                    <TableCell>{p.paymentMethod || '—'}</TableCell>
-                    <TableCell>{p.notes || '—'}</TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Card>
+      <PaymentHistoryTable
+        payments={data.paymentsReceived}
+        currency={data.currency}
+      />
     </Box>
   )
 }

@@ -5,6 +5,8 @@ import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 
+import { toast } from 'react-toastify'
+
 import Alert from '@mui/material/Alert'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
@@ -19,6 +21,8 @@ import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
+import PaymentRegistrationCard from '@views/greenhouse/finance/components/PaymentRegistrationCard'
+import PaymentHistoryTable from '@views/greenhouse/finance/components/PaymentHistoryTable'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -142,6 +146,7 @@ const ExpenseDetailView = () => {
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<ExpenseDetail | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [payments, setPayments] = useState<Array<{ paymentId: string; paymentDate: string | null; amount: number; currency?: string; reference: string | null; paymentMethod: string | null; notes: string | null }>>([])
 
   const fetchDetail = useCallback(async () => {
     setLoading(true)
@@ -156,6 +161,14 @@ const ExpenseDetailView = () => {
       }
 
       setData(await res.json())
+
+      const paymentsRes = await fetch(`/api/finance/expenses/${expenseId}/payments`)
+
+      if (paymentsRes.ok) {
+        const paymentsData = await paymentsRes.json()
+
+        setPayments(paymentsData.payments || [])
+      }
     } catch {
       setError('Error de conexión')
     } finally {
@@ -313,6 +326,36 @@ const ExpenseDetailView = () => {
           </Grid>
         </CardContent>
       </Card>
+
+      {/* Register payment form (if not fully paid) */}
+      {data.paymentStatus !== 'paid' && data.paymentStatus !== 'written_off' && (
+        <PaymentRegistrationCard
+          onSubmit={async (amount, date, reference) => {
+            const res = await fetch(`/api/finance/expenses/${expenseId}/payments`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ amount, paymentDate: date, ...(reference.trim() && { reference: reference.trim() }) })
+            })
+
+            if (!res.ok) {
+              const d = await res.json().catch(() => ({}))
+
+              throw new Error(d.error || 'Error al registrar pago')
+            }
+
+            toast.success('Pago registrado')
+            fetchDetail()
+          }}
+          pendingBalance={data.totalAmount - payments.reduce((sum, p) => sum + p.amount, 0)}
+          currency={data.currency}
+        />
+      )}
+
+      {/* Payments timeline */}
+      <PaymentHistoryTable
+        payments={payments}
+        currency={data.currency}
+      />
     </Box>
   )
 }
