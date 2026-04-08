@@ -1,5 +1,25 @@
 # Handoff.md
 
+## Sesion 2026-04-08 — CI root cause for open PRs 41/42
+
+- contexto:
+  - los PR `#41` y `#42` en GitHub fallaban en `Lint, test and build` aunque `#42` solo cambia docs
+  - el único test rojo en CI era `src/views/greenhouse/organizations/tabs/OrganizationPeopleTab.test.tsx`
+- causa raiz confirmada:
+  - `OrganizationPeopleTab` ahora hace 2 requests al montar:
+    - `/api/organizations/[id]/memberships`
+    - `/api/organization/[id]/360?facets=team`
+  - el test seguía asumiendo 1 request y además asumía que `1.0` solo aparecía una vez; con los KPIs 360 ahora aparece también en `FTE total`
+- fix local aplicado:
+  - se actualizó el test para mockear ambas respuestas, validar ambos endpoints y aceptar `1.0` en KPI + tabla
+- validación local:
+  - `pnpm exec vitest run src/views/greenhouse/organizations/tabs/OrganizationPeopleTab.test.tsx` — OK
+  - `pnpm test` — OK (`224 passed`, `946 passed`, `2 skipped`)
+  - `pnpm build` — OK
+- pendiente:
+  - el failure de Vercel no se pudo inspeccionar por CLI local porque esta máquina no tiene sesión activa de `vercel login`
+  - como `#42` solo toca docs y `pnpm build` pasa local en `9ef3dcc`, el fallo de Vercel parece de entorno/configuración preview más que del diff mismo
+
 ## Sesion 2026-04-08 — Hotfix productivo Banco
 
 - contexto:
