@@ -20,6 +20,7 @@ export default async function FinanceLayout({ children }: { children: ReactNode 
       'finanzas.ingresos',
       'finanzas.egresos',
       'finanzas.conciliacion',
+      'finanzas.banco',
       'finanzas.clientes',
       'finanzas.proveedores',
       'finanzas.inteligencia',

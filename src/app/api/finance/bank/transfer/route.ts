@@ -8,12 +8,12 @@ import {
   normalizeString,
   toNumber
 } from '@/lib/finance/shared'
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireBankTreasuryTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: Request) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireBankTreasuryTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

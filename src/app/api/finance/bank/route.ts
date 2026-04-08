@@ -11,7 +11,7 @@ import {
   normalizeString,
   toNumber
 } from '@/lib/finance/shared'
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireBankTreasuryTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,7 +28,7 @@ const parsePeriodValue = (value: string | null, fieldName: string) => {
 }
 
 export async function GET(request: Request) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireBankTreasuryTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -56,7 +56,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireBankTreasuryTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

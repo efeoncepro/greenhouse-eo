@@ -73,6 +73,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     roleCodes.includes(ROLE_CODES.EFEONCE_OPERATIONS) ||
     roleCodes.includes(ROLE_CODES.HR_PAYROLL)
 
+  const canSeeBankTreasury =
+    roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN) ||
+    roleCodes.includes(ROLE_CODES.FINANCE_ADMIN) ||
+    roleCodes.includes(ROLE_CODES.FINANCE_ANALYST)
+
   const dashboardHref = session?.user?.portalHomePath || '/dashboard'
 
   const capabilityModules = resolveCapabilityModules({
@@ -223,7 +228,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               if (item.href === '/finance/suppliers') return canSeeView('finanzas.proveedores', true)
               if (item.href === '/finance/cash-in') return canSeeView('finanzas.ingresos', true)
               if (item.href === '/finance/cash-out') return canSeeView('finanzas.egresos', true)
-              if (item.href === '/finance/bank') return canSeeView('finanzas.banco', true)
+              if (item.href === '/finance/bank') return canSeeView('finanzas.banco', canSeeBankTreasury)
               if (item.href === '/finance/cash-position') return canSeeView('finanzas.resumen', true)
 
               return true

@@ -5,6 +5,7 @@
 - estado actual:
   - `TASK-283` quedó implementada y lista para merge/deploy
   - el módulo `Banco` ya existe como surface propia en `Finance`
+  - acceso endurecido después del cierre: `Banco` solo lo pueden ver `efeonce_admin`, `finance_admin` y `finance_analyst`
 - cambios principales:
   - nueva tabla `greenhouse_finance.account_balances` con snapshots diarios por cuenta y cierre de período
   - nuevos helpers `account-balances.ts` e `internal-transfers.ts`

@@ -5,7 +5,7 @@ import {
   getBankAccountDetail
 } from '@/lib/finance/account-balances'
 import { FinanceValidationError } from '@/lib/finance/shared'
-import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
+import { requireBankTreasuryTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,7 +23,7 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ accountId: string }> }
 ) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireBankTreasuryTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -58,7 +58,7 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ accountId: string }> }
 ) {
-  const { tenant, errorResponse } = await requireFinanceTenantContext()
+  const { tenant, errorResponse } = await requireBankTreasuryTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

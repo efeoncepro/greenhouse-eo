@@ -3066,6 +3066,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Integración transversal:
   - `Banco`, `Cobros`, `Pagos`, `Conciliación` y `Posición de caja` comparten el mismo contrato instrument-aware
   - los drawers de caja y settlement usan `/api/finance/accounts` para seleccionar instrumentos visibles al equipo de finanzas
+  - `Banco` quedó restringido a `efeonce_admin`, `finance_admin` y `finance_analyst`; no debe asumirse como superficie general de cualquier usuario con route group `finance`
 
 ## Delta 2026-03-14 Task board reorganization
 

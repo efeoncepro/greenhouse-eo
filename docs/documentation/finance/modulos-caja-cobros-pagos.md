@@ -54,6 +54,7 @@ Finance separa explícitamente los **documentos comerciales** (facturas de venta
 ## Banco (Treasury)
 
 - Vista operativa de tesoreria por instrumento real: cuenta bancaria, tarjeta, fintech o wallet
+- Visible solo para **Superadministrador** y roles de **Finanzas**
 - Lee desde `account_balances`, settlement legs y payment ledgers, no desde flags documentales
 - Responde preguntas como:
   - cuanto saldo estimado tiene cada cuenta

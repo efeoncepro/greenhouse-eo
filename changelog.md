@@ -5,6 +5,7 @@
 ### 2026-04-08 — Finance bank & treasury module completed
 
 - Nuevo módulo `Finance > Banco` (`/finance/bank`) con lectura ledger-first por instrumento: saldos por cuenta, coverage de asignación, discrepancia contra conciliación, exposición multi-moneda y tarjetas de crédito.
+- Restricción de acceso endurecida: `Banco` queda visible solo para `efeonce_admin`, `finance_admin` y `finance_analyst`, tanto en UI como en App Router y APIs.
 - Nueva tabla `greenhouse_finance.account_balances` con snapshots diarios por cuenta e indicadores de cierre de período, materializada reactivamente desde eventos de caja, settlement y conciliación.
 - Nuevos endpoints:
   - `GET/POST /api/finance/bank`
