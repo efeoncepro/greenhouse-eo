@@ -614,7 +614,9 @@ export const importBankStatementsToPostgres = async (
             match_status, source_import_batch_id, source_import_fingerprint, source_imported_at,
             source_payload_json, created_at
           ) VALUES ($1, $2, $3::date, $4::date, $5, $6, $7, $8, 'unmatched', $9, $10, CURRENT_TIMESTAMP, $11::jsonb, CURRENT_TIMESTAMP)
-          ON CONFLICT (period_id, source_import_fingerprint) DO NOTHING
+          ON CONFLICT (period_id, source_import_fingerprint)
+            WHERE source_import_fingerprint IS NOT NULL
+          DO NOTHING
           RETURNING row_id
         `,
         [
