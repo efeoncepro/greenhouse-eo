@@ -47,6 +47,8 @@ interface StatementRow {
 interface Candidate {
   id: string
   type: 'income' | 'expense'
+  matchedRecordId: string | null
+  matchedPaymentId: string | null
   amount: number
   currency: string
   transactionDate: string | null
@@ -185,7 +187,8 @@ const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionCompl
         body: JSON.stringify({
           rowId: row.rowId,
           matchedType: candidate.type,
-          matchedId: candidate.id
+          matchedId: candidate.matchedRecordId ?? candidate.id,
+          matchedPaymentId: candidate.matchedPaymentId ?? null
         })
       })
 
@@ -344,7 +347,7 @@ const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionCompl
         {mode === 'unmatch' && (
           <Box sx={{ textAlign: 'center', py: 4 }}>
             <Typography variant='body1' sx={{ mb: 2 }}>
-              Esta fila esta vinculada a un {row.matchedType === 'income' ? 'ingreso' : 'egreso'}:
+              Esta fila esta vinculada a un {row.matchedType === 'income' ? 'cobro' : 'pago'}:
             </Typography>
             <Chip
               label={row.matchedId}
@@ -370,7 +373,7 @@ const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionCompl
               </Button>
             }
           >
-            El sistema sugirió vincular esta fila con {row.matchedType === 'income' ? 'el ingreso' : 'el egreso'} <strong>{row.matchedId}</strong>. Confirma la sugerencia o selecciona otro candidato.
+            El sistema sugirió vincular esta fila con {row.matchedType === 'income' ? 'el cobro' : 'el pago'} <strong>{row.matchedId}</strong>. Confirma la sugerencia o selecciona otro candidato.
           </Alert>
         )}
 
@@ -416,8 +419,8 @@ const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionCompl
                 sx={{ minWidth: 140 }}
               >
                 <MenuItem value='all'>Todos</MenuItem>
-                <MenuItem value='income'>Ingresos</MenuItem>
-                <MenuItem value='expense'>Egresos</MenuItem>
+                <MenuItem value='income'>Cobros</MenuItem>
+                <MenuItem value='expense'>Pagos</MenuItem>
               </CustomTextField>
             </Box>
 
@@ -471,7 +474,7 @@ const ReconciliationMatchDialog = ({ open, periodId, row, onClose, onActionCompl
                                   round='true'
                                   size='small'
                                   color={candidate.type === 'income' ? 'success' : 'error'}
-                                  label={candidate.type === 'income' ? 'Ingreso' : 'Egreso'}
+                                  label={candidate.type === 'income' ? 'Cobro' : 'Pago'}
                                 />
                                 {isExactMatch && (
                                   <CustomChip round='true' size='small' color='primary' label='Monto exacto' />

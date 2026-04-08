@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-04-07 por Claude
-> **Ultima actualizacion:** 2026-04-08 por Claude
+> **Ultima actualizacion:** 2026-04-08 por Codex
 > **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md)
 
 # Modulos de Caja — Cobros, Pagos y Posicion de Caja
@@ -100,6 +100,40 @@ Cada cobro o pago puede asociarse a un **instrumento de pago** (cuenta bancaria,
 - Al registrar un pago (drawer "Registrar pago")
 - Al crear una factura de venta (drawer "Registrar ingreso")
 - Al crear un compromiso de compra (drawer "Registrar egreso")
+
+## Conciliacion e instrumentos
+
+- `Conciliacion` ya no debe leerse como una cola documental separada; su unidad canonica es el mismo ledger que usan `Cobros` y `Pagos`
+- Cuando existe un `income_payment` o `expense_payment`, el matching operativo ocurre contra ese movimiento real, no contra un flag embebido en la factura o el gasto
+- El periodo de conciliacion guarda snapshots del instrumento para que el cierre no dependa de que el catalogo cambie despues
+- Reimportar el mismo extracto o reporte no debe duplicar filas: Greenhouse usa fingerprints de importacion y omite rows repetidas del mismo periodo
+
+## Settlement y pagos internacionales
+
+Greenhouse ya deja preparada la base para **settlement orchestration**.
+
+- Un pago directo desde `Santander` a un proveedor o colaborador se registra como un settlement directo
+- Un flujo `Santander -> Global66 -> beneficiario` ya no debe verse como un solo pago
+- El fondeo a `Global66` es una **transferencia interna** o `funding`
+- El leg que realmente liquida la obligacion es el `payout` al beneficiario
+- `FX conversion` y `fee` pueden existir como legs separados del principal
+
+En la base esto se representa con:
+
+- `settlement_groups`: agrupa una ejecucion operativa completa
+- `settlement_legs`: cada movimiento conciliable real (`receipt`, `payout`, `internal_transfer`, `funding`, `fx_conversion`, `fee`)
+
+Esto permite que un mismo documento tenga:
+
+- un pago directo simple, o
+- una cadena multi-leg sin mezclar caja real, conciliacion e instrumento
+
+## Eventos reactivos relevantes
+
+- Registrar un cobro sigue publicando `finance.income_payment.recorded`
+- Registrar un pago sigue publicando `finance.expense_payment.recorded`
+- Conciliar o desconciliar movimientos ahora publica eventos canónicos de reconciliación de pago y settlement leg
+- Cerrar o marcar reconciliado un período publica eventos de conciliación operativa para que otras proyecciones puedan reaccionar sin leer flags manualmente
 
 ## Tipo de cambio y resultado cambiario
 

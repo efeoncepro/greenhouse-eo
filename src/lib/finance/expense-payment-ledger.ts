@@ -16,6 +16,7 @@ import {
   toTimestampString,
   type FinanceCurrency
 } from '@/lib/finance/shared'
+import { ensureSettlementForExpensePayment } from '@/lib/finance/settlement-orchestration'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 // ─── Types ──────────────────────────────────────────────────────────
@@ -42,6 +43,7 @@ export interface RecordExpensePaymentInput {
 export interface ExpensePaymentRecord {
   paymentId: string
   expenseId: string
+  settlementGroupId?: string | null
   paymentDate: string | null
   amount: number
   currency: string | null
@@ -85,6 +87,7 @@ type PostgresExpensePaymentRow = {
   recorded_at: string | Date | null
   is_reconciled: boolean
   reconciliation_row_id: string | null
+  settlement_group_id: string | null
   reconciled_at: string | Date | null
   created_at: string | Date | null
   exchange_rate_at_payment: unknown
@@ -118,6 +121,7 @@ const queryRows = async <T extends Record<string, unknown>>(
 const mapPaymentRow = (row: PostgresExpensePaymentRow): ExpensePaymentRecord => ({
   paymentId: normalizeString(row.payment_id),
   expenseId: normalizeString(row.expense_id),
+  settlementGroupId: str((row as PostgresExpensePaymentRow & { settlement_group_id?: string | null }).settlement_group_id),
   paymentDate: toDateString(row.payment_date as string | { value?: string } | null),
   amount: toNumber(row.amount),
   currency: str(row.currency),
@@ -140,7 +144,7 @@ const PAYMENT_COLUMNS = `
   payment_id, expense_id, payment_date, amount, currency, reference,
   payment_method, payment_account_id, payment_source, notes,
   recorded_at, is_reconciled, reconciliation_row_id, reconciled_at,
-  created_at, exchange_rate_at_payment, amount_clp, fx_gain_loss_clp
+  created_at, exchange_rate_at_payment, amount_clp, fx_gain_loss_clp, settlement_group_id
 `
 
 // ─── recordExpensePayment ───────────────────────────────────────────
@@ -272,6 +276,22 @@ export async function recordExpensePayment(input: RecordExpensePaymentInput): Pr
     )
 
     const payment = mapPaymentRow(paymentRows[0])
+
+    const settlement = await ensureSettlementForExpensePayment({
+      client,
+      paymentId,
+      paymentAccountId: input.paymentAccountId || null,
+      paymentDate: input.paymentDate,
+      amount: input.amount,
+      currency: paymentCurrency,
+      amountClp,
+      exchangeRate: exchangeRateAtPayment,
+      providerReference: input.reference || null,
+      actorUserId: input.actorUserId || null,
+      paymentSource
+    })
+
+    payment.settlementGroupId = settlement.settlementGroup.settlementGroupId
 
     // Re-derive for response (and as fallback if trigger absent)
     const sumResult = await queryRows<{ total: string }>(

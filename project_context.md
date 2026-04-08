@@ -3024,6 +3024,29 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Ajuste de consistencia relevante:
   - `auto-match`, `match`, `unmatch` y `exclude` ya no pueden dejar desacoplado el estado entre la fila bancaria y la transacción financiera reconciliada
 
+## Delta 2026-04-08 Finance reconciliation ledger-first + settlement orchestration foundation
+
+- `Finance > Conciliación` ya no debe modelarse como un reader documental aislado.
+- Regla operativa vigente:
+  - `income_payments` y `expense_payments` son la unidad canónica de conciliación cuando existe ledger real
+  - `Cobros`, `Pagos` y `Conciliación` deben leer el mismo contrato de caja
+  - `matchedPaymentId` es parte del contrato manual para bajar el match al pago real
+- Foundation nueva en PostgreSQL:
+  - `greenhouse_finance.settlement_groups`
+  - `greenhouse_finance.settlement_legs`
+  - `reconciliation_periods` con snapshots del instrumento
+  - `bank_statement_rows` con fingerprints de importación idempotente
+- Semántica nueva formalizada:
+  - un pago puede tener varios settlement legs
+  - `internal_transfer` / `funding` no liquidan la obligación
+  - `payout` / `receipt` sí pueden liquidarla
+  - `Global66` y otros rails no bancarios deben tratarse como payment instruments conciliables
+- Eventos reactivos de conciliación ya disponibles para el ecosistema:
+  - `finance.income_payment.reconciled|unreconciled`
+  - `finance.expense_payment.reconciled|unreconciled`
+  - `finance.settlement_leg.recorded|reconciled|unreconciled`
+  - `finance.reconciliation_period.reconciled|closed`
+
 ## Delta 2026-03-14 Task board reorganization
 
 - `docs/tasks/` ya no debe leerse como una carpeta plana de briefs.

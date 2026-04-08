@@ -2,6 +2,23 @@
 
 ## 2026-04-08
 
+### 2026-04-08 — Finance reconciliation ledger-first + settlement orchestration foundation
+
+- `Finance > Conciliación` quedó alineado al ledger real de caja: la cola de pendientes ya se arma desde `cash-in` / `cash-out`, no desde documentos `income` / `expenses`.
+- `ReconciliationMatchDialog` ya envía `matchedPaymentId`, cerrando el carril manual payment-level para cobros y pagos reales.
+- `postgres-reconciliation` ahora reconcilia egresos a nivel `expense_payments` y sincroniza `settlement_legs` al hacer match / unmatch.
+- Nueva base PostgreSQL para treasury enterprise:
+  - snapshots instrument-aware en `reconciliation_periods`
+  - importación idempotente en `bank_statement_rows`
+  - `settlement_groups` y `settlement_legs` para modelar `internal_transfer`, `funding`, `fx_conversion`, `payout` y `fee`
+  - `settlement_group_id` agregado a `income_payments` y `expense_payments`
+- Eventos outbox nuevos del dominio:
+  - `finance.income_payment.reconciled|unreconciled`
+  - `finance.expense_payment.reconciled|unreconciled`
+  - `finance.settlement_leg.recorded|reconciled|unreconciled`
+  - `finance.reconciliation_period.reconciled|closed`
+- Impacto operativo: Greenhouse ya tiene foundation canónica para conciliar pagos directos y cadenas multi-leg como `Santander -> Global66 -> beneficiario` sin liquidar la obligación en el leg equivocado.
+
 ### 2026-04-08 — Finance cash lane alignment: registered payments now surface in Cobros/Pagos
 
 - `IncomeDetailView` ya registra cobros contra el endpoint canónico `POST /api/finance/income/[id]/payments` en vez del carril legacy singular `/payment`, evitando que un fallback a BigQuery deje el cobro fuera de `greenhouse_finance.income_payments`.

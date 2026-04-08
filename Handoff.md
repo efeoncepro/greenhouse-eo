@@ -1,5 +1,57 @@
 # Handoff.md
 
+## Sesion 2026-04-08 — TASK-282 implementación core + settlement foundation
+
+- estado actual:
+  - `TASK-282` sigue en `in-progress`, pero ya no está en discovery
+  - quedó implementado el core `ledger-first` de conciliación con foundation de settlement orchestration
+- cambios principales:
+  - `ReconciliationView` ahora arma pendientes desde `GET /api/finance/cash-in?isReconciled=false` y `GET /api/finance/cash-out?isReconciled=false`
+  - `ReconciliationMatchDialog` ya envía `matchedPaymentId` cuando el candidato corresponde a un payment real
+  - `src/lib/finance/postgres-reconciliation.ts` ahora:
+    - reconcilia egresos a nivel `expense_payments`
+    - sincroniza `settlement_legs` al reconciliar / desconciliar
+    - publica eventos `finance.income_payment.reconciled|unreconciled`, `finance.expense_payment.reconciled|unreconciled` y `finance.settlement_leg.reconciled|unreconciled`
+  - nuevo helper `src/lib/finance/settlement-orchestration.ts` que crea settlement directo para `income_payments` y `expense_payments`
+  - nueva migración `20260408103211338_finance-reconciliation-ledger-orchestration.sql`:
+    - snapshots instrument-aware en `reconciliation_periods`
+    - importación idempotente en `bank_statement_rows`
+    - tablas `settlement_groups` y `settlement_legs`
+    - `settlement_group_id` en `income_payments` y `expense_payments`
+  - `src/app/api/finance/reconciliation/[id]/route.ts` publica `finance.reconciliation_period.reconciled` y `finance.reconciliation_period.closed`
+  - `src/app/api/finance/reconciliation/route.ts` vuelve a fallar en cerrado con `FINANCE_BQ_WRITE_DISABLED` si Postgres falla
+- validación ejecutada:
+  - `pnpm pg:connect:migrate` — OK
+  - `pnpm build` — OK
+  - `pnpm lint` — OK
+  - `pnpm exec tsc --noEmit` — OK durante implementación
+  - `pnpm test` — falla en 2 tests
+    - `src/app/api/finance/bigquery-write-cutover.test.ts` quedó corregido con el fail-closed de conciliación
+    - `src/views/greenhouse/organizations/tabs/OrganizationPeopleTab.test.tsx` sigue fallando por un comportamiento ajeno a esta lane: la vista ahora hace 2 fetches y el test todavía espera 1
+- riesgo / siguiente paso recomendado:
+  - decidir si `TASK-282` se cierra como foundation implementada o si se mantiene abierta para follow-ons de consumers downstream y UX multi-leg más rica
+  - si se quiere dejar `pnpm test` completamente verde, hay que reconciliar el test de `OrganizationPeopleTab` con su contrato actual
+  - verificar staging de `Finance > Conciliación` con un flujo real de `match`, `unmatch`, reimport y período `closed`
+
+## Sesion 2026-04-08 — TASK-282 tomada para discovery/audit
+
+### TASK-282 — Finance Payment Instrument Reconciliation & Settlement Orchestration
+
+- rama de trabajo esperada: `task/TASK-282-finance-payment-instrument-reconciliation-settlement-orchestration`
+- estado:
+  - `TASK-282` esta en `in-progress`
+  - discovery y auditoria en curso antes de tocar runtime
+- hallazgos iniciales que cambian la baseline:
+  - `TASK-280` y `TASK-281` ya actuan como foundations implementadas; dejaron de ser bloqueos reales
+  - conciliacion sigue con fallback BigQuery activo y ese residual de `TASK-179` debe absorberse en Slice 1
+  - ingresos ya tienen carril parcial payment-level; egresos siguen document-level sobre `expenses`
+  - `ReconciliationView` sigue cargando pendientes desde documentos, no desde `cash-in` / `cash-out`
+  - el outbox/reactive engine ya consume `finance.income_payment.recorded` y `finance.expense_payment.recorded` en `client_economics`, `commercial_cost_attribution`, `operational_pl` y `period_closure_status`
+- siguiente paso:
+  - imprimir auditoria formal `TASK-282`
+  - imprimir mapa de conexiones
+  - cerrar plan de implementacion antes de invocar skills y editar codigo
+
 ## Sesion 2026-04-08 — Finance cash lane alignment (document detail → cash modules)
 
 ### UX semantica caja: estado != conciliacion (2026-04-08)

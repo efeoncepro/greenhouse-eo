@@ -1221,11 +1221,19 @@ export interface GreenhouseFinanceBankStatementRows {
   matched_by_user_id: string | null;
   matched_id: string | null;
   matched_payment_id: string | null;
+  matched_settlement_leg_id: string | null;
   matched_type: string | null;
   notes: string | null;
   period_id: string;
   reference: string | null;
   row_id: string;
+  source_import_batch_id: string | null;
+  /**
+   * Fingerprint determinístico del extracto para imports idempotentes y retries seguros.
+   */
+  source_import_fingerprint: string | null;
+  source_imported_at: Timestamp | null;
+  source_payload_json: Generated<Json>;
   transaction_date: Timestamp;
   value_date: Timestamp | null;
 }
@@ -1342,6 +1350,7 @@ export interface GreenhouseFinanceExpensePayments {
   recorded_at: Generated<Timestamp | null>;
   recorded_by_user_id: string | null;
   reference: string | null;
+  settlement_group_id: string | null;
 }
 
 export interface GreenhouseFinanceExpenses {
@@ -1584,6 +1593,7 @@ export interface GreenhouseFinanceIncomePayments {
   recorded_at: Generated<Timestamp | null>;
   recorded_by_user_id: string | null;
   reference: string | null;
+  settlement_group_id: string | null;
 }
 
 export interface GreenhouseFinanceNuboxEmissionLog {
@@ -1714,10 +1724,21 @@ export interface GreenhouseFinanceReconciliationPeriods {
   closing_balance_system: Numeric | null;
   created_at: Generated<Timestamp>;
   difference: Numeric | null;
+  /**
+   * Snapshot del tipo de instrumento al crear el período de conciliación.
+   */
+  instrument_category_snapshot: string | null;
+  metadata_json: Generated<Json>;
   month: number;
   notes: string | null;
   opening_balance: Numeric;
+  period_currency_snapshot: string | null;
   period_id: string;
+  provider_name_snapshot: string | null;
+  /**
+   * Snapshot del provider canónico del instrumento al crear el período de conciliación.
+   */
+  provider_slug_snapshot: string | null;
   reconciled_at: Timestamp | null;
   reconciled_by_user_id: string | null;
   statement_imported: Generated<boolean>;
@@ -1756,6 +1777,46 @@ export interface GreenhouseFinanceServiceEntrySheets {
   status: Generated<string>;
   submitted_at: Timestamp | null;
   updated_at: Generated<Timestamp | null>;
+}
+
+export interface GreenhouseFinanceSettlementGroups {
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  group_direction: string;
+  notes: string | null;
+  primary_instrument_id: string | null;
+  provider_reference: string | null;
+  provider_status: Generated<string>;
+  settlement_group_id: string;
+  settlement_mode: Generated<string>;
+  source_payment_id: string | null;
+  source_payment_type: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinanceSettlementLegs {
+  amount: Numeric;
+  amount_clp: Numeric | null;
+  counterparty_instrument_id: string | null;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  currency: string;
+  direction: string;
+  fx_rate: Numeric | null;
+  instrument_id: string | null;
+  is_reconciled: Generated<boolean>;
+  leg_type: string;
+  linked_payment_id: string | null;
+  linked_payment_type: string | null;
+  notes: string | null;
+  provider_reference: string | null;
+  provider_status: Generated<string>;
+  reconciled_at: Timestamp | null;
+  reconciliation_row_id: string | null;
+  settlement_group_id: string;
+  settlement_leg_id: string;
+  transaction_date: Timestamp | null;
+  updated_at: Generated<Timestamp>;
 }
 
 export interface GreenhouseFinanceSuppliers {
@@ -3631,6 +3692,8 @@ export interface DB {
   "greenhouse_finance.quotes": GreenhouseFinanceQuotes;
   "greenhouse_finance.reconciliation_periods": GreenhouseFinanceReconciliationPeriods;
   "greenhouse_finance.service_entry_sheets": GreenhouseFinanceServiceEntrySheets;
+  "greenhouse_finance.settlement_groups": GreenhouseFinanceSettlementGroups;
+  "greenhouse_finance.settlement_legs": GreenhouseFinanceSettlementLegs;
   "greenhouse_finance.suppliers": GreenhouseFinanceSuppliers;
   "greenhouse_hr.leave_balances": GreenhouseHrLeaveBalances;
   "greenhouse_hr.leave_policies": GreenhouseHrLeavePolicies;

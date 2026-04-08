@@ -447,6 +447,27 @@ Estado operativo post `TASK-166`:
 - `client_id` se preserva como bridge operativo para modules, `purchase_orders`, `hes`, `income`, `client_economics` y `v_client_active_modules`; el cutover actual no elimina esa clave legacy.
 - El residual de `Finance Clients` queda reducido a fallback transicional, no a dependencia estructural del request path.
 
+### Delta 2026-04-08 — Ledger-first reconciliation & settlement foundation
+
+- `Finance > Conciliación` ya converge al mismo contrato canónico que `Cobros` y `Pagos`: `income_payments` / `expense_payments` son la unidad primaria de caja conciliable cuando existe ledger real.
+- `reconciliation_periods` ahora guarda snapshots del instrumento (`instrument_category_snapshot`, `provider_slug_snapshot`, `provider_name_snapshot`, `period_currency_snapshot`) para que la conciliación no dependa del estado mutable del catálogo.
+- `bank_statement_rows` ahora soporta importación idempotente mediante `source_import_batch_id`, `source_import_fingerprint`, `source_imported_at` y `source_payload_json`.
+- `greenhouse_finance.settlement_groups` y `greenhouse_finance.settlement_legs` formalizan la base de settlement orchestration para pagos directos y cadenas multi-leg (`internal_transfer`, `funding`, `fx_conversion`, `payout`, `fee`).
+- La semántica operativa queda explícita:
+  - `pagado/cobrado` != `conciliado`
+  - transferencia interna o funding no liquida la obligación
+  - el leg que liquida una obligación es el `payout` o `receipt` hacia la contraparte final
+- Eventos outbox nuevos de primer nivel del dominio:
+  - `finance.income_payment.reconciled`
+  - `finance.income_payment.unreconciled`
+  - `finance.expense_payment.reconciled`
+  - `finance.expense_payment.unreconciled`
+  - `finance.settlement_leg.recorded`
+  - `finance.settlement_leg.reconciled`
+  - `finance.settlement_leg.unreconciled`
+  - `finance.reconciliation_period.reconciled`
+  - `finance.reconciliation_period.closed`
+
 ## P&L Endpoint — Motor Financiero Central
 
 ### `GET /api/finance/dashboard/pnl`

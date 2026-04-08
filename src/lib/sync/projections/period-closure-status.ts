@@ -85,6 +85,12 @@ export const PERIOD_CLOSURE_STATUS_TRIGGER_EVENTS = [
   'finance.expense.created',
   'finance.expense.updated',
   'finance.expense_payment.recorded',
+  'finance.income_payment.reconciled',
+  'finance.income_payment.unreconciled',
+  'finance.expense_payment.reconciled',
+  'finance.expense_payment.unreconciled',
+  'finance.reconciliation_period.reconciled',
+  'finance.reconciliation_period.closed',
   'finance.exchange_rate.upserted'
 ] as const
 
