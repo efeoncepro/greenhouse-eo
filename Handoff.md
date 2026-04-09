@@ -1,5 +1,19 @@
 # Handoff.md
 
+## Sesion 2026-04-09 — Skill nueva: `greenhouse-secret-hygiene`
+
+- se creó la skill local de Codex en:
+  - `.codex/skills/greenhouse-secret-hygiene/SKILL.md`
+  - `.codex/skills/greenhouse-secret-hygiene/agents/openai.yaml`
+- objetivo:
+  - estandarizar auditoría, clasificación de riesgo, remediación mínima segura y verificación de secretos para Secret Manager, auth, webhooks, PostgreSQL y provider tokens
+  - default `read-only` salvo instrucción explícita del usuario para rotar/corregir en origen
+- follow-on creado para Claude:
+  - `docs/tasks/to-do/TASK-305-claude-secret-hygiene-skill.md`
+- documentación de índice actualizada:
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+
 ## Sesion 2026-04-09 — ISSUE-032 cerrado: Secret Manager payload contamination
 
 - contexto:

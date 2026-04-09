@@ -354,3 +354,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-302` | `to-do` | Equipo Enhanced: Workload Indicators | `docs/tasks/to-do/TASK-302-equipo-enhanced.md` |
 | `TASK-303` | `to-do` | Notifications Role Differentiation | `docs/tasks/to-do/TASK-303-notifications-role-differentiation.md` |
 | `TASK-304` | `to-do` | Pulse Revenue Enabled Headline | `docs/tasks/to-do/TASK-304-pulse-revenue-headline.md` |
+| `TASK-305` | `to-do` | Claude Secret Hygiene Skill | `docs/tasks/to-do/TASK-305-claude-secret-hygiene-skill.md` |

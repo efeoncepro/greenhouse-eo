@@ -2,6 +2,12 @@
 
 ## 2026-04-09
 
+### 2026-04-09 — Secret hygiene skill added for Codex + follow-on task for Claude
+
+- Se agregó la skill local `greenhouse-secret-hygiene` en `.codex/skills/greenhouse-secret-hygiene/` para auditar y remediar secretos con protocolo safety-first.
+- La skill cubre Secret Manager, `*_SECRET_REF`, auth, webhooks, PostgreSQL y provider tokens, y obliga a verificar el consumer real después de una rotación.
+- Se creó `TASK-305` para que Claude implemente su skill equivalente bajo la convención `.claude/skills/`.
+
 ### 2026-04-09 — ISSUE-032 closed: Secret Manager payload hygiene enforced
 
 - Se cerró un incidente transversal donde secretos runtime críticos podían existir en GCP Secret Manager pero romper consumidores por haber sido publicados con comillas envolventes, `\n` literal o whitespace residual.

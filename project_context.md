@@ -1,5 +1,23 @@
 # project_context.md
 
+## Delta 2026-04-09 Secret hygiene skill available for Codex
+
+- Nueva skill local de Codex:
+  - `.codex/skills/greenhouse-secret-hygiene/SKILL.md`
+- Cobertura:
+  - GCP Secret Manager
+  - `*_SECRET_REF`
+  - auth (`NEXTAUTH_SECRET`, OAuth client secrets)
+  - webhooks
+  - PostgreSQL passwords
+  - provider tokens
+- Regla operativa encapsulada en la skill:
+  - auditoría `read-only` por defecto
+  - no exponer secretos crudos
+  - verificar el consumer real tras cada corrección o rotación
+- Follow-on documentado:
+  - `docs/tasks/to-do/TASK-305-claude-secret-hygiene-skill.md`
+
 ## Delta 2026-04-09 Secret Manager payload hygiene enforced after ISSUE-032
 
 - `src/lib/secrets/secret-manager.ts` ahora sanea tanto payloads leídos desde GCP Secret Manager como fallbacks por env:

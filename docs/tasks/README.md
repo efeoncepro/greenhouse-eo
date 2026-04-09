@@ -20,9 +20,10 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-305`
+- siguiente ID disponible: `TASK-306`
 - `TASK-285` a `TASK-304` son el bloque "Client Portal Enterprise Renovation (Globe)" — 20 tasks en 3 fases. Spec: `docs/architecture/GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md`. Prereqs: TASK-285 (role differentiation) y TASK-286 (view catalog). Fase 1 (P1): TASK-287 Revenue Enabled, TASK-288 Reports Center, TASK-289 Reviews Split, TASK-290 Pipeline CSC. Fase 2 (P2): TASK-291 Brief Clarity, TASK-292 Mis Revisiones, TASK-293 Campaigns Metrics, TASK-294 Novedades, TASK-295 SLA Scorecard. Fase 3 (P3): TASK-296 Brand Health, TASK-297 Asset Tracker, TASK-298 QBR, TASK-299 Sprints, TASK-300 Mi Proyecto, TASK-301 Analytics, TASK-302 Equipo, TASK-303 Notifications, TASK-304 Pulse headline.
 - `TASK-284` crea el módulo de Cuenta Corriente de Accionista (CCA) en Finance: movimientos bidireccionales accionista ↔ empresa, saldo neto en tiempo real, integración con settlement layer y posición de tesorería. Soporta multi-moneda y vinculación a expenses/incomes existentes.
+- `TASK-305` define la skill equivalente para Claude bajo `.claude/skills/greenhouse-secret-hygiene/`, alineada con `ISSUE-032` y el protocolo de Secret Manager / auth / webhooks / PostgreSQL.
 - `TASK-241` migra procesos batch pesados (ICO materialización, LLM enrichment) de Vercel Functions a Cloud Run. Formaliza política: batch > 30s → Cloud Run. Código listo, deploy operacional pendiente.
 - `TASK-239` enriquece el prompt LLM de Nexa Insights con glosario de métricas, cadena causal, doble capa narrativa y nombres de Space/miembros.
 - `TASK-240` agrega menciones interactivas (@mentions) de Spaces y miembros en los insights de Nexa — chips clickeables que navegan a perfiles. Depende de `TASK-239`.
@@ -115,6 +116,7 @@ Primer bloque operativo asignado:
 | `TASK-280` | [TASK-280-finance-cash-modules-ingresos-egresos.md](complete/TASK-280-finance-cash-modules-ingresos-egresos.md)                                                                | P1        | Alto     | Alto     | Complete             | Módulos reales de Ingresos (cobros/cash-in) y Egresos (pagos/cash-out): expense_payments ledger 1:N, surfaces centralizadas de cobros y pagos, posición de caja real, componente compartido de registro de pagos               |
 | `TASK-281` | [TASK-281-payment-instruments-registry-fx-tracking.md](complete/TASK-281-payment-instruments-registry-fx-tracking.md)                                                              | P1        | Alto     | Alto     | Complete             | Payment Instruments Registry (bancos, TC, fintech, Deel, Global66) + FX gain/loss tracking + logos SVG + Admin Center CRUD + posición de caja multi-moneda                                                                     |
 | `TASK-284` | [TASK-284-shareholder-current-account.md](to-do/TASK-284-shareholder-current-account.md)                                                                                   | P2        | Alto     | Medio    | Diseño                  | Cuenta Corriente de Accionista (CCA): movimientos bidireccionales accionista ↔ empresa, saldo neto, integración settlement layer, posición de tesorería, multi-moneda, vinculación a expenses/incomes                           |
+| `TASK-305` | [TASK-305-claude-secret-hygiene-skill.md](to-do/TASK-305-claude-secret-hygiene-skill.md)                                                                                   | P2        | Medio    | Bajo     | Diseño                  | Crear la skill de Claude para auditoría y remediación safety-first de secretos (`*_SECRET_REF`, Secret Manager, auth, webhooks, PostgreSQL) alineada con `ISSUE-032` y la documentación canónica                                 |
 
 ## Complete
 
