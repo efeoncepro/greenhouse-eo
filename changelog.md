@@ -2,6 +2,26 @@
 
 ## 2026-04-08
 
+### 2026-04-08 — Finance shareholder current account module completed
+
+- Nuevo módulo `Finance > Cuenta accionista` (`/finance/shareholder-account`) para leer y operar la posición bilateral empresa ↔ accionista desde el portal.
+- Nuevo schema runtime en PostgreSQL:
+  - `greenhouse_finance.shareholder_accounts`
+  - `greenhouse_finance.shareholder_account_movements`
+  - `greenhouse_finance.accounts.instrument_category` ahora admite `shareholder_account`
+- Nuevos endpoints:
+  - `GET/POST /api/finance/shareholder-account`
+  - `GET /api/finance/shareholder-account/people`
+  - `GET /api/finance/shareholder-account/[id]/balance`
+  - `GET/POST /api/finance/shareholder-account/[id]/movements`
+- Integración con el ecosistema financiero:
+  - cada movimiento de CCA crea `settlement_groups` / `settlement_legs` y rematerializa `account_balances`
+  - `Banco` y `Cuenta accionista` comparten la misma base instrument-aware de tesorería
+  - la creación de cuentas ya busca personas por nombre/email en Identity y respeta el vínculo `profile_id` + `member_id` cuando el accionista también es colaborador interno
+- Integración de navegación y permisos:
+  - nuevo item `Cuenta accionista` dentro de `Finance > Caja`
+  - nuevo `viewCode` `finanzas.cuenta_corriente_accionista`
+
 ### 2026-04-08 — Vercel Preview auth drift hardening
 
 - Se resolvió el incidente donde los Preview Deployments de Vercel quedaban en `Error` por `NEXTAUTH_SECRET` faltante durante `page-data collection`.

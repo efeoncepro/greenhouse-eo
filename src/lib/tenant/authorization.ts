@@ -302,6 +302,35 @@ export const requireBankTreasuryTenantContext = async () => {
   }
 }
 
+export const requireShareholderAccountTenantContext = async () => {
+  const { tenant, unauthorizedResponse } = await requireTenantContext()
+
+  if (!tenant) {
+    return {
+      tenant: null,
+      errorResponse: unauthorizedResponse
+    }
+  }
+
+  const hasAccess = hasAuthorizedViewCode({
+    tenant,
+    viewCode: 'finanzas.cuenta_corriente_accionista',
+    fallback: canAccessBankTreasury(tenant)
+  })
+
+  if (!hasAccess) {
+    return {
+      tenant: null,
+      errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+  }
+
+  return {
+    tenant,
+    errorResponse: null
+  }
+}
+
 export const requireCostIntelligenceTenantContext = async () => {
   const { tenant, unauthorizedResponse } = await requireTenantContext()
 

@@ -51,6 +51,8 @@ const defaultAccountTypeForCategory = (category: InstrumentCategory): AccountTyp
       return 'other'
     case 'payroll_processor':
       return 'other'
+    case 'shareholder_account':
+      return 'other'
     default:
       return 'checking'
   }

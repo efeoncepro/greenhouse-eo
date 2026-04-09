@@ -1221,7 +1221,7 @@ export interface GreenhouseFinanceAccounts {
   default_for: Generated<string[] | null>;
   display_order: Generated<number | null>;
   /**
-   * Payment instrument type: bank_account, credit_card, fintech, payment_platform, cash, payroll_processor
+   * Payment instrument type: bank_account, credit_card, fintech, payment_platform, cash, payroll_processor, shareholder_account
    */
   instrument_category: Generated<string>;
   is_active: Generated<boolean>;
@@ -1844,6 +1844,45 @@ export interface GreenhouseFinanceSettlementLegs {
   settlement_group_id: string;
   settlement_leg_id: string;
   transaction_date: Timestamp | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseFinanceShareholderAccountMovements {
+  account_id: string;
+  amount: Numeric;
+  amount_clp: Numeric;
+  counterparty_account_id: string | null;
+  currency: Generated<string>;
+  description: string | null;
+  direction: string;
+  evidence_url: string | null;
+  exchange_rate: Numeric | null;
+  linked_expense_id: string | null;
+  linked_income_id: string | null;
+  linked_payment_id: string | null;
+  linked_payment_type: string | null;
+  metadata_json: Generated<Json>;
+  movement_date: Timestamp;
+  movement_id: string;
+  movement_type: string;
+  recorded_at: Generated<Timestamp>;
+  recorded_by_user_id: string | null;
+  running_balance_clp: Numeric | null;
+  settlement_group_id: string | null;
+  space_id: string | null;
+}
+
+export interface GreenhouseFinanceShareholderAccounts {
+  account_id: string;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  member_id: string | null;
+  metadata_json: Generated<Json>;
+  notes: string | null;
+  ownership_percentage: Numeric | null;
+  profile_id: string;
+  space_id: string | null;
+  status: Generated<string>;
   updated_at: Generated<Timestamp>;
 }
 
@@ -3723,6 +3762,8 @@ export interface DB {
   "greenhouse_finance.service_entry_sheets": GreenhouseFinanceServiceEntrySheets;
   "greenhouse_finance.settlement_groups": GreenhouseFinanceSettlementGroups;
   "greenhouse_finance.settlement_legs": GreenhouseFinanceSettlementLegs;
+  "greenhouse_finance.shareholder_account_movements": GreenhouseFinanceShareholderAccountMovements;
+  "greenhouse_finance.shareholder_accounts": GreenhouseFinanceShareholderAccounts;
   "greenhouse_finance.suppliers": GreenhouseFinanceSuppliers;
   "greenhouse_hr.leave_balances": GreenhouseHrLeaveBalances;
   "greenhouse_hr.leave_policies": GreenhouseHrLeavePolicies;
