@@ -55,10 +55,8 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Si el cambio es UI, UX o seleccion de componentes, usar como criterio operativo los skills locales vigentes (`greenhouse-agent`, `greenhouse-portal-ui-implementer`, `greenhouse-ui-orchestrator` o `greenhouse-vuexy-ui-expert`) y revisar `full-version` junto con la documentacion oficial de Vuexy antes de inventar componentes nuevos.
 - Si el cambio crea o modifica skills locales para agentes:
   - skills de Codex viven en `.codex/skills/<skill-name>/SKILL.md`
-  - `agents/openai.yaml` es recomendado para metadata UI/discovery de Codex
-  - `references/`, `scripts/` y `assets/` son opcionales y deben usarse para mantener `SKILL.md` corto
-  - skills nuevas de Claude deben preferir `.claude/skills/<skill-name>/SKILL.md`; los ejemplos legacy con `skill.md` minúscula se consideran compatibilidad histórica, no el estándar para trabajo nuevo
-  - antes de inventar una skill nueva, revisar primero ejemplos locales existentes en `.codex/skills/*` o `.claude/skills/*`
+  - skills de Claude viven en `.claude/skills/<skill-name>/skill.md` (minuscula — convencion oficial de Claude Code)
+  - antes de crear una skill nueva, revisar primero ejemplos locales existentes en `.codex/skills/*` o `.claude/skills/*`
 - Si el cambio afecta como funciona un modulo desde la perspectiva del usuario, verificar si existe documentacion funcional en `docs/documentation/` para el dominio afectado y actualizarla.
 - Aplicar `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md` para documentar con una fuente canonica y deltas cortos en los documentos vivos.
 - Revisar `git status` y no asumir que el arbol esta limpio.
