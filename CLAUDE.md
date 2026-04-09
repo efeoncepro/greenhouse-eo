@@ -72,24 +72,6 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
   - PostgreSQL: `pnpm pg:doctor` o conexión real
 - Rotar `NEXTAUTH_SECRET` puede invalidar sesiones activas y forzar re-login.
 
-### Creating Codex Skills
-
-- Skill nueva de Codex: `.codex/skills/<skill-name>/SKILL.md`
-- Metadata recomendada para discovery/UI de Codex: `.codex/skills/<skill-name>/agents/openai.yaml`
-- Supporting files opcionales:
-  - `references/` para contexto largo
-  - `scripts/` para pasos determinísticos
-  - `assets/` para plantillas o recursos de salida
-- Regla práctica:
-  - mantener `SKILL.md` corto y estable
-  - mover detalle largo a `references/`
-  - revisar primero ejemplos locales del repo antes de crear otra skill
-- Ejemplos canónicos actuales en este repo:
-  - `.codex/skills/greenhouse-secret-hygiene/SKILL.md`
-  - `.codex/skills/greenhouse-task-planner/SKILL.md`
-  - `.codex/skills/claude-skill-creator/SKILL.md`
-- Si Claude crea una skill de Codex, debe documentar el cambio en `Handoff.md`, `changelog.md` y `project_context.md` cuando la nueva skill cambie el contrato multi-agente del repo.
-
 ## Key Docs
 
 - `AGENTS.md` — reglas operativas completas, branching, deploy, coordinación, PostgreSQL access
@@ -104,9 +86,9 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
   - `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`
   - `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
   - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
-- Fuente canónica para crear skills locales:
-  - `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`
-  - `.codex/skills/claude-skill-creator/SKILL.md`
+- Convenciones de skills locales:
+  - Claude: `.claude/skills/<skill-name>/skill.md` (minuscula)
+  - Codex: `.codex/skills/<skill-name>/SKILL.md` (mayuscula)
 
 ### Architecture Docs (los más críticos)
 
