@@ -1,5 +1,31 @@
 # project_context.md
 
+## Delta 2026-04-09 Claude skill creator available for Codex
+
+- Nueva skill local de Codex:
+  - `.codex/skills/claude-skill-creator/SKILL.md`
+- Fuente normativa usada para construirla:
+  - `https://code.claude.com/docs/en/skills`
+- Contrato encapsulado:
+  - Claude Skills canónicas viven en `.claude/skills/<skill-name>/SKILL.md`
+  - `SKILL.md` lleva frontmatter + markdown body
+  - supporting files son válidos y recomendados para mantener el archivo principal corto
+- Drift local explicitado:
+  - el repo todavía tiene ejemplos legacy en `.claude/skills/*/skill.md`
+  - la skill enseña a reconciliar ese drift explícitamente en vez de seguir replicándolo sin revisión
+- Documentación operativa derivada:
+  - `AGENTS.md`, `CLAUDE.md` y `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md` ya explicitan también cómo Claude debe crear skills de Codex dentro de este repo
+
+## Delta 2026-04-09 Claude secret hygiene skill closed in repo
+
+- Claude ya tiene la skill local:
+  - `.claude/skills/greenhouse-secret-hygiene/skill.md`
+- Decisión de integración:
+  - se preserva la skill de Claude tal como fue creada por Claude
+  - no se reescribe ese archivo desde Codex
+- Estado del backlog:
+  - `TASK-305` ya quedó cerrada en `docs/tasks/complete/`
+
 ## Delta 2026-04-09 Secret hygiene skill available for Codex
 
 - Nueva skill local de Codex:
@@ -15,8 +41,8 @@
   - auditoría `read-only` por defecto
   - no exponer secretos crudos
   - verificar el consumer real tras cada corrección o rotación
-- Follow-on documentado:
-  - `docs/tasks/to-do/TASK-305-claude-secret-hygiene-skill.md`
+- Follow-on ya resuelto:
+  - `docs/tasks/complete/TASK-305-claude-secret-hygiene-skill.md`
 
 ## Delta 2026-04-09 Secret Manager payload hygiene enforced after ISSUE-032
 

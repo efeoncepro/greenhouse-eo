@@ -2,11 +2,24 @@
 
 ## 2026-04-09
 
+### 2026-04-09 — Claude secret hygiene skill closed and Codex skill creation protocol documented
+
+- Se integró al repo la skill de Claude `greenhouse-secret-hygiene` bajo `.claude/skills/greenhouse-secret-hygiene/`.
+- El cierre preserva exactamente el trabajo ya creado por Claude en `.claude/skills/greenhouse-secret-hygiene/skill.md`, sin reescribir esa skill.
+- `TASK-305` quedó cerrada en el pipeline de tasks.
+- También se dejó documentado para Claude cómo crear skills de Codex en `AGENTS.md`, `CLAUDE.md` y `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`.
+
+### 2026-04-09 — Claude skill creator added from official Anthropic docs
+
+- Se agregó la skill local `claude-skill-creator` en `.codex/skills/claude-skill-creator/` para crear y actualizar skills de Claude siguiendo la documentación oficial actual de Anthropic.
+- La skill incorpora la convención canónica `.claude/skills/<skill-name>/SKILL.md`, frontmatter soportado, supporting files y guardrails para decidir entre auto-invocación, manual-only y background knowledge.
+- También deja explícito el drift actual del repo con ejemplos legacy `skill.md` en minúscula y cómo reconciliarlo sin propagar la convención ambigua.
+
 ### 2026-04-09 — Secret hygiene skill added for Codex + follow-on task for Claude
 
 - Se agregó la skill local `greenhouse-secret-hygiene` en `.codex/skills/greenhouse-secret-hygiene/` para auditar y remediar secretos con protocolo safety-first.
 - La skill cubre Secret Manager, `*_SECRET_REF`, auth, webhooks, PostgreSQL y provider tokens, y obliga a verificar el consumer real después de una rotación.
-- Se creó `TASK-305` para que Claude implemente su skill equivalente bajo la convención `.claude/skills/`.
+- Se creó `TASK-305` para que Claude implemente su skill equivalente bajo `.claude/skills/`; esa task ya quedó cerrada en el mismo bloque operativo.
 
 ### 2026-04-09 — ISSUE-032 closed: Secret Manager payload hygiene enforced
 
