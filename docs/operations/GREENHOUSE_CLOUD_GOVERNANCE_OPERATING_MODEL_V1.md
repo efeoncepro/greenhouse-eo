@@ -202,6 +202,26 @@ Each Cloud concern must have a canonical home.
 - Cloud SQL PITR and flags
 - secret storage decisions
 - deploy validation expectations
+- preview baseline ownership and cleanup rules for branch overrides
+
+### 5.2.1 Preview baseline rule
+
+For Vercel in Greenhouse:
+
+- `Preview` is the generic non-`develop`, non-`main` runtime baseline
+- `Staging` is the `develop` baseline
+- `Production` is the `main` baseline
+
+This means:
+
+- branch previews must inherit a usable baseline without relying on `Preview (develop)` or another branch override
+- branch-specific preview vars are temporary exceptions, not the canonical contract
+- if a value is required for normal preview runtime across working branches, it belongs in generic `Preview`
+
+Operational guardrail:
+
+- when investigating new preview failures, check the effective env for an arbitrary branch before assuming code regression
+- if a key only exists in `Preview (develop)` or `Preview (<branch>)` but is needed by ordinary previews, promote it to generic `Preview` and document the cleanup
 
 ### 5.3 May live in UI as a mirror
 

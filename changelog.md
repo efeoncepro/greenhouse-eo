@@ -9,6 +9,7 @@
 - Si un runtime carece de `NEXTAUTH_SECRET`, el build ya no se cae: el portal degrada a sesión `null` y `/api/auth/[...nextauth]` responde `503` controlado.
 - Seguimiento operativo: el baseline genérico de `Preview` en Vercel quedó alineado para ramas nuevas con `NEXTAUTH_*`, Google/Azure auth, PostgreSQL, media buckets y `AGENT_AUTH_*`, evitando depender de overrides por branch como baseline compartido.
 - Validación posterior: un preview fresco ya respondió `200 {}` en `/api/auth/session` y `200` en `/api/auth/agent-session`.
+- Nuevo protocolo operativo: `Preview` pasa a tratarse explícitamente como baseline genérico para cualquier rama distinta de `develop` y `main`; los overrides por branch quedan solo como excepción temporal y documentada.
 - El incidente quedó documentado como `ISSUE-031`.
 
 ### 2026-04-08 — Hotfix productivo Banco: materializacion de balances corregida

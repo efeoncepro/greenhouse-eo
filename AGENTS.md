@@ -198,6 +198,32 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Si se define un dominio de staging, debe apuntar al `Custom Environment` de `develop`, no a ramas personales.
 - No usar Production como entorno de prueba manual.
 
+### Protocolo canonico de Preview
+
+- Regla base: `Preview` debe considerarse **el entorno compartido y genérico para cualquier rama que no sea `develop` ni `main`**.
+- Interpretación operativa:
+  - `develop` valida en `Staging`
+  - `main` valida en `Production`
+  - toda rama `feature/*`, `fix/*`, `hotfix/*`, `docs/*` o equivalente valida en `Preview`
+- Consecuencia obligatoria: una branch nueva debe poder desplegar en `Preview` **sin depender** de que antes exista `Preview (develop)` o `Preview (<otra-rama>)`.
+- Las variables críticas de runtime para ramas de trabajo deben existir como baseline de `Preview` genérico, no solo como override por branch.
+- Los overrides `Preview (<branch>)` quedan permitidos solo como excepción temporal cuando:
+  - una rama necesita un valor distinto al baseline compartido
+  - el caso está documentado en `Handoff.md` y, si aplica, en un issue o task
+  - existe plan explícito de limpieza al cerrar la rama
+- Regla dura: no usar `Preview (develop)` como source of truth de secrets para el resto de las ramas. Si una variable es necesaria para una preview nueva, debe promoverse a `Preview` genérico.
+- Antes de dar por sano un cambio que dependa de variables nuevas, verificar el baseline efectivo con una branch cualquiera, no solo con `develop`.
+- Smoke check canónico de baseline:
+  - `vercel env pull --environment preview --git-branch <branch-cualquiera>`
+  - confirmar que el set mínimo requerido aparece sin depender de overrides históricos
+- Familias de variables que no deben quedar solo en overrides por branch cuando afectan el runtime base de previews:
+  - auth (`NEXTAUTH_*`, `GOOGLE_CLIENT_*`, `AZURE_AD_*`)
+  - acceso GCP (`GCP_*`, credenciales o WIF equivalente)
+  - PostgreSQL (`GREENHOUSE_POSTGRES_*`)
+  - acceso headless/agentes (`AGENT_AUTH_*`)
+  - correo, webhooks o cron si el flujo requiere esas capacidades en previews
+- Si aparece una preview roja en una rama nueva pero `develop` sigue sano, asumir primero drift de env por overrides de branch antes de culpar al diff.
+
 ### Vercel Deployment Protection (SSO)
 
 - El proyecto tiene **Vercel Authentication (SSO)** habilitada con `deploymentType: "all_except_custom_domains"`.
@@ -237,6 +263,12 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - `Staging`: branch `develop`
   - `Production`: solo main
 - No crear una variable solo en Production si el cambio necesita validacion previa en Preview o Staging.
+- No dejar variables críticas solo en `Preview (develop)` o `Preview (<branch>)` si el comportamiento esperado debe existir para cualquier rama de trabajo.
+- Regla de provisioning:
+  - `Preview` genérico es el baseline para ramas no `develop`/`main`
+  - `Staging` es el baseline de `develop`
+  - `Production` es el baseline de `main`
+  - los overrides por branch son aditivos o excepcionales, no la fuente primaria del contrato
 - Toda variable nueva debe indicar:
   - nombre
   - proposito
