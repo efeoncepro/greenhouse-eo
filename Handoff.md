@@ -1,5 +1,16 @@
 # Handoff.md
 
+## Sesion 2026-04-09 — Skill nueva de Claude: `codex-skill-creator`
+
+- se creó la skill local de Claude en:
+  - `.claude/skills/codex-skill-creator/skill.md`
+- objetivo:
+  - crear o actualizar skills de Codex bajo `.codex/skills/`
+  - estandarizar la estructura mínima de `SKILL.md`, `agents/openai.yaml` y el uso opcional de `references/`, `scripts/` y `assets/`
+- decisión de alcance:
+  - se descartó crear otra skill de Codex para esto
+  - la necesidad real era una skill de Claude que supiera producir skills de Codex
+
 ## Sesion 2026-04-09 — TASK-305 cerrado + skill de Claude integrada
 
 - se integró también el trabajo creado por Claude en `feature/codex-claude-skill-builder`

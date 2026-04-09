@@ -2,6 +2,11 @@
 
 ## 2026-04-09
 
+### 2026-04-09 — Claude skill added to create Codex skills
+
+- Se agregó la skill de Claude `codex-skill-creator` en `.claude/skills/codex-skill-creator/skill.md`.
+- La skill enseña a crear y actualizar skills de Codex bajo `.codex/skills/` usando la estructura canónica del repo (`SKILL.md`, `agents/openai.yaml`, y supporting files opcionales cuando realmente hacen falta).
+
 ### 2026-04-09 — Claude secret hygiene skill closed and Codex skill creation protocol documented
 
 - Se integró al repo la skill de Claude `greenhouse-secret-hygiene` bajo `.claude/skills/greenhouse-secret-hygiene/`.

@@ -333,7 +333,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-281` | `complete` | Payment Instruments Registry, FX Tracking & Provider Logos | `docs/tasks/complete/TASK-281-payment-instruments-registry-fx-tracking.md` |
 | `TASK-282` | `complete` | Finance Payment Instrument Reconciliation & Settlement Orchestration | `docs/tasks/complete/TASK-282-finance-payment-instrument-reconciliation-settlement-orchestration.md` |
 | `TASK-283` | `complete` | Finance Bank & Treasury Module: saldos materializados, transferencias internas, coverage, multi-moneda | `docs/tasks/complete/TASK-283-finance-bank-treasury-module.md` |
-| `TASK-284` | `to-do` | Shareholder Current Account (Cuenta Corriente Accionista): movimientos bidireccionales, saldo neto, integración tesorería | `docs/tasks/to-do/TASK-284-shareholder-current-account.md` |
+| `TASK-284` | `complete` | Shareholder Current Account (Cuenta Corriente Accionista): movimientos bidireccionales, saldo neto, integración tesorería | `docs/tasks/complete/TASK-284-shareholder-current-account.md` |
 | `TASK-285` | `to-do` | Client Role Differentiation for Globe Enterprise | `docs/tasks/to-do/TASK-285-client-role-differentiation.md` |
 | `TASK-286` | `to-do` | Client View Catalog Expansion (10 new view codes) | `docs/tasks/to-do/TASK-286-client-view-catalog-expansion.md` |
 | `TASK-287` | `to-do` | Revenue Enabled Standalone View | `docs/tasks/to-do/TASK-287-revenue-enabled-standalone-view.md` |
@@ -355,3 +355,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-303` | `to-do` | Notifications Role Differentiation | `docs/tasks/to-do/TASK-303-notifications-role-differentiation.md` |
 | `TASK-304` | `to-do` | Pulse Revenue Enabled Headline | `docs/tasks/to-do/TASK-304-pulse-revenue-headline.md` |
 | `TASK-305` | `complete` | Claude Secret Hygiene Skill | `docs/tasks/complete/TASK-305-claude-secret-hygiene-skill.md` |
+| `TASK-306` | `to-do` | Shareholder Account Canonical Traceability & Cross-Module Linkage | `docs/tasks/to-do/TASK-306-shareholder-account-canonical-traceability.md` |

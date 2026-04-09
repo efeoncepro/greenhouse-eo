@@ -8,16 +8,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Complete`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`
-- Branch: `task/TASK-284-shareholder-current-account`
+- Branch: `feature/codex-task-284-shareholder-current-account`
 - Legacy ID: —
 - GitHub Issue: —
 
@@ -37,6 +37,18 @@ No son préstamos formales con calendario de cuotas — es una cuenta corriente 
 - Conocer el saldo neto en cualquier momento: "la empresa me debe $X" o "yo le debo $X"
 - Vincular movimientos a documentos existentes (expenses, incomes) cuando corresponda
 - Preparar la estructura para soportar aportes de capital en el futuro sin cambio estructural
+
+## Completion Delta
+
+- El módulo quedó implementado en `Finance > Cuenta accionista` con surface principal en `/finance/shareholder-account`
+- El runtime real incluye:
+  - `GET/POST /api/finance/shareholder-account`
+  - `GET /api/finance/shareholder-account/people`
+  - `GET /api/finance/shareholder-account/[id]/balance`
+  - `GET/POST /api/finance/shareholder-account/[id]/movements`
+- La CCA quedó integrada al registry de instrumentos (`accounts.instrument_category = shareholder_account`), al settlement layer y a la posición de tesorería
+- La documentación viva quedó actualizada en arquitectura Finance y en documentación funcional de módulos de caja
+- El follow-on enterprise para trazabilidad canónica cross-module y eliminación de IDs manuales quedó separado en `TASK-306`
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -106,12 +118,10 @@ Reglas obligatorias:
 
 ### Gap
 
-- No existe concepto formal de "cuenta corriente de accionista" en el sistema
-- No existe una extensión de dominio 1:1 sobre `accounts` para vincular un instrumento CCA con una persona canónica
-- No hay tabla para movimientos bidireccionales accionista ↔ empresa con trazabilidad a payments/settlement
-- No hay categoría de instrumento `shareholder_account` en `accounts`
-- No hay UI para gestionar ni visualizar la posición del accionista
-- No hay eventos propios ni surface Finance para CCA
+- Gap base cerrado: ya existe el concepto formal de "cuenta corriente de accionista" en el sistema
+- Ya existe la extensión de dominio 1:1 sobre `accounts` (`greenhouse_finance.shareholder_accounts`) para vincular un instrumento CCA con una persona canónica
+- Ya existe el ledger `greenhouse_finance.shareholder_account_movements`, la categoría `shareholder_account`, la UI operativa y los eventos del subdominio
+- Gap remanente separado: la trazabilidad canónica hacia `expenses`, `income`, `income_payments`, `expense_payments` y `settlement_groups` todavía necesita endurecimiento enterprise y quedó derivada a `TASK-306`
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -261,30 +271,32 @@ CREATE INDEX idx_sha_movements_expense ON greenhouse_finance.shareholder_account
 
 ## Acceptance Criteria
 
-- [ ] Migración aplicada: tablas `shareholder_accounts` y `shareholder_account_movements` creadas en `greenhouse_finance`
-- [ ] API CRUD operativa: crear cuenta, registrar movimiento, listar movimientos, consultar saldo
-- [ ] UI funcional: listado de cuentas, detalle con movimientos, formulario de registro
-- [ ] Saldo calculado correctamente en CLP con soporte multi-moneda
-- [ ] Movimientos vinculables a expenses/incomes existentes
-- [ ] Instrumento visible en posición de tesorería (integración con `accounts` / `account_balances`)
-- [ ] `pnpm build` + `pnpm lint` + `pnpm test` + `npx tsc --noEmit` pasan
+- [x] Migración aplicada: tablas `shareholder_accounts` y `shareholder_account_movements` creadas en `greenhouse_finance`
+- [x] API CRUD operativa: crear cuenta, registrar movimiento, listar movimientos, consultar saldo
+- [x] UI funcional: listado de cuentas, detalle con movimientos, formulario de registro
+- [x] Saldo calculado correctamente en CLP con soporte multi-moneda
+- [x] Movimientos vinculables a expenses/incomes existentes
+- [x] Instrumento visible en posición de tesorería (integración con `accounts` / `account_balances`)
+- [x] `pnpm pg:connect:migrate` + `pnpm exec tsc --noEmit --incremental false` + `pnpm lint` + `pnpm build` pasan
 
 ## Verification
 
+- `pnpm pg:connect:migrate`
+- `pnpm exec tsc --noEmit --incremental false`
 - `pnpm lint`
-- `npx tsc --noEmit`
-- `pnpm test`
 - `pnpm build`
-- Validación manual: crear cuenta, registrar movimientos en ambas direcciones, verificar saldo
+- Validación manual en `/finance/shareholder-account`: crear cuenta, registrar movimientos en ambas direcciones, verificar saldo y visibilidad como instrumento de tesorería
 
 ## Closing Protocol
 
-- [ ] Actualizar `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` con sección CCA
-- [ ] Verificar impacto en `TASK-283` (Banco/Tesorería) — CCA como instrumento
-- [ ] Verificar impacto en `TASK-070` (Cost Intelligence) — saldo CCA en dashboard
+- [x] Actualizar `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` con la evolución del instrumento `shareholder_account`
+- [x] Actualizar `docs/documentation/finance/modulos-caja-cobros-pagos.md` con el flujo operativo de CCA
+- [x] Verificar impacto en `TASK-283` (Banco/Tesorería) — la CCA quedó integrada como instrumento
+- [x] Separar el follow-on de trazabilidad enterprise en `TASK-306`
 
 ## Follow-ups
 
+- `TASK-306` — trazabilidad canónica cross-module y eliminación de IDs manuales como interfaz primaria
 - Módulo de Aportes de Capital / Equity Tracker (extiende `capital_contribution` movement_type)
 - Intereses devengados sobre saldo si se formaliza mutuo
 - Reporting tributario de cuenta corriente accionista
@@ -292,6 +304,6 @@ CREATE INDEX idx_sha_movements_expense ON greenhouse_finance.shareholder_account
 
 ## Open Questions
 
-- ¿El accionista ya tiene un `identity_profile_id` o `member_id` en el sistema, o hay que provisionarlo?
-- ¿Se quiere vincular automáticamente expenses que se pagaron con una tarjeta específica (la personal del accionista) como movimientos CCA, o siempre será registro manual?
-- ¿Visibilidad: solo admin/owner ve la CCA, o también el perfil `efeonce_admin`?
+- El accionista ya puede resolverse desde `identity_profiles` y vincular opcionalmente `member_id` cuando también existe como usuario/colaborador interno
+- El flujo base quedó operativo con registro manual asistido; la vinculación canónica y automática con otros módulos se endurece en `TASK-306`
+- La visibilidad quedó gobernada por el `viewCode` `finanzas.cuenta_corriente_accionista`

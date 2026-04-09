@@ -1,5 +1,15 @@
 # project_context.md
 
+## Delta 2026-04-09 Claude skill for creating Codex skills
+
+- Nueva skill local de Claude:
+  - `.claude/skills/codex-skill-creator/skill.md`
+- Cobertura:
+  - creación y mantenimiento de skills de Codex bajo `.codex/skills/`
+  - estructura mínima con `SKILL.md`
+  - criterio para agregar `agents/openai.yaml`
+  - decisión de cuándo usar `references/`, `scripts/` y `assets/`
+
 ## Delta 2026-04-09 Claude skill creator available for Codex
 
 - Nueva skill local de Codex:
