@@ -1,23 +1,27 @@
 # TASK-305 — Claude Secret Hygiene Skill
 
-<!-- ═══════════════════════════════════════════════════════════
-     ZONE 0 — IDENTITY & TRIAGE
-     "Que task es y puedo tomarla?"
-     Un agente lee esto primero. Si Lifecycle = complete, STOP.
-     ═══════════════════════════════════════════════════════════ -->
+## Delta 2026-04-09
+
+- Claude ya ejecutó esta task y la skill quedó publicada en:
+  - `.claude/skills/greenhouse-secret-hygiene/skill.md`
+- La skill se integró al repo sin reescribir el archivo de Claude.
+- También quedó documentado para Claude cómo crear skills de Codex en:
+  - `AGENTS.md`
+  - `CLAUDE.md`
+  - `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Bajo`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Complete`
 - Rank: `TBD`
 - Domain: `ops`
 - Blocked by: `none`
-- Branch: `task/TASK-305-claude-secret-hygiene-skill`
+- Branch: `feature/codex-claude-skill-builder`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -25,7 +29,7 @@
 
 Crear una skill específica para Claude que estandarice cómo auditar, sanear, rotar y verificar secretos en Greenhouse sin volver a caer en contaminación de payloads, drift por ambiente o verificaciones incompletas. La skill debe vivir en la convención real de Claude del repo y reutilizar las reglas ya formalizadas tras `ISSUE-032`.
 
-## Why This Task Exists
+## Why This Task Existed
 
 Greenhouse ya documentó y endureció el manejo de secretos en Codex y en la documentación operativa, pero Claude todavía no tiene una skill dedicada para esta superficie. Eso deja un gap multi-agente: el protocolo existe, pero no está empaquetado como workflow invocable en `.claude/skills/`, por lo que el siguiente incidente puede volver a depender de memoria humana o de lectura manual dispersa.
 
@@ -34,13 +38,6 @@ Greenhouse ya documentó y endureció el manejo de secretos en Codex y en la doc
 - Crear una skill de Claude para secretos bajo la convención real del repo.
 - Alinear esa skill con las reglas canónicas de Secret Manager, auth, webhooks y PostgreSQL.
 - Dejar a Claude con un workflow safety-first que priorice auditoría, clasificación de riesgo, verificación del consumer y documentación de incidentes.
-
-<!-- ═══════════════════════════════════════════════════════════
-     ZONE 1 — CONTEXT & CONSTRAINTS
-     "Que necesito entender antes de planificar?"
-     El agente lee cada doc referenciado aqui. Si un doc no
-     existe en el repo, reporta antes de continuar.
-     ═══════════════════════════════════════════════════════════ -->
 
 ## Architecture Alignment
 
@@ -99,64 +96,52 @@ Reglas obligatorias:
 
 ## Current Repo State
 
-### Already exists
+### Implemented
 
 - Claude ya tiene skills locales en el repo:
   - `.claude/skills/greenhouse-email/skill.md`
   - `.claude/skills/greenhouse-task-planner/skill.md`
+- Claude ahora también tiene la skill:
+  - `.claude/skills/greenhouse-secret-hygiene/skill.md`
 - Codex ya tiene skill equivalente como baseline de comportamiento:
   - `.codex/skills/greenhouse-secret-hygiene/SKILL.md`
+- Codex ya tiene una skill específica para crear skills de Claude usando la documentación oficial actual:
+  - `.codex/skills/claude-skill-creator/SKILL.md`
 - El protocolo canónico anti-contaminación ya quedó documentado en docs operativos y de arquitectura.
 - El helper canónico de runtime ya sanea payloads contaminados:
   - `src/lib/secrets/secret-manager.ts`
 
-### Gap
-
-- Claude no tiene todavía una skill específica para secretos en `.claude/skills/`.
-- El protocolo existe, pero no está empaquetado como workflow invocable para Claude.
-- No hay garantía de que Claude siga por defecto la misma matriz de riesgo/verificación que ya quedó institucionalizada tras `ISSUE-032`.
-
-<!-- ═══════════════════════════════════════════════════════════
-     ZONE 2 — PLAN MODE
-     El agente que toma esta task ejecuta Discovery y produce
-     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
-     ═══════════════════════════════════════════════════════════ -->
-
-<!-- ═══════════════════════════════════════════════════════════
-     ZONE 3 — EXECUTION SPEC
-     "Que construyo exactamente, slice por slice?"
-     El agente solo lee esta zona DESPUES de que el plan este
-     aprobado. Ejecuta un slice, verifica, commitea, y avanza.
-     ═══════════════════════════════════════════════════════════ -->
-
-## Scope
+## Scope Delivered
 
 ### Slice 1 — Skill contract para Claude
 
-- Crear `.claude/skills/greenhouse-secret-hygiene/skill.md` siguiendo la convención real de Claude del repo.
-- Definir claramente cuándo invocar la skill:
+- Se creó `.claude/skills/greenhouse-secret-hygiene/skill.md` siguiendo la convención real vigente en los skills de Claude del repo.
+- La skill define cuándo invocarse para:
   - `*_SECRET_REF`
   - GCP Secret Manager
   - rotación de secretos
   - drift de env vars
   - auth/webhooks/PostgreSQL/provider tokens
-- Incluir los first reads mínimos y los paths reales del repo que Claude debe consultar.
+- La skill incluye first reads mínimos y paths reales del repo.
 
 ### Slice 2 — Workflow safety-first
 
-- Codificar en la skill un workflow concreto:
+- La skill ya codifica el workflow:
   - clasificar familia de secreto
   - confirmar source of truth
   - auditar sin exponer valores
   - proponer remediación mínima segura
   - verificar el consumer real
   - documentar `ISSUE`, `Handoff`, `changelog` y `project_context` si aplica
-- Incluir guardrails explícitos para no imprimir secretos ni rotarlos por defecto.
+- También deja guardrails explícitos para no imprimir secretos ni rotarlos por defecto.
 
 ### Slice 3 — Paridad operativa con el protocolo actual
 
-- Alinear la skill con las reglas ya documentadas en `AGENTS.md`, `CLAUDE.md`, `project_context.md` y Cloud Governance/Security/Infrastructure.
-- Si hace falta, dejar una nota corta en `CLAUDE.md` o `Handoff.md` indicando que la nueva skill ya existe y cuál es su path canónico.
+- La skill quedó alineada con las reglas ya documentadas en `AGENTS.md`, `CLAUDE.md`, `project_context.md` y Cloud Governance / Security / Infrastructure.
+- Además, el repo ya documenta cómo Claude debe crear skills de Codex en:
+  - `AGENTS.md`
+  - `CLAUDE.md`
+  - `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`
 
 ## Out of Scope
 
@@ -195,11 +180,11 @@ La skill de Claude debe reflejar estas reglas mínimas:
 
 ## Acceptance Criteria
 
-- [ ] Existe una nueva skill de Claude en `.claude/skills/greenhouse-secret-hygiene/skill.md`.
-- [ ] La skill referencia paths reales del repo y cubre Secret Manager, auth, webhooks, PostgreSQL y provider tokens.
-- [ ] La skill deja explícito que el default es auditoría read-only y que no se deben exponer secretos crudos.
-- [ ] La skill incluye una matriz concreta de verificación por tipo de secreto y menciona el impacto especial de `NEXTAUTH_SECRET`.
-- [ ] La documentación del repo queda consistente si se agrega una nota registrando la nueva skill.
+- [x] Existe una nueva skill de Claude en `.claude/skills/greenhouse-secret-hygiene/skill.md`.
+- [x] La skill referencia paths reales del repo y cubre Secret Manager, auth, webhooks, PostgreSQL y provider tokens.
+- [x] La skill deja explícito que el default es auditoría read-only y que no se deben exponer secretos crudos.
+- [x] La skill incluye una matriz concreta de verificación por tipo de secreto y menciona el impacto especial de `NEXTAUTH_SECRET`.
+- [x] La documentación del repo quedó consistente registrando la nueva skill y el protocolo de creación de skills de Codex para Claude.
 
 ## Verification
 
@@ -208,12 +193,13 @@ La skill de Claude debe reflejar estas reglas mínimas:
   - `.claude/skills/greenhouse-email/skill.md`
   - `.claude/skills/greenhouse-task-planner/skill.md`
   - `.codex/skills/greenhouse-secret-hygiene/SKILL.md`
+  - `.codex/skills/claude-skill-creator/SKILL.md`
 - Validación manual de que todos los paths citados existen en el repo
 
 ## Closing Protocol
 
-- [ ] Si se registra la skill en docs de continuidad, dejar el path canónico y el objetivo de uso en `Handoff.md`
-- [ ] No modificar secretos reales, entornos ni GCP como parte de esta task
+- [x] Se registró la skill en docs de continuidad y se dejó el objetivo de uso en `Handoff.md`
+- [x] No se modificaron secretos reales, entornos ni GCP como parte de esta task
 
 ## Follow-ups
 
@@ -221,4 +207,4 @@ La skill de Claude debe reflejar estas reglas mínimas:
 
 ## Open Questions
 
-- Confirmar si Claude necesita además una convención de metadata adicional fuera de `skill.md` para discovery local.
+- Por ahora no hay metadata adicional requerida fuera de `skill.md` para el discovery local ya usado por Claude en este repo.

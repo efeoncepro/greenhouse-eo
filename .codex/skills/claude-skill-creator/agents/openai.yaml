@@ -1,0 +1,7 @@
+interface:
+  display_name: "Claude Skill Creator"
+  short_description: "Create or update Claude Code skills."
+  default_prompt: "Use $claude-skill-creator to create a Claude Code skill in this repo following the official Anthropic skill format and local conventions."
+
+policy:
+  allow_implicit_invocation: true

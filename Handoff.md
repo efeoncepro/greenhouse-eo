@@ -1,5 +1,36 @@
 # Handoff.md
 
+## Sesion 2026-04-09 — TASK-305 cerrado + skill de Claude integrada
+
+- se integró también el trabajo creado por Claude en `feature/codex-claude-skill-builder`
+- resultado publicado en el repo:
+  - `.claude/skills/greenhouse-secret-hygiene/skill.md`
+- decisión operativa:
+  - no se reescribió la skill de Claude
+  - se preserva exactamente el archivo que Claude ya había creado
+- `TASK-305` quedó movida a `complete/` y el índice de tasks ya refleja el cierre
+- además se documentó para Claude cómo crear skills de Codex en:
+  - `AGENTS.md`
+  - `CLAUDE.md`
+  - `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`
+
+## Sesion 2026-04-09 — Skill nueva: `claude-skill-creator`
+
+- se investigó la documentación oficial actual de Claude Skills:
+  - fuente: `https://code.claude.com/docs/en/skills`
+- hallazgo clave:
+  - Anthropic documenta `.claude/skills/<skill-name>/SKILL.md` como entrypoint canónico
+  - el repo todavía tiene ejemplos legacy con `skill.md` minúscula en `.claude/skills/`
+- se creó la skill local de Codex en:
+  - `.codex/skills/claude-skill-creator/SKILL.md`
+  - `.codex/skills/claude-skill-creator/agents/openai.yaml`
+  - `.codex/skills/claude-skill-creator/references/official-claude-skills-reference.md`
+- objetivo:
+  - crear o actualizar skills de Claude usando formato oficial, frontmatter correcto y supporting files cuando haga falta
+  - reconciliar explícitamente el drift entre el estándar oficial `SKILL.md` y los ejemplos legacy del repo
+- follow-on relacionado:
+  - `TASK-305` ya quedó cerrada sobre la implementación real que Claude dejó en `.claude/skills/greenhouse-secret-hygiene/skill.md`
+
 ## Sesion 2026-04-09 — Skill nueva: `greenhouse-secret-hygiene`
 
 - se creó la skill local de Codex en:
@@ -8,8 +39,8 @@
 - objetivo:
   - estandarizar auditoría, clasificación de riesgo, remediación mínima segura y verificación de secretos para Secret Manager, auth, webhooks, PostgreSQL y provider tokens
   - default `read-only` salvo instrucción explícita del usuario para rotar/corregir en origen
-- follow-on creado para Claude:
-  - `docs/tasks/to-do/TASK-305-claude-secret-hygiene-skill.md`
+- follow-on ya cerrado para Claude:
+  - `docs/tasks/complete/TASK-305-claude-secret-hygiene-skill.md`
 - documentación de índice actualizada:
   - `docs/tasks/README.md`
   - `docs/tasks/TASK_ID_REGISTRY.md`

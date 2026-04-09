@@ -116,3 +116,22 @@ Si un documento ya tiene suficiente contexto y otro solo necesita continuidad, e
   - `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
   - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
 - `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `Handoff.md` y `changelog.md` deben dejar solo el delta operativo corto y enlazar a esos documentos, no duplicar el runbook completo.
+
+## Regla para skills locales de agentes
+
+- La convención canónica para skills de Codex en este repo es:
+  - `.codex/skills/<skill-name>/SKILL.md`
+  - `agents/openai.yaml` recomendado para metadata UI/discovery
+  - `references/`, `scripts/` y `assets/` opcionales para mantener `SKILL.md` corto
+- La convención oficial actual para skills de Claude es:
+  - `.claude/skills/<skill-name>/SKILL.md`
+- Excepción documentada:
+  - el repo todavía conserva ejemplos legacy de Claude en `.claude/skills/*/skill.md`
+  - esos archivos se tratan como compatibilidad histórica; las skills nuevas no deben seguir naciendo en minúscula por defecto
+- Fuente operativa corta para crear skills de Codex:
+  - `AGENTS.md`
+  - `CLAUDE.md`
+  - ejemplos locales en `.codex/skills/`
+- Regla de compresión:
+  - la explicación canónica de estructura y ubicación vive aquí
+  - `Handoff.md`, `changelog.md` y `project_context.md` solo registran la nueva skill, su propósito y el impacto contractual

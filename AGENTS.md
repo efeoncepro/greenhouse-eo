@@ -53,6 +53,12 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - correr `pnpm pg:doctor` antes de asumir que el acceso esta sano
 - Si una task del sistema contradice la arquitectura vigente, no implementarla tal cual; corregir primero la task o documentar la nueva decision arquitectonica.
 - Si el cambio es UI, UX o seleccion de componentes, usar como criterio operativo los skills locales vigentes (`greenhouse-agent`, `greenhouse-portal-ui-implementer`, `greenhouse-ui-orchestrator` o `greenhouse-vuexy-ui-expert`) y revisar `full-version` junto con la documentacion oficial de Vuexy antes de inventar componentes nuevos.
+- Si el cambio crea o modifica skills locales para agentes:
+  - skills de Codex viven en `.codex/skills/<skill-name>/SKILL.md`
+  - `agents/openai.yaml` es recomendado para metadata UI/discovery de Codex
+  - `references/`, `scripts/` y `assets/` son opcionales y deben usarse para mantener `SKILL.md` corto
+  - skills nuevas de Claude deben preferir `.claude/skills/<skill-name>/SKILL.md`; los ejemplos legacy con `skill.md` minúscula se consideran compatibilidad histórica, no el estándar para trabajo nuevo
+  - antes de inventar una skill nueva, revisar primero ejemplos locales existentes en `.codex/skills/*` o `.claude/skills/*`
 - Si el cambio afecta como funciona un modulo desde la perspectiva del usuario, verificar si existe documentacion funcional en `docs/documentation/` para el dominio afectado y actualizarla.
 - Aplicar `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md` para documentar con una fuente canonica y deltas cortos en los documentos vivos.
 - Revisar `git status` y no asumir que el arbol esta limpio.
@@ -116,6 +122,10 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - `docs/architecture/` — contratos tecnicos para agentes y desarrolladores (schemas, APIs, decisiones de diseno)
   - `docs/documentation/` — explicaciones funcionales en lenguaje simple (roles, flujos, reglas de negocio). Cada documento enlaza a su spec tecnica
   - `docs/operations/` — modelos operativos del repo y del equipo (documentacion, GitHub Project, release channels)
+- Las skills locales tambien tienen contrato documental:
+  - `AGENTS.md` y `CLAUDE.md` dejan la regla operativa corta
+  - `project_context.md` registra skills nuevas que cambian el contrato multi-agente
+  - `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md` guarda la convención canónica para crear skills de Codex y Claude
 
 ### 8. Regla de line endings
 
