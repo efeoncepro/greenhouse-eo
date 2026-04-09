@@ -1,5 +1,18 @@
 # Handoff.md
 
+## Sesion 2026-04-08 — Protocolo nuevo: Preview es baseline genérico para ramas distintas de develop/main
+
+- se documentó en `AGENTS.md` y docs operativos que:
+  - `Preview` es el baseline genérico para cualquier rama distinta de `develop` y `main`
+  - `Staging` es el baseline compartido de `develop`
+  - `Production` es el baseline de `main`
+  - `Preview (develop)` y `Preview (<branch>)` no pueden seguir siendo source of truth del runtime base
+- regla nueva:
+  - los overrides por branch quedan permitidos solo como excepción temporal y documentada
+  - si una variable es necesaria para previews normales, debe vivir en `Preview` genérico
+- motivación:
+  - evitar que ramas nuevas hereden un preview casi vacío y generen cascadas de failures en GitHub/Vercel por drift acumulado de env vars
+
 ## Sesion 2026-04-08 — ISSUE-031 cerrado de punta a punta: Preview baseline ya no depende de overrides por branch
 
 - contexto:

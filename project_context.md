@@ -14,6 +14,10 @@
   - el baseline genérico de `Preview` ya quedó alineado en Vercel para ramas nuevas
   - auth, Google/Azure, PostgreSQL, media buckets y `AGENT_AUTH_*` no deben seguir dependiendo de overrides por branch como baseline compartido
   - validación runtime: un preview fresco ya responde `200` en `/api/auth/session` y `200` en `/api/auth/agent-session`
+- Regla operativa nueva:
+  - `Preview` debe tratarse siempre como baseline genérico para toda rama distinta de `develop` y `main`
+  - `Preview (develop)` no puede seguir funcionando como source of truth del resto de previews
+  - los overrides por branch quedan solo como excepción temporal y documentada
 - Issue resuelto de referencia: `docs/issues/resolved/ISSUE-031-vercel-preview-build-fails-missing-nextauth-secret.md`
 
 ## Delta 2026-04-07 Account Complete 360 — serving federado por facetas (TASK-274)

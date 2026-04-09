@@ -117,6 +117,21 @@ Uso recomendado:
 - exploración interna
 - validación técnica o UX temprana
 
+Reglas operativas obligatorias:
+
+- `Preview` es el ambiente canónico para cualquier rama que no sea `develop` ni `main`.
+- `Preview` no debe depender de `Preview (develop)` ni de overrides históricos por branch para su runtime base.
+- Toda capacidad o fix que necesite validación remota en ramas de trabajo debe poder desplegar con el baseline genérico de `Preview`.
+- Los overrides `Preview (<branch>)` solo se permiten como excepción temporal y documentada; no reemplazan el baseline compartido.
+- Si una rama nueva falla en preview mientras `develop` funciona, el primer diagnóstico debe ser drift de variables por branch antes de asumir regressión de código.
+
+Baseline mínimo esperado para `Preview` cuando aplica login/runtime completo:
+
+- auth compartida (`NEXTAUTH_*`, `GOOGLE_CLIENT_*`, `AZURE_AD_*`)
+- acceso cloud/runtime (`GCP_*` o mecanismo equivalente)
+- acceso de datos (`GREENHOUSE_POSTGRES_*`)
+- acceso headless/agente (`AGENT_AUTH_*`)
+
 Canal típico:
 
 - `alpha`
