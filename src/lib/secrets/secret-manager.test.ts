@@ -54,10 +54,47 @@ describe('resolveSecret', () => {
     })
   })
 
+  it('sanitizes quoted secret payloads returned by Secret Manager', async () => {
+    vi.stubEnv('GCP_PROJECT', 'efeonce-group')
+    vi.stubEnv('NEXTAUTH_SECRET_SECRET_REF', 'greenhouse-nextauth-secret-staging')
+    accessSecretVersion.mockResolvedValue([
+      {
+        payload: {
+          data: Buffer.from('"quoted-secret-value"')
+        }
+      }
+    ])
+
+    const { resolveSecret } = await import('@/lib/secrets/secret-manager')
+
+    const resolution = await resolveSecret({
+      envVarName: 'NEXTAUTH_SECRET'
+    })
+
+    expect(resolution.source).toBe('secret_manager')
+    expect(resolution.value).toBe('quoted-secret-value')
+  })
+
   it('falls back to env vars when Secret Manager lookup fails', async () => {
     vi.stubEnv('GCP_PROJECT', 'efeonce-group')
     vi.stubEnv('NUBOX_BEARER_TOKEN_SECRET_REF', 'nubox-bearer-token')
     vi.stubEnv('NUBOX_BEARER_TOKEN', 'env-fallback-token')
+    accessSecretVersion.mockRejectedValue(new Error('permission denied'))
+
+    const { resolveSecret } = await import('@/lib/secrets/secret-manager')
+
+    const resolution = await resolveSecret({
+      envVarName: 'NUBOX_BEARER_TOKEN'
+    })
+
+    expect(resolution.source).toBe('env')
+    expect(resolution.value).toBe('env-fallback-token')
+  })
+
+  it('sanitizes quoted env fallback values with trailing literal newline markers', async () => {
+    vi.stubEnv('GCP_PROJECT', 'efeonce-group')
+    vi.stubEnv('NUBOX_BEARER_TOKEN_SECRET_REF', 'greenhouse-nubox-bearer-token-staging')
+    vi.stubEnv('NUBOX_BEARER_TOKEN', '"env-fallback-token\\n"')
     accessSecretVersion.mockRejectedValue(new Error('permission denied'))
 
     const { resolveSecret } = await import('@/lib/secrets/secret-manager')

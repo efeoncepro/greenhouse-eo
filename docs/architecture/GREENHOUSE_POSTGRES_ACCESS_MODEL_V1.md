@@ -230,6 +230,11 @@ It also aligns with the 360 model:
 - create dedicated login user `greenhouse_migrator_user`
 - store its password in Secret Manager
 - stop using `postgres` for routine migrations
+- passwords publicados en Secret Manager deben ser scalar crudo:
+  - sin comillas envolventes
+  - sin `\n` / `\r` literal
+  - sin whitespace residual
+- después de rotar cualquier password PostgreSQL, ejecutar `pnpm pg:doctor` o una conexión real antes de asumir que el perfil quedó sano
 
 ### Steady state
 

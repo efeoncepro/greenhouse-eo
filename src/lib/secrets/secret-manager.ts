@@ -55,7 +55,14 @@ const getSecretRefEnvVarName = (envVarName: string, provided?: string) => provid
 const normalizeSecretValue = (value: string | undefined) => {
   const trimmed = value?.trim()
 
-  return trimmed ? trimmed : null
+  if (!trimmed) {
+    return null
+  }
+
+  const withoutQuotes = trimmed.replace(/^['"]+|['"]+$/g, '').trim()
+  const withoutLiteralLineEndings = withoutQuotes.replace(/(?:\\r|\\n)+$/g, '').trim()
+
+  return withoutLiteralLineEndings ? withoutLiteralLineEndings : null
 }
 
 const normalizeSecretRefValue = (value: string | undefined) => {
@@ -115,7 +122,7 @@ const readSecretFromSecretManager = async ({
       name: normalizedSecretRef
     })
 
-    const value = version.payload?.data?.toString('utf8')?.trim()
+    const value = normalizeSecretValue(version.payload?.data?.toString('utf8'))
 
     if (!value) {
       console.warn(`[secrets] Secret Manager returned an empty payload for ${envVarName}.`, {

@@ -6,6 +6,27 @@
 
 ---
 
+## Delta 2026-04-09 — Secret Manager publication protocol tightened after ISSUE-032
+
+Greenhouse formaliza un protocolo operativo para secretos runtime en GCP Secret Manager:
+
+- publicar secretos scalar como valor crudo
+- no envolverlos en comillas
+- no agregar `\\n` / `\\r` literal
+- no dejar whitespace residual
+
+Patrón recomendado:
+
+```bash
+printf %s "$VALOR" | gcloud secrets versions add <secret-id> --data-file=-
+```
+
+Regla operativa:
+
+- no usar `JSON.stringify`, copy/paste entre comillas ni blobs multilínea cuando el consumer espera un token/password simple
+- después de cada nueva versión o rotación, validar el servicio dependiente real
+- si el secreto afecta auth (`NEXTAUTH_SECRET`, client secrets OAuth), considerar explícitamente el impacto de sesión/re-login
+
 ## Delta 2026-04-07 — Cost attribution materialization endpoint added to ops-worker (TASK-279)
 
 The `ops-worker` Cloud Run service gains a new endpoint `POST /cost-attribution/materialize` that runs the heavy commercial cost attribution materialization pipeline (3 CTEs + LATERAL JOIN + exchange rate conversion) which times out on Vercel serverless cold-starts. Optionally recomputes `client_economics` snapshots after materialization.

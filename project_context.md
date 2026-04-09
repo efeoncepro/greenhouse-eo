@@ -1,5 +1,27 @@
 # project_context.md
 
+## Delta 2026-04-09 Secret Manager payload hygiene enforced after ISSUE-032
+
+- `src/lib/secrets/secret-manager.ts` ahora sanea tanto payloads leídos desde GCP Secret Manager como fallbacks por env:
+  - `trim()`
+  - remueve comillas envolventes simples o dobles
+  - remueve sufijos literales `\\n` / `\\r`
+- El hardening es defensa en profundidad. La fuente canónica sigue siendo publicar secretos como scalar crudo, no como string serializado.
+- Secretos saneados en origen con nueva versión limpia en GCP:
+  - `greenhouse-google-client-secret-shared`
+  - `greenhouse-nextauth-secret-staging`
+  - `greenhouse-nextauth-secret-production`
+  - `webhook-notifications-secret`
+- Auditoría posterior: los secretos runtime críticos referenciados por `*_SECRET_REF` quedaron limpios en origen.
+- Regla operativa nueva:
+  - usar `printf %s "$VALOR" | gcloud secrets versions add <secret-id> --data-file=-`
+  - no publicar secretos con comillas, `\\n` literal o whitespace residual
+  - después de cada rotación validar el consumer real del secreto en el ambiente afectado
+- Nota crítica:
+  - rotar `NEXTAUTH_SECRET` puede invalidar sesiones activas y forzar re-login
+  - no tratarlo como cambio inocuo de infraestructura
+- Referencia del incidente: `docs/issues/resolved/ISSUE-032-secret-manager-payload-contamination-breaks-runtime-secrets.md`
+
 ## Delta 2026-04-08 Vercel Preview auth hardening
 
 - Se confirmó que `Preview` puede quedar con drift de env respecto de local/shared y faltar al menos `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `GCP_PROJECT` o `GOOGLE_APPLICATION_CREDENTIALS_JSON`.
@@ -1516,6 +1538,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - secret ref opcional: `<ENV_VAR>_SECRET_REF`
   - resolución runtime: `Secret Manager -> env fallback -> unconfigured`
 - El helper usa `@google-cloud/secret-manager`, cache corta y no expone valores crudos en logs.
+- Regla vigente ampliada tras `ISSUE-032`:
+  - también sanea payloads quoted/contaminados (`\"secret\"`, `secret\\n`) antes de entregarlos al runtime
+  - ese saneamiento no reemplaza la higiene operativa del secreto en origen; solo evita que un payload sucio vuelva a romper el consumer
 - `GET /api/internal/health` ahora proyecta postura de secretos críticos bajo `secrets.summary` y `secrets.entries`, sin devolver valores.
 - Primer consumer migrado al patrón:
   - `src/lib/nubox/client.ts` ahora resuelve `NUBOX_BEARER_TOKEN` vía helper con fallback controlado

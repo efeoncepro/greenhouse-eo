@@ -1,5 +1,44 @@
 # Handoff.md
 
+## Sesion 2026-04-09 — ISSUE-032 cerrado: Secret Manager payload contamination
+
+- contexto:
+  - después del incidente de Nubox se auditó el resto de secretos runtime críticos servidos por `*_SECRET_REF`
+  - se detectó el mismo patrón de payload contaminado en secretos de auth y un caso menor de webhook
+- causa raíz confirmada:
+  - algunos secretos en GCP Secret Manager habían sido publicados con comillas envolventes o whitespace/literal `\\n` residual
+  - `src/lib/secrets/secret-manager.ts` saneaba refs `*_SECRET_REF`, pero no el payload efectivo devuelto por Secret Manager
+- fix aplicado:
+  - `src/lib/secrets/secret-manager.ts` ahora sanea payloads y fallbacks env antes de entregarlos al runtime
+  - cobertura agregada en `src/lib/secrets/secret-manager.test.ts`
+  - se publicaron nuevas versiones limpias de:
+    - `greenhouse-google-client-secret-shared`
+    - `greenhouse-nextauth-secret-staging`
+    - `greenhouse-nextauth-secret-production`
+    - `webhook-notifications-secret`
+  - se documentó el protocolo anti-contaminación en:
+    - `AGENTS.md`
+    - `CLAUDE.md`
+    - `project_context.md`
+    - `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`
+    - `docs/operations/ISSUE_OPERATING_MODEL_V1.md`
+    - `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`
+    - `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
+    - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
+    - `docs/architecture/GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
+    - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
+- validación ejecutada:
+  - `pnpm exec vitest run src/lib/secrets/secret-manager.test.ts src/lib/auth-secrets.test.ts src/lib/nubox/client.test.ts` — OK
+  - `pnpm exec tsc --noEmit --incremental false` — OK
+  - `pnpm lint` — OK
+  - `pnpm staging:request /api/auth/providers --pretty` — `200`
+  - `pnpm staging:request /api/auth/session --pretty` — `200`
+  - `curl https://greenhouse.efeoncepro.com/api/auth/providers` — `200`
+  - `curl https://greenhouse.efeoncepro.com/api/auth/session` — `200`
+  - auditoría posterior de secretos runtime críticos: todos quedaron limpios en origen
+- nota operativa:
+  - la rotación de `NEXTAUTH_SECRET` puede forzar re-login al invalidar sesiones previas; tratar futuras rotaciones como cambio con impacto visible
+
 ## Sesion 2026-04-08 — Hotfix Nubox DTE: token con comillas en Secret Manager
 
 - contexto:

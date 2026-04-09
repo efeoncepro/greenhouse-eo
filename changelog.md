@@ -1,5 +1,15 @@
 # changelog.md
 
+## 2026-04-09
+
+### 2026-04-09 — ISSUE-032 closed: Secret Manager payload hygiene enforced
+
+- Se cerró un incidente transversal donde secretos runtime críticos podían existir en GCP Secret Manager pero romper consumidores por haber sido publicados con comillas envolventes, `\n` literal o whitespace residual.
+- `src/lib/secrets/secret-manager.ts` ahora sanea payloads devueltos por Secret Manager y fallbacks por env antes de entregarlos al runtime.
+- Se publicaron nuevas versiones limpias de `greenhouse-google-client-secret-shared`, `greenhouse-nextauth-secret-staging`, `greenhouse-nextauth-secret-production` y `webhook-notifications-secret`.
+- Verificación ejecutada en `staging` y `production`: `/api/auth/providers` y `/api/auth/session` respondieron `200`.
+- Se formalizó el protocolo operativo anti-contaminación de secretos en `AGENTS.md`, `CLAUDE.md`, `project_context.md` y la documentación canónica de Cloud Governance / Security Posture / Infrastructure.
+
 ## 2026-04-08
 
 ### 2026-04-08 — Hotfix Nubox DTE downloads and status checks
