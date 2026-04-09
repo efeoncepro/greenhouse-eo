@@ -3088,6 +3088,27 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - los drawers de caja y settlement usan `/api/finance/accounts` para seleccionar instrumentos visibles al equipo de finanzas
   - `Banco` quedó restringido a `efeonce_admin`, `finance_admin` y `finance_analyst`; no debe asumirse como superficie general de cualquier usuario con route group `finance`
 
+## Delta 2026-04-08 Finance shareholder current account module completed
+
+- `Finance` agrega la superficie `Cuenta accionista` en `/finance/shareholder-account` como carril bilateral empresa ↔ accionista, montado sobre el runtime de tesorería existente.
+- Modelo vigente:
+  - `greenhouse_finance.accounts.instrument_category` incluye `shareholder_account`
+  - `greenhouse_finance.shareholder_accounts` extiende el instrumento con `profile_id`, `member_id` opcional, participación, estado, notas y `space_id`
+  - `greenhouse_finance.shareholder_account_movements` persiste el ledger append-only de cargos/abonos
+- Regla operativa:
+  - cada movimiento manual crea `settlement_group` + `settlement_legs` reutilizando la misma base de settlement que `Banco`, `Cobros`, `Pagos` y `Conciliación`
+  - el saldo visible se rematerializa en `account_balances`; no debe recalcularse inline en la UI
+  - `credit` significa que la empresa debe al accionista; `debit` significa que el accionista debe a la empresa
+- Superficie backend agregada:
+  - `GET/POST /api/finance/shareholder-account`
+  - `GET /api/finance/shareholder-account/people`
+  - `GET /api/finance/shareholder-account/[id]/balance`
+  - `GET/POST /api/finance/shareholder-account/[id]/movements`
+- Integración transversal:
+  - la creación de cuentas busca personas por nombre/email en Identity y autocompleta `profile_id` / `member_id`
+  - soporta el caso donde un accionista también existe como usuario interno / superadministrador dentro de Greenhouse
+  - acceso protegido por `finanzas.cuenta_corriente_accionista` con el mismo fallback operativo que `Banco`
+
 ## Delta 2026-03-14 Task board reorganization
 
 - `docs/tasks/` ya no debe leerse como una carpeta plana de briefs.

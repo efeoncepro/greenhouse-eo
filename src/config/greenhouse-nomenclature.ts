@@ -72,6 +72,7 @@ export const GH_FINANCE_NAV = {
   cashIn: { label: 'Cobros', subtitle: 'Pagos recibidos contra facturas de venta' },
   cashOut: { label: 'Pagos', subtitle: 'Pagos ejecutados contra compromisos' },
   bank: { label: 'Banco', subtitle: 'Tesorería por cuenta, fintech e instrumentos' },
+  shareholderAccount: { label: 'Cuenta accionista', subtitle: 'Saldo empresa ↔ accionista' },
   cashPosition: { label: 'Posición de caja', subtitle: 'Saldo real, cuentas por cobrar y por pagar' },
   documents: { label: 'Documentos', subtitle: 'Cotizaciones, OC, HES y conciliación' },
   analytics: { label: 'Inteligencia', subtitle: 'Economía y asignaciones de costos' }

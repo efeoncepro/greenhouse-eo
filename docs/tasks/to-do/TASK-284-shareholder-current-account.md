@@ -57,10 +57,11 @@ Revisar y respetar:
 Reglas obligatorias:
 
 - Reutilizar el settlement layer existente (`settlement_groups`, `settlement_legs`) para integrar desembolsos y reembolsos al flujo de tesorería
-- No crear identidades paralelas — el accionista se modela como extensión del objeto `Persona` (identity_profiles) o `team_members`
+- No crear identidades paralelas — la CCA debe anclarse al registry de instrumentos `greenhouse_finance.accounts` y el accionista se modela como extensión del objeto `Persona` (`greenhouse_core.identity_profiles.profile_id`) con vínculo opcional a `greenhouse_core.members.member_id`
 - Schema destino: `greenhouse_finance` (consistente con el resto del módulo Finance)
 - Migraciones via `node-pg-migrate`, tipos regenerados con `kysely-codegen`
 - Multi-moneda nativo (CLP/USD) reutilizando infraestructura FX existente (`exchange_rates`, `economic_indicators`)
+- `docs/architecture/schema-snapshot-baseline.sql` sirve como baseline histórico, pero para este carril la fuente de verdad actual son las migraciones recientes de `TASK-281`, `TASK-282` y `TASK-283`
 
 ## Normative Docs
 
@@ -71,14 +72,15 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `greenhouse_finance.accounts` — la CCA se puede modelar como un instrumento tipo `shareholder_account`
+- `greenhouse_finance.accounts` — la CCA debe modelarse como un instrumento tipo `shareholder_account`
 - `greenhouse_finance.settlement_groups` / `settlement_legs` — para integrar al flujo de tesorería
 - `greenhouse_finance.expenses` / `greenhouse_finance.income` — para vincular movimientos a documentos origen
-- `greenhouse_core.identity_profiles` — para identificar al accionista como persona canónica
+- `greenhouse_core.identity_profiles` — para identificar al accionista como persona canónica (`profile_id`)
+- `greenhouse_core.members` — vínculo opcional cuando el accionista también existe como collaborator interno
 
 ### Blocks / Impacts
 
-- `TASK-283` (Banco/Tesorería) — la CCA debería aparecer en la posición de tesorería como un instrumento más
+- Runtime existente de `TASK-283` (Banco/Tesorería) — la CCA debe aparecer en la posición de tesorería como un instrumento más; ya no es dependencia futura sino integración obligatoria
 - `TASK-070` (Cost Intelligence Finance UI) — el saldo CCA podría ser relevante en el dashboard de economía
 - Futuro módulo de Equity/Aportes de Capital — esta task sienta las bases
 
@@ -98,16 +100,18 @@ Reglas obligatorias:
 - Infraestructura FX: `exchange_rates`, `economic_indicators`, campos `amount_clp`, `exchange_rate_at_payment` en payments
 - `account_balances` con snapshots diarios por instrumento
 - `expense_payments` / `income_payments` como ledger append-only
+- Módulo `Banco/Tesorería` operativo (`/finance/bank`) con `viewCode` `finanzas.banco`
 - Kysely tipado + `src/lib/db.ts` centralizado
 - `node-pg-migrate` operativo con scripts `pnpm migrate:*`
 
 ### Gap
 
-- No existe concepto de "cuenta de accionista" ni "préstamo accionista" en el sistema
-- No hay tabla para movimientos bidireccionales accionista ↔ empresa
+- No existe concepto formal de "cuenta corriente de accionista" en el sistema
+- No existe una extensión de dominio 1:1 sobre `accounts` para vincular un instrumento CCA con una persona canónica
+- No hay tabla para movimientos bidireccionales accionista ↔ empresa con trazabilidad a payments/settlement
 - No hay categoría de instrumento `shareholder_account` en `accounts`
 - No hay UI para gestionar ni visualizar la posición del accionista
-- No hay integración con settlement layer para funding de accionista
+- No hay eventos propios ni surface Finance para CCA
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -126,14 +130,14 @@ Reglas obligatorias:
 
 ### Slice 1 — Schema y migración
 
-- Tabla `shareholder_accounts`: accionista (link a identity_profile_id o member_id), porcentaje de participación, moneda base, estado, metadata
-- Tabla `shareholder_account_movements`: cada cargo/abono con direction (`credit` = empresa debe al accionista, `debit` = accionista debe a empresa), movement_type, monto, moneda, FX, link opcional a expense_id/income_id, descripción, evidencia
+- Extensión `shareholder_accounts` anclada 1:1 a `greenhouse_finance.accounts.account_id` (sin identidad paralela): accionista (`profile_id` y opcionalmente `member_id`), porcentaje de participación, estado, metadata y notas
+- Tabla `shareholder_account_movements`: cada cargo/abono con direction (`credit` = empresa debe al accionista, `debit` = accionista debe a empresa), movement_type, monto, moneda, FX, link opcional a `expense_id` / `income_id` / `payment_id` / `settlement_group_id`, descripción y evidencia
 - Agregar categoría `shareholder_account` al enum/check de `accounts.instrument_category`
 - Migración SQL + regenerar tipos Kysely
 
 ### Slice 2 — Domain logic y API
 
-- `src/lib/finance/shareholder-account/` — funciones de dominio: crear cuenta, registrar movimiento, calcular saldo, listar movimientos con filtros
+- `src/lib/finance/shareholder-account/` — funciones de dominio: crear cuenta CCA sobre `accounts`, registrar movimiento, calcular saldo, listar movimientos con filtros y resolver vínculos a persona/documento/settlement
 - API routes CRUD: `POST/GET /api/finance/shareholder-account`, `POST /api/finance/shareholder-account/[id]/movements`, `GET /api/finance/shareholder-account/[id]/movements`, `GET /api/finance/shareholder-account/[id]/balance`
 - Integración con settlement layer: movimientos que se originan de un expense pagado por accionista generan settlement_leg tipo `funding`
 
@@ -147,9 +151,9 @@ Reglas obligatorias:
 
 ### Slice 4 — Integración tesorería
 
-- Registrar la CCA como instrumento en `accounts` para que aparezca en posición de tesorería
+- Registrar la CCA como instrumento en `accounts` para que aparezca en posición de tesorería sin duplicar identidad
 - Materializar saldo en `account_balances` (o vista derivada)
-- Integración con `TASK-283` (Banco/Tesorería) si ya está implementada
+- Integración con runtime existente de `TASK-283` (Banco/Tesorería)
 
 ## Out of Scope
 
@@ -164,29 +168,31 @@ Reglas obligatorias:
 ### Schema conceptual
 
 ```sql
--- Cuenta del accionista
+-- Cuenta del accionista como extensión 1:1 del registry de instrumentos
 CREATE TABLE greenhouse_finance.shareholder_accounts (
-  shareholder_account_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  account_id TEXT PRIMARY KEY
+    REFERENCES greenhouse_finance.accounts(account_id) ON DELETE CASCADE,
   -- Identidad del accionista
-  identity_profile_id UUID REFERENCES greenhouse_core.identity_profiles(identity_profile_id),
-  member_id UUID REFERENCES greenhouse.team_members(member_id),
+  profile_id TEXT NOT NULL REFERENCES greenhouse_core.identity_profiles(profile_id),
+  member_id TEXT REFERENCES greenhouse_core.members(member_id),
+  space_id TEXT,
   -- Metadata
-  display_name TEXT NOT NULL,               -- e.g. "CCA — Felipe Efeonce"
   ownership_percentage NUMERIC(5,2),        -- e.g. 51.00
-  base_currency TEXT NOT NULL DEFAULT 'CLP',
   status TEXT NOT NULL DEFAULT 'active',    -- active | frozen | closed
   notes TEXT,
+  metadata_json JSONB NOT NULL DEFAULT '{}'::jsonb,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  created_by UUID,
+  created_by_user_id TEXT,
   -- Constraint: al menos una identidad
-  CONSTRAINT chk_identity CHECK (identity_profile_id IS NOT NULL OR member_id IS NOT NULL)
+  CONSTRAINT chk_shareholder_member_identity
+    CHECK (profile_id IS NOT NULL)
 );
 
 -- Movimientos de la cuenta corriente
 CREATE TABLE greenhouse_finance.shareholder_account_movements (
-  movement_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  shareholder_account_id UUID NOT NULL REFERENCES greenhouse_finance.shareholder_accounts(shareholder_account_id),
+  movement_id TEXT PRIMARY KEY,
+  account_id TEXT NOT NULL REFERENCES greenhouse_finance.shareholder_accounts(account_id) ON DELETE CASCADE,
   -- Clasificación
   direction TEXT NOT NULL CHECK (direction IN ('credit', 'debit')),
     -- credit = empresa debe al accionista (accionista pagó algo de la empresa)
@@ -206,21 +212,24 @@ CREATE TABLE greenhouse_finance.shareholder_account_movements (
   exchange_rate NUMERIC(12,6),              -- si currency != CLP
   amount_clp NUMERIC(15,2) NOT NULL,        -- monto normalizado a CLP
   -- Trazabilidad
-  linked_expense_id UUID,                   -- FK a expenses si aplica
-  linked_income_id UUID,                    -- FK a income si aplica
-  settlement_group_id UUID,                 -- FK a settlement_groups si se integra
+  linked_expense_id TEXT,                   -- FK a expenses si aplica
+  linked_income_id TEXT,                    -- FK a income si aplica
+  linked_payment_type TEXT,                 -- income_payment | expense_payment
+  linked_payment_id TEXT,
+  settlement_group_id TEXT,                 -- FK a settlement_groups si se integra
+  space_id TEXT,
   -- Metadata
   description TEXT,
   evidence_url TEXT,                         -- link a comprobante
   movement_date DATE NOT NULL,
   recorded_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  recorded_by UUID,
+  recorded_by_user_id TEXT,
   -- Running balance (materializado por trigger o calculado)
   running_balance_clp NUMERIC(15,2)
 );
 
 -- Índices
-CREATE INDEX idx_sha_movements_account ON greenhouse_finance.shareholder_account_movements(shareholder_account_id, movement_date);
+CREATE INDEX idx_sha_movements_account ON greenhouse_finance.shareholder_account_movements(account_id, movement_date);
 CREATE INDEX idx_sha_movements_type ON greenhouse_finance.shareholder_account_movements(movement_type);
 CREATE INDEX idx_sha_movements_expense ON greenhouse_finance.shareholder_account_movements(linked_expense_id) WHERE linked_expense_id IS NOT NULL;
 ```

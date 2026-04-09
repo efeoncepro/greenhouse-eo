@@ -1,5 +1,40 @@
 # Handoff.md
 
+## Sesion 2026-04-08 — TASK-284 cerrada: Cuenta corriente accionista
+
+- estado actual:
+  - `TASK-284` quedó implementada sobre el runtime de tesorería existente
+  - la nueva superficie vive en `/finance/shareholder-account`
+  - acceso protegido por `finanzas.cuenta_corriente_accionista` con fallback equivalente a `Banco`
+- cambios principales:
+  - nueva migración aplicada:
+    - `20260409002205385_shareholder-current-account.sql` quedó vacía pero ya aplicada
+    - `20260409002455606_shareholder-current-account-schema.sql` contiene el DDL real de `shareholder_accounts` + `shareholder_account_movements`
+  - `greenhouse_finance.accounts.instrument_category` ahora admite `shareholder_account`
+  - nuevo store `src/lib/finance/shareholder-account/store.ts`
+  - nuevas APIs:
+    - `GET/POST /api/finance/shareholder-account`
+    - `GET /api/finance/shareholder-account/people`
+    - `GET /api/finance/shareholder-account/[id]/balance`
+    - `GET/POST /api/finance/shareholder-account/[id]/movements`
+  - nueva UI:
+    - `src/app/(dashboard)/finance/shareholder-account/page.tsx`
+    - `src/views/greenhouse/finance/shareholder-account/*`
+  - navegación y catálogo de acceso ya incluyen `Cuenta accionista`
+- decisiones operativas:
+  - la CCA se modela como extensión 1:1 de `greenhouse_finance.accounts`, no como identidad paralela
+  - cada movimiento manual crea `settlement_group` + `settlement_legs` reutilizando el mismo rail que Banco/Tesorería
+  - la búsqueda de accionista en el drawer de creación consume Identity (`profile_id` + `member_id`) y soporta el caso donde el accionista también es usuario interno/admin
+- validación ejecutada:
+  - `pnpm pg:connect:migrate` — OK
+  - `pnpm exec tsc --noEmit --incremental false` — OK
+  - lint acotado del módulo/rutas nuevas — OK
+- validación pendiente al cerrar el turno:
+  - correr `pnpm lint` global
+  - correr `pnpm build` global
+  - si todo queda verde, commit + push de la rama
+  - smoke recomendado en staging: crear una cuenta, registrar un crédito, registrar un débito y revisar que `/finance/bank` refleje el instrumento `shareholder_account`
+
 ## Sesion 2026-04-08 — Protocolo nuevo: Preview es baseline genérico para ramas distintas de develop/main
 
 - se documentó en `AGENTS.md` y docs operativos que:

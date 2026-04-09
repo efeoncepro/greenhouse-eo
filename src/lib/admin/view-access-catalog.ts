@@ -200,6 +200,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'finance'
   },
   {
+    viewCode: 'finanzas.cuenta_corriente_accionista',
+    section: 'finanzas',
+    label: 'Cuenta corriente accionista',
+    description: 'Posición bilateral entre empresa y accionistas con trazabilidad de movimientos.',
+    routePath: '/finance/shareholder-account',
+    routeGroup: 'finance'
+  },
+  {
     viewCode: 'finanzas.clientes',
     section: 'finanzas',
     label: 'Clientes',

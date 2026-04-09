@@ -1,10 +1,10 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-04-07 por Claude
 > **Ultima actualizacion:** 2026-04-08 por Codex
 > **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md)
 
-# Modulos de Caja — Cobros, Pagos, Banco y Posicion de Caja
+# Modulos de Caja — Cobros, Pagos, Banco, Cuenta Accionista y Posicion de Caja
 
 ## Que son estos modulos
 
@@ -17,6 +17,7 @@ Finance separa explícitamente los **documentos comerciales** (facturas de venta
 | **Cobros** | `/finance/cash-in` | Dinero efectivamente recibido |
 | **Pagos** | `/finance/cash-out` | Dinero efectivamente pagado |
 | **Banco** | `/finance/bank` | Tesoreria por instrumento: saldo, coverage, discrepancia y cierre |
+| **Cuenta accionista** | `/finance/shareholder-account` | Saldo bilateral entre empresa y accionistas |
 | **Posicion de caja** | `/finance/cash-position` | Saldo real: cobrado menos pagado |
 
 ## Cobros (Cash In)
@@ -201,6 +202,46 @@ Cada cobro o pago puede asociarse a un **instrumento de pago** (cuenta bancaria,
   - tiene extracto importado
   - no quedan filas `unmatched` o `suggested`
   - la diferencia esta en cero
+
+## Cuenta corriente accionista
+
+- Vista operativa para leer y registrar la posición bilateral entre la empresa y cada accionista
+- Visible para **Superadministrador** y roles de **Finanzas**, o para usuarios con el view code `finanzas.cuenta_corriente_accionista`
+- La cuenta se monta sobre el mismo runtime de instrumentos que usa `Banco`; no vive como módulo aislado ni como identidad paralela
+- Cada cuenta queda ligada a una persona canónica (`profile_id`) y opcionalmente a un `member_id` cuando el accionista también existe como colaborador interno
+
+### Qué significa el saldo
+
+- **Crédito**:
+  - la empresa le debe al accionista
+  - caso típico: el accionista pagó un gasto con fondos propios o financió temporalmente una salida
+- **Débito**:
+  - el accionista le debe a la empresa
+  - caso típico: retiro personal, adelanto o saldo pendiente de devolución
+- **Saldado**:
+  - la relación bilateral quedó en cero para esa cuenta
+
+### Qué permite hacer
+
+- Crear una cuenta corriente accionista buscando primero la persona por nombre o email
+- Registrar movimientos manuales con:
+  - dirección (`crédito` / `débito`)
+  - tipo de movimiento
+  - monto y moneda
+  - fecha
+  - descripción, evidencia y referencias opcionales (`expense_id`, `income_id`, `payment_id`)
+- Revisar el detalle de la cuenta:
+  - saldo actual
+  - participación referencial
+  - historial filtrable por rango, dirección y tipo
+
+### Cómo se integra con el resto de Finance
+
+- Cada movimiento de CCA crea settlement legs y vuelve a materializar `account_balances`
+- Eso hace que `Cuenta accionista` y `Banco` compartan la misma base operativa de tesorería
+- Importante:
+  - la CCA no reemplaza `Cobros`, `Pagos` ni `Conciliación`
+  - cuando un movimiento se vincula a un gasto, cobro o payment real, agrega trazabilidad bilateral sobre ese evento
 
 ## Settlement y pagos internacionales
 

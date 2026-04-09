@@ -16,10 +16,42 @@
   - Evento `finance.expense_payment.recorded` registrado en catálogo y 4 projections
   - Navegación Finance actualizada con sección Caja (3 items nuevos)
 
+## Delta 2026-04-08 — Shareholder current account module completed (TASK-284)
+
+- **Nuevo instrumento de tesorería `shareholder_account`**
+  - `greenhouse_finance.accounts.instrument_category` ahora admite `shareholder_account`
+  - la CCA no vive como identidad paralela: se monta 1:1 encima de `accounts.account_id`
+  - mantiene compatibilidad con `account_balances`, settlement orchestration y cierres por instrumento
+- **Nuevo subdominio `greenhouse_finance.shareholder_accounts`**
+  - extiende el instrumento con `profile_id`, `member_id` opcional, `ownership_percentage`, `status`, `notes`, `space_id` y `metadata_json`
+  - el vínculo person-aware se resuelve contra `greenhouse_core.identity_profiles` y `greenhouse_core.members`
+  - soporta el caso donde el accionista también es usuario interno / admin del portal
+- **Nuevo ledger `greenhouse_finance.shareholder_account_movements`**
+  - append-only para cargos/abonos bilaterales entre empresa y accionista
+  - cada movimiento persiste `direction` (`credit` = empresa debe, `debit` = accionista debe), `movement_type`, monto, FX, referencias documentales y `running_balance_clp`
+  - puede vincular opcionalmente `expense_id`, `income_id`, `payment_id`, `settlement_group_id` y una cuenta contraparte
+- **Settlement y proyecciones reutilizadas**
+  - registrar un movimiento crea `settlement_group` + `settlement_legs` con `leg_type = funding`
+  - la rematerialización de `account_balances` usa el mismo carril reactivo que Banco/Tesorería
+  - eventos nuevos publicados al outbox:
+    - `finance.shareholder_account.created`
+    - `finance.shareholder_account_movement.recorded`
+    - `finance.settlement_leg.recorded`
+- **Nueva superficie operativa**
+  - página `GET /finance/shareholder-account`
+  - APIs:
+    - `GET/POST /api/finance/shareholder-account`
+    - `GET /api/finance/shareholder-account/people`
+    - `GET /api/finance/shareholder-account/[id]/balance`
+    - `GET/POST /api/finance/shareholder-account/[id]/movements`
+  - view code nuevo: `finanzas.cuenta_corriente_accionista`
+  - acceso alineado a la misma política que `Banco`: `efeonce_admin`, `finance_admin`, `finance_analyst`, salvo override explícito por authorized views
+  - la creación de cuentas ya busca personas por nombre/email en Identity y autocompleta `profile_id` / `member_id`
+
 ## Delta 2026-04-08 — Payment Instruments Registry + FX Tracking (TASK-281)
 
 - **Tabla `accounts` evolucionada** con 10 nuevas columnas para Payment Instruments:
-  - `instrument_category` (bank_account, credit_card, fintech, payment_platform, cash, payroll_processor)
+  - `instrument_category` (bank_account, credit_card, fintech, payment_platform, cash, payroll_processor, shareholder_account)
   - `provider_slug` — link al catálogo estático de proveedores (`src/config/payment-instruments.ts`)
   - `provider_identifier` — ID de cuenta en el proveedor externo
   - `card_last_four`, `card_network` — campos de tarjeta

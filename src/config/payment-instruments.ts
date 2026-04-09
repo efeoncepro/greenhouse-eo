@@ -5,7 +5,7 @@
  */
 
 export const INSTRUMENT_CATEGORIES = [
-  'bank_account', 'credit_card', 'fintech', 'payment_platform', 'cash', 'payroll_processor'
+  'bank_account', 'credit_card', 'fintech', 'payment_platform', 'cash', 'payroll_processor', 'shareholder_account'
 ] as const
 
 export type InstrumentCategory = (typeof INSTRUMENT_CATEGORIES)[number]
@@ -16,7 +16,8 @@ export const INSTRUMENT_CATEGORY_LABELS: Record<InstrumentCategory, string> = {
   fintech: 'Fintech',
   payment_platform: 'Plataforma de pagos',
   cash: 'Caja / Efectivo',
-  payroll_processor: 'Procesador de nómina'
+  payroll_processor: 'Procesador de nómina',
+  shareholder_account: 'Cuenta corriente accionista'
 }
 
 export const INSTRUMENT_CATEGORY_COLORS: Record<InstrumentCategory, 'primary' | 'info' | 'success' | 'warning' | 'error' | 'secondary'> = {
@@ -25,7 +26,8 @@ export const INSTRUMENT_CATEGORY_COLORS: Record<InstrumentCategory, 'primary' | 
   fintech: 'success',
   payment_platform: 'warning',
   cash: 'secondary',
-  payroll_processor: 'error'
+  payroll_processor: 'error',
+  shareholder_account: 'success'
 }
 
 export const INSTRUMENT_CATEGORY_ICONS: Record<InstrumentCategory, string> = {
@@ -34,7 +36,8 @@ export const INSTRUMENT_CATEGORY_ICONS: Record<InstrumentCategory, string> = {
   fintech: 'tabler-wallet',
   payment_platform: 'tabler-cloud-dollar',
   cash: 'tabler-cash',
-  payroll_processor: 'tabler-file-invoice'
+  payroll_processor: 'tabler-file-invoice',
+  shareholder_account: 'tabler-users-group'
 }
 
 export interface ProviderDefinition {
