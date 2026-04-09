@@ -108,3 +108,11 @@ La documentacion debe:
 - evitar explicar el mismo cambio con redacciones distintas en 4 archivos
 
 Si un documento ya tiene suficiente contexto y otro solo necesita continuidad, enlazar o mencionar, no reescribir.
+
+## Regla para hygiene de secretos
+
+- La política canónica de publicación/rotación de secretos vive en:
+  - `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`
+  - `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
+- `AGENTS.md`, `CLAUDE.md`, `project_context.md`, `Handoff.md` y `changelog.md` deben dejar solo el delta operativo corto y enlazar a esos documentos, no duplicar el runbook completo.

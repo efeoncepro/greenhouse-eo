@@ -59,6 +59,19 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - **Migrations:** `pnpm migrate:up`, `pnpm migrate:down`, `pnpm migrate:create <nombre>`, `pnpm migrate:status`
 - **DB types:** `pnpm db:generate-types` (regenerar después de cada migración)
 
+### Secret Manager Hygiene
+
+- Secretos consumidos por `*_SECRET_REF` deben publicarse como scalar crudo: sin comillas envolventes, sin `\n`/`\r` literal y sin whitespace residual.
+- Patrón recomendado:
+  ```bash
+  printf %s "$VALOR" | gcloud secrets versions add <secret-id> --data-file=-
+  ```
+- Siempre verificar el consumer real después de una rotación:
+  - auth: `/api/auth/providers` o `/api/auth/session`
+  - webhooks: firma/HMAC del endpoint
+  - PostgreSQL: `pnpm pg:doctor` o conexión real
+- Rotar `NEXTAUTH_SECRET` puede invalidar sesiones activas y forzar re-login.
+
 ## Key Docs
 
 - `AGENTS.md` — reglas operativas completas, branching, deploy, coordinación, PostgreSQL access
@@ -69,6 +82,10 @@ Regla: módulos de dominio extienden estos objetos, no crean identidades paralel
 - `docs/architecture/` — specs de arquitectura canónicas (30+ documentos)
 - `docs/documentation/` — documentación funcional de la plataforma en lenguaje simple, organizada por dominio (identity, finance, hr, etc.). Cada documento enlaza a su spec técnica en `docs/architecture/`
 - `docs/operations/` — modelos operativos (documentación, GitHub Project, data model, repo ecosystem)
+- Fuente canónica para higiene y rotación segura de secretos:
+  - `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`
+  - `docs/architecture/GREENHOUSE_CLOUD_SECURITY_POSTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
 
 ### Architecture Docs (los más críticos)
 

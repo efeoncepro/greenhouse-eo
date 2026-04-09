@@ -123,6 +123,11 @@ outbox_events (published) → webhook-dispatch cron (*/2 min) → matches wh-sub
   - firma HMAC obligatoria cuando existe secreto resuelto
   - dedupe cubriendo `notifications` y también `notification_log` para casos `email-only`
   - target URL sembrado sobre alias estable del request, no `VERCEL_URL` efímero
+  - los secretos resueltos por `*_SECRET_REF` deben llegar como scalar limpio:
+    - sin comillas envolventes
+    - sin `\n` / `\r` literal
+    - sin whitespace residual
+  - una rotación de secreto no se considera cerrada hasta reprobar firma/autorización del consumer real
 - Evidencia operativa confirmada:
   - `staging`: `assignment.created` visible en campanita y `payroll_period.exported` con 4 notificaciones `payroll_ready`
   - `production`: delivery firmada real `assignment.created` con notificación persistida para `user-efeonce-admin-julio-reyes`

@@ -31,6 +31,7 @@ Create an `ISSUE-###` when at least one of these is true:
 - authorization or tenant isolation is broken
 - a visible surface lies about system health or completeness
 - a deployment/migration/runtime contract regressed in a way users or operators can feel
+- a secret, env var, `*_SECRET_REF`, webhook signing secret, auth secret, or password was published/rotated incorrectly and the runtime consumer now fails or degrades
 
 Do not create an issue just because implementation work is pending.
 If there is no current malfunction or regression, use a task instead.
@@ -81,6 +82,9 @@ When a fix lands:
 - update `docs/issues/README.md`
 - add the verification actually executed
 - link the relevant commit or task when applicable
+- if the incident involved secrets or env publication, verify both:
+  - the source was corrected
+  - the affected endpoint or runtime flow recovered in the target environment
 
 ### 4. Close-Out Documentation
 

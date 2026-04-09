@@ -310,6 +310,26 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Mantener `.env.example` alineado con cualquier variable requerida por el proyecto.
 - No asumir que Vercel tiene variables cargadas.
 
+### Secret Manager y payload hygiene
+
+- Todo secreto publicado en GCP Secret Manager para consumo runtime debe ser un scalar crudo:
+  - sin comillas envolventes
+  - sin sufijos literales `\n` o `\r`
+  - sin whitespace residual al inicio o al final
+- Patrón recomendado de publicación/rotación:
+  ```bash
+  printf %s "$VALOR" | gcloud secrets versions add <secret-id> --data-file=-
+  ```
+- Nunca hacer `JSON.stringify`, copiar el valor entre comillas ni pegar bloques multilínea cuando el consumer espera un token/password simple.
+- Si un secreto usa el patrón `*_SECRET_REF`, la verificación no termina al publicarlo:
+  - confirmar que el payload quedó limpio en Secret Manager
+  - confirmar que el consumer real se recuperó en el ambiente afectado
+- Casos críticos:
+  - rotar `NEXTAUTH_SECRET` puede invalidar sesiones activas y forzar re-login
+  - rotar secretos de webhook obliga a reprobar firma/HMAC del consumer
+  - rotar passwords PostgreSQL obliga a reprobar `pnpm pg:doctor` o una conexión real
+- Si un secreto mal publicado rompe runtime, auth o integraciones, documentarlo como `ISSUE-###` aunque también exista fix defensivo en código.
+
 ### Agent Auth (acceso headless para agentes y E2E)
 
 - Endpoint: `POST /api/auth/agent-session` — genera un JWT NextAuth válido sin pasar por login interactivo.

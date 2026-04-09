@@ -204,6 +204,30 @@ Each Cloud concern must have a canonical home.
 - deploy validation expectations
 - preview baseline ownership and cleanup rules for branch overrides
 
+### 5.2.2 Secret Manager payload hygiene rule
+
+For scalar secrets consumed by Greenhouse runtime (`tokens`, `passwords`, `client secrets`, `NEXTAUTH_SECRET`, webhook signing secrets):
+
+- the payload in GCP Secret Manager must be the raw scalar only
+- do not wrap the value in quotes
+- do not append literal `\n` / `\r`
+- do not leave leading/trailing whitespace
+
+Recommended publication pattern:
+
+```bash
+printf %s "$VALOR" | gcloud secrets versions add <secret-id> --data-file=-
+```
+
+Operational guardrails:
+
+- a defensive runtime sanitizer is allowed as defense in depth, but does not make dirty payloads acceptable at source
+- every rotation of a `*_SECRET_REF` consumer requires a smoke check of the real dependent flow
+- auth secret rotations are not neutral infra changes:
+  - rotating `NEXTAUTH_SECRET` can invalidate sessions and force re-login
+- webhook secret rotations require signature/HMAC verification against the live consumer
+- PostgreSQL password rotations require `pnpm pg:doctor` or equivalent real connection verification
+
 ### 5.2.1 Preview baseline rule
 
 For Vercel in Greenhouse:

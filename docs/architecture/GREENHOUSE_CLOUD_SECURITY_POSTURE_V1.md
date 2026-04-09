@@ -8,6 +8,26 @@
 
 ---
 
+## Delta 2026-04-09 — Secret Manager payload hygiene enforced after ISSUE-032
+
+- Se confirmó un riesgo operativo real: un secreto podía existir, resolver por `*_SECRET_REF` y aun así romper runtime si el payload fue publicado con comillas envolventes o `\\n` literal.
+- Defensa en profundidad aplicada:
+  - `src/lib/secrets/secret-manager.ts` ahora sanea payloads quoted/contaminados antes de entregarlos al runtime
+- Regla de seguridad vigente:
+  - ese saneamiento no autoriza publicar secretos “sucios”
+  - el secreto fuente debe seguir siendo un scalar crudo, sin comillas, sin `\\n` / `\\r` literal y sin whitespace residual
+- Remediación en origen ya ejecutada:
+  - `greenhouse-google-client-secret-shared`
+  - `greenhouse-nextauth-secret-staging`
+  - `greenhouse-nextauth-secret-production`
+  - `webhook-notifications-secret`
+  quedaron con nuevas versiones limpias en GCP Secret Manager
+- Impacto operativo explícito:
+  - rotar `NEXTAUTH_SECRET` puede invalidar sesiones activas y requiere tratar la rotación como cambio con impacto de autenticación
+- Verificación mínima obligatoria después de una rotación:
+  - confirmar payload limpio en origen
+  - confirmar recuperación del consumer real en el ambiente afectado
+
 ## Delta 2026-03-31 — Dedicated bucket security posture applied
 
 - La postura `public vs private` ya no es solo normativa; quedó aplicada en GCP.
