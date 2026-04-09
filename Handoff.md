@@ -1,5 +1,30 @@
 # Handoff.md
 
+## Sesion 2026-04-08 — Hotfix Nubox DTE: token con comillas en Secret Manager
+
+- contexto:
+  - `Descargar PDF`, `Descargar XML` y `Actualizar estado` de DTE Nubox estaban fallando en `staging`
+  - el runtime devolvía `502`, pero la causa raíz venía de Nubox con `401 Unauthorized`
+- causa raíz confirmada:
+  - `NUBOX_BEARER_TOKEN` en `staging` se resolvía desde Secret Manager, pero el secreto `greenhouse-nubox-bearer-token-staging` estaba guardado con comillas envolventes
+  - el mismo patrón apareció también en `greenhouse-nubox-bearer-token-production`
+  - Greenhouse enviaba `Authorization: Bearer "NP_SECRET_..."`, y Nubox rechazaba tanto `GET /sales/:id` como `GET /sales/:id/pdf` / `xml`
+- fix aplicado:
+  - `src/lib/nubox/client.ts` ahora sanea el bearer token antes de usarlo:
+    - remueve comillas envolventes
+    - remueve sufijos literales `\\n`
+    - hace `trim()` final
+  - se agregó cobertura en `src/lib/nubox/client.test.ts` para tokens quoted / contaminados
+  - se publicó una nueva versión limpia de los secretos:
+    - `greenhouse-nubox-bearer-token-staging`
+    - `greenhouse-nubox-bearer-token-production`
+- validación ejecutada:
+  - `pnpm exec vitest run src/lib/nubox/client.test.ts` — OK
+  - `pnpm exec tsc --noEmit --incremental false` — OK
+  - `pnpm lint` — OK
+  - `GET /api/finance/income/INC-NB-26639047/dte-status` en staging — `200`
+  - `GET /api/finance/income/INC-NB-26639047/dte-pdf` en staging — `200 (application/pdf)`
+
 ## Sesion 2026-04-08 — Hotfix CCA en staging: listado roto por mismatch `numeric`/`text`
 
 - contexto:

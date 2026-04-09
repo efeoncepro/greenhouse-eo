@@ -2,6 +2,14 @@
 
 ## 2026-04-08
 
+### 2026-04-08 — Hotfix Nubox DTE downloads and status checks
+
+- Se corrigió un incidente donde `Descargar PDF`, `Descargar XML` y `Actualizar estado` de DTE Nubox respondían `401` desde Nubox y `502` en Greenhouse.
+- Causa raíz: los secretos `greenhouse-nubox-bearer-token-staging` y `greenhouse-nubox-bearer-token-production` estaban persistidos con comillas envolventes, por lo que el runtime enviaba un `Authorization` inválido.
+- `src/lib/nubox/client.ts` ahora sanea el bearer token antes de usarlo, removiendo comillas envolventes y sufijos literales `\n`.
+- Se publicaron nuevas versiones limpias de ambos secretos en GCP Secret Manager.
+- Validación compartida en `staging`: `GET /api/finance/income/INC-NB-26639047/dte-status` volvió a `200` y `GET /api/finance/income/INC-NB-26639047/dte-pdf` volvió a entregar `application/pdf`.
+
 ### 2026-04-08 — Finance shareholder current account module completed
 
 - Nuevo módulo `Finance > Cuenta accionista` (`/finance/shareholder-account`) para leer y operar la posición bilateral empresa ↔ accionista desde el portal.

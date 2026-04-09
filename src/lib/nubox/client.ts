@@ -24,14 +24,29 @@ const getBaseUrl = () => {
   return url.replace(/\/+$/, '')
 }
 
+const sanitizeNuboxToken = (value: string | null | undefined) => {
+  const trimmed = value?.trim()
+
+  if (!trimmed) {
+    return null
+  }
+
+  return trimmed
+    .replace(/^['"]+|['"]+$/g, '')
+    .replace(/(?:\\n)+$/g, '')
+    .trim()
+}
+
 const getBearerToken = async () => {
   const { value: token } = await resolveSecret({
     envVarName: 'NUBOX_BEARER_TOKEN'
   })
 
-  if (!token) throw new Error('NUBOX_BEARER_TOKEN is not configured')
+  const normalizedToken = sanitizeNuboxToken(token)
 
-  return token
+  if (!normalizedToken) throw new Error('NUBOX_BEARER_TOKEN is not configured')
+
+  return normalizedToken
 }
 
 const getApiKey = () => {
