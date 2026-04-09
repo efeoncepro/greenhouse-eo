@@ -96,6 +96,34 @@ describe('decodeNuboxXmlPayload', () => {
     })
   })
 
+  it('sanitizes quoted tokens with trailing literal newline markers', async () => {
+    vi.stubEnv('NUBOX_API_BASE_URL', 'https://nubox.example.com')
+    vi.stubEnv('NUBOX_X_API_KEY', 'nubox-api-key')
+    resolveSecret.mockResolvedValue({
+      source: 'secret_manager',
+      value: '"env-token\\n"'
+    })
+
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => [],
+      headers: new Headers({
+        'x-total-count': '0'
+      })
+    })
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    await listNuboxSales('2026-03')
+
+    expect(fetchMock.mock.calls[0]?.[1]).toMatchObject({
+      headers: expect.objectContaining({
+        Authorization: 'Bearer env-token'
+      })
+    })
+  })
+
   it('throws a clear error when the token is unconfigured', async () => {
     vi.stubEnv('NUBOX_API_BASE_URL', 'https://nubox.example.com')
     vi.stubEnv('NUBOX_X_API_KEY', 'nubox-api-key')
