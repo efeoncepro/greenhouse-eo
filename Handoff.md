@@ -1,5 +1,29 @@
 # Handoff.md
 
+## Sesion 2026-04-08 — Hotfix CCA en staging: listado roto por mismatch `numeric`/`text`
+
+- contexto:
+  - en `develop` ya estaba desplegado `TASK-284`, pero `/api/finance/shareholder-account` respondía `500`
+  - el drawer de creación mostraba error genérico aunque la cuenta sí alcanzaba a insertarse
+- causa raíz confirmada:
+  - `listShareholderAccounts()` en `src/lib/finance/shareholder-account/store.ts` construía `movement_summary.current_balance` y `current_balance_clp` como `text`
+  - luego hacía `COALESCE(lb.current_balance, ms.current_balance, a.opening_balance)`, mezclando `numeric` y `text`
+  - PostgreSQL devolvía: `COALESCE types numeric and text cannot be matched`
+- fix aplicado:
+  - se removió el cast `::text` dentro del CTE `movement_summary` para que el `COALESCE` opere siempre sobre `numeric`
+  - commit del fix: `e9308dd5`
+  - mergeado a `develop` y empujado: `1bdfc58b`
+- validación ejecutada:
+  - `pnpm exec tsc --noEmit --incremental false` — OK
+  - `pnpm lint` — OK
+  - reproducción SQL directa contra Cloud SQL con la consulta corregida — OK, sin `500`
+- estado de datos en staging:
+  - la cuenta `sha-cca-julio-reyes-clp` ya existe
+  - `account_name`: `CCA — Julio Reyes`
+  - `profile_id`: `identity-greenhouse-auth-client-user-user-efeonce-admin-julio-reyes`
+  - `member_id`: `julio-reyes`
+  - `space_id`: `null`
+
 ## Sesion 2026-04-08 — TASK-284 cerrada: Cuenta corriente accionista
 
 - estado actual:
