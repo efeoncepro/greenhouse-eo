@@ -1,5 +1,35 @@
 # Handoff.md
 
+## Sesion 2026-04-08 — ISSUE-031 cerrado de punta a punta: Preview baseline ya no depende de overrides por branch
+
+- contexto:
+  - el hardening de auth ya habia cerrado el deploy blocker, pero faltaba confirmar si `Preview` seguia dependiendo de env vars atadas a `develop` y ramas historicas
+  - con `vercel` CLI autenticado se pudo inspeccionar el entorno efectivo real de una preview cualquiera
+- causa raiz operativa confirmada:
+  - el `Preview` generico resolvia casi solo `NUBOX_*` + variables internas de Vercel
+  - auth, GCP, PostgreSQL, media buckets y `AGENT_AUTH_*` estaban mayormente como overrides por branch (`develop` u otras ramas), no como baseline generico de `Preview`
+  - por eso una branch nueva podia buildar con drift severo aunque `develop` pareciera sano
+- fix operativo aplicado en Vercel:
+  - se forzaron overrides genericos `preview` para:
+    - `AGENT_AUTH_EMAIL`, `AGENT_AUTH_SECRET`
+    - `AZURE_AD_CLIENT_ID`, `AZURE_AD_CLIENT_SECRET`
+    - `GCP_PROJECT`, `GCP_SERVICE_ACCOUNT_EMAIL`, `GCP_WORKLOAD_IDENTITY_PROVIDER`
+    - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
+    - `GREENHOUSE_MEDIA_BUCKET`, `GREENHOUSE_PRIVATE_ASSETS_BUCKET`, `GREENHOUSE_PUBLIC_MEDIA_BUCKET`
+    - `GREENHOUSE_POSTGRES_DATABASE`, `GREENHOUSE_POSTGRES_HOST`, `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME`, `GREENHOUSE_POSTGRES_IP_TYPE`, `GREENHOUSE_POSTGRES_MAX_CONNECTIONS`, `GREENHOUSE_POSTGRES_PASSWORD`, `GREENHOUSE_POSTGRES_SSL`, `GREENHOUSE_POSTGRES_USER`
+    - `NEXTAUTH_SECRET`, `NEXTAUTH_URL`
+    - `WEBHOOK_NOTIFICATIONS_SECRET_SECRET_REF`
+  - `GOOGLE_APPLICATION_CREDENTIALS_JSON` no se forzo porque el baseline local actual lo lleva vacio; el runtime queda cubierto por WIF (`GCP_*` + `VERCEL_OIDC_TOKEN`)
+- validacion operativa ejecutada:
+  - `vercel env pull --environment preview --git-branch fix/codex-preview-baseline-smoke` — ya resuelve `NEXTAUTH_*`, `GCP_*`, `GOOGLE_CLIENT_*`, `GREENHOUSE_POSTGRES_*` y `AGENT_AUTH_*`
+  - preview fresco desplegado: `https://greenhouse-mi5qiomu5-efeonce-7670142f.vercel.app`
+  - `GET /api/auth/session` en ese preview — `200 {}` (ya no `503`)
+  - `POST /api/auth/agent-session` con el usuario agente — `200`, devolviendo `cookieName`, `cookieValue`, `portalHomePath`, `userId`
+- documentacion a mantener alineada:
+  - `docs/issues/resolved/ISSUE-031-vercel-preview-build-fails-missing-nextauth-secret.md`
+  - `project_context.md`
+  - `changelog.md`
+
 ## Sesion 2026-04-08 — ISSUE-031 resolved: Vercel Preview build no longer dies on missing NEXTAUTH_SECRET
 
 - contexto:
