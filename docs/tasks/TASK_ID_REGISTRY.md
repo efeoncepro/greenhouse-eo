@@ -334,3 +334,23 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-282` | `complete` | Finance Payment Instrument Reconciliation & Settlement Orchestration | `docs/tasks/complete/TASK-282-finance-payment-instrument-reconciliation-settlement-orchestration.md` |
 | `TASK-283` | `complete` | Finance Bank & Treasury Module: saldos materializados, transferencias internas, coverage, multi-moneda | `docs/tasks/complete/TASK-283-finance-bank-treasury-module.md` |
 | `TASK-284` | `to-do` | Shareholder Current Account (Cuenta Corriente Accionista): movimientos bidireccionales, saldo neto, integración tesorería | `docs/tasks/to-do/TASK-284-shareholder-current-account.md` |
+| `TASK-285` | `to-do` | Client Role Differentiation for Globe Enterprise | `docs/tasks/to-do/TASK-285-client-role-differentiation.md` |
+| `TASK-286` | `to-do` | Client View Catalog Expansion (10 new view codes) | `docs/tasks/to-do/TASK-286-client-view-catalog-expansion.md` |
+| `TASK-287` | `to-do` | Revenue Enabled Standalone View | `docs/tasks/to-do/TASK-287-revenue-enabled-standalone-view.md` |
+| `TASK-288` | `to-do` | Reports Center MVP (PDF + CSV export) | `docs/tasks/to-do/TASK-288-reports-center-mvp.md` |
+| `TASK-289` | `to-do` | Reviews Split: Client vs Agency Wait | `docs/tasks/to-do/TASK-289-reviews-split-client-vs-agency.md` |
+| `TASK-290` | `to-do` | Pipeline CSC Standalone View | `docs/tasks/to-do/TASK-290-pipeline-csc-standalone-view.md` |
+| `TASK-291` | `to-do` | Brief Clarity Client View | `docs/tasks/to-do/TASK-291-brief-clarity-client-view.md` |
+| `TASK-292` | `to-do` | Mis Revisiones: Personal Review Queue | `docs/tasks/to-do/TASK-292-mis-revisiones-personal-queue.md` |
+| `TASK-293` | `to-do` | Campaigns with Performance Metrics | `docs/tasks/to-do/TASK-293-campaigns-performance-metrics.md` |
+| `TASK-294` | `to-do` | Novedades: Implementar o Eliminar | `docs/tasks/to-do/TASK-294-novedades-implementation.md` |
+| `TASK-295` | `to-do` | SLA & Performance Scorecard | `docs/tasks/to-do/TASK-295-sla-performance-scorecard.md` |
+| `TASK-296` | `to-do` | Brand Health Dashboard | `docs/tasks/to-do/TASK-296-brand-health-dashboard.md` |
+| `TASK-297` | `to-do` | Asset Tracker: Revision History per Asset | `docs/tasks/to-do/TASK-297-asset-tracker.md` |
+| `TASK-298` | `to-do` | QBR Executive Summary | `docs/tasks/to-do/TASK-298-qbr-executive-summary.md` |
+| `TASK-299` | `to-do` | Sprints Completion: Burndown & Team Velocity | `docs/tasks/to-do/TASK-299-sprints-completion.md` |
+| `TASK-300` | `to-do` | Mi Proyecto Enhanced Drill-down | `docs/tasks/to-do/TASK-300-mi-proyecto-enhanced-drilldown.md` |
+| `TASK-301` | `to-do` | Analytics Enrichment: Revenue Enabled Trend & Benchmarking | `docs/tasks/to-do/TASK-301-analytics-enrichment.md` |
+| `TASK-302` | `to-do` | Equipo Enhanced: Workload Indicators | `docs/tasks/to-do/TASK-302-equipo-enhanced.md` |
+| `TASK-303` | `to-do` | Notifications Role Differentiation | `docs/tasks/to-do/TASK-303-notifications-role-differentiation.md` |
+| `TASK-304` | `to-do` | Pulse Revenue Enabled Headline | `docs/tasks/to-do/TASK-304-pulse-revenue-headline.md` |
