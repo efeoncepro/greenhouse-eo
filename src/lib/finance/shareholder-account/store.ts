@@ -502,13 +502,13 @@ export const listShareholderAccounts = async ({
             WHEN sam.direction = 'credit' THEN sam.amount
             ELSE -sam.amount
           END
-        ), 0)::text AS current_balance,
+        ), 0) AS current_balance,
         COALESCE(SUM(
           CASE
             WHEN sam.direction = 'credit' THEN sam.amount_clp
             ELSE -sam.amount_clp
           END
-        ), 0)::text AS current_balance_clp
+        ), 0) AS current_balance_clp
       FROM greenhouse_finance.shareholder_account_movements sam
       GROUP BY sam.account_id
     )
