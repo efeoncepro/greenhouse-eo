@@ -356,3 +356,9 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-304` | `to-do` | Pulse Revenue Enabled Headline | `docs/tasks/to-do/TASK-304-pulse-revenue-headline.md` |
 | `TASK-305` | `complete` | Claude Secret Hygiene Skill | `docs/tasks/complete/TASK-305-claude-secret-hygiene-skill.md` |
 | `TASK-306` | `to-do` | Shareholder Account Canonical Traceability & Cross-Module Linkage | `docs/tasks/to-do/TASK-306-shareholder-account-canonical-traceability.md` |
+| `TASK-307` | `to-do` | Partnership Schema + Partner Programs Foundation | `docs/tasks/to-do/TASK-307-partnership-schema-partner-programs.md` |
+| `TASK-308` | `to-do` | Partnership Revenue Registration | `docs/tasks/to-do/TASK-308-partnership-revenue-registration.md` |
+| `TASK-309` | `to-do` | Partnership Serving Views + Dashboard | `docs/tasks/to-do/TASK-309-partnership-serving-views-dashboard.md` |
+| `TASK-310` | `to-do` | Partner Cost Tracking + Profitability | `docs/tasks/to-do/TASK-310-partnership-cost-tracking-profitability.md` |
+| `TASK-311` | `to-do` | Partner Contacts + Role Label | `docs/tasks/to-do/TASK-311-partnership-contacts-role-label.md` |
+| `TASK-312` | `to-do` | Partnership Automation + Alerts | `docs/tasks/to-do/TASK-312-partnership-automation-alerts.md` |
