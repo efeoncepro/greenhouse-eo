@@ -281,6 +281,55 @@ export interface HrHierarchyResponse {
   }
 }
 
+export interface HrOrgChartNode {
+  memberId: string
+  displayName: string
+  publicEmail: string
+  internalEmail: string | null
+  avatarUrl: string | null
+  roleTitle: string | null
+  roleCategory: string
+  departmentName: string | null
+  locationCountry: string | null
+  payRegime: 'chile' | 'international' | null
+  supervisorMemberId: string | null
+  supervisorName: string | null
+  depth: number
+  directReportsCount: number
+  subtreeSize: number
+  active: boolean
+  isRoot: boolean
+  isCurrentMember: boolean
+  isDirectReportToCurrentMember: boolean
+  hasActiveDelegation: boolean
+}
+
+export interface HrOrgChartEdge {
+  id: string
+  source: string
+  target: string
+}
+
+export interface HrOrgChartBreadcrumb {
+  memberId: string
+  displayName: string
+}
+
+export interface HrOrgChartResponse {
+  accessMode: 'broad' | 'supervisor'
+  currentMemberId: string | null
+  focusMemberId: string | null
+  nodes: HrOrgChartNode[]
+  edges: HrOrgChartEdge[]
+  breadcrumbs: HrOrgChartBreadcrumb[]
+  summary: {
+    totalNodes: number
+    roots: number
+    maxDepth: number
+    delegatedApprovals: number
+  }
+}
+
 export interface HrHierarchyHistoryRecord {
   reportingLineId: string
   memberId: string

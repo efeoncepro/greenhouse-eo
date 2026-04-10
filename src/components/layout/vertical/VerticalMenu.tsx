@@ -164,6 +164,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           { label: nl(GH_HR_NAV.payroll), href: '/hr/payroll', icon: 'tabler-receipt' },
           { label: nl(GH_HR_NAV.payrollProjected), href: '/hr/payroll/projected', icon: 'tabler-calculator' },
           { label: nl(GH_HR_NAV.hierarchy), href: '/hr/hierarchy', icon: 'tabler-hierarchy-2' },
+          { label: nl(GH_HR_NAV.orgChart), href: '/hr/org-chart', icon: 'tabler-hierarchy-3' },
           { label: nl(GH_HR_NAV.departments), href: '/hr/departments', icon: 'tabler-sitemap' },
           { label: nl(GH_HR_NAV.leave), href: '/hr/leave', icon: 'tabler-calendar-event' },
           { label: nl(GH_HR_NAV.attendance), href: '/hr/attendance', icon: 'tabler-clock-check' }
@@ -171,6 +172,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           if (item.href === '/hr/payroll') return canSeeView('equipo.nomina', true)
           if (item.href === '/hr/payroll/projected') return canSeeView('equipo.nomina_proyectada', true)
           if (item.href === '/hr/hierarchy') return canSeeView('equipo.jerarquia', true)
+          if (item.href === '/hr/org-chart') return canSeeView('equipo.organigrama', true)
           if (item.href === '/hr/departments') return canSeeView('equipo.departamentos', true)
           if (item.href === '/hr/leave') return canSeeView('equipo.permisos', true)
           if (item.href === '/hr/attendance') return canSeeView('equipo.asistencia', true)

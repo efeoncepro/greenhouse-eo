@@ -152,6 +152,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'hr'
   },
   {
+    viewCode: 'equipo.organigrama',
+    section: 'equipo',
+    label: 'Organigrama',
+    description: 'Explorador visual de la jerarquía canónica del equipo.',
+    routePath: '/hr/org-chart',
+    routeGroup: 'hr'
+  },
+  {
     viewCode: 'equipo.departamentos',
     section: 'equipo',
     label: 'Departamentos',

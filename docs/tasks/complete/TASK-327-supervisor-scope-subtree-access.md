@@ -79,7 +79,7 @@ Reglas obligatorias:
 ### Blocks / Impacts
 
 - `docs/tasks/complete/TASK-328-supervisor-workspace-my-team.md`
-- `docs/tasks/to-do/TASK-329-org-chart-hierarchy-explorer.md`
+- `docs/tasks/complete/TASK-329-org-chart-hierarchy-explorer.md`
 - People / HR surfaces que hoy no distinguen bien entre `hr/admin` y supervisor subtree-aware
 
 ### Files owned
@@ -180,4 +180,4 @@ Reglas obligatorias:
 ## Follow-ups
 
 - `docs/tasks/complete/TASK-328-supervisor-workspace-my-team.md`
-- `docs/tasks/to-do/TASK-329-org-chart-hierarchy-explorer.md`
+- `docs/tasks/complete/TASK-329-org-chart-hierarchy-explorer.md`

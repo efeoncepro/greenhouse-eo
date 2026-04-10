@@ -18,6 +18,25 @@ Regla operativa:
   - `greenhouse_hr.workflow_approval_snapshots`
 - no se debe reabrir la discusión de `supervisor` como role code para estas surfaces
 
+## Delta 2026-04-10 — org chart explorer materialized over canonical reporting hierarchy (TASK-329)
+
+La navegación HR ya no debe leer `Organigrama` como route target o idea futura.
+
+Estado vigente:
+- `/hr/org-chart` ya existe como explorer visual del árbol vigente
+- el explorer reutiliza la jerarquía canónica:
+  - `greenhouse_core.reporting_lines`
+  - compat snapshot `greenhouse_core.members.reports_to_member_id`
+  - delegaciones `approval_delegate` solo como señal operativa complementaria del nodo
+- el modo de lectura ya distingue:
+  - HR/admin con vista amplia
+  - supervisor con foco limitado a su subárbol visible
+
+Regla operativa:
+- el organigrama es lectura humana y drilldown, no surface de edición
+- `HR > Jerarquía` sigue siendo el lugar administrativo para cambios, historial y delegaciones
+- el explorer no debe reabrir la discusión de `supervisor` como role code ni usar `ApexCharts` como hack de grafo
+
 ## Delta 2026-04-01 — Contract model consolidation for TASK-026
 
 La consolidacion del contrato HRIS ya quedo implementada en el branch y debe leerse como contrato vigente, no como propuesta futura.
@@ -581,7 +600,7 @@ Management views for `hr_manager`, `hr_payroll`, and `efeonce_admin`.
 | Asistencia | `/hr/attendance` | `tabler-user-check` | 0 | `hr`, `admin` |
 | Aprobaciones | `/hr/approvals` | `tabler-checklist` | 0 | Users with direct reports OR `hr`, `admin`. Badge shows pending count (leave + expenses) |
 | Calendario de equipo | `/hr/team-calendar` | `tabler-calendar-stats` | 0 | All collaborators, `hr`, `admin` |
-| Organigrama | `/hr/org-chart` | `tabler-hierarchy-3` | 0 | All collaborators, `hr`, `admin` |
+| Organigrama | `/hr/org-chart` | `tabler-hierarchy-3` | 0 | Supervisor subtree-aware, `hr`, `admin` |
 | Nómina | `/hr/payroll` | `tabler-receipt-2` | 0 | `hr`, `admin` |
 | Documentos equipo | `/hr/documents` | `tabler-folders` | 1 | `hr`, `admin` |
 | Onboarding | `/hr/onboarding` | `tabler-list-check` | 1 | `hr`, `admin` |

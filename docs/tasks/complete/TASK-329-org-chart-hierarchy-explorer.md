@@ -14,7 +14,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ui`
-- Blocked by: `TASK-324, TASK-327`
+- Blocked by: `none`
 - Branch: `task/TASK-329-org-chart-hierarchy-explorer`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -44,8 +44,9 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
 - `docs/architecture/Greenhouse_HRIS_Architecture_v1.md`
 - `docs/architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md`
-- `docs/tasks/to-do/TASK-324-reporting-hierarchy-foundation.md`
+- `docs/tasks/complete/TASK-324-reporting-hierarchy-foundation.md`
 - `docs/tasks/complete/TASK-327-supervisor-scope-subtree-access.md`
+- `docs/tasks/complete/TASK-328-supervisor-workspace-my-team.md`
 
 Reglas obligatorias:
 
@@ -53,6 +54,7 @@ Reglas obligatorias:
 - No forzar `react-apexcharts` para simular organigrama; el paquete actual no trae org chart nativo en el core instalado.
 - La implementacion recomendada es `@xyflow/react` con layout jerarquico (`dagre` en la primera iteracion; `elkjs` como follow-on si hiciera falta).
 - No habilitar edicion mutante por drag-and-drop en la primera iteracion.
+- La visibilidad del explorer debe seguir el modelo vigente broad HR/admin vs supervisor subtree-aware; no usar la tabla legacy del HRIS que todavia enumera `/hr/org-chart` como si fuera una vista global para todos los colaboradores.
 
 ## Normative Docs
 
@@ -62,8 +64,10 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `docs/tasks/to-do/TASK-324-reporting-hierarchy-foundation.md`
+- `docs/tasks/complete/TASK-324-reporting-hierarchy-foundation.md`
 - `docs/tasks/complete/TASK-327-supervisor-scope-subtree-access.md`
+- `docs/tasks/complete/TASK-325-hierarchy-admin-crud.md`
+- `docs/tasks/complete/TASK-328-supervisor-workspace-my-team.md`
 - `src/app/(dashboard)/hr/layout.tsx`
 - `src/views/greenhouse/hr-core/HrCoreDashboard.tsx`
 
@@ -88,12 +92,17 @@ Reglas obligatorias:
 - la arquitectura HRIS ya documenta `/hr/org-chart`
 - `react-apexcharts` y `apexcharts` existen en el repo para charts tradicionales
 - Greenhouse ya tiene primitives UI suficientes para nodos ricos (chips, badges, cards, avatars)
+- `/hr/hierarchy` ya existe como surface admin/tabular sobre la jerarquia canonica
+- `/hr`, `/hr/team` y `/hr/approvals` ya existen como surfaces supervisor-aware
+- `src/lib/reporting-hierarchy/admin.ts` ya compone un dataset rico de jerarquia actual reusable para HR/admin
+- `src/lib/reporting-hierarchy/access.ts` y `src/lib/reporting-hierarchy/readers.ts` ya resuelven subtree visibility para supervisoria limitada
 
 ### Gap
 
 - no existe la route `/hr/org-chart`
 - no existe visual explorer de jerarquia
 - no existe decision materializada de libreria para organigrama
+- no existe un endpoint de lectura dedicado que sirva tanto modo HR/admin como modo supervisor sin exponer la API admin de `/api/hr/core/hierarchy`
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC

@@ -78,7 +78,7 @@ Reglas obligatorias:
 ### Blocks / Impacts
 
 - `docs/tasks/complete/TASK-328-supervisor-workspace-my-team.md`
-- `docs/tasks/to-do/TASK-329-org-chart-hierarchy-explorer.md`
+- `docs/tasks/complete/TASK-329-org-chart-hierarchy-explorer.md`
 - operacion diaria de RRHH y liderazgo interno
 
 ### Files owned

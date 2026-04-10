@@ -91,6 +91,10 @@ La materialización runtime actual quedó así:
   - supervisor limitado ve su workspace `Mi equipo`
 - `/hr/team` materializa la vista operativa del subárbol visible
 - `/hr/approvals` materializa la cola de aprobaciones basada en snapshots del workflow
+- `/hr/org-chart` materializa el explorer visual del árbol accesible
+  - HR/admin puede recorrer la estructura completa
+  - supervisor limitado ve solo el subárbol que ya puede operar
+  - el explorer sirve para leer foco, cadena ascendente y quick actions hacia People
 - `/hr/leave` sigue siendo la surface completa de permisos y el lugar de revisión detallada
 
 Esto mantiene una separación clara:

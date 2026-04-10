@@ -89,6 +89,13 @@ export const hasBroadHrLeaveAccess = (tenant: TenantContext) =>
     fallback: tenant.routeGroups.includes('hr') || tenant.roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)
   })
 
+export const hasBroadHrOrgChartAccess = (tenant: TenantContext) =>
+  hasAuthorizedViewCode({
+    tenant,
+    viewCode: 'equipo.organigrama',
+    fallback: tenant.routeGroups.includes('hr') || tenant.roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)
+  })
+
 export const resolvePeopleAccessContext = async (
   tenant: TenantContext
 ): Promise<DerivedTenantAccessContext | null> => {
