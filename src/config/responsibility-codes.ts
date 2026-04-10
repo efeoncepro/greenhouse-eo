@@ -25,7 +25,7 @@ export const RESPONSIBILITY_TYPE_LABELS: Record<ResponsibilityType, string> = {
 
 // ── Scope Types ──
 
-export const SCOPE_TYPES = ['organization', 'space', 'project', 'department'] as const
+export const SCOPE_TYPES = ['organization', 'space', 'project', 'department', 'member'] as const
 
 export type ScopeType = (typeof SCOPE_TYPES)[number]
 
@@ -33,5 +33,6 @@ export const SCOPE_TYPE_LABELS: Record<ScopeType, string> = {
   organization: 'Organización',
   space: 'Space',
   project: 'Proyecto',
-  department: 'Departamento'
+  department: 'Departamento',
+  member: 'Miembro'
 }

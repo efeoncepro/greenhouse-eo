@@ -372,3 +372,11 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-320` | `to-do` | Talent Ops Analytics, Completeness & Maintenance Automation | `docs/tasks/to-do/TASK-320-talent-ops-analytics-maintenance-automation.md` |
 | `TASK-321` | `to-do` | Space 360 View: UI/UX polish y eliminacion de jerga tecnica | `docs/tasks/to-do/TASK-321-space-360-ui-ux-polish.md` |
 | `TASK-322` | `to-do` | Enriquecer Cuentas Detail con tabs operativas y deprecar Tenant Detail legacy | `docs/tasks/to-do/TASK-322-admin-tenant-detail-ui-overhaul.md` |
+| `TASK-323` | `to-do` | Programa enterprise de jerarquias, supervisoria y permisos de aprobacion | `docs/tasks/to-do/TASK-323-hierarchy-supervisor-approval-program.md` |
+| `TASK-324` | `complete` | Modelo canonico de jerarquia de reporte, historial y delegaciones | `docs/tasks/complete/TASK-324-reporting-hierarchy-foundation.md` |
+| `TASK-325` | `to-do` | Admin de jerarquias: CRUD, reasignaciones y auditoria | `docs/tasks/to-do/TASK-325-hierarchy-admin-crud-audit.md` |
+| `TASK-326` | `to-do` | Autoridad de aprobacion por dominio y snapshots de workflow | `docs/tasks/to-do/TASK-326-approval-authority-workflow-snapshots.md` |
+| `TASK-327` | `to-do` | Supervisor scope: acceso subtree-aware y visibilidad limitada | `docs/tasks/to-do/TASK-327-supervisor-scope-subtree-access.md` |
+| `TASK-328` | `to-do` | Workspace de supervisor: Mi equipo y cola de aprobaciones | `docs/tasks/to-do/TASK-328-supervisor-workspace-my-team.md` |
+| `TASK-329` | `to-do` | Organigrama y explorador de jerarquias | `docs/tasks/to-do/TASK-329-org-chart-hierarchy-explorer.md` |
+| `TASK-330` | `to-do` | Gobernanza de fuentes, sync y drift de jerarquias | `docs/tasks/to-do/TASK-330-hierarchy-sync-drift-governance.md` |

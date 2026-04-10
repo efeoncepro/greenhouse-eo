@@ -599,6 +599,20 @@ export interface GreenhouseCoreProviders {
   website_url: string | null;
 }
 
+export interface GreenhouseCoreReportingLines {
+  change_reason: Generated<string>;
+  changed_by_user_id: string | null;
+  created_at: Generated<Timestamp>;
+  effective_from: Generated<Timestamp>;
+  effective_to: Timestamp | null;
+  member_id: string;
+  reporting_line_id: string;
+  source_metadata: Generated<Json>;
+  source_system: Generated<string>;
+  supervisor_member_id: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCoreRoles {
   created_at: Generated<Timestamp>;
   description: string | null;
@@ -3743,6 +3757,7 @@ export interface DB {
   "greenhouse_core.permission_sets": GreenhouseCorePermissionSets;
   "greenhouse_core.person_memberships": GreenhouseCorePersonMemberships;
   "greenhouse_core.providers": GreenhouseCoreProviders;
+  "greenhouse_core.reporting_lines": GreenhouseCoreReportingLines;
   "greenhouse_core.role_view_assignments": GreenhouseCoreRoleViewAssignments;
   "greenhouse_core.roles": GreenhouseCoreRoles;
   "greenhouse_core.scim_group_memberships": GreenhouseCoreScimGroupMemberships;

@@ -129,6 +129,19 @@ async function validateScopeExists(scopeType: ScopeType, scopeId: string): Promi
 
       break
     }
+
+    case 'member': {
+      const rows = await db
+        .selectFrom('greenhouse_core.members')
+        .select('member_id')
+        .where('member_id', '=', scopeId)
+        .limit(1)
+        .execute()
+
+      exists = rows.length > 0
+
+      break
+    }
   }
 
   if (!exists) {

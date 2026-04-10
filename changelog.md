@@ -4922,6 +4922,13 @@
 
 # Changelog
 
+## 2026-04-10
+
+- Identity/HR foundation: `TASK-324` introdujo `greenhouse_core.reporting_lines` como source of truth historizable para supervisoría formal, manteniendo `greenhouse_core.members.reports_to_member_id` como snapshot actual y capa de compatibilidad para consumers legacy.
+- Reporting hierarchy: se agregaron readers canónicos para supervisor actual/efectivo, reportes directos, subárbol, cadena ascendente y miembros sin supervisor en `src/lib/reporting-hierarchy/*`.
+- HR Core: `updateMemberHrProfile()` ya no muta `reports_to_member_id` de forma aislada; ahora escribe la relación formal vía reporting hierarchy y publica `reporting_hierarchy.updated`.
+- Operational responsibility: `approval_delegate` ya puede scoped por `member`, permitiendo que la delegación temporal del supervisor efectivo reutilice el registry canónico en vez de abrir storage paralelo.
+
 ## 2026-04-03
 
 - Finance: se corrigió la semántica visible de `income` / `expenses` para dejar explícito que los documentos sincronizados desde Nubox son ledgers de venta/compra y devengo, no equivalentes directos a cobros/pagos. La navegación, títulos y copy de Finance ahora distinguen mejor documento vs caja.

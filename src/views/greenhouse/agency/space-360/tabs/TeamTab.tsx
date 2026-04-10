@@ -297,6 +297,7 @@ const TeamTab = ({ detail }: Props) => {
                     },
                     member.placementProviderName && { label: 'Placement / provider', value: member.placementProviderName }
                   ].filter(Boolean) as Array<{ label: string; value: string }>
+
                   const memberHasVerifiedSkills = hasVerifiedSkills(member.skills)
 
                   return (

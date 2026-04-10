@@ -52,7 +52,8 @@ describe('getCloudGcpAuthPosture', () => {
       GCP_WORKLOAD_IDENTITY_PROVIDER: 'projects/123/locations/global/workloadIdentityPools/p/providers/p',
       GCP_SERVICE_ACCOUNT_EMAIL: 'runtime@example.com',
       VERCEL: '1',
-      VERCEL_ENV: 'staging'
+      VERCEL_URL: 'greenhouse-test.vercel.app',
+      VERCEL_OIDC_TOKEN: 'oidc-token-for-test'
     }))
 
     expect(posture.mode).toBe('wif')
@@ -66,7 +67,8 @@ describe('getCloudGcpAuthPosture', () => {
       GCP_SERVICE_ACCOUNT_EMAIL: 'runtime@example.com',
       GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64: 'e30=',
       VERCEL: '1',
-      VERCEL_ENV: 'staging'
+      VERCEL_URL: 'greenhouse-test.vercel.app',
+      VERCEL_OIDC_TOKEN: 'oidc-token-for-test'
     }))
 
     expect(posture.mode).toBe('mixed')
