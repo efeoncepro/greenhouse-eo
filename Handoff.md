@@ -1,5 +1,54 @@
 # Handoff.md
 
+## Sesion 2026-04-10 — TASK-325 cerrada: admin de jerarquías HR
+
+- alcance cerrado:
+  - nueva superficie `HR > Jerarquía` en `/hr/hierarchy`
+  - nuevas APIs dedicadas:
+    - `GET /api/hr/core/hierarchy`
+    - `GET /api/hr/core/hierarchy/history`
+    - `POST /api/hr/core/hierarchy/reassign`
+    - `GET/POST/DELETE /api/hr/core/hierarchy/delegations`
+  - nueva helper lane `src/lib/reporting-hierarchy/admin.ts` para:
+    - listado enriquecido de jerarquía actual
+    - historial auditado de `reporting_lines`
+    - delegaciones temporales por `approval_delegate`
+    - cambio individual de supervisor
+    - reasignación bulk de reportes directos
+  - `src/lib/reporting-hierarchy/store.ts` ahora expone `upsertReportingLineInTransaction()` para reuse transaccional en bulk ops
+  - navegación/access actualizados:
+    - `equipo.jerarquia` en view catalog
+    - item nuevo en menú HR
+    - entry point desde `HrCoreDashboard`
+    - búsqueda rápida alineada a `/hr/hierarchy`
+  - documentación alineada:
+    - snapshot baseline ahora incluye `operational_responsibilities`
+    - docs de arquitectura y documentación funcional HR ya mencionan la nueva surface
+  - migración de hardening aplicada:
+    - `migrations/20260410105829326_reporting-hierarchy-runtime-grants.sql`
+    - resuelve grants runtime sobre `greenhouse_core.reporting_lines`
+- archivos sensibles / de alto impacto tocados:
+  - `src/lib/reporting-hierarchy/store.ts`
+  - `src/lib/reporting-hierarchy/admin.ts`
+  - `src/app/api/hr/core/hierarchy/**`
+  - `src/views/greenhouse/hr-core/HrHierarchyView.tsx`
+  - `src/app/(dashboard)/hr/layout.tsx`
+  - `src/app/(dashboard)/hr/page.tsx`
+  - `src/app/(dashboard)/hr/hierarchy/page.tsx`
+  - `src/components/layout/vertical/VerticalMenu.tsx`
+  - `src/lib/admin/view-access-catalog.ts`
+  - `docs/architecture/schema-snapshot-baseline.sql`
+- validación ejecutada:
+  - `pnpm pg:connect:migrate` — OK
+  - runtime query a `greenhouse_core.reporting_lines` como app user — OK (`count = 7`)
+  - `pnpm exec tsc --noEmit --incremental false` — OK
+  - `pnpm exec vitest run src/app/api/hr/core/hierarchy/route.test.ts src/app/api/hr/core/hierarchy/history/route.test.ts src/app/api/hr/core/hierarchy/reassign/route.test.ts src/app/api/hr/core/hierarchy/delegations/route.test.ts src/views/greenhouse/hr-core/HrHierarchyView.test.tsx` — OK
+  - `pnpm lint` — OK
+  - `pnpm build` — OK
+- nota operativa:
+  - `members`, `reporting_lines` y `operational_responsibilities` siguen sin `space_id`; el aislamiento actual de esta capacidad entra por `tenant context`, route group `hr` y `authorizedViews`, no por filtro físico por tenant en esas tablas
+  - quedaron cambios ajenos ya presentes en el worktree bajo `docs/issues/**`, `docs/architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` y `src/app/api/internal/ico-diagnostics/route.ts`; no se tocaron ni se deben revertir desde este slice
+
 ## Sesion 2026-04-10 — foundation compartida de iconografia: Tabler + Flaticon + BrandLogo
 
 - alcance en curso:

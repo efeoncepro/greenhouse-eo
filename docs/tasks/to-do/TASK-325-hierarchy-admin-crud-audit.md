@@ -11,11 +11,11 @@
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Auditada`
 - Rank: `TBD`
 - Domain: `hr`
-- Blocked by: `TASK-324`
-- Branch: `task/TASK-325-hierarchy-admin-crud-audit`
+- Blocked by: `none`
+- Branch: `feature/codex-task-325-hierarchy-admin-crud`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -52,7 +52,7 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md`
 - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `docs/architecture/Greenhouse_HRIS_Architecture_v1.md`
-- `docs/tasks/to-do/TASK-324-reporting-hierarchy-foundation.md`
+- `docs/tasks/complete/TASK-324-reporting-hierarchy-foundation.md`
 
 Reglas obligatorias:
 
@@ -60,6 +60,7 @@ Reglas obligatorias:
 - Toda mutacion debe pedir motivo y quedar auditada.
 - Los selectores de supervisor deben reutilizar members/options y no inventar otro directorio paralelo.
 - No habilitar drag-and-drop mutante sin historia, preview y confirmacion.
+- La surface debe vivir sobre reporting hierarchy; `departments` solo puede aportar filtros o contexto visual, nunca source of truth de supervisoria.
 
 ## Normative Docs
 
@@ -69,9 +70,10 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `docs/tasks/to-do/TASK-324-reporting-hierarchy-foundation.md`
+- `docs/tasks/complete/TASK-324-reporting-hierarchy-foundation.md`
 - `src/app/api/hr/core/members/options/route.ts`
-- `src/views/greenhouse/hr-core/HrDepartmentsView.tsx`
+- `src/lib/reporting-hierarchy/readers.ts`
+- `src/lib/reporting-hierarchy/store.ts`
 
 ### Blocks / Impacts
 
@@ -81,22 +83,24 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `src/views/greenhouse/hr-core/HrDepartmentsView.tsx`
-- `src/views/greenhouse/hr-core/HrCoreDashboard.tsx`
-- `src/app/(dashboard)/hr/departments/page.tsx`
+- `src/lib/reporting-hierarchy/*`
 - `src/app/api/hr/core/members/options/route.ts`
-- `src/lib/hr-core/service.ts`
 - `src/lib/admin/view-access-catalog.ts`
-- `[verificar] src/app/(dashboard)/hr/hierarchy/page.tsx`
-- `[verificar] src/views/greenhouse/hr-core/HrHierarchyView.tsx`
+- `src/views/greenhouse/hr-core/HrCoreDashboard.tsx`
+- `[nuevo] src/app/(dashboard)/hr/hierarchy/page.tsx`
+- `[nuevo] src/views/greenhouse/hr-core/HrHierarchyView.tsx`
+- `[nuevo] src/app/api/hr/core/hierarchy/**`
 
 ## Current Repo State
 
 ### Already exists
 
-- `HR > Departments` ya tiene surface operativa sobre PostgreSQL
+- `TASK-324` ya dejo `greenhouse_core.reporting_lines` como foundation canonica de supervisoria
 - `src/app/api/hr/core/members/options/route.ts` ya existe para selectores de miembros
-- `src/lib/hr-core/service.ts` ya soporta update de `reportsTo` en algunos flows de perfil/member
+- `src/lib/hr-core/service.ts` ya enruta cambios de `reportsTo` por `src/lib/reporting-hierarchy/store.ts`
+- `src/lib/reporting-hierarchy/readers.ts` ya expone subtree, chain, supervisor actual y supervisor efectivo
+- `src/views/greenhouse/admin/responsibilities/AdminResponsibilitiesView.tsx` y `/api/admin/responsibilities` ya dan un patron CRUD reusable para delegaciones scoped
+- `HR > Departments` ya tiene una surface operativa sobre PostgreSQL, pero solo como referencia de patron y entry point cercano
 
 ### Gap
 
@@ -104,6 +108,8 @@ Reglas obligatorias:
 - no existe bulk reassignment de subarbol
 - no existe historial visible de cambios de supervisoria
 - las delegaciones temporales no tienen UX ni control de vigencia
+- no existe un API dedicado para reporting hierarchy admin
+- `schema-snapshot-baseline.sql` todavia no refleja `operational_responsibilities`
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC

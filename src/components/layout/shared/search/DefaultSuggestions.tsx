@@ -73,6 +73,11 @@ const defaultSuggestions: DefaultSuggestionsType[] = [
         icon: 'tabler-receipt'
       },
       {
+        label: 'Jerarquía',
+        href: '/hr/hierarchy',
+        icon: 'tabler-hierarchy-2'
+      },
+      {
         label: 'Departamentos',
         href: '/hr/departments',
         icon: 'tabler-sitemap'

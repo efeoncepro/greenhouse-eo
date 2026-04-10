@@ -222,7 +222,10 @@ const reloadReportingLine = async (
   return mapReportingLine(row)
 }
 
-export const upsertReportingLine = async (input: UpsertReportingLineInput): Promise<ReportingLineRecord> => {
+export const upsertReportingLineInTransaction = async (
+  input: UpsertReportingLineInput,
+  client: PoolClient
+): Promise<ReportingLineRecord> => {
   const memberId = String(input.memberId || '').trim()
   const supervisorMemberId = input.supervisorMemberId ? String(input.supervisorMemberId).trim() : null
   const actorUserId = input.actorUserId ? String(input.actorUserId).trim() : null
@@ -239,99 +242,100 @@ export const upsertReportingLine = async (input: UpsertReportingLineInput): Prom
     throw new Error('A member cannot report to itself.')
   }
 
-  return withTransaction(async client => {
-    await assertReportingLineChangeAllowedInTransaction({ memberId, supervisorMemberId, client })
+  await assertReportingLineChangeAllowedInTransaction({ memberId, supervisorMemberId, client })
 
-    const currentLine = await getCurrentReportingLineForUpdate(memberId, client)
+  const currentLine = await getCurrentReportingLineForUpdate(memberId, client)
 
-    if (currentLine?.supervisor_member_id === supervisorMemberId) {
-      return reloadReportingLine(memberId, client)
-    }
-
-    if (currentLine) {
-      const currentEffectiveFrom = new Date(currentLine.effective_from)
-      const nextEffectiveFrom = new Date(effectiveFrom)
-
-      if (nextEffectiveFrom <= currentEffectiveFrom) {
-        throw new Error('effectiveFrom must be later than the current active reporting line.')
-      }
-
-      await queryRows(
-        `
-          UPDATE greenhouse_core.reporting_lines
-          SET
-            effective_to = $2::timestamptz,
-            updated_at = CURRENT_TIMESTAMP
-          WHERE reporting_line_id = $1
-        `,
-        [currentLine.reporting_line_id, effectiveFrom],
-        client
-      )
-    }
-
-    const reportingLineId = `rpt-${randomUUID()}`
-
-    await queryRows(
-      `
-        INSERT INTO greenhouse_core.reporting_lines (
-          reporting_line_id,
-          member_id,
-          supervisor_member_id,
-          effective_from,
-          source_system,
-          source_metadata,
-          change_reason,
-          changed_by_user_id
-        )
-        VALUES ($1, $2, $3, $4::timestamptz, $5, $6::jsonb, $7, $8)
-      `,
-      [
-        reportingLineId,
-        memberId,
-        supervisorMemberId,
-        effectiveFrom,
-        sourceSystem,
-        JSON.stringify(sourceMetadata),
-        changeReason,
-        actorUserId
-      ],
-      client
-    )
-
-    await queryRows(
-      `
-        UPDATE greenhouse_core.members
-        SET
-          reports_to_member_id = $2,
-          updated_at = CURRENT_TIMESTAMP
-        WHERE member_id = $1
-      `,
-      [memberId, supervisorMemberId],
-      client
-    )
-
-    await publishOutboxEvent(
-      {
-        aggregateType: AGGREGATE_TYPES.reportingHierarchy,
-        aggregateId: memberId,
-        eventType: EVENT_TYPES.reportingHierarchyUpdated,
-        payload: {
-          memberId,
-          reportingLineId,
-          previousSupervisorMemberId: currentLine?.supervisor_member_id ?? null,
-          supervisorMemberId,
-          changedByUserId: actorUserId,
-          changeReason,
-          sourceSystem,
-          sourceMetadata
-        }
-      },
-      client
-    )
-
+  if (currentLine?.supervisor_member_id === supervisorMemberId) {
     return reloadReportingLine(memberId, client)
-  })
+  }
+
+  if (currentLine) {
+    const currentEffectiveFrom = new Date(currentLine.effective_from)
+    const nextEffectiveFrom = new Date(effectiveFrom)
+
+    if (nextEffectiveFrom <= currentEffectiveFrom) {
+      throw new Error('effectiveFrom must be later than the current active reporting line.')
+    }
+
+    await queryRows(
+      `
+        UPDATE greenhouse_core.reporting_lines
+        SET
+          effective_to = $2::timestamptz,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE reporting_line_id = $1
+      `,
+      [currentLine.reporting_line_id, effectiveFrom],
+      client
+    )
+  }
+
+  const reportingLineId = `rpt-${randomUUID()}`
+
+  await queryRows(
+    `
+      INSERT INTO greenhouse_core.reporting_lines (
+        reporting_line_id,
+        member_id,
+        supervisor_member_id,
+        effective_from,
+        source_system,
+        source_metadata,
+        change_reason,
+        changed_by_user_id
+      )
+      VALUES ($1, $2, $3, $4::timestamptz, $5, $6::jsonb, $7, $8)
+    `,
+    [
+      reportingLineId,
+      memberId,
+      supervisorMemberId,
+      effectiveFrom,
+      sourceSystem,
+      JSON.stringify(sourceMetadata),
+      changeReason,
+      actorUserId
+    ],
+    client
+  )
+
+  await queryRows(
+    `
+      UPDATE greenhouse_core.members
+      SET
+        reports_to_member_id = $2,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE member_id = $1
+    `,
+    [memberId, supervisorMemberId],
+    client
+  )
+
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.reportingHierarchy,
+      aggregateId: memberId,
+      eventType: EVENT_TYPES.reportingHierarchyUpdated,
+      payload: {
+        memberId,
+        reportingLineId,
+        previousSupervisorMemberId: currentLine?.supervisor_member_id ?? null,
+        supervisorMemberId,
+        changedByUserId: actorUserId,
+        changeReason,
+        sourceSystem,
+        sourceMetadata
+      }
+    },
+    client
+  )
+
+  return reloadReportingLine(memberId, client)
 }
+
+export const upsertReportingLine = async (input: UpsertReportingLineInput): Promise<ReportingLineRecord> =>
+  withTransaction(client => upsertReportingLineInTransaction(input, client))
 
 export const clearReportingLine = async (
   input: Omit<UpsertReportingLineInput, 'supervisorMemberId'>

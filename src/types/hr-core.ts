@@ -214,6 +214,81 @@ export interface HrMemberOptionsResponse {
   members: HrMemberOption[]
 }
 
+export interface HrHierarchyRecord {
+  reportingLineId: string
+  memberId: string
+  memberName: string
+  memberActive: boolean
+  roleTitle: string | null
+  departmentId: string | null
+  departmentName: string | null
+  supervisorMemberId: string | null
+  supervisorName: string | null
+  supervisorActive: boolean | null
+  effectiveFrom: string
+  sourceSystem: string
+  changeReason: string
+  changedByUserId: string | null
+  directReportsCount: number
+  subtreeSize: number
+  depth: number
+  isRoot: boolean
+  delegation: {
+    responsibilityId: string
+    delegateMemberId: string
+    delegateMemberName: string | null
+    effectiveFrom: string
+    effectiveTo: string | null
+  } | null
+}
+
+export interface HrHierarchyResponse {
+  items: HrHierarchyRecord[]
+  summary: {
+    total: number
+    active: number
+    roots: number
+    withoutSupervisor: number
+    delegatedApprovals: number
+  }
+}
+
+export interface HrHierarchyHistoryRecord {
+  reportingLineId: string
+  memberId: string
+  memberName: string
+  supervisorMemberId: string | null
+  supervisorName: string | null
+  previousSupervisorMemberId: string | null
+  previousSupervisorName: string | null
+  effectiveFrom: string
+  effectiveTo: string | null
+  sourceSystem: string
+  changeReason: string
+  changedByUserId: string | null
+  changedByName: string | null
+  createdAt: string
+}
+
+export interface HrHierarchyDelegationRecord {
+  responsibilityId: string
+  supervisorMemberId: string
+  supervisorName: string | null
+  delegateMemberId: string
+  delegateMemberName: string | null
+  effectiveFrom: string
+  effectiveTo: string | null
+  active: boolean
+  isPrimary: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface HrHierarchyHistoryResponse {
+  history: HrHierarchyHistoryRecord[]
+  delegations: HrHierarchyDelegationRecord[]
+}
+
 export interface HrLeaveBalancesResponse {
   balances: HrLeaveBalance[]
   policies?: HrLeavePolicy[]

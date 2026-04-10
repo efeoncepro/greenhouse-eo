@@ -27,6 +27,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 ### HR y Nomina
 
 - [Sistema de Permisos y Licencias](hr/sistema-permisos-leave.md) — tipos de permiso, medio dia (AM/PM), calculo de dias habiles, flujo de aprobacion, saldo y acumulacion
+- [Jerarquía de Reporte y Supervisoría](hr/jerarquia-reporte-supervisoria.md) — gestion de supervisores, delegaciones temporales, historial y diferencias con departamentos
 
 ### Personas
 

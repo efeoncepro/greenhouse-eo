@@ -304,6 +304,7 @@ Regla operativa:
 
 - `supervisor` no es un role code; es una relación derivada de `reports_to_member_id`
 - `departments` no reemplaza ownership operativo ni aprobaciones por sí solo
+- la surface de administración de supervisoría se expone como vista `equipo.jerarquia` bajo el route group `hr`
 - la matriz base `role_code -> routeGroups -> catálogo de vistas` debe leerse en `docs/architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md`
 
 ## Purpose
