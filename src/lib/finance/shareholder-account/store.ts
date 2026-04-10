@@ -18,6 +18,14 @@ import {
   type FinanceCurrency
 } from '@/lib/finance/shared'
 import { rematerializeAccountBalancesFromDate } from '@/lib/finance/account-balances'
+import {
+  getShareholderMovementSourceSummaries,
+  inferShareholderMovementSource,
+  resolveShareholderMovementSource,
+  type ShareholderMovementSourceSummary,
+  type ShareholderMovementSourceType,
+  type ShareholderMovementTenantScope
+} from '@/lib/finance/shareholder-account/source-links'
 
 import type { DB } from '@/types/db'
 
@@ -81,6 +89,8 @@ type ShareholderMovementRow = {
   evidence_url: string | null
   movement_date: string | Date | null
   running_balance_clp: unknown
+  source_type: string | null
+  source_id: string | null
   space_id: string | null
   recorded_by_user_id: string | null
   recorded_at: string | Date | null
@@ -152,6 +162,9 @@ export type ShareholderAccountMovement = {
   evidenceUrl: string | null
   movementDate: string
   runningBalanceClp: number | null
+  sourceType: ShareholderMovementSourceType
+  sourceId: string | null
+  source: ShareholderMovementSourceSummary | null
   spaceId: string | null
   recordedByUserId: string | null
   recordedAt: string | null
@@ -192,10 +205,13 @@ export type RecordShareholderMovementInput = {
   linkedIncomeId?: string | null
   linkedPaymentType?: 'income_payment' | 'expense_payment' | null
   linkedPaymentId?: string | null
+  sourceType?: ShareholderMovementSourceType | null
+  sourceId?: string | null
   counterpartyAccountId?: string | null
   exchangeRateOverride?: number | null
   spaceId?: string | null
   actorUserId?: string | null
+  tenantScope?: ShareholderMovementTenantScope | null
 }
 
 const slugify = (value: string) =>
@@ -261,6 +277,15 @@ const mapSummaryRow = (row: ShareholderAccountSummaryRow): ShareholderAccountSum
 })
 
 const mapMovementRow = (row: ShareholderMovementRow): ShareholderAccountMovement => ({
+  ...inferShareholderMovementSource({
+    sourceType: row.source_type,
+    sourceId: row.source_id,
+    linkedExpenseId: row.linked_expense_id,
+    linkedIncomeId: row.linked_income_id,
+    linkedPaymentType: row.linked_payment_type,
+    linkedPaymentId: row.linked_payment_id,
+    settlementGroupId: row.settlement_group_id
+  }),
   movementId: normalizeString(row.movement_id),
   accountId: normalizeString(row.account_id),
   direction: normalizeString(row.direction) as ShareholderMovementDirection,
@@ -280,6 +305,7 @@ const mapMovementRow = (row: ShareholderMovementRow): ShareholderAccountMovement
   evidenceUrl: row.evidence_url ? normalizeString(row.evidence_url) : null,
   movementDate: toDateString(row.movement_date) || '',
   runningBalanceClp: row.running_balance_clp != null ? roundCurrency(toNumber(row.running_balance_clp)) : null,
+  source: null,
   spaceId: row.space_id ? normalizeString(row.space_id) : null,
   recordedByUserId: row.recorded_by_user_id ? normalizeString(row.recorded_by_user_id) : null,
   recordedAt: row.recorded_at instanceof Date ? row.recorded_at.toISOString() : row.recorded_at
@@ -408,6 +434,37 @@ const validateCounterpartyAccount = async (accountId: string, currency: string) 
 
 const buildMovementSettlementDirection = (direction: ShareholderMovementDirection) =>
   direction === 'credit' ? 'incoming' : 'outgoing'
+
+const enrichShareholderMovements = async ({
+  movements,
+  tenantScope
+}: {
+  movements: ShareholderAccountMovement[]
+  tenantScope?: ShareholderMovementTenantScope | null
+}) => {
+  if (!tenantScope || movements.length === 0) {
+    return movements
+  }
+
+  const sourceSummaries = await getShareholderMovementSourceSummaries({
+    scope: tenantScope,
+    refs: movements.map(movement => ({
+      sourceType: movement.sourceType,
+      sourceId: movement.sourceId
+    }))
+  })
+
+  return movements.map(movement => {
+    if (!movement.sourceId || movement.sourceType === 'manual') {
+      return movement
+    }
+
+    return {
+      ...movement,
+      source: sourceSummaries.get(`${movement.sourceType}:${movement.sourceId}`) || null
+    }
+  })
+}
 
 export const listShareholderPersonOptions = async ({
   search
@@ -692,13 +749,15 @@ export const listShareholderAccountMovements = async ({
   startDate,
   endDate,
   direction,
-  movementType
+  movementType,
+  tenantScope
 }: {
   accountId: string
   startDate?: string | null
   endDate?: string | null
   direction?: ShareholderMovementDirection | null
   movementType?: ShareholderMovementType | null
+  tenantScope?: ShareholderMovementTenantScope | null
 }): Promise<ShareholderAccountMovement[]> => {
   const normalizedAccountId = assertNonEmptyString(accountId, 'accountId')
 
@@ -749,6 +808,8 @@ export const listShareholderAccountMovements = async ({
         sam.evidence_url,
         sam.movement_date,
         sam.running_balance_clp,
+        sam.source_type,
+        sam.source_id,
         sam.space_id,
         sam.recorded_by_user_id,
         sam.recorded_at
@@ -761,7 +822,10 @@ export const listShareholderAccountMovements = async ({
     params
   )
 
-  return rows.map(mapMovementRow)
+  return enrichShareholderMovements({
+    movements: rows.map(mapMovementRow),
+    tenantScope
+  })
 }
 
 export const getShareholderAccountBalance = async (accountId: string): Promise<ShareholderAccountBalance> => {
@@ -864,10 +928,36 @@ export const recordShareholderAccountMovement = async (
 
   const description = normalizeString(input.description) || null
   const evidenceUrl = normalizeString(input.evidenceUrl) || null
-  const linkedExpenseId = normalizeString(input.linkedExpenseId) || null
-  const linkedIncomeId = normalizeString(input.linkedIncomeId) || null
-  const linkedPaymentType = input.linkedPaymentType ? normalizeString(input.linkedPaymentType) as 'income_payment' | 'expense_payment' : null
-  const linkedPaymentId = normalizeString(input.linkedPaymentId) || null
+  const normalizedTenantScope = input.tenantScope || null
+
+  const inferredSource = inferShareholderMovementSource({
+    sourceType: input.sourceType,
+    sourceId: input.sourceId,
+    linkedExpenseId: input.linkedExpenseId,
+    linkedIncomeId: input.linkedIncomeId,
+    linkedPaymentType: input.linkedPaymentType,
+    linkedPaymentId: input.linkedPaymentId
+  })
+
+  if (inferredSource.sourceType !== 'manual' && (!normalizedTenantScope || !inferredSource.sourceId)) {
+    throw new FinanceValidationError('A tenant-scoped canonical source is required for non-manual shareholder movements.', 422)
+  }
+
+  const resolvedSource = inferredSource.sourceType !== 'manual' && inferredSource.sourceId && normalizedTenantScope
+    ? await resolveShareholderMovementSource({
+        scope: normalizedTenantScope,
+        sourceType: inferredSource.sourceType,
+        sourceId: inferredSource.sourceId
+      })
+    : null
+
+  const linkedExpenseId = resolvedSource?.linkedExpenseId || normalizeString(input.linkedExpenseId) || null
+  const linkedIncomeId = resolvedSource?.linkedIncomeId || normalizeString(input.linkedIncomeId) || null
+
+  const linkedPaymentType = resolvedSource?.linkedPaymentType
+    || (input.linkedPaymentType ? normalizeString(input.linkedPaymentType) as 'income_payment' | 'expense_payment' : null)
+
+  const linkedPaymentId = resolvedSource?.linkedPaymentId || normalizeString(input.linkedPaymentId) || null
   const spaceId = normalizeString(input.spaceId || account.space_id) || null
   const actorUserId = normalizeString(input.actorUserId) || null
   const movementId = `sha-mov-${randomUUID()}`
@@ -961,32 +1051,58 @@ export const recordShareholderAccountMovement = async (
         .execute()
     }
 
-    await trx
-      .insertInto('greenhouse_finance.shareholder_account_movements')
-      .values({
-        movement_id: movementId,
-        account_id: normalizedAccountId,
+    await sql`
+      INSERT INTO greenhouse_finance.shareholder_account_movements (
+        movement_id,
+        account_id,
         direction,
-        movement_type: movementType,
-        amount: amount.toString(),
+        movement_type,
+        amount,
         currency,
-        exchange_rate: exchangeRate.toString(),
-        amount_clp: amountClp.toString(),
-        linked_expense_id: linkedExpenseId,
-        linked_income_id: linkedIncomeId,
-        linked_payment_type: linkedPaymentType,
-        linked_payment_id: linkedPaymentId,
-        settlement_group_id: settlementGroupId,
-        counterparty_account_id: counterpartyAccountId,
+        exchange_rate,
+        amount_clp,
+        linked_expense_id,
+        linked_income_id,
+        linked_payment_type,
+        linked_payment_id,
+        settlement_group_id,
+        counterparty_account_id,
+        source_type,
+        source_id,
         description,
-        evidence_url: evidenceUrl,
-        movement_date: movementDate,
-        running_balance_clp: runningBalanceClp.toString(),
-        metadata_json: {} as never,
-        space_id: spaceId,
-        recorded_by_user_id: actorUserId
-      })
-      .execute()
+        evidence_url,
+        movement_date,
+        running_balance_clp,
+        metadata_json,
+        space_id,
+        recorded_by_user_id
+      )
+      VALUES (
+        ${movementId},
+        ${normalizedAccountId},
+        ${direction},
+        ${movementType},
+        ${amount.toString()},
+        ${currency},
+        ${exchangeRate.toString()},
+        ${amountClp.toString()},
+        ${linkedExpenseId},
+        ${linkedIncomeId},
+        ${linkedPaymentType},
+        ${linkedPaymentId},
+        ${settlementGroupId},
+        ${counterpartyAccountId},
+        ${inferredSource.sourceType},
+        ${inferredSource.sourceId},
+        ${description},
+        ${evidenceUrl},
+        ${movementDate},
+        ${runningBalanceClp.toString()},
+        '{}'::jsonb,
+        ${spaceId},
+        ${actorUserId}
+      )
+    `.execute(trx)
 
     await insertOutboxEvent(trx, {
       aggregateType: 'finance_shareholder_account',
@@ -1003,6 +1119,8 @@ export const recordShareholderAccountMovement = async (
         currency,
         movementDate,
         counterpartyAccountId,
+        sourceType: inferredSource.sourceType,
+        sourceId: inferredSource.sourceId,
         linkedExpenseId,
         linkedIncomeId,
         linkedPaymentType,
@@ -1051,7 +1169,10 @@ export const recordShareholderAccountMovement = async (
     })
   }
 
-  const created = await listShareholderAccountMovements({ accountId: normalizedAccountId })
+  const created = await listShareholderAccountMovements({
+    accountId: normalizedAccountId,
+    tenantScope: normalizedTenantScope
+  })
 
   const movement = created.find(item => item.movementId === movementId)
 

@@ -3167,6 +3167,24 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
   - los drawers de caja y settlement usan `/api/finance/accounts` para seleccionar instrumentos visibles al equipo de finanzas
   - `Banco` quedó restringido a `efeonce_admin`, `finance_admin` y `finance_analyst`; no debe asumirse como superficie general de cualquier usuario con route group `finance`
 
+## Delta 2026-04-10 Finance shareholder account canonical traceability completed
+
+- `Finance > Cuenta accionista` ya no usa IDs manuales como contrato primario para trazabilidad cross-module.
+- Schema vigente:
+  - `greenhouse_finance.shareholder_account_movements` incorpora `source_type` + `source_id`
+  - compatibilidad legacy preservada con `linked_*`, pero el origen canónico pasa por `source_type` / `source_id`
+- Reglas operativas:
+  - toda resolución de origen CCA corre server-side y tenant-safe
+  - `expense` se filtra por `space_id`
+  - `income` se resuelve por `organization_id` / `client_id` / `client_profile_id` cuando no existe `space_id` directo
+  - `settlement_group_id` no debe capturarse manualmente en la UI; backend lo deriva desde el origen real cuando aplica
+- Superficie backend agregada:
+  - `GET /api/finance/shareholder-account/lookups/sources`
+- Integración transversal:
+  - `GET/POST /api/finance/shareholder-account/[id]/movements` ahora devuelve `sourceType`, `sourceId` y `source` enriquecido
+  - `ExpenseDetailView` e `IncomeDetailView` pueden abrir CCA precontextualizada con el documento real
+  - los balances y métricas siguen dependiendo de settlement / `account_balances`, no de cálculos inline del módulo
+
 ## Delta 2026-04-08 Finance shareholder current account module completed
 
 - `Finance` agrega la superficie `Cuenta accionista` en `/finance/shareholder-account` como carril bilateral empresa ↔ accionista, montado sobre el runtime de tesorería existente.

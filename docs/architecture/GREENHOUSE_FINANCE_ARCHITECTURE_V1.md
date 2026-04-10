@@ -16,6 +16,26 @@
   - Evento `finance.expense_payment.recorded` registrado en catálogo y 4 projections
   - Navegación Finance actualizada con sección Caja (3 items nuevos)
 
+## Delta 2026-04-10 — Shareholder account canonical traceability completed (TASK-306)
+
+- **La CCA deja de depender de IDs manuales como interfaz primaria**
+  - `greenhouse_finance.shareholder_account_movements` ahora persiste `source_type` + `source_id` como contrato canónico de origen
+  - `source_type` admite `manual`, `expense`, `income`, `expense_payment`, `income_payment`, `settlement_group`
+  - los vínculos legacy (`linked_expense_id`, `linked_income_id`, `linked_payment_id`, `linked_payment_type`, `settlement_group_id`) siguen como compatibilidad operativa, pero ya no gobiernan el UX principal
+- **Validación tenant-safe en backend**
+  - la resolución de origen corre server-side desde `src/lib/finance/shareholder-account/source-links.ts`
+  - `expense` se valida por `space_id`
+  - `income` se valida por sus anclas canónicas (`organization_id`, `client_id`, `client_profile_id`) porque no tiene `space_id` directo en el modelo actual
+  - `expense_payment`, `income_payment` y `settlement_group` se resuelven contra su documento/pago real antes de persistir o exponer el vínculo
+- **Read model enriquecido y navegación cross-module**
+  - `GET/POST /api/finance/shareholder-account/[id]/movements` ya devuelve `sourceType`, `sourceId` y un objeto `source` con label, estado, monto, fecha y `href`
+  - nueva lookup API `GET /api/finance/shareholder-account/lookups/sources` para búsqueda remota tenant-scoped de egresos, ingresos y pagos
+  - `ExpenseDetailView` e `IncomeDetailView` ya abren CCA precontextualizada vía query params (`sourceType`, `sourceId`)
+- **Settlement se mantiene como capa derivada**
+  - `settlement_group_id` ya no debe capturarse manualmente en el drawer de CCA
+  - cuando el origen real es un pago o un documento con settlement existente, backend deriva o resuelve el settlement desde esa entidad
+  - las métricas y balances siguen consumiéndose desde settlement / `account_balances`; no se recalculan inline
+
 ## Delta 2026-04-08 — Shareholder current account module completed (TASK-284)
 
 - **Nuevo instrumento de tesorería `shareholder_account`**

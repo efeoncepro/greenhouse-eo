@@ -44,6 +44,25 @@
 - Se publicaron nuevas versiones limpias de ambos secretos en GCP Secret Manager.
 - Validación compartida en `staging`: `GET /api/finance/income/INC-NB-26639047/dte-status` volvió a `200` y `GET /api/finance/income/INC-NB-26639047/dte-pdf` volvió a entregar `application/pdf`.
 
+### 2026-04-10 — Finance shareholder account canonical traceability completed
+
+- `Finance > Cuenta accionista` deja de depender de IDs manuales para enlazar movimientos con `expenses`, `income`, `income_payments`, `expense_payments` y settlement.
+- Nuevo contrato runtime en PostgreSQL:
+  - `greenhouse_finance.shareholder_account_movements.source_type`
+  - `greenhouse_finance.shareholder_account_movements.source_id`
+- Nuevos endpoints / contratos:
+  - `GET /api/finance/shareholder-account/lookups/sources`
+  - `GET/POST /api/finance/shareholder-account/[id]/movements` ahora devuelve `sourceType`, `sourceId` y `source` enriquecido
+- Integración con el ecosistema financiero:
+  - backend valida tenant-safe cada origen antes de persistirlo
+  - `ExpenseDetailView` e `IncomeDetailView` ya pueden abrir CCA precontextualizada desde el documento real
+  - `settlement_group_id` deja de ser un campo libre del flujo principal; se deriva o resuelve desde el origen real
+- Validación ejecutada:
+  - `pnpm exec tsc --noEmit --incremental false` — OK
+  - `pnpm pg:connect:migrate` — OK
+  - `pnpm lint` — OK
+  - `pnpm build` — OK
+
 ### 2026-04-08 — Finance shareholder current account module completed
 
 - Nuevo módulo `Finance > Cuenta accionista` (`/finance/shareholder-account`) para leer y operar la posición bilateral empresa ↔ accionista desde el portal.

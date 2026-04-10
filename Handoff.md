@@ -1,5 +1,31 @@
 # Handoff.md
 
+## Sesion 2026-04-10 — TASK-306 cerrada: trazabilidad canónica de Cuenta accionista
+
+- alcance cerrado:
+  - `greenhouse_finance.shareholder_account_movements` ahora persiste `source_type` + `source_id`
+  - nueva helper lane `src/lib/finance/shareholder-account/source-links.ts` para búsqueda/resolución tenant-safe de `expense`, `income`, `expense_payment`, `income_payment` y `settlement_group`
+  - nueva route `GET /api/finance/shareholder-account/lookups/sources`
+  - `GET/POST /api/finance/shareholder-account/[id]/movements` ya devuelve/acepta el contrato canónico de origen
+  - UI CCA ahora usa búsqueda remota, muestra origen enriquecido y deja de pedir IDs libres
+  - `ExpenseDetailView` e `IncomeDetailView` ya abren la creación de movimientos CCA con contexto del documento real
+- archivos sensibles / de alto impacto tocados:
+  - `src/lib/finance/shareholder-account/store.ts`
+  - `src/app/api/finance/shareholder-account/[id]/movements/route.ts`
+  - `src/app/api/finance/shareholder-account/lookups/sources/route.ts`
+  - `src/views/greenhouse/finance/shareholder-account/*`
+  - `src/views/greenhouse/finance/ExpenseDetailView.tsx`
+  - `src/views/greenhouse/finance/IncomeDetailView.tsx`
+  - `src/types/db.d.ts`
+  - `migrations/20260410005343119_shareholder-account-canonical-traceability.sql`
+- validación ejecutada:
+  - `pnpm exec tsc --noEmit --incremental false` — OK
+  - `pnpm pg:connect:migrate` — OK
+  - `pnpm lint` — OK
+  - `pnpm build` — OK
+- nota operativa:
+  - durante `pnpm build` apareció un fallback no bloqueante en `admin-access-overview` hacia BigQuery por `invalid_grant` de un ID token stale; el build completó OK y no pertenece al slice de TASK-306
+
 ## Sesion 2026-04-09 — Skill nueva de Claude: `codex-skill-creator`
 
 - se creó la skill local de Claude en:

@@ -224,16 +224,19 @@ Cada cobro o pago puede asociarse a un **instrumento de pago** (cuenta bancaria,
 ### Qué permite hacer
 
 - Crear una cuenta corriente accionista buscando primero la persona por nombre o email
-- Registrar movimientos manuales con:
+- Registrar movimientos con un origen canónico:
   - dirección (`crédito` / `débito`)
   - tipo de movimiento
   - monto y moneda
   - fecha
-  - descripción, evidencia y referencias opcionales (`expense_id`, `income_id`, `payment_id`)
+  - descripción y evidencia
+  - búsqueda real de egresos, ingresos o pagos cuando el movimiento nace desde otro módulo
+  - modo manual solo cuando no existe un documento o pago real que enlazar
 - Revisar el detalle de la cuenta:
   - saldo actual
   - participación referencial
   - historial filtrable por rango, dirección y tipo
+  - origen enriquecido con label humano, estado y navegación al documento o pago real
 
 ### Cómo se integra con el resto de Finance
 
@@ -241,7 +244,8 @@ Cada cobro o pago puede asociarse a un **instrumento de pago** (cuenta bancaria,
 - Eso hace que `Cuenta accionista` y `Banco` compartan la misma base operativa de tesorería
 - Importante:
   - la CCA no reemplaza `Cobros`, `Pagos` ni `Conciliación`
-  - cuando un movimiento se vincula a un gasto, cobro o payment real, agrega trazabilidad bilateral sobre ese evento
+  - cuando un movimiento se vincula a un gasto, ingreso o payment real, agrega trazabilidad bilateral sobre ese evento
+  - el vínculo ya no depende de escribir IDs a mano; Greenhouse resuelve el origen real desde Finance
 
 ## Settlement y pagos internacionales
 

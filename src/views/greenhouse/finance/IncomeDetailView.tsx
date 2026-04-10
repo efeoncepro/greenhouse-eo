@@ -316,6 +316,16 @@ const IncomeDetailView = () => {
         </Box>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
           <CustomChip round='true' size='small' color={statusColor(data.paymentStatus)} label={statusLabel(data.paymentStatus)} />
+          <Button
+            variant='tonal'
+            color='secondary'
+            size='small'
+            component={Link}
+            href={`/finance/shareholder-account?sourceType=income&sourceId=${encodeURIComponent(incomeId)}`}
+            startIcon={<i className='tabler-arrow-forward-up' />}
+          >
+            Registrar en CCA
+          </Button>
           <Button variant='outlined' component={Link} href='/finance/income' startIcon={<i className='tabler-arrow-left' />}>
             Volver
           </Button>

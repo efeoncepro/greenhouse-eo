@@ -8,6 +8,7 @@ import {
   type ShareholderMovementDirection,
   type ShareholderMovementType
 } from '@/lib/finance/shareholder-account/store'
+import type { ShareholderMovementSourceType } from '@/lib/finance/shareholder-account/source-links'
 import {
   FinanceValidationError,
   assertNonEmptyString,
@@ -40,6 +41,24 @@ const serializeMovement = (movement: ShareholderAccountMovement) => ({
   evidenceUrl: movement.evidenceUrl,
   movementDate: movement.movementDate,
   runningBalanceClp: movement.runningBalanceClp,
+  sourceType: movement.sourceType,
+  sourceId: movement.sourceId,
+  source: movement.source ? {
+    sourceType: movement.source.sourceType,
+    sourceId: movement.source.sourceId,
+    label: movement.source.label,
+    subtitle: movement.source.subtitle,
+    status: movement.source.status,
+    amount: movement.source.amount,
+    currency: movement.source.currency,
+    date: movement.source.date,
+    href: movement.source.href,
+    linkedExpenseId: movement.source.linkedExpenseId,
+    linkedIncomeId: movement.source.linkedIncomeId,
+    linkedPaymentType: movement.source.linkedPaymentType,
+    linkedPaymentId: movement.source.linkedPaymentId,
+    sourceSettlementGroupId: movement.source.sourceSettlementGroupId
+  } : null,
   recordedByUserId: movement.recordedByUserId,
   recordedAt: movement.recordedAt
 })
@@ -78,7 +97,13 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       startDate: fromDate,
       endDate: toDate,
       direction: direction ? (normalizeString(direction) as ShareholderMovementDirection) : null,
-      movementType: movementType ? (normalizeString(movementType) as ShareholderMovementType) : null
+      movementType: movementType ? (normalizeString(movementType) as ShareholderMovementType) : null,
+      tenantScope: {
+        tenantType: tenant.tenantType,
+        clientId: tenant.clientId,
+        organizationId: tenant.organizationId || null,
+        spaceId: tenant.spaceId || null
+      }
     })
 
     return NextResponse.json({
@@ -123,10 +148,18 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         ? normalizeString(body.linkedPaymentType) as 'income_payment' | 'expense_payment'
         : null,
       linkedPaymentId: body.linkedPaymentId ? normalizeString(body.linkedPaymentId) : null,
+      sourceType: body.sourceType ? normalizeString(body.sourceType) as ShareholderMovementSourceType : null,
+      sourceId: body.sourceId ? normalizeString(body.sourceId) : null,
       counterpartyAccountId: body.counterpartyAccountId ? normalizeString(body.counterpartyAccountId) : null,
       exchangeRateOverride: body.exchangeRateOverride != null ? toNumber(body.exchangeRateOverride) : null,
       spaceId: tenant.spaceId || null,
-      actorUserId: tenant.userId || null
+      actorUserId: tenant.userId || null,
+      tenantScope: {
+        tenantType: tenant.tenantType,
+        clientId: tenant.clientId,
+        organizationId: tenant.organizationId || null,
+        spaceId: tenant.spaceId || null
+      }
     })
 
     return NextResponse.json(serializeMovement(movement), { status: 201 })
