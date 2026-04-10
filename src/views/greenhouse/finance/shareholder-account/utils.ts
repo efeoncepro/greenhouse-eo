@@ -1,4 +1,11 @@
-import type { ShareholderAccountBalance, ShareholderAccountMovement, ShareholderAccountStatus, ShareholderAccountSummary } from './types'
+import type {
+  ShareholderAccountBalance,
+  ShareholderAccountMovement,
+  ShareholderAccountStatus,
+  ShareholderAccountSummary,
+  ShareholderMovementSourceSummary,
+  ShareholderMovementSourceType
+} from './types'
 
 const readValue = (source: Record<string, unknown>, keys: string[]) => {
   for (const key of keys) {
@@ -43,6 +50,96 @@ export const formatDate = (date: string | null) => {
 
 export const formatPercent = (value: number | null) =>
   value === null || !Number.isFinite(value) ? '—' : `${value.toFixed(2)}%`
+
+export const SHAREHOLDER_MOVEMENT_SOURCE_TYPE_OPTIONS = [
+  { value: 'manual', label: 'Manual', helper: 'Sin origen vinculado' },
+  { value: 'expense', label: 'Egreso', helper: 'Documento de gasto' },
+  { value: 'income', label: 'Ingreso', helper: 'Documento de venta' },
+  { value: 'expense_payment', label: 'Pago de egreso', helper: 'Cobro ya liquidado de un gasto' },
+  { value: 'income_payment', label: 'Pago de ingreso', helper: 'Cobro asociado a un ingreso' },
+  { value: 'settlement_group', label: 'Liquidación', helper: 'Origen derivado de settlement' }
+] as const
+
+type ShareholderMovementSourceTypeMeta = {
+  label: string
+  helper: string
+  color: 'warning' | 'success' | 'info' | 'secondary'
+}
+
+export const SHAREHOLDER_MOVEMENT_SEARCHABLE_SOURCE_TYPES = new Set<ShareholderMovementSourceType>([
+  'expense',
+  'income',
+  'expense_payment',
+  'income_payment'
+])
+
+export const normalizeShareholderMovementSourceType = (value: unknown): ShareholderMovementSourceType => {
+  const normalized = toNullableString(value) as ShareholderMovementSourceType | null
+
+  return normalized || 'manual'
+}
+
+export const getShareholderMovementSourceTypeMeta = (
+  sourceType: ShareholderMovementSourceType | null
+): ShareholderMovementSourceTypeMeta => {
+  if (sourceType === 'expense') return { label: 'Egreso', helper: 'Documento de gasto', color: 'warning' as const }
+  if (sourceType === 'income') return { label: 'Ingreso', helper: 'Documento de venta', color: 'success' as const }
+  if (sourceType === 'expense_payment') return { label: 'Pago de egreso', helper: 'Pago asociado al gasto', color: 'warning' as const }
+  if (sourceType === 'income_payment') return { label: 'Pago de ingreso', helper: 'Pago asociado al ingreso', color: 'success' as const }
+  if (sourceType === 'settlement_group') return { label: 'Liquidación', helper: 'Origen derivado de settlement', color: 'info' as const }
+  if (sourceType === 'manual') return { label: 'Manual', helper: 'Sin origen vinculado', color: 'secondary' as const }
+
+  return { label: sourceType ? String(sourceType) : 'Sin origen', helper: 'Origen no clasificado', color: 'secondary' as const }
+}
+
+export const getShareholderMovementSourceStatusMeta = (status: string | null) => {
+  if (!status) {
+    return { label: 'Sin estado', color: 'secondary' as const }
+  }
+
+  const normalized = status.toLowerCase()
+
+  if (['paid', 'reconciled', 'posted', 'active', 'emitted'].includes(normalized)) {
+    return { label: status, color: 'success' as const }
+  }
+
+  if (['partial', 'scheduled', 'pending', 'draft'].includes(normalized)) {
+    return { label: status, color: 'info' as const }
+  }
+
+  if (['overdue', 'rejected', 'failed', 'cancelled', 'annulled'].includes(normalized)) {
+    return { label: status, color: 'warning' as const }
+  }
+
+  return { label: status, color: 'secondary' as const }
+}
+
+export const normalizeShareholderMovementSource = (item: Record<string, unknown>): ShareholderMovementSourceSummary => {
+  const sourceType = normalizeShareholderMovementSourceType(readValue(item, ['sourceType', 'source_type']))
+  const sourceId = toNullableString(readValue(item, ['sourceId', 'source_id']))
+
+  const label = toNullableString(readValue(item, ['label', 'sourceLabel', 'source_label']))
+    || (sourceType === 'manual' ? 'Movimiento manual' : sourceId || 'Origen sin nombre')
+
+  return {
+    sourceType,
+    sourceId,
+    label,
+    subtitle: toNullableString(readValue(item, ['subtitle', 'sourceSubtitle', 'source_subtitle'])),
+    status: toNullableString(readValue(item, ['status', 'sourceStatus', 'source_status'])),
+    amount: readValue(item, ['amount', 'sourceAmount', 'source_amount']) !== null
+      ? toNumber(readValue(item, ['amount', 'sourceAmount', 'source_amount']))
+      : null,
+    currency: toNullableString(readValue(item, ['currency', 'sourceCurrency', 'source_currency'])),
+    date: toNullableString(readValue(item, ['date', 'sourceDate', 'source_date'])),
+    href: toNullableString(readValue(item, ['href', 'sourceHref', 'source_href'])),
+    linkedExpenseId: toNullableString(readValue(item, ['linkedExpenseId', 'linked_expense_id'])),
+    linkedIncomeId: toNullableString(readValue(item, ['linkedIncomeId', 'linked_income_id'])),
+    linkedPaymentType: toNullableString(readValue(item, ['linkedPaymentType', 'linked_payment_type'])),
+    linkedPaymentId: toNullableString(readValue(item, ['linkedPaymentId', 'linked_payment_id'])),
+    sourceSettlementGroupId: toNullableString(readValue(item, ['sourceSettlementGroupId', 'source_settlement_group_id', 'settlementGroupId', 'settlement_group_id']))
+  }
+}
 
 export const getAccountStatusMeta = (status: ShareholderAccountStatus | null) => {
   if (status === 'active') return { label: 'Activa', color: 'success' as const }
@@ -146,6 +243,7 @@ export const normalizeShareholderBalance = (item: Record<string, unknown>): Shar
 
 export const normalizeShareholderMovement = (item: Record<string, unknown>): ShareholderAccountMovement => ({
   movementId: toStringValue(readValue(item, ['movementId', 'movement_id'])),
+  accountId: toNullableString(readValue(item, ['accountId', 'account_id'])) ?? undefined,
   movementType: toStringValue(readValue(item, ['movementType', 'movement_type'])),
   direction: (toNullableString(readValue(item, ['direction'])) || 'credit') as ShareholderAccountMovement['direction'],
   amount: toNumber(readValue(item, ['amount'])),
@@ -158,9 +256,30 @@ export const normalizeShareholderMovement = (item: Record<string, unknown>): Sha
   linkedIncomeId: toNullableString(readValue(item, ['linkedIncomeId', 'linked_income_id'])),
   linkedPaymentId: toNullableString(readValue(item, ['linkedPaymentId', 'linked_payment_id'])),
   settlementGroupId: toNullableString(readValue(item, ['settlementGroupId', 'settlement_group_id'])),
+  sourceType: normalizeShareholderMovementSourceType(readValue(item, ['sourceType', 'source_type'])),
+  sourceId: toNullableString(readValue(item, ['sourceId', 'source_id'])),
+  source: (() => {
+    const nestedSource = readValue(item, ['source'])
+
+    if (isRecord(nestedSource)) {
+      return normalizeShareholderMovementSource(nestedSource)
+    }
+
+    const hasFlatSourceData = [
+      'sourceType',
+      'source_type',
+      'sourceId',
+      'source_id',
+      'sourceLabel',
+      'source_label',
+      'sourceHref',
+      'source_href'
+    ].some(key => item[key] !== undefined && item[key] !== null)
+
+    return hasFlatSourceData ? normalizeShareholderMovementSource(item) : null
+  })(),
   recordedAt: toNullableString(readValue(item, ['recordedAt', 'recorded_at']))
 })
 
 export const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
-

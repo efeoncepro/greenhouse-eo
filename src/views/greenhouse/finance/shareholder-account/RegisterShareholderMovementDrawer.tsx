@@ -1,12 +1,16 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+
+import Link from 'next/link'
 
 import { toast } from 'react-toastify'
 
+import Autocomplete from '@mui/material/Autocomplete'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Drawer from '@mui/material/Drawer'
 import Grid from '@mui/material/Grid'
@@ -17,13 +21,24 @@ import Typography from '@mui/material/Typography'
 
 import CustomTextField from '@core/components/mui/TextField'
 
-import type { ShareholderAccountSummary } from './types'
-import { formatMoney, getBalanceMeta } from './utils'
+import type { ShareholderAccountSummary, ShareholderMovementSourceSummary, ShareholderMovementSourceType } from './types'
+import {
+  formatDate,
+  formatMoney,
+  getBalanceMeta,
+  getShareholderMovementSourceStatusMeta,
+  getShareholderMovementSourceTypeMeta,
+  normalizeShareholderMovementSource,
+  SHAREHOLDER_MOVEMENT_SEARCHABLE_SOURCE_TYPES,
+  SHAREHOLDER_MOVEMENT_SOURCE_TYPE_OPTIONS
+} from './utils'
 
 type Props = {
   open: boolean
   accounts: ShareholderAccountSummary[]
   account: ShareholderAccountSummary | null
+  initialSourceType?: ShareholderMovementSourceType | null
+  initialSourceId?: string | null
   onClose: () => void
   onSuccess: () => void
 }
@@ -44,6 +59,8 @@ const MOVEMENT_TYPE_OPTIONS = [
 ]
 
 const CURRENCY_OPTIONS = ['CLP', 'USD']
+const DEFAULT_SOURCE_TYPE: ShareholderMovementSourceType = 'manual'
+const SOURCE_TYPE_OPTIONS = SHAREHOLDER_MOVEMENT_SOURCE_TYPE_OPTIONS.filter(option => option.value !== 'settlement_group')
 
 const getToday = () => {
   const now = new Date()
@@ -51,7 +68,25 @@ const getToday = () => {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
 }
 
-const RegisterShareholderMovementDrawer = ({ open, accounts, account, onClose, onSuccess }: Props) => {
+const buildSourceLabel = (source: ShareholderMovementSourceSummary | null) => {
+  if (!source) {
+    return ''
+  }
+
+  return source.sourceType === 'manual'
+    ? source.label
+    : `${source.label}${source.subtitle ? ` · ${source.subtitle}` : ''}`
+}
+
+const RegisterShareholderMovementDrawer = ({
+  open,
+  accounts,
+  account,
+  initialSourceType = null,
+  initialSourceId = null,
+  onClose,
+  onSuccess
+}: Props) => {
   const [selectedAccountId, setSelectedAccountId] = useState(account?.accountId ?? '')
   const [direction, setDirection] = useState<'credit' | 'debit'>('credit')
   const [movementType, setMovementType] = useState('expense_paid_by_shareholder')
@@ -60,16 +95,27 @@ const RegisterShareholderMovementDrawer = ({ open, accounts, account, onClose, o
   const [movementDate, setMovementDate] = useState(getToday())
   const [description, setDescription] = useState('')
   const [evidenceUrl, setEvidenceUrl] = useState('')
-  const [linkedExpenseId, setLinkedExpenseId] = useState('')
-  const [linkedIncomeId, setLinkedIncomeId] = useState('')
-  const [linkedPaymentId, setLinkedPaymentId] = useState('')
-  const [settlementGroupId, setSettlementGroupId] = useState('')
+  const [sourceType, setSourceType] = useState<ShareholderMovementSourceType>(DEFAULT_SOURCE_TYPE)
+  const [sourceQuery, setSourceQuery] = useState('')
+  const [sourceOptions, setSourceOptions] = useState<ShareholderMovementSourceSummary[]>([])
+  const [selectedSource, setSelectedSource] = useState<ShareholderMovementSourceSummary | null>(null)
+  const [prefilledSourceId, setPrefilledSourceId] = useState<string | null>(null)
+  const [sourceLoading, setSourceLoading] = useState(false)
+  const [sourceLookupError, setSourceLookupError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const selectedAccount = useMemo(
     () => account || accounts.find(item => item.accountId === selectedAccountId) || null,
     [account, accounts, selectedAccountId]
+  )
+
+  const sourceTypeMeta = useMemo(() => getShareholderMovementSourceTypeMeta(sourceType), [sourceType])
+
+  const selectedSourceMeta = useMemo(
+    () => getShareholderMovementSourceTypeMeta(selectedSource?.sourceType ?? sourceType),
+    [selectedSource?.sourceType, sourceType]
   )
 
   useEffect(() => {
@@ -82,10 +128,13 @@ const RegisterShareholderMovementDrawer = ({ open, accounts, account, onClose, o
       setMovementDate(getToday())
       setDescription('')
       setEvidenceUrl('')
-      setLinkedExpenseId('')
-      setLinkedIncomeId('')
-      setLinkedPaymentId('')
-      setSettlementGroupId('')
+      setSourceType(initialSourceType ?? DEFAULT_SOURCE_TYPE)
+      setSourceQuery('')
+      setSourceOptions([])
+      setSelectedSource(null)
+      setPrefilledSourceId(initialSourceType && initialSourceType !== 'manual' ? initialSourceId ?? null : null)
+      setSourceLoading(false)
+      setSourceLookupError(null)
       setError(null)
       setSaving(false)
 
@@ -100,13 +149,199 @@ const RegisterShareholderMovementDrawer = ({ open, accounts, account, onClose, o
     setMovementDate(getToday())
     setDescription('')
     setEvidenceUrl('')
-    setLinkedExpenseId('')
-    setLinkedIncomeId('')
-    setLinkedPaymentId('')
-    setSettlementGroupId('')
+    setSourceType(DEFAULT_SOURCE_TYPE)
+    setSourceQuery('')
+    setSourceOptions([])
+    setSelectedSource(null)
+    setPrefilledSourceId(null)
+    setSourceLoading(false)
+    setSourceLookupError(null)
     setError(null)
     setSaving(false)
-  }, [account?.accountId, account?.currency, open])
+  }, [account?.accountId, account?.currency, initialSourceId, initialSourceType, open])
+
+  useEffect(() => {
+    if (!open || sourceType === 'manual') {
+      return
+    }
+
+    if (!initialSourceId || initialSourceType !== sourceType) {
+      setSelectedSource(null)
+      setSourceQuery('')
+      setSourceOptions([])
+      setSourceLoading(false)
+      setSourceLookupError(null)
+
+      return
+    }
+
+    const controller = new AbortController()
+
+    const resolveSource = async () => {
+      setSourceLoading(true)
+      setSourceLookupError(null)
+      setPrefilledSourceId(initialSourceId)
+
+      try {
+        const params = new URLSearchParams({
+          sourceType,
+          sourceId: initialSourceId
+        })
+
+        const res = await fetch(`/api/finance/shareholder-account/lookups/sources?${params.toString()}`, {
+          cache: 'no-store',
+          signal: controller.signal
+        })
+
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}))
+
+          setPrefilledSourceId(null)
+          setSourceLookupError(body.error || 'No pudimos resolver el origen.')
+
+          return
+        }
+
+        const body = await res.json().catch(() => ({}))
+
+        if (body?.item && typeof body.item === 'object' && !Array.isArray(body.item)) {
+          const resolved = normalizeShareholderMovementSource(body.item as Record<string, unknown>)
+
+          setSelectedSource(resolved)
+          setSourceQuery(buildSourceLabel(resolved))
+          setSourceOptions([resolved])
+          setPrefilledSourceId(resolved.sourceId)
+        }
+      } catch {
+        if (!controller.signal.aborted) {
+          setPrefilledSourceId(null)
+          setSourceLookupError('No pudimos resolver el origen.')
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setSourceLoading(false)
+        }
+      }
+    }
+
+    void resolveSource()
+
+    return () => controller.abort()
+  }, [initialSourceId, initialSourceType, open, sourceType])
+
+  useEffect(() => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current)
+      debounceRef.current = null
+    }
+
+    if (!open || !SHAREHOLDER_MOVEMENT_SEARCHABLE_SOURCE_TYPES.has(sourceType)) {
+      setSelectedSource(null)
+      setSourceQuery('')
+      setSourceOptions([])
+      setSourceLoading(false)
+      setSourceLookupError(null)
+
+      return
+    }
+
+    const query = sourceQuery.trim()
+
+    if (query.length < 2) {
+      setSourceOptions(selectedSource ? [selectedSource] : [])
+      setSourceLoading(false)
+      setSourceLookupError(null)
+
+      return
+    }
+
+    if (selectedSource && query === buildSourceLabel(selectedSource)) {
+      setSourceOptions([selectedSource])
+      setSourceLoading(false)
+      setSourceLookupError(null)
+
+      return
+    }
+
+    const controller = new AbortController()
+
+    debounceRef.current = setTimeout(async () => {
+      setSourceLoading(true)
+      setSourceLookupError(null)
+
+      try {
+        const params = new URLSearchParams({
+          sourceType,
+          q: query
+        })
+
+        const res = await fetch(`/api/finance/shareholder-account/lookups/sources?${params.toString()}`, {
+          cache: 'no-store',
+          signal: controller.signal
+        })
+
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}))
+
+          setSourceLookupError(body.error || 'No pudimos buscar orígenes.')
+          setSourceOptions([])
+
+          return
+        }
+
+        const body = await res.json().catch(() => ({}))
+
+        const items = Array.isArray(body.items)
+          ? body.items
+              .filter((item: unknown): item is Record<string, unknown> => typeof item === 'object' && item !== null && !Array.isArray(item))
+              .map((item: Record<string, unknown>) => normalizeShareholderMovementSource(item))
+          : []
+
+        setSourceOptions(items)
+      } catch {
+        if (!controller.signal.aborted) {
+          setSourceLookupError('No pudimos buscar orígenes.')
+          setSourceOptions([])
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setSourceLoading(false)
+        }
+      }
+    }, 300)
+
+    return () => {
+      controller.abort()
+
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current)
+        debounceRef.current = null
+      }
+    }
+  }, [open, selectedSource, sourceQuery, sourceType])
+
+  useEffect(() => () => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current)
+    }
+  }, [])
+
+  const handleSourceTypeChange = useCallback((nextSourceType: ShareholderMovementSourceType) => {
+    setSourceType(nextSourceType)
+    setSelectedSource(null)
+    setPrefilledSourceId(null)
+    setSourceQuery('')
+    setSourceOptions([])
+    setSourceLookupError(null)
+  }, [])
+
+  const handleSourceSelect = useCallback((source: ShareholderMovementSourceSummary | null) => {
+    setSelectedSource(source)
+    setPrefilledSourceId(source?.sourceId ?? null)
+    setSourceQuery(source ? buildSourceLabel(source) : '')
+    setSourceOptions(source ? [source] : [])
+    setSourceLookupError(null)
+  }, [])
 
   const handleSubmit = async () => {
     if (!selectedAccountId) {
@@ -127,6 +362,12 @@ const RegisterShareholderMovementDrawer = ({ open, accounts, account, onClose, o
       return
     }
 
+    if (sourceType !== 'manual' && !selectedSource?.sourceId && !prefilledSourceId) {
+      setError('Selecciona un origen canónico para continuar.')
+
+      return
+    }
+
     setSaving(true)
     setError(null)
 
@@ -142,10 +383,8 @@ const RegisterShareholderMovementDrawer = ({ open, accounts, account, onClose, o
           movementDate,
           description: description.trim() || null,
           evidenceUrl: evidenceUrl.trim() || null,
-          linkedExpenseId: linkedExpenseId.trim() || null,
-          linkedIncomeId: linkedIncomeId.trim() || null,
-          linkedPaymentId: linkedPaymentId.trim() || null,
-          settlementGroupId: settlementGroupId.trim() || null
+          sourceType,
+          sourceId: selectedSource?.sourceId || prefilledSourceId || null
         })
       })
 
@@ -178,7 +417,7 @@ const RegisterShareholderMovementDrawer = ({ open, accounts, account, onClose, o
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 4 }}>
         <Box>
-          <Typography variant='h6'>Registrar movimiento manual</Typography>
+          <Typography variant='h6'>Registrar movimiento</Typography>
           <Typography variant='body2' color='text.secondary'>
             Carga un cargo o abono bilateral sobre la cuenta corriente accionista.
           </Typography>
@@ -219,6 +458,180 @@ const RegisterShareholderMovementDrawer = ({ open, accounts, account, onClose, o
             ))}
           </CustomTextField>
         ) : null}
+
+        <Stack spacing={1.5}>
+          <CustomTextField
+            select
+            fullWidth
+            label='Origen canónico'
+            value={sourceType}
+            onChange={event => handleSourceTypeChange(event.target.value as ShareholderMovementSourceType)}
+          >
+            {SOURCE_TYPE_OPTIONS.map(option => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </CustomTextField>
+          <Typography variant='caption' color='text.secondary'>
+            {sourceType === 'manual'
+              ? 'Movimiento sin documento de origen. Úsalo solo cuando no exista una trazabilidad canónica.'
+              : `Busca el ${sourceTypeMeta.label.toLowerCase()} real antes de registrar el movimiento.`}
+          </Typography>
+        </Stack>
+
+        {sourceType !== 'manual' ? (
+          <Stack spacing={1.5}>
+            <Autocomplete
+              options={sourceOptions}
+              value={selectedSource}
+              inputValue={sourceQuery}
+              loading={sourceLoading}
+              onChange={(_event, value) => handleSourceSelect(value)}
+              onInputChange={(_event, value, reason) => {
+                if (reason === 'input') {
+                  setSourceQuery(value)
+
+                  if (selectedSource?.label !== value) {
+                    setSelectedSource(null)
+                    setPrefilledSourceId(null)
+                  }
+                }
+              }}
+              getOptionLabel={option => option.label}
+              isOptionEqualToValue={(option, value) => option.sourceType === value.sourceType && option.sourceId === value.sourceId}
+              noOptionsText={sourceQuery.trim().length < 2 ? 'Escribe al menos 2 caracteres para buscar.' : 'Sin resultados.'}
+              loadingText='Buscando orígenes...'
+              renderInput={params => (
+                <CustomTextField
+                  {...params}
+                  fullWidth
+                  label='Buscar origen'
+                  placeholder='ID, referencia, cliente, proveedor...'
+                  helperText={sourceTypeMeta.helper}
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {sourceLoading ? <CircularProgress color='inherit' size={18} /> : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    )
+                  }}
+                />
+              )}
+              renderOption={(props, option) => {
+                const typeMeta = getShareholderMovementSourceTypeMeta(option.sourceType)
+                const statusMeta = getShareholderMovementSourceStatusMeta(option.status)
+
+                return (
+                  <li {...props} key={`${option.sourceType}:${option.sourceId ?? option.label}`}>
+                    <Stack spacing={0.5} sx={{ py: 0.5, width: '100%' }}>
+                      <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap'>
+                        <Typography variant='body2' fontWeight={700}>
+                          {option.label}
+                        </Typography>
+                        <Typography variant='caption' color='text.secondary'>
+                          {typeMeta.label}
+                        </Typography>
+                      </Stack>
+                      {option.subtitle ? (
+                        <Typography variant='caption' color='text.secondary'>
+                          {option.subtitle}
+                        </Typography>
+                      ) : null}
+                      <Stack direction='row' spacing={1} flexWrap='wrap' alignItems='center'>
+                        {option.amount !== null && option.currency ? (
+                          <Typography variant='caption' color='text.secondary'>
+                            {formatMoney(option.amount, option.currency)}
+                          </Typography>
+                        ) : null}
+                        {option.date ? (
+                          <Typography variant='caption' color='text.secondary'>
+                            {formatDate(option.date)}
+                          </Typography>
+                        ) : null}
+                        {option.status ? (
+                          <Typography variant='caption' color='text.secondary'>
+                            {statusMeta.label}
+                          </Typography>
+                        ) : null}
+                      </Stack>
+                    </Stack>
+                  </li>
+                )
+              }}
+            />
+
+            {sourceLookupError ? <Alert severity='warning'>{sourceLookupError}</Alert> : null}
+
+            <Box
+              sx={{
+                border: theme => `1px solid ${theme.palette.divider}`,
+                borderRadius: 1,
+                p: 3,
+                bgcolor: 'background.paper'
+              }}
+            >
+              <Stack spacing={1.25}>
+                <Typography variant='subtitle2'>Origen seleccionado</Typography>
+                {selectedSource ? (
+                  <>
+                    <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap'>
+                      <Typography variant='body2' fontWeight={700}>
+                        {selectedSource.label}
+                      </Typography>
+                      <Typography variant='caption' color='text.secondary'>
+                        {selectedSourceMeta.label}
+                      </Typography>
+                    </Stack>
+                    {selectedSource.subtitle ? (
+                      <Typography variant='body2' color='text.secondary'>
+                        {selectedSource.subtitle}
+                      </Typography>
+                    ) : null}
+                    <Stack direction='row' spacing={2} flexWrap='wrap'>
+                      {selectedSource.amount !== null && selectedSource.currency ? (
+                        <Typography variant='caption' color='text.secondary'>
+                          {formatMoney(selectedSource.amount, selectedSource.currency)}
+                        </Typography>
+                      ) : null}
+                      {selectedSource.date ? (
+                        <Typography variant='caption' color='text.secondary'>
+                          {formatDate(selectedSource.date)}
+                        </Typography>
+                      ) : null}
+                      {selectedSource.status ? (
+                        <Typography variant='caption' color='text.secondary'>
+                          {getShareholderMovementSourceStatusMeta(selectedSource.status).label}
+                        </Typography>
+                      ) : null}
+                    </Stack>
+                    {selectedSource.href ? (
+                      <Button
+                        component={Link}
+                        href={selectedSource.href}
+                        size='small'
+                        variant='text'
+                        sx={{ alignSelf: 'flex-start', px: 0 }}
+                      >
+                        Abrir origen
+                      </Button>
+                    ) : null}
+                  </>
+                ) : (
+                  <Typography variant='body2' color='text.secondary'>
+                    Elige un origen para dejar la trazabilidad lista antes de guardar.
+                  </Typography>
+                )}
+              </Stack>
+            </Box>
+          </Stack>
+        ) : (
+          <Alert severity='info'>
+            El movimiento quedará como manual. Usa esta vía solo cuando no exista un documento de origen que enlazar.
+          </Alert>
+        )}
 
         <Grid container spacing={3}>
           <Grid size={{ xs: 12, sm: 6 }}>
@@ -299,56 +712,9 @@ const RegisterShareholderMovementDrawer = ({ open, accounts, account, onClose, o
           placeholder='Explica el origen o la razón del movimiento'
         />
 
-        <Divider />
-
-        <Box>
-          <Typography variant='subtitle2' sx={{ mb: 2 }}>
-            Trazabilidad opcional
-          </Typography>
-
-          <Grid container spacing={3}>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='expense_id'
-                value={linkedExpenseId}
-                onChange={event => setLinkedExpenseId(event.target.value)}
-                placeholder='EXP-...'
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='income_id'
-                value={linkedIncomeId}
-                onChange={event => setLinkedIncomeId(event.target.value)}
-                placeholder='INC-...'
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='payment_id'
-                value={linkedPaymentId}
-                onChange={event => setLinkedPaymentId(event.target.value)}
-                placeholder='pay-... / exp-pay-...'
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label='settlement_group_id'
-                value={settlementGroupId}
-                onChange={event => setSettlementGroupId(event.target.value)}
-                placeholder='stlgrp-...'
-              />
-            </Grid>
-          </Grid>
-        </Box>
-
         <CustomTextField
           fullWidth
-          label='Evidence URL'
+          label='URL de evidencia'
           value={evidenceUrl}
           onChange={event => setEvidenceUrl(event.target.value)}
           placeholder='https://...'

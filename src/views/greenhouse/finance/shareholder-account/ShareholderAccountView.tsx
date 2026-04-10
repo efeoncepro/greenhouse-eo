@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -32,7 +34,7 @@ import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
 import CreateShareholderAccountDrawer from './CreateShareholderAccountDrawer'
 import RegisterShareholderMovementDrawer from './RegisterShareholderMovementDrawer'
 import ShareholderAccountDetailDrawer from './ShareholderAccountDetailDrawer'
-import type { ShareholderAccountSummary } from './types'
+import type { ShareholderAccountSummary, ShareholderMovementSourceType } from './types'
 import {
   formatDate,
   formatMoney,
@@ -40,7 +42,8 @@ import {
   getAccountStatusMeta,
   getBalanceMeta,
   isRecord,
-  normalizeShareholderAccount
+  normalizeShareholderAccount,
+  normalizeShareholderMovementSourceType
 } from './utils'
 
 type AccountsResponse = {
@@ -57,6 +60,10 @@ const STATUS_OPTIONS = [
 ]
 
 const ShareholderAccountView = () => {
+  const pathname = usePathname()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [accounts, setAccounts] = useState<ShareholderAccountSummary[]>([])
@@ -68,6 +75,8 @@ const ShareholderAccountView = () => {
   const [detailOpen, setDetailOpen] = useState(false)
   const [selectedAccount, setSelectedAccount] = useState<ShareholderAccountSummary | null>(null)
   const [movementAccount, setMovementAccount] = useState<ShareholderAccountSummary | null>(null)
+  const [movementSourceType, setMovementSourceType] = useState<ShareholderMovementSourceType | null>(null)
+  const [movementSourceId, setMovementSourceId] = useState<string | null>(null)
 
   const fetchAccounts = useCallback(async () => {
     setLoading(true)
@@ -97,6 +106,39 @@ const ShareholderAccountView = () => {
   useEffect(() => {
     void fetchAccounts()
   }, [fetchAccounts])
+
+  const searchParamsString = searchParams.toString()
+
+  const movementQueryContext = useMemo(() => {
+    const params = new URLSearchParams(searchParamsString)
+    const sourceType = normalizeShareholderMovementSourceType(params.get('sourceType'))
+    const sourceId = params.get('sourceId')?.trim() || null
+
+    return {
+      sourceType,
+      sourceId,
+      hasContext: params.has('sourceType')
+    }
+  }, [searchParamsString])
+
+  useEffect(() => {
+    if (!movementQueryContext.hasContext) {
+      return
+    }
+
+    setMovementAccount(null)
+    setMovementSourceType(movementQueryContext.sourceType)
+    setMovementSourceId(movementQueryContext.sourceType === 'manual' ? null : movementQueryContext.sourceId)
+    setMovementOpen(true)
+  }, [movementQueryContext.hasContext, movementQueryContext.sourceId, movementQueryContext.sourceType])
+
+  const clearMovementQueryContext = useCallback(() => {
+    if (!movementQueryContext.hasContext) {
+      return
+    }
+
+    router.replace(pathname, { scroll: false })
+  }, [movementQueryContext.hasContext, pathname, router])
 
   const filteredAccounts = useMemo(() => {
     const query = search.trim().toLowerCase()
@@ -293,7 +335,17 @@ const ShareholderAccountView = () => {
               </Box>
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <Button variant='tonal' color='secondary' onClick={() => setMovementOpen(true)}>
+                <Button
+                  variant='tonal'
+                  color='secondary'
+                  onClick={() => {
+                    clearMovementQueryContext()
+                    setMovementAccount(null)
+                    setMovementSourceType(null)
+                    setMovementSourceId(null)
+                    setMovementOpen(true)
+                  }}
+                >
                   Registrar movimiento
                 </Button>
                 <Button variant='contained' onClick={() => setCreateOpen(true)}>
@@ -441,9 +493,14 @@ const ShareholderAccountView = () => {
         open={movementOpen}
         accounts={accounts}
         account={movementAccount}
+        initialSourceType={movementSourceType}
+        initialSourceId={movementSourceId}
         onClose={() => {
           setMovementOpen(false)
           setMovementAccount(null)
+          setMovementSourceType(null)
+          setMovementSourceId(null)
+          clearMovementQueryContext()
         }}
         onSuccess={handleRefresh}
       />
@@ -456,8 +513,11 @@ const ShareholderAccountView = () => {
           setSelectedAccount(null)
         }}
         onRegisterMovement={account => {
+          clearMovementQueryContext()
           setDetailOpen(false)
           setMovementAccount(account)
+          setMovementSourceType(null)
+          setMovementSourceId(null)
           setMovementOpen(true)
         }}
         onSuccess={handleRefresh}

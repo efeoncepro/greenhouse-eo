@@ -8,16 +8,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseño`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`
-- Branch: `task/TASK-306-shareholder-account-canonical-traceability`
+- Branch: `feature/codex-task-306-canonical-traceability`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -53,14 +53,17 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`
 - `docs/architecture/GREENHOUSE_POSTGRES_ACCESS_MODEL_V1.md`
+- `docs/architecture/schema-snapshot-baseline.sql` como baseline historico, pero validar contra migraciones recientes de Finance/Settlement/CCA
 
 Reglas obligatorias:
 
 - Los vínculos de CCA deben ser tenant-safe y filtrar por `space_id` cuando la entidad vinculada sea tenant-scoped
+- Cuando la entidad origen no tenga `space_id` directo (caso actual de `income`), el tenant scope debe resolverse por sus anclas canónicas (`client_id`, `client_profile_id`, `organization_id`) en vez de asumir columna local
 - `settlement_group_id` debe ser derivado por backend o resuelto desde el origen real; no debe quedar como campo libre editable
 - No introducir identidades paralelas ni shortcuts fuera de `@/lib/db`
 - La solución debe distinguir claramente documento (`income` / `expense`) de caja (`income_payment` / `expense_payment`) y no mezclar ambas semánticas
 - Si el contrato actual de `shareholder_account_movements` no escala, la task puede evolucionarlo mediante migración versionada en `greenhouse_finance`
+- Los readers actuales de `cash-in`, `cash-out`, payments y settlement pueden servir como referencia funcional, pero no deben reutilizarse como validadores tenant-safe sin endurecer explícitamente sus filtros de scope
 
 ## Normative Docs
 
@@ -119,6 +122,9 @@ Reglas obligatorias:
   - `income_payments`
   - `expense_payments`
   - `settlement_groups`
+- Fuente real del DDL vigente para esta lane:
+  - `migrations/20260408103211338_finance-reconciliation-ledger-orchestration.sql`
+  - `migrations/20260409002455606_shareholder-current-account-schema.sql`
 
 ### Gap
 
@@ -128,6 +134,8 @@ Reglas obligatorias:
 - `settlement_group_id` del drawer no gobierna el flujo real: la route no lo pasa al store y el store crea un `settlementGroupId` nuevo en cada movimiento
 - El detalle CCA no resuelve labels ni links navegables al módulo origen; solo muestra IDs crudos
 - El modelo actual no expresa bien un origen canónico de movimiento (`manual`, `expense`, `income`, `expense_payment`, `income_payment`, `settlement_group`)
+- `schema-snapshot-baseline.sql` no refleja todavía las tablas nuevas de CCA ni settlement; para esta task debe tratarse como referencia histórica y no como contrato suficiente por sí solo
+- Los readers actuales de pagos/caja no aplican tenant isolation en SQL, por lo que no deben reutilizarse tal cual para validar referencias CCA
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE

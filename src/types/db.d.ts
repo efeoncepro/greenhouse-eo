@@ -1869,6 +1869,8 @@ export interface GreenhouseFinanceShareholderAccountMovements {
   recorded_by_user_id: string | null;
   running_balance_clp: Numeric | null;
   settlement_group_id: string | null;
+  source_id: string | null;
+  source_type: Generated<string>;
   space_id: string | null;
 }
 

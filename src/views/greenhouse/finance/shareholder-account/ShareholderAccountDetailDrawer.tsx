@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
+import Link from 'next/link'
+
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -39,6 +41,8 @@ import {
   getBalanceMeta,
   getDirectionMeta,
   getMovementTypeLabel,
+  getShareholderMovementSourceStatusMeta,
+  getShareholderMovementSourceTypeMeta,
   isRecord,
   normalizeShareholderBalance,
   normalizeShareholderMovement
@@ -243,37 +247,64 @@ const ShareholderAccountDetailDrawer = ({
             </Stack>
           )
         }),
-        helper.accessor('settlementGroupId', {
-          header: 'Vínculos',
-          cell: ({ row }) => (
-            <Stack spacing={0.25}>
-              {row.original.linkedExpenseId ? (
-                <Typography variant='caption' color='text.secondary'>
-                  expense_id: {row.original.linkedExpenseId}
-                </Typography>
-              ) : null}
-              {row.original.linkedIncomeId ? (
-                <Typography variant='caption' color='text.secondary'>
-                  income_id: {row.original.linkedIncomeId}
-                </Typography>
-              ) : null}
-              {row.original.linkedPaymentId ? (
-                <Typography variant='caption' color='text.secondary'>
-                  payment_id: {row.original.linkedPaymentId}
-                </Typography>
-              ) : null}
-              {row.original.settlementGroupId ? (
-                <Typography variant='caption' color='text.secondary'>
-                  settlement_group_id: {row.original.settlementGroupId}
-                </Typography>
-              ) : null}
-              {!row.original.linkedExpenseId && !row.original.linkedIncomeId && !row.original.linkedPaymentId && !row.original.settlementGroupId ? (
-                <Typography variant='caption' color='text.secondary'>
-                  —
-                </Typography>
-              ) : null}
-            </Stack>
-          )
+        helper.accessor('sourceId', {
+          header: 'Origen',
+          cell: ({ row }) => {
+            const source = row.original.source
+            const sourceTypeMeta = getShareholderMovementSourceTypeMeta(row.original.sourceType)
+            const sourceStatusMeta = getShareholderMovementSourceStatusMeta(source?.status ?? null)
+            const href = source?.href || null
+
+            return (
+              <Stack spacing={0.75} sx={{ minWidth: 0 }}>
+                <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap'>
+                  <CustomChip round='true' size='small' color={sourceTypeMeta.color} label={sourceTypeMeta.label} />
+                  {href ? (
+                    <Button
+                      component={Link}
+                      href={href}
+                      size='small'
+                      variant='text'
+                      sx={{ px: 0, minWidth: 0, whiteSpace: 'nowrap' }}
+                    >
+                      Abrir
+                    </Button>
+                  ) : null}
+                </Stack>
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography variant='body2' fontWeight={600} noWrap>
+                    {source?.label || (row.original.sourceId ? 'Origen vinculado' : 'Movimiento manual')}
+                  </Typography>
+                  {source?.subtitle ? (
+                    <Typography variant='caption' color='text.secondary' display='block' noWrap>
+                      {source.subtitle}
+                    </Typography>
+                  ) : row.original.sourceId ? (
+                    <Typography variant='caption' color='text.secondary' display='block' noWrap>
+                      ID: {row.original.sourceId}
+                    </Typography>
+                  ) : null}
+                  <Stack direction='row' spacing={1} flexWrap='wrap'>
+                    {source?.amount !== null && source?.currency ? (
+                      <Typography variant='caption' color='text.secondary'>
+                        {formatMoney(source.amount, source.currency)}
+                      </Typography>
+                    ) : null}
+                    {source?.date ? (
+                      <Typography variant='caption' color='text.secondary'>
+                        {formatDate(source.date)}
+                      </Typography>
+                    ) : null}
+                    {source?.status ? (
+                      <Typography variant='caption' color='text.secondary'>
+                        {sourceStatusMeta.label}
+                      </Typography>
+                    ) : null}
+                  </Stack>
+                </Box>
+              </Stack>
+            )
+          }
         })
       ]
     }, []),

@@ -42,6 +42,30 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.10
+
+**Canal:** Beta
+**Fecha:** 2026-04-10
+**Disponible para:** internal
+**Módulos:** Finance / Cuenta accionista
+
+### Novedades
+
+- `Cuenta accionista` ahora puede enlazar movimientos contra egresos, ingresos y pagos reales sin pedir IDs escritos a mano.
+
+### Mejoras
+
+- El detalle de la cuenta ya muestra el origen con contexto útil y acceso directo al documento o pago real.
+- Desde `Egresos` e `Ingresos` ya puedes abrir la creación del movimiento CCA con el contexto correcto cargado.
+
+### Correcciones
+
+- El portal deja de guardar vínculos ambiguos de CCA cuando el origen real no fue validado contra Finance.
+
+### Notas
+
+- `Liquidación` sigue siendo una capa derivada del origen real; no aparece como búsqueda principal en el drawer de creación.
+
 ## 2026.04-beta.9
 
 **Canal:** Beta
