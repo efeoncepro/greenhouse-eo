@@ -1,5 +1,29 @@
 # Handoff.md
 
+## Sesion 2026-04-10 — follow-up jerarquía/org chart en staging
+
+- alcance cerrado:
+  - `HR > Jerarquía` ya no confunde una línea futura abierta con la supervisión vigente al guardar cambios con fecha efectiva hoy
+  - las validaciones de reporting hierarchy ahora devuelven errores de dominio (`HrCoreValidationError`) en vez de caer en `500` genérico
+  - `GET /api/hr/core/hierarchy/history` ya no revienta cuando Postgres entrega `created_at` / `updated_at` como `Date` en delegaciones
+  - `HR > Organigrama` ahora puede recuperar `departmentName` desde roster (`People`) cuando la snapshot de jerarquía todavía viene atrasada
+  - la UI de delegaciones deja explícito que solo una delegación primaria puede quedar activa por supervisor y que una nueva reemplaza la anterior
+- archivos sensibles / de alto impacto tocados:
+  - `src/lib/reporting-hierarchy/store.ts`
+  - `src/lib/reporting-hierarchy/shared.ts`
+  - `src/lib/reporting-hierarchy/admin.ts`
+  - `src/app/api/hr/core/hierarchy/history/route.ts`
+  - `src/lib/reporting-hierarchy/org-chart.ts`
+  - `src/lib/people/get-people-list.ts`
+  - `src/views/greenhouse/hr-core/HrHierarchyView.tsx`
+- validación ejecutada:
+  - `pnpm exec vitest run src/app/api/hr/core/hierarchy/history/route.test.ts src/lib/reporting-hierarchy/org-chart.test.ts` — OK
+  - `pnpm exec eslint src/lib/reporting-hierarchy/store.ts src/lib/reporting-hierarchy/shared.ts src/lib/reporting-hierarchy/admin.ts src/app/api/hr/core/hierarchy/history/route.ts src/lib/people/get-people-list.ts src/lib/reporting-hierarchy/org-chart.ts src/views/greenhouse/hr-core/HrHierarchyView.tsx src/app/api/hr/core/hierarchy/history/route.test.ts src/lib/reporting-hierarchy/org-chart.test.ts src/types/people.ts` — OK
+  - `pnpm lint` — OK
+  - `pnpm build` — OK
+- nota operativa:
+  - en staging quedó una línea futura de Daniela (`2026-04-11`) creada durante la depuración previa; este fix está pensado justamente para permitir adelantar esa reasignación a hoy sin dejar la vista actual en estado incoherente
+
 ## Sesion 2026-04-10 — TASK-330 cerrada: gobernanza de drift Entra vs Greenhouse
 
 - alcance cerrado:

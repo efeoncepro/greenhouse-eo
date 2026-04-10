@@ -15,6 +15,7 @@ type PeopleListRow = {
   email_aliases: string[] | null
   role_title: string | null
   role_category: string | null
+  department_name: string | null
   avatar_url: string | null
   location_country: string | null
   active: boolean | null
@@ -36,6 +37,7 @@ const normalizePersonListItem = (row: PeopleListRow): PersonListItem => {
     internalEmail,
     roleTitle: String(row.role_title || 'Efeonce Team'),
     roleCategory: String(row.role_category || 'unknown'),
+    departmentName: row.department_name || null,
     avatarUrl: row.avatar_url || resolveAvatarPath({ name: row.display_name, email: publicEmail }),
     locationCountry: row.location_country || null,
     active: Boolean(row.active),
@@ -208,12 +210,15 @@ const getPeopleListFromPostgres = async (
       COALESCE(m.email_aliases, ARRAY[]::text[]) AS email_aliases,
       m.role_title,
       m.role_category,
+      COALESCE(p360.department_name, dept.name) AS department_name,
       m.avatar_url,
       m.location_country,
       m.active,
       c.pay_regime
     FROM greenhouse_core.members m
     LEFT JOIN current_comp c ON c.member_id = m.member_id
+    LEFT JOIN greenhouse_core.departments dept ON dept.department_id = m.department_id
+    LEFT JOIN greenhouse_serving.person_360 p360 ON p360.member_id = m.member_id
     ${organizationFilterJoin}
     ${memberFilterClause}
     ORDER BY

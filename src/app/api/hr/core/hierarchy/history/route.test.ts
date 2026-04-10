@@ -72,4 +72,46 @@ describe('GET /api/hr/core/hierarchy/history', () => {
     expect(body.history).toHaveLength(1)
     expect(body.delegations).toHaveLength(1)
   })
+
+  it('dedupes delegations even when timestamps arrive as Date-like values', async () => {
+    mockListHierarchyHistory.mockResolvedValue([])
+    mockListApprovalDelegations
+      .mockResolvedValueOnce([
+        {
+          responsibilityId: 'resp-1',
+          supervisorMemberId: 'member-1',
+          supervisorName: 'Ana Perez',
+          delegateMemberId: 'member-3',
+          delegateMemberName: 'Marta Silva',
+          effectiveFrom: '2026-04-10T12:00:00.000Z',
+          effectiveTo: null,
+          active: true,
+          isPrimary: true,
+          createdAt: new Date('2026-04-10T12:00:00.000Z') as unknown as string,
+          updatedAt: new Date('2026-04-10T12:30:00.000Z') as unknown as string
+        }
+      ])
+      .mockResolvedValueOnce([
+        {
+          responsibilityId: 'resp-1',
+          supervisorMemberId: 'member-1',
+          supervisorName: 'Ana Perez',
+          delegateMemberId: 'member-3',
+          delegateMemberName: 'Marta Silva',
+          effectiveFrom: '2026-04-10T12:00:00.000Z',
+          effectiveTo: null,
+          active: true,
+          isPrimary: true,
+          createdAt: new Date('2026-04-10T12:00:00.000Z') as unknown as string,
+          updatedAt: new Date('2026-04-10T12:30:00.000Z') as unknown as string
+        }
+      ])
+
+    const response = await GET(new Request('http://localhost/api/hr/core/hierarchy/history?memberId=member-1'))
+    const body = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(body.history).toEqual([])
+    expect(body.delegations).toHaveLength(1)
+  })
 })

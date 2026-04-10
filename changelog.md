@@ -2,6 +2,13 @@
 
 ## 2026-04-10
 
+### 2026-04-10 — Hierarchy follow-up hardening for staged changes and org chart data
+
+- `HR > Jerarquía` corrige un bug donde una línea futura abierta podía bloquear o invisibilizar un cambio de supervisor con fecha efectiva hoy.
+- `GET /api/hr/core/hierarchy/history` deja de fallar al combinar historial y delegaciones cuando PostgreSQL entrega timestamps como objetos `Date`.
+- `HR > Organigrama` ahora puede mostrar el departamento desde el roster enriquecido aunque la snapshot de jerarquía todavía venga sin `departmentName`.
+- La UX de delegaciones ahora deja explícito que cada supervisor mantiene solo una delegación primaria activa a la vez.
+
 ### 2026-04-10 — Org chart explorer materialized over canonical hierarchy
 
 - Se materializó `HR > Organigrama` en `/hr/org-chart` como explorer visual de lectura sobre la jerarquía canónica.

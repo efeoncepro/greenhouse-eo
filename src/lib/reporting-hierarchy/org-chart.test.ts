@@ -187,4 +187,61 @@ describe('getHrOrgChart', () => {
     expect(result.edges).toEqual([])
     expect(result.nodes.find(node => node.memberId === 'member-3')?.isRoot).toBe(true)
   })
+
+  it('falls back to the roster department when the hierarchy snapshot does not have it yet', async () => {
+    mockListHierarchy.mockResolvedValue([
+      {
+        reportingLineId: 'rpt-1',
+        memberId: 'member-1',
+        memberName: 'Ana Perez',
+        memberActive: true,
+        roleTitle: 'Lead',
+        departmentId: null,
+        departmentName: null,
+        supervisorMemberId: null,
+        supervisorName: null,
+        supervisorActive: null,
+        effectiveFrom: '2026-04-10T12:00:00.000Z',
+        sourceSystem: 'greenhouse_manual',
+        changeReason: 'initial_setup',
+        changedByUserId: 'user-1',
+        directReportsCount: 0,
+        subtreeSize: 0,
+        depth: 0,
+        isRoot: true,
+        delegation: null
+      }
+    ])
+    mockGetPeopleList.mockResolvedValue({
+      items: [
+        {
+          memberId: 'member-1',
+          displayName: 'Ana Perez',
+          publicEmail: 'ana@efeonce.org',
+          internalEmail: 'ana@efeonce.org',
+          roleTitle: 'Lead',
+          roleCategory: 'operations',
+          departmentName: 'Delivery',
+          avatarUrl: null,
+          locationCountry: 'CL',
+          active: true,
+          totalAssignments: 0,
+          contractedFte: 1,
+          assignedFte: 1,
+          totalFte: 1,
+          payRegime: 'chile'
+        }
+      ]
+    })
+
+    const result = await getHrOrgChart({
+      tenant: { userId: 'user-1', memberId: 'member-1' } as any,
+      accessContext: {
+        accessMode: 'broad',
+        supervisorScope: null
+      }
+    })
+
+    expect(result.nodes[0]?.departmentName).toBe('Delivery')
+  })
 })
