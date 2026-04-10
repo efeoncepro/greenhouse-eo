@@ -46,6 +46,7 @@ export const AGGREGATE_TYPES = {
 
   // HR Core / People
   member: 'member',
+  memberSkill: 'member_skill',
   assignment: 'assignment',
   department: 'department',
 
@@ -57,6 +58,7 @@ export const AGGREGATE_TYPES = {
 
   // Services
   service: 'service',
+  serviceSkillRequirement: 'service_skill_requirement',
 
   // Person Intelligence
   compensation: 'compensation',
@@ -131,6 +133,8 @@ export const EVENT_TYPES = {
   memberCreated: 'member.created',
   memberUpdated: 'member.updated',
   memberDeactivated: 'member.deactivated',
+  memberSkillUpserted: 'member_skill.upserted',
+  memberSkillDeleted: 'member_skill.deleted',
   assignmentCreated: 'assignment.created',
   assignmentUpdated: 'assignment.updated',
   assignmentRemoved: 'assignment.removed',
@@ -206,6 +210,8 @@ export const EVENT_TYPES = {
   serviceCreated: 'service.created',
   serviceUpdated: 'service.updated',
   serviceDeactivated: 'service.deactivated',
+  serviceSkillRequirementUpserted: 'service_skill_requirement.upserted',
+  serviceSkillRequirementDeleted: 'service_skill_requirement.deleted',
 
   // Person Intelligence
   compensationUpdated: 'compensation.updated',
@@ -354,6 +360,8 @@ export const REACTIVE_EVENT_TYPES = [
 
   // Notification triggers
   EVENT_TYPES.serviceCreated,
+  EVENT_TYPES.serviceSkillRequirementUpserted,
+  EVENT_TYPES.serviceSkillRequirementDeleted,
   EVENT_TYPES.reconciliationApproved,
   EVENT_TYPES.dteDiscrepancyFound,
   EVENT_TYPES.profileLinked,
@@ -366,6 +374,8 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.icoAiLlmEnrichmentsMaterialized,
   EVENT_TYPES.memberCreated,
   EVENT_TYPES.memberUpdated,
+  EVENT_TYPES.memberSkillUpserted,
+  EVENT_TYPES.memberSkillDeleted,
 
   // Capacity Economics triggers
   EVENT_TYPES.financeExchangeRateUpserted,

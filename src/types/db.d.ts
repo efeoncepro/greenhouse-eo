@@ -476,6 +476,18 @@ export interface GreenhouseCoreMembers {
   years_experience: Numeric | null;
 }
 
+export interface GreenhouseCoreMemberSkills {
+  created_at: Generated<Timestamp>;
+  member_id: string;
+  notes: string | null;
+  seniority_level: string;
+  skill_code: string;
+  source_system: Generated<string>;
+  updated_at: Generated<Timestamp>;
+  verified_at: Timestamp | null;
+  verified_by: string | null;
+}
+
 export interface GreenhouseCoreNotionWorkspaces {
   active: Generated<boolean>;
   client_id: string | null;
@@ -713,6 +725,28 @@ export interface GreenhouseCoreServices {
   total_cost: Numeric | null;
   updated_at: Generated<Timestamp>;
   updated_by: string | null;
+}
+
+export interface GreenhouseCoreServiceSkillRequirements {
+  created_at: Generated<Timestamp>;
+  notes: string | null;
+  required_fte: Numeric;
+  required_seniority: string;
+  service_id: string;
+  skill_code: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCoreSkillCatalog {
+  active: Generated<boolean>;
+  created_at: Generated<Timestamp>;
+  description: string | null;
+  display_order: Generated<number>;
+  seniority_levels: Generated<string[]>;
+  skill_category: string;
+  skill_code: string;
+  skill_name: string;
+  updated_at: Generated<Timestamp>;
 }
 
 export interface GreenhouseCoreSpaceNotionPublicationTargets {
@@ -3700,6 +3734,7 @@ export interface DB {
   "greenhouse_core.entity_source_links": GreenhouseCoreEntitySourceLinks;
   "greenhouse_core.identity_profile_source_links": GreenhouseCoreIdentityProfileSourceLinks;
   "greenhouse_core.identity_profiles": GreenhouseCoreIdentityProfiles;
+  "greenhouse_core.member_skills": GreenhouseCoreMemberSkills;
   "greenhouse_core.members": GreenhouseCoreMembers;
   "greenhouse_core.notion_workspace_source_bindings": GreenhouseCoreNotionWorkspaceSourceBindings;
   "greenhouse_core.notion_workspaces": GreenhouseCoreNotionWorkspaces;
@@ -3716,7 +3751,9 @@ export interface DB {
   "greenhouse_core.scim_tenant_mappings": GreenhouseCoreScimTenantMappings;
   "greenhouse_core.service_history": GreenhouseCoreServiceHistory;
   "greenhouse_core.service_modules": GreenhouseCoreServiceModules;
+  "greenhouse_core.service_skill_requirements": GreenhouseCoreServiceSkillRequirements;
   "greenhouse_core.services": GreenhouseCoreServices;
+  "greenhouse_core.skill_catalog": GreenhouseCoreSkillCatalog;
   "greenhouse_core.space_notion_publication_targets": GreenhouseCoreSpaceNotionPublicationTargets;
   "greenhouse_core.space_notion_sources": GreenhouseCoreSpaceNotionSources;
   "greenhouse_core.spaces": GreenhouseCoreSpaces;

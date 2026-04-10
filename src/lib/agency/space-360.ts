@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { getSpaceFinanceMetrics } from '@/lib/agency/agency-finance-metrics'
+import { getEmptySpaceSkillCoverage, getSpaceSkillCoverage } from '@/lib/agency/skills-staffing'
 import { readLatestSpaceMetrics, readProjectMetrics } from '@/lib/ico-engine/read-metrics'
 import { getIcoEngineProjectId, runIcoEngineQuery, toNumber as toIcoNumber, normalizeString } from '@/lib/ico-engine/shared'
 import { ICO_DATASET } from '@/lib/ico-engine/schema'
@@ -9,6 +10,7 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getServicesBySpace, type ServiceListItem } from '@/lib/services/service-store'
 import { getSpaceHealth, type SpaceHealthZone } from '@/components/agency/space-health'
 import { getScopeOwnership, type ScopeOwnership } from '@/lib/operational-responsibility/readers'
+import type { MemberSkill, ServiceStaffingRecommendation } from '@/types/agency-skills'
 
 type RiskLevel = 'low' | 'medium' | 'high'
 type DataStatus = 'ready' | 'partial' | 'missing'
@@ -565,6 +567,11 @@ export type Space360Detail = {
       activePlacements: number
       providerCount: number
       overcommittedCount: number
+      requiredSkillCount: number
+      coveredSkillCount: number
+      gapSkillCount: number
+      serviceCountWithRequirements: number
+      coveragePct: number | null
     }
     members: Array<{
       assignmentId: string
@@ -585,7 +592,11 @@ export type Space360Detail = {
       placementStatus: string | null
       placementProviderId: string | null
       placementProviderName: string | null
+      skills: MemberSkill[]
     }>
+    staffing: {
+      services: ServiceStaffingRecommendation[]
+    }
   }
   services: {
     items: Array<ServiceListItem>
@@ -670,7 +681,8 @@ export const getAgencySpace360 = async (requestedId: string): Promise<Space360De
     ownership,
     placementExposure,
     services,
-    recentActivity
+    recentActivity,
+    skillCoverage
   ] = await Promise.all([
     readLatestFinanceSnapshot({ clientId: context.client_id, spaceId: context.space_id }),
     getSpaceFinanceMetrics().then(items =>
@@ -691,7 +703,10 @@ export const getAgencySpace360 = async (requestedId: string): Promise<Space360De
       clientId: context.client_id,
       spaceId: context.space_id,
       organizationId: context.organization_id
-    })
+    }),
+    context.space_id
+      ? getSpaceSkillCoverage({ spaceId: context.space_id }).catch(() => getEmptySpaceSkillCoverage(context.space_id))
+      : Promise.resolve(getEmptySpaceSkillCoverage(context.space_id))
   ])
 
   const currentPeriod = getCurrentPeriod()
@@ -737,7 +752,8 @@ export const getAgencySpace360 = async (requestedId: string): Promise<Space360De
       placementId: assignment.placement_id,
       placementStatus: assignment.placement_status,
       placementProviderId: assignment.placement_provider_id,
-      placementProviderName: assignment.placement_provider_name
+      placementProviderName: assignment.placement_provider_name,
+      skills: skillCoverage.memberSkillsByMember[assignment.member_id] || []
     }
   })
 
@@ -888,13 +904,21 @@ export const getAgencySpace360 = async (requestedId: string): Promise<Space360De
       summary: {
         assignedMembers: teamMembers.length,
         allocatedFte: Number(allocatedFte.toFixed(1)),
-        avgUsagePct,
-        totalLoadedCostClp: Math.round(totalLoadedCostClp),
-        activePlacements: placementExposure.activeCount,
-        providerCount: placementExposure.providerCount,
-        overcommittedCount
-      },
-      members: teamMembers
+      avgUsagePct,
+      totalLoadedCostClp: Math.round(totalLoadedCostClp),
+      activePlacements: placementExposure.activeCount,
+      providerCount: placementExposure.providerCount,
+      overcommittedCount,
+      requiredSkillCount: skillCoverage.summary.requiredSkillCount,
+      coveredSkillCount: skillCoverage.summary.coveredSkillCount,
+      gapSkillCount: skillCoverage.summary.gapSkillCount,
+      serviceCountWithRequirements: skillCoverage.summary.serviceCountWithRequirements,
+      coveragePct: skillCoverage.summary.coveragePct
+    },
+      members: teamMembers,
+      staffing: {
+        services: skillCoverage.services
+      }
     },
     services: {
       items: services,

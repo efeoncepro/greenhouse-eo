@@ -11,6 +11,7 @@ import type { Space360Detail } from '@/lib/agency/space-360'
 import Space360View from './Space360View'
 
 const replaceMock = vi.fn()
+let searchParams = new URLSearchParams()
 
 vi.mock('next/link', () => ({
   default: ({ children, href, ...props }: { children: ReactNode; href: string }) => (
@@ -23,7 +24,7 @@ vi.mock('next/link', () => ({
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace: replaceMock }),
   usePathname: () => '/agency/spaces/client-1',
-  useSearchParams: () => new URLSearchParams()
+  useSearchParams: () => searchParams
 }))
 
 // Mock IntersectionObserver for AnimatedCounter's useInView
@@ -97,7 +98,12 @@ const detail: Space360Detail = {
       totalLoadedCostClp: 950000,
       activePlacements: 1,
       providerCount: 1,
-      overcommittedCount: 0
+      overcommittedCount: 0,
+      requiredSkillCount: 2,
+      coveredSkillCount: 1,
+      gapSkillCount: 1,
+      serviceCountWithRequirements: 1,
+      coveragePct: 50
     },
     members: [
       {
@@ -118,9 +124,71 @@ const detail: Space360Detail = {
         placementId: 'placement-1',
         placementStatus: 'active',
         placementProviderId: 'provider-1',
-        placementProviderName: 'Anthropic'
+        placementProviderName: 'Anthropic',
+        skills: [
+          {
+            memberId: 'member-1',
+            skillCode: 'ux_ui_design',
+            skillName: 'UX/UI Design',
+            skillCategory: 'design',
+            seniorityLevel: 'senior',
+            sourceSystem: 'manual',
+            notes: null,
+            verifiedBy: 'user-1',
+            verifiedAt: '2026-04-10T00:00:00.000Z'
+          }
+        ]
       }
-    ]
+    ],
+    staffing: {
+      services: [
+        {
+          serviceId: 'service-1',
+          serviceName: 'Creative Retainer',
+          serviceLine: 'creative',
+          serviceType: 'retainer',
+          requirements: [
+            {
+              serviceId: 'service-1',
+              skillCode: 'ux_ui_design',
+              skillName: 'UX/UI Design',
+              skillCategory: 'design',
+              requiredSeniority: 'senior',
+              requiredFte: 1,
+              notes: null,
+              matchedMemberCount: 1,
+              coverageFte: 1,
+              status: 'covered',
+              topCandidates: [
+                {
+                  memberId: 'member-1',
+                  displayName: 'Ana',
+                  roleTitle: 'Designer',
+                  roleCategory: 'design',
+                  assignmentId: 'asg-1',
+                  assignmentFte: 1,
+                  availableFte: 0.1,
+                  utilizationPercent: 92,
+                  placementId: 'placement-1',
+                  placementStatus: 'active',
+                  seniorityLevel: 'senior',
+                  seniorityScore: 100,
+                  availabilityScore: 10,
+                  fitScore: 69
+                }
+              ]
+            }
+          ],
+          gaps: [],
+          summary: {
+            totalRequirementCount: 1,
+            coveredRequirementCount: 1,
+            gapRequirementCount: 0,
+            averageFitScore: 69
+          }
+        }
+      ]
+    }
   },
   services: {
     items: [
@@ -202,6 +270,7 @@ const detail: Space360Detail = {
 describe('Space360View', () => {
   beforeEach(() => {
     replaceMock.mockReset()
+    searchParams = new URLSearchParams()
   })
 
   afterEach(() => {
@@ -230,5 +299,19 @@ describe('Space360View', () => {
 
     expect(screen.getByText('Space no encontrado')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Volver a Spaces' })).toHaveAttribute('href', '/agency?tab=spaces')
+  })
+
+  it('renders the team tab with skill coverage and service gaps', () => {
+    searchParams = new URLSearchParams('tab=team')
+
+    renderWithTheme(<Space360View detail={detail} requestedId='client-1' />)
+
+    expect(screen.getByText('Cobertura de skills')).toBeInTheDocument()
+    expect(screen.getByText('50% cubierto')).toBeInTheDocument()
+    expect(screen.getByText('Servicios con requisitos')).toBeInTheDocument()
+    expect(screen.getByText('Cubiertas')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'UX/UI Design · Senior' })).toBeInTheDocument()
+    expect(screen.getByText('Creative Retainer')).toBeInTheDocument()
+    expect(screen.getByText('Cubierto')).toBeInTheDocument()
   })
 })

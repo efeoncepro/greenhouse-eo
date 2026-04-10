@@ -1,5 +1,42 @@
 # Handoff.md
 
+## Sesion 2026-04-10 — TASK-157 cerrada: Skills Matrix + Intelligent Staffing Engine
+
+- alcance cerrado:
+  - nuevas tablas canónicas en `greenhouse_core`:
+    - `skill_catalog`
+    - `member_skills`
+    - `service_skill_requirements`
+  - nuevo helper `src/lib/agency/skills-staffing.ts` con validación tenant-safe por `spaceId`, reads/writes canónicos y scoring de cobertura/fit
+  - nuevas APIs:
+    - `GET /api/agency/skills`
+    - `GET/PATCH /api/agency/skills/members/[memberId]`
+    - `GET/PATCH /api/agency/skills/services/[serviceId]`
+    - `GET /api/agency/staffing`
+  - `Space 360 > Team` ahora consume la matriz de skills y muestra:
+    - cobertura agregada del Space
+    - chips de skills por persona
+    - gaps y recomendaciones por servicio
+  - `src/lib/sync/event-catalog.ts` agrega eventos de outbox para `member_skill` y `service_skill_requirement`
+- archivos sensibles / de alto impacto tocados:
+  - `migrations/20260410012752662_skills-matrix-staffing.sql`
+  - `src/lib/agency/skills-staffing.ts`
+  - `src/lib/agency/space-360.ts`
+  - `src/views/greenhouse/agency/space-360/tabs/TeamTab.tsx`
+  - `src/app/api/agency/skills/**`
+  - `src/app/api/agency/staffing/route.ts`
+  - `src/types/agency-skills.ts`
+  - `src/types/db.d.ts`
+- validación ejecutada:
+  - `pnpm pg:connect:migrate` — OK
+  - `pnpm exec tsc --noEmit --incremental false` — OK
+  - `pnpm exec vitest run src/views/greenhouse/agency/space-360/Space360View.test.tsx` — OK
+  - `pnpm lint` — OK
+  - `pnpm build` — OK
+- nota operativa:
+  - el primer corte del staffing engine rankea y detecta gaps sobre los miembros ya asignados al `space_id` canónico; la búsqueda cross-space de talento queda como follow-on futuro si se requiere
+  - durante `pnpm build` reapareció el fallback no bloqueante de `admin-access-overview` hacia BigQuery por `invalid_grant` de un ID token stale; el build completó OK y no pertenece al slice de TASK-157
+
 ## Sesion 2026-04-10 — TASK-306 cerrada: trazabilidad canónica de Cuenta accionista
 
 - alcance cerrado:
