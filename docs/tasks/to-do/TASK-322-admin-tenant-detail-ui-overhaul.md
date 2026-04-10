@@ -76,7 +76,7 @@ Reglas obligatorias:
 ### Depends on
 
 - Ninguna tabla, schema ni API nueva. Todos los cambios son frontend-only sobre archivos existentes.
-- La conexion bidireccional con Space 360 depende de que el backend ya incluya `spaceId` en `AdminTenantDetail` (campo existente: `data.publicId` o lookup por `clientId`). Si no existe, agregar un campo derivado.
+- La conexion bidireccional con Space 360 usa `data.clientId` como clave de navegacion — Space 360 ya acepta `clientId` como parametro de ruta (`getAgencySpace360(id)` resuelve por `clientId`).
 
 ### Blocks / Impacts
 
@@ -184,9 +184,9 @@ Reglas obligatorias:
 - **TenantProjectsPanel.tsx:39-41** — Eliminar boton "Agregar proyecto" disabled. Cuando se implemente, se agrega
 - **TenantProjectsPanel.tsx:80-83** — Mover project ID tecnico a tooltip en el nombre del proyecto
 - **TenantSettingsPanel.tsx:47** — Agregar boton de copy-to-clipboard al lado del `clientId` interno (util para admin pero no como texto plano)
-- **TenantSettingsPanel.tsx:122-129** — Agregar nota visual `(solo lectura)` al card de Notes, o convertirlo en `TextField` editable si la API lo soporta [verificar]
+- **TenantSettingsPanel.tsx:122-129** — Agregar label `(solo lectura — origen: registro de cliente)` debajo del contenido de Notes. No implementar edicion (no hay API de update; BigQuery no es destino de escritura)
 - **TenantNotionPanel.tsx** — Agregar descripcion introductoria al panel: "Configuracion de la integracion Notion para este tenant. Permite descubrir bases de datos, verificar calidad de datos y gestionar la sincronizacion."
-- **GreenhouseAdminTenantDetail.tsx:228-239** — Evaluar si el banner "Esta vista esta en transicion" sigue siendo necesario. Si Cuentas ya esta consolidado, eliminarlo. Si no, agregar fecha o contexto de cuando se completara la transicion
+- **GreenhouseAdminTenantDetail.tsx:228-239** — **Eliminar** el banner "Esta vista esta en transicion" completo. La vista de Cuentas (`/admin/accounts`) ya existe y opera. Si se depreca esta vista en el futuro, se redirige con `redirect()` en el server component
 
 ### Slice 7 — Deduplicacion de informacion entre tabs
 
@@ -304,6 +304,9 @@ const isUnknownFallback = capability.moduleCode === 'EO-BL-UNKNOWN'
 - [ ] Company Record no aparece duplicado en tab Capabilities (solo en CRM y Configuracion)
 - [ ] Tab CRM Config tiene un chip-summary de Business Lines con link a Capabilities (no duplicacion completa)
 - [ ] El chip "Realtime" se muestra como "Tiempo real"
+- [ ] El banner "Esta vista esta en transicion" ya no existe
+- [ ] El card de Notes muestra label `(solo lectura)` explicito
+- [ ] La seccion "HubSpot Raw Read" esta renombrada a "Detalle tecnico CRM" y no muestra `serviceBaseUrl`
 - [ ] `pnpm lint` y `npx tsc --noEmit` pasan sin errores
 
 ## Verification
@@ -331,6 +334,16 @@ const isUnknownFallback = capability.moduleCode === 'EO-BL-UNKNOWN'
 
 ## Open Questions
 
-- El banner "Esta vista esta en transicion" — se elimina, se mantiene, o se actualiza con fecha de migracion? Decision del usuario
-- Notes en tab Configuracion — son readonly por diseno o falta implementar edicion? [verificar si existe API de update]
-- La seccion "HubSpot Raw Read" en CRM — se mantiene como accordion tecnico o se elimina? Para un admin avanzado es util, pero agrega ruido
+Resueltas 2026-04-09:
+
+### 1. Banner "Esta vista esta en transicion" → **Eliminar**
+
+La vista de Cuentas (`/admin/accounts` y `/admin/accounts/[id]`) ya existe y opera con su propio componente (`AdminAccountsView`, `AdminAccountDetailView`). El banner lleva tiempo suficiente como para haber entrenado a los usuarios a ignorarlo. Un banner permanente sin fecha ni progreso no es una señal operativa — es ruido visual. **Accion:** eliminarlo en Slice 6. Si en el futuro se depreca completamente esta vista, se redirige con `redirect()` en el server component, no con un banner.
+
+### 2. Notes en tab Configuracion → **Mantener readonly con label explicito**
+
+`notes` se lee desde BigQuery (`greenhouse.clients.notes`) y no existe API de update (`PUT`/`PATCH`) para este campo. Crear un endpoint de escritura contra BigQuery no es escalable — la escritura canonica deberia ser contra PostgreSQL cuando se migre el data model (follow-up declarado). **Accion:** agregar label `(solo lectura — origen: registro de cliente)` al card de Notes. No implementar edicion inline en esta task.
+
+### 3. HubSpot Raw Read en CRM → **Mantener como accordion colapsado y renombrado**
+
+Para un admin que troubleshootea integraciones, ver el company profile, owner y estado de sync es operativamente util — la alternativa seria abrir HubSpot directamente. Eliminarlo forzaria eso. **Accion:** mantener el accordion pero: (1) renombrarlo a "Detalle tecnico CRM", (2) asegurar que esta colapsado por defecto (ya lo esta — es `Accordion` sin `defaultExpanded`), (3) quitar `serviceBaseUrl` del contenido visible (infraestructura interna).
