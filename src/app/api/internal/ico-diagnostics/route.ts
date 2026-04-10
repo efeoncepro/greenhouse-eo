@@ -41,10 +41,13 @@ export async function GET(request: Request) {
 
   // Step 2: Direct metric_snapshots_monthly read (no joins)
   try {
-    const rows = await runIcoEngineQuery<{ cnt: string }>(`
+    const rows = await runIcoEngineQuery<{ cnt: string }>(
+      `
       SELECT COUNT(*) as cnt FROM \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\`
       WHERE period_year = @year AND period_month = @month
-    `, { year, month })
+    `,
+      { year, month }
+    )
 
     results.snapshotCount = rows[0]?.cnt ?? 0
   } catch (e: unknown) {
@@ -53,7 +56,8 @@ export async function GET(request: Request) {
 
   // Step 3: readAgencyMetrics query (subquery JOINs — fixed)
   try {
-    const rows = await runIcoEngineQuery<{ space_id: string }>(`
+    const rows = await runIcoEngineQuery<{ space_id: string }>(
+      `
       SELECT ms.space_id, COALESCE(c1.client_name, c2.client_name) AS client_name
       FROM \`${projectId}.${ICO_DATASET}.metric_snapshots_monthly\` ms
       LEFT JOIN (SELECT client_id, client_name FROM \`${projectId}.greenhouse.clients\`) c1
@@ -62,7 +66,9 @@ export async function GET(request: Request) {
         ON c2.client_id = ms.space_id
       WHERE ms.period_year = @year AND ms.period_month = @month
       LIMIT 5
-    `, { year, month })
+    `,
+      { year, month }
+    )
 
     results.agencyMetrics = `OK: ${rows.length} rows`
   } catch (e: unknown) {
@@ -86,23 +92,31 @@ export async function GET(request: Request) {
 
   // Step 5: Performance report (BigQuery materialized)
   try {
-    const rows = await runIcoEngineQuery<{ report_scope: string }>(`
+    const rows = await runIcoEngineQuery<{ report_scope: string }>(
+      `
       SELECT report_scope FROM \`${projectId}.${ICO_DATASET}.performance_report_monthly\`
       WHERE period_year = @year AND period_month = @month
       LIMIT 1
-    `, { year, month })
+    `,
+      { year, month }
+    )
 
-    results.performanceReportBQ = rows.length > 0 ? `OK: ${rows.length} rows` : 'EMPTY (will trigger live compute fallback)'
+    results.performanceReportBQ =
+      rows.length > 0 ? `OK: ${rows.length} rows` : 'EMPTY (will trigger live compute fallback)'
   } catch (e: unknown) {
     results.performanceReportBQ = `FAIL: ${e instanceof Error ? e.message : String(e)}`
   }
 
   // Step 6: readTopPerformer isolation test (subquery JOINs — the fix)
   try {
-    const { buildDeliveryPeriodSourceSql, buildMetricSelectSQL, buildAgencyReportScopeSql } = await import('@/lib/ico-engine/shared')
+    const { buildDeliveryPeriodSourceSql, buildMetricSelectSQL, buildAgencyReportScopeSql } = await import(
+      '@/lib/ico-engine/shared'
+    )
+
     const { TOP_PERFORMER_MIN_THROUGHPUT } = await import('@/lib/ico-engine/performance-report')
 
-    const rows = await runIcoEngineQuery<{ member_id: string }>(`
+    const rows = await runIcoEngineQuery<{ member_id: string }>(
+      `
       SELECT
         scoped.member_id,
         scoped.member_name,
@@ -136,11 +150,13 @@ export async function GET(request: Request) {
         AND scoped.otd_pct IS NOT NULL
       ORDER BY scoped.otd_pct DESC, scoped.total_tasks DESC
       LIMIT 1
-    `, {
-      periodYear: year,
-      periodMonth: month,
-      minThroughput: TOP_PERFORMER_MIN_THROUGHPUT
-    })
+    `,
+      {
+        periodYear: year,
+        periodMonth: month,
+        minThroughput: TOP_PERFORMER_MIN_THROUGHPUT
+      }
+    )
 
     results.topPerformerQuery = rows.length > 0 ? `OK: ${rows[0].member_id}` : 'OK: no top performer (0 rows)'
   } catch (e: unknown) {
@@ -158,14 +174,26 @@ export async function GET(request: Request) {
   }
 
   // Step 8: If Postgres serving is empty but BQ has data, seed it directly
-  if (results.performanceReportServing === 'EMPTY (will trigger BQ fallback)' && typeof results.performanceReportBQ === 'string' && results.performanceReportBQ.startsWith('OK')) {
+  if (
+    results.performanceReportServing === 'EMPTY (will trigger BQ fallback)' &&
+    typeof results.performanceReportBQ === 'string' &&
+    results.performanceReportBQ.startsWith('OK')
+  ) {
     try {
       const { agencyPerformanceReportProjection } = await import('@/lib/sync/projections/agency-performance-report')
 
-      const scope = agencyPerformanceReportProjection.extractScope({ reportScope: 'agency', periodYear: year, periodMonth: month })
+      const scope = agencyPerformanceReportProjection.extractScope({
+        reportScope: 'agency',
+        periodYear: year,
+        periodMonth: month
+      })
 
       if (scope) {
-        const refreshResult = await agencyPerformanceReportProjection.refresh(scope, { reportScope: 'agency', periodYear: year, periodMonth: month })
+        const refreshResult = await agencyPerformanceReportProjection.refresh(scope, {
+          reportScope: 'agency',
+          periodYear: year,
+          periodMonth: month
+        })
 
         results.postgresProjectionSeed = refreshResult ?? 'no-op'
       }
