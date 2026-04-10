@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { ROLE_CODES } from '@/config/role-codes'
-import { sendEmail } from '@/lib/email/delivery'
+import { sendEmail, wasEmailAlreadySent } from '@/lib/email/delivery'
 import {
   getMemberNotificationRecipients,
   getProfileNotificationRecipient,
@@ -250,15 +250,19 @@ export const notificationProjection: ProjectionDefinition = {
       const requestedDays = typeof payload.requestedDays === 'number' ? payload.requestedDays : 0
       const reason = typeof payload.reason === 'string' ? payload.reason : null
 
+      if (!requestId) return null
+
+      // When there is no supervisor, the request goes directly to pending_hr and
+      // a separate leave_request.escalated_to_hr event is published in the same
+      // transaction. That handler already notifies HR reviewers, so we must NOT
+      // notify HR here to avoid duplicate emails + in-app notifications (ISSUE-033).
       const reviewerRecipients = supervisorMemberId
         ? [...(await getMemberNotificationRecipients([supervisorMemberId])).values()].filter(
           (recipient): recipient is PersonNotificationRecipient => recipient !== null
         )
-        : await getHrReviewRecipients()
+        : []
 
-      if (!requestId) return null
-
-      // In-app notification to reviewer (existing behavior)
+      // In-app notification to supervisor (only when a supervisor exists)
       if (reviewerRecipients.length > 0) {
         await NotificationService.dispatch({
           category: 'leave_review',
@@ -276,31 +280,39 @@ export const notificationProjection: ProjectionDefinition = {
       const memberFirstName = memberName.split(' ')[0] || memberName
 
       if (memberEmail) {
-        const memberRecipientMap = memberId ? await getMemberNotificationRecipients([memberId]) : new Map()
-        const memberRecipient = memberId ? memberRecipientMap.get(memberId) ?? null : null
+        const alreadySent = await wasEmailAlreadySent(requestId, 'leave_request_submitted', memberEmail)
 
-        await sendEmail({
-          emailType: 'leave_request_submitted',
-          domain: 'hr',
-          recipients: [{ email: memberEmail, name: memberName, userId: memberRecipient?.userId }],
-          context: {
-            memberFirstName,
-            leaveTypeName,
-            startDate,
-            endDate,
-            requestedDays,
-            reason
-          },
-          sourceEventId: requestId,
-          sourceEntity: 'leave_request_submitted'
-        }).catch(err => {
-          console.warn('[notifications] Failed to send leave_request_submitted email:', err instanceof Error ? err.message : err)
-        })
+        if (!alreadySent) {
+          const memberRecipientMap = memberId ? await getMemberNotificationRecipients([memberId]) : new Map()
+          const memberRecipient = memberId ? memberRecipientMap.get(memberId) ?? null : null
+
+          await sendEmail({
+            emailType: 'leave_request_submitted',
+            domain: 'hr',
+            recipients: [{ email: memberEmail, name: memberName, userId: memberRecipient?.userId }],
+            context: {
+              memberFirstName,
+              leaveTypeName,
+              startDate,
+              endDate,
+              requestedDays,
+              reason
+            },
+            sourceEventId: requestId,
+            sourceEntity: 'leave_request_submitted'
+          }).catch(err => {
+            console.warn('[notifications] Failed to send leave_request_submitted email:', err instanceof Error ? err.message : err)
+          })
+        }
       }
 
-      // ── Email to REVIEWERS: pending review notification ──
+      // ── Email to SUPERVISOR: pending review notification (only when supervisor exists) ──
       for (const reviewer of reviewerRecipients) {
         if (!reviewer.email) continue
+
+        const alreadySent = await wasEmailAlreadySent(requestId, 'leave_request_pending_review', reviewer.email)
+
+        if (alreadySent) continue
 
         const reviewerFirstName = (reviewer.fullName || '').split(' ')[0] || 'Revisor'
 
@@ -324,7 +336,9 @@ export const notificationProjection: ProjectionDefinition = {
         })
       }
 
-      return `notified ${reviewerRecipients.length} recipients about leave_request.created`
+      return supervisorMemberId
+        ? `notified ${reviewerRecipients.length} supervisor(s) about leave_request.created`
+        : 'leave_request.created without supervisor — HR notification deferred to escalated_to_hr'
     }
 
     if (eventType === 'leave_request.escalated_to_hr') {
@@ -352,6 +366,10 @@ export const notificationProjection: ProjectionDefinition = {
       // ── Email to HR REVIEWERS: escalated request needs review ──
       for (const reviewer of recipients) {
         if (!reviewer.email) continue
+
+        const alreadySent = await wasEmailAlreadySent(requestId, 'leave_request_pending_review', reviewer.email)
+
+        if (alreadySent) continue
 
         const reviewerFirstName = (reviewer.fullName || '').split(' ')[0] || 'Revisor'
 
@@ -431,43 +449,55 @@ export const notificationProjection: ProjectionDefinition = {
         recipients: [recipient]
       })
 
+      // Resolve actor (reviewer) recipient once — reused for both emails (ISSUE-034)
+      const actorRecipient = actorUserId
+        ? await getUserNotificationRecipient(actorUserId).catch(() => null)
+        : null
+
+      const resolvedActorEmail = actorRecipient?.email || undefined
+
       // ── Dedicated email to the REQUESTER ──
       const memberFirstName = memberName.split(' ')[0] || memberName
 
       if (memberEmail) {
-        await sendEmail({
-          emailType: 'leave_request_decision',
-          domain: 'hr',
-          recipients: [{ email: memberEmail, name: memberName, userId: recipient.userId }],
-          context: {
-            memberFirstName,
-            actorName,
-            leaveTypeName,
-            startDate,
-            endDate,
-            requestedDays,
-            status: leaveStatus,
-            notes
-          },
-          sourceEventId: requestId,
-          sourceEntity: 'leave_request_decision',
-          actorEmail: actorUserId ?? undefined
-        }).catch(err => {
-          console.warn('[notifications] Failed to send leave_request_decision email:', err instanceof Error ? err.message : err)
-        })
+        const alreadySent = await wasEmailAlreadySent(requestId, 'leave_request_decision', memberEmail)
+
+        if (!alreadySent) {
+          await sendEmail({
+            emailType: 'leave_request_decision',
+            domain: 'hr',
+            recipients: [{ email: memberEmail, name: memberName, userId: recipient.userId }],
+            context: {
+              memberFirstName,
+              actorName,
+              leaveTypeName,
+              startDate,
+              endDate,
+              requestedDays,
+              status: leaveStatus,
+              notes
+            },
+            sourceEventId: requestId,
+            sourceEntity: 'leave_request_decision',
+            actorEmail: resolvedActorEmail
+          }).catch(err => {
+            console.warn('[notifications] Failed to send leave_request_decision email:', err instanceof Error ? err.message : err)
+          })
+        }
       }
 
       // ── Dedicated email to the REVIEWER ──
-      if (actorUserId && leaveStatus !== 'cancelled') {
-        const actorRecipient = await getUserNotificationRecipient(actorUserId).catch(() => null)
+      if (actorRecipient?.email && leaveStatus !== 'cancelled') {
+        const alreadySent = await wasEmailAlreadySent(requestId, 'leave_review_confirmation', actorRecipient.email)
 
-        if (actorRecipient?.email) {
+        if (!alreadySent) {
           const actorFirstName = actorName.split(' ')[0] || actorName
+          const actorRecipientEmail = actorRecipient.email
 
           await sendEmail({
             emailType: 'leave_review_confirmation',
             domain: 'hr',
-            recipients: [{ email: actorRecipient.email, name: actorRecipient.fullName || actorName, userId: actorUserId }],
+            recipients: [{ email: actorRecipientEmail, name: actorRecipient.fullName || actorName, userId: actorUserId ?? undefined }],
             context: {
               actorFirstName,
               memberName,

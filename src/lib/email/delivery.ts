@@ -557,6 +557,31 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
   }
 }
 
+/**
+ * Check whether an email with the given sourceEventId + sourceEntity was already
+ * sent successfully. Used as a defensive dedup layer to prevent re-sending
+ * transactional emails if the reactive event is reprocessed (ISSUE-035).
+ */
+export const wasEmailAlreadySent = async (
+  sourceEventId: string,
+  sourceEntity: string,
+  recipientEmail: string
+): Promise<boolean> => {
+  const rows = await runGreenhousePostgresQuery<{ exists: boolean } & Record<string, unknown>>(
+    `SELECT EXISTS (
+       SELECT 1
+       FROM greenhouse_notifications.email_deliveries
+       WHERE source_event_id = $1
+         AND source_entity = $2
+         AND recipient_email = $3
+         AND status = 'sent'
+     ) AS exists`,
+    [sourceEventId, sourceEntity, normalizeEmail(recipientEmail)]
+  )
+
+  return rows[0]?.exists === true
+}
+
 export const sendEmail = async <TContext extends Record<string, unknown>>(
   input: SendEmailInput<TContext>
 ): Promise<SendEmailResult> => {
