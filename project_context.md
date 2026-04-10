@@ -1,5 +1,16 @@
 # project_context.md
 
+## Delta 2026-04-10 GCP auth hardening for local vs Vercel runtime
+
+- `Workload Identity Federation` sigue siendo el mecanismo preferido para runtimes reales en `Vercel`, pero deja de activarse en local solo porque exista un `VERCEL_OIDC_TOKEN` persistido en `.env*`.
+- Regla operativa nueva:
+  - `VERCEL_OIDC_TOKEN` es efímero y runtime-only
+  - no debe guardarse en `.env.local`, `.env.production.local` ni archivos equivalentes
+  - local/CLI/migraciones deben usar `GOOGLE_APPLICATION_CREDENTIALS_JSON(_BASE64)` o `ADC`, no un token OIDC reciclado
+- Nuevo guardrail:
+  - `pnpm gcp:doctor` audita los `.env*` operativos del repo y falla si detecta drift de `VERCEL_OIDC_TOKEN` o una resolución inconsistente de `WIF`
+- Páginas admin que leen `getAdminAccessOverview()` quedaron dinámicas para evitar evaluación estática de una vista dependiente de credenciales runtime.
+
 ## Delta 2026-04-10 Agency skills matrix + staffing engine
 
 - Agency ya tiene matriz canónica de skills en PostgreSQL:

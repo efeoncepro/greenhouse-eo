@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import {
   getGoogleAuthOptions,
+  getGoogleCredentialDiagnostics,
   getGoogleCredentialSource,
   getGoogleCredentials,
   getGoogleProjectId,
+  hasPersistedLocalVercelOidcToken,
   shouldUseWorkloadIdentity
 } from '@/lib/google-credentials'
 
@@ -45,7 +47,7 @@ describe('google credentials helpers', () => {
     expect(credentials?.private_key).toBe('-----BEGIN PRIVATE KEY-----\nabc\n-----END PRIVATE KEY-----\n')
   })
 
-  it('prioritizes workload identity when provider, service account and oidc token exist', () => {
+  it('ignores persisted local vercel oidc tokens outside real vercel runtime', () => {
     const env = asEnv({
       GCP_WORKLOAD_IDENTITY_PROVIDER: 'projects/123/locations/global/workloadIdentityPools/pool/providers/vercel',
       GCP_SERVICE_ACCOUNT_EMAIL: 'greenhouse-runtime@efeonce-group.iam.gserviceaccount.com',
@@ -54,14 +56,14 @@ describe('google credentials helpers', () => {
       GCP_PROJECT: 'efeonce-group'
     })
 
-    expect(shouldUseWorkloadIdentity(env)).toBe(true)
-    expect(getGoogleCredentialSource(env)).toBe('wif')
+    expect(shouldUseWorkloadIdentity(env)).toBe(false)
+    expect(getGoogleCredentialSource(env)).toBe('service_account_key')
 
     const authOptions = getGoogleAuthOptions({ env, scopes: ['scope-a'] })
 
     expect(authOptions.projectId).toBe('efeonce-group')
-    expect(authOptions.authClient).toBeDefined()
-    expect(authOptions.credentials).toBeUndefined()
+    expect(authOptions.authClient).toBeUndefined()
+    expect(authOptions.credentials).toBeDefined()
   })
 
   it('uses service account key mode when oidc token is missing', () => {
@@ -87,7 +89,8 @@ describe('google credentials helpers', () => {
       GOOGLE_APPLICATION_CREDENTIALS_JSON: '{"project_id":"efeonce-group","client_email":"runtime@example.com","private_key":"key"}',
       GCP_PROJECT: 'efeonce-group',
       VERCEL: '1',
-      VERCEL_ENV: 'preview'
+      VERCEL_ENV: 'preview',
+      VERCEL_URL: 'greenhouse-preview.vercel.app'
     })
 
     expect(shouldUseWorkloadIdentity(env)).toBe(true)
@@ -117,6 +120,24 @@ describe('google credentials helpers', () => {
 
     expect(authOptions.credentials).toBeDefined()
     expect(authOptions.authClient).toBeUndefined()
+  })
+
+  it('allows an explicit wif preference when a token is injected into a non-runtime env object', () => {
+    const env = asEnv({
+      GCP_WORKLOAD_IDENTITY_PROVIDER: 'projects/123/locations/global/workloadIdentityPools/pool/providers/vercel',
+      GCP_SERVICE_ACCOUNT_EMAIL: 'greenhouse-runtime@efeonce-group.iam.gserviceaccount.com',
+      GCP_AUTH_PREFERENCE: 'wif',
+      VERCEL_OIDC_TOKEN: 'oidc-token',
+      GCP_PROJECT: 'efeonce-group'
+    })
+
+    expect(shouldUseWorkloadIdentity(env)).toBe(true)
+    expect(getGoogleCredentialSource(env)).toBe('wif')
+
+    const authOptions = getGoogleAuthOptions({ env })
+
+    expect(authOptions.authClient).toBeDefined()
+    expect(authOptions.credentials).toBeUndefined()
   })
 
   it('falls back to ambient adc when no explicit wif or key is available', () => {
@@ -152,11 +173,45 @@ describe('google credentials helpers', () => {
       env: asEnv({
         GCP_WORKLOAD_IDENTITY_PROVIDER: 'iam.googleapis.com/projects/123/locations/global/workloadIdentityPools/pool/providers/vercel',
         GCP_SERVICE_ACCOUNT_EMAIL: 'greenhouse-runtime@efeonce-group.iam.gserviceaccount.com',
+        GCP_AUTH_PREFERENCE: 'wif',
         VERCEL_OIDC_TOKEN: 'oidc-token',
         GCP_PROJECT: 'efeonce-group'
       })
     })
 
     expect(authOptions.authClient).toBeDefined()
+  })
+
+  it('flags persisted local vercel oidc tokens in diagnostics', () => {
+    const originalToken = process.env.VERCEL_OIDC_TOKEN
+    const originalVercel = process.env.VERCEL
+
+    process.env.VERCEL_OIDC_TOKEN = 'persisted-token'
+    delete process.env.VERCEL
+
+    try {
+      expect(hasPersistedLocalVercelOidcToken()).toBe(true)
+
+      const diagnostics = getGoogleCredentialDiagnostics(
+        asEnv({
+          GCP_PROJECT: 'efeonce-group',
+          VERCEL_OIDC_TOKEN: 'persisted-token'
+        })
+      )
+
+      expect(diagnostics.hasPersistedLocalVercelOidcToken).toBe(false)
+    } finally {
+      if (originalToken === undefined) {
+        delete process.env.VERCEL_OIDC_TOKEN
+      } else {
+        process.env.VERCEL_OIDC_TOKEN = originalToken
+      }
+
+      if (originalVercel === undefined) {
+        delete process.env.VERCEL
+      } else {
+        process.env.VERCEL = originalVercel
+      }
+    }
   })
 })
