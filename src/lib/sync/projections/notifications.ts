@@ -23,8 +23,27 @@ const getAdminRecipients = async () => getRoleCodeNotificationRecipients([ROLE_C
 
 const getFinanceRecipients = async () => getRoleCodeNotificationRecipients([ROLE_CODES.FINANCE_ADMIN, ROLE_CODES.EFEONCE_ADMIN])
 
-const getHrReviewRecipients = async () =>
-  getRoleCodeNotificationRecipients([ROLE_CODES.HR_MANAGER, ROLE_CODES.HR_PAYROLL, ROLE_CODES.EFEONCE_ADMIN])
+const getApprovalSnapshotFromPayload = (payload: Record<string, unknown>) => {
+  const approvalSnapshot = payload.approvalSnapshot
+
+  if (!approvalSnapshot || typeof approvalSnapshot !== 'object') {
+    return null
+  }
+
+  return approvalSnapshot as Record<string, unknown>
+}
+
+const getFallbackRoleCodesFromApprovalSnapshot = (approvalSnapshot: Record<string, unknown> | null) => {
+  const fallbackRoleCodes = approvalSnapshot?.fallbackRoleCodes
+
+  if (!Array.isArray(fallbackRoleCodes)) {
+    return [ROLE_CODES.HR_MANAGER, ROLE_CODES.HR_PAYROLL, ROLE_CODES.EFEONCE_ADMIN]
+  }
+
+  return fallbackRoleCodes
+    .map(item => (typeof item === 'string' ? item.trim() : ''))
+    .filter(Boolean)
+}
 
 const getPayrollOpsRecipients = async (): Promise<PersonNotificationRecipient[]> => {
   const recipientsByMemberId = await getMemberNotificationRecipients(
@@ -241,6 +260,13 @@ export const notificationProjection: ProjectionDefinition = {
     if (eventType === 'leave_request.created') {
       const requestId = typeof payload.requestId === 'string' ? payload.requestId : null
       const supervisorMemberId = typeof payload.supervisorMemberId === 'string' ? payload.supervisorMemberId : null
+      const approvalSnapshot = getApprovalSnapshotFromPayload(payload)
+
+      const effectiveReviewerMemberId =
+        typeof approvalSnapshot?.effectiveApproverMemberId === 'string'
+          ? approvalSnapshot.effectiveApproverMemberId
+          : supervisorMemberId
+
       const memberId = typeof payload.memberId === 'string' ? payload.memberId : null
       const memberName = typeof payload.memberName === 'string' ? payload.memberName : 'Colaborador'
       const memberEmail = typeof payload.memberEmail === 'string' ? payload.memberEmail : null
@@ -256,8 +282,8 @@ export const notificationProjection: ProjectionDefinition = {
       // a separate leave_request.escalated_to_hr event is published in the same
       // transaction. That handler already notifies HR reviewers, so we must NOT
       // notify HR here to avoid duplicate emails + in-app notifications (ISSUE-033).
-      const reviewerRecipients = supervisorMemberId
-        ? [...(await getMemberNotificationRecipients([supervisorMemberId])).values()].filter(
+      const reviewerRecipients = effectiveReviewerMemberId
+        ? [...(await getMemberNotificationRecipients([effectiveReviewerMemberId])).values()].filter(
           (recipient): recipient is PersonNotificationRecipient => recipient !== null
         )
         : []
@@ -336,20 +362,24 @@ export const notificationProjection: ProjectionDefinition = {
         })
       }
 
-      return supervisorMemberId
+      return effectiveReviewerMemberId
         ? `notified ${reviewerRecipients.length} supervisor(s) about leave_request.created`
         : 'leave_request.created without supervisor — HR notification deferred to escalated_to_hr'
     }
 
     if (eventType === 'leave_request.escalated_to_hr') {
       const requestId = typeof payload.requestId === 'string' ? payload.requestId : null
+      const approvalSnapshot = getApprovalSnapshotFromPayload(payload)
       const memberName = typeof payload.memberName === 'string' ? payload.memberName : 'Colaborador'
       const leaveTypeName = typeof payload.leaveTypeName === 'string' ? payload.leaveTypeName : 'Permiso'
       const startDate = typeof payload.startDate === 'string' ? payload.startDate : ''
       const endDate = typeof payload.endDate === 'string' ? payload.endDate : ''
       const requestedDays = typeof payload.requestedDays === 'number' ? payload.requestedDays : 0
       const reason = typeof payload.reason === 'string' ? payload.reason : null
-      const recipients = await getHrReviewRecipients()
+
+      const recipients = await getRoleCodeNotificationRecipients(
+        getFallbackRoleCodesFromApprovalSnapshot(approvalSnapshot)
+      )
 
       if (!requestId || recipients.length === 0) return null
 

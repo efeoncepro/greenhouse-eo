@@ -40,6 +40,19 @@ Las delegaciones temporales de aprobación se modelan en `greenhouse_core.operat
 
 Esto permite que el supervisor formal siga existiendo como relación canónica, mientras la aprobación efectiva cambia por vigencia.
 
+## Snapshots de approval
+
+Cuando un workflow se envía, Greenhouse ya no depende solo del snapshot vivo `reports_to_member_id`. Para approvals por etapa usa `greenhouse_hr.workflow_approval_snapshots`.
+
+Ese snapshot guarda:
+
+- supervisor formal
+- aprobador efectivo si hubo delegación
+- fallback de dominio cuando no existe supervisor
+- override administrativo cuando RRHH interviene
+
+Con eso, leave y futuros módulos pueden mostrar la cola correcta, notificar al reviewer correcto y auditar quién tenía autoridad en ese momento.
+
 ## Surface del portal
 
 La administración operativa vive en `HR > Jerarquía` (`/hr/hierarchy`).

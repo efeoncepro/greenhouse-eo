@@ -74,7 +74,7 @@ Greenhouse HRIS is an internal operations module — it serves Efeonce Group's o
 
 The HRIS does not replace external providers (Deel for international payroll, Nubox for Chilean tax reporting). It is the operational layer that consolidates people data, tracks workflows, and feeds Finance and People 360 modules.
 
-For reporting hierarchy operations, the dedicated management surface is `HR > /hr/hierarchy`. That module is distinct from `HR > Departments`: departments remain organizational taxonomy, while supervisor relationships come from `greenhouse_core.reporting_lines` and the compatibility snapshot `greenhouse_core.members.reports_to_member_id`.
+For reporting hierarchy operations, the dedicated management surface is `HR > /hr/hierarchy`. That module is distinct from `HR > Departments`: departments remain organizational taxonomy, while supervisor relationships come from `greenhouse_core.reporting_lines` and the compatibility snapshot `greenhouse_core.members.reports_to_member_id`. Workflow-specific approval decisions are frozen in `greenhouse_hr.workflow_approval_snapshots`, so reviewers and notifications do not recalculate authority on every render.
 
 ### What the HRIS owns
 

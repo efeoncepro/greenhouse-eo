@@ -111,6 +111,21 @@ Usar junto con:
 - Admin UI: `/admin/responsibilities` con panel de asignación y tabla CRUD
 - Config canónico: `src/config/responsibility-codes.ts` (tipos y labels)
 
+## Delta 2026-04-10 — shared approval authority snapshots (TASK-326)
+
+- La supervisoría deja de ser un dato resuelto ad hoc por cada workflow y pasa a consumirse mediante un resolver compartido de autoridad por dominio.
+- Se formaliza `greenhouse_hr.workflow_approval_snapshots` como snapshot auditable por etapa (`supervisor_review`, `hr_review`, `finance_review`) y por dominio (`leave`, `expense_report`, `onboarding`, `offboarding`, `performance_evaluation`).
+- Cada snapshot congela:
+  - aprobador formal derivado de `reporting_lines`
+  - aprobador efectivo cuando hay `approval_delegate`
+  - fallback de dominio por `role_code`
+  - override administrativo explícito
+- `leave` ya consume este contrato: submit, review, escalamiento a HR y notificaciones leen el snapshot en vez de recalcular supervisoría inline.
+- La regla vigente queda así:
+  - la relación formal se resuelve desde `greenhouse_core.reporting_lines`
+  - la delegación efectiva se resuelve desde `greenhouse_core.operational_responsibilities`
+  - la decisión operativa del workflow se congela en `greenhouse_hr.workflow_approval_snapshots`
+
 ## Delta 2026-04-10 — Reporting Hierarchy foundation (TASK-324)
 
 - `greenhouse_core.reporting_lines` pasa a ser la lane canónica e historizable de supervisoría formal.
@@ -496,8 +511,8 @@ El nombre físico final puede variar, pero la semántica target no.
 | Necesidad | Plano correcto | Source of truth |
 |-----------|----------------|-----------------|
 | Qué superficies puede ver un usuario | Access Role | `roles` + `user_role_assignments` |
-| Quién aprueba un permiso | Reporting Hierarchy | `reporting_lines` + snapshot `members.reports_to_member_id` |
-| Quién aprueba un gasto | Reporting Hierarchy + Domain reviewer | `reporting_lines` + snapshot `members.reports_to_member_id` + rol/registry financiero |
+| Quién aprueba un permiso | Reporting Hierarchy | `reporting_lines` + `operational_responsibilities` + `workflow_approval_snapshots` |
+| Quién aprueba un gasto | Reporting Hierarchy + Domain reviewer | `reporting_lines` + `operational_responsibilities` + `workflow_approval_snapshots` + registry financiero |
 | Quién es jefe de un área | Structural Hierarchy | `departments.head_member_id` |
 | Quién aparece en el organigrama | Structural Hierarchy | `departments` + `members.department_id` + `reports_to_member_id` |
 | Quién ve sus reportes directos | Reporting Hierarchy | `reporting_lines` + snapshot `members.reports_to_member_id` |
@@ -509,7 +524,7 @@ El nombre físico final puede variar, pero la semántica target no.
 
 ### HR
 
-- leave y expense approvals deben seguir leyendo supervisoría desde el contrato canónico de reporting hierarchy, manteniendo compatibilidad con `reports_to_member_id` mientras existan consumers legacy
+- leave y expense approvals deben seguir leyendo supervisoría desde el contrato canónico de reporting hierarchy y congelar la decisión por etapa en `greenhouse_hr.workflow_approval_snapshots`
 - HR puede actuar como validador final de dominio
 - `departments` no debe reemplazar supervisoría directa
 

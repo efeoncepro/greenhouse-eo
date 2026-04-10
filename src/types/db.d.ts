@@ -2055,6 +2055,29 @@ export interface GreenhouseHrLeaveTypes {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseHrWorkflowApprovalSnapshots {
+  authority_source: string;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  delegate_member_id: string | null;
+  delegate_member_name: string | null;
+  delegate_responsibility_id: string | null;
+  effective_approver_member_id: string | null;
+  effective_approver_name: string | null;
+  fallback_role_codes: Generated<string[]>;
+  formal_approver_member_id: string | null;
+  formal_approver_name: string | null;
+  override_actor_user_id: string | null;
+  override_reason: string | null;
+  snapshot_id: string;
+  snapshot_payload: Generated<Json>;
+  stage_code: string;
+  subject_member_id: string;
+  updated_at: Generated<Timestamp>;
+  workflow_domain: string;
+  workflow_entity_id: string;
+}
+
 export interface GreenhouseNotificationsEmailDeliveries {
   actor_email: string | null;
   attempt_number: Generated<number>;
@@ -3824,6 +3847,7 @@ export interface DB {
   "greenhouse_hr.leave_request_actions": GreenhouseHrLeaveRequestActions;
   "greenhouse_hr.leave_requests": GreenhouseHrLeaveRequests;
   "greenhouse_hr.leave_types": GreenhouseHrLeaveTypes;
+  "greenhouse_hr.workflow_approval_snapshots": GreenhouseHrWorkflowApprovalSnapshots;
   "greenhouse_notifications.email_deliveries": GreenhouseNotificationsEmailDeliveries;
   "greenhouse_notifications.email_subscriptions": GreenhouseNotificationsEmailSubscriptions;
   "greenhouse_notifications.notification_log": GreenhouseNotificationsNotificationLog;

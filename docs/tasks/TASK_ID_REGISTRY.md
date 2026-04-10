@@ -375,7 +375,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-323` | `to-do` | Programa enterprise de jerarquias, supervisoria y permisos de aprobacion | `docs/tasks/to-do/TASK-323-hierarchy-supervisor-approval-program.md` |
 | `TASK-324` | `complete` | Modelo canonico de jerarquia de reporte, historial y delegaciones | `docs/tasks/complete/TASK-324-reporting-hierarchy-foundation.md` |
 | `TASK-325` | `complete` | Admin de jerarquias: CRUD, reasignaciones y auditoria | `docs/tasks/complete/TASK-325-hierarchy-admin-crud.md` |
-| `TASK-326` | `to-do` | Autoridad de aprobacion por dominio y snapshots de workflow | `docs/tasks/to-do/TASK-326-approval-authority-workflow-snapshots.md` |
+| `TASK-326` | `complete` | Autoridad de aprobacion por dominio y snapshots de workflow | `docs/tasks/complete/TASK-326-approval-authority-workflow-snapshots.md` |
 | `TASK-327` | `to-do` | Supervisor scope: acceso subtree-aware y visibilidad limitada | `docs/tasks/to-do/TASK-327-supervisor-scope-subtree-access.md` |
 | `TASK-328` | `to-do` | Workspace de supervisor: Mi equipo y cola de aprobaciones | `docs/tasks/to-do/TASK-328-supervisor-workspace-my-team.md` |
 | `TASK-329` | `to-do` | Organigrama y explorador de jerarquias | `docs/tasks/to-do/TASK-329-org-chart-hierarchy-explorer.md` |

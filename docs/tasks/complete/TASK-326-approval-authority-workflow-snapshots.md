@@ -6,16 +6,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `hr`
-- Blocked by: `TASK-324`
-- Branch: `task/TASK-326-approval-authority-workflow-snapshots`
+- Blocked by: `none`
+- Branch: `feature/codex-task-326-approval-authority`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -53,7 +53,8 @@ Revisar y respetar:
 - `docs/architecture/Greenhouse_HRIS_Architecture_v1.md`
 - `docs/tasks/to-do/TASK-028-hris-expense-reports.md`
 - `docs/tasks/to-do/TASK-031-hris-performance-evaluations.md`
-- `docs/tasks/to-do/TASK-324-reporting-hierarchy-foundation.md`
+- `docs/tasks/complete/TASK-324-reporting-hierarchy-foundation.md`
+- `docs/tasks/complete/TASK-325-hierarchy-admin-crud.md`
 
 Reglas obligatorias:
 
@@ -70,7 +71,8 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `docs/tasks/to-do/TASK-324-reporting-hierarchy-foundation.md`
+- `docs/tasks/complete/TASK-324-reporting-hierarchy-foundation.md`
+- `docs/tasks/complete/TASK-325-hierarchy-admin-crud.md`
 - `src/lib/hr-core/postgres-leave-store.ts`
 - `src/lib/hr-core/leave-domain.ts`
 - `src/lib/sync/projections/notifications.ts`
@@ -87,25 +89,36 @@ Reglas obligatorias:
 - `src/lib/hr-core/postgres-leave-store.ts`
 - `src/lib/hr-core/service.ts`
 - `src/lib/hr-core/leave-domain.ts`
+- `src/types/hr-core.ts`
 - `src/app/api/hr/core/leave/requests/route.ts`
+- `src/app/api/hr/core/leave/requests/[requestId]/review/route.ts`
 - `src/views/greenhouse/hr-core/HrLeaveView.tsx`
 - `src/lib/sync/projections/notifications.ts`
 - `src/config/notification-categories.ts`
+- `src/lib/reporting-hierarchy/readers.ts`
+- `src/lib/operational-responsibility/store.ts`
+- `src/lib/sync/event-catalog.ts`
+- `migrations/`
 
 ## Current Repo State
 
 ### Already exists
 
-- `leave` ya resuelve supervisor desde `reports_to_member_id`
+- `TASK-324` ya dejó `greenhouse_core.reporting_lines` y `getEffectiveSupervisor()` como foundation canónica para supervisor efectivo con delegación temporal
+- `TASK-325` ya dejó una surface admin para delegaciones `approval_delegate` y cambios de jerarquía en `/hr/hierarchy`
+- `leave` ya persiste `supervisor_member_id` al submit
 - `supervisor_member_id` ya se persiste al submit del leave request
 - notifications de leave ya distinguen supervisor vs HR
+- `src/lib/sync/event-catalog.ts` ya tiene el carril `leave_request.*`
 
 ### Gap
 
 - no existe matriz generica `dominio -> autoridad de aprobacion`
-- no existe soporte canonico para delegaciones temporales dentro del resolver
-- no existe contrato compartido para snapshot y override de aprobadores
+- leave sigue resolviendo supervisor desde el snapshot `members.reports_to_member_id` en vez de consumir el resolver canónico de supervisor efectivo
+- no existe contrato compartido para snapshot completo de autoridad (primario, delegado, fallback, override)
+- no existe override administrativo explícito y auditable para approvals
 - `expenses` y futuros workflows todavia dependen de specs, no de un engine reusable
+- el path legacy/fallback de BigQuery en `src/lib/hr-core/service.ts` sigue viviendo en paralelo al runtime Postgres y debe tratarse con cuidado para no divergir eventos ni snapshots
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -153,10 +166,10 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Existe un resolver compartido de autoridad de aprobacion por dominio
-- [ ] Leave usa ese resolver sin perder el snapshot actual del aprobador efectivo
-- [ ] Delegacion, fallback y override quedan auditables en el snapshot
-- [ ] El contrato resultante sirve como base para expenses y futuros workflows
+- [x] Existe un resolver compartido de autoridad de aprobacion por dominio
+- [x] Leave usa ese resolver sin perder el snapshot actual del aprobador efectivo
+- [x] Delegacion, fallback y override quedan auditables en el snapshot
+- [x] El contrato resultante sirve como base para expenses y futuros workflows
 
 ## Verification
 
@@ -167,7 +180,7 @@ Reglas obligatorias:
 
 ## Closing Protocol
 
-- [ ] Actualizar la documentacion de HR/Identity si cambia el contrato de aprobacion o snapshot
+- [x] Actualizar la documentacion de HR/Identity si cambia el contrato de aprobacion o snapshot
 
 ## Follow-ups
 
