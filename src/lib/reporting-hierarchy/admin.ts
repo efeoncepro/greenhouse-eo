@@ -219,7 +219,7 @@ export const listHierarchy = async (filters?: HierarchyListFilters): Promise<HrH
   }
 
   const result = await sql<HierarchyListRow>`
-    WITH current_lines AS (
+    WITH RECURSIVE current_lines AS (
       SELECT DISTINCT ON (rl.member_id)
         rl.reporting_line_id,
         rl.member_id,

@@ -82,6 +82,7 @@ export const GH_HR_NAV = {
   payroll: { label: 'Nómina', subtitle: 'Compensaciones y nómina mensual' },
   payrollProjected: { label: 'Nómina Proyectada', subtitle: 'Simulación y previsión' },
   hierarchy: { label: 'Jerarquía', subtitle: 'Supervisoría, delegaciones y cambios' },
+  orgChart: { label: 'Organigrama', subtitle: 'Explorador visual de la jerarquía' },
   departments: { label: 'Departamentos', subtitle: 'Estructura organizacional' },
   leave: { label: 'Permisos', subtitle: 'Solicitudes y saldos de permisos' },
   attendance: { label: 'Asistencia', subtitle: 'Registros de asistencia del equipo' }

@@ -1,5 +1,18 @@
 # project_context.md
 
+## Delta 2026-04-10 Org chart explorer materialized on canonical reporting hierarchy
+
+- La capability de jerarquía ya no se agota en la superficie admin `/hr/hierarchy`; ahora tiene una surface visual de lectura:
+  - `/hr/org-chart`
+  - `GET /api/hr/core/org-chart`
+- Regla operativa nueva:
+  - `HR > Organigrama` consume la jerarquía canónica ya materializada en `greenhouse_core.reporting_lines`
+  - el explorer respeta el mismo modelo broad HR/admin vs supervisor subtree-aware
+  - `HR > Jerarquía` sigue siendo la surface de cambios; el organigrama no habilita edición mutante
+- Stack visual materializado:
+  - `@xyflow/react`
+  - `dagre`
+
 ## Delta 2026-04-10 Supervisor workspace materialized on top of subtree scope
 
 - La capability de supervisor ya no vive solo como policy de acceso; ahora tiene surface operativa materializada:

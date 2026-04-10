@@ -10,6 +10,20 @@
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
 
+## Delta 2026-04-10 — Org chart explorer visual stack (TASK-329)
+
+### Decisión de librería
+
+- `@xyflow/react` queda materializado como engine canónico para el organigrama de HR.
+- `dagre` queda materializado como layout jerárquico inicial para distribuir nodos del árbol.
+- `ApexCharts` se mantiene para charts numéricos; no debe usarse para simular organigramas con nodos React ricos.
+
+### Regla operativa
+
+- El organigrama es una surface de lectura con zoom, pan, foco y quick actions.
+- La edición de jerarquía sigue viviendo fuera del canvas, en `HR > Jerarquía`.
+- Los nodos deben reutilizar primitives Greenhouse/Vuexy/MUI del portal antes de crear una estética paralela al resto de HR.
+
 ## Delta 2026-04-05 — Permission Sets UI patterns (TASK-263)
 
 ### Keyboard-accessible interactive cards

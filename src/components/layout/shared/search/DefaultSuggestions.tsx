@@ -78,6 +78,11 @@ const defaultSuggestions: DefaultSuggestionsType[] = [
         icon: 'tabler-hierarchy-2'
       },
       {
+        label: 'Organigrama',
+        href: '/hr/org-chart',
+        icon: 'tabler-hierarchy-3'
+      },
+      {
         label: 'Departamentos',
         href: '/hr/departments',
         icon: 'tabler-sitemap'

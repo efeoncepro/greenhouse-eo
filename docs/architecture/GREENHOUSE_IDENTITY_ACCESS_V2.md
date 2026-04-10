@@ -1,5 +1,18 @@
 # Greenhouse Identity & Access Architecture V2
 
+## Delta 2026-04-10 — org chart explorer materialized without a new route group (TASK-329)
+
+- La capability de supervisor ya no se limita a `/hr`, `/hr/team` y `/hr/approvals`; ahora también aterriza en:
+  - `/hr/org-chart`
+  - `GET /api/hr/core/org-chart`
+- Regla vigente:
+  - `routeGroup: hr` sigue siendo el carril broad HR
+  - supervisoría limitada sigue derivándose on-demand desde `reporting_lines` + `approval_delegate`
+  - no se crea `routeGroup` ni `role_code` nuevo para `supervisor`
+- Comportamiento efectivo:
+  - HR/admin puede abrir el explorer completo
+  - un supervisor con subtree access puede abrir `/hr/org-chart`, ver solo su subárbol visible y enfocar personas puntuales sin heredar acceso amplio a `HR > Jerarquía`
+
 ## Delta 2026-04-10 — supervisor workspace materialized without a new route group (TASK-328)
 
 - La capability de supervisor ya no vive solo en readers y guards; ahora tiene surfaces runtime:
@@ -532,7 +545,7 @@ Route groups are the enforcement boundary. Each route group maps to a set of URL
 | `client`     | `/dashboard`, `/proyectos`, `/sprints`, `/campanas`, `/equipo`, `/settings`                                                       | `client_executive`, `client_manager`, `client_specialist`, `efeonce_account`, `efeonce_operations`, `efeonce_admin` | Active tenant         |
 | `my`         | `/my/leave`, `/my/attendance`, `/my/expenses`, `/my/tools`, `/my/payroll`, `/my/profile`                                          | `collaborator`, `efeonce_admin`                                                                                     | Home tenant (efeonce) |
 | `internal`   | `/internal/dashboard`, `/internal/clientes`, `/internal/capacidad`, `/internal/riesgos`, `/internal/kpis`                         | `efeonce_account`, `efeonce_operations`, `efeonce_admin`                                                            | Cross-tenant          |
-| `hr`         | `/hr/leave`, `/hr/attendance`, `/hr/org`, `/hr/payroll`, `/hr/approvals`                                                          | `hr_manager`, `hr_payroll`, `efeonce_admin`                                                                         | Efeonce tenant        |
+| `hr`         | `/hr/leave`, `/hr/attendance`, `/hr/org-chart`, `/hr/payroll`, `/hr/approvals`, `/hr/hierarchy`, `/hr/departments`                | `hr_manager`, `hr_payroll`, `efeonce_admin`                                                                         | Efeonce tenant        |
 | `finance`    | `/finance/dashboard`, `/finance/income`, `/finance/expenses`, `/finance/suppliers`, `/finance/reconciliation`, `/finance/clients` | `finance_analyst`, `finance_admin`, `efeonce_admin`                                                                 | Efeonce tenant        |
 | `people`     | `/people`, `/people/[memberId]`                                                                                                   | `people_viewer`, `hr_manager`, `efeonce_operations`, `efeonce_admin`                                                | Efeonce tenant        |
 | `ai_tooling` | `/ai-tools/catalog`, `/ai-tools/licenses`, `/ai-tools/wallets`, `/ai-tools/ledger`                                                | `ai_tooling_admin`, `efeonce_admin`                                                                                 | Efeonce tenant        |
@@ -542,7 +555,7 @@ Notes:
 
 - `hr` remains the broad HR route group. It must not be used as a proxy for “has direct reports”.
 - Supervisor-limited access is derived at reader/page level from reporting hierarchy and active delegation, not from a dedicated route group or role code.
-- `/hr/approvals` is still part of the target architecture, but the materialized runtime surface today is `/hr/leave` plus scoped People access.
+- `/hr/approvals`, `/hr/team` y `/hr/org-chart` ya existen como surfaces runtime para supervisoría limitada; `HR > Jerarquía` sigue siendo broad HR/admin.
 
 ### Enforcement Architecture
 

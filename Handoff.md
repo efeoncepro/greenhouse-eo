@@ -1,5 +1,56 @@
 # Handoff.md
 
+## Sesion 2026-04-10 — TASK-329 cerrada: organigrama y explorador de jerarquias
+
+- alcance cerrado:
+  - nueva helper lane read-only:
+    - `src/lib/reporting-hierarchy/org-chart.ts`
+  - nueva route runtime:
+    - `GET /api/hr/core/org-chart`
+  - nuevas surfaces:
+    - `src/views/greenhouse/hr-core/HrOrgChartView.tsx`
+    - `src/components/greenhouse/OrgChartNodeCard.tsx`
+    - `/hr/org-chart`
+  - navegación/access actualizados:
+    - `equipo.organigrama` en view catalog
+    - item nuevo en menu HR
+    - entry point desde `HrCoreDashboard`
+    - búsqueda rápida alineada a `/hr/org-chart`
+  - nuevos contratos tipados:
+    - `HrOrgChartNode`
+    - `HrOrgChartEdge`
+    - `HrOrgChartBreadcrumb`
+    - `HrOrgChartResponse`
+  - la spec de `TASK-329` quedó saneada antes de implementar para reflejar:
+    - `TASK-325`, `TASK-327` y `TASK-328` ya cerradas
+    - `/hr/hierarchy`, `/hr/team` y `/hr/approvals` ya existentes
+    - visibilidad broad vs supervisor subtree-aware sobre la misma jerarquía canonica
+- archivos sensibles / de alto impacto tocados:
+  - `package.json`
+  - `pnpm-lock.yaml`
+  - `src/app/(dashboard)/hr/layout.tsx`
+  - `src/app/(dashboard)/hr/page.tsx`
+  - `src/components/layout/vertical/VerticalMenu.tsx`
+  - `src/lib/admin/view-access-catalog.ts`
+  - `src/lib/reporting-hierarchy/admin.ts`
+  - `src/lib/tenant/authorization.ts`
+  - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+  - `docs/architecture/Greenhouse_HRIS_Architecture_v1.md`
+- validación ejecutada:
+  - `pnpm pg:doctor` — OK
+  - `pnpm migrate:status` — no ejecutable sin Cloud SQL Proxy en `127.0.0.1:15432`; no hubo migración en este slice
+  - `pnpm exec vitest run src/lib/reporting-hierarchy/org-chart.test.ts src/app/api/hr/core/org-chart/route.test.ts` — OK
+  - `pnpm exec tsc --noEmit --incremental false` — OK
+  - `pnpm lint` — OK
+  - `pnpm build` — OK
+  - smoke local autenticada con usuario agente (`agent@greenhouse.efeonce.org`) contra `http://localhost:3002`:
+    - `GET /api/hr/core/org-chart` — 200
+    - `GET /hr/org-chart` — 200
+- nota operativa:
+  - durante la smoke real apareció una falla SQL en `listHierarchy()` por CTE recursiva sin `WITH RECURSIVE`; quedó corregida en `src/lib/reporting-hierarchy/admin.ts`
+  - el tenant actual sigue teniendo una jerarquía plana en `reporting_lines` (`7` raíces, `0` aristas). El organigrama materializa correctamente ese estado de datos; no es un bug de rendering
+  - Playwright MCP no pudo usarse en esta sesión por `ENOENT` al crear `/.playwright-mcp`; la verificación runtime quedó hecha con cookie real de agente + `curl`
+
 ## Sesion 2026-04-10 — TASK-328 cerrada: workspace supervisor materializado
 
 - alcance cerrado:

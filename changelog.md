@@ -2,6 +2,19 @@
 
 ## 2026-04-10
 
+### 2026-04-10 — Org chart explorer materialized over canonical hierarchy
+
+- Se materializó `HR > Organigrama` en `/hr/org-chart` como explorer visual de lectura sobre la jerarquía canónica.
+- Nuevo handler agregado:
+  - `GET /api/hr/core/org-chart`
+- La capability reutiliza:
+  - `greenhouse_core.reporting_lines`
+  - `members.reports_to_member_id` como compat snapshot
+  - subtree visibility derivada desde supervisor scope
+  - enrichments de People para avatar, cargo y contexto del nodo
+- Se integró `@xyflow/react` con layout jerárquico `dagre` para resolver zoom, pan, foco por persona y quick actions sin convertir la surface en editor.
+- `HR > Jerarquía` sigue siendo la surface administrativa; `Organigrama` queda como vista de lectura broad HR/admin y subtree-aware para supervisors.
+
 ### 2026-04-10 — Supervisor workspace and approvals queue materialized
 
 - Se materializó el workspace operativo de supervisor sobre la capability ya cerrada de subtree scope:
