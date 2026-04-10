@@ -48,9 +48,26 @@ Revisar y respetar:
 
 Reglas obligatorias:
 
-- Usar primitivas Vuexy (`CustomChip`, `CustomTabList`, `Card variant='outlined'`)
+- **Priorizar widgets Vuexy nativos** de `src/components/card-statistics/` y `src/components/greenhouse/` antes de construir layouts ad-hoc con Typography + Box
 - Los componentes compartidos (`ExecutiveMiniStatCard`, `EmptyState`, `TeamProgressBar`) no deben cambiar su API publica sin verificar consumidores
 - El idioma del portal es espanol; siglas tecnicas aceptadas (ICO, RpA, OTD, FTR, CSC, P&L, CxC, CxP) pero no frases completas en ingles
+
+### Widgets Vuexy disponibles para esta task
+
+Inventario de componentes ricos que **deben** usarse en vez de Typography plano:
+
+| Componente | Path | Usar para |
+|-----------|------|-----------|
+| `HorizontalWithSubtitle` | `src/components/card-statistics/HorizontalWithSubtitle.tsx` | KPIs de IcoTab Contexto (Total, Completadas, Activas, etc.) — soporta icon, stats, subtitle, trend chip |
+| `HorizontalWithBorder` | `src/components/card-statistics/HorizontalWithBorder.tsx` | KPIs header de DeliveryTab y FinanceTab (RpA, OTD, Ingresos, Costo) — soporta trend indicators |
+| `CardStatsSquare` | `src/components/card-statistics/CardStatsSquare.tsx` | Grillas densas de 4+ columnas (Pipeline CSC phases, skills coverage) |
+| `CardStatHorizontal` | `src/components/card-statistics/CardStatHorizontal.tsx` | KPIs secundarios en grillas 2-3 columnas |
+| `ExecutiveHeroCard` | `src/components/greenhouse/ExecutiveHeroCard.tsx` | **Opcional:** header del Space con gradient, highlights grid y badges — reemplazaria el Card plano actual |
+| `ExecutiveCardShell` | `src/components/greenhouse/ExecutiveCardShell.tsx` | Wrapper consistente para secciones con CardHeader + CardContent |
+| `CapacityOverviewCard` | `src/components/greenhouse/CapacityOverviewCard.tsx` | TeamTab — ya tiene patron de summary items + member cards con LinearProgress |
+| `GreenhouseFunnelCard` | `src/components/greenhouse/GreenhouseFunnelCard.tsx` | **Opcional:** Pipeline CSC como funnel visual |
+| `TeamProgressBar` | `src/components/greenhouse/TeamProgressBar.tsx` | Barra de cobertura de skills (ya se usa) |
+| `TeamLoadBar` | `src/components/greenhouse/TeamLoadBar.tsx` | Distribucion de carga por proyecto en TeamTab |
 
 ## Normative Docs
 
@@ -180,62 +197,76 @@ Reglas obligatorias:
 "Algunos datos de esta vista aun estan incompletos. Las secciones afectadas lo indican con su propio aviso."
 ```
 
-### IcoTab "Contexto" — layout de grilla
+### IcoTab "Contexto" — usar `HorizontalWithSubtitle` o `CardStatsSquare`
 
-Reemplazar el dump raw por una grilla 4×2 con el mismo patron que DeliveryTab y FinanceTab:
-
-```tsx
-<Box sx={{
-  display: 'grid',
-  gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', md: 'repeat(4, minmax(0, 1fr))' },
-  gap: 2
-}}>
-  <Box>
-    <Typography variant='caption' color='text.secondary'>Total</Typography>
-    <Typography variant='h5'>{snapshot.context.totalTasks}</Typography>
-  </Box>
-  <Box>
-    <Typography variant='caption' color='text.secondary'>Completadas</Typography>
-    <Typography variant='h5'>{snapshot.context.completedTasks}</Typography>
-  </Box>
-  {/* ... Activas, On-Time, Late Drops, Overdue, Carry-Over, Overdue C/F */}
-</Box>
-```
-
-### IcoTab "Pipeline CSC" — layout de distribucion
-
-Reemplazar plain text por rows con label + count + porcentaje:
+Reemplazar el dump raw por una grilla de `HorizontalWithSubtitle` (de `src/components/card-statistics/`). Cada stat con icon, valor y subtitle:
 
 ```tsx
-<Box sx={{ display: 'grid', gap: 1.5 }}>
-  {snapshot.cscDistribution.map(item => (
-    <Stack key={item.phase} direction='row' alignItems='center' justifyContent='space-between'>
-      <Typography variant='body2' fontWeight={600}>{item.label}</Typography>
-      <Stack direction='row' gap={1} alignItems='center'>
-        <Typography variant='body2'>{item.count}</Typography>
-        <CustomChip round='true' size='small' color='secondary' variant='tonal' label={`${item.pct}%`} />
-      </Stack>
-    </Stack>
-  ))}
-</Box>
+import { HorizontalWithSubtitle } from '@components/card-statistics'
+
+<Grid container spacing={4}>
+  <Grid size={{ xs: 6, md: 3 }}>
+    <HorizontalWithSubtitle
+      title='Total'
+      stats={String(snapshot.context.totalTasks)}
+      icon='tabler-list'
+      trendNumber={...}  // opcional: delta vs periodo anterior
+    />
+  </Grid>
+  <Grid size={{ xs: 6, md: 3 }}>
+    <HorizontalWithSubtitle
+      title='Completadas'
+      stats={String(snapshot.context.completedTasks)}
+      icon='tabler-circle-check'
+      color='success'
+    />
+  </Grid>
+  {/* Activas, On-Time, Late Drops, Overdue, Carry-Over, Overdue C/F */}
+</Grid>
 ```
+
+Alternativa compacta con `CardStatsSquare` si se necesitan 8 metricas en poco espacio.
+
+### IcoTab "Pipeline CSC" — usar `CardStatHorizontal` o `GreenhouseFunnelCard`
+
+**Opcion A (recomendada):** Reemplazar plain text por rows con `CardStatHorizontal`:
+
+```tsx
+import { CardStatHorizontal } from '@components/card-statistics'
+
+{snapshot.cscDistribution.map(item => (
+  <CardStatHorizontal
+    key={item.phase}
+    title={item.label}
+    stats={String(item.count)}
+    icon='tabler-layout-kanban'
+    color={phaseColor(item.phase)}
+    trendNumber={`${item.pct}%`}
+  />
+))}
+```
+
+**Opcion B (premium):** Usar `GreenhouseFunnelCard` para visualizar la distribucion como funnel con conversion badges entre fases.
 
 ### KPI card click wrapper
 
-No se modifica `ExecutiveMiniStatCard`. Se envuelve externamente:
+No se modifica `ExecutiveMiniStatCard`. Se envuelve externamente con `CardActionArea` de MUI o un `Box` clickeable:
 
 ```tsx
+import CardActionArea from '@mui/material/CardActionArea'
+
 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-  <Box
+  <CardActionArea
     onClick={() => handleTabChange(null as any, 'finance')}
-    sx={{ cursor: 'pointer', '&:hover': { opacity: 0.92 }, transition: 'opacity 0.15s' }}
-    role='link'
+    sx={{ borderRadius: 2 }}
     aria-label={`Ingresos: ${formatMoney(detail.kpis.revenueClp)} — ver detalle en Finanzas`}
   >
     <ExecutiveMiniStatCard ... />
-  </Box>
+  </CardActionArea>
 </Grid>
 ```
+
+**Alternativa:** Si se quiere un look mas rico, reemplazar `ExecutiveMiniStatCard` por `HorizontalWithBorder` (de `src/components/card-statistics/`) que ya trae hover nativo y soporte de trend indicators.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
