@@ -1,0 +1,168 @@
+# TASK-319 — Reputation, Evidence & Endorsements for Talent Profiles
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 0 — IDENTITY & TRIAGE
+     ═══════════════════════════════════════════════════════════ -->
+
+## Status
+
+- Lifecycle: `to-do`
+- Priority: `P2`
+- Impact: `Medio`
+- Effort: `Alto`
+- Type: `implementation`
+- Status real: `Diseno`
+- Rank: `TBD`
+- Domain: `identity`
+- Blocked by: `TASK-315`, `TASK-316`
+- Branch: `task/TASK-319-reputation-evidence-endorsements`
+- Legacy ID: `none`
+- GitHub Issue: `none`
+
+## Summary
+
+Agregar la capa de reputación del talento: evidencia de trabajo, endorsements internos, highlights reutilizables y señales de credibilidad más allá de la autodeclaración. Esta task hace que el perfil profesional se sienta más cercano a un marketplace serio y menos a una ficha administrativa.
+
+## Why This Task Exists
+
+Un perfil enterprise necesita algo más que skills y certificados:
+
+- evidencia de experiencia
+- señales de calidad
+- contexto de trabajo real
+- validación social/operativa interna
+
+Sin esta capa, el perfil puede ser correcto pero sigue siendo plano.
+
+## Goal
+
+- Registrar evidencia reusable del trabajo o experiencia
+- Permitir endorsements o validaciones internas estructuradas
+- Preparar insumos para perfiles cliente-safe y ranking futuro
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 1 — CONTEXT & CONSTRAINTS
+     ═══════════════════════════════════════════════════════════ -->
+
+## Architecture Alignment
+
+Revisar y respetar:
+
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
+
+Reglas obligatorias:
+
+- La reputación no reemplaza la verificación; la complementa.
+- Evidence y endorsements deben poder distinguirse de claims autodeclarados.
+- No exponer feedback interno sensible en surfaces cliente sin filtro explícito.
+
+## Normative Docs
+
+- `docs/tasks/to-do/TASK-315-talent-taxonomy-canonical-model.md`
+- `docs/tasks/to-do/TASK-316-talent-trust-ops-verification-governance.md`
+
+## Dependencies & Impact
+
+### Depends on
+
+- `TASK-315`
+- `TASK-316`
+- `src/views/greenhouse/my/my-profile/**`
+- `src/views/greenhouse/admin/users/**`
+- `src/views/greenhouse/people/**`
+
+### Blocks / Impacts
+
+- `TASK-318`
+- `TASK-320`
+
+### Files owned
+
+- `src/views/greenhouse/my/my-profile/**`
+- `src/views/greenhouse/admin/users/**`
+- `src/views/greenhouse/people/**`
+- `src/lib/[verificar]`
+- `docs/architecture/GREENHOUSE_UI_PLATFORM_V1.md`
+
+## Current Repo State
+
+### Already exists
+
+- perfiles internos con tabs
+- assets privados y links
+- base de skills y certificaciones
+
+### Gap
+
+- no hay reputación estructurada ni evidence layer
+- no hay endorsements internos ni highlights reutilizables
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 3 — EXECUTION SPEC
+     ═══════════════════════════════════════════════════════════ -->
+
+## Scope
+
+### Slice 1 — Evidence model
+
+- Definir cómo una persona puede asociar evidencia:
+  - proyecto/caso
+  - extracto o highlight
+  - asset o link
+  - visibilidad
+
+### Slice 2 — Endorsements
+
+- Permitir endorsements internos estructurados:
+  - quién endorsó
+  - qué skill/área valida
+  - cuándo
+  - visibilidad y moderación
+
+### Slice 3 — Surfacing
+
+- Mostrar evidencia y endorsements en self/admin y dejar reader reusable para cliente-safe
+
+## Out of Scope
+
+- scoring algorítmico de reputación público
+- feedback libre no moderado estilo red social
+
+## Detailed Spec
+
+La capa de reputación debe responder:
+
+- qué evidencia concreta respalda este perfil
+- qué parte fue validada por terceros internos
+- qué puede mostrarse externamente
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 4 — VERIFICATION & CLOSING
+     ═══════════════════════════════════════════════════════════ -->
+
+## Acceptance Criteria
+
+- [ ] Existe un modelo de evidencia reusable y separable de skills/certificaciones
+- [ ] Existen endorsements internos estructurados y moderables
+- [ ] La UI distingue evidencia, verificación y endorsement como señales distintas
+
+## Verification
+
+- `pnpm lint`
+- `pnpm exec tsc --noEmit --incremental false`
+- `pnpm build`
+- validación manual de surfacing en self/admin
+
+## Closing Protocol
+
+- [ ] Documentar qué señales son internas y cuáles pueden volverse client-safe
+
+## Follow-ups
+
+- score compuesto de reputación si el negocio realmente lo necesita
+
+## Open Questions
+
+- si endorsements deben permitirse solo a managers/admins o también a peers

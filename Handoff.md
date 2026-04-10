@@ -1,5 +1,29 @@
 # Handoff.md
 
+## Sesion 2026-04-10 — foundation compartida de iconografia: Tabler + Flaticon + BrandLogo
+
+- alcance en curso:
+  - se instaló `@flaticon/flaticon-uicons`
+  - `src/app/layout.tsx` ahora importa selectivamente:
+    - `@flaticon/flaticon-uicons/css/brands/all.css`
+    - `@flaticon/flaticon-uicons/css/regular/rounded.css`
+  - nuevo primitive shared:
+    - `src/components/greenhouse/GhIcon.tsx`
+    - `src/components/greenhouse/gh-icon-registry.ts`
+  - `BrandLogo` se amplió para redes profesionales comunes (`linkedin`, `behance`, `dribbble`, `x`, `threads`, `twitter`)
+  - primeros consumers adaptados:
+    - `src/components/greenhouse/TeamIdentityBadgeGroup.tsx`
+    - `src/views/greenhouse/my/my-profile/tabs/AboutOverview.tsx`
+- archivos sensibles / de alto impacto tocados:
+  - `package.json`
+  - `pnpm-lock.yaml`
+  - `src/app/layout.tsx`
+  - `src/components/greenhouse/BrandLogo.tsx`
+  - `src/components/greenhouse/index.ts`
+- nota operativa:
+  - la regla vigente es `Tabler` para semántica de producto, `BrandLogo` para logos reales y `Flaticon` solo como fuente complementaria detrás de la primitive `GhIcon`
+  - el serving actual de assets privados sigue devolviendo `Content-Disposition: attachment`; el preview embebido de certificados de `TASK-313` necesitará una vía inline/controlada adicional
+
 ## Sesion 2026-04-10 — hardening GCP auth local vs Vercel runtime
 
 - alcance en curso:

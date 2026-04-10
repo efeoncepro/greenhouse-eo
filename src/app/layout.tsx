@@ -20,6 +20,8 @@ import '@/styles/greenhouse-sidebar.css'
 
 // Generated Icon CSS Imports
 import '@assets/iconify-icons/generated-icons.css'
+import '@flaticon/flaticon-uicons/css/brands/all.css'
+import '@flaticon/flaticon-uicons/css/regular/rounded.css'
 
 const dmSans = DM_Sans({
   subsets: ['latin'],

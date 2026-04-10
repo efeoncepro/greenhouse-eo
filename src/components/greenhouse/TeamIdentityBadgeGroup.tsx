@@ -6,6 +6,8 @@ import Stack from '@mui/material/Stack'
 import { GH_TEAM } from '@/config/greenhouse-nomenclature'
 import type { TeamIdentityConfidence, TeamIdentityProvider } from '@/types/team'
 
+import GhIcon from './GhIcon'
+
 type TeamIdentityBadgeGroupProps = {
   providers: TeamIdentityProvider[]
   confidence: TeamIdentityConfidence
@@ -19,17 +21,17 @@ const providerMeta: Partial<Record<TeamIdentityProvider, { label: string; icon: 
   },
   microsoft: {
     label: GH_TEAM.provider_microsoft,
-    icon: 'tabler-brand-windows',
+    icon: 'fi-brands-microsoft',
     color: 'primary'
   },
   google: {
     label: GH_TEAM.provider_google,
-    icon: 'tabler-brand-google',
+    icon: 'fi-brands-google',
     color: 'success'
   },
   hubspot: {
     label: GH_TEAM.provider_hubspot,
-    icon: 'tabler-brand-office',
+    icon: 'fi-brands-hubspot',
     color: 'warning'
   },
   deel: {
@@ -73,7 +75,7 @@ const TeamIdentityBadgeGroup = ({ providers, confidence }: TeamIdentityBadgeGrou
         size='small'
         variant='tonal'
         color={confidenceMeta[confidence].color === 'default' ? undefined : confidenceMeta[confidence].color}
-        icon={<i className={confidenceMeta[confidence].icon} />}
+        icon={<GhIcon icon={confidenceMeta[confidence].icon} size={16} />}
         label={confidenceMeta[confidence].label}
       />
 
@@ -83,7 +85,7 @@ const TeamIdentityBadgeGroup = ({ providers, confidence }: TeamIdentityBadgeGrou
           size='small'
           variant='outlined'
           color={providerMeta[provider]?.color || 'default'}
-          icon={<i className={providerMeta[provider]?.icon || 'tabler-plug-connected'} />}
+          icon={<GhIcon icon={providerMeta[provider]?.icon || 'tabler-plug-connected'} size={16} />}
           label={providerMeta[provider]?.label || formatProviderLabel(provider)}
         />
       ))}

@@ -5,6 +5,8 @@ import Card from '@mui/material/Card'
 import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
 
+import { GhIcon } from '@/components/greenhouse'
+
 type CommonItem = {
   icon: string
   property: string
@@ -28,7 +30,7 @@ const renderList = (list: CommonItem[]) => {
     list.length > 0 &&
     list.map((item, index) => (
       <div key={index} className='flex items-center gap-2'>
-        <i className={item.icon} />
+        <GhIcon icon={item.icon} size={18} />
         <div className='flex items-center flex-wrap gap-2'>
           <Typography className='font-medium'>
             {`${item.property.charAt(0).toUpperCase() + item.property.slice(1)}:`}

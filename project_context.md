@@ -1,5 +1,23 @@
 # project_context.md
 
+## Delta 2026-04-10 Shared icon foundation: Tabler + Flaticon + BrandLogo
+
+- El portal tiene ahora una foundation compartida de iconografía en tres capas:
+  - `tabler-*` sigue siendo la base semántica de producto para navegación, estados, CRUD y surfaces operativas
+  - `@flaticon/flaticon-uicons` entra como fuente complementaria para brands y algunos tokens de talento/perfil
+  - `BrandLogo` sigue siendo la primitive para logos reales de marca y ahora también cubre redes profesionales comunes
+- Nuevo primitive reusable:
+  - `src/components/greenhouse/GhIcon.tsx`
+  - registry asociado: `src/components/greenhouse/gh-icon-registry.ts`
+- Regla operativa nueva:
+  - no introducir clases `fi-*` o `tabler-*` al voleo en surfaces nuevas cuando el caso caiga en la semántica ya modelada por `GhIcon`
+  - `Tabler` para semántica de producto
+  - `BrandLogo` para marca/logo real
+  - `Flaticon` solo como fuente suplementaria, cargada selectivamente en `src/app/layout.tsx`
+- Import selectivo activo:
+  - `@flaticon/flaticon-uicons/css/brands/all.css`
+  - `@flaticon/flaticon-uicons/css/regular/rounded.css`
+
 ## Delta 2026-04-10 GCP auth hardening for local vs Vercel runtime
 
 - `Workload Identity Federation` sigue siendo el mecanismo preferido para runtimes reales en `Vercel`, pero deja de activarse en local solo porque exista un `VERCEL_OIDC_TOKEN` persistido en `.env*`.

@@ -2,6 +2,20 @@
 
 ## 2026-04-10
 
+### 2026-04-10 — Shared icon foundation with selective Flaticon support
+
+- Se integró `@flaticon/flaticon-uicons` como fuente complementaria de iconografía, cargada de forma selectiva desde `src/app/layout.tsx`:
+  - `brands/all.css`
+  - `regular/rounded.css`
+- Nuevo primitive compartido:
+  - `src/components/greenhouse/GhIcon.tsx`
+  - `src/components/greenhouse/gh-icon-registry.ts`
+- `BrandLogo` ahora cubre también redes profesionales comunes (`LinkedIn`, `Behance`, `Dribbble`, `X`, `Threads`, `Twitter`) sin obligar a inventar assets nuevos.
+- Regla de sistema visible:
+  - `Tabler` sigue siendo la iconografía semántica principal del producto
+  - `BrandLogo` resuelve logos reales de marca
+  - `Flaticon` entra como fuente suplementaria, no como reemplazo indiscriminado del sistema base
+
 ### 2026-04-10 — GCP auth hardening: WIF only in real Vercel runtime
 
 - `src/lib/google-credentials.ts` ya no activa `Workload Identity Federation` en local por el mero hecho de encontrar `VERCEL_OIDC_TOKEN` en `process.env`.
