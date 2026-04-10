@@ -162,6 +162,13 @@ CREATE TABLE greenhouse_commercial.quotations (
   total_price          NUMERIC(14,2),
   effective_margin_pct NUMERIC(5,2),
 
+  -- Revenue metrics (derivados, recalculados al guardar — ver §12A)
+  revenue_type         TEXT DEFAULT 'recurring' CHECK (revenue_type IN ('recurring', 'one_time', 'hybrid')),
+  mrr                  NUMERIC(14,2),         -- Monthly Recurring Revenue (null si one_time puro)
+  arr                  NUMERIC(14,2),         -- Annual Recurring Revenue (MRR × 12)
+  tcv                  NUMERIC(14,2),         -- Total Contract Value
+  acv                  NUMERIC(14,2),         -- Annual Contract Value (TCV / años)
+
   -- Validez y condiciones
   valid_until          DATE,
   contract_duration_months INTEGER,
@@ -259,6 +266,12 @@ CREATE TABLE greenhouse_commercial.quotation_line_items (
   -- Margen
   margin_pct           NUMERIC(5,2),         -- nullable; hereda de cotizacion si null
   effective_margin_pct NUMERIC(5,2),         -- derivado: (price_after_discount - cost) / price_after_discount
+
+  -- Recurrencia (ver §12A — revenue metrics)
+  recurrence_type      TEXT DEFAULT 'inherit' CHECK (recurrence_type IN ('recurring', 'one_time', 'inherit')),
+  -- 'inherit' = usa billing_frequency de la cotizacion
+  -- 'one_time' = este item se cobra una vez aunque la cotizacion sea monthly
+  -- 'recurring' = este item se cobra cada periodo
 
   -- Moneda (hereda de cotizacion; override para items multi-moneda)
   currency             TEXT,
@@ -681,6 +694,154 @@ El sistema detecta cual rama aplica segun si `purchase_orders` tiene registros p
 
 ---
 
+## 11A. Revenue metrics: MRR, ARR, TCV, ACV (v2)
+
+### 11A.1. Proposito
+
+Una cotizacion tiene multiples "valores" segun quien la mira: el PDF muestra un precio mensual, Finance necesita MRR/ARR para medir salud del negocio recurrente, Comercial necesita TCV para medir pipeline, y HubSpot necesita un `amount` consistente. Todas estas metricas se derivan de los mismos campos base.
+
+### 11A.2. Campos base → metricas derivadas
+
+Las metricas se calculan desde 3 campos existentes de la cotizacion:
+
+```
+total_price              → precio del periodo base (lo que dice el PDF)
+billing_frequency        → monthly | milestone | one_time
+contract_duration_months → duracion total del contrato (null = indefinido)
+```
+
+Mas la clasificacion por item:
+
+```
+recurrence_type por line item → 'recurring' | 'one_time' | 'inherit'
+```
+
+### 11A.3. Formulas de calculo
+
+| Metrica | Formula | Aplica a |
+|---------|---------|----------|
+| **MRR** | Suma de `subtotal_after_discount` de items recurrentes | Retainers, Staff Aug |
+| **ARR** | `MRR × 12` | Retainers, Staff Aug |
+| **TCV** | `MRR × contract_duration_months` + suma de items one-time | Todos |
+| **ACV** | `TCV / ceil(contract_duration_months / 12)` | Contratos multi-anio |
+| **revenue_type** | `recurring` si todos los items son recurrentes, `one_time` si todos son one-time, `hybrid` si hay mezcla | Todos |
+
+**Resolucion de `recurrence_type: 'inherit'`:** hereda segun `billing_frequency` de la cotizacion. Si `billing_frequency = 'monthly'` → recurrente. Si `one_time` → one-time. Si `milestone` → one-time (cada hito se factura una vez).
+
+**Contratos indefinidos** (`contract_duration_months = null`):
+- TCV = null (no tiene sentido sin duracion)
+- ACV = null
+- MRR y ARR se calculan normalmente
+
+### 11A.4. Contratos hibridos
+
+Un contrato puede mezclar componentes recurrentes y one-time:
+
+```
+Ejemplo: "Retainer creativo $9.6M/mes + Setup inicial $5M (unico)"
+
+Line items:
+  1. Fee gestion         → recurrence_type: 'recurring'  → $3.200.000/mes
+  2. Produccion 80h      → recurrence_type: 'recurring'  → $4.800.000/mes
+  3. Adaptaciones 40h    → recurrence_type: 'recurring'  → $1.600.000/mes
+  4. Setup plataforma    → recurrence_type: 'one_time'   → $5.000.000
+
+Metricas derivadas:
+  MRR:          $9.600.000 (solo items 1+2+3)
+  ARR:          $115.200.000
+  TCV:          $9.600.000 × 12 + $5.000.000 = $120.200.000
+  ACV:          $120.200.000
+  revenue_type: 'hybrid'
+```
+
+### 11A.5. Recalculo automatico
+
+Las metricas se recalculan cada vez que:
+- Se agrega, edita o elimina un line item
+- Se cambia `billing_frequency` o `contract_duration_months`
+- Se aplica o modifica un descuento (afecta `subtotal_after_discount`)
+- Se crea una nueva version
+
+El recalculo es sincronico (al guardar) — no es una projection reactiva. Los campos `mrr`, `arr`, `tcv`, `acv`, `revenue_type` se persisten en `quotations` para queries rapidas.
+
+### 11A.6. Revenue metric config (sync HubSpot)
+
+El `amount` que se pushea al deal de HubSpot es configurable por BL:
+
+```sql
+CREATE TABLE greenhouse_commercial.revenue_metric_config (
+  config_id            TEXT PRIMARY KEY DEFAULT 'rmc-' || gen_random_uuid(),
+  business_line_code   TEXT,                  -- null = global default
+  hubspot_amount_metric TEXT NOT NULL DEFAULT 'tcv'
+    CHECK (hubspot_amount_metric IN ('mrr', 'arr', 'tcv', 'acv')),
+  pipeline_default_metric TEXT NOT NULL DEFAULT 'mrr'
+    CHECK (pipeline_default_metric IN ('mrr', 'arr', 'tcv', 'acv')),
+  active               BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at           TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at           TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (business_line_code)
+);
+```
+
+Ejemplo de configuracion:
+
+| BL | HubSpot amount | Pipeline default | Razon |
+|----|---------------|-----------------|-------|
+| Global (null) | TCV | MRR | Default conservador |
+| Wave | TCV | MRR | Contratos de delivery con duracion definida |
+| Reach | MRR | MRR | Media tiene pass-through; el TCV distorsiona |
+| Globe | TCV | ARR | Contratos creativos anuales |
+| Efeonce Digital | ARR | MRR | Consultoria con vision anual |
+
+### 11A.7. HubSpot deal sync — mapeo de metricas
+
+| HubSpot property | Greenhouse source | Sync | Notas |
+|-----------------|------------------|------|-------|
+| `amount` | Segun `revenue_metric_config.hubspot_amount_metric` | GH → HS | Configurable por BL |
+| `hs_mrr` | `quotation.mrr` | GH → HS | Propiedad nativa de HubSpot |
+| `hs_arr` | `quotation.arr` | GH → HS | Propiedad nativa de HubSpot |
+| `hs_tcv` | `quotation.tcv` | GH → HS | Custom property si no existe |
+| `hs_acv` | `quotation.acv` | GH → HS | Custom property si no existe |
+| `recurringrevenuedealtype` | `quotation.revenue_type` mapping: recurring→`existing`, one_time→`newbusiness` | GH → HS | Alimenta HubSpot recurring revenue analytics |
+| `hs_deal_stage_probability` | De tabla de probabilidades §14.2 | GH → HS | |
+
+**Regla:** costo y margen nunca se pushean a HubSpot. Solo metricas de revenue y deal metadata.
+
+### 11A.8. Impacto en pipeline dashboard (§14)
+
+El pipeline dashboard debe permitir toggle entre metricas:
+
+```
+┌─ Pipeline view: [MRR ▾]  [ARR]  [TCV]  [ACV] ────────────────┐
+│                                                                 │
+│  Draft:     $12.400.000 MRR  ░░░░░░░░░░░░ (3 cotizaciones)    │
+│  Sent:      $28.600.000 MRR  ░░░░░░░░░░░░░░░░░ (5)            │
+│  Approved:  $45.200.000 MRR  ░░░░░░░░░░░░░░░░░░░░░░░ (8)      │
+│                                                                 │
+│  Pipeline ponderado: $32.180.000 MRR                           │
+│  ARR equivalente:    $386.160.000                              │
+│                                                                 │
+│  Metricas clave:                                               │
+│  ├── ARR activo (converted):        $542.400.000               │
+│  ├── ARR en riesgo (renewal due):    $86.400.000               │
+│  └── ARR nuevo en pipeline:         $148.800.000               │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+La columna `weighted_value` en `revenue_pipeline` se calcula segun la metrica seleccionada: `weighted_mrr`, `weighted_tcv`, etc. Para evitar multiplicar columnas, el pipeline materializa `mrr`, `arr`, `tcv`, `acv` y el dashboard multiplica por `probability_pct` al renderizar.
+
+### 11A.9. Impacto en profitability tracking (§15)
+
+El profitability tracking compara usando la metrica que corresponda al `revenue_type`:
+
+| revenue_type | Metrica de comparacion | Logica |
+|-------------|----------------------|--------|
+| `recurring` | MRR cotizado vs MRR facturado por mes | La unidad natural del retainer |
+| `one_time` | TCV cotizado vs total facturado acumulado | El proyecto se mide al cierre |
+| `hybrid` | MRR recurrente + avance de items one-time por separado | Dos tracks en paralelo |
+
+---
+
 ## 12. Approval workflow (v2)
 
 ### 12.1. Modelo: aprobacion por excepcion
@@ -828,13 +989,18 @@ CREATE TABLE greenhouse_commercial.revenue_pipeline (
   currency             TEXT NOT NULL,
   status               TEXT NOT NULL,
 
-  -- Valores
+  -- Valores base
   total_price          NUMERIC(14,2) NOT NULL,
   probability_pct      NUMERIC(5,2) NOT NULL,
-  weighted_value       NUMERIC(14,2) NOT NULL,   -- total_price * probability_pct / 100
-  monthly_recurring    NUMERIC(14,2),             -- para retainers: total_price (ya es mensual)
-  contract_total       NUMERIC(14,2),             -- total_price * duration meses (o total proyecto)
   expected_close_date  DATE,
+
+  -- Revenue metrics (derivados de §11A)
+  revenue_type         TEXT NOT NULL,             -- recurring | one_time | hybrid
+  mrr                  NUMERIC(14,2),             -- Monthly Recurring Revenue
+  arr                  NUMERIC(14,2),             -- Annual Recurring Revenue
+  tcv                  NUMERIC(14,2),             -- Total Contract Value
+  acv                  NUMERIC(14,2),             -- Annual Contract Value
+  -- El dashboard multiplica por probability_pct al renderizar; no se persiste weighted por metrica
 
   -- Tracking
   days_in_current_stage INTEGER,
@@ -1238,6 +1404,7 @@ Flujo inverso: "Guardar como template" desde una cotizacion aprobada. El sistema
 | CRUD de terms library | Finance, Efeonce Admin |
 | CRUD de quote templates | Account Lead, Finance, Efeonce Admin |
 | CRUD de approval policies | Efeonce Admin |
+| CRUD de revenue metric config | Efeonce Admin |
 | Ver pipeline y forecast | Account Lead, Finance, Efeonce Admin |
 | Ver profitability tracking | Finance, Efeonce Admin |
 
@@ -1294,6 +1461,10 @@ Flujo inverso: "Guardar como template" desde una cotizacion aprobada. El sistema
 /api/commercial/pipeline                                GET (revenue pipeline dashboard)
 /api/commercial/profitability                           GET (cotizado vs ejecutado)
 /api/commercial/profitability/[quotationId]             GET (detalle por cotizacion)
+
+# ── Revenue metrics config ──
+/api/commercial/revenue-metric-config                   GET, POST
+/api/commercial/revenue-metric-config/[id]              PUT
 
 # ── Cron ──
 /api/cron/commercial-renewal-check                      POST (procesado por ops-worker)
@@ -1360,8 +1531,9 @@ Flujo inverso: "Guardar como template" desde una cotizacion aprobada. El sistema
 | 16 | `quotation_audit_log` | Audit trail inmutable | §18.1 |
 | 17 | `quote_templates` | Templates de cotizacion reutilizables | §19.1 |
 | 18 | `quote_template_items` | Line items default de cada template | §19.1 |
+| 19 | `revenue_metric_config` | Config de metrica para HubSpot amount y pipeline default por BL | §11A.6 |
 
-**Total: 18 tablas** en schema `greenhouse_commercial`.
+**Total: 19 tablas** en schema `greenhouse_commercial`.
 
 ---
 
@@ -1388,5 +1560,12 @@ Flujo inverso: "Guardar como template" desde una cotizacion aprobada. El sistema
 | **Drift driver** | Causa identificada automaticamente de un margin drift (rotacion, scope creep, FX) |
 | **Escalamiento** | Ajuste periodico de precios por IPC o porcentaje negociado |
 | **Discount health** | Evaluacion automatica del impacto del descuento sobre el margen |
+| **MRR** | Monthly Recurring Revenue — ingreso mensual recurrente. Solo items con `recurrence_type = 'recurring'` |
+| **ARR** | Annual Recurring Revenue — MRR × 12. Run-rate anual del negocio recurrente |
+| **TCV** | Total Contract Value — valor total del contrato incluyendo items recurrentes y one-time |
+| **ACV** | Annual Contract Value — TCV / anos del contrato. Para contratos multi-anio |
+| **Revenue type** | Clasificacion de la cotizacion: `recurring` (todo recurrente), `one_time` (todo unico), `hybrid` (mezcla) |
+| **Recurrence type** | Clasificacion por line item: `recurring`, `one_time`, o `inherit` (hereda de la cotizacion) |
+| **Revenue metric config** | Configuracion por BL de que metrica se usa como `amount` en HubSpot y como default en pipeline |
 | **Terms library** | Catalogo de clausulas legales/comerciales reutilizables con variables de template |
 | **Renewal** | Cotizacion de renovacion generada automatica o manualmente al vencer un contrato |
