@@ -20,6 +20,7 @@ import type {
   ReviewLeaveRequestInput
 } from '@/types/hr-core'
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
+import type { ApprovalStageCode, WorkflowApprovalSnapshotRecord } from '@/lib/approval-authority/types'
 
 import {
   calculateProgressiveExtraDays,
@@ -36,6 +37,14 @@ import {
   loadHolidayDateSetForRange
 } from '@/lib/hr-core/leave-domain'
 import type { LeaveDayPeriod, LeavePayrollImpactPeriod, LeavePolicy } from '@/lib/hr-core/leave-domain'
+import { getNextApprovalAuthority, resolveInitialApprovalAuthority } from '@/lib/approval-authority/resolver'
+import {
+  applyWorkflowApprovalOverrideInTransaction,
+  getWorkflowApprovalSnapshotForStage,
+  listVisibleWorkflowEntityIdsForApprover,
+  listWorkflowApprovalSnapshotsForEntities,
+  upsertWorkflowApprovalSnapshotInTransaction
+} from '@/lib/approval-authority/store'
 import {
   isGreenhousePostgresConfigured,
   runGreenhousePostgresQuery,
@@ -316,12 +325,105 @@ const mapLeaveRequest = (row: PostgresLeaveRequestRow): HrLeaveRequest => ({
       : normalizeNullableString(row.attachment_url),
   supervisorMemberId: normalizeNullableString(row.supervisor_member_id),
   supervisorName: normalizeNullableString(row.supervisor_name),
+  approvalStageCode:
+    normalizeNullableString(row.status) === 'pending_hr'
+      ? 'hr_review'
+      : normalizeNullableString(row.status) === 'pending_supervisor'
+        ? 'supervisor_review'
+        : null,
+  approvalSnapshot: null,
   hrReviewerUserId: normalizeNullableString(row.hr_reviewer_user_id),
   decidedAt: toPgTimestampString(row.decided_at),
   decidedBy: normalizeNullableString(row.decided_by),
   notes: normalizeNullableString(row.notes),
   createdAt: toPgTimestampString(row.created_at)
 })
+
+const getLeaveApprovalStageCode = (status: HrLeaveRequest['status']): ApprovalStageCode | null => {
+  if (status === 'pending_supervisor') {
+    return 'supervisor_review'
+  }
+
+  if (status === 'pending_hr') {
+    return 'hr_review'
+  }
+
+  return null
+}
+
+const pickBestApprovalSnapshot = ({
+  request,
+  snapshots
+}: {
+  request: HrLeaveRequest
+  snapshots: WorkflowApprovalSnapshotRecord[]
+}) => {
+  const currentStageCode = getLeaveApprovalStageCode(request.status)
+
+  if (currentStageCode) {
+    return snapshots.find(snapshot => snapshot.stageCode === currentStageCode) ?? null
+  }
+
+  return [...snapshots]
+    .sort((left, right) => Date.parse(right.updatedAt) - Date.parse(left.updatedAt))
+    .at(0) ?? null
+}
+
+const attachApprovalSnapshotsToLeaveRequests = async (
+  requests: HrLeaveRequest[],
+  client?: PoolClient
+): Promise<HrLeaveRequest[]> => {
+  if (requests.length === 0) {
+    return requests
+  }
+
+  const snapshots = await listWorkflowApprovalSnapshotsForEntities({
+    workflowDomain: 'leave',
+    workflowEntityIds: requests.map(request => request.requestId),
+    client
+  })
+
+  const snapshotsByRequestId = new Map<string, WorkflowApprovalSnapshotRecord[]>()
+
+  for (const snapshot of snapshots) {
+    const requestSnapshots = snapshotsByRequestId.get(snapshot.workflowEntityId) ?? []
+
+    requestSnapshots.push(snapshot)
+    snapshotsByRequestId.set(snapshot.workflowEntityId, requestSnapshots)
+  }
+
+  return requests.map(request => {
+    const requestSnapshots = snapshotsByRequestId.get(request.requestId) ?? []
+    const approvalSnapshot = pickBestApprovalSnapshot({ request, snapshots: requestSnapshots })
+
+    return {
+      ...request,
+      approvalStageCode: getLeaveApprovalStageCode(request.status),
+      approvalSnapshot
+    }
+  })
+}
+
+const attachApprovalSnapshotToLeaveRequest = async (request: HrLeaveRequest, client?: PoolClient) => {
+  const [hydratedRequest] = await attachApprovalSnapshotsToLeaveRequests([request], client)
+
+  return hydratedRequest ?? request
+}
+
+const getCurrentLeaveApprovalSnapshot = async (request: HrLeaveRequest, client: PoolClient) => {
+  const currentStageCode = getLeaveApprovalStageCode(request.status)
+
+  if (!currentStageCode) {
+    return request.approvalSnapshot ?? null
+  }
+
+  return getWorkflowApprovalSnapshotForStage({
+    workflowDomain: 'leave',
+    workflowEntityId: request.requestId,
+    stageCode: currentStageCode,
+    client
+  })
+}
 
 const queryRows = async <T extends Record<string, unknown>>(text: string, values: unknown[] = [], client?: PoolClient) => {
   if (client) {
@@ -891,7 +993,11 @@ const getLeaveRequestByIdInternal = async (requestId: string, client?: PoolClien
     client
   )
 
-  return row ? mapLeaveRequest(row) : null
+  if (!row) {
+    return null
+  }
+
+  return attachApprovalSnapshotToLeaveRequest(mapLeaveRequest(row), client)
 }
 
 const assertNoLeaveOverlap = async ({
@@ -979,6 +1085,7 @@ const buildLeaveEventPayload = async ({
   payrollImpact,
   eventStage,
   action,
+  approvalSnapshot,
   client
 }: {
   request: HrLeaveRequest
@@ -990,6 +1097,7 @@ const buildLeaveEventPayload = async ({
   payrollImpact: HrLeavePayrollImpactSummary | null
   eventStage: 'requested' | 'pending_hr' | 'approved' | 'rejected' | 'cancelled'
   action: string
+  approvalSnapshot?: WorkflowApprovalSnapshotRecord | null
   client: PoolClient
 }) => {
   const member = await getMemberById(request.memberId, client)
@@ -1007,6 +1115,8 @@ const buildLeaveEventPayload = async ({
     endDate: request.endDate,
     requestedDays: request.requestedDays,
     status: request.status,
+    approvalStageCode: approvalSnapshot?.stageCode ?? getLeaveApprovalStageCode(request.status),
+    approvalSnapshot: approvalSnapshot ?? request.approvalSnapshot ?? null,
     eventStage,
     action,
     actorUserId,
@@ -1136,6 +1246,13 @@ export const listLeaveRequestsFromPostgres = async ({
   const values: unknown[] = []
   const filters = ['1 = 1']
 
+  const visibleRequestIds = currentMember
+    ? await listVisibleWorkflowEntityIdsForApprover({
+      workflowDomain: 'leave',
+      approverMemberId: currentMember.member_id
+    })
+    : []
+
   if (isHrAdminTenant(tenant)) {
     if (memberId) {
       values.push(memberId)
@@ -1143,7 +1260,16 @@ export const listLeaveRequestsFromPostgres = async ({
     }
   } else {
     values.push(currentMember?.member_id || '')
-    filters.push(`(r.member_id = $${values.length} OR r.supervisor_member_id = $${values.length})`)
+    const actorParamIndex = values.length
+
+    if (visibleRequestIds.length > 0) {
+      values.push(visibleRequestIds)
+      filters.push(
+        `(r.member_id = $${actorParamIndex} OR r.supervisor_member_id = $${actorParamIndex} OR r.request_id = ANY($${values.length}::text[]))`
+      )
+    } else {
+      filters.push(`(r.member_id = $${actorParamIndex} OR r.supervisor_member_id = $${actorParamIndex})`)
+    }
   }
 
   if (status) {
@@ -1194,7 +1320,7 @@ export const listLeaveRequestsFromPostgres = async ({
     values
   )
 
-  const requests = rows.map(mapLeaveRequest)
+  const requests = await attachApprovalSnapshotsToLeaveRequests(rows.map(mapLeaveRequest))
 
   return {
     requests,
@@ -1228,7 +1354,11 @@ export const getLeaveRequestByIdFromPostgres = async ({
 
   const currentMember = await resolveTenantMember(tenant)
 
-  if (request.memberId !== currentMember.member_id && request.supervisorMemberId !== currentMember.member_id) {
+  if (
+    request.memberId !== currentMember.member_id &&
+    request.supervisorMemberId !== currentMember.member_id &&
+    request.approvalSnapshot?.effectiveApproverMemberId !== currentMember.member_id
+  ) {
     throw new HrCoreValidationError('Forbidden', 403)
   }
 
@@ -1258,8 +1388,37 @@ export const listLeaveCalendarFromPostgres = async ({
   const currentMember = isHrAdminTenant(tenant) ? null : await resolveTenantMember(tenant)
   const effectiveMemberId = memberId || (isHrAdminTenant(tenant) ? null : currentMember?.member_id ?? null)
 
+  const visibleRequestIds = currentMember
+    ? await listVisibleWorkflowEntityIdsForApprover({
+      workflowDomain: 'leave',
+      approverMemberId: currentMember.member_id
+    })
+    : []
+
   if (effectiveMemberId) {
     await assertMemberVisibleToTenant(tenant, effectiveMemberId)
+  }
+
+  const values: unknown[] = [normalizedTo, normalizedFrom, effectiveMemberId]
+
+  const filters = [
+    'r.start_date <= $1::date',
+    'r.end_date >= $2::date',
+    '($3::text IS NULL OR r.member_id = $3)'
+  ]
+
+  if (!isHrAdminTenant(tenant)) {
+    values.push(currentMember?.member_id ?? '')
+    const actorParamIndex = values.length
+
+    if (visibleRequestIds.length > 0) {
+      values.push(visibleRequestIds)
+      filters.push(
+        `(r.member_id = $${actorParamIndex} OR r.supervisor_member_id = $${actorParamIndex} OR r.request_id = ANY($${values.length}::text[]))`
+      )
+    } else {
+      filters.push(`(r.member_id = $${actorParamIndex} OR r.supervisor_member_id = $${actorParamIndex})`)
+    }
   }
 
   const rows = await runGreenhousePostgresQuery<PostgresLeaveRequestRow>(
@@ -1294,20 +1453,10 @@ export const listLeaveCalendarFromPostgres = async ({
         ON supervisor.member_id = r.supervisor_member_id
       LEFT JOIN greenhouse_hr.leave_types AS lt
         ON lt.leave_type_code = r.leave_type_code
-      WHERE r.start_date <= $1::date
-        AND r.end_date >= $2::date
-        AND (
-          $3::text IS NULL
-          OR r.member_id = $3
-        )
-        AND (
-          $4::boolean = TRUE
-          OR r.member_id = $5
-          OR r.supervisor_member_id = $5
-        )
+      WHERE ${filters.join(' AND ')}
       ORDER BY r.start_date ASC, member.display_name ASC NULLS LAST
     `,
-    [normalizedTo, normalizedFrom, effectiveMemberId, isHrAdminTenant(tenant), currentMember?.member_id ?? null]
+    values
   )
 
   const leaveEvents: HrLeaveCalendarEvent[] = rows.map(row => {
@@ -1514,8 +1663,19 @@ export const createLeaveRequestInPostgres = async ({
     }
 
     const requestId = `leave-${randomUUID()}`
-    const supervisorMemberId = normalizeNullableString(member.reports_to)
-    const status = supervisorMemberId ? 'pending_supervisor' : 'pending_hr'
+
+    const initialApprovalAuthority = await resolveInitialApprovalAuthority({
+      workflowDomain: 'leave',
+      subjectMemberId: effectiveMemberId
+    })
+
+    const supervisorMemberId = initialApprovalAuthority.formalApproverMemberId
+
+    const status: HrLeaveRequest['status'] =
+      initialApprovalAuthority.stageCode === 'supervisor_review'
+        ? 'pending_supervisor'
+        : 'pending_hr'
+
     const reason = normalizeNullableString(input.reason)
     const attachmentUrl = attachmentAssetId ? buildPrivateAssetDownloadUrl(attachmentAssetId) : attachmentUrlFallback
     const notes = normalizeNullableString(input.notes)
@@ -1603,6 +1763,15 @@ export const createLeaveRequestInPostgres = async ({
       [`leave-action-${randomUUID()}`, requestId, actorUserId, currentMember.member_id, currentMember.display_name, notes]
     )
 
+    const approvalSnapshot = await upsertWorkflowApprovalSnapshotInTransaction({
+      workflowDomain: 'leave',
+      workflowEntityId: requestId,
+      subjectMemberId: effectiveMemberId,
+      resolution: initialApprovalAuthority,
+      createdByUserId: actorUserId,
+      client
+    })
+
     const created: HrLeaveRequest = {
       requestId,
       memberId: effectiveMemberId,
@@ -1623,7 +1792,9 @@ export const createLeaveRequestInPostgres = async ({
       attachmentAssetId,
       attachmentUrl,
       supervisorMemberId,
-      supervisorName: null,
+      supervisorName: approvalSnapshot.formalApproverName,
+      approvalStageCode: approvalSnapshot.stageCode,
+      approvalSnapshot,
       hrReviewerUserId: null,
       decidedAt: null,
       decidedBy: null,
@@ -1654,6 +1825,7 @@ export const createLeaveRequestInPostgres = async ({
       payrollImpact: null,
       eventStage: status === 'pending_hr' ? 'pending_hr' : 'requested',
       action: 'submit',
+      approvalSnapshot,
       client
     })
 
@@ -1742,6 +1914,8 @@ export const reviewLeaveRequestInPostgres = async ({
     let payrollImpact: HrLeavePayrollImpactSummary | null = null
     let eventType: string = EVENT_TYPES.leaveRequestRejected
     let eventStage: 'requested' | 'pending_hr' | 'approved' | 'rejected' | 'cancelled' = 'rejected'
+    let approvalSnapshot = await getCurrentLeaveApprovalSnapshot(request, client)
+    const currentApprovalStageCode = getLeaveApprovalStageCode(request.status)
 
     if (action === 'cancel') {
       if (!isHrAdminTenant(tenant) && actorMemberId !== request.memberId) {
@@ -1781,7 +1955,14 @@ export const reviewLeaveRequestInPostgres = async ({
         })
       }
     } else if (!isHrAdminTenant(tenant)) {
-      if (request.supervisorMemberId !== actorMemberId || request.status !== 'pending_supervisor') {
+      const effectiveApproverMemberId =
+        approvalSnapshot?.effectiveApproverMemberId ?? request.supervisorMemberId
+
+      if (
+        request.status !== 'pending_supervisor' ||
+        !actorMemberId ||
+        effectiveApproverMemberId !== actorMemberId
+      ) {
         throw new HrCoreValidationError('Forbidden', 403)
       }
 
@@ -1803,6 +1984,27 @@ export const reviewLeaveRequestInPostgres = async ({
       eventType = action === 'approve' ? EVENT_TYPES.leaveRequestEscalatedToHr : EVENT_TYPES.leaveRequestRejected
       eventStage = action === 'approve' ? 'pending_hr' : 'rejected'
 
+      if (action === 'approve') {
+        const nextApprovalAuthority = await getNextApprovalAuthority({
+          workflowDomain: 'leave',
+          subjectMemberId: request.memberId,
+          stageCode: 'supervisor_review'
+        })
+
+        if (nextApprovalAuthority) {
+          approvalSnapshot = await upsertWorkflowApprovalSnapshotInTransaction({
+            workflowDomain: 'leave',
+            workflowEntityId: requestId,
+            subjectMemberId: request.memberId,
+            resolution: nextApprovalAuthority,
+            createdByUserId: actorUserId,
+            client
+          })
+        } else {
+          approvalSnapshot = null
+        }
+      }
+
       if (action === 'reject' && tracksBalance) {
         await adjustBalanceForRequest({
           request,
@@ -1816,6 +2018,24 @@ export const reviewLeaveRequestInPostgres = async ({
     } else {
       if (!['pending_hr', 'pending_supervisor'].includes(request.status)) {
         throw new HrCoreValidationError('This request is no longer pending HR review.', 409)
+      }
+
+      if (request.status === 'pending_supervisor' && currentApprovalStageCode === 'supervisor_review') {
+        approvalSnapshot = await applyWorkflowApprovalOverrideInTransaction({
+          workflowDomain: 'leave',
+          workflowEntityId: requestId,
+          stageCode: 'supervisor_review',
+          overrideActorUserId: actorUserId,
+          overrideReason: notes ?? 'hr_override',
+          client
+        })
+      } else if (currentApprovalStageCode === 'hr_review') {
+        approvalSnapshot = await getWorkflowApprovalSnapshotForStage({
+          workflowDomain: 'leave',
+          workflowEntityId: requestId,
+          stageCode: 'hr_review',
+          client
+        })
       }
 
       await client.query(
@@ -1881,6 +2101,8 @@ export const reviewLeaveRequestInPostgres = async ({
 
     updated.holidaySource = dayBreakdown.holidaySource
     updated.payrollImpact = payrollImpact
+    updated.approvalStageCode = getLeaveApprovalStageCode(updated.status)
+    updated.approvalSnapshot = approvalSnapshot
 
     const eventPayload = await buildLeaveEventPayload({
       request: updated,
@@ -1892,6 +2114,7 @@ export const reviewLeaveRequestInPostgres = async ({
       payrollImpact,
       eventStage,
       action,
+      approvalSnapshot,
       client
     })
 

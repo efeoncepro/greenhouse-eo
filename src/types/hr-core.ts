@@ -1,4 +1,5 @@
 import type { ContractType, PayrollVia, PayRegime } from '@/types/hr-contracts'
+import type { ApprovalStageCode, WorkflowApprovalSnapshotRecord } from '@/lib/approval-authority/types'
 
 export type HrJobLevel = 'junior' | 'semi_senior' | 'senior' | 'lead' | 'manager' | 'director'
 export type HrEmploymentType = 'full_time' | 'part_time' | 'contractor'
@@ -127,6 +128,8 @@ export interface HrLeaveRequest {
   attachmentUrl: string | null
   supervisorMemberId: string | null
   supervisorName: string | null
+  approvalStageCode?: ApprovalStageCode | null
+  approvalSnapshot?: WorkflowApprovalSnapshotRecord | null
   hrReviewerUserId: string | null
   decidedAt: string | null
   decidedBy: string | null

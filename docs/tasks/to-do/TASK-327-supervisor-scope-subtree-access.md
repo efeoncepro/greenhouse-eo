@@ -50,7 +50,7 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md`
 - `docs/tasks/to-do/TASK-263-permission-sets-enterprise-view-access.md`
 - `docs/tasks/to-do/TASK-324-reporting-hierarchy-foundation.md`
-- `docs/tasks/to-do/TASK-326-approval-authority-workflow-snapshots.md`
+- `docs/tasks/complete/TASK-326-approval-authority-workflow-snapshots.md`
 
 Reglas obligatorias:
 

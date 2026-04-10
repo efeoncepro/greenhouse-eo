@@ -175,6 +175,20 @@ END;
 $$;
 
 
+--
+-- Name: touch_workflow_approval_snapshots_updated_at(); Type: FUNCTION; Schema: greenhouse_hr; Owner: -
+--
+
+CREATE FUNCTION greenhouse_hr.touch_workflow_approval_snapshots_updated_at() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  NEW.updated_at := CURRENT_TIMESTAMP;
+  RETURN NEW;
+END;
+$$;
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -2324,6 +2338,37 @@ CREATE TABLE greenhouse_hr.leave_requests (
     updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     attachment_asset_id text,
     CONSTRAINT leave_requests_status_check CHECK ((status = ANY (ARRAY['pending_supervisor'::text, 'pending_hr'::text, 'approved'::text, 'rejected'::text, 'cancelled'::text])))
+);
+
+
+--
+-- Name: workflow_approval_snapshots; Type: TABLE; Schema: greenhouse_hr; Owner: -
+--
+
+CREATE TABLE greenhouse_hr.workflow_approval_snapshots (
+    snapshot_id text NOT NULL,
+    workflow_domain text NOT NULL,
+    workflow_entity_id text NOT NULL,
+    stage_code text NOT NULL,
+    subject_member_id text NOT NULL,
+    authority_source text NOT NULL,
+    formal_approver_member_id text,
+    formal_approver_name text,
+    effective_approver_member_id text,
+    effective_approver_name text,
+    delegate_member_id text,
+    delegate_member_name text,
+    delegate_responsibility_id text,
+    fallback_role_codes text[] DEFAULT '{}'::text[] NOT NULL,
+    override_actor_user_id text,
+    override_reason text,
+    snapshot_payload jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_by_user_id text,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT workflow_approval_snapshots_authority_source_check CHECK ((authority_source = ANY (ARRAY['reporting_hierarchy'::text, 'delegation'::text, 'domain_fallback'::text, 'admin_override'::text]))),
+    CONSTRAINT workflow_approval_snapshots_stage_code_check CHECK ((stage_code = ANY (ARRAY['supervisor_review'::text, 'hr_review'::text, 'finance_review'::text]))),
+    CONSTRAINT workflow_approval_snapshots_workflow_domain_check CHECK ((workflow_domain = ANY (ARRAY['leave'::text, 'expense_report'::text, 'onboarding'::text, 'offboarding'::text, 'performance_evaluation'::text])))
 );
 
 
@@ -5266,6 +5311,14 @@ ALTER TABLE ONLY greenhouse_hr.leave_requests
 
 
 --
+-- Name: workflow_approval_snapshots workflow_approval_snapshots_pkey; Type: CONSTRAINT; Schema: greenhouse_hr; Owner: -
+--
+
+ALTER TABLE ONLY greenhouse_hr.workflow_approval_snapshots
+    ADD CONSTRAINT workflow_approval_snapshots_pkey PRIMARY KEY (snapshot_id);
+
+
+--
 -- Name: leave_types leave_types_pkey; Type: CONSTRAINT; Schema: greenhouse_hr; Owner: -
 --
 
@@ -7030,6 +7083,27 @@ CREATE INDEX leave_requests_supervisor_status_idx ON greenhouse_hr.leave_request
 
 
 --
+-- Name: idx_workflow_approval_snapshots_effective_approver; Type: INDEX; Schema: greenhouse_hr; Owner: -
+--
+
+CREATE INDEX idx_workflow_approval_snapshots_effective_approver ON greenhouse_hr.workflow_approval_snapshots USING btree (effective_approver_member_id, workflow_domain, stage_code);
+
+
+--
+-- Name: idx_workflow_approval_snapshots_subject_member; Type: INDEX; Schema: greenhouse_hr; Owner: -
+--
+
+CREATE INDEX idx_workflow_approval_snapshots_subject_member ON greenhouse_hr.workflow_approval_snapshots USING btree (subject_member_id, created_at DESC);
+
+
+--
+-- Name: idx_workflow_approval_snapshots_workflow_stage; Type: INDEX; Schema: greenhouse_hr; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_workflow_approval_snapshots_workflow_stage ON greenhouse_hr.workflow_approval_snapshots USING btree (workflow_domain, workflow_entity_id, stage_code);
+
+
+--
 -- Name: idx_email_deliveries_batch; Type: INDEX; Schema: greenhouse_notifications; Owner: -
 --
 
@@ -7454,6 +7528,13 @@ CREATE TRIGGER trg_reporting_lines_sync_snapshot AFTER INSERT OR DELETE OR UPDAT
 --
 
 CREATE TRIGGER trg_reporting_lines_touch_updated_at BEFORE UPDATE ON greenhouse_core.reporting_lines FOR EACH ROW EXECUTE FUNCTION greenhouse_core.touch_reporting_lines_updated_at();
+
+
+--
+-- Name: workflow_approval_snapshots trg_workflow_approval_snapshots_touch_updated_at; Type: TRIGGER; Schema: greenhouse_hr; Owner: -
+--
+
+CREATE TRIGGER trg_workflow_approval_snapshots_touch_updated_at BEFORE UPDATE ON greenhouse_hr.workflow_approval_snapshots FOR EACH ROW EXECUTE FUNCTION greenhouse_hr.touch_workflow_approval_snapshots_updated_at();
 
 
 --
@@ -8718,6 +8799,62 @@ ALTER TABLE ONLY greenhouse_hr.leave_requests
 
 ALTER TABLE ONLY greenhouse_hr.leave_requests
     ADD CONSTRAINT leave_requests_supervisor_member_id_fkey FOREIGN KEY (supervisor_member_id) REFERENCES greenhouse_core.members(member_id);
+
+
+--
+-- Name: workflow_approval_snapshots workflow_approval_snapshots_created_by_user_id_fkey; Type: FK CONSTRAINT; Schema: greenhouse_hr; Owner: -
+--
+
+ALTER TABLE ONLY greenhouse_hr.workflow_approval_snapshots
+    ADD CONSTRAINT workflow_approval_snapshots_created_by_user_id_fkey FOREIGN KEY (created_by_user_id) REFERENCES greenhouse_core.client_users(user_id);
+
+
+--
+-- Name: workflow_approval_snapshots workflow_approval_snapshots_delegate_member_id_fkey; Type: FK CONSTRAINT; Schema: greenhouse_hr; Owner: -
+--
+
+ALTER TABLE ONLY greenhouse_hr.workflow_approval_snapshots
+    ADD CONSTRAINT workflow_approval_snapshots_delegate_member_id_fkey FOREIGN KEY (delegate_member_id) REFERENCES greenhouse_core.members(member_id);
+
+
+--
+-- Name: workflow_approval_snapshots workflow_approval_snapshots_delegate_responsibility_id_fkey; Type: FK CONSTRAINT; Schema: greenhouse_hr; Owner: -
+--
+
+ALTER TABLE ONLY greenhouse_hr.workflow_approval_snapshots
+    ADD CONSTRAINT workflow_approval_snapshots_delegate_responsibility_id_fkey FOREIGN KEY (delegate_responsibility_id) REFERENCES greenhouse_core.operational_responsibilities(responsibility_id) ON DELETE SET NULL;
+
+
+--
+-- Name: workflow_approval_snapshots workflow_approval_snapshots_effective_approver_member_id_fkey; Type: FK CONSTRAINT; Schema: greenhouse_hr; Owner: -
+--
+
+ALTER TABLE ONLY greenhouse_hr.workflow_approval_snapshots
+    ADD CONSTRAINT workflow_approval_snapshots_effective_approver_member_id_fkey FOREIGN KEY (effective_approver_member_id) REFERENCES greenhouse_core.members(member_id);
+
+
+--
+-- Name: workflow_approval_snapshots workflow_approval_snapshots_formal_approver_member_id_fkey; Type: FK CONSTRAINT; Schema: greenhouse_hr; Owner: -
+--
+
+ALTER TABLE ONLY greenhouse_hr.workflow_approval_snapshots
+    ADD CONSTRAINT workflow_approval_snapshots_formal_approver_member_id_fkey FOREIGN KEY (formal_approver_member_id) REFERENCES greenhouse_core.members(member_id);
+
+
+--
+-- Name: workflow_approval_snapshots workflow_approval_snapshots_override_actor_user_id_fkey; Type: FK CONSTRAINT; Schema: greenhouse_hr; Owner: -
+--
+
+ALTER TABLE ONLY greenhouse_hr.workflow_approval_snapshots
+    ADD CONSTRAINT workflow_approval_snapshots_override_actor_user_id_fkey FOREIGN KEY (override_actor_user_id) REFERENCES greenhouse_core.client_users(user_id);
+
+
+--
+-- Name: workflow_approval_snapshots workflow_approval_snapshots_subject_member_id_fkey; Type: FK CONSTRAINT; Schema: greenhouse_hr; Owner: -
+--
+
+ALTER TABLE ONLY greenhouse_hr.workflow_approval_snapshots
+    ADD CONSTRAINT workflow_approval_snapshots_subject_member_id_fkey FOREIGN KEY (subject_member_id) REFERENCES greenhouse_core.members(member_id) ON DELETE CASCADE;
 
 
 --

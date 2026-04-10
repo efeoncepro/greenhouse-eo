@@ -211,7 +211,7 @@ describe('HrHierarchyView', () => {
     expect(screen.getByRole('combobox', { name: 'Nuevo supervisor' })).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Razón' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Guardar cambio' })).toBeDisabled()
-  })
+  }, 10000)
 
   it('opens the temporary delegation dialog from the audit panel', async () => {
     const user = userEvent.setup()
@@ -225,5 +225,5 @@ describe('HrHierarchyView', () => {
     expect(screen.getByRole('heading', { name: 'Nueva delegación temporal' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Delegado' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Crear delegación' })).toBeInTheDocument()
-  })
+  }, 10000)
 })

@@ -2,6 +2,20 @@
 
 ## 2026-04-10
 
+### 2026-04-10 — Approval authority snapshots for HR workflows
+
+- Se agregó la lane compartida `src/lib/approval-authority/*` para resolver autoridad de aprobación por dominio y congelarla por etapa.
+- Nueva tabla `greenhouse_hr.workflow_approval_snapshots` para snapshots auditables de:
+  - supervisor formal
+  - aprobador efectivo por delegación
+  - fallback de dominio
+  - override administrativo
+- `HR > Permisos` ya consume el resolver canónico en submit/review:
+  - delegados activos pueden revisar solicitudes pendientes de supervisor
+  - top-of-tree escalan a HR por snapshot en vez de heurística inline
+  - HR override queda auditado
+- Las notificaciones de leave ahora siguen al aprobador efectivo del snapshot y usan los fallback roles de la etapa activa.
+
 ### 2026-04-10 — HR hierarchy admin surface completed
 
 - Nuevo módulo `HR > Jerarquía` (`/hr/hierarchy`) para administrar supervisoría formal, delegaciones temporales y auditoría de cambios.

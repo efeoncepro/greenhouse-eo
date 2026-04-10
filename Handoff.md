@@ -1,5 +1,20 @@
 # Handoff.md
 
+## Sesion 2026-04-10 — TASK-326 cerrada: approval authority snapshots
+
+- alcance cerrado:
+  - nueva lane shared `src/lib/approval-authority/{types,config,resolver,store}.ts`
+  - nueva migración `migrations/20260410114658761_workflow-approval-snapshots.sql`
+  - nueva tabla `greenhouse_hr.workflow_approval_snapshots` con snapshot por dominio/etapa
+  - `src/lib/hr-core/postgres-leave-store.ts` ya resuelve autoridad por dominio y congela snapshot en submit/review
+  - `leave` ya permite aprobación por delegado activo y deja auditado el override HR cuando interviene fuera de la cadena normal
+  - `src/lib/sync/projections/notifications.ts` ya notifica al aprobador efectivo del snapshot y reutiliza fallback roles del workflow
+- validación ejecutada:
+  - `pnpm vitest run src/lib/approval-authority/resolver.test.ts` — OK
+  - `pnpm vitest run src/lib/sync/projections/notifications.test.ts` — OK
+- siguiente paso natural:
+  - `TASK-327` para subtree-aware access y visibilidad limitada del supervisor
+
 ## Sesion 2026-04-10 — TASK-325 cerrada: admin de jerarquías HR
 
 - alcance cerrado:

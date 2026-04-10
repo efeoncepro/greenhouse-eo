@@ -7,9 +7,54 @@ const mockDispatch = vi.fn()
 const mockEnsureNotificationSchema = vi.fn()
 const mockGetUserNotificationRecipient = vi.fn()
 const mockGetRoleCodeNotificationRecipients = vi.fn()
+const mockSendEmail = vi.fn()
+const mockWasEmailAlreadySent = vi.fn()
+
+const MEMBER_RECIPIENTS = new Map([
+  ['julio-reyes', {
+    identityProfileId: 'profile-julio',
+    memberId: 'julio-reyes',
+    userId: 'user-efeonce-admin-julio-reyes',
+    email: 'jreyes@efeoncepro.com',
+    fullName: 'Julio Reyes'
+  }],
+  ['humberly-henriquez', {
+    identityProfileId: 'profile-humberly',
+    memberId: 'humberly-henriquez',
+    userId: 'user-efeonce-internal-humberly-henriquez',
+    email: 'humberly.henriquez@efeonce.org',
+    fullName: 'Humberly Henriquez'
+  }],
+  ['member-requester', {
+    identityProfileId: 'profile-requester',
+    memberId: 'member-requester',
+    userId: 'user-requester',
+    email: 'requester@example.com',
+    fullName: 'Paula Requester'
+  }],
+  ['member-supervisor', {
+    identityProfileId: 'profile-supervisor',
+    memberId: 'member-supervisor',
+    userId: 'user-supervisor',
+    email: 'supervisor@example.com',
+    fullName: 'Sofía Supervisor'
+  }],
+  ['member-delegate', {
+    identityProfileId: 'profile-delegate',
+    memberId: 'member-delegate',
+    userId: 'user-delegate',
+    email: 'delegate@example.com',
+    fullName: 'Diego Delegate'
+  }]
+])
 
 vi.mock('@/lib/postgres/client', () => ({
   runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
+}))
+
+vi.mock('@/lib/email/delivery', () => ({
+  sendEmail: (...args: unknown[]) => mockSendEmail(...args),
+  wasEmailAlreadySent: (...args: unknown[]) => mockWasEmailAlreadySent(...args)
 }))
 
 vi.mock('@/lib/notifications/notification-service', () => ({
@@ -31,23 +76,14 @@ vi.mock('@/lib/notifications/schema', () => ({
 }))
 
 vi.mock('@/lib/notifications/person-recipient-resolver', () => ({
-  getMemberNotificationRecipients: vi.fn(async () => new Map([
-    ['julio-reyes', {
-      identityProfileId: 'profile-julio',
-      memberId: 'julio-reyes',
-      userId: 'user-efeonce-admin-julio-reyes',
-      email: 'jreyes@efeoncepro.com',
-      fullName: 'Julio Reyes'
-    }],
-    ['humberly-henriquez', {
-      identityProfileId: 'profile-humberly',
-      memberId: 'humberly-henriquez',
-      userId: 'user-efeonce-internal-humberly-henriquez',
-      email: 'humberly.henriquez@efeonce.org',
-      fullName: 'Humberly Henriquez'
-    }]
-  ])),
-  getIdentityProfileNotificationRecipients: vi.fn(async () => new Map()),
+  getMemberNotificationRecipients: vi.fn(async (memberIds: string[]) =>
+    new Map(memberIds.flatMap(memberId => {
+      const recipient = MEMBER_RECIPIENTS.get(memberId)
+
+      return recipient ? [[memberId, recipient]] : []
+    }))
+  ),
+  getProfileNotificationRecipient: vi.fn(async () => null),
   getRoleCodeNotificationRecipients: (...args: unknown[]) => mockGetRoleCodeNotificationRecipients(...args),
   getUserNotificationRecipient: (...args: unknown[]) => mockGetUserNotificationRecipient(...args)
 }))
@@ -61,6 +97,8 @@ describe('notificationProjection payroll ops', () => {
     mockDispatch.mockResolvedValue({ sent: [], skipped: [], failed: [] })
     mockGetUserNotificationRecipient.mockResolvedValue(null)
     mockGetRoleCodeNotificationRecipients.mockResolvedValue([])
+    mockSendEmail.mockResolvedValue(undefined)
+    mockWasEmailAlreadySent.mockResolvedValue(false)
   })
 
   it('dispatches payroll ops notifications to mixed portal and email-only recipients', async () => {
@@ -176,5 +214,78 @@ describe('notificationProjection payroll ops', () => {
         }
       ]
     }))
+  })
+
+  it('notifies the delegated approver for leave_request.created', async () => {
+    const result = await notificationProjection.refresh(
+      { entityType: 'notification', entityId: 'leave_request.created' },
+      {
+        requestId: 'leave-123',
+        memberId: 'member-requester',
+        memberName: 'Paula Requester',
+        memberEmail: 'requester@example.com',
+        supervisorMemberId: 'member-supervisor',
+        leaveTypeName: 'Vacaciones',
+        startDate: '2026-04-15',
+        endDate: '2026-04-18',
+        requestedDays: 4,
+        reason: 'Descanso',
+        approvalSnapshot: {
+          stageCode: 'supervisor_review',
+          effectiveApproverMemberId: 'member-delegate',
+          fallbackRoleCodes: ['hr_manager', 'hr_payroll', 'efeonce_admin']
+        }
+      }
+    )
+
+    expect(result).toBe('notified 1 supervisor(s) about leave_request.created')
+    expect(mockDispatch).toHaveBeenCalledWith(expect.objectContaining({
+      category: 'leave_review',
+      recipients: [
+        expect.objectContaining({
+          memberId: 'member-delegate',
+          email: 'delegate@example.com'
+        })
+      ]
+    }))
+    expect(mockDispatch).not.toHaveBeenCalledWith(expect.objectContaining({
+      recipients: [
+        expect.objectContaining({
+          memberId: 'member-supervisor'
+        })
+      ]
+    }))
+  })
+
+  it('uses snapshot fallback roles when leave_request escalates to hr', async () => {
+    mockGetRoleCodeNotificationRecipients.mockResolvedValueOnce([
+      {
+        identityProfileId: 'profile-hr',
+        memberId: 'member-hr',
+        userId: 'user-hr',
+        email: 'hr@example.com',
+        fullName: 'Helena HR'
+      }
+    ])
+
+    const result = await notificationProjection.refresh(
+      { entityType: 'notification', entityId: 'leave_request.escalated_to_hr' },
+      {
+        requestId: 'leave-123',
+        memberName: 'Paula Requester',
+        leaveTypeName: 'Vacaciones',
+        startDate: '2026-04-15',
+        endDate: '2026-04-18',
+        requestedDays: 4,
+        reason: 'Descanso',
+        approvalSnapshot: {
+          stageCode: 'hr_review',
+          fallbackRoleCodes: ['hr_manager', 'efeonce_admin']
+        }
+      }
+    )
+
+    expect(result).toBe('notified 1 HR recipients about leave_request.escalated_to_hr')
+    expect(mockGetRoleCodeNotificationRecipients).toHaveBeenCalledWith(['hr_manager', 'efeonce_admin'])
   })
 })

@@ -202,7 +202,7 @@ El contrato `TenantAccessRow` (fields del session resolution) debe tener paridad
 
 ### Gaps cerrados
 
-- **Gap 1 (Approval Snapshot):** Verificado como ya cerrado — `supervisor_member_id` se persiste al momento del submit del leave request. No requiere cambios.
+- **Gap 1 (Approval Snapshot):** Evolucionado y cerrado con contrato compartido — leave ya no depende solo de `supervisor_member_id`; ahora congela autoridad por etapa en `greenhouse_hr.workflow_approval_snapshots`, incluyendo delegación, fallback y override.
 - **Gap 2 (scope.revoked):** `revokeStaleProjectScopes()` en `tenant-member-provisioning.ts` desactiva scopes obsoletos y emite `scope.revoked` al outbox. Complementa la emisión de `scope.assigned` de TASK-248.
 - **Gap 4 (user.deactivated / user.reactivated):** Eventos canónicos emitidos desde ambas vías:
   - Admin Center: `deactivateMember()` emite `user.deactivated` (deactivatedBy: 'admin')
@@ -661,12 +661,13 @@ Full spec: `docs/architecture/GREENHOUSE_PERMISSION_SETS_ARCHITECTURE_V1.md`
 
 ## Supervisor Derivation
 
-For HR workflows (leave approvals), the supervisor is not a role — it is a relationship derived from `greenhouse_core.members.reports_to_member_id`.
+For HR workflows (leave approvals), the supervisor is not a role — it is a relationship derived from reporting hierarchy, with compatibility through `greenhouse_core.members.reports_to_member_id`.
 
 Rules:
 
-- When a collaborator submits a leave request, the system resolves their supervisor from `reports_to_member_id`
-- If `reports_to_member_id` is NULL (top of hierarchy), the request goes directly to `hr_manager` role holders
+- When a collaborator submits a leave request, the system resolves authority from `greenhouse_core.reporting_lines` plus any active `approval_delegate`
+- The resolved decision is frozen in `greenhouse_hr.workflow_approval_snapshots`
+- If the collaborator has no supervisor (top of hierarchy), the first active stage falls back to HR role holders defined by the workflow domain
 - A person does not need a `supervisor` role to approve leave — they approve because they are the `reports_to` target of the requester
 - HR managers can override or finalize any leave request regardless of the reporting chain
 
