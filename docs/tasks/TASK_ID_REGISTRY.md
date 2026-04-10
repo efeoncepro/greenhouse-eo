@@ -371,4 +371,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-319` | `to-do` | Reputation, Evidence & Endorsements for Talent Profiles | `docs/tasks/to-do/TASK-319-reputation-evidence-endorsements.md` |
 | `TASK-320` | `to-do` | Talent Ops Analytics, Completeness & Maintenance Automation | `docs/tasks/to-do/TASK-320-talent-ops-analytics-maintenance-automation.md` |
 | `TASK-321` | `to-do` | Space 360 View: UI/UX polish y eliminacion de jerga tecnica | `docs/tasks/to-do/TASK-321-space-360-ui-ux-polish.md` |
-| `TASK-322` | `to-do` | Deprecar Admin Tenant Detail y consolidar en Cuentas + Space 360 | `docs/tasks/to-do/TASK-322-admin-tenant-detail-ui-overhaul.md` |
+| `TASK-322` | `to-do` | Enriquecer Cuentas Detail con tabs operativas y deprecar Tenant Detail legacy | `docs/tasks/to-do/TASK-322-admin-tenant-detail-ui-overhaul.md` |
