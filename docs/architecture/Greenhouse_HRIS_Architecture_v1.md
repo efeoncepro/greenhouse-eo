@@ -1,5 +1,23 @@
 # Greenhouse HRIS Architecture V1
 
+## Delta 2026-04-10 — supervisor workspace materialized for team follow-up and approvals (TASK-328)
+
+La navegación HR ya no debe leerse solo como arquitectura target para supervisors.
+
+Estado vigente:
+- `/hr` es supervisor-aware
+  - broad HR/admin → dashboard HR amplio
+  - supervisor limitado → workspace `Mi equipo`
+- `/hr/approvals` ya existe como route runtime materializada sobre `leave`
+- `/hr/team` ya existe como surface operativa para el subárbol visible
+
+Regla operativa:
+- `Aprobaciones` y `Mi equipo` reutilizan la foundation existente:
+  - `greenhouse_core.reporting_lines`
+  - `approval_delegate`
+  - `greenhouse_hr.workflow_approval_snapshots`
+- no se debe reabrir la discusión de `supervisor` como role code para estas surfaces
+
 ## Delta 2026-04-01 — Contract model consolidation for TASK-026
 
 La consolidacion del contrato HRIS ya quedo implementada en el branch y debe leerse como contrato vigente, no como propuesta futura.

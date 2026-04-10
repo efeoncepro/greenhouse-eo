@@ -2,6 +2,21 @@
 
 ## 2026-04-10
 
+### 2026-04-10 — Supervisor workspace and approvals queue materialized
+
+- Se materializó el workspace operativo de supervisor sobre la capability ya cerrada de subtree scope:
+  - `/hr` ahora funciona como landing supervisor-aware
+  - `/hr/team` expone la vista `Mi equipo`
+  - `/hr/approvals` expone la cola operativa de approvals visibles
+- Nuevo handler agregado:
+  - `GET /api/hr/core/supervisor-workspace`
+- La nueva surface reutiliza:
+  - `greenhouse_core.reporting_lines`
+  - delegaciones `approval_delegate`
+  - `greenhouse_hr.workflow_approval_snapshots`
+  - People scoped y leave scoped existentes
+- HR/admin mantiene su experiencia amplia en `/hr`; el supervisor limitado ya no cae en el limbo entre “ve demasiado” y “no ve nada”.
+
 ### 2026-04-10 — Supervisor scope subtree-aware for People and Leave
 
 - Se agregó `src/lib/reporting-hierarchy/access.ts` para derivar supervisor scope desde `greenhouse_core.reporting_lines` y delegaciones `approval_delegate`.

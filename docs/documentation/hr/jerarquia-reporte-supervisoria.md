@@ -84,7 +84,20 @@ En la iteración actual:
 
 Esto evita usar `supervisor` como rol global y también evita que un supervisor herede HR completo por accidente.
 
-`/hr/approvals` sigue documentado como surface futura del programa, pero todavía no está materializado como route separada en el portal.
+La materialización runtime actual quedó así:
+
+- `/hr` ya funciona como landing supervisor-aware
+  - HR/admin ve el dashboard HR amplio
+  - supervisor limitado ve su workspace `Mi equipo`
+- `/hr/team` materializa la vista operativa del subárbol visible
+- `/hr/approvals` materializa la cola de aprobaciones basada en snapshots del workflow
+- `/hr/leave` sigue siendo la surface completa de permisos y el lugar de revisión detallada
+
+Esto mantiene una separación clara:
+
+- `HR > Jerarquía` sigue siendo solo para RRHH/admin
+- el supervisor no recibe HR completo por navegar su workspace
+- approvals y team visibility siguen derivando del contrato canónico, no de departamentos
 
 ## Relación con Departments
 

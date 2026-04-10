@@ -82,7 +82,7 @@ Reglas obligatorias:
 - `docs/tasks/to-do/TASK-028-hris-expense-reports.md`
 - `docs/tasks/to-do/TASK-030-hris-onboarding-offboarding.md`
 - `docs/tasks/to-do/TASK-031-hris-performance-evaluations.md`
-- `docs/tasks/to-do/TASK-328-supervisor-workspace-my-team.md`
+- `docs/tasks/complete/TASK-328-supervisor-workspace-my-team.md`
 
 ### Files owned
 

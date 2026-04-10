@@ -1,5 +1,20 @@
 # Greenhouse Identity & Access Architecture V2
 
+## Delta 2026-04-10 — supervisor workspace materialized without a new route group (TASK-328)
+
+- La capability de supervisor ya no vive solo en readers y guards; ahora tiene surfaces runtime:
+  - `/hr` como landing supervisor-aware
+  - `/hr/team`
+  - `/hr/approvals`
+- Regla vigente:
+  - `routeGroup: hr` sigue siendo el carril broad HR
+  - supervisoría limitada sigue derivándose on-demand desde `reporting_lines` + `approval_delegate`
+  - no se crea `routeGroup` ni `role_code` nuevo para `supervisor`
+- Comportamiento efectivo:
+  - HR/admin conserva el dashboard amplio en `/hr`
+  - un supervisor con subtree access puede entrar a `/hr`, `/hr/team` y `/hr/approvals` aunque no tenga `hr_manager`
+  - la cola materializada sigue leyendo `workflow_approval_snapshots`; no recalcula autoridad inline en la UI
+
 ## Delta 2026-04-05 — Entra sync cierra ciclo completo: avatar + identity link + person_360 v2 (TASK-256 / ISSUE-014)
 
 ### Entra sync pipeline (completo)

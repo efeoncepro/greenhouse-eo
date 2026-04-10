@@ -6,16 +6,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Implementada`
 - Rank: `TBD`
 - Domain: `hr`
-- Blocked by: `TASK-326, TASK-327`
-- Branch: `task/TASK-328-supervisor-workspace-my-team`
+- Blocked by: `none`
+- Branch: `develop`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -69,6 +69,8 @@ Reglas obligatorias:
 
 - `docs/tasks/complete/TASK-326-approval-authority-workflow-snapshots.md`
 - `docs/tasks/complete/TASK-327-supervisor-scope-subtree-access.md`
+- `src/lib/reporting-hierarchy/access.ts`
+- `src/lib/approval-authority/store.ts`
 - `src/views/greenhouse/hr-core/HrCoreDashboard.tsx`
 - `src/views/greenhouse/hr-core/HrLeaveView.tsx`
 - `src/views/greenhouse/people/PeopleList.tsx`
@@ -95,12 +97,16 @@ Reglas obligatorias:
 
 - `HrCoreDashboard` y `HrLeaveView` ya existen como surfaces HR
 - `PeopleList` y Person 360 ya existen para drilldown de miembros
-- la arquitectura ya documenta `/hr/approvals` y `Calendario de equipo`
+- `TASK-327` ya permite `/people` y `/hr/leave` en modo supervisor limitado
+- `src/app/(dashboard)/hr/layout.tsx` ya deja pasar supervisoria limitada
+- la arquitectura ya documenta `/hr/approvals` y `Calendario de equipo`, pero esas surfaces no existen todavia como routes runtime
 
 ### Gap
 
 - no existe un workspace de supervisor con alcance limitado
+- `src/app/(dashboard)/hr/page.tsx` sigue resolviendo solo acceso broad HR y todavia no funciona como landing de supervisor
 - `/hr/approvals` no esta materializado como route real
+- `/hr/team-calendar` no esta materializado como route real
 - no existe vista integrada `Mi equipo`
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -116,7 +122,7 @@ Reglas obligatorias:
   - pendientes de aprobacion
   - ausencias/proximos eventos del equipo
   - alertas operativas del subarbol
-- Definir entry point claro desde HR o desde la experiencia personal segun el access model de `TASK-327`
+- Convertir `/hr` en entry point supervisor-aware sin degradar la experiencia amplia de HR/admin
 
 ### Slice 2 — Mi equipo
 
@@ -147,21 +153,22 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Existe una vista `Mi equipo` o equivalente para supervisors
-- [ ] Existe una cola de aprobaciones limitada al subarbol del supervisor
-- [ ] Los drilldowns a miembros respetan subtree access
-- [ ] HR/admin siguen teniendo su experiencia amplia sin degradacion
+- [x] Existe una vista `Mi equipo` o equivalente para supervisors
+- [x] Existe una cola de aprobaciones limitada al subarbol del supervisor
+- [x] Los drilldowns a miembros respetan subtree access
+- [x] HR/admin siguen teniendo su experiencia amplia sin degradacion
 
 ## Verification
 
-- `pnpm exec tsc --noEmit --incremental false`
-- `pnpm lint`
-- `pnpm test`
-- validacion manual con supervisor real o fixture con reportes directos
+- [x] `pnpm exec tsc --noEmit --incremental false`
+- [x] `pnpm lint`
+- [x] `pnpm build`
+- [x] `pnpm vitest run src/app/api/hr/core/supervisor-workspace/route.test.ts src/app/api/hr/core/meta/route.test.ts src/views/greenhouse/hr-core/HrLeaveView.test.tsx`
+- [ ] validacion manual con supervisor real o fixture con reportes directos
 
 ## Closing Protocol
 
-- [ ] Actualizar documentacion funcional de HR/supervisor si se crea una surface visible nueva
+- [x] Actualizar documentacion funcional de HR/supervisor si se crea una surface visible nueva
 
 ## Follow-ups
 

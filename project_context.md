@@ -1,5 +1,25 @@
 # project_context.md
 
+## Delta 2026-04-10 Supervisor workspace materialized on top of subtree scope
+
+- La capability de supervisor ya no vive solo como policy de acceso; ahora tiene surface operativa materializada:
+  - `/hr` funciona como landing supervisor-aware
+    - `hr_manager` / `hr_payroll` / `efeonce_admin` siguen viendo el dashboard HR amplio
+    - un supervisor limitado ahora ve su workspace `Mi equipo`
+  - nuevas routes:
+    - `/hr/team`
+    - `/hr/approvals`
+  - nuevo handler agregado:
+    - `GET /api/hr/core/supervisor-workspace`
+- Regla operativa nueva:
+  - el workspace de supervisor reutiliza la capability existente de `reporting_lines` + `approval_delegate` + `workflow_approval_snapshots`
+  - no introduce un role code nuevo ni un modelo paralelo de approvals
+  - `People` sigue siendo el drilldown canónico; la nueva surface solo compone señal operativa, cola y ausencias del subárbol visible
+- Alcance actual:
+  - approvals materializadas solo para `leave`
+  - el calendario del workspace usa las ausencias ya visibles por scope
+  - HR/admin conserva su experiencia amplia en `/hr` y `/hr/leave`
+
 ## Delta 2026-04-10 Shared icon foundation: Tabler + Flaticon + BrandLogo
 
 - El portal tiene ahora una foundation compartida de iconografía en tres capas:

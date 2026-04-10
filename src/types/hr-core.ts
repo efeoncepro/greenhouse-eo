@@ -1,4 +1,5 @@
 import type { ContractType, PayrollVia, PayRegime } from '@/types/hr-contracts'
+import type { PersonListItem } from '@/types/people'
 import type { ApprovalStageCode, WorkflowApprovalSnapshotRecord } from '@/lib/approval-authority/types'
 
 export type HrJobLevel = 'junior' | 'semi_senior' | 'senior' | 'lead' | 'manager' | 'director'
@@ -197,6 +198,30 @@ export interface HrCoreMetadata {
   bankAccountTypes: HrBankAccountType[]
   leaveRequestStatuses: HrLeaveRequestStatus[]
   attendanceStatuses: HrAttendanceStatus[]
+}
+
+export interface HrSupervisorWorkspaceTeamMember extends PersonListItem {
+  supervisorMemberId: string | null
+  depth: number
+  directReport: boolean
+}
+
+export interface HrSupervisorWorkspaceSummary {
+  directReports: number
+  totalVisibleReports: number
+  pendingApprovals: number
+  upcomingAbsences: number
+}
+
+export interface HrSupervisorWorkspaceResponse {
+  currentMemberId: string | null
+  hasBroadAccess: boolean
+  hasDirectReports: boolean
+  hasDelegatedAuthority: boolean
+  summary: HrSupervisorWorkspaceSummary
+  team: HrSupervisorWorkspaceTeamMember[]
+  approvals: HrLeaveRequest[]
+  calendar: HrLeaveCalendarResponse
 }
 
 export interface HrDepartmentsResponse {

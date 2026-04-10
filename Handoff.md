@@ -1,5 +1,32 @@
 # Handoff.md
 
+## Sesion 2026-04-10 — TASK-328 cerrada: workspace supervisor materializado
+
+- alcance cerrado:
+  - nueva lane agregada `src/lib/hr-core/supervisor-workspace.ts` para componer:
+    - scope derivado de supervisor
+    - cola de approvals visible
+    - ausencias próximas
+    - roster del subárbol reutilizable por UI
+  - nueva route runtime:
+    - `GET /api/hr/core/supervisor-workspace`
+  - nuevas surfaces:
+    - `src/views/greenhouse/hr-core/SupervisorWorkspaceView.tsx`
+    - `/hr/team`
+    - `/hr/approvals`
+  - `/hr` ya es supervisor-aware:
+    - HR/admin conserva `HrCoreDashboard`
+    - supervisor limitado aterriza en `Mi equipo`
+  - la spec de `TASK-328` quedó saneada contra el repo real antes de implementar
+- validación ejecutada:
+  - `pnpm exec tsc --noEmit --incremental false` — OK
+  - `pnpm vitest run src/app/api/hr/core/supervisor-workspace/route.test.ts src/app/api/hr/core/meta/route.test.ts src/views/greenhouse/hr-core/HrLeaveView.test.tsx` — OK
+  - `pnpm lint` — OK
+  - `pnpm build` — OK
+- siguiente paso natural:
+  - `TASK-329` para materializar organigrama/explorer sobre la misma foundation
+  - `TASK-330` para source governance, sync y drift de jerarquías
+
 ## Sesion 2026-04-10 — TASK-327 cerrada: supervisor scope subtree-aware
 
 - alcance cerrado:
