@@ -1,5 +1,42 @@
 # Handoff.md
 
+## Sesion 2026-04-10 — TASK-330 cerrada: gobernanza de drift Entra vs Greenhouse
+
+- alcance cerrado:
+  - nueva migración:
+    - `migrations/20260410133033615_reporting-hierarchy-drift-governance.sql`
+  - nueva cola canónica de review:
+    - `greenhouse_sync.reporting_hierarchy_drift_proposals`
+  - nueva helper lane:
+    - `src/lib/reporting-hierarchy/governance.ts`
+  - Graph client ampliado:
+    - `src/lib/entra/graph-client.ts` ahora resuelve `manager`
+  - nuevos endpoints runtime:
+    - `GET /api/hr/core/hierarchy/governance`
+    - `POST /api/hr/core/hierarchy/governance/run`
+    - `POST /api/hr/core/hierarchy/governance/proposals/[proposalId]/resolve`
+  - Entra cron/webhook ya reusan el mismo snapshot de usuarios para:
+    - profile sync
+    - drift detection de jerarquía
+  - `HR > Jerarquía` ya materializa un panel de gobernanza con:
+    - policy visible
+    - último run
+    - resumen de propuestas
+    - acciones aprobar / rechazar / descartar
+- regla operativa vigente:
+  - `greenhouse_core.reporting_lines` sigue siendo la fuente formal canónica
+  - Entra solo propone drift; no pisa supervisoría manual silenciosamente
+  - approvals ya snapshot-eados en `greenhouse_hr.workflow_approval_snapshots` no se recalculan retroactivamente
+- validación ejecutada:
+  - `pnpm exec vitest run src/app/api/hr/core/hierarchy/governance/route.test.ts src/app/api/hr/core/hierarchy/governance/run/route.test.ts src/app/api/hr/core/hierarchy/governance/proposals/[proposalId]/resolve/route.test.ts src/app/api/cron/entra-profile-sync/route.test.ts` — OK
+  - `pnpm exec tsc --noEmit --incremental false` — OK
+  - `pnpm lint` — OK
+  - `pnpm pg:connect:migrate` — OK
+  - `pnpm build` — OK
+- nota operativa:
+  - `reporting_lines`, `members` y la cola de drift siguen sin `space_id`; esta capability mantiene el mismo aislamiento interno por tenant context/route group `hr` que el resto del bloque de jerarquía
+  - el Cloud SQL Proxy quedó levantado por `pg:connect:migrate`; si sigue vivo fuera de la sesión, puede cerrarse con `kill 59099`
+
 ## Sesion 2026-04-10 — TASK-329 cerrada: organigrama y explorador de jerarquias
 
 - alcance cerrado:

@@ -87,7 +87,7 @@ Reglas obligatorias:
 - `docs/tasks/complete/TASK-327-supervisor-scope-subtree-access.md`
 - `docs/tasks/complete/TASK-328-supervisor-workspace-my-team.md`
 - `docs/tasks/complete/TASK-329-org-chart-hierarchy-explorer.md`
-- `docs/tasks/to-do/TASK-330-hierarchy-sync-drift-governance.md`
+- `docs/tasks/complete/TASK-330-hierarchy-sync-drift-governance.md`
 
 ### Files owned
 
@@ -191,5 +191,5 @@ Reglas obligatorias:
 
 ## Follow-ups
 
-- `docs/tasks/to-do/TASK-330-hierarchy-sync-drift-governance.md`
+- `docs/tasks/complete/TASK-330-hierarchy-sync-drift-governance.md`
 - support futuro para jerarquias matrix / dotted-line

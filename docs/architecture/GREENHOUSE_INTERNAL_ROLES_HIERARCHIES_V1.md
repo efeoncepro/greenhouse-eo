@@ -28,6 +28,30 @@ Usar junto con:
 - Origen: `TASK-225`
 - Estado: contrato arquitectónico nuevo; describe foundations ya existentes y formaliza la dirección target
 
+## Delta 2026-04-10 — hierarchy source governance, drift queue y resolución auditada (TASK-330)
+
+- `greenhouse_core.reporting_lines` se mantiene como source of truth canónica de la supervisoría formal.
+- Microsoft Entra pasa a aportar observabilidad y propuesta de drift, no overwrite silencioso:
+  - el cron `entra-profile-sync`
+  - el webhook `entra-user-change`
+  - y `src/lib/reporting-hierarchy/governance.ts`
+    comparan el manager resuelto desde Graph contra la relación formal vigente.
+- Se formaliza la cola auditable `greenhouse_sync.reporting_hierarchy_drift_proposals` para registrar:
+  - mismatch de supervisor
+  - supervisor faltante en Greenhouse
+  - supervisor faltante o no resoluble desde la fuente externa
+  - evidencia y snapshot de fuente
+  - resolución humana (`approved`, `rejected`, `dismissed`)
+- Regla vigente de precedencia:
+  - manual Greenhouse gana por defecto
+  - un drift externo nunca pisa `reporting_lines` de forma implícita
+  - RRHH/Admin decide desde `HR > Jerarquía`
+  - si se aprueba una propuesta, el cambio queda auditado y entra por la misma writer lane canónica de reporting hierarchy
+- Los approvals ya congelados en `greenhouse_hr.workflow_approval_snapshots` no se recalculan retroactivamente por la detección de drift.
+- Nuevos eventos publicados:
+  - `reporting_hierarchy.drift_detected`
+  - `reporting_hierarchy.proposal_resolved`
+
 ## Delta 2026-04-05 — Identity & Platform Block Hardening (TASK-247)
 
 ### Race conditions cerradas

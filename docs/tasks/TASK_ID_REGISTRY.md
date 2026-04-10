@@ -379,4 +379,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-327` | `complete` | Supervisor scope: acceso subtree-aware y visibilidad limitada | `docs/tasks/complete/TASK-327-supervisor-scope-subtree-access.md` |
 | `TASK-328` | `complete` | Workspace de supervisor: Mi equipo y cola de aprobaciones | `docs/tasks/complete/TASK-328-supervisor-workspace-my-team.md` |
 | `TASK-329` | `complete` | Organigrama y explorador de jerarquias | `docs/tasks/complete/TASK-329-org-chart-hierarchy-explorer.md` |
-| `TASK-330` | `to-do` | Gobernanza de fuentes, sync y drift de jerarquias | `docs/tasks/to-do/TASK-330-hierarchy-sync-drift-governance.md` |
+| `TASK-330` | `complete` | Gobernanza de fuentes, sync y drift de jerarquias | `docs/tasks/complete/TASK-330-hierarchy-sync-drift-governance.md` |

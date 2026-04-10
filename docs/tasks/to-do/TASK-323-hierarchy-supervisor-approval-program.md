@@ -97,13 +97,13 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-324-reporting-hierarchy-foundation.md`
+- `docs/tasks/complete/TASK-324-reporting-hierarchy-foundation.md`
 - `docs/tasks/complete/TASK-325-hierarchy-admin-crud.md`
 - `docs/tasks/complete/TASK-326-approval-authority-workflow-snapshots.md`
 - `docs/tasks/complete/TASK-327-supervisor-scope-subtree-access.md`
 - `docs/tasks/complete/TASK-328-supervisor-workspace-my-team.md`
 - `docs/tasks/complete/TASK-329-org-chart-hierarchy-explorer.md`
-- `docs/tasks/to-do/TASK-330-hierarchy-sync-drift-governance.md`
+- `docs/tasks/complete/TASK-330-hierarchy-sync-drift-governance.md`
 
 ## Current Repo State
 
@@ -132,7 +132,7 @@ Reglas obligatorias:
 
 - `TASK-324` — modelo canonico de jerarquia, historial y delegaciones
 - `TASK-325` — surfaces admin/HR para CRUD y reasignaciones auditables
-- `TASK-330` — source governance, sync y drift
+- `TASK-330` — source governance, sync y drift (cerrada)
 
 ### Slice 2 — Permisos y workflows
 

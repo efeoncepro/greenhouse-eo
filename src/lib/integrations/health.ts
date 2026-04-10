@@ -190,6 +190,8 @@ const mapSourceSystemToKey = (sourceSystem: string): string | null => {
     notion: 'notion',
     hubspot: 'hubspot',
     nubox: 'nubox',
+    'azure-ad': 'scim-entra-provisioning',
+    entra: 'scim-entra-provisioning',
     frame_io: 'frame_io',
     'frame.io': 'frame_io'
   }

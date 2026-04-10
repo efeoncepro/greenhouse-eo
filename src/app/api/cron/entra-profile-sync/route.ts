@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
 
 import { requireCronAuth } from '@/lib/cron/require-cron-auth'
-import { fetchEntraUsers } from '@/lib/entra/graph-client'
+import { fetchEntraUsersWithManagers } from '@/lib/entra/graph-client'
 import { syncEntraProfiles } from '@/lib/entra/profile-sync'
+import { runEntraHierarchyGovernanceScan } from '@/lib/reporting-hierarchy/governance'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
@@ -15,11 +16,17 @@ export async function GET(request: Request) {
   const startMs = Date.now()
 
   try {
-    const entraUsers = await fetchEntraUsers()
+    const entraUsers = await fetchEntraUsersWithManagers()
 
     console.log(`[entra-profile-sync] Fetched ${entraUsers.length} users from Entra`)
 
     const result = await syncEntraProfiles(entraUsers)
+
+    const hierarchyGovernance = await runEntraHierarchyGovernanceScan({
+      triggeredBy: 'cron:entra-profile-sync',
+      syncMode: 'poll',
+      entraUsers
+    })
 
     const durationMs = Date.now() - startMs
 
@@ -27,7 +34,7 @@ export async function GET(request: Request) {
       `[entra-profile-sync] done processed=${result.processed} users_updated=${result.usersUpdated} profiles_created=${result.profilesCreated} profiles_linked=${result.profilesLinked} profiles_updated=${result.profilesUpdated} members_updated=${result.membersUpdated} avatars_synced=${result.avatarsSynced} skipped=${result.skipped} errors=${result.errors.length} duration=${durationMs}ms`
     )
 
-    return NextResponse.json({ ...result, durationMs })
+    return NextResponse.json({ ...result, hierarchyGovernance, durationMs })
   } catch (error) {
     const durationMs = Date.now() - startMs
 
