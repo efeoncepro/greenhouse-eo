@@ -113,6 +113,68 @@ END;
 $$;
 
 
+--
+-- Name: reporting_lines_sync_snapshot_trigger(); Type: FUNCTION; Schema: greenhouse_core; Owner: -
+--
+
+CREATE FUNCTION greenhouse_core.reporting_lines_sync_snapshot_trigger() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  IF TG_OP = 'DELETE' THEN
+    PERFORM greenhouse_core.sync_current_reports_to_snapshot(OLD.member_id);
+    RETURN OLD;
+  END IF;
+
+  PERFORM greenhouse_core.sync_current_reports_to_snapshot(NEW.member_id);
+  RETURN NEW;
+END;
+$$;
+
+
+--
+-- Name: sync_current_reports_to_snapshot(text); Type: FUNCTION; Schema: greenhouse_core; Owner: -
+--
+
+CREATE FUNCTION greenhouse_core.sync_current_reports_to_snapshot(target_member_id text) RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+  resolved_supervisor_member_id TEXT;
+BEGIN
+  SELECT rl.supervisor_member_id
+  INTO resolved_supervisor_member_id
+  FROM greenhouse_core.reporting_lines AS rl
+  WHERE rl.member_id = target_member_id
+    AND rl.effective_from <= CURRENT_TIMESTAMP
+    AND (rl.effective_to IS NULL OR rl.effective_to > CURRENT_TIMESTAMP)
+  ORDER BY rl.effective_from DESC, rl.created_at DESC
+  LIMIT 1;
+
+  UPDATE greenhouse_core.members
+  SET
+    reports_to_member_id = resolved_supervisor_member_id,
+    updated_at = CURRENT_TIMESTAMP
+  WHERE member_id = target_member_id
+    AND reports_to_member_id IS DISTINCT FROM resolved_supervisor_member_id;
+END;
+$$;
+
+
+--
+-- Name: touch_reporting_lines_updated_at(); Type: FUNCTION; Schema: greenhouse_core; Owner: -
+--
+
+CREATE FUNCTION greenhouse_core.touch_reporting_lines_updated_at() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  NEW.updated_at := CURRENT_TIMESTAMP;
+  RETURN NEW;
+END;
+$$;
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -705,6 +767,27 @@ CREATE TABLE greenhouse_core.members (
     languages text[],
     assignable boolean DEFAULT true NOT NULL,
     prior_work_years numeric(10,2) DEFAULT 0 NOT NULL
+);
+
+
+--
+-- Name: reporting_lines; Type: TABLE; Schema: greenhouse_core; Owner: -
+--
+
+CREATE TABLE greenhouse_core.reporting_lines (
+    reporting_line_id text NOT NULL,
+    member_id text NOT NULL,
+    supervisor_member_id text,
+    effective_from timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    effective_to timestamp with time zone,
+    source_system text DEFAULT 'greenhouse_manual'::text NOT NULL,
+    source_metadata jsonb DEFAULT '{}'::jsonb NOT NULL,
+    change_reason text DEFAULT 'unspecified'::text NOT NULL,
+    changed_by_user_id text,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT reporting_lines_effective_window_check CHECK (((effective_to IS NULL) OR (effective_to > effective_from))),
+    CONSTRAINT reporting_lines_no_self_reference_check CHECK (((supervisor_member_id IS NULL) OR (member_id <> supervisor_member_id)))
 );
 
 
@@ -4482,6 +4565,22 @@ ALTER TABLE ONLY greenhouse_core.members
 
 
 --
+-- Name: reporting_lines reporting_lines_pkey; Type: CONSTRAINT; Schema: greenhouse_core; Owner: -
+--
+
+ALTER TABLE ONLY greenhouse_core.reporting_lines
+    ADD CONSTRAINT reporting_lines_pkey PRIMARY KEY (reporting_line_id);
+
+
+--
+-- Name: reporting_lines reporting_lines_no_overlap; Type: CONSTRAINT; Schema: greenhouse_core; Owner: -
+--
+
+ALTER TABLE ONLY greenhouse_core.reporting_lines
+    ADD CONSTRAINT reporting_lines_no_overlap EXCLUDE USING gist (member_id WITH =, tstzrange(effective_from, COALESCE(effective_to, 'infinity'::timestamp with time zone), '[)'::text) WITH &&);
+
+
+--
 -- Name: notion_workspace_source_bindings notion_workspace_source_bindings_unique; Type: CONSTRAINT; Schema: greenhouse_core; Owner: -
 --
 
@@ -6049,6 +6148,34 @@ CREATE INDEX members_reports_to_idx ON greenhouse_core.members USING btree (repo
 
 
 --
+-- Name: idx_reporting_lines_current_member; Type: INDEX; Schema: greenhouse_core; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_reporting_lines_current_member ON greenhouse_core.reporting_lines USING btree (member_id) WHERE (effective_to IS NULL);
+
+
+--
+-- Name: idx_reporting_lines_current_supervisor; Type: INDEX; Schema: greenhouse_core; Owner: -
+--
+
+CREATE INDEX idx_reporting_lines_current_supervisor ON greenhouse_core.reporting_lines USING btree (supervisor_member_id, member_id) WHERE (effective_to IS NULL);
+
+
+--
+-- Name: idx_reporting_lines_member_history; Type: INDEX; Schema: greenhouse_core; Owner: -
+--
+
+CREATE INDEX idx_reporting_lines_member_history ON greenhouse_core.reporting_lines USING btree (member_id, effective_from DESC);
+
+
+--
+-- Name: idx_reporting_lines_supervisor_history; Type: INDEX; Schema: greenhouse_core; Owner: -
+--
+
+CREATE INDEX idx_reporting_lines_supervisor_history ON greenhouse_core.reporting_lines USING btree (supervisor_member_id, effective_from DESC);
+
+
+--
 -- Name: notion_workspace_source_bindings_lookup_idx; Type: INDEX; Schema: greenhouse_core; Owner: -
 --
 
@@ -7253,6 +7380,20 @@ CREATE TRIGGER trg_identity_public_id BEFORE INSERT ON greenhouse_core.identity_
 
 
 --
+-- Name: reporting_lines trg_reporting_lines_sync_snapshot; Type: TRIGGER; Schema: greenhouse_core; Owner: -
+--
+
+CREATE TRIGGER trg_reporting_lines_sync_snapshot AFTER INSERT OR DELETE OR UPDATE ON greenhouse_core.reporting_lines FOR EACH ROW EXECUTE FUNCTION greenhouse_core.reporting_lines_sync_snapshot_trigger();
+
+
+--
+-- Name: reporting_lines trg_reporting_lines_touch_updated_at; Type: TRIGGER; Schema: greenhouse_core; Owner: -
+--
+
+CREATE TRIGGER trg_reporting_lines_touch_updated_at BEFORE UPDATE ON greenhouse_core.reporting_lines FOR EACH ROW EXECUTE FUNCTION greenhouse_core.touch_reporting_lines_updated_at();
+
+
+--
 -- Name: credit_ledger credit_ledger_client_id_fkey; Type: FK CONSTRAINT; Schema: greenhouse_ai; Owner: -
 --
 
@@ -7554,6 +7695,30 @@ ALTER TABLE ONLY greenhouse_core.members
 
 ALTER TABLE ONLY greenhouse_core.members
     ADD CONSTRAINT members_reports_to_member_id_fkey FOREIGN KEY (reports_to_member_id) REFERENCES greenhouse_core.members(member_id);
+
+
+--
+-- Name: reporting_lines reporting_lines_changed_by_user_id_fkey; Type: FK CONSTRAINT; Schema: greenhouse_core; Owner: -
+--
+
+ALTER TABLE ONLY greenhouse_core.reporting_lines
+    ADD CONSTRAINT reporting_lines_changed_by_user_id_fkey FOREIGN KEY (changed_by_user_id) REFERENCES greenhouse_core.client_users(user_id);
+
+
+--
+-- Name: reporting_lines reporting_lines_member_id_fkey; Type: FK CONSTRAINT; Schema: greenhouse_core; Owner: -
+--
+
+ALTER TABLE ONLY greenhouse_core.reporting_lines
+    ADD CONSTRAINT reporting_lines_member_id_fkey FOREIGN KEY (member_id) REFERENCES greenhouse_core.members(member_id) ON DELETE CASCADE;
+
+
+--
+-- Name: reporting_lines reporting_lines_supervisor_member_id_fkey; Type: FK CONSTRAINT; Schema: greenhouse_core; Owner: -
+--
+
+ALTER TABLE ONLY greenhouse_core.reporting_lines
+    ADD CONSTRAINT reporting_lines_supervisor_member_id_fkey FOREIGN KEY (supervisor_member_id) REFERENCES greenhouse_core.members(member_id);
 
 
 --

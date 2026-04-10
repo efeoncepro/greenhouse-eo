@@ -7,8 +7,10 @@ const {
   getDepartmentByIdFromPostgresMock,
   getMemberDepartmentContextFromPostgresMock,
   listDepartmentHeadOptionsFromPostgresMock,
+  assertReportingLineChangeAllowedMock,
   publishOutboxEventMock,
   runGreenhousePostgresQueryMock,
+  upsertReportingLineMock,
   updateMemberDepartmentContextInPostgresMock
 } = vi.hoisted(() => {
   process.env.NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET || 'test-secret'
@@ -20,6 +22,7 @@ const {
     getDepartmentByIdFromPostgresMock: vi.fn(),
     getMemberDepartmentContextFromPostgresMock: vi.fn(),
     listDepartmentHeadOptionsFromPostgresMock: vi.fn(),
+    assertReportingLineChangeAllowedMock: vi.fn(async () => undefined),
     publishOutboxEventMock: vi.fn(async (...args: unknown[]) => {
       void args
 
@@ -30,6 +33,7 @@ const {
 
       return []
     }),
+    upsertReportingLineMock: vi.fn(async () => undefined),
     updateMemberDepartmentContextInPostgresMock: vi.fn()
   }
 })
@@ -70,6 +74,11 @@ vi.mock('@/lib/sync/publish-event', () => ({
   publishOutboxEvent: (...args: unknown[]) => publishOutboxEventMock(...args)
 }))
 
+vi.mock('@/lib/reporting-hierarchy/store', () => ({
+  assertReportingLineChangeAllowed: assertReportingLineChangeAllowedMock,
+  upsertReportingLine: upsertReportingLineMock
+}))
+
 vi.mock('@/lib/hr-core/postgres-departments-store', () => ({
   createDepartmentInPostgres: (...args: unknown[]) => createDepartmentInPostgresMock(...args),
   getDepartmentByIdFromPostgres: (...args: unknown[]) => getDepartmentByIdFromPostgresMock(...args),
@@ -88,8 +97,10 @@ describe('updateMemberHrProfile', () => {
     assertHrCoreInfrastructureReadyMock.mockClear()
     getDepartmentByIdFromPostgresMock.mockReset()
     getMemberDepartmentContextFromPostgresMock.mockReset()
+    assertReportingLineChangeAllowedMock.mockClear()
     publishOutboxEventMock.mockClear()
     runGreenhousePostgresQueryMock.mockClear()
+    upsertReportingLineMock.mockClear()
     updateMemberDepartmentContextInPostgresMock.mockReset()
   })
 
@@ -121,6 +132,7 @@ describe('updateMemberHrProfile', () => {
       memberId: 'member-1',
       hireDate: '2024-12-15'
     })
+    expect(upsertReportingLineMock).not.toHaveBeenCalled()
   })
 
   it('updates department assignment in Postgres without touching BigQuery team_members.department_id', async () => {
@@ -164,6 +176,48 @@ describe('updateMemberHrProfile', () => {
       memberId: 'member-1',
       departmentId: 'creative-team'
     })
+    expect(upsertReportingLineMock).not.toHaveBeenCalled()
+  })
+
+  it('routes reportsTo changes through the reporting hierarchy store', async () => {
+    runHrCoreQueryMock
+      .mockResolvedValueOnce([
+        {
+          member_id: 'member-1',
+          display_name: 'Daniela Ferreira',
+          email: 'dferreira@efeoncepro.com',
+          identity_profile_id: null,
+          reports_to: 'member-2'
+        }
+      ])
+      .mockResolvedValueOnce([])
+
+    await updateMemberHrProfile({
+      memberId: 'member-1',
+      input: {
+        reportsTo: 'member-3'
+      },
+      actorUserId: 'user-1'
+    })
+
+    expect(assertReportingLineChangeAllowedMock).toHaveBeenCalledWith({
+      memberId: 'member-1',
+      supervisorMemberId: 'member-3'
+    })
+    expect(upsertReportingLineMock).toHaveBeenCalledWith({
+      memberId: 'member-1',
+      supervisorMemberId: 'member-3',
+      actorUserId: 'user-1',
+      reason: 'hr_core_profile_update',
+      sourceSystem: 'hr_core_profile_update',
+      sourceMetadata: {
+        actor: 'updateMemberHrProfile'
+      }
+    })
+    expect(runGreenhousePostgresQueryMock).not.toHaveBeenCalledWith(
+      expect.stringContaining('reports_to_member_id'),
+      expect.anything()
+    )
   })
 })
 

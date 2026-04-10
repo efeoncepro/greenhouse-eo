@@ -100,6 +100,7 @@ export const AGGREGATE_TYPES = {
 
   // Operational Responsibility
   operationalResponsibility: 'operational_responsibility',
+  reportingHierarchy: 'reporting_hierarchy',
 
   // Role Governance
   roleAssignment: 'role_assignment',
@@ -290,6 +291,7 @@ export const EVENT_TYPES = {
   responsibilityAssigned: 'responsibility.assigned',
   responsibilityRevoked: 'responsibility.revoked',
   responsibilityUpdated: 'responsibility.updated',
+  reportingHierarchyUpdated: 'reporting_hierarchy.updated',
 
   // Role Governance
   roleAssigned: 'role.assigned',
@@ -450,6 +452,17 @@ export interface ResponsibilityUpdatedPayload {
   scopeId: string
   responsibilityType: string
   changes: Record<string, unknown>
+}
+
+export interface ReportingHierarchyUpdatedPayload {
+  memberId: string
+  reportingLineId: string
+  previousSupervisorMemberId: string | null
+  supervisorMemberId: string | null
+  changedByUserId: string | null
+  changeReason: string
+  sourceSystem: string
+  sourceMetadata?: Record<string, unknown>
 }
 
 export interface RoleAssignedPayload {

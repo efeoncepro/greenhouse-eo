@@ -73,6 +73,7 @@ import {
 import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 import { getPeopleTableColumns } from '@/lib/people/shared'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { assertReportingLineChangeAllowed, upsertReportingLine } from '@/lib/reporting-hierarchy/store'
 import { buildPrivateAssetDownloadUrl } from '@/lib/storage/greenhouse-assets'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
@@ -951,6 +952,9 @@ export const updateMemberHrProfile = async ({
   const departmentIdInput =
     input.departmentId !== undefined ? normalizeNullableString(input.departmentId) : undefined
 
+  const reportsToInput =
+    input.reportsTo !== undefined ? normalizeNullableString(input.reportsTo) : undefined
+
   if (departmentIdInput !== undefined) {
     await getMemberDepartmentContextFromPostgres(memberId)
 
@@ -960,6 +964,17 @@ export const updateMemberHrProfile = async ({
       if (!department) {
         throw new HrCoreValidationError('Department not found.', 404, { departmentId: departmentIdInput })
       }
+    }
+  }
+
+  if (reportsToInput !== undefined) {
+    try {
+      await assertReportingLineChangeAllowed({
+        memberId,
+        supervisorMemberId: reportsToInput
+      })
+    } catch (error) {
+      throw new HrCoreValidationError(error instanceof Error ? error.message : 'Invalid reporting line.', 409)
     }
   }
 
@@ -982,7 +997,7 @@ export const updateMemberHrProfile = async ({
     postgresMemberValues.push(value)
   }
 
-  if (input.reportsTo !== undefined) setTeamField('reports_to', 'reportsTo', normalizeNullableString(input.reportsTo))
+  if (reportsToInput !== undefined) setTeamField('reports_to', 'reportsTo', reportsToInput)
   if (input.jobLevel !== undefined)
     setTeamField('job_level', 'jobLevel', input.jobLevel ? assertEnum(input.jobLevel, HR_JOB_LEVELS, 'jobLevel') : null)
   if (input.hireDate !== undefined) setTeamField('hire_date', 'hireDate', input.hireDate ? assertDateString(input.hireDate, 'hireDate') : null)
@@ -1096,7 +1111,6 @@ export const updateMemberHrProfile = async ({
   if (input.hireDate !== undefined) setPostgresField('hire_date', input.hireDate ? assertDateString(input.hireDate, 'hireDate') : null)
   if (input.jobLevel !== undefined)
     setPostgresField('job_level', input.jobLevel ? assertEnum(input.jobLevel, HR_JOB_LEVELS, 'jobLevel') : null)
-  if (input.reportsTo !== undefined) setPostgresField('reports_to_member_id', normalizeNullableString(input.reportsTo))
   if (input.employmentType !== undefined)
     setPostgresField(
       'employment_type',
@@ -1162,6 +1176,19 @@ export const updateMemberHrProfile = async ({
       `,
       postgresMemberValues
     )
+  }
+
+  if (reportsToInput !== undefined) {
+    await upsertReportingLine({
+      memberId,
+      supervisorMemberId: reportsToInput,
+      actorUserId,
+      reason: 'hr_core_profile_update',
+      sourceSystem: 'hr_core_profile_update',
+      sourceMetadata: {
+        actor: 'updateMemberHrProfile'
+      }
+    })
   }
 
   if (departmentIdInput !== undefined) {

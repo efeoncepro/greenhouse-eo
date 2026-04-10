@@ -10755,3 +10755,38 @@ Fase 4 completada:
   - el bootstrap full sigue incompleto porque `greenhouse_finance.purchase_orders` y `greenhouse_payroll.payroll_receipts` continúan owned por `postgres`
   - verificación explícita: con credenciales runtime, `ALTER TABLE greenhouse_finance.purchase_orders ...` falla con `must be owner of table purchase_orders`
   - falta resolver acceso/owner `postgres` para cerrar completamente la task en GCP
+
+### Sesión 2026-04-10 — TASK-324 reporting hierarchy foundation
+
+- Archivos tocados:
+  - `migrations/20260410102941383_reporting-hierarchy-foundation.sql`
+  - `src/lib/reporting-hierarchy/*`
+  - `src/lib/hr-core/service.ts`
+  - `src/lib/hr-core/service.test.ts`
+  - `src/lib/operational-responsibility/store.ts`
+  - `src/config/responsibility-codes.ts`
+  - `src/lib/sync/event-catalog.ts`
+  - `src/types/db.d.ts`
+  - `docs/architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md`
+  - `docs/architecture/schema-snapshot-baseline.sql`
+- Decisión de arquitectura cerrada:
+  - `greenhouse_core.reporting_lines` es la lane canónica de supervisoría formal e historizable
+  - `greenhouse_core.members.reports_to_member_id` se conserva como snapshot actual / compat layer
+  - la delegación temporal del supervisor efectivo reutiliza `greenhouse_core.operational_responsibilities` con `scope_type = member` + `responsibility_type = approval_delegate`
+- Guardrails implementados:
+  - no self-reporting
+  - no ciclos
+  - no vigencias solapadas por miembro
+- Integración cerrada en runtime:
+  - `updateMemberHrProfile()` ahora enruta cambios de supervisor por reporting hierarchy
+  - se publica `reporting_hierarchy.updated` en outbox
+- Validación ejecutada:
+  - `pnpm pg:connect:migrate`
+  - `pnpm exec vitest run src/lib/hr-core/service.test.ts`
+  - `pnpm exec tsc --noEmit --incremental false`
+  - `pnpm lint`
+  - `pnpm test`
+  - `pnpm build`
+- Ajuste adicional de verificación:
+  - `src/lib/cloud/gcp-auth.test.ts` quedó deterministic-friendly para no depender del runtime local de Vercel/WIF durante `pnpm test`
+  - se corrigió un `padding-line-between-statements` preexistente en `src/views/greenhouse/agency/space-360/tabs/TeamTab.tsx` para dejar `pnpm lint` verde

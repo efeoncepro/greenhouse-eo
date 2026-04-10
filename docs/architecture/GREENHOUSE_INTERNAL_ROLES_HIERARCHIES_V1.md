@@ -111,6 +111,24 @@ Usar junto con:
 - Admin UI: `/admin/responsibilities` con panel de asignación y tabla CRUD
 - Config canónico: `src/config/responsibility-codes.ts` (tipos y labels)
 
+## Delta 2026-04-10 — Reporting Hierarchy foundation (TASK-324)
+
+- `greenhouse_core.reporting_lines` pasa a ser la lane canónica e historizable de supervisoría formal.
+- `greenhouse_core.members.reports_to_member_id` se conserva como snapshot actual / compat layer para consumers legacy y views existentes.
+- Se agrega dual-sync explícito: cambios sobre `reporting_lines` actualizan el snapshot vivo en `members.reports_to_member_id`.
+- La delegación temporal del supervisor efectivo se apoya en `greenhouse_core.operational_responsibilities` con `responsibility_type = 'approval_delegate'` y `scope_type = 'member'`, en vez de abrir un segundo modelo paralelo.
+- Se publican readers canónicos para:
+  - supervisor formal actual
+  - supervisor efectivo
+  - reportes directos
+  - subárbol completo
+  - cadena ascendente
+  - miembros sin supervisor
+- Guardrails mínimos de grafo ya formalizados:
+  - no self-reporting
+  - no ciclos
+  - no overlaps de vigencia para una misma persona
+
 ## Delta 2026-04-03 — separacion formal de roles y jerarquias
 
 Regla nueva:
@@ -294,7 +312,8 @@ Quién supervisa directamente a quién.
 
 ### Source of truth
 
-- `greenhouse_core.members.reports_to_member_id`
+- `greenhouse_core.reporting_lines`
+- `greenhouse_core.members.reports_to_member_id` como snapshot actual / compat layer
 
 ### Casos de uso
 
@@ -310,8 +329,8 @@ Quién supervisa directamente a quién.
 
 Si una persona puede aprobar una solicitud por supervisoría, eso ocurre porque:
 
-- el solicitante apunta a ella en `reports_to_member_id`, o
-- existe una delegación explícita documentada en un modelo scoped de responsabilidades
+- la relación formal vigente en `greenhouse_core.reporting_lines` la resuelve como supervisor actual, reflejada además en `reports_to_member_id`, o
+- existe una delegación explícita en `greenhouse_core.operational_responsibilities` con `responsibility_type = approval_delegate` y `scope_type = member`
 
 No debe existir un rol genérico `supervisor` con semántica global.
 
@@ -346,7 +365,7 @@ Es una capa de lectura humana encima de relaciones ya existentes.
 |---------------|---------------|------------------|
 | `Superadministrador` | persona con el alcance más amplio de todo Greenhouse | `role_code = efeonce_admin` |
 | `Responsable de Área` | persona que lidera formalmente un área/departamento | `departments.head_member_id` |
-| `Supervisor` | persona a la que otros miembros reportan directamente | aparece como target de `reports_to_member_id` |
+| `Supervisor` | persona a la que otros miembros reportan directamente | aparece como target del estado vigente de `reporting_lines` y de su snapshot `reports_to_member_id` |
 | `Colaborador` | miembro interno sin una responsabilidad jerárquica visible superior en esa lectura | miembro activo interno sin labels superiores aplicables |
 
 ### Reglas
@@ -467,11 +486,11 @@ El nombre físico final puede variar, pero la semántica target no.
 | Necesidad | Plano correcto | Source of truth |
 |-----------|----------------|-----------------|
 | Qué superficies puede ver un usuario | Access Role | `roles` + `user_role_assignments` |
-| Quién aprueba un permiso | Reporting Hierarchy | `members.reports_to_member_id` |
-| Quién aprueba un gasto | Reporting Hierarchy + Domain reviewer | `members.reports_to_member_id` + rol/registry financiero |
+| Quién aprueba un permiso | Reporting Hierarchy | `reporting_lines` + snapshot `members.reports_to_member_id` |
+| Quién aprueba un gasto | Reporting Hierarchy + Domain reviewer | `reporting_lines` + snapshot `members.reports_to_member_id` + rol/registry financiero |
 | Quién es jefe de un área | Structural Hierarchy | `departments.head_member_id` |
 | Quién aparece en el organigrama | Structural Hierarchy | `departments` + `members.department_id` + `reports_to_member_id` |
-| Quién ve sus reportes directos | Reporting Hierarchy | `members.reports_to_member_id` |
+| Quién ve sus reportes directos | Reporting Hierarchy | `reporting_lines` + snapshot `members.reports_to_member_id` |
 | Quién responde por una cuenta | Operational Responsibility | registry scoped / ownership explícito |
 | Quién ve métricas de una cuenta | Operational Responsibility + Access Role | ownership scoped + permissions |
 | Qué equipo está asignado a un cliente | Assignments + Operational Responsibility | `client_team_assignments` + ownership explícito |
@@ -480,7 +499,7 @@ El nombre físico final puede variar, pero la semántica target no.
 
 ### HR
 
-- leave y expense approvals deben seguir leyendo supervisoría desde `reports_to_member_id`
+- leave y expense approvals deben seguir leyendo supervisoría desde el contrato canónico de reporting hierarchy, manteniendo compatibilidad con `reports_to_member_id` mientras existan consumers legacy
 - HR puede actuar como validador final de dominio
 - `departments` no debe reemplazar supervisoría directa
 

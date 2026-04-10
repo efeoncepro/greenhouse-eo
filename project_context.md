@@ -318,6 +318,26 @@
 - Drift reconocido:
   - `employee` y `finance_manager` siguen existiendo como contracts legacy en partes del runtime y deben leerse como carriles de convergencia, no como taxonomía target
 
+## Delta 2026-04-10 Reporting hierarchy foundation (TASK-324)
+
+- La supervisoría formal ya no depende solo de `greenhouse_core.members.reports_to_member_id`.
+- Nueva lane canónica:
+  - `greenhouse_core.reporting_lines`
+  - historial efectivo con `effective_from` / `effective_to`
+  - metadata de origen, motivo y actor del cambio
+- Compatibilidad obligatoria:
+  - `greenhouse_core.members.reports_to_member_id` sigue vivo como snapshot actual y compat layer
+  - triggers en `reporting_lines` sincronizan el snapshot hacia `members`
+- Delegación temporal:
+  - el supervisor efectivo puede resolverse con `greenhouse_core.operational_responsibilities`
+  - `responsibility_type = approval_delegate`
+  - `scope_type = member`
+- Readers canónicos disponibles en `src/lib/reporting-hierarchy/*` para supervisor actual/efectivo, reportes directos, subárbol, cadena ascendente y miembros sin supervisor
+- Guardrails mínimos:
+  - no self-reporting
+  - no ciclos
+  - no múltiples relaciones vigentes solapadas para el mismo miembro
+
 ## Delta 2026-04-03 Finance visible semantics: Nubox documents are not cash events
 
 - Las surfaces visibles `Finance > income` y `Finance > expenses` deben leerse como ledgers de documento/devengo, no como caja pura.
