@@ -11,7 +11,7 @@ vi.mock('@/lib/reporting-hierarchy/access', () => ({
   getSupervisorScopeForTenant: (...args: unknown[]) => mockGetSupervisorScopeForTenant(...args)
 }))
 
-import { requirePeopleTenantContext } from '@/lib/tenant/authorization'
+import { requirePeopleTenantContext, resolveHrOrgChartAccessContext } from '@/lib/tenant/authorization'
 
 describe('requirePeopleTenantContext', () => {
   beforeEach(() => {
@@ -124,5 +124,78 @@ describe('requirePeopleTenantContext', () => {
     expect(result.errorResponse).toBeNull()
     expect(result.accessContext?.accessMode).toBe('supervisor')
     expect(result.accessContext?.supervisorScope?.visibleMemberIds).toContain('member-a')
+  })
+})
+
+describe('resolveHrOrgChartAccessContext', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('grants supervisor-scoped org chart access when the tenant has subtree visibility', async () => {
+    mockGetSupervisorScopeForTenant.mockResolvedValue({
+      memberId: 'member-supervisor',
+      directReportCount: 1,
+      delegatedSupervisorIds: [],
+      visibleMemberIds: ['member-supervisor', 'member-a'],
+      hasDirectReports: true,
+      hasDelegatedAuthority: false,
+      canAccessSupervisorPeople: true,
+      canAccessSupervisorLeave: false
+    })
+
+    const result = await resolveHrOrgChartAccessContext({
+      userId: 'user-3',
+      clientId: 'efeonce',
+      clientName: 'Efeonce',
+      tenantType: 'efeonce_internal',
+      roleCodes: ['collaborator'],
+      primaryRoleCode: 'collaborator',
+      routeGroups: ['my'],
+      authorizedViews: [],
+      projectScopes: [],
+      campaignScopes: [],
+      businessLines: [],
+      serviceModules: [],
+      role: 'Collaborator',
+      projectIds: [],
+      featureFlags: [],
+      timezone: 'America/Santiago',
+      portalHomePath: '/hr',
+      authMode: 'sso',
+      memberId: 'member-supervisor'
+    } as any)
+
+    expect(result?.accessMode).toBe('supervisor')
+    expect(result?.supervisorScope?.visibleMemberIds).toContain('member-a')
+  })
+
+  it('returns broad access when the tenant has the explicit org chart view', async () => {
+    const result = await resolveHrOrgChartAccessContext({
+      userId: 'user-1',
+      clientId: 'efeonce',
+      clientName: 'Efeonce',
+      tenantType: 'efeonce_internal',
+      roleCodes: ['hr_manager'],
+      primaryRoleCode: 'hr_manager',
+      routeGroups: ['hr'],
+      authorizedViews: ['equipo.organigrama'],
+      projectScopes: [],
+      campaignScopes: [],
+      businessLines: [],
+      serviceModules: [],
+      role: 'HR Manager',
+      projectIds: [],
+      featureFlags: [],
+      timezone: 'America/Santiago',
+      portalHomePath: '/hr',
+      authMode: 'sso'
+    } as any)
+
+    expect(result).toEqual({
+      accessMode: 'broad',
+      supervisorScope: null
+    })
+    expect(mockGetSupervisorScopeForTenant).not.toHaveBeenCalled()
   })
 })

@@ -36,20 +36,20 @@ Referencias:
 
 ## Solución
 
-Unificar el criterio de navegación con el criterio de acceso:
+Se alineó el criterio de acceso y descubrimiento:
 
-1. Si supervisor-limited debe ver el módulo, reflejarlo en el menú.
-2. Si no debe verlo, endurecer también page guard y API para que el contrato sea consistente.
+1. page + API ahora usan un resolver propio `resolveHrOrgChartAccessContext()` para broad HR/admin o supervisor subtree-aware;
+2. el menú lateral deja visible `Organigrama` cuando la persona ya aterriza en el workspace supervisor y tiene identidad interna materializada.
 
 ## Verificación
 
-1. Probar con un usuario supervisor-limited sin rol broad de HR.
-2. Confirmar si el menú lateral muestra `Organigrama`.
-3. Abrir `/hr/org-chart` directo y validar que navegación y autorización coincidan.
+1. `pnpm exec vitest run src/app/api/hr/core/org-chart/route.test.ts src/lib/tenant/authorization.test.ts`
+2. `pnpm lint`
+3. `pnpm build`
 
 ## Estado
 
-open
+resolved
 
 ## Relacionado
 

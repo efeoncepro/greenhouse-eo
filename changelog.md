@@ -2,6 +2,13 @@
 
 ## 2026-04-10
 
+### 2026-04-10 — Organigrama estructural + sync de departamentos + menú supervisor-aware
+
+- `HR > Organigrama` dejó de dibujar reporting lines como si fueran estructura: ahora materializa áreas padre/hija desde `greenhouse_core.departments` y cuelga a cada persona desde su adscripción vigente.
+- El reader del organigrama usa fallback estructural para responsables de área cuando `members.department_id` todavía no refleja el cambio, evitando que el nodo siga apareciendo “sin departamento”.
+- `HR > Departamentos` ahora sincroniza `members.department_id` al asignar o cambiar `head_member_id`, para que el responsable del área no quede desacoplado de su adscripción canónica.
+- El menú lateral ya deja visible `Organigrama` para supervisoría limitada cuando la persona aterriza en el workspace supervisor, alineando navegación con page/API.
+
 ### 2026-04-10 — Hierarchy follow-up hardening for staged changes and org chart data
 
 - `HR > Jerarquía` corrige un bug donde una línea futura abierta podía bloquear o invisibilizar un cambio de supervisor con fecha efectiva hoy.

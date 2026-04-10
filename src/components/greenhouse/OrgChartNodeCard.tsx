@@ -23,7 +23,7 @@ import { getInitials } from '@/utils/getInitials'
 export type OrgChartNodeCardData = {
   node: HrOrgChartNode
   isFocused: boolean
-  onFocusMember: (memberId: string) => void
+  onFocusMember: (memberId: string | null) => void
 }
 
 export type OrgChartNodeCardNode = Node<OrgChartNodeCardData, 'orgChartNode'>
@@ -54,15 +54,26 @@ const stopPropagation = (event: MouseEvent) => {
 const OrgChartNodeCard = ({ data }: NodeProps<OrgChartNodeCardNode>) => {
   const node = data.node
   const tone = resolveRoleTone(node.roleCategory)
-  const focusMember = () => data.onFocusMember(node.memberId)
+  const focusTargetMemberId = node.nodeType === 'member' ? node.memberId : node.headMemberId
+  const canFocusMember = Boolean(focusTargetMemberId)
+  const focusMember = () => data.onFocusMember(focusTargetMemberId)
+  const isDepartmentNode = node.nodeType === 'department'
 
   return (
     <Card
-      role='button'
-      tabIndex={0}
-      aria-label={`Enfocar a ${node.displayName}`}
-      onClick={focusMember}
+      role={canFocusMember ? 'button' : undefined}
+      tabIndex={canFocusMember ? 0 : -1}
+      aria-label={
+        canFocusMember
+          ? `Enfocar a ${node.displayName}`
+          : undefined
+      }
+      onClick={canFocusMember ? focusMember : undefined}
       onKeyDown={event => {
+        if (!canFocusMember) {
+          return
+        }
+
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault()
           focusMember()
@@ -76,7 +87,7 @@ const OrgChartNodeCard = ({ data }: NodeProps<OrgChartNodeCardNode>) => {
         border: `1px solid ${data.isFocused ? alpha(tone.source, 0.55) : GH_COLORS.neutral.border}`,
         background: `linear-gradient(180deg, ${alpha(tone.source, 0.12)} 0%, ${GH_COLORS.neutral.bgSurface} 48%)`,
         boxShadow: data.isFocused ? `0 0 0 2px ${alpha(tone.source, 0.14)}` : 'none',
-        cursor: 'pointer',
+        cursor: canFocusMember ? 'pointer' : 'default',
         '&:focus-visible': {
           outline: `2px solid ${alpha(tone.source, 0.72)}`,
           outlineOffset: 2
@@ -103,6 +114,7 @@ const OrgChartNodeCard = ({ data }: NodeProps<OrgChartNodeCardNode>) => {
 
             <Box sx={{ minWidth: 0, flex: 1 }}>
               <Stack direction='row' spacing={0.75} flexWrap='wrap' useFlexGap sx={{ mb: 0.75 }}>
+                <Chip size='small' label={isDepartmentNode ? 'Departamento' : 'Persona'} variant='outlined' sx={{ height: 24 }} />
                 <Chip
                   size='small'
                   label={node.active ? 'Activo' : 'Inactivo'}
@@ -118,54 +130,113 @@ const OrgChartNodeCard = ({ data }: NodeProps<OrgChartNodeCardNode>) => {
                 {node.isRoot ? <Chip size='small' label='Raíz' variant='outlined' sx={{ height: 24 }} /> : null}
                 {node.isDirectReportToCurrentMember ? <Chip size='small' label='Tu equipo' color='success' variant='outlined' sx={{ height: 24 }} /> : null}
                 {node.hasActiveDelegation ? <Chip size='small' label='Delegación activa' color='warning' variant='outlined' sx={{ height: 24 }} /> : null}
+                {node.isDepartmentHead ? <Chip size='small' label='Responsable de área' color='info' variant='outlined' sx={{ height: 24 }} /> : null}
               </Stack>
 
               <Typography variant='subtitle1' fontWeight={700} lineHeight={1.2} noWrap title={node.displayName}>
                 {node.displayName}
               </Typography>
-              <Typography variant='body2' color='text.secondary' noWrap title={node.roleTitle ?? 'Sin cargo visible'}>
-                {node.roleTitle ?? 'Sin cargo visible'}
+              <Typography
+                variant='body2'
+                color='text.secondary'
+                noWrap
+                title={
+                  isDepartmentNode
+                    ? node.businessUnit ?? node.roleTitle ?? 'Área sin detalle adicional'
+                    : node.roleTitle ?? 'Sin cargo visible'
+                }
+              >
+                {isDepartmentNode
+                  ? node.businessUnit ?? node.roleTitle ?? 'Área sin detalle adicional'
+                  : node.roleTitle ?? 'Sin cargo visible'}
               </Typography>
             </Box>
           </Stack>
 
           <Box sx={{ minWidth: 0 }}>
-            <Typography variant='body2' fontWeight={600} lineHeight={1.35} noWrap title={node.departmentName ?? 'Departamento no visible'}>
-              {node.departmentName ?? 'Departamento no visible'}
+            <Typography
+              variant='body2'
+              fontWeight={600}
+              lineHeight={1.35}
+              noWrap
+              title={
+                isDepartmentNode
+                  ? node.headMemberName ?? 'Sin responsable visible'
+                  : node.departmentName ?? 'Departamento no visible'
+              }
+            >
+              {isDepartmentNode
+                ? node.headMemberName ?? 'Sin responsable visible'
+                : node.departmentName ?? 'Departamento no visible'}
             </Typography>
-            <Typography variant='caption' color='text.secondary' noWrap title={node.supervisorName ?? 'Sin supervisor visible'}>
-              {node.supervisorName ? `Reporta a ${node.supervisorName}` : 'Raíz visible'}
+            <Typography
+              variant='caption'
+              color='text.secondary'
+              noWrap
+              title={
+                isDepartmentNode
+                  ? node.parentDepartmentName ?? 'Nivel raíz'
+                  : node.supervisorName ?? 'Sin supervisor visible'
+              }
+            >
+              {isDepartmentNode
+                ? node.parentDepartmentName ? `Reporta a ${node.parentDepartmentName}` : 'Nivel raíz'
+                : node.supervisorName ? `Reporta a ${node.supervisorName}` : 'Sin supervisor visible'}
             </Typography>
           </Box>
 
           <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-            <Chip size='small' label={`Directos ${node.directReportsCount}`} variant='outlined' sx={{ height: 24 }} />
-            <Chip size='small' label={`Subárbol ${node.subtreeSize}`} variant='outlined' sx={{ height: 24 }} />
+            <Chip
+              size='small'
+              label={isDepartmentNode ? `Áreas ${node.childDepartmentCount}` : `Directos ${node.directReportsCount}`}
+              variant='outlined'
+              sx={{ height: 24 }}
+            />
+            <Chip
+              size='small'
+              label={isDepartmentNode ? `Miembros ${node.memberCount}` : `Área ${node.departmentName ?? 'Sin dato'}`}
+              variant='outlined'
+              sx={{ height: 24 }}
+            />
             <Chip size='small' label={`Profundidad ${node.depth}`} variant='outlined' sx={{ height: 24 }} />
           </Stack>
 
           <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+            {node.nodeType === 'member' && node.memberId ? (
+              <Button
+                component={Link}
+                href={`/people/${node.memberId}`}
+                size='small'
+                variant='tonal'
+                color='primary'
+                startIcon={<i className='tabler-user-search' />}
+                onClick={stopPropagation}
+              >
+                Ver ficha
+              </Button>
+            ) : node.headMemberId ? (
+              <Button
+                component={Link}
+                href={`/people/${node.headMemberId}`}
+                size='small'
+                variant='tonal'
+                color='primary'
+                startIcon={<i className='tabler-user-search' />}
+                onClick={stopPropagation}
+              >
+                Ver responsable
+              </Button>
+            ) : null}
             <Button
               component={Link}
-              href={`/people/${node.memberId}`}
-              size='small'
-              variant='tonal'
-              color='primary'
-              startIcon={<i className='tabler-user-search' />}
-              onClick={stopPropagation}
-            >
-              Ver ficha
-            </Button>
-            <Button
-              component={Link}
-              href='/hr/hierarchy'
+              href={isDepartmentNode ? '/hr/departments' : '/hr/hierarchy'}
               size='small'
               variant='outlined'
               color='secondary'
-              startIcon={<i className='tabler-hierarchy-2' />}
+              startIcon={<i className={isDepartmentNode ? 'tabler-sitemap' : 'tabler-hierarchy-2'} />}
               onClick={stopPropagation}
             >
-              Jerarquía
+              {isDepartmentNode ? 'Departamentos' : 'Jerarquía'}
             </Button>
           </Stack>
         </Stack>

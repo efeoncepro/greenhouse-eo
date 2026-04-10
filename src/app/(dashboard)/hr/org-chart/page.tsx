@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 
 import HrOrgChartView from '@views/greenhouse/hr-core/HrOrgChartView'
-import { hasBroadHrOrgChartAccess, resolveHrLeaveAccessContext } from '@/lib/tenant/authorization'
+import { resolveHrOrgChartAccessContext } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 
 const HrOrgChartPage = async () => {
@@ -11,10 +11,9 @@ const HrOrgChartPage = async () => {
     redirect('/login')
   }
 
-  const hasAccess = hasBroadHrOrgChartAccess(tenant)
-  const accessContext = hasAccess ? null : await resolveHrLeaveAccessContext(tenant)
+  const accessContext = await resolveHrOrgChartAccessContext(tenant)
 
-  if (!hasAccess && !accessContext) {
+  if (!accessContext) {
     redirect(tenant.portalHomePath || '/dashboard')
   }
 

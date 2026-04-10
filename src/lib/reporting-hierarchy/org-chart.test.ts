@@ -1,11 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockListHierarchy = vi.fn()
+const mockListDepartmentsFromPostgres = vi.fn()
 const mockGetPeopleList = vi.fn()
 const mockResolveCurrentHrMemberId = vi.fn()
+const mockQuery = vi.fn()
 
 vi.mock('@/lib/reporting-hierarchy/admin', () => ({
   listHierarchy: (...args: unknown[]) => mockListHierarchy(...args)
+}))
+
+vi.mock('@/lib/hr-core/postgres-departments-store', () => ({
+  listDepartmentsFromPostgres: (...args: unknown[]) => mockListDepartmentsFromPostgres(...args)
 }))
 
 vi.mock('@/lib/people/get-people-list', () => ({
@@ -16,125 +22,207 @@ vi.mock('@/lib/hr-core/service', () => ({
   resolveCurrentHrMemberId: (...args: unknown[]) => mockResolveCurrentHrMemberId(...args)
 }))
 
+vi.mock('@/lib/db', () => ({
+  query: (...args: unknown[]) => mockQuery(...args)
+}))
+
 import { getHrOrgChart } from '@/lib/reporting-hierarchy/org-chart'
 
 describe('getHrOrgChart', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
+    mockListDepartmentsFromPostgres.mockResolvedValue([
+      {
+        departmentId: 'ejecutivo',
+        name: 'Ejecutivo',
+        description: 'Dirección',
+        parentDepartmentId: null,
+        headMemberId: 'julio-reyes',
+        headMemberName: 'Julio Reyes',
+        businessUnit: 'globe',
+        active: true,
+        sortOrder: 1
+      },
+      {
+        departmentId: 'creative-team',
+        name: 'Creative Team',
+        description: 'Creative Operations',
+        parentDepartmentId: 'ejecutivo',
+        headMemberId: 'daniela-ferreira',
+        headMemberName: 'Daniela Ferreira',
+        businessUnit: 'globe',
+        active: true,
+        sortOrder: 2
+      }
+    ])
+
     mockListHierarchy.mockResolvedValue([
       {
         reportingLineId: 'rpt-1',
-        memberId: 'member-1',
-        memberName: 'Ana Perez',
+        memberId: 'julio-reyes',
+        memberName: 'Julio Reyes',
         memberActive: true,
-        roleTitle: 'Lead',
-        departmentId: 'dept-1',
-        departmentName: 'Delivery',
+        roleTitle: 'CEO',
+        departmentId: 'ejecutivo',
+        departmentName: 'Ejecutivo',
         supervisorMemberId: null,
         supervisorName: null,
         supervisorActive: null,
-        effectiveFrom: '2026-04-10T12:00:00.000Z',
-        sourceSystem: 'greenhouse_manual',
-        changeReason: 'initial_setup',
-        changedByUserId: 'user-1',
-        directReportsCount: 2,
-        subtreeSize: 2,
-        depth: 0,
-        isRoot: true,
-        delegation: null
-      },
-      {
-        reportingLineId: 'rpt-2',
-        memberId: 'member-2',
-        memberName: 'Bruno Diaz',
-        memberActive: true,
-        roleTitle: 'Manager',
-        departmentId: 'dept-1',
-        departmentName: 'Delivery',
-        supervisorMemberId: 'member-1',
-        supervisorName: 'Ana Perez',
-        supervisorActive: true,
         effectiveFrom: '2026-04-10T12:00:00.000Z',
         sourceSystem: 'greenhouse_manual',
         changeReason: 'initial_setup',
         changedByUserId: 'user-1',
         directReportsCount: 1,
         subtreeSize: 1,
-        depth: 1,
-        isRoot: false,
-        delegation: {
-          responsibilityId: 'rsp-1',
-          delegateMemberId: 'member-9',
-          delegateMemberName: 'Delegada',
-          effectiveFrom: '2026-04-10T12:00:00.000Z',
-          effectiveTo: null
-        }
+        depth: 0,
+        isRoot: true,
+        delegation: null
       },
       {
-        reportingLineId: 'rpt-3',
-        memberId: 'member-3',
-        memberName: 'Carla Soto',
+        reportingLineId: 'rpt-2',
+        memberId: 'daniela-ferreira',
+        memberName: 'Daniela Ferreira',
         memberActive: true,
-        roleTitle: 'Analyst',
-        departmentId: 'dept-1',
-        departmentName: 'Delivery',
-        supervisorMemberId: 'member-2',
-        supervisorName: 'Bruno Diaz',
+        roleTitle: 'Creative Operations Lead',
+        departmentId: null,
+        departmentName: null,
+        supervisorMemberId: 'julio-reyes',
+        supervisorName: 'Julio Reyes',
         supervisorActive: true,
         effectiveFrom: '2026-04-10T12:00:00.000Z',
         sourceSystem: 'greenhouse_manual',
-        changeReason: 'initial_setup',
+        changeReason: 'team_update',
         changedByUserId: 'user-1',
         directReportsCount: 0,
         subtreeSize: 0,
-        depth: 2,
+        depth: 1,
         isRoot: false,
-        delegation: null
+        delegation: {
+          responsibilityId: 'resp-1',
+          delegateMemberId: 'member-9',
+          delegateMemberName: 'Valentina Hoyos',
+          effectiveFrom: '2026-04-10T12:00:00.000Z',
+          effectiveTo: null
+        }
       }
     ])
 
+    const rosterItems = [
+      {
+        memberId: 'julio-reyes',
+        displayName: 'Julio Reyes',
+        publicEmail: 'julio@efeonce.org',
+        internalEmail: 'julio@efeonce.org',
+        roleTitle: 'CEO',
+        roleCategory: 'strategy',
+        departmentName: 'Ejecutivo',
+        avatarUrl: null,
+        locationCountry: 'CL',
+        active: true,
+        totalAssignments: 0,
+        contractedFte: 1,
+        assignedFte: 1,
+        totalFte: 1,
+        payRegime: 'chile'
+      },
+      {
+        memberId: 'daniela-ferreira',
+        displayName: 'Daniela Ferreira',
+        publicEmail: 'daniela@efeonce.org',
+        internalEmail: 'daniela@efeonce.org',
+        roleTitle: 'Creative Operations Lead',
+        roleCategory: 'operations',
+        departmentName: null,
+        avatarUrl: null,
+        locationCountry: 'CL',
+        active: true,
+        totalAssignments: 0,
+        contractedFte: 1,
+        assignedFte: 1,
+        totalFte: 1,
+        payRegime: 'chile'
+      }
+    ]
+
+    mockGetPeopleList.mockImplementation(async (input?: { memberIds?: string[] }) => ({
+      items: input?.memberIds?.length
+        ? rosterItems.filter(item => input.memberIds?.includes(item.memberId))
+        : rosterItems
+    }))
+
+    mockQuery.mockResolvedValue([
+      {
+        member_id: 'julio-reyes',
+        department_id: 'ejecutivo'
+      },
+      {
+        member_id: 'daniela-ferreira',
+        department_id: null
+      }
+    ])
+
+    mockResolveCurrentHrMemberId.mockResolvedValue('julio-reyes')
+  })
+
+  it('builds a structural graph with department and member nodes', async () => {
+    const result = await getHrOrgChart({
+      tenant: { userId: 'user-1', memberId: 'julio-reyes' } as any,
+      accessContext: {
+        accessMode: 'broad',
+        supervisorScope: null
+      },
+      focusMemberId: 'daniela-ferreira'
+    })
+
+    expect(result.summary.departments).toBe(2)
+    expect(result.summary.members).toBe(2)
+    expect(result.nodes.some(node => node.nodeType === 'department' && node.departmentId === 'creative-team')).toBe(true)
+    expect(result.nodes.some(node => node.nodeType === 'member' && node.memberId === 'daniela-ferreira')).toBe(true)
+    expect(result.edges).toEqual(
+      expect.arrayContaining([
+        {
+          id: 'department:ejecutivo-department:creative-team',
+          source: 'department:ejecutivo',
+          target: 'department:creative-team'
+        },
+        {
+          id: 'department:creative-team-member:daniela-ferreira',
+          source: 'department:creative-team',
+          target: 'member:daniela-ferreira'
+        }
+      ])
+    )
+    expect(result.breadcrumbs.map(item => item.label)).toEqual(['Ejecutivo', 'Creative Team', 'Daniela Ferreira'])
+  })
+
+  it('falls back to the headed department when the member assignment is still null', async () => {
+    const result = await getHrOrgChart({
+      tenant: { userId: 'user-1', memberId: 'julio-reyes' } as any,
+      accessContext: {
+        accessMode: 'broad',
+        supervisorScope: null
+      }
+    })
+
+    const danielaNode = result.nodes.find(node => node.nodeType === 'member' && node.memberId === 'daniela-ferreira')
+
+    expect(danielaNode?.departmentId).toBe('creative-team')
+    expect(danielaNode?.departmentName).toBe('Creative Team')
+    expect(danielaNode?.isDepartmentHead).toBe(true)
+  })
+
+  it('keeps only visible member branches and their ancestor departments for supervisor scope', async () => {
     mockGetPeopleList.mockResolvedValue({
       items: [
         {
-          memberId: 'member-1',
-          displayName: 'Ana Perez',
-          publicEmail: 'ana@efeonce.org',
-          internalEmail: 'ana@efeonce.org',
-          roleTitle: 'Lead',
-          roleCategory: 'operations',
-          avatarUrl: null,
-          locationCountry: 'CL',
-          active: true,
-          totalAssignments: 0,
-          contractedFte: 1,
-          assignedFte: 1,
-          totalFte: 1,
-          payRegime: 'chile'
-        },
-        {
-          memberId: 'member-2',
-          displayName: 'Bruno Diaz',
-          publicEmail: 'bruno@efeonce.org',
-          internalEmail: 'bruno@efeonce.org',
-          roleTitle: 'Manager',
-          roleCategory: 'operations',
-          avatarUrl: null,
-          locationCountry: 'CL',
-          active: true,
-          totalAssignments: 0,
-          contractedFte: 1,
-          assignedFte: 1,
-          totalFte: 1,
-          payRegime: 'chile'
-        },
-        {
-          memberId: 'member-3',
-          displayName: 'Carla Soto',
-          publicEmail: 'carla@efeonce.org',
-          internalEmail: 'carla@efeonce.org',
-          roleTitle: 'Analyst',
-          roleCategory: 'operations',
+          memberId: 'daniela-ferreira',
+          displayName: 'Daniela Ferreira',
+          publicEmail: 'daniela@efeonce.org',
+          internalEmail: 'daniela@efeonce.org',
+          roleTitle: 'Creative Lead',
+          roleCategory: 'design',
+          departmentName: null,
           avatarUrl: null,
           locationCountry: 'CL',
           active: true,
@@ -146,102 +234,23 @@ describe('getHrOrgChart', () => {
         }
       ]
     })
+    mockQuery.mockResolvedValue([{ member_id: 'daniela-ferreira', department_id: null }])
 
-    mockResolveCurrentHrMemberId.mockResolvedValue('member-1')
-  })
-
-  it('returns the full graph for broad access and builds breadcrumbs from the focused node', async () => {
     const result = await getHrOrgChart({
-      tenant: { userId: 'user-1', memberId: 'member-1' } as any,
-      accessContext: {
-        accessMode: 'broad',
-        supervisorScope: null
-      },
-      focusMemberId: 'member-3'
-    })
-
-    expect(result.accessMode).toBe('broad')
-    expect(result.nodes).toHaveLength(3)
-    expect(result.edges).toEqual([
-      { id: 'member-1-member-2', source: 'member-1', target: 'member-2' },
-      { id: 'member-2-member-3', source: 'member-2', target: 'member-3' }
-    ])
-    expect(result.breadcrumbs.map(item => item.memberId)).toEqual(['member-1', 'member-2', 'member-3'])
-    expect(result.summary.delegatedApprovals).toBe(1)
-  })
-
-  it('filters the graph for supervisor access and promotes hidden-parent nodes to roots', async () => {
-    const result = await getHrOrgChart({
-      tenant: { userId: 'user-1', memberId: 'member-1' } as any,
+      tenant: { userId: 'user-1', memberId: 'julio-reyes' } as any,
       accessContext: {
         accessMode: 'supervisor',
         supervisorScope: {
-          memberId: 'member-1',
-          visibleMemberIds: ['member-1', 'member-3']
+          memberId: 'daniela-ferreira',
+          visibleMemberIds: ['daniela-ferreira']
         } as any
       }
     })
 
-    expect(result.focusMemberId).toBe('member-1')
-    expect(result.nodes.map(node => node.memberId)).toEqual(['member-1', 'member-3'])
-    expect(result.edges).toEqual([])
-    expect(result.nodes.find(node => node.memberId === 'member-3')?.isRoot).toBe(true)
-  })
-
-  it('falls back to the roster department when the hierarchy snapshot does not have it yet', async () => {
-    mockListHierarchy.mockResolvedValue([
-      {
-        reportingLineId: 'rpt-1',
-        memberId: 'member-1',
-        memberName: 'Ana Perez',
-        memberActive: true,
-        roleTitle: 'Lead',
-        departmentId: null,
-        departmentName: null,
-        supervisorMemberId: null,
-        supervisorName: null,
-        supervisorActive: null,
-        effectiveFrom: '2026-04-10T12:00:00.000Z',
-        sourceSystem: 'greenhouse_manual',
-        changeReason: 'initial_setup',
-        changedByUserId: 'user-1',
-        directReportsCount: 0,
-        subtreeSize: 0,
-        depth: 0,
-        isRoot: true,
-        delegation: null
-      }
-    ])
-    mockGetPeopleList.mockResolvedValue({
-      items: [
-        {
-          memberId: 'member-1',
-          displayName: 'Ana Perez',
-          publicEmail: 'ana@efeonce.org',
-          internalEmail: 'ana@efeonce.org',
-          roleTitle: 'Lead',
-          roleCategory: 'operations',
-          departmentName: 'Delivery',
-          avatarUrl: null,
-          locationCountry: 'CL',
-          active: true,
-          totalAssignments: 0,
-          contractedFte: 1,
-          assignedFte: 1,
-          totalFte: 1,
-          payRegime: 'chile'
-        }
-      ]
-    })
-
-    const result = await getHrOrgChart({
-      tenant: { userId: 'user-1', memberId: 'member-1' } as any,
-      accessContext: {
-        accessMode: 'broad',
-        supervisorScope: null
-      }
-    })
-
-    expect(result.nodes[0]?.departmentName).toBe('Delivery')
+    expect(result.memberOptions.map(option => option.memberId)).toEqual(['daniela-ferreira'])
+    expect(result.nodes.filter(node => node.nodeType === 'member').map(node => node.memberId)).toEqual(['daniela-ferreira'])
+    expect(result.nodes.filter(node => node.nodeType === 'department').map(node => node.departmentId)).toEqual(
+      expect.arrayContaining(['creative-team', 'ejecutivo'])
+    )
   })
 })

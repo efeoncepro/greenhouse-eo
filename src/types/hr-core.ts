@@ -282,7 +282,10 @@ export interface HrHierarchyResponse {
 }
 
 export interface HrOrgChartNode {
-  memberId: string
+  nodeId: string
+  nodeType: 'department' | 'member'
+  memberId: string | null
+  departmentId: string | null
   displayName: string
   publicEmail: string
   internalEmail: string | null
@@ -290,18 +293,25 @@ export interface HrOrgChartNode {
   roleTitle: string | null
   roleCategory: string
   departmentName: string | null
+  parentDepartmentId: string | null
+  parentDepartmentName: string | null
+  headMemberId: string | null
+  headMemberName: string | null
+  businessUnit: string | null
   locationCountry: string | null
   payRegime: 'chile' | 'international' | null
   supervisorMemberId: string | null
   supervisorName: string | null
   depth: number
   directReportsCount: number
-  subtreeSize: number
+  memberCount: number
+  childDepartmentCount: number
   active: boolean
   isRoot: boolean
   isCurrentMember: boolean
   isDirectReportToCurrentMember: boolean
   hasActiveDelegation: boolean
+  isDepartmentHead: boolean
 }
 
 export interface HrOrgChartEdge {
@@ -311,8 +321,20 @@ export interface HrOrgChartEdge {
 }
 
 export interface HrOrgChartBreadcrumb {
+  nodeId: string
+  nodeType: 'department' | 'member'
+  memberId: string | null
+  departmentId: string | null
+  label: string
+}
+
+export interface HrOrgChartMemberOption {
   memberId: string
   displayName: string
+  roleTitle: string | null
+  departmentName: string | null
+  avatarUrl: string | null
+  isCurrentMember: boolean
 }
 
 export interface HrOrgChartResponse {
@@ -322,8 +344,11 @@ export interface HrOrgChartResponse {
   nodes: HrOrgChartNode[]
   edges: HrOrgChartEdge[]
   breadcrumbs: HrOrgChartBreadcrumb[]
+  memberOptions: HrOrgChartMemberOption[]
   summary: {
     totalNodes: number
+    departments: number
+    members: number
     roots: number
     maxDepth: number
     delegatedApprovals: number

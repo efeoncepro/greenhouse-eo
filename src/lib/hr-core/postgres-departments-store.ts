@@ -156,6 +156,69 @@ const assertMemberExists = async (memberId: string, client?: PoolClient) => {
   }
 }
 
+const assertDepartmentTreeIsAcyclic = async ({
+  departmentId,
+  parentDepartmentId,
+  client
+}: {
+  departmentId: string
+  parentDepartmentId: string | null
+  client?: PoolClient
+}) => {
+  const visited = new Set<string>([departmentId])
+  let cursorDepartmentId = parentDepartmentId
+
+  while (cursorDepartmentId) {
+    if (visited.has(cursorDepartmentId)) {
+      throw new HrCoreValidationError('A department cannot become a descendant of itself.', 409, {
+        departmentId,
+        parentDepartmentId
+      })
+    }
+
+    visited.add(cursorDepartmentId)
+
+    const [row] = await queryRows<{ parent_department_id: string | null }>(
+      `
+        SELECT parent_department_id
+        FROM greenhouse_core.departments
+        WHERE department_id = $1
+        LIMIT 1
+      `,
+      [cursorDepartmentId],
+      client
+    )
+
+    cursorDepartmentId = normalizeNullableString(row?.parent_department_id)
+  }
+}
+
+const syncHeadMemberDepartment = async ({
+  departmentId,
+  headMemberId,
+  client
+}: {
+  departmentId: string
+  headMemberId: string | null
+  client: PoolClient
+}) => {
+  if (!headMemberId) {
+    return
+  }
+
+  await client.query(
+    `
+      UPDATE greenhouse_core.members
+      SET
+        department_id = $2,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE member_id = $1
+        AND department_id IS DISTINCT FROM $2
+    `,
+    [headMemberId, departmentId]
+  )
+}
+
 const validateDepartmentRelations = async ({
   departmentId,
   parentDepartmentId,
@@ -176,6 +239,11 @@ const validateDepartmentRelations = async ({
 
   if (parentDepartmentId) {
     await assertDepartmentExists(parentDepartmentId, client)
+    await assertDepartmentTreeIsAcyclic({
+      departmentId,
+      parentDepartmentId,
+      client
+    })
   }
 
   if (headMemberId) {
@@ -315,6 +383,12 @@ export const createDepartmentInPostgres = async (input: CreateDepartmentInput) =
       [departmentId, normalizedName, description, parentDepartmentId, headMemberId, normalizedBusinessUnit, active, sortOrder]
     )
 
+    await syncHeadMemberDepartment({
+      departmentId,
+      headMemberId,
+      client
+    })
+
     const created = await getDepartmentByIdFromPostgres(departmentId, client)
 
     if (!created) {
@@ -409,6 +483,12 @@ export const updateDepartmentInPostgres = async (departmentId: string, input: Up
       values
     )
 
+    await syncHeadMemberDepartment({
+      departmentId,
+      headMemberId: nextHeadMemberId,
+      client
+    })
+
     const updated = await getDepartmentByIdFromPostgres(departmentId, client)
 
     if (!updated) {
@@ -426,11 +506,20 @@ export const getMemberDepartmentContextFromPostgres = async (memberId: string, c
     `
       SELECT
         m.member_id,
-        m.department_id,
-        d.name AS department_name
+        COALESCE(m.department_id, headed_dept.department_id) AS department_id,
+        COALESCE(d.name, headed_dept.name) AS department_name
       FROM greenhouse_core.members AS m
       LEFT JOIN greenhouse_core.departments AS d
         ON d.department_id = m.department_id
+      LEFT JOIN LATERAL (
+        SELECT
+          dept.department_id,
+          dept.name
+        FROM greenhouse_core.departments AS dept
+        WHERE dept.head_member_id = m.member_id
+        ORDER BY dept.sort_order ASC, dept.name ASC
+        LIMIT 1
+      ) AS headed_dept ON TRUE
       WHERE m.member_id = $1
       LIMIT 1
     `,

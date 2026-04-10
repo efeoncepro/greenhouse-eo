@@ -532,7 +532,6 @@ export const bulkReassignDirectReports = async (input: BulkReassignDirectReports
   const reason = assertRequired(input.reason, 'reason')
   const nextSupervisorMemberId = normalizeNullableString(input.nextSupervisorMemberId)
   const effectiveFrom = sanitizeEffectiveFrom(input.effectiveFrom)
-  const effectiveAt = effectiveFrom
 
   if (nextSupervisorMemberId && currentSupervisorMemberId === nextSupervisorMemberId) {
     throw new HrCoreValidationError('The replacement supervisor must be different from the current supervisor.')

@@ -67,18 +67,26 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   const isAgencyUser = isInternalUser || isAdminUser
   const roleCodes = session?.user?.roleCodes ?? []
 
-  const canSeePeople =
-    isPeopleRouteGroup ||
-    roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN) ||
-    roleCodes.includes(ROLE_CODES.EFEONCE_OPERATIONS) ||
-    roleCodes.includes(ROLE_CODES.HR_PAYROLL)
-
   const canSeeBankTreasury =
     roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN) ||
     roleCodes.includes(ROLE_CODES.FINANCE_ADMIN) ||
     roleCodes.includes(ROLE_CODES.FINANCE_ANALYST)
 
   const dashboardHref = session?.user?.portalHomePath || '/dashboard'
+
+  const hasSupervisorWorkspaceLanding =
+    isInternalUser &&
+    Boolean(session?.user?.memberId) &&
+    ['/hr', '/hr/team', '/hr/approvals'].includes(dashboardHref)
+
+  const canSeePeople =
+    isPeopleRouteGroup ||
+    hasSupervisorWorkspaceLanding ||
+    roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN) ||
+    roleCodes.includes(ROLE_CODES.EFEONCE_OPERATIONS) ||
+    roleCodes.includes(ROLE_CODES.HR_PAYROLL)
+
+  const canSeeSupervisorOrgChart = hasSupervisorWorkspaceLanding || authorizedViews.includes('equipo.organigrama')
 
   const capabilityModules = resolveCapabilityModules({
     businessLines: session?.user?.businessLines || [],
@@ -181,6 +189,10 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         })
       : []
 
+    const supervisorScopeItems: VerticalMenuDataType[] = !hasHrAccess && canSeeSupervisorOrgChart
+      ? [{ label: nl(GH_HR_NAV.orgChart), href: '/hr/org-chart', icon: 'tabler-hierarchy-3' }]
+      : []
+
     if (canSeePeople && hasHrAccess) {
       menuData.push({
         isSection: true,
@@ -190,11 +202,26 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           ...hrItems
         ]
       })
+    } else if (canSeePeople && supervisorScopeItems.length > 0) {
+      menuData.push({
+        isSection: true,
+        label: 'Equipo',
+        children: [
+          { label: nl(GH_PEOPLE_NAV.people), href: '/people', icon: 'tabler-users-group' },
+          ...supervisorScopeItems
+        ]
+      })
     } else if (canSeePeople) {
       menuData.push({
         label: nl(GH_PEOPLE_NAV.people),
         href: '/people',
         icon: 'tabler-users-group'
+      })
+    } else if (supervisorScopeItems.length > 0) {
+      menuData.push({
+        isSection: true,
+        label: 'Equipo',
+        children: supervisorScopeItems
       })
     } else if (hasHrAccess) {
       menuData.push({

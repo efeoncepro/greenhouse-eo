@@ -1,5 +1,32 @@
 # Handoff.md
 
+## Sesion 2026-04-10 — organigrama/departamentos realineados con estructura
+
+- alcance cerrado:
+  - `HR > Organigrama` ya no usa `reporting_lines` como edges principales; ahora materializa:
+    - `greenhouse_core.departments.parent_department_id`
+    - `greenhouse_core.members.department_id`
+    - fallback estructural por `departments.head_member_id` cuando el snapshot del miembro todavía no está al día
+  - `HR > Departamentos` ahora sincroniza `members.department_id` al crear o cambiar `head_member_id`
+  - el store de departamentos ya bloquea ciclos transitorios de padre/hijo (`A -> B -> A`)
+  - `/hr/org-chart` y `GET /api/hr/core/org-chart` usan un resolver propio `resolveHrOrgChartAccessContext()` en vez de reciclar el access resolver de permisos
+  - el menú lateral ya deja visible `Organigrama` para personas que entran por el workspace supervisor
+- archivos sensibles / de alto impacto tocados:
+  - `src/lib/reporting-hierarchy/org-chart.ts`
+  - `src/lib/hr-core/postgres-departments-store.ts`
+  - `src/views/greenhouse/hr-core/HrOrgChartView.tsx`
+  - `src/components/greenhouse/OrgChartNodeCard.tsx`
+  - `src/components/layout/vertical/VerticalMenu.tsx`
+  - `src/lib/tenant/authorization.ts`
+- validación ejecutada:
+  - `pnpm exec vitest run src/lib/reporting-hierarchy/org-chart.test.ts src/lib/hr-core/postgres-departments-store.test.ts src/app/api/hr/core/org-chart/route.test.ts src/lib/tenant/authorization.test.ts` — OK
+  - `pnpm exec tsc --noEmit --incremental false` — OK
+  - `pnpm lint` — OK
+  - `pnpm build` — OK
+- nota operativa:
+  - los issues `ISSUE-038`, `ISSUE-042` y `ISSUE-043` quedaron movidos a `resolved/` junto con el update del tracker
+  - el fix de `ISSUE-038` deja corregido el write lane y el organigrama; consumers legacy como la ficha HR siguen siendo otra lane distinta si se quiere eliminar todo fallback restante
+
 ## Sesion 2026-04-10 — follow-up jerarquía/org chart en staging
 
 - alcance cerrado:

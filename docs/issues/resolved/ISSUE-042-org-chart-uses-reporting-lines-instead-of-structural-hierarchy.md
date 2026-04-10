@@ -45,21 +45,21 @@ Referencias:
 
 ## Solución
 
-Definir y alinear el contrato funcional:
+`HR > Organigrama` se reconstruyó como vista estructural real:
 
-1. Si `Organigrama` debe ser estructural, reconstruir el grafo desde departamentos y adscripciones de miembros.
-2. Si la intención real es mostrar supervisoría, renombrar la vista y su copy para no prometer una estructura departamental.
-3. Si ambas vistas son necesarias, separar explícitamente “Jerarquía de reporte” y “Organigrama estructural”.
+1. el reader ahora usa `greenhouse_core.departments.parent_department_id` como eje del árbol;
+2. los miembros se cuelgan de su departamento efectivo, con fallback al departamento que lideran cuando el snapshot de adscripción todavía no está al día;
+3. la supervisoría formal se conserva solo como metadata del miembro, no como edge del grafo.
 
 ## Verificación
 
-1. Crear o editar una cadena `Departamento padre -> Departamento hijo`.
-2. Asignar miembros y responsable al departamento hijo.
-3. Confirmar que `HR > Organigrama` represente esa estructura esperada, no solo la cadena de supervisión.
+1. `pnpm exec vitest run src/lib/reporting-hierarchy/org-chart.test.ts src/app/api/hr/core/org-chart/route.test.ts`
+2. `pnpm lint`
+3. `pnpm build`
 
 ## Estado
 
-open
+resolved
 
 ## Relacionado
 

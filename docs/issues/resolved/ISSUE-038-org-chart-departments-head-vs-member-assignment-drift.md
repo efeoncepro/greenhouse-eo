@@ -53,21 +53,20 @@ Referencias:
 
 ## Solución
 
-Definir explícitamente el contrato:
+Se cerró por dos carriles complementarios:
 
-1. Si `headMemberId` no implica pertenencia al departamento, la UI debe decirlo claramente.
-2. Si el producto espera que el responsable también quede asignado al área, sincronizar `members.department_id` o exponer el flujo de asignación del miembro en la UI correspondiente.
-3. Alinear labels y documentación funcional para que “responsable” y “miembro del departamento” no se mezclen.
+1. `src/lib/hr-core/postgres-departments-store.ts` ahora sincroniza `greenhouse_core.members.department_id` cuando un departamento crea o cambia su `head_member_id`.
+2. `src/lib/reporting-hierarchy/org-chart.ts` ya no depende solo del snapshot `members.department_id`; si el responsable aún no está materializado ahí, usa el departamento encabezado por esa persona como fallback estructural en el organigrama.
 
 ## Verificación
 
-1. Asignar responsable a un departamento.
-2. Verificar si esa operación debe o no asignar también `department_id` al miembro.
-3. Validar que `Departamentos`, `Jerarquía`, `Organigrama` y ficha HR muestren el mismo resultado esperado.
+1. `pnpm exec vitest run src/lib/hr-core/postgres-departments-store.test.ts src/lib/reporting-hierarchy/org-chart.test.ts`
+2. `pnpm lint`
+3. `pnpm build`
 
 ## Estado
 
-open
+resolved
 
 ## Relacionado
 

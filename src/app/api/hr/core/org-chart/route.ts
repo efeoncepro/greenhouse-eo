@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { getHrOrgChart } from '@/lib/reporting-hierarchy/org-chart'
 import { requireHrCoreReadTenantContext, toHrCoreErrorResponse } from '@/lib/hr-core/shared'
-import { hasBroadHrOrgChartAccess, resolveHrLeaveAccessContext } from '@/lib/tenant/authorization'
+import { resolveHrOrgChartAccessContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,11 +14,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const hasBroadAccess = hasBroadHrOrgChartAccess(tenant)
-
-    const accessContext = hasBroadAccess
-      ? { accessMode: 'broad' as const, supervisorScope: null }
-      : await resolveHrLeaveAccessContext(tenant)
+    const accessContext = await resolveHrOrgChartAccessContext(tenant)
 
     if (!accessContext) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })

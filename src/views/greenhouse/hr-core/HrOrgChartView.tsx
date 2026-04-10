@@ -29,7 +29,7 @@ import dagre from 'dagre'
 
 import EmptyState from '@components/greenhouse/EmptyState'
 import { GH_COLORS, GH_HR_NAV } from '@/config/greenhouse-nomenclature'
-import type { HrOrgChartEdge, HrOrgChartNode, HrOrgChartResponse } from '@/types/hr-core'
+import type { HrOrgChartEdge, HrOrgChartMemberOption, HrOrgChartNode, HrOrgChartResponse } from '@/types/hr-core'
 import { getInitials } from '@/utils/getInitials'
 
 import OrgChartNodeCard, { type OrgChartNodeCardData, type OrgChartNodeCardNode } from '@/components/greenhouse/OrgChartNodeCard'
@@ -57,7 +57,7 @@ const buildLayout = ({
   nodes: HrOrgChartNode[]
   edges: HrOrgChartEdge[]
   focusedMemberId: string | null
-  onFocusMember: (memberId: string) => void
+  onFocusMember: (memberId: string | null) => void
 }) => {
   const graph = new dagre.graphlib.Graph()
 
@@ -71,7 +71,7 @@ const buildLayout = ({
   })
 
   nodes.forEach(node => {
-    graph.setNode(node.memberId, {
+    graph.setNode(node.nodeId, {
       width: NODE_WIDTH,
       height: NODE_HEIGHT
     })
@@ -84,10 +84,10 @@ const buildLayout = ({
   dagre.layout(graph)
 
   const layoutedNodes: OrgChartNodeCardNode[] = nodes.map(node => {
-    const layout = graph.node(node.memberId)
+    const layout = graph.node(node.nodeId)
 
     return {
-      id: node.memberId,
+      id: node.nodeId,
       type: 'orgChartNode',
       position: {
         x: layout.x - NODE_WIDTH / 2,
@@ -97,7 +97,7 @@ const buildLayout = ({
       targetPosition: Position.Top,
       data: {
         node,
-        isFocused: focusedMemberId === node.memberId,
+        isFocused: focusedMemberId != null && node.memberId === focusedMemberId,
         onFocusMember
       }
     }
@@ -126,7 +126,7 @@ const buildLayout = ({
   return { layoutedNodes, layoutedEdges }
 }
 
-const renderOption = (props: HTMLAttributes<HTMLLIElement>, option: HrOrgChartNode) => (
+const renderOption = (props: HTMLAttributes<HTMLLIElement>, option: HrOrgChartMemberOption) => (
   <li {...props}>
     <Stack direction='row' spacing={1.5} alignItems='center' sx={{ minWidth: 0, width: '100%' }}>
       <Avatar
@@ -239,7 +239,7 @@ const HrOrgChartView = () => {
       return null
     }
 
-    return payload.nodes.find(node => node.memberId === activeFocusMemberId) ?? null
+    return payload.nodes.find(node => node.nodeType === 'member' && node.memberId === activeFocusMemberId) ?? null
   }, [activeFocusMemberId, payload])
 
   const focusNodeName = selectedNode?.displayName ?? 'Selecciona una persona'
@@ -325,8 +325,8 @@ const HrOrgChartView = () => {
 
   const accessSubtitle =
     payload.accessMode === 'broad'
-      ? 'Exploras la jerarquía completa visible para tu perfil.'
-      : 'La vista se recorta al subárbol autorizado para tu alcance.'
+      ? 'Exploras la estructura organizacional completa visible para tu perfil.'
+      : 'La vista se recorta al subárbol organizacional visible para tu alcance.'
 
   return (
     <Stack spacing={4}>
@@ -338,7 +338,7 @@ const HrOrgChartView = () => {
             {refreshing ? <Chip size='small' label='Actualizando' color='info' variant='outlined' /> : null}
           </Stack>
           <Typography variant='body2' color='text.secondary'>
-            {GH_HR_NAV.orgChart.subtitle}
+            Estructura por áreas, responsables y adscripción vigente del equipo.
           </Typography>
           <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>
             {accessSubtitle}
@@ -359,6 +359,8 @@ const HrOrgChartView = () => {
 
       <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
         <Chip size='small' label={`${formatCount(payload.summary.totalNodes)} nodos`} variant='outlined' />
+        <Chip size='small' label={`${formatCount(payload.summary.departments)} áreas`} variant='outlined' />
+        <Chip size='small' label={`${formatCount(payload.summary.members)} personas`} variant='outlined' />
         <Chip size='small' label={`${formatCount(payload.summary.roots)} raíces`} variant='outlined' />
         <Chip size='small' label={`Profundidad ${payload.summary.maxDepth}`} variant='outlined' />
         <Chip size='small' label={`${formatCount(payload.summary.delegatedApprovals)} delegaciones`} variant='outlined' />
@@ -369,8 +371,8 @@ const HrOrgChartView = () => {
         <Grid size={{ xs: 12, lg: 8 }}>
           <Card sx={{ overflow: 'hidden' }}>
             <CardHeader
-              title='Mapa visual'
-              subheader='Usa zoom, pan y búsqueda para seguir la cadena sin perder el contexto.'
+              title='Mapa estructural'
+              subheader='Usa zoom, pan y búsqueda para seguir áreas, responsables y personas sin perder el contexto.'
               action={
                 <Button
                   size='small'
@@ -388,8 +390,12 @@ const HrOrgChartView = () => {
             <CardContent sx={{ p: 0 }}>
               <Box sx={{ p: 3, display: 'grid', gap: 2 }}>
                 <Autocomplete
-                  options={payload.nodes}
-                  value={selectedNode}
+                  options={payload.memberOptions}
+                  value={
+                    selectedNode?.memberId
+                      ? payload.memberOptions.find(option => option.memberId === selectedNode.memberId) ?? null
+                      : null
+                  }
                   onChange={(_, value) => handleFocusMember(value?.memberId ?? null)}
                   isOptionEqualToValue={(option, value) => option.memberId === value.memberId}
                   getOptionLabel={option => option.displayName}
@@ -400,7 +406,7 @@ const HrOrgChartView = () => {
                       {...params}
                       label='Buscar persona'
                       placeholder='Escribe un nombre o cargo'
-                      helperText='La búsqueda se ajusta al scope visible actual.'
+                      helperText='La búsqueda centra el mapa sobre las personas visibles y su área.'
                     />
                   )}
                 />
@@ -487,11 +493,12 @@ const HrOrgChartView = () => {
             <CardContent>
               {selectedNode ? (
                 <Stack spacing={2.25}>
-                  <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-                    {selectedNode.isCurrentMember ? <Chip size='small' label='Mi posición' color='primary' variant='outlined' /> : null}
-                    {selectedNode.isDirectReportToCurrentMember ? <Chip size='small' label='Reporte directo' color='success' variant='outlined' /> : null}
-                    {selectedNode.hasActiveDelegation ? <Chip size='small' label='Delegación activa' color='warning' variant='outlined' /> : null}
-                  </Stack>
+	                  <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+	                    {selectedNode.isCurrentMember ? <Chip size='small' label='Mi posición' color='primary' variant='outlined' /> : null}
+	                    {selectedNode.isDirectReportToCurrentMember ? <Chip size='small' label='Reporte directo' color='success' variant='outlined' /> : null}
+	                    {selectedNode.hasActiveDelegation ? <Chip size='small' label='Delegación activa' color='warning' variant='outlined' /> : null}
+	                    {selectedNode.isDepartmentHead ? <Chip size='small' label='Responsable de área' color='info' variant='outlined' /> : null}
+	                  </Stack>
 
                   <Box sx={{ display: 'grid', gap: 1.25, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
                     <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
@@ -502,14 +509,14 @@ const HrOrgChartView = () => {
                         {selectedNode.departmentName ?? 'Sin dato'}
                       </Typography>
                     </Box>
-                    <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
-                      <Typography variant='caption' color='text.secondary'>
-                        Supervisor
-                      </Typography>
-                      <Typography variant='body2' sx={{ mt: 0.25 }} noWrap title={selectedNode.supervisorName ?? 'Raíz visible'}>
-                        {selectedNode.supervisorName ?? 'Raíz visible'}
-                      </Typography>
-                    </Box>
+	                    <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
+	                      <Typography variant='caption' color='text.secondary'>
+	                        Área superior
+	                      </Typography>
+	                      <Typography variant='body2' sx={{ mt: 0.25 }} noWrap title={selectedNode.parentDepartmentName ?? 'Nivel raíz'}>
+	                        {selectedNode.parentDepartmentName ?? 'Nivel raíz'}
+	                      </Typography>
+	                    </Box>
                     <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
                       <Typography variant='caption' color='text.secondary'>
                         Régimen
@@ -518,38 +525,38 @@ const HrOrgChartView = () => {
                         {formatRegime(selectedNode.payRegime)}
                       </Typography>
                     </Box>
-                    <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
-                      <Typography variant='caption' color='text.secondary'>
-                        Ubicación
-                      </Typography>
-                      <Typography variant='body2' sx={{ mt: 0.25 }} noWrap title={selectedNode.locationCountry ?? 'Sin dato'}>
-                        {selectedNode.locationCountry ?? 'Sin dato'}
-                      </Typography>
-                    </Box>
-                  </Box>
+	                    <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
+	                      <Typography variant='caption' color='text.secondary'>
+	                        Supervisor formal
+	                      </Typography>
+	                      <Typography variant='body2' sx={{ mt: 0.25 }} noWrap title={selectedNode.supervisorName ?? 'Sin dato'}>
+	                        {selectedNode.supervisorName ?? 'Sin dato'}
+	                      </Typography>
+	                    </Box>
+	                  </Box>
 
-                  <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-                    <Chip size='small' label={`Directos ${formatCount(selectedNode.directReportsCount)}`} variant='outlined' />
-                    <Chip size='small' label={`Subárbol ${formatCount(selectedNode.subtreeSize)}`} variant='outlined' />
-                    <Chip size='small' label={`Profundidad ${selectedNode.depth}`} variant='outlined' />
-                  </Stack>
+	                  <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+	                    <Chip size='small' label={`Directos ${formatCount(selectedNode.directReportsCount)}`} variant='outlined' />
+	                    <Chip size='small' label={`Área ${selectedNode.departmentName ?? 'Sin dato'}`} variant='outlined' />
+	                    <Chip size='small' label={`Profundidad ${selectedNode.depth}`} variant='outlined' />
+	                  </Stack>
 
-                  <Box>
-                    <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 1 }}>
-                      Cadena ascendente
-                    </Typography>
-                    <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-                      {payload.breadcrumbs.map(crumb => (
-                        <Chip
-                          key={crumb.memberId}
-                          label={crumb.displayName}
-                          size='small'
-                          variant={crumb.memberId === selectedNode.memberId ? 'filled' : 'outlined'}
-                          color={crumb.memberId === selectedNode.memberId ? 'primary' : 'default'}
-                          clickable
-                          onClick={() => handleFocusMember(crumb.memberId)}
-                        />
-                      ))}
+	                  <Box>
+	                    <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 1 }}>
+	                      Ruta estructural
+	                    </Typography>
+	                    <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+	                      {payload.breadcrumbs.map(crumb => (
+	                        <Chip
+	                          key={crumb.nodeId}
+	                          label={crumb.label}
+	                          size='small'
+	                          variant={crumb.memberId === selectedNode.memberId ? 'filled' : 'outlined'}
+	                          color={crumb.memberId === selectedNode.memberId ? 'primary' : 'default'}
+	                          clickable={Boolean(crumb.memberId)}
+	                          onClick={() => handleFocusMember(crumb.memberId)}
+	                        />
+	                      ))}
                     </Stack>
                   </Box>
 

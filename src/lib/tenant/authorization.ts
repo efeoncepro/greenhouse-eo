@@ -140,6 +140,28 @@ export const resolveHrLeaveAccessContext = async (
   return null
 }
 
+export const resolveHrOrgChartAccessContext = async (
+  tenant: TenantContext
+): Promise<DerivedTenantAccessContext | null> => {
+  if (hasBroadHrOrgChartAccess(tenant)) {
+    return {
+      accessMode: 'broad',
+      supervisorScope: null
+    }
+  }
+
+  const supervisorScope = await getSupervisorScopeForTenant(tenant).catch(() => null)
+
+  if (supervisorScope?.canAccessSupervisorPeople) {
+    return {
+      accessMode: 'supervisor',
+      supervisorScope
+    }
+  }
+
+  return null
+}
+
 export const requireMyTenantContext = async (): Promise<{
   tenant: TenantContext | null
   memberId: string | null

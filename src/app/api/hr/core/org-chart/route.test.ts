@@ -1,8 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockRequireHrCoreReadTenantContext = vi.fn()
-const mockHasBroadHrOrgChartAccess = vi.fn()
-const mockResolveHrLeaveAccessContext = vi.fn()
+const mockResolveHrOrgChartAccessContext = vi.fn()
 const mockGetHrOrgChart = vi.fn()
 
 vi.mock('@/lib/hr-core/shared', () => ({
@@ -15,8 +14,7 @@ vi.mock('@/lib/hr-core/shared', () => ({
 }))
 
 vi.mock('@/lib/tenant/authorization', () => ({
-  hasBroadHrOrgChartAccess: (...args: unknown[]) => mockHasBroadHrOrgChartAccess(...args),
-  resolveHrLeaveAccessContext: (...args: unknown[]) => mockResolveHrLeaveAccessContext(...args)
+  resolveHrOrgChartAccessContext: (...args: unknown[]) => mockResolveHrOrgChartAccessContext(...args)
 }))
 
 vi.mock('@/lib/reporting-hierarchy/org-chart', () => ({
@@ -42,8 +40,7 @@ describe('GET /api/hr/core/org-chart', () => {
   })
 
   it('returns the org chart for a supervisor-scoped user', async () => {
-    mockHasBroadHrOrgChartAccess.mockReturnValue(false)
-    mockResolveHrLeaveAccessContext.mockResolvedValue({
+    mockResolveHrOrgChartAccessContext.mockResolvedValue({
       accessMode: 'supervisor',
       supervisorScope: {
         memberId: 'member-1',
@@ -57,8 +54,11 @@ describe('GET /api/hr/core/org-chart', () => {
       nodes: [],
       edges: [],
       breadcrumbs: [],
+      memberOptions: [],
       summary: {
         totalNodes: 2,
+        departments: 1,
+        members: 1,
         roots: 1,
         maxDepth: 1,
         delegatedApprovals: 0
@@ -78,8 +78,7 @@ describe('GET /api/hr/core/org-chart', () => {
   })
 
   it('returns 403 when the user has neither broad nor supervisor access', async () => {
-    mockHasBroadHrOrgChartAccess.mockReturnValue(false)
-    mockResolveHrLeaveAccessContext.mockResolvedValue(null)
+    mockResolveHrOrgChartAccessContext.mockResolvedValue(null)
 
     const response = await GET(new Request('http://localhost/api/hr/core/org-chart'))
     const body = await response.json()

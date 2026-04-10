@@ -1,5 +1,17 @@
 # project_context.md
 
+## Delta 2026-04-10 Organigrama structural-first over departments
+
+- `HR > Organigrama` ya no debe entenderse como una vista visual de `reporting_lines`.
+- Regla operativa nueva:
+  - el organigrama estructural usa `greenhouse_core.departments.parent_department_id` como eje del árbol
+  - los miembros se cuelgan de `greenhouse_core.members.department_id`
+  - `departments.head_member_id` identifica liderazgo de área y además sincroniza la adscripción del responsable en el write lane de departamentos
+  - la supervisoría formal sigue visible como metadata del miembro, pero no define las aristas del grafo estructural
+- Acceso:
+  - broad HR/admin sigue viendo la estructura completa
+  - supervisoría limitada sigue viendo solo las personas y áreas visibles de su scope, con ancestros estructurales incluidos para no romper contexto
+
 ## Delta 2026-04-10 Org chart explorer materialized on canonical reporting hierarchy
 
 - La capability de jerarquía ya no se agota en la superficie admin `/hr/hierarchy`; ahora tiene una surface visual de lectura:

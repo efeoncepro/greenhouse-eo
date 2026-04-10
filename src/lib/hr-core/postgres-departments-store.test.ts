@@ -100,6 +100,7 @@ describe('postgres-departments-store', () => {
       .mockResolvedValueOnce({ rows: [] })
       .mockResolvedValueOnce({ rows: [{ member_id: 'member-1' }] })
       .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [], rowCount: 1 })
       .mockResolvedValueOnce({
         rows: [
           {
@@ -134,6 +135,10 @@ describe('postgres-departments-store', () => {
       String(call[0]).includes('INSERT INTO greenhouse_core.departments')
     )
 
+    const syncHeadCall = mockClientQuery.mock.calls.find(call =>
+      String(call[0]).includes('UPDATE greenhouse_core.members') && String(call[0]).includes('department_id = $2')
+    )
+
     expect(insertCall?.[1]).toEqual([
       'creative-team',
       'Creative Team',
@@ -144,6 +149,7 @@ describe('postgres-departments-store', () => {
       true,
       1
     ])
+    expect(syncHeadCall?.[1]).toEqual(['member-1', 'creative-team'])
   })
 
   it('updates department relations in Postgres after validating the new head member', async () => {
@@ -166,6 +172,7 @@ describe('postgres-departments-store', () => {
         ]
       })
       .mockResolvedValueOnce({ rows: [{ member_id: 'member-2' }] })
+      .mockResolvedValueOnce({ rows: [], rowCount: 1 })
       .mockResolvedValueOnce({ rows: [], rowCount: 1 })
       .mockResolvedValueOnce({
         rows: [
@@ -198,7 +205,45 @@ describe('postgres-departments-store', () => {
       String(call[0]).includes('UPDATE greenhouse_core.departments')
     )
 
+    const syncHeadCall = mockClientQuery.mock.calls.find(call =>
+      String(call[0]).includes('UPDATE greenhouse_core.members') && String(call[0]).includes('department_id = $2')
+    )
+
     expect(String(updateCall?.[0])).toContain('head_member_id')
     expect(updateCall?.[1]?.[0]).toBe('creative-team')
+    expect(syncHeadCall?.[1]).toEqual(['member-2', 'creative-team'])
+  })
+
+  it('rejects updates that would create a department cycle', async () => {
+    mockQuery.mockResolvedValueOnce(REQUIRED_TABLES)
+
+    mockClientQuery
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            department_id: 'creative-team',
+            name: 'Creative Team',
+            description: null,
+            parent_department_id: null,
+            head_member_id: null,
+            head_member_name: null,
+            business_unit: 'globe',
+            active: true,
+            sort_order: 1
+          }
+        ]
+      })
+      .mockResolvedValueOnce({ rows: [{ department_id: 'design-studio' }] })
+      .mockResolvedValueOnce({ rows: [{ parent_department_id: 'creative-team' }] })
+
+    const { updateDepartmentInPostgres } = await loadStore()
+
+    await expect(
+      updateDepartmentInPostgres('creative-team', {
+        parentDepartmentId: 'design-studio'
+      })
+    ).rejects.toMatchObject({
+      message: 'A department cannot become a descendant of itself.'
+    })
   })
 })
