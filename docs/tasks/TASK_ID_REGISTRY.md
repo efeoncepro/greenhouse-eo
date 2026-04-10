@@ -374,7 +374,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-322` | `to-do` | Enriquecer Cuentas Detail con tabs operativas y deprecar Tenant Detail legacy | `docs/tasks/to-do/TASK-322-admin-tenant-detail-ui-overhaul.md` |
 | `TASK-323` | `to-do` | Programa enterprise de jerarquias, supervisoria y permisos de aprobacion | `docs/tasks/to-do/TASK-323-hierarchy-supervisor-approval-program.md` |
 | `TASK-324` | `complete` | Modelo canonico de jerarquia de reporte, historial y delegaciones | `docs/tasks/complete/TASK-324-reporting-hierarchy-foundation.md` |
-| `TASK-325` | `to-do` | Admin de jerarquias: CRUD, reasignaciones y auditoria | `docs/tasks/to-do/TASK-325-hierarchy-admin-crud-audit.md` |
+| `TASK-325` | `complete` | Admin de jerarquias: CRUD, reasignaciones y auditoria | `docs/tasks/complete/TASK-325-hierarchy-admin-crud.md` |
 | `TASK-326` | `to-do` | Autoridad de aprobacion por dominio y snapshots de workflow | `docs/tasks/to-do/TASK-326-approval-authority-workflow-snapshots.md` |
 | `TASK-327` | `to-do` | Supervisor scope: acceso subtree-aware y visibilidad limitada | `docs/tasks/to-do/TASK-327-supervisor-scope-subtree-access.md` |
 | `TASK-328` | `to-do` | Workspace de supervisor: Mi equipo y cola de aprobaciones | `docs/tasks/to-do/TASK-328-supervisor-workspace-my-team.md` |

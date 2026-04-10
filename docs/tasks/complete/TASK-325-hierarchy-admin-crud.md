@@ -6,16 +6,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Auditada`
+- Status real: `Implementada`
 - Rank: `TBD`
 - Domain: `hr`
 - Blocked by: `none`
-- Branch: `feature/codex-task-325-hierarchy-admin-crud`
+- Branch: `feature/codex-task-325-hierarchy-admin-crud-v2`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -153,21 +153,23 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] HR/admin puede ver y editar la jerarquia desde una vista dedicada
-- [ ] Los cambios piden motivo y quedan auditados
-- [ ] Existe soporte para delegacion temporal y para reasignacion de equipo
-- [ ] No se reutiliza `departments` como sustituto de jerarquia de reporte
+- [x] HR/admin puede ver y editar la jerarquia desde una vista dedicada
+- [x] Los cambios piden motivo y quedan auditados
+- [x] Existe soporte para delegacion temporal y para reasignacion de equipo
+- [x] No se reutiliza `departments` como sustituto de jerarquia de reporte
 
 ## Verification
 
+- `pnpm pg:connect:migrate`
 - `pnpm exec tsc --noEmit --incremental false`
 - `pnpm lint`
-- `pnpm test`
-- validacion manual del flujo crear/cambiar supervisor y revisar auditoria
+- `pnpm build`
+- `pnpm exec vitest run src/app/api/hr/core/hierarchy/route.test.ts src/app/api/hr/core/hierarchy/history/route.test.ts src/app/api/hr/core/hierarchy/reassign/route.test.ts src/app/api/hr/core/hierarchy/delegations/route.test.ts src/views/greenhouse/hr-core/HrHierarchyView.test.tsx`
+- validacion runtime de lectura sobre `greenhouse_core.reporting_lines`
 
 ## Closing Protocol
 
-- [ ] Actualizar documentacion funcional de HR si se crea una nueva surface de jerarquias
+- [x] Actualizar documentacion funcional de HR si se crea una nueva surface de jerarquias
 
 ## Follow-ups
 

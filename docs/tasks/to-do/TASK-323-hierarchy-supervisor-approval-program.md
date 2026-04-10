@@ -98,7 +98,7 @@ Reglas obligatorias:
 ### Files owned
 
 - `docs/tasks/to-do/TASK-324-reporting-hierarchy-foundation.md`
-- `docs/tasks/to-do/TASK-325-hierarchy-admin-crud-audit.md`
+- `docs/tasks/complete/TASK-325-hierarchy-admin-crud.md`
 - `docs/tasks/to-do/TASK-326-approval-authority-workflow-snapshots.md`
 - `docs/tasks/to-do/TASK-327-supervisor-scope-subtree-access.md`
 - `docs/tasks/to-do/TASK-328-supervisor-workspace-my-team.md`
