@@ -1,7 +1,8 @@
 # Greenhouse EO — Commercial Quotation Module Architecture V1
 
-> **Version:** 1.0
+> **Version:** 2.0
 > **Created:** 2026-04-09
+> **Updated:** 2026-04-09 — v2.0: approval workflow, capacity check, revenue pipeline, profitability tracking, renewal lifecycle, terms library, audit trail, quote templates
 > **Audience:** Backend engineers, product owners, agents implementing quotation features
 > **Related:** `GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`, `GREENHOUSE_COMMERCIAL_COST_ATTRIBUTION_V1.md`, `GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`
 
@@ -18,6 +19,9 @@ El modulo de cotizaciones es el puente entre **lo que cuesta operar** (payroll, 
 3. **El catalogo es local-first** — productos viven en PG con sync opcional a HubSpot. No depender del CRM para cotizar.
 4. **La cotizacion genera la cadena documental** — Cotizacion → OC → HES → Factura. Cada eslabon tiene su lifecycle independiente.
 5. **Descuentos saludables por construccion** — el sistema calcula el impacto del descuento sobre el margen y bloquea o alerta antes de generar perdida.
+6. **Aprobacion por excepcion, no por regla** — el flujo default no requiere aprobacion. Solo se activan steps de aprobacion cuando una condicion (margen debajo del floor, monto alto, descuento agresivo) lo dispara.
+7. **Cotizado vs ejecutado siempre visible** — el sistema compara lo que se prometio con lo que se entrego. El margin drift es un KPI de primer nivel.
+8. **Templates para velocidad, catalogo para consistencia** — las cotizaciones frecuentes parten de templates predefinidos; los line items se arman desde un catalogo unificado con HubSpot.
 
 ---
 
@@ -677,80 +681,627 @@ El sistema detecta cual rama aplica segun si `purchase_orders` tiene registros p
 
 ---
 
-## 12. Eventos outbox
+## 12. Approval workflow (v2)
+
+### 12.1. Modelo: aprobacion por excepcion
+
+El flujo default no requiere aprobacion — un Account Lead crea, edita y envia. Los approval steps se activan solo cuando una condicion de riesgo lo dispara.
+
+```
+Draft ──→ [health check] ──→ Sin alertas bloqueantes ──→ Enviada
+                │
+                └── Alerta bloqueante detectada ──→ Pending Approval
+                                                        │
+                         ┌──────────────────────────────┤
+                         ↓                              ↓
+                    Step 1: Finance              Step 2: Efeonce Admin
+                    (margen < floor)             (monto > threshold)
+                         │                              │
+                    Aprobado / Rechazado          Aprobado / Rechazado
+                         │                              │
+                         └──────── Todos aprobados ─────┘
+                                        │
+                                   Enviada
+```
+
+### 12.2. Tablas
+
+```sql
+CREATE TABLE greenhouse_commercial.approval_policies (
+  policy_id          TEXT PRIMARY KEY DEFAULT 'ap-' || gen_random_uuid(),
+  business_line_code TEXT,                   -- null = aplica a todas las BL
+  pricing_model      TEXT,                   -- null = aplica a todos los modelos
+  condition_type     TEXT NOT NULL CHECK (condition_type IN (
+    'margin_below_floor', 'margin_below_target', 'amount_above_threshold',
+    'discount_above_threshold', 'always'
+  )),
+  threshold_value    NUMERIC(14,2),          -- monto o % segun condition
+  required_role      TEXT NOT NULL,          -- 'finance' | 'efeonce_admin'
+  step_order         INTEGER NOT NULL DEFAULT 1,
+  active             BOOLEAN NOT NULL DEFAULT TRUE,
+  created_by         TEXT NOT NULL,
+  created_at         TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at         TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE greenhouse_commercial.approval_steps (
+  step_id          TEXT PRIMARY KEY DEFAULT 'as-' || gen_random_uuid(),
+  quotation_id     TEXT NOT NULL REFERENCES greenhouse_commercial.quotations(quotation_id),
+  version_number   INTEGER NOT NULL,
+  policy_id        TEXT REFERENCES greenhouse_commercial.approval_policies(policy_id),
+  step_order       INTEGER NOT NULL,
+  required_role    TEXT NOT NULL,
+  assigned_to      TEXT,                     -- user_id especifico (nullable = cualquiera con el rol)
+  condition_label  TEXT NOT NULL,            -- "Margen 18% por debajo del floor 20%"
+  status           TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected', 'skipped')),
+  decided_by       TEXT,
+  decided_at       TIMESTAMPTZ,
+  notes            TEXT,
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_approval_steps_quotation ON greenhouse_commercial.approval_steps (quotation_id, version_number);
+CREATE INDEX idx_approval_steps_pending ON greenhouse_commercial.approval_steps (status) WHERE status = 'pending';
+```
+
+### 12.3. Evaluacion de approval
+
+Al intentar enviar una cotizacion, el sistema:
+1. Ejecuta el discount health check
+2. Busca `approval_policies` que apliquen a esta BL + modelo
+3. Evalua cada condicion contra los totales de la cotizacion
+4. Si alguna condicion se cumple, crea `approval_steps` y pone la cotizacion en `status = 'pending_approval'`
+5. Notifica a los aprobadores (evento outbox + in-app notification)
+6. Cuando todos los steps estan `approved`, la cotizacion pasa a `sent` automaticamente
+
+Si un step es `rejected`, la cotizacion vuelve a `draft` con las notas del aprobador visibles.
+
+---
+
+## 13. Capacity check (v2)
+
+### 13.1. Verificacion al asignar personas
+
+Al agregar un `line_type: 'person'` con `member_id`, el sistema consulta assignments activos y capacity economics:
+
+```typescript
+interface CapacityCheckResult {
+  memberId: string
+  memberName: string
+  currentFteAllocated: number        // suma de assignments activos
+  maxFte: number                     // tipicamente 1.0
+  availableFte: number               // maxFte - currentFteAllocated
+  requestedFte: number               // lo que pide esta cotizacion
+  feasible: boolean                  // availableFte >= requestedFte
+  overallocationPct: number | null   // si no es feasible, cuanto excede
+  conflicts: CapacityConflict[]
+}
+
+interface CapacityConflict {
+  spaceId: string
+  spaceName: string
+  organizationName: string | null
+  fteAllocation: number
+  assignmentEndDate: string | null   // null = indefinido
+  isTemporary: boolean               // true si tiene end date
+}
+```
+
+### 13.2. Comportamiento
+
+| Resultado | UI | Bloqueo |
+|-----------|-----|---------|
+| `feasible = true` | Check verde | No |
+| `feasible = false`, conflictos temporales que terminan antes del inicio de esta cotizacion | Warning amarillo: "Disponible a partir de {fecha}" | No |
+| `feasible = false`, conflictos indefinidos | Warning rojo: "Sobre-asignacion de {X}% — {N} conflicto(s) activos" | No (warning, no bloqueo) |
+
+No se bloquea la cotizacion por sobre-asignacion — el comercial puede tener razones (rotacion planificada, ramp-down en otro cliente). Pero la informacion es visible y queda registrada.
+
+### 13.3. Fuentes de datos
+
+- `greenhouse_core.assignments` — assignments activos con FTE allocation
+- `greenhouse_hr.member_capacity_economics` — costo loaded y horas contratadas
+- No se crea tabla nueva — es query-time
+
+### 13.4. Sinergia con modulos existentes
+
+- **Space 360 TeamTab:** misma data de capacity, misma fuente
+- **Agency Staffing Engine:** el staffing engine ya calcula gaps por servicio; la cotizacion consume el mismo calculo
+- **Payroll:** no comprometer personas cuyo costo no se puede cubrir
+
+---
+
+## 14. Revenue pipeline y forecast (v2)
+
+### 14.1. Pipeline como projection reactiva
+
+El pipeline de revenue se materializa como una projection reactiva (mismo patron que `commercial_cost_attribution`):
+
+```sql
+CREATE TABLE greenhouse_commercial.revenue_pipeline (
+  pipeline_id          TEXT PRIMARY KEY DEFAULT 'rp-' || gen_random_uuid(),
+  quotation_id         TEXT NOT NULL REFERENCES greenhouse_commercial.quotations(quotation_id),
+  organization_id      TEXT NOT NULL,
+  organization_name    TEXT,
+  business_line_code   TEXT NOT NULL,
+  pricing_model        TEXT NOT NULL,
+  currency             TEXT NOT NULL,
+  status               TEXT NOT NULL,
+
+  -- Valores
+  total_price          NUMERIC(14,2) NOT NULL,
+  probability_pct      NUMERIC(5,2) NOT NULL,
+  weighted_value       NUMERIC(14,2) NOT NULL,   -- total_price * probability_pct / 100
+  monthly_recurring    NUMERIC(14,2),             -- para retainers: total_price (ya es mensual)
+  contract_total       NUMERIC(14,2),             -- total_price * duration meses (o total proyecto)
+  expected_close_date  DATE,
+
+  -- Tracking
+  days_in_current_stage INTEGER,
+  created_at           TIMESTAMPTZ NOT NULL,       -- de la cotizacion
+  last_status_change   TIMESTAMPTZ,
+  materialized_at      TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_pipeline_org ON greenhouse_commercial.revenue_pipeline (organization_id);
+CREATE INDEX idx_pipeline_bl ON greenhouse_commercial.revenue_pipeline (business_line_code);
+CREATE INDEX idx_pipeline_status ON greenhouse_commercial.revenue_pipeline (status);
+```
+
+### 14.2. Probabilidades por status
+
+| Status | Probabilidad | Logica |
+|--------|-------------|--------|
+| `draft` | 10% | Intento inicial, puede no enviarse |
+| `pending_approval` | 20% | En revision interna |
+| `sent` | 30% | Enviada, esperando respuesta |
+| `approved` (sin OC) | 80% | Aprobada pero sin documento formal |
+| OC recibida (`purchase_orders` exists) | 95% | Compromiso formal del cliente |
+| `converted` | 100% | Servicio activo |
+| `rejected` / `expired` | 0% | Perdida |
+
+### 14.3. Dashboard de pipeline
+
+El pipeline alimenta un dashboard con:
+- **Pipeline total ponderado** por mes/quarter
+- **Pipeline por BL** (Wave, Globe, Reach, Efeonce Digital)
+- **Conversion funnel** por etapa (cuantas pasan de sent → approved → converted)
+- **Aging** de cotizaciones (dias promedio en cada estado)
+- **Forecast vs actual** — pipeline proyectado vs revenue facturado real
+
+### 14.4. Projection event triggers
+
+La projection se rematerializa cuando cambian:
+- `commercial.quotation.created/sent/approved/rejected/expired/converted`
+- `commercial.purchase_order.received`
+- `commercial.quotation.version_created` (puede cambiar amount)
+
+---
+
+## 15. Profitability tracking: cotizado vs ejecutado (v2)
+
+### 15.1. Proposito
+
+El margin drift — la diferencia entre el margen cotizado y el margen real ejecutado — es un KPI de primer nivel que hoy no existe en ningun modulo. El profitability tracker cierra ese gap.
+
+### 15.2. Tabla
+
+```sql
+CREATE TABLE greenhouse_commercial.profitability_tracking (
+  tracking_id         TEXT PRIMARY KEY DEFAULT 'pt-' || gen_random_uuid(),
+  quotation_id        TEXT NOT NULL REFERENCES greenhouse_commercial.quotations(quotation_id),
+  organization_id     TEXT NOT NULL,
+  business_line_code  TEXT NOT NULL,
+  period_year         INTEGER NOT NULL,
+  period_month        INTEGER NOT NULL,
+
+  -- Cotizado (snapshot de la version aprobada)
+  quoted_price        NUMERIC(14,2) NOT NULL,
+  quoted_cost         NUMERIC(14,2) NOT NULL,
+  quoted_margin_pct   NUMERIC(5,2) NOT NULL,
+  quoted_hours        NUMERIC(8,2),
+  quoted_headcount    INTEGER,
+
+  -- Ejecutado (desde finance + cost attribution)
+  actual_revenue      NUMERIC(14,2),          -- desde finance.income
+  actual_cost         NUMERIC(14,2),          -- desde commercial_cost_attribution
+  actual_margin_pct   NUMERIC(5,2),
+  actual_hours        NUMERIC(8,2),           -- desde time tracking / ICO
+  actual_headcount    INTEGER,                -- desde assignments activos
+
+  -- Drift
+  margin_drift_pct    NUMERIC(5,2),           -- actual_margin - quoted_margin
+  revenue_drift_pct   NUMERIC(5,2),
+  cost_drift_pct      NUMERIC(5,2),
+  hours_drift_pct     NUMERIC(5,2),
+
+  -- Diagnostico
+  drift_drivers       JSONB,                  -- causas identificadas automaticamente
+  drift_severity      TEXT CHECK (drift_severity IN ('on_track', 'minor_drift', 'significant_drift', 'critical')),
+
+  materialized_at     TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (quotation_id, period_year, period_month)
+);
+
+CREATE INDEX idx_profitability_org ON greenhouse_commercial.profitability_tracking (organization_id, period_year, period_month);
+CREATE INDEX idx_profitability_severity ON greenhouse_commercial.profitability_tracking (drift_severity) WHERE drift_severity IN ('significant_drift', 'critical');
+```
+
+### 15.3. Drift drivers (diagnostico automatico)
+
+El sistema identifica automaticamente las causas del drift:
+
+```typescript
+type DriftDriver =
+  | { type: 'headcount_change'; detail: string; impact_pct: number }    // rotacion de persona
+  | { type: 'rate_mismatch'; detail: string; impact_pct: number }       // tarifa real != cotizada
+  | { type: 'scope_creep'; detail: string; impact_pct: number }         // horas reales > cotizadas
+  | { type: 'fx_variance'; detail: string; impact_pct: number }         // tipo de cambio se movio
+  | { type: 'overhead_increase'; detail: string; impact_pct: number }   // overhead subio
+  | { type: 'discount_absorbed'; detail: string; impact_pct: number }   // descuento mayor al planeado
+```
+
+### 15.4. Severity rules
+
+| Condicion | Severity | Accion |
+|-----------|----------|--------|
+| `|margin_drift| <= 3pp` | `on_track` | Solo informativo |
+| `3pp < |margin_drift| <= 8pp` | `minor_drift` | Warning en dashboard |
+| `8pp < |margin_drift| <= 15pp` | `significant_drift` | Alerta a Account Lead + Finance |
+| `|margin_drift| > 15pp` | `critical` | Alerta critica, requiere plan de accion |
+
+### 15.5. Materialization trigger
+
+Projection reactiva que se rematerializa:
+- Al cierre de cada periodo de payroll (`payroll_period.calculated`)
+- Al registrar income para el cliente (`finance.income.created`)
+- Al cambiar assignments del cliente (`assignment.created/updated`)
+
+---
+
+## 16. Renewal lifecycle (v2)
+
+### 16.1. Campos adicionales en quotations
+
+```sql
+ALTER TABLE greenhouse_commercial.quotations ADD COLUMN
+  renewal_of_quotation_id TEXT REFERENCES greenhouse_commercial.quotations(quotation_id);
+ALTER TABLE greenhouse_commercial.quotations ADD COLUMN
+  renewal_alert_days INTEGER DEFAULT 60;
+ALTER TABLE greenhouse_commercial.quotations ADD COLUMN
+  auto_generate_renewal BOOLEAN DEFAULT FALSE;
+```
+
+### 16.2. Flujo de renovacion
+
+```
+Cotizacion converted (status = 'converted')
+  │
+  ├── T-60 dias de valid_until
+  │     → Evento: commercial.quotation.renewal_due
+  │     → Notification a Account Lead: "Retainer Sky Airline vence en 60 dias"
+  │
+  ├── T-30 dias (si auto_generate_renewal = true)
+  │     → Crear draft de renovacion automaticamente:
+  │        - Clona line items de la version vigente
+  │        - Aplica escalamiento (IPC o negociado)
+  │        - Establece renewal_of_quotation_id = cotizacion original
+  │        - Notifica al Account Lead: "Borrador de renovacion creado"
+  │
+  └── T-0 (valid_until alcanzado sin renovacion)
+        → Evento: commercial.quotation.expired_without_renewal
+        → Alerta critica a Account Lead + Finance
+        → Cotizacion original pasa a status = 'expired'
+```
+
+### 16.3. Cron job
+
+Procesado por el ops-worker como scheduled job:
+
+```
+POST /api/cron/commercial-renewal-check
+  → Busca: status = 'converted' AND valid_until BETWEEN NOW() AND NOW() + max(renewal_alert_days)
+  → Para cada match:
+    - Si days_until_expiry <= renewal_alert_days AND no hay renewal draft ya creado:
+      publicar commercial.quotation.renewal_due
+    - Si days_until_expiry <= 30 AND auto_generate_renewal AND no hay renewal draft:
+      crear draft de renovacion
+    - Si days_until_expiry <= 0:
+      marcar expired, publicar commercial.quotation.expired_without_renewal
+```
+
+---
+
+## 17. Terms & conditions library (v2)
+
+### 17.1. Tabla
+
+```sql
+CREATE TABLE greenhouse_commercial.terms_library (
+  term_id            TEXT PRIMARY KEY DEFAULT 'tm-' || gen_random_uuid(),
+  term_code          TEXT NOT NULL UNIQUE,    -- 'payment_30d', 'replacement_15d', 'scope_change'
+  category           TEXT NOT NULL CHECK (category IN ('payment', 'delivery', 'legal', 'staffing', 'sla', 'general')),
+  title              TEXT NOT NULL,           -- "Condiciones de pago"
+  body_template      TEXT NOT NULL,           -- "Facturacion mensual anticipada. Pago a {{payment_terms_days}} dias."
+  applies_to_model   TEXT,                    -- 'staff_aug' | 'retainer' | 'project' | null (todas)
+  default_for_bl     TEXT[],                  -- BLs donde se incluye por defecto (ej: {'EO-BL-WAVE', 'EO-BL-GLOBE'})
+  required           BOOLEAN NOT NULL DEFAULT FALSE, -- no se puede quitar de la cotizacion
+  sort_order         INTEGER NOT NULL DEFAULT 100,
+  active             BOOLEAN NOT NULL DEFAULT TRUE,
+  version            INTEGER NOT NULL DEFAULT 1,
+  created_by         TEXT NOT NULL,
+  created_at         TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at         TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE greenhouse_commercial.quotation_terms (
+  quotation_term_id  TEXT PRIMARY KEY DEFAULT 'qt-' || gen_random_uuid(),
+  quotation_id       TEXT NOT NULL REFERENCES greenhouse_commercial.quotations(quotation_id),
+  term_id            TEXT NOT NULL REFERENCES greenhouse_commercial.terms_library(term_id),
+  body_resolved      TEXT NOT NULL,           -- template con variables reemplazadas
+  sort_order         INTEGER NOT NULL,
+  included           BOOLEAN NOT NULL DEFAULT TRUE, -- false = excluido por el comercial
+  created_at         TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_quotation_terms_qt ON greenhouse_commercial.quotation_terms (quotation_id);
+```
+
+### 17.2. Flujo
+
+1. Al crear cotizacion, el sistema precarga `terms_library` donde `active = true` AND (`applies_to_model` = pricing_model OR null) AND (business_line_code IN `default_for_bl` OR `default_for_bl` is null)
+2. Resuelve variables del template: `{{payment_terms_days}}` → 30, `{{contract_duration}}` → "12 meses"
+3. El comercial puede quitar terminos no-required (`included = false`), reordenar, o agregar terminos adicionales
+4. Los terminos `required = true` no se pueden excluir
+5. El PDF renderiza solo los terminos con `included = true`, ordenados por `sort_order`
+
+### 17.3. Variables de template disponibles
+
+| Variable | Fuente |
+|----------|--------|
+| `{{payment_terms_days}}` | `quotations.payment_terms_days` |
+| `{{contract_duration}}` | `quotations.contract_duration_months` + " meses" |
+| `{{billing_frequency}}` | "mensual" / "por hito" / "unico" |
+| `{{valid_until}}` | `quotations.valid_until` formateado |
+| `{{organization_name}}` | Nombre de la organizacion |
+| `{{escalation_pct}}` | `quotations.escalation_pct` + "%" |
+
+---
+
+## 18. Audit trail (v2)
+
+### 18.1. Tabla
+
+```sql
+CREATE TABLE greenhouse_commercial.quotation_audit_log (
+  log_id           TEXT PRIMARY KEY DEFAULT 'al-' || gen_random_uuid(),
+  quotation_id     TEXT NOT NULL REFERENCES greenhouse_commercial.quotations(quotation_id),
+  action           TEXT NOT NULL CHECK (action IN (
+    'created', 'updated', 'status_changed',
+    'line_item_added', 'line_item_updated', 'line_item_removed',
+    'discount_changed', 'terms_changed',
+    'version_created', 'pdf_generated', 'sent',
+    'approval_requested', 'approval_decided',
+    'po_received', 'hes_received', 'invoice_triggered',
+    'renewal_generated', 'expired'
+  )),
+  actor_user_id    TEXT NOT NULL,
+  actor_name       TEXT NOT NULL,
+  details          JSONB NOT NULL DEFAULT '{}',
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_audit_quotation ON greenhouse_commercial.quotation_audit_log (quotation_id, created_at DESC);
+CREATE INDEX idx_audit_actor ON greenhouse_commercial.quotation_audit_log (actor_user_id);
+```
+
+### 18.2. Que se registra
+
+| Accion | details JSONB |
+|--------|--------------|
+| `line_item_updated` | `{ lineItemId, field: 'unit_price', old: 85, new: 80, currency: 'USD' }` |
+| `discount_changed` | `{ level: 'item', lineItemId, discountType: 'percentage', old: 5, new: 10 }` |
+| `status_changed` | `{ from: 'draft', to: 'sent' }` |
+| `approval_decided` | `{ stepId, decision: 'approved', notes: '...' }` |
+| `version_created` | `{ fromVersion: 1, toVersion: 2, totalPriceDelta: 3100, marginDelta: -4.1 }` |
+
+### 18.3. Diferencia con outbox y versionamiento
+
+| Mecanismo | Proposito | Granularidad | Inmutable |
+|-----------|----------|--------------|-----------|
+| **Outbox events** | Trigger consumers (notifications, sync) | Por evento de negocio | Si |
+| **Versions** | Snapshot completo para comparar | Por version (v1, v2...) | Si |
+| **Audit log** | Registro de quien cambio que y cuando | Por campo editado | Si |
+
+Los tres coexisten — cada uno sirve un proposito distinto.
+
+---
+
+## 19. Quote templates (v2)
+
+### 19.1. Tablas
+
+```sql
+CREATE TABLE greenhouse_commercial.quote_templates (
+  template_id            TEXT PRIMARY KEY DEFAULT 'tmpl-' || gen_random_uuid(),
+  template_name          TEXT NOT NULL,        -- "Retainer creativo Globe 80h"
+  template_code          TEXT NOT NULL UNIQUE,  -- "TMPL-RETAINER-GLOBE-80H"
+  business_line_code     TEXT,
+  pricing_model          TEXT NOT NULL CHECK (pricing_model IN ('staff_aug', 'retainer', 'project')),
+  default_currency       TEXT NOT NULL DEFAULT 'CLP',
+  default_billing_frequency TEXT NOT NULL DEFAULT 'monthly',
+  default_payment_terms_days INTEGER NOT NULL DEFAULT 30,
+  default_contract_duration_months INTEGER,
+  default_conditions_text TEXT,
+  default_term_ids       TEXT[],               -- term_ids de la library a precargar
+  description            TEXT,
+  active                 BOOLEAN NOT NULL DEFAULT TRUE,
+  usage_count            INTEGER NOT NULL DEFAULT 0,   -- cuantas veces se ha usado
+  created_by             TEXT NOT NULL,
+  created_at             TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at             TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE greenhouse_commercial.quote_template_items (
+  template_item_id   TEXT PRIMARY KEY DEFAULT 'tmpi-' || gen_random_uuid(),
+  template_id        TEXT NOT NULL REFERENCES greenhouse_commercial.quote_templates(template_id),
+  product_id         TEXT REFERENCES greenhouse_commercial.product_catalog(product_id),
+  line_type          TEXT NOT NULL CHECK (line_type IN ('person', 'role', 'deliverable', 'direct_cost')),
+  label              TEXT NOT NULL,
+  description        TEXT,
+  role_code          TEXT,
+  suggested_hours    NUMERIC(8,2),
+  unit               TEXT NOT NULL DEFAULT 'hour',
+  quantity           NUMERIC(10,2) NOT NULL DEFAULT 1,
+  default_margin_pct NUMERIC(5,2),
+  sort_order         INTEGER NOT NULL DEFAULT 0,
+  created_at         TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_template_items ON greenhouse_commercial.quote_template_items (template_id);
+```
+
+### 19.2. Flujo de uso
+
+```
+1. "Nueva cotizacion para Sky Airline"
+2. Seleccionar BL: Globe
+3. El sistema muestra templates disponibles para Globe:
+   - "Retainer creativo Globe 80h" (usado 12 veces)
+   - "Retainer creativo Globe 120h" (usado 5 veces)
+   - "Proyecto creativo on-demand" (usado 8 veces)
+   - [En blanco]
+4. Seleccionar "Retainer creativo Globe 80h"
+5. El sistema precarga:
+   - 3 line items (fee gestion, produccion 80h, adaptaciones 40h)
+   - Moneda: CLP
+   - Billing: monthly
+   - Payment terms: 30 dias
+   - Terminos: payment_30d, scope_change, confidentiality
+   - Margen target de Globe: 40%
+6. El comercial ajusta para este cliente
+```
+
+### 19.3. Crear template desde cotizacion existente
+
+Flujo inverso: "Guardar como template" desde una cotizacion aprobada. El sistema:
+1. Extrae los line items como `quote_template_items` (sin persona asignada, con role_code)
+2. Copia billing frequency, payment terms, conditions, terms
+3. Pide al usuario un nombre y codigo de template
+4. Lo registra como nuevo template reutilizable
+
+---
+
+## 20. Eventos outbox (consolidado v2)
 
 | Evento | Trigger | Consumers |
 |--------|---------|-----------|
-| `commercial.quotation.created` | Crear draft | Notifications → Account Lead |
+| `commercial.quotation.created` | Crear draft | Notifications → Account Lead, audit log |
 | `commercial.quotation.sent` | Enviar al cliente | HubSpot sync (deal stage), Notifications |
-| `commercial.quotation.approved` | Marcar aprobada | HubSpot sync, crear service module, crear assignments |
-| `commercial.quotation.rejected` | Marcar rechazada | HubSpot sync, Notifications |
-| `commercial.quotation.version_created` | Crear nueva version | HubSpot sync (update amount) |
-| `commercial.purchase_order.received` | Registrar OC | Notifications → Finance |
+| `commercial.quotation.approved` | Aprobada (post-approval) | HubSpot sync, crear service module, crear assignments |
+| `commercial.quotation.rejected` | Rechazada | HubSpot sync, Notifications |
+| `commercial.quotation.expired` | Vencida sin renovacion | Notifications → Account Lead + Finance |
+| `commercial.quotation.converted` | Convertida a servicio | Pipeline projection, profitability tracking |
+| `commercial.quotation.version_created` | Nueva version | HubSpot sync (update amount), audit log |
+| `commercial.quotation.renewal_due` | T-60 dias de vencimiento | Notifications → Account Lead |
+| `commercial.quotation.expired_without_renewal` | Vencida sin draft de renovacion | Alerta critica → Account Lead + Finance |
+| `commercial.quotation.approval_requested` | Health check dispara approval | Notifications → aprobadores |
+| `commercial.quotation.approval_decided` | Aprobador decide | Notifications → creador, audit log |
+| `commercial.purchase_order.received` | Registrar OC | Notifications → Finance, pipeline projection |
 | `commercial.service_entry.received` | Registrar HES | Notifications → Finance |
 | `commercial.service_entry.invoiced` | Facturar | Nubox integration, finance.income |
 | `commercial.product.created` | Crear producto | HubSpot sync (si sync habilitado) |
 | `commercial.product.updated` | Actualizar producto | HubSpot sync |
-| `commercial.discount.health_alert` | Descuento riesgoso | Notifications → Finance |
+| `commercial.discount.health_alert` | Descuento riesgoso | Notifications → Finance, audit log |
 
 ---
 
-## 13. Permisos
+## 21. Permisos (consolidado v2)
 
 | Accion | Roles permitidos |
 |--------|-----------------|
 | Ver cotizaciones de su organizacion | Account Lead, Ops Lead, Finance, Efeonce Admin |
 | Crear cotizacion draft | Account Lead, Ops Lead |
+| Crear cotizacion desde template | Account Lead, Ops Lead |
 | Editar line items y precios | Account Lead, Finance |
 | Ver costos y margenes (capa interna) | Finance, Efeonce Admin |
+| Ver audit trail | Finance, Efeonce Admin |
 | Aplicar descuentos | Account Lead, Finance |
 | Enviar cotizacion (generar PDF) | Account Lead |
-| Aprobar cotizacion debajo del floor | Solo Finance |
+| Aprobar cotizacion (approval step) | Segun `required_role` del step |
 | Registrar OC recibida | Account Lead, Ops Lead |
 | Registrar HES recibida | Ops Lead, Delivery Lead |
 | Trigger facturacion (Nubox) | Finance |
 | CRUD de product catalog | Finance, Efeonce Admin |
 | CRUD de margin targets | Efeonce Admin |
 | CRUD de role rate cards | Finance, Efeonce Admin |
+| CRUD de terms library | Finance, Efeonce Admin |
+| CRUD de quote templates | Account Lead, Finance, Efeonce Admin |
+| CRUD de approval policies | Efeonce Admin |
+| Ver pipeline y forecast | Account Lead, Finance, Efeonce Admin |
+| Ver profitability tracking | Finance, Efeonce Admin |
 
 ---
 
-## 14. API routes
+## 22. API routes (consolidado v2)
 
 ```
-/api/commercial/quotations                    GET (list), POST (create)
-/api/commercial/quotations/[id]               GET, PUT, DELETE
-/api/commercial/quotations/[id]/send          POST (generar PDF + cambiar status)
-/api/commercial/quotations/[id]/approve       POST
-/api/commercial/quotations/[id]/reject        POST
-/api/commercial/quotations/[id]/version       POST (crear nueva version)
-/api/commercial/quotations/[id]/versions      GET (historial de versiones + diffs)
-/api/commercial/quotations/[id]/pdf           GET (descargar PDF de version vigente)
-/api/commercial/quotations/[id]/health        GET (discount health check)
-/api/commercial/quotations/[id]/line-items    GET, POST
-/api/commercial/quotations/[id]/line-items/[itemId]  PUT, DELETE
+# ── Cotizaciones ──
+/api/commercial/quotations                              GET (list), POST (create)
+/api/commercial/quotations/[id]                         GET, PUT, DELETE
+/api/commercial/quotations/[id]/send                    POST (generar PDF + cambiar status)
+/api/commercial/quotations/[id]/approve                 POST (approval step decision)
+/api/commercial/quotations/[id]/reject                  POST
+/api/commercial/quotations/[id]/version                 POST (crear nueva version)
+/api/commercial/quotations/[id]/versions                GET (historial + diffs)
+/api/commercial/quotations/[id]/pdf                     GET (descargar PDF version vigente)
+/api/commercial/quotations/[id]/health                  GET (discount health check)
+/api/commercial/quotations/[id]/capacity-check          GET (verificar disponibilidad de personas)
+/api/commercial/quotations/[id]/audit                   GET (audit trail)
+/api/commercial/quotations/[id]/save-as-template        POST (guardar como template)
 
-/api/commercial/purchase-orders               GET (list by quotation)
-/api/commercial/purchase-orders/[id]          GET, POST, PUT
+# ── Line items ──
+/api/commercial/quotations/[id]/line-items              GET, POST
+/api/commercial/quotations/[id]/line-items/[itemId]     PUT, DELETE
 
-/api/commercial/service-entries               GET (list by quotation/PO)
-/api/commercial/service-entries/[id]          GET, POST, PUT
-/api/commercial/service-entries/[id]/invoice  POST (trigger facturacion)
+# ── Cadena documental ──
+/api/commercial/purchase-orders                         GET (list by quotation)
+/api/commercial/purchase-orders/[id]                    GET, POST, PUT
+/api/commercial/service-entries                         GET (list by quotation/PO)
+/api/commercial/service-entries/[id]                    GET, POST, PUT
+/api/commercial/service-entries/[id]/invoice            POST (trigger facturacion)
 
-/api/commercial/products                      GET (catalog), POST
-/api/commercial/products/[id]                 GET, PUT, DELETE
-/api/commercial/products/[id]/sync            POST (sync a HubSpot)
+# ── Catalogo ──
+/api/commercial/products                                GET (catalog), POST
+/api/commercial/products/[id]                           GET, PUT, DELETE
+/api/commercial/products/[id]/sync                      POST (sync a HubSpot)
 
-/api/commercial/margin-targets                GET, POST
-/api/commercial/margin-targets/[id]           PUT
+# ── Configuracion ──
+/api/commercial/margin-targets                          GET, POST
+/api/commercial/margin-targets/[id]                     PUT
+/api/commercial/rate-cards                              GET, POST
+/api/commercial/rate-cards/[id]                         PUT, DELETE
+/api/commercial/terms                                   GET, POST
+/api/commercial/terms/[id]                              PUT, DELETE
+/api/commercial/approval-policies                       GET, POST
+/api/commercial/approval-policies/[id]                  PUT, DELETE
 
-/api/commercial/rate-cards                    GET, POST
-/api/commercial/rate-cards/[id]               PUT, DELETE
+# ── Templates ──
+/api/commercial/templates                               GET, POST
+/api/commercial/templates/[id]                          GET, PUT, DELETE
+
+# ── Intelligence ──
+/api/commercial/pipeline                                GET (revenue pipeline dashboard)
+/api/commercial/profitability                           GET (cotizado vs ejecutado)
+/api/commercial/profitability/[quotationId]             GET (detalle por cotizacion)
+
+# ── Cron ──
+/api/cron/commercial-renewal-check                      POST (procesado por ops-worker)
 ```
 
 ---
 
-## 15. Relacion con modulos existentes
+## 23. Relacion con modulos existentes (v2)
 
 ```
                     ┌─────────────────┐
@@ -758,43 +1309,84 @@ El sistema detecta cual rama aplica segun si `purchase_orders` tiene registros p
                     │  Capacity Econ   │
                     │ (costo loaded)   │
                     └────────┬────────┘
-                             │ unit_cost
+                             │ unit_cost + capacity check
                              ▼
-┌──────────┐     ┌───────────────────────┐     ┌──────────────┐
-│ HubSpot  │◄───►│  COMMERCIAL MODULE    │────►│   Nubox      │
-│ (deals,  │     │                       │     │ (facturacion)│
-│ products)│     │  product_catalog      │     └──────────────┘
-└──────────┘     │  quotations           │              │
-                 │  line_items           │              ▼
-                 │  purchase_orders      │     ┌──────────────┐
-                 │  service_entries      │     │   Finance    │
-                 │  margin_targets       │────►│   (income,   │
-                 │  rate_cards           │     │    P&L)      │
-                 └───────────────────────┘     └──────────────┘
+┌──────────┐     ┌────────────────────────────────┐     ┌──────────────┐
+│ HubSpot  │◄───►│     COMMERCIAL MODULE          │────►│   Nubox      │
+│ (deals,  │     │                                │     │ (facturacion)│
+│ products)│     │  product_catalog               │     └──────────────┘
+└──────────┘     │  quote_templates               │              │
+                 │  quotations + line_items        │              ▼
+                 │  approval_policies + steps      │     ┌──────────────┐
+                 │  purchase_orders               │     │   Finance    │
+                 │  service_entries               │────►│   (income,   │
+                 │  margin_targets + rate_cards    │     │    P&L)      │
+                 │  terms_library                  │     └──────┬───────┘
+                 │  audit_log                      │            │
+                 │  revenue_pipeline ◄─────────────┼────────────┘
+                 │  profitability_tracking ◄────────┼── cost_attribution
+                 └────────────────────────────────┘
                              │
-                             │ assignments
+                             │ assignments + capacity
                              ▼
                     ┌─────────────────┐
                     │   Agency /      │
-                    │   Space 360     │
+                    │   Space 360     │◄── pipeline dashboard
                     │ (team, delivery)│
                     └─────────────────┘
 ```
 
 ---
 
-## 16. Glosario
+## 24. Inventory de tablas del schema `greenhouse_commercial`
+
+| # | Tabla | Proposito | Seccion |
+|---|-------|----------|---------|
+| 1 | `margin_targets` | Target y floor de margen por BL | §3.1 |
+| 2 | `product_catalog` | Catalogo de productos (sync HubSpot) | §3.2 |
+| 3 | `product_overhead_defaults` | Overhead directo por producto | §3.3 |
+| 4 | `quotations` | Cotizaciones con status, moneda, descuentos | §3.4 |
+| 5 | `quotation_versions` | Snapshots + diffs entre versiones | §3.5 |
+| 6 | `quotation_line_items` | Line items con costeo y pricing | §3.6 |
+| 7 | `purchase_orders` | Ordenes de compra (OC) | §3.7 |
+| 8 | `service_entries` | Hojas de entrada de servicio (HES) | §3.8 |
+| 9 | `role_rate_cards` | Tarifas por rol + seniority + BL | §4.3 |
+| 10 | `approval_policies` | Reglas de aprobacion por BL | §12.2 |
+| 11 | `approval_steps` | Steps de aprobacion por cotizacion | §12.2 |
+| 12 | `revenue_pipeline` | Pipeline de revenue materializado | §14.2 |
+| 13 | `profitability_tracking` | Cotizado vs ejecutado por periodo | §15.2 |
+| 14 | `terms_library` | Catalogo de terminos y condiciones | §17.1 |
+| 15 | `quotation_terms` | Terminos aplicados a cada cotizacion | §17.1 |
+| 16 | `quotation_audit_log` | Audit trail inmutable | §18.1 |
+| 17 | `quote_templates` | Templates de cotizacion reutilizables | §19.1 |
+| 18 | `quote_template_items` | Line items default de cada template | §19.1 |
+
+**Total: 18 tablas** en schema `greenhouse_commercial`.
+
+---
+
+## 25. Glosario (v2)
 
 | Termino | Significado |
 |---------|------------|
-| **Cotizacion** | Oferta formal de precio a un cliente. Tiene versiones, line items y status |
+| **Cotizacion** | Oferta formal de precio a un cliente. Tiene versiones, line items, terms y status |
 | **OC (Orden de Compra)** | Documento del cliente que aprueba la cotizacion. Tiene numero, monto y PDF |
 | **HES (Hoja de Entrada de Servicio)** | Documento del cliente que confirma la entrega del servicio en un periodo. Autoriza la facturacion |
-| **Line item** | Un renglon de la cotizacion. Puede ser persona, rol, entregable o costo directo |
+| **Line item** | Un renglon de la cotizacion: persona, rol, entregable o costo directo |
 | **Producto** | Item del catalogo reutilizable. Puede estar synced con HubSpot |
+| **Template** | Cotizacion predefinida reutilizable con line items, terms y configuracion default |
 | **Costo loaded** | Costo total de una persona: salario + cargas empleador + overhead directo + overhead estructural |
 | **Margin target** | Margen objetivo por business line. Se hereda a cotizaciones como default |
-| **Margin floor** | Margen minimo aceptable. Debajo de el, se requiere aprobacion de Finance |
+| **Margin floor** | Margen minimo aceptable. Debajo de el, se activa approval workflow |
 | **Rate card** | Tarifa de referencia por rol + seniority + BL. Se usa cuando no hay persona asignada |
+| **Approval policy** | Regla que define cuando se requiere aprobacion y de quien |
+| **Approval step** | Instancia de aprobacion pendiente o resuelta en una cotizacion |
+| **Capacity check** | Verificacion de disponibilidad FTE de una persona antes de cotizarla |
+| **Revenue pipeline** | Projection del revenue esperado de cotizaciones en vuelo, ponderado por probabilidad |
+| **Profitability tracking** | Comparacion periodica entre margen cotizado y margen real ejecutado |
+| **Margin drift** | Diferencia entre margen cotizado y margen ejecutado. KPI de primer nivel |
+| **Drift driver** | Causa identificada automaticamente de un margin drift (rotacion, scope creep, FX) |
 | **Escalamiento** | Ajuste periodico de precios por IPC o porcentaje negociado |
 | **Discount health** | Evaluacion automatica del impacto del descuento sobre el margen |
+| **Terms library** | Catalogo de clausulas legales/comerciales reutilizables con variables de template |
+| **Renewal** | Cotizacion de renovacion generada automatica o manualmente al vencer un contrato |
