@@ -2,6 +2,15 @@
 
 ## 2026-04-10
 
+### 2026-04-10 — GCP auth hardening: WIF only in real Vercel runtime
+
+- `src/lib/google-credentials.ts` ya no activa `Workload Identity Federation` en local por el mero hecho de encontrar `VERCEL_OIDC_TOKEN` en `process.env`.
+- `VERCEL_OIDC_TOKEN` pasa a tratarse explícitamente como token efímero de runtime, no como credencial persistible en `.env.local` o `.env.production.local`.
+- Nuevo comando operativo:
+  - `pnpm gcp:doctor`
+  - detecta drift de `VERCEL_OIDC_TOKEN` en `.env*` y configuraciones inconsistentes de auth GCP antes de que reaparezcan warnings `invalid_grant`
+- `/admin`, `/admin/users` y `/admin/roles` quedaron `force-dynamic` para no congelar durante build un overview que depende de credenciales vivas.
+
 ### 2026-04-10 — Agency skills matrix and staffing engine completed
 
 - Se implementó la matriz canónica de skills en PostgreSQL con:

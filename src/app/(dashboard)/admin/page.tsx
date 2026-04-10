@@ -8,6 +8,8 @@ import { getOperationsOverview } from '@/lib/operations/get-operations-overview'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 
+export const dynamic = 'force-dynamic'
+
 export default async function Page() {
   const tenant = await getTenantContext()
 

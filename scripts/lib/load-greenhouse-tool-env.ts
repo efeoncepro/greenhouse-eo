@@ -3,7 +3,7 @@ import path from 'node:path'
 
 type PostgresProfile = 'runtime' | 'migrator' | 'admin' | 'ops'
 
-const DEFAULT_ENV_FILES = [
+export const DEFAULT_ENV_FILES = [
   '.env.local',
   '.env.production.local',
   '.env.development.local'
@@ -17,7 +17,7 @@ const stripWrappingQuotes = (value: string) => {
   return hasDoubleQuotes || hasSingleQuotes ? trimmed.slice(1, -1) : trimmed
 }
 
-const parseEnvFile = (content: string) => {
+export const parseEnvFile = (content: string) => {
   const entries: Record<string, string> = {}
 
   for (const rawLine of content.split(/\r?\n/)) {

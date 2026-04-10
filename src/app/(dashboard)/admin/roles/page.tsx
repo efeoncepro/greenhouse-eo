@@ -6,6 +6,8 @@ import { getAdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 
+export const dynamic = 'force-dynamic'
+
 export default async function Page() {
   const tenant = await getTenantContext()
 

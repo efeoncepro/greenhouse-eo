@@ -147,11 +147,24 @@ const getGoogleCredentialPreference = (env: NodeJS.ProcessEnv = process.env): Go
   }
 }
 
-const isVercelRuntime = (env: NodeJS.ProcessEnv = process.env) => hasValue(env.VERCEL) || hasValue(env.VERCEL_ENV)
+const hasVercelRuntimeMetadata = (env: NodeJS.ProcessEnv = process.env) =>
+  hasValue(env.VERCEL_URL) || hasValue(env.VERCEL_DEPLOYMENT_ID) || hasValue(env.VERCEL_REGION)
+
+const isVercelRuntime = (env: NodeJS.ProcessEnv = process.env) => hasValue(env.VERCEL) && hasVercelRuntimeMetadata(env)
+
+const hasInjectedVercelOidcToken = (env: NodeJS.ProcessEnv = process.env) =>
+  env !== process.env && hasValue(env.VERCEL_OIDC_TOKEN)
+
+export const hasPersistedLocalVercelOidcToken = (env: NodeJS.ProcessEnv = process.env) =>
+  env === process.env && !isVercelRuntime(env) && hasValue(env.VERCEL_OIDC_TOKEN)
 
 const getAvailableVercelOidcTokenSync = (env: NodeJS.ProcessEnv = process.env) => {
-  if (env !== process.env) {
+  if (hasInjectedVercelOidcToken(env)) {
     return env.VERCEL_OIDC_TOKEN?.trim()
+  }
+
+  if (!isVercelRuntime(env)) {
+    return undefined
   }
 
   if (hasValue(process.env.VERCEL_OIDC_TOKEN)) {
@@ -263,11 +276,15 @@ const getWorkloadIdentityAuthClient = ({
     ...(scopes ? { scopes: Array.isArray(scopes) ? scopes : [scopes] } : {}),
     subject_token_supplier: {
       getSubjectToken: async () => {
-        if (env !== process.env && hasValue(env.VERCEL_OIDC_TOKEN)) {
+        if (hasInjectedVercelOidcToken(env)) {
           return env.VERCEL_OIDC_TOKEN!.trim()
         }
 
-        const token = await getVercelOidcToken().catch(() => env.VERCEL_OIDC_TOKEN?.trim() || process.env.VERCEL_OIDC_TOKEN?.trim())
+        if (!isVercelRuntime(env)) {
+          throw new Error('Vercel OIDC token is only available during real Vercel runtime execution')
+        }
+
+        const token = await getVercelOidcToken().catch(() => process.env.VERCEL_OIDC_TOKEN?.trim())
 
         if (!token) {
           throw new Error('Vercel OIDC token is not available in this runtime context')
@@ -293,15 +310,11 @@ export const shouldUseWorkloadIdentity = (env: NodeJS.ProcessEnv = process.env) 
   }
 
   if (preference === 'wif') {
-    return isWorkloadIdentityConfigured(env)
+    return isWorkloadIdentityConfigured(env) && (isVercelRuntime(env) || hasInjectedVercelOidcToken(env))
   }
 
   if (!isWorkloadIdentityConfigured(env)) {
     return false
-  }
-
-  if (hasValue(getAvailableVercelOidcTokenSync(env))) {
-    return true
   }
 
   return isVercelRuntime(env)
@@ -328,6 +341,22 @@ export const getGoogleCredentialSource = (env: NodeJS.ProcessEnv = process.env):
   }
 
   return 'ambient_adc'
+}
+
+export const getGoogleCredentialDiagnostics = (env: NodeJS.ProcessEnv = process.env) => {
+  const preference = getGoogleCredentialPreference(env)
+  const source = getGoogleCredentialSource(env)
+
+  return {
+    preference,
+    source,
+    isVercelRuntime: isVercelRuntime(env),
+    workloadIdentityConfigured: isWorkloadIdentityConfigured(env),
+    hasInjectedVercelOidcToken: hasInjectedVercelOidcToken(env),
+    hasPersistedLocalVercelOidcToken: hasPersistedLocalVercelOidcToken(env),
+    serviceAccountKeyConfigured: hasValue(env.GOOGLE_APPLICATION_CREDENTIALS_JSON) || hasValue(env.GOOGLE_APPLICATION_CREDENTIALS_JSON_BASE64),
+    hasResolvableVercelOidcToken: hasValue(getAvailableVercelOidcTokenSync(env))
+  }
 }
 
 export const getGoogleCredentials = (env: NodeJS.ProcessEnv = process.env) => getServiceAccountKeyCredentials(env)

@@ -1,5 +1,26 @@
 # Handoff.md
 
+## Sesion 2026-04-10 — hardening GCP auth local vs Vercel runtime
+
+- alcance en curso:
+  - `src/lib/google-credentials.ts` ahora trata `Workload Identity Federation` como credencial de runtime real de Vercel, no como fallback activable por un `VERCEL_OIDC_TOKEN` persistido en `.env*`
+  - se agregó diagnóstico explícito para detectar drift local:
+    - `hasPersistedLocalVercelOidcToken()`
+    - `getGoogleCredentialDiagnostics()`
+    - `pnpm gcp:doctor`
+  - páginas admin que consumen `getAdminAccessOverview()` quedaron `force-dynamic` para evitar que el build estático vuelva a cruzar esta ruta como si fuera dato estable
+- archivos sensibles / de alto impacto tocados:
+  - `src/lib/google-credentials.ts`
+  - `src/lib/google-credentials.test.ts`
+  - `scripts/gcp-auth-doctor.ts`
+  - `scripts/lib/load-greenhouse-tool-env.ts`
+  - `src/app/(dashboard)/admin/page.tsx`
+  - `src/app/(dashboard)/admin/users/page.tsx`
+  - `src/app/(dashboard)/admin/roles/page.tsx`
+- nota operativa:
+  - `WIF` sigue siendo la postura preferida en `Vercel`; el hardening solo evita usar tokens OIDC efímeros como si fueran secretos persistibles para local/CLI
+  - si `pnpm gcp:doctor` reporta `VERCEL_OIDC_TOKEN` en `.env.local` o `.env.production.local`, la remediación correcta es remover esa variable de los archivos locales, no desactivar `WIF`
+
 ## Sesion 2026-04-10 — TASK-157 cerrada: Skills Matrix + Intelligent Staffing Engine
 
 - alcance cerrado:

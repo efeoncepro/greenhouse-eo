@@ -243,9 +243,12 @@ Regla operativa:
   - `src/lib/cloud/gcp-auth.ts`
   - `src/lib/cloud/postgres.ts`
 - El orden efectivo de autenticación GCP en runtime quedó formalizado así:
-  1. `Workload Identity Federation` vía `VERCEL_OIDC_TOKEN` + `GCP_WORKLOAD_IDENTITY_PROVIDER` + `GCP_SERVICE_ACCOUNT_EMAIL`
+  1. `Workload Identity Federation` en runtime real de `Vercel`, resolviendo el token OIDC efímero desde ese entorno y usando `GCP_WORKLOAD_IDENTITY_PROVIDER` + `GCP_SERVICE_ACCOUNT_EMAIL`
   2. fallback a `GOOGLE_APPLICATION_CREDENTIALS_JSON` o `_BASE64`
   3. `ambient ADC` cuando el entorno ya provee credenciales implícitas
+- Regla operativa reforzada en 2026-04-10:
+  - `VERCEL_OIDC_TOKEN` no se persiste en `.env*`
+  - local, scripts y CLI no deben depender de ese token para auth GCP; usan service account key o `ADC`
 - Consumers principales ya alineados:
   - `src/lib/bigquery.ts`
   - `src/lib/postgres/client.ts`

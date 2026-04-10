@@ -143,9 +143,12 @@ Regla vigente:
 
 - `TASK-096` ya no está solo en diseño: el repo quedó con baseline WIF-aware en implementación.
 - La capa `src/lib/google-credentials.ts` ahora resuelve una estrategia transicional:
-  - `wif` cuando existen `VERCEL_OIDC_TOKEN`, `GCP_WORKLOAD_IDENTITY_PROVIDER` y `GCP_SERVICE_ACCOUNT_EMAIL`
+  - `wif` solo en runtime real de `Vercel` cuando existe `GCP_WORKLOAD_IDENTITY_PROVIDER` + `GCP_SERVICE_ACCOUNT_EMAIL` y el token OIDC efímero puede resolverse en ese contexto
   - `service_account_key` como fallback
   - `ambient_adc` para runtimes con credenciales implícitas
+- Regla reforzada en 2026-04-10:
+  - `VERCEL_OIDC_TOKEN` no debe persistirse en `.env.local`, `.env.production.local` ni archivos equivalentes
+  - un token OIDC stale en local no debe activar `WIF`; local/CLI deben resolver por `service_account_key` o `ADC`
 - Consumers alineados en esta sesión:
   - `src/lib/bigquery.ts`
   - `src/lib/postgres/client.ts`
