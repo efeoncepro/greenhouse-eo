@@ -64,7 +64,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-036`
+`ISSUE-044`
 
 ## Open
 
@@ -73,6 +73,14 @@ Tasks, docs de arquitectura, o commits relacionados.
 | `ISSUE-002` | [Nubox sync conformed: data integrity (period mixing, identity loss)](open/ISSUE-002-nubox-sync-conformed-data-integrity.md) | staging + production | 2026-03-30 | open   |
 | `ISSUE-020` | [3 endpoints duplicados de retry batch sin error handling](open/ISSUE-020-duplicate-email-retry-endpoints.md)                | staging + production | 2026-04-06 | open   |
 | `ISSUE-023` | [Tablas de email sin migracion formal](open/ISSUE-023-email-tables-no-formal-migration.md)                                   | production + staging | 2026-04-06 | open   |
+| `ISSUE-036` | [HR member profile queda stale tras cambio de supervisor en Jerarquía](open/ISSUE-036-hr-hierarchy-profile-reader-stale-reports-to.md) | staging | 2026-04-10 | open |
+| `ISSUE-037` | [Historial de jerarquía pierde `effectiveTo` en líneas cerradas](open/ISSUE-037-hr-hierarchy-history-drops-effective-to.md) | staging | 2026-04-10 | open |
+| `ISSUE-038` | [Organigrama y Jerarquía no reflejan departamento cuando solo se asigna responsable del área](open/ISSUE-038-org-chart-departments-head-vs-member-assignment-drift.md) | staging | 2026-04-10 | open |
+| `ISSUE-039` | [Modal de “Cambiar supervisor” bloquea guardar sin validación visible](open/ISSUE-039-hr-hierarchy-change-supervisor-modal-silent-disabled-save.md) | staging | 2026-04-10 | open |
+| `ISSUE-040` | [Crear nueva delegación puede dejar al supervisor sin delegación activa](open/ISSUE-040-hierarchy-delegation-revoke-before-create.md) | staging + runtime general | 2026-04-10 | open |
+| `ISSUE-041` | [Reasignación masiva ignora la fecha efectiva al resolver reportes directos](open/ISSUE-041-hierarchy-bulk-reassign-ignores-effective-date-for-scope.md) | staging + runtime general | 2026-04-10 | open |
+| `ISSUE-042` | [Organigrama visual no representa la jerarquía estructural de departamentos](open/ISSUE-042-org-chart-uses-reporting-lines-instead-of-structural-hierarchy.md) | staging | 2026-04-10 | open |
+| `ISSUE-043` | [Organigrama puede estar permitido por permisos pero oculto en el menú](open/ISSUE-043-org-chart-menu-hidden-for-supervisor-limited-access.md) | runtime general | 2026-04-10 | open |
 
 ## Resolved
 

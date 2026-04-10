@@ -11012,3 +11012,21 @@ Fase 4 completada:
 - Ajuste adicional de verificación:
   - `src/lib/cloud/gcp-auth.test.ts` quedó deterministic-friendly para no depender del runtime local de Vercel/WIF durante `pnpm test`
   - se corrigió un `padding-line-between-statements` preexistente en `src/views/greenhouse/agency/space-360/tabs/TeamTab.tsx` para dejar `pnpm lint` verde
+
+### Sesión 2026-04-10 — auditoría staging `Jerarquía` / `Organigrama` / `Departamentos`
+
+- Pedido del usuario: auditar antes de seguir tocando código porque `Cambiar supervisor` “no deja guardar” y había drift visible entre supervisoría, delegaciones y departamentos.
+- Verificación browser + API en staging (`/hr/hierarchy` y endpoints `hr/core/*`):
+  - con `Razón` vacía el botón `Guardar cambio` queda deshabilitado sin validación visible
+  - al completar `Razón`, el cambio de supervisor sí persiste y `daniela-ferreira -> julio-reyes` ya aparece en la API canónica de jerarquía y en el organigrama actual basado en reporting lines
+  - siguen abiertos drifts en ficha HR, historial y departamentos
+- Issues documentados:
+  - `ISSUE-036` ficha HR stale tras cambio de supervisor
+  - `ISSUE-037` historial pierde `effectiveTo`
+  - `ISSUE-038` responsable de departamento no implica adscripción del miembro
+  - `ISSUE-039` modal bloquea guardar sin feedback visible
+  - `ISSUE-040` crear nueva delegación revoca antes de confirmar la nueva
+  - `ISSUE-041` reasignación masiva ignora fecha efectiva al resolver scope
+  - `ISSUE-042` organigrama usa reporting lines, no jerarquía estructural
+  - `ISSUE-043` acceso al organigrama puede existir sin reflejo en el menú
+- No se hicieron fixes nuevos en esta sesión de auditoría; solo documentación y verificación end-to-end para dejar el estado reproducible.
