@@ -3608,6 +3608,36 @@ export interface GreenhouseSyncProjectionRefreshQueue {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseSyncReportingHierarchyDriftProposals {
+  created_at: Generated<Timestamp>;
+  current_reporting_line_id: string | null;
+  current_supervisor_member_id: string | null;
+  drift_kind: Generated<string>;
+  evidence_json: Generated<Json>;
+  first_detected_at: Generated<Timestamp>;
+  last_detected_at: Generated<Timestamp>;
+  member_id: string;
+  occurrence_count: Generated<number>;
+  policy_action: Generated<string>;
+  proposal_id: string;
+  proposed_supervisor_member_id: string | null;
+  resolution_note: string | null;
+  resolved_at: Timestamp | null;
+  resolved_by_user_id: string | null;
+  severity: Generated<string>;
+  source_member_email: string | null;
+  source_member_id: string | null;
+  source_member_name: string | null;
+  source_snapshot_json: Generated<Json>;
+  source_supervisor_email: string | null;
+  source_supervisor_id: string | null;
+  source_supervisor_name: string | null;
+  source_sync_run_id: string | null;
+  source_system: string;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseSyncSchemaMigrations {
   applied_at: Generated<Timestamp>;
   applied_by: string;
@@ -3915,6 +3945,7 @@ export interface DB {
   "greenhouse_sync.outbox_events": GreenhouseSyncOutboxEvents;
   "greenhouse_sync.outbox_reactive_log": GreenhouseSyncOutboxReactiveLog;
   "greenhouse_sync.projection_refresh_queue": GreenhouseSyncProjectionRefreshQueue;
+  "greenhouse_sync.reporting_hierarchy_drift_proposals": GreenhouseSyncReportingHierarchyDriftProposals;
   "greenhouse_sync.schema_migrations": GreenhouseSyncSchemaMigrations;
   "greenhouse_sync.service_sync_queue": GreenhouseSyncServiceSyncQueue;
   "greenhouse_sync.source_sync_failures": GreenhouseSyncSourceSyncFailures;

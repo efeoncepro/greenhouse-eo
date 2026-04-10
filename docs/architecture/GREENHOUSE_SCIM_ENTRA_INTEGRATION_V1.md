@@ -26,6 +26,7 @@ Implemented and active in production. SCIM provisioning job is running in Entra,
 | Identity existence, account status, basic profile | Entra ID | `active`, `userName`, `displayName` flow from Entra via SCIM |
 | Authorization, roles, scopes, operational context | Greenhouse | Role assignments, space access, org scoping are Greenhouse-managed |
 | Enrichment profile (jobTitle, country, city, phone) | Entra ID | Synced via Graph API cron, not SCIM |
+| Reporting hierarchy formal | Greenhouse | `greenhouse_core.reporting_lines` remains canonical; Entra only proposes drift for review |
 
 Entra is the source of truth for who exists and whether they are active. Greenhouse is the source of truth for what they can do.
 
@@ -57,6 +58,7 @@ Daily cron job that fetches enrichment data directly from the Microsoft Graph AP
 - **Auth:** OAuth2 client credentials flow (`AZURE_AD_CLIENT_ID` + `AZURE_AD_CLIENT_SECRET`)
 - **Syncs:** `jobTitle`, `country`, `city`, `phone`, `displayName`, `accountEnabled`
 - **Targets:** `client_users`, `identity_profiles`, `members`
+- **Governance add-on:** resolves Graph `manager` and opens review proposals when Entra disagrees with `greenhouse_core.reporting_lines`
 
 Rationale: the SCIM standard only handles basic lifecycle attributes (`userName`, `displayName`, `active`). Rich profile data such as job title, country, and department requires direct Graph API calls.
 
@@ -78,7 +80,10 @@ Core business logic for SCIM-driven user lifecycle management:
 
 #### 5. Graph API Client (`src/lib/entra/graph-client.ts`)
 
-OAuth2 client credentials token acquisition with in-memory caching. Provides paginated user fetch from the Microsoft Graph `/v1.0/users` endpoint.
+OAuth2 client credentials token acquisition with in-memory caching. Provides:
+
+- paginated user fetch from the Microsoft Graph `/v1.0/users` endpoint
+- per-user `manager` resolution from `/v1.0/users/{id}/manager`
 
 #### 6. Profile Sync Engine (`src/lib/entra/profile-sync.ts`)
 
@@ -86,6 +91,15 @@ Diff-based update logic:
 - Compares Entra values against current Greenhouse records
 - Only writes when values actually differ (uses `IS DISTINCT FROM` in SQL)
 - Cleans Entra display names by removing organizational suffixes (e.g., " | Efeonce")
+
+#### 6b. Hierarchy Governance Lane (`src/lib/reporting-hierarchy/governance.ts`)
+
+Compares the resolved Graph manager against the canonical reporting hierarchy:
+
+- creates or refreshes drift proposals in `greenhouse_sync.reporting_hierarchy_drift_proposals`
+- writes a `source_sync_runs` entry with `source_system = 'azure-ad'` and `source_object_type = 'reporting_hierarchy'`
+- never auto-overwrites manual hierarchy by default
+- allows RRHH/Admin to approve, reject, or dismiss the proposal from `HR > Jerarquía`
 
 #### 7. SCIM Groups (`src/lib/scim/groups.ts`)
 
@@ -107,7 +121,7 @@ Real-time change notification endpoint. When a user profile changes in Entra, Mi
 
 - **Validation:** Microsoft sends a GET with `?validationToken=xxx` during subscription creation; the endpoint echoes it as plain text
 - **Notifications:** POST with `clientState` validation against the SCIM bearer token (first 16 chars)
-- **Processing:** On notification, fetches all Entra profiles via Graph API and runs the same diff-sync as the daily cron
+- **Processing:** On notification, fetches all Entra profiles via Graph API, runs the same diff-sync as the daily cron, and re-evaluates hierarchy drift against Graph `manager`
 - **Trade-off:** Fetches all users on each notification (simple, consistent) vs. fetching only the changed user (more efficient but fragile)
 
 #### 9. Webhook Subscription Manager (`src/lib/entra/webhook-subscription.ts`)
@@ -140,10 +154,10 @@ Provisioning (SCIM — ~40 min cycle):
   [Entra ID] <--SCIM GET/filter-------- [SCIM Server] <-- [PostgreSQL: client_users]
 
 Real-time (Graph Webhook — seconds):
-  [Entra ID] --user change--> [Graph] --POST notification--> [Webhook Endpoint] --> [Profile Sync] --> [PostgreSQL]
+  [Entra ID] --user change--> [Graph] --POST notification--> [Webhook Endpoint] --> [Profile Sync + Hierarchy Governance] --> [PostgreSQL]
 
 Enrichment (Graph API cron — daily safety net):
-  [Graph API] --daily fetch-----------> [Profile Sync] --> [PostgreSQL: identity_profiles, members, client_users]
+  [Graph API] --daily fetch-----------> [Profile Sync + Hierarchy Governance] --> [PostgreSQL: identity_profiles, members, client_users, reporting_hierarchy_drift_proposals]
 
 Admin governance:
   [Admin Center] --/admin/scim-tenant-mappings--> [API] --> [PostgreSQL: scim_tenant_mappings]

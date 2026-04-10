@@ -4049,6 +4049,46 @@ CREATE TABLE greenhouse_sync.identity_reconciliation_proposals (
 
 
 --
+-- Name: reporting_hierarchy_drift_proposals; Type: TABLE; Schema: greenhouse_sync; Owner: -
+--
+
+CREATE TABLE greenhouse_sync.reporting_hierarchy_drift_proposals (
+    proposal_id text PRIMARY KEY,
+    member_id text NOT NULL REFERENCES greenhouse_core.members(member_id) ON DELETE CASCADE,
+    source_system text NOT NULL,
+    source_sync_run_id text REFERENCES greenhouse_sync.source_sync_runs(sync_run_id) ON DELETE SET NULL,
+    source_member_id text,
+    source_member_email text,
+    source_member_name text,
+    source_supervisor_id text,
+    source_supervisor_email text,
+    source_supervisor_name text,
+    current_supervisor_member_id text REFERENCES greenhouse_core.members(member_id) ON DELETE SET NULL,
+    proposed_supervisor_member_id text REFERENCES greenhouse_core.members(member_id) ON DELETE SET NULL,
+    current_reporting_line_id text REFERENCES greenhouse_core.reporting_lines(reporting_line_id) ON DELETE SET NULL,
+    status text DEFAULT 'pending'::text NOT NULL,
+    drift_kind text DEFAULT 'supervisor_mismatch'::text NOT NULL,
+    policy_action text DEFAULT 'review_required'::text NOT NULL,
+    severity text DEFAULT 'warning'::text NOT NULL,
+    occurrence_count integer DEFAULT 1 NOT NULL,
+    first_detected_at timestamp with time zone DEFAULT now() NOT NULL,
+    last_detected_at timestamp with time zone DEFAULT now() NOT NULL,
+    resolved_at timestamp with time zone,
+    resolved_by_user_id text REFERENCES greenhouse_core.client_users(user_id) ON DELETE SET NULL,
+    resolution_note text,
+    evidence_json jsonb DEFAULT '{}'::jsonb NOT NULL,
+    source_snapshot_json jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT reporting_hierarchy_drift_proposals_status_check CHECK ((status = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text, 'dismissed'::text, 'auto_applied'::text]))),
+    CONSTRAINT reporting_hierarchy_drift_proposals_drift_kind_check CHECK ((drift_kind = ANY (ARRAY['supervisor_mismatch'::text, 'missing_greenhouse_supervisor'::text, 'missing_source_supervisor'::text, 'source_supervisor_unresolved'::text, 'member_not_linked_to_source'::text]))),
+    CONSTRAINT reporting_hierarchy_drift_proposals_policy_action_check CHECK ((policy_action = ANY (ARRAY['review_required'::text, 'blocked_manual_precedence'::text, 'auto_apply_allowed'::text, 'no_action'::text]))),
+    CONSTRAINT reporting_hierarchy_drift_proposals_severity_check CHECK ((severity = ANY (ARRAY['info'::text, 'warning'::text, 'error'::text]))),
+    CONSTRAINT reporting_hierarchy_drift_proposals_occurrence_count_check CHECK ((occurrence_count >= 1))
+);
+
+
+--
 -- Name: outbox_events; Type: TABLE; Schema: greenhouse_sync; Owner: -
 --
 
@@ -7458,6 +7498,34 @@ CREATE INDEX source_sync_runs_source_idx ON greenhouse_sync.source_sync_runs USI
 --
 
 CREATE INDEX source_sync_runs_status_idx ON greenhouse_sync.source_sync_runs USING btree (status, started_at DESC);
+
+
+--
+-- Name: idx_reporting_hierarchy_drift_proposals_status; Type: INDEX; Schema: greenhouse_sync; Owner: -
+--
+
+CREATE INDEX idx_reporting_hierarchy_drift_proposals_status ON greenhouse_sync.reporting_hierarchy_drift_proposals USING btree (status, last_detected_at DESC);
+
+
+--
+-- Name: idx_reporting_hierarchy_drift_proposals_member; Type: INDEX; Schema: greenhouse_sync; Owner: -
+--
+
+CREATE INDEX idx_reporting_hierarchy_drift_proposals_member ON greenhouse_sync.reporting_hierarchy_drift_proposals USING btree (member_id, source_system, last_detected_at DESC);
+
+
+--
+-- Name: idx_reporting_hierarchy_drift_proposals_run; Type: INDEX; Schema: greenhouse_sync; Owner: -
+--
+
+CREATE INDEX idx_reporting_hierarchy_drift_proposals_run ON greenhouse_sync.reporting_hierarchy_drift_proposals USING btree (source_sync_run_id, status, last_detected_at DESC);
+
+
+--
+-- Name: idx_reporting_hierarchy_drift_active_member; Type: INDEX; Schema: greenhouse_sync; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_reporting_hierarchy_drift_active_member ON greenhouse_sync.reporting_hierarchy_drift_proposals USING btree (member_id, source_system, drift_kind) WHERE (status = 'pending'::text);
 
 
 --

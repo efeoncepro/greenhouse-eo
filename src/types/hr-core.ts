@@ -366,6 +366,80 @@ export interface HrHierarchyHistoryResponse {
   delegations: HrHierarchyDelegationRecord[]
 }
 
+export type HrHierarchyGovernanceProposalStatus =
+  | 'pending'
+  | 'approved'
+  | 'rejected'
+  | 'dismissed'
+  | 'auto_applied'
+
+export type HrHierarchyGovernancePolicyAction =
+  | 'review_required'
+  | 'blocked_manual_precedence'
+  | 'auto_apply_allowed'
+  | 'no_action'
+
+export type HrHierarchyGovernanceSeverity = 'info' | 'warning' | 'error'
+
+export interface HrHierarchyGovernanceProposal {
+  proposalId: string
+  memberId: string
+  memberName: string
+  sourceSystem: string
+  sourceSyncRunId: string | null
+  sourceMemberId: string | null
+  sourceMemberEmail: string | null
+  sourceMemberName: string | null
+  sourceSupervisorId: string | null
+  sourceSupervisorEmail: string | null
+  sourceSupervisorName: string | null
+  currentSupervisorMemberId: string | null
+  currentSupervisorName: string | null
+  proposedSupervisorMemberId: string | null
+  proposedSupervisorName: string | null
+  currentReportingLineId: string | null
+  status: HrHierarchyGovernanceProposalStatus
+  driftKind: string
+  policyAction: HrHierarchyGovernancePolicyAction
+  severity: HrHierarchyGovernanceSeverity
+  occurrenceCount: number
+  firstDetectedAt: string
+  lastDetectedAt: string
+  resolvedAt: string | null
+  resolvedByUserId: string | null
+  resolutionNote: string | null
+  evidence: Record<string, unknown>
+  sourceSnapshot: Record<string, unknown>
+}
+
+export interface HrHierarchyGovernanceRunSummary {
+  syncRunId: string
+  status: string
+  syncMode: string
+  recordsRead: number
+  proposalsDetected: number
+  notes: string | null
+  startedAt: string
+  finishedAt: string | null
+}
+
+export interface HrHierarchyGovernanceResponse {
+  policy: {
+    canonicalSource: string
+    externalSource: string
+    precedence: string[]
+  }
+  lastRun: HrHierarchyGovernanceRunSummary | null
+  summary: {
+    pending: number
+    approved: number
+    rejected: number
+    dismissed: number
+    autoApplied: number
+  }
+  proposals: HrHierarchyGovernanceProposal[]
+}
+
 export interface HrLeaveBalancesResponse {
   balances: HrLeaveBalance[]
   policies?: HrLeavePolicy[]

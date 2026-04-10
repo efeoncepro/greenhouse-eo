@@ -292,6 +292,8 @@ export const EVENT_TYPES = {
   responsibilityRevoked: 'responsibility.revoked',
   responsibilityUpdated: 'responsibility.updated',
   reportingHierarchyUpdated: 'reporting_hierarchy.updated',
+  reportingHierarchyDriftDetected: 'reporting_hierarchy.drift_detected',
+  reportingHierarchyProposalResolved: 'reporting_hierarchy.proposal_resolved',
 
   // Role Governance
   roleAssigned: 'role.assigned',
@@ -463,6 +465,24 @@ export interface ReportingHierarchyUpdatedPayload {
   changeReason: string
   sourceSystem: string
   sourceMetadata?: Record<string, unknown>
+}
+
+export interface ReportingHierarchyDriftDetectedPayload {
+  proposalId: string
+  memberId: string
+  driftKind: string
+  policyAction: string
+  sourceSystem: string
+  proposedSupervisorMemberId: string | null
+  currentSupervisorMemberId: string | null
+}
+
+export interface ReportingHierarchyProposalResolvedPayload {
+  proposalId: string
+  memberId: string
+  resolution: string
+  resolvedByUserId: string
+  proposedSupervisorMemberId: string | null
 }
 
 export interface RoleAssignedPayload {

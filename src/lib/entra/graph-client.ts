@@ -23,6 +23,17 @@ export interface EntraUserProfile {
   usageLocation: string | null
 }
 
+export interface EntraManagerRef {
+  id: string
+  displayName: string | null
+  mail: string | null
+  userPrincipalName: string | null
+}
+
+export interface EntraUserWithManager extends EntraUserProfile {
+  manager: EntraManagerRef | null
+}
+
 // ── Token cache ──
 
 let cachedToken: { value: string; expiresAt: number } | null = null
@@ -139,4 +150,61 @@ export const fetchEntraUsers = async (): Promise<EntraUserProfile[]> => {
   }
 
   return allUsers
+}
+
+export const fetchEntraUserManager = async (oid: string): Promise<EntraManagerRef | null> => {
+  const token = await getAccessToken()
+
+  const res = await fetch(
+    `https://graph.microsoft.com/v1.0/users/${oid}/manager?$select=id,displayName,mail,userPrincipalName`,
+    {
+      headers: { Authorization: `Bearer ${token}` }
+    }
+  )
+
+  if (res.status === 404) return null
+
+  if (!res.ok) {
+    const body = await res.text().catch(() => '')
+
+    throw new Error(`[entra] Manager request failed (${res.status}): ${body}`)
+  }
+
+  const data = await res.json()
+
+  return {
+    id: data.id,
+    displayName: data.displayName ?? null,
+    mail: data.mail ?? null,
+    userPrincipalName: data.userPrincipalName ?? null
+  }
+}
+
+export const fetchEntraUsersWithManagers = async (): Promise<EntraUserWithManager[]> => {
+  const users = await fetchEntraUsers()
+  const results: EntraUserWithManager[] = []
+
+  for (const user of users) {
+    try {
+      const manager = await fetchEntraUserManager(user.id)
+
+      results.push({
+        ...user,
+        manager
+      })
+    } catch (error) {
+      console.warn(
+        '[entra] Unable to resolve manager for user:',
+        user.id,
+        error instanceof Error ? error.message : error
+      )
+
+      results.push({
+        ...user,
+        manager: null
+      })
+    }
+  }
+
+  return results
 }

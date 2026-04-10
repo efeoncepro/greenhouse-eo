@@ -4995,6 +4995,9 @@
 
 ## 2026-04-10
 
+- HR / Identity: `TASK-330` formalizó la gobernanza de supervisoría entre Greenhouse y Entra; `greenhouse_core.reporting_lines` sigue siendo la fuente formal canónica y `greenhouse_sync.reporting_hierarchy_drift_proposals` registra drift auditable con evidencia, severidad y resolución humana.
+- Entra sync: `src/lib/entra/graph-client.ts` ahora resuelve `manager` por Microsoft Graph, y tanto `GET /api/cron/entra-profile-sync` como `POST /api/webhooks/entra-user-change` disparan también el escaneo de drift de jerarquía usando el mismo snapshot de usuarios.
+- HR > Jerarquía: se agregaron `GET /api/hr/core/hierarchy/governance`, `POST /api/hr/core/hierarchy/governance/run` y `POST /api/hr/core/hierarchy/governance/proposals/[proposalId]/resolve`, además del panel visual en `/hr/hierarchy` para correr la gobernanza y aprobar/rechazar/descartar propuestas.
 - Identity/HR foundation: `TASK-324` introdujo `greenhouse_core.reporting_lines` como source of truth historizable para supervisoría formal, manteniendo `greenhouse_core.members.reports_to_member_id` como snapshot actual y capa de compatibilidad para consumers legacy.
 - Reporting hierarchy: se agregaron readers canónicos para supervisor actual/efectivo, reportes directos, subárbol, cadena ascendente y miembros sin supervisor en `src/lib/reporting-hierarchy/*`.
 - HR Core: `updateMemberHrProfile()` ya no muta `reports_to_member_id` de forma aislada; ahora escribe la relación formal vía reporting hierarchy y publica `reporting_hierarchy.updated`.

@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
 
 import { resolveSecret } from '@/lib/secrets/secret-manager'
-import { fetchEntraUsers } from '@/lib/entra/graph-client'
+import { fetchEntraUsersWithManagers } from '@/lib/entra/graph-client'
 import { syncEntraProfiles } from '@/lib/entra/profile-sync'
+import { runEntraHierarchyGovernanceScan } from '@/lib/reporting-hierarchy/governance'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
@@ -82,8 +83,14 @@ export async function POST(request: Request) {
     // Fetch all Entra users and sync (reuses cron logic)
     // For efficiency we could fetch only changed users, but with <50 users
     // fetching all is fast and ensures consistency
-    const entraUsers = await fetchEntraUsers()
+    const entraUsers = await fetchEntraUsersWithManagers()
     const result = await syncEntraProfiles(entraUsers)
+
+    const hierarchyGovernance = await runEntraHierarchyGovernanceScan({
+      triggeredBy: 'webhook:entra-user-change',
+      syncMode: 'webhook',
+      entraUsers
+    })
 
     console.log(
       `[entra-webhook] Sync complete: users_updated=${result.usersUpdated} profiles_updated=${result.profilesUpdated} members_updated=${result.membersUpdated}`
@@ -91,6 +98,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       notificationsReceived: changedUserIds.length,
+      hierarchyGovernance,
       ...result
     })
   } catch (error) {

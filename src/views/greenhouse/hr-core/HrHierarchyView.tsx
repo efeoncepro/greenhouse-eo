@@ -41,6 +41,8 @@ import { HorizontalWithSubtitle } from '@/components/card-statistics'
 import type {
   HrHierarchyDelegationRecord,
   HrHierarchyHistoryRecord,
+  HrHierarchyGovernanceProposal,
+  HrHierarchyGovernanceResponse,
   HrHierarchyRecord,
   HrHierarchyResponse,
   HrMemberOption,
@@ -110,6 +112,73 @@ const formatDateTime = (value: string | null | undefined) => {
 }
 
 const formatCount = (value: number) => new Intl.NumberFormat('es-CL').format(value)
+
+type GovernanceActionState =
+  | { kind: 'run' }
+  | { kind: 'resolve'; proposalId: string; resolution: 'approve' | 'reject' | 'dismiss' }
+  | null
+
+const GOVERNANCE_PROPOSAL_STATUS_LABELS: Record<HrHierarchyGovernanceProposal['status'], string> = {
+  pending: 'Pendiente',
+  approved: 'Aprobada',
+  rejected: 'Rechazada',
+  dismissed: 'Descartada',
+  auto_applied: 'Aplicada automáticamente'
+}
+
+const GOVERNANCE_PROPOSAL_STATUS_COLORS: Record<HrHierarchyGovernanceProposal['status'], 'warning' | 'success' | 'error' | 'secondary' | 'info'> = {
+  pending: 'warning',
+  approved: 'success',
+  rejected: 'error',
+  dismissed: 'secondary',
+  auto_applied: 'info'
+}
+
+const GOVERNANCE_POLICY_ACTION_LABELS: Record<HrHierarchyGovernanceProposal['policyAction'], string> = {
+  review_required: 'Revisión requerida',
+  blocked_manual_precedence: 'Precedencia manual',
+  auto_apply_allowed: 'Autoaplicación permitida',
+  no_action: 'Sin acción'
+}
+
+const GOVERNANCE_POLICY_ACTION_COLORS: Record<HrHierarchyGovernanceProposal['policyAction'], 'warning' | 'error' | 'success' | 'default'> = {
+  review_required: 'warning',
+  blocked_manual_precedence: 'error',
+  auto_apply_allowed: 'success',
+  no_action: 'default'
+}
+
+const GOVERNANCE_SEVERITY_LABELS: Record<HrHierarchyGovernanceProposal['severity'], string> = {
+  info: 'Informativa',
+  warning: 'Advertencia',
+  error: 'Crítica'
+}
+
+const GOVERNANCE_SEVERITY_COLORS: Record<HrHierarchyGovernanceProposal['severity'], 'info' | 'warning' | 'error'> = {
+  info: 'info',
+  warning: 'warning',
+  error: 'error'
+}
+
+const GOVERNANCE_RUN_STATUS_LABELS: Record<string, string> = {
+  running: 'En curso',
+  succeeded: 'Exitosa',
+  partial: 'Parcial',
+  failed: 'Fallida'
+}
+
+const GOVERNANCE_RUN_STATUS_COLORS: Record<string, 'info' | 'success' | 'warning' | 'error' | 'secondary'> = {
+  running: 'info',
+  succeeded: 'success',
+  partial: 'warning',
+  failed: 'error'
+}
+
+const GOVERNANCE_SYNC_MODE_LABELS: Record<string, string> = {
+  manual: 'Manual',
+  poll: 'Programada',
+  webhook: 'Webhook'
+}
 
 const buildMemberChoices = (items: HrHierarchyRecord[], options: HrMemberOption[]) => {
   const byId = new Map<string, MemberChoice>()
@@ -216,6 +285,10 @@ const HrHierarchyView = () => {
   const [delegationRows, setDelegationRows] = useState<HrHierarchyDelegationRecord[]>([])
   const [panelLoading, setPanelLoading] = useState(false)
   const [panelError, setPanelError] = useState<string | null>(null)
+  const [governance, setGovernance] = useState<HrHierarchyGovernanceResponse | null>(null)
+  const [governanceLoading, setGovernanceLoading] = useState(true)
+  const [governanceError, setGovernanceError] = useState<string | null>(null)
+  const [governanceAction, setGovernanceAction] = useState<GovernanceActionState>(null)
 
   const [changeDialogOpen, setChangeDialogOpen] = useState(false)
   const [changeForm, setChangeForm] = useState<ChangeSupervisorForm>(EMPTY_MEMBER_FORM)
@@ -277,6 +350,31 @@ const HrHierarchyView = () => {
     }
   }, [])
 
+  const loadGovernance = useCallback(async (signal?: AbortSignal) => {
+    setGovernanceLoading(true)
+    setGovernanceError(null)
+
+    try {
+      const res = await fetch('/api/hr/core/hierarchy/governance?limit=20', { signal })
+
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as ApiError
+
+        throw new Error(data.error || 'No pudimos cargar la gobernanza de jerarquía.')
+      }
+
+      const payload = (await res.json()) as HrHierarchyGovernanceResponse
+
+      setGovernance(payload)
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return
+
+      setGovernanceError(error instanceof Error ? error.message : 'No pudimos cargar la gobernanza de jerarquía.')
+    } finally {
+      setGovernanceLoading(false)
+    }
+  }, [])
+
   const loadPanelData = useCallback(async (memberId: string, signal?: AbortSignal) => {
     if (!memberId) {
       setHistoryRows([])
@@ -335,6 +433,14 @@ const HrHierarchyView = () => {
   useEffect(() => {
     void loadMemberOptions()
   }, [loadMemberOptions])
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    void loadGovernance(controller.signal)
+
+    return () => controller.abort()
+  }, [loadGovernance])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -624,9 +730,107 @@ const HrHierarchyView = () => {
     [loadHierarchy, loadPanelData, selectedMemberId]
   )
 
+  const runGovernanceScan = useCallback(async () => {
+    setGovernanceAction({ kind: 'run' })
+
+    try {
+      const res = await fetch('/api/hr/core/hierarchy/governance/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as ApiError
+
+        throw new Error(data.error || 'No pudimos ejecutar la revisión de jerarquía.')
+      }
+
+      toast.success('Revisión de jerarquía ejecutada.')
+      await Promise.all([
+        loadGovernance(),
+        loadHierarchy(),
+        selectedMemberId ? loadPanelData(selectedMemberId) : Promise.resolve()
+      ])
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'No pudimos ejecutar la revisión de jerarquía.')
+    } finally {
+      setGovernanceAction(null)
+    }
+  }, [loadGovernance, loadHierarchy, loadPanelData, selectedMemberId])
+
+  const resolveGovernanceProposal = useCallback(
+    async (proposalId: string, resolution: 'approve' | 'reject' | 'dismiss') => {
+      setGovernanceAction({ kind: 'resolve', proposalId, resolution })
+
+      try {
+        const res = await fetch(`/api/hr/core/hierarchy/governance/proposals/${proposalId}/resolve`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ resolution })
+        })
+
+        if (!res.ok) {
+          const data = (await res.json().catch(() => ({}))) as ApiError
+
+          throw new Error(data.error || 'No pudimos resolver la propuesta.')
+        }
+
+        const resolved = (await res.json()) as HrHierarchyGovernanceProposal
+
+        toast.success(
+          resolution === 'approve'
+            ? 'Propuesta aprobada.'
+            : resolution === 'reject'
+              ? 'Propuesta rechazada.'
+              : 'Propuesta descartada.'
+        )
+
+        setGovernance(prev =>
+          prev
+            ? {
+                ...prev,
+                proposals: prev.proposals.map(item => (item.proposalId === resolved.proposalId ? resolved : item))
+              }
+            : prev
+        )
+
+        await Promise.all([
+          loadGovernance(),
+          loadHierarchy(),
+          selectedMemberId ? loadPanelData(selectedMemberId) : Promise.resolve()
+        ])
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'No pudimos resolver la propuesta.')
+      } finally {
+        setGovernanceAction(null)
+      }
+    },
+    [loadGovernance, loadHierarchy, loadPanelData, selectedMemberId]
+  )
+
   const activeHierarchyItems = useMemo(
     () => (includeInactive ? hierarchy?.items ?? [] : (hierarchy?.items ?? []).filter(item => item.memberActive)),
     [hierarchy?.items, includeInactive]
+  )
+
+  const governanceSummary = governance?.summary ?? {
+    pending: 0,
+    approved: 0,
+    rejected: 0,
+    dismissed: 0,
+    autoApplied: 0
+  }
+
+  const governanceProposals = governance?.proposals ?? []
+
+  const isGovernanceRunning = governanceAction?.kind === 'run'
+
+  const isResolvingGovernanceProposal = useCallback(
+    (proposalId: string, resolution: 'approve' | 'reject' | 'dismiss') =>
+      governanceAction?.kind === 'resolve' &&
+      governanceAction.proposalId === proposalId &&
+      governanceAction.resolution === resolution,
+    [governanceAction]
   )
 
   const canSubmitChange = Boolean(changeForm.memberId && changeForm.reason.trim())
@@ -688,6 +892,451 @@ const HrHierarchyView = () => {
           </Button>
         </Stack>
       </Stack>
+
+      <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
+        <SectionTitle
+          icon='tabler-shield-search'
+          title='Gobernanza de jerarquía'
+          subtitle='Política vigente, última revisión y propuestas de drift pendientes.'
+          action={
+            <Button
+              variant='tonal'
+              color='primary'
+              size='small'
+              startIcon={isGovernanceRunning ? <CircularProgress size={14} color='inherit' /> : <i className='tabler-refresh' />}
+              onClick={() => void runGovernanceScan()}
+              disabled={isGovernanceRunning || governanceLoading}
+            >
+              Ejecutar revisión
+            </Button>
+          }
+        />
+        <Divider />
+        <CardContent>
+          {governanceError && (
+            <Alert
+              severity='error'
+              sx={{ mb: 3 }}
+              action={
+                <Button color='inherit' size='small' onClick={() => void loadGovernance()}>
+                  Reintentar
+                </Button>
+              }
+            >
+              {governanceError}
+            </Alert>
+          )}
+
+          {governanceLoading && !governance ? (
+            <Stack spacing={3}>
+              <Grid container spacing={3}>
+                {[0, 1].map(index => (
+                  <Grid size={{ xs: 12, lg: index === 0 ? 7 : 5 }} key={index}>
+                    <Skeleton variant='rounded' height={index === 0 ? 224 : 224} />
+                  </Grid>
+                ))}
+              </Grid>
+              <Stack direction='row' spacing={1.5} flexWrap='wrap'>
+                {[0, 1, 2, 3, 4].map(index => (
+                  <Skeleton key={index} variant='rounded' width={148} height={32} />
+                ))}
+              </Stack>
+              <Skeleton variant='rounded' height={320} />
+            </Stack>
+          ) : governance ? (
+            <Stack spacing={3}>
+              <Grid container spacing={3}>
+                <Grid size={{ xs: 12, lg: 7 }}>
+                  <Box
+                    sx={{
+                      p: 2.5,
+                      borderRadius: 2,
+                      border: theme => `1px solid ${theme.palette.divider}`,
+                      bgcolor: 'background.paper',
+                      height: '100%'
+                    }}
+                  >
+                    <Stack spacing={2}>
+                      <Stack direction='row' justifyContent='space-between' spacing={2} flexWrap='wrap' alignItems='flex-start'>
+                        <Box>
+                          <Typography variant='subtitle1' fontWeight={600}>
+                            Política vigente
+                          </Typography>
+                          <Typography variant='body2' color='text.secondary'>
+                            La línea manual de Greenhouse prevalece por defecto; lo externo entra como revisión auditable.
+                          </Typography>
+                        </Box>
+
+                        <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                          <Chip label={`Canónica: ${governance.policy.canonicalSource}`} size='small' variant='tonal' color='primary' />
+                          <Chip label={`Externa: ${governance.policy.externalSource}`} size='small' variant='tonal' color='secondary' />
+                        </Stack>
+                      </Stack>
+
+                      <Stack spacing={1.25}>
+                        {governance.policy.precedence.map((rule, index) => (
+                          <Stack key={`${rule}-${index}`} direction='row' spacing={1} alignItems='flex-start'>
+                            <i
+                              className='tabler-point-filled'
+                              style={{ color: 'var(--mui-palette-primary-main)', fontSize: 18, marginTop: 2 }}
+                            />
+                            <Typography variant='body2' color='text.primary'>
+                              {rule}
+                            </Typography>
+                          </Stack>
+                        ))}
+                      </Stack>
+                    </Stack>
+                  </Box>
+                </Grid>
+
+                <Grid size={{ xs: 12, lg: 5 }}>
+                  <Box
+                    sx={{
+                      p: 2.5,
+                      borderRadius: 2,
+                      border: theme => `1px solid ${theme.palette.divider}`,
+                      bgcolor: 'background.paper',
+                      height: '100%'
+                    }}
+                  >
+                    <Stack spacing={2}>
+                      <Stack direction='row' justifyContent='space-between' spacing={2} flexWrap='wrap' alignItems='flex-start'>
+                        <Box>
+                          <Typography variant='subtitle1' fontWeight={600}>
+                            Último análisis
+                          </Typography>
+                          <Typography variant='body2' color='text.secondary'>
+                            Última corrida de revisión sobre la jerarquía activa.
+                          </Typography>
+                        </Box>
+
+                        <Chip
+                          label={governance.lastRun ? GOVERNANCE_RUN_STATUS_LABELS[governance.lastRun.status] ?? governance.lastRun.status : 'Sin corridas'}
+                          size='small'
+                          variant='tonal'
+                          color={governance.lastRun ? GOVERNANCE_RUN_STATUS_COLORS[governance.lastRun.status] ?? 'secondary' : 'secondary'}
+                        />
+                      </Stack>
+
+                      {governance.lastRun ? (
+                        <Grid container spacing={2}>
+                          <Grid size={{ xs: 6 }}>
+                            <Typography variant='caption' color='text.secondary'>
+                              Registros leídos
+                            </Typography>
+                            <Typography variant='body1' fontWeight={600}>
+                              {formatCount(governance.lastRun.recordsRead)}
+                            </Typography>
+                          </Grid>
+                          <Grid size={{ xs: 6 }}>
+                            <Typography variant='caption' color='text.secondary'>
+                              Propuestas detectadas
+                            </Typography>
+                            <Typography variant='body1' fontWeight={600}>
+                              {formatCount(governance.lastRun.proposalsDetected)}
+                            </Typography>
+                          </Grid>
+                          <Grid size={{ xs: 6 }}>
+                            <Typography variant='caption' color='text.secondary'>
+                              Modo
+                            </Typography>
+                            <Typography variant='body1' fontWeight={600}>
+                              {GOVERNANCE_SYNC_MODE_LABELS[governance.lastRun.syncMode] ?? governance.lastRun.syncMode}
+                            </Typography>
+                          </Grid>
+                          <Grid size={{ xs: 6 }}>
+                            <Typography variant='caption' color='text.secondary'>
+                              Estado
+                            </Typography>
+                            <Typography variant='body1' fontWeight={600}>
+                              {GOVERNANCE_RUN_STATUS_LABELS[governance.lastRun.status] ?? governance.lastRun.status}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      ) : (
+                        <EmptyState
+                          icon='tabler-history-off'
+                          title='Aún no hay corridas'
+                          description='Ejecuta una revisión para detectar propuestas de gobernanza en la jerarquía.'
+                          minHeight={180}
+                        />
+                      )}
+
+                      {governance.lastRun && (
+                        <Stack spacing={0.75}>
+                          <Typography variant='caption' color='text.secondary'>
+                            Inicio: {formatDateTime(governance.lastRun.startedAt)}
+                          </Typography>
+                          <Typography variant='caption' color='text.secondary'>
+                            Término: {formatDateTime(governance.lastRun.finishedAt)}
+                          </Typography>
+                          {governance.lastRun.notes && (
+                            <Typography variant='caption' color='text.secondary'>
+                              {governance.lastRun.notes}
+                            </Typography>
+                          )}
+                        </Stack>
+                      )}
+                    </Stack>
+                  </Box>
+                </Grid>
+              </Grid>
+
+              <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                <Chip label={`Pendientes: ${formatCount(governanceSummary.pending)}`} size='small' color='warning' variant='tonal' />
+                <Chip label={`Aprobadas: ${formatCount(governanceSummary.approved)}`} size='small' color='success' variant='tonal' />
+                <Chip label={`Rechazadas: ${formatCount(governanceSummary.rejected)}`} size='small' color='error' variant='tonal' />
+                <Chip label={`Descartadas: ${formatCount(governanceSummary.dismissed)}`} size='small' color='secondary' variant='tonal' />
+                <Chip label={`Autoaplicadas: ${formatCount(governanceSummary.autoApplied)}`} size='small' color='info' variant='tonal' />
+              </Stack>
+
+              <Box
+                sx={{
+                  borderRadius: 2,
+                  border: theme => `1px solid ${theme.palette.divider}`,
+                  overflow: 'hidden',
+                  bgcolor: 'background.paper'
+                }}
+              >
+                <Box sx={{ p: 2.5, pb: 2 }}>
+                  <Stack direction='row' justifyContent='space-between' spacing={2} flexWrap='wrap' alignItems='flex-start'>
+                    <Box>
+                      <Typography variant='subtitle1' fontWeight={600}>
+                        Propuestas de gobernanza
+                      </Typography>
+                      <Typography variant='body2' color='text.secondary'>
+                        {governanceProposals.length
+                          ? `${formatCount(governanceProposals.length)} propuestas visibles en esta revisión.`
+                          : 'No hay propuestas pendientes para revisar.'}
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </Box>
+                <Divider />
+
+                {governanceLoading && governance ? (
+                  <Box sx={{ p: 2.5 }}>
+                    <Stack spacing={1.5}>
+                      {Array.from({ length: 4 }).map((_, index) => (
+                        <Skeleton key={index} variant='rounded' height={64} />
+                      ))}
+                    </Stack>
+                  </Box>
+                ) : governanceProposals.length > 0 ? (
+                  <TableContainer>
+                    <Table size='small' stickyHeader>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Miembro</TableCell>
+                          <TableCell>Cambio propuesto</TableCell>
+                          <TableCell>Estado</TableCell>
+                          <TableCell>Gobernanza</TableCell>
+                          <TableCell>Detección</TableCell>
+                          <TableCell align='right'>Acciones</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {governanceProposals.map(proposal => {
+                          const pending = proposal.status === 'pending'
+                          const resolutionLabel = proposal.resolutionNote ? proposal.resolutionNote : 'Sin nota de resolución.'
+
+                          return (
+                            <TableRow
+                              key={proposal.proposalId}
+                              hover
+                              sx={{
+                                '& td': {
+                                  borderBottomColor: 'divider'
+                                }
+                              }}
+                            >
+                              <TableCell>
+                                <Stack spacing={0.75}>
+                                  <Stack spacing={0.25}>
+                                    <Typography variant='body2' fontWeight={600} noWrap>
+                                      {proposal.memberName}
+                                    </Typography>
+                                    <Typography variant='caption' color='text.secondary' noWrap>
+                                      Origen: {proposal.sourceSystem}
+                                    </Typography>
+                                  </Stack>
+
+                                  <Stack direction='row' spacing={0.75} flexWrap='wrap' useFlexGap>
+                                    <Chip
+                                      label={proposal.sourceMemberName ?? proposal.sourceMemberEmail ?? 'Fuente no identificada'}
+                                      size='small'
+                                      variant='tonal'
+                                      color='info'
+                                    />
+                                    <Chip
+                                      label={proposal.sourceSyncRunId ? `Corrida ${proposal.sourceSyncRunId.slice(0, 8)}` : 'Sin corrida'}
+                                      size='small'
+                                      variant='tonal'
+                                      color='secondary'
+                                    />
+                                  </Stack>
+                                </Stack>
+                              </TableCell>
+
+                              <TableCell>
+                                <Stack spacing={0.5}>
+                                  <Typography variant='body2' fontWeight={500} noWrap>
+                                    Actual: {proposal.currentSupervisorName ?? 'Sin supervisor'}
+                                  </Typography>
+                                  <Typography variant='body2' color='text.secondary' noWrap>
+                                    Propuesto: {proposal.proposedSupervisorName ?? 'Sin supervisor'}
+                                  </Typography>
+                                  <Typography variant='caption' color='text.secondary' noWrap>
+                                    {proposal.sourceSupervisorName ? `Fuente: ${proposal.sourceSupervisorName}` : 'Sin supervisor externo resuelto'}
+                                  </Typography>
+                                </Stack>
+                              </TableCell>
+
+                              <TableCell>
+                                <Stack spacing={0.75} alignItems='flex-start'>
+                                  <Chip
+                                    label={GOVERNANCE_PROPOSAL_STATUS_LABELS[proposal.status] ?? proposal.status}
+                                    size='small'
+                                    color={GOVERNANCE_PROPOSAL_STATUS_COLORS[proposal.status] ?? 'secondary'}
+                                    variant='tonal'
+                                  />
+                                  <Typography variant='caption' color='text.secondary'>
+                                    Veces detectada: {formatCount(proposal.occurrenceCount)}
+                                  </Typography>
+                                </Stack>
+                              </TableCell>
+
+                              <TableCell>
+                                <Stack spacing={0.75} alignItems='flex-start'>
+                                  <Chip
+                                    label={GOVERNANCE_POLICY_ACTION_LABELS[proposal.policyAction] ?? proposal.policyAction}
+                                    size='small'
+                                    color={GOVERNANCE_POLICY_ACTION_COLORS[proposal.policyAction] ?? 'default'}
+                                    variant='tonal'
+                                  />
+                                  <Chip
+                                    label={GOVERNANCE_SEVERITY_LABELS[proposal.severity] ?? proposal.severity}
+                                    size='small'
+                                    color={GOVERNANCE_SEVERITY_COLORS[proposal.severity] ?? 'info'}
+                                    variant='tonal'
+                                  />
+                                </Stack>
+                              </TableCell>
+
+                              <TableCell>
+                                <Stack spacing={0.5}>
+                                  <Typography variant='body2' noWrap>
+                                    Primera detección: {formatDateTime(proposal.firstDetectedAt)}
+                                  </Typography>
+                                  <Typography variant='body2' color='text.secondary' noWrap>
+                                    Última detección: {formatDateTime(proposal.lastDetectedAt)}
+                                  </Typography>
+                                  {proposal.resolvedAt && (
+                                    <Typography variant='caption' color='text.secondary' noWrap>
+                                      Resuelta: {formatDateTime(proposal.resolvedAt)}
+                                    </Typography>
+                                  )}
+                                  {!pending && (
+                                    <Typography variant='caption' color='text.secondary'>
+                                      {resolutionLabel}
+                                    </Typography>
+                                  )}
+                                </Stack>
+                              </TableCell>
+
+                              <TableCell align='right'>
+                                {pending ? (
+                                  <Stack direction='row' spacing={0.75} justifyContent='flex-end' flexWrap='wrap' useFlexGap>
+                                    <Button
+                                      size='small'
+                                      variant='tonal'
+                                      color='success'
+                                      startIcon={
+                                        isResolvingGovernanceProposal(proposal.proposalId, 'approve') ? (
+                                          <CircularProgress size={14} color='inherit' />
+                                        ) : (
+                                          <i className='tabler-check' />
+                                        )
+                                      }
+                                      disabled={Boolean(governanceAction)}
+                                      onClick={() => void resolveGovernanceProposal(proposal.proposalId, 'approve')}
+                                    >
+                                      Aprobar
+                                    </Button>
+                                    <Button
+                                      size='small'
+                                      variant='tonal'
+                                      color='error'
+                                      startIcon={
+                                        isResolvingGovernanceProposal(proposal.proposalId, 'reject') ? (
+                                          <CircularProgress size={14} color='inherit' />
+                                        ) : (
+                                          <i className='tabler-x' />
+                                        )
+                                      }
+                                      disabled={Boolean(governanceAction)}
+                                      onClick={() => void resolveGovernanceProposal(proposal.proposalId, 'reject')}
+                                    >
+                                      Rechazar
+                                    </Button>
+                                    <Button
+                                      size='small'
+                                      variant='text'
+                                      color='secondary'
+                                      startIcon={
+                                        isResolvingGovernanceProposal(proposal.proposalId, 'dismiss') ? (
+                                          <CircularProgress size={14} color='inherit' />
+                                        ) : (
+                                          <i className='tabler-eye-off' />
+                                        )
+                                      }
+                                      disabled={Boolean(governanceAction)}
+                                      onClick={() => void resolveGovernanceProposal(proposal.proposalId, 'dismiss')}
+                                    >
+                                      Descartar
+                                    </Button>
+                                  </Stack>
+                                ) : (
+                                  <Stack spacing={0.5} alignItems='flex-end'>
+                                    <Chip
+                                      label={GOVERNANCE_PROPOSAL_STATUS_LABELS[proposal.status] ?? proposal.status}
+                                      size='small'
+                                      color={GOVERNANCE_PROPOSAL_STATUS_COLORS[proposal.status] ?? 'secondary'}
+                                      variant='tonal'
+                                    />
+                                    <Typography variant='caption' color='text.secondary' align='right'>
+                                      {resolutionLabel}
+                                    </Typography>
+                                  </Stack>
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          )
+                        })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                ) : (
+                  <Box sx={{ p: 2.5 }}>
+                    <EmptyState
+                      icon='tabler-shield-check'
+                      title='Sin propuestas pendientes'
+                      description='Ejecuta una revisión para encontrar diferencias entre la fuente externa y la jerarquía vigente.'
+                      minHeight={220}
+                      action={
+                        <Button variant='outlined' size='small' onClick={() => void runGovernanceScan()} disabled={isGovernanceRunning}>
+                          Ejecutar revisión
+                        </Button>
+                      }
+                    />
+                  </Box>
+                )}
+              </Box>
+            </Stack>
+          ) : null}
+        </CardContent>
+      </Card>
 
       {hierarchyError && (
         <Alert severity='error' action={<Button color='inherit' size='small' onClick={() => void loadHierarchy()}>Reintentar</Button>}>

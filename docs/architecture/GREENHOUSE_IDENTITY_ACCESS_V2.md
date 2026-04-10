@@ -1,5 +1,18 @@
 # Greenhouse Identity & Access Architecture V2
 
+## Delta 2026-04-10 — hierarchy governance stays broad-only and preserves manual precedence (TASK-330)
+
+- `HR > Jerarquía` mantiene su carácter broad HR/admin; no se abre a supervisoría limitada.
+- La nueva gobernanza de drift vive en la misma surface:
+  - `GET /api/hr/core/hierarchy/governance`
+  - `POST /api/hr/core/hierarchy/governance/run`
+  - `POST /api/hr/core/hierarchy/governance/proposals/[proposalId]/resolve`
+- Regla vigente:
+  - Entra puede sugerir drift de supervisoría
+  - Greenhouse manual mantiene precedencia por defecto
+  - solo RRHH/Admin puede aprobar el cambio formal
+  - `workflow_approval_snapshots` no se reescribe por resolver drift histórico
+
 ## Delta 2026-04-10 — org chart explorer materialized without a new route group (TASK-329)
 
 - La capability de supervisor ya no se limita a `/hr`, `/hr/team` y `/hr/approvals`; ahora también aterriza en:

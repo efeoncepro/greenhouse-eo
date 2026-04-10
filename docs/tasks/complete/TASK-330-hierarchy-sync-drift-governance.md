@@ -6,15 +6,15 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Implementado`
 - Rank: `TBD`
 - Domain: `data`
-- Blocked by: `TASK-324`
+- Blocked by: `none`
 - Branch: `task/TASK-330-hierarchy-sync-drift-governance`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -49,7 +49,7 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md`
 - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `docs/architecture/GREENHOUSE_SCIM_ENTRA_INTEGRATION_V1.md`
-- `docs/tasks/to-do/TASK-324-reporting-hierarchy-foundation.md`
+- `docs/tasks/complete/TASK-324-reporting-hierarchy-foundation.md`
 
 Reglas obligatorias:
 
@@ -65,7 +65,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `docs/tasks/to-do/TASK-324-reporting-hierarchy-foundation.md`
+- `docs/tasks/complete/TASK-324-reporting-hierarchy-foundation.md`
 - `src/lib/entra/graph-client.ts`
 - `src/app/api/webhooks/entra-user-change/route.ts`
 - `src/lib/sync/event-catalog.ts`
@@ -83,21 +83,26 @@ Reglas obligatorias:
 - `src/lib/sync/event-catalog.ts`
 - `src/lib/hr-core/service.ts`
 - `docs/architecture/GREENHOUSE_SCIM_ENTRA_INTEGRATION_V1.md`
-- `[verificar] src/lib/hr-core/hierarchy-sync.ts`
+- `src/lib/reporting-hierarchy/store.ts`
+- `src/lib/reporting-hierarchy/readers.ts`
+- `src/lib/integrations/notion-delivery-data-quality.ts`
+- `src/lib/identity/reconciliation/reconciliation-service.ts`
 
 ## Current Repo State
 
 ### Already exists
 
-- Entra sync ya enriquece perfiles con atributos como department y job title
+- Entra sync ya enriquece perfiles con atributos como job title, ubicación, teléfono, estado y avatar
 - Greenhouse ya tiene event catalog y lanes de sync para otros dominios
 - la jerarquia canonica propuesta en `TASK-324` puede capturar source metadata
+- Greenhouse ya tiene infraestructura reusable para monitoreo histórico (`integration_data_quality_runs/checks`) y review queue (`identity_reconciliation_proposals`)
 
 ### Gap
 
 - no existe policy de precedence para reporting hierarchy
 - no existe drift detection ni review queue
 - no existe contrato canonico para imports de supervisoria
+- el contrato actual de Entra/SCIM no trae `manager`, por lo que no existe todavía una fuente externa madura de reporting hierarchy lista para auto-apply
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -119,7 +124,7 @@ Reglas obligatorias:
 
 ### Slice 3 — Ingest controlado
 
-- Integrar el primer carril de import controlado para la fuente soportada mas madura del repo
+- Integrar el primer carril de import controlado solo si la fuente soportada realmente expone supervisoria; si no, limitar la iteracion a gobernanza + drift + observabilidad sobre manual Greenhouse y dejar Entra preparado pero no sobredimensionado
 - Registrar source metadata y no sobrescribir sin policy
 - Dejar el contrato listo para futuras fuentes sin acoplar el core
 
@@ -132,7 +137,8 @@ Reglas obligatorias:
 ## Detailed Spec
 
 - La primera iteracion puede enfocarse en gobernanza y deteccion antes que en auto-apply agresivo.
-- Si el source support efectivo queda acotado a Entra/manual, documentarlo explicitamente y no sobredimensionar la lane.
+- Si el source support efectivo queda acotado a manual Greenhouse + observabilidad sobre Entra, documentarlo explicitamente y no sobredimensionar la lane.
+- No asumir import de jerarquia desde Entra mientras `src/lib/entra/graph-client.ts` no resuelva `manager` ni exista una policy aprobada para mapear ese dato a `reporting_lines`.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -140,10 +146,10 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Existe policy explicita de source of truth para jerarquias
-- [ ] Hay deteccion de drift entre jerarquia canonica y fuente externa soportada
-- [ ] Los cambios importados preservan auditabilidad y no rompen approvals ya snapshot-eados
-- [ ] La lane deja preparado el terreno para sync futuro sin ambiguedad
+- [x] Existe policy explicita de source of truth para jerarquias
+- [x] Hay deteccion de drift entre jerarquia canonica y fuente externa soportada
+- [x] Los cambios importados preservan auditabilidad y no rompen approvals ya snapshot-eados
+- [x] La lane deja preparado el terreno para sync futuro sin ambiguedad
 
 ## Verification
 
@@ -154,7 +160,7 @@ Reglas obligatorias:
 
 ## Closing Protocol
 
-- [ ] Actualizar arquitectura de identidad/sync si cambia la policy de source precedence
+- [x] Actualizar arquitectura de identidad/sync si cambia la policy de source precedence
 
 ## Follow-ups
 

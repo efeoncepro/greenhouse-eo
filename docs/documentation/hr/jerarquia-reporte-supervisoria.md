@@ -22,6 +22,22 @@ La relación formal vive en `greenhouse_core.reporting_lines`.
 
 Como capa de compatibilidad, Greenhouse mantiene sincronizado `greenhouse_core.members.reports_to_member_id` para módulos que todavía leen el snapshot actual. Person 360 y algunos flujos de leave siguen consumiendo ese snapshot mientras terminan de migrar.
 
+## Gobernanza de fuentes y drift
+
+Greenhouse separa la relación formal de las señales externas:
+
+- Greenhouse manual sigue siendo la fuente que manda para supervisoría formal
+- Entra puede detectar diferencias usando el `manager` de Microsoft Graph
+- una diferencia no reemplaza la jerarquía sola
+
+Cuando aparece drift, Greenhouse crea una propuesta auditable en `HR > Jerarquía` para que RRHH o admin decida:
+
+- aprobar el cambio y actualizar la relación formal
+- rechazarlo
+- descartarlo porque ya no aplica
+
+Esto permite observar cambios externos sin romper de forma silenciosa una jerarquía que ya está operando en approvals, visibilidad o delegaciones.
+
 ## Diferencia entre jerarquía, cargo y rol
 
 - `rol` = permisos de acceso
@@ -53,6 +69,8 @@ Ese snapshot guarda:
 
 Con eso, leave y futuros módulos pueden mostrar la cola correcta, notificar al reviewer correcto y auditar quién tenía autoridad en ese momento.
 
+Resolver una propuesta de drift no reescribe approvals ya snapshot-eados. El cambio impacta hacia adelante; lo histórico queda auditado con la autoridad que existía en el momento del workflow.
+
 ## Surface del portal
 
 La administración operativa vive en `HR > Jerarquía` (`/hr/hierarchy`).
@@ -65,6 +83,9 @@ Ahí RRHH y administradores pueden:
 - reasignar reportes directos
 - crear o revocar delegaciones temporales
 - revisar el historial auditado de cambios
+- ejecutar una corrida manual de gobernanza
+- revisar propuestas de drift entre Greenhouse y Entra
+- aprobar, rechazar o descartar propuestas externas
 
 ## Scope de supervisor
 

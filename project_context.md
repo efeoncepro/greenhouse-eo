@@ -4226,6 +4226,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - La navegacion cliente vigente para el portal Greenhouse contempla `Pulse`, `Proyectos`, `Ciclos`, `Mi Greenhouse` y `Updates`.
 - `Mi Greenhouse` concentra el modulo relacional `Tu equipo de cuenta`; `Pulse` mantiene `Capacidad del equipo` como lectura operativa separada.
 - La capa `GH_INTERNAL_MESSAGES` ya gobierna tambien partes grandes de `admin/tenants/[id]`, `view-as/dashboard`, governance de capabilities y tablas operativas del detalle de space.
+- La supervisoría formal sigue teniendo precedencia manual en Greenhouse: Entra solo puede abrir propuestas de drift auditables en `greenhouse_sync.reporting_hierarchy_drift_proposals`; no debe sobreescribir `greenhouse_core.reporting_lines` sin aprobación humana explícita.
 
 ## Deuda Tecnica Visible
 
