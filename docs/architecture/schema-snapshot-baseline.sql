@@ -792,6 +792,27 @@ CREATE TABLE greenhouse_core.reporting_lines (
 
 
 --
+-- Name: operational_responsibilities; Type: TABLE; Schema: greenhouse_core; Owner: -
+--
+
+CREATE TABLE greenhouse_core.operational_responsibilities (
+    responsibility_id text NOT NULL,
+    member_id text NOT NULL,
+    scope_type text NOT NULL,
+    scope_id text NOT NULL,
+    responsibility_type text NOT NULL,
+    is_primary boolean DEFAULT false NOT NULL,
+    effective_from timestamp with time zone DEFAULT now() NOT NULL,
+    effective_to timestamp with time zone,
+    active boolean DEFAULT true NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT operational_responsibilities_scope_type_check CHECK ((scope_type = ANY (ARRAY['organization'::text, 'space'::text, 'project'::text, 'department'::text, 'member'::text]))),
+    CONSTRAINT operational_responsibilities_responsibility_type_check CHECK ((responsibility_type = ANY (ARRAY['account_lead'::text, 'delivery_lead'::text, 'finance_reviewer'::text, 'approval_delegate'::text, 'operations_lead'::text])))
+);
+
+
+--
 -- Name: notion_workspace_source_bindings; Type: TABLE; Schema: greenhouse_core; Owner: -
 --
 
@@ -6176,6 +6197,48 @@ CREATE INDEX idx_reporting_lines_supervisor_history ON greenhouse_core.reporting
 
 
 --
+-- Name: idx_opresp_member_id; Type: INDEX; Schema: greenhouse_core; Owner: -
+--
+
+CREATE INDEX idx_opresp_member_id ON greenhouse_core.operational_responsibilities USING btree (member_id);
+
+
+--
+-- Name: idx_opresp_scope; Type: INDEX; Schema: greenhouse_core; Owner: -
+--
+
+CREATE INDEX idx_opresp_scope ON greenhouse_core.operational_responsibilities USING btree (scope_type, scope_id);
+
+
+--
+-- Name: idx_opresp_scope_type; Type: INDEX; Schema: greenhouse_core; Owner: -
+--
+
+CREATE INDEX idx_opresp_scope_type ON greenhouse_core.operational_responsibilities USING btree (scope_id, responsibility_type);
+
+
+--
+-- Name: idx_opresp_active; Type: INDEX; Schema: greenhouse_core; Owner: -
+--
+
+CREATE INDEX idx_opresp_active ON greenhouse_core.operational_responsibilities USING btree (active) WHERE (active = true);
+
+
+--
+-- Name: idx_opresp_unique_primary; Type: INDEX; Schema: greenhouse_core; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_opresp_unique_primary ON greenhouse_core.operational_responsibilities USING btree (scope_type, scope_id, responsibility_type) WHERE ((is_primary = true) AND (active = true));
+
+
+--
+-- Name: idx_opresp_no_dup_assignment; Type: INDEX; Schema: greenhouse_core; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_opresp_no_dup_assignment ON greenhouse_core.operational_responsibilities USING btree (member_id, scope_type, scope_id, responsibility_type, effective_from) WHERE (active = true);
+
+
+--
 -- Name: notion_workspace_source_bindings_lookup_idx; Type: INDEX; Schema: greenhouse_core; Owner: -
 --
 
@@ -7719,6 +7782,14 @@ ALTER TABLE ONLY greenhouse_core.reporting_lines
 
 ALTER TABLE ONLY greenhouse_core.reporting_lines
     ADD CONSTRAINT reporting_lines_supervisor_member_id_fkey FOREIGN KEY (supervisor_member_id) REFERENCES greenhouse_core.members(member_id);
+
+
+--
+-- Name: operational_responsibilities operational_responsibilities_member_id_fkey; Type: FK CONSTRAINT; Schema: greenhouse_core; Owner: -
+--
+
+ALTER TABLE ONLY greenhouse_core.operational_responsibilities
+    ADD CONSTRAINT operational_responsibilities_member_id_fkey FOREIGN KEY (member_id) REFERENCES greenhouse_core.members(member_id) ON DELETE CASCADE;
 
 
 --

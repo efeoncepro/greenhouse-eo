@@ -144,6 +144,14 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     routeGroup: 'hr'
   },
   {
+    viewCode: 'equipo.jerarquia',
+    section: 'equipo',
+    label: 'Jerarquía',
+    description: 'Supervisoría, delegaciones y auditoría de cambios del equipo.',
+    routePath: '/hr/hierarchy',
+    routeGroup: 'hr'
+  },
+  {
     viewCode: 'equipo.departamentos',
     section: 'equipo',
     label: 'Departamentos',

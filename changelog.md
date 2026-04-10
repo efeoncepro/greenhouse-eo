@@ -2,6 +2,22 @@
 
 ## 2026-04-10
 
+### 2026-04-10 — HR hierarchy admin surface completed
+
+- Nuevo módulo `HR > Jerarquía` (`/hr/hierarchy`) para administrar supervisoría formal, delegaciones temporales y auditoría de cambios.
+- Nuevos endpoints dedicados:
+  - `GET /api/hr/core/hierarchy`
+  - `GET /api/hr/core/hierarchy/history`
+  - `POST /api/hr/core/hierarchy/reassign`
+  - `GET/POST/DELETE /api/hr/core/hierarchy/delegations`
+- La jerarquía ya no depende de surfaces prestadas como `Departments`; usa `greenhouse_core.reporting_lines` como source of truth y `operational_responsibilities` para `approval_delegate`.
+- Se agregó soporte operativo para:
+  - cambio individual de supervisor con motivo
+  - reasignación de reportes directos
+  - creación y revocación de delegaciones temporales
+  - historial auditado visible de `reporting_lines`
+- Se endureció el runtime con una migración de grants sobre `greenhouse_core.reporting_lines`, dejando la foundation de `TASK-324` realmente consumible por UI y APIs.
+
 ### 2026-04-10 — Shared icon foundation with selective Flaticon support
 
 - Se integró `@flaticon/flaticon-uicons` como fuente complementaria de iconografía, cargada de forma selectiva desde `src/app/layout.tsx`:

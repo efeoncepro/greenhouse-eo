@@ -24,7 +24,7 @@ const data: SearchData[] = [
   // People / HR
   { id: '20', name: 'Nómina', url: '/hr/payroll', icon: 'tabler-report-money', section: 'People' },
   { id: '21', name: 'Personas', url: '/hr/people', icon: 'tabler-user-heart', section: 'People' },
-  { id: '22', name: 'Estructura', url: '/hr/structure', icon: 'tabler-hierarchy-2', section: 'People' },
+  { id: '22', name: 'Jerarquía', url: '/hr/hierarchy', icon: 'tabler-hierarchy-2', section: 'People' },
 
   // Administración
   { id: '30', name: 'Spaces', url: '/admin/tenants', icon: 'tabler-building', section: 'Administración' },

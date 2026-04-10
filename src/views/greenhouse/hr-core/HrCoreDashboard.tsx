@@ -140,14 +140,25 @@ const HrCoreDashboard = () => {
             Gestión de personas, permisos y asistencia
           </Typography>
         </Box>
-        <Button
-          component={Link}
-          href='/hr/leave'
-          variant='contained'
-          startIcon={<i className='tabler-calendar-plus' />}
-        >
-          Solicitar permiso
-        </Button>
+        <Stack direction='row' spacing={2}>
+          <Button
+            component={Link}
+            href='/hr/hierarchy'
+            variant='tonal'
+            color='secondary'
+            startIcon={<i className='tabler-hierarchy-2' />}
+          >
+            Abrir jerarquía
+          </Button>
+          <Button
+            component={Link}
+            href='/hr/leave'
+            variant='contained'
+            startIcon={<i className='tabler-calendar-plus' />}
+          >
+            Solicitar permiso
+          </Button>
+        </Stack>
       </Stack>
 
       {error && (

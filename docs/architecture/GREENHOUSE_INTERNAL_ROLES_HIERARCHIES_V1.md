@@ -387,6 +387,16 @@ Es una capa de lectura humana encima de relaciones ya existentes.
 - directorio interno
 - configuración de delegaciones futuras
 
+### Superficie admin vigente
+
+- La gestión operativa de supervisoría vive en `HR > /hr/hierarchy`.
+- Esa superficie administra:
+  - cambio individual de supervisor
+  - reasignación de reportes directos
+  - delegaciones temporales de aprobación
+  - historial visible de `reporting_lines`
+- `HR > Departments` puede aportar contexto o filtros, pero no reemplaza esta surface ni su source of truth.
+
 ### Anti-regla
 
 No debe asumirse que:
