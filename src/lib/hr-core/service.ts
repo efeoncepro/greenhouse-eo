@@ -79,6 +79,7 @@ import { buildPrivateAssetDownloadUrl } from '@/lib/storage/greenhouse-assets'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { CONTRACT_DERIVATIONS, normalizeContractType, resolveScheduleRequired, SCHEDULE_DEFAULTS } from '@/types/hr-contracts'
+import { getCurrentReportingLine } from '@/lib/reporting-hierarchy/readers'
 
 type MemberUserRow = {
   user_id: string | null
@@ -917,10 +918,13 @@ export const getMemberHrProfile = async ({
 
   const departmentContext = await getMemberDepartmentContextFromPostgres(memberId)
   const contract = await getMemberContractFromPostgres(memberId)
+  const currentReportingLine = await getCurrentReportingLine(memberId)
   const profile = mapMemberProfile(row, contract, { includeSensitive: isHrAdminTenant(tenant) })
 
   return {
     ...profile,
+    reportsTo: currentReportingLine ? currentReportingLine.supervisorMemberId : profile.reportsTo,
+    reportsToName: currentReportingLine ? currentReportingLine.supervisorName : profile.reportsToName,
     departmentId: departmentContext.departmentId,
     departmentName: departmentContext.departmentName
   }

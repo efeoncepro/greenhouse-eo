@@ -2,6 +2,8 @@ import 'server-only'
 
 import { randomUUID } from 'node:crypto'
 
+import type { PoolClient } from 'pg'
+
 import { getDb, withTransaction } from '@/lib/db'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
@@ -152,6 +154,10 @@ async function validateScopeExists(scopeType: ScopeType, scopeId: string): Promi
 // ── CRUD ──
 
 export async function createResponsibility(input: CreateResponsibilityInput): Promise<string> {
+  return withTransaction(client => createResponsibilityInTransaction(input, client))
+}
+
+export async function createResponsibilityInTransaction(input: CreateResponsibilityInput, client: PoolClient): Promise<string> {
   const memberId = validateNonEmpty(input.memberId, 'memberId')
   const scopeType = validateScopeType(input.scopeType)
   const scopeId = validateNonEmpty(input.scopeId, 'scopeId')
@@ -185,47 +191,45 @@ export async function createResponsibility(input: CreateResponsibilityInput): Pr
 
   const responsibilityId = `resp-${randomUUID()}`
 
-  await withTransaction(async (client) => {
-    // If marking as primary, lock + demote existing primary for same scope+type
-    // FOR UPDATE serializes concurrent requests to prevent two primaries (Gap 2 — TASK-247)
-    if (isPrimary) {
-      await client.query(
-        `SELECT responsibility_id
-         FROM greenhouse_core.operational_responsibilities
-         WHERE scope_type = $1 AND scope_id = $2 AND responsibility_type = $3
-           AND is_primary = TRUE AND active = TRUE
-         FOR UPDATE`,
-        [scopeType, scopeId, responsibilityType]
-      )
-
-      await client.query(
-        `UPDATE greenhouse_core.operational_responsibilities
-         SET is_primary = FALSE, updated_at = NOW()
-         WHERE scope_type = $1 AND scope_id = $2 AND responsibility_type = $3
-           AND is_primary = TRUE AND active = TRUE`,
-        [scopeType, scopeId, responsibilityType]
-      )
-    }
+  // If marking as primary, lock + demote existing primary for same scope+type
+  // FOR UPDATE serializes concurrent requests to prevent two primaries (Gap 2 — TASK-247)
+  if (isPrimary) {
+    await client.query(
+      `SELECT responsibility_id
+       FROM greenhouse_core.operational_responsibilities
+       WHERE scope_type = $1 AND scope_id = $2 AND responsibility_type = $3
+         AND is_primary = TRUE AND active = TRUE
+       FOR UPDATE`,
+      [scopeType, scopeId, responsibilityType]
+    )
 
     await client.query(
-      `INSERT INTO greenhouse_core.operational_responsibilities (
-        responsibility_id, member_id, scope_type, scope_id,
-        responsibility_type, is_primary, effective_from, effective_to,
-        active, created_at, updated_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TRUE, NOW(), NOW())`,
-      [responsibilityId, memberId, scopeType, scopeId, responsibilityType, isPrimary, effectiveFrom, effectiveTo]
+      `UPDATE greenhouse_core.operational_responsibilities
+       SET is_primary = FALSE, updated_at = NOW()
+       WHERE scope_type = $1 AND scope_id = $2 AND responsibility_type = $3
+         AND is_primary = TRUE AND active = TRUE`,
+      [scopeType, scopeId, responsibilityType]
     )
+  }
 
-    await publishOutboxEvent(
-      {
-        aggregateType: AGGREGATE_TYPES.operationalResponsibility,
-        aggregateId: responsibilityId,
-        eventType: EVENT_TYPES.responsibilityAssigned,
-        payload: { responsibilityId, memberId, scopeType, scopeId, responsibilityType, isPrimary }
-      },
-      client
-    )
-  })
+  await client.query(
+    `INSERT INTO greenhouse_core.operational_responsibilities (
+      responsibility_id, member_id, scope_type, scope_id,
+      responsibility_type, is_primary, effective_from, effective_to,
+      active, created_at, updated_at
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TRUE, NOW(), NOW())`,
+    [responsibilityId, memberId, scopeType, scopeId, responsibilityType, isPrimary, effectiveFrom, effectiveTo]
+  )
+
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.operationalResponsibility,
+      aggregateId: responsibilityId,
+      eventType: EVENT_TYPES.responsibilityAssigned,
+      payload: { responsibilityId, memberId, scopeType, scopeId, responsibilityType, isPrimary }
+    },
+    client
+  )
 
   return responsibilityId
 }
@@ -234,14 +238,35 @@ export async function updateResponsibility(
   responsibilityId: string,
   input: UpdateResponsibilityInput
 ): Promise<void> {
-  const db = await getDb()
+  return withTransaction(client => updateResponsibilityInTransaction(responsibilityId, input, client))
+}
 
-  const existing = await db
-    .selectFrom('greenhouse_core.operational_responsibilities')
-    .selectAll()
-    .where('responsibility_id', '=', responsibilityId)
-    .where('active', '=', true)
-    .executeTakeFirst()
+export async function updateResponsibilityInTransaction(
+  responsibilityId: string,
+  input: UpdateResponsibilityInput,
+  client: PoolClient
+): Promise<void> {
+  const existingResult = await client.query<{
+    member_id: string
+    scope_type: string
+    scope_id: string
+    responsibility_type: string
+  }>(
+    `
+      SELECT
+        member_id,
+        scope_type,
+        scope_id,
+        responsibility_type
+      FROM greenhouse_core.operational_responsibilities
+      WHERE responsibility_id = $1
+        AND active = TRUE
+      LIMIT 1
+    `,
+    [responsibilityId]
+  )
+
+  const existing = existingResult.rows[0]
 
   if (!existing) {
     throw new ResponsibilityValidationError(`Responsabilidad '${responsibilityId}' no encontrada.`, 404)
@@ -281,54 +306,56 @@ export async function updateResponsibility(
   const isRevocation = input.active === false
   const eventType = isRevocation ? EVENT_TYPES.responsibilityRevoked : EVENT_TYPES.responsibilityUpdated
 
-  await withTransaction(async (client) => {
-    // If promoting to primary, lock + demote existing primary
-    // FOR UPDATE serializes concurrent requests to prevent two primaries (Gap 2 — TASK-247)
-    if (input.isPrimary === true) {
-      await client.query(
-        `SELECT responsibility_id
-         FROM greenhouse_core.operational_responsibilities
-         WHERE scope_type = $1 AND scope_id = $2 AND responsibility_type = $3
-           AND is_primary = TRUE AND active = TRUE AND responsibility_id != $4
-         FOR UPDATE`,
+  // If promoting to primary, lock + demote existing primary
+  // FOR UPDATE serializes concurrent requests to prevent two primaries (Gap 2 — TASK-247)
+  if (input.isPrimary === true) {
+    await client.query(
+      `SELECT responsibility_id
+       FROM greenhouse_core.operational_responsibilities
+       WHERE scope_type = $1 AND scope_id = $2 AND responsibility_type = $3
+         AND is_primary = TRUE AND active = TRUE AND responsibility_id != $4
+       FOR UPDATE`,
         [existing.scope_type, existing.scope_id, existing.responsibility_type, responsibilityId]
       )
-
-      await client.query(
-        `UPDATE greenhouse_core.operational_responsibilities
-         SET is_primary = FALSE, updated_at = NOW()
-         WHERE scope_type = $1 AND scope_id = $2 AND responsibility_type = $3
-           AND is_primary = TRUE AND active = TRUE AND responsibility_id != $4`,
-        [existing.scope_type, existing.scope_id, existing.responsibility_type, responsibilityId]
-      )
-    }
 
     await client.query(
       `UPDATE greenhouse_core.operational_responsibilities
-       SET ${updates.join(', ')}
-       WHERE responsibility_id = $${paramIdx}`,
-      params
-    )
+       SET is_primary = FALSE, updated_at = NOW()
+       WHERE scope_type = $1 AND scope_id = $2 AND responsibility_type = $3
+         AND is_primary = TRUE AND active = TRUE AND responsibility_id != $4`,
+        [existing.scope_type, existing.scope_id, existing.responsibility_type, responsibilityId]
+      )
+  }
 
-    await publishOutboxEvent(
-      {
-        aggregateType: AGGREGATE_TYPES.operationalResponsibility,
-        aggregateId: responsibilityId,
-        eventType,
-        payload: {
-          responsibilityId,
-          memberId: existing.member_id,
-          scopeType: existing.scope_type,
-          scopeId: existing.scope_id,
-          responsibilityType: existing.responsibility_type,
-          changes: input
-        }
-      },
-      client
-    )
-  })
+  await client.query(
+    `UPDATE greenhouse_core.operational_responsibilities
+     SET ${updates.join(', ')}
+     WHERE responsibility_id = $${paramIdx}`,
+    params
+  )
+
+  await publishOutboxEvent(
+    {
+      aggregateType: AGGREGATE_TYPES.operationalResponsibility,
+      aggregateId: responsibilityId,
+      eventType,
+      payload: {
+        responsibilityId,
+        memberId: existing.member_id,
+        scopeType: existing.scope_type,
+        scopeId: existing.scope_id,
+        responsibilityType: existing.responsibility_type,
+        changes: input
+      }
+    },
+    client
+  )
 }
 
 export async function revokeResponsibility(responsibilityId: string): Promise<void> {
-  await updateResponsibility(responsibilityId, { active: false, effectiveTo: new Date().toISOString() })
+  return withTransaction(client => revokeResponsibilityInTransaction(responsibilityId, client))
+}
+
+export async function revokeResponsibilityInTransaction(responsibilityId: string, client: PoolClient): Promise<void> {
+  await updateResponsibilityInTransaction(responsibilityId, { active: false, effectiveTo: new Date().toISOString() }, client)
 }

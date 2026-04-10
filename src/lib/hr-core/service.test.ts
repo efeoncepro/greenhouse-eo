@@ -6,6 +6,7 @@ const {
   createDepartmentInPostgresMock,
   getDepartmentByIdFromPostgresMock,
   getMemberDepartmentContextFromPostgresMock,
+  getCurrentReportingLineMock,
   listDepartmentHeadOptionsFromPostgresMock,
   assertReportingLineChangeAllowedMock,
   publishOutboxEventMock,
@@ -21,6 +22,7 @@ const {
     createDepartmentInPostgresMock: vi.fn(),
     getDepartmentByIdFromPostgresMock: vi.fn(),
     getMemberDepartmentContextFromPostgresMock: vi.fn(),
+    getCurrentReportingLineMock: vi.fn(),
     listDepartmentHeadOptionsFromPostgresMock: vi.fn(),
     assertReportingLineChangeAllowedMock: vi.fn(async () => undefined),
     publishOutboxEventMock: vi.fn(async (...args: unknown[]) => {
@@ -61,6 +63,10 @@ vi.mock('@/lib/people/shared', () => ({
   getPeopleTableColumns: vi.fn(async () => new Set(['reports_to']))
 }))
 
+vi.mock('@/lib/reporting-hierarchy/readers', () => ({
+  getCurrentReportingLine: (...args: unknown[]) => getCurrentReportingLineMock(...args)
+}))
+
 vi.mock('@/lib/postgres/client', async () => {
   const actual = await vi.importActual('@/lib/postgres/client')
 
@@ -89,7 +95,13 @@ vi.mock('@/lib/hr-core/postgres-departments-store', () => ({
   updateMemberDepartmentContextInPostgres: (...args: unknown[]) => updateMemberDepartmentContextInPostgresMock(...args)
 }))
 
-import { createDepartment, isHrLeavePostgresFallbackError, listDepartmentHeadOptions, updateMemberHrProfile } from '@/lib/hr-core/service'
+import {
+  createDepartment,
+  getMemberHrProfile,
+  isHrLeavePostgresFallbackError,
+  listDepartmentHeadOptions,
+  updateMemberHrProfile
+} from '@/lib/hr-core/service'
 
 describe('updateMemberHrProfile', () => {
   beforeEach(() => {
@@ -97,6 +109,7 @@ describe('updateMemberHrProfile', () => {
     assertHrCoreInfrastructureReadyMock.mockClear()
     getDepartmentByIdFromPostgresMock.mockReset()
     getMemberDepartmentContextFromPostgresMock.mockReset()
+    getCurrentReportingLineMock.mockReset()
     assertReportingLineChangeAllowedMock.mockClear()
     publishOutboxEventMock.mockClear()
     runGreenhousePostgresQueryMock.mockClear()
@@ -218,6 +231,47 @@ describe('updateMemberHrProfile', () => {
       expect.stringContaining('reports_to_member_id'),
       expect.anything()
     )
+  })
+
+  it('prefers the canonical reporting line when building the HR profile', async () => {
+    runHrCoreQueryMock.mockResolvedValueOnce([
+      {
+        member_id: 'member-1',
+        display_name: 'Daniela Ferreira',
+        email: 'dferreira@efeoncepro.com',
+        department_id: null,
+        department_name: null,
+        reports_to: null,
+        reports_to_name: null,
+        identity_profile_id: null
+      }
+    ])
+    getMemberDepartmentContextFromPostgresMock.mockResolvedValue({
+      departmentId: null,
+      departmentName: null
+    })
+    getCurrentReportingLineMock.mockResolvedValue({
+      memberId: 'member-1',
+      memberName: 'Daniela Ferreira',
+      memberActive: true,
+      supervisorMemberId: 'member-2',
+      supervisorName: 'Carlos Diaz',
+      supervisorActive: true,
+      effectiveFrom: '2026-04-10T12:00:00.000Z',
+      effectiveTo: null,
+      sourceSystem: 'greenhouse_manual',
+      sourceMetadata: {},
+      changeReason: 'team_refresh',
+      changedByUserId: 'user-1'
+    })
+
+    const profile = await getMemberHrProfile({
+      tenant: { userId: 'user-1', routeGroups: ['hr'] } as any,
+      memberId: 'member-1'
+    })
+
+    expect(profile.reportsTo).toBe('member-2')
+    expect(profile.reportsToName).toBe('Carlos Diaz')
   })
 })
 

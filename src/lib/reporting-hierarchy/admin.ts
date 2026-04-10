@@ -5,7 +5,11 @@ import { sql } from 'kysely'
 import { getDb, withTransaction } from '@/lib/db'
 import { listDirectReports } from '@/lib/reporting-hierarchy/readers'
 import { upsertReportingLine, upsertReportingLineInTransaction } from '@/lib/reporting-hierarchy/store'
-import { createResponsibility, revokeResponsibility } from '@/lib/operational-responsibility/store'
+import {
+  createResponsibilityInTransaction,
+  revokeResponsibility,
+  revokeResponsibilityInTransaction
+} from '@/lib/operational-responsibility/store'
 import { HrCoreValidationError, normalizeNullableString, normalizeString } from '@/lib/hr-core/shared'
 
 import type {
@@ -62,13 +66,13 @@ type HierarchyHistoryRow = {
   supervisor_name: string | null
   previous_supervisor_member_id: string | null
   previous_supervisor_name: string | null
-  effective_from: string
-  effective_to: string | null
+  effective_from: string | Date
+  effective_to: string | Date | null
   source_system: string
   change_reason: string
   changed_by_user_id: string | null
   changed_by_name: string | null
-  created_at: string
+  created_at: string | Date
 }
 
 type DelegationRow = {
@@ -77,12 +81,12 @@ type DelegationRow = {
   supervisor_name: string | null
   delegate_member_id: string
   delegate_member_name: string | null
-  effective_from: string
-  effective_to: string | null
+  effective_from: string | Date
+  effective_to: string | Date | null
   active: boolean
   is_primary: boolean
-  created_at: string
-  updated_at: string
+  created_at: string | Date
+  updated_at: string | Date
 }
 
 type AssignApprovalDelegationInput = {
@@ -136,6 +140,20 @@ const sanitizeEffectiveFrom = (value: unknown) => {
 
 const sanitizeEffectiveTo = (value: unknown) => normalizeNullableString(value)
 
+export const formatTimestampLike = (value: string | Date | null | undefined) => {
+  if (!value) {
+    return null
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString()
+  }
+
+  const parsed = new Date(value)
+
+  return Number.isNaN(parsed.getTime()) ? String(value) : parsed.toISOString()
+}
+
 const mapHierarchyRow = (row: HierarchyListRow): HrHierarchyRecord => ({
   reportingLineId: row.reporting_line_id,
   memberId: row.member_id,
@@ -172,12 +190,29 @@ const mapDelegationRow = (row: DelegationRow): HrHierarchyDelegationRecord => ({
   supervisorName: normalizeNullableString(row.supervisor_name),
   delegateMemberId: row.delegate_member_id,
   delegateMemberName: normalizeNullableString(row.delegate_member_name),
-  effectiveFrom: new Date(row.effective_from).toISOString(),
-  effectiveTo: row.effective_to ? new Date(row.effective_to).toISOString() : null,
+  effectiveFrom: formatTimestampLike(row.effective_from) || new Date(row.effective_from).toISOString(),
+  effectiveTo: formatTimestampLike(row.effective_to),
   active: Boolean(row.active),
   isPrimary: Boolean(row.is_primary),
-  createdAt: new Date(row.created_at).toISOString(),
-  updatedAt: new Date(row.updated_at).toISOString()
+  createdAt: formatTimestampLike(row.created_at) || new Date(row.created_at).toISOString(),
+  updatedAt: formatTimestampLike(row.updated_at) || new Date(row.updated_at).toISOString()
+})
+
+export const mapHierarchyHistoryRow = (row: HierarchyHistoryRow): HrHierarchyHistoryRecord => ({
+  reportingLineId: row.reporting_line_id,
+  memberId: row.member_id,
+  memberName: row.member_name || row.member_id,
+  supervisorMemberId: normalizeNullableString(row.supervisor_member_id),
+  supervisorName: normalizeNullableString(row.supervisor_name),
+  previousSupervisorMemberId: normalizeNullableString(row.previous_supervisor_member_id),
+  previousSupervisorName: normalizeNullableString(row.previous_supervisor_name),
+  effectiveFrom: formatTimestampLike(row.effective_from) || new Date(row.effective_from).toISOString(),
+  effectiveTo: formatTimestampLike(row.effective_to),
+  sourceSystem: row.source_system,
+  changeReason: row.change_reason,
+  changedByUserId: normalizeNullableString(row.changed_by_user_id),
+  changedByName: normalizeNullableString(row.changed_by_name),
+  createdAt: formatTimestampLike(row.created_at) || new Date(row.created_at).toISOString()
 })
 
 export const listHierarchy = async (filters?: HierarchyListFilters): Promise<HrHierarchyRecord[]> => {
@@ -194,7 +229,7 @@ export const listHierarchy = async (filters?: HierarchyListFilters): Promise<HrH
   }
 
   if (filters?.departmentId) {
-    conditions.push(sql<boolean>`m.department_id = ${filters.departmentId}`)
+    conditions.push(sql<boolean>`COALESCE(m.department_id, headed_dept.department_id) = ${filters.departmentId}`)
   }
 
   if (filters?.withoutSupervisor) {
@@ -212,7 +247,7 @@ export const listHierarchy = async (filters?: HierarchyListFilters): Promise<HrH
       sql<boolean>`(
         LOWER(COALESCE(m.display_name, '')) LIKE ${pattern}
         OR LOWER(COALESCE(supervisor.display_name, '')) LIKE ${pattern}
-        OR LOWER(COALESCE(dept.name, '')) LIKE ${pattern}
+        OR LOWER(COALESCE(dept.name, headed_dept.name, '')) LIKE ${pattern}
         OR LOWER(COALESCE(m.role_title, '')) LIKE ${pattern}
       )`
     )
@@ -286,8 +321,8 @@ export const listHierarchy = async (filters?: HierarchyListFilters): Promise<HrH
       m.display_name AS member_name,
       m.active AS member_active,
       m.role_title,
-      m.department_id,
-      dept.name AS department_name,
+      COALESCE(m.department_id, headed_dept.department_id) AS department_id,
+      COALESCE(dept.name, headed_dept.name) AS department_name,
       cl.supervisor_member_id,
       supervisor.display_name AS supervisor_name,
       supervisor.active AS supervisor_active,
@@ -310,6 +345,15 @@ export const listHierarchy = async (filters?: HierarchyListFilters): Promise<HrH
       ON supervisor.member_id = cl.supervisor_member_id
     LEFT JOIN greenhouse_core.departments AS dept
       ON dept.department_id = m.department_id
+    LEFT JOIN LATERAL (
+      SELECT
+        hd.department_id,
+        hd.name
+      FROM greenhouse_core.departments AS hd
+      WHERE hd.head_member_id = m.member_id
+      ORDER BY hd.sort_order ASC, hd.name ASC
+      LIMIT 1
+    ) AS headed_dept ON TRUE
     LEFT JOIN subtree_stats AS stats
       ON stats.member_id = cl.member_id
     LEFT JOIN hierarchy_depth AS depth
@@ -409,22 +453,7 @@ export const listHierarchyHistory = async (filters?: HierarchyHistoryFilters): P
     LIMIT ${limit}
   `.execute(db)
 
-  return result.rows.map(row => ({
-    reportingLineId: row.reporting_line_id,
-    memberId: row.member_id,
-    memberName: row.member_name || row.member_id,
-    supervisorMemberId: normalizeNullableString(row.supervisor_member_id),
-    supervisorName: normalizeNullableString(row.supervisor_name),
-    previousSupervisorMemberId: normalizeNullableString(row.previous_supervisor_member_id),
-    previousSupervisorName: normalizeNullableString(row.previous_supervisor_name),
-    effectiveFrom: row.effective_from,
-    effectiveTo: normalizeNullableString(row.effective_to),
-    sourceSystem: row.source_system,
-    changeReason: row.change_reason,
-    changedByUserId: normalizeNullableString(row.changed_by_user_id),
-    changedByName: normalizeNullableString(row.changed_by_name),
-    createdAt: row.created_at
-  }))
+  return result.rows.map(mapHierarchyHistoryRow)
 }
 
 export const listApprovalDelegations = async (opts?: {
@@ -503,12 +532,15 @@ export const bulkReassignDirectReports = async (input: BulkReassignDirectReports
   const reason = assertRequired(input.reason, 'reason')
   const nextSupervisorMemberId = normalizeNullableString(input.nextSupervisorMemberId)
   const effectiveFrom = sanitizeEffectiveFrom(input.effectiveFrom)
+  const effectiveAt = effectiveFrom
 
   if (nextSupervisorMemberId && currentSupervisorMemberId === nextSupervisorMemberId) {
     throw new HrCoreValidationError('The replacement supervisor must be different from the current supervisor.')
   }
 
-  const directReports = await listDirectReports(currentSupervisorMemberId)
+  const directReports = await listDirectReports(currentSupervisorMemberId, {
+    effectiveAt: effectiveFrom
+  })
 
   if (directReports.length === 0) {
     return {
@@ -551,6 +583,28 @@ export const bulkReassignDirectReports = async (input: BulkReassignDirectReports
 }
 
 export const assignApprovalDelegation = async (input: AssignApprovalDelegationInput) => {
+  const loadApprovalDelegations: AssignApprovalDelegationDependencies['loadApprovalDelegations'] = opts =>
+    listApprovalDelegations(opts)
+
+  return assignApprovalDelegationWithDependencies(input, {
+    loadApprovalDelegations
+  })
+}
+
+type AssignApprovalDelegationDependencies = {
+  loadApprovalDelegations: (
+    opts?: {
+      supervisorMemberId?: string | null
+      delegateMemberId?: string | null
+      includeInactive?: boolean
+    }
+  ) => Promise<HrHierarchyDelegationRecord[]>
+}
+
+export const assignApprovalDelegationWithDependencies = async (
+  input: AssignApprovalDelegationInput,
+  dependencies: AssignApprovalDelegationDependencies
+) => {
   const supervisorMemberId = assertRequired(input.supervisorMemberId, 'supervisorMemberId')
   const delegateMemberId = assertRequired(input.delegateMemberId, 'delegateMemberId')
   const effectiveFrom = sanitizeEffectiveFrom(input.effectiveFrom)
@@ -560,26 +614,31 @@ export const assignApprovalDelegation = async (input: AssignApprovalDelegationIn
     throw new HrCoreValidationError('A supervisor cannot delegate approvals to the same member.')
   }
 
-  const activeDelegations = await listApprovalDelegations({
+  const activeDelegations = await dependencies.loadApprovalDelegations({
     supervisorMemberId,
     includeInactive: false
   })
 
-  for (const existing of activeDelegations) {
-    await revokeResponsibility(existing.responsibilityId)
-  }
+  await withTransaction(async client => {
+    for (const existing of activeDelegations) {
+      await revokeResponsibilityInTransaction(existing.responsibilityId, client)
+    }
 
-  await createResponsibility({
-    memberId: delegateMemberId,
-    scopeType: 'member',
-    scopeId: supervisorMemberId,
-    responsibilityType: 'approval_delegate',
-    isPrimary: true,
-    effectiveFrom,
-    effectiveTo
+    await createResponsibilityInTransaction(
+      {
+        memberId: delegateMemberId,
+        scopeType: 'member',
+        scopeId: supervisorMemberId,
+        responsibilityType: 'approval_delegate',
+        isPrimary: true,
+        effectiveFrom,
+        effectiveTo
+      },
+      client
+    )
   })
 
-  const [delegation] = await listApprovalDelegations({
+  const [delegation] = await dependencies.loadApprovalDelegations({
     supervisorMemberId,
     includeInactive: true
   })
