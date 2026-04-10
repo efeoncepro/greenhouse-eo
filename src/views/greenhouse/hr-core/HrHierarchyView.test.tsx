@@ -128,6 +128,34 @@ const baseDelegations = {
   ]
 }
 
+const baseGovernance = {
+  policy: {
+    canonicalSource: 'greenhouse_manual',
+    externalSource: 'greenhouse_serving',
+    precedence: [
+      'La supervisión manual de Greenhouse prevalece sobre la fuente externa.',
+      'Las propuestas externas pasan por revisión antes de aplicar cambios.'
+    ]
+  },
+  lastRun: {
+    status: 'succeeded',
+    recordsRead: 3,
+    proposalsDetected: 0,
+    syncMode: 'manual',
+    startedAt: '2026-04-10T12:00:00.000Z',
+    finishedAt: '2026-04-10T12:05:00.000Z',
+    notes: null
+  },
+  summary: {
+    pending: 0,
+    approved: 0,
+    rejected: 0,
+    dismissed: 0,
+    autoApplied: 0
+  },
+  proposals: []
+}
+
 describe('HrHierarchyView', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -152,6 +180,10 @@ describe('HrHierarchyView', () => {
 
       if (url.startsWith('/api/hr/core/hierarchy/delegations')) {
         return Response.json(baseDelegations)
+      }
+
+      if (url.startsWith('/api/hr/core/hierarchy/governance')) {
+        return Response.json(baseGovernance)
       }
 
       if (url.startsWith('/api/hr/core/hierarchy') && !init?.method) {
@@ -210,7 +242,36 @@ describe('HrHierarchyView', () => {
     expect(screen.getByRole('heading', { name: 'Cambiar supervisor' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Nuevo supervisor' })).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Razón' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Guardar cambio' })).toBeDisabled()
+
+    const saveButton = screen.getByRole('button', { name: 'Guardar cambio' })
+
+    expect(saveButton).toBeEnabled()
+
+    await user.click(saveButton)
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Revisa los campos obligatorios antes de guardar el cambio.')
+    expect(screen.getByRole('textbox', { name: 'Razón' })).toHaveAttribute('aria-invalid', 'true')
+  }, 10000)
+
+  it('shows validation when bulk reassignment is submitted without a reason', async () => {
+    const user = userEvent.setup()
+    const { default: HrHierarchyView } = await import('./HrHierarchyView')
+
+    renderWithTheme(<HrHierarchyView />)
+
+    await screen.findAllByText('Ana Perez')
+    await user.click(screen.getAllByRole('button', { name: 'Reasignar reportes' })[0])
+
+    expect(screen.getByRole('heading', { name: 'Reasignar reportes directos' })).toBeInTheDocument()
+
+    const saveButton = screen.getByRole('button', { name: 'Reasignar reportes' })
+
+    expect(saveButton).toBeEnabled()
+
+    await user.click(saveButton)
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Revisa los campos obligatorios antes de reasignar los reportes.')
+    expect(screen.getByRole('textbox', { name: 'Razón' })).toHaveAttribute('aria-invalid', 'true')
   }, 10000)
 
   it('opens the temporary delegation dialog from the audit panel', async () => {

@@ -292,8 +292,10 @@ const HrHierarchyView = () => {
 
   const [changeDialogOpen, setChangeDialogOpen] = useState(false)
   const [changeForm, setChangeForm] = useState<ChangeSupervisorForm>(EMPTY_MEMBER_FORM)
+  const [changeValidationAttempted, setChangeValidationAttempted] = useState(false)
   const [bulkDialogOpen, setBulkDialogOpen] = useState(false)
   const [bulkForm, setBulkForm] = useState<ReassignDirectReportsForm>(EMPTY_REASSIGN_FORM)
+  const [bulkValidationAttempted, setBulkValidationAttempted] = useState(false)
   const [delegationDialogOpen, setDelegationDialogOpen] = useState(false)
   const [delegationForm, setDelegationForm] = useState<DelegationForm>(EMPTY_DELEGATION_FORM)
   const [savingAction, setSavingAction] = useState<'change' | 'bulk' | 'delegation' | 'revoke' | null>(null)
@@ -557,6 +559,7 @@ const HrHierarchyView = () => {
 
       if (!target) return
 
+      setChangeValidationAttempted(false)
       setChangeForm({
         memberId: target.memberId,
         supervisorMemberId: target.supervisorMemberId ?? '',
@@ -574,6 +577,7 @@ const HrHierarchyView = () => {
 
       if (!target) return
 
+      setBulkValidationAttempted(false)
       setBulkForm({
         currentSupervisorMemberId: target.memberId,
         nextSupervisorMemberId: '',
@@ -603,7 +607,11 @@ const HrHierarchyView = () => {
   )
 
   const submitChangeSupervisor = useCallback(async () => {
-    if (!changeForm.memberId || !changeForm.reason.trim()) return
+    if (!changeForm.memberId || !changeForm.reason.trim()) {
+      setChangeValidationAttempted(true)
+
+      return
+    }
 
     setSavingAction('change')
 
@@ -636,7 +644,11 @@ const HrHierarchyView = () => {
   }, [changeForm, loadHierarchy, loadPanelData, selectedMemberId])
 
   const submitBulkReassign = useCallback(async () => {
-    if (!bulkForm.currentSupervisorMemberId || !bulkForm.reason.trim()) return
+    if (!bulkForm.currentSupervisorMemberId || !bulkForm.reason.trim()) {
+      setBulkValidationAttempted(true)
+
+      return
+    }
 
     setSavingAction('bulk')
 
@@ -833,9 +845,16 @@ const HrHierarchyView = () => {
     [governanceAction]
   )
 
-  const canSubmitChange = Boolean(changeForm.memberId && changeForm.reason.trim())
-  const canSubmitBulk = Boolean(bulkForm.currentSupervisorMemberId && bulkForm.reason.trim())
   const canSubmitDelegation = Boolean(delegationForm.supervisorMemberId && delegationForm.delegateMemberId)
+
+  const changeReasonError = changeValidationAttempted && !changeForm.reason.trim() ? 'La razón es obligatoria para guardar este cambio.' : ''
+
+  const changeMemberError = changeValidationAttempted && !changeForm.memberId ? 'Selecciona a la persona cuya supervisión quieres cambiar.' : ''
+
+  const bulkReasonError = bulkValidationAttempted && !bulkForm.reason.trim() ? 'La razón es obligatoria para reasignar los reportes.' : ''
+
+  const bulkCurrentSupervisorError =
+    bulkValidationAttempted && !bulkForm.currentSupervisorMemberId ? 'Selecciona al supervisor cuyos reportes directos vas a mover.' : ''
 
   if (hierarchyLoading && !hierarchy) {
     return (
@@ -1977,6 +1996,12 @@ const HrHierarchyView = () => {
         <Divider />
         <DialogContent>
           <Stack spacing={3} sx={{ mt: 1 }}>
+            {changeValidationAttempted && (!changeForm.memberId || !changeForm.reason.trim()) && (
+              <Alert severity='error' variant='outlined'>
+                Revisa los campos obligatorios antes de guardar el cambio.
+              </Alert>
+            )}
+
             <Autocomplete
               disablePortal
               options={memberChoices}
@@ -2001,7 +2026,8 @@ const HrHierarchyView = () => {
                   label='Miembro'
                   placeholder='Buscar persona'
                   size='small'
-                  helperText='La persona cuya línea de reporte vas a cambiar.'
+                  error={Boolean(changeMemberError)}
+                  helperText={changeMemberError || 'La persona cuya línea de reporte vas a cambiar.'}
                 />
               )}
             />
@@ -2037,7 +2063,8 @@ const HrHierarchyView = () => {
               minRows={3}
               value={changeForm.reason}
               onChange={event => setChangeForm(prev => ({ ...prev, reason: event.target.value }))}
-              helperText='Obligatoria para auditoría.'
+              error={Boolean(changeReasonError)}
+              helperText={changeReasonError || 'Obligatoria para auditoría.'}
             />
 
             <CustomTextField
@@ -2056,7 +2083,7 @@ const HrHierarchyView = () => {
           <Button variant='text' color='secondary' onClick={() => setChangeDialogOpen(false)}>
             Cancelar
           </Button>
-          <Button variant='contained' onClick={() => void submitChangeSupervisor()} disabled={!canSubmitChange || savingAction === 'change'}>
+          <Button variant='contained' onClick={() => void submitChangeSupervisor()} disabled={savingAction === 'change'}>
             {savingAction === 'change' ? <CircularProgress size={18} color='inherit' /> : 'Guardar cambio'}
           </Button>
         </DialogActions>
@@ -2067,6 +2094,12 @@ const HrHierarchyView = () => {
         <Divider />
         <DialogContent>
           <Stack spacing={3} sx={{ mt: 1 }}>
+            {bulkValidationAttempted && (!bulkForm.currentSupervisorMemberId || !bulkForm.reason.trim()) && (
+              <Alert severity='error' variant='outlined'>
+                Revisa los campos obligatorios antes de reasignar los reportes.
+              </Alert>
+            )}
+
             <Autocomplete
               disablePortal
               options={memberChoices}
@@ -2091,7 +2124,8 @@ const HrHierarchyView = () => {
                   label='Supervisor actual'
                   placeholder='Persona a reemplazar'
                   size='small'
-                  helperText='Se reasignan los reportes directos de esta persona.'
+                  error={Boolean(bulkCurrentSupervisorError)}
+                  helperText={bulkCurrentSupervisorError || 'Se reasignan los reportes directos de esta persona.'}
                 />
               )}
             />
@@ -2127,7 +2161,8 @@ const HrHierarchyView = () => {
               minRows={3}
               value={bulkForm.reason}
               onChange={event => setBulkForm(prev => ({ ...prev, reason: event.target.value }))}
-              helperText='Describe por qué se mueve el equipo.'
+              error={Boolean(bulkReasonError)}
+              helperText={bulkReasonError || 'Describe por qué se mueve el equipo.'}
             />
 
             <CustomTextField
@@ -2146,7 +2181,7 @@ const HrHierarchyView = () => {
           <Button variant='text' color='secondary' onClick={() => setBulkDialogOpen(false)}>
             Cancelar
           </Button>
-          <Button variant='contained' onClick={() => void submitBulkReassign()} disabled={!canSubmitBulk || savingAction === 'bulk'}>
+          <Button variant='contained' onClick={() => void submitBulkReassign()} disabled={savingAction === 'bulk'}>
             {savingAction === 'bulk' ? <CircularProgress size={18} color='inherit' /> : 'Reasignar reportes'}
           </Button>
         </DialogActions>
