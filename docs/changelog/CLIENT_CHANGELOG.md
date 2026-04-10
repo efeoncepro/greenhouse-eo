@@ -42,6 +42,29 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.12
+
+**Canal:** Beta
+**Fecha:** 2026-04-10
+**Disponible para:** internal
+**Módulos:** HR / Organigrama
+
+### Novedades
+
+- `Organigrama` ahora mantiene la cadena visual del equipo incluso cuando una persona todavía no tiene adscripción estructural de departamento.
+
+### Mejoras
+
+- La búsqueda y el panel lateral conservan el contexto del área visible aunque la adscripción formal siga pendiente.
+
+### Correcciones
+
+- El organigrama deja de mostrar como raíces planas a personas que sí tienen supervisor formal.
+
+### Notas
+
+- La vista sigue priorizando estructura por áreas; la cadena de supervisoría entra como fallback visual cuando falta la adscripción estructural.
+
 ## 2026.04-beta.11
 
 **Canal:** Beta

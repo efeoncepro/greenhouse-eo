@@ -131,6 +131,9 @@ const OrgChartNodeCard = ({ data }: NodeProps<OrgChartNodeCardNode>) => {
                 {node.isDirectReportToCurrentMember ? <Chip size='small' label='Tu equipo' color='success' variant='outlined' sx={{ height: 24 }} /> : null}
                 {node.hasActiveDelegation ? <Chip size='small' label='Delegación activa' color='warning' variant='outlined' sx={{ height: 24 }} /> : null}
                 {node.isDepartmentHead ? <Chip size='small' label='Responsable de área' color='info' variant='outlined' sx={{ height: 24 }} /> : null}
+                {!isDepartmentNode && node.placementMode === 'supervisor' ? (
+                  <Chip size='small' label='Ubicado por supervisor' color='secondary' variant='outlined' sx={{ height: 24 }} />
+                ) : null}
               </Stack>
 
               <Typography variant='subtitle1' fontWeight={700} lineHeight={1.2} noWrap title={node.displayName}>
@@ -162,12 +165,12 @@ const OrgChartNodeCard = ({ data }: NodeProps<OrgChartNodeCardNode>) => {
               title={
                 isDepartmentNode
                   ? node.headMemberName ?? 'Sin responsable visible'
-                  : node.departmentName ?? 'Departamento no visible'
+                  : node.departmentName ?? node.contextDepartmentName ?? 'Sin adscripción visible'
               }
             >
               {isDepartmentNode
                 ? node.headMemberName ?? 'Sin responsable visible'
-                : node.departmentName ?? 'Departamento no visible'}
+                : node.departmentName ?? node.contextDepartmentName ?? 'Sin adscripción visible'}
             </Typography>
             <Typography
               variant='caption'
@@ -176,12 +179,16 @@ const OrgChartNodeCard = ({ data }: NodeProps<OrgChartNodeCardNode>) => {
               title={
                 isDepartmentNode
                   ? node.parentDepartmentName ?? 'Nivel raíz'
-                  : node.supervisorName ?? 'Sin supervisor visible'
+                  : node.placementMode === 'supervisor'
+                    ? node.supervisorName ? `Ubicado bajo ${node.supervisorName}` : 'Ubicación visual por supervisor'
+                    : node.supervisorName ?? 'Sin supervisor visible'
               }
             >
               {isDepartmentNode
                 ? node.parentDepartmentName ? `Reporta a ${node.parentDepartmentName}` : 'Nivel raíz'
-                : node.supervisorName ? `Reporta a ${node.supervisorName}` : 'Sin supervisor visible'}
+                : node.placementMode === 'supervisor'
+                  ? node.supervisorName ? `Ubicado bajo ${node.supervisorName}` : 'Ubicación visual por supervisor'
+                  : node.supervisorName ? `Reporta a ${node.supervisorName}` : 'Sin supervisor visible'}
             </Typography>
           </Box>
 
@@ -194,7 +201,7 @@ const OrgChartNodeCard = ({ data }: NodeProps<OrgChartNodeCardNode>) => {
             />
             <Chip
               size='small'
-              label={isDepartmentNode ? `Miembros ${node.memberCount}` : `Área ${node.departmentName ?? 'Sin dato'}`}
+              label={isDepartmentNode ? `Miembros ${node.memberCount}` : `Subárbol ${node.subtreeSize}`}
               variant='outlined'
               sx={{ height: 24 }}
             />

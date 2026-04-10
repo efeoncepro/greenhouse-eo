@@ -2,6 +2,12 @@
 
 ## 2026-04-10
 
+### 2026-04-10 — Organigrama híbrido para miembros sin adscripción estructural
+
+- `HR > Organigrama` ahora resuelve el parentaje visual de cada persona de forma robusta cuando todavía no existe `department_id`.
+- Si una persona tiene supervisor formal visible pero aún no tiene adscripción estructural, el grafo la cuelga de la cadena de supervisoría en vez de dejarla como raíz plana.
+- La vista ahora explica ese caso en el panel lateral y conserva breadcrumb + contexto de área heredada para no perder legibilidad.
+
 ### 2026-04-10 — Hierarchy and org chart audit issues closed
 
 - `HR > Jerarquía` y la ficha HR ya leen la misma supervisoría vigente, evitando que la persona vea un supervisor distinto según la surface.

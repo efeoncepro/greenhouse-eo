@@ -286,6 +286,7 @@ export interface HrOrgChartNode {
   nodeType: 'department' | 'member'
   memberId: string | null
   departmentId: string | null
+  contextDepartmentId: string | null
   displayName: string
   publicEmail: string
   internalEmail: string | null
@@ -293,6 +294,7 @@ export interface HrOrgChartNode {
   roleTitle: string | null
   roleCategory: string
   departmentName: string | null
+  contextDepartmentName: string | null
   parentDepartmentId: string | null
   parentDepartmentName: string | null
   headMemberId: string | null
@@ -302,8 +304,12 @@ export interface HrOrgChartNode {
   payRegime: 'chile' | 'international' | null
   supervisorMemberId: string | null
   supervisorName: string | null
+  visualParentNodeId: string | null
+  visualParentLabel: string | null
+  placementMode: 'department' | 'supervisor' | 'root'
   depth: number
   directReportsCount: number
+  subtreeSize: number
   memberCount: number
   childDepartmentCount: number
   active: boolean

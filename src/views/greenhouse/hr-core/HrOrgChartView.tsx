@@ -406,7 +406,7 @@ const HrOrgChartView = () => {
                       {...params}
                       label='Buscar persona'
                       placeholder='Escribe un nombre o cargo'
-                      helperText='La búsqueda centra el mapa sobre las personas visibles y su área.'
+                      helperText='La búsqueda centra el mapa sobre las personas visibles y conserva el contexto por área o supervisor cuando falta la adscripción estructural.'
                     />
                   )}
                 />
@@ -493,28 +493,42 @@ const HrOrgChartView = () => {
             <CardContent>
               {selectedNode ? (
                 <Stack spacing={2.25}>
+                  {selectedNode.placementMode === 'supervisor' ? (
+                    <Alert severity='info'>
+                      Esta persona aparece bajo su supervisor formal porque todavía no tiene adscripción estructural de departamento.
+                    </Alert>
+                  ) : null}
+
 	                  <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
 	                    {selectedNode.isCurrentMember ? <Chip size='small' label='Mi posición' color='primary' variant='outlined' /> : null}
 	                    {selectedNode.isDirectReportToCurrentMember ? <Chip size='small' label='Reporte directo' color='success' variant='outlined' /> : null}
 	                    {selectedNode.hasActiveDelegation ? <Chip size='small' label='Delegación activa' color='warning' variant='outlined' /> : null}
 	                    {selectedNode.isDepartmentHead ? <Chip size='small' label='Responsable de área' color='info' variant='outlined' /> : null}
+                      {selectedNode.placementMode === 'supervisor' ? (
+                        <Chip size='small' label='Ubicación visual por supervisor' color='secondary' variant='outlined' />
+                      ) : null}
 	                  </Stack>
 
                   <Box sx={{ display: 'grid', gap: 1.25, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
                     <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
                       <Typography variant='caption' color='text.secondary'>
-                        Departamento
+                        Adscripción
                       </Typography>
-                      <Typography variant='body2' sx={{ mt: 0.25 }} noWrap title={selectedNode.departmentName ?? 'Sin dato'}>
-                        {selectedNode.departmentName ?? 'Sin dato'}
+                      <Typography variant='body2' sx={{ mt: 0.25 }} noWrap title={selectedNode.departmentName ?? 'Sin adscripción directa'}>
+                        {selectedNode.departmentName ?? 'Sin adscripción directa'}
                       </Typography>
                     </Box>
 	                    <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
 	                      <Typography variant='caption' color='text.secondary'>
-	                        Área superior
+	                        Contexto visual
 	                      </Typography>
-	                      <Typography variant='body2' sx={{ mt: 0.25 }} noWrap title={selectedNode.parentDepartmentName ?? 'Nivel raíz'}>
-	                        {selectedNode.parentDepartmentName ?? 'Nivel raíz'}
+	                      <Typography
+                          variant='body2'
+                          sx={{ mt: 0.25 }}
+                          noWrap
+                          title={selectedNode.contextDepartmentName ?? selectedNode.visualParentLabel ?? 'Sin contexto visible'}
+                        >
+	                        {selectedNode.contextDepartmentName ?? selectedNode.visualParentLabel ?? 'Sin contexto visible'}
 	                      </Typography>
 	                    </Box>
                     <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
@@ -537,7 +551,7 @@ const HrOrgChartView = () => {
 
 	                  <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
 	                    <Chip size='small' label={`Directos ${formatCount(selectedNode.directReportsCount)}`} variant='outlined' />
-	                    <Chip size='small' label={`Área ${selectedNode.departmentName ?? 'Sin dato'}`} variant='outlined' />
+	                    <Chip size='small' label={`Subárbol ${formatCount(selectedNode.subtreeSize)}`} variant='outlined' />
 	                    <Chip size='small' label={`Profundidad ${selectedNode.depth}`} variant='outlined' />
 	                  </Stack>
 

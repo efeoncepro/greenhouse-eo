@@ -105,6 +105,27 @@ describe('getHrOrgChart', () => {
           effectiveFrom: '2026-04-10T12:00:00.000Z',
           effectiveTo: null
         }
+      },
+      {
+        reportingLineId: 'rpt-3',
+        memberId: 'andres-carlosama',
+        memberName: 'Andres Carlosama',
+        memberActive: true,
+        roleTitle: 'Senior Visual Designer',
+        departmentId: null,
+        departmentName: null,
+        supervisorMemberId: 'daniela-ferreira',
+        supervisorName: 'Daniela Ferreira',
+        supervisorActive: true,
+        effectiveFrom: '2026-04-10T12:00:00.000Z',
+        sourceSystem: 'greenhouse_manual',
+        changeReason: 'team_update',
+        changedByUserId: 'user-1',
+        directReportsCount: 0,
+        subtreeSize: 0,
+        depth: 2,
+        isRoot: false,
+        delegation: null
       }
     ])
 
@@ -142,6 +163,23 @@ describe('getHrOrgChart', () => {
         assignedFte: 1,
         totalFte: 1,
         payRegime: 'chile'
+      },
+      {
+        memberId: 'andres-carlosama',
+        displayName: 'Andres Carlosama',
+        publicEmail: 'andres@efeonce.org',
+        internalEmail: 'andres@efeonce.org',
+        roleTitle: 'Senior Visual Designer',
+        roleCategory: 'design',
+        departmentName: null,
+        avatarUrl: null,
+        locationCountry: 'CO',
+        active: true,
+        totalAssignments: 0,
+        contractedFte: 1,
+        assignedFte: 1,
+        totalFte: 1,
+        payRegime: 'international'
       }
     ]
 
@@ -158,6 +196,10 @@ describe('getHrOrgChart', () => {
       },
       {
         member_id: 'daniela-ferreira',
+        department_id: null
+      },
+      {
+        member_id: 'andres-carlosama',
         department_id: null
       }
     ])
@@ -176,9 +218,10 @@ describe('getHrOrgChart', () => {
     })
 
     expect(result.summary.departments).toBe(2)
-    expect(result.summary.members).toBe(2)
+    expect(result.summary.members).toBe(3)
     expect(result.nodes.some(node => node.nodeType === 'department' && node.departmentId === 'creative-team')).toBe(true)
     expect(result.nodes.some(node => node.nodeType === 'member' && node.memberId === 'daniela-ferreira')).toBe(true)
+    expect(result.nodes.some(node => node.nodeType === 'member' && node.memberId === 'andres-carlosama')).toBe(true)
     expect(result.edges).toEqual(
       expect.arrayContaining([
         {
@@ -190,6 +233,11 @@ describe('getHrOrgChart', () => {
           id: 'department:creative-team-member:daniela-ferreira',
           source: 'department:creative-team',
           target: 'member:daniela-ferreira'
+        },
+        {
+          id: 'member:daniela-ferreira-member:andres-carlosama',
+          source: 'member:daniela-ferreira',
+          target: 'member:andres-carlosama'
         }
       ])
     )
@@ -210,6 +258,30 @@ describe('getHrOrgChart', () => {
     expect(danielaNode?.departmentId).toBe('creative-team')
     expect(danielaNode?.departmentName).toBe('Creative Team')
     expect(danielaNode?.isDepartmentHead).toBe(true)
+  })
+
+  it('hangs members without structural assignment under their visible supervisor instead of leaving them as roots', async () => {
+    const result = await getHrOrgChart({
+      tenant: { userId: 'user-1', memberId: 'julio-reyes' } as any,
+      accessContext: {
+        accessMode: 'broad',
+        supervisorScope: null
+      },
+      focusMemberId: 'andres-carlosama'
+    })
+
+    const andresNode = result.nodes.find(node => node.nodeType === 'member' && node.memberId === 'andres-carlosama')
+
+    expect(andresNode?.placementMode).toBe('supervisor')
+    expect(andresNode?.visualParentNodeId).toBe('member:daniela-ferreira')
+    expect(andresNode?.contextDepartmentName).toBe('Creative Team')
+    expect(andresNode?.isRoot).toBe(false)
+    expect(result.breadcrumbs.map(item => item.label)).toEqual([
+      'Ejecutivo',
+      'Creative Team',
+      'Daniela Ferreira',
+      'Andres Carlosama'
+    ])
   })
 
   it('keeps only visible member branches and their ancestor departments for supervisor scope', async () => {

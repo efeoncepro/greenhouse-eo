@@ -1,5 +1,28 @@
 # Handoff.md
 
+## Sesion 2026-04-10 — organigrama híbrido cuando falta adscripción estructural
+
+- alcance cerrado:
+  - `HR > Organigrama` ya no deja como raíces planas a personas con supervisor formal pero `department_id = null`
+  - el reader ahora resuelve un parentaje visual robusto en este orden:
+    - adscripción estructural directa (`members.department_id`)
+    - liderazgo de área (`departments.head_member_id`)
+    - cadena formal de supervisoría visible
+  - cuando una persona cuelga visualmente de su supervisor por falta de adscripción estructural:
+    - el breadcrumb conserva el contexto completo
+    - el panel lateral lo explica explícitamente
+    - la búsqueda muestra el área de contexto heredada
+- archivos sensibles / de alto impacto tocados:
+  - `src/lib/reporting-hierarchy/org-chart.ts`
+  - `src/views/greenhouse/hr-core/HrOrgChartView.tsx`
+  - `src/components/greenhouse/OrgChartNodeCard.tsx`
+  - `src/types/hr-core.ts`
+- validación ejecutada:
+  - `pnpm exec vitest run src/lib/reporting-hierarchy/org-chart.test.ts src/app/api/hr/core/org-chart/route.test.ts` — OK
+  - `pnpm exec eslint src/lib/reporting-hierarchy/org-chart.ts src/lib/reporting-hierarchy/org-chart.test.ts src/views/greenhouse/hr-core/HrOrgChartView.tsx src/components/greenhouse/OrgChartNodeCard.tsx src/types/hr-core.ts` — OK
+  - `pnpm lint` — OK
+  - `pnpm build` — OK
+
 ## Sesion 2026-04-10 — cierre de issues 036-043 en jerarquía, organigrama y departamentos
 
 - alcance cerrado:
