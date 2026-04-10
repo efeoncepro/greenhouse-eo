@@ -1,5 +1,21 @@
 # changelog.md
 
+## 2026-04-10
+
+### 2026-04-10 — Agency skills matrix and staffing engine completed
+
+- Se implementó la matriz canónica de skills en PostgreSQL con:
+  - `greenhouse_core.skill_catalog`
+  - `greenhouse_core.member_skills`
+  - `greenhouse_core.service_skill_requirements`
+- Nuevos endpoints Agency:
+  - `GET /api/agency/skills`
+  - `GET/PATCH /api/agency/skills/members/[memberId]`
+  - `GET/PATCH /api/agency/skills/services/[serviceId]`
+  - `GET /api/agency/staffing`
+- `Space 360 > Team` ahora muestra cobertura de skills, chips por persona, gaps por servicio y recomendaciones de staffing sobre el equipo asignado al `space_id`.
+- Se agregaron eventos de outbox para mutaciones de skills de miembro y requisitos de servicio.
+
 ## 2026-04-09
 
 ### 2026-04-09 — Claude skill added to create Codex skills

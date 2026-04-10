@@ -1113,6 +1113,16 @@ Team tab muestra:
      ¿Asignar a este Space?"
 ```
 
+**Estado runtime 2026-04-10 (TASK-157):**
+
+- Las tablas `greenhouse_core.skill_catalog`, `greenhouse_core.member_skills` y `greenhouse_core.service_skill_requirements` ya existen en PostgreSQL y quedaron tipadas en `src/types/db.d.ts`.
+- Endpoints operativos:
+  - `GET /api/agency/skills`
+  - `GET/PATCH /api/agency/skills/members/[memberId]?spaceId=...`
+  - `GET/PATCH /api/agency/skills/services/[serviceId]?spaceId=...`
+  - `GET /api/agency/staffing?spaceId=...&serviceId=...`
+- El primer corte del staffing engine usa el runtime actual de team/capacity y evalúa cobertura sobre los miembros ya asignados al `space_id` canónico; gaps y fit scores quedan visibles en `Space 360 > Team`.
+
 ### 11.5 SLA/SLO contractual por servicio
 
 Cada servicio contratado tiene compromisos formales. Hoy OTD es global — debería ser por servicio contra su SLA específico.

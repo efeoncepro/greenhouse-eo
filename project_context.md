@@ -1,5 +1,23 @@
 # project_context.md
 
+## Delta 2026-04-10 Agency skills matrix + staffing engine
+
+- Agency ya tiene matriz canónica de skills en PostgreSQL:
+  - `greenhouse_core.skill_catalog`
+  - `greenhouse_core.member_skills`
+  - `greenhouse_core.service_skill_requirements`
+- Endpoints nuevos:
+  - `GET /api/agency/skills`
+  - `GET/PATCH /api/agency/skills/members/[memberId]`
+  - `GET/PATCH /api/agency/skills/services/[serviceId]`
+  - `GET /api/agency/staffing`
+- Regla operativa vigente:
+  - el acceso runtime a skills de miembro y requisitos de servicio se autoriza con `spaceId`
+  - el primer corte del staffing engine evalúa cobertura y gaps sobre el equipo ya asignado al `space_id` canónico, reutilizando `member_capacity_economics` para disponibilidad
+  - `member_profiles.skills` en HR Core y arrays de Staff Aug siguen siendo suplementarios, no source of truth
+- Consumer visible:
+  - `Space 360 > Team` ahora muestra coverage de skills, chips por persona y gaps/recomendaciones por servicio
+
 ## Delta 2026-04-09 Claude skill for creating Codex skills
 
 - Nueva skill local de Claude:
