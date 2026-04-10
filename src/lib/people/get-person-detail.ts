@@ -364,7 +364,15 @@ const getMemberByIdFromPostgres = async (memberId: string): Promise<MemberRow | 
       COALESCE(m.email_aliases, ARRAY[]::text[]) AS email_aliases,
       m.role_title,
       m.role_category,
-      m.avatar_url,
+      COALESCE(
+        m.avatar_url,
+        (SELECT cu.avatar_url
+         FROM greenhouse_core.client_users cu
+         WHERE cu.identity_profile_id = m.identity_profile_id
+           AND cu.avatar_url IS NOT NULL
+         ORDER BY cu.active DESC, cu.created_at ASC
+         LIMIT 1)
+      ) AS avatar_url,
       m.active,
       m.contact_channel,
       m.contact_handle,

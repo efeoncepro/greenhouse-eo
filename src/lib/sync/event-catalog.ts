@@ -145,6 +145,7 @@ export const EVENT_TYPES = {
   reconciliationApproved: 'identity.reconciliation.approved',
   reconciliationRejected: 'identity.reconciliation.rejected',
   profileLinked: 'identity.profile.linked',
+  profileMerged: 'identity.profile.merged',
 
   // DTE Reconciliation
   dteAutoMatched: 'finance.dte.auto_matched',

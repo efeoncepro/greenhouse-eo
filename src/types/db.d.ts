@@ -394,6 +394,7 @@ export interface GreenhouseCoreIdentityProfiles {
   default_auth_mode: string | null;
   full_name: string;
   job_title: string | null;
+  merged_into_profile_id: string | null;
   notes: string | null;
   primary_source_object_id: string | null;
   primary_source_object_type: string | null;
@@ -3348,6 +3349,22 @@ export interface GreenhouseServingUser360 {
   user_id: string | null;
 }
 
+export interface GreenhouseSyncIdentityProfileMergeLog {
+  client_users_moved: Generated<number>;
+  contacts_moved: Generated<number>;
+  created_at: Generated<Timestamp>;
+  members_moved: Generated<number>;
+  memberships_deduped: Generated<number>;
+  memberships_moved: Generated<number>;
+  merge_id: string;
+  merge_reason: string | null;
+  merged_by: string;
+  source_links_moved: Generated<number>;
+  source_profile_id: string;
+  source_profile_snapshot: Generated<Json>;
+  target_profile_id: string;
+}
+
 export interface GreenhouseSyncIdentityReconciliationProposals {
   candidate_display_name: string | null;
   candidate_member_id: string | null;
@@ -3930,6 +3947,7 @@ export interface DB {
   "greenhouse_serving.session_360": GreenhouseServingSession360;
   "greenhouse_serving.staff_aug_placement_snapshots": GreenhouseServingStaffAugPlacementSnapshots;
   "greenhouse_serving.user_360": GreenhouseServingUser360;
+  "greenhouse_sync.identity_profile_merge_log": GreenhouseSyncIdentityProfileMergeLog;
   "greenhouse_sync.identity_reconciliation_proposals": GreenhouseSyncIdentityReconciliationProposals;
   "greenhouse_sync.integration_data_quality_checks": GreenhouseSyncIntegrationDataQualityChecks;
   "greenhouse_sync.integration_data_quality_runs": GreenhouseSyncIntegrationDataQualityRuns;
