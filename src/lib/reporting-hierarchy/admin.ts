@@ -172,12 +172,12 @@ const mapDelegationRow = (row: DelegationRow): HrHierarchyDelegationRecord => ({
   supervisorName: normalizeNullableString(row.supervisor_name),
   delegateMemberId: row.delegate_member_id,
   delegateMemberName: normalizeNullableString(row.delegate_member_name),
-  effectiveFrom: row.effective_from,
-  effectiveTo: normalizeNullableString(row.effective_to),
+  effectiveFrom: new Date(row.effective_from).toISOString(),
+  effectiveTo: row.effective_to ? new Date(row.effective_to).toISOString() : null,
   active: Boolean(row.active),
   isPrimary: Boolean(row.is_primary),
-  createdAt: row.created_at,
-  updatedAt: row.updated_at
+  createdAt: new Date(row.created_at).toISOString(),
+  updatedAt: new Date(row.updated_at).toISOString()
 })
 
 export const listHierarchy = async (filters?: HierarchyListFilters): Promise<HrHierarchyRecord[]> => {
@@ -350,20 +350,20 @@ export const listHierarchyHistory = async (filters?: HierarchyHistoryFilters): P
   const limit = Math.min(250, Math.max(10, Number(filters?.limit ?? 80)))
 
   if (filters?.memberId) {
-    conditions.push(sql<boolean>`history.member_id = ${filters.memberId}`)
+    conditions.push(sql<boolean>`line_history.member_id = ${filters.memberId}`)
   }
 
   if (filters?.supervisorMemberId) {
     conditions.push(
       sql<boolean>`(
-        history.supervisor_member_id = ${filters.supervisorMemberId}
-        OR history.previous_supervisor_member_id = ${filters.supervisorMemberId}
+        line_history.supervisor_member_id = ${filters.supervisorMemberId}
+        OR line_history.previous_supervisor_member_id = ${filters.supervisorMemberId}
       )`
     )
   }
 
   const result = await sql<HierarchyHistoryRow>`
-    WITH history AS (
+    WITH line_history AS (
       SELECT
         rl.reporting_line_id,
         rl.member_id,
@@ -381,31 +381,31 @@ export const listHierarchyHistory = async (filters?: HierarchyHistoryFilters): P
       FROM greenhouse_core.reporting_lines AS rl
     )
     SELECT
-      history.reporting_line_id,
-      history.member_id,
+      line_history.reporting_line_id,
+      line_history.member_id,
       member_ref.display_name AS member_name,
-      history.supervisor_member_id,
+      line_history.supervisor_member_id,
       supervisor_ref.display_name AS supervisor_name,
-      history.previous_supervisor_member_id,
+      line_history.previous_supervisor_member_id,
       previous_supervisor_ref.display_name AS previous_supervisor_name,
-      history.effective_from,
-      history.effective_to,
-      history.source_system,
-      history.change_reason,
-      history.changed_by_user_id,
+      line_history.effective_from,
+      line_history.effective_to,
+      line_history.source_system,
+      line_history.change_reason,
+      line_history.changed_by_user_id,
       COALESCE(actor.full_name, actor.email) AS changed_by_name,
-      history.created_at
-    FROM history
+      line_history.created_at
+    FROM line_history
     INNER JOIN greenhouse_core.members AS member_ref
-      ON member_ref.member_id = history.member_id
+      ON member_ref.member_id = line_history.member_id
     LEFT JOIN greenhouse_core.members AS supervisor_ref
-      ON supervisor_ref.member_id = history.supervisor_member_id
+      ON supervisor_ref.member_id = line_history.supervisor_member_id
     LEFT JOIN greenhouse_core.members AS previous_supervisor_ref
-      ON previous_supervisor_ref.member_id = history.previous_supervisor_member_id
+      ON previous_supervisor_ref.member_id = line_history.previous_supervisor_member_id
     LEFT JOIN greenhouse_core.client_users AS actor
-      ON actor.user_id = history.changed_by_user_id
+      ON actor.user_id = line_history.changed_by_user_id
     WHERE ${sql.join(conditions, sql` AND `)}
-    ORDER BY history.effective_from DESC, history.created_at DESC
+    ORDER BY line_history.effective_from DESC, line_history.created_at DESC
     LIMIT ${limit}
   `.execute(db)
 

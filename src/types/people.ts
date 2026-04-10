@@ -15,6 +15,7 @@ export interface PersonListItem {
   internalEmail: string | null
   roleTitle: string
   roleCategory: string
+  departmentName?: string | null
   avatarUrl: string | null
   locationCountry: string | null
   active: boolean

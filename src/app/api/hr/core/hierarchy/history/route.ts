@@ -16,7 +16,9 @@ const dedupeDelegations = (rows: HrHierarchyDelegationRecord[]) => {
     map.set(row.responsibilityId, row)
   }
 
-  return Array.from(map.values()).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+  return Array.from(map.values()).sort(
+    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+  )
 }
 
 export async function GET(request: Request) {

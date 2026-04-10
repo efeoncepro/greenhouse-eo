@@ -692,7 +692,7 @@ const HrHierarchyView = () => {
         throw new Error(data.error || 'No pudimos crear la delegación.')
       }
 
-      toast.success('Delegación temporal creada.')
+      toast.success('Delegación temporal creada. La nueva delegación reemplaza la activa anterior.')
       setDelegationDialogOpen(false)
       await Promise.all([loadHierarchy(), loadPanelData(selectedMemberId)])
     } catch (error) {
@@ -1881,7 +1881,7 @@ const HrHierarchyView = () => {
               <SectionTitle
                 icon='tabler-shield-check'
                 title='Delegaciones temporales'
-                subtitle='Responsabilidades de aprobación delegadas por supervisor.'
+                subtitle='Historial completo de delegaciones. Solo una delegación primaria puede quedar activa por supervisor.'
                 action={
                   <Button
                     variant='tonal'

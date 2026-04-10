@@ -134,7 +134,7 @@ export const getHrOrgChart = async ({
       avatarUrl: roster?.avatarUrl ?? null,
       roleTitle: item.roleTitle,
       roleCategory: roster?.roleCategory ?? 'unknown',
-      departmentName: item.departmentName,
+      departmentName: item.departmentName ?? roster?.departmentName ?? null,
       locationCountry: roster?.locationCountry ?? null,
       payRegime: roster?.payRegime ?? null,
       supervisorMemberId: item.supervisorMemberId,

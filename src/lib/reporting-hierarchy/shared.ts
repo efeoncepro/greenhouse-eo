@@ -3,6 +3,7 @@ import 'server-only'
 import type { PoolClient } from 'pg'
 
 import { query } from '@/lib/db'
+import { HrCoreValidationError } from '@/lib/hr-core/shared'
 
 type MemberExistenceRow = {
   member_id: string
@@ -30,7 +31,7 @@ export const normalizeTimestampInput = (value?: string | null): string => {
   const date = new Date(value)
 
   if (Number.isNaN(date.getTime())) {
-    throw new Error('Invalid effectiveFrom timestamp.')
+    throw new HrCoreValidationError('effectiveFrom must be a valid date.')
   }
 
   return date.toISOString()
@@ -71,7 +72,7 @@ export const assertMemberExists = async (
   const row = rows[0]
 
   if (!row) {
-    throw new Error(`Member '${memberId}' not found.`)
+    throw new HrCoreValidationError(`Member '${memberId}' not found.`, 404)
   }
 
   return row
