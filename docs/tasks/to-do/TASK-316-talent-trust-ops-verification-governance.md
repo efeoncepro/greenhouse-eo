@@ -138,6 +138,7 @@ Reglas obligatorias:
 ### Slice 3 — Badge and governance
 
 - Mostrar `Verificado por Efeonce` de forma consistente en self/admin y reusable para client-safe surfaces
+- El badge visible debe usar lockup inline locale-aware (`Verificado por` / `Verified by`) + wordmark SVG de Efeonce desde un componente shared, no una composición ad hoc por pantalla
 - Gestionar expiry y revalidación de certificaciones
 - Emitir eventos/auditoría si la arquitectura vigente lo requiere
 

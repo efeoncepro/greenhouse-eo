@@ -313,5 +313,6 @@ describe('Space360View', () => {
     expect(screen.getByRole('heading', { name: 'UX/UI Design · Senior' })).toBeInTheDocument()
     expect(screen.getByText('Creative Retainer')).toBeInTheDocument()
     expect(screen.getByText('Cubierto')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Verificado por Efeonce' })).toBeInTheDocument()
   })
 })

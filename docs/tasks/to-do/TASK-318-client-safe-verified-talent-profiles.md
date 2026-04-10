@@ -121,6 +121,7 @@ Reglas obligatorias:
 
 - Adaptar una surface real del portal para mostrar perfiles verificados
 - Mostrar badge `Verificado por Efeonce`
+- El badge debe verse como lockup inline locale-aware (`Verificado por` / `Verified by`) + wordmark SVG de Efeonce para reforzar señal de confianza enterprise sin parecer insignia genérica
 - Mantener densidad y claridad tipo dossier profesional, no admin panel disfrazado
 - Resolver iconografía con reglas consistentes:
   - skill/certificación/estado -> iconografía semántica del producto

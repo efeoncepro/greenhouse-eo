@@ -285,7 +285,7 @@ El perfil profesional se divide en cuatro lanes:
 ### Visual / UX baseline
 
 - Nombre visible del módulo: `Skills y certificaciones`
-- La verificación debe mostrarse como badge azul con copy `Verificado por Efeonce`; no replicar branding de Twitter/Meta literalmente.
+- La verificación debe mostrarse como badge azul con lockup inline locale-aware (`Verificado por` / `Verified by`) + wordmark SVG de Efeonce; no replicar branding de Twitter/Meta literalmente ni reemplazar el wordmark por texto plano cuando la surface soporte el componente shared.
 - Certificados:
   - card compacta con nombre, emisor y vigencia
   - CTA `Ver certificado`

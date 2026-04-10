@@ -17,7 +17,7 @@ import type { ChipProps } from '@mui/material/Chip'
 import CustomChip from '@core/components/mui/Chip'
 
 import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
-import { EmptyState, TeamProgressBar } from '@/components/greenhouse'
+import { EmptyState, TeamProgressBar, VerifiedByEfeonceBadge } from '@/components/greenhouse'
 import type { Space360Detail } from '@/lib/agency/space-360'
 
 import { formatPct, formatMoney, titleize } from '../shared'
@@ -89,6 +89,8 @@ const formatSkillLabel = (skill: TeamSkill) =>
 
 const formatRequirementLabel = (requirement: ServiceRequirement) =>
   `${requirement.skillName} · ${SENIORITY_LABELS[requirement.requiredSeniority] || titleize(requirement.requiredSeniority)}`
+
+const hasVerifiedSkills = (skills: TeamSkill[]) => skills.some(skill => Boolean(skill.verifiedBy || skill.verifiedAt))
 
 const renderSkillChips = (skills: TeamSkill[]) => {
   if (skills.length === 0) {
@@ -295,6 +297,7 @@ const TeamTab = ({ detail }: Props) => {
                     },
                     member.placementProviderName && { label: 'Placement / provider', value: member.placementProviderName }
                   ].filter(Boolean) as Array<{ label: string; value: string }>
+                  const memberHasVerifiedSkills = hasVerifiedSkills(member.skills)
 
                   return (
                     <Card key={member.assignmentId} variant='outlined'>
@@ -341,6 +344,7 @@ const TeamTab = ({ detail }: Props) => {
                           <Stack direction='row' flexWrap='wrap' gap={1}>
                             {renderSkillChips(member.skills)}
                           </Stack>
+                          {memberHasVerifiedSkills ? <VerifiedByEfeonceBadge size='small' /> : null}
                         </Box>
 
                         {member.placementId ? (
