@@ -62,6 +62,22 @@ describe('people access matrix', () => {
     expect(access.canViewIdentityContext).toBe(false)
     expect(access.canViewAccessContext).toBe(false)
   })
+
+  it('grants supervisor-scoped users profile, activity, and memberships without economy or hr data', () => {
+    const access = getPersonAccess(['collaborator'], { supervisorScoped: true })
+
+    expect(access.visibleTabs).toEqual([
+      'profile',
+      'activity',
+      'memberships'
+    ])
+    expect(access.canViewMemberships).toBe(true)
+    expect(access.canViewAssignments).toBe(true)
+    expect(access.canViewActivity).toBe(true)
+    expect(access.canViewHrProfile).toBe(false)
+    expect(access.canViewPayroll).toBe(false)
+    expect(access.canViewFinance).toBe(false)
+  })
 })
 
 describe('people meta contract', () => {
@@ -87,5 +103,15 @@ describe('people meta contract', () => {
       aiTools: true,
       deliveryContext: true
     })
+  })
+
+  it('publishes supervisor-scoped visible tabs in people meta', () => {
+    const meta = getPeopleMeta(['collaborator'], { supervisorScoped: true })
+
+    expect(meta.visibleTabs).toEqual([
+      'profile',
+      'activity',
+      'memberships'
+    ])
   })
 })

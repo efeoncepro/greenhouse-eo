@@ -2,6 +2,19 @@
 
 ## 2026-04-10
 
+### 2026-04-10 — Supervisor scope subtree-aware for People and Leave
+
+- Se agregó `src/lib/reporting-hierarchy/access.ts` para derivar supervisor scope desde `greenhouse_core.reporting_lines` y delegaciones `approval_delegate`.
+- Greenhouse ya no necesita convertir a un supervisor en `hr_manager` para abrir surfaces limitadas:
+  - `/people` puede funcionar en modo supervisor
+  - `/hr/leave` puede abrirse sin otorgar `routeGroup: hr`
+- El scope derivado recorta:
+  - roster de `/api/people`
+  - detalle y subroutes relevantes de `/api/people/[memberId]/*`
+  - tabs visibles de Person View para supervisoría limitada
+- HR/admin mantienen acceso amplio; supervisoría no se modela como role code nuevo.
+- Se dejó explícito en arquitectura y documentación funcional que `/hr/approvals` sigue siendo un surface futuro del programa, mientras la capability operativa actual vive en `/hr/leave` + People scoped.
+
 ### 2026-04-10 — Approval authority snapshots for HR workflows
 
 - Se agregó la lane compartida `src/lib/approval-authority/*` para resolver autoridad de aprobación por dominio y congelarla por etapa.

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
-import { requireInternalTenantContext, requireAdminTenantContext } from '@/lib/tenant/authorization'
+import { assertMemberVisibleInPeopleScope, assertPeopleCapability, getPersonAccessForTenant } from '@/lib/people/access-scope'
+import { requirePeopleTenantContext, requireAdminTenantContext } from '@/lib/tenant/authorization'
 import { getPersonMemberships, membershipExists, createMembership, updateMembership, deactivateMembership } from '@/lib/account-360/organization-store'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
@@ -22,11 +23,20 @@ const resolveProfileId = async (memberId: string): Promise<string | null> => {
 }
 
 export async function GET(_request: Request, { params }: { params: Promise<{ memberId: string }> }) {
-  const { tenant, errorResponse } = await requireInternalTenantContext()
+  const { tenant, accessContext, errorResponse } = await requirePeopleTenantContext()
 
   if (!tenant) return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { memberId } = await params
+  const access = getPersonAccessForTenant(tenant, accessContext)
+
+  assertPeopleCapability({ allowed: access.canViewMemberships })
+  await assertMemberVisibleInPeopleScope({
+    memberId,
+    organizationId: null,
+    accessContext
+  })
+
   const profileId = await resolveProfileId(memberId)
 
   if (!profileId) {

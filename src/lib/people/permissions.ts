@@ -3,23 +3,27 @@ import type { PersonAccess, PersonTab } from '@/types/people'
 
 const personTabOrder: PersonTab[] = ['profile', 'activity', 'memberships', 'economy', 'ai-tools']
 
-export const getPersonAccess = (roleCodes: string[]): PersonAccess => {
+export const getPersonAccess = (
+  roleCodes: string[],
+  options?: { supervisorScoped?: boolean }
+): PersonAccess => {
   const isAdmin = roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)
   const isOps = roleCodes.includes(ROLE_CODES.EFEONCE_OPERATIONS)
   const isHrPayroll = roleCodes.includes(ROLE_CODES.HR_PAYROLL)
   const isHrManager = roleCodes.includes(ROLE_CODES.HR_MANAGER)
   const isFinance = roleCodes.includes(ROLE_CODES.FINANCE_ADMIN)
   const isPeopleViewer = roleCodes.includes(ROLE_CODES.PEOPLE_VIEWER)
+  const isSupervisorScoped = options?.supervisorScoped === true
 
-  const canViewMemberships = isAdmin || isOps
-  const canViewAssignments = isAdmin || isOps || isPeopleViewer
-  const canViewActivity = isAdmin || isOps || isPeopleViewer
+  const canViewMemberships = isAdmin || isOps || isSupervisorScoped
+  const canViewAssignments = isAdmin || isOps || isPeopleViewer || isSupervisorScoped
+  const canViewActivity = isAdmin || isOps || isPeopleViewer || isSupervisorScoped
   const canViewCompensation = isAdmin || isHrPayroll || isHrManager
   const canViewPayroll = isAdmin || isHrPayroll || isHrManager
   const canViewFinance = isAdmin || isOps || isHrPayroll || isFinance
   const canViewHrProfile = isAdmin || isHrPayroll || isHrManager
   const canViewAiTools = isAdmin || isOps
-  const canViewIdentityContext = isAdmin || isOps || isHrPayroll
+  const canViewIdentityContext = isAdmin || isOps || isHrPayroll || isSupervisorScoped
   const canViewAccessContext = isAdmin || isOps
 
   return {

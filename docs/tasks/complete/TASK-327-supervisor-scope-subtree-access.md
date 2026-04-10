@@ -6,16 +6,16 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Implementada`
 - Rank: `TBD`
 - Domain: `identity`
-- Blocked by: `TASK-324`
-- Branch: `task/TASK-327-supervisor-scope-subtree-access`
+- Blocked by: `none`
+- Branch: `develop`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
@@ -27,8 +27,9 @@ Habilitar supervisor scope real en Greenhouse: una persona con reportes directos
 
 El problema actual es doble:
 
-- algunos supervisors ven demasiado porque la visibilidad sigue uniendo supervisoria con vistas HR amplias
-- otros no ven lo necesario porque el sistema sigue pensando en `role_code`, no en subarbol de reporte
+- hoy no existe una policy reusable para habilitar acceso de supervisor sin otorgar `routeGroup: hr`
+- algunos readers siguen siendo `self-only` o `hr/admin`, sin una capa intermedia subtree-aware
+- otros surfaces futuros ya estan documentados, pero el runtime todavia no materializa la semantica de supervisor basada en jerarquia y delegacion
 
 La arquitectura ya dice que `supervisor` no es un role code. Falta convertir esa semantica en access runtime real.
 
@@ -48,8 +49,8 @@ Revisar y respetar:
 
 - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `docs/architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md`
-- `docs/tasks/to-do/TASK-263-permission-sets-enterprise-view-access.md`
-- `docs/tasks/to-do/TASK-324-reporting-hierarchy-foundation.md`
+- `docs/tasks/complete/TASK-263-permission-sets-enterprise-view-access.md`
+- `docs/tasks/complete/TASK-324-reporting-hierarchy-foundation.md`
 - `docs/tasks/complete/TASK-326-approval-authority-workflow-snapshots.md`
 
 Reglas obligatorias:
@@ -67,16 +68,19 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `docs/tasks/to-do/TASK-324-reporting-hierarchy-foundation.md`
-- `docs/tasks/to-do/TASK-263-permission-sets-enterprise-view-access.md`
+- `docs/tasks/complete/TASK-324-reporting-hierarchy-foundation.md`
+- `docs/tasks/complete/TASK-263-permission-sets-enterprise-view-access.md`
+- `docs/tasks/complete/TASK-326-approval-authority-workflow-snapshots.md`
 - `src/lib/tenant/authorization.ts`
 - `src/lib/admin/view-access-catalog.ts`
+- `src/lib/reporting-hierarchy/readers.ts`
+- `src/lib/approval-authority/store.ts`
 
 ### Blocks / Impacts
 
 - `docs/tasks/to-do/TASK-328-supervisor-workspace-my-team.md`
 - `docs/tasks/to-do/TASK-329-org-chart-hierarchy-explorer.md`
-- People / HR surfaces que hoy sobrerreaccionan a `role_code`
+- People / HR surfaces que hoy no distinguen bien entre `hr/admin` y supervisor subtree-aware
 
 ### Files owned
 
@@ -85,7 +89,15 @@ Reglas obligatorias:
 - `src/lib/admin/view-access-catalog.ts`
 - `src/lib/admin/get-admin-view-access-governance.ts`
 - `src/lib/admin/permission-sets.ts`
+- `src/lib/reporting-hierarchy/readers.ts`
+- `src/lib/approval-authority/store.ts`
+- `src/lib/hr-core/shared.ts`
+- `src/lib/hr-core/postgres-leave-store.ts`
+- `src/lib/people/permissions.ts`
+- `src/lib/people/organization-scope.ts`
+- `src/app/api/people/route.ts`
 - `src/app/api/people/[memberId]/route.ts`
+- `src/app/api/people/[memberId]/hr/route.ts`
 - `src/app/api/hr/core/leave/requests/route.ts`
 
 ## Current Repo State
@@ -94,13 +106,17 @@ Reglas obligatorias:
 
 - `src/lib/tenant/authorization.ts` y `role-route-mapping.ts` ya gobiernan el access runtime
 - `src/lib/admin/view-access-catalog.ts` y permission sets ya modelan vistas persistidas
-- la arquitectura documenta que `/hr/approvals` debe ser visible a users with direct reports o HR/admin
+- `TASK-324` ya dejo `reporting_lines`, readers de subtree y `getEffectiveSupervisor()`
+- `TASK-326` ya dejo `workflow_approval_snapshots` y leave ya consume visibilidad por snapshot para approvals
+- la arquitectura documenta que `/hr/approvals` debe existir para users with direct reports o HR/admin, pero esa route todavia no esta materializada; el surface operativo actual es `/hr/leave`
 
 ### Gap
 
 - el access runtime no materializa subtree access para supervisoria
 - no existe distincion fuerte entre `hr_manager` y supervisor con equipo a cargo
 - el sistema no expone una capability clara `hasDirectReports` / `hasDelegatedAuthority`
+- People detail, Person HR y People list todavia no aplican un guard subtree-aware reutilizable
+- `greenhouse_core.reporting_lines` y `greenhouse_hr.workflow_approval_snapshots` no tienen `space_id`; esta capability debe resolverse con tenant context + jerarquia + guards, no con filtro fisico directo por tabla
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -145,10 +161,10 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Un supervisor con reportes directos puede acceder a surfaces de supervisor sin ser `hr_manager`
-- [ ] Ese acceso queda limitado a su subarbol o autoridad delegada vigente
-- [ ] HR/admin conservan acceso amplio
-- [ ] No se introduce un role code global `supervisor`
+- [x] Un supervisor con reportes directos puede acceder a surfaces de supervisor sin ser `hr_manager`
+- [x] Ese acceso queda limitado a su subarbol o autoridad delegada vigente
+- [x] HR/admin conservan acceso amplio
+- [x] No se introduce un role code global `supervisor`
 
 ## Verification
 
@@ -159,7 +175,7 @@ Reglas obligatorias:
 
 ## Closing Protocol
 
-- [ ] Actualizar la documentacion de Identity Access si cambian guards o surfaces visibles
+- [x] Actualizar la documentacion de Identity Access si cambian guards o surfaces visibles
 
 ## Follow-ups
 

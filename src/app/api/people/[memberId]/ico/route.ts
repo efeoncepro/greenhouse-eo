@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
-import { assertMemberInPeopleOrganizationScope, resolvePeopleOrganizationScope } from '@/lib/people/organization-scope'
+import { assertMemberVisibleInPeopleScope, assertPeopleCapability, getPersonAccessForTenant } from '@/lib/people/access-scope'
+import { resolvePeopleOrganizationScope } from '@/lib/people/organization-scope'
 import { requirePeopleTenantContext } from '@/lib/tenant/authorization'
 import { ensureIcoEngineInfrastructure } from '@/lib/ico-engine/schema'
 import { readMemberMetrics, computeMetricsByContext } from '@/lib/ico-engine/read-metrics'
@@ -10,7 +11,7 @@ import { readPersonIcoSnapshot } from '@/lib/person-360/get-person-ico-profile'
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request, { params }: { params: Promise<{ memberId: string }> }) {
-  const { tenant, errorResponse } = await requirePeopleTenantContext()
+  const { tenant, accessContext, errorResponse } = await requirePeopleTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -33,7 +34,14 @@ export async function GET(request: Request, { params }: { params: Promise<{ memb
       return NextResponse.json({ error: 'Invalid month' }, { status: 400 })
     }
 
-    await assertMemberInPeopleOrganizationScope(memberId, organizationId)
+    const access = getPersonAccessForTenant(tenant, accessContext)
+
+    assertPeopleCapability({ allowed: access.canViewActivity })
+    await assertMemberVisibleInPeopleScope({
+      memberId,
+      organizationId,
+      accessContext
+    })
 
     if (organizationId) {
       const scoped = await readPersonIcoSnapshot(memberId, periodYear, periodMonth, { organizationId })

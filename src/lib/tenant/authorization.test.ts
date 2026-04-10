@@ -1,9 +1,14 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 
 const mockGetTenantContext = vi.fn()
+const mockGetSupervisorScopeForTenant = vi.fn()
 
 vi.mock('@/lib/tenant/get-tenant-context', () => ({
   getTenantContext: (...args: unknown[]) => mockGetTenantContext(...args)
+}))
+
+vi.mock('@/lib/reporting-hierarchy/access', () => ({
+  getSupervisorScopeForTenant: (...args: unknown[]) => mockGetSupervisorScopeForTenant(...args)
 }))
 
 import { requirePeopleTenantContext } from '@/lib/tenant/authorization'
@@ -11,6 +16,16 @@ import { requirePeopleTenantContext } from '@/lib/tenant/authorization'
 describe('requirePeopleTenantContext', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockGetSupervisorScopeForTenant.mockResolvedValue({
+      memberId: null,
+      directReportCount: 0,
+      delegatedSupervisorIds: [],
+      visibleMemberIds: [],
+      hasDirectReports: false,
+      hasDelegatedAuthority: false,
+      canAccessSupervisorPeople: false,
+      canAccessSupervisorLeave: false
+    })
   })
 
   it('allows people API access when the tenant has the explicit people view', async () => {
@@ -67,5 +82,47 @@ describe('requirePeopleTenantContext', () => {
 
     expect(result.tenant).toBeNull()
     expect(result.errorResponse?.status).toBe(403)
+  })
+
+  it('allows supervisor-scoped access when the tenant has visible subtree members but no broad people view', async () => {
+    mockGetTenantContext.mockResolvedValue({
+      userId: 'user-3',
+      clientId: 'efeonce',
+      clientName: 'Efeonce',
+      tenantType: 'efeonce_internal',
+      roleCodes: ['collaborator'],
+      primaryRoleCode: 'collaborator',
+      routeGroups: ['my'],
+      authorizedViews: [],
+      projectScopes: [],
+      campaignScopes: [],
+      businessLines: [],
+      serviceModules: [],
+      role: 'Collaborator',
+      projectIds: [],
+      featureFlags: [],
+      timezone: 'America/Santiago',
+      portalHomePath: '/my',
+      authMode: 'sso',
+      memberId: 'member-supervisor'
+    })
+
+    mockGetSupervisorScopeForTenant.mockResolvedValue({
+      memberId: 'member-supervisor',
+      directReportCount: 2,
+      delegatedSupervisorIds: [],
+      visibleMemberIds: ['member-supervisor', 'member-a', 'member-b'],
+      hasDirectReports: true,
+      hasDelegatedAuthority: false,
+      canAccessSupervisorPeople: true,
+      canAccessSupervisorLeave: true
+    })
+
+    const result = await requirePeopleTenantContext()
+
+    expect(result.tenant?.userId).toBe('user-3')
+    expect(result.errorResponse).toBeNull()
+    expect(result.accessContext?.accessMode).toBe('supervisor')
+    expect(result.accessContext?.supervisorScope?.visibleMemberIds).toContain('member-a')
   })
 })

@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { assertMemberInPeopleOrganizationScope, resolvePeopleOrganizationScope } from '@/lib/people/organization-scope'
+import { assertMemberVisibleInPeopleScope, assertPeopleCapability, getPersonAccessForTenant } from '@/lib/people/access-scope'
+import { resolvePeopleOrganizationScope } from '@/lib/people/organization-scope'
 import { toPeopleErrorResponse } from '@/lib/people/shared'
 import { requirePeopleTenantContext } from '@/lib/tenant/authorization'
 import { roundCurrency, toNumber } from '@/lib/finance/shared'
@@ -44,7 +45,7 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ memberId: string }> }
 ) {
-  const { tenant, errorResponse } = await requirePeopleTenantContext()
+  const { tenant, accessContext, errorResponse } = await requirePeopleTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -53,8 +54,14 @@ export async function GET(
   try {
     const { memberId } = await params
     const organizationId = resolvePeopleOrganizationScope(request, tenant)
+    const access = getPersonAccessForTenant(tenant, accessContext)
 
-    await assertMemberInPeopleOrganizationScope(memberId, organizationId)
+    assertPeopleCapability({ allowed: access.canViewFinance })
+    await assertMemberVisibleInPeopleScope({
+      memberId,
+      organizationId,
+      accessContext
+    })
 
     // Get latest capacity economics for this member
     let costData: {

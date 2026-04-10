@@ -42,6 +42,17 @@ export interface EffectiveSupervisorRecord {
   } | null
 }
 
+export interface SupervisorScopeRecord {
+  memberId: string | null
+  directReportCount: number
+  delegatedSupervisorIds: string[]
+  visibleMemberIds: string[]
+  hasDirectReports: boolean
+  hasDelegatedAuthority: boolean
+  canAccessSupervisorPeople: boolean
+  canAccessSupervisorLeave: boolean
+}
+
 export interface UpsertReportingLineInput {
   memberId: string
   supervisorMemberId: string | null

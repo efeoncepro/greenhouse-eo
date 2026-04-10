@@ -50,6 +50,7 @@ import {
   runGreenhousePostgresQuery,
   withGreenhousePostgresTransaction
 } from '@/lib/postgres/client'
+import { getSupervisorScopeForTenant } from '@/lib/reporting-hierarchy/access'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import {
@@ -689,7 +690,13 @@ const assertMemberVisibleToTenant = async (tenant: TenantContext, memberId: stri
 
   const currentMember = await resolveTenantMember(tenant, client)
 
-  if (currentMember.member_id !== memberId) {
+  if (currentMember.member_id === memberId) {
+    return
+  }
+
+  const supervisorScope = await getSupervisorScopeForTenant(tenant).catch(() => null)
+
+  if (!supervisorScope?.visibleMemberIds.includes(memberId)) {
     throw new HrCoreValidationError('Forbidden', 403)
   }
 }

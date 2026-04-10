@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server'
 
+import { assertMemberVisibleInPeopleScope, getPersonAccessForTenant } from '@/lib/people/access-scope'
 import { getPersonDetail } from '@/lib/people/get-person-detail'
-import { assertMemberInPeopleOrganizationScope, resolvePeopleOrganizationScope } from '@/lib/people/organization-scope'
-import { getPersonAccess } from '@/lib/people/permissions'
+import { resolvePeopleOrganizationScope } from '@/lib/people/organization-scope'
 import { toPeopleErrorResponse } from '@/lib/people/shared'
 import { requirePeopleTenantContext } from '@/lib/tenant/authorization'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request, { params }: { params: Promise<{ memberId: string }> }) {
-  const { tenant, errorResponse } = await requirePeopleTenantContext()
+  const { tenant, accessContext, errorResponse } = await requirePeopleTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -19,11 +19,15 @@ export async function GET(request: Request, { params }: { params: Promise<{ memb
     const { memberId } = await params
     const organizationId = resolvePeopleOrganizationScope(request, tenant)
 
-    await assertMemberInPeopleOrganizationScope(memberId, organizationId)
+    await assertMemberVisibleInPeopleScope({
+      memberId,
+      organizationId,
+      accessContext
+    })
 
     const detail = await getPersonDetail({
       memberId,
-      access: getPersonAccess(tenant.roleCodes),
+      access: getPersonAccessForTenant(tenant, accessContext),
       organizationId
     })
 

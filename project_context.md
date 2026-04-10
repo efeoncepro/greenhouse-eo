@@ -310,6 +310,17 @@
   - esta jerarquía es de lectura humana y no reemplaza `role_code` ni ownership operativo
 - Naming guidance:
   - `role_code` técnico estable en `snake_case`
+
+## Delta 2026-04-10 Supervisor subtree-aware access
+
+- Greenhouse ya materializa supervisoría limitada en runtime sin introducir un `role_code` `supervisor`.
+- `/people` y `/hr/leave` pueden abrirse en modo supervisor derivado cuando el actor tiene:
+  - reportes directos en `greenhouse_core.reporting_lines`, o
+  - delegación activa `approval_delegate`
+- Regla operativa:
+  - `routeGroup: hr` sigue siendo acceso HR amplio; no debe reutilizarse como proxy de liderazgo formal
+  - la visibilidad limitada de supervisor se deriva on-demand desde jerarquía + delegación
+  - `HR > Jerarquía` sigue siendo una surface de RRHH/admin; supervisoría limitada actual no concede CRUD de jerarquía
   - nombre visible amigable y legible para UI/admin
 - rol visible más amplio:
   - `Superadministrador`

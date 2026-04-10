@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 
+import { assertMemberVisibleInPeopleScope, assertPeopleCapability, getPersonAccessForTenant } from '@/lib/people/access-scope'
+import { resolvePeopleOrganizationScope } from '@/lib/people/organization-scope'
 import { requirePeopleTenantContext } from '@/lib/tenant/authorization'
 import { readPersonIntelligence, readPersonIntelligenceTrend } from '@/lib/person-intelligence/store'
 import type { PersonIntelligenceResponse } from '@/lib/person-intelligence/types'
@@ -120,7 +122,7 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ memberId: string }> }
 ) {
-  const { tenant, errorResponse } = await requirePeopleTenantContext()
+  const { tenant, accessContext, errorResponse } = await requirePeopleTenantContext()
 
   if (!tenant) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -133,8 +135,18 @@ export async function GET(
   const { memberId } = await params
   const { searchParams } = new URL(request.url)
   const trendMonths = Math.min(24, Math.max(1, Number(searchParams.get('trend') || '6')))
+  const organizationId = resolvePeopleOrganizationScope(request, tenant)
 
   try {
+    const access = getPersonAccessForTenant(tenant, accessContext)
+
+    assertPeopleCapability({ allowed: access.canViewActivity })
+    await assertMemberVisibleInPeopleScope({
+      memberId,
+      organizationId,
+      accessContext
+    })
+
     const { year, month } = getCurrentSantiagoPeriod()
 
     const [current, trend, currentEconomics, trendEconomics] = await Promise.all([

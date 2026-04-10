@@ -1,5 +1,24 @@
 # Handoff.md
 
+## Sesion 2026-04-10 — TASK-327 cerrada: supervisor scope subtree-aware
+
+- alcance cerrado:
+  - nueva helper lane `src/lib/reporting-hierarchy/access.ts` para derivar scope de supervisor desde `reporting_lines` + `approval_delegate`
+  - `requirePeopleTenantContext()` ya distingue acceso `broad` vs `supervisor` sin crear un role code `supervisor`
+  - `/people` ya puede abrirse en modo supervisor limitado; list, detail y subroutes relevantes recortan visibilidad al subárbol o delegación vigente
+  - `PersonView` ya recibe tabs limitadas para supervisoría (`profile`, `activity`, `memberships`) sin abrir HR profile, payroll ni finance
+  - `/hr/leave` ya puede abrirse para supervisoría limitada sin otorgar `routeGroup: hr`
+  - `leave` mantiene visibilidad por snapshot/direct supervisor y ahora acepta subtree/delegation también en checks de member visibility para readers puntuales
+  - la spec de `TASK-327` quedó saneada contra el repo real y lista para archivo en `complete/`
+- validación ejecutada:
+  - `pnpm exec tsc --noEmit --incremental false` — OK
+  - `pnpm exec vitest run src/lib/tenant/authorization.test.ts src/lib/people/permissions.test.ts` — OK
+  - `pnpm lint` — OK
+  - `pnpm build` — OK
+- siguiente paso natural:
+  - `TASK-328` para materializar el workspace de supervisor y la cola dedicada de aprobaciones
+  - `TASK-329` para el organigrama/explorer sobre la misma policy subtree-aware
+
 ## Sesion 2026-04-10 — TASK-326 cerrada: approval authority snapshots
 
 - alcance cerrado:

@@ -3,9 +3,18 @@ import 'server-only'
 import { NextResponse } from 'next/server'
 
 import { ROLE_CODES } from '@/config/role-codes'
+import { getSupervisorScopeForTenant } from '@/lib/reporting-hierarchy/access'
+import type { SupervisorScopeRecord } from '@/lib/reporting-hierarchy/types'
 import { getTenantContext, type TenantContext } from '@/lib/tenant/get-tenant-context'
 
 export type TenantRouteGroup = 'client' | 'internal' | 'admin' | 'agency' | 'hr' | 'finance' | 'my' | 'people' | 'ai_tooling'
+
+export type DerivedAccessMode = 'broad' | 'supervisor'
+
+export type DerivedTenantAccessContext = {
+  accessMode: DerivedAccessMode
+  supervisorScope: SupervisorScopeRecord | null
+}
 
 export const hasAuthorizedViewCode = ({
   tenant,
@@ -65,6 +74,64 @@ export const canAccessPeopleModule = (tenant: TenantContext) =>
   hasRouteGroup(tenant, 'people') ||
   hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN) ||
   (hasRouteGroup(tenant, 'internal') && hasRoleCode(tenant, ROLE_CODES.FINANCE_ADMIN))
+
+export const hasBroadPeopleAccess = (tenant: TenantContext) =>
+  hasAuthorizedViewCode({
+    tenant,
+    viewCode: 'equipo.personas',
+    fallback: canAccessPeopleModule(tenant)
+  })
+
+export const hasBroadHrLeaveAccess = (tenant: TenantContext) =>
+  hasAuthorizedViewCode({
+    tenant,
+    viewCode: 'equipo.permisos',
+    fallback: tenant.routeGroups.includes('hr') || tenant.roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN)
+  })
+
+export const resolvePeopleAccessContext = async (
+  tenant: TenantContext
+): Promise<DerivedTenantAccessContext | null> => {
+  if (hasBroadPeopleAccess(tenant)) {
+    return {
+      accessMode: 'broad',
+      supervisorScope: null
+    }
+  }
+
+  const supervisorScope = await getSupervisorScopeForTenant(tenant).catch(() => null)
+
+  if (supervisorScope?.canAccessSupervisorPeople) {
+    return {
+      accessMode: 'supervisor',
+      supervisorScope
+    }
+  }
+
+  return null
+}
+
+export const resolveHrLeaveAccessContext = async (
+  tenant: TenantContext
+): Promise<DerivedTenantAccessContext | null> => {
+  if (hasBroadHrLeaveAccess(tenant)) {
+    return {
+      accessMode: 'broad',
+      supervisorScope: null
+    }
+  }
+
+  const supervisorScope = await getSupervisorScopeForTenant(tenant).catch(() => null)
+
+  if (supervisorScope?.canAccessSupervisorLeave) {
+    return {
+      accessMode: 'supervisor',
+      supervisorScope
+    }
+  }
+
+  return null
+}
 
 export const requireMyTenantContext = async (): Promise<{
   tenant: TenantContext | null
@@ -231,21 +298,19 @@ export const requirePeopleTenantContext = async () => {
     }
   }
 
-  const hasPeopleAccess = hasAuthorizedViewCode({
-    tenant,
-    viewCode: 'equipo.personas',
-    fallback: canAccessPeopleModule(tenant)
-  })
+  const accessContext = await resolvePeopleAccessContext(tenant)
 
-  if (!hasPeopleAccess) {
+  if (!accessContext) {
     return {
       tenant: null,
+      accessContext: null,
       errorResponse: NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
   }
 
   return {
     tenant,
+    accessContext,
     errorResponse: null
   }
 }

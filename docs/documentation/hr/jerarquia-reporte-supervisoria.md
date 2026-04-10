@@ -66,6 +66,26 @@ Ahí RRHH y administradores pueden:
 - crear o revocar delegaciones temporales
 - revisar el historial auditado de cambios
 
+## Scope de supervisor
+
+Greenhouse ya separa dos niveles de acceso:
+
+- `HR/admin` mantiene acceso amplio a surfaces de personas y permisos
+- `supervisor` obtiene acceso derivado y limitado por:
+  - su subárbol real en `reporting_lines`
+  - delegaciones activas de `approval_delegate`
+
+En la iteración actual:
+
+- `/people` puede abrirse para un supervisor aunque no tenga `hr_manager`
+- la lista y los drilldowns se recortan al equipo visible por jerarquía o delegación
+- `/hr/leave` puede abrirse para supervisoría limitada sin otorgar `routeGroup: hr`
+- `HR > Jerarquía` sigue siendo solo para RRHH/admin
+
+Esto evita usar `supervisor` como rol global y también evita que un supervisor herede HR completo por accidente.
+
+`/hr/approvals` sigue documentado como surface futura del programa, pero todavía no está materializado como route separada en el portal.
+
 ## Relación con Departments
 
 `HR > Departments` sigue representando taxonomía interna del equipo:

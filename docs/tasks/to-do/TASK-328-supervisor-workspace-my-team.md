@@ -50,7 +50,7 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `docs/architecture/Greenhouse_HRIS_Architecture_v1.md`
 - `docs/tasks/complete/TASK-326-approval-authority-workflow-snapshots.md`
-- `docs/tasks/to-do/TASK-327-supervisor-scope-subtree-access.md`
+- `docs/tasks/complete/TASK-327-supervisor-scope-subtree-access.md`
 
 Reglas obligatorias:
 
@@ -68,7 +68,7 @@ Reglas obligatorias:
 ### Depends on
 
 - `docs/tasks/complete/TASK-326-approval-authority-workflow-snapshots.md`
-- `docs/tasks/to-do/TASK-327-supervisor-scope-subtree-access.md`
+- `docs/tasks/complete/TASK-327-supervisor-scope-subtree-access.md`
 - `src/views/greenhouse/hr-core/HrCoreDashboard.tsx`
 - `src/views/greenhouse/hr-core/HrLeaveView.tsx`
 - `src/views/greenhouse/people/PeopleList.tsx`

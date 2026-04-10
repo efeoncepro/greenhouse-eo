@@ -527,6 +527,7 @@ El nombre físico final puede variar, pero la semántica target no.
 - leave y expense approvals deben seguir leyendo supervisoría desde el contrato canónico de reporting hierarchy y congelar la decisión por etapa en `greenhouse_hr.workflow_approval_snapshots`
 - HR puede actuar como validador final de dominio
 - `departments` no debe reemplazar supervisoría directa
+- subtree-aware access para supervisors debe derivarse de `reporting_lines` y `approval_delegate`, sin crear un `role_code` nuevo ni reutilizar `routeGroup: hr` como señal de liderazgo formal
 
 ### People
 
@@ -534,6 +535,7 @@ El nombre físico final puede variar, pero la semántica target no.
   - direct reports
   - equipo operativo asignado
 - no debe mezclar ambos universos como si fueran la misma relación
+- `/people` puede abrirse en modo supervisor limitado, pero el reader debe recortar lista y drilldowns al subárbol visible o a la delegación vigente
 
 ### Agency
 

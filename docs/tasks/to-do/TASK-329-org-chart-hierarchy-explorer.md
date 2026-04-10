@@ -45,7 +45,7 @@ Revisar y respetar:
 - `docs/architecture/Greenhouse_HRIS_Architecture_v1.md`
 - `docs/architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md`
 - `docs/tasks/to-do/TASK-324-reporting-hierarchy-foundation.md`
-- `docs/tasks/to-do/TASK-327-supervisor-scope-subtree-access.md`
+- `docs/tasks/complete/TASK-327-supervisor-scope-subtree-access.md`
 
 Reglas obligatorias:
 
@@ -63,7 +63,7 @@ Reglas obligatorias:
 ### Depends on
 
 - `docs/tasks/to-do/TASK-324-reporting-hierarchy-foundation.md`
-- `docs/tasks/to-do/TASK-327-supervisor-scope-subtree-access.md`
+- `docs/tasks/complete/TASK-327-supervisor-scope-subtree-access.md`
 - `src/app/(dashboard)/hr/layout.tsx`
 - `src/views/greenhouse/hr-core/HrCoreDashboard.tsx`
 

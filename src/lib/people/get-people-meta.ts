@@ -6,8 +6,11 @@ import type { PeopleMetaPayload } from '@/types/people'
 import { peopleRoleCodes } from '@/lib/people/shared'
 import { getPersonAccess } from '@/lib/people/permissions'
 
-export const getPeopleMeta = (roleCodes: string[]): PeopleMetaPayload => {
-  const access = getPersonAccess(roleCodes)
+export const getPeopleMeta = (
+  roleCodes: string[],
+  options?: { supervisorScoped?: boolean }
+): PeopleMetaPayload => {
+  const access = getPersonAccess(roleCodes, options)
 
   return {
     canManageTeam: roleCodes.includes(ROLE_CODES.EFEONCE_ADMIN),

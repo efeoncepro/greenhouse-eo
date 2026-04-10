@@ -523,6 +523,12 @@ Route groups are the enforcement boundary. Each route group maps to a set of URL
 | `ai_tooling` | `/ai-tools/catalog`, `/ai-tools/licenses`, `/ai-tools/wallets`, `/ai-tools/ledger`                                                | `ai_tooling_admin`, `efeonce_admin`                                                                                 | Efeonce tenant        |
 | `admin`      | `/admin/tenants`, `/admin/users`, `/admin/roles`, `/admin/scopes`, `/admin/feature-flags`                                         | `efeonce_admin`                                                                                                     | Cross-tenant          |
 
+Notes:
+
+- `hr` remains the broad HR route group. It must not be used as a proxy for “has direct reports”.
+- Supervisor-limited access is derived at reader/page level from reporting hierarchy and active delegation, not from a dedicated route group or role code.
+- `/hr/approvals` is still part of the target architecture, but the materialized runtime surface today is `/hr/leave` plus scoped People access.
+
 ### Enforcement Architecture
 
 #### Server-side guards
@@ -670,6 +676,7 @@ Rules:
 - If the collaborator has no supervisor (top of hierarchy), the first active stage falls back to HR role holders defined by the workflow domain
 - A person does not need a `supervisor` role to approve leave — they approve because they are the `reports_to` target of the requester
 - HR managers can override or finalize any leave request regardless of the reporting chain
+- Session payload keeps `memberId`, but supervisor subtree visibility is still derived on demand from `reporting_lines` / `approval_delegate` instead of being flattened into a broad session role
 
 ## Session Payload
 

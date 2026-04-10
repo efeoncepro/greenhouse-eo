@@ -165,7 +165,10 @@ const buildPayload = async (
 // Postgres-first path — roster + pay_regime only; capacity from snapshot
 // ---------------------------------------------------------------------------
 
-const getPeopleListFromPostgres = async (organizationId?: string | null): Promise<PeopleListPayload> => {
+const getPeopleListFromPostgres = async (
+  organizationId?: string | null,
+  memberIds?: string[]
+): Promise<PeopleListPayload> => {
   const organizationFilterJoin = organizationId
     ? `
     JOIN greenhouse_core.person_memberships pm
@@ -174,6 +177,20 @@ const getPeopleListFromPostgres = async (organizationId?: string | null): Promis
      AND pm.organization_id = $1
      AND pm.membership_type = 'team_member'`
     : ''
+
+  const values: unknown[] = []
+
+  if (organizationId) {
+    values.push(organizationId)
+  }
+
+  const memberFilterClause = memberIds && memberIds.length > 0
+    ? `WHERE m.member_id = ANY($${values.length + 1}::text[])`
+    : ''
+
+  if (memberIds && memberIds.length > 0) {
+    values.push(memberIds)
+  }
 
   const rows = await runGreenhousePostgresQuery<PeopleListRow>(`
     WITH current_comp AS (
@@ -198,6 +215,7 @@ const getPeopleListFromPostgres = async (organizationId?: string | null): Promis
     FROM greenhouse_core.members m
     LEFT JOIN current_comp c ON c.member_id = m.member_id
     ${organizationFilterJoin}
+    ${memberFilterClause}
     ORDER BY
       CASE m.role_category
         WHEN 'account' THEN 1
@@ -209,14 +227,29 @@ const getPeopleListFromPostgres = async (organizationId?: string | null): Promis
         ELSE 7
       END,
       m.display_name
-  `, organizationId ? [organizationId] : [])
+  `, values)
 
   const items = rows.map(normalizePersonListItem)
 
-  return buildPayload(items, () => getCoveredClientsCountFromPostgres(organizationId))
+  return buildPayload(items, () => getCoveredClientsCountFromPostgres(organizationId, memberIds))
 }
 
-const getCoveredClientsCountFromPostgres = async (organizationId?: string | null) => {
+const getCoveredClientsCountFromPostgres = async (
+  organizationId?: string | null,
+  memberIds?: string[]
+) => {
+  const values: unknown[] = []
+  const filters = ['a.active = TRUE', '(a.end_date IS NULL OR a.end_date >= CURRENT_DATE)']
+
+  if (organizationId) {
+    values.push(organizationId)
+  }
+
+  if (memberIds && memberIds.length > 0) {
+    values.push(memberIds)
+    filters.push(`a.member_id = ANY($${values.length}::text[])`)
+  }
+
   const [row] = await runGreenhousePostgresQuery<{ covered_clients: string | number | null }>(`
     SELECT COUNT(DISTINCT a.client_id) AS covered_clients
     FROM greenhouse_core.client_team_assignments a
@@ -226,9 +259,8 @@ const getCoveredClientsCountFromPostgres = async (organizationId?: string | null
          AND s.active = TRUE
          AND s.organization_id = $1`
       : ''}
-    WHERE a.active = TRUE
-      AND (a.end_date IS NULL OR a.end_date >= CURRENT_DATE)
-  `, organizationId ? [organizationId] : [])
+    WHERE ${filters.join(' AND ')}
+  `, values)
 
   return toNumber(row?.covered_clients)
 }
@@ -237,7 +269,7 @@ const getCoveredClientsCountFromPostgres = async (organizationId?: string | null
 // BigQuery fallback path — roster + pay_regime only; capacity from snapshot
 // ---------------------------------------------------------------------------
 
-const getPeopleListFromBigQuery = async (): Promise<PeopleListPayload> => {
+const getPeopleListFromBigQuery = async (memberIds?: string[]): Promise<PeopleListPayload> => {
   const projectId = getBigQueryProjectId()
   const memberColumns = await getPeopleTableColumns('greenhouse', 'team_members')
   const compensationColumns = await getPeopleTableColumns('greenhouse', 'compensation_versions')
@@ -269,6 +301,10 @@ const getPeopleListFromBigQuery = async (): Promise<PeopleListPayload> => {
         WHERE FALSE
       )`
 
+  const memberFilterClause = memberIds && memberIds.length > 0
+    ? 'WHERE tm.member_id IN UNNEST(@memberIds)'
+    : ''
+
   const rows = await runPeopleQuery<PeopleListRow>(
     `
       WITH ${currentCompensationCte}
@@ -286,6 +322,7 @@ const getPeopleListFromBigQuery = async (): Promise<PeopleListPayload> => {
       FROM \`${projectId}.greenhouse.team_members\` AS tm
       LEFT JOIN current_compensation AS c
         ON c.member_id = tm.member_id
+      ${memberFilterClause}
       ORDER BY
         CASE tm.role_category
           WHEN 'account' THEN 1
@@ -297,22 +334,29 @@ const getPeopleListFromBigQuery = async (): Promise<PeopleListPayload> => {
           ELSE 7
         END,
         tm.display_name
-    `
+    `,
+    memberIds && memberIds.length > 0 ? { memberIds } : {}
   )
 
   const items = rows.map(normalizePersonListItem)
 
-  return buildPayload(items, () => getCoveredClientsCountFromBigQuery(projectId))
+  return buildPayload(items, () => getCoveredClientsCountFromBigQuery(projectId, memberIds))
 }
 
-const getCoveredClientsCountFromBigQuery = async (projectId: string) => {
+const getCoveredClientsCountFromBigQuery = async (projectId: string, memberIds?: string[]) => {
+  const memberFilterClause = memberIds && memberIds.length > 0
+    ? 'AND member_id IN UNNEST(@memberIds)'
+    : ''
+
   const [row] = await runPeopleQuery<{ covered_clients: number | string | null }>(
     `
       SELECT COUNT(DISTINCT client_id) AS covered_clients
       FROM \`${projectId}.greenhouse.client_team_assignments\`
       WHERE active = TRUE
         AND (end_date IS NULL OR end_date >= CURRENT_DATE())
-    `
+        ${memberFilterClause}
+    `,
+    memberIds && memberIds.length > 0 ? { memberIds } : {}
   )
 
   return toNumber(row?.covered_clients)
@@ -340,12 +384,15 @@ const shouldFallbackToLegacy = (error: unknown) => {
   )
 }
 
-export const getPeopleList = async (options: { organizationId?: string | null } = {}): Promise<PeopleListPayload> => {
+export const getPeopleList = async (
+  options: { organizationId?: string | null; memberIds?: string[] } = {}
+): Promise<PeopleListPayload> => {
   const organizationId = options.organizationId?.trim() || null
+  const memberIds = options.memberIds?.filter(Boolean) ?? []
 
   if (isGreenhousePostgresConfigured()) {
     try {
-      return await getPeopleListFromPostgres(organizationId)
+      return await getPeopleListFromPostgres(organizationId, memberIds)
     } catch (error) {
       if (!shouldFallbackToLegacy(error)) throw error
       console.warn('[people/list] Postgres failed, falling back to BigQuery:', error instanceof Error ? error.message : error)
@@ -356,5 +403,5 @@ export const getPeopleList = async (options: { organizationId?: string | null } 
     throw new PeopleValidationError('Organization-scoped people list requires PostgreSQL runtime.', 503)
   }
 
-  return getPeopleListFromBigQuery()
+  return getPeopleListFromBigQuery(memberIds)
 }
