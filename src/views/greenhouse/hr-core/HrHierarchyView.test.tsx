@@ -260,7 +260,7 @@ describe('HrHierarchyView', () => {
     renderWithTheme(<HrHierarchyView />)
 
     await screen.findAllByText('Ana Perez')
-    await user.click(screen.getAllByRole('button', { name: 'Reasignar reportes' })[0])
+    await user.click(screen.getAllByRole('button', { name: 'Reasignar' })[0])
 
     expect(screen.getByRole('heading', { name: 'Reasignar reportes directos' })).toBeInTheDocument()
 

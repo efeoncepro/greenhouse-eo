@@ -40,7 +40,7 @@ Referencias:
 
 ## Solución
 
-Hacer que `getMemberHrProfile()` resuelva `reportsTo` / `reportsToName` desde la misma fuente canónica que `Jerarquía`, o desde un snapshot Postgres sincronizado explícitamente con `reporting_lines`.
+`getMemberHrProfile()` ya no deja `reportsTo` y `reportsToName` amarrados al snapshot stale de BigQuery. Ahora resuelve la línea vigente desde la jerarquía canónica en PostgreSQL y sobreescribe esos campos con el mismo contrato que usa `HR > Jerarquía`.
 
 ## Verificación
 
@@ -54,7 +54,7 @@ Hacer que `getMemberHrProfile()` resuelva `reportsTo` / `reportsToName` desde la
 
 ## Estado
 
-open
+resolved
 
 ## Relacionado
 

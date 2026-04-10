@@ -2,6 +2,13 @@
 
 ## 2026-04-10
 
+### 2026-04-10 — Hierarchy and org chart audit issues closed
+
+- `HR > Jerarquía` y la ficha HR ya leen la misma supervisoría vigente, evitando que la persona vea un supervisor distinto según la surface.
+- El historial auditado vuelve a exponer correctamente `effectiveTo` para líneas cerradas.
+- `Cambiar supervisor` y `Reasignar reportes` ahora explican de forma visible cuándo falta la razón obligatoria.
+- El reemplazo de delegaciones pasó a ser atómico y la reasignación masiva ya respeta la fecha efectiva elegida.
+
 ### 2026-04-10 — Organigrama estructural + sync de departamentos + menú supervisor-aware
 
 - `HR > Organigrama` dejó de dibujar reporting lines como si fueran estructura: ahora materializa áreas padre/hija desde `greenhouse_core.departments` y cuelga a cada persona desde su adscripción vigente.

@@ -30,7 +30,7 @@ Referencias:
 
 ## Solución
 
-Resolver el set de reportes directos según la fecha efectiva seleccionada, no según el “ahora” del request.
+`bulkReassignDirectReports()` ya resuelve el conjunto de reportes directos con `effectiveAt = effectiveFrom` antes de aplicar la operación. El universo reasignado ahora coincide con la fecha elegida por la persona operadora, no con el estado actual del request.
 
 ## Verificación
 
@@ -40,7 +40,7 @@ Resolver el set de reportes directos según la fecha efectiva seleccionada, no s
 
 ## Estado
 
-open
+resolved
 
 ## Relacionado
 

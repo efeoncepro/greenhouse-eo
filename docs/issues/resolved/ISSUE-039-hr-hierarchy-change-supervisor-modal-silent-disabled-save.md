@@ -44,11 +44,13 @@ Referencias:
 
 ## Solución
 
-Agregar validación visible de campo requerido:
+La UI del modal ahora deja intentar el submit y muestra validación visible cuando falta la razón:
 
-- estado `error`
-- mensaje contextual cuando falta la razón
-- opcionalmente CTA disabled con explicación explícita o submit permitido con validación al intentar guardar
+- `Alert` contextual en la parte superior
+- campo `Razón` en estado `error`
+- mensaje inline específico para el campo requerido
+
+El mismo patrón quedó aplicado también al flujo de `Reasignar reportes`.
 
 ## Verificación
 
@@ -58,7 +60,7 @@ Agregar validación visible de campo requerido:
 
 ## Estado
 
-open
+resolved
 
 ## Relacionado
 

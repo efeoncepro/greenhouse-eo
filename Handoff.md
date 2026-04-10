@@ -1,5 +1,24 @@
 # Handoff.md
 
+## Sesion 2026-04-10 — cierre de issues 036-043 en jerarquía, organigrama y departamentos
+
+- alcance cerrado:
+  - `ISSUE-036`: la ficha HR ya resuelve supervisoría desde la jerarquía canónica en Postgres
+  - `ISSUE-037`: el historial preserva `effectiveTo` y demás timestamps aunque Postgres/Kysely los entregue como `Date`
+  - `ISSUE-038`: asignar `head_member_id` en departamentos sincroniza la adscripción del responsable y el organigrama tiene fallback estructural
+  - `ISSUE-039`: los modales de cambio de supervisor y reasignación masiva muestran validación visible cuando falta la razón
+  - `ISSUE-040`: el reemplazo de delegaciones quedó transaccional; ya no puede dejar al supervisor sin delegación activa si falla el create
+  - `ISSUE-041`: la reasignación masiva calcula reportes directos según la `effectiveFrom` elegida
+  - `ISSUE-042`: `HR > Organigrama` ahora materializa estructura de departamentos y no una cadena de reporting lines
+  - `ISSUE-043`: el menú lateral ya muestra `Organigrama` cuando el acceso supervisor-limited realmente puede abrir la ruta
+- validación ejecutada:
+  - `pnpm exec vitest run src/lib/reporting-hierarchy/admin.test.ts src/lib/reporting-hierarchy/org-chart.test.ts src/lib/hr-core/service.test.ts src/lib/hr-core/postgres-departments-store.test.ts src/views/greenhouse/hr-core/HrHierarchyView.test.tsx src/lib/tenant/authorization.test.ts src/app/api/hr/core/org-chart/route.test.ts` — OK
+  - `pnpm lint` — OK
+  - `pnpm build` — OK
+- nota operativa:
+  - los issues `ISSUE-036` a `ISSUE-043` quedaron movidos a `docs/issues/resolved/` y el tracker ya no los deja abiertos
+  - el cierre mezcla fixes ya empujados en `develop` con el remate documental y de fallback estructural final
+
 ## Sesion 2026-04-10 — organigrama/departamentos realineados con estructura
 
 - alcance cerrado:

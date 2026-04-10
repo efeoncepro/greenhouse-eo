@@ -37,11 +37,7 @@ Referencias:
 
 ## Solución
 
-Hacer el reemplazo de delegación de forma atómica:
-
-- validar primero que la nueva delegación es creable
-- crear y luego desactivar la previa, o
-- encapsular el reemplazo en una transacción que preserve el estado anterior si algo falla
+El reemplazo de delegación quedó encapsulado en una sola transacción. La revocación de delegaciones activas y la creación de la nueva ya no corren como pasos independientes; si el alta falla, la transacción revierte y la delegación previa sigue intacta.
 
 ## Verificación
 
@@ -51,7 +47,7 @@ Hacer el reemplazo de delegación de forma atómica:
 
 ## Estado
 
-open
+resolved
 
 ## Relacionado
 

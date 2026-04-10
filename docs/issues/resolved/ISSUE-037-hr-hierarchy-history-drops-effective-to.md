@@ -39,7 +39,7 @@ Referencias:
 
 ## Solución
 
-Normalizar `effective_from`, `effective_to` y `created_at` de historial a ISO string explícito, igual que ya se hace con delegaciones.
+`listHierarchyHistory()` ahora normaliza timestamps tipo `Date` y string con el mismo mapper antes de serializar el payload. Eso conserva `effectiveTo` en líneas cerradas y evita que la auditoría muestre filas abiertas falsas.
 
 ## Verificación
 
@@ -49,7 +49,7 @@ Normalizar `effective_from`, `effective_to` y `created_at` de historial a ISO st
 
 ## Estado
 
-open
+resolved
 
 ## Relacionado
 

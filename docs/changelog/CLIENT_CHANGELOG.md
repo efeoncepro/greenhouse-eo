@@ -42,6 +42,32 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.11
+
+**Canal:** Beta
+**Fecha:** 2026-04-10
+**Disponible para:** internal
+**Módulos:** HR / Jerarquía / Organigrama / Departamentos
+
+### Novedades
+
+- `Organigrama` ahora representa la estructura real de áreas y equipos, no solo la cadena de supervisión entre personas.
+
+### Mejoras
+
+- Cuando asignas un responsable de área en `Departamentos`, su adscripción queda alineada con la estructura visible en `Jerarquía` y `Organigrama`.
+- Las personas con acceso supervisor-limited ya pueden descubrir `Organigrama` directamente desde el menú lateral cuando su scope lo permite.
+
+### Correcciones
+
+- `Cambiar supervisor` y `Reasignar reportes` ya muestran por qué no dejan guardar cuando falta la razón obligatoria.
+- El historial auditado vuelve a mostrar correctamente el cierre temporal de líneas anteriores.
+- La ficha HR deja de quedar atrasada después de un cambio de supervisor.
+
+### Notas
+
+- `Jerarquía` sigue siendo la surface administrativa; `Organigrama` queda como explorador visual de lectura sobre la misma fuente canónica.
+
 ## 2026.04-beta.10
 
 **Canal:** Beta
