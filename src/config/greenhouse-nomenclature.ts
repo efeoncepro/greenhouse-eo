@@ -52,7 +52,7 @@ export const GH_AGENCY_NAV = {
   services: { label: 'Servicios', subtitle: 'Servicios contratados por Space' },
   staffAugmentation: { label: 'Staff Augmentation', subtitle: 'Placements, onboarding y economía por assignment' },
   economics: { label: 'Economía', subtitle: 'P&L y rentabilidad' },
-  team: { label: 'Equipo', subtitle: 'Capacidad y dedicación' },
+  team: { label: 'Capacidad', subtitle: 'Carga operativa y dedicación del equipo' },
   talentDiscovery: { label: 'Talento', subtitle: 'Descubrimiento y ranking' },
   delivery: { label: 'Delivery', subtitle: 'ICO, sprints y producción' },
   campaigns: { label: 'Campañas', subtitle: 'Iniciativas cross-space' },
@@ -87,8 +87,8 @@ export const GH_FINANCE_NAV = {
 } as const
 
 export const GH_HR_NAV = {
-  payroll: { label: 'Nómina', subtitle: 'Compensaciones y nómina mensual' },
-  payrollProjected: { label: 'Nómina Proyectada', subtitle: 'Simulación y previsión' },
+  payroll: { label: 'Nómina mensual', subtitle: 'Compensaciones y liquidación' },
+  payrollProjected: { label: 'Nómina proyectada', subtitle: 'Simulación y previsión' },
   team: { label: 'Mi equipo', subtitle: 'Workspace operativo de tu subárbol visible' },
   approvals: { label: 'Aprobaciones', subtitle: 'Cola operativa del equipo visible' },
   hierarchy: { label: 'Jerarquía', subtitle: 'Supervisoría, delegaciones y cambios' },
