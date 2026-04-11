@@ -2,6 +2,24 @@
 
 ## 2026-04-11
 
+### 2026-04-11 — RESEARCH-005: modelo de servicio para `AI Workers` con contexto de cliente
+
+- Se agregó un nuevo research brief para explorar `AI Workers` como oferta productizada de Efeonce operada a través de Greenhouse.
+- El brief fija una tesis distinta a "meter IA al portal":
+  - workers digitales especializados
+  - contexto operativo real por cliente / space / service module
+  - supervision humana
+  - medicion de ROI
+- Tambien deja explicitas las capas faltantes antes de bajar esto a roadmap:
+  - identidad de producto
+  - governance de contexto
+  - modelo de acciones y aprobaciones
+  - packaging comercial
+  - UX, auditoria y confianza cliente
+- Indices actualizados:
+  - `docs/research/README.md`
+  - `docs/README.md`
+
 ### 2026-04-11 — TASK-367: Claude microinteractions research & dual skill creation
 
 - Claude realizó investigación externa independiente sobre microinteracciones UI/UX (Apple HIG, Fluent, Carbon, Material, W3C/WCAG, Baymard).

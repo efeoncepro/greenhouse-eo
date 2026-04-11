@@ -29,3 +29,4 @@ RESEARCH-###-short-description.md
 | RESEARCH-002 | [Staff Augmentation Enterprise Module](RESEARCH-002-staff-augmentation-enterprise-module.md) | Active | TBD |
 | RESEARCH-003 | [Hiring Desk Reactive Ecosystem](RESEARCH-003-hiring-desk-reactive-ecosystem.md) | Active | TBD |
 | RESEARCH-004 | [Space Identity Consolidation](RESEARCH-004-space-identity-consolidation.md) | Active | TASK-195 |
+| RESEARCH-005 | [Client-Context AI Workers Service Model](RESEARCH-005-client-context-ai-workers-service-model.md) | Active | TBD |

@@ -1,5 +1,30 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — RESEARCH-005 para `AI Workers` basados en contexto operativo del cliente
+
+- alcance cerrado:
+  - se creó `docs/research/RESEARCH-005-client-context-ai-workers-service-model.md`
+  - el brief formaliza la hipótesis de `AI Workers` como servicio productizado de Efeonce operado sobre Greenhouse
+  - el framing quedó explícitamente separado de "IA genérica" y de una copia plana de Deel:
+    - role-shaped workers
+    - client / space / service-module context
+    - managed service first
+    - advisory before autonomy
+  - se dejó una sección `Missing Considerations` con gaps de diseño todavía abiertos:
+    - product identity
+    - context governance
+    - supervision / approvals
+    - action model
+    - commercial packaging
+    - ROI, trust y UX
+- documentos vivos actualizados:
+  - `docs/research/README.md`
+  - `docs/README.md`
+  - `changelog.md`
+- validación ejecutada:
+  - revisión manual de consistencia contra `RESEARCH-001`, `Assigned Team Architecture`, `Service Modules` y el modelo documental vigente
+  - no aplica build/lint; cambio exclusivamente documental / research estratégico
+
 ## Sesion 2026-04-11 — TASK-367 COMPLETADA: Claude microinteractions research & dual skill creation
 
 - alcance cerrado:

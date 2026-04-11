@@ -79,6 +79,7 @@ Indice maestro de la documentacion no operativa del repo.
 - [RESEARCH-002-staff-augmentation-enterprise-module.md](research/RESEARCH-002-staff-augmentation-enterprise-module.md)
 - [RESEARCH-003-hiring-desk-reactive-ecosystem.md](research/RESEARCH-003-hiring-desk-reactive-ecosystem.md)
 - [RESEARCH-004-space-identity-consolidation.md](research/RESEARCH-004-space-identity-consolidation.md)
+- [RESEARCH-005-client-context-ai-workers-service-model.md](research/RESEARCH-005-client-context-ai-workers-service-model.md)
 
 ### Operations
 
