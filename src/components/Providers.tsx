@@ -33,7 +33,15 @@ const Providers = async (props: Props) => {
   const settingsCookie = await getSettingsFromCookie()
   const systemMode = await getSystemMode()
 
-  const operatingEntity = session ? await getOperatingEntityIdentity() : null
+  let operatingEntity: Awaited<ReturnType<typeof getOperatingEntityIdentity>> = null
+
+  if (session) {
+    try {
+      operatingEntity = await getOperatingEntityIdentity()
+    } catch (error) {
+      console.error('[Providers] getOperatingEntityIdentity failed — rendering with operatingEntity=null:', error)
+    }
+  }
 
   return (
     <AuthSessionProvider session={session}>
