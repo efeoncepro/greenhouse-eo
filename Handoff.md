@@ -1,5 +1,23 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — organigrama con lectura por liderazgo + acceso visible a Mi equipo
+
+- alcance cerrado:
+  - `HR > Organigrama` ahora soporta dos lecturas complementarias en la misma route:
+    - `Estructura`: mantiene departamentos como nodos estructurales
+    - `Líderes y equipos`: agrupa por personas líderes y deja las áreas asociadas como metadata
+  - la vista alternativa no reutiliza el grafo estructural como si fuera el mismo contrato; deriva un modelo propio de liderazgo para no reabrir la duplicación entre responsables y áreas
+  - `Mi equipo` y `Aprobaciones` ya quedan visibles en el menú lateral para perfiles broad HR/admin con identidad interna vinculada, además de los supervisors que aterrizan por workspace
+- archivos sensibles / de alto impacto tocados:
+  - `src/views/greenhouse/hr-core/HrOrgChartView.tsx`
+  - `src/components/greenhouse/OrgLeadershipNodeCard.tsx`
+  - `src/lib/reporting-hierarchy/org-chart-leadership.ts`
+  - `src/components/layout/vertical/VerticalMenu.tsx`
+  - `src/config/greenhouse-nomenclature.ts`
+- validación ejecutada:
+  - `pnpm exec vitest run src/lib/reporting-hierarchy/org-chart-leadership.test.ts src/lib/reporting-hierarchy/org-chart.test.ts src/app/api/hr/core/org-chart/route.test.ts` — OK
+  - `pnpm exec eslint src/views/greenhouse/hr-core/HrOrgChartView.tsx src/components/greenhouse/OrgLeadershipNodeCard.tsx src/components/layout/vertical/VerticalMenu.tsx src/config/greenhouse-nomenclature.ts src/lib/reporting-hierarchy/org-chart-leadership.ts src/lib/reporting-hierarchy/org-chart-leadership.test.ts` — OK
+
 ## Sesion 2026-04-11 — organigrama estructural sin duplicar responsables como hijos
 
 - alcance cerrado:

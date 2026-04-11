@@ -42,6 +42,29 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.13
+
+**Canal:** Beta
+**Fecha:** 2026-04-11
+**Disponible para:** internal
+**Módulos:** HR / Organigrama / Mi equipo
+
+### Novedades
+
+- `Organigrama` ahora ofrece una lectura alternativa `Líderes y equipos` para seguir responsables visibles y las áreas que coordinan.
+
+### Mejoras
+
+- `Mi equipo` y `Aprobaciones` quedan visibles en el menú para perfiles internos que lideran personas aunque también tengan acceso amplio de HR/admin.
+
+### Correcciones
+
+- La navegación ya no obliga a un líder broad a conocer manualmente la route de `Mi equipo`.
+
+### Notas
+
+- La vista `Líderes y equipos` complementa al mapa estructural; no reemplaza la jerarquía formal de departamentos.
+
 ## 2026.04-beta.12
 
 **Canal:** Beta

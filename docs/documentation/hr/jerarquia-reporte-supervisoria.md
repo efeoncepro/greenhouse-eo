@@ -116,7 +116,9 @@ La materialización runtime actual quedó así:
   - HR/admin puede recorrer la estructura completa
   - supervisor limitado ve solo el subárbol que ya puede operar
   - el explorer sirve para leer foco, cadena ascendente y quick actions hacia People
+  - ahora también puede alternar a `Líderes y equipos`, donde las personas líderes quedan como foco del mapa y las áreas pasan a metadata asociada
 - `/hr/leave` sigue siendo la surface completa de permisos y el lugar de revisión detallada
+- `Mi equipo` y `Aprobaciones` deben quedar visibles también para perfiles broad HR/admin con identidad interna vinculada, no solo para supervisoría limitada
 
 Esto mantiene una separación clara:
 

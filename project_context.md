@@ -1,5 +1,15 @@
 # project_context.md
 
+## Delta 2026-04-11 Organigrama dual: estructura + liderazgo
+
+- `HR > Organigrama` ya no se limita a una sola lectura del árbol:
+  - `structure` mantiene departamentos como nodos y personas como adscripción visible
+  - `leaders` agrupa por personas líderes y deja departamentos asociados como metadata del nodo
+- Regla operativa nueva:
+  - la vista por liderazgo no redefine la estructura canónica ni reemplaza `departments.parent_department_id`
+  - la supervisoría entre líderes se usa solo para esa lectura alternativa y no debe contaminar el payload estructural
+  - `Mi equipo` y `Aprobaciones` deben ser descubribles también para perfiles broad HR/admin con `memberId`, no solo para supervisor-limited
+
 ## Delta 2026-04-10 Organigrama structural-first over departments
 
 - `HR > Organigrama` ya no debe entenderse como una vista visual de `reporting_lines`.

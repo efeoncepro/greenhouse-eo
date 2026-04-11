@@ -20,6 +20,8 @@ import Grid from '@mui/material/Grid'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
+import ToggleButton from '@mui/material/ToggleButton'
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
 import { alpha, useTheme } from '@mui/material/styles'
 
@@ -29,13 +31,20 @@ import dagre from 'dagre'
 
 import EmptyState from '@components/greenhouse/EmptyState'
 import { GH_COLORS, GH_HR_NAV } from '@/config/greenhouse-nomenclature'
+import { buildOrgLeadershipView, type HrOrgLeadershipEdge, type HrOrgLeadershipNode } from '@/lib/reporting-hierarchy/org-chart-leadership'
 import type { HrOrgChartEdge, HrOrgChartMemberOption, HrOrgChartNode, HrOrgChartResponse } from '@/types/hr-core'
 import { getInitials } from '@/utils/getInitials'
 
+import OrgLeadershipNodeCard, {
+  type OrgLeadershipNodeCardData,
+  type OrgLeadershipNodeCardNode
+} from '@/components/greenhouse/OrgLeadershipNodeCard'
 import OrgChartNodeCard, { type OrgChartNodeCardData, type OrgChartNodeCardNode } from '@/components/greenhouse/OrgChartNodeCard'
 
-const NODE_WIDTH = 320
-const NODE_HEIGHT = 228
+const STRUCTURE_NODE_WIDTH = 320
+const STRUCTURE_NODE_HEIGHT = 228
+const LEADERSHIP_NODE_WIDTH = 320
+const LEADERSHIP_NODE_HEIGHT = 268
 
 const formatNumber = new Intl.NumberFormat('es-CL')
 
@@ -47,6 +56,8 @@ const formatRegime = (value: HrOrgChartNode['payRegime']) => {
 
   return 'Sin dato'
 }
+
+type OrgChartViewMode = 'structure' | 'leaders'
 
 const buildLayout = ({
   nodes,
@@ -72,8 +83,8 @@ const buildLayout = ({
 
   nodes.forEach(node => {
     graph.setNode(node.nodeId, {
-      width: NODE_WIDTH,
-      height: NODE_HEIGHT
+      width: STRUCTURE_NODE_WIDTH,
+      height: STRUCTURE_NODE_HEIGHT
     })
   })
 
@@ -90,8 +101,86 @@ const buildLayout = ({
       id: node.nodeId,
       type: 'orgChartNode',
       position: {
-        x: layout.x - NODE_WIDTH / 2,
-        y: layout.y - NODE_HEIGHT / 2
+        x: layout.x - STRUCTURE_NODE_WIDTH / 2,
+        y: layout.y - STRUCTURE_NODE_HEIGHT / 2
+      },
+      sourcePosition: Position.Bottom,
+      targetPosition: Position.Top,
+      data: {
+        node,
+        isFocused: focusedNodeId != null && node.nodeId === focusedNodeId,
+        onFocusMember
+      }
+    }
+  })
+
+  const layoutedEdges: Edge[] = edges.map(edge => ({
+    id: edge.id,
+    source: edge.source,
+    target: edge.target,
+    type: 'smoothstep',
+    animated: false,
+    selectable: false,
+    focusable: false,
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      width: 16,
+      height: 16,
+      color: alpha(GH_COLORS.neutral.textSecondary, 0.35)
+    },
+    style: {
+      stroke: alpha(GH_COLORS.neutral.textSecondary, 0.22),
+      strokeWidth: 1.5
+    }
+  }))
+
+  return { layoutedNodes, layoutedEdges }
+}
+
+const buildLeadershipLayout = ({
+  nodes,
+  edges,
+  focusedNodeId,
+  onFocusMember
+}: {
+  nodes: HrOrgLeadershipNode[]
+  edges: HrOrgLeadershipEdge[]
+  focusedNodeId: string | null
+  onFocusMember: (memberId: string | null) => void
+}) => {
+  const graph = new dagre.graphlib.Graph()
+
+  graph.setDefaultEdgeLabel(() => ({}))
+  graph.setGraph({
+    rankdir: 'TB',
+    ranksep: 92,
+    nodesep: 48,
+    marginx: 24,
+    marginy: 24
+  })
+
+  nodes.forEach(node => {
+    graph.setNode(node.nodeId, {
+      width: LEADERSHIP_NODE_WIDTH,
+      height: LEADERSHIP_NODE_HEIGHT
+    })
+  })
+
+  edges.forEach(edge => {
+    graph.setEdge(edge.source, edge.target)
+  })
+
+  dagre.layout(graph)
+
+  const layoutedNodes: OrgLeadershipNodeCardNode[] = nodes.map(node => {
+    const layout = graph.node(node.nodeId)
+
+    return {
+      id: node.nodeId,
+      type: 'orgLeadershipNode',
+      position: {
+        x: layout.x - LEADERSHIP_NODE_WIDTH / 2,
+        y: layout.y - LEADERSHIP_NODE_HEIGHT / 2
       },
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
@@ -161,6 +250,8 @@ const HrOrgChartView = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const focusMemberId = searchParams.get('focusMemberId')
+  const rawViewMode = searchParams.get('view')
+  const viewMode: OrgChartViewMode = rawViewMode === 'leaders' ? 'leaders' : 'structure'
   const hasLoadedRef = useRef(false)
 
   const [payload, setPayload] = useState<HrOrgChartResponse | null>(null)
@@ -232,6 +323,27 @@ const HrOrgChartView = () => {
     [pathname, router, searchParams]
   )
 
+  const handleViewModeChange = useCallback(
+    (_: unknown, nextViewMode: OrgChartViewMode | null) => {
+      if (!nextViewMode || nextViewMode === viewMode) {
+        return
+      }
+
+      const params = new URLSearchParams(searchParams.toString())
+
+      if (nextViewMode === 'structure') {
+        params.delete('view')
+      } else {
+        params.set('view', nextViewMode)
+      }
+
+      const nextUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname
+
+      router.replace(nextUrl, { scroll: false })
+    },
+    [pathname, router, searchParams, viewMode]
+  )
+
   const activeFocusMemberId = payload?.focusMemberId ?? focusMemberId ?? payload?.currentMemberId ?? null
   const activeFocusNodeId = payload?.focusNodeId ?? null
 
@@ -246,7 +358,7 @@ const HrOrgChartView = () => {
   const focusNodeName = selectedMember?.displayName ?? 'Selecciona una persona'
   const canOpenPeople = Boolean(selectedMember)
 
-  const chart = useMemo(() => {
+  const structureChart = useMemo(() => {
     if (!payload) {
       return { layoutedNodes: [], layoutedEdges: [] }
     }
@@ -259,7 +371,44 @@ const HrOrgChartView = () => {
     })
   }, [activeFocusNodeId, handleFocusMember, payload])
 
+  const leadershipView = useMemo(() => {
+    if (!payload) {
+      return { nodes: [], edges: [], focusNodeId: null, focusedLeaderMemberId: null }
+    }
+
+    return buildOrgLeadershipView({
+      payload,
+      focusMemberId: activeFocusMemberId
+    })
+  }, [activeFocusMemberId, payload])
+
+  const leadershipChart = useMemo(() => {
+    return buildLeadershipLayout({
+      nodes: leadershipView.nodes,
+      edges: leadershipView.edges,
+      focusedNodeId: leadershipView.focusNodeId,
+      onFocusMember: handleFocusMember
+    })
+  }, [handleFocusMember, leadershipView.edges, leadershipView.focusNodeId, leadershipView.nodes])
+
+  const selectedLeaderNode = useMemo(() => {
+    if (!selectedMember) {
+      return null
+    }
+
+    return (
+      leadershipView.nodes.find(node => node.memberId === selectedMember.memberId) ??
+      leadershipView.nodes.find(node => node.memberId === leadershipView.focusedLeaderMemberId) ??
+      null
+    )
+  }, [leadershipView.focusedLeaderMemberId, leadershipView.nodes, selectedMember])
+
+  const chart = viewMode === 'leaders' ? leadershipChart : structureChart
+  const activeGraphNodeCount = viewMode === 'leaders' ? leadershipView.nodes.length : payload?.nodes.length ?? 0
+
   const nodeTypes = useMemo<NodeTypes>(() => ({ orgChartNode: OrgChartNodeCard }), [])
+  const leadershipNodeTypes = useMemo<NodeTypes>(() => ({ orgLeadershipNode: OrgLeadershipNodeCard }), [])
+  const activeNodeTypes = viewMode === 'leaders' ? leadershipNodeTypes : nodeTypes
 
   if (loading && !payload) {
     return (
@@ -298,7 +447,7 @@ const HrOrgChartView = () => {
     )
   }
 
-  if (payload.nodes.length === 0) {
+  if (activeGraphNodeCount === 0) {
     return (
       <Stack spacing={3}>
         {error ? <Alert severity='warning' onClose={() => setError(null)}>{error}</Alert> : null}
@@ -329,6 +478,18 @@ const HrOrgChartView = () => {
       ? 'Exploras la estructura organizacional completa visible para tu perfil.'
       : 'La vista se recorta al subárbol organizacional visible para tu alcance.'
 
+  const chartTitle = viewMode === 'leaders' ? 'Mapa de liderazgo' : 'Mapa estructural'
+
+  const chartSubtitle =
+    viewMode === 'leaders'
+      ? 'Agrupa líderes visibles y deja sus áreas asociadas como metadata para leer personas antes que cajas organizacionales.'
+      : 'Usa zoom, pan y búsqueda para seguir áreas, responsables y personas sin perder el contexto.'
+
+  const viewDescription =
+    viewMode === 'leaders'
+      ? 'Lectura alternativa por líderes, equipos visibles y áreas asociadas.'
+      : 'Estructura por áreas, responsables y adscripción vigente del equipo.'
+
   return (
     <Stack spacing={4}>
       <Stack direction={{ xs: 'column', md: 'row' }} justifyContent='space-between' spacing={3}>
@@ -339,7 +500,7 @@ const HrOrgChartView = () => {
             {refreshing ? <Chip size='small' label='Actualizando' color='info' variant='outlined' /> : null}
           </Stack>
           <Typography variant='body2' color='text.secondary'>
-            Estructura por áreas, responsables y adscripción vigente del equipo.
+            {viewDescription}
           </Typography>
           <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>
             {accessSubtitle}
@@ -347,6 +508,9 @@ const HrOrgChartView = () => {
         </Box>
 
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
+          <Button component={Link} href='/hr/team' variant='tonal' color='secondary' startIcon={<i className='tabler-users-group' />}>
+            {GH_HR_NAV.team.label}
+          </Button>
           <Button component={Link} href='/hr/hierarchy' variant='tonal' color='secondary' startIcon={<i className='tabler-list-search' />}>
             Abrir jerarquía
           </Button>
@@ -359,7 +523,15 @@ const HrOrgChartView = () => {
       {error ? <Alert severity='warning' onClose={() => setError(null)}>{error}</Alert> : null}
 
       <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-        <Chip size='small' label={`${formatCount(payload.summary.totalNodes)} nodos`} variant='outlined' />
+        <Chip
+          size='small'
+          label={
+            viewMode === 'leaders'
+              ? `${formatCount(leadershipView.nodes.length)} líderes`
+              : `${formatCount(payload.summary.totalNodes)} nodos`
+          }
+          variant='outlined'
+        />
         <Chip size='small' label={`${formatCount(payload.summary.departments)} áreas`} variant='outlined' />
         <Chip size='small' label={`${formatCount(payload.summary.members)} personas`} variant='outlined' />
         <Chip size='small' label={`${formatCount(payload.summary.roots)} raíces`} variant='outlined' />
@@ -372,19 +544,31 @@ const HrOrgChartView = () => {
         <Grid size={{ xs: 12, lg: 8 }}>
           <Card sx={{ overflow: 'hidden' }}>
             <CardHeader
-              title='Mapa estructural'
-              subheader='Usa zoom, pan y búsqueda para seguir áreas, responsables y personas sin perder el contexto.'
+              title={chartTitle}
+              subheader={chartSubtitle}
               action={
-                <Button
-                  size='small'
-                  variant='tonal'
-                  color='secondary'
-                  onClick={() => handleFocusMember(payload.currentMemberId)}
-                  disabled={!payload.currentMemberId}
-                  startIcon={<i className='tabler-badge' />}
-                >
-                  Mi posición
-                </Button>
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25}>
+                  <ToggleButtonGroup
+                    exclusive
+                    size='small'
+                    value={viewMode}
+                    onChange={handleViewModeChange}
+                    aria-label='Cambiar lectura del organigrama'
+                  >
+                    <ToggleButton value='structure'>Estructura</ToggleButton>
+                    <ToggleButton value='leaders'>Líderes y equipos</ToggleButton>
+                  </ToggleButtonGroup>
+                  <Button
+                    size='small'
+                    variant='tonal'
+                    color='secondary'
+                    onClick={() => handleFocusMember(payload.currentMemberId)}
+                    disabled={!payload.currentMemberId}
+                    startIcon={<i className='tabler-badge' />}
+                  >
+                    Mi posición
+                  </Button>
+                </Stack>
               }
             />
             <Divider />
@@ -407,7 +591,11 @@ const HrOrgChartView = () => {
                       {...params}
                       label='Buscar persona'
                       placeholder='Escribe un nombre o cargo'
-                      helperText='La búsqueda centra el mapa sobre las personas visibles y conserva el contexto estructural del área cuando falta la adscripción directa.'
+                      helperText={
+                        viewMode === 'leaders'
+                          ? 'La búsqueda mantiene la persona en foco y ancla el mapa en el líder visible más cercano cuando el equipo se agrupa por liderazgo.'
+                          : 'La búsqueda centra el mapa sobre las personas visibles y conserva el contexto estructural del área cuando falta la adscripción directa.'
+                      }
                     />
                   )}
                 />
@@ -422,10 +610,10 @@ const HrOrgChartView = () => {
                   }}
                 >
                   <ReactFlow
-                    key={activeFocusNodeId ?? activeFocusMemberId ?? 'org-chart'}
-                    nodes={chart.layoutedNodes}
+                    key={`${viewMode}-${viewMode === 'leaders' ? leadershipView.focusNodeId ?? activeFocusMemberId ?? 'org-chart' : activeFocusNodeId ?? activeFocusMemberId ?? 'org-chart'}`}
+                    nodes={chart.layoutedNodes as any}
                     edges={chart.layoutedEdges}
-                    nodeTypes={nodeTypes}
+                    nodeTypes={activeNodeTypes}
                     fitView
                     fitViewOptions={{ padding: 0.2, duration: 350, minZoom: 0.18, maxZoom: 1.5 }}
                     minZoom={0.18}
@@ -450,7 +638,7 @@ const HrOrgChartView = () => {
                       pannable
                       nodeColor={node =>
                         (() => {
-                          const nodeData = node.data as OrgChartNodeCardData | undefined
+                          const nodeData = node.data as OrgChartNodeCardData | OrgLeadershipNodeCardData | undefined
 
                           if (nodeData?.isFocused) {
                             return GH_COLORS.semantic.info.source
@@ -494,7 +682,17 @@ const HrOrgChartView = () => {
             <CardContent>
               {selectedMember ? (
                 <Stack spacing={2.25}>
-                  {selectedMember.isDepartmentHead ? (
+                  {viewMode === 'leaders' ? (
+                    selectedLeaderNode && selectedLeaderNode.memberId !== selectedMember.memberId ? (
+                      <Alert severity='info'>
+                        Esta lectura agrupa por liderazgo. Mantuvimos a {selectedMember.displayName} en foco y anclamos el mapa en {selectedLeaderNode.displayName}, que es la referencia visible más cercana para su equipo.
+                      </Alert>
+                    ) : selectedLeaderNode?.associatedDepartments.length ? (
+                      <Alert severity='info'>
+                        Esta vista prioriza personas líderes. Las áreas que coordina {selectedLeaderNode.displayName} quedan resumidas como metadata dentro del nodo y del panel lateral.
+                      </Alert>
+                    ) : null
+                  ) : selectedMember.isDepartmentHead ? (
                     <Alert severity='info'>
                       Esta persona lidera el área enfocada. El organigrama estructural representa esa relación dentro del nodo del departamento para no duplicarla como hija de su propia área.
                     </Alert>
@@ -504,15 +702,18 @@ const HrOrgChartView = () => {
                     </Alert>
                   ) : null}
 
-	                  <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-	                    {selectedMember.isCurrentMember ? <Chip size='small' label='Mi posición' color='primary' variant='outlined' /> : null}
-	                    {selectedMember.isDirectReportToCurrentMember ? <Chip size='small' label='Reporte directo' color='success' variant='outlined' /> : null}
-	                    {selectedMember.hasActiveDelegation ? <Chip size='small' label='Delegación activa' color='warning' variant='outlined' /> : null}
-	                    {selectedMember.isDepartmentHead ? <Chip size='small' label='Responsable de área' color='info' variant='outlined' /> : null}
-                      {selectedMember.placementMode === 'inferred_department' ? (
-                        <Chip size='small' label='Contexto heredado' color='secondary' variant='outlined' />
-                      ) : null}
-	                  </Stack>
+                  <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                    {selectedMember.isCurrentMember ? <Chip size='small' label='Mi posición' color='primary' variant='outlined' /> : null}
+                    {selectedMember.isDirectReportToCurrentMember ? <Chip size='small' label='Reporte directo' color='success' variant='outlined' /> : null}
+                    {selectedMember.hasActiveDelegation ? <Chip size='small' label='Delegación activa' color='warning' variant='outlined' /> : null}
+                    {selectedMember.isDepartmentHead ? <Chip size='small' label='Responsable de área' color='info' variant='outlined' /> : null}
+                    {selectedMember.placementMode === 'inferred_department' ? (
+                      <Chip size='small' label='Contexto heredado' color='secondary' variant='outlined' />
+                    ) : null}
+                    {viewMode === 'leaders' && selectedLeaderNode ? (
+                      <Chip size='small' label='Lectura por liderazgo' color='primary' variant='outlined' />
+                    ) : null}
+                  </Stack>
 
                   <Box sx={{ display: 'grid', gap: 1.25, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
                     <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
@@ -523,19 +724,31 @@ const HrOrgChartView = () => {
                         {selectedMember.departmentName ?? 'Sin adscripción directa'}
                       </Typography>
                     </Box>
-	                    <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
-	                      <Typography variant='caption' color='text.secondary'>
-	                        Contexto estructural
-	                      </Typography>
-	                      <Typography
-                          variant='body2'
-                          sx={{ mt: 0.25 }}
-                          noWrap
-                          title={selectedMember.contextDepartmentName ?? 'Sin contexto visible'}
-                        >
-	                        {selectedMember.contextDepartmentName ?? 'Sin contexto visible'}
-	                      </Typography>
-	                    </Box>
+                    <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
+                      <Typography variant='caption' color='text.secondary'>
+                        {viewMode === 'leaders' ? 'Área principal' : 'Contexto estructural'}
+                      </Typography>
+                      <Typography
+                        variant='body2'
+                        sx={{ mt: 0.25 }}
+                        noWrap
+                        title={
+                          viewMode === 'leaders'
+                            ? selectedLeaderNode?.associatedDepartments.find(department => department.isPrimary)?.name ??
+                              selectedLeaderNode?.associatedDepartments[0]?.name ??
+                              selectedMember.contextDepartmentName ??
+                              'Sin contexto visible'
+                            : selectedMember.contextDepartmentName ?? 'Sin contexto visible'
+                        }
+                      >
+                        {viewMode === 'leaders'
+                          ? selectedLeaderNode?.associatedDepartments.find(department => department.isPrimary)?.name ??
+                            selectedLeaderNode?.associatedDepartments[0]?.name ??
+                            selectedMember.contextDepartmentName ??
+                            'Sin contexto visible'
+                          : selectedMember.contextDepartmentName ?? 'Sin contexto visible'}
+                      </Typography>
+                    </Box>
                     <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
                       <Typography variant='caption' color='text.secondary'>
                         Régimen
@@ -544,42 +757,71 @@ const HrOrgChartView = () => {
                         {formatRegime(selectedMember.payRegime)}
                       </Typography>
                     </Box>
-	                    <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
-	                      <Typography variant='caption' color='text.secondary'>
-	                        Supervisor formal
-	                      </Typography>
-	                      <Typography variant='body2' sx={{ mt: 0.25 }} noWrap title={selectedMember.supervisorName ?? 'Sin dato'}>
-	                        {selectedMember.supervisorName ?? 'Sin dato'}
-	                      </Typography>
-	                    </Box>
-	                  </Box>
+                    <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
+                      <Typography variant='caption' color='text.secondary'>
+                        Supervisor formal
+                      </Typography>
+                      <Typography variant='body2' sx={{ mt: 0.25 }} noWrap title={selectedMember.supervisorName ?? 'Sin dato'}>
+                        {selectedMember.supervisorName ?? 'Sin dato'}
+                      </Typography>
+                    </Box>
+                  </Box>
 
-	                  <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-	                    <Chip size='small' label={`Directos ${formatCount(selectedMember.directReportsCount)}`} variant='outlined' />
-	                    <Chip size='small' label={`Subárbol ${formatCount(selectedMember.subtreeSize)}`} variant='outlined' />
-	                    <Chip
-                        size='small'
-                        label={`Profundidad ${formatCount(payload.nodes.find(node => node.nodeId === activeFocusNodeId)?.depth ?? 0)}`}
-                        variant='outlined'
-                      />
-	                  </Stack>
+                  {viewMode === 'leaders' && selectedLeaderNode ? (
+                    <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
+                      <Typography variant='caption' color='text.secondary'>
+                        Áreas lideradas en esta vista
+                      </Typography>
+                      <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap sx={{ mt: 1 }}>
+                        {selectedLeaderNode.associatedDepartments.length > 0 ? (
+                          selectedLeaderNode.associatedDepartments.map(department => (
+                            <Chip
+                              key={department.departmentId}
+                              size='small'
+                              label={`${department.name} · ${department.memberCount} miembro${department.memberCount !== 1 ? 's' : ''}`}
+                              color={department.isPrimary ? 'primary' : 'default'}
+                              variant={department.isPrimary ? 'outlined' : 'filled'}
+                            />
+                          ))
+                        ) : (
+                          <Typography variant='body2' color='text.secondary'>
+                            Sin áreas lideradas visibles para este scope.
+                          </Typography>
+                        )}
+                      </Stack>
+                    </Box>
+                  ) : null}
 
-	                  <Box>
-	                    <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 1 }}>
-	                      Ruta estructural
-	                    </Typography>
-	                    <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-	                      {payload.breadcrumbs.map(crumb => (
-	                        <Chip
-	                          key={crumb.nodeId}
-	                          label={crumb.label}
-	                          size='small'
-	                          variant={crumb.memberId === selectedMember.memberId ? 'filled' : 'outlined'}
-	                          color={crumb.memberId === selectedMember.memberId ? 'primary' : 'default'}
-	                          clickable={Boolean(crumb.memberId)}
-	                          onClick={() => handleFocusMember(crumb.memberId)}
-	                        />
-	                      ))}
+                  <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                    <Chip size='small' label={`Directos ${formatCount(selectedMember.directReportsCount)}`} variant='outlined' />
+                    <Chip size='small' label={`Subárbol ${formatCount(selectedMember.subtreeSize)}`} variant='outlined' />
+                    <Chip
+                      size='small'
+                      label={
+                        viewMode === 'leaders'
+                          ? `Profundidad ${formatCount(selectedLeaderNode?.depth ?? 0)}`
+                          : `Profundidad ${formatCount(payload.nodes.find(node => node.nodeId === activeFocusNodeId)?.depth ?? 0)}`
+                      }
+                      variant='outlined'
+                    />
+                  </Stack>
+
+                  <Box>
+                    <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mb: 1 }}>
+                      {viewMode === 'leaders' ? 'Ruta visible' : 'Ruta estructural'}
+                    </Typography>
+                    <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
+                      {payload.breadcrumbs.map(crumb => (
+                        <Chip
+                          key={crumb.nodeId}
+                          label={crumb.label}
+                          size='small'
+                          variant={crumb.memberId === selectedMember.memberId ? 'filled' : 'outlined'}
+                          color={crumb.memberId === selectedMember.memberId ? 'primary' : 'default'}
+                          clickable={Boolean(crumb.memberId)}
+                          onClick={() => handleFocusMember(crumb.memberId)}
+                        />
+                      ))}
                     </Stack>
                   </Box>
 

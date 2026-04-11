@@ -1,5 +1,13 @@
 # changelog.md
 
+## 2026-04-11
+
+### 2026-04-11 — Organigrama con lectura por liderazgo y workspace visible en menú
+
+- `HR > Organigrama` ahora puede alternar entre lectura estructural por áreas y una lectura `Líderes y equipos` centrada en personas responsables.
+- La lectura por liderazgo reutiliza el mismo scope y foco por persona, pero resume las áreas asociadas como metadata dentro del nodo del líder para no mezclar estructura y supervisoría en un solo grafo.
+- `Mi equipo` y `Aprobaciones` quedaron visibles en el menú lateral para perfiles HR/admin con identidad interna vinculada, además del caso supervisor-aware existente.
+
 ## 2026-04-10
 
 ### 2026-04-10 — Organigrama estructural con contexto heredado

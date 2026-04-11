@@ -167,10 +167,14 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     // ── EQUIPO (section: flat, conditional) ──
     const hasHrAccess = isHrUser || isAdminUser
 
+    const canSeeHrTeamWorkspace = Boolean(session?.user?.memberId) && (hasHrAccess || hasSupervisorWorkspaceLanding)
+
     const hrItems: VerticalMenuDataType[] = hasHrAccess
       ? [
           { label: nl(GH_HR_NAV.payroll), href: '/hr/payroll', icon: 'tabler-receipt' },
           { label: nl(GH_HR_NAV.payrollProjected), href: '/hr/payroll/projected', icon: 'tabler-calculator' },
+          { label: nl(GH_HR_NAV.team), href: '/hr/team', icon: 'tabler-users-group' },
+          { label: nl(GH_HR_NAV.approvals), href: '/hr/approvals', icon: 'tabler-checklist' },
           { label: nl(GH_HR_NAV.hierarchy), href: '/hr/hierarchy', icon: 'tabler-hierarchy-2' },
           { label: nl(GH_HR_NAV.orgChart), href: '/hr/org-chart', icon: 'tabler-hierarchy-3' },
           { label: nl(GH_HR_NAV.departments), href: '/hr/departments', icon: 'tabler-sitemap' },
@@ -179,6 +183,8 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         ].filter(item => {
           if (item.href === '/hr/payroll') return canSeeView('equipo.nomina', true)
           if (item.href === '/hr/payroll/projected') return canSeeView('equipo.nomina_proyectada', true)
+          if (item.href === '/hr/team') return canSeeHrTeamWorkspace
+          if (item.href === '/hr/approvals') return canSeeHrTeamWorkspace
           if (item.href === '/hr/hierarchy') return canSeeView('equipo.jerarquia', true)
           if (item.href === '/hr/org-chart') return canSeeView('equipo.organigrama', true)
           if (item.href === '/hr/departments') return canSeeView('equipo.departamentos', true)
@@ -189,8 +195,12 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         })
       : []
 
-    const supervisorScopeItems: VerticalMenuDataType[] = !hasHrAccess && canSeeSupervisorOrgChart
-      ? [{ label: nl(GH_HR_NAV.orgChart), href: '/hr/org-chart', icon: 'tabler-hierarchy-3' }]
+    const supervisorScopeItems: VerticalMenuDataType[] = !hasHrAccess && canSeeHrTeamWorkspace
+      ? [
+          { label: nl(GH_HR_NAV.team), href: '/hr/team', icon: 'tabler-users-group' },
+          { label: nl(GH_HR_NAV.approvals), href: '/hr/approvals', icon: 'tabler-checklist' },
+          ...(canSeeSupervisorOrgChart ? [{ label: nl(GH_HR_NAV.orgChart), href: '/hr/org-chart', icon: 'tabler-hierarchy-3' }] : [])
+        ]
       : []
 
     if (canSeePeople && hasHrAccess) {

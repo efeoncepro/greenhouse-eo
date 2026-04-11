@@ -81,6 +81,8 @@ export const GH_FINANCE_NAV = {
 export const GH_HR_NAV = {
   payroll: { label: 'Nómina', subtitle: 'Compensaciones y nómina mensual' },
   payrollProjected: { label: 'Nómina Proyectada', subtitle: 'Simulación y previsión' },
+  team: { label: 'Mi equipo', subtitle: 'Workspace operativo de tu subárbol visible' },
+  approvals: { label: 'Aprobaciones', subtitle: 'Cola operativa del equipo visible' },
   hierarchy: { label: 'Jerarquía', subtitle: 'Supervisoría, delegaciones y cambios' },
   orgChart: { label: 'Organigrama', subtitle: 'Explorador visual de la jerarquía' },
   departments: { label: 'Departamentos', subtitle: 'Estructura organizacional' },
