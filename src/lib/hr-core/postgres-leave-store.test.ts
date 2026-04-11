@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
 vi.mock('server-only', () => ({}))

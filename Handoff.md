@@ -1,5 +1,29 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — Seed operativo Kortex pilot READY
+
+- alcance implementado:
+  - helper nuevo `src/lib/sister-platforms/consumers.ts`
+    - lista consumers
+    - crea consumer con token hasheado
+    - upsert idempotente por `sister_platform_key + consumer_name`
+    - rotacion opcional de token
+  - script nuevo `scripts/seed-kortex-sister-platform-pilot.ts`
+  - comando nuevo `pnpm seed:kortex-pilot`
+  - docs actualizados:
+    - `docs/architecture/GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`
+    - `docs/documentation/plataforma/sister-platform-bindings.md`
+- contrato operativo:
+  - el seed provisiona o actualiza el consumer dedicado de Kortex y su binding `portal -> Greenhouse scope`
+  - defaults seguros:
+    - consumer `active`
+    - binding `draft`
+    - allowed scopes `client,space`
+  - el token solo aparece cuando se crea o se rota (`KORTEX_ROTATE_CONSUMER_TOKEN=true`)
+- siguiente accion natural:
+  - correr `pnpm seed:kortex-pilot` con IDs reales del piloto y guardar el token emitido en los secrets del runtime Kortex
+  - luego hacer smoke call a `/api/integrations/v1/sister-platforms/context`
+
 ## Sesion 2026-04-11 — local Next build isolation ACTIVADA para evitar colisiones entre agentes
 
 - alcance implementado:

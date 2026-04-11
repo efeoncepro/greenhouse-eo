@@ -39,6 +39,19 @@
   - la migración quedó aplicada el 2026-04-11 vía `pnpm pg:connect:migrate`
   - `src/types/db.d.ts` quedó regenerado en el mismo lote
 
+## Delta 2026-04-11 Seed operativo para consumer piloto Kortex
+
+- Greenhouse ya tiene una utilidad operativa para provisionar el primer consumer Kortex y su binding piloto sin SQL manual.
+- Runtime nuevo:
+  - helper `src/lib/sister-platforms/consumers.ts`
+  - script `scripts/seed-kortex-sister-platform-pilot.ts`
+  - comando `pnpm seed:kortex-pilot`
+- Contrato operativo:
+  - el seed crea o actualiza el consumer dedicado `Kortex Operator Console`
+  - el seed crea o actualiza el binding `kortex` con `external_scope_type='portal'`
+  - el token solo se imprime cuando se crea o rota; no se reexpone en ejecuciones normales
+  - defaults seguros: binding `draft`, consumer `active`, scopes permitidos `client,space`
+
 ## Delta 2026-04-11 Foundation runtime para sister-platform bindings
 
 - Greenhouse ya tiene una foundation runtime explícita para bindear sister platforms con scopes internos.
