@@ -13,6 +13,7 @@ export type GreenhouseAssetRetentionClass =
   | 'provider_supporting_doc'
   | 'tooling_supporting_doc'
   | 'hr_certification'
+  | 'hr_evidence'
 
 export type GreenhouseAssetContext =
   | 'leave_request_draft'
@@ -24,6 +25,8 @@ export type GreenhouseAssetContext =
   | 'payroll_export_csv'
   | 'certification_draft'
   | 'certification'
+  | 'evidence_draft'
+  | 'evidence'
 
 export interface GreenhouseAssetRecord {
   assetId: string
@@ -61,7 +64,7 @@ export interface PrivateAssetUploadResponse {
 
 export type DraftUploadContext = Extract<
   GreenhouseAssetContext,
-  'leave_request_draft' | 'purchase_order_draft' | 'certification_draft'
+  'leave_request_draft' | 'purchase_order_draft' | 'certification_draft' | 'evidence_draft'
 >
 
 export interface UploadPrivateAssetInput {

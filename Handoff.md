@@ -1,5 +1,88 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — TASK-319: Reputation, Evidence & Endorsements completada
+
+- Migration: member_evidence + member_endorsements tables con runtime grants
+- Services: evidence.ts (CRUD + asset attach), endorsements.ts (create + moderate)
+- APIs: /api/my/evidence (CRUD), /api/my/endorsements (view), /api/hr/core/members/[id]/endorse (peer), /api/hr/core/members/[id]/endorsements (admin moderate)
+- UI: Evidence section (cards con type chip, skill/tool links, URL) + Endorsements section (avatar+name+skill chip+comment+time)
+- Asset context: evidence_draft/evidence con retention class hr_evidence
+- Event catalog: memberEvidence + memberEndorsement aggregates
+- STATUS: COMPLETE
+
+## Sesion 2026-04-11 — backlog ejecutable para `Assigned Team Enterprise Program`
+
+- alcance cerrado:
+  - se creó el bloque `TASK-357` a `TASK-366` como programa de implementación completo para `Equipo asignado`
+  - el bloque quedó separado por capas:
+    - umbrella / sequencing
+    - semantic layer
+    - field-level access
+    - UI shared
+    - main module runtime
+    - talent detail drawer
+    - capacity + health bridge
+    - risk / continuity alerts
+    - cross-surface consumers
+    - observability / export / hardening
+  - se fijó la secuencia recomendada de ejecución:
+    - `358`
+    - `359` + `360`
+    - `363`
+    - `361`
+    - `362` + `364`
+    - `365`
+    - `366`
+- documentos vivos actualizados:
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/to-do/TASK-357-assigned-team-canonical-program.md`
+  - `docs/tasks/to-do/TASK-358-assigned-team-semantic-layer-portfolio-readers.md`
+  - `docs/tasks/to-do/TASK-359-assigned-team-client-visibility-policy-field-access.md`
+  - `docs/tasks/to-do/TASK-360-assigned-team-shared-ui-primitives-cards.md`
+  - `docs/tasks/to-do/TASK-361-assigned-team-main-module-runtime.md`
+  - `docs/tasks/to-do/TASK-362-assigned-team-talent-detail-drawer-client-safe-dossier.md`
+  - `docs/tasks/to-do/TASK-363-assigned-team-capacity-health-signals-integration.md`
+  - `docs/tasks/to-do/TASK-364-assigned-team-risk-continuity-coverage-alerts.md`
+  - `docs/tasks/to-do/TASK-365-assigned-team-cross-surface-consumers.md`
+  - `docs/tasks/to-do/TASK-366-assigned-team-enterprise-hardening-observability-export.md`
+- validación ejecutada:
+  - revisión manual de consistencia contra `Assigned Team Architecture`, `Client Portal`, `Identity Access`, `Team Capacity` y foundations runtime existentes
+  - no aplica build/lint; cambio exclusivamente documental
+
+## Sesion 2026-04-11 — arquitectura canónica de `Equipo asignado` para portal cliente enterprise
+
+- alcance cerrado:
+  - se formalizó `Equipo asignado` como capability enterprise cliente-facing y ya no como roster aislado de `/equipo`
+  - se fijó que el root de lectura es `Organization / Space + assignments`, sin crear una tabla transaccional paralela
+  - la arquitectura quedó separada en tres capas:
+    - assignments operativos
+    - capability profile `client-safe`
+    - service health / capacity signals
+  - se dejó explícito que el módulo no debe absorber `ATS`, `HR`, `Payroll` ni `Staff Augmentation` admin
+  - se agregó un `Greenhouse Synergy Contract` dentro de la spec para dejar explícito cómo este módulo compone con `Organization/Space`, `Assignments`, `Staff Augmentation`, `HRIS`, `Person Complete 360`, `Talent Trust`, `Team Capacity`, `Delivery/ICO`, `Capability Modules`, `Finance`, `Hiring / ATS` e `Identity Access`
+  - se agregó también la sección `UI / UX Architecture` con:
+    - pattern family (`hero + KPI strip + roster inteligente + detail drawer`)
+    - estrategia de componentes Vuexy/Greenhouse
+    - microinteracciones y motion sobria
+    - estados, microcopy y accessibility contract
+  - se agregó además `Reusable UI Component Model`, separando:
+    - `shared primitives`
+    - `shared building blocks`
+    - `module-local composites`
+    - reglas de promoción a `shared`
+- documentos vivos actualizados:
+  - `docs/architecture/GREENHOUSE_ASSIGNED_TEAM_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `docs/architecture/GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md`
+  - `docs/README.md`
+  - `project_context.md`
+  - `changelog.md`
+- validación ejecutada:
+  - revisión manual de consistencia contra `Client Portal`, `Team Capacity`, `Person ↔ Organization`, `Person Complete 360` y `TASK-318`
+  - no aplica build/lint; no hubo cambios de runtime
+
 ## Sesion 2026-04-11 — TASK-318: Client-Safe Verified Talent Profiles completada
 
 - Service: src/lib/team/client-safe-profile.ts — reader que filtra solo verified + client_visible

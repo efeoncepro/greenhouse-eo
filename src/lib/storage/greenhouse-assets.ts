@@ -51,10 +51,11 @@ type AssetRow = {
 const PRIVATE_USER_ALLOWED_MIME_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png', 'image/webp'])
 const SYSTEM_ALLOWED_MIME_TYPES = new Set([...PRIVATE_USER_ALLOWED_MIME_TYPES, 'text/csv', 'text/csv; charset=utf-8'])
 
-const MAX_PRIVATE_UPLOAD_BYTES_BY_CONTEXT: Record<Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'certification_draft'>, number> = {
+const MAX_PRIVATE_UPLOAD_BYTES_BY_CONTEXT: Record<Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'certification_draft' | 'evidence_draft'>, number> = {
   leave_request_draft: 10 * 1024 * 1024,
   purchase_order_draft: 10 * 1024 * 1024,
-  certification_draft: 10 * 1024 * 1024
+  certification_draft: 10 * 1024 * 1024,
+  evidence_draft: 10 * 1024 * 1024
 }
 
 const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRetentionClass> = {
@@ -66,7 +67,9 @@ const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRet
   payroll_export_pdf: 'payroll_export',
   payroll_export_csv: 'payroll_export',
   certification_draft: 'hr_certification',
-  certification: 'hr_certification'
+  certification: 'hr_certification',
+  evidence_draft: 'hr_evidence',
+  evidence: 'hr_evidence'
 }
 
 const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
@@ -78,7 +81,9 @@ const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
   payroll_export_pdf: 'payroll-export-packages',
   payroll_export_csv: 'payroll-export-packages',
   certification_draft: 'certifications',
-  certification: 'certifications'
+  certification: 'certifications',
+  evidence_draft: 'evidence',
+  evidence: 'evidence'
 }
 
 const toNumber = (value: number | string | null | undefined) => {
@@ -252,7 +257,7 @@ const assertPrivateAssetUpload = ({
   contentType,
   sizeBytes
 }: {
-  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'certification_draft'>
+  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'certification_draft' | 'evidence_draft'>
   contentType: string
   sizeBytes: number
 }) => {
@@ -317,7 +322,7 @@ export const createPrivatePendingAsset = async ({
   ownerMemberId,
   metadata
 }: {
-  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'certification_draft'>
+  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'certification_draft' | 'evidence_draft'>
   uploadedByUserId: string
   fileName: string
   contentType: string
@@ -452,7 +457,7 @@ export const attachAssetToAggregate = async ({
   client
 }: {
   assetId: string
-  ownerAggregateType: Exclude<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft'>
+  ownerAggregateType: Exclude<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'certification_draft' | 'evidence_draft'>
   ownerAggregateId: string
   actorUserId: string
   ownerClientId?: string | null

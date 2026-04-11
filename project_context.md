@@ -1,5 +1,36 @@
 # project_context.md
 
+## Delta 2026-04-11 Equipo asignado ya tiene arquitectura canónica enterprise
+
+- Greenhouse ya no debe pensar la surface cliente `/equipo` como roster simple.
+- Regla operativa nueva:
+  - `Equipo asignado` es la capability enterprise cliente-facing para visibilidad de talento contratado
+  - su root de lectura es `Organization / Space + client_team_assignments`, no una tabla mutante nueva
+  - combina tres capas:
+    - assignments operativos
+    - capability profile `client-safe`
+    - health/capacity signals resumidas
+- Alcance semántico nuevo:
+  - composición del equipo
+  - FTE contratada / asignada / activa
+  - seniority, skills, certificaciones, idiomas
+  - saturación y team health resumidas
+  - lectura consolidada por cliente y drilldown por `space`
+- Contrato de sinergia explícito:
+  - `Equipo asignado` compone sobre `assignments`, `client-safe profiles`, `Team Capacity`, `Delivery/ICO`, `Organization/Space` e `Identity Access`
+  - no absorbe ownership de `HRIS`, `Hiring / ATS`, `Staff Augmentation` admin, `Finance` ni `Payroll`
+- Contrato UI nuevo:
+  - la surface debe resolverse como `executive summary + operational drilldown`
+  - el primer fold se compone de hero ejecutivo, KPI strip y roster inteligente
+  - el detalle individual recomendado es `detail drawer` cliente-safe, no tabla admin ni HR profile externo
+  - el modelo reusable queda dividido en:
+    - `shared primitives`
+    - `shared building blocks`
+    - `module-local composites`
+  - solo se promueve a `shared` lo que demuestre reuso cross-surface real
+- Fuente canónica nueva:
+  - `docs/architecture/GREENHOUSE_ASSIGNED_TEAM_ARCHITECTURE_V1.md`
+
 ## Delta 2026-04-11 Deel compensation now treats connectivity as canonical recurring allowance
 
 - `Payroll > Compensaciones` ya no debe ocultar la conectividad para contratos gestionados por Deel.

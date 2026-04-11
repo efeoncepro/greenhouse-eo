@@ -7,6 +7,19 @@
 
 ---
 
+## Delta 2026-04-11 — `Equipo` must evolve into the enterprise `Equipo asignado` capability
+
+- La vista cliente `/equipo` ya no debe pensarse como roster estático.
+- Fuente canónica nueva:
+  - `docs/architecture/GREENHOUSE_ASSIGNED_TEAM_ARCHITECTURE_V1.md`
+- Regla nueva:
+  - la experiencia cliente de equipo debe evolucionar hacia `Equipo asignado`
+  - debe combinar roster, FTE visible, seniority mix, capability coverage y team health
+  - debe soportar lectura consolidada por cliente y drilldown por `space`
+  - los perfiles individuales visibles deben ser siempre `client-safe`
+
+---
+
 ## 1. Proposito
 
 Documentar el estado actual del portal cliente de Greenhouse: que ve un cliente, como se controla su acceso, como se filtran los datos, y que gaps existen para planificar la renovacion.
@@ -158,6 +171,8 @@ No todas las vistas registradas en el catalogo tienen el mismo nivel de implemen
 | **Campanas** | Solo estructura (nombre, tipo, fechas) — sin metricas de performance, sin conexion a resultados, sin ROI |
 | **Equipo** | Roster estatico — sin tendencia de carga, sin indicadores de disponibilidad, sin contexto de skills o especialidad |
 | **Analytics** | Solo metricas de delivery — sin Revenue Enabled, sin Brief Clarity, sin Brand Intelligence, sin benchmarking |
+
+La evolución esperada para `Equipo` ya no es “más columnas en la tabla”, sino converger al módulo enterprise `Equipo asignado` definido en `GREENHOUSE_ASSIGNED_TEAM_ARCHITECTURE_V1.md`.
 
 ---
 

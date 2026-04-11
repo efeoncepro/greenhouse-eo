@@ -1439,7 +1439,42 @@ export const GH_SKILLS_CERTS = {
   empty_languages_description: 'Agrega los idiomas que dominas y tu nivel de competencia.',
   empty_links_title: 'Sin links profesionales',
   empty_links_description: 'Agrega tus perfiles en plataformas profesionales.',
-  empty_about_me: 'Aún no has escrito tu biografía profesional.'
+  empty_about_me: 'Aún no has escrito tu biografía profesional.',
+
+  // Evidence
+  section_evidence: 'Evidencia y portafolio',
+  evidence_add: 'Agregar evidencia',
+  evidence_view: 'Ver',
+  evidence_remove: 'Eliminar evidencia',
+  evidence_type_project_highlight: 'Proyecto',
+  evidence_type_work_sample: 'Muestra',
+  evidence_type_case_study: 'Caso',
+  evidence_type_publication: 'Publicación',
+  evidence_type_award: 'Premio',
+  evidence_type_other: 'Otro',
+  empty_evidence_title: 'Sin evidencia registrada',
+  empty_evidence_description: 'Agrega proyectos, casos o muestras de trabajo para enriquecer tu perfil.',
+
+  // Evidence dialog
+  evidence_dialog_title: 'Agregar evidencia',
+  evidence_field_title: 'Título',
+  evidence_field_description: 'Descripción',
+  evidence_field_type: 'Tipo de evidencia',
+  evidence_field_skill: 'Skill relacionada',
+  evidence_field_tool: 'Herramienta relacionada',
+  evidence_field_url: 'URL externa',
+  evidence_field_url_placeholder: 'https://...',
+
+  // Endorsements
+  section_endorsements: 'Endorsements',
+  endorsement_empty_title: 'Sin endorsements',
+  endorsement_empty_description: 'Tus colegas pueden respaldar tus skills y herramientas.',
+  endorsement_moderate: 'Moderar',
+  endorsement_remove: 'Eliminar',
+
+  // Summary (evidence + endorsements)
+  summary_evidence: (n: number) => `${n} evidencia${n === 1 ? '' : 's'}`,
+  summary_endorsements: (n: number) => `${n} endorsement${n === 1 ? '' : 's'}`
 } as const
 
 /* ─────────────────── Talent Discovery ─────────────────── */

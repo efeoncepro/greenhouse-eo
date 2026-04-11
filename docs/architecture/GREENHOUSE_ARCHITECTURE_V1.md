@@ -1,5 +1,16 @@
 # Greenhouse Architecture V1
 
+## Delta 2026-04-11 — Assigned Team becomes a canonical enterprise client visibility capability
+
+- Greenhouse ya no debe tratar `/equipo` como un roster cliente estático ni como una copia superficial de `People`.
+- Fuente canónica nueva:
+  - `docs/architecture/GREENHOUSE_ASSIGNED_TEAM_ARCHITECTURE_V1.md`
+- Regla arquitectónica nueva:
+  - `Equipo asignado` es una capability enterprise cliente-facing de `workforce visibility`
+  - su root de lectura es `Organization / Space + assignments`, no una tabla nueva paralela
+  - debe combinar composición del equipo, cobertura de capacidad, capability profile cliente-safe y health signals resumidas
+  - no debe absorber `ATS`, `HR`, `Payroll` ni `Staff Augmentation` admin
+
 ## Delta 2026-04-11 — Hiring / ATS becomes a canonical talent fulfillment domain
 
 - Greenhouse ya no debe tratar `ATS` solo como una herramienta externa hipotética o como un mini pipeline accesorio de `Staff Aug`.

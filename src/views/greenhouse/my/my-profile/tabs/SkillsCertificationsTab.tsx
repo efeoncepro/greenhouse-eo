@@ -53,6 +53,8 @@ import type {
 } from '@/types/talent-taxonomy'
 import { SKILL_SENIORITY_LEVELS, SKILL_CATEGORY_VALUES } from '@/types/agency-skills'
 import { TOOL_PROFICIENCY_LEVELS, TOOL_CATEGORY_VALUES, LANGUAGE_PROFICIENCY_LEVELS } from '@/types/talent-taxonomy'
+import type { MemberEvidence, MemberEndorsement, EvidenceType } from '@/types/reputation'
+import { EVIDENCE_TYPES } from '@/types/reputation'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -80,6 +82,8 @@ type ProfileData = {
   tools: MemberTool[]
   toolCatalog: ToolCatalogItem[]
   languages: MemberLanguage[]
+  evidence: MemberEvidence[]
+  endorsements: MemberEndorsement[]
   links: ProfessionalLinks
   headline: string | null
   aboutMe: string | null
@@ -92,6 +96,8 @@ type ProfileData = {
     expiringSoonCount: number
     toolCount: number
     languageCount: number
+    evidenceCount: number
+    endorsementCount: number
   }
 }
 
@@ -152,6 +158,24 @@ const VERIFICATION_STATUS_CONFIG: Record<
   rejected: { label: GH_SKILLS_CERTS.cert_status_rejected, color: 'error' }
 }
 
+const EVIDENCE_TYPE_LABELS: Record<EvidenceType, string> = {
+  project_highlight: GH_SKILLS_CERTS.evidence_type_project_highlight,
+  work_sample: GH_SKILLS_CERTS.evidence_type_work_sample,
+  case_study: GH_SKILLS_CERTS.evidence_type_case_study,
+  publication: GH_SKILLS_CERTS.evidence_type_publication,
+  award: GH_SKILLS_CERTS.evidence_type_award,
+  other: GH_SKILLS_CERTS.evidence_type_other
+}
+
+const EVIDENCE_TYPE_COLOR: Record<EvidenceType, 'primary' | 'info' | 'success' | 'warning' | 'error' | 'default'> = {
+  project_highlight: 'primary',
+  work_sample: 'info',
+  case_study: 'success',
+  publication: 'warning',
+  award: 'error',
+  other: 'default'
+}
+
 const formatDate = (date: string | null): string => {
   if (!date) return '—'
 
@@ -161,6 +185,32 @@ const formatDate = (date: string | null): string => {
     )
   } catch {
     return date
+  }
+}
+
+const formatTimeAgo = (dateStr: string): string => {
+  try {
+    const diff = Date.now() - new Date(dateStr).getTime()
+    const minutes = Math.floor(diff / 60_000)
+
+    if (minutes < 1) return 'ahora'
+    if (minutes < 60) return `hace ${minutes} min`
+
+    const hours = Math.floor(minutes / 60)
+
+    if (hours < 24) return `hace ${hours}h`
+
+    const days = Math.floor(hours / 24)
+
+    if (days < 30) return `hace ${days}d`
+
+    const months = Math.floor(days / 30)
+
+    if (months < 12) return `hace ${months} mes${months === 1 ? '' : 'es'}`
+
+    return `hace ${Math.floor(months / 12)} año${Math.floor(months / 12) === 1 ? '' : 's'}`
+  } catch {
+    return ''
   }
 }
 
@@ -203,6 +253,23 @@ function SummaryCounters({ summary }: { summary: ProfileData['summary'] }) {
         size='small'
         color='info'
       />
+      {summary.evidenceCount > 0 && (
+        <Chip
+          icon={<i className='tabler-photo' />}
+          label={GH_SKILLS_CERTS.summary_evidence(summary.evidenceCount)}
+          variant='outlined'
+          size='small'
+        />
+      )}
+      {summary.endorsementCount > 0 && (
+        <Chip
+          icon={<i className='tabler-thumb-up' />}
+          label={GH_SKILLS_CERTS.summary_endorsements(summary.endorsementCount)}
+          variant='outlined'
+          size='small'
+          color='primary'
+        />
+      )}
       {summary.expiringSoonCount > 0 && (
         <Chip
           icon={<i className='tabler-clock-exclamation' />}
@@ -1100,6 +1167,465 @@ function LanguagesSection({
 }
 
 // ---------------------------------------------------------------------------
+// Add Evidence Dialog
+// ---------------------------------------------------------------------------
+
+function AddEvidenceDialog({
+  open,
+  onClose,
+  skillCatalog,
+  toolCatalog,
+  onSubmit
+}: {
+  open: boolean
+  onClose: () => void
+  skillCatalog: SkillCatalogItem[]
+  toolCatalog: ToolCatalogItem[]
+  onSubmit: (data: {
+    title: string
+    description: string | null
+    evidenceType: EvidenceType
+    relatedSkillCode: string | null
+    relatedToolCode: string | null
+    externalUrl: string | null
+  }) => Promise<void>
+}) {
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [evidenceType, setEvidenceType] = useState<EvidenceType>('project_highlight')
+  const [relatedSkill, setRelatedSkill] = useState<SkillCatalogItem | null>(null)
+  const [relatedTool, setRelatedTool] = useState<ToolCatalogItem | null>(null)
+  const [externalUrl, setExternalUrl] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleSubmit = async () => {
+    if (!title.trim()) return
+
+    setSubmitting(true)
+    setError(null)
+
+    try {
+      await onSubmit({
+        title: title.trim(),
+        description: description.trim() || null,
+        evidenceType,
+        relatedSkillCode: relatedSkill?.skillCode ?? null,
+        relatedToolCode: relatedTool?.toolCode ?? null,
+        externalUrl: externalUrl.trim() || null
+      })
+      handleClose()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo agregar la evidencia.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handleClose = () => {
+    setTitle('')
+    setDescription('')
+    setEvidenceType('project_highlight')
+    setRelatedSkill(null)
+    setRelatedTool(null)
+    setExternalUrl('')
+    setError(null)
+    onClose()
+  }
+
+  return (
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth='sm' aria-labelledby='add-evidence-dialog-title'>
+      <DialogTitle id='add-evidence-dialog-title'>{GH_SKILLS_CERTS.evidence_dialog_title}</DialogTitle>
+      <DialogContent>
+        <Stack spacing={3} sx={{ pt: 1 }}>
+          <TextField
+            label={GH_SKILLS_CERTS.evidence_field_title}
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            required
+            disabled={submitting}
+            placeholder='ej. Rediseno portal cliente Acme'
+          />
+          <TextField
+            label={GH_SKILLS_CERTS.evidence_field_description}
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            disabled={submitting}
+            multiline
+            rows={3}
+            placeholder='Describe brevemente el proyecto o muestra de trabajo.'
+          />
+          <TextField
+            select
+            label={GH_SKILLS_CERTS.evidence_field_type}
+            value={evidenceType}
+            onChange={e => setEvidenceType(e.target.value as EvidenceType)}
+            disabled={submitting}
+            size='small'
+          >
+            {EVIDENCE_TYPES.map(type => (
+              <MenuItem key={type} value={type}>
+                {EVIDENCE_TYPE_LABELS[type]}
+              </MenuItem>
+            ))}
+          </TextField>
+          <Autocomplete
+            options={skillCatalog.filter(s => s.active)}
+            getOptionLabel={option => option.skillName}
+            groupBy={option => CATEGORY_LABELS[option.skillCategory] ?? option.skillCategory}
+            value={relatedSkill}
+            onChange={(_, value) => setRelatedSkill(value)}
+            renderInput={params => (
+              <TextField {...params} label={GH_SKILLS_CERTS.evidence_field_skill} placeholder='Opcional' size='small' />
+            )}
+            disabled={submitting}
+            noOptionsText='Sin skills disponibles'
+          />
+          <Autocomplete
+            options={toolCatalog.filter(t => t.active)}
+            getOptionLabel={option => option.toolName}
+            groupBy={option => TOOL_CATEGORY_LABELS[option.toolCategory] ?? option.toolCategory}
+            value={relatedTool}
+            onChange={(_, value) => setRelatedTool(value)}
+            renderInput={params => (
+              <TextField {...params} label={GH_SKILLS_CERTS.evidence_field_tool} placeholder='Opcional' size='small' />
+            )}
+            disabled={submitting}
+            noOptionsText='Sin herramientas disponibles'
+          />
+          <TextField
+            label={GH_SKILLS_CERTS.evidence_field_url}
+            value={externalUrl}
+            onChange={e => setExternalUrl(e.target.value)}
+            disabled={submitting}
+            placeholder={GH_SKILLS_CERTS.evidence_field_url_placeholder}
+          />
+          {error && <Alert severity='error'>{error}</Alert>}
+        </Stack>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose} disabled={submitting}>
+          Cancelar
+        </Button>
+        <Button
+          variant='contained'
+          onClick={handleSubmit}
+          disabled={!title.trim() || submitting}
+        >
+          {submitting ? 'Guardando...' : GH_SKILLS_CERTS.evidence_add}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Evidence Section
+// ---------------------------------------------------------------------------
+
+function EvidenceSection({
+  evidence,
+  mode,
+  skillCatalog,
+  toolCatalog,
+  onAdd,
+  onRemove
+}: {
+  evidence: MemberEvidence[]
+  mode: 'self' | 'admin'
+  skillCatalog: SkillCatalogItem[]
+  toolCatalog: ToolCatalogItem[]
+  onAdd: (data: {
+    title: string
+    description: string | null
+    evidenceType: EvidenceType
+    relatedSkillCode: string | null
+    relatedToolCode: string | null
+    externalUrl: string | null
+  }) => Promise<void>
+  onRemove: (evidenceId: string) => Promise<void>
+}) {
+  const [showAddDialog, setShowAddDialog] = useState(false)
+
+  return (
+    <>
+      <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
+        <CardHeader
+          title={GH_SKILLS_CERTS.section_evidence}
+          avatar={
+            <Avatar variant='rounded' sx={{ bgcolor: 'info.lightOpacity', color: 'info.main' }}>
+              <i className='tabler-photo' />
+            </Avatar>
+          }
+          action={
+            <Button
+              size='small'
+              variant='tonal'
+              startIcon={<i className='tabler-plus' />}
+              onClick={() => setShowAddDialog(true)}
+            >
+              {GH_SKILLS_CERTS.evidence_add}
+            </Button>
+          }
+        />
+        <Divider />
+        <CardContent>
+          {evidence.length === 0 ? (
+            <Stack alignItems='center' spacing={1} sx={{ py: 4 }} role='status'>
+              <i className='tabler-photo text-[28px]' style={{ opacity: 0.3 }} aria-hidden='true' />
+              <Typography variant='body2' color='text.secondary'>
+                {GH_SKILLS_CERTS.empty_evidence_title}
+              </Typography>
+              <Typography variant='caption' color='text.disabled'>
+                {GH_SKILLS_CERTS.empty_evidence_description}
+              </Typography>
+            </Stack>
+          ) : (
+            <Stack spacing={2}>
+              {evidence.map(item => (
+                <Card
+                  key={item.evidenceId}
+                  elevation={0}
+                  sx={{
+                    border: theme => `1px solid ${theme.palette.divider}`,
+                    '&:hover': { boxShadow: theme => theme.shadows[2] }
+                  }}
+                >
+                  <CardContent sx={{ py: 2, '&:last-child': { pb: 2 } }}>
+                    <Stack spacing={1.5}>
+                      <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1 }}>
+                        <Box sx={{ minWidth: 0, flex: 1 }}>
+                          <Typography variant='subtitle2' noWrap>
+                            {item.title}
+                          </Typography>
+                          {item.description && (
+                            <Typography
+                              variant='caption'
+                              color='text.secondary'
+                              sx={{
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden'
+                              }}
+                            >
+                              {item.description}
+                            </Typography>
+                          )}
+                        </Box>
+                        <Chip
+                          label={EVIDENCE_TYPE_LABELS[item.evidenceType]}
+                          color={EVIDENCE_TYPE_COLOR[item.evidenceType]}
+                          size='small'
+                          variant='outlined'
+                        />
+                      </Box>
+
+                      {(item.relatedSkillName || item.relatedToolName) && (
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                          {item.relatedSkillName && (
+                            <Chip
+                              icon={<i className='tabler-sparkles' style={{ fontSize: 14 }} />}
+                              label={item.relatedSkillName}
+                              size='small'
+                              variant='outlined'
+                              sx={{ fontSize: '0.7rem' }}
+                            />
+                          )}
+                          {item.relatedToolName && (
+                            <Chip
+                              icon={<i className='tabler-tool' style={{ fontSize: 14 }} />}
+                              label={item.relatedToolName}
+                              size='small'
+                              variant='outlined'
+                              sx={{ fontSize: '0.7rem' }}
+                            />
+                          )}
+                        </Box>
+                      )}
+
+                      <Stack direction='row' spacing={1} alignItems='center'>
+                        {(item.assetId || item.externalUrl) && (
+                          <Button
+                            size='small'
+                            variant='text'
+                            startIcon={<i className='tabler-external-link' />}
+                            {...(item.externalUrl
+                              ? {
+                                  component: 'a' as const,
+                                  href: item.externalUrl,
+                                  target: '_blank',
+                                  rel: 'noreferrer'
+                                }
+                              : {})}
+                          >
+                            {GH_SKILLS_CERTS.evidence_view}
+                          </Button>
+                        )}
+                        {mode === 'self' && (
+                          <IconButton
+                            size='small'
+                            color='error'
+                            onClick={() => onRemove(item.evidenceId)}
+                            aria-label={`${GH_SKILLS_CERTS.evidence_remove}: ${item.title}`}
+                          >
+                            <i className='tabler-trash text-[16px]' />
+                          </IconButton>
+                        )}
+                      </Stack>
+                    </Stack>
+                  </CardContent>
+                </Card>
+              ))}
+            </Stack>
+          )}
+        </CardContent>
+      </Card>
+
+      <AddEvidenceDialog
+        open={showAddDialog}
+        onClose={() => setShowAddDialog(false)}
+        skillCatalog={skillCatalog}
+        toolCatalog={toolCatalog}
+        onSubmit={onAdd}
+      />
+    </>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Endorsements Section
+// ---------------------------------------------------------------------------
+
+function EndorsementsSection({
+  endorsements,
+  mode,
+  onModerate,
+  onRemove
+}: {
+  endorsements: MemberEndorsement[]
+  mode: 'self' | 'admin'
+  onModerate?: (endorsementId: string) => Promise<void>
+  onRemove?: (endorsementId: string) => Promise<void>
+}) {
+  const activeEndorsements = endorsements.filter(e => e.status === 'active')
+
+  return (
+    <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
+      <CardHeader
+        title={GH_SKILLS_CERTS.section_endorsements}
+        avatar={
+          <Avatar variant='rounded' sx={{ bgcolor: 'primary.lightOpacity', color: 'primary.main' }}>
+            <i className='tabler-thumb-up' />
+          </Avatar>
+        }
+        subheader={activeEndorsements.length > 0 ? `${activeEndorsements.length}` : undefined}
+      />
+      <Divider />
+      <CardContent>
+        {activeEndorsements.length === 0 ? (
+          <Stack alignItems='center' spacing={1} sx={{ py: 4 }} role='status'>
+            <i className='tabler-thumb-up text-[28px]' style={{ opacity: 0.3 }} aria-hidden='true' />
+            <Typography variant='body2' color='text.secondary'>
+              {GH_SKILLS_CERTS.endorsement_empty_title}
+            </Typography>
+            <Typography variant='caption' color='text.disabled'>
+              {GH_SKILLS_CERTS.endorsement_empty_description}
+            </Typography>
+          </Stack>
+        ) : (
+          <Stack spacing={1.5}>
+            {activeEndorsements.map(endorsement => (
+              <Box
+                key={endorsement.endorsementId}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.5,
+                  py: 1,
+                  px: 1.5,
+                  borderRadius: 1,
+                  '&:hover': { bgcolor: 'action.hover' }
+                }}
+              >
+                <Avatar
+                  src={endorsement.endorsedByAvatarUrl ?? undefined}
+                  sx={{ width: 32, height: 32, fontSize: '0.8rem' }}
+                  alt={endorsement.endorsedByDisplayName}
+                >
+                  {endorsement.endorsedByDisplayName?.charAt(0)?.toUpperCase() ?? '?'}
+                </Avatar>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Stack direction='row' spacing={1} alignItems='center' flexWrap='wrap'>
+                    <Typography variant='body2' fontWeight={500} noWrap>
+                      {endorsement.endorsedByDisplayName}
+                    </Typography>
+                    {endorsement.skillName && (
+                      <Chip
+                        icon={<i className='tabler-sparkles' style={{ fontSize: 12 }} />}
+                        label={endorsement.skillName}
+                        size='small'
+                        variant='outlined'
+                        sx={{ fontSize: '0.65rem', height: 22 }}
+                      />
+                    )}
+                    {endorsement.toolName && (
+                      <Chip
+                        icon={<i className='tabler-tool' style={{ fontSize: 12 }} />}
+                        label={endorsement.toolName}
+                        size='small'
+                        variant='outlined'
+                        sx={{ fontSize: '0.65rem', height: 22 }}
+                      />
+                    )}
+                  </Stack>
+                  {endorsement.comment && (
+                    <Typography variant='caption' color='text.secondary' sx={{ display: 'block', mt: 0.25 }}>
+                      {endorsement.comment}
+                    </Typography>
+                  )}
+                  <Typography variant='caption' color='text.disabled'>
+                    {endorsement.createdAt ? formatTimeAgo(endorsement.createdAt) : ''}
+                  </Typography>
+                </Box>
+                {mode === 'admin' && (
+                  <Stack direction='row' spacing={0.5} flexShrink={0}>
+                    {onModerate && (
+                      <Tooltip title={GH_SKILLS_CERTS.endorsement_moderate}>
+                        <IconButton
+                          size='small'
+                          color='warning'
+                          onClick={() => onModerate(endorsement.endorsementId)}
+                          aria-label={`${GH_SKILLS_CERTS.endorsement_moderate} endorsement de ${endorsement.endorsedByDisplayName}`}
+                        >
+                          <i className='tabler-flag text-[16px]' />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                    {onRemove && (
+                      <Tooltip title={GH_SKILLS_CERTS.endorsement_remove}>
+                        <IconButton
+                          size='small'
+                          color='error'
+                          onClick={() => onRemove(endorsement.endorsementId)}
+                          aria-label={`${GH_SKILLS_CERTS.endorsement_remove} endorsement de ${endorsement.endorsedByDisplayName}`}
+                        >
+                          <i className='tabler-trash text-[16px]' />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                  </Stack>
+                )}
+              </Box>
+            ))}
+          </Stack>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // Headline Card
 // ---------------------------------------------------------------------------
 
@@ -1426,11 +1952,20 @@ const SkillsCertificationsTab = ({ mode, memberId }: SkillsCertificationsTabProp
 
     try {
       if (mode === 'admin') {
-        const res = await fetch(`/api/hr/core/members/${memberId}/professional-profile`)
+        const [profileRes, evidenceRes, endorsementsRes] = await Promise.all([
+          fetch(`/api/hr/core/members/${memberId}/professional-profile`),
+          fetch(`/api/hr/core/members/${memberId}/evidence`),
+          fetch(`/api/hr/core/members/${memberId}/endorsements`)
+        ])
 
-        if (!res.ok) throw new Error('No se pudo cargar el perfil profesional.')
+        if (!profileRes.ok) throw new Error('No se pudo cargar el perfil profesional.')
 
-        const profile = await res.json()
+        const profile = await profileRes.json()
+        const evidenceData = evidenceRes.ok ? await evidenceRes.json() : { items: [] }
+        const endorsementsData = endorsementsRes.ok ? await endorsementsRes.json() : { items: [] }
+
+        const evidenceItems: MemberEvidence[] = evidenceData.items ?? []
+        const endorsementItems: MemberEndorsement[] = endorsementsData.items ?? []
 
         setData({
           skills: profile.skills ?? [],
@@ -1439,6 +1974,8 @@ const SkillsCertificationsTab = ({ mode, memberId }: SkillsCertificationsTabProp
           tools: profile.tools ?? [],
           toolCatalog: [],
           languages: profile.languages ?? [],
+          evidence: evidenceItems,
+          endorsements: endorsementItems,
           links: profile.professionalLinks ?? {
             linkedinUrl: null,
             portfolioUrl: null,
@@ -1450,15 +1987,19 @@ const SkillsCertificationsTab = ({ mode, memberId }: SkillsCertificationsTabProp
           },
           headline: profile.headline ?? null,
           aboutMe: profile.aboutMe ?? null,
-          summary: profile.summary ?? {
-            skillCount: 0,
-            certificationCount: 0,
-            verifiedSkillCount: 0,
-            verifiedCertCount: 0,
-            activeCertCount: 0,
-            expiringSoonCount: 0,
-            toolCount: 0,
-            languageCount: 0
+          summary: {
+            ...(profile.summary ?? {
+              skillCount: 0,
+              certificationCount: 0,
+              verifiedSkillCount: 0,
+              verifiedCertCount: 0,
+              activeCertCount: 0,
+              expiringSoonCount: 0,
+              toolCount: 0,
+              languageCount: 0
+            }),
+            evidenceCount: evidenceItems.length,
+            endorsementCount: endorsementItems.filter(e => e.status === 'active').length
           }
         })
 
@@ -1485,30 +2026,36 @@ const SkillsCertificationsTab = ({ mode, memberId }: SkillsCertificationsTabProp
           )
         }
       } else {
-        const [skillsRes, certsRes, linksRes, toolsRes, langsRes] = await Promise.all([
+        const [skillsRes, certsRes, linksRes, toolsRes, langsRes, evidenceRes, endorsementsRes] = await Promise.all([
           fetch('/api/my/skills'),
           fetch('/api/my/certifications'),
           fetch('/api/my/professional-links'),
           fetch('/api/my/tools'),
-          fetch('/api/my/languages')
+          fetch('/api/my/languages'),
+          fetch('/api/my/evidence'),
+          fetch('/api/my/endorsements')
         ])
 
         if (!skillsRes.ok || !certsRes.ok || !linksRes.ok) {
           throw new Error('No se pudieron cargar los datos del perfil.')
         }
 
-        const [skillsData, certsData, linksData, toolsData, langsData] = await Promise.all([
+        const [skillsData, certsData, linksData, toolsData, langsData, evidenceData, endorsementsData] = await Promise.all([
           skillsRes.json(),
           certsRes.json(),
           linksRes.json(),
           toolsRes.ok ? toolsRes.json() : { items: [], catalog: [] },
-          langsRes.ok ? langsRes.json() : { items: [] }
+          langsRes.ok ? langsRes.json() : { items: [] },
+          evidenceRes.ok ? evidenceRes.json() : { items: [] },
+          endorsementsRes.ok ? endorsementsRes.json() : { items: [] }
         ])
 
         const skills: MemberSkill[] = skillsData.items ?? []
         const certifications: MemberCertification[] = certsData.items ?? []
         const tools: MemberTool[] = toolsData.items ?? []
         const languages: MemberLanguage[] = langsData.items ?? []
+        const evidenceItems: MemberEvidence[] = evidenceData.items ?? []
+        const endorsementItems: MemberEndorsement[] = endorsementsData.items ?? []
 
         const verifiedSkillCount = skills.filter(s => s.verifiedBy !== null).length
         const verifiedCertCount = certifications.filter(c => c.verificationStatus === 'verified').length
@@ -1529,6 +2076,8 @@ const SkillsCertificationsTab = ({ mode, memberId }: SkillsCertificationsTabProp
           tools,
           toolCatalog: toolsData.catalog ?? [],
           languages,
+          evidence: evidenceItems,
+          endorsements: endorsementItems,
           links: linksData.links ?? {
             linkedinUrl: null,
             portfolioUrl: null,
@@ -1548,7 +2097,9 @@ const SkillsCertificationsTab = ({ mode, memberId }: SkillsCertificationsTabProp
             activeCertCount,
             expiringSoonCount,
             toolCount: tools.length,
-            languageCount: languages.length
+            languageCount: languages.length,
+            evidenceCount: evidenceItems.length,
+            endorsementCount: endorsementItems.filter(e => e.status === 'active').length
           }
         })
       }
@@ -1824,6 +2375,91 @@ const SkillsCertificationsTab = ({ mode, memberId }: SkillsCertificationsTabProp
     await fetchData()
   }
 
+  // --- Evidence mutation handlers ---
+
+  const handleAddEvidence = async (evidenceData: {
+    title: string
+    description: string | null
+    evidenceType: EvidenceType
+    relatedSkillCode: string | null
+    relatedToolCode: string | null
+    externalUrl: string | null
+  }) => {
+    const url =
+      mode === 'admin'
+        ? `/api/hr/core/members/${memberId}/evidence`
+        : '/api/my/evidence'
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(evidenceData)
+    })
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => null)
+
+      throw new Error(body?.error ?? 'No se pudo agregar la evidencia.')
+    }
+
+    await fetchData()
+  }
+
+  const handleRemoveEvidence = async (evidenceId: string) => {
+    const url =
+      mode === 'admin'
+        ? `/api/hr/core/members/${memberId}/evidence`
+        : '/api/my/evidence'
+
+    const res = await fetch(url, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ evidenceId })
+    })
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => null)
+
+      throw new Error(body?.error ?? 'No se pudo eliminar la evidencia.')
+    }
+
+    await fetchData()
+  }
+
+  // --- Endorsement mutation handlers (admin only) ---
+
+  const handleModerateEndorsement = async (endorsementId: string) => {
+    const res = await fetch(`/api/hr/core/members/${memberId}/endorsements`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ endorsementId, action: 'moderate' })
+    })
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => null)
+
+      throw new Error(body?.error ?? 'No se pudo moderar el endorsement.')
+    }
+
+    await fetchData()
+  }
+
+  const handleRemoveEndorsement = async (endorsementId: string) => {
+    const res = await fetch(`/api/hr/core/members/${memberId}/endorsements`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ endorsementId, action: 'remove' })
+    })
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => null)
+
+      throw new Error(body?.error ?? 'No se pudo eliminar el endorsement.')
+    }
+
+    await fetchData()
+  }
+
   // --- Loading state ---
 
   if (loading) {
@@ -1897,6 +2533,20 @@ const SkillsCertificationsTab = ({ mode, memberId }: SkillsCertificationsTabProp
             languages={data.languages}
             onAdd={handleAddLanguage}
             onRemove={handleRemoveLanguage}
+          />
+          <EvidenceSection
+            evidence={data.evidence}
+            mode={mode}
+            skillCatalog={data.catalog}
+            toolCatalog={data.toolCatalog}
+            onAdd={handleAddEvidence}
+            onRemove={handleRemoveEvidence}
+          />
+          <EndorsementsSection
+            endorsements={data.endorsements}
+            mode={mode}
+            onModerate={mode === 'admin' ? handleModerateEndorsement : undefined}
+            onRemove={mode === 'admin' ? handleRemoveEndorsement : undefined}
           />
         </Stack>
       </Grid>

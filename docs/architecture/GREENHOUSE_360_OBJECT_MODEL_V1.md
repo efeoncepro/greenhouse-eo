@@ -1,5 +1,16 @@
 # Greenhouse 360 Object Model V1
 
+## Delta 2026-04-11 — Assigned Team formalized as a governed client workforce portfolio lens
+
+- Greenhouse ya debe tratar `Equipo asignado` como una lens canónica cliente-facing sobre objetos existentes y no como una página suelta.
+- Regla nueva:
+  - `ClientWorkforcePortfolio` es un composite read object anclado a `Organization` y `Space`
+  - `AssignedTeamEntry` se apoya en assignments visibles, no crea identidad humana paralela
+  - `AssignedTalentProfile` reutiliza el carril `client-safe`
+  - `AssignedTeamHealthSnapshot` resume capacidad y health para consumo cliente
+- Documento canónico nuevo:
+  - `docs/architecture/GREENHOUSE_ASSIGNED_TEAM_ARCHITECTURE_V1.md`
+
 ## Delta 2026-04-11 — Hiring / ATS objects formalized around demand, person and handoff
 
 - Greenhouse ya debe tratar `Hiring / ATS` como un dominio de objetos canónicos y no como un pipeline informal previo a `Staff Aug`.

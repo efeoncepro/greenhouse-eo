@@ -451,6 +451,36 @@ export interface GreenhouseCoreMemberCertifications {
   visibility: Generated<string>;
 }
 
+export interface GreenhouseCoreMemberEndorsements {
+  comment: string | null;
+  created_at: Generated<Timestamp>;
+  endorsed_by_member_id: string;
+  endorsement_id: string;
+  member_id: string;
+  skill_code: string | null;
+  /**
+   * active → moderated|removed (admin moderation)
+   */
+  status: Generated<string>;
+  tool_code: string | null;
+  visibility: Generated<string>;
+}
+
+export interface GreenhouseCoreMemberEvidence {
+  asset_id: string | null;
+  created_at: Generated<Timestamp>;
+  description: string | null;
+  evidence_id: string;
+  evidence_type: Generated<string>;
+  external_url: string | null;
+  member_id: string;
+  related_skill_code: string | null;
+  related_tool_code: string | null;
+  title: string;
+  updated_at: Generated<Timestamp>;
+  visibility: Generated<string>;
+}
+
 export interface GreenhouseCoreMemberLanguages {
   created_at: Generated<Timestamp>;
   /**
@@ -3946,6 +3976,8 @@ export interface DB {
   "greenhouse_core.identity_profile_source_links": GreenhouseCoreIdentityProfileSourceLinks;
   "greenhouse_core.identity_profiles": GreenhouseCoreIdentityProfiles;
   "greenhouse_core.member_certifications": GreenhouseCoreMemberCertifications;
+  "greenhouse_core.member_endorsements": GreenhouseCoreMemberEndorsements;
+  "greenhouse_core.member_evidence": GreenhouseCoreMemberEvidence;
   "greenhouse_core.member_languages": GreenhouseCoreMemberLanguages;
   "greenhouse_core.member_skills": GreenhouseCoreMemberSkills;
   "greenhouse_core.member_tools": GreenhouseCoreMemberTools;

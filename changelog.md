@@ -2,6 +2,36 @@
 
 ## 2026-04-11
 
+### 2026-04-11 — Bloque de implementación creado para `Assigned Team Enterprise Program`
+
+- Se creó el backlog ejecutable `TASK-357` a `TASK-366` para bajar a runtime la arquitectura de `Equipo asignado`.
+- El programa quedó separado en:
+  - semantic layer y portfolio readers
+  - field-level access
+  - shared UI primitives/cards
+  - main module runtime
+  - talent detail drawer
+  - capacity/health bridge
+  - risk/continuity alerts
+  - cross-surface consumers
+  - observability/export/hardening
+- `docs/tasks/README.md` ahora deja `TASK-367` como siguiente ID disponible.
+
+### 2026-04-11 — Arquitectura canónica para `Equipo asignado` cliente-facing enterprise
+
+- Se agregó la spec `GREENHOUSE_ASSIGNED_TEAM_ARCHITECTURE_V1.md` para formalizar `Equipo asignado` como capability enterprise de visibilidad de talento contratado.
+- La nueva arquitectura fija que:
+  - la surface debe anclarse a `Organization / Space + assignments`
+  - el módulo combina composición, capacidad, capability profile `client-safe` y health signals resumidas
+  - no debe absorber `ATS`, `HR`, `Payroll` ni `Staff Augmentation` admin
+  - el shape target ya no es un roster simple, sino un `ClientWorkforcePortfolio` con drilldown por `space` y persona
+- Deltas breves aplicados a:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md`
+  - `project_context.md`
+  - `docs/README.md`
+
 ### 2026-04-11 — Nómina proyectada aclara retención SII para honorarios Chile
 
 - `Payroll > Nómina proyectada` ahora deja explícito cuando un colaborador `honorarios` en CLP tiene `Retención SII`, en vez de parecer un descuento fantasma.

@@ -19,6 +19,10 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-04-11 (TASK-319)
+
+- TASK-319 completada — member_evidence y member_endorsements existen con CRUD + moderation. Analytics puede medir evidence coverage y endorsement activity.
+
 ## Delta 2026-04-11 (TASK-318)
 
 - TASK-318 completada — getClientSafeTeamProfiles() disponible. Analytics puede medir cobertura de perfiles client-safe.

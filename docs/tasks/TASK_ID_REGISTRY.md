@@ -368,7 +368,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-316` | `complete` | Talent Trust Ops: Verification, Certification Governance & Review Queue | `docs/tasks/complete/TASK-316-talent-trust-ops-verification-governance.md` |
 | `TASK-317` | `complete` | Internal Talent Discovery: Search, Filters & Ranking | `docs/tasks/complete/TASK-317-internal-talent-discovery-search-ranking.md` |
 | `TASK-318` | `complete` | Client-Safe Verified Talent Profiles | `docs/tasks/complete/TASK-318-client-safe-verified-talent-profiles.md` |
-| `TASK-319` | `to-do` | Reputation, Evidence & Endorsements for Talent Profiles | `docs/tasks/to-do/TASK-319-reputation-evidence-endorsements.md` |
+| `TASK-319` | `complete` | Reputation, Evidence & Endorsements for Talent Profiles | `docs/tasks/complete/TASK-319-reputation-evidence-endorsements.md` |
 | `TASK-320` | `to-do` | Talent Ops Analytics, Completeness & Maintenance Automation | `docs/tasks/to-do/TASK-320-talent-ops-analytics-maintenance-automation.md` |
 | `TASK-321` | `to-do` | Space 360 View: UI/UX polish y eliminacion de jerga tecnica | `docs/tasks/to-do/TASK-321-space-360-ui-ux-polish.md` |
 | `TASK-322` | `to-do` | Enriquecer Cuentas Detail con tabs operativas y deprecar Tenant Detail legacy | `docs/tasks/to-do/TASK-322-admin-tenant-detail-ui-overhaul.md` |
@@ -406,3 +406,13 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-354` | `to-do` | Public Careers Landing & Apply Intake | `docs/tasks/to-do/TASK-354-public-careers-landing-apply-intake.md` |
 | `TASK-355` | `to-do` | Hiring Desk Internal Workspaces & Publication Governance | `docs/tasks/to-do/TASK-355-hiring-desk-internal-workspaces-publication-governance.md` |
 | `TASK-356` | `to-do` | Hiring Handoff, Reactive Signals & Downstream Bridges | `docs/tasks/to-do/TASK-356-hiring-handoff-reactive-signals-downstream-bridges.md` |
+| `TASK-357` | `to-do` | Assigned Team Canonical Program | `docs/tasks/to-do/TASK-357-assigned-team-canonical-program.md` |
+| `TASK-358` | `to-do` | Assigned Team Semantic Layer & Portfolio Readers | `docs/tasks/to-do/TASK-358-assigned-team-semantic-layer-portfolio-readers.md` |
+| `TASK-359` | `to-do` | Assigned Team Client Visibility Policy & Field-Level Access | `docs/tasks/to-do/TASK-359-assigned-team-client-visibility-policy-field-access.md` |
+| `TASK-360` | `to-do` | Assigned Team Shared UI Primitives & Cards | `docs/tasks/to-do/TASK-360-assigned-team-shared-ui-primitives-cards.md` |
+| `TASK-361` | `to-do` | Assigned Team Main Module Runtime | `docs/tasks/to-do/TASK-361-assigned-team-main-module-runtime.md` |
+| `TASK-362` | `to-do` | Assigned Team Talent Detail Drawer & Client-Safe Dossier Convergence | `docs/tasks/to-do/TASK-362-assigned-team-talent-detail-drawer-client-safe-dossier.md` |
+| `TASK-363` | `to-do` | Assigned Team Capacity Coverage & Health Signals Integration | `docs/tasks/to-do/TASK-363-assigned-team-capacity-health-signals-integration.md` |
+| `TASK-364` | `to-do` | Assigned Team Risk, Continuity & Coverage Alerts | `docs/tasks/to-do/TASK-364-assigned-team-risk-continuity-coverage-alerts.md` |
+| `TASK-365` | `to-do` | Assigned Team Cross-Surface Consumers | `docs/tasks/to-do/TASK-365-assigned-team-cross-surface-consumers.md` |
+| `TASK-366` | `to-do` | Assigned Team Observability, Freshness, Export & Enterprise Hardening | `docs/tasks/to-do/TASK-366-assigned-team-enterprise-hardening-observability-export.md` |
