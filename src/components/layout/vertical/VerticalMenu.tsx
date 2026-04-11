@@ -201,7 +201,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
 
           // Collapsible "Supervisión"
           {
-            label: <NavLabel label='Equipo y supervisión' subtitle='Aprobaciones y departamentos' show={showSub} />,
+            label: <NavLabel label='Supervisión' subtitle='Equipo, aprobaciones y departamentos' show={showSub} />,
             icon: 'tabler-users-group',
             children: [
               { label: nl(GH_HR_NAV.team), href: '/hr/team' },
