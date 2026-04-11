@@ -265,11 +265,11 @@ Existen 4 conceptos semánticos donde `mergedTheme` y `GH_COLORS` definen **hex 
 | Token | Hex | Decisión | Destino | Justificación |
 |-------|-----|----------|---------|---------------|
 | `neutral.textPrimary` | `#022A4E` | `RESOLVER` | `theme.palette.customColors.midnight` | **Conflicto:** theme text.primary es `#1A1A2E`. Los 18 consumers de `GH_COLORS.neutral.textPrimary` usan `#022A4E` (midnight navy). `customColors.midnight` ya es `#022A4E`. Resolución: migrar consumers a `customColors.midnight` y evaluar si `text.primary` debería ser `#022A4E` o mantener `#1A1A2E`. Ver §4.2. |
-| `neutral.textSecondary` | `#848484` | `RESOLVER` | `theme.palette.customColors.claimGray` | **Conflicto:** theme text.secondary es `#667085`. Los 21 consumers usan `#848484`. `customColors.claimGray` ya es `#848484`. Resolución: migrar consumers a `customColors.claimGray`. Ver §4.2. |
+| `neutral.textSecondary` | `#848484` | `RESUELTO` | `theme.palette.text.secondary` (`#667085`) | **Resuelto 2026-04-11.** Converge a `#667085` (theme). Razón: `#848484` falla WCAG AA (3.9:1) para texto < 18pt en 11 archivos. `#667085` pasa (5.2:1). Cambio visual sutil: gris neutro → gris azulado, más legible. `customColors.claimGray` queda deprecated. |
 | `neutral.border` | `#DBDBDB` | `ELIMINAR` | `theme.palette.customColors.lightAlloy` | Hex idéntico a `customColors.lightAlloy`. Los 28 consumers migran a `customColors.lightAlloy`. |
-| `neutral.bgSurface` | `#F7F7F5` | `RESOLVER` | `theme.palette.customColors.bodyBg` o nuevo token | **Conflicto:** theme `background.default` es `#F8F9FA`. `GH_COLORS` es `#F7F7F5` (warm). La mayoría de consumers usan este como card background, no como page background. Ver §4.2. |
+| `neutral.bgSurface` | `#F7F7F5` | `RESUELTO` | `theme.palette.background.default` (`#F8F9FA`) | **Resuelto 2026-04-11.** Converge a `#F8F9FA` (theme). Razón: diferencia imperceptible (CIE76 < 1.5, delta < 3 RGB por canal). Todos los consumers tienen border #DBDBDB como boundary — no dependen del hex exacto. |
 
-**Resultado:** 2 tokens son eliminables directamente (`border` → `customColors.lightAlloy`). 3 tokens requieren resolución de conflicto antes de migrar. Ver §4.2.
+**Resultado:** Los 4 tokens neutral están resueltos: 2 eliminables directamente, 2 conflictos resueltos formalmente (textSecondary → `text.secondary`, bgSurface → `background.default`).
 
 ### 3.4 Clasificacion: chart (7 tokens)
 
@@ -321,13 +321,36 @@ Existen 4 conceptos semánticos donde `mergedTheme` y `GH_COLORS` definen **hex 
 |----------|---------------|
 | `GH_COLORS` — permanecen todos | Taxonomía de workflow de producción creativa. Las 7 fases (planning, briefing, production, approval, assetMgmt, activation, completed) son conceptos de negocio con identidad visual fija. Solo 1 consumer (capability-queries/helpers.ts). No hay equivalente en `theme.palette`. |
 
-### 3.10 Resumen de clasificacion
+### 3.10 Clasificacion: capability (nueva categoria — aprobada 2026-04-11)
 
-| Decisión | Tokens | % del total |
-|----------|--------|-------------|
-| `ELIMINAR` → migrar a theme.palette | 14 (12 semantic + 2 neutral) | 14% |
-| `RESOLVER` → conflicto de hex | 3 (neutral.textPrimary, textSecondary, bgSurface) | 3% |
-| `GH_COLORS` → permanecen | 86 (role + semaphore + brand + service + chart + cscPhase) | 83% |
+| Token | Hex | Decisión | Justificación |
+|-------|-----|----------|---------------|
+| `capability.globe.accent` | `#7C3AED` | `GH_COLORS` (nuevo) | Paleta de capabilities para admin/tenant. Distinta de `service` (operativo). Color no es único ID — acompañado de BrandWordmark + text label. Accent borders cumplen 3:1 para UI components. |
+| `capability.globe.soft` | `rgba(124,58,237,0.12)` | `GH_COLORS` (nuevo) | Variante light para backgrounds |
+| `capability.globe.contrast` | `#F5F3FF` | `GH_COLORS` (nuevo) | Fondo de alto contraste |
+| `capability.reach.accent` | `#4F46E5` | `GH_COLORS` (nuevo) | |
+| `capability.reach.soft` | `rgba(79,70,229,0.12)` | `GH_COLORS` (nuevo) | |
+| `capability.reach.contrast` | `#EEF2FF` | `GH_COLORS` (nuevo) | |
+| `capability.wave.accent` | `#0891B2` | `GH_COLORS` (nuevo) | |
+| `capability.wave.soft` | `rgba(8,145,178,0.12)` | `GH_COLORS` (nuevo) | |
+| `capability.wave.contrast` | `#ECFEFF` | `GH_COLORS` (nuevo) | |
+| `capability.crm.accent` | `#FF7A59` | `GH_COLORS` (nuevo) | |
+| `capability.crm.soft` | `rgba(255,122,89,0.14)` | `GH_COLORS` (nuevo) | |
+| `capability.crm.contrast` | `#FFF7F4` | `GH_COLORS` (nuevo) | |
+| `capability.core.accent` | `#1E3A5F` | `GH_COLORS` (nuevo) | |
+| `capability.core.soft` | `rgba(30,58,95,0.12)` | `GH_COLORS` (nuevo) | |
+| `capability.core.contrast` | `#EFF6FF` | `GH_COLORS` (nuevo) | |
+
+**Resultado:** 15 tokens nuevos formalizan hex que ya existían hardcodeados en `helpers.ts`. No cambian ningún visual — solo canonicalizan la fuente de verdad. La separación de `service` (business lines en contexto operativo) vs `capability` (módulos de producto en contexto admin) es semánticamente correcta.
+
+### 3.11 Resumen de clasificacion (actualizado 2026-04-11)
+
+| Decisión | Tokens | Nota |
+|----------|--------|------|
+| `ELIMINAR` → migrar a theme.palette | 16 (12 semantic + 4 neutral) | Todos los conflictos resueltos |
+| `RESOLVER` → conflicto de hex | **0** | textSecondary y bgSurface resueltos formalmente |
+| `GH_COLORS` → permanecen | 86 (role + semaphore + brand + service + chart + cscPhase) | Sin cambio |
+| `GH_COLORS` → nueva categoría | 15 (capability) | Formaliza hex de helpers.ts |
 
 ---
 
@@ -365,29 +388,42 @@ Existen 4 conceptos semánticos donde `mergedTheme` y `GH_COLORS` definen **hex 
 
 TASK-370 debe migrar los 18 consumers de `GH_COLORS.neutral.textPrimary` a `theme.palette.customColors.midnight`. No se cambia `text.primary`.
 
-#### 4.2.2 Text secondary: #848484 vs #667085
+#### 4.2.2 Text secondary: #848484 vs #667085 — RESUELTO
 
-| Fuente | Hex | Dónde se usa |
-|--------|-----|-------------|
-| `GH_COLORS.neutral.textSecondary` | `#848484` | 21 archivos — captions, helper text, meta info |
-| `mergedTheme text.secondary` | `#667085` | MUI default secondary text |
+| Fuente | Hex | Contraste vs #FFF | WCAG AA (< 18pt) |
+|--------|-----|-------------------|-------------------|
+| `GH_COLORS.neutral.textSecondary` | `#848484` | 3.9:1 | **FALLA** |
+| `mergedTheme text.secondary` | `#667085` | 5.2:1 | **PASA** |
 
-**Decisión:** Evaluar convergencia a un solo valor.
-- `#667085` (theme) tiene mejor contraste WCAG contra white (5.2:1 AA) que `#848484` (3.9:1 — falla AA para texto normal).
-- Recomendación: TASK-370 migre consumers a `theme.palette.text.secondary` (`#667085`) y marque `customColors.claimGray` como deprecated. Si algún consumer necesita específicamente el gris neutro, usar `text.disabled`.
+**Decisión (aprobada 2026-04-11):** `#667085` (theme) gana.
 
-#### 4.2.3 Background surface: #F7F7F5 vs #F8F9FA
+Justificación formal (UX Spec + Copy Spec + WCAG audit):
+1. **Accesibilidad:** `#848484` viola WCAG 2.1.4.3 en 11 archivos con texto < 18pt (chart labels 11-12px, captions, table headers). No es un riesgo — es un bug activo.
+2. **Companion elements:** Verificado en 21 archivos — color siempre acompañado de jerarquía tipográfica (variant + weight), posición en charts, o icons. Color no es el único indicador.
+3. **Copy impact:** Ninguno. Los textos (labels, captions, metadata) no cambian — solo su color.
+4. **Screen reader impact:** Ninguno. aria-labels de charts contienen texto descriptivo completo.
+5. **Visual:** Sutil — gris neutro puro → gris azulado coherente con familia Efeonce. Los textos ganan legibilidad sin competir con texto primario.
 
-| Fuente | Hex | Dónde se usa |
-|--------|-----|-------------|
-| `GH_COLORS.neutral.bgSurface` | `#F7F7F5` | 16 archivos — card backgrounds, surface areas |
-| `mergedTheme background.default` | `#F8F9FA` | Page background |
-| `mergedTheme customColors.bodyBg` | `#F8F9FA` | Body background |
+Acción TASK-370: migrar 21 consumers a `theme.palette.text.secondary`. Marcar `customColors.claimGray` como deprecated.
 
-**Decisión:** Converger a `#F8F9FA`.
-- La diferencia visual es imperceptible (warm vs cool, delta < 3 en RGB).
-- Mantener un solo valor elimina confusión. Los 16 consumers migran a `theme.palette.background.default` o `customColors.bodyBg`.
-- Si un componente necesita un surface elevado, usar `background.paper` (`#FFFFFF`).
+#### 4.2.3 Background surface: #F7F7F5 vs #F8F9FA — RESUELTO
+
+| Fuente | Hex | RGB | Delta |
+|--------|-----|-----|-------|
+| `GH_COLORS.neutral.bgSurface` | `#F7F7F5` | 247, 247, 245 | — |
+| `mergedTheme background.default` | `#F8F9FA` | 248, 249, 250 | < 3 por canal |
+
+**Decisión (aprobada 2026-04-11):** `#F8F9FA` (theme) gana.
+
+Justificación formal (UX Spec + WCAG audit):
+1. **Diferencia perceptual:** CIE76 < 1.5 — imperceptible para el ojo humano.
+2. **Boundaries:** 100% de los 16 consumers tienen `border: 1px solid #DBDBDB` definiendo los límites de la superficie. No dependen del hex exacto del background.
+3. **Interactive surfaces:** 8 de 16 son interactivos (clickable cards, hover rows). El surface es backdrop, no target — focus-visible usa outline de color de rol, no depende del surface.
+4. **Contraste de texto sobre surface:** Mejora marginal (+0.2-0.3) con `#F8F9FA` vs `#F7F7F5`.
+5. **Copy impact:** Ninguno. Es un color de fondo.
+6. **Coherencia:** Cool grey alineado con familia cromática Efeonce. Un solo valor elimina confusión.
+
+Acción TASK-370: migrar 16 consumers a `theme.palette.background.default`. Si un componente necesita surface elevado, usar `background.paper` (`#FFFFFF`).
 
 ---
 
@@ -405,8 +441,8 @@ TASK-370 debe migrar los 18 consumers de `GH_COLORS.neutral.textPrimary` a `them
 ¿El color necesita responder a dark mode automáticamente?
   → SI → theme.palette.* o theme.palette.customColors.*
 
-¿El color es una taxonomía de dominio (rol, servicio, fase CSC, semáforo operativo)?
-  → SI → GH_COLORS.{role,service,cscPhase,semaphore}.*
+¿El color es una taxonomía de dominio (rol, servicio, fase CSC, semáforo, capability)?
+  → SI → GH_COLORS.{role,service,cscPhase,semaphore,capability}.*
 
 ¿El color es para una paleta de datos/charts?
   → SI → GH_COLORS.chart.*
@@ -456,32 +492,35 @@ TASK-370 debe migrar los 18 consumers de `GH_COLORS.neutral.textPrimary` a `them
 
 ## 6. Mapa de migracion para tasks hijas
 
-### 6.1 TASK-369 — Hardcoded Hex Cleanup
+### 6.1 TASK-369 — Hardcoded Hex Cleanup — COMPLETADA
 
-**Alcance confirmado:**
+Ejecutada 2026-04-11. Cambios reales vs spec original:
 
-| Archivo | Hex hardcodeado | Reemplazar con |
-|---------|----------------|---------------|
-| `OrganizationIcoTab.tsx` | CSC_COLORS local (#7367F0, #00BAD1, etc.) | `GH_COLORS.cscPhase.*` o `theme.palette.*` |
-| `PersonActivityTab.tsx` | CSC_COLORS duplicado | Mismo import que OrganizationIcoTab |
-| `PayrollReceiptCard.tsx` | `#023C70` | `GH_COLORS.role.account.source` o `customColors.deepAzure` |
-| `NexaInsightsBlock.tsx` | `#7367F0` | `theme.palette.primary.main` (nota: este hex es el OLD vuexy purple, probablemente un bug — debería ser `#0375DB`) |
-| `admin/tenants/helpers.ts` | 7 brand hex | `GH_COLORS.service.*` |
+| Archivo | Acción real |
+|---------|-----------|
+| `OrganizationIcoTab.tsx` | CSC_COLORS extraído a `CSC_CHART_COLORS` compartido en `metric-registry.ts`. TREND_LINE_COLORS derivado con `Object.values()`. |
+| `PersonActivityTab.tsx` | CSC_COLORS local eliminado, import compartido. |
+| `PayrollReceiptCard.tsx` | `#023c70` → `GH_COLORS.role.account.source` (2 instancias). |
+| `NexaInsightsBlock.tsx` | `#7367F0` → `theme.palette.primary.main` (2 instancias). Bug fix: purple→blue. |
+| `admin/tenants/helpers.ts` | **EXCLUIDO** — hex no coinciden con GH_COLORS.service. Resuelto como nueva categoría `capability` (ver §3.10). |
 
-**Nota sobre NexaInsightsBlock:** El hex `#7367F0` es el purple de Vuexy que ya NO es el primary del portal. Esto es probablemente un bug — el componente debería leer `theme.palette.primary.main` (`#0375DB`). Verificar visualmente antes de cambiar.
+### 6.2 TASK-370 — Semantic Token Absorption (actualizado 2026-04-11)
 
-### 6.2 TASK-370 — Semantic Token Absorption
-
-**Tokens a eliminar de GH_COLORS:**
+**Tokens a eliminar de GH_COLORS (todos los conflictos resueltos):**
 - Toda la categoría `semantic` (12 tokens) — consumers migran a `theme.palette.{success,warning,error,info}`
-- `neutral.textPrimary` — consumers migran a `theme.palette.customColors.midnight`
-- `neutral.textSecondary` — consumers migran a `theme.palette.text.secondary`
-- `neutral.border` — consumers migran a `theme.palette.customColors.lightAlloy`
-- `neutral.bgSurface` — consumers migran a `theme.palette.background.default`
+- `neutral.textPrimary` — consumers migran a `theme.palette.customColors.midnight` (sin cambio visual)
+- `neutral.textSecondary` — consumers migran a `theme.palette.text.secondary` (`#667085`) — **cambio visual aprobado** (mejora WCAG)
+- `neutral.border` — consumers migran a `theme.palette.customColors.lightAlloy` (sin cambio visual)
+- `neutral.bgSurface` — consumers migran a `theme.palette.background.default` (`#F8F9FA`) — **cambio visual imperceptible**
 
-**Total de consumers a migrar:** ~41 archivos (con solapamiento — algunos archivos usan múltiples categorías).
+**Tokens nuevos a registrar en GH_COLORS:**
+- `capability` (15 tokens) — formaliza hex de `helpers.ts getCapabilityPalette()`. Solo canonicaliza, no cambia visual.
 
-**Riesgo de conflicto neutral.textSecondary:** Los 21 consumers pasarán de `#848484` a `#667085`. Diferencia visible (gris neutro → gris azulado). Verificar visualmente.
+**Total de consumers a migrar:** ~41 archivos (con solapamiento).
+
+**Cambios visuales aprobados:**
+- textSecondary: `#848484` → `#667085` en 21 archivos. Aprobado por resolución de violación WCAG 2.1.4.3. Verificar visualmente en Agency dashboards.
+- bgSurface: `#F7F7F5` → `#F8F9FA` en 16 archivos. Imperceptible. No requiere verificación visual.
 
 **Type augmentation requerida:** Crear module augmentation para `customColors` en MUI:
 ```typescript
