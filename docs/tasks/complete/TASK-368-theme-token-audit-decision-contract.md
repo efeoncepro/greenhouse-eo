@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Bajo`
 - Type: `research`
-- Status real: `Pendiente`
+- Status real: `Complete`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
@@ -24,9 +24,20 @@
 
 Auditar cada token de `GH_COLORS` y clasificarlo en una de tres categorías: (1) debe migrar al theme canónico MUI/Vuexy, (2) es de dominio y permanece en `GH_COLORS`, (3) es redundante y se elimina. Produce un documento de decisión que alimenta TASK-369 a TASK-372. **No toca código visual ni cambia colores.**
 
+## Delta 2026-04-11 — Hallazgos de auditoría pre-ejecución
+
+La investigación de descubrimiento reveló 6 correcciones a los supuestos originales:
+
+1. **GH_COLORS tiene 114 tokens, no ~47** — la escala es más del doble de lo estimado.
+2. **El primary ya es #0375DB** — `mergedTheme.ts` ya overridea el Vuexy purple. La pregunta "¿a qué color converger?" ya está respondida en código.
+3. **`neutral.*` no mapea 1:1 al theme** — `GH_COLORS.neutral.textPrimary` (#022a4e) ≠ `mergedTheme text.primary` (#1A1A2E). Hay dos "text primary" compitiendo con hex distintos.
+4. **`neutral.textSecondary` y `neutral.bgSurface` tampoco coinciden** — misma situación: hex diferentes para el mismo concepto semántico.
+5. **`mergedTheme.ts` ya define `customColors` con solapamiento directo** — hay 7 tokens en `customColors` que son el mismo hex que tokens de `GH_COLORS` (midnight, coreBlue, neonLime, sunsetOrange, crimson, lightAlloy, claimGray). Existen TRES capas paralelas, no dos.
+6. **No hay TypeScript augmentation para `customColors`** — los 11 tokens de `mergedTheme.customColors` no están tipados en MUI. TASK-370 necesitará crearla.
+
 ## Why This Task Exists
 
-Hoy `GH_COLORS` tiene ~8 categorías (role, semaphore, semantic, brand, neutral, service, chart, cscPhase) con ~47 tokens. Algunos son claramente de shell global (neutrals, semantic states) y deberían vivir en `theme.palette` o `theme.customColors`. Otros son taxonomías de dominio (roles, services, CSC phases) que tienen sentido fuera del theme. Sin esta clasificación, cualquier migración es una apuesta a ciegas.
+Hoy `GH_COLORS` tiene 8 categorías (role, semaphore, semantic, brand, neutral, service, chart, cscPhase) con 114 tokens. Además, `mergedTheme.ts` ya define 11 `customColors` Greenhouse que solapan parcialmente con `GH_COLORS`. El resultado son tres fuentes de verdad: `colorSchemes.ts` (Vuexy base), `mergedTheme.ts` (overrides + customColors), y `GH_COLORS` (nomenclatura). Sin una clasificación formal, cualquier migración es una apuesta a ciegas.
 
 ## Goal
 

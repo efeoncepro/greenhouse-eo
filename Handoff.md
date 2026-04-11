@@ -1,5 +1,31 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — TASK-368: Theme Token Audit & Decision Contract COMPLETADA
+
+- alcance cerrado:
+  - se creó `docs/architecture/GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md` con clasificación token-por-token de los 114 tokens de `GH_COLORS`
+  - decisión de primary institucional: **`#0375DB` (coreBlue) ya es el primary** — mergedTheme.ts lo overridea desde su implementación. No se requiere cambio de color.
+  - 3 conflictos neutral resueltos:
+    - `textPrimary` (#022A4E) migra a `customColors.midnight` (no reemplaza `text.primary` #1A1A2E)
+    - `textSecondary` (#848484) migra a `text.secondary` (#667085) — mejora contraste WCAG
+    - `bgSurface` (#F7F7F5) converge a `background.default` (#F8F9FA)
+  - clasificación: 14 tokens eliminables (semantic + neutral parcial), 3 requieren resolución, 86 permanecen en GH_COLORS como dominio
+  - mapa de migración documentado para TASK-369 a TASK-372
+  - TASK-371 reclasificada como limpieza de capas (no cambio visual) — el primary ya es correcto
+- tasks desbloqueadas: TASK-369, TASK-370, TASK-371, TASK-372
+- documentos vivos actualizados:
+  - `docs/architecture/GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md` (nuevo)
+  - `docs/tasks/to-do/TASK-368-theme-token-audit-decision-contract.md` (delta con hallazgos)
+- validación: task de investigación pura — no aplica build/lint
+
+## Sesion 2026-04-11 — TASK-264 descompuesta en 5 sub-tasks (TASK-368 a TASK-372)
+
+- alcance cerrado:
+  - TASK-264 convertida en umbrella con tabla de sub-tasks y secuencia recomendada
+  - 5 tasks creadas: 368 (audit, riesgo cero) → 369 (hex cleanup, bajo) + 370 (token absorption, medio) → 371 (primary cutover, opcional) + 372 (Kortex preset, cero)
+- documentos vivos actualizados:
+  - `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/README.md`
+
 ## Sesion 2026-04-11 — TASK-367 creada para lane Claude de microinteracciones
 
 - alcance cerrado:

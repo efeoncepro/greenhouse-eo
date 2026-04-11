@@ -417,7 +417,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-365` | `to-do` | Assigned Team Cross-Surface Consumers | `docs/tasks/to-do/TASK-365-assigned-team-cross-surface-consumers.md` |
 | `TASK-366` | `to-do` | Assigned Team Observability, Freshness, Export & Enterprise Hardening | `docs/tasks/to-do/TASK-366-assigned-team-enterprise-hardening-observability-export.md` |
 | `TASK-367` | `to-do` | Claude Microinteractions Research & Dual Skill Creation | `docs/tasks/to-do/TASK-367-claude-microinteractions-research-dual-skill-creation.md` |
-| `TASK-368` | `to-do` | Theme Token Audit & Decision Contract | `docs/tasks/to-do/TASK-368-theme-token-audit-decision-contract.md` |
+| `TASK-368` | `complete` | Theme Token Audit & Decision Contract | `docs/tasks/complete/TASK-368-theme-token-audit-decision-contract.md` |
 | `TASK-369` | `to-do` | Hardcoded Hex Cleanup | `docs/tasks/to-do/TASK-369-theme-hardcoded-hex-cleanup.md` |
 | `TASK-370` | `to-do` | Semantic Token Absorption into Theme | `docs/tasks/to-do/TASK-370-semantic-token-absorption-into-theme.md` |
 | `TASK-371` | `to-do` | Shell Primary Cutover | `docs/tasks/to-do/TASK-371-shell-primary-cutover.md` |
