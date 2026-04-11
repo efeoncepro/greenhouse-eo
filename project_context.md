@@ -1,5 +1,30 @@
 # project_context.md
 
+## Delta 2026-04-11 Primer bridge Kortex ya tiene policy ejecutable Greenhouse-side
+
+- `TASK-377` ya dejó cerrado el primer bridge Kortex como contrato operativo, no como runtime Kortex-specific dentro de este repo.
+- Contrato operativo nuevo:
+  - consumer inicial:
+    - `operator console`
+    - servicios `server-to-server`
+  - auth:
+    - credencial dedicada en `greenhouse_core.sister_platform_consumers`
+    - lane endurecido `/api/integrations/v1/sister-platforms/*`
+  - binding recomendado:
+    - `external_scope_type = 'portal'`
+    - `external_scope_id = <hubspot_portal_id o portal_id canonico>`
+  - allowlist inicial:
+    - `client`
+    - `space`
+    - `organization` solo por excepción
+  - capability intake por madurez real:
+    - ola 1: `delivery / ICO`, `project health`, `organization / space summaries`
+    - ola 2: `sprints`
+    - ola 3: `assigned team / capacity summary`
+- Split multi-repo explícito:
+  - `greenhouse-eo` owns provider-side, binding, auth y payloads read-only
+  - `efeoncepro/kortex` owns consumer implementation, operator console y CRM reasoning
+
 ## Delta 2026-04-11 Local Next build isolation para agentes y procesos concurrentes
 
 - `pnpm build` ya no reutiliza `.next` por defecto en local/agent runtime fuera de Vercel y CI.

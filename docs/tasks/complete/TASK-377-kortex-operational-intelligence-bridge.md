@@ -7,12 +7,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `policy`
-- Status real: `Diseno`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `crm`
 - Blocked by: `TASK-375`, `TASK-376`
@@ -45,8 +45,10 @@ Revisar y respetar:
 
 - `docs/architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`
 - `docs/architecture/GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`
 - `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`
 - `docs/tasks/to-do/TASK-039-data-node-architecture-v1.md`
+- `docs/tasks/to-do/TASK-040-data-node-architecture-v2.md`
 
 Reglas obligatorias:
 
@@ -61,6 +63,7 @@ Reglas obligatorias:
 - `docs/tasks/to-do/TASK-265-greenhouse-nomenclature-dictionary-kortex-copy-contract.md`
 - `docs/tasks/complete/TASK-375-sister-platforms-identity-tenancy-binding-foundation.md`
 - `docs/tasks/complete/TASK-376-sister-platforms-read-only-external-surface-hardening.md`
+- `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md`
 
 ## Dependencies & Impact
 
@@ -78,7 +81,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-377-kortex-operational-intelligence-bridge.md`
+- `docs/tasks/complete/TASK-377-kortex-operational-intelligence-bridge.md`
 - `docs/architecture/GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md`
 - `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`
 
@@ -89,6 +92,11 @@ Reglas obligatorias:
 - Kortex ya esta reconocido como repo hermano operativo.
 - Existe preset visual reusable Greenhouse -> Kortex.
 - Existe framing de API/MCP downstream para que Greenhouse exponga contexto operativo.
+- La foundation sister-platform ya esta materializada en runtime:
+  - `greenhouse_core.sister_platform_bindings`
+  - `greenhouse_core.sister_platform_consumers`
+  - `greenhouse_core.sister_platform_request_logs`
+  - lane endurecido `/api/integrations/v1/sister-platforms/*`
 - El anexo Kortex ya define el split de ownership y el pattern recomendado.
 
 ### Gap
@@ -96,6 +104,21 @@ Reglas obligatorias:
 - No existe todavia una policy ejecutable de que consume primero Kortex desde Greenhouse.
 - No esta definido el onboarding Greenhouse-side del consumer Kortex.
 - No existe handoff multi-repo canonico para pasar de anexo arquitectonico a implementacion bilateral.
+- No existe todavia un runtime Kortex-specific dentro de `src/app`; el bridge real hoy es solo foundation reusable + namespace `kortex`.
+
+## Audit Delta
+
+Reality check ejecutado antes de implementar:
+
+- `TASK-039` se conserva como vision de producto, pero no debe implementarse literalmente; la baseline tecnica vigente es `TASK-040`.
+- `docs/architecture/schema-snapshot-baseline.sql` no incluye aun las tablas sister-platform nuevas. Para esta lane, la fuente viva actual es:
+  - `migrations/20260411192943501_sister-platform-bindings-foundation.sql`
+  - `migrations/20260411201917370_sister-platform-read-surface-hardening.sql`
+  - `src/types/db.d.ts`
+- La base reutilizable ya existe; el trabajo real de `TASK-377` no es abrir otra foundation sino cerrar:
+  - consumer profile inicial de Kortex
+  - capabilities prioritarias por madurez real
+  - split Greenhouse-side vs Kortex-side
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -147,6 +170,37 @@ La task debe cerrar una policy bilateral minima:
 
 El output debe ser suficientemente concreto para que luego se abran tasks espejo en Kortex sin re-diseñar el contrato.
 
+Decision cerrada en esta task:
+
+1. Primera ola Kortex:
+   - `operator console`
+   - servicios server-to-server asociados
+2. Auth:
+   - consumer dedicado en `greenhouse_core.sister_platform_consumers`
+   - lane endurecido `/api/integrations/v1/sister-platforms/*`
+3. Binding recomendado:
+   - `external_scope_type = 'portal'`
+   - `external_scope_id = <hubspot_portal_id o portal_id canonico>`
+   - `installation_id` y metadata relacionada quedan como complemento, no como raíz del binding
+4. Greenhouse scope allowlist inicial:
+   - `client`
+   - `space`
+   - `organization` solo por excepción explícita
+   - `internal` fuera de la primera ola
+5. Capability intake por madurez real:
+   - ola 1:
+     - `delivery / ICO`
+     - `project health`
+     - `organization / space summaries`
+   - ola 2:
+     - `sprints / cycles summary`
+   - ola 3:
+     - `assigned team / capacity summary`
+6. Queda diferido:
+   - MCP
+   - writes Kortex -> Greenhouse
+   - payloads narrativos o advisory que no dependan de serving maduro
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
      "Como compruebo que termine y que actualizo?"
@@ -156,10 +210,10 @@ El output debe ser suficientemente concreto para que luego se abran tasks espejo
 
 ## Acceptance Criteria
 
-- [ ] Existe un consumer profile inicial de Kortex definido desde Greenhouse.
-- [ ] Queda explicitado el primer set de capabilities Greenhouse -> Kortex.
-- [ ] La policy deja claro el split Greenhouse-side vs Kortex-side.
-- [ ] El bridge inicial sigue siendo read-only y tenant-safe.
+- [x] Existe un consumer profile inicial de Kortex definido desde Greenhouse.
+- [x] Queda explicitado el primer set de capabilities Greenhouse -> Kortex.
+- [x] La policy deja claro el split Greenhouse-side vs Kortex-side.
+- [x] El bridge inicial sigue siendo read-only y tenant-safe.
 
 ## Verification
 
@@ -168,8 +222,8 @@ El output debe ser suficientemente concreto para que luego se abran tasks espejo
 
 ## Closing Protocol
 
-- [ ] Dejar explicitado en `Handoff.md` si la siguiente acción natural vive en Greenhouse o en Kortex.
-- [ ] Si la policy cambia el anexo Kortex, actualizar el doc antes de cerrar la task.
+- [x] Dejar explicitado en `Handoff.md` si la siguiente acción natural vive en Greenhouse o en Kortex.
+- [x] Si la policy cambia el anexo Kortex, actualizar el doc antes de cerrar la task.
 
 ## Follow-ups
 
@@ -178,4 +232,23 @@ El output debe ser suficientemente concreto para que luego se abran tasks espejo
 
 ## Open Questions
 
-- Si el primer consumer Kortex debe vivir solo en operator console/server-side o si los agents entran en la misma ola.
+- Resuelto en esta task: la primera ola queda limitada a `operator console / server-side`; `agents` y `MCP` pasan a follow-on posterior.
+
+## Delta 2026-04-11 — cierre real
+
+- Se corrigió la task para usar como baseline técnica `TASK-040` y el runtime sister-platform ya materializado por `TASK-375` / `TASK-376`.
+- Se cerró el primer handoff Greenhouse-side para Kortex con estas decisiones:
+  - consumer inicial `operator console / server-side`
+  - bridge `read-only`
+  - binding inicial por `portal`
+  - allowlist inicial `client` + `space`, con `organization` solo por excepción
+  - capability intake por madurez real:
+    - `delivery / ICO`
+    - `project health`
+    - `organization / space summaries`
+    - `sprints` después
+    - `assigned team / capacity` como resumen posterior
+- No se implementó runtime Kortex-specific en este repo porque la foundation reusable actual ya cubre el contrato base y esta task es `policy + architecture + handoff`, no un nuevo lane de código.
+- El follow-on natural queda dividido así:
+  - Greenhouse: declarar consumer/bindings piloto y abrir payloads operativos read-only estables
+  - Kortex: implementar el consumer real y componer el contexto en operator console / CRM reasoning

@@ -84,7 +84,7 @@ Reglas obligatorias:
 - `docs/tasks/complete/TASK-374-sister-platforms-integration-program.md`
 - `docs/tasks/complete/TASK-375-sister-platforms-identity-tenancy-binding-foundation.md`
 - `docs/tasks/complete/TASK-376-sister-platforms-read-only-external-surface-hardening.md`
-- `docs/tasks/to-do/TASK-377-kortex-operational-intelligence-bridge.md`
+- `docs/tasks/complete/TASK-377-kortex-operational-intelligence-bridge.md`
 - `docs/architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`
 - `docs/architecture/GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md`
 

@@ -381,7 +381,7 @@ What it does not do yet:
 - expose MCP read operations
 - implement any Kortex-specific bridge logic
 
-Those belong to `TASK-377`.
+La policy y el handoff del primer bridge Kortex ya quedaron cerrados en `TASK-377`; el runtime Kortex-specific y el consumer real quedan como follow-ons posteriores.
 
 ## Known Gaps
 
@@ -408,5 +408,6 @@ Those belong to `TASK-377`.
 
 ## Next Steps
 
-1. implement the first Kortex bridge in `TASK-377`
-2. add a dedicated downstream consumer for the binding lifecycle events when a concrete integration needs them
+1. declarar el primer consumer Kortex real y sus bindings piloto sobre esta foundation
+2. abrir payloads operativos read-only específicos reutilizando el lane sister-platform existente
+3. add a dedicated downstream consumer for the binding lifecycle events when a concrete integration needs them

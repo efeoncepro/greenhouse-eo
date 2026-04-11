@@ -2,6 +2,19 @@
 
 ## 2026-04-11
 
+### 2026-04-11 — TASK-377 cierra la policy del primer bridge Greenhouse -> Kortex
+
+- `TASK-377` quedó cerrada como contract/handoff Greenhouse-side sobre la foundation reusable ya existente.
+- El consumer inicial aprobado para Kortex queda limitado a `operator console / server-side`.
+- El binding inicial recomendado queda anclado a `portal`, con `organization` solo por excepción y allowlist inicial `client + space`.
+- El capability intake inicial prioriza:
+  - `delivery / ICO`
+  - `project health`
+  - `organization / space summaries`
+  - `sprints` después
+  - `assigned team / capacity` como resumen posterior
+- No se abrió runtime Kortex-specific nuevo en este repo; el cierre de la task es documental y deja el split bilateral explícito entre provider-side `greenhouse-eo` y consumer-side `efeoncepro/kortex`.
+
 ### 2026-04-11 — Local Next builds pasan a usar output aislado fuera de Vercel/CI
 
 - `pnpm build` ya no reutiliza `.next` por defecto en local; ahora usa `.next-local/build-<timestamp>-<pid>` mediante `scripts/next-dist-dir.mjs`.

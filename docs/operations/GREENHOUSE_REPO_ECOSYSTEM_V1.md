@@ -12,6 +12,27 @@
   - la lista de este documento sigue definiendo `quién consulta a quién`
   - el contrato arquitectónico nuevo define `cómo se integran`
 
+## Delta 2026-04-11 — TASK-377 deja cerrado el primer handoff Greenhouse -> Kortex
+
+- El primer bridge Kortex ya no debe interpretarse como “hacer todo el carril en un solo repo”.
+- Split bilateral explícito:
+  - `greenhouse-eo` owns:
+    - binding canónico
+    - consumer auth
+    - read lane endurecido
+    - payloads operativos read-only
+  - `kortex` owns:
+    - consumer implementation
+    - operator console composition
+    - CRM reasoning
+    - lifecycle propio de HubSpot / agentes / despliegues
+- Prioridad de payload para el primer bridge:
+  - `delivery / ICO`
+  - `project health`
+  - `organization / space summaries`
+  - `sprints` como segunda ola
+  - `assigned team / capacity` como resumen posterior
+
 ## Objetivo
 
 Dejar explicito que `greenhouse-eo` no vive aislado: depende de un ecosistema pequeño de repos hermanos que cubren pipelines, notificaciones e inteligencia adyacente, y de un upstream de referencia para la base Vuexy.
@@ -118,6 +139,10 @@ Nota:
 - Regla importante:
   - `kortex` es repo hermano, no submodulo ni package interno de `greenhouse-eo`
   - usarlo como referencia de ownership funcional o integracion, no como source of truth de UX del portal Greenhouse
+- Regla del primer bridge:
+  - Greenhouse expone el contexto operativo read-only
+  - Kortex consume ese contexto y decide como integrarlo a su UX y runtime
+  - no se debe abrir una surface Kortex-specific en Greenhouse si el lane sister-platform reusable ya cubre el contrato
 
 ### 7. Vuexy Next.js Admin Template
 
@@ -158,6 +183,10 @@ Nota:
 - Cuando haya duda entre `greenhouse-eo` y `kortex`:
   - `greenhouse-eo` owns la experiencia Greenhouse
   - `kortex` owns su propia plataforma y runtime de agentes
+- Cuando un task diga `Greenhouse -> Kortex`:
+  - el provider-side va en `greenhouse-eo`
+  - el consumer-side va en `kortex`
+  - si el contrato aún no existe, primero se cierra aquí y recién después se implementa aguas afuera
 
 ## Estado actual validado
 

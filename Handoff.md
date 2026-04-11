@@ -1,5 +1,28 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — TASK-377: Kortex Operational Intelligence Bridge COMPLETADA
+
+- alcance cerrado:
+  - `TASK-377` quedó cerrada como `policy + architecture + handoff`, no como runtime Kortex-specific nuevo
+  - `GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md` ahora deja explícito:
+    - consumer inicial `operator console / server-side`
+    - auth por consumer dedicado sobre `/api/integrations/v1/sister-platforms/*`
+    - binding inicial recomendado por `portal`
+    - capability intake por madurez real:
+      - ola 1: `delivery / ICO`, `project health`, `organization / space summaries`
+      - ola 2: `sprints`
+      - ola 3: `assigned team / capacity summary`
+  - `GREENHOUSE_REPO_ECOSYSTEM_V1.md` ahora deja explícito el split bilateral:
+    - `greenhouse-eo` owns provider-side
+    - `kortex` owns consumer implementation / operator console / CRM reasoning
+  - la task se movió a `docs/tasks/complete/`
+- verificación esperada para cierre:
+  - `pnpm lint`
+  - `pnpm build`
+- siguiente acción natural:
+  - en Greenhouse: declarar consumer/bindings piloto y abrir payloads read-only específicos reutilizando serving ya maduro
+  - en Kortex: implementar el consumer real contra ese contrato
+
 ## Sesion 2026-04-11 — local Next build isolation ACTIVADA para evitar colisiones entre agentes
 
 - alcance implementado:
