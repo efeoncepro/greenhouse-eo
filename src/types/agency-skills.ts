@@ -22,6 +22,9 @@ export interface SkillCatalogItem {
   displayOrder: number | null
 }
 
+export const SKILL_VISIBILITY_VALUES = ['internal', 'client_visible'] as const
+export type SkillVisibility = (typeof SKILL_VISIBILITY_VALUES)[number]
+
 export interface MemberSkill {
   memberId: string
   skillCode: string
@@ -32,6 +35,7 @@ export interface MemberSkill {
   notes: string | null
   verifiedBy: string | null
   verifiedAt: string | null
+  visibility: SkillVisibility
 }
 
 export interface ServiceSkillRequirement {
@@ -103,6 +107,7 @@ export interface UpsertMemberSkillInput {
   seniorityLevel: SkillSeniorityLevel
   notes?: string | null
   sourceSystem?: string
+  visibility?: SkillVisibility
 }
 
 export interface UpsertServiceSkillRequirementInput {

@@ -12,6 +12,7 @@ export type GreenhouseAssetRetentionClass =
   | 'expense_report'
   | 'provider_supporting_doc'
   | 'tooling_supporting_doc'
+  | 'hr_certification'
 
 export type GreenhouseAssetContext =
   | 'leave_request_draft'
@@ -21,6 +22,8 @@ export type GreenhouseAssetContext =
   | 'payroll_receipt'
   | 'payroll_export_pdf'
   | 'payroll_export_csv'
+  | 'certification_draft'
+  | 'certification'
 
 export interface GreenhouseAssetRecord {
   assetId: string
@@ -56,8 +59,13 @@ export interface PrivateAssetUploadResponse {
   downloadUrl: string
 }
 
+export type DraftUploadContext = Extract<
+  GreenhouseAssetContext,
+  'leave_request_draft' | 'purchase_order_draft' | 'certification_draft'
+>
+
 export interface UploadPrivateAssetInput {
-  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft'>
+  contextType: DraftUploadContext
   ownerClientId?: string | null
   ownerSpaceId?: string | null
   ownerMemberId?: string | null

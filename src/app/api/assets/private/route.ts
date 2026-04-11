@@ -8,14 +8,14 @@ import { ROLE_CODES } from '@/config/role-codes'
 
 export const dynamic = 'force-dynamic'
 
-const isDraftContext = (value: string): value is Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft'> =>
-  value === 'leave_request_draft' || value === 'purchase_order_draft'
+const isDraftContext = (value: string): value is Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'certification_draft'> =>
+  value === 'leave_request_draft' || value === 'purchase_order_draft' || value === 'certification_draft'
 
 const canUploadForContext = ({
   contextType,
   tenant
 }: {
-  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft'>
+  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'certification_draft'>
   tenant: Awaited<ReturnType<typeof requireTenantContext>>['tenant']
 }) => {
   if (!tenant) {
@@ -23,6 +23,10 @@ const canUploadForContext = ({
   }
 
   if (contextType === 'leave_request_draft') {
+    return Boolean(tenant.memberId) || hasRouteGroup(tenant, 'hr') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+  }
+
+  if (contextType === 'certification_draft') {
     return Boolean(tenant.memberId) || hasRouteGroup(tenant, 'hr') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
   }
 
@@ -61,22 +65,24 @@ export async function POST(request: Request) {
     const ownerClientId = ownerClientIdRaw || tenant.clientId || null
     const ownerSpaceId = ownerSpaceIdRaw || tenant.spaceId || null
 
+    const memberOwnerContexts = ['leave_request_draft', 'certification_draft'] as const
+    const needsMemberOwner = (memberOwnerContexts as readonly string[]).includes(contextTypeValue)
+
     const fallbackOwnerMemberId =
-      contextTypeValue === 'leave_request_draft' && !ownerMemberIdRaw && !tenant.memberId
+      needsMemberOwner && !ownerMemberIdRaw && !tenant.memberId
         ? await resolveCurrentHrMemberId(tenant).catch(() => null)
         : null
 
-    const ownerMemberId =
-      contextTypeValue === 'leave_request_draft'
-        ? ownerMemberIdRaw || tenant.memberId || fallbackOwnerMemberId || null
-        : ownerMemberIdRaw || null
+    const ownerMemberId = needsMemberOwner
+      ? ownerMemberIdRaw || tenant.memberId || fallbackOwnerMemberId || null
+      : ownerMemberIdRaw || null
 
     if (contextTypeValue === 'purchase_order_draft' && !ownerClientId) {
       return NextResponse.json({ error: 'ownerClientId is required for purchase order drafts.' }, { status: 400 })
     }
 
-    if (contextTypeValue === 'leave_request_draft' && !ownerMemberId) {
-      return NextResponse.json({ error: 'ownerMemberId is required for leave drafts.' }, { status: 400 })
+    if (needsMemberOwner && !ownerMemberId) {
+      return NextResponse.json({ error: 'ownerMemberId is required for this context.' }, { status: 400 })
     }
 
     const uploaded = await createPrivatePendingAsset({

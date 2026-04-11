@@ -20,6 +20,7 @@ import TeamsTab from './my-profile/tabs/TeamsTab'
 import ProjectsTab from './my-profile/tabs/ProjectsTab'
 import ConnectionsTab from './my-profile/tabs/ConnectionsTab'
 import SecurityTab from './my-profile/tabs/SecurityTab'
+import SkillsCertificationsTab from './my-profile/tabs/SkillsCertificationsTab'
 
 // ── Helpers ──
 
@@ -294,6 +295,12 @@ const MyProfileView = () => {
               iconPosition='start'
             />
             <Tab
+              icon={<i className='tabler-certificate' />}
+              value='skills'
+              label='Skills y certificaciones'
+              iconPosition='start'
+            />
+            <Tab
               icon={<i className='tabler-lock' />}
               value='security'
               label='Seguridad'
@@ -321,6 +328,9 @@ const MyProfileView = () => {
           </TabPanel>
           <TabPanel value='connections' className='p-0 pbs-6'>
             <ConnectionsTab data={connectionsTabData} />
+          </TabPanel>
+          <TabPanel value='skills' className='p-0 pbs-6'>
+            <SkillsCertificationsTab mode='self' memberId='' />
           </TabPanel>
           <TabPanel value='security' className='p-0 pbs-6'>
             <SecurityTab />

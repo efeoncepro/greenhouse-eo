@@ -28,6 +28,7 @@ import UserAccessTab from './admin/users/UserAccessTab'
 import UserActivityTimeline from './admin/users/UserActivityTimeline'
 import UserDetailHeader from './admin/users/UserDetailHeader'
 import UserProjectListTable from './admin/users/UserProjectListTable'
+import SkillsCertificationsTab from './my/my-profile/tabs/SkillsCertificationsTab'
 import UserRoleManager from './admin/users/UserRoleManager'
 import { formatDateTime, roleColorFor, roleIconFor, statusTone, toTitleCase } from './admin/users/helpers'
 
@@ -419,6 +420,14 @@ const GreenhouseAdminUserDetail = ({ data }: Props) => {
               label={GH_INTERNAL_MESSAGES.admin_user_detail_tab_roles}
               iconPosition='start'
             />
+            {data.linkedMemberId && (
+              <Tab
+                icon={<i className='tabler-certificate' />}
+                value='skills'
+                label='Skills y certificaciones'
+                iconPosition='start'
+              />
+            )}
             <Tab
               icon={<i className='tabler-eye-check' />}
               value='access'
@@ -443,6 +452,11 @@ const GreenhouseAdminUserDetail = ({ data }: Props) => {
               initialRoleCodes={data.roleCodes}
             />
           </TabPanel>
+          {data.linkedMemberId && (
+            <TabPanel value='skills' className='p-0 pbs-6'>
+              <SkillsCertificationsTab mode='admin' memberId={data.linkedMemberId} />
+            </TabPanel>
+          )}
           <TabPanel value='access' className='p-0 pbs-6'>
             <UserAccessTab userId={data.userId} />
           </TabPanel>

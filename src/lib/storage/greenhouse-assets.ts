@@ -51,9 +51,10 @@ type AssetRow = {
 const PRIVATE_USER_ALLOWED_MIME_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png', 'image/webp'])
 const SYSTEM_ALLOWED_MIME_TYPES = new Set([...PRIVATE_USER_ALLOWED_MIME_TYPES, 'text/csv', 'text/csv; charset=utf-8'])
 
-const MAX_PRIVATE_UPLOAD_BYTES_BY_CONTEXT: Record<Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft'>, number> = {
+const MAX_PRIVATE_UPLOAD_BYTES_BY_CONTEXT: Record<Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'certification_draft'>, number> = {
   leave_request_draft: 10 * 1024 * 1024,
-  purchase_order_draft: 10 * 1024 * 1024
+  purchase_order_draft: 10 * 1024 * 1024,
+  certification_draft: 10 * 1024 * 1024
 }
 
 const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRetentionClass> = {
@@ -63,7 +64,9 @@ const CONTEXT_RETENTION_CLASS: Record<GreenhouseAssetContext, GreenhouseAssetRet
   purchase_order: 'finance_purchase_order',
   payroll_receipt: 'payroll_receipt',
   payroll_export_pdf: 'payroll_export',
-  payroll_export_csv: 'payroll_export'
+  payroll_export_csv: 'payroll_export',
+  certification_draft: 'hr_certification',
+  certification: 'hr_certification'
 }
 
 const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
@@ -73,7 +76,9 @@ const CONTEXT_PREFIX: Record<GreenhouseAssetContext, string> = {
   purchase_order: 'purchase-orders',
   payroll_receipt: 'payroll-receipts',
   payroll_export_pdf: 'payroll-export-packages',
-  payroll_export_csv: 'payroll-export-packages'
+  payroll_export_csv: 'payroll-export-packages',
+  certification_draft: 'certifications',
+  certification: 'certifications'
 }
 
 const toNumber = (value: number | string | null | undefined) => {
@@ -247,7 +252,7 @@ const assertPrivateAssetUpload = ({
   contentType,
   sizeBytes
 }: {
-  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft'>
+  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'certification_draft'>
   contentType: string
   sizeBytes: number
 }) => {
@@ -312,7 +317,7 @@ export const createPrivatePendingAsset = async ({
   ownerMemberId,
   metadata
 }: {
-  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft'>
+  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'certification_draft'>
   uploadedByUserId: string
   fileName: string
   contentType: string
@@ -664,6 +669,14 @@ const canAccessPayrollReceiptAsset = (tenant: TenantContext, asset: GreenhouseAs
 const canAccessPayrollExportAsset = (tenant: TenantContext) =>
   hasRouteGroup(tenant, 'hr') || hasRouteGroup(tenant, 'finance') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
 
+const canAccessCertificationAsset = (tenant: TenantContext, asset: GreenhouseAssetRecord) => {
+  if (asset.ownerMemberId && tenant.memberId && asset.ownerMemberId === tenant.memberId) {
+    return true
+  }
+
+  return hasRouteGroup(tenant, 'hr') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
+}
+
 export const canTenantAccessAsset = ({
   tenant,
   asset
@@ -683,6 +696,9 @@ export const canTenantAccessAsset = ({
     case 'payroll_export_pdf':
     case 'payroll_export_csv':
       return canAccessPayrollExportAsset(tenant)
+    case 'certification_draft':
+    case 'certification':
+      return canAccessCertificationAsset(tenant, asset)
     default:
       return false
   }

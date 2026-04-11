@@ -1328,3 +1328,79 @@ export const GH_NEXA = {
   empty_title: 'Aún no hay señales analizadas',
   empty_description: 'Nexa analiza automáticamente las señales del ICO Engine después de cada sincronización. Las señales aparecerán aquí cuando estén listas.'
 } as const
+
+/* ─────────────────── Skills & Certifications ─────────────────── */
+
+export const GH_SKILLS_CERTS = {
+  tab_label: 'Skills y certificaciones',
+  tab_label_short: 'Skills',
+
+  // Section headings
+  section_skills: 'Skills',
+  section_certifications: 'Certificaciones',
+  section_professional_links: 'Links profesionales',
+  section_about_me: 'Sobre mí',
+  section_contact: 'Contacto',
+
+  // Skills
+  skill_add: 'Agregar skill',
+  skill_edit: 'Editar skill',
+  skill_remove: 'Eliminar skill',
+  skill_seniority: 'Nivel',
+  skill_category: 'Categoría',
+  skill_status_self_declared: 'Autodeclarada',
+  skill_status_verified: 'Verificada',
+  skill_visibility_internal: 'Interna',
+  skill_visibility_client: 'Visible para cliente',
+
+  // Certifications
+  cert_add: 'Agregar certificación',
+  cert_edit: 'Editar certificación',
+  cert_remove: 'Eliminar certificación',
+  cert_issuer: 'Emisor',
+  cert_issued_date: 'Fecha de emisión',
+  cert_expiry_date: 'Fecha de vencimiento',
+  cert_validation_url: 'Link de validación',
+  cert_view: 'Ver certificado',
+  cert_upload: 'Subir evidencia',
+  cert_upload_helper: 'PDF, JPG, PNG o WebP. Máximo 10 MB.',
+  cert_status_self_declared: 'Autodeclarada',
+  cert_status_pending_review: 'Por revisar',
+  cert_status_verified: 'Verificada',
+  cert_status_rejected: 'Rechazada',
+  cert_expired: 'Vencida',
+
+  // Verification
+  verify_action: 'Verificar',
+  unverify_action: 'Quitar verificación',
+  reject_action: 'Rechazar',
+  verified_badge_label: 'Verificado por Efeonce',
+  verification_date: 'Verificado el',
+
+  // Links
+  link_linkedin: 'LinkedIn',
+  link_portfolio: 'Portfolio',
+  link_twitter: 'X / Twitter',
+  link_threads: 'Threads',
+  link_behance: 'Behance',
+  link_github: 'GitHub',
+  link_dribbble: 'Dribbble',
+
+  // About me
+  about_me_placeholder: 'Describe tu perfil profesional, especialidades y experiencia relevante.',
+
+  // Summary counters
+  summary_skills: (n: number) => `${n} skill${n === 1 ? '' : 's'}`,
+  summary_certs_active: (n: number) => `${n} certificación${n === 1 ? '' : 'es'} activa${n === 1 ? '' : 's'}`,
+  summary_verified: (n: number) => `${n} verificada${n === 1 ? '' : 's'}`,
+  summary_expiring_soon: (n: number) => `${n} por vencer`,
+
+  // Empty states
+  empty_skills_title: 'Sin skills registradas',
+  empty_skills_description: 'Agrega tus capacidades profesionales para que sean visibles en tu perfil.',
+  empty_certs_title: 'Sin certificaciones',
+  empty_certs_description: 'Agrega tus certificaciones profesionales y sube la evidencia para que puedan ser verificadas.',
+  empty_links_title: 'Sin links profesionales',
+  empty_links_description: 'Agrega tus perfiles en plataformas profesionales.',
+  empty_about_me: 'Aún no has escrito tu biografía profesional.'
+} as const

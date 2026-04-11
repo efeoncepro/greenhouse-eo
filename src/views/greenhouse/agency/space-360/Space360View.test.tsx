@@ -135,7 +135,8 @@ const detail: Space360Detail = {
             sourceSystem: 'manual',
             notes: null,
             verifiedBy: 'user-1',
-            verifiedAt: '2026-04-10T00:00:00.000Z'
+            verifiedAt: '2026-04-10T00:00:00.000Z',
+            visibility: 'internal'
           }
         ]
       }

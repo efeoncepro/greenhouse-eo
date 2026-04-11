@@ -1,5 +1,22 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — TASK-313: Skills y certificaciones — perfil profesional, verificación Efeonce y CRUD
+
+- rama: `task/TASK-313-skills-certifications-profile-crud`
+- alcance implementado:
+  - **3 migraciones**: social links en `members`, visibility en `member_skills`, tabla `member_certifications`
+  - **Asset context**: `certification_draft` / `certification` — upload, attach, access control
+  - **Certification service**: CRUD + verificación + rechazo en `src/lib/hr-core/certifications.ts`
+  - **Skills service extendido**: self-service (upsert/remove/verify/unverify sin space), visibility field
+  - **10 API routes**: self-service (`/api/my/skills`, `/api/my/certifications`, `/api/my/professional-links`) + admin (`/api/hr/core/members/[memberId]/skills`, certifications, verify, professional-profile)
+  - **4 UI components**: `SkillsCertificationsTab` (shared self/admin), `CertificatePreviewDialog`, `ProfessionalLinksCard`, `AboutMeCard`
+  - **Integración**: nueva tab "Skills y certificaciones" en `/my/profile` y `/admin/users/[id]`
+  - **Nomenclatura**: `GH_SKILLS_CERTS` en `greenhouse-nomenclature.ts`
+  - **Badge**: reutiliza `VerifiedByEfeonceBadge` existente
+- política de visibilidad: `internal` (self+admin) vs `client_visible` (requiere verified)
+- verificación: `pnpm lint` ✓, `tsc --noEmit` ✓ (1 error pre-existente), `pnpm build` ✓
+- pendiente: ejecutar migraciones (`pnpm migrate:up`) contra Cloud SQL y regenerar `db.d.ts`
+
 ## Sesion 2026-04-11 — contrato arquitectónico persona ↔ entidad legal para CCA y compensación ejecutiva
 
 - alcance cerrado:
