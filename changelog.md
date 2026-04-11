@@ -2,6 +2,15 @@
 
 ## 2026-04-11
 
+### 2026-04-11 — Leave vuelve a resolver avatars desde la identidad canónica
+
+- `HR > Permisos` y `My Leave` ya no dependen de un avatar nulo en el store PostgreSQL.
+- La lectura de solicitudes ahora reutiliza la misma resolución canónica de persona/avatar que el resto del ecosistema:
+  - `greenhouse_serving.person_360`
+  - `resolveAvatarUrl()`
+  - fallback defensivo a `members.avatar_url` cuando la persona todavía no viene enriquecida por `person_360`
+- El detalle de solicitud y la respuesta inmediata tras crear una solicitud también devuelven `memberAvatarUrl` coherente, evitando que la UI caiga a iniciales por un bug del backend.
+
 ### 2026-04-11 — Organigrama con lectura por liderazgo y workspace visible en menú
 
 - `HR > Organigrama` ahora puede alternar entre lectura estructural por áreas y una lectura `Líderes y equipos` centrada en personas responsables.

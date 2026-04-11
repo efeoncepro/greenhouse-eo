@@ -1,5 +1,25 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — leave reenganchado al pipeline canónico de avatar/persona
+
+- alcance cerrado:
+  - `HR > Permisos` y `/api/my/leave` dejaron de recibir `memberAvatarUrl: null` desde el store PostgreSQL por un gap de migración tras la eliminación del fallback hardcodeado por nombres
+  - el store de permisos ahora resuelve persona/avatar con el pipeline canónico vigente:
+    - `greenhouse_serving.person_360`
+    - `resolveAvatarUrl()`
+    - fallback defensivo a `greenhouse_core.members.avatar_url`
+  - el ajuste cubre:
+    - `listLeaveRequestsFromPostgres()`
+    - `getLeaveRequestByIdInternal()`
+    - la respuesta inmediata de `createLeaveRequestInPostgres()`
+- archivos sensibles / de alto impacto tocados:
+  - `src/lib/hr-core/postgres-leave-store.ts`
+  - `src/lib/hr-core/postgres-leave-store.test.ts`
+- validación ejecutada:
+  - `pnpm exec vitest run src/lib/hr-core/postgres-leave-store.test.ts src/lib/hr-core/service.test.ts` — OK
+  - `pnpm exec eslint src/lib/hr-core/postgres-leave-store.ts src/lib/hr-core/postgres-leave-store.test.ts` — OK
+  - `pnpm build` — OK
+
 ## Sesion 2026-04-11 — organigrama con lectura por liderazgo + acceso visible a Mi equipo
 
 - alcance cerrado:

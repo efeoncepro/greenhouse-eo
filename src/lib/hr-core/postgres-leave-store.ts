@@ -69,6 +69,7 @@ import {
   toInt,
   toNullableNumber
 } from '@/lib/hr-core/shared'
+import { resolveAvatarUrl } from '@/lib/person-360/resolve-avatar'
 import { attachAssetToAggregate, buildPrivateAssetDownloadUrl } from '@/lib/storage/greenhouse-assets'
 
 type PostgresDepartmentRow = {
@@ -115,6 +116,8 @@ type PostgresLeaveRequestRow = {
   member_id: string
   member_name: string | null
   member_email: string | null
+  member_avatar_url: string | null
+  member_linked_user_id: string | null
   leave_type_code: string
   leave_type_name: string | null
   start_date: string | Date
@@ -139,6 +142,8 @@ type PostgresMemberResolverRow = {
   member_id: string
   display_name: string
   email: string | null
+  avatar_url: string | null
+  linked_user_id: string | null
   identity_profile_id: string | null
   reports_to: string | null
   employment_type: string | null
@@ -305,7 +310,10 @@ const mapLeaveRequest = (row: PostgresLeaveRequestRow): HrLeaveRequest => ({
   requestId: row.request_id,
   memberId: row.member_id,
   memberName: normalizeNullableString(row.member_name),
-  memberAvatarUrl: null,
+  memberAvatarUrl: resolveAvatarUrl(
+    normalizeNullableString(row.member_avatar_url),
+    normalizeNullableString(row.member_linked_user_id)
+  ),
   leaveTypeCode: row.leave_type_code,
   leaveTypeName: normalizeNullableString(row.leave_type_name) || row.leave_type_code,
   startDate: toPgDateString(row.start_date) || '',
@@ -585,6 +593,8 @@ const getMemberById = async (memberId: string, client?: PoolClient) => {
         member_id,
         display_name,
         primary_email AS email,
+        COALESCE(p360.resolved_avatar_url, m.avatar_url) AS avatar_url,
+        p360.user_id AS linked_user_id,
         identity_profile_id,
         reports_to_member_id AS reports_to,
         employment_type,
@@ -593,12 +603,14 @@ const getMemberById = async (memberId: string, client?: PoolClient) => {
         (
           SELECT cv.pay_regime
           FROM greenhouse_payroll.compensation_versions AS cv
-          WHERE cv.member_id = greenhouse_core.members.member_id
+          WHERE cv.member_id = m.member_id
           ORDER BY cv.effective_from DESC, cv.version DESC
           LIMIT 1
         ) AS pay_regime
-      FROM greenhouse_core.members
-      WHERE member_id = $1
+      FROM greenhouse_core.members AS m
+      LEFT JOIN greenhouse_serving.person_360 AS p360
+        ON p360.member_id = m.member_id
+      WHERE m.member_id = $1
       LIMIT 1
     `,
     [memberId],
@@ -962,8 +974,10 @@ const getLeaveRequestByIdInternal = async (requestId: string, client?: PoolClien
       SELECT
         r.request_id,
         r.member_id,
-        member.display_name AS member_name,
-        member.primary_email AS member_email,
+        COALESCE(p360.resolved_display_name, member.display_name) AS member_name,
+        COALESCE(p360.resolved_email, member.primary_email) AS member_email,
+        COALESCE(p360.resolved_avatar_url, member.avatar_url) AS member_avatar_url,
+        COALESCE(p360.user_id, linked_user.user_id) AS member_linked_user_id,
         r.leave_type_code,
         lt.leave_type_name,
         r.start_date,
@@ -985,6 +999,15 @@ const getLeaveRequestByIdInternal = async (requestId: string, client?: PoolClien
       FROM greenhouse_hr.leave_requests AS r
       LEFT JOIN greenhouse_core.members AS member
         ON member.member_id = r.member_id
+      LEFT JOIN greenhouse_serving.person_360 AS p360
+        ON p360.member_id = member.member_id
+      LEFT JOIN LATERAL (
+        SELECT cu.user_id
+        FROM greenhouse_core.client_users AS cu
+        WHERE cu.member_id = member.member_id
+        ORDER BY cu.active DESC, cu.updated_at DESC NULLS LAST, cu.created_at DESC NULLS LAST
+        LIMIT 1
+      ) AS linked_user ON TRUE
       LEFT JOIN greenhouse_core.members AS supervisor
         ON supervisor.member_id = r.supervisor_member_id
       LEFT JOIN greenhouse_hr.leave_types AS lt
@@ -1290,8 +1313,10 @@ export const listLeaveRequestsFromPostgres = async ({
       SELECT
         r.request_id,
         r.member_id,
-        member.display_name AS member_name,
-        member.primary_email AS member_email,
+        COALESCE(p360.resolved_display_name, member.display_name) AS member_name,
+        COALESCE(p360.resolved_email, member.primary_email) AS member_email,
+        COALESCE(p360.resolved_avatar_url, member.avatar_url) AS member_avatar_url,
+        COALESCE(p360.user_id, linked_user.user_id) AS member_linked_user_id,
         r.leave_type_code,
         lt.leave_type_name,
         r.start_date,
@@ -1313,6 +1338,15 @@ export const listLeaveRequestsFromPostgres = async ({
       FROM greenhouse_hr.leave_requests AS r
       LEFT JOIN greenhouse_core.members AS member
         ON member.member_id = r.member_id
+      LEFT JOIN greenhouse_serving.person_360 AS p360
+        ON p360.member_id = member.member_id
+      LEFT JOIN LATERAL (
+        SELECT cu.user_id
+        FROM greenhouse_core.client_users AS cu
+        WHERE cu.member_id = member.member_id
+        ORDER BY cu.active DESC, cu.updated_at DESC NULLS LAST, cu.created_at DESC NULLS LAST
+        LIMIT 1
+      ) AS linked_user ON TRUE
       LEFT JOIN greenhouse_core.members AS supervisor
         ON supervisor.member_id = r.supervisor_member_id
       LEFT JOIN greenhouse_hr.leave_types AS lt
@@ -1779,7 +1813,7 @@ export const createLeaveRequestInPostgres = async ({
       requestId,
       memberId: effectiveMemberId,
       memberName: normalizeNullableString(member.display_name),
-      memberAvatarUrl: null,
+      memberAvatarUrl: resolveAvatarUrl(normalizeNullableString(member.avatar_url), normalizeNullableString(member.linked_user_id)),
       leaveTypeCode,
       leaveTypeName: leaveType.leaveTypeName,
       startDate,
