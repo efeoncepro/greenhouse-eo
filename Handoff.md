@@ -1,5 +1,20 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — TASK-369: Hardcoded Hex Cleanup COMPLETADA
+
+- alcance cerrado:
+  - CSC_COLORS duplicado en 2 archivos → extraído a `CSC_CHART_COLORS` en `metric-registry.ts` (fuente única)
+  - TREND_LINE_COLORS → derivado de `Object.values(CSC_CHART_COLORS)` (ya no es array hardcodeado)
+  - PayrollReceiptCard `#023c70` → `GH_COLORS.role.account.source` (2 instancias)
+  - NexaInsightsBlock `#7367F0` (old Vuexy purple) → `theme.palette.primary.main` (bug fix: purple→blue)
+  - helpers.ts `getCapabilityPalette()` → EXCLUIDO (hex no coinciden con GH_COLORS.service, documentado)
+- hallazgos documentados en delta de TASK-369:
+  - CSC_COLORS no mapea a GH_COLORS.cscPhase (fases y colores distintos)
+  - helpers.ts usa paleta completamente diferente a GH_COLORS.service
+  - NexaInsightsBlock tenía bug: usaba Vuexy purple (#7367F0) en vez del primary actual (#0375DB)
+- verificación ejecutada: `tsc`, `lint`, `build` — todos pasan
+- documentos actualizados: task file, README.md, TASK_ID_REGISTRY.md, Handoff.md
+
 ## Sesion 2026-04-11 — TASK-368: Theme Token Audit & Decision Contract COMPLETADA
 
 - alcance cerrado:

@@ -23,7 +23,7 @@ import EmptyState from '@/components/greenhouse/EmptyState'
 import ExecutiveCardShell from '@/components/greenhouse/ExecutiveCardShell'
 import { HorizontalWithSubtitle } from '@/components/card-statistics'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
-import { THRESHOLD_ZONE_COLOR, type ThresholdZone, CSC_PHASE_LABELS, type CscPhase } from '@/lib/ico-engine/metric-registry'
+import { THRESHOLD_ZONE_COLOR, type ThresholdZone, CSC_PHASE_LABELS, CSC_CHART_COLORS, type CscPhase } from '@/lib/ico-engine/metric-registry'
 import type { IcoMetricSnapshot, MetricValue, CscDistributionEntry } from '@/lib/ico-engine/read-metrics'
 
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
@@ -32,13 +32,6 @@ const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexChart
 
 const MONTH_SHORT = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
 
-const CSC_COLORS: Record<CscPhase, string> = {
-  briefing: '#7367F0',
-  produccion: '#00BAD1',
-  revision_interna: '#ff6500',
-  cambios_cliente: '#bb1954',
-  entrega: '#6ec207'
-}
 
 // ── Helpers ───────────────────────────────────────────────────────────
 
@@ -146,7 +139,7 @@ const PersonActivityTab = ({ memberId }: Props) => {
     theme: { mode },
     stroke: { width: 2 },
     labels: cscEntries.map(e => e.label),
-    colors: cscEntries.map(e => CSC_COLORS[e.phase]),
+    colors: cscEntries.map(e => CSC_CHART_COLORS[e.phase]),
     dataLabels: {
       enabled: true,
       formatter: (val: number) => `${Math.round(val)}%`

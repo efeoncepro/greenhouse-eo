@@ -418,7 +418,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-366` | `to-do` | Assigned Team Observability, Freshness, Export & Enterprise Hardening | `docs/tasks/to-do/TASK-366-assigned-team-enterprise-hardening-observability-export.md` |
 | `TASK-367` | `to-do` | Claude Microinteractions Research & Dual Skill Creation | `docs/tasks/to-do/TASK-367-claude-microinteractions-research-dual-skill-creation.md` |
 | `TASK-368` | `complete` | Theme Token Audit & Decision Contract | `docs/tasks/complete/TASK-368-theme-token-audit-decision-contract.md` |
-| `TASK-369` | `to-do` | Hardcoded Hex Cleanup | `docs/tasks/to-do/TASK-369-theme-hardcoded-hex-cleanup.md` |
+| `TASK-369` | `complete` | Hardcoded Hex Cleanup | `docs/tasks/complete/TASK-369-theme-hardcoded-hex-cleanup.md` |
 | `TASK-370` | `to-do` | Semantic Token Absorption into Theme | `docs/tasks/to-do/TASK-370-semantic-token-absorption-into-theme.md` |
 | `TASK-371` | `to-do` | Shell Primary Cutover | `docs/tasks/to-do/TASK-371-shell-primary-cutover.md` |
 | `TASK-372` | `to-do` | Kortex Visual Preset Documentation | `docs/tasks/to-do/TASK-372-kortex-visual-preset-documentation.md` |

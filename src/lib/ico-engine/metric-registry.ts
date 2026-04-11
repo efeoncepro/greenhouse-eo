@@ -88,6 +88,15 @@ export const CSC_PHASE_LABELS: Record<CscPhase, string> = {
   entrega: 'Entrega'
 }
 
+/** Chart colors per CSC phase — used by ICO donut/trend visualizations */
+export const CSC_CHART_COLORS: Record<CscPhase, string> = {
+  briefing: '#7367F0',
+  produccion: '#00BAD1',
+  revision_interna: '#ff6500',
+  cambios_cliente: '#bb1954',
+  entrega: '#6ec207'
+}
+
 // ─── Task Status → CSC Phase Mapping ────────────────────────────────────────
 // task_status values come from Notion (Spanish) but the column name is English.
 

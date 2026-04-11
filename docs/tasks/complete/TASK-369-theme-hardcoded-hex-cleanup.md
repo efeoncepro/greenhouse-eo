@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Medio`
 - Effort: `Bajo`
@@ -24,9 +24,21 @@
 
 Reemplazar los ~11 valores hex hardcodeados en vistas y helpers por referencias a `GH_COLORS` o `theme.palette` existentes. **Sin cambiar colores visibles** — solo cambiar la fuente de verdad de inline hex a constante nombrada. Es una limpieza quirúrgica de bajo riesgo.
 
+## Delta 2026-04-11 — Hallazgos de auditoría pre-ejecución
+
+La inspección archivo-por-archivo reveló 5 correcciones a los supuestos originales:
+
+1. **CSC_COLORS NO mapea a GH_COLORS.cscPhase** — las fases son distintas (5 simplificadas vs 7 canónicas) y los hex no coinciden. briefing=#7367F0 (old Vuexy purple) ≠ cscPhase.briefing.source=#024C8F. Se extrae a constante compartida sin cambiar hex.
+2. **CSC_COLORS solo mapea parcialmente a theme.palette** — solo 3 de 5 valores (warning, error, success) coinciden. briefing y produccion usan colores Vuexy legacy.
+3. **helpers.ts getCapabilityPalette() NO coincide con GH_COLORS.service** — ninguno de los 5 accent colors tiene equivalente en el sistema de tokens. Se excluye de esta task.
+4. **NexaInsightsBlock #7367F0 es un bug** — es el old Vuexy purple, no el primary actual #0375DB. Se corrige como bug fix (cambia visual purple→blue, intencionalmente).
+5. **Ambos ICO tabs tienen rgba() adicionales** en configs de chart que son opacity-specific, no tokens. Se documentan pero no se tocan.
+
+Alcance ajustado: 3 archivos efectivos (OrganizationIcoTab + PersonActivityTab como CSC_COLORS compartido, PayrollReceiptCard, NexaInsightsBlock). helpers.ts excluido.
+
 ## Why This Task Exists
 
-Existen hex hardcodeados duplicados en al menos 5 hotspots del portal que ya tienen equivalente exacto en `GH_COLORS` o `theme.palette`. Si alguien cambia un color en la fuente canónica, estos valores no se actualizan. Es deuda técnica pura sin beneficio.
+Existen hex hardcodeados duplicados en al menos 4 hotspots del portal que tienen equivalente en `GH_COLORS` o `theme.palette`. Si alguien cambia un color en la fuente canónica, estos valores no se actualizan. Es deuda técnica pura sin beneficio.
 
 ## Goal
 

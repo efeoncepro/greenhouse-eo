@@ -8,6 +8,7 @@ import Card from '@mui/material/Card'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { useTheme } from '@mui/material/styles'
 
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
@@ -174,6 +175,7 @@ const NexaInsightsBlock = ({
   runStatus,
   defaultExpanded
 }: NexaInsightsBlockProps) => {
+  const theme = useTheme()
   const prefersReduced = useReducedMotion()
   const hasData = totalAnalyzed > 0
   const chip = getRunChip(runStatus)
@@ -185,7 +187,7 @@ const NexaInsightsBlock = ({
         <Accordion disableGutters elevation={0} defaultExpanded={defaultExpanded}>
           <AccordionSummary expandIcon={<i className='tabler-chevron-down' aria-hidden='true' />}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <i className='tabler-sparkles' style={{ fontSize: 20, color: '#7367F0' }} aria-hidden='true' />
+              <i className='tabler-sparkles' style={{ fontSize: 20, color: theme.palette.primary.main }} aria-hidden='true' />
               <Typography variant='h6'>{GH_NEXA.insights_title}</Typography>
               <CustomChip
                 round='true'
@@ -216,7 +218,7 @@ const NexaInsightsBlock = ({
       <Accordion disableGutters elevation={0} defaultExpanded={defaultExpanded}>
         <AccordionSummary expandIcon={<i className='tabler-chevron-down' aria-hidden='true' />}>
           <Stack direction='row' alignItems='center' spacing={2} sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
-            <i className='tabler-sparkles' style={{ fontSize: 20, color: '#7367F0' }} aria-hidden='true' />
+            <i className='tabler-sparkles' style={{ fontSize: 20, color: theme.palette.primary.main }} aria-hidden='true' />
             <Typography variant='h6'>{GH_NEXA.insights_title}</Typography>
             <CustomChip
               round='true'
