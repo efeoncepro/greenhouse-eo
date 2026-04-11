@@ -151,6 +151,7 @@
     "react-email": "^5.2.10",
     "react-hook-form": "7.69.0",
     "react-map-gl": "8.1.0",
+    "react-pdf": "^10.4.1",
     "react-perfect-scrollbar": "1.5.8",
     "react-player": "3.4.0",
     "react-redux": "9.2.0",
