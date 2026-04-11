@@ -68,7 +68,6 @@ type MemberAggregateRow = {
   language_count: string | number
   verified_tool_count: string | number
   verified_cert_count: string | number
-  contracted_hours: string | number | null
 }
 
 type TopSkillRow = {
@@ -114,14 +113,6 @@ const toNum = (value: unknown): number => {
   }
 
   return 0
-}
-
-const toNullableNum = (value: unknown): number | null => {
-  if (value == null) return null
-
-  const parsed = toNum(value)
-
-  return Number.isFinite(parsed) ? parsed : null
 }
 
 const getCurrentPeriod = () => {
@@ -332,8 +323,7 @@ export const searchTalent = async (
         COALESCE(ct.certification_count, 0) AS certification_count,
         COALESCE(ct.active_cert_count, 0) AS active_cert_count,
         COALESCE(ct.verified_cert_count, 0) AS verified_cert_count,
-        COALESCE(lg.language_count, 0) AS language_count,
-        cv.contracted_hours
+        COALESCE(lg.language_count, 0) AS language_count
       FROM greenhouse_core.members m
       ${skillJoin}
       ${toolJoin}
@@ -370,14 +360,6 @@ export const searchTalent = async (
         FROM greenhouse_core.member_languages ml
         WHERE ml.member_id = m.member_id
       ) lg ON TRUE
-      LEFT JOIN LATERAL (
-        SELECT cv_inner.contracted_hours
-        FROM greenhouse_hr.compensation_versions cv_inner
-        WHERE cv_inner.member_id = m.member_id
-          AND cv_inner.status = 'active'
-        ORDER BY cv_inner.effective_from DESC
-        LIMIT 1
-      ) cv ON TRUE
       WHERE m.active = TRUE
         AND m.assignable = TRUE
         ${filterClause}
@@ -540,9 +522,9 @@ export const searchTalent = async (
     const activeCertCount = toNum(row.active_cert_count)
     const verifiedCertCount = toNum(row.verified_cert_count)
     const languageCount = toNum(row.language_count)
-    const contractedHours = toNullableNum(row.contracted_hours)
 
     const capacity = capacityMap.get(memberId)
+    const contractedHours = capacity?.contractedHours ?? null
     const commercialAvailabilityHours = capacity?.commercialAvailabilityHours ?? null
     const utilizationPercent = capacity?.usagePercent ?? null
 
