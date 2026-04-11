@@ -33,7 +33,8 @@ export const GH_INTERNAL_NAV = {
   adminIntegrationGovernance: { label: 'Integration Governance', subtitle: 'Registro, taxonomia, readiness y ownership de integraciones nativas' },
   adminAccounts: { label: 'Cuentas', subtitle: 'Organizaciones, spaces y gobierno de identidad' },
   adminPaymentInstruments: { label: 'Instrumentos de pago', subtitle: 'Cuentas bancarias, tarjetas, fintech y plataformas' },
-  adminTalentReview: { label: 'Verificación de talento', subtitle: 'Skills, herramientas y certificaciones por revisar' }
+  adminTalentReview: { label: 'Verificación de talento', subtitle: 'Skills, herramientas y certificaciones por revisar' },
+  adminTalentOps: { label: 'Salud del talento', subtitle: 'Metricas y mantenimiento del sistema' }
 } as const
 
 export const GH_PEOPLE_NAV = {

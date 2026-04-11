@@ -348,6 +348,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               { label: nl(GH_INTERNAL_NAV.adminViews), href: '/admin/views' },
               { label: nl(GH_INTERNAL_NAV.adminTeam), href: '/admin/team' },
               { label: nl(GH_INTERNAL_NAV.adminTalentReview), href: '/admin/talent-review', icon: 'tabler-rosette-discount-check' },
+              { label: nl(GH_INTERNAL_NAV.adminTalentOps), href: '/admin/talent-ops', icon: 'tabler-heart-rate-monitor' },
               { label: nl(GH_INTERNAL_NAV.adminBusinessLines), href: '/admin/business-lines' }
             ].filter(item => {
               if (item.href === '/admin') return canSeeView('administracion.admin_center', true)
@@ -359,6 +360,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               if (item.href === '/admin/views') return canSeeView('administracion.vistas', true)
               if (item.href === '/admin/team') return canSeeView('administracion.equipo', true)
               if (item.href === '/admin/talent-review') return canSeeView('administracion.equipo', true)
+              if (item.href === '/admin/talent-ops') return canSeeView('administracion.equipo', true)
               if (item.href === '/admin/business-lines') return canSeeView('administracion.admin_center', true)
 
               return true

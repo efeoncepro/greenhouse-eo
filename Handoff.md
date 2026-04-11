@@ -1,5 +1,18 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — TASK-320 + TASK-314: Talent Profile Enterprise Program COMPLETADO
+
+- TASK-320: service talent-ops.ts (completeness, stale, gaps, actions), API /api/hr/core/talent-ops, dashboard /admin/talent-ops, nav "Salud del talento"
+- TASK-314 UMBRELLA CERRADA — 8/8 child tasks complete:
+  - TASK-313: Skills, certs, links, profile CRUD
+  - TASK-315: Taxonomy (tools, languages, headline)
+  - TASK-316: Trust ops (verification states, review queue)
+  - TASK-317: Internal talent discovery & search
+  - TASK-318: Client-safe verified profiles
+  - TASK-319: Reputation, evidence & endorsements
+  - TASK-320: Ops analytics & maintenance
+- STATUS: PROGRAM COMPLETE
+
 ## Sesion 2026-04-11 — TASK-319: Reputation, Evidence & Endorsements completada
 
 - Migration: member_evidence + member_endorsements tables con runtime grants

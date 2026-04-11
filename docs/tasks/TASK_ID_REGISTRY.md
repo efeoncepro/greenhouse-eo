@@ -363,13 +363,13 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-311` | `to-do` | Partner Contacts + Role Label | `docs/tasks/to-do/TASK-311-partnership-contacts-role-label.md` |
 | `TASK-312` | `to-do` | Partnership Automation + Alerts | `docs/tasks/to-do/TASK-312-partnership-automation-alerts.md` |
 | `TASK-313` | `complete` | Skills y Certificaciones: perfil profesional, verificación Efeonce y CRUD | `docs/tasks/complete/TASK-313-skills-certifications-profile-crud.md` |
-| `TASK-314` | `in-progress` | Talent Profile Enterprise Program | `docs/tasks/in-progress/TASK-314-talent-profile-enterprise-program.md` |
+| `TASK-314` | `complete` | Talent Profile Enterprise Program | `docs/tasks/complete/TASK-314-talent-profile-enterprise-program.md` |
 | `TASK-315` | `to-do` | Talent Taxonomy & Canonical Professional Model | `docs/tasks/to-do/TASK-315-talent-taxonomy-canonical-model.md` |
 | `TASK-316` | `complete` | Talent Trust Ops: Verification, Certification Governance & Review Queue | `docs/tasks/complete/TASK-316-talent-trust-ops-verification-governance.md` |
 | `TASK-317` | `complete` | Internal Talent Discovery: Search, Filters & Ranking | `docs/tasks/complete/TASK-317-internal-talent-discovery-search-ranking.md` |
 | `TASK-318` | `complete` | Client-Safe Verified Talent Profiles | `docs/tasks/complete/TASK-318-client-safe-verified-talent-profiles.md` |
 | `TASK-319` | `complete` | Reputation, Evidence & Endorsements for Talent Profiles | `docs/tasks/complete/TASK-319-reputation-evidence-endorsements.md` |
-| `TASK-320` | `to-do` | Talent Ops Analytics, Completeness & Maintenance Automation | `docs/tasks/to-do/TASK-320-talent-ops-analytics-maintenance-automation.md` |
+| `TASK-320` | `complete` | Talent Ops Analytics, Completeness & Maintenance Automation | `docs/tasks/complete/TASK-320-talent-ops-analytics-maintenance-automation.md` |
 | `TASK-321` | `to-do` | Space 360 View: UI/UX polish y eliminacion de jerga tecnica | `docs/tasks/to-do/TASK-321-space-360-ui-ux-polish.md` |
 | `TASK-322` | `to-do` | Enriquecer Cuentas Detail con tabs operativas y deprecar Tenant Detail legacy | `docs/tasks/to-do/TASK-322-admin-tenant-detail-ui-overhaul.md` |
 | `TASK-323` | `to-do` | Programa enterprise de jerarquias, supervisoria y permisos de aprobacion | `docs/tasks/to-do/TASK-323-hierarchy-supervisor-approval-program.md` |

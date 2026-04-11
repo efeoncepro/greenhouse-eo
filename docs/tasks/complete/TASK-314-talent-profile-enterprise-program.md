@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `umbrella`
-- Status real: `In Progress`
+- Status real: `Complete`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
