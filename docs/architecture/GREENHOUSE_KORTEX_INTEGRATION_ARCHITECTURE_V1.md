@@ -11,13 +11,16 @@
 
 ## Estado de implementación actual
 
-La foundation reusable para Kortex ya existe del lado Greenhouse desde `TASK-375`:
+La foundation reusable para Kortex ya existe del lado Greenhouse desde `TASK-375` y `TASK-376`:
 
 - tabla `greenhouse_core.sister_platform_bindings`
+- tabla `greenhouse_core.sister_platform_consumers`
+- tabla `greenhouse_core.sister_platform_request_logs`
 - soporte de `sister_platform_key = 'kortex'`
 - lifecycle `draft`, `active`, `suspended`, `deprecated`
 - soporte de scopes `organization`, `client`, `space` e `internal`
 - lectura administrativa en `/admin/integrations`
+- lane read-only endurecido en `/api/integrations/v1/sister-platforms/*`
 
 Esto no significa que el bridge Kortex esté completo. Significa que ya existe el contrato persistente y resoluble sobre el cual `TASK-376` y `TASK-377` pueden apoyarse sin inventar mappings ad hoc.
 

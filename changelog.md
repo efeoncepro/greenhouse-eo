@@ -2,6 +2,33 @@
 
 ## 2026-04-11
 
+### 2026-04-11 — Local Next builds pasan a usar output aislado fuera de Vercel/CI
+
+- `pnpm build` ya no reutiliza `.next` por defecto en local; ahora usa `.next-local/build-<timestamp>-<pid>` mediante `scripts/next-dist-dir.mjs`.
+- `pnpm start` sigue funcionando sobre el ultimo build exitoso gracias al puntero `.next-build-dir`.
+- El puntero del build ya no se escribe antes de compilar; ahora solo se actualiza despues de un build exitoso.
+- El cambio reduce locks y corrupciones del output cuando multiples agentes o procesos construyen el mismo repo a la vez.
+- Rollback temporal disponible via `GREENHOUSE_FORCE_SHARED_NEXT_DIST=true pnpm build`.
+
+### 2026-04-11 — TASK-376 endurece la surface read-only para sister platforms
+
+- Se agregó la migración `sister-platform-read-surface-hardening` para introducir:
+  - `greenhouse_core.sister_platform_consumers`
+  - `greenhouse_core.sister_platform_request_logs`
+  - la secuencia `EO-SPK-####`
+- Se agregó `src/lib/sister-platforms/external-auth.ts` como capa reusable para:
+  - auth por consumer token
+  - resolución obligatoria de binding activo
+  - allowlist de scopes por consumer
+  - rate limiting por consumer
+  - request logging con `requestId`
+- Se agregó el lane read-only endurecido:
+  - `GET /api/integrations/v1/sister-platforms/context`
+  - `GET /api/integrations/v1/sister-platforms/catalog/capabilities`
+  - `GET /api/integrations/v1/sister-platforms/readiness`
+- La spec `TASK-376` quedó corregida para apuntar al carril externo real del repo (`/api/integrations/v1/*`) en vez de un namespace inexistente.
+- Queda pendiente aplicar la migración en una sesión con Cloud SQL Proxy + ADC válidas para regenerar `db.d.ts`.
+
 ### 2026-04-11 — TASK-375 baja la foundation runtime para sister-platform bindings
 
 - Se agregó la migración `sister-platform-bindings-foundation` para introducir `greenhouse_core.sister_platform_bindings` y la secuencia `EO-SPB-####`.
@@ -4836,7 +4863,7 @@
 - Se agrego `.gitattributes` para fijar finales de linea `LF` en archivos de texto y reducir warnings recurrentes de `LF/CRLF` en Windows.
 - Se verifico el staging de Git sin warnings de conversion despues de ajustar la politica local de `EOL`.
 - Se reemplazaron scripts Unix `rm -rf` por utilidades cross-platform con Node.
-- En Windows local, `build` paso a usar un `distDir` dinamico bajo `.next-local/` para evitar bloqueos recurrentes sobre `.next` dentro de OneDrive.
+- En local fuera de Vercel/CI, `build` paso a usar un `distDir` dinamico bajo `.next-local/` para evitar bloqueos recurrentes sobre `.next` y colisiones entre procesos.
 - Se dejo explicitada la regla de no correr `git add/commit/push` en paralelo para evitar `index.lock`.
 
 ## 2026-03-10

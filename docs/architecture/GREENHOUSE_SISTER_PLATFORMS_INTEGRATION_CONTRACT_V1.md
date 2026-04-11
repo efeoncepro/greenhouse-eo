@@ -11,12 +11,17 @@
 
 ## Estado de implementación actual
 
-Desde `TASK-375`, este contrato ya tiene una primera bajada runtime en Greenhouse:
+Desde `TASK-375` y `TASK-376`, este contrato ya tiene una primera bajada runtime en Greenhouse:
 
 - tabla `greenhouse_core.sister_platform_bindings`
+- tabla `greenhouse_core.sister_platform_consumers`
+- tabla `greenhouse_core.sister_platform_request_logs`
 - secuencia `greenhouse_core.seq_sister_platform_binding_public_id`
+- secuencia `greenhouse_core.seq_sister_platform_consumer_public_id`
 - helper reusable `src/lib/sister-platforms/bindings.ts`
+- helper reusable `src/lib/sister-platforms/external-auth.ts`
 - rutas admin `/api/admin/integrations/sister-platform-bindings*`
+- rutas read-only `/api/integrations/v1/sister-platforms/*`
 - visibilidad mínima en `/admin/integrations`
 
 La foundation implementada cubre:
@@ -24,6 +29,8 @@ La foundation implementada cubre:
 - scopes `organization`, `client`, `space` e `internal`
 - lifecycle `draft`, `active`, `suspended`, `deprecated`
 - resolución explícita `external scope -> greenhouse scope`
+- auth explícita por consumer para el carril sister-platform read-only
+- request logging y rate limiting para el carril sister-platform read-only
 - publicación de eventos outbox para consumers posteriores
 
 ---

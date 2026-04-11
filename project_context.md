@@ -1,5 +1,43 @@
 # project_context.md
 
+## Delta 2026-04-11 Local Next build isolation para agentes y procesos concurrentes
+
+- `pnpm build` ya no reutiliza `.next` por defecto en local/agent runtime fuera de Vercel y CI.
+- Runtime nuevo:
+  - helper `scripts/next-dist-dir.mjs`
+  - `scripts/run-next-build.mjs` ahora genera un `distDir` aislado bajo `.next-local/build-<timestamp>-<pid>`
+  - `scripts/run-next-start.mjs` resuelve el ultimo build exitoso desde `.next-build-dir`
+  - `.next-build-meta.json` deja metadata minima del ultimo build exitoso
+- Contrato operativo:
+  - el puntero `.next-build-dir` ya no se escribe antes del build; solo se actualiza cuando el build termina bien
+  - el output aislado evita locks y corrupcion de `.next` cuando Codex, Claude u otros procesos compilan el mismo repo en paralelo
+  - se conservan solo algunos builds recientes bajo `.next-local/` para evitar crecimiento indefinido
+- Rollback:
+  - temporal: correr `GREENHOUSE_FORCE_SHARED_NEXT_DIST=true pnpm build`
+  - hard rollback: revertir `scripts/next-dist-dir.mjs`, `scripts/run-next-build.mjs` y `scripts/run-next-start.mjs`
+
+## Delta 2026-04-11 Surface read-only endurecida para sister platforms
+
+- Greenhouse ya tiene un carril read-only endurecido para sister platforms bajo `/api/integrations/v1/sister-platforms/*`.
+- Runtime nuevo:
+  - migracion `20260411201917370_sister-platform-read-surface-hardening.sql`
+  - tabla `greenhouse_core.sister_platform_consumers`
+  - tabla `greenhouse_core.sister_platform_request_logs`
+  - secuencia `greenhouse_core.seq_sister_platform_consumer_public_id`
+  - helper `src/lib/sister-platforms/external-auth.ts`
+  - rutas:
+    - `/api/integrations/v1/sister-platforms/context`
+    - `/api/integrations/v1/sister-platforms/catalog/capabilities`
+    - `/api/integrations/v1/sister-platforms/readiness`
+- Contrato operativo:
+  - la credencial deja de ser un token compartido para este carril y pasa a ser por consumer
+  - toda lectura sister-platform exige `externalScopeType` + `externalScopeId`
+  - toda lectura sister-platform resuelve binding canonico activo antes de responder
+  - toda lectura sister-platform deja request logging y aplica rate limiting
+- Estado de infraestructura:
+  - el código y la migración existen en repo
+  - la aplicación de migración sigue requiriendo Cloud SQL Proxy + ADC válidas para regenerar tipos DB
+
 ## Delta 2026-04-11 Foundation runtime para sister-platform bindings
 
 - Greenhouse ya tiene una foundation runtime explícita para bindear sister platforms con scopes internos.
@@ -4395,7 +4433,7 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - Usar `develop` como rama de `Staging` y `main` como rama de produccion.
 - Documentar toda decision que afecte layout, rutas, deploy o variables de entorno.
 - Mantener la politica de finales de linea en `LF` y evitar depender de conversiones automaticas de Git en Windows.
-- En Windows local, `build` usa un `distDir` dinamico bajo `.next-local/` para evitar fallos `EPERM` al reutilizar la misma salida dentro de OneDrive.
+- En local fuera de Vercel/CI, `build` usa un `distDir` dinamico bajo `.next-local/` para evitar locks, colisiones y fallos de filesystem al reutilizar la misma salida.
 - Evitar comandos Git mutantes en paralelo para no generar `index.lock`.
 - La estrategia de IDs de producto ya no debe exponer prefijos de origen como `hubspot-company-*`; usar `docs/architecture/GREENHOUSE_ID_STRATEGY_V1.md` y `src/lib/ids/greenhouse-ids.ts` como referencia.
 - Capability governance no debe derivarse desde `deals` ni `closedwon`; el sync externo solo es valido cuando llega con payload explicito desde el registro de empresa u otra fuente canonica equivalente.

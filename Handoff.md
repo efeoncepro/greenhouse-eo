@@ -1,5 +1,58 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — local Next build isolation ACTIVADA para evitar colisiones entre agentes
+
+- alcance implementado:
+  - helper nuevo `scripts/next-dist-dir.mjs`
+  - `scripts/run-next-build.mjs` ahora usa `distDir` aislado bajo `.next-local/build-<timestamp>-<pid>` en local fuera de Vercel/CI
+  - `scripts/run-next-start.mjs` arranca desde el ultimo build exitoso resuelto por `.next-build-dir`
+  - `.next-build-dir` ya no se actualiza antes del build; solo despues de un build exitoso
+  - cleanup controlado de builds aislados viejos
+- problema que resuelve:
+  - locks sobre `.next/lock`
+  - corrupcion del output cuando dos agentes o procesos ejecutan `pnpm build` en el mismo workspace
+  - `start` apuntando a un build fallido o incompleto
+- rollback:
+  - temporal: `GREENHOUSE_FORCE_SHARED_NEXT_DIST=true pnpm build`
+  - hard rollback: revertir `scripts/next-dist-dir.mjs`, `scripts/run-next-build.mjs` y `scripts/run-next-start.mjs`
+- nota operativa:
+  - en Vercel y CI el comportamiento sigue compartido sobre `.next` para no cambiar el contrato de esos entornos sin necesidad
+
+## Sesion 2026-04-11 — TASK-376: Sister Platforms Read-Only External Surface Hardening IMPLEMENTADA (pendiente apply de migracion)
+
+- alcance implementado:
+  - nueva migracion `20260411201917370_sister-platform-read-surface-hardening.sql`
+  - nueva tabla canónica `greenhouse_core.sister_platform_consumers`
+  - nueva tabla canónica `greenhouse_core.sister_platform_request_logs`
+  - secuencia `greenhouse_core.seq_sister_platform_consumer_public_id` para `EO-SPK-####`
+  - helper reusable `src/lib/sister-platforms/external-auth.ts` con:
+    - auth por consumer token
+    - resolucion obligatoria de binding activo
+    - allowlist de scopes por consumer
+    - rate limiting por consumer
+    - request logging con `requestId`
+  - nuevo lane read-only endurecido:
+    - `/api/integrations/v1/sister-platforms/context`
+    - `/api/integrations/v1/sister-platforms/catalog/capabilities`
+    - `/api/integrations/v1/sister-platforms/readiness`
+  - actualización de docs:
+    - `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md`
+    - `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`
+    - `docs/api/GREENHOUSE_API_REFERENCE_V1.md`
+    - `docs/architecture/GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`
+    - `docs/documentation/plataforma/sister-platform-bindings.md`
+- decisiones de contrato:
+  - la task se corrigió para operar sobre `src/app/api/integrations/v1/*`, no sobre un inexistente `src/app/api/v1/*`
+  - el lane nuevo queda separado del carril genérico y mutativo ya existente
+  - MCP sigue downstream; no se implementó aquí
+- verificación esperada:
+  - `pnpm lint`
+  - `pnpm build`
+  - chequeo de `new Pool()`
+  - `pnpm migrate:up` sujeto a Cloud SQL Proxy + ADC
+- deuda/nota operativa:
+  - falta aplicar la migración en una sesión con Cloud SQL Proxy + ADC vigentes para materializar tablas y regenerar `db.d.ts`
+
 ## Sesion 2026-04-11 — TASK-375: Sister Platforms Identity & Tenancy Binding Foundation IMPLEMENTADA (pendiente apply de migracion)
 
 - alcance implementado:

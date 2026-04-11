@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-04-11 por Codex (TASK-375)
-> **Ultima actualizacion:** 2026-04-11 por Codex (TASK-375)
+> **Ultima actualizacion:** 2026-04-11 por Codex (TASK-376)
 > **Documentacion tecnica:** `docs/architecture/GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`
 
 ---
@@ -36,12 +36,25 @@ La visibilidad funcional actual vive en:
 
 - `/admin/integrations`
 
+Y la surface read-only endurecida vive en:
+
+- `/api/integrations/v1/sister-platforms/context`
+- `/api/integrations/v1/sister-platforms/catalog/capabilities`
+- `/api/integrations/v1/sister-platforms/readiness`
+
 Hoy esa pantalla permite ver:
 
 - cuantas plataformas hermanas tienen bindings registrados
 - cuantos bindings estan activos
 - que scopes Greenhouse estan enlazados
 - el estado operativo de cada binding
+
+La API read-only nueva permite:
+
+- autenticar consumers sister-platform con credencial propia
+- resolver el binding activo de un scope externo
+- leer el catalogo y la readiness sin usar el token compartido generico
+- dejar request logging y rate limiting sobre ese carril
 
 ## Que estados puede tener
 
@@ -90,14 +103,26 @@ Ejemplos:
 - otra puede ser especifica de un space
 - otra puede ser interna, sin apuntar a un cliente concreto
 
+## Que hace ahora la surface read-only
+
+La lane endurecida funciona con esta secuencia:
+
+1. credencial explicita del consumer
+2. resolucion del binding canonico
+3. validacion del scope permitido
+4. rate limiting
+5. request logging
+6. respuesta read-only
+
+Eso evita que una app hermana tenga que adivinar tenancy o reutilizar un token compartido con otros conectores.
+
 ## Que NO hace todavia esta foundation
 
 Todavia no hace estas cosas:
 
-- no expone una API externa endurecida para sister platforms
 - no expone MCP read-only
 - no implementa el bridge especifico de Kortex
-- no es una UI completa de operacion avanzada; por ahora es una surface de governance y lectura
+- no es una UI completa de operacion avanzada para credenciales; por ahora la surface nueva es backend/read-only y la pantalla admin sigue centrada en bindings
 
 Esas piezas vienen despues en:
 
@@ -155,7 +180,7 @@ Eso significa que:
 
 Despues de esta foundation, lo natural es:
 
-1. endurecer la surface read-only
-2. conectar el primer carril Greenhouse -> Kortex
+1. conectar el primer carril Greenhouse -> Kortex
+2. montar MCP downstream sobre esta misma lane
 
 La foundation ya deja listo el terreno para eso.

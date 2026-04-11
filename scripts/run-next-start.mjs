@@ -1,8 +1,6 @@
-import fs from 'node:fs/promises'
-import path from 'node:path'
 import { spawn } from 'node:child_process'
 
-const latestBuildFile = path.resolve(process.cwd(), '.next-build-dir')
+import { resolveLatestStartDistDir } from './next-dist-dir.mjs'
 
 const runProcess = (command, args, env) =>
   new Promise((resolve, reject) => {
@@ -25,13 +23,7 @@ const runProcess = (command, args, env) =>
     })
   })
 
-let distDir = '.next'
-
-try {
-  distDir = (await fs.readFile(latestBuildFile, 'utf8')).trim() || distDir
-} catch {
-  distDir = '.next'
-}
+const distDir = await resolveLatestStartDistDir()
 
 await runProcess('npx', ['next', 'start'], {
   ...process.env,

@@ -27,6 +27,14 @@ export const SISTER_PLATFORM_BINDING_STATUSES = ['draft', 'active', 'suspended',
 
 export type SisterPlatformBindingStatus = (typeof SISTER_PLATFORM_BINDING_STATUSES)[number]
 
+export const SISTER_PLATFORM_CONSUMER_TYPES = ['sister_platform', 'mcp_adapter', 'internal_service'] as const
+
+export type SisterPlatformConsumerType = (typeof SISTER_PLATFORM_CONSUMER_TYPES)[number]
+
+export const SISTER_PLATFORM_CONSUMER_STATUSES = ['draft', 'active', 'suspended', 'deprecated'] as const
+
+export type SisterPlatformConsumerStatus = (typeof SISTER_PLATFORM_CONSUMER_STATUSES)[number]
+
 export type SisterPlatformBindingRecord = {
   bindingId: string
   publicId: string
@@ -72,6 +80,32 @@ export type SisterPlatformBindingResolution = {
   spaceName: string | null
   bindingId: string
   publicId: string
+}
+
+export type SisterPlatformConsumerRecord = {
+  consumerId: string
+  publicId: string
+  sisterPlatformKey: string
+  consumerName: string
+  consumerType: SisterPlatformConsumerType
+  credentialStatus: SisterPlatformConsumerStatus
+  tokenPrefix: string
+  hashAlgorithm: 'sha256'
+  allowedGreenhouseScopeTypes: SisterPlatformGreenhouseScopeType[]
+  rateLimitPerMinute: number
+  rateLimitPerHour: number
+  expiresAt: string | null
+  lastUsedAt: string | null
+  notes: string | null
+  metadata: Record<string, unknown>
+  createdByUserId: string | null
+  rotatedByUserId: string | null
+  suspendedByUserId: string | null
+  deprecatedByUserId: string | null
+  suspendedAt: string | null
+  deprecatedAt: string | null
+  createdAt: string
+  updatedAt: string
 }
 
 export type CreateSisterPlatformBindingInput = {

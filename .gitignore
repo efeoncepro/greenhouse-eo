@@ -15,6 +15,7 @@
 /.next-cache/
 /.next-local/
 /.next-build-dir
+/.next-build-meta.json
 /out/
 
 # production

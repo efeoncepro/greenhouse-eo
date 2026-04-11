@@ -22,11 +22,11 @@
 
 ## Summary
 
-Endurecer la surface read-only con la que Greenhouse debe exponer contexto operativo a sister platforms. Esta task toma la direction ya planteada en `TASK-039` y la convierte en una foundation enterprise para consumers externos del ecosistema: auth, tenancy binding, rate limiting, observabilidad y shape estable de lectura.
+Endurecer la surface read-only con la que Greenhouse debe exponer contexto operativo a sister platforms. Esta task toma la direccion ya planteada en `TASK-039` y la aterriza sobre el carril externo que hoy ya existe en el repo (`/api/integrations/v1/*`), convirtiendolo en una foundation enterprise para consumers externos del ecosistema: auth, tenancy binding, rate limiting, observabilidad y shape estable de lectura.
 
 ## Why This Task Exists
 
-`TASK-039` y `TASK-040` ya dejaron planteado que Greenhouse debe tener API v1 y un MCP downstream como adapter. El nuevo contrato de sister platforms sube el nivel de exigencia: esa surface ya no debe pensarse solo como export o AI tooling, sino como carril institucional para plataformas hermanas. Sin hardening, el primer consumer serio terminaria mezclando tenant inference, auth improvisada y response shapes frágiles.
+`TASK-039` y `TASK-040` ya dejaron planteado que Greenhouse debe tener una read API y un MCP downstream como adapter. El nuevo contrato de sister platforms sube el nivel de exigencia: esa surface ya no debe pensarse solo como export o AI tooling, sino como carril institucional para plataformas hermanas. Sin hardening, el primer consumer serio terminaria mezclando tenant inference, auth improvisada, namespace ambiguo y response shapes fragiles.
 
 ## Goal
 
@@ -44,6 +44,7 @@ Endurecer la surface read-only con la que Greenhouse debe exponer contexto opera
 Revisar y respetar:
 
 - `docs/architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`
+- `docs/architecture/GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`
 - `docs/architecture/GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md`
 - `docs/tasks/to-do/TASK-039-data-node-architecture-v1.md`
 - `docs/tasks/to-do/TASK-040-data-node-architecture-v2.md`
@@ -78,25 +79,28 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `src/app/api/v1/`
+- `src/app/api/integrations/v1/`
 - `src/lib/sister-platforms/`
-- `src/lib/tenant/authorization.ts`
-- `docs/tasks/to-do/TASK-039-data-node-architecture-v1.md`
+- `src/lib/integrations/`
+- `migrations/`
+- `docs/architecture/`
 - `docs/api/`
 
 ## Current Repo State
 
 ### Already exists
 
-- `TASK-039` ya define el shape conceptual de una API v1 y del MCP read-only downstream.
-- Greenhouse ya tiene tenant context y authorization helpers maduros.
+- `TASK-039` y `TASK-040` ya definen el shape conceptual de una read API y del MCP read-only downstream.
+- Greenhouse ya tiene un carril externo real en `src/app/api/integrations/v1/*` con helpers y shapes reutilizables.
+- `TASK-375` ya dejo la foundation reusable de bindings cross-platform y su helper runtime.
 - El contrato marco ya define read API y MCP como carriles permitidos.
 
 ### Gap
 
-- La API v1 sigue siendo plan, no capability endurecida para sister platforms.
+- El carril externo actual es generico y mezcla lectura con mutaciones; no existe todavia un lane sister-platform-first y read-only por defecto.
 - No existe todavia un auth/consumer model canonico para plataformas hermanas.
-- No existe request logging o governance institucional especifica para este carril.
+- No existe request logging, rate limiting ni governance institucional especifica para este carril.
+- La spec original todavia apuntaba a `src/app/api/v1/`, pero el repo real vive en `src/app/api/integrations/v1/*`.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -107,12 +111,12 @@ Reglas obligatorias:
 
 ### Slice 1 — Consumer auth and tenancy resolution
 
-- Amarrar la read surface externa al binding canonico de sister platforms.
-- Formalizar auth, scope resolution y consumer metadata.
+- Amarrar un lane read-only sister-platform-first al binding canonico de sister platforms.
+- Formalizar auth por consumer, scope resolution y consumer metadata.
 
 ### Slice 2 — Stable read endpoints
 
-- Materializar el baseline minimo de endpoints read-only que puedan consumir sister platforms.
+- Materializar el baseline minimo de endpoints read-only sobre `src/app/api/integrations/v1/*` que puedan consumir sister platforms.
 - Asegurar response shapes estables y auditables.
 
 ### Slice 3 — Governance and observability
@@ -130,7 +134,9 @@ Reglas obligatorias:
 
 La task debe aterrizar la regla:
 
-`sister platform consumer -> auth explicita -> tenancy binding -> read-only API -> optional MCP adapter`
+`sister platform consumer -> auth explicita -> tenancy binding -> read-only integrations lane -> optional MCP adapter`
+
+La implementacion no debe inventar un namespace nuevo fuera del carril externo vigente si no existe necesidad real. El baseline debe aterrizar sobre `src/app/api/integrations/v1/*`, idealmente aislando un lane read-only sister-platform-first dentro de esa surface en vez de mezclarlo con rutas genericas o mutativas ya existentes.
 
 La read surface debe nacer reusable para:
 
@@ -138,6 +144,12 @@ La read surface debe nacer reusable para:
 - futuras apps hermanas despues
 
 y no como integration point ad hoc solo para un consumer.
+
+La task tambien debe dejar explicito el split entre:
+
+- lane generico de integraciones existente
+- lane read-only endurecido para sister platforms
+- MCP downstream como adapter posterior
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -161,7 +173,14 @@ y no como integration point ad hoc solo para un consumer.
 ## Closing Protocol
 
 - [ ] Actualizar `TASK-039` o dejar delta si algun supuesto de esa spec cambia al aterrizar la surface real.
+- [ ] Actualizar esta task si el namespace final difiere del carril externo vigente por una razon arquitectonica aprobada.
 - [ ] Documentar el auth model final en la doc canonica que corresponda.
+
+## Delta 2026-04-11
+
+- Se corrigio la task para alinearla con el repo real: el carril externo vigente vive en `src/app/api/integrations/v1/*`, no en `src/app/api/v1/`.
+- Se explicito que el gap actual no es "crear API v1 desde cero", sino endurecer una surface externa ya existente y aislar un lane sister-platform-first read-only.
+- Se agrego como referencia obligatoria `GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`.
 
 ## Follow-ups
 

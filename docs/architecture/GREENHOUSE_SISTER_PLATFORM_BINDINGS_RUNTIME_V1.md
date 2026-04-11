@@ -20,11 +20,14 @@ Use together with:
 
 ## Status
 
-Implemented in code on 2026-04-11 via `TASK-375`.
+Implemented in code on 2026-04-11 via `TASK-375`, and extended on 2026-04-11 via `TASK-376`.
 
 Current runtime status:
 - code implemented
 - admin read/governance surface implemented
+- hardened read-only sister-platform lane implemented under `/api/integrations/v1/sister-platforms/*`
+- per-consumer credential model implemented in code + migration file
+- request logging and rate limiting implemented in code + migration file
 - migration file created
 - database apply still requires Cloud SQL Proxy + valid ADC in an interactive environment
 
@@ -91,6 +94,68 @@ Public IDs are generated as:
 | `last_verified_at` | Last explicit verification timestamp |
 | actor fields | `created_by_user_id`, `activated_by_user_id`, `suspended_by_user_id`, `deprecated_by_user_id` |
 | status timestamps | `activated_at`, `suspended_at`, `deprecated_at` |
+
+## Consumer Auth Runtime
+
+### Canonical tables
+
+- `greenhouse_core.sister_platform_consumers`
+- `greenhouse_core.sister_platform_request_logs`
+
+### Supporting sequence
+
+`greenhouse_core.seq_sister_platform_consumer_public_id`
+
+Public IDs are generated as:
+
+- `EO-SPK-0001`
+- `EO-SPK-0002`
+- ...
+
+### Why a second runtime object exists
+
+Bindings alone are not enough to operate a safe external surface.
+
+The read lane also needs:
+
+- a credential that identifies the consumer explicitly
+- a policy for what Greenhouse scopes that consumer is allowed to read
+- rate limiting
+- request traceability
+
+Without this layer, sister-platform reads would keep depending on a shared token and ad hoc logging, which breaks the enterprise contract.
+
+### Primary consumer fields
+
+| Field | Purpose |
+|-------|---------|
+| `sister_platform_consumer_id` | Internal PK |
+| `public_id` | Human-friendly EO identifier |
+| `sister_platform_key` | Which sister platform this credential belongs to |
+| `consumer_name` | Friendly runtime label |
+| `consumer_type` | `sister_platform`, `mcp_adapter`, or `internal_service` |
+| `credential_status` | `draft`, `active`, `suspended`, or `deprecated` |
+| `token_prefix` / `token_hash` | Lookup + verification of the credential |
+| `allowed_greenhouse_scope_types` | Scope allowlist for this consumer |
+| `rate_limit_per_minute` / `rate_limit_per_hour` | Request ceilings |
+| `expires_at` | Optional credential expiry |
+| `last_used_at` | Last successful runtime usage |
+
+### Primary request-log fields
+
+| Field | Purpose |
+|-------|---------|
+| `sister_platform_request_log_id` | Request/correlation ID |
+| `sister_platform_consumer_id` | Optional FK to the authenticated consumer |
+| `sister_platform_binding_id` | Optional FK to the resolved binding |
+| `external_scope_type` / `external_scope_id` | External lookup that was requested |
+| `greenhouse_scope_type` | Effective Greenhouse scope served |
+| `organization_id` / `client_id` / `space_id` | Effective tenant snapshot |
+| `route_key` | Logical route identifier |
+| `response_status` | Final HTTP status |
+| `duration_ms` | Request duration |
+| `rate_limited` | Whether the request was rejected by rate limiting |
+| `error_code` | Stable machine-readable failure code |
 
 ## Scope Model
 
@@ -193,6 +258,10 @@ Admin routes use `requireAdminTenantContext()`, so only admin-scoped users can o
 - validate scope consistency
 - enforce tenant-aware access when tenant context is provided
 - emit outbox events for binding lifecycle
+- authenticate sister-platform consumers
+- enforce scope allowlists per consumer
+- enforce read-lane rate limiting
+- persist request logs for the hardened read lane
 
 ### Canonical resolver
 
@@ -218,6 +287,39 @@ Resolver policy:
 - reads only `active` bindings
 - prefers primary role ordering over secondary/observer
 - never infers scope from labels
+
+## Hardened Read Lane
+
+### Files
+
+- `src/lib/sister-platforms/external-auth.ts`
+- `src/app/api/integrations/v1/sister-platforms/context/route.ts`
+- `src/app/api/integrations/v1/sister-platforms/catalog/capabilities/route.ts`
+- `src/app/api/integrations/v1/sister-platforms/readiness/route.ts`
+
+### Request contract
+
+Every request in the hardened lane must pass this chain:
+
+`consumer credential -> binding resolution -> scope allowlist -> rate limit -> read-only response -> request log`
+
+Accepted auth headers:
+
+- `Authorization: Bearer <consumer-token>`
+- `x-greenhouse-sister-platform-key: <consumer-token>`
+
+Required query params:
+
+- `externalScopeType`
+- `externalScopeId`
+
+### Current routes
+
+| Method | Route | Purpose |
+|--------|-------|---------|
+| `GET` | `/api/integrations/v1/sister-platforms/context` | Resolve consumer + active binding context |
+| `GET` | `/api/integrations/v1/sister-platforms/catalog/capabilities` | Export capability catalog through the hardened lane |
+| `GET` | `/api/integrations/v1/sister-platforms/readiness?keys=...` | Export readiness posture through the hardened lane |
 
 ## Events
 
@@ -294,10 +396,15 @@ Those belong to `TASK-376` and `TASK-377`.
 | Area | Path |
 |------|------|
 | migration | `migrations/20260411192943501_sister-platform-bindings-foundation.sql` |
+| migration | `migrations/20260411201917370_sister-platform-read-surface-hardening.sql` |
 | runtime types | `src/lib/sister-platforms/types.ts` |
 | runtime helper | `src/lib/sister-platforms/bindings.ts` |
+| runtime helper | `src/lib/sister-platforms/external-auth.ts` |
 | admin API list/create | `src/app/api/admin/integrations/sister-platform-bindings/route.ts` |
 | admin API detail/update | `src/app/api/admin/integrations/sister-platform-bindings/[bindingId]/route.ts` |
+| external API context | `src/app/api/integrations/v1/sister-platforms/context/route.ts` |
+| external API catalog | `src/app/api/integrations/v1/sister-platforms/catalog/capabilities/route.ts` |
+| external API readiness | `src/app/api/integrations/v1/sister-platforms/readiness/route.ts` |
 | admin UI wiring | `src/app/(dashboard)/admin/integrations/page.tsx` |
 | admin UI section | `src/views/greenhouse/admin/AdminIntegrationGovernanceView.tsx` |
 | event catalog | `src/lib/sync/event-catalog.ts` |

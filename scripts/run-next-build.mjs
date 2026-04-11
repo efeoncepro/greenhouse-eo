@@ -1,8 +1,13 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { spawn } from 'node:child_process'
+import {
+  getNextBuildTarget,
+  pruneOldIsolatedBuilds,
+  shouldUseIsolatedNextDist,
+  writeLatestBuildPointer
+} from './next-dist-dir.mjs'
 
-const latestBuildFile = path.resolve(process.cwd(), '.next-build-dir')
 const tsconfigFile = path.resolve(process.cwd(), 'tsconfig.json')
 
 const runProcess = (command, args, env) =>
@@ -26,21 +31,39 @@ const runProcess = (command, args, env) =>
     })
   })
 
-const isWindowsLocal = process.platform === 'win32' && !process.env.VERCEL
-const distDir = isWindowsLocal ? path.posix.join('.next-local', `build-${Date.now()}`) : '.next'
+const { distDir, buildId } = getNextBuildTarget()
 
-await fs.mkdir(path.dirname(latestBuildFile), { recursive: true })
-await fs.writeFile(latestBuildFile, `${distDir}\n`, 'utf8')
+await fs.mkdir(path.resolve(process.cwd(), distDir), { recursive: true })
+const tsconfigBackup = shouldUseIsolatedNextDist() ? await fs.readFile(tsconfigFile, 'utf8') : null
+let tsconfigRestored = false
 
-const tsconfigBackup = isWindowsLocal ? await fs.readFile(tsconfigFile, 'utf8') : null
+const restoreTsconfig = async () => {
+  if (tsconfigBackup === null || tsconfigRestored) {
+    return
+  }
+
+  tsconfigRestored = true
+  await fs.writeFile(tsconfigFile, tsconfigBackup, 'utf8')
+}
+
+if (tsconfigBackup !== null) {
+  process.on('SIGINT', () => {
+    void restoreTsconfig().finally(() => process.exit(130))
+  })
+
+  process.on('SIGTERM', () => {
+    void restoreTsconfig().finally(() => process.exit(143))
+  })
+}
 
 try {
   await runProcess('npx', ['next', 'build'], {
     ...process.env,
     NEXT_DIST_DIR: distDir
   })
+
+  await writeLatestBuildPointer({ distDir, buildId })
+  await pruneOldIsolatedBuilds()
 } finally {
-  if (tsconfigBackup !== null) {
-    await fs.writeFile(tsconfigFile, tsconfigBackup, 'utf8')
-  }
+  await restoreTsconfig()
 }
