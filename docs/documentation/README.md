@@ -16,6 +16,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 ### Plataforma interna y calidad
 
 - [Mi Perfil](plataforma/mi-perfil.md) — vista personal del colaborador: datos de identidad, equipos, proyectos, colegas y actividad reciente
+- [Sister Platform Bindings](plataforma/sister-platform-bindings.md) — enlace formal entre scopes externos de apps hermanas y scopes internos de Greenhouse
 - [Sistema de Observabilidad de Tests](plataforma/sistema-observabilidad-de-tests.md) — inventario del suite, resultados, coverage, artifacts y como leer la ultima corrida sin abrir logs crudos
 - [Sistema de Email Templates](plataforma/sistema-email-templates.md) — inventario de templates (react-email + Resend), design tokens, assets de marca, workflow Figma ↔ codigo
 
@@ -61,6 +62,7 @@ Para detalle tecnico, schemas, contratos y decisiones de diseno, ver `docs/archi
 | ---------------------------------------------------------------------------------------------------------- | ------------------ | ----------------------------------------------------------------- |
 | [GREENHOUSE_ARCHITECTURE_V1.md](../architecture/GREENHOUSE_ARCHITECTURE_V1.md)                             | Global             | Arquitectura maestra del portal                                   |
 | [GREENHOUSE_IDENTITY_ACCESS_V2.md](../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md)                       | Identidad          | Auth, sesion, RBAC, route groups, scopes, audit                   |
+| [GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md](../architecture/GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md) | Plataforma / Ecosistema | Runtime canonico de bindings entre sister platforms y scopes Greenhouse |
 | [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md](../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md) | Identidad          | 4 planos de roles y jerarquias, taxonomia de roles                |
 | [GREENHOUSE_EVENT_CATALOG_V1.md](../architecture/GREENHOUSE_EVENT_CATALOG_V1.md)                           | Plataforma         | Catalogo de eventos outbox, publishers, consumers                 |
 | [GREENHOUSE_360_OBJECT_MODEL_V1.md](../architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md)                     | Global             | Modelo canonico 360: Cliente, Colaborador, Persona, Space         |

@@ -5,7 +5,7 @@
 > **Creado:** 2026-04-11
 > **Ultima actualizacion:** 2026-04-11
 > **Scope:** Greenhouse y plataformas hermanas del ecosistema Efeonce
-> **Docs relacionados:** `GREENHOUSE_ARCHITECTURE_V1.md`, `GREENHOUSE_REPO_ECOSYSTEM_V1.md`, `GREENHOUSE_KORTEX_VISUAL_PRESET_V1.md`, `TASK-265`, `TASK-039`
+> **Docs relacionados:** `GREENHOUSE_ARCHITECTURE_V1.md`, `GREENHOUSE_REPO_ECOSYSTEM_V1.md`, `GREENHOUSE_KORTEX_VISUAL_PRESET_V1.md`, `GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`, `TASK-265`, `TASK-039`
 
 ---
 

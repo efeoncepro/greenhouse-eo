@@ -42,6 +42,7 @@ Indice maestro de la documentacion no operativa del repo.
 - [Greenhouse_Nomenclatura_Portal_v3.md](architecture/Greenhouse_Nomenclatura_Portal_v3.md)
 - [GREENHOUSE_SCIM_ENTRA_INTEGRATION_V1.md](architecture/GREENHOUSE_SCIM_ENTRA_INTEGRATION_V1.md)
 - [GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md](architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md)
+- [GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md](architecture/GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md)
 - [GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md](architecture/GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md)
 - [12-testing-development.md](architecture/12-testing-development.md)
 
@@ -49,6 +50,7 @@ Indice maestro de la documentacion no operativa del repo.
 
 - [Portal Functional Documentation](documentation/README.md)
 - [Sistema de Observabilidad de Tests](documentation/plataforma/sistema-observabilidad-de-tests.md)
+- [Sister Platform Bindings](documentation/plataforma/sister-platform-bindings.md)
 
 ### API
 
