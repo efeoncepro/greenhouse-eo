@@ -1,11 +1,11 @@
 'use client'
 
 import Box from '@mui/material/Box'
+import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
 import BrandWordmark from './BrandWordmark'
-import GhIcon from './GhIcon'
 
 export type VerificationBadgeLocale = 'es' | 'en'
 
@@ -16,22 +16,28 @@ type VerifiedByEfeonceBadgeProps = {
 
 const SIZE_CONFIG = {
   small: {
-    minHeight: 28,
+    minHeight: 30,
     paddingInline: 10,
+    paddingBlock: 4,
     gap: 6,
     textVariant: 'caption' as const,
-    iconSize: 14,
-    wordmarkHeight: 12,
-    wordmarkMaxWidth: 72
+    iconSize: 15,
+    wordmarkHeight: 13,
+    wordmarkMaxWidth: 72,
+    borderRadius: 6,
+    dividerHeight: 14
   },
   medium: {
-    minHeight: 34,
-    paddingInline: 12,
+    minHeight: 38,
+    paddingInline: 14,
+    paddingBlock: 6,
     gap: 8,
     textVariant: 'body2' as const,
-    iconSize: 16,
-    wordmarkHeight: 14,
-    wordmarkMaxWidth: 84
+    iconSize: 18,
+    wordmarkHeight: 16,
+    wordmarkMaxWidth: 88,
+    borderRadius: 6,
+    dividerHeight: 16
   }
 }
 
@@ -58,37 +64,70 @@ const VerifiedByEfeonceBadge = ({ locale = 'es', size = 'small' }: VerifiedByEfe
       sx={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: config.gap,
+        gap: `${config.gap}px`,
         minHeight: config.minHeight,
         paddingInline: `${config.paddingInline}px`,
-        borderRadius: '8px',
-        border: theme => `1px solid ${alpha(theme.palette.info.main, 0.28)}`,
-        backgroundColor: theme => alpha(theme.palette.info.main, 0.1),
-        color: 'info.main',
-        whiteSpace: 'nowrap'
+        paddingBlock: `${config.paddingBlock}px`,
+        borderRadius: `${config.borderRadius}px`,
+        border: theme => `1.5px solid ${alpha(theme.palette.primary.main, 0.35)}`,
+        backgroundColor: theme => alpha(theme.palette.primary.main, 0.06),
+        whiteSpace: 'nowrap',
+        transition: 'box-shadow 0.2s ease',
+        '&:hover': {
+          boxShadow: theme => `0 0 0 3px ${alpha(theme.palette.primary.main, 0.08)}`
+        }
       }}
     >
-      <GhIcon icon='verified' size={config.iconSize} />
+      {/* Shield icon */}
+      <Box
+        component='span'
+        sx={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: config.iconSize + 6,
+          height: config.iconSize + 6,
+          borderRadius: '50%',
+          backgroundColor: theme => alpha(theme.palette.primary.main, 0.12),
+          color: 'primary.main',
+          flexShrink: 0
+        }}
+      >
+        <i className='tabler-shield-check' style={{ fontSize: config.iconSize }} aria-hidden='true' />
+      </Box>
 
+      {/* Label text */}
       <Typography
         variant={config.textVariant}
         component='span'
         sx={{
-          color: 'info.main',
-          fontWeight: 600,
-          lineHeight: 1.2
+          color: 'text.secondary',
+          fontWeight: 500,
+          lineHeight: 1.2,
+          letterSpacing: '0.01em'
         }}
       >
         {copy.label}
       </Typography>
 
+      {/* Separator */}
+      <Divider
+        orientation='vertical'
+        flexItem
+        sx={{
+          height: config.dividerHeight,
+          alignSelf: 'center',
+          borderColor: theme => alpha(theme.palette.primary.main, 0.2),
+          mx: 0.25
+        }}
+      />
+
+      {/* Brand wordmark */}
       <BrandWordmark
         brand='efeonce'
         height={config.wordmarkHeight}
         maxWidth={config.wordmarkMaxWidth}
-        imgSx={{
-          display: 'block'
-        }}
+        imgSx={{ display: 'block', opacity: 0.85 }}
       />
     </Box>
   )
