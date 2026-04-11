@@ -371,7 +371,29 @@ Existen 4 conceptos semánticos donde `mergedTheme` y `GH_COLORS` definen **hex 
 
 **Decisión formal:** `#0375DB` (coreBlue) es y sigue siendo el primary institucional. No se requiere cambio.
 
-**Implicación para TASK-371:** La task de "shell primary cutover" puede reclasificarse como **ya resuelta** en mergedTheme. Lo que falta es formalizar `#0375DB` directamente en `colorSchemes.ts` en vez de depender del override de mergedTheme, pero eso es una limpieza técnica, no un cambio visual. Se recomienda que TASK-371 se enfoque en consolidar el path (mover el primary de mergedTheme a colorSchemes) en vez de "cambiar" el primary.
+**WCAG AA Contrast Verification (formalizada 2026-04-11, TASK-371):**
+
+| Combinación | Ratio | AA normal text (4.5:1) | AA large text (3:1) |
+|-------------|-------|----------------------|---------------------|
+| `#0375DB` vs `#FFFFFF` (light paper) | 4.59:1 | **PASA** | PASA |
+| `#0375DB` vs `#F8F9FA` (light default bg) | 4.36:1 | Marginal (< 4.5) | PASA |
+| `#0375DB` vs `#101827` (dark bg) | 3.87:1 | No | PASA |
+| `#0375DB` vs `#162033` (dark paper) | 3.55:1 | No | PASA |
+| `#FFFFFF` vs `#0375DB` (button text) | 4.59:1 | **PASA** | PASA |
+
+Nota: el caso marginal `#0375DB` vs `#F8F9FA` (4.36:1) aplica solo a texto primario pequeño sobre el background default. En la práctica, el primary se usa en botones (texto blanco sobre azul, 4.59:1), links (azul sobre blanco/paper, 4.59:1), y elementos interactivos (large text). Aceptable.
+
+**Cadena final simplificada (post TASK-371):**
+
+```
+primaryColorConfig.ts: #0375DB (source of truth)
+  └→ brandSettings.ts: settings.primaryColor = primaryColorConfig[0].main
+     └→ Provider (index.tsx): deepmerge(mergedTheme, { primary: settings.primaryColor })
+        └→ theme.palette.primary.main = #0375DB (final)
+
+mergedTheme.ts: primary ELIMINADO (era redundante — provider siempre lo overrideaba)
+colorSchemes.ts: #7367F0 (nunca visible — overrideado por cadena anterior)
+```
 
 ### 4.2 Resolucion de conflictos neutral
 

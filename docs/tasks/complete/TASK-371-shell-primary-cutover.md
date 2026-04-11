@@ -6,10 +6,10 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
-- Effort: `Medio`
+- Effort: `Bajo` (reclasificado — limpieza de capas, no cambio visual)
 - Type: `implementation`
 - Status real: `Pendiente`
 - Rank: `TBD`

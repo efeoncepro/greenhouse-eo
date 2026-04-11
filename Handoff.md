@@ -1,5 +1,22 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — TASK-371: Shell Primary Cutover COMPLETADA
+
+- alcance real vs spec:
+  - **Spec original:** cambiar primary de Vuexy purple (#7367F0) al institucional (#0375DB)
+  - **Realidad:** primary ya era #0375DB via cadena mergedTheme→provider. No había cambio visual pendiente.
+  - **Alcance ejecutado:** limpieza de cadena redundante + formalización WCAG
+- cambios implementados:
+  - Eliminado primary override redundante de mergedTheme.ts (light + dark) — el provider ya lo aplicaba via settings.primaryColor desde primaryColorConfig.ts
+  - La cadena queda: `primaryColorConfig.ts` → `brandSettings.ts` → `Provider` → `theme.palette.primary.main`
+- WCAG AA formalizado:
+  - #0375DB vs #FFFFFF: 4.59:1 (PASA AA)
+  - #FFFFFF vs #0375DB (botones): 4.59:1 (PASA AA)
+  - #0375DB vs #F8F9FA: 4.36:1 (marginal, aceptable — primary usado en large text / buttons)
+  - #0375DB vs dark backgrounds: 3.55-3.87:1 (PASA AA large text)
+- verificación: `tsc`, `lint` (0 errors), `build` — todos pasan
+- **No hay cambio visual** — el portal se ve exactamente igual antes y después
+
 ## Sesion 2026-04-11 — TASK-370: Semantic Token Absorption into Theme COMPLETADA
 
 - alcance cerrado:

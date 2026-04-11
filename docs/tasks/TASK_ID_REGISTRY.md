@@ -420,5 +420,5 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-368` | `complete` | Theme Token Audit & Decision Contract | `docs/tasks/complete/TASK-368-theme-token-audit-decision-contract.md` |
 | `TASK-369` | `complete` | Hardcoded Hex Cleanup | `docs/tasks/complete/TASK-369-theme-hardcoded-hex-cleanup.md` |
 | `TASK-370` | `complete` | Semantic Token Absorption into Theme | `docs/tasks/complete/TASK-370-semantic-token-absorption-into-theme.md` |
-| `TASK-371` | `to-do` | Shell Primary Cutover | `docs/tasks/to-do/TASK-371-shell-primary-cutover.md` |
+| `TASK-371` | `complete` | Shell Primary Cutover | `docs/tasks/complete/TASK-371-shell-primary-cutover.md` |
 | `TASK-372` | `to-do` | Kortex Visual Preset Documentation | `docs/tasks/to-do/TASK-372-kortex-visual-preset-documentation.md` |
