@@ -19,6 +19,11 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-04-11
+
+- TASK-313 completada — ahora existe: estados de verificación (`self_declared`, `pending_review`, `verified`, `rejected`) en skills y certificaciones, APIs admin `verify`/`unverify` para skills, `VerifiedByEfeonceBadge` como componente shared, `verified_by`/`verified_at` en member_skills
+- Impacto: el modelo de estados base y el badge ya existen; esta task escala hacia review queue admin, expiración/revalidación de certificaciones y auditoría formal — ya no necesita crear el state model desde cero
+
 ## Summary
 
 Implementar la capa de confianza del perfil profesional: verificación `Verificado por Efeonce`, estados operativos, expiración de certificaciones, cola de revisión admin y auditoría de quién validó qué. Esta task convierte el perfil en señal confiable, no solo en autodeclaración.

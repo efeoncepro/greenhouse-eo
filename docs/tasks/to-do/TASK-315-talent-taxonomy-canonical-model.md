@@ -19,6 +19,11 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-04-11
+
+- TASK-313 completada — ahora existe: `skill_catalog`, `member_skills` con columna `visibility` (internal/client_visible), tabla `member_certifications` con issuer/expiry/evidence, `social_links` en team_members, servicio `src/lib/hr-core/certifications.ts`, tipos en `src/types/hr-core.ts`
+- Impacto: la separación skill vs certificación vs links profesionales ya tiene storage y readers base; esta task amplía y formaliza la taxonomía pero ya no parte de cero — herramientas, especialidades e idiomas siguen siendo el gap principal
+
 ## Summary
 
 Formalizar el modelo canónico del perfil profesional para separar `skills`, `herramientas`, `certificaciones`, `especialidades`, `idiomas`, links profesionales y datos de presentación. Esta task evita que el sistema escale sobre arrays legacy ambiguos y prepara search, trust y client-safe surfacing.

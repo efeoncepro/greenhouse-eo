@@ -19,6 +19,11 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-04-11
+
+- TASK-313 completada — ahora existe: campo `visibility` (internal/client_visible) en `member_skills`, reader de perfil profesional en skills y certifications services, `ProfessionalLinksCard` con social links tipados, `AboutMeCard` con headline/bio
+- Impacto: la columna `visibility` ya modela la distinción internal vs client_visible; esta task formaliza el reader client-safe y la surface, pero el contrato de datos base ya existe
+
 ## Summary
 
 Construir perfiles profesionales cliente-safe donde solo salgan skills, certificaciones y señales aprobadas para consumo externo, incluyendo badge `Verificado por Efeonce`, evidencia seleccionada y narrativa profesional legible. Esta task aterriza la cara visible del talento hacia clientes o stakeholders externos.

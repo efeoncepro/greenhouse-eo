@@ -2,6 +2,21 @@
 
 ## 2026-04-11
 
+### 2026-04-11 — TASK-313: Skills y certificaciones — perfil profesional, verificación Efeonce y CRUD
+
+- **3 migraciones aplicadas**: social links en `members` (7 URLs + `about_me`), `visibility` en `member_skills`, tabla `member_certifications` con verificación y FK a assets
+- **Servicio de certificaciones**: CRUD + verificación/rechazo + eventos outbox en `src/lib/hr-core/certifications.ts`
+- **Skills extendido**: funciones self-service (upsert, remove, verify, unverify sin space), visibility field
+- **10 API routes**: self-service (`/api/my/skills`, `/api/my/certifications`, `/api/my/professional-links`) + admin con verificación
+- **4 componentes UI**: `SkillsCertificationsTab` (modo self/admin), `CertificatePreviewDialog`, `ProfessionalLinksCard`, `AboutMeCard`
+- **Integración**: nueva tab "Skills y certificaciones" en `/my/profile` y `/admin/users/[id]`
+- **Assets**: contexto `certification_draft`/`certification` con retención `hr_certification` y access control
+- **Nomenclatura**: sección `GH_SKILLS_CERTS` con todos los labels en español
+- **Badge**: reutiliza `VerifiedByEfeonceBadge` e iconos `BrandLogo` existentes
+- **Política de visibilidad**: `internal` (self+admin) vs `client_visible` (requiere verified)
+- **Docs actualizados**: `GREENHOUSE_UI_PLATFORM_V1.md`, `Greenhouse_HRIS_Architecture_v1.md`
+- **Cross-impact**: delta notes en 9 tasks downstream (TASK-314 a TASK-320, TASK-332, TASK-334)
+
 ### 2026-04-11 — Persona vs entidad legal formalizado para compensación ejecutiva y cuenta accionista
 
 - Se agregó una spec de arquitectura para modelar relaciones explícitas `persona ↔ entidad legal` sin colgarlas de `user`, `member` o `space`.

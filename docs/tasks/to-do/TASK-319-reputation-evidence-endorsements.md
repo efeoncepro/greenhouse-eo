@@ -19,6 +19,11 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-04-11
+
+- TASK-313 completada — ahora existe: evidencia de certificaciones vía assets privados con `CertificatePreviewDialog` (PDF/imagen embebido), `VerifiedByEfeonceBadge` como señal de confianza reutilizable, campo `credential_url` en certifications
+- Impacto: la evidencia documental de certificaciones y el badge de verificación ya son componentes reusables; esta task extiende hacia endorsements internos, highlights de proyecto y evidence layer más amplia
+
 ## Summary
 
 Agregar la capa de reputación del talento: evidencia de trabajo, endorsements internos, highlights reutilizables y señales de credibilidad más allá de la autodeclaración. Esta task hace que el perfil profesional se sienta más cercano a un marketplace serio y menos a una ficha administrativa.

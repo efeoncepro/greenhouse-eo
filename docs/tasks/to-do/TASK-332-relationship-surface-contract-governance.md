@@ -21,6 +21,11 @@
 - Legacy ID: `follow-on de la semantica documentada el 2026-04-11`
 - GitHub Issue: `none`
 
+## Delta 2026-04-11
+
+- TASK-313 completada — modifico `MyProfileView.tsx` y `GreenhouseAdminUserDetail.tsx` agregando tab `Skills y certificaciones`, `ProfessionalLinksCard` y `AboutMeCard`
+- Impacto: las surfaces listadas en "Already exists" (`MyProfileView`, admin user detail) ahora tienen tabs adicionales; cualquier rediseño relacional debe considerar la nueva estructura de tabs del perfil
+
 ## Summary
 
 Formalizar el contrato portal-wide para las relaciones entre personas de Efeonce: `estructura interna`, `equipos operativos`, `trabajo puntual` y `capacidad extendida`. La task define qué superficie consume cada capa, qué módulos la administran y qué labels quedan prohibidos por ambiguos para evitar que `Mi Perfil`, `People`, `Mi equipo`, `Org Chart` y directorios internos reinventen la misma lógica.

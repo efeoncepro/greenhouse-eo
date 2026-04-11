@@ -21,6 +21,11 @@
 - Legacy ID: `follow-on de TASK-332 y TASK-333`
 - GitHub Issue: `none`
 
+## Delta 2026-04-11
+
+- TASK-313 completada — modifico `MyProfileView.tsx` y `GreenhouseAdminUserDetail.tsx` con nuevos tabs y cards (SkillsCertificationsTab, ProfessionalLinksCard, AboutMeCard); la estructura de tabs del perfil ya no es la misma que cuando se creo esta task
+- Impacto: el Slice 1 (superficies personales) debe considerar la nueva layout de tabs; cualquier reestructuracion de `Mi Perfil` debe preservar o integrar los componentes profesionales recien agregados
+
 ## Summary
 
 Rediseñar las surfaces que muestran o administran relaciones humanas para consumir la semántica compartida del portal. La task aterriza esa separación en `Mi Perfil`, `Mi organización`, `People`, `Mi equipo` y entry points administrativos hacia `Jerarquía`, `Departamentos`, lanes de assignments y `Staff Augmentation`, evitando que la lógica viva solo en una tab local o en labels ambiguos como `Colegas`.

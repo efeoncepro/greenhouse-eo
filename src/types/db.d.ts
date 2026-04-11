@@ -423,11 +423,47 @@ export interface GreenhouseCoreIdentityProfileSourceLinks {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCoreMemberCertifications {
+  /**
+   * FK to assets — PDF/image evidence uploaded via private assets
+   */
+  asset_id: string | null;
+  certification_id: string;
+  created_at: Generated<Timestamp>;
+  expiry_date: Timestamp | null;
+  issued_date: Timestamp | null;
+  issuer: string;
+  member_id: string;
+  name: string;
+  notes: string | null;
+  rejection_reason: string | null;
+  updated_at: Generated<Timestamp>;
+  validation_url: string | null;
+  /**
+   * self_declared → pending_review → verified|rejected
+   */
+  verification_status: Generated<string>;
+  verified_at: Timestamp | null;
+  verified_by: string | null;
+  /**
+   * internal (self+admin) or client_visible (requires verified status)
+   */
+  visibility: Generated<string>;
+}
+
 export interface GreenhouseCoreMembers {
+  /**
+   * Free-text professional bio (Sobre mi)
+   */
+  about_me: string | null;
   active: Generated<boolean>;
   assignable: Generated<boolean>;
   avatar_url: string | null;
   azure_oid: string | null;
+  /**
+   * Behance portfolio URL
+   */
+  behance_url: string | null;
   biography: string | null;
   birth_date: Timestamp | null;
   contact_channel: string | null;
@@ -439,10 +475,18 @@ export interface GreenhouseCoreMembers {
   deel_contract_id: string | null;
   department_id: string | null;
   display_name: string;
+  /**
+   * Dribbble portfolio URL
+   */
+  dribbble_url: string | null;
   efeonce_start_date: Timestamp | null;
   email_aliases: string[] | null;
   employment_type: string | null;
   first_name: string | null;
+  /**
+   * GitHub profile URL
+   */
+  github_url: string | null;
   hire_date: Timestamp | null;
   hubspot_owner_id: string | null;
   identity_profile_id: string | null;
@@ -450,6 +494,10 @@ export interface GreenhouseCoreMembers {
   languages: string[] | null;
   last_name: string | null;
   legal_name: string | null;
+  /**
+   * LinkedIn profile URL
+   */
+  linkedin_url: string | null;
   location_city: string | null;
   location_country: string | null;
   member_id: string;
@@ -459,6 +507,10 @@ export interface GreenhouseCoreMembers {
   pay_regime: Generated<string>;
   payroll_via: Generated<string>;
   phone: string | null;
+  /**
+   * Personal portfolio or website URL
+   */
+  portfolio_url: string | null;
   preferred_name: string | null;
   primary_email: string | null;
   prior_work_years: Generated<Numeric>;
@@ -472,7 +524,15 @@ export interface GreenhouseCoreMembers {
   slack_user_id: string | null;
   status: Generated<string>;
   teams_user_id: string | null;
+  /**
+   * Threads profile URL
+   */
+  threads_url: string | null;
   time_zone: string | null;
+  /**
+   * X/Twitter profile URL
+   */
+  twitter_url: string | null;
   updated_at: Generated<Timestamp>;
   years_experience: Numeric | null;
 }
@@ -487,6 +547,10 @@ export interface GreenhouseCoreMemberSkills {
   updated_at: Generated<Timestamp>;
   verified_at: Timestamp | null;
   verified_by: string | null;
+  /**
+   * Audience: internal (self+admin only) or client_visible (requires verification)
+   */
+  visibility: Generated<string>;
 }
 
 export interface GreenhouseCoreNotionWorkspaces {
@@ -3818,6 +3882,7 @@ export interface DB {
   "greenhouse_core.entity_source_links": GreenhouseCoreEntitySourceLinks;
   "greenhouse_core.identity_profile_source_links": GreenhouseCoreIdentityProfileSourceLinks;
   "greenhouse_core.identity_profiles": GreenhouseCoreIdentityProfiles;
+  "greenhouse_core.member_certifications": GreenhouseCoreMemberCertifications;
   "greenhouse_core.member_skills": GreenhouseCoreMemberSkills;
   "greenhouse_core.members": GreenhouseCoreMembers;
   "greenhouse_core.notion_workspace_source_bindings": GreenhouseCoreNotionWorkspaceSourceBindings;

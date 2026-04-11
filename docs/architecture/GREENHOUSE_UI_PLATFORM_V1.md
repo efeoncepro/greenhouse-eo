@@ -10,6 +10,56 @@
 
 Greenhouse EO es un portal Next.js 16 App Router con MUI 7.x envuelto por el starter-kit Vuexy. Este documento es la referencia canónica de la plataforma UI: stack, librerías disponibles, patrones de componentes, convenciones de estado, y reglas de adopción.
 
+## Delta 2026-04-11 — Professional profile patterns and certificate preview (TASK-313)
+
+### SkillsCertificationsTab (shared component, dual-mode)
+
+`src/views/greenhouse/hr/certifications/SkillsCertificationsTab.tsx` is a shared tab component used in both self-service (`/my/profile`) and admin (`/people/:slug`) contexts.
+
+| Mode | Trigger | Capabilities |
+|------|---------|-------------|
+| `self` | User views own profile | Add/edit/delete own certifications, upload certificate file |
+| `admin` | HR/admin views a member | All of the above + verification workflow (verify/reject) |
+
+Mode is resolved at render time via props, not via route. The same component renders in both contexts with conditional actions.
+
+### CertificatePreviewDialog
+
+`src/views/greenhouse/hr/certifications/CertificatePreviewDialog.tsx` — dialog for inline preview of uploaded certificate files.
+
+| File type | Render strategy |
+|-----------|----------------|
+| PDF (`application/pdf`) | `<iframe>` with `src={signedUrl}` inside `DialogContent` |
+| Image (`image/*`) | `<img>` with `object-fit: contain` |
+| Other | Download link fallback |
+
+Pattern: `Dialog maxWidth='md' fullWidth` with `DialogContent sx={{ minHeight: 400 }}`. The signed URL is fetched on dialog open, not pre-fetched.
+
+### ProfessionalLinksCard and AboutMeCard
+
+Two sidebar cards for the professional profile section of My Profile and Person Detail:
+
+- **ProfessionalLinksCard** — renders social/professional links (LinkedIn, GitHub, Behance, Dribbble, portfolio, Twitter, Threads) as icon buttons. Only links with a non-empty URL are rendered. Edit mode shows `TextField` inputs per link.
+- **AboutMeCard** — renders the `about_me` free-text field as a read-only card with an edit dialog. Markdown is not supported; plain text with line breaks.
+
+Both cards reuse `CustomAvatar`, `CustomIconButton`, and the Card+CardContent Vuexy pattern.
+
+### Reuse of VerifiedByEfeonceBadge and BrandLogo
+
+`VerifiedByEfeonceBadge` — compact badge (`Chip` variant) used in certification cards to indicate verification status. States: `verified` (success), `pending_review` (warning), `rejected` (error), `self_declared` (default/muted).
+
+`BrandLogo` — resolves issuer name to a known brand logo. Used in certification cards to display a recognizable issuer icon alongside the certification name. Falls back to a generic certificate icon when the issuer is not in the known-brands catalog.
+
+### Key files
+
+| File | Purpose |
+|------|---------|
+| `src/views/greenhouse/hr/certifications/SkillsCertificationsTab.tsx` | Shared certifications tab (self/admin) |
+| `src/views/greenhouse/hr/certifications/CertificatePreviewDialog.tsx` | PDF/image inline preview dialog |
+| `src/views/greenhouse/hr/certifications/CertificationCard.tsx` | Individual certification card with status badge |
+| `src/views/greenhouse/people/cards/ProfessionalLinksCard.tsx` | Social/professional links sidebar card |
+| `src/views/greenhouse/people/cards/AboutMeCard.tsx` | About me free-text sidebar card |
+
 ## Delta 2026-04-10 — Org chart explorer visual stack (TASK-329)
 
 ### Decisión de librería

@@ -1,5 +1,85 @@
 # Greenhouse HRIS Architecture V1
 
+## Delta 2026-04-11 — Certifications aggregate and professional profile fields (TASK-313)
+
+### Certifications data model
+
+`greenhouse_core.member_certifications` is now materialized as a first-class aggregate attached to members.
+
+```sql
+CREATE TABLE greenhouse_core.member_certifications (
+  certification_id    TEXT PRIMARY KEY,
+  member_id           TEXT NOT NULL REFERENCES greenhouse_core.members(member_id),
+  name                TEXT NOT NULL,
+  issuer              TEXT,
+  issued_date         DATE,
+  expiry_date         DATE,
+  validation_url      TEXT,
+  asset_id            TEXT REFERENCES greenhouse_core.assets(asset_id),
+  visibility          VARCHAR(20) NOT NULL DEFAULT 'internal',
+    -- 'internal' | 'client_visible'
+  verification_status VARCHAR(20) NOT NULL DEFAULT 'self_declared',
+    -- 'self_declared' | 'pending_review' | 'verified' | 'rejected'
+  verified_by         TEXT,
+  verified_at         TIMESTAMPTZ,
+  rejection_reason    TEXT,
+  notes               TEXT,
+  created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+```
+
+### Verification workflow
+
+State machine: `self_declared` → `pending_review` → `verified` | `rejected`.
+
+- Collaborator creates a certification → status is `self_declared`.
+- When a certificate file is uploaded (via `GreenhouseFileUploader` with `certification_draft` context), status transitions to `pending_review`.
+- HR/admin verifies → `verified` (records `verified_by`, `verified_at`).
+- HR/admin rejects → `rejected` (records `rejection_reason`).
+- Collaborator can edit and resubmit a rejected certification, which resets status to `pending_review`.
+
+### Visibility policy
+
+| Visibility | Who can see | Constraint |
+|-----------|------------|------------|
+| `internal` | Self + HR/admin | Default. No verification required. |
+| `client_visible` | Self + HR/admin + client-facing surfaces | Requires `verification_status = 'verified'`. API enforces this — setting `client_visible` on a non-verified certification is rejected. |
+
+### Asset integration
+
+Certificate files are uploaded via `GreenhouseFileUploader` with context `certification_draft`. The resulting `asset_id` (from `greenhouse_core.assets`) is stored as FK on the certification row. Preview uses signed GCS URLs fetched on demand.
+
+### API routes
+
+| Route | Method | Purpose |
+|-------|--------|---------|
+| `/api/my/certifications` | GET, POST, PUT, DELETE | Self-service CRUD for the authenticated user's certifications |
+| `/api/hr/core/members/[memberId]/certifications` | GET, POST, PUT, DELETE | Admin CRUD for any member. Includes verification actions (verify/reject). |
+
+### Social link and about_me columns on members
+
+The following columns were added to `greenhouse_core.members` for the professional profile:
+
+```sql
+linkedin_url    TEXT,
+portfolio_url   TEXT,
+twitter_url     TEXT,
+threads_url     TEXT,
+behance_url     TEXT,
+github_url      TEXT,
+dribbble_url    TEXT,
+about_me        TEXT
+```
+
+These are self-service editable via `/api/my/profile` and admin-editable via the existing member update routes. No verification workflow — they are informational fields.
+
+### Decisions
+
+15. **Certifications live in `greenhouse_core`, not `greenhouse_hr`** — they are a property of the canonical identity, not an HR-only concern. Client-facing surfaces (Staff Aug compliance, talent profiles) consume them directly.
+16. **Visibility enforcement is API-side** — the database stores the requested visibility; the API rejects `client_visible` if not verified.
+17. **Social links are plain columns on `members`, not a separate table** — the set of supported platforms is small and stable. No EAV pattern needed.
+
 ## Delta 2026-04-10 — supervisor workspace materialized for team follow-up and approvals (TASK-328)
 
 La navegación HR ya no debe leerse solo como arquitectura target para supervisors.
@@ -119,7 +199,7 @@ For reporting hierarchy operations, the dedicated management surface is `HR > /h
 - Leave management with approval workflows
 - Attendance tracking (Teams webhook integration)
 - Organizational structure (departments, reporting hierarchy)
-- Collaborator profiles (personal data, professional profile, performance history)
+- Collaborator profiles (personal data, professional profile, certifications, social links, performance history)
 - Document vault (contracts, certificates, compliance docs)
 - Onboarding and offboarding checklists
 - Expense reports with approval workflows
@@ -843,6 +923,9 @@ These are explicitly out of scope but documented for completeness:
 12. **Staff Aug cost_rate derives from Payroll compensation, not an independent field** — margin = billing_rate (Staff Aug) - cost_rate (Payroll)
 13. **HRIS onboarding and Staff Aug onboarding are sequential, not overlapping** — HRIS = entry to Efeonce, Staff Aug = placement into client
 14. **Document Vault controls confidentiality; Staff Aug respects it** — only non-confidential docs of types `contrato`, `nda`, `certificado` surface in client-facing compliance view
+15. **Certifications live in `greenhouse_core`, not `greenhouse_hr`** — they are a property of the canonical identity, not an HR-only concern
+16. **Certification visibility enforcement is API-side** — the database stores the requested visibility; the API rejects `client_visible` if not verified
+17. **Social links are plain columns on `members`, not a separate table** — the set of supported platforms is small and stable
 
 ---
 
@@ -852,6 +935,7 @@ These are explicitly out of scope but documented for completeness:
 |---|---|---|
 | 2026-03-21 | v1.0 | Initial architecture — contract taxonomy, module inventory, data model, navigation, roadmap |
 | 2026-03-21 | v1.1 | Added §8.6 Staff Augmentation integration (6 points), added decisions 11-14 |
+| 2026-04-11 | v1.2 | Added certifications aggregate (`member_certifications`), verification workflow, visibility policy, social link columns on members, decisions 15-17 (TASK-313) |
 
 ---
 

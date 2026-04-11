@@ -19,6 +19,11 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-04-11
+
+- TASK-313 completada — ahora existe: `member_certifications` con `expiry_date` queryable, `member_skills` con `verification_status` y `updated_at`, 10 API routes con datos suficientes para construir métricas de completitud, pendientes de verificación y certificaciones por vencer
+- Impacto: las tablas base para analytics de completitud y expiración ya existen; esta task puede diseñar queries y dashboards sobre data real en vez de esperar storage
+
 ## Summary
 
 Agregar la capa operativa que mantiene vivo el sistema de talento: analytics de completitud, backlog de revisión, certificados por vencer, perfiles desactualizados y automatizaciones de recordatorio o mantenimiento. Esta task evita que el módulo se degrade con el tiempo.

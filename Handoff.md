@@ -15,7 +15,12 @@
   - **Badge**: reutiliza `VerifiedByEfeonceBadge` existente
 - política de visibilidad: `internal` (self+admin) vs `client_visible` (requiere verified)
 - verificación: `pnpm lint` ✓, `tsc --noEmit` ✓ (1 error pre-existente), `pnpm build` ✓
-- pendiente: ejecutar migraciones (`pnpm migrate:up`) contra Cloud SQL y regenerar `db.d.ts`
+- migraciones aplicadas: 3/3 contra Cloud SQL, `db.d.ts` regenerado (181 tablas)
+- docs de arquitectura actualizados:
+  - `GREENHOUSE_UI_PLATFORM_V1.md` — patrón de perfil profesional + preview embebido
+  - `Greenhouse_HRIS_Architecture_v1.md` — agregado de certificaciones, social links, verificación
+- cross-impact: delta notes aplicados a 9 tasks (TASK-314 a TASK-320, TASK-332, TASK-334)
+- **STATUS: COMPLETE** — task movida a `docs/tasks/complete/`
 
 ## Sesion 2026-04-11 — contrato arquitectónico persona ↔ entidad legal para CCA y compensación ejecutiva
 

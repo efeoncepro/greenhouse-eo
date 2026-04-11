@@ -19,6 +19,11 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-04-11
+
+- TASK-313 completada — ahora existe: `member_skills` y `member_certifications` con datos queryables (seniority, verification_status, visibility, issuer, expiry_date), readers en `src/lib/hr-core/certifications.ts` y skills service extendido con funciones de lectura
+- Impacto: las tablas base para búsqueda y filtrado ya existen con señal de verificación y seniority; esta task puede construir search/ranking sobre data real en vez de diseñar storage
+
 ## Summary
 
 Crear la capa interna de descubrimiento de talento: búsqueda, filtros y ranking sobre perfiles profesionales verificados, integrando skills, certificaciones, herramientas y disponibilidad operativa. El objetivo es que staffing y operaciones puedan encontrar a la persona correcta rápidamente.

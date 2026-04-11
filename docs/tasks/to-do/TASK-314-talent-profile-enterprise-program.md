@@ -19,6 +19,11 @@
 - Legacy ID: `programa follow-on de TASK-157 y TASK-313`
 - GitHub Issue: `none`
 
+## Delta 2026-04-11
+
+- TASK-313 completada — ahora existe: 3 migraciones (social links, visibility en member_skills, member_certifications), servicio CRUD de certificaciones, 10 API routes (self-service + admin), tabs SkillsCertificationsTab y ProfessionalLinksCard en `/my/profile` y `/admin/users/[id]`
+- Impacto: la fundación del programa (Slice 1) ya tiene su primera child task cerrada; TASK-315 y TASK-316 pueden avanzar sin blocker de TASK-313
+
 ## Summary
 
 Coordinar la evolución del perfil profesional de Greenhouse desde una base de `skills y certificaciones` hacia una capability enterprise de talento: taxonomía canónica, verificación `Verificado por Efeonce`, discovery interno, perfiles cliente-safe, reputación/evidencia y analítica operativa.
