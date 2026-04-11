@@ -289,7 +289,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         label: 'Finanzas',
         icon: 'tabler-report-money',
         children: [
-          // Flujo submenu
+          // Flujo operativo submenu (business operations: sales, purchases, masters)
           {
             label: nl(GH_FINANCE_NAV.flow),
             icon: 'tabler-arrows-exchange',
@@ -298,31 +298,31 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               { label: nl(GH_FINANCE_NAV.income), href: '/finance/income' },
               { label: nl(GH_FINANCE_NAV.expenses), href: '/finance/expenses' },
               { label: nl(GH_FINANCE_NAV.clients), href: '/finance/clients' },
-              { label: nl(GH_FINANCE_NAV.suppliers), href: '/finance/suppliers' },
-              { label: nl(GH_FINANCE_NAV.cashIn), href: '/finance/cash-in' },
-              { label: nl(GH_FINANCE_NAV.cashOut), href: '/finance/cash-out' }
+              { label: nl(GH_FINANCE_NAV.suppliers), href: '/finance/suppliers' }
             ].filter(item => {
               if (item.href === '/finance') return canSeeView('finanzas.resumen', true)
               if (item.href === '/finance/income') return canSeeView('finanzas.ingresos', true)
               if (item.href === '/finance/expenses') return canSeeView('finanzas.egresos', true)
               if (item.href === '/finance/clients') return canSeeView('finanzas.clientes', true)
               if (item.href === '/finance/suppliers') return canSeeView('finanzas.proveedores', true)
-              if (item.href === '/finance/cash-in') return canSeeView('finanzas.ingresos', true)
-              if (item.href === '/finance/cash-out') return canSeeView('finanzas.egresos', true)
 
               return true
             })
           },
 
-          // Tesorería submenu
+          // Tesorería submenu (cash operations: collections, payments, bank, positions)
           {
             label: nl(GH_FINANCE_NAV.treasury),
             icon: 'tabler-building-bank',
             children: [
+              { label: nl(GH_FINANCE_NAV.cashIn), href: '/finance/cash-in' },
+              { label: nl(GH_FINANCE_NAV.cashOut), href: '/finance/cash-out' },
               { label: nl(GH_FINANCE_NAV.bank), href: '/finance/bank' },
               { label: nl(GH_FINANCE_NAV.shareholderAccount), href: '/finance/shareholder-account' },
               { label: nl(GH_FINANCE_NAV.cashPosition), href: '/finance/cash-position' }
             ].filter(item => {
+              if (item.href === '/finance/cash-in') return canSeeView('finanzas.ingresos', true)
+              if (item.href === '/finance/cash-out') return canSeeView('finanzas.egresos', true)
               if (item.href === '/finance/bank') return canSeeView('finanzas.banco', canSeeBankTreasury)
               if (item.href === '/finance/shareholder-account') return canSeeView('finanzas.cuenta_corriente_accionista', canSeeBankTreasury)
               if (item.href === '/finance/cash-position') return canSeeView('finanzas.resumen', true)

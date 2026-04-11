@@ -75,7 +75,7 @@ export const GH_FINANCE_NAV = {
   hes: { label: 'HES', subtitle: 'Hojas de entrada de servicio' },
   clients: { label: 'Clientes', subtitle: 'Maestro de clientes y coberturas' },
   costAllocations: { label: 'Asignaciones', subtitle: 'Reparto e imputación de costos' },
-  flow: { label: 'Caja', subtitle: 'Cobros, pagos y cuentas' },
+  flow: { label: 'Flujo operativo', subtitle: 'Ventas, compras y maestros' },
   cashIn: { label: 'Cobros', subtitle: 'Pagos recibidos contra facturas de venta' },
   cashOut: { label: 'Pagos', subtitle: 'Pagos ejecutados contra compromisos' },
   bank: { label: 'Banco', subtitle: 'Tesorería por cuenta, fintech e instrumentos' },
@@ -83,7 +83,7 @@ export const GH_FINANCE_NAV = {
   cashPosition: { label: 'Posición de caja', subtitle: 'Saldo real, cuentas por cobrar y por pagar' },
   documents: { label: 'Documentos', subtitle: 'Cotizaciones, OC, HES y conciliación' },
   analytics: { label: 'Inteligencia', subtitle: 'Economía y asignaciones de costos' },
-  treasury: { label: 'Tesorería', subtitle: 'Banco, cuenta accionista y posición de caja' }
+  treasury: { label: 'Tesorería', subtitle: 'Cobros, pagos, banco y posición de caja' }
 } as const
 
 export const GH_HR_NAV = {
