@@ -361,6 +361,7 @@ const HrOrgChartView = () => {
 
   const focusNodeName = selectedMember?.displayName ?? 'Selecciona una persona'
   const canOpenPeople = Boolean(selectedMember)
+  const chartEdgeColor = theme.palette.text.secondary
 
   const structureChart = useMemo(() => {
     if (!payload) {
@@ -372,9 +373,9 @@ const HrOrgChartView = () => {
       edges: payload.edges,
       focusedNodeId: activeFocusNodeId,
       onFocusMember: handleFocusMember,
-      edgeColor: theme.palette.text.secondary
+      edgeColor: chartEdgeColor
     })
-  }, [activeFocusNodeId, handleFocusMember, payload])
+  }, [activeFocusNodeId, chartEdgeColor, handleFocusMember, payload])
 
   const leadershipView = useMemo(() => {
     if (!payload) {
@@ -393,9 +394,9 @@ const HrOrgChartView = () => {
       edges: leadershipView.edges,
       focusedNodeId: leadershipView.focusNodeId,
       onFocusMember: handleFocusMember,
-      edgeColor: theme.palette.text.secondary
+      edgeColor: chartEdgeColor
     })
-  }, [handleFocusMember, leadershipView.edges, leadershipView.focusNodeId, leadershipView.nodes])
+  }, [chartEdgeColor, handleFocusMember, leadershipView.edges, leadershipView.focusNodeId, leadershipView.nodes])
 
   const selectedLeaderNode = useMemo(() => {
     if (!selectedMember) {
