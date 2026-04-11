@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import Box from '@mui/material/Box'
+import CircularProgress from '@mui/material/CircularProgress'
 import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
@@ -25,7 +26,54 @@ const CertificatePreviewDialog = ({
   assetMimeType,
   certificationName
 }: CertificatePreviewDialogProps) => {
-  const [imageError, setImageError] = useState(false)
+  const [blobUrl, setBlobUrl] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(false)
+
+  const fetchBlob = useCallback(async () => {
+    if (!assetDownloadUrl || !open) return
+
+    setLoading(true)
+    setError(false)
+
+    try {
+      const res = await fetch(assetDownloadUrl, { credentials: 'include' })
+
+      if (!res.ok) throw new Error('fetch failed')
+
+      const blob = await res.blob()
+
+      setBlobUrl(URL.createObjectURL(blob))
+    } catch {
+      setError(true)
+    } finally {
+      setLoading(false)
+    }
+  }, [assetDownloadUrl, open])
+
+  useEffect(() => {
+    if (open && assetDownloadUrl) {
+      fetchBlob()
+    }
+
+    return () => {
+      if (blobUrl) {
+        URL.revokeObjectURL(blobUrl)
+        setBlobUrl(null)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, assetDownloadUrl])
+
+  const handleClose = () => {
+    if (blobUrl) {
+      URL.revokeObjectURL(blobUrl)
+      setBlobUrl(null)
+    }
+
+    setError(false)
+    onClose()
+  }
 
   const renderContent = () => {
     if (!assetDownloadUrl || !assetMimeType) {
@@ -51,14 +99,58 @@ const CertificatePreviewDialog = ({
       )
     }
 
-    if (assetMimeType.startsWith('image/') && !imageError) {
+    if (loading) {
+      return (
+        <Stack alignItems='center' justifyContent='center' sx={{ py: 8 }}>
+          <CircularProgress />
+          <Typography variant='body2' color='text.secondary' sx={{ mt: 2 }}>
+            Cargando vista previa...
+          </Typography>
+        </Stack>
+      )
+    }
+
+    if (error || !blobUrl) {
+      return (
+        <Stack alignItems='center' justifyContent='center' spacing={2} sx={{ py: 8 }}>
+          <Box
+            sx={{
+              width: 56,
+              height: 56,
+              borderRadius: '50%',
+              display: 'grid',
+              placeItems: 'center',
+              bgcolor: 'action.hover',
+              color: 'text.secondary'
+            }}
+          >
+            <i className='tabler-file-description text-[28px]' />
+          </Box>
+          <Typography variant='body1' color='text.secondary'>
+            No se pudo cargar la vista previa.
+          </Typography>
+          <Typography
+            component='a'
+            href={assetDownloadUrl}
+            target='_blank'
+            rel='noreferrer'
+            variant='body2'
+            color='primary'
+            sx={{ textDecoration: 'underline' }}
+          >
+            Descargar archivo
+          </Typography>
+        </Stack>
+      )
+    }
+
+    if (assetMimeType.startsWith('image/')) {
       return (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
           <Box
             component='img'
-            src={assetDownloadUrl}
+            src={blobUrl}
             alt={`Certificado: ${certificationName}`}
-            onError={() => setImageError(true)}
             sx={{
               maxWidth: '100%',
               maxHeight: '70vh',
@@ -74,7 +166,7 @@ const CertificatePreviewDialog = ({
       return (
         <Box
           component='iframe'
-          src={assetDownloadUrl}
+          src={blobUrl}
           title={`Certificado: ${certificationName}`}
           sx={{
             width: '100%',
@@ -86,7 +178,6 @@ const CertificatePreviewDialog = ({
       )
     }
 
-    // Fallback for unsupported mime types or image load error
     return (
       <Stack alignItems='center' justifyContent='center' spacing={2} sx={{ py: 8 }}>
         <Box
@@ -123,7 +214,7 @@ const CertificatePreviewDialog = ({
   return (
     <Dialog
       open={open}
-      onClose={onClose}
+      onClose={handleClose}
       fullWidth
       maxWidth='md'
       aria-labelledby='certificate-preview-title'
@@ -135,7 +226,7 @@ const CertificatePreviewDialog = ({
         <Typography variant='h6' component='span' noWrap sx={{ flex: 1 }}>
           {certificationName}
         </Typography>
-        <IconButton onClick={onClose} aria-label='Cerrar vista previa' size='small'>
+        <IconButton onClick={handleClose} aria-label='Cerrar vista previa' size='small'>
           <i className='tabler-x' />
         </IconButton>
       </DialogTitle>
