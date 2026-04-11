@@ -27,6 +27,7 @@ import Typography from '@mui/material/Typography'
 
 import VerifiedByEfeonceBadge from '@/components/greenhouse/VerifiedByEfeonceBadge'
 import CertificatePreviewDialog from '@/components/greenhouse/CertificatePreviewDialog'
+import GreenhouseFileUploader, { type UploadedFileValue } from '@/components/greenhouse/GreenhouseFileUploader'
 import ProfessionalLinksCard from '@/components/greenhouse/ProfessionalLinksCard'
 import AboutMeCard from '@/components/greenhouse/AboutMeCard'
 import BrandLogo from '@/components/greenhouse/BrandLogo'
@@ -325,6 +326,7 @@ function AddCertificationDialog({
     issuedDate: string | null
     expiryDate: string | null
     validationUrl: string | null
+    assetId: string | null
   }) => Promise<void>
 }) {
   const [name, setName] = useState('')
@@ -332,6 +334,7 @@ function AddCertificationDialog({
   const [issuedDate, setIssuedDate] = useState('')
   const [expiryDate, setExpiryDate] = useState('')
   const [validationUrl, setValidationUrl] = useState('')
+  const [evidenceAsset, setEvidenceAsset] = useState<UploadedFileValue | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -347,7 +350,8 @@ function AddCertificationDialog({
         issuer: issuer.trim(),
         issuedDate: issuedDate || null,
         expiryDate: expiryDate || null,
-        validationUrl: validationUrl.trim() || null
+        validationUrl: validationUrl.trim() || null,
+        assetId: evidenceAsset?.assetId ?? null
       })
       handleClose()
     } catch (err) {
@@ -363,6 +367,7 @@ function AddCertificationDialog({
     setIssuedDate('')
     setExpiryDate('')
     setValidationUrl('')
+    setEvidenceAsset(null)
     setError(null)
     onClose()
   }
@@ -414,6 +419,18 @@ function AddCertificationDialog({
             onChange={e => setValidationUrl(e.target.value)}
             disabled={submitting}
             placeholder='https://...'
+          />
+          <GreenhouseFileUploader
+            contextType='certification_draft'
+            title={GH_SKILLS_CERTS.cert_upload}
+            helperText={GH_SKILLS_CERTS.cert_upload_helper}
+            emptyTitle='Arrastra tu certificado aquí'
+            emptyDescription='PDF, JPG, PNG o WebP hasta 10 MB.'
+            browseCta='Seleccionar archivo'
+            replaceCta='Reemplazar archivo'
+            value={evidenceAsset}
+            onChange={setEvidenceAsset}
+            disabled={submitting}
           />
           {error && <Alert severity='error'>{error}</Alert>}
         </Stack>
@@ -1193,6 +1210,7 @@ function CertificationsSection({
     issuedDate: string | null
     expiryDate: string | null
     validationUrl: string | null
+    assetId: string | null
   }) => Promise<void>
   onVerify?: (certificationId: string) => Promise<void>
   onReject?: (certificationId: string, reason: string) => Promise<void>
@@ -1576,6 +1594,7 @@ const SkillsCertificationsTab = ({ mode, memberId }: SkillsCertificationsTabProp
     issuedDate: string | null
     expiryDate: string | null
     validationUrl: string | null
+    assetId: string | null
   }) => {
     const res = await fetch('/api/my/certifications', {
       method: 'POST',
