@@ -421,4 +421,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-369` | `complete` | Hardcoded Hex Cleanup | `docs/tasks/complete/TASK-369-theme-hardcoded-hex-cleanup.md` |
 | `TASK-370` | `complete` | Semantic Token Absorption into Theme | `docs/tasks/complete/TASK-370-semantic-token-absorption-into-theme.md` |
 | `TASK-371` | `complete` | Shell Primary Cutover | `docs/tasks/complete/TASK-371-shell-primary-cutover.md` |
-| `TASK-372` | `to-do` | Kortex Visual Preset Documentation | `docs/tasks/to-do/TASK-372-kortex-visual-preset-documentation.md` |
+| `TASK-372` | `complete` | Kortex Visual Preset Documentation | `docs/tasks/complete/TASK-372-kortex-visual-preset-documentation.md` |

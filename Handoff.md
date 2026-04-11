@@ -1,5 +1,21 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — TASK-372: Kortex Visual Preset Documentation COMPLETADA
+
+- alcance cerrado:
+  - creado `docs/architecture/GREENHOUSE_KORTEX_VISUAL_PRESET_V1.md` con contrato visual completo
+  - §2: tokens compartibles (palette, typography DM Sans + Poppins, shape 6px, shadows, WCAG AA)
+  - §3: tokens NO compartibles (GH_COLORS dominio, nav, nomenclatura, brand assets)
+  - §4: ejemplo de consumo con snippets funcionales para Kortex
+  - §5: governance — drift detection, actualizacion manual, criterios para package futuro
+- **TASK-264 UMBRELLA COMPLETADA** — 5/5 sub-tasks cerradas:
+  - TASK-368: Token audit + contrato de decisiones
+  - TASK-369: Hex cleanup
+  - TASK-370: Semantic + neutral absorption (40 archivos, WCAG fix)
+  - TASK-371: Primary chain simplification + WCAG formal
+  - TASK-372: Kortex preset (esta)
+- proximo paso: extender identidad visual al repo `efeoncepro/kortex` usando el contrato
+
 ## Sesion 2026-04-11 — TASK-371: Shell Primary Cutover COMPLETADA
 
 - alcance real vs spec:
