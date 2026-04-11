@@ -11,16 +11,32 @@
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
-- Type: `implementation`
-- Status real: `Diseno`
+- Type: `umbrella`
+- Status real: `Descompuesta en sub-tasks`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
-- Branch: `task/TASK-264-greenhouse-theme-canonicalization-kortex-brand-contract`
+- Branch: —
 - Legacy ID: —
 - GitHub Issue: —
 
+## Sub-tasks (programa de ejecución)
+
+| Task | Nombre | Riesgo | Esfuerzo | Depende de | Tipo |
+|------|--------|--------|----------|------------|------|
+| `TASK-368` | Theme Token Audit & Decision Contract | Cero | Bajo | — | research |
+| `TASK-369` | Hardcoded Hex Cleanup | Bajo | Bajo | TASK-368 | implementation |
+| `TASK-370` | Semantic Token Absorption into Theme | Medio | Medio | TASK-368 | implementation |
+| `TASK-371` | Shell Primary Cutover | **Alto** | Medio | TASK-370 | implementation |
+| `TASK-372` | Kortex Visual Preset Documentation | Cero | Bajo | TASK-370 | documentation |
+
+**Secuencia recomendada:** `368` → `369` + `370` (paralelo controlado) → `371` (opcional) + `372`
+
+**Nota:** TASK-371 es explícitamente opcional. Si después de TASK-370 el portal ya se ve coherente, puede diferirse o cancelarse sin afectar el programa.
+
 ## Summary
+
+**Umbrella task** — descompuesta en 5 sub-tasks (TASK-368 a TASK-372) para ejecución incremental y reversible.
 
 Greenhouse hoy usa un shell base de Vuexy/MUI pero mantiene una segunda capa de branding y semántica visual hardcodeada fuera del theme principal. Esta task converge esa identidad al sistema canónico de theme, deja un contrato visual único para el portal y produce un preset/patrón reutilizable para Kortex como plataforma paralela integrada, sin copiar componentes a ciegas ni tocar Kortex directamente en esta lane.
 
