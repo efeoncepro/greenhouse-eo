@@ -241,9 +241,49 @@ const TalentOpsDashboardView = () => {
 
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
 
-        const json: TalentOpsResponse = await res.json()
+        const raw = await res.json()
 
-        if (!cancelled) setData(json)
+        // API returns { metrics, completeness, skillGaps, actionItems } — flatten to view shape
+        const mapped: TalentOpsResponse = {
+          profileHealthScore: raw.metrics?.profileHealthScore ?? 0,
+          totalMembers: raw.metrics?.totalMembers ?? 0,
+          completeProfiles: raw.metrics?.completeProfiles ?? 0,
+          pendingReviewCount: raw.metrics?.pendingReviewCount ?? 0,
+          expiringSoonCertCount: raw.metrics?.expiringSoonCertCount ?? 0,
+          expiredCertCount: raw.metrics?.expiredCertCount ?? 0,
+          catalogCoverage: raw.metrics?.skillCatalogCoverage ?? 0,
+          toolCatalogCoverage: raw.metrics?.toolCatalogCoverage ?? 0,
+          actionItems: (raw.actionItems ?? []).map((item: Record<string, unknown>) => ({
+            type: item.type,
+            memberId: item.memberId,
+            memberDisplayName: item.memberDisplayName,
+            memberAvatarUrl: null,
+            description: item.description,
+            urgency: item.urgency
+          })),
+          profileCompleteness: (raw.completeness ?? []).map((row: Record<string, unknown>) => ({
+            memberId: row.memberId,
+            displayName: row.displayName,
+            avatarUrl: row.avatarUrl ?? null,
+            score: Number(row.completenessScore ?? 0),
+            hasHeadline: Boolean(row.hasHeadline),
+            hasSkills: Boolean(row.hasSkills),
+            hasTools: Boolean(row.hasTools),
+            hasCertifications: Boolean(row.hasCertifications),
+            hasLanguages: Boolean(row.hasLanguages),
+            hasLinks: Boolean(row.hasLinks),
+            hasEvidence: Boolean(row.hasEvidence),
+            lastUpdated: (row.lastProfileUpdate as string) ?? null
+          })),
+          skillGaps: (raw.skillGaps ?? []).map((gap: Record<string, unknown>) => ({
+            skillName: gap.skillName,
+            category: gap.skillCategory ?? null,
+            memberCount: Number(gap.memberCount ?? 0),
+            verifiedCount: Number(gap.verifiedCount ?? 0)
+          }))
+        }
+
+        if (!cancelled) setData(mapped)
       } catch {
         if (!cancelled) setError(LABELS.error)
       } finally {
