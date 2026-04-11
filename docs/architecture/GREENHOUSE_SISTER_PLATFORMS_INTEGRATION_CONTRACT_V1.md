@@ -9,6 +9,25 @@
 
 ---
 
+## Estado de implementación actual
+
+Desde `TASK-375`, este contrato ya tiene una primera bajada runtime en Greenhouse:
+
+- tabla `greenhouse_core.sister_platform_bindings`
+- secuencia `greenhouse_core.seq_sister_platform_binding_public_id`
+- helper reusable `src/lib/sister-platforms/bindings.ts`
+- rutas admin `/api/admin/integrations/sister-platform-bindings*`
+- visibilidad mínima en `/admin/integrations`
+
+La foundation implementada cubre:
+
+- scopes `organization`, `client`, `space` e `internal`
+- lifecycle `draft`, `active`, `suspended`, `deprecated`
+- resolución explícita `external scope -> greenhouse scope`
+- publicación de eventos outbox para consumers posteriores
+
+---
+
 ## 1. Objetivo
 
 Formalizar el contrato canónico con el que `greenhouse-eo` debe integrarse con plataformas hermanas del ecosistema Efeonce.

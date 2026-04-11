@@ -1,5 +1,33 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — TASK-375: Sister Platforms Identity & Tenancy Binding Foundation IMPLEMENTADA (pendiente apply de migracion)
+
+- alcance implementado:
+  - nueva migracion `20260411192943501_sister-platform-bindings-foundation.sql`
+  - nueva tabla canónica `greenhouse_core.sister_platform_bindings`
+  - secuencia `greenhouse_core.seq_sister_platform_binding_public_id` para `EO-SPB-####`
+  - helper reusable `src/lib/sister-platforms/bindings.ts` con:
+    - list/read admin
+    - create/update
+    - resolver `external scope -> greenhouse scope`
+    - soporte de scopes `organization`, `client`, `space` e `internal`
+  - eventos outbox nuevos en `event-catalog.ts` para lifecycle del binding
+  - rutas admin nuevas:
+    - `/api/admin/integrations/sister-platform-bindings`
+    - `/api/admin/integrations/sister-platform-bindings/[bindingId]`
+  - `/admin/integrations` ahora muestra la sección `Sister Platform Bindings`
+- reusable real para futuras sister platforms:
+  - no hay hardcode a Kortex en la foundation de runtime
+  - `kortex` y `verk` aparecen solo como keys/plataformas, no como shape especial
+  - el contrato queda listo para `TASK-376` y `TASK-377`
+- verificación:
+  - `pnpm build` pasa
+  - `pnpm lint` pasa con 2 warnings preexistentes en `HrOrgChartView.tsx`
+  - `pnpm migrate:up` falla localmente por `ECONNREFUSED 127.0.0.1:15432` sin Cloud SQL Proxy
+  - `pnpm pg:connect:migrate` intentó renovar ADC y abrió login interactivo de Google; no se completó en esta sesión
+- deuda/nota operativa:
+  - falta aplicar la migración en un entorno con Cloud SQL Proxy + ADC vigentes para materializar la tabla y regenerar `db.d.ts`
+
 ## Sesion 2026-04-11 — TASK-374: Sister Platforms Integration Program COMPLETADA
 
 - alcance cerrado:

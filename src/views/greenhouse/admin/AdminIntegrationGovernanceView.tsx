@@ -21,6 +21,7 @@ import Typography from '@mui/material/Typography'
 
 import { ExecutiveCardShell, ExecutiveMiniStatCard } from '@/components/greenhouse'
 import { GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
+import type { SisterPlatformBindingRecord } from '@/lib/sister-platforms/types'
 import type {
   IntegrationDataQualityOverview,
   IntegrationDataQualityRunResult,
@@ -37,6 +38,7 @@ type Props = {
   integrations: IntegrationWithHealth[]
   notionDataQualityOverview: IntegrationDataQualityOverview | null
   notionOrchestrationOverview: NotionSyncOrchestrationOverview | null
+  sisterPlatformBindings: SisterPlatformBindingRecord[]
 }
 
 const typeLabel: Record<IntegrationType, string> = {
@@ -76,6 +78,35 @@ const healthColor: Record<IntegrationHealth, 'success' | 'warning' | 'error' | '
   idle: 'secondary',
   not_configured: 'info'
 }
+
+const bindingStatusColor: Record<
+  SisterPlatformBindingRecord['bindingStatus'],
+  'success' | 'warning' | 'error' | 'secondary'
+> = {
+  active: 'success',
+  draft: 'warning',
+  suspended: 'error',
+  deprecated: 'secondary'
+}
+
+const bindingScopeLabel = (binding: SisterPlatformBindingRecord) => {
+  if (binding.greenhouseScopeType === 'internal') {
+    return 'Ecosistema interno'
+  }
+
+  if (binding.spaceId) {
+    return binding.spaceName ?? binding.spaceId
+  }
+
+  if (binding.clientId) {
+    return binding.clientName ?? binding.clientId
+  }
+
+  return binding.organizationName ?? binding.organizationId ?? 'Sin scope'
+}
+
+const bindingExternalLabel = (binding: SisterPlatformBindingRecord) =>
+  binding.externalDisplayName ?? binding.externalScopeId
 
 const freshnessBarColor = (percent: number): 'success' | 'warning' | 'error' => {
   if (percent >= 75) return 'success'
@@ -157,13 +188,19 @@ const getTopFindings = (runs: IntegrationDataQualityRunResult[]) => {
 const AdminIntegrationGovernanceView = ({
   integrations,
   notionDataQualityOverview,
-  notionOrchestrationOverview
+  notionOrchestrationOverview,
+  sisterPlatformBindings
 }: Props) => {
   const activeCount = integrations.filter(i => i.active).length
   const readyCount = integrations.filter(i => i.readinessStatus === 'ready' && !i.pausedAt).length
   const pausedCount = integrations.filter(i => i.pausedAt).length
   const domains = [...new Set(integrations.flatMap(i => i.consumerDomains))]
   const syncableCount = integrations.filter(i => i.syncEndpoint && !i.pausedAt).length
+  const activeBindingsCount = sisterPlatformBindings.filter(binding => binding.bindingStatus === 'active').length
+  const draftBindingsCount = sisterPlatformBindings.filter(binding => binding.bindingStatus === 'draft').length
+  const suspendedBindingsCount = sisterPlatformBindings.filter(binding => binding.bindingStatus === 'suspended').length
+  const boundPlatforms = [...new Set(sisterPlatformBindings.map(binding => binding.sisterPlatformKey))]
+  const boundScopes = [...new Set(sisterPlatformBindings.map(binding => `${binding.greenhouseScopeType}:${binding.organizationId}:${binding.clientId ?? '-'}:${binding.spaceId ?? '-'}`))]
   const notionLatestBySpace = notionDataQualityOverview?.latestBySpace ?? []
   const notionStatusTotals = notionDataQualityOverview?.totals ?? null
   const notionRecentRuns = notionDataQualityOverview?.recentRuns ?? []
@@ -255,6 +292,128 @@ const AdminIntegrationGovernanceView = ({
           icon='tabler-topology-ring-3'
         />
       </Box>}
+
+      <ExecutiveCardShell
+        title='Sister Platform Bindings'
+        subtitle='Contrato operativo entre plataformas hermanas y los scopes Greenhouse. Aquí se ve qué tenant externo resuelve a qué organización, cliente o space antes de abrir sincronías más profundas.'
+      >
+        {sisterPlatformBindings.length === 0 ? (
+          <Alert severity='info' variant='outlined'>
+            Todavía no hay bindings sister-platform registrados. La base ya está lista para Kortex, Verk y futuras apps hermanas, pero aún no se ha declarado un enlace activo.
+          </Alert>
+        ) : (
+          <Stack spacing={3}>
+            <Box
+              sx={{
+                display: 'grid',
+                gap: 3,
+                gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))', xl: 'repeat(4, minmax(0, 1fr))' }
+              }}
+            >
+              <ExecutiveMiniStatCard
+                eyebrow='Active'
+                tone={activeBindingsCount > 0 ? 'success' : 'warning'}
+                title='Bindings activos'
+                value={String(activeBindingsCount)}
+                detail='Resoluciones habilitadas para consumo downstream.'
+                icon='tabler-link-check'
+              />
+              <ExecutiveMiniStatCard
+                eyebrow='Coverage'
+                tone='info'
+                title='Plataformas cubiertas'
+                value={String(boundPlatforms.length)}
+                detail={boundPlatforms.join(', ') || 'Sin plataformas registradas.'}
+                icon='tabler-app-window'
+              />
+              <ExecutiveMiniStatCard
+                eyebrow='Governance'
+                tone={draftBindingsCount > 0 ? 'warning' : 'success'}
+                title='Pendientes'
+                value={String(draftBindingsCount)}
+                detail='Bindings todavía en revisión o pendientes de activación.'
+                icon='tabler-clock-hour-4'
+              />
+              <ExecutiveMiniStatCard
+                eyebrow='Resilience'
+                tone={suspendedBindingsCount > 0 ? 'error' : 'info'}
+                title='Scopes enlazados'
+                value={String(boundScopes.length)}
+                detail={suspendedBindingsCount > 0 ? `${suspendedBindingsCount} binding(s) suspendido(s).` : 'Sin suspensiones vigentes.'}
+                icon='tabler-topology-complex'
+              />
+            </Box>
+
+            <TableContainer>
+              <Table size='small'>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Plataforma</TableCell>
+                    <TableCell>Scope externo</TableCell>
+                    <TableCell>Scope Greenhouse</TableCell>
+                    <TableCell>Rol</TableCell>
+                    <TableCell>Estado</TableCell>
+                    <TableCell>Verificación</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {sisterPlatformBindings.map(binding => (
+                    <TableRow key={binding.bindingId} hover>
+                      <TableCell>
+                        <Stack spacing={0.25}>
+                          <Typography variant='body2' sx={{ fontWeight: 600, textTransform: 'capitalize' }}>
+                            {binding.sisterPlatformKey}
+                          </Typography>
+                          <Typography variant='caption' color='text.secondary' sx={{ fontFamily: 'monospace' }}>
+                            {binding.publicId}
+                          </Typography>
+                        </Stack>
+                      </TableCell>
+                      <TableCell>
+                        <Stack spacing={0.25}>
+                          <Typography variant='body2'>{bindingExternalLabel(binding)}</Typography>
+                          <Typography variant='caption' color='text.secondary'>
+                            {binding.externalScopeType}: {binding.externalScopeId}
+                          </Typography>
+                        </Stack>
+                      </TableCell>
+                      <TableCell>
+                        <Stack spacing={0.25}>
+                          <Typography variant='body2'>{bindingScopeLabel(binding)}</Typography>
+                          <Typography variant='caption' color='text.secondary'>
+                            {binding.greenhouseScopeType}
+                          </Typography>
+                        </Stack>
+                      </TableCell>
+                      <TableCell>
+                        <Chip size='small' variant='outlined' label={binding.bindingRole} />
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          size='small'
+                          variant='tonal'
+                          color={bindingStatusColor[binding.bindingStatus]}
+                          label={binding.bindingStatus}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Stack spacing={0.25}>
+                          <Typography variant='body2'>
+                            {formatDateTime(binding.lastVerifiedAt ?? binding.updatedAt)}
+                          </Typography>
+                          <Typography variant='caption' color='text.secondary'>
+                            {binding.lastVerifiedAt ? 'Última verificación' : 'Última actualización'}
+                          </Typography>
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Stack>
+        )}
+      </ExecutiveCardShell>
 
       {/* Registry Table */}
       <ExecutiveCardShell

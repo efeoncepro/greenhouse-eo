@@ -1,5 +1,22 @@
 # project_context.md
 
+## Delta 2026-04-11 Foundation runtime para sister-platform bindings
+
+- Greenhouse ya tiene una foundation runtime explícita para bindear sister platforms con scopes internos.
+- Runtime nuevo:
+  - tabla `greenhouse_core.sister_platform_bindings`
+  - secuencia `greenhouse_core.seq_sister_platform_binding_public_id`
+  - helper `src/lib/sister-platforms/bindings.ts`
+  - rutas admin `/api/admin/integrations/sister-platform-bindings*`
+  - visibilidad mínima en `/admin/integrations`
+- Contrato operativo:
+  - el binding soporta scopes `organization`, `client`, `space` e `internal`
+  - el binding soporta lifecycle `draft`, `active`, `suspended`, `deprecated`
+  - el binding publica eventos outbox propios para consumers posteriores
+- Estado de infraestructura:
+  - el código y la migración existen en repo
+  - la aplicación de migración requiere Cloud SQL Proxy + ADC válidas para regenerar tipos DB
+
 ## Delta 2026-04-11 Contrato canónico para sister platforms del ecosistema
 
 - Greenhouse ya no debe tratar plataformas hermanas como consumers informales del portal.

@@ -7,12 +7,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Implementado pendiente de migracion`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -64,6 +64,8 @@ Reglas obligatorias:
 - `src/lib/tenant/access.ts`
 - `src/lib/tenant/get-tenant-context.ts`
 - `src/types/next-auth.d.ts`
+- `src/lib/scim/provisioning.ts`
+- `src/lib/integrations/greenhouse-integration.ts`
 
 ## Dependencies & Impact
 
@@ -86,7 +88,8 @@ Reglas obligatorias:
 - `src/lib/tenant/get-tenant-context.ts`
 - `src/types/next-auth.d.ts`
 - `src/lib/sister-platforms/`
-- `src/app/api/admin/`
+- `src/app/api/admin/integrations/`
+- `src/views/greenhouse/admin/`
 - `docs/architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`
 
 ## Current Repo State
@@ -96,12 +99,30 @@ Reglas obligatorias:
 - Greenhouse ya resuelve tenant context canico en `src/lib/tenant/access.ts` y `src/lib/tenant/get-tenant-context.ts`.
 - Session user ya expone `clientId`, `organizationId`, `spaceId`, `tenantType`, `memberId`, `businessLines` y `serviceModules`.
 - `GREENHOUSE_IDENTITY_ACCESS_V2.md` y `MULTITENANT_ARCHITECTURE.md` ya fijan la semantica interna de tenancy.
+- Ya existen precedentes parciales de binding externo:
+  - `greenhouse_core.scim_tenant_mappings`
+  - `greenhouse_core.notion_workspace_source_bindings`
+  - `greenhouse_core.identity_profile_source_links`
+- Ya existe una surface admin natural para visibilidad mínima de governance en `/admin/integrations`.
 
 ### Gap
 
 - No existe binding canico entre IDs Greenhouse y IDs de sister platforms.
 - No existe resolver reusable para transformar un external binding en un scope Greenhouse legible por APIs y tools.
 - No existe governance runtime para saber si un binding esta `draft`, `active`, `suspended` o `deprecated`.
+- No existe audit trail específico ni reader admin dedicado para bindings sister-platform.
+
+## Audit Delta
+
+Reality check ejecutado antes de implementar:
+
+- La foundation no parte de cero: `SCIM`, `Notion` e `identity_profile_source_links` ya muestran tres patrones parciales reutilizables.
+- La visibilidad administrativa mínima no necesita ruta nueva por defecto; el lugar natural es extender `/admin/integrations` y su carril API asociado.
+- `MULTITENANT_ARCHITECTURE.md` y el runtime actual no son 100% idénticos:
+  - la doc todavía describe `featureFlags` como `Record<string, boolean>`
+  - el runtime actual usa `featureFlags: string[]`
+  - `spaceId` / `organizationId` son opcionales en `TenantContext` y `next-auth.d.ts`
+- La task debe asumir desde el inicio que `client`, `organization` y `space` no son sinónimos y que el binding no puede colapsar todo a `client_id`.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -125,6 +146,7 @@ Reglas obligatorias:
 
 - Exponer un carril minimo de visibilidad administrativa u operativa para validar bindings activos.
 - Dejar audit trail y reglas de ownership del bridge.
+- Reutilizar la surface existente de integrations/admin governance antes de abrir una UI nueva.
 
 ## Out of Scope
 
@@ -149,6 +171,13 @@ La foundation debe nacer reusable para soportar:
 
 sin cambiar el shape base del binding.
 
+La primera visibilidad mínima recomendada es:
+
+- reader/admin API bajo el carril de integrations
+- bloque de lectura dentro de `/admin/integrations`
+
+no una surface nueva aislada si el runtime existente ya puede absorberla.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
      "Como compruebo que termine y que actualizo?"
@@ -156,10 +185,11 @@ sin cambiar el shape base del binding.
 
 ## Acceptance Criteria
 
-- [ ] Existe un modelo runtime explicito para bindings de sister platforms.
-- [ ] Existe un resolver reusable que transforma un binding valido en contexto Greenhouse estable.
-- [ ] La foundation soporta al menos scopes `organization/client`, `space` e `internal`.
-- [ ] La task no deja la semantica hardcodeada a Kortex.
+- [x] Existe un modelo runtime explicito para bindings de sister platforms.
+- [x] Existe un resolver reusable que transforma un binding valido en contexto Greenhouse estable.
+- [x] La foundation soporta al menos scopes `organization/client`, `space` e `internal`.
+- [x] La task no deja la semantica hardcodeada a Kortex.
+- [x] La visibilidad mínima de governance reutiliza la surface existente de integrations/admin cuando sea suficiente.
 
 ## Verification
 
@@ -170,8 +200,8 @@ sin cambiar el shape base del binding.
 
 ## Closing Protocol
 
-- [ ] Actualizar el contrato marco si el binding runtime obliga a cerrar un detalle que hoy siga abstracto.
-- [ ] Dejar explícito en `Handoff.md` que parte del binding quedo reusable para futuras sister platforms.
+- [x] Actualizar el contrato marco si el binding runtime obliga a cerrar un detalle que hoy siga abstracto.
+- [x] Dejar explícito en `Handoff.md` que parte del binding quedo reusable para futuras sister platforms.
 
 ## Follow-ups
 

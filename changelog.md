@@ -2,6 +2,18 @@
 
 ## 2026-04-11
 
+### 2026-04-11 — TASK-375 baja la foundation runtime para sister-platform bindings
+
+- Se agregó la migración `sister-platform-bindings-foundation` para introducir `greenhouse_core.sister_platform_bindings` y la secuencia `EO-SPB-####`.
+- Se agregó `src/lib/sister-platforms/bindings.ts` como capa reusable para:
+  - listar y leer bindings
+  - crear y actualizar lifecycle
+  - resolver `external scope -> greenhouse scope`
+- El contrato soporta scopes `organization`, `client`, `space` e `internal`, sin hardcodear la semántica a Kortex.
+- Se agregaron rutas admin nuevas bajo `/api/admin/integrations/sister-platform-bindings*`.
+- `/admin/integrations` ahora muestra una lectura operativa de los bindings sister-platform dentro de la gobernanza existente.
+- `pnpm build` y `pnpm lint` pasan; la aplicación de migración quedó pendiente de una sesión con Cloud SQL Proxy + ADC activos.
+
 ### 2026-04-11 — TASK-374 queda cerrada como umbrella de programa, no como runtime
 
 - `TASK-374` se corrigió contra la realidad del repo y quedó cerrada como umbrella documental/programática.
