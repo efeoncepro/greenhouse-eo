@@ -7,7 +7,8 @@
   - el organigrama estructural usa `greenhouse_core.departments.parent_department_id` como eje del árbol
   - los miembros se cuelgan de `greenhouse_core.members.department_id`
   - `departments.head_member_id` identifica liderazgo de área y además sincroniza la adscripción del responsable en el write lane de departamentos
-  - si una persona todavía no tiene adscripción estructural pero sí supervisor formal visible, el grafo usa esa cadena de supervisoría como fallback visual para no romper el contexto
+  - si una persona todavía no tiene adscripción estructural directa, el grafo la mantiene dentro del área visible más cercana como `Contexto heredado`, sin convertir la supervisoría formal en edge estructural
+  - si una persona lidera un área, el organigrama la representa dentro del nodo del departamento y no como hija-persona del mismo departamento
   - la supervisoría formal sigue visible como metadata del miembro, pero no define las aristas del grafo estructural
 - Acceso:
   - broad HR/admin sigue viendo la estructura completa

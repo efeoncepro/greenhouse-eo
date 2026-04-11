@@ -51,12 +51,12 @@ const formatRegime = (value: HrOrgChartNode['payRegime']) => {
 const buildLayout = ({
   nodes,
   edges,
-  focusedMemberId,
+  focusedNodeId,
   onFocusMember
 }: {
   nodes: HrOrgChartNode[]
   edges: HrOrgChartEdge[]
-  focusedMemberId: string | null
+  focusedNodeId: string | null
   onFocusMember: (memberId: string | null) => void
 }) => {
   const graph = new dagre.graphlib.Graph()
@@ -97,7 +97,7 @@ const buildLayout = ({
       targetPosition: Position.Top,
       data: {
         node,
-        isFocused: focusedMemberId != null && node.memberId === focusedMemberId,
+        isFocused: focusedNodeId != null && node.nodeId === focusedNodeId,
         onFocusMember
       }
     }
@@ -233,17 +233,18 @@ const HrOrgChartView = () => {
   )
 
   const activeFocusMemberId = payload?.focusMemberId ?? focusMemberId ?? payload?.currentMemberId ?? null
+  const activeFocusNodeId = payload?.focusNodeId ?? null
 
-  const selectedNode = useMemo(() => {
+  const selectedMember = useMemo(() => {
     if (!payload || !activeFocusMemberId) {
       return null
     }
 
-    return payload.nodes.find(node => node.nodeType === 'member' && node.memberId === activeFocusMemberId) ?? null
+    return payload.members.find(member => member.memberId === activeFocusMemberId) ?? null
   }, [activeFocusMemberId, payload])
 
-  const focusNodeName = selectedNode?.displayName ?? 'Selecciona una persona'
-  const canOpenPeople = Boolean(selectedNode)
+  const focusNodeName = selectedMember?.displayName ?? 'Selecciona una persona'
+  const canOpenPeople = Boolean(selectedMember)
 
   const chart = useMemo(() => {
     if (!payload) {
@@ -253,10 +254,10 @@ const HrOrgChartView = () => {
     return buildLayout({
       nodes: payload.nodes,
       edges: payload.edges,
-      focusedMemberId: activeFocusMemberId,
+      focusedNodeId: activeFocusNodeId,
       onFocusMember: handleFocusMember
     })
-  }, [activeFocusMemberId, handleFocusMember, payload])
+  }, [activeFocusNodeId, handleFocusMember, payload])
 
   const nodeTypes = useMemo<NodeTypes>(() => ({ orgChartNode: OrgChartNodeCard }), [])
 
@@ -349,7 +350,7 @@ const HrOrgChartView = () => {
           <Button component={Link} href='/hr/hierarchy' variant='tonal' color='secondary' startIcon={<i className='tabler-list-search' />}>
             Abrir jerarquía
           </Button>
-          <Button component={Link} href={selectedNode ? `/people/${selectedNode.memberId}` : '/people'} variant='contained' startIcon={<i className='tabler-user-search' />}>
+          <Button component={Link} href={selectedMember ? `/people/${selectedMember.memberId}` : '/people'} variant='contained' startIcon={<i className='tabler-user-search' />}>
             {canOpenPeople ? 'Ver ficha' : 'Abrir People'}
           </Button>
         </Stack>
@@ -392,8 +393,8 @@ const HrOrgChartView = () => {
                 <Autocomplete
                   options={payload.memberOptions}
                   value={
-                    selectedNode?.memberId
-                      ? payload.memberOptions.find(option => option.memberId === selectedNode.memberId) ?? null
+                    selectedMember?.memberId
+                      ? payload.memberOptions.find(option => option.memberId === selectedMember.memberId) ?? null
                       : null
                   }
                   onChange={(_, value) => handleFocusMember(value?.memberId ?? null)}
@@ -406,7 +407,7 @@ const HrOrgChartView = () => {
                       {...params}
                       label='Buscar persona'
                       placeholder='Escribe un nombre o cargo'
-                      helperText='La búsqueda centra el mapa sobre las personas visibles y conserva el contexto por área o supervisor cuando falta la adscripción estructural.'
+                      helperText='La búsqueda centra el mapa sobre las personas visibles y conserva el contexto estructural del área cuando falta la adscripción directa.'
                     />
                   )}
                 />
@@ -421,7 +422,7 @@ const HrOrgChartView = () => {
                   }}
                 >
                   <ReactFlow
-                    key={activeFocusMemberId ?? 'org-chart'}
+                    key={activeFocusNodeId ?? activeFocusMemberId ?? 'org-chart'}
                     nodes={chart.layoutedNodes}
                     edges={chart.layoutedEdges}
                     nodeTypes={nodeTypes}
@@ -477,35 +478,39 @@ const HrOrgChartView = () => {
             <CardHeader
               avatar={
                 <Avatar
-                  src={selectedNode?.avatarUrl || undefined}
+                  src={selectedMember?.avatarUrl || undefined}
                   sx={{
-                    bgcolor: selectedNode?.isCurrentMember ? GH_COLORS.semantic.success.bg : GH_COLORS.role.development.bg,
-                    color: selectedNode?.isCurrentMember ? GH_COLORS.semantic.success.text : GH_COLORS.role.development.textDark
+                    bgcolor: selectedMember?.isCurrentMember ? GH_COLORS.semantic.success.bg : GH_COLORS.role.development.bg,
+                    color: selectedMember?.isCurrentMember ? GH_COLORS.semantic.success.text : GH_COLORS.role.development.textDark
                   }}
                 >
-                  {selectedNode ? getInitials(selectedNode.displayName) : 'GH'}
+                  {selectedMember ? getInitials(selectedMember.displayName) : 'GH'}
                 </Avatar>
               }
               title={focusNodeName}
-              subheader={selectedNode ? selectedNode.roleTitle ?? 'Sin cargo visible' : 'Selecciona una persona para ver el detalle del foco.'}
+              subheader={selectedMember ? selectedMember.roleTitle ?? 'Sin cargo visible' : 'Selecciona una persona para ver el detalle del foco.'}
             />
             <Divider />
             <CardContent>
-              {selectedNode ? (
+              {selectedMember ? (
                 <Stack spacing={2.25}>
-                  {selectedNode.placementMode === 'supervisor' ? (
+                  {selectedMember.isDepartmentHead ? (
                     <Alert severity='info'>
-                      Esta persona aparece bajo su supervisor formal porque todavía no tiene adscripción estructural de departamento.
+                      Esta persona lidera el área enfocada. El organigrama estructural representa esa relación dentro del nodo del departamento para no duplicarla como hija de su propia área.
+                    </Alert>
+                  ) : selectedMember.placementMode === 'inferred_department' ? (
+                    <Alert severity='info'>
+                      La adscripción estructural directa de esta persona sigue pendiente. La vista la mantiene dentro del área visible más cercana para no romper el contexto organizacional.
                     </Alert>
                   ) : null}
 
 	                  <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-	                    {selectedNode.isCurrentMember ? <Chip size='small' label='Mi posición' color='primary' variant='outlined' /> : null}
-	                    {selectedNode.isDirectReportToCurrentMember ? <Chip size='small' label='Reporte directo' color='success' variant='outlined' /> : null}
-	                    {selectedNode.hasActiveDelegation ? <Chip size='small' label='Delegación activa' color='warning' variant='outlined' /> : null}
-	                    {selectedNode.isDepartmentHead ? <Chip size='small' label='Responsable de área' color='info' variant='outlined' /> : null}
-                      {selectedNode.placementMode === 'supervisor' ? (
-                        <Chip size='small' label='Ubicación visual por supervisor' color='secondary' variant='outlined' />
+	                    {selectedMember.isCurrentMember ? <Chip size='small' label='Mi posición' color='primary' variant='outlined' /> : null}
+	                    {selectedMember.isDirectReportToCurrentMember ? <Chip size='small' label='Reporte directo' color='success' variant='outlined' /> : null}
+	                    {selectedMember.hasActiveDelegation ? <Chip size='small' label='Delegación activa' color='warning' variant='outlined' /> : null}
+	                    {selectedMember.isDepartmentHead ? <Chip size='small' label='Responsable de área' color='info' variant='outlined' /> : null}
+                      {selectedMember.placementMode === 'inferred_department' ? (
+                        <Chip size='small' label='Contexto heredado' color='secondary' variant='outlined' />
                       ) : null}
 	                  </Stack>
 
@@ -514,21 +519,21 @@ const HrOrgChartView = () => {
                       <Typography variant='caption' color='text.secondary'>
                         Adscripción
                       </Typography>
-                      <Typography variant='body2' sx={{ mt: 0.25 }} noWrap title={selectedNode.departmentName ?? 'Sin adscripción directa'}>
-                        {selectedNode.departmentName ?? 'Sin adscripción directa'}
+                      <Typography variant='body2' sx={{ mt: 0.25 }} noWrap title={selectedMember.departmentName ?? 'Sin adscripción directa'}>
+                        {selectedMember.departmentName ?? 'Sin adscripción directa'}
                       </Typography>
                     </Box>
 	                    <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
 	                      <Typography variant='caption' color='text.secondary'>
-	                        Contexto visual
+	                        Contexto estructural
 	                      </Typography>
 	                      <Typography
                           variant='body2'
                           sx={{ mt: 0.25 }}
                           noWrap
-                          title={selectedNode.contextDepartmentName ?? selectedNode.visualParentLabel ?? 'Sin contexto visible'}
+                          title={selectedMember.contextDepartmentName ?? 'Sin contexto visible'}
                         >
-	                        {selectedNode.contextDepartmentName ?? selectedNode.visualParentLabel ?? 'Sin contexto visible'}
+	                        {selectedMember.contextDepartmentName ?? 'Sin contexto visible'}
 	                      </Typography>
 	                    </Box>
                     <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
@@ -536,23 +541,27 @@ const HrOrgChartView = () => {
                         Régimen
                       </Typography>
                       <Typography variant='body2' sx={{ mt: 0.25 }}>
-                        {formatRegime(selectedNode.payRegime)}
+                        {formatRegime(selectedMember.payRegime)}
                       </Typography>
                     </Box>
 	                    <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
 	                      <Typography variant='caption' color='text.secondary'>
 	                        Supervisor formal
 	                      </Typography>
-	                      <Typography variant='body2' sx={{ mt: 0.25 }} noWrap title={selectedNode.supervisorName ?? 'Sin dato'}>
-	                        {selectedNode.supervisorName ?? 'Sin dato'}
+	                      <Typography variant='body2' sx={{ mt: 0.25 }} noWrap title={selectedMember.supervisorName ?? 'Sin dato'}>
+	                        {selectedMember.supervisorName ?? 'Sin dato'}
 	                      </Typography>
 	                    </Box>
 	                  </Box>
 
 	                  <Stack direction='row' spacing={1} flexWrap='wrap' useFlexGap>
-	                    <Chip size='small' label={`Directos ${formatCount(selectedNode.directReportsCount)}`} variant='outlined' />
-	                    <Chip size='small' label={`Subárbol ${formatCount(selectedNode.subtreeSize)}`} variant='outlined' />
-	                    <Chip size='small' label={`Profundidad ${selectedNode.depth}`} variant='outlined' />
+	                    <Chip size='small' label={`Directos ${formatCount(selectedMember.directReportsCount)}`} variant='outlined' />
+	                    <Chip size='small' label={`Subárbol ${formatCount(selectedMember.subtreeSize)}`} variant='outlined' />
+	                    <Chip
+                        size='small'
+                        label={`Profundidad ${formatCount(payload.nodes.find(node => node.nodeId === activeFocusNodeId)?.depth ?? 0)}`}
+                        variant='outlined'
+                      />
 	                  </Stack>
 
 	                  <Box>
@@ -565,8 +574,8 @@ const HrOrgChartView = () => {
 	                          key={crumb.nodeId}
 	                          label={crumb.label}
 	                          size='small'
-	                          variant={crumb.memberId === selectedNode.memberId ? 'filled' : 'outlined'}
-	                          color={crumb.memberId === selectedNode.memberId ? 'primary' : 'default'}
+	                          variant={crumb.memberId === selectedMember.memberId ? 'filled' : 'outlined'}
+	                          color={crumb.memberId === selectedMember.memberId ? 'primary' : 'default'}
 	                          clickable={Boolean(crumb.memberId)}
 	                          onClick={() => handleFocusMember(crumb.memberId)}
 	                        />
@@ -577,7 +586,7 @@ const HrOrgChartView = () => {
                   <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
                     <Button
                       component={Link}
-                      href={`/people/${selectedNode.memberId}`}
+                      href={`/people/${selectedMember.memberId}`}
                       variant='contained'
                       startIcon={<i className='tabler-user-search' />}
                       fullWidth

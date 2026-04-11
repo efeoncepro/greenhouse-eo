@@ -5,6 +5,7 @@ import type {
   HrHierarchyRecord,
   HrOrgChartBreadcrumb,
   HrOrgChartEdge,
+  HrOrgChartMemberContext,
   HrOrgChartMemberOption,
   HrOrgChartNode,
   HrOrgChartResponse
@@ -50,7 +51,7 @@ type OrgChartMemberDraft = {
   supervisorName: string | null
   visualParentNodeId: string | null
   visualParentLabel: string | null
-  placementMode: 'department' | 'supervisor' | 'root'
+  placementMode: 'department' | 'inferred_department' | 'root'
   directReportsCount: number
   subtreeSize: number
   memberCount: number
@@ -134,27 +135,29 @@ const resolveRequestedFocus = ({
 }
 
 const buildBreadcrumbs = ({
-  focusMemberId,
+  focusNodeId,
+  focusedMember,
   nodesById,
   parentNodeIdByNodeId
 }: {
-  focusMemberId: string | null
+  focusNodeId: string | null
+  focusedMember: HrOrgChartMemberContext | null
   nodesById: Map<string, HrOrgChartNode>
   parentNodeIdByNodeId: Map<string, string | null>
 }): HrOrgChartBreadcrumb[] => {
-  if (!focusMemberId) {
+  if (!focusNodeId) {
     return []
   }
 
-  const memberNode = nodesById.get(buildMemberNodeId(focusMemberId))
+  const focusNode = nodesById.get(focusNodeId)
 
-  if (!memberNode) {
+  if (!focusNode) {
     return []
   }
 
   const breadcrumbs: HrOrgChartBreadcrumb[] = []
   const visitedNodeIds = new Set<string>()
-  let cursorNodeId: string | null = memberNode.nodeId
+  let cursorNodeId: string | null = focusNode.nodeId
 
   while (cursorNodeId) {
     if (visitedNodeIds.has(cursorNodeId)) {
@@ -180,6 +183,16 @@ const buildBreadcrumbs = ({
   }
 
   breadcrumbs.reverse()
+
+  if (focusedMember && focusedMember.displayName !== breadcrumbs[breadcrumbs.length - 1]?.label) {
+    breadcrumbs.push({
+      nodeId: focusedMember.renderedNodeId ?? buildMemberNodeId(focusedMember.memberId),
+      nodeType: 'member',
+      memberId: focusedMember.memberId,
+      departmentId: focusedMember.departmentId,
+      label: focusedMember.displayName
+    })
+  }
 
   return breadcrumbs
 }
@@ -403,81 +416,105 @@ export const getHrOrgChart = async ({
     }
   })
 
-  const memberDrafts: OrgChartMemberDraft[] = peopleItems.map(person => {
+  const memberContexts: HrOrgChartMemberContext[] = peopleItems.map(person => {
     const hierarchyNode = hierarchyByMemberId.get(person.memberId) as HrHierarchyRecord | undefined
     const departmentId = effectiveDepartmentIdByMemberId.get(person.memberId) ?? null
     const contextDepartmentId = resolveContextDepartmentId(person.memberId)
     const department = departmentId ? departmentsById.get(departmentId) ?? null : null
     const contextDepartment = contextDepartmentId ? departmentsById.get(contextDepartmentId) ?? null : null
     const isCurrentMember = currentMemberId != null && person.memberId === currentMemberId
+    const isDepartmentHead = Boolean(contextDepartment?.headMemberId && contextDepartment.headMemberId === person.memberId)
 
-    const visibleSupervisorMemberId =
-      hierarchyNode?.supervisorMemberId && hierarchyByMemberId.has(hierarchyNode.supervisorMemberId)
-        ? hierarchyNode.supervisorMemberId
-        : null
-
-    const visualParentNodeId =
-      departmentId && relevantDepartmentIds.has(departmentId)
-        ? buildDepartmentNodeId(departmentId)
-        : visibleSupervisorMemberId
-          ? buildMemberNodeId(visibleSupervisorMemberId)
-          : contextDepartmentId && relevantDepartmentIds.has(contextDepartmentId)
-            ? buildDepartmentNodeId(contextDepartmentId)
-            : null
-
-    const placementMode: 'department' | 'supervisor' | 'root' =
+    const placementMode: 'department' | 'inferred_department' | 'root' =
       departmentId && relevantDepartmentIds.has(departmentId)
         ? 'department'
-        : visibleSupervisorMemberId
-          ? 'supervisor'
-          : contextDepartmentId && relevantDepartmentIds.has(contextDepartmentId)
-            ? 'department'
-            : 'root'
+        : contextDepartmentId && relevantDepartmentIds.has(contextDepartmentId)
+          ? 'inferred_department'
+          : 'root'
 
-    const visualParentLabel =
-      visibleSupervisorMemberId
-        ? hierarchyByMemberId.get(visibleSupervisorMemberId)?.memberName ?? null
-        : contextDepartment?.name ?? null
+    const focusNodeId =
+      contextDepartmentId && relevantDepartmentIds.has(contextDepartmentId)
+        ? buildDepartmentNodeId(contextDepartmentId)
+        : null
+
+    const renderedNodeId = isDepartmentHead ? null : buildMemberNodeId(person.memberId)
 
     return {
-      nodeId: buildMemberNodeId(person.memberId),
-      nodeType: 'member',
       memberId: person.memberId,
-      departmentId,
-      contextDepartmentId,
+      focusNodeId: isDepartmentHead ? focusNodeId : renderedNodeId,
+      renderedNodeId,
       displayName: person.displayName,
       publicEmail: person.publicEmail,
       internalEmail: person.internalEmail,
       avatarUrl: person.avatarUrl ?? null,
       roleTitle: person.roleTitle ?? null,
       roleCategory: person.roleCategory,
+      departmentId,
       departmentName: department?.name ?? null,
+      contextDepartmentId,
       contextDepartmentName: contextDepartment?.name ?? person.departmentName ?? null,
-      parentDepartmentId: contextDepartment?.parentDepartmentId ?? null,
-      parentDepartmentName: contextDepartment?.parentDepartmentId
-        ? departmentsById.get(contextDepartment.parentDepartmentId)?.name ?? null
-        : null,
-      headMemberId: contextDepartment?.headMemberId ?? null,
-      headMemberName: contextDepartment?.headMemberName ?? null,
-      businessUnit: contextDepartment?.businessUnit ?? null,
-      locationCountry: person.locationCountry,
-      payRegime: person.payRegime,
       supervisorMemberId: hierarchyNode?.supervisorMemberId ?? null,
       supervisorName: hierarchyNode?.supervisorName ?? null,
-      visualParentNodeId,
-      visualParentLabel,
-      placementMode,
+      locationCountry: person.locationCountry,
+      payRegime: person.payRegime,
       directReportsCount: hierarchyNode?.directReportsCount ?? 0,
       subtreeSize: hierarchyNode?.subtreeSize ?? 0,
-      memberCount: 0,
-      childDepartmentCount: 0,
-      active: person.active,
       isCurrentMember,
       isDirectReportToCurrentMember: Boolean(currentMemberId && hierarchyNode?.supervisorMemberId === currentMemberId),
       hasActiveDelegation: Boolean(hierarchyNode?.delegation),
-      isDepartmentHead: Boolean(contextDepartment?.headMemberId && contextDepartment.headMemberId === person.memberId)
+      isDepartmentHead,
+      placementMode
     }
   })
+
+  const memberDrafts: OrgChartMemberDraft[] = memberContexts
+    .filter(member => member.renderedNodeId)
+    .map(member => {
+      const contextDepartment = member.contextDepartmentId
+        ? departmentsById.get(member.contextDepartmentId) ?? null
+        : null
+
+      return {
+        nodeId: member.renderedNodeId as string,
+        nodeType: 'member',
+        memberId: member.memberId,
+        departmentId: member.departmentId,
+        contextDepartmentId: member.contextDepartmentId,
+        displayName: member.displayName,
+        publicEmail: member.publicEmail,
+        internalEmail: member.internalEmail,
+        avatarUrl: member.avatarUrl,
+        roleTitle: member.roleTitle,
+        roleCategory: member.roleCategory,
+        departmentName: member.departmentName,
+        contextDepartmentName: member.contextDepartmentName,
+        parentDepartmentId: contextDepartment?.parentDepartmentId ?? null,
+        parentDepartmentName: contextDepartment?.parentDepartmentId
+          ? departmentsById.get(contextDepartment.parentDepartmentId)?.name ?? null
+          : null,
+        headMemberId: contextDepartment?.headMemberId ?? null,
+        headMemberName: contextDepartment?.headMemberName ?? null,
+        businessUnit: contextDepartment?.businessUnit ?? null,
+        locationCountry: member.locationCountry,
+        payRegime: member.payRegime,
+        supervisorMemberId: member.supervisorMemberId,
+        supervisorName: member.supervisorName,
+        visualParentNodeId: member.contextDepartmentId && relevantDepartmentIds.has(member.contextDepartmentId)
+          ? buildDepartmentNodeId(member.contextDepartmentId)
+          : null,
+        visualParentLabel: member.contextDepartmentName,
+        placementMode: member.placementMode,
+        directReportsCount: member.directReportsCount,
+        subtreeSize: member.subtreeSize,
+        memberCount: 0,
+        childDepartmentCount: 0,
+        active: true,
+        isCurrentMember: member.isCurrentMember,
+        isDirectReportToCurrentMember: member.isDirectReportToCurrentMember,
+        hasActiveDelegation: member.hasActiveDelegation,
+        isDepartmentHead: false
+      }
+    })
 
   const parentNodeIdByNodeId = new Map<string, string | null>()
 
@@ -516,23 +553,20 @@ export const getHrOrgChart = async ({
     isRoot: !memberDraft.visualParentNodeId
   }))
 
-  const memberOptions: HrOrgChartMemberOption[] = peopleItems.map(item => {
-    const contextDepartmentId = resolveContextDepartmentId(item.memberId)
-    const contextDepartmentName = contextDepartmentId ? departmentsById.get(contextDepartmentId)?.name ?? null : null
-
-    return {
-      memberId: item.memberId,
-      displayName: item.displayName,
-      roleTitle: item.roleTitle ?? null,
-      departmentName: contextDepartmentName ?? item.departmentName ?? null,
-      avatarUrl: item.avatarUrl ?? null,
-      isCurrentMember: currentMemberId != null && item.memberId === currentMemberId
-    }
-  })
+  const memberOptions: HrOrgChartMemberOption[] = memberContexts.map(member => ({
+    memberId: member.memberId,
+    displayName: member.displayName,
+    roleTitle: member.roleTitle,
+    departmentName: member.contextDepartmentName ?? member.departmentName,
+    avatarUrl: member.avatarUrl,
+    isCurrentMember: member.isCurrentMember
+  }))
 
   const nodes = [...departmentNodes, ...memberNodes]
 
   const nodesById = new Map(nodes.map(node => [node.nodeId, node]))
+  const focusedMember = memberContexts.find(member => member.memberId === resolvedFocusMemberId) ?? null
+  const focusNodeId = focusedMember?.focusNodeId ?? null
 
   const edges: HrOrgChartEdge[] = [
     ...departmentNodes
@@ -555,10 +589,13 @@ export const getHrOrgChart = async ({
     accessMode: accessContext.accessMode,
     currentMemberId,
     focusMemberId: resolvedFocusMemberId,
+    focusNodeId,
     nodes,
+    members: memberContexts,
     edges,
     breadcrumbs: buildBreadcrumbs({
-      focusMemberId: resolvedFocusMemberId,
+      focusNodeId,
+      focusedMember,
       nodesById,
       parentNodeIdByNodeId
     }),
@@ -566,10 +603,10 @@ export const getHrOrgChart = async ({
     summary: {
       totalNodes: nodes.length,
       departments: departmentNodes.length,
-      members: memberNodes.length,
+      members: memberContexts.length,
       roots: nodes.filter(node => node.isRoot).length,
       maxDepth: nodes.reduce((maxDepth, node) => Math.max(maxDepth, node.depth), 0),
-      delegatedApprovals: memberNodes.filter(node => node.hasActiveDelegation).length
+      delegatedApprovals: memberContexts.filter(member => member.hasActiveDelegation).length
     }
   }
 }

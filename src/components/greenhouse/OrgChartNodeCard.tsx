@@ -131,8 +131,8 @@ const OrgChartNodeCard = ({ data }: NodeProps<OrgChartNodeCardNode>) => {
                 {node.isDirectReportToCurrentMember ? <Chip size='small' label='Tu equipo' color='success' variant='outlined' sx={{ height: 24 }} /> : null}
                 {node.hasActiveDelegation ? <Chip size='small' label='Delegación activa' color='warning' variant='outlined' sx={{ height: 24 }} /> : null}
                 {node.isDepartmentHead ? <Chip size='small' label='Responsable de área' color='info' variant='outlined' sx={{ height: 24 }} /> : null}
-                {!isDepartmentNode && node.placementMode === 'supervisor' ? (
-                  <Chip size='small' label='Ubicado por supervisor' color='secondary' variant='outlined' sx={{ height: 24 }} />
+                {!isDepartmentNode && node.placementMode === 'inferred_department' ? (
+                  <Chip size='small' label='Contexto heredado' color='secondary' variant='outlined' sx={{ height: 24 }} />
                 ) : null}
               </Stack>
 
@@ -179,15 +179,15 @@ const OrgChartNodeCard = ({ data }: NodeProps<OrgChartNodeCardNode>) => {
               title={
                 isDepartmentNode
                   ? node.parentDepartmentName ?? 'Nivel raíz'
-                  : node.placementMode === 'supervisor'
-                    ? node.supervisorName ? `Ubicado bajo ${node.supervisorName}` : 'Ubicación visual por supervisor'
+                  : node.placementMode === 'inferred_department'
+                    ? node.contextDepartmentName ? `Área visible: ${node.contextDepartmentName}` : 'Contexto estructural heredado'
                     : node.supervisorName ?? 'Sin supervisor visible'
               }
             >
               {isDepartmentNode
                 ? node.parentDepartmentName ? `Reporta a ${node.parentDepartmentName}` : 'Nivel raíz'
-                : node.placementMode === 'supervisor'
-                  ? node.supervisorName ? `Ubicado bajo ${node.supervisorName}` : 'Ubicación visual por supervisor'
+                : node.placementMode === 'inferred_department'
+                  ? node.contextDepartmentName ? `Área visible: ${node.contextDepartmentName}` : 'Contexto estructural heredado'
                   : node.supervisorName ? `Reporta a ${node.supervisorName}` : 'Sin supervisor visible'}
             </Typography>
           </Box>

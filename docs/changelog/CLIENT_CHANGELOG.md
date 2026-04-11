@@ -51,19 +51,20 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ### Novedades
 
-- `Organigrama` ahora mantiene la cadena visual del equipo incluso cuando una persona todavía no tiene adscripción estructural de departamento.
+- `Organigrama` ahora mantiene el contexto visual del área incluso cuando una persona todavía no tiene adscripción estructural directa.
 
 ### Mejoras
 
 - La búsqueda y el panel lateral conservan el contexto del área visible aunque la adscripción formal siga pendiente.
+- Los responsables de área se presentan dentro de su departamento sin duplicarse como una persona hija de la misma área.
 
 ### Correcciones
 
-- El organigrama deja de mostrar como raíces planas a personas que sí tienen supervisor formal.
+- El organigrama deja de mostrar como raíces planas a personas que sí tienen contexto estructural visible.
 
 ### Notas
 
-- La vista sigue priorizando estructura por áreas; la cadena de supervisoría entra como fallback visual cuando falta la adscripción estructural.
+- La vista sigue priorizando estructura por áreas; la supervisoría formal se mantiene como dato contextual y ya no redefine las aristas visuales del organigrama.
 
 ## 2026.04-beta.11
 

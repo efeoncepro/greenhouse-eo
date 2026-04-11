@@ -2,11 +2,11 @@
 
 ## 2026-04-10
 
-### 2026-04-10 — Organigrama híbrido para miembros sin adscripción estructural
+### 2026-04-10 — Organigrama estructural con contexto heredado
 
-- `HR > Organigrama` ahora resuelve el parentaje visual de cada persona de forma robusta cuando todavía no existe `department_id`.
-- Si una persona tiene supervisor formal visible pero aún no tiene adscripción estructural, el grafo la cuelga de la cadena de supervisoría en vez de dejarla como raíz plana.
-- La vista ahora explica ese caso en el panel lateral y conserva breadcrumb + contexto de área heredada para no perder legibilidad.
+- `HR > Organigrama` ahora resuelve la ubicación visual de cada persona desde estructura de áreas, incluso cuando todavía no existe `department_id`.
+- Los responsables de área quedan representados dentro del nodo del departamento y dejan de aparecer duplicados como personas hijas de su propia área.
+- La vista ahora explica los casos pendientes como `Contexto heredado` y conserva breadcrumb + contexto de área sin convertir la cadena de supervisoría en aristas del organigrama.
 
 ### 2026-04-10 — Hierarchy and org chart audit issues closed
 

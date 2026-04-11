@@ -1,17 +1,21 @@
 # Handoff.md
 
-## Sesion 2026-04-10 — organigrama híbrido cuando falta adscripción estructural
+## Sesion 2026-04-11 — organigrama estructural sin duplicar responsables como hijos
 
 - alcance cerrado:
-  - `HR > Organigrama` ya no deja como raíces planas a personas con supervisor formal pero `department_id = null`
+  - `HR > Organigrama` ya no duplica a la persona responsable de un área como si fuera hija de su propio departamento
   - el reader ahora resuelve un parentaje visual robusto en este orden:
     - adscripción estructural directa (`members.department_id`)
     - liderazgo de área (`departments.head_member_id`)
-    - cadena formal de supervisoría visible
-  - cuando una persona cuelga visualmente de su supervisor por falta de adscripción estructural:
-    - el breadcrumb conserva el contexto completo
-    - el panel lateral lo explica explícitamente
-    - la búsqueda muestra el área de contexto heredada
+    - contexto estructural heredado desde el área visible más cercana
+  - regla operativa explícita:
+    - los departamentos son los nodos estructurales del organigrama
+    - el responsable del área se representa dentro del nodo del departamento, no como persona hija de esa misma área
+    - la supervisoría formal sigue visible como metadata y se administra en `HR > Jerarquía`, pero no define las aristas del organigrama
+  - cuando una persona todavía no tiene adscripción estructural directa:
+    - el breadcrumb conserva el contexto completo del área visible
+    - el panel lateral marca el caso como `Contexto heredado`
+    - el nodo cuelga del área estructural visible más cercana, no de otra persona
 - archivos sensibles / de alto impacto tocados:
   - `src/lib/reporting-hierarchy/org-chart.ts`
   - `src/views/greenhouse/hr-core/HrOrgChartView.tsx`

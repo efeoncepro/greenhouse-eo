@@ -220,7 +220,7 @@ describe('getHrOrgChart', () => {
     expect(result.summary.departments).toBe(2)
     expect(result.summary.members).toBe(3)
     expect(result.nodes.some(node => node.nodeType === 'department' && node.departmentId === 'creative-team')).toBe(true)
-    expect(result.nodes.some(node => node.nodeType === 'member' && node.memberId === 'daniela-ferreira')).toBe(true)
+    expect(result.nodes.some(node => node.nodeType === 'member' && node.memberId === 'daniela-ferreira')).toBe(false)
     expect(result.nodes.some(node => node.nodeType === 'member' && node.memberId === 'andres-carlosama')).toBe(true)
     expect(result.edges).toEqual(
       expect.arrayContaining([
@@ -230,17 +230,13 @@ describe('getHrOrgChart', () => {
           target: 'department:creative-team'
         },
         {
-          id: 'department:creative-team-member:daniela-ferreira',
+          id: 'department:creative-team-member:andres-carlosama',
           source: 'department:creative-team',
-          target: 'member:daniela-ferreira'
-        },
-        {
-          id: 'member:daniela-ferreira-member:andres-carlosama',
-          source: 'member:daniela-ferreira',
           target: 'member:andres-carlosama'
         }
       ])
     )
+    expect(result.focusNodeId).toBe('department:creative-team')
     expect(result.breadcrumbs.map(item => item.label)).toEqual(['Ejecutivo', 'Creative Team', 'Daniela Ferreira'])
   })
 
@@ -254,13 +250,16 @@ describe('getHrOrgChart', () => {
     })
 
     const danielaNode = result.nodes.find(node => node.nodeType === 'member' && node.memberId === 'daniela-ferreira')
+    const danielaMember = result.members.find(member => member.memberId === 'daniela-ferreira')
 
-    expect(danielaNode?.departmentId).toBe('creative-team')
-    expect(danielaNode?.departmentName).toBe('Creative Team')
-    expect(danielaNode?.isDepartmentHead).toBe(true)
+    expect(danielaNode).toBeUndefined()
+    expect(danielaMember?.departmentId).toBe('creative-team')
+    expect(danielaMember?.departmentName).toBe('Creative Team')
+    expect(danielaMember?.isDepartmentHead).toBe(true)
+    expect(danielaMember?.focusNodeId).toBe('department:creative-team')
   })
 
-  it('hangs members without structural assignment under their visible supervisor instead of leaving them as roots', async () => {
+  it('keeps members without structural assignment inside the inherited area context instead of creating member-to-member edges', async () => {
     const result = await getHrOrgChart({
       tenant: { userId: 'user-1', memberId: 'julio-reyes' } as any,
       accessContext: {
@@ -271,15 +270,16 @@ describe('getHrOrgChart', () => {
     })
 
     const andresNode = result.nodes.find(node => node.nodeType === 'member' && node.memberId === 'andres-carlosama')
+    const andresMember = result.members.find(member => member.memberId === 'andres-carlosama')
 
-    expect(andresNode?.placementMode).toBe('supervisor')
-    expect(andresNode?.visualParentNodeId).toBe('member:daniela-ferreira')
+    expect(andresNode?.placementMode).toBe('inferred_department')
+    expect(andresNode?.visualParentNodeId).toBe('department:creative-team')
     expect(andresNode?.contextDepartmentName).toBe('Creative Team')
     expect(andresNode?.isRoot).toBe(false)
+    expect(andresMember?.focusNodeId).toBe('member:andres-carlosama')
     expect(result.breadcrumbs.map(item => item.label)).toEqual([
       'Ejecutivo',
       'Creative Team',
-      'Daniela Ferreira',
       'Andres Carlosama'
     ])
   })
@@ -320,7 +320,8 @@ describe('getHrOrgChart', () => {
     })
 
     expect(result.memberOptions.map(option => option.memberId)).toEqual(['daniela-ferreira'])
-    expect(result.nodes.filter(node => node.nodeType === 'member').map(node => node.memberId)).toEqual(['daniela-ferreira'])
+    expect(result.nodes.filter(node => node.nodeType === 'member').map(node => node.memberId)).toEqual([])
+    expect(result.members.map(member => member.memberId)).toEqual(['daniela-ferreira'])
     expect(result.nodes.filter(node => node.nodeType === 'department').map(node => node.departmentId)).toEqual(
       expect.arrayContaining(['creative-team', 'ejecutivo'])
     )

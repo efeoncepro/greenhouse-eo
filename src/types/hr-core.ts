@@ -306,7 +306,7 @@ export interface HrOrgChartNode {
   supervisorName: string | null
   visualParentNodeId: string | null
   visualParentLabel: string | null
-  placementMode: 'department' | 'supervisor' | 'root'
+  placementMode: 'department' | 'inferred_department' | 'root'
   depth: number
   directReportsCount: number
   subtreeSize: number
@@ -343,11 +343,40 @@ export interface HrOrgChartMemberOption {
   isCurrentMember: boolean
 }
 
+export interface HrOrgChartMemberContext {
+  memberId: string
+  focusNodeId: string | null
+  renderedNodeId: string | null
+  displayName: string
+  publicEmail: string
+  internalEmail: string | null
+  avatarUrl: string | null
+  roleTitle: string | null
+  roleCategory: string
+  departmentId: string | null
+  departmentName: string | null
+  contextDepartmentId: string | null
+  contextDepartmentName: string | null
+  supervisorMemberId: string | null
+  supervisorName: string | null
+  locationCountry: string | null
+  payRegime: 'chile' | 'international' | null
+  directReportsCount: number
+  subtreeSize: number
+  isCurrentMember: boolean
+  isDirectReportToCurrentMember: boolean
+  hasActiveDelegation: boolean
+  isDepartmentHead: boolean
+  placementMode: 'department' | 'inferred_department' | 'root'
+}
+
 export interface HrOrgChartResponse {
   accessMode: 'broad' | 'supervisor'
   currentMemberId: string | null
   focusMemberId: string | null
+  focusNodeId: string | null
   nodes: HrOrgChartNode[]
+  members: HrOrgChartMemberContext[]
   edges: HrOrgChartEdge[]
   breadcrumbs: HrOrgChartBreadcrumb[]
   memberOptions: HrOrgChartMemberOption[]
