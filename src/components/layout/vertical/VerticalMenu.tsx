@@ -133,9 +133,9 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           // Collapsible "Equipo y talento"
           {
             label: nl(GH_AGENCY_NAV.teamAndTalent),
-            icon: 'tabler-affiliate',
+            icon: 'tabler-friends',
             children: [
-              { label: nl(GH_AGENCY_NAV.team), href: '/agency/team', icon: 'tabler-affiliate' },
+              { label: nl(GH_AGENCY_NAV.team), href: '/agency/team', icon: 'tabler-friends' },
               { label: nl(GH_AGENCY_NAV.talentDiscovery), href: '/agency/talent-discovery' },
               { label: nl(GH_AGENCY_NAV.staffAugmentation), href: '/agency/staff-augmentation' }
             ].filter(item => {
