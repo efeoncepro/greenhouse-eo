@@ -2,6 +2,14 @@
 
 ## 2026-04-11
 
+### 2026-04-11 — TASK-367: Claude microinteractions research & dual skill creation
+
+- Claude realizó investigación externa independiente sobre microinteracciones UI/UX (Apple HIG, Fluent, Carbon, Material, W3C/WCAG, Baymard).
+- Skill repo-local creada: `.claude/skills/greenhouse-microinteractions-auditor/skill.md` — aterriza sobre primitives reales de Greenhouse.
+- Skill global creada: `~/.claude/skills/microinteractions-auditor/skill.md` — portable, no acoplada al portal.
+- Diferencias vs Codex documentadas: easing taxonomy, Apple prohibition categories, wait UX behavioral rules, ARIA atomic semantics, WCAG compliance paths, M3 travel-distance scaling.
+- Paridad multi-agente completada: Codex y Claude ahora tienen skills equivalentes (repo-local + global) para auditoría e implementación de microinteracciones.
+
 ### 2026-04-11 — Skill local para auditoría de microinteracciones Greenhouse
 
 - Se agregó la skill de Codex `greenhouse-microinteractions-auditor`.

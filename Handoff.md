@@ -1,5 +1,27 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — TASK-367 COMPLETADA: Claude microinteractions research & dual skill creation
+
+- alcance cerrado:
+  - Claude realizó investigación externa independiente sobre microinteracciones UI/UX con fuentes oficiales:
+    - Apple HIG + Reduced Motion evaluation criteria
+    - Microsoft Fluent (Motion + Wait UX)
+    - IBM Carbon (Motion overview + choreography)
+    - Material Design 3 (duration/easing)
+    - W3C WCAG 2.3.3, prefers-reduced-motion (C39), role=status (ARIA22)
+    - Baymard (inline validation)
+  - skill repo-local creada: `.claude/skills/greenhouse-microinteractions-auditor/skill.md`
+    - aterriza sobre primitives reales: `FramerMotion`, `Lottie`, `useReducedMotion`, `AnimatedCounter`, `EmptyState`, `react-toastify`, MUI
+    - incluye playbook con timing ranges, easing profiles, wait thresholds, reduced motion rules, ARIA semantics
+    - invocable como `/greenhouse-microinteractions-auditor`
+  - skill global creada: `~/.claude/skills/microinteractions-auditor/skill.md`
+    - portable, no acoplada a Greenhouse
+    - invocable como `/microinteractions-auditor`
+  - diferencias vs Codex documentadas en playbook sección 7:
+    - Fluent easing taxonomy, Apple prohibition categories, wait UX behavioral rules, ARIA atomic semantics, WCAG compliance paths, M3 travel-distance scaling
+- rama: `task/TASK-367-claude-microinteractions-research-skills`
+- STATUS: COMPLETE
+
 ## Sesion 2026-04-11 — TASK-367 creada para lane Claude de microinteracciones
 
 - alcance cerrado:

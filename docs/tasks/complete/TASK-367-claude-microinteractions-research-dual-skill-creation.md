@@ -8,13 +8,13 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseno`
-- Rank: `TBD`
+- Status real: `Complete`
+- Rank: `—`
 - Domain: `ui / tooling`
 - Blocked by: `none`
 - Branch: `task/TASK-367-claude-microinteractions-research-skills`
