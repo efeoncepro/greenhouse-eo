@@ -70,7 +70,6 @@ import {
   toStringArray,
   toTimestampString
 } from '@/lib/hr-core/shared'
-import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 import { getPeopleTableColumns } from '@/lib/people/shared'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getSupervisorScopeForTenant } from '@/lib/reporting-hierarchy/access'
@@ -322,12 +321,7 @@ const mapLeaveRequest = (row: LeaveRequestRow): HrLeaveRequest => ({
   requestId: String(row.request_id || ''),
   memberId: String(row.member_id || ''),
   memberName: normalizeNullableString(row.member_name),
-  memberAvatarUrl:
-    normalizeNullableString(row.member_avatar_url) ||
-    resolveAvatarPath({
-      name: normalizeNullableString(row.member_name),
-      email: normalizeNullableString(row.member_email)
-    }),
+  memberAvatarUrl: normalizeNullableString(row.member_avatar_url),
   leaveTypeCode: String(row.leave_type_code || ''),
   leaveTypeName: String(row.leave_type_name || row.leave_type_code || ''),
   startDate: toDateString(row.start_date) || '',
@@ -1584,10 +1578,7 @@ export const createLeaveRequest = async ({
           requestId,
           memberId: effectiveMemberId,
           memberName: normalizeNullableString(member.display_name),
-          memberAvatarUrl: resolveAvatarPath({
-            name: normalizeNullableString(member.display_name),
-            email: normalizeNullableString(member.email)
-          }),
+          memberAvatarUrl: null,
           leaveTypeCode,
           leaveTypeName: leaveType.leaveTypeName,
           startDate,

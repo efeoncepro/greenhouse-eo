@@ -33,7 +33,6 @@ import TablePaginationComponent from '@components/TablePaginationComponent'
 import type { AdminAccessOverview, AdminUserRow } from '@/lib/admin/get-admin-access-overview'
 import { ROLE_CODES } from '@/config/role-codes'
 import { GH_INTERNAL_MESSAGES, GH_INTERNAL_NAV } from '@/config/greenhouse-nomenclature'
-import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 import { getInitials } from '@/utils/getInitials'
 
 import tableStyles from '@core/styles/table.module.css'
@@ -139,7 +138,7 @@ const UserListTable = ({ data }: { data: AdminAccessOverview }) => {
         cell: ({ row }) => {
           const avatarSrc = row.original.avatarUrl
             ? `/api/media/users/${row.original.userId}/avatar`
-            : resolveAvatarPath({ name: row.original.fullName, email: row.original.email })
+            : null
 
           return (
             <div className='flex items-center gap-4'>

@@ -22,7 +22,6 @@ import Typography from '@mui/material/Typography'
 
 import { useSettings } from '@core/hooks/useSettings'
 import { GH_CLIENT_NAV, GH_INTERNAL_NAV, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
-import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 
 const BadgeContentSpan = styled('span')({
   width: 8,
@@ -43,15 +42,10 @@ const UserDropdown = () => {
   const isInternalUser = session?.user?.routeGroups?.includes('internal') ?? false
   const isAdminUser = session?.user?.routeGroups?.includes('admin') ?? false
 
-  const sessionAvatarPath = resolveAvatarPath({
-    name: session?.user?.name,
-    email: session?.user?.email
-  })
-
   const avatarSrc =
     session?.user?.avatarUrl && session.user.userId
       ? `/api/media/users/${session.user.userId}/avatar`
-      : sessionAvatarPath || '/images/avatars/1.png'
+      : '/images/avatars/1.png'
 
   const handleDropdownOpen = () => {
     setOpen(previous => !previous)

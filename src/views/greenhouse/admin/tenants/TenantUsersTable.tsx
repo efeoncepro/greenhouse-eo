@@ -32,7 +32,6 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 
 import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
 import type { AdminTenantUserRow } from '@/lib/admin/get-admin-tenant-detail'
-import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 import { getInitials } from '@/utils/getInitials'
 
 import tableStyles from '@core/styles/table.module.css'
@@ -76,7 +75,7 @@ const TenantUsersTable = ({ users }: TenantUsersTableProps) => {
         cell: ({ row }) => {
           const avatarSrc = row.original.avatarUrl
             ? `/api/media/users/${row.original.userId}/avatar`
-            : resolveAvatarPath({ name: row.original.fullName, email: row.original.email })
+            : null
 
           return (
             <div className='flex items-center gap-4'>

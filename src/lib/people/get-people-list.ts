@@ -6,7 +6,6 @@ import { getBigQueryProjectId } from '@/lib/bigquery'
 import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { readMemberCapacityEconomicsBatch } from '@/lib/member-capacity-economics/store'
 import { PeopleValidationError, getPeopleTableColumns, pickMemberEmails, roundToTenths, runPeopleQuery, toNumber, toStringArray } from '@/lib/people/shared'
-import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 
 type PeopleListRow = {
   member_id: string | null
@@ -38,7 +37,7 @@ const normalizePersonListItem = (row: PeopleListRow): PersonListItem => {
     roleTitle: String(row.role_title || 'Efeonce Team'),
     roleCategory: String(row.role_category || 'unknown'),
     departmentName: row.department_name || null,
-    avatarUrl: row.avatar_url || resolveAvatarPath({ name: row.display_name, email: publicEmail }),
+    avatarUrl: row.avatar_url || null,
     locationCountry: row.location_country || null,
     active: Boolean(row.active),
     totalAssignments: 0,

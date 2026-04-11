@@ -50,7 +50,7 @@ import {
 } from '@/lib/payroll/period-lifecycle'
 import { getHistoricalEconomicIndicatorForPeriod } from '@/lib/finance/economic-indicators'
 import { resolveChileAfpSplitRates } from '@/lib/payroll/chile-previsional-helpers'
-import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
+
 
 // ---------------------------------------------------------------------------
 // Row types (PostgreSQL result shapes)
@@ -443,7 +443,7 @@ const mapCompensationVersion = (row: PgCompensationRow): CompensationVersion => 
     memberId: row.member_id,
     memberName: row.display_name || 'Sin nombre',
     memberEmail: row.primary_email || '',
-    memberAvatarUrl: normalizeNullableString(row.avatar_url) || resolveAvatarPath({ name: row.display_name, email: row.primary_email }),
+    memberAvatarUrl: normalizeNullableString(row.avatar_url),
     notionUserId: null,
     version: toNumber(row.version),
     payRegime,
@@ -504,7 +504,7 @@ const mapEntry = (row: PgEntryRow): PayrollEntry => ({
   memberId: row.member_id,
   memberName: row.display_name || row.member_display_name || 'Sin nombre',
   memberEmail: row.primary_email || '',
-  memberAvatarUrl: normalizeNullableString(row.avatar_url) || resolveAvatarPath({ name: row.display_name || row.member_display_name, email: row.primary_email }),
+  memberAvatarUrl: normalizeNullableString(row.avatar_url),
   compensationVersionId: row.compensation_version_id,
   payRegime: row.pay_regime === 'international' ? 'international' : 'chile',
   payrollVia: row.payroll_via === 'deel' ? 'deel' : 'internal',
@@ -588,7 +588,7 @@ const mapMemberSummary = (row: PgMemberRow): PayrollMemberSummary => ({
   memberId: row.member_id,
   memberName: row.display_name || 'Sin nombre',
   memberEmail: row.primary_email || '',
-  memberAvatarUrl: normalizeNullableString(row.avatar_url) || resolveAvatarPath({ name: row.display_name, email: row.primary_email }),
+  memberAvatarUrl: normalizeNullableString(row.avatar_url),
   notionUserId: null,
   active: Boolean(row.active)
 })

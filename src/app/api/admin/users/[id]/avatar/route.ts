@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { setUserAvatarAssetPath } from '@/lib/admin/media-assets'
+import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import {
   assertSupportedImageFile,
   greenhouseMediaMaxBytes,
@@ -55,6 +56,24 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       userId: id,
       assetPath
     })
+
+    // Propagate to PostgreSQL: client_users + members
+    await runGreenhousePostgresQuery(
+      `UPDATE greenhouse_core.client_users
+       SET avatar_url = $1, updated_at = CURRENT_TIMESTAMP
+       WHERE user_id = $2 AND (avatar_url IS DISTINCT FROM $1)`,
+      [assetPath, id]
+    )
+
+    await runGreenhousePostgresQuery(
+      `UPDATE greenhouse_core.members
+       SET avatar_url = $1, updated_at = CURRENT_TIMESTAMP
+       WHERE member_id = (
+         SELECT member_id FROM greenhouse_core.client_users
+         WHERE user_id = $2 AND member_id IS NOT NULL
+       ) AND (avatar_url IS DISTINCT FROM $1)`,
+      [assetPath, id]
+    )
 
     return NextResponse.json({
       ok: true,

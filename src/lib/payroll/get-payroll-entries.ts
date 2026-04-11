@@ -3,7 +3,7 @@ import 'server-only'
 import type { MemberPayrollHistory, PayrollEntry } from '@/types/payroll'
 
 import { getBigQueryProjectId } from '@/lib/bigquery'
-import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
+
 import { getCompensationHistoryByMember } from '@/lib/payroll/get-compensation'
 import { getPayrollMemberSummary } from '@/lib/payroll/get-payroll-members'
 import { ensurePayrollInfrastructure } from '@/lib/payroll/schema'
@@ -119,7 +119,7 @@ const normalizePayrollEntry = (row: PayrollEntryRow): PayrollEntry => ({
   memberId: String(row.member_id || ''),
   memberName: String(row.display_name || 'Sin nombre'),
   memberEmail: String(row.email || ''),
-  memberAvatarUrl: normalizeNullableString(row.avatar_url) || resolveAvatarPath({ name: row.display_name, email: row.email }),
+  memberAvatarUrl: normalizeNullableString(row.avatar_url),
   compensationVersionId: String(row.compensation_version_id || ''),
   payRegime: row.pay_regime === 'international' ? 'international' : 'chile',
   payrollVia: row.payroll_via === 'deel' ? 'deel' : 'internal',

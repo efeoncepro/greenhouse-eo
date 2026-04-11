@@ -34,7 +34,6 @@ import { readLatestMemberCapacityEconomicsSnapshot, type MemberCapacityEconomics
 import { readPersonIntelligence } from '@/lib/person-intelligence/store'
 import type { PersonIntelligenceSnapshot } from '@/lib/person-intelligence/types'
 import type { TeamIdentityProvider } from '@/types/team'
-import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 import { resolveAvatarUrl } from '@/lib/person-360/resolve-avatar'
 
 type MemberRow = {
@@ -285,7 +284,7 @@ const buildPersonMember = (row: MemberRow): {
       displayName: String(row.display_name || 'Sin nombre'),
       publicEmail,
       internalEmail,
-      avatarUrl: resolveAvatarUrl(row.avatar_url, row.linked_user_id) || resolveAvatarPath({ name: row.display_name, email: publicEmail }),
+      avatarUrl: resolveAvatarUrl(row.avatar_url, row.linked_user_id),
       roleTitle: String(row.role_title || 'Efeonce Team'),
       roleCategory: String(row.role_category || inferRoleCategory(row.role_title)),
       active: Boolean(row.active),

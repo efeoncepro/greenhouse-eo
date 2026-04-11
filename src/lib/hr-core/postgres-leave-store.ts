@@ -69,7 +69,6 @@ import {
   toInt,
   toNullableNumber
 } from '@/lib/hr-core/shared'
-import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 import { attachAssetToAggregate, buildPrivateAssetDownloadUrl } from '@/lib/storage/greenhouse-assets'
 
 type PostgresDepartmentRow = {
@@ -306,10 +305,7 @@ const mapLeaveRequest = (row: PostgresLeaveRequestRow): HrLeaveRequest => ({
   requestId: row.request_id,
   memberId: row.member_id,
   memberName: normalizeNullableString(row.member_name),
-  memberAvatarUrl: resolveAvatarPath({
-    name: normalizeNullableString(row.member_name),
-    email: normalizeNullableString(row.member_email)
-  }),
+  memberAvatarUrl: null,
   leaveTypeCode: row.leave_type_code,
   leaveTypeName: normalizeNullableString(row.leave_type_name) || row.leave_type_code,
   startDate: toPgDateString(row.start_date) || '',
@@ -1783,10 +1779,7 @@ export const createLeaveRequestInPostgres = async ({
       requestId,
       memberId: effectiveMemberId,
       memberName: normalizeNullableString(member.display_name),
-      memberAvatarUrl: resolveAvatarPath({
-        name: normalizeNullableString(member.display_name),
-        email: normalizeNullableString(member.email)
-      }),
+      memberAvatarUrl: null,
       leaveTypeCode,
       leaveTypeName: leaveType.leaveTypeName,
       startDate,

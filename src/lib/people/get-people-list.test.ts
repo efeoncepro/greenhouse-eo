@@ -26,9 +26,6 @@ vi.mock('@/lib/people/shared', () => ({
   toStringArray: (v: unknown) => (Array.isArray(v) ? v : [])
 }))
 
-vi.mock('@/lib/people/resolve-avatar-path', () => ({
-  resolveAvatarPath: () => '/default-avatar.png'
-}))
 
 const mockCapacityBatch = vi.fn()
 

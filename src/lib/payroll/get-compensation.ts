@@ -30,7 +30,6 @@ import {
   isCompensationVersionLockedByPayroll
 } from '@/lib/payroll/compensation-versioning'
 import { getBigQueryProjectId } from '@/lib/bigquery'
-import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 import {
   isPayrollPostgresEnabled,
   pgGetCurrentCompensation,
@@ -201,7 +200,7 @@ const normalizeCompensationVersion = (row: CompensationRow): CompensationVersion
     memberId: String(row.member_id || ''),
     memberName: String(row.display_name || 'Sin nombre'),
     memberEmail: String(row.email || ''),
-    memberAvatarUrl: normalizeNullableString(row.avatar_url) || resolveAvatarPath({ name: row.display_name, email: row.email }),
+    memberAvatarUrl: normalizeNullableString(row.avatar_url),
     notionUserId: normalizeNullableString(row.notion_user_id),
     version: toNumber(row.version),
     payRegime,
@@ -385,7 +384,7 @@ const listFallbackPayrollMembers = async (): Promise<PayrollCompensationMember[]
     memberId: String(row.member_id || ''),
     memberName: String(row.display_name || 'Sin nombre'),
     memberEmail: String(row.email || ''),
-    memberAvatarUrl: normalizeNullableString(row.avatar_url) || resolveAvatarPath({ name: row.display_name, email: row.email }),
+    memberAvatarUrl: normalizeNullableString(row.avatar_url),
     notionUserId: normalizeNullableString(row.notion_user_id),
     active: true,
     hasCurrentCompensation: false,

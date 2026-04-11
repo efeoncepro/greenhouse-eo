@@ -13,7 +13,6 @@ import { toast } from 'react-toastify'
 import { IdentityImageUploader } from '@/components/greenhouse'
 import { GH_INTERNAL_MESSAGES } from '@/config/greenhouse-nomenclature'
 import type { AdminUserDetail } from '@/lib/admin/get-admin-user-detail'
-import { resolveAvatarPath } from '@/lib/people/resolve-avatar-path'
 import { getInitials } from '@/utils/getInitials'
 
 import { formatDateTime, statusTone, tenantTone, toTitleCase } from './helpers'
@@ -27,7 +26,7 @@ const UserDetailHeader = ({ data }: Props) => {
 
   const avatarSrc = data.avatarUrl
     ? `/api/media/users/${data.userId}/avatar`
-    : resolveAvatarPath({ name: data.fullName, email: data.email })
+    : null
 
   const handleResendOnboarding = async () => {
     setResending(true)

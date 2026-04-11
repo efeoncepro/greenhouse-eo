@@ -54,9 +54,6 @@ vi.mock('@/lib/people/shared', () => ({
   toContactChannel: (v: unknown) => v || null
 }))
 
-vi.mock('@/lib/people/resolve-avatar-path', () => ({
-  resolveAvatarPath: () => '/default-avatar.png'
-}))
 
 vi.mock('@/lib/person-360/resolve-eo-id', () => ({
   resolvePersonIdentifier: (...args: unknown[]) => mockResolveIdentifier(...args)

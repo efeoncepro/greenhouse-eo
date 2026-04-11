@@ -230,11 +230,21 @@ export const syncEntraProfiles = async (
             ) as ArrayBuffer
           })
 
-          // Update PostgreSQL
+          // Update PostgreSQL — client_users + propagate to members
           await query(
             `UPDATE greenhouse_core.client_users
              SET avatar_url = $1, updated_at = CURRENT_TIMESTAMP
              WHERE user_id = $2 AND (avatar_url IS DISTINCT FROM $1)`,
+            [assetPath, gh.user_id]
+          )
+
+          await query(
+            `UPDATE greenhouse_core.members
+             SET avatar_url = $1, updated_at = CURRENT_TIMESTAMP
+             WHERE member_id = (
+               SELECT member_id FROM greenhouse_core.client_users
+               WHERE user_id = $2 AND member_id IS NOT NULL
+             ) AND (avatar_url IS DISTINCT FROM $1)`,
             [assetPath, gh.user_id]
           )
 
