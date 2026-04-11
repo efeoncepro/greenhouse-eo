@@ -867,6 +867,39 @@ function ToolsSection({
 // Add Language Dialog
 // ---------------------------------------------------------------------------
 
+const COMMON_LANGUAGES = [
+  { code: 'es', name: 'Español' },
+  { code: 'en', name: 'Inglés' },
+  { code: 'pt', name: 'Portugués' },
+  { code: 'fr', name: 'Francés' },
+  { code: 'de', name: 'Alemán' },
+  { code: 'it', name: 'Italiano' },
+  { code: 'zh', name: 'Chino mandarín' },
+  { code: 'ja', name: 'Japonés' },
+  { code: 'ko', name: 'Coreano' },
+  { code: 'ar', name: 'Árabe' },
+  { code: 'ru', name: 'Ruso' },
+  { code: 'hi', name: 'Hindi' },
+  { code: 'nl', name: 'Holandés' },
+  { code: 'sv', name: 'Sueco' },
+  { code: 'da', name: 'Danés' },
+  { code: 'no', name: 'Noruego' },
+  { code: 'fi', name: 'Finlandés' },
+  { code: 'pl', name: 'Polaco' },
+  { code: 'tr', name: 'Turco' },
+  { code: 'he', name: 'Hebreo' },
+  { code: 'th', name: 'Tailandés' },
+  { code: 'vi', name: 'Vietnamita' },
+  { code: 'uk', name: 'Ucraniano' },
+  { code: 'cs', name: 'Checo' },
+  { code: 'ro', name: 'Rumano' },
+  { code: 'hu', name: 'Húngaro' },
+  { code: 'el', name: 'Griego' },
+  { code: 'id', name: 'Indonesio' },
+  { code: 'ms', name: 'Malayo' },
+  { code: 'ca', name: 'Catalán' }
+] as const
+
 function AddLanguageDialog({
   open,
   onClose,
@@ -878,26 +911,21 @@ function AddLanguageDialog({
   existingLanguageCodes: Set<string>
   onSubmit: (languageCode: string, languageName: string, proficiencyLevel: LanguageProficiencyLevel) => Promise<void>
 }) {
-  const [languageCode, setLanguageCode] = useState('')
-  const [languageName, setLanguageName] = useState('')
+  const [selected, setSelected] = useState<(typeof COMMON_LANGUAGES)[number] | null>(null)
   const [proficiency, setProficiency] = useState<LanguageProficiencyLevel>('professional')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const availableLanguages = COMMON_LANGUAGES.filter(l => !existingLanguageCodes.has(l.code))
+
   const handleSubmit = async () => {
-    if (!languageCode.trim() || !languageName.trim()) return
-
-    if (existingLanguageCodes.has(languageCode.trim().toLowerCase())) {
-      setError('Ya tienes este idioma registrado.')
-
-      return
-    }
+    if (!selected) return
 
     setSubmitting(true)
     setError(null)
 
     try {
-      await onSubmit(languageCode.trim().toLowerCase(), languageName.trim(), proficiency)
+      await onSubmit(selected.code, selected.name, proficiency)
       handleClose()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo agregar el idioma.')
@@ -907,8 +935,7 @@ function AddLanguageDialog({
   }
 
   const handleClose = () => {
-    setLanguageCode('')
-    setLanguageName('')
+    setSelected(null)
     setProficiency('professional')
     setError(null)
     onClose()
@@ -919,29 +946,27 @@ function AddLanguageDialog({
       <DialogTitle id='add-lang-dialog-title'>{GH_SKILLS_CERTS.lang_add}</DialogTitle>
       <DialogContent>
         <Stack spacing={3} sx={{ pt: 1 }}>
-          <Stack direction='row' spacing={2}>
-            <TextField
-              label='Codigo'
-              value={languageCode}
-              onChange={e => setLanguageCode(e.target.value)}
-              required
-              disabled={submitting}
-              placeholder='ej. es, en, pt'
-              size='small'
-              sx={{ maxWidth: 120 }}
-              slotProps={{ htmlInput: { maxLength: 10 } }}
-            />
-            <TextField
-              label='Idioma'
-              value={languageName}
-              onChange={e => setLanguageName(e.target.value)}
-              required
-              disabled={submitting}
-              placeholder='ej. Español, English'
-              size='small'
-              fullWidth
-            />
-          </Stack>
+          <Autocomplete
+            options={availableLanguages}
+            getOptionLabel={opt => opt.name}
+            value={selected}
+            onChange={(_, value) => setSelected(value)}
+            disabled={submitting}
+            renderInput={params => (
+              <TextField {...params} label='Idioma' required placeholder='Buscar idioma...' size='small' />
+            )}
+            renderOption={(props, option) => (
+              <li {...props} key={option.code}>
+                <Stack direction='row' spacing={1} alignItems='center'>
+                  <Typography variant='body2' color='text.secondary' sx={{ minWidth: 24, fontFamily: 'monospace' }}>
+                    {option.code}
+                  </Typography>
+                  <Typography variant='body2'>{option.name}</Typography>
+                </Stack>
+              </li>
+            )}
+            noOptionsText='Sin idiomas disponibles'
+          />
           <TextField
             select
             label={GH_SKILLS_CERTS.lang_proficiency}
@@ -966,7 +991,7 @@ function AddLanguageDialog({
         <Button
           variant='contained'
           onClick={handleSubmit}
-          disabled={!languageCode.trim() || !languageName.trim() || submitting}
+          disabled={!selected || submitting}
         >
           {submitting ? 'Guardando...' : GH_SKILLS_CERTS.lang_add}
         </Button>
