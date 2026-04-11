@@ -3,10 +3,13 @@ import { NextResponse } from 'next/server'
 import { query } from '@/lib/db'
 import { getMemberSkillsDirect, StaffingValidationError } from '@/lib/agency/skills-staffing'
 import { getMemberCertifications, CertificationValidationError } from '@/lib/hr-core/certifications'
+import { getMemberTools, ToolValidationError } from '@/lib/hr-core/tools'
+import { getMemberLanguages, LanguageValidationError } from '@/lib/hr-core/languages'
 import { requireHrTenantContext } from '@/lib/tenant/authorization'
 
 import type { MemberSkill } from '@/types/agency-skills'
 import type { MemberCertification, ProfessionalProfile } from '@/types/certifications'
+import type { MemberTool, MemberLanguage } from '@/types/talent-taxonomy'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,6 +18,7 @@ const EXPIRING_SOON_DAYS = 90
 type MemberProfileRow = {
   member_id: string
   display_name: string | null
+  headline: string | null
   about_me: string | null
   linkedin_url: string | null
   portfolio_url: string | null
@@ -58,7 +62,7 @@ export async function GET(
     const rows = await query<MemberProfileRow>(
       `
         SELECT
-          member_id, display_name, about_me,
+          member_id, display_name, headline, about_me,
           linkedin_url, portfolio_url, twitter_url, threads_url,
           behance_url, github_url, dribbble_url,
           phone, location_city, location_country
@@ -74,9 +78,11 @@ export async function GET(
       return NextResponse.json({ error: 'Member not found.' }, { status: 404 })
     }
 
-    const [skills, certifications]: [MemberSkill[], MemberCertification[]] = await Promise.all([
+    const [skills, certifications, tools, languages]: [MemberSkill[], MemberCertification[], MemberTool[], MemberLanguage[]] = await Promise.all([
       getMemberSkillsDirect(memberId),
-      getMemberCertifications(memberId)
+      getMemberCertifications(memberId),
+      getMemberTools(memberId),
+      getMemberLanguages(memberId)
     ])
 
     const verifiedSkillCount = skills.filter(s => s.verifiedBy !== null).length
@@ -87,6 +93,7 @@ export async function GET(
     const profile: ProfessionalProfile = {
       memberId: member.member_id,
       displayName: member.display_name ?? '',
+      headline: member.headline ?? null,
       aboutMe: member.about_me ?? null,
       professionalLinks: {
         linkedinUrl: member.linkedin_url ?? null,
@@ -104,13 +111,17 @@ export async function GET(
       },
       skills,
       certifications,
+      tools,
+      languages,
       summary: {
         skillCount: skills.length,
         certificationCount: certifications.length,
         verifiedSkillCount,
         verifiedCertCount,
         activeCertCount,
-        expiringSoonCount
+        expiringSoonCount,
+        toolCount: tools.length,
+        languageCount: languages.length
       }
     }
 
@@ -121,6 +132,14 @@ export async function GET(
     }
 
     if (error instanceof CertificationValidationError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
+
+    if (error instanceof ToolValidationError) {
+      return NextResponse.json({ error: error.message }, { status: error.statusCode })
+    }
+
+    if (error instanceof LanguageValidationError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode })
     }
 

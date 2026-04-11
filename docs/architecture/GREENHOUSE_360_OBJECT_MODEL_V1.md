@@ -1,5 +1,17 @@
 # Greenhouse 360 Object Model V1
 
+## Delta 2026-04-11 — Hiring / ATS objects formalized around demand, person and handoff
+
+- Greenhouse ya debe tratar `Hiring / ATS` como un dominio de objetos canónicos y no como un pipeline informal previo a `Staff Aug`.
+- Regla nueva:
+  - `TalentDemand` es la capa upstream de demanda de talento
+  - `HiringOpening` es child object de una demanda
+  - `Person` sigue siendo la raíz humana; `CandidateFacet` no crea identidad paralela
+  - `HiringApplication` es la unidad transaccional del pipeline
+  - `HiringHandoff` es el boundary object explícito antes de crear o promover runtime en HR / Assignments / Staff Aug
+- Documento canónico nuevo:
+  - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
+
 ## Delta 2026-04-11 — Person ↔ Legal Entity relationships formalized
 
 - Greenhouse ya debe distinguir explícitamente entre:

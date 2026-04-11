@@ -1,4 +1,5 @@
 import type { MemberSkill } from './agency-skills'
+import type { MemberTool, MemberLanguage } from './talent-taxonomy'
 
 export const CERTIFICATION_VERIFICATION_STATUSES = ['self_declared', 'pending_review', 'verified', 'rejected'] as const
 export type CertificationVerificationStatus = (typeof CERTIFICATION_VERIFICATION_STATUSES)[number]
@@ -58,6 +59,7 @@ export interface VerifyCertificationInput {
 export interface ProfessionalProfile {
   memberId: string
   displayName: string
+  headline: string | null
   aboutMe: string | null
   professionalLinks: {
     linkedinUrl: string | null
@@ -75,6 +77,8 @@ export interface ProfessionalProfile {
   }
   skills: MemberSkill[]
   certifications: MemberCertification[]
+  tools: MemberTool[]
+  languages: MemberLanguage[]
   summary: {
     skillCount: number
     certificationCount: number
@@ -82,5 +86,7 @@ export interface ProfessionalProfile {
     verifiedCertCount: number
     activeCertCount: number
     expiringSoonCount: number
+    toolCount: number
+    languageCount: number
   }
 }

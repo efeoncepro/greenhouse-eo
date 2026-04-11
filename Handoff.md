@@ -1,5 +1,35 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — arquitectura canónica de Hiring / ATS para Efeonce / Greenhouse
+
+- alcance cerrado:
+  - se promovió de research a arquitectura viva el dominio `Hiring / ATS` como capa canónica de fulfillment de talento
+  - el documento nuevo ya cubre:
+    - demanda interna + cliente
+    - trabajo `on_demand` + `on_going`
+    - pool mixto de talento
+    - objeto raíz `TalentDemand`
+    - pipeline sobre `HiringApplication`
+    - boundary explícito `HiringHandoff`
+  - se dejó explícito que:
+    - `Person` sigue siendo la raíz humana
+    - `HRIS` conserva `member` + onboarding interno
+    - `Staff Aug` conserva `placement`
+    - el ATS no debe duplicar payroll, margin ni costo canónico
+- documentos vivos actualizados:
+  - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `docs/architecture/Greenhouse_HRIS_Architecture_v1.md`
+  - `docs/README.md`
+  - `project_context.md`
+  - `changelog.md`
+- validación ejecutada:
+  - revisión manual de consistencia contra `RESEARCH-003`, `Staff Aug enterprise`, `360 Object Model` y boundary HRIS
+  - no aplica build/lint; no hubo cambios de runtime
+- próximo paso natural:
+  - bajar esta arquitectura a task(s) de data model, UI surfaces y handoff con Staff Aug
+
 ## Sesion 2026-04-11 — TASK-314: Talent Profile Enterprise Program activado
 
 - tipo: `umbrella` — coordinación, no código

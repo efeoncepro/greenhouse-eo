@@ -1,5 +1,30 @@
 # project_context.md
 
+## Delta 2026-04-11 Canonical talent taxonomy materialized in PostgreSQL (TASK-315)
+
+- `greenhouse_core` now owns the full professional taxonomy: `tool_catalog` + `member_tools` (29 seeded tools, 8 categories), `member_languages`, and `members.headline`. Combined with prior `skill_catalog`/`member_skills` (TASK-157) and `member_certifications` (TASK-313), BigQuery `member_profiles.skills[]`/`tools[]`/`aiSuites[]` are superseded for runtime reads.
+
+## Delta 2026-04-11 ATS / Hiring ya tiene arquitectura canónica como capa de fulfillment
+
+- Greenhouse ya no debe pensar `ATS` como un módulo de recruitment corporativo genérico ni como apéndice de `Staff Aug`.
+- Regla operativa nueva:
+  - el nombre arquitectónico preferido del dominio es `Hiring / ATS`
+  - `TalentDemand` es el objeto raíz de demanda
+  - `HiringApplication` es la unidad transaccional del pipeline
+  - `HiringHandoff` es el contrato explícito de salida hacia:
+    - `member` / onboarding HR
+    - `assignment`
+    - `placement`
+    - lanes contractuales de contractor/partner
+- Alcance semántico nuevo:
+  - demanda interna y de cliente
+  - trabajo `on_demand` y `on_going`
+  - pool mixto de talento: internos, bench, externos, contractors y partners
+- Regla de diseño:
+  - el kanban del ATS debe mover `applications`, no personas sueltas ni openings sueltos
+- Fuente canónica nueva:
+  - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
+
 ## Delta 2026-04-11 Person vs Legal Entity relationships formalized
 
 - Greenhouse ya deja explícito que una persona no debe modelarse como `user especial` ni como simple extensión de `member` cuando el caso es societario, contractual o financiero.

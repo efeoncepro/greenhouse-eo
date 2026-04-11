@@ -2,6 +2,21 @@
 
 ## 2026-04-11
 
+### 2026-04-11 — Arquitectura canónica de Hiring / ATS para demanda y fulfillment de talento
+
+- Se agregó la spec `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` para modelar `Hiring / ATS` como capa canónica de fulfillment de talento en Greenhouse.
+- La nueva arquitectura fija que:
+  - `TalentDemand` es el objeto raíz de demanda
+  - `HiringApplication` es la unidad transaccional del pipeline
+  - `HiringHandoff` es el contrato explícito hacia HR, assignments o Staff Aug
+  - el dominio debe cubrir demanda interna y de cliente, tanto `on_demand` como `on_going`
+- Deltas breves aplicados a:
+  - `GREENHOUSE_ARCHITECTURE_V1.md`
+  - `GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `Greenhouse_HRIS_Architecture_v1.md`
+  - `project_context.md`
+  - `docs/README.md`
+
 ### 2026-04-11 — TASK-313: Skills y certificaciones — perfil profesional, verificación Efeonce y CRUD
 
 - **3 migraciones aplicadas**: social links en `members` (7 URLs + `about_me`), `visibility` en `member_skills`, tabla `member_certifications` con verificación y FK a assets

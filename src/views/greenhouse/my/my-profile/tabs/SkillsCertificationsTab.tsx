@@ -29,6 +29,7 @@ import VerifiedByEfeonceBadge from '@/components/greenhouse/VerifiedByEfeonceBad
 import CertificatePreviewDialog from '@/components/greenhouse/CertificatePreviewDialog'
 import ProfessionalLinksCard from '@/components/greenhouse/ProfessionalLinksCard'
 import AboutMeCard from '@/components/greenhouse/AboutMeCard'
+import BrandLogo from '@/components/greenhouse/BrandLogo'
 import { GH_SKILLS_CERTS } from '@/config/greenhouse-nomenclature'
 
 import type {
@@ -41,7 +42,16 @@ import type {
   MemberCertification,
   CertificationVerificationStatus
 } from '@/types/certifications'
+import type {
+  MemberTool,
+  ToolCatalogItem,
+  ToolProficiencyLevel,
+  ToolCategory,
+  MemberLanguage,
+  LanguageProficiencyLevel
+} from '@/types/talent-taxonomy'
 import { SKILL_SENIORITY_LEVELS, SKILL_CATEGORY_VALUES } from '@/types/agency-skills'
+import { TOOL_PROFICIENCY_LEVELS, TOOL_CATEGORY_VALUES, LANGUAGE_PROFICIENCY_LEVELS } from '@/types/talent-taxonomy'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -66,7 +76,11 @@ type ProfileData = {
   skills: MemberSkill[]
   catalog: SkillCatalogItem[]
   certifications: MemberCertification[]
+  tools: MemberTool[]
+  toolCatalog: ToolCatalogItem[]
+  languages: MemberLanguage[]
   links: ProfessionalLinks
+  headline: string | null
   aboutMe: string | null
   summary: {
     skillCount: number
@@ -75,6 +89,8 @@ type ProfileData = {
     verifiedCertCount: number
     activeCertCount: number
     expiringSoonCount: number
+    toolCount: number
+    languageCount: number
   }
 }
 
@@ -97,6 +113,32 @@ const CATEGORY_LABELS: Record<SkillCategory, string> = {
   media: 'Medios',
   operations: 'Operaciones',
   other: 'Otra'
+}
+
+const TOOL_CATEGORY_LABELS: Record<ToolCategory, string> = {
+  design: 'Diseño',
+  development: 'Desarrollo',
+  analytics: 'Analítica',
+  media: 'Medios',
+  project_management: 'Gestión de proyectos',
+  collaboration: 'Colaboración',
+  content: 'Contenido',
+  other: 'Otra'
+}
+
+const TOOL_PROFICIENCY_LABELS: Record<ToolProficiencyLevel, string> = {
+  beginner: GH_SKILLS_CERTS.tool_proficiency_beginner,
+  intermediate: GH_SKILLS_CERTS.tool_proficiency_intermediate,
+  advanced: GH_SKILLS_CERTS.tool_proficiency_advanced,
+  expert: GH_SKILLS_CERTS.tool_proficiency_expert
+}
+
+const LANGUAGE_PROFICIENCY_LABELS: Record<LanguageProficiencyLevel, string> = {
+  basic: GH_SKILLS_CERTS.lang_proficiency_basic,
+  conversational: GH_SKILLS_CERTS.lang_proficiency_conversational,
+  professional: GH_SKILLS_CERTS.lang_proficiency_professional,
+  fluent: GH_SKILLS_CERTS.lang_proficiency_fluent,
+  native: GH_SKILLS_CERTS.lang_proficiency_native
 }
 
 const VERIFICATION_STATUS_CONFIG: Record<
@@ -135,11 +177,23 @@ function SummaryCounters({ summary }: { summary: ProfileData['summary'] }) {
         size='small'
       />
       <Chip
+        icon={<i className='tabler-tool' />}
+        label={GH_SKILLS_CERTS.summary_tools(summary.toolCount)}
+        variant='outlined'
+        size='small'
+      />
+      <Chip
         icon={<i className='tabler-certificate' />}
         label={GH_SKILLS_CERTS.summary_certs_active(summary.activeCertCount)}
         variant='outlined'
         size='small'
         color='success'
+      />
+      <Chip
+        icon={<i className='tabler-language' />}
+        label={GH_SKILLS_CERTS.summary_languages(summary.languageCount)}
+        variant='outlined'
+        size='small'
       />
       <Chip
         icon={<i className='tabler-rosette-discount-check' />}
@@ -533,6 +587,594 @@ function SkillsSection({
 }
 
 // ---------------------------------------------------------------------------
+// Add Tool Dialog
+// ---------------------------------------------------------------------------
+
+function AddToolDialog({
+  open,
+  onClose,
+  catalog,
+  existingToolCodes,
+  onSubmit
+}: {
+  open: boolean
+  onClose: () => void
+  catalog: ToolCatalogItem[]
+  existingToolCodes: Set<string>
+  onSubmit: (toolCode: string, proficiencyLevel: ToolProficiencyLevel) => Promise<void>
+}) {
+  const [selectedTool, setSelectedTool] = useState<ToolCatalogItem | null>(null)
+  const [proficiency, setProficiency] = useState<ToolProficiencyLevel>('intermediate')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const availableCatalog = catalog.filter(t => t.active && !existingToolCodes.has(t.toolCode))
+
+  const handleSubmit = async () => {
+    if (!selectedTool) return
+
+    setSubmitting(true)
+    setError(null)
+
+    try {
+      await onSubmit(selectedTool.toolCode, proficiency)
+      handleClose()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo agregar la herramienta.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handleClose = () => {
+    setSelectedTool(null)
+    setProficiency('intermediate')
+    setError(null)
+    onClose()
+  }
+
+  return (
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth='sm' aria-labelledby='add-tool-dialog-title'>
+      <DialogTitle id='add-tool-dialog-title'>{GH_SKILLS_CERTS.tool_add}</DialogTitle>
+      <DialogContent>
+        <Stack spacing={3} sx={{ pt: 1 }}>
+          <Autocomplete
+            options={availableCatalog}
+            getOptionLabel={option => option.toolName}
+            groupBy={option => TOOL_CATEGORY_LABELS[option.toolCategory] ?? option.toolCategory}
+            value={selectedTool}
+            onChange={(_, value) => setSelectedTool(value)}
+            renderOption={(props, option) => (
+              <Box component='li' {...props} key={option.toolCode} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                {option.iconKey ? (
+                  <BrandLogo brand={option.iconKey} size={24} />
+                ) : (
+                  <i className='tabler-tool text-[18px]' style={{ opacity: 0.5 }} />
+                )}
+                <span>{option.toolName}</span>
+              </Box>
+            )}
+            renderInput={params => (
+              <TextField {...params} label='Herramienta' placeholder='Buscar herramienta...' />
+            )}
+            disabled={submitting}
+            noOptionsText='No hay herramientas disponibles'
+          />
+          <TextField
+            select
+            label={GH_SKILLS_CERTS.tool_proficiency}
+            value={proficiency}
+            onChange={e => setProficiency(e.target.value as ToolProficiencyLevel)}
+            disabled={submitting}
+            size='small'
+          >
+            {TOOL_PROFICIENCY_LEVELS.map(level => (
+              <MenuItem key={level} value={level}>
+                {TOOL_PROFICIENCY_LABELS[level]}
+              </MenuItem>
+            ))}
+          </TextField>
+          {error && <Alert severity='error'>{error}</Alert>}
+        </Stack>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose} disabled={submitting}>
+          Cancelar
+        </Button>
+        <Button variant='contained' onClick={handleSubmit} disabled={!selectedTool || submitting}>
+          {submitting ? 'Guardando...' : GH_SKILLS_CERTS.tool_add}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Tools Section
+// ---------------------------------------------------------------------------
+
+function ToolsSection({
+  tools,
+  catalog,
+  mode,
+  onAdd,
+  onRemove,
+  onVerify
+}: {
+  tools: MemberTool[]
+  catalog: ToolCatalogItem[]
+  mode: 'self' | 'admin'
+  onAdd: (toolCode: string, proficiencyLevel: ToolProficiencyLevel) => Promise<void>
+  onRemove: (toolCode: string) => Promise<void>
+  onVerify?: (toolCode: string, action: 'verify' | 'unverify') => Promise<void>
+}) {
+  const [showAddDialog, setShowAddDialog] = useState(false)
+  const existingToolCodes = new Set(tools.map(t => t.toolCode))
+
+  // Group tools by category
+  const grouped = TOOL_CATEGORY_VALUES.reduce<Record<string, MemberTool[]>>((acc, cat) => {
+    const items = tools.filter(t => t.toolCategory === cat)
+
+    if (items.length > 0) acc[cat] = items
+
+    return acc
+  }, {})
+
+  return (
+    <>
+      <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
+        <CardHeader
+          title={GH_SKILLS_CERTS.section_tools}
+          avatar={
+            <Avatar variant='rounded' sx={{ bgcolor: 'warning.lightOpacity', color: 'warning.main' }}>
+              <i className='tabler-tool' />
+            </Avatar>
+          }
+          action={
+            <Button
+              size='small'
+              variant='tonal'
+              startIcon={<i className='tabler-plus' />}
+              onClick={() => setShowAddDialog(true)}
+            >
+              {GH_SKILLS_CERTS.tool_add}
+            </Button>
+          }
+        />
+        <Divider />
+        <CardContent>
+          {tools.length === 0 ? (
+            <Stack alignItems='center' spacing={1} sx={{ py: 4 }}>
+              <i className='tabler-tool text-[28px]' style={{ opacity: 0.3 }} />
+              <Typography variant='body2' color='text.secondary'>
+                {GH_SKILLS_CERTS.empty_tools_title}
+              </Typography>
+              <Typography variant='caption' color='text.disabled'>
+                {GH_SKILLS_CERTS.empty_tools_description}
+              </Typography>
+            </Stack>
+          ) : (
+            <Stack spacing={3}>
+              {Object.entries(grouped).map(([category, items]) => (
+                <Box key={category}>
+                  <Typography variant='caption' color='text.secondary' sx={{ mb: 1, display: 'block' }}>
+                    {TOOL_CATEGORY_LABELS[category as ToolCategory] ?? category}
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                    {items.map(tool => (
+                      <Chip
+                        key={tool.toolCode}
+                        icon={
+                          tool.iconKey ? (
+                            <BrandLogo brand={tool.iconKey} size={20} />
+                          ) : undefined
+                        }
+                        label={
+                          <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+                            <span>{tool.toolName}</span>
+                            <Typography
+                              component='span'
+                              variant='caption'
+                              sx={{
+                                bgcolor: 'action.selected',
+                                borderRadius: 0.5,
+                                px: 0.5,
+                                fontSize: '0.65rem',
+                                fontWeight: 600,
+                                textTransform: 'uppercase'
+                              }}
+                            >
+                              {TOOL_PROFICIENCY_LABELS[tool.proficiencyLevel]}
+                            </Typography>
+                            {tool.verifiedBy && (
+                              <i className='tabler-rosette-discount-check text-[14px]' style={{ color: 'var(--mui-palette-info-main)' }} />
+                            )}
+                          </Box>
+                        }
+                        variant='outlined'
+                        size='small'
+                        onDelete={() => onRemove(tool.toolCode)}
+                        deleteIcon={
+                          <Tooltip title={GH_SKILLS_CERTS.tool_remove}>
+                            <i className='tabler-x text-[14px]' />
+                          </Tooltip>
+                        }
+                        sx={{ '& .MuiChip-label': { display: 'flex', alignItems: 'center' } }}
+                      />
+                    ))}
+                  </Box>
+                  {mode === 'admin' && onVerify && (
+                    <Stack direction='row' spacing={0.5} sx={{ mt: 1 }}>
+                      {items.map(tool => (
+                        <Tooltip
+                          key={tool.toolCode}
+                          title={
+                            tool.verifiedBy
+                              ? GH_SKILLS_CERTS.unverify_action
+                              : GH_SKILLS_CERTS.verify_action
+                          }
+                        >
+                          <IconButton
+                            size='small'
+                            color={tool.verifiedBy ? 'info' : 'default'}
+                            onClick={() =>
+                              onVerify(tool.toolCode, tool.verifiedBy ? 'unverify' : 'verify')
+                            }
+                            aria-label={`${tool.verifiedBy ? GH_SKILLS_CERTS.unverify_action : GH_SKILLS_CERTS.verify_action} ${tool.toolName}`}
+                          >
+                            <i className={tool.verifiedBy ? 'tabler-rosette-discount-check' : 'tabler-rosette'} />
+                          </IconButton>
+                        </Tooltip>
+                      ))}
+                    </Stack>
+                  )}
+                </Box>
+              ))}
+            </Stack>
+          )}
+        </CardContent>
+      </Card>
+
+      <AddToolDialog
+        open={showAddDialog}
+        onClose={() => setShowAddDialog(false)}
+        catalog={catalog}
+        existingToolCodes={existingToolCodes}
+        onSubmit={onAdd}
+      />
+    </>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Add Language Dialog
+// ---------------------------------------------------------------------------
+
+function AddLanguageDialog({
+  open,
+  onClose,
+  existingLanguageCodes,
+  onSubmit
+}: {
+  open: boolean
+  onClose: () => void
+  existingLanguageCodes: Set<string>
+  onSubmit: (languageCode: string, languageName: string, proficiencyLevel: LanguageProficiencyLevel) => Promise<void>
+}) {
+  const [languageCode, setLanguageCode] = useState('')
+  const [languageName, setLanguageName] = useState('')
+  const [proficiency, setProficiency] = useState<LanguageProficiencyLevel>('professional')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleSubmit = async () => {
+    if (!languageCode.trim() || !languageName.trim()) return
+
+    if (existingLanguageCodes.has(languageCode.trim().toLowerCase())) {
+      setError('Ya tienes este idioma registrado.')
+
+      return
+    }
+
+    setSubmitting(true)
+    setError(null)
+
+    try {
+      await onSubmit(languageCode.trim().toLowerCase(), languageName.trim(), proficiency)
+      handleClose()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo agregar el idioma.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handleClose = () => {
+    setLanguageCode('')
+    setLanguageName('')
+    setProficiency('professional')
+    setError(null)
+    onClose()
+  }
+
+  return (
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth='sm' aria-labelledby='add-lang-dialog-title'>
+      <DialogTitle id='add-lang-dialog-title'>{GH_SKILLS_CERTS.lang_add}</DialogTitle>
+      <DialogContent>
+        <Stack spacing={3} sx={{ pt: 1 }}>
+          <Stack direction='row' spacing={2}>
+            <TextField
+              label='Codigo'
+              value={languageCode}
+              onChange={e => setLanguageCode(e.target.value)}
+              required
+              disabled={submitting}
+              placeholder='ej. es, en, pt'
+              size='small'
+              sx={{ maxWidth: 120 }}
+              slotProps={{ htmlInput: { maxLength: 10 } }}
+            />
+            <TextField
+              label='Idioma'
+              value={languageName}
+              onChange={e => setLanguageName(e.target.value)}
+              required
+              disabled={submitting}
+              placeholder='ej. Español, English'
+              size='small'
+              fullWidth
+            />
+          </Stack>
+          <TextField
+            select
+            label={GH_SKILLS_CERTS.lang_proficiency}
+            value={proficiency}
+            onChange={e => setProficiency(e.target.value as LanguageProficiencyLevel)}
+            disabled={submitting}
+            size='small'
+          >
+            {LANGUAGE_PROFICIENCY_LEVELS.map(level => (
+              <MenuItem key={level} value={level}>
+                {LANGUAGE_PROFICIENCY_LABELS[level]}
+              </MenuItem>
+            ))}
+          </TextField>
+          {error && <Alert severity='error'>{error}</Alert>}
+        </Stack>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose} disabled={submitting}>
+          Cancelar
+        </Button>
+        <Button
+          variant='contained'
+          onClick={handleSubmit}
+          disabled={!languageCode.trim() || !languageName.trim() || submitting}
+        >
+          {submitting ? 'Guardando...' : GH_SKILLS_CERTS.lang_add}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Languages Section
+// ---------------------------------------------------------------------------
+
+function LanguagesSection({
+  languages,
+  onAdd,
+  onRemove
+}: {
+  languages: MemberLanguage[]
+  onAdd: (languageCode: string, languageName: string, proficiencyLevel: LanguageProficiencyLevel) => Promise<void>
+  onRemove: (languageCode: string) => Promise<void>
+}) {
+  const [showAddDialog, setShowAddDialog] = useState(false)
+  const existingLanguageCodes = new Set(languages.map(l => l.languageCode))
+
+  return (
+    <>
+      <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
+        <CardHeader
+          title={GH_SKILLS_CERTS.section_languages}
+          avatar={
+            <Avatar variant='rounded' sx={{ bgcolor: 'info.lightOpacity', color: 'info.main' }}>
+              <i className='tabler-language' />
+            </Avatar>
+          }
+          action={
+            <Button
+              size='small'
+              variant='tonal'
+              startIcon={<i className='tabler-plus' />}
+              onClick={() => setShowAddDialog(true)}
+            >
+              {GH_SKILLS_CERTS.lang_add}
+            </Button>
+          }
+        />
+        <Divider />
+        <CardContent>
+          {languages.length === 0 ? (
+            <Stack alignItems='center' spacing={1} sx={{ py: 4 }}>
+              <i className='tabler-language text-[28px]' style={{ opacity: 0.3 }} />
+              <Typography variant='body2' color='text.secondary'>
+                {GH_SKILLS_CERTS.empty_languages_title}
+              </Typography>
+              <Typography variant='caption' color='text.disabled'>
+                {GH_SKILLS_CERTS.empty_languages_description}
+              </Typography>
+            </Stack>
+          ) : (
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              {languages.map(lang => (
+                <Chip
+                  key={lang.languageCode}
+                  label={
+                    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+                      <span>{lang.languageName}</span>
+                      <Typography
+                        component='span'
+                        variant='caption'
+                        sx={{
+                          bgcolor: 'action.selected',
+                          borderRadius: 0.5,
+                          px: 0.5,
+                          fontSize: '0.65rem',
+                          fontWeight: 600,
+                          textTransform: 'uppercase'
+                        }}
+                      >
+                        {LANGUAGE_PROFICIENCY_LABELS[lang.proficiencyLevel]}
+                      </Typography>
+                    </Box>
+                  }
+                  variant='outlined'
+                  size='small'
+                  onDelete={() => onRemove(lang.languageCode)}
+                  deleteIcon={
+                    <Tooltip title={GH_SKILLS_CERTS.lang_remove}>
+                      <i className='tabler-x text-[14px]' />
+                    </Tooltip>
+                  }
+                  sx={{ '& .MuiChip-label': { display: 'flex', alignItems: 'center' } }}
+                />
+              ))}
+            </Box>
+          )}
+        </CardContent>
+      </Card>
+
+      <AddLanguageDialog
+        open={showAddDialog}
+        onClose={() => setShowAddDialog(false)}
+        existingLanguageCodes={existingLanguageCodes}
+        onSubmit={onAdd}
+      />
+    </>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Headline Card
+// ---------------------------------------------------------------------------
+
+function HeadlineCard({
+  value,
+  editable,
+  onSave
+}: {
+  value: string | null
+  editable: boolean
+  onSave?: (value: string) => Promise<void>
+}) {
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(value ?? '')
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const MAX_HEADLINE_CHARS = 120
+
+  const handleEdit = () => {
+    setDraft(value ?? '')
+    setEditing(true)
+    setError(null)
+  }
+
+  const handleCancel = () => {
+    setEditing(false)
+    setError(null)
+  }
+
+  const handleSave = async () => {
+    if (!onSave) return
+
+    setSaving(true)
+    setError(null)
+
+    try {
+      await onSave(draft.trim())
+      setEditing(false)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudieron guardar los cambios.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (editing) {
+    return (
+      <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
+        <CardHeader
+          title={GH_SKILLS_CERTS.section_headline}
+          action={
+            <Stack direction='row' spacing={1}>
+              <Button size='small' onClick={handleCancel} disabled={saving}>
+                Cancelar
+              </Button>
+              <Button size='small' variant='contained' onClick={handleSave} disabled={saving}>
+                {saving ? 'Guardando...' : 'Guardar'}
+              </Button>
+            </Stack>
+          }
+        />
+        <CardContent>
+          <Stack spacing={1}>
+            <TextField
+              value={draft}
+              onChange={e => {
+                if (e.target.value.length <= MAX_HEADLINE_CHARS) {
+                  setDraft(e.target.value)
+                }
+              }}
+              placeholder={GH_SKILLS_CERTS.headline_placeholder}
+              fullWidth
+              size='small'
+              disabled={saving}
+              slotProps={{
+                htmlInput: { maxLength: MAX_HEADLINE_CHARS }
+              }}
+            />
+            <Typography variant='caption' color='text.secondary' textAlign='right'>
+              {draft.length} / {MAX_HEADLINE_CHARS}
+            </Typography>
+            {error && <Alert severity='error'>{error}</Alert>}
+          </Stack>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  return (
+    <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.divider}` }}>
+      <CardHeader
+        title={GH_SKILLS_CERTS.section_headline}
+        action={
+          editable ? (
+            <IconButton size='small' onClick={handleEdit} aria-label='Editar titular profesional'>
+              <i className='tabler-pencil' />
+            </IconButton>
+          ) : undefined
+        }
+      />
+      <CardContent>
+        {value ? (
+          <Typography variant='body2' color='text.secondary' fontStyle='italic'>
+            {value}
+          </Typography>
+        ) : (
+          <Typography variant='body2' color='text.disabled'>
+            {GH_SKILLS_CERTS.headline_placeholder}
+          </Typography>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // Certifications Section
 // ---------------------------------------------------------------------------
 
@@ -751,6 +1393,9 @@ const SkillsCertificationsTab = ({ mode, memberId }: SkillsCertificationsTabProp
           skills: profile.skills ?? [],
           catalog: [],
           certifications: profile.certifications ?? [],
+          tools: profile.tools ?? [],
+          toolCatalog: [],
+          languages: profile.languages ?? [],
           links: profile.professionalLinks ?? {
             linkedinUrl: null,
             portfolioUrl: null,
@@ -760,6 +1405,7 @@ const SkillsCertificationsTab = ({ mode, memberId }: SkillsCertificationsTabProp
             githubUrl: null,
             dribbbleUrl: null
           },
+          headline: profile.headline ?? null,
           aboutMe: profile.aboutMe ?? null,
           summary: profile.summary ?? {
             skillCount: 0,
@@ -767,37 +1413,59 @@ const SkillsCertificationsTab = ({ mode, memberId }: SkillsCertificationsTabProp
             verifiedSkillCount: 0,
             verifiedCertCount: 0,
             activeCertCount: 0,
-            expiringSoonCount: 0
+            expiringSoonCount: 0,
+            toolCount: 0,
+            languageCount: 0
           }
         })
 
-        // Also fetch catalog for admin add-skill dialog
-        const catalogRes = await fetch('/api/my/skills')
+        // Also fetch catalogs for admin add dialogs
+        const [skillCatalogRes, toolCatalogRes] = await Promise.all([
+          fetch('/api/my/skills'),
+          fetch('/api/my/tools')
+        ])
 
-        if (catalogRes.ok) {
-          const catalogData = await catalogRes.json()
+        if (skillCatalogRes.ok || toolCatalogRes.ok) {
+          const [skillCatalogData, toolCatalogData] = await Promise.all([
+            skillCatalogRes.ok ? skillCatalogRes.json() : { catalog: [] },
+            toolCatalogRes.ok ? toolCatalogRes.json() : { catalog: [] }
+          ])
 
-          setData(prev => (prev ? { ...prev, catalog: catalogData.catalog ?? [] } : prev))
+          setData(prev =>
+            prev
+              ? {
+                  ...prev,
+                  catalog: skillCatalogData.catalog ?? [],
+                  toolCatalog: toolCatalogData.catalog ?? []
+                }
+              : prev
+          )
         }
       } else {
-        const [skillsRes, certsRes, linksRes] = await Promise.all([
+        const [skillsRes, certsRes, linksRes, toolsRes, langsRes] = await Promise.all([
           fetch('/api/my/skills'),
           fetch('/api/my/certifications'),
-          fetch('/api/my/professional-links')
+          fetch('/api/my/professional-links'),
+          fetch('/api/my/tools'),
+          fetch('/api/my/languages')
         ])
 
         if (!skillsRes.ok || !certsRes.ok || !linksRes.ok) {
           throw new Error('No se pudieron cargar los datos del perfil.')
         }
 
-        const [skillsData, certsData, linksData] = await Promise.all([
+        const [skillsData, certsData, linksData, toolsData, langsData] = await Promise.all([
           skillsRes.json(),
           certsRes.json(),
-          linksRes.json()
+          linksRes.json(),
+          toolsRes.ok ? toolsRes.json() : { items: [], catalog: [] },
+          langsRes.ok ? langsRes.json() : { items: [] }
         ])
 
         const skills: MemberSkill[] = skillsData.items ?? []
         const certifications: MemberCertification[] = certsData.items ?? []
+        const tools: MemberTool[] = toolsData.items ?? []
+        const languages: MemberLanguage[] = langsData.items ?? []
 
         const verifiedSkillCount = skills.filter(s => s.verifiedBy !== null).length
         const verifiedCertCount = certifications.filter(c => c.verificationStatus === 'verified').length
@@ -815,6 +1483,9 @@ const SkillsCertificationsTab = ({ mode, memberId }: SkillsCertificationsTabProp
           skills,
           catalog: skillsData.catalog ?? [],
           certifications,
+          tools,
+          toolCatalog: toolsData.catalog ?? [],
+          languages,
           links: linksData.links ?? {
             linkedinUrl: null,
             portfolioUrl: null,
@@ -824,6 +1495,7 @@ const SkillsCertificationsTab = ({ mode, memberId }: SkillsCertificationsTabProp
             githubUrl: null,
             dribbbleUrl: null
           },
+          headline: linksData.headline ?? null,
           aboutMe: linksData.aboutMe ?? null,
           summary: {
             skillCount: skills.length,
@@ -831,7 +1503,9 @@ const SkillsCertificationsTab = ({ mode, memberId }: SkillsCertificationsTabProp
             verifiedSkillCount,
             verifiedCertCount,
             activeCertCount,
-            expiringSoonCount
+            expiringSoonCount,
+            toolCount: tools.length,
+            languageCount: languages.length
           }
         })
       }
@@ -982,6 +1656,130 @@ const SkillsCertificationsTab = ({ mode, memberId }: SkillsCertificationsTabProp
     await fetchData()
   }
 
+  const handleSaveHeadline = async (value: string) => {
+    const res = await fetch('/api/my/professional-links', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ headline: value })
+    })
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => null)
+
+      throw new Error(body?.error ?? 'No se pudo guardar el titular.')
+    }
+
+    await fetchData()
+  }
+
+  // --- Tool mutation handlers ---
+
+  const handleAddTool = async (toolCode: string, proficiencyLevel: ToolProficiencyLevel) => {
+    const url =
+      mode === 'admin'
+        ? `/api/hr/core/members/${memberId}/tools`
+        : '/api/my/tools'
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ toolCode, proficiencyLevel })
+    })
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => null)
+
+      throw new Error(body?.error ?? 'No se pudo agregar la herramienta.')
+    }
+
+    await fetchData()
+  }
+
+  const handleRemoveTool = async (toolCode: string) => {
+    const url =
+      mode === 'admin'
+        ? `/api/hr/core/members/${memberId}/tools`
+        : '/api/my/tools'
+
+    const res = await fetch(url, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ toolCode })
+    })
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => null)
+
+      throw new Error(body?.error ?? 'No se pudo eliminar la herramienta.')
+    }
+
+    await fetchData()
+  }
+
+  const handleVerifyTool = async (toolCode: string, action: 'verify' | 'unverify') => {
+    const res = await fetch(`/api/hr/core/members/${memberId}/tools`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ toolCode, action })
+    })
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => null)
+
+      throw new Error(body?.error ?? 'No se pudo actualizar la verificacion.')
+    }
+
+    await fetchData()
+  }
+
+  // --- Language mutation handlers ---
+
+  const handleAddLanguage = async (
+    languageCode: string,
+    languageName: string,
+    proficiencyLevel: LanguageProficiencyLevel
+  ) => {
+    const url =
+      mode === 'admin'
+        ? `/api/hr/core/members/${memberId}/languages`
+        : '/api/my/languages'
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ languageCode, languageName, proficiencyLevel })
+    })
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => null)
+
+      throw new Error(body?.error ?? 'No se pudo agregar el idioma.')
+    }
+
+    await fetchData()
+  }
+
+  const handleRemoveLanguage = async (languageCode: string) => {
+    const url =
+      mode === 'admin'
+        ? `/api/hr/core/members/${memberId}/languages`
+        : '/api/my/languages'
+
+    const res = await fetch(url, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ languageCode })
+    })
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => null)
+
+      throw new Error(body?.error ?? 'No se pudo eliminar el idioma.')
+    }
+
+    await fetchData()
+  }
+
   // --- Loading state ---
 
   if (loading) {
@@ -1025,7 +1823,7 @@ const SkillsCertificationsTab = ({ mode, memberId }: SkillsCertificationsTabProp
         <SummaryCounters summary={data.summary} />
       </Grid>
 
-      {/* Skills section */}
+      {/* Skills + Tools + Certifications + Languages */}
       <Grid size={{ xs: 12, md: 7 }}>
         <Stack spacing={6}>
           <SkillsSection
@@ -1036,6 +1834,14 @@ const SkillsCertificationsTab = ({ mode, memberId }: SkillsCertificationsTabProp
             onRemove={handleRemoveSkill}
             onVerify={mode === 'admin' ? handleVerifySkill : undefined}
           />
+          <ToolsSection
+            tools={data.tools}
+            catalog={data.toolCatalog}
+            mode={mode}
+            onAdd={handleAddTool}
+            onRemove={handleRemoveTool}
+            onVerify={mode === 'admin' ? handleVerifyTool : undefined}
+          />
           <CertificationsSection
             certifications={data.certifications}
             mode={mode}
@@ -1043,12 +1849,18 @@ const SkillsCertificationsTab = ({ mode, memberId }: SkillsCertificationsTabProp
             onVerify={mode === 'admin' ? handleVerifyCertification : undefined}
             onReject={mode === 'admin' ? handleRejectCertification : undefined}
           />
+          <LanguagesSection
+            languages={data.languages}
+            onAdd={handleAddLanguage}
+            onRemove={handleRemoveLanguage}
+          />
         </Stack>
       </Grid>
 
-      {/* Professional links + About me */}
+      {/* Headline + About me + Professional links */}
       <Grid size={{ xs: 12, md: 5 }}>
         <Stack spacing={6}>
+          <HeadlineCard value={data.headline} editable={isEditable} onSave={isEditable ? handleSaveHeadline : undefined} />
           <AboutMeCard value={data.aboutMe} editable={isEditable} onSave={isEditable ? handleSaveAboutMe : undefined} />
           <ProfessionalLinksCard links={data.links} editable={isEditable} onSave={isEditable ? handleSaveLinks : undefined} />
         </Stack>

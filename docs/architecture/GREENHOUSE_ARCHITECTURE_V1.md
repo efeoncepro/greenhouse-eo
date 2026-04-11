@@ -1,5 +1,17 @@
 # Greenhouse Architecture V1
 
+## Delta 2026-04-11 — Hiring / ATS becomes a canonical talent fulfillment domain
+
+- Greenhouse ya no debe tratar `ATS` solo como una herramienta externa hipotética o como un mini pipeline accesorio de `Staff Aug`.
+- Fuente canónica nueva:
+  - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
+- Regla arquitectónica nueva:
+  - `Hiring / ATS` es la capa canónica de fulfillment de talento previa a `member`, `assignment` y `placement`
+  - el objeto raíz del dominio es `TalentDemand`
+  - `HiringApplication` es la unidad transaccional del pipeline
+  - `HiringHandoff` es el contrato explícito de salida hacia HR, staffing o lanes contractuales
+  - el dominio debe soportar demanda interna y de cliente, tanto `on_demand` como `on_going`
+
 ## Delta 2026-04-05 — Organization-first admin surface (TASK-195)
 
 - `Organization` es ahora el entrypoint administrativo principal de la cuenta

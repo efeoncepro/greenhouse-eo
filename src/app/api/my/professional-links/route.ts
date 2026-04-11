@@ -18,6 +18,7 @@ interface ProfessionalLinksRow extends Record<string, unknown> {
   phone: string | null
   location_city: string | null
   location_country: string | null
+  headline: string | null
 }
 
 const toResponse = (row: ProfessionalLinksRow) => ({
@@ -30,6 +31,7 @@ const toResponse = (row: ProfessionalLinksRow) => ({
     githubUrl: row.github_url ?? null,
     dribbbleUrl: row.dribbble_url ?? null
   },
+  headline: row.headline ?? null,
   aboutMe: row.about_me ?? null,
   contact: {
     phone: row.phone ?? null,
@@ -63,7 +65,7 @@ export async function GET() {
       `SELECT
         linkedin_url, portfolio_url, twitter_url, threads_url,
         behance_url, github_url, dribbble_url,
-        about_me, biography, phone, location_city, location_country
+        about_me, biography, phone, location_city, location_country, headline
       FROM greenhouse_core.members
       WHERE member_id = $1`,
       [memberId]
@@ -122,6 +124,14 @@ export async function PATCH(request: Request) {
       }
     }
 
+    // headline — short text
+    if (body.headline !== undefined) {
+      const value = typeof body.headline === 'string' ? body.headline.trim() || null : null
+
+      updates.push(`headline = $${idx++}`)
+      params.push(value)
+    }
+
     // about_me — free text
     if (body.aboutMe !== undefined) {
       const value = typeof body.aboutMe === 'string' ? body.aboutMe.trim() || null : null
@@ -165,7 +175,7 @@ export async function PATCH(request: Request) {
       RETURNING
         linkedin_url, portfolio_url, twitter_url, threads_url,
         behance_url, github_url, dribbble_url,
-        about_me, biography, phone, location_city, location_country`,
+        about_me, biography, phone, location_city, location_country, headline`,
       params
     )
 

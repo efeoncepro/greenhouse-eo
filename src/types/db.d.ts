@@ -451,6 +451,22 @@ export interface GreenhouseCoreMemberCertifications {
   visibility: Generated<string>;
 }
 
+export interface GreenhouseCoreMemberLanguages {
+  created_at: Generated<Timestamp>;
+  /**
+   * ISO 639-1 two-letter code (es, en, pt, etc.)
+   */
+  language_code: string;
+  language_name: string;
+  member_id: string;
+  /**
+   * basic → conversational → professional → fluent → native
+   */
+  proficiency_level: Generated<string>;
+  updated_at: Generated<Timestamp>;
+  visibility: Generated<string>;
+}
+
 export interface GreenhouseCoreMembers {
   /**
    * Free-text professional bio (Sobre mi)
@@ -487,6 +503,10 @@ export interface GreenhouseCoreMembers {
    * GitHub profile URL
    */
   github_url: string | null;
+  /**
+   * Short professional tagline (e.g. Senior UX Designer | Motion & Brand)
+   */
+  headline: string | null;
   hire_date: Timestamp | null;
   hubspot_owner_id: string | null;
   identity_profile_id: string | null;
@@ -550,6 +570,18 @@ export interface GreenhouseCoreMemberSkills {
   /**
    * Audience: internal (self+admin only) or client_visible (requires verification)
    */
+  visibility: Generated<string>;
+}
+
+export interface GreenhouseCoreMemberTools {
+  created_at: Generated<Timestamp>;
+  member_id: string;
+  notes: string | null;
+  proficiency_level: Generated<string>;
+  tool_code: string;
+  updated_at: Generated<Timestamp>;
+  verified_at: Timestamp | null;
+  verified_by: string | null;
   visibility: Generated<string>;
 }
 
@@ -876,6 +908,21 @@ export interface GreenhouseCoreSpaces {
   space_name: string;
   space_type: Generated<string>;
   status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCoreToolCatalog {
+  active: Generated<boolean>;
+  created_at: Generated<Timestamp>;
+  description: string | null;
+  display_order: Generated<number>;
+  /**
+   * Key for BrandLogo component (e.g. figma, notion, adobe)
+   */
+  icon_key: string | null;
+  tool_category: string;
+  tool_code: string;
+  tool_name: string;
   updated_at: Generated<Timestamp>;
 }
 
@@ -3883,7 +3930,9 @@ export interface DB {
   "greenhouse_core.identity_profile_source_links": GreenhouseCoreIdentityProfileSourceLinks;
   "greenhouse_core.identity_profiles": GreenhouseCoreIdentityProfiles;
   "greenhouse_core.member_certifications": GreenhouseCoreMemberCertifications;
+  "greenhouse_core.member_languages": GreenhouseCoreMemberLanguages;
   "greenhouse_core.member_skills": GreenhouseCoreMemberSkills;
+  "greenhouse_core.member_tools": GreenhouseCoreMemberTools;
   "greenhouse_core.members": GreenhouseCoreMembers;
   "greenhouse_core.notion_workspace_source_bindings": GreenhouseCoreNotionWorkspaceSourceBindings;
   "greenhouse_core.notion_workspaces": GreenhouseCoreNotionWorkspaces;
@@ -3907,6 +3956,7 @@ export interface DB {
   "greenhouse_core.space_notion_publication_targets": GreenhouseCoreSpaceNotionPublicationTargets;
   "greenhouse_core.space_notion_sources": GreenhouseCoreSpaceNotionSources;
   "greenhouse_core.spaces": GreenhouseCoreSpaces;
+  "greenhouse_core.tool_catalog": GreenhouseCoreToolCatalog;
   "greenhouse_core.user_campaign_scopes": GreenhouseCoreUserCampaignScopes;
   "greenhouse_core.user_client_scopes": GreenhouseCoreUserClientScopes;
   "greenhouse_core.user_permission_set_assignments": GreenhouseCoreUserPermissionSetAssignments;

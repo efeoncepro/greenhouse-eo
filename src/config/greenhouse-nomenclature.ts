@@ -1337,9 +1337,12 @@ export const GH_SKILLS_CERTS = {
 
   // Section headings
   section_skills: 'Skills',
+  section_tools: 'Herramientas',
   section_certifications: 'Certificaciones',
+  section_languages: 'Idiomas',
   section_professional_links: 'Links profesionales',
   section_about_me: 'Sobre mí',
+  section_headline: 'Titular profesional',
   section_contact: 'Contacto',
 
   // Skills
@@ -1386,6 +1389,30 @@ export const GH_SKILLS_CERTS = {
   link_github: 'GitHub',
   link_dribbble: 'Dribbble',
 
+  // Tools
+  tool_add: 'Agregar herramienta',
+  tool_edit: 'Editar herramienta',
+  tool_remove: 'Eliminar herramienta',
+  tool_proficiency: 'Dominio',
+  tool_proficiency_beginner: 'Basico',
+  tool_proficiency_intermediate: 'Intermedio',
+  tool_proficiency_advanced: 'Avanzado',
+  tool_proficiency_expert: 'Experto',
+
+  // Languages
+  lang_add: 'Agregar idioma',
+  lang_edit: 'Editar idioma',
+  lang_remove: 'Eliminar idioma',
+  lang_proficiency: 'Nivel',
+  lang_proficiency_basic: 'Basico',
+  lang_proficiency_conversational: 'Conversacional',
+  lang_proficiency_professional: 'Profesional',
+  lang_proficiency_fluent: 'Fluido',
+  lang_proficiency_native: 'Nativo',
+
+  // Headline
+  headline_placeholder: 'Ej: Senior UX Designer | Motion & Brand',
+
   // About me
   about_me_placeholder: 'Describe tu perfil profesional, especialidades y experiencia relevante.',
 
@@ -1395,11 +1422,19 @@ export const GH_SKILLS_CERTS = {
   summary_verified: (n: number) => `${n} verificada${n === 1 ? '' : 's'}`,
   summary_expiring_soon: (n: number) => `${n} por vencer`,
 
+  // Summary counters (tools + languages)
+  summary_tools: (n: number) => `${n} herramienta${n === 1 ? '' : 's'}`,
+  summary_languages: (n: number) => `${n} idioma${n === 1 ? '' : 's'}`,
+
   // Empty states
   empty_skills_title: 'Sin skills registradas',
   empty_skills_description: 'Agrega tus capacidades profesionales para que sean visibles en tu perfil.',
+  empty_tools_title: 'Sin herramientas registradas',
+  empty_tools_description: 'Agrega las herramientas y plataformas que dominas.',
   empty_certs_title: 'Sin certificaciones',
   empty_certs_description: 'Agrega tus certificaciones profesionales y sube la evidencia para que puedan ser verificadas.',
+  empty_languages_title: 'Sin idiomas registrados',
+  empty_languages_description: 'Agrega los idiomas que dominas y tu nivel de competencia.',
   empty_links_title: 'Sin links profesionales',
   empty_links_description: 'Agrega tus perfiles en plataformas profesionales.',
   empty_about_me: 'Aún no has escrito tu biografía profesional.'

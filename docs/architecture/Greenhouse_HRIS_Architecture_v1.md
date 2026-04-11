@@ -1,5 +1,15 @@
 # Greenhouse HRIS Architecture V1
 
+## Delta 2026-04-11 — Hiring / ATS clarified as adjacent domain, not new HRIS phase
+
+- La nueva arquitectura `Hiring / ATS` vive fuera del boundary principal de `HRIS`.
+- Fuente canónica:
+  - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
+- Regla:
+  - `HRIS` sigue siendo owner de `member`, onboarding interno, contract taxonomy y lifecycle laboral
+  - `Hiring / ATS` queda definido como capa previa de fulfillment de talento y handoff
+  - por lo tanto, la mención previa a `ATS / Recruitment pipeline` como future/out-of-scope en este documento no debe leerse como veto a un dominio `Hiring / ATS` en Greenhouse, sino como separación de boundaries respecto de `HRIS`
+
 ## Delta 2026-04-11 — Certifications aggregate and professional profile fields (TASK-313)
 
 ### Certifications data model
@@ -79,6 +89,93 @@ These are self-service editable via `/api/my/profile` and admin-editable via the
 15. **Certifications live in `greenhouse_core`, not `greenhouse_hr`** — they are a property of the canonical identity, not an HR-only concern. Client-facing surfaces (Staff Aug compliance, talent profiles) consume them directly.
 16. **Visibility enforcement is API-side** — the database stores the requested visibility; the API rejects `client_visible` if not verified.
 17. **Social links are plain columns on `members`, not a separate table** — the set of supported platforms is small and stable. No EAV pattern needed.
+
+## Delta 2026-04-11 — Talent Taxonomy: tools catalog, member tools, member languages, headline (TASK-315)
+
+### Tool catalog and member tool proficiency
+
+`greenhouse_core.tool_catalog` is the controlled catalog of professional tools and platforms. `greenhouse_core.member_tools` records each member's proficiency in those tools.
+
+```sql
+CREATE TABLE greenhouse_core.tool_catalog (
+  tool_code       VARCHAR(50) PRIMARY KEY,
+  tool_name       VARCHAR(100) NOT NULL,
+  tool_category   VARCHAR(50) NOT NULL,
+  icon_key        VARCHAR(100),          -- maps to BrandLogo component
+  active          BOOLEAN NOT NULL DEFAULT TRUE,
+  display_order   INTEGER NOT NULL DEFAULT 0,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE greenhouse_core.member_tools (
+  member_id         TEXT NOT NULL REFERENCES greenhouse_core.members(member_id),
+  tool_code         VARCHAR(50) NOT NULL REFERENCES greenhouse_core.tool_catalog(tool_code),
+  proficiency_level VARCHAR(20) NOT NULL DEFAULT 'intermediate',
+    -- 'beginner' | 'intermediate' | 'advanced' | 'expert'
+  visibility        VARCHAR(20) NOT NULL DEFAULT 'internal',
+    -- 'internal' | 'client_visible'
+  verification_status VARCHAR(20) NOT NULL DEFAULT 'self_declared',
+  verified_by       TEXT,
+  verified_at       TIMESTAMPTZ,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (member_id, tool_code)
+);
+```
+
+29 tools seeded across 8 categories (design, development, project_management, marketing, analytics, ai_platforms, communication, productivity).
+
+### Member language proficiency
+
+`greenhouse_core.member_languages` records language proficiencies per member.
+
+```sql
+CREATE TABLE greenhouse_core.member_languages (
+  member_id         TEXT NOT NULL REFERENCES greenhouse_core.members(member_id),
+  language_code     VARCHAR(10) NOT NULL,
+  language_name     VARCHAR(100) NOT NULL,
+  proficiency_level VARCHAR(20) NOT NULL DEFAULT 'conversational',
+    -- 'basic' | 'conversational' | 'professional' | 'fluent' | 'native'
+  visibility        VARCHAR(20) NOT NULL DEFAULT 'internal',
+    -- 'internal' | 'client_visible'
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (member_id, language_code)
+);
+```
+
+### Headline column on members
+
+`greenhouse_core.members.headline` (TEXT, nullable) — short professional tagline for talent profiles and client-facing surfaces.
+
+### Canonical talent taxonomy lanes
+
+| Lane | Source table | Owner task |
+|------|-------------|------------|
+| Skills | `greenhouse_core.skill_catalog` + `member_skills` | TASK-157 |
+| Tools | `greenhouse_core.tool_catalog` + `member_tools` | TASK-315 |
+| Certifications | `greenhouse_core.member_certifications` | TASK-313 |
+| Languages | `greenhouse_core.member_languages` | TASK-315 |
+| Professional links | `greenhouse_core.members` (linkedin_url, portfolio_url, etc.) | TASK-313 |
+| Narrative | `greenhouse_core.members` (headline, about_me) | TASK-313 + TASK-315 |
+
+Legacy fields `member_profiles.skills[]`, `member_profiles.tools[]`, and `member_profiles.aiSuites[]` in BigQuery are superseded by the canonical PostgreSQL tables above.
+
+### API routes
+
+| Route | Method | Purpose |
+|-------|--------|---------|
+| `/api/my/tools` | GET, POST, PUT, DELETE | Self-service CRUD for authenticated user's tool proficiencies |
+| `/api/my/languages` | GET, POST, PUT, DELETE | Self-service CRUD for authenticated user's language proficiencies |
+| `/api/hr/core/members/[memberId]/tools` | GET, POST, PUT, DELETE | Admin CRUD for any member's tools |
+| `/api/hr/core/members/[memberId]/languages` | GET, POST, PUT, DELETE | Admin CRUD for any member's languages |
+
+### Decisions
+
+18. **Tool catalog is a controlled list, not free-text** — `tool_catalog` acts as a domain enum with icon_key for consistent rendering via BrandLogo. New tools require catalog entry.
+19. **Languages use composite PK (member_id, language_code), not a surrogate** — same pattern as `member_tools`. Language codes follow ISO 639-1.
+20. **`headline` lives on `members`, not in a separate profile table** — it is a scalar property of the canonical identity, same rationale as social links (decision 17).
 
 ## Delta 2026-04-10 — supervisor workspace materialized for team follow-up and approvals (TASK-328)
 
@@ -926,6 +1023,9 @@ These are explicitly out of scope but documented for completeness:
 15. **Certifications live in `greenhouse_core`, not `greenhouse_hr`** — they are a property of the canonical identity, not an HR-only concern
 16. **Certification visibility enforcement is API-side** — the database stores the requested visibility; the API rejects `client_visible` if not verified
 17. **Social links are plain columns on `members`, not a separate table** — the set of supported platforms is small and stable
+18. **Tool catalog is a controlled list, not free-text** — `tool_catalog` acts as a domain enum with `icon_key` for consistent rendering via BrandLogo
+19. **Languages use composite PK `(member_id, language_code)`, not a surrogate** — same pattern as `member_tools`; language codes follow ISO 639-1
+20. **`headline` lives on `members`, not in a separate profile table** — scalar property of the canonical identity, same rationale as social links (decision 17)
 
 ---
 
@@ -936,6 +1036,7 @@ These are explicitly out of scope but documented for completeness:
 | 2026-03-21 | v1.0 | Initial architecture — contract taxonomy, module inventory, data model, navigation, roadmap |
 | 2026-03-21 | v1.1 | Added §8.6 Staff Augmentation integration (6 points), added decisions 11-14 |
 | 2026-04-11 | v1.2 | Added certifications aggregate (`member_certifications`), verification workflow, visibility policy, social link columns on members, decisions 15-17 (TASK-313) |
+| 2026-04-11 | v1.3 | Added talent taxonomy: `tool_catalog`, `member_tools`, `member_languages`, `headline` column, canonical taxonomy lanes table, legacy supersession note, decisions 18-20 (TASK-315) |
 
 ---
 
