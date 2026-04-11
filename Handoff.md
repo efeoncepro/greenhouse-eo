@@ -1,5 +1,25 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — TASK-374: Sister Platforms Integration Program COMPLETADA
+
+- alcance cerrado:
+  - `TASK-374` ya no se interpreta como task de runtime sino como umbrella de programa
+  - se corrigió la spec contra la realidad del repo actual
+  - se dejó explícito que hoy la surface externa viva es `/api/integrations/v1/*`
+  - se dejó explícito que `API v1` y `MCP` para sister platforms siguen pendientes de implementación
+  - la continuación real del programa queda secuenciada en:
+    - `TASK-375` — binding canónico sister-platform -> Greenhouse
+    - `TASK-376` — read-only external surface hardening
+    - `TASK-377` — primer bridge Greenhouse -> Kortex
+- impacto:
+  - evita implementar sobre el supuesto falso de que ya existe `src/app/api/v1/*`
+  - evita mezclar umbrella documental con runtime foundation
+  - deja el backlog sister-platform listo para ejecución técnica real
+- verificación:
+  - auditoría manual de task + arquitectura + runtime real + schema snapshot
+  - sin cambios de código de producto ni migraciones
+  - no aplica `build`/`lint` por tratarse de cierre documental / backlog orchestration
+
 ## Sesion 2026-04-11 — TASK-373: Sidebar Reorganization COMPLETADA
 
 - alcance cerrado:

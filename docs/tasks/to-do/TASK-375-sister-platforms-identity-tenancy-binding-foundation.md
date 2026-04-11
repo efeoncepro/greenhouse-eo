@@ -60,7 +60,7 @@ Reglas obligatorias:
 ## Normative Docs
 
 - `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`
-- `docs/tasks/to-do/TASK-374-sister-platforms-integration-program.md`
+- `docs/tasks/complete/TASK-374-sister-platforms-integration-program.md`
 - `src/lib/tenant/access.ts`
 - `src/lib/tenant/get-tenant-context.ts`
 - `src/types/next-auth.d.ts`

@@ -2,6 +2,12 @@
 
 ## 2026-04-11
 
+### 2026-04-11 — TASK-374 queda cerrada como umbrella de programa, no como runtime
+
+- `TASK-374` se corrigió contra la realidad del repo y quedó cerrada como umbrella documental/programática.
+- El audit dejó explícito que hoy la surface externa viva es `/api/integrations/v1/*`, mientras que `API v1` sister-platform-neutral y `MCP` siguen pendientes.
+- La continuación correcta del programa queda concentrada en `TASK-375`, `TASK-376` y `TASK-377`.
+
 ### 2026-04-11 — Greenhouse formaliza contrato con sister platforms y anexo Kortex
 
 - Se agregó la spec `GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md` para fijar que Greenhouse y las plataformas hermanas del ecosistema se integran como `peer systems`.

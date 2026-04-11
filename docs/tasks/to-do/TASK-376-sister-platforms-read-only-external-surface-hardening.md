@@ -60,7 +60,7 @@ Reglas obligatorias:
 
 - `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`
 - `docs/tasks/to-do/TASK-375-sister-platforms-identity-tenancy-binding-foundation.md`
-- `docs/tasks/to-do/TASK-374-sister-platforms-integration-program.md`
+- `docs/tasks/complete/TASK-374-sister-platforms-integration-program.md`
 
 ## Dependencies & Impact
 
