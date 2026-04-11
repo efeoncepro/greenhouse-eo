@@ -1,10 +1,6 @@
+import { createRequire } from 'node:module'
+
 import { closeGreenhousePostgres } from '@/lib/db'
-import {
-  createSisterPlatformBinding,
-  listSisterPlatformBindings,
-  updateSisterPlatformBinding
-} from '@/lib/sister-platforms/bindings'
-import { upsertSisterPlatformConsumer } from '@/lib/sister-platforms/consumers'
 import type {
   CreateSisterPlatformBindingInput,
   SisterPlatformBindingRecord,
@@ -13,6 +9,16 @@ import type {
 } from '@/lib/sister-platforms/types'
 
 import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from './lib/load-greenhouse-tool-env'
+
+const require = createRequire(import.meta.url)
+
+const stubServerOnlyForScripts = () => {
+  const serverOnlyPath = require.resolve('server-only')
+
+  require.cache[serverOnlyPath] = {
+    exports: {}
+  } as NodeJS.Module
+}
 
 type ScopeInput = {
   greenhouseScopeType: SisterPlatformGreenhouseScopeType
@@ -24,8 +30,7 @@ type ScopeInput = {
 const readEnv = (key: string) => {
   const value = process.env[key]?.trim()
 
-  
-return value ? value : null
+  return value ? value : null
 }
 
 const readPositiveInt = (key: string, fallback: number) => {
@@ -144,6 +149,8 @@ const readScopeInput = (): ScopeInput => {
 }
 
 const resolveExistingBinding = async (externalScopeId: string) => {
+  const { listSisterPlatformBindings } = await import('@/lib/sister-platforms/bindings')
+
   const bindings = await listSisterPlatformBindings({
     sisterPlatformKey: 'kortex',
     limit: 200
@@ -160,6 +167,7 @@ const resolveExistingBinding = async (externalScopeId: string) => {
 }
 
 const upsertKortexBinding = async (input: CreateSisterPlatformBindingInput) => {
+  const { createSisterPlatformBinding, updateSisterPlatformBinding } = await import('@/lib/sister-platforms/bindings')
   const existingBinding = await resolveExistingBinding(input.externalScopeId)
 
   if (!existingBinding) {
@@ -205,8 +213,11 @@ const printBindingSummary = (binding: SisterPlatformBindingRecord) => {
 }
 
 async function main() {
+  stubServerOnlyForScripts()
   loadGreenhouseToolEnv()
   applyGreenhousePostgresProfile('runtime')
+
+  const { upsertSisterPlatformConsumer } = await import('@/lib/sister-platforms/consumers')
 
   const externalScopeId = readEnv('KORTEX_EXTERNAL_SCOPE_ID')
   const externalDisplayName = readEnv('KORTEX_EXTERNAL_DISPLAY_NAME')
