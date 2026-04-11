@@ -37,6 +37,10 @@
   color: inherit !important;
 }
 
+.ts-vertical-nav-root .ts-submenu-expand-icon {
+  color: rgba(255, 255, 255, 1) !important;
+}
+
 .ts-vertical-nav-root .ts-menu-section-content {
   color: rgba(255, 255, 255, 0.5) !important;
 }
