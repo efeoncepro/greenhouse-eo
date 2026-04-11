@@ -1,5 +1,34 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — bloque TASK-343 a TASK-351 para implementación canónica de Quotation
+
+- alcance cerrado:
+  - se leyó y contrastó `docs/architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md` contra:
+    - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+    - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+    - `docs/documentation/finance/cotizaciones-multi-source.md`
+    - `TASK-210`, `TASK-211` y `TASK-212`
+  - se detectaron gaps de contrato que justifican arrancar por una task de policy/consolidación antes del runtime:
+    - `pending_approval` usado por el flow pero ausente en el `CHECK` del status de quotations
+    - referencias de capacity/cost desalineadas con el repo real (`client_team_assignments`, `greenhouse_serving.member_capacity_economics`)
+    - convivencia aún ambigua entre `quotes multi-source en finance` y `quotation comercial canónica`
+  - se creó el bloque completo:
+    - `TASK-343` umbrella del programa
+    - `TASK-344` policy de consolidación/cutover
+    - `TASK-345` schema canónico + compat Finance
+    - `TASK-346` pricing/costing/margin health
+    - `TASK-347` bridge canónico HubSpot
+    - `TASK-348` governance runtime (approvals/versions/templates/audit)
+    - `TASK-349` workspace UI + PDF
+    - `TASK-350` quote-to-cash bridge
+    - `TASK-351` pipeline/renewals/profitability
+- documentos vivos actualizados:
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+- validación ejecutada:
+  - revisión manual de consistencia entre task block, índice y registry
+  - pendiente natural del próximo agente: tomar `TASK-344` antes de implementar runtime de Quotation
+
 ## Sesion 2026-04-11 — TASK-313: Skills y certificaciones — perfil profesional, verificación Efeonce y CRUD
 
 - rama: `task/TASK-313-skills-certifications-profile-crud`
