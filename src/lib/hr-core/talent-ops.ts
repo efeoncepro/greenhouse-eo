@@ -406,7 +406,7 @@ export const getSkillGaps = async (): Promise<SkillGap[]> => {
       SELECT
         sc.skill_code,
         sc.skill_name,
-        COALESCE(sc.category, 'uncategorized') AS skill_category,
+        COALESCE(sc.skill_category, 'uncategorized') AS skill_category,
         COUNT(ms.member_id) AS member_count,
         COUNT(ms.member_id) FILTER (WHERE ms.verification_status = 'verified') AS verified_count
       FROM greenhouse_core.skill_catalog sc
@@ -414,7 +414,7 @@ export const getSkillGaps = async (): Promise<SkillGap[]> => {
         AND ms.member_id IN (
           SELECT member_id FROM greenhouse_core.members WHERE active = TRUE AND assignable = TRUE
         )
-      GROUP BY sc.skill_code, sc.skill_name, sc.category
+      GROUP BY sc.skill_code, sc.skill_name, sc.skill_category
       ORDER BY member_count ASC, sc.skill_name ASC
     `
   )
