@@ -384,3 +384,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-332` | `to-do` | Contrato y gobernanza de superficies relacionales | `docs/tasks/to-do/TASK-332-relationship-surface-contract-governance.md` |
 | `TASK-333` | `to-do` | Readers compartidos de relaciones para personas, workspaces y admin | `docs/tasks/to-do/TASK-333-shared-relationship-readers.md` |
 | `TASK-334` | `to-do` | Superficies relacionales y entry points de administración | `docs/tasks/to-do/TASK-334-relationship-surfaces-admin-ux.md` |
+| `TASK-335` | `to-do` | Rediseno UX de la vista Organigrama | `docs/tasks/to-do/TASK-335-org-chart-ux-redesign.md` |
