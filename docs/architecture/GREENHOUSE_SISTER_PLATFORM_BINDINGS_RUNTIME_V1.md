@@ -28,8 +28,8 @@ Current runtime status:
 - hardened read-only sister-platform lane implemented under `/api/integrations/v1/sister-platforms/*`
 - per-consumer credential model implemented in code + migration file
 - request logging and rate limiting implemented in code + migration file
-- migration file created
-- database apply still requires Cloud SQL Proxy + valid ADC in an interactive environment
+- migrations applied on 2026-04-11 via `pnpm pg:connect:migrate`
+- generated DB types regenerated in `src/types/db.d.ts`
 
 ## Why This Runtime Exists
 
@@ -378,18 +378,15 @@ What it does allow:
 - portal/workspace/install IDs from Kortex to resolve to Greenhouse scopes
 
 What it does not do yet:
-- expose a hardened read-only external API for Kortex
 - expose MCP read operations
 - implement any Kortex-specific bridge logic
 
-Those belong to `TASK-376` and `TASK-377`.
+Those belong to `TASK-377`.
 
 ## Known Gaps
 
-1. migration still needs to be applied in a live database session with Cloud SQL Proxy
-2. generated DB types still need regeneration after the migration is applied
-3. no dedicated consumer exists yet for the new outbox events
-4. admin UI is visibility-first; it is not yet a full operator workflow
+1. no dedicated consumer exists yet for the new outbox events
+2. admin UI is visibility-first; it is not yet a full operator workflow
 
 ## File Map
 
@@ -411,6 +408,5 @@ Those belong to `TASK-376` and `TASK-377`.
 
 ## Next Steps
 
-1. apply the migration and regenerate DB types
-2. harden the external read-only surface in `TASK-376`
-3. implement the first Kortex bridge in `TASK-377`
+1. implement the first Kortex bridge in `TASK-377`
+2. add a dedicated downstream consumer for the binding lifecycle events when a concrete integration needs them

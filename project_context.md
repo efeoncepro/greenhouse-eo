@@ -36,7 +36,8 @@
   - toda lectura sister-platform deja request logging y aplica rate limiting
 - Estado de infraestructura:
   - el código y la migración existen en repo
-  - la aplicación de migración sigue requiriendo Cloud SQL Proxy + ADC válidas para regenerar tipos DB
+  - la migración quedó aplicada el 2026-04-11 vía `pnpm pg:connect:migrate`
+  - `src/types/db.d.ts` quedó regenerado en el mismo lote
 
 ## Delta 2026-04-11 Foundation runtime para sister-platform bindings
 
@@ -53,7 +54,8 @@
   - el binding publica eventos outbox propios para consumers posteriores
 - Estado de infraestructura:
   - el código y la migración existen en repo
-  - la aplicación de migración requiere Cloud SQL Proxy + ADC válidas para regenerar tipos DB
+  - la migración quedó aplicada el 2026-04-11 vía `pnpm pg:connect:migrate`
+  - `src/types/db.d.ts` quedó regenerado en el mismo lote
 
 ## Delta 2026-04-11 Contrato canónico para sister platforms del ecosistema
 

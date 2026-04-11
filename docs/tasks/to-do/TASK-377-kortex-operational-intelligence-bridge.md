@@ -59,8 +59,8 @@ Reglas obligatorias:
 
 - `docs/architecture/GREENHOUSE_KORTEX_VISUAL_PRESET_V1.md`
 - `docs/tasks/to-do/TASK-265-greenhouse-nomenclature-dictionary-kortex-copy-contract.md`
-- `docs/tasks/to-do/TASK-375-sister-platforms-identity-tenancy-binding-foundation.md`
-- `docs/tasks/to-do/TASK-376-sister-platforms-read-only-external-surface-hardening.md`
+- `docs/tasks/complete/TASK-375-sister-platforms-identity-tenancy-binding-foundation.md`
+- `docs/tasks/complete/TASK-376-sister-platforms-read-only-external-surface-hardening.md`
 
 ## Dependencies & Impact
 

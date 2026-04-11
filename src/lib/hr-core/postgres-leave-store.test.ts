@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { TenantContext } from '@/lib/tenant/get-tenant-context'
 
 vi.mock('server-only', () => ({}))
 
@@ -39,7 +40,7 @@ const REQUIRED_TABLES = [
   'greenhouse_hr.leave_request_actions'
 ]
 
-const adminTenant = {
+const adminTenant: TenantContext = {
   userId: 'user-admin-1',
   clientId: 'efeonce',
   clientName: 'Efeonce',
@@ -58,7 +59,7 @@ const adminTenant = {
   timezone: 'America/Santiago',
   portalHomePath: '/hr',
   authMode: 'credentials'
-} as const
+}
 
 describe('listLeaveRequestsFromPostgres', () => {
   beforeEach(() => {

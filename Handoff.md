@@ -18,7 +18,7 @@
 - nota operativa:
   - en Vercel y CI el comportamiento sigue compartido sobre `.next` para no cambiar el contrato de esos entornos sin necesidad
 
-## Sesion 2026-04-11 — TASK-376: Sister Platforms Read-Only External Surface Hardening IMPLEMENTADA (pendiente apply de migracion)
+## Sesion 2026-04-11 — TASK-376: Sister Platforms Read-Only External Surface Hardening COMPLETADA
 
 - alcance implementado:
   - nueva migracion `20260411201917370_sister-platform-read-surface-hardening.sql`
@@ -49,11 +49,13 @@
   - `pnpm lint`
   - `pnpm build`
   - chequeo de `new Pool()`
-  - `pnpm migrate:up` sujeto a Cloud SQL Proxy + ADC
-- deuda/nota operativa:
-  - falta aplicar la migración en una sesión con Cloud SQL Proxy + ADC vigentes para materializar tablas y regenerar `db.d.ts`
+  - `pnpm pg:connect:migrate`
+- cierre real:
+  - la migración quedó aplicada sobre Cloud SQL el 2026-04-11 vía `pnpm pg:connect:migrate`
+  - `src/types/db.d.ts` quedó regenerado en el mismo lote
+  - `TASK-376` ya puede considerarse cerrada
 
-## Sesion 2026-04-11 — TASK-375: Sister Platforms Identity & Tenancy Binding Foundation IMPLEMENTADA (pendiente apply de migracion)
+## Sesion 2026-04-11 — TASK-375: Sister Platforms Identity & Tenancy Binding Foundation COMPLETADA
 
 - alcance implementado:
   - nueva migracion `20260411192943501_sister-platform-bindings-foundation.sql`
@@ -76,10 +78,11 @@
 - verificación:
   - `pnpm build` pasa
   - `pnpm lint` pasa con 2 warnings preexistentes en `HrOrgChartView.tsx`
-  - `pnpm migrate:up` falla localmente por `ECONNREFUSED 127.0.0.1:15432` sin Cloud SQL Proxy
-  - `pnpm pg:connect:migrate` intentó renovar ADC y abrió login interactivo de Google; no se completó en esta sesión
-- deuda/nota operativa:
-  - falta aplicar la migración en un entorno con Cloud SQL Proxy + ADC vigentes para materializar la tabla y regenerar `db.d.ts`
+  - `pnpm pg:connect:migrate` terminó OK el 2026-04-11 tras reautenticar ADC y levantar Cloud SQL Proxy
+  - `src/types/db.d.ts` quedó regenerado en el mismo lote
+- cierre real:
+  - la foundation runtime ya quedó materializada en DB y tipos
+  - `TASK-375` ya puede considerarse cerrada
 
 ## Sesion 2026-04-11 — TASK-374: Sister Platforms Integration Program COMPLETADA
 

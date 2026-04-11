@@ -27,7 +27,7 @@
   - `GET /api/integrations/v1/sister-platforms/catalog/capabilities`
   - `GET /api/integrations/v1/sister-platforms/readiness`
 - La spec `TASK-376` quedó corregida para apuntar al carril externo real del repo (`/api/integrations/v1/*`) en vez de un namespace inexistente.
-- Queda pendiente aplicar la migración en una sesión con Cloud SQL Proxy + ADC válidas para regenerar `db.d.ts`.
+- La migración quedó aplicada vía `pnpm pg:connect:migrate` y `src/types/db.d.ts` se regeneró en el mismo lote.
 
 ### 2026-04-11 — TASK-375 baja la foundation runtime para sister-platform bindings
 
@@ -39,7 +39,7 @@
 - El contrato soporta scopes `organization`, `client`, `space` e `internal`, sin hardcodear la semántica a Kortex.
 - Se agregaron rutas admin nuevas bajo `/api/admin/integrations/sister-platform-bindings*`.
 - `/admin/integrations` ahora muestra una lectura operativa de los bindings sister-platform dentro de la gobernanza existente.
-- `pnpm build` y `pnpm lint` pasan; la aplicación de migración quedó pendiente de una sesión con Cloud SQL Proxy + ADC activos.
+- `pnpm build`, `pnpm lint` y `pnpm pg:connect:migrate` quedaron cerrados; la migración ya está aplicada y `src/types/db.d.ts` regenerado.
 
 ### 2026-04-11 — TASK-374 queda cerrada como umbrella de programa, no como runtime
 

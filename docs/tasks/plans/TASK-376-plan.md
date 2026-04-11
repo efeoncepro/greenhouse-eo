@@ -39,7 +39,7 @@
 
 ## Files to modify
 
-- `docs/tasks/to-do/TASK-376-sister-platforms-read-only-external-surface-hardening.md` — corregir supuestos desactualizados
+- `docs/tasks/complete/TASK-376-sister-platforms-read-only-external-surface-hardening.md` — corregir supuestos desactualizados
 - `src/lib/sister-platforms/types.ts` — extender tipos si hace falta para consumers/read surface
 - `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md` — documentar lane endurecido
 - `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml` — reflejar rutas/security nuevas

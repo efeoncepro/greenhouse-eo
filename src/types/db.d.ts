@@ -894,6 +894,84 @@ export interface GreenhouseCoreServiceSkillRequirements {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCoreSisterPlatformBindings {
+  activated_at: Timestamp | null;
+  activated_by_user_id: string | null;
+  binding_role: Generated<string>;
+  binding_status: Generated<string>;
+  client_id: string | null;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  deprecated_at: Timestamp | null;
+  deprecated_by_user_id: string | null;
+  external_display_name: string | null;
+  external_scope_id: string;
+  external_scope_parent_id: string | null;
+  external_scope_type: string;
+  greenhouse_scope_type: string;
+  last_verified_at: Timestamp | null;
+  metadata_json: Generated<Json>;
+  notes: string | null;
+  organization_id: string | null;
+  public_id: string;
+  sister_platform_binding_id: string;
+  sister_platform_key: string;
+  space_id: string | null;
+  suspended_at: Timestamp | null;
+  suspended_by_user_id: string | null;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCoreSisterPlatformConsumers {
+  allowed_greenhouse_scope_types: Generated<string[]>;
+  consumer_name: string;
+  consumer_type: Generated<string>;
+  created_at: Generated<Timestamp>;
+  created_by_user_id: string | null;
+  credential_status: Generated<string>;
+  deprecated_at: Timestamp | null;
+  deprecated_by_user_id: string | null;
+  expires_at: Timestamp | null;
+  hash_algorithm: Generated<string>;
+  last_used_at: Timestamp | null;
+  metadata_json: Generated<Json>;
+  notes: string | null;
+  public_id: string;
+  rate_limit_per_hour: Generated<number>;
+  rate_limit_per_minute: Generated<number>;
+  rotated_by_user_id: string | null;
+  sister_platform_consumer_id: string;
+  sister_platform_key: string;
+  suspended_at: Timestamp | null;
+  suspended_by_user_id: string | null;
+  token_hash: string;
+  token_prefix: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCoreSisterPlatformRequestLogs {
+  client_id: string | null;
+  created_at: Generated<Timestamp>;
+  duration_ms: number;
+  error_code: string | null;
+  external_scope_id: string | null;
+  external_scope_type: string | null;
+  greenhouse_scope_type: string | null;
+  ip_hash: string | null;
+  organization_id: string | null;
+  rate_limited: Generated<boolean>;
+  request_method: string;
+  request_path: string;
+  response_status: number;
+  route_key: string;
+  sister_platform_binding_id: string | null;
+  sister_platform_consumer_id: string | null;
+  sister_platform_key: string | null;
+  sister_platform_request_log_id: string;
+  space_id: string | null;
+  user_agent_hash: string | null;
+}
+
 export interface GreenhouseCoreSkillCatalog {
   active: Generated<boolean>;
   created_at: Generated<Timestamp>;
@@ -4000,6 +4078,9 @@ export interface DB {
   "greenhouse_core.service_modules": GreenhouseCoreServiceModules;
   "greenhouse_core.service_skill_requirements": GreenhouseCoreServiceSkillRequirements;
   "greenhouse_core.services": GreenhouseCoreServices;
+  "greenhouse_core.sister_platform_bindings": GreenhouseCoreSisterPlatformBindings;
+  "greenhouse_core.sister_platform_consumers": GreenhouseCoreSisterPlatformConsumers;
+  "greenhouse_core.sister_platform_request_logs": GreenhouseCoreSisterPlatformRequestLogs;
   "greenhouse_core.skill_catalog": GreenhouseCoreSkillCatalog;
   "greenhouse_core.space_notion_publication_targets": GreenhouseCoreSpaceNotionPublicationTargets;
   "greenhouse_core.space_notion_sources": GreenhouseCoreSpaceNotionSources;

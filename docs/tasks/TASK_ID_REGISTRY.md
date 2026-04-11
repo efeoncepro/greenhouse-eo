@@ -424,7 +424,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-372` | `complete` | Kortex Visual Preset Documentation | `docs/tasks/complete/TASK-372-kortex-visual-preset-documentation.md` |
 | `TASK-373` | `complete` | Sidebar Reorganization: Density, Icons & Microinteractions | `docs/tasks/complete/TASK-373-sidebar-reorganization-density-microinteractions.md` |
 | `TASK-374` | `complete` | Sister Platforms Integration Program | `docs/tasks/complete/TASK-374-sister-platforms-integration-program.md` |
-| `TASK-375` | `to-do` | Sister Platforms Identity & Tenancy Binding Foundation | `docs/tasks/to-do/TASK-375-sister-platforms-identity-tenancy-binding-foundation.md` |
-| `TASK-376` | `to-do` | Sister Platforms Read-Only External Surface Hardening | `docs/tasks/to-do/TASK-376-sister-platforms-read-only-external-surface-hardening.md` |
+| `TASK-375` | `complete` | Sister Platforms Identity & Tenancy Binding Foundation | `docs/tasks/complete/TASK-375-sister-platforms-identity-tenancy-binding-foundation.md` |
+| `TASK-376` | `complete` | Sister Platforms Read-Only External Surface Hardening | `docs/tasks/complete/TASK-376-sister-platforms-read-only-external-surface-hardening.md` |
 | `TASK-377` | `to-do` | Kortex Operational Intelligence Bridge | `docs/tasks/to-do/TASK-377-kortex-operational-intelligence-bridge.md` |
 | `TASK-378` | `to-do` | Dashboard SSR Error Resilience | `docs/tasks/to-do/TASK-378-dashboard-ssr-error-resilience.md` |

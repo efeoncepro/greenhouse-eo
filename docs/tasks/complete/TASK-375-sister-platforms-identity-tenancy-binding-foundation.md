@@ -7,12 +7,12 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Implementado pendiente de migracion`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -207,6 +207,12 @@ no una surface nueva aislada si el runtime existente ya puede absorberla.
 
 - `TASK-376` — read-only external surface sobre esta foundation.
 - `TASK-377` — bridge Kortex usando el binding canonico.
+
+## Delta 2026-04-11 — cierre real
+
+- La migración `20260411192943501_sister-platform-bindings-foundation.sql` quedó aplicada el 2026-04-11 vía `pnpm pg:connect:migrate`.
+- `src/types/db.d.ts` quedó regenerado en el mismo lote.
+- La task queda cerrada como foundation materializada en código, base de datos y tipos.
 
 ## Open Questions
 

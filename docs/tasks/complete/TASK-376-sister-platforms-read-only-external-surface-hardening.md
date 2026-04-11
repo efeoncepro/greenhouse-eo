@@ -7,15 +7,15 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Cerrada`
 - Rank: `TBD`
 - Domain: `platform`
-- Blocked by: `TASK-375`
+- Blocked by: `none`
 - Branch: `task/TASK-376-sister-platforms-read-only-external-surface-hardening`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -60,7 +60,7 @@ Reglas obligatorias:
 ## Normative Docs
 
 - `docs/operations/GREENHOUSE_REPO_ECOSYSTEM_V1.md`
-- `docs/tasks/to-do/TASK-375-sister-platforms-identity-tenancy-binding-foundation.md`
+- `docs/tasks/complete/TASK-375-sister-platforms-identity-tenancy-binding-foundation.md`
 - `docs/tasks/complete/TASK-374-sister-platforms-integration-program.md`
 
 ## Dependencies & Impact
@@ -158,10 +158,10 @@ La task tambien debe dejar explicito el split entre:
 
 ## Acceptance Criteria
 
-- [ ] Existe una read surface externa formalmente ligada al binding de sister platforms.
-- [ ] El auth model, tenant resolution y request logging quedan definidos y ejecutables.
-- [ ] La surface es read-only por defecto y no abre mutaciones laterales.
-- [ ] La task deja el carril listo para un adapter MCP downstream.
+- [x] Existe una read surface externa formalmente ligada al binding de sister platforms.
+- [x] El auth model, tenant resolution y request logging quedan definidos y ejecutables.
+- [x] La surface es read-only por defecto y no abre mutaciones laterales.
+- [x] La task deja el carril listo para un adapter MCP downstream.
 
 ## Verification
 
@@ -172,15 +172,21 @@ La task tambien debe dejar explicito el split entre:
 
 ## Closing Protocol
 
-- [ ] Actualizar `TASK-039` o dejar delta si algun supuesto de esa spec cambia al aterrizar la surface real.
-- [ ] Actualizar esta task si el namespace final difiere del carril externo vigente por una razon arquitectonica aprobada.
-- [ ] Documentar el auth model final en la doc canonica que corresponda.
+- [x] Actualizar `TASK-039` o dejar delta si algun supuesto de esa spec cambia al aterrizar la surface real.
+- [x] Actualizar esta task si el namespace final difiere del carril externo vigente por una razon arquitectonica aprobada.
+- [x] Documentar el auth model final en la doc canonica que corresponda.
 
 ## Delta 2026-04-11
 
 - Se corrigio la task para alinearla con el repo real: el carril externo vigente vive en `src/app/api/integrations/v1/*`, no en `src/app/api/v1/`.
 - Se explicito que el gap actual no es "crear API v1 desde cero", sino endurecer una surface externa ya existente y aislar un lane sister-platform-first read-only.
 - Se agrego como referencia obligatoria `GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`.
+
+## Delta 2026-04-11 — cierre real
+
+- Se aplicó la migración `20260411201917370_sister-platform-read-surface-hardening.sql` vía `pnpm pg:connect:migrate`.
+- `src/types/db.d.ts` quedó regenerado en el mismo lote.
+- La task queda cerrada con lane read-only endurecido, auth por consumer y observabilidad base materializados.
 
 ## Follow-ups
 
