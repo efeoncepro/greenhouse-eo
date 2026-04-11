@@ -401,3 +401,8 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-349` | `to-do` | Quotation Workspace UI & PDF Delivery | `docs/tasks/to-do/TASK-349-quotation-workspace-ui-pdf-delivery.md` |
 | `TASK-350` | `to-do` | Quotation-to-Cash Document Chain Bridge | `docs/tasks/to-do/TASK-350-quotation-to-cash-document-chain-bridge.md` |
 | `TASK-351` | `to-do` | Quotation Intelligence Automation: Pipeline, Renewals & Profitability | `docs/tasks/to-do/TASK-351-quotation-intelligence-automation-pipeline-renewals-profitability.md` |
+| `TASK-352` | `to-do` | Hiring / ATS Canonical Program | `docs/tasks/to-do/TASK-352-hiring-ats-canonical-program.md` |
+| `TASK-353` | `to-do` | Hiring / ATS Domain Foundation | `docs/tasks/to-do/TASK-353-hiring-ats-domain-foundation.md` |
+| `TASK-354` | `to-do` | Public Careers Landing & Apply Intake | `docs/tasks/to-do/TASK-354-public-careers-landing-apply-intake.md` |
+| `TASK-355` | `to-do` | Hiring Desk Internal Workspaces & Publication Governance | `docs/tasks/to-do/TASK-355-hiring-desk-internal-workspaces-publication-governance.md` |
+| `TASK-356` | `to-do` | Hiring Handoff, Reactive Signals & Downstream Bridges | `docs/tasks/to-do/TASK-356-hiring-handoff-reactive-signals-downstream-bridges.md` |

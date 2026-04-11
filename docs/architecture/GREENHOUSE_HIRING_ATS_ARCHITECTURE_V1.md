@@ -11,6 +11,7 @@ Este documento fija:
 - qué ownership conserva cada módulo vecino
 - cómo se resuelve el handoff hacia `member`, `assignment` y `placement`
 - qué surfaces UI deberían existir
+- cómo debe convivir una landing pública de vacantes con el ATS interno
 
 ## Status
 
@@ -77,6 +78,7 @@ En una frase:
 5. La unidad visual del pipeline debe ser `Application`, no la persona sola ni el opening solo.
 6. El handoff hacia runtime operativo debe ser explícito y auditable.
 7. `Finance`, `Payroll`, `Cost Intelligence` y `Team Capacity` siguen siendo dueños de su verdad; `Hiring / ATS` consume y contextualiza.
+8. El dominio debe soportar una entrada pública para candidatos sin exponer datos internos del pipeline.
 
 ## Demand Matrix
 
@@ -143,6 +145,32 @@ Reglas:
 - una `TalentDemand` puede abrir cero, uno o varios openings
 - un opening no reemplaza a la demanda
 - el opening debe poder cerrarse o pausarse sin destruir la demanda madre
+
+Capas adicionales recomendadas:
+
+- `visibility`
+  - `internal_only`
+  - `private_sourcing`
+  - `public_listed`
+- `publicationStatus`
+  - `draft`
+  - `ready_for_review`
+  - `published`
+  - `paused`
+  - `closed`
+- `public copy`
+  - `publicTitle`
+  - `publicSummary`
+  - `publicDescription`
+  - `publicRequirements`
+  - `publicLocationMode`
+  - `publicEmploymentMode`
+  - `applyUrl?` solo si existe desvío externo excepcional
+
+Regla:
+
+- no todo opening debe ser público
+- el opening público es una proyección controlada del opening interno, no otra identidad
 
 ### `Person`
 
@@ -469,6 +497,86 @@ pero no recalcular localmente toda la economía.
 
 ## Recommended UI Surfaces
 
+### 0. Public Vacancies Landing
+
+Surface pública para atraer candidatos y permitir postulación.
+
+Objetivo:
+
+- listar openings publicables
+- permitir discovery por rol, seniority, modalidad y ubicación
+- abrir detalle público de cada vacante
+- capturar postulaciones hacia el ATS interno
+
+Reglas:
+
+- esta landing no expone `TalentDemand` completa
+- no expone score, owners internos, rate bands internos, riesgo, notas ni contexto sensible de cliente
+- consume solo la proyección pública del opening
+
+Bloques recomendados:
+
+- hero o first fold con búsqueda
+- filtros por:
+  - área
+  - seniority
+  - modalidad
+  - ubicación/timezone
+  - tipo de vínculo
+- lista de vacantes
+- detalle público de vacante
+- CTA claro de postulación
+
+### 0.1 Public Opening Detail
+
+Vista pública por vacante.
+
+Debe mostrar solo campos publicables:
+
+- título
+- resumen
+- responsabilidades
+- requisitos
+- nice-to-have
+- modalidad
+- ubicación / timezone
+- tipo de engagement
+- seniority
+- proceso esperado
+
+No debe mostrar:
+
+- score interno
+- owners internos
+- shortage/risk
+- cliente si el caso requiere confidencialidad
+- economics internos
+- señales internas del pipeline
+
+### 0.2 Public Apply Flow
+
+Formulario público de postulación.
+
+Debe permitir:
+
+- datos básicos de contacto
+- CV / portfolio / links
+- disponibilidad
+- compensation expectations si aplica
+- consentimiento y autorización de tratamiento
+- source attribution
+
+Resultado canónico:
+
+- crear o reconciliar `Person`
+- activar o actualizar `CandidateFacet`
+- crear `HiringApplication` contra el `HiringOpening`
+
+Regla:
+
+- una postulación pública no debe crear un aggregate paralelo de candidato
+- entra al mismo pipeline interno que sourcing manual, referral o bench
+
 ### 1. Demand Desk
 
 Lista institucional de demandas y openings.
@@ -541,6 +649,105 @@ Debe responder:
 - quién está listo para assignment / placement
 - qué casos siguen bloqueados
 
+### 7. Publication Desk
+
+Surface interna para gobernar qué openings se publican externamente.
+
+Debe responder:
+
+- qué openings están listos para publicarse
+- qué openings ya están publicados
+- cuáles están pausados o vencidos
+- qué copy pública o compliance falta antes de publicar
+
+Acciones esperadas:
+
+- revisar copy pública
+- aprobar publicación
+- pausar
+- cerrar
+- ver métricas de conversión básicas
+
+## Public Candidate Entry Model
+
+### Public entry is a controlled lens, not a second ATS
+
+La landing pública de vacantes no debe modelarse como módulo separado del ATS.
+
+Debe ser:
+
+- una surface pública de discovery
+- una surface pública de apply
+- conectada al mismo dominio `Hiring / ATS`
+
+### Publication model
+
+Cada `HiringOpening` debe poder distinguir entre:
+
+- truth interna del opening
+- payload público derivado
+
+Campos internos siempre canónicos:
+
+- owner
+- stakeholder
+- demand origin
+- budget/rate
+- risk
+- notes
+- shortlist logic
+
+Campos publicables derivados:
+
+- title
+- description
+- requirements
+- location/mode
+- seniority
+- visible hiring process notes
+
+### Candidate source normalization
+
+El ATS debe registrar la fuente de entrada del candidato.
+
+Fuentes mínimas:
+
+- `public_careers`
+- `manual`
+- `referral`
+- `bench_internal`
+- `partner`
+- `hubspot`
+- `import`
+
+### Privacy, consent and abuse guardrails
+
+La entrada pública debe contemplar:
+
+- consentimiento explícito de tratamiento de datos
+- retención y borrado según policy
+- assets privados para CV/portfolio cuando corresponda
+- rate limiting / captcha / anti-spam
+- email verification opcional si el volumen lo justifica
+
+Regla:
+
+- el ATS no debe abrir write lanes públicos sin guardrails mínimos de abuso y consentimiento
+
+### Multi-tenant / brand stance
+
+La primera iteración recomendada es:
+
+- una landing pública de marca Efeonce / Greenhouse
+- openings publicados desde el dominio central
+
+Se permite evolución futura hacia:
+
+- lenses por cliente o por practice
+- branding parcial por demand/opening
+
+Pero no conviene arrancar con micrositios por tenant como requisito base del dominio.
+
 ## Event Model
 
 ## Aggregate types recomendados
@@ -569,6 +776,8 @@ Debe responder:
 - `hiring.opening.updated`
 - `hiring.opening.status_changed`
 - `hiring.opening.closed`
+- `hiring.opening.published`
+- `hiring.opening.unpublished`
 
 ### Candidate facet lifecycle
 
@@ -586,6 +795,12 @@ Debe responder:
 - `hiring.application.rejected`
 - `hiring.application.withdrawn`
 - `hiring.application.handoff_ready`
+
+### Public application lifecycle
+
+- `hiring.public_application.submitted`
+- `hiring.public_application.confirmed`
+- `hiring.public_application.deduplicated`
 
 ### Handoff lifecycle
 
@@ -613,7 +828,10 @@ Debe responder:
 7. **`Hiring / ATS` no es owner de `member`, `assignment`, `placement`, `compensation` ni `margin`**.
 8. **La demanda puede nacer sin cliente totalmente canonizado** mientras exista trazabilidad hacia prospecto/deal/upstream.
 9. **El dominio debe soportar interno vs cliente y on-demand vs on-going sin cambiar de objeto raíz**.
-10. **El rollout inicial debe priorizar uso interno controlado** antes de abrir exposición cliente más amplia o portales públicos de candidatos.
+10. **El dominio debe soportar una landing pública de vacantes y postulación** sin crear un pipeline paralelo al ATS interno.
+11. **El opening público es una proyección controlada del `HiringOpening` interno**, no una identidad nueva.
+12. **La primera iteración recomendada de la landing pública es centralizada y de marca Efeonce**, no multi-tenant por cliente desde el día 1.
+13. **El rollout inicial debe priorizar publicación controlada y guardrails de consentimiento/abuso** antes de abrir variaciones más complejas de portal público.
 
 ## Relationship To Existing Research
 

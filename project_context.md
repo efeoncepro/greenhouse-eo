@@ -22,6 +22,7 @@
   - pool mixto de talento: internos, bench, externos, contractors y partners
 - Regla de diseño:
   - el kanban del ATS debe mover `applications`, no personas sueltas ni openings sueltos
+  - la landing pública de vacantes debe publicar openings derivados del mismo dominio `Hiring / ATS`, no otro pipeline paralelo
 - Fuente canónica nueva:
   - `docs/architecture/GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`
 

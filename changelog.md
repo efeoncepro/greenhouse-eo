@@ -10,6 +10,7 @@
   - `HiringApplication` es la unidad transaccional del pipeline
   - `HiringHandoff` es el contrato explícito hacia HR, assignments o Staff Aug
   - el dominio debe cubrir demanda interna y de cliente, tanto `on_demand` como `on_going`
+  - la landing pública de vacantes debe resolver como lens público del mismo `HiringOpening`, no como módulo separado
 - Deltas breves aplicados a:
   - `GREENHOUSE_ARCHITECTURE_V1.md`
   - `GREENHOUSE_360_OBJECT_MODEL_V1.md`

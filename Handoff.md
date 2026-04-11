@@ -1,5 +1,34 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — bloque TASK-352 a TASK-356 para Hiring / ATS canónico
+
+- alcance cerrado:
+  - se tomó la nueva arquitectura `Hiring / ATS` y se bajó a bloque ejecutable de tasks
+  - el programa quedó separado en:
+    - `TASK-352` umbrella del programa
+    - `TASK-353` foundation transaccional del dominio
+    - `TASK-354` landing pública de vacantes + apply intake
+    - `TASK-355` desks internos + publication governance
+    - `TASK-356` handoff + signals + bridges downstream
+- decisiones de shape ya fijadas en las tasks:
+  - `TalentDemand` como root
+  - `HiringApplication` como unidad del pipeline
+  - landing pública como lens del mismo `HiringOpening`
+  - handoff explícito antes de `member` / `assignment` / `placement`
+- documentos vivos actualizados:
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/to-do/TASK-352-hiring-ats-canonical-program.md`
+  - `docs/tasks/to-do/TASK-353-hiring-ats-domain-foundation.md`
+  - `docs/tasks/to-do/TASK-354-public-careers-landing-apply-intake.md`
+  - `docs/tasks/to-do/TASK-355-hiring-desk-internal-workspaces-publication-governance.md`
+  - `docs/tasks/to-do/TASK-356-hiring-handoff-reactive-signals-downstream-bridges.md`
+- validación ejecutada:
+  - revisión manual de consistencia contra `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md`, `RESEARCH-003`, `Person 360`, `Staff Aug` y `TASK_TEMPLATE`
+  - no aplica build/lint; no hubo cambios de runtime
+- próximo paso natural:
+  - arrancar por `TASK-353` y usar ese foundation para destrabar `354` y `355`
+
 ## Sesion 2026-04-11 — arquitectura canónica de Hiring / ATS para Efeonce / Greenhouse
 
 - alcance cerrado:
@@ -11,6 +40,7 @@
     - objeto raíz `TalentDemand`
     - pipeline sobre `HiringApplication`
     - boundary explícito `HiringHandoff`
+    - landing pública de vacantes + apply flow como lens del mismo ATS
   - se dejó explícito que:
     - `Person` sigue siendo la raíz humana
     - `HRIS` conserva `member` + onboarding interno

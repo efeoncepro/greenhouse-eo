@@ -11,6 +11,7 @@
   - `HiringApplication` es la unidad transaccional del pipeline
   - `HiringHandoff` es el contrato explícito de salida hacia HR, staffing o lanes contractuales
   - el dominio debe soportar demanda interna y de cliente, tanto `on_demand` como `on_going`
+  - el dominio debe soportar también una landing pública de vacantes como lens controlado del mismo pipeline interno
 
 ## Delta 2026-04-05 — Organization-first admin surface (TASK-195)
 
