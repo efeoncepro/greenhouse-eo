@@ -5,7 +5,7 @@ import LinearProgress from '@mui/material/LinearProgress'
 import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
-import { alpha } from '@mui/material/styles'
+import { alpha, useTheme } from '@mui/material/styles'
 
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
@@ -80,6 +80,8 @@ const getUtilTone = (pct: number): 'success' | 'warning' | 'error' =>
 // ── Component ──
 
 const CapacityOverview = ({ capacity }: Props) => {
+  const theme = useTheme()
+
   if (!capacity || capacity.members.length === 0) {
     return (
       <EmptyState
@@ -141,7 +143,7 @@ const CapacityOverview = ({ capacity }: Props) => {
       {/* Utilization bar */}
       <Box>
         <Stack direction='row' justifyContent='space-between' sx={{ mb: 1 }}>
-          <Typography variant='body2' sx={{ fontWeight: 600, color: GH_COLORS.neutral.textPrimary }}>
+          <Typography variant='body2' sx={{ fontWeight: 600, color: theme.palette.customColors.midnight }}>
             Utilización global
           </Typography>
           <Stack direction='row' spacing={1} alignItems='center'>
@@ -174,14 +176,14 @@ const CapacityOverview = ({ capacity }: Props) => {
       {/* Member list */}
       <Box
         sx={{
-          border: `1px solid ${GH_COLORS.neutral.border}`,
+          border: `1px solid ${theme.palette.customColors.lightAlloy}`,
           borderRadius: 3,
           overflow: 'hidden',
           bgcolor: 'background.paper'
         }}
       >
-        <Box sx={{ px: 2.5, py: 1.25, bgcolor: GH_COLORS.neutral.bgSurface }}>
-          <Typography sx={{ fontSize: '0.7rem', fontWeight: 500, color: GH_COLORS.neutral.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <Box sx={{ px: 2.5, py: 1.25, bgcolor: theme.palette.background.default }}>
+          <Typography sx={{ fontSize: '0.7rem', fontWeight: 500, color: theme.palette.text.secondary, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
             Distribución por persona
           </Typography>
         </Box>
@@ -205,16 +207,16 @@ const CapacityOverview = ({ capacity }: Props) => {
                 gap: 2,
                 px: 2.5,
                 py: 1.5,
-                borderTop: idx > 0 ? `1px solid ${alpha(GH_COLORS.neutral.border, 0.6)}` : 'none',
-                '&:hover': { bgcolor: GH_COLORS.neutral.bgSurface }
+                borderTop: idx > 0 ? `1px solid ${alpha(theme.palette.customColors.lightAlloy ?? '', 0.6)}` : 'none',
+                '&:hover': { bgcolor: theme.palette.background.default }
               }}
             >
               <TeamAvatar name={member.displayName} avatarUrl={null} roleCategory='unknown' size={36} />
               <Box sx={{ flex: 1, minWidth: 0 }}>
-                <Typography variant='subtitle2' noWrap sx={{ color: GH_COLORS.neutral.textPrimary }}>
+                <Typography variant='subtitle2' noWrap sx={{ color: theme.palette.customColors.midnight }}>
                   {member.displayName}
                 </Typography>
-                <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+                <Typography variant='caption' sx={{ color: theme.palette.text.secondary }}>
                   {member.roleTitle ?? 'Sin rol definido'}
                 </Typography>
               </Box>
@@ -224,10 +226,10 @@ const CapacityOverview = ({ capacity }: Props) => {
                 </Box>
               </Tooltip>
               <Box sx={{ textAlign: 'right', flexShrink: 0, minWidth: 80 }}>
-                <Typography variant='body2' sx={{ fontWeight: 600, color: GH_COLORS.neutral.textPrimary }}>
+                <Typography variant='body2' sx={{ fontWeight: 600, color: theme.palette.customColors.midnight }}>
                   {memberFte.toFixed(1)} FTE
                 </Typography>
-                <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+                <Typography variant='caption' sx={{ color: theme.palette.text.secondary }}>
                   {memberAssignedPct}% asignado
                 </Typography>
               </Box>

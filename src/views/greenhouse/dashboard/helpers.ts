@@ -1,14 +1,16 @@
 'use client'
 
-import type { ThemeColor } from '@core/types'
-import { GH_COLORS, GH_LABELS, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
+import type { Theme } from '@mui/material/styles'
 
-export const CLIENT_STATUS_COLORS = {
-  active: GH_COLORS.semantic.info.source,
-  review: GH_COLORS.semantic.warning.source,
-  changes: GH_COLORS.semantic.danger.source,
-  completed: GH_COLORS.semantic.success.source
-} as const
+import type { ThemeColor } from '@core/types'
+import { GH_LABELS, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
+
+export const getClientStatusColors = (theme: Theme) => ({
+  active: theme.palette.info.main,
+  review: theme.palette.warning.main,
+  changes: theme.palette.error.main,
+  completed: theme.palette.success.main
+})
 
 const absoluteDateFormatter = new Intl.DateTimeFormat('es-CL', {
   day: 'numeric',

@@ -116,8 +116,8 @@ const AccountTeamDossierSection = ({ accountTeam, businessLines }: Props) => {
                 sx={{
                   p: 3,
                   borderRadius: 3,
-                  border: `1px solid ${GH_COLORS.neutral.border}`,
-                  backgroundColor: GH_COLORS.neutral.bgSurface,
+                  border: theme => `1px solid ${theme.palette.customColors.lightAlloy}`,
+                  backgroundColor: 'background.default',
                   display: 'grid',
                   gap: 2
                 }}

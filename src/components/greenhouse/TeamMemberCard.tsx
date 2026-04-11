@@ -6,7 +6,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
-import { GH_COLORS, GH_TEAM } from '@/config/greenhouse-nomenclature'
+import { GH_TEAM } from '@/config/greenhouse-nomenclature'
 import type { TeamMemberResponse } from '@/types/team'
 
 import TeamAvatar, { getTeamRoleTone } from './TeamAvatar'
@@ -73,7 +73,7 @@ const TeamMemberCard = ({ member }: TeamMemberCardProps) => {
         p: 3,
         borderRadius: 4,
         border: `1px solid ${alpha(tone.source, 0.16)}`,
-        background: `linear-gradient(180deg, ${alpha(tone.source, 0.12)} 0%, ${GH_COLORS.neutral.bgSurface} 42%)`,
+        background: theme => `linear-gradient(180deg, ${alpha(tone.source, 0.12)} 0%, ${theme.palette.background.default} 42%)`,
         display: 'grid',
         gap: 2.25,
         minHeight: 280
@@ -157,8 +157,8 @@ const TeamMemberCard = ({ member }: TeamMemberCardProps) => {
             sx={{
               p: 1.5,
               borderRadius: 3,
-              bgcolor: GH_COLORS.neutral.bgSurface,
-              border: `1px solid ${GH_COLORS.neutral.border}`
+              bgcolor: 'background.default',
+              border: theme => `1px solid ${theme.palette.customColors.lightAlloy}`
             }}
           >
             <Typography variant='caption' color='text.secondary'>
@@ -187,8 +187,8 @@ const TeamMemberCard = ({ member }: TeamMemberCardProps) => {
         sx={{
           p: 2,
           borderRadius: 3,
-          bgcolor: GH_COLORS.neutral.bgSurface,
-          border: `1px solid ${GH_COLORS.neutral.border}`,
+          bgcolor: 'background.default',
+          border: theme => `1px solid ${theme.palette.customColors.lightAlloy}`,
           gap: 1.25
         }}
       >

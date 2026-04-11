@@ -63,12 +63,14 @@ const buildLayout = ({
   nodes,
   edges,
   focusedNodeId,
-  onFocusMember
+  onFocusMember,
+  edgeColor
 }: {
   nodes: HrOrgChartNode[]
   edges: HrOrgChartEdge[]
   focusedNodeId: string | null
   onFocusMember: (memberId: string | null) => void
+  edgeColor: string
 }) => {
   const graph = new dagre.graphlib.Graph()
 
@@ -126,10 +128,10 @@ const buildLayout = ({
       type: MarkerType.ArrowClosed,
       width: 16,
       height: 16,
-      color: alpha(GH_COLORS.neutral.textSecondary, 0.35)
+      color: alpha(edgeColor, 0.35)
     },
     style: {
-      stroke: alpha(GH_COLORS.neutral.textSecondary, 0.22),
+      stroke: alpha(edgeColor, 0.22),
       strokeWidth: 1.5
     }
   }))
@@ -141,12 +143,14 @@ const buildLeadershipLayout = ({
   nodes,
   edges,
   focusedNodeId,
-  onFocusMember
+  onFocusMember,
+  edgeColor
 }: {
   nodes: HrOrgLeadershipNode[]
   edges: HrOrgLeadershipEdge[]
   focusedNodeId: string | null
   onFocusMember: (memberId: string | null) => void
+  edgeColor: string
 }) => {
   const graph = new dagre.graphlib.Graph()
 
@@ -204,10 +208,10 @@ const buildLeadershipLayout = ({
       type: MarkerType.ArrowClosed,
       width: 16,
       height: 16,
-      color: alpha(GH_COLORS.neutral.textSecondary, 0.35)
+      color: alpha(edgeColor, 0.35)
     },
     style: {
-      stroke: alpha(GH_COLORS.neutral.textSecondary, 0.22),
+      stroke: alpha(edgeColor, 0.22),
       strokeWidth: 1.5
     }
   }))
@@ -223,8 +227,8 @@ const renderOption = (props: HTMLAttributes<HTMLLIElement>, option: HrOrgChartMe
         sx={{
           width: 32,
           height: 32,
-          bgcolor: option.isCurrentMember ? GH_COLORS.semantic.success.bg : GH_COLORS.role.development.bg,
-          color: option.isCurrentMember ? GH_COLORS.semantic.success.text : GH_COLORS.role.development.textDark,
+          bgcolor: t => option.isCurrentMember ? t.palette.success.lighterOpacity : GH_COLORS.role.development.bg,
+          color: t => option.isCurrentMember ? t.palette.success.main : GH_COLORS.role.development.textDark,
           flexShrink: 0
         }}
       >
@@ -367,7 +371,8 @@ const HrOrgChartView = () => {
       nodes: payload.nodes,
       edges: payload.edges,
       focusedNodeId: activeFocusNodeId,
-      onFocusMember: handleFocusMember
+      onFocusMember: handleFocusMember,
+      edgeColor: theme.palette.text.secondary
     })
   }, [activeFocusNodeId, handleFocusMember, payload])
 
@@ -387,7 +392,8 @@ const HrOrgChartView = () => {
       nodes: leadershipView.nodes,
       edges: leadershipView.edges,
       focusedNodeId: leadershipView.focusNodeId,
-      onFocusMember: handleFocusMember
+      onFocusMember: handleFocusMember,
+      edgeColor: theme.palette.text.secondary
     })
   }, [handleFocusMember, leadershipView.edges, leadershipView.focusNodeId, leadershipView.nodes])
 
@@ -604,7 +610,7 @@ const HrOrgChartView = () => {
                   sx={{
                     height: { xs: 620, lg: 760 },
                     borderRadius: 2,
-                    border: `1px solid ${GH_COLORS.neutral.border}`,
+                    border: `1px solid ${theme.palette.customColors.lightAlloy}`,
                     overflow: 'hidden',
                     backgroundColor: alpha(theme.palette.background.paper, 0.7)
                   }}
@@ -632,7 +638,7 @@ const HrOrgChartView = () => {
                     }}
                     defaultViewport={{ x: 0, y: 0, zoom: 0.85 }}
                   >
-                    <Background gap={22} size={1} color={alpha(GH_COLORS.neutral.border, 0.7)} />
+                    <Background gap={22} size={1} color={alpha(theme.palette.customColors.lightAlloy ?? '', 0.7)} />
                     <MiniMap
                       zoomable
                       pannable
@@ -641,14 +647,14 @@ const HrOrgChartView = () => {
                           const nodeData = node.data as OrgChartNodeCardData | OrgLeadershipNodeCardData | undefined
 
                           if (nodeData?.isFocused) {
-                            return GH_COLORS.semantic.info.source
+                            return theme.palette.info.main
                           }
 
                           if (nodeData?.node?.isCurrentMember) {
-                            return GH_COLORS.semantic.success.source
+                            return theme.palette.success.main
                           }
 
-                          return GH_COLORS.neutral.textSecondary
+                          return theme.palette.text.secondary
                         })()
                       }
                       nodeStrokeWidth={2}
@@ -668,8 +674,8 @@ const HrOrgChartView = () => {
                 <Avatar
                   src={selectedMember?.avatarUrl || undefined}
                   sx={{
-                    bgcolor: selectedMember?.isCurrentMember ? GH_COLORS.semantic.success.bg : GH_COLORS.role.development.bg,
-                    color: selectedMember?.isCurrentMember ? GH_COLORS.semantic.success.text : GH_COLORS.role.development.textDark
+                    bgcolor: selectedMember?.isCurrentMember ? theme.palette.success.lighterOpacity : GH_COLORS.role.development.bg,
+                    color: selectedMember?.isCurrentMember ? theme.palette.success.main : GH_COLORS.role.development.textDark
                   }}
                 >
                   {selectedMember ? getInitials(selectedMember.displayName) : 'GH'}
@@ -716,7 +722,7 @@ const HrOrgChartView = () => {
                   </Stack>
 
                   <Box sx={{ display: 'grid', gap: 1.25, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-                    <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
+                    <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${theme.palette.customColors.lightAlloy}`, bgcolor: theme.palette.background.default }}>
                       <Typography variant='caption' color='text.secondary'>
                         Adscripción
                       </Typography>
@@ -724,7 +730,7 @@ const HrOrgChartView = () => {
                         {selectedMember.departmentName ?? 'Sin adscripción directa'}
                       </Typography>
                     </Box>
-                    <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
+                    <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${theme.palette.customColors.lightAlloy}`, bgcolor: theme.palette.background.default }}>
                       <Typography variant='caption' color='text.secondary'>
                         {viewMode === 'leaders' ? 'Área principal' : 'Contexto estructural'}
                       </Typography>
@@ -749,7 +755,7 @@ const HrOrgChartView = () => {
                           : selectedMember.contextDepartmentName ?? 'Sin contexto visible'}
                       </Typography>
                     </Box>
-                    <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
+                    <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${theme.palette.customColors.lightAlloy}`, bgcolor: theme.palette.background.default }}>
                       <Typography variant='caption' color='text.secondary'>
                         Régimen
                       </Typography>
@@ -757,7 +763,7 @@ const HrOrgChartView = () => {
                         {formatRegime(selectedMember.payRegime)}
                       </Typography>
                     </Box>
-                    <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
+                    <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${theme.palette.customColors.lightAlloy}`, bgcolor: theme.palette.background.default }}>
                       <Typography variant='caption' color='text.secondary'>
                         Supervisor formal
                       </Typography>
@@ -768,7 +774,7 @@ const HrOrgChartView = () => {
                   </Box>
 
                   {viewMode === 'leaders' && selectedLeaderNode ? (
-                    <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${GH_COLORS.neutral.border}`, bgcolor: GH_COLORS.neutral.bgSurface }}>
+                    <Box sx={{ p: 1.5, borderRadius: 2, border: `1px solid ${theme.palette.customColors.lightAlloy}`, bgcolor: theme.palette.background.default }}>
                       <Typography variant='caption' color='text.secondary'>
                         Áreas lideradas en esta vista
                       </Typography>

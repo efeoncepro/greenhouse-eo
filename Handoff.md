@@ -1,5 +1,17 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — TASK-370: Semantic Token Absorption into Theme COMPLETADA
+
+- alcance cerrado:
+  - **Oleada 1 — Fix at source:** GH_COLORS.neutral.textSecondary actualizado #848484→#667085 (WCAG fix), bgSurface #F7F7F5→#F8F9FA. Nueva categoría GH_COLORS.capability (15 tokens). helpers.ts getCapabilityPalette() migrado a GH_COLORS.capability.
+  - **Oleada 2 — Semantic migration:** 9 archivos migrados de GH_COLORS.semantic a theme.palette.{success,warning,error,info}. CLIENT_STATUS_COLORS convertido a función getClientStatusColors(theme). TeamSignalChip y TeamProgressBar reciben theme.
+  - **Oleada 2 — Neutral migration:** 32 archivos migrados de GH_COLORS.neutral a theme.palette equivalentes. textPrimary→customColors.midnight, textSecondary→text.secondary, border→customColors.lightAlloy, bgSurface→background.default.
+  - **Post-migración:** 0 refs a GH_COLORS.semantic, 0 refs a GH_COLORS.neutral en todo el codebase. Ambas categorías marcadas @deprecated en nomenclature.
+- cambios visuales aprobados:
+  - textSecondary: gris neutro #848484 → gris azulado #667085 (mejora WCAG 3.9:1→5.2:1) en 21 archivos
+  - bgSurface: warm grey #F7F7F5 → cool grey #F8F9FA (imperceptible) en 16 archivos
+- verificación ejecutada: `tsc`, `lint` (0 errors, 2 warnings pre-existentes), `build` — todos pasan
+
 ## Sesion 2026-04-11 — TASK-369: Hardcoded Hex Cleanup COMPLETADA
 
 - alcance cerrado:

@@ -21,7 +21,6 @@ import type { ThemeColor } from '@core/types'
 import CustomAvatar from '@core/components/mui/Avatar'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import { EmptyState, ExecutiveCardShell } from '@/components/greenhouse'
-import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import AppReactApexCharts from '@/libs/styles/AppReactApexCharts'
 import type {
   CapabilityCardData,
@@ -624,8 +623,8 @@ const MetricsRowCard = ({ card, cardData }: TypedCapabilityCardProps<'metrics-ro
           sx={{
             p: 2.5,
             borderRadius: 3,
-            border: `1px solid ${GH_COLORS.neutral.border}`,
-            bgcolor: GH_COLORS.neutral.bgSurface,
+            border: theme => `1px solid ${theme.palette.customColors.lightAlloy}`,
+            bgcolor: 'background.default',
             display: 'grid',
             gap: 1
           }}
@@ -721,16 +720,16 @@ const AlertListCard = ({ card, cardData }: TypedCapabilityCardProps<'alert-list'
           return (
             <Box
               key={item.id}
-              sx={{
+              sx={theme => ({
                 display: 'flex',
                 gap: 2,
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 p: 2,
                 borderRadius: 3,
-                border: `1px solid ${alpha(isDanger ? GH_COLORS.semantic.danger.source : GH_COLORS.semantic.warning.source, 0.24)}`,
-                bgcolor: isDanger ? GH_COLORS.semantic.danger.bg : GH_COLORS.semantic.warning.bg
-              }}
+                border: `1px solid ${alpha(isDanger ? theme.palette.error.main : theme.palette.warning.main, 0.24)}`,
+                bgcolor: isDanger ? theme.palette.error.lighterOpacity : theme.palette.warning.lighterOpacity
+              })}
             >
               <Stack direction='row' spacing={1.5} alignItems='center' sx={{ minWidth: 0, flex: 1 }}>
                 <CustomAvatar skin='light' variant='rounded' color={isDanger ? 'error' : 'warning'} size={36}>

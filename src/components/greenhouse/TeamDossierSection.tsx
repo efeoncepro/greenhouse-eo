@@ -9,7 +9,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
-import { GH_COLORS, GH_MESSAGES, GH_TEAM } from '@/config/greenhouse-nomenclature'
+import { GH_MESSAGES, GH_TEAM } from '@/config/greenhouse-nomenclature'
 import type { TeamMembersPayload } from '@/types/team'
 
 import BusinessLineBadge from './BusinessLineBadge'
@@ -155,8 +155,8 @@ const TeamDossierSection = () => {
                 sx={{
                   p: 2.5,
                   borderRadius: 4,
-                  border: `1px solid ${GH_COLORS.neutral.border}`,
-                  bgcolor: GH_COLORS.neutral.bgSurface
+                  border: theme => `1px solid ${theme.palette.customColors.lightAlloy}`,
+                  bgcolor: 'background.default'
                 }}
               >
                 <Typography variant='caption' color='text.secondary'>
@@ -175,7 +175,7 @@ const TeamDossierSection = () => {
                           py: 0.9,
                           borderRadius: 999,
                           bgcolor: 'background.paper',
-                          border: `1px solid ${GH_COLORS.neutral.border}`
+                          border: theme => `1px solid ${theme.palette.customColors.lightAlloy}`
                         }}
                       >
                         <BusinessLineBadge brand={line} />

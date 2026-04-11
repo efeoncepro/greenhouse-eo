@@ -74,8 +74,8 @@ const OrgLeadershipNodeCard = ({ data }: NodeProps<OrgLeadershipNodeCardNode>) =
         minHeight: 268,
         overflow: 'hidden',
         borderRadius: 2,
-        border: `1px solid ${data.isFocused ? alpha(tone.source, 0.55) : GH_COLORS.neutral.border}`,
-        background: `linear-gradient(180deg, ${alpha(tone.source, 0.12)} 0%, ${GH_COLORS.neutral.bgSurface} 52%)`,
+        border: theme => `1px solid ${data.isFocused ? alpha(tone.source, 0.55) : theme.palette.customColors.lightAlloy}`,
+        background: theme => `linear-gradient(180deg, ${alpha(tone.source, 0.12)} 0%, ${theme.palette.background.default} 52%)`,
         boxShadow: data.isFocused ? `0 0 0 2px ${alpha(tone.source, 0.14)}` : 'none',
         cursor: 'pointer',
         '&:focus-visible': {
@@ -148,12 +148,12 @@ const OrgLeadershipNodeCard = ({ data }: NodeProps<OrgLeadershipNodeCardNode>) =
           </Stack>
 
           <Box
-            sx={{
+            sx={theme => ({
               p: 1.25,
               borderRadius: 2,
-              border: `1px solid ${GH_COLORS.neutral.border}`,
-              bgcolor: alpha(GH_COLORS.neutral.bgSurface, 0.96)
-            }}
+              border: `1px solid ${theme.palette.customColors.lightAlloy}`,
+              bgcolor: alpha(theme.palette.background.default, 0.96)
+            })}
           >
             <Typography variant='caption' color='text.secondary'>
               Áreas asociadas

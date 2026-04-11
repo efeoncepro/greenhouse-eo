@@ -9,7 +9,7 @@ import LinearProgress from '@mui/material/LinearProgress'
 import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
-import { alpha } from '@mui/material/styles'
+import { alpha, useTheme } from '@mui/material/styles'
 
 import CustomAvatar from '@core/components/mui/Avatar'
 import CustomChip from '@core/components/mui/Chip'
@@ -47,16 +47,16 @@ const getServiceColor = (lines: string[]) => {
   }
 }
 
-const getRpaSemaphore = (v: number | null) => {
-  if (v === null) return { color: 'secondary' as const, muiColor: GH_COLORS.neutral.border, pct: 0 }
+const getRpaSemaphore = (v: number | null, fallbackColor: string) => {
+  if (v === null) return { color: 'secondary' as const, muiColor: fallbackColor, pct: 0 }
   if (v <= 1.5) return { color: 'success' as const, muiColor: GH_COLORS.semaphore.green.source, pct: Math.min(100, (v / 4) * 100) }
   if (v <= 2.5) return { color: 'warning' as const, muiColor: GH_COLORS.semaphore.yellow.source, pct: Math.min(100, (v / 4) * 100) }
 
   return { color: 'error' as const, muiColor: GH_COLORS.semaphore.red.source, pct: Math.min(100, (v / 4) * 100) }
 }
 
-const getOtdSemaphore = (v: number | null) => {
-  if (v === null) return { color: 'secondary' as const, muiColor: GH_COLORS.neutral.border, pct: 0 }
+const getOtdSemaphore = (v: number | null, fallbackColor: string) => {
+  if (v === null) return { color: 'secondary' as const, muiColor: fallbackColor, pct: 0 }
   if (v >= 90) return { color: 'success' as const, muiColor: GH_COLORS.semaphore.green.source, pct: v }
   if (v >= 70) return { color: 'warning' as const, muiColor: GH_COLORS.semaphore.yellow.source, pct: v }
 
@@ -75,9 +75,10 @@ const getFinanceSnapshotLabel = (financeMetrics: SpaceFinanceMetrics) => {
 
 const SpaceCard = ({ space, financeMetrics }: Props) => {
   const router = useRouter()
+  const theme = useTheme()
   const color = getServiceColor(space.businessLines)
-  const rpa = getRpaSemaphore(space.rpaAvg)
-  const otd = getOtdSemaphore(space.otdPct)
+  const rpa = getRpaSemaphore(space.rpaAvg, theme.palette.customColors.lightAlloy ?? '')
+  const otd = getOtdSemaphore(space.otdPct, theme.palette.customColors.lightAlloy ?? '')
   const healthZone = getSpaceHealth(space)
   const financePeriodLabel = financeMetrics ? getFinanceSnapshotLabel(financeMetrics) : null
 
@@ -86,13 +87,13 @@ const SpaceCard = ({ space, financeMetrics }: Props) => {
       onClick={() => router.push(`/dashboard?space=${space.clientId}`)}
       elevation={0}
       sx={{
-        border: `1px solid ${GH_COLORS.neutral.border}`,
+        border: `1px solid ${theme.palette.customColors.lightAlloy}`,
         borderRadius: 3,
         cursor: 'pointer',
         transition: 'box-shadow 0.2s, border-color 0.2s',
         '&:hover': {
           boxShadow: 2,
-          borderColor: alpha(GH_COLORS.neutral.textSecondary, 0.25)
+          borderColor: alpha(theme.palette.text.secondary, 0.25)
         }
       }}
     >
@@ -111,7 +112,7 @@ const SpaceCard = ({ space, financeMetrics }: Props) => {
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Stack direction='row' spacing={0.75} alignItems='center' flexWrap='wrap' useFlexGap>
             <Typography
-              sx={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '0.95rem', color: GH_COLORS.neutral.textPrimary }}
+              sx={{ fontFamily: 'Poppins', fontWeight: 600, fontSize: '0.95rem', color: theme.palette.customColors.midnight }}
               noWrap
             >
               {space.clientName}
@@ -167,7 +168,7 @@ const SpaceCard = ({ space, financeMetrics }: Props) => {
       <Box sx={{ px: 2.5, py: 2 }}>
         {/* RpA */}
         <Stack direction='row' alignItems='center' spacing={1.5} sx={{ mb: 1.5 }}>
-          <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary, minWidth: 30 }}>RpA</Typography>
+          <Typography variant='caption' sx={{ color: theme.palette.text.secondary, minWidth: 30 }}>RpA</Typography>
           <Box sx={{ flex: 1 }}>
             <LinearProgress
               variant='determinate'
@@ -183,7 +184,7 @@ const SpaceCard = ({ space, financeMetrics }: Props) => {
 
         {/* OTD */}
         <Stack direction='row' alignItems='center' spacing={1.5}>
-          <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary, minWidth: 30 }}>OTD</Typography>
+          <Typography variant='caption' sx={{ color: theme.palette.text.secondary, minWidth: 30 }}>OTD</Typography>
           <Box sx={{ flex: 1 }}>
             <LinearProgress
               variant='determinate'
@@ -203,7 +204,7 @@ const SpaceCard = ({ space, financeMetrics }: Props) => {
       {/* ── Metadata line ─────────────────────────────────────── */}
       <Box sx={{ px: 2.5, py: 1.5 }}>
         <Stack direction='row' justifyContent='space-between' alignItems='center' flexWrap='wrap' useFlexGap spacing={1}>
-          <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+          <Typography variant='caption' sx={{ color: theme.palette.text.secondary }}>
             {[
               `${space.projectCount} proyecto${space.projectCount !== 1 ? 's' : ''}`,
               `${space.assignedMembers} persona${space.assignedMembers !== 1 ? 's' : ''}`,

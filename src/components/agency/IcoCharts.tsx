@@ -170,8 +170,8 @@ const IcoCharts = ({ spaces, rpaTrend }: Props) => {
     cscCategories,
     cscFullNames,
     mode,
-    GH_COLORS.neutral.border,
-    GH_COLORS.neutral.textSecondary
+    theme.palette.customColors.lightAlloy ?? '',
+    theme.palette.text.secondary
   )
 
   // ── RPA Trend ─────────────────────────────────────────────────────────────
@@ -226,8 +226,8 @@ const IcoCharts = ({ spaces, rpaTrend }: Props) => {
     trendSeries.length,
     trendFullNames,
     mode,
-    GH_COLORS.neutral.border,
-    GH_COLORS.neutral.textSecondary
+    theme.palette.customColors.lightAlloy ?? '',
+    theme.palette.text.secondary
   )
 
   return (

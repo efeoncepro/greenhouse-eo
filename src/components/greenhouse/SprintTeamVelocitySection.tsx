@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
-import { GH_COLORS, GH_MESSAGES, GH_TEAM } from '@/config/greenhouse-nomenclature'
+import { GH_MESSAGES, GH_TEAM } from '@/config/greenhouse-nomenclature'
 import type { TeamBySprintPayload } from '@/types/team'
 import { getRpaStatus } from '@views/greenhouse/dashboard/helpers'
 
@@ -142,7 +142,7 @@ const SprintTeamVelocitySection = ({ sprintId }: SprintTeamVelocitySectionProps)
                 sx={{
                   p: 3,
                   borderRadius: 4,
-                  border: `1px solid ${GH_COLORS.neutral.border}`,
+                  border: theme => `1px solid ${theme.palette.customColors.lightAlloy}`,
                   bgcolor: 'background.paper',
                   display: 'grid',
                   gap: 1.5
@@ -171,8 +171,8 @@ const SprintTeamVelocitySection = ({ sprintId }: SprintTeamVelocitySectionProps)
               sx={{
                 p: 2.5,
                 borderRadius: 4,
-                bgcolor: GH_COLORS.neutral.bgSurface,
-                border: `1px solid ${GH_COLORS.neutral.border}`
+                bgcolor: 'background.default',
+                border: theme => `1px solid ${theme.palette.customColors.lightAlloy}`
               }}
             >
               <Stack direction='row' justifyContent='space-between' spacing={2} alignItems='center'>

@@ -16,7 +16,7 @@ import AnimatedCounter from '@/components/greenhouse/AnimatedCounter'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import { motion, AnimatePresence } from '@/libs/FramerMotion'
 import useReducedMotion from '@/hooks/useReducedMotion'
-import { GH_NEXA, GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_NEXA } from '@/config/greenhouse-nomenclature'
 import { getMetricById } from '@/lib/ico-engine/metric-registry'
 import NexaMentionText from '@/components/greenhouse/NexaMentionText'
 
@@ -93,7 +93,7 @@ const InsightCard = ({ item, index, animate }: { item: NexaInsightItem; index: n
       sx={{
         p: 2.5,
         borderRadius: 2,
-        border: `1px solid ${GH_COLORS.neutral.border}`,
+        border: theme => `1px solid ${theme.palette.customColors.lightAlloy}`,
         bgcolor: 'background.paper',
         '&:hover': { bgcolor: 'action.hover' }
       }}
@@ -109,7 +109,7 @@ const InsightCard = ({ item, index, animate }: { item: NexaInsightItem; index: n
             label={signalLabel}
             sx={{ height: 20, fontSize: '0.64rem', fontWeight: 600 }}
           />
-          <Typography variant='subtitle2' sx={{ color: GH_COLORS.neutral.textPrimary }}>
+          <Typography variant='subtitle2' sx={{ color: theme => theme.palette.customColors.midnight }}>
             {metricName}
           </Typography>
         </Stack>
@@ -120,7 +120,7 @@ const InsightCard = ({ item, index, animate }: { item: NexaInsightItem; index: n
             text={item.explanation}
             variant='body2'
             sx={{
-              color: GH_COLORS.neutral.textSecondary,
+              color: 'text.secondary',
               display: '-webkit-box',
               WebkitLineClamp: 3,
               WebkitBoxOrient: 'vertical',
@@ -138,13 +138,13 @@ const InsightCard = ({ item, index, animate }: { item: NexaInsightItem; index: n
               borderLeft: t => `3px solid ${t.palette.warning.main}`
             }}
           >
-            <Typography variant='caption' sx={{ fontWeight: 600, color: GH_COLORS.neutral.textSecondary, display: 'block', mb: 0.25 }}>
+            <Typography variant='caption' sx={{ fontWeight: 600, color: 'text.secondary', display: 'block', mb: 0.25 }}>
               {GH_NEXA.insights_action_label}
             </Typography>
             <NexaMentionText
               text={item.recommendedAction}
               variant='body2'
-              sx={{ color: GH_COLORS.neutral.textPrimary }}
+              sx={{ color: theme => theme.palette.customColors.midnight }}
             />
           </Box>
         )}
@@ -183,7 +183,7 @@ const NexaInsightsBlock = ({
 
   if (!hasData) {
     return (
-      <Card elevation={0} sx={{ border: `1px solid ${GH_COLORS.neutral.border}` }}>
+      <Card elevation={0} sx={{ border: `1px solid ${theme.palette.customColors.lightAlloy}` }}>
         <Accordion disableGutters elevation={0} defaultExpanded={defaultExpanded}>
           <AccordionSummary expandIcon={<i className='tabler-chevron-down' aria-hidden='true' />}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -214,7 +214,7 @@ const NexaInsightsBlock = ({
   }
 
   return (
-    <Card elevation={0} sx={{ border: `1px solid ${GH_COLORS.neutral.border}` }}>
+    <Card elevation={0} sx={{ border: `1px solid ${theme.palette.customColors.lightAlloy}` }}>
       <Accordion disableGutters elevation={0} defaultExpanded={defaultExpanded}>
         <AccordionSummary expandIcon={<i className='tabler-chevron-down' aria-hidden='true' />}>
           <Stack direction='row' alignItems='center' spacing={2} sx={{ flexWrap: 'wrap', rowGap: 0.5 }}>
@@ -231,7 +231,7 @@ const NexaInsightsBlock = ({
             {lastAnalysis && (
               <Typography
                 variant='caption'
-                sx={{ color: GH_COLORS.neutral.textSecondary, display: { xs: 'none', sm: 'inline' } }}
+                sx={{ color: 'text.secondary', display: { xs: 'none', sm: 'inline' } }}
               >
                 · {GH_NEXA.insights_last_analysis(formatTimestamp(lastAnalysis))}
               </Typography>
@@ -267,7 +267,7 @@ const NexaInsightsBlock = ({
             {/* Insights list */}
             {insights.length > 0 && (
               <div>
-                <Typography variant='overline' sx={{ color: GH_COLORS.neutral.textSecondary, mb: 1.5, display: 'block' }}>
+                <Typography variant='overline' sx={{ color: 'text.secondary', mb: 1.5, display: 'block' }}>
                   {GH_NEXA.insights_list_title}
                 </Typography>
                 <AnimatePresence>
@@ -284,11 +284,11 @@ const NexaInsightsBlock = ({
             <Typography
               variant='caption'
               sx={{
-                color: GH_COLORS.neutral.textSecondary,
+                color: 'text.secondary',
                 textAlign: 'center',
                 display: 'block',
                 pt: 2,
-                borderTop: `1px solid ${GH_COLORS.neutral.border}`
+                borderTop: `1px solid ${theme.palette.customColors.lightAlloy}`
               }}
             >
               {GH_NEXA.disclaimer}

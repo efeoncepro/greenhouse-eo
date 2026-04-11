@@ -1,7 +1,8 @@
 'use client'
 
 import LinearProgress from '@mui/material/LinearProgress'
-import { alpha } from '@mui/material/styles'
+import { alpha, useTheme } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles'
 
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 
@@ -10,7 +11,7 @@ type TeamProgressBarProps = {
   tone: 'success' | 'warning' | 'error' | 'default' | 'info'
 }
 
-const getBarColor = (tone: TeamProgressBarProps['tone']) => {
+const getBarColor = (tone: TeamProgressBarProps['tone'], theme: Theme) => {
   switch (tone) {
     case 'success':
       return GH_COLORS.semaphore.green.source
@@ -19,14 +20,15 @@ const getBarColor = (tone: TeamProgressBarProps['tone']) => {
     case 'error':
       return GH_COLORS.semaphore.red.source
     case 'info':
-      return GH_COLORS.semantic.info.source
+      return theme.palette.info.main
     default:
-      return GH_COLORS.neutral.textSecondary
+      return theme.palette.text.secondary
   }
 }
 
 const TeamProgressBar = ({ value, tone }: TeamProgressBarProps) => {
-  const color = getBarColor(tone)
+  const theme = useTheme()
+  const color = getBarColor(tone, theme)
 
   return (
     <LinearProgress

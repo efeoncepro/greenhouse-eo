@@ -29,7 +29,7 @@ const PulseGlobalCharts = ({ spaces, statusMix, weeklyActivity }: Props) => {
   const baseApexOptions = {
     chart: { toolbar: { show: false }, zoom: { enabled: false }, background: 'transparent' },
     theme: { mode: theme.palette.mode },
-    grid: { borderColor: GH_COLORS.neutral.border, strokeDashArray: 4 },
+    grid: { borderColor: theme.palette.customColors.lightAlloy, strokeDashArray: 4 },
     tooltip: { theme: theme.palette.mode }
   }
 
@@ -49,13 +49,13 @@ const PulseGlobalCharts = ({ spaces, statusMix, weeklyActivity }: Props) => {
     ),
     xaxis: {
       categories: spacesWithRpa.map(s => s.clientName),
-      labels: { style: { colors: GH_COLORS.neutral.textSecondary, fontSize: '12px' } }
+      labels: { style: { colors: theme.palette.text.secondary, fontSize: '12px' } }
     },
-    yaxis: { labels: { style: { colors: GH_COLORS.neutral.textSecondary, fontSize: '12px' } } },
+    yaxis: { labels: { style: { colors: theme.palette.text.secondary, fontSize: '12px' } } },
     annotations: {
       xaxis: [{ x: 2.0, borderColor: GH_COLORS.semaphore.yellow.source, strokeDashArray: 4, label: { text: 'Límite ICO', style: { color: GH_COLORS.semaphore.yellow.source } } }]
     },
-    dataLabels: { enabled: true, style: { fontSize: '11px', colors: [GH_COLORS.neutral.textPrimary] } }
+    dataLabels: { enabled: true, style: { fontSize: '11px', colors: [theme.palette.customColors.midnight] } }
   }
 
   // ── Status mix (donut) ────────────────────────────────────────────────────
@@ -64,7 +64,7 @@ const PulseGlobalCharts = ({ spaces, statusMix, weeklyActivity }: Props) => {
     chart: { ...baseApexOptions.chart, type: 'donut' as const },
     labels: statusMix.map(s => s.label),
     colors: STATUS_COLORS.slice(0, statusMix.length),
-    legend: { position: 'bottom' as const, labels: { colors: GH_COLORS.neutral.textSecondary } },
+    legend: { position: 'bottom' as const, labels: { colors: theme.palette.text.secondary } },
     dataLabels: { enabled: true, style: { fontSize: '12px' } }
   }
 
@@ -79,10 +79,10 @@ const PulseGlobalCharts = ({ spaces, statusMix, weeklyActivity }: Props) => {
         try { return new Intl.DateTimeFormat('es-MX', { month: 'short', day: 'numeric' }).format(new Date(w.weekStart)) }
         catch { return w.weekStart }
       }),
-      labels: { style: { colors: GH_COLORS.neutral.textSecondary, fontSize: '11px' } },
+      labels: { style: { colors: theme.palette.text.secondary, fontSize: '11px' } },
       tickAmount: 8
     },
-    yaxis: { labels: { style: { colors: GH_COLORS.neutral.textSecondary } } },
+    yaxis: { labels: { style: { colors: theme.palette.text.secondary } } },
     markers: { size: 4, colors: [GH_COLORS.chart.primary], strokeColors: '#fff', strokeWidth: 2 }
   }
 
@@ -136,7 +136,7 @@ const PulseGlobalCharts = ({ spaces, statusMix, weeklyActivity }: Props) => {
       {/* Placeholder cuadrante 4 */}
       <ExecutiveCardShell title='Volumen por Space' subtitle='Próximamente disponible'>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 260 }}>
-          <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+          <Typography variant='body2' sx={{ color: theme.palette.text.secondary }}>
             Disponible cuando haya 2+ semanas de data por Space.
           </Typography>
         </Box>

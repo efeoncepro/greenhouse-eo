@@ -1213,6 +1213,11 @@ export const GH_COLORS = {
     red: { source: '#bb1954', bg: '#f9ecf1', text: '#bb1954' }
   },
 
+  /**
+   * @deprecated Use theme.palette.{success,warning,error,info} instead.
+   * Kept temporarily for backwards compat — will be removed when all consumers migrate.
+   * See GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md §3.2
+   */
   semantic: {
     success: { source: '#6ec207', bg: '#f3faeb', text: '#6ec207' },
     warning: { source: '#ff6500', bg: '#fff2ea', text: '#ff6500' },
@@ -1228,11 +1233,19 @@ export const GH_COLORS = {
     softBlue: '#85B7EB'
   },
 
+  /**
+   * @deprecated Use theme.palette equivalents instead:
+   *   textPrimary  → theme.palette.customColors.midnight
+   *   textSecondary → theme.palette.text.secondary
+   *   border       → theme.palette.customColors.lightAlloy
+   *   bgSurface    → theme.palette.background.default
+   * See GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md §4.2
+   */
   neutral: {
     textPrimary: '#022a4e',
-    textSecondary: '#848484',
+    textSecondary: '#667085',
     border: '#dbdbdb',
-    bgSurface: '#f7f7f5'
+    bgSurface: '#F8F9FA'
   },
 
   service: {
@@ -1261,6 +1274,15 @@ export const GH_COLORS = {
     assetMgmt:  { source: '#0375db', bg: '#eaf3fc', text: '#0375db' },
     activation: { source: '#023c70', bg: '#eaeff3', text: '#023c70' },
     completed:  { source: '#6ec207', bg: '#f3faeb', text: '#6ec207' }
+  },
+
+  /** Capability module brand palettes (admin/tenant context). Distinct from service (operational context). */
+  capability: {
+    globe:  { accent: '#7C3AED', soft: 'rgba(124,58,237,0.12)', contrast: '#F5F3FF' },
+    reach:  { accent: '#4F46E5', soft: 'rgba(79,70,229,0.12)',  contrast: '#EEF2FF' },
+    wave:   { accent: '#0891B2', soft: 'rgba(8,145,178,0.12)',  contrast: '#ECFEFF' },
+    crm:    { accent: '#FF7A59', soft: 'rgba(255,122,89,0.14)', contrast: '#FFF7F4' },
+    core:   { accent: '#1E3A5F', soft: 'rgba(30,58,95,0.12)',   contrast: '#EFF6FF' }
   }
 } as const
 

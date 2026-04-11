@@ -84,8 +84,8 @@ const OrgChartNodeCard = ({ data }: NodeProps<OrgChartNodeCardNode>) => {
         minHeight: 228,
         overflow: 'hidden',
         borderRadius: 2,
-        border: `1px solid ${data.isFocused ? alpha(tone.source, 0.55) : GH_COLORS.neutral.border}`,
-        background: `linear-gradient(180deg, ${alpha(tone.source, 0.12)} 0%, ${GH_COLORS.neutral.bgSurface} 48%)`,
+        border: theme => `1px solid ${data.isFocused ? alpha(tone.source, 0.55) : theme.palette.customColors.lightAlloy}`,
+        background: theme => `linear-gradient(180deg, ${alpha(tone.source, 0.12)} 0%, ${theme.palette.background.default} 48%)`,
         boxShadow: data.isFocused ? `0 0 0 2px ${alpha(tone.source, 0.14)}` : 'none',
         cursor: canFocusMember ? 'pointer' : 'default',
         '&:focus-visible': {
@@ -121,9 +121,9 @@ const OrgChartNodeCard = ({ data }: NodeProps<OrgChartNodeCardNode>) => {
                   variant='outlined'
                   sx={{
                     height: 24,
-                    borderColor: node.active ? alpha(GH_COLORS.semantic.success.source, 0.24) : alpha(GH_COLORS.semantic.warning.source, 0.28),
-                    color: node.active ? GH_COLORS.semantic.success.text : GH_COLORS.semantic.warning.text,
-                    bgcolor: node.active ? alpha(GH_COLORS.semantic.success.source, 0.08) : alpha(GH_COLORS.semantic.warning.source, 0.08)
+                    borderColor: t => node.active ? alpha(t.palette.success.main, 0.24) : alpha(t.palette.warning.main, 0.28),
+                    color: t => node.active ? t.palette.success.main : t.palette.warning.main,
+                    bgcolor: t => node.active ? alpha(t.palette.success.main, 0.08) : alpha(t.palette.warning.main, 0.08)
                   }}
                 />
                 {node.isCurrentMember ? <Chip size='small' label='Tú' color='primary' variant='outlined' sx={{ height: 24 }} /> : null}

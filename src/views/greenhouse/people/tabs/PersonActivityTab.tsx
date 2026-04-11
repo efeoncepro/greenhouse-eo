@@ -147,7 +147,7 @@ const PersonActivityTab = ({ memberId }: Props) => {
     legend: {
       fontSize: '13px',
       position: 'bottom',
-      labels: { colors: GH_COLORS.neutral.textSecondary },
+      labels: { colors: theme.palette.text.secondary },
       itemMargin: { horizontal: 8 }
     },
     plotOptions: {
@@ -156,13 +156,13 @@ const PersonActivityTab = ({ memberId }: Props) => {
           size: '62%',
           labels: {
             show: true,
-            name: { fontSize: '0.9rem', color: GH_COLORS.neutral.textSecondary },
-            value: { fontSize: '1.5rem', fontWeight: 700, color: GH_COLORS.neutral.textPrimary },
+            name: { fontSize: '0.9rem', color: theme.palette.text.secondary },
+            value: { fontSize: '1.5rem', fontWeight: 700, color: theme.palette.customColors.midnight },
             total: {
               show: true,
               fontSize: '0.85rem',
               label: 'Activos asignados',
-              color: GH_COLORS.neutral.textPrimary,
+              color: theme.palette.customColors.midnight,
               formatter: () => String(cscTotal)
             }
           }
@@ -221,8 +221,8 @@ const PersonActivityTab = ({ memberId }: Props) => {
     plotOptions: {
       radar: {
         polygons: {
-          strokeColors: GH_COLORS.neutral.border,
-          connectorColors: GH_COLORS.neutral.border,
+          strokeColors: theme.palette.customColors.lightAlloy,
+          connectorColors: theme.palette.customColors.lightAlloy,
           fill: {
             colors: [mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', 'transparent']
           }
@@ -231,7 +231,7 @@ const PersonActivityTab = ({ memberId }: Props) => {
     },
     xaxis: {
       categories: radarMetrics.map(m => m.label),
-      labels: { style: { fontSize: '12px', colors: Array(6).fill(GH_COLORS.neutral.textSecondary) } }
+      labels: { style: { fontSize: '12px', colors: Array(6).fill(theme.palette.text.secondary) } }
     },
     yaxis: { show: false, max: 100 },
     grid: { show: false, padding: { top: -10, bottom: -10 } },
@@ -257,7 +257,7 @@ const PersonActivityTab = ({ memberId }: Props) => {
           strokeWidth: '100%'
         },
         dataLabels: {
-          name: { fontSize: '14px', color: GH_COLORS.neutral.textSecondary, offsetY: -10 },
+          name: { fontSize: '14px', color: theme.palette.text.secondary, offsetY: -10 },
           value: { fontSize: '28px', fontWeight: 700, offsetY: 5 }
         }
       }

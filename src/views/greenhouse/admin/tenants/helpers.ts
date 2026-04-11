@@ -95,23 +95,13 @@ export const getCapabilityPalette = (
 ): CapabilityPalette => {
   const family = resolveCapabilityFamily(capability)
 
-  if (family === 'globe') {
-    return { accent: '#7C3AED', soft: 'rgba(124,58,237,0.12)', contrast: '#F5F3FF', label: 'Globe' }
+  const FAMILY_LABELS: Record<string, string> = {
+    globe: 'Globe', reach: 'Reach', wave: 'Wave', crm: 'CRM Solutions', core: 'Efeonce Core'
   }
 
-  if (family === 'reach') {
-    return { accent: '#4F46E5', soft: 'rgba(79,70,229,0.12)', contrast: '#EEF2FF', label: 'Reach' }
-  }
+  const palette = GH_COLORS.capability[family as keyof typeof GH_COLORS.capability] ?? GH_COLORS.capability.core
 
-  if (family === 'wave') {
-    return { accent: '#0891B2', soft: 'rgba(8,145,178,0.12)', contrast: '#ECFEFF', label: 'Wave' }
-  }
-
-  if (family === 'crm') {
-    return { accent: '#FF7A59', soft: 'rgba(255,122,89,0.14)', contrast: '#FFF7F4', label: 'CRM Solutions' }
-  }
-
-  return { accent: '#1E3A5F', soft: 'rgba(30,58,95,0.12)', contrast: '#EFF6FF', label: 'Efeonce Core' }
+  return { ...palette, label: FAMILY_LABELS[family] ?? 'Efeonce Core' }
 }
 
 /**

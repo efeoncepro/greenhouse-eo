@@ -15,7 +15,7 @@ import SpaceCard from '@/components/agency/SpaceCard'
 import SpaceFilters from '@/components/agency/SpaceFilters'
 import SpaceHealthTable from '@/components/agency/SpaceHealthTable'
 import SpacesCharts from '@/components/agency/SpacesCharts'
-import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_AGENCY } from '@/config/greenhouse-nomenclature'
 import type { AgencySpaceHealth } from '@/lib/agency/agency-queries'
 import type { SpaceFinanceMetrics } from '@/lib/agency/agency-finance-metrics'
 
@@ -92,14 +92,14 @@ const AgencySpacesView = ({ spaces }: Props) => {
       {/* ── Header ───────────────────────────────────────────────────────────── */}
       <Card
         elevation={0}
-        sx={{ p: 3, border: `1px solid ${GH_COLORS.neutral.border}`, borderRadius: 3, bgcolor: 'background.paper' }}
+        sx={{ p: 3, border: theme => `1px solid ${theme.palette.customColors.lightAlloy}`, borderRadius: 3, bgcolor: 'background.paper' }}
       >
         <Stack direction='row' alignItems='center' justifyContent='space-between' flexWrap='wrap' useFlexGap gap={1}>
           <Box>
-            <Typography variant='h5' sx={{ fontFamily: 'Poppins', fontWeight: 700, color: GH_COLORS.neutral.textPrimary, mb: 0.5 }}>
+            <Typography variant='h5' sx={{ fontFamily: 'Poppins', fontWeight: 700, color: theme => theme.palette.customColors.midnight, mb: 0.5 }}>
               {GH_AGENCY.spaces_title}
             </Typography>
-            <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+            <Typography variant='body2' sx={{ color: 'text.secondary' }}>
               {GH_AGENCY.spaces_subtitle}
             </Typography>
           </Box>
@@ -177,9 +177,9 @@ const AgencySpacesView = ({ spaces }: Props) => {
       {/* ── Data View ────────────────────────────────────────────────────────── */}
       <SectionErrorBoundary sectionName='agency-spaces-data' description='No pudimos cargar los Spaces.'>
         {filtered.length === 0 ? (
-          <Card elevation={0} sx={{ border: `1px solid ${GH_COLORS.neutral.border}`, textAlign: 'center', py: 8 }}>
-            <i className='tabler-search' style={{ fontSize: '2.5rem', color: GH_COLORS.neutral.border }} />
-            <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textSecondary, mt: 2 }}>
+          <Card elevation={0} sx={{ border: theme => `1px solid ${theme.palette.customColors.lightAlloy}`, textAlign: 'center', py: 8 }}>
+            <i className='tabler-search' style={{ fontSize: '2.5rem' }} />
+            <Typography variant='body2' sx={{ color: 'text.secondary', mt: 2 }}>
               {GH_AGENCY.empty_spaces}
             </Typography>
           </Card>
