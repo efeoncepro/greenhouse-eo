@@ -1,5 +1,26 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — contrato arquitectónico persona ↔ entidad legal para CCA y compensación ejecutiva
+
+- alcance cerrado:
+  - se agregó la spec canónica `docs/architecture/GREENHOUSE_PERSON_LEGAL_ENTITY_RELATIONSHIPS_V1.md`
+  - el repo ya deja explícito que relaciones societarias/contractuales/financieras no deben colgar primariamente de `user`, `member`, `space` ni `organization_type`
+  - `Finance > Cuenta accionista` queda documentada como instrumento derivado de una relación `person ↔ legal entity`
+  - `Payroll` queda documentado como owner de nómina formal, sin absorber toda la semántica de compensación ejecutiva
+- documentos vivos actualizados:
+  - `docs/architecture/GREENHOUSE_PERSON_LEGAL_ENTITY_RELATIONSHIPS_V1.md`
+  - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+  - `docs/architecture/GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md`
+  - `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md`
+  - `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+  - `project_context.md`
+  - `docs/README.md`
+  - `changelog.md`
+- validación ejecutada:
+  - revisión manual de consistencia documental cross-module
+  - no aplica build/lint; no hubo cambios de runtime
+  - pendiente natural: bajar esta semántica a task/ADR de implementación cuando se quiera tocar modelo runtime
+
 ## Sesion 2026-04-11 — arquitectura base para separar estructura, equipos y capacidad extendida
 
 - alcance cerrado:

@@ -1,5 +1,17 @@
 # Greenhouse 360 Object Model V1
 
+## Delta 2026-04-11 — Person ↔ Legal Entity relationships formalized
+
+- Greenhouse ya debe distinguir explícitamente entre:
+  - `Person` como raíz humana canónica
+  - `LegalEntity` como contraparte jurídica/económica
+  - `Organization` / `Space` como capas operativas
+- Regla nueva:
+  - relaciones societarias, contractuales y financieras sensibles no deben colgar primariamente de `user`, `member`, `space` ni de una `organization` ambigua
+  - la compensación ejecutiva y la cuenta corriente accionista deben leerse como extensiones de una relación `person ↔ legal entity`
+- Documento canónico nuevo:
+  - `docs/architecture/GREENHOUSE_PERSON_LEGAL_ENTITY_RELATIONSHIPS_V1.md`
+
 ## Delta 2026-04-07 — Person Complete 360 Federated Resolver implementado (TASK-273)
 
 - **Person Complete 360** es ahora un resolver federado (`getPersonComplete360`) que consolida toda la data de una persona bajo un solo entry point con 8 facetas on-demand.

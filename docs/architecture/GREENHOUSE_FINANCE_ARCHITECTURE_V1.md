@@ -6,6 +6,19 @@
 
 ---
 
+## Delta 2026-04-11 — Shareholder account anchored semantically to Person ↔ Legal Entity
+
+- `Finance > Cuenta accionista` sigue siendo owner del instrumento, ledger, settlement y balances.
+- Regla nueva:
+  - la CCA no debe interpretarse como extensión primaria de `user`, `member` ni `space`
+  - su semántica canónica es una relación `person ↔ legal entity`
+  - `profile_id`, `member_id` opcional y `space_id` siguen siendo anclas útiles de runtime, pero no sustituyen la contraparte económica primaria
+- Regla complementaria:
+  - `executive compensation` y `shareholder current account` son carriles distintos
+  - cualquier compensación/cruce entre ambos debe ser explícita y auditable
+- Fuente canónica complementaria:
+  - `docs/architecture/GREENHOUSE_PERSON_LEGAL_ENTITY_RELATIONSHIPS_V1.md`
+
 ## Delta 2026-04-07
 
 - **TASK-280**: Módulos de caja implementados

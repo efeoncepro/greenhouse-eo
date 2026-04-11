@@ -2,6 +2,18 @@
 
 ## 2026-04-11
 
+### 2026-04-11 — Persona vs entidad legal formalizado para compensación ejecutiva y cuenta accionista
+
+- Se agregó una spec de arquitectura para modelar relaciones explícitas `persona ↔ entidad legal` sin colgarlas de `user`, `member` o `space`.
+- La nueva fuente canónica fija que:
+  - `identity_profile` sigue siendo la raíz humana
+  - `Efeonce Group SpA` debe leerse como contraparte jurídica/económica
+  - `Cuenta accionista` y `compensación ejecutiva` son carriles distintos
+  - `Payroll` materializa nómina formal, pero no agota la semántica de toda compensación ejecutiva
+- Documentos alineados:
+  - `GREENHOUSE_PERSON_LEGAL_ENTITY_RELATIONSHIPS_V1.md`
+  - deltas breves en `360 Object Model`, `Person ↔ Organization`, `Finance` y `HR Payroll`
+
 ### 2026-04-11 — Leave vuelve a resolver avatars desde la identidad canónica
 
 - `HR > Permisos` y `My Leave` ya no dependen de un avatar nulo en el store PostgreSQL.

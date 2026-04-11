@@ -385,3 +385,10 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-333` | `to-do` | Readers compartidos de relaciones para personas, workspaces y admin | `docs/tasks/to-do/TASK-333-shared-relationship-readers.md` |
 | `TASK-334` | `to-do` | Superficies relacionales y entry points de administración | `docs/tasks/to-do/TASK-334-relationship-surfaces-admin-ux.md` |
 | `TASK-335` | `to-do` | Rediseno UX de la vista Organigrama | `docs/tasks/to-do/TASK-335-org-chart-ux-redesign.md` |
+| `TASK-336` | `to-do` | Person ↔ Legal Entity & Executive Economics Program | `docs/tasks/to-do/TASK-336-person-legal-entity-executive-economics-program.md` |
+| `TASK-337` | `to-do` | Person ↔ Legal Entity Relationship Runtime Foundation | `docs/tasks/to-do/TASK-337-person-legal-entity-relationship-runtime-foundation.md` |
+| `TASK-338` | `to-do` | Compensation Arrangement Canonical Contract & Runtime Foundation | `docs/tasks/to-do/TASK-338-compensation-arrangement-canonical-runtime-foundation.md` |
+| `TASK-339` | `to-do` | Shareholder Account Legal Entity Alignment | `docs/tasks/to-do/TASK-339-shareholder-account-legal-entity-alignment.md` |
+| `TASK-340` | `to-do` | Compensation Arrangement → Payroll Bridge | `docs/tasks/to-do/TASK-340-compensation-arrangement-payroll-bridge.md` |
+| `TASK-341` | `to-do` | Executive Economics 360 Read Model | `docs/tasks/to-do/TASK-341-executive-economics-360-read-model.md` |
+| `TASK-342` | `to-do` | Executive Compensation Cost Intelligence Integration | `docs/tasks/to-do/TASK-342-executive-compensation-cost-intelligence-integration.md` |

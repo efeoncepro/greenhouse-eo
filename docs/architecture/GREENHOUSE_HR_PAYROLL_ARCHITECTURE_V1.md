@@ -1,5 +1,19 @@
 # GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md
 
+## Delta 2026-04-11 — Payroll no agota la semántica de compensación ejecutiva
+
+- `Payroll` sigue siendo owner de la nómina formal materializada sobre `member_id`.
+- Regla nueva:
+  - no toda compensación de una persona frente a la entidad legal debe nacer conceptualmente dentro de `Payroll`
+  - Greenhouse debe distinguir entre:
+    - `CompensationArrangement` como acuerdo de compensación persona ↔ entidad legal
+    - `Payroll` como materialización formal cuando esa compensación corresponde a nómina
+- Regla complementaria:
+  - esto no cambia el ownership transaccional actual de `compensation_versions`, `payroll_periods` y `payroll_entries`
+  - sí evita mezclar sueldo empresarial con cuenta corriente accionista o con la identidad del `member`
+- Fuente canónica complementaria:
+  - `docs/architecture/GREENHOUSE_PERSON_LEGAL_ENTITY_RELATIONSHIPS_V1.md`
+
 ## Delta 2026-04-06 — TASK-271: Half-day leave periods + min_advance_days precision
 
 ### Half-day leave periods

@@ -1,5 +1,15 @@
 # Greenhouse Person ↔ Organization Model V1
 
+## Delta 2026-04-11 — Organization no reemplaza Legal Entity
+
+- El modelo `Person ↔ Organization` sigue siendo canónico para contexto organizacional, memberships y scoping operativo.
+- Regla nueva:
+  - no debe usarse automáticamente como reemplazo del vínculo `person ↔ legal entity` cuando el caso de uso es societario, contractual o financiero
+  - `Efeonce Group SpA` hoy puede vivir runtime-wise como `operating entity` en `organizations`, pero esa implementación no debe borrar la semántica de **entidad legal**
+  - `space`, `tenant`, `organization_type` y `membership` no bastan por sí solos para modelar sueldo empresarial, cuenta corriente accionista o participación societaria
+- Fuente canónica complementaria:
+  - `docs/architecture/GREENHOUSE_PERSON_LEGAL_ENTITY_RELATIONSHIPS_V1.md`
+
 **Version 1.0 — April 2026**
 
 ## Purpose

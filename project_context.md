@@ -1,5 +1,19 @@
 # project_context.md
 
+## Delta 2026-04-11 Person vs Legal Entity relationships formalized
+
+- Greenhouse ya deja explícito que una persona no debe modelarse como `user especial` ni como simple extensión de `member` cuando el caso es societario, contractual o financiero.
+- Regla operativa nueva:
+  - la raíz humana canónica sigue siendo `identity_profile`
+  - la contraparte jurídica/económica primaria debe leerse como `legal entity`
+  - `user`, `member`, `space` y `organization_type` pueden seguir actuando como facetas/scopes de runtime, pero no como sustitutos de la relación legal base
+- Aplicación directa:
+  - `Finance > Cuenta accionista` debe entenderse como instrumento derivado de `person ↔ legal entity`
+  - el sueldo empresarial debe distinguirse conceptualmente de la CCA
+  - `Payroll` sigue materializando nómina formal sobre `member_id`, pero ya no debe leerse como única raíz semántica de toda compensación ejecutiva
+- Fuente canónica nueva:
+  - `docs/architecture/GREENHOUSE_PERSON_LEGAL_ENTITY_RELATIONSHIPS_V1.md`
+
 ## Delta 2026-04-11 Semántica canónica para estructura, equipos y capacidad extendida
 
 - La arquitectura viva ya explicita que Greenhouse no debe tratar `equipo` como un concepto único.
