@@ -108,6 +108,25 @@ export type SisterPlatformConsumerRecord = {
   updatedAt: string
 }
 
+export type CreateSisterPlatformConsumerInput = {
+  sisterPlatformKey: string
+  consumerName: string
+  consumerType?: SisterPlatformConsumerType
+  credentialStatus?: SisterPlatformConsumerStatus
+  token?: string
+  allowedGreenhouseScopeTypes?: SisterPlatformGreenhouseScopeType[]
+  rateLimitPerMinute?: number
+  rateLimitPerHour?: number
+  expiresAt?: string | null
+  notes?: string | null
+  metadata?: Record<string, unknown> | null
+  actorUserId?: string | null
+}
+
+export type UpsertSisterPlatformConsumerInput = CreateSisterPlatformConsumerInput & {
+  rotateToken?: boolean
+}
+
 export type CreateSisterPlatformBindingInput = {
   sisterPlatformKey: string
   externalScopeType: SisterPlatformExternalScopeType

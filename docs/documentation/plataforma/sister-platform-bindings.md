@@ -3,7 +3,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-04-11 por Codex (TASK-375)
-> **Ultima actualizacion:** 2026-04-11 por Codex (TASK-376)
+> **Ultima actualizacion:** 2026-04-11 por Codex (Kortex pilot seed follow-up)
 > **Documentacion tecnica:** `docs/architecture/GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`
 
 ---
@@ -55,6 +55,10 @@ La API read-only nueva permite:
 - resolver el binding activo de un scope externo
 - leer el catalogo y la readiness sin usar el token compartido generico
 - dejar request logging y rate limiting sobre ese carril
+
+Tambien existe ahora un seed operativo para dejar listo el primer consumer Kortex sin crear registros a mano:
+
+- `pnpm seed:kortex-pilot`
 
 ## Que estados puede tener
 
@@ -134,10 +138,41 @@ Esas piezas vienen despues en:
 Regla simple:
 
 - primero se crea o corrige el binding
+- en el caso de Kortex piloto, se crea o actualiza tambien su consumer dedicado con `pnpm seed:kortex-pilot`
 - despues se activa
 - solo entonces una integracion externa deberia apoyarse en ese enlace
 
 Si hay duda sobre el scope correcto, no corresponde activar el binding "para probar". Debe quedar en `draft` hasta validar la relacion real.
+
+## Seed piloto Kortex
+
+El seed operativo del piloto Kortex hace dos cosas juntas:
+
+1. crea o actualiza el consumer `Kortex Operator Console`
+2. crea o actualiza el binding `kortex -> portal`
+
+Variables minimas para correrlo:
+
+- `KORTEX_EXTERNAL_SCOPE_ID`
+- `KORTEX_GREENHOUSE_SCOPE_TYPE`
+- `KORTEX_GREENHOUSE_ORGANIZATION_ID`
+
+Y segun el scope:
+
+- `KORTEX_GREENHOUSE_CLIENT_ID` para `client` o `space`
+- `KORTEX_GREENHOUSE_SPACE_ID` para `space`
+
+Defaults operativos:
+
+- binding en `draft`
+- consumer en `active`
+- scopes permitidos `client,space`
+
+El script es idempotente:
+
+- si el consumer existe, lo actualiza
+- si el binding existe, lo actualiza
+- solo imprime token nuevo cuando lo crea o cuando se pide rotacion
 
 ## Quien deberia tocarlo
 

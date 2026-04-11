@@ -27,6 +27,7 @@ Current runtime status:
 - admin read/governance surface implemented
 - hardened read-only sister-platform lane implemented under `/api/integrations/v1/sister-platforms/*`
 - per-consumer credential model implemented in code + migration file
+- consumer provisioning helper + Kortex pilot seed script implemented in code
 - request logging and rate limiting implemented in code + migration file
 - migrations applied on 2026-04-11 via `pnpm pg:connect:migrate`
 - generated DB types regenerated in `src/types/db.d.ts`
@@ -293,9 +294,11 @@ Resolver policy:
 ### Files
 
 - `src/lib/sister-platforms/external-auth.ts`
+- `src/lib/sister-platforms/consumers.ts`
 - `src/app/api/integrations/v1/sister-platforms/context/route.ts`
 - `src/app/api/integrations/v1/sister-platforms/catalog/capabilities/route.ts`
 - `src/app/api/integrations/v1/sister-platforms/readiness/route.ts`
+- `scripts/seed-kortex-sister-platform-pilot.ts`
 
 ### Request contract
 
@@ -320,6 +323,52 @@ Required query params:
 | `GET` | `/api/integrations/v1/sister-platforms/context` | Resolve consumer + active binding context |
 | `GET` | `/api/integrations/v1/sister-platforms/catalog/capabilities` | Export capability catalog through the hardened lane |
 | `GET` | `/api/integrations/v1/sister-platforms/readiness?keys=...` | Export readiness posture through the hardened lane |
+
+## Consumer Provisioning
+
+### Runtime helper
+
+`src/lib/sister-platforms/consumers.ts`
+
+Responsibilities:
+
+- list existing consumer credentials
+- create a consumer credential with hashed token storage
+- upsert an existing consumer credential by `(sister_platform_key, consumer_name)`
+- rotate the token only when explicitly requested
+- preserve consumer governance metadata and scope allowlist
+
+### Current operational script
+
+`scripts/seed-kortex-sister-platform-pilot.ts`
+
+Entrypoint:
+
+- `pnpm seed:kortex-pilot`
+
+What it does:
+
+1. provisions or updates the dedicated Kortex consumer
+2. provisions or updates the primary `portal` binding for the selected Greenhouse scope
+3. prints a fresh token only when the credential is created or rotated
+4. keeps the binding idempotent so operators can rerun it safely
+
+Minimum env for the script:
+
+- `KORTEX_EXTERNAL_SCOPE_ID`
+- `KORTEX_GREENHOUSE_SCOPE_TYPE`
+- `KORTEX_GREENHOUSE_ORGANIZATION_ID`
+
+Additional env depending on scope:
+
+- `KORTEX_GREENHOUSE_CLIENT_ID` for `client` / `space`
+- `KORTEX_GREENHOUSE_SPACE_ID` for `space`
+
+Safe defaults:
+
+- binding status defaults to `draft`
+- consumer status defaults to `active`
+- allowed scopes default to `client,space`
 
 ## Events
 
@@ -381,12 +430,16 @@ What it does not do yet:
 - expose MCP read operations
 - implement any Kortex-specific bridge logic
 
-Those belong to `TASK-377`.
+What it now does for Kortex specifically:
+- seeds the first dedicated Kortex consumer credential
+- seeds the first primary Kortex `portal -> Greenhouse scope` binding
+
+The bridge logic itself still belongs to `TASK-377` and the Kortex repo follow-on.
 
 ## Known Gaps
 
 1. no dedicated consumer exists yet for the new outbox events
-2. admin UI is visibility-first; it is not yet a full operator workflow
+2. admin UI is visibility-first; it is not yet a full operator workflow for consumer rotation
 
 ## File Map
 
@@ -397,16 +450,19 @@ Those belong to `TASK-377`.
 | runtime types | `src/lib/sister-platforms/types.ts` |
 | runtime helper | `src/lib/sister-platforms/bindings.ts` |
 | runtime helper | `src/lib/sister-platforms/external-auth.ts` |
+| runtime helper | `src/lib/sister-platforms/consumers.ts` |
 | admin API list/create | `src/app/api/admin/integrations/sister-platform-bindings/route.ts` |
 | admin API detail/update | `src/app/api/admin/integrations/sister-platform-bindings/[bindingId]/route.ts` |
 | external API context | `src/app/api/integrations/v1/sister-platforms/context/route.ts` |
 | external API catalog | `src/app/api/integrations/v1/sister-platforms/catalog/capabilities/route.ts` |
 | external API readiness | `src/app/api/integrations/v1/sister-platforms/readiness/route.ts` |
+| operational script | `scripts/seed-kortex-sister-platform-pilot.ts` |
 | admin UI wiring | `src/app/(dashboard)/admin/integrations/page.tsx` |
 | admin UI section | `src/views/greenhouse/admin/AdminIntegrationGovernanceView.tsx` |
 | event catalog | `src/lib/sync/event-catalog.ts` |
 
 ## Next Steps
 
-1. implement the first Kortex bridge in `TASK-377`
-2. add a dedicated downstream consumer for the binding lifecycle events when a concrete integration needs them
+1. run `pnpm seed:kortex-pilot` with the real pilot IDs and store the emitted token in Kortex runtime secrets
+2. implement the first Kortex bridge in `TASK-377`
+3. add a dedicated downstream consumer for the binding lifecycle events when a concrete integration needs them

@@ -2,6 +2,16 @@
 
 ## 2026-04-11
 
+### 2026-04-11 — Seed operativo para el piloto Kortex sobre sister-platform consumers
+
+- Se agregó `src/lib/sister-platforms/consumers.ts` para provisionar y actualizar credenciales dedicadas de sister platforms con token hasheado y rotación opcional.
+- Se agregó `scripts/seed-kortex-sister-platform-pilot.ts` y el comando `pnpm seed:kortex-pilot`.
+- El seed deja listo el primer carril operativo Kortex-side en Greenhouse:
+  - consumer dedicado `Kortex Operator Console`
+  - binding `kortex` con `external_scope_type='portal'`
+  - defaults seguros (`binding=draft`, `consumer=active`, `allowed scopes=client,space`)
+- El token solo se vuelve a imprimir cuando el consumer se crea o cuando se solicita una rotación explícita.
+
 ### 2026-04-11 — Local Next builds pasan a usar output aislado fuera de Vercel/CI
 
 - `pnpm build` ya no reutiliza `.next` por defecto en local; ahora usa `.next-local/build-<timestamp>-<pid>` mediante `scripts/next-dist-dir.mjs`.
