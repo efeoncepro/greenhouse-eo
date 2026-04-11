@@ -416,3 +416,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-364` | `to-do` | Assigned Team Risk, Continuity & Coverage Alerts | `docs/tasks/to-do/TASK-364-assigned-team-risk-continuity-coverage-alerts.md` |
 | `TASK-365` | `to-do` | Assigned Team Cross-Surface Consumers | `docs/tasks/to-do/TASK-365-assigned-team-cross-surface-consumers.md` |
 | `TASK-366` | `to-do` | Assigned Team Observability, Freshness, Export & Enterprise Hardening | `docs/tasks/to-do/TASK-366-assigned-team-enterprise-hardening-observability-export.md` |
+| `TASK-367` | `to-do` | Claude Microinteractions Research & Dual Skill Creation | `docs/tasks/to-do/TASK-367-claude-microinteractions-research-dual-skill-creation.md` |

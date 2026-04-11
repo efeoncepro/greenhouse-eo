@@ -1,5 +1,21 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — TASK-367 creada para lane Claude de microinteracciones
+
+- alcance cerrado:
+  - se creó `TASK-367` para pedir a Claude:
+    - investigación externa propia sobre mejores prácticas de microinteracciones UI/UX
+    - creación de una skill repo-local para Greenhouse
+    - creación de una skill global portable
+  - la task quedó formulada explícitamente como paridad multi-agente con la lane ya materializada en Codex, pero exigiendo research independiente y skills en el formato de Claude
+- documentos vivos actualizados:
+  - `docs/tasks/to-do/TASK-367-claude-microinteractions-research-dual-skill-creation.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+- validación ejecutada:
+  - revisión manual de consistencia contra `TASK_TEMPLATE`, `TASK_PROCESS`, `CLAUDE.md`, `TASK-231` y `TASK-305`
+  - no aplica build/lint; cambio exclusivamente documental / backlog
+
 ## Sesion 2026-04-11 — nueva skill local `greenhouse-microinteractions-auditor`
 
 - alcance cerrado:

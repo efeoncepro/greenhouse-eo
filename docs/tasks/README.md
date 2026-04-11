@@ -20,10 +20,11 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-367`
+- siguiente ID disponible: `TASK-368`
 - `TASK-285` a `TASK-304` son el bloque "Client Portal Enterprise Renovation (Globe)" — 20 tasks en 3 fases. Spec: `docs/architecture/GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md`. Prereqs: TASK-285 (role differentiation) y TASK-286 (view catalog). Fase 1 (P1): TASK-287 Revenue Enabled, TASK-288 Reports Center, TASK-289 Reviews Split, TASK-290 Pipeline CSC. Fase 2 (P2): TASK-291 Brief Clarity, TASK-292 Mis Revisiones, TASK-293 Campaigns Metrics, TASK-294 Novedades, TASK-295 SLA Scorecard. Fase 3 (P3): TASK-296 Brand Health, TASK-297 Asset Tracker, TASK-298 QBR, TASK-299 Sprints, TASK-300 Mi Proyecto, TASK-301 Analytics, TASK-302 Equipo, TASK-303 Notifications, TASK-304 Pulse headline.
 - `TASK-284` ya quedó cerrada: CCA está operativa en Finance (`/finance/shareholder-account`) con ledger propio, integración a settlement layer y posición de tesorería. El follow-on enterprise de trazabilidad cross-module quedó absorbido por `TASK-306`, que ya también quedó cerrado.
 - `TASK-305` ya quedó cerrada: Claude ahora tiene la skill `greenhouse-secret-hygiene` bajo `.claude/skills/greenhouse-secret-hygiene/skill.md`, alineada con `ISSUE-032` y el protocolo de Secret Manager / auth / webhooks / PostgreSQL.
+- `TASK-367` abre la lane para que Claude haga investigación propia de microinteracciones UI/UX y cree dos skills equivalentes en su ecosistema: una repo-local Greenhouse y una global portable.
 - `TASK-157` ya quedó cerrada: Agency ahora tiene matriz canónica de skills (`skill_catalog`, `member_skills`, `service_skill_requirements`), APIs de staffing y surfacing en `Space 360 > Team`.
 - `TASK-313` nace como follow-on operativo de `TASK-157` para convertir ese backend en perfil profesional usable: `Skills y certificaciones` con CRUD en `Mi perfil` y `Admin > Usuario`, preview embebido de certificados, links profesionales, contacto, `Sobre mí` y badge `Verificado por Efeonce`.
 - `TASK-314` a `TASK-320` son el bloque "Talent Profile Enterprise Program". Secuencia recomendada: `TASK-313` → `TASK-315` → `TASK-316` → `TASK-317` → `TASK-318` → `TASK-319` → `TASK-320`. `TASK-314` coordina el programa. Objetivo: llevar el perfil profesional a nivel enterprise tipo marketplace B2B con taxonomía canónica, trust ops, discovery interno, perfil cliente-safe, reputación/evidencia y mantenimiento operativo.
