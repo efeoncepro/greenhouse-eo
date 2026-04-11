@@ -1,5 +1,15 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — TASK-318: Client-Safe Verified Talent Profiles completada
+
+- Service: src/lib/team/client-safe-profile.ts — reader que filtra solo verified + client_visible
+- APIs: GET /api/team/profiles (batch), GET /api/team/members/[memberId]/profile (individual)
+- Component: ClientSafeTalentCard — dossier enterprise con collapsed/expanded views
+- Integración: /equipo ahora muestra "Ver perfil profesional" por miembro con Dialog
+- Seguridad: nunca expone phone, address, internal notes, twitter, threads
+- Nomenclature: GH_CLIENT_TALENT con labels en español
+- STATUS: COMPLETE
+
 ## Sesion 2026-04-11 — Projected Payroll aclara retención SII para honorarios CLP
 
 - alcance cerrado:

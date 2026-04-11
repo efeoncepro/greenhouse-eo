@@ -19,6 +19,10 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-04-11 (TASK-318)
+
+- TASK-318 completada — getClientSafeTeamProfiles() disponible. Analytics puede medir cobertura de perfiles client-safe.
+
 ## Delta 2026-04-11 (TASK-317)
 
 - TASK-317 completada — TalentDiscoverySummary disponible vía API. Analytics puede consumir el mismo aggregation.

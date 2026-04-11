@@ -19,6 +19,10 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-04-11 (TASK-318)
+
+- TASK-318 completada — reader client-safe y ClientSafeTalentCard existen. Endorsements client-safe pueden extender este componente.
+
 ## Delta 2026-04-11 (TASK-317)
 
 - TASK-317 completada — discoveryScore pondera verification (30%) y cert freshness (15%). Endorsements podrían agregar un nuevo factor al score.

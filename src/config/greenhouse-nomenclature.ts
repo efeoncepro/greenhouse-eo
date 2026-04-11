@@ -1492,3 +1492,33 @@ export const GH_TALENT_DISCOVERY = {
   // Error
   error_message: 'No pudimos cargar los datos de talento. Verifica tu conexión e intenta de nuevo.'
 } as const
+
+/* ─────────────────── Client Talent Profile ─────────────────── */
+
+export const GH_CLIENT_TALENT = {
+  // Dialog / actions
+  btn_view_profile: 'Ver perfil profesional',
+  dialog_title: 'Perfil profesional verificado',
+  empty_no_profile: 'Sin perfil profesional disponible',
+
+  // Counter labels
+  label_verified_items: 'habilidades verificadas',
+  label_certifications: 'certificaciones activas',
+  label_tools: 'herramientas',
+
+  // Section headings (inside dossier)
+  section_about_me: 'Sobre mi',
+  section_skills: 'Habilidades',
+  section_tools: 'Herramientas',
+  section_certifications: 'Certificaciones',
+  section_languages: 'Idiomas',
+  section_links: 'Links profesionales',
+
+  // Certification details
+  cert_evidence_available: 'Evidencia disponible',
+  cert_verify_link: 'Verificar certificado',
+
+  // Loading / error
+  loading_profiles: 'Cargando perfiles...',
+  error_profiles: 'No pudimos cargar los perfiles del equipo. Intenta de nuevo.'
+} as const
