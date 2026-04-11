@@ -42,6 +42,30 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.04-beta.14
+
+**Canal:** Beta
+**Fecha:** 2026-04-11
+**Disponible para:** internal
+**Módulos:** HR / Nómina
+
+### Novedades
+
+- Los contratos `Contractor (Deel)` y `EOR (Deel)` ahora pueden registrar `Bono conectividad` directamente dentro de la compensación vigente.
+
+### Mejoras
+
+- La conectividad Deel deja de depender de usar `Bono fijo` como campo genérico.
+- El monto de conectividad ahora también entra al bruto/neto referencial que Greenhouse muestra para registros Deel.
+
+### Correcciones
+
+- `Nómina > Compensaciones` ya no pierde la conectividad al guardar o recalcular una compensación Deel.
+
+### Notas
+
+- Deel sigue siendo el owner del pago final y compliance internacional; Greenhouse mantiene el registro operativo y los bonos KPI.
+
 ## 2026.04-beta.13
 
 **Canal:** Beta

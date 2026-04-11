@@ -19,6 +19,10 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-04-11 (TASK-316)
+
+- TASK-316 completada — verification_status en skills/tools/certs, cola admin /admin/talent-review, reject con reason. Search puede filtrar por verification_status.
+
 ## Delta 2026-04-11
 
 - TASK-313 completada — ahora existe: `member_skills` y `member_certifications` con datos queryables (seniority, verification_status, visibility, issuer, expiry_date), readers en `src/lib/hr-core/certifications.ts` y skills service extendido con funciones de lectura

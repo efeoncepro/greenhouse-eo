@@ -19,6 +19,10 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-04-11 (TASK-316)
+
+- TASK-316 completada — items client_visible solo si verification_status='verified'. Contrato de trust ya implementado.
+
 ## Delta 2026-04-11
 
 - TASK-313 completada — ahora existe: campo `visibility` (internal/client_visible) en `member_skills`, reader de perfil profesional en skills y certifications services, `ProfessionalLinksCard` con social links tipados, `AboutMeCard` con headline/bio

@@ -132,4 +132,47 @@ describe('CompensationDrawer', () => {
       })
     )
   })
+
+  it('keeps connectivity allowance enabled for Deel contracts and sends it in the payload', async () => {
+    const onSave = vi.fn().mockResolvedValue(undefined)
+
+    renderWithTheme(
+      <CompensationDrawer
+        open
+        onClose={vi.fn()}
+        existingVersion={{
+          ...existingVersion,
+          contractType: 'contractor',
+          payrollVia: 'deel',
+          deelContractId: 'deel-123',
+          remoteAllowance: 50
+        }}
+        memberId={existingVersion.memberId}
+        memberName={existingVersion.memberName}
+        onSave={onSave}
+      />
+    )
+
+    fireEvent.change(screen.getByLabelText('Bono conectividad'), {
+      target: { value: '75' }
+    })
+    fireEvent.change(screen.getByLabelText('Motivo del cambio *'), {
+      target: { value: 'Ajuste conectividad Deel' }
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar cambios' }))
+
+    await waitFor(() => {
+      expect(onSave).toHaveBeenCalled()
+    })
+
+    expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({
+        input: expect.objectContaining({
+          contractType: 'contractor',
+          remoteAllowance: 75,
+          deelContractId: 'deel-123'
+        })
+      })
+    )
+  })
 })

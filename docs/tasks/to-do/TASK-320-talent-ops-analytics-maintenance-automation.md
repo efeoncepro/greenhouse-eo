@@ -19,6 +19,10 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-04-11 (TASK-316)
+
+- TASK-316 completada — cola /admin/talent-review con summary counts. Analytics puede consumir el mismo query UNION de pending/verified/rejected.
+
 ## Delta 2026-04-11
 
 - TASK-313 completada — ahora existe: `member_certifications` con `expiry_date` queryable, `member_skills` con `verification_status` y `updated_at`, 10 API routes con datos suficientes para construir métricas de completitud, pendientes de verificación y certificaciones por vencer

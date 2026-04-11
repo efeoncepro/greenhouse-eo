@@ -1,5 +1,16 @@
 # GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md
 
+## Delta 2026-04-11 — Deel también usa conectividad como haber canónico de compensación
+
+- `remoteAllowance` deja de leerse como un haber exclusivo de nómina Chile.
+- Regla nueva:
+  - para `contractor` y `eor` gestionados por Deel, Greenhouse también puede versionar conectividad en `compensation_versions.remote_allowance`
+  - ese monto debe entrar al bruto/neto referencial que Greenhouse registra para la entry Deel
+  - no debe forzarse a usar `fixedBonusLabel` / `fixedBonusAmount` como sustituto semántico de conectividad
+- Límite del contrato:
+  - Deel sigue siendo owner de pago final, compliance y contrato legal
+  - Greenhouse sigue siendo owner del snapshot operativo de compensación y del cálculo de bonos KPI visibles en Payroll
+
 ## Delta 2026-04-11 — Payroll no agota la semántica de compensación ejecutiva
 
 - `Payroll` sigue siendo owner de la nómina formal materializada sobre `member_id`.

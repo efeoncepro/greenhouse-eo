@@ -16,6 +16,7 @@ import type {
 } from '@/types/payroll'
 import {
   CONTRACT_DERIVATIONS,
+  contractAllowsRemoteAllowance,
   normalizeContractType,
   normalizePayrollVia,
   resolveScheduleRequired
@@ -1025,6 +1026,10 @@ export const pgCreateCompensationVersion = async ({
       comisionRate: input.afpComisionRate ?? null
     })
 
+    const resolvedRemoteAllowance = contractAllowsRemoteAllowance(memberContract.contractType)
+      ? Number(input.remoteAllowance ?? 0)
+      : 0
+
     await syncMemberContractForCompensation({
       memberId: input.memberId,
       contractType: memberContract.contractType,
@@ -1072,7 +1077,7 @@ export const pgCreateCompensationVersion = async ({
       `,
       [
         versionId, input.memberId, nextVersion, memberContract.payRegime, input.currency,
-        Number(input.baseSalary), Number(input.remoteAllowance ?? 0), Number(input.colacionAmount ?? 0), Number(input.movilizacionAmount ?? 0),
+        Number(input.baseSalary), resolvedRemoteAllowance, Number(input.colacionAmount ?? 0), Number(input.movilizacionAmount ?? 0),
         normalizeNullableString(input.fixedBonusLabel), Number(input.fixedBonusAmount ?? 0),
         Number(input.bonusOtdMin ?? 0), Number(input.bonusOtdMax ?? 0),
         Number(input.bonusRpaMin ?? 0), Number(input.bonusRpaMax ?? 0),
@@ -1199,6 +1204,10 @@ export const pgUpdateCompensationVersion = async ({
       client
     })
 
+    const resolvedRemoteAllowance = contractAllowsRemoteAllowance(memberContract.contractType)
+      ? Number(input.remoteAllowance ?? 0)
+      : 0
+
     if (existingVersion.effectiveFrom !== effectiveFrom) {
       throw new PayrollValidationError(
         'Changing the effective date requires creating a new compensation version.',
@@ -1280,7 +1289,7 @@ export const pgUpdateCompensationVersion = async ({
         memberContract.payRegime,
         input.currency,
         Number(input.baseSalary),
-        Number(input.remoteAllowance ?? 0),
+        resolvedRemoteAllowance,
         Number(input.colacionAmount ?? 0),
         Number(input.movilizacionAmount ?? 0),
         normalizeNullableString(input.fixedBonusLabel),

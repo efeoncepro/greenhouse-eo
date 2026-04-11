@@ -35,7 +35,7 @@ import type {
   GratificacionLegalMode
 } from '@/types/payroll'
 import { getCompensationSaveMode } from '@/lib/payroll/compensation-versioning'
-import { CONTRACT_DERIVATIONS, CONTRACT_LABELS } from '@/types/hr-contracts'
+import { CONTRACT_DERIVATIONS, CONTRACT_LABELS, contractAllowsRemoteAllowance } from '@/types/hr-contracts'
 
 export type CompensationSavePayload = {
   mode: 'create' | 'update'
@@ -135,6 +135,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
   const isChileEmployee = payRegime === 'chile' && contractType !== 'honorarios'
   const isHonorarios = contractType === 'honorarios'
   const isDeel = payrollVia === 'deel'
+  const supportsRemoteAllowance = contractAllowsRemoteAllowance(contractType)
   const saveMode = getCompensationSaveMode({ existingVersion: ev, effectiveFrom })
 
   useEffect(() => {
@@ -255,11 +256,14 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
     } else {
       setUnemploymentRate(0)
       setGratificacionLegalMode('ninguna')
-      setRemoteAllowance(0)
       setColacionAmount(0)
       setMovilizacionAmount(0)
       setHasApv(false)
       setApvAmount(0)
+    }
+
+    if (!contractAllowsRemoteAllowance(ct)) {
+      setRemoteAllowance(0)
     }
   }
 
@@ -281,7 +285,7 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
       const input: CreateCompensationVersionInput = {
         memberId, payRegime, currency, baseSalary,
         desiredNetClp: isChileEmployee && desiredNet > 0 ? desiredNet : null,
-        remoteAllowance: isChileEmployee ? remoteAllowance : 0,
+        remoteAllowance: supportsRemoteAllowance ? remoteAllowance : 0,
         colacionAmount: isChileEmployee ? colacionAmount : 0,
         movilizacionAmount: isChileEmployee ? movilizacionAmount : 0,
         fixedBonusLabel: fixedBonusLabel.trim() || null, fixedBonusAmount,
@@ -484,11 +488,22 @@ const CompensationDrawer = ({ open, onClose, existingVersion, memberId, memberNa
                   <Alert severity='info' variant='outlined' sx={{ py: 0.5 }}>
                     {isHonorarios
                       ? 'Para honorarios los bonos KPI son discrecionales y parten en $0.'
-                      : 'Para Deel los bonos KPI sí se calculan desde OTD y RpA; Greenhouse no calcula descuentos previsionales locales.'}
+                      : 'Para Deel Greenhouse registra conectividad y calcula los bonos KPI desde OTD y RpA; Deel sigue gestionando compliance y pago final.'}
                   </Alert>
                 )}
-                {!isHonorarios && !isDeel && (
-                  <CustomTextField fullWidth size='small' label='Bono conectividad' type='number' value={remoteAllowance || ''} onChange={e => setRemoteAllowance(Number(e.target.value))} slotProps={{ input: { startAdornment: isChile ? clpAdornment : undefined } }} />
+                {supportsRemoteAllowance && (
+                  <CustomTextField
+                    fullWidth
+                    size='small'
+                    label='Bono conectividad'
+                    type='number'
+                    value={remoteAllowance || ''}
+                    onChange={e => setRemoteAllowance(Number(e.target.value))}
+                    helperText={
+                      isDeel ? 'Se registra como haber recurrente y se suma al bruto referencial de Greenhouse.' : undefined
+                    }
+                    slotProps={{ input: { startAdornment: isChile ? clpAdornment : undefined } }}
+                  />
                 )}
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 7 }}>

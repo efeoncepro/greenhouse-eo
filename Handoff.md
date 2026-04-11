@@ -1,5 +1,38 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — TASK-316: Talent Trust Ops completada
+
+- Migration: verification_status + rejection_reason en member_skills y member_tools (backfill desde verified_by)
+- Modelo unificado: skills, tools y certifications comparten 4 estados (self_declared → pending_review → verified | rejected)
+- Cola de revision admin: /admin/talent-review con tabla filtrable, 5 KPIs, acciones verify/reject/unverify
+- APIs: tool verify endpoint + skill reject support
+- Event catalog: memberTool, memberCertification, memberLanguage aggregates
+- Nav: "Verificacion de talento" en Admin Center > Gobierno
+- STATUS: COMPLETE
+
+## Sesion 2026-04-11 — Payroll Deel: conectividad vuelve a ser canónica en compensaciones
+
+- alcance cerrado:
+  - `Payroll > Compensaciones` ya permite capturar `Bono conectividad` para contratos `Contractor (Deel)` y `EOR (Deel)`
+  - la policy quedó centralizada por tipo de contrato en `src/types/hr-contracts.ts`
+  - el cálculo de entries Deel ahora suma conectividad al bruto/neto referencial en vez de descartarla
+- archivos de alto impacto tocados:
+  - `src/types/hr-contracts.ts`
+  - `src/views/greenhouse/payroll/CompensationDrawer.tsx`
+  - `src/lib/payroll/calculate-payroll.ts`
+  - `src/views/greenhouse/payroll/CompensationDrawer.test.tsx`
+  - `src/lib/payroll/project-payroll.test.ts`
+- documentos vivos actualizados:
+  - `project_context.md`
+  - `changelog.md`
+  - `docs/changelog/CLIENT_CHANGELOG.md`
+  - `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- validación ejecutada:
+  - `pnpm exec vitest run src/views/greenhouse/payroll/CompensationDrawer.test.tsx src/lib/payroll/project-payroll.test.ts` — OK
+  - `pnpm exec eslint src/types/hr-contracts.ts src/views/greenhouse/payroll/CompensationDrawer.tsx src/lib/payroll/calculate-payroll.ts src/views/greenhouse/payroll/CompensationDrawer.test.tsx src/lib/payroll/project-payroll.test.ts` — OK
+- nota operativa:
+  - el cambio deja resuelto el contrato de producto y cálculo para Deel, pero los registros existentes con conectividad en `0` siguen requiriendo actualización de monto si hoy el dato no está versionado
+
 ## Sesion 2026-04-11 — bloque TASK-352 a TASK-356 para Hiring / ATS canónico
 
 - alcance cerrado:

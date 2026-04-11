@@ -2,6 +2,10 @@ export type ContractType = 'indefinido' | 'plazo_fijo' | 'honorarios' | 'contrac
 export type PayRegime = 'chile' | 'international'
 export type PayrollVia = 'internal' | 'deel'
 
+export interface ContractCompensationPolicy {
+  allowsRemoteAllowance: boolean
+}
+
 export interface MemberContractInfo {
   contractType: ContractType
   payRegime: PayRegime
@@ -48,6 +52,14 @@ export const SCHEDULE_DEFAULTS: Record<ContractType, { defaultValue: boolean; ov
   honorarios: { defaultValue: false, overridable: true },
   contractor: { defaultValue: false, overridable: true },
   eor: { defaultValue: false, overridable: true }
+}
+
+export const CONTRACT_COMPENSATION_POLICIES: Record<ContractType, ContractCompensationPolicy> = {
+  indefinido: { allowsRemoteAllowance: true },
+  plazo_fijo: { allowsRemoteAllowance: true },
+  honorarios: { allowsRemoteAllowance: false },
+  contractor: { allowsRemoteAllowance: true },
+  eor: { allowsRemoteAllowance: true }
 }
 
 export const SII_RETENTION_RATES: Record<number, number> = {
@@ -117,3 +129,6 @@ export const resolveScheduleRequired = ({
 
   return config.defaultValue
 }
+
+export const contractAllowsRemoteAllowance = (contractType: ContractType | string | null | undefined) =>
+  CONTRACT_COMPENSATION_POLICIES[normalizeContractType(contractType)].allowsRemoteAllowance

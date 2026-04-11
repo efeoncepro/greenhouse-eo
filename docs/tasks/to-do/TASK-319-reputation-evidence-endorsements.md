@@ -19,6 +19,10 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-04-11 (TASK-316)
+
+- TASK-316 completada — modelo de verificacion unificado (skills/tools/certs). Endorsements pueden construirse sobre verification_status.
+
 ## Delta 2026-04-11
 
 - TASK-313 completada — ahora existe: evidencia de certificaciones vía assets privados con `CertificatePreviewDialog` (PDF/imagen embebido), `VerifiedByEfeonceBadge` como señal de confianza reutilizable, campo `credential_url` en certifications

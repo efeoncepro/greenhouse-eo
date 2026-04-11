@@ -210,7 +210,7 @@ describe('projectPayrollForPeriod', () => {
     expect(result.totals.grossByCurrency.USD).toBeGreaterThan(0)
   })
 
-  it('calculates KPI bonuses automatically for Deel contractors without Chile deductions', async () => {
+  it('calculates KPI bonuses and connectivity for Deel contractors without Chile deductions', async () => {
     const deelComp = {
       ...baseCompensation,
       versionId: 'cv-2',
@@ -264,8 +264,9 @@ describe('projectPayrollForPeriod', () => {
     expect(entry.kpiRpaQualifies).toBe(true)
     expect(entry.bonusOtdAmount).toBe(500)
     expect(entry.bonusRpaAmount).toBe(300)
-    expect(entry.grossTotal).toBe(2920)
-    expect(entry.netTotal).toBe(2920)
+    expect(entry.remoteAllowance).toBe(100)
+    expect(entry.grossTotal).toBe(3020)
+    expect(entry.netTotal).toBe(3020)
     expect(entry.chileTotalDeductions).toBe(0)
     expect(entry.workingDaysInPeriod).toBeNull()
   })

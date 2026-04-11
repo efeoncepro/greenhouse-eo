@@ -1,5 +1,17 @@
 # project_context.md
 
+## Delta 2026-04-11 Deel compensation now treats connectivity as canonical recurring allowance
+
+- `Payroll > Compensaciones` ya no debe ocultar la conectividad para contratos gestionados por Deel.
+- Regla operativa nueva:
+  - `remoteAllowance` sigue siendo el haber recurrente canónico para conectividad
+  - aplica a contratos internos elegibles y también a `contractor` / `eor` con `payroll_via = deel`
+  - Greenhouse debe incluir esa conectividad en el bruto/neto referencial del registro Deel, aunque Deel siga siendo owner del pago final y compliance
+- Consecuencia:
+  - el drawer de compensación muestra `Bono conectividad` para contratos Deel
+  - el motor de payroll ya no obliga a modelar conectividad Deel como `bono fijo` libre
+  - la policy quedó centralizada en `src/types/hr-contracts.ts`
+
 ## Delta 2026-04-11 Canonical talent taxonomy materialized in PostgreSQL (TASK-315)
 
 - `greenhouse_core` now owns the full professional taxonomy: `tool_catalog` + `member_tools` (29 seeded tools, 8 categories), `member_languages`, and `members.headline`. Combined with prior `skill_catalog`/`member_skills` (TASK-157) and `member_certifications` (TASK-313), BigQuery `member_profiles.skills[]`/`tools[]`/`aiSuites[]` are superseded for runtime reads.

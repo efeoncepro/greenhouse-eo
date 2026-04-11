@@ -1,5 +1,50 @@
 # Greenhouse HRIS Architecture V1
 
+## Delta 2026-04-11 — Talent Trust Ops: unified verification model, admin review queue, tool/skill reject (TASK-316)
+
+### Unified verification model across skills, tools, and certifications
+
+`verification_status` and `rejection_reason` columns added to `greenhouse_core.member_skills` and `greenhouse_core.member_tools`, unifying the 4-state verification model (`self_declared` | `pending_review` | `verified` | `rejected`) that was previously only present on `member_certifications`.
+
+```sql
+-- Added to member_skills and member_tools
+verification_status VARCHAR(20) NOT NULL DEFAULT 'self_declared',
+  -- 'self_declared' | 'pending_review' | 'verified' | 'rejected'
+rejection_reason    TEXT
+```
+
+Migration backfills `verification_status` from existing `verified_by`: rows with non-null `verified_by` become `'verified'`, others remain `'self_declared'`.
+
+### Admin review queue
+
+`/admin/talent-review` — dedicated admin surface for cross-member verification governance.
+
+- Cross-member UNION query across `member_skills`, `member_tools`, and `member_certifications`
+- 5 KPIs: total pending, skills pending, tools pending, certifications pending, recently verified
+- Filterable table with actions: verify, reject (with reason), unverify
+- Navigation: Admin Center > Gobierno > "Verificacion de talento"
+
+### Verification API routes
+
+| Route | Method | Purpose |
+|-------|--------|---------|
+| `/api/hr/core/members/[memberId]/tools/[toolCode]/verify` | POST | Admin verify/reject/unverify for a member's tool |
+| `/api/hr/core/members/[memberId]/skills/[skillCode]/verify` | POST | Extended with reject support (rejection_reason) |
+
+### Event catalog extensions
+
+Event catalog extended with three new aggregate namespaces:
+
+- `memberTool` — tool proficiency lifecycle events
+- `memberCertification` — certification lifecycle events
+- `memberLanguage` — language proficiency lifecycle events
+
+### Decisions
+
+21. **Verification model is unified across all talent lanes** — skills, tools, and certifications share the same 4-state machine and column names. This enables the cross-type UNION query in the admin review queue.
+22. **Rejection requires a reason** — `rejection_reason` is populated when status transitions to `rejected`. The collaborator can edit and resubmit, resetting status to `pending_review`.
+23. **Admin review queue is a standalone route, not embedded in user detail** — `/admin/talent-review` serves the cross-member governance use case; per-member verification remains available in the user detail view.
+
 ## Delta 2026-04-11 — Hiring / ATS clarified as adjacent domain, not new HRIS phase
 
 - La nueva arquitectura `Hiring / ATS` vive fuera del boundary principal de `HRIS`.

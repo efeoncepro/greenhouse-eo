@@ -41,7 +41,7 @@ import {
   pgGetCompensationOverview
 } from '@/lib/payroll/postgres-store'
 import { resolveChileAfpSplitRates } from '@/lib/payroll/chile-previsional-helpers'
-import { normalizeContractType } from '@/types/hr-contracts'
+import { contractAllowsRemoteAllowance, normalizeContractType } from '@/types/hr-contracts'
 
 const COMPENSATION_MUTATION_TYPES = {
   afpName: 'STRING',
@@ -732,7 +732,7 @@ export const createCompensationVersion = async ({
     payRegime: input.payRegime,
     currency: input.currency,
     baseSalary: Number(input.baseSalary),
-    remoteAllowance: Number(input.remoteAllowance ?? 0),
+    remoteAllowance: contractAllowsRemoteAllowance(input.contractType ?? 'indefinido') ? Number(input.remoteAllowance ?? 0) : 0,
     colacionAmount: Number(input.colacionAmount ?? 0),
     movilizacionAmount: Number(input.movilizacionAmount ?? 0),
     fixedBonusLabel: normalizeNullableString(input.fixedBonusLabel),
@@ -932,7 +932,7 @@ export const updateCompensationVersion = async ({
     payRegime: input.payRegime,
     currency: input.currency,
     baseSalary: Number(input.baseSalary),
-    remoteAllowance: Number(input.remoteAllowance ?? 0),
+    remoteAllowance: contractAllowsRemoteAllowance(input.contractType ?? 'indefinido') ? Number(input.remoteAllowance ?? 0) : 0,
     colacionAmount: Number(input.colacionAmount ?? 0),
     movilizacionAmount: Number(input.movilizacionAmount ?? 0),
     fixedBonusLabel: normalizeNullableString(input.fixedBonusLabel),

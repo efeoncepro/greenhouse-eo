@@ -2,6 +2,13 @@
 
 ## 2026-04-11
 
+### 2026-04-11 — Payroll Deel ahora registra conectividad como haber canónico
+
+- `Payroll > Compensaciones` ya no oculta `Bono conectividad` para contratos `Contractor (Deel)` o `EOR (Deel)`.
+- La conectividad Deel vuelve a usar el carril canónico `remoteAllowance` en vez de obligar a modelarla como `bono fijo` libre.
+- El motor de cálculo ahora suma esa conectividad al bruto/neto referencial de entries Deel, manteniendo a Deel como owner del pago final y compliance.
+- Se centralizó una policy compartida por tipo de contrato para evitar que la UI y el cálculo vuelvan a divergir.
+
 ### 2026-04-11 — Arquitectura canónica de Hiring / ATS para demanda y fulfillment de talento
 
 - Se agregó la spec `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` para modelar `Hiring / ATS` como capa canónica de fulfillment de talento en Greenhouse.

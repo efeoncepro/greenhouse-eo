@@ -31,6 +31,7 @@ import {
   pgGetActiveBonusConfig,
   pgSetPeriodCalculated
 } from '@/lib/payroll/postgres-store'
+import { contractAllowsRemoteAllowance } from '@/types/hr-contracts'
 
 type BonusConfigRow = {
   otd_threshold: number | string | null
@@ -159,6 +160,8 @@ export const buildPayrollEntry = async ({
   const kpiRpaAvg = kpi?.rpaAvg ?? null
   const usesDiscretionaryBonuses = compensation.contractType === 'honorarios'
   const skipsAttendanceAdjustments = compensation.contractType === 'honorarios' || compensation.payrollVia === 'deel'
+  const remoteAllowanceEnabled = contractAllowsRemoteAllowance(compensation.contractType)
+  const effectiveRemoteAllowance = remoteAllowanceEnabled ? compensation.remoteAllowance : 0
 
   const otdResult = usesDiscretionaryBonuses
     ? { amount: 0, qualifies: true, prorationFactor: null }
@@ -185,7 +188,7 @@ export const buildPayrollEntry = async ({
     deductibleDays > 0 ? roundCurrency(compensation.baseSalary * attendanceRatio) : compensation.baseSalary
 
   const adjustedRemoteAllowance =
-    deductibleDays > 0 ? roundCurrency(compensation.remoteAllowance * attendanceRatio) : compensation.remoteAllowance
+    deductibleDays > 0 ? roundCurrency(effectiveRemoteAllowance * attendanceRatio) : effectiveRemoteAllowance
 
   const adjustedColacionAmount =
     deductibleDays > 0
@@ -214,7 +217,7 @@ export const buildPayrollEntry = async ({
 
   const deelGrossTotal =
     compensation.payrollVia === 'deel'
-      ? roundCurrency(adjustedBaseSalary + adjustedFixedBonusAmount + bonusOtdAmount + bonusRpaAmount)
+      ? roundCurrency(adjustedBaseSalary + adjustedRemoteAllowance + adjustedFixedBonusAmount + bonusOtdAmount + bonusRpaAmount)
       : null
 
   const totals = honorariosTotals
@@ -311,10 +314,7 @@ export const buildPayrollEntry = async ({
     payrollVia: compensation.payrollVia,
     currency: compensation.currency,
     baseSalary: compensation.baseSalary,
-    remoteAllowance:
-      compensation.payrollVia === 'deel' || compensation.contractType === 'honorarios'
-        ? 0
-        : compensation.remoteAllowance,
+    remoteAllowance: remoteAllowanceEnabled ? compensation.remoteAllowance : 0,
     colacionAmount: compensation.contractType === 'honorarios' ? 0 : compensation.colacionAmount,
     movilizacionAmount: compensation.contractType === 'honorarios' ? 0 : compensation.movilizacionAmount,
     fixedBonusLabel: compensation.fixedBonusLabel,
@@ -373,7 +373,7 @@ export const buildPayrollEntry = async ({
     daysOnLeave: skipsAttendanceAdjustments ? null : (attendance?.daysOnLeave ?? null),
     daysOnUnpaidLeave: skipsAttendanceAdjustments ? null : (attendance?.daysOnUnpaidLeave ?? null),
     adjustedBaseSalary: deductibleDays > 0 ? adjustedBaseSalary : null,
-    adjustedRemoteAllowance: deductibleDays > 0 ? adjustedRemoteAllowance : null,
+    adjustedRemoteAllowance: deductibleDays > 0 && remoteAllowanceEnabled ? adjustedRemoteAllowance : null,
     adjustedColacionAmount: deductibleDays > 0 ? adjustedColacionAmount : null,
     adjustedMovilizacionAmount: deductibleDays > 0 ? adjustedMovilizacionAmount : null,
     adjustedFixedBonusAmount: deductibleDays > 0 ? adjustedFixedBonusAmount : null,
