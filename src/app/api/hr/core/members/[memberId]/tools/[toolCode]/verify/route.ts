@@ -1,20 +1,20 @@
 import { NextResponse } from 'next/server'
 
 import {
-  verifyMemberSkill,
-  unverifyMemberSkill,
-  rejectMemberSkill,
-  StaffingValidationError
-} from '@/lib/agency/skills-staffing'
+  verifyMemberTool,
+  unverifyMemberTool,
+  rejectMemberTool,
+  ToolValidationError
+} from '@/lib/hr-core/tools'
 import { requireHrTenantContext } from '@/lib/tenant/authorization'
 
-import type { MemberSkill } from '@/types/agency-skills'
+import type { MemberTool } from '@/types/talent-taxonomy'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ memberId: string; skillCode: string }> }
+  { params }: { params: Promise<{ memberId: string; toolCode: string }> }
 ) {
   const { tenant, errorResponse } = await requireHrTenantContext()
 
@@ -23,31 +23,31 @@ export async function POST(
   }
 
   try {
-    const { memberId, skillCode } = await params
+    const { memberId, toolCode } = await params
     const body = await request.json().catch(() => null)
 
     if (!body || !body.action) {
       return NextResponse.json({ error: 'action is required (verify | unverify | reject).' }, { status: 400 })
     }
 
-    let items: MemberSkill[]
+    let items: MemberTool[]
 
     if (body.action === 'verify') {
-      items = await verifyMemberSkill({
+      items = await verifyMemberTool({
         memberId,
-        skillCode,
+        toolCode,
         actorUserId: tenant.userId
       })
     } else if (body.action === 'unverify') {
-      items = await unverifyMemberSkill({
+      items = await unverifyMemberTool({
         memberId,
-        skillCode,
+        toolCode,
         actorUserId: tenant.userId
       })
     } else if (body.action === 'reject') {
-      items = await rejectMemberSkill({
+      items = await rejectMemberTool({
         memberId,
-        skillCode,
+        toolCode,
         actorUserId: tenant.userId,
         reason: typeof body.rejectionReason === 'string' ? body.rejectionReason.trim() || null : null
       })
@@ -60,12 +60,12 @@ export async function POST(
 
     return NextResponse.json({ items })
   } catch (error) {
-    if (error instanceof StaffingValidationError) {
+    if (error instanceof ToolValidationError) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode })
     }
 
-    console.error('[hr/core/members/skills/verify] POST error:', error)
+    console.error('[hr/core/members/tools/verify] POST error:', error)
 
-    return NextResponse.json({ error: 'Unable to verify/unverify/reject member skill.' }, { status: 500 })
+    return NextResponse.json({ error: 'Unable to verify/unverify/reject member tool.' }, { status: 500 })
   }
 }

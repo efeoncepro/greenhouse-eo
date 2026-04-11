@@ -561,10 +561,18 @@ export interface GreenhouseCoreMemberSkills {
   created_at: Generated<Timestamp>;
   member_id: string;
   notes: string | null;
+  /**
+   * Reason provided when admin rejects the skill
+   */
+  rejection_reason: string | null;
   seniority_level: string;
   skill_code: string;
   source_system: Generated<string>;
   updated_at: Generated<Timestamp>;
+  /**
+   * self_declared → pending_review → verified|rejected
+   */
+  verification_status: Generated<string>;
   verified_at: Timestamp | null;
   verified_by: string | null;
   /**
@@ -578,8 +586,16 @@ export interface GreenhouseCoreMemberTools {
   member_id: string;
   notes: string | null;
   proficiency_level: Generated<string>;
+  /**
+   * Reason provided when admin rejects the tool
+   */
+  rejection_reason: string | null;
   tool_code: string;
   updated_at: Generated<Timestamp>;
+  /**
+   * self_declared → pending_review → verified|rejected
+   */
+  verification_status: Generated<string>;
   verified_at: Timestamp | null;
   verified_by: string | null;
   visibility: Generated<string>;

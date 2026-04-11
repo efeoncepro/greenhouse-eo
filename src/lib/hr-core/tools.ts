@@ -2,12 +2,14 @@ import 'server-only'
 
 import { query } from '@/lib/db'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 
 import type {
   ToolCatalogItem,
   ToolCategory,
   MemberTool,
   ToolProficiencyLevel,
+  ToolVerificationStatus,
   ToolVisibility
 } from '@/types/talent-taxonomy'
 
@@ -32,6 +34,8 @@ type MemberToolRow = {
   notes: string | null
   verified_by: string | null
   verified_at: string | Date | null
+  verification_status: string
+  rejection_reason: string | null
 }
 
 class ToolValidationError extends Error {
@@ -61,6 +65,14 @@ const mapCatalogRow = (row: CatalogRow): ToolCatalogItem => ({
   displayOrder: row.display_order
 })
 
+const VALID_TOOL_VERIFICATION_STATUSES = new Set(['self_declared', 'pending_review', 'verified', 'rejected'])
+
+const normalizeToolVerificationStatus = (value: unknown): ToolVerificationStatus => {
+  const s = String(value || '').trim().toLowerCase()
+
+  return VALID_TOOL_VERIFICATION_STATUSES.has(s) ? (s as ToolVerificationStatus) : 'self_declared'
+}
+
 const mapMemberToolRow = (row: MemberToolRow): MemberTool => ({
   memberId: row.member_id,
   toolCode: row.tool_code,
@@ -73,7 +85,9 @@ const mapMemberToolRow = (row: MemberToolRow): MemberTool => ({
   visibility: row.visibility === 'client_visible' ? 'client_visible' : 'internal',
   notes: row.notes,
   verifiedBy: row.verified_by,
-  verifiedAt: toTimestamp(row.verified_at)
+  verifiedAt: toTimestamp(row.verified_at),
+  verificationStatus: normalizeToolVerificationStatus(row.verification_status),
+  rejectionReason: row.rejection_reason
 })
 
 /* ─── Catalog ─── */
@@ -123,7 +137,9 @@ export const getMemberTools = async (memberId: string): Promise<MemberTool[]> =>
         mt.visibility,
         mt.notes,
         mt.verified_by,
-        mt.verified_at
+        mt.verified_at,
+        mt.verification_status,
+        mt.rejection_reason
       FROM greenhouse_core.member_tools mt
       INNER JOIN greenhouse_core.tool_catalog tc ON tc.tool_code = mt.tool_code
       WHERE mt.member_id = $1
@@ -179,9 +195,9 @@ export const upsertMemberTool = async ({
   )
 
   await publishOutboxEvent({
-    aggregateType: 'memberTool',
+    aggregateType: AGGREGATE_TYPES.memberTool,
     aggregateId: `${memberId}:${toolCode}`,
-    eventType: 'memberToolUpserted',
+    eventType: EVENT_TYPES.memberToolUpserted,
     payload: { memberId, toolCode, proficiencyLevel: proficiency, visibility, actorUserId }
   })
 
@@ -205,10 +221,124 @@ export const removeMemberTool = async ({
   )
 
   await publishOutboxEvent({
-    aggregateType: 'memberTool',
+    aggregateType: AGGREGATE_TYPES.memberTool,
     aggregateId: `${memberId}:${normalized}`,
-    eventType: 'memberToolDeleted',
+    eventType: EVENT_TYPES.memberToolDeleted,
     payload: { memberId, toolCode: normalized, actorUserId }
+  })
+
+  return getMemberTools(memberId)
+}
+
+export const verifyMemberTool = async ({
+  memberId,
+  toolCode,
+  actorUserId
+}: {
+  memberId: string
+  toolCode: string
+  actorUserId: string
+}): Promise<MemberTool[]> => {
+  const normalized = String(toolCode || '').trim().toLowerCase()
+
+  const result = await query<{ member_id: string }>(
+    `
+      UPDATE greenhouse_core.member_tools
+      SET verified_by = $3,
+          verified_at = CURRENT_TIMESTAMP,
+          verification_status = 'verified',
+          rejection_reason = NULL,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE member_id = $1 AND tool_code = $2
+      RETURNING member_id
+    `,
+    [memberId, normalized, actorUserId]
+  )
+
+  if (result.length === 0) {
+    throw new ToolValidationError(`Herramienta '${toolCode}' no encontrada para el miembro.`, 404)
+  }
+
+  await publishOutboxEvent({
+    aggregateType: AGGREGATE_TYPES.memberTool,
+    aggregateId: `${memberId}:${normalized}`,
+    eventType: EVENT_TYPES.memberToolVerified,
+    payload: { memberId, toolCode: normalized, verifiedBy: actorUserId, action: 'verified' }
+  })
+
+  return getMemberTools(memberId)
+}
+
+export const unverifyMemberTool = async ({
+  memberId,
+  toolCode,
+  actorUserId
+}: {
+  memberId: string
+  toolCode: string
+  actorUserId: string
+}): Promise<MemberTool[]> => {
+  const normalized = String(toolCode || '').trim().toLowerCase()
+
+  await query(
+    `
+      UPDATE greenhouse_core.member_tools
+      SET verified_by = NULL,
+          verified_at = NULL,
+          verification_status = 'self_declared',
+          rejection_reason = NULL,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE member_id = $1 AND tool_code = $2
+    `,
+    [memberId, normalized]
+  )
+
+  await publishOutboxEvent({
+    aggregateType: AGGREGATE_TYPES.memberTool,
+    aggregateId: `${memberId}:${normalized}`,
+    eventType: EVENT_TYPES.memberToolUpserted,
+    payload: { memberId, toolCode: normalized, action: 'unverified', actorUserId }
+  })
+
+  return getMemberTools(memberId)
+}
+
+export const rejectMemberTool = async ({
+  memberId,
+  toolCode,
+  actorUserId,
+  reason
+}: {
+  memberId: string
+  toolCode: string
+  actorUserId: string
+  reason: string | null
+}): Promise<MemberTool[]> => {
+  const normalized = String(toolCode || '').trim().toLowerCase()
+
+  const result = await query<{ member_id: string }>(
+    `
+      UPDATE greenhouse_core.member_tools
+      SET verified_by = $3,
+          verified_at = CURRENT_TIMESTAMP,
+          verification_status = 'rejected',
+          rejection_reason = $4,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE member_id = $1 AND tool_code = $2
+      RETURNING member_id
+    `,
+    [memberId, normalized, actorUserId, reason]
+  )
+
+  if (result.length === 0) {
+    throw new ToolValidationError(`Herramienta '${toolCode}' no encontrada para el miembro.`, 404)
+  }
+
+  await publishOutboxEvent({
+    aggregateType: AGGREGATE_TYPES.memberTool,
+    aggregateId: `${memberId}:${normalized}`,
+    eventType: EVENT_TYPES.memberToolRejected,
+    payload: { memberId, toolCode: normalized, rejectedBy: actorUserId, reason, action: 'rejected' }
   })
 
   return getMemberTools(memberId)

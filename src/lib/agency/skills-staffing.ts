@@ -13,6 +13,7 @@ import type {
   SkillCategory,
   SkillCatalogItem,
   SkillSeniorityLevel,
+  SkillVerificationStatus,
   SpaceSkillCoverage,
   StaffingCandidate,
   StaffingRequirementCoverage,
@@ -41,6 +42,8 @@ type MemberSkillRow = Record<string, unknown> & {
   verified_by: string | null
   verified_at: string | Date | null
   visibility: string | null
+  verification_status: string
+  rejection_reason: string | null
 }
 
 type ServiceSkillRequirementRow = Record<string, unknown> & {
@@ -140,6 +143,14 @@ const mapCatalogRow = (row: CatalogRow): SkillCatalogItem => ({
   displayOrder: row.display_order
 })
 
+const VALID_VERIFICATION_STATUSES = new Set(['self_declared', 'pending_review', 'verified', 'rejected'])
+
+const normalizeVerificationStatus = (value: unknown): SkillVerificationStatus => {
+  const s = String(value || '').trim().toLowerCase()
+
+  return VALID_VERIFICATION_STATUSES.has(s) ? (s as SkillVerificationStatus) : 'self_declared'
+}
+
 const mapMemberSkillRow = (row: MemberSkillRow): MemberSkill => ({
   memberId: row.member_id,
   skillCode: row.skill_code,
@@ -150,6 +161,8 @@ const mapMemberSkillRow = (row: MemberSkillRow): MemberSkill => ({
   notes: row.notes,
   verifiedBy: row.verified_by,
   verifiedAt: toTimestampString(row.verified_at),
+  verificationStatus: normalizeVerificationStatus(row.verification_status),
+  rejectionReason: row.rejection_reason,
   visibility: row.visibility === 'client_visible' ? 'client_visible' : 'internal'
 })
 
@@ -278,6 +291,8 @@ const readMemberSkills = async (memberId: string) => {
         ms.notes,
         ms.verified_by,
         ms.verified_at,
+        ms.verification_status,
+        ms.rejection_reason,
         ms.visibility
       FROM greenhouse_core.member_skills ms
       INNER JOIN greenhouse_core.skill_catalog sc
@@ -499,10 +514,11 @@ export const replaceMemberSkillsForSpaceMember = async ({
             verified_by,
             verified_at,
             visibility,
+            verification_status,
             created_at,
             updated_at
           )
-          VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, $7, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+          VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP, $7, 'self_declared', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         `,
         [memberId, skill.skillCode, skill.seniorityLevel, skill.sourceSystem, skill.notes, actorUserId ?? null, skill.visibility || 'internal']
       )
@@ -679,6 +695,8 @@ export const getSpaceSkillCoverage = async ({
             ms.notes,
             ms.verified_by,
             ms.verified_at,
+            ms.verification_status,
+            ms.rejection_reason,
             ms.visibility
           FROM greenhouse_core.member_skills ms
           INNER JOIN greenhouse_core.skill_catalog sc
@@ -867,9 +885,9 @@ export const upsertSingleMemberSkill = async ({
     `
       INSERT INTO greenhouse_core.member_skills (
         member_id, skill_code, seniority_level, source_system, notes,
-        verified_by, verified_at, visibility, created_at, updated_at
+        verified_by, verified_at, visibility, verification_status, created_at, updated_at
       )
-      VALUES ($1, $2, $3, $4, $5, NULL, NULL, $6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      VALUES ($1, $2, $3, $4, $5, NULL, NULL, $6, 'self_declared', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
       ON CONFLICT (member_id, skill_code) DO UPDATE SET
         seniority_level = EXCLUDED.seniority_level,
         source_system = EXCLUDED.source_system,
@@ -930,7 +948,11 @@ export const verifyMemberSkill = async ({
   const result = await query<{ member_id: string }>(
     `
       UPDATE greenhouse_core.member_skills
-      SET verified_by = $3, verified_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+      SET verified_by = $3,
+          verified_at = CURRENT_TIMESTAMP,
+          verification_status = 'verified',
+          rejection_reason = NULL,
+          updated_at = CURRENT_TIMESTAMP
       WHERE member_id = $1 AND skill_code = $2
       RETURNING member_id
     `,
@@ -944,7 +966,7 @@ export const verifyMemberSkill = async ({
   await publishOutboxEvent({
     aggregateType: AGGREGATE_TYPES.memberSkill,
     aggregateId: `${memberId}:${normalized}`,
-    eventType: EVENT_TYPES.memberSkillUpserted,
+    eventType: EVENT_TYPES.memberSkillVerified,
     payload: { memberId, skillCode: normalized, verifiedBy: actorUserId, action: 'verified' }
   })
 
@@ -965,7 +987,11 @@ export const unverifyMemberSkill = async ({
   await query(
     `
       UPDATE greenhouse_core.member_skills
-      SET verified_by = NULL, verified_at = NULL, updated_at = CURRENT_TIMESTAMP
+      SET verified_by = NULL,
+          verified_at = NULL,
+          verification_status = 'self_declared',
+          rejection_reason = NULL,
+          updated_at = CURRENT_TIMESTAMP
       WHERE member_id = $1 AND skill_code = $2
     `,
     [memberId, normalized]
@@ -976,6 +1002,47 @@ export const unverifyMemberSkill = async ({
     aggregateId: `${memberId}:${normalized}`,
     eventType: EVENT_TYPES.memberSkillUpserted,
     payload: { memberId, skillCode: normalized, action: 'unverified', actorUserId }
+  })
+
+  return readMemberSkills(memberId)
+}
+
+export const rejectMemberSkill = async ({
+  memberId,
+  skillCode,
+  actorUserId,
+  reason
+}: {
+  memberId: string
+  skillCode: string
+  actorUserId: string
+  reason: string | null
+}): Promise<MemberSkill[]> => {
+  const normalized = normalizeSkillCode(skillCode)
+
+  const result = await query<{ member_id: string }>(
+    `
+      UPDATE greenhouse_core.member_skills
+      SET verified_by = $3,
+          verified_at = CURRENT_TIMESTAMP,
+          verification_status = 'rejected',
+          rejection_reason = $4,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE member_id = $1 AND skill_code = $2
+      RETURNING member_id
+    `,
+    [memberId, normalized, actorUserId, reason]
+  )
+
+  if (result.length === 0) {
+    throw new StaffingValidationError(`Skill '${skillCode}' no encontrada para el miembro.`, 404)
+  }
+
+  await publishOutboxEvent({
+    aggregateType: AGGREGATE_TYPES.memberSkill,
+    aggregateId: `${memberId}:${normalized}`,
+    eventType: EVENT_TYPES.memberSkillRejected,
+    payload: { memberId, skillCode: normalized, rejectedBy: actorUserId, reason, action: 'rejected' }
   })
 
   return readMemberSkills(memberId)

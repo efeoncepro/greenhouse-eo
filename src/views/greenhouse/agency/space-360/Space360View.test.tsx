@@ -136,6 +136,8 @@ const detail: Space360Detail = {
             notes: null,
             verifiedBy: 'user-1',
             verifiedAt: '2026-04-10T00:00:00.000Z',
+            verificationStatus: 'verified',
+            rejectionReason: null,
             visibility: 'internal'
           }
         ]

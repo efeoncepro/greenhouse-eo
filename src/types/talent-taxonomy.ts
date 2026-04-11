@@ -1,5 +1,8 @@
 /* ─── Tool Catalog & Member Tools ─── */
 
+export const TOOL_VERIFICATION_STATUSES = ['self_declared', 'pending_review', 'verified', 'rejected'] as const
+export type ToolVerificationStatus = (typeof TOOL_VERIFICATION_STATUSES)[number]
+
 export const TOOL_CATEGORY_VALUES = [
   'design', 'development', 'analytics', 'media',
   'project_management', 'collaboration', 'content', 'other'
@@ -33,6 +36,8 @@ export interface MemberTool {
   notes: string | null
   verifiedBy: string | null
   verifiedAt: string | null
+  verificationStatus: ToolVerificationStatus
+  rejectionReason: string | null
 }
 
 export interface UpsertMemberToolInput {

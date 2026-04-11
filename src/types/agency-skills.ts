@@ -1,3 +1,6 @@
+export const SKILL_VERIFICATION_STATUSES = ['self_declared', 'pending_review', 'verified', 'rejected'] as const
+export type SkillVerificationStatus = (typeof SKILL_VERIFICATION_STATUSES)[number]
+
 export const SKILL_SENIORITY_LEVELS = ['junior', 'mid', 'senior', 'lead'] as const
 export type SkillSeniorityLevel = (typeof SKILL_SENIORITY_LEVELS)[number]
 
@@ -35,6 +38,8 @@ export interface MemberSkill {
   notes: string | null
   verifiedBy: string | null
   verifiedAt: string | null
+  verificationStatus: SkillVerificationStatus
+  rejectionReason: string | null
   visibility: SkillVisibility
 }
 
