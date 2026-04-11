@@ -189,7 +189,7 @@
     "eslint-config-next": "15.1.2",
     "eslint-config-prettier": "9.1.0",
     "eslint-import-resolver-typescript": "3.7.0",
-    "eslint-plugin-import": "2.31.0",
+    "eslint-plugin-import": "2.32.0",
     "jsdom": "^29.0.0",
     "kysely-codegen": "^0.20.0",
     "node-pg-migrate": "^8.0.4",
