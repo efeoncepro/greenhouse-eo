@@ -1,5 +1,20 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — arquitectura base para separar estructura, equipos y capacidad extendida
+
+- alcance cerrado:
+  - quedó documentada la semántica canónica para no mezclar:
+    - estructura interna
+    - equipos operativos
+    - trabajo puntual
+    - capacidad extendida
+  - `Mi Perfil`, `People`, `Mi equipo`, `Org Chart` y directorios internos ya tienen una pauta explícita de diseño/lectura antes de abrir una task nueva de UX o modelado
+  - `assignments` queda formalizado como contrato de equipo operativo, no como reader suficiente de estructura interna
+- documentos vivos actualizados:
+  - `docs/architecture/GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md`
+  - `docs/architecture/GREENHOUSE_PERSON_COMPLETE_360_V1.md`
+  - `project_context.md`
+
 ## Sesion 2026-04-11 — leave reenganchado al pipeline canónico de avatar/persona
 
 - alcance cerrado:

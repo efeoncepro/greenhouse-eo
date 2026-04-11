@@ -1,5 +1,25 @@
 # project_context.md
 
+## Delta 2026-04-11 Semántica canónica para estructura, equipos y capacidad extendida
+
+- La arquitectura viva ya explicita que Greenhouse no debe tratar `equipo` como un concepto único.
+- Quedan separadas cuatro capas de relación:
+  - `estructura interna` — departamentos, supervisoría formal, subárbol
+  - `equipos operativos` — squads/cuentas/clientes que mezclan áreas
+  - `trabajo puntual` — proyectos e iniciativas concretas
+  - `capacidad extendida` — freelancers/contractors/on-demand externos a la estructura formal
+- Regla operativa nueva:
+  - `departments` + `reporting_lines` describen solo estructura
+  - `assignments` y roster operativo describen equipos de entrega
+  - `staff_augmentation` y talento externo siguen siendo relación operativa, no organigrama ni adscripción estructural
+  - surfaces como `Mi Perfil`, `People`, `Mi equipo`, `Org Chart` y directorios internos deben dejar explícita esa diferencia
+- Consecuencia de diseño:
+  - `Mi Perfil > Equipos` no debe usarse como sinónimo de departamentos liderados
+  - `Colegas` no debe resolverse como una bolsa org-wide si el caso de uso real es `mi área`, `mis equipos` o `capacidad extendida`
+- Fuente canónica:
+  - `docs/architecture/GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md`
+  - `docs/architecture/GREENHOUSE_PERSON_COMPLETE_360_V1.md`
+
 ## Delta 2026-04-11 Organigrama dual: estructura + liderazgo
 
 - `HR > Organigrama` ya no se limita a una sola lectura del árbol:

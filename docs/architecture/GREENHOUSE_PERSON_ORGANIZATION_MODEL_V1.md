@@ -35,6 +35,22 @@ Gaps identificados y cierre operativo quedan catalogados en `TASK-193` (`docs/ta
 - `CanonicalPersonRecord` ya consume contexto organizacional primario y `Finance` ya acepta `organizationId` opcional para scoping downstream.
 - `Organization memberships` ahora exponen la distinción operativa `internal` vs `staff_augmentation` como contexto del vínculo cliente sobre `team_member`; no se creó un `membership_type` nuevo.
 
+## Delta 2026-04-11 — semántica explícita para estructura, equipos operativos y capacidad extendida
+
+- Greenhouse ya no debe usar la palabra `equipo` como sinónimo de cualquier relación entre personas.
+- Quedan formalizadas cuatro capas distintas de relación para una persona de Efeonce:
+  - **estructura interna** — departamento, supervisoría formal, subárbol, liderazgo de área
+  - **equipos operativos** — pods/squads/cuentas que atienden clientes y mezclan varias áreas
+  - **trabajo puntual** — proyectos, campañas e iniciativas concretas
+  - **capacidad extendida** — freelancers, contractors y colaboradores externos que participan en la operación pero no pertenecen a la estructura interna
+- Regla nueva:
+  - `departments` y `reporting_lines` gobiernan solo la estructura interna
+  - `client_team_assignments` y relaciones operativas similares gobiernan equipos de servicio
+  - `staff_augmentation` y vínculos equivalentes siguen siendo relaciones operativas; no deben contaminar organigrama, jerarquía ni adscripción estructural
+- Implicación de UI:
+  - surfaces como `Mi Perfil`, `People`, `Org Chart` y directorios internos deben separar explícitamente `estructura`, `equipos operativos` y `capacidad extendida`
+  - `colegas` no debe seguir tratándose como una bolsa plana de toda la organización cuando el caso de uso real es `mi área`, `mis equipos` o `personas externas con las que colaboro`
+
 ## Delta 2026-04-02 — org-scoping de People y contactos mínimos de supplier
 
 - `People` ya tiene un carril shared de scope organizacional vía `resolvePeopleOrganizationScope()`:
@@ -79,6 +95,9 @@ Esta realidad define:
 | **Membership** | Vínculo persona → organización con contexto (rol, tipo, departamento, vigencia) | `greenhouse_core.person_memberships` |
 | **Assignment** | Asignación operativa de un member a un cliente: FTE, capacidad, economics | `greenhouse_core.client_team_assignments` |
 | **Operating Entity** | La org de Efeonce: empleador, emisor de DTEs, entidad de payroll (`is_operating_entity = TRUE`) | `greenhouse_core.organizations` |
+| **Structural Team** | Equipo interno formal de una persona: área/departamento + cadena de supervisoría | `greenhouse_core.departments` + `greenhouse_core.reporting_lines` |
+| **Operational Team** | Equipo de entrega al cliente o squad operativo, potencialmente cross-funcional | `greenhouse_core.client_team_assignments` + proyecciones/ownership operativo |
+| **Extended Capacity** | Participación operativa de talento no estructural: freelancers, contractors, on-demand | misma capa operativa; nunca la jerarquía formal |
 
 ---
 
@@ -200,6 +219,21 @@ identity_profile ──[person_memberships]──→ organization_id
 - **Datos:** membership_type, role_label, department, is_primary, start/end dates
 - **Consumers:** organization detail, person detail, HubSpot sync, UI navigation
 - **Aplica a:** Población A (como proyección) y Población B (como relación directa)
+
+### Regla de interpretación
+
+- **Grafo estructural** responde:
+  - dónde está una persona en Efeonce
+  - qué área lidera
+  - a quién reporta
+  - quién cae en su subárbol formal
+- **Grafo operativo** responde:
+  - con qué cliente/equipo trabaja una persona
+  - qué mezcla de áreas participa en la entrega
+  - cuánto FTE dedica cada integrante
+  - qué capacidad extendida externa participa en ese equipo
+
+No deben colapsarse ambos grafos bajo una sola etiqueta de `equipo`.
 
 ### Bridge: Assignment → Membership Sync
 
@@ -334,6 +368,93 @@ Decisión vigente:
 - la relación con la org cliente sigue siendo `team_member`, enriquecida con `assignmentType`, `assignedFte` y metadata laboral cuando existe faceta `member`
 
 Esto permite que readers y UI distingan `internal` vs `staff_augmentation` sin deformar el grafo estructural. El gap residual de `TASK-193` (G7) queda acotado a seguir propagando ese contexto en consumers downstream adicionales, no a cambiar el modelo base.
+
+### Extensión del principio a capacidad extendida
+
+La misma regla aplica a freelancers, contractors externos y talento on-demand:
+
+- pertenecen a la capa operativa, no a la estructura formal de Efeonce
+- pueden formar parte de un equipo de servicio, un squad o una cobertura de delivery
+- no deben convertirse en `department head`, `reporting line`, nodo estructural del organigrama ni miembro del subárbol formal salvo que exista un contrato interno explícito que los materialice como faceta `member`
+
+En otras palabras:
+
+- **capacidad extendida sí** aparece en rosters operativos
+- **capacidad extendida no** redefine departamentos ni jerarquías
+
+---
+
+## Surface Semantics
+
+Este documento deja un contrato semántico para surfaces que muestran personas, especialmente `Mi Perfil`, `People`, `Org Chart` y vistas de workspace:
+
+### Estructura
+
+Debe responder: **“Dónde estoy en Efeonce?”**
+
+Fuente:
+- `greenhouse_core.departments`
+- `greenhouse_core.reporting_lines`
+- `departments.head_member_id`
+- `members.department_id`
+
+Puede mostrar:
+- departamento/área
+- supervisor formal
+- breadcrumb estructural
+- reportes directos / subárbol
+- liderazgo de área
+
+No debe mostrar:
+- equipos cliente
+- squads operativos
+- freelancers on-demand como si fueran parte del organigrama
+
+### Equipos
+
+Debe responder: **“Con quién entrego valor?”**
+
+Fuente:
+- `greenhouse_core.client_team_assignments`
+- ownership operativo por cliente/space/proyecto
+- proyecciones de roster y cobertura
+
+Puede mostrar:
+- cuentas/clientes como `Sky`
+- squads operativos cross-funcionales
+- internos + capacidad extendida
+- rol operativo
+- dedicación / FTE
+
+No debe asumirse como sinónimo de departamento.
+
+### Proyectos
+
+Debe responder: **“En qué iniciativas concretas participo?”**
+
+Fuente:
+- proyectos/campañas/iniciativas puntuales
+
+Puede cruzarse con `Equipos`, pero no los reemplaza.
+
+### Personas
+
+Debe responder: **“Qué red humana es relevante para mí?”**
+
+No debe resolverse como una lista plana de toda la organización bajo la palabra `colegas`.
+
+Debe poder desagregar al menos en:
+- `mi área` — cercanía estructural
+- `mis equipos` — cercanía operativa
+- `capacidad extendida` — externos con los que colaboro
+
+### Regla de naming
+
+- `Área` / `Departamento` = estructura formal
+- `Equipo` = unidad operativa de entrega
+- `Proyecto` = trabajo puntual
+- `Capacidad extendida` = talento externo no estructural
+- `Colegas` no debe usarse como source of truth conceptual cuando el reader necesita distinguir estructura, operación y externalidad
 
 ---
 

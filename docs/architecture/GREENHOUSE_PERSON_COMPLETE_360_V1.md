@@ -14,6 +14,23 @@ Define el contrato, la arquitectura y las reglas del **Person Complete 360 Feder
 
 Antes de este resolver, cada vista del portal (Mi Perfil, Admin User Detail, People Detail) hacia 4-6 queries independientes a tablas distintas, cada una con su propia resolucion de `profile_id -> member_id`, su propio mapeo de avatares, y su propio fallback. Este resolver elimina esa duplicacion.
 
+## Delta 2026-04-11 — pauta de consumo para surfaces de perfil personal
+
+- `Person Complete 360` no debe inducir a mezclar `estructura`, `equipos`, `proyectos` y `capacidad extendida` en una sola tab o bajo el label genérico `colegas`.
+- Para surfaces como `Mi Perfil`, la pauta de consumo queda así:
+  - `identity` = quién soy
+  - `organization` = a qué organizaciones pertenezco y en qué calidad
+  - `assignments` = en qué equipos operativos/cuentas participo y con quién trabajo
+  - `staffAug` = qué contexto de capacidad extendida aplica
+- Nota explícita:
+  - el contrato actual de `assignments` describe **equipos operativos**
+  - no describe por sí solo **estructura interna**
+  - la estructura formal debe venir de `departments` + `reporting_lines` por un reader específico, no forzarse dentro de `assignments`
+- Consecuencia de diseño:
+  - `Mi Perfil > Equipos` puede colgar de `assignments`, pero debe nombrarse y presentarse como equipo operativo
+  - un futuro tab `Estructura` requiere un reader propio sobre jerarquía/departamentos
+  - `Colegas` como lista plana org-wide no es una lectura canónica suficiente del objeto persona
+
 ## Core Thesis
 
 **Una persona, un resolver, N facetas.** El consumidor pide exactamente las facetas que necesita. El resolver resuelve identidad una sola vez, ejecuta facetas en paralelo, aplica autorizacion, cache, y retorna `_meta` con timing, errores, y estado de cache por faceta.
