@@ -29,10 +29,15 @@ export async function GET(_: Request, { params }: { params: Promise<{ assetId: s
       actorUserId: tenant.userId
     })
 
+    const { searchParams } = new URL(_.url)
+    const wantsInline = searchParams.get('inline') === '1'
+    const isPreviewable = /^(application\/pdf|image\/)/.test(downloaded.asset.mimeType)
+    const disposition = wantsInline || isPreviewable ? 'inline' : 'attachment'
+
     return new NextResponse(new Uint8Array(downloaded.file.arrayBuffer), {
       headers: {
         'Content-Type': downloaded.asset.mimeType,
-        'Content-Disposition': `attachment; filename="${downloaded.asset.filename}"`,
+        'Content-Disposition': `${disposition}; filename="${downloaded.asset.filename}"`,
         'Cache-Control': downloaded.file.cacheControl
       }
     })

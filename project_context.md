@@ -1,5 +1,19 @@
 # project_context.md
 
+## Delta 2026-04-11 Skill local para microinteracciones UI/UX en Greenhouse
+
+- Nueva skill de Codex disponible:
+  - `.codex/skills/greenhouse-microinteractions-auditor/SKILL.md`
+- Propósito:
+  - auditar e implementar microinteracciones de Greenhouse sobre el stack real del portal
+  - cubrir motion, reduced motion, loading, empty, validation, hover/focus, toasts, alerts y live regions
+- Contrato operativo:
+  - reutiliza wrappers y primitives existentes (`FramerMotion`, `Lottie`, `useReducedMotion`, `AnimatedCounter`, `EmptyState`, `react-toastify`, MUI feedback states)
+  - usa investigación externa canónica en `references/microinteraction-playbook.md` sin inflar el prompt base de la skill
+  - sirve como puente entre `greenhouse-agent`, `greenhouse-ui-orchestrator` y `greenhouse-ux-content-accessibility` cuando el problema es calidad de interacción, no solo layout o copy
+- Metadata UI/discovery agregada:
+  - `.codex/skills/greenhouse-microinteractions-auditor/agents/openai.yaml`
+
 ## Delta 2026-04-11 Equipo asignado ya tiene arquitectura canónica enterprise
 
 - Greenhouse ya no debe pensar la surface cliente `/equipo` como roster simple.

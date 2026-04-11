@@ -2,6 +2,12 @@
 
 ## 2026-04-11
 
+### 2026-04-11 — Skill local para auditoría de microinteracciones Greenhouse
+
+- Se agregó la skill de Codex `greenhouse-microinteractions-auditor`.
+- La skill centraliza heurísticas para motion, reduced motion, loading, empty states, validation, feedback transitorio y accesibilidad dinámica sobre el stack real del portal.
+- El detalle externo y el inventario del repo quedaron comprimidos en `references/microinteraction-playbook.md` para mantener el prompt operativo corto.
+
 ### 2026-04-11 — Bloque de implementación creado para `Assigned Team Enterprise Program`
 
 - Se creó el backlog ejecutable `TASK-357` a `TASK-366` para bajar a runtime la arquitectura de `Equipo asignado`.

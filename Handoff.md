@@ -1,5 +1,23 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — nueva skill local `greenhouse-microinteractions-auditor`
+
+- alcance cerrado:
+  - se creó la skill de Codex `.codex/skills/greenhouse-microinteractions-auditor/SKILL.md`
+  - la skill quedó orientada a auditoría e implementación de microinteracciones UI/UX en Greenhouse:
+    - motion y reduced motion
+    - loading / empty / warning / error / success feedback
+    - hover / focus / keyboard affordances
+    - inline validation, live regions, toasts y dialogs
+  - se separó el conocimiento detallado en `references/microinteraction-playbook.md` para mantener `SKILL.md` corto
+  - se agregó metadata de discovery en `agents/openai.yaml`
+- documentos vivos actualizados:
+  - `project_context.md`
+  - `changelog.md`
+- validación ejecutada:
+  - revisión manual de consistencia contra `AGENTS.md`, `DOCUMENTATION_OPERATING_MODEL_V1.md`, `GREENHOUSE_UI_PLATFORM_V1.md` y `GREENHOUSE_ACCESSIBILITY_GUIDELINES_V1.md`
+  - no aplica build/lint; cambio documental y de tooling local para agentes
+
 ## Sesion 2026-04-11 — TASK-320 + TASK-314: Talent Profile Enterprise Program COMPLETADO
 
 - TASK-320: service talent-ops.ts (completeness, stale, gaps, actions), API /api/hr/core/talent-ops, dashboard /admin/talent-ops, nav "Salud del talento"

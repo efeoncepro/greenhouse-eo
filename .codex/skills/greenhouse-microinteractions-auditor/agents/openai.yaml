@@ -1,0 +1,5 @@
+interface:
+  display_name: "Greenhouse Microinteractions Auditor"
+  short_description: "Audit Greenhouse motion, feedback, loading, and states"
+  default_prompt: "Use $greenhouse-microinteractions-auditor to audit or improve motion, feedback, loading, empty, validation, and accessibility states in this Greenhouse UI flow."
+
