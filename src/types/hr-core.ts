@@ -247,6 +247,7 @@ export interface HrHierarchyRecord {
   memberId: string
   memberName: string
   memberActive: boolean
+  memberAvatarUrl: string | null
   roleTitle: string | null
   departmentId: string | null
   departmentName: string | null

@@ -1554,8 +1554,13 @@ const HrHierarchyView = () => {
                                 <TableCell>
                                   <Stack spacing={0.5}>
                                     <Stack direction='row' spacing={1.5} alignItems='center'>
-                                      <CustomAvatar skin='light' color='info' size={34}>
-                                        {getInitials(row.memberName)}
+                                      <CustomAvatar
+                                        src={row.memberAvatarUrl || undefined}
+                                        skin={row.memberAvatarUrl ? undefined : 'light'}
+                                        color='info'
+                                        size={34}
+                                      >
+                                        {!row.memberAvatarUrl ? getInitials(row.memberName) : null}
                                       </CustomAvatar>
                                       <Stack spacing={0}>
                                         <Typography variant='body2' fontWeight={600} noWrap>
@@ -1743,8 +1748,13 @@ const HrHierarchyView = () => {
                     >
                       <Stack spacing={1.5}>
                         <Stack direction='row' spacing={1.5} alignItems='center'>
-                          <CustomAvatar skin='light' color='info' size={42}>
-                            {getInitials(selectedRow.memberName)}
+                          <CustomAvatar
+                            src={selectedRow.memberAvatarUrl || undefined}
+                            skin={selectedRow.memberAvatarUrl ? undefined : 'light'}
+                            color='info'
+                            size={42}
+                          >
+                            {!selectedRow.memberAvatarUrl ? getInitials(selectedRow.memberName) : null}
                           </CustomAvatar>
                           <Box sx={{ minWidth: 0 }}>
                             <Typography variant='subtitle1' fontWeight={600} noWrap>

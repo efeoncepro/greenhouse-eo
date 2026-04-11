@@ -11,6 +11,7 @@ import {
   revokeResponsibilityInTransaction
 } from '@/lib/operational-responsibility/store'
 import { HrCoreValidationError, normalizeNullableString, normalizeString } from '@/lib/hr-core/shared'
+import { resolveAvatarUrl } from '@/lib/person-360/resolve-avatar'
 
 import type {
   HrHierarchyDelegationRecord,
@@ -38,6 +39,8 @@ type HierarchyListRow = {
   member_id: string
   member_name: string | null
   member_active: boolean
+  member_avatar_url: string | null
+  member_linked_user_id: string | null
   role_title: string | null
   department_id: string | null
   department_name: string | null
@@ -159,6 +162,7 @@ const mapHierarchyRow = (row: HierarchyListRow): HrHierarchyRecord => ({
   memberId: row.member_id,
   memberName: row.member_name || row.member_id,
   memberActive: Boolean(row.member_active),
+  memberAvatarUrl: resolveAvatarUrl(row.member_avatar_url, row.member_linked_user_id),
   roleTitle: normalizeNullableString(row.role_title),
   departmentId: normalizeNullableString(row.department_id),
   departmentName: normalizeNullableString(row.department_name),
@@ -320,6 +324,12 @@ export const listHierarchy = async (filters?: HierarchyListFilters): Promise<HrH
       m.member_id,
       m.display_name AS member_name,
       m.active AS member_active,
+      m.avatar_url AS member_avatar_url,
+      (SELECT cu.user_id
+       FROM greenhouse_core.client_users cu
+       WHERE cu.member_id = m.member_id
+       ORDER BY cu.active DESC, cu.created_at ASC
+       LIMIT 1) AS member_linked_user_id,
       m.role_title,
       COALESCE(m.department_id, headed_dept.department_id) AS department_id,
       COALESCE(dept.name, headed_dept.name) AS department_name,
