@@ -381,3 +381,6 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-329` | `complete` | Organigrama y explorador de jerarquias | `docs/tasks/complete/TASK-329-org-chart-hierarchy-explorer.md` |
 | `TASK-330` | `complete` | Gobernanza de fuentes, sync y drift de jerarquias | `docs/tasks/complete/TASK-330-hierarchy-sync-drift-governance.md` |
 | `TASK-331` | `to-do` | Rediseno UX completo de la vista Jerarquia | `docs/tasks/to-do/TASK-331-hierarchy-view-ux-redesign.md` |
+| `TASK-332` | `to-do` | Contrato y gobernanza de superficies relacionales | `docs/tasks/to-do/TASK-332-relationship-surface-contract-governance.md` |
+| `TASK-333` | `to-do` | Readers compartidos de relaciones para personas, workspaces y admin | `docs/tasks/to-do/TASK-333-shared-relationship-readers.md` |
+| `TASK-334` | `to-do` | Superficies relacionales y entry points de administración | `docs/tasks/to-do/TASK-334-relationship-surfaces-admin-ux.md` |
