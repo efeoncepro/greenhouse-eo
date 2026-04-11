@@ -34,7 +34,6 @@ import { readLatestMemberCapacityEconomicsSnapshot, type MemberCapacityEconomics
 import { readPersonIntelligence } from '@/lib/person-intelligence/store'
 import type { PersonIntelligenceSnapshot } from '@/lib/person-intelligence/types'
 import type { TeamIdentityProvider } from '@/types/team'
-import { resolveAvatarUrl } from '@/lib/person-360/resolve-avatar'
 
 type MemberRow = {
   member_id: string | null
@@ -44,7 +43,6 @@ type MemberRow = {
   role_title: string | null
   role_category: string | null
   avatar_url: string | null
-  linked_user_id: string | null
   active: boolean | null
   contact_channel: string | null
   contact_handle: string | null
@@ -284,7 +282,7 @@ const buildPersonMember = (row: MemberRow): {
       displayName: String(row.display_name || 'Sin nombre'),
       publicEmail,
       internalEmail,
-      avatarUrl: resolveAvatarUrl(row.avatar_url, row.linked_user_id),
+      avatarUrl: row.avatar_url || null,
       roleTitle: String(row.role_title || 'Efeonce Team'),
       roleCategory: String(row.role_category || inferRoleCategory(row.role_title)),
       active: Boolean(row.active),
@@ -331,7 +329,6 @@ const getMemberByIdFromPostgres = async (memberId: string): Promise<MemberRow | 
     role_title: string | null
     role_category: string | null
     avatar_url: string | null
-    linked_user_id: string | null
     active: boolean | null
     contact_channel: string | null
     contact_handle: string | null
@@ -366,20 +363,7 @@ const getMemberByIdFromPostgres = async (memberId: string): Promise<MemberRow | 
       COALESCE(m.email_aliases, ARRAY[]::text[]) AS email_aliases,
       m.role_title,
       m.role_category,
-      COALESCE(
-        m.avatar_url,
-        (SELECT cu.avatar_url
-         FROM greenhouse_core.client_users cu
-         WHERE cu.identity_profile_id = m.identity_profile_id
-           AND cu.avatar_url IS NOT NULL
-         ORDER BY cu.active DESC, cu.created_at ASC
-         LIMIT 1)
-      ) AS avatar_url,
-      (SELECT cu.user_id
-       FROM greenhouse_core.client_users cu
-       WHERE cu.identity_profile_id = m.identity_profile_id
-       ORDER BY cu.active DESC, cu.created_at ASC
-       LIMIT 1) AS linked_user_id,
+      m.avatar_url,
       m.active,
       m.contact_channel,
       m.contact_handle,
@@ -423,7 +407,6 @@ const getMemberByIdFromPostgres = async (memberId: string): Promise<MemberRow | 
     role_title: row.role_title,
     role_category: row.role_category,
     avatar_url: row.avatar_url,
-    linked_user_id: row.linked_user_id,
     active: row.active,
     contact_channel: row.contact_channel,
     contact_handle: row.contact_handle,
@@ -517,7 +500,7 @@ const getMemberByIdFromBigQuery = async (memberId: string) => {
         m.role_title,
         m.role_category,
         m.avatar_url,
-        CAST(NULL AS STRING) AS linked_user_id,
+
         m.active,
         m.contact_channel,
         m.contact_handle,

@@ -230,13 +230,16 @@ export const syncEntraProfiles = async (
             ) as ArrayBuffer
           })
 
-          // Update PostgreSQL — client_users + propagate to members
+          // Update PostgreSQL — client_users keeps gs:// path,
+          // members gets browser-ready proxy URL
           await query(
             `UPDATE greenhouse_core.client_users
              SET avatar_url = $1, updated_at = CURRENT_TIMESTAMP
              WHERE user_id = $2 AND (avatar_url IS DISTINCT FROM $1)`,
             [assetPath, gh.user_id]
           )
+
+          const memberProxyUrl = `/api/media/users/${gh.user_id}/avatar`
 
           await query(
             `UPDATE greenhouse_core.members
@@ -245,7 +248,7 @@ export const syncEntraProfiles = async (
                SELECT member_id FROM greenhouse_core.client_users
                WHERE user_id = $2 AND member_id IS NOT NULL
              ) AND (avatar_url IS DISTINCT FROM $1)`,
-            [assetPath, gh.user_id]
+            [memberProxyUrl, gh.user_id]
           )
 
           // Update BigQuery (fire-and-forget, non-blocking)

@@ -57,13 +57,16 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       assetPath
     })
 
-    // Propagate to PostgreSQL: client_users + members
+    // Propagate to PostgreSQL — client_users keeps gs:// path,
+    // members gets browser-ready proxy URL
     await runGreenhousePostgresQuery(
       `UPDATE greenhouse_core.client_users
        SET avatar_url = $1, updated_at = CURRENT_TIMESTAMP
        WHERE user_id = $2 AND (avatar_url IS DISTINCT FROM $1)`,
       [assetPath, id]
     )
+
+    const memberProxyUrl = `/api/media/users/${id}/avatar`
 
     await runGreenhousePostgresQuery(
       `UPDATE greenhouse_core.members
@@ -72,7 +75,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
          SELECT member_id FROM greenhouse_core.client_users
          WHERE user_id = $2 AND member_id IS NOT NULL
        ) AND (avatar_url IS DISTINCT FROM $1)`,
-      [assetPath, id]
+      [memberProxyUrl, id]
     )
 
     return NextResponse.json({
