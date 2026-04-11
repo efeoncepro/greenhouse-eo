@@ -34,7 +34,9 @@ export const GH_INTERNAL_NAV = {
   adminAccounts: { label: 'Cuentas', subtitle: 'Organizaciones, spaces y gobierno de identidad' },
   adminPaymentInstruments: { label: 'Instrumentos de pago', subtitle: 'Cuentas bancarias, tarjetas, fintech y plataformas' },
   adminTalentReview: { label: 'Verificación de talento', subtitle: 'Skills, herramientas y certificaciones por revisar' },
-  adminTalentOps: { label: 'Salud del talento', subtitle: 'Metricas y mantenimiento del sistema' }
+  adminTalentOps: { label: 'Salud del talento', subtitle: 'Metricas y mantenimiento del sistema' },
+  adminIdentityAccess: { label: 'Identidad y acceso', subtitle: 'Usuarios, roles, vistas y cuentas' },
+  adminTeamOps: { label: 'Equipo y operaciones', subtitle: 'Talento, líneas de negocio e instrumentos' }
 } as const
 
 export const GH_PEOPLE_NAV = {
@@ -55,7 +57,9 @@ export const GH_AGENCY_NAV = {
   delivery: { label: 'Delivery', subtitle: 'ICO, sprints y producción' },
   campaigns: { label: 'Campañas', subtitle: 'Iniciativas cross-space' },
   operations: { label: 'Operaciones', subtitle: 'Salud del platform' },
-  structure: { label: 'Estructura', subtitle: 'Organizaciones, servicios y operaciones' }
+  structure: { label: 'Estructura', subtitle: 'Organizaciones, servicios y operaciones' },
+  teamAndTalent: { label: 'Equipo y talento', subtitle: 'Capacidad, descubrimiento y staffing' },
+  operationsGroup: { label: 'Operaciones', subtitle: 'Delivery, campañas y estructura' }
 } as const
 
 export const GH_FINANCE_NAV = {
@@ -78,7 +82,8 @@ export const GH_FINANCE_NAV = {
   shareholderAccount: { label: 'Cuenta accionista', subtitle: 'Saldo empresa ↔ accionista' },
   cashPosition: { label: 'Posición de caja', subtitle: 'Saldo real, cuentas por cobrar y por pagar' },
   documents: { label: 'Documentos', subtitle: 'Cotizaciones, OC, HES y conciliación' },
-  analytics: { label: 'Inteligencia', subtitle: 'Economía y asignaciones de costos' }
+  analytics: { label: 'Inteligencia', subtitle: 'Economía y asignaciones de costos' },
+  treasury: { label: 'Tesorería', subtitle: 'Banco, cuenta accionista y posición de caja' }
 } as const
 
 export const GH_HR_NAV = {

@@ -1,5 +1,24 @@
 # project_context.md
 
+## Delta 2026-04-11 Contrato canónico para sister platforms del ecosistema
+
+- Greenhouse ya no debe tratar plataformas hermanas como consumers informales del portal.
+- Nuevas fuentes canónicas:
+  - `docs/architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`
+  - `docs/architecture/GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md`
+- Contrato operativo nuevo:
+  - Greenhouse y las sister platforms se integran como `peer systems`
+  - runtime, DB, secrets e IAM compartidos no son el default
+  - la foundation reusable se separa en:
+    - institutional layer reusable
+    - tenancy binding cross-platform
+    - read-only external surfaces
+    - MCP/agent adapter downstream
+- Estado actual:
+  - `Kortex` es la primera sister platform activa bajo este marco
+  - `Verk` queda prevista como future sister platform, pero sin anexo propio hasta tener baseline real equivalente
+  - el backlog nuevo `TASK-374` a `TASK-377` coordina la bajada desde contrato arquitectónico hacia foundation y primer consumer
+
 ## Delta 2026-04-11 Skill local para microinteracciones UI/UX en Greenhouse
 
 - Nueva skill de Codex disponible:

@@ -1,5 +1,39 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — TASK-373: Sidebar Reorganization COMPLETADA
+
+- alcance cerrado:
+  - **Microinteracciones CSS:** hover transition 150ms ease-out, active transition 200ms ease-out, `prefers-reduced-motion` media query que deshabilita todas las transiciones del sidebar
+  - **Gestión:** de 8 flat + 1 collapsible a 3 flat + 2 collapsibles ("Equipo y talento", "Operaciones")
+  - **Personas y HR:** de 10 flat a 1 flat (Personas) + 3 collapsibles ("Nómina", "Supervisión", "Organización"). 5 variantes condicionales preservadas.
+  - **Finanzas > Flujo:** de 10 items a 7 (Flujo operativo) + 3 (Tesorería nuevo submenu)
+  - **Admin > Gobierno:** de 11 items a 2 submenús ("Identidad y acceso" 6 items, "Equipo y operaciones" 5 items)
+  - **Iconos diferenciados:** Agency Equipo→`tabler-affiliate`, Personas→`tabler-address-book`, Client Equipo→`tabler-users`
+- impacto: admin ve ~18 items sin expandir (antes ~40), reducción del 55%
+- sin cambios en: rutas, view codes, permisos, portal cliente, Mi Ficha
+- verificación: `tsc`, `lint` (0 errors), `build` — todos pasan
+
+## Sesion 2026-04-11 — contrato marco para sister platforms + anexo Kortex + backlog derivado
+
+- alcance cerrado:
+  - creada la spec base `docs/architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`
+  - creado el anexo `docs/architecture/GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md`
+  - Greenhouse ahora fija explícitamente que las apps hermanas se integran como `peer systems`, no como módulos embebidos
+  - el contrato separa:
+    - institutional layer reusable
+    - tenancy binding cross-platform
+    - read-only external surfaces
+    - MCP / agent adapter downstream
+- backlog nuevo abierto:
+  - `TASK-374` — Sister Platforms Integration Program
+  - `TASK-375` — Sister Platforms Identity & Tenancy Binding Foundation
+  - `TASK-376` — Sister Platforms Read-Only External Surface Hardening
+  - `TASK-377` — Kortex Operational Intelligence Bridge
+- próximos pasos naturales:
+  - bajar primero la foundation reusable (`375`, `376`)
+  - después cerrar el primer carril Kortex (`377`)
+  - abrir anexo para `Verk` solo cuando exista baseline real de repo/arquitectura equivalente
+
 ## Sesion 2026-04-11 — TASK-372: Kortex Visual Preset Documentation COMPLETADA
 
 - alcance cerrado:

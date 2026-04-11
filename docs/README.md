@@ -41,6 +41,8 @@ Indice maestro de la documentacion no operativa del repo.
 - [Greenhouse_Capabilities_Architecture_v1.md](architecture/Greenhouse_Capabilities_Architecture_v1.md)
 - [Greenhouse_Nomenclatura_Portal_v3.md](architecture/Greenhouse_Nomenclatura_Portal_v3.md)
 - [GREENHOUSE_SCIM_ENTRA_INTEGRATION_V1.md](architecture/GREENHOUSE_SCIM_ENTRA_INTEGRATION_V1.md)
+- [GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md](architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md)
+- [GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md](architecture/GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md)
 - [12-testing-development.md](architecture/12-testing-development.md)
 
 ### Documentation

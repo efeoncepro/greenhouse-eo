@@ -2,6 +2,12 @@
 
 ## 2026-04-11
 
+### 2026-04-11 — Greenhouse formaliza contrato con sister platforms y anexo Kortex
+
+- Se agregó la spec `GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md` para fijar que Greenhouse y las plataformas hermanas del ecosistema se integran como `peer systems`.
+- Se agregó el anexo `GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md` para definir el primer bridge concreto con Kortex como consumer de operational intelligence Greenhouse.
+- El backlog operativo ahora incluye `TASK-374` a `TASK-377` para bajar el contrato a foundation reusable, read-only surfaces y primer carril Kortex.
+
 ### 2026-04-11 — Skill local para auditoría de microinteracciones Greenhouse
 
 - Se agregó la skill de Codex `greenhouse-microinteractions-auditor`.

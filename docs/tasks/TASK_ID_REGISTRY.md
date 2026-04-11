@@ -422,4 +422,8 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-370` | `complete` | Semantic Token Absorption into Theme | `docs/tasks/complete/TASK-370-semantic-token-absorption-into-theme.md` |
 | `TASK-371` | `complete` | Shell Primary Cutover | `docs/tasks/complete/TASK-371-shell-primary-cutover.md` |
 | `TASK-372` | `complete` | Kortex Visual Preset Documentation | `docs/tasks/complete/TASK-372-kortex-visual-preset-documentation.md` |
-| `TASK-373` | `to-do` | Sidebar Reorganization: Density, Icons & Microinteractions | `docs/tasks/to-do/TASK-373-sidebar-reorganization-density-microinteractions.md` |
+| `TASK-373` | `complete` | Sidebar Reorganization: Density, Icons & Microinteractions | `docs/tasks/complete/TASK-373-sidebar-reorganization-density-microinteractions.md` |
+| `TASK-374` | `to-do` | Sister Platforms Integration Program | `docs/tasks/to-do/TASK-374-sister-platforms-integration-program.md` |
+| `TASK-375` | `to-do` | Sister Platforms Identity & Tenancy Binding Foundation | `docs/tasks/to-do/TASK-375-sister-platforms-identity-tenancy-binding-foundation.md` |
+| `TASK-376` | `to-do` | Sister Platforms Read-Only External Surface Hardening | `docs/tasks/to-do/TASK-376-sister-platforms-read-only-external-surface-hardening.md` |
+| `TASK-377` | `to-do` | Kortex Operational Intelligence Bridge | `docs/tasks/to-do/TASK-377-kortex-operational-intelligence-bridge.md` |

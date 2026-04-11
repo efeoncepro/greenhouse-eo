@@ -1,5 +1,17 @@
 # GREENHOUSE_REPO_ECOSYSTEM_V1.md
 
+## Delta 2026-04-11 — Sister platforms contract now governs cross-repo integration posture
+
+- La relación entre `greenhouse-eo` y plataformas hermanas del ecosistema ya no debe inferirse solo desde esta lista operativa.
+- Fuente canónica nueva:
+  - `docs/architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`
+- Primer anexo activo:
+  - `docs/architecture/GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md`
+- Regla operativa nueva:
+  - los repos hermanos tipo plataforma deben tratarse como `peer systems`
+  - la lista de este documento sigue definiendo `quién consulta a quién`
+  - el contrato arquitectónico nuevo define `cómo se integran`
+
 ## Objetivo
 
 Dejar explicito que `greenhouse-eo` no vive aislado: depende de un ecosistema pequeño de repos hermanos que cubren pipelines, notificaciones e inteligencia adyacente, y de un upstream de referencia para la base Vuexy.

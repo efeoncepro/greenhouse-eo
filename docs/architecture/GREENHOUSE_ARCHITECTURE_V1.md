@@ -1,5 +1,23 @@
 # Greenhouse Architecture V1
 
+## Delta 2026-04-11 — Sister platforms now have a canonical peer-system integration contract
+
+- Greenhouse ya no debe pensar repos hermanos como consumers informales de branding, datos o tooling.
+- Fuente canónica nueva:
+  - `docs/architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`
+- Primer anexo concreto:
+  - `docs/architecture/GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md`
+- Regla arquitectónica nueva:
+  - las sister platforms del ecosistema se integran con Greenhouse como `peer systems`
+  - runtime, DB, secrets e IAM compartidos no son el default
+  - la integración canónica ocurre mediante contratos explícitos de:
+    - tenancy binding
+    - read-only operational surfaces
+    - MCP / agent adapters downstream
+    - institutional layer reusable
+  - `Kortex` es la primera sister platform activa bajo este marco
+  - futuras plataformas, por ejemplo `Verk`, deben abrir anexo propio sobre el mismo contrato y no reinventar la foundation
+
 ## Delta 2026-04-11 — Assigned Team becomes a canonical enterprise client visibility capability
 
 - Greenhouse ya no debe tratar `/equipo` como un roster cliente estático ni como una copia superficial de `People`.
