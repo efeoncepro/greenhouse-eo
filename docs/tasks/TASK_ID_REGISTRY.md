@@ -366,7 +366,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-314` | `in-progress` | Talent Profile Enterprise Program | `docs/tasks/in-progress/TASK-314-talent-profile-enterprise-program.md` |
 | `TASK-315` | `to-do` | Talent Taxonomy & Canonical Professional Model | `docs/tasks/to-do/TASK-315-talent-taxonomy-canonical-model.md` |
 | `TASK-316` | `complete` | Talent Trust Ops: Verification, Certification Governance & Review Queue | `docs/tasks/complete/TASK-316-talent-trust-ops-verification-governance.md` |
-| `TASK-317` | `to-do` | Internal Talent Discovery: Search, Filters & Ranking | `docs/tasks/to-do/TASK-317-internal-talent-discovery-search-ranking.md` |
+| `TASK-317` | `complete` | Internal Talent Discovery: Search, Filters & Ranking | `docs/tasks/complete/TASK-317-internal-talent-discovery-search-ranking.md` |
 | `TASK-318` | `to-do` | Client-Safe Verified Talent Profiles | `docs/tasks/to-do/TASK-318-client-safe-verified-talent-profiles.md` |
 | `TASK-319` | `to-do` | Reputation, Evidence & Endorsements for Talent Profiles | `docs/tasks/to-do/TASK-319-reputation-evidence-endorsements.md` |
 | `TASK-320` | `to-do` | Talent Ops Analytics, Completeness & Maintenance Automation | `docs/tasks/to-do/TASK-320-talent-ops-analytics-maintenance-automation.md` |

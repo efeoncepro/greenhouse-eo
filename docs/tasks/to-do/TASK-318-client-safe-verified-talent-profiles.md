@@ -19,6 +19,10 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-04-11 (TASK-317)
+
+- TASK-317 completada — discovery search/ranking existe en /agency/talent-discovery. Client-safe puede reutilizar el reader con filtro de visibility.
+
 ## Delta 2026-04-11 (TASK-316)
 
 - TASK-316 completada — items client_visible solo si verification_status='verified'. Contrato de trust ya implementado.

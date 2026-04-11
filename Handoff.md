@@ -1,5 +1,15 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — TASK-317: Internal Talent Discovery completada
+
+- Service: src/lib/agency/talent-discovery.ts — search, filter, rank across members with weighted scoring
+- API: GET /api/agency/talent-discovery — faceted search with q, skills, tools, languages, verification, sortBy
+- Page: /agency/talent-discovery con cards grid (3/2/1 cols responsive), 4 KPI cards, filtros
+- Discovery score (0-100): completeness 20% + verification 30% + availability 25% + cert freshness 15% + seniority 10%
+- Nav: "Talento" en sidebar Agency (GESTIÓN)
+- Nomenclature: GH_TALENT_DISCOVERY block + GH_AGENCY_NAV.talentDiscovery
+- STATUS: COMPLETE
+
 ## Sesion 2026-04-11 — TASK-316: Talent Trust Ops completada
 
 - Migration: verification_status + rejection_reason en member_skills y member_tools (backfill desde verified_by)

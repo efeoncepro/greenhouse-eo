@@ -19,6 +19,10 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-04-11 (TASK-317)
+
+- TASK-317 completada — TalentDiscoverySummary disponible vía API. Analytics puede consumir el mismo aggregation.
+
 ## Delta 2026-04-11 (TASK-316)
 
 - TASK-316 completada — cola /admin/talent-review con summary counts. Analytics puede consumir el mismo query UNION de pending/verified/rejected.

@@ -19,6 +19,10 @@
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
+## Delta 2026-04-11 (TASK-317)
+
+- TASK-317 completada — discoveryScore pondera verification (30%) y cert freshness (15%). Endorsements podrían agregar un nuevo factor al score.
+
 ## Delta 2026-04-11 (TASK-316)
 
 - TASK-316 completada — modelo de verificacion unificado (skills/tools/certs). Endorsements pueden construirse sobre verification_status.

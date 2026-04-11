@@ -50,6 +50,7 @@ export const GH_AGENCY_NAV = {
   staffAugmentation: { label: 'Staff Augmentation', subtitle: 'Placements, onboarding y economía por assignment' },
   economics: { label: 'Economía', subtitle: 'P&L y rentabilidad' },
   team: { label: 'Equipo', subtitle: 'Capacidad y dedicación' },
+  talentDiscovery: { label: 'Talento', subtitle: 'Descubrimiento y ranking' },
   delivery: { label: 'Delivery', subtitle: 'ICO, sprints y producción' },
   campaigns: { label: 'Campañas', subtitle: 'Iniciativas cross-space' },
   operations: { label: 'Operaciones', subtitle: 'Salud del platform' },
@@ -1439,4 +1440,55 @@ export const GH_SKILLS_CERTS = {
   empty_links_title: 'Sin links profesionales',
   empty_links_description: 'Agrega tus perfiles en plataformas profesionales.',
   empty_about_me: 'Aún no has escrito tu biografía profesional.'
+} as const
+
+/* ─────────────────── Talent Discovery ─────────────────── */
+
+export const GH_TALENT_DISCOVERY = {
+  page_title: 'Descubrimiento de talento',
+  page_subtitle: 'Busca y filtra personas por skills, herramientas, certificaciones e idiomas',
+
+  // Search & filters
+  search_placeholder: 'Buscar por nombre, cargo o titular...',
+  filter_skills: 'Skills',
+  filter_tools: 'Herramientas',
+  filter_verification: 'Verificación',
+  filter_sort: 'Ordenar por',
+
+  // Sort options
+  sort_relevance: 'Relevancia',
+  sort_availability: 'Mayor disponibilidad',
+  sort_verified: 'Más verificados',
+
+  // Verification filter options
+  verification_all: 'Todos',
+  verification_only_verified: 'Solo verificados',
+  verification_with_verifications: 'Con verificaciones',
+
+  // Summary cards
+  summary_total: 'Total personas',
+  summary_verified: 'Con skills verificadas',
+  summary_availability: 'Disponibilidad promedio',
+  summary_categories: 'Categorías',
+
+  // Card labels
+  card_available: 'disponibles',
+  card_skills: 'skills',
+  card_tools: 'herramientas',
+  card_certifications: 'certificaciones',
+  card_languages: 'idiomas',
+  card_view_profile: 'Ver perfil',
+
+  // Discovery score
+  score_label: 'Score',
+
+  // Empty state
+  empty_title: 'No se encontraron personas con los filtros aplicados',
+  empty_description: 'Ajusta los filtros o amplía tu búsqueda para encontrar talento.',
+
+  // Loading
+  loading: 'Cargando talento...',
+
+  // Error
+  error_message: 'No pudimos cargar los datos de talento. Verifica tu conexión e intenta de nuevo.'
 } as const

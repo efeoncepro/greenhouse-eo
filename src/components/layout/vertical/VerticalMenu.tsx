@@ -130,6 +130,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           { label: nl(GH_AGENCY_NAV.spaces), href: '/agency/spaces', icon: 'tabler-grid-4x4' },
           { label: nl(GH_AGENCY_NAV.economics), href: '/agency/economics', icon: 'tabler-chart-line' },
           { label: nl(GH_AGENCY_NAV.team), href: '/agency/team', icon: 'tabler-users-group' },
+          { label: nl(GH_AGENCY_NAV.talentDiscovery), href: '/agency/talent-discovery', icon: 'tabler-user-search' },
           { label: nl(GH_AGENCY_NAV.staffAugmentation), href: '/agency/staff-augmentation', icon: 'tabler-briefcase-2' },
           { label: nl(GH_AGENCY_NAV.delivery), href: '/agency/delivery', icon: 'tabler-cpu' },
           { label: nl(GH_AGENCY_NAV.campaigns), href: '/agency/campaigns', icon: 'tabler-speakerphone' },
@@ -155,6 +156,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           if (item.href === '/agency/spaces') return canSeeView('gestion.spaces', true)
           if (item.href === '/agency/economics') return canSeeView('gestion.economia', true)
           if (item.href === '/agency/team') return canSeeView('gestion.equipo', true)
+          if (item.href === '/agency/talent-discovery') return canSeeView('gestion.equipo', true)
           if (item.href === '/agency/staff-augmentation') return canSeeView('gestion.staff_augmentation', true)
           if (item.href === '/agency/delivery') return canSeeView('gestion.delivery', true)
           if (item.href === '/agency/campaigns') return canSeeView('gestion.campanas', true)
