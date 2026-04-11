@@ -61,6 +61,7 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 ### Correcciones
 
 - `Nómina > Compensaciones` ya no pierde la conectividad al guardar o recalcular una compensación Deel.
+- `Nómina proyectada` ahora muestra `Retención SII` de forma explícita para contratos `Honorarios` en CLP, evitando que el total de descuentos parezca inconsistente.
 
 ### Notas
 

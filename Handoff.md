@@ -1,5 +1,21 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — Projected Payroll aclara retención SII para honorarios CLP
+
+- alcance cerrado:
+  - se confirmó que el motor de `honorarios` estaba correcto: aplica retención SII (`14.5%` en 2026) sobre el bruto
+  - el problema real estaba en `ProjectedPayrollView`: mostraba AFP/salud/cesantía/impuesto en `0` pero dejaba el total rojo, generando un descuento fantasma
+  - la UI ahora distingue explícitamente `Retención SII` para honorarios y renombra la card a `Retención honorarios`
+- archivos tocados:
+  - `src/views/greenhouse/payroll/ProjectedPayrollView.tsx`
+  - `src/views/greenhouse/payroll/ProjectedPayrollView.test.tsx`
+- documentos vivos actualizados:
+  - `changelog.md`
+  - `docs/changelog/CLIENT_CHANGELOG.md`
+- validación ejecutada:
+  - `pnpm exec vitest run src/views/greenhouse/payroll/ProjectedPayrollView.test.tsx src/lib/payroll/project-payroll.test.ts` — OK
+  - `pnpm exec eslint src/views/greenhouse/payroll/ProjectedPayrollView.tsx src/views/greenhouse/payroll/ProjectedPayrollView.test.tsx` — OK
+
 ## Sesion 2026-04-11 — TASK-317: Internal Talent Discovery completada
 
 - Service: src/lib/agency/talent-discovery.ts — search, filter, rank across members with weighted scoring

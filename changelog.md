@@ -2,6 +2,12 @@
 
 ## 2026-04-11
 
+### 2026-04-11 — Nómina proyectada aclara retención SII para honorarios Chile
+
+- `Payroll > Nómina proyectada` ahora deja explícito cuando un colaborador `honorarios` en CLP tiene `Retención SII`, en vez de parecer un descuento fantasma.
+- La vista ya no muestra AFP, salud y cesantía en `0` junto a un total negativo para ese caso.
+- El cálculo no cambió: la branch de `honorarios` sigue reteniendo según `getSiiRetentionRate(year)`.
+
 ### 2026-04-11 — Payroll Deel ahora registra conectividad como haber canónico
 
 - `Payroll > Compensaciones` ya no oculta `Bono conectividad` para contratos `Contractor (Deel)` o `EOR (Deel)`.

@@ -74,6 +74,8 @@ interface ProjectedEntry {
   chileHealthAmount: number
   chileUnemploymentAmount: number
   chileTaxAmount: number
+  siiRetentionRate: number | null
+  siiRetentionAmount: number | null
   chileApvAmount: number
   chileUfValue: number | null
   chileColacionAmount?: number | null
@@ -187,6 +189,8 @@ const chipTooltip = (color: 'success' | 'warning' | 'error' | 'secondary') => {
 
 const isInternationalRegime = (e: ProjectedEntry) =>
   e.payRegime === 'international' || (e.currency === 'USD' && e.chileTotalDeductions === 0)
+
+const isHonorariosProjectedEntry = (e: ProjectedEntry) => (e.siiRetentionAmount ?? 0) > 0
 
 const currencySummaryLabel = (byCurrency: Record<string, number>) => {
   const parts: string[] = []
@@ -381,6 +385,21 @@ const ProjectedPayrollView = () => {
 
         if (isInternationalRegime(e)) {
           return <Tooltip title='Régimen USD internacional — sin retenciones previsionales chilenas'><CustomChip round='true' size='small' variant='tonal' color='secondary' label='Sin descuentos' /></Tooltip>
+        }
+
+        if (isHonorariosProjectedEntry(e)) {
+          return (
+            <Tooltip title='Honorarios Chile — retención SII'>
+              <Stack alignItems='flex-end' spacing={0.25}>
+                <Typography variant='body2' color='error.main'>
+                  {formatCurrency(-(e.siiRetentionAmount ?? e.chileTotalDeductions), e.currency as 'CLP' | 'USD')}
+                </Typography>
+                <Typography variant='caption' color='text.secondary'>
+                  Retención SII
+                </Typography>
+              </Stack>
+            </Tooltip>
+          )
         }
 
         return <Typography variant='body2' color='error.main'>{formatCurrency(-e.chileTotalDeductions, e.currency as 'CLP' | 'USD')}</Typography>
@@ -732,17 +751,41 @@ const ProjectedPayrollView = () => {
                                                 <CustomAvatar skin='light' color='error' variant='rounded' size={28}>
                                                   <i className='tabler-receipt-tax' style={{ fontSize: 16 }} />
                                                 </CustomAvatar>
-                                                <Typography variant='subtitle2'>Descuentos</Typography>
+                                                <Typography variant='subtitle2'>
+                                                  {isHonorariosProjectedEntry(e) ? 'Retención honorarios' : 'Descuentos'}
+                                                </Typography>
                                               </Stack>
-                                              <Stack spacing={0.5}>
-                                                <LineItem label='AFP' value={formatCurrency(-e.chileAfpAmount, cur)} color='error.main' />
-                                                <LineItem label='Salud' value={formatCurrency(-e.chileHealthAmount, cur)} color='error.main' />
-                                                <LineItem label='Cesantía' value={formatCurrency(-e.chileUnemploymentAmount, cur)} color='error.main' />
-                                                {e.chileApvAmount > 0 && <LineItem label='APV' value={formatCurrency(-e.chileApvAmount, cur)} color='error.main' />}
-                                                <LineItem label='Impuesto' value={formatCurrency(-e.chileTaxAmount, cur)} color='error.main' />
-                                              </Stack>
+                                              {isHonorariosProjectedEntry(e) ? (
+                                                <Stack spacing={0.5}>
+                                                  <LineItem
+                                                    label='Retención SII'
+                                                    value={formatCurrency(-(e.siiRetentionAmount ?? e.chileTotalDeductions), cur)}
+                                                    color='error.main'
+                                                  />
+                                                  <LineItem
+                                                    label='Tasa'
+                                                    value={e.siiRetentionRate != null ? `${(e.siiRetentionRate * 100).toFixed(2)}%` : '—'}
+                                                  />
+                                                  <Typography variant='caption' color='text.secondary' sx={{ pt: 0.5 }}>
+                                                    Boleta de honorarios Chile
+                                                  </Typography>
+                                                </Stack>
+                                              ) : (
+                                                <Stack spacing={0.5}>
+                                                  <LineItem label='AFP' value={formatCurrency(-e.chileAfpAmount, cur)} color='error.main' />
+                                                  <LineItem label='Salud' value={formatCurrency(-e.chileHealthAmount, cur)} color='error.main' />
+                                                  <LineItem label='Cesantía' value={formatCurrency(-e.chileUnemploymentAmount, cur)} color='error.main' />
+                                                  {e.chileApvAmount > 0 && <LineItem label='APV' value={formatCurrency(-e.chileApvAmount, cur)} color='error.main' />}
+                                                  <LineItem label='Impuesto' value={formatCurrency(-e.chileTaxAmount, cur)} color='error.main' />
+                                                </Stack>
+                                              )}
                                               <Divider />
-                                              <LineItem label='Total descuentos' value={formatCurrency(-e.chileTotalDeductions, cur)} color='error.main' bold />
+                                              <LineItem
+                                                label={isHonorariosProjectedEntry(e) ? 'Total retención' : 'Total descuentos'}
+                                                value={formatCurrency(-e.chileTotalDeductions, cur)}
+                                                color='error.main'
+                                                bold
+                                              />
                                             </Stack>
                                           </CardContent>
                                         </Card>
