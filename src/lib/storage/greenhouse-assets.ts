@@ -703,6 +703,8 @@ export const canTenantAccessAsset = ({
       return canAccessPayrollExportAsset(tenant)
     case 'certification_draft':
     case 'certification':
+    case 'evidence_draft':
+    case 'evidence':
       return canAccessCertificationAsset(tenant, asset)
     default:
       return false

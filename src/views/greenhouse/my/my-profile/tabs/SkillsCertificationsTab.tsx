@@ -1187,6 +1187,7 @@ function AddEvidenceDialog({
     evidenceType: EvidenceType
     relatedSkillCode: string | null
     relatedToolCode: string | null
+    assetId: string | null
     externalUrl: string | null
   }) => Promise<void>
 }) {
@@ -1195,6 +1196,7 @@ function AddEvidenceDialog({
   const [evidenceType, setEvidenceType] = useState<EvidenceType>('project_highlight')
   const [relatedSkill, setRelatedSkill] = useState<SkillCatalogItem | null>(null)
   const [relatedTool, setRelatedTool] = useState<ToolCatalogItem | null>(null)
+  const [evidenceAsset, setEvidenceAsset] = useState<UploadedFileValue | null>(null)
   const [externalUrl, setExternalUrl] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -1212,6 +1214,7 @@ function AddEvidenceDialog({
         evidenceType,
         relatedSkillCode: relatedSkill?.skillCode ?? null,
         relatedToolCode: relatedTool?.toolCode ?? null,
+        assetId: evidenceAsset?.assetId ?? null,
         externalUrl: externalUrl.trim() || null
       })
       handleClose()
@@ -1228,6 +1231,7 @@ function AddEvidenceDialog({
     setEvidenceType('project_highlight')
     setRelatedSkill(null)
     setRelatedTool(null)
+    setEvidenceAsset(null)
     setExternalUrl('')
     setError(null)
     onClose()
@@ -1293,12 +1297,26 @@ function AddEvidenceDialog({
             disabled={submitting}
             noOptionsText='Sin herramientas disponibles'
           />
+          <GreenhouseFileUploader
+            contextType='evidence_draft'
+            title='Archivo de evidencia'
+            helperText='PDF, JPG, PNG o WebP. Máximo 10 MB.'
+            emptyTitle='Arrastra tu evidencia aquí'
+            emptyDescription='Sube un archivo que respalde este proyecto o muestra de trabajo.'
+            browseCta='Seleccionar archivo'
+            replaceCta='Reemplazar archivo'
+            value={evidenceAsset}
+            onChange={setEvidenceAsset}
+            disabled={submitting}
+          />
           <TextField
             label={GH_SKILLS_CERTS.evidence_field_url}
             value={externalUrl}
             onChange={e => setExternalUrl(e.target.value)}
             disabled={submitting}
             placeholder={GH_SKILLS_CERTS.evidence_field_url_placeholder}
+            size='small'
+            helperText='Link externo opcional (ej. Behance, GitHub, portfolio)'
           />
           {error && <Alert severity='error'>{error}</Alert>}
         </Stack>
@@ -1341,6 +1359,7 @@ function EvidenceSection({
     evidenceType: EvidenceType
     relatedSkillCode: string | null
     relatedToolCode: string | null
+    assetId: string | null
     externalUrl: string | null
   }) => Promise<void>
   onRemove: (evidenceId: string) => Promise<void>
@@ -2383,6 +2402,7 @@ const SkillsCertificationsTab = ({ mode, memberId }: SkillsCertificationsTabProp
     evidenceType: EvidenceType
     relatedSkillCode: string | null
     relatedToolCode: string | null
+    assetId: string | null
     externalUrl: string | null
   }) => {
     const url =

@@ -8,14 +8,14 @@ import { ROLE_CODES } from '@/config/role-codes'
 
 export const dynamic = 'force-dynamic'
 
-const isDraftContext = (value: string): value is Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'certification_draft'> =>
-  value === 'leave_request_draft' || value === 'purchase_order_draft' || value === 'certification_draft'
+const isDraftContext = (value: string): value is Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'certification_draft' | 'evidence_draft'> =>
+  value === 'leave_request_draft' || value === 'purchase_order_draft' || value === 'certification_draft' || value === 'evidence_draft'
 
 const canUploadForContext = ({
   contextType,
   tenant
 }: {
-  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'certification_draft'>
+  contextType: Extract<GreenhouseAssetContext, 'leave_request_draft' | 'purchase_order_draft' | 'certification_draft' | 'evidence_draft'>
   tenant: Awaited<ReturnType<typeof requireTenantContext>>['tenant']
 }) => {
   if (!tenant) {
@@ -26,7 +26,7 @@ const canUploadForContext = ({
     return Boolean(tenant.memberId) || hasRouteGroup(tenant, 'hr') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
   }
 
-  if (contextType === 'certification_draft') {
+  if (contextType === 'certification_draft' || contextType === 'evidence_draft') {
     return Boolean(tenant.memberId) || hasRouteGroup(tenant, 'hr') || hasRoleCode(tenant, ROLE_CODES.EFEONCE_ADMIN)
   }
 
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
     const ownerClientId = ownerClientIdRaw || tenant.clientId || null
     const ownerSpaceId = ownerSpaceIdRaw || tenant.spaceId || null
 
-    const memberOwnerContexts = ['leave_request_draft', 'certification_draft'] as const
+    const memberOwnerContexts = ['leave_request_draft', 'certification_draft', 'evidence_draft'] as const
     const needsMemberOwner = (memberOwnerContexts as readonly string[]).includes(contextTypeValue)
 
     const fallbackOwnerMemberId =
