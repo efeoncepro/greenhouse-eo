@@ -1,5 +1,14 @@
 # Handoff.md
 
+## Sesion 2026-04-11 — TASK-314: Talent Profile Enterprise Program activado
+
+- tipo: `umbrella` — coordinación, no código
+- TASK-313 completada → programa desbloqueado
+- TASK-314 movida a `in-progress`; referencias a TASK-313 corregidas (`to-do/` → `complete/`)
+- TASK_ID_REGISTRY.md sincronizado (TASK-313: complete, TASK-314: in-progress)
+- Próximo paso del programa: TASK-315 (Talent Taxonomy & Canonical Model)
+- Cadena: `313 ✓ → 315 → 316 → 317 → 318 → 319 → 320`
+
 ## Sesion 2026-04-11 — bloque TASK-343 a TASK-351 para implementación canónica de Quotation
 
 - alcance cerrado:

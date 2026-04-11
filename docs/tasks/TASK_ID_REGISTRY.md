@@ -362,8 +362,8 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-310` | `to-do` | Partner Cost Tracking + Profitability | `docs/tasks/to-do/TASK-310-partnership-cost-tracking-profitability.md` |
 | `TASK-311` | `to-do` | Partner Contacts + Role Label | `docs/tasks/to-do/TASK-311-partnership-contacts-role-label.md` |
 | `TASK-312` | `to-do` | Partnership Automation + Alerts | `docs/tasks/to-do/TASK-312-partnership-automation-alerts.md` |
-| `TASK-313` | `to-do` | Skills y Certificaciones: perfil profesional, verificación Efeonce y CRUD | `docs/tasks/to-do/TASK-313-skills-certifications-profile-crud.md` |
-| `TASK-314` | `to-do` | Talent Profile Enterprise Program | `docs/tasks/to-do/TASK-314-talent-profile-enterprise-program.md` |
+| `TASK-313` | `complete` | Skills y Certificaciones: perfil profesional, verificación Efeonce y CRUD | `docs/tasks/complete/TASK-313-skills-certifications-profile-crud.md` |
+| `TASK-314` | `in-progress` | Talent Profile Enterprise Program | `docs/tasks/in-progress/TASK-314-talent-profile-enterprise-program.md` |
 | `TASK-315` | `to-do` | Talent Taxonomy & Canonical Professional Model | `docs/tasks/to-do/TASK-315-talent-taxonomy-canonical-model.md` |
 | `TASK-316` | `to-do` | Talent Trust Ops: Verification, Certification Governance & Review Queue | `docs/tasks/to-do/TASK-316-talent-trust-ops-verification-governance.md` |
 | `TASK-317` | `to-do` | Internal Talent Discovery: Search, Filters & Ranking | `docs/tasks/to-do/TASK-317-internal-talent-discovery-search-ranking.md` |

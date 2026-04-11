@@ -6,12 +6,12 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `umbrella`
-- Status real: `Diseno`
+- Status real: `In Progress`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -61,13 +61,13 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/to-do/TASK-313-skills-certifications-profile-crud.md`
+- `docs/tasks/complete/TASK-313-skills-certifications-profile-crud.md`
 
 ## Dependencies & Impact
 
 ### Depends on
 
-- `docs/tasks/to-do/TASK-313-skills-certifications-profile-crud.md`
+- `docs/tasks/complete/TASK-313-skills-certifications-profile-crud.md`
 
 ### Blocks / Impacts
 
@@ -78,7 +78,7 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `docs/tasks/to-do/TASK-313-skills-certifications-profile-crud.md`
+- `docs/tasks/complete/TASK-313-skills-certifications-profile-crud.md`
 - `docs/tasks/to-do/TASK-315-talent-taxonomy-canonical-model.md`
 - `docs/tasks/to-do/TASK-316-talent-trust-ops-verification-governance.md`
 - `docs/tasks/to-do/TASK-317-internal-talent-discovery-search-ranking.md`
@@ -166,7 +166,7 @@ Dependencias lógicas:
 
 ## Follow-ups
 
-- re-priorizar slices según feedback del negocio una vez que `TASK-313` esté implementada
+- re-priorizar slices según feedback del negocio — `TASK-313` ya completada (2026-04-11), siguiente: `TASK-315`
 
 ## Open Questions
 
