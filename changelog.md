@@ -6,6 +6,7 @@
 
 - `docs/tasks/to-do/TASK-156-sla-slo-per-service.md` ahora define la cadena correcta `SLI -> SLO -> SLA` por servicio.
 - La lane deja explícito que primero se modela la métrica observable, luego el objetivo operativo y finalmente el compromiso contractual.
+- La task ahora exige también CRUD en Admin Center para setear y gobernar esas definiciones por servicio.
 - `docs/tasks/TASK_ID_REGISTRY.md` quedó alineado con el título `SLI/SLO/SLA Contractual per Service`.
 
 ### 2026-04-13 — TASK-031 queda rebaselined al runtime actual

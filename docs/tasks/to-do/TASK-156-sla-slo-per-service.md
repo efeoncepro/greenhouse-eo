@@ -19,6 +19,7 @@
   - **SLO (Service Level Objective)** = el objetivo operativo/umbral interno que ese SLI debe cumplir
   - **SLA (Service Level Agreement)** = el compromiso contractual expuesto al cliente, apoyado en uno o más SLI/SLO
 - No diseñar la lane solo como tabla de targets; debe quedar explícito qué se mide, con qué fórmula y contra qué umbral se evalúa.
+- El seteo y gobierno de estas definiciones debe tener CRUD explícito en Admin Center; no dejarse solo como endpoint técnico o config escondida.
 
 ## Status
 
@@ -35,7 +36,7 @@
 
 ## Summary
 
-Definir por servicio los SLI observables, los SLO operativos y los SLA contractuales: response time, first delivery time, revision rounds limit, OTD target %, RPA target y otras métricas verificables. Calcular compliance comparando target vs actual sobre indicadores explícitos, detectar trending-toward-breach antes del breach real y mostrar el estado en service detail y Space 360.
+Definir por servicio los SLI observables, los SLO operativos y los SLA contractuales: response time, first delivery time, revision rounds limit, OTD target %, RPA target y otras métricas verificables. La lane debe incluir CRUD en Admin Center para setear y gobernar esas definiciones, calcular compliance comparando target vs actual sobre indicadores explícitos, detectar trending-toward-breach antes del breach real y mostrar el estado en service detail y Space 360.
 
 ## Architecture Reference
 
@@ -49,9 +50,9 @@ Definir por servicio los SLI observables, los SLO operativos y los SLA contractu
 
 ## Scope
 
-### Slice 1 — Data model + CRUD (~4h)
+### Slice 1 — Data model + CRUD admin (~4h)
 
-`service_sla_definitions` table: `service_id`, `metric` (otd_pct, rpa_target, response_hours, first_delivery_days, max_revision_rounds), `indicator_formula` / `measurement_source`, `target_value`, `breach_threshold`, `created_at`. CRUD API: `GET/POST/PUT /api/agency/services/[serviceId]/sla`. UI form para definir por servicio qué SLI se mide, cuál es su SLO y cuál es el target contractual expuesto como SLA.
+`service_sla_definitions` table: `service_id`, `metric` (otd_pct, rpa_target, response_hours, first_delivery_days, max_revision_rounds), `indicator_formula` / `measurement_source`, `target_value`, `breach_threshold`, `created_at`. CRUD API: `GET/POST/PUT /api/agency/services/[serviceId]/sla`. Admin Center UI para definir por servicio qué SLI se mide, cuál es su SLO y cuál es el target contractual expuesto como SLA.
 
 ### Slice 2 — Compliance engine (~5h)
 
@@ -65,6 +66,7 @@ Service detail: tabla de definiciones SLI/SLO/SLA + compliance status por métri
 
 - [ ] Cada definición por servicio deja explícito qué SLI se mide y desde qué fuente se calcula
 - [ ] El modelo distingue con claridad indicador observado (SLI), objetivo operativo (SLO) y compromiso contractual (SLA)
+- [ ] Existe CRUD en Admin Center para crear, editar y ajustar las definiciones por servicio
 - [ ] SLA definitions stored per service with configurable targets
 - [ ] Compliance computed: Met / At-Risk / Breached per metric
 - [ ] Trending-toward-breach detected before actual breach
@@ -79,5 +81,6 @@ Service detail: tabla de definiciones SLI/SLO/SLA + compliance status por métri
 |---------|--------|
 | `src/lib/agency/sla-compliance.ts` | New — compliance engine |
 | `src/app/api/agency/services/[serviceId]/sla/route.ts` | New — SLA CRUD + compliance API |
+| `src/views/greenhouse/admin/**` | Add Admin Center CRUD surface for SLI/SLO/SLA governance |
 | `src/views/greenhouse/agency/services/ServiceDetailView.tsx` | Add SLA section |
 | `src/views/greenhouse/agency/space-360/tabs/ServicesTab.tsx` | Add SLA health badge |

@@ -12,6 +12,7 @@
   - `SLI` queda definido como la métrica observable que se mide
   - `SLO` queda como el objetivo operativo sobre ese indicador
   - `SLA` queda como el compromiso contractual apoyado en esos indicadores
+  - el seteo y gobierno de estas definiciones queda exigido como CRUD en Admin Center
 - validación:
   - `git diff --check`
 
