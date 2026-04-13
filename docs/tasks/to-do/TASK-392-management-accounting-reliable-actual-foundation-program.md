@@ -69,7 +69,8 @@ Reglas obligatorias:
 - `TASK-174` — quality gates y controles de consistencia
 - `TASK-175` — cobertura del nucleo finance / cost intelligence
 - `TASK-176` — costo laboral fully-loaded con provisiones
-- `TASK-179` — reconciliacion finance Postgres-first
+- `TASK-179` — reconciliacion finance Postgres-first (prerequisito para actual limpio)
+- `TASK-401` — continuous matching (sin conciliación diaria, el actual siempre tiene lag de un mes)
 - `TASK-167` — scope organizacional del operational P&L
 
 ### Blocks / Impacts

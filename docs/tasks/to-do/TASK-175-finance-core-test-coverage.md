@@ -60,6 +60,8 @@ Si alguien modifica la query de `listFinanceIncomeFromPostgres()` y rompe el JOI
 - **Impacta a:**
   - TASK-174 (data integrity — tests de concurrencia pueden agregarse aqui)
   - TASK-179 (reconciliation cutover — tests validan pre/post migracion)
+  - TASK-401 (continuous matching — red de seguridad necesaria antes de refactorizar reconciliation.ts)
+  - TASK-392 (management accounting — sin tests sobre el core Finance no hay "actual confiable" auditable)
   - CI pipeline (mas tests = mas confianza en deploys)
 - **Archivos owned:**
   - `src/lib/finance/__tests__/postgres-store-slice2.test.ts` (nuevo)

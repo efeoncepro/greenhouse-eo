@@ -69,17 +69,24 @@ Reglas obligatorias:
 
 ### Depends on
 
+- `TASK-174` — idempotency keys y locking: prerequisito para que el motor de auto-match no genere double-match en retries
+- `TASK-175` — test coverage sobre `reconciliation.ts` antes de refactorizarlo como motor standalone
+- `TASK-179` — **prerequisito directo**: la reconciliación debe estar en Postgres-only antes de implementar el motor continuo; operar auto-match sobre dual-write es riesgo de inconsistencia
 - `greenhouse_finance.income_payments` — campo `is_reconciled`, `payment_account_id`
-- `greenhouse_finance.expense_payments` — campo `is_reconciled`, `payment_account_id`
 - `greenhouse_finance.settlement_legs` — fuente primaria de movimientos bancarios conciliados
 - Pipeline Nubox sync (Cloud Run / `src/lib/sync/`) — origen de movimientos bancarios
 - TASK-399 — Native Integrations Runtime Hardening (puede afectar el pipeline de sync)
 
 ### Blocks / Impacts
 
+- `TASK-392` — management accounting: sin matching continuo el "actual confiable" tiene lag mensual
 - Vista Cobros (`CashInListView`) — estado de conciliación por cobro
 - Vista Banco (`BankDetailView`) — coverage y movimientos sin conciliar
 - Flujo de conciliación mensual (`reconciliation_periods`) — debe coexistir sin conflicto
+
+### Quality Enhancers (no bloqueantes)
+
+- `TASK-212` (Nubox line items sync) — cuando esté lista, los movimientos de Nubox tendrán folio, RUT y descripción completos, mejorando el scoring del auto-match de ~70% a ~95% de precisión
 
 ### Files owned
 

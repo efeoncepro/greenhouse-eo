@@ -74,7 +74,9 @@ PUT /api/finance/reconciliation/[id]  (marcar reconciled)
   - Schema `greenhouse_finance` (ya existe)
 - **Impacta a:**
   - TASK-175 (test coverage — necesita tests de concurrencia)
-  - TASK-179 (reconciliation cutover — se beneficia del locking)
+  - TASK-179 (reconciliation cutover — locking es prerequisito para cortar dual-write con seguridad)
+  - TASK-401 (continuous matching — idempotency keys previenen double-match en auto-reconciliation)
+  - TASK-392 (management accounting — actuals confiables requieren integridad de escritura)
   - Todo consumer de Finance API (mobile, integraciones futuras)
 - **Archivos owned:**
   - `src/app/api/finance/expenses/bulk/route.ts`

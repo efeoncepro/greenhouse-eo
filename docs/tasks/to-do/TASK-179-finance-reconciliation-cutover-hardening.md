@@ -69,6 +69,8 @@ WHEN NOT MATCHED THEN INSERT ...
   - Datos de reconciliacion ya migrados a Postgres (verificar completeness)
 - **Impacta a:**
   - TASK-175 (test coverage — tests post-cutover validan Postgres-only paths)
+  - TASK-401 (continuous matching — TASK-179 es prerequisito directo: auto-match solo puede correr sobre Postgres-only sin dual-write)
+  - TASK-392 (management accounting — reconciliación Postgres-first es fundamento del actual confiable)
   - BigQuery cost — elimina writes redundantes
   - Latencia de reconciliation — elimina BigQuery roundtrip
   - HubSpot sync reliability — schema validation previene data loss
