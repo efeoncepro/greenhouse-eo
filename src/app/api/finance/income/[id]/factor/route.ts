@@ -88,6 +88,15 @@ export async function POST(
 
     const operationDate = assertDateString(body.operationDate, 'operationDate')
 
+    const todayInSantiago = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date())
+
+    if (operationDate > todayInSantiago) {
+      return NextResponse.json(
+        { error: `La fecha de operación no puede ser futura. Hoy es ${todayInSantiago}.` },
+        { status: 400 }
+      )
+    }
+
     const paymentAccountId = normalizeString(body.paymentAccountId)
 
     if (!paymentAccountId) {
