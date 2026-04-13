@@ -431,4 +431,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-379` | `complete` | Reactive Projections Enterprise Hardening | `docs/tasks/complete/TASK-379-reactive-projections-enterprise-hardening.md` |
 | `TASK-380` | `to-do` | Structured Context Layer Foundation | `docs/tasks/to-do/TASK-380-structured-context-layer-foundation.md` |
 | `TASK-381` | `to-do` | Structured Context Layer Enterprise Hardening | `docs/tasks/to-do/TASK-381-structured-context-layer-enterprise-hardening.md` |
-| `TASK-382` | `to-do` | Email System Enterprise Hardening | `docs/tasks/to-do/TASK-382-email-system-enterprise-hardening.md` |
+| `TASK-382` | `complete` | Email System Enterprise Hardening | `docs/tasks/complete/TASK-382-email-system-enterprise-hardening.md` |
+| `TASK-383` | `to-do` | Email Observabilidad | `docs/tasks/to-do/TASK-383-email-observabilidad.md` |
+| `TASK-384` | `to-do` | Email Compliance & Retención GDPR | `docs/tasks/to-do/TASK-384-email-compliance-retencion.md` |
+| `TASK-385` | `to-do` | Email Scaling Cloud Run | `docs/tasks/to-do/TASK-385-email-scaling-cloud-run.md` |
