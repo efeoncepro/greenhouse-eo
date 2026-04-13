@@ -58,6 +58,11 @@ Reglas obligatorias:
 - La Structured Context Layer es sidecar: guarda contexto flexible, snapshots controlados, payloads normalizados y memoria operativa; no reemplaza tablas de dominio cuando un dato se vuelve crítico, consultable o transaccional.
 - Todo documento de contexto debe ser tenant-safe, tipado por `context_kind` y versionado por `schema_version`.
 - Ningún writer puede introducir `new Pool()` ni leer `GREENHOUSE_POSTGRES_*` directo; usar `getDb`, `query` o `withTransaction`.
+- Regla explícita para agentes:
+  - si el dato es verdad canónica del negocio, usar modelo relacional
+  - si el dato es contexto flexible persistible y reusable dentro de PostgreSQL, usar `JSONB`
+  - si solo importa preservar representación cruda exacta y no necesitas comportamiento de DB, `JSON` es excepcionalmente aceptable
+  - si el campo empieza a usarse para joins, reporting, access control o reglas de negocio, debe promocionarse a columnas/tablas relacionales
 
 ## Normative Docs
 
@@ -172,6 +177,13 @@ La decisión arquitectónica central es que Greenhouse necesita una memoria estr
 - replay context de eventos o proyecciones
 - bundles de auditoría y resolución de supuestos
 - memoria de trabajo operativa que hoy termina enterrada en docs o prompts
+
+La implementación de esta task debe dejar una guía reusable para agentes y developers sobre cuándo aplicar:
+
+- tabla/columna relacional
+- `JSONB` inline local
+- `JSONB` en la Structured Context Layer
+- `JSON` como excepción
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING

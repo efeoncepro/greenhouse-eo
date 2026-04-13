@@ -145,6 +145,68 @@ Si un dato se vuelve:
 
 entonces debe pasar al modelo relacional.
 
+## Guia rápida para agentes: cuando usar JSON, JSONB y cuando no
+
+Esta guía baja la decisión a reglas simples.
+
+### Usa modelo relacional cuando
+
+El dato forma parte de la verdad principal del negocio.
+
+Ejemplos:
+
+- estados oficiales
+- montos y balances
+- relaciones entre entidades
+- ownership y tenant isolation
+- permisos
+- fechas contractuales
+- campos que el sistema filtra o joinea todo el tiempo
+
+Si el dato define cómo funciona Greenhouse, no debería ir a JSON ni a JSONB.
+
+### Usa JSONB cuando
+
+El dato es contexto flexible, pero aun así tiene valor operativo y Greenhouse puede querer leerlo después de forma estructurada.
+
+Ejemplos:
+
+- payload normalizado de una integración
+- contexto para replay de un proceso reactivo
+- evidencia de auditoría
+- snapshot explicativo
+- supuestos o resultados de un agente
+- metadata local pequeña y bien acotada
+
+La idea es: contexto reusable sí, verdad canónica no.
+
+### Usa JSON solo en casos excepcionales
+
+Dentro de Greenhouse, `JSON` puro debería ser raro.
+
+Solo tiene sentido cuando importa conservar una representación casi tal cual llegó y no necesitas lo que normalmente da `JSONB` en PostgreSQL.
+
+Ejemplo mental:
+
+- un payload crudo que quieres preservar tal como vino
+
+Si va a vivir en PostgreSQL y después Greenhouse puede inspeccionarlo, mezclarlo o consultarlo, lo normal debería ser `JSONB`.
+
+### No uses ninguno cuando
+
+El problema real es que todavía no modelaste bien el dato.
+
+No conviene crear campos genéricos como:
+
+- `metadata_jsonb`
+- `extra_json`
+- `payload`
+- `data`
+
+solo para patear la decisión.
+
+Si el dato ya se volvió importante para joins, reporting o reglas de negocio, la salida correcta suele ser una tabla o columna relacional.
+
 ## Como pensar la capa en una frase
 
 La mejor forma de verla es esta:

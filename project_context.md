@@ -12,6 +12,10 @@
   - funciona como sidecar del modelo canónico, no como reemplazo de tablas relacionales
   - todo documento debe ser tenant-safe, tipado por `context_kind` y versionado por `schema_version`
   - se orienta a integraciones, replay reactivo, trazabilidad operativa y memoria estructurada para trabajo asistido por agentes
+  - heurística explícita para agentes:
+    - verdad canónica de negocio -> relacional
+    - contexto estructurado reusable en PostgreSQL -> `JSONB`
+    - representación cruda exacta sin semántica de DB -> `JSON` solo como excepción
 - criterio de modelado:
   - si un dato se vuelve transaccional, consultable de forma intensiva o contractual para negocio, debe promocionarse a tabla relacional
   - JSONB queda reservado para contexto flexible, payloads normalizados, snapshots controlados y bundles de auditoría
