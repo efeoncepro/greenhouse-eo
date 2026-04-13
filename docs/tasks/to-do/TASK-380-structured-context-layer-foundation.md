@@ -34,6 +34,7 @@ Hoy el repo ya usa JSON/JSONB en varios módulos, pero de forma dispersa y sin u
 - Crear una foundation canónica `greenhouse_context` para documentos de contexto estructurado.
 - Materializar una librería runtime tipada para leer/escribir contexto con validación y tenant isolation.
 - Dejar el primer set de `context_kind` orientado a integraciones, reactividad y trabajo de agentes.
+- Incluir guardrails enterprise de clasificación, retención, redacción, idempotencia y límites de tamaño desde el diseño base.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -63,6 +64,8 @@ Reglas obligatorias:
   - si el dato es contexto flexible persistible y reusable dentro de PostgreSQL, usar `JSONB`
   - si solo importa preservar representación cruda exacta y no necesitas comportamiento de DB, `JSON` es excepcionalmente aceptable
   - si el campo empieza a usarse para joins, reporting, access control o reglas de negocio, debe promocionarse a columnas/tablas relacionales
+- La foundation no puede almacenar secretos, tokens, cookies, credenciales ni blobs binarios/base64 grandes dentro de `document_jsonb`.
+- Cada `context_kind` debe tener política explícita de sensibilidad, retención y access scope.
 
 ## Normative Docs
 
@@ -154,6 +157,14 @@ Reglas obligatorias:
 - documentar anti-patrones y criterio de promoción a modelo físico
 - dejar tests o smoke checks que aseguren validación y aislamiento por tenant
 
+### Slice 5 — Enterprise hardening
+
+- definir envelope mínimo para clasificación, redacción y access scope
+- definir política de retención y expiración por `context_kind`
+- definir estrategia de idempotencia, `content_hash` y lineage entre documentos
+- definir límites de tamaño y prohibición de binarios/base64 en `document_jsonb`
+- definir manejo de validación fallida, observabilidad y quarantine/dead-letter operativo
+
 ## Out of Scope
 
 - migrar de golpe todos los JSONB existentes del repo
@@ -185,6 +196,15 @@ La implementación de esta task debe dejar una guía reusable para agentes y dev
 - `JSONB` en la Structured Context Layer
 - `JSON` como excepción
 
+Además, la foundation debe salir con criterios enterprise explícitos para:
+
+- clasificación de datos
+- retención
+- redacción
+- idempotencia
+- límites de tamaño
+- observabilidad y quarantine
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
      "Como compruebo que termine y que actualizo?"
@@ -199,6 +219,8 @@ La implementación de esta task debe dejar una guía reusable para agentes y dev
 - [ ] Existe una taxonomía inicial de `context_kind` con al menos dos validators reales
 - [ ] Al menos un consumer piloto escribe y lee contexto estructurado de forma tenant-safe
 - [ ] La arquitectura y el criterio de uso quedan documentados para equipos y agentes
+- [ ] Existen reglas explícitas de clasificación, retención, access scope, redacción e idempotencia para la foundation
+- [ ] La foundation prohíbe secretos y blobs binarios en `document_jsonb` y define estrategia de quarantine para documentos inválidos
 
 ## Verification
 
