@@ -1,5 +1,16 @@
 # project_context.md
 
+## Delta 2026-04-13 Root redirect del portal vuelve a respetar la policy canónica de Home
+
+- El repo ya no debe depender de redirects globales de Next para decidir el entrypoint autenticado del portal.
+- Runtime actualizado:
+  - `next.config.ts` ya no fuerza `source: '/' -> destination: '/dashboard'`
+  - el root vuelve a resolverse en `src/app/page.tsx` usando `session.user.portalHomePath`
+- Contrato operativo:
+  - `/` debe respetar la policy canónica de Home por sesión/rol/surface
+  - `/dashboard` puede seguir existiendo como compatibilidad o feature route, pero no como redirect estructural global
+  - cualquier cambio futuro de startup home debe pasar por la policy de `resolvePortalHomePath()` y el App Router, no por redirects opacos en `next.config.ts`
+
 ## Delta 2026-04-13 Management Accounting queda formalizado como capability distinta de contabilidad legal
 
 - Greenhouse ya tiene una decision arquitectonica explicita para el siguiente modulo financiero a institucionalizar.

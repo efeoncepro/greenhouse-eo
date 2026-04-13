@@ -108,7 +108,7 @@ Cuando alguien inicia sesion, el sistema calcula que secciones del menu mostrar 
 | Operaciones                   | "Gestion" (agencia, clientes, delivery) + "Personas"                                |
 | Nomina                        | "Gestion" + "Equipo/HR" + "Personas"                                                |
 | Superadministrador            | Todo: Gestion, Administracion, Finanzas, HR, Personas, IA, Mi Ficha, Portal cliente |
-| Cliente Ejecutivo             | Solo su portal: dashboard, proyectos, ciclos, equipo                                |
+| Cliente Ejecutivo             | Solo su portal: Pulse, proyectos, ciclos, equipo                                    |
 
 Cada vista individual del portal (53 en total) esta registrada en un catalogo. Si tu rol no te da acceso al grupo requerido, esa vista no aparece en tu menu.
 

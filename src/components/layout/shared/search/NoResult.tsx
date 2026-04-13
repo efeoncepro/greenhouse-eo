@@ -13,8 +13,8 @@ type NoResultData = {
 const noResultData: NoResultData[] = [
   {
     label: 'Pulse',
-    href: '/dashboards',
-    icon: 'tabler-trending-up'
+    href: '/home',
+    icon: 'tabler-smart-home'
   },
   {
     label: 'Spaces',

@@ -6,7 +6,8 @@ Catálogo de todas las vistas del portal organizadas por audiencia.
 
 | Vista | Ruta | Estado | Descripción |
 |-------|------|--------|-------------|
-| Pulse | `/dashboard` | Implementada | Dashboard con KPIs, charts, portfolio health, team, AI credits |
+| Pulse | `/home` | Implementada | Home canónica del portal cliente con accesos, contexto operativo y entrada a la experiencia moderna |
+| Pulse legacy | `/dashboard` | Compatibilidad | Vista legacy/feature route mantenida para deep links y compatibilidad gobernada |
 | Proyectos | `/proyectos` | Implementada | Lista de proyectos con tasks, RPA, review items |
 | Detalle Proyecto | `/proyectos/[id]` | Implementada | Tasks con assignee, ICO metrics, CSC phase |
 | Campañas | `/campanas` | Implementada | Lista + detalle de campañas con KPIs y equipo |
@@ -79,6 +80,6 @@ El JWT ahora incluye `memberId` e `identityProfileId` para colaboradores Efeonce
 
 | Audiencia | Sidebar | Home path |
 |-----------|---------|-----------|
-| Cliente | Pulse, Proyectos, Campañas, Revisiones, Ciclos, Equipo, Analytics, Novedades, Settings | `/dashboard` |
+| Cliente | Pulse, Proyectos, Campañas, Revisiones, Ciclos, Equipo, Analytics, Novedades, Settings | `/home` |
 | Colaborador | Mi Greenhouse, Mis Asignaciones, Mi Desempeño, Mi Delivery, Mi Perfil, Mi Nómina, Mis Permisos | `/my` |
-| Operador interno | Torre de Control, Agencia, Personas, Nómina, Departamentos, Permisos, Asistencia, Finanzas, Admin | `/internal/dashboard` |
+| Operador interno | Torre de Control, Agencia, Personas, Nómina, Departamentos, Permisos, Asistencia, Finanzas, Admin | `/home` |

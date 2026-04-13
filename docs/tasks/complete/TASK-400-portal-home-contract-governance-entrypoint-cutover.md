@@ -1,5 +1,20 @@
 # TASK-400 — Portal Home Contract Governance, Entrypoint Cutover & Dashboard Compatibility
 
+## Delta 2026-04-13 — Runtime principal ya quedó cortado a la policy canónica; resta cierre de drift residual
+
+- El repo ya no está en el estado descrito por la versión inicial de esta spec.
+- Estado real confirmado en discovery:
+  - `GET /` y `auth/landing` ya redirigen solo a `session.user.portalHomePath`
+  - `DEFAULT_PORTAL_HOME` de provisioning ya es `/home`
+  - `resolvePortalHomePath()` ya centraliza aliases legacy y defaults por policy
+  - `agent-session`, NextAuth y tenant access ya consumen la misma policy
+  - existe `scripts/backfill-portal-home-contract.ts` para normalizar valores legacy en PostgreSQL + BigQuery
+- Gap residual real:
+  - drift documental en arquitectura/documentación viva que todavía presenta `/dashboard` o `/internal/dashboard` como home estructural
+  - relictos visibles de navegación/copy que aún enlazan a `/dashboard` o `/dashboards`
+  - split de store en provisioning, porque todavía lee `greenhouse.clients.portal_home_path` como contexto upstream aunque el runtime auth/login converge sobre `client_users.default_portal_home_path`
+- Esta task ya no debe ejecutarse como foundation desde cero; debe cerrarse como lane de convergencia final y cleanup gobernado.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -8,22 +23,22 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Completada`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
-- Branch: `task/TASK-400-portal-home-contract-governance`
+- Branch: `develop`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Greenhouse hoy tiene multiples contratos de entrada conviviendo a la vez: `GET /` cae a `/dashboard`, `auth/landing` cae a `/home`, el resolver canonico normaliza algunos casos, provisioning sigue sembrando `/dashboard`, y decenas de guards/layouts usan fallbacks locales inconsistentes. Esta task formaliza un contrato enterprise para el entrypoint del portal, hace el cutover a una policy canonica reusable, gobierna la compatibilidad de `/dashboard` y elimina el drift entre auth, routing, provisioning, agent auth y navegacion.
+Greenhouse ya tiene el core del contrato de entrada cortado a una policy canónica (`/`, `auth/landing`, NextAuth y `agent-session`), pero la lane sigue abierta porque aún quedan relictos visibles de `/dashboard`, drift documental y un split residual entre el carril de acceso/login y el contexto que consume provisioning. Esta task termina la convergencia, gobierna la compatibilidad legacy y deja el cierre documental y operativo del contrato de Home.
 
 ## Why This Task Exists
 
@@ -101,7 +116,7 @@ Reglas obligatorias:
 - compatibilidad de rutas legacy `/dashboard` y `/internal/dashboard`
 - agent auth y verificacion headless
 - guards de acceso en `src/app/(dashboard)/**`
-- menus, search suggestions y dropdowns que hoy usan `portalHomePath || '/dashboard'`
+- menus, search suggestions y dropdowns que todavía pueden filtrar enlaces legacy o defaults locales fuera del choke point canónico
 - follow-on de `TASK-378`, porque endurecer SSR no corrige por si solo el contrato de entrada
 
 ### Files owned
@@ -113,6 +128,7 @@ Reglas obligatorias:
 - `src/app/page.tsx`
 - `src/app/auth/landing/page.tsx`
 - `src/app/api/auth/agent-session/route.ts`
+- `next.config.ts`
 - `src/configs/themeConfig.ts`
 - `src/data/navigation/verticalMenuData.tsx`
 - `src/data/navigation/horizontalMenuData.tsx`
@@ -127,8 +143,9 @@ Reglas obligatorias:
 - `src/lib/sync/projections/notifications.ts`
 - `scripts/setup-postgres-identity-v2.sql`
 - `scripts/backfill-postgres-identity-v2.ts`
+- `scripts/backfill-portal-home-contract.ts`
 - `src/app/(dashboard)/**`
-- `docs/tasks/to-do/TASK-400-portal-home-contract-governance-entrypoint-cutover.md`
+- `docs/tasks/complete/TASK-400-portal-home-contract-governance-entrypoint-cutover.md`
 
 ## Current Repo State
 
@@ -139,23 +156,22 @@ Reglas obligatorias:
 - `src/app/api/auth/agent-session/route.ts` ya devuelve `portalHomePath` desde la misma policy
 - `src/lib/tenant/resolve-portal-home-path.test.ts` ya tiene una base de tests para internal, HR y finance
 - `src/lib/tenant/get-tenant-context.ts` ya propaga un `portalHomePath` normalizado a pages y layouts
+- `src/app/page.tsx` y `src/app/auth/landing/page.tsx` ya quedaron cortados al `portalHomePath` de sesión sin fallback legacy
+- `next.config.ts` ya no fuerza `/ -> /dashboard`; el root vuelve a resolverse vía App Router y sesión
+- `src/lib/admin/tenant-member-provisioning.ts` ya usa `DEFAULT_PORTAL_HOME = '/home'`
+- `src/configs/themeConfig.ts`, menús base, `welcome.ts`, `view-access-catalog` y buena parte de la shell ya están alineados a `/home`
+- existe `scripts/backfill-portal-home-contract.ts` para PG + BigQuery
 
 ### Gap
 
-- `src/app/page.tsx` todavia redirige a `session.user.portalHomePath || '/dashboard'`
-- `src/app/auth/landing/page.tsx` usa otro fallback (`'/home'`)
-- `src/lib/admin/tenant-member-provisioning.ts` sigue sembrando `DEFAULT_PORTAL_HOME = '/dashboard'`
-- `src/lib/tenant/access.ts` todavia cae a `/dashboard` para tenants no internos si no hay valor persistido
-- existen decenas de pages/layouts con `redirect(tenant.portalHomePath || '/dashboard')`
-- menus y dropdowns siguen tomando `/dashboard` como fallback estructural
-- `themeConfig`, menús base, footers, search shortcuts, notificaciones y `view-access-catalog` siguen tratando `/dashboard` como home canónico
-- `src/data/searchData.ts` conserva además un relicto `'/dashboards'`
-- `/dashboard` sigue operando como startup contract aunque semanticamente ya no es la Home principal del portal
+- `src/lib/admin/tenant-member-provisioning.ts` sigue leyendo `greenhouse.clients.portal_home_path` como contexto upstream del tenant, en paralelo a `client_users.default_portal_home_path`
+- sobreviven algunos enlaces visibles legacy (`/dashboard` o `/dashboards`) fuera del choke point canónico
+- la surface `/dashboard` sigue viva como compatibilidad/feature route, así que cualquier deep link residual puede reintroducirla como entrypoint de facto
 - la surface `/dashboard` ademas tiene un bug funcional separado cuando faltan quality signals (`avgRpa` / `firstTimeRightPct` / `onTimePct`), lo que vuelve mas riesgoso seguir usandola como fallback masivo
 - el contrato está partido entre stores:
-  - BigQuery fallback en `src/lib/tenant/access.ts` lee `greenhouse.clients.portal_home_path`
+  - BigQuery fallback en `src/lib/tenant/access.ts` lee `greenhouse.client_users.default_portal_home_path`
   - PostgreSQL path en `src/lib/tenant/identity-store.ts` solo ve `greenhouse_core.client_users.default_portal_home_path` vía `greenhouse_serving.session_360`
-  - `agent-session` usa PG-only y puede divergir del login interactivo
+  - provisioning todavía toma contexto desde `greenhouse.clients.portal_home_path`
 - la arquitectura viva también está desalineada:
   - `GREENHOUSE_IDENTITY_ACCESS_V2.md`, `GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md` y otras specs aún documentan `/dashboard`, `/internal/dashboard`, `/finance/dashboard`, `/hr/leave` y `/my/profile` como homes base
 
@@ -283,13 +299,13 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] `GET /` autenticado resuelve al home canonico y ya no depende de `|| '/dashboard'`
-- [ ] `auth/landing`, `agent-session`, session auth y provisioning usan la misma policy de home
-- [ ] no quedan fallbacks estructurales a `/dashboard` fuera de compatibilidad legacy explícitamente documentada
-- [ ] los valores legacy persistidos relevantes quedan normalizados o remapeados mediante policy + backfill gobernado
-- [ ] `/dashboard` deja de ser el startup contract del portal
-- [ ] si `/dashboard` sigue accesible por compatibilidad, no explota cuando faltan quality/delivery signals
-- [ ] existe cobertura de tests para internal, HR, finance, collaborator puro, legacy aliases y valores no soportados
+- [x] `GET /` autenticado resuelve al home canonico y ya no depende de `|| '/dashboard'`
+- [x] `auth/landing`, `agent-session`, session auth y provisioning usan la misma policy de home
+- [x] no quedan fallbacks estructurales a `/dashboard` fuera de compatibilidad legacy explícitamente documentada
+- [x] los valores legacy persistidos relevantes quedan normalizados o remapeados mediante policy + backfill gobernado
+- [x] `/dashboard` deja de ser el startup contract del portal
+- [x] si `/dashboard` sigue accesible por compatibilidad, no explota cuando faltan quality/delivery signals
+- [x] existe cobertura de tests para internal, HR, finance, collaborator puro, legacy aliases y valores no soportados
 
 ## Verification
 
@@ -302,15 +318,28 @@ Reglas obligatorias:
 - `pnpm staging:request /dashboard`
 - verificación manual de navegación autenticada en preview o staging
 
+Verificación local efectiva de cierre:
+
+- `pnpm lint`
+- `pnpm build`
+- `rg -n "new Pool\\(" src scripts`
+- runtime local autenticado vía `POST /api/auth/agent-session` contra `http://localhost:3105`
+  - `GET /` -> `307 /hr/payroll`
+  - `GET /home` -> `200`
+  - `GET /dashboard` -> `200`
+  - `GET /hr/payroll` -> `200`
+- hallazgo resuelto durante verificación:
+  - `next.config.ts` todavía tenía un redirect global `/ -> /dashboard`; se eliminó para que el root respete la resolución canónica de `src/app/page.tsx`
+
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] `ISSUE-044` y `TASK-378` quedaron reconciliadas documentalmente para separar SSR issue de contract governance issue
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `ISSUE-044` y `TASK-378` quedaron reconciliadas documentalmente para separar SSR issue de contract governance issue
 
 ## Follow-ups
 
