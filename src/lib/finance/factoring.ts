@@ -65,7 +65,7 @@ const insertExpenseInTransaction = async (
     description: string
     amount: number
     paymentDate: string
-    supplierId: string
+    supplierId: string | null
     supplierName: string
     paymentReference: string | null
     actorUserId: string | null
