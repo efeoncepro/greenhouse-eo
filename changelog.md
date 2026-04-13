@@ -2,6 +2,12 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — TASK-380 queda materializada también en la base compartida
+
+- La migración `20260413113902271_structured-context-layer-foundation.sql` ya fue aplicada sobre el shared dev DB desde `develop`.
+- `src/types/db.d.ts` ahora expone las tablas de `greenhouse_context`.
+- Con esto se cierra el gap operativo que quedaba entre foundation en código y materialización real en PostgreSQL.
+
 ### 2026-04-13 — TASK-380 materializa la foundation runtime de Structured Context Layer
 
 - Se agregó la migración `20260413113902271_structured-context-layer-foundation.sql` para crear `greenhouse_context` con documentos, versiones, quarantine y guardrails base.

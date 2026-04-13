@@ -1,5 +1,17 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — TASK-380 gap operativo cerrado en develop
+
+- cierre del gap:
+  - `pnpm pg:connect:migrate` ya aplicó `20260413113902271_structured-context-layer-foundation.sql` en el shared dev DB
+  - `src/types/db.d.ts` quedó regenerado en `develop` con las tablas de `greenhouse_context`
+- validación ejecutada:
+  - `pnpm pg:connect:migrate`
+  - `pnpm exec vitest run src/lib/structured-context/validation.test.ts src/lib/structured-context/store.test.ts src/lib/structured-context/reactive.test.ts`
+- aprendizaje operativo confirmado:
+  - el bloqueo previo no era de la migración de `TASK-380`, sino drift temporal de historial con `TASK-379`
+  - una vez reconciliado `develop`, la materialización de DB cerró sin errores
+
 ## Sesion 2026-04-13 — TASK-380 foundation runtime implementada en worktree aislado
 
 - worktree usado:

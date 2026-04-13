@@ -9,12 +9,12 @@
 ## Status
 
 - Lifecycle: `to-do`
-- Lifecycle note: `implemented in branch; pending shared dev DB apply because the shared database is ahead of this branch with TASK-379 migration history`
+- Lifecycle note: `implemented in repo and applied in shared dev DB on develop`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Foundation implementada en rama`
+- Status real: `Foundation implementada y materializada`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -230,8 +230,10 @@ Además, la foundation debe salir con criterios enterprise explícitos para:
   - tests unitarios de la capa
   - eslint dirigido sobre runtime nuevo
   - `pnpm build`
-- Bloqueo real detectado:
-  - `pnpm pg:connect:migrate` no pudo aplicar en el shared dev DB porque ese entorno ya tiene corrida `20260413105218813_reactive-pipeline-v2-circuit-breaker` de `TASK-379`, migración que esta rama/worktree todavía no trae
+- Resolución operativa:
+  - el bloqueo inicial por drift con `TASK-379` quedó resuelto al mergear a `develop`
+  - la migración `20260413113902271_structured-context-layer-foundation.sql` ya fue aplicada sobre el shared dev DB
+  - `src/types/db.d.ts` ya fue regenerado contra esa base
 
 ## Implementation Learnings
 
@@ -252,9 +254,9 @@ Además, la foundation debe salir con criterios enterprise explícitos para:
 - no asumir que todo consumer debe depender sin fallback del sidecar desde el día uno
 - si un documento empieza a usarse para joins, reporting o reglas de negocio, planear promoción a modelo relacional
 - cuando una migración de esta layer no aplica en un entorno compartido, verificar primero drift de historia con otras ramas antes de mezclar migraciones ajenas en la branch
-- [ ] La arquitectura y el criterio de uso quedan documentados para equipos y agentes
-- [ ] Existen reglas explícitas de clasificación, retención, access scope, redacción e idempotencia para la foundation
-- [ ] La foundation prohíbe secretos y blobs binarios en `document_jsonb` y define estrategia de quarantine para documentos inválidos
+- [x] La arquitectura y el criterio de uso quedan documentados para equipos y agentes
+- [x] Existen reglas explícitas de clasificación, retención, access scope, redacción e idempotencia para la foundation
+- [x] La foundation prohíbe secretos y blobs binarios en `document_jsonb` y define estrategia de quarantine para documentos inválidos
 
 ## Verification
 
@@ -265,9 +267,9 @@ Además, la foundation debe salir con criterios enterprise explícitos para:
 
 ## Closing Protocol
 
-- [ ] correr `pnpm migrate:create <nombre>` para la migración oficial; nunca crearla a mano
-- [ ] si hay migración nueva, aplicar `pnpm pg:connect:migrate` y regenerar `src/types/db.d.ts` en el mismo lote
-- [ ] actualizar `project_context.md`, `Handoff.md` y `changelog.md` si la foundation queda materializada
+- [x] correr `pnpm migrate:create <nombre>` para la migración oficial; nunca crearla a mano
+- [x] si hay migración nueva, aplicar `pnpm pg:connect:migrate` y regenerar `src/types/db.d.ts` en el mismo lote
+- [x] actualizar `project_context.md`, `Handoff.md` y `changelog.md` si la foundation queda materializada
 
 ## Follow-ups
 
