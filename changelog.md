@@ -2,6 +2,12 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — Finance canonical blinda el lookup de client profiles para evitar `client_id` ambiguo
+
+- Se corrigió `src/lib/finance/canonical.ts` para calificar con alias `cp.` los filtros del lookup de `client_profiles` cuando el resolver une `greenhouse_core.spaces`.
+- El ajuste evita el error SQL `column reference "client_id" is ambiguous` que estaba rompiendo el registro de órdenes de compra.
+- Se agregó regresión en `src/lib/finance/canonical.test.ts` y se revalidó la route de purchase orders.
+
 ### 2026-04-13 — Finance OC ahora prioriza contactos asociados al cliente
 
 - `Finance > Purchase Orders > Registrar OC` ahora ofrece un selector de contactos vinculado al cliente elegido.

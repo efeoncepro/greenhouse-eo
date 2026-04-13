@@ -1,5 +1,26 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — ISSUE-045 abierto: registrar OC cae por `client_id` ambiguo en Finance canonical
+
+- incidente:
+  - el flujo `Finance > Purchase Orders > Registrar OC` devuelve error genérico al crear una OC en staging
+  - Sentry confirmó `error: column reference "client_id" is ambiguous`
+  - la falla vive en `resolveFinanceClientContext()` y no en el selector nuevo de contactos
+- causa raíz confirmada:
+  - el query de `src/lib/finance/canonical.ts` hace `LEFT JOIN greenhouse_core.spaces s ON s.client_id = cp.client_id`
+  - en el `WHERE`, el lookup de `client_profiles` usaba `client_id`, `client_profile_id` y `hubspot_company_id` sin alias
+  - al existir `s.client_id`, PostgreSQL rompe con referencia ambigua
+- fix aplicado en repo:
+  - columnas del lookup ahora quedan calificadas con `cp.`
+  - se agregó regresión en `src/lib/finance/canonical.test.ts` para asegurar que ese SQL siga aliasado
+- verificación ejecutada:
+  - `pnpm exec vitest run src/lib/finance/canonical.test.ts src/app/api/finance/purchase-orders/route.test.ts`
+  - `pnpm lint -- src/lib/finance/canonical.ts src/lib/finance/canonical.test.ts`
+- estado documental:
+  - issue creado en `docs/issues/open/ISSUE-045-purchase-order-create-ambiguous-client-id.md`
+  - queda **open** hasta validar el recovery en staging post-deploy
+  - tracker actualizado en `docs/issues/README.md`
+
 ## Sesion 2026-04-13 — MINI-001 cerrada: OC ahora prioriza contactos del cliente seleccionado
 
 - alcance implementado:
