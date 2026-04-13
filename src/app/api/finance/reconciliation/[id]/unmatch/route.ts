@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { withTransaction } from '@/lib/db'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import {
   assertReconciliationPeriodIsMutableFromPostgres,
@@ -44,7 +45,17 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const previousPaymentId = normalizeString(row.matched_payment_id)
     const previousSettlementLegId = normalizeString(row.matched_settlement_leg_id)
 
-    await clearStatementRowMatchInPostgres(rowId, periodId)
+    // Lock the statement row before clearing to prevent concurrent match/unmatch
+    // on the same row. NOWAIT: fails fast (→ 409) if lock is held by another request.
+    await withTransaction(async txClient => {
+      await txClient.query(
+        `SELECT 1 FROM greenhouse_finance.bank_statement_rows
+         WHERE row_id = $1 AND period_id = $2 FOR UPDATE NOWAIT`,
+        [rowId, periodId]
+      )
+
+      await clearStatementRowMatchInPostgres(rowId, periodId, { client: txClient })
+    })
 
     if (previousType && previousId) {
       await clearReconciliationLinkInPostgres({
