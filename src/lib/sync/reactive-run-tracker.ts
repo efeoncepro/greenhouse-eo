@@ -3,6 +3,8 @@ import 'server-only'
 import { randomUUID } from 'node:crypto'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { createReactiveReplayContext, getReactiveReplayContext } from '@/lib/structured-context/reactive'
+import type { ReactiveReplayContextDocument } from '@/lib/structured-context/types'
 
 import type { ReactiveConsumerResult } from './reactive-consumer'
 
@@ -21,6 +23,37 @@ export interface ReactiveRunRecord {
   startedAt: string
   finishedAt: string | null
   notes: string | null
+  replayContext: ReactiveReplayContextDocument | null
+}
+
+const persistReactiveReplayContextSafely = async ({
+  runId,
+  status,
+  result,
+  errorMessage,
+  notes
+}: {
+  runId: string
+  status: ReactiveRunStatus
+  result?: ReactiveConsumerResult
+  errorMessage?: string | null
+  notes?: string | null
+}) => {
+  try {
+    await createReactiveReplayContext({
+      runId,
+      status,
+      result,
+      errorMessage,
+      notes
+    })
+  } catch (error) {
+    console.warn('Failed to persist structured replay context for reactive worker run.', {
+      runId,
+      status,
+      error
+    })
+  }
 }
 
 // ── Run tracking helpers ──
@@ -94,6 +127,13 @@ export const writeReactiveRunComplete = async ({
       `${result.eventsProcessed} processed, ${result.eventsFailed} failed, ${result.projectionsTriggered} projections, ${result.durationMs}ms`
     ]
   )
+
+  await persistReactiveReplayContextSafely({
+    runId,
+    status: finalStatus,
+    result,
+    notes: `${result.eventsProcessed} processed, ${result.eventsFailed} failed, ${result.projectionsTriggered} projections, ${result.durationMs}ms`
+  })
 }
 
 /**
@@ -110,6 +150,13 @@ export const writeReactiveRunFailure = async ({ runId, error }: { runId: string;
      WHERE sync_run_id = $1`,
     [runId, message.slice(0, 500)]
   )
+
+  await persistReactiveReplayContextSafely({
+    runId,
+    status: 'failed',
+    errorMessage: message.slice(0, 500),
+    notes: message.slice(0, 500)
+  })
 }
 
 /**
@@ -142,6 +189,7 @@ export const getLastSuccessfulReactiveRun = async (): Promise<ReactiveRunRecord 
   const row = rows[0]
   const startedAt = new Date(row.started_at).getTime()
   const finishedAt = row.finished_at ? new Date(row.finished_at).getTime() : startedAt
+  const replayContextRecord = await getReactiveReplayContext(row.sync_run_id)
 
   return {
     runId: row.sync_run_id,
@@ -153,7 +201,8 @@ export const getLastSuccessfulReactiveRun = async (): Promise<ReactiveRunRecord 
     durationMs: finishedAt - startedAt,
     startedAt: new Date(row.started_at).toISOString(),
     finishedAt: row.finished_at ? new Date(row.finished_at).toISOString() : null,
-    notes: row.notes
+    notes: row.notes,
+    replayContext: replayContextRecord?.document ?? null
   }
 }
 
@@ -186,6 +235,7 @@ export const getLastReactiveRun = async (): Promise<ReactiveRunRecord | null> =>
   const row = rows[0]
   const startedAt = new Date(row.started_at).getTime()
   const finishedAt = row.finished_at ? new Date(row.finished_at).getTime() : startedAt
+  const replayContextRecord = await getReactiveReplayContext(row.sync_run_id)
 
   return {
     runId: row.sync_run_id,
@@ -197,6 +247,7 @@ export const getLastReactiveRun = async (): Promise<ReactiveRunRecord | null> =>
     durationMs: finishedAt - startedAt,
     startedAt: new Date(row.started_at).toISOString(),
     finishedAt: row.finished_at ? new Date(row.finished_at).toISOString() : null,
-    notes: row.notes
+    notes: row.notes,
+    replayContext: replayContextRecord?.document ?? null
   }
 }

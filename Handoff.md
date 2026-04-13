@@ -1,5 +1,78 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — TASK-380 foundation runtime implementada en worktree aislado
+
+- worktree usado:
+  - `/Users/jreye/Documents/greenhouse-eo-codex-task-380`
+  - branch `task/TASK-380-structured-context-layer-foundation`
+- alcance implementado:
+  - migración `20260413113902271_structured-context-layer-foundation.sql`
+  - runtime nuevo `src/lib/structured-context/{types,validation,store,reactive,index}.ts`
+  - tests nuevos `src/lib/structured-context/*.test.ts`
+  - piloto real conectado a `src/lib/sync/reactive-run-tracker.ts`
+- comportamiento nuevo:
+  - Greenhouse ya tiene foundation sidecar para contexto estructurado con documentos, versiones y quarantine
+  - la taxonomía inicial queda registrada y validada runtime-side
+  - los runs reactivos ya pueden persistir y releer `event.replay_context` sin romper el tracking canónico
+- criterio de robustez:
+  - el store rechaza secretos y llaves sensibles
+  - la capa aplica límites de tamaño por `context_kind`
+  - la validación fallida cae en quarantine antes de explotar
+  - el piloto reactivo escribe en modo degradado: si la capa falla, el worker no se cae por ese sidecar
+- verificación:
+  - `pnpm exec vitest run src/lib/structured-context/validation.test.ts src/lib/structured-context/store.test.ts src/lib/structured-context/reactive.test.ts`
+  - `pnpm exec eslint src/lib/structured-context/types.ts src/lib/structured-context/validation.ts src/lib/structured-context/store.ts src/lib/structured-context/reactive.ts src/lib/sync/reactive-run-tracker.ts`
+  - `pnpm build`
+- bloqueo real:
+  - `pnpm pg:connect:migrate` en shared dev DB falla por drift de historial: esa base ya tiene aplicada `20260413105218813_reactive-pipeline-v2-circuit-breaker` de `TASK-379`, pero esta rama/worktree no trae todavía esa migración
+  - no mezclé esa migración ajena en esta branch para no cruzar lanes sin decisión explícita
+- aprendizajes críticos:
+  - documentos persistidos deben ser JSON puros también a nivel de tipos; `undefined` fue el principal roce de implementación
+  - el patrón correcto para valores opcionales es `null`
+  - quarantine-before-throw deja evidencia operativa mucho más útil que fallar en seco
+  - el piloto sidecar debe degradar con seguridad si falla, no romper el flujo canónico
+  - worktree aislado + Turbopack exige `node_modules` local real; un symlink fuera del root puede romper el build sin relación con el código
+
+## Sesion 2026-04-13 — operating model multi-agent con worktrees formalizado
+
+- alcance documental:
+  - `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md`
+  - `docs/README.md`
+  - `AGENTS.md`
+  - `project_context.md`
+  - `changelog.md`
+- decisión tomada:
+  - el workspace actual se preserva para el agente que ya está trabajando ahí
+  - si otro agente necesita otra rama en paralelo, debe abrir worktree propio y no cambiar la rama del checkout ocupado
+- contrato nuevo:
+  - naming de worktrees y ramas
+  - checklist de inicio/cierre de sesión
+  - reglas de sincronización con `develop`/`main`
+  - rollback y limpieza del esquema
+- verificación:
+  - `git diff --check`
+
+## Sesion 2026-04-13 — Structured Context Layer formalizada y TASK-380 sembrada
+
+- alcance documental:
+  - `docs/architecture/GREENHOUSE_STRUCTURED_CONTEXT_LAYER_V1.md`
+  - `docs/documentation/plataforma/capa-contexto-estructurado.md`
+  - `docs/tasks/to-do/TASK-380-structured-context-layer-foundation.md`
+  - índices/documentos vivos actualizados: `docs/README.md`, `docs/documentation/README.md`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `project_context.md`, `changelog.md`
+- decisión tomada:
+  - Greenhouse formaliza una `Structured Context Layer` como sidecar del modelo relacional para contexto flexible, payloads normalizados, replay reactivo, auditoría y memoria de trabajo de agentes
+  - el schema objetivo es `greenhouse_context` y la raíz runtime prevista es `src/lib/structured-context/`
+- criterio de modelado:
+  - JSONB no reemplaza la verdad canónica ni evita modelar tablas cuando un dato se vuelve contractual, transaccional o consultable de forma intensiva
+  - la capa sí habilita guardar bundles tipados/versionados que hoy terminan dispersos en payloads ad hoc, docs o prompts
+  - se añadió una regla explícita para agentes sobre cuándo usar relacional, `JSONB`, `JSON` o ninguno
+  - además se endureció el contrato enterprise con clasificación, redacción, retención, idempotencia, access scope, límites de tamaño y quarantine
+- verificación:
+  - `git diff --check`
+- notas operativas:
+  - no hubo cambios de runtime, migraciones ni deploy funcional en esta sesión
+  - quedaron cambios ajenos en el árbol (`TASK-379` / `docs/issues/**`) que no se mezclaron en este lote
+
 ## Sesion 2026-04-13 — MINI-004 cerrada: HES ya se registra como documento recibido y no como envío outbound
 
 - alcance implementado:

@@ -2,6 +2,30 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — TASK-380 materializa la foundation runtime de Structured Context Layer
+
+- Se agregó la migración `20260413113902271_structured-context-layer-foundation.sql` para crear `greenhouse_context` con documentos, versiones, quarantine y guardrails base.
+- Se agregó `src/lib/structured-context/` como runtime compartido para tipos, validación, hashing, persistencia y lectura.
+- La taxonomía inicial ya incluye validadores reales para `event.replay_context`, `agent.audit_report` y `agent.execution_plan`.
+- `src/lib/sync/reactive-run-tracker.ts` ahora queda conectado como primer piloto de escritura/lectura usando `event.replay_context`.
+- El piloto está endurecido para no romper el worker reactivo si la capa sidecar falla; registra warning y degrada sin cortar el flujo principal.
+- La aplicación de la migración en el shared dev DB quedó pendiente porque esa base ya tiene aplicada una migración de `TASK-379` que esta rama todavía no trae.
+
+### 2026-04-13 — Modelo operativo multi-agent con worktrees formalizado
+
+- Se agregó `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md`.
+- El repo ahora deja explícito cómo trabajar con varios agentes en paralelo sin cambiar la rama del checkout ocupado por otro agente.
+- La convención nueva reserva el workspace actual para el agente owner y manda a los agentes adicionales a worktrees aislados con rama propia.
+
+### 2026-04-13 — Structured Context Layer formalizada como foundation arquitectónica
+
+- Se agregó `docs/architecture/GREENHOUSE_STRUCTURED_CONTEXT_LAYER_V1.md` para gobernar el uso de JSONB/contexto estructurado en Greenhouse.
+- La nueva capa propone `greenhouse_context` como schema sidecar para documentos tipados, versionados y tenant-safe.
+- El objetivo es soportar integraciones, replay reactivo, auditoría operativa y memoria de trabajo para agentes sin degradar el modelo relacional como fuente de verdad.
+- Se sembró `TASK-380` como lane de implementación para materializar esta foundation.
+- La documentación ahora deja una regla explícita para agentes: verdad canónica -> relacional; contexto flexible reusable en PostgreSQL -> `JSONB`; `JSON` solo como excepción cuando importa preservar representación cruda.
+- La foundation también quedó endurecida a nivel enterprise en la documentación: clasificación de datos, redacción, retención, access scope, idempotencia, límites de tamaño y quarantine de documentos inválidos.
+
 ### 2026-04-13 — HES ahora se registra como documento recibido del cliente
 
 - `Finance > HES` ya no deja una HES nueva presentada como `Borrador` cuando el flujo principal es registrar una hoja recibida.

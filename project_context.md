@@ -1,5 +1,62 @@
 # project_context.md
 
+## Delta 2026-04-13 Structured Context Layer ya tiene foundation runtime en repo
+
+- `TASK-380` ya materializó la base runtime de la Structured Context Layer dentro del repo.
+- Runtime nuevo:
+  - migración `20260413113902271_structured-context-layer-foundation.sql`
+  - módulo `src/lib/structured-context/`
+  - piloto de replay context en `src/lib/sync/reactive-run-tracker.ts`
+- Contrato operativo nuevo:
+  - el schema sidecar ya no es solo propuesta arquitectónica; existe una foundation concreta para documentos, versiones y quarantine
+  - el primer piloto de lectura/escritura sobre `source_sync_runs` deja trazabilidad reutilizable para replay reactivo
+  - la validación del runtime nuevo se cerró con tests unitarios, eslint dirigido y `pnpm build`
+- Limitación operativa detectada:
+  - `pnpm pg:connect:migrate` contra el shared dev DB puede fallar si la rama local no trae una migración ya aplicada en esa base por otro frente de trabajo; el caso real observado fue `20260413105218813_reactive-pipeline-v2-circuit-breaker` de `TASK-379`
+
+## Delta 2026-04-13 Multi-agent worktree operating model formalizado
+
+- Greenhouse ya tiene un modelo operativo explícito para trabajo paralelo entre agentes sobre el mismo repo sin compartir el mismo checkout activo.
+- Runtime documental nuevo:
+  - `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md`
+- Contrato operativo:
+  - si un agente ya está trabajando en el workspace actual, otro agente no debe cambiarle la rama
+  - el checkout actual queda reservado para el agente owner de esa sesión
+  - los agentes adicionales deben abrir `git worktree` propio en carpeta separada y rama separada
+  - la sincronización con `develop` o `main` ocurre desde el worktree del propio agente, no desde el checkout ajeno
+- convención recomendada:
+  - carpetas: `<repo>-<agent>-<branch-slug>`
+  - ramas: seguir `feature/*`, `fix/*`, `hotfix/*`, `docs/*` o `task/TASK-###-*`
+- reversibilidad:
+  - el esquema se puede desmontar eliminando worktrees cuando ya no hagan falta
+- referencia corta en `AGENTS.md`:
+  - coordinación entre agentes y branching ya apuntan al operating model nuevo
+
+## Delta 2026-04-13 Structured Context Layer formalizada como foundation arquitectónica
+
+- Greenhouse ahora tiene una decisión arquitectónica explícita para usar JSONB de forma gobernada sin degradar el modelo relacional.
+- Runtime documental nuevo:
+  - `docs/architecture/GREENHOUSE_STRUCTURED_CONTEXT_LAYER_V1.md`
+  - `docs/tasks/to-do/TASK-380-structured-context-layer-foundation.md`
+- Contrato operativo:
+  - la capa se llama `Structured Context Layer`
+  - vive conceptualmente en el schema `greenhouse_context`
+  - funciona como sidecar del modelo canónico, no como reemplazo de tablas relacionales
+  - todo documento debe ser tenant-safe, tipado por `context_kind` y versionado por `schema_version`
+  - se orienta a integraciones, replay reactivo, trazabilidad operativa y memoria estructurada para trabajo asistido por agentes
+  - heurística explícita para agentes:
+    - verdad canónica de negocio -> relacional
+    - contexto estructurado reusable en PostgreSQL -> `JSONB`
+    - representación cruda exacta sin semántica de DB -> `JSON` solo como excepción
+- criterio de modelado:
+  - si un dato se vuelve transaccional, consultable de forma intensiva o contractual para negocio, debe promocionarse a tabla relacional
+  - JSONB queda reservado para contexto flexible, payloads normalizados, snapshots controlados y bundles de auditoría
+- criterios enterprise añadidos:
+  - la capa debe contemplar clasificación de datos, redacción, retention/lifecycle, access scope, idempotencia y límites de tamaño
+  - secretos, tokens, cookies, credenciales y blobs binarios/base64 grandes no pertenecen a esta capa
+- siguiente paso planificado:
+  - `TASK-380` materializa schema, runtime tipado, taxonomía inicial y primeros pilotos
+
 ## Delta 2026-04-13 Lane formal de mini-tasks para mejoras chicas planificadas
 
 - Greenhouse ya tiene una lane documental intermedia para cambios chicos que no deben ejecutarse "al vuelo" pero tampoco justifican una `TASK-###` completa.
