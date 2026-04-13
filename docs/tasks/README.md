@@ -23,7 +23,7 @@ Primer bloque operativo asignado:
 - `TASK-053` a `TASK-056` asignados
 - siguiente ID disponible: `TASK-386`
 - siguiente ID disponible: `TASK-392`
-- `TASK-391` — Finance Factoring Operations. Registro atómico de cesión de facturas a empresas de factoring (Xepelin). Endpoint `POST /api/finance/income/[id]/factor` + migración schema + modal UI en detalle de factura + badges en listados. P1, Medio. Spec: `to-do/TASK-391-finance-factoring-operations.md`.
+- `TASK-391` ✅ — Finance Factoring Operations. Implementado: migración schema (4 columnas), `src/lib/finance/factoring.ts` (transacción atómica), `POST /api/finance/income/[id]/factor`, `GET /api/finance/factoring/providers`, `FactoringOperationDrawer.tsx`, badges FACTORADA en IncomeListView y Vía Factoring en CashInListView. Spec: `complete/TASK-391-finance-factoring-operations.md`.
 - `TASK-390` — Notificaciones In-App Broadcast Admin. Endpoint `POST /api/admin/notifications/broadcast` + UI en Admin Center para enviar notificaciones a segmentos (todos, colaboradores, clientes, tenant específico). Solo `efeonce_admin`. P3, Medio. Spec: `to-do/TASK-390-notifications-broadcast-admin.md`.
 - `TASK-389` — Notificaciones In-App Retención y Purga. Cron semanal: archiva leídas >30 días, borra archivadas >90 días, purga notification_log >180 días. Idempotente, en batches de 500. P2, Bajo. Spec: `to-do/TASK-389-notifications-retencion-purga.md`.
 - `TASK-388` — Notificaciones In-App Acciones Inline. Botones Aprobar/Rechazar directamente en el dropdown de notificaciones para `leave_review`. Proxy endpoint + NotificationActionBar + schema de actions en metadata. P2, Medio. Spec: `to-do/TASK-388-notifications-acciones-inline.md`.

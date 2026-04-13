@@ -29,6 +29,7 @@ import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSu
 import PaymentRegistrationCard from '@views/greenhouse/finance/components/PaymentRegistrationCard'
 import PaymentHistoryTable from '@views/greenhouse/finance/components/PaymentHistoryTable'
 import SettlementOrchestrationDrawer from '@views/greenhouse/finance/drawers/SettlementOrchestrationDrawer'
+import FactoringOperationDrawer from '@views/greenhouse/finance/drawers/FactoringOperationDrawer'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -60,6 +61,7 @@ interface IncomeDetail {
   exchangeRateToClp: number
   totalAmountClp: number
   paymentStatus: string
+  collectionMethod: string | null
   amountPaid: number
   amountPending: number
   paymentsReceived: PaymentRecord[]
@@ -175,6 +177,9 @@ const IncomeDetailView = () => {
   const [emitting, setEmitting] = useState(false)
   const [refreshingDte, setRefreshingDte] = useState(false)
   const [settlementPaymentId, setSettlementPaymentId] = useState<string | null>(null)
+
+  // Factoring
+  const [factoringDrawerOpen, setFactoringDrawerOpen] = useState(false)
 
   const fetchDetail = useCallback(async () => {
     setLoading(true)
@@ -314,8 +319,22 @@ const IncomeDetailView = () => {
             {data.clientName} · {data.description || 'Sin descripción'}
           </Typography>
         </Box>
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
           <CustomChip round='true' size='small' color={statusColor(data.paymentStatus)} label={statusLabel(data.paymentStatus)} />
+          {data.collectionMethod === 'factored' && (
+            <CustomChip round='true' size='small' color='warning' label='Factorada' icon={<i className='tabler-building-bank' />} />
+          )}
+          {data.paymentStatus !== 'paid' && data.paymentStatus !== 'written_off' && data.collectionMethod !== 'factored' && (
+            <Button
+              variant='tonal'
+              color='warning'
+              size='small'
+              startIcon={<i className='tabler-building-bank' />}
+              onClick={() => setFactoringDrawerOpen(true)}
+            >
+              Ceder a factoring
+            </Button>
+          )}
           <Button
             variant='tonal'
             color='secondary'
@@ -583,6 +602,15 @@ const IncomeDetailView = () => {
         paymentId={settlementPaymentId}
         onClose={() => setSettlementPaymentId(null)}
         onSuccess={fetchDetail}
+      />
+
+      <FactoringOperationDrawer
+        open={factoringDrawerOpen}
+        onClose={() => setFactoringDrawerOpen(false)}
+        onSuccess={fetchDetail}
+        incomeId={incomeId}
+        nominalAmount={data.totalAmount}
+        currency={data.currency}
       />
     </Box>
   )

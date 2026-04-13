@@ -45,6 +45,7 @@ interface IncomeDetailRow {
   exchange_rate_to_clp: unknown
   total_amount_clp: unknown
   payment_status: string
+  collection_method: string | null
   amount_paid: unknown
   payments_received: unknown
   po_number: string | null
@@ -92,6 +93,7 @@ const normalizeIncomeDetail = (row: IncomeDetailRow) => ({
   exchangeRateToClp: toNumber(row.exchange_rate_to_clp),
   totalAmountClp: toNumber(row.total_amount_clp),
   paymentStatus: normalizeString(row.payment_status),
+  collectionMethod: row.collection_method ? normalizeString(row.collection_method) : null,
   amountPaid: toNumber(row.amount_paid),
   amountPending: toNumber(row.total_amount) - toNumber(row.amount_paid),
   paymentsReceived: parsePaymentsReceived(row.payments_received),

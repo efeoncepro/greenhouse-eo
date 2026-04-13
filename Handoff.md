@@ -1,5 +1,56 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — TASK-391 Finance Factoring Operations: implementación completa
+
+- implementación:
+  - `migrations/20260413195519177_factoring-operations-fee-breakdown.sql` — 4 columnas nuevas en `factoring_operations` (interest_amount, advisory_fee_amount, external_reference, external_folio). Migración aplicada, `db.d.ts` regenerado.
+  - `src/lib/finance/factoring.ts` — función `recordFactoringOperation()`: transacción atómica con `withGreenhousePostgresTransaction`, 8 operaciones en un solo commit (lock income, validate provider, INSERT factoring_op, INSERT income_payment, INSERT expense x2, UPDATE income)
+  - `src/app/api/finance/income/[id]/factor/route.ts` — `POST` con validación de fee balance (±$1 CLP tolerancia), auth guard, manejo de errores
+  - `src/app/api/finance/factoring/providers/route.ts` — `GET` para dropdown filtrado por `provider_type = 'factoring'`
+  - `src/views/greenhouse/finance/drawers/FactoringOperationDrawer.tsx` — Drawer 520px, provider select, advance/interés/asesoría inputs, fee calculator en tiempo real con indicador visual, fechas, referencias externas, cuenta de depósito
+  - `src/views/greenhouse/finance/IncomeDetailView.tsx` — `collectionMethod` en interfaz + botón "Ceder a Factoring" (oculto si ya pagado/cedido) + badge FACTORADA + drawer montado
+  - `src/views/greenhouse/finance/IncomeListView.tsx` — `collectionMethod` en interfaz + badge FACTORADA en columna de estado
+  - `src/views/greenhouse/finance/CashInListView.tsx` — `paymentSource` en interfaces + badge "Vía factoring" cuando `payment_source = 'factoring_proceeds'`
+  - `src/app/api/finance/income/[id]/route.ts` — `collectionMethod` agregado al BigQuery fallback normalizer
+- semántica de negocio implementada:
+  - `income.amount_paid = nominalAmount` (obligación del cliente saldada al 100%)
+  - `income_payment.amount = advanceAmount` (efectivo real recibido — conciliable contra banco)
+  - diferencia (fee) = 2 expenses en P&L (factoring_fee + factoring_advisory)
+- validación: `npx tsc --noEmit` — 0 errores
+- task: `TASK-391` movida a `complete/`
+- pendiente para uso real: seed del proveedor Xepelin en `greenhouse_core.providers` (INSERT manual con `provider_type = 'factoring'`)
+
+## Sesion 2026-04-13 — Management Accounting queda documentado como capability enterprise distinta de contabilidad legal
+
+- alcance documental:
+  - `docs/architecture/GREENHOUSE_MANAGEMENT_ACCOUNTING_ARCHITECTURE_V1.md`
+  - `docs/README.md`
+  - `project_context.md`
+  - `changelog.md`
+- decisión tomada:
+  - Greenhouse no debe abrir primero un módulo de contabilidad legal/partida doble
+  - la capability correcta a profundizar es `Management Accounting`, con lectura funcional `contabilidad de costos` y surface recomendada `Finance > Economia operativa`
+- actualización clave:
+  - el documento nuevo ya no deja solo la tesis base del módulo
+  - también fija el inventario de gaps y hardening enterprise pendiente:
+    - budget / variance / forecast
+    - fully-loaded labor cost
+    - BU P&L
+    - cierre gobernado
+    - explainability y auditabilidad
+    - overrides manuales
+    - RBAC
+    - observabilidad y data quality
+    - materialización escalable
+    - legal entity / intercompany / related parties
+    - multi-moneda más fuerte
+    - runbooks, testing de negocio y roadmap de madurez
+- nota importante:
+  - `factoring` quedó explicitado como input financiero que pertenece primero a `Finance`, pero cuyo impacto real debe absorberse dentro de `Management Accounting`
+- validación:
+  - documentación solamente
+  - `git diff --check`
+
 ## Sesion 2026-04-13 — hardening del lifecycle de tasks para forzar cierre real
 
 - alcance documental:

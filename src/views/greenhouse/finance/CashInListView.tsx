@@ -43,6 +43,7 @@ interface CashInItem {
   clientName: string | null
   reference: string | null
   paymentMethod: string | null
+  paymentSource: string | null
   reconciled: boolean
   paymentAccountName: string | null
   paymentProviderSlug: string | null
@@ -59,6 +60,7 @@ interface CashInApiItem {
   clientName: string | null
   reference: string | null
   paymentMethod: string | null
+  paymentSource: string | null
   isReconciled: boolean
   paymentAccountName: string | null
   paymentProviderSlug: string | null
@@ -158,6 +160,7 @@ const CashInListView = () => {
             clientName: item.clientName,
             reference: item.reference,
             paymentMethod: item.paymentMethod,
+            paymentSource: item.paymentSource ?? null,
             reconciled: item.isReconciled,
             paymentAccountName: item.paymentAccountName,
             paymentProviderSlug: item.paymentProviderSlug,
@@ -379,7 +382,19 @@ const CashInListView = () => {
                       <Typography variant='body2'>{item.paymentMethod || '—'}</Typography>
                     </TableCell>
                     <TableCell>
-                      <CustomChip round='true' size='small' color='success' label='Cobrado' />
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <CustomChip round='true' size='small' color='success' label='Cobrado' />
+                        {item.paymentSource === 'factoring_proceeds' && (
+                          <CustomChip
+                            round='true'
+                            size='small'
+                            color='warning'
+                            variant='tonal'
+                            label='Vía factoring'
+                            sx={{ height: 20, fontSize: '0.65rem' }}
+                          />
+                        )}
+                      </Box>
                     </TableCell>
                     <TableCell>
                       <CustomChip

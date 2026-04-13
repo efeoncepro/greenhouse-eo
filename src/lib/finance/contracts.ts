@@ -16,7 +16,9 @@ export const EXPENSE_TYPES = [
   'miscellaneous',
   'bank_fee',
   'gateway_fee',
-  'financial_cost'
+  'financial_cost',
+  'factoring_fee',      // Interés variable de cesión de facturas (TASK-391)
+  'factoring_advisory'  // Asesoría fija por operación de factoring (TASK-391)
 ] as const
 export type ExpenseType = (typeof EXPENSE_TYPES)[number]
 
