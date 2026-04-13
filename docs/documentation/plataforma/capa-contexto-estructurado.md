@@ -235,6 +235,85 @@ Hoy esta capa está formalizada como arquitectura y como task de implementación
 
 Eso significa que la decisión de modelado ya existe, pero la foundation runtime todavía debe materializarse.
 
+## Que faltaba para que esto sea realmente enterprise
+
+Sí, faltaban varias cosas importantes.
+
+Una capa así no queda nivel enterprise solo por usar `JSONB`.
+
+También necesita reglas claras de operación para que no se vuelva un contenedor flexible pero frágil.
+
+### 1. Clasificación de datos
+
+Cada tipo de contexto debería declarar qué tan sensible es.
+
+Eso importa porque no es lo mismo guardar:
+
+- metadata técnica inocua
+- contexto financiero
+- contexto con PII
+- un resultado de agente que necesita redacción
+
+Y hay una regla dura:
+
+- secretos, tokens, cookies, credenciales y material de autenticación no deberían guardarse aquí
+
+### 2. Retención
+
+No todo el contexto debería vivir para siempre.
+
+Ejemplos:
+
+- payloads crudos pueden expirar antes
+- contexto de replay puede durar solo la ventana operativa
+- bundles de auditoría pueden necesitar una vida más larga
+
+### 3. Idempotencia y trazabilidad
+
+Si integraciones, retries o agentes escriben contexto más de una vez, Greenhouse necesita detectar duplicados y mantener lineage entre versiones o reemplazos.
+
+### 4. Acceso y redacción
+
+No todo contexto que cuelga de un objeto debería ser visible a cualquiera que vea ese objeto.
+
+Puede haber contexto:
+
+- interno
+- restringido a ops
+- restringido a finanzas
+- client-safe solo después de redacción
+
+### 5. Límites de tamaño
+
+Esta capa no es para guardar binarios ni blobs enormes.
+
+Los archivos deben seguir viviendo en Assets. La capa debería guardar referencias y contexto, no PDFs embebidos ni base64 gigantes.
+
+### 6. Observabilidad y quarantine
+
+Si un productor emite un documento inválido, Greenhouse no debería:
+
+- aceptarlo a ciegas
+- ni perderlo silenciosamente
+
+Debería poder rechazarlo o mandarlo a una ruta de quarantine/dead-letter con trazabilidad suficiente.
+
+## Qué quedó resuelto en la documentación
+
+La arquitectura y la task ahora ya dejan explícito que esta capa enterprise debe contemplar:
+
+- clasificación
+- redacción
+- retención
+- idempotencia
+- lineage
+- access scopes
+- límites de tamaño
+- observabilidad
+- quarantine de documentos inválidos
+
+O sea: ya no está planteada como "tabla con `JSONB`", sino como una capability de plataforma con gobierno real.
+
 ## Siguiente paso natural
 
 El siguiente paso es bajar esta decisión a runtime con:
@@ -242,7 +321,8 @@ El siguiente paso es bajar esta decisión a runtime con:
 1. un schema dedicado
 2. una tabla base de documentos de contexto
 3. tipos y validators compartidos
-4. primeros pilotos reales en integraciones, replay o memoria de agentes
+4. guardrails enterprise de clasificación, retención, redacción e idempotencia
+5. primeros pilotos reales en integraciones, replay o memoria de agentes
 
 ## En resumen
 

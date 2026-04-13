@@ -19,6 +19,9 @@
 - criterio de modelado:
   - si un dato se vuelve transaccional, consultable de forma intensiva o contractual para negocio, debe promocionarse a tabla relacional
   - JSONB queda reservado para contexto flexible, payloads normalizados, snapshots controlados y bundles de auditoría
+- criterios enterprise añadidos:
+  - la capa debe contemplar clasificación de datos, redacción, retention/lifecycle, access scope, idempotencia y límites de tamaño
+  - secretos, tokens, cookies, credenciales y blobs binarios/base64 grandes no pertenecen a esta capa
 - siguiente paso planificado:
   - `TASK-380` materializa schema, runtime tipado, taxonomía inicial y primeros pilotos
 

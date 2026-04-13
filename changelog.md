@@ -9,6 +9,7 @@
 - El objetivo es soportar integraciones, replay reactivo, auditoría operativa y memoria de trabajo para agentes sin degradar el modelo relacional como fuente de verdad.
 - Se sembró `TASK-380` como lane de implementación para materializar esta foundation.
 - La documentación ahora deja una regla explícita para agentes: verdad canónica -> relacional; contexto flexible reusable en PostgreSQL -> `JSONB`; `JSON` solo como excepción cuando importa preservar representación cruda.
+- La foundation también quedó endurecida a nivel enterprise en la documentación: clasificación de datos, redacción, retención, access scope, idempotencia, límites de tamaño y quarantine de documentos inválidos.
 
 ### 2026-04-13 — HES ahora se registra como documento recibido del cliente
 

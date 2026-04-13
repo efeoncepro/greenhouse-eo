@@ -356,6 +356,185 @@ The sidecar model gives Greenhouse:
 - safer indexing and retention policies
 - less pollution in core transactional tables
 
+## Enterprise Hardening Requirements
+
+To be truly enterprise-grade, the Structured Context Layer needs more than typed `jsonb`.
+
+It also needs explicit rules for:
+
+- data classification
+- retention and expiration
+- idempotent writes and document lineage
+- access control and redaction
+- storage budgets and document size limits
+- observability, validation failure handling, and quarantine
+
+Without these controls, the layer would still be useful, but it would not yet be robust enough for high-scale, multi-agent, multi-integration operation.
+
+### 1. Data classification is mandatory
+
+Every context kind should declare its sensitivity profile.
+
+Recommended envelope fields:
+
+- `data_classification` — example values: `public`, `internal`, `confidential`, `restricted`
+- `contains_pii` — boolean
+- `contains_financial_context` — boolean
+- `contains_secrets` — boolean, expected to be `false` in normal operation
+- `redaction_status` — example values: `not_needed`, `redacted`, `restricted`
+
+Hard rule:
+
+- secrets, tokens, credentials, raw session cookies, signed auth material, and private keys must **not** be stored in the Structured Context Layer
+
+If a producer receives that material, it must:
+
+- redact it
+- replace it with references
+- or drop it entirely
+
+### 2. Retention and lifecycle must be explicit
+
+Not all context should live forever.
+
+Each context kind should define:
+
+- `retention_policy_code`
+- `expires_at` when applicable
+- whether the document is:
+  - ephemeral
+  - operational
+  - audit-grade
+  - historical
+
+Examples:
+
+- raw integration payloads may need shorter retention
+- replay context may expire after operational windows close
+- audit evidence may need longer retention
+- agent execution traces may need aggressive retention and redaction
+
+### 3. Writes must be idempotent and traceable
+
+The layer should support repeat-safe production.
+
+Recommended fields:
+
+- `idempotency_key`
+- `content_hash`
+- `supersedes_context_id`
+- `created_by_type`
+- `created_by_id`
+
+This matters because integrations, retries, reactive reprocessing, and agents may attempt to emit equivalent context more than once.
+
+Enterprise rule:
+
+- duplicate writes should be detectable
+- replacements should preserve lineage
+- append-only history should be available where auditability matters
+
+### 4. Access control must be narrower than base table visibility
+
+Tenant scoping alone is not enough.
+
+Some context documents may be:
+
+- internal only
+- ops-only
+- finance-restricted
+- safe for client-facing readers after redaction
+
+Recommended envelope field:
+
+- `access_scope`
+
+Example values:
+
+- `internal`
+- `restricted_ops`
+- `restricted_finance`
+- `client_safe`
+
+Read APIs should be able to enforce these scopes instead of assuming that every consumer of an aggregate can also read all of its context documents.
+
+### 5. Storage budgets and size limits are required
+
+This layer should store structured context, not binary payload abuse.
+
+Hard rules:
+
+- do not store files, PDFs, images, or large base64 blobs in `document_jsonb`
+- store binary objects in Greenhouse Assets and reference them from context
+- set maximum document size budgets per `context_kind`
+
+Operational recommendation:
+
+- keep documents small and purposeful
+- split giant compound documents into separate context records when lifecycle or ownership differs
+
+### 6. Validation failures need quarantine, not silent loss
+
+If a producer emits an invalid context document, Greenhouse should not silently accept garbage and should not silently drop it either.
+
+Enterprise-safe handling means:
+
+- fail validation explicitly
+- log producer and aggregate metadata
+- send invalid payloads to a quarantine or dead-letter path when loss would be operationally dangerous
+
+The layer should expose enough metadata to answer:
+
+- what producer emitted the invalid document
+- for which aggregate
+- under which schema version
+- whether it was retried, rejected, or quarantined
+
+### 7. Observability must treat context as a platform capability
+
+The platform should measure:
+
+- documents written by `context_kind`
+- validation failures
+- average and p95 document size
+- duplicate/idempotency collisions
+- redaction-required incidents
+- reads by consumer type
+- expired documents awaiting cleanup
+
+If the layer becomes important to agents, replay, or integrations, then it needs platform-level telemetry, not module-local guesswork.
+
+### 8. Promotion to relational must remain part of the contract
+
+Enterprise maturity does not mean "more JSONB forever".
+
+It means Greenhouse can use flexible context safely while still promoting stable, repeated, contractual fields into relational modeling at the right time.
+
+If a JSONB key becomes:
+
+- operationally critical
+- heavily queried
+- cross-module contractual
+- part of compliance or finance truth
+
+that is a signal to promote it, not to index deeper forever.
+
+## Recommended Enterprise Envelope Additions
+
+Beyond the base fields, enterprise implementations should strongly consider:
+
+- `data_classification`
+- `contains_pii`
+- `redaction_status`
+- `retention_policy_code`
+- `expires_at`
+- `idempotency_key`
+- `content_hash`
+- `supersedes_context_id`
+- `access_scope`
+
+Not every context kind needs every field populated, but the model should have a place for them.
+
 ## Recommended Key Fields
 
 ### `owner_aggregate_type`
