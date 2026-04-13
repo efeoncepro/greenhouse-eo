@@ -2,6 +2,13 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — Structured Context Layer formalizada como foundation arquitectónica
+
+- Se agregó `docs/architecture/GREENHOUSE_STRUCTURED_CONTEXT_LAYER_V1.md` para gobernar el uso de JSONB/contexto estructurado en Greenhouse.
+- La nueva capa propone `greenhouse_context` como schema sidecar para documentos tipados, versionados y tenant-safe.
+- El objetivo es soportar integraciones, replay reactivo, auditoría operativa y memoria de trabajo para agentes sin degradar el modelo relacional como fuente de verdad.
+- Se sembró `TASK-380` como lane de implementación para materializar esta foundation.
+
 ### 2026-04-13 — HES ahora se registra como documento recibido del cliente
 
 - `Finance > HES` ya no deja una HES nueva presentada como `Borrador` cuando el flujo principal es registrar una hoja recibida.

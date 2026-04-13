@@ -1,5 +1,23 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — Structured Context Layer formalizada y TASK-380 sembrada
+
+- alcance documental:
+  - `docs/architecture/GREENHOUSE_STRUCTURED_CONTEXT_LAYER_V1.md`
+  - `docs/tasks/to-do/TASK-380-structured-context-layer-foundation.md`
+  - índices/documentos vivos actualizados: `docs/README.md`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `project_context.md`, `changelog.md`
+- decisión tomada:
+  - Greenhouse formaliza una `Structured Context Layer` como sidecar del modelo relacional para contexto flexible, payloads normalizados, replay reactivo, auditoría y memoria de trabajo de agentes
+  - el schema objetivo es `greenhouse_context` y la raíz runtime prevista es `src/lib/structured-context/`
+- criterio de modelado:
+  - JSONB no reemplaza la verdad canónica ni evita modelar tablas cuando un dato se vuelve contractual, transaccional o consultable de forma intensiva
+  - la capa sí habilita guardar bundles tipados/versionados que hoy terminan dispersos en payloads ad hoc, docs o prompts
+- verificación:
+  - `git diff --check`
+- notas operativas:
+  - no hubo cambios de runtime, migraciones ni deploy funcional en esta sesión
+  - quedaron cambios ajenos en el árbol (`TASK-379` / `docs/issues/**`) que no se mezclaron en este lote
+
 ## Sesion 2026-04-13 — MINI-004 cerrada: HES ya se registra como documento recibido y no como envío outbound
 
 - alcance implementado:
