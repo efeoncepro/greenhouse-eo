@@ -101,8 +101,8 @@ Reglas obligatorias:
 ### Gap
 
 - No existe matching automático fuera del contexto de un `reconciliation_period`.
-- El pipeline Nubox no dispara ningún matching al importar nuevos movimientos.
-- No existe un job periódico (diario) que intente matchear los movimientos bancarios recientes contra cobros/pagos sin conciliar.
+- El pipeline Nubox sincroniza **dos tipos de datos distintos**: documentos DTE (facturas emitidas → `income` records) y movimientos bancarios (pagos recibidos → `income_payments` con `payment_source = 'nubox_bank_sync'`). El auto-match solo aplica al segundo tipo. Hoy ninguno de los dos dispara matching.
+- No existe un job periódico (diario) que intente matchear los movimientos bancarios recientes (`income_payments` con `payment_source IN ('nubox_bank_sync', 'factoring_proceeds')`) contra los `income` registrados sin conciliar.
 - La lógica de scoring/matching de `reconciliation.ts` está acoplada al período mensual — no es invocable standalone.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -120,7 +120,9 @@ Reglas obligatorias:
 ### Slice 2 — Job de auto-match continuo
 
 - Crear endpoint `POST /api/finance/reconciliation/auto-match` que corra el motor standalone.
-- Ejecutar automáticamente después de cada sync de Nubox (hook en el pipeline o cron diario).
+- **Trigger correcto:** el auto-match se dispara únicamente cuando Nubox trae **movimientos bancarios** (`payment_source = 'nubox_bank_sync'`), es decir cuando crea registros en `income_payments`. NO se dispara al sincronizar documentos DTE (facturas), que van a `income` y no son pagos.
+- También aplica a pagos de factoring (`payment_source = 'factoring_proceeds'`) y otros orígenes con `payment_account_id` asignado.
+- Cron diario 08:00 CLT como fallback para movimientos que llegaron fuera de sync.
 - Registrar matches como `is_reconciled = true` + crear entrada en `settlement_legs` con `linked_payment_type = 'income_payment'` o `'expense_payment'`.
 - Matches con score < umbral quedan en cola para revisión manual.
 
@@ -159,8 +161,16 @@ Umbral de auto-aplicación: score ≥ 90. Score 60-89: se propone pero requiere 
 
 ### Trigger de ejecución
 
-- **Post-Nubox sync**: cuando el pipeline de Nubox importa nuevos movimientos, dispara el auto-match sobre el rango importado.
-- **Cron diario 08:00 CLT**: re-intenta el matching de los últimos 7 días por si hubo sync tardíos.
+Nubox sincroniza dos tipos de datos con semántica distinta:
+
+| Tipo Nubox | Destino en Greenhouse | ¿Dispara auto-match? |
+|---|---|---|
+| Documentos DTE (facturas emitidas) | `greenhouse_finance.income` | ❌ No — son registros de ingresos, no pagos |
+| Movimientos bancarios (cobros recibidos) | `greenhouse_finance.income_payments` con `payment_source = 'nubox_bank_sync'` | ✅ Sí — son pagos reales contra una cuenta |
+
+- **Post-Nubox bank-movement sync**: cuando el pipeline importa `income_payments` nuevos con `payment_source = 'nubox_bank_sync'`, dispara el auto-match sobre esos `payment_id`s específicos.
+- **Post-factoring**: cuando se registra una operación de factoring (`payment_source = 'factoring_proceeds'`), el pago también entra al motor de auto-match.
+- **Cron diario 08:00 CLT**: re-intenta el matching de los últimos 7 días como fallback para syncs tardíos o fuera de orden.
 - **Trigger manual**: `POST /api/finance/reconciliation/auto-match` con parámetros `{ fromDate, toDate, accountId? }`.
 
 <!-- ═══════════════════════════════════════════════════════════
