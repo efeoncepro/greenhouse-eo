@@ -133,7 +133,10 @@ export async function POST(
       return NextResponse.json({ error: error.message }, { status: error.statusCode })
     }
 
+    const message = error instanceof Error ? error.message : String(error)
+
     console.error('[income/factor] Unexpected error:', error)
-    throw error
+
+    return NextResponse.json({ error: `Error interno: ${message}` }, { status: 500 })
   }
 }
