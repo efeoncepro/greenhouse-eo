@@ -79,6 +79,9 @@ importers:
       '@google-cloud/cloud-sql-connector':
         specifier: ^1.9.1
         version: 1.9.1
+      '@google-cloud/monitoring':
+        specifier: ^5.3.1
+        version: 5.3.1
       '@google-cloud/secret-manager':
         specifier: ^6.1.1
         version: 6.1.1
@@ -1174,6 +1177,10 @@ packages:
 
   '@google-cloud/common@6.0.0':
     resolution: {integrity: sha512-IXh04DlkLMxWgYLIUYuHHKXKOUwPDzDgke1ykkkJPe48cGIS9kkL2U/o0pm4ankHLlvzLF/ma1eO86n/bkumIA==}
+    engines: {node: '>=18'}
+
+  '@google-cloud/monitoring@5.3.1':
+    resolution: {integrity: sha512-f88LJn4PrzhiDaK0VH5KPxEXZfzJ7X8AGfYnK3KTfZEfH3cyxlvCnpgQQaScNTPhv+zX2MrdW/lJHDOpLsm71Q==}
     engines: {node: '>=18'}
 
   '@google-cloud/paginator@6.0.0':
@@ -9637,6 +9644,12 @@ snapshots:
       html-entities: 2.6.0
       retry-request: 8.0.2
       teeny-request: 10.1.0
+    transitivePeerDependencies:
+      - supports-color
+
+  '@google-cloud/monitoring@5.3.1':
+    dependencies:
+      google-gax: 5.0.6
     transitivePeerDependencies:
       - supports-color
 

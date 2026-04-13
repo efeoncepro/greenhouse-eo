@@ -89,6 +89,7 @@ type Props = {
 const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) => {
   const isEditing = Boolean(editHes)
   const currentStatus = editHes?.status || 'new'
+
   const currentStatusLabel =
     currentStatus === 'approved'
       ? 'Validada'

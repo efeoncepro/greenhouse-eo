@@ -34,6 +34,31 @@ Mutacion en store
   -> outbox-react cron lee published + tipo reactivo, ejecuta handler, registra en reactive_log (evento + handler)
 ```
 
+## Schema versioning convention
+
+> Introducido por TASK-379 el 2026-04-13. El event catalog no versionaba payloads antes — todos los eventos preexistentes son considerados "v1 legacy" bajo esta convencion.
+
+Los payloads del outbox siguen dos versiones que coexisten durante el rollout de V2:
+
+- **v1 legacy** (sin campo `schemaVersion`). Un evento por entidad. El consumer lee todo el detalle del payload. Todos los eventos publicados antes del 2026-04-13 caen en esta categoria por definicion.
+- **v2** (`schemaVersion: 2`). Un evento por periodo/corrida de materializacion. Payload minimo: `{ schemaVersion: 2, periodId, snapshotCount, _materializedAt, ...contexto }`. Los consumers deben refetchar el detalle desde la tabla materializada (no leer detalle del payload).
+
+**Reglas:**
+
+1. Todo nuevo event type `*.period_materialized` debe usar `publishPeriodMaterializedEvent()` en `src/lib/sync/publish-event.ts`. Nunca construir payloads v2 a mano.
+2. Los consumers v2-aware (`staff_augmentation_placements`, downstream de provider tooling) deben tolerar ambas versiones — el consumer reactivo V2 no discrimina por `schemaVersion`, es responsabilidad de `extractScope` y `refresh` en cada proyeccion.
+3. Durante la ventana de coexistencia (~2 semanas post-deploy de V2), publishers legacy siguen emitiendo v1 hasta que un cleanup task dedicado retire el codigo.
+4. Ver playbook operativo: [GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V2.md](./GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V2.md).
+
+**Event types `*.period_materialized` introducidos por Slice 2 de TASK-379:**
+
+| Aggregate Type | Event Type | Publisher | Proyeccion downstream |
+|---|---|---|---|
+| `provider_tooling_snapshot` | `provider.tooling_snapshot.period_materialized` | `src/lib/sync/projections/provider-tooling.ts` | `staff_augmentation_placements` |
+| `commercial_cost_attribution` | `accounting.commercial_cost_attribution.period_materialized` | `src/lib/sync/projections/commercial-cost-attribution.ts` | `client_economics`, `operational_pl` |
+| `pl_snapshot` | `accounting.pl_snapshot.period_materialized` | `src/lib/sync/projections/operational-pl.ts` | `operational_pl_rollup` |
+| `staff_aug_placement_snapshot` | `staff_aug.placement_snapshot.period_materialized` | `src/lib/sync/projections/staff-augmentation.ts` | Downstream de staff augmentation |
+
 ## Catalogo de eventos
 
 ### Finance
