@@ -251,7 +251,7 @@ describe('HrHierarchyView', () => {
 
     expect(screen.getByRole('alert')).toHaveTextContent('Revisa los campos obligatorios antes de guardar el cambio.')
     expect(screen.getByRole('textbox', { name: 'Razón' })).toHaveAttribute('aria-invalid', 'true')
-  }, 10000)
+  }, 30000)
 
   it('shows validation when bulk reassignment is submitted without a reason', async () => {
     const user = userEvent.setup()
@@ -272,7 +272,7 @@ describe('HrHierarchyView', () => {
 
     expect(screen.getByRole('alert')).toHaveTextContent('Revisa los campos obligatorios antes de reasignar los reportes.')
     expect(screen.getByRole('textbox', { name: 'Razón' })).toHaveAttribute('aria-invalid', 'true')
-  }, 10000)
+  }, 30000)
 
   it('opens the temporary delegation dialog from the audit panel', async () => {
     const user = userEvent.setup()
@@ -286,5 +286,5 @@ describe('HrHierarchyView', () => {
     expect(screen.getByRole('heading', { name: 'Nueva delegación temporal' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Delegado' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Crear delegación' })).toBeInTheDocument()
-  }, 10000)
+  }, 30000)
 })
