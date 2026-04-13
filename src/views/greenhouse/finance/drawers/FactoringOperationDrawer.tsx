@@ -50,6 +50,9 @@ type Props = {
 // Helpers
 // ---------------------------------------------------------------------------
 
+const getTodayInSantiago = () =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Santiago' }).format(new Date())
+
 const formatCLP = (amount: number): string =>
   new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(amount)
 
@@ -75,7 +78,7 @@ const FactoringOperationDrawer = ({ open, onClose, onSuccess, incomeId, nominalA
   const [interestAmount, setInterestAmount] = useState('')
   const [advisoryFeeAmount, setAdvisoryFeeAmount] = useState('')
   const [feeRate, setFeeRate] = useState('')
-  const [operationDate, setOperationDate] = useState('')
+  const [operationDate, setOperationDate] = useState(getTodayInSantiago)
   const [settlementDate, setSettlementDate] = useState('')
   const [externalReference, setExternalReference] = useState('')
   const [externalFolio, setExternalFolio] = useState('')
@@ -136,7 +139,7 @@ const FactoringOperationDrawer = ({ open, onClose, onSuccess, incomeId, nominalA
     setInterestAmount('')
     setAdvisoryFeeAmount('')
     setFeeRate('')
-    setOperationDate('')
+    setOperationDate(getTodayInSantiago())
     setSettlementDate('')
     setExternalReference('')
     setExternalFolio('')
@@ -374,6 +377,7 @@ const FactoringOperationDrawer = ({ open, onClose, onSuccess, incomeId, nominalA
             value={operationDate}
             onChange={e => setOperationDate(e.target.value)}
             InputLabelProps={{ shrink: true }}
+            inputProps={{ max: getTodayInSantiago() }}
           />
           <CustomTextField
             fullWidth
