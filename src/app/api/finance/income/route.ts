@@ -30,6 +30,7 @@ import {
 } from '@/lib/finance/postgres-store-slice2'
 import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
 import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
+import { withIdempotency } from '@/lib/finance/idempotency'
 
 export const dynamic = 'force-dynamic'
 
@@ -253,6 +254,7 @@ export async function POST(request: Request) {
     return errorResponse || NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  return withIdempotency(request, tenant.clientId, '/api/finance/income', async () => {
   try {
     const body = await request.json()
 
@@ -431,4 +433,5 @@ export async function POST(request: Request) {
       { status: 500 }
     )
   }
+  }) // end withIdempotency
 }
