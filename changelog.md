@@ -2,6 +2,30 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — TASK-400 alinea el contrato canónico de Home y deja base para homes distintas por tipo de usuario
+
+- `/` y `/auth/landing` ya no dependen de `|| '/dashboard'`; ambos consumen el `portalHomePath` resuelto por la misma policy runtime.
+- `src/lib/tenant/resolve-portal-home-path.ts` ahora centraliza:
+  - aliases legacy (`/dashboard`, `/internal/dashboard`, `/finance/dashboard`, `/hr/leave`, `/my/profile`)
+  - policy explícita de home por tipo (`client_default`, `internal_default`, `hr_workspace`, `finance_workspace`, `my_workspace`)
+  - una base extensible para soportar homes diferenciadas por tipo de usuario sin reintroducir drift en guards, auth y shell
+- provisioning, session auth, agent auth, navegación, shortcuts, notifications y `view-access-catalog` quedaron alineados a `/home` como startup contract canónico.
+- `/dashboard` se mantiene como ruta legacy/compatibilidad, pero deja de ser el fallback estructural del portal.
+- Se agregó `scripts/backfill-portal-home-contract.ts` para normalizar `default_portal_home_path` en PostgreSQL y BigQuery bajo control explícito.
+- Se agregó regresión focalizada para evitar que `/dashboard` vuelva a romper cuando falten quality/delivery signals.
+
+### 2026-04-13 — Se agrega `TASK-400` para gobernar el contrato canónico de Home del portal
+
+- Se creó `docs/tasks/to-do/TASK-400-portal-home-contract-governance-entrypoint-cutover.md`.
+- La task formaliza que el problema no es solo un bug de `/dashboard`, sino drift de contrato entre root routing, auth landing, provisioning, session resolution, agent auth, guards y navegación.
+- El backlog ahora exige resolver esto como lane enterprise: policy canónica de startup home, compatibilidad legacy gobernada para `/dashboard`, normalización/backfill de valores persistidos y validación de blast radius.
+
+### 2026-04-13 — Dashboard SSR headless deja de arrastrar `react-pdf` en rutas autenticadas
+
+- Se corrigieron los imports compartidos del layout para que `BrandWordmark` no entre por el barrel `@/components/greenhouse`.
+- `src/components/greenhouse/index.ts` ya no exporta `CertificatePreviewDialog`, porque `react-pdf/pdfjs` toca `DOMMatrix` al evaluarse en Node SSR.
+- El fix protege el render HTML autenticado de requests headless sin cambiar rutas, payloads, auth ni semántica visible del portal.
+
 ### 2026-04-13 — Se registra el programa de 7 tasks robustas para Management Accounting
 
 - Se agregaron `TASK-392` a `TASK-398` bajo `docs/tasks/to-do/` para convertir la arquitectura nueva de Management Accounting en backlog ejecutable.
@@ -5327,6 +5351,7 @@
 - Nubox freshness: `nubox_last_synced_at` en `income`, `expenses` y `quotes` ahora refleja el `ingested_at` real del raw snapshot fuente, no el timestamp artificial de cualquier proyección.
 - Finance Ops: se ejecutó backfill raw histórico `2023-01 -> 2026-04` y luego una corrida `conformed -> postgres` exitosa; staging terminó con `postgres_projection` exitosa (`1 income` creado, `2 expenses` creados, `2 incomes` reconciliados).
 - Architecture / backlog: `GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1` y `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1` ya formalizan el patrón runtime reusable para integraciones source-led, y se abrió `TASK-399` para institucionalizar adapters resilientes, control plane por etapa y replay governance.
+- Task backlog: `docs/tasks/README.md` ahora deja explícita la prioridad operativa vigente del backlog `to-do` separando `impacto cliente` e `impacto agencia`, para que los agentes no infieran el orden solo desde el ID o el título.
 
 ## 2026-04-10
 

@@ -36,7 +36,7 @@ type ExistingUserRow = {
 
 const DEFAULT_LOCALE = 'es-CL'
 const DEFAULT_TIMEZONE = 'America/Santiago'
-const DEFAULT_PORTAL_HOME = '/dashboard'
+const DEFAULT_PORTAL_HOME = '/home'
 
 const normalizeEmail = (value: string | null | undefined) => value?.trim().toLowerCase() || null
 

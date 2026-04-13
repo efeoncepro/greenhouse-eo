@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolvePortalHomePath } from './resolve-portal-home-path'
+import { resolvePortalHomeDefaultPath, resolvePortalHomePath, resolvePortalHomePolicy } from './resolve-portal-home-path'
 
 describe('resolvePortalHomePath', () => {
   it('routes internal legacy dashboard home to /home', () => {
@@ -51,5 +51,25 @@ describe('resolvePortalHomePath', () => {
         roleCodes: ['finance_admin']
       })
     ).toBe('/finance')
+  })
+
+  it('uses separate policy keys for client and internal defaults', () => {
+    expect(resolvePortalHomePolicy({ tenantType: 'client' }).key).toBe('client_default')
+    expect(resolvePortalHomePolicy({ tenantType: 'efeonce_internal' }).key).toBe('internal_default')
+  })
+
+  it('exposes the default home path through a centralized policy resolver', () => {
+    expect(resolvePortalHomeDefaultPath({ tenantType: 'client' })).toBe('/home')
+    expect(resolvePortalHomeDefaultPath({ tenantType: 'efeonce_internal' })).toBe('/home')
+  })
+
+  it('maps legacy client dashboard home to /home', () => {
+    expect(
+      resolvePortalHomePath({
+        portalHomePath: '/dashboard',
+        tenantType: 'client',
+        roleCodes: ['client_executive']
+      })
+    ).toBe('/home')
   })
 })

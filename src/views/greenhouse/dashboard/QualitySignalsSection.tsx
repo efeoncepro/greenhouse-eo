@@ -56,7 +56,7 @@ const QualitySignalsSection = ({ data }: QualitySignalsSectionProps) => {
                 {latestQualitySignal?.label || 'Ultimo mes visible'}
               </Typography>
               <Typography variant='h3'>
-                {latestQualitySignal?.avgRpa !== null ? latestQualitySignal.avgRpa.toFixed(1) : 'Sin dato'}
+                {latestQualitySignal?.avgRpa != null ? latestQualitySignal.avgRpa.toFixed(1) : 'Sin dato'}
               </Typography>
               <Typography variant='body2' color='text.secondary'>
                 RpA promedio visible del ultimo mes con trazabilidad disponible.
@@ -69,7 +69,7 @@ const QualitySignalsSection = ({ data }: QualitySignalsSectionProps) => {
                   First-Time Right
                 </Typography>
                 <Typography variant='body2' color='text.primary'>
-                  {latestQualitySignal?.firstTimeRightPct !== null ? `${latestQualitySignal.firstTimeRightPct}%` : 'Sin dato'}
+                  {latestQualitySignal?.firstTimeRightPct != null ? `${latestQualitySignal.firstTimeRightPct}%` : 'Sin dato'}
                 </Typography>
               </Stack>
               <LinearProgress
@@ -95,7 +95,7 @@ const QualitySignalsSection = ({ data }: QualitySignalsSectionProps) => {
             items={[
               {
                 label: 'RpA ultimo mes',
-                value: latestQualitySignal?.avgRpa !== null ? latestQualitySignal.avgRpa.toFixed(1) : 'Sin dato',
+                value: latestQualitySignal?.avgRpa != null ? latestQualitySignal.avgRpa.toFixed(1) : 'Sin dato',
                 detail:
                   latestQualitySignal?.rpaSource === 'seeded'
                     ? 'Valor seedado para visibilidad inicial mientras madura la fuente medida.'
@@ -103,7 +103,7 @@ const QualitySignalsSection = ({ data }: QualitySignalsSectionProps) => {
               },
               {
                 label: 'First-Time Right',
-                value: latestQualitySignal?.firstTimeRightPct !== null ? `${latestQualitySignal.firstTimeRightPct}%` : 'Sin dato',
+                value: latestQualitySignal?.firstTimeRightPct != null ? `${latestQualitySignal.firstTimeRightPct}%` : 'Sin dato',
                 detail: 'Calculado como entregables sin ajustes cliente sobre entregables visibles del mes.'
               },
               {
@@ -141,7 +141,7 @@ const QualitySignalsSection = ({ data }: QualitySignalsSectionProps) => {
           items={[
             {
               label: 'RpA ultimo mes',
-              value: latestQualitySignal?.avgRpa !== null ? latestQualitySignal?.avgRpa.toFixed(1) : 'Sin dato',
+              value: latestQualitySignal?.avgRpa != null ? latestQualitySignal.avgRpa.toFixed(1) : 'Sin dato',
               detail:
                 latestQualitySignal?.rpaSource === 'seeded'
                   ? 'Valor seedado para visibilidad inicial mientras madura la fuente medida.'
@@ -149,7 +149,7 @@ const QualitySignalsSection = ({ data }: QualitySignalsSectionProps) => {
             },
             {
               label: 'First-Time Right',
-              value: latestQualitySignal?.firstTimeRightPct !== null ? `${latestQualitySignal?.firstTimeRightPct}%` : 'Sin dato',
+              value: latestQualitySignal?.firstTimeRightPct != null ? `${latestQualitySignal.firstTimeRightPct}%` : 'Sin dato',
               detail: 'Calculado como entregables sin ajustes cliente sobre entregables visibles del mes.'
             },
             {

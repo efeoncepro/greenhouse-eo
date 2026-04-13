@@ -553,7 +553,8 @@ const createAuthOptions = (): NextAuthOptions => {
       token.portalHomePath = resolvePortalHomePath({
         portalHomePath: typeof token.portalHomePath === 'string' ? token.portalHomePath : null,
         tenantType: token.tenantType,
-        roleCodes: Array.isArray(token.roleCodes) ? token.roleCodes : []
+        roleCodes: Array.isArray(token.roleCodes) ? token.roleCodes : [],
+        routeGroups: Array.isArray(token.routeGroups) ? token.routeGroups : []
       })
 
       return token
@@ -589,7 +590,8 @@ const createAuthOptions = (): NextAuthOptions => {
         session.user.portalHomePath = resolvePortalHomePath({
           portalHomePath: typeof token.portalHomePath === 'string' ? token.portalHomePath : null,
           tenantType: token.tenantType,
-          roleCodes: Array.isArray(token.roleCodes) ? token.roleCodes : []
+          roleCodes: Array.isArray(token.roleCodes) ? token.roleCodes : [],
+          routeGroups: Array.isArray(token.routeGroups) ? token.routeGroups : []
         })
         session.user.authMode = typeof token.authMode === 'string' ? token.authMode : 'credentials'
         session.user.provider = typeof token.provider === 'string' ? token.provider : 'credentials'

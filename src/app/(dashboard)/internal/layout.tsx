@@ -12,7 +12,7 @@ export default async function InternalLayout({ children }: { children: ReactNode
   }
 
   if (!tenant.routeGroups.includes('internal')) {
-    redirect(tenant.portalHomePath || '/dashboard')
+    redirect(tenant.portalHomePath)
   }
 
   return children

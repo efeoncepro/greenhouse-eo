@@ -126,14 +126,14 @@ const GreenhouseDashboard = ({ clientName, data, teamMembersData = null }: Green
           >
             <DashboardKpiCard
               title={GH_LABELS.kpi_rpa}
-              stats={latestQualitySignal?.avgRpa !== null ? formatDecimal(latestQualitySignal.avgRpa) : '0'}
+              stats={latestQualitySignal?.avgRpa != null ? formatDecimal(latestQualitySignal.avgRpa) : '0'}
               avatarIcon='tabler-git-pull-request'
               avatarColor='primary'
               trend={getTrend(latestQualitySignal?.avgRpa ?? null, previousQualitySignal?.avgRpa ?? null)}
               trendNumber={formatTrendValue(latestQualitySignal?.avgRpa ?? null, previousQualitySignal?.avgRpa ?? null)}
               subtitle={GH_MESSAGES.dashboard_kpi_rpa_subtitle}
               titleTooltip={GH_MESSAGES.tooltip_rpa}
-              footer={latestQualitySignal?.avgRpa !== null ? `${latestQualitySignal.label}.` : GH_MESSAGES.dashboard_kpi_monthly_empty}
+              footer={latestQualitySignal?.avgRpa != null ? `${latestQualitySignal.label}.` : GH_MESSAGES.dashboard_kpi_monthly_empty}
               statusLabel={rpaStatus.label}
               statusColor={rpaStatus.tone}
               statusIcon={rpaStatus.icon}
@@ -305,7 +305,7 @@ const GreenhouseDashboard = ({ clientName, data, teamMembersData = null }: Green
             {GH_MESSAGES.footer}
           </Typography>
           <Stack direction='row' spacing={2} flexWrap='wrap' useFlexGap>
-            <MuiLink component={Link} href='/dashboard' color='text.secondary' underline='hover'>
+            <MuiLink component={Link} href='/home' color='text.secondary' underline='hover'>
               {GH_CLIENT_NAV.dashboard.label}
             </MuiLink>
             <MuiLink component={Link} href='/proyectos' color='text.secondary' underline='hover'>

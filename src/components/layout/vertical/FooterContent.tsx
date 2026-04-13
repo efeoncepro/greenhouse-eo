@@ -6,7 +6,7 @@ import classnames from 'classnames'
 
 import useVerticalNav from '@menu/hooks/useVerticalNav'
 
-import { BrandWordmark } from '@/components/greenhouse'
+import BrandWordmark from '@/components/greenhouse/BrandWordmark'
 import { verticalLayoutClasses } from '@layouts/utils/layoutClasses'
 import { GH_CLIENT_NAV, GH_MESSAGES } from '@/config/greenhouse-nomenclature'
 
@@ -23,7 +23,7 @@ const FooterContent = () => {
       </div>
       {!isBreakpointReached ? (
         <div className='flex items-center gap-4'>
-          <Link href='/dashboard' className='text-primary'>
+          <Link href='/home' className='text-primary'>
             {GH_CLIENT_NAV.dashboard.label}
           </Link>
           <Link href='/proyectos' className='text-primary'>

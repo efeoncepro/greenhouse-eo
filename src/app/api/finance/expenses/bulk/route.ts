@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server'
 
+import { withTransaction } from '@/lib/db'
 import { resolveFinanceDownstreamScope, resolveFinanceMemberContext } from '@/lib/finance/canonical'
-import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
-import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
 import { createFinanceExpenseInPostgres } from '@/lib/finance/postgres-store-slice2'
 import {
   EXPENSE_PAYMENT_STATUSES,
@@ -14,10 +13,8 @@ import {
   assertPositiveAmount,
   assertValidCurrency,
   buildMonthlySequenceId,
-  getFinanceProjectId,
   normalizeString,
   resolveExchangeRateToClp,
-  runFinanceQuery,
   toNumber,
   type ExpensePaymentStatus,
   type ExpenseType,
@@ -25,7 +22,6 @@ import {
   type ServiceLine
 } from '@/lib/finance/shared'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
-import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
 
 export const dynamic = 'force-dynamic'
 

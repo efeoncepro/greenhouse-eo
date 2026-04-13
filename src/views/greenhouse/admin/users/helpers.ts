@@ -101,7 +101,7 @@ export const buildUserTimeline = (data: AdminUserDetail): UserTimelineEvent[] =>
       color: 'success' as ThemeColor,
       title: data.lastLoginAt ? 'Ultimo acceso al portal' : 'Sin acceso registrado',
       caption: data.lastLoginAt
-        ? `Ingreso a ${data.defaultPortalHomePath || '/dashboard'} desde el tenant ${data.client.clientName}.`
+        ? `Ingreso a ${data.defaultPortalHomePath || '/home'} desde el tenant ${data.client.clientName}.`
         : 'El usuario aun no registra login visible en Greenhouse.',
       timestamp: data.lastLoginAt
     },

@@ -85,7 +85,8 @@ export async function POST(request: Request) {
   const portalHomePath = resolvePortalHomePath({
     portalHomePath: tenant.portalHomePath || null,
     tenantType: tenant.tenantType,
-    roleCodes: tenant.roleCodes ?? []
+    roleCodes: tenant.roleCodes ?? [],
+    routeGroups: tenant.routeGroups ?? []
   })
 
   const tokenPayload = {

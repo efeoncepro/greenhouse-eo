@@ -34,7 +34,7 @@ export default async function FinanceLayout({ children }: { children: ReactNode 
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath || '/dashboard')
+    redirect(tenant.portalHomePath)
   }
 
   return children

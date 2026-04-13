@@ -71,7 +71,7 @@ const DeliverySignalsSection = ({ data }: DeliverySignalsSectionProps) => {
               <Typography variant='caption' color='text.secondary'>
                 {latestMonthlyDelivery?.label || 'Ultimo mes activo'}
               </Typography>
-              <Typography variant='h2'>{latestMonthlyDelivery?.onTimePct !== null ? `${latestMonthlyDelivery?.onTimePct}%` : 'Sin dato'}</Typography>
+              <Typography variant='h2'>{latestMonthlyDelivery?.onTimePct != null ? `${latestMonthlyDelivery.onTimePct}%` : 'Sin dato'}</Typography>
               <Typography variant='body2' color='text.secondary'>
                 {latestMonthlyDelivery
                   ? `Snapshot mensual sobre ${latestMonthlyDelivery.totalDeliverables} entregables visibles.`

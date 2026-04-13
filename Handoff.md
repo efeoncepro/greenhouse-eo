@@ -1,5 +1,78 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — TASK-400 implementada localmente con policy centralizada de Home y compatibilidad legacy gobernada
+
+- implementación cerrada en código:
+  - `/` y `/auth/landing` ya resuelven solo `session.user.portalHomePath`; se elimina la dependencia estructural de `|| '/dashboard'`
+  - `src/lib/tenant/resolve-portal-home-path.ts` ahora concentra:
+    - aliases legacy (`/dashboard`, `/internal/dashboard`, `/finance/dashboard`, `/hr/leave`, `/my/profile`)
+    - policy centralizada por tipo de home (`client_default`, `internal_default`, `hr_workspace`, `finance_workspace`, `my_workspace`)
+    - base explícita para soportar homes distintas por tipo de usuario sin volver a dispersar lógica en routes y shell
+  - `src/lib/auth.ts`, `src/lib/tenant/access.ts` y `src/app/api/auth/agent-session/route.ts` ya consumen la misma policy
+  - provisioning, theme config, navegación, search suggestions, footers, dropdown de usuario, notifications y `view-access-catalog` quedaron alineados a `/home` como contrato canónico
+  - `/dashboard` sigue accesible como compatibilidad/feature route, pero ya no es fallback estructural y quedó hardenizado para no explotar cuando faltan señales de calidad/delivery
+  - se agregó `scripts/backfill-portal-home-contract.ts` para normalizar `default_portal_home_path` en PostgreSQL + BigQuery (dry-run por default, `--apply` para ejecutar)
+- validación local cerrada:
+  - `pnpm test src/lib/tenant/resolve-portal-home-path.test.ts src/views/greenhouse/GreenhouseDashboard.test.tsx`
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src scripts` sin nuevos pools fuera de `src/lib/postgres/client.ts`
+- cobertura agregada:
+  - tests de aliases/policy en `src/lib/tenant/resolve-portal-home-path.test.ts`
+  - regresión de render para `src/views/greenhouse/GreenhouseDashboard.test.tsx`
+- estado de staging antes del push:
+  - `pnpm staging:request /`
+  - `pnpm staging:request /home`
+  - `pnpm staging:request /dashboard`
+  - los tres siguen devolviendo `HTTP 500` en el deployment actual de `develop`, por lo que ese entorno todavía no refleja este diff local
+- próximos pasos operativos:
+  - commit + push de `develop`
+  - volver a verificar staging en `/`, `/home` y `/dashboard` una vez que el deploy nuevo termine
+  - si staging siguiera en `500` tras el deploy, revisar logs del deployment nuevo y reconciliar con `ISSUE-044`
+
+## Sesion 2026-04-13 — TASK-400 sembrada para gobernar el contrato canónico de Home y desactivar `/dashboard` como fallback estructural
+
+- backlog nuevo:
+  - `docs/tasks/in-progress/TASK-400-portal-home-contract-governance-entrypoint-cutover.md`
+- problema formalizado:
+  - el repo actual tiene múltiples contratos de entrada conviviendo:
+    - `src/app/page.tsx` redirige a `session.user.portalHomePath || '/dashboard'`
+    - `src/app/auth/landing/page.tsx` cae a `'/home'`
+    - `src/lib/admin/tenant-member-provisioning.ts` sigue sembrando `DEFAULT_PORTAL_HOME = '/dashboard'`
+    - decenas de guards/layouts y navegación usan `tenant.portalHomePath || '/dashboard'`
+  - `/dashboard` está actuando como fallback estructural pese a que semánticamente `Home` ya es la landing moderna del portal
+- alcance que debe cubrir la task:
+  - policy canónica para startup home / access-denied fallback / legacy compatibility
+  - cutover coordinado de root, auth, provisioning, agent auth y navegación
+  - normalización/backfill de valores persistidos legacy (`/dashboard`, `/internal/dashboard`)
+  - compatibilidad gobernada para `/dashboard` y hardening mínimo si sigue accesible
+- relación con issues/tasks existentes:
+  - esto no reemplaza el fix SSR de `ISSUE-044`; lo complementa
+  - tampoco duplica `TASK-378`: esa lane endurece SSR/error boundaries; `TASK-400` gobierna el contrato de entrada
+- estado operativo:
+  - tomada en `in-progress`
+  - discovery ya confirmó drift adicional en stores PG/BQ, shell UI, notifications y docs de arquitectura
+
+## Sesion 2026-04-13 — ISSUE-044 root cause confirmado y fix mínimo implementado
+
+- issue atacado:
+  - `docs/issues/open/ISSUE-044-dashboard-ssr-500-agent-headless.md`
+- causa raíz confirmada:
+  - el 500 de HTML SSR para requests headless autenticados no venía de auth, cookies, MUI ni providers
+  - el runtime de producción local reprodujo el fallo exacto: `ReferenceError: DOMMatrix is not defined`
+  - la fuente real era un import transitive desde el barrel `@/components/greenhouse`, que exportaba `CertificatePreviewDialog` y arrastraba `react-pdf/pdfjs` al SSR del layout y de vistas cliente-safe
+- fix aplicado:
+  - `src/components/layout/vertical/FooterContent.tsx` ahora importa `BrandWordmark` directo
+  - `src/components/layout/horizontal/FooterContent.tsx` ahora importa `BrandWordmark` directo
+  - `src/components/greenhouse/index.ts` deja de exportar `CertificatePreviewDialog` y documenta que debe importarse directo
+- blast radius validado:
+  - build local de producción
+  - auth real con `/api/auth/agent-session`
+  - HTML 200 para `/home`, `/admin`, `/settings`, `/dashboard`, `/updates`
+- pendiente:
+  - no quedó validado en `staging` porque en este turno no se desplegó el fix
+  - por política del tracker el issue se mantiene `open` hasta verificar `pnpm staging:request /home|/admin|/settings`
+
 ## Sesion 2026-04-13 — Management Accounting ya queda aterrizado como programa ejecutable de 7 tasks robustas
 
 - backlog nuevo documentado:

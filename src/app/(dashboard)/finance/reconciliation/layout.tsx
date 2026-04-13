@@ -20,7 +20,7 @@ export default async function FinanceReconciliationLayout({ children }: { childr
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath || '/dashboard')
+    redirect(tenant.portalHomePath)
   }
 
   return children

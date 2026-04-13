@@ -20,7 +20,7 @@ export default async function FinanceExpensesLayout({ children }: { children: Re
   })
 
   if (!hasAccess) {
-    redirect(tenant.portalHomePath || '/dashboard')
+    redirect(tenant.portalHomePath)
   }
 
   return children

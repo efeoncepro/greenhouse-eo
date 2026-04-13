@@ -666,7 +666,7 @@ export const notificationProjection: ProjectionDefinition = {
 
       const actionUrl =
         grantedViews.find(entry => entry.routePath)?.routePath
-        || '/dashboard'
+        || '/home'
 
       await NotificationService.dispatch({
         category: 'system_event',

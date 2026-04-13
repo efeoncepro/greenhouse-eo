@@ -191,7 +191,12 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
     role: primaryRoleCode,
     featureFlags: normalizeStringArray(row.feature_flags),
     timezone: row.timezone || 'UTC',
-    portalHomePath: resolvePortalHomePath({ portalHomePath: row.portal_home_path, tenantType, roleCodes }),
+    portalHomePath: resolvePortalHomePath({
+      portalHomePath: row.portal_home_path,
+      tenantType,
+      roleCodes,
+      routeGroups
+    }),
     authMode: row.auth_mode || 'credentials',
     active: Boolean(row.active),
     status: row.status || 'disabled',
@@ -270,7 +275,7 @@ const getIdentityAccessRecord = async ({
         ARRAY_AGG(DISTINCT IF(sm.module_kind = 'service_module', csm.module_code, NULL) IGNORE NULLS ORDER BY IF(sm.module_kind = 'service_module', csm.module_code, NULL)) AS service_modules,
         ARRAY_AGG(DISTINCT cff.feature_code IGNORE NULLS ORDER BY cff.feature_code) AS feature_flags,
         COALESCE(cu.timezone, c.timezone, 'UTC') AS timezone,
-        COALESCE(cu.default_portal_home_path, c.portal_home_path, IF(cu.tenant_type = 'efeonce_internal', '/home', '/dashboard')) AS portal_home_path,
+        COALESCE(cu.default_portal_home_path, '/home') AS portal_home_path,
         cu.auth_mode,
         cu.active,
         cu.status,

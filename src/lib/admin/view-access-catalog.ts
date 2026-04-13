@@ -468,7 +468,7 @@ export const VIEW_REGISTRY: GovernanceViewRegistryEntry[] = [
     section: 'cliente',
     label: 'Pulse',
     description: 'Vista general del space cliente.',
-    routePath: '/dashboard',
+    routePath: '/home',
     routeGroup: 'client'
   },
   {
