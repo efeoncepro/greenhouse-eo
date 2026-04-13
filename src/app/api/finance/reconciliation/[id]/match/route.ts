@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { withTransaction } from '@/lib/db'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
 import {
   assertReconciliationPeriodIsMutableFromPostgres,
@@ -84,15 +85,26 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       })
     }
 
-    await updateStatementRowMatchInPostgres(rowId, periodId, {
-      matchStatus: 'manual_matched',
-      matchedType,
-      matchedId: target.matchedRecordId,
-      matchedPaymentId: target.matchedPaymentId,
-      matchedSettlementLegId: target.matchedSettlementLegId,
-      matchConfidence: 1.0,
-      matchedByUserId: tenant.userId || null,
-      notes: body.notes ? normalizeString(body.notes) : null
+    // Lock the statement row and update match fields atomically.
+    // SELECT FOR UPDATE NOWAIT: if another request is modifying this row, fail
+    // immediately with an error (→ 409) instead of waiting for the lock.
+    await withTransaction(async txClient => {
+      await txClient.query(
+        `SELECT 1 FROM greenhouse_finance.bank_statement_rows
+         WHERE row_id = $1 AND period_id = $2 FOR UPDATE NOWAIT`,
+        [rowId, periodId]
+      )
+
+      await updateStatementRowMatchInPostgres(rowId, periodId, {
+        matchStatus: 'manual_matched',
+        matchedType,
+        matchedId: target.matchedRecordId,
+        matchedPaymentId: target.matchedPaymentId,
+        matchedSettlementLegId: target.matchedSettlementLegId,
+        matchConfidence: 1.0,
+        matchedByUserId: tenant.userId || null,
+        notes: body.notes ? normalizeString(body.notes) : null
+      }, { client: txClient })
     })
 
     await setReconciliationLinkInPostgres({
