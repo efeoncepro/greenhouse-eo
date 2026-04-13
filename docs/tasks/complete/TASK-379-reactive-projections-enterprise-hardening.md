@@ -8,18 +8,65 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
-- Rank: `TBD`
+- Status real: `Cerrada 2026-04-13`
+- Rank: `n/a`
 - Domain: `ops`
 - Blocked by: `none`
-- Branch: `task/TASK-379-reactive-projections-enterprise-hardening`
+- Branch: `task/TASK-379-reactive-projections-enterprise-hardening` (mergeada via PRs #53 + #54 + release #55)
 - Legacy ID: `none`
-- GitHub Issue: `none`
+- GitHub Issue: `ISSUE-046` (cerrado)
+
+## Closing Summary 2026-04-13
+
+Implementacion completa de los 6 slices + audit-only sweep follow-up + provision de 5 alerting policies + promovida a produccion. Backlog drenado de 11,495 → 0 el mismo dia que se detecto el incidente. Cierra ISSUE-046.
+
+**Entregables shippeados**:
+
+- **PR #53** (`task/TASK-379-reactive-projections-enterprise-hardening` → `develop`, merged commit `62f6dfeb`): 6 slices completos (consumer V2 + circuit breaker + 4 publishers refactorizados + Cloud Run scaling + 7 cron jobs por dominio + custom metrics + dashboard + V2 architecture docs).
+- **PR #54** (`fix/reactive-audit-only-sweep` → `develop`, merged commit `8d90f15f`): audit-only sweep helper + wire-up al endpoint `/reactive/recover`.
+- **PR #55** (`develop` → `main`, merged commit `68c84891`): release de 27 commits acumulados, Vercel prod deploy success.
+- **Migration aplicada**: `migrations/20260413105218813_reactive-pipeline-v2-circuit-breaker.sql` (tabla `projection_circuit_state`).
+- **Cloud Run**: revision `00007-q45` (V1) → `00008-grv` (V2) → `00009-p8b` (V2 + sweep).
+- **IAM**: `roles/monitoring.metricWriter` granted al SA `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`.
+- **Cloud Scheduler**: 7 jobs por dominio (`ops-reactive-organization`, `-finance`, `-people`, `-notifications`, `-delivery`, `-cost-intelligence`, `-recover`).
+- **Cloud Monitoring**: 5 custom metric descriptors (`backlog_depth`, `lag_seconds_p95`, `throughput_events_per_run`, `error_rate`, `circuit_breaker_state`) + 1 notification channel `webhook_tokenauth` + 5 alerting policies (IDs `12724517129604513698`, `12724517129604512902`, `9439773336525841089`, `9439773336525840646`, `242492081293795724`).
+
+**Verificacion cuantitativa**:
+
+| Metric | Pre | Post |
+|---|---|---|
+| Total raw outbox `published` sin log entry | 11,495 | **0** |
+| Eventos coaleados V2 | 0 (loop silencioso) | 5,420 |
+| Eventos audit-only marcados | 0 | 6,071 |
+| Eventos rastreables para TASK-377 | 0 | 2 |
+| Projections en circuit `closed` | n/a | 14/14 |
+
+**Documentacion arquitectonica** (canonica):
+
+- `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V2.md` (reemplaza V1)
+- `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_ARCHITECTURE_V2.md` (spec tecnica + diagrama)
+- `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_SLO_V1.md` (4 SLOs formales)
+- `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_ALERTING_V1.md` (5 policies + webhook bypass)
+- `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md` §4.9 + §5 (actualizado)
+- `docs/architecture/GREENHOUSE_EVENT_CATALOG_V1.md` (schema versioning convention)
+- `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md` (Reactive serving SLO section)
+- `docs/operations/TASK_379_DEPLOYMENT_RETROSPECTIVE.md` (retrospectiva operacional completa de la sesion)
+
+**Issue resuelto**: `docs/issues/resolved/ISSUE-046-reactive-pipeline-silent-skip-backlog.md`
+
+**Follow-ups que NO bloquean cierre** (capturados en otros tasks/issues):
+
+1. Implementar TASK-377 (Kortex bridge) y replayear los 2 sister_platform_binding events guardados como `no-op:pending-task-377-consumer` (ver Delta block en `docs/tasks/to-do/TASK-377-kortex-operational-intelligence-bridge.md`).
+2. Activar branch protection en `develop` para prevenir push directo (decision pendiente del operador).
+3. Cron de retencion que purgue `outbox_events` con entries `no-op:audit-only` > 90 dias (future ops sprint).
+4. Cleanup del codigo legacy v1 publishing en las 4 projections refactorizadas (esperar 1-2 semanas de operacion estable).
+5. Migrar outbox polling a Pub/Sub event bus (siguiente evolucion arquitectonica, posible TASK-382).
+6. Mejorar formato de notificaciones Slack (Pub/Sub → Cloud Run → Slack bot pipeline) — solo si raw JSON deja de ser suficiente.
 
 ## Summary
 
