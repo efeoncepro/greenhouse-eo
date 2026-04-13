@@ -1,313 +1,276 @@
-# DELTA — HR Payroll Module v2: Reemplazo de Bono RpA por Bono FTR%
+# TASK-025 — Payroll FTR Bonus Policy Decision
 
-## Delta 2026-04-03 — FTR health benchmark != payroll bonus threshold
-
-- El contrato maestro `docs/architecture/Contrato_Metricas_ICO_v1.md` ya adopta bandas benchmark-informed para `FTR` (`world-class >= 85%`, `strong >= 70%`, etc.).
-- Regla obligatoria si esta lane se reactiva:
-  - no reutilizar automáticamente los thresholds legacy del body (`65%`, `70%`, etc.) como si fueran benchmark canónico de `ICO`
-  - distinguir explícitamente entre:
-    - salud del KPI `FTR` en el contrato de métricas
-    - policy de compensación variable en payroll
-- Implicación:
-  - un umbral de bono futuro puede existir, pero debe decidirse como policy de compensación aparte y no contradecir ni reemplazar la semántica benchmark del contrato.
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 0 — IDENTITY & TRIAGE
+     "Que task es y puedo tomarla?"
+     Un agente lee esto primero. Si Lifecycle = complete, STOP.
+     ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-| Campo | Valor |
-|-------|-------|
-| Lifecycle | `deferred` |
-| Razón | TASK-065 recalibró RpA con soft bands y se mantuvo como indicador de bonos. FTR es propuesta estratégica pendiente de decisión de producto. |
-
-## Delta 2026-03-27 — Alineación arquitectónica
-
-- **Lifecycle cambiado a `deferred`**: el body de esta task está CONGELADO. Ningún slice debe ejecutarse hasta que exista una decisión de producto que active formalmente FTR como indicador de bonos.
-- **Correcciones obligatorias si FTR se activa:**
-  - Fuente de KPI: usar `greenhouse_serving.ico_member_metrics.ftr_pct` (PostgreSQL serving, ya materializado por ICO projection). NO usar `notion_ops.tareas` directo.
-  - Approach de schema: AGREGAR `bonus_ftr_min`, `bonus_ftr_max`, `kpi_ftr_percent`, `bonus_ftr_amount` como campos nuevos JUNTO a `bonus_rpa_*` existentes. NO renombrar ni eliminar los campos RpA — están en producción y son usados por TASK-065, proyecciones, exports y recibos.
-  - `payroll_bonus_config`: extender la tabla PostgreSQL existente (ya ampliada por TASK-065 con `rpa_soft_band_*`). No crear tabla paralela ni referenciar BigQuery.
-  - Motor de cálculo: integrar sobre el forward engine cortado a indicadores synced (TASK-078), no sobre el engine manual anterior.
-- **Prerequisitos si se reactiva:** TASK-078 (forward engine cutover), TASK-065 (bonus config canónico)
-
-## Delta 2026-03-27 (original)
-- La lane inmediata aprobada por negocio no es reemplazar `RpA` todavía, sino recalibrar el payout vigente de `OTD + RpA` para hacerlo más flexible.
-- La ejecución inmediata queda capturada en [TASK-065](../in-progress/TASK-065-payroll-variable-bonus-policy-recalibration.md).
-- Interpretación actual:
-  - `TASK-025` sigue vigente como propuesta estratégica de migración a `FTR`
-  - pero ya no debe asumirse como el siguiente paso obligatorio antes de cerrar la nómina
-- Si `TASK-065` se implementa, `TASK-025` debe reevaluarse después como:
-  - reemplazo futuro de `RpA`
-  - complemento a `OTD`
-  - o lane cancelada si la recalibración de `RpA` resulta suficiente
-
-**Aplica sobre:** `CODEX_TASK_HR_Payroll_Module_v2.md`
-**Fecha:** 2026-03-21
-**Decisión:** Reemplazar el bono por RpA (Rounds per Asset) con bono por FTR% (First Time Right)
-**Razón:** FTR% alinea el incentivo interno con la promesa ICO al cliente. OTD% = "a tiempo", FTR% = "bien a la primera". RpA como promedio diluye outliers y no premia calidad desde el brief.
-
----
-
-## Definición de First Time Right (FTR%)
-
-**Para explicar al equipo:**
-
-> FTR% mide cuántas de tus piezas terminadas el cliente aprobó sin pedir ningún cambio.
-> Si 65 de cada 100 piezas que entregas pasan sin correcciones, calificas para el bono.
-> Lo que importa es entender bien el brief antes de producir, validar contra guidelines,
-> y entregar algo que no necesite iteración.
-> Los ajustes internos antes de entregar al cliente no cuentan como ronda —
-> solo cuentan las rondas de revisión del cliente.
-
-**Definición técnica:**
-
-```
-FTR% = (Tareas completadas con client_change_round = 0) / (Total tareas con fase_csc = 'Completado') × 100
-```
-
-**Qué cuenta como FTR:**
-- Cliente aprobó sin solicitar cambios
-- 0 rondas de revisión cliente (`client_change_round = 0` o `NULL`)
-- Ajustes internos pre-entrega al cliente no cuentan como ronda
-- Solo tareas en fase `Completado`
-
-**Qué NO cuenta como FTR:**
-- Cliente pidió cualquier cambio (1 o más rondas)
-- Da igual si fueron 1 o 5 rondas — cada una es un fallo
-- Tareas canceladas o en backlog no entran al cálculo
-
-**Umbral para bono:** FTR% >= 65.0%
-- 65% es el umbral inicial de activación
-- Se revisará trimestralmente; el objetivo aspiracional ICO es 70%
-- El `payroll_bonus_config` soporta versionado con `effective_from`
-
----
-
-## Cambios por sección del CODEX TASK
-
-### PARTE A: Infraestructura BigQuery
-
-#### A1. `compensation_versions` — RENOMBRAR columnas de bono
-
-**Eliminar:**
-```sql
-bonus_rpa_min FLOAT64 DEFAULT 0,
-bonus_rpa_max FLOAT64 DEFAULT 0,
-```
-
-**Reemplazar con:**
-```sql
-bonus_ftr_min FLOAT64 DEFAULT 0,
-bonus_ftr_max FLOAT64 DEFAULT 0,
-```
-
-#### A3. `payroll_entries` — RENOMBRAR columnas KPI y bono
-
-**Eliminar:**
-```sql
-kpi_rpa_avg FLOAT64,
-kpi_rpa_qualifies BOOL DEFAULT FALSE,
-bonus_rpa_amount FLOAT64 DEFAULT 0,
-```
-
-**Reemplazar con:**
-```sql
-kpi_ftr_percent FLOAT64,
-kpi_ftr_qualifies BOOL DEFAULT FALSE,
-bonus_ftr_amount FLOAT64 DEFAULT 0,
-```
+- Lifecycle: `to-do`
+- Priority: `P2`
+- Impact: `Alto`
+- Effort: `Bajo`
+- Type: `policy`
+- Status real: `Deferred hasta decisión explícita de producto`
+- Rank: `TBD`
+- Domain: `hr`
+- Blocked by: `none`
+- Branch: `task/TASK-025-payroll-ftr-bonus-policy-decision`
+- Legacy ID: `CODEX_TASK_HR_Payroll_Module_v2_DELTA_FTR`
+- GitHub Issue: `none`
+
+## Summary
+
+Formalizar si `Payroll` debe seguir usando `OTD + RpA` como incentivo variable o si en el futuro `FTR` entra como reemplazo o complemento. Esta task rescata la lane legacy y la convierte en policy ejecutable: define los no-negociables, el contrato de datos y los gates que cualquier implementación futura debe respetar para no romper nómina, projected payroll, receipts, exports y consumers financieros.
+
+## Why This Task Exists
+
+La task original proponía reemplazar `RpA` por `FTR` como si bastara un rename de columnas y queries sobre BigQuery. Eso hoy es peligroso y conceptualmente incorrecto:
+
+- el runtime real de Payroll sigue pagándose con `OTD + RpA`
+- `TASK-065` endureció esa policy con bandas suaves y compatibilidad transversal
+- `FTR` ya existe como KPI del ecosistema `ICO`, pero su benchmark de salud no equivale automáticamente a un threshold de bono
+- el módulo de nómina, projected payroll, exports, receipts, `personnel-expense` y consumers de Finance siguen anclados a `bonus_rpa_*`
+
+La lane sigue teniendo valor, pero ya no como implementación inmediata. Su cabida actual es decidir **si** y **cómo** `FTR` podría entrar a la compensación variable sin causar un corte destructivo del runtime actual.
+
+## Goal
+
+- Convertir la propuesta legacy `RpA -> FTR` en una policy canónica y compatible con el runtime actual.
+- Definir el contrato de datos y los guardrails de cualquier adopción futura de `FTR` en Payroll.
+- Dejar explícito si `FTR` queda descartado, diferido, complementario o reemplaza a `RpA` en una lane posterior de implementación.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 1 — CONTEXT & CONSTRAINTS
+     "Que necesito entender antes de planificar?"
+     El agente lee cada doc referenciado aqui. Si un doc no
+     existe en el repo, reporta antes de continuar.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Architecture Alignment
+
+Revisar y respetar:
+
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- `docs/architecture/Contrato_Metricas_ICO_v1.md`
+- `docs/architecture/Greenhouse_ICO_Engine_v1.md`
+
+Reglas obligatorias:
+
+- `Payroll` no puede redefinir localmente `OTD`, `RpA` o `FTR`; debe consumir el contrato canónico de `ICO`.
+- Si `FTR` entra a nómina alguna vez, su fuente debe venir del reader/materialización oficial de `ICO`, no de `notion_ops.tareas` ni de queries ad hoc.
+- El benchmark de salud de `FTR` no equivale automáticamente al threshold de bono; compensation policy y metric contract son capas distintas.
+- Una futura activación de `FTR` no puede renombrar ni eliminar en caliente `bonus_rpa_*`, `kpi_rpa_*` o `rpa_soft_band_*`; debe convivir de forma aditiva o migrarse con plan explícito.
+- Cualquier cambio futuro debe preservar consistencia entre:
+  - official payroll
+  - projected payroll
+  - recalculate-entry
+  - receipts / PDF / Excel / exports
+  - `personnel-expense` y consumers financieros
+
+## Normative Docs
+
+- `project_context.md`
+- `Handoff.md`
+- `docs/tasks/complete/TASK-065-payroll-variable-bonus-policy-recalibration.md`
+- `docs/tasks/complete/TASK-078-payroll-chile-previsional-foundation.md`
+
+## Dependencies & Impact
+
+### Depends on
+
+- `docs/tasks/complete/TASK-065-payroll-variable-bonus-policy-recalibration.md`
+- `docs/tasks/complete/TASK-078-payroll-chile-previsional-foundation.md`
+- `src/lib/payroll/fetch-kpis-for-period.ts`
+- `src/lib/payroll/bonus-proration.ts`
+- `src/lib/payroll/calculate-payroll.ts`
+- `src/lib/payroll/recalculate-entry.ts`
+- `src/lib/payroll/postgres-store.ts`
+- `src/lib/payroll/projected-payroll-store.ts`
+- `src/lib/payroll/generate-payroll-pdf.tsx`
+- `src/lib/payroll/generate-payroll-excel.ts`
+- `src/lib/payroll/export-payroll.ts`
+
+### Blocks / Impacts
+
+- futura política de bono variable en Payroll
+- projected payroll y explainability
+- exports y recibos legales
+- `personnel-expense` y lectura de bonos por Finance
+- cualquier futura lane de payout basada en `FTR`
+
+### Files owned
+
+- `docs/tasks/to-do/TASK-025-hr-payroll-module-delta-ftr.md`
+- `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+- `docs/architecture/Contrato_Metricas_ICO_v1.md`
+- `src/lib/payroll/**`
+
+## Current Repo State
+
+### Already exists
+
+- `TASK-065` dejó una policy vigente de bonos basada en `OTD + RpA` con bandas suaves y compatibilidad runtime.
+- `TASK-078` cerró el forward engine que hoy gobierna payroll oficial y projected payroll.
+- El esquema y el runtime actual siguen materialmente anclados a `RpA`:
+  - `bonus_rpa_min` / `bonus_rpa_max`
+  - `kpi_rpa_avg` / `kpi_rpa_qualifies`
+  - `bonus_rpa_amount` / `bonus_rpa_proration_factor`
+  - `rpa_soft_band_*` en `greenhouse_payroll.payroll_bonus_config`
+- `FTR` ya existe como métrica canónica en el ecosistema `ICO` y en su contrato documental, pero Payroll todavía no la consume en el bonus flow.
+- `src/lib/payroll/fetch-kpis-for-period.ts` hoy trae `OTD` y `RpA`, no `FTR`.
 
-#### A4. `payroll_bonus_config` — RENOMBRAR columna y cambiar umbral
+### Gap
+
+- No existe una decisión institucional sobre si `FTR` entra a Payroll como reemplazo, complemento o no entra.
+- La task legacy propone cambios destructivos incompatibles con el runtime real actual.
+- Falta un contrato explícito de activación futura para `FTR` que preserve compatibilidad con official payroll, projected payroll y exports.
 
-**Tabla completa reemplazada:**
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 2 — PLAN MODE
+     El agente que toma esta task ejecuta Discovery y produce
+     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 3 — EXECUTION SPEC
+     "Que construyo exactamente, slice por slice?"
+     El agente solo lee esta zona DESPUES de que el plan este
+     aprobado. Ejecuta un slice, verifica, commitea, y avanza.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Scope
 
-```sql
-CREATE TABLE IF NOT EXISTS `efeonce-group.greenhouse.payroll_bonus_config` (
-  config_id STRING NOT NULL DEFAULT 'default',
-  otd_threshold FLOAT64 NOT NULL DEFAULT 89.0,    -- OTD% mínimo para calificar (>=)
-  ftr_threshold FLOAT64 NOT NULL DEFAULT 65.0,    -- FTR% mínimo para calificar (>=)
-  effective_from DATE NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
-);
+### Slice 1 — Decision Frame
 
-INSERT INTO `efeonce-group.greenhouse.payroll_bonus_config`
-  (config_id, otd_threshold, ftr_threshold, effective_from)
-VALUES
-  ('default', 89.0, 65.0, '2026-01-01');
-```
+- documentar las opciones válidas de producto:
+  - `RpA` sigue como KPI de bonus y `FTR` queda solo como health metric
+  - `FTR` complementa a `RpA`
+  - `FTR` reemplaza a `RpA` en una lane futura
+  - `FTR` se descarta para comp variable aunque siga vivo como KPI operativo
+- dejar explícito qué pregunta de negocio resuelve cada opción
+- separar benchmark de salud del KPI vs threshold de pago
 
----
+### Slice 2 — Canonical Data Contract
 
-### PARTE B: Contrato de KPIs
+- definir la fuente aprobada para una futura lectura de `FTR` en Payroll
+- prohibir explícitamente queries crudas a BigQuery/Notion desde la lane de compensación
+- definir compatibilidad mínima de schema/runtime si `FTR` se activa:
+  - convivencia aditiva con `bonus_rpa_*`
+  - no rename destructivo
+  - no tabla paralela innecesaria
 
-#### B3. Query de FTR% por persona (reemplaza query de RpA)
+### Slice 3 — Activation Gates
 
-```sql
--- ADAPTAR: verificar nombres reales de columnas antes de usar
--- La fórmula es idéntica a la del ICO Engine metric registry (ftr_pct)
-SELECT
-  @identity_field AS member_ref,
-  COUNTIF(IFNULL(client_change_round, 0) = 0) AS tasks_ftr,
-  COUNT(*) AS tasks_completed,
-  ROUND(
-    COUNTIF(IFNULL(client_change_round, 0) = 0) * 100.0 / NULLIF(COUNT(*), 0),
-    1
-  ) AS ftr_percent
-FROM `efeonce-group.notion_ops.tareas`
-WHERE estado = 'Listo'
-  AND last_edited_time >= TIMESTAMP(@month_start)
-  AND last_edited_time < TIMESTAMP(@month_end)
-GROUP BY member_ref
-```
+- listar las precondiciones para abrir una task de implementación futura
+- definir qué surfaces y consumers deben entrar en cualquier rollout:
+  - official payroll
+  - projected payroll
+  - recalculate-entry
+  - receipts / PDF / Excel / exports
+  - `personnel-expense`
+- proponer la estrategia de rollout:
+  - paralela
+  - feature-flagged
+  - dual-write / dual-read si aplica
+  - validación comparativa antes de cutover
 
-**Nota:** La query trata `client_change_round = NULL` como 0 rondas (FTR). Esto es consistente con el ICO Engine que usa `IFNULL(client_change_round, 0) = 0`. Si el equipo decide que NULL debe excluirse del cálculo, cambiar a `WHERE client_change_round IS NOT NULL` en el filtro.
+## Out of Scope
 
-#### B4. Evaluación de umbrales — REEMPLAZAR
+- implementar `FTR` en payroll hoy
+- cambiar el schema actual para borrar o renombrar `RpA`
+- alterar la fórmula canónica de `FTR` dentro de `ICO`
+- recalibrar nuevamente la policy vigente de `OTD + RpA`
+- reabrir `TASK-065` o `TASK-078`
 
-**Antes:**
-```
-Si kpi_otd_percent >= 89.0 → kpi_otd_qualifies = TRUE
-Si kpi_rpa_avg < 2.0       → kpi_rpa_qualifies = TRUE
-```
+## Detailed Spec
 
-**Después:**
-```
-Si kpi_otd_percent >= 89.0  → kpi_otd_qualifies = TRUE
-Si kpi_ftr_percent >= 65.0  → kpi_ftr_qualifies = TRUE
-```
+La forma correcta de rescatar esta lane es convertirla en una **policy de decisión**, no en un brief de implementación inmediata.
 
-Umbrales se leen de `payroll_bonus_config`. Notar que ambos usan operador `>=` (antes RpA usaba `<`).
+### Hechos duros del runtime actual
 
-#### B5. Bonos — sin cambio en lógica
+- `Payroll` hoy paga con `OTD + RpA`
+- `RpA` ya tiene semántica, trust model, exports y consumers downstream
+- `FTR` existe en el ecosistema `ICO`, pero todavía no está cableado al bonus flow de Payroll
 
-Misma mecánica: si califica, HR ve rango `[bonus_ftr_min, bonus_ftr_max]`, pre-llena con min, HR ajusta. Validación server-side idéntica pero con los nuevos campos.
+### Contrato mínimo si FTR se activa en el futuro
 
-#### B6. Cálculo Chile — RENOMBRAR
+Una futura implementación de `FTR` en nómina debe respetar estas reglas:
 
-```
-Renta imponible = base_salary + bonus_otd + bonus_ftr + bonus_other
-                  (remote_allowance NO es imponible)
-```
+1. **Source of truth**
+   - leer `FTR` desde el carril canónico de `ICO` que consume Payroll, no desde queries directas a BigQuery o Notion
+   - si el reader actual de Payroll no expone `FTR`, la futura lane debe extenderlo primero
 
-El resto del cálculo no cambia.
+2. **Compatibilidad de schema**
+   - agregar campos `ftr_*` si hacen falta
+   - no eliminar ni renombrar `rpa_*` en caliente
+   - cualquier deprecación posterior exige migración, backfill, rollout y consumers cerrados
 
-#### B7. Cálculo Internacional — RENOMBRAR
+3. **Compatibilidad funcional**
+   - official y projected payroll deben seguir dando la misma historia
+   - receipts / exports / explain dialogs deben soportar la transición sin ambigüedad semántica
+   - Finance no debe perder trazabilidad de bonos en `personnel-expense`
 
-```
-Gross = base_salary + bonus_otd + bonus_ftr + bonus_other + remote_allowance
-Net = Gross  (sin descuentos)
-```
+4. **Compensation policy != benchmark**
+   - `FTR >= 85` como banda benchmark de salud no obliga a usar `85` como threshold de bono
+   - el threshold de payout es una decisión de compensación y debe documentarse como tal
 
----
+### Recomendación base
 
-### PARTE C: API Routes
+Mientras no exista decisión explícita de producto:
 
-#### C6. `POST .../calculate` — Paso 3 cambia
+- `RpA` sigue como policy de bonus vigente
+- `FTR` sigue como métrica operativa y de calidad
+- `TASK-025` no debe ejecutarse como implementación
 
-El paso 3 ahora consulta FTR% en vez de RpA:
-1. Leer `team_members` activos
-2. Para cada uno, obtener `compensation_version` vigente
-3. Consultar KPIs del mes: **OTD% y FTR%** desde `notion_ops.tareas`
-4. Evaluar umbrales (`otd >= 89`, `ftr >= 65`)
-5. Pre-llenar bonos
-6. Calcular bruto, descuentos, neto
-7-9. Sin cambios
+Si negocio decide avanzar, esta misma task debe servir como gate de entrada para abrir una nueva lane de implementación compatible con el runtime actual.
 
-#### C8. `PATCH /entries/[entryId]` — Campos editables actualizados
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 4 — VERIFICATION & CLOSING
+     "Como compruebo que termine y que actualizo?"
+     El agente ejecuta estos checks al cerrar cada slice y
+     al cerrar la task completa.
+     ═══════════════════════════════════════════════════════════ -->
 
-**Campos editables:** `bonus_otd_amount`, `bonus_ftr_amount` (antes `bonus_rpa_amount`), `bonus_other_amount`, `bonus_other_description`, `chile_tax_amount`, `manual_override`, `manual_override_note`, `net_total` (solo si manual_override = TRUE).
+## Acceptance Criteria
 
-**Regla KPI manual:** si entran KPIs manuales, actualiza `kpi_*`, recalcula umbrales (`kpi_ftr_qualifies` en vez de `kpi_rpa_qualifies`) y vuelve a validar elegibilidad de bonos.
+- [ ] La task ya no propone renames o drops destructivos sobre `RpA`
+- [ ] Queda explícita la distinción entre benchmark `FTR` y threshold de bono
+- [ ] Queda documentado que una futura activación de `FTR` debe ser compatible con official payroll, projected payroll, receipts y exports
+- [ ] Queda definida la fuente canónica aprobada para una futura lectura de `FTR` en Payroll
+- [ ] La lane queda clasificada como policy estratégica y no como implementación inmediata
 
----
+## Verification
 
-### PARTE D: Vistas UI
+- revisión documental contra:
+  - `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
+  - `docs/architecture/Contrato_Metricas_ICO_v1.md`
+  - `docs/tasks/complete/TASK-065-payroll-variable-bonus-policy-recalibration.md`
+- verificación manual de consistencia con el schema/runtime actual
 
-#### D2. Tab: Período actual — Tabla REEMPLAZAR columnas
+## Closing Protocol
 
-| Columna | Dato |
-|---------|------|
-| Nombre | Avatar + nombre + badge régimen (CLP/USD) |
-| Salario base | Formateado con moneda |
-| OTD% | Porcentaje + semáforo (≥89 verde, <89 gris) + badge si califica |
-| Bono OTD | **Input editable** con slider [min-max]. Disabled + $0 si no califica |
-| **FTR%** | **Porcentaje + semáforo (≥65 verde, <65 gris) + badge si califica** |
-| **Bono FTR** | **Input editable** con slider [min-max]. Disabled + $0 si no califica |
-| Teletrabajo | Monto |
-| Bruto | Calculado automático |
-| Descuentos | Solo Chile. Click expande desglose |
-| **Neto** | Número destacado |
+- [ ] Actualizar `Handoff.md` dejando explícito que `TASK-025` fue rescatada como policy y no reactivada como implementación
+- [ ] Mantener `TASK-025` fuera de la cola inmediata de ejecución hasta que exista decisión de producto
 
-**KPIs sin match automático:** Si para una persona no se encontraron KPIs en `notion_ops`, mostrar badge "KPI manual" y campos editables para que HR ingrese OTD% y **FTR%** manualmente (antes era OTD% y RpA).
+## Follow-ups
 
-#### D3. Tab: Compensaciones — Drawer
+- si negocio aprueba mover el incentivo a `FTR`, abrir una nueva `TASK-###` de implementación compatible con el runtime actual
+- si negocio decide que `FTR` no entra a compensación, cerrar `TASK-025` como policy descartada
+- si se decide una convivencia `RpA + FTR`, abrir una lane específica de rollout y explainability
 
-Sección 2 del drawer cambia de "Rangos OTD min/max, RpA min/max" a "Rangos OTD min/max, **FTR min/max**".
+## Delta 2026-04-13
 
----
+- Task rescatada desde brief legacy destructivo a policy canónica.
+- Se elimina la lectura de implementación inmediata basada en rename de `RpA`.
+- La lane queda reencuadrada como decisión estratégica de compensación variable futura.
 
-### PARTE E: Tipos TypeScript
+## Open Questions
 
-#### `CompensationVersion` — RENOMBRAR
-
-```typescript
-// Eliminar:
-bonusRpaMin: number
-bonusRpaMax: number
-
-// Reemplazar con:
-bonusFtrMin: number
-bonusFtrMax: number
-```
-
-#### `PayrollEntry` — RENOMBRAR
-
-```typescript
-// Eliminar:
-kpiRpaAvg: number | null
-kpiRpaQualifies: boolean
-bonusRpaAmount: number
-
-// Reemplazar con:
-kpiFtrPercent: number | null
-kpiFtrQualifies: boolean
-bonusFtrAmount: number
-```
-
----
-
-### PARTE F: Estructura de archivos
-
-```
-// Renombrar en lib/payroll/:
-fetch-kpis-for-period.ts     // Ahora consulta OTD% + FTR% (antes OTD% + RpA)
-
-// Renombrar en views/:
-BonusInput.tsx                // Sin cambio en componente, solo en props/labels
-```
-
----
-
-### Criterios de aceptación — ACTUALIZAR
-
-**Reemplazar:**
-- [ ] ~~HR no puede asignar bono RpA si RpA >= 2.0~~
-
-**Con:**
-- [ ] HR no puede asignar bono FTR si FTR% < 65% (validación server-side)
-- [ ] La columna FTR% muestra semáforo: ≥65 verde, <65 gris
-- [ ] El umbral FTR se lee de `payroll_bonus_config.ftr_threshold`
-- [ ] La query de FTR% es consistente con la definición del ICO Engine (`client_change_round = 0`)
-
----
-
-### Notas para el agente — AGREGAR
-
-- **FTR% usa la misma fuente de datos que RpA** (`client_change_round` en `notion_ops.tareas`), pero la evaluación es diferente: RpA era un promedio continuo, FTR% es un ratio binario por tarea (0 rondas = éxito, ≥1 = fallo).
-- **Consistencia con ICO Engine:** La fórmula de FTR% en payroll DEBE ser idéntica a la del ICO metric registry (`ftr_pct` en `ico-metric-registry.ts`). Si el ICO Engine cambia la fórmula, payroll debe actualizarse.
-- **`NULL` en `client_change_round`:** Tratar como 0 rondas (FTR). Esto es consistente con el ICO Engine que usa `IFNULL(client_change_round, 0)`.
-- **Umbral versionable:** El `payroll_bonus_config` tiene `effective_from`. Cuando el equipo estabilice FTR% por encima de 65%, se puede crear nueva fila con `ftr_threshold = 70.0` sin tocar código.
-- **El operador cambió:** RpA usaba `<` (menor que 2.0). FTR% usa `>=` (mayor o igual a 65.0). No confundir al evaluar umbrales.
-
----
-
-*Efeonce Greenhouse™ • Efeonce Group • Marzo 2026*
-*Delta técnico — Referencia normativa para agentes de desarrollo.*
+- si el negocio quiere que `FTR` reemplace, complemente o solo informe respecto a `RpA`
+- si una futura activación de `FTR` usaría threshold binario, banda suave o score híbrido
+- qué consumer downstream debe considerarse criterio de cierre para una futura implementación

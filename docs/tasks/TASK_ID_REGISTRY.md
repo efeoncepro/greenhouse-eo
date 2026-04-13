@@ -39,7 +39,7 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-022` | `to-do`          | `CODEX_TASK_Services_Runtime_Closure_v1`                           | `docs/tasks/to-do/TASK-022-services-runtime-closure.md`                 |
 | `TASK-023` | `to-do`          | `CODEX_TASK_Notification_System`                                   | `docs/tasks/to-do/TASK-023-notification-system.md`                      |
 | `TASK-024` | `to-do`          | `CODEX_TASK_Greenhouse_Login_Redesign`                             | `docs/tasks/to-do/TASK-024-greenhouse-login-redesign.md`                |
-| `TASK-025` | `deferred`       | `CODEX_TASK_HR_Payroll_Module_v2_DELTA_FTR`                        | `docs/tasks/to-do/TASK-025-hr-payroll-module-delta-ftr.md`              |
+| `TASK-025` | `deferred`       | `Payroll FTR Bonus Policy Decision`                                | `docs/tasks/to-do/TASK-025-hr-payroll-module-delta-ftr.md`              |
 | `TASK-026` | `complete`       | `CODEX_TASK_HRIS_Contract_Type_Consolidation`                      | `docs/tasks/complete/TASK-026-hris-contract-type-consolidation.md`      |
 | `TASK-027` | `to-do`          | `CODEX_TASK_HRIS_Document_Vault`                                   | `docs/tasks/to-do/TASK-027-hris-document-vault.md`                      |
 | `TASK-028` | `to-do`          | `CODEX_TASK_HRIS_Expense_Reports`                                  | `docs/tasks/to-do/TASK-028-hris-expense-reports.md`                     |
