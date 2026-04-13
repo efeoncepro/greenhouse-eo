@@ -1,5 +1,21 @@
 # changelog.md
 
+## 2026-04-13
+
+### 2026-04-13 — Finance OC ahora prioriza contactos asociados al cliente
+
+- `Finance > Purchase Orders > Registrar OC` ahora ofrece un selector de contactos vinculado al cliente elegido.
+- El dropdown se nutre primero de memberships de la organización del cliente; si no hay contactos financieros explícitos, cae a miembros de esa misma organización con email.
+- Solo si no hay memberships útiles, el flujo reutiliza el snapshot legacy `financeContacts` del cliente.
+- El ingreso manual sigue disponible como excepción explícita con `No encuentro el contacto`.
+
+### 2026-04-13 — Nueva lane `MINI-###` para mejoras chicas planificadas
+
+- Se agregó `docs/mini-tasks/` con pipeline `to-do / in-progress / complete`.
+- La nueva lane sirve para cambios pequeños y locales que no conviene dejar solo en chat, pero que tampoco justifican una `TASK-###` completa.
+- La convención quedó formalizada en `docs/operations/MINI_TASK_OPERATING_MODEL_V1.md`.
+- Se sembró el primer brief: `MINI-001` para convertir el contacto de OC en selección asociada al cliente.
+
 ## 2026-04-11
 
 ### 2026-04-11 — Seed operativo para el piloto Kortex sobre sister-platform consumers

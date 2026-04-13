@@ -1,5 +1,22 @@
 # project_context.md
 
+## Delta 2026-04-13 Lane formal de mini-tasks para mejoras chicas planificadas
+
+- Greenhouse ya tiene una lane documental intermedia para cambios chicos que no deben ejecutarse "al vuelo" pero tampoco justifican una `TASK-###` completa.
+- Runtime documental nuevo:
+  - `docs/mini-tasks/README.md`
+  - `docs/mini-tasks/MINI_TASK_TEMPLATE.md`
+  - `docs/mini-tasks/MINI_TASK_ID_REGISTRY.md`
+  - `docs/operations/MINI_TASK_OPERATING_MODEL_V1.md`
+- Contrato operativo:
+  - las mini-tasks usan `MINI-###`
+  - viven en `docs/mini-tasks/{to-do,in-progress,complete}`
+  - capturan mejoras chicas, locales y planificadas
+  - si el hallazgo es una falla real de runtime, sigue siendo `ISSUE-###`
+  - si el cambio crece de alcance o toca arquitectura/shared runtime, debe promoverse a `TASK-###`
+- Primer brief sembrado:
+  - `docs/mini-tasks/to-do/MINI-001-po-client-contact-selector.md`
+
 ## Delta 2026-04-11 Local Next build isolation para agentes y procesos concurrentes
 
 - `pnpm build` ya no reutiliza `.next` por defecto en local/agent runtime fuera de Vercel y CI.
