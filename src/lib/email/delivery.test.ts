@@ -98,7 +98,7 @@ describe('email delivery layer', () => {
 
   it('retries failed deliveries using the persisted replay payload', async () => {
     mockRunGreenhousePostgresQuery.mockImplementation((sql: string) => {
-      if (sql.includes("WHERE status = 'failed'")) {
+      if (sql.includes("status = 'failed' AND attempt_number")) {
         return Promise.resolve([
           {
             delivery_id: 'delivery-claim-1',
@@ -214,7 +214,7 @@ describe('email delivery layer', () => {
     )
   })
 
-  it('returns skipped aggregate when all recipients are skipped (e.g. RESEND_API_KEY missing)', async () => {
+  it('returns failed aggregate when RESEND_API_KEY is not configured (config error is retryable)', async () => {
     mockIsResendConfigured.mockReturnValue(false)
 
     const result = await sendEmail({
@@ -224,8 +224,8 @@ describe('email delivery layer', () => {
       context: { title: 'Test', body: 'Test body' }
     })
 
-    expect(result.status).toBe('skipped')
+    expect(result.status).toBe('failed')
     expect(result.recipientResults).toBeDefined()
-    expect(result.recipientResults?.[0]?.status).toBe('skipped')
+    expect(result.recipientResults?.[0]?.status).toBe('failed')
   })
 })
