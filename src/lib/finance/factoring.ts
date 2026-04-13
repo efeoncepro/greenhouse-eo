@@ -73,10 +73,10 @@ const insertExpenseInTransaction = async (
 ): Promise<void> => {
   await client.query(
     `INSERT INTO greenhouse_finance.expenses (
-      expense_id, client_id, space_id, expense_type, source_type, description, currency,
+      expense_id, client_id, expense_type, description, currency,
       subtotal, tax_rate, tax_amount, total_amount,
       exchange_rate_to_clp, total_amount_clp,
-      payment_date, payment_status, payment_method, payment_provider, payment_rail,
+      payment_date, payment_status, payment_method,
       payment_account_id, payment_reference,
       document_number, document_date, due_date,
       supplier_id, supplier_name, supplier_invoice_number,
@@ -91,10 +91,10 @@ const insertExpenseInTransaction = async (
       created_at, updated_at
     )
     VALUES (
-      $1, $2, NULL, $3, 'manual', $4, 'CLP',
+      $1, $2, $3, $4, 'CLP',
       $5, 0, 0, $5,
       1, $5,
-      $6::date, 'paid', NULL, NULL, NULL,
+      $6::date, 'paid', NULL,
       NULL, $7,
       NULL, NULL, NULL,
       $8, $9, NULL,
@@ -219,14 +219,12 @@ export const recordFactoringOperation = async (
       `INSERT INTO greenhouse_finance.income_payments (
         payment_id, income_id, payment_date, amount, currency,
         reference, payment_method, payment_account_id, payment_source,
-        notes, recorded_by_user_id, recorded_at, is_reconciled, created_at,
-        exchange_rate_at_payment, amount_clp, fx_gain_loss_clp
+        notes, recorded_by_user_id, recorded_at, is_reconciled, created_at
       )
       VALUES (
         $1, $2, $3::date, $4, 'CLP',
         $5, NULL, $6, 'factoring_proceeds',
-        NULL, $7, CURRENT_TIMESTAMP, FALSE, CURRENT_TIMESTAMP,
-        1, $4, 0
+        NULL, $7, CURRENT_TIMESTAMP, FALSE, CURRENT_TIMESTAMP
       )`,
       [
         paymentId, input.incomeId, input.operationDate,
