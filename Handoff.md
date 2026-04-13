@@ -13,6 +13,7 @@
 - criterio de modelado:
   - JSONB no reemplaza la verdad canónica ni evita modelar tablas cuando un dato se vuelve contractual, transaccional o consultable de forma intensiva
   - la capa sí habilita guardar bundles tipados/versionados que hoy terminan dispersos en payloads ad hoc, docs o prompts
+  - se añadió una regla explícita para agentes sobre cuándo usar relacional, `JSONB`, `JSON` o ninguno
 - verificación:
   - `git diff --check`
 - notas operativas:

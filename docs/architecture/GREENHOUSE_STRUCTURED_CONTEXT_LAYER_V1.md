@@ -186,6 +186,123 @@ The layer must support stable querying by:
 
 The layer is intentionally designed to support AI and multi-agent development workflows, not just webhook payload storage.
 
+## Agent Decision Rules — When To Use Relational Columns, JSONB, JSON, Or Neither
+
+This section is normative for agents and developers working on Greenhouse.
+
+### Rule 1 — Use relational modeling first
+
+Use normal columns and tables when the data is part of canonical business truth.
+
+That includes:
+
+- IDs and foreign keys
+- lifecycle states
+- balances, amounts, and accounting truth
+- contractual dates
+- permission and access state
+- ownership and tenant isolation
+- fields that are filtered, joined, grouped, or enforced regularly
+
+If the answer to "is this part of the canonical object model?" is yes, then the answer is **not JSON** and **not JSONB**.
+
+### Rule 2 — Use JSONB inside PostgreSQL when the context is structured, flexible, and operationally useful
+
+Use `jsonb` when all of these are true:
+
+- the data is not the canonical truth of the aggregate
+- the structure can evolve over time
+- the value is still machine-readable and worth validating
+- Greenhouse may query, merge, replay, or inspect it later
+
+Good fits in Greenhouse:
+
+- normalized integration payloads
+- replay context for reactive runs
+- audit evidence bundles
+- snapshots used for explanation or debugging
+- agent assumption sets, audit reports, execution plans, and result summaries
+- local metadata that is narrow and clearly bounded
+
+### Rule 3 — Use JSON only when exact raw representation matters more than database behavior
+
+Inside Greenhouse, plain `json` should be rare.
+
+Use `json` only when you must preserve the incoming representation as-is and do **not** need the normal PostgreSQL `jsonb` advantages such as:
+
+- indexing
+- containment queries
+- patch/merge operations
+- normalized binary storage
+
+Typical examples are limited to:
+
+- pass-through raw payload preservation where exact ordering/format matters
+- artifacts outside the canonical DB model
+- transient serialization boundaries in app/runtime code
+
+If the data is being stored in PostgreSQL and Greenhouse may inspect it later, default to `jsonb`, not `json`.
+
+### Rule 4 — Do not add catch-all JSONB to core aggregates by default
+
+Do not solve uncertainty by adding:
+
+- `metadata_jsonb`
+- `extra_json`
+- `payload`
+- `data`
+
+to every aggregate "just in case".
+
+That pattern creates shadow truth and weakens the data model.
+
+If the context is broad, cross-cutting, or likely to grow, put it in the Structured Context Layer instead of bolting a generic `jsonb` field onto the core table.
+
+### Rule 5 — Inline JSONB is acceptable only for narrow, local extension areas
+
+Inline `jsonb` in a domain table is still acceptable when:
+
+- the scope is local to that table
+- the document is small
+- the shape is well understood
+- the field is not becoming a second schema
+- there is no cross-aggregate reuse need
+
+Examples already present in Greenhouse:
+
+- narrow `metadata_json` in assets or bindings
+- trust or evidence payloads tied to one serving row
+- source payload snapshots tied to one import/reconciliation row
+
+If multiple modules start depending on that document, it has outgrown inline `jsonb` and should be promoted to the Structured Context Layer or to relational tables, depending on the use case.
+
+### Rule 6 — If it is queried by business keys repeatedly, promote it
+
+When a JSONB key starts becoming:
+
+- a repeated filter
+- a join target
+- part of reporting
+- part of access control
+- part of reconciliation truth
+
+it should stop being "just context".
+
+Promote it into explicit relational columns or child tables.
+
+### Rule 7 — Agent shortcut
+
+Agents should apply this fast decision tree:
+
+1. Is it canonical business truth?
+   -> Relational
+2. Is it flexible context worth persisting and reusing inside PostgreSQL?
+   -> JSONB
+3. Is exact raw representation the main concern and DB semantics do not matter?
+   -> JSON, but only exceptionally
+4. Is it just uncertainty about the model?
+   -> Neither; model it properly first
+
 ## Recommended Physical Model
 
 ### Schema
