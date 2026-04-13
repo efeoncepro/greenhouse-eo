@@ -2,6 +2,12 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — Las OC ya permiten cargar o reemplazar su respaldo después del registro
+
+- `Finance > Purchase Orders` ahora expone una acción por fila para completar o reemplazar el respaldo de una OC ya creada.
+- El documento sigue perteneciendo a la OC; las HES vinculadas continúan heredándolo en vez de guardar un PDF propio.
+- Cuando una OC no tiene respaldo, `Finance > HES > Registrar HES` ahora lo comunica con copy explícito y dirige operativamente a completar ese documento en la OC.
+
 ### 2026-04-13 — HES ahora reutiliza contactos del cliente y hereda respaldo desde la OC vinculada
 
 - `Finance > HES > Registrar HES` ahora carga contactos asociados solo al cliente seleccionado, igual que el flujo de OC.

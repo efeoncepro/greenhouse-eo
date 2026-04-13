@@ -35,6 +35,7 @@ import TablePaginationComponent from '@components/TablePaginationComponent'
 import { fuzzyFilter } from '@/components/tableUtils'
 import tableStyles from '@core/styles/table.module.css'
 import CreatePurchaseOrderDrawer from '@views/greenhouse/finance/drawers/CreatePurchaseOrderDrawer'
+import UpdatePurchaseOrderDocumentDrawer from '@views/greenhouse/finance/drawers/UpdatePurchaseOrderDocumentDrawer'
 
 // ── Types ──
 
@@ -42,6 +43,7 @@ interface PurchaseOrder {
   poId: string
   poNumber: string
   clientId: string
+  spaceId: string | null
   authorizedAmountClp: number
   invoicedAmountClp: number
   remainingAmountClp: number
@@ -51,6 +53,8 @@ interface PurchaseOrder {
   expiryDate: string | null
   description: string | null
   serviceScope: string | null
+  attachmentAssetId: string | null
+  attachmentUrl: string | null
 }
 
 // ── Config ──
@@ -86,84 +90,6 @@ const formatDate = (date: string | null) => {
 
 const poColumnHelper = createColumnHelper<PurchaseOrder>()
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const poColumns: ColumnDef<PurchaseOrder, any>[] = [
-  poColumnHelper.accessor('poNumber', {
-    header: 'OC #',
-    cell: ({ row }) => (
-      <Box>
-        <Typography variant='body2' fontWeight={600} sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
-          {row.original.poNumber}
-        </Typography>
-        {row.original.description && (
-          <Typography variant='caption' color='text.secondary' sx={{ display: 'block', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {row.original.description}
-          </Typography>
-        )}
-      </Box>
-    )
-  }),
-  poColumnHelper.accessor('issueDate', {
-    header: 'Emitida',
-    cell: ({ getValue }) => <Typography variant='body2'>{formatDate(getValue())}</Typography>
-  }),
-  poColumnHelper.accessor('expiryDate', {
-    header: 'Vence',
-    cell: ({ getValue }) => <Typography variant='body2'>{formatDate(getValue())}</Typography>
-  }),
-  poColumnHelper.accessor('authorizedAmountClp', {
-    header: 'Autorizado',
-    cell: ({ getValue }) => <Typography variant='body2' fontWeight={600}>{formatCLP(getValue())}</Typography>,
-    meta: { align: 'right' }
-  }),
-  {
-    id: 'consumption',
-    header: 'Consumo',
-    cell: ({ row }: { row: { original: PurchaseOrder } }) => {
-      const pct = row.original.authorizedAmountClp > 0
-        ? Math.min(100, (row.original.invoicedAmountClp / row.original.authorizedAmountClp) * 100)
-        : 0
-
-      return (
-        <Box sx={{ minWidth: 100 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-            <Typography variant='caption'>{formatCLP(row.original.invoicedAmountClp)}</Typography>
-            <Typography variant='caption' color='text.secondary'>{Math.round(pct)}%</Typography>
-          </Box>
-          <LinearProgress
-            variant='determinate'
-            value={pct}
-            color={pct >= 100 ? 'info' : pct >= 80 ? 'warning' : 'success'}
-            sx={{ height: 6, borderRadius: 3 }}
-          />
-        </Box>
-      )
-    },
-    enableSorting: false
-  },
-  poColumnHelper.accessor('remainingAmountClp', {
-    header: 'Saldo',
-    cell: ({ getValue }) => (
-      <Typography variant='body2' fontWeight={500} color={getValue() <= 0 ? 'text.disabled' : 'success.main'}>
-        {formatCLP(getValue())}
-      </Typography>
-    ),
-    meta: { align: 'right' }
-  }),
-  poColumnHelper.accessor('invoiceCount', {
-    header: 'Facturas',
-    cell: ({ getValue }) => <Typography variant='body2'>{getValue()}</Typography>
-  }),
-  poColumnHelper.accessor('status', {
-    header: 'Estado',
-    cell: ({ getValue }) => {
-      const conf = STATUS_CONFIG[getValue()] || STATUS_CONFIG.active
-
-      return <CustomChip round='true' size='small' variant='tonal' color={conf.color} label={conf.label} />
-    }
-  })
-]
-
 const PurchaseOrdersListView = () => {
   const [loading, setLoading] = useState(true)
   const [items, setItems] = useState<PurchaseOrder[]>([])
@@ -171,6 +97,8 @@ const PurchaseOrdersListView = () => {
   const [sorting, setSorting] = useState<SortingState>([{ id: 'issueDate', desc: true }])
   const [globalFilter, setGlobalFilter] = useState('')
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [documentDrawerOpen, setDocumentDrawerOpen] = useState(false)
+  const [selectedPurchaseOrder, setSelectedPurchaseOrder] = useState<PurchaseOrder | null>(null)
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -193,6 +121,128 @@ const PurchaseOrdersListView = () => {
   }, [statusFilter])
 
   useEffect(() => { fetchData() }, [fetchData])
+
+  const handleOpenDocumentDrawer = (purchaseOrder: PurchaseOrder) => {
+    setSelectedPurchaseOrder(purchaseOrder)
+    setDocumentDrawerOpen(true)
+  }
+
+  const handleCloseDocumentDrawer = () => {
+    setDocumentDrawerOpen(false)
+    setSelectedPurchaseOrder(null)
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const poColumns: ColumnDef<PurchaseOrder, any>[] = [
+    poColumnHelper.accessor('poNumber', {
+      header: 'OC #',
+      cell: ({ row }) => (
+        <Box>
+          <Typography variant='body2' fontWeight={600} sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+            {row.original.poNumber}
+          </Typography>
+          {row.original.description && (
+            <Typography variant='caption' color='text.secondary' sx={{ display: 'block', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {row.original.description}
+            </Typography>
+          )}
+        </Box>
+      )
+    }),
+    poColumnHelper.accessor('issueDate', {
+      header: 'Emitida',
+      cell: ({ getValue }) => <Typography variant='body2'>{formatDate(getValue())}</Typography>
+    }),
+    poColumnHelper.accessor('expiryDate', {
+      header: 'Vence',
+      cell: ({ getValue }) => <Typography variant='body2'>{formatDate(getValue())}</Typography>
+    }),
+    poColumnHelper.accessor('authorizedAmountClp', {
+      header: 'Autorizado',
+      cell: ({ getValue }) => <Typography variant='body2' fontWeight={600}>{formatCLP(getValue())}</Typography>,
+      meta: { align: 'right' }
+    }),
+    {
+      id: 'consumption',
+      header: 'Consumo',
+      cell: ({ row }: { row: { original: PurchaseOrder } }) => {
+        const pct = row.original.authorizedAmountClp > 0
+          ? Math.min(100, (row.original.invoicedAmountClp / row.original.authorizedAmountClp) * 100)
+          : 0
+
+        return (
+          <Box sx={{ minWidth: 100 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+              <Typography variant='caption'>{formatCLP(row.original.invoicedAmountClp)}</Typography>
+              <Typography variant='caption' color='text.secondary'>{Math.round(pct)}%</Typography>
+            </Box>
+            <LinearProgress
+              variant='determinate'
+              value={pct}
+              color={pct >= 100 ? 'info' : pct >= 80 ? 'warning' : 'success'}
+              sx={{ height: 6, borderRadius: 3 }}
+            />
+          </Box>
+        )
+      },
+      enableSorting: false
+    },
+    poColumnHelper.accessor('remainingAmountClp', {
+      header: 'Saldo',
+      cell: ({ getValue }) => (
+        <Typography variant='body2' fontWeight={500} color={getValue() <= 0 ? 'text.disabled' : 'success.main'}>
+          {formatCLP(getValue())}
+        </Typography>
+      ),
+      meta: { align: 'right' }
+    }),
+    poColumnHelper.accessor('invoiceCount', {
+      header: 'Facturas',
+      cell: ({ getValue }) => <Typography variant='body2'>{getValue()}</Typography>
+    }),
+    {
+      id: 'attachment',
+      header: 'Respaldo',
+      enableSorting: false,
+      cell: ({ row }) => (
+        <Stack spacing={1} sx={{ minWidth: 190, alignItems: 'flex-start' }}>
+          <Typography variant='caption' color={row.original.attachmentUrl ? 'success.main' : 'text.secondary'} fontWeight={600}>
+            {row.original.attachmentUrl ? 'Respaldo cargado' : 'Sin respaldo'}
+          </Typography>
+          <Stack direction='row' spacing={1} useFlexGap flexWrap='wrap'>
+            {row.original.attachmentUrl ? (
+              <Button
+                size='small'
+                variant='text'
+                color='primary'
+                href={row.original.attachmentUrl}
+                target='_blank'
+                rel='noreferrer'
+              >
+                Abrir
+              </Button>
+            ) : null}
+            <Button
+              size='small'
+              variant={row.original.attachmentUrl ? 'outlined' : 'contained'}
+              color='primary'
+              onClick={() => handleOpenDocumentDrawer(row.original)}
+            >
+              {row.original.attachmentUrl ? 'Reemplazar' : 'Cargar'}
+            </Button>
+          </Stack>
+        </Stack>
+      )
+    },
+    poColumnHelper.accessor('status', {
+      header: 'Estado',
+      cell: ({ getValue }) => {
+        const conf = STATUS_CONFIG[getValue()] || STATUS_CONFIG.active
+
+        return <CustomChip round='true' size='small' variant='tonal' color={conf.color} label={conf.label} />
+      }
+    })
+  ]
 
   const table = useReactTable({
     data: items,
@@ -304,6 +354,15 @@ const PurchaseOrdersListView = () => {
       </Card>
 
       <CreatePurchaseOrderDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} onSuccess={() => { setDrawerOpen(false); fetchData() }} />
+      <UpdatePurchaseOrderDocumentDrawer
+        open={documentDrawerOpen}
+        purchaseOrder={selectedPurchaseOrder}
+        onClose={handleCloseDocumentDrawer}
+        onSuccess={() => {
+          handleCloseDocumentDrawer()
+          fetchData()
+        }}
+      />
     </Stack>
   )
 }

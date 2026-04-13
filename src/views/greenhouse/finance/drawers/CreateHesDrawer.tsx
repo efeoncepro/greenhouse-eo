@@ -716,9 +716,13 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
                 </Link>
               </Alert>
             ) : selectedPO ? (
-              <Alert severity='warning'>La OC vinculada no tiene un documento cargado.</Alert>
+              <Alert severity='warning'>
+                La OC vinculada todavía no tiene respaldo cargado. Súbelo desde Órdenes de compra para que esta HES lo herede.
+              </Alert>
             ) : (
-              <Alert severity='info'>La HES no admite adjuntos propios. Si necesitas respaldo, vincula una OC con documento.</Alert>
+              <Alert severity='info'>
+                La HES no admite adjuntos propios. Si necesitas respaldo, vincula una OC y carga el documento en esa OC.
+              </Alert>
             )}
           </Stack>
         )}

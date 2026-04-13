@@ -314,4 +314,91 @@ describe('purchase-order-store compatibility', () => {
       attachmentUrl: 'https://assets.example/private/asset-999'
     })
   })
+
+  it('orphans the previous attached asset when replacing an OC document', async () => {
+    mockRunGreenhousePostgresQuery.mockImplementation(async (sql: string) => {
+      if (sql.includes('information_schema.columns')) {
+        return [{ has_attachment_asset_id: true }]
+      }
+
+      throw new Error(`Unexpected query: ${sql}`)
+    })
+
+    mockClientQuery
+      .mockResolvedValueOnce({
+        rows: [{ attachment_asset_id: 'asset-old' }]
+      })
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            po_id: 'PO-modern-2',
+            po_number: 'PO-011',
+            client_id: 'client-1',
+            organization_id: null,
+            space_id: 'space-1',
+            authorized_amount: '1000',
+            currency: 'CLP',
+            exchange_rate_to_clp: '1',
+            authorized_amount_clp: '1000',
+            invoiced_amount_clp: '0',
+            remaining_amount_clp: '1000',
+            invoice_count: '0',
+            status: 'active',
+            issue_date: '2026-03-31',
+            expiry_date: null,
+            description: 'Orden moderna actualizada',
+            service_scope: null,
+            contact_name: null,
+            contact_email: null,
+            notes: null,
+            attachment_asset_id: 'asset-new',
+            attachment_url: 'https://assets.example/private/asset-new',
+            created_by: 'user-1',
+            created_at: '2026-03-31T12:00:00.000Z',
+            updated_at: '2026-03-31T13:00:00.000Z'
+          }
+        ]
+      })
+      .mockResolvedValueOnce({ rows: [] })
+
+    const { updatePurchaseOrder } = await loadStore()
+
+    const updated = await updatePurchaseOrder('PO-modern-2', {
+      description: 'Orden moderna actualizada',
+      attachmentAssetId: 'asset-new',
+      createdBy: 'user-1',
+      clientId: 'client-1',
+      spaceId: 'space-1'
+    })
+
+    expect(mockAttachAssetToAggregate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        assetId: 'asset-new',
+        ownerAggregateType: 'purchase_order',
+        ownerAggregateId: 'PO-modern-2',
+        actorUserId: 'user-1',
+        ownerClientId: 'client-1',
+        ownerSpaceId: 'space-1'
+      })
+    )
+
+    const orphanCall = mockClientQuery.mock.calls.find(call => String(call[0]).includes('UPDATE greenhouse_core.assets'))
+
+    expect(orphanCall).toBeTruthy()
+    expect(String(orphanCall?.[0])).toContain("status = 'orphaned'")
+    expect(orphanCall?.[1]?.[0]).toBe('asset-old')
+    expect(JSON.parse(String(orphanCall?.[1]?.[1]))).toEqual(
+      expect.objectContaining({
+        supersededByAssetId: 'asset-new',
+        supersededByAggregateType: 'purchase_order',
+        supersededByAggregateId: 'PO-modern-2',
+        supersededAt: expect.any(String)
+      })
+    )
+
+    expect(updated).toMatchObject({
+      attachmentAssetId: 'asset-new',
+      attachmentUrl: 'https://assets.example/private/asset-new'
+    })
+  })
 })

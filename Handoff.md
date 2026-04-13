@@ -1,5 +1,28 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — MINI-003 cerrada: OC ya permite cargar o reemplazar respaldo después del alta
+
+- alcance implementado:
+  - `src/views/greenhouse/finance/PurchaseOrdersListView.tsx`
+  - drawer nuevo `src/views/greenhouse/finance/drawers/UpdatePurchaseOrderDocumentDrawer.tsx`
+  - ajuste de copy en `src/views/greenhouse/finance/drawers/CreateHesDrawer.tsx`
+  - endurecimiento de reemplazo en `src/lib/finance/purchase-order-store.ts`
+- comportamiento nuevo:
+  - la tabla de `Finance > Purchase Orders` ahora expone una acción por fila para cargar o reemplazar el respaldo de la OC
+  - si la OC ya tiene documento, se puede abrir y reemplazar desde esa misma surface
+  - la HES mantiene la herencia del respaldo desde la OC y ahora explica explícitamente que el documento debe completarse en Órdenes de compra
+- criterio de robustez:
+  - al reemplazar un respaldo de OC, el store marca el asset anterior como `orphaned` para no dejar adjuntos supersedidos colgados del aggregate
+- verificación:
+  - `pnpm exec vitest run src/lib/finance/purchase-order-store.test.ts`
+  - `pnpm lint -- src/views/greenhouse/finance/PurchaseOrdersListView.tsx src/views/greenhouse/finance/drawers/UpdatePurchaseOrderDocumentDrawer.tsx src/views/greenhouse/finance/drawers/CreateHesDrawer.tsx src/lib/finance/purchase-order-store.ts src/lib/finance/purchase-order-store.test.ts`
+  - `pnpm build`
+- gap conocido:
+  - la validación manual automatizada local quedó bloqueada por Playwright MCP en este runtime (`ENOENT: no such file or directory, mkdir '/.playwright-mcp'`)
+- documentación:
+  - mini-task cerrada en `docs/mini-tasks/complete/MINI-003-po-post-create-document-upload-for-hes-inheritance.md`
+  - tracker `docs/mini-tasks/README.md` actualizado
+
 ## Sesion 2026-04-13 — MINI-002 cerrada: HES reutiliza contactos del cliente y hereda respaldo desde la OC
 
 - alcance implementado:

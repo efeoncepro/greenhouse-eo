@@ -37,6 +37,9 @@ export type PurchaseOrderRecord = {
 }
 
 type PoRow = Record<string, unknown>
+type ExistingAttachmentRow = {
+  attachment_asset_id: string | null
+}
 
 let purchaseOrderAttachmentAssetIdSupportPromise: Promise<boolean> | null = null
 
@@ -315,6 +318,21 @@ export const updatePurchaseOrder = async (
         })
       : null
 
+    const previousAttachmentAssetId =
+      attachmentPersistence?.supportsAttachmentAssetId
+        ? (
+            await client.query<ExistingAttachmentRow>(
+              `
+                SELECT attachment_asset_id
+                FROM greenhouse_finance.purchase_orders
+                WHERE po_id = $1
+                FOR UPDATE
+              `,
+              [poId]
+            )
+          ).rows[0]?.attachment_asset_id || null
+        : null
+
     const add = (column: string, value: unknown) => {
       if (value !== undefined) {
         idx++
@@ -369,6 +387,33 @@ export const updatePurchaseOrder = async (
         },
         client
       })
+    }
+
+    if (
+      attachmentPersistence?.supportsAttachmentAssetId &&
+      previousAttachmentAssetId &&
+      previousAttachmentAssetId !== attachmentPersistence.attachmentAssetId
+    ) {
+      await client.query(
+        `
+          UPDATE greenhouse_core.assets
+          SET
+            status = 'orphaned',
+            owner_aggregate_id = NULL,
+            metadata_json = COALESCE(metadata_json, '{}'::jsonb) || $2::jsonb
+          WHERE asset_id = $1
+            AND status <> 'deleted'
+        `,
+        [
+          previousAttachmentAssetId,
+          JSON.stringify({
+            supersededByAssetId: attachmentPersistence.attachmentAssetId || null,
+            supersededAt: new Date().toISOString(),
+            supersededByAggregateType: 'purchase_order',
+            supersededByAggregateId: poId
+          })
+        ]
+      )
     }
 
     return mapRow(row)
