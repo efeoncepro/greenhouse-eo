@@ -64,6 +64,7 @@ interface Income {
   totalAmount: number
   totalAmountClp: number
   paymentStatus: string
+  collectionMethod: string | null
   amountPaid: number
   amountPending: number
   serviceLine: string | null
@@ -377,10 +378,17 @@ const IncomeListView = () => {
     }),
     incomeColumnHelper.accessor('paymentStatus', {
       header: 'Estado',
-      cell: ({ getValue }) => {
-        const conf = STATUS_CONFIG[getValue()] || STATUS_CONFIG.pending
+      cell: ({ row }) => {
+        const conf = STATUS_CONFIG[row.original.paymentStatus] || STATUS_CONFIG.pending
 
-        return <CustomChip round='true' size='small' color={conf.color} label={conf.label} />
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <CustomChip round='true' size='small' color={conf.color} label={conf.label} />
+            {row.original.collectionMethod === 'factored' && (
+              <CustomChip round='true' size='small' color='warning' variant='tonal' label='Factorada' sx={{ height: 20, fontSize: '0.65rem' }} />
+            )}
+          </Box>
+        )
       }
     }),
     {

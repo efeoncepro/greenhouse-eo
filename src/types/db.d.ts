@@ -1843,12 +1843,28 @@ export interface GreenhouseFinanceExpenses {
 
 export interface GreenhouseFinanceFactoringOperations {
   advance_amount: Numeric;
+  /**
+   * Componente de asesoría fija por operación, independiente del monto. Ej: Asesoría Xepelin = $30.990
+   */
+  advisory_fee_amount: Numeric | null;
   created_at: Generated<Timestamp>;
   created_by_user_id: string | null;
+  /**
+   * Folio interno del proveedor para esta operación específica. Ej: Folio 115 de Xepelin
+   */
+  external_folio: string | null;
+  /**
+   * Número de solicitud en el sistema del proveedor de factoring. Ej: Solicitud Nº 371497 de Xepelin
+   */
+  external_reference: string | null;
   factoring_provider_id: string;
   fee_amount: Numeric;
   fee_rate: Numeric;
   income_id: string;
+  /**
+   * Componente de tasa variable (interés puro según plazo y monto). Ej: valor tasa Xepelin = $94.557
+   */
+  interest_amount: Numeric | null;
   linked_expense_id: string | null;
   linked_payment_id: string | null;
   nominal_amount: Numeric;
