@@ -1,5 +1,23 @@
 # project_context.md
 
+## Delta 2026-04-13 Multi-agent worktree operating model formalizado
+
+- Greenhouse ya tiene un modelo operativo explícito para trabajo paralelo entre agentes sobre el mismo repo sin compartir el mismo checkout activo.
+- Runtime documental nuevo:
+  - `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md`
+- Contrato operativo:
+  - si un agente ya está trabajando en el workspace actual, otro agente no debe cambiarle la rama
+  - el checkout actual queda reservado para el agente owner de esa sesión
+  - los agentes adicionales deben abrir `git worktree` propio en carpeta separada y rama separada
+  - la sincronización con `develop` o `main` ocurre desde el worktree del propio agente, no desde el checkout ajeno
+- convención recomendada:
+  - carpetas: `<repo>-<agent>-<branch-slug>`
+  - ramas: seguir `feature/*`, `fix/*`, `hotfix/*`, `docs/*` o `task/TASK-###-*`
+- reversibilidad:
+  - el esquema se puede desmontar eliminando worktrees cuando ya no hagan falta
+- referencia corta en `AGENTS.md`:
+  - coordinación entre agentes y branching ya apuntan al operating model nuevo
+
 ## Delta 2026-04-13 Structured Context Layer formalizada como foundation arquitectónica
 
 - Greenhouse ahora tiene una decisión arquitectónica explícita para usar JSONB de forma gobernada sin degradar el modelo relacional.

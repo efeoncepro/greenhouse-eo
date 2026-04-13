@@ -1,5 +1,24 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — operating model multi-agent con worktrees formalizado
+
+- alcance documental:
+  - `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md`
+  - `docs/README.md`
+  - `AGENTS.md`
+  - `project_context.md`
+  - `changelog.md`
+- decisión tomada:
+  - el workspace actual se preserva para el agente que ya está trabajando ahí
+  - si otro agente necesita otra rama en paralelo, debe abrir worktree propio y no cambiar la rama del checkout ocupado
+- contrato nuevo:
+  - naming de worktrees y ramas
+  - checklist de inicio/cierre de sesión
+  - reglas de sincronización con `develop`/`main`
+  - rollback y limpieza del esquema
+- verificación:
+  - `git diff --check`
+
 ## Sesion 2026-04-13 — Structured Context Layer formalizada y TASK-380 sembrada
 
 - alcance documental:
