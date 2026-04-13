@@ -1,5 +1,19 @@
 # project_context.md
 
+## Delta 2026-04-13 Structured Context Layer ya tiene foundation runtime en repo
+
+- `TASK-380` ya materializó la base runtime de la Structured Context Layer dentro del repo.
+- Runtime nuevo:
+  - migración `20260413113902271_structured-context-layer-foundation.sql`
+  - módulo `src/lib/structured-context/`
+  - piloto de replay context en `src/lib/sync/reactive-run-tracker.ts`
+- Contrato operativo nuevo:
+  - el schema sidecar ya no es solo propuesta arquitectónica; existe una foundation concreta para documentos, versiones y quarantine
+  - el primer piloto de lectura/escritura sobre `source_sync_runs` deja trazabilidad reutilizable para replay reactivo
+  - la validación del runtime nuevo se cerró con tests unitarios, eslint dirigido y `pnpm build`
+- Limitación operativa detectada:
+  - `pnpm pg:connect:migrate` contra el shared dev DB puede fallar si la rama local no trae una migración ya aplicada en esa base por otro frente de trabajo; el caso real observado fue `20260413105218813_reactive-pipeline-v2-circuit-breaker` de `TASK-379`
+
 ## Delta 2026-04-13 Multi-agent worktree operating model formalizado
 
 - Greenhouse ya tiene un modelo operativo explícito para trabajo paralelo entre agentes sobre el mismo repo sin compartir el mismo checkout activo.

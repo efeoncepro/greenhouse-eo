@@ -1,5 +1,32 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — TASK-380 foundation runtime implementada en worktree aislado
+
+- worktree usado:
+  - `/Users/jreye/Documents/greenhouse-eo-codex-task-380`
+  - branch `task/TASK-380-structured-context-layer-foundation`
+- alcance implementado:
+  - migración `20260413113902271_structured-context-layer-foundation.sql`
+  - runtime nuevo `src/lib/structured-context/{types,validation,store,reactive,index}.ts`
+  - tests nuevos `src/lib/structured-context/*.test.ts`
+  - piloto real conectado a `src/lib/sync/reactive-run-tracker.ts`
+- comportamiento nuevo:
+  - Greenhouse ya tiene foundation sidecar para contexto estructurado con documentos, versiones y quarantine
+  - la taxonomía inicial queda registrada y validada runtime-side
+  - los runs reactivos ya pueden persistir y releer `event.replay_context` sin romper el tracking canónico
+- criterio de robustez:
+  - el store rechaza secretos y llaves sensibles
+  - la capa aplica límites de tamaño por `context_kind`
+  - la validación fallida cae en quarantine antes de explotar
+  - el piloto reactivo escribe en modo degradado: si la capa falla, el worker no se cae por ese sidecar
+- verificación:
+  - `pnpm exec vitest run src/lib/structured-context/validation.test.ts src/lib/structured-context/store.test.ts src/lib/structured-context/reactive.test.ts`
+  - `pnpm exec eslint src/lib/structured-context/types.ts src/lib/structured-context/validation.ts src/lib/structured-context/store.ts src/lib/structured-context/reactive.ts src/lib/sync/reactive-run-tracker.ts`
+  - `pnpm build`
+- bloqueo real:
+  - `pnpm pg:connect:migrate` en shared dev DB falla por drift de historial: esa base ya tiene aplicada `20260413105218813_reactive-pipeline-v2-circuit-breaker` de `TASK-379`, pero esta rama/worktree no trae todavía esa migración
+  - no mezclé esa migración ajena en esta branch para no cruzar lanes sin decisión explícita
+
 ## Sesion 2026-04-13 — operating model multi-agent con worktrees formalizado
 
 - alcance documental:

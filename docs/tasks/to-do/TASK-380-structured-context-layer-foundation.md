@@ -9,11 +9,12 @@
 ## Status
 
 - Lifecycle: `to-do`
+- Lifecycle note: `implemented in branch; pending shared dev DB apply because the shared database is ahead of this branch with TASK-379 migration history`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseno`
+- Status real: `Foundation implementada en rama`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -214,10 +215,23 @@ Además, la foundation debe salir con criterios enterprise explícitos para:
 
 ## Acceptance Criteria
 
-- [ ] Existe schema `greenhouse_context` con tabla base y contrato mínimo de ownership + tenant isolation
-- [ ] Existe runtime tipado compartido para validar y persistir documentos de contexto
-- [ ] Existe una taxonomía inicial de `context_kind` con al menos dos validators reales
-- [ ] Al menos un consumer piloto escribe y lee contexto estructurado de forma tenant-safe
+- [x] Existe schema `greenhouse_context` con tabla base y contrato mínimo de ownership + tenant isolation
+- [x] Existe runtime tipado compartido para validar y persistir documentos de contexto
+- [x] Existe una taxonomía inicial de `context_kind` con al menos dos validators reales
+- [x] Al menos un consumer piloto escribe y lee contexto estructurado de forma tenant-safe
+
+## Execution Notes
+
+- Implementación materializada en:
+  - `migrations/20260413113902271_structured-context-layer-foundation.sql`
+  - `src/lib/structured-context/**`
+  - piloto reactivo en `src/lib/sync/reactive-run-tracker.ts`
+- Validación cerrada en rama:
+  - tests unitarios de la capa
+  - eslint dirigido sobre runtime nuevo
+  - `pnpm build`
+- Bloqueo real detectado:
+  - `pnpm pg:connect:migrate` no pudo aplicar en el shared dev DB porque ese entorno ya tiene corrida `20260413105218813_reactive-pipeline-v2-circuit-breaker` de `TASK-379`, migración que esta rama/worktree todavía no trae
 - [ ] La arquitectura y el criterio de uso quedan documentados para equipos y agentes
 - [ ] Existen reglas explícitas de clasificación, retención, access scope, redacción e idempotencia para la foundation
 - [ ] La foundation prohíbe secretos y blobs binarios en `document_jsonb` y define estrategia de quarantine para documentos inválidos

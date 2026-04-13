@@ -20,6 +20,26 @@ En palabras simples:
 
 La idea es que Greenhouse pueda conservar memoria operativa útil sin ensuciar cada tabla core con un `jsonb` genérico.
 
+## Estado actual en el repo
+
+Hoy esta capa ya tiene foundation materializada en código:
+
+- schema objetivo: `greenhouse_context`
+- tablas base:
+  - `context_documents`
+  - `context_document_versions`
+  - `context_document_quarantine`
+- runtime compartido:
+  - `src/lib/structured-context/`
+
+El primer uso real conectado es el tracking reactivo:
+
+- los runs de `reactive_worker` pueden escribir `event.replay_context`
+- ese contexto se relee desde el mismo aggregate `source_sync_run`
+- el objetivo es dejar evidencia estructurada para replay, debugging y auditoría operativa sin tocar la verdad canónica del sync
+
+La aplicación de la migración en el shared dev DB quedó pendiente por drift de historial entre ramas, pero la base runtime y el contrato ya quedaron implementados en repo.
+
 ## Para que sirve
 
 Sirve para guardar cosas que sí importan operativamente, pero que no siempre justifican una tabla nueva desde el día uno.

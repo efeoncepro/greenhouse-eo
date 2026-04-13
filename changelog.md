@@ -2,6 +2,15 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — TASK-380 materializa la foundation runtime de Structured Context Layer
+
+- Se agregó la migración `20260413113902271_structured-context-layer-foundation.sql` para crear `greenhouse_context` con documentos, versiones, quarantine y guardrails base.
+- Se agregó `src/lib/structured-context/` como runtime compartido para tipos, validación, hashing, persistencia y lectura.
+- La taxonomía inicial ya incluye validadores reales para `event.replay_context`, `agent.audit_report` y `agent.execution_plan`.
+- `src/lib/sync/reactive-run-tracker.ts` ahora queda conectado como primer piloto de escritura/lectura usando `event.replay_context`.
+- El piloto está endurecido para no romper el worker reactivo si la capa sidecar falla; registra warning y degrada sin cortar el flujo principal.
+- La aplicación de la migración en el shared dev DB quedó pendiente porque esa base ya tiene aplicada una migración de `TASK-379` que esta rama todavía no trae.
+
 ### 2026-04-13 — Modelo operativo multi-agent con worktrees formalizado
 
 - Se agregó `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md`.

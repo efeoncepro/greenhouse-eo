@@ -1,5 +1,26 @@
 # Greenhouse Structured Context Layer V1
 
+## Delta 2026-04-13 — Runtime foundation materialized in repo
+
+- La foundation ya no es solo intención arquitectónica.
+- Implementación materializada:
+  - migración `migrations/20260413113902271_structured-context-layer-foundation.sql`
+  - runtime `src/lib/structured-context/`
+  - piloto real de lectura/escritura sobre `src/lib/sync/reactive-run-tracker.ts`
+- La migration crea:
+  - `greenhouse_context.context_documents`
+  - `greenhouse_context.context_document_versions`
+  - `greenhouse_context.context_document_quarantine`
+  - secuencia `greenhouse_context.seq_context_document_public_id`
+- La primera taxonomía runtime queda conectada a validadores reales para:
+  - `event.replay_context`
+  - `agent.audit_report`
+  - `agent.execution_plan`
+- Primer piloto activo:
+  - el tracking de runs reactivos ahora puede persistir y releer `event.replay_context` como sidecar de `greenhouse_sync.source_sync_runs`
+- Nota operativa:
+  - la aplicación local de la migración en shared dev DB quedó bloqueada por drift de historial con una migración ya aplicada de `TASK-379`; el contrato de la capa y el runtime sí quedaron cerrados en repo
+
 ## Delta 2026-04-13 — Structured Context Layer proposed as canonical sidecar for flexible, typed, governable JSON
 
 - Greenhouse ya usa `jsonb` en múltiples dominios (`payload_json`, `metadata_json`, `snapshot_payload`, `source_payload_json`, `metric_trust_json`), pero todavía no tiene una capa canónica que gobierne cuándo usarlo, cómo tiparlo y dónde ubicarlo en el modelo.
@@ -31,7 +52,7 @@ Read together with:
 
 ## Status
 
-This is a forward-looking architecture contract.
+This is now both an architecture contract and a runtime foundation already materialized in the repo.
 
 Current reality:
 
