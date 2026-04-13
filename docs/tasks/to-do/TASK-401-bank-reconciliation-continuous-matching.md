@@ -1,5 +1,6 @@
 ## Delta 2026-04-13
 
+- TASK-179 cerrada. Prerequisito directo para este task cumplido: la reconciliación está ahora en modo Postgres-only (sin dual-write BQ en ningún path). El motor continuo de auto-match puede implementarse sin riesgo de inconsistencia con BigQuery. El bulk expense también es Postgres-only.
 - TASK-175 cerrada. La red de seguridad de tests para `postgres-reconciliation.ts` (18 tests) y `payment-ledger.ts` (15 tests) ya existe. Refactorizar `reconciliation.ts` como motor standalone (Slice 1 de esta task) ahora tiene cobertura base — se puede avanzar sin riesgo de regresión silenciosa.
 - TASK-174 cerrada. Los fundamentos de locking que esta task requiere ya están en producción: `SELECT ... FOR UPDATE NOWAIT` en reconciliation period y bank_statement_rows, `withTransaction` en match/unmatch routes, idempotency middleware disponible en `src/lib/finance/idempotency.ts`. El motor de auto-match de esta task puede apalancarse en estos primitivos directamente.
 

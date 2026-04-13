@@ -1,5 +1,18 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — TASK-179 Finance Reconciliation Postgres-Only Cutover (complete)
+
+- **Estado:** `complete`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/lib/finance/schema.ts` — removidos `fin_reconciliation_periods` y `fin_bank_statement_rows` del DDL BigQuery (`FINANCE_TABLE_DEFINITIONS` + `FINANCE_COLUMN_REQUIREMENTS`). Reconciliation ya no provisiona tablas BQ.
+  - `src/app/api/finance/expenses/bulk/route.ts` — eliminados 3 imports obsoletos (`ensureFinanceInfrastructure`, `shouldFallbackFromFinancePostgres`, `isFinanceBigQueryWriteEnabled`) y el bloque BQ fallback try/catch completo (~80 LOC). La Phase 2 ahora es un `await withTransaction(...)` directo sin red BigQuery.
+  - `src/app/api/finance/reconciliation/route.ts` — removido stale error message `"BigQuery fallback is disabled"` y código `FINANCE_BQ_WRITE_DISABLED` del POST catch. Los errores de Postgres ahora se re-lanzan limpiamente.
+  - `src/lib/finance/hubspot.ts` — agregada schema validation (`validateHubSpotCompaniesSchema`, `validateHubSpotDealsSchema`) con `publishOutboxEvent` en `integration_health` para drift crítico (throws) y drift de columnas esperadas (warning). `pickColumn` ahora loguea cuando usa una columna fallback.
+  - `src/app/api/finance/bigquery-write-cutover.test.ts` — actualizados 2 tests que verificaban el comportamiento 503/FINANCE_BQ_WRITE_DISABLED eliminado; ahora verifican que los errores Postgres se propagan (rethrow).
+- **Verificación:** 1122/1122 tests, lint clean, build OK.
+- **Nota:** `bigquery-write-flag.ts` tiene 15 callsites activos en income/expenses/accounts — está fuera del scope de esta task. El flag sigue vigente para esos paths. El cleanup completo pertenece a un bloque de cutover posterior.
+
 ## Sesion 2026-04-13 — TASK-175 Finance Core Test Coverage (complete)
 
 - **Estado:** `complete`

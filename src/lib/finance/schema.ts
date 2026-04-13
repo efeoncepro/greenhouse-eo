@@ -157,48 +157,6 @@ const FINANCE_TABLE_DEFINITIONS: Record<string, string> = {
       updated_at TIMESTAMP
     )
   `,
-  fin_reconciliation_periods: `
-    CREATE TABLE IF NOT EXISTS \`{projectId}.greenhouse.fin_reconciliation_periods\` (
-      period_id STRING NOT NULL,
-      account_id STRING NOT NULL,
-      year INT64 NOT NULL,
-      month INT64 NOT NULL,
-      opening_balance NUMERIC NOT NULL,
-      closing_balance_bank NUMERIC,
-      closing_balance_system NUMERIC,
-      difference NUMERIC,
-      status STRING NOT NULL,
-      statement_imported BOOL,
-      statement_imported_at TIMESTAMP,
-      statement_row_count INT64,
-      reconciled_by STRING,
-      reconciled_at TIMESTAMP,
-      notes STRING,
-      created_at TIMESTAMP,
-      updated_at TIMESTAMP
-    )
-  `,
-  fin_bank_statement_rows: `
-    CREATE TABLE IF NOT EXISTS \`{projectId}.greenhouse.fin_bank_statement_rows\` (
-      row_id STRING NOT NULL,
-      period_id STRING NOT NULL,
-      transaction_date DATE NOT NULL,
-      value_date DATE,
-      description STRING NOT NULL,
-      reference STRING,
-      amount NUMERIC NOT NULL,
-      balance NUMERIC,
-      match_status STRING NOT NULL,
-      matched_type STRING,
-      matched_id STRING,
-      matched_payment_id STRING,
-      match_confidence NUMERIC,
-      notes STRING,
-      matched_by STRING,
-      matched_at TIMESTAMP,
-      created_at TIMESTAMP
-    )
-  `,
   fin_exchange_rates: `
     CREATE TABLE IF NOT EXISTS \`{projectId}.greenhouse.fin_exchange_rates\` (
       rate_id STRING NOT NULL,
@@ -250,9 +208,6 @@ const FINANCE_COLUMN_REQUIREMENTS: Record<string, Record<string, string>> = {
     nubox_origin: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS nubox_origin STRING',
     nubox_last_synced_at: 'ALTER TABLE `{projectId}.greenhouse.fin_expenses` ADD COLUMN IF NOT EXISTS nubox_last_synced_at TIMESTAMP'
   },
-  fin_bank_statement_rows: {
-    matched_payment_id: 'ALTER TABLE `{projectId}.greenhouse.fin_bank_statement_rows` ADD COLUMN IF NOT EXISTS matched_payment_id STRING'
-  }
 }
 
 /** @deprecated Seed kept for backwards compat. Canonical role is finance_admin (TASK-228). */

@@ -2,8 +2,6 @@ import { NextResponse } from 'next/server'
 
 import { withTransaction } from '@/lib/db'
 import { resolveFinanceDownstreamScope, resolveFinanceMemberContext } from '@/lib/finance/canonical'
-import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
-import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
 import { createFinanceExpenseInPostgres } from '@/lib/finance/postgres-store-slice2'
 import {
   EXPENSE_PAYMENT_STATUSES,
@@ -15,10 +13,8 @@ import {
   assertPositiveAmount,
   assertValidCurrency,
   buildMonthlySequenceId,
-  getFinanceProjectId,
   normalizeString,
   resolveExchangeRateToClp,
-  runFinanceQuery,
   toNumber,
   type ExpensePaymentStatus,
   type ExpenseType,
@@ -26,7 +22,6 @@ import {
   type ServiceLine
 } from '@/lib/finance/shared'
 import { requireFinanceTenantContext } from '@/lib/tenant/authorization'
-import { isFinanceBigQueryWriteEnabled } from '@/lib/finance/bigquery-write-flag'
 
 export const dynamic = 'force-dynamic'
 
@@ -204,105 +199,11 @@ export async function POST(request: Request) {
 
     // ── Phase 2: all inserts inside a single transaction (atomic) ──
     // If any item fails, ALL are rolled back — no partial bulk.
-    try {
-      await withTransaction(async (txClient) => {
-        for (const { params } of resolvedItems) {
-          await createFinanceExpenseInPostgres(params, { client: txClient })
-        }
-      })
-    } catch (pgError) {
-      if (!shouldFallbackFromFinancePostgres(pgError)) {
-        throw pgError
+    await withTransaction(async (txClient) => {
+      for (const { params } of resolvedItems) {
+        await createFinanceExpenseInPostgres(params, { client: txClient })
       }
-
-      if (!isFinanceBigQueryWriteEnabled()) {
-        return NextResponse.json(
-          {
-            error: 'Finance BigQuery fallback write is disabled. Postgres write path failed.',
-            code: 'FINANCE_BQ_WRITE_DISABLED'
-          },
-          { status: 503 }
-        )
-      }
-
-      // BigQuery fallback: write all items individually (BQ has no transactions)
-      await ensureFinanceInfrastructure()
-      const projectId = getFinanceProjectId()
-
-      for (const { params: p } of resolvedItems) {
-        await runFinanceQuery(`
-          INSERT INTO \`${projectId}.greenhouse.fin_expenses\` (
-            expense_id, client_id, space_id, expense_type, description, currency,
-            subtotal, tax_rate, tax_amount, total_amount,
-            exchange_rate_to_clp, total_amount_clp,
-            payment_date, payment_status, payment_method,
-            payment_account_id, payment_reference,
-            document_number, document_date, due_date,
-            supplier_id, supplier_name, supplier_invoice_number,
-            payroll_period_id, payroll_entry_id, member_id, member_name,
-            social_security_type, social_security_institution, social_security_period,
-            tax_type, tax_period, tax_form_number,
-            miscellaneous_category, service_line, is_recurring, recurrence_frequency,
-            is_reconciled, notes, created_by,
-            created_at, updated_at
-          ) VALUES (
-            @expenseId, @clientId, @spaceId, @expenseType, @description, @currency,
-            CAST(@subtotal AS NUMERIC), CAST(@taxRate AS NUMERIC), CAST(@taxAmount AS NUMERIC), CAST(@totalAmount AS NUMERIC),
-            CAST(@exchangeRateToClp AS NUMERIC), CAST(@totalAmountClp AS NUMERIC),
-            IF(@paymentDate = '', NULL, CAST(@paymentDate AS DATE)), @paymentStatus, @paymentMethod,
-            @paymentAccountId, @paymentReference,
-            @documentNumber, IF(@documentDate = '', NULL, CAST(@documentDate AS DATE)), IF(@dueDate = '', NULL, CAST(@dueDate AS DATE)),
-            @supplierId, @supplierName, @supplierInvoiceNumber,
-            @payrollPeriodId, @payrollEntryId, @memberId, @memberName,
-            @socialSecurityType, @socialSecurityInstitution, @socialSecurityPeriod,
-            @taxType, @taxPeriod, @taxFormNumber,
-            @miscellaneousCategory, @serviceLine, @isRecurring, @recurrenceFrequency,
-            FALSE, @notes, @createdBy,
-            CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP()
-          )
-        `, {
-          expenseId: p.expenseId,
-          clientId: p.clientId,
-          spaceId: p.spaceId,
-          expenseType: p.expenseType,
-          description: p.description,
-          currency: p.currency,
-          subtotal: p.subtotal,
-          taxRate: p.taxRate,
-          taxAmount: p.taxAmount,
-          totalAmount: p.totalAmount,
-          exchangeRateToClp: p.exchangeRateToClp,
-          totalAmountClp: p.totalAmountClp,
-          paymentDate: p.paymentDate,
-          paymentStatus: p.paymentStatus,
-          paymentMethod: p.paymentMethod,
-          paymentAccountId: p.paymentAccountId,
-          paymentReference: p.paymentReference,
-          documentNumber: p.documentNumber,
-          documentDate: p.documentDate,
-          dueDate: p.dueDate,
-          supplierId: p.supplierId,
-          supplierName: p.supplierName,
-          supplierInvoiceNumber: p.supplierInvoiceNumber,
-          payrollPeriodId: p.payrollPeriodId,
-          payrollEntryId: p.payrollEntryId,
-          memberId: p.memberId,
-          memberName: p.memberName,
-          socialSecurityType: p.socialSecurityType,
-          socialSecurityInstitution: p.socialSecurityInstitution,
-          socialSecurityPeriod: p.socialSecurityPeriod,
-          taxType: p.taxType,
-          taxPeriod: p.taxPeriod,
-          taxFormNumber: p.taxFormNumber,
-          miscellaneousCategory: p.miscellaneousCategory,
-          serviceLine: p.serviceLine,
-          isRecurring: p.isRecurring,
-          recurrenceFrequency: p.recurrenceFrequency,
-          notes: p.notes,
-          createdBy: p.actorUserId
-        })
-      }
-    }
+    })
 
     const createdIds = resolvedItems.map(r => r.expenseId)
 

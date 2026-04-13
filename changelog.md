@@ -2,6 +2,14 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — TASK-179: Finance Reconciliation Postgres-Only Cutover & HubSpot Schema Hardening
+
+- `src/lib/finance/schema.ts`: removidos `fin_reconciliation_periods` y `fin_bank_statement_rows` del provisioning BigQuery. La reconciliación ya no provisiona tablas BQ. Las tablas BigQuery históricas quedan como read-only.
+- `src/app/api/finance/expenses/bulk/route.ts`: eliminado el bloque BQ fallback try/catch completo (~80 LOC) y 3 imports obsoletos. El bulk de gastos ahora es Postgres-only con `withTransaction` atómico directo.
+- `src/app/api/finance/reconciliation/route.ts`: removido el error code `FINANCE_BQ_WRITE_DISABLED` y el mensaje obsoleto "BigQuery fallback is disabled" del POST catch. Los errores Postgres se re-lanzan limpiamente al runtime de Next.js.
+- `src/lib/finance/hubspot.ts`: agregada `validateHubSpotCompaniesSchema` y `validateHubSpotDealsSchema` que emiten `integration.schema_drift.detected` al outbox (`integration_health`) cuando faltan columnas críticas (error fatal) o columnas esperadas (warning observable). `pickColumn` ahora loguea `console.warn` cuando resuelve a una columna fallback — hace observable el drift en producción sin romper el flujo.
+- Tests actualizados en `bigquery-write-cutover.test.ts` para reflejar que las rutas migradas ya no retornan 503/FINANCE_BQ_WRITE_DISABLED sino que propagan errores Postgres al caller.
+
 ### 2026-04-13 — TASK-175: Finance Core Test Coverage — 64 tests nuevos sobre la capa de persistencia Finance
 
 - `src/lib/finance/__tests__/` creado con 5 archivos nuevos cubriendo los módulos de mayor riesgo: `postgres-store-slice2.ts` (income/expense CRUD), `postgres-reconciliation.ts` (period lifecycle + match ops), `payment-ledger.ts` (recordPayment + reconcilePaymentTotals), `postgres-store.ts` (accounts/FX/suppliers), y P&L E2E (`computeClientEconomicsSnapshots`).

@@ -10,11 +10,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Medio` |
-| Status real | `Diseno` |
+| Status real | `Implementado` |
 | Domain | Finance / Data Platform |
 | Sequence | Despues de TASK-174 (locking — prerequisito para reconciliation safety) |
 

@@ -65,14 +65,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: error.statusCode })
     }
 
-    const detail = error instanceof Error ? error.message : 'Unknown error'
-
-    return NextResponse.json(
-      {
-        error: `Finance reconciliation write failed. BigQuery fallback is disabled: ${detail}`,
-        code: 'FINANCE_BQ_WRITE_DISABLED'
-      },
-      { status: 503 }
-    )
+    throw error
   }
 }
