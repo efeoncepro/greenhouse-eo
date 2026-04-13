@@ -35,7 +35,7 @@ describe('GET /api/people/[memberId]/hr', () => {
 
   it('returns hr context for internal tenants', async () => {
     mockRequirePeopleTenantContext.mockResolvedValue({
-      tenant: { tenantType: 'efeonce_internal', routeGroups: ['people'] },
+      tenant: { tenantType: 'efeonce_internal', routeGroups: ['people'], roleCodes: ['efeonce_admin'] },
       errorResponse: null
     })
     mockGetPersonHrContext.mockResolvedValue({
