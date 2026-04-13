@@ -21,8 +21,9 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-402`
+- siguiente ID disponible: `TASK-403`
 - `TASK-401` — Bank Reconciliation: Continuous Transaction Matching. Evoluciona el modelo de conciliación bancaria de períodos mensuales manuales a matching automático continuo: motor standalone, auto-match post-Nubox-sync, cron diario, coexistencia con cierre mensual formal. P1, Alto. Spec: `to-do/TASK-401-bank-reconciliation-continuous-matching.md`.
+- `TASK-402` — Universal Adaptive Home Orchestration. Formaliza `/home` como entrypoint universal del portal, separa startup policy de permisos/route groups y convierte la Home en una superficie adaptativa por audiencia, Nexa y contexto operativo. P1, Alto. Spec: `to-do/TASK-402-universal-adaptive-home-orchestration.md`.
 - `TASK-400` ✅ — Portal Home Contract Governance, Entrypoint Cutover & Dashboard Compatibility. El runtime quedó convergido sobre la policy canónica de Home, `/dashboard` salió del rol de fallback estructural, se corrigieron relictos visibles de navegación y se eliminó el redirect global viejo de `next.config.ts` que seguía forzando `/ -> /dashboard`. Spec: `complete/TASK-400-portal-home-contract-governance-entrypoint-cutover.md`.
 - `TASK-399` — Native Integrations Runtime Hardening. Follow-on runtime de la `Native Integrations Layer`: adapters resilientes, control plane por etapa, replay/backfill gobernado, stage freshness y patrón snapshot-safe reusable para Nubox, Notion, HubSpot y futuros upstreams. P1, Muy Alto. Spec: `to-do/TASK-399-native-integrations-runtime-hardening-source-adapters-control-plane-replay.md`.
 - `TASK-398` — Management Accounting Enterprise Hardening. Programa de cierre enterprise del modulo: explainability por numero, overrides gobernados, RBAC multi-scope, observabilidad de materializaciones, runbooks, exports y business testing. P1, Muy Alto. Spec: `to-do/TASK-398-management-accounting-enterprise-hardening-explainability-rbac-observability-runbooks.md`.
