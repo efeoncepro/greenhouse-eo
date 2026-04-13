@@ -1,5 +1,16 @@
 # project_context.md
 
+## Delta 2026-04-13 Superadmin y perfiles mixtos ya no deben derivar startup home desde route groups especializados
+
+- `resolvePortalHomePath()` ya no debe usar la mera presencia de `routeGroups` especializados para decidir el startup home de perfiles administrativos multi-workspace.
+- Runtime actualizado:
+  - `efeonce_admin` y usuarios con surface administrativa priorizan `internal_default`
+  - el startup home efectivo de superadmin vuelve a `/home`
+- Contrato operativo:
+  - `routeGroups` siguen definiendo superficies autorizadas
+  - el startup home no debe colapsar automáticamente a HR, Finance o My cuando el usuario es multi-módulo o administrativo
+  - `/home` pasa a ser la entrada canónica para perfiles mixtos mientras se formaliza la Home universal adaptativa
+
 ## Delta 2026-04-13 Root redirect del portal vuelve a respetar la policy canónica de Home
 
 - El repo ya no debe depender de redirects globales de Next para decidir el entrypoint autenticado del portal.

@@ -1,5 +1,31 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — Hotfix de Home universal para superadmin y perfiles mixtos
+
+- **Estado:** `validado localmente`
+- **Problema detectado:**
+  - la policy de `resolvePortalHomePath()` seguía derivando el startup home desde `routeGroups`
+  - como `efeonce_admin` hereda `admin`, `internal`, `hr`, `finance`, `my` y otras superficies, el resolver estaba priorizando `hr_workspace`
+  - resultado visible: superadministradores y perfiles mixtos entraban a `/hr/payroll` en vez de a `/home`
+- **Fix aplicado:**
+  - `src/lib/tenant/resolve-portal-home-path.ts`
+    - `efeonce_admin` y perfiles con `routeGroups` administrativos ahora priorizan `internal_default`
+    - el startup home de superadmin queda forzado a `/home`
+  - `src/lib/tenant/resolve-portal-home-path.test.ts`
+    - se agregó regresión explícita para `efeonce_admin` + route groups mixtos
+- **Validación cerrada:**
+  - `pnpm exec vitest run src/lib/tenant/resolve-portal-home-path.test.ts`
+  - `pnpm build`
+  - verificación real con login por credenciales:
+    - `GET /` sin sesión -> `/login`
+    - login del usuario agente/superadmin-like -> `/home`
+    - contenido visible en `/home`: `Home Nexa y operación de hoy`
+- **Decisión de producto sugerida:**
+  - consolidar `/home` como entrypoint universal del portal
+  - mantener HR / Finance / My como workspaces especializados dentro de una Home adaptativa, no como homes rivales
+- **Follow-up sembrado:**
+  - `TASK-402` para diseñar e implementar Home universal adaptativa con policy de startup separada de permisos
+
 ## Sesion 2026-04-13 — TASK-400 cierre formal con verificación runtime real
 
 - **Estado:** `complete`

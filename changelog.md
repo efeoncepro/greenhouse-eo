@@ -13,6 +13,7 @@
 - provisioning, session auth, agent auth, navegación, shortcuts, notifications y `view-access-catalog` quedaron alineados a `/home` como startup contract canónico.
 - `/dashboard` se mantiene como ruta legacy/compatibilidad, pero deja de ser el fallback estructural del portal.
 - la búsqueda sin resultados y los breadcrumbs cliente-safe ya vuelven a `/home` en lugar de reforzar rutas legacy.
+- `efeonce_admin` y perfiles administrativos mixtos ya no aterrizan por error en `/hr/payroll`; el startup home vuelve a priorizar `/home` para la experiencia universal de Nexa.
 - Se agregó `scripts/backfill-portal-home-contract.ts` para normalizar `default_portal_home_path` en PostgreSQL y BigQuery bajo control explícito.
 - Se agregó regresión focalizada para evitar que `/dashboard` vuelva a romper cuando falten quality/delivery signals.
 

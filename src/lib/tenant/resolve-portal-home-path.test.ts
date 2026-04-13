@@ -53,6 +53,17 @@ describe('resolvePortalHomePath', () => {
     ).toBe('/finance')
   })
 
+  it('keeps superadmin on the canonical internal home even with admin route groups', () => {
+    expect(
+      resolvePortalHomePath({
+        portalHomePath: '/internal/dashboard',
+        tenantType: 'efeonce_internal',
+        roleCodes: ['efeonce_admin', 'collaborator'],
+        routeGroups: ['internal', 'admin', 'finance', 'hr', 'people', 'my']
+      })
+    ).toBe('/home')
+  })
+
   it('uses separate policy keys for client and internal defaults', () => {
     expect(resolvePortalHomePolicy({ tenantType: 'client' }).key).toBe('client_default')
     expect(resolvePortalHomePolicy({ tenantType: 'efeonce_internal' }).key).toBe('internal_default')

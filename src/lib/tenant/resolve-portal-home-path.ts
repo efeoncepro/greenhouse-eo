@@ -82,6 +82,7 @@ export const resolvePortalHomePolicy = ({
   const roleCodes = Array.isArray(rawRoleCodes) ? rawRoleCodes.filter(Boolean) : []
   const routeGroups = Array.isArray(rawRouteGroups) ? rawRouteGroups.filter(Boolean) : []
   const isInternalTenant = tenantType === 'efeonce_internal'
+  const isSuperadmin = hasRole(roleCodes, ROLE_CODES.EFEONCE_ADMIN) || hasRouteGroup(routeGroups, 'admin')
 
   const isHrUser =
     hasRouteGroup(routeGroups, 'hr') ||
@@ -97,6 +98,10 @@ export const resolvePortalHomePolicy = ({
     hasRole(roleCodes, ROLE_CODES.COLLABORATOR) &&
     !hasRole(roleCodes, ROLE_CODES.EFEONCE_ADMIN) &&
     !hasRole(roleCodes, ROLE_CODES.EFEONCE_OPERATIONS)
+
+  if (isSuperadmin) {
+    return PORTAL_HOME_POLICY_MAP.internal_default
+  }
 
   if (isHrUser) {
     return PORTAL_HOME_POLICY_MAP.hr_workspace
