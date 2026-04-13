@@ -4,8 +4,9 @@
 
 - alcance documental:
   - `docs/architecture/GREENHOUSE_STRUCTURED_CONTEXT_LAYER_V1.md`
+  - `docs/documentation/plataforma/capa-contexto-estructurado.md`
   - `docs/tasks/to-do/TASK-380-structured-context-layer-foundation.md`
-  - índices/documentos vivos actualizados: `docs/README.md`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `project_context.md`, `changelog.md`
+  - índices/documentos vivos actualizados: `docs/README.md`, `docs/documentation/README.md`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `project_context.md`, `changelog.md`
 - decisión tomada:
   - Greenhouse formaliza una `Structured Context Layer` como sidecar del modelo relacional para contexto flexible, payloads normalizados, replay reactivo, auditoría y memoria de trabajo de agentes
   - el schema objetivo es `greenhouse_context` y la raíz runtime prevista es `src/lib/structured-context/`
