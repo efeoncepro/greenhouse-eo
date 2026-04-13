@@ -26,7 +26,7 @@ describe('GET /api/people/[memberId]/intelligence', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockRequirePeopleTenantContext.mockResolvedValue({
-      tenant: { tenantType: 'efeonce_internal', routeGroups: ['people'] },
+      tenant: { tenantType: 'efeonce_internal', routeGroups: ['people'], roleCodes: ['efeonce_admin'] },
       errorResponse: null
     })
   })
