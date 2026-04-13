@@ -49,6 +49,11 @@ vi.mock('@/lib/finance/postgres-reconciliation', () => ({
   createReconciliationPeriodInPostgres: (...args: unknown[]) => mockCreateReconciliationPeriodInPostgres(...args)
 }))
 
+// Allow withTransaction to call its callback in test env (no real Postgres needed)
+vi.mock('@/lib/db', () => ({
+  withTransaction: async (fn: (client: unknown) => Promise<unknown>) => fn({ query: vi.fn() })
+}))
+
 vi.mock('@/lib/providers/canonical', () => ({
   syncProviderFromFinanceSupplier: vi.fn().mockResolvedValue({ providerId: 'provider-test' })
 }))

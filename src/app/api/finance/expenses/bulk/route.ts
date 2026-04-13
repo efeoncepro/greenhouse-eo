@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 
+import { withTransaction } from '@/lib/db'
 import { resolveFinanceDownstreamScope, resolveFinanceMemberContext } from '@/lib/finance/canonical'
 import { ensureFinanceInfrastructure } from '@/lib/finance/schema'
 import { shouldFallbackFromFinancePostgres } from '@/lib/finance/postgres-store'
@@ -88,7 +89,12 @@ export async function POST(request: Request) {
       }, { status: 400 })
     }
 
-    const createdIds: string[] = []
+    // ── Phase 1: resolve all items before opening the transaction ──
+    // (async lookups like scope resolution, FX rates, sequence IDs run outside tx)
+    const resolvedItems: Array<{
+      expenseId: string
+      params: Parameters<typeof createFinanceExpenseInPostgres>[0]
+    }> = []
 
     for (const item of items) {
       const description = assertNonEmptyString(item.description, 'description')
@@ -141,8 +147,9 @@ export async function POST(request: Request) {
         period
       })
 
-      try {
-        await createFinanceExpenseInPostgres({
+      resolvedItems.push({
+        expenseId,
+        params: {
           expenseId,
           clientId: resolvedScope.clientId,
           spaceId: resolvedScope.spaceId,
@@ -191,25 +198,38 @@ export async function POST(request: Request) {
           directOverheadMemberId: null,
           notes: item.notes ? normalizeString(item.notes) : null,
           actorUserId: tenant.userId || null
-        })
-      } catch (error) {
-        if (!shouldFallbackFromFinancePostgres(error)) {
-          throw error
         }
+      })
+    }
 
-        if (!isFinanceBigQueryWriteEnabled()) {
-          return NextResponse.json(
-            {
-              error: 'Finance BigQuery fallback write is disabled. Postgres write path failed.',
-              code: 'FINANCE_BQ_WRITE_DISABLED'
-            },
-            { status: 503 }
-          )
+    // ── Phase 2: all inserts inside a single transaction (atomic) ──
+    // If any item fails, ALL are rolled back — no partial bulk.
+    try {
+      await withTransaction(async (txClient) => {
+        for (const { params } of resolvedItems) {
+          await createFinanceExpenseInPostgres(params, { client: txClient })
         }
+      })
+    } catch (pgError) {
+      if (!shouldFallbackFromFinancePostgres(pgError)) {
+        throw pgError
+      }
 
-        await ensureFinanceInfrastructure()
-        const projectId = getFinanceProjectId()
+      if (!isFinanceBigQueryWriteEnabled()) {
+        return NextResponse.json(
+          {
+            error: 'Finance BigQuery fallback write is disabled. Postgres write path failed.',
+            code: 'FINANCE_BQ_WRITE_DISABLED'
+          },
+          { status: 503 }
+        )
+      }
 
+      // BigQuery fallback: write all items individually (BQ has no transactions)
+      await ensureFinanceInfrastructure()
+      const projectId = getFinanceProjectId()
+
+      for (const { params: p } of resolvedItems) {
         await runFinanceQuery(`
           INSERT INTO \`${projectId}.greenhouse.fin_expenses\` (
             expense_id, client_id, space_id, expense_type, description, currency,
@@ -241,50 +261,50 @@ export async function POST(request: Request) {
             CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP()
           )
         `, {
-          expenseId,
-          clientId: resolvedScope.clientId,
-          spaceId: resolvedScope.spaceId,
-          expenseType,
-          description,
-          currency,
-          subtotal,
-          taxRate,
-          taxAmount,
-          totalAmount,
-          exchangeRateToClp,
-          totalAmountClp,
-          paymentDate: item.paymentDate ? normalizeString(item.paymentDate) : null,
-          paymentStatus,
-          paymentMethod,
-          paymentAccountId: item.paymentAccountId ? normalizeString(item.paymentAccountId) : null,
-          paymentReference: item.paymentReference ? normalizeString(item.paymentReference) : null,
-          documentNumber: item.documentNumber ? normalizeString(item.documentNumber) : null,
-          documentDate: item.documentDate ? normalizeString(item.documentDate) : null,
-          dueDate: item.dueDate ? normalizeString(item.dueDate) : null,
-          supplierId: item.supplierId ? normalizeString(item.supplierId) : null,
-          supplierName: item.supplierName ? normalizeString(item.supplierName) : null,
-          supplierInvoiceNumber: item.supplierInvoiceNumber ? normalizeString(item.supplierInvoiceNumber) : null,
-          payrollPeriodId: normalizeString(item.payrollPeriodId) || resolvedMember.payrollPeriodId,
-          payrollEntryId: resolvedMember.payrollEntryId,
-          memberId: resolvedMember.memberId,
-          memberName: normalizeString(item.memberName) || resolvedMember.memberName,
-          socialSecurityType: item.socialSecurityType ? normalizeString(item.socialSecurityType) : null,
-          socialSecurityInstitution: item.socialSecurityInstitution ? normalizeString(item.socialSecurityInstitution) : null,
-          socialSecurityPeriod: item.socialSecurityPeriod ? normalizeString(item.socialSecurityPeriod) : null,
-          taxType: item.taxType ? normalizeString(item.taxType) : null,
-          taxPeriod: item.taxPeriod ? normalizeString(item.taxPeriod) : null,
-          taxFormNumber: item.taxFormNumber ? normalizeString(item.taxFormNumber) : null,
-          miscellaneousCategory: item.miscellaneousCategory ? normalizeString(item.miscellaneousCategory) : null,
-          serviceLine,
-          isRecurring: Boolean(item.isRecurring),
-          recurrenceFrequency: item.recurrenceFrequency ? normalizeString(item.recurrenceFrequency) : null,
-          notes: item.notes ? normalizeString(item.notes) : null,
-          createdBy: tenant.userId || null
+          expenseId: p.expenseId,
+          clientId: p.clientId,
+          spaceId: p.spaceId,
+          expenseType: p.expenseType,
+          description: p.description,
+          currency: p.currency,
+          subtotal: p.subtotal,
+          taxRate: p.taxRate,
+          taxAmount: p.taxAmount,
+          totalAmount: p.totalAmount,
+          exchangeRateToClp: p.exchangeRateToClp,
+          totalAmountClp: p.totalAmountClp,
+          paymentDate: p.paymentDate,
+          paymentStatus: p.paymentStatus,
+          paymentMethod: p.paymentMethod,
+          paymentAccountId: p.paymentAccountId,
+          paymentReference: p.paymentReference,
+          documentNumber: p.documentNumber,
+          documentDate: p.documentDate,
+          dueDate: p.dueDate,
+          supplierId: p.supplierId,
+          supplierName: p.supplierName,
+          supplierInvoiceNumber: p.supplierInvoiceNumber,
+          payrollPeriodId: p.payrollPeriodId,
+          payrollEntryId: p.payrollEntryId,
+          memberId: p.memberId,
+          memberName: p.memberName,
+          socialSecurityType: p.socialSecurityType,
+          socialSecurityInstitution: p.socialSecurityInstitution,
+          socialSecurityPeriod: p.socialSecurityPeriod,
+          taxType: p.taxType,
+          taxPeriod: p.taxPeriod,
+          taxFormNumber: p.taxFormNumber,
+          miscellaneousCategory: p.miscellaneousCategory,
+          serviceLine: p.serviceLine,
+          isRecurring: p.isRecurring,
+          recurrenceFrequency: p.recurrenceFrequency,
+          notes: p.notes,
+          createdBy: p.actorUserId
         })
       }
-
-      createdIds.push(expenseId)
     }
+
+    const createdIds = resolvedItems.map(r => r.expenseId)
 
     return NextResponse.json({ created: true, count: createdIds.length, expenseIds: createdIds }, { status: 201 })
   } catch (error) {
