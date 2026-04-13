@@ -14,7 +14,27 @@ export type EmailType =
   | 'leave_request_submitted'
   | 'leave_request_pending_review'
 
-export type EmailDeliveryStatus = 'pending' | 'sent' | 'failed' | 'skipped' | 'rate_limited' | 'delivered'
+export type EmailDeliveryStatus = 'pending' | 'sent' | 'failed' | 'skipped' | 'rate_limited' | 'delivered' | 'dead_letter'
+
+export type EmailPriority = 'critical' | 'transactional' | 'broadcast'
+
+/**
+ * Priority mapping canónico por EmailType.
+ * critical/transactional bypass rate limits completamente.
+ * broadcast respeta rate limits y usa Batch API para multi-recipient.
+ */
+export const EMAIL_PRIORITY_MAP: Record<string, EmailPriority> = {
+  password_reset:               'critical',
+  verify_email:                 'critical',
+  invitation:                   'transactional',
+  leave_request_decision:       'transactional',
+  leave_request_submitted:      'transactional',
+  leave_request_pending_review: 'transactional',
+  leave_review_confirmation:    'transactional',
+  notification:                 'broadcast',
+  payroll_export:               'broadcast',
+  payroll_receipt:              'broadcast',
+}
 
 export interface EmailRecipient {
   email: string
@@ -75,6 +95,9 @@ export interface SendEmailInput<TContext extends EmailTemplateContext = EmailTem
   sourceEventId?: string
   sourceEntity?: string
   actorEmail?: string
+
+  /** Priority override. Defaults to EMAIL_PRIORITY_MAP[emailType] ?? 'broadcast'. */
+  priority?: EmailPriority
 }
 
 export interface SendEmailResult {

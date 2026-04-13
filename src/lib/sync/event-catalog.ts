@@ -260,6 +260,9 @@ export const EVENT_TYPES = {
   emailDeliveryComplained: 'email_delivery.complained',
   emailDeliveryRateLimited: 'email_delivery.rate_limited',
   emailDeliveryUndeliverableMarked: 'email_delivery.undeliverable_marked',
+  emailDeliveryDead: 'email_delivery.dead_letter',
+  emailDeliverabilityAlert: 'email_delivery.deliverability_alert',
+  emailGdprDeletionCompleted: 'email_delivery.gdpr_deletion_completed',
 
   // Quotes & Credit Notes
   quoteCreated: 'finance.quote.created',

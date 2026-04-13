@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import type { EmailPriority } from './types'
 
 const DEFAULT_LIMIT_PER_HOUR = 10
 
@@ -11,13 +12,19 @@ interface CountRow {
 /**
  * Checks whether a recipient is within the hourly email rate limit.
  *
- * Counts sent/delivered emails to this recipient in the last hour.
- * Returns whether sending is allowed and the current count.
+ * - critical / transactional emails bypass rate limits completely (always allowed).
+ * - broadcast emails check the per-recipient hourly limit (default: 10/hour).
  */
 export const checkRecipientRateLimit = async (
   recipientEmail: string,
-  limit = DEFAULT_LIMIT_PER_HOUR
+  limit = DEFAULT_LIMIT_PER_HOUR,
+  priority?: EmailPriority
 ): Promise<{ allowed: boolean; currentCount: number }> => {
+  // Priority bypass: critical and transactional emails always pass
+  if (priority === 'critical' || priority === 'transactional') {
+    return { allowed: true, currentCount: 0 }
+  }
+
   const normalizedEmail = recipientEmail.trim().toLowerCase()
 
   const rows = await runGreenhousePostgresQuery<CountRow & Record<string, unknown>>(`

@@ -12,6 +12,7 @@
  *   POST /reactive/recover          → Recover orphaned projection queue items (replaces projection-recovery cron)
  *   GET  /reactive/queue-depth      → Queue depth + oldest-event lag, optionally filtered by ?domain=<x>
  *   POST /cost-attribution/materialize → Materialize commercial cost attribution + client economics
+ *   POST /batch-email-send             → Send a transactional email via the Greenhouse delivery pipeline
  *
  * Auth: Cloud Run IAM (--no-allow-unauthenticated) + optional CRON_SECRET header
  * Runtime: Node.js 22 via esbuild bundle (handles TypeScript + @/ path aliases)
@@ -34,6 +35,7 @@ import {
   materializeAllAvailablePeriods
 } from '@/lib/commercial-cost-attribution/member-period-attribution'
 import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
+import { sendEmail } from '@/lib/email/delivery'
 
 import { getReactiveQueueDepth, InvalidDomainError } from './reactive-queue-depth'
 
@@ -418,6 +420,63 @@ const handleReactiveQueueDepth = async (req: IncomingMessage, res: ServerRespons
   }
 }
 
+/**
+ * POST /batch-email-send
+ * Sends a transactional email via the Greenhouse email delivery pipeline.
+ * Accepts the same shape as SendEmailInput (see src/lib/email/types.ts).
+ *
+ * Body:
+ *   {
+ *     emailType: EmailType,
+ *     domain: EmailDomain,
+ *     recipients: EmailRecipient[],
+ *     context: Record<string, unknown>,
+ *     attachments?: EmailAttachment[],
+ *     sourceEventId?: string,
+ *     sourceEntity?: string,
+ *     actorEmail?: string,
+ *     priority?: string   // informational only — not part of SendEmailInput
+ *   }
+ */
+const handleBatchEmailSend = async (req: IncomingMessage, res: ServerResponse) => {
+  const body = await readBody(req)
+
+  const {
+    emailType,
+    domain,
+    recipients,
+    context,
+    attachments,
+    sourceEventId,
+    sourceEntity,
+    actorEmail
+  } = body
+
+  console.log(`[ops-worker] POST /batch-email-send — emailType=${String(emailType)} domain=${String(domain)} recipients=${Array.isArray(recipients) ? recipients.length : 0}`)
+
+  try {
+    const result = await sendEmail({
+      emailType: emailType as Parameters<typeof sendEmail>[0]['emailType'],
+      domain: domain as Parameters<typeof sendEmail>[0]['domain'],
+      recipients: recipients as Parameters<typeof sendEmail>[0]['recipients'],
+      context: (context ?? {}) as Record<string, unknown>,
+      attachments: attachments as Parameters<typeof sendEmail>[0]['attachments'],
+      sourceEventId: typeof sourceEventId === 'string' ? sourceEventId : undefined,
+      sourceEntity: typeof sourceEntity === 'string' ? sourceEntity : undefined,
+      actorEmail: typeof actorEmail === 'string' ? actorEmail : undefined
+    })
+
+    console.log(`[ops-worker] /batch-email-send done — deliveryId=${result.deliveryId} status=${result.status}`)
+
+    json(res, 200, result)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /batch-email-send failed:', message)
+    json(res, 502, { error: message })
+  }
+}
+
 // ─── Router ─────────────────────────────────────────────────────────────────
 
 const server = createServer(async (req, res) => {
@@ -464,6 +523,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/cost-attribution/materialize') {
       await handleCostAttributionMaterialize(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/batch-email-send') {
+      await handleBatchEmailSend(req, res)
 
       return
     }

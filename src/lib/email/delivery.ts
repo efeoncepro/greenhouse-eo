@@ -2,8 +2,12 @@ import 'server-only'
 
 import { randomUUID } from 'crypto'
 
+import * as Sentry from '@sentry/nextjs'
+
 import { getEmailFromAddress, getResendClient, isResendConfigured } from '@/lib/resend'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 import { resolveEmailContext, EmailUndeliverableError } from './context-resolver'
 import { checkRecipientRateLimit } from './rate-limit'
@@ -15,12 +19,37 @@ import type {
   EmailAttachment,
   EmailDeliveryPayload,
   EmailRecipient,
+  EmailPriority,
   EmailType,
   SendEmailInput,
   SendEmailResult
 } from './types'
+import { EMAIL_PRIORITY_MAP } from './types'
+
+// ── Broadcast types that include List-Unsubscribe header ──
+const BROADCAST_EMAIL_TYPES: EmailType[] = ['payroll_export', 'notification', 'payroll_receipt']
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase()
+
+// ── Kill switch: check if email type is enabled ──
+const checkEmailTypeEnabled = async (emailType: string): Promise<{ enabled: boolean; pausedReason?: string }> => {
+  try {
+    const rows = await runGreenhousePostgresQuery<{ enabled: boolean; paused_reason: string | null } & Record<string, unknown>>(
+      `SELECT enabled, paused_reason FROM greenhouse_notifications.email_type_config WHERE email_type = $1`,
+      [emailType]
+    )
+
+    if (!rows[0]) return { enabled: true }
+
+    return {
+      enabled: rows[0].enabled === true,
+      pausedReason: rows[0].paused_reason ?? undefined
+    }
+  } catch {
+    // Non-blocking: if kill switch check fails, allow sending
+    return { enabled: true }
+  }
+}
 
 const mergeAttachments = (
   templateAttachments: EmailAttachment[] | undefined,
@@ -150,6 +179,8 @@ const createDeliveryRow = async (input: {
   sourceEntity?: string
   actorEmail?: string
   errorMessage?: string | null
+  priority?: EmailPriority
+  errorClass?: string | null
 }) => {
   const rows = await runGreenhousePostgresQuery<{ delivery_id: string } & Record<string, unknown>>(
     `
@@ -169,11 +200,13 @@ const createDeliveryRow = async (input: {
         source_entity,
         actor_email,
         error_message,
+        priority,
+        error_class,
         attempt_number,
         created_at,
         updated_at
       ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::jsonb, $12, $13, $14, $15, 1, NOW(), NOW()
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::jsonb, $12, $13, $14, $15, $16, $17, 1, NOW(), NOW()
       )
       RETURNING delivery_id
     `,
@@ -192,7 +225,9 @@ const createDeliveryRow = async (input: {
       input.sourceEventId ?? null,
       input.sourceEntity ?? null,
       input.actorEmail ?? null,
-      input.errorMessage ?? null
+      input.errorMessage ?? null,
+      input.priority ?? 'broadcast',
+      input.errorClass ?? null
     ]
   )
 
@@ -247,7 +282,7 @@ const claimFailedDelivery = async (deliveryId: string) => {
           error_message = NULL,
           updated_at = NOW()
       WHERE delivery_id = $1
-        AND status = 'failed'
+        AND status IN ('failed', 'rate_limited')
         AND attempt_number < 3
       RETURNING
         delivery_id,
@@ -285,6 +320,7 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
   sourceEntity?: string
   actorEmail?: string
   existingDeliveryId?: string | null
+  priority?: EmailPriority
 }) => {
   const basePayload = normalizePayload({
     recipients: [input.recipient],
@@ -365,9 +401,9 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
       )
     }
 
-    // ── Rate Limit: check per-recipient hourly limit ──
+    // ── Rate Limit: check per-recipient hourly limit (critical/transactional bypass) ──
     if (!input.existingDeliveryId) {
-      const rateCheck = await checkRecipientRateLimit(input.recipient.email)
+      const rateCheck = await checkRecipientRateLimit(input.recipient.email, undefined, input.priority)
 
       if (!rateCheck.allowed) {
         const errorMessage = `Rate limit exceeded: ${rateCheck.currentCount} emails/hour to ${input.recipient.email}`
@@ -401,10 +437,10 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
     }
 
     // ── Unsubscribe URL: only for broadcast email types ──
-    const BROADCAST_EMAIL_TYPES: EmailType[] = ['payroll_export', 'notification']
+    const isBroadcast = BROADCAST_EMAIL_TYPES.includes(input.emailType)
     let unsubscribeUrl: string | undefined
 
-    if (BROADCAST_EMAIL_TYPES.includes(input.emailType)) {
+    if (isBroadcast) {
       try {
         unsubscribeUrl = await generateUnsubscribeUrl(input.recipient.email, input.emailType)
       } catch {
@@ -433,13 +469,16 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
       attachments: mergedAttachments
     })
 
+    // ── RESEND_API_KEY guard: config error → failed (retryable), NOT skipped ──
     if (!isResendConfigured()) {
+      const configErrorMsg = 'RESEND_API_KEY is not configured.'
+
       if (input.existingDeliveryId) {
         await updateDeliveryRow({
           deliveryId: input.existingDeliveryId,
           resendId: null,
-          status: 'skipped',
-          errorMessage: 'RESEND_API_KEY is not configured.'
+          status: 'failed',
+          errorMessage: configErrorMsg
         })
       } else {
         await createDeliveryRow({
@@ -449,13 +488,15 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
           recipient: input.recipient,
           subject: resolvedTemplate.subject,
           resendId: null,
-          status: 'skipped',
+          status: 'failed',
           hasAttachments: Boolean(resendAttachments.length),
           payload,
           sourceEventId: input.sourceEventId,
           sourceEntity: input.sourceEntity,
           actorEmail: input.actorEmail,
-          errorMessage: 'RESEND_API_KEY is not configured.'
+          errorMessage: configErrorMsg,
+          priority: input.priority,
+          errorClass: 'config_error'
         })
       }
 
@@ -463,12 +504,22 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
         deliveryId: input.existingDeliveryId || input.batchId,
         recipientEmail: input.recipient.email,
         resendId: null,
-        status: 'skipped' as const,
-        error: 'RESEND_API_KEY is not configured.'
+        status: 'failed' as const,
+        error: configErrorMsg
       }
     }
 
     const resend = getResendClient()
+
+    // ── List-Unsubscribe header (RFC 8058) for broadcast emails ──
+    const unsubscribeHeaders = isBroadcast && unsubscribeUrl
+      ? {
+          headers: {
+            'List-Unsubscribe': `<${unsubscribeUrl}>`,
+            'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+          }
+        }
+      : {}
 
     const result = await resend.emails.send({
       from: getEmailFromAddress(),
@@ -476,7 +527,8 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
       subject: resolvedTemplate.subject,
       react: resolvedTemplate.react,
       text: resolvedTemplate.text,
-      ...(resendAttachments.length > 0 ? { attachments: resendAttachments } : {})
+      ...(resendAttachments.length > 0 ? { attachments: resendAttachments } : {}),
+      ...unsubscribeHeaders
     })
 
     const resendId = result?.data?.id ?? null
@@ -500,7 +552,8 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
         payload,
         sourceEventId: input.sourceEventId,
         sourceEntity: input.sourceEntity,
-        actorEmail: input.actorEmail
+        actorEmail: input.actorEmail,
+        priority: input.priority
       })
     }
 
@@ -513,10 +566,19 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to send email.'
 
-    const subject =
-      error instanceof Error && error.message.includes('No email template registered')
-        ? '[template missing]'
-        : '[email delivery failed]'
+    const isTemplateMissing = error instanceof Error && error.message.includes('No email template registered')
+    const subject = isTemplateMissing ? '[template missing]' : '[email delivery failed]'
+    const errorClass = isTemplateMissing ? 'template_error' : 'resend_api_error'
+
+    // Capture in Sentry for observability
+    Sentry.captureException(error, {
+      extra: {
+        emailType: input.emailType,
+        recipientEmail: input.recipient.email,
+        priority: input.priority,
+        attempt: input.existingDeliveryId ? 'retry' : 'first'
+      }
+    })
 
     if (input.existingDeliveryId) {
       await updateDeliveryRow({
@@ -541,7 +603,9 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
         sourceEventId: input.sourceEventId,
         sourceEntity: input.sourceEntity,
         actorEmail: input.actorEmail,
-        errorMessage: message
+        errorMessage: message,
+        priority: input.priority,
+        errorClass
       }).catch(err => {
         console.warn('[email-delivery] Failed to persist failed delivery row:', err)
       })
@@ -586,6 +650,22 @@ export const sendEmail = async <TContext extends Record<string, unknown>>(
   input: SendEmailInput<TContext>
 ): Promise<SendEmailResult> => {
   const batchId = randomUUID()
+
+  // Kill switch: check if this email type is paused
+  const killSwitch = await checkEmailTypeEnabled(input.emailType)
+
+  if (!killSwitch.enabled) {
+    return {
+      deliveryId: batchId,
+      resendId: null,
+      status: 'skipped',
+      error: `Email type paused: ${killSwitch.pausedReason ?? 'no reason provided'}`
+    }
+  }
+
+  // Derive priority from map or explicit override
+  const priority: EmailPriority = input.priority ?? EMAIL_PRIORITY_MAP[input.emailType] ?? 'broadcast'
+
   let recipients: EmailRecipient[]
 
   try {
@@ -627,7 +707,8 @@ export const sendEmail = async <TContext extends Record<string, unknown>>(
       attachments: input.attachments,
       sourceEventId: input.sourceEventId,
       sourceEntity: input.sourceEntity,
-      actorEmail: input.actorEmail
+      actorEmail: input.actorEmail,
+      priority
     })
 
     if (result.resendId && !firstResendId) {
@@ -691,8 +772,10 @@ export const processFailedEmailDeliveries = async (limit = 25) => {
         error_message,
         attempt_number
       FROM greenhouse_notifications.email_deliveries
-      WHERE status = 'failed'
-        AND attempt_number < 3
+      WHERE (
+        (status = 'failed' AND attempt_number < 3)
+        OR (status = 'rate_limited' AND updated_at < NOW() - INTERVAL '1 hour' AND attempt_number < 3)
+      )
         AND created_at > NOW() - INTERVAL '24 hours'
       ORDER BY created_at ASC
       LIMIT $1
@@ -756,6 +839,29 @@ export const processFailedEmailDeliveries = async (limit = 25) => {
       skipped++
     } else {
       failed++
+
+      // Dead letter: exhaused all attempts — escalate and alert
+      if (claimedRow.attempt_number >= 3) {
+        await runGreenhousePostgresQuery(
+          `UPDATE greenhouse_notifications.email_deliveries
+           SET status = 'dead_letter', updated_at = NOW()
+           WHERE delivery_id = $1`,
+          [claimedRow.delivery_id]
+        ).catch(err => console.warn('[email-delivery] Failed to mark dead letter:', err))
+
+        await publishOutboxEvent({
+          aggregateType: AGGREGATE_TYPES.emailDelivery,
+          aggregateId: claimedRow.delivery_id,
+          eventType: EVENT_TYPES.emailDeliveryDead,
+          payload: {
+            deliveryId: claimedRow.delivery_id,
+            emailType: claimedRow.email_type,
+            recipientEmail: claimedRow.recipient_email,
+            attemptNumber: claimedRow.attempt_number,
+            lastError: retryResult.error ?? claimedRow.error_message
+          }
+        }).catch(err => console.warn('[email-delivery] Failed to publish dead letter event:', err))
+      }
     }
   }
 
