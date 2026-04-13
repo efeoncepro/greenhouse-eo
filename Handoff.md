@@ -1,5 +1,23 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — Arquitectura de entitlements modulares formalizada
+
+- **Estado:** `documentado`
+- **Artefacto nuevo:**
+  - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
+- **Decisión principal:**
+  - Greenhouse debe converger a una capa híbrida de autorización:
+    - `roleCodes` para identidad base
+    - `routeGroups` para superficies broad
+    - `entitlements` para autorización real por capability
+    - `authorizedViews` como proyección derivada
+    - `startupPolicy` como contrato separado
+- **Integración documental:**
+  - `docs/README.md` actualizado
+  - `project_context.md` actualizado
+  - `changelog.md` actualizado
+  - `TASK-402` ahora referencia esta arquitectura como foundation obligatoria
+
 ## Sesion 2026-04-13 — Hotfix de Home universal para superadmin y perfiles mixtos
 
 - **Estado:** `validado localmente`

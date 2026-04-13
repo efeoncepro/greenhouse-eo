@@ -2,6 +2,12 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — Entitlements modulares quedan formalizados como dirección canónica de autorización
+
+- Se agregó `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`.
+- El repo ahora deja explícita una evolución canónica desde `roleCodes + routeGroups + authorizedViews` hacia una capa de entitlements por `module + capability + action + scope`.
+- La nueva arquitectura se conecta explícitamente con `TASK-402` (Home universal adaptativa) y `TASK-285` (client role differentiation) para que el runtime no siga creciendo sobre permisos centrados en vistas/pathnames.
+
 ### 2026-04-13 — TASK-400 alinea el contrato canónico de Home y deja base para homes distintas por tipo de usuario
 
 - `/` y `/auth/landing` ya no dependen de `|| '/dashboard'`; ambos consumen el `portalHomePath` resuelto por la misma policy runtime.

@@ -57,6 +57,7 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
 - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+- `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_PORTAL_VIEWS_V1.md`
 - `docs/architecture/Greenhouse_Nomenclatura_Portal_v3.md`
 

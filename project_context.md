@@ -1,5 +1,17 @@
 # project_context.md
 
+## Delta 2026-04-13 Entitlements modulares quedan formalizados como dirección canónica de autorización
+
+- Greenhouse ya tiene una arquitectura explícita para evolucionar desde `roleCodes + routeGroups + authorizedViews` hacia una capa de entitlements modular, action-based y scope-aware.
+- Runtime documental nuevo:
+  - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
+- Contrato operativo:
+  - `roleCodes` siguen definiendo identidad base
+  - `routeGroups` siguen definiendo superficies broad de navegación
+  - la autorización fina debe evolucionar hacia `module + capability + action + scope`
+  - `authorizedViews` debe tratarse como proyección derivada de UI, no como source of truth final
+  - `startupPolicy` debe mantenerse separada de permisos para soportar Home universal adaptativa
+
 ## Delta 2026-04-13 Superadmin y perfiles mixtos ya no deben derivar startup home desde route groups especializados
 
 - `resolvePortalHomePath()` ya no debe usar la mera presencia de `routeGroups` especializados para decidir el startup home de perfiles administrativos multi-workspace.
