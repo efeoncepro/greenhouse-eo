@@ -1,5 +1,22 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — TASK-175 Finance Core Test Coverage (complete)
+
+- **Estado:** `complete`
+- **Rama:** `develop`
+- **Implementado:**
+  - `src/lib/finance/__tests__/postgres-store-slice2.test.ts` — 14 tests: income CRUD, expense CRUD con/sin client externo, buildMonthlySequenceIdFromPostgres, TTL readiness cache
+  - `src/lib/finance/__tests__/postgres-store.test.ts` — 11 tests: shouldFallbackFromFinancePostgres, createFinanceAccountInPostgres, upsertFinanceExchangeRateInPostgres, seedFinanceSupplierInPostgres, listFinanceAccountsFromPostgres
+  - `src/lib/finance/__tests__/payment-ledger.test.ts` — 15 tests: recordPayment (happy path, 409 overpayment, 409 duplicate, 404 income not found, full paid), getPaymentsForIncome, reconcilePaymentTotals (4 escenarios)
+  - `src/lib/finance/__tests__/postgres-reconciliation.test.ts` — 18 tests: createReconciliationPeriodInPostgres (happy, 409 dup, 404 account), listReconciliationPeriods, updateStatementRowMatch con/sin client, clearStatementRowMatch, assertMutable, validateReconciledTransition
+  - `src/lib/finance/__tests__/finance-pnl-e2e.test.ts` — 5 tests: computeClientEconomicsSnapshots (zero-revenue, empty period, multi-client, labor attribution call, silent error swallowing)
+- **Total:** 64 tests nuevos. Suite: 1122 tests, 255 archivos, lint clean, build OK.
+- **Patrones clave aprendidos:**
+  - `assertFinanceSlice2PostgresReady` tiene TTL 60s de módulo — se primea en `beforeAll`, evitando consumo extra de mocks en tests posteriores
+  - `reconcilePaymentTotals` usa `client.query` directo (no `queryRows`), retorna `{ rows, rowCount }` — mock distinto al resto
+  - `postgres-reconciliation.ts` importa `'server-only'` — requiere `vi.mock('server-only', () => ({}))`
+  - outbox local en slice2/store vs outbox importado en reconciliation/ledger — distinto mock target
+
 ## Sesion 2026-04-13 — Arquitectura de entitlements modulares formalizada
 
 - **Estado:** `documentado`

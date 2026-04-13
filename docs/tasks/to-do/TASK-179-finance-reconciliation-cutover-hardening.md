@@ -1,5 +1,6 @@
 ## Delta 2026-04-13
 
+- TASK-175 cerrada. Tests de `postgres-reconciliation.ts` (18 tests cubriendo period CRUD, match/unmatch, state machine) ya existen en `src/lib/finance/__tests__/postgres-reconciliation.test.ts`. El cutover BigQuery de Slice 2 puede hacerse con red de seguridad real — ya no hay riesgo de regresión silenciosa en las operaciones de conciliación.
 - TASK-174 cerrada. Prerequisito de locking ya implementado: `SELECT ... FOR UPDATE NOWAIT` en `updateReconciliationPeriodInPostgres`, row lock en match/unmatch routes via `withTransaction`, y `reconcilePaymentTotals()` wrapped en transacción atómica. Esta task puede avanzar sin bloqueo de TASK-174.
 - La remoción del BigQuery fallback en bulk expenses (`expenses/bulk/route.ts`) sigue siendo responsabilidad de esta task (TASK-179 owns el cleanup del `FINANCE_BQ_WRITE_DISABLED` guard).
 

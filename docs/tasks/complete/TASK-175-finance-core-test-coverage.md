@@ -18,11 +18,11 @@
 
 | Campo | Valor |
 |-------|-------|
-| Lifecycle | `to-do` |
+| Lifecycle | `complete` |
 | Priority | `P1` |
 | Impact | `Alto` |
 | Effort | `Medio` |
-| Status real | `Diseno` |
+| Status real | `Implementado` |
 | Domain | Finance / Quality |
 | Sequence | Independiente — puede ejecutarse en paralelo con cualquier task |
 

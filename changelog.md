@@ -2,6 +2,13 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — TASK-175: Finance Core Test Coverage — 64 tests nuevos sobre la capa de persistencia Finance
+
+- `src/lib/finance/__tests__/` creado con 5 archivos nuevos cubriendo los módulos de mayor riesgo: `postgres-store-slice2.ts` (income/expense CRUD), `postgres-reconciliation.ts` (period lifecycle + match ops), `payment-ledger.ts` (recordPayment + reconcilePaymentTotals), `postgres-store.ts` (accounts/FX/suppliers), y P&L E2E (`computeClientEconomicsSnapshots`).
+- Los archivos críticos de Finance que tenían 0% de cobertura (`postgres-store-slice2.ts` ~1800 LOC, `postgres-reconciliation.ts` ~2000 LOC, `payment-ledger.ts` ~300 LOC) ahora tienen red de seguridad para sus principales code paths.
+- El suite total pasó de 1058 a 1122 tests (64 nuevos). Lint clean, build OK, sin regresiones.
+- Prerequisito cerrado para TASK-179 (reconciliation cutover) y TASK-401 (auto-match continuo): ambos podían refactorizar sin red de seguridad antes de este bloque.
+
 ### 2026-04-13 — Entitlements modulares quedan formalizados como dirección canónica de autorización
 
 - Se agregó `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`.
