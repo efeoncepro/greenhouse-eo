@@ -2,6 +2,12 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — TASK-381 documenta el backlog de hardening enterprise de la Structured Context Layer
+
+- Se creó `docs/tasks/to-do/TASK-381-structured-context-layer-enterprise-hardening.md` como follow-on directo de `TASK-380`.
+- La task deja explícito qué falta para que la SCL sea una capability enterprise reusable: registry de `context_kind`, readers con enforcement real, lifecycle de retention/quarantine, observabilidad, segundo piloto y promotion criteria.
+- `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedaron actualizados para reservar `TASK-381` y dejar `TASK-382` como siguiente ID disponible.
+
 ### 2026-04-13 — TASK-380 queda materializada también en la base compartida
 
 - La migración `20260413113902271_structured-context-layer-foundation.sql` ya fue aplicada sobre el shared dev DB desde `develop`.

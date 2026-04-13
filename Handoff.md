@@ -1,5 +1,23 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — TASK-381 sembrada para hardening enterprise de la SCL
+
+- backlog nuevo documentado:
+  - `docs/tasks/to-do/TASK-381-structured-context-layer-enterprise-hardening.md`
+- alcance formalizado:
+  - registry canónico de `context_kind`
+  - readers tenant-safe con access scope enforcement
+  - lifecycle de retention / quarantine / lineage
+  - observabilidad de adopción y salud
+  - segundo piloto real y criterio de promoción a modelo relacional
+- documentación operativa actualizada:
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `changelog.md`
+- validación de este turno:
+  - documentación solamente; sin cambios runtime
+  - correr `git diff --check` antes de commit
+
 ## Sesion 2026-04-13 — TASK-380 gap operativo cerrado en develop
 
 - cierre del gap:
