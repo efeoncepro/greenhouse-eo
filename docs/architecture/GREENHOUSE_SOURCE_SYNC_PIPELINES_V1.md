@@ -1,5 +1,41 @@
 # Greenhouse Source Sync Pipelines V1
 
+## Delta 2026-04-13 — Nubox hardening generalizes the canonical inbound sync pattern
+
+El incidente `Nubox` del `2026-04-13` dejó explícito un patrón que ahora debe tratarse como canónico para cualquier pipeline inbound `source -> raw -> conformed -> product`.
+
+### Stage graph canónico
+
+```text
+Source API / upstream
+  -> Source adapter
+  -> Sync planner (hot window + historical sweep + lease)
+  -> Raw snapshots (append-only)
+  -> Conformed snapshots (append-only or stage-safe writer)
+  -> Product projection / serving upsert
+  -> Status / readiness / alerting
+```
+
+### Reglas nuevas
+
+1. `raw` es la primera evidencia durable del source y la base de frescura real.
+2. `conformed` no debe usar `DELETE` destructivo sobre tablas que puedan quedar bloqueadas por streaming buffers o writes calientes.
+3. Los readers de `conformed` deben poder resolver `latest snapshot by source id`.
+4. La capa producto debe usar `source_last_ingested_at` o equivalente; `NOW()` en la proyección no cuenta como señal de sync del source.
+5. Toda pipeline multi-fase debe exponer estado por etapa (`raw_sync`, `conformed_sync`, `projection`) y no esconder fallas parciales detrás de un status agregado ambiguo.
+6. Todo pipeline crítico debe soportar replay manual e historical sweep sin edición manual de SQL ni secretos.
+
+### Aplicación inmediata
+
+`Nubox` ya opera bajo este patrón:
+
+- raw con hot window + historical sweep rotativo
+- conformed append-only snapshots
+- projection PostgreSQL leyendo latest snapshot por ID
+- `sync-status` exponiendo `lastRaw`, `lastConformed` y `lastProjection`
+
+La misma disciplina debe aplicarse progresivamente a otros source syncs críticos que aún dependan de writers destructivos o de freshness inferida.
+
 ## Delta 2026-04-07 — TASK-210 HubSpot Quotes sync pipeline
 
 Nuevo pipeline inbound: HubSpot Quotes → PostgreSQL `greenhouse_finance.quotes`.

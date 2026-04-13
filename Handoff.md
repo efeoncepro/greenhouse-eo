@@ -1,5 +1,31 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — Management Accounting ya queda aterrizado como programa ejecutable de 7 tasks robustas
+
+- backlog nuevo documentado:
+  - `docs/tasks/to-do/TASK-392-management-accounting-reliable-actual-foundation-program.md`
+  - `docs/tasks/to-do/TASK-393-management-accounting-period-governance-restatements-reclassification.md`
+  - `docs/tasks/to-do/TASK-394-management-accounting-scope-expansion-bu-legal-entity-intercompany.md`
+  - `docs/tasks/to-do/TASK-395-management-accounting-planning-engine-budgets-drivers-approval-governance.md`
+  - `docs/tasks/to-do/TASK-396-management-accounting-variance-forecast-executive-control-tower.md`
+  - `docs/tasks/to-do/TASK-397-management-accounting-financial-costs-integration-factoring-fx-fees-treasury.md`
+  - `docs/tasks/to-do/TASK-398-management-accounting-enterprise-hardening-explainability-rbac-observability-runbooks.md`
+- criterio de particion:
+  - se evitó fragmentar demasiado el programa
+  - las 7 lanes quedan lo bastante grandes para coordinar trabajo enterprise, pero lo bastante separadas para no mezclar foundation, governance, planning, analytics, financial costs y hardening
+- amarras importantes:
+  - `TASK-392` queda como gate fundacional antes de planning / forecast / variance
+  - `TASK-395` absorbe y reencuadra `TASK-178` como planning engine
+  - `TASK-397` amarra `TASK-391` al modelo de Management Accounting
+  - `TASK-398` concentra explainability, RBAC, observabilidad, runbooks y testing de negocio
+- docs sincronizados:
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+  - `changelog.md`
+- validación:
+  - documentación solamente
+  - pendiente correr `git diff --check` tras la actualización del índice y registro
+
 ## Sesion 2026-04-13 — TASK-391 Finance Factoring Operations: implementación completa
 
 - implementación:
@@ -12130,3 +12156,61 @@ Fase 4 completada:
   - `ISSUE-042` organigrama usa reporting lines, no jerarquía estructural
   - `ISSUE-043` acceso al organigrama puede existir sin reflejo en el menú
 - No se hicieron fixes nuevos en esta sesión de auditoría; solo documentación y verificación end-to-end para dejar el estado reproducible.
+
+### Sesión 2026-04-13 — hardening real de sync Nubox docs
+
+- Pedido del usuario: revisar por qué Nubox “no estaba sincronizando docs hace días” y dejarlo resuelto con una solución robusta y escalable, no un parche.
+- Diagnóstico operativo:
+  - `raw` sí estaba corriendo diariamente en staging/producción; había runs exitosos hasta `2026-04-13 07:30 UTC`.
+  - El problema real era doble:
+    - el raw default solo cubría ventana corta reciente, así que rectificaciones históricas podían quedar fuera indefinidamente
+    - la capa `conformed` seguía usando `DELETE + INSERT` por ID en BigQuery; al ejecutar un backfill masivo, chocó con el streaming buffer (`UPDATE or DELETE ... would affect rows in the streaming buffer`)
+  - además, `postgres_projection` marcaba `nubox_last_synced_at = NOW()` aunque el raw real no hubiera refrescado ese documento en la corrida actual; eso maquillaba frescura.
+  - el fallo local `403 Invalid key=value pair in Authorization header` vino de drift del token/local env; staging siguió autenticando bien, por lo que no era la causa raíz del incidente productivo.
+- Cambios implementados:
+  - `src/lib/nubox/sync-plan.ts` + `src/lib/nubox/sync-plan.test.ts`
+    - nuevo plan de sync con hot window configurable + historical sweep rotativo persistido en `greenhouse_sync.source_sync_watermarks`
+  - `src/lib/nubox/sync-nubox-raw.ts`
+    - usa el sync plan por defecto
+    - registra `period_window`
+    - marca `partial` si hay familias con error pero el raw escribió algo
+  - `src/lib/nubox/client.ts` + `src/lib/nubox/client.test.ts`
+    - `fetchAllPages()` ya no depende ciegamente de `x-total-count`; sigue paginando cuando la página viene llena
+  - `src/lib/nubox/sync-nubox-conformed.ts`
+    - cambia el contrato de `conformed` a append-only snapshots
+    - ya no hace `DELETE` previo sobre tablas calientes de BigQuery
+  - `src/lib/nubox/sync-nubox-to-postgres.ts`
+    - lectores de `conformed` y `bank_movements` ahora resuelven latest snapshot por ID
+    - `nubox_last_synced_at` ahora se alimenta desde `source_last_ingested_at` del raw real, no desde `NOW()`
+  - `src/app/api/cron/nubox-balance-sync/route.ts`
+    - balances leen latest snapshot por ID, compatibles con append-only conformed
+  - `src/lib/finance/payment-ledger-remediation.ts`
+    - bank movements usan latest snapshot por `nubox_movement_id`
+  - `src/app/api/finance/nubox/sync-status/route.ts`
+    - expone `lastRaw`, `lastConformed`, `lastProjection` y deja de esconder frescura real detrás de cualquier run Nubox reciente
+  - `scripts/setup-bigquery-nubox-conformed.sql`
+    - documentación actualizada a append-only snapshots
+- Recuperación operativa ejecutada:
+  - staging backfill raw por lotes `2023-01 -> 2026-04`: completado con éxito
+  - conformed local con nuevo contrato: `nubox-conf-2e8e7828-68ce-48b6-bebd-076da5f798c8` succeeded
+  - postgres projection local: `nubox-pg-ce4b8eeb-8a2b-4777-9885-37d96c0a1ed8` succeeded
+    - `Income: 1 created, 71 updated`
+    - `Expenses: 2 created, 122 updated`
+    - `Reconciled: 0 expenses, 2 incomes`
+    - `Orphaned: 17`
+- Estado final verificado:
+  - `GET /api/finance/nubox/sync-status` en staging terminó en `succeeded` para `postgres_projection`
+  - los failures `conformed_sync` previos a las `20:30 UTC` del `2026-04-13` quedan como evidencia histórica del incidente de streaming buffer y ya no representan el estado actual
+- Validación ejecutada:
+  - `pnpm exec vitest run src/lib/nubox/client.test.ts src/lib/nubox/sync-plan.test.ts`
+  - `pnpm exec eslint src/lib/nubox/sync-nubox-conformed.ts src/lib/nubox/sync-nubox-to-postgres.ts src/app/api/cron/nubox-balance-sync/route.ts src/lib/finance/payment-ledger-remediation.ts`
+  - `pnpm exec tsc --noEmit`
+  - `git diff --check`
+  - `pnpm exec tsx scripts/test-nubox-sync.ts conformed`
+  - `pnpm exec tsx scripts/test-nubox-sync.ts postgres`
+  - `pnpm staging:request /api/finance/nubox/sync-status --pretty`
+- Riesgo/deuda abierta:
+  - siguen existiendo `17` orphaned sales sin identity resolution suficiente; eso ya no es un problema de sincronización sino de matching organizacional/RUT.
+  - follow-on arquitectónico/documental abierto:
+    - `docs/architecture/GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1.md` y `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` ya quedaron ampliados con el `Integration Runtime Pattern`
+    - nueva `TASK-399` creada para institucionalizar el hardening runtime de integraciones source-led como carril separado de `TASK-188`

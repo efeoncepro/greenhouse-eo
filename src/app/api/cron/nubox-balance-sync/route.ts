@@ -2,7 +2,6 @@ import { randomUUID } from 'node:crypto'
 
 import { NextResponse } from 'next/server'
 
-
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 
@@ -33,8 +32,17 @@ export async function GET(request: Request) {
     // 1. Read sales balances from conformed
     const [saleRows] = await bq.query({
       query: `
+        WITH latest_sales AS (
+          SELECT * EXCEPT(rn)
+          FROM (
+            SELECT s.*,
+                   ROW_NUMBER() OVER (PARTITION BY nubox_sale_id ORDER BY synced_at DESC, sync_run_id DESC) AS rn
+            FROM \`${projectId}.greenhouse_conformed.nubox_sales\` s
+          )
+          WHERE rn = 1
+        )
         SELECT nubox_sale_id, CAST(balance AS FLOAT64) AS balance
-        FROM \`${projectId}.greenhouse_conformed.nubox_sales\`
+        FROM latest_sales
         WHERE balance IS NOT NULL
       `
     })
@@ -83,8 +91,17 @@ export async function GET(request: Request) {
     // 2. Read purchase balances from conformed
     const [purchaseRows] = await bq.query({
       query: `
+        WITH latest_purchases AS (
+          SELECT * EXCEPT(rn)
+          FROM (
+            SELECT p.*,
+                   ROW_NUMBER() OVER (PARTITION BY nubox_purchase_id ORDER BY synced_at DESC, sync_run_id DESC) AS rn
+            FROM \`${projectId}.greenhouse_conformed.nubox_purchases\` p
+          )
+          WHERE rn = 1
+        )
         SELECT nubox_purchase_id, CAST(balance AS FLOAT64) AS balance
-        FROM \`${projectId}.greenhouse_conformed.nubox_purchases\`
+        FROM latest_purchases
         WHERE balance IS NOT NULL
       `
     })

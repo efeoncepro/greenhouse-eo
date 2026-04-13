@@ -313,10 +313,15 @@ export const fetchAllPages = async <T>(
       all.push(...response.data)
     }
 
-    // Nubox returns total record count in x-total-count header (captured as totalCount)
-    const totalPages = Math.ceil((response.totalCount || all.length) / size)
+    if (!response.data || response.data.length === 0) break
 
-    if (page >= totalPages || response.data.length < size) break
+    const totalPagesFromHeader = response.totalCount > 0 ? Math.ceil(response.totalCount / size) : null
+
+    if (totalPagesFromHeader != null) {
+      if (page >= totalPagesFromHeader) break
+    } else if (response.data.length < size) {
+      break
+    }
 
     page++
   }

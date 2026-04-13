@@ -1,5 +1,73 @@
 # GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1
 
+## Delta 2026-04-13 — Integration Runtime Pattern for source-led connectors
+
+El incidente real de `Nubox` dejó una regla nueva para la `Native Integrations Layer`: Greenhouse ya no debe endurecer conectores críticos solo a nivel de inventory/readiness. También debe imponer un patrón runtime reusable para cualquier integración que haga `source sync` hacia capas raw/conformed/productivas.
+
+Este patrón aplica a conectores como:
+
+- `Nubox`
+- `Notion`
+- `HubSpot` cuando opera como source sync inbound
+- futuros upstreams de payroll, treasury, BI o plataformas hermanas
+
+### Runtime pattern canonico
+
+| Stage | Responsabilidad | Regla dura |
+| --- | --- | --- |
+| `Source Adapter` | Auth, paginación, retries, timeouts, clasificación de errores | No mezclar transporte con lógica de producto |
+| `Sync Planner` | Hot window, historical sweep, cursores/watermarks, lease/lock | No depender solo de ventanas recientes ni de reruns manuales |
+| `Raw Ledger` | Persistencia append-only del source tal como llegó | La frescura real nace aquí |
+| `Conformed Snapshot` | Normalización + resolución de identidad + snapshots analíticos | No usar `DELETE` destructivo sobre tablas calientes |
+| `Product Projection` | Upserts hacia PostgreSQL / serving | Debe leer latest snapshot por ID y preservar idempotencia |
+| `Status / Readiness` | Health por etapa, stage lag, last success, partial success | `success` global no puede esconder drift entre raw/conformed/projection |
+| `Replay / Runbooks` | Backfill por rango, replay por etapa, recuperación guiada | Todo conector crítico debe poder rehidratar historia sin cirugía manual |
+
+### Non-negotiables nuevos
+
+1. **Freshness real**
+   - La fecha visible de sincronización en producto debe derivarse del `ingested_at` real del raw source, no del `NOW()` de una proyección downstream.
+
+2. **`partial success` first-class**
+   - Si una corrida refresca `raw` pero falla `conformed` o `projection`, el estado debe quedar explícito. No esconderlo como `success`.
+
+3. **Snapshot-safe conformed**
+   - Las capas `greenhouse_conformed.*` que dependan de BigQuery no deben asumir que pueden borrar filas recién insertadas. El patrón preferido es `append-only snapshots + latest-snapshot readers`.
+
+4. **Replay explícito**
+   - Todo conector crítico debe soportar:
+     - hot window automática
+     - historical sweep rotativo
+     - replay/backfill manual por período o rango
+
+5. **Locks y control plane**
+   - Corridas largas o multi-fase deben usar `lease` o control equivalente para evitar solapes destructivos entre scheduler, rerun manual y recovery.
+
+6. **Taxonomía de errores**
+   - El adapter debe clasificar al menos:
+     - `auth`
+     - `rate_limit`
+     - `transient`
+     - `schema_drift`
+     - `fatal`
+
+### Implicación arquitectónica
+
+La `Native Integrations Layer` ya no se considera completa cuando existe:
+
+- inventory
+- health
+- readiness
+- surface admin
+
+Ahora también debe cubrir el contrato runtime que separa:
+
+- `adapter hardening`
+- `orchestration hardening`
+- `storage safety`
+- `projection integrity`
+- `operational replay`
+
 ## Objetivo
 
 Definir la `Native Integrations Layer` como capability formal del platform layer de Greenhouse para operar integraciones críticas de forma enterprise, robusta y escalable.
@@ -215,6 +283,22 @@ Cada adapter:
 - extrae o publica datos
 - traduce al `canonical core`
 - no se convierte en truth layer del producto por sí mismo
+- implementa taxonomía explícita de errores, retries, timeout budget y paginación defensiva
+
+### Layer 3.1 - Sync Planning and Replay Control
+
+Todo conector source-led debe declarar un plan de sincronización runtime:
+
+- hot window automática
+- historical sweep rotativo
+- cursores / watermarks persistidos
+- lease / lock cuando la corrida pueda solaparse
+- replay manual por rango
+
+Regla:
+
+- la planificación es infraestructura de integración, no lógica de dominio
+- no debe quedar embebida informalmente en un cron suelto o en parámetros mágicos del adapter
 
 ### Layer 4 - Canonical Mapping Layer
 
@@ -239,6 +323,18 @@ Backbone para:
 - orquestación de syncs complejos o de larga duración
 
 Greenhouse ya tiene foundations de outbox/reactive projections; esta layer debe integrarse con ellas, no duplicarlas.
+
+### Layer 5.1 - Raw and Conformed Snapshot Discipline
+
+Para source syncs inbound:
+
+- `raw` debe ser append-only e inmutable
+- `conformed` debe preferir snapshots append-only cuando la tecnología subyacente no garantice deletes/merges seguros en caliente
+- los consumers downstream deben resolver latest snapshot por `source object id`
+
+Regla:
+
+- la capa de integración no debe degradar la posibilidad de replay o auditoría para “mantener una tabla limpia”
 
 ### Layer 6 - Runtime Governance Layer
 

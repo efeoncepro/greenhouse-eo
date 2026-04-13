@@ -114,19 +114,20 @@ Reemplazar el patrón full-refresh con MERGE/upsert que preserve registros exist
 
 ## Estado
 
-`resolved` — 2026-03-30
+`resolved` — 2026-04-13
 
 ### Resolución
 
 Los tres problemas fueron resueltos:
 
-1. **Período**: el problema real no era falta de filtro de período sino documentos anulados sumando a revenue. Se agregó `is_annulled` flag y se excluyen de todos los cálculos (TASK-163 + TASK-165).
-2. **Identity resolution**: corregido con `GROUP BY + MAX(client_id) FILTER` en `buildOrgByRutMap()` — ya no pierde client_id en orgs multi-space.
-3. **DELETE/INSERT**: migrado a upsert selectivo (`DELETE WHERE id IN (...) → INSERT`) en TASK-165, protege contra pérdida de datos si la lectura falla.
+1. **Período/frescura**: el raw default dejó de depender solo de la ventana reciente; ahora combina hot window configurable con historical sweep rotativo, y la proyección a PostgreSQL usa `source_last_ingested_at` real en vez de `NOW()` como falsa señal de frescura.
+2. **Identity resolution**: corregido con `GROUP BY + MAX(client_id) FILTER` en `buildOrgByRutMap()` — ya no pierde `client_id` en organizaciones multi-space.
+3. **DELETE/INSERT**: la mitigación selectiva de TASK-165 no alcanzó para backfills porque BigQuery igual bloquea `DELETE` sobre filas en streaming buffer. Desde `2026-04-13`, el writer conformed quedó append-only por snapshots y los readers relevantes resuelven latest snapshot por ID; con eso se elimina la dependencia de borrar filas calientes.
+4. **Recuperación operativa**: se ejecutó backfill raw `2023-01 -> 2026-04` y luego corridas exitosas `conformed -> postgres`; el estado final verificado en staging quedó `succeeded`.
 
 ## Relacionado
 
-- `src/lib/nubox/sync-nubox-conformed.ts` — identity resolution + full-refresh
+- `src/lib/nubox/sync-nubox-conformed.ts` — identity resolution + append-only snapshot writes
 - `src/lib/nubox/sync-nubox-to-postgres.ts` — projection to Postgres
 - `src/lib/nubox/mappers.ts` — field mapping (correcto)
 - `src/lib/nubox/sync-nubox-raw.ts` — raw sync (correcto, filtra por período)

@@ -1,5 +1,19 @@
 # project_context.md
 
+## Delta 2026-04-13 Management Accounting queda formalizado como capability distinta de contabilidad legal
+
+- Greenhouse ya tiene una decision arquitectonica explicita para el siguiente modulo financiero a institucionalizar.
+- Runtime documental nuevo:
+  - `docs/architecture/GREENHOUSE_MANAGEMENT_ACCOUNTING_ARCHITECTURE_V1.md`
+  - `docs/README.md`
+- Contrato operativo:
+  - el modulo correcto a profundizar no es `financial accounting` legal, sino `Management Accounting`
+  - su lectura funcional recomendada es `contabilidad de costos`
+  - su surface product recomendada sigue bajo `Finance > Economia operativa`
+  - la capability debe crecer sobre `Finance + Cost Intelligence`, no como modulo paralelo desconectado
+  - para considerarse enterprise debe contemplar no solo `actual`, sino tambien `budget`, `variance`, `forecast`, `fully-loaded cost`, `P&L` por BU, cierre gobernado, explainability, overrides, RBAC, observabilidad, data quality y runbooks operativos
+  - `factoring` y otros financial costs deben entrar al margen real como parte del actual consolidado, no quedar aislados como lanes de tesoreria sin impacto explicable en management accounting
+
 ## Delta 2026-04-13 Task lifecycle hardening para cierres reales
 
 - El protocolo de tasks ya no considera "terminada" una task solo porque la implementación quedó lista.
@@ -4545,6 +4559,9 @@ Proyecto base de Greenhouse construido sobre el starter kit de Vuexy para Next.j
 - `Mi Greenhouse` concentra el modulo relacional `Tu equipo de cuenta`; `Pulse` mantiene `Capacidad del equipo` como lectura operativa separada.
 - La capa `GH_INTERNAL_MESSAGES` ya gobierna tambien partes grandes de `admin/tenants/[id]`, `view-as/dashboard`, governance de capabilities y tablas operativas del detalle de space.
 - La supervisoría formal sigue teniendo precedencia manual en Greenhouse: Entra solo puede abrir propuestas de drift auditables en `greenhouse_sync.reporting_hierarchy_drift_proposals`; no debe sobreescribir `greenhouse_core.reporting_lines` sin aprobación humana explícita.
+- La capa `greenhouse_conformed.nubox_*` debe tratarse como append-only snapshots: cualquier consumer nuevo de ventas, compras o movimientos Nubox debe resolver explícitamente el latest snapshot por ID (`nubox_sale_id`, `nubox_purchase_id`, `nubox_movement_id`) en vez de asumir una sola fila viva por documento.
+- La frescura visible de documentos Nubox en PostgreSQL debe derivarse del `ingested_at` real del raw snapshot fuente; `NOW()` en una proyección downstream no es señal válida de que el documento se haya refrescado desde Nubox.
+- Los conectores `source-led` críticos de Greenhouse deben converger al patrón runtime `source adapter -> sync planner -> raw append-only -> conformed snapshots -> product projection -> status/readiness -> replay/runbook`; no deben quedar como crons aislados con semántica implícita por conector.
 
 ## Deuda Tecnica Visible
 

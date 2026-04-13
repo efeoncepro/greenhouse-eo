@@ -441,3 +441,11 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-389` | `to-do` | Notificaciones In-App Retención y Purga | `docs/tasks/to-do/TASK-389-notifications-retencion-purga.md` |
 | `TASK-390` | `to-do` | Notificaciones In-App Broadcast Admin | `docs/tasks/to-do/TASK-390-notifications-broadcast-admin.md` |
 | `TASK-391` | `to-do` | Finance Factoring Operations | `docs/tasks/to-do/TASK-391-finance-factoring-operations.md` |
+| `TASK-392` | `to-do` | Management Accounting Reliable Actual Foundation Program | `docs/tasks/to-do/TASK-392-management-accounting-reliable-actual-foundation-program.md` |
+| `TASK-393` | `to-do` | Management Accounting Period Governance, Restatements & Reclassification | `docs/tasks/to-do/TASK-393-management-accounting-period-governance-restatements-reclassification.md` |
+| `TASK-394` | `to-do` | Management Accounting Scope Expansion: BU, Legal Entity & Intercompany | `docs/tasks/to-do/TASK-394-management-accounting-scope-expansion-bu-legal-entity-intercompany.md` |
+| `TASK-395` | `to-do` | Management Accounting Planning Engine: Budgets, Drivers & Approval Governance | `docs/tasks/to-do/TASK-395-management-accounting-planning-engine-budgets-drivers-approval-governance.md` |
+| `TASK-396` | `to-do` | Management Accounting Variance, Forecast & Executive Control Tower | `docs/tasks/to-do/TASK-396-management-accounting-variance-forecast-executive-control-tower.md` |
+| `TASK-397` | `to-do` | Management Accounting Financial Costs Integration: Factoring, FX, Fees & Treasury | `docs/tasks/to-do/TASK-397-management-accounting-financial-costs-integration-factoring-fx-fees-treasury.md` |
+| `TASK-398` | `to-do` | Management Accounting Enterprise Hardening: Explainability, RBAC, Observability & Runbooks | `docs/tasks/to-do/TASK-398-management-accounting-enterprise-hardening-explainability-rbac-observability-runbooks.md` |
+| `TASK-399` | `to-do` | Native Integrations Runtime Hardening: Source Adapters, Control Plane & Replay Governance | `docs/tasks/to-do/TASK-399-native-integrations-runtime-hardening-source-adapters-control-plane-replay.md` |

@@ -10,6 +10,7 @@ vi.mock('@/lib/secrets/secret-manager', () => ({
 
 import {
   decodeNuboxXmlPayload,
+  fetchAllPages,
   getNuboxSalePdf,
   getNuboxSaleXml,
   listNuboxSales
@@ -183,5 +184,22 @@ describe('decodeNuboxXmlPayload', () => {
         })
       })
     )
+  })
+
+  it('keeps paginating when Nubox omits x-total-count but pages are still full', async () => {
+    const fetcher = vi.fn()
+      .mockResolvedValueOnce({
+        data: Array.from({ length: 2 }, (_, index) => ({ id: index + 1 })),
+        totalCount: 0
+      })
+      .mockResolvedValueOnce({
+        data: [{ id: 3 }],
+        totalCount: 0
+      })
+
+    const rows = await fetchAllPages(fetcher, '2026-03', 2)
+
+    expect(fetcher).toHaveBeenCalledTimes(2)
+    expect(rows).toEqual([{ id: 1 }, { id: 2 }, { id: 3 }])
   })
 })

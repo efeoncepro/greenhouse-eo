@@ -2,6 +2,20 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — Se registra el programa de 7 tasks robustas para Management Accounting
+
+- Se agregaron `TASK-392` a `TASK-398` bajo `docs/tasks/to-do/` para convertir la arquitectura nueva de Management Accounting en backlog ejecutable.
+- El programa queda ordenado en 7 lanes robustas: actual foundation, period governance, scope expansion, planning engine, variance/forecast/control tower, financial costs integration y enterprise hardening.
+- `docs/tasks/TASK_ID_REGISTRY.md` y `docs/tasks/README.md` quedaron actualizados para reservar los IDs y dejar visible la secuencia de ejecución.
+
+### 2026-04-13 — Management Accounting queda formalizado como capability canonica separada de contabilidad legal
+
+- Se agregó `docs/architecture/GREENHOUSE_MANAGEMENT_ACCOUNTING_ARCHITECTURE_V1.md`.
+- La arquitectura ahora deja explícito que el siguiente módulo financiero a institucionalizar en Greenhouse es `Management Accounting`, no un módulo de contabilidad legal o de partida doble.
+- La lectura funcional recomendada queda fijada como `contabilidad de costos`, mientras que la surface product recomendada sigue siendo `Finance > Economia operativa`.
+- El documento nuevo también deja formalizado qué falta para que la capability sea enterprise: budget, variance, forecast, fully-loaded labor cost, P&L por BU, cierre gobernado, explainability, overrides, RBAC, observabilidad, data quality, runbooks, testing de negocio, policy map y roadmap de madurez.
+- `docs/README.md` y `project_context.md` quedaron alineados para que la decisión ya no viva solo en un archivo aislado.
+
 ### 2026-04-13 — Lifecycle de tasks endurecido para evitar cierres a medias
 
 - `docs/tasks/TASK_TEMPLATE.md` ahora deja el cierre como parte explícita de Definition of Done: sincronizar `Lifecycle`, mover el archivo y actualizar `docs/tasks/README.md`.
@@ -5305,6 +5319,14 @@
 - La validación funcional quedó cubierta con `dryRun` real para `Marzo 2026`, resolviendo el target page existente sin sobrescribir el contenido histórico durante la verificación.
 
 # Changelog
+
+## 2026-04-13
+
+- Nubox sync hardening: el raw sync ya no depende solo de la ventana reciente; ahora combina hot window configurable con historical sweep rotativo persistido, para que documentos tardíos o rectificaciones históricas no queden fuera indefinidamente.
+- Nubox conformed: las tablas `greenhouse_conformed.nubox_*` pasan a operar como snapshots append-only; los readers de balances, ledger remediation y proyección a PostgreSQL resuelven siempre el último snapshot por ID, evitando fallos por streaming buffer de BigQuery durante backfills.
+- Nubox freshness: `nubox_last_synced_at` en `income`, `expenses` y `quotes` ahora refleja el `ingested_at` real del raw snapshot fuente, no el timestamp artificial de cualquier proyección.
+- Finance Ops: se ejecutó backfill raw histórico `2023-01 -> 2026-04` y luego una corrida `conformed -> postgres` exitosa; staging terminó con `postgres_projection` exitosa (`1 income` creado, `2 expenses` creados, `2 incomes` reconciliados).
+- Architecture / backlog: `GREENHOUSE_NATIVE_INTEGRATIONS_LAYER_V1` y `GREENHOUSE_SOURCE_SYNC_PIPELINES_V1` ya formalizan el patrón runtime reusable para integraciones source-led, y se abrió `TASK-399` para institucionalizar adapters resilientes, control plane por etapa y replay governance.
 
 ## 2026-04-10
 
