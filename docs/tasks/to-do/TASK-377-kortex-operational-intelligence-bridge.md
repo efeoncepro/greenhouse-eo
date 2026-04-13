@@ -176,6 +176,31 @@ El output debe ser suficientemente concreto para que luego se abran tasks espejo
 - Tasks espejo en el repo `efeoncepro/kortex` para consumir la surface Greenhouse una vez que la foundation exista.
 - Future consumer patterns para sister platforms posteriores como Verk.
 
+## Delta 2026-04-13 (TASK-379 audit-only sweep)
+
+Cuando TASK-379 ejecuto el audit-only sweep en outbox, marco 2 eventos `sister_platform_binding.*` (1 `created` + 1 `activated`) como `no-op:pending-task-377-consumer` en lugar de `no-op:audit-only` para que sean rastreables. Estos eventos representan binding actions reales que se aplicaron en la tabla `greenhouse_core.sister_platform_bindings`, pero su consumer reactivo (este task) todavia no existe.
+
+Cuando este task se implemente, hay que:
+
+1. Recuperar los event_ids con:
+   ```sql
+   SELECT r.event_id, e.aggregate_id, e.event_type, e.payload_json
+     FROM greenhouse_sync.outbox_reactive_log r
+     JOIN greenhouse_sync.outbox_events e USING (event_id)
+    WHERE r.handler = 'system:no-handler'
+      AND r.result = 'no-op:pending-task-377-consumer'
+      AND e.event_type LIKE 'sister_platform_binding.%';
+   ```
+2. Replay manual via el nuevo consumer (los 2 eventos historicos: 1 created + 1 activated).
+3. Despues del replay, opcionalmente actualizar el log para reflejar el resultado real:
+   ```sql
+   UPDATE greenhouse_sync.outbox_reactive_log
+      SET handler = '<new-handler>', result = '<new-result>'
+    WHERE result = 'no-op:pending-task-377-consumer';
+   ```
+
+Este caveat solo aplica a los 2 eventos historicos pre-TASK-377. Los nuevos eventos `sister_platform_binding.*` que se publiquen despues del deploy del consumer reactivo entraran al flujo normal del consumer V2 sin replay manual.
+
 ## Open Questions
 
 - Si el primer consumer Kortex debe vivir solo en operator console/server-side o si los agents entran en la misma ola.

@@ -2,9 +2,10 @@
 
 > **Tipo:** Incidente operativo
 > **Detectado:** 2026-04-13 durante smoke post-deploy + Slice 0 de TASK-379
-> **Estado:** Open — fix en progreso via TASK-379
+> **Estado:** Resuelto — 2026-04-13 (mismo dia)
 > **Severidad:** P0 (datos materializados stale en multiples superficies)
 > **Ambiente:** Compartido (Cloud SQL `greenhouse-pg-dev` es single-instance dev+prod)
+> **Resolucion:** TASK-379 implementacion completa (slices 0-5) + PR #54 audit-only sweep follow-up. Ver seccion `Resolucion` mas abajo.
 
 ## Sintoma observable
 
@@ -121,13 +122,55 @@ El consumer `processReactiveEvents` itera el outbox via offset/limit con `ORDER 
 
 Ninguna manual recomendada — el fix de TASK-379 esta en progreso y es el plan correcto. NO mass-ack manual del backlog: con Slice 1 desplegado, el consumer V2 limpia el backlog por construccion via scope coalescing.
 
-## Resolucion
+## Resolucion (2026-04-13)
 
-Cierre cuando TASK-379 quede mergeada a main y el `Ops Health > Reactive backlog` reporte `healthy` por > 24 horas continuas con backlog total < 100.
+TASK-379 implementacion completa (slices 0-5, PR #53) + audit-only sweep follow-up (PR #54) resuelven el incidente el mismo dia que se detecto.
+
+### Que se hizo
+
+1. **Consumer V2 (PR #53 Slice 1)**: refactor de `processReactiveEvents` con scope-level coalescing, eliminacion del silent-skip path (todo evento fetcheado obtiene entry en `outbox_reactive_log`), circuit breaker por projection, bulk acknowledgement. Migration nueva: `projection_circuit_state` table.
+2. **Publisher fan-out reduction (PR #53 Slice 2)**: 4 projections (`provider_tooling`, `commercial_cost_attribution`, `operational_pl`, `staff_augmentation_placements`) ahora publican 1 evento por periodo en lugar de N por entidad. Schema versioning v1/v2 coexisten.
+3. **Cloud Run scaling (PR #53 Slice 3)**: ops-worker pasa de `max=2 concurrency=1` a `max=5 concurrency=4 cpu=2 mem=2Gi timeout=540`. 7 Cloud Scheduler jobs por dominio reemplazan los 3 anteriores. Nuevo endpoint `GET /reactive/queue-depth?domain=<x>`.
+4. **Observability + SLO (PR #53 Slice 4)**: 5 custom metrics emitidas a Cloud Monitoring desde el consumer V2. Dashboard de Ops Health upgraded con drill-down per-projection + circuit breaker badges. SLO formal documentado en `GREENHOUSE_REACTIVE_PROJECTIONS_SLO_V1.md`.
+5. **Backfill + load test + V2 docs (PR #53 Slice 5)**: scripts `pnpm reactive:backfill` y `pnpm reactive:load-test`. Playbook V2 + arquitectura V2 publicados.
+6. **Audit-only sweep (PR #54 follow-up)**: nuevo `sweepAuditOnlyEvents()` helper en el consumer + wire-up en `/reactive/recover` para que el cron de 15 min limpie automaticamente eventos cuyo event_type no tiene handler. Entries `no-op:audit-only` preservan audit trail; futura cron de retencion puede borrarlos seguro.
+7. **`monitoring.metricWriter` IAM role** otorgado al SA `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` para que las custom metrics emitan correctamente.
+
+### Verificacion cuantitativa
+
+| Metric | Pre-fix | Post-fix |
+|---|---|---|
+| Total raw outbox `published` sin log entry | **11,495** | **0** |
+| Eventos con consumer real procesados | 0 (loop silencioso) | 5,420 colapsados via coalescing |
+| Eventos audit-only marcados `no-op:audit-only` | 0 | 6,071 |
+| Eventos rastreables para TASK-377 (`no-op:pending-task-377-consumer`) | n/a | 2 |
+| Projections en circuit breaker `closed` | n/a | 14 / 14 |
+| Worker logs antes (`50 processed, 0 projections`) | confirmado | reemplazado por `Y processed, N projections` reales |
+| Cloud Run revision | `00007-q45` (V1) | `00008-grv` (V2) + redeploy post-PR-#54 |
+
+### Lo que NO se silencio
+
+Los 6071 eventos marcados `no-op:audit-only` corresponden, sin excepcion, a notificaciones post-hoc de trabajo que ya esta en su tabla canonica:
+
+- `*.nubox_synced` (3434): rows en `fin_income/fin_expenses` ya importadas por el sync pipeline.
+- `accounting.pl_snapshot.materialized` (763) y `staff_aug.placement_snapshot.materialized` (620): snapshots ya en `serving_*` tables (legacy V1 fan-out).
+- `payroll.projected_period.refreshed` (260): explicitamente `AUDIT-ONLY DEPRECATED` en Event Catalog V1.
+- `auth.login.*`, `role.*`, `responsibility.*`, `access.*`, `asset.*`, `reporting_hierarchy.*`: audit trail de identity/seguridad por diseno (ver TASK-247).
+
+Los 2 eventos `sister_platform_binding.*` se marcaron como `no-op:pending-task-377-consumer` (handler distinto) para que TASK-377 los pueda recuperar y replayear cuando se implemente el consumer real. TASK-377 actualizado con instrucciones SQL de replay.
+
+### Acciones operativas pendientes (no bloquean cierre)
+
+- [ ] Provisionar las 5 alerting policies de Cloud Monitoring documentadas en `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_ALERTING_V1.md` — bloqueado por crear Slack notification channel via OAuth en Cloud Console (unica accion que requiere browser, no scriptable).
+- [ ] Promover el deploy a `main` (Vercel production) cuando el equipo confirme operacion estable en staging.
+- [ ] Implementar TASK-377 (Kortex bridge) y replayear los 2 sister_platform_binding events.
+- [ ] Futura cron de retencion que purgue `outbox_events` con entries `no-op:audit-only` > 90 dias.
 
 ## Referencias
 
-- Task: `docs/tasks/in-progress/TASK-379-reactive-projections-enterprise-hardening.md`
+- Task: `docs/tasks/in-progress/TASK-379-reactive-projections-enterprise-hardening.md` (a mover a `complete/` cuando todas las acciones operativas pendientes esten cerradas)
 - PR previo relacionado (filtro de metric): #50
-- Codigo afectado: `src/lib/sync/reactive-consumer.ts`, `src/lib/sync/refresh-queue.ts`, `src/lib/sync/projections/*`
-- Docs: `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md` (sera reemplazado por V2 en TASK-379 Slice 5)
+- PRs de fix: **#53** (TASK-379 V2 implementation, merged commit `62f6dfeb`), **#54** (audit-only sweep follow-up, merged commit `8d90f15f`)
+- Codigo afectado: `src/lib/sync/reactive-consumer.ts`, `src/lib/sync/refresh-queue.ts`, `src/lib/sync/projections/{provider-tooling,commercial-cost-attribution,operational-pl,staff-augmentation}.ts`, `src/lib/operations/reactive-circuit-breaker.ts`, `src/lib/operations/cloud-monitoring-emitter.ts`, `services/ops-worker/{server.ts,deploy.sh,reactive-queue-depth.ts}`
+- Docs nuevos: `GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V2.md`, `GREENHOUSE_REACTIVE_PROJECTIONS_ARCHITECTURE_V2.md`, `GREENHOUSE_REACTIVE_PROJECTIONS_SLO_V1.md`, `GREENHOUSE_REACTIVE_PROJECTIONS_ALERTING_V1.md`
+- Migration: `migrations/20260413105218813_reactive-pipeline-v2-circuit-breaker.sql`
