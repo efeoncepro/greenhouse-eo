@@ -78,6 +78,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
   - detecto una decision pendiente del usuario
   - cambio supuestos del proyecto
 - Si dos agentes pueden tocar la misma zona, prevalece el ultimo handoff documentado, no la memoria conversacional.
+- Si otro agente ya esta trabajando en el workspace actual y hace falta otra rama, **no cambiar la rama de ese checkout**; abrir un `git worktree` aislado. Fuente canonica: `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md`.
 
 ### 4. Regla de cambios minimos
 
@@ -141,6 +142,7 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - `main` es solo para codigo listo para produccion.
 - `develop` debe funcionar como rama de integracion y rama asociada a `Staging` en Vercel.
 - Todo trabajo de agentes debe salir desde rama propia salvo cambios minimos de emergencia.
+- Si varios agentes trabajan en paralelo, cada uno debe usar rama propia y, cuando compartan máquina/workspace físico, worktree propio para no alterar el branch visible del otro agente.
 - Formato recomendado de ramas:
   - `feature/<owner>-<tema>`
   - `fix/<owner>-<tema>`

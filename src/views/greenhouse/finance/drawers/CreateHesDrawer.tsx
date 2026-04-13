@@ -4,15 +4,18 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { toast } from 'react-toastify'
 
+import Autocomplete from '@mui/material/Autocomplete'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
+import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Drawer from '@mui/material/Drawer'
 import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
+import Link from '@mui/material/Link'
 import LinearProgress from '@mui/material/LinearProgress'
 import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
@@ -20,6 +23,11 @@ import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+import {
+  getContactOptionLabel,
+  loadFinanceClientContactOptions,
+  type FinanceContactOption
+} from './financeClientContacts'
 
 // ── Types ──
 
@@ -40,6 +48,9 @@ interface POOption {
   invoicedAmountClp: number
   remainingAmountClp: number
   status: string
+  contactName: string | null
+  contactEmail: string | null
+  attachmentUrl: string | null
 }
 
 const getClientLabel = (c: ClientOption) =>
@@ -79,6 +90,15 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
   const isEditing = Boolean(editHes)
   const currentStatus = editHes?.status || 'new'
 
+  const currentStatusLabel =
+    currentStatus === 'approved'
+      ? 'Validada'
+      : currentStatus === 'submitted'
+        ? 'Recibida'
+        : currentStatus === 'rejected'
+          ? 'Observada'
+          : 'Borrador'
+
   // Form fields
   const [hesNumber, setHesNumber] = useState('')
   const [selectedClientKey, setSelectedClientKey] = useState('')
@@ -91,7 +111,6 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
   const [currency, setCurrency] = useState('CLP')
   const [clientContactName, setClientContactName] = useState('')
   const [clientContactEmail, setClientContactEmail] = useState('')
-  const [attachmentUrl, setAttachmentUrl] = useState('')
   const [notes, setNotes] = useState('')
 
   // Lifecycle action fields
@@ -105,8 +124,16 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
   const [loadingClients, setLoadingClients] = useState(false)
   const [activePOs, setActivePOs] = useState<POOption[]>([])
   const [selectedPO, setSelectedPO] = useState<POOption | null>(null)
+  const [clientContacts, setClientContacts] = useState<FinanceContactOption[]>([])
+  const [loadingContacts, setLoadingContacts] = useState(false)
+  const [contactMode, setContactMode] = useState<'linked' | 'manual'>('linked')
+  const [selectedContact, setSelectedContact] = useState<FinanceContactOption | null>(null)
+  const [contactsError, setContactsError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const selectedClient = clients.find(client => getClientValue(client) === selectedClientKey) || null
+  const resolvedDocumentUrl = selectedPO?.attachmentUrl || editHes?.attachmentUrl || ''
 
   // ── Populate form when editing ──
 
@@ -122,7 +149,6 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
       setAmount(String(editHes.amount))
       setClientContactName(editHes.clientContactName || '')
       setClientContactEmail(editHes.clientContactEmail || '')
-      setAttachmentUrl(editHes.attachmentUrl || '')
       setNotes(editHes.notes || '')
     }
   }, [editHes, open])
@@ -181,7 +207,6 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
   const handleClientChange = (value: string) => {
     setSelectedClientKey(value)
     setSelectedPoId('')
-    setSelectedPO(null)
 
     const client = clients.find(item => getClientValue(item) === value) || null
 
@@ -190,10 +215,6 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
 
   const handlePOChange = (value: string) => {
     setSelectedPoId(value)
-
-    const po = activePOs.find(p => p.poId === value)
-
-    setSelectedPO(po || null)
   }
 
   // ── Fetch POs on edit load ──
@@ -209,6 +230,96 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
     }
   }, [editHes, open, fetchPOs])
 
+  useEffect(() => {
+    if (!selectedClientKey || !selectedClient) {
+      setClientContacts([])
+      setLoadingContacts(false)
+      setContactMode('linked')
+      setSelectedContact(null)
+      setContactsError(null)
+      setClientContactName(editHes?.clientContactName || '')
+      setClientContactEmail(editHes?.clientContactEmail || '')
+
+      return
+    }
+
+    let active = true
+
+    const run = async () => {
+      setLoadingContacts(true)
+      setContactsError(null)
+      setClientContacts([])
+      setSelectedContact(null)
+      setClientContactName('')
+      setClientContactEmail('')
+
+      try {
+        const nextContacts = await loadFinanceClientContactOptions({
+          selectedClientKey,
+          selectedClient
+        })
+
+        if (!active) return
+
+        setClientContacts(nextContacts)
+        setContactMode(nextContacts.length > 0 ? 'linked' : 'manual')
+
+        if (nextContacts.length === 0) {
+          setContactsError('Este cliente no tiene contactos vinculados todavía. Puedes registrar el contacto manualmente.')
+        }
+      } catch {
+        if (!active) return
+
+        setContactMode('manual')
+        setContactsError('No pudimos cargar los contactos vinculados. Puedes registrar el contacto manualmente.')
+      } finally {
+        if (active) {
+          setLoadingContacts(false)
+        }
+      }
+    }
+
+    run()
+
+    return () => {
+      active = false
+    }
+  }, [editHes?.clientContactEmail, editHes?.clientContactName, selectedClient, selectedClientKey])
+
+  useEffect(() => {
+    if (!selectedPoId) {
+      setSelectedPO(null)
+
+      return
+    }
+
+    const po = activePOs.find(item => item.poId === selectedPoId) || null
+
+    setSelectedPO(po)
+  }, [activePOs, selectedPoId])
+
+  useEffect(() => {
+    if (contactMode !== 'linked') {
+      return
+    }
+
+    const preferredEmail = selectedPO?.contactEmail?.trim() || editHes?.clientContactEmail?.trim() || ''
+
+    if (!preferredEmail || clientContacts.length === 0) {
+      return
+    }
+
+    const matchedContact = clientContacts.find(contact => contact.email.trim().toLowerCase() === preferredEmail.toLowerCase())
+
+    if (!matchedContact) {
+      return
+    }
+
+    setSelectedContact(matchedContact)
+    setClientContactName(matchedContact.name)
+    setClientContactEmail(matchedContact.email)
+  }, [clientContacts, contactMode, editHes?.clientContactEmail, selectedPO?.contactEmail])
+
   // ── Form ──
 
   const resetForm = () => {
@@ -223,8 +334,12 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
     setCurrency('CLP')
     setClientContactName('')
     setClientContactEmail('')
-    setAttachmentUrl('')
     setNotes('')
+    setClientContacts([])
+    setLoadingContacts(false)
+    setContactMode('linked')
+    setSelectedContact(null)
+    setContactsError(null)
     setShowApproveField(false)
     setApprovedBy('')
     setShowRejectField(false)
@@ -235,6 +350,23 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
   }
 
   const handleClose = () => { resetForm(); onClose() }
+
+  const handleContactSelect = (_event: unknown, value: FinanceContactOption | null) => {
+    setSelectedContact(value)
+    setClientContactName(value?.name ?? '')
+    setClientContactEmail(value?.email ?? '')
+  }
+
+  const handleUseManualContact = () => {
+    setContactMode('manual')
+  }
+
+  const handleUseLinkedContact = () => {
+    setContactMode('linked')
+    setSelectedContact(null)
+    setClientContactName('')
+    setClientContactEmail('')
+  }
 
   const handleSubmit = async () => {
     if (!hesNumber.trim() || !selectedClientKey || !serviceDescription.trim() || !amount.trim()) {
@@ -275,7 +407,7 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
           ...(deliverablesSummary.trim() && { deliverablesSummary: deliverablesSummary.trim() }),
           ...(clientContactName.trim() && { clientContactName: clientContactName.trim() }),
           ...(clientContactEmail.trim() && { clientContactEmail: clientContactEmail.trim() }),
-          ...(attachmentUrl.trim() && { attachmentUrl: attachmentUrl.trim() }),
+          ...(resolvedDocumentUrl && { attachmentUrl: resolvedDocumentUrl }),
           ...(notes.trim() && { notes: notes.trim() })
         })
       })
@@ -289,7 +421,7 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
         return
       }
 
-      toast.success(`HES ${hesNumber} registrada`)
+      toast.success(`HES ${hesNumber} registrada como recibida`)
       resetForm()
       onClose()
       onSuccess()
@@ -306,13 +438,13 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
     if (!editHes) return
 
     if (action === 'approve' && !approvedBy.trim()) {
-      setError('Ingrese el nombre de quien aprueba.')
+      setError('Ingresa el nombre de quien valida la HES.')
 
       return
     }
 
     if (action === 'reject' && !rejectReason.trim()) {
-      setError('Ingrese el motivo del rechazo.')
+      setError('Ingresa el motivo de la observación.')
 
       return
     }
@@ -338,13 +470,13 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
 
-        setError(data.error || `Error al ${action === 'submit' ? 'enviar' : action === 'approve' ? 'aprobar' : 'rechazar'} la HES`)
+        setError(data.error || `Error al ${action === 'submit' ? 'marcar como recibida' : action === 'approve' ? 'validar' : 'observar'} la HES`)
         setSaving(false)
 
         return
       }
 
-      const labels = { submit: 'enviada al cliente', approve: 'aprobada', reject: 'rechazada' }
+      const labels = { submit: 'marcada como recibida', approve: 'validada', reject: 'observada' }
 
       toast.success(`HES ${editHes.hesNumber} ${labels[action]}`)
       resetForm()
@@ -376,12 +508,12 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 4 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Typography variant='h6'>{isEditing ? `HES #${editHes?.hesNumber}` : 'Registrar HES'}</Typography>
+          <Typography variant='h6'>{isEditing ? `HES #${editHes?.hesNumber}` : 'Registrar HES recibida'}</Typography>
           {isEditing && (
             <CustomChip
               round='true' size='small' variant='tonal'
-              color={currentStatus === 'approved' ? 'success' : currentStatus === 'submitted' ? 'info' : currentStatus === 'rejected' ? 'error' : 'secondary'}
-              label={currentStatus === 'approved' ? 'Aprobada' : currentStatus === 'submitted' ? 'Enviada' : currentStatus === 'rejected' ? 'Rechazada' : 'Borrador'}
+              color={currentStatus === 'approved' ? 'success' : currentStatus === 'submitted' ? 'info' : currentStatus === 'rejected' ? 'warning' : 'secondary'}
+              label={currentStatusLabel}
             />
           )}
         </Box>
@@ -492,27 +624,118 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
         />
 
         <Divider />
-        <Typography variant='subtitle2' color='text.secondary'>Contacto y adjunto</Typography>
+        <Typography variant='subtitle2' color='text.secondary'>Contacto y respaldo</Typography>
 
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <CustomTextField
-              fullWidth size='small' label='Contacto del cliente' disabled={isReadOnly}
-              value={clientContactName} onChange={e => setClientContactName(e.target.value)}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <CustomTextField
-              fullWidth size='small' label='Email contacto' type='email' disabled={isReadOnly}
-              value={clientContactEmail} onChange={e => setClientContactEmail(e.target.value)}
-            />
-          </Grid>
-        </Grid>
+        {!selectedClientKey ? (
+          <Alert severity='info'>Selecciona primero el cliente para cargar sus contactos vinculados.</Alert>
+        ) : (
+          <Stack spacing={2}>
+            {contactsError && <Alert severity='warning'>{contactsError}</Alert>}
 
-        <CustomTextField
-          fullWidth size='small' label='URL del documento (PDF)' disabled={isReadOnly}
-          value={attachmentUrl} onChange={e => setAttachmentUrl(e.target.value)}
-        />
+            {contactMode === 'linked' ? (
+              <>
+                <Autocomplete<FinanceContactOption, false, false, false>
+                  options={clientContacts}
+                  value={selectedContact}
+                  onChange={handleContactSelect}
+                  getOptionLabel={getContactOptionLabel}
+                  isOptionEqualToValue={(option, value) => option.email === value.email}
+                  loading={loadingContacts}
+                  disabled={isReadOnly || loadingContacts || clientContacts.length === 0}
+                  renderInput={params => (
+                    <CustomTextField
+                      {...params}
+                      fullWidth
+                      size='small'
+                      label='Seleccionar contacto'
+                      placeholder={loadingContacts ? 'Cargando contactos...' : 'Elegir contacto del cliente'}
+                      helperText='El nombre y el email se completan desde el contacto vinculado.'
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <>
+                            {loadingContacts ? <CircularProgress color='inherit' size={18} /> : null}
+                            {params.InputProps.endAdornment}
+                          </>
+                        )
+                      }}
+                    />
+                  )}
+                />
+
+                <CustomTextField
+                  fullWidth
+                  size='small'
+                  label='Email contacto'
+                  type='email'
+                  value={clientContactEmail}
+                  disabled
+                  helperText='Email completado desde el contacto vinculado.'
+                />
+
+                {!isReadOnly && (
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button size='small' variant='text' color='primary' onClick={handleUseManualContact}>
+                      No encuentro el contacto
+                    </Button>
+                  </Box>
+                )}
+              </>
+            ) : (
+              <>
+                {!isReadOnly && clientContacts.length > 0 && (
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button size='small' variant='text' color='primary' onClick={handleUseLinkedContact}>
+                      Usar contacto vinculado
+                    </Button>
+                  </Box>
+                )}
+
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <CustomTextField
+                      fullWidth
+                      size='small'
+                      label='Contacto del cliente'
+                      disabled={isReadOnly}
+                      value={clientContactName}
+                      onChange={e => setClientContactName(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <CustomTextField
+                      fullWidth
+                      size='small'
+                      label='Email contacto'
+                      type='email'
+                      disabled={isReadOnly}
+                      value={clientContactEmail}
+                      onChange={e => setClientContactEmail(e.target.value)}
+                    />
+                  </Grid>
+                </Grid>
+              </>
+            )}
+
+            {resolvedDocumentUrl ? (
+              <Alert severity='info'>
+                Esta HES usará el respaldo de la OC vinculada.{' '}
+                <Link href={resolvedDocumentUrl} target='_blank' rel='noreferrer'>
+                  Abrir documento
+                </Link>
+              </Alert>
+            ) : selectedPO ? (
+              <Alert severity='warning'>
+                La OC vinculada todavía no tiene respaldo cargado. Súbelo desde Órdenes de compra para que esta HES lo herede.
+              </Alert>
+            ) : (
+              <Alert severity='info'>
+                La HES no admite adjuntos propios. Si necesitas respaldo, vincula una OC y carga el documento en esa OC.
+              </Alert>
+            )}
+          </Stack>
+        )}
+
         <CustomTextField
           fullWidth size='small' label='Notas' multiline rows={2} disabled={isReadOnly}
           value={notes} onChange={e => setNotes(e.target.value)}
@@ -524,10 +747,10 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
             <Divider />
             <Button
               variant='contained' color='info' fullWidth disabled={saving}
-              startIcon={<i className='tabler-send' />}
+              startIcon={<i className='tabler-file-check' />}
               onClick={() => handleLifecycleAction('submit')}
             >
-              Enviar al cliente
+              Marcar como recibida
             </Button>
           </>
         )}
@@ -535,7 +758,7 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
         {isEditing && currentStatus === 'submitted' && (
           <>
             <Divider />
-            <Typography variant='subtitle2' color='text.secondary'>Acciones de aprobación</Typography>
+            <Typography variant='subtitle2' color='text.secondary'>Acciones de validación</Typography>
 
             {!showApproveField && !showRejectField && (
               <Grid container spacing={2}>
@@ -545,16 +768,16 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
                     startIcon={<i className='tabler-check' />}
                     onClick={() => { setShowApproveField(true); setShowRejectField(false) }}
                   >
-                    Aprobar
+                    Validar
                   </Button>
                 </Grid>
                 <Grid size={{ xs: 6 }}>
                   <Button
-                    variant='contained' color='error' fullWidth disabled={saving}
+                    variant='contained' color='warning' fullWidth disabled={saving}
                     startIcon={<i className='tabler-x' />}
                     onClick={() => { setShowRejectField(true); setShowApproveField(false) }}
                   >
-                    Rechazar
+                    Observar
                   </Button>
                 </Grid>
               </Grid>
@@ -563,9 +786,9 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
             {showApproveField && (
               <Stack spacing={2}>
                 <CustomTextField
-                  fullWidth size='small' label='Aprobada por' required autoFocus
+                  fullWidth size='small' label='Validada por' required autoFocus
                   value={approvedBy} onChange={e => setApprovedBy(e.target.value)}
-                  placeholder='Nombre del aprobador en el cliente'
+                  placeholder='Nombre de quien valida la HES'
                 />
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 6 }}>
@@ -578,7 +801,7 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
                       variant='contained' color='success' fullWidth disabled={saving}
                       onClick={() => handleLifecycleAction('approve')}
                     >
-                      Confirmar aprobación
+                      Confirmar validación
                     </Button>
                   </Grid>
                 </Grid>
@@ -588,7 +811,7 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
             {showRejectField && (
               <Stack spacing={2}>
                 <CustomTextField
-                  fullWidth size='small' label='Motivo del rechazo' required autoFocus
+                  fullWidth size='small' label='Motivo de la observación' required autoFocus
                   multiline rows={2}
                   value={rejectReason} onChange={e => setRejectReason(e.target.value)}
                 />
@@ -600,10 +823,10 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
                   </Grid>
                   <Grid size={{ xs: 6 }}>
                     <Button
-                      variant='contained' color='error' fullWidth disabled={saving}
+                      variant='contained' color='warning' fullWidth disabled={saving}
                       onClick={() => handleLifecycleAction('reject')}
                     >
-                      Confirmar rechazo
+                      Confirmar observación
                     </Button>
                   </Grid>
                 </Grid>
@@ -617,10 +840,10 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
             <Divider />
             <Button
               variant='contained' color='info' fullWidth disabled={saving}
-              startIcon={<i className='tabler-send' />}
+              startIcon={<i className='tabler-file-check' />}
               onClick={() => handleLifecycleAction('submit')}
             >
-              Re-enviar al cliente
+              Volver a marcar como recibida
             </Button>
           </>
         )}
@@ -632,7 +855,7 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
           <Box sx={{ display: 'flex', gap: 2, p: 4 }}>
             <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth>Cancelar</Button>
             <Button variant='contained' color='primary' onClick={handleSubmit} disabled={saving} fullWidth startIcon={<i className='tabler-check' />}>
-              {saving ? 'Guardando...' : 'Registrar HES'}
+              {saving ? 'Guardando...' : 'Registrar HES recibida'}
             </Button>
           </Box>
         </>

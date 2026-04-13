@@ -29,12 +29,22 @@ REGION="us-east4"
 SERVICE_NAME="ops-worker"
 SERVICE_ACCOUNT="greenhouse-portal@${PROJECT_ID}.iam.gserviceaccount.com"
 
-# Cloud Run settings
-MEMORY="1Gi"
-CPU="1"
-TIMEOUT="300"          # 5 minutes max (reactive events are fast)
-MAX_INSTANCES="2"
-CONCURRENCY="1"        # One request at a time (serialized event processing)
+# Cloud Run settings — enterprise tier (TASK-379 Slice 3)
+# Rationale:
+#   - min=0 lets the service scale to zero between bursts (cost control).
+#   - max=5 allows horizontal fan-out under backlog pressure.
+#   - cpu=2/memory=2Gi gives headroom for concurrent reactive batches.
+#   - concurrency=4 permits multi-batch processing per instance; multi-instance
+#     safety is provided by refresh_queue SELECT ... FOR UPDATE SKIP LOCKED and
+#     outbox_reactive_log's INSERT ... ON CONFLICT DO NOTHING idempotency key.
+#   - timeout=540s (9 min) covers worst-case materialization runs.
+MIN_INSTANCES="0"
+MAX_INSTANCES="5"
+MEMORY="2Gi"
+CPU="2"
+TIMEOUT="540"
+CONCURRENCY="4"
+REACTIVE_BATCH_SIZE="500"
 
 # Cloud Scheduler timezone
 SCHEDULER_TZ="America/Santiago"
@@ -82,6 +92,7 @@ ENV_VARS="${ENV_VARS},GCP_PROJECT=${PROJECT_ID}"
 ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=${PG_INSTANCE}"
 ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_DATABASE=greenhouse_app"
 ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_USER=greenhouse_app"
+ENV_VARS="${ENV_VARS},REACTIVE_BATCH_SIZE=${REACTIVE_BATCH_SIZE}"
 
 # Secrets from Secret Manager (mounted as env vars)
 SECRETS="NEXTAUTH_SECRET=${NEXTAUTH_SECRET_REF}"
@@ -95,6 +106,7 @@ gcloud run deploy "${SERVICE_NAME}" \
   --memory="${MEMORY}" \
   --cpu="${CPU}" \
   --timeout="${TIMEOUT}" \
+  --min-instances="${MIN_INSTANCES}" \
   --max-instances="${MAX_INSTANCES}" \
   --concurrency="${CONCURRENCY}" \
   --no-allow-unauthenticated \
@@ -152,113 +164,119 @@ fi
 
 echo "=== Creating Cloud Scheduler jobs ==="
 
-# Job 1: Reactive event processing — all domains (every 5 minutes)
-# Replaces: vercel.json cron "api/cron/outbox-react" schedule "*/5 * * * *"
-gcloud scheduler jobs create http "ops-reactive-process" \
-  --project="${PROJECT_ID}" \
-  --location="${REGION}" \
-  --schedule="*/5 * * * *" \
-  --time-zone="${SCHEDULER_TZ}" \
-  --uri="${SERVICE_URL}/reactive/process" \
-  --http-method=POST \
-  --headers="Content-Type=application/json" \
-  --message-body='{"batchSize":50}' \
-  --oidc-service-account-email="${SERVICE_ACCOUNT}" \
-  --oidc-token-audience="${SERVICE_URL}" \
-  --attempt-deadline="300s" \
-  --max-retry-attempts=1 \
-  --quiet 2>/dev/null || \
-gcloud scheduler jobs update http "ops-reactive-process" \
-  --project="${PROJECT_ID}" \
-  --location="${REGION}" \
-  --schedule="*/5 * * * *" \
-  --time-zone="${SCHEDULER_TZ}" \
-  --uri="${SERVICE_URL}/reactive/process" \
-  --http-method=POST \
-  --update-headers="Content-Type=application/json" \
-  --message-body='{"batchSize":50}' \
-  --oidc-service-account-email="${SERVICE_ACCOUNT}" \
-  --oidc-token-audience="${SERVICE_URL}" \
-  --attempt-deadline="300s" \
-  --max-retry-attempts=1 \
-  --quiet
+# Helper: delete a scheduler job if it exists (idempotent, never fails the script).
+delete_scheduler_job() {
+  local job_name="$1"
+  gcloud scheduler jobs delete "${job_name}" \
+    --project="${PROJECT_ID}" \
+    --location="${REGION}" \
+    --quiet 2>/dev/null || true
+}
 
-echo "  -> ops-reactive-process: */5 * * * * (every 5 min, all domains)"
+# Helper: create-or-update a Cloud Scheduler HTTP job with OIDC auth.
+# Args: job_name, schedule, path, message_body
+upsert_scheduler_job() {
+  local job_name="$1"
+  local schedule="$2"
+  local uri_path="$3"
+  local body="$4"
 
-# Job 2: Reactive event processing — delivery domain (every 5 minutes, offset by 2 min)
-# Replaces: vercel.json cron "api/cron/outbox-react-delivery" schedule "*/5 * * * *"
-gcloud scheduler jobs create http "ops-reactive-process-delivery" \
-  --project="${PROJECT_ID}" \
-  --location="${REGION}" \
-  --schedule="2-59/5 * * * *" \
-  --time-zone="${SCHEDULER_TZ}" \
-  --uri="${SERVICE_URL}/reactive/process-domain" \
-  --http-method=POST \
-  --headers="Content-Type=application/json" \
-  --message-body='{"domain":"delivery","batchSize":50}' \
-  --oidc-service-account-email="${SERVICE_ACCOUNT}" \
-  --oidc-token-audience="${SERVICE_URL}" \
-  --attempt-deadline="300s" \
-  --max-retry-attempts=1 \
-  --quiet 2>/dev/null || \
-gcloud scheduler jobs update http "ops-reactive-process-delivery" \
-  --project="${PROJECT_ID}" \
-  --location="${REGION}" \
-  --schedule="2-59/5 * * * *" \
-  --time-zone="${SCHEDULER_TZ}" \
-  --uri="${SERVICE_URL}/reactive/process-domain" \
-  --http-method=POST \
-  --update-headers="Content-Type=application/json" \
-  --message-body='{"domain":"delivery","batchSize":50}' \
-  --oidc-service-account-email="${SERVICE_ACCOUNT}" \
-  --oidc-token-audience="${SERVICE_URL}" \
-  --attempt-deadline="300s" \
-  --max-retry-attempts=1 \
-  --quiet
+  gcloud scheduler jobs create http "${job_name}" \
+    --project="${PROJECT_ID}" \
+    --location="${REGION}" \
+    --schedule="${schedule}" \
+    --time-zone="${SCHEDULER_TZ}" \
+    --uri="${SERVICE_URL}${uri_path}" \
+    --http-method=POST \
+    --headers="Content-Type=application/json" \
+    --message-body="${body}" \
+    --oidc-service-account-email="${SERVICE_ACCOUNT}" \
+    --oidc-token-audience="${SERVICE_URL}" \
+    --attempt-deadline="540s" \
+    --max-retry-attempts=1 \
+    --quiet 2>/dev/null || \
+  gcloud scheduler jobs update http "${job_name}" \
+    --project="${PROJECT_ID}" \
+    --location="${REGION}" \
+    --schedule="${schedule}" \
+    --time-zone="${SCHEDULER_TZ}" \
+    --uri="${SERVICE_URL}${uri_path}" \
+    --http-method=POST \
+    --update-headers="Content-Type=application/json" \
+    --message-body="${body}" \
+    --oidc-service-account-email="${SERVICE_ACCOUNT}" \
+    --oidc-token-audience="${SERVICE_URL}" \
+    --attempt-deadline="540s" \
+    --max-retry-attempts=1 \
+    --quiet
+}
 
-echo "  -> ops-reactive-process-delivery: 2-59/5 * * * * (every 5 min offset +2, delivery domain)"
+# Cleanup: remove legacy "all domains" jobs replaced by per-domain lanes (TASK-379 Slice 3).
+echo "  -> cleaning up legacy scheduler jobs (if present)..."
+delete_scheduler_job "ops-reactive-process"
+delete_scheduler_job "ops-reactive-process-delivery"
 
-# Job 3: Projection recovery (every 15 minutes)
-# Replaces: vercel.json cron "api/cron/projection-recovery" schedule "*/15 * * * *"
-gcloud scheduler jobs create http "ops-reactive-recover" \
-  --project="${PROJECT_ID}" \
-  --location="${REGION}" \
-  --schedule="*/15 * * * *" \
-  --time-zone="${SCHEDULER_TZ}" \
-  --uri="${SERVICE_URL}/reactive/recover" \
-  --http-method=POST \
-  --headers="Content-Type=application/json" \
-  --message-body='{"batchSize":10,"staleMinutes":30}' \
-  --oidc-service-account-email="${SERVICE_ACCOUNT}" \
-  --oidc-token-audience="${SERVICE_URL}" \
-  --attempt-deadline="300s" \
-  --max-retry-attempts=1 \
-  --quiet 2>/dev/null || \
-gcloud scheduler jobs update http "ops-reactive-recover" \
-  --project="${PROJECT_ID}" \
-  --location="${REGION}" \
-  --schedule="*/15 * * * *" \
-  --time-zone="${SCHEDULER_TZ}" \
-  --uri="${SERVICE_URL}/reactive/recover" \
-  --http-method=POST \
-  --update-headers="Content-Type=application/json" \
-  --message-body='{"batchSize":10,"staleMinutes":30}' \
-  --oidc-service-account-email="${SERVICE_ACCOUNT}" \
-  --oidc-token-audience="${SERVICE_URL}" \
-  --attempt-deadline="300s" \
-  --max-retry-attempts=1 \
-  --quiet
+# ─── Per-domain reactive lanes (TASK-379 Slice 3) ───────────────────────────
+# Each domain gets its own Cloud Scheduler job hitting POST /reactive/process-domain
+# so domains drain independently and multi-instance workers can fan out safely
+# via refresh_queue SKIP LOCKED. Offsets spread the load across the minute.
 
-echo "  -> ops-reactive-recover: */15 * * * * (every 15 min, projection recovery)"
+upsert_scheduler_job \
+  "ops-reactive-organization" \
+  "*/5 * * * *" \
+  "/reactive/process-domain" \
+  '{"domain":"organization","batchSize":500}'
+echo "  -> ops-reactive-organization: */5 * * * * (organization domain)"
+
+upsert_scheduler_job \
+  "ops-reactive-finance" \
+  "*/5 * * * *" \
+  "/reactive/process-domain" \
+  '{"domain":"finance","batchSize":500}'
+echo "  -> ops-reactive-finance: */5 * * * * (finance domain)"
+
+upsert_scheduler_job \
+  "ops-reactive-people" \
+  "2-59/5 * * * *" \
+  "/reactive/process-domain" \
+  '{"domain":"people","batchSize":500}'
+echo "  -> ops-reactive-people: 2-59/5 * * * * (people domain, +2 min offset)"
+
+upsert_scheduler_job \
+  "ops-reactive-notifications" \
+  "*/2 * * * *" \
+  "/reactive/process-domain" \
+  '{"domain":"notifications","batchSize":500}'
+echo "  -> ops-reactive-notifications: */2 * * * * (notifications domain, high cadence)"
+
+upsert_scheduler_job \
+  "ops-reactive-delivery" \
+  "*/5 * * * *" \
+  "/reactive/process-domain" \
+  '{"domain":"delivery","batchSize":500}'
+echo "  -> ops-reactive-delivery: */5 * * * * (delivery domain)"
+
+upsert_scheduler_job \
+  "ops-reactive-cost-intelligence" \
+  "*/10 * * * *" \
+  "/reactive/process-domain" \
+  '{"domain":"cost_intelligence","batchSize":500}'
+echo "  -> ops-reactive-cost-intelligence: */10 * * * * (cost_intelligence domain)"
+
+# Global projection recovery — unchanged lane.
+upsert_scheduler_job \
+  "ops-reactive-recover" \
+  "*/15 * * * *" \
+  "/reactive/recover" \
+  '{"batchSize":10,"staleMinutes":30}'
+echo "  -> ops-reactive-recover: */15 * * * * (projection recovery)"
 
 echo ""
 echo "=== Deployment complete ==="
 echo ""
 echo "Next steps:"
 echo "  1. Verify health:  gcloud run services proxy ${SERVICE_NAME} --port=9092 & sleep 3 && curl -s http://localhost:9092/health"
-echo "  2. Run once manually:  gcloud scheduler jobs run ops-reactive-process --project=${PROJECT_ID} --location=${REGION}"
-echo "  3. Check logs:  gcloud logging read 'resource.labels.service_name=\"${SERVICE_NAME}\"' --project=${PROJECT_ID} --limit=10"
-echo "  4. After dual-run verification, remove the 3 cron entries from vercel.json:"
-echo "     - api/cron/outbox-react"
-echo "     - api/cron/outbox-react-delivery"
-echo "     - api/cron/projection-recovery"
+echo "  2. Run a lane manually:  gcloud scheduler jobs run ops-reactive-finance --project=${PROJECT_ID} --location=${REGION}"
+echo "  3. Check queue depth:  gcloud run services proxy ${SERVICE_NAME} --port=9092 & sleep 3 && curl -s 'http://localhost:9092/reactive/queue-depth?domain=finance'"
+echo "  4. Check logs:  gcloud logging read 'resource.labels.service_name=\"${SERVICE_NAME}\"' --project=${PROJECT_ID} --limit=10"
+echo "  5. Active scheduler jobs (TASK-379 Slice 3): ops-reactive-{organization,finance,people,notifications,delivery,cost-intelligence,recover}"

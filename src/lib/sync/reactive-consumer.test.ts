@@ -1,19 +1,33 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const mockRunGreenhousePostgresQuery = vi.fn()
-const mockEnsureProjectionsRegistered = vi.fn()
+import type { ProjectionDefinition } from './projection-registry'
+
+const mockQuery = vi.fn()
+const mockEvaluateCircuit = vi.fn()
+const mockRecordSuccess = vi.fn()
+const mockRecordFailure = vi.fn()
 const mockGetAllTriggerEventTypes = vi.fn()
 const mockGetProjectionsForEvent = vi.fn()
+const mockEnsureProjectionsRegistered = vi.fn()
 const mockEnqueueRefresh = vi.fn()
 const mockMarkRefreshCompleted = vi.fn()
 const mockMarkRefreshFailed = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
-  runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
+  runGreenhousePostgresQuery: (...args: unknown[]) => mockQuery(...args)
 }))
 
-vi.mock('./projections', () => ({
-  ensureProjectionsRegistered: () => mockEnsureProjectionsRegistered()
+vi.mock('@/lib/operations/reactive-circuit-breaker', () => ({
+  DEFAULT_CIRCUIT_BREAKER_CONFIG: {
+    minimumRunsForEvaluation: 10,
+    failureRateThreshold: 0.5,
+    consecutiveFailureThreshold: 5,
+    cooldownMs: 30 * 60 * 1000,
+    rollingWindowSize: 50
+  },
+  evaluateCircuit: (...args: unknown[]) => mockEvaluateCircuit(...args),
+  recordSuccess: (...args: unknown[]) => mockRecordSuccess(...args),
+  recordFailure: (...args: unknown[]) => mockRecordFailure(...args)
 }))
 
 vi.mock('./projection-registry', () => ({
@@ -21,15 +35,46 @@ vi.mock('./projection-registry', () => ({
   getProjectionsForEvent: (...args: unknown[]) => mockGetProjectionsForEvent(...args)
 }))
 
+vi.mock('./projections', () => ({
+  ensureProjectionsRegistered: () => mockEnsureProjectionsRegistered()
+}))
+
 vi.mock('./refresh-queue', () => ({
-  buildRefreshQueueId: (projectionName: string, entityType: string, entityId: string) =>
-    `${projectionName}:${entityType}:${entityId}`,
+  buildRefreshQueueId: (projection: string, type: string, id: string) => `${projection}:${type}:${id}`,
   enqueueRefresh: (...args: unknown[]) => mockEnqueueRefresh(...args),
   markRefreshCompleted: (...args: unknown[]) => mockMarkRefreshCompleted(...args),
   markRefreshFailed: (...args: unknown[]) => mockMarkRefreshFailed(...args)
 }))
 
+// The real Cloud Monitoring emitter spawns a GoogleAuth task on first use
+// that rejects asynchronously when ADC is missing (CI). Mocking it here
+// keeps the consumer test hermetic and prevents the post-test unhandled
+// rejection that breaks CI runs.
+vi.mock('@/lib/operations/cloud-monitoring-emitter', () => ({
+  emitConsumerRunMetrics: vi.fn().mockResolvedValue(undefined)
+}))
+
 import { buildReactiveHandlerKey, processReactiveEvents } from './reactive-consumer'
+
+const buildProjection = (overrides: Partial<ProjectionDefinition> = {}): ProjectionDefinition => ({
+  name: 'test_projection',
+  description: 'test',
+  domain: 'finance',
+  triggerEvents: ['finance.expense.created'],
+  extractScope: vi.fn().mockReturnValue({ entityType: 'finance_period', entityId: '2026-04' }),
+  refresh: vi.fn().mockResolvedValue('refreshed: 1 entity for 2026-04'),
+  maxRetries: 2,
+  ...overrides
+})
+
+const buildEventRow = (id: string, eventType: string, occurredAt = '2026-04-05T19:41:26Z') => ({
+  event_id: id,
+  aggregate_type: 'provider_tooling_snapshot',
+  aggregate_id: 'snap-1',
+  event_type: eventType,
+  payload_json: { periodId: '2026-04', periodYear: 2026, periodMonth: 4 },
+  occurred_at: occurredAt
+})
 
 describe('buildReactiveHandlerKey', () => {
   it('keeps the handler key scoped to projection name and event type', () => {
@@ -42,241 +87,287 @@ describe('buildReactiveHandlerKey', () => {
   })
 })
 
-describe('processReactiveEvents', () => {
-  const projection = {
-    name: 'payroll_receipts_delivery',
-    description: 'Generate payroll receipts',
-    domain: 'notifications' as const,
-    triggerEvents: ['payroll_period.exported'],
-    extractScope: (payload: Record<string, unknown>) => {
-      if (payload.periodId === '2026-03') {
-        return { entityType: 'payroll_period', entityId: '2026-03' }
-      }
-
-      return null
-    },
-    refresh: vi.fn(),
-    maxRetries: 2
-  }
-
+describe('processReactiveEvents (V2)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockEnsureProjectionsRegistered.mockReturnValue(undefined)
-    mockGetAllTriggerEventTypes.mockReturnValue(['payroll_period.exported'])
-    mockGetProjectionsForEvent.mockReturnValue([projection])
+    mockEvaluateCircuit.mockResolvedValue({ allow: true, mode: 'normal', snapshot: null })
     mockEnqueueRefresh.mockResolvedValue(undefined)
     mockMarkRefreshCompleted.mockResolvedValue(undefined)
     mockMarkRefreshFailed.mockResolvedValue(undefined)
-    projection.refresh = vi.fn().mockResolvedValue('generated receipts for 2026-03')
   })
 
-  it('marks queue items completed after successful refreshes', async () => {
-    mockRunGreenhousePostgresQuery.mockImplementation(async (sql: string, values?: unknown[]) => {
-      if (sql.includes('to_regclass(\'greenhouse_sync.outbox_reactive_log\')')) {
-        return [{ exists: true }]
-      }
+  it('returns empty result when no trigger event types are registered', async () => {
+    mockGetAllTriggerEventTypes.mockReturnValue([])
 
-      if (sql.includes('FROM greenhouse_sync.outbox_events')) {
-        if (values?.[2] === 0) {
-          return [
-            {
-              event_id: 'event-1',
-              aggregate_type: 'payroll_period',
-              aggregate_id: '2026-03',
-              event_type: 'payroll_period.exported',
-              payload_json: { periodId: '2026-03' },
-              occurred_at: '2026-03-27T12:00:00.000Z'
-            }
-          ]
-        }
+    const result = await processReactiveEvents()
 
-        return []
-      }
+    expect(result.eventsFetched).toBe(0)
+    expect(result.scopesCoalesced).toBe(0)
+    expect(result.projectionsTriggered).toBe(0)
+    expect(mockQuery).not.toHaveBeenCalled()
+  })
 
-      if (
-        sql.includes('FROM greenhouse_sync.outbox_reactive_log') &&
-        sql.includes('handler = ANY($2)')
-      ) {
-        return []
-      }
+  it('returns empty result when no events are pending', async () => {
+    mockGetAllTriggerEventTypes.mockReturnValue(['finance.expense.created'])
+    mockGetProjectionsForEvent.mockReturnValue([buildProjection()])
+    mockQuery.mockResolvedValueOnce([]) // SELECT events
 
-      if (sql.includes('SELECT EXISTS')) {
-        return [
-          {
-            exists: false
-          }
-        ]
-      }
+    const result = await processReactiveEvents()
 
-      if (sql.includes('INSERT INTO greenhouse_sync.outbox_reactive_log')) {
-        return []
-      }
+    expect(result.eventsFetched).toBe(0)
+    expect(result.eventsAcknowledged).toBe(0)
+  })
 
-      return []
+  it('coalesces N events with same scope into 1 refresh call', async () => {
+    const projection = buildProjection()
+
+    mockGetAllTriggerEventTypes.mockReturnValue(['finance.expense.created'])
+    mockGetProjectionsForEvent.mockReturnValue([projection])
+
+    // 5 events, all mapping to scope finance_period:2026-04
+    const events = Array.from({ length: 5 }, (_, i) =>
+      buildEventRow(`evt-${i}`, 'finance.expense.created')
+    )
+
+    mockQuery.mockResolvedValueOnce(events) // SELECT events
+    mockQuery.mockResolvedValue([]) // bulk INSERTs
+
+    const result = await processReactiveEvents()
+
+    expect(result.eventsFetched).toBe(5)
+    expect(result.scopesCoalesced).toBe(1)
+
+    // refresh called ONCE despite 5 events
+    expect(projection.refresh).toHaveBeenCalledTimes(1)
+
+    // All 5 events acknowledged
+    expect(result.eventsAcknowledged).toBe(5)
+    expect(mockRecordSuccess).toHaveBeenCalledWith('test_projection', expect.any(Object))
+
+    // Queue lifecycle
+    expect(mockEnqueueRefresh).toHaveBeenCalledTimes(1)
+    expect(mockMarkRefreshCompleted).toHaveBeenCalledWith('test_projection:finance_period:2026-04')
+  })
+
+  it('marks events with no registered projection as no-op:no-handler', async () => {
+    mockGetAllTriggerEventTypes.mockReturnValue(['orphan.event'])
+    mockGetProjectionsForEvent.mockReturnValue([]) // no projection consumes this
+
+    const events = [buildEventRow('orphan-1', 'orphan.event')]
+
+    mockQuery.mockResolvedValueOnce(events)
+    mockQuery.mockResolvedValue([])
+
+    const result = await processReactiveEvents()
+
+    expect(result.eventsFetched).toBe(1)
+    expect(result.eventsAcknowledged).toBe(1)
+    expect(result.scopesCoalesced).toBe(0)
+
+    const insertCalls = mockQuery.mock.calls.filter(call =>
+      typeof call[0] === 'string' && call[0].includes('INSERT INTO greenhouse_sync.outbox_reactive_log')
+    )
+
+    expect(insertCalls.length).toBeGreaterThan(0)
+    const allParams = insertCalls.flatMap(call => call[1] as unknown[])
+
+    expect(allParams).toContain('no-op:no-handler')
+  })
+
+  it('marks events with null extractScope as no-op:no-scope', async () => {
+    const projection = buildProjection({
+      extractScope: vi.fn().mockReturnValue(null)
     })
 
-    const result = await processReactiveEvents({ domain: 'notifications' })
+    mockGetAllTriggerEventTypes.mockReturnValue(['finance.expense.created'])
+    mockGetProjectionsForEvent.mockReturnValue([projection])
 
-    expect(mockEnqueueRefresh).toHaveBeenCalledWith({
-      projectionName: 'payroll_receipts_delivery',
-      entityType: 'payroll_period',
-      entityId: '2026-03',
-      priority: 2,
-      triggeredByEventId: 'event-1',
+    const events = [buildEventRow('null-scope-1', 'finance.expense.created')]
+
+    mockQuery.mockResolvedValueOnce(events)
+    mockQuery.mockResolvedValue([])
+
+    const result = await processReactiveEvents()
+
+    expect(projection.refresh).not.toHaveBeenCalled()
+    expect(result.eventsAcknowledged).toBe(1)
+
+    const insertCalls = mockQuery.mock.calls.filter(call =>
+      typeof call[0] === 'string' && call[0].includes('INSERT INTO greenhouse_sync.outbox_reactive_log')
+    )
+
+    const allParams = insertCalls.flatMap(call => call[1] as unknown[])
+
+    expect(allParams).toContain('no-op:no-scope')
+  })
+
+  it('skips a scope group when circuit breaker is open', async () => {
+    const projection = buildProjection()
+
+    mockGetAllTriggerEventTypes.mockReturnValue(['finance.expense.created'])
+    mockGetProjectionsForEvent.mockReturnValue([projection])
+
+    mockEvaluateCircuit.mockResolvedValueOnce({
+      allow: false,
+      mode: 'blocked',
+      snapshot: { state: 'open' }
+    })
+
+    const events = [buildEventRow('breaker-1', 'finance.expense.created')]
+
+    mockQuery.mockResolvedValueOnce(events)
+    mockQuery.mockResolvedValue([])
+
+    const result = await processReactiveEvents()
+
+    expect(projection.refresh).not.toHaveBeenCalled()
+    expect(result.scopeGroupsBreakerSkipped).toBe(1)
+    expect(result.scopesCoalesced).toBe(0)
+    expect(mockRecordSuccess).not.toHaveBeenCalled()
+    expect(mockRecordFailure).not.toHaveBeenCalled()
+  })
+
+  it('records failure to circuit breaker and marks events as retry on first failure', async () => {
+    const projection = buildProjection({
+      refresh: vi.fn().mockRejectedValue(new Error('boom')),
+      maxRetries: 3
+    })
+
+    mockGetAllTriggerEventTypes.mockReturnValue(['finance.expense.created'])
+    mockGetProjectionsForEvent.mockReturnValue([projection])
+
+    const events = [buildEventRow('fail-1', 'finance.expense.created')]
+
+    // SELECT events
+    mockQuery.mockResolvedValueOnce(events)
+
+    // Per-event prior retry lookup
+    mockQuery.mockResolvedValueOnce([{ retries: 0 }])
+
+    // Subsequent inserts
+    mockQuery.mockResolvedValue([])
+
+    const result = await processReactiveEvents()
+
+    expect(result.scopeGroupsFailed).toBe(1)
+    expect(mockRecordFailure).toHaveBeenCalledWith(
+      'test_projection',
+      'boom',
+      expect.any(Object)
+    )
+    expect(mockMarkRefreshFailed).toHaveBeenCalled()
+
+    const insertCalls = mockQuery.mock.calls.filter(call =>
+      typeof call[0] === 'string' && call[0].includes('INSERT INTO greenhouse_sync.outbox_reactive_log')
+    )
+
+    const allParams = insertCalls.flatMap(call => call[1] as unknown[])
+
+    expect(allParams).toContain('retry')
+  })
+
+  it('marks events as dead-letter when retry budget exhausted', async () => {
+    const projection = buildProjection({
+      refresh: vi.fn().mockRejectedValue(new Error('persistent')),
       maxRetries: 2
     })
-    expect(mockMarkRefreshCompleted).toHaveBeenCalledWith('payroll_receipts_delivery:payroll_period:2026-03')
-    expect(mockMarkRefreshFailed).not.toHaveBeenCalled()
-    expect(result.eventsProcessed).toBe(1)
-    expect(result.projectionsTriggered).toBe(1)
-  })
 
-  it('marks queue items failed when the refresh throws', async () => {
-    projection.refresh = vi.fn().mockRejectedValue(new Error('refresh failed'))
+    mockGetAllTriggerEventTypes.mockReturnValue(['finance.expense.created'])
+    mockGetProjectionsForEvent.mockReturnValue([projection])
 
-    mockRunGreenhousePostgresQuery.mockImplementation(async (sql: string, values?: unknown[]) => {
-      if (sql.includes('to_regclass(\'greenhouse_sync.outbox_reactive_log\')')) {
-        return [{ exists: true }]
-      }
+    const events = [buildEventRow('dead-1', 'finance.expense.created')]
 
-      if (sql.includes('FROM greenhouse_sync.outbox_events')) {
-        if (values?.[2] === 0) {
-          return [
-            {
-              event_id: 'event-2',
-              aggregate_type: 'payroll_period',
-              aggregate_id: '2026-03',
-              event_type: 'payroll_period.exported',
-              payload_json: { periodId: '2026-03' },
-              occurred_at: '2026-03-27T12:00:00.000Z'
-            }
-          ]
-        }
+    mockQuery.mockResolvedValueOnce(events)
+    mockQuery.mockResolvedValueOnce([{ retries: 1 }]) // already 1 retry, next = 2 = maxRetries
+    mockQuery.mockResolvedValue([])
 
-        return []
-      }
+    const result = await processReactiveEvents()
 
-      if (
-        sql.includes('FROM greenhouse_sync.outbox_reactive_log') &&
-        sql.includes('handler = ANY($2)')
-      ) {
-        return []
-      }
+    expect(result.scopeGroupsFailed).toBe(1)
 
-      if (sql.includes('SELECT EXISTS')) {
-        return [
-          {
-            exists: false
-          }
-        ]
-      }
-
-      if (sql.includes('SELECT COALESCE(retries, 0) AS retries')) {
-        return [{ retries: 0 }]
-      }
-
-      if (sql.includes('INSERT INTO greenhouse_sync.outbox_reactive_log')) {
-        return []
-      }
-
-      return []
-    })
-
-    const result = await processReactiveEvents({ domain: 'notifications' })
-
-    expect(mockMarkRefreshFailed).toHaveBeenCalledWith(
-      'payroll_receipts_delivery:payroll_period:2026-03',
-      'refresh failed',
-      2
+    const insertCalls = mockQuery.mock.calls.filter(call =>
+      typeof call[0] === 'string' && call[0].includes('INSERT INTO greenhouse_sync.outbox_reactive_log')
     )
-    expect(mockMarkRefreshCompleted).not.toHaveBeenCalled()
-    expect(result.eventsProcessed).toBe(1)
-    expect(result.eventsFailed).toBe(1)
+
+    const allParams = insertCalls.flatMap(call => call[1] as unknown[])
+
+    expect(allParams).toContain('dead-letter')
+    expect(result.actions.some(a => a.includes('DEAD-LETTER'))).toBe(true)
   })
 
-  it('skips terminal older events and advances to later actionable events', async () => {
-    const incomeProjection = {
-      ...projection,
-      name: 'commercial_cost_attribution',
+  it('reports per-projection stats with successes and acknowledged counts', async () => {
+    const projectionA = buildProjection({ name: 'projection_a' })
+
+    const projectionB = buildProjection({
+      name: 'projection_b',
       triggerEvents: ['finance.income.created'],
-      refresh: vi.fn()
-    }
+      extractScope: vi.fn().mockReturnValue({ entityType: 'client', entityId: 'client-1' }),
+      refresh: vi.fn().mockResolvedValue('refreshed b')
+    })
 
-    mockGetAllTriggerEventTypes.mockReturnValue(['finance.income.created', 'payroll_period.exported'])
+    mockGetAllTriggerEventTypes.mockReturnValue(['finance.expense.created', 'finance.income.created'])
     mockGetProjectionsForEvent.mockImplementation((eventType: string) => {
-      if (eventType === 'finance.income.created') {
-        return [incomeProjection]
-      }
-
-      return [projection]
+      if (eventType === 'finance.expense.created') return [projectionA]
+      if (eventType === 'finance.income.created') return [projectionB]
+      
+return []
     })
 
-    mockRunGreenhousePostgresQuery.mockImplementation(async (sql: string, values?: unknown[]) => {
-      if (sql.includes('to_regclass(\'greenhouse_sync.outbox_reactive_log\')')) {
-        return [{ exists: true }]
-      }
+    const events = [
+      buildEventRow('a-1', 'finance.expense.created'),
+      buildEventRow('a-2', 'finance.expense.created'),
+      buildEventRow('b-1', 'finance.income.created')
+    ]
 
-      if (sql.includes('FROM greenhouse_sync.outbox_events')) {
-        if (values?.[2] && Number(values[2]) > 0) {
-          return []
-        }
+    mockQuery.mockResolvedValueOnce(events)
+    mockQuery.mockResolvedValue([])
 
-        return [
-          {
-            event_id: 'event-old-terminal',
-            aggregate_type: 'finance_income',
-            aggregate_id: 'INC-1',
-            event_type: 'finance.income.created',
-            payload_json: { incomeId: 'INC-1' },
-            occurred_at: '2026-03-20T12:00:00.000Z'
-          },
-          {
-            event_id: 'event-late-actionable',
-            aggregate_type: 'payroll_period',
-            aggregate_id: '2026-03',
-            event_type: 'payroll_period.exported',
-            payload_json: { periodId: '2026-03' },
-            occurred_at: '2026-03-28T12:00:00.000Z'
-          }
-        ]
-      }
+    const result = await processReactiveEvents()
 
-      if (
-        sql.includes('FROM greenhouse_sync.outbox_reactive_log') &&
-        sql.includes('handler = ANY($2)')
-      ) {
-        if (values?.[0] === 'event-old-terminal') {
-          return [
-            {
-              handler: 'commercial_cost_attribution:finance.income.created',
-              result: 'dead-letter',
-              last_error: 'permission denied'
-            }
-          ]
-        }
+    expect(result.scopesCoalesced).toBe(2)
+    expect(result.eventsAcknowledged).toBe(3)
+    expect(result.perProjection.projection_a.scopesCoalesced).toBe(1)
+    expect(result.perProjection.projection_a.eventsAcknowledged).toBe(2)
+    expect(result.perProjection.projection_a.successes).toBe(1)
+    expect(result.perProjection.projection_b.scopesCoalesced).toBe(1)
+    expect(result.perProjection.projection_b.eventsAcknowledged).toBe(1)
+  })
 
-        return []
-      }
+  it('preserves backwards-compat fields eventsProcessed and eventsFailed', async () => {
+    mockGetAllTriggerEventTypes.mockReturnValue(['finance.expense.created'])
+    mockGetProjectionsForEvent.mockReturnValue([buildProjection()])
 
-      if (sql.includes('SELECT EXISTS')) {
-        return [{ exists: false }]
-      }
+    const events = [buildEventRow('e-1', 'finance.expense.created')]
 
-      if (sql.includes('INSERT INTO greenhouse_sync.outbox_reactive_log')) {
-        return []
-      }
+    mockQuery.mockResolvedValueOnce(events)
+    mockQuery.mockResolvedValue([])
 
-      return []
-    })
+    const result = await processReactiveEvents()
 
-    const result = await processReactiveEvents({ domain: 'notifications', batchSize: 1 })
+    expect(result.eventsProcessed).toBe(result.eventsAcknowledged)
+    expect(result.eventsFailed).toBe(result.scopeGroupsFailed)
+  })
+
+  it('calls projection.refresh with the most recent payload as representative', async () => {
+    const projection = buildProjection()
+
+    mockGetAllTriggerEventTypes.mockReturnValue(['finance.expense.created'])
+    mockGetProjectionsForEvent.mockReturnValue([projection])
+
+    const events = [
+      { ...buildEventRow('older', 'finance.expense.created'), payload_json: { periodId: '2026-04', sequence: 1 } },
+      { ...buildEventRow('mid', 'finance.expense.created'), payload_json: { periodId: '2026-04', sequence: 2 } },
+      { ...buildEventRow('newest', 'finance.expense.created'), payload_json: { periodId: '2026-04', sequence: 3 } }
+    ]
+
+    mockQuery.mockResolvedValueOnce(events)
+    mockQuery.mockResolvedValue([])
+
+    await processReactiveEvents()
 
     expect(projection.refresh).toHaveBeenCalledWith(
-      { entityType: 'payroll_period', entityId: '2026-03' },
-      expect.objectContaining({ periodId: '2026-03' })
+      { entityType: 'finance_period', entityId: '2026-04' },
+      expect.objectContaining({ sequence: 3, _eventType: 'finance.expense.created' })
     )
-    expect(incomeProjection.refresh).not.toHaveBeenCalled()
-    expect(result.eventsProcessed).toBe(1)
-    expect(result.projectionsTriggered).toBe(1)
   })
 })

@@ -3,7 +3,10 @@
 ## Bootstrap actual
 
 - `MINI-001` asignado
-- siguiente ID disponible: `MINI-002`
+- `MINI-002` asignado
+- `MINI-003` asignado
+- `MINI-004` asignado
+- siguiente ID disponible: `MINI-005`
 
 ## Reglas
 

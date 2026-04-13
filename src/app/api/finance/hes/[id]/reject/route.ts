@@ -17,12 +17,14 @@ export async function POST(
   const body = await request.json()
 
   if (!body.reason) {
-    return NextResponse.json({ error: 'reason is required' }, { status: 400 })
+    return NextResponse.json({ error: 'reason es obligatorio' }, { status: 400 })
   }
 
   const result = await rejectHes(id, body.reason)
 
-  if (!result) return NextResponse.json({ error: 'HES not found or not in submitted status' }, { status: 404 })
+  if (!result) {
+    return NextResponse.json({ error: 'La HES no existe o ya no está en estado recibida.' }, { status: 404 })
+  }
 
   return NextResponse.json(result)
 }

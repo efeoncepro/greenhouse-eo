@@ -4,7 +4,8 @@ import {
   materializeCommercialCostAttributionForPeriod,
   readCommercialCostAttributionByClientForPeriod
 } from '@/lib/commercial-cost-attribution/member-period-attribution'
-import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { publishPeriodMaterializedEvent } from '@/lib/sync/publish-event'
 
 import type { ProjectionDefinition } from '../projection-registry'
 
@@ -177,14 +178,17 @@ export const commercialCostAttributionProjection: ProjectionDefinition = {
 
     const clientSummary = await readCommercialCostAttributionByClientForPeriod(year, month)
 
-    await publishOutboxEvent({
-      aggregateType: 'commercial_cost_attribution',
-      aggregateId: `${year}-${String(month).padStart(2, '0')}`,
-      eventType: 'accounting.commercial_cost_attribution.materialized',
+    // TASK-379 Slice 2: publish ONE coarse-grained period-materialized event.
+    // The legacy `accounting.commercial_cost_attribution.materialized` event remains
+    // registered in the catalog for backwards compatibility; consumers must accept both.
+    await publishPeriodMaterializedEvent({
+      aggregateType: AGGREGATE_TYPES.commercialCostAttribution,
+      eventType: EVENT_TYPES.accountingCommercialCostAttributionPeriodMaterialized,
+      periodId: `${year}-${String(month).padStart(2, '0')}`,
+      snapshotCount: rows.length,
       payload: {
         periodYear: year,
         periodMonth: month,
-        periodId: `${year}-${String(month).padStart(2, '0')}`,
         memberCount: rows.length,
         allocationCount: replaced,
         clientCount: clientSummary.length

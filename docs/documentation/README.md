@@ -15,6 +15,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 
 ### Plataforma interna y calidad
 
+- [Capa de Contexto Estructurado](plataforma/capa-contexto-estructurado.md) — memoria estructurada sidecar para payloads normalizados, auditoría, replay operativo y trabajo asistido por agentes sin reemplazar la verdad relacional
 - [Mi Perfil](plataforma/mi-perfil.md) — vista personal del colaborador: datos de identidad, equipos, proyectos, colegas y actividad reciente
 - [Sister Platform Bindings](plataforma/sister-platform-bindings.md) — enlace formal entre scopes externos de apps hermanas y scopes internos de Greenhouse
 - [Sistema de Observabilidad de Tests](plataforma/sistema-observabilidad-de-tests.md) — inventario del suite, resultados, coverage, artifacts y como leer la ultima corrida sin abrir logs crudos
@@ -23,6 +24,7 @@ Documentacion oficial de la plataforma Greenhouse. Cada documento describe como 
 ### Finanzas
 
 - [Cotizaciones multi-source](finance/cotizaciones-multi-source.md) — cotizaciones de Nubox y HubSpot unificadas, sync automatico, creacion outbound, mapeo de estados
+- [HES — Recepción y validación de servicio](finance/hes-recepcion-y-validacion.md) — hoja de entrada de servicio como respaldo recibido del cliente, estados visibles y herencia documental desde la OC
 - [Modulos de Caja — Cobros, Pagos, Banco, Cuenta Accionista y Posicion de Caja](finance/modulos-caja-cobros-pagos.md) — cobros (cash in), pagos (cash out), tesoreria por instrumento, cuenta corriente accionista y diferencia devengado vs caja
 
 ### HR y Nomina
@@ -67,6 +69,7 @@ Para detalle tecnico, schemas, contratos y decisiones de diseno, ver `docs/archi
 | [GREENHOUSE_EVENT_CATALOG_V1.md](../architecture/GREENHOUSE_EVENT_CATALOG_V1.md)                           | Plataforma         | Catalogo de eventos outbox, publishers, consumers                 |
 | [GREENHOUSE_360_OBJECT_MODEL_V1.md](../architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md)                     | Global             | Modelo canonico 360: Cliente, Colaborador, Persona, Space         |
 | [GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md](../architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md) | Datos              | Estrategia PostgreSQL + BigQuery                                  |
+| [GREENHOUSE_STRUCTURED_CONTEXT_LAYER_V1.md](../architecture/GREENHOUSE_STRUCTURED_CONTEXT_LAYER_V1.md)     | Plataforma / Datos | Capa sidecar de contexto estructurado, tipado y versionado        |
 | [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md)       | HR                 | Contrato completo de Payroll                                      |
 | [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md)             | Finanzas           | P&L engine, dual-store, outbox, allocations                       |
 | [GREENHOUSE_UI_PLATFORM_V1.md](../architecture/GREENHOUSE_UI_PLATFORM_V1.md)                               | UI                 | Stack UI, librerias, patrones de componentes                      |

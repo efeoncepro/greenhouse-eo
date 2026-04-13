@@ -149,6 +149,79 @@ export interface GreenhouseAiToolCatalog {
   website_url: string | null;
 }
 
+export interface GreenhouseContextContextDocumentQuarantine {
+  client_id: string | null;
+  context_kind: string | null;
+  created_at: Generated<Timestamp>;
+  organization_id: string | null;
+  owner_aggregate_id: string | null;
+  owner_aggregate_type: string | null;
+  payload_bytes: Generated<number>;
+  producer_id: string | null;
+  producer_type: string | null;
+  quarantine_id: Generated<string>;
+  raw_document_jsonb: Generated<Json>;
+  resolution_notes: string | null;
+  resolution_status: Generated<string>;
+  resolved_at: Timestamp | null;
+  resolved_by_id: string | null;
+  resolved_by_type: string | null;
+  source_system: string | null;
+  space_id: string | null;
+  validation_errors_jsonb: Generated<Json>;
+}
+
+export interface GreenhouseContextContextDocuments {
+  access_scope: Generated<string>;
+  archived_at: Timestamp | null;
+  client_id: string | null;
+  contains_financial_context: Generated<boolean>;
+  contains_pii: Generated<boolean>;
+  contains_secrets: Generated<boolean>;
+  content_hash: string;
+  context_id: Generated<string>;
+  context_kind: string;
+  created_at: Generated<Timestamp>;
+  created_by_id: string | null;
+  created_by_type: string | null;
+  current_version_number: Generated<number>;
+  data_classification: Generated<string>;
+  document_bytes: Generated<number>;
+  document_jsonb: Generated<Json>;
+  expires_at: Timestamp | null;
+  idempotency_key: string | null;
+  lineage_root_context_id: string | null;
+  organization_id: string | null;
+  owner_aggregate_id: string;
+  owner_aggregate_type: string;
+  producer_id: string | null;
+  producer_type: string;
+  public_id: Generated<string>;
+  redaction_status: Generated<string>;
+  retention_policy_code: Generated<string>;
+  schema_version: Generated<string>;
+  source_system: string;
+  space_id: string | null;
+  supersedes_context_id: string | null;
+  updated_at: Generated<Timestamp>;
+  updated_by_id: string | null;
+  updated_by_type: string | null;
+}
+
+export interface GreenhouseContextContextDocumentVersions {
+  change_reason: string | null;
+  changed_by_id: string | null;
+  changed_by_type: string | null;
+  content_hash: string;
+  context_id: string;
+  context_version_id: Generated<string>;
+  created_at: Generated<Timestamp>;
+  document_bytes: Generated<number>;
+  document_jsonb: Generated<Json>;
+  schema_version: string;
+  version_number: number;
+}
+
 export interface GreenhouseCoreAssetAccessLog {
   access_log_id: string;
   action: string;
@@ -3845,6 +3918,30 @@ export interface GreenhouseSyncOutboxReactiveLog {
   retries: Generated<number>;
 }
 
+export interface GreenhouseSyncProjectionCircuitState {
+  /**
+   * Streak of failures since the last success. Resets on first success.
+   */
+  consecutive_failures: Generated<number>;
+  /**
+   * Failed runs counted in the current rolling failure-rate window.
+   */
+  failed_runs_window: Generated<number>;
+  half_open_probe_at: Timestamp | null;
+  last_error: string | null;
+  last_failure_at: Timestamp | null;
+  last_success_at: Timestamp | null;
+  opened_at: Timestamp | null;
+  projection_name: string;
+  state: Generated<string>;
+  /**
+   * Total runs counted in the current rolling failure-rate window.
+   */
+  total_runs_window: Generated<number>;
+  updated_at: Generated<Timestamp>;
+  window_started_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseSyncProjectionRefreshQueue {
   created_at: Generated<Timestamp>;
   entity_id: string;
@@ -4037,6 +4134,9 @@ export interface DB {
   "greenhouse_ai.nexa_messages": GreenhouseAiNexaMessages;
   "greenhouse_ai.nexa_threads": GreenhouseAiNexaThreads;
   "greenhouse_ai.tool_catalog": GreenhouseAiToolCatalog;
+  "greenhouse_context.context_document_quarantine": GreenhouseContextContextDocumentQuarantine;
+  "greenhouse_context.context_document_versions": GreenhouseContextContextDocumentVersions;
+  "greenhouse_context.context_documents": GreenhouseContextContextDocuments;
   "greenhouse_core.asset_access_log": GreenhouseCoreAssetAccessLog;
   "greenhouse_core.assets": GreenhouseCoreAssets;
   "greenhouse_core.audit_events": GreenhouseCoreAuditEvents;
@@ -4206,6 +4306,7 @@ export interface DB {
   "greenhouse_sync.notion_sync_orchestration_runs": GreenhouseSyncNotionSyncOrchestrationRuns;
   "greenhouse_sync.outbox_events": GreenhouseSyncOutboxEvents;
   "greenhouse_sync.outbox_reactive_log": GreenhouseSyncOutboxReactiveLog;
+  "greenhouse_sync.projection_circuit_state": GreenhouseSyncProjectionCircuitState;
   "greenhouse_sync.projection_refresh_queue": GreenhouseSyncProjectionRefreshQueue;
   "greenhouse_sync.reporting_hierarchy_drift_proposals": GreenhouseSyncReportingHierarchyDriftProposals;
   "greenhouse_sync.schema_migrations": GreenhouseSyncSchemaMigrations;

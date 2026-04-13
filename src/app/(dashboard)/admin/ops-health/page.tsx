@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 
 
 import { getOperationsOverview } from '@/lib/operations/get-operations-overview'
+import { readReactiveProjectionBreakdown } from '@/lib/operations/get-reactive-projection-breakdown'
 import AdminOpsHealthView from '@/views/greenhouse/admin/AdminOpsHealthView'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
@@ -28,7 +29,10 @@ export default async function Page() {
     redirect(tenant.portalHomePath || '/dashboard')
   }
 
-  const data = await getOperationsOverview()
+  const [data, reactiveBreakdown] = await Promise.all([
+    getOperationsOverview(),
+    readReactiveProjectionBreakdown().catch(() => null)
+  ])
 
-  return <AdminOpsHealthView data={data} />
+  return <AdminOpsHealthView data={data} reactiveBreakdown={reactiveBreakdown} />
 }

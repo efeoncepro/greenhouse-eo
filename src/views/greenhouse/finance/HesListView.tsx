@@ -59,18 +59,18 @@ interface Hes {
 
 const STATUS_CONFIG: Record<string, { label: string; color: 'success' | 'info' | 'error' | 'warning' | 'secondary' }> = {
   draft: { label: 'Borrador', color: 'secondary' },
-  submitted: { label: 'Enviada', color: 'info' },
-  approved: { label: 'Aprobada', color: 'success' },
-  rejected: { label: 'Rechazada', color: 'error' },
+  submitted: { label: 'Recibida', color: 'info' },
+  approved: { label: 'Validada', color: 'success' },
+  rejected: { label: 'Observada', color: 'warning' },
   cancelled: { label: 'Cancelada', color: 'secondary' }
 }
 
 const STATUS_OPTIONS = [
   { value: '', label: 'Todos los estados' },
   { value: 'draft', label: 'Borrador' },
-  { value: 'submitted', label: 'Enviadas' },
-  { value: 'approved', label: 'Aprobadas' },
-  { value: 'rejected', label: 'Rechazadas' }
+  { value: 'submitted', label: 'Recibidas' },
+  { value: 'approved', label: 'Validadas' },
+  { value: 'rejected', label: 'Observadas' }
 ]
 
 // ── Helpers ──
@@ -127,7 +127,7 @@ const hesColumns: ColumnDef<Hes, any>[] = [
     }
   }),
   hesColumnHelper.accessor('approvedBy', {
-    header: 'Aprobada por',
+    header: 'Validada por',
     cell: ({ getValue }) => <Typography variant='body2' color='text.secondary'>{getValue() || '—'}</Typography>
   }),
   {
@@ -210,16 +210,16 @@ const HesListView = () => {
           <Typography variant='body2' color='text.secondary'>HES — certificación de recepción de servicio</Typography>
         </Box>
         <Button variant='contained' color='warning' startIcon={<i className='tabler-plus' />} onClick={() => setDrawerOpen(true)}>
-          Registrar HES
+          Registrar HES recibida
         </Button>
       </Box>
 
       <Grid container spacing={6}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <HorizontalWithSubtitle title='Aprobadas' stats={String(approvedCount)} subtitle='Listas para facturar' avatarIcon='tabler-check' avatarColor='success' />
+          <HorizontalWithSubtitle title='Validadas' stats={String(approvedCount)} subtitle='Listas para facturar' avatarIcon='tabler-check' avatarColor='success' />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <HorizontalWithSubtitle title='Pendientes' stats={String(pendingCount)} subtitle='Esperan aprobación' avatarIcon='tabler-clock' avatarColor='warning' />
+          <HorizontalWithSubtitle title='Recibidas' stats={String(pendingCount)} subtitle='Pendientes de validación' avatarIcon='tabler-clock' avatarColor='warning' />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <HorizontalWithSubtitle title='Monto total' stats={formatCLP(totalAmount)} subtitle='En todas las HES' avatarIcon='tabler-cash' avatarColor='primary' />
@@ -245,7 +245,7 @@ const HesListView = () => {
         {items.length === 0 ? (
           <Box sx={{ textAlign: 'center', py: 8 }} role='status'>
             <Typography variant='h6' sx={{ mb: 1 }}>Sin hojas de entrada</Typography>
-            <Typography variant='body2' color='text.secondary'>Las HES aparecen aquí cuando se registran.</Typography>
+            <Typography variant='body2' color='text.secondary'>Las HES aparecen aquí cuando registras una hoja recibida desde el cliente.</Typography>
           </Box>
         ) : (
           <div className='overflow-x-auto'>

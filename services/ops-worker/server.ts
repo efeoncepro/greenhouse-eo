@@ -10,6 +10,7 @@
  *   POST /reactive/process          → Process all reactive events (replaces outbox-react cron)
  *   POST /reactive/process-domain   → Process domain-scoped reactive events (replaces outbox-react-delivery cron)
  *   POST /reactive/recover          → Recover orphaned projection queue items (replaces projection-recovery cron)
+ *   GET  /reactive/queue-depth      → Queue depth + oldest-event lag, optionally filtered by ?domain=<x>
  *   POST /cost-attribution/materialize → Materialize commercial cost attribution + client economics
  *
  * Auth: Cloud Run IAM (--no-allow-unauthenticated) + optional CRON_SECRET header
@@ -18,7 +19,7 @@
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 
-import { processReactiveEvents, ensureReactiveSchema } from '@/lib/sync/reactive-consumer'
+import { processReactiveEvents, ensureReactiveSchema, sweepAuditOnlyEvents } from '@/lib/sync/reactive-consumer'
 import { claimOrphanedRefreshItems, markRefreshCompleted, markRefreshFailed } from '@/lib/sync/refresh-queue'
 import { getRegisteredProjections } from '@/lib/sync/projection-registry'
 import { ensureProjectionsRegistered } from '@/lib/sync/projections'
@@ -33,6 +34,8 @@ import {
   materializeAllAvailablePeriods
 } from '@/lib/commercial-cost-attribution/member-period-attribution'
 import { computeClientEconomicsSnapshots } from '@/lib/finance/postgres-store-intelligence'
+
+import { getReactiveQueueDepth, InvalidDomainError } from './reactive-queue-depth'
 
 // ─── Config ─────────────────────────────────────────────────────────────────
 
@@ -204,15 +207,48 @@ const handleReactiveRecover = async (req: IncomingMessage, res: ServerResponse) 
     ensureProjectionsRegistered()
 
     const recoverStartMs = Date.now()
+
+    // Audit-only sweep first: bulk-mark events whose type has zero
+    // registered projection handlers as no-op:audit-only so they stop
+    // accumulating in the raw outbox table. Always runs regardless of
+    // whether there are orphaned queue items.
+    let auditSweptCount = 0
+
+    try {
+      const sweep = await sweepAuditOnlyEvents({ batchSize: 1000 })
+
+      auditSweptCount = sweep.eventsSwept
+
+      if (auditSweptCount > 0) {
+        console.log(
+          `[ops-worker] /reactive/recover audit-only sweep — runId=${sweep.runId} swept=${auditSweptCount} ${sweep.durationMs}ms`
+        )
+      }
+    } catch (sweepError) {
+      console.error(
+        '[ops-worker] /reactive/recover audit-only sweep failed (non-fatal):',
+        sweepError instanceof Error ? sweepError.message : sweepError
+      )
+    }
+
     const orphans = await claimOrphanedRefreshItems(batchSize, staleMinutes)
 
     if (orphans.length === 0) {
       await writeReactiveRunComplete({
         runId,
-        result: { runId, eventsProcessed: 0, eventsFailed: 0, projectionsTriggered: 0, actions: [], durationMs: Date.now() - recoverStartMs }
+        result: { eventsProcessed: auditSweptCount, eventsFailed: 0, projectionsTriggered: 0, durationMs: Date.now() - recoverStartMs }
       })
 
-      json(res, 200, { runId, recovered: 0, failed: 0, message: 'No orphaned projections found' })
+      json(res, 200, {
+        runId,
+        recovered: 0,
+        failed: 0,
+        auditOnlySwept: auditSweptCount,
+        message:
+          auditSweptCount > 0
+            ? `No orphaned projections — swept ${auditSweptCount} audit-only events`
+            : 'No orphaned projections found'
+      })
 
       return
     }
@@ -253,21 +289,19 @@ const handleReactiveRecover = async (req: IncomingMessage, res: ServerResponse) 
     await writeReactiveRunComplete({
       runId,
       result: {
-        runId,
-        eventsProcessed: recovered,
+        eventsProcessed: recovered + auditSweptCount,
         eventsFailed: failed,
         projectionsTriggered: orphans.length,
-        actions: details.map(d => `${d.projectionName}:${d.status}`),
         durationMs: recoverDurationMs
       },
       status: failed > 0 && recovered > 0 ? 'partial' : failed > 0 ? 'failed' : 'succeeded'
     })
 
     console.log(
-      `[ops-worker] /reactive/recover done — ${recovered} recovered, ${failed} failed out of ${orphans.length} orphans`
+      `[ops-worker] /reactive/recover done — ${recovered} recovered, ${failed} failed out of ${orphans.length} orphans, ${auditSweptCount} audit-only swept`
     )
 
-    json(res, 200, { runId, recovered, failed, total: orphans.length, details })
+    json(res, 200, { runId, recovered, failed, total: orphans.length, auditOnlySwept: auditSweptCount, details })
   } catch (error) {
     await writeReactiveRunFailure({ runId, error })
 
@@ -353,6 +387,37 @@ const handleCostAttributionMaterialize = async (req: IncomingMessage, res: Serve
   }
 }
 
+/**
+ * GET /reactive/queue-depth
+ * Returns the number of outbox events still pending reactive processing for a
+ * domain (or across all domains if `domain` is omitted), plus the oldest event
+ * age and a top-10 breakdown by event_type. Used by ops dashboards and Cloud
+ * Monitoring alerting policies.
+ */
+const handleReactiveQueueDepth = async (req: IncomingMessage, res: ServerResponse) => {
+  const url = new URL(req.url || '/', `http://localhost:${PORT}`)
+  const domainParam = url.searchParams.get('domain')
+
+  try {
+    ensureProjectionsRegistered()
+
+    const result = await getReactiveQueueDepth(domainParam ?? undefined)
+
+    json(res, 200, result)
+  } catch (error) {
+    if (error instanceof InvalidDomainError) {
+      json(res, 400, { error: error.message, validDomains: error.validDomains })
+
+      return
+    }
+
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /reactive/queue-depth failed:', message)
+    json(res, 500, { error: message })
+  }
+}
+
 // ─── Router ─────────────────────────────────────────────────────────────────
 
 const server = createServer(async (req, res) => {
@@ -387,6 +452,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/reactive/recover') {
       await handleReactiveRecover(req, res)
+
+      return
+    }
+
+    if (method === 'GET' && path === '/reactive/queue-depth') {
+      await handleReactiveQueueDepth(req, res)
 
       return
     }

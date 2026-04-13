@@ -64,7 +64,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-046`
+`ISSUE-047`
 
 ## Open
 
@@ -80,6 +80,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 | ID          | Título                                                                                                                                                            | Ambiente                       | Detectado  | Resuelto   | Causa                                                                                                                    |
 | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `ISSUE-046` | [Reactive pipeline silent-skip backlog (~11k eventos sin procesar)](resolved/ISSUE-046-reactive-pipeline-silent-skip-backlog.md) | staging + production (single-instance) | 2026-04-13 | 2026-04-13 | Consumer V1 silent-skip path + fan-out explosion. Resuelto por TASK-379 (PR #53) + audit-only sweep follow-up (PR #54). Backlog drenado de 11,495 → 0. |
 | `ISSUE-031` | [Vercel Preview falla en build por drift de `NEXTAUTH_SECRET`](resolved/ISSUE-031-vercel-preview-build-fails-missing-nextauth-secret.md)                        | preview                        | 2026-04-08 | 2026-04-08 | `authOptions` se resolvía en import-time y Preview no tenía `NEXTAUTH_SECRET`, por lo que el build caía en page-data collection |
 | `ISSUE-032` | [Secret Manager payload contamination breaks runtime secrets](resolved/ISSUE-032-secret-manager-payload-contamination-breaks-runtime-secrets.md)                 | staging + production           | 2026-04-08 | 2026-04-09 | Payloads de Secret Manager publicados con comillas/`\\n` literal llegaban sucios al runtime y rompían auth/integraciones |
 | `ISSUE-027` | [My Profile vacío tras migración a Person 360: resolución "me" retorna 404](resolved/ISSUE-027-my-profile-360-me-resolution-404.md)                               | staging                        | 2026-04-07 | 2026-04-07 | `resolvePersonIdentifier` no buscaba por `identity_profile_id` — WHERE clause solo tenía `member_id OR user_id`          |

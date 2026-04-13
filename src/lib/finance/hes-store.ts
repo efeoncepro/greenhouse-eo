@@ -148,13 +148,15 @@ export const createHes = async (input: CreateHesInput): Promise<HesRecord> => {
       service_description, service_period_start, service_period_end, deliverables_summary,
       amount, currency, amount_clp,
       status,
+      submitted_at,
       client_contact_name, client_contact_email, attachment_url, notes,
       created_by
     ) VALUES (
       $1, $2, $3, $4, $5, $6,
       $7, $8, $9, $10,
       $11, $12, $13,
-      'draft',
+      'submitted',
+      NOW(),
       $14, $15, $16, $17,
       $18
     ) RETURNING *`,

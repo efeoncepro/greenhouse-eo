@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { materializeStaffAugPlacementSnapshotsForPeriod } from '@/lib/staff-augmentation/snapshots'
-import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { publishPeriodMaterializedEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 
 import type { ProjectionDefinition } from '../projection-registry'
@@ -90,7 +90,9 @@ export const STAFF_AUG_PLACEMENT_TRIGGER_EVENTS = [
   EVENT_TYPES.financeToolingCostUpdated,
   EVENT_TYPES.providerUpserted,
   EVENT_TYPES.providerToolingSnapshotMaterialized,
+  EVENT_TYPES.providerToolingSnapshotPeriodMaterialized,
   EVENT_TYPES.accountingCommercialCostAttributionMaterialized,
+  EVENT_TYPES.accountingCommercialCostAttributionPeriodMaterialized,
   EVENT_TYPES.payrollPeriodCalculated,
   EVENT_TYPES.payrollPeriodApproved,
   EVENT_TYPES.payrollPeriodExported,
@@ -122,30 +124,20 @@ export const staffAugPlacementProjection: ProjectionDefinition = {
       `reactive-refresh:${eventType}:${scope.entityId}`
     )
 
-    for (const snapshot of snapshots) {
-      await publishOutboxEvent({
-        aggregateType: AGGREGATE_TYPES.staffAugPlacementSnapshot,
-        aggregateId: snapshot.snapshotId,
-        eventType: EVENT_TYPES.staffAugPlacementSnapshotMaterialized,
-        payload: {
-          placementId: snapshot.placementId,
-          assignmentId: snapshot.assignmentId,
-          clientId: snapshot.clientId,
-          memberId: snapshot.memberId,
-          providerId: snapshot.providerId,
-          periodYear: snapshot.periodYear,
-          periodMonth: snapshot.periodMonth,
-          periodId: snapshot.periodId,
-          projectedRevenueClp: snapshot.projectedRevenueClp,
-          payrollEmployerCostClp: snapshot.payrollEmployerCostClp,
-          commercialLoadedCostClp: snapshot.commercialLoadedCostClp,
-          toolingCostClp: snapshot.toolingCostClp,
-          grossMarginProxyClp: snapshot.grossMarginProxyClp,
-          grossMarginProxyPct: snapshot.grossMarginProxyPct,
-          snapshotStatus: snapshot.snapshotStatus
-        }
-      })
-    }
+    // TASK-379 Slice 2: publish ONE period-level event instead of N per placement.
+    // Downstream consumers refetch per-placement detail from
+    // greenhouse_cost_intelligence.staff_aug_placement_snapshots when needed.
+    await publishPeriodMaterializedEvent({
+      aggregateType: AGGREGATE_TYPES.staffAugPlacementSnapshot,
+      eventType: EVENT_TYPES.staffAugPlacementSnapshotPeriodMaterialized,
+      periodId: scope.entityId,
+      snapshotCount: snapshots.length,
+      payload: {
+        periodYear: year,
+        periodMonth: month,
+        placementIds: snapshots.map(snapshot => snapshot.placementId)
+      }
+    })
 
     return `materialized staff augmentation placement snapshots: ${snapshots.length} placements for ${scope.entityId} via ${eventType}`
   },

@@ -203,6 +203,7 @@ export const EVENT_TYPES = {
   financeEconomicIndicatorUpserted: 'finance.economic_indicator.upserted',
   providerUpserted: 'provider.upserted',
   providerToolingSnapshotMaterialized: 'provider.tooling_snapshot.materialized',
+  providerToolingSnapshotPeriodMaterialized: 'provider.tooling_snapshot.period_materialized',
 
   // AI Tooling structural events
   aiToolCreated: 'ai_tool.created',
@@ -303,13 +304,16 @@ export const EVENT_TYPES = {
   accountingPeriodClosed: 'accounting.period_closed',
   accountingPeriodReopened: 'accounting.period_reopened',
   accountingCommercialCostAttributionMaterialized: 'accounting.commercial_cost_attribution.materialized',
+  accountingCommercialCostAttributionPeriodMaterialized: 'accounting.commercial_cost_attribution.period_materialized',
   accountingPlSnapshotMaterialized: 'accounting.pl_snapshot.materialized',
+  accountingPlSnapshotPeriodMaterialized: 'accounting.pl_snapshot.period_materialized',
   accountingMarginAlertTriggered: 'accounting.margin_alert.triggered',
   staffAugPlacementCreated: 'staff_aug.placement.created',
   staffAugPlacementUpdated: 'staff_aug.placement.updated',
   staffAugPlacementStatusChanged: 'staff_aug.placement.status_changed',
   staffAugOnboardingItemUpdated: 'staff_aug.onboarding_item.updated',
   staffAugPlacementSnapshotMaterialized: 'staff_aug.placement_snapshot.materialized',
+  staffAugPlacementSnapshotPeriodMaterialized: 'staff_aug.placement_snapshot.period_materialized',
 
   // Operational Responsibility
   responsibilityAssigned: 'responsibility.assigned',
@@ -462,7 +466,20 @@ export const REACTIVE_EVENT_TYPES = [
   EVENT_TYPES.sisterPlatformBindingUpdated,
   EVENT_TYPES.sisterPlatformBindingActivated,
   EVENT_TYPES.sisterPlatformBindingSuspended,
-  EVENT_TYPES.sisterPlatformBindingDeprecated
+  EVENT_TYPES.sisterPlatformBindingDeprecated,
+
+  // Projection fan-out reduction (TASK-379)
+  // v1 legacy per-entity events are kept here so the V2 consumer still recognizes
+  // them as eligible during the migration window. They coexist with the v2
+  // period-level events below until the legacy publish paths are retired.
+  EVENT_TYPES.providerToolingSnapshotMaterialized,
+  EVENT_TYPES.providerToolingSnapshotPeriodMaterialized,
+  EVENT_TYPES.accountingCommercialCostAttributionMaterialized,
+  EVENT_TYPES.accountingCommercialCostAttributionPeriodMaterialized,
+  EVENT_TYPES.accountingPlSnapshotMaterialized,
+  EVENT_TYPES.accountingPlSnapshotPeriodMaterialized,
+  EVENT_TYPES.staffAugPlacementSnapshotMaterialized,
+  EVENT_TYPES.staffAugPlacementSnapshotPeriodMaterialized
 ] as const
 
 // ── Event Payload Types (TASK-247) ──

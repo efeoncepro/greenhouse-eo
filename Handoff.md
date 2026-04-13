@@ -1,5 +1,212 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — TASK-025 rescatada como policy estratégica y no como implementación
+
+- alcance documental:
+  - `docs/tasks/to-do/TASK-025-hr-payroll-module-delta-ftr.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `changelog.md`
+- decisión tomada:
+  - `TASK-025` sigue teniendo cabida, pero ya no como lane de implementación inmediata
+  - la propuesta legacy `RpA -> FTR` se reencuadra como policy de compensación futura
+  - el runtime vigente de Payroll sigue anclado a `OTD + RpA` según `TASK-065`
+- guardrails documentados:
+  - no renombrar ni eliminar `bonus_rpa_*` / `kpi_rpa_*` en caliente
+  - no leer `FTR` desde raw BigQuery / Notion para nómina
+  - benchmark de `FTR` y threshold de bono son conceptos distintos
+- validación:
+  - `git diff --check`
+
+## Sesion 2026-04-13 — TASK-027 rebaselined al runtime actual del repo
+
+- alcance documental:
+  - `docs/tasks/to-do/TASK-027-hris-document-vault.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `changelog.md`
+- decisión tomada:
+  - `TASK-027` sigue vigente funcionalmente, pero ya no como brief legacy
+  - la lane ahora queda explícitamente montada sobre `TASK-173` (`private assets`) y no sobre bucket/signed URL propios
+  - `Document Vault` se redefine como dominio de documentos laborales/compliance y no debe duplicar `member_certifications` ni `member_evidence`
+- actualización clave:
+  - el contrato esperado pasa a `asset_id` como referencia principal
+  - se formalizan las surfaces objetivo `/my/documents`, `/hr/documents` y surfacing en `People 360`
+  - se deja abierta como decisión de discovery la semántica exacta de `certificado` para no chocar con `TASK-313`
+- validación:
+  - `git diff --check`
+
+## Sesion 2026-04-13 — TASK-381 sembrada para hardening enterprise de la SCL
+
+- backlog nuevo documentado:
+  - `docs/tasks/to-do/TASK-381-structured-context-layer-enterprise-hardening.md`
+- alcance formalizado:
+  - registry canónico de `context_kind`
+  - readers tenant-safe con access scope enforcement
+  - lifecycle de retention / quarantine / lineage
+  - observabilidad de adopción y salud
+  - segundo piloto real y criterio de promoción a modelo relacional
+- documentación operativa actualizada:
+  - `docs/tasks/README.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `changelog.md`
+- validación de este turno:
+  - documentación solamente; sin cambios runtime
+  - correr `git diff --check` antes de commit
+
+## Sesion 2026-04-13 — TASK-380 gap operativo cerrado en develop
+
+- cierre del gap:
+  - `pnpm pg:connect:migrate` ya aplicó `20260413113902271_structured-context-layer-foundation.sql` en el shared dev DB
+  - `src/types/db.d.ts` quedó regenerado en `develop` con las tablas de `greenhouse_context`
+- validación ejecutada:
+  - `pnpm pg:connect:migrate`
+  - `pnpm exec vitest run src/lib/structured-context/validation.test.ts src/lib/structured-context/store.test.ts src/lib/structured-context/reactive.test.ts`
+- aprendizaje operativo confirmado:
+  - el bloqueo previo no era de la migración de `TASK-380`, sino drift temporal de historial con `TASK-379`
+  - una vez reconciliado `develop`, la materialización de DB cerró sin errores
+
+## Sesion 2026-04-13 — TASK-380 foundation runtime implementada en worktree aislado
+
+- worktree usado:
+  - `/Users/jreye/Documents/greenhouse-eo-codex-task-380`
+  - branch `task/TASK-380-structured-context-layer-foundation`
+- alcance implementado:
+  - migración `20260413113902271_structured-context-layer-foundation.sql`
+  - runtime nuevo `src/lib/structured-context/{types,validation,store,reactive,index}.ts`
+  - tests nuevos `src/lib/structured-context/*.test.ts`
+  - piloto real conectado a `src/lib/sync/reactive-run-tracker.ts`
+- comportamiento nuevo:
+  - Greenhouse ya tiene foundation sidecar para contexto estructurado con documentos, versiones y quarantine
+  - la taxonomía inicial queda registrada y validada runtime-side
+  - los runs reactivos ya pueden persistir y releer `event.replay_context` sin romper el tracking canónico
+- criterio de robustez:
+  - el store rechaza secretos y llaves sensibles
+  - la capa aplica límites de tamaño por `context_kind`
+  - la validación fallida cae en quarantine antes de explotar
+  - el piloto reactivo escribe en modo degradado: si la capa falla, el worker no se cae por ese sidecar
+- verificación:
+  - `pnpm exec vitest run src/lib/structured-context/validation.test.ts src/lib/structured-context/store.test.ts src/lib/structured-context/reactive.test.ts`
+  - `pnpm exec eslint src/lib/structured-context/types.ts src/lib/structured-context/validation.ts src/lib/structured-context/store.ts src/lib/structured-context/reactive.ts src/lib/sync/reactive-run-tracker.ts`
+  - `pnpm build`
+- bloqueo real:
+  - `pnpm pg:connect:migrate` en shared dev DB falla por drift de historial: esa base ya tiene aplicada `20260413105218813_reactive-pipeline-v2-circuit-breaker` de `TASK-379`, pero esta rama/worktree no trae todavía esa migración
+  - no mezclé esa migración ajena en esta branch para no cruzar lanes sin decisión explícita
+- aprendizajes críticos:
+  - documentos persistidos deben ser JSON puros también a nivel de tipos; `undefined` fue el principal roce de implementación
+  - el patrón correcto para valores opcionales es `null`
+  - quarantine-before-throw deja evidencia operativa mucho más útil que fallar en seco
+  - el piloto sidecar debe degradar con seguridad si falla, no romper el flujo canónico
+  - worktree aislado + Turbopack exige `node_modules` local real; un symlink fuera del root puede romper el build sin relación con el código
+
+## Sesion 2026-04-13 — operating model multi-agent con worktrees formalizado
+
+- alcance documental:
+  - `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md`
+  - `docs/README.md`
+  - `AGENTS.md`
+  - `project_context.md`
+  - `changelog.md`
+- decisión tomada:
+  - el workspace actual se preserva para el agente que ya está trabajando ahí
+  - si otro agente necesita otra rama en paralelo, debe abrir worktree propio y no cambiar la rama del checkout ocupado
+- contrato nuevo:
+  - naming de worktrees y ramas
+  - checklist de inicio/cierre de sesión
+  - reglas de sincronización con `develop`/`main`
+  - rollback y limpieza del esquema
+- verificación:
+  - `git diff --check`
+
+## Sesion 2026-04-13 — Structured Context Layer formalizada y TASK-380 sembrada
+
+- alcance documental:
+  - `docs/architecture/GREENHOUSE_STRUCTURED_CONTEXT_LAYER_V1.md`
+  - `docs/documentation/plataforma/capa-contexto-estructurado.md`
+  - `docs/tasks/to-do/TASK-380-structured-context-layer-foundation.md`
+  - índices/documentos vivos actualizados: `docs/README.md`, `docs/documentation/README.md`, `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md`, `project_context.md`, `changelog.md`
+- decisión tomada:
+  - Greenhouse formaliza una `Structured Context Layer` como sidecar del modelo relacional para contexto flexible, payloads normalizados, replay reactivo, auditoría y memoria de trabajo de agentes
+  - el schema objetivo es `greenhouse_context` y la raíz runtime prevista es `src/lib/structured-context/`
+- criterio de modelado:
+  - JSONB no reemplaza la verdad canónica ni evita modelar tablas cuando un dato se vuelve contractual, transaccional o consultable de forma intensiva
+  - la capa sí habilita guardar bundles tipados/versionados que hoy terminan dispersos en payloads ad hoc, docs o prompts
+  - se añadió una regla explícita para agentes sobre cuándo usar relacional, `JSONB`, `JSON` o ninguno
+  - además se endureció el contrato enterprise con clasificación, redacción, retención, idempotencia, access scope, límites de tamaño y quarantine
+- verificación:
+  - `git diff --check`
+- notas operativas:
+  - no hubo cambios de runtime, migraciones ni deploy funcional en esta sesión
+  - quedaron cambios ajenos en el árbol (`TASK-379` / `docs/issues/**`) que no se mezclaron en este lote
+
+## Sesion 2026-04-13 — MINI-004 cerrada: HES ya se registra como documento recibido y no como envío outbound
+
+- alcance implementado:
+  - `src/lib/finance/hes-store.ts`
+  - `src/lib/finance/hes-store.test.ts`
+  - `src/views/greenhouse/finance/HesListView.tsx`
+  - `src/views/greenhouse/finance/drawers/CreateHesDrawer.tsx`
+  - routes HES bajo `src/app/api/finance/hes/**`
+- comportamiento nuevo:
+  - `Finance > HES` ya registra la HES en estado operativo `Recibida` al momento del alta
+  - la UI deja de hablar de envío al cliente y pasa a expresar recepción, validación y observación
+  - el estado visible `Validada por` reemplaza la semántica previa de aprobación outbound
+  - el feedback backend también quedó alineado en español cuando una transición de lifecycle ya no aplica
+- criterio de robustez:
+  - el cambio reutiliza el lifecycle backend existente (`submitted`, `approved`, `rejected`) sin abrir un contrato paralelo ni meter migraciones
+  - se agregó regresión de store para asegurar que `createHes()` siga naciendo como `submitted`
+- verificación:
+  - `pnpm exec vitest run src/lib/finance/hes-store.test.ts`
+  - `pnpm lint -- src/lib/finance/hes-store.ts src/lib/finance/hes-store.test.ts src/views/greenhouse/finance/HesListView.tsx src/views/greenhouse/finance/drawers/CreateHesDrawer.tsx src/app/api/finance/hes/route.ts src/app/api/finance/hes/[id]/submit/route.ts src/app/api/finance/hes/[id]/approve/route.ts src/app/api/finance/hes/[id]/reject/route.ts`
+  - `pnpm build`
+- documentación:
+  - mini-task cerrada en `docs/mini-tasks/complete/MINI-004-hes-received-workflow-semantics.md`
+  - doc funcional nueva `docs/documentation/finance/hes-recepcion-y-validacion.md`
+  - trackers `docs/mini-tasks/README.md` y `docs/documentation/README.md` actualizados
+
+## Sesion 2026-04-13 — MINI-003 cerrada: OC ya permite cargar o reemplazar respaldo después del alta
+
+- alcance implementado:
+  - `src/views/greenhouse/finance/PurchaseOrdersListView.tsx`
+  - drawer nuevo `src/views/greenhouse/finance/drawers/UpdatePurchaseOrderDocumentDrawer.tsx`
+  - ajuste de copy en `src/views/greenhouse/finance/drawers/CreateHesDrawer.tsx`
+  - endurecimiento de reemplazo en `src/lib/finance/purchase-order-store.ts`
+- comportamiento nuevo:
+  - la tabla de `Finance > Purchase Orders` ahora expone una acción por fila para cargar o reemplazar el respaldo de la OC
+  - si la OC ya tiene documento, se puede abrir y reemplazar desde esa misma surface
+  - la HES mantiene la herencia del respaldo desde la OC y ahora explica explícitamente que el documento debe completarse en Órdenes de compra
+- criterio de robustez:
+  - al reemplazar un respaldo de OC, el store marca el asset anterior como `orphaned` para no dejar adjuntos supersedidos colgados del aggregate
+- verificación:
+  - `pnpm exec vitest run src/lib/finance/purchase-order-store.test.ts`
+  - `pnpm lint -- src/views/greenhouse/finance/PurchaseOrdersListView.tsx src/views/greenhouse/finance/drawers/UpdatePurchaseOrderDocumentDrawer.tsx src/views/greenhouse/finance/drawers/CreateHesDrawer.tsx src/lib/finance/purchase-order-store.ts src/lib/finance/purchase-order-store.test.ts`
+  - `pnpm build`
+- gap conocido:
+  - la validación manual automatizada local quedó bloqueada por Playwright MCP en este runtime (`ENOENT: no such file or directory, mkdir '/.playwright-mcp'`)
+- documentación:
+  - mini-task cerrada en `docs/mini-tasks/complete/MINI-003-po-post-create-document-upload-for-hes-inheritance.md`
+  - tracker `docs/mini-tasks/README.md` actualizado
+
+## Sesion 2026-04-13 — MINI-002 cerrada: HES reutiliza contactos del cliente y hereda respaldo desde la OC
+
+- alcance implementado:
+  - `src/views/greenhouse/finance/drawers/CreateHesDrawer.tsx`
+  - helper nuevo `src/views/greenhouse/finance/drawers/financeClientContacts.ts`
+  - refactor menor de reuse en `src/views/greenhouse/finance/drawers/CreatePurchaseOrderDrawer.tsx`
+- comportamiento nuevo:
+  - HES ya no usa nombre/email abiertos como camino principal
+  - el contacto se selecciona desde los contactos asociados al cliente, con el mismo patrón que OC
+  - el email se completa desde el contacto vinculado
+  - se mantiene fallback manual explícito si el contacto no existe todavía
+  - HES ya no expone `URL del documento (PDF)` como campo editable
+  - si la OC vinculada tiene respaldo, la HES hereda ese documento y lo informa en la UI
+- criterio de escalabilidad:
+  - la carga de contactos asociados quedó extraída a un helper compartido del módulo Finance para evitar duplicidad entre OC y HES
+- verificación:
+  - `pnpm lint -- src/views/greenhouse/finance/drawers/financeClientContacts.ts src/views/greenhouse/finance/drawers/CreatePurchaseOrderDrawer.tsx src/views/greenhouse/finance/drawers/CreateHesDrawer.tsx`
+  - `pnpm build`
+- documentación:
+  - mini-task cerrada en `docs/mini-tasks/complete/MINI-002-hes-client-contact-and-po-document-inheritance.md`
+  - tracker y registry de mini-tasks actualizados
+
 ## Sesion 2026-04-13 — ISSUE-045 abierto: registrar OC cae por `client_id` ambiguo en Finance canonical
 
 - incidente:

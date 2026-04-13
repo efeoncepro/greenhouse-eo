@@ -2,6 +2,74 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — TASK-025 queda rescatada como policy canónica de FTR para Payroll
+
+- `docs/tasks/to-do/TASK-025-hr-payroll-module-delta-ftr.md` fue reescrita para dejar de ser un brief destructivo de implementación.
+- La lane ahora queda formalizada como decisión estratégica de compensación variable: si `FTR` entra a Payroll, debe hacerlo como rollout compatible con el runtime actual y no como rename de `RpA`.
+- `docs/tasks/TASK_ID_REGISTRY.md` quedó alineado con el título canónico `Payroll FTR Bonus Policy Decision`.
+
+### 2026-04-13 — TASK-027 queda rebaselined al runtime actual
+
+- `docs/tasks/to-do/TASK-027-hris-document-vault.md` fue reescrita al template canónico vigente.
+- La lane deja de asumir bucket propio, `file_url` y signed URLs específicas del dominio; ahora consume explícitamente la foundation shared de `private assets` cerrada en `TASK-173`.
+- La task ahora define con más claridad su frontera contra `TASK-313`: `Document Vault` cubre documentos laborales/compliance y no debe duplicar certificaciones profesionales ni evidencia reputacional.
+- `docs/tasks/TASK_ID_REGISTRY.md` quedó alineado con el título canónico `HRIS Document Vault`.
+
+### 2026-04-13 — TASK-381 documenta el backlog de hardening enterprise de la Structured Context Layer
+
+- Se creó `docs/tasks/to-do/TASK-381-structured-context-layer-enterprise-hardening.md` como follow-on directo de `TASK-380`.
+- La task deja explícito qué falta para que la SCL sea una capability enterprise reusable: registry de `context_kind`, readers con enforcement real, lifecycle de retention/quarantine, observabilidad, segundo piloto y promotion criteria.
+- `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` quedaron actualizados para reservar `TASK-381` y dejar `TASK-382` como siguiente ID disponible.
+
+### 2026-04-13 — TASK-380 queda materializada también en la base compartida
+
+- La migración `20260413113902271_structured-context-layer-foundation.sql` ya fue aplicada sobre el shared dev DB desde `develop`.
+- `src/types/db.d.ts` ahora expone las tablas de `greenhouse_context`.
+- Con esto se cierra el gap operativo que quedaba entre foundation en código y materialización real en PostgreSQL.
+
+### 2026-04-13 — TASK-380 materializa la foundation runtime de Structured Context Layer
+
+- Se agregó la migración `20260413113902271_structured-context-layer-foundation.sql` para crear `greenhouse_context` con documentos, versiones, quarantine y guardrails base.
+- Se agregó `src/lib/structured-context/` como runtime compartido para tipos, validación, hashing, persistencia y lectura.
+- La taxonomía inicial ya incluye validadores reales para `event.replay_context`, `agent.audit_report` y `agent.execution_plan`.
+- `src/lib/sync/reactive-run-tracker.ts` ahora queda conectado como primer piloto de escritura/lectura usando `event.replay_context`.
+- El piloto está endurecido para no romper el worker reactivo si la capa sidecar falla; registra warning y degrada sin cortar el flujo principal.
+- La aplicación de la migración en el shared dev DB quedó pendiente porque esa base ya tiene aplicada una migración de `TASK-379` que esta rama todavía no trae.
+
+### 2026-04-13 — Modelo operativo multi-agent con worktrees formalizado
+
+- Se agregó `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md`.
+- El repo ahora deja explícito cómo trabajar con varios agentes en paralelo sin cambiar la rama del checkout ocupado por otro agente.
+- La convención nueva reserva el workspace actual para el agente owner y manda a los agentes adicionales a worktrees aislados con rama propia.
+
+### 2026-04-13 — Structured Context Layer formalizada como foundation arquitectónica
+
+- Se agregó `docs/architecture/GREENHOUSE_STRUCTURED_CONTEXT_LAYER_V1.md` para gobernar el uso de JSONB/contexto estructurado en Greenhouse.
+- La nueva capa propone `greenhouse_context` como schema sidecar para documentos tipados, versionados y tenant-safe.
+- El objetivo es soportar integraciones, replay reactivo, auditoría operativa y memoria de trabajo para agentes sin degradar el modelo relacional como fuente de verdad.
+- Se sembró `TASK-380` como lane de implementación para materializar esta foundation.
+- La documentación ahora deja una regla explícita para agentes: verdad canónica -> relacional; contexto flexible reusable en PostgreSQL -> `JSONB`; `JSON` solo como excepción cuando importa preservar representación cruda.
+- La foundation también quedó endurecida a nivel enterprise en la documentación: clasificación de datos, redacción, retención, access scope, idempotencia, límites de tamaño y quarantine de documentos inválidos.
+
+### 2026-04-13 — HES ahora se registra como documento recibido del cliente
+
+- `Finance > HES` ya no deja una HES nueva presentada como `Borrador` cuando el flujo principal es registrar una hoja recibida.
+- Los estados visibles quedan alineados al proceso real: `Recibida`, `Validada` y `Observada`.
+- El módulo deja de comunicar acciones outbound como si la HES se enviara al cliente; ahora expresa recepción y validación interna.
+
+### 2026-04-13 — Las OC ya permiten cargar o reemplazar su respaldo después del registro
+
+- `Finance > Purchase Orders` ahora expone una acción por fila para completar o reemplazar el respaldo de una OC ya creada.
+- El documento sigue perteneciendo a la OC; las HES vinculadas continúan heredándolo en vez de guardar un PDF propio.
+- Cuando una OC no tiene respaldo, `Finance > HES > Registrar HES` ahora lo comunica con copy explícito y dirige operativamente a completar ese documento en la OC.
+
+### 2026-04-13 — HES ahora reutiliza contactos del cliente y hereda respaldo desde la OC vinculada
+
+- `Finance > HES > Registrar HES` ahora carga contactos asociados solo al cliente seleccionado, igual que el flujo de OC.
+- El contacto principal se elige desde un selector y el email se completa desde ese vínculo; el fallback manual queda como excepción explícita.
+- La HES ya no pide `URL del documento (PDF)` como campo editable.
+- Si la HES se vincula a una OC con respaldo cargado, hereda ese documento automáticamente.
+
 ### 2026-04-13 — Finance canonical blinda el lookup de client profiles para evitar `client_id` ambiguo
 
 - Se corrigió `src/lib/finance/canonical.ts` para calificar con alias `cp.` los filtros del lookup de `client_profiles` cuando el resolver une `greenhouse_core.spaces`.

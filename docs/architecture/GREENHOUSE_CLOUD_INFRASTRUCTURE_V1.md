@@ -554,24 +554,26 @@ notion_ops  (legacy)   ─┤──►  greenhouse_conformed (replacement target
 
 #### 9. ops-worker (us-east4)
 
+> Config actualizada 2026-04-13 via TASK-379 (reactive projections V2 hardening). Baseline anterior era `cpu=1 mem=1Gi max=2 concurrency=1 timeout=300`.
+
 | Property      | Value                                                                                                                                                                                     |
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Type          | Custom Cloud Run service                                                                                                                                                                  |
 | Runtime       | Node.js 22 (esbuild bundle)                                                                                                                                                               |
 | Region        | `us-east4` (co-located with Cloud SQL)                                                                                                                                                    |
-| Memory        | 1 GiB                                                                                                                                                                                     |
-| CPU           | 1                                                                                                                                                                                         |
-| Timeout       | 300 s (5 min)                                                                                                                                                                             |
-| Max instances | 2                                                                                                                                                                                         |
-| Concurrency   | 1                                                                                                                                                                                         |
+| Memory        | 2 GiB (TASK-379)                                                                                                                                                                          |
+| CPU           | 2 (TASK-379)                                                                                                                                                                              |
+| Timeout       | 540 s (9 min, TASK-379)                                                                                                                                                                   |
+| Max instances | 5 (TASK-379)                                                                                                                                                                              |
+| Concurrency   | 4 (TASK-379)                                                                                                                                                                              |
 | Auth          | IAM (`--no-allow-unauthenticated`)                                                                                                                                                        |
 | Source        | `services/ops-worker/` (monorepo, reuses `src/lib/`)                                                                                                                                      |
-| Purpose       | Durable reactive worker: processes outbox reactive events, domain-specific reactive events, recovers orphaned projection refreshes, and materializes commercial cost attribution. Replaces Vercel crons that risked 120s timeout. |
-| Endpoints     | `GET /health`, `POST /reactive/process`, `POST /reactive/process-domain`, `POST /reactive/recover`, `POST /cost-attribution/materialize`                                                   |
+| Purpose       | Durable reactive worker V2: processes outbox reactive events with scope coalescing and circuit breaker (TASK-379), domain-specific reactive events, recovers orphaned projection refreshes, and materializes commercial cost attribution. Replaces Vercel crons that risked 120s timeout. |
+| Endpoints     | `GET /health`, `POST /reactive/process`, `POST /reactive/process-domain`, `POST /reactive/recover`, `POST /cost-attribution/materialize`, `GET /reactive/queue-depth` (TASK-379)           |
 | SA            | `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` (runs as + `roles/run.invoker` for scheduler OIDC)                                                                              |
 | Image         | `gcr.io/efeonce-group/ops-worker` (Cloud Build)                                                                                                                                           |
 | Build         | esbuild two-stage Dockerfile with 9 `--alias` shims for ESM/CJS interop (see note below)                                                                                                 |
-| TASK          | TASK-254                                                                                                                                                                                  |
+| TASK          | TASK-254 (inicial) + TASK-379 (V2 scaling)                                                                                                                                                |
 
 **ESM/CJS shim pattern:** The import chain `server.ts → projections/ → greenhouse-assets.ts → authorization.ts → auth.ts` pulls in `next-auth` providers which are CJS-only and fail under Node 22 ESM. Since the ops-worker never uses auth, 9 esbuild `--alias` shims stub out `server-only`, `next/server`, `next/headers`, `next-auth`, `next-auth/providers/credentials`, `next-auth/providers/azure-ad`, `next-auth/providers/google`, `next-auth/next`, and `bcryptjs`. This pattern should be replicated for any future Cloud Run service that reuses `src/lib/` without needing NextAuth.
 
@@ -601,15 +603,19 @@ Staging services share the same configuration as their production counterparts b
 | `notion-hubspot-reverse-poll`   | `7,22,37,52 * * * *` (every 15 min, offset by 7 min) | `notion-hubspot-reverse-sync` | America/Santiago |
 | `ico-materialize-daily`         | `15 3 * * *` (daily at 3:15 AM)                      | `ico-batch-worker` (us-east4) | America/Santiago |
 | `ico-llm-enrich-daily`          | `45 3 * * *` (daily at 3:45 AM)                      | `ico-batch-worker` (us-east4) | America/Santiago |
-| `ops-reactive-process`          | `*/5 * * * *` (every 5 min)                          | `ops-worker` (us-east4)       | America/Santiago |
-| `ops-reactive-process-delivery` | `2-59/5 * * * *` (every 5 min, offset by 2 min)      | `ops-worker` (us-east4)       | America/Santiago |
+| `ops-reactive-organization`     | `*/5 * * * *` (every 5 min)                          | `ops-worker` (us-east4)       | America/Santiago |
+| `ops-reactive-finance`          | `*/5 * * * *` (every 5 min)                          | `ops-worker` (us-east4)       | America/Santiago |
+| `ops-reactive-people`           | `2-59/5 * * * *` (every 5 min, offset by 2 min)      | `ops-worker` (us-east4)       | America/Santiago |
+| `ops-reactive-notifications`    | `*/2 * * * *` (every 2 min, high priority)           | `ops-worker` (us-east4)       | America/Santiago |
+| `ops-reactive-delivery`         | `*/5 * * * *` (every 5 min)                          | `ops-worker` (us-east4)       | America/Santiago |
+| `ops-reactive-cost-intelligence`| `*/10 * * * *` (every 10 min)                        | `ops-worker` (us-east4)       | America/Santiago |
 | `ops-reactive-recover`          | `*/15 * * * *` (every 15 min)                        | `ops-worker` (us-east4)       | America/Santiago |
 
 The 7-minute offset on `notion-hubspot-reverse-poll` prevents overlap with the forward sync job, reducing contention on shared Notion API rate limits.
 
 The `ico-materialize-daily` and `ico-llm-enrich-daily` jobs replace the Vercel cron routes that exceeded the 120s timeout. The 30-minute gap between materialization and LLM enrichment ensures outbox events from materialization are published before enrichment reads the signals. Both jobs target the `ico-batch-worker` service in `us-east4` (co-located with Cloud SQL) via IAM OIDC authentication.
 
-The `ops-reactive-*` jobs replace 3 Vercel cron routes (`outbox-react`, `outbox-react-delivery`, `projection-recovery`) migrated to Cloud Run for durability. The 2-minute offset on `ops-reactive-process-delivery` prevents overlap with the all-domains process job. All 3 jobs target the `ops-worker` service in `us-east4` via IAM OIDC authentication. The original Vercel API routes remain as manual fallback endpoints but are no longer scheduled.
+Los `ops-reactive-*` jobs forman el fan-out por dominio del reactive worker. Actualizado 2026-04-13 via TASK-379: la topologia paso de 3 jobs (`ops-reactive-process`, `ops-reactive-process-delivery`, `ops-reactive-recover`) a 7 jobs (uno por dominio + recovery) para que ningun dominio bloquee al siguiente y el backlog se drene en paralelo. Los 6 jobs de dominio invocan `POST /reactive/process-domain` con `{ domain: "<name>" }`; el job de recovery invoca `POST /reactive/recover` para reclamar items huerfanos via `claimOrphanedRefreshItems`. Todos autenticados via OIDC con SA `greenhouse-portal@efeonce-group.iam.gserviceaccount.com`. Las Vercel API routes (`/api/cron/outbox-react*`, `/api/cron/projection-recovery`) siguen disponibles como fallback manual pero no estan agendadas.
 
 ### Paused Jobs (Staging)
 
