@@ -4,9 +4,11 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { toast } from 'react-toastify'
 
+import Autocomplete from '@mui/material/Autocomplete'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Drawer from '@mui/material/Drawer'
 import Grid from '@mui/material/Grid'
@@ -37,10 +39,80 @@ interface ActivePOSummary {
   totalRemaining: number
 }
 
+interface FinanceContactOption {
+  name: string
+  email: string
+  phone: string
+  role: string
+}
+
+interface OrganizationMembershipOption {
+  fullName: string | null
+  canonicalEmail: string | null
+  membershipType: string
+  roleLabel: string | null
+  isPrimary: boolean
+}
+
+type FinanceContactCandidate = {
+  name: string
+  email: string
+  phone?: unknown
+  role?: unknown
+}
+
 const getClientLabel = (c: ClientOption) =>
   c.legalName || c.companyName || c.greenhouseClientName || c.clientId || c.organizationId || c.clientProfileId
 
 const getClientValue = (client: ClientOption) => client.clientId || client.organizationId || client.clientProfileId
+
+const getContactOptionLabel = (contact: FinanceContactOption) =>
+  contact.name && contact.email ? `${contact.name} (${contact.email})` : contact.name || contact.email
+
+const FINANCE_CONTACT_MEMBERSHIP_TYPES = new Set(['billing', 'contact', 'client_contact'])
+
+const isFinanceContactCandidate = (contact: unknown): contact is FinanceContactCandidate => {
+  if (!contact || typeof contact !== 'object') {
+    return false
+  }
+
+  const candidate = contact as Record<string, unknown>
+
+  return (
+    typeof candidate.name === 'string'
+    && candidate.name.trim().length > 0
+    && typeof candidate.email === 'string'
+    && candidate.email.trim().length > 0
+  )
+}
+
+const toOrganizationContactOptions = (memberships: OrganizationMembershipOption[]) => {
+  const membershipsWithEmail = memberships.filter(
+    membership => typeof membership.canonicalEmail === 'string' && membership.canonicalEmail.trim().length > 0
+  )
+
+  const financeMemberships = membershipsWithEmail.filter(membership =>
+    FINANCE_CONTACT_MEMBERSHIP_TYPES.has(membership.membershipType)
+  )
+
+  const sourceMemberships = financeMemberships.length > 0 ? financeMemberships : membershipsWithEmail
+
+  return sourceMemberships
+    .slice()
+    .sort((a, b) => {
+      if (a.isPrimary !== b.isPrimary) {
+        return a.isPrimary ? -1 : 1
+      }
+
+      return (a.fullName || a.canonicalEmail || '').localeCompare(b.fullName || b.canonicalEmail || '', 'es')
+    })
+    .map(membership => ({
+      name: membership.fullName?.trim() || membership.canonicalEmail?.trim() || 'Sin nombre',
+      email: membership.canonicalEmail?.trim() || '',
+      phone: '',
+      role: membership.roleLabel?.trim() || membership.membershipType
+    }))
+}
 
 const CURRENCIES = ['CLP', 'USD']
 
@@ -70,8 +142,13 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
 
   // State
   const [clients, setClients] = useState<ClientOption[]>([])
+  const [clientContacts, setClientContacts] = useState<FinanceContactOption[]>([])
   const [loadingClients, setLoadingClients] = useState(false)
+  const [loadingContacts, setLoadingContacts] = useState(false)
   const [activePOs, setActivePOs] = useState<ActivePOSummary | null>(null)
+  const [contactMode, setContactMode] = useState<'linked' | 'manual'>('linked')
+  const [selectedContact, setSelectedContact] = useState<FinanceContactOption | null>(null)
+  const [contactsError, setContactsError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -131,6 +208,97 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
     }
   }, [])
 
+  const selectedClient = clients.find(client => getClientValue(client) === selectedClientKey)
+
+  useEffect(() => {
+    if (!selectedClientKey || !selectedClient) {
+      setClientContacts([])
+      setLoadingContacts(false)
+      setContactMode('linked')
+      setSelectedContact(null)
+      setContactsError(null)
+      setContactName('')
+      setContactEmail('')
+
+      return
+    }
+
+    let active = true
+
+    const run = async () => {
+      setLoadingContacts(true)
+      setContactsError(null)
+      setClientContacts([])
+      setSelectedContact(null)
+      setContactName('')
+      setContactEmail('')
+
+      try {
+        let nextContacts: FinanceContactOption[] = []
+
+        if (selectedClient.organizationId) {
+          const membershipsRes = await fetch(`/api/organizations/${encodeURIComponent(selectedClient.organizationId)}/memberships`, {
+            cache: 'no-store'
+          })
+
+          if (membershipsRes.ok) {
+            const membershipsData = await membershipsRes.json()
+            const organizationMemberships = Array.isArray(membershipsData?.items) ? membershipsData.items as OrganizationMembershipOption[] : []
+
+            nextContacts = toOrganizationContactOptions(organizationMemberships)
+          }
+        }
+
+        if (nextContacts.length === 0) {
+          const clientRes = await fetch(`/api/finance/clients/${encodeURIComponent(selectedClientKey)}`, { cache: 'no-store' })
+
+          if (!clientRes.ok) {
+            throw new Error('client-contact-fetch-failed')
+          }
+
+          const clientData = await clientRes.json()
+
+          const financeContacts: unknown[] = Array.isArray(clientData?.financialProfile?.financeContacts)
+            ? clientData.financialProfile.financeContacts
+            : []
+
+          nextContacts = financeContacts
+            .filter(isFinanceContactCandidate)
+            .map(contact => ({
+              name: contact.name.trim(),
+              email: contact.email.trim(),
+              phone: typeof contact.phone === 'string' ? contact.phone.trim() : '',
+              role: typeof contact.role === 'string' ? contact.role.trim() : ''
+            }))
+        }
+
+        if (!active) return
+
+        setClientContacts(nextContacts)
+        setContactMode(nextContacts.length > 0 ? 'linked' : 'manual')
+
+        if (nextContacts.length === 0) {
+          setContactsError('Este cliente no tiene contactos vinculados todavía. Puedes registrar el contacto manualmente.')
+        }
+      } catch {
+        if (!active) return
+
+        setContactMode('manual')
+        setContactsError('No pudimos cargar los contactos vinculados. Puedes registrar el contacto manualmente.')
+      } finally {
+        if (active) {
+          setLoadingContacts(false)
+        }
+      }
+    }
+
+    run()
+
+    return () => {
+      active = false
+    }
+  }, [selectedClient, selectedClientKey])
+
   const handleClientChange = (value: string) => {
     setSelectedClientKey(value)
 
@@ -159,13 +327,33 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
     setContactEmail('')
     setAttachmentAsset(null)
     setNotes('')
+    setClientContacts([])
     setActivePOs(null)
+    setLoadingContacts(false)
+    setContactMode('linked')
+    setSelectedContact(null)
+    setContactsError(null)
     setError(null)
   }
 
   const handleClose = () => { resetForm(); onClose() }
 
-  const selectedClient = clients.find(client => getClientValue(client) === selectedClientKey)
+  const handleContactSelect = (_event: unknown, value: FinanceContactOption | null) => {
+    setSelectedContact(value)
+    setContactName(value?.name ?? '')
+    setContactEmail(value?.email ?? '')
+  }
+
+  const handleUseManualContact = () => {
+    setContactMode('manual')
+  }
+
+  const handleUseLinkedContact = () => {
+    setContactMode('linked')
+    setSelectedContact(null)
+    setContactName('')
+    setContactEmail('')
+  }
 
   const handleSubmit = async () => {
     if (!poNumber.trim() || !selectedClientKey || !authorizedAmount.trim() || !issueDate) {
@@ -336,20 +524,116 @@ const CreatePurchaseOrderDrawer = ({ open, onClose, onSuccess }: Props) => {
           value={description} onChange={e => setDescription(e.target.value)}
         />
 
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <CustomTextField
-              fullWidth size='small' label='Nombre contacto'
-              value={contactName} onChange={e => setContactName(e.target.value)}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <CustomTextField
-              fullWidth size='small' label='Email contacto' type='email'
-              value={contactEmail} onChange={e => setContactEmail(e.target.value)}
-            />
-          </Grid>
-        </Grid>
+        <Stack spacing={2}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap' }}>
+            <Typography variant='body2' fontWeight={600}>
+              Contacto del cliente
+            </Typography>
+            {selectedClientKey && clientContacts.length > 0 ? (
+              <Button
+                size='small'
+                variant='text'
+                onClick={contactMode === 'linked' ? handleUseManualContact : handleUseLinkedContact}
+              >
+                {contactMode === 'linked' ? 'No encuentro el contacto' : 'Usar contacto vinculado'}
+              </Button>
+            ) : null}
+          </Box>
+
+          {!selectedClientKey ? (
+            <Alert severity='info'>
+              Selecciona primero el cliente para cargar sus contactos vinculados.
+            </Alert>
+          ) : null}
+
+          {selectedClientKey && contactsError ? (
+            <Alert severity='info'>
+              {contactsError}
+            </Alert>
+          ) : null}
+
+          {contactMode === 'linked' && selectedClientKey ? (
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12 }}>
+                <Autocomplete
+                  options={clientContacts}
+                  value={selectedContact}
+                  loading={loadingContacts}
+                  onChange={handleContactSelect}
+                  getOptionLabel={getContactOptionLabel}
+                  isOptionEqualToValue={(option, value) => option.email === value.email && option.name === value.name}
+                  noOptionsText='No hay contactos vinculados para este cliente.'
+                  loadingText='Cargando contactos...'
+                  renderInput={params => (
+                    <CustomTextField
+                      {...params}
+                      fullWidth
+                      size='small'
+                      label='Seleccionar contacto'
+                      placeholder='Busca un contacto vinculado'
+                      helperText='El nombre y el email se completan desde el contacto seleccionado.'
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <>
+                            {loadingContacts ? <CircularProgress color='inherit' size={18} /> : null}
+                            {params.InputProps.endAdornment}
+                          </>
+                        )
+                      }}
+                    />
+                  )}
+                  renderOption={(props, option) => (
+                    <li {...props} key={`${option.email}:${option.name}`}>
+                      <Stack spacing={0.5} sx={{ py: 0.5, width: '100%' }}>
+                        <Typography variant='body2' fontWeight={700}>
+                          {option.name}
+                        </Typography>
+                        <Typography variant='caption' color='text.secondary'>
+                          {option.email}
+                        </Typography>
+                        {option.role ? (
+                          <Typography variant='caption' color='text.secondary'>
+                            {option.role}
+                          </Typography>
+                        ) : null}
+                      </Stack>
+                    </li>
+                  )}
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <CustomTextField
+                  fullWidth
+                  size='small'
+                  label='Email contacto'
+                  type='email'
+                  value={contactEmail}
+                  placeholder='Se completará al seleccionar un contacto'
+                  InputProps={{ readOnly: true }}
+                  helperText={selectedContact ? 'Email completado desde el contacto vinculado.' : 'El email se completará al elegir un contacto.'}
+                />
+              </Grid>
+            </Grid>
+          ) : null}
+
+          {contactMode === 'manual' ? (
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
+                  fullWidth size='small' label='Nombre contacto'
+                  value={contactName} onChange={e => setContactName(e.target.value)}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <CustomTextField
+                  fullWidth size='small' label='Email contacto' type='email'
+                  value={contactEmail} onChange={e => setContactEmail(e.target.value)}
+                />
+              </Grid>
+            </Grid>
+          ) : null}
+        </Stack>
 
         <Divider />
         <Typography variant='subtitle2' color='text.secondary'>Adjunto y notas</Typography>

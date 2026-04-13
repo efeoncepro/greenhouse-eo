@@ -1,5 +1,44 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — MINI-001 cerrada: OC ahora prioriza contactos del cliente seleccionado
+
+- alcance implementado:
+  - `src/views/greenhouse/finance/drawers/CreatePurchaseOrderDrawer.tsx`
+  - el drawer de OC ya no depende solo de nombre/email libres como camino principal
+  - al elegir cliente:
+    - intenta cargar memberships de la organización de ese cliente
+    - prioriza memberships `billing`, `contact` y `client_contact`
+    - si no existen, cae a miembros de esa misma organización con email
+    - si tampoco hay memberships útiles, cae al snapshot legacy `financeContacts` del cliente
+  - el selector muestra solo contactos asociados a ese cliente, nunca una búsqueda global
+  - se mantiene fallback manual explícito con `No encuentro el contacto`
+- verificación:
+  - `pnpm lint -- src/views/greenhouse/finance/drawers/CreatePurchaseOrderDrawer.tsx`
+  - `pnpm build`
+- nota:
+  - `pnpm build` volvió a emitir logs preexistentes de Next sobre `Dynamic server usage` en rutas que usan `headers`; no bloqueó el build ni nace de esta mini-task
+
+## Sesion 2026-04-13 — lane `MINI-###` materializada para mejoras chicas planificadas
+
+- alcance implementado:
+  - nueva taxonomía `docs/mini-tasks/` con pipeline `to-do`, `in-progress`, `complete`
+  - tracker nuevo `docs/mini-tasks/README.md`
+  - plantilla nueva `docs/mini-tasks/MINI_TASK_TEMPLATE.md`
+  - registry nuevo `docs/mini-tasks/MINI_TASK_ID_REGISTRY.md`
+  - operating model nuevo `docs/operations/MINI_TASK_OPERATING_MODEL_V1.md`
+  - docs vivas alineadas:
+    - `AGENTS.md`
+    - `docs/README.md`
+    - `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`
+    - `project_context.md`
+    - `changelog.md`
+- primer seed operativo:
+  - `docs/mini-tasks/to-do/MINI-001-po-client-contact-selector.md`
+- criterio nuevo:
+  - `MINI-###` para mejoras chicas, locales y planificadas
+  - `ISSUE-###` sigue reservado para problemas reales de runtime
+  - `TASK-###` sigue siendo la lane cuando el alcance deja de ser claramente acotado
+
 ## Sesion 2026-04-11 — Seed operativo Kortex pilot READY
 
 - alcance implementado:

@@ -13,6 +13,8 @@ Este repositorio es la base operativa de Greenhouse sobre Vuexy + Next.js. Aqui 
 - Convencion documental vigente:
   - `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, `project_context.md`, `Handoff.md`, `Handoff.archive.md` y `changelog.md` quedan en raiz.
   - specs, tasks, roadmap y guias especializadas viven bajo `docs/`.
+  - `docs/mini-tasks/` se ordena operativamente en `in-progress/`, `to-do/` y `complete/`; el indice vigente es `docs/mini-tasks/README.md`.
+  - las mini-tasks nuevas deben usar ID estable `MINI-###` y `docs/mini-tasks/MINI_TASK_TEMPLATE.md`; el modelo operativo vive en `docs/operations/MINI_TASK_OPERATING_MODEL_V1.md`.
   - `docs/tasks/` se ordena operativamente en `in-progress/`, `to-do/` y `complete/`; el indice vigente es `docs/tasks/README.md`.
   - las tasks nuevas deben nacer con ID estable `TASK-###` y usar `docs/tasks/TASK_TEMPLATE.md` como plantilla copiable. El protocolo de ejecucion (Plan Mode, Skill, Subagent, Checkpoint/Mode) vive en `docs/tasks/TASK_PROCESS.md`.
   - los briefs `CODEX_TASK_*` existentes siguen vigentes como legacy hasta su migracion y deben vivir versionados dentro de `docs/tasks/**`; el patron ignorado en raiz queda solo para scratch local fuera de la taxonomia documental.
@@ -588,6 +590,33 @@ Cada task activa debe tener un bloque `## Dependencies & Impact` que declare:
 - **Depende de:** qué tablas, schemas, o tasks deben existir antes
 - **Impacta a:** qué otras tasks se verían afectadas si esta se completa
 - **Archivos owned:** qué archivos son propiedad de esta task (para detectar impacto cruzado)
+
+## Mini Task Lifecycle Protocol
+
+### Regla general
+
+Las mejoras chicas, locales y planificadas que no son incidentes ni ameritan `TASK-###` deben vivir como `MINI-###` en `docs/mini-tasks/{to-do,in-progress,complete}/`, con índice en `docs/mini-tasks/README.md`.
+
+Antes de crear una mini-task nueva:
+
+1. Revisar `docs/operations/MINI_TASK_OPERATING_MODEL_V1.md`
+2. Revisar `docs/mini-tasks/MINI_TASK_TEMPLATE.md`
+3. Revisar `docs/mini-tasks/MINI_TASK_ID_REGISTRY.md`
+4. Asignar el siguiente `MINI-###` disponible
+5. Crear el archivo en `docs/mini-tasks/to-do/`
+
+### Al iniciar trabajo en una mini-task
+
+1. Mover el archivo de `to-do/` a `in-progress/`
+2. Actualizar `docs/mini-tasks/README.md`
+3. Registrar en `Handoff.md` si el cambio toca una zona sensible o deja pendientes
+
+### Al completar una mini-task
+
+1. Mover el archivo de `in-progress/` a `complete/`
+2. Actualizar `docs/mini-tasks/README.md`
+3. Registrar verificación real ejecutada
+4. Actualizar `Handoff.md` y `changelog.md` cuando aplique
 
 Cuando un agente modifica archivos listados como "owned" por otra task, debe revisar esa task y actualizar su estado si corresponde.
 
