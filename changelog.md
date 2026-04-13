@@ -2,6 +2,12 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — TASK-025 queda rescatada como policy canónica de FTR para Payroll
+
+- `docs/tasks/to-do/TASK-025-hr-payroll-module-delta-ftr.md` fue reescrita para dejar de ser un brief destructivo de implementación.
+- La lane ahora queda formalizada como decisión estratégica de compensación variable: si `FTR` entra a Payroll, debe hacerlo como rollout compatible con el runtime actual y no como rename de `RpA`.
+- `docs/tasks/TASK_ID_REGISTRY.md` quedó alineado con el título canónico `Payroll FTR Bonus Policy Decision`.
+
 ### 2026-04-13 — TASK-027 queda rebaselined al runtime actual
 
 - `docs/tasks/to-do/TASK-027-hris-document-vault.md` fue reescrita al template canónico vigente.

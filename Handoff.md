@@ -1,5 +1,22 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — TASK-025 rescatada como policy estratégica y no como implementación
+
+- alcance documental:
+  - `docs/tasks/to-do/TASK-025-hr-payroll-module-delta-ftr.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `changelog.md`
+- decisión tomada:
+  - `TASK-025` sigue teniendo cabida, pero ya no como lane de implementación inmediata
+  - la propuesta legacy `RpA -> FTR` se reencuadra como policy de compensación futura
+  - el runtime vigente de Payroll sigue anclado a `OTD + RpA` según `TASK-065`
+- guardrails documentados:
+  - no renombrar ni eliminar `bonus_rpa_*` / `kpi_rpa_*` en caliente
+  - no leer `FTR` desde raw BigQuery / Notion para nómina
+  - benchmark de `FTR` y threshold de bono son conceptos distintos
+- validación:
+  - `git diff --check`
+
 ## Sesion 2026-04-13 — TASK-027 rebaselined al runtime actual del repo
 
 - alcance documental:
