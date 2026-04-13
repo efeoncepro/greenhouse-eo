@@ -283,7 +283,9 @@ describe('HrHierarchyView', () => {
     renderWithTheme(<HrHierarchyView />)
 
     await screen.findAllByText('Ana Perez')
-    await user.click(screen.getAllByRole('button', { name: 'Nueva delegación' })[0])
+    const delegationButtons = await screen.findAllByRole('button', { name: 'Nueva delegación' })
+
+    await user.click(delegationButtons[0])
 
     expect(screen.getByRole('heading', { name: 'Nueva delegación temporal' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Delegado' })).toBeInTheDocument()
