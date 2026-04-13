@@ -88,6 +88,7 @@ Indice maestro de la documentacion no operativa del repo.
 ### Operations
 
 - [Issue Tracker](issues/README.md)
+- [MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md](operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md)
 - [Mini Task Operating Model](operations/MINI_TASK_OPERATING_MODEL_V1.md)
 - [DOCUMENTATION_OPERATING_MODEL_V1.md](operations/DOCUMENTATION_OPERATING_MODEL_V1.md)
 - [ISSUE_OPERATING_MODEL_V1.md](operations/ISSUE_OPERATING_MODEL_V1.md)

@@ -2,6 +2,12 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — Modelo operativo multi-agent con worktrees formalizado
+
+- Se agregó `docs/operations/MULTI_AGENT_WORKTREE_OPERATING_MODEL_V1.md`.
+- El repo ahora deja explícito cómo trabajar con varios agentes en paralelo sin cambiar la rama del checkout ocupado por otro agente.
+- La convención nueva reserva el workspace actual para el agente owner y manda a los agentes adicionales a worktrees aislados con rama propia.
+
 ### 2026-04-13 — Structured Context Layer formalizada como foundation arquitectónica
 
 - Se agregó `docs/architecture/GREENHOUSE_STRUCTURED_CONTEXT_LAYER_V1.md` para gobernar el uso de JSONB/contexto estructurado en Greenhouse.
