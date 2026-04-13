@@ -1,5 +1,22 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — TASK-027 rebaselined al runtime actual del repo
+
+- alcance documental:
+  - `docs/tasks/to-do/TASK-027-hris-document-vault.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `changelog.md`
+- decisión tomada:
+  - `TASK-027` sigue vigente funcionalmente, pero ya no como brief legacy
+  - la lane ahora queda explícitamente montada sobre `TASK-173` (`private assets`) y no sobre bucket/signed URL propios
+  - `Document Vault` se redefine como dominio de documentos laborales/compliance y no debe duplicar `member_certifications` ni `member_evidence`
+- actualización clave:
+  - el contrato esperado pasa a `asset_id` como referencia principal
+  - se formalizan las surfaces objetivo `/my/documents`, `/hr/documents` y surfacing en `People 360`
+  - se deja abierta como decisión de discovery la semántica exacta de `certificado` para no chocar con `TASK-313`
+- validación:
+  - `git diff --check`
+
 ## Sesion 2026-04-13 — TASK-381 sembrada para hardening enterprise de la SCL
 
 - backlog nuevo documentado:

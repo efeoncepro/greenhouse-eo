@@ -2,6 +2,13 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — TASK-027 queda rebaselined al runtime actual
+
+- `docs/tasks/to-do/TASK-027-hris-document-vault.md` fue reescrita al template canónico vigente.
+- La lane deja de asumir bucket propio, `file_url` y signed URLs específicas del dominio; ahora consume explícitamente la foundation shared de `private assets` cerrada en `TASK-173`.
+- La task ahora define con más claridad su frontera contra `TASK-313`: `Document Vault` cubre documentos laborales/compliance y no debe duplicar certificaciones profesionales ni evidencia reputacional.
+- `docs/tasks/TASK_ID_REGISTRY.md` quedó alineado con el título canónico `HRIS Document Vault`.
+
 ### 2026-04-13 — TASK-381 documenta el backlog de hardening enterprise de la Structured Context Layer
 
 - Se creó `docs/tasks/to-do/TASK-381-structured-context-layer-enterprise-hardening.md` como follow-on directo de `TASK-380`.
