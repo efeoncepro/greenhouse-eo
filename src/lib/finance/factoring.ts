@@ -243,7 +243,7 @@ export const recordFactoringOperation = async (
       description: `Interés factoring ${refLabel}— ${providerName}`,
       amount: input.interestAmount,
       paymentDate: input.operationDate,
-      supplierId: input.factoringProviderId,
+      supplierId: null, // factoring_provider_id is not a greenhouse_finance.suppliers FK
       supplierName: providerName,
       paymentReference: input.externalReference || null,
       actorUserId: input.actorUserId
@@ -257,7 +257,7 @@ export const recordFactoringOperation = async (
       description: `Asesoría factoring ${refLabel}— ${providerName}`,
       amount: input.advisoryFeeAmount,
       paymentDate: input.operationDate,
-      supplierId: input.factoringProviderId,
+      supplierId: null, // factoring_provider_id is not a greenhouse_finance.suppliers FK
       supplierName: providerName,
       paymentReference: input.externalReference || null,
       actorUserId: input.actorUserId
