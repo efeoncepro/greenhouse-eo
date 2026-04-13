@@ -25,12 +25,15 @@ import type {
   OperationsOverview,
   OperationsSubsystem
 } from '@/lib/operations/get-operations-overview'
+import type { ReactiveProjectionBreakdown } from '@/lib/operations/get-reactive-projection-breakdown'
 import type { IntegrationDataQualityRunResult, IntegrationDataQualityStatus } from '@/types/integration-data-quality'
 import AdminOperationalActionsPanel from './AdminOperationalActionsPanel'
 import AdminOpsActionButton from './AdminOpsActionButton'
+import AdminReactiveProjectionBreakdown from './AdminReactiveProjectionBreakdown'
 
 type Props = {
   data: OperationsOverview
+  reactiveBreakdown?: ReactiveProjectionBreakdown | null
 }
 
 type AdminHealth = 'ok' | 'warning' | 'failed' | 'stale'
@@ -234,7 +237,7 @@ const buildAuditEvents = (data: OperationsOverview): AuditEvent[] => {
     .slice(0, 10)
 }
 
-const AdminOpsHealthView = ({ data }: Props) => {
+const AdminOpsHealthView = ({ data, reactiveBreakdown = null }: Props) => {
   const subsystems = healthSubsystems(data.subsystems)
   const uniqueRecentEventTypes = Array.from(new Set(data.recentEvents.map(event => event.eventType))).slice(0, 8)
   const auditEvents = buildAuditEvents(data)
@@ -380,6 +383,8 @@ const AdminOpsHealthView = ({ data }: Props) => {
           })}
         </Box>
       </ExecutiveCardShell>
+
+      <AdminReactiveProjectionBreakdown breakdown={reactiveBreakdown} />
 
       <ExecutiveCardShell
         title='Notion Delivery monitor'

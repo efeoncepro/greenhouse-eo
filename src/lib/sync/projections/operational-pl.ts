@@ -3,7 +3,8 @@ import 'server-only'
 import { materializeOperationalPl } from '@/lib/cost-intelligence/compute-operational-pl'
 import { toInteger } from '@/lib/cost-intelligence/shared'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { publishOutboxEvent, publishPeriodMaterializedEvent } from '@/lib/sync/publish-event'
 
 import type { ProjectionDefinition } from '../projection-registry'
 
@@ -178,25 +179,27 @@ export const operationalPlProjection: ProjectionDefinition = {
     const result = await materializeOperationalPl(year, month, `reactive-refresh:${eventType}:${scope.entityId}`)
     const marginThresholdPct = await getMarginThresholdPct()
 
-    for (const snapshot of result.snapshots) {
-      await publishOutboxEvent({
-        aggregateType: 'operational_pl',
-        aggregateId: snapshot.snapshotId,
-        eventType: 'accounting.pl_snapshot.materialized',
-        payload: {
+    // TASK-379 Slice 2: publish ONE period-level P&L materialization event instead of
+    // one per snapshot. Margin alerts stay 1-per-alert — each alert is semantically
+    // distinct (per scope crossing threshold) and must not be coalesced.
+    await publishPeriodMaterializedEvent({
+      aggregateType: AGGREGATE_TYPES.operationalPl,
+      eventType: EVENT_TYPES.accountingPlSnapshotPeriodMaterialized,
+      periodId: scope.entityId,
+      snapshotCount: result.snapshots.length,
+      payload: {
+        periodYear: year,
+        periodMonth: month,
+        periodClosed: result.periodClosed,
+        snapshotRevision: result.snapshotRevision,
+        scopeIds: result.snapshots.map(snapshot => ({
           scopeType: snapshot.scopeType,
-          scopeId: snapshot.scopeId,
-          scopeName: snapshot.scopeName,
-          periodYear: snapshot.periodYear,
-          periodMonth: snapshot.periodMonth,
-          periodId: `${snapshot.periodYear}-${String(snapshot.periodMonth).padStart(2, '0')}`,
-          snapshotRevision: snapshot.snapshotRevision,
-          periodClosed: snapshot.periodClosed,
-          grossMarginPct: snapshot.grossMarginPct,
-          totalCostClp: snapshot.totalCostClp
-        }
-      })
+          scopeId: snapshot.scopeId
+        }))
+      }
+    })
 
+    for (const snapshot of result.snapshots) {
       if (
         snapshot.grossMarginPct != null &&
         snapshot.revenueClp > 0 &&

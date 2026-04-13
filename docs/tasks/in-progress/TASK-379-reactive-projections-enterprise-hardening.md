@@ -126,29 +126,45 @@ Reglas obligatorias:
 
 ### Already exists
 
-- `src/lib/sync/reactive-consumer.ts` — consumer actual con iteracion evento-por-evento desde outbox, sin scope coalescing, sin locking optimista.
-- `src/lib/sync/refresh-queue.ts` — tabla y helpers ya implementados; el consumer enqueue pero no drena desde aqui.
-- `src/lib/sync/projection-registry.ts` — registry funcional con `getAllTriggerEventTypes`, `getProjectionsForEvent`, `PROJECTION_DOMAINS`.
-- 25 projections registradas en `src/lib/sync/projections/index.ts`.
-- `services/ops-worker/server.ts` — endpoints `POST /reactive/process`, `POST /reactive/recover`, `POST /cost-attribution/materialize`, `GET /health`.
-- 3 Cloud Scheduler jobs activos (`ops-reactive-process`, `ops-reactive-process-delivery`, `ops-reactive-recover`).
-- `src/lib/operations/reactive-backlog.ts` — fix de filtrado por handlers registrados ya en main (PR #50).
-- Sentry runtime + Slack alerts configurados a nivel infra (segun health endpoint).
+- `src/lib/sync/reactive-consumer.ts` — consumer actual con iteracion evento-por-evento desde outbox, sin scope coalescing. **CRITICAL DISCOVERY (Phase 1 audit)**: el bug NO es falta de SKIP LOCKED — es que el consumer no usa los helpers que ya existen en refresh-queue.ts.
+- `src/lib/sync/refresh-queue.ts` — **YA TIENE** `dequeueRefreshBatch()` con `FOR UPDATE SKIP LOCKED` ([refresh-queue.ts:112](src/lib/sync/refresh-queue.ts#L112)) y `claimOrphanedRefreshItems()` ([refresh-queue.ts:189-227](src/lib/sync/refresh-queue.ts#L189-L227)). El consumer V2 los va a llamar en lugar de iterar outbox.
+- `src/lib/sync/projection-registry.ts` — registry funcional con `getAllTriggerEventTypes`, `getProjectionsForEvent`, `PROJECTION_DOMAINS`. In-memory, populated at startup.
+- 25 projections registradas en `src/lib/sync/projections/index.ts`. Inventario completo en el audit report (Phase 2).
+- `services/ops-worker/server.ts` — endpoints `POST /reactive/process`, `POST /reactive/process-domain` (acepta `domain` en body), `POST /reactive/recover`, `POST /cost-attribution/materialize`, `GET /health`.
+- 3 Cloud Scheduler jobs activos: `ops-reactive-process` (todos los dominios `*/5`), `ops-reactive-process-delivery` (solo delivery `2-59/5`), `ops-reactive-recover` (`*/15`). Solo delivery tiene su propio lane.
+- Cloud Run baseline real (corregido del audit, no la asuncion previa): `--memory=1Gi --cpu=1 --timeout=300 --max-instances=2 --concurrency=1` ([deploy.sh:35-37](services/ops-worker/deploy.sh#L35-L37)).
+- `src/lib/operations/reactive-backlog.ts` — fix de filtrado por handlers registrados ya en main (PR #50), confirmado en [reactive-backlog.ts:129](src/lib/operations/reactive-backlog.ts#L129).
+- Schema actual de `outbox_events`: `event_id PK, aggregate_type, aggregate_id, event_type, payload_json (JSONB), status, occurred_at, published_at`. Append-only por diseno.
+- Schema actual de `outbox_reactive_log`: `(event_id, handler) PK, reacted_at, result, retries, last_error`. Ya tiene ON CONFLICT idempotency.
+- Schema actual de `projection_refresh_queue`: `refresh_id PK, projection_name, entity_type, entity_id, status (CHECK pending/processing/completed/failed), priority, triggered_by_event_id, error_message, retry_count, max_retries, created_at, updated_at, UNIQUE(projection_name, entity_type, entity_id)`. Recovery via `updated_at` staleness, NO necesita columnas claimed_by explicitas.
+- Sentry runtime + Slack alerts (`SLACK_ALERTS_WEBHOOK_URL`) configurados.
+- SA `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` con `roles/run.invoker`. Pendiente verificar si tiene `roles/monitoring.metricWriter`.
 
 ### Gap
 
-- Consumer no usa `refresh_queue`, itera el outbox directo.
-- Sin scope-level coalescing — cada evento dispara un refresh aunque caigan 500 al mismo scope.
-- Sin row-level locking en `outbox_reactive_log` ni `outbox_events` que permita multi-instance.
-- Sin circuit breaker por projection. Una projection que falla repetidamente bloquea el batch.
-- Publishers (provider_tooling, commercial_cost_attribution, operational_pl) publican N eventos por run sin coalescing en la fuente.
-- Cloud Run probablemente con `max-instances=1`, `concurrency=1`, sin auto-scaling driven por backlog.
-- Cloud Scheduler como polling fijo cada 5/15 min, sin signal de queue depth.
+- Consumer no usa `refresh_queue` (que ya tiene SKIP LOCKED) — itera el outbox directo con offset/limit (no multi-instance safe).
+- Sin scope-level coalescing — cada evento dispara un refresh aunque caigan 500 al mismo scope. Esto es el corazon del problema de fan-out.
+- Sin circuit breaker por projection. Una projection que falla repetidamente bloquea el batch entero.
+- Publishers en cadena: `provider_tooling.refresh()` publica 1 evento por snapshot (N eventos por run); `staff_augmentation_placements.refresh()` consume Y publica eventos propios; `operational_pl` publica 1-2 eventos por snapshot. Cadena que amplifica fan-out.
+- Cloud Run con `max-instances=2 concurrency=1` — solo 2 procesos serializados como techo. Insuficiente bajo backlog real.
+- Solo 1 dominio (`delivery`) tiene su propio Cloud Scheduler lane. Los otros 5 dominios (`organization`, `people`, `finance`, `notifications`, `cost_intelligence`) comparten el job "todos".
 - Sin custom metrics en Cloud Monitoring para reactive pipeline.
 - Sin alerting policies en Slack/PagerDuty para backlog, lag o dead-letter.
 - Sin SLO formal documentado.
-- 5446 eventos backlog real esperando procesamiento.
+- Event Catalog NO documenta convencion de schema versioning para payloads — TASK-379 introduce el patron `schemaVersion: 2` como convencion nueva.
+- 5446 eventos backlog real esperando procesamiento (descubierto en smoke post-deploy 2026-04-13).
 - `staff_augmentation_placements.lastReactedAt: null` en perpetuidad — bandera roja sobre projection nunca consumida.
+
+### Audit Phase 2 corrections (2026-04-13)
+
+Las siguientes asunciones de la spec original quedaron corregidas tras Phase 1 discovery:
+
+1. **Slice 1**: NO se "agrega SKIP LOCKED" — los helpers ya existen en `refresh-queue.ts`. El work real es REFACTORIZAR el consumer para llamarlos en lugar de iterar outbox manualmente.
+2. **Slice 1 schema**: `outbox_events` NO necesita `locked_by/locked_at` (es append-only). `projection_refresh_queue` NO necesita `claimed_by/claimed_at` explicitos (la heuristica de `updated_at` staleness es suficiente para `claimOrphanedRefreshItems`).
+3. **Slice 1 nueva tabla**: solo `projection_circuit_state` es nueva. La migracion es 1 CREATE TABLE, 0 ALTER en tablas existentes.
+4. **Slice 3 baseline**: el Cloud Run NO esta en `max=1` como asumi — esta en `max=2 concurrency=1`. El cambio sigue siendo correcto (`max=5 concurrency=4`) pero el delta es menor.
+5. **Slice 3 domain partition**: ya existe parcialmente (`getProjectionsForEvent(eventType, domain?)`, endpoint `/reactive/process-domain`). El work es agregar 5 cron jobs nuevos via `deploy.sh`, no construir el sistema desde cero.
+6. **Schema versioning**: NO es preexistente en el Event Catalog. TASK-379 introduce `schemaVersion: 2` como patron nuevo, debe documentarse en V2 playbook.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE

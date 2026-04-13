@@ -503,3 +503,24 @@ When this architecture is adopted:
 - `/api/finance/exchange-rates/sync` — daily 11:05 PM UTC
 
 Automated pipeline: notion-bq-sync (3:00 AM) → sync-conformed (3:45 AM) → ico-materialize (6:15 AM)
+
+## Reactive serving SLO
+
+> Seccion agregada 2026-04-13 via TASK-379.
+
+Las tablas de serving (`greenhouse_serving.*`) se mantienen frescas via el pipeline reactivo de proyecciones descrito en:
+
+- Playbook operativo: [GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V2.md](./GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V2.md)
+- Arquitectura tecnica: [GREENHOUSE_REACTIVE_PROJECTIONS_ARCHITECTURE_V2.md](./GREENHOUSE_REACTIVE_PROJECTIONS_ARCHITECTURE_V2.md)
+- SLO formal: `docs/architecture/GREENHOUSE_REACTIVE_PROJECTIONS_SLO_V1.md` (pendiente de creacion en Slice 4 de TASK-379)
+
+**Targets preliminares (pendientes de ratificar con metricas reales):**
+
+| SLO | Target | Ventana | Medicion |
+|---|---|---|---|
+| Latency P99 | Eventos procesados en ≤ 5 min desde publicacion | Rolling 7d | `greenhouse/reactive/lag_seconds_p95` en Cloud Monitoring |
+| Completeness | 99.9% de eventos eventualmente procesados | Lifetime | `outbox_reactive_log` result distribution |
+| Hygiene | 0 eventos en dead-letter > 24h sin resolucion | Continuous | Alerting en `result = 'dead-letter'` |
+| Recovery | Drain de 5000 eventos en < 30 min | Per incident | Validado via `pnpm reactive:load-test` |
+
+Las tablas materializadas downstream (member_capacity_economics, client_economics, operational_pl_rollup, staff_augmentation_placements, payroll_receipts_delivery) heredan estos SLO — sus snapshots en `greenhouse_serving.*` son tan frescos como el pipeline reactivo los mantiene.

@@ -64,7 +64,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-046`
+`ISSUE-047`
 
 ## Open
 
@@ -75,6 +75,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 | `ISSUE-023` | [Tablas de email sin migracion formal](open/ISSUE-023-email-tables-no-formal-migration.md)                                   | production + staging | 2026-04-06 | open   |
 | `ISSUE-044` | [Dashboard pages 500 via agent headless](open/ISSUE-044-dashboard-ssr-500-agent-headless.md)                                  | staging              | 2026-04-11 | open   |
 | `ISSUE-045` | [Registrar OC falla por referencia ambigua a `client_id` en el resolver canónico de Finance](open/ISSUE-045-purchase-order-create-ambiguous-client-id.md) | staging | 2026-04-13 | open |
+| `ISSUE-046` | [Reactive pipeline silent-skip backlog (~11k eventos sin procesar desde 2026-04-05)](open/ISSUE-046-reactive-pipeline-silent-skip-backlog.md) | staging + production (single-instance) | 2026-04-13 | open |
 
 ## Resolved
 

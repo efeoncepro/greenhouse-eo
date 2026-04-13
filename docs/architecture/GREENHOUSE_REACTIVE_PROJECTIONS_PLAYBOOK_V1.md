@@ -1,5 +1,7 @@
 # Greenhouse Reactive Projections Playbook v1
 
+> **STATUS: SUPERSEDED por V2.** Este documento queda como referencia historica. Ver [GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V2.md](./GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V2.md) para el playbook vigente. Cierre: 2026-04-13 via TASK-379.
+
 ## Delta 2026-03-31
 
 - En código ya existen routes particionadas por dominio:

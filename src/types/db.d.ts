@@ -3845,6 +3845,30 @@ export interface GreenhouseSyncOutboxReactiveLog {
   retries: Generated<number>;
 }
 
+export interface GreenhouseSyncProjectionCircuitState {
+  /**
+   * Streak of failures since the last success. Resets on first success.
+   */
+  consecutive_failures: Generated<number>;
+  /**
+   * Failed runs counted in the current rolling failure-rate window.
+   */
+  failed_runs_window: Generated<number>;
+  half_open_probe_at: Timestamp | null;
+  last_error: string | null;
+  last_failure_at: Timestamp | null;
+  last_success_at: Timestamp | null;
+  opened_at: Timestamp | null;
+  projection_name: string;
+  state: Generated<string>;
+  /**
+   * Total runs counted in the current rolling failure-rate window.
+   */
+  total_runs_window: Generated<number>;
+  updated_at: Generated<Timestamp>;
+  window_started_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseSyncProjectionRefreshQueue {
   created_at: Generated<Timestamp>;
   entity_id: string;
@@ -4206,6 +4230,7 @@ export interface DB {
   "greenhouse_sync.notion_sync_orchestration_runs": GreenhouseSyncNotionSyncOrchestrationRuns;
   "greenhouse_sync.outbox_events": GreenhouseSyncOutboxEvents;
   "greenhouse_sync.outbox_reactive_log": GreenhouseSyncOutboxReactiveLog;
+  "greenhouse_sync.projection_circuit_state": GreenhouseSyncProjectionCircuitState;
   "greenhouse_sync.projection_refresh_queue": GreenhouseSyncProjectionRefreshQueue;
   "greenhouse_sync.reporting_hierarchy_drift_proposals": GreenhouseSyncReportingHierarchyDriftProposals;
   "greenhouse_sync.schema_migrations": GreenhouseSyncSchemaMigrations;
