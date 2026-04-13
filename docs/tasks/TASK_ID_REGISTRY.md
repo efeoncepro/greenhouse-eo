@@ -53,8 +53,8 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 | `TASK-036` | `to-do`          | `CODEX_TASK_Greenhouse_Home_Nexa` (brief historico)                | `docs/tasks/to-do/TASK-036-greenhouse-home-nexa-brief.md`               |
 | `TASK-037` | `complete`       | `CODEX_TASK_SCIM_User_Provisioning` (brief historico)              | `docs/tasks/to-do/TASK-037-scim-user-provisioning-brief.md`             |
 | `TASK-038` | `complete`       | `CODEX_TASK_Staff_Augmentation_Module` (brief historico absorbido) | `docs/tasks/complete/TASK-038-staff-augmentation-module-brief.md`       |
-| `TASK-039` | `to-do`          | `Greenhouse_Data_Node_Architecture_v1` (supporting spec)           | `docs/tasks/to-do/TASK-039-data-node-architecture-v1.md`                |
-| `TASK-040` | `to-do`          | `Greenhouse_Data_Node_Architecture_v2` (supporting spec)           | `docs/tasks/to-do/TASK-040-data-node-architecture-v2.md`                |
+| `TASK-039` | `to-do`          | `Data Node Product Vision (Legacy Reference)`                      | `docs/tasks/to-do/TASK-039-data-node-architecture-v1.md`                |
+| `TASK-040` | `to-do`          | `Data Node Operating Baseline`                                     | `docs/tasks/to-do/TASK-040-data-node-architecture-v2.md`                |
 
 | `TASK-041` | `complete` | `CODEX_TASK_Staff_Augmentation_HRIS_Addendum` (absorbida) | `docs/tasks/complete/TASK-041-staff-augmentation-hris-addendum.md` |
 | `TASK-042` | `to-do` | Person Operational Serving Cutover | `docs/tasks/to-do/TASK-042-person-operational-serving-cutover.md` |

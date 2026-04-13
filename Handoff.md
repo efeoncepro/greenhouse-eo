@@ -1,5 +1,22 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — TASK-039 y TASK-040 ya no compiten como la misma lane
+
+- alcance documental:
+  - `docs/tasks/to-do/TASK-039-data-node-architecture-v1.md`
+  - `docs/tasks/to-do/TASK-040-data-node-architecture-v2.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+- decisión tomada:
+  - `TASK-039` queda rescatada como referencia legacy de visión del Data Node
+  - `TASK-040` queda rebaselined como baseline técnica/operativa vigente
+- actualización clave:
+  - `TASK-039` deja de leerse como backlog ejecutable independiente
+  - `TASK-040` absorbe el reality check del repo actual, el split con sister platforms y el mapa de follow-ons
+  - el Data Node ya no se modela como una pieza única, sino como secuencia `DN0 -> DN1 -> DN2 -> DN3`
+- validación:
+  - `git diff --check`
+
 ## Sesion 2026-04-13 — TASK-156 ahora explicita tambien la capa SLI
 
 - alcance documental:

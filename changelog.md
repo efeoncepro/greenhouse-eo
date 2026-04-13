@@ -2,6 +2,12 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — TASK-039 y TASK-040 quedan rescatadas con roles distintos
+
+- `docs/tasks/to-do/TASK-039-data-node-architecture-v1.md` ahora queda explícita como referencia legacy de visión y no como baseline técnica ejecutable.
+- `docs/tasks/to-do/TASK-040-data-node-architecture-v2.md` ahora queda formalizada como baseline técnica/operativa del Data Node sobre el runtime actual.
+- `docs/tasks/TASK_ID_REGISTRY.md` y `docs/tasks/README.md` quedaron alineados para que `039` y `040` ya no compitan como si fueran la misma lane.
+
 ### 2026-04-13 — TASK-156 ahora incluye explícitamente SLI además de SLO y SLA
 
 - `docs/tasks/to-do/TASK-156-sla-slo-per-service.md` ahora define la cadena correcta `SLI -> SLO -> SLA` por servicio.
