@@ -7,6 +7,7 @@ Panel operativo de tasks del repo.
 - Las tasks nuevas deben usar `TASK-###` como ID estable.
 - Los `CODEX_TASK_*` existentes siguen vigentes como legacy hasta su migracion.
 - El numero de `TASK-###` no define prioridad mutable; el orden actual vive en `Rank` y en el backlog priorizado de este indice.
+- Cerrar una task exige sincronizar ambas cosas: carpeta de lifecycle (`to-do/`, `in-progress/`, `complete/`) y campo `Lifecycle` dentro del markdown. Si una de las dos no cambió, la task sigue abierta.
 - Plantilla copiable para crear tasks:
   - [TASK_TEMPLATE.md](TASK_TEMPLATE.md)
 - Protocolo completo (Plan Mode, Skill, Subagent, derivacion de Checkpoint/Mode):

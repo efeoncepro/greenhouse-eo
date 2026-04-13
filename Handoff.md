@@ -1,5 +1,23 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — hardening del lifecycle de tasks para forzar cierre real
+
+- alcance documental:
+  - `docs/tasks/TASK_TEMPLATE.md`
+  - `docs/tasks/TASK_PROCESS.md`
+  - `docs/tasks/README.md`
+  - `AGENTS.md`
+  - `CLAUDE.md`
+- problema atacado:
+  - algunos agentes estaban terminando la implementación pero dejaban la task en `in-progress/`
+  - el protocolo anterior dejaba el cierre genérico demasiado implícito y fácil de omitir
+- ajuste aplicado:
+  - tomar una task ahora exige moverla a `in-progress/` y sincronizar `Lifecycle` dentro del markdown
+  - cerrar una task ahora exige cambiar `Lifecycle` a `complete`, mover el archivo a `complete/` y sincronizar `README`
+  - se declaró explícitamente que una task no puede reportarse como "cerrada" si sigue en `in-progress/`
+- validación:
+  - `git diff --check`
+
 ## Sesion 2026-04-13 — TASK-039 y TASK-040 ya no compiten como la misma lane
 
 - alcance documental:

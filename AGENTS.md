@@ -550,15 +550,24 @@ Antes de crear una task nueva:
 ### Al iniciar trabajo en una task
 
 1. Mover el archivo de la task de `to-do/` a `in-progress/`
-2. Actualizar `docs/tasks/README.md` — cambiar estado a `In Progress`
-3. Registrar en `Handoff.md` qué task se está trabajando, rama y objetivo
+2. Cambiar `Lifecycle` dentro del markdown a `in-progress`
+3. Verificar que carpeta y `Lifecycle` digan lo mismo
+4. Actualizar `docs/tasks/README.md` — cambiar estado a `In Progress`
+5. Registrar en `Handoff.md` qué task se está trabajando, rama y objetivo
 
 ### Al completar una task
 
-1. Mover el archivo de `in-progress/` a `complete/`
-2. Actualizar `docs/tasks/README.md` — mover entrada a sección `Complete` con resumen de lo implementado
-3. Documentar en `Handoff.md` y `changelog.md`
-4. Ejecutar el chequeo de impacto cruzado (ver abajo)
+1. Cambiar `Lifecycle` dentro del markdown a `complete`
+2. Mover el archivo de `in-progress/` a `complete/`
+3. Verificar que carpeta y `Lifecycle` digan lo mismo
+4. Actualizar `docs/tasks/README.md` — mover entrada a sección `Complete` con resumen de lo implementado
+5. Documentar en `Handoff.md` y `changelog.md`
+6. Ejecutar el chequeo de impacto cruzado (ver abajo)
+
+Regla dura:
+
+- una task no está cerrada si el trabajo terminó pero el archivo sigue en `in-progress/`
+- un agente no debe reportar "task completada" al usuario mientras `Lifecycle` siga en `in-progress`
 
 ### Chequeo de impacto cruzado (obligatorio al cerrar)
 

@@ -1,5 +1,19 @@
 # project_context.md
 
+## Delta 2026-04-13 Task lifecycle hardening para cierres reales
+
+- El protocolo de tasks ya no considera "terminada" una task solo porque la implementación quedó lista.
+- Runtime documental actualizado:
+  - `docs/tasks/TASK_TEMPLATE.md`
+  - `docs/tasks/TASK_PROCESS.md`
+  - `docs/tasks/README.md`
+  - `AGENTS.md`
+  - `CLAUDE.md`
+- Contrato operativo nuevo:
+  - al tomar una task, el agente debe moverla a `docs/tasks/in-progress/` y sincronizar `Lifecycle: in-progress`
+  - al cerrarla, debe cambiar `Lifecycle` a `complete`, moverla a `docs/tasks/complete/` y sincronizar `docs/tasks/README.md`
+  - una task no puede reportarse como cerrada al usuario mientras el archivo siga en `in-progress/` o con `Lifecycle: in-progress`
+
 ## Delta 2026-04-13 Structured Context Layer ya tiene foundation runtime en repo
 
 - `TASK-380` ya materializó la base runtime de la Structured Context Layer dentro del repo.

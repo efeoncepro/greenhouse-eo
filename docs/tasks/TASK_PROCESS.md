@@ -56,9 +56,14 @@ ZONE 4 — Verification & Closing     "Como compruebo que termine y que actualiz
 
 1. **Leer Zone 0.** Si `Lifecycle = complete` -> STOP, la task ya cerro. Si `Blocked by` tiene items -> STOP, no es ejecutable aun.
 2. **Leer Zone 1.** Abrir y leer cada documento listado en `Architecture Alignment` y `Normative Docs`. Si algun doc no existe en el repo -> reportar antes de continuar. Crear branch: `task/TASK-###-short-slug`.
-3. **Ejecutar Zone 2** (Plan Mode). Producir el plan. Commitear `plan.md` al branch. Aplicar regla de checkpoint. **Zone 2 la ejecuta el agente que toma la task, no se llena al crearla.**
-4. **Leer Zone 3** solo despues de que el plan este aprobado (o auto-aprobado). Ejecutar slice por slice.
-5. **Ejecutar Zone 4** al cerrar cada slice y al cerrar la task completa.
+3. **Tomar ownership operativo.** Antes del primer cambio de codigo o de docs de la task:
+   - mover el archivo a `docs/tasks/in-progress/`
+   - cambiar `Lifecycle` a `in-progress`
+   - actualizar `docs/tasks/README.md`
+   - registrar en `Handoff.md` que la task fue tomada
+4. **Ejecutar Zone 2** (Plan Mode). Producir el plan. Commitear `plan.md` al branch. Aplicar regla de checkpoint. **Zone 2 la ejecuta el agente que toma la task, no se llena al crearla.**
+5. **Leer Zone 3** solo despues de que el plan este aprobado (o auto-aprobado). Ejecutar slice por slice.
+6. **Ejecutar Zone 4** al cerrar cada slice y al cerrar la task completa.
 
 > Para tasks `umbrella` o `policy`: el agente salta Zone 2 y Zone 3. Su trabajo es Zone 0 -> Zone 1 -> Acceptance Criteria.
 
@@ -84,8 +89,10 @@ Reglas:
 - `TASK-###` no cambia cuando cambia el backlog
 - `Rank` si puede cambiar
 - `Lifecycle` cambia cuando el archivo se mueve entre `to-do/`, `in-progress/` y `complete/`
+- `Lifecycle` dentro del markdown y la carpeta donde vive el archivo deben decir lo mismo; si no coinciden, la task esta mal cerrada
 - `Status real` describe madurez de runtime, no solo estado administrativo
 - `Checkpoint` y `Mode` se derivan automaticamente de Priority x Effort (ver tablas abajo) — el agente los calcula al tomar la task, no se declaran en el archivo
+- una task no puede declararse "terminada" ante el usuario mientras siga en `in-progress/` o con `Lifecycle: in-progress`
 
 ---
 
@@ -237,7 +244,15 @@ Cuando el checkpoint es auto-aprobable:
 - Correr todos los checks de `## Verification`
 - Marcar acceptance criteria como completados
 - Si la task dejo follow-ups -> crear issues o documentar en `## Follow-ups`
-- Ejecutar el cierre segun `CLAUDE.md` § Task Lifecycle Protocol (mover archivo, actualizar README, Handoff.md, changelog.md, chequeo de impacto cruzado)
+- Ejecutar el cierre documental y de lifecycle. La task sigue abierta hasta completar TODO este bloque:
+  1. cambiar `Lifecycle` a `complete`
+  2. mover el archivo a `docs/tasks/complete/`
+  3. actualizar `docs/tasks/README.md`
+  4. actualizar `Handoff.md`
+  5. actualizar `changelog.md` si hubo cambio real de comportamiento, estructura o protocolo
+  6. ejecutar el chequeo de impacto cruzado
+- Si el trabajo implementado quedo listo pero falta alguno de los puntos anteriores, el estado correcto sigue siendo `in-progress`
+- El agente no debe responder "listo", "cerrado" o equivalente mientras la task siga viva en `docs/tasks/in-progress/`
 
 ---
 

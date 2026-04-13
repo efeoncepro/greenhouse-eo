@@ -2,6 +2,12 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — Lifecycle de tasks endurecido para evitar cierres a medias
+
+- `docs/tasks/TASK_TEMPLATE.md` ahora deja el cierre como parte explícita de Definition of Done: sincronizar `Lifecycle`, mover el archivo y actualizar `docs/tasks/README.md`.
+- `docs/tasks/TASK_PROCESS.md` ahora obliga a tomar ownership moviendo la task a `in-progress/` antes de empezar y prohíbe reportarla como cerrada mientras siga viva allí.
+- `AGENTS.md`, `CLAUDE.md` y `docs/tasks/README.md` quedaron alineados con la misma regla dura para que el protocolo no dependa de una sola fuente.
+
 ### 2026-04-13 — TASK-039 y TASK-040 quedan rescatadas con roles distintos
 
 - `docs/tasks/to-do/TASK-039-data-node-architecture-v1.md` ahora queda explícita como referencia legacy de visión y no como baseline técnica ejecutable.
