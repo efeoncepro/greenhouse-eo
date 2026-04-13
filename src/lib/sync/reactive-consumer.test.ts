@@ -46,6 +46,14 @@ vi.mock('./refresh-queue', () => ({
   markRefreshFailed: (...args: unknown[]) => mockMarkRefreshFailed(...args)
 }))
 
+// The real Cloud Monitoring emitter spawns a GoogleAuth task on first use
+// that rejects asynchronously when ADC is missing (CI). Mocking it here
+// keeps the consumer test hermetic and prevents the post-test unhandled
+// rejection that breaks CI runs.
+vi.mock('@/lib/operations/cloud-monitoring-emitter', () => ({
+  emitConsumerRunMetrics: vi.fn().mockResolvedValue(undefined)
+}))
+
 import { buildReactiveHandlerKey, processReactiveEvents } from './reactive-consumer'
 
 const buildProjection = (overrides: Partial<ProjectionDefinition> = {}): ProjectionDefinition => ({

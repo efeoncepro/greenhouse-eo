@@ -29,6 +29,20 @@
 // ops-worker instead.
 // ============================================================
 
+import { createRequire } from 'node:module'
+
+// Bypass the `server-only` runtime guard so this script can import the V2
+// consumer (which lives behind `import 'server-only'`) under tsx. Same
+// pattern used by the other backfill scripts in this directory.
+const _require = createRequire(import.meta.url)
+const _moduleCache = (_require('module') as { _cache: Record<string, unknown> })._cache
+
+_moduleCache[_require.resolve('server-only')] = {
+  id: 'server-only',
+  exports: {},
+  loaded: true
+}
+
 import {
   applyGreenhousePostgresProfile,
   loadGreenhouseToolEnv,

@@ -72,7 +72,25 @@ type MetricServiceClientShape = {
 let clientPromise: Promise<MetricServiceClientShape | null> | null = null
 let missingProjectWarningEmitted = false
 
+/**
+ * Defense-in-depth: never instantiate the SDK during unit tests. The
+ * @google-cloud/monitoring client kicks off GoogleAuth metadata lookups in
+ * the background that reject asynchronously when ADC is missing, producing
+ * unhandled rejections that fail CI even when individual tests pass and
+ * even when callers mock this module. Tests can still opt into the real
+ * emitter by setting GREENHOUSE_REACTIVE_FORCE_REAL_EMITTER=1.
+ */
+const isTestEnvironment = (): boolean => {
+  if (process.env.GREENHOUSE_REACTIVE_FORCE_REAL_EMITTER === '1') return false
+
+  return Boolean(process.env.VITEST) || process.env.NODE_ENV === 'test'
+}
+
 const loadClient = async (): Promise<MetricServiceClientShape | null> => {
+  if (isTestEnvironment()) {
+    return null
+  }
+
   const projectId = process.env.GCP_PROJECT?.trim()
 
   if (!projectId) {
