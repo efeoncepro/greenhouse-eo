@@ -429,3 +429,4 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-377` | `to-do` | Kortex Operational Intelligence Bridge | `docs/tasks/to-do/TASK-377-kortex-operational-intelligence-bridge.md` |
 | `TASK-378` | `to-do` | Dashboard SSR Error Resilience | `docs/tasks/to-do/TASK-378-dashboard-ssr-error-resilience.md` |
 | `TASK-379` | `to-do` | Reactive Projections Enterprise Hardening | `docs/tasks/to-do/TASK-379-reactive-projections-enterprise-hardening.md` |
+| `TASK-380` | `to-do` | Structured Context Layer Foundation | `docs/tasks/to-do/TASK-380-structured-context-layer-foundation.md` |

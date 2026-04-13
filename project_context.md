@@ -1,5 +1,23 @@
 # project_context.md
 
+## Delta 2026-04-13 Structured Context Layer formalizada como foundation arquitectónica
+
+- Greenhouse ahora tiene una decisión arquitectónica explícita para usar JSONB de forma gobernada sin degradar el modelo relacional.
+- Runtime documental nuevo:
+  - `docs/architecture/GREENHOUSE_STRUCTURED_CONTEXT_LAYER_V1.md`
+  - `docs/tasks/to-do/TASK-380-structured-context-layer-foundation.md`
+- Contrato operativo:
+  - la capa se llama `Structured Context Layer`
+  - vive conceptualmente en el schema `greenhouse_context`
+  - funciona como sidecar del modelo canónico, no como reemplazo de tablas relacionales
+  - todo documento debe ser tenant-safe, tipado por `context_kind` y versionado por `schema_version`
+  - se orienta a integraciones, replay reactivo, trazabilidad operativa y memoria estructurada para trabajo asistido por agentes
+- criterio de modelado:
+  - si un dato se vuelve transaccional, consultable de forma intensiva o contractual para negocio, debe promocionarse a tabla relacional
+  - JSONB queda reservado para contexto flexible, payloads normalizados, snapshots controlados y bundles de auditoría
+- siguiente paso planificado:
+  - `TASK-380` materializa schema, runtime tipado, taxonomía inicial y primeros pilotos
+
 ## Delta 2026-04-13 Lane formal de mini-tasks para mejoras chicas planificadas
 
 - Greenhouse ya tiene una lane documental intermedia para cambios chicos que no deben ejecutarse "al vuelo" pero tampoco justifican una `TASK-###` completa.
