@@ -23,7 +23,7 @@ Usar `MINI-###` para cambios como:
 
 ## Siguiente ID disponible
 
-`MINI-002`
+`MINI-003`
 
 ## To Do
 
@@ -38,3 +38,4 @@ Sin mini-tasks en curso.
 | ID         | Título | Dominio | Impacto | Estado |
 | ---------- | ------ | ------- | ------- | ------ |
 | `MINI-001` | [OC debe seleccionar contacto desde lista asociada al cliente](complete/MINI-001-po-client-contact-selector.md) | finance | Medio | complete |
+| `MINI-002` | [HES debe usar contacto vinculado al cliente y heredar respaldo desde la OC](complete/MINI-002-hes-client-contact-and-po-document-inheritance.md) | finance | Medio | complete |

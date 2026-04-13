@@ -1,5 +1,27 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — MINI-002 cerrada: HES reutiliza contactos del cliente y hereda respaldo desde la OC
+
+- alcance implementado:
+  - `src/views/greenhouse/finance/drawers/CreateHesDrawer.tsx`
+  - helper nuevo `src/views/greenhouse/finance/drawers/financeClientContacts.ts`
+  - refactor menor de reuse en `src/views/greenhouse/finance/drawers/CreatePurchaseOrderDrawer.tsx`
+- comportamiento nuevo:
+  - HES ya no usa nombre/email abiertos como camino principal
+  - el contacto se selecciona desde los contactos asociados al cliente, con el mismo patrón que OC
+  - el email se completa desde el contacto vinculado
+  - se mantiene fallback manual explícito si el contacto no existe todavía
+  - HES ya no expone `URL del documento (PDF)` como campo editable
+  - si la OC vinculada tiene respaldo, la HES hereda ese documento y lo informa en la UI
+- criterio de escalabilidad:
+  - la carga de contactos asociados quedó extraída a un helper compartido del módulo Finance para evitar duplicidad entre OC y HES
+- verificación:
+  - `pnpm lint -- src/views/greenhouse/finance/drawers/financeClientContacts.ts src/views/greenhouse/finance/drawers/CreatePurchaseOrderDrawer.tsx src/views/greenhouse/finance/drawers/CreateHesDrawer.tsx`
+  - `pnpm build`
+- documentación:
+  - mini-task cerrada en `docs/mini-tasks/complete/MINI-002-hes-client-contact-and-po-document-inheritance.md`
+  - tracker y registry de mini-tasks actualizados
+
 ## Sesion 2026-04-13 — ISSUE-045 abierto: registrar OC cae por `client_id` ambiguo en Finance canonical
 
 - incidente:

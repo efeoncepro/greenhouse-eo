@@ -4,15 +4,18 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { toast } from 'react-toastify'
 
+import Autocomplete from '@mui/material/Autocomplete'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
+import CircularProgress from '@mui/material/CircularProgress'
 import Divider from '@mui/material/Divider'
 import Drawer from '@mui/material/Drawer'
 import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
+import Link from '@mui/material/Link'
 import LinearProgress from '@mui/material/LinearProgress'
 import MenuItem from '@mui/material/MenuItem'
 import Stack from '@mui/material/Stack'
@@ -20,6 +23,11 @@ import Typography from '@mui/material/Typography'
 
 import CustomChip from '@core/components/mui/Chip'
 import CustomTextField from '@core/components/mui/TextField'
+import {
+  getContactOptionLabel,
+  loadFinanceClientContactOptions,
+  type FinanceContactOption
+} from './financeClientContacts'
 
 // ── Types ──
 
@@ -40,6 +48,9 @@ interface POOption {
   invoicedAmountClp: number
   remainingAmountClp: number
   status: string
+  contactName: string | null
+  contactEmail: string | null
+  attachmentUrl: string | null
 }
 
 const getClientLabel = (c: ClientOption) =>
@@ -91,7 +102,6 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
   const [currency, setCurrency] = useState('CLP')
   const [clientContactName, setClientContactName] = useState('')
   const [clientContactEmail, setClientContactEmail] = useState('')
-  const [attachmentUrl, setAttachmentUrl] = useState('')
   const [notes, setNotes] = useState('')
 
   // Lifecycle action fields
@@ -105,8 +115,16 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
   const [loadingClients, setLoadingClients] = useState(false)
   const [activePOs, setActivePOs] = useState<POOption[]>([])
   const [selectedPO, setSelectedPO] = useState<POOption | null>(null)
+  const [clientContacts, setClientContacts] = useState<FinanceContactOption[]>([])
+  const [loadingContacts, setLoadingContacts] = useState(false)
+  const [contactMode, setContactMode] = useState<'linked' | 'manual'>('linked')
+  const [selectedContact, setSelectedContact] = useState<FinanceContactOption | null>(null)
+  const [contactsError, setContactsError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const selectedClient = clients.find(client => getClientValue(client) === selectedClientKey) || null
+  const resolvedDocumentUrl = selectedPO?.attachmentUrl || editHes?.attachmentUrl || ''
 
   // ── Populate form when editing ──
 
@@ -122,7 +140,6 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
       setAmount(String(editHes.amount))
       setClientContactName(editHes.clientContactName || '')
       setClientContactEmail(editHes.clientContactEmail || '')
-      setAttachmentUrl(editHes.attachmentUrl || '')
       setNotes(editHes.notes || '')
     }
   }, [editHes, open])
@@ -181,7 +198,6 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
   const handleClientChange = (value: string) => {
     setSelectedClientKey(value)
     setSelectedPoId('')
-    setSelectedPO(null)
 
     const client = clients.find(item => getClientValue(item) === value) || null
 
@@ -190,10 +206,6 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
 
   const handlePOChange = (value: string) => {
     setSelectedPoId(value)
-
-    const po = activePOs.find(p => p.poId === value)
-
-    setSelectedPO(po || null)
   }
 
   // ── Fetch POs on edit load ──
@@ -209,6 +221,96 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
     }
   }, [editHes, open, fetchPOs])
 
+  useEffect(() => {
+    if (!selectedClientKey || !selectedClient) {
+      setClientContacts([])
+      setLoadingContacts(false)
+      setContactMode('linked')
+      setSelectedContact(null)
+      setContactsError(null)
+      setClientContactName(editHes?.clientContactName || '')
+      setClientContactEmail(editHes?.clientContactEmail || '')
+
+      return
+    }
+
+    let active = true
+
+    const run = async () => {
+      setLoadingContacts(true)
+      setContactsError(null)
+      setClientContacts([])
+      setSelectedContact(null)
+      setClientContactName('')
+      setClientContactEmail('')
+
+      try {
+        const nextContacts = await loadFinanceClientContactOptions({
+          selectedClientKey,
+          selectedClient
+        })
+
+        if (!active) return
+
+        setClientContacts(nextContacts)
+        setContactMode(nextContacts.length > 0 ? 'linked' : 'manual')
+
+        if (nextContacts.length === 0) {
+          setContactsError('Este cliente no tiene contactos vinculados todavía. Puedes registrar el contacto manualmente.')
+        }
+      } catch {
+        if (!active) return
+
+        setContactMode('manual')
+        setContactsError('No pudimos cargar los contactos vinculados. Puedes registrar el contacto manualmente.')
+      } finally {
+        if (active) {
+          setLoadingContacts(false)
+        }
+      }
+    }
+
+    run()
+
+    return () => {
+      active = false
+    }
+  }, [editHes?.clientContactEmail, editHes?.clientContactName, selectedClient, selectedClientKey])
+
+  useEffect(() => {
+    if (!selectedPoId) {
+      setSelectedPO(null)
+
+      return
+    }
+
+    const po = activePOs.find(item => item.poId === selectedPoId) || null
+
+    setSelectedPO(po)
+  }, [activePOs, selectedPoId])
+
+  useEffect(() => {
+    if (contactMode !== 'linked') {
+      return
+    }
+
+    const preferredEmail = selectedPO?.contactEmail?.trim() || editHes?.clientContactEmail?.trim() || ''
+
+    if (!preferredEmail || clientContacts.length === 0) {
+      return
+    }
+
+    const matchedContact = clientContacts.find(contact => contact.email.trim().toLowerCase() === preferredEmail.toLowerCase())
+
+    if (!matchedContact) {
+      return
+    }
+
+    setSelectedContact(matchedContact)
+    setClientContactName(matchedContact.name)
+    setClientContactEmail(matchedContact.email)
+  }, [clientContacts, contactMode, editHes?.clientContactEmail, selectedPO?.contactEmail])
+
   // ── Form ──
 
   const resetForm = () => {
@@ -223,8 +325,12 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
     setCurrency('CLP')
     setClientContactName('')
     setClientContactEmail('')
-    setAttachmentUrl('')
     setNotes('')
+    setClientContacts([])
+    setLoadingContacts(false)
+    setContactMode('linked')
+    setSelectedContact(null)
+    setContactsError(null)
     setShowApproveField(false)
     setApprovedBy('')
     setShowRejectField(false)
@@ -235,6 +341,23 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
   }
 
   const handleClose = () => { resetForm(); onClose() }
+
+  const handleContactSelect = (_event: unknown, value: FinanceContactOption | null) => {
+    setSelectedContact(value)
+    setClientContactName(value?.name ?? '')
+    setClientContactEmail(value?.email ?? '')
+  }
+
+  const handleUseManualContact = () => {
+    setContactMode('manual')
+  }
+
+  const handleUseLinkedContact = () => {
+    setContactMode('linked')
+    setSelectedContact(null)
+    setClientContactName('')
+    setClientContactEmail('')
+  }
 
   const handleSubmit = async () => {
     if (!hesNumber.trim() || !selectedClientKey || !serviceDescription.trim() || !amount.trim()) {
@@ -275,7 +398,7 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
           ...(deliverablesSummary.trim() && { deliverablesSummary: deliverablesSummary.trim() }),
           ...(clientContactName.trim() && { clientContactName: clientContactName.trim() }),
           ...(clientContactEmail.trim() && { clientContactEmail: clientContactEmail.trim() }),
-          ...(attachmentUrl.trim() && { attachmentUrl: attachmentUrl.trim() }),
+          ...(resolvedDocumentUrl && { attachmentUrl: resolvedDocumentUrl }),
           ...(notes.trim() && { notes: notes.trim() })
         })
       })
@@ -492,27 +615,114 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
         />
 
         <Divider />
-        <Typography variant='subtitle2' color='text.secondary'>Contacto y adjunto</Typography>
+        <Typography variant='subtitle2' color='text.secondary'>Contacto y respaldo</Typography>
 
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <CustomTextField
-              fullWidth size='small' label='Contacto del cliente' disabled={isReadOnly}
-              value={clientContactName} onChange={e => setClientContactName(e.target.value)}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <CustomTextField
-              fullWidth size='small' label='Email contacto' type='email' disabled={isReadOnly}
-              value={clientContactEmail} onChange={e => setClientContactEmail(e.target.value)}
-            />
-          </Grid>
-        </Grid>
+        {!selectedClientKey ? (
+          <Alert severity='info'>Selecciona primero el cliente para cargar sus contactos vinculados.</Alert>
+        ) : (
+          <Stack spacing={2}>
+            {contactsError && <Alert severity='warning'>{contactsError}</Alert>}
 
-        <CustomTextField
-          fullWidth size='small' label='URL del documento (PDF)' disabled={isReadOnly}
-          value={attachmentUrl} onChange={e => setAttachmentUrl(e.target.value)}
-        />
+            {contactMode === 'linked' ? (
+              <>
+                <Autocomplete<FinanceContactOption, false, false, false>
+                  options={clientContacts}
+                  value={selectedContact}
+                  onChange={handleContactSelect}
+                  getOptionLabel={getContactOptionLabel}
+                  isOptionEqualToValue={(option, value) => option.email === value.email}
+                  loading={loadingContacts}
+                  disabled={isReadOnly || loadingContacts || clientContacts.length === 0}
+                  renderInput={params => (
+                    <CustomTextField
+                      {...params}
+                      fullWidth
+                      size='small'
+                      label='Seleccionar contacto'
+                      placeholder={loadingContacts ? 'Cargando contactos...' : 'Elegir contacto del cliente'}
+                      helperText='El nombre y el email se completan desde el contacto vinculado.'
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: (
+                          <>
+                            {loadingContacts ? <CircularProgress color='inherit' size={18} /> : null}
+                            {params.InputProps.endAdornment}
+                          </>
+                        )
+                      }}
+                    />
+                  )}
+                />
+
+                <CustomTextField
+                  fullWidth
+                  size='small'
+                  label='Email contacto'
+                  type='email'
+                  value={clientContactEmail}
+                  disabled
+                  helperText='Email completado desde el contacto vinculado.'
+                />
+
+                {!isReadOnly && (
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button size='small' variant='text' color='primary' onClick={handleUseManualContact}>
+                      No encuentro el contacto
+                    </Button>
+                  </Box>
+                )}
+              </>
+            ) : (
+              <>
+                {!isReadOnly && clientContacts.length > 0 && (
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button size='small' variant='text' color='primary' onClick={handleUseLinkedContact}>
+                      Usar contacto vinculado
+                    </Button>
+                  </Box>
+                )}
+
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <CustomTextField
+                      fullWidth
+                      size='small'
+                      label='Contacto del cliente'
+                      disabled={isReadOnly}
+                      value={clientContactName}
+                      onChange={e => setClientContactName(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <CustomTextField
+                      fullWidth
+                      size='small'
+                      label='Email contacto'
+                      type='email'
+                      disabled={isReadOnly}
+                      value={clientContactEmail}
+                      onChange={e => setClientContactEmail(e.target.value)}
+                    />
+                  </Grid>
+                </Grid>
+              </>
+            )}
+
+            {resolvedDocumentUrl ? (
+              <Alert severity='info'>
+                Esta HES usará el respaldo de la OC vinculada.{' '}
+                <Link href={resolvedDocumentUrl} target='_blank' rel='noreferrer'>
+                  Abrir documento
+                </Link>
+              </Alert>
+            ) : selectedPO ? (
+              <Alert severity='warning'>La OC vinculada no tiene un documento cargado.</Alert>
+            ) : (
+              <Alert severity='info'>La HES no admite adjuntos propios. Si necesitas respaldo, vincula una OC con documento.</Alert>
+            )}
+          </Stack>
+        )}
+
         <CustomTextField
           fullWidth size='small' label='Notas' multiline rows={2} disabled={isReadOnly}
           value={notes} onChange={e => setNotes(e.target.value)}

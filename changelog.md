@@ -2,6 +2,13 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — HES ahora reutiliza contactos del cliente y hereda respaldo desde la OC vinculada
+
+- `Finance > HES > Registrar HES` ahora carga contactos asociados solo al cliente seleccionado, igual que el flujo de OC.
+- El contacto principal se elige desde un selector y el email se completa desde ese vínculo; el fallback manual queda como excepción explícita.
+- La HES ya no pide `URL del documento (PDF)` como campo editable.
+- Si la HES se vincula a una OC con respaldo cargado, hereda ese documento automáticamente.
+
 ### 2026-04-13 — Finance canonical blinda el lookup de client profiles para evitar `client_id` ambiguo
 
 - Se corrigió `src/lib/finance/canonical.ts` para calificar con alias `cp.` los filtros del lookup de `client_profiles` cuando el resolver une `greenhouse_core.spaces`.
