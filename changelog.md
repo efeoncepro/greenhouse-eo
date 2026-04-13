@@ -2,6 +2,32 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — Lifecycle de tasks endurecido para evitar cierres a medias
+
+- `docs/tasks/TASK_TEMPLATE.md` ahora deja el cierre como parte explícita de Definition of Done: sincronizar `Lifecycle`, mover el archivo y actualizar `docs/tasks/README.md`.
+- `docs/tasks/TASK_PROCESS.md` ahora obliga a tomar ownership moviendo la task a `in-progress/` antes de empezar y prohíbe reportarla como cerrada mientras siga viva allí.
+- `AGENTS.md`, `CLAUDE.md` y `docs/tasks/README.md` quedaron alineados con la misma regla dura para que el protocolo no dependa de una sola fuente.
+
+### 2026-04-13 — TASK-039 y TASK-040 quedan rescatadas con roles distintos
+
+- `docs/tasks/to-do/TASK-039-data-node-architecture-v1.md` ahora queda explícita como referencia legacy de visión y no como baseline técnica ejecutable.
+- `docs/tasks/to-do/TASK-040-data-node-architecture-v2.md` ahora queda formalizada como baseline técnica/operativa del Data Node sobre el runtime actual.
+- `docs/tasks/TASK_ID_REGISTRY.md` y `docs/tasks/README.md` quedaron alineados para que `039` y `040` ya no compitan como si fueran la misma lane.
+
+### 2026-04-13 — TASK-156 ahora incluye explícitamente SLI además de SLO y SLA
+
+- `docs/tasks/to-do/TASK-156-sla-slo-per-service.md` ahora define la cadena correcta `SLI -> SLO -> SLA` por servicio.
+- La lane deja explícito que primero se modela la métrica observable, luego el objetivo operativo y finalmente el compromiso contractual.
+- La task ahora exige también CRUD en Admin Center para setear y gobernar esas definiciones por servicio.
+- `docs/tasks/TASK_ID_REGISTRY.md` quedó alineado con el título `SLI/SLO/SLA Contractual per Service`.
+
+### 2026-04-13 — TASK-031 queda rebaselined al runtime actual
+
+- `docs/tasks/to-do/TASK-031-hris-performance-evaluations.md` fue reescrita al template canónico vigente.
+- La lane deja de asumir BigQuery directo y fija `greenhouse_serving.ico_member_metrics` como source cuantitativa canónica para evaluaciones.
+- `TASK-029` pasa a modelarse como integración soft: el módulo puede existir sin goals materializados y degradar a `null` en ese componente del summary.
+- `docs/tasks/TASK_ID_REGISTRY.md` quedó alineado con el título canónico `HRIS Performance Evaluations`.
+
 ### 2026-04-13 — TASK-025 queda rescatada como policy canónica de FTR para Payroll
 
 - `docs/tasks/to-do/TASK-025-hr-payroll-module-delta-ftr.md` fue reescrita para dejar de ser un brief destructivo de implementación.

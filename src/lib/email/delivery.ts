@@ -2,8 +2,12 @@ import 'server-only'
 
 import { randomUUID } from 'crypto'
 
+import * as Sentry from '@sentry/nextjs'
+
 import { getEmailFromAddress, getResendClient, isResendConfigured } from '@/lib/resend'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
+import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 import { resolveEmailContext, EmailUndeliverableError } from './context-resolver'
 import { checkRecipientRateLimit } from './rate-limit'
@@ -15,12 +19,37 @@ import type {
   EmailAttachment,
   EmailDeliveryPayload,
   EmailRecipient,
+  EmailPriority,
   EmailType,
   SendEmailInput,
   SendEmailResult
 } from './types'
+import { EMAIL_PRIORITY_MAP } from './types'
+
+// ── Broadcast types that include List-Unsubscribe header ──
+const BROADCAST_EMAIL_TYPES: EmailType[] = ['payroll_export', 'notification', 'payroll_receipt']
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase()
+
+// ── Kill switch: check if email type is enabled ──
+const checkEmailTypeEnabled = async (emailType: string): Promise<{ enabled: boolean; pausedReason?: string }> => {
+  try {
+    const rows = await runGreenhousePostgresQuery<{ enabled: boolean; paused_reason: string | null } & Record<string, unknown>>(
+      `SELECT enabled, paused_reason FROM greenhouse_notifications.email_type_config WHERE email_type = $1`,
+      [emailType]
+    )
+
+    if (!rows[0]) return { enabled: true }
+
+    return {
+      enabled: rows[0].enabled === true,
+      pausedReason: rows[0].paused_reason ?? undefined
+    }
+  } catch {
+    // Non-blocking: if kill switch check fails, allow sending
+    return { enabled: true }
+  }
+}
 
 const mergeAttachments = (
   templateAttachments: EmailAttachment[] | undefined,
@@ -150,6 +179,8 @@ const createDeliveryRow = async (input: {
   sourceEntity?: string
   actorEmail?: string
   errorMessage?: string | null
+  priority?: EmailPriority
+  errorClass?: string | null
 }) => {
   const rows = await runGreenhousePostgresQuery<{ delivery_id: string } & Record<string, unknown>>(
     `
@@ -169,11 +200,13 @@ const createDeliveryRow = async (input: {
         source_entity,
         actor_email,
         error_message,
+        priority,
+        error_class,
         attempt_number,
         created_at,
         updated_at
       ) VALUES (
-        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::jsonb, $12, $13, $14, $15, 1, NOW(), NOW()
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::jsonb, $12, $13, $14, $15, $16, $17, 1, NOW(), NOW()
       )
       RETURNING delivery_id
     `,
@@ -192,7 +225,9 @@ const createDeliveryRow = async (input: {
       input.sourceEventId ?? null,
       input.sourceEntity ?? null,
       input.actorEmail ?? null,
-      input.errorMessage ?? null
+      input.errorMessage ?? null,
+      input.priority ?? 'broadcast',
+      input.errorClass ?? null
     ]
   )
 
@@ -247,7 +282,7 @@ const claimFailedDelivery = async (deliveryId: string) => {
           error_message = NULL,
           updated_at = NOW()
       WHERE delivery_id = $1
-        AND status = 'failed'
+        AND status IN ('failed', 'rate_limited')
         AND attempt_number < 3
       RETURNING
         delivery_id,
@@ -285,6 +320,7 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
   sourceEntity?: string
   actorEmail?: string
   existingDeliveryId?: string | null
+  priority?: EmailPriority
 }) => {
   const basePayload = normalizePayload({
     recipients: [input.recipient],
@@ -365,9 +401,9 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
       )
     }
 
-    // ── Rate Limit: check per-recipient hourly limit ──
+    // ── Rate Limit: check per-recipient hourly limit (critical/transactional bypass) ──
     if (!input.existingDeliveryId) {
-      const rateCheck = await checkRecipientRateLimit(input.recipient.email)
+      const rateCheck = await checkRecipientRateLimit(input.recipient.email, undefined, input.priority)
 
       if (!rateCheck.allowed) {
         const errorMessage = `Rate limit exceeded: ${rateCheck.currentCount} emails/hour to ${input.recipient.email}`
@@ -401,10 +437,10 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
     }
 
     // ── Unsubscribe URL: only for broadcast email types ──
-    const BROADCAST_EMAIL_TYPES: EmailType[] = ['payroll_export', 'notification']
+    const isBroadcast = BROADCAST_EMAIL_TYPES.includes(input.emailType)
     let unsubscribeUrl: string | undefined
 
-    if (BROADCAST_EMAIL_TYPES.includes(input.emailType)) {
+    if (isBroadcast) {
       try {
         unsubscribeUrl = await generateUnsubscribeUrl(input.recipient.email, input.emailType)
       } catch {
@@ -433,13 +469,16 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
       attachments: mergedAttachments
     })
 
+    // ── RESEND_API_KEY guard: config error → failed (retryable), NOT skipped ──
     if (!isResendConfigured()) {
+      const configErrorMsg = 'RESEND_API_KEY is not configured.'
+
       if (input.existingDeliveryId) {
         await updateDeliveryRow({
           deliveryId: input.existingDeliveryId,
           resendId: null,
-          status: 'skipped',
-          errorMessage: 'RESEND_API_KEY is not configured.'
+          status: 'failed',
+          errorMessage: configErrorMsg
         })
       } else {
         await createDeliveryRow({
@@ -449,13 +488,15 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
           recipient: input.recipient,
           subject: resolvedTemplate.subject,
           resendId: null,
-          status: 'skipped',
+          status: 'failed',
           hasAttachments: Boolean(resendAttachments.length),
           payload,
           sourceEventId: input.sourceEventId,
           sourceEntity: input.sourceEntity,
           actorEmail: input.actorEmail,
-          errorMessage: 'RESEND_API_KEY is not configured.'
+          errorMessage: configErrorMsg,
+          priority: input.priority,
+          errorClass: 'config_error'
         })
       }
 
@@ -463,12 +504,22 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
         deliveryId: input.existingDeliveryId || input.batchId,
         recipientEmail: input.recipient.email,
         resendId: null,
-        status: 'skipped' as const,
-        error: 'RESEND_API_KEY is not configured.'
+        status: 'failed' as const,
+        error: configErrorMsg
       }
     }
 
     const resend = getResendClient()
+
+    // ── List-Unsubscribe header (RFC 8058) for broadcast emails ──
+    const unsubscribeHeaders = isBroadcast && unsubscribeUrl
+      ? {
+          headers: {
+            'List-Unsubscribe': `<${unsubscribeUrl}>`,
+            'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+          }
+        }
+      : {}
 
     const result = await resend.emails.send({
       from: getEmailFromAddress(),
@@ -476,7 +527,8 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
       subject: resolvedTemplate.subject,
       react: resolvedTemplate.react,
       text: resolvedTemplate.text,
-      ...(resendAttachments.length > 0 ? { attachments: resendAttachments } : {})
+      ...(resendAttachments.length > 0 ? { attachments: resendAttachments } : {}),
+      ...unsubscribeHeaders
     })
 
     const resendId = result?.data?.id ?? null
@@ -500,7 +552,8 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
         payload,
         sourceEventId: input.sourceEventId,
         sourceEntity: input.sourceEntity,
-        actorEmail: input.actorEmail
+        actorEmail: input.actorEmail,
+        priority: input.priority
       })
     }
 
@@ -513,10 +566,19 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to send email.'
 
-    const subject =
-      error instanceof Error && error.message.includes('No email template registered')
-        ? '[template missing]'
-        : '[email delivery failed]'
+    const isTemplateMissing = error instanceof Error && error.message.includes('No email template registered')
+    const subject = isTemplateMissing ? '[template missing]' : '[email delivery failed]'
+    const errorClass = isTemplateMissing ? 'template_error' : 'resend_api_error'
+
+    // Capture in Sentry for observability
+    Sentry.captureException(error, {
+      extra: {
+        emailType: input.emailType,
+        recipientEmail: input.recipient.email,
+        priority: input.priority,
+        attempt: input.existingDeliveryId ? 'retry' : 'first'
+      }
+    })
 
     if (input.existingDeliveryId) {
       await updateDeliveryRow({
@@ -541,7 +603,9 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
         sourceEventId: input.sourceEventId,
         sourceEntity: input.sourceEntity,
         actorEmail: input.actorEmail,
-        errorMessage: message
+        errorMessage: message,
+        priority: input.priority,
+        errorClass
       }).catch(err => {
         console.warn('[email-delivery] Failed to persist failed delivery row:', err)
       })
@@ -555,6 +619,315 @@ const deliverRecipient = async <TContext extends Record<string, unknown>>(input:
       error: message
     }
   }
+}
+
+// ── Broadcast Batch Delivery ──────────────────────────────────────────────────
+//
+// Uses Resend Batch API for broadcast emails with >1 recipient and no attachments.
+// Runs per-recipient preparation in parallel, then makes a single API call.
+// Falls back to sequential delivery if any recipient has attachments.
+//
+// Note: Resend Batch API does not support `attachments` — see CreateBatchEmailOptions.
+// ─────────────────────────────────────────────────────────────────────────────
+
+type BroadcastPrepared =
+  | {
+      ok: true
+      recipient: EmailRecipient
+      subject: string
+      react: ReturnType<typeof resolveTemplate>['react']
+      text: string
+      hasAttachments: boolean
+      headers: Record<string, string>
+      payload: EmailDeliveryPayload
+    }
+  | {
+      ok: false
+      recipient: EmailRecipient
+      status: 'rate_limited' | 'skipped' | 'failed'
+      error: string
+      payload: EmailDeliveryPayload
+    }
+
+const prepareBroadcastRecipient = async <TContext extends Record<string, unknown>>(
+  recipient: EmailRecipient,
+  input: {
+    batchId: string
+    emailType: EmailType
+    domain: EmailDomain
+    context: TContext
+    sourceEventId?: string
+    sourceEntity?: string
+    actorEmail?: string
+    priority: EmailPriority
+  }
+): Promise<BroadcastPrepared> => {
+  const basePayload = normalizePayload({ recipients: [recipient], context: input.context })
+
+  try {
+    // Rate limit (critical/transactional bypass handled inside checkRecipientRateLimit)
+    const rateCheck = await checkRecipientRateLimit(recipient.email, undefined, input.priority)
+
+    if (!rateCheck.allowed) {
+      const errorMessage = `Rate limit exceeded: ${rateCheck.currentCount} emails/hour to ${recipient.email}`
+
+      await createDeliveryRow({
+        batchId: input.batchId,
+        emailType: input.emailType,
+        domain: input.domain,
+        recipient,
+        subject: '[rate_limited]',
+        resendId: null,
+        status: 'rate_limited',
+        hasAttachments: false,
+        payload: basePayload,
+        sourceEventId: input.sourceEventId,
+        sourceEntity: input.sourceEntity,
+        actorEmail: input.actorEmail,
+        priority: input.priority
+      })
+
+      return { ok: false, recipient, status: 'rate_limited', error: errorMessage, payload: basePayload }
+    }
+
+    // Context resolution
+    let resolvedContext: Record<string, unknown> = {}
+
+    try {
+      const emailContext = await resolveEmailContext(recipient.email)
+
+      if (emailContext) {
+        resolvedContext = {
+          userName: emailContext.recipient.fullName,
+          recipientFirstName: emailContext.recipient.firstName,
+          clientName: emailContext.client.name,
+          clientId: emailContext.client.id,
+          locale: emailContext.recipient.locale,
+          tenantType: emailContext.client.tenantType,
+          platformUrl: emailContext.platform.url,
+          supportEmail: emailContext.platform.supportEmail
+        }
+
+        if (!recipient.name && emailContext.recipient.fullName) recipient.name = emailContext.recipient.fullName
+        if (!recipient.userId && emailContext.recipient.userId) recipient.userId = emailContext.recipient.userId
+      }
+    } catch (ctxErr) {
+      if (ctxErr instanceof EmailUndeliverableError) {
+        const errorMessage = ctxErr.message
+
+        await createDeliveryRow({
+          batchId: input.batchId,
+          emailType: input.emailType,
+          domain: input.domain,
+          recipient,
+          subject: '[undeliverable]',
+          resendId: null,
+          status: 'skipped',
+          hasAttachments: false,
+          payload: basePayload,
+          sourceEventId: input.sourceEventId,
+          sourceEntity: input.sourceEntity,
+          actorEmail: input.actorEmail,
+          errorMessage
+        })
+
+        return { ok: false, recipient, status: 'skipped', error: errorMessage, payload: basePayload }
+      }
+
+      // Non-blocking: continue with caller context if resolver fails for other reasons
+    }
+
+    // Unsubscribe URL (non-blocking)
+    let unsubscribeUrl: string | undefined
+
+    try {
+      unsubscribeUrl = await generateUnsubscribeUrl(recipient.email, input.emailType)
+    } catch {
+      // non-blocking
+    }
+
+    // Merge contexts and resolve template
+    const mergedContext = {
+      ...resolvedContext,
+      ...input.context,
+      recipientEmail: recipient.email,
+      recipientName: recipient.name,
+      recipientUserId: recipient.userId,
+      unsubscribeUrl
+    }
+
+    const resolvedTemplate = resolveTemplate(input.emailType, mergedContext)
+    const mergedAttachments = mergeAttachments(resolvedTemplate.attachments, undefined)
+
+    const payload = normalizePayload({
+      recipients: [recipient],
+      context: input.context,
+      attachments: mergedAttachments
+    })
+
+    const headers: Record<string, string> = unsubscribeUrl
+      ? { 'List-Unsubscribe': `<${unsubscribeUrl}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' }
+      : {}
+
+    return {
+      ok: true,
+      recipient,
+      subject: resolvedTemplate.subject,
+      react: resolvedTemplate.react,
+      text: resolvedTemplate.text,
+      hasAttachments: mergedAttachments.length > 0,
+      headers,
+      payload
+    }
+  } catch (error) {
+    Sentry.captureException(error, {
+      extra: { emailType: input.emailType, recipientEmail: recipient.email, phase: 'batch_prepare' }
+    })
+
+    return {
+      ok: false,
+      recipient,
+      status: 'failed',
+      error: error instanceof Error ? error.message : 'Preparation failed.',
+      payload: basePayload
+    }
+  }
+}
+
+/**
+ * Delivers broadcast emails to multiple recipients using Resend Batch API.
+ * Preparation runs in parallel per recipient; then a single API call is made.
+ * Falls back to sequential (deliverRecipient) if any recipient has attachments.
+ */
+const deliverBroadcastBatch = async <TContext extends Record<string, unknown>>(input: {
+  batchId: string
+  emailType: EmailType
+  domain: EmailDomain
+  recipients: EmailRecipient[]
+  context: TContext
+  sourceEventId?: string
+  sourceEntity?: string
+  actorEmail?: string
+  priority: EmailPriority
+}): Promise<NonNullable<SendEmailResult['recipientResults']>> => {
+  // Parallel preparation
+  const preparations = await Promise.all(
+    input.recipients.map(recipient => prepareBroadcastRecipient(recipient, input))
+  )
+
+  const eligible = preparations.filter((p): p is Extract<BroadcastPrepared, { ok: true }> => p.ok)
+  const ineligible = preparations.filter((p): p is Extract<BroadcastPrepared, { ok: false }> => !p.ok)
+
+  const results: NonNullable<SendEmailResult['recipientResults']> = ineligible.map(item => ({
+    recipientEmail: item.recipient.email,
+    resendId: null,
+    status: item.status,
+    error: item.error
+  }))
+
+  if (eligible.length === 0) return results
+
+  // If any recipient requires attachments, Batch API can't be used — fall back to sequential
+  const needsAttachments = eligible.some(item => item.hasAttachments)
+
+  if (needsAttachments) {
+    for (const item of eligible) {
+      const result = await deliverRecipient({
+        batchId: input.batchId,
+        emailType: input.emailType,
+        domain: input.domain,
+        recipient: item.recipient,
+        context: input.context,
+        sourceEventId: input.sourceEventId,
+        sourceEntity: input.sourceEntity,
+        actorEmail: input.actorEmail,
+        priority: input.priority
+      })
+
+      results.push({
+        recipientEmail: item.recipient.email,
+        resendId: result.resendId,
+        status: result.status,
+        ...(result.error ? { error: result.error } : {})
+      })
+    }
+
+    return results
+  }
+
+  // Resend Batch API — single call for all eligible recipients
+  const resendClient = getResendClient()
+
+  try {
+    const batchPayload = eligible.map(item => ({
+      from: getEmailFromAddress(),
+      to: normalizeEmail(item.recipient.email),
+      subject: item.subject,
+      react: item.react,
+      text: item.text,
+      headers: Object.keys(item.headers).length > 0 ? item.headers : undefined
+    }))
+
+    const batchResult = await resendClient.batch.send(batchPayload)
+
+    // Record one delivery row per recipient
+    await Promise.allSettled(
+      eligible.map(async (item, i) => {
+        const resendId = batchResult.data?.data?.[i]?.id ?? null
+
+        await createDeliveryRow({
+          batchId: input.batchId,
+          emailType: input.emailType,
+          domain: input.domain,
+          recipient: item.recipient,
+          subject: item.subject,
+          resendId,
+          status: 'sent',
+          hasAttachments: false,
+          payload: item.payload,
+          sourceEventId: input.sourceEventId,
+          sourceEntity: input.sourceEntity,
+          actorEmail: input.actorEmail,
+          priority: input.priority
+        })
+
+        results.push({ recipientEmail: item.recipient.email, resendId, status: 'sent' })
+      })
+    )
+  } catch (batchError) {
+    // Batch API failed — record all eligible as failed (retryable)
+    Sentry.captureException(batchError, {
+      extra: { emailType: input.emailType, recipientCount: eligible.length, phase: 'batch_send' }
+    })
+
+    const errorMessage = batchError instanceof Error ? batchError.message : 'Batch send failed.'
+
+    await Promise.allSettled(
+      eligible.map(async item => {
+        await createDeliveryRow({
+          batchId: input.batchId,
+          emailType: input.emailType,
+          domain: input.domain,
+          recipient: item.recipient,
+          subject: item.subject,
+          resendId: null,
+          status: 'failed',
+          hasAttachments: false,
+          payload: item.payload,
+          sourceEventId: input.sourceEventId,
+          sourceEntity: input.sourceEntity,
+          actorEmail: input.actorEmail,
+          errorMessage,
+          priority: input.priority,
+          errorClass: 'resend_api_error'
+        })
+
+        results.push({ recipientEmail: item.recipient.email, resendId: null, status: 'failed', error: errorMessage })
+      })
+    )
+  }
+
+  return results
 }
 
 /**
@@ -586,6 +959,22 @@ export const sendEmail = async <TContext extends Record<string, unknown>>(
   input: SendEmailInput<TContext>
 ): Promise<SendEmailResult> => {
   const batchId = randomUUID()
+
+  // Kill switch: check if this email type is paused
+  const killSwitch = await checkEmailTypeEnabled(input.emailType)
+
+  if (!killSwitch.enabled) {
+    return {
+      deliveryId: batchId,
+      resendId: null,
+      status: 'skipped',
+      error: `Email type paused: ${killSwitch.pausedReason ?? 'no reason provided'}`
+    }
+  }
+
+  // Derive priority from map or explicit override
+  const priority: EmailPriority = input.priority ?? EMAIL_PRIORITY_MAP[input.emailType] ?? 'broadcast'
+
   let recipients: EmailRecipient[]
 
   try {
@@ -611,35 +1000,62 @@ export const sendEmail = async <TContext extends Record<string, unknown>>(
     }
   }
 
+  // ── Broadcast + multi-recipient → Batch API (parallel prep + 1 Resend call) ──
+  // Sequential path is kept for: single recipients, non-broadcast priority, or input-level attachments.
+  const useBatch =
+    priority === 'broadcast' &&
+    recipients.length > 1 &&
+    !input.attachments?.length &&
+    isResendConfigured()
+
   let firstResendId: string | null = null
   let sawFailure = false
   let sawSkipped = false
   let lastError: string | undefined
-  const recipientResults: NonNullable<SendEmailResult['recipientResults']> = []
+  let recipientResults: NonNullable<SendEmailResult['recipientResults']>
 
-  for (const recipient of recipients) {
-    const result = await deliverRecipient({
+  if (useBatch) {
+    recipientResults = await deliverBroadcastBatch({
       batchId,
       emailType: input.emailType,
       domain: input.domain,
-      recipient,
+      recipients,
       context: input.context,
-      attachments: input.attachments,
       sourceEventId: input.sourceEventId,
       sourceEntity: input.sourceEntity,
-      actorEmail: input.actorEmail
+      actorEmail: input.actorEmail,
+      priority
     })
+  } else {
+    recipientResults = []
 
+    for (const recipient of recipients) {
+      const result = await deliverRecipient({
+        batchId,
+        emailType: input.emailType,
+        domain: input.domain,
+        recipient,
+        context: input.context,
+        attachments: input.attachments,
+        sourceEventId: input.sourceEventId,
+        sourceEntity: input.sourceEntity,
+        actorEmail: input.actorEmail,
+        priority
+      })
+
+      recipientResults.push({
+        recipientEmail: recipient.email,
+        resendId: result.resendId,
+        status: result.status,
+        ...(result.error ? { error: result.error } : {})
+      })
+    }
+  }
+
+  for (const result of recipientResults) {
     if (result.resendId && !firstResendId) {
       firstResendId = result.resendId
     }
-
-    recipientResults.push({
-      recipientEmail: recipient.email,
-      resendId: result.resendId,
-      status: result.status,
-      ...(result.error ? { error: result.error } : {})
-    })
 
     if (result.status === 'failed') {
       sawFailure = true
@@ -691,8 +1107,10 @@ export const processFailedEmailDeliveries = async (limit = 25) => {
         error_message,
         attempt_number
       FROM greenhouse_notifications.email_deliveries
-      WHERE status = 'failed'
-        AND attempt_number < 3
+      WHERE (
+        (status = 'failed' AND attempt_number < 3)
+        OR (status = 'rate_limited' AND updated_at < NOW() - INTERVAL '1 hour' AND attempt_number < 3)
+      )
         AND created_at > NOW() - INTERVAL '24 hours'
       ORDER BY created_at ASC
       LIMIT $1
@@ -756,6 +1174,29 @@ export const processFailedEmailDeliveries = async (limit = 25) => {
       skipped++
     } else {
       failed++
+
+      // Dead letter: exhaused all attempts — escalate and alert
+      if (claimedRow.attempt_number >= 3) {
+        await runGreenhousePostgresQuery(
+          `UPDATE greenhouse_notifications.email_deliveries
+           SET status = 'dead_letter', updated_at = NOW()
+           WHERE delivery_id = $1`,
+          [claimedRow.delivery_id]
+        ).catch(err => console.warn('[email-delivery] Failed to mark dead letter:', err))
+
+        await publishOutboxEvent({
+          aggregateType: AGGREGATE_TYPES.emailDelivery,
+          aggregateId: claimedRow.delivery_id,
+          eventType: EVENT_TYPES.emailDeliveryDead,
+          payload: {
+            deliveryId: claimedRow.delivery_id,
+            emailType: claimedRow.email_type,
+            recipientEmail: claimedRow.recipient_email,
+            attemptNumber: claimedRow.attempt_number,
+            lastError: retryResult.error ?? claimedRow.error_message
+          }
+        }).catch(err => console.warn('[email-delivery] Failed to publish dead letter event:', err))
+      }
     }
   }
 

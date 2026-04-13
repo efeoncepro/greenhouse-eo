@@ -1,5 +1,73 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — hardening del lifecycle de tasks para forzar cierre real
+
+- alcance documental:
+  - `docs/tasks/TASK_TEMPLATE.md`
+  - `docs/tasks/TASK_PROCESS.md`
+  - `docs/tasks/README.md`
+  - `AGENTS.md`
+  - `CLAUDE.md`
+- problema atacado:
+  - algunos agentes estaban terminando la implementación pero dejaban la task en `in-progress/`
+  - el protocolo anterior dejaba el cierre genérico demasiado implícito y fácil de omitir
+- ajuste aplicado:
+  - tomar una task ahora exige moverla a `in-progress/` y sincronizar `Lifecycle` dentro del markdown
+  - cerrar una task ahora exige cambiar `Lifecycle` a `complete`, mover el archivo a `complete/` y sincronizar `README`
+  - se declaró explícitamente que una task no puede reportarse como "cerrada" si sigue en `in-progress/`
+- validación:
+  - `git diff --check`
+
+## Sesion 2026-04-13 — TASK-039 y TASK-040 ya no compiten como la misma lane
+
+- alcance documental:
+  - `docs/tasks/to-do/TASK-039-data-node-architecture-v1.md`
+  - `docs/tasks/to-do/TASK-040-data-node-architecture-v2.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `docs/tasks/README.md`
+- decisión tomada:
+  - `TASK-039` queda rescatada como referencia legacy de visión del Data Node
+  - `TASK-040` queda rebaselined como baseline técnica/operativa vigente
+- actualización clave:
+  - `TASK-039` deja de leerse como backlog ejecutable independiente
+  - `TASK-040` absorbe el reality check del repo actual, el split con sister platforms y el mapa de follow-ons
+  - el Data Node ya no se modela como una pieza única, sino como secuencia `DN0 -> DN1 -> DN2 -> DN3`
+- validación:
+  - `git diff --check`
+
+## Sesion 2026-04-13 — TASK-156 ahora explicita tambien la capa SLI
+
+- alcance documental:
+  - `docs/tasks/to-do/TASK-156-sla-slo-per-service.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+- decisión tomada:
+  - la lane ya no se modela solo como SLA/SLO
+  - `TASK-156` ahora formaliza la cadena `SLI -> SLO -> SLA` por servicio
+- actualización clave:
+  - `SLI` queda definido como la métrica observable que se mide
+  - `SLO` queda como el objetivo operativo sobre ese indicador
+  - `SLA` queda como el compromiso contractual apoyado en esos indicadores
+  - el seteo y gobierno de estas definiciones queda exigido como CRUD en Admin Center
+- validación:
+  - `git diff --check`
+
+## Sesion 2026-04-13 — TASK-031 rebaselined al runtime actual del repo
+
+- alcance documental:
+  - `docs/tasks/to-do/TASK-031-hris-performance-evaluations.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `changelog.md`
+- decisión tomada:
+  - `TASK-031` sigue vigente funcionalmente y conserva cabida real en el backlog HRIS
+  - la lane deja de asumir BigQuery directo y fija `greenhouse_serving.ico_member_metrics` como source cuantitativa canónica
+  - `TASK-029` deja de leerse como bloqueo duro del primer corte; goals queda como integración soft con degradación graceful
+- actualización clave:
+  - el diseño ahora reconoce que hoy no existen tablas `eval_*`, APIs ni surfaces de evaluaciones en el repo
+  - el módulo debe reutilizar `reports_to_member_id`, `person_intelligence` y `workflowDomain = performance_evaluation`
+  - el scope ya separa schema, orchestration, APIs, UI y summary enrichment sin mezclar una lane de goals dentro de esta task
+- validación:
+  - `git diff --check`
+
 ## Sesion 2026-04-13 — TASK-025 rescatada como policy estratégica y no como implementación
 
 - alcance documental:

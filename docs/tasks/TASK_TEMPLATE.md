@@ -14,6 +14,7 @@ Plantilla copiable para crear tasks nuevas. Para el protocolo completo (Plan Mod
 4. Zone 2 no se llena al crear la task — es responsabilidad del agente que la toma
 5. Llenar Zone 3 y Zone 4 con el detalle que tengas disponible
 6. Para tasks `umbrella` o `policy`: Zone 3 (Detailed Spec) puede omitirse; Verification es revision manual
+7. El cierre de una task no termina cuando el codigo "ya funciona": termina solo cuando el agente actualiza `Lifecycle`, mueve el archivo a la carpeta correcta y sincroniza `docs/tasks/README.md`
 
 ---
 
@@ -166,9 +167,16 @@ Puede omitirse si el Scope ya es suficiente o si la task es umbrella/policy.]
 
 ## Closing Protocol
 
-[Solo items especificos de esta task. El protocolo generico de cierre
-(mover archivo, actualizar README, Handoff.md, changelog.md, chequeo
-de impacto cruzado) esta en CLAUDE.md § Task Lifecycle Protocol.]
+[Cerrar una task es obligatorio y forma parte de Definition of Done.
+Si la implementacion termino pero estos items no se ejecutaron, la task
+sigue abierta.]
+
+- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
 - [ ] [item especifico de esta task]
 

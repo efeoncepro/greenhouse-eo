@@ -80,6 +80,11 @@ interface ResendWebhookEvent {
     complaint?: {
       message?: string
     }
+
+    // Click-specific
+    click?: {
+      link?: string
+    }
   }
 }
 
@@ -190,6 +195,48 @@ export async function POST(request: Request) {
              SET status = 'delivered', updated_at = NOW()
              WHERE resend_id = $1 AND status = 'sent'`,
             [resendId]
+          )
+        }
+
+        break
+      }
+
+      case 'email.opened': {
+        if (resendId) {
+          // Look up delivery_id for the FK reference
+          const deliveryRows = await runGreenhousePostgresQuery<{ delivery_id: string } & Record<string, unknown>>(
+            `SELECT delivery_id FROM greenhouse_notifications.email_deliveries WHERE resend_id = $1 LIMIT 1`,
+            [resendId]
+          )
+
+          const deliveryId = deliveryRows[0]?.delivery_id ?? null
+
+          await runGreenhousePostgresQuery(
+            `INSERT INTO greenhouse_notifications.email_engagement (resend_id, delivery_id, event_type)
+             VALUES ($1, $2, 'opened')`,
+            [resendId, deliveryId]
+          )
+        }
+
+        break
+      }
+
+      case 'email.clicked': {
+        if (resendId) {
+          const clickData = (event.data as Record<string, unknown>).click as Record<string, unknown> | undefined
+          const linkUrl = typeof clickData?.link === 'string' ? clickData.link : null
+
+          const deliveryRows = await runGreenhousePostgresQuery<{ delivery_id: string } & Record<string, unknown>>(
+            `SELECT delivery_id FROM greenhouse_notifications.email_deliveries WHERE resend_id = $1 LIMIT 1`,
+            [resendId]
+          )
+
+          const deliveryId = deliveryRows[0]?.delivery_id ?? null
+
+          await runGreenhousePostgresQuery(
+            `INSERT INTO greenhouse_notifications.email_engagement (resend_id, delivery_id, event_type, link_url)
+             VALUES ($1, $2, 'clicked', $3)`,
+            [resendId, deliveryId, linkUrl]
           )
         }
 

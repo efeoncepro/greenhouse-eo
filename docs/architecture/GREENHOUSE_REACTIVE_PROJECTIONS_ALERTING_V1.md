@@ -31,25 +31,36 @@ La metrica `circuit_breaker_state` usa una codificacion numerica: `0 = closed`, 
 
 ## Canales de notificacion
 
-Antes de crear las politicas, provisionar dos notification channels en Cloud Monitoring:
+**Historia**: la version inicial de este documento proponia usar un notification channel de `--type=slack`, que es el tipo OAuth-native de Cloud Monitoring. Al intentar provisionarlo via `gcloud` descubrimos que ese tipo requiere **autenticacion OAuth a nivel de workspace admin via la UI de Cloud Console** — no es scriptable desde un agente, una CI, ni un operador que no tenga permisos de install de Slack apps en el workspace.
+
+**Solucion adoptada 2026-04-13**: usar `--type=webhook_tokenauth` apuntando directamente al secret `greenhouse-slack-alerts-webhook` en Secret Manager, que ya contenia la URL del Slack incoming webhook. Bypass total del OAuth, scriptable end-to-end.
+
+### Comando exacto que funciono en prod
 
 ```bash
-# Slack warning
-gcloud alpha monitoring channels create \
-  --display-name="Greenhouse Slack Alerts" \
-  --type=slack \
-  --channel-labels=channel_name=#greenhouse-alerts \
-  --user-labels=purpose=reactive-warning
+SLACK_URL=$(gcloud secrets versions access latest \
+  --secret=greenhouse-slack-alerts-webhook \
+  --project=efeonce-group)
 
-# PagerDuty critical (solo si se configura PD para Greenhouse)
 gcloud alpha monitoring channels create \
-  --display-name="Greenhouse PagerDuty Critical" \
-  --type=pagerduty \
-  --channel-labels=service_key=$PAGERDUTY_SERVICE_KEY \
-  --user-labels=purpose=reactive-critical
+  --display-name="Greenhouse Reactive Pipeline Alerts (Slack via webhook)" \
+  --type=webhook_tokenauth \
+  --channel-labels="url=${SLACK_URL}" \
+  --user-labels="component=reactive-pipeline,managed-by=task-379" \
+  --project=efeonce-group
 ```
 
-Guardar los `CHANNEL_ID` resultantes y reemplazarlos en los comandos `--notification-channels` mas abajo.
+**Notification channel provisionado**: `projects/efeonce-group/notificationChannels/8736345518502755361`. Usar este ID en el flag `--notification-channels` de cada politica mas abajo.
+
+### Caveat sobre el formato de los mensajes
+
+El payload que Cloud Monitoring envia al webhook **no es Slack Block Kit** — es el schema generico de Cloud Monitoring (`incident`, `policy_name`, `state`, `summary`, `documentation`, etc.). Slack lo renderiza como JSON plano dentro de un code block. Adecuado para alerting operacional (warning/critical), no para dashboards bonitos.
+
+Si en el futuro se necesita pretty-formatting (mentions, colores, botones de ack), la evolucion correcta es **Pub/Sub → Cloud Run → Slack bot**: Cloud Monitoring publica a un Pub/Sub topic, un Cloud Run service chiquito consume el mensaje, mapea a Block Kit, y hace `POST` al webhook. No aplica hoy — el formato raw es suficiente para la criticidad de las 5 politicas.
+
+### PagerDuty (opcional, no provisionado)
+
+PagerDuty sigue soportado por Cloud Monitoring via `--type=pagerduty --channel-labels=service_key=...`. No se provisiono hoy porque Greenhouse todavia no tiene cuenta PD activa. Cuando se agregue, la unica politica que debe notificar a PD es la **Politica 2 (backlog critical)** — el resto se queda en Slack.
 
 ---
 
@@ -90,6 +101,8 @@ gcloud alpha monitoring policies create \
   --condition-display-name='backlog_depth > 500 for 10m'
 ```
 
+**Provisioned in production (2026-04-13):** `projects/efeonce-group/alertPolicies/12724517129604513698`.
+
 ---
 
 ## Politica 2 — `reactive_backlog_total_critical`
@@ -128,6 +141,8 @@ gcloud alpha monitoring policies create \
   --condition-threshold-aggregations='alignment_period=60s,per_series_aligner=ALIGN_MAX,cross_series_reducer=REDUCE_MAX' \
   --condition-display-name='backlog_depth > 2000 for 5m'
 ```
+
+**Provisioned in production (2026-04-13):** `projects/efeonce-group/alertPolicies/12724517129604512902`. Actualmente solo notifica a Slack (PagerDuty pendiente de setup).
 
 ---
 
@@ -168,6 +183,8 @@ gcloud alpha monitoring policies create \
   --condition-display-name='lag_seconds_p95 > 900 for 15m'
 ```
 
+**Provisioned in production (2026-04-13):** `projects/efeonce-group/alertPolicies/9439773336525841089`.
+
 ---
 
 ## Politica 4 — `reactive_circuit_open_warning`
@@ -207,100 +224,111 @@ gcloud alpha monitoring policies create \
   --condition-display-name='circuit_breaker_state == open (>=2) for 60m'
 ```
 
+**Provisioned in production (2026-04-13):** `projects/efeonce-group/alertPolicies/9439773336525840646`.
+
 ---
 
-## Politica 5 — `reactive_dead_letter_warning`
+## Politica 5 — `reactive_projection_error_rate_warning`
 
-**Trigger:** aparece al menos un evento con `result = 'dead-letter'` en `greenhouse_sync.outbox_reactive_log` dentro de las ultimas 24 horas.
+**Trigger:** el `error_rate` de una proyeccion (fallos / total runs) supera el 30% sostenido por 15 minutos.
 
 **Severidad:** warning
 
 **Canal:** Slack (`#greenhouse-alerts`)
 
-**Por que importa:** dead-letters son eventos que la proyeccion no pudo procesar despues de agotar sus reintentos. Requieren intervencion manual (fix + replay o mass-ack). No deben quedar sin resolver por mas de 24 horas — eso rompe el SLO 3 (higiene).
+**Por que importa:** una proyeccion con error_rate > 30% durante un cuarto de hora esta efectivamente rota — la mayoria de los scope groups que intenta procesar fallan. Es la senal operativa mas directa de que algo anda mal en el codigo de `refresh()`, en los datos upstream, o en dependencias externas (Postgres, BigQuery, Nubox). Antes de que la proyeccion llegue a dead-letters o a que el circuit breaker se abra (que ya cubre Politica 4), esta alerta avisa del deterioro progresivo.
 
-**Nota sobre implementacion:** esta alerta no depende de una metrica custom, sino de una metrica derivada de logs (log-based metric). Cloud Monitoring genera la metrica desde los logs de Postgres emitidos via `pg_logical_read` o desde un cron job que consulta la tabla y escribe un log estructurado.
+**Historia — por que NO usamos una log-based metric de dead-letter:** la v1 de este doc proponia una Opcion A con cron job + structured log + log-based metric, y una Opcion B con `--condition-matched-log`. Al momento de provisionar descubrimos que (a) la Opcion A requiere un cron adicional solo para emitir el log, (b) la Opcion B basada en matched-log tiene limitaciones de throughput en Cloud Monitoring que la hacen poco confiable, y (c) el `error_rate` custom metric que ya emite el consumer V2 cubre el mismo signal operacional de forma mas directa. Una proyeccion que genera dead-letters sostenidos tambien genera error_rate alto — atacamos la causa upstream en vez del sintoma terminal.
 
-**Opcion A — Log-based metric via cron job:**
+**MQL query:**
 
-1. Crear un cron job (Cloud Scheduler + Cloud Run existente `ops-worker`, endpoint nuevo opcional `GET /reactive/dead-letter-count`) que emita un log estructurado cada 5 minutos:
+```mql
+fetch global
+| metric 'custom.googleapis.com/greenhouse/reactive/error_rate'
+| align mean(5m)
+| every 1m
+| group_by [metric.projection_name], [err: mean(value.error_rate)]
+| condition err > 0.30
+```
 
-    ```json
+**Comando gcloud (via `--policy-from-file`):**
+
+```json
+{
+  "displayName": "Reactive projection error_rate > 30% (warning)",
+  "userLabels": {
+    "severity": "warning",
+    "component": "reactive-pipeline",
+    "slo": "slo-3-hygiene"
+  },
+  "documentation": {
+    "content": "Una proyeccion tiene error_rate > 30% sostenido por 15 minutos. Pasos: 1) buscar la proyeccion en /admin/ops-health, 2) revisar perProjection.failures en los logs del ops-worker, 3) reproducir localmente con pnpm reactive:backfill --domain=<dominio>, 4) si persiste mas de 1 hora, abrir ISSUE y considerar pausar el publisher upstream."
+  },
+  "conditions": [
     {
-      "severity": "WARNING",
-      "labels": {
-        "metric_type": "greenhouse.reactive.dead_letter_count"
-      },
-      "jsonPayload": {
-        "deadLetterCount": 3,
-        "eventIds": ["outbox-evt-abc", "outbox-evt-def", "outbox-evt-ghi"]
+      "displayName": "error_rate > 0.30 for 15m",
+      "conditionThreshold": {
+        "filter": "metric.type=\"custom.googleapis.com/greenhouse/reactive/error_rate\" AND resource.type=\"global\"",
+        "comparison": "COMPARISON_GT",
+        "thresholdValue": 0.30,
+        "duration": "900s",
+        "aggregations": [
+          {
+            "alignmentPeriod": "300s",
+            "perSeriesAligner": "ALIGN_MEAN",
+            "crossSeriesReducer": "REDUCE_MEAN",
+            "groupByFields": ["metric.label.projection_name"]
+          }
+        ]
       }
     }
-    ```
+  ],
+  "notificationChannels": [
+    "projects/efeonce-group/notificationChannels/8736345518502755361"
+  ],
+  "combiner": "OR"
+}
+```
 
-2. Crear la log-based metric:
-
-    ```bash
-    gcloud logging metrics create reactive_dead_letter_count \
-      --description='Conteo de eventos en dead-letter en outbox_reactive_log en las ultimas 24 horas.' \
-      --log-filter='resource.type="cloud_run_revision"
-    resource.labels.service_name="ops-worker"
-    jsonPayload.metric_type="greenhouse.reactive.dead_letter_count"' \
-      --value-extractor='EXTRACT(jsonPayload.deadLetterCount)' \
-      --metric-descriptor-value-type=INT64 \
-      --metric-descriptor-metric-kind=GAUGE
-    ```
-
-3. Crear la alerting policy sobre la log-based metric:
-
-    ```bash
-    gcloud alpha monitoring policies create \
-      --notification-channels=projects/$GCP_PROJECT/notificationChannels/$SLACK_CHANNEL_ID \
-      --display-name='Reactive dead-letters detected (warning)' \
-      --user-labels=severity=warning,component=reactive-pipeline,slo=slo-3-hygiene \
-      --documentation='Hay al menos 1 evento en estado dead-letter en outbox_reactive_log en las ultimas 24 horas. Runbook: 1) consultar SELECT event_id, handler, last_error, retries FROM greenhouse_sync.outbox_reactive_log WHERE result = '"'"'dead-letter'"'"' AND reacted_at > NOW() - INTERVAL '"'"'24 hours'"'"'; 2) decidir si corresponde fix + replay o mass-ack; 3) documentar en ISSUE-###.' \
-      --condition-filter='metric.type="logging.googleapis.com/user/reactive_dead_letter_count" AND resource.type="global"' \
-      --condition-threshold-value=0 \
-      --condition-threshold-comparison=COMPARISON_GT \
-      --condition-threshold-duration=60s \
-      --condition-threshold-aggregations='alignment_period=300s,per_series_aligner=ALIGN_MAX' \
-      --condition-display-name='dead_letter_count > 0'
-    ```
-
-**Opcion B — Alerta directa sobre logs estructurados (recomendada si no se quiere mantener un cron job extra):** emitir un log `severity=ERROR` desde el consumer V2 cada vez que marca un evento como `dead-letter` (ya lo hace en `actions.push('[name] DEAD-LETTER event ...')`) y configurar una alerting policy basada en el conteo de entradas coincidentes:
+Aplicar con:
 
 ```bash
 gcloud alpha monitoring policies create \
-  --notification-channels=projects/$GCP_PROJECT/notificationChannels/$SLACK_CHANNEL_ID \
-  --display-name='Reactive dead-letter log event (warning)' \
-  --user-labels=severity=warning,component=reactive-pipeline,slo=slo-3-hygiene \
-  --condition-matched-log='filter=resource.type="cloud_run_revision" AND textPayload=~"DEAD-LETTER event"' \
-  --condition-display-name='Any dead-letter log in 5m window'
+  --policy-from-file=policy-5-error-rate.json \
+  --project=efeonce-group
 ```
 
-La Opcion B es mas rapida de provisionar pero no permite umbrales cuantitativos; se dispara con el primer dead-letter visible. Para Greenhouse es apropiada porque el SLO 3 define "0 dead-letters por mas de 24 horas" — cualquier aparicion debe ser visible.
+**Provisioned in production (2026-04-13):** `projects/efeonce-group/alertPolicies/242492081293795724`.
 
 ---
 
 ## Checklist de provisioning
 
-- [ ] Canales Slack y PagerDuty creados
-- [ ] Politica 1 activa (`reactive_backlog_total_warning`)
-- [ ] Politica 2 activa (`reactive_backlog_total_critical`)
-- [ ] Politica 3 activa (`reactive_lag_p95_warning`)
-- [ ] Politica 4 activa (`reactive_circuit_open_warning`)
-- [ ] Politica 5 activa (`reactive_dead_letter_warning`) — Opcion A o B
+- [x] Canal Slack via `webhook_tokenauth` creado — `8736345518502755361` (2026-04-13)
+- [ ] Canal PagerDuty (pendiente — no se provisiono aun)
+- [x] Politica 1 activa (`reactive_backlog_total_warning`) — `12724517129604513698` (2026-04-13)
+- [x] Politica 2 activa (`reactive_backlog_total_critical`) — `12724517129604512902` (2026-04-13)
+- [x] Politica 3 activa (`reactive_lag_p95_warning`) — `9439773336525841089` (2026-04-13)
+- [x] Politica 4 activa (`reactive_circuit_open_warning`) — `9439773336525840646` (2026-04-13)
+- [x] Politica 5 activa (`reactive_projection_error_rate_warning`) — `242492081293795724` (2026-04-13, reemplaza al dead-letter log-based original)
 - [ ] Probar cada politica con un evento sintetico (ver runbook abajo)
-- [ ] Documentar los `policy_id` resultantes en `Handoff.md`
+- [x] `policy_id` y `channel_id` documentados en `Handoff.md` (2026-04-13)
 
 ## Runbook de verificacion post-provisioning
 
 Para cada politica, inyectar una senal que cruce el umbral y validar que Slack/PagerDuty reciben la notificacion:
 
+0. **Verificar el canal**: antes de nada, confirmar que el notification channel existe y esta enabled:
+   ```bash
+   gcloud alpha monitoring channels describe \
+     projects/efeonce-group/notificationChannels/8736345518502755361 \
+     --project=efeonce-group
+   ```
+   El output debe mostrar `type: webhook_tokenauth`, `enabled: true`, y una url label que empieza con `https://hooks.slack.com/services/...`.
 1. **Backlog warning/critical:** publicar 600 (o 2100) eventos sinteticos de un tipo inofensivo via `scripts/publish-synthetic-reactive-events.ts` (a crear como follow-up). Verificar que `/admin/ops-health` muestra el backlog crecer y que la alerta se dispara.
 2. **Lag warning:** forzar una proyeccion lenta inyectando un `setTimeout` de 16 minutos en una copia local del consumer ejecutada contra staging. Verificar que `lag_seconds_p95` supera 900 en Cloud Monitoring.
 3. **Circuit open:** hacer fallar 5 veces consecutivas una proyeccion en staging (via un scope que triggea una constraint violation conocida). Verificar que el breaker abre, esperar 60 minutos, verificar que la alerta se dispara.
-4. **Dead-letter:** forzar una proyeccion a fallar con `maxRetries=0`, publicar un evento, verificar que se marca dead-letter y que la alerta llega.
+4. **Error rate:** forzar una proyeccion a fallar en el 50%+ de sus runs durante 20 minutos (por ejemplo, devolviendo `throw new Error('synthetic')` desde el refresh en staging para eventos con cierto tag en el payload). Verificar que `error_rate` supera 0.30 en Cloud Monitoring y que la alerta llega a Slack.
 
 ## Referencias
 

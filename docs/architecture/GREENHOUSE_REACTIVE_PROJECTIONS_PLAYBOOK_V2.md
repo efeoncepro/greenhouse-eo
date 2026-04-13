@@ -135,6 +135,30 @@ V2 **no** implementa locking estricto a nivel de `outbox_events` — esa tabla s
 
 **Cuando escalar a V3 con locking en outbox:** si la redundancia (2 workers procesando el mismo scope) se vuelve el cuello de botella por costo de compute, la proxima evolucion introduce columnas `claimed_by/claimed_at` en `outbox_events` y usa SKIP LOCKED en Phase A. No es necesario hasta que el trafico real justifique el costo del cambio — V2 ya tolera 2-5 instancias en paralelo sin corromper estado.
 
+## Audit-only events sweep
+
+Existen event types que llegan al outbox pero que **ningun** `ProjectionDefinition` registra en su `triggerEvents`. Casos tipicos:
+
+- Resultados de sync externos (`finance.income.nubox_synced`, `hubspot.contact.upserted`).
+- Eventos de auditoria puros (`auth.login.success`, `identity.role.granted`).
+- Events deprecados que ya no tienen consumer vivo (`payroll.projected_period.refreshed`).
+- Events que son **output** de un publisher que ya materializa en su propia transaccion (`accounting.pl_snapshot.materialized`).
+
+V1 los dejaba acumularse indefinidamente en `outbox_events`. El metric de Ops Health (post PR #50) ya los filtra del backlog visible, pero la tabla raw seguia creciendo sin freno — al momento del rollout de V2 habia ~6000 events audit-only acumulados en `greenhouse-pg-dev`.
+
+**El helper**: `sweepAuditOnlyEvents()` en [reactive-consumer.ts:287](src/lib/sync/reactive-consumer.ts#L287) hace un bulk-INSERT en `outbox_reactive_log` marcando cada event cuyo `event_type` no aparece en `getAllTriggerEventTypes()` con:
+
+- `handler = 'system:no-handler'`
+- `result = 'no-op:audit-only'`
+
+Esto lo saca del re-fetch del consumer reactivo (la query Phase A excluye events con entries ya escritas) y deja un audit trail explicito.
+
+**Cuando corre**: dentro del endpoint [`/reactive/recover`](services/ops-worker/server.ts#L185) (`ops-reactive-recover`, cada 15 min). El sweep es best-effort — si falla, el endpoint sigue devolviendo el resultado del orphan recovery. El response incluye `auditOnlySwept: <count>` y el worker solo loguea la linea `audit-only sweep — swept=<N>` cuando `N > 0`.
+
+**Caveat — pending consumers**: eventos que pertenecen a consumers en construccion (ejemplo: `sister_platform_binding.created` / `.activated` para el bridge Kortex en TASK-377) deben marcarse con un result distinto, `no-op:pending-task-<N>-consumer`, para mantenerlos rastreables y replayables cuando el consumer entre en produccion. El SQL de re-marcado queda documentado en el Delta block de la task bloqueante.
+
+**Path hacia retencion**: una cron futura podra hacer `DELETE FROM outbox_events WHERE event_id IN (SELECT event_id FROM outbox_reactive_log WHERE result = 'no-op:audit-only' AND reacted_at < NOW() - INTERVAL '90 days')`. Asi el raw outbox se mantiene acotado y el ledger de auditoria conserva la evidencia. No es parte de V2 — es un follow-up.
+
 ## Observabilidad
 
 - **Endpoint de salud**: `GET /api/internal/projections` — stats por proyeccion en 24h, estado del queue, health boolean, circuit breaker state.
@@ -142,6 +166,7 @@ V2 **no** implementa locking estricto a nivel de `outbox_events` — esa tabla s
 - **Logs estructurados**: cada run del consumer emite un objeto JSON con `{ runId, instanceId, eventsFetched, scopesCoalesced, projectionsTriggered, durationMs, perProjection }` parseable por Cloud Logging.
 - **Dashboard operativo**: `src/views/greenhouse/admin/ops-health/*` — drill-down por proyeccion, lag historico, estado del circuit breaker.
 - **Metricas custom en Cloud Monitoring**: ver Slice 4 de TASK-379 y [GREENHOUSE_REACTIVE_PROJECTIONS_SLO_V1](./GREENHOUSE_REACTIVE_PROJECTIONS_SLO_V1.md) (pendiente de creacion cuando Slice 4 se cierre).
+- **Guard de test environment en el emitter**: `cloud-monitoring-emitter.ts` implementa [`isTestEnvironment()`](src/lib/operations/cloud-monitoring-emitter.ts#L83) como defense-in-depth. El emitter bail-outs temprano cuando `process.env.VITEST` o `NODE_ENV === 'test'` estan set, para evitar que el GoogleAuth metadata lookup del cliente `@google-cloud/monitoring` produzca unhandled rejections en Vitest. Escape hatch para tests que necesitan validar el flujo real: `GREENHOUSE_REACTIVE_FORCE_REAL_EMITTER=1`. En runtime productivo (Cloud Run `ops-worker`) no aplica — las variables de test no estan set.
 
 ## Runbook operativo
 
@@ -169,6 +194,8 @@ V2 **no** implementa locking estricto a nivel de `outbox_events` — esa tabla s
 El script vive en `scripts/reactive-backfill.ts`. Corre contra el Cloud SQL Proxy local en puerto 15432 (mismas credenciales que `pnpm migrate:up`).
 
 ### Una proyeccion esta en dead-letter — que hago
+
+> Nota: los events sin handler (audit-only, outputs, deprecados) se marcan automaticamente como `no-op:audit-only` via `sweepAuditOnlyEvents()` cada 15 min en `/reactive/recover` y ya no se confunden con dead-letters reales. El runbook de abajo aplica solo a eventos que fallaron despues de agotar sus retries en una proyeccion registrada.
 
 1. Identificar los eventos muertos:
    ```sql
@@ -216,6 +243,22 @@ El script vive en `scripts/reactive-backfill.ts`. Corre contra el Cloud SQL Prox
 
 - Eliminar codigo legacy de `provider_tooling`, `commercial_cost_attribution`, `operational_pl` que todavia publica por entidad cuando la feature flag este 100% rollout.
 - Archivar V1 del playbook en `docs/architecture/_archive/`.
+
+## Production validation 2026-04-13
+
+Todo el ciclo V2 — deteccion, diseno, implementacion, rollout y validacion — ocurrio el mismo dia. Registro cronologico para referencia futura:
+
+1. **Deteccion**: smoke post-deploy sobre el dashboard de Ops Health revela backlog reactivo de **11.495 events** acumulados. El `ops-worker` estaba corriendo silenciosamente — `source_sync_runs` mostraba 5205 runs successful pero con **0 projections processed**. Clasico sintoma de silent-skip de V1.
+2. **Diagnostico Slice 0**: se abre [ISSUE-046](../issues/open/ISSUE-046-reactive-pipeline-silent-skip-backlog.md) con la causa raiz confirmada: `extractScope()` devolvia `null` para 5040 events de `provider.tooling_snapshot.materialized` y el consumer V1 hacia `continue` sin marcar `outbox_reactive_log`, de modo que la query Phase A volvia a traerlos en cada run.
+3. **Implementacion Slices 1-6**: publish-once-per-period, consumer V2 con coalescing, circuit breaker + migracion `migrations/20260413105218813_reactive-pipeline-v2-circuit-breaker.sql`, emitter de metricas custom, alerting policies y backfill script. Todo shipped el mismo dia en el branch `feature/reactive-pipeline-enterprise-hardening`.
+4. **Sweep one-time de audit-only**: se corrio una SQL que marco **6073 events** como `no-op:audit-only` en prod. De esos, **2 events** del tipo `sister_platform_binding.created` / `.activated` se re-marcaron como `no-op:pending-task-377-consumer` porque su consumer vive en el bridge Kortex que TASK-377 esta construyendo. El SQL de replay queda documentado en el Delta block de esa task.
+5. **Draining**: el backlog drena de **11.495 → 0 events** el mismo dia una vez que V2 queda deployado. Todos los circuits terminan en estado `closed` (14/14).
+6. **Cloud Run revisions**: `00007-q45` (V1 legacy) → `00008-grv` (V2 sin sweep) → `00009-p8b` (V2 con sweep de audit-only integrado en `/reactive/recover`). Revision activa al cierre: `00009-p8b`.
+7. **IAM**: al SA `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` se le concede `roles/monitoring.metricWriter` en el proyecto `efeonce-group` para que el emitter pueda escribir las 5 metricas custom. El rol `roles/run.invoker` ya existia para los jobs de Cloud Scheduler.
+8. **Alerting provisioning**: se crean 5 alerting policies via `gcloud alpha monitoring policies create --policy-from-file=...` contra el canal `webhook_tokenauth` `8736345518502755361` (vinculado al secret `greenhouse-slack-alerts-webhook`). IDs reales en [GREENHOUSE_REACTIVE_PROJECTIONS_ALERTING_V1.md](./GREENHOUSE_REACTIVE_PROJECTIONS_ALERTING_V1.md).
+9. **Cierre**: ISSUE-046 se mueve a `resolved/` el mismo dia. La rama se promueve a `main` via commit merge `68c84891` y Vercel deploya prod sin errores.
+
+Resultado final: `/api/internal/projections` reporta `health = true`, 14/14 projections en `circuit: closed`, backlog 0, audit-only sweep integrado al recovery cron.
 
 ## Referencias
 

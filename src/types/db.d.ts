@@ -2392,12 +2392,24 @@ export interface GreenhouseNotificationsEmailDeliveries {
   attempt_number: Generated<number>;
   batch_id: string;
   created_at: Generated<Timestamp>;
+  /**
+   * Set when delivery_payload and PII fields are anonymized for GDPR/data retention
+   */
+  data_redacted_at: Timestamp | null;
   delivery_id: Generated<string>;
   delivery_payload: Generated<Json>;
   domain: string;
   email_type: string;
+  /**
+   * config_error | rate_limited | template_error | resend_api_error | undeliverable
+   */
+  error_class: string | null;
   error_message: string | null;
   has_attachments: Generated<boolean>;
+  /**
+   * critical | transactional | broadcast — critical/transactional bypass rate limits
+   */
+  priority: Generated<string>;
   recipient_email: string;
   recipient_name: string | null;
   recipient_user_id: string | null;
@@ -2409,6 +2421,15 @@ export interface GreenhouseNotificationsEmailDeliveries {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseNotificationsEmailEngagement {
+  created_at: Generated<Timestamp>;
+  delivery_id: string | null;
+  engagement_id: Generated<string>;
+  event_type: string;
+  link_url: string | null;
+  resend_id: string;
+}
+
 export interface GreenhouseNotificationsEmailSubscriptions {
   active: Generated<boolean>;
   created_at: Generated<Timestamp>;
@@ -2417,6 +2438,14 @@ export interface GreenhouseNotificationsEmailSubscriptions {
   recipient_name: string | null;
   recipient_user_id: string | null;
   subscription_id: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseNotificationsEmailTypeConfig {
+  email_type: string;
+  enabled: Generated<boolean>;
+  paused_by: string | null;
+  paused_reason: string | null;
   updated_at: Generated<Timestamp>;
 }
 
@@ -4240,7 +4269,9 @@ export interface DB {
   "greenhouse_hr.leave_types": GreenhouseHrLeaveTypes;
   "greenhouse_hr.workflow_approval_snapshots": GreenhouseHrWorkflowApprovalSnapshots;
   "greenhouse_notifications.email_deliveries": GreenhouseNotificationsEmailDeliveries;
+  "greenhouse_notifications.email_engagement": GreenhouseNotificationsEmailEngagement;
   "greenhouse_notifications.email_subscriptions": GreenhouseNotificationsEmailSubscriptions;
+  "greenhouse_notifications.email_type_config": GreenhouseNotificationsEmailTypeConfig;
   "greenhouse_notifications.notification_log": GreenhouseNotificationsNotificationLog;
   "greenhouse_notifications.notification_preferences": GreenhouseNotificationsNotificationPreferences;
   "greenhouse_notifications.notifications": GreenhouseNotificationsNotifications;
