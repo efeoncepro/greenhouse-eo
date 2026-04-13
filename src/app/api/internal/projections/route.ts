@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { requireAdminTenantContext } from '@/lib/tenant/authorization'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { readReactiveBacklogOverview } from '@/lib/operations/reactive-backlog'
+import { readAllCircuitStates } from '@/lib/operations/reactive-circuit-breaker'
 import { getRegisteredProjections, getSupportedProjectionDomains } from '@/lib/sync/projection-registry'
 import { ensureProjectionsRegistered } from '@/lib/sync/projections'
 import { getQueueStats } from '@/lib/sync/refresh-queue'
@@ -49,33 +50,47 @@ export async function GET() {
 
     const statsMap = new Map(stats.map(s => [s.handler, s]))
 
+    // Queue stats + reactive backlog overview + circuit breaker states, fetched in parallel
+    const [queue, reactiveBacklog, circuitStates] = await Promise.all([
+      getQueueStats().catch(() => ({ pending: 0, processing: 0, completed: 0, failed: 0 })),
+      readReactiveBacklogOverview(),
+      readAllCircuitStates().catch(() => [])
+    ])
+
+    const circuitMap = new Map(circuitStates.map(c => [c.projectionName, c]))
+
     const projectionStatus = projections.map(p => {
       const s = statsMap.get(p.name)
       const lastReactedAt = s?.last_reacted_at || null
       const ageHours = lastReactedAt ? Math.round((Date.now() - new Date(lastReactedAt).getTime()) / 3_600_000) : null
+      const circuit = circuitMap.get(p.name) ?? null
+      const totalEvents = Number(s?.total_events ?? 0)
+      const deadLetters = Number(s?.dead_letters ?? 0)
+      const retrying = Number(s?.retrying ?? 0)
+      const failures = deadLetters + retrying
+      const errorRate = totalEvents > 0 ? failures / totalEvents : 0
 
       return {
         name: p.name,
         description: p.description,
+        domain: p.domain ?? null,
         triggerEvents: p.triggerEvents,
         maxRetries: p.maxRetries ?? 2,
+        circuitState: circuit?.state ?? 'closed',
+        circuitLastError: circuit?.lastError ?? null,
+        circuitOpenedAt: circuit?.openedAt ?? null,
         last24h: {
-          totalEvents: Number(s?.total_events ?? 0),
+          totalEvents,
           successful: Number(s?.successful ?? 0),
-          deadLetters: Number(s?.dead_letters ?? 0),
-          retrying: Number(s?.retrying ?? 0),
+          deadLetters,
+          retrying,
+          errorRate,
           lastReactedAt,
           lagHours: ageHours,
           healthy: ageHours === null || ageHours <= 2
         }
       }
     })
-
-    // Queue stats
-    const [queue, reactiveBacklog] = await Promise.all([
-      getQueueStats().catch(() => ({ pending: 0, processing: 0, completed: 0, failed: 0 })),
-      readReactiveBacklogOverview()
-    ])
 
     // Global health: no dead letters, no failed queue items
     const globalDeadLetters = projectionStatus.reduce((s, p) => s + p.last24h.deadLetters, 0)

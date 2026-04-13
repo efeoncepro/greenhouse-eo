@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockMaterializeCommercialCostAttributionForPeriod = vi.fn()
 const mockReadCommercialCostAttributionByClientForPeriod = vi.fn()
-const mockPublishOutboxEvent = vi.fn()
+const mockRunGreenhousePostgresQuery = vi.fn()
 
 vi.mock('@/lib/commercial-cost-attribution/member-period-attribution', () => ({
   materializeCommercialCostAttributionForPeriod: (...args: unknown[]) =>
@@ -11,8 +11,9 @@ vi.mock('@/lib/commercial-cost-attribution/member-period-attribution', () => ({
     mockReadCommercialCostAttributionByClientForPeriod(...args)
 }))
 
-vi.mock('@/lib/sync/publish-event', () => ({
-  publishOutboxEvent: (...args: unknown[]) => mockPublishOutboxEvent(...args)
+// TASK-379: assert the v2 publish helper reaches the outbox with schemaVersion.
+vi.mock('@/lib/postgres/client', () => ({
+  runGreenhousePostgresQuery: (...args: unknown[]) => mockRunGreenhousePostgresQuery(...args)
 }))
 
 import {
@@ -48,19 +49,25 @@ describe('commercialCostAttributionProjection', () => {
     expect(commercialCostAttributionProjection.triggerEvents).toContain('compensation_version.updated')
   })
 
-  it('materializes the period and emits an attribution materialized event', async () => {
+  it('materializes the period and emits a single period-level event (TASK-379)', async () => {
     mockMaterializeCommercialCostAttributionForPeriod.mockResolvedValue({
       rows: [
         {
           memberId: 'member-1',
           allocations: [{ clientId: 'client-1' }]
+        },
+        {
+          memberId: 'member-2',
+          allocations: [{ clientId: 'client-1' }, { clientId: 'client-2' }]
         }
       ],
-      replaced: 1
+      replaced: 3
     })
     mockReadCommercialCostAttributionByClientForPeriod.mockResolvedValue([
-      { clientId: 'client-1' }
+      { clientId: 'client-1' },
+      { clientId: 'client-2' }
     ])
+    mockRunGreenhousePostgresQuery.mockResolvedValue([])
 
     const result = await commercialCostAttributionProjection.refresh(
       { entityType: 'finance_period', entityId: '2026-03' },
@@ -72,12 +79,49 @@ describe('commercialCostAttributionProjection', () => {
       3,
       'reactive-refresh:finance.expense.updated:2026-03'
     )
-    expect(mockPublishOutboxEvent).toHaveBeenCalledWith(
-      expect.objectContaining({
-        aggregateType: 'commercial_cost_attribution',
-        eventType: 'accounting.commercial_cost_attribution.materialized'
-      })
-    )
+
+    // Fan-out reduction: exactly ONE outbox insert for the whole period.
+    expect(mockRunGreenhousePostgresQuery).toHaveBeenCalledTimes(1)
+    const [sql, values] = mockRunGreenhousePostgresQuery.mock.calls[0] as [string, unknown[]]
+
+    expect(sql).toContain('INSERT INTO greenhouse_sync.outbox_events')
+
+    expect(values[1]).toBe('commercial_cost_attribution')
+    expect(values[2]).toBe('2026-03')
+    expect(values[3]).toBe('accounting.commercial_cost_attribution.period_materialized')
+
+    const payload = JSON.parse(String(values[4])) as Record<string, unknown>
+
+    expect(payload.schemaVersion).toBe(2)
+    expect(payload.periodId).toBe('2026-03')
+    expect(payload.snapshotCount).toBe(2)
+    expect(payload._materializedAt).toEqual(expect.any(String))
+    expect(payload.periodYear).toBe(2026)
+    expect(payload.periodMonth).toBe(3)
+    expect(payload.memberCount).toBe(2)
+    expect(payload.allocationCount).toBe(3)
+    expect(payload.clientCount).toBe(2)
+
     expect(result).toContain('2026-03')
+  })
+
+  it('does not publish the legacy per-entity event type anymore (TASK-379)', async () => {
+    mockMaterializeCommercialCostAttributionForPeriod.mockResolvedValue({
+      rows: [{ memberId: 'member-1', allocations: [] }],
+      replaced: 0
+    })
+    mockReadCommercialCostAttributionByClientForPeriod.mockResolvedValue([])
+    mockRunGreenhousePostgresQuery.mockResolvedValue([])
+
+    await commercialCostAttributionProjection.refresh(
+      { entityType: 'finance_period', entityId: '2026-03' },
+      { _eventType: 'finance.expense.updated' }
+    )
+
+    for (const call of mockRunGreenhousePostgresQuery.mock.calls) {
+      const values = call[1] as unknown[]
+
+      expect(values[3]).not.toBe('accounting.commercial_cost_attribution.materialized')
+    }
   })
 })

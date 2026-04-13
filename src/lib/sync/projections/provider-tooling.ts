@@ -1,7 +1,8 @@
 import 'server-only'
 
 import { materializeProviderToolingSnapshotsForPeriod } from '@/lib/providers/provider-tooling-snapshots'
-import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { publishPeriodMaterializedEvent } from '@/lib/sync/publish-event'
 
 import type { ProjectionDefinition } from '../projection-registry'
 
@@ -141,29 +142,20 @@ export const providerToolingProjection: ProjectionDefinition = {
       `reactive-refresh:${eventType}:${scope.entityId}`
     )
 
-    for (const snapshot of snapshots) {
-      await publishOutboxEvent({
-        aggregateType: 'provider_tooling_snapshot',
-        aggregateId: snapshot.snapshotId,
-        eventType: 'provider.tooling_snapshot.materialized',
-        payload: {
-          providerId: snapshot.providerId,
-          providerName: snapshot.providerName,
-          supplierId: snapshot.supplierId,
-          periodYear: snapshot.periodYear,
-          periodMonth: snapshot.periodMonth,
-          periodId: snapshot.periodId,
-          activeLicenseCount: snapshot.activeLicenseCount,
-          activeMemberCount: snapshot.activeMemberCount,
-          financeExpenseTotalClp: snapshot.financeExpenseTotalClp,
-          subscriptionCostTotalClp: snapshot.subscriptionCostTotalClp,
-          usageCostTotalClp: snapshot.usageCostTotalClp,
-          payrollMemberCount: snapshot.payrollMemberCount,
-          licensedMemberPayrollCostClp: snapshot.licensedMemberPayrollCostClp,
-          totalProviderCostClp: snapshot.totalProviderCostClp
-        }
-      })
-    }
+    // TASK-379 Slice 2: publish ONE period-level event instead of N per snapshot.
+    // Consumers refetch detail from greenhouse_providers.provider_tooling_snapshots
+    // using the `periodId` carried in the payload.
+    await publishPeriodMaterializedEvent({
+      aggregateType: AGGREGATE_TYPES.providerToolingSnapshot,
+      eventType: EVENT_TYPES.providerToolingSnapshotPeriodMaterialized,
+      periodId: scope.entityId,
+      snapshotCount: snapshots.length,
+      payload: {
+        periodYear: year,
+        periodMonth: month,
+        providerIds: snapshots.map(snapshot => snapshot.providerId)
+      }
+    })
 
     return `materialized provider_tooling: ${snapshots.length} providers for ${scope.entityId} via ${eventType}`
   },

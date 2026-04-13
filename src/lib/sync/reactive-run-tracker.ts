@@ -6,7 +6,6 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { createReactiveReplayContext, getReactiveReplayContext } from '@/lib/structured-context/reactive'
 import type { ReactiveReplayContextDocument } from '@/lib/structured-context/types'
 
-import type { ReactiveConsumerResult } from './reactive-consumer'
 
 // ── Types ──
 
@@ -91,8 +90,20 @@ export const writeReactiveRunStart = async ({
 }
 
 /**
+ * Minimal summary required by writeReactiveRunComplete. Both the V2 reactive
+ * consumer (ReactiveConsumerResult) and the recovery cron (which builds a
+ * smaller synthetic object) satisfy this shape.
+ */
+export interface ReactiveRunSummary {
+  eventsProcessed: number
+  eventsFailed: number
+  projectionsTriggered: number
+  durationMs: number
+}
+
+/**
  * Records the completion of a reactive worker run.
- * Updates the existing row with final stats from `ReactiveConsumerResult`.
+ * Updates the existing row with final stats from a `ReactiveRunSummary`.
  */
 export const writeReactiveRunComplete = async ({
   runId,
@@ -100,7 +111,7 @@ export const writeReactiveRunComplete = async ({
   status
 }: {
   runId: string
-  result: ReactiveConsumerResult
+  result: ReactiveRunSummary
   status?: ReactiveRunStatus
 }) => {
   const finalStatus =
