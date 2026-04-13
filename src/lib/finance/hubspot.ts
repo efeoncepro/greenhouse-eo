@@ -1,12 +1,26 @@
 import 'server-only'
 
 import { getFinanceProjectId, runFinanceQuery } from '@/lib/finance/shared'
+import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 type HubspotTableName = 'companies' | 'deals'
 
 const tableColumnsCache = new Map<HubspotTableName, Promise<Set<string>>>()
 
-const pickColumn = (columns: Set<string>, candidates: string[]) => candidates.find(candidate => columns.has(candidate)) ?? null
+/**
+ * Returns the first matching candidate column from the set.
+ * Logs a warning when the first preferred candidate is not found and a fallback is used,
+ * which indicates potential schema drift in the HubSpot CRM dataset.
+ */
+const pickColumn = (columns: Set<string>, candidates: string[], fieldHint?: string): string | null => {
+  const found = candidates.find(candidate => columns.has(candidate)) ?? null
+
+  if (found && fieldHint && found !== candidates[0]) {
+    console.warn(`[hubspot-finance] Column drift: "${fieldHint}" resolved to fallback column "${found}" (expected "${candidates[0]}")`)
+  }
+
+  return found
+}
 
 export const getHubspotTableColumns = async (tableName: HubspotTableName) => {
   const cached = tableColumnsCache.get(tableName)
@@ -35,14 +49,67 @@ export const getHubspotTableColumns = async (tableName: HubspotTableName) => {
   return promise
 }
 
+/**
+ * Validates that required and expected columns exist in the HubSpot schema.
+ * - Missing required columns: throws (sync will fail — better than silent corruption).
+ * - Missing expected columns: emits an outbox event for observability.
+ */
+async function validateHubSpotSchema(
+  tableName: HubspotTableName,
+  columns: Set<string>,
+  required: string[],
+  expected: string[]
+): Promise<void> {
+  const missingRequired = required.filter(col => !columns.has(col))
+
+  if (missingRequired.length > 0) {
+    const msg = `[hubspot-finance] Critical schema drift on "${tableName}": required columns missing: ${missingRequired.join(', ')}`
+
+    console.error(msg)
+    await publishOutboxEvent({
+      aggregateType: 'integration_health',
+      aggregateId: `hubspot-${tableName}`,
+      eventType: 'integration.schema_drift.detected',
+      payload: { source: 'hubspot', table: tableName, missingRequired, severity: 'critical' }
+    })
+    throw new Error(msg)
+  }
+
+  const missingExpected = expected.filter(col => !columns.has(col))
+
+  if (missingExpected.length > 0) {
+    console.warn(`[hubspot-finance] Schema drift on "${tableName}": expected columns missing: ${missingExpected.join(', ')}`)
+    await publishOutboxEvent({
+      aggregateType: 'integration_health',
+      aggregateId: `hubspot-${tableName}`,
+      eventType: 'integration.schema_drift.detected',
+      payload: { source: 'hubspot', table: tableName, missingExpected, severity: 'warning' }
+    })
+  }
+}
+
+/**
+ * Call before building company SQL expressions. Emits outbox event on schema drift.
+ * Throws if hs_object_id is missing (query would produce corrupt NULL IDs).
+ */
+export const validateHubSpotCompaniesSchema = (columns: Set<string>) =>
+  validateHubSpotSchema('companies', columns, ['hs_object_id'], ['name', 'domain', 'country'])
+
+/**
+ * Call before building deal SQL expressions. Emits outbox event on schema drift.
+ * Throws if hs_object_id or associatedcompanyid is missing.
+ */
+export const validateHubSpotDealsSchema = (columns: Set<string>) =>
+  validateHubSpotSchema('deals', columns, ['hs_object_id', 'associatedcompanyid'], ['dealname', 'dealstage', 'amount'])
+
 export const getHubspotCompaniesExpressions = (columns: Set<string>) => {
-  const companyIdColumn = pickColumn(columns, ['hs_object_id'])
-  const companyNameColumn = pickColumn(columns, ['name', 'company_name'])
-  const domainColumn = pickColumn(columns, ['domain'])
-  const countryColumn = pickColumn(columns, ['country'])
-  const archivedColumn = pickColumn(columns, ['hs_archived'])
-  const businessLineColumn = pickColumn(columns, ['linea_de_servicio'])
-  const servicesColumn = pickColumn(columns, ['servicios_especificos'])
+  const companyIdColumn = pickColumn(columns, ['hs_object_id'], 'company_id')
+  const companyNameColumn = pickColumn(columns, ['name', 'company_name'], 'company_name')
+  const domainColumn = pickColumn(columns, ['domain'], 'domain')
+  const countryColumn = pickColumn(columns, ['country'], 'country')
+  const archivedColumn = pickColumn(columns, ['hs_archived'], 'archived')
+  const businessLineColumn = pickColumn(columns, ['linea_de_servicio'], 'business_line')
+  const servicesColumn = pickColumn(columns, ['servicios_especificos'], 'services')
 
   return {
     idExpr: companyIdColumn ? `CAST(hc.${companyIdColumn} AS STRING)` : 'NULL',
@@ -56,14 +123,14 @@ export const getHubspotCompaniesExpressions = (columns: Set<string>) => {
 }
 
 export const getHubspotDealsExpressions = (columns: Set<string>) => {
-  const dealIdColumn = pickColumn(columns, ['hs_object_id'])
-  const dealNameColumn = pickColumn(columns, ['dealname', 'name'])
-  const stageColumn = pickColumn(columns, ['dealstage', 'stage'])
-  const amountColumn = pickColumn(columns, ['amount'])
-  const closeDateColumn = pickColumn(columns, ['closedate', 'close_date'])
-  const pipelineColumn = pickColumn(columns, ['pipeline'])
-  const companyIdColumn = pickColumn(columns, ['associatedcompanyid', 'hubspot_company_id'])
-  const archivedColumn = pickColumn(columns, ['hs_archived'])
+  const dealIdColumn = pickColumn(columns, ['hs_object_id'], 'deal_id')
+  const dealNameColumn = pickColumn(columns, ['dealname', 'name'], 'deal_name')
+  const stageColumn = pickColumn(columns, ['dealstage', 'stage'], 'deal_stage')
+  const amountColumn = pickColumn(columns, ['amount'], 'amount')
+  const closeDateColumn = pickColumn(columns, ['closedate', 'close_date'], 'close_date')
+  const pipelineColumn = pickColumn(columns, ['pipeline'], 'pipeline')
+  const companyIdColumn = pickColumn(columns, ['associatedcompanyid', 'hubspot_company_id'], 'company_id')
+  const archivedColumn = pickColumn(columns, ['hs_archived'], 'archived')
 
   return {
     canQueryDeals: Boolean(dealIdColumn && companyIdColumn),

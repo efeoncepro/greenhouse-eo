@@ -214,30 +214,27 @@ describe('Finance BigQuery write cutover guards', () => {
     })
   })
 
-  it('fails closed for bulk expense creation when Postgres fails and fallback is disabled', async () => {
+  it('propagates Postgres errors for bulk expense creation (Postgres-only, no BQ fallback)', async () => {
     mockCreateFinanceExpenseInPostgres.mockRejectedValue(new Error('pg down'))
 
-    const response = await postBulkExpenses(
-      new Request('http://localhost/api/finance/expenses/bulk', {
-        method: 'POST',
-        body: JSON.stringify({
-          items: [
-            {
-              expenseId: 'exp-1',
-              description: 'Servicio',
-              currency: 'CLP',
-              subtotal: 1000,
-              paymentDate: '2026-03-30'
-            }
-          ]
+    await expect(
+      postBulkExpenses(
+        new Request('http://localhost/api/finance/expenses/bulk', {
+          method: 'POST',
+          body: JSON.stringify({
+            items: [
+              {
+                expenseId: 'exp-1',
+                description: 'Servicio',
+                currency: 'CLP',
+                subtotal: 1000,
+                paymentDate: '2026-03-30'
+              }
+            ]
+          })
         })
-      })
-    )
-
-    expect(response.status).toBe(503)
-    await expect(response.json()).resolves.toMatchObject({
-      code: 'FINANCE_BQ_WRITE_DISABLED'
-    })
+      )
+    ).rejects.toThrow('pg down')
   })
 
   it('fails closed for income updates when Postgres fails and fallback is disabled', async () => {
@@ -292,23 +289,22 @@ describe('Finance BigQuery write cutover guards', () => {
     await expect(response.json()).resolves.toMatchObject({ code: 'FINANCE_BQ_WRITE_DISABLED' })
   })
 
-  it('fails closed for reconciliation period creation when Postgres fails and fallback is disabled', async () => {
+  it('propagates Postgres errors for reconciliation period creation (Postgres-only, no BQ fallback)', async () => {
     mockCreateReconciliationPeriodInPostgres.mockRejectedValue(new Error('pg down'))
 
-    const response = await postReconciliation(
-      new Request('http://localhost/api/finance/reconciliation', {
-        method: 'POST',
-        body: JSON.stringify({
-          accountId: 'acc-1',
-          year: 2026,
-          month: 3,
-          openingBalance: 0
+    await expect(
+      postReconciliation(
+        new Request('http://localhost/api/finance/reconciliation', {
+          method: 'POST',
+          body: JSON.stringify({
+            accountId: 'acc-1',
+            year: 2026,
+            month: 3,
+            openingBalance: 0
+          })
         })
-      })
-    )
-
-    expect(response.status).toBe(503)
-    await expect(response.json()).resolves.toMatchObject({ code: 'FINANCE_BQ_WRITE_DISABLED' })
+      )
+    ).rejects.toThrow('pg down')
   })
 
   it('fails closed for client creation when legacy write fallback is disabled', async () => {
