@@ -465,17 +465,31 @@ export const updateReconciliationPeriodInPostgres = async (
   setClauses.push('updated_at = CURRENT_TIMESTAMP')
   values.push(periodId)
 
-  const rows = await queryRows<PostgresPeriodRow>(
-    `
-      UPDATE greenhouse_finance.reconciliation_periods
-      SET ${setClauses.join(', ')}
-      WHERE period_id = $${paramIdx}
-      RETURNING *
-    `,
-    values
-  )
+  return withGreenhousePostgresTransaction(async client => {
+    // Acquire an exclusive row lock before updating — NOWAIT fails fast with
+    // an error if another transaction already holds the lock, preventing
+    // concurrent status transitions from corrupting the period state.
+    const lockResult = await client.query<{ period_id: string }>(
+      `SELECT period_id FROM greenhouse_finance.reconciliation_periods
+       WHERE period_id = $1 FOR UPDATE NOWAIT`,
+      [periodId]
+    )
 
-  return rows.length > 0 ? mapPeriod(rows[0]) : null
+    if (lockResult.rowCount === 0) return null
+
+    const rows = await queryRows<PostgresPeriodRow>(
+      `
+        UPDATE greenhouse_finance.reconciliation_periods
+        SET ${setClauses.join(', ')}
+        WHERE period_id = $${paramIdx}
+        RETURNING *
+      `,
+      values,
+      client
+    )
+
+    return rows.length > 0 ? mapPeriod(rows[0]) : null
+  })
 }
 
 // ─── Periods: context (lightweight) ────────────────────────────────
@@ -702,7 +716,8 @@ export const updateStatementRowMatchInPostgres = async (
     matchConfidence: number
     matchedByUserId: string | null
     notes?: string | null
-  }
+  },
+  opts?: { client?: QueryableClient }
 ) => {
   await assertFinanceSlice2PostgresReady()
 
@@ -726,13 +741,18 @@ export const updateStatementRowMatchInPostgres = async (
       match.matchStatus, match.matchedType, match.matchedId,
       match.matchedPaymentId, match.matchedSettlementLegId ?? null, match.matchConfidence,
       match.matchedByUserId, match.notes ?? null
-    ]
+    ],
+    opts?.client
   )
 }
 
 // ─── Statement rows: clear match ────────────────────────────────────
 
-export const clearStatementRowMatchInPostgres = async (rowId: string, periodId: string) => {
+export const clearStatementRowMatchInPostgres = async (
+  rowId: string,
+  periodId: string,
+  opts?: { client?: QueryableClient }
+) => {
   await assertFinanceSlice2PostgresReady()
 
   await queryRows(
@@ -749,7 +769,8 @@ export const clearStatementRowMatchInPostgres = async (rowId: string, periodId: 
         matched_at = NULL
       WHERE row_id = $1 AND period_id = $2
     `,
-    [rowId, periodId]
+    [rowId, periodId],
+    opts?.client
   )
 }
 
