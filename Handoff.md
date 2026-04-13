@@ -1,5 +1,20 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — TASK-156 ahora explicita tambien la capa SLI
+
+- alcance documental:
+  - `docs/tasks/to-do/TASK-156-sla-slo-per-service.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+- decisión tomada:
+  - la lane ya no se modela solo como SLA/SLO
+  - `TASK-156` ahora formaliza la cadena `SLI -> SLO -> SLA` por servicio
+- actualización clave:
+  - `SLI` queda definido como la métrica observable que se mide
+  - `SLO` queda como el objetivo operativo sobre ese indicador
+  - `SLA` queda como el compromiso contractual apoyado en esos indicadores
+- validación:
+  - `git diff --check`
+
 ## Sesion 2026-04-13 — TASK-031 rebaselined al runtime actual del repo
 
 - alcance documental:
