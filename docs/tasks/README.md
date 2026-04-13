@@ -22,7 +22,12 @@ Primer bloque operativo asignado:
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
 - siguiente ID disponible: `TASK-386`
-- siguiente ID disponible: `TASK-386`
+- siguiente ID disponible: `TASK-391`
+- `TASK-390` — Notificaciones In-App Broadcast Admin. Endpoint `POST /api/admin/notifications/broadcast` + UI en Admin Center para enviar notificaciones a segmentos (todos, colaboradores, clientes, tenant específico). Solo `efeonce_admin`. P3, Medio. Spec: `to-do/TASK-390-notifications-broadcast-admin.md`.
+- `TASK-389` — Notificaciones In-App Retención y Purga. Cron semanal: archiva leídas >30 días, borra archivadas >90 días, purga notification_log >180 días. Idempotente, en batches de 500. P2, Bajo. Spec: `to-do/TASK-389-notifications-retencion-purga.md`.
+- `TASK-388` — Notificaciones In-App Acciones Inline. Botones Aprobar/Rechazar directamente en el dropdown de notificaciones para `leave_review`. Proxy endpoint + NotificationActionBar + schema de actions en metadata. P2, Medio. Spec: `to-do/TASK-388-notifications-acciones-inline.md`.
+- `TASK-387` — Notificaciones In-App Agrupación y Digest. Notificaciones de la misma categoría en ventana de 1h se colapsan en un grupo con conteo. UI expandible en dropdown y feed. P2, Medio. Spec: `to-do/TASK-387-notifications-agrupacion-digest.md`.
+- `TASK-386` — Notificaciones In-App Real-Time SSE. Reemplaza polling 30s por Server-Sent Events. Endpoint `/api/notifications/stream`, hook `useNotificationStream` con reconexión automática y fallback a polling. P2, Alto. Spec: `to-do/TASK-386-notifications-realtime-sse.md`.
 - `TASK-385` — Email Scaling Cloud Run. **Diferida (P3).** Mover envíos broadcast >50 destinatarios al ops-worker de Cloud Run para salir del límite de 60s de Vercel. Activar cuando: un envío falla por timeout, o base >150 empleados, o tiempo promedio broadcast >30s. Blocked by: TASK-383, TASK-384. Spec: `to-do/TASK-385-email-scaling-cloud-run.md`.
 - `TASK-384` — Email Compliance & Retención GDPR. Cron semanal que nullifica `delivery_payload` a los 90 días + endpoint admin de anonimización individual por solicitud GDPR + verificación del priority bypass para emails critical/transactional. P2, Bajo. Spec: `to-do/TASK-384-email-compliance-retencion.md`.
 - `TASK-383` — Email Observabilidad. Sentry capture en el pipeline de entrega + cron diario de bounce/complaint rate monitoring (alerta si >2%/0.1%) + alerta inmediata en dead letter. P1, Medio. Spec: `to-do/TASK-383-email-observabilidad.md`.

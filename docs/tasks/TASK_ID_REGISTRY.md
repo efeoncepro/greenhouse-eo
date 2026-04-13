@@ -435,3 +435,8 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-383` | `to-do` | Email Observabilidad | `docs/tasks/to-do/TASK-383-email-observabilidad.md` |
 | `TASK-384` | `to-do` | Email Compliance & Retención GDPR | `docs/tasks/to-do/TASK-384-email-compliance-retencion.md` |
 | `TASK-385` | `to-do` | Email Scaling Cloud Run | `docs/tasks/to-do/TASK-385-email-scaling-cloud-run.md` |
+| `TASK-386` | `to-do` | Notificaciones In-App Real-Time SSE | `docs/tasks/to-do/TASK-386-notifications-realtime-sse.md` |
+| `TASK-387` | `to-do` | Notificaciones In-App Agrupación y Digest | `docs/tasks/to-do/TASK-387-notifications-agrupacion-digest.md` |
+| `TASK-388` | `to-do` | Notificaciones In-App Acciones Inline | `docs/tasks/to-do/TASK-388-notifications-acciones-inline.md` |
+| `TASK-389` | `to-do` | Notificaciones In-App Retención y Purga | `docs/tasks/to-do/TASK-389-notifications-retencion-purga.md` |
+| `TASK-390` | `to-do` | Notificaciones In-App Broadcast Admin | `docs/tasks/to-do/TASK-390-notifications-broadcast-admin.md` |
