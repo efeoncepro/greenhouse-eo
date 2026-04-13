@@ -1,5 +1,22 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — TASK-031 rebaselined al runtime actual del repo
+
+- alcance documental:
+  - `docs/tasks/to-do/TASK-031-hris-performance-evaluations.md`
+  - `docs/tasks/TASK_ID_REGISTRY.md`
+  - `changelog.md`
+- decisión tomada:
+  - `TASK-031` sigue vigente funcionalmente y conserva cabida real en el backlog HRIS
+  - la lane deja de asumir BigQuery directo y fija `greenhouse_serving.ico_member_metrics` como source cuantitativa canónica
+  - `TASK-029` deja de leerse como bloqueo duro del primer corte; goals queda como integración soft con degradación graceful
+- actualización clave:
+  - el diseño ahora reconoce que hoy no existen tablas `eval_*`, APIs ni surfaces de evaluaciones en el repo
+  - el módulo debe reutilizar `reports_to_member_id`, `person_intelligence` y `workflowDomain = performance_evaluation`
+  - el scope ya separa schema, orchestration, APIs, UI y summary enrichment sin mezclar una lane de goals dentro de esta task
+- validación:
+  - `git diff --check`
+
 ## Sesion 2026-04-13 — TASK-025 rescatada como policy estratégica y no como implementación
 
 - alcance documental:

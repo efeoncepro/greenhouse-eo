@@ -2,6 +2,13 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — TASK-031 queda rebaselined al runtime actual
+
+- `docs/tasks/to-do/TASK-031-hris-performance-evaluations.md` fue reescrita al template canónico vigente.
+- La lane deja de asumir BigQuery directo y fija `greenhouse_serving.ico_member_metrics` como source cuantitativa canónica para evaluaciones.
+- `TASK-029` pasa a modelarse como integración soft: el módulo puede existir sin goals materializados y degradar a `null` en ese componente del summary.
+- `docs/tasks/TASK_ID_REGISTRY.md` quedó alineado con el título canónico `HRIS Performance Evaluations`.
+
 ### 2026-04-13 — TASK-025 queda rescatada como policy canónica de FTR para Payroll
 
 - `docs/tasks/to-do/TASK-025-hr-payroll-module-delta-ftr.md` fue reescrita para dejar de ser un brief destructivo de implementación.
