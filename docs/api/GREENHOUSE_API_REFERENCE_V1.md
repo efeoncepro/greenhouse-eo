@@ -13,16 +13,23 @@ Use this file as the first read for any agent or connector that needs to integra
 
 Purpose:
 - generic machine-to-machine integration surface
-- intended for HubSpot, Notion, BigQuery-backed connectors, and future external systems
+- intended for HubSpot, Notion, BigQuery-backed connectors, sister platforms, and future external systems
 
 Auth:
 - `Authorization: Bearer <GREENHOUSE_INTEGRATION_API_TOKEN>`
 - or `x-greenhouse-integration-key: <GREENHOUSE_INTEGRATION_API_TOKEN>`
+- sister-platform hardened lane:
+  - `Authorization: Bearer <consumer-token>`
+  - or `x-greenhouse-sister-platform-key: <consumer-token>`
+  - plus `externalScopeType` + `externalScopeId`
 
 Routes:
 - `GET /api/integrations/v1/catalog/capabilities`
 - `GET /api/integrations/v1/tenants`
 - `POST /api/integrations/v1/tenants/capabilities/sync`
+- `GET /api/integrations/v1/sister-platforms/context`
+- `GET /api/integrations/v1/sister-platforms/catalog/capabilities`
+- `GET /api/integrations/v1/sister-platforms/readiness`
 
 Read next:
 - `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md`
@@ -30,6 +37,7 @@ Read next:
 
 Key rules:
 - provider-neutral contract
+- sister-platform read routes are binding-aware and read-only by default
 - no automatic derivation from `deals` or `closedwon`
 - external sync must send explicit `businessLines` and `serviceModules`
 - tenant resolution supports:
@@ -73,12 +81,18 @@ Key rules:
 - `https://greenhouse.efeoncepro.com/api/integrations/v1/catalog/capabilities`
 - `https://greenhouse.efeoncepro.com/api/integrations/v1/tenants`
 - `https://greenhouse.efeoncepro.com/api/integrations/v1/tenants/capabilities/sync`
+- `https://greenhouse.efeoncepro.com/api/integrations/v1/sister-platforms/context`
+- `https://greenhouse.efeoncepro.com/api/integrations/v1/sister-platforms/catalog/capabilities`
+- `https://greenhouse.efeoncepro.com/api/integrations/v1/sister-platforms/readiness`
 
 ### Staging API
 
 - `https://dev-greenhouse.efeoncepro.com/api/integrations/v1/catalog/capabilities`
 - `https://dev-greenhouse.efeoncepro.com/api/integrations/v1/tenants`
 - `https://dev-greenhouse.efeoncepro.com/api/integrations/v1/tenants/capabilities/sync`
+- `https://dev-greenhouse.efeoncepro.com/api/integrations/v1/sister-platforms/context`
+- `https://dev-greenhouse.efeoncepro.com/api/integrations/v1/sister-platforms/catalog/capabilities`
+- `https://dev-greenhouse.efeoncepro.com/api/integrations/v1/sister-platforms/readiness`
 
 ### ICO Engine API
 

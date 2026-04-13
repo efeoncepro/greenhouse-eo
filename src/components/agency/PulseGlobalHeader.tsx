@@ -5,7 +5,7 @@ import Card from '@mui/material/Card'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_AGENCY } from '@/config/greenhouse-nomenclature'
 import type { AgencyPulseKpis } from '@/lib/agency/agency-queries'
 
 type Props = {
@@ -27,7 +27,7 @@ const PulseGlobalHeader = ({ kpis }: Props) => (
     elevation={0}
     sx={{
       p: 3,
-      border: `1px solid ${GH_COLORS.neutral.border}`,
+      border: theme => `1px solid ${theme.palette.customColors.lightAlloy}`,
       borderRadius: 3,
       bgcolor: 'background.paper'
     }}
@@ -36,23 +36,23 @@ const PulseGlobalHeader = ({ kpis }: Props) => (
       <Box>
         <Typography
           variant='h5'
-          sx={{ fontFamily: 'Poppins', fontWeight: 700, color: GH_COLORS.neutral.textPrimary, mb: 0.5 }}
+          sx={{ fontFamily: 'Poppins', fontWeight: 700, color: theme => theme.palette.customColors.midnight, mb: 0.5 }}
         >
           {GH_AGENCY.pulse_title}
         </Typography>
-        <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+        <Typography variant='body2' sx={{ color: 'text.secondary' }}>
           {GH_AGENCY.pulse_subtitle}
         </Typography>
       </Box>
       {kpis ? (
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} flexWrap='wrap' useFlexGap>
-          <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+          <Typography variant='caption' sx={{ color: 'text.secondary' }}>
             {GH_AGENCY.meta_spaces(kpis.totalSpaces)}
           </Typography>
-          <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+          <Typography variant='caption' sx={{ color: 'text.secondary' }}>
             {GH_AGENCY.meta_projects(kpis.totalProjects)}
           </Typography>
-          <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+          <Typography variant='caption' sx={{ color: 'text.secondary' }}>
             {GH_AGENCY.meta_sync(formatSync(kpis.lastSyncedAt))}
           </Typography>
         </Stack>

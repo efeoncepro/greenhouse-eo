@@ -41,12 +41,16 @@ Indice maestro de la documentacion no operativa del repo.
 - [Greenhouse_Capabilities_Architecture_v1.md](architecture/Greenhouse_Capabilities_Architecture_v1.md)
 - [Greenhouse_Nomenclatura_Portal_v3.md](architecture/Greenhouse_Nomenclatura_Portal_v3.md)
 - [GREENHOUSE_SCIM_ENTRA_INTEGRATION_V1.md](architecture/GREENHOUSE_SCIM_ENTRA_INTEGRATION_V1.md)
+- [GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md](architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md)
+- [GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md](architecture/GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md)
+- [GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md](architecture/GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md)
 - [12-testing-development.md](architecture/12-testing-development.md)
 
 ### Documentation
 
 - [Portal Functional Documentation](documentation/README.md)
 - [Sistema de Observabilidad de Tests](documentation/plataforma/sistema-observabilidad-de-tests.md)
+- [Sister Platform Bindings](documentation/plataforma/sister-platform-bindings.md)
 
 ### API
 
@@ -83,6 +87,7 @@ Indice maestro de la documentacion no operativa del repo.
 ### Operations
 
 - [Issue Tracker](issues/README.md)
+- [Mini Task Operating Model](operations/MINI_TASK_OPERATING_MODEL_V1.md)
 - [DOCUMENTATION_OPERATING_MODEL_V1.md](operations/DOCUMENTATION_OPERATING_MODEL_V1.md)
 - [ISSUE_OPERATING_MODEL_V1.md](operations/ISSUE_OPERATING_MODEL_V1.md)
 - [GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md](operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md)
@@ -99,6 +104,17 @@ Indice maestro de la documentacion no operativa del repo.
 
 ### Tasks
 
+- [Mini Task Index](mini-tasks/README.md)
+- [Mini Task Template](mini-tasks/MINI_TASK_TEMPLATE.md) — plantilla copiable para mini-tasks nuevas
+- [Mini Task ID Registry](mini-tasks/MINI_TASK_ID_REGISTRY.md)
+- Paneles activos bajo `docs/mini-tasks/`:
+  - `in-progress/`
+  - `to-do/`
+  - `complete/`
+- Regla obligatoria:
+  - `MINI-###` se usa solo para mejoras chicas, locales y planificadas
+  - si el cambio crece de alcance o toca arquitectura/shared runtime, debe promoverse a `TASK-###`
+  - si el hallazgo es una falla real de runtime, debe abrirse como `ISSUE-###`
 - [Task Index](tasks/README.md)
 - [Task Template](tasks/TASK_TEMPLATE.md) — plantilla copiable para tasks nuevas
 - [Task Process](tasks/TASK_PROCESS.md) — protocolo completo (Plan Mode, Skill, Subagent, Checkpoint/Mode)

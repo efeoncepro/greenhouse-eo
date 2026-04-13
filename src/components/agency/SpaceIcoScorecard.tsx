@@ -149,12 +149,12 @@ const buildColumns = (onStuckClick: (spaceId: string) => void) => [
     cell: ({ row }) => (
       <Stack sx={{ minWidth: 0 }}>
         <Stack direction='row' spacing={0.75} alignItems='center' flexWrap='wrap'>
-          <Typography variant='body2' noWrap sx={{ fontWeight: 600, color: GH_COLORS.neutral.textPrimary }}>
+          <Typography variant='body2' noWrap sx={{ fontWeight: 600, color: t => t.palette.customColors.midnight }}>
             {row.original.clientName}
           </Typography>
           <AgencyMetricStatusChip metric={row.original.trustSummaryMetric} />
         </Stack>
-        <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+        <Typography variant='caption' sx={{ color: 'text.secondary' }}>
           {row.original.totalTasks} tareas · {row.original.activeTasks} activas
         </Typography>
       </Stack>
@@ -175,7 +175,7 @@ const buildColumns = (onStuckClick: (spaceId: string) => void) => [
     cell: ({ row }) => (
       <Stack direction='row' spacing={0.5} alignItems='center' justifyContent='flex-end'>
         <ZoneDot zone={row.original.rpa?.zone ?? null} />
-        <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 500 }}>
+        <Typography variant='body2' sx={{ color: t => t.palette.customColors.midnight, fontWeight: 500 }}>
           {formatMetric(row.original.rpa, 'number')}
         </Typography>
       </Stack>
@@ -196,7 +196,7 @@ const buildColumns = (onStuckClick: (spaceId: string) => void) => [
     cell: ({ row }) => (
       <Stack direction='row' spacing={0.5} alignItems='center' justifyContent='flex-end'>
         <ZoneDot zone={row.original.otd?.zone ?? null} />
-        <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 500 }}>
+        <Typography variant='body2' sx={{ color: t => t.palette.customColors.midnight, fontWeight: 500 }}>
           {formatMetric(row.original.otd, 'pct')}
         </Typography>
       </Stack>
@@ -217,7 +217,7 @@ const buildColumns = (onStuckClick: (spaceId: string) => void) => [
     cell: ({ row }) => (
       <Stack direction='row' spacing={0.5} alignItems='center' justifyContent='flex-end'>
         <ZoneDot zone={row.original.ftr?.zone ?? null} />
-        <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 500 }}>
+        <Typography variant='body2' sx={{ color: t => t.palette.customColors.midnight, fontWeight: 500 }}>
           {formatMetric(row.original.ftr, 'pct')}
         </Typography>
       </Stack>
@@ -236,7 +236,7 @@ const buildColumns = (onStuckClick: (spaceId: string) => void) => [
       return va - vb
     },
     cell: ({ row }) => (
-      <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 500, textAlign: 'end' }}>
+      <Typography variant='body2' sx={{ color: t => t.palette.customColors.midnight, fontWeight: 500, textAlign: 'end' }}>
         {formatMetric(row.original.throughput, 'number')}
       </Typography>
     )
@@ -254,7 +254,7 @@ const buildColumns = (onStuckClick: (spaceId: string) => void) => [
       return va - vb
     },
     cell: ({ row }) => (
-      <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 500, textAlign: 'end' }}>
+      <Typography variant='body2' sx={{ color: t => t.palette.customColors.midnight, fontWeight: 500, textAlign: 'end' }}>
         {formatMetric(row.original.cycle, 'days')}
       </Typography>
     )
@@ -292,7 +292,7 @@ const buildColumns = (onStuckClick: (spaceId: string) => void) => [
       }
 
       return (
-        <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 500, textAlign: 'end' }}>
+        <Typography variant='body2' sx={{ color: t => t.palette.customColors.midnight, fontWeight: 500, textAlign: 'end' }}>
           {formatMetric(row.original.stuck, 'number')}
         </Typography>
       )

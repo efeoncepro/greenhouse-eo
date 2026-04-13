@@ -5,7 +5,7 @@ import CardActionArea from '@mui/material/CardActionArea'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
-import { GH_COLORS, GH_TEAM } from '@/config/greenhouse-nomenclature'
+import { GH_TEAM } from '@/config/greenhouse-nomenclature'
 
 type TeamExpansionGhostCardProps = {
   minHeight?: number
@@ -19,8 +19,8 @@ const TeamExpansionGhostCard = ({ minHeight = 280, onClick, variant = 'card' }: 
       <Box
         sx={{
           borderRadius: 3,
-          border: `1px dashed ${GH_COLORS.neutral.border}`,
-          bgcolor: GH_COLORS.neutral.bgSurface,
+          border: theme => `1px dashed ${theme.palette.customColors.lightAlloy}`,
+          bgcolor: 'background.default',
           overflow: 'hidden'
         }}
       >
@@ -38,16 +38,16 @@ const TeamExpansionGhostCard = ({ minHeight = 280, onClick, variant = 'card' }: 
         >
           <Stack direction='row' spacing={2} alignItems='center' sx={{ minWidth: 0 }}>
             <Box
-              sx={{
+              sx={theme => ({
                 width: 40,
                 height: 40,
                 display: 'grid',
                 placeItems: 'center',
                 borderRadius: 999,
-                bgcolor: GH_COLORS.semantic.warning.bg,
-                color: GH_COLORS.semantic.warning.text,
+                bgcolor: theme.palette.warning.lighterOpacity,
+                color: theme.palette.warning.main,
                 flexShrink: 0
-              }}
+              })}
             >
               <i className='tabler-plus text-[20px]' />
             </Box>
@@ -59,7 +59,7 @@ const TeamExpansionGhostCard = ({ minHeight = 280, onClick, variant = 'card' }: 
             </Stack>
           </Stack>
 
-          <Box sx={{ color: GH_COLORS.semantic.warning.text, flexShrink: 0 }}>
+          <Box sx={{ color: theme => theme.palette.warning.main, flexShrink: 0 }}>
             <i className='tabler-arrow-right text-[18px]' />
           </Box>
         </CardActionArea>
@@ -71,8 +71,8 @@ const TeamExpansionGhostCard = ({ minHeight = 280, onClick, variant = 'card' }: 
     <Box
       sx={{
         borderRadius: 3,
-        border: `1px dashed ${GH_COLORS.neutral.border}`,
-        bgcolor: GH_COLORS.neutral.bgSurface,
+        border: theme => `1px dashed ${theme.palette.customColors.lightAlloy}`,
+        bgcolor: 'background.default',
         overflow: 'hidden'
       }}
     >
@@ -88,15 +88,15 @@ const TeamExpansionGhostCard = ({ minHeight = 280, onClick, variant = 'card' }: 
       >
         <Stack spacing={1.5} alignItems='center'>
           <Box
-            sx={{
+            sx={theme => ({
               width: 48,
               height: 48,
               display: 'grid',
               placeItems: 'center',
               borderRadius: 999,
-              bgcolor: GH_COLORS.semantic.warning.bg,
-              color: GH_COLORS.semantic.warning.text
-            }}
+              bgcolor: theme.palette.warning.lighterOpacity,
+              color: theme.palette.warning.main
+            })}
           >
             <i className='tabler-plus text-[24px]' />
           </Box>

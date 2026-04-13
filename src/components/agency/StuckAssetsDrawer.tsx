@@ -10,6 +10,8 @@ import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
+import { useTheme } from '@mui/material/styles'
+
 import CustomChip from '@core/components/mui/Chip'
 
 import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
@@ -39,6 +41,7 @@ type Props = {
 // ─── Component ──────────────────────────────────────────────────────────────
 
 const StuckAssetsDrawer = ({ open, spaceId, onClose }: Props) => {
+  const theme = useTheme()
   const [assets, setAssets] = useState<StuckAsset[]>([])
   const [loading, setLoading] = useState(false)
 
@@ -67,7 +70,7 @@ const StuckAssetsDrawer = ({ open, spaceId, onClose }: Props) => {
   }, [open, fetchAssets])
 
   const COL = {
-    color: GH_COLORS.neutral.textSecondary,
+    color: theme.palette.text.secondary,
     fontSize: '0.7rem',
     fontWeight: 500,
     textTransform: 'uppercase' as const,
@@ -84,10 +87,10 @@ const StuckAssetsDrawer = ({ open, spaceId, onClose }: Props) => {
       {/* Header */}
       <Stack direction='row' alignItems='center' justifyContent='space-between' sx={{ p: 3 }}>
         <Stack>
-          <Typography variant='h6' sx={{ fontWeight: 600, color: GH_COLORS.neutral.textPrimary }}>
+          <Typography variant='h6' sx={{ fontWeight: 600, color: theme.palette.customColors.midnight }}>
             {GH_AGENCY.ico_stuck_drawer_title}
           </Typography>
-          <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+          <Typography variant='body2' sx={{ color: theme.palette.text.secondary }}>
             {spaceId}
           </Typography>
         </Stack>
@@ -109,7 +112,7 @@ const StuckAssetsDrawer = ({ open, spaceId, onClose }: Props) => {
         ) : assets.length === 0 ? (
           <Stack alignItems='center' justifyContent='center' sx={{ py: 8 }} role='status'>
             <i className='tabler-check-circle' style={{ fontSize: '2.5rem', color: GH_COLORS.semaphore.green.source }} />
-            <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textSecondary, mt: 2, textAlign: 'center' }}>
+            <Typography variant='body2' sx={{ color: theme.palette.text.secondary, mt: 2, textAlign: 'center' }}>
               {GH_AGENCY.ico_stuck_empty}
             </Typography>
           </Stack>
@@ -138,26 +141,26 @@ const StuckAssetsDrawer = ({ open, spaceId, onClose }: Props) => {
                     px: 1,
                     py: 1.5,
                     gap: 1,
-                    '&:hover': { bgcolor: GH_COLORS.neutral.bgSurface }
+                    '&:hover': { bgcolor: theme.palette.background.default }
                   }}
                 >
                   {/* Task name */}
-                  <Typography variant='body2' noWrap sx={{ fontWeight: 500, color: GH_COLORS.neutral.textPrimary }}>
+                  <Typography variant='body2' noWrap sx={{ fontWeight: 500, color: theme.palette.customColors.midnight }}>
                     {asset.taskName || asset.taskSourceId}
                   </Typography>
 
                   {/* CSC Phase */}
-                  <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+                  <Typography variant='caption' sx={{ color: theme.palette.text.secondary }}>
                     {CSC_PHASE_LABELS[asset.faseCsc as CscPhase] ?? asset.faseCsc}
                   </Typography>
 
                   {/* RPA */}
-                  <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 500 }}>
+                  <Typography variant='body2' sx={{ color: theme.palette.customColors.midnight, fontWeight: 500 }}>
                     {asset.rpaValue != null ? asset.rpaValue.toFixed(1) : '—'}
                   </Typography>
 
                   {/* Days stuck */}
-                  <Typography variant='body2' sx={{ fontWeight: 500, color: GH_COLORS.neutral.textPrimary }}>
+                  <Typography variant='body2' sx={{ fontWeight: 500, color: theme.palette.customColors.midnight }}>
                     {asset.daysSinceUpdate}d
                   </Typography>
 

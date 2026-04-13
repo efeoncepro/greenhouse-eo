@@ -12,6 +12,7 @@ import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 
 import type { PayrollEntry, PayrollPeriod } from '@/types/payroll'
+import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import { formatCurrency, formatFactor, formatPercent } from './helpers'
 
 type EmployerInfo = {
@@ -178,7 +179,7 @@ const PayrollReceiptCard = ({ entry, period, employerInfo }: Props) => {
           </Box>
         </Box>
 
-        <Divider sx={{ borderColor: '#023c70', borderWidth: 1, mb: 3 }} />
+        <Divider sx={{ borderColor: GH_COLORS.role.account.source, borderWidth: 1, mb: 3 }} />
 
         {/* Employee info */}
         <Typography variant='subtitle2' sx={{ mb: 1.5 }}>Datos del colaborador</Typography>
@@ -246,7 +247,7 @@ const PayrollReceiptCard = ({ entry, period, employerInfo }: Props) => {
         {/* Net total */}
         <Box
           sx={{
-            bgcolor: '#023c70',
+            bgcolor: GH_COLORS.role.account.source,
             color: '#fff',
             borderRadius: 1,
             display: 'flex',

@@ -21,7 +21,7 @@ import type { RpaTrendBySpace } from '@/components/agency/IcoCharts'
 import SpaceIcoScorecard from '@/components/agency/SpaceIcoScorecard'
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 import type { SpaceMetricSnapshot, MetricValue } from '@/lib/ico-engine/read-metrics'
-import { CSC_PHASE_LABELS, type CscPhase } from '@/lib/ico-engine/metric-registry'
+import { CSC_PHASE_LABELS, CSC_CHART_COLORS, type CscPhase } from '@/lib/ico-engine/metric-registry'
 
 import type { OrganizationDetailData } from '../types'
 
@@ -31,15 +31,7 @@ const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexChart
 
 const MONTH_SHORT = ['', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
 
-const CSC_COLORS: Record<CscPhase, string> = {
-  briefing: '#7367F0',
-  produccion: '#00BAD1',
-  revision_interna: '#ff6500',
-  cambios_cliente: '#bb1954',
-  entrega: '#6ec207'
-}
-
-const TREND_LINE_COLORS = ['#7367F0', '#00BAD1', '#ff6500', '#bb1954', '#6ec207']
+const TREND_LINE_COLORS = Object.values(CSC_CHART_COLORS)
 
 type IcoData = {
   periodYear: number
@@ -200,7 +192,7 @@ const OrganizationIcoTab = ({ detail }: Props) => {
     theme: { mode },
     stroke: { width: 2 },
     labels: aggregatedCsc.map(e => e.label),
-    colors: aggregatedCsc.map(e => CSC_COLORS[e.phase]),
+    colors: aggregatedCsc.map(e => CSC_CHART_COLORS[e.phase]),
     dataLabels: {
       enabled: true,
       formatter: (val: number) => `${Math.round(val)}%`
@@ -208,7 +200,7 @@ const OrganizationIcoTab = ({ detail }: Props) => {
     legend: {
       fontSize: '13px',
       position: 'bottom',
-      labels: { colors: GH_COLORS.neutral.textSecondary },
+      labels: { colors: theme.palette.text.secondary },
       itemMargin: { horizontal: 8 }
     },
     plotOptions: {
@@ -217,13 +209,13 @@ const OrganizationIcoTab = ({ detail }: Props) => {
           size: '62%',
           labels: {
             show: true,
-            name: { fontSize: '0.9rem', color: GH_COLORS.neutral.textSecondary },
-            value: { fontSize: '1.5rem', fontWeight: 700, color: GH_COLORS.neutral.textPrimary },
+            name: { fontSize: '0.9rem', color: theme.palette.text.secondary },
+            value: { fontSize: '1.5rem', fontWeight: 700, color: theme.palette.customColors.midnight },
             total: {
               show: true,
               fontSize: '0.85rem',
               label: 'Activos en CSC',
-              color: GH_COLORS.neutral.textPrimary,
+              color: theme.palette.customColors.midnight,
               formatter: () => String(cscTotal)
             }
           }
@@ -260,15 +252,15 @@ const OrganizationIcoTab = ({ detail }: Props) => {
     plotOptions: {
       radar: {
         polygons: {
-          strokeColors: GH_COLORS.neutral.border,
-          connectorColors: GH_COLORS.neutral.border,
+          strokeColors: theme.palette.customColors.lightAlloy,
+          connectorColors: theme.palette.customColors.lightAlloy,
           fill: { colors: [mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', 'transparent'] }
         }
       }
     },
     xaxis: {
       categories: radarMetrics.map(m => m.label),
-      labels: { style: { fontSize: '12px', colors: Array(6).fill(GH_COLORS.neutral.textSecondary) } }
+      labels: { style: { fontSize: '12px', colors: Array(6).fill(theme.palette.text.secondary) } }
     },
     yaxis: { show: false, max: 100 },
     grid: { show: false, padding: { top: -10, bottom: -10 } },
@@ -298,7 +290,7 @@ const OrganizationIcoTab = ({ detail }: Props) => {
         hollow: { size: '60%' },
         track: { background: mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)', strokeWidth: '100%' },
         dataLabels: {
-          name: { fontSize: '14px', color: GH_COLORS.neutral.textSecondary, offsetY: -10 },
+          name: { fontSize: '14px', color: theme.palette.text.secondary, offsetY: -10 },
           value: { fontSize: '28px', fontWeight: 700, offsetY: 5 }
         }
       }
@@ -357,13 +349,13 @@ const OrganizationIcoTab = ({ detail }: Props) => {
     colors: TREND_LINE_COLORS.slice(0, trendSeries.length),
     stroke: { curve: 'smooth', width: 2.5 },
     markers: { size: 4, strokeWidth: 0 },
-    grid: { borderColor: GH_COLORS.neutral.border, strokeDashArray: 4 },
+    grid: { borderColor: theme.palette.customColors.lightAlloy, strokeDashArray: 4 },
     xaxis: {
       categories: trendCategories,
-      labels: { style: { colors: GH_COLORS.neutral.textSecondary, fontSize: '11px' } }
+      labels: { style: { colors: theme.palette.text.secondary, fontSize: '11px' } }
     },
     yaxis: {
-      labels: { style: { colors: GH_COLORS.neutral.textSecondary } },
+      labels: { style: { colors: theme.palette.text.secondary } },
       title: { text: 'RpA' }
     },
     annotations: {
@@ -378,7 +370,7 @@ const OrganizationIcoTab = ({ detail }: Props) => {
         }
       }]
     },
-    legend: { position: 'top', labels: { colors: GH_COLORS.neutral.textSecondary } },
+    legend: { position: 'top', labels: { colors: theme.palette.text.secondary } },
     dataLabels: { enabled: false },
     tooltip: { theme: mode }
   }

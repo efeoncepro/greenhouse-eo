@@ -25,6 +25,7 @@ const buildRpaBarOptions = (
   colors: string[],
   borderColor: string,
   textSecondary: string,
+  textPrimary: string,
   mode: 'light' | 'dark'
 ): ApexOptions => ({
   chart: { type: 'bar', toolbar: { show: false }, background: 'transparent' },
@@ -57,7 +58,7 @@ const buildRpaBarOptions = (
       }
     }]
   },
-  dataLabels: { enabled: true, style: { fontSize: '11px', colors: [GH_COLORS.neutral.textPrimary] }, offsetX: 30 },
+  dataLabels: { enabled: true, style: { fontSize: '11px', colors: [textPrimary] }, offsetX: 30 },
   tooltip: { theme: mode }
 })
 
@@ -124,8 +125,9 @@ const SpacesCharts = ({ spaces }: Props) => {
   const rpaBarOpts = buildRpaBarOptions(
     rpaCategories,
     rpaColors,
-    GH_COLORS.neutral.border,
-    GH_COLORS.neutral.textSecondary,
+    theme.palette.customColors.lightAlloy ?? '',
+    theme.palette.text.secondary,
+    theme.palette.customColors.midnight ?? '',
     mode
   )
 
@@ -153,8 +155,8 @@ const SpacesCharts = ({ spaces }: Props) => {
   const donutOpts = buildHealthDonutOptions(
     donutLabels,
     donutColors,
-    GH_COLORS.neutral.border,
-    GH_COLORS.neutral.textSecondary,
+    theme.palette.customColors.lightAlloy ?? '',
+    theme.palette.text.secondary,
     mode,
     spaces.length
   )

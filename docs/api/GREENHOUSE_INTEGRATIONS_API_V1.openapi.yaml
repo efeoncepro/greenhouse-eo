@@ -13,6 +13,10 @@ components:
       type: http
       scheme: bearer
       bearerFormat: API Token
+    sisterPlatformKey:
+      type: apiKey
+      in: header
+      name: x-greenhouse-sister-platform-key
   schemas:
     CapabilityCatalogItem:
       type: object
@@ -200,3 +204,86 @@ paths:
           description: Tenant capabilities synced successfully
         '404':
           description: Tenant not found for selector
+  /api/integrations/v1/sister-platforms/context:
+    get:
+      summary: Resolve the authenticated sister-platform consumer and binding context
+      security:
+        - bearerToken: []
+        - sisterPlatformKey: []
+      parameters:
+        - in: query
+          name: externalScopeType
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: externalScopeId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Sister-platform context resolved successfully
+        '401':
+          description: Missing or invalid sister-platform credential
+        '404':
+          description: No active binding found for the provided external scope
+        '429':
+          description: Rate limited
+  /api/integrations/v1/sister-platforms/catalog/capabilities:
+    get:
+      summary: Export the active capability catalog through the hardened sister-platform lane
+      security:
+        - bearerToken: []
+        - sisterPlatformKey: []
+      parameters:
+        - in: query
+          name: externalScopeType
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: externalScopeId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Capability catalog exported successfully
+        '401':
+          description: Missing or invalid sister-platform credential
+        '404':
+          description: No active binding found for the provided external scope
+        '429':
+          description: Rate limited
+  /api/integrations/v1/sister-platforms/readiness:
+    get:
+      summary: Read readiness posture for integrations through the hardened sister-platform lane
+      security:
+        - bearerToken: []
+        - sisterPlatformKey: []
+      parameters:
+        - in: query
+          name: externalScopeType
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: externalScopeId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: keys
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Readiness exported successfully
+        '401':
+          description: Missing or invalid sister-platform credential
+        '404':
+          description: No active binding found for the provided external scope
+        '429':
+          description: Rate limited

@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography'
 import { alpha } from '@mui/material/styles'
 
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
-import { GH_COLORS, GH_MESSAGES, GH_TEAM } from '@/config/greenhouse-nomenclature'
+import { GH_MESSAGES, GH_TEAM } from '@/config/greenhouse-nomenclature'
 import type { GreenhouseDashboardData, GreenhouseDashboardTeamMember } from '@/types/greenhouse-dashboard'
 import type { TeamMemberResponse, TeamMembersPayload, TeamRoleCategory } from '@/types/team'
 
@@ -187,11 +187,11 @@ const TeamCapacitySection = ({ initialData = null, dashboardData }: TeamCapacity
           {/* ── Member list ────────────────────────────────────────── */}
           <Stack
             divider={
-              <Divider flexItem sx={{ borderStyle: 'dashed', borderColor: alpha(GH_COLORS.neutral.border, 0.7) }} />
+              <Divider flexItem sx={{ borderStyle: 'dashed', borderColor: theme => alpha(theme.palette.customColors.lightAlloy ?? '', 0.7) }} />
             }
             sx={{
               borderRadius: 4,
-              border: `1px solid ${alpha(GH_COLORS.neutral.border, 0.9)}`,
+              border: theme => `1px solid ${alpha(theme.palette.customColors.lightAlloy ?? '', 0.9)}`,
               bgcolor: 'background.paper',
               overflow: 'hidden'
             }}
@@ -202,7 +202,7 @@ const TeamCapacitySection = ({ initialData = null, dashboardData }: TeamCapacity
               spacing={2}
               alignItems='center'
               justifyContent='space-between'
-              sx={{ px: 2.5, py: 1.75, bgcolor: GH_COLORS.neutral.bgSurface }}
+              sx={{ px: 2.5, py: 1.75, bgcolor: 'background.default' }}
             >
               <AvatarGroup
                 max={6}
@@ -262,7 +262,7 @@ const TeamCapacitySection = ({ initialData = null, dashboardData }: TeamCapacity
                       <Typography
                         variant='subtitle2'
                         noWrap
-                        sx={{ color: GH_COLORS.neutral.textPrimary, lineHeight: 1.3 }}
+                        sx={{ color: theme => theme.palette.customColors.midnight, lineHeight: 1.3 }}
                       >
                         {member.displayName}
                       </Typography>
@@ -284,10 +284,10 @@ const TeamCapacitySection = ({ initialData = null, dashboardData }: TeamCapacity
 
                   {/* Right: FTE */}
                   <Box sx={{ textAlign: 'right', flexShrink: 0 }}>
-                    <Typography variant='body2' sx={{ fontWeight: 600, color: GH_COLORS.neutral.textPrimary }}>
+                    <Typography variant='body2' sx={{ fontWeight: 600, color: theme => theme.palette.customColors.midnight }}>
                       {fteLabel}
                     </Typography>
-                    <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+                    <Typography variant='caption' sx={{ color: 'text.secondary' }}>
                       {hoursLabel}
                     </Typography>
                   </Box>

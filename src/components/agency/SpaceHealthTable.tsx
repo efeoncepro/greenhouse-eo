@@ -12,7 +12,7 @@ import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
-import { alpha } from '@mui/material/styles'
+import { alpha, useTheme } from '@mui/material/styles'
 
 import CustomChip from '@core/components/mui/Chip'
 
@@ -39,7 +39,8 @@ const getServiceColor = (lines: string[]) => {
 }
 
 const SemaphoreDot = ({ color }: { color: string }) => {
-  const resolvedColor = color || GH_COLORS.neutral.border
+  const theme = useTheme()
+  const resolvedColor = color || theme.palette.customColors.lightAlloy
 
   return <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: resolvedColor, flexShrink: 0 }} />
 }
@@ -49,11 +50,12 @@ const resolveMetricDotColor = (tone: ReturnType<typeof getAgencyMetricTone>) => 
   if (tone === 'warning') return GH_COLORS.semaphore.yellow.source
   if (tone === 'error') return GH_COLORS.semaphore.red.source
 
-  return GH_COLORS.neutral.border
+  return ''
 }
 
 const SpaceHealthTable = ({ spaces }: Props) => {
   const router = useRouter()
+  const theme = useTheme()
 
   // Sort by health (critical first), then by name
   const sorted = useMemo(() =>
@@ -70,20 +72,20 @@ const SpaceHealthTable = ({ spaces }: Props) => {
 
   if (sorted.length === 0) {
     return (
-      <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textSecondary, p: 3 }}>
+      <Typography variant='body2' sx={{ color: theme.palette.text.secondary, p: 3 }}>
         No hay Spaces activos.
       </Typography>
     )
   }
 
-  const COL = { color: GH_COLORS.neutral.textSecondary, fontSize: '0.7rem', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em' }
+  const COL = { color: theme.palette.text.secondary, fontSize: '0.7rem', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em' }
 
   const GRID = '2fr 1fr 110px 110px 80px 90px 80px 36px'
 
   return (
     <Box
       sx={{
-        border: `1px solid ${GH_COLORS.neutral.border}`,
+        border: `1px solid ${theme.palette.customColors.lightAlloy}`,
         borderRadius: 3,
         overflow: 'hidden',
         bgcolor: 'background.paper'
@@ -96,7 +98,7 @@ const SpaceHealthTable = ({ spaces }: Props) => {
           gridTemplateColumns: GRID,
           px: 2.5,
           py: 1.25,
-          bgcolor: GH_COLORS.neutral.bgSurface
+          bgcolor: theme.palette.background.default
         }}
       >
         {[
@@ -121,7 +123,7 @@ const SpaceHealthTable = ({ spaces }: Props) => {
 
         return (
           <Box key={space.clientId}>
-            {idx > 0 && <Divider sx={{ borderColor: alpha(GH_COLORS.neutral.border, 0.6) }} />}
+            {idx > 0 && <Divider sx={{ borderColor: alpha(theme.palette.customColors.lightAlloy ?? '', 0.6) }} />}
             <Box
               onClick={() => router.push(`/agency/spaces/${space.clientId}`)}
               sx={{
@@ -132,7 +134,7 @@ const SpaceHealthTable = ({ spaces }: Props) => {
                 py: 1.5,
                 cursor: 'pointer',
                 transition: 'background 0.15s',
-                '&:hover': { bgcolor: GH_COLORS.neutral.bgSurface }
+                '&:hover': { bgcolor: theme.palette.background.default }
               }}
             >
               {/* Space name + avatar */}
@@ -156,7 +158,7 @@ const SpaceHealthTable = ({ spaces }: Props) => {
                     <Typography
                       variant='body2'
                       noWrap
-                      sx={{ fontWeight: 600, color: GH_COLORS.neutral.textPrimary }}
+                      sx={{ fontWeight: 600, color: theme.palette.customColors.midnight }}
                     >
                       {space.clientName}
                     </Typography>
@@ -168,14 +170,14 @@ const SpaceHealthTable = ({ spaces }: Props) => {
                           height: 16,
                           fontSize: '0.65rem',
                           fontWeight: 500,
-                          bgcolor: GH_COLORS.neutral.bgSurface,
-                          color: GH_COLORS.neutral.textSecondary,
-                          border: `1px solid ${GH_COLORS.neutral.border}`
+                          bgcolor: theme.palette.background.default,
+                          color: theme.palette.text.secondary,
+                          border: `1px solid ${theme.palette.customColors.lightAlloy}`
                         }}
                       />
                     )}
                   </Stack>
-                  <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+                  <Typography variant='caption' sx={{ color: theme.palette.text.secondary }}>
                     {`${space.assignedMembers} persona${space.assignedMembers !== 1 ? 's' : ''} · ${space.allocatedFte.toFixed(1)} FTE`}
                   </Typography>
                 </Box>
@@ -190,7 +192,7 @@ const SpaceHealthTable = ({ spaces }: Props) => {
                     sx={{ height: 20, fontSize: '0.68rem', fontWeight: 500, bgcolor: color.bg, color: color.text, border: 'none' }}
                   />
                 ) : (
-                  <Typography variant='caption' sx={{ color: GH_COLORS.neutral.textSecondary }}>—</Typography>
+                  <Typography variant='caption' sx={{ color: theme.palette.text.secondary }}>—</Typography>
                 )}
               </Box>
 
@@ -198,7 +200,7 @@ const SpaceHealthTable = ({ spaces }: Props) => {
               <Stack spacing={0.5} sx={{ minWidth: 0 }}>
                 <Stack direction='row' spacing={0.75} alignItems='center'>
                   <SemaphoreDot color={resolveMetricDotColor(getAgencyMetricTone(space.rpaMetric))} />
-                  <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 500 }}>
+                  <Typography variant='body2' sx={{ color: theme.palette.customColors.midnight, fontWeight: 500 }}>
                     {space.rpaAvg !== null ? space.rpaAvg.toFixed(1) : '—'}
                   </Typography>
                 </Stack>
@@ -209,7 +211,7 @@ const SpaceHealthTable = ({ spaces }: Props) => {
               <Stack spacing={0.5} sx={{ minWidth: 0 }}>
                 <Stack direction='row' spacing={0.75} alignItems='center'>
                   <SemaphoreDot color={resolveMetricDotColor(getAgencyMetricTone(space.otdMetric))} />
-                  <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 500 }}>
+                  <Typography variant='body2' sx={{ color: theme.palette.customColors.midnight, fontWeight: 500 }}>
                     {space.otdPct !== null ? `${Math.round(space.otdPct)}%` : '—'}
                   </Typography>
                 </Stack>
@@ -217,12 +219,12 @@ const SpaceHealthTable = ({ spaces }: Props) => {
               </Stack>
 
               {/* Projects */}
-              <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary }}>
+              <Typography variant='body2' sx={{ color: theme.palette.customColors.midnight }}>
                 {space.projectCount}
               </Typography>
 
               {/* Team */}
-              <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textPrimary }}>
+              <Typography variant='body2' sx={{ color: theme.palette.customColors.midnight }}>
                 {space.assignedMembers} · {space.allocatedFte.toFixed(1)}
               </Typography>
 
@@ -241,7 +243,7 @@ const SpaceHealthTable = ({ spaces }: Props) => {
                 <IconButton
                   size='small'
                   onClick={e => { e.stopPropagation(); router.push(`/agency/spaces/${space.clientId}`) }}
-                  sx={{ color: GH_COLORS.neutral.textSecondary }}
+                  sx={{ color: theme.palette.text.secondary }}
                 >
                   <i className='tabler-arrow-right' style={{ fontSize: '1rem' }} />
                 </IconButton>

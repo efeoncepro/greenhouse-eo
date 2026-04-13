@@ -6,8 +6,10 @@ import { getIntegrationHealthSnapshots } from '@/lib/integrations/health'
 import { getNotionDeliveryDataQualityOverview } from '@/lib/integrations/notion-delivery-data-quality'
 import { getNotionSyncOrchestrationOverview } from '@/lib/integrations/notion-sync-orchestration'
 import { getIntegrationRegistry } from '@/lib/integrations/registry'
+import { listSisterPlatformBindings } from '@/lib/sister-platforms/bindings'
 import { hasAuthorizedViewCode } from '@/lib/tenant/authorization'
 import { getTenantContext } from '@/lib/tenant/get-tenant-context'
+import type { SisterPlatformBindingRecord } from '@/lib/sister-platforms/types'
 import type { IntegrationDataQualityOverview } from '@/types/integration-data-quality'
 import type { NotionSyncOrchestrationOverview } from '@/types/notion-sync-orchestration'
 import type { IntegrationWithHealth } from '@/types/integrations'
@@ -36,15 +38,17 @@ export default async function Page() {
   let integrations: IntegrationWithHealth[] = []
   let notionDataQualityOverview: IntegrationDataQualityOverview | null = null
   let notionOrchestrationOverview: NotionSyncOrchestrationOverview | null = null
+  let sisterPlatformBindings: SisterPlatformBindingRecord[] = []
 
   try {
     const registry = await getIntegrationRegistry()
 
     const healthMap = await getIntegrationHealthSnapshots(registry.map(r => r.integrationKey))
 
-    ;[notionDataQualityOverview, notionOrchestrationOverview] = await Promise.all([
+    ;[notionDataQualityOverview, notionOrchestrationOverview, sisterPlatformBindings] = await Promise.all([
       getNotionDeliveryDataQualityOverview({ limit: 12 }),
-      getNotionSyncOrchestrationOverview({ limit: 12 })
+      getNotionSyncOrchestrationOverview({ limit: 12 }),
+      listSisterPlatformBindings({ tenant, limit: 24 })
     ])
 
     integrations = registry.map(entry => ({
@@ -68,6 +72,7 @@ export default async function Page() {
       integrations={integrations}
       notionDataQualityOverview={notionDataQualityOverview}
       notionOrchestrationOverview={notionOrchestrationOverview}
+      sisterPlatformBindings={sisterPlatformBindings}
     />
   )
 }

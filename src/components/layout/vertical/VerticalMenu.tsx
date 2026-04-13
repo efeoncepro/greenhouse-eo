@@ -120,7 +120,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
       icon: 'tabler-smart-home'
     })
 
-    // ── GESTIÓN (section: 6 flat + 1 collapsible "Estructura") ──
+    // ── GESTIÓN (section: 3 flat + 2 collapsibles) ──
     if (isAgencyUser) {
       menuData.push({
         isSection: true,
@@ -129,21 +129,37 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           { label: nl(GH_AGENCY_NAV.workspace), href: '/agency', icon: 'tabler-building' },
           { label: nl(GH_AGENCY_NAV.spaces), href: '/agency/spaces', icon: 'tabler-grid-4x4' },
           { label: nl(GH_AGENCY_NAV.economics), href: '/agency/economics', icon: 'tabler-chart-line' },
-          { label: nl(GH_AGENCY_NAV.team), href: '/agency/team', icon: 'tabler-users-group' },
-          { label: nl(GH_AGENCY_NAV.talentDiscovery), href: '/agency/talent-discovery', icon: 'tabler-user-search' },
-          { label: nl(GH_AGENCY_NAV.staffAugmentation), href: '/agency/staff-augmentation', icon: 'tabler-briefcase-2' },
-          { label: nl(GH_AGENCY_NAV.delivery), href: '/agency/delivery', icon: 'tabler-cpu' },
-          { label: nl(GH_AGENCY_NAV.campaigns), href: '/agency/campaigns', icon: 'tabler-speakerphone' },
 
-          // Collapsible submenu inside section
+          // Collapsible "Equipo y talento"
           {
-            label: nl(GH_AGENCY_NAV.structure),
-            icon: 'tabler-hierarchy-2',
+            label: nl(GH_AGENCY_NAV.teamAndTalent),
+            icon: 'tabler-friends',
             children: [
+              { label: nl(GH_AGENCY_NAV.team), href: '/agency/team', icon: 'tabler-friends' },
+              { label: nl(GH_AGENCY_NAV.talentDiscovery), href: '/agency/talent-discovery' },
+              { label: nl(GH_AGENCY_NAV.staffAugmentation), href: '/agency/staff-augmentation' }
+            ].filter(item => {
+              if (item.href === '/agency/team') return canSeeView('gestion.equipo', true)
+              if (item.href === '/agency/talent-discovery') return canSeeView('gestion.equipo', true)
+              if (item.href === '/agency/staff-augmentation') return canSeeView('gestion.staff_augmentation', true)
+
+              return true
+            })
+          },
+
+          // Collapsible "Operaciones"
+          {
+            label: nl(GH_AGENCY_NAV.operationsGroup),
+            icon: 'tabler-cpu',
+            children: [
+              { label: nl(GH_AGENCY_NAV.delivery), href: '/agency/delivery' },
+              { label: nl(GH_AGENCY_NAV.campaigns), href: '/agency/campaigns' },
               { label: nl(GH_AGENCY_NAV.organizations), href: '/agency/organizations' },
               { label: nl(GH_AGENCY_NAV.services), href: '/agency/services' },
               { label: nl(GH_AGENCY_NAV.operations), href: '/agency/operations' }
             ].filter(item => {
+              if (item.href === '/agency/delivery') return canSeeView('gestion.delivery', true)
+              if (item.href === '/agency/campaigns') return canSeeView('gestion.campanas', true)
               if (item.href === '/agency/organizations') return canSeeView('gestion.organizaciones', true)
               if (item.href === '/agency/services') return canSeeView('gestion.servicios', true)
               if (item.href === '/agency/operations') return canSeeView('gestion.operaciones', true)
@@ -155,46 +171,70 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           if (item.href === '/agency') return canSeeView('gestion.agencia', true)
           if (item.href === '/agency/spaces') return canSeeView('gestion.spaces', true)
           if (item.href === '/agency/economics') return canSeeView('gestion.economia', true)
-          if (item.href === '/agency/team') return canSeeView('gestion.equipo', true)
-          if (item.href === '/agency/talent-discovery') return canSeeView('gestion.equipo', true)
-          if (item.href === '/agency/staff-augmentation') return canSeeView('gestion.staff_augmentation', true)
-          if (item.href === '/agency/delivery') return canSeeView('gestion.delivery', true)
-          if (item.href === '/agency/campaigns') return canSeeView('gestion.campanas', true)
 
           return true
         })
       })
     }
 
-    // ── EQUIPO (section: flat, conditional) ──
+    // ── PERSONAS Y HR (section: 1 flat + 3 collapsibles, conditional) ──
     const hasHrAccess = isHrUser || isAdminUser
 
     const canSeeHrTeamWorkspace = Boolean(session?.user?.memberId) && (hasHrAccess || hasSupervisorWorkspaceLanding)
 
     const hrItems: VerticalMenuDataType[] = hasHrAccess
       ? [
-          { label: nl(GH_HR_NAV.payroll), href: '/hr/payroll', icon: 'tabler-receipt' },
-          { label: nl(GH_HR_NAV.payrollProjected), href: '/hr/payroll/projected', icon: 'tabler-calculator' },
-          { label: nl(GH_HR_NAV.team), href: '/hr/team', icon: 'tabler-users-group' },
-          { label: nl(GH_HR_NAV.approvals), href: '/hr/approvals', icon: 'tabler-checklist' },
-          { label: nl(GH_HR_NAV.hierarchy), href: '/hr/hierarchy', icon: 'tabler-hierarchy-2' },
-          { label: nl(GH_HR_NAV.orgChart), href: '/hr/org-chart', icon: 'tabler-hierarchy-3' },
-          { label: nl(GH_HR_NAV.departments), href: '/hr/departments', icon: 'tabler-sitemap' },
-          { label: nl(GH_HR_NAV.leave), href: '/hr/leave', icon: 'tabler-calendar-event' },
-          { label: nl(GH_HR_NAV.attendance), href: '/hr/attendance', icon: 'tabler-clock-check' }
-        ].filter(item => {
-          if (item.href === '/hr/payroll') return canSeeView('equipo.nomina', true)
-          if (item.href === '/hr/payroll/projected') return canSeeView('equipo.nomina_proyectada', true)
-          if (item.href === '/hr/team') return canSeeHrTeamWorkspace
-          if (item.href === '/hr/approvals') return canSeeHrTeamWorkspace
-          if (item.href === '/hr/hierarchy') return canSeeView('equipo.jerarquia', true)
-          if (item.href === '/hr/org-chart') return canSeeView('equipo.organigrama', true)
-          if (item.href === '/hr/departments') return canSeeView('equipo.departamentos', true)
-          if (item.href === '/hr/leave') return canSeeView('equipo.permisos', true)
-          if (item.href === '/hr/attendance') return canSeeView('equipo.asistencia', true)
+          // Collapsible "Nómina"
+          {
+            label: <NavLabel label='Nómina' subtitle='Liquidación y proyección' show={showSub} />,
+            icon: 'tabler-receipt',
+            children: [
+              { label: nl(GH_HR_NAV.payroll), href: '/hr/payroll' },
+              { label: nl(GH_HR_NAV.payrollProjected), href: '/hr/payroll/projected' }
+            ].filter(item => {
+              if (item.href === '/hr/payroll') return canSeeView('equipo.nomina', true)
+              if (item.href === '/hr/payroll/projected') return canSeeView('equipo.nomina_proyectada', true)
 
-          return true
-        })
+              return true
+            })
+          },
+
+          // Collapsible "Supervisión"
+          {
+            label: <NavLabel label='Supervisión' subtitle='Equipo, aprobaciones y departamentos' show={showSub} />,
+            icon: 'tabler-users-group',
+            children: [
+              { label: nl(GH_HR_NAV.team), href: '/hr/team' },
+              { label: nl(GH_HR_NAV.approvals), href: '/hr/approvals' },
+              { label: nl(GH_HR_NAV.departments), href: '/hr/departments' }
+            ].filter(item => {
+              if (item.href === '/hr/team') return canSeeHrTeamWorkspace
+              if (item.href === '/hr/approvals') return canSeeHrTeamWorkspace
+              if (item.href === '/hr/departments') return canSeeView('equipo.departamentos', true)
+
+              return true
+            })
+          },
+
+          // Collapsible "Organización"
+          {
+            label: <NavLabel label='Organización' subtitle='Jerarquía, permisos y asistencia' show={showSub} />,
+            icon: 'tabler-sitemap',
+            children: [
+              { label: nl(GH_HR_NAV.hierarchy), href: '/hr/hierarchy' },
+              { label: nl(GH_HR_NAV.orgChart), href: '/hr/org-chart' },
+              { label: nl(GH_HR_NAV.leave), href: '/hr/leave' },
+              { label: nl(GH_HR_NAV.attendance), href: '/hr/attendance' }
+            ].filter(item => {
+              if (item.href === '/hr/hierarchy') return canSeeView('equipo.jerarquia', true)
+              if (item.href === '/hr/org-chart') return canSeeView('equipo.organigrama', true)
+              if (item.href === '/hr/leave') return canSeeView('equipo.permisos', true)
+              if (item.href === '/hr/attendance') return canSeeView('equipo.asistencia', true)
+
+              return true
+            })
+          }
+        ]
       : []
 
     const supervisorScopeItems: VerticalMenuDataType[] = !hasHrAccess && canSeeHrTeamWorkspace
@@ -208,18 +248,18 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
     if (canSeePeople && hasHrAccess) {
       menuData.push({
         isSection: true,
-        label: 'Equipo',
+        label: 'Personas y HR',
         children: [
-          { label: nl(GH_PEOPLE_NAV.people), href: '/people', icon: 'tabler-users-group' },
+          { label: nl(GH_PEOPLE_NAV.people), href: '/people', icon: 'tabler-address-book' },
           ...hrItems
         ]
       })
     } else if (canSeePeople && supervisorScopeItems.length > 0) {
       menuData.push({
         isSection: true,
-        label: 'Equipo',
+        label: 'Personas y HR',
         children: [
-          { label: nl(GH_PEOPLE_NAV.people), href: '/people', icon: 'tabler-users-group' },
+          { label: nl(GH_PEOPLE_NAV.people), href: '/people', icon: 'tabler-address-book' },
           ...supervisorScopeItems
         ]
       })
@@ -227,18 +267,18 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
       menuData.push({
         label: nl(GH_PEOPLE_NAV.people),
         href: '/people',
-        icon: 'tabler-users-group'
+        icon: 'tabler-address-book'
       })
     } else if (supervisorScopeItems.length > 0) {
       menuData.push({
         isSection: true,
-        label: 'Equipo',
+        label: 'Personas y HR',
         children: supervisorScopeItems
       })
     } else if (hasHrAccess) {
       menuData.push({
         isSection: true,
-        label: 'Equipo',
+        label: 'Personas y HR',
         children: hrItems
       })
     }
@@ -249,7 +289,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         label: 'Finanzas',
         icon: 'tabler-report-money',
         children: [
-          // Flujo submenu
+          // Flujo operativo submenu (business operations: sales, purchases, masters)
           {
             label: nl(GH_FINANCE_NAV.flow),
             icon: 'tabler-arrows-exchange',
@@ -258,18 +298,29 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               { label: nl(GH_FINANCE_NAV.income), href: '/finance/income' },
               { label: nl(GH_FINANCE_NAV.expenses), href: '/finance/expenses' },
               { label: nl(GH_FINANCE_NAV.clients), href: '/finance/clients' },
-              { label: nl(GH_FINANCE_NAV.suppliers), href: '/finance/suppliers' },
-              { label: nl(GH_FINANCE_NAV.cashIn), href: '/finance/cash-in' },
-              { label: nl(GH_FINANCE_NAV.cashOut), href: '/finance/cash-out' },
-              { label: nl(GH_FINANCE_NAV.bank), href: '/finance/bank' },
-              { label: nl(GH_FINANCE_NAV.shareholderAccount), href: '/finance/shareholder-account' },
-              { label: nl(GH_FINANCE_NAV.cashPosition), href: '/finance/cash-position' }
+              { label: nl(GH_FINANCE_NAV.suppliers), href: '/finance/suppliers' }
             ].filter(item => {
               if (item.href === '/finance') return canSeeView('finanzas.resumen', true)
               if (item.href === '/finance/income') return canSeeView('finanzas.ingresos', true)
               if (item.href === '/finance/expenses') return canSeeView('finanzas.egresos', true)
               if (item.href === '/finance/clients') return canSeeView('finanzas.clientes', true)
               if (item.href === '/finance/suppliers') return canSeeView('finanzas.proveedores', true)
+
+              return true
+            })
+          },
+
+          // Tesorería submenu (cash operations: collections, payments, bank, positions)
+          {
+            label: nl(GH_FINANCE_NAV.treasury),
+            icon: 'tabler-building-bank',
+            children: [
+              { label: nl(GH_FINANCE_NAV.cashIn), href: '/finance/cash-in' },
+              { label: nl(GH_FINANCE_NAV.cashOut), href: '/finance/cash-out' },
+              { label: nl(GH_FINANCE_NAV.bank), href: '/finance/bank' },
+              { label: nl(GH_FINANCE_NAV.shareholderAccount), href: '/finance/shareholder-account' },
+              { label: nl(GH_FINANCE_NAV.cashPosition), href: '/finance/cash-position' }
+            ].filter(item => {
               if (item.href === '/finance/cash-in') return canSeeView('finanzas.ingresos', true)
               if (item.href === '/finance/cash-out') return canSeeView('finanzas.egresos', true)
               if (item.href === '/finance/bank') return canSeeView('finanzas.banco', canSeeBankTreasury)
@@ -334,34 +385,45 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         label: GH_INTERNAL_NAV.adminCenter.label,
         icon: 'tabler-shield-lock',
         children: [
-          // Gobierno submenu
+          // Identidad y acceso submenu
           {
-            label: <NavLabel label='Gobierno' subtitle='Identidad, acceso y gobernanza' show={showSub} />,
+            label: nl(GH_INTERNAL_NAV.adminIdentityAccess),
             icon: 'tabler-shield-lock',
             children: [
               { label: nl(GH_INTERNAL_NAV.adminCenter), href: '/admin' },
-              { label: nl(GH_INTERNAL_NAV.adminAccounts), href: '/admin/accounts' },
-              { label: nl(GH_INTERNAL_NAV.adminPaymentInstruments), href: '/admin/payment-instruments' },
-              { label: nl(GH_INTERNAL_NAV.adminTenants), href: '/admin/tenants' },
               { label: nl(GH_INTERNAL_NAV.adminUsers), href: '/admin/users' },
               { label: nl(GH_INTERNAL_NAV.adminRoles), href: '/admin/roles' },
               { label: nl(GH_INTERNAL_NAV.adminViews), href: '/admin/views' },
-              { label: nl(GH_INTERNAL_NAV.adminTeam), href: '/admin/team' },
-              { label: nl(GH_INTERNAL_NAV.adminTalentReview), href: '/admin/talent-review', icon: 'tabler-rosette-discount-check' },
-              { label: nl(GH_INTERNAL_NAV.adminTalentOps), href: '/admin/talent-ops', icon: 'tabler-heart-rate-monitor' },
-              { label: nl(GH_INTERNAL_NAV.adminBusinessLines), href: '/admin/business-lines' }
+              { label: nl(GH_INTERNAL_NAV.adminAccounts), href: '/admin/accounts' },
+              { label: nl(GH_INTERNAL_NAV.adminTenants), href: '/admin/tenants' }
             ].filter(item => {
               if (item.href === '/admin') return canSeeView('administracion.admin_center', true)
-              if (item.href === '/admin/accounts') return canSeeView('administracion.cuentas', true)
-              if (item.href === '/admin/payment-instruments') return canSeeView('administracion.instrumentos_pago', true)
-              if (item.href === '/admin/tenants') return canSeeView('administracion.spaces', true)
               if (item.href === '/admin/users') return canSeeView('administracion.usuarios', true)
               if (item.href === '/admin/roles') return canSeeView('administracion.roles', true)
               if (item.href === '/admin/views') return canSeeView('administracion.vistas', true)
+              if (item.href === '/admin/accounts') return canSeeView('administracion.cuentas', true)
+              if (item.href === '/admin/tenants') return canSeeView('administracion.spaces', true)
+
+              return true
+            })
+          },
+
+          // Equipo y operaciones submenu
+          {
+            label: nl(GH_INTERNAL_NAV.adminTeamOps),
+            icon: 'tabler-briefcase',
+            children: [
+              { label: nl(GH_INTERNAL_NAV.adminTeam), href: '/admin/team' },
+              { label: nl(GH_INTERNAL_NAV.adminTalentReview), href: '/admin/talent-review', icon: 'tabler-rosette-discount-check' },
+              { label: nl(GH_INTERNAL_NAV.adminTalentOps), href: '/admin/talent-ops', icon: 'tabler-heart-rate-monitor' },
+              { label: nl(GH_INTERNAL_NAV.adminBusinessLines), href: '/admin/business-lines' },
+              { label: nl(GH_INTERNAL_NAV.adminPaymentInstruments), href: '/admin/payment-instruments' }
+            ].filter(item => {
               if (item.href === '/admin/team') return canSeeView('administracion.equipo', true)
               if (item.href === '/admin/talent-review') return canSeeView('administracion.equipo', true)
               if (item.href === '/admin/talent-ops') return canSeeView('administracion.equipo', true)
               if (item.href === '/admin/business-lines') return canSeeView('administracion.admin_center', true)
+              if (item.href === '/admin/payment-instruments') return canSeeView('administracion.instrumentos_pago', true)
 
               return true
             })
@@ -443,7 +505,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         { label: nl(GH_CLIENT_NAV.dashboard), href: dashboardHref, icon: 'tabler-smart-home' },
         { label: nl(GH_CLIENT_NAV.projects), href: '/proyectos', icon: 'tabler-folders' },
         { label: nl(GH_CLIENT_NAV.sprints), href: '/sprints', icon: 'tabler-bolt' },
-        { label: nl(GH_CLIENT_NAV.team), href: '/equipo', icon: 'tabler-users-group' },
+        { label: nl(GH_CLIENT_NAV.team), href: '/equipo', icon: 'tabler-users' },
         { label: nl(GH_CLIENT_NAV.reviews), href: '/reviews', icon: 'tabler-git-pull-request' },
         { label: nl(GH_CLIENT_NAV.analytics), href: '/analytics', icon: 'tabler-chart-dots' },
         { label: nl(GH_CLIENT_NAV.campaigns), href: '/campanas', icon: 'tabler-speakerphone' }

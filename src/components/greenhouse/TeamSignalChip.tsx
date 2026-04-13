@@ -1,7 +1,8 @@
 'use client'
 
 import Chip from '@mui/material/Chip'
-import { alpha } from '@mui/material/styles'
+import { alpha, useTheme } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles'
 
 import { GH_COLORS } from '@/config/greenhouse-nomenclature'
 
@@ -12,7 +13,7 @@ type TeamSignalChipProps = {
   size?: 'small' | 'medium'
 }
 
-const getToneStyles = (tone: TeamSignalChipProps['tone']) => {
+const getToneStyles = (tone: TeamSignalChipProps['tone'], theme: Theme) => {
   switch (tone) {
     case 'success':
       return GH_COLORS.semaphore.green
@@ -22,24 +23,29 @@ const getToneStyles = (tone: TeamSignalChipProps['tone']) => {
       return GH_COLORS.semaphore.red
     case 'info':
     case 'primary':
-      return GH_COLORS.semantic.info
+      return {
+        source: theme.palette.info.main,
+        bg: theme.palette.info.lighterOpacity,
+        text: theme.palette.info.main
+      }
     case 'secondary':
       return {
-        source: GH_COLORS.neutral.textPrimary,
-        bg: alpha(GH_COLORS.neutral.textPrimary, 0.08),
-        text: GH_COLORS.neutral.textPrimary
+        source: theme.palette.customColors.midnight ?? '',
+        bg: alpha(theme.palette.customColors.midnight ?? '', 0.08),
+        text: theme.palette.customColors.midnight ?? ''
       }
     default:
       return {
-        source: GH_COLORS.neutral.textSecondary,
-        bg: alpha(GH_COLORS.neutral.textSecondary, 0.12),
-        text: GH_COLORS.neutral.textSecondary
+        source: theme.palette.text.secondary,
+        bg: alpha(theme.palette.text.secondary, 0.12),
+        text: theme.palette.text.secondary
       }
   }
 }
 
 const TeamSignalChip = ({ label, tone, icon, size = 'small' }: TeamSignalChipProps) => {
-  const palette = getToneStyles(tone)
+  const theme = useTheme()
+  const palette = getToneStyles(tone, theme)
 
   return (
     <Chip

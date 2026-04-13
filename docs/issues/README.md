@@ -64,7 +64,7 @@ Tasks, docs de arquitectura, o commits relacionados.
 
 ## Siguiente ID disponible
 
-`ISSUE-044`
+`ISSUE-046`
 
 ## Open
 
@@ -73,6 +73,8 @@ Tasks, docs de arquitectura, o commits relacionados.
 | `ISSUE-002` | [Nubox sync conformed: data integrity (period mixing, identity loss)](open/ISSUE-002-nubox-sync-conformed-data-integrity.md) | staging + production | 2026-03-30 | open   |
 | `ISSUE-020` | [3 endpoints duplicados de retry batch sin error handling](open/ISSUE-020-duplicate-email-retry-endpoints.md)                | staging + production | 2026-04-06 | open   |
 | `ISSUE-023` | [Tablas de email sin migracion formal](open/ISSUE-023-email-tables-no-formal-migration.md)                                   | production + staging | 2026-04-06 | open   |
+| `ISSUE-044` | [Dashboard pages 500 via agent headless](open/ISSUE-044-dashboard-ssr-500-agent-headless.md)                                  | staging              | 2026-04-11 | open   |
+| `ISSUE-045` | [Registrar OC falla por referencia ambigua a `client_id` en el resolver canónico de Finance](open/ISSUE-045-purchase-order-create-ambiguous-client-id.md) | staging | 2026-04-13 | open |
 
 ## Resolved
 

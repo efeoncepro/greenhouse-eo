@@ -24,6 +24,7 @@ Cada cambio debe documentarse, pero no cada documento debe repetir la historia c
   - `docs/architecture/`
   - `docs/api/`
   - `docs/changelog/`
+  - `docs/mini-tasks/`
   - `docs/ui/`
   - `docs/roadmap/`
   - `docs/operations/`

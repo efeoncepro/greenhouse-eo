@@ -116,8 +116,8 @@ const ProjectTeamSection = ({ projectId }: ProjectTeamSectionProps) => {
               sx={{
                 p: 2.5,
                 borderRadius: 4,
-                border: `1px solid ${GH_COLORS.neutral.border}`,
-                bgcolor: GH_COLORS.neutral.bgSurface,
+                border: theme => `1px solid ${theme.palette.customColors.lightAlloy}`,
+                bgcolor: 'background.default',
                 display: 'grid',
                 gap: 2
               }}
@@ -142,7 +142,7 @@ const ProjectTeamSection = ({ projectId }: ProjectTeamSectionProps) => {
                       width: 32,
                       height: 32,
                       fontSize: '0.75rem',
-                      border: `2px solid ${GH_COLORS.neutral.bgSurface}`
+                      border: theme => `2px solid ${theme.palette.background.default}`
                     }
                   }}
                 >
@@ -164,7 +164,7 @@ const ProjectTeamSection = ({ projectId }: ProjectTeamSectionProps) => {
               sx={{
                 borderRadius: 4,
                 overflow: 'hidden',
-                border: `1px solid ${GH_COLORS.neutral.border}`,
+                border: theme => `1px solid ${theme.palette.customColors.lightAlloy}`,
                 '&::before': { display: 'none' }
               }}
             >
@@ -227,7 +227,7 @@ const ProjectTeamSection = ({ projectId }: ProjectTeamSectionProps) => {
                                 variant='body2'
                                 sx={{
                                   fontWeight: 600,
-                                  color: member.inReview > 0 ? GH_COLORS.semaphore.yellow.text : GH_COLORS.neutral.textPrimary
+                                  color: theme => member.inReview > 0 ? GH_COLORS.semaphore.yellow.text : theme.palette.customColors.midnight
                                 }}
                               >
                                 {member.inReview}
@@ -238,7 +238,7 @@ const ProjectTeamSection = ({ projectId }: ProjectTeamSectionProps) => {
                                 variant='body2'
                                 sx={{
                                   fontWeight: 600,
-                                  color: member.changesRequested > 0 ? GH_COLORS.semaphore.red.text : GH_COLORS.neutral.textPrimary
+                                  color: theme => member.changesRequested > 0 ? GH_COLORS.semaphore.red.text : theme.palette.customColors.midnight
                                 }}
                               >
                                 {member.changesRequested}

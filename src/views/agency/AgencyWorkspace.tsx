@@ -20,7 +20,7 @@ import CustomTabList from '@core/components/mui/TabList'
 import { visuallyHiddenSx } from '@/components/greenhouse/accessibility'
 import EmptyState from '@/components/greenhouse/EmptyState'
 import SectionErrorBoundary from '@/components/greenhouse/SectionErrorBoundary'
-import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_AGENCY } from '@/config/greenhouse-nomenclature'
 import type {
   AgencyChartStatusItem,
   AgencyChartWeeklyPoint,
@@ -220,12 +220,12 @@ const AgencyWorkspace = ({ pulseKpis, pulseSpaces, pulseStatusMix, pulseWeeklyAc
       {/* Workspace header */}
       <Card
         elevation={0}
-        sx={{ p: 3, border: `1px solid ${GH_COLORS.neutral.border}`, borderRadius: 3, bgcolor: 'background.paper' }}
+        sx={{ p: 3, border: theme => `1px solid ${theme.palette.customColors.lightAlloy}`, borderRadius: 3, bgcolor: 'background.paper' }}
       >
-        <Typography variant='h5' sx={{ fontFamily: 'Poppins', fontWeight: 700, color: GH_COLORS.neutral.textPrimary, mb: 0.5 }}>
+        <Typography variant='h5' sx={{ fontFamily: 'Poppins', fontWeight: 700, color: theme => theme.palette.customColors.midnight, mb: 0.5 }}>
           {GH_AGENCY.pulse_title}
         </Typography>
-        <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+        <Typography variant='body2' sx={{ color: 'text.secondary' }}>
           {GH_AGENCY.pulse_subtitle}
         </Typography>
       </Card>

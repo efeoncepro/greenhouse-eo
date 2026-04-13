@@ -170,7 +170,7 @@ export const resolveFinanceClientContext = async ({
   // Postgres-first: resolve from greenhouse_core.organizations and greenhouse_finance.client_profiles
   const { runGreenhousePostgresQuery } = await import('@/lib/postgres/client')
 
-    let clientRows: ClientRow[] = []
+  let clientRows: ClientRow[] = []
   let profileRows: ClientProfileRow[] = []
   let organizationRows: OrganizationRow[] = []
 
@@ -218,9 +218,9 @@ export const resolveFinanceClientContext = async ({
         AND s.organization_id IS NOT NULL
         AND s.active = TRUE
        WHERE (
-         ($1 != '' AND client_profile_id = $1)
-         OR ($2 != '' AND (client_id = $2 OR client_profile_id = $2))
-         OR ($3 != '' AND hubspot_company_id = $3)
+         ($1 != '' AND cp.client_profile_id = $1)
+         OR ($2 != '' AND (cp.client_id = $2 OR cp.client_profile_id = $2))
+         OR ($3 != '' AND cp.hubspot_company_id = $3)
          OR ($4 != '' AND COALESCE(cp.organization_id, s.organization_id) = $4)
        )`,
       [normalizedClientProfileId, normalizedClientId, normalizedHubspotCompanyId, normalizedOrganizationId]

@@ -1,7 +1,8 @@
 import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
-import { REACTIVE_EVENT_TYPES } from '@/lib/sync/event-catalog'
+import { getAllTriggerEventTypes } from '@/lib/sync/projection-registry'
+import { ensureProjectionsRegistered } from '@/lib/sync/projections'
 
 export type ReactiveBacklogStatus = 'healthy' | 'degraded' | 'down' | 'not_configured'
 
@@ -119,6 +120,27 @@ export const readReactiveBacklogOverview = async (): Promise<ReactiveBacklogOver
     }
   }
 
+  // Only events that have at least one registered projection handler should
+  // count toward the reactive backlog. Events catalogued in REACTIVE_EVENT_TYPES
+  // without a registered consumer (e.g. audit-only events like role.assigned or
+  // forward-declared sister_platform_binding.* before its sync target lands)
+  // are intentionally not processed and must not inflate the Ops Health metric.
+  ensureProjectionsRegistered()
+  const handledEventTypes = getAllTriggerEventTypes()
+
+  if (handledEventTypes.length === 0) {
+    return {
+      totalUnreacted: 0,
+      last24hUnreacted: 0,
+      oldestUnreactedAt: null,
+      newestUnreactedAt: null,
+      lastReactedAt: null,
+      lagHours: null,
+      status: 'healthy',
+      topEventTypes: []
+    }
+  }
+
   try {
     const [totalsRows, lastReactedRows, topEventTypesRows] = await Promise.all([
       runGreenhousePostgresQuery<TotalsRow>(
@@ -135,7 +157,7 @@ export const readReactiveBacklogOverview = async (): Promise<ReactiveBacklogOver
              FROM greenhouse_sync.outbox_reactive_log r
              WHERE r.event_id = e.event_id
            )`,
-        [REACTIVE_EVENT_TYPES]
+        [handledEventTypes]
       ),
       runGreenhousePostgresQuery<LastReactedRow>(
         `SELECT MAX(reacted_at)::text AS last_reacted_at
@@ -154,7 +176,7 @@ export const readReactiveBacklogOverview = async (): Promise<ReactiveBacklogOver
          GROUP BY e.event_type
          ORDER BY count DESC, e.event_type ASC
          LIMIT 5`,
-        [REACTIVE_EVENT_TYPES]
+        [handledEventTypes]
       )
     ])
 

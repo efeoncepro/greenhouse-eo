@@ -32,18 +32,30 @@ import { getServerAuthSession } from '@/lib/auth'
 const Layout = async (props: ChildrenType) => {
   const { children } = props
 
-  const session = await getServerAuthSession()
+  let session
+
+  try {
+    session = await getServerAuthSession()
+  } catch (error) {
+    console.error('[DashboardLayout] getServerAuthSession failed:', error)
+    redirect('/login')
+  }
 
   if (!session) {
     redirect('/login')
   }
 
-  // Type guard to ensure lang is a valid Locale
-
   // Vars
   const direction = 'ltr'
-  const mode = await getMode()
-  const systemMode = await getSystemMode()
+  let mode: Awaited<ReturnType<typeof getMode>> = 'light'
+  let systemMode: Awaited<ReturnType<typeof getSystemMode>> = 'light'
+
+  try {
+    mode = await getMode()
+    systemMode = await getSystemMode()
+  } catch (error) {
+    console.error('[DashboardLayout] getMode/getSystemMode failed:', error)
+  }
 
   return (
     <Providers direction={direction} session={session}>

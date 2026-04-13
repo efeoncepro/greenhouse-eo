@@ -34,7 +34,9 @@ export const GH_INTERNAL_NAV = {
   adminAccounts: { label: 'Cuentas', subtitle: 'Organizaciones, spaces y gobierno de identidad' },
   adminPaymentInstruments: { label: 'Instrumentos de pago', subtitle: 'Cuentas bancarias, tarjetas, fintech y plataformas' },
   adminTalentReview: { label: 'Verificación de talento', subtitle: 'Skills, herramientas y certificaciones por revisar' },
-  adminTalentOps: { label: 'Salud del talento', subtitle: 'Metricas y mantenimiento del sistema' }
+  adminTalentOps: { label: 'Salud del talento', subtitle: 'Metricas y mantenimiento del sistema' },
+  adminIdentityAccess: { label: 'Identidad y acceso', subtitle: 'Usuarios, roles, vistas y cuentas' },
+  adminTeamOps: { label: 'Equipo y operaciones', subtitle: 'Talento, líneas de negocio e instrumentos' }
 } as const
 
 export const GH_PEOPLE_NAV = {
@@ -50,12 +52,14 @@ export const GH_AGENCY_NAV = {
   services: { label: 'Servicios', subtitle: 'Servicios contratados por Space' },
   staffAugmentation: { label: 'Staff Augmentation', subtitle: 'Placements, onboarding y economía por assignment' },
   economics: { label: 'Economía', subtitle: 'P&L y rentabilidad' },
-  team: { label: 'Equipo', subtitle: 'Capacidad y dedicación' },
+  team: { label: 'Capacidad', subtitle: 'Carga operativa y dedicación del equipo' },
   talentDiscovery: { label: 'Talento', subtitle: 'Descubrimiento y ranking' },
   delivery: { label: 'Delivery', subtitle: 'ICO, sprints y producción' },
   campaigns: { label: 'Campañas', subtitle: 'Iniciativas cross-space' },
   operations: { label: 'Operaciones', subtitle: 'Salud del platform' },
-  structure: { label: 'Estructura', subtitle: 'Organizaciones, servicios y operaciones' }
+  structure: { label: 'Estructura', subtitle: 'Organizaciones, servicios y operaciones' },
+  teamAndTalent: { label: 'Equipo y talento', subtitle: 'Capacidad, descubrimiento y staffing' },
+  operationsGroup: { label: 'Operaciones', subtitle: 'Delivery, campañas y estructura' }
 } as const
 
 export const GH_FINANCE_NAV = {
@@ -71,19 +75,20 @@ export const GH_FINANCE_NAV = {
   hes: { label: 'HES', subtitle: 'Hojas de entrada de servicio' },
   clients: { label: 'Clientes', subtitle: 'Maestro de clientes y coberturas' },
   costAllocations: { label: 'Asignaciones', subtitle: 'Reparto e imputación de costos' },
-  flow: { label: 'Caja', subtitle: 'Cobros, pagos y cuentas' },
+  flow: { label: 'Flujo operativo', subtitle: 'Ventas, compras y maestros' },
   cashIn: { label: 'Cobros', subtitle: 'Pagos recibidos contra facturas de venta' },
   cashOut: { label: 'Pagos', subtitle: 'Pagos ejecutados contra compromisos' },
   bank: { label: 'Banco', subtitle: 'Tesorería por cuenta, fintech e instrumentos' },
   shareholderAccount: { label: 'Cuenta accionista', subtitle: 'Saldo empresa ↔ accionista' },
   cashPosition: { label: 'Posición de caja', subtitle: 'Saldo real, cuentas por cobrar y por pagar' },
   documents: { label: 'Documentos', subtitle: 'Cotizaciones, OC, HES y conciliación' },
-  analytics: { label: 'Inteligencia', subtitle: 'Economía y asignaciones de costos' }
+  analytics: { label: 'Inteligencia', subtitle: 'Economía y asignaciones de costos' },
+  treasury: { label: 'Tesorería', subtitle: 'Cobros, pagos, banco y posición de caja' }
 } as const
 
 export const GH_HR_NAV = {
-  payroll: { label: 'Nómina', subtitle: 'Compensaciones y nómina mensual' },
-  payrollProjected: { label: 'Nómina Proyectada', subtitle: 'Simulación y previsión' },
+  payroll: { label: 'Nómina mensual', subtitle: 'Compensaciones y liquidación' },
+  payrollProjected: { label: 'Nómina proyectada', subtitle: 'Simulación y previsión' },
   team: { label: 'Mi equipo', subtitle: 'Workspace operativo de tu subárbol visible' },
   approvals: { label: 'Aprobaciones', subtitle: 'Cola operativa del equipo visible' },
   hierarchy: { label: 'Jerarquía', subtitle: 'Supervisoría, delegaciones y cambios' },
@@ -1213,6 +1218,11 @@ export const GH_COLORS = {
     red: { source: '#bb1954', bg: '#f9ecf1', text: '#bb1954' }
   },
 
+  /**
+   * @deprecated Use theme.palette.{success,warning,error,info} instead.
+   * Kept temporarily for backwards compat — will be removed when all consumers migrate.
+   * See GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md §3.2
+   */
   semantic: {
     success: { source: '#6ec207', bg: '#f3faeb', text: '#6ec207' },
     warning: { source: '#ff6500', bg: '#fff2ea', text: '#ff6500' },
@@ -1228,11 +1238,19 @@ export const GH_COLORS = {
     softBlue: '#85B7EB'
   },
 
+  /**
+   * @deprecated Use theme.palette equivalents instead:
+   *   textPrimary  → theme.palette.customColors.midnight
+   *   textSecondary → theme.palette.text.secondary
+   *   border       → theme.palette.customColors.lightAlloy
+   *   bgSurface    → theme.palette.background.default
+   * See GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md §4.2
+   */
   neutral: {
     textPrimary: '#022a4e',
-    textSecondary: '#848484',
+    textSecondary: '#667085',
     border: '#dbdbdb',
-    bgSurface: '#f7f7f5'
+    bgSurface: '#F8F9FA'
   },
 
   service: {
@@ -1261,6 +1279,15 @@ export const GH_COLORS = {
     assetMgmt:  { source: '#0375db', bg: '#eaf3fc', text: '#0375db' },
     activation: { source: '#023c70', bg: '#eaeff3', text: '#023c70' },
     completed:  { source: '#6ec207', bg: '#f3faeb', text: '#6ec207' }
+  },
+
+  /** Capability module brand palettes (admin/tenant context). Distinct from service (operational context). */
+  capability: {
+    globe:  { accent: '#7C3AED', soft: 'rgba(124,58,237,0.12)', contrast: '#F5F3FF' },
+    reach:  { accent: '#4F46E5', soft: 'rgba(79,70,229,0.12)',  contrast: '#EEF2FF' },
+    wave:   { accent: '#0891B2', soft: 'rgba(8,145,178,0.12)',  contrast: '#ECFEFF' },
+    crm:    { accent: '#FF7A59', soft: 'rgba(255,122,89,0.14)', contrast: '#FFF7F4' },
+    core:   { accent: '#1E3A5F', soft: 'rgba(30,58,95,0.12)',   contrast: '#EFF6FF' }
   }
 } as const
 

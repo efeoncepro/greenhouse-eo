@@ -1,6 +1,89 @@
 # changelog.md
 
+## 2026-04-13
+
+### 2026-04-13 — Finance canonical blinda el lookup de client profiles para evitar `client_id` ambiguo
+
+- Se corrigió `src/lib/finance/canonical.ts` para calificar con alias `cp.` los filtros del lookup de `client_profiles` cuando el resolver une `greenhouse_core.spaces`.
+- El ajuste evita el error SQL `column reference "client_id" is ambiguous` que estaba rompiendo el registro de órdenes de compra.
+- Se agregó regresión en `src/lib/finance/canonical.test.ts` y se revalidó la route de purchase orders.
+
+### 2026-04-13 — Finance OC ahora prioriza contactos asociados al cliente
+
+- `Finance > Purchase Orders > Registrar OC` ahora ofrece un selector de contactos vinculado al cliente elegido.
+- El dropdown se nutre primero de memberships de la organización del cliente; si no hay contactos financieros explícitos, cae a miembros de esa misma organización con email.
+- Solo si no hay memberships útiles, el flujo reutiliza el snapshot legacy `financeContacts` del cliente.
+- El ingreso manual sigue disponible como excepción explícita con `No encuentro el contacto`.
+
+### 2026-04-13 — Nueva lane `MINI-###` para mejoras chicas planificadas
+
+- Se agregó `docs/mini-tasks/` con pipeline `to-do / in-progress / complete`.
+- La nueva lane sirve para cambios pequeños y locales que no conviene dejar solo en chat, pero que tampoco justifican una `TASK-###` completa.
+- La convención quedó formalizada en `docs/operations/MINI_TASK_OPERATING_MODEL_V1.md`.
+- Se sembró el primer brief: `MINI-001` para convertir el contacto de OC en selección asociada al cliente.
+
 ## 2026-04-11
+
+### 2026-04-11 — Seed operativo para el piloto Kortex sobre sister-platform consumers
+
+- Se agregó `src/lib/sister-platforms/consumers.ts` para provisionar y actualizar credenciales dedicadas de sister platforms con token hasheado y rotación opcional.
+- Se agregó `scripts/seed-kortex-sister-platform-pilot.ts` y el comando `pnpm seed:kortex-pilot`.
+- El seed deja listo el primer carril operativo Kortex-side en Greenhouse:
+  - consumer dedicado `Kortex Operator Console`
+  - binding `kortex` con `external_scope_type='portal'`
+  - defaults seguros (`binding=draft`, `consumer=active`, `allowed scopes=client,space`)
+- El token solo se vuelve a imprimir cuando el consumer se crea o cuando se solicita una rotación explícita.
+
+### 2026-04-11 — Local Next builds pasan a usar output aislado fuera de Vercel/CI
+
+- `pnpm build` ya no reutiliza `.next` por defecto en local; ahora usa `.next-local/build-<timestamp>-<pid>` mediante `scripts/next-dist-dir.mjs`.
+- `pnpm start` sigue funcionando sobre el ultimo build exitoso gracias al puntero `.next-build-dir`.
+- El puntero del build ya no se escribe antes de compilar; ahora solo se actualiza despues de un build exitoso.
+- El cambio reduce locks y corrupciones del output cuando multiples agentes o procesos construyen el mismo repo a la vez.
+- Rollback temporal disponible via `GREENHOUSE_FORCE_SHARED_NEXT_DIST=true pnpm build`.
+
+### 2026-04-11 — TASK-376 endurece la surface read-only para sister platforms
+
+- Se agregó la migración `sister-platform-read-surface-hardening` para introducir:
+  - `greenhouse_core.sister_platform_consumers`
+  - `greenhouse_core.sister_platform_request_logs`
+  - la secuencia `EO-SPK-####`
+- Se agregó `src/lib/sister-platforms/external-auth.ts` como capa reusable para:
+  - auth por consumer token
+  - resolución obligatoria de binding activo
+  - allowlist de scopes por consumer
+  - rate limiting por consumer
+  - request logging con `requestId`
+- Se agregó el lane read-only endurecido:
+  - `GET /api/integrations/v1/sister-platforms/context`
+  - `GET /api/integrations/v1/sister-platforms/catalog/capabilities`
+  - `GET /api/integrations/v1/sister-platforms/readiness`
+- La spec `TASK-376` quedó corregida para apuntar al carril externo real del repo (`/api/integrations/v1/*`) en vez de un namespace inexistente.
+- La migración quedó aplicada vía `pnpm pg:connect:migrate` y `src/types/db.d.ts` se regeneró en el mismo lote.
+
+### 2026-04-11 — TASK-375 baja la foundation runtime para sister-platform bindings
+
+- Se agregó la migración `sister-platform-bindings-foundation` para introducir `greenhouse_core.sister_platform_bindings` y la secuencia `EO-SPB-####`.
+- Se agregó `src/lib/sister-platforms/bindings.ts` como capa reusable para:
+  - listar y leer bindings
+  - crear y actualizar lifecycle
+  - resolver `external scope -> greenhouse scope`
+- El contrato soporta scopes `organization`, `client`, `space` e `internal`, sin hardcodear la semántica a Kortex.
+- Se agregaron rutas admin nuevas bajo `/api/admin/integrations/sister-platform-bindings*`.
+- `/admin/integrations` ahora muestra una lectura operativa de los bindings sister-platform dentro de la gobernanza existente.
+- `pnpm build`, `pnpm lint` y `pnpm pg:connect:migrate` quedaron cerrados; la migración ya está aplicada y `src/types/db.d.ts` regenerado.
+
+### 2026-04-11 — TASK-374 queda cerrada como umbrella de programa, no como runtime
+
+- `TASK-374` se corrigió contra la realidad del repo y quedó cerrada como umbrella documental/programática.
+- El audit dejó explícito que hoy la surface externa viva es `/api/integrations/v1/*`, mientras que `API v1` sister-platform-neutral y `MCP` siguen pendientes.
+- La continuación correcta del programa queda concentrada en `TASK-375`, `TASK-376` y `TASK-377`.
+
+### 2026-04-11 — Greenhouse formaliza contrato con sister platforms y anexo Kortex
+
+- Se agregó la spec `GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md` para fijar que Greenhouse y las plataformas hermanas del ecosistema se integran como `peer systems`.
+- Se agregó el anexo `GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md` para definir el primer bridge concreto con Kortex como consumer de operational intelligence Greenhouse.
+- El backlog operativo ahora incluye `TASK-374` a `TASK-377` para bajar el contrato a foundation reusable, read-only surfaces y primer carril Kortex.
 
 ### 2026-04-11 — Skill local para auditoría de microinteracciones Greenhouse
 
@@ -4812,7 +4895,7 @@
 - Se agrego `.gitattributes` para fijar finales de linea `LF` en archivos de texto y reducir warnings recurrentes de `LF/CRLF` en Windows.
 - Se verifico el staging de Git sin warnings de conversion despues de ajustar la politica local de `EOL`.
 - Se reemplazaron scripts Unix `rm -rf` por utilidades cross-platform con Node.
-- En Windows local, `build` paso a usar un `distDir` dinamico bajo `.next-local/` para evitar bloqueos recurrentes sobre `.next` dentro de OneDrive.
+- En local fuera de Vercel/CI, `build` paso a usar un `distDir` dinamico bajo `.next-local/` para evitar bloqueos recurrentes sobre `.next` y colisiones entre procesos.
 - Se dejo explicitada la regla de no correr `git add/commit/push` en paralelo para evitar `index.lock`.
 
 ## 2026-03-10

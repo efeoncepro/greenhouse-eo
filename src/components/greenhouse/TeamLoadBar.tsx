@@ -42,7 +42,7 @@ const TeamLoadBar = ({ items, emptyLabel }: TeamLoadBarProps) => {
           height: 12,
           overflow: 'hidden',
           borderRadius: 999,
-          bgcolor: GH_COLORS.neutral.border
+          bgcolor: theme => theme.palette.customColors.lightAlloy
         }}
       >
         {items.map((item, index) => (

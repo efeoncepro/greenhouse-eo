@@ -4,6 +4,11 @@
 
 Expose a system-agnostic integration API so external connectors can exchange tenant commercial context with Greenhouse without coupling the product to a single provider.
 
+This surface now has two lanes:
+
+- a generic integrations lane for existing connector-style consumers
+- a hardened read-only sister-platform lane for ecosystem peers such as Kortex
+
 This API is intended for integration workers such as:
 - HubSpot -> BigQuery Cloud Functions
 - Notion -> BigQuery loaders
@@ -17,12 +22,28 @@ Machine-readable handoff:
 
 ## Authentication
 
-All routes under `/api/integrations/v1/*` require one shared token:
+### Generic integrations lane
+
+Most generic routes under `/api/integrations/v1/*` still require one shared token:
 
 - env var: `GREENHOUSE_INTEGRATION_API_TOKEN`
 - accepted headers:
   - `Authorization: Bearer <token>`
   - `x-greenhouse-integration-key: <token>`
+
+### Sister-platform read-only lane
+
+Routes under `/api/integrations/v1/sister-platforms/*` require:
+
+- a per-consumer credential stored in `greenhouse_core.sister_platform_consumers`
+- accepted headers:
+  - `Authorization: Bearer <consumer-token>`
+  - `x-greenhouse-sister-platform-key: <consumer-token>`
+- explicit scope query params:
+  - `externalScopeType`
+  - `externalScopeId`
+
+The request is only served if the consumer token is valid, the binding resolves as `active`, and the resolved Greenhouse scope is allowed for that consumer.
 
 This token is separate from NextAuth and admin session auth.
 
@@ -36,6 +57,7 @@ This token is separate from NextAuth and admin session auth.
 - Greenhouse remains the canonical runtime for tenant capability state.
 - Connectors may push normalized commercial context into Greenhouse.
 - Connectors may also read tenant state back from Greenhouse to support bidirectional sync.
+- Sister-platform read-only routes must resolve tenancy through `sister_platform_bindings`; they do not infer scope from labels or provider-specific heuristics.
 - No route derives capabilities from `deals` automatically.
 - If a provider wants to sync capabilities, it must send explicit `businessLines` and `serviceModules`.
 
@@ -155,6 +177,44 @@ The selector supports:
 - `publicId`
 - `sourceSystem` + `sourceObjectType` + `sourceObjectId`
 
+### `GET /api/integrations/v1/sister-platforms/context`
+
+Returns the resolved consumer + binding context for a sister-platform request.
+
+Required query params:
+- `externalScopeType`
+- `externalScopeId`
+
+This is the lowest-friction handshake route for a sister-platform consumer.
+
+Use this to:
+- validate that the token resolves to the expected sister platform
+- validate that the external scope is actually bound in Greenhouse
+- inspect the effective Greenhouse scope before asking for additional reads
+
+### `GET /api/integrations/v1/sister-platforms/catalog/capabilities`
+
+Returns the active capability catalog, but only after authenticating the consumer and resolving the binding context.
+
+Required query params:
+- `externalScopeType`
+- `externalScopeId`
+
+This route exists so a sister-platform consumer can bootstrap its own code mappings without bypassing the hardened auth + binding lane.
+
+### `GET /api/integrations/v1/sister-platforms/readiness`
+
+Returns readiness for one or more registered integrations while preserving the same consumer auth, binding resolution, request logging, and rate limiting rules as the rest of the sister-platform lane.
+
+Required query params:
+- `externalScopeType`
+- `externalScopeId`
+- `keys=notion,hubspot,...`
+
+This is useful for:
+- operator consoles that need preflight posture before surfacing downstream context
+- future MCP adapters that should not bypass the same operational rules
+
 ## Bidirectional Pattern
 
 Recommended connector flow:
@@ -172,6 +232,12 @@ Implemented now:
 - capability catalog export
 - tenant snapshot export
 - inbound capability sync by tenant selector
+- hardened sister-platform read-only lane with:
+  - per-consumer credentials
+  - binding-aware scope resolution
+  - request logging
+  - rate limiting
+  - read-only endpoints for `context`, `catalog/capabilities`, and `readiness`
 - live CRM reads can now be consumed separately through the dedicated HubSpot facade service `hubspot-greenhouse-integration` for:
   - `GET /contract`
   - `GET /companies/{hubspotCompanyId}`
@@ -183,6 +249,8 @@ Not implemented yet:
 - generic external-id registry table for non-HubSpot source mappings
 - outbound webhooks
 - signed request rotation or per-integration credentials
+- MCP server mounted on top of the sister-platform read lane
+- write flows for sister-platform consumers
 
 Those can be layered later without replacing the contract above.
 

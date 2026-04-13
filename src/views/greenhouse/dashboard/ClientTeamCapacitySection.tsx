@@ -90,7 +90,7 @@ const ClientTeamCapacitySection = ({ data, onRequest }: ClientTeamCapacitySectio
                 sx={{
                   p: 2.5,
                   borderRadius: 3,
-                  border: `1px solid ${GH_COLORS.neutral.border}`,
+                  border: theme => `1px solid ${theme.palette.customColors.lightAlloy}`,
                   display: 'grid',
                   gap: 1.5
                 }}
@@ -150,8 +150,8 @@ const ClientTeamCapacitySection = ({ data, onRequest }: ClientTeamCapacitySectio
             sx={{
               p: 3,
               borderRadius: 3,
-              border: `1px solid ${GH_COLORS.neutral.border}`,
-              backgroundColor: GH_COLORS.neutral.bgSurface,
+              border: theme => `1px solid ${theme.palette.customColors.lightAlloy}`,
+              backgroundColor: 'background.default',
               display: 'grid',
               gap: 2.5,
               alignContent: 'start'
@@ -190,32 +190,32 @@ const ClientTeamCapacitySection = ({ data, onRequest }: ClientTeamCapacitySectio
 
             {utilizationPct >= 85 ? (
               <Box
-                sx={{
+                sx={theme => ({
                   p: 2,
                   borderRadius: 3,
-                  backgroundColor: GH_COLORS.semantic.warning.bg,
-                  border: `1px solid ${alpha(GH_COLORS.semantic.warning.source, 0.24)}`,
+                  backgroundColor: theme.palette.warning.lighterOpacity,
+                  border: `1px solid ${alpha(theme.palette.warning.main, 0.24)}`,
                   display: 'grid',
                   gap: 1.5
-                }}
+                })}
               >
                 <Typography variant='subtitle2' sx={{ color: GH_COLORS.role.media.textDark }}>
                   {GH_TEAM.cta_title.replace('{percent}', String(utilizationPct))}
                 </Typography>
-                <Typography variant='body2' sx={{ color: GH_COLORS.semantic.warning.text }}>
+                <Typography variant='body2' sx={{ color: theme => theme.palette.warning.main }}>
                   {GH_TEAM.cta_subtitle}
                 </Typography>
                 <ButtonBase
                   onClick={() => onRequest('ampliar capacidad')}
-                  sx={{
+                  sx={theme => ({
                     justifyContent: 'center',
                     px: 2,
                     py: 1.5,
                     borderRadius: 2,
-                    border: `1px solid ${GH_COLORS.semantic.warning.source}`,
-                    color: GH_COLORS.semantic.warning.text,
+                    border: `1px solid ${theme.palette.warning.main}`,
+                    color: theme.palette.warning.main,
                     fontWeight: 600
-                  }}
+                  })}
                 >
                   {GH_TEAM.cta_button}
                 </ButtonBase>

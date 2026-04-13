@@ -22,11 +22,8 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
     colorSchemes: {
       light: {
         palette: {
-          primary: {
-            main: '#0375DB',
-            light: '#3691E3',
-            dark: '#024C8F'
-          },
+          // primary is set by the provider via settings.primaryColor (source: primaryColorConfig.ts)
+          // — no need to duplicate it here. See GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md §4.1
           secondary: {
             main: '#023C70',
             light: '#035A9E',
@@ -79,11 +76,7 @@ const mergedTheme = (settings: Settings, mode: SystemMode, direction: Theme['dir
       },
       dark: {
         palette: {
-          primary: {
-            main: '#0375DB',
-            light: '#3691E3',
-            dark: '#024C8F'
-          },
+          // primary is set by the provider via settings.primaryColor (same source as light)
           secondary: {
             main: '#023C70',
             light: '#035A9E',

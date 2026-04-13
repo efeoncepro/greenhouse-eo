@@ -11,7 +11,7 @@ import CustomChip from '@core/components/mui/Chip'
 import CustomIconButton from '@core/components/mui/IconButton'
 import CustomTextField from '@core/components/mui/TextField'
 
-import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
+import { GH_AGENCY } from '@/config/greenhouse-nomenclature'
 import type { AgencySpaceHealth } from '@/lib/agency/agency-queries'
 import { getSpaceHealth, type SpaceHealthZone } from './space-health'
 
@@ -68,7 +68,7 @@ const SpaceFilters = ({ spaces, onChange, filteredCount, viewMode, onViewModeCha
   const handleHealth = (v: HealthFilter) => { setHealth(v); applyFilters(search, serviceLine, status, v) }
 
   return (
-    <Card elevation={0} sx={{ p: 2.5, border: `1px solid ${GH_COLORS.neutral.border}`, borderRadius: 3 }}>
+    <Card elevation={0} sx={{ p: 2.5, border: theme => `1px solid ${theme.palette.customColors.lightAlloy}`, borderRadius: 3 }}>
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} flexWrap='wrap' useFlexGap alignItems='center'>
         <CustomTextField
           size='small'
@@ -78,7 +78,7 @@ const SpaceFilters = ({ spaces, onChange, filteredCount, viewMode, onViewModeCha
           InputProps={{
             startAdornment: (
               <InputAdornment position='start'>
-                <i className='tabler-search' style={{ fontSize: '1rem', color: GH_COLORS.neutral.textSecondary }} />
+                <i className='tabler-search' style={{ fontSize: '1rem' }} />
               </InputAdornment>
             )
           }}

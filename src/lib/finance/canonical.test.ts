@@ -87,6 +87,32 @@ describe('resolveFinanceClientContext', () => {
     expect(mockRunFinanceQuery).not.toHaveBeenCalled()
   })
 
+  it('qualifies joined client profile filters to avoid ambiguous client_id references', async () => {
+    mockRunGreenhousePostgresQuery
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+
+    await expect(
+      resolveFinanceClientContext({
+        organizationId: 'org-1',
+        clientId: 'client-1',
+        clientProfileId: 'profile-1',
+        hubspotCompanyId: 'hubspot-1'
+      })
+    ).rejects.toThrow('clientId does not exist in the finance client context.')
+
+    const profileQuery = mockRunGreenhousePostgresQuery.mock.calls[1]?.[0]
+
+    expect(typeof profileQuery).toBe('string')
+    expect(profileQuery).toContain("($1 != '' AND cp.client_profile_id = $1)")
+    expect(profileQuery).toContain("OR ($2 != '' AND (cp.client_id = $2 OR cp.client_profile_id = $2))")
+    expect(profileQuery).toContain("OR ($3 != '' AND cp.hubspot_company_id = $3)")
+    expect(profileQuery).not.toContain("($1 != '' AND client_profile_id = $1)")
+    expect(profileQuery).not.toContain("OR ($2 != '' AND (client_id = $2 OR client_profile_id = $2))")
+    expect(profileQuery).not.toContain("OR ($3 != '' AND hubspot_company_id = $3)")
+  })
+
   it('falls back to BigQuery only for allowed Postgres fallback errors', async () => {
     const pgError = new Error('finance postgres schema is not ready')
 

@@ -120,7 +120,10 @@ export const AGGREGATE_TYPES = {
   userLifecycle: 'user_lifecycle',
 
   // Permission Sets (TASK-263)
-  permissionSet: 'permission_set'
+  permissionSet: 'permission_set',
+
+  // Sister Platforms (TASK-375)
+  sisterPlatformBinding: 'sister_platform_binding'
 } as const
 
 export type AggregateType = (typeof AGGREGATE_TYPES)[keyof typeof AGGREGATE_TYPES]
@@ -335,7 +338,14 @@ export const EVENT_TYPES = {
 
   // Permission Sets (TASK-263)
   viewAccessSetAssigned: 'access.permission_set_assigned',
-  viewAccessSetRevoked: 'access.permission_set_revoked'
+  viewAccessSetRevoked: 'access.permission_set_revoked',
+
+  // Sister Platforms (TASK-375)
+  sisterPlatformBindingCreated: 'sister_platform_binding.created',
+  sisterPlatformBindingUpdated: 'sister_platform_binding.updated',
+  sisterPlatformBindingActivated: 'sister_platform_binding.activated',
+  sisterPlatformBindingSuspended: 'sister_platform_binding.suspended',
+  sisterPlatformBindingDeprecated: 'sister_platform_binding.deprecated'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]
@@ -445,7 +455,14 @@ export const REACTIVE_EVENT_TYPES = [
 
   // Permission Sets (TASK-263)
   EVENT_TYPES.viewAccessSetAssigned,
-  EVENT_TYPES.viewAccessSetRevoked
+  EVENT_TYPES.viewAccessSetRevoked,
+
+  // Sister Platforms (TASK-375)
+  EVENT_TYPES.sisterPlatformBindingCreated,
+  EVENT_TYPES.sisterPlatformBindingUpdated,
+  EVENT_TYPES.sisterPlatformBindingActivated,
+  EVENT_TYPES.sisterPlatformBindingSuspended,
+  EVENT_TYPES.sisterPlatformBindingDeprecated
 ] as const
 
 // ── Event Payload Types (TASK-247) ──

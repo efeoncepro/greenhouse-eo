@@ -17,6 +17,10 @@
   color: rgba(255, 255, 255, 0.82);
 }
 
+.ts-vertical-nav-root .ts-menu-button {
+  transition: background-color 150ms ease-out, color 200ms ease-out;
+}
+
 .ts-vertical-nav-root .ts-menu-button:hover,
 .ts-vertical-nav-root .ts-menu-button:focus-visible,
 .ts-vertical-nav-root .ts-menu-button[aria-expanded='true'] {
@@ -37,10 +41,22 @@
   color: inherit !important;
 }
 
+.ts-vertical-nav-root .ts-submenu-expand-icon {
+  color: rgba(255, 255, 255, 1) !important;
+}
+
 .ts-vertical-nav-root .ts-menu-section-content {
   color: rgba(255, 255, 255, 0.5) !important;
 }
 
 .ts-vertical-nav-root .ts-menu-section-content::before {
   background-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ts-vertical-nav-root,
+  .ts-vertical-nav-root * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }

@@ -13,6 +13,7 @@ import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
+import { useTheme } from '@mui/material/styles'
 
 import CustomChip from '@core/components/mui/Chip'
 import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
@@ -23,7 +24,8 @@ import IcoAdvisoryBlock from '@/components/agency/IcoAdvisoryBlock'
 import IcoCharts from '@/components/agency/IcoCharts'
 import type { RpaTrendBySpace } from '@/components/agency/IcoCharts'
 import SpaceIcoScorecard from '@/components/agency/SpaceIcoScorecard'
-import { GH_AGENCY, GH_COLORS } from '@/config/greenhouse-nomenclature'
+
+import { GH_AGENCY } from '@/config/greenhouse-nomenclature'
 import type { SpaceMetricSnapshot } from '@/lib/ico-engine/read-metrics'
 import type { AgencyPerformanceReport } from '@/lib/ico-engine/performance-report'
 import type { AgencyAiLlmSummary } from '@/lib/ico-engine/ai/llm-types'
@@ -57,6 +59,7 @@ const trendChipLabel = (trend: AgencyPerformanceReport['summary']['trend']): str
   trend === 'improving' ? 'Mejorando' : trend === 'degrading' ? 'Retroceso' : 'Estable'
 
 const AgencyIcoEngineView = ({ data, onComputeLive, computingLive }: Props) => {
+  const theme = useTheme()
   const hasData = data !== null && data.spaces.length > 0
 
   const [rpaTrend, setRpaTrend] = useState<RpaTrendBySpace[] | undefined>(undefined)
@@ -92,14 +95,14 @@ const AgencyIcoEngineView = ({ data, onComputeLive, computingLive }: Props) => {
       {/* Header */}
       <Card
         elevation={0}
-        sx={{ p: 3, border: `1px solid ${GH_COLORS.neutral.border}`, borderRadius: 3, bgcolor: 'background.paper' }}
+        sx={{ p: 3, border: `1px solid ${theme.palette.customColors.lightAlloy}`, borderRadius: 3, bgcolor: 'background.paper' }}
       >
         <Stack direction='row' alignItems='center' justifyContent='space-between' flexWrap='wrap' useFlexGap gap={1}>
           <div>
-            <Typography variant='h5' sx={{ fontFamily: 'Poppins', fontWeight: 700, color: GH_COLORS.neutral.textPrimary, mb: 0.5 }}>
+            <Typography variant='h5' sx={{ fontFamily: 'Poppins', fontWeight: 700, color: theme.palette.customColors.midnight, mb: 0.5 }}>
               {GH_AGENCY.ico_title}
             </Typography>
-            <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+            <Typography variant='body2' sx={{ color: theme.palette.text.secondary }}>
               {GH_AGENCY.ico_subtitle}
             </Typography>
           </div>
@@ -289,20 +292,20 @@ const AgencyIcoEngineView = ({ data, onComputeLive, computingLive }: Props) => {
                           >
                             <Card
                               elevation={0}
-                              sx={{ p: 3, border: `1px solid ${GH_COLORS.neutral.border}`, borderRadius: 3, bgcolor: 'background.paper' }}
+                              sx={{ p: 3, border: `1px solid ${theme.palette.customColors.lightAlloy}`, borderRadius: 3, bgcolor: 'background.paper' }}
                             >
                               <Stack direction='row' spacing={2} alignItems='center'>
-                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 40, height: 40, borderRadius: '50%', bgcolor: GH_COLORS.neutral.bgSurface }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 40, height: 40, borderRadius: '50%', bgcolor: theme.palette.background.default }}>
                                   <i className='tabler-trophy' style={{ fontSize: 20 }} />
                                 </Box>
                                 <div>
-                                  <Typography variant='overline' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+                                  <Typography variant='overline' sx={{ color: theme.palette.text.secondary }}>
                                     Top Performer del período
                                   </Typography>
-                                  <Typography variant='h6' sx={{ fontFamily: 'Poppins', fontWeight: 700, color: GH_COLORS.neutral.textPrimary }}>
+                                  <Typography variant='h6' sx={{ fontFamily: 'Poppins', fontWeight: 700, color: theme.palette.customColors.midnight }}>
                                     {data.report.topPerformer?.memberName ?? 'Sin ranking elegible'}
                                   </Typography>
-                                  <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+                                  <Typography variant='body2' sx={{ color: theme.palette.text.secondary }}>
                                     {data.report.topPerformer
                                       ? `${formatPct(data.report.topPerformer.otdPct)} OTD · ${data.report.topPerformer.throughputCount} completadas · RpA ${data.report.topPerformer.rpaAvg?.toFixed(2) ?? '—'}`
                                       : `Se requiere throughput >= ${data.report.assumptions.topPerformerMinThroughput} para entrar al ranking.`}
@@ -329,18 +332,18 @@ const AgencyIcoEngineView = ({ data, onComputeLive, computingLive }: Props) => {
                     <AccordionDetails>
                       <Stack spacing={2.5}>
                         <div>
-                          <Typography variant='overline' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+                          <Typography variant='overline' sx={{ color: theme.palette.text.secondary }}>
                             Alerta
                           </Typography>
-                          <Typography variant='body1' sx={{ color: GH_COLORS.neutral.textPrimary, fontWeight: 600 }}>
+                          <Typography variant='body1' sx={{ color: theme.palette.customColors.midnight, fontWeight: 600 }}>
                             {data.report.alertText}
                           </Typography>
                         </div>
                         <div>
-                          <Typography variant='overline' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+                          <Typography variant='overline' sx={{ color: theme.palette.text.secondary }}>
                             Resumen Ejecutivo
                           </Typography>
-                          <Typography variant='body2' sx={{ color: GH_COLORS.neutral.textSecondary }}>
+                          <Typography variant='body2' sx={{ color: theme.palette.text.secondary }}>
                             {data.report.executiveSummary}
                           </Typography>
                         </div>

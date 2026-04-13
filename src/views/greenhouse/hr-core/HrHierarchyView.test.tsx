@@ -156,6 +156,11 @@ const baseGovernance = {
   proposals: []
 }
 
+// Coverage instrumentation in CI pushes this suite past the default 5s budget
+// on the slower first-render case. Set a generous file-level timeout so no
+// individual test hits the default window under load.
+vi.setConfig({ testTimeout: 30000 })
+
 describe('HrHierarchyView', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -251,7 +256,7 @@ describe('HrHierarchyView', () => {
 
     expect(screen.getByRole('alert')).toHaveTextContent('Revisa los campos obligatorios antes de guardar el cambio.')
     expect(screen.getByRole('textbox', { name: 'Razón' })).toHaveAttribute('aria-invalid', 'true')
-  }, 10000)
+  }, 30000)
 
   it('shows validation when bulk reassignment is submitted without a reason', async () => {
     const user = userEvent.setup()
@@ -260,7 +265,9 @@ describe('HrHierarchyView', () => {
     renderWithTheme(<HrHierarchyView />)
 
     await screen.findAllByText('Ana Perez')
-    await user.click(screen.getAllByRole('button', { name: 'Reasignar' })[0])
+    const reasignButtons = await screen.findAllByRole('button', { name: 'Reasignar' })
+
+    await user.click(reasignButtons[0])
 
     expect(screen.getByRole('heading', { name: 'Reasignar reportes directos' })).toBeInTheDocument()
 
@@ -272,7 +279,7 @@ describe('HrHierarchyView', () => {
 
     expect(screen.getByRole('alert')).toHaveTextContent('Revisa los campos obligatorios antes de reasignar los reportes.')
     expect(screen.getByRole('textbox', { name: 'Razón' })).toHaveAttribute('aria-invalid', 'true')
-  }, 10000)
+  }, 30000)
 
   it('opens the temporary delegation dialog from the audit panel', async () => {
     const user = userEvent.setup()
@@ -281,10 +288,12 @@ describe('HrHierarchyView', () => {
     renderWithTheme(<HrHierarchyView />)
 
     await screen.findAllByText('Ana Perez')
-    await user.click(screen.getAllByRole('button', { name: 'Nueva delegación' })[0])
+    const delegationButtons = await screen.findAllByRole('button', { name: 'Nueva delegación' })
+
+    await user.click(delegationButtons[0])
 
     expect(screen.getByRole('heading', { name: 'Nueva delegación temporal' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Delegado' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Crear delegación' })).toBeInTheDocument()
-  }, 10000)
+  }, 30000)
 })

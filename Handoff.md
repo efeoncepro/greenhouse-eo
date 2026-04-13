@@ -1,5 +1,313 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — ISSUE-045 abierto: registrar OC cae por `client_id` ambiguo en Finance canonical
+
+- incidente:
+  - el flujo `Finance > Purchase Orders > Registrar OC` devuelve error genérico al crear una OC en staging
+  - Sentry confirmó `error: column reference "client_id" is ambiguous`
+  - la falla vive en `resolveFinanceClientContext()` y no en el selector nuevo de contactos
+- causa raíz confirmada:
+  - el query de `src/lib/finance/canonical.ts` hace `LEFT JOIN greenhouse_core.spaces s ON s.client_id = cp.client_id`
+  - en el `WHERE`, el lookup de `client_profiles` usaba `client_id`, `client_profile_id` y `hubspot_company_id` sin alias
+  - al existir `s.client_id`, PostgreSQL rompe con referencia ambigua
+- fix aplicado en repo:
+  - columnas del lookup ahora quedan calificadas con `cp.`
+  - se agregó regresión en `src/lib/finance/canonical.test.ts` para asegurar que ese SQL siga aliasado
+- verificación ejecutada:
+  - `pnpm exec vitest run src/lib/finance/canonical.test.ts src/app/api/finance/purchase-orders/route.test.ts`
+  - `pnpm lint -- src/lib/finance/canonical.ts src/lib/finance/canonical.test.ts`
+- estado documental:
+  - issue creado en `docs/issues/open/ISSUE-045-purchase-order-create-ambiguous-client-id.md`
+  - queda **open** hasta validar el recovery en staging post-deploy
+  - tracker actualizado en `docs/issues/README.md`
+
+## Sesion 2026-04-13 — MINI-001 cerrada: OC ahora prioriza contactos del cliente seleccionado
+
+- alcance implementado:
+  - `src/views/greenhouse/finance/drawers/CreatePurchaseOrderDrawer.tsx`
+  - el drawer de OC ya no depende solo de nombre/email libres como camino principal
+  - al elegir cliente:
+    - intenta cargar memberships de la organización de ese cliente
+    - prioriza memberships `billing`, `contact` y `client_contact`
+    - si no existen, cae a miembros de esa misma organización con email
+    - si tampoco hay memberships útiles, cae al snapshot legacy `financeContacts` del cliente
+  - el selector muestra solo contactos asociados a ese cliente, nunca una búsqueda global
+  - se mantiene fallback manual explícito con `No encuentro el contacto`
+- verificación:
+  - `pnpm lint -- src/views/greenhouse/finance/drawers/CreatePurchaseOrderDrawer.tsx`
+  - `pnpm build`
+- nota:
+  - `pnpm build` volvió a emitir logs preexistentes de Next sobre `Dynamic server usage` en rutas que usan `headers`; no bloqueó el build ni nace de esta mini-task
+
+## Sesion 2026-04-13 — lane `MINI-###` materializada para mejoras chicas planificadas
+
+- alcance implementado:
+  - nueva taxonomía `docs/mini-tasks/` con pipeline `to-do`, `in-progress`, `complete`
+  - tracker nuevo `docs/mini-tasks/README.md`
+  - plantilla nueva `docs/mini-tasks/MINI_TASK_TEMPLATE.md`
+  - registry nuevo `docs/mini-tasks/MINI_TASK_ID_REGISTRY.md`
+  - operating model nuevo `docs/operations/MINI_TASK_OPERATING_MODEL_V1.md`
+  - docs vivas alineadas:
+    - `AGENTS.md`
+    - `docs/README.md`
+    - `docs/operations/DOCUMENTATION_OPERATING_MODEL_V1.md`
+    - `project_context.md`
+    - `changelog.md`
+- primer seed operativo:
+  - `docs/mini-tasks/to-do/MINI-001-po-client-contact-selector.md`
+- criterio nuevo:
+  - `MINI-###` para mejoras chicas, locales y planificadas
+  - `ISSUE-###` sigue reservado para problemas reales de runtime
+  - `TASK-###` sigue siendo la lane cuando el alcance deja de ser claramente acotado
+
+## Sesion 2026-04-11 — Seed operativo Kortex pilot READY
+
+- alcance implementado:
+  - helper nuevo `src/lib/sister-platforms/consumers.ts`
+    - lista consumers
+    - crea consumer con token hasheado
+    - upsert idempotente por `sister_platform_key + consumer_name`
+    - rotacion opcional de token
+  - script nuevo `scripts/seed-kortex-sister-platform-pilot.ts`
+  - comando nuevo `pnpm seed:kortex-pilot`
+  - docs actualizados:
+    - `docs/architecture/GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`
+    - `docs/documentation/plataforma/sister-platform-bindings.md`
+- contrato operativo:
+  - el seed provisiona o actualiza el consumer dedicado de Kortex y su binding `portal -> Greenhouse scope`
+  - defaults seguros:
+    - consumer `active`
+    - binding `draft`
+    - allowed scopes `client,space`
+  - el token solo aparece cuando se crea o se rota (`KORTEX_ROTATE_CONSUMER_TOKEN=true`)
+- siguiente accion natural:
+  - correr `pnpm seed:kortex-pilot` con IDs reales del piloto y guardar el token emitido en los secrets del runtime Kortex
+  - luego hacer smoke call a `/api/integrations/v1/sister-platforms/context`
+
+## Sesion 2026-04-11 — local Next build isolation ACTIVADA para evitar colisiones entre agentes
+
+- alcance implementado:
+  - helper nuevo `scripts/next-dist-dir.mjs`
+  - `scripts/run-next-build.mjs` ahora usa `distDir` aislado bajo `.next-local/build-<timestamp>-<pid>` en local fuera de Vercel/CI
+  - `scripts/run-next-start.mjs` arranca desde el ultimo build exitoso resuelto por `.next-build-dir`
+  - `.next-build-dir` ya no se actualiza antes del build; solo despues de un build exitoso
+  - cleanup controlado de builds aislados viejos
+- problema que resuelve:
+  - locks sobre `.next/lock`
+  - corrupcion del output cuando dos agentes o procesos ejecutan `pnpm build` en el mismo workspace
+  - `start` apuntando a un build fallido o incompleto
+- rollback:
+  - temporal: `GREENHOUSE_FORCE_SHARED_NEXT_DIST=true pnpm build`
+  - hard rollback: revertir `scripts/next-dist-dir.mjs`, `scripts/run-next-build.mjs` y `scripts/run-next-start.mjs`
+- nota operativa:
+  - en Vercel y CI el comportamiento sigue compartido sobre `.next` para no cambiar el contrato de esos entornos sin necesidad
+
+## Sesion 2026-04-11 — TASK-376: Sister Platforms Read-Only External Surface Hardening COMPLETADA
+
+- alcance implementado:
+  - nueva migracion `20260411201917370_sister-platform-read-surface-hardening.sql`
+  - nueva tabla canónica `greenhouse_core.sister_platform_consumers`
+  - nueva tabla canónica `greenhouse_core.sister_platform_request_logs`
+  - secuencia `greenhouse_core.seq_sister_platform_consumer_public_id` para `EO-SPK-####`
+  - helper reusable `src/lib/sister-platforms/external-auth.ts` con:
+    - auth por consumer token
+    - resolucion obligatoria de binding activo
+    - allowlist de scopes por consumer
+    - rate limiting por consumer
+    - request logging con `requestId`
+  - nuevo lane read-only endurecido:
+    - `/api/integrations/v1/sister-platforms/context`
+    - `/api/integrations/v1/sister-platforms/catalog/capabilities`
+    - `/api/integrations/v1/sister-platforms/readiness`
+  - actualización de docs:
+    - `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.md`
+    - `docs/api/GREENHOUSE_INTEGRATIONS_API_V1.openapi.yaml`
+    - `docs/api/GREENHOUSE_API_REFERENCE_V1.md`
+    - `docs/architecture/GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`
+    - `docs/documentation/plataforma/sister-platform-bindings.md`
+- decisiones de contrato:
+  - la task se corrigió para operar sobre `src/app/api/integrations/v1/*`, no sobre un inexistente `src/app/api/v1/*`
+  - el lane nuevo queda separado del carril genérico y mutativo ya existente
+  - MCP sigue downstream; no se implementó aquí
+- verificación esperada:
+  - `pnpm lint`
+  - `pnpm build`
+  - chequeo de `new Pool()`
+  - `pnpm pg:connect:migrate`
+- cierre real:
+  - la migración quedó aplicada sobre Cloud SQL el 2026-04-11 vía `pnpm pg:connect:migrate`
+  - `src/types/db.d.ts` quedó regenerado en el mismo lote
+  - `TASK-376` ya puede considerarse cerrada
+
+## Sesion 2026-04-11 — TASK-375: Sister Platforms Identity & Tenancy Binding Foundation COMPLETADA
+
+- alcance implementado:
+  - nueva migracion `20260411192943501_sister-platform-bindings-foundation.sql`
+  - nueva tabla canónica `greenhouse_core.sister_platform_bindings`
+  - secuencia `greenhouse_core.seq_sister_platform_binding_public_id` para `EO-SPB-####`
+  - helper reusable `src/lib/sister-platforms/bindings.ts` con:
+    - list/read admin
+    - create/update
+    - resolver `external scope -> greenhouse scope`
+    - soporte de scopes `organization`, `client`, `space` e `internal`
+  - eventos outbox nuevos en `event-catalog.ts` para lifecycle del binding
+  - rutas admin nuevas:
+    - `/api/admin/integrations/sister-platform-bindings`
+    - `/api/admin/integrations/sister-platform-bindings/[bindingId]`
+  - `/admin/integrations` ahora muestra la sección `Sister Platform Bindings`
+- reusable real para futuras sister platforms:
+  - no hay hardcode a Kortex en la foundation de runtime
+  - `kortex` y `verk` aparecen solo como keys/plataformas, no como shape especial
+  - el contrato queda listo para `TASK-376` y `TASK-377`
+- verificación:
+  - `pnpm build` pasa
+  - `pnpm lint` pasa con 2 warnings preexistentes en `HrOrgChartView.tsx`
+  - `pnpm pg:connect:migrate` terminó OK el 2026-04-11 tras reautenticar ADC y levantar Cloud SQL Proxy
+  - `src/types/db.d.ts` quedó regenerado en el mismo lote
+- cierre real:
+  - la foundation runtime ya quedó materializada en DB y tipos
+  - `TASK-375` ya puede considerarse cerrada
+
+## Sesion 2026-04-11 — TASK-374: Sister Platforms Integration Program COMPLETADA
+
+- alcance cerrado:
+  - `TASK-374` ya no se interpreta como task de runtime sino como umbrella de programa
+  - se corrigió la spec contra la realidad del repo actual
+  - se dejó explícito que hoy la surface externa viva es `/api/integrations/v1/*`
+  - se dejó explícito que `API v1` y `MCP` para sister platforms siguen pendientes de implementación
+  - la continuación real del programa queda secuenciada en:
+    - `TASK-375` — binding canónico sister-platform -> Greenhouse
+    - `TASK-376` — read-only external surface hardening
+    - `TASK-377` — primer bridge Greenhouse -> Kortex
+- impacto:
+  - evita implementar sobre el supuesto falso de que ya existe `src/app/api/v1/*`
+  - evita mezclar umbrella documental con runtime foundation
+  - deja el backlog sister-platform listo para ejecución técnica real
+- verificación:
+  - auditoría manual de task + arquitectura + runtime real + schema snapshot
+  - sin cambios de código de producto ni migraciones
+  - no aplica `build`/`lint` por tratarse de cierre documental / backlog orchestration
+
+## Sesion 2026-04-11 — TASK-373: Sidebar Reorganization COMPLETADA
+
+- alcance cerrado:
+  - **Microinteracciones CSS:** hover transition 150ms ease-out, active transition 200ms ease-out, `prefers-reduced-motion` media query que deshabilita todas las transiciones del sidebar
+  - **Gestión:** de 8 flat + 1 collapsible a 3 flat + 2 collapsibles ("Equipo y talento", "Operaciones")
+  - **Personas y HR:** de 10 flat a 1 flat (Personas) + 3 collapsibles ("Nómina", "Supervisión", "Organización"). 5 variantes condicionales preservadas.
+  - **Finanzas > Flujo:** de 10 items a 7 (Flujo operativo) + 3 (Tesorería nuevo submenu)
+  - **Admin > Gobierno:** de 11 items a 2 submenús ("Identidad y acceso" 6 items, "Equipo y operaciones" 5 items)
+  - **Iconos diferenciados:** Agency Equipo→`tabler-affiliate`, Personas→`tabler-address-book`, Client Equipo→`tabler-users`
+- impacto: admin ve ~18 items sin expandir (antes ~40), reducción del 55%
+- sin cambios en: rutas, view codes, permisos, portal cliente, Mi Ficha
+- verificación: `tsc`, `lint` (0 errors), `build` — todos pasan
+
+## Sesion 2026-04-11 — contrato marco para sister platforms + anexo Kortex + backlog derivado
+
+- alcance cerrado:
+  - creada la spec base `docs/architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`
+  - creado el anexo `docs/architecture/GREENHOUSE_KORTEX_INTEGRATION_ARCHITECTURE_V1.md`
+  - Greenhouse ahora fija explícitamente que las apps hermanas se integran como `peer systems`, no como módulos embebidos
+  - el contrato separa:
+    - institutional layer reusable
+    - tenancy binding cross-platform
+    - read-only external surfaces
+    - MCP / agent adapter downstream
+- backlog nuevo abierto:
+  - `TASK-374` — Sister Platforms Integration Program
+  - `TASK-375` — Sister Platforms Identity & Tenancy Binding Foundation
+  - `TASK-376` — Sister Platforms Read-Only External Surface Hardening
+  - `TASK-377` — Kortex Operational Intelligence Bridge
+- próximos pasos naturales:
+  - bajar primero la foundation reusable (`375`, `376`)
+  - después cerrar el primer carril Kortex (`377`)
+  - abrir anexo para `Verk` solo cuando exista baseline real de repo/arquitectura equivalente
+
+## Sesion 2026-04-11 — TASK-372: Kortex Visual Preset Documentation COMPLETADA
+
+- alcance cerrado:
+  - creado `docs/architecture/GREENHOUSE_KORTEX_VISUAL_PRESET_V1.md` con contrato visual completo
+  - §2: tokens compartibles (palette, typography DM Sans + Poppins, shape 6px, shadows, WCAG AA)
+  - §3: tokens NO compartibles (GH_COLORS dominio, nav, nomenclatura, brand assets)
+  - §4: ejemplo de consumo con snippets funcionales para Kortex
+  - §5: governance — drift detection, actualizacion manual, criterios para package futuro
+- **TASK-264 UMBRELLA COMPLETADA** — 5/5 sub-tasks cerradas:
+  - TASK-368: Token audit + contrato de decisiones
+  - TASK-369: Hex cleanup
+  - TASK-370: Semantic + neutral absorption (40 archivos, WCAG fix)
+  - TASK-371: Primary chain simplification + WCAG formal
+  - TASK-372: Kortex preset (esta)
+- proximo paso: extender identidad visual al repo `efeoncepro/kortex` usando el contrato
+
+## Sesion 2026-04-11 — TASK-371: Shell Primary Cutover COMPLETADA
+
+- alcance real vs spec:
+  - **Spec original:** cambiar primary de Vuexy purple (#7367F0) al institucional (#0375DB)
+  - **Realidad:** primary ya era #0375DB via cadena mergedTheme→provider. No había cambio visual pendiente.
+  - **Alcance ejecutado:** limpieza de cadena redundante + formalización WCAG
+- cambios implementados:
+  - Eliminado primary override redundante de mergedTheme.ts (light + dark) — el provider ya lo aplicaba via settings.primaryColor desde primaryColorConfig.ts
+  - La cadena queda: `primaryColorConfig.ts` → `brandSettings.ts` → `Provider` → `theme.palette.primary.main`
+- WCAG AA formalizado:
+  - #0375DB vs #FFFFFF: 4.59:1 (PASA AA)
+  - #FFFFFF vs #0375DB (botones): 4.59:1 (PASA AA)
+  - #0375DB vs #F8F9FA: 4.36:1 (marginal, aceptable — primary usado en large text / buttons)
+  - #0375DB vs dark backgrounds: 3.55-3.87:1 (PASA AA large text)
+- verificación: `tsc`, `lint` (0 errors), `build` — todos pasan
+- **No hay cambio visual** — el portal se ve exactamente igual antes y después
+
+## Sesion 2026-04-11 — TASK-370: Semantic Token Absorption into Theme COMPLETADA
+
+- alcance cerrado:
+  - **Oleada 1 — Fix at source:** GH_COLORS.neutral.textSecondary actualizado #848484→#667085 (WCAG fix), bgSurface #F7F7F5→#F8F9FA. Nueva categoría GH_COLORS.capability (15 tokens). helpers.ts getCapabilityPalette() migrado a GH_COLORS.capability.
+  - **Oleada 2 — Semantic migration:** 9 archivos migrados de GH_COLORS.semantic a theme.palette.{success,warning,error,info}. CLIENT_STATUS_COLORS convertido a función getClientStatusColors(theme). TeamSignalChip y TeamProgressBar reciben theme.
+  - **Oleada 2 — Neutral migration:** 32 archivos migrados de GH_COLORS.neutral a theme.palette equivalentes. textPrimary→customColors.midnight, textSecondary→text.secondary, border→customColors.lightAlloy, bgSurface→background.default.
+  - **Post-migración:** 0 refs a GH_COLORS.semantic, 0 refs a GH_COLORS.neutral en todo el codebase. Ambas categorías marcadas @deprecated en nomenclature.
+- cambios visuales aprobados:
+  - textSecondary: gris neutro #848484 → gris azulado #667085 (mejora WCAG 3.9:1→5.2:1) en 21 archivos
+  - bgSurface: warm grey #F7F7F5 → cool grey #F8F9FA (imperceptible) en 16 archivos
+- verificación ejecutada: `tsc`, `lint` (0 errors, 2 warnings pre-existentes), `build` — todos pasan
+
+## Sesion 2026-04-11 — TASK-369: Hardcoded Hex Cleanup COMPLETADA
+
+- alcance cerrado:
+  - CSC_COLORS duplicado en 2 archivos → extraído a `CSC_CHART_COLORS` en `metric-registry.ts` (fuente única)
+  - TREND_LINE_COLORS → derivado de `Object.values(CSC_CHART_COLORS)` (ya no es array hardcodeado)
+  - PayrollReceiptCard `#023c70` → `GH_COLORS.role.account.source` (2 instancias)
+  - NexaInsightsBlock `#7367F0` (old Vuexy purple) → `theme.palette.primary.main` (bug fix: purple→blue)
+  - helpers.ts `getCapabilityPalette()` → EXCLUIDO (hex no coinciden con GH_COLORS.service, documentado)
+- hallazgos documentados en delta de TASK-369:
+  - CSC_COLORS no mapea a GH_COLORS.cscPhase (fases y colores distintos)
+  - helpers.ts usa paleta completamente diferente a GH_COLORS.service
+  - NexaInsightsBlock tenía bug: usaba Vuexy purple (#7367F0) en vez del primary actual (#0375DB)
+- verificación ejecutada: `tsc`, `lint`, `build` — todos pasan
+- documentos actualizados: task file, README.md, TASK_ID_REGISTRY.md, Handoff.md
+
+## Sesion 2026-04-11 — TASK-368: Theme Token Audit & Decision Contract COMPLETADA
+
+- alcance cerrado:
+  - se creó `docs/architecture/GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md` con clasificación token-por-token de los 114 tokens de `GH_COLORS`
+  - decisión de primary institucional: **`#0375DB` (coreBlue) ya es el primary** — mergedTheme.ts lo overridea desde su implementación. No se requiere cambio de color.
+  - 3 conflictos neutral resueltos:
+    - `textPrimary` (#022A4E) migra a `customColors.midnight` (no reemplaza `text.primary` #1A1A2E)
+    - `textSecondary` (#848484) migra a `text.secondary` (#667085) — mejora contraste WCAG
+    - `bgSurface` (#F7F7F5) converge a `background.default` (#F8F9FA)
+  - clasificación: 14 tokens eliminables (semantic + neutral parcial), 3 requieren resolución, 86 permanecen en GH_COLORS como dominio
+  - mapa de migración documentado para TASK-369 a TASK-372
+  - TASK-371 reclasificada como limpieza de capas (no cambio visual) — el primary ya es correcto
+- tasks desbloqueadas: TASK-369, TASK-370, TASK-371, TASK-372
+- documentos vivos actualizados:
+  - `docs/architecture/GREENHOUSE_THEME_TOKEN_CONTRACT_V1.md` (nuevo)
+  - `docs/tasks/to-do/TASK-368-theme-token-audit-decision-contract.md` (delta con hallazgos)
+- validación: task de investigación pura — no aplica build/lint
+
+## Sesion 2026-04-11 — TASK-264 descompuesta en 5 sub-tasks (TASK-368 a TASK-372)
+
+- alcance cerrado:
+  - TASK-264 convertida en umbrella con tabla de sub-tasks y secuencia recomendada
+  - 5 tasks creadas: 368 (audit, riesgo cero) → 369 (hex cleanup, bajo) + 370 (token absorption, medio) → 371 (primary cutover, opcional) + 372 (Kortex preset, cero)
+- documentos vivos actualizados:
+  - `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/README.md`
+
 ## Sesion 2026-04-11 — TASK-367 creada para lane Claude de microinteracciones
 
 - alcance cerrado:
