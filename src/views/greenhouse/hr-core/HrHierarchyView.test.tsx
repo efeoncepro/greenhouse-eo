@@ -156,6 +156,11 @@ const baseGovernance = {
   proposals: []
 }
 
+// Coverage instrumentation in CI pushes this suite past the default 5s budget
+// on the slower first-render case. Set a generous file-level timeout so no
+// individual test hits the default window under load.
+vi.setConfig({ testTimeout: 30000 })
+
 describe('HrHierarchyView', () => {
   beforeEach(() => {
     vi.clearAllMocks()
