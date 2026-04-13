@@ -194,7 +194,7 @@ Configuracion actualizada en TASK-379 — baseline anterior era `cpu=1 mem=1Gi m
 | `ops-reactive-notifications` | `*/2 * * * *` | `POST /reactive/process-domain` body `{domain:"notifications"}` | Alta prioridad, cada 2 min |
 | `ops-reactive-delivery` | `*/5 * * * *` | `POST /reactive/process-domain` body `{domain:"delivery"}` | Dominio delivery |
 | `ops-reactive-cost-intelligence` | `*/10 * * * *` | `POST /reactive/process-domain` body `{domain:"cost_intelligence"}` | Cada 10 min |
-| `ops-reactive-recover` | `*/15 * * * *` | `POST /reactive/recover` | Reclama items huerfanos (`claimOrphanedRefreshItems`) |
+| `ops-reactive-recover` | `*/15 * * * *` | `POST /reactive/recover` | Reclama items huerfanos (`claimOrphanedRefreshItems`) + corre `sweepAuditOnlyEvents()` sobre events sin handler (ver §5 Audit-only events accumulation) |
 
 Reemplaza los 3 jobs del pre-V2 (`ops-reactive-process`, `ops-reactive-process-delivery`, `ops-reactive-recover`). Con 6 jobs de dominio + 1 recovery, ningun dominio bloquea al siguiente y el backlog por dominio se drena en paralelo.
 
@@ -223,6 +223,18 @@ V2 no envia alerts automaticas de dead-letter todavia — Slice 4 de TASK-379 ag
 El cron `ops-reactive-recover` corre cada 15 min y llama `claimOrphanedRefreshItems()` para reclamar items stuck en `status = 'pending'` o `status = 'processing'` con `updated_at < NOW() - INTERVAL '30 minutes'`. Re-ejecuta el `refresh()` y los marca `completed` o `failed` segun el resultado. El locking usa `FOR UPDATE SKIP LOCKED` para evitar doble-claim si el consumer reactivo y el recovery cron se traslapan.
 
 Implementacion: `src/lib/sync/refresh-queue.ts:189-227`.
+
+### Audit-only events accumulation
+
+**El problema**: existen event types publicados al outbox que ningun `ProjectionDefinition` registra en sus `triggerEvents` — resultados de sync externos (Nubox, HubSpot), eventos de auditoria puros (`auth.login.success`), outputs de materializers que commiten en la misma transaccion (`accounting.pl_snapshot.materialized`), y event types deprecados cuyo consumer ya se eliminio. En V1 estos events se quedaban como `status = 'published'` sin entry en `outbox_reactive_log` indefinidamente.
+
+El Ops Health metric (post PR #50) ya los filtra del backlog visible restando la interseccion con `getAllTriggerEventTypes()`, pero la **tabla raw `outbox_events` crecia sin freno**. En el rollout de V2 contra `greenhouse-pg-dev` habia ~6000 events audit-only acumulados.
+
+**El fix**: [`sweepAuditOnlyEvents()`](src/lib/sync/reactive-consumer.ts#L287) se invoca desde el handler de `POST /reactive/recover` en [services/ops-worker/server.ts:218](services/ops-worker/server.ts#L218). Hace bulk-INSERT en `outbox_reactive_log` con `(event_id, handler='system:no-handler', result='no-op:audit-only')` para todo event cuyo `event_type` no aparece en el conjunto de trigger events registrados. El sweep es best-effort — si lanza excepcion, el endpoint igual devuelve el resultado del orphan recovery. El response JSON incluye `auditOnlySwept: <count>`.
+
+**Caveat — pending consumers**: eventos que son work-in-progress para consumers en construccion (caso `sister_platform_binding.created` / `.activated` que TASK-377 va a consumir en el bridge Kortex) deben marcarse con `no-op:pending-task-<N>-consumer` en vez de `no-op:audit-only`. Esto los mantiene distinguibles del resto del audit-only, de modo que se puedan replayar cuando el consumer entre en produccion.
+
+**Retention forward**: futuro cron puede hacer `DELETE FROM outbox_events WHERE event_id IN (SELECT event_id FROM outbox_reactive_log WHERE result = 'no-op:audit-only' AND reacted_at < NOW() - INTERVAL '90 days')`. Queda como follow-up — no bloquea el cierre de V2.
 
 ## 6. Schema versioning — reglas de coexistencia
 
