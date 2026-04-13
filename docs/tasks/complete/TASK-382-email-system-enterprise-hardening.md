@@ -6,13 +6,55 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
-- Status real: `Diseño`
+- Status real: `Cerrada 2026-04-13`
 - Rank: `1` — activo data loss en producción
+
+## Closing Summary — 2026-04-13
+
+**Implementación completa en 3 commits sobre `develop`, deployados en staging (`dpl_Ha3jCHUft7KryHywDy8nMjjNYrrS`).**
+
+### Commits
+
+| Commit | Descripción |
+|--------|-------------|
+| `2a7ad644` | P0 bugs + enterprise hardening (Phases 1+2+3) |
+| `569c3b16` | Task lifecycle update |
+| `210bb52b` | Resend Batch API (Phase 2 completion) |
+
+### Qué se implementó
+
+**Fase 1 — P0 operacional:**
+- `status='skipped'` → `status='failed'` + `error_class='config_error'` cuando falta RESEND_API_KEY
+- Retry cron amplía query a `rate_limited` con backoff de 1h
+- `claimFailedDelivery` ahora reclama `failed` Y `rate_limited`
+- Migración formal `20260413162215719_email-notifications-schema-foundation.sql` (cierra ISSUE-023)
+- Migración `20260413162238855_email-delivery-enterprise-v2.sql` (error_class, priority, data_redacted_at, dead_letter, email_engagement, email_type_config)
+
+**Fase 2 — Enterprise hardening:**
+- Kill switch por tipo: `email_type_config` + `checkEmailTypeEnabled()` en `sendEmail()`
+- Priority queue: `EmailPriority`, `EMAIL_PRIORITY_MAP`, bypass para critical/transactional
+- Dead letter: `status='dead_letter'` tras `attempt_number >= 3` + outbox event `emailDeliveryDead`
+- List-Unsubscribe header (RFC 8058) en emails broadcast
+- Webhook: `email.opened` + `email.clicked` → `email_engagement`
+- Sentry.captureException en todos los fallos de delivery
+- Cron de deliverability (0 */6 * * *): alerta si bounce > 2% o complaint > 0.1%
+- Resend Batch API: `deliverBroadcastBatch()` para broadcast multi-recipient sin adjuntos
+- ops-worker: `POST /batch-email-send` handler
+
+**Fase 3 — Compliance:**
+- Cron de retención (0 3 * * 0): anonimiza `delivery_payload` + `recipient_name` > 90 días
+- Endpoint GDPR `POST /api/admin/email-gdpr-deletion`: anonimiza + revoca suscripciones
+
+**Recovery:**
+- 8 emails con `status='skipped'` del 2026-04-13 recuperados vía UPDATE a `status='failed'`
+- Retry cron procesó los 8 automáticamente: 6 con Resend ID confirmado, 2 sin ID
+
+**Issues cerrados:** ISSUE-020 (STALE), ISSUE-023 (migraciones formales)
 - Domain: `platform`
 - Blocked by: `none`
 - Branch: `task/TASK-382-email-enterprise-hardening`
