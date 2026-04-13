@@ -391,60 +391,64 @@ export async function getPaymentsForIncome(incomeId: string): Promise<{
  * the trigger), this function corrects them.
  */
 export async function reconcilePaymentTotals(incomeId: string): Promise<ReconcilePaymentTotalsResult> {
-  const incomeRows = await runGreenhousePostgresQuery<{
-    income_id: string
-    total_amount: unknown
-    amount_paid: unknown
-    payment_status: string
-  }>(
-    `SELECT income_id, total_amount, amount_paid, payment_status
-     FROM greenhouse_finance.income WHERE income_id = $1`,
-    [incomeId]
-  )
-
-  if (incomeRows.length === 0) {
-    throw new FinanceValidationError('Income record not found', 404)
-  }
-
-  const income = incomeRows[0]
-  const totalAmount = toNumber(income.total_amount)
-  const currentAmountPaid = toNumber(income.amount_paid)
-
-  const sumResult = await runGreenhousePostgresQuery<{ total: string; cnt: string }>(
-    `SELECT COALESCE(SUM(amount), 0)::text AS total, COUNT(*)::text AS cnt
-     FROM greenhouse_finance.income_payments WHERE income_id = $1`,
-    [incomeId]
-  )
-
-  const sumPayments = roundCurrency(toNumber(sumResult[0]?.total))
-  const paymentCount = Number(sumResult[0]?.cnt ?? 0)
-  const isConsistent = Math.abs(currentAmountPaid - sumPayments) < 0.01
-
-  let corrected = false
-
-  if (!isConsistent) {
-    const newStatus = sumPayments >= totalAmount ? 'paid' : sumPayments > 0 ? 'partial' : 'pending'
-
-    await runGreenhousePostgresQuery(
-      `UPDATE greenhouse_finance.income SET
-        amount_paid = $2, payment_status = $3, updated_at = CURRENT_TIMESTAMP
-       WHERE income_id = $1`,
-      [incomeId, sumPayments, newStatus]
+  return withGreenhousePostgresTransaction(async client => {
+    // Lock the income row so concurrent calls read the same snapshot and
+    // don't both attempt to correct the same divergence.
+    const incomeRows = await client.query<{
+      income_id: string
+      total_amount: unknown
+      amount_paid: unknown
+      payment_status: string
+    }>(
+      `SELECT income_id, total_amount, amount_paid, payment_status
+       FROM greenhouse_finance.income WHERE income_id = $1 FOR UPDATE`,
+      [incomeId]
     )
 
-    corrected = true
-  }
+    if (incomeRows.rowCount === 0) {
+      throw new FinanceValidationError('Income record not found', 404)
+    }
 
-  const finalStatus = sumPayments >= totalAmount ? 'paid' : sumPayments > 0 ? 'partial' : 'pending'
+    const income = incomeRows.rows[0]
+    const totalAmount = toNumber(income.total_amount)
+    const currentAmountPaid = toNumber(income.amount_paid)
 
-  return {
-    incomeId,
-    totalAmount,
-    sumPayments,
-    amountPaid: corrected ? sumPayments : currentAmountPaid,
-    paymentStatus: finalStatus,
-    paymentCount,
-    isConsistent,
-    corrected
-  }
+    const sumResult = await client.query<{ total: string; cnt: string }>(
+      `SELECT COALESCE(SUM(amount), 0)::text AS total, COUNT(*)::text AS cnt
+       FROM greenhouse_finance.income_payments WHERE income_id = $1`,
+      [incomeId]
+    )
+
+    const sumPayments = roundCurrency(toNumber(sumResult.rows[0]?.total))
+    const paymentCount = Number(sumResult.rows[0]?.cnt ?? 0)
+    const isConsistent = Math.abs(currentAmountPaid - sumPayments) < 0.01
+
+    let corrected = false
+
+    if (!isConsistent) {
+      const newStatus = sumPayments >= totalAmount ? 'paid' : sumPayments > 0 ? 'partial' : 'pending'
+
+      await client.query(
+        `UPDATE greenhouse_finance.income SET
+          amount_paid = $2, payment_status = $3, updated_at = CURRENT_TIMESTAMP
+         WHERE income_id = $1`,
+        [incomeId, sumPayments, newStatus]
+      )
+
+      corrected = true
+    }
+
+    const finalStatus = sumPayments >= totalAmount ? 'paid' : sumPayments > 0 ? 'partial' : 'pending'
+
+    return {
+      incomeId,
+      totalAmount,
+      sumPayments,
+      amountPaid: corrected ? sumPayments : currentAmountPaid,
+      paymentStatus: finalStatus,
+      paymentCount,
+      isConsistent,
+      corrected
+    }
+  })
 }

@@ -5,12 +5,14 @@
 ### 2026-04-13 — TASK-400 alinea el contrato canónico de Home y deja base para homes distintas por tipo de usuario
 
 - `/` y `/auth/landing` ya no dependen de `|| '/dashboard'`; ambos consumen el `portalHomePath` resuelto por la misma policy runtime.
+- `next.config.ts` ya no fuerza `source: '/' -> destination: '/dashboard'`, por lo que el root vuelve a respetar el contrato del App Router y la sesión autenticada.
 - `src/lib/tenant/resolve-portal-home-path.ts` ahora centraliza:
   - aliases legacy (`/dashboard`, `/internal/dashboard`, `/finance/dashboard`, `/hr/leave`, `/my/profile`)
   - policy explícita de home por tipo (`client_default`, `internal_default`, `hr_workspace`, `finance_workspace`, `my_workspace`)
   - una base extensible para soportar homes diferenciadas por tipo de usuario sin reintroducir drift en guards, auth y shell
 - provisioning, session auth, agent auth, navegación, shortcuts, notifications y `view-access-catalog` quedaron alineados a `/home` como startup contract canónico.
 - `/dashboard` se mantiene como ruta legacy/compatibilidad, pero deja de ser el fallback estructural del portal.
+- la búsqueda sin resultados y los breadcrumbs cliente-safe ya vuelven a `/home` en lugar de reforzar rutas legacy.
 - Se agregó `scripts/backfill-portal-home-contract.ts` para normalizar `default_portal_home_path` en PostgreSQL y BigQuery bajo control explícito.
 - Se agregó regresión focalizada para evitar que `/dashboard` vuelva a romper cuando falten quality/delivery signals.
 

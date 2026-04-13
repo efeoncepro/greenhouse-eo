@@ -1,5 +1,55 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — TASK-400 cierre formal con verificación runtime real
+
+- **Estado:** `complete`
+- **Ajuste de cierre detectado durante la verificación:**
+  - `next.config.ts` todavía forzaba `source: '/' -> destination: '/dashboard'`
+  - ese redirect global estaba sobreescribiendo el contrato de `src/app/page.tsx`
+  - se removió para que `/` respete el `portalHomePath` resuelto por sesión
+- **Cleanup aplicado además del runtime ya convergido:**
+  - `src/components/layout/shared/search/NoResult.tsx` ahora vuelve a `/home`
+  - breadcrumbs cliente-safe de proyecto y sprint ahora vuelven a `/home`
+  - docs sincronizadas:
+    - `docs/architecture/GREENHOUSE_PORTAL_VIEWS_V1.md`
+    - `docs/architecture/Greenhouse_Nomenclatura_Portal_v3.md`
+    - `docs/documentation/identity/sistema-identidad-roles-acceso.md`
+  - lifecycle sincronizado:
+    - spec movida a `docs/tasks/complete/`
+    - `docs/tasks/README.md` y `docs/tasks/TASK_ID_REGISTRY.md` actualizados
+- **Validación cerrada:**
+  - `pnpm lint`
+  - `pnpm build`
+  - `rg -n "new Pool\\(" src scripts`
+  - runtime local autenticado con agente:
+    - `GET /` -> `307 /hr/payroll`
+    - `GET /home` -> `200`
+    - `GET /dashboard` -> `200`
+    - `GET /hr/payroll` -> `200`
+- **Notas:**
+  - `pnpm build` sigue emitiendo warnings esperados de `Dynamic server usage` en páginas autenticadas que usan `headers`; no bloquean el build y no nacen de esta task
+  - el workspace sigue teniendo cambios ajenos de `TASK-174`; no fueron tocados
+- **Pendiente fuera del cierre técnico:**
+  - commit + push
+  - verificación de staging post-push si se quiere confirmar el deployment nuevo contra `/`, `/home` y `/dashboard`
+
+## Sesion 2026-04-13 — TASK-174 Slice 1-3 implementados (Finance Data Integrity)
+
+- **Rama activa:** `develop`
+- **Motivación:** P0 — prevenir double-entry por retry de red, bulk parcial sin rollback, y race conditions en conciliación.
+- **Implementado:**
+  - Migración `20260413222055844_finance-idempotency-keys.sql` — tabla `greenhouse_finance.idempotency_keys` (TTL 24h)
+  - `src/lib/finance/idempotency.ts` — middleware `withIdempotency()` aplicado a `POST /api/finance/income` y `POST /api/finance/expenses`
+  - `expenses/bulk/route.ts` — resolución de items separada de inserción; toda la escritura Postgres ocurre en un solo `withTransaction` (rollback total si falla cualquier item)
+  - `postgres-store-slice2.ts` — `createFinanceExpenseInPostgres` acepta `opts?: { client?: PoolClient }` para participar en transacción externa
+  - `postgres-reconciliation.ts` — `updateReconciliationPeriodInPostgres` usa `withGreenhousePostgresTransaction` + `SELECT FOR UPDATE NOWAIT`; `updateStatementRowMatchInPostgres` y `clearStatementRowMatchInPostgres` aceptan `opts?.client`
+  - `match/route.ts` y `unmatch/route.ts` — `withTransaction` + `FOR UPDATE NOWAIT` en `bank_statement_rows` antes de modificar match state
+- **Validación:** `pnpm tsc --noEmit` limpio, `pnpm lint` limpio, `pnpm test` 250/250 archivos pass
+- **Pendiente para cerrar TASK-174:**
+  - `pnpm migrate:up` en staging para crear `idempotency_keys`
+  - Verificación en staging: bulk rollback real, idempotency-key retry, concurrent reconciliation → 409
+  - Slice 4 minor: `reconcilePaymentTotals()` en `payment-ledger.ts` (ya tiene transaction en `recordPayment`, esto es corrección menor)
+
 ## Sesion 2026-04-13 — TASK-400 implementada localmente con policy centralizada de Home y compatibilidad legacy gobernada
 
 - implementación cerrada en código:

@@ -8,7 +8,7 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 type IdempotencyStatus = 'processing' | 'completed' | 'failed'
 
-interface StoredKey {
+interface StoredKey extends Record<string, unknown> {
   status: IdempotencyStatus
   response_status: number | null
   response_body: unknown | null

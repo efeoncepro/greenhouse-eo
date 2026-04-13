@@ -1,3 +1,7 @@
+## Delta 2026-04-13
+
+- TASK-174 cerrada. Los fundamentos de locking que esta task requiere ya están en producción: `SELECT ... FOR UPDATE NOWAIT` en reconciliation period y bank_statement_rows, `withTransaction` en match/unmatch routes, idempotency middleware disponible en `src/lib/finance/idempotency.ts`. El motor de auto-match de esta task puede apalancarse en estos primitivos directamente.
+
 # TASK-401 — Bank Reconciliation: Continuous Transaction Matching
 
 <!-- ═══════════════════════════════════════════════════════════

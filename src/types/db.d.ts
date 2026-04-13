@@ -1876,6 +1876,17 @@ export interface GreenhouseFinanceFactoringOperations {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseFinanceIdempotencyKeys {
+  created_at: Generated<Timestamp>;
+  endpoint: string;
+  expires_at: Generated<Timestamp>;
+  idempotency_key: string;
+  response_body: Json | null;
+  response_status: number | null;
+  status: Generated<string>;
+  tenant_id: string;
+}
+
 export interface GreenhouseFinanceIncome {
   amount_paid: Generated<Numeric>;
   balance_nubox: Numeric | null;
@@ -4263,6 +4274,7 @@ export interface DB {
   "greenhouse_finance.expense_payments": GreenhouseFinanceExpensePayments;
   "greenhouse_finance.expenses": GreenhouseFinanceExpenses;
   "greenhouse_finance.factoring_operations": GreenhouseFinanceFactoringOperations;
+  "greenhouse_finance.idempotency_keys": GreenhouseFinanceIdempotencyKeys;
   "greenhouse_finance.income": GreenhouseFinanceIncome;
   "greenhouse_finance.income_line_items": GreenhouseFinanceIncomeLineItems;
   "greenhouse_finance.income_payments": GreenhouseFinanceIncomePayments;

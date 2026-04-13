@@ -1,3 +1,8 @@
+## Delta 2026-04-13
+
+- TASK-174 cerrada. Prerequisito de locking ya implementado: `SELECT ... FOR UPDATE NOWAIT` en `updateReconciliationPeriodInPostgres`, row lock en match/unmatch routes via `withTransaction`, y `reconcilePaymentTotals()` wrapped en transacción atómica. Esta task puede avanzar sin bloqueo de TASK-174.
+- La remoción del BigQuery fallback en bulk expenses (`expenses/bulk/route.ts`) sigue siendo responsabilidad de esta task (TASK-179 owns el cleanup del `FINANCE_BQ_WRITE_DISABLED` guard).
+
 # TASK-179 — Finance Reconciliation Postgres-Only Cutover & Integration Hardening
 
 ## Status

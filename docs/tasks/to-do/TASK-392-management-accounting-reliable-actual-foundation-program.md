@@ -1,3 +1,7 @@
+## Delta 2026-04-13
+
+- TASK-174 cerrada. El bloque de integridad transaccional de Finance ya está implementado: bulk atomicity, idempotency keys (tabla PG migrada), SELECT FOR UPDATE NOWAIT en reconciliación y payment ledger con FOR UPDATE atómico. El gap de "reconciliación financiera todavía en hardening" de este programa se reduce — solo resta el cutover Postgres-only de TASK-179 para que actuals sean 100% confiables sin riesgo de doble escritura.
+
 # TASK-392 — Management Accounting Reliable Actual Foundation Program
 
 <!-- ═══════════════════════════════════════════════════════════

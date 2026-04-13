@@ -1,3 +1,7 @@
+## Delta 2026-04-13
+
+- TASK-174 cerrada. Los archivos `postgres-store-slice2.ts`, `postgres-reconciliation.ts` y `payment-ledger.ts` fueron modificados: `createFinanceExpenseInPostgres` ahora acepta `opts?: { client?: PoolClient }`, `updateStatementRowMatchInPostgres` y `clearStatementRowMatchInPostgres` aceptan `opts?: { client?: QueryableClient }`, `reconcilePaymentTotals` fue envuelto en `withGreenhousePostgresTransaction`. Los tests que esta task escriba deben probar los nuevos code paths de transacción (con y sin client externo). El supuesto de "funciones sin transacción" ya no aplica a estas firmas.
+
 ## Delta 2026-03-31
 - TASK-181 (Finance Clients → Organizations canonical source) reescribira queries en `canonical.ts` y `route.ts` de clients. Los tests que esta task cree para esos archivos deben considerar que el anchor cambiara de `greenhouse_core.clients` a `greenhouse_core.organizations`. Recomendacion: ejecutar TASK-181 antes o coordinar para que los tests se escriban contra la fuente canonica final.
 
