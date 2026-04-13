@@ -21,7 +21,9 @@ Primer bloque operativo asignado:
 
 - `TASK-001` a `TASK-052` asignados (backlog activo, briefs historicos, specs de apoyo)
 - `TASK-053` a `TASK-056` asignados
-- siguiente ID disponible: `TASK-400`
+- siguiente ID disponible: `TASK-402`
+- `TASK-401` — Bank Reconciliation: Continuous Transaction Matching. Evoluciona el modelo de conciliación bancaria de períodos mensuales manuales a matching automático continuo: motor standalone, auto-match post-Nubox-sync, cron diario, coexistencia con cierre mensual formal. P1, Alto. Spec: `to-do/TASK-401-bank-reconciliation-continuous-matching.md`.
+- `TASK-400` — Portal Home Contract Governance, Entrypoint Cutover & Dashboard Compatibility. Formaliza un solo contrato canónico para la Home del portal, corta el drift entre root/auth/provisioning/guards, saca a `/dashboard` del rol de fallback estructural y gobierna la compatibilidad legacy con backfill y blast radius validation. P1, Muy Alto. Spec: `to-do/TASK-400-portal-home-contract-governance-entrypoint-cutover.md`.
 - `TASK-399` — Native Integrations Runtime Hardening. Follow-on runtime de la `Native Integrations Layer`: adapters resilientes, control plane por etapa, replay/backfill gobernado, stage freshness y patrón snapshot-safe reusable para Nubox, Notion, HubSpot y futuros upstreams. P1, Muy Alto. Spec: `to-do/TASK-399-native-integrations-runtime-hardening-source-adapters-control-plane-replay.md`.
 - `TASK-398` — Management Accounting Enterprise Hardening. Programa de cierre enterprise del modulo: explainability por numero, overrides gobernados, RBAC multi-scope, observabilidad de materializaciones, runbooks, exports y business testing. P1, Muy Alto. Spec: `to-do/TASK-398-management-accounting-enterprise-hardening-explainability-rbac-observability-runbooks.md`.
 - `TASK-397` — Management Accounting Financial Costs Integration. Integra factoring, FX, fees bancarios y tesoreria al modelo gerencial para que el margen no ignore costo de financiamiento y cash management. Amarra `TASK-391` al P&L de management accounting. P1, Muy Alto. Spec: `to-do/TASK-397-management-accounting-financial-costs-integration-factoring-fx-fees-treasury.md`.
@@ -78,6 +80,53 @@ Primer bloque operativo asignado:
 - `TASK-254` formaliza la migración de cron operativos worker-like fuera de Vercel, empezando por `outbox-react*` y `projection-recovery`, para separar scheduler de executor durable en GCP.
 - `TASK-251` crea la capability enterprise para backlog reactivo real: visibilidad del tramo `published -> outbox_reactive_log`, replay scoped, lag operativo y alerting en Admin Ops.
 - `TASK-252` crea el `Ops Copilot` para `Admin Center` y `Ops Health`: IA grounded en métricas reales, explicación operativa, payloads sugeridos, avisos no invasivos vía el sistema actual de notificaciones y aprobación humana antes de ejecutar acciones mutantes.
+
+## Prioridad operativa vigente — cliente vs agencia
+
+Actualizado al `2026-04-13` según estado real del repo, issues abiertos y foundations ya materializadas.
+
+Reglas de lectura:
+
+- **Primero van los `ISSUE-### open`** cuando exista runtime roto en staging/production; esta matriz ordena solo el backlog `TASK-### to-do`.
+- **Impacto cliente** mide cuánto cambia la experiencia o continuidad del portal cliente / superficies externas.
+- **Impacto agencia** mide cuánto reduce riesgo operativo interno, soporte, finanzas, integraciones o capacidad de ejecución del equipo.
+- Si dos tasks empatan, se prioriza la que:
+  1. desbloquea más carriles,
+  2. reutiliza más foundation existente,
+  3. reduce riesgo sistémico antes que pulir UX.
+
+### Top prioridad real ahora
+
+| Orden | Task | Impacto cliente | Impacto agencia | Criterio operativo |
+| --- | --- | --- | --- | --- |
+| 1 | `TASK-378` | Medio | Muy alto | Hay fragilidad SSR transversal en `(dashboard)`; bloquear verificación y dejar 500 silenciosos pesa más que nuevas features. |
+| 2 | `TASK-383` | Medio | Muy alto | `TASK-382` dejó email funcional, pero sin observabilidad operativa suficiente; es el follow-on inmediato correcto. |
+| 3 | `TASK-399` | Medio | Muy alto | El incidente real de Nubox confirmó el gap; endurece el patrón reusable de integraciones source-led. |
+| 4 | `TASK-262` | Medio | Muy alto | `outbox-publish` es foundation del bus entero; moverlo a `ops-worker` reduce riesgo sistémico. |
+| 5 | `TASK-258` | Medio | Alto | `sync-conformed` sigue siendo carril crítico y durable-first; va antes de migraciones más específicas. |
+| 6 | `TASK-260` | Medio | Alto | Después del patrón runtime + worker foundations, ya conviene migrar `nubox-sync` e `ico-member-sync`. |
+| 7 | `TASK-392` | Bajo/Medio | Muy alto | Es la puerta real de entrada a Management Accounting; todo el bloque `393-398` depende de esta foundation. |
+| 8 | `TASK-393` | Bajo | Muy alto | Con actual confiable listo, gobernanza de períodos y restatements es el siguiente riesgo financiero relevante. |
+| 9 | `TASK-397` | Bajo/Medio | Alto | Ya existe factoring en runtime; toca meter costos financieros reales al modelo gerencial. |
+| 10 | `TASK-395` | Bajo/Medio | Alto | Planning engine solo tiene sentido una vez estabilizado `actual`. |
+| 11 | `TASK-396` | Medio | Alto | La surface ejecutiva debe venir después de foundation + planning, no antes. |
+| 12 | `TASK-398` | Bajo/Medio | Alto | Hardening enterprise del módulo va al final del bloque, como cierre y no como punto de partida. |
+
+### Prioridad de las lanes actualmente visibles en el editor
+
+| Task | Prioridad práctica | Impacto cliente | Impacto agencia | Nota |
+| --- | --- | --- | --- | --- |
+| `TASK-399` | Alta inmediata | Medio | Muy alto | Sí debería moverse ya. |
+| `TASK-335` | Media/Baja | Bajo | Medio | UX interna valiosa, pero detrás de estabilidad e integraciones. |
+| `TASK-336` | No ejecutar directa | Bajo | Alto | Es umbrella; usarla para secuencia, no como primer slice. |
+| `TASK-341` | Baja por ahora | Bajo | Medio/Alto | Debe esperar `337 -> 338 -> 339 -> 340 -> 342`. |
+| `TASK-301` | Baja | Medio | Bajo | Es enriquecimiento cliente `P3`, además bloqueado por `TASK-287` y `TASK-291`. |
+
+### Lectura resumida por audiencia
+
+- **Si el foco es cliente:** `TASK-378` primero; luego el bloque base del client portal (`TASK-285` → `TASK-290`) y después enriquecimientos como `TASK-291`, `TASK-294`, `TASK-295`, `TASK-301`.
+- **Si el foco es agencia / operación interna:** `TASK-383`, `TASK-399`, `TASK-262`, `TASK-258`, `TASK-260`, `TASK-392`, `TASK-393`, `TASK-397`.
+- **Si el foco es estrategia de largo plazo pero no urgencia runtime:** `TASK-336`, `TASK-341`, `TASK-377`, `TASK-335`.
 - todas las tasks en `to-do/` tienen `TASK-###` asignado
 - `TASK-231` quedó cerrada como tooling repo/global para la skill `greenhouse-task-planner` de Codex.
 - `TASK-232` ya quedó cerrada con lane async LLM operativa para `ICO`: trigger reactivo, storage BQ/PG, readers downstream y baseline `Gemini`.
