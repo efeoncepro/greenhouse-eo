@@ -89,6 +89,14 @@ type Props = {
 const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) => {
   const isEditing = Boolean(editHes)
   const currentStatus = editHes?.status || 'new'
+  const currentStatusLabel =
+    currentStatus === 'approved'
+      ? 'Validada'
+      : currentStatus === 'submitted'
+        ? 'Recibida'
+        : currentStatus === 'rejected'
+          ? 'Observada'
+          : 'Borrador'
 
   // Form fields
   const [hesNumber, setHesNumber] = useState('')
@@ -412,7 +420,7 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
         return
       }
 
-      toast.success(`HES ${hesNumber} registrada`)
+      toast.success(`HES ${hesNumber} registrada como recibida`)
       resetForm()
       onClose()
       onSuccess()
@@ -429,13 +437,13 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
     if (!editHes) return
 
     if (action === 'approve' && !approvedBy.trim()) {
-      setError('Ingrese el nombre de quien aprueba.')
+      setError('Ingresa el nombre de quien valida la HES.')
 
       return
     }
 
     if (action === 'reject' && !rejectReason.trim()) {
-      setError('Ingrese el motivo del rechazo.')
+      setError('Ingresa el motivo de la observación.')
 
       return
     }
@@ -461,13 +469,13 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
 
-        setError(data.error || `Error al ${action === 'submit' ? 'enviar' : action === 'approve' ? 'aprobar' : 'rechazar'} la HES`)
+        setError(data.error || `Error al ${action === 'submit' ? 'marcar como recibida' : action === 'approve' ? 'validar' : 'observar'} la HES`)
         setSaving(false)
 
         return
       }
 
-      const labels = { submit: 'enviada al cliente', approve: 'aprobada', reject: 'rechazada' }
+      const labels = { submit: 'marcada como recibida', approve: 'validada', reject: 'observada' }
 
       toast.success(`HES ${editHes.hesNumber} ${labels[action]}`)
       resetForm()
@@ -499,12 +507,12 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 4 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Typography variant='h6'>{isEditing ? `HES #${editHes?.hesNumber}` : 'Registrar HES'}</Typography>
+          <Typography variant='h6'>{isEditing ? `HES #${editHes?.hesNumber}` : 'Registrar HES recibida'}</Typography>
           {isEditing && (
             <CustomChip
               round='true' size='small' variant='tonal'
-              color={currentStatus === 'approved' ? 'success' : currentStatus === 'submitted' ? 'info' : currentStatus === 'rejected' ? 'error' : 'secondary'}
-              label={currentStatus === 'approved' ? 'Aprobada' : currentStatus === 'submitted' ? 'Enviada' : currentStatus === 'rejected' ? 'Rechazada' : 'Borrador'}
+              color={currentStatus === 'approved' ? 'success' : currentStatus === 'submitted' ? 'info' : currentStatus === 'rejected' ? 'warning' : 'secondary'}
+              label={currentStatusLabel}
             />
           )}
         </Box>
@@ -738,10 +746,10 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
             <Divider />
             <Button
               variant='contained' color='info' fullWidth disabled={saving}
-              startIcon={<i className='tabler-send' />}
+              startIcon={<i className='tabler-file-check' />}
               onClick={() => handleLifecycleAction('submit')}
             >
-              Enviar al cliente
+              Marcar como recibida
             </Button>
           </>
         )}
@@ -749,7 +757,7 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
         {isEditing && currentStatus === 'submitted' && (
           <>
             <Divider />
-            <Typography variant='subtitle2' color='text.secondary'>Acciones de aprobación</Typography>
+            <Typography variant='subtitle2' color='text.secondary'>Acciones de validación</Typography>
 
             {!showApproveField && !showRejectField && (
               <Grid container spacing={2}>
@@ -759,16 +767,16 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
                     startIcon={<i className='tabler-check' />}
                     onClick={() => { setShowApproveField(true); setShowRejectField(false) }}
                   >
-                    Aprobar
+                    Validar
                   </Button>
                 </Grid>
                 <Grid size={{ xs: 6 }}>
                   <Button
-                    variant='contained' color='error' fullWidth disabled={saving}
+                    variant='contained' color='warning' fullWidth disabled={saving}
                     startIcon={<i className='tabler-x' />}
                     onClick={() => { setShowRejectField(true); setShowApproveField(false) }}
                   >
-                    Rechazar
+                    Observar
                   </Button>
                 </Grid>
               </Grid>
@@ -777,9 +785,9 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
             {showApproveField && (
               <Stack spacing={2}>
                 <CustomTextField
-                  fullWidth size='small' label='Aprobada por' required autoFocus
+                  fullWidth size='small' label='Validada por' required autoFocus
                   value={approvedBy} onChange={e => setApprovedBy(e.target.value)}
-                  placeholder='Nombre del aprobador en el cliente'
+                  placeholder='Nombre de quien valida la HES'
                 />
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 6 }}>
@@ -792,7 +800,7 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
                       variant='contained' color='success' fullWidth disabled={saving}
                       onClick={() => handleLifecycleAction('approve')}
                     >
-                      Confirmar aprobación
+                      Confirmar validación
                     </Button>
                   </Grid>
                 </Grid>
@@ -802,7 +810,7 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
             {showRejectField && (
               <Stack spacing={2}>
                 <CustomTextField
-                  fullWidth size='small' label='Motivo del rechazo' required autoFocus
+                  fullWidth size='small' label='Motivo de la observación' required autoFocus
                   multiline rows={2}
                   value={rejectReason} onChange={e => setRejectReason(e.target.value)}
                 />
@@ -814,10 +822,10 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
                   </Grid>
                   <Grid size={{ xs: 6 }}>
                     <Button
-                      variant='contained' color='error' fullWidth disabled={saving}
+                      variant='contained' color='warning' fullWidth disabled={saving}
                       onClick={() => handleLifecycleAction('reject')}
                     >
-                      Confirmar rechazo
+                      Confirmar observación
                     </Button>
                   </Grid>
                 </Grid>
@@ -831,10 +839,10 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
             <Divider />
             <Button
               variant='contained' color='info' fullWidth disabled={saving}
-              startIcon={<i className='tabler-send' />}
+              startIcon={<i className='tabler-file-check' />}
               onClick={() => handleLifecycleAction('submit')}
             >
-              Re-enviar al cliente
+              Volver a marcar como recibida
             </Button>
           </>
         )}
@@ -846,7 +854,7 @@ const CreateHesDrawer = ({ open, onClose, onSuccess, editHes = null }: Props) =>
           <Box sx={{ display: 'flex', gap: 2, p: 4 }}>
             <Button variant='outlined' color='secondary' onClick={handleClose} fullWidth>Cancelar</Button>
             <Button variant='contained' color='primary' onClick={handleSubmit} disabled={saving} fullWidth startIcon={<i className='tabler-check' />}>
-              {saving ? 'Guardando...' : 'Registrar HES'}
+              {saving ? 'Guardando...' : 'Registrar HES recibida'}
             </Button>
           </Box>
         </>

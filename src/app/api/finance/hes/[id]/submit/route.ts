@@ -16,7 +16,9 @@ export async function POST(
   const { id } = await params
   const result = await submitHes(id)
 
-  if (!result) return NextResponse.json({ error: 'HES not found or not in draft status' }, { status: 404 })
+  if (!result) {
+    return NextResponse.json({ error: 'La HES no existe o ya no está en borrador.' }, { status: 404 })
+  }
 
   return NextResponse.json(result)
 }

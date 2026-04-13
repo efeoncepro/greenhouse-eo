@@ -1,5 +1,30 @@
 # Handoff.md
 
+## Sesion 2026-04-13 — MINI-004 cerrada: HES ya se registra como documento recibido y no como envío outbound
+
+- alcance implementado:
+  - `src/lib/finance/hes-store.ts`
+  - `src/lib/finance/hes-store.test.ts`
+  - `src/views/greenhouse/finance/HesListView.tsx`
+  - `src/views/greenhouse/finance/drawers/CreateHesDrawer.tsx`
+  - routes HES bajo `src/app/api/finance/hes/**`
+- comportamiento nuevo:
+  - `Finance > HES` ya registra la HES en estado operativo `Recibida` al momento del alta
+  - la UI deja de hablar de envío al cliente y pasa a expresar recepción, validación y observación
+  - el estado visible `Validada por` reemplaza la semántica previa de aprobación outbound
+  - el feedback backend también quedó alineado en español cuando una transición de lifecycle ya no aplica
+- criterio de robustez:
+  - el cambio reutiliza el lifecycle backend existente (`submitted`, `approved`, `rejected`) sin abrir un contrato paralelo ni meter migraciones
+  - se agregó regresión de store para asegurar que `createHes()` siga naciendo como `submitted`
+- verificación:
+  - `pnpm exec vitest run src/lib/finance/hes-store.test.ts`
+  - `pnpm lint -- src/lib/finance/hes-store.ts src/lib/finance/hes-store.test.ts src/views/greenhouse/finance/HesListView.tsx src/views/greenhouse/finance/drawers/CreateHesDrawer.tsx src/app/api/finance/hes/route.ts src/app/api/finance/hes/[id]/submit/route.ts src/app/api/finance/hes/[id]/approve/route.ts src/app/api/finance/hes/[id]/reject/route.ts`
+  - `pnpm build`
+- documentación:
+  - mini-task cerrada en `docs/mini-tasks/complete/MINI-004-hes-received-workflow-semantics.md`
+  - doc funcional nueva `docs/documentation/finance/hes-recepcion-y-validacion.md`
+  - trackers `docs/mini-tasks/README.md` y `docs/documentation/README.md` actualizados
+
 ## Sesion 2026-04-13 — MINI-003 cerrada: OC ya permite cargar o reemplazar respaldo después del alta
 
 - alcance implementado:

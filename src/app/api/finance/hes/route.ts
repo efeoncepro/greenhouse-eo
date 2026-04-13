@@ -70,7 +70,7 @@ export async function POST(request: Request) {
 
   if (!body.hesNumber || !body.serviceDescription || !body.amount) {
     return NextResponse.json(
-      { error: 'Missing required fields: hesNumber, serviceDescription, amount' },
+      { error: 'Faltan campos obligatorios: hesNumber, serviceDescription, amount' },
       { status: 400 }
     )
   }

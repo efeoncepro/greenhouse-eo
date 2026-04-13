@@ -5,7 +5,8 @@
 - `MINI-001` asignado
 - `MINI-002` asignado
 - `MINI-003` asignado
-- siguiente ID disponible: `MINI-004`
+- `MINI-004` asignado
+- siguiente ID disponible: `MINI-005`
 
 ## Reglas
 

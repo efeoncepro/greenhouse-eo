@@ -2,6 +2,12 @@
 
 ## 2026-04-13
 
+### 2026-04-13 — HES ahora se registra como documento recibido del cliente
+
+- `Finance > HES` ya no deja una HES nueva presentada como `Borrador` cuando el flujo principal es registrar una hoja recibida.
+- Los estados visibles quedan alineados al proceso real: `Recibida`, `Validada` y `Observada`.
+- El módulo deja de comunicar acciones outbound como si la HES se enviara al cliente; ahora expresa recepción y validación interna.
+
 ### 2026-04-13 — Las OC ya permiten cargar o reemplazar su respaldo después del registro
 
 - `Finance > Purchase Orders` ahora expone una acción por fila para completar o reemplazar el respaldo de una OC ya creada.

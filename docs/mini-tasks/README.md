@@ -23,7 +23,7 @@ Usar `MINI-###` para cambios como:
 
 ## Siguiente ID disponible
 
-`MINI-004`
+`MINI-005`
 
 ## To Do
 
@@ -40,3 +40,4 @@ Sin mini-tasks en curso.
 | `MINI-001` | [OC debe seleccionar contacto desde lista asociada al cliente](complete/MINI-001-po-client-contact-selector.md) | finance | Medio | complete |
 | `MINI-002` | [HES debe usar contacto vinculado al cliente y heredar respaldo desde la OC](complete/MINI-002-hes-client-contact-and-po-document-inheritance.md) | finance | Medio | complete |
 | `MINI-003` | [OC debe permitir cargar respaldo después del registro para que HES lo herede](complete/MINI-003-po-post-create-document-upload-for-hes-inheritance.md) | finance | Medio | complete |
+| `MINI-004` | [HES debe modelarse como documento recibido del cliente, no como envío outbound](complete/MINI-004-hes-received-workflow-semantics.md) | finance | Medio | complete |
