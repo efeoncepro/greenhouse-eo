@@ -254,6 +254,91 @@ const ensureProjectionStats = (
   return fresh
 }
 
+// ── Audit-only event sweep ──
+
+export interface AuditOnlySweepResult {
+  runId: string
+  eventsSwept: number
+  perEventType: Record<string, number>
+  durationMs: number
+}
+
+/**
+ * Sweep audit-only events out of the outbox.
+ *
+ * "Audit-only" = events whose `event_type` has zero registered projection
+ * handlers across all domains. They are published intentionally for audit
+ * trail or downstream sync (Nubox, quotes, products, payroll projections,
+ * etc.) but no reactive consumer ever processes them. Without a sweep they
+ * accumulate in `outbox_events` indefinitely, which inflates table size
+ * and skews any raw COUNT query against the outbox.
+ *
+ * The sweep marks them as `no-op:audit-only` in `outbox_reactive_log` under
+ * the system-level handler `system:no-handler`. After the mark:
+ *   - The Ops Health backlog metric continues to ignore them (because it
+ *     filters by `getAllTriggerEventTypes()`, which they're not in).
+ *   - A future retention cron can safely DELETE outbox events whose
+ *     reactive_log entry is `no-op:audit-only` and older than N days.
+ *   - The raw outbox_events COUNT no longer grows unbounded.
+ *
+ * Idempotent and safe to call from any cron lane. Defaults to 1000 events
+ * per call which keeps a single sweep under ~50ms typical Postgres latency.
+ */
+export const sweepAuditOnlyEvents = async (options?: {
+  batchSize?: number
+}): Promise<AuditOnlySweepResult> => {
+  const startMs = Date.now()
+  const runId = `sweep-audit-${randomUUID()}`
+  const batchSize = options?.batchSize ?? 1000
+
+  ensureProjectionsRegistered()
+
+  const handledEventTypes = getAllTriggerEventTypes()
+
+  // Fetch unprocessed events whose type is NOT in the handled set.
+  const events = await runGreenhousePostgresQuery<{ event_id: string; event_type: string }>(
+    `SELECT e.event_id, e.event_type
+       FROM greenhouse_sync.outbox_events e
+      WHERE e.status = 'published'
+        AND e.event_type <> ALL($1)
+        AND NOT EXISTS (
+          SELECT 1
+            FROM greenhouse_sync.outbox_reactive_log r
+           WHERE r.event_id = e.event_id
+        )
+      ORDER BY e.occurred_at ASC
+      LIMIT $2`,
+    [handledEventTypes, batchSize]
+  )
+
+  if (events.length === 0) {
+    return { runId, eventsSwept: 0, perEventType: {}, durationMs: Date.now() - startMs }
+  }
+
+  const perEventType: Record<string, number> = {}
+
+  for (const event of events) {
+    perEventType[event.event_type] = (perEventType[event.event_type] ?? 0) + 1
+  }
+
+  await bulkAcknowledgeEvents(
+    events.map(event => ({
+      eventId: event.event_id,
+      handler: NO_HANDLER_SENTINEL,
+      result: 'no-op:audit-only',
+      lastError: null,
+      retries: 0
+    }))
+  )
+
+  return {
+    runId,
+    eventsSwept: events.length,
+    perEventType,
+    durationMs: Date.now() - startMs
+  }
+}
+
 // ── Main consumer ──
 
 export const processReactiveEvents = async (options?: {

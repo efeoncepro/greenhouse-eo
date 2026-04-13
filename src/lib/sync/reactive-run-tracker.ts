@@ -34,7 +34,7 @@ const persistReactiveReplayContextSafely = async ({
 }: {
   runId: string
   status: ReactiveRunStatus
-  result?: ReactiveConsumerResult
+  result?: ReactiveRunSummary
   errorMessage?: string | null
   notes?: string | null
 }) => {

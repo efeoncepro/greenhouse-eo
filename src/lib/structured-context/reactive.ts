@@ -1,6 +1,6 @@
 import 'server-only'
 
-import type { ReactiveConsumerResult } from '@/lib/sync/reactive-consumer'
+import type { ReactiveRunSummary } from '@/lib/sync/reactive-run-tracker'
 
 import { createStructuredContext, getLatestStructuredContextByOwner } from './store'
 import type { ReactiveReplayContextDocument } from './types'
@@ -18,7 +18,7 @@ export const createReactiveReplayContext = async ({
 }: {
   runId: string
   status: ReactiveRunStatus
-  result?: ReactiveConsumerResult
+  result?: ReactiveRunSummary
   errorMessage?: string | null
   triggeredBy?: string | null
   sourceObjectType?: string | null

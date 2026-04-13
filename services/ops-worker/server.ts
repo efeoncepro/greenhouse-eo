@@ -19,7 +19,7 @@
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 
-import { processReactiveEvents, ensureReactiveSchema } from '@/lib/sync/reactive-consumer'
+import { processReactiveEvents, ensureReactiveSchema, sweepAuditOnlyEvents } from '@/lib/sync/reactive-consumer'
 import { claimOrphanedRefreshItems, markRefreshCompleted, markRefreshFailed } from '@/lib/sync/refresh-queue'
 import { getRegisteredProjections } from '@/lib/sync/projection-registry'
 import { ensureProjectionsRegistered } from '@/lib/sync/projections'
@@ -207,15 +207,48 @@ const handleReactiveRecover = async (req: IncomingMessage, res: ServerResponse) 
     ensureProjectionsRegistered()
 
     const recoverStartMs = Date.now()
+
+    // Audit-only sweep first: bulk-mark events whose type has zero
+    // registered projection handlers as no-op:audit-only so they stop
+    // accumulating in the raw outbox table. Always runs regardless of
+    // whether there are orphaned queue items.
+    let auditSweptCount = 0
+
+    try {
+      const sweep = await sweepAuditOnlyEvents({ batchSize: 1000 })
+
+      auditSweptCount = sweep.eventsSwept
+
+      if (auditSweptCount > 0) {
+        console.log(
+          `[ops-worker] /reactive/recover audit-only sweep — runId=${sweep.runId} swept=${auditSweptCount} ${sweep.durationMs}ms`
+        )
+      }
+    } catch (sweepError) {
+      console.error(
+        '[ops-worker] /reactive/recover audit-only sweep failed (non-fatal):',
+        sweepError instanceof Error ? sweepError.message : sweepError
+      )
+    }
+
     const orphans = await claimOrphanedRefreshItems(batchSize, staleMinutes)
 
     if (orphans.length === 0) {
       await writeReactiveRunComplete({
         runId,
-        result: { eventsProcessed: 0, eventsFailed: 0, projectionsTriggered: 0, durationMs: Date.now() - recoverStartMs }
+        result: { eventsProcessed: auditSweptCount, eventsFailed: 0, projectionsTriggered: 0, durationMs: Date.now() - recoverStartMs }
       })
 
-      json(res, 200, { runId, recovered: 0, failed: 0, message: 'No orphaned projections found' })
+      json(res, 200, {
+        runId,
+        recovered: 0,
+        failed: 0,
+        auditOnlySwept: auditSweptCount,
+        message:
+          auditSweptCount > 0
+            ? `No orphaned projections — swept ${auditSweptCount} audit-only events`
+            : 'No orphaned projections found'
+      })
 
       return
     }
@@ -256,7 +289,7 @@ const handleReactiveRecover = async (req: IncomingMessage, res: ServerResponse) 
     await writeReactiveRunComplete({
       runId,
       result: {
-        eventsProcessed: recovered,
+        eventsProcessed: recovered + auditSweptCount,
         eventsFailed: failed,
         projectionsTriggered: orphans.length,
         durationMs: recoverDurationMs
@@ -265,10 +298,10 @@ const handleReactiveRecover = async (req: IncomingMessage, res: ServerResponse) 
     })
 
     console.log(
-      `[ops-worker] /reactive/recover done — ${recovered} recovered, ${failed} failed out of ${orphans.length} orphans`
+      `[ops-worker] /reactive/recover done — ${recovered} recovered, ${failed} failed out of ${orphans.length} orphans, ${auditSweptCount} audit-only swept`
     )
 
-    json(res, 200, { runId, recovered, failed, total: orphans.length, details })
+    json(res, 200, { runId, recovered, failed, total: orphans.length, auditOnlySwept: auditSweptCount, details })
   } catch (error) {
     await writeReactiveRunFailure({ runId, error })
 
