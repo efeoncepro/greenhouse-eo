@@ -232,6 +232,26 @@ Además, la foundation debe salir con criterios enterprise explícitos para:
   - `pnpm build`
 - Bloqueo real detectado:
   - `pnpm pg:connect:migrate` no pudo aplicar en el shared dev DB porque ese entorno ya tiene corrida `20260413105218813_reactive-pipeline-v2-circuit-breaker` de `TASK-379`, migración que esta rama/worktree todavía no trae
+
+## Implementation Learnings
+
+- los tipos de documentos persistidos deben ser JSON puros también en TypeScript; `undefined` en objetos sidecar rompe el contrato aunque el runtime parezca aceptarlo
+- el fallback correcto para campos opcionales de documentos persistidos es `null`, no `undefined`
+- la capa gana mucho valor cuando el documento inválido cae primero en quarantine y luego falla; así no se pierde evidencia operativa
+- el primer piloto confirmó que un sidecar de contexto no debe derribar el flujo canónico si falla; en reactive tracking se aplicó degradación con warning en vez de caída dura del worker
+- la idempotencia funciona mejor como constraint acotado a `owner_aggregate_type + owner_aggregate_id + context_kind + idempotency_key`, no como llave global
+- no se justificó un índice GIN global sobre `document_jsonb` en la foundation; el lookup principal es por owner, kind, tenant y source system
+- trabajar con worktrees aislados puede exponer fricciones del toolchain local; Turbopack rechazó `node_modules` symlink fuera del root y hubo que instalar dependencias localmente en el worktree
+- el shared dev DB puede quedar adelantado respecto a la rama actual cuando varios agentes aplican migraciones en paralelo; eso debe tratarse como drift operativo, no automáticamente como fallo del cambio nuevo
+
+## Critical Considerations
+
+- no abrir `context_kind` nuevos sin validator, access scope, clasificación y retención explícita
+- no usar esta capa para diferir modelado relacional de datos que ya son contractuales o transaccionales
+- no persistir secretos, cookies, tokens ni blobs/base64 grandes
+- no asumir que todo consumer debe depender sin fallback del sidecar desde el día uno
+- si un documento empieza a usarse para joins, reporting o reglas de negocio, planear promoción a modelo relacional
+- cuando una migración de esta layer no aplica en un entorno compartido, verificar primero drift de historia con otras ramas antes de mezclar migraciones ajenas en la branch
 - [ ] La arquitectura y el criterio de uso quedan documentados para equipos y agentes
 - [ ] Existen reglas explícitas de clasificación, retención, access scope, redacción e idempotencia para la foundation
 - [ ] La foundation prohíbe secretos y blobs binarios en `document_jsonb` y define estrategia de quarantine para documentos inválidos

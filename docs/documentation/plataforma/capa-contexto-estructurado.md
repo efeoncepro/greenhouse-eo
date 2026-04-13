@@ -40,6 +40,151 @@ El primer uso real conectado es el tracking reactivo:
 
 La aplicación de la migración en el shared dev DB quedó pendiente por drift de historial entre ramas, pero la base runtime y el contrato ya quedaron implementados en repo.
 
+## Aprendizajes de implementación
+
+Estos aprendizajes ya deberían considerarse reglas prácticas para el equipo y para agentes.
+
+### 1. Un documento persistido debe ser JSON real, no "casi JSON"
+
+Esto parece obvio, pero en implementación pegó de inmediato.
+
+No basta con que el documento "se vea bien". También debe cumplir el contrato técnico de JSON puro:
+
+- sin `undefined`
+- sin funciones
+- sin instancias raras
+- sin objetos que no sean serializables de forma estable
+
+Regla práctica:
+
+- si un dato opcional no existe, usar `null`
+- no confiar en que un objeto con propiedades opcionales se va a serializar como esperas
+
+### 2. La capa debe dejar evidencia incluso cuando rechaza un documento
+
+Si algo falla al validar, no conviene perder la evidencia.
+
+Por eso la foundation deja quarantine antes de lanzar el error.
+
+En términos simples:
+
+- documento inválido no entra al flujo normal
+- pero tampoco desaparece
+- queda registro para revisar qué intentó escribirlo y por qué falló
+
+### 3. No todo consumer debe caerse si el sidecar falla
+
+En el primer piloto, el contexto estructurado se conectó al tracking reactivo.
+
+Ahí quedó claro algo importante:
+
+- cuando la capa agrega contexto pero no define la verdad canónica, debe degradar con seguridad
+
+Eso significa:
+
+- el `source_sync_run` sigue siendo el registro principal del run
+- el `event.replay_context` lo enriquece
+- si el sidecar falla, el worker no debería morir solo por eso
+
+### 4. No conviene indexar todo el JSONB "por si acaso"
+
+La implementación base no creó un índice GIN global sobre `document_jsonb`.
+
+La razón es simple:
+
+- primero se consulta por owner, tipo, source system, tenant y retención
+- el contenido interno del JSON no necesita indexarse masivamente desde el día uno
+
+Si aparece una necesidad real de búsqueda interna por documento, ese índice debe entrar de forma dirigida.
+
+### 5. La idempotencia correcta es local al aggregate
+
+Otro aprendizaje importante:
+
+- la idempotencia no debería ser global para toda la capa
+- debe acotarse por aggregate y `context_kind`
+
+Eso evita colisiones innecesarias y respeta la lógica sidecar del modelo.
+
+### 6. En trabajo multi-agente, la base compartida puede ir más adelantada que tu branch
+
+Esto pasó de verdad durante la implementación.
+
+La base dev compartida ya tenía una migración de otro frente (`TASK-379`) y eso impidió aplicar la nueva migración de `TASK-380` en orden.
+
+Qué implica:
+
+- una branch no puede asumir que la historia de migraciones local coincide con la de la base compartida
+- antes de empujar una migración, conviene revisar si el bloqueo viene por drift de ramas y no por un error del cambio nuevo
+
+### 7. El tooling local del worktree también importa
+
+Durante la validación apareció una fricción de Turbopack:
+
+- no aceptó un `node_modules` symlink que apuntaba fuera del root del worktree
+
+Aprendizaje práctico:
+
+- en worktrees aislados conviene usar `node_modules` local real al validar build
+- si no, puedes perder tiempo persiguiendo un falso error de aplicación
+
+## Aspectos críticos a tener en cuenta
+
+### No convertir la capa en basurero estructurado
+
+Si cada módulo empieza a meter:
+
+- `payload`
+- `data`
+- `metadata`
+- `extra`
+
+sin semántica ni policy, la capa se degrada muy rápido.
+
+La capa solo escala si cada documento entra con:
+
+- `context_kind`
+- política de retención
+- sensibilidad
+- validación
+- owner claro
+
+### No meter secretos ni binarios
+
+Esto no es opcional.
+
+No deben vivir aquí:
+
+- tokens
+- cookies
+- passwords
+- credenciales
+- blobs binarios o base64 grandes
+
+### Recordar siempre qué es verdad y qué es contexto
+
+La forma más sana de revisar una implementación es preguntarse:
+
+1. ¿esto define el negocio?
+2. ¿o esto explica, acompaña o contextualiza el negocio?
+
+Si define el negocio, va al modelo relacional.
+
+Si solo lo explica o lo acompaña, esta capa puede ser la salida correcta.
+
+### Pensar en promoción futura
+
+Un documento en JSONB no es necesariamente su forma final.
+
+Si con el tiempo ese dato:
+
+- se vuelve contractual
+- se consulta seguido
+- participa en reporting
+- se usa en reglas o permisos
+
+entonces debe promocionarse a columnas o tablas relacionales.
+
 ## Para que sirve
 
 Sirve para guardar cosas que sí importan operativamente, pero que no siempre justifican una tabla nueva desde el día uno.

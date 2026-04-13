@@ -26,6 +26,12 @@
 - bloqueo real:
   - `pnpm pg:connect:migrate` en shared dev DB falla por drift de historial: esa base ya tiene aplicada `20260413105218813_reactive-pipeline-v2-circuit-breaker` de `TASK-379`, pero esta rama/worktree no trae todavía esa migración
   - no mezclé esa migración ajena en esta branch para no cruzar lanes sin decisión explícita
+- aprendizajes críticos:
+  - documentos persistidos deben ser JSON puros también a nivel de tipos; `undefined` fue el principal roce de implementación
+  - el patrón correcto para valores opcionales es `null`
+  - quarantine-before-throw deja evidencia operativa mucho más útil que fallar en seco
+  - el piloto sidecar debe degradar con seguridad si falla, no romper el flujo canónico
+  - worktree aislado + Turbopack exige `node_modules` local real; un symlink fuera del root puede romper el build sin relación con el código
 
 ## Sesion 2026-04-13 — operating model multi-agent con worktrees formalizado
 

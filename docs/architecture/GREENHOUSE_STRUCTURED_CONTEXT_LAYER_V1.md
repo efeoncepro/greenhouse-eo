@@ -207,6 +207,160 @@ The layer must support stable querying by:
 
 The layer is intentionally designed to support AI and multi-agent development workflows, not just webhook payload storage.
 
+## Implementation Learnings — 2026-04-13
+
+These learnings are now normative guidance for future adopters of the layer.
+
+### 1. JSONB contracts must be valid JSON at the type level too
+
+It is not enough to validate documents only at runtime.
+
+The TypeScript types that represent persisted context must also exclude values that are not valid JSON, especially:
+
+- `undefined`
+- class instances
+- functions
+- non-plain objects
+
+Practical rule:
+
+- persisted document shapes should prefer `null` over `undefined` for missing optional values
+- helpers that build context documents should normalize optional numeric or text fields before writing
+
+Why this matters:
+
+- runtime validators may pass while the build still fails if the static type allows `undefined`
+- agent-written helpers tend to accidentally leak `undefined` into object literals
+
+### 2. Validation failure should quarantine before it throws
+
+The implementation confirmed that simple rejection is not enough.
+
+If a writer produces an invalid document and the platform only throws, the operational evidence is lost.
+
+Practical rule:
+
+- validation failure should persist a quarantine record first
+- only after the quarantine write should the writer raise a validation error
+
+Why this matters:
+
+- it leaves evidence for debugging and replay
+- it reduces silent loss of context during integration or agent experimentation
+
+### 3. Sidecar failure must not break canonical operational flows by default
+
+The first pilot was connected to reactive run tracking.
+
+That integration taught an important rule:
+
+- if the context write is auxiliary and the canonical flow already has a source of truth, the sidecar should fail in degraded mode
+
+Practical rule:
+
+- core writes stay authoritative in their own canonical tables
+- structured context writes should be wrapped defensively when they are enrichment, not transaction truth
+
+Why this matters:
+
+- the reactive worker cannot be allowed to fail only because replay context persistence failed
+- the layer must be additive before it becomes dependency-critical
+
+### 4. Do not add blanket JSONB GIN indexing on day one
+
+The foundation deliberately avoided a broad GIN index on `document_jsonb`.
+
+Practical rule:
+
+- index owner, kind, source system, tenant scope, retention and idempotency first
+- add targeted JSONB indexing only when a concrete read pattern proves necessary
+
+Why this matters:
+
+- blanket JSONB indexing is expensive and easy to cargo-cult
+- the layer is primarily governed lookup by owner and kind, not free-form document search
+
+### 5. Idempotency must be scoped, not global
+
+The first implementation confirmed that idempotency works best when bounded by:
+
+- `owner_aggregate_type`
+- `owner_aggregate_id`
+- `context_kind`
+- `idempotency_key`
+
+Practical rule:
+
+- never model a global idempotency key for the whole layer
+- the same producer may legitimately reuse the same key shape on different aggregates
+
+Why this matters:
+
+- context documents are sidecars to aggregates
+- aggregate-local semantics are the correct boundary
+
+### 6. Shared dev databases can drift ahead of a branch in multi-agent workflows
+
+This was not a theory; it happened during implementation.
+
+The shared dev DB already had a later migration from `TASK-379`, which prevented `TASK-380` from applying its own migration in order.
+
+Practical rule:
+
+- when multiple agents work in parallel, a branch cannot assume the shared DB migration history matches its local migration tree
+- before forcing a migrate, verify whether the DB is ahead because of another active branch
+- do not mix unrelated migrations into the branch only to make `migrate:up` green without an explicit merge decision
+
+Why this matters:
+
+- the migration history is shared operational state
+- careless catch-up can cross lanes and muddy branch ownership
+
+### 7. Worktree-local build tooling matters
+
+The worktree implementation exposed a concrete Next.js/Turbopack caveat:
+
+- Turbopack rejected a `node_modules` symlink that pointed outside the worktree root
+
+Practical rule for agents:
+
+- when validating builds from an isolated worktree, use a real local `node_modules` directory
+- do not assume a symlinked dependency tree is always acceptable to the frontend toolchain
+
+Why this matters:
+
+- a build failure caused by worktree plumbing can be mistaken for an application regression
+- this is especially relevant in multi-agent execution where isolated worktrees are now the expected pattern
+
+## Critical Considerations For Future Adoption
+
+### When this layer is the right tool
+
+Use it when the platform needs:
+
+- machine-readable context that survives beyond logs or chat
+- typed replay or audit evidence attached to a canonical aggregate
+- flexible payload normalization without polluting core relational tables
+- agent memory that must be reusable by runtime and humans
+
+### When this layer is the wrong tool
+
+Do not use it to:
+
+- postpone relational modeling of important business truth
+- store credentials, access tokens, cookies or raw secrets
+- hide large binary/base64 payloads in PostgreSQL
+- replace tenant ownership or permission models
+- invent ungoverned per-module `context_kind` values with no validator or retention rule
+
+### What must remain true for the layer to stay enterprise-grade
+
+- every `context_kind` has an explicit policy
+- every writer uses runtime validation
+- invalid documents leave an audit trail in quarantine
+- enrichment writes do not casually take down canonical flows
+- promotion from JSONB to relational remains an expected lifecycle, not a failure
+
 ## Agent Decision Rules — When To Use Relational Columns, JSONB, JSON, Or Neither
 
 This section is normative for agents and developers working on Greenhouse.
