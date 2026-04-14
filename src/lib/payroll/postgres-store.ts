@@ -2153,22 +2153,22 @@ export const pgListPayrollCompensationMembers = async (): Promise<PayrollCompens
         GROUP BY member_id
       ),
       current_compensation AS (
-        SELECT DISTINCT ON (member_id)
-          member_id,
-          version_id AS current_version_id,
-          effective_from AS current_effective_from,
-          contract_type AS current_contract_type,
-          pay_regime AS current_pay_regime,
+        SELECT DISTINCT ON (cv.member_id)
+          cv.member_id,
+          cv.version_id AS current_version_id,
+          cv.effective_from AS current_effective_from,
+          cv.contract_type AS current_contract_type,
+          cv.pay_regime AS current_pay_regime,
           m.payroll_via AS current_payroll_via,
           m.daily_required AS current_daily_required,
           m.deel_contract_id AS current_deel_contract_id,
           m.contract_end_date,
-          currency AS current_currency
+          cv.currency AS current_currency
         FROM greenhouse_payroll.compensation_versions AS cv
         INNER JOIN greenhouse_core.members AS m ON m.member_id = cv.member_id
-        WHERE effective_from <= CURRENT_DATE
-          AND (effective_to IS NULL OR effective_to >= CURRENT_DATE)
-        ORDER BY member_id, effective_from DESC, version DESC
+        WHERE cv.effective_from <= CURRENT_DATE
+          AND (cv.effective_to IS NULL OR cv.effective_to >= CURRENT_DATE)
+        ORDER BY cv.member_id, cv.effective_from DESC, cv.version DESC
       )
       SELECT
         m.member_id,

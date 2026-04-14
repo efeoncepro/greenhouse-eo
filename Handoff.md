@@ -30,6 +30,11 @@
   - nueva prueba focalizada que inspecciona el SQL y asegura que el reader quede aliasado
 - **Validación ejecutada:**
   - `pnpm exec vitest run src/lib/payroll/postgres-store.test.ts`
+  - runtime local autenticado:
+    - `POST /api/auth/agent-session` -> `200`
+    - `GET /api/hr/payroll/compensation` -> `200`
+    - payload post-fix: `compensations=6`, `members=7`, `eligibleMembers=1`
+    - `GET /hr/payroll` -> `200`
 - **Decisión explícita de no tocar en este lote:**
   - `pgGetCompensationOverview()` sigue degradando silenciosamente si falla el reader de miembros
   - se dejó igual para mantener backward compatibility y limitar el diff al root cause confirmado del issue
